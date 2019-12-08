@@ -30,11 +30,13 @@ DEFINE_DEVICE_TYPE(SUN4C_MMU, sun4c_mmu_device, "sun4c_mmu", "Sun 4c MMU")
 #define LOG_UNKNOWN_SYSTEM  (1U << 9)
 #define LOG_UNKNOWN_SEGMENT (1U << 10)
 #define LOG_TYPE0_TIMEOUT   (1U << 11)
-#define LOG_UNKNOWN_SPACE   (1U << 12)
-#define LOG_WRITE_PROTECT   (1U << 13)
-#define LOG_ALL_ASI         (1U << 14) // WARNING: Heavy!
+#define LOG_TYPE1_TIMEOUT   (1U << 12)
+#define LOG_UNKNOWN_SPACE   (1U << 13)
+#define LOG_WRITE_PROTECT   (1U << 14)
+#define LOG_PARITY			(1U << 15)
+#define LOG_ALL_ASI         (1U << 16) // WARNING: Heavy!
 
-#define VERBOSE (0)
+#define VERBOSE (LOG_CACHE_TAGS)
 #include "logmacro.h"
 
 sun4_mmu_base_device::sun4_mmu_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -108,6 +110,7 @@ void sun4_mmu_base_device::device_start()
 	save_item(NAME(m_system_enable));
 	save_item(NAME(m_fetch_bootrom));
 	save_item(NAME(m_buserr));
+	save_item(NAME(m_type1_offset));
 	save_item(NAME(m_ctx_mask));
 	save_item(NAME(m_pmeg_mask));
 	save_item(NAME(m_page_mask));
@@ -118,6 +121,9 @@ void sun4_mmu_base_device::device_start()
 	save_item(NAME(m_ram_set_mask));
 	save_item(NAME(m_ram_set_base));
 	save_item(NAME(m_populated_ram_words));
+	save_item(NAME(m_parity_err_reg));
+	save_item(NAME(m_memory_err_reg));
+	save_item(NAME(m_parity_err));
 
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
@@ -128,6 +134,7 @@ void sun4_mmu_base_device::device_start()
 
 void sun4_mmu_base_device::device_reset()
 {
+	m_log_mem = false;
 	m_rom_ptr = (uint32_t *)m_rom->base();
 	m_ram_ptr = (uint32_t *)m_ram->pointer();
 	m_ram_size = m_ram->size();
@@ -163,7 +170,7 @@ void sun4_mmu_base_device::device_reset()
 	m_system_enable = 0;
 	m_fetch_bootrom = true;
 
-	memset(m_buserr, 0, sizeof(uint32_t) * 4);
+	memset(m_buserr, 0, sizeof(uint32_t) * 8);
 	for (int i = 0; i < 16; i++)
 	{
 		memset(&m_segmap[i][0], 0, 4096);
@@ -252,6 +259,37 @@ void sun4_mmu_base_device::write_asi(uint8_t asi, uint32_t offset, uint32_t data
 			return;
 		default:
 			return;
+	}
+}
+
+uint32_t sun4_mmu_base_device::parity_r(uint32_t offset, uint32_t mem_mask)
+{
+	if (offset == 0)
+	{
+		const uint32_t data = m_parity_err_reg;
+		logerror("%s: parity_err_reg read: %08x & %08x\n", machine().describe_context(), m_parity_err_reg, mem_mask);
+		m_parity_err_reg &= ~0xcf;
+		return data;
+	}
+	else if (offset == 1)
+	{
+		logerror("%s: memory_err_reg read: %08x & %08x\n", machine().describe_context(), m_memory_err_reg, mem_mask);
+		return m_memory_err_reg;
+	}
+	return 0;
+}
+
+void sun4_mmu_base_device::parity_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
+{
+	if (offset == 0)
+	{
+		logerror("%s: parity_err_reg write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_parity_err_reg);
+	}
+	else
+	{
+		logerror("%s: memory_err_reg write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_memory_err_reg);
 	}
 }
 
@@ -357,30 +395,30 @@ void sun4_mmu_base_device::system_w(const uint32_t offset, const uint32_t data, 
 			LOGMASKED(LOG_BUSERROR, "write bus error %08x = %08x & %08x\n", offset << 2, data, mem_mask);
 			if (masked_offset == 0)
 				m_buserr[0] = (data & 0x000000ff) | 0x00008000;
-			else if (masked_offset == 1)
-				m_buserr[1] = data;
-			else if (masked_offset == 2)
-				m_buserr[2] = data & 0x000000b0;
-			else if (masked_offset == 3)
-				m_buserr[3] = (data & 0x3fffffff) | ((data & 0x20000000) << 1) | ((data & 0x20000000) << 2);
+			else
+				m_buserr[masked_offset] = data;
 			return;
 		}
 
 		case 8: // cache tags
-			LOGMASKED(LOG_CACHE_TAGS, "write cache tags %08x = %08x & %08x\n", offset << 2, data, mem_mask);
+			LOGMASKED(LOG_CACHE_TAGS, "%s: write cache tags %08x = %08x & %08x\n", machine().describe_context(), offset << 2, data, mem_mask);
 			m_cachetags[offset & m_cache_mask] = data & 0x03f8fffc;
+			if (m_cpu->pc() == 0xFFE8B940)
+			{
+				m_log_mem = true;
+			}
 			return;
 
 		case 9: // cache data
 			LOGMASKED(LOG_CACHE_DATA, "write cache data %08x = %08x & %08x\n", offset << 2, data, mem_mask);
-			m_cachedata[offset & m_cache_mask] = data | (1 << 19);
+			m_cachedata[offset & m_cache_mask] = data;
 			return;
 
 		case 0xf:   // UART bypass
 			switch (offset & 3)
 			{
 				case 0: if (mem_mask == 0xff000000) m_scc->cb_w(0, data>>24); else m_scc->db_w(0, data>>8); break;
-				case 1: if (mem_mask == 0xff000000) m_scc->ca_w(0, data>>24); else { m_scc->da_w(0, data>>8); printf("%c", data>>8); } break;
+				case 1: if (mem_mask == 0xff000000) m_scc->ca_w(0, data>>24); else { m_scc->da_w(0, data>>8); logerror("%c\n", data>>8); printf("%c", data>>8); } break;
 			}
 			return;
 
@@ -453,6 +491,21 @@ void sun4_mmu_base_device::type0_timeout_w(const uint32_t offset)
 	m_host->set_mae();
 }
 
+uint32_t sun4_mmu_base_device::type1_timeout_r(uint32_t offset)
+{
+	LOGMASKED(LOG_TYPE1_TIMEOUT, "type 1 read timeout %08x, PC=%08x\n", offset << 2, m_cpu->pc());
+	m_buserr[2] = 0x20; // read timeout
+	m_buserr[3] = m_type1_offset << 2;
+	return 0;
+}
+
+void sun4_mmu_base_device::type1_timeout_w(uint32_t offset, uint32_t data)
+{
+	LOGMASKED(LOG_TYPE1_TIMEOUT, "type 1 write timeout %08x = %08x, PC=%08x\n", offset << 2, data, m_cpu->pc());
+	m_buserr[2] = 0x120; // write timeout
+	m_buserr[3] = m_type1_offset << 2;
+}
+
 uint32_t sun4_mmu_base_device::page_entry_to_uint(uint32_t index)
 {
 	const page_entry &pe = m_pagemap[index];
@@ -467,6 +520,12 @@ void sun4_mmu_base_device::merge_page_entry(uint32_t index, uint32_t data, uint3
 	pe.writable = new_value & PM_WRITEMASK;
 	pe.supervisor = new_value & PM_SYSMASK;
 	pe.uncached = new_value & PM_CACHE;
+
+	if (pe.uncached)
+		logerror("page entry %05x is uncached\n", index);
+	else
+		logerror("page entry %05x is cached\n", index);
+
 	pe.type = (new_value & PM_TYPEMASK) >> 26;
 	pe.accessed = new_value & PM_ACCESSED;
 	pe.modified = new_value & PM_MODIFIED;
@@ -484,6 +543,8 @@ uint32_t sun4_mmu_base_device::insn_data_r(const uint32_t offset, const uint32_t
 	// supervisor program fetches in boot state are special
 	if (MODE == SUPER_INSN && m_fetch_bootrom)
 	{
+		if (!machine().side_effects_disabled())
+			m_cpu->eat_cycles(50); // !?
 		return m_rom_ptr[offset & 0x1ffff];
 	}
 
@@ -503,9 +564,44 @@ uint32_t sun4_mmu_base_device::insn_data_r(const uint32_t offset, const uint32_t
 		case 0: // type 0 space
 			if (tmp < m_populated_ram_words)
 			{
+				if (BIT(m_parity_err_reg, 4) && m_parity_err)
+				{
+					logerror("%s: ram read with parity %08x: %08x & %08x\n", machine().describe_context(), m_parity_err_reg, offset, mem_mask);
+					m_parity_err_reg |= m_parity_err;
+					if (BIT(m_parity_err_reg, 7))
+					{
+						m_parity_err_reg |= (1 << 6);
+					}
+					uint8_t boffs = 0;
+
+					if (ACCESSING_BITS_24_31)
+						boffs = 0;
+					else if (ACCESSING_BITS_16_23)
+						boffs = 1;
+					else if (ACCESSING_BITS_8_15)
+						boffs = 2;
+					else if (ACCESSING_BITS_0_7)
+						boffs = 3;
+
+					m_parity_err_reg |= (1 << 7);
+					m_parity_err = 0;
+					m_buserr[0] = 0x8; // Read cycle, memory error
+					m_buserr[1] = (offset << 2) | boffs;
+					m_host->set_mae();
+				}
+				if (!entry.uncached)
+				{
+					const uint32_t cache_entry = (offset >> 2) & 0xfff;
+					m_cachetags[cache_entry] |= (1 << 19);
+					m_cachetags[cache_entry] &= ~(3 << 20);
+					m_cachetags[cache_entry] |= entry.supervisor ? (1 << 20) : (0 << 20);
+					m_cachetags[cache_entry] |= entry.writable ? (1 << 21) : (0 << 21);
+				}
 				const uint32_t set = (tmp >> 22) & 3;
 				const uint32_t addr_mask = m_ram_set_mask[set];
 				const uint32_t masked_addr = m_ram_set_base[set] + (tmp & addr_mask);
+				//if (m_log_mem)
+					//logerror("RAM read: %08x (%08x)\n", offset << 2, tmp << 2);
 				return m_ram_ptr[masked_addr];
 			}
 			else if (tmp >= 0x4000000 >> 2 && tmp < 0x10000000 >> 2)
@@ -515,6 +611,7 @@ uint32_t sun4_mmu_base_device::insn_data_r(const uint32_t offset, const uint32_t
 			return ~0;
 
 		case 1: // type 1 space
+			m_type1_offset = offset;
 			return m_type1_r(tmp, mem_mask);
 
 		default:
@@ -588,10 +685,25 @@ void sun4_mmu_base_device::insn_data_w(const uint32_t offset, const uint32_t dat
 		case 0: // type 0
 			if (tmp < m_populated_ram_words)
 			{
+				if (BIT(m_parity_err_reg, 5))
+				{
+					logerror("%s: ram write with parity %08x: %08x = %08x & %08x\n", machine().describe_context(), m_parity_err_reg, offset, data, mem_mask);
+					if (ACCESSING_BITS_24_31)
+						m_parity_err |= (1 << 0);
+					if (ACCESSING_BITS_16_23)
+						m_parity_err |= (1 << 1);
+					if (ACCESSING_BITS_8_15)
+						m_parity_err |= (1 << 2);
+					if (ACCESSING_BITS_0_7)
+						m_parity_err |= (1 << 3);
+				}
+				m_cachetags[(offset >> 4) & m_cache_mask] |= (1 << 19);
 				const uint32_t set = (tmp >> 22) & 3;
 				const uint32_t addr_mask = m_ram_set_mask[set];
 				const uint32_t masked_addr = m_ram_set_base[set] + (tmp & addr_mask);
 				COMBINE_DATA((m_ram_ptr + masked_addr));
+				//if (m_log_mem)
+					//logerror("RAM write: %08x (%08x) = %08x\n", offset << 2, tmp << 2, data);
 			}
 			else if (tmp >= 0x4000000 >> 2 && tmp < 0x10000000 >> 2)
 			{
@@ -600,6 +712,7 @@ void sun4_mmu_base_device::insn_data_w(const uint32_t offset, const uint32_t dat
 			return;
 
 		case 1: // type 1
+			m_type1_offset = offset;
 			m_type1_w(tmp, data, mem_mask);
 			return;
 

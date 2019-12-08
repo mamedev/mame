@@ -209,7 +209,7 @@ void rmnimbus_state::nimbus(machine_config &config)
 	msm5205.set_prescaler_selector(msm5205_device::S48_4B);      /* 8 kHz */
 	msm5205.add_route(ALL_OUTPUTS, MONO_TAG, 0.75);
 
-	SOFTWARE_LIST(config, "disk_list").set_type("nimbus", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "disk_list").set_original("nimbus");
 }
 
 

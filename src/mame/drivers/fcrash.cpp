@@ -1352,8 +1352,6 @@ void fcrash_state::fcrash_render_layer( screen_device &screen, bitmap_ind16 &bit
 
 void fcrash_state::fcrash_render_high_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer )
 {
-	bitmap_ind16 dummy_bitmap;
-
 	switch (layer)
 	{
 		case 0:
@@ -1362,7 +1360,7 @@ void fcrash_state::fcrash_render_high_layer( screen_device &screen, bitmap_ind16
 		case 1:
 		case 2:
 		case 3:
-			m_bg_tilemap[layer - 1]->draw(screen, dummy_bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
+			m_bg_tilemap[layer - 1]->draw(screen, m_dummy_bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
 			break;
 	}
 }

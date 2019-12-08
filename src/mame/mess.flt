@@ -177,6 +177,8 @@ crvision.cpp
 ct486.cpp
 cvicny.cpp
 cxg_ch2001.cpp
+cxg_dominator.cpp
+cxg_sphinx40.cpp
 cxhumax.cpp
 cybiko.cpp
 cz101.cpp
@@ -399,6 +401,7 @@ isbc.cpp
 isbc8010.cpp
 isbc8030.cpp
 iskr103x.cpp
+itc4.cpp
 itt1700.cpp
 itt3030.cpp
 itt9216.cpp
@@ -709,6 +712,7 @@ rc759.cpp
 rcm32p.cpp
 rd100.cpp
 rd110.cpp
+regence.cpp
 replicator.cpp
 rex6000.cpp
 riscpc.cpp
@@ -908,6 +912,7 @@ v102.cpp
 v550.cpp
 v1050.cpp
 v6809.cpp
+vanguardmk1.cpp
 vax11.cpp
 vboy.cpp
 vc4000.cpp

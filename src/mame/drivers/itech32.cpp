@@ -82,8 +82,8 @@
 
         Some time in 2004 I.T. introduced a new bowling game called Silver Strike Bowling on a full
         blown PC system known as "Nighthawk System Box" (AKA The Nighthawk Chassis) to replace it's
-        aging World Class Bowling game.  Other known games on this platform include Golden Tee Live!
-        and Target Toss Pro: Bags
+        aging World Class Bowling game.  Other known games on this platform include Golden Tee Live!,
+        Power Putt Golf (Mini-Golf) and Target Toss Pro: Lawn Darts / Bags
 
     Trivia: For the Golden Tee series, the second generation was called GT2.  The third gen was known
             as GT3 but also included Golden Tee '97 through 2K and Classic.  The fourth gen on the
@@ -1737,14 +1737,14 @@ void drivedge_state::drivedge(machine_config &config)
 	m_via->writepb_handler().set(FUNC(drivedge_state::portb_out));
 	m_via->cb2_handler().set(FUNC(drivedge_state::turbo_light));
 
-//  M6803(config, "comm", 8000000/4); -- network CPU
+//  M6803(config, "comm", 8000000/4); -- network CPU MC68803P
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	m_screen->screen_vblank().set_nop(); // interrupt not used?
 
-	SPEAKER(config, "left_back").front_left();
-	SPEAKER(config, "right_back").front_right();
+	SPEAKER(config, "left_back").front_left();   /* Sound PCB has hook-ups & AMPs for 5 channels */
+	SPEAKER(config, "right_back").front_right(); /* As per Sound Tests Menu: Left Front, Right Front, Left Rear, Right Rear, Under Seat */
 
 	m_ensoniq->set_channels(2);
 	m_ensoniq->add_route(2, "right_back", 0.1);  /* swapped stereo */
@@ -2834,44 +2834,44 @@ ROM_END
 
 
 ROM_START( drivedge )
-	ROM_REGION32_BE( 0x8000, "user1", 0 )
-	ROM_LOAD( "de_v1.6-u130.bin", 0x00000, 0x8000, CRC(873579b0) SHA1(ce7fcbea780aee376c2f4c659a75fcf6b7abbdb4) )
+	ROM_REGION32_BE( 0x8000, "user1", 0 ) /* Main board P/N 1053 REV3 */
+	ROM_LOAD( "itde_er_u130_v1.0.u130", 0x00000, 0x8000, CRC(873579b0) SHA1(ce7fcbea780aee376c2f4c659a75fcf6b7abbdb4) ) /* Labeled as "ITDE ER (U130) V1.0" */
 
-	ROM_REGION( 0x28000, "soundcpu", 0 )
-	ROM_LOAD( "desndu17.bin", 0x10000, 0x18000, CRC(6e8ca8bc) SHA1(98ad36877b40123b0396943754234df8de183687) )
-	ROM_CONTINUE(             0x08000, 0x08000 )
+	ROM_REGION( 0x28000, "soundcpu", 0 ) /* Sound board P/N 1054 REV2 */
+	ROM_LOAD( "itde_sndu17_v1.2.u17", 0x10000, 0x18000, CRC(6e8ca8bc) SHA1(98ad36877b40123b0396943754234df8de183687) ) /* Labeled as "ITDE SND(U17) V1.2" */
+	ROM_CONTINUE(                     0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "cpu4", 0 )
-	ROM_LOAD( "de-u7net.bin", 0x08000, 0x08000, CRC(dea8b9de) SHA1(46ba3a549522d7e6a32792814a04fd34839c7e55) )
+	ROM_REGION( 0x10000, "cpu4", 0 ) /* Network daughterboard P/N 1055 REV3 */
+	ROM_LOAD( "vidnet_v1.0_u7.u7", 0x08000, 0x08000, CRC(dea8b9de) SHA1(46ba3a549522d7e6a32792814a04fd34839c7e55) ) /* Labeled as "VIDNET V1.0 (U7)" */
 
-	ROM_REGION( 0xa00000, "gfx1", 0 )
-	ROM_LOAD32_BYTE( "de-grom0.bin", 0x000000, 0x80000, CRC(7fe5b01b) SHA1(b31e48971253d77e2277434b1b1590cbbea2209f) )
-	ROM_LOAD32_BYTE( "de-grom5.bin", 0x000001, 0x80000, CRC(5ea6dbc2) SHA1(c2de55ec6a527d0555504070a7ecb43b8aa797ea) )
-	ROM_LOAD32_BYTE( "de-grm10.bin", 0x000002, 0x80000, CRC(76be06cd) SHA1(b533a07853b531e318c5a85139a74ca3edb9089f) )
-	ROM_LOAD32_BYTE( "de-grm15.bin", 0x000003, 0x80000, CRC(119bf46b) SHA1(67f5434581d5f0042c7acd36d2c64ffe69efaa76) )
-	ROM_LOAD32_BYTE( "de-grom1.bin", 0x200000, 0x80000, CRC(5b88e8b7) SHA1(04f05d9e811697c28a5671df6a9530594978decc) )
-	ROM_LOAD32_BYTE( "de-grom6.bin", 0x200001, 0x80000, CRC(2cb76b9a) SHA1(0db32cb572121c8a751dcce55b94adc48f9be738) )
-	ROM_LOAD32_BYTE( "de-grm11.bin", 0x200002, 0x80000, CRC(5d29018c) SHA1(11f346afedfac4f7b0d5d4995dd38ec2d7fc7777) )
-	ROM_LOAD32_BYTE( "de-grm16.bin", 0x200003, 0x80000, CRC(476940fb) SHA1(00dab9aeb0d5cc23e4f78f15cb976ddcafa63b42) )
-	ROM_LOAD32_BYTE( "de-grom2.bin", 0x400000, 0x80000, CRC(5ccc4c62) SHA1(fc49bba2208a1157fe0948fcadac79c597f382c4) )
-	ROM_LOAD32_BYTE( "de-grom7.bin", 0x400001, 0x80000, CRC(45367070) SHA1(c7cf074f95cf287c4caf70d2286608c50ad01044) )
-	ROM_LOAD32_BYTE( "de-grm12.bin", 0x400002, 0x80000, CRC(b978ef5a) SHA1(d1fce9c7966b8324ce1a4a99d92cd69ec32f5c47) )
-	ROM_LOAD32_BYTE( "de-grm17.bin", 0x400003, 0x80000, CRC(eff8abac) SHA1(83da116368fae05a0c3c12ea72656681912a1175) )
-	ROM_LOAD32_BYTE( "de-grom3.bin", 0x600000, 0x20000, CRC(9cd252c9) SHA1(7db6bdeeb2967154cd104ac2e20761cb99046d70) )
-	ROM_LOAD32_BYTE( "de-grom8.bin", 0x600001, 0x20000, CRC(43f10ca4) SHA1(9eb0e2fd1adc25b334f86582be8e5960de0caba7) )
-	ROM_LOAD32_BYTE( "de-grm13.bin", 0x600002, 0x20000, CRC(431d131e) SHA1(efe5a4aa65fde1f094adc6e701db8be94a4b625c) )
-	ROM_LOAD32_BYTE( "de-grm18.bin", 0x600003, 0x20000, CRC(b09e0d9c) SHA1(b14ff39b028c0070ccca601c21542896168bd0b7) )
-	ROM_LOAD32_BYTE( "de-grom4.bin", 0x800000, 0x20000, CRC(c499cdfa) SHA1(acec47fb606f999f9d88fdce1b5860d5afcd5106) )
-	ROM_LOAD32_BYTE( "de-grom9.bin", 0x800001, 0x20000, CRC(e5f21566) SHA1(ce41c7e808799eea217e14e9aabe6ce617f87287) )
-	ROM_LOAD32_BYTE( "de-grm14.bin", 0x800002, 0x20000, CRC(09dbe382) SHA1(a85ecba433eb9bb75b4060d1b6391f66f4c8146c) )
-	ROM_LOAD32_BYTE( "de-grm19.bin", 0x800003, 0x20000, CRC(4ced78e1) SHA1(7995c8684ca28cbdf620d10297850463fa473fe8) )
+	ROM_REGION( 0xa00000, "gfx1", 0 ) /* ROM board P/N 1049 REV1 */
+	ROM_LOAD32_BYTE( "grom0_itde_gv1.2.grom0",   0x000000, 0x80000, CRC(7fe5b01b) SHA1(b31e48971253d77e2277434b1b1590cbbea2209f) ) /* These 8 labeled as GV1.2 */
+	ROM_LOAD32_BYTE( "grom5_itde_gv1.2.grom5",   0x000001, 0x80000, CRC(5ea6dbc2) SHA1(c2de55ec6a527d0555504070a7ecb43b8aa797ea) )
+	ROM_LOAD32_BYTE( "grom10_itde_gv1.2.grom10", 0x000002, 0x80000, CRC(76be06cd) SHA1(b533a07853b531e318c5a85139a74ca3edb9089f) )
+	ROM_LOAD32_BYTE( "grom15_itde_gv1.2.grom15", 0x000003, 0x80000, CRC(119bf46b) SHA1(67f5434581d5f0042c7acd36d2c64ffe69efaa76) )
+	ROM_LOAD32_BYTE( "grom1_itde_gv1.2.grom1",   0x200000, 0x80000, CRC(5b88e8b7) SHA1(04f05d9e811697c28a5671df6a9530594978decc) )
+	ROM_LOAD32_BYTE( "grom6_itde_gv1.2.grom6",   0x200001, 0x80000, CRC(2cb76b9a) SHA1(0db32cb572121c8a751dcce55b94adc48f9be738) )
+	ROM_LOAD32_BYTE( "grom11_itde_gv1.2.grom11", 0x200002, 0x80000, CRC(5d29018c) SHA1(11f346afedfac4f7b0d5d4995dd38ec2d7fc7777) )
+	ROM_LOAD32_BYTE( "grom16_itde_gv1.2.grom16", 0x200003, 0x80000, CRC(476940fb) SHA1(00dab9aeb0d5cc23e4f78f15cb976ddcafa63b42) )
+	ROM_LOAD32_BYTE( "grom2_itde_dv1.2.grom2",   0x400000, 0x80000, CRC(5ccc4c62) SHA1(fc49bba2208a1157fe0948fcadac79c597f382c4) ) /* These 4 labeled as DV1.2 */
+	ROM_LOAD32_BYTE( "grom7_itde_dv1.2.grom7",   0x400001, 0x80000, CRC(45367070) SHA1(c7cf074f95cf287c4caf70d2286608c50ad01044) )
+	ROM_LOAD32_BYTE( "grom12_itde_dv1.2.grom12", 0x400002, 0x80000, CRC(b978ef5a) SHA1(d1fce9c7966b8324ce1a4a99d92cd69ec32f5c47) )
+	ROM_LOAD32_BYTE( "grom17_itde_dv1.2.grom17", 0x400003, 0x80000, CRC(eff8abac) SHA1(83da116368fae05a0c3c12ea72656681912a1175) )
+	ROM_LOAD32_BYTE( "grom3_itde_mv1.2.grom3",   0x600000, 0x20000, CRC(9cd252c9) SHA1(7db6bdeeb2967154cd104ac2e20761cb99046d70) ) /* These 4 labeled as MV1.2 */
+	ROM_LOAD32_BYTE( "grom8_itde_mv1.2.grom8",   0x600001, 0x20000, CRC(43f10ca4) SHA1(9eb0e2fd1adc25b334f86582be8e5960de0caba7) )
+	ROM_LOAD32_BYTE( "grom13_itde_mv1.2.grom13", 0x600002, 0x20000, CRC(431d131e) SHA1(efe5a4aa65fde1f094adc6e701db8be94a4b625c) )
+	ROM_LOAD32_BYTE( "grom18_itde_mv1.2.grom18", 0x600003, 0x20000, CRC(b09e0d9c) SHA1(b14ff39b028c0070ccca601c21542896168bd0b7) )
+	ROM_LOAD32_BYTE( "grom4_itde_pv1.6.grom4",   0x800000, 0x20000, CRC(c499cdfa) SHA1(acec47fb606f999f9d88fdce1b5860d5afcd5106) ) /* These 4 labeled as PV1.6 */
+	ROM_LOAD32_BYTE( "grom9_itde_pv1.6.grom9",   0x800001, 0x20000, CRC(e5f21566) SHA1(ce41c7e808799eea217e14e9aabe6ce617f87287) )
+	ROM_LOAD32_BYTE( "grom14_itde_pv1.6.grom14", 0x800002, 0x20000, CRC(09dbe382) SHA1(a85ecba433eb9bb75b4060d1b6391f66f4c8146c) )
+	ROM_LOAD32_BYTE( "grom19_itde_pv1.6.grom19", 0x800003, 0x20000, CRC(4ced78e1) SHA1(7995c8684ca28cbdf620d10297850463fa473fe8) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 ) /* Sound board P/N 1054 REV2 */
 	ROM_LOAD16_BYTE( "ensoniq.2m", 0x000000, 0x200000, CRC(9fdc4825) SHA1(71e5255c66d9010be7e6f27916b605441fc53839) ) /* Ensoniq 2m 1350901601 */
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "de-srom0.bin", 0x000000, 0x80000, CRC(649c685f) SHA1(95d8f257cac621c8bd4abaa88ea5f7b3b8adea4c) )
-	ROM_LOAD16_BYTE( "de-srom1.bin", 0x100000, 0x80000, CRC(df4fff97) SHA1(3c43623bfc176639417e86a037b92026e84a5dce) )
+	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 ) /* Sound board P/N 1054 REV2 */
+	ROM_LOAD16_BYTE( "srom0_itde_v1.0.srom0", 0x000000, 0x80000, CRC(649c685f) SHA1(95d8f257cac621c8bd4abaa88ea5f7b3b8adea4c) )
+	ROM_LOAD16_BYTE( "srom1_itde_v1.0.srom1", 0x100000, 0x80000, CRC(df4fff97) SHA1(3c43623bfc176639417e86a037b92026e84a5dce) )
 ROM_END
 
 

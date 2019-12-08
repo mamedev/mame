@@ -1109,6 +1109,7 @@ shtzone.cpp
 shuuz.cpp
 sidearms.cpp
 sidepckt.cpp
+sigma21.cpp
 sigmab52.cpp
 sigmab98.cpp
 silkroad.cpp
@@ -1224,6 +1225,7 @@ suprridr.cpp
 suprslam.cpp
 supstarf.cpp
 surpratk.cpp
+sweetland.cpp
 system1.cpp
 system16.cpp
 tagteam.cpp

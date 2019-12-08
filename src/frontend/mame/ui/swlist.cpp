@@ -357,7 +357,7 @@ void menu_software::populate(float &customtop, float &custombottom)
 	// Add original software lists for this system
 	software_list_device_iterator iter(machine().config().root_device());
 	for (software_list_device &swlistdev : iter)
-		if (swlistdev.list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM)
+		if (swlistdev.is_original())
 			if (!swlistdev.get_info().empty() && m_interface != nullptr)
 			{
 				bool found = false;
@@ -374,7 +374,7 @@ void menu_software::populate(float &customtop, float &custombottom)
 
 	// add compatible software lists for this system
 	for (software_list_device &swlistdev : iter)
-		if (swlistdev.list_type() == SOFTWARE_LIST_COMPATIBLE_SYSTEM)
+		if (swlistdev.is_compatible())
 			if (!swlistdev.get_info().empty() && m_interface != nullptr)
 			{
 				bool found = false;

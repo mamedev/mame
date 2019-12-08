@@ -28,6 +28,7 @@ TODO: VIA KT133a chipset support, GeForce 2MX video support, lots of things ;-)
 #include "cpu/i386/i386.h"
 #include "machine/idectrl.h"
 #include "machine/lpci.h"
+#include "machine/nvram.h"
 #include "machine/pckeybrd.h"
 #include "machine/pcshare.h"
 #include "video/pc_vga.h"
@@ -52,10 +53,13 @@ public:
 
 private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
+	std::unique_ptr<uint8_t[]> m_nvram_data;
 	uint8_t m_mtxc_config_reg[256];
 	uint8_t m_piix4_config_reg[4][256];
 
 	DECLARE_WRITE32_MEMBER(bios_ram_w);
+	uint8_t nvram_r(offs_t offset);
+	void nvram_w(offs_t offset, uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -243,6 +247,16 @@ WRITE32_MEMBER(voyager_state::bios_ram_w)
 	}
 }
 
+uint8_t voyager_state::nvram_r(offs_t offset)
+{
+	return m_nvram_data[offset];
+}
+
+void voyager_state::nvram_w(offs_t offset, uint8_t data)
+{
+	m_nvram_data[offset] = data;
+}
+
 void voyager_state::voyager_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
@@ -251,8 +265,7 @@ void voyager_state::voyager_map(address_map &map)
 	map(0x000c8000, 0x000cffff).noprw();
 	//map(0x000d0000, 0x000d0003).ram();  // XYLINX - Sincronus serial communication
 	map(0x000d0008, 0x000d000b).nopw(); // ???
-	map(0x000d0800, 0x000d0fff).rom().region("nvram", 0); //
-//  map(0x000d0800, 0x000d0fff).ram();  // GAME_CMOS
+	map(0x000d0800, 0x000d0fff).rw(FUNC(voyager_state::nvram_r), FUNC(voyager_state::nvram_w)); // GAME_CMOS
 
 	//GRULL map(0x000e0000, 0x000effff).ram();
 	//GRULL-map(0x000f0000, 0x000fffff).bankr("bank1");
@@ -494,6 +507,8 @@ INPUT_PORTS_END
 
 void voyager_state::machine_start()
 {
+	m_nvram_data = std::make_unique<uint8_t[]>(0x800);
+	subdevice<nvram_device>("nvram")->set_base(m_nvram_data.get(), 0x800);
 }
 
 void voyager_state::machine_reset()
@@ -518,6 +533,8 @@ void voyager_state::voyager(machine_config &config)
 	pcibus.set_device(0, FUNC(voyager_state::intel82439tx_pci_r), FUNC(voyager_state::intel82439tx_pci_w));
 	pcibus.set_device(7, FUNC(voyager_state::intel82371ab_pci_r), FUNC(voyager_state::intel82371ab_pci_w));
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	/* video hardware */
 	pcvideo_trident_vga(config);
 
@@ -535,10 +552,10 @@ void voyager_state::init_voyager()
 
 // unknown version and cabinet style, but believed to be the deluxe sit-down.
 ROM_START( voyager )
-	ROM_REGION( 0x40000, "bios", 0 )
+	ROM_REGION32_LE( 0x40000, "bios", 0 )
 	ROM_LOAD( "stv.u23", 0x000000, 0x040000, CRC(0bed28b6) SHA1(8e7f17af65ca9d17c5c7ddedb2313507d0ea8181) )
 
-	ROM_REGION( 0x8000, "video_bios", 0 )   // incorrect, need GeForce 2MX BIOS for 32MB card
+	ROM_REGION32_LE( 0x8000, "video_bios", 0 )   // incorrect, need GeForce 2MX BIOS for 32MB card
 	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) BAD_DUMP SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
 	ROM_CONTINUE(                                 0x0001, 0x4000 )
 
@@ -550,10 +567,10 @@ ROM_END
 
 // upright version 1.002
 ROM_START( voyagers )
-	ROM_REGION( 0x40000, "bios", 0 )
+	ROM_REGION32_LE( 0x40000, "bios", 0 )
 	ROM_LOAD( "stv.u23", 0x000000, 0x040000, CRC(0bed28b6) SHA1(8e7f17af65ca9d17c5c7ddedb2313507d0ea8181) )
 
-	ROM_REGION( 0x8000, "video_bios", 0 )   // incorrect, need GeForce 2MX BIOS for 32MB card
+	ROM_REGION32_LE( 0x8000, "video_bios", 0 )   // incorrect, need GeForce 2MX BIOS for 32MB card
 	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) BAD_DUMP SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
 	ROM_CONTINUE(                                 0x0001, 0x4000 )
 
@@ -564,10 +581,10 @@ ROM_START( voyagers )
 ROM_END
 
 ROM_START( policet2 )
-	ROM_REGION( 0x40000, "bios", 0 )
+	ROM_REGION32_LE( 0x40000, "bios", 0 )
 	ROM_LOAD( "pm29f002t.u22", 0x000000, 0x040000, CRC(eb32ace6) SHA1(1b1eeb07e20822c690d05959077c7ddcc22d1708) )
 
-	ROM_REGION( 0x8000, "video_bios", 0 )   // incorrect, need GeForce 2MX BIOS for 32MB card
+	ROM_REGION32_LE( 0x8000, "video_bios", 0 )   // incorrect, need GeForce 2MX BIOS for 32MB card
 	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) BAD_DUMP SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
 	ROM_CONTINUE(                                 0x0001, 0x4000 )
 

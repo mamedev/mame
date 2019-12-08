@@ -2436,7 +2436,7 @@ ROM_START( dkongjr )
 ROM_END
 
 ROM_START( dkongjr2 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // same code as dkongjr, but arranged differently
 	ROM_LOAD( "0",            0x0000, 0x2000, CRC(dc1f1d12) SHA1(d0faac0310b0273429ccb3387b914792d1a312eb) )
 	ROM_LOAD( "1",            0x2000, 0x2000, CRC(f1f286d0) SHA1(cd87770c968d10623f312f651955ad9b1f85c6df) )
 	ROM_LOAD( "2",            0x4000, 0x2000, CRC(4cb856c4) SHA1(e5ac7155b13cac2c201fa733f5061fb4a0ceafa4) )

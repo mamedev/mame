@@ -47,19 +47,23 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(DP8344, dp8344_device, "dp8344", "DP8344 BCP")
+// device type definitions
+DEFINE_DEVICE_TYPE(DP8344A, dp8344a_device, "dp8344a", "DP8344A BCP")
+DEFINE_DEVICE_TYPE(DP8344B, dp8344b_device, "dp8344b", "DP8344B BCP")
 
 
 //**************************************************************************
 //  DEVICE CONSTRUCTION AND INITIALIZATION
 //**************************************************************************
 
+ALLOW_SAVE_TYPE(dp8344_device::inst_state);
+
 //-------------------------------------------------
 //  dp8344_device - constructor
 //-------------------------------------------------
 
-dp8344_device::dp8344_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: cpu_device(mconfig, DP8344, tag, owner, clock)
+dp8344_device::dp8344_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_inst_config("instruction", ENDIANNESS_LITTLE, 16, 16, -1)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_inst_space(nullptr)
@@ -72,6 +76,9 @@ dp8344_device::dp8344_device(const machine_config &mconfig, const char *tag, dev
 	, m_pc(0)
 	, m_icount(0)
 	, m_nmi_pending(false)
+	, m_wait_states(0)
+	, m_source_data(0)
+	, m_data_address(0)
 	, m_ccr(0)
 	, m_ncf(0)
 	, m_icr(0)
@@ -86,8 +93,10 @@ dp8344_device::dp8344_device(const machine_config &mconfig, const char *tag, dev
 	, m_tmr(0)
 	, m_gp_main{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 	, m_gp_alt{0, 0, 0, 0}
-	, m_ir{{0}, {0}, {0}, {0}}
+	, m_ir{0, 0, 0, 0}
 	, m_tr(0)
+	, m_tclk(0)
+	, m_tcount(0)
 	, m_as{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 	, m_ds{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 	, m_asp(0)
@@ -104,6 +113,27 @@ dp8344_device::dp8344_device(const machine_config &mconfig, const char *tag, dev
 	, m_rfifo_head(0)
 	, m_tfifo_head(0)
 {
+}
+
+
+//-------------------------------------------------
+//  dp8344a_device - constructor
+//-------------------------------------------------
+
+dp8344a_device::dp8344a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: dp8344_device(mconfig, DP8344A, tag, owner, clock)
+{
+}
+
+
+//-------------------------------------------------
+//  dp8344b_device - constructor
+//-------------------------------------------------
+
+dp8344b_device::dp8344b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: dp8344_device(mconfig, DP8344B, tag, owner, clock)
+{
+	// TODO: emulate differences between DP8344A and DP8344B
 }
 
 
@@ -151,10 +181,10 @@ void dp8344_device::device_start()
 	set_icountptr(m_icount);
 
 	// debug state registration
-	state_add(BCP_PC, "PC", m_pc);
+	state_add<u16>(BCP_PC, "PC", [this]() { return m_pc; }, [this](u16 data) { m_pc = m_ppc = data; prefetch_instruction(); });
 	state_add(STATE_GENPC, "GENPC", m_pc).noshow();
 	state_add(STATE_GENPCBASE, "GENPCBASE", m_pc).noshow();
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_ccr).noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_ccr).formatstr("%09s").noshow();
 	state_add(BCP_BA, "BA", m_ba);
 	state_add(BCP_BB, "BB", m_bb);
 	state_add(BCP_CCR, "CCR", m_ccr);
@@ -175,18 +205,24 @@ void dp8344_device::device_start()
 		state_add(BCP_GP4_ALT + i, string_format("GP%da", 4 + i).c_str(), m_gp_alt[i]);
 	for (int i = 0; i < 4; i++)
 	{
-		state_add(BCP_IW + i, string_format("I%c", 'W' + i).c_str(), m_ir[i].w);
-		state_add(BCP_IWLO + i, string_format("I%cLO", 'W' + i).c_str(), m_ir[i].b.l).noshow();
-		state_add(BCP_IWHI + i, string_format("I%cHI", 'W' + i).c_str(), m_ir[i].b.h).noshow();
+		state_add(BCP_IW + i, string_format("I%c", 'W' + i).c_str(), m_ir[i]);
+		state_add<u8>(BCP_IWLO + i, string_format("I%cLO", 'W' + i).c_str(),
+			[this, i]() -> u8 { return m_ir[i] & 0x00ff; },
+			[this, i](u8 data) { m_ir[i] = (m_ir[i] & 0xff00) | data; }).noshow();
+		state_add<u8>(BCP_IWHI + i, string_format("I%cHI", 'W' + i).c_str(),
+			[this, i]() -> u8 { return (m_ir[i] & 0xff00) >> 8; },
+			[this, i](u8 data) { m_ir[i] = (m_ir[i] & 0x00ff) | u16(data) << 8; }).noshow();
 	}
 	for (int i = 8; i < 16; i++)
 		state_add(BCP_GP8 + i - 8, string_format("GP%d", i).c_str(), m_gp_main[i]);
 	state_add(BCP_TR, "TR", m_tr);
+	state_add(BCP_COUNT, "COUNT", m_tcount);
 	state_add(BCP_ASP, "ASP", m_asp).mask(0xf);
 	state_add(BCP_DSP, "DSP", m_dsp).mask(0xf);
 
 	// save states
 	save_item(NAME(m_pc));
+	save_item(NAME(m_ppc));
 	save_item(NAME(m_nmi_state));
 	save_item(NAME(m_ccr));
 	save_item(NAME(m_ncf));
@@ -202,9 +238,10 @@ void dp8344_device::device_start()
 	save_item(NAME(m_tmr));
 	save_item(NAME(m_gp_main));
 	save_item(NAME(m_gp_alt));
-	for (int i = 0; i < 4; i++)
-		save_item(NAME(m_ir[i].w), i);
+	save_item(NAME(m_ir));
 	save_item(NAME(m_tr));
+	save_item(NAME(m_tclk));
+	save_item(NAME(m_tcount));
 	save_item(NAME(m_asp));
 	save_item(NAME(m_dsp));
 	save_item(NAME(m_as)); // 12-word Address Stack
@@ -215,6 +252,10 @@ void dp8344_device::device_start()
 	save_item(NAME(m_hib));
 	save_item(NAME(m_latched_instr));
 	save_item(NAME(m_nmi_pending));
+	save_item(NAME(m_inst_state));
+	save_item(NAME(m_wait_states));
+	save_item(NAME(m_source_data));
+	save_item(NAME(m_data_address));
 	save_item(NAME(m_rfifo)); // 3-frame Receive FIFO
 	save_item(NAME(m_tfifo)); // 3-frame Transmit FIFO
 	save_item(NAME(m_rfifo_head));
@@ -229,12 +270,12 @@ void dp8344_device::device_start()
 void dp8344_device::device_reset()
 {
 	// Reset Program Counter
-	m_pc = 0x0000;
+	m_pc = m_ppc = 0x0000;
 
 	// Reset Condition Code Register
 	m_ccr &= 0x10;
 
-	// Reset Interrupt Control Register
+	// Reset Interrupt Control Register (all interrupts masked out)
 	m_icr = 0xff;
 
 	// Reset Auxiliary Control Register and timer interrupt
@@ -264,8 +305,12 @@ void dp8344_device::device_reset()
 	// Reset Remote Interface Configuration Register
 	m_ric = m_auto_start ? 0x03 : 0x01;
 	m_hib = false;
+	if (!m_auto_start)
+		suspend(SUSPEND_REASON_HALT, true);
 
+	// Reset execution state
 	m_nmi_pending = false;
+	m_inst_state = T1_START;
 
 	transceiver_reset();
 
@@ -274,48 +319,20 @@ void dp8344_device::device_reset()
 }
 
 
-//**************************************************************************
-//  CONTROL REGISTERS AND CONDITION CODES
-//**************************************************************************
-
 //-------------------------------------------------
-//  get_flag - retrieve condition from CCR or TSR
+//  create_disassembler - factory method for
+//  disassembling program code
 //-------------------------------------------------
 
-bool dp8344_device::get_flag(unsigned f) const
+std::unique_ptr<util::disasm_interface> dp8344_device::create_disassembler()
 {
-	switch (f)
-	{
-	case 0: // Zero/Equal
-		return BIT(m_ccr, 0);
-
-	case 1: // Carry
-		return BIT(m_ccr, 1);
-
-	case 2: // Overflow
-		return BIT(m_ccr, 2);
-
-	case 3: // Negative (or else Positive)
-		return BIT(m_ccr, 3);
-
-	case 4: // Receiver Active
-		return BIT(m_tsr, 4);
-
-	case 5: // Receiver Error
-		return BIT(m_tsr, 5);
-
-	case 6: // Data Available
-		return BIT(m_tsr, 3); // FIXME: differs from numeric value!
-
-	case 7: // Transmitter FIFO Full (or else Not Full)
-		return BIT(m_tsr, 7);
-
-	default:
-		logerror("Unknown flag %d\n", f);
-		return false;
-	}
+	return std::make_unique<dp8344_disassembler>();
 }
 
+
+//**************************************************************************
+//  INTERRUPTS AND CONTROL REGISTERS
+//**************************************************************************
 
 //-------------------------------------------------
 //  set_receiver_interrupt - update receiver
@@ -405,6 +422,10 @@ void dp8344_device::set_condition_code(u8 data)
 }
 
 
+//-------------------------------------------------
+//  set_interrupt_control - write to ICR
+//-------------------------------------------------
+
 void dp8344_device::set_interrupt_control(u8 data)
 {
 	// IM0: Receiver
@@ -462,10 +483,224 @@ void dp8344_device::set_auxiliary_control(u8 data)
 
 	// Clearing Timer StarT disables the timer and its interrupt
 	if (!BIT(data, 7) && BIT(m_acr, 7))
+	{
+		logerror("%04X: Timer Stop\n", m_ppc);
 		set_timer_interrupt(false);
+	}
+	else if (BIT(data, 7) && !BIT(m_acr, 7))
+	{
+		unsigned prescale = (BIT(m_dcr, 7) ? 2 : 1) * (BIT(data, 5) ? 2 : 16);
+		logerror("%04X: Timer Start (TO Period = %d Hz)\n",
+			m_ppc,
+			int(clocks_to_attotime(prescale * (m_tr == 0 ? 65536 : m_tr)).as_hz()));
+	}
 
-	// Bit 3 is reserved
+	if (BIT(data, 6))
+	{
+		logerror("%04X: Timer Load (TR = %d)\n", m_ppc, m_tr);
+		m_tcount = m_tr;
+
+		// TODO: only cleared when load pulse finishes
+		data &= 0xbf;
+	}
+
+	// Bit 3 is reserved (TODO: DP8344B uses this to extend read cycles)
 	m_acr = data & 0xf7;
+}
+
+
+//-------------------------------------------------
+//  set_device_control - write to DCR
+//-------------------------------------------------
+
+void dp8344_device::set_device_control(u8 data)
+{
+	if ((data & 0xe0) != (m_dcr & 0xe0))
+	{
+		if ((data & 0x60) == 0x60)
+			logerror("%04X: CPU Clock = OCLK%s (%.4f MHz); Transceiver Clock = X-TCLK\n",
+				m_ppc,
+				BIT(data, 7) ? "/2" : "",
+				clocks_to_attotime(BIT(data, 7) ? 2 : 1).as_mhz());
+		else
+			logerror("%04X: CPU Clock = OCLK%s (%.4f MHz); Transceiver Clock = OCLK%s (%.4f MHz)\n",
+				m_ppc,
+				BIT(data, 7) ? "/2" : "",
+				clocks_to_attotime(BIT(data, 7) ? 2 : 1).as_mhz(),
+				BIT(data, 6) ? "/4" : BIT(data, 5) ? "/2" : "",
+				clocks_to_attotime(BIT(data, 6) ? 4 : BIT(data, 5) ? 2 : 1).as_mhz());
+	}
+
+	if ((data & 0x1f) != (m_dcr & 0x1f))
+		logerror("%04X: Wait States = %d (Instruction Memory), %d (Data Memory)\n",
+			m_ppc,
+			(data & 0x18) >> 3,
+			data & 0x07);
+
+	m_dcr = data;
+}
+
+
+//-------------------------------------------------
+//  interrupt_active - determine if any of the
+//  five maskable interrupts is active
+//-------------------------------------------------
+
+bool dp8344_device::interrupt_active() const
+{
+	// TODO: non-timer interrupts
+	return !BIT(m_icr, 4) && BIT(m_ccr, 7);
+}
+
+
+//-------------------------------------------------
+//  get_interrupt_vector - return the vector for
+//  the highest priority maskable interrupt
+//-------------------------------------------------
+
+u8 dp8344_device::get_interrupt_vector() const
+{
+	// TODO: non-timer interrupts
+	return 0x14;
+}
+
+
+//**************************************************************************
+//  CONDITION CODES AND ALU HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  get_flag - retrieve condition from CCR or TSR
+//-------------------------------------------------
+
+bool dp8344_device::get_flag(unsigned f) const
+{
+	switch (f)
+	{
+	case 0: // Zero/Equal
+		return BIT(m_ccr, 0);
+
+	case 1: // Carry
+		return BIT(m_ccr, 1);
+
+	case 2: // Overflow
+		return BIT(m_ccr, 2);
+
+	case 3: // Negative (or else Positive)
+		return BIT(m_ccr, 3);
+
+	case 4: // Receiver Active
+		return BIT(m_tsr, 4);
+
+	case 5: // Receiver Error
+		return BIT(m_tsr, 5);
+
+	case 6: // Data Available
+		return BIT(m_tsr, 3); // FIXME: differs from numeric value!
+
+	case 7: // Transmitter FIFO Full (or else Not Full)
+		return BIT(m_tsr, 7);
+
+	default:
+		logerror("Unknown flag %d\n", f);
+		return false;
+	}
+}
+
+
+//-------------------------------------------------
+//  set_nz - set the N and Z flags based on the
+//  result of an ALU operation
+//-------------------------------------------------
+
+void dp8344_device::set_nz(u8 result)
+{
+	m_ccr &= 0xf6;
+	if (result == 0)
+		m_ccr |= 0x01;
+	else if (BIT(result, 7))
+		m_ccr |= 0x08;
+}
+
+
+//-------------------------------------------------
+//  set_carry - set or clear the C flag
+//-------------------------------------------------
+
+void dp8344_device::set_carry(bool state)
+{
+	if (state)
+		m_ccr |= 0x02;
+	else
+		m_ccr &= 0xfd;
+}
+
+
+//-------------------------------------------------
+//  rotate_right - perform right rotation for ROT
+//  and JRMK instructions
+//-------------------------------------------------
+
+u8 dp8344_device::rotate_right(u8 data, u8 b)
+{
+	return (data >> b) | (data << (8 - b));
+}
+
+
+//-------------------------------------------------
+//  add_nzcv - add and set N, Z, C, V flags for
+//  ADCA, ADD and ADDA instructions
+//-------------------------------------------------
+
+u8 dp8344_device::add_nzcv(u8 s1, u8 s2, bool carry_in)
+{
+	s16 result = s8(s1) + s8(s2) + (carry_in ? 1 : 0);
+	if (result >= 128 && result < -128)
+		m_ccr |= 0x04;
+	else
+		m_ccr &= 0xfb;
+
+	set_carry(s1 + s2 + (carry_in ? 1 : 0) >= 0x100);
+	set_nz(u8(result));
+	return u8(result);
+}
+
+
+//-------------------------------------------------
+//  sub_nzcv - add and set N, Z, C, V flags for
+//  CMP, SBCA, SUB and SUBA instructions
+//-------------------------------------------------
+
+u8 dp8344_device::sub_nzcv(u8 s1, u8 s2, bool carry_in)
+{
+	s16 result = s8(s1) - s8(s2) - (carry_in ? 1 : 0);
+	if (result >= 128 && result < -128)
+		m_ccr |= 0x04;
+	else
+		m_ccr &= 0xfb;
+
+	set_carry(s1 < s2 + (carry_in ? 1 : 0));
+	set_nz(u8(result));
+	return u8(result);
+}
+
+
+void dp8344_device::state_string_export(const device_state_entry &entry, std::string &str) const
+{
+	switch (entry.index())
+	{
+	case STATE_GENFLAGS:
+		str = string_format("%c%c%c%c %c%c%c%c",
+			BIT(m_ccr, 7) ? 'T' : '.', // TO
+			BIT(m_ccr, 6) ? 'R' : '.', // RR
+			BIT(m_ccr, 5) ? 'W' : '.', // RW
+			BIT(m_ccr, 4) ? 'B' : '.', // BIRQ
+			BIT(m_ccr, 3) ? 'N' : '.',
+			BIT(m_ccr, 2) ? 'V' : '.',
+			BIT(m_ccr, 1) ? 'C' : '.',
+			BIT(m_ccr, 0) ? 'Z' : '.');
+		break;
+	}
 }
 
 
@@ -474,14 +709,19 @@ void dp8344_device::set_auxiliary_control(u8 data)
 //**************************************************************************
 
 //-------------------------------------------------
-//  get_timer_count - return current count status
-//  of the timer
+//  timer_count - count down on timer
 //-------------------------------------------------
 
-u16 dp8344_device::get_timer_count()
+void dp8344_device::timer_count()
 {
-	// TODO
-	return 0;
+	// Count down to zero
+	if (--m_tcount == 0)
+	{
+		set_timer_interrupt(true);
+
+		// Count automatically reloads
+		m_tcount = m_tr;
+	}
 }
 
 
@@ -498,8 +738,8 @@ void dp8344_device::address_stack_push()
 {
 	m_as[m_asp++] = u32(m_pc)
 		| (u32(m_ccr & 0x0f) << 16)
-		| (m_ba << 20)
-		| (m_bb << 21)
+		| (m_ba << 21)
+		| (m_bb << 20)
 		| (u32(m_acr & 0x01) << 22);
 	if (m_asp >= 12)
 		m_asp = 0;
@@ -511,23 +751,23 @@ void dp8344_device::address_stack_push()
 //  executing a RET or RETF instruction
 //-------------------------------------------------
 
-void dp8344_device::address_stack_pop(u8 grf)
+void dp8344_device::address_stack_pop(u8 g, bool rf)
 {
 	m_asp = (m_asp == 0) ? 11 : m_asp - 1;
 	m_pc = m_as[m_asp] & 0xffff;
 
 	// Optionally restore, set or clear GIE
-	if (BIT(grf, 6))
-		set_gie(BIT(grf, 5));
-	else if (BIT(grf, 5))
+	if (BIT(g, 1))
+		set_gie(!BIT(g, 0));
+	else if (BIT(g, 0))
 		set_gie(BIT(m_as[m_asp], 22));
 
 	// Optionally restore ALU flags and register banks
-	if (BIT(grf, 4))
+	if (rf)
 	{
-		m_ccr = (m_ccr & 0xf0) | (m_as[m_asp] & 0xf0000) >> 20;
-		m_ba = BIT(m_as[m_asp], 20);
-		m_bb = BIT(m_as[m_asp], 21);
+		m_ccr = (m_ccr & 0xf0) | (m_as[m_asp] & 0xf0000) >> 16;
+		m_ba = BIT(m_as[m_asp], 21);
+		m_bb = BIT(m_as[m_asp], 20);
 	}
 }
 
@@ -561,11 +801,10 @@ void dp8344_device::data_stack_push(u8 data)
 
 u8 dp8344_device::data_stack_pop()
 {
+	// TBD: do test instructions (BIT, CMP, JRMK, etc.) suppress side effects as with RTR and ECR?
 	m_dsp = (m_dsp - 1) & 0xf;
 	return m_ds[m_dsp];
 }
-
-
 
 
 //**************************************************************************
@@ -705,16 +944,20 @@ void dp8344_device::receive_fifo_push(u8 data)
 //  receive_fifo_pop - read from RTR
 //-------------------------------------------------
 
-u8 dp8344_device::receive_fifo_pop()
+u8 dp8344_device::receive_fifo_pop(bool test)
 {
-	// Clear Receive FIFO Full, DEME, Auto-Response and Poll/Acknowledge bits in NCF
-	m_ncf &= 0xb0;
+	if (!test)
+	{
+		// Clear Receive FIFO Full, DEME, Auto-Response and Poll/Acknowledge bits in NCF
+		m_ncf &= 0xb0;
 
-	// Clear Data Available flag in TSR
-	m_tsr &= 0xf7;
-	if ((m_icr & 0xc0) == 0xc0)
-		set_receiver_interrupt(false);
+		// Clear Data Available flag in TSR
+		m_tsr &= 0xf7;
+		if ((m_icr & 0xc0) == 0xc0)
+			set_receiver_interrupt(false);
+	}
 
+	// TODO
 	return 0;
 }
 
@@ -746,32 +989,52 @@ void dp8344_device::set_receiver_error(u8 code)
 //  get_error_code - read from ECR
 //-------------------------------------------------
 
-u8 dp8344_device::get_error_code()
+u8 dp8344_device::get_error_code(bool test)
 {
 	u8 code = m_ecr;
 
-	// Clear Error Code Register and Receiver Error flag in NCF
-	m_ecr = 0x00;
-	m_ncf &= 0xdf;
-
-	// Update interrupt status if RE interrupt selected
-	switch (m_icr & 0xc0)
+	if (!test)
 	{
-	case 0x00:
-		// Interrupt on RFF
-		set_receiver_interrupt(BIT(m_ncf, 6));
-		break;
+		// Clear Error Code Register and Receiver Error flag in NCF
+		m_ecr = 0x00;
+		m_ncf &= 0xdf;
 
-	case 0x40:
-		// Interrupt on DAV
-		set_receiver_interrupt(BIT(m_tsr, 3));
-		break;
+		// Update interrupt status if RE interrupt selected
+		switch (m_icr & 0xc0)
+		{
+		case 0x00:
+			// Interrupt on RFF
+			set_receiver_interrupt(BIT(m_ncf, 6));
+			break;
 
-	default:
-		break;
+		case 0x40:
+			// Interrupt on DAV
+			set_receiver_interrupt(BIT(m_tsr, 3));
+			break;
+
+		default:
+			break;
+		}
 	}
 
 	return code;
+}
+
+
+//-------------------------------------------------
+//  set_transceiver_command - write to TCR
+//-------------------------------------------------
+
+void dp8344_device::set_transceiver_command(u8 data)
+{
+	if ((data & 0xb0) != (m_tcr & 0xb0))
+		logerror("%04X: Receiver Selected as %s with %d Quiesces; TX-ACT %sAdvanced\n",
+			m_ppc,
+			BIT(data, 5) ? "ALG" : "DATA-IN",
+			BIT(data, 7) ? 3 : 2,
+			BIT(data, 4) ? "" : "Not ");
+
+	m_tcr = data;
 }
 
 
@@ -792,35 +1055,35 @@ void dp8344_device::set_transceiver_mode(u8 data)
 	switch (data & 0x07)
 	{
 	case 0:
-		logerror("Protocol Select: IBM 3270\n");
+		logerror("%04X: Protocol Select: IBM 3270\n", m_ppc);
 		break;
 
 	case 1:
-		logerror("Protocol Select: IBM 3299 Multiplexer\n");
+		logerror("%04X: Protocol Select: IBM 3299 Multiplexer\n", m_ppc);
 		break;
 
 	case 2:
-		logerror("Protocol Select: IBM 3299 Controller\n");
+		logerror("%04X: Protocol Select: IBM 3299 Controller\n", m_ppc);
 		break;
 
 	case 3:
-		logerror("Protocol Select: IBM 3299 Repeater\n");
+		logerror("%04X: Protocol Select: IBM 3299 Repeater\n", m_ppc);
 		break;
 
 	case 4:
-		logerror("Protocol Select: IBM 5250\n");
+		logerror("%04X: Protocol Select: IBM 5250\n", m_ppc);
 		break;
 
 	case 5:
-		logerror("Protocol Select: IBM 5250 Promiscuous\n");
+		logerror("%04X: Protocol Select: IBM 5250 Promiscuous\n", m_ppc);
 		break;
 
 	case 6:
-		logerror("Protocol Select: 8-bit\n");
+		logerror("%04X: Protocol Select: 8-bit\n", m_ppc);
 		break;
 
 	case 7:
-		logerror("Protocol Select: 8-bit Promiscuous\n");
+		logerror("%04X: Protocol Select: 8-bit Promiscuous\n", m_ppc);
 		break;
 	}
 
@@ -851,7 +1114,7 @@ void dp8344_device::clear_network_command_flag(u8 data)
 //  read_register - read from source register
 //-------------------------------------------------
 
-u8 dp8344_device::read_register(unsigned reg)
+u8 dp8344_device::read_register(unsigned reg, bool test)
 {
 	switch (reg)
 	{
@@ -881,7 +1144,7 @@ u8 dp8344_device::read_register(unsigned reg)
 
 	case 4: // GP0 (main) or Receive/Transmit Register and/or Error Code Register (alternate)
 		if (m_bb)
-			return BIT(m_tcr, 6) ? get_error_code() : receive_fifo_pop();
+			return BIT(m_tcr, 6) ? get_error_code(test) : receive_fifo_pop(test);
 		else
 			return m_gp_main[0];
 
@@ -928,28 +1191,28 @@ u8 dp8344_device::read_register(unsigned reg)
 			return m_gp_main[7];
 
 	case 12: // IW (low byte)
-		return m_ir[0].b.l;
+		return m_ir[0] & 0x00ff;
 
 	case 13: // IW (high byte)
-		return m_ir[0].b.h;
+		return (m_ir[0] & 0xff00) >> 8;
 
 	case 14: // IX (low byte)
-		return m_ir[1].b.l;
+		return m_ir[1] & 0x00ff;
 
 	case 15: // IX (high byte)
-		return m_ir[1].b.h;
+		return (m_ir[1] & 0xff00) >> 8;
 
 	case 16: // IY (low byte)
-		return m_ir[2].b.l;
+		return m_ir[2] & 0x00ff;
 
 	case 17: // IY (high byte)
-		return m_ir[2].b.h;
+		return (m_ir[2] & 0xff00) >> 8;
 
 	case 18: // IZ (low byte)
-		return m_ir[3].b.l;
+		return m_ir[3] & 0x00ff;
 
 	case 19: // IZ (high byte)
-		return m_ir[3].b.h;
+		return (m_ir[3] & 0xff00) >> 8;
 
 	case 20: // GP8
 		return m_gp_main[8];
@@ -976,10 +1239,10 @@ u8 dp8344_device::read_register(unsigned reg)
 		return m_gp_main[15];
 
 	case 28: // TRL count status
-		return get_timer_count() & 0x00ff;
+		return m_tcount & 0x00ff;
 
 	case 29: // TRH count status
-		return get_timer_count() >> 8;
+		return (m_tcount & 0xff00) >> 8;
 
 	case 30: // Internal Stack Pointer
 		return (m_asp << 4) | m_dsp;
@@ -1015,7 +1278,7 @@ void dp8344_device::write_register(unsigned reg, u8 data)
 	{
 	case 0: // Condition Code Register (main) or Device Control Register (alternate)
 		if (m_ba)
-			m_dcr = data;
+			set_device_control(data);
 		else
 			set_condition_code(data);
 		break;
@@ -1053,10 +1316,11 @@ void dp8344_device::write_register(unsigned reg, u8 data)
 			logerror("Transceiver Status Register is read-only\n");
 		else
 			m_gp_main[1] = data;
+		break;
 
 	case 6: // GP2 (main) or Transceiver Command Register (alternate)
 		if (m_bb)
-			m_tcr = data;
+			set_transceiver_command(data);
 		else
 			m_gp_main[2] = data;
 		break;
@@ -1097,35 +1361,35 @@ void dp8344_device::write_register(unsigned reg, u8 data)
 		break;
 
 	case 12: // IW (low byte)
-		m_ir[0].b.l = data;
+		m_ir[0] = (m_ir[0] & 0xff00) | data;
 		break;
 
 	case 13: // IW (high byte)
-		m_ir[0].b.h = data;
+		m_ir[0] = (m_ir[0] & 0x00ff) | u16(data) << 8;
 		break;
 
 	case 14: // IX (low byte)
-		m_ir[1].b.l = data;
+		m_ir[1] = (m_ir[1] & 0xff00) | data;
 		break;
 
 	case 15: // IX (high byte)
-		m_ir[1].b.h = data;
+		m_ir[1] = (m_ir[1] & 0x00ff) | u16(data) << 8;
 		break;
 
 	case 16: // IY (low byte)
-		m_ir[2].b.l = data;
+		m_ir[2] = (m_ir[2] & 0xff00) | data;
 		break;
 
 	case 17: // IY (high byte)
-		m_ir[2].b.h = data;
+		m_ir[2] = (m_ir[2] & 0x00ff) | u16(data) << 8;
 		break;
 
 	case 18: // IZ (low byte)
-		m_ir[3].b.l = data;
+		m_ir[3] = (m_ir[3] & 0xff00) | data;
 		break;
 
 	case 19: // IZ (high byte)
-		m_ir[3].b.h = data;
+		m_ir[3] = (m_ir[3] & 0x00ff) | u16(data) << 8;
 		break;
 
 	case 20: // GP8
@@ -1220,12 +1484,378 @@ void dp8344_device::execute_set_input(int irqline, int state)
 //**************************************************************************
 
 //-------------------------------------------------
-//  create_disassembler -
+//  prefetch_instruction - fetch the next
+//  instruction word from program memory
 //-------------------------------------------------
 
-std::unique_ptr<util::disasm_interface> dp8344_device::create_disassembler()
+void dp8344_device::prefetch_instruction()
 {
-	return std::make_unique<dp8344_disassembler>();
+	m_latched_instr = m_inst_cache->read_word(m_pc);
+}
+
+
+//-------------------------------------------------
+//  latch_address - handle ALE cycle and set T2
+//  wait states for instructions referencing data
+//  memory
+//-------------------------------------------------
+
+void dp8344_device::latch_address(bool rw)
+{
+	//logerror("Latching data memory address %04Xh for %sing (PC = %04Xh)\n", m_data_address, rw ? "read" : "writ", m_pc);
+	if ((m_dcr & 0x18) == 0)
+		m_wait_states = m_dcr & 0x07;
+	else
+		m_wait_states = std::max(m_dcr & 0x07, ((m_dcr & 0x18) >> 3) - 1);
+}
+
+
+//-------------------------------------------------
+//  instruction_wait - set T2 wait states for
+//  non-memory instructions
+//-------------------------------------------------
+
+void dp8344_device::instruction_wait()
+{
+	m_wait_states = (m_dcr & 0x18) >> 3;
+}
+
+
+//-------------------------------------------------
+//  decode_instruction - begin execution of an
+//  opcode
+//-------------------------------------------------
+
+dp8344_device::inst_state dp8344_device::decode_instruction()
+{
+	if (m_latched_instr < 0x8000)
+	{
+		m_source_data = read_register(m_latched_instr & 0x000f, (m_latched_instr & 0x7000) == 0x3000);
+		if ((m_latched_instr & 0xf000) == 0x1000)
+		{
+			// MOVE to indexed data memory
+			m_data_address = m_ir[3] + ((m_latched_instr & 0x0ff0) >> 4);
+			return TX_WRITE;
+		}
+		else
+		{
+			instruction_wait();
+			return T2_STORE;
+		}
+	}
+	else if ((m_latched_instr & 0xf800) == 0x8000)
+	{
+		// JRMK
+		m_source_data = read_register(m_latched_instr & 0x001f, true);
+		return TX1_JRMK;
+	}
+	else if ((m_latched_instr & 0xfc00) == 0x8800)
+	{
+		// MOVE immediate to data memory
+		m_source_data = (m_latched_instr & 0x0380) >> 2 | (m_latched_instr & 0x001f);
+		m_data_address = m_ir[(m_latched_instr & 0x0060) >> 5];
+		return TX_WRITE;
+	}
+	else if ((m_latched_instr & 0xfc00) == 0x8c00)
+	{
+		// LJMP or LCALL, conditional
+		m_source_data = read_register(m_latched_instr & 0x001f, true);
+		instruction_wait();
+		return T2_ABSOLUTE;
+	}
+	else if ((m_latched_instr & 0xf000) == 0x9000)
+	{
+		// MOVE from indexed data memory
+		m_data_address = m_ir[3] + ((m_latched_instr & 0x0ff0) >> 4);
+		return TX_READ;
+	}
+	else if ((m_latched_instr >= 0xa000 && m_latched_instr < 0xae00) || (m_latched_instr & 0xfc00) == 0xc000)
+	{
+		if ((m_latched_instr & 0xfe00) != 0xc000)
+			m_source_data = read_register(m_latched_instr & 0x001f, false);
+		switch (m_latched_instr & 0x0180)
+		{
+		case 0x0000:
+			m_data_address = m_ir[(m_latched_instr & 0x0060) >> 5]--;
+			break;
+		case 0x0080:
+			m_data_address = m_ir[(m_latched_instr & 0x0060) >> 5];
+			break;
+		case 0x0100:
+			m_data_address = m_ir[(m_latched_instr & 0x0060) >> 5]++;
+			break;
+		case 0x0180:
+			m_data_address = ++m_ir[(m_latched_instr & 0x0060) >> 5];
+			break;
+		}
+		return (m_latched_instr & 0xfe00) == 0xc000 ? TX_READ : TX_WRITE;
+	}
+	else if ((m_latched_instr & 0xff80) == 0xae80)
+	{
+		// EXX
+		m_ba = BIT(m_latched_instr, 4);
+		m_bb = BIT(m_latched_instr, 3);
+		if (BIT(m_latched_instr, 6))
+			set_gie(!BIT(m_latched_instr, 5));
+		instruction_wait();
+		return T2_NEXT;
+	}
+	else if ((m_latched_instr & 0xff00) == 0xaf00)
+	{
+		// RET or RETF
+		if (BIT(m_latched_instr, 7))
+		{
+			address_stack_pop((m_latched_instr & 0x0060) >> 5, BIT(m_latched_instr, 4));
+			instruction_wait();
+			return T2_NEXT;
+		}
+		else if (get_flag(m_latched_instr & 0x0007) == BIT(m_latched_instr, 3))
+			return TX_RETF;
+		else
+		{
+			instruction_wait();
+			return T2_NEXT;
+		}
+	}
+	else if ((m_latched_instr & 0xf000) == 0xb000)
+	{
+		// MOVE immediate to register
+		instruction_wait();
+		return T2_STORE;
+	}
+	else if ((m_latched_instr & 0xfc00) == 0xc400)
+	{
+		// MOVE to or from accumulator-indexed data memory
+		if (BIT(m_latched_instr, 7))
+			m_source_data = read_register(m_latched_instr & 0x001f, false);
+		m_data_address = m_ir[(m_latched_instr & 0x0060) >> 5] + read_accumulator();
+		return BIT(m_latched_instr, 7) ? TX_WRITE : TX_READ;
+	}
+	else if ((m_latched_instr & 0xff00) == 0xcb00)
+	{
+		// JMP to relative destination
+		m_source_data = m_latched_instr & 0x00ff;
+		return TX2_JMP;
+	}
+	else if ((m_latched_instr & 0xff00) == 0xcc00)
+	{
+		// CALL to relative destination
+		m_source_data = m_latched_instr & 0x00ff;
+		return TX_CALL;
+	}
+	else if ((m_latched_instr & 0xff80) == 0xcd00)
+	{
+		// LJMP to index register
+		m_pc = m_ir[(m_latched_instr & 0x0060) >> 5];
+		instruction_wait();
+		return T2_NEXT;
+	}
+	else if ((m_latched_instr & 0xff80) == 0xcd80)
+	{
+		// JMP, register-based
+		m_source_data = read_register(m_latched_instr & 0x001f, true);
+		return TX1_JMP;
+	}
+	else if ((m_latched_instr & 0xff00) == 0xce00)
+	{
+		// LJMP or LCALL, unconditional
+		instruction_wait();
+		return T2_ABSOLUTE;
+	}
+	else if ((m_latched_instr & 0xff80) == 0xcf80)
+	{
+		// TRAP or interrupt
+		address_stack_push();
+		m_pc = u16(m_ibr) << 8 | (m_latched_instr & 0x003f);
+		if (BIT(m_latched_instr, 6))
+			set_gie(false);
+		instruction_wait();
+		return T2_NEXT;
+	}
+	else if ((m_latched_instr & 0xf000) == 0xd000)
+	{
+		// JMP, conditional
+		m_source_data = m_latched_instr & 0x00ff;
+		if (get_flag((m_latched_instr & 0x0700) >> 8) == BIT(m_latched_instr, 11))
+			return TX2_JMP;
+		else
+		{
+			instruction_wait();
+			return T2_NEXT;
+		}
+	}
+	else
+	{
+		m_source_data = read_register(m_latched_instr & 0x001f, false);
+		instruction_wait();
+		return T2_STORE;
+	}
+}
+
+
+//-------------------------------------------------
+//  store_result - calculate and store the result
+//  of a register operation
+//-------------------------------------------------
+
+void dp8344_device::store_result()
+{
+	switch (m_latched_instr & 0xf000)
+	{
+	case 0x0000:
+		m_source_data = add_nzcv(m_source_data, (m_latched_instr & 0x0ff0) >> 4, false);
+		write_register(m_latched_instr & 0x000f, m_source_data);
+		break;
+
+	case 0x2000:
+		m_source_data = sub_nzcv(m_source_data, (m_latched_instr & 0x0ff0) >> 4, false);
+		write_register(m_latched_instr & 0x000f, m_source_data);
+		break;
+
+	case 0x3000:
+		(void)sub_nzcv(m_source_data, (m_latched_instr & 0x0ff0) >> 4, false);
+		break;
+
+	case 0x4000:
+		m_source_data &= (m_latched_instr & 0x0ff0) >> 4;
+		set_nz(m_source_data);
+		write_register(m_latched_instr & 0x000f, m_source_data);
+		break;
+
+	case 0x5000:
+		m_source_data |= (m_latched_instr & 0x0ff0) >> 4;
+		set_nz(m_source_data);
+		write_register(m_latched_instr & 0x000f, m_source_data);
+		break;
+
+	case 0x6000:
+		m_source_data ^= (m_latched_instr & 0x0ff0) >> 4;
+		set_nz(m_source_data);
+		write_register(m_latched_instr & 0x000f, m_source_data);
+		break;
+
+	case 0x7000:
+		m_source_data &= (m_latched_instr & 0x0ff0) >> 4;
+		set_nz(m_source_data);
+		break;
+
+	case 0xa000:
+		assert((m_latched_instr & 0x0f80) == 0x0e00);
+		m_source_data ^= 0xff;
+		set_nz(m_source_data);
+		write_register(m_latched_instr & 0x001f, m_source_data);
+		break;
+
+	case 0xb000:
+		write_register(m_latched_instr & 0x000f, (m_latched_instr & 0x0ff0) >> 4);
+		break;
+
+	case 0xc000:
+		switch (m_latched_instr & 0x0f00)
+		{
+		case 0x800:
+			set_carry(BIT(u16(m_source_data) << 1, (m_latched_instr & 0x00e0) >> 5));
+			m_source_data >>= (m_latched_instr & 0x00e0) >> 5;
+			set_nz(m_source_data);
+			write_register(m_latched_instr & 0x001f, m_source_data);
+			break;
+
+		case 0x900:
+			set_carry(BIT(m_source_data, (m_latched_instr & 0x00e0) >> 5));
+			if ((m_latched_instr & 0x00e0) != 0)
+				m_source_data <<= 8 - ((m_latched_instr & 0x00e0) >> 5);
+			set_nz(m_source_data);
+			write_register(m_latched_instr & 0x001f, m_source_data);
+			break;
+
+		case 0xa00:
+			set_carry(BIT(u16(m_source_data) << 1, (m_latched_instr & 0x00e0) >> 5));
+			m_source_data = rotate_right(m_source_data, (m_latched_instr & 0x00e0) >> 5);
+			set_nz(m_source_data);
+			write_register(m_latched_instr & 0x001f, m_source_data);
+			break;
+		}
+
+	case 0xe000:
+		if (BIT(m_latched_instr, 11))
+			m_source_data = sub_nzcv(m_source_data, read_accumulator(), BIT(m_latched_instr, 10) && BIT(m_ccr, 1));
+		else
+			m_source_data = add_nzcv(m_source_data, read_accumulator(), BIT(m_latched_instr, 10) && BIT(m_ccr, 1));
+		write_register((m_latched_instr & 0x03e0) >> 5, m_source_data);
+		break;
+
+	case 0xf000:
+		switch (m_latched_instr & 0x0c00)
+		{
+		case 0x000:
+			m_source_data &= read_accumulator();
+			set_nz(m_source_data);
+			break;
+
+		case 0x400:
+			m_source_data |= read_accumulator();
+			set_nz(m_source_data);
+			break;
+
+		case 0x800:
+			m_source_data ^= read_accumulator();
+			set_nz(m_source_data);
+			break;
+
+		case 0xc00:
+			break;
+		}
+		write_register((m_latched_instr & 0x03e0) >> 5, m_source_data);
+		break;
+	}
+}
+
+
+//-------------------------------------------------
+//  data_write - write one byte to data memory to
+//  finish instruction
+//-------------------------------------------------
+
+void dp8344_device::data_write()
+{
+	switch (m_latched_instr & 0xfe00)
+	{
+	case 0xa000: case 0xa200:
+		m_source_data = add_nzcv(m_source_data, read_accumulator(), BIT(m_latched_instr, 9) && BIT(m_ccr, 1));
+		break;
+
+	case 0xa400: case 0xa600:
+		m_source_data = sub_nzcv(m_source_data, read_accumulator(), BIT(m_latched_instr, 9) && BIT(m_ccr, 1));
+		break;
+
+	case 0xa800:
+		m_source_data &= read_accumulator();
+		set_nz(m_source_data);
+		break;
+
+	case 0xaa00:
+		m_source_data |= read_accumulator();
+		set_nz(m_source_data);
+		break;
+
+	case 0xac00:
+		m_source_data ^= read_accumulator();
+		set_nz(m_source_data);
+		break;
+	}
+
+	m_data_space->write_byte(m_data_address, m_source_data);
+}
+
+
+//-------------------------------------------------
+//  data_read - read one byte from data memory
+//  into register to finish instruction
+//-------------------------------------------------
+
+void dp8344_device::data_read()
+{
+	write_register(m_latched_instr & ((m_latched_instr & 0xf000) == 0x9000 ? 0x000f : 0x001f), m_data_space->read_byte(m_data_address));
 }
 
 
@@ -1235,10 +1865,167 @@ std::unique_ptr<util::disasm_interface> dp8344_device::create_disassembler()
 
 void dp8344_device::execute_run()
 {
-	debugger_instruction_hook(m_pc);
+	while (m_icount > 0)
+	{
+		switch (m_inst_state)
+		{
+		case T1_DECODE:
+			m_ppc = m_pc;
+			debugger_instruction_hook(m_pc);
 
-	// TODO: everything
-	m_icount = 0;
+			if (m_nmi_pending)
+			{
+				m_nmi_pending = false;
+
+				// TRAP to interrupt vector
+				m_latched_instr = 0xcfdc;
+			}
+			else if (BIT(m_acr, 0) && interrupt_active())
+			{
+				// TRAP to interrupt vector
+				m_latched_instr = 0xcfc0 | get_interrupt_vector();
+			}
+			else
+				m_pc++;
+
+			m_inst_state = decode_instruction();
+			break;
+
+		case T1_START:
+			instruction_wait();
+			m_inst_state = T2_NEXT;
+			break;
+
+		case T1_SKIP:
+			m_pc++;
+			instruction_wait();
+			m_inst_state = T2_NEXT;
+			break;
+
+		case T1_LJMP:
+			m_pc = m_latched_instr;
+			instruction_wait();
+			m_inst_state = T2_NEXT;
+			break;
+
+		case T1_LCALL:
+			m_pc++;
+			address_stack_push();
+			m_pc = m_latched_instr;
+			instruction_wait();
+			m_inst_state = T2_NEXT;
+			break;
+
+		case TX_READ:
+			latch_address(true);
+			m_inst_state = T2_READ;
+			break;
+
+		case TX_WRITE:
+			latch_address(false);
+			m_inst_state = T2_WRITE;
+			break;
+
+		case TX1_JRMK:
+			m_source_data = rotate_right(m_source_data, (m_latched_instr & 0x00e0) >> 5);
+			m_source_data &= (0xff >> ((m_latched_instr & 0x0700) >> 8)) & 0xfe;
+			m_inst_state = TX2_JMP;
+			break;
+
+		case TX1_JMP:
+			m_inst_state = TX2_JMP;
+			break;
+
+		case TX2_JMP:
+			m_pc += s8(m_source_data);
+			instruction_wait();
+			m_inst_state = T2_NEXT;
+			break;
+
+		case TX_CALL:
+			address_stack_push();
+			m_pc += s8(m_source_data);
+			instruction_wait();
+			m_inst_state = T2_NEXT;
+			break;
+
+		case TX_RETF:
+			address_stack_pop((m_latched_instr & 0x0060) >> 5, BIT(m_latched_instr, 4));
+			instruction_wait();
+			m_inst_state = T2_NEXT;
+			break;
+
+		case T2_NEXT:
+			if (m_wait_states != 0)
+				m_wait_states--;
+			else
+			{
+				prefetch_instruction();
+				m_inst_state = T1_DECODE;
+			}
+			break;
+
+		case T2_STORE:
+			if (m_wait_states != 0)
+				m_wait_states--;
+			else
+			{
+				store_result();
+				prefetch_instruction();
+				m_inst_state = T1_DECODE;
+			}
+			break;
+
+		case T2_READ:
+			if (m_wait_states != 0)
+				m_wait_states--;
+			else
+			{
+				data_read();
+				prefetch_instruction();
+				m_inst_state = T1_DECODE;
+			}
+			break;
+
+		case T2_WRITE:
+			if (m_wait_states != 0)
+				m_wait_states--;
+			else
+			{
+				data_write();
+				prefetch_instruction();
+				m_inst_state = T1_DECODE;
+			}
+			break;
+
+		case T2_ABSOLUTE:
+			if (m_wait_states != 0)
+				m_wait_states--;
+			else
+			{
+				if ((m_latched_instr & 0xfc00) == 0x8c00)
+				{
+					if (BIT(m_source_data, (m_latched_instr & 0x00e0) >> 5) == BIT(m_latched_instr, 8))
+						m_inst_state = BIT(m_latched_instr, 9) ? T1_LCALL : T1_LJMP;
+					else
+						m_inst_state = T1_SKIP;
+				}
+				else
+					m_inst_state = BIT(m_latched_instr, 7) ? T1_LCALL : T1_LJMP;
+				prefetch_instruction();
+			}
+			break;
+		}
+
+		// If the timer is started, run it
+		if (BIT(m_acr, 7))
+		{
+			if ((m_tclk++ & (BIT(m_acr, 5) ? 1 : 15)) == 0)
+				timer_count();
+		}
+
+		m_icount--;
+	}
 }
 
 

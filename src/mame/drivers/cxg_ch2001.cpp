@@ -6,6 +6,12 @@
 CXG Chess 2001, also sold by Hanimex as HCG 1900 and by CGL as Computachess Champion.
 CXG Chess 3000 is assumed to be on similar hardware as this.
 
+The chess engine is by Richard Lang, based on Cyrus.
+
+CXG Systems S.A. and Newcrest Technology Ltd. are related companies, with
+Eric White at the steering wheel. Newcrest(1984-1991) is probably a rename of
+"White & Allcock"(1981-1984).
+
 Hardware notes:
 - Zilog Z8400APS @ 4 MHz (8MHz XTAL)
 - 2KB RAM HM6116, 16KB ROM D27128D
@@ -220,5 +226,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME      FLAGS */
-CONS( 1984, ch2001, 0,      0,      ch2001,  ch2001, ch2001_state, empty_init, "CXG",   "Chess 2001", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS */
+CONS( 1984, ch2001, 0,      0,      ch2001,  ch2001, ch2001_state, empty_init, "CXG Systems / Newcrest Technology", "Chess 2001", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -111,6 +111,11 @@ offs_t m6502_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		flags |= 3;
 		break;
 
+	case DASM_ipx:
+		util::stream_format(stream, " ($%02x), x", params.r8(pc+1));
+		flags |= 2;
+		break;
+
 	case DASM_isy:
 		util::stream_format(stream, " ($%02x, s), y", params.r8(pc+1));
 		flags |= 2;

@@ -118,7 +118,7 @@ void macpci_state::pippin(machine_config &config)
 
 	cdrom_image_device &cdrom(CDROM(config, "cdrom", 0));
 	cdrom.set_interface("pippin_cdrom");
-	SOFTWARE_LIST(config, "cd_list").set_type("pippin", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cd_list").set_original("pippin");
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("32M");

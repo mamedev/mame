@@ -1273,7 +1273,7 @@ void cli_frontend::verifysoftware(const std::vector<std::string> &args)
 
 		for (software_list_device &swlistdev : software_list_device_iterator(drivlist.config()->root_device()))
 		{
-			if (swlistdev.list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM)
+			if (swlistdev.is_original())
 			{
 				if (list_map.insert(swlistdev.list_name()).second)
 				{

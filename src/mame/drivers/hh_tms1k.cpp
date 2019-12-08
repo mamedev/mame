@@ -54,6 +54,7 @@
  @MP1218   TMS1100   1980, Entex Basketball 2 (6010)
  @MP1219   TMS1100   1980, U.S. Games Super Sports-4
  @MP1221   TMS1100   1980, Entex Raise The Devil (6011)
+ *MP1231   TMS1100   1983, Tandy 3-in-1 Sports Arena (model 60-2178)
  *MP1296   TMS1100?  1982, Entex Black Knight
  @MP1312   TMS1100   1983, Gakken FX-Micom R-165/Tandy Radio Shack Science Fair Microcomputer Trainer
  *MP1359   TMS1100?  1985, Capsela CRC2000

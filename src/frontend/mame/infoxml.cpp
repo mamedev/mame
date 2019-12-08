@@ -1940,7 +1940,7 @@ void output_software_list(std::ostream &out, device_t &root)
 {
 	for (const software_list_device &swlist : software_list_device_iterator(root))
 	{
-		out << util::string_format("\t\t<softwarelist name=\"%s\" status=\"%s\"", normalize_string(swlist.list_name().c_str()), (swlist.list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM) ? "original" : "compatible");
+		out << util::string_format("\t\t<softwarelist name=\"%s\" status=\"%s\"", normalize_string(swlist.list_name().c_str()), swlist.is_original() ? "original" : "compatible");
 		if (swlist.filter())
 			out << util::string_format(" filter=\"%s\"", normalize_string(swlist.filter()));
 		out << "/>\n";

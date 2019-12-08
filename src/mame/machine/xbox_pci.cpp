@@ -192,6 +192,7 @@ void mcpx_isalpc_device::device_start()
 void mcpx_isalpc_device::device_reset()
 {
 	pci_device::device_reset();
+	memset(m_gpio_mode, 0, sizeof(m_gpio_mode));
 	m_refresh = false;
 	m_pit_out2 = 1;
 	m_spkrdata = 0;
@@ -282,6 +283,19 @@ WRITE32_MEMBER(mcpx_isalpc_device::acpi_w)
 		m_global_smi_control |= 0x200;
 		update_smi_line();
 		logerror("Generate software SMI with value %02X\n", m_smi_command_port);
+	}
+	else if (((offset >= 0x30) && (offset < 0x36)) || ((offset == 0x36) && ACCESSING_BITS_0_15))
+	{
+		int m = offset != 0x36 ? 4 : 2;
+		int p = (offset - 0x30) * 4;
+
+		for (int a = 0; a < m; a++)
+		{
+			m_gpio_mode[p] = (m_gpio_mode[p] & (~mem_mask & 0xff)) | (data & 0xff);
+			p++;
+			data = data >> 8;
+			mem_mask = mem_mask >> 8;
+		}
 	}
 	else
 		logerror("Acpi write not recognized\n");

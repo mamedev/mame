@@ -610,9 +610,23 @@ public:
 
 	// state saving interfaces
 	template<typename ItemType>
-	void ATTR_COLD save_item(ItemType &&value, const char *valname, int index = 0) { assert(m_save != nullptr); m_save->save_item(this, name(), tag(), index, std::forward<ItemType>(value), valname); }
+	void ATTR_COLD save_item(ItemType &&value, const char *valname, int index = 0)
+	{
+		assert(m_save);
+		m_save->save_item(this, name(), tag(), index, std::forward<ItemType>(value), valname);
+	}
+	template<typename ItemType, typename ElementType>
+	void ATTR_COLD save_item(ItemType &&value, ElementType save_manager::array_unwrap<std::remove_reference_t<ItemType> >::underlying_type::*element, const char *valname, int index = 0)
+	{
+		assert(m_save);
+		m_save->save_item(this, name(), tag(), index, std::forward<ItemType>(value), element, valname);
+	}
 	template<typename ItemType>
-	void ATTR_COLD save_pointer(ItemType &&value, const char *valname, u32 count, int index = 0) { assert(m_save != nullptr); m_save->save_pointer(this, name(), tag(), index, std::forward<ItemType>(value), valname, count); }
+	void ATTR_COLD save_pointer(ItemType &&value, const char *valname, u32 count, int index = 0)
+	{
+		assert(m_save);
+		m_save->save_pointer(this, name(), tag(), index, std::forward<ItemType>(value), valname, count);
+	}
 
 	// debugging
 	device_debug *debug() const { return m_debug.get(); }
