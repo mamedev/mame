@@ -565,9 +565,11 @@ sonicwi:
 
 ;(spinal breakers (world)) and clones (by GeoMan) 
 spinlbrk:
-spinlbrkj:
 spinlbrku:
 @:maincpu,program,ffac76,8c,00,50
+
+
+spinlbrkj:
 @:maincpu,program,ffacce,8c,00,50
 
 
@@ -2255,9 +2257,11 @@ feversos:
 cbuster:
 cbusterj:
 cbusterw:
+@:maincpu,program,80080,28,01,00
+
+
 twocrude:
 twocrudea:
-@:maincpu,program,80080,28,01,00
 @:maincpu,program,80080,28,01,00
 @:maincpu,program,800c0,28,41,00
 
@@ -3093,17 +3097,20 @@ sf2accp2:
 
 
 ;ffightj2:******Final Fight (Japan 900112)
-ffighta:
 ffightj1:
 ffightj2:
 ffightu:
-ffightu1:
 ffightua:
-ffightub:
 @:maincpu,program,ff8520,27,00,50
 @:maincpu,program,ff80a0,4,00,01
+
+ffightub:
+ffightuc:
 @:maincpu,program,ff8520,27,00,50
 @:maincpu,program,ff80a0,4,00,03
+
+ffighta:
+ffightu1:
 @:maincpu,program,ff850c,3b,ff,50
 @:maincpu,program,ff80a0,4,00,00
 
@@ -4572,9 +4579,11 @@ castfant:
 
 ;(cassette: scrum try (set 1)) and clones (by GeoMan)
 cscrtry:
-cscrtry2:
 @:maincpu,program,400,21,01,15
 @:maincpu,program,a,3,10,01
+
+
+cscrtry2:
 @:maincpu,program,400,24,0,2b
 @:maincpu,program,a,3,0,0
 @:maincpu,program,ca41,1,1,1
@@ -7307,14 +7316,14 @@ shogwarru:
 
 
 ;mgcrystlo:******Magical Crystals (World, 91/12/10)
-mgcrystl:
-mgcrystlj:
 mgcrystlo:
 @:maincpu,program,30047a,7a,00,00
 @:maincpu,program,3004f1,1,46,46
 @:maincpu,program,30047b,1,09,09
-@:maincpu,program,300478,4,00,09
-@:maincpu,program,30047c,7c,00,00
+
+
+mgcrystl:
+mgcrystlj:
 @:maincpu,program,300488,4,00,00
 @:maincpu,program,30048c,7c,41,00
 
@@ -7916,10 +7925,14 @@ firebarr:
 
 ;(dream soccer '94) and clones (by GeoMan)
 dsoccr94:
-dsoccr94j:
-dsoccr94k:
 @:maincpu,program,eb57b,80,10,04
+
+
+dsoccr94j:
 @:maincpu,program,ead6d,80,10,04
+
+
+dsoccr94k:
 @:maincpu,program,eb7a1,80,10,04
 
 
