@@ -114,16 +114,16 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	/* add all single-entry save state globals */
 	for (int itemnum = 0; itemnum < MAX_GLOBALS; itemnum++)
 	{
-		u32 valsize, valcount;
 		void *base;
+		u32 valsize, valcount, blockcount, stride;
 
 		/* stop when we run out of items */
-		const char* name = m_machine.save().indexed_item(itemnum, base, valsize, valcount);
-		if (name == nullptr)
+		const char* name = m_machine.save().indexed_item(itemnum, base, valsize, valcount, blockcount, stride);
+		if (!name)
 			break;
 
 		/* if this is a single-entry global, add it */
-		if (valcount == 1 && strstr(name, "/globals/"))
+		if ((valcount == 1) && (blockcount == 1) && strstr(name, "/globals/"))
 		{
 			char symname[100];
 			sprintf(symname, ".%s", strrchr(name, '/') + 1);

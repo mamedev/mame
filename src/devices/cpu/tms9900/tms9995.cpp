@@ -1836,7 +1836,7 @@ void tms9995_device::mem_read()
 		// An on-chip memory access is also visible to the outside world ([1], 2.3.1.2)
 		// but only on word boundary, as only full words are read.
 		if (m_setaddr)
-				m_setaddr->write_byte(m_address & 0xfffe, (TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0)));
+			m_setaddr->write_byte(m_address & 0xfffe, (TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0)));
 
 		// Always read a word from internal memory
 		m_current_value = (m_onchip_memory[intaddr] << 8) | m_onchip_memory[intaddr + 1];

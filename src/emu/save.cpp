@@ -82,12 +82,12 @@ void save_manager::allow_registration(bool allowed)
 	{
 		// look for duplicates
 		std::sort(m_entry_list.begin(), m_entry_list.end(),
-			[](std::unique_ptr<state_entry> const& a, std::unique_ptr<state_entry> const& b) { return a->m_name < b->m_name; });
+				[] (std::unique_ptr<state_entry> const& a, std::unique_ptr<state_entry> const& b) { return a->m_name < b->m_name; });
 
 		int dupes_found = 0;
-		for (int i = 0; i < m_entry_list.size() - 1; i++)
+		for (int i = 1; i < m_entry_list.size(); i++)
 		{
-			if (m_entry_list[i]->m_name == m_entry_list[i + 1]->m_name)
+			if (m_entry_list[i - 1]->m_name == m_entry_list[i]->m_name)
 			{
 				osd_printf_error("Duplicate save state registration entry (%s)\n", m_entry_list[i]->m_name);
 				dupes_found++;
@@ -110,7 +110,7 @@ void save_manager::allow_registration(bool allowed)
 //  index
 //-------------------------------------------------
 
-const char *save_manager::indexed_item(int index, void *&base, u32 &valsize, u32 &valcount) const
+const char *save_manager::indexed_item(int index, void *&base, u32 &valsize, u32 &valcount, u32 &blockcount, u32 &stride) const
 {
 	if (index >= m_entry_list.size() || index < 0)
 		return nullptr;
@@ -119,6 +119,8 @@ const char *save_manager::indexed_item(int index, void *&base, u32 &valsize, u32
 	base = entry->m_data;
 	valsize = entry->m_typesize;
 	valcount = entry->m_typecount;
+	blockcount = entry->m_blockcount;
+	stride = entry->m_stride;
 
 	return entry->m_name.c_str();
 }
@@ -171,9 +173,10 @@ void save_manager::register_postload(save_prepost_delegate func)
 //  memory
 //-------------------------------------------------
 
-void save_manager::save_memory(device_t *device, const char *module, const char *tag, u32 index, const char *name, void *val, u32 valsize, u32 valcount)
+void save_manager::save_memory(device_t *device, const char *module, const char *tag, u32 index, const char *name, void *val, u32 valsize, u32 valcount, u32 blockcount, u32 stride)
 {
 	assert(valsize == 1 || valsize == 2 || valsize == 4 || valsize == 8);
+	assert(((blockcount <= 1) && (stride == 0)) || (stride >= valcount));
 
 	// check for invalid timing
 	if (!m_reg_allowed)
@@ -193,7 +196,7 @@ void save_manager::save_memory(device_t *device, const char *module, const char 
 		totalname = string_format("%s/%X/%s", module, index, name);
 
 	// insert us into the list
-	m_entry_list.emplace_back(std::make_unique<state_entry>(val, totalname.c_str(), device, module, tag ? tag : "", index, valsize, valcount));
+	m_entry_list.emplace_back(std::make_unique<state_entry>(val, totalname.c_str(), device, module, tag ? tag : "", index, valsize, valcount, blockcount, stride));
 }
 
 
@@ -265,9 +268,11 @@ save_error save_manager::read_file(emu_file &file)
 	// read all the data, flipping if necessary
 	for (auto &entry : m_entry_list)
 	{
-		u32 totalsize = entry->m_typesize * entry->m_typecount;
-		if (file.read(entry->m_data, totalsize) != totalsize)
-			return STATERR_READ_ERROR;
+		const u32 blocksize = entry->m_typesize * entry->m_typecount;
+		u8 *data = reinterpret_cast<u8 *>(entry->m_data);
+		for (u32 b = 0; entry->m_blockcount > b; ++b, data += (entry->m_typesize * entry->m_stride))
+			if (file.read(data, blocksize) != blocksize)
+				return STATERR_READ_ERROR;
 
 		// handle flipping
 		if (flip)
@@ -325,9 +330,11 @@ save_error save_manager::write_file(emu_file &file)
 	// then write all the data
 	for (auto &entry : m_entry_list)
 	{
-		u32 totalsize = entry->m_typesize * entry->m_typecount;
-		if (file.write(entry->m_data, totalsize) != totalsize)
-			return STATERR_WRITE_ERROR;
+		const u32 blocksize = entry->m_typesize * entry->m_typecount;
+		const u8 *data = reinterpret_cast<const u8 *>(entry->m_data);
+		for (u32 b = 0; entry->m_blockcount > b; ++b, data += (entry->m_typesize * entry->m_stride))
+			if (file.write(data, blocksize) != blocksize)
+				return STATERR_WRITE_ERROR;
 	}
 	return STATERR_NONE;
 }
@@ -348,9 +355,11 @@ u32 save_manager::signature() const
 		crc = core_crc32(crc, (u8 *)entry->m_name.c_str(), entry->m_name.length());
 
 		// add the type and size to the CRC
-		u32 temp[2];
-		temp[0] = little_endianize_int32(entry->m_typecount);
-		temp[1] = little_endianize_int32(entry->m_typesize);
+		u32 temp[4];
+		temp[0] = little_endianize_int32(entry->m_typesize);
+		temp[1] = little_endianize_int32(entry->m_typecount);
+		temp[2] = little_endianize_int32(entry->m_blockcount);
+		temp[3] = little_endianize_int32(entry->m_stride);
 		crc = core_crc32(crc, (u8 *)&temp[0], sizeof(temp));
 	}
 	return crc;
@@ -365,7 +374,7 @@ u32 save_manager::signature() const
 void save_manager::dump_registry() const
 {
 	for (auto &entry : m_entry_list)
-		LOG(("%s: %d x %d\n", entry->m_name.c_str(), entry->m_typesize, entry->m_typecount));
+		LOG(("%s: %u x %u x %u (%u)\n", entry->m_name.c_str(), entry->m_typesize, entry->m_typecount, entry->m_blockcount, entry->m_stride));
 }
 
 
@@ -454,9 +463,7 @@ size_t ram_state::get_size(save_manager &save)
 	size_t totalsize = 0;
 
 	for (auto &entry : save.m_entry_list)
-	{
-		totalsize += entry->m_typesize * entry->m_typecount;
-	}
+		totalsize += entry->m_typesize * entry->m_typecount * entry->m_blockcount;
 
 	return totalsize + HEADER_SIZE;
 }
@@ -499,8 +506,10 @@ save_error ram_state::save()
 	// write all the data
 	for (auto &entry : m_save.m_entry_list)
 	{
-		u32 totalsize = entry->m_typesize * entry->m_typecount;
-		m_data.write((char *)entry->m_data, totalsize);
+		const u32 blocksize = entry->m_typesize * entry->m_typecount;
+		const char *data = reinterpret_cast<const char *>(entry->m_data);
+		for (u32 b = 0; entry->m_blockcount > b; ++b, data += (entry->m_typesize * entry->m_stride))
+			m_data.write(data, blocksize);
 
 		// check for any errors
 		if (!m_data)
@@ -548,8 +557,10 @@ save_error ram_state::load()
 	// read all the data, flipping if necessary
 	for (auto &entry : m_save.m_entry_list)
 	{
-		u32 totalsize = entry->m_typesize * entry->m_typecount;
-		m_data.read((char *)entry->m_data, totalsize);
+		const u32 blocksize = entry->m_typesize * entry->m_typecount;
+		char *data = reinterpret_cast<char *>(entry->m_data);
+		for (u32 b = 0; entry->m_blockcount > b; ++b, data += (entry->m_typesize * entry->m_stride))
+			m_data.read(data, blocksize);
 
 		// check for any errors
 		if (!m_data)
@@ -880,7 +891,7 @@ void rewinder::report_error(save_error error, rewind_operation operation)
 //  state_entry - constructor
 //-------------------------------------------------
 
-state_entry::state_entry(void *data, const char *name, device_t *device, const char *module, const char *tag, int index, u8 size, u32 count)
+save_manager::state_entry::state_entry(void *data, const char *name, device_t *device, const char *module, const char *tag, int index, u8 size, u32 valcount, u32 blockcount, u32 stride)
 	: m_data(data)
 	, m_name(name)
 	, m_device(device)
@@ -888,8 +899,9 @@ state_entry::state_entry(void *data, const char *name, device_t *device, const c
 	, m_tag(tag)
 	, m_index(index)
 	, m_typesize(size)
-	, m_typecount(count)
-	, m_offset(0)
+	, m_typecount(valcount)
+	, m_blockcount(blockcount)
+	, m_stride(stride)
 {
 }
 
@@ -899,31 +911,34 @@ state_entry::state_entry(void *data, const char *name, device_t *device, const c
 //  block of data
 //-------------------------------------------------
 
-void state_entry::flip_data()
+void save_manager::state_entry::flip_data()
 {
-	u16 *data16;
-	u32 *data32;
-	u64 *data64;
-	int count;
-
-	switch (m_typesize)
+	u8 *data = reinterpret_cast<u8 *>(m_data);
+	for (u32 b = 0; m_blockcount > b; ++b, data += (m_typesize * m_stride))
 	{
+		u16 *data16;
+		u32 *data32;
+		u64 *data64;
+
+		switch (m_typesize)
+		{
 		case 2:
-			data16 = (u16 *)m_data;
-			for (count = 0; count < m_typecount; count++)
+			data16 = reinterpret_cast<u16 *>(data);
+			for (u32 count = 0; count < m_typecount; count++)
 				data16[count] = swapendian_int16(data16[count]);
 			break;
 
 		case 4:
-			data32 = (u32 *)m_data;
-			for (count = 0; count < m_typecount; count++)
+			data32 = reinterpret_cast<u32 *>(data);
+			for (u32 count = 0; count < m_typecount; count++)
 				data32[count] = swapendian_int32(data32[count]);
 			break;
 
 		case 8:
-			data64 = (u64 *)m_data;
-			for (count = 0; count < m_typecount; count++)
+			data64 = reinterpret_cast<u64 *>(data);
+			for (u32 count = 0; count < m_typecount; count++)
 				data64[count] = swapendian_int64(data64[count]);
 			break;
+		}
 	}
 }

@@ -466,7 +466,7 @@ TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 	m_beep_state = (ra & 0x04) ? 1 : 0;
 	m_speaker->level_w((m_beep_state && BIT(m_pia1->b_output(), 5)) ? 1 : 0);
 
-	int const next((10 * (y / 10)) + ((ra < 4) ? 4 : (ra < 8) ? 8 : 14));
+	int const next((y - ra) + ((ra < 4) ? 4 : (ra < 8) ? 8 : 14));
 	m_video_timer->adjust(m_screen->time_until_pos((m_screen->height() > next) ? next : 0, 0));
 }
 
