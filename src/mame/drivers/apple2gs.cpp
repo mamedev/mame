@@ -1173,7 +1173,7 @@ void apple2gs_state::adb_check_mouse()
 			m_adb_kmstatus &= ~0x02;
 			if (m_adb_kmstatus & 0x40)
 			{
-				//raise_irq(IRQS_ADB);
+				raise_irq(IRQS_ADB);
 			}
 		}
 	}
