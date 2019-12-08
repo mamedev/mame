@@ -16391,6 +16391,9 @@ istellar                        // (c) 1983 Funai / Gakken
 istreb                          //
 motogonki                       //
 
+@source:itc4.cpp
+itc4                            //
+
 @source:iteagle.cpp
 bbh2sp                          //
 bbh2spa                         //
