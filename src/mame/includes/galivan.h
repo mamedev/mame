@@ -52,12 +52,12 @@ private:
 	tilemap_t     *m_tx_tilemap;
 	uint16_t       m_scrollx;
 	uint16_t       m_scrolly;
-	uint8_t       m_galivan_scrollx[2],m_galivan_scrolly[2];
-	uint8_t       m_layers;
-	uint8_t       m_ninjemak_dispdisable;
+	uint8_t        m_galivan_scrollx[2],m_galivan_scrolly[2];
+	uint8_t        m_layers;
+	uint8_t        m_ninjemak_dispdisable;
 
-	uint8_t       m_shift_scroll; //youmab
-	uint32_t      m_shift_val;
+	uint8_t        m_shift_scroll; //youmab
+	uint32_t       m_shift_val;
 	DECLARE_WRITE8_MEMBER(galivan_sound_command_w);
 	DECLARE_READ8_MEMBER(soundlatch_clear_r);
 	DECLARE_READ8_MEMBER(IO_port_c0_r);
