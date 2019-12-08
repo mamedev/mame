@@ -2306,6 +2306,12 @@ READ8_MEMBER(apple2gs_state::c000_r)
 		case 0x46:  // INTFLAG
 			return (m_an3 ? INTFLAG_AN3 : 0x00) | m_intflag;
 
+		case 0x47:  // CLRVBLINT
+			m_intflag &= ~INTFLAG_VBL;
+			lower_irq(IRQS_VBL);
+			lower_irq(IRQS_QTRSEC);
+			return read_floatingbus();
+
 		case 0x60: // button 3 on IIgs
 			return m_gameio->sw3_r() | uFloatingBus7;
 
