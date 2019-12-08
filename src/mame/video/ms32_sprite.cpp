@@ -15,20 +15,22 @@
     Offset Bits              Description
            fedcba98 76543210
     00     -xxxxxxx -------- Palette Select (some hardwares with YUV color format)
-	       -------- xxxx---- Priority
-	       -------- -----x-- Visible
-	       -------- ------x- Flip Y
-	       -------- -------x Flip X
+           -------- xxxx---- Priority
+           -------- -----x-- Visible
+           -------- ------x- Flip Y
+           -------- -------x Flip X
     02     xxxxxxxx -------- Source Y offset (1 pixel each)
            -------- xxxxxxxx Source X offset (1 pixel each)
     04     xxxx---- -------- Palette Select (most of hardwares)
-	       ----xxxx xxxxxxxx Source Texture Select (each texture is 256 x 256 pixels)
+           ----xxxx xxxxxxxx Source Texture Select (each texture is 256 x 256 pixels)
     06     xxxxxxxx -------- Source Width - 1 (1 pixel each)
-	       -------- xxxxxxxx Source Height - 1 (1 pixel each)
+           -------- xxxxxxxx Source Height - 1 (1 pixel each)
     08     ------xx xxxxxxxx Y (10 bits signed)
     0a     -----xxx xxxxxxxx X (11 bits signed)
-    0c     xxxxxxxx xxxxxxxx Zoom X (some hardware disabled this, 0x200 = 50%, 0x100 = 100%, 0x80 = 200%)
-    0e     xxxxxxxx xxxxxxxx Zoom Y (some hardware disabled this, 0x200 = 50%, 0x100 = 100%, 0x80 = 200%)
+    0c     xxxxxxxx xxxxxxxx Zoom X (some hardware disabled this, 0x200 = 50%, 0x100 = 100%, 0x80 = 200%)*
+    0e     xxxxxxxx xxxxxxxx Zoom Y (some hardware disabled this, 0x200 = 50%, 0x100 = 100%, 0x80 = 200%)*
+
+    * : Source position add, 8.8 Fixed point
 */
 
 #include "emu.h"
