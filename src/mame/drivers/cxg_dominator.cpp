@@ -46,8 +46,8 @@ public:
 		m_board(*this, "board"),
 		m_dac(*this, "dac"),
 		m_inputs(*this, "IN.%u", 0),
-		m_digits(*this, "digit%u", 0U),
-		m_dp(*this, "dp%u", 0U)
+		m_out_digit(*this, "digit%u", 0U),
+		m_out_lcd(*this, "lcd%u.%u", 0U, 0U)
 	{ }
 
 	// machine drivers
@@ -64,8 +64,8 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_inputs;
-	output_finder<8> m_digits;
-	output_finder<2> m_dp;
+	output_finder<8> m_out_digit;
+	output_finder<2, 53> m_out_lcd;
 
 	// address maps
 	void main_map(address_map &map);
@@ -79,8 +79,8 @@ private:
 
 void dominator_state::machine_start()
 {
-	m_digits.resolve();
-	m_dp.resolve();
+	m_out_digit.resolve();
+	m_out_lcd.resolve();
 }
 
 
@@ -96,7 +96,7 @@ WRITE64_MEMBER(dominator_state::lcd_s_w)
 	u8 d[4];
 
 	// 1st digit: S1-S9, unused middle vertical segments
-	// 2nd digit: S10-S18, unused bottom-right diagonal segment
+	// 2nd digit: S10-S18, unused bottom-right diagonal segment, colon at S17
 	// 3rd digit: S21-S27
 	// 4th digit: S28-S34
 	d[0] = bitswap<9>(data >> 0 & 0x1ff, 2,7,5,4,3,1,0,8,6) & 0x7f;
@@ -105,10 +105,11 @@ WRITE64_MEMBER(dominator_state::lcd_s_w)
 	d[3] = bitswap<7>(data >> 27 & 0x7f, 4,2,0,6,5,3,1);
 
 	for (int i = 0; i < 4; i++)
-		m_digits[offset * 4 + i] = d[i];
+		m_out_digit[offset * 4 + i] = d[i];
 
-	// colon: S17 (part of 2nd digit)
-	m_dp[offset] = BIT(data, 16);
+	// output individual segments
+	for (int i = 0; i < 53; i++)
+		m_out_lcd[offset][i] = BIT(data, i);
 }
 
 
