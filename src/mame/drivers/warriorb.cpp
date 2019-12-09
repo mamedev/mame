@@ -598,44 +598,6 @@ ROM_START( sagaia )
 //  ROM_LOAD( "C07-16.79", 0x00000, 0x00?00, NO_DUMP )
 ROM_END
 
-ROM_START( sagaiaa )
-	ROM_REGION( 0x100000, "maincpu", 0 )    /* 512K for 68000 code */
-	ROM_LOAD16_BYTE( "c07_44.74", 0x00000, 0x20000, CRC(62e0c736) SHA1(86973c4260143e9f1d0d03605487607c6d0c569f) )
-	ROM_LOAD16_BYTE( "c07_43.73", 0x00001, 0x20000, CRC(1c59400b) SHA1(6ce3e9c13706b6b96cfeb772d4bfab5622d9d628) )
-	ROM_LOAD16_BYTE( "c07_45.76", 0x40000, 0x20000, CRC(4fbc9e5f) SHA1(4e6ec0cf448397f32854e73d54aa63afebe6893a) )
-	ROM_LOAD16_BYTE( "c07_42.71", 0x40001, 0x20000, CRC(6c092f03) SHA1(b33b607d1a9f7494e680f834a7290925a9db8d33) )
-
-	ROM_LOAD16_WORD_SWAP( "c07-09.75",   0x80000, 0x80000, CRC(cc69c2ce) SHA1(47883b9e14d8b6dd74db221bff396477231938f2) )   /* data rom */
-
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "c07_41.69", 0x00000, 0x20000, CRC(b50256ea) SHA1(6ed271e4dafd1c759adaa55d5b2343d7374c721a) )
-
-	ROM_REGION( 0x200000, "sprites", 0 )
-	ROM_LOAD64_WORD( "c07-05.24", 0x00000, 0x80000, CRC(fb6d0550) SHA1(2d570ff5ef262cb4cb52e8584a7f167263194d37) )  /* OBJ */
-	ROM_LOAD64_WORD( "c07-06.27", 0x00002, 0x80000, CRC(5eebbcd6) SHA1(d4d860bf6b099956c45c7273ad77b1d35deba4c1) )
-	ROM_LOAD64_WORD( "c07-07.26", 0x00004, 0x80000, CRC(fd9f9e74) SHA1(e89beb5cac844fe16662465b0c76337692591aae) )
-	ROM_LOAD64_WORD( "c07-08.25", 0x00006, 0x80000, CRC(a07dc846) SHA1(7199a604fcd693215ddb7670bfb2daf150145fd7) )
-
-	ROM_REGION( 0x100000, "tc0100scn_1", 0 )
-	ROM_LOAD16_WORD_SWAP( "c07-03.12", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) ) /* SCr(screen 1) */
-	ROM_LOAD16_WORD_SWAP( "c07-04.11", 0x80000, 0x80000, CRC(50421e81) SHA1(27ac420602f1dac00dc32903543a518e6f47fb2f) )
-
-	ROM_REGION( 0x100000, "tc0100scn_2", 0 )
-	ROM_LOAD16_WORD_SWAP( "c07-03.47", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) ) /* SCr(screen 2) */
-	ROM_LOAD16_WORD_SWAP( "c07-04.48", 0x80000, 0x80000, CRC(50421e81) SHA1(27ac420602f1dac00dc32903543a518e6f47fb2f) )
-
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
-	ROM_LOAD( "c07-10.95", 0x00000, 0x80000, CRC(4bbe0ed9) SHA1(081b73c4e4d4fa548445e5548573099bcb1e9213) )
-	ROM_LOAD( "c07-11.96", 0x80000, 0x80000, CRC(3c815699) SHA1(0471ff5b0c0da905267f2cee52fd68c8661cccc9) )
-
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
-	ROM_LOAD( "c07-12.107", 0x00000, 0x80000, CRC(e0b71258) SHA1(0258e308b643d723475824752ebffc4ea29d1ac4) )
-
-	ROM_REGION( 0x001000, "user1", 0 )  /* unknown roms */
-	ROM_LOAD( "c07-13.37", 0x00000, 0x00400, CRC(3ca18eb3) SHA1(54560f02c2be67993940831222130e90cd171991) )
-	ROM_LOAD( "c07-14.38", 0x00000, 0x00400, CRC(baf2a193) SHA1(b7f103b5f5aab0702dd21fd7e3a82261ae1760e9) )
-ROM_END
-
 ROM_START( darius2d )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 512K for 68000 code */
 	ROM_LOAD16_BYTE( "c07_20-2.74", 0x00000, 0x20000, CRC(a0f345b8) SHA1(1ce46e9707ec9ad51b26acf613eedc0536d227ae) )
@@ -761,8 +723,7 @@ ROM_END
 /* Working Games */
 
 //    YEAR, NAME,      PARENT,  MACHINE,  INPUT,    STATE,          INIT,       MONITOR,COMPANY,FULLNAME,          FLAGS
-GAME( 1989, sagaia,    darius2, darius2d, sagaia,   warriorb_state, empty_init, ROT0,   "Taito Corporation Japan", "Sagaia (dual screen) (World, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, sagaiaa,   darius2, darius2d, sagaia,   warriorb_state, empty_init, ROT0,   "Taito Corporation Japan", "Sagaia (dual screen) (World, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, sagaia,    darius2, darius2d, sagaia,   warriorb_state, empty_init, ROT0,   "Taito Corporation Japan", "Sagaia (dual screen) (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, darius2d,  darius2, darius2d, darius2d, warriorb_state, empty_init, ROT0,   "Taito Corporation",       "Darius II (dual screen) (Japan, Rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, darius2do, darius2, darius2d, darius2d, warriorb_state, empty_init, ROT0,   "Taito Corporation",       "Darius II (dual screen) (Japan, Rev 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1991, warriorb,  0,       warriorb, warriorb, warriorb_state, empty_init, ROT0,   "Taito Corporation",       "Warrior Blade - Rastan Saga Episode III (Japan)", MACHINE_SUPPORTS_SAVE )
