@@ -262,17 +262,17 @@ void sknsspr_device::skns_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cl
 
 	  a = ROM address of sprite data
 
-0x08  ZZZZ ZZ--  zzzz zz--  xxxx xxxx  xx-- ----
+0x08  ZZZZ ZZ--  zzzz zz--  xxxx xxxx  xxxx xxxx
 
 	  Z = horizontal zoom table
 	  z = horizontal zoom subtable
-	  x = x position
+	  x = x position (10.6 fixed point)
 
-0x0C  ZZZZ ZZ--  zzzz zz--  yyyy yyyy  yy-- ----
+0x0C  ZZZZ ZZ--  zzzz zz--  yyyy yyyy  yyyy yyyy
 
 	  Z = vertical zoom table
 	  z = vertical zoom subtable
-	  x = y position
+	  x = y position (10.6 fixed point)
 
 	**- End of Comments -*/
 
