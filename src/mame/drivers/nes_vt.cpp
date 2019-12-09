@@ -165,6 +165,9 @@ protected:
 
 	void nes_vt_xx_map(address_map& map);
 
+	/* Misc */
+	DECLARE_READ8_MEMBER(rs232flags_region_r);
+
 private:
 	/* APU handling */
 	DECLARE_WRITE_LINE_MEMBER(apu_irq);
@@ -177,8 +180,6 @@ private:
 	DECLARE_WRITE8_MEMBER(extraout_01_w);
 	DECLARE_WRITE8_MEMBER(extraout_23_w);
 
-	/* Misc */
-	DECLARE_READ8_MEMBER(rs232flags_region_r);
 
 	DECLARE_WRITE8_MEMBER(chr_w);
 
@@ -350,10 +351,12 @@ public:
 
 	void nes_vt_hh(machine_config& config);
 	void nes_vt_vg(machine_config& config);
+	void nes_vt_vg_baddma(machine_config& config);
 	void nes_vt_fp(machine_config& config);
 
 private:
 	void nes_vt_hh_map(address_map& map);
+	void nes_vt_hh_baddma_map(address_map& map);
 	void nes_vt_fp_map(address_map& map);
 
 	DECLARE_WRITE8_MEMBER(vtfp_411e_w);
@@ -1580,11 +1583,19 @@ void nes_vt_hh_state::nes_vt_hh_map(address_map &map)
 	map(0x4034, 0x4034).w(FUNC(nes_vt_hh_state::vt03_4034_w));
 	map(0x4014, 0x4014).r(FUNC(nes_vt_hh_state::psg1_4014_r)).w(FUNC(nes_vt_hh_state::vt_fixed_dma_w));
 
-	map(0x414A, 0x414A).r(FUNC(nes_vt_hh_state::vthh_414a_r));
+	map(0x4119, 0x4119).r(FUNC(nes_vt_hh_state::rs232flags_region_r));
+	map(0x414a, 0x414a).r(FUNC(nes_vt_hh_state::vthh_414a_r));
 	map(0x411d, 0x411d).w(FUNC(nes_vt_hh_state::vtfp_411d_w));
 
 	map(0x6000, 0x7fff).ram();
 }
+
+void nes_vt_hh_state::nes_vt_hh_baddma_map(address_map &map)
+{
+	nes_vt_hh_map(map);
+	map(0x4014, 0x4014).w(FUNC(nes_vt_hh_state::vt_dma_w));
+}
+
 
 READ8_MEMBER(nes_vt_hh_state::vtfp_4119_r)
 {
@@ -1829,6 +1840,14 @@ void nes_vt_hh_state::nes_vt_vg(machine_config &config)
 {
 	nes_vt_dg(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_hh_map);
+
+	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
+}
+
+void nes_vt_hh_state::nes_vt_vg_baddma(machine_config &config)
+{
+	nes_vt_dg(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_hh_baddma_map);
 
 	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
 }
@@ -2132,10 +2151,17 @@ ROM_START( ddrstraw )
 	ROM_LOAD( "straws-ddr.bin", 0x00000, 0x200000, CRC(ce94e53a) SHA1(10c6970205a4df28086029c0a348225f57bf0cc5) ) // 26LV160 Flash
 ROM_END
 
+ROM_START( majkon )
+	ROM_REGION( 0x200000, "mainrom", ROMREGION_ERASEFF )
+	ROM_LOAD( "konamicollectorsseries.bin", 0x00000, 0x100000, CRC(47505e51) SHA1(3bfb05d7cfa2bb4c115335f0383fa4aa59db0b28) )
+ROM_END
+
 ROM_START( ablping )
 	ROM_REGION( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "abl_pingpong.bin", 0x00000, 0x200000, CRC(b31de1fb) SHA1(94e8afb2315ba1fa0892191c8e1832391e401c70) )
 ROM_END
+
+
 
 #if 0
 ROM_START( mc_15kin1 )
@@ -2247,8 +2273,10 @@ CONS( 200?, mc_dgear,  0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "dre
 
 // all software in this runs in the VT03 enhanced mode, it also includes an actual licensed VT03 port of Frogger.
 // all games work OK except Frogger which has serious graphical issues
-CONS( 2006, vgtablet,  0, 0,  nes_vt_vg,    nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products (licensed by Konami)", "VG Pocket Tablet (VG-4000)", MACHINE_NOT_WORKING )
+CONS( 2006, vgtablet,  0, 0,  nes_vt_vg,        nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products (licensed by Konami)", "VG Pocket Tablet (VG-4000)", MACHINE_NOT_WORKING ) // raster timing is broken for Frogger
 // There is a 2004 Majesco Frogger "TV game" that appears to contain the same version of Frogger as above but with no other games, so probably fits here.
+CONS( 2004, majkon,    0, 0,  nes_vt_vg_baddma, nes_vt, nes_vt_hh_state, empty_init, "Majesco (licensed from Konami)", "Konami Collector's Series Arcade Advanced", MACHINE_NOT_WORKING ) // raster timing is broken for Frogger, palette issues
+
 
 // this is VT09 based
 // it boots, most games correct, but palette issues in some games still (usually they appear greyscale)
@@ -2256,6 +2284,7 @@ CONS( 2006, vgtablet,  0, 0,  nes_vt_vg,    nes_vt, nes_vt_hh_state, empty_init,
 CONS( 2009, cybar120,  0,  0,  nes_vt_vg, nes_vt, nes_vt_hh_state, empty_init, "Defender", "Defender M2500P 120-in-1", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2005, vgpocket,  0,  0,  nes_vt_vg, nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products", "VG Pocket (VG-2000)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, vgpmini,   0,  0,  nes_vt_vg, nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products", "VG Pocket Mini (VG-1500)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+
 
 // Runs fine, non-sport 121 in 1 games perfect, but minor graphical issues in
 // sport games, also no sound in menu or sport games due to missing PCM
@@ -2313,6 +2342,8 @@ CONS( 200?, gprnrs16,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_ini
 // * Console has stereo output (dual RCA connectors).
 CONS( 2006, ddrdismx,   0,        0,  nes_vt_ddr, nes_vt, nes_vt_state, empty_init, "Majesco (licensed from Konami, Disney)", "Dance Dance Revolution Disney Mix",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // shows (c)2001 Disney onscreen, but that's recycled art from the Playstation release, actual release was 2006
 CONS( 2006, ddrstraw,   0,        0,  nes_vt_ddr, nes_vt, nes_vt_state, empty_init, "Majesco (licensed from Konami)",         "Dance Dance Revolution Strawberry Shortcake", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+
 
 // unsorted, these were all in nes.xml listed as ONE BUS systems
 CONS( 200?, mc_dg101,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "dreamGEAR", "dreamGEAR 101 in 1", MACHINE_IMPERFECT_GRAPHICS ) // dreamGear, but no enhanced games?
