@@ -440,34 +440,34 @@
 	<group name="buttons">
 		<bounds x="6" y="6" width="88" height="44" />
 
-		<element ref="text_l1"><bounds x="34.75" y="6.6" width="16" height="3.29" /></element>
-		<element ref="text_l2"><bounds x="49.75" y="6.6" width="16" height="3.29" /></element>
+		<element ref="text_l1"><bounds x="34.75" y="6.5" width="16" height="3.29" /></element>
+		<element ref="text_l2"><bounds x="49.75" y="6.5" width="16" height="3.29" /></element>
 
-		<element ref="text_p6"><bounds x="12.5" y="17.1" width="5" height="5" /></element>
-		<element ref="text_p5"><bounds x="26.5" y="17.1" width="5" height="5" /></element>
-		<element ref="text_p4"><bounds x="40.5" y="17.1" width="5" height="5" /></element>
-		<element ref="text_p3"><bounds x="54.5" y="17.1" width="5" height="5" /></element>
-		<element ref="text_p2"><bounds x="68.5" y="17.1" width="5" height="5" /></element>
-		<element ref="text_p1"><bounds x="82.5" y="17.1" width="5" height="5" /></element>
+		<element ref="text_p6"><bounds x="12.25" y="16.65" width="5.5" height="5.5" /></element>
+		<element ref="text_p5"><bounds x="26.25" y="16.65" width="5.5" height="5.5" /></element>
+		<element ref="text_p4"><bounds x="40.25" y="16.65" width="5.5" height="5.5" /></element>
+		<element ref="text_p3"><bounds x="54.25" y="16.65" width="5.5" height="5.5" /></element>
+		<element ref="text_p2"><bounds x="68.25" y="16.65" width="5.5" height="5.5" /></element>
+		<element ref="text_p1"><bounds x="82.25" y="16.65" width="5.5" height="5.5" /></element>
 
-		<element ref="text_l3"><bounds x="8"  y="29.7" width="14" height="4.5" /></element>
-		<element ref="text_l4"><bounds x="22" y="29.7" width="14" height="4.5" /></element>
-		<element ref="text_l5"><bounds x="36" y="29.7" width="14" height="4.5" /></element>
-		<element ref="text_l6"><bounds x="50" y="29.7" width="14" height="4.5" /></element>
-		<element ref="text_l7"><bounds x="64" y="29.7" width="14" height="4.5" /></element>
-		<element ref="text_l8"><bounds x="78" y="29.7" width="14" height="4.5" /></element>
+		<element ref="text_l3"><bounds x="8"  y="29.7" width="14" height="4.3" /></element>
+		<element ref="text_l4"><bounds x="22" y="29.7" width="14" height="4.3" /></element>
+		<element ref="text_l5"><bounds x="36" y="29.7" width="14" height="4.3" /></element>
+		<element ref="text_l6"><bounds x="50" y="29.7" width="14" height="4.3" /></element>
+		<element ref="text_l7"><bounds x="64" y="29.7" width="14" height="4.3" /></element>
+		<element ref="text_l8"><bounds x="78" y="29.7" width="14" height="4.3" /></element>
 
-		<element ref="text_l4a"><bounds x="24" y="29.6" width="10" height="4.0" /></element>
-		<element ref="text_l5a"><bounds x="38" y="29.6" width="10" height="4.0" /></element>
+		<element ref="text_l4a"><bounds x="24" y="29.48" width="10" height="4.0" /></element>
+		<element ref="text_l5a"><bounds x="38" y="29.48" width="10" height="4.0" /></element>
 
-		<element ref="text_l9"><bounds x="36" y="41.7" width="14" height="4.5" /></element>
-		<element ref="text_l10"><bounds x="50" y="41.7" width="14" height="4.5" /></element>
-		<element ref="text_l11"><bounds x="64" y="41.7" width="14" height="4.5" /></element>
-		<element ref="text_l12"><bounds x="78" y="41.7" width="14" height="4.5" /></element>
+		<element ref="text_l9"><bounds x="36" y="41.7" width="14" height="4.3" /></element>
+		<element ref="text_l10"><bounds x="50" y="41.7" width="14" height="4.3" /></element>
+		<element ref="text_l11"><bounds x="64" y="41.7" width="14" height="4.3" /></element>
+		<element ref="text_l12"><bounds x="78" y="41.7" width="14" height="4.3" /></element>
 
-		<element ref="white"><bounds x="13.4" y="42.2" width="3.2" height="3.2" /></element>
-		<element ref="black"><bounds x="13.9" y="42.7" width="2.2" height="2.2" /></element>
-		<element ref="white"><bounds x="27.4" y="42.2" width="3.2" height="3.2" /></element>
+		<element ref="white"><bounds x="13.4" y="42.1" width="3.2" height="3.2" /></element>
+		<element ref="black"><bounds x="13.9" y="42.6" width="2.2" height="2.2" /></element>
+		<element ref="white"><bounds x="27.4" y="42.1" width="3.2" height="3.2" /></element>
 
 		<element ref="bmask" blend="multiply"><bounds x="8" y="6" width="84" height="42" /></element>
 		<element ref="black2"><bounds x="6" y="16" width="88" height="0.8" /></element>
@@ -529,8 +529,8 @@
 		<bezel element="text_g"><bounds x="67.5" y="84.5" width="2" height="2" /></bezel>
 		<bezel element="text_h"><bounds x="77.5" y="84.5" width="2" height="2" /></bezel>
 
-		<group ref="lcd1"><bounds x="17.25" y="102.5" width="12.5" height="4.9" /></group>
-		<group ref="lcd2"><bounds x="17.25" y="93.5" width="12.5" height="4.9" /></group>
+		<group ref="lcd1"><bounds x="17.25" y="102.5" width="12.5" height="5.1" /></group>
+		<group ref="lcd2"><bounds x="17.25" y="93.5" width="12.5" height="5.1" /></group>
 
 		<group ref="buttons"><bounds x="41.5" y="88.5" width="44" height="22" /></group>
 
