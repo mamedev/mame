@@ -1146,7 +1146,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2001_vblank_r)
 	uint8_t ret = 0x00;
 
 	int sp_err = 0; // too many sprites per lien
-	int vblank = m_screen->vpos() > 240 ? 1 : 0; // in vblank?
+	int vblank = m_screen->vpos() > 239 ? 1 : 0; // in vblank, the pinball game in miwi2_16 under 'drum master' requires this to become set before the VBL interrupt fires
 
 	ret |= sp_err << 6;
 	ret |= vblank << 7;
@@ -4904,6 +4904,9 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 			// TODO: bit 0x8000 in palette can cause the layer to 'dig through'
 			// palette layers can also be turned off, or just sent to lcd / just sent to tv
 			// layers can also blend 50/50 rather than using depth
+
+			// the transparency fallthrough here works for Boxing, but appears to be incorrect for Lawn Purge title screen (assuming it isn't an offset issue)
+
 			if (pri1 <= pri2)
 			{
 				if (pix1) dstptr[x] = paldata[pix1 | 0x100];
