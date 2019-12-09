@@ -31170,6 +31170,7 @@ zdog
 ii8in1
 ii32in1
 miwi2_16
+intact89
 
 @source:newbrain.cpp
 newbrain                        //
@@ -39619,6 +39620,7 @@ vigilanto                       // (c) 1988 (US)
 jak_capb                        //
 jak_spdmo                       //
 conyteni                        //
+conyping                        //
 
 @source:vii.cpp
 jak_batm                        // The Batman, 2004
@@ -39661,7 +39663,8 @@ icanpian                        //
 tvgogo                          //
 pvmil                           //
 taikeegr                        //
-sentx6p                        //
+shredmjr                        //
+sentx6p                         //
 
 @source:vsmile.cpp
 vsmile                          //

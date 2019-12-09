@@ -99,6 +99,8 @@ public:
 		m_leftdac(*this, "leftdac"),
 		m_rightdac(*this, "rightdac"),
 		m_maincpu(*this, "maincpu"),
+		m_fullrom(*this, "fullrom"),
+		m_bank(*this, "cartbank"),
 		m_soundcpu(*this, "soundcpu"),
 		m_maincpu_alu(*this, "mainalu"),
 		m_soundcpu_alu(*this, "soundalu"),
@@ -106,7 +108,6 @@ public:
 		m_soundcpu_timer_b_dev(*this, "snd_timerb_dev"),
 		m_system_timer_dev(*this, "sys_timer_dev"),
 		m_screen(*this, "screen"),
-		m_fullrom(*this, "fullrom"),
 		m_spriteram(*this, "spriteram"),
 		m_vram(*this, "vram"),
 		m_sound_share(*this, "sound_share"),
@@ -116,6 +117,7 @@ public:
 	{ }
 
 	void vt_vt1682(machine_config& config);
+	void regular_init();
 
 protected:
 	virtual void machine_start() override;
@@ -125,8 +127,13 @@ protected:
 	required_device<vrt_vt1682_io_device> m_io;
 	required_device<dac_12bit_r2r_device> m_leftdac;
 	required_device<dac_12bit_r2r_device> m_rightdac;
-private:
 	required_device<cpu_device> m_maincpu;
+
+	void vt_vt1682_map(address_map& map);
+
+	required_device<address_map_bank_device> m_fullrom;
+	required_memory_bank m_bank;
+private:
 	required_device<cpu_device> m_soundcpu;
 	required_device<vrt_vt1682_alu_device> m_maincpu_alu;
 	required_device<vrt_vt1682_alu_device> m_soundcpu_alu;
@@ -136,7 +143,6 @@ private:
 	required_device<vrt_vt1682_timer_device> m_system_timer_dev;
 
 	required_device<screen_device> m_screen;
-	required_device<address_map_bank_device> m_fullrom;
 	required_device<address_map_bank_device> m_spriteram;
 	required_device<address_map_bank_device> m_vram;
 	required_shared_ptr<uint8_t> m_sound_share;
@@ -145,8 +151,9 @@ private:
 	required_device<timer_device> m_render_timer;
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
-	void vt_vt1682_map(address_map& map);
 	void vt_vt1682_sound_map(address_map& map);
+
+
 
 	void rom_map(address_map& map);
 
@@ -596,7 +603,10 @@ public:
 		m_io_p4(*this, "IN3")
 	{ }
 
+	void banked_init();
+
 	void intech_interact(machine_config& config);
+	void intech_interact_bank(machine_config& config);
 
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(portb_r) { return 0x00;/*uint8_t ret = machine().rand() & 0xf; LOGMASKED(LOG_OTHER, "%s: portb_r returning: %1x\n", machine().describe_context(), ret); return ret;*/ };
@@ -612,7 +622,11 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void vt_vt1682_map_bank(address_map& map);
+
 private:
+	DECLARE_WRITE8_MEMBER(inteact_2129_bank_w);
+
 	uint8_t m_previous_port_b;
 	int m_input_sense;
 	int m_input_pos;
@@ -839,6 +853,8 @@ void vt_vt1682_state::machine_reset()
 	/* Misc */
 
 	update_banks();
+
+	m_bank->set_entry(0);
 
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
@@ -4934,7 +4950,7 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 // VT1682 can address 25-bit address space (32MB of ROM)
 void vt_vt1682_state::rom_map(address_map &map)
 {
-	map(0x0000000, 0x1ffffff).rom().region("mainrom", 0);
+	map(0x0000000, 0x1ffffff).bankr("cartbank");
 }
 
 // 11-bits (0x800 bytes) for sprites
@@ -5113,6 +5129,17 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x8000, 0xffff).r(FUNC(vt_vt1682_state::rom_8000_to_ffff_r));
 
 	map(0xfffe, 0xffff).r(FUNC(vt_vt1682_state::maincpu_irq_vector_hack_r)); // probably need custom IRQ support in the core instead...
+}
+
+void intec_interact_state::vt_vt1682_map_bank(address_map& map)
+{
+	vt_vt1682_map(map);
+	map(0x2129, 0x2129).w(FUNC(intec_interact_state::inteact_2129_bank_w));  // 2129 UIO
+}
+
+WRITE8_MEMBER(intec_interact_state::inteact_2129_bank_w)
+{
+	m_bank->set_entry(data & 0x01);
 }
 
 /*
@@ -5543,6 +5570,29 @@ void intec_interact_state::intech_interact(machine_config& config)
 	m_rightdac->add_route(0, "mono", 0.5);
 }
 
+void intec_interact_state::intech_interact_bank(machine_config& config)
+{
+	intech_interact(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &intec_interact_state::vt_vt1682_map_bank);
+}
+
+void vt_vt1682_state::regular_init()
+{
+	m_bank->configure_entry(0, memregion("mainrom")->base() + 0x0000000);
+}
+
+
+void intec_interact_state::banked_init()
+{
+	m_bank->configure_entry(0, memregion("mainrom")->base() + 0x0000000);
+	m_bank->configure_entry(1, memregion("mainrom")->base() + 0x2000000);
+}
+
+
+
+
+
 // the VT1682 can have 0x1000 bytes of internal ROM, but none of the software dumped makes use of it.
 
 ROM_START( ii8in1 )
@@ -5560,17 +5610,25 @@ ROM_START( miwi2_16 )
 	ROM_LOAD( "miwi 2 16 arcade games and drum master vt168.bin", 0x00000, 0x1000000, CRC(00c115c5) SHA1(fa5fdb448dd9b963351d71fe94e2072f5c872a18) )
 ROM_END
 
+ROM_START( intact89 )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "89n1.bin", 0x00000, 0x4000000, CRC(bbcba068) SHA1(0ec1ecc55e9a7050ca20b1349b9712319fd21629) )
+ROM_END
+
 
 // TODO: this is a cartridge based system (actually, verify this, it seems some versions simply had built in games) move these to SL if verified as from cartridge config
 //  actually it appears that for the cart based systems these are 'fake systems' anyway, where the base unit is just a Famiclone but as soon as you plug in a cart none of
 //  the internal hardware gets used at all.
 
-CONS( 200?, ii8in1,    0,  0,  intech_interact,    intec, intec_interact_state, empty_init,  "Intec", "InterAct 8-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, ii32in1,   0,  0,  intech_interact,    intec, intec_interact_state, empty_init,  "Intec", "InterAct 32-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, ii8in1,    0,  0,  intech_interact,    intec, intec_interact_state, regular_init,  "Intec", "InterAct 8-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, ii32in1,   0,  0,  intech_interact,    intec, intec_interact_state, regular_init,  "Intec", "InterAct 32-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // a 40-in-1 also exists which combines the above
 
-CONS( 200?, miwi2_16,  0,  0,  intech_interact,    miwi2, intec_interact_state, empty_init,  "<unknown>", "MiWi2 16-in-1 + Drum Master", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, miwi2_16,  0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "<unknown>", "MiWi2 16-in-1 + Drum Master", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // miwi2 7-in-1 Sports
+
+CONS( 200?, intact89,  0,  0,  intech_interact_bank, miwi2, intec_interact_state, banked_init,  "Intec", "InterAct Complete Video Game 89-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
 
 // Intec Interact Infrazone 15 Shooting Games, 42 Mi kara, 96 Arcade Games + more should run here too
 // Other standalone Mi Kara units should fit here as well
