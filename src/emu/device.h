@@ -627,6 +627,12 @@ public:
 		assert(m_save);
 		m_save->save_pointer(this, name(), tag(), index, std::forward<ItemType>(value), valname, count);
 	}
+	template<typename ItemType, typename ElementType>
+	void ATTR_COLD save_pointer(ItemType &&value, ElementType save_manager::pointer_unwrap<ItemType>::underlying_type::*element, const char *valname, u32 count, int index = 0)
+	{
+		assert(m_save);
+		m_save->save_pointer(this, name(), tag(), index, std::forward<ItemType>(value), element, valname, count);
+	}
 
 	// debugging
 	device_debug *debug() const { return m_debug.get(); }

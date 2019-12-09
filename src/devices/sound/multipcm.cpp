@@ -575,23 +575,23 @@ void multipcm_device::device_start()
 	save_item(NAME(m_address));
 
 	// Slots
-	m_slots = make_unique_clear<slot_t[]>(28);
+	m_slots = make_unique_clear<slot_t []>(28);
+
+	save_pointer(STRUCT_MEMBER(m_slots, m_regs), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_playing), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_base), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_offset), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_step), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_pan), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_total_level), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_dest_total_level), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_total_level_step), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_prev_sample), 28);
+
 	for (int32_t slot = 0; slot < 28; ++slot)
 	{
-		m_slots[slot].m_slot_index = slot;
 		m_slots[slot].m_playing = false;
 
-		save_item(NAME(m_slots[slot].m_slot_index), slot);
-		save_item(NAME(m_slots[slot].m_regs), slot);
-		save_item(NAME(m_slots[slot].m_playing), slot);
-		save_item(NAME(m_slots[slot].m_base), slot);
-		save_item(NAME(m_slots[slot].m_offset), slot);
-		save_item(NAME(m_slots[slot].m_step), slot);
-		save_item(NAME(m_slots[slot].m_pan), slot);
-		save_item(NAME(m_slots[slot].m_total_level), slot);
-		save_item(NAME(m_slots[slot].m_dest_total_level), slot);
-		save_item(NAME(m_slots[slot].m_total_level_step), slot);
-		save_item(NAME(m_slots[slot].m_prev_sample), slot);
 		save_item(NAME(m_slots[slot].m_envelope_gen.m_volume), slot);
 		save_item(NAME(m_slots[slot].m_envelope_gen.m_state), slot);
 		save_item(NAME(m_slots[slot].m_envelope_gen.step), slot);

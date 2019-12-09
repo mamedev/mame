@@ -19,7 +19,10 @@
 
 #include <array>
 #include <cassert>
+#include <memory>
+#include <string>
 #include <type_traits>
+#include <vector>
 
 
 
@@ -60,7 +63,7 @@ typedef named_delegate<void ()> save_prepost_delegate;
 	template <> inline void save_manager::save_item(device_t *device, const char *module, const char *tag, int index, std::vector<TYPE> &value, const char *name) { save_memory(device, module, tag, index, name, &value[0], sizeof(TYPE), value.size()); }
 
 // use this for saving members of structures in arrays
-#define STRUCT_MEMBER(s, m) s, &save_manager::array_unwrap<std::remove_reference_t<decltype(s)> >::underlying_type::m, #s "." #m
+#define STRUCT_MEMBER(s, m) s, &save_manager::pointer_unwrap<decltype(s)>::underlying_type::m, #s "." #m
 
 
 //**************************************************************************
@@ -74,7 +77,7 @@ class save_manager
 {
 	// type_checker is a set of templates to identify valid save types
 	template <typename ItemType> struct type_checker { static constexpr bool is_atom = false; static constexpr bool is_pointer = false; };
-	template <typename ItemType> struct type_checker<ItemType*> { static constexpr bool is_atom = false; static constexpr bool is_pointer = true; };
+	template <typename ItemType> struct type_checker<ItemType *> { static constexpr bool is_atom = false; static constexpr bool is_pointer = true; };
 
 	class state_entry
 	{
@@ -110,7 +113,7 @@ public:
 		static constexpr std::size_t SIZE = sizeof(underlying_type);
 		static underlying_type *ptr(T &value) { return &value; }
 	};
-	template <typename T, std::size_t N> struct array_unwrap<T[N]>
+	template <typename T, std::size_t N> struct array_unwrap<T [N]>
 	{
 		using underlying_type = typename array_unwrap<T>::underlying_type;
 		static constexpr std::size_t SAVE_COUNT = N * array_unwrap<T>::SAVE_COUNT;
@@ -124,6 +127,12 @@ public:
 		static constexpr std::size_t SIZE = sizeof(underlying_type);
 		static underlying_type *ptr(std::array<T, N> &value) { return array_unwrap<T>::ptr(value[0]); }
 	};
+
+	// stuff to allow STRUCT_MEMBER to work with pointers
+	template <typename T> struct pointer_unwrap { using underlying_type = typename array_unwrap<T>::underlying_type; };
+	template <typename T> struct pointer_unwrap<T &> { using underlying_type = typename pointer_unwrap<std::remove_cv_t<T> >::underlying_type; };
+	template <typename T> struct pointer_unwrap<T *> { using underlying_type = typename array_unwrap<T>::underlying_type; };
+	template <typename T> struct pointer_unwrap<std::unique_ptr<T []> > { using underlying_type = typename array_unwrap<T>::underlying_type; };
 
 	// construction/destruction
 	save_manager(running_machine &machine);
