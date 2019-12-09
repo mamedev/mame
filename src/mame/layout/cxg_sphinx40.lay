@@ -529,8 +529,8 @@
 		<bezel element="text_g"><bounds x="67.5" y="84.5" width="2" height="2" /></bezel>
 		<bezel element="text_h"><bounds x="77.5" y="84.5" width="2" height="2" /></bezel>
 
-		<group ref="lcd1"><bounds x="17.25" y="99.5" width="12.5" height="4.9" /></group>
-		<group ref="lcd2"><bounds x="17.25" y="90.4" width="12.5" height="4.9" /></group>
+		<group ref="lcd1"><bounds x="17.25" y="102.5" width="12.5" height="4.9" /></group>
+		<group ref="lcd2"><bounds x="17.25" y="93.5" width="12.5" height="4.9" /></group>
 
 		<group ref="buttons"><bounds x="41.5" y="88.5" width="44" height="22" /></group>
 
