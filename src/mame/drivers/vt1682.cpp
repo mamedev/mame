@@ -5409,6 +5409,14 @@ static INPUT_PORTS_START( intec )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( miwi2 )
+	PORT_INCLUDE( intec )
+
+	PORT_MODIFY("IN3") // the 2nd drum appears to act like a single 2nd player controller? (even if none of the player 2 controls work in this port for intec?)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // Pink Drum in Drum Master
+INPUT_PORTS_END
+
+
 // this controller code is just designed to feed the games with data they're happy with, it probably has no grounds in reality
 // as I don't know how they really work.  presumably wireless with timeouts, sending signals for brief periods that need to be
 // picked up on, although that said, there are some very short (128 read on status) timeout loops in the code that will force
@@ -5532,25 +5540,36 @@ void intec_interact_state::intech_interact(machine_config& config)
 	m_rightdac->add_route(0, "mono", 0.5);
 }
 
+// the VT1682 can have 0x1000 bytes of internal ROM, but none of the software dumped makes use of it.
 
 ROM_START( ii8in1 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "ii8in1.bin", 0x00000, 0x2000000, CRC(7aee7464) SHA1(7a9cf7f54a350f0853a17459f2dcbef34f4f7c30) ) // 2ND HALF EMPTY
-
-	// possible undumped 0x1000 bytes of Internal ROM (software doesn't appear to make use of it)
 ROM_END
 
 ROM_START( ii32in1 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "ii32in1.bin", 0x00000, 0x2000000, CRC(ddee4eac) SHA1(828c0c18a66bb4872299f9a43d5e3647482c5925) )
-
-	// possible undumped 0x1000 bytes of Internal ROM (software doesn't appear to make use of it)
 ROM_END
 
+ROM_START( miwi2_16 )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "miwi 2 16 arcade games and drum master vt168.bin", 0x00000, 0x1000000, CRC(00c115c5) SHA1(fa5fdb448dd9b963351d71fe94e2072f5c872a18) )
+ROM_END
+
+
 // TODO: this is a cartridge based system (actually, verify this, it seems some versions simply had built in games) move these to SL if verified as from cartridge config
+//  actually it appears that for the cart based systems these are 'fake systems' anyway, where the base unit is just a Famiclone but as soon as you plug in a cart none of
+//  the internal hardware gets used at all.
+
 CONS( 200?, ii8in1,    0,  0,  intech_interact,    intec, intec_interact_state, empty_init,  "Intec", "InterAct 8-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, ii32in1,   0,  0,  intech_interact,    intec, intec_interact_state, empty_init,  "Intec", "InterAct 32-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // a 40-in-1 also exists which combines the above
 
+CONS( 200?, miwi2_16,  0,  0,  intech_interact,    miwi2, intec_interact_state, empty_init,  "<unknown>", "MiWi2 16-in-1 + Drum Master", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// miwi2 7-in-1 Sports
+
 // Intec Interact Infrazone 15 Shooting Games, 42 Mi kara, 96 Arcade Games + more should run here too
-// MiWi(2?) and other Mi Kara units should fit here as well
+// Other standalone Mi Kara units should fit here as well
+// ViMax seems to be identical software to MiWi2
+// some older versions of these show 'Arcase' instead of 'Arcade' on the menu.
