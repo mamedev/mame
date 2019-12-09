@@ -16,6 +16,10 @@ inline void unsp_device::execute_fxxx_000_group(uint16_t op)
 	// DS Reg   1 1 1 1   - - - 0   0 0 1 0   w r r r
 	// FR Reg   1 1 1 1   - - - 0   0 0 1 1   w r r r
 
+	// FR = 'inner flag register' on ISA1.2+
+	// does this mean 1.2+ do not store the registers in the upper bits of SR, or is this something else?
+	// smartfp IRQ4 reads this and puts in on the stack
+
 	if (((op & 0xffc0) == 0xfe00) && m_iso >= 12)
 	{
 		// ds = imm6

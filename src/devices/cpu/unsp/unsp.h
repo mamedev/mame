@@ -164,7 +164,7 @@ protected:
 
 	struct internal_unsp_state
 	{
-		uint32_t m_r[8];
+		uint32_t m_r[8]; // why are these 32-bit? they're 16-bit regs? (changing to uint16_t causes crashes tho, so something is depending on this)
 		uint32_t m_enable_irq;
 		uint32_t m_enable_fiq;
 		uint32_t m_irq;
