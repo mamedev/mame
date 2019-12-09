@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="evio" description="Gachinko Contest! Slot machine TV cartridges">
+	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
+
+	***********************************************************************************
+
+	-->
+
+	<software name="c01black" supported="no">
+		<description>Aladdin TV</description>
+		<year>2002</year>
+		<publisher>Sammy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="slotslc01black.bin" size="0x400000" crc="d18ff203" sha1="8d62051565bfb1cc9eb14e4161ed892014e97c9c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="c01orange" supported="no">
+		<description>Cartridge 01 Orange</description>
+		<year>2002</year>
+		<publisher>Sammy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="slotslc01orange.bin" size="0x400000" crc="f3e9c746" sha1="e242587406e9e4fa76ddb5120211e2eb996e36f8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="c05red" supported="no">
+		<description>Cartridge 05 Red</description>
+		<year>2002</year>
+		<publisher>Sammy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="slotslc05red.bin" size="0x400000" crc="b30e908e" sha1="f9ad6b93bcf626ba1d5222af13088565a5d4a729"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="c07yellow" supported="no">
+		<description>Cartridge 07 Yellow</description>
+		<year>2002</year>
+		<publisher>Sammy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="slotslc07yellow.bin" size="0x800000" crc="461a9ede" sha1="e41b97409e17ce16fe522a3a45c4577c6dbed522"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
