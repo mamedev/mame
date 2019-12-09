@@ -117,7 +117,7 @@ READ8_MEMBER(dpc_device::read)
 	uint8_t   data_fetcher = offset & 0x07;
 	uint8_t   data = 0xff;
 
-	//logerror("%04X: Read from DPC offset $%02X\n", machine().device<cpu_device>("maincpu")->pc(), offset);
+	//logerror("%s: Read from DPC offset $%02X\n", machine().describe_context(), offset);
 	if (offset < 0x08)
 	{
 		switch(offset & 0x06)
@@ -220,13 +220,13 @@ WRITE8_MEMBER(dpc_device::write)
 			m_movamt = data;
 			break;
 		case 0x28:          // Not used
-			logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", machine().device<cpu_device>("maincpu")->pc(), offset, data);
+			logerror("%s: Write to unused DPC register $%02X, data $%02X\n", machine().describe_context(), offset, data);
 			break;
 		case 0x30:          // Random number generator reset
 			m_shift_reg = 0;
 			break;
 		case 0x38:          // Not used
-			logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", machine().device<cpu_device>("maincpu")->pc(), offset, data);
+			logerror("%s: Write to unused DPC register $%02X, data $%02X\n", machine().describe_context(), offset, data);
 			break;
 	}
 }
