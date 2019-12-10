@@ -44,7 +44,7 @@ protected:
 
 	void switch_bank(uint32_t bank);
 
-	required_device<sunplus_gcm394_device> m_maincpu;
+	required_device<sunplus_gcm394_base_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
 	optional_memory_bank m_bank;
@@ -55,10 +55,6 @@ protected:
 	virtual void mem_map_4m(address_map &map);
 
 	required_region_ptr<uint16_t> m_romregion;
-private:
-
-	uint32_t m_current_bank;
-	int m_numbanks;
 
 	DECLARE_READ16_MEMBER(porta_r);
 	DECLARE_READ16_MEMBER(portb_r);
@@ -68,6 +64,12 @@ private:
 
 	virtual DECLARE_READ16_MEMBER(read_external_space);
 	virtual DECLARE_WRITE16_MEMBER(write_external_space);
+
+private:
+
+	uint32_t m_current_bank;
+	int m_numbanks;
+
 };
 
 class wrlshunt_game_state : public gcm394_game_state
@@ -276,7 +278,16 @@ void wrlshunt_game_state::wrlshunt(machine_config &config)
 void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 {
 	gcm394_game_state::base(config);
+
+	GPAC800(config.replace(), m_maincpu, XTAL(27'000'000), m_screen);
 	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_gpac800_game_state::generalplus_gpac800_map);
+	m_maincpu->porta_in().set(FUNC(generalplus_gpac800_game_state::porta_r));
+	m_maincpu->portb_in().set(FUNC(generalplus_gpac800_game_state::portb_r));
+	m_maincpu->porta_out().set(FUNC(generalplus_gpac800_game_state::porta_w));
+	m_maincpu->space_read_callback().set(FUNC(generalplus_gpac800_game_state::read_external_space));
+	m_maincpu->space_write_callback().set(FUNC(generalplus_gpac800_game_state::write_external_space));
+	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(sunplus_gcm394_base_device::irq_vector_cb));
+	m_maincpu->mapping_write_callback().set(FUNC(generalplus_gpac800_game_state::mapping_w));	
 }
 
 
@@ -567,15 +578,29 @@ void generalplus_gpac800_game_state::machine_reset()
 {
 	address_space& mem = m_maincpu->space(AS_PROGRAM);
 
+	/* Offset(h) 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
+	   00000000 (50 47 61 6E 64 6E 61 6E 64 6E)-- -- -- -- -- --  PGandnandn------
+	   00000010  -- -- -- -- -- bb -- -- -- -- -- -- -- -- -- --  ----------------
+
+	   bb = where to copy first block
+
+	   The header is GPnandnand (byteswapped) then some params
+	   one of the params appears to be for the initial code copy operation done
+	   by the bootstrap
+	*/
+
+	// probably more bytes are used
+	int dest = m_strippedrom[0x15] << 8;
+
 	// copy a block of code from the NAND to RAM
 	for (int i = 0; i < 0x2000; i++)
 	{
 		uint16_t word = m_strippedrom[(i * 2) + 0] | (m_strippedrom[(i * 2) + 1] << 8);
 
-		mem.write_word(0x4000+i, word);
+		mem.write_word(dest+i, word);
 	}
 
-	mem.write_word(0xfff7, 0x4020); // point boot vector at code in RAM
+	mem.write_word(0xfff7, dest+0x20); // point boot vector at code in RAM
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 }
 
@@ -604,7 +629,7 @@ void generalplus_gpac800_game_state::nand_init()
 	}
 
 	// debug to allow for easy use of unidasm.exe
-	if (0)
+	if (1)
 	{
 		FILE *fp;
 		char filename[256];

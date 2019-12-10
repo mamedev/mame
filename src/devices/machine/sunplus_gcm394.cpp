@@ -26,6 +26,12 @@ sunplus_gcm394_device::sunplus_gcm394_device(const machine_config &mconfig, cons
 {
 }
 
+DEFINE_DEVICE_TYPE(GPAC800, generalplus_gpac800_device, "gpac800", "GeneralPlus GPAC800 System-on-a-Chip")
+
+generalplus_gpac800_device::generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sunplus_gcm394_base_device(mconfig, GCM394, tag, owner, clock)
+{
+}
 
 
 

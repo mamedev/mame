@@ -260,8 +260,8 @@ class sunplus_gcm394_device : public sunplus_gcm394_base_device
 {
 public:
 	template <typename T>
-	sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag)
-		: sunplus_gcm394_device(mconfig, tag, owner, clock)
+	sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag) :
+		sunplus_gcm394_device(mconfig, tag, owner, clock)
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
 	}
@@ -270,6 +270,22 @@ public:
 };
 
 
+class generalplus_gpac800_device : public sunplus_gcm394_base_device
+{
+public:
+	template <typename T>
+	generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag) :
+		generalplus_gpac800_device(mconfig, tag, owner, clock)
+	{
+		m_screen.set_tag(std::forward<T>(screen_tag));
+	}
+
+	generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+
 DECLARE_DEVICE_TYPE(GCM394, sunplus_gcm394_device)
+DECLARE_DEVICE_TYPE(GPAC800, generalplus_gpac800_device)
 
 #endif // MAME_MACHINE_SUNPLUS_GCM394_H
