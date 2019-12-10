@@ -385,7 +385,7 @@
 		<info name="release" value="19950428" />
 		<info name="alt_title" value="赤ずきんチャチャ" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="akazukin chacha (japan).bin" size="262144" crc="898609b4" sha1="d07970a7eae51aef8c4e8b4bcdd57aeed6360bdd" />
@@ -401,7 +401,7 @@
 		<info name="release" value="19971127" />
 		<info name="alt_title" value="悪魔城ドラキュラ 漆黒たる前奏曲" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="akumajou dracula - shikkokutaru zensoukyoku (japan).bin" size="262144" crc="4825b25f" sha1="baaa12be322adc005e51b43c73a352420d7cd034" />
@@ -433,7 +433,7 @@
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="DMG-ALAP-AUS, DMG-ALAP-EUR, DMG-ALAP-EUR-1" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" /> <!-- Also found with DMG-BEAN-10 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" /> <!-- Also found with [DMG MBC1-B] -->
@@ -450,7 +450,7 @@
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-ALAE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="aladdin (usa).bin" size="262144" crc="af6bdc50" sha1="81b4e56ae235fbb123d7ad4bd7c1d96c3b69eb72" />
@@ -482,7 +482,7 @@
 		<info name="release" value="19950728" />
 		<info name="alt_title" value="アルフレッドチキン" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="alfred chicken (japan).bin" size="262144" crc="1089098f" sha1="e04ddf4df8b5ef70d85e0523d277abfc68c61496" />
@@ -801,7 +801,7 @@
 		<info name="release" value="19970911" />
 		<info name="alt_title" value="あにまるぶりーだー" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -825,7 +825,7 @@
 		<info name="release" value="19980515" />
 		<info name="alt_title" value="あにまるぶりーだー2" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -847,7 +847,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-ANCP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN(K)-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
@@ -864,7 +864,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-ANCE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="animaniacs (usa).bin" size="262144" crc="673c815d" sha1="a0732f81e0c4f1bba592563bdc0eaae9d759ef28" />
@@ -880,7 +880,7 @@
 		<info name="release" value="19950303" />
 		<info name="alt_title" value="アナザ・バイブル" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="another bible (japan).bin" size="524288" crc="4a486435" sha1="6a5d0da889247169135665dc91f153305e1c71b6" />
@@ -898,7 +898,7 @@
 		<info name="release" value="19950407" />
 		<info name="alt_title" value="蒼き伝説シュート!" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B" />
@@ -915,7 +915,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AMCE-USA, DMG-AMCP-NOE, DMG-AMCP-UKV" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN(K)-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
@@ -932,7 +932,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ACPE-USA, DMG-ACPP-UKV" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN(K)-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
@@ -949,7 +949,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AGCP-NOE, DMG-AGCP-UKV" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN(K)-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
@@ -966,7 +966,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AGCE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN(K)-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
@@ -983,7 +983,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ADJE-USA, DMG-ADJP-UKV" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN(K)-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
@@ -1000,7 +1000,7 @@
 		<publisher>Atari</publisher>
 		<info name="serial" value="DMG-ABSE-USA, DMG-ABSP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="arcade classics - battlezone &amp; super breakout (usa, europe).bin" size="262144" crc="6c292739" sha1="7d78b06ad896fb949e28858d141f73a37c550fe2" />
@@ -1098,7 +1098,7 @@
 		<info name="serial" value="DMG-AXOS-EUR" />
 		<info name="alt_title" value="Astérix &amp; Obélix (Box)" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1" />
@@ -1116,7 +1116,7 @@
 		<info name="serial" value="DMG-AXOP-FAH" />
 		<info name="alt_title" value="Astérix &amp; Obélix (Box)" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
@@ -1279,7 +1279,7 @@
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-RJ-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
@@ -1311,7 +1311,7 @@
 		<info name="release" value="19941028" />
 		<info name="alt_title" value="馬券王TV'94" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="bakenou tv '94 (japan).bin" size="131072" crc="d1c3f371" sha1="c567bdd1ca17750c853019f244e208fe812772fd" />
@@ -1353,7 +1353,7 @@
 		<info name="release" value="19981015" />
 		<info name="alt_title" value="爆釣 リトリーブマスター" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="bakuchou retrieve master (japan).bin" size="524288" crc="8a546dec" sha1="bfea17b22b3ac91366156d8db1a7dc619c7b5a28" />
@@ -1371,7 +1371,7 @@
 		<info name="release" value="19980724" />
 		<info name="alt_title" value="爆釣烈伝 翔 〜ハイパー・フィッシング〜" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -1672,7 +1672,7 @@
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-ATDP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B" />
@@ -1689,7 +1689,7 @@
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-ATDE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="battle arena toshinden (usa).bin" size="524288" crc="2d0c1073" sha1="9c337d3f56938aa46cfc8b85c0db4631bcbe217c" />
@@ -2299,7 +2299,7 @@
 		<info name="release" value="19951229" />
 		<info name="alt_title" value="ブロックくずしGB" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="block kuzushi gb (japan).bin" size="131072" crc="54b67501" sha1="7540fe9af69d8c7d48f50c2d5fe6d3ce07421f74" />
@@ -2391,7 +2391,7 @@
 		<info name="release" value="19971219" />
 		<info name="alt_title" value="牧場物語GB" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-KECN-10" /> <!-- Also found with DMG-KECN-01 and DMG-KECN-20 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC3A [MBC3 A P-2]" /> <!-- Also found with [MBC3] -->
@@ -2417,7 +2417,7 @@
 		<info name="release" value="19971219" />
 		<info name="alt_title" value="牧場物語GB" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-KECN-01" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC3 [MBC3]" /> <!-- Also found with [MBC3] -->
@@ -2495,7 +2495,7 @@
 		<info name="release" value="19960721" />
 		<info name="alt_title" value="ボンバーマンコレクション" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-M-BFAN-01" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1" />
@@ -2512,7 +2512,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AB2E-USA, DMG-AB2P-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
@@ -2531,7 +2531,7 @@
 		<info name="release" value="19940810" />
 		<info name="alt_title" value="ボンバーマンGB" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B" />
@@ -2550,7 +2550,7 @@
 		<info name="release" value="19950810" />
 		<info name="alt_title" value="ボンバーマンGB2 (Japan), BOMBER MAN GB2 爆爆人GB2 (China)" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-M14" />
 			<feature name="u1" value="U1 MBC1" />
 			<feature name="u2" value="U2 PRG-ROM [epoxy]" />
@@ -2570,7 +2570,7 @@
 		<info name="release" value="19961202" />
 		<info name="alt_title" value="ボンバーマンGB3" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="bomberman gb 3 (japan).bin" size="262144" crc="f658b7a7" sha1="98a6327639833e1a6696e4acc5ca162388d5f6e1" />
@@ -2597,7 +2597,7 @@
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-RJ-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="bonk's revenge (usa).bin" size="262144" crc="f1344b78" sha1="8d1b81e456b271ad8f49a2c6efc9ca2504a24591" />
@@ -2755,7 +2755,7 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-ABRP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="brain drain (europe).bin" size="131072" crc="8a7fb0e6" sha1="67e1796ed410ecc19efc2f73ef7f5226414cc8bb" />
@@ -2784,7 +2784,7 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-ABRE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="brain drain (usa).bin" size="131072" crc="aff0b159" sha1="da11b3909bef958abc9b3b184771f4f8fe498456" />
@@ -2947,7 +2947,7 @@
 		<publisher>Telstar</publisher>
 		<info name="serial" value="DMG-ABBP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN(K)-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B" />
@@ -2964,7 +2964,7 @@
 		<publisher>Accolade</publisher>
 		<info name="serial" value="DMG-ABBE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="bubsy ii (usa).bin" size="262144" crc="600a6ad5" sha1="1ac9bf5043caf428994bca3e80158ca697e94c58" />
@@ -2980,7 +2980,7 @@
 		<info name="release" value="19971219" />
 		<info name="alt_title" value="バックス・バニー コレクション" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="bugs bunny collection (japan) (rev a).bin" size="262144" crc="8244220b" sha1="9d69d72b7de0377cb0439aa301b1fb82d3ce786a" />
@@ -2996,7 +2996,7 @@
 		<info name="release" value="19971219" />
 		<info name="alt_title" value="バックス・バニー コレクション" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="bugs bunny collection (japan).bin" size="262144" crc="d2dbea8f" sha1="4f1f56b06364272033372230cfe0819cb3e25b50" />
@@ -3282,7 +3282,7 @@
 		<info name="release" value="19950914" />
 		<info name="alt_title" value="キャプテン翼J 全国制覇への挑戦" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="captain tsubasa j - zenkoku seiha e no chousen (japan).bin" size="524288" crc="33a1e1cf" sha1="d3f9c5700389f7a876a4a821db1f99e7da4a6f68" />
@@ -3450,7 +3450,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-ADNE-USA, DMG-ADNP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="castlevania legends (usa, europe).bin" size="262144" crc="ad9c17fb" sha1="91a8e49bf6eac5fe62ec2cc5e6decbd08ce9b515" />
@@ -3495,7 +3495,7 @@
 		<publisher>Majesco</publisher>
 		<info name="serial" value="DMG-AC4E-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="centipede (usa).bin" size="131072" crc="e957014f" sha1="a3a5755020c9cbe13fc1a815288830d2e143367f" />
@@ -3671,7 +3671,7 @@
 		<info name="release" value="19950526" />
 		<info name="alt_title" value="ちびまる子ちゃん まる子デラックス劇場" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="chibi maruko-chan - maruko deluxe gekijou (japan).bin" size="131072" crc="886049f9" sha1="0e774a12ed2d99b5a62a5ad3f634f2c32da5929a" />
@@ -3860,7 +3860,7 @@
 		<info name="release" value="19971212" />
 		<info name="alt_title" value="超魔神英雄伝ワタル まぜっこモンスター" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -3885,7 +3885,7 @@
 		<info name="release" value="19980807" />
 		<info name="alt_title" value="超魔神英雄伝ワタル まぜっこモンスター2" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -3910,7 +3910,7 @@
 		<info name="release" value="19980918" />
 		<info name="alt_title" value="超速スピナー" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-TEDN-01" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 HuC1 [HuC-1]" />
@@ -3966,7 +3966,7 @@
 		<info name="release" value="19971121" />
 		<info name="alt_title" value="コレクションポケット" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="collection pocket (japan).bin" size="262144" crc="34e62c8b" sha1="daad5ec53da0e375cee3962c0a9031d8a67020fd" />
@@ -4008,7 +4008,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-ACSE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="contra - the alien wars (usa).bin" size="131072" crc="f1c81eb0" sha1="2e23477eb8738d7fb45e13b02f054422222c9c4f" />
@@ -4024,7 +4024,7 @@
 		<info name="release" value="19940923" />
 		<info name="alt_title" value="魂斗羅スピリッツ" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="contra spirits (japan).bin" size="131072" crc="7fc22df5" sha1="72213c5d8af05cad5f17a42566f7383066612eee" />
@@ -4166,7 +4166,7 @@
 		<info name="release" value="19961202" />
 		<info name="alt_title" value="クレヨンしんちゃん −オラのごきげんコレクション−" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="crayon shin-chan - ora no gokigen collection (japan).bin" size="262144" crc="dc723a9e" sha1="1dbd23b639b8a4b20ed28c3637608e03ebf59dad" />
@@ -4233,7 +4233,7 @@
 		<info name="release" value="19940826" />
 		<info name="alt_title" value="クレヨンしんちゃん4 ゛オラのいたずら大変身″" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="crayon shin-chan 4 - ora no itazura daihenshin (japan).bin" size="131072" crc="37d4aa8c" sha1="b5bb01ad7e25e9e83c564ccf604a59f8930cd0d5" />
@@ -4332,7 +4332,7 @@
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-YS-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
@@ -4351,7 +4351,7 @@
 		<info name="release" value="19940930" />
 		<info name="alt_title" value="ルーニー・テューンズシリーズ ダフィー・ダック ~ Looney Tunes Series - Daffy Duck (Box)" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="daffy duck - the marvin missions (japan).bin" size="262144" crc="798d9489" sha1="65f063906680e65d8786e698bd51674268d7ae68" />
@@ -4365,7 +4365,7 @@
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-YS-NOE, DMG-YS-NOE-1" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- Also with DMG-BEAN-10 and DMG-BEAN-02 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B" />
@@ -4384,7 +4384,7 @@
 		<info name="release" value="19950630" />
 		<info name="alt_title" value="第2次スーパーロボット大戦G" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
@@ -4413,7 +4413,7 @@
 		<info name="release" value="19980305" />
 		<info name="alt_title" value="大貝獣物語 ザ・ミラクル オブ ザ・ゾーン" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-TEDN-01" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 HuC1" />
@@ -4657,7 +4657,7 @@
 		<publisher>Malibu Games</publisher>
 		<info name="serial" value="DMG-ADSE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="desert strike - return to the gulf (usa).bin" size="262144" crc="6a702c32" sha1="325ee739ecf5aa403741e8dad36abcfa441dd26b" />
@@ -4740,7 +4740,7 @@
 		<info name="release" value="19970822" />
 		<info name="alt_title" value="ディノブリーダー" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-GDAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC2A" />
@@ -4763,7 +4763,7 @@
 		<info name="release" value="19970822" />
 		<info name="alt_title" value="ディノブリーダー" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-GDAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC2A [DMG MBC2A]" />
@@ -4786,7 +4786,7 @@
 		<info name="release" value="19980605" />
 		<info name="alt_title" value="ディノブリーダー2" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -4841,7 +4841,7 @@
 		<info name="release" value="19940614" />
 		<info name="alt_title" value="ドンキーコング" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
@@ -4866,7 +4866,7 @@
 		<info name="release" value="19940614 (JPN)" />
 		<info name="alt_title" value="ドンキーコング" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="donkey kong (world).bin" size="524288" crc="edab3378" sha1="6ed661bd1d6d8cdd48e1c10f8ca4e8dcba49128e" />
@@ -4885,7 +4885,7 @@
 		<info name="release" value="19961123" />
 		<info name="alt_title" value="ドンキーコングランド" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
@@ -4907,7 +4907,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-YT-AUS, DMG-YT-EUR, DMG-YT-NOE, DMG-YT-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN(K)-02" /> <!-- Also found with DMG-DECN-10 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" /> <!-- Also found with [DMG MBC1-B] -->
@@ -4929,7 +4929,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ADDE-USA, DMG-ADDP-EUR, DMG-ADDP-EUR-1" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-02" />  <!-- Also found with DMG-DECN(K)-02 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [MBC1B1]" />
@@ -4952,7 +4952,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AD3E-USA, DMG-AD3P-AUS, DMG-AD3P-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-20" /> <!-- Also found with DMG-DECN-10 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1 [DMG MBC1-B]" /> <!-- Also found with [DMG MBC1B1] -->
@@ -4974,7 +4974,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AD3E-USA, DMG-AD3P-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />  <!-- EUR carts -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
@@ -4995,7 +4995,7 @@
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="donkeykongland.bin" size="524288" crc="872bbd5e" sha1="9d17bc07bd3c48f8bb8a3315faf817d055417f53" />
@@ -5050,7 +5050,7 @@
 		<info name="release" value="19980320" />
 		<info name="alt_title" value="ドラえもんカート" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-GDAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC2A" />
@@ -5074,7 +5074,7 @@
 		<info name="release" value="19981127" />
 		<info name="alt_title" value="ドラえもんのGAMEBOYであそぼうよデラックス10" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="262144">
 				<rom name="doraemon no game boy de asobouyo deluxe 10 (japan).bin" size="262144" crc="b368e717" sha1="7ad70061c8afbbe0890e3d50accd40b2a8cb9790" />
@@ -5465,7 +5465,7 @@
 		<info name="release" value="19950825" />
 		<info name="alt_title" value="ドラゴンボールZ 悟空激闘伝" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="dragon ball z - gokuu gekitouden (japan).bin" size="524288" crc="ff3c027d" sha1="1f7a08d2e51e90d770d9dbf4092166b2bfa5697e" />
@@ -5483,7 +5483,7 @@
 		<info name="release" value="19941125" />
 		<info name="alt_title" value="ドラゴンボールZ 悟空飛翔伝" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="262144">
 				<rom name="dragon ball z - gokuu hishouden (japan).bin" size="262144" crc="38da46d7" sha1="6bf8f3400bf323edecc2152c4a86f6b0cae628fe" />
@@ -6279,7 +6279,7 @@
 		<publisher>Malibu Games</publisher>
 		<info name="serial" value="DMG-AFSE-USA, DMG-AFSP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="fifa international soccer (usa, europe) (en,fr,de,es).bin" size="524288" crc="e5989908" sha1="6f0affdec339d7beb9c565dc51abe59ee0398b7b" />
@@ -6293,7 +6293,7 @@
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-A8SP-EUU" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
@@ -6310,7 +6310,7 @@
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-A8SP-EUU, DMG-A8SP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1" />
@@ -6327,7 +6327,7 @@
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="DMG-A6SE-USA, DMG-A6SP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1 [DMG MBC1B]" />
@@ -6344,7 +6344,7 @@
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-A7SE-USA, DMG-A7SP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="fifa soccer '97 (usa, europe).bin" size="524288" crc="dcab906c" sha1="dd9b9b99bd663cdf55187ff5867eccd52615f025" />
@@ -6707,7 +6707,7 @@
 		<publisher>Majesco</publisher>
 		<info name="serial" value="DMG-AFGE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" /> <!-- Also found with [DMG MBC1-B] -->
@@ -6726,7 +6726,7 @@
 		<info name="release" value="19940811" />
 		<info name="alt_title" value="テレビアニメ スラムダンク がけっぷちの決勝リーグ" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B" />
@@ -6745,7 +6745,7 @@
 		<info name="release" value="19950317" />
 		<info name="alt_title" value="テレビアニメ スラムダンク 2 全国へのTIPOFF" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="from tv animation slam dunk 2 - zenkoku e no tip off (japan).bin" size="524288" crc="cb35900a" sha1="b8223ce166121ae7224d4431fdf27750c737b3f2" />
@@ -6792,7 +6792,7 @@
 		<info name="release" value="19961122" />
 		<info name="alt_title" value="不思議のダンジョン 風来のシレンGB 月影村の怪物" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DEDN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -6816,7 +6816,7 @@
 		<info name="release" value="19950714" />
 		<info name="alt_title" value="ギャラガ&amp;ギャラクシアン" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="galaga &amp; galaxian (japan).bin" size="131072" crc="532036d5" sha1="2d67a97b4737b24ea0eff7a7c798b7d77e6a0724" />
@@ -6830,7 +6830,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AGAP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -6852,7 +6852,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AGAE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="game &amp; watch gallery (usa) (rev a).bin" size="262144" crc="9e6cdc96" sha1="4e4da0ed89c2baaed64600f7eaca90aeeadc084e" />
@@ -6868,7 +6868,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AGAE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="game &amp; watch gallery (usa).bin" size="262144" crc="99b2fe79" sha1="f8c5ad6d6bf1a5a90dffebada1dbd69a93720c83" />
@@ -6895,7 +6895,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AGGA-AUS, DMG-AGGA-EUR, DMG-AGGA-NOE, DMG-AGGA-UKV" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" /> <!-- Also found with DMG-BEAN-10 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
@@ -6915,7 +6915,7 @@
 		<info name="release" value="19970201" />
 		<info name="alt_title" value="ゲームボーイギャラリー" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -6937,7 +6937,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AGAU-AUS" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -6962,7 +6962,7 @@
 		<info name="release" value="19970927" />
 		<info name="alt_title" value="ゲームボーイギャラリー2" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -7011,7 +7011,7 @@
 		<info name="release" value="19970627" />
 		<info name="alt_title" value="ゲームボーイウォーズ ターボ" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DEDN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
@@ -7049,7 +7049,7 @@
 		<info name="release" value="19970627" />
 		<info name="alt_title" value="ゲームで発見!!たまごっち" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" /> <!-- Also with DMG-DECN(K)-10 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
@@ -7074,7 +7074,7 @@
 		<info name="release" value="19980115" />
 		<info name="alt_title" value="ゲームで発見!!たまごっち オスっちとメスっち" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="BANDAI 020309E4-01-1" />
 			<feature name="u1" value="U1 [TAMA7]" />
 			<feature name="u2" value="U2 [TAMA5]" />
@@ -7098,7 +7098,7 @@
 		<info name="release" value="19971017" />
 		<info name="alt_title" value="ゲームで発見!!たまごっち2" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -7134,7 +7134,7 @@
 		<info name="release" value="19950303" />
 		<info name="alt_title" value="ガメラ 大怪獣空中決戦" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="gamera - daikaijuu kuuchuu kessen (japan).bin" size="262144" crc="62769ec1" sha1="c6ec7aa3ad2b28ca43551cda3c0cfdbcb4377b45" />
@@ -7150,7 +7150,7 @@
 		<info name="release" value="19971204" />
 		<info name="alt_title" value="がんばれゴエモン 黒船党の謎" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="ganbare goemon - kurofunetou no nazo (japan).bin" size="262144" crc="910afe24" sha1="bd336346982e33270128b74a7b356e9e6824e4a6" />
@@ -7290,7 +7290,7 @@
 		<info name="release" value="19941021" />
 		<info name="alt_title" value="GB原人2 (Japan), GB原人2 BONK'S REVENGE (China)" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-M14" />
 			<feature name="u1" value="U1 MBC1" />
 			<feature name="u2" value="U2 PRG-ROM [epoxy]" />
@@ -7383,7 +7383,7 @@
 		<info name="release" value="19961213" />
 		<info name="alt_title" value="ゲゲゲの鬼太郎 妖怪創造主現る!" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-GDAN-03" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC2A [DMG MBC2A]" />
@@ -7406,7 +7406,7 @@
 		<info name="release" value="19981127" />
 		<info name="alt_title" value="激闘パワーモデラー" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -7447,7 +7447,7 @@
 		<info name="release" value="19961122" />
 		<info name="alt_title" value="原人コレクション GB原人, GB原人2, GB原人ランド" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-M-BFAN-01" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1" />
@@ -7466,7 +7466,7 @@
 		<info name="release" value="19950324" />
 		<info name="alt_title" value="原人コッツ" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="genjin cottsu (japan).bin" size="262144" crc="95e8fcb1" sha1="70e3cd1df16fbff644c32f588bf80a116b043bb2" />
@@ -7508,7 +7508,7 @@
 		<publisher>Williams</publisher>
 		<info name="serial" value="DMG-AGEE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="getaway, the (usa).bin" size="262144" crc="8f2bf517" sha1="a0ca7187b55135150f348d44544d3a6e6d51394e" />
@@ -7612,7 +7612,7 @@
 		<info name="release" value="19950825" />
 		<info name="alt_title" value="ゴーゴーアックマン" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B" />
@@ -7631,7 +7631,7 @@
 		<info name="release" value="19980710" />
 		<info name="alt_title" value="ゴー!ゴー! ヒッチハイク" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="go! go! hitchhike (japan).bin" size="524288" crc="845735de" sha1="6a35bc2967f25fda0626b7a00a2cacfec9c53278" />
@@ -7739,7 +7739,7 @@
 		<info name="release" value="19980326" />
 		<info name="alt_title" value="ゴッドメディスン 復刻版" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="god medicine - hukkoku ban (japan).bin" size="524288" crc="847e0772" sha1="61d3579293bf07166402d11d891e14bfd6fef6b4" />
@@ -7812,7 +7812,7 @@
 		<publisher>Malibu Games</publisher>
 		<info name="serial" value="DMG-AGFP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="golf classic (europe).bin" size="262144" crc="a6dadb1e" sha1="b7ffb77a5061c33b0bbe5b074c1526e46c5eb7c3" />
@@ -8549,7 +8549,7 @@
 		<info name="release" value="19980724" />
 		<info name="alt_title" value="グランダー武蔵RV" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -8611,7 +8611,7 @@
 		<publisher>Natsume</publisher>
 		<info name="serial" value="DMG-AYWE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="harvest moon gb (usa).bin" size="524288" crc="1eae0e10" sha1="5b85d2accd3877e80d73a7ad19d9f55c288f43cc" />
@@ -8644,7 +8644,7 @@
 		<info name="release" value="19980731" />
 		<info name="alt_title" value="早押しクイズ 王座決定戦" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1" />
@@ -8739,7 +8739,7 @@
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="DMG-AHCE-USA, DMG-AHCP-NOE" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="hercules (usa, europe).bin" size="524288" crc="00a9001e" sha1="215cceaccd4a33a2da6205f33a2803ff4004e2b1" />
@@ -8932,7 +8932,7 @@
 		<info name="release" value="19941125" />
 		<info name="alt_title" value="本将棋" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
 				<rom name="hon shougi (japan).bin" size="65536" crc="6c407eed" sha1="3f49109296b4dc0006b4e8e68133992f5ca2b843" />
@@ -9081,7 +9081,7 @@
 		<info name="release" value="19950321" />
 		<info name="alt_title" value="星のカービィ2" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -9190,7 +9190,7 @@
 		<info name="serial" value="DMG-ANDE-USA, DMG-ANDP-NOE, DMG-ANDP-UKV" />
 		<info name="alt_title" value="Disney's The Hunchback of Notre Dame - 5 Foolishly Fun Topsy Turvy Games (Box)" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
@@ -9379,7 +9379,7 @@
 		<publisher>Titus</publisher>
 		<info name="serial" value="DMG-A65P-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="indien dans la ville, un (france).bin" size="131072" crc="e37e1832" sha1="168337cdd8e4d919ce3b62ea4802ec6b959c6893" />
@@ -9515,7 +9515,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AIGE-USA, DMG-AIGP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
@@ -9637,7 +9637,7 @@
 		<info name="release" value="19980626" />
 		<info name="alt_title" value="つでも!にゃんとワンダフル" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-KECN-SP" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC3 [MBC3]" />
@@ -9662,7 +9662,7 @@
 		<info name="release" value="19951124" />
 		<info name="alt_title" value="Jリーグ ビッグウェイブサッカー" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="262144">
 				<rom name="j.league big wave soccer (japan).bin" size="262144" crc="cdd02f22" sha1="00369c42d2c4be0506901b64f7d5424538574ce0" />
@@ -9703,7 +9703,7 @@
 		<info name="release" value="19950421" />
 		<info name="alt_title" value="Jリーグライブ95" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="j.league live '95 (japan).bin" size="262144" crc="f0321342" sha1="3b4922f8034877d1a5aca380f846a7cb6841f6ee" />
@@ -9786,7 +9786,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AW7E-USA, DMG-AW7E-USA-1, DMG-AW7P-AUS, DMG-AW7P-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1-B]" /> <!-- Also with [DMG MBC1B1] -->
@@ -9912,7 +9912,7 @@
 		<publisher>GameTek</publisher>
 		<info name="serial" value="DMG-AJPE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="jeopardy! - platinum edition (usa).bin" size="131072" crc="5206fd09" sha1="35934633a9b301d734a6fced7c56d55eba0385aa" />
@@ -9939,7 +9939,7 @@
 		<publisher>GameTek</publisher>
 		<info name="serial" value="DMG-AJQE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="jeopardy! - teen tournament (usa).bin" size="131072" crc="cd3df0c1" sha1="20c71f434ef093fac9361fa1db9c2282c938dd71" />
@@ -10023,7 +10023,7 @@
 		<info name="release" value="19950623" />
 		<info name="alt_title" value="人生ゲーム" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="262144">
 				<rom name="jinsei game (japan).bin" size="262144" crc="09f53d55" sha1="11f883c0f5f4b62d614fd8662ae56e62ab00450b" />
@@ -10180,7 +10180,7 @@
 		<info name="release" value="19940729" />
 		<info name="alt_title" value="ジャングルの王者 ターちゃん" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="jungle no ouja tarchan (japan).bin" size="262144" crc="96555e9a" sha1="5312e1804848603c41ac804243e5b2b758c75d0d" />
@@ -10194,7 +10194,7 @@
 		<publisher>Ocean</publisher> <!-- Malibu Games in USA -->
 		<info name="serial" value="DMG-AJGE-USA, DMG-AJGP-UKV" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
@@ -10411,7 +10411,7 @@
 		<info name="release" value="19980327" />
 		<info name="alt_title" value="カンヅメモンスター" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-KECN-SP" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC3 [MBC3]" />
@@ -10451,7 +10451,7 @@
 		<info name="release" value="19971219" />
 		<info name="alt_title" value="カラムー町の大事件" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="karamuchou no daijiken (japan).bin" size="262144" crc="fa7ea8a0" sha1="d831320bcec612c283afc2b6f194062cf98243dc" />
@@ -10467,7 +10467,7 @@
 		<info name="release" value="19980717" />
 		<info name="alt_title" value="化石創世リボーン" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -10532,7 +10532,7 @@
 		<info name="release" value="19970919" />
 		<info name="alt_title" value="川のぬし釣り3" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -10571,7 +10571,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AKGE-USA, DMG-AKGP-AUS" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />  <!-- AUS cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
@@ -10686,7 +10686,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AKLE-USA, DMG-AKLP-EUR, DMG-AKLP-UKV" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
@@ -10720,7 +10720,7 @@
 		<publisher>Laguna</publisher>
 		<info name="serial" value="DMG-AKFP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="king of fighters '95, the (europe).bin" size="524288" crc="a3e9b148" sha1="27eeb37f7be07381b6e4e01b5ae0d32f2ec209c0" />
@@ -10734,7 +10734,7 @@
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-AKFE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="king of fighters '95, the (usa).bin" size="524288" crc="1ff84e8c" sha1="59c11dd527d47b24323f84fb8a1bb3d06a531f32" />
@@ -10748,7 +10748,7 @@
 		<publisher>Laguna</publisher>
 		<info name="serial" value="DMG-AK6P-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
@@ -10876,7 +10876,7 @@
 		<info name="release" value="19951214" />
 		<info name="alt_title" value="カービィのブロックボール" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-20" />
 			<feature name="u1" value="U1 PRG [MX23C4002-20]" />
 			<feature name="u2" value="U2 MBC1 [DMG MBC1-B]" />
@@ -10901,7 +10901,7 @@
 		<info name="release" value="19970125" />
 		<info name="alt_title" value="カービィのきらきらきっず" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="kirby no kirakira kids (japan).bin" size="262144" crc="47f42f42" sha1="2c46c42be76eca134e188814345afa390e298811" />
@@ -10940,7 +10940,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AKXE-USA, DMG-AKXP-UKV" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="kirby's block ball (usa, europe).bin" size="524288" crc="7ad90b4b" sha1="a790d96526972d7ceb026ca27ae41ff475ccb2c5" />
@@ -10972,7 +10972,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AKBE-USA, DMG-AKBP-AUS, DMG-AKBP-NOE" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [MBC1-B]" /> <!-- Also found with [DMG MBC1B1] -->
@@ -11014,7 +11014,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AKCE-USA, DMG-AKCP-AUS, DMG-AKCP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
@@ -11158,7 +11158,7 @@
 		<info name="release" value="19970925" />
 		<info name="alt_title" value="コナミGBコレクションVol.1 グラディウス, ドラキュラ伝説, コナミレーシング, コントラ" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="konami gb collection vol.1 (japan).bin" size="524288" crc="992cd78f" sha1="dfb86b1b2db29a7086d60dc143374ef27b130580" />
@@ -11175,7 +11175,7 @@
 		<info name="release" value="19971211" />
 		<info name="alt_title" value="コナミGBコレクションVol.2 ツインビーだ!!, がんばれゴエモン, モトクロスマニアックス, ガッタンゴットン" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="konami gb collection vol.2 (japan).bin" size="524288" crc="c3b318cd" sha1="5753310cb9fbe44efc2b27ce488cd069ef243199" />
@@ -11191,7 +11191,7 @@
 		<info name="release" value="19980219 (JPN)" />
 		<info name="alt_title" value="コナミGBコレクションVol.3  グラディウスII, ドラキュラ伝説II,  イー・アル・カンフー, けっきょく南極大冒険" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="konami gb collection vol.3 (japan).bin" size="524288" crc="1de9caf9" sha1="db9f1192df7e186ea498c4f576fc016fdc339539" />
@@ -11208,7 +11208,7 @@
 		<info name="release" value="19980319" />
 		<info name="alt_title" value="コナミGBコレクションVol.4 パロディウスだ!, クォース, コナミックスポーツ, フロッガー" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="konami gb collection vol.4 (japan).bin" size="524288" crc="3a43ea33" sha1="c33ba418386b34b466b5dd28159ea76ca2db12f8" />
@@ -11301,7 +11301,7 @@
 		<info name="release" value="19980828" />
 		<info name="alt_title" value="昆虫博士" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="konchuu hakase (japan) (rev a).bin" size="524288" crc="05753790" sha1="3e8e47b36a2171ad93d0e21fe5c22feff17c6d88" />
@@ -11319,7 +11319,7 @@
 		<info name="release" value="19980828" />
 		<info name="alt_title" value="昆虫博士" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="konchuu hakase (japan).bin" size="524288" crc="f6b3e291" sha1="ac792793b43cc8fae098df23e6aeb845f98199cd" />
@@ -11351,7 +11351,7 @@
 		<info name="release" value="19980702" />
 		<info name="alt_title" value="高気圧ボーイ" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="koukiatsu boy (japan).bin" size="524288" crc="53ff8041" sha1="f7f5b71a8d3b393b0507eee75fbdaea7006f945f" />
@@ -11400,7 +11400,7 @@
 		<info name="release" value="19960322" />
 		<info name="alt_title" value="クマのプー太郎 宝さがしだ大入りゲームバトル!" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="kuma no puutarou - takara sagashi da ooiri game battle! (japan).bin" size="262144" crc="f01d0b87" sha1="b986ce8e1a6a4a1b22e0db5bf03b8b028cce9057" />
@@ -11449,7 +11449,7 @@
 		<info name="release" value="19950428" />
 		<info name="alt_title" value="空想科学世界ガリバーボーイ 空想科学パズル プリッとポン" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="kuusou kagaku sekai gulliver boy - kuusou kagaku puzzle purittopon!! (japan).bin" size="262144" crc="fb291e78" sha1="1ba1abc4db088cfc57bc733634c5b02308d132f4" />
@@ -11584,7 +11584,7 @@
 		<publisher>Natsume</publisher>
 		<info name="serial" value="DMG-AFHU-AUS" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="legend of the river king gb (australia).bin" size="524288" crc="51627213" sha1="87274e8c0d2daaac2e0dda94651c35d6a0617c0f" />
@@ -11600,7 +11600,7 @@
 		<publisher>Natsume</publisher>
 		<info name="serial" value="DMG-AFHE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="legend of the river king gb (usa).bin" size="524288" crc="a6e685dc" sha1="d2e8a9aceec8639b528f712532a38fe0c2b0edef" />
@@ -11852,7 +11852,7 @@
 		<info name="serial" value="DMG-ALNE-USA" />
 		<info name="alt_title" value="Disney's The Lion King (Box)" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="lion king, the (usa).bin" size="524288" crc="3430d261" sha1="fbbdb1d2073bafa45943cb5f4d4aae5648120089" />
@@ -12030,7 +12030,7 @@
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-ALWE-USA, DMG-ALWP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
@@ -12047,7 +12047,7 @@
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-ALWF-FRA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1-B]" />
@@ -12132,7 +12132,7 @@
 		<info name="release" value="19970808" />
 		<info name="alt_title" value="マッハゴーゴーゴー" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="262144">
 				<rom name="mach go go go (japan).bin" size="262144" crc="016d230b" sha1="baea8b49ce2402c5c094ddae0320a382c0d95d86" />
@@ -12148,7 +12148,7 @@
 		<publisher>Malibu Games</publisher>
 		<info name="serial" value="DMG-ANLE-USA, DMG-ANLP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="madden '95 (usa, europe).bin" size="524288" crc="d2585bbb" sha1="b41a14394bbd890e341bf5d27f297cb5e906fd60" />
@@ -12162,7 +12162,7 @@
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-A6ME-USA, DMG-A6MP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="madden '96 (usa, europe).bin" size="524288" crc="fd9dc1ad" sha1="dd67d34b7801f31063df522c45349823713fe99b" />
@@ -12176,7 +12176,7 @@
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-A7ME-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="madden '97 (usa).bin" size="524288" crc="88a837a2" sha1="e1d92b6afdd7dc2254c895ad8a9a066262fb214b" />
@@ -12207,7 +12207,7 @@
 		<info name="release" value="19950602" />
 		<info name="alt_title" value="マジックナイトレイアース" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="magic knight rayearth (japan).bin" size="262144" crc="94838a81" sha1="4f77031946e62772a241a9b5b046d7fcf6a28ea8" />
@@ -12225,7 +12225,7 @@
 		<info name="release" value="19951027" />
 		<info name="alt_title" value="マジックナイトレイアース2nd ザ・ミッシング・カラーズ" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="262144">
 				<rom name="magic knight rayearth 2nd. - the missing colors (japan).bin" size="262144" crc="00202dfa" sha1="afe76c2d6f796813f1803e8c542107bf0827f966" />
@@ -12295,7 +12295,7 @@
 		<info name="release" value="19950428" />
 		<info name="alt_title" value="魔法陣グルグル 勇者とククリの大冒険" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="mahoujin guruguru (japan).bin" size="262144" crc="2d439d0d" sha1="10a55c546c68cb117cc47d49304f807a7bb63687" />
@@ -12485,7 +12485,7 @@
 		<info name="release" value="19950314" />
 		<info name="alt_title" value="マリオのピクロス" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" /> <!-- Also found with [DMG MBC1B1] -->
@@ -12507,7 +12507,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APCP-NOE, DMG-APCE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" /> <!-- Also found with [DMG MBC1B1] -->
@@ -12531,7 +12531,7 @@
 		<info name="release" value="19950127" />
 		<info name="alt_title" value="ママレード・ボーイ" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B" />
@@ -12578,7 +12578,7 @@
 		<info name="release" value="19941028" />
 		<info name="alt_title" value="マサカリ伝説−金太郎RPG編−" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="masakari densetsu - kintarou rpg hen (japan).bin" size="524288" crc="d8bab8e0" sha1="a9bcb90df5b19a372ceed81c614bb7eb295ec74c" />
@@ -12629,7 +12629,7 @@
 		<info name="serial" value="DMG-AMIE-USA" />
 		<info name="alt_title" value="Maui Mallard in Cold Shadow (Box)" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="maui mallard (usa).bin" size="262144" crc="6f30a43a" sha1="eb401c5ddff1488013ff032918ed365e82104ae0" />
@@ -12694,7 +12694,7 @@
 		<info name="release" value="19971128" />
 		<info name="alt_title" value="メダロット カブトバージョン" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DEDN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -12719,7 +12719,7 @@
 		<info name="release" value="19971128" />
 		<info name="alt_title" value="メダロット カブトバージョン" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DEDN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -12744,7 +12744,7 @@
 		<info name="release" value="19971128" />
 		<info name="alt_title" value="メダロット クワガタバージョン" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DEDN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
@@ -12769,7 +12769,7 @@
 		<info name="release" value="19971128" />
 		<info name="alt_title" value="メダロット クワガタバージョン" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="medarot - kuwagata version (japan).bin" size="524288" crc="bc0588c4" sha1="f657f822ed15e459c4abcd171c9620cddbdfd022" />
@@ -12788,7 +12788,7 @@
 		<info name="release" value="19980320" />
 		<info name="alt_title" value="メダロット パーツコレクション" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="medarot - parts collection (japan).bin" size="524288" crc="f4cab596" sha1="eec1245abb1d97cd2df976fdf179c924a4efa720" />
@@ -12806,7 +12806,7 @@
 		<info name="release" value="19980529" />
 		<info name="alt_title" value="メダロット パーツコレクション2" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="medarot - parts collection 2 (japan).bin" size="524288" crc="89f94482" sha1="edd74afbfca5e3d3366fb231c4bedd80fcf8a81e" />
@@ -12975,7 +12975,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-WM-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" /> <!-- Also found with DMG-BEAN(K)-02 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
@@ -12992,7 +12992,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-WM-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="megaman v (usa).bin" size="524288" crc="72e6d21d" sha1="9a7da0e4d3f49e4a0b94e85cd64e28a687d81260" />
@@ -13042,7 +13042,7 @@
 		<info name="release" value="19961227" />
 		<info name="alt_title" value="名探偵コナン 地下遊園地殺人事件" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="meitantei conan - chika yuuenchi satsujin jiken (japan).bin" size="262144" crc="3945bc0d" sha1="2ab6749d2abaf3fc3cb9317f64cec78e0184ff6b" />
@@ -13058,7 +13058,7 @@
 		<info name="release" value="19980807" />
 		<info name="alt_title" value="名探偵コナン 疑惑の豪華列車" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="meitantei conan - giwaku no gouka ressha (japan).bin" size="262144" crc="1dc5c31a" sha1="125db863bad5d48033d0bf94ed808b2b8d34ca2f" />
@@ -13319,7 +13319,7 @@
 		<info name="release" value="19961221" />
 		<info name="alt_title" value="みどりのマキバオー" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B" />
@@ -13336,7 +13336,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-ZW-USA, DMG-ZW-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
@@ -13353,7 +13353,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-A2RE-USA, DMG-A2RP-UKV" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="mighty morphin power rangers - the movie (usa, europe).bin" size="262144" crc="86a1c549" sha1="0646bff26350059224a5dca807218ff02a4704af" />
@@ -13460,7 +13460,7 @@
 		<info name="release" value="19961227" />
 		<info name="alt_title" value="ミニ4ボーイ" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="mini 4 boy (japan).bin" size="524288" crc="0618e4b0" sha1="cb6022ef5729cbf370ccdc9c1958d0b4bcbd5e90" />
@@ -13478,7 +13478,7 @@
 		<info name="release" value="19970926" />
 		<info name="alt_title" value="ミニ4ボーイII ファイナルエボリューション" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
@@ -13517,7 +13517,7 @@
 		<info name="release" value="19970523" />
 		<info name="alt_title" value="ミニ四駆GB レッツ&amp;ゴー" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DEDN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -13541,7 +13541,7 @@
 		<info name="release" value="19980619" />
 		<info name="alt_title" value="ミニ四駆GB Let's &amp; Go!! オールスターバトルMAX" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-LFDN-01" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC3 [MBC3]" />
@@ -13602,7 +13602,7 @@
 		<info name="release" value="19950616" />
 		<info name="alt_title" value="モグモグGOMBO 遥かなる超料理伝説" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="262144">
 				<rom name="mogu mogu gombo (japan).bin" size="262144" crc="85c984f2" sha1="a4524d11f2a86e28bc319335b5c05ea6550b26e1" />
@@ -13635,7 +13635,7 @@
 		<info name="release" value="19960721" />
 		<info name="alt_title" value="モグラーニャ" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />  <!-- Also found on DMG-DECN(K)-02 pcb -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -13657,7 +13657,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AMOE-USA, DMG-AMOP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1-B]" /> <!-- Also found with [DMG MBC1B1] -->
@@ -13682,7 +13682,7 @@
 		<info name="release" value="19960809" />
 		<info name="alt_title" value="桃太郎コレクション" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-MC-DFCN-01" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1-B]" />
@@ -13706,7 +13706,7 @@
 		<info name="release" value="19961206" />
 		<info name="alt_title" value="桃太郎コレクション2" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-MC-SFCN-01" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MMM01 [MMM01]" />
@@ -13746,7 +13746,7 @@
 		<info name="release" value="19941216" />
 		<info name="alt_title" value="桃太郎電劇2" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="momotarou dengeki 2 (japan).bin" size="524288" crc="3c1c5eb4" sha1="f050cc860e610a07a27c51ff873dd71aca9e23e6" />
@@ -13780,7 +13780,7 @@
 		<info name="release" value="19980731" />
 		<info name="alt_title" value="桃太郎電鉄Jr. 全国ラーメンめぐりの巻" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="momotarou dentetsu jr. - zenkoku ramen meguri no maki (japan).bin" size="524288" crc="218265b3" sha1="30edf17fc9ddd9db7613c8f78b0ebc340cc89eb0" />
@@ -13798,7 +13798,7 @@
 		<info name="release" value="19970829" />
 		<info name="alt_title" value="マネーアイドル エクスチェンジャー" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
@@ -13976,7 +13976,7 @@
 		<info name="release" value="19980306" />
 		<info name="alt_title" value="もんすたあ★レース" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DEDN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -14000,7 +14000,7 @@
 		<info name="release" value="19981002" />
 		<info name="alt_title" value="もんすたあ★レース おかわり" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DEDN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -14371,7 +14371,7 @@
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-AMLE-USA, DMG-AMLP-EUR, DMG-AMLP-EUR-1" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1-B]" /> <!-- Also found with [DMG MBC1B1] -->
@@ -14468,7 +14468,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AGDP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="mystical ninja starring goemon (europe).bin" size="262144" crc="a1813cd5" sha1="6a47ec0c2a81741d93687b85f966c6bfca039770" />
@@ -14482,7 +14482,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AGDE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="mystical ninja starring goemon (usa).bin" size="262144" crc="fafb343c" sha1="6674baaae85a8eb6e950f1ea30527321c942a9bc" />
@@ -14498,7 +14498,7 @@
 		<info name="release" value="19981225" />
 		<info name="alt_title" value="小島武夫・灘麻太郎の実践麻雀教室" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="131072">
 				<rom name="nada asatarou &amp; kojima takeo no jissen mahjong kyoushitsu (japan).bin" size="131072" crc="9d335162" sha1="20ba98670eb3bf18756f15e50b5fc65f58a15918" />
@@ -14596,7 +14596,7 @@
 		<info name="release" value="19960721" />
 		<info name="alt_title" value="ナムコギャラリーVOL.1 バトルシティー, ギャラガ, マッピー, ナムコクラシック" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="namco gallery vol.1 (japan).bin" size="524288" crc="1902c6bd" sha1="d6b3c5fdb4b710cb104d461faf3b57f6eec066c4" />
@@ -14612,7 +14612,7 @@
 		<info name="release" value="19961129" />
 		<info name="alt_title" value="ナムコギャラリーVOL.2 ギャラクシアン, ディグダグ, ドルアーガの塔, ファミスタ4" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="namco gallery vol.2 (japan).bin" size="524288" crc="a69b9260" sha1="02b1d728a8c722bd2299c44b54beb4de6eb70e4f" />
@@ -14629,7 +14629,7 @@
 		<info name="release" value="19970725" />
 		<info name="alt_title" value="ナムコギャラリーVOL.3 スカイキッド, バベルの塔, ファミリーテニス, 雀卓ボーイ" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="namco gallery vol.3 (japan).bin" size="524288" crc="7740341e" sha1="a8902e4af858b28c1c934879718e8c971a2000bb" />
@@ -14812,7 +14812,7 @@
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-A6BE-USA, DMG-A6BP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="nba live 96 (usa, europe).bin" size="524288" crc="8885c7cd" sha1="f4d13f947f7f8f074f7979a5889cc2c91c56f4ea" />
@@ -14833,7 +14833,7 @@
 		<info name="release" value="19980227" />
 		<info name="alt_title" value="ネクタリスジービー" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-TEDN-01" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 HuC1 [HuC-1]" />
@@ -14902,7 +14902,7 @@
 		<info name="release" value="19940729" />
 		<info name="alt_title" value="熱血!ビーチバレーだよ くにおくん" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="nekketsu! beach volley dayo kunio-kun (japan).bin" size="262144" crc="abfb84df" sha1="d3ad43c40c21d9825b4879dbf28ca58835da658a" />
@@ -15011,7 +15011,7 @@
 		<info name="release" value="19940729" />
 		<info name="alt_title" value="熱闘 餓狼伝説2 -あらたなるたたかい-" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="nettou garou densetsu 2 (japan).bin" size="524288" crc="aa98687f" sha1="74b1e1b53235eb356ae1ef4bce940873a96bd076" />
@@ -15027,7 +15027,7 @@
 		<info name="release" value="19940630" />
 		<info name="alt_title" value="熱闘サムライスピリッツ (Japan), 熱闘サムライスピリッツ DEAD HEAT FIGHTERS SAMURAI SPIRITS 热斗侍魂·熱鬥侍魂 (China)" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B" />
@@ -15051,7 +15051,7 @@
 		<info name="release" value="19940630" />
 		<info name="alt_title" value="熱闘サムライスピリッツ" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="nettou samurai spirits (japan).bin" size="524288" crc="4a306276" sha1="6303a5fb1d99ba8bad36437af5e2592fdecf0f72" />
@@ -15067,7 +15067,7 @@
 		<info name="release" value="19960823" />
 		<info name="alt_title" value="熱闘 サムライスピリッツ 斬紅郎無双剣" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BFAN-01" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1" />
@@ -15086,7 +15086,7 @@
 		<info name="release" value="19960426" />
 		<info name="alt_title" value="熱闘ザ・キング・オブ・ファイターズ'95" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="nettou the king of fighters '95 (japan).bin" size="524288" crc="8712f17b" sha1="af48f83d5dc319aa1e373b8e91ede45606bd867c" />
@@ -15102,7 +15102,7 @@
 		<info name="release" value="19970808" />
 		<info name="alt_title" value="熱闘 ザ・キング・オブ・ファイターズ'96" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN(K)-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1-B]" />
@@ -15122,7 +15122,7 @@
 		<info name="release" value="19960322" />
 		<info name="alt_title" value="熱闘 闘神伝" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="nettou toushinden (japan) (rev a).bin" size="524288" crc="d5a6b132" sha1="5fd55a5d01817c770b251dbb9a0dc73a02d8c566" />
@@ -15139,7 +15139,7 @@
 		<info name="release" value="19960322" />
 		<info name="alt_title" value="熱闘 闘神伝" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="nettou toushinden (japan).bin" size="524288" crc="dde161a5" sha1="61b99fbc4d56dad2e6002c7a8c6b5a1660a23137" />
@@ -15155,7 +15155,7 @@
 		<info name="release" value="19950224" />
 		<info name="alt_title" value="熱闘ワールドヒーローズ2JET" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
@@ -15174,7 +15174,7 @@
 		<info name="release" value="19980130" />
 		<info name="alt_title" value="ニューチェスマスター" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
 				<rom name="new chessmaster, the (japan) (en,ja).bin" size="65536" crc="5e1c3e8d" sha1="5d0a22b99ffa528003997c59c54ac9d1c8920d6f" />
@@ -15274,7 +15274,7 @@
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-A6HE-USA, DMG-A6HP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
@@ -15370,7 +15370,7 @@
 		<info name="release" value="19980522" />
 		<info name="alt_title" value="日本代表チーム 栄光のイレブン" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="nihon daihyou team - eikou no eleven (japan).bin" size="262144" crc="e497842e" sha1="344613295d4b246b8873dde2951b323197d18db7" />
@@ -15386,7 +15386,7 @@
 		<info name="release" value="19980626" />
 		<info name="alt_title" value="Jリーグサポーターサッカー" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="nihon daihyou team france de ganbare! - j.league supporter soccer (japan).bin" size="524288" crc="91e6bf74" sha1="1f038df0b742a2d76d49eaefe7b753ed0dea3767" />
@@ -15514,7 +15514,7 @@
 		<info name="release" value="19950714" />
 		<info name="alt_title" value="−忍空−" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B" />
@@ -15533,7 +15533,7 @@
 		<info name="release" value="19951124" />
 		<info name="alt_title" value="−忍空− 第2弾 【忍空戦争編】" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="ninku dai-2-dan - ninku sensou hen (japan).bin" size="524288" crc="7f818772" sha1="52d3ab8b84e3e825280c6b5db80933ace1aa5909" />
@@ -15549,7 +15549,7 @@
 		<info name="release" value="19951227" />
 		<info name="alt_title" value="忍たま乱太郎GB ~ Nintama Rantarou GB" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN(K)-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B" />
@@ -15568,7 +15568,7 @@
 		<info name="release" value="19980619" />
 		<info name="alt_title" value="忍たま乱太郎GB えあわせチャレンジパズル" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="nintama rantarou gb - eawase challenge puzzle (japan).bin" size="524288" crc="0e37e462" sha1="5642c866711bd5057a2c7de2662d23a4a74d8be9" />
@@ -15680,7 +15680,7 @@
 		<publisher>GT Interactive</publisher>
 		<info name="serial" value="DMG-AODE-USA, DMG-AODP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1-B]" />
@@ -15715,7 +15715,7 @@
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-AO9E-USA, DMG-AO9P-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN(K)-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
@@ -15791,7 +15791,7 @@
 		<info name="release" value="19950324" />
 		<info name="alt_title" value="ONI V 隠忍を継ぐ者" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="oni v - innin o tsugumono (japan).bin" size="262144" crc="af030940" sha1="197e2d2980053104ecf1c0edbff9f4d235518320" />
@@ -15884,7 +15884,7 @@
 		<info name="release" value="19940930" />
 		<info name="alt_title" value="オセロワールド" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
 				<rom name="othello world (japan).bin" size="65536" crc="64d13a6d" sha1="089013eb2dac79c5525c442bfc9cda74e8660597" />
@@ -15900,7 +15900,7 @@
 		<info name="release" value="19950804" />
 		<info name="alt_title" value="おとぎ話大戦" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="262144">
 				<rom name="otogibanashi taisen (japan).bin" size="262144" crc="98500521" sha1="49176ced7152d6d411db1aa77d7a131f46e7a081" />
@@ -15965,7 +15965,7 @@
 		<info name="release" value="19970926" />
 		<info name="alt_title" value="おやつクイズ もぐもぐQ THE QUIZ GAME" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="oyatsu quiz mogu mogu q (japan).bin" size="262144" crc="79e05789" sha1="9b026834756201ccc58988f1718c2380bd8f6326" />
@@ -15997,7 +15997,7 @@
 		<publisher>Namco</publisher>
 		<info name="serial" value="DMG-NO-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
@@ -16014,7 +16014,7 @@
 		<publisher>Namco</publisher>
 		<info name="serial" value="DMG-APTE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
@@ -16033,7 +16033,7 @@
 		<info name="release" value="19950103" />
 		<info name="alt_title" value="パックインタイム" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="pac-in-time (japan).bin" size="262144" crc="1a5a38da" sha1="a804e8fc2614c55154b1a904639244bca6553997" />
@@ -16047,7 +16047,7 @@
 		<publisher>Namco</publisher>
 		<info name="serial" value="DMG-APTP-FAH, DMG-APTP-NOE" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B" />
@@ -16112,7 +16112,7 @@
 		<publisher>Namco</publisher>
 		<info name="serial" value="DMG-NO-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="pac-panic (europe).bin" size="131072" crc="e4af8f75" sha1="963222935becb2139fb0133fbd9b02a1e239bbf2" />
@@ -16128,7 +16128,7 @@
 		<info name="release" value="19941209" />
 		<info name="alt_title" value="パックパニック" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="pac-panic (japan).bin" size="131072" crc="aaebd509" sha1="64573cd6c4a26087485af540818c972cd256a881" />
@@ -16144,7 +16144,7 @@
 		<info name="release" value="19950127" />
 		<info name="alt_title" value="パチスロ必勝ガイドGB" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="131072">
 				<rom name="pachi-slot hisshou guide gb (japan).bin" size="131072" crc="6ee0f7b9" sha1="48564d29dd997878eb3165d7b40ac3fa8f287143" />
@@ -16222,7 +16222,7 @@
 		<info name="release" value="19980313" />
 		<info name="alt_title" value="パチンコCR大工の源さんGB" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="262144">
 				<rom name="pachinko cr daiku no gen-san gb (japan).bin" size="262144" crc="69a5e681" sha1="2fc86c0da3601e7b614290b30197aaae50ab510e" />
@@ -16240,7 +16240,7 @@
 		<info name="release" value="19990128" />
 		<info name="alt_title" value="Pachinko Data Card ちょ〜あたる君" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="pachinko data card - chou ataru-kun (japan).bin" size="1048576" crc="955b25ba" sha1="b8799e2a7d6df8a41f0e8f8857885f7ccc3397b8" />
@@ -16273,7 +16273,7 @@
 		<info name="release" value="19950623" />
 		<info name="alt_title" value="パチンコ物語 外伝" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="pachinko monogatari gaiden (japan).bin" size="524288" crc="52adb7f9" sha1="b5229f7263ed761fbf30e98d88192787e79bcc56" />
@@ -16395,7 +16395,7 @@
 		<publisher>Fox Interactive</publisher>
 		<info name="serial" value="DMG-APMP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="pagemaster, the (europe).bin" size="262144" crc="c9be96d3" sha1="9b3063350581cec9cf595a78faa8d415b75be399" />
@@ -16409,7 +16409,7 @@
 		<publisher>Fox Interactive</publisher>
 		<info name="serial" value="DMG-APME-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
@@ -16697,7 +16697,7 @@
 		<publisher>Malibu Games</publisher>
 		<info name="serial" value="DMG-APRE-USA, DMG-APRP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
@@ -16714,7 +16714,7 @@
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-A3GE-USA, DMG-A3GP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
@@ -16762,7 +16762,7 @@
 		<info name="release" value="19961019" />
 		<info name="alt_title" value="ピクロス2" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN(K)-02" /> <!-- Also found with DMG-DECN-02 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" /> <!-- Also found with [DMG MBC1B1] -->
@@ -17008,7 +17008,7 @@
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-AHQE-USA, DMG-AHQP-FRG" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
@@ -17027,7 +17027,7 @@
 		<info name="release" value="19980424" />
 		<info name="alt_title" value="ポケットバスフィッシング" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="pocket bass fishing (japan).bin" size="131072" crc="2c88f996" sha1="c59402eaf86fb8d52ddf81e3054ab78a06a07eb3" />
@@ -17056,7 +17056,7 @@
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-AKQP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="pocket bomberman (europe).bin" size="524288" crc="0fd1ae54" sha1="34f377a6de2961fe16bfb854e0cebc7fdba7cf4b" />
@@ -17077,7 +17077,7 @@
 		<info name="release" value="19971212" />
 		<info name="alt_title" value="ポケットボンバーマン" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-TEDN-01" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 HuC1 [HuC-1]" />
@@ -17101,7 +17101,7 @@
 		<info name="release" value="19981030" />
 		<info name="alt_title" value="ポケット電車" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="pocket densha (japan).bin" size="524288" crc="845bb677" sha1="702981654640fe59c2f6b47c7191a58be0804a4d" />
@@ -17122,7 +17122,7 @@
 		<info name="release" value="19980809" />
 		<info name="alt_title" value="ポケットファミリーGB" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-UEDT-01" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 HuC3 [HuC-3]" />
@@ -17162,7 +17162,7 @@
 		<info name="release" value="19980110" />
 		<info name="alt_title" value="ポケット漢字郎" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="pocket kanjirou (japan).bin" size="524288" crc="e18aedaf" sha1="ef150c97cb4e9a46f90d826b1aad208cbaa4410f" />
@@ -17180,7 +17180,7 @@
 		<info name="release" value="19980227" />
 		<info name="alt_title" value="ポケットキョロちゃん" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-GDAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC2A [DMG MBC2A]" />
@@ -17203,7 +17203,7 @@
 		<info name="release" value="19970718" />
 		<info name="alt_title" value="ポケット・ラブ" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN(K)-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
@@ -17227,7 +17227,7 @@
 		<info name="release" value="19980313" />
 		<info name="alt_title" value="ポケットラブ2" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DFCN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -17269,7 +17269,7 @@
 		<info name="release" value="19980912" />
 		<info name="alt_title" value="ポケットモンスター ピカチュウ" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-KFDN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC3A [MBC3 A]" /> <!-- Also found with [MBC-3 B] -->
@@ -17293,7 +17293,7 @@
 		<info name="release" value="19980912" />
 		<info name="alt_title" value="ポケットモンスター ピカチュウ" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-KFDN-10" /> <!-- Also found with DMG-KFDN-01 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC3A [MBC3 A]" /> <!-- Also found with [MBC3 A P-2] -->
@@ -17317,7 +17317,7 @@
 		<info name="release" value="19980912" />
 		<info name="alt_title" value="ポケットモンスター ピカチュウ" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-KFDN-01" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC3A [MBC3 A P-2]" />
@@ -17341,7 +17341,7 @@
 		<info name="release" value="19980912" />
 		<info name="alt_title" value="ポケットモンスター ピカチュウ" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-KFDN-01" /> <!-- Also found with DMG-LFDN-01 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC3A [MBC3 A]" /> <!-- Also found with [MBC3] -->
@@ -17365,7 +17365,7 @@
 		<info name="release" value="19960227" />
 		<info name="alt_title" value="ポケットモンスター赤" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DEDN-10" /> <!-- Also found with DMG-DEDN-20 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
@@ -17389,7 +17389,7 @@
 		<info name="release" value="19960227" />
 		<info name="alt_title" value="ポケットモンスター赤" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DEDN-01" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B" />
@@ -17413,7 +17413,7 @@
 		<info name="release" value="19961015" />
 		<info name="alt_title" value="ポケットモンスター青" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="pocket monsters ao (japan).bin" size="524288" crc="e4468d14" sha1="0da501e3e5c51ab8fef55b092dcdd7e6b050e424" />
@@ -17431,7 +17431,7 @@
 		<info name="release" value="19960227" />
 		<info name="alt_title" value="ポケットモンスター緑" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DEDN-01" /> <!-- Also found with DMG-DEDN-10 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B [MBC1B1]" /> <!-- Also found with [DMG MBC1-B] -->
@@ -17455,7 +17455,7 @@
 		<info name="release" value="19960227" />
 		<info name="alt_title" value="ポケットモンスター緑" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="pocket monsters midori (japan).bin" size="524288" crc="baeacd2b" sha1="82c0eef40a5e2423699d9fd8ba15dfaa8b51d196" />
@@ -17473,7 +17473,7 @@
 		<info name="release" value="19961213" />
 		<info name="alt_title" value="ぽけっとぷよぷよ通" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="pocket puyo puyo tsuu (japan).bin" size="262144" crc="43e47a81" sha1="2ffbff6706047988468a7952de09c2720c3019ed" />
@@ -17489,7 +17489,7 @@
 		<info name="release" value="19980911" />
 		<info name="alt_title" value="ポケット将棋" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="pocket shougi (japan).bin" size="262144" crc="2fa1bde6" sha1="5bc0aea0beb7c80f3d2bc650499a6c0e30006544" />
@@ -17521,7 +17521,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APEE-USA, DMG-APEU-AUS, DMG-APEU-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-KFDN-10" /> <!-- Also found with DMG-KFDN-01 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC3A [MBC-3 A]" /> <!-- Also found with [MBC3 A P-2] -->
@@ -17544,7 +17544,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APEF-FRA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="pokemon - version bleue (france).bin" size="1048576" crc="50e2fc1d" sha1="47faa910d0e073c600665bf9c83b6bd17babdf8a" />
@@ -17560,7 +17560,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APED-NOE" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A02-01" />
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5 [MBC5 P-1]" />
@@ -17582,7 +17582,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APEI-ITA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A02-01" />
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5 [MBC5 P-1]" />
@@ -17604,7 +17604,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APES-ESP" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="pokemon - edicion azul (spain).bin" size="1048576" crc="d95416f9" sha1="7715e7b133e8634df48918b9138374110212a108" />
@@ -17620,7 +17620,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APAE-USA, DMG-APAU-AUS, DMG-APAU-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="pcb" value="DMG-KFDN-10" /> <!-- Also found with DMG-KFDN-01 -->
 			<feature name="u1" value="U1 PRG" />
@@ -17642,7 +17642,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APAF-FRA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A02-01" />
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5" />
@@ -17664,7 +17664,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APAD-NOE" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A02-01" />
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5 [MBC5 P-1]" />
@@ -17686,7 +17686,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APAI-ITA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A02-01" />
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5 [MBC-5]" />
@@ -17708,7 +17708,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APAS-ESP" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="pokemon - edicion roja (spain).bin" size="1048576" crc="d8507d8a" sha1="fc17c5b904d551b1b908054ccd1c493f755f832a" />
@@ -17723,7 +17723,7 @@
 		<year>20??</year>
 		<publisher>bootleg</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc3" />
 			<dataarea name="rom" size = "1048576">
 				<rom name="Pokemon - Cock Version (Bootleg).gb" size="1048576" crc="5716d623" sha1="cfe7ba33ae527d057c631ea27ad1b77b551ec480" offset="0" />
@@ -17739,8 +17739,8 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APSE-USA, DMG-APSE-USA-1, DMG-APSU-AUS, DMG-APSU-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
-			<feature name="compatibility" value="gbc" />
+			<feature name="enhancement" value="sgb" />
+			<feature name="enhancement" value="gbc" />
 			<feature name="pcb" value="DMG-A02-01" />
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5 [MBC-5]" /> <!-- Also found with [MBC5 P-1] -->
@@ -17763,8 +17763,8 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APSF-FRA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
-			<feature name="compatibility" value="gbc" />
+			<feature name="enhancement" value="sgb" />
+			<feature name="enhancement" value="gbc" />
 			<feature name="pcb" value="DMG-A02-01" />
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5 [MBC-5]" />
@@ -17786,8 +17786,8 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APSD-NOE" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
-			<feature name="compatibility" value="gbc" />
+			<feature name="enhancement" value="sgb" />
+			<feature name="enhancement" value="gbc" />
 			<feature name="pcb" value="DMG-A02-01" />
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5 [MBC-5]" /> <!-- Also found with [MBC5 P-1] -->
@@ -17809,7 +17809,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APSI-ITA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A02-01" />
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5" />
@@ -17831,7 +17831,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APSS-ESP" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="pokemon - edicion amarilla (spain).bin" size="1048576" crc="964b7a10" sha1="1dc242039218fba50928d1afb66b70565b6b9daf" />
@@ -17849,7 +17849,7 @@
 		<info name="release" value="19940805" />
 		<info name="alt_title" value="ポコニャン! 夢の大冒険" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="pokonyan! - yume no daibouken (japan).bin" size="262144" crc="61c34232" sha1="c5706e26f1cc591cd1fe762ace097df868703480" />
@@ -18046,7 +18046,7 @@
 		<info name="release" value="19980326" />
 		<info name="alt_title" value="パワプロGB" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="power pro gb (japan) (rev a).bin" size="262144" crc="71bea855" sha1="ebca3bce624d19a0fa3a92d30a5c543c12541ea4" />
@@ -18064,7 +18064,7 @@
 		<info name="release" value="19980326" />
 		<info name="alt_title" value="パワプロGB" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="power pro gb (japan).bin" size="262144" crc="2e123f5b" sha1="135d04cbaab6afd03997bceb6b1a2a8aa1dbc7e8" />
@@ -18137,7 +18137,7 @@
 		<publisher>Time Warner Interactive</publisher>
 		<info name="serial" value="DMG-AR9E-USA, DMG-AR9P-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN(K)-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
@@ -18201,7 +18201,7 @@
 		<info name="release" value="19941223" />
 		<info name="alt_title" value="プロ麻雀 極GB" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="pro mahjong kiwame gb (japan).bin" size="131072" crc="6f5b6748" sha1="dc6b304ac4e9b679272f843411ba964b438a69b6" />
@@ -18301,7 +18301,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-ACSP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="probotector 2 (europe).bin" size="131072" crc="b5090e43" sha1="d3eafed6727afd14bd30ffc31e2d3e4ee6cfc52e" />
@@ -18314,7 +18314,7 @@
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="probotector 2 (sample).bin" size="131072" crc="7d60c005" sha1="8f060253ea228c43d2992458dbf904a0b0d7b01e" />
@@ -18373,7 +18373,7 @@
 		<info name="release" value="19971017" />
 		<info name="alt_title" value="プリクラポケット 不完全女子高生マニュアル" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="purikura pocket - fukanzen joshikousei manual (japan).bin" size="524288" crc="acc589fc" sha1="2f2d519e0c9acad3cf96546aebb04b8ff309ab1f" />
@@ -18392,7 +18392,7 @@
 		<info name="release" value="19971129" />
 		<info name="alt_title" value="プリクラポケット2 彼氏改造大作戦" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="purikura pocket 2 - kareshi kaizou daisakusen (japan).bin" size="524288" crc="d145ea23" sha1="6b7ab5728973865f970cd676a4837e7f4c4128bb" />
@@ -18411,7 +18411,7 @@
 		<info name="release" value="19981218" />
 		<info name="alt_title" value="プリクラポケット3 タレントデビュー大作戦" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="purikura pocket 3 - talent debut daisakusen (japan).bin" size="1048576" crc="ceb62411" sha1="b8df59d63a2f836ef497f503b67a3401eae497a7" />
@@ -18429,7 +18429,7 @@
 		<info name="release" value="19940731" />
 		<info name="alt_title" value="ぷよぷよ" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN(K)-02" /> <!-- Also found with DMG-BEAN-02 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" /> <!-- Also found with [DMG MBC1B1] -->
@@ -18448,7 +18448,7 @@
 		<info name="release" value="19940731" />
 		<info name="alt_title" value="ぷよぷよ" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
@@ -18515,7 +18515,7 @@
 		<info name="release" value="19961101" />
 		<info name="alt_title" value="パズル忍たま乱太郎GB" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B" />
@@ -18958,7 +18958,7 @@
 		<info name="release" value="19980327" />
 		<info name="alt_title" value="熱闘 リアルバウト餓狼伝説SPECIAL ~ Nettou Real Bout Garou Densetsu Special (Box)" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1" />
@@ -19053,7 +19053,7 @@
 		<info name="release" value="19960517" />
 		<info name="alt_title" value="連珠倶楽部 五目ならべ" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<dataarea name="rom" size="32768">
 				<rom name="renju club (japan).bin" size="32768" crc="52f5e960" sha1="d5d2a3f194af308a2e7fbbf0f893537bd9e44a68" />
 			</dataarea>
@@ -19370,7 +19370,7 @@
 		<info name="release" value="19940701" />
 		<info name="alt_title" value="ろっくん!もんすたぁ!!" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="rock'n! monster!! (japan).bin" size="524288" crc="630299c1" sha1="338070ed1ced15eaca02198ab32b9e82a92f77ee" />
@@ -19596,7 +19596,7 @@
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-ARGE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="rugrats movie, the (usa).bin" size="524288" crc="124a0d06" sha1="70384eb3474637b81bec3018ebf0c2d6fa1d8a9d" />
@@ -19745,7 +19745,7 @@
 		<info name="release" value="19970425" />
 		<info name="alt_title" value="セームゲーム" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="same game (japan).bin" size="262144" crc="70393c0f" sha1="9dcb5a95e808423e6bd1149319ca8eda069363c8" />
@@ -19942,7 +19942,7 @@
 		<info name="release" value="19950414" />
 		<info name="alt_title" value="SD飛龍の拳 外伝 (Japan), SD飛龍の拳外伝 SD Flying Dragon Cuff SD飞龙之拳外传·SD飛龍之拳外傳 (China)" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-M13" />
 			<feature name="u1" value="U1 MBC1" />
 			<feature name="u2" value="U2 PRG-ROM [epoxy]" />
@@ -19961,7 +19961,7 @@
 		<info name="release" value="19960927" />
 		<info name="alt_title" value="SD飛龍の拳 外伝2" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BFAN-01" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1" />
@@ -20063,7 +20063,7 @@
 		<publisher>Malibu Games</publisher>
 		<info name="serial" value="DMG-ASQE-EUR, DMG-ASQE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B" />
@@ -20140,7 +20140,7 @@
 		<info name="release" value="19980501" />
 		<info name="alt_title" value="セレクション1&amp;2 選ばれし者&amp;暗黒の封印" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="selection i &amp; ii (japan).bin" size="524288" crc="a6027919" sha1="58c0c524b07018beb2d9178de53fe2f6cbb6670f" />
@@ -20274,7 +20274,7 @@
 		<info name="release" value="19980806?" />
 		<info name="alt_title" value="上海 ポケット" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="shanghai pocket (japan).bin" size="262144" crc="6b8eff2c" sha1="82fe97442aa625fd36cf865d82f78b07108ede7f" />
@@ -20288,7 +20288,7 @@
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-AQFE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="shaq fu (usa).bin" size="524288" crc="7ed43fe6" sha1="5e9e68d9235cf8149232b85fd6080ba8796cb85e" />
@@ -20319,7 +20319,7 @@
 		<info name="release" value="19981016" />
 		<info name="alt_title" value="新 競馬貴族 ポケットジョッキー" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-KECN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC3A" />
@@ -20358,7 +20358,7 @@
 		<info name="release" value="19940909" />
 		<info name="alt_title" value="新SDガンダム外伝 ナイトガンダム物語" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="shin sd gundam gaiden - knight gundam monogatari (japan).bin" size="262144" crc="e5a78b9b" sha1="62e1d4dc9f6fae94e981bdcf2fa4b65bb3949644" />
@@ -20488,7 +20488,7 @@
 		<info name="release" value="19941223" />
 		<info name="alt_title" value="将棋最強" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="shougi saikyou (japan) (rev a).bin" size="262144" crc="a074bf7e" sha1="1c5a97aa3a09362c94fdd630456e5e59ae3af5fa" />
@@ -20504,7 +20504,7 @@
 		<info name="release" value="19941223" />
 		<info name="alt_title" value="将棋最強" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
@@ -20659,7 +20659,7 @@
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-ASIE-USA, DMG-ASIP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1-B]" />
@@ -20804,7 +20804,7 @@
 		<info name="release" value="19961221" />
 		<info name="alt_title" value="スヌーピーのはじめてのおつかい" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="snoopy no hajimete no otsukai (japan).bin" size="131072" crc="8900a7c0" sha1="535a85e3955ec58754395a8bf7c4f5b7d319e57f" />
@@ -20859,7 +20859,7 @@
 		<publisher>GameTek</publisher>
 		<info name="serial" value="DMG-YK-AUS, DMG-YK-ESP-1, DMG-YK-EUR, DMG-YK-FAH, DMG-YK-ITA, DMG-YK-NOE-1, DMG-YK-UKV-1" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />  <!-- Also found with DMG-BEAN-10 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" /> <!-- Also found with [DMG MBC1B1] -->
@@ -21105,7 +21105,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-SP-NOE, DMG-SP-UKV" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
@@ -21138,7 +21138,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-SP-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="space invaders (usa).bin" size="524288" crc="7f0f5762" sha1="da48687f3a5ee547510a0ea9eb05859b4ea9531d" />
@@ -21283,7 +21283,7 @@
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="DMG-AUOP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN(K)-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
@@ -21372,7 +21372,7 @@
 		<publisher>Malibu Games</publisher>
 		<info name="serial" value="DMG-AGFE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
@@ -21536,7 +21536,7 @@
 		<info name="release" value="19971219" />
 		<info name="alt_title" value="スタースイープ" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="star sweep (japan).bin" size="262144" crc="d6fd967c" sha1="caabaa2e9cbab27859db80ef6b0e90e7b94b3bd0" />
@@ -21610,7 +21610,7 @@
 		<publisher>Absolute Entertainment</publisher>
 		<info name="serial" value="DMG-ASTP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
@@ -21627,7 +21627,7 @@
 		<publisher>Absolute Entertainment</publisher>
 		<info name="serial" value="DMG-ASTE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="star trek generations - beyond the nexus (usa).bin" size="131072" crc="9f2d11c6" sha1="86a97ad95738bbcbbe94fc9911d6fd6a92a7a636" />
@@ -21751,7 +21751,7 @@
 		<info name="release" value="19950811" />
 		<info name="alt_title" value="ストリートファイターII" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="street fighter ii (japan).bin" size="524288" crc="c775f488" sha1="52fdac69097e9323ab867e0139e860b9ad55d500" />
@@ -21765,7 +21765,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ASFE-USA, DMG-ASFE-USA-1, DMG-ASFP-EUR, DMG-ASFP-NOE" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN(K)-02" /> <!-- Also found with DMG-BEAN-10 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
@@ -21783,7 +21783,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ASFE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN(K)-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
@@ -21802,7 +21802,7 @@
 		<info name="release" value="19960927" />
 		<info name="alt_title" value="ストリートレーサー" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="street racer (japan).bin" size="131072" crc="5bbacaa8" sha1="2e5e0610a7c535980b6a185cab83248f6d6096b3" />
@@ -21883,7 +21883,7 @@
 		<info name="release" value="19970711" />
 		<info name="alt_title" value="スーパービーダマン ファイティングフェニックス" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-TEDN-01" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 HuC1 [HuC-1]" />
@@ -21967,7 +21967,7 @@
 		<info name="release" value="19961228" />
 		<info name="alt_title" value="スーパーブラックバスポケット" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="super black bass pocket (japan).bin" size="1048576" crc="8a7c1678" sha1="1fb714757e9a0ad02c96feb57a0d04163e44dc74" />
@@ -21985,7 +21985,7 @@
 		<info name="release" value="19970620" />
 		<info name="alt_title" value="スーパーブラックバスポケット2" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DFCN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1" />
@@ -22009,7 +22009,7 @@
 		<info name="release" value="19950317 (reprinted on 19971010, 廉価版, DMGASBJ1)" />
 		<info name="alt_title" value="スーパーボンブリス" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="super bombliss (japan).bin" size="131072" crc="b503ffad" sha1="8f44cd2d819a3cd0ab697e60939d5921e29609ac" />
@@ -22023,7 +22023,7 @@
 		<publisher>Majesco</publisher>
 		<info name="serial" value="DMG-ABOE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
@@ -22055,7 +22055,7 @@
 		<info name="release" value="19961228" />
 		<info name="alt_title" value="スーパーチャイニーズFIGHTER GB" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-01" /> <!-- Also found with DMG-BFAN-01 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1-B]" />
@@ -22092,7 +22092,7 @@
 		<info name="release" value="19960913" />
 		<info name="alt_title" value="スーパーチャイニーズランド1・2・3'" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-M-BFAN-01" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1" />
@@ -22126,7 +22126,7 @@
 		<info name="release" value="19950113" />
 		<info name="alt_title" value="スーパーチャイニーズランド3 (Japan), スーパーチャイニーズランド3 SUPER CHINESE LAND 3 超级中国人3 超級中國人3 (China)" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-M11" />
 			<feature name="u1" value="U1 MBC1 [MBC1-B]" />
 			<feature name="u2" value="U2 PRG-ROM [epoxy]" />
@@ -22146,7 +22146,7 @@
 		<info name="release" value="19950727" />
 		<info name="alt_title" value="スーパードンキーコングGB" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
@@ -22477,7 +22477,7 @@
 		<info name="release" value="19950630" />
 		<info name="alt_title" value="スーパーパチンコ大戦" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="super pachinko taisen (japan).bin" size="262144" crc="cde0ff00" sha1="642f4f6b043d8886d02552430bf3b3c87142ad2d" />
@@ -22536,7 +22536,7 @@
 		<info name="release" value="19941220" />
 		<info name="alt_title" value="スーパー・スネーキー" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
 				<rom name="super snakey (japan).bin" size="65536" crc="984d0f7f" sha1="f4746aace9190196ca82003b8e479a130926035e" />
@@ -22550,7 +22550,7 @@
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-ARJE-USA, DMG-ARJP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
@@ -22587,7 +22587,7 @@
 		<info name="release" value="19940916" />
 		<info name="alt_title" value="スーパーストリートバスケットボール2" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B" />
@@ -22604,7 +22604,7 @@
 		<publisher>Titus</publisher>
 		<info name="serial" value="DMG-ASME-USA, DMG-ASMP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
@@ -22931,7 +22931,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-ATAE-USA, DMG-ATAP-NOE" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1B1]" />
@@ -22953,7 +22953,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-ATAF-FRA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="tamagotchi (france).bin" size="524288" crc="084c2401" sha1="0f4e508f90e52a869efb245894a362e5f677c2ed" />
@@ -23387,7 +23387,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-EH-USA-1, DMG-EH-(ESP-1/UKV)" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- USA-1 cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
@@ -23461,7 +23461,7 @@
 		<info name="release" value="19940614" />
 		<info name="alt_title" value="テトリスフラッシュ" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="tetris flash (japan).bin" size="131072" crc="9dfcb385" sha1="ee30c75e068aefe131b880d611d987c41a421470" />
@@ -23477,7 +23477,7 @@
 		<info name="release" value="19961227" />
 		<info name="alt_title" value="テトリスプラス" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="tetris plus (japan).bin" size="262144" crc="2ec9120a" sha1="dbb20951409739f1e11ffbcd8b0af1e802bf693a" />
@@ -23493,7 +23493,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ATRE-USA, DMG-ATRP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-10" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1-B]" />
@@ -23693,7 +23693,7 @@
 		<info name="release" value="19941222" />
 		<info name="alt_title" value="トコロ's まあじゃん ジュニア" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="tokoro's mahjong jr. (japan).bin" size="262144" crc="56afca4c" sha1="bc6ae2ade135ef59aa1a213df004252149937aa8" />
@@ -23711,7 +23711,7 @@
 		<info name="release" value="19980724" />
 		<info name="alt_title" value="東京ディズニーランド ファンタジーツアー" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="tokyo disneyland - fantasy tour (japan).bin" size="524288" crc="28b85584" sha1="e413b0ab506cb12b68439ccc0a72e4664c112378" />
@@ -23927,7 +23927,7 @@
 		<info name="release" value="19940922" />
 		<info name="alt_title" value="とっても!ラッキーマン ラッキークッキーみんな大好きー!!" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="tottemo! luckyman (japan).bin" size="262144" crc="8f9e28ad" sha1="25e5e07b4945145f2681f0c991583335826c4f82" />
@@ -23954,7 +23954,7 @@
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-AQHP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN(K)-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
@@ -23971,7 +23971,7 @@
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-AQHE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="toy story (usa) (rev a).bin" size="524288" crc="6f36b6ed" sha1="04227fcd3e049465f4499fefe6519322ee492a82" />
@@ -23985,7 +23985,7 @@
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-AQHE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="toy story (usa).bin" size="524288" crc="d34287cc" sha1="ac2cdbd6ae42edcf407f02150add2c0442ec116c" />
@@ -24160,7 +24160,7 @@
 		<info name="release" value="19941019" />
 		<info name="alt_title" value="詰碁シリーズ1 藤沢秀行名誉棋聖" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="tsume go series 1 - fujisawa hideyuki meiyo kisei (japan).bin" size="131072" crc="ceee6a61" sha1="4c16e7298713de7741ceb6513fa50a8b12432578" />
@@ -24203,7 +24203,7 @@
 		<info name="release" value="19941019" />
 		<info name="alt_title" value="詰将棋 神吉五段" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="tsume shougi - kamiki godan (japan).bin" size="131072" crc="d5434c94" sha1="2e54faf9f97b6e590caacb26294bdafe40ca7214" />
@@ -24234,7 +24234,7 @@
 		<info name="release" value="19980911" />
 		<info name="alt_title" value="釣り先生" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="tsuri sensei (japan).bin" size="524288" crc="dc324100" sha1="be079a98f072c4b694a10154c351379529897ff6" />
@@ -24343,7 +24343,7 @@
 		<info name="release" value="19941028" />
 		<info name="alt_title" value="TVチャンピオン" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="tv champion (japan).bin" size="262144" crc="18f64779" sha1="eddc884ff0fea50dc059b650728d2d3507461dfe" />
@@ -24513,7 +24513,7 @@
 		<info name="release" value="19941222" />
 		<info name="alt_title" value="ウルトラマンボール" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="ultraman ball (japan).bin" size="131072" crc="468d1a2e" sha1="3cdfcfb1a88d0cbfeb1c7b12751409faf69bba02" />
@@ -24563,7 +24563,7 @@
 		<info name="release" value="19980710" />
 		<info name="alt_title" value="海のぬし釣り2" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="umi no nushi tsuri 2 (japan).bin" size="524288" crc="19ff5b3e" sha1="8e533bea9ce1ce1f5a984e7cc4414f02bc98f1c1" />
@@ -24624,7 +24624,7 @@
 		<info name="release" value="19950303" />
 		<info name="alt_title" value="UNO2 スモールワールド" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="uno 2 - small world (japan).bin" size="131072" crc="a7ad65ef" sha1="d2d281da240779a3605356513132687a485c0b39" />
@@ -24653,7 +24653,7 @@
 		<publisher>Black Pearl</publisher>
 		<info name="serial" value="DMG-AUSE-USA, DMG-AUSP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="urban strike (usa, europe).bin" size="524288" crc="89625945" sha1="6bc1010aad73d2cde677f897adb77684d9b508ed" />
@@ -24715,7 +24715,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AVSE-USA, DMG-AVSP-GPS" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-DECN-02" />  <!-- GPS cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [MBC1B]" />
@@ -24849,7 +24849,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-EE-NOE, DMG-EE-UKV, DMG-EE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" /> <!-- Also found with [DMG MBC1B] -->
@@ -24890,7 +24890,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AW2E-USA, DMG-AW2P-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-LFDN-01" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC3 [MBC3]" />
@@ -24987,7 +24987,7 @@
 		<info name="release" value="19951208" />
 		<info name="alt_title" value="ウェディングピーチ 〜じゃ魔ピーパニック〜" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="wedding peach - jamapii panic (japan).bin" size="262144" crc="9812a6c6" sha1="b10bea6e0e57a19cde7f02c7e97227e002cfc6b3" />
@@ -25071,7 +25071,7 @@
 		<publisher>Spectrum Holobyte</publisher>
 		<info name="serial" value="DMG-AWSE-USA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
 				<rom name="wild snake (usa).bin" size="65536" crc="72462125" sha1="0ea5c37262ba60ef97dd14f8f673f951534ccd38" />
@@ -25285,7 +25285,7 @@
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-A8WE-USA, DMG-A8WP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1B1]" />
@@ -25334,7 +25334,7 @@
 		<info name="release" value="19940729" />
 		<info name="alt_title" value="ワールドカップUSA'94" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="world cup usa '94 (japan) (en,fr,de,es,it,nl,pt,sv).bin" size="262144" crc="9d27f9de" sha1="6f9fb96a4551b4c5b3c6d8928b9a561d1cc28acd" />
@@ -25350,7 +25350,7 @@
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-AWJE-USA, DMG-AWJP-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="world heroes 2 jet (usa, europe).bin" size="524288" crc="67303954" sha1="3c5f213104e1bf968a01e0cffbe7b5b5120e0458" />
@@ -25381,7 +25381,7 @@
 		<info name="release" value="19980604" />
 		<info name="alt_title" value="ワールドサッカーGB" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="world soccer gb (japan).bin" size="524288" crc="57d21ef4" sha1="aca208dabd8d110cf0334103dcb8dd28b68e450d" />
@@ -25519,7 +25519,7 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-AWWE-USA, DMG-AWWP-EUR," />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="wwf war zone (usa, europe).bin" size="262144" crc="6015b7e1" sha1="6ef34105a8944e5aa8e44f3aebb68b9bb45e9105" />
@@ -25753,7 +25753,7 @@
 		<info name="release" value="19961026" />
 		<info name="alt_title" value="ヨッシーのパネポン" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="yossy no panepon (japan).bin" size="524288" crc="3beb7239" sha1="c54d0a33a562c93b9e1243fd9c615b5f92671e58" />
@@ -25859,7 +25859,7 @@
 		<info name="release" value="19941209" />
 		<info name="alt_title" value="幽☆遊☆白書 第4弾 魔界統一編" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="yuu yuu hakusho dai-4-dan - makai touitsu (japan).bin" size="262144" crc="3e7c6b2b" sha1="14a8e39f1adfa6acce11f902eb6763c73ababa47" />
@@ -25950,7 +25950,7 @@
 		<info name="release" value="19940715" />
 		<info name="alt_title" value="全日本プロレス ジェット" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="zen-nihon pro wrestling jet (japan).bin" size="262144" crc="119bcad5" sha1="60d3b8618bb80c61ca29bccc7c1af9244a6c1764" />
@@ -26071,7 +26071,7 @@
 		<info name="release" value="19970130" />
 		<info name="alt_title" value="ズープ" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="compatibility" value="sgb" />
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
 				<rom name="zoop (japan).bin" size="65536" crc="10e1a10c" sha1="89a74970761700d591c2affc47c9306f49d22ba8" />
