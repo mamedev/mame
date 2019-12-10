@@ -153,12 +153,12 @@ void vsmileb_state::vsmilebp(machine_config &config)
 // TODO: decide on a dump endian, these likely differ in endianess due to different dumping technqiues
 ROM_START( vsmileb )
 	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
-	ROM_LOAD( "vbabybios.bin", 0x000000, 0x800000, CRC(ddc7f845) SHA1(2c17d0f54200070176d03d44a40c7923636e596a) )
+	ROM_LOAD( "vsmilebabybios.bin", 0x000000, 0x800000, CRC(ddc7f845) SHA1(2c17d0f54200070176d03d44a40c7923636e596a) )
 ROM_END
 
 ROM_START( vsmilebsw )
 	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "vsmileswedenbios.bin", 0x000000, 0x800000, CRC(8b464b19) SHA1(cea304ba886c39e86906aad3dce17d5fff7cfcbe) )
+	ROM_LOAD16_WORD_SWAP( "vsmilebabyswedenbios.bin", 0x000000, 0x800000, CRC(8b464b19) SHA1(cea304ba886c39e86906aad3dce17d5fff7cfcbe) )
 ROM_END
 
 //    year, name,    parent, compat, machine, input,   class,         init,       company, fullname,            flags
