@@ -14471,6 +14471,10 @@ suprpokr                        // (c) 1986 Grayhound Electronics
 suprpokra                       // (c) 1986 Grayhound Electronics
 suprpokrb                       // (c) 1986 Grayhound Electronics
 
+@source:generalplus_gpl32612.cpp
+jak_tmnthp
+jak_swbstrik
+
 @source:geneve.cpp
 geneve                          // 1987 Myarc Geneve 9640
 genmod                          // 1990 Myarc / Ron G. Walters Geneve 9640 Mod
