@@ -37,7 +37,6 @@ public:
 
 	void base(machine_config &config);
 
-	void nand_init();
 
 protected:
 	virtual void machine_start() override;
@@ -102,6 +101,33 @@ private:
 	virtual DECLARE_READ16_MEMBER(read_external_space) override;
 	virtual DECLARE_WRITE16_MEMBER(write_external_space) override;
 };
+
+
+class generalplus_gpac800_game_state : public gcm394_game_state
+{
+public:
+	generalplus_gpac800_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		gcm394_game_state(mconfig, type, tag),
+		m_mainram(*this, "mainram")
+	{
+	}
+
+	void generalplus_gpac800(machine_config &config);
+
+	void nand_init();
+
+protected:
+	virtual void machine_reset() override;
+
+	void generalplus_gpac800_map(address_map &map);
+
+private:
+	required_shared_ptr<u16> m_mainram;
+	std::vector<uint8_t> m_strippedrom;
+};
+
+
+
 
 READ16_MEMBER(gcm394_game_state::read_external_space)
 {
@@ -245,9 +271,14 @@ void wrlshunt_game_state::wrlshunt(machine_config &config)
 
 	m_screen->set_size(320*2, 262*2);
 	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
-
-
 }
+
+void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
+{
+	gcm394_game_state::base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_gpac800_game_state::generalplus_gpac800_map);
+}
+
 
 void gcm394_game_state::switch_bank(uint32_t bank)
 {
@@ -302,6 +333,12 @@ void wrlshunt_game_state::wrlshunt_map(address_map &map)
 	map(0x000000, 0x00ffff).rom().region("maincpu", 0); // non-banked area on this SoC?
 	map(0x030000, 0x3fffff).ram().share("mainram");
 }
+
+void generalplus_gpac800_game_state::generalplus_gpac800_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).ram().share("mainram");
+}
+
 
 static INPUT_PORTS_START( gcm394 )
 	PORT_START("P1")
@@ -526,16 +563,67 @@ CONS(2009, smartfp, 0, 0, base, gcm394, gcm394_game_state, empty_init, "Fisher-P
 // Fun 2 Learn 3-in-1 SMART SPORTS  ?
 
 
-void gcm394_game_state::nand_init()
+void generalplus_gpac800_game_state::machine_reset()
 {
+	address_space& mem = m_maincpu->space(AS_PROGRAM);
+
+	// copy a block of code from the NAND to RAM
+	for (int i = 0; i < 0x2000; i++)
+	{
+		uint16_t word = m_strippedrom[(i * 2) + 0] | (m_strippedrom[(i * 2) + 1] << 8);
+
+		mem.write_word(0x4000+i, word);
+	}
+
+	mem.write_word(0xfff7, 0x4020); // point boot vector at code in RAM
+	m_maincpu->reset(); // reset CPU so vector gets read etc.
+}
+
+
+void generalplus_gpac800_game_state::nand_init()
+{
+	uint8_t* rom = memregion("maincpu")->base();
+	int size = memregion("maincpu")->bytes();
+
+	const int blocksize = 0x210;
+	const int blocksize_stripped = 0x200;
+
+	int numblocks = size / blocksize;
+
+	m_strippedrom.resize(numblocks * blocksize_stripped);
+
+	for (int i = 0; i < numblocks; i++)
+	{
+		const int base = i * blocksize;
+		const int basestripped = i * blocksize_stripped;
+
+		for (int j = 0; j < blocksize_stripped; j++)
+		{ 
+			m_strippedrom[basestripped + j] = rom[base + j];
+		}
+	}
+
+	// debug to allow for easy use of unidasm.exe
+	if (0)
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"stripped_%s", machine().system().name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(&m_strippedrom[0], blocksize_stripped * numblocks, 1, fp);
+			fclose(fp);
+		}
+	}
 }
 
 
 // NAND dumps w/ internal bootstrap (and u'nSP 2.0 extended opcodes)  (have gpnandnand strings)
 // the JAKKS ones seem to be known as 'Generalplus GPAC800' hardware
-CONS(2010, wlsair60, 0, 0, base, gcm394, gcm394_game_state, nand_init, "Jungle Soft / Kids Station Toys Inc", "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, jak_gtg,  0, 0, base, gcm394, gcm394_game_state, nand_init, "JAKKS Pacific Inc", "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, jak_car2, 0, 0, base, gcm394, gcm394_game_state, nand_init, "JAKKS Pacific Inc", "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, jak_tsm , 0, 0, base, gcm394, gcm394_game_state, nand_init, "JAKKS Pacific Inc", "Toy Story Mania (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, vbaby,    0, 0, base, gcm394, gcm394_game_state, nand_init, "VTech", "V.Baby",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, beambox,  0, 0, base, gcm394, gcm394_game_state, nand_init, "Hasbro", "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2010, wlsair60, 0, 0, generalplus_gpac800, gcm394, generalplus_gpac800_game_state, nand_init, "Jungle Soft / Kids Station Toys Inc", "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_gtg,  0, 0, generalplus_gpac800, gcm394, generalplus_gpac800_game_state, nand_init, "JAKKS Pacific Inc", "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_car2, 0, 0, generalplus_gpac800, gcm394, generalplus_gpac800_game_state, nand_init, "JAKKS Pacific Inc", "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_tsm , 0, 0, generalplus_gpac800, gcm394, generalplus_gpac800_game_state, nand_init, "JAKKS Pacific Inc", "Toy Story Mania (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, vbaby,    0, 0, generalplus_gpac800, gcm394, generalplus_gpac800_game_state, nand_init, "VTech", "V.Baby",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, beambox,  0, 0, generalplus_gpac800, gcm394, generalplus_gpac800_game_state, nand_init, "Hasbro", "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

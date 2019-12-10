@@ -251,8 +251,8 @@ void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 		return;
 
 	case 0xf145: case 0xf345: case 0xf545: case 0xf745: case 0xf945: case 0xfb45: case 0xfd45: case 0xff45:
-		logerror("fir_mov off\n");
-		unimplemented_opcode(op);
+		logerror("unimplemented: fir_mov off\n"); 
+		//unimplemented_opcode(op); // generalplus_gpac800 games do this on startup
 		return;
 
 	case 0xf161: case 0xf361: case 0xf561: case 0xf761: case 0xf961: case 0xfb61: case 0xfd61: case 0xff61:
