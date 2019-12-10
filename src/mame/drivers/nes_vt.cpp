@@ -90,6 +90,7 @@ public:
 		m_exin2(*this, "EXTRAIN2"),
 		m_exin3(*this, "EXTRAIN3"),
 		m_prg(*this, "prg"),
+		m_initial_e000_bank(0xff),
 		m_ntram(nullptr),
 		m_chrram(nullptr),
 		m_prgbank0(*this, "prg_bank0"),
@@ -168,6 +169,7 @@ protected:
 	/* Misc */
 	DECLARE_READ8_MEMBER(rs232flags_region_r);
 
+	uint8_t m_initial_e000_bank;
 private:
 	/* APU handling */
 	DECLARE_WRITE_LINE_MEMBER(apu_irq);
@@ -213,7 +215,7 @@ private:
 
 	int calculate_real_video_address(int addr, int extended, int readtype);
 
-
+	
 	required_memory_bank m_prgbank0;
 	required_memory_bank m_prgbank1;
 	required_memory_bank m_prgbank2;
@@ -239,6 +241,22 @@ protected:
 private:
 };
 
+class nes_vt_ts_state : public nes_vt_state
+{
+public:
+	nes_vt_ts_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_vt_state(mconfig, type, tag)
+	{ 	
+		m_initial_e000_bank = 0x03; // or the banking is just different / ROM is scrambled
+	}
+
+	void nes_vt_ts(machine_config& config);
+
+protected:
+	void nes_vt_ts_map(address_map& map);
+
+private:
+};
 
 
 class nes_vt_pjoy_state : public nes_vt_state
@@ -461,7 +479,7 @@ void nes_vt_state::update_banks()
 	m_prgbank2->set_entry((amod | get_banks(bank)) & (m_numbanks-1));
 
 	// e000 - ffff
-	bank = 0xff;
+	bank = m_initial_e000_bank;
 	m_prgbank3->set_entry((amod | get_banks(bank)) & (m_numbanks-1));
 }
 
@@ -1646,6 +1664,16 @@ void nes_vt_dg_state::nes_vt_fa_map(address_map &map)
 	map(0x4242, 0x4242).w(FUNC(nes_vt_dg_state::vtfp_4242_w));
 }
 
+void nes_vt_ts_state::nes_vt_ts_map(address_map& map)
+{
+	nes_vt_map(map);
+	map(0x0800, 0x1fff).ram(); // how much RAM?
+
+	map(0x5000, 0x57ff).ram(); // plays music if you map this as RAM
+
+	map(0x2040, 0x207f).ram(); // strange regs in vdp area
+}
+
 void nes_vt_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x1fff).bankr("prg_bank0");
@@ -1896,6 +1924,12 @@ void nes_vt_vh2009_state::nes_vt_vh2009(machine_config &config)
 	//m_ppu->set_palette_mode(PAL_MODE_NEW_VG); // gives better title screens, but worse ingame, must be able to switch
 }
 
+void nes_vt_ts_state::nes_vt_ts(machine_config &config)
+{
+	nes_vt(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_ts_state::nes_vt_ts_map);
+}
 
 static INPUT_PORTS_START( nes_vt_fp )
 	PORT_START("CARTSEL")
@@ -2244,6 +2278,12 @@ ROM_START( zdog )
 	ROM_LOAD( "zdog.bin", 0x00000, 0x400000, CRC(5ed3485b) SHA1(5ab0e9370d4ed1535205deb0456878c4e400dd81) )
 ROM_END
 
+ROM_START( ts_handy11 )
+	ROM_REGION( 0x100000, "mainrom", 0 )
+	ROM_LOAD( "tvplaypowercontroller.bin", 0x00000, 0x100000, CRC(9c7fe9ff) SHA1(c872e91ca835b66c9dd3b380e8374b51f12bcae0) ) // 29LV008B
+ROM_END
+
+
 // earlier version of vdogdemo
 CONS( 200?, vdogdeme,  0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT", "V-Dog (prototype, earlier)", MACHINE_NOT_WORKING )
 
@@ -2387,3 +2427,6 @@ CONS( 2017, fapocket,   0,        0,  nes_vt_fa, nes_vt_fa, nes_vt_dg_state, emp
 
 // Plays intro music but then crashes. same hardware as SY-88x but uses more features
 CONS( 2016, mog_m320,   0,        0,  nes_vt_hh, nes_vt, nes_vt_hh_state, empty_init, "MOGIS",    "MOGIS M320 246 in 1 Handheld", MACHINE_NOT_WORKING )
+
+// uncertain VT type, odd accesses above PPU space, non-standard first bank (or scrambling)  possibly newer than 2001 but most games have a 2001 copyright.  Most games are higher colour versions of NES games, so it's an enhanced NES chipset at least but maybe not VT?
+CONS( 2001, ts_handy11,  0,  0,  nes_vt_ts,    nes_vt, nes_vt_ts_state, empty_init, "Techno Source", "Handy Boy 11-in-1 (TV Play Power)", MACHINE_NOT_WORKING )
