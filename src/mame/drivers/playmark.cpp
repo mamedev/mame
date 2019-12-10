@@ -82,6 +82,7 @@ A |__     |_MCT1413P_|       |
 
 
 TODO:
+- Hard Times sound is controlled by a PIC16C57 whose internal ROM is currently missing.
 - Dump the World Beach Volley sound S87C751 internal ROM.
 - Lucky Boom has some minor colour issue with the background - see the title screen. The
   game selects the wrong colour for some tiles. The tiles should be colour 0x01 not 0x02.
