@@ -519,6 +519,7 @@ ROM_START( beambox )
 	ROM_LOAD16_WORD_SWAP( "beambox.bin", 0x0000, 0x4200000, CRC(a486f04e) SHA1(73c7d99d8922eba58d94e955e254b9c3baa4443e) )
 ROM_END
 
+// the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
 CONS(2011, wrlshunt, 0, 0, wrlshunt, wrlshunt, wrlshunt_game_state, empty_init, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 CONS(2009, smartfp, 0, 0, base, gcm394, gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
@@ -531,6 +532,7 @@ void gcm394_game_state::nand_init()
 
 
 // NAND dumps w/ internal bootstrap (and u'nSP 2.0 extended opcodes)  (have gpnandnand strings)
+// the JAKKS ones seem to be known as 'Generalplus GPAC800' hardware
 CONS(2010, wlsair60, 0, 0, base, gcm394, gcm394_game_state, nand_init, "Jungle Soft / Kids Station Toys Inc", "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, jak_gtg,  0, 0, base, gcm394, gcm394_game_state, nand_init, "JAKKS Pacific Inc", "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, jak_car2, 0, 0, base, gcm394, gcm394_game_state, nand_init, "JAKKS Pacific Inc", "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
