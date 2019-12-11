@@ -4314,6 +4314,15 @@ ROM_START( ts34t25 )// blank display
 	ROM_LOAD( "s34t0003_51slbios_019f.u31", 0x00000, 0x8000, CRC(40467716) SHA1(f976f2ce13eb22e0ed164d31d6382eda489545c1))
 ROM_END
 
+// Highscreen Colani Blue Note
+// Chipset: Cirrus Logic CL-GD6235-65QC-A, CL-PD6720-QC-A ETEQ ET6000 A, Appian ADI2, SMC FDC37C651 QF P, DIA UA0300-QA, Chips F82C206J
+// Video: Dual Scan Color LCD (monochrome available) - RAM: 4MB on board, RAM expansion board - on board: trackball, ser, par, PS2, VGA
+// mass storage: Floppy, IDE - expansion: 2xPCMCIA, expansion bus
+ROM_START( bluenote )
+	ROM_REGION32_LE(0x20000, "bios", 0)
+	ROM_LOAD( "7500d_rev26_121593.bin", 0x00000, 0x20000, CRC(d564f855) SHA1(181e4097c3b4ca2e8e79f1732d4aef9edd5b4586))
+ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -4576,6 +4585,7 @@ COMP( 199?, uniwb4407, ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, sm48650usc,ibm5170, 0,       at486,     0,     at_state,     init_at,        "Vintage Sprite", "SM 486-50USC", MACHINE_NOT_WORKING )
 COMP( 199?, zito4dps,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "ZIDA", "Tomato board 4DPS", MACHINE_NOT_WORKING )
 COMP( 199?, ts34t25,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Highscreen",  "486-25", MACHINE_NOT_WORKING )
+COMP( 199?, bluenote,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "Highscreen",  "Colani Blue Note", MACHINE_NOT_WORKING )
 COMP( 1995, pcd4nl,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4NL", MACHINE_NOT_WORKING )
 COMP( 1993, pcd4nd,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4ND", MACHINE_NOT_WORKING )
 COMP( 1993, lion3500,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "Lion",        "3500", MACHINE_NOT_WORKING )
