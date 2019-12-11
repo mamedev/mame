@@ -302,6 +302,7 @@ gamemachine.cpp
 gamepock.cpp
 gb.cpp
 gba.cpp
+generalplus_gpl32612.cpp
 geneve.cpp
 geniusiq.cpp
 geniusjr.cpp
