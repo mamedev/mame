@@ -22,8 +22,7 @@
         * (CoJag) map out unused RAM per-game via memory_nop_read/write
         * (Jaguar) support is very poor, most games aren't properly playable
           or have severe performance issues or crashes related to the unsafe
-          blitter code.  Only Pinball Fantasies is fully playable albeit
-          without sound.
+          blitter code. Please refer to jaguar SW list file for more details.
         * The code (GPU/DSP access) should probably be refactored around the
           16-bit interface from the plain 68k, the driver currently uses
           trampoline functions due to the original driver being entirely
