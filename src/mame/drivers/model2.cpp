@@ -1684,6 +1684,16 @@ static INPUT_PORTS_START( model2 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(2)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2)
+
+	PORT_START("SW")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW:8")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ioboard_dipswitches )
@@ -1962,7 +1972,7 @@ static INPUT_PORTS_START( zerogun )
 	PORT_MODIFY("IN2")
 	PORT_BIT(0x0c, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("DSW")
+	PORT_MODIFY("SW")
 	// in service mode, enables scroll check, polygon check, bg check, stage select
 	PORT_DIPNAME(0x01, 0x01, "Enable Debug Menu") PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING(   0x01, DEF_STR( Off ))
@@ -2695,6 +2705,7 @@ void model2a_state::model2a(machine_config &config)
 	io.in_pb_callback().set(FUNC(model2a_state::in0_r));
 	io.in_pc_callback().set_ioport("IN1");
 	io.in_pd_callback().set_ioport("IN2");
+	io.in_pg_callback().set_ioport("SW");
 	io.out_pe_callback().set([this] (uint8_t data) { m_billboard->write(data); });
 
 	model2_timers(config);
@@ -2788,9 +2799,6 @@ void model2a_state::model2a_0229(machine_config &config)
 void model2a_state::zeroguna(machine_config &config)
 {
 	model2a_5881(config);
-
-	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
-	io.in_pg_callback().set_ioport("DSW");
 }
 
 /* 2B-CRX */
@@ -2822,6 +2830,7 @@ void model2b_state::model2b(machine_config &config)
 	io.in_pb_callback().set(FUNC(model2b_state::in0_r));
 	io.in_pc_callback().set_ioport("IN1");
 	io.in_pd_callback().set_ioport("IN2");
+	io.in_pg_callback().set_ioport("SW");
 	io.out_pe_callback().set([this] (uint8_t data) { m_billboard->write(data); });
 
 	model2_timers(config);
@@ -2945,9 +2954,6 @@ void model2b_state::dynabb(machine_config &config)
 void model2b_state::zerogun(machine_config &config)
 {
 	model2b_5881(config);
-
-	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
-	io.in_pg_callback().set_ioport("DSW");
 }
 
 /* 2C-CRX */
@@ -2974,6 +2980,7 @@ void model2c_state::model2c(machine_config &config)
 	io.in_pb_callback().set(FUNC(model2c_state::in0_r));
 	io.in_pc_callback().set_ioport("IN1");
 	io.in_pd_callback().set_ioport("IN2");
+	io.in_pg_callback().set_ioport("SW");
 
 	model2_timers(config);
 	model2_screen(config);
