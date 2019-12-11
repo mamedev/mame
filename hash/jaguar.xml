@@ -107,6 +107,7 @@ Unreleased (possibly no prototypes exist):
   -->
 
 <softwarelist name="jaguar" description="Atari Jaguar cartridges">
+	<!-- boot OK, gameplay graphics are in shades of blue, pause message gets cut off -->
 	<software name="aircars" supported="no">
 		<description>Air Cars</description>
 		<year>1997</year>
@@ -124,6 +125,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- boot OK, gameplay graphics are in shades of blue, pause message gets cut off -->
 	<software name="aircars94" cloneof="aircars" supported="no">
 		<description>Air Cars (1994 version)</description>
 		<year>1994</year>
@@ -136,7 +138,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-
+	<!-- boot OK, several HUD elements have wrong pitch, HUD automap is incorrectly drawn as a big quadrilateral, HUD blending looks ugly -->
 	<software name="avsp" supported="no">
 		<description>Alien vs Predator</description>
 		<year>1994</year>
@@ -149,19 +151,22 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- 4MB Alpine ROM with Universal Header -->
+	<!-- "licensed by Atari" then black screen -->
 	<software name="fball95" supported="no">
 		<description>Arena Football '95</description>
+		<!-- Made in 1995 but released in 2006 -->
 		<year>2006</year>
 		<publisher>B&amp;C Computervision</publisher>
 		<info name="serial" value="J9003E 800108-006"/>
 		<part name="cart" interface="jaguar_cart">
+			<!-- 4MB Alpine ROM with Universal Header -->
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
 				<rom name="arena football.j64" size="4194304" crc="199b9d83" sha1="542063a5b27659781a85821f61e85cd89ea59ab3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
+	<!-- black screen -->
 	<software name="atarikrt" supported="no">
 		<description>Atari Karts</description>
 		<year>1995</year>
@@ -174,6 +179,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- black screen -->
 	<software name="mutntpng" supported="no">
 		<description>Attack of the Mutant Penguins</description>
 		<year>1996</year>
@@ -186,6 +192,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- no sound, hangs after choosing a game mode, title screen has black dots of garbage on top (btanb) -->
 	<software name="barkley" supported="no">
 		<description>Barkley Shut Up and Jam!</description>
 		<year>2002</year>
@@ -198,6 +205,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- black screen -->
 	<software name="battlesp" supported="no">
 		<description>Battle Sphere</description>
 		<year>2000</year>
@@ -210,6 +218,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- black screen -->
 	<software name="battlesg" supported="no">
 		<description>Battle Sphere Gold</description>
 		<year>2002</year>
@@ -222,6 +231,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- no sound, has severe RMW issues in both versions of the game when breaking blocks -->
 	<software name="breakout" supported="no">
 		<description>Breakout 2000</description>
 		<year>1996</year>
@@ -234,6 +244,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- no sound, hardlocks then eventually throws an exception after the Dyna Cam logo -->
 	<software name="bretth" supported="no">
 		<description>Brett Hull NHL Hockey</description>
 		<year>2004</year>
@@ -246,6 +257,8 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- throws an exception if the Telegames logo isn't skipped, switching items in main menu causes a glitch on the text -->
+	<!-- rightmost column of gameplay has odd "overscan" area -->
 	<software name="brutalsp" supported="no">
 		<description>Brutal Sports Football</description>
 		<year>1994</year>
@@ -258,7 +271,8 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<software name="bubsy" supported="no">
+	<!-- boot OK -->
+	<software name="bubsy" supported="yes">
 		<description>Bubsy in Fractured Furry Tales</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
@@ -270,7 +284,8 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<software name="cfodder" supported="no">
+	<!-- boot OK -->
+	<software name="cfodder" supported="yes">
 		<description>Cannon Fodder</description>
 		<year>1995</year>
 		<publisher>Virgin Interactive</publisher>
@@ -282,6 +297,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- has serious 3D GFX pitch issues -->
 	<software name="chekflag" supported="no">
 		<description>Checkered Flag</description>
 		<year>1994</year>
@@ -294,6 +310,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- no sound, title screen cuts off background, gameplay GFX pop-ups, eventually black screens -->
 	<software name="clubdriv" supported="no">
 		<description>Club Drive</description>
 		<year>1994</year>
@@ -306,6 +323,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- no sound, huge GFX issues (mostly related with pitch) -->
 	<software name="cybermor" supported="no">
 		<description>Cybermorph (Rev. B)</description>
 		<year>1994</year>
@@ -318,6 +336,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- no sound, huge GFX issues (mostly related with pitch) -->
 	<software name="cybermor1" cloneof="cybermor" supported="no">
 		<description>Cybermorph (Rev. A)</description>
 		<year>1993</year>
@@ -330,6 +349,9 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- boot OK, Defender 2000 and Defender Plus both crashes after some few seconds in gameplay -->
+	<!-- Defender 2000 have misplaced GFX portions -->
+	<!-- "paused" GFX upper part incorrectly placed in Defender Classic -->
 	<software name="defender" supported="no">
 		<description>Defender 2000</description>
 		<year>1996</year>
@@ -342,6 +364,8 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- boot OK, sound farts, GFX status bar is stretched in horizontal direction (screen mode changes mid-frame) -->
+	<!-- automap becomes blue a few frames after being called -->
 	<software name="doom" supported="no">
 		<description>Doom</description>
 		<year>1994</year>
@@ -354,7 +378,8 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<software name="ddragon5" supported="no">
+	<!-- boot OK, no BGMs -->
+	<software name="ddragon5" supported="partial">
 		<description>Double Dragon V - The Shadow Falls</description>
 		<year>1995</year>
 		<publisher>Tradewest</publisher>
@@ -366,7 +391,8 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<software name="dragon" supported="no">
+	<!-- boot OK, gameplay backgrounds are missing or garbled -->
+	<software name="dragon" supported="partial">
 		<description>Dragon - The Bruce Lee Story</description>
 		<year>1994</year>
 		<publisher>Virgin Interactibe</publisher>
@@ -378,6 +404,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- boot OK, gameplay area is cut off to the right, status bar even moreso (screen mode changes mid-frame) -->
 	<software name="dinodude" supported="no">
 		<description>Evolution - Dino Dudes</description>
 		<year>1994</year>
@@ -390,6 +417,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- "licensed by Atari" then black screen -->
 	<software name="feverpit" supported="no">
 		<description>Fever Pitch Soccer</description>
 		<year>1995</year>
@@ -402,6 +430,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- no sound, heavy pitch GFX issues -->
 	<software name="fforlife" supported="no">
 		<description>Fight for Life</description>
 		<year>1996</year>
@@ -414,6 +443,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- RSoD on Jaguar logo -->
 	<software name="fforlife1" cloneof="fforlife" supported="no">
 		<description>Fight for Life (Alt)</description>
 		<year>1996</year>
@@ -426,6 +456,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- boot OK, gameplay area is cut off to the right (especially noticeable when pausing game), no color fill for cutscenes -->
 	<software name="flashb" supported="no">
 		<description>Flashback - The Quest for Identity</description>
 		<year>1995</year>
@@ -438,6 +469,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- "Another Great Game" then black screen -->
 	<software name="flipout" supported="no">
 		<description>Flip Out!</description>
 		<year>1995</year>
@@ -453,6 +485,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- huge GFX issues (mostly related with pitch) -->
 	<software name="hstrike" supported="no">
 		<description>Hover Strike</description>
 		<year>1995</year>
@@ -465,7 +498,8 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<software name="hyperfrc" supported="no">
+	<!-- boot OK, reload after saving doesn't work -->
+	<software name="hyperfrc" supported="partial">
 		<description>Hyper Force</description>
 		<year>2000</year>
 		<publisher>Songboard Productions</publisher>
@@ -477,6 +511,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- boot OK, has heavy pitch GFX issues -->
 	<software name="iwar" supported="no">
 		<description>I-War</description>
 		<year>1995</year>
@@ -489,6 +524,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- no sound, black screen after briefing -->
 	<software name="ironsold" supported="no">
 		<description>Iron Soldier (v1.04)</description>
 		<year>1994</year>
@@ -501,6 +537,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- no sound, black screen after title (with incorrect width too) -->
 	<software name="ironsol2" supported="no">
 		<description>Iron Soldier 2</description>
 		<year>1997</year>
@@ -513,6 +550,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- black screen with heavy logs -->
 	<software name="kasumi" supported="no">
 		<description>Kasumi Ninja</description>
 		<year>1994</year>
@@ -526,6 +564,7 @@ Unreleased (possibly no prototypes exist):
 	</software>
 
 	<!-- technically a Jaguar CD cartridge -->
+	<!-- draws an incorrect pitch GFX, doesn't do much else -->
 	<software name="memtrack" supported="no">
 		<description>Memory Track</description>
 		<year>1995</year>
@@ -538,6 +577,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- boot OK, text GFXs are solid filled, no BGMs -->
 	<software name="missil3d" supported="no">
 		<description>Missile Command 3D</description>
 		<year>1995</year>
@@ -550,6 +590,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- hangs at the NBA Jam TE logo -->
 	<software name="nbajamte" supported="no">
 		<description>NBA Jam T.E. - Tournament Edition</description>
 		<year>1996</year>
@@ -562,6 +603,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- boot OK, "Enter Combat" has ground textures with black, "Enter Network" causes a black screen after loading, no BGMs -->
 	<software name="phase0" supported="no">
 		<description>Phase Zero</description>
 		<year>2002</year>
@@ -573,7 +615,8 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<software name="pbfant" supported="no">
+	<!-- boot OK, no sound -->
+	<software name="pbfant" supported="partial">
 		<description>Pinball Fantasies</description>
 		<year>1995</year>
 		<publisher>21st Century Entertainment</publisher>
@@ -585,6 +628,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- boot OK, hangs after few seconds of gameplay -->
 	<software name="pitfall" supported="no">
 		<description>Pitfall - The Mayan Adventure</description>
 		<year>1995</year>
@@ -597,6 +641,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- boot OK, no BGMs, water background in stage 1 is in Black and white, eventually crashes if bumping into road edges -->
 	<software name="pdrive" supported="no">
 		<description>Power Drive Rally</description>
 		<year>1995</year>
@@ -609,6 +654,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- black screen -->
 	<software name="protect" supported="no">
 		<description>Protector</description>
 		<year>1999</year>
@@ -621,6 +667,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- black screen -->
 	<software name="protctse" supported="no">
 		<description>Protector - Special Edition</description>
 		<year>2002</year>
@@ -633,7 +680,8 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<software name="raiden" supported="no">
+	<!-- boot OK, ranking screen cuts off text on 9th and 10th places -->
+	<software name="raiden" supported="partial">
 		<description>Raiden (Rev. A)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
@@ -645,7 +693,8 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<software name="raiden1" cloneof="raiden" supported="no">
+	<!-- boot OK, ranking screen cuts off text on 9th and 10th places -->
+	<software name="raiden1" cloneof="raiden" supported="partial">
 		<description>Raiden</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
@@ -657,7 +706,8 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<software name="rayman" supported="no">
+	<!-- boot OK, saves reports error, no sound -->
+	<software name="rayman" supported="partial">
 		<description>Rayman</description>
 		<year>1995</year>
 		<publisher>Ubisoft</publisher>
@@ -669,6 +719,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- throws an exception off the bat -->
 	<software name="ruinerp" supported="no">
 		<description>Ruiner Pinball</description>
 		<year>1995</year>
@@ -681,7 +732,8 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<software name="sensible" supported="no">
+	<!-- boot OK, no BGMs -->
+	<software name="sensible" supported="partial">
 		<description>Sensible Soccer - International Edition</description>
 		<year>1995</year>
 		<publisher>Telegames</publisher>
@@ -694,6 +746,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- boot OK, hangs after loading a stage -->
 	<software name="skyhamm" supported="no">
 		<description>Skyhammer</description>
 		<year>2000</year>
@@ -706,7 +759,8 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<software name="soccerkd" supported="no">
+	<!-- boot OK -->
+	<software name="soccerkd" supported="yes">
 		<description>Soccer Kid</description>
 		<year>1996</year>
 		<publisher>ReadySoft</publisher>
@@ -717,8 +771,10 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- RSoD on Jaguar logo -->
 	<software name="soccerkd1" cloneof="soccerkd" supported="no">
-		<description>Soccer Kid (Re-release)</description><!-- uses BIOS security skipping hardware -->
+		<!-- uses BIOS security skipping hardware -->
+		<description>Soccer Kid (Re-release)</description>
 		<year>2000</year>
 		<publisher>Songbird Productions</publisher>
 		<info name="serial" value="CF3002"/>
@@ -733,8 +789,10 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<software name="soccerkd1h" cloneof="soccerkd" supported="no">
-		<description>Soccer Kid (Re-release, Hacked)</description><!-- uses universal header, only way to boot this at moment -->
+	<!-- boot OK -->
+	<software name="soccerkd1h" cloneof="soccerkd" supported="yes">
+		<!-- uses universal header, only way to boot this at moment -->
+		<description>Soccer Kid (Re-release, Hacked)</description>
 		<year>2000</year>
 		<publisher>Songbird Productions</publisher>
 		<info name="serial" value="CF3002"/>
@@ -745,6 +803,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- throws an exception off the bat -->
 	<software name="spacewar" supported="no">
 		<description>Space War 2000</description>
 		<year>2001</year>
@@ -756,6 +815,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- throws an exception off the bat -->
 	<software name="spacewarp" cloneof="spacewar" supported="no">
 		<description>Space War 2000 (Prototype)</description>
 		<year>19??</year>
@@ -770,6 +830,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- draws a cutted off Super Burnout copyright text then black screen -->
 	<software name="sburnout" supported="no">
 		<description>Super Burnout</description>
 		<year>1995</year>
@@ -782,6 +843,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- gets to title screen (with wrong GFX width) then hangs -->
 	<software name="superx3d" supported="no">
 		<description>SuperCross 3D</description>
 		<year>1995</year>
@@ -794,6 +856,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- boot OK, OSD full of pitch imperfections (name entry chars) -->
 	<software name="syndicat" supported="no">
 		<description>Syndicate</description>
 		<year>1995</year>
@@ -805,7 +868,8 @@ Unreleased (possibly no prototypes exist):
 			</dataarea>
 		</part>
 	</software>
-
+	
+	<!-- throws exception after few seconds on title screen -->
 	<software name="tempst2k" supported="no">
 		<description>Tempest 2000</description>
 		<year>1994</year>
@@ -818,6 +882,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- boot OK, background has pitch glitch -->
 	<software name="themeprk" supported="no">
 		<description>Theme Park</description>
 		<year>1995</year>
@@ -830,6 +895,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- boot OK, no sprites, main menu with incorrect width, no sound (btanb) -->
 	<software name="ttoonadv" supported="no">
 		<description>Tiny Toon Adventures (Ver. 1)</description>
 		<year>2010</year>
@@ -842,6 +908,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- heavy GFX issues, black screen if left on title screen -->
 	<software name="totalcar" supported="no">
 		<description>Total Carnage</description>
 		<year>2005</year>
@@ -854,7 +921,8 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<software name="towers2" supported="no">
+	<!-- boot OK, gameplay screen flickers -->
+	<software name="towers2" supported="partial">
 		<description>Towers II - Plight of the Stargazer</description>
 		<year>1996</year>
 		<publisher>Telegames</publisher>
@@ -869,6 +937,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- boot OK, no sound, GFXs missing on gameplay and title screen -->
 	<software name="trevmcfr" supported="no">
 		<description>Trevor McFur in the Crescent Galaxy (Rev. A)</description>
 		<year>1993</year>
@@ -881,6 +950,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- boot OK, no sound, GFXs missing on gameplay and title screen -->
 	<software name="trevmcfr1" cloneof="trevmcfr" supported="no">
 		<description>Trevor McFur in the Crescent Galaxy</description>
 		<year>1993</year>
@@ -893,6 +963,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- boot OK, no BGMs, has minor GFX pitch issue when action summary message pops up after a play -->
 	<software name="troyaik" supported="no">
 		<description>Troy Aikman NFL Football</description>
 		<year>1995</year>
@@ -905,6 +976,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- black screen -->
 	<software name="ultravor" supported="no">
 		<description>Ultra Vortek</description>
 		<year>1995</year>
@@ -917,6 +989,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- RSoD on Jaguar logo -->
 	<software name="ultravor1" cloneof="ultravor" supported="no">
 		<description>Ultra Vortek (v0.94, Prototype)</description>
 		<year>1995</year>
@@ -929,6 +1002,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- boot OK, sound farts, missing/wrong GFXs on menus and gameplay -->
 	<software name="valdiser" supported="no">
 		<description>Val d'Isère Skiing and Snowboarding</description>
 		<year>1994</year>
@@ -941,6 +1015,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- boot OK, black screen after title screen, no sound -->
 	<software name="whitemen" supported="no">
 		<description>White Men Can't Jump</description>
 		<year>1995</year>
@@ -953,6 +1028,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- boot OK, sound buzz when selecting new game, can eventually black screen or throw an exception --> 
 	<software name="wolfn3d" supported="no">
 		<description>Wolfenstein 3D</description>
 		<year>1994</year>
@@ -965,7 +1041,8 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<software name="worms" supported="no">
+	<!-- boot OK, pen corruption on background during gameplay, layers are slightly cut off -->
+	<software name="worms" supported="partial">
 		<description>Worms</description>
 		<year>1998</year>
 		<publisher>Telegames</publisher>
@@ -977,7 +1054,8 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<software name="zero5" supported="no">
+	<!-- boot OK, minor GFX pitch issues, no sound -->
+	<software name="zero5" supported="partial">
 		<description>Zero 5</description>
 		<year>1997</year>
 		<publisher>Telegames</publisher>
@@ -989,7 +1067,8 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<software name="zool2" supported="no">
+	<!-- boot OK, sound metrics menu has glitchy bars (pause menu then press 'B') -->
+	<software name="zool2" supported="yes">
 		<description>Zool 2</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
@@ -1001,6 +1080,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- "licensed by Atari" screen then resets to Jaguar logo -->
 	<software name="zoop" supported="no">
 		<description>Zoop!</description>
 		<year>1996</year>
@@ -1071,6 +1151,7 @@ These have been converted to j64 format with the universal header -->
 		</part>
 	</software>
 
+	<!-- black screen -->
 	<software name="cybrgolf" supported="no">
 		<description>Jack Nicklaus Cyber Golf examples (Prototype, v0.01, 19940704)</description>
 		<year>1994</year>
@@ -1082,6 +1163,7 @@ These have been converted to j64 format with the universal header -->
 		</part>
 	</software>
 
+	<!-- black screen -->
 	<software name="cybrgolfa" cloneof="cybrgolf" supported="no">
 		<description>Cyber Golf (Prototype)</description>
 		<year>199?</year>
@@ -1093,6 +1175,7 @@ These have been converted to j64 format with the universal header -->
 		</part>
 	</software>
 
+	<!-- black screen -->
 	<software name="cybrgolfb" cloneof="cybrgolf" supported="no">
 		<description>Cyber Golf (Prototype, Alt)</description>
 		<year>199?</year>
@@ -1137,6 +1220,7 @@ These have been converted to j64 format with the universal header -->
 		</part>
 	</software>
 
+	<!-- black screen -->
 	<software name="gorf2k" supported="no">
 		<description>Gorf 2000 (Demo)</description>
 		<year>2008</year>
@@ -1148,8 +1232,9 @@ These have been converted to j64 format with the universal header -->
 		</part>
 	</software>
 
-	<!-- this was intended to be released with the VR headset -->
+	<!-- boot OK, text GFXs are solid filled, no BGMs, GFXs are cut off during gameplay -->
 	<software name="missilvr" supported="no">
+		<!-- this was intended to be released with the VR headset -->
 		<description>Missile Command VR</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
@@ -1182,6 +1267,7 @@ These have been converted to j64 format with the universal header -->
 		</part>
 	</software>
 
+	<!-- black screen -->
 	<software name="ultbrain" supported="no">
 		<description>Ultimate Brain Games (Prototype)</description>
 		<year>199?</year>
