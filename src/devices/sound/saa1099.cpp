@@ -178,25 +178,19 @@ void saa1099_device::device_start()
 	save_item(NAME(m_sync_state));
 	save_item(NAME(m_selected_reg));
 
-	for (int i = 0; i < 6; i++)
-	{
-		save_item(NAME(m_channels[i].frequency), i);
-		save_item(NAME(m_channels[i].freq_enable), i);
-		save_item(NAME(m_channels[i].noise_enable), i);
-		save_item(NAME(m_channels[i].octave), i);
-		save_item(NAME(m_channels[i].amplitude), i);
-		save_item(NAME(m_channels[i].envelope), i);
-		save_item(NAME(m_channels[i].counter), i);
-		save_item(NAME(m_channels[i].freq), i);
-		save_item(NAME(m_channels[i].level), i);
-	}
+	save_item(STRUCT_MEMBER(m_channels, frequency));
+	save_item(STRUCT_MEMBER(m_channels, freq_enable));
+	save_item(STRUCT_MEMBER(m_channels, noise_enable));
+	save_item(STRUCT_MEMBER(m_channels, octave));
+	save_item(STRUCT_MEMBER(m_channels, amplitude));
+	save_item(STRUCT_MEMBER(m_channels, envelope));
+	save_item(STRUCT_MEMBER(m_channels, counter));
+	save_item(STRUCT_MEMBER(m_channels, freq));
+	save_item(STRUCT_MEMBER(m_channels, level));
 
-	for (int i = 0; i < 2; i++)
-	{
-		save_item(NAME(m_noise[i].counter), i);
-		save_item(NAME(m_noise[i].freq), i);
-		save_item(NAME(m_noise[i].level), i);
-	}
+	save_item(STRUCT_MEMBER(m_noise, counter));
+	save_item(STRUCT_MEMBER(m_noise, freq));
+	save_item(STRUCT_MEMBER(m_noise, level));
 }
 
 
