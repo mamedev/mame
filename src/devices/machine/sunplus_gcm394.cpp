@@ -29,7 +29,7 @@ sunplus_gcm394_device::sunplus_gcm394_device(const machine_config &mconfig, cons
 DEFINE_DEVICE_TYPE(GPAC800, generalplus_gpac800_device, "gpac800", "GeneralPlus GPAC800 System-on-a-Chip")
 
 generalplus_gpac800_device::generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sunplus_gcm394_base_device(mconfig, GCM394, tag, owner, clock)
+	: sunplus_gcm394_base_device(mconfig, GCM394, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpac800_device::gpac800_internal_map), this))
 {
 }
 
@@ -333,7 +333,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unk_w)
 	}
 }
 
-void sunplus_gcm394_base_device::internal_map(address_map &map)
+void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 {
 	map(0x000000, 0x006fff).ram();
 	map(0x007000, 0x007fff).rw(FUNC(sunplus_gcm394_base_device::unk_r), FUNC(sunplus_gcm394_base_device::unk_w)); // catch unhandled
@@ -504,6 +504,18 @@ void sunplus_gcm394_base_device::internal_map(address_map &map)
 	map(0x007e00, 0x007fff).rw(m_spg_audio, FUNC(sunplus_gcm394_audio_device::audio_phase_r), FUNC(sunplus_gcm394_audio_device::audio_phase_w));
 }
 
+READ16_MEMBER(generalplus_gpac800_device::unkarea_7850_r)
+{
+	return machine().rand();
+}
+
+void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
+{
+	sunplus_gcm394_base_device::gcm394_internal_map(map);
+
+	map(0x007850, 0x007850).r(FUNC(generalplus_gpac800_device::unkarea_7850_r));	
+}
+	
 void sunplus_gcm394_base_device::device_start()
 {
 	unsp_20_device::device_start();
