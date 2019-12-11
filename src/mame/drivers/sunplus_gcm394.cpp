@@ -631,7 +631,7 @@ void generalplus_gpac800_game_state::nand_init()
 	}
 
 	// debug to allow for easy use of unidasm.exe
-	if (1)
+	if (0)
 	{
 		FILE *fp;
 		char filename[256];
