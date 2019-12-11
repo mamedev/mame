@@ -22351,6 +22351,7 @@ bublpong                        // bootleg on enhanced hardware
 missb2                          // bootleg on enhanced hardware
 
 @source:missbamby.cpp
+gwinner                         //
 msbamby                         // 198?
 
 @source:missile.cpp
