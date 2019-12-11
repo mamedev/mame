@@ -152,7 +152,7 @@ READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7810_r)
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7810_w)
 {
-	printf( "%s:sunplus_gcm394_base_device::unkarea_7810_w %04x\n", machine().describe_context().c_str(), data);
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7810_w %04x\n", machine().describe_context(), data);
 	m_7810 = data;
 }
 

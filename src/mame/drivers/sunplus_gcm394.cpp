@@ -34,7 +34,7 @@ public:
 		m_romregion(*this, "maincpu")
 	{
 	}
-
+	
 	void base(machine_config &config);
 
 
@@ -231,6 +231,8 @@ void gcm394_game_state::base(machine_config &config)
 	m_maincpu->space_write_callback().set(FUNC(gcm394_game_state::write_external_space));
 	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(sunplus_gcm394_base_device::irq_vector_cb));
 	m_maincpu->mapping_write_callback().set(FUNC(gcm394_game_state::mapping_w));	
+	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -241,9 +243,6 @@ void gcm394_game_state::base(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
-
 }
 
 READ16_MEMBER(wrlshunt_game_state::hunt_porta_r)
@@ -288,6 +287,9 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 	m_maincpu->space_write_callback().set(FUNC(generalplus_gpac800_game_state::write_external_space));
 	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(sunplus_gcm394_base_device::irq_vector_cb));
 	m_maincpu->mapping_write_callback().set(FUNC(generalplus_gpac800_game_state::mapping_w));	
+	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+
 }
 
 
