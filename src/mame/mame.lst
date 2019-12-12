@@ -2676,7 +2676,9 @@ pci48af                         // TMC Research Corporation PCI48AF motherboard 
 ft486f55                        // Freetech 486FT55 motherboard (486)
 ga486am                         // Gigabyte GA486AM/S motherboard (486)
 jwj446a                         // Jetway J-446A motherboard (486)
-
+bluenote                        // Highscreen Colani Blue Note (486)
+4dmshl3g						// EFA 4DMS HL3G-L4-VI motherboard (486)
+4dmuhl3s						// EFA 4DMU HL3S motherboard (486)
 
 @source:atari_s1.cpp
 aavenger                        //

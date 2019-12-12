@@ -3961,6 +3961,13 @@ ROM_START( pkm0038s )
 	ROM_LOAD( "pkm0038s.bin", 0x10000, 0x10000, CRC(f6e7dd88) SHA1(5a2986ff0e6352ade8d5b0abaa86e436dddcf226))
 ROM_END
 
+// EFA 4DMS HL3G-L4-VI - Chipset: SIS-85C471B/E/G / SIS471E/G - CPU: Socket 3 - RAM: 2xSIMM72, Cache: 8x32pin+TAG - ISA16: 5, ISA16/VL: 3
+// BIOS: Award - BIOS-String: 12/07/95-SIS-85C471B/E/G-2C4I9E30-00 / 4DMS-HL3GC Award BIOS REV 1.05 01/12/'96
+ROM_START( 4dmshl3g )
+	ROM_REGION32_LE(0x20000, "bios", 0)
+	ROM_LOAD( "3g105.bin", 0x00000, 0x20000, CRC(60e4841f) SHA1(60ad11e4e4a60eef858d837470a9014706e7576a))
+ROM_END
+
 ROM_START( sis85c471 )
 	ROM_REGION32_LE(0x20000, "bios", 0)
 	// 0: Chipset: SiS 85C407, another chip with the Energy Star/Green PC label (85C441) - CPU: 486 - BIOS: Award BIOS ISA 486 036875 - Keyboard-BIOS: Lance LT38C41
@@ -4183,6 +4190,12 @@ ROM_END
 ROM_START( mb4d33 )
 	ROM_REGION32_LE(0x20000, "bios", 0)
 	ROM_LOAD( "486-mb-4d33.bin", 0x10000, 0x10000, CRC(f1299131) SHA1(d8e2749e180135e23483e36a0a05479e64f23d8c))
+ROM_END
+
+	// BIOS-String: 40-0100-001281-00101111-080893-UMC491F-0 / HL3SC/SM AMI BIOS VER 4.9 01/09/'95
+ROM_START( 4dmuhl3s )
+	ROM_REGION32_LE(0x20000, "bios", 0)
+	ROM_LOAD( "3s-49-1.rom", 0x10000, 0x10000, CRC(78a8ea39) SHA1(35e2d0103da28b93a8c1addb1f083bd6e4239d2a))
 ROM_END
 
 // Elitegroup ECS UC4915 A AIO - Chipset: UMC UM82C491F UM82C493F UM82C865F SMC FDC37C662QF P,  PROCHIP PR 4030 - CPU: Socket 3
@@ -4540,6 +4553,8 @@ COMP( 199?, ch491e,    ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, 486ccv,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Diamond Flower, Inc. (DFI)", "486-CCV", MACHINE_NOT_WORKING )
 COMP( 199?, pkm0038s,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "DTK", "PKM-0038S aka Gemlight GMB-486SG", MACHINE_NOT_WORKING )
 COMP( 199?, gc10a,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Eagle", "EAGLEN486 GC10A", MACHINE_NOT_WORKING )
+COMP( 199?, 4dmshl3g,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "EFA",   "4DMS HL3G-L4-VI", MACHINE_NOT_WORKING )
+COMP( 199?, 4dmuhl3s,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "EFA",   "4DMU HL3S", MACHINE_NOT_WORKING )
 COMP( 199?, um486,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Elitegroup", "UM486/UM486sx", MACHINE_NOT_WORKING )
 COMP( 199?, um486v,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Elitegroup", "UM486V-AIO", MACHINE_NOT_WORKING )
 COMP( 199?, ec4915aio, ibm5170, 0,       at486,     0,     at_state,     init_at,        "Elitegroup", "UC4915 A AIO", MACHINE_NOT_WORKING )
