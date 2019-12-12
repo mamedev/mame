@@ -2,10 +2,10 @@
 // copyright-holders:
 
 /*
-Miss Bamby - Automatics Pasqual (ClawGrip 2019-01-21)
+Miss Bamby - Automatics Pasqual
    _____________________________________________________________
    |                             _______                        |
-   |                             |__??__|      ____________     |
+   |                             |_PROM_|      ____________     |
    |                  __________________       | EMPTY     |    |
    |                  | M5L8085AP       |      |_SOCKET____|    |
    |                  |_________________|      ____________     |
@@ -27,6 +27,33 @@ Miss Bamby - Automatics Pasqual (ClawGrip 2019-01-21)
 |__|   |LM380N|          |    AY-3-8910     | |I  | |_________| |
 |__|                     |__________________| |P  | ______      |
 |__|                                          |S__| LM311N      |
+   |____________________________________________________________|
+
+Golden Winner - Reben
+   _____________________________________________________________
+   |                             _______                        |
+   |                            DM74S188N      ____________     |
+   |                  __________________       | EMPTY     |    |
+   |                  | NEC D8085AC     |      |_SOCKET____|    |
+   |                  |_________________|      ____________     |
+   |                       ______________      | ROM-B     |    |
+   |         XTAL          |INS/DP8212N |      |___________|    |
+   |   __   6.000          |____________|      ____________     |
+   |   |R|                                     | ROM-A     |    |
+ __|                                           |___________|    |
+|__| ________  ________  ___________________   ____________     |
+|__| |_L203B_| |_L203B_| | NEC D8155HC      |  |MCM51L01P45|    |
+|__|                     |__________________|  ____________     |
+|__|                     ________   _________  |SCL 5101E-1|    |
+|__|           _______   |74LS393N  |DM7474N|                   |
+|__|           |7407N |                        ________         |
+|__|                     ________   ________   |GD4001B|        |
+|__|                     SN74LS14N  DM74LS153N                  |
+|__|                                          ____              |
+|__|   _______           ___________________  |D  |             |
+|__|   |LM380N|          |    AY-3-8910     | |I  |             |
+|__|                     |__________________| |P  | ______      |
+|__|                                          |S__| CA311E      |
    |____________________________________________________________|
 */
 
@@ -150,5 +177,5 @@ ROM_START( gwinner )
 ROM_END
 
 
-GAME( 198?, msbamby, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1983, gwinner, 0, gldwinner, missbamby, missbamby_state, empty_init, ROT0, "Reben SA", "Golden Winner", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 198?, msbamby, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",    MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1983, gwinner, 0, gldwinner, missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner", MACHINE_IS_SKELETON_MECHANICAL )
