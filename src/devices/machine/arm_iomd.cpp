@@ -11,7 +11,8 @@
 	- word-boundary accesses for 8-bit ports;
 	- split into different types, add quick notes about where they diverges do in this header;
 	- keyboard/mouse interface hookup is wrong for PS/2 and unimplemented for quadrature. 
-	  I guess we can use connectors over a custom handling;
+	  I guess we can use connectors over a custom handling, with a terminal mock for testing it 
+	  without the overhead of everything else.
 
 **************************************************************************************************/
 
@@ -357,8 +358,8 @@ WRITE32_MEMBER( arm_iomd_device::iocr_w )
 {
 	m_iocr_ddr = (data & 0x0b);
 	m_iocr_write_id_cb(BIT(m_iocr_ddr,3));
-	m_iocr_write_od_cb[1](BIT(m_iocr_ddr,1));
 	m_iocr_write_od_cb[0](BIT(m_iocr_ddr,0));
+	m_iocr_write_od_cb[1](BIT(m_iocr_ddr,1));
 }
 
 READ32_MEMBER( arm_iomd_device::kbddat_r )
