@@ -18352,12 +18352,14 @@
 		<description>Music Construction Set (cleanly cracked)</description>
 		<year>1983</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="release" value="2017-03-02"/>
+		<info name="release" value="2019-12-09"/>
+		<!-- This crack was updated on 2019-12-09 to fix corruption on track
+		$20. -->
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="music construction set (4am and san inc crack).dsk" size="143360" crc="07fb5f2f" sha1="d266f61abf5ca1c013449748eac3fb43edb7c63b" />
+				<rom name="music construction set (4am and san inc crack).dsk" size="143360" crc="221034cd" sha1="ff22eb248c1a6d270ebb97f4660c97ff832cf0a2" />
 			</dataarea>
 		</part>
 	</software>
