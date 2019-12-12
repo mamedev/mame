@@ -1910,21 +1910,26 @@ static INPUT_PORTS_START( srallyc )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vcop2 )
-	PORT_INCLUDE(vcop)
+	PORT_INCLUDE(model2crx)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1) PORT_NAME("P1 Trigger")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2) PORT_NAME("P2 Trigger")
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_MODIFY("IN2")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_MODIFY("P1_X")
+	PORT_START("P1_X")
 	PORT_BIT(0x3ff, 0x17f, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(137, 630) PORT_SENSITIVITY(50) PORT_KEYDELTA(13) PORT_PLAYER(1)
 
-	PORT_MODIFY("P1_Y")
+	PORT_START("P1_Y")
 	PORT_BIT(0x3ff, 0x0e6, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX( 36, 425) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_MODIFY("P2_X")
+	PORT_START("P2_X")
 	PORT_BIT(0x3ff, 0x17c, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(134, 627) PORT_SENSITIVITY(50) PORT_KEYDELTA(13) PORT_PLAYER(2)
 
-	PORT_MODIFY("P2_Y")
+	PORT_START("P2_Y")
 	PORT_BIT(0x3ff, 0x0e6, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX( 36, 425) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -7089,7 +7094,7 @@ GAME( 1997, bel,       0,        bel,          bel,      model2c_state, empty_in
 GAME( 1997, hotd,      0,        hotd,         hotd,     model2c_state, empty_init, ROT0, "Sega",   "The House of the Dead", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, hotdp,     hotd,     hotd,         hotd,     model2c_state, empty_init, ROT0, "Sega",   "The House of the Dead (prototype)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, overrev,   0,        overrev2c,    overrev,  model2c_state, empty_init, ROT0, "Jaleco", "Over Rev (Model 2C, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, rascot2,   0,        model2c,      model2,   model2c_state, empty_init, ROT0, "Sega",   "Royal Ascot II", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, rascot2,   0,        model2c,      model2crx,model2c_state, empty_init, ROT0, "Sega",   "Royal Ascot II", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, segawski,  0,        segawski,     segawski, model2c_state, empty_init, ROT0, "Sega",   "Sega Water Ski (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, topskatr,  0,        topskatr,     topskatr, model2c_state, empty_init, ROT0, "Sega",   "Top Skater (Export, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, topskatru, topskatr, model2c,      topskatr, model2c_state, empty_init, ROT0, "Sega",   "Top Skater (USA, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
