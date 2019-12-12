@@ -169,8 +169,8 @@ ROM_END
 
 ROM_START( gwinner )
 	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD( "reben_sa_gw-a_chk_8811_crc_2677.bin", 0x0000, 0x2000, CRC(ffcb4ba0) SHA1(2bc0dfc2b35a3a6cc3addf69a4c8916cc54347e4) )
-	ROM_LOAD( "reben_sa_gw-b_chk_f884_crc_7822.bin", 0x2000, 0x2000, CRC(0146a4ff) SHA1(d23048ba0f23daf5caba07affc57e88ab09ca91e) )
+	ROM_LOAD( "reben_sa_gw-a_chk_8811_crc_2677.bin", 0x0000, 0x1000, CRC(ffcb4ba0) SHA1(2bc0dfc2b35a3a6cc3addf69a4c8916cc54347e4) )
+	ROM_LOAD( "reben_sa_gw-b_chk_f884_crc_7822.bin", 0x2000, 0x1000, CRC(0146a4ff) SHA1(d23048ba0f23daf5caba07affc57e88ab09ca91e) )
 
 	ROM_REGION(0x20, "prom", 0)
 	ROM_LOAD( "dm74s188n.bin", 0x00, 0x20, NO_DUMP )
