@@ -10000,6 +10000,9 @@ chaknpop                        // AO4 (c) 1983 Taito Corporation
 @source:cham24.cpp
 cham24                          // 2002
 
+@source:chameleonrx1.cpp
+chamrx1                         // 2003
+
 @source:champbas.cpp
 champbas                        // (c) 1983 Sega
 champbasj                       // (c) 1983 Alpha Denshi Co.
