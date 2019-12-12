@@ -610,28 +610,28 @@ public:
 
 	// state saving interfaces
 	template<typename ItemType>
-	void ATTR_COLD save_item(ItemType &&value, const char *valname, int index = 0)
+	void ATTR_COLD save_item(ItemType &value, const char *valname, int index = 0)
 	{
 		assert(m_save);
-		m_save->save_item(this, name(), tag(), index, std::forward<ItemType>(value), valname);
+		m_save->save_item(this, name(), tag(), index, value, valname);
 	}
-	template<typename ItemType, typename ElementType>
-	void ATTR_COLD save_item(ItemType &&value, ElementType save_manager::array_unwrap<std::remove_reference_t<ItemType> >::underlying_type::*element, const char *valname, int index = 0)
+	template<typename ItemType, typename StructType, typename ElementType>
+	void ATTR_COLD save_item(ItemType &value, ElementType StructType::*element, const char *valname, int index = 0)
 	{
 		assert(m_save);
-		m_save->save_item(this, name(), tag(), index, std::forward<ItemType>(value), element, valname);
+		m_save->save_item(this, name(), tag(), index, value, element, valname);
 	}
 	template<typename ItemType>
-	void ATTR_COLD save_pointer(ItemType &&value, const char *valname, u32 count, int index = 0)
+	void ATTR_COLD save_pointer(ItemType &value, const char *valname, u32 count, int index = 0)
 	{
 		assert(m_save);
-		m_save->save_pointer(this, name(), tag(), index, std::forward<ItemType>(value), valname, count);
+		m_save->save_pointer(this, name(), tag(), index, value, valname, count);
 	}
-	template<typename ItemType, typename ElementType>
-	void ATTR_COLD save_pointer(ItemType &&value, ElementType save_manager::pointer_unwrap<ItemType>::underlying_type::*element, const char *valname, u32 count, int index = 0)
+	template<typename ItemType, typename StructType, typename ElementType>
+	void ATTR_COLD save_pointer(ItemType &value, ElementType StructType::*element, const char *valname, u32 count, int index = 0)
 	{
 		assert(m_save);
-		m_save->save_pointer(this, name(), tag(), index, std::forward<ItemType>(value), element, valname, count);
+		m_save->save_pointer(this, name(), tag(), index, value, element, valname, count);
 	}
 
 	// debugging
