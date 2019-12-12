@@ -9987,6 +9987,9 @@ tsclass                         //
 @source:cfx9850.cpp
 cfx9850                         // Casio CFX-9850
 
+@source:cgang.cpp
+cgang
+
 @source:cgc7900.cpp
 cgc7900                         //
 

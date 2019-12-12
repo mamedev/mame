@@ -2794,6 +2794,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/baraduke.cpp",
 	MAME_DIR .. "src/mame/includes/baraduke.h",
 	MAME_DIR .. "src/mame/video/baraduke.cpp",
+	MAME_DIR .. "src/mame/drivers/cgang.cpp",
 	MAME_DIR .. "src/mame/drivers/cswat.cpp",
 	MAME_DIR .. "src/mame/drivers/dambustr.cpp",
 	MAME_DIR .. "src/mame/drivers/dkmb.cpp",
