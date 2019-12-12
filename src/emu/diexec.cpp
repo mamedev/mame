@@ -413,6 +413,7 @@ void device_execute_interface::interface_post_start()
 	// it's more efficient and causes less clutter to save these this way
 	device().save_item(STRUCT_MEMBER(m_input, m_stored_vector));
 	device().save_item(STRUCT_MEMBER(m_input, m_curvector));
+	device().save_item(STRUCT_MEMBER(m_input, m_curstate));
 
 	// fill in the input states and IRQ callback information
 	for (int line = 0; line < ARRAY_LENGTH(m_input); line++)
