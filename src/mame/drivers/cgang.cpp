@@ -25,19 +25,23 @@ Audio CPU side:
 - 32KB ROM(27C256), 16KB RAM(2*HM6264AP-10)
 - M5L8255AP-5 PPI
 - Namco CUS121 sound interface, same chip used in Namco System 1
-- Yamaha YM2151 @ 3.57MHz, 2*NEC D7759C @ 640KHz
+- Yamaha YM2151 @ 3.57MHz, 2*NEC D7759C @ 640kHz
 - 2*128KB ADPCM ROM (27C010, one for each D7759C)
 
 Cabinet:
 - 5 lanes with movable aliens, lightsensor under mouth
+- 5 'energy containers', aliens will try to steal them
 - 2 lightguns
 - UFO with leds above cabinet
 - 7segs for scorekeeping
+- 2 ticket dispensers
 
 ******************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/pit8253.h"
+#include "machine/ripple_counter.h"
 #include "speaker.h"
 
 
@@ -49,7 +53,8 @@ public:
 	cgang_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu")
+		m_audiocpu(*this, "audiocpu"),
+		m_pit(*this, "pit%u", 0)
 	{ }
 
 	// machine drivers
@@ -62,16 +67,27 @@ private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device_array<pit8253_device, 2> m_pit;
 
 	// address maps
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 
 	// I/O handlers
+	DECLARE_WRITE_LINE_MEMBER(main_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(main_firq_w);
+	DECLARE_WRITE8_MEMBER(main_irq_clear_w) { m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); }
+	DECLARE_WRITE8_MEMBER(main_firq_clear_w) { m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE); }
+
+	int m_main_irq = 0;
+	int m_main_firq = 0;
 };
 
 void cgang_state::machine_start()
 {
+	// register for savestates
+	save_item(NAME(m_main_irq));
+	save_item(NAME(m_main_firq));
 }
 
 
@@ -81,6 +97,25 @@ void cgang_state::machine_start()
 ******************************************************************************/
 
 // maincpu
+
+WRITE_LINE_MEMBER(cgang_state::main_irq_w)
+{
+	// irq on rising edge
+	if (state && !m_main_irq)
+		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+
+	m_main_irq = state;
+}
+
+WRITE_LINE_MEMBER(cgang_state::main_firq_w)
+{
+	// firq on rising edge
+	if (state && !m_main_firq)
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+
+	m_main_firq = state;
+}
+
 
 // audiocpu
 
@@ -93,6 +128,10 @@ void cgang_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).ram();
+	map(0x4008, 0x4008).mirror(0x0003).w(FUNC(cgang_state::main_irq_clear_w));
+	map(0x400c, 0x400c).mirror(0x0003).w(FUNC(cgang_state::main_firq_clear_w));
+	map(0x4010, 0x4013).rw(m_pit[0], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x4014, 0x4017).rw(m_pit[1], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -126,6 +165,23 @@ void cgang_state::cgang(machine_config &config)
 
 	MC6809E(config, m_audiocpu, 8_MHz_XTAL/4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cgang_state::sound_map);
+
+	PIT8253(config, m_pit[0], 0);
+	m_pit[0]->set_clk<0>(4_MHz_XTAL/4);
+	m_pit[0]->set_clk<1>(4_MHz_XTAL/4);
+	m_pit[0]->set_clk<2>(4_MHz_XTAL/4);
+
+	PIT8253(config, m_pit[1], 0);
+	m_pit[1]->set_clk<0>(4_MHz_XTAL/4);
+	m_pit[1]->set_clk<1>(4_MHz_XTAL/4);
+	m_pit[1]->set_clk<2>(4_MHz_XTAL/4);
+	m_pit[1]->out_handler<2>().set("int_clk", FUNC(ripple_counter_device::clock_w));
+
+	ripple_counter_device &int_clk(RIPPLE_COUNTER(config, "int_clk")); // 4040
+	int_clk.set_stages(12);
+	int_clk.count_out_cb().set_inputline(m_maincpu, INPUT_LINE_NMI).bit(0);
+	int_clk.count_out_cb().append(FUNC(cgang_state::main_irq_w)).bit(3);
+	int_clk.count_out_cb().append(FUNC(cgang_state::main_firq_w)).bit(4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
