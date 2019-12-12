@@ -78,7 +78,7 @@ private:
 READ_LINE_MEMBER(riscpc_state::iocr_od1_r)
 {
 	// TODO: presuming same as Acorn Archimedes, where i2c clock can be readback
-	return m_i2cmem_clock;
+	return (m_i2cmem_clock == true) ? 1 : 0;
 }
 
 READ_LINE_MEMBER(riscpc_state::iocr_od0_r)
@@ -88,13 +88,13 @@ READ_LINE_MEMBER(riscpc_state::iocr_od0_r)
 
 WRITE_LINE_MEMBER(riscpc_state::iocr_od0_w)
 {
-	m_i2cmem->write_sda(state);
+	m_i2cmem->write_sda(state == true ? 1 : 0);
 }
 
 WRITE_LINE_MEMBER(riscpc_state::iocr_od1_w)
 {
 	m_i2cmem_clock = state;
-	m_i2cmem->write_scl(m_i2cmem_clock);
+	m_i2cmem->write_scl(state == true ? 1 : 0);
 }
 
 void riscpc_state::a7000_map(address_map &map)

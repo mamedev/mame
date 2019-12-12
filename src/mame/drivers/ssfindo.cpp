@@ -245,7 +245,7 @@ WRITE8_MEMBER(ssfindo_state::iolines_w)
 	m_flash_bank_select = BIT(data, 0);
 }
 
-// inverted compared to riscpc.cpp?
+// inverted compared to riscpc.cpp
 // TODO: simplify hookup over i2cmem having AND 1 on state for a writeline (?)
 READ_LINE_MEMBER(tetfight_state::iocr_od1_r)
 {
