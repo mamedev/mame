@@ -377,6 +377,7 @@ it8703f_device::it8703f_device(const machine_config &mconfig, const char *tag, d
 	, m_txd2_callback(*this)
 	, m_ndtr2_callback(*this)
 	, m_nrts2_callback(*this)
+	, floppy_controller_fdcdev(*this, "fdc")
 	, pc_lpt_lptdev(*this, "lpt")
 	, pc_serial1_comdev(*this, "uart_0")
 	, pc_serial2_comdev(*this, "uart_1")
@@ -389,6 +390,12 @@ it8703f_device::it8703f_device(const machine_config &mconfig, const char *tag, d
 	global_configuration_registers[0x21] = 1;
 	global_configuration_registers[0x24] = 4;
 	memset(configuration_registers, 0, sizeof(configuration_registers));
+	configuration_registers[LogicalDevice::FDC][0x60] = 3;
+	configuration_registers[LogicalDevice::FDC][0x61] = 0xf0;
+	configuration_registers[LogicalDevice::FDC][0x70] = 6;
+	configuration_registers[LogicalDevice::FDC][0x74] = 2;
+	configuration_registers[LogicalDevice::FDC][0xf0] = 0xe;
+	configuration_registers[LogicalDevice::FDC][0xf2] = 0xff;
 	configuration_registers[LogicalDevice::Parallel][0x74] = 4;
 	configuration_registers[LogicalDevice::Parallel][0xf0] = 0x3f;
 	for (int n = 0; n < 13; n++)
@@ -425,6 +432,11 @@ uint16_t it8703f_device::get_base_address(int logical, int index)
 
 void it8703f_device::device_add_mconfig(machine_config &config)
 {
+	// floppy disc controller
+	smc37c78_device& fdcdev(SMC37C78(config, floppy_controller_fdcdev, 24'000'000));
+	fdcdev.intrq_wr_callback().set(FUNC(it8703f_device::irq_floppy_w));
+	fdcdev.drq_wr_callback().set(FUNC(it8703f_device::drq_floppy_w));
+
 	// parallel port
 	PC_LPT(config, pc_lpt_lptdev);
 	pc_lpt_lptdev->irq_handler().set(FUNC(it8703f_device::irq_parallel_w));
@@ -531,6 +543,9 @@ void it8703f_device::write_logical_configuration_register(int index, int data)
 	configuration_registers[logical_device][index] = data;
 	switch (logical_device)
 	{
+	case LogicalDevice::FDC:
+		write_fdd_configuration_register(index, data);
+		break;
 	case LogicalDevice::Serial1:
 		write_serial1_configuration_register(index, data);
 		break;
@@ -555,6 +570,33 @@ void it8703f_device::write_logical_configuration_register(int index, int data)
 	}
 }
 
+void it8703f_device::write_fdd_configuration_register(int index, int data)
+{
+	if (index == 0x30)
+	{
+		if (data & 1)
+		{
+			if (enabled_logical[LogicalDevice::FDC] == false)
+			{
+				enabled_logical[LogicalDevice::FDC] = true;
+				lpchost->remap();
+			}
+			logerror("Enabled FDD at %04X\n", get_base_address(LogicalDevice::FDC, 0));
+		}
+		else
+		{
+			if (enabled_logical[LogicalDevice::FDC] == true)
+			{
+				enabled_logical[LogicalDevice::FDC] = false;
+				lpchost->remap();
+			}
+			logerror("Disabled FDD at %04X\n", get_base_address(LogicalDevice::FDC, 0));
+		}
+	}
+	if (index == 0x74)
+		logerror("Set FDD dma channel %d\n", configuration_registers[LogicalDevice::FDC][0x74]);
+}
+
 void it8703f_device::write_parallel_configuration_register(int index, int data)
 {
 	if (index == 0x30)
@@ -577,6 +619,8 @@ void it8703f_device::write_parallel_configuration_register(int index, int data)
 			}
 		}
 	}
+	if (index == 0x74)
+		logerror("Set LPT dma channel %d\n", configuration_registers[LogicalDevice::Parallel][0x74]);
 }
 
 void it8703f_device::write_serial1_configuration_register(int index, int data)
@@ -672,6 +716,9 @@ uint16_t it8703f_device::read_logical_configuration_register(int index)
 
 	switch (logical_device)
 	{
+	case LogicalDevice::FDC:
+		ret = read_fdd_configuration_register(index);
+		break;
 	case LogicalDevice::Parallel:
 		ret = read_parallel_configuration_register(index);
 		break;
@@ -691,11 +738,32 @@ uint16_t it8703f_device::read_logical_configuration_register(int index)
 	return ret;
 }
 
+WRITE_LINE_MEMBER(it8703f_device::irq_floppy_w)
+{
+	if (enabled_logical[LogicalDevice::FDC] == false)
+		return;
+	lpchost->set_virtual_line(configuration_registers[LogicalDevice::FDC][0x70], state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::drq_floppy_w)
+{
+	if (enabled_logical[LogicalDevice::FDC] == false)
+		return;
+	lpchost->set_virtual_line(configuration_registers[LogicalDevice::FDC][0x74] + 16, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
 WRITE_LINE_MEMBER(it8703f_device::irq_parallel_w)
 {
 	if (enabled_logical[LogicalDevice::Parallel] == false)
 		return;
 	lpchost->set_virtual_line(configuration_registers[LogicalDevice::Parallel][0x70], state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(it8703f_device::drq_parallel_w)
+{
+	if (enabled_logical[LogicalDevice::Parallel] == false)
+		return;
+	lpchost->set_virtual_line(configuration_registers[LogicalDevice::Parallel][0x74] + 16, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(it8703f_device::irq_serial1_w)
@@ -825,6 +893,13 @@ WRITE_LINE_MEMBER(it8703f_device::kbdp20_gp20_reset_w)
 	pin_reset_callback(state);
 }
 
+void it8703f_device::map_fdc_addresses()
+{
+	uint16_t base = get_base_address(LogicalDevice::FDC, 0);
+
+	iospace->install_device(base, base + 7, *floppy_controller_fdcdev, &pc_fdc_interface::map);
+}
+
 void it8703f_device::map_lpt(address_map& map)
 {
 	map(0x0, 0x3).rw(FUNC(it8703f_device::lpt_read), FUNC(it8703f_device::lpt_write));
@@ -897,12 +972,6 @@ void it8703f_device::map_keyboard(address_map &map)
 	map(0x4, 0x4).rw(FUNC(it8703f_device::keybc_status_r), FUNC(it8703f_device::keybc_command_w));
 }
 
-void it8703f_device::unmap_keyboard(address_map &map)
-{
-	map(0x0, 0x0).noprw();
-	map(0x4, 0x4).noprw();
-}
-
 READ8_MEMBER(it8703f_device::at_keybc_r)
 {
 	switch (offset) //m_kbdc
@@ -945,6 +1014,8 @@ void it8703f_device::map_extra(address_space *memory_space, address_space *io_sp
 	memspace = memory_space;
 	iospace = io_space;
 	io_space->install_device(0, 0xffff, *this, &it8703f_device::internal_io_map);
+	if (enabled_logical[LogicalDevice::FDC] == true)
+		map_fdc_addresses();
 	if (enabled_logical[LogicalDevice::Parallel] == true)
 		map_lpt_addresses();
 	if (enabled_logical[LogicalDevice::Serial1] == true)
@@ -1061,6 +1132,19 @@ static void isa_com(device_slot_interface& device)
 	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
 }
 
+static void pc_hd_floppies(device_slot_interface& device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+	device.option_add("35hd", FLOPPY_35_HD);
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("35dd", FLOPPY_35_DD);
+}
+
+DECLARE_FLOPPY_FORMATS(floppy_formats) = {
+	FLOPPY_PC_FORMAT,
+	FLOPPY_NASLITE_FORMAT
+FLOPPY_FORMATS_END
+
 /*
   Machine configuration
 */
@@ -1085,12 +1169,12 @@ void nforcepc_state::nforcepc(machine_config &config)
 	it8703f_device &ite(IT8703F(config, ":pci:01.0:0", 0));
 	ite.pin_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
 	ite.pin_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
-	ite.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
-	ite.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
-	ite.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
-	ite.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
-	ite.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
-	ite.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+	ite.txd1().set("serport0", FUNC(rs232_port_device::write_txd));
+	ite.ndtr1().set("serport0", FUNC(rs232_port_device::write_dtr));
+	ite.nrts1().set("serport0", FUNC(rs232_port_device::write_rts));
+	ite.txd2().set("serport1", FUNC(rs232_port_device::write_txd));
+	ite.ndtr2().set("serport1", FUNC(rs232_port_device::write_dtr));
+	ite.nrts2().set("serport1", FUNC(rs232_port_device::write_rts));
 	MCPX_SMBUS(config, ":pci:01.1", 0); // 10de:01b4 NVIDIA Corporation nForce PCI System Management (SMBus)
 	SMBUS_ROM(config, ":pci:01.1:050", 0, test_spd_data, sizeof(test_spd_data)); // these 3 are on smbus number 0
 	SMBUS_LOGGER(config, ":pci:01.1:051", 0);
@@ -1110,10 +1194,14 @@ void nforcepc_state::nforcepc(machine_config &config)
 	mcpx_ide_device &ide(MCPX_IDE(config, ":pci:09.0", 0)); // 10de:01bc NVIDIA Corporation nForce IDE
 	ide.pri_interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq14));
 	ide.sec_interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq15));
-		/*subdevice<ide_controller_32_device>(":pci:09.0:ide")->options(ata_devices, "hdd", "cdrom", true);*/
+	ide.subdevice<ide_controller_32_device>("ide1")->options(ata_devices, "hdd", nullptr, true);
+	ide.subdevice<ide_controller_32_device>("ide2")->options(ata_devices, "cdrom", nullptr, true);
 	NV2A_AGP(config, ":pci:1e.0", 0, 0x10de01b7, 0); // 10de:01b7 NVIDIA Corporation nForce AGP to PCI Bridge
 	VIRGEDX_PCI(config, ":pci:0a.0", 0);
 	SST_49LF020(config, "bios", 0);
+
+	FLOPPY_CONNECTOR(config, ":pci:01.0:0:fdc:0", pc_hd_floppies, "35hd", floppy_formats);
+	FLOPPY_CONNECTOR(config, ":pci:01.0:0:fdc:1", pc_hd_floppies, "35hd", floppy_formats);
 
 	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
 	serport0.rxd_handler().set(":pci:01.0:0", FUNC(it8703f_device::rxd1_w));
