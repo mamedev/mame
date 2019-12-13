@@ -2121,7 +2121,7 @@ void i386_device::register_state_i386()
 
 	state_add( STATE_GENPC, "GENPC", m_pc).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_pc).noshow();
-	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%8s").noshow();
+	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%32s").noshow();
 	state_add( STATE_GENSP, "GENSP", REG32(ESP)).noshow();
 }
 
@@ -2204,7 +2204,20 @@ void i386_device::state_string_export(const device_state_entry &entry, std::stri
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			str = string_format("%08X", get_flags());
+			str = string_format("%08X %s%s%d%s%s%s%s%s%s%s%s%s",
+				get_flags(),
+				m_RF ? "R" : "r",
+				m_NT ? " N " : " n ",
+				m_IOP2 << 1 | m_IOP1,
+				m_OF ? " O" : " o",
+				m_DF ? " D" : " d",
+				m_IF ? " I" : " i",
+				m_TF ? " T" : " t",
+				m_SF ? " S" : " s",
+				m_ZF ? " Z" : " z",
+				m_AF ? " A" : " a",
+				m_PF ? " P" : " p",
+				m_CF ? " C" : " c");
 			break;
 		case X87_ST0:
 			str = string_format("%f", fx80_to_double(ST(0)));
