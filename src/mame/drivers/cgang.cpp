@@ -10,7 +10,7 @@ There is no screen, feedback is with motorized elements, lamps and 7segs,
 and of course sounds and music.
 
 TODO:
-- everything
+- almost everything
 
 Hardware notes:
 
@@ -61,8 +61,9 @@ public:
 		m_latch(*this, "latch%u", 0),
 		m_pit(*this, "pit%u", 0),
 		m_ppi(*this, "ppi%u", 0),
-		m_upd(*this, "adpcm%u", 0),
-		m_ymsnd(*this, "ymsnd")
+		m_adpcm(*this, "adpcm%u", 0),
+		m_ymsnd(*this, "ymsnd"),
+		m_dipsw(*this, "SW%u", 1)
 	{ }
 
 	// machine drivers
@@ -78,8 +79,9 @@ private:
 	required_device_array<generic_latch_8_device, 2> m_latch;
 	required_device_array<pit8253_device, 2> m_pit;
 	required_device_array<i8255_device, 5> m_ppi;
-	required_device_array<upd7759_device, 2> m_upd;
+	required_device_array<upd7759_device, 2> m_adpcm;
 	required_device<ym2151_device> m_ymsnd;
+	required_ioport_array<4> m_dipsw;
 
 	// address maps
 	void main_map(address_map &map);
@@ -93,6 +95,7 @@ private:
 	template<int N> DECLARE_WRITE8_MEMBER(motor_clock_w);
 
 	DECLARE_READ8_MEMBER(ppi0_c_r);
+	DECLARE_WRITE8_MEMBER(ppi1_c_w);
 
 	template<int N> DECLARE_WRITE8_MEMBER(adpcm_w);
 	DECLARE_WRITE8_MEMBER(spot_w);
@@ -152,17 +155,27 @@ READ8_MEMBER(cgang_state::ppi0_c_r)
 	return data;
 }
 
+WRITE8_MEMBER(cgang_state::ppi1_c_w)
+{
+	// PC0: COUNTER
+	// PC1: LOCK-SOL
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 1));
+
+	// PC2,PC3: start lamps
+}
+
 
 // audiocpu
 
 template<int N>
 WRITE8_MEMBER(cgang_state::adpcm_w)
 {
-	m_upd[N]->port_w(data);
+	m_adpcm[N]->port_w(data);
 
 	// also strobes start
-	m_upd[N]->start_w(0);
-	m_upd[N]->start_w(1);
+	m_adpcm[N]->start_w(0);
+	m_adpcm[N]->start_w(1);
 }
 
 WRITE8_MEMBER(cgang_state::spot_w)
@@ -172,8 +185,8 @@ WRITE8_MEMBER(cgang_state::spot_w)
 WRITE8_MEMBER(cgang_state::ppi4_a_w)
 {
 	// PA0,PA1: ADPCM reset
-	m_upd[0]->reset_w(BIT(data, 0));
-	m_upd[1]->reset_w(BIT(data, 1));
+	m_adpcm[0]->reset_w(BIT(data, 0));
+	m_adpcm[1]->reset_w(BIT(data, 1));
 }
 
 READ8_MEMBER(cgang_state::ppi4_c_r)
@@ -181,13 +194,16 @@ READ8_MEMBER(cgang_state::ppi4_c_r)
 	u8 data = 0;
 
 	// PC0,PC1: ADPCM busy
-	data |= m_upd[0]->busy_r() ? 1 : 0;
-	data |= m_upd[1]->busy_r() ? 2 : 0;
+	data |= m_adpcm[0]->busy_r() ? 1 : 0;
+	data |= m_adpcm[1]->busy_r() ? 2 : 0;
 
 	// PC2: CALL-CPU2
 	data |= m_latch[0]->pending_r() ? 0 : 4;
 
-	return data;
+	// PC5-PC7: SW1
+	data |= m_dipsw[0]->read() << 5;
+
+	return data | 0x18;
 }
 
 
@@ -209,6 +225,7 @@ void cgang_state::main_map(address_map &map)
 	map(0x400c, 0x400c).mirror(0x0003).w(FUNC(cgang_state::main_firq_clear_w));
 	map(0x4010, 0x4013).rw(m_pit[0], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x4014, 0x4017).rw(m_pit[1], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x4018, 0x4018).mirror(0x0003).portr("SW2");
 	map(0x8000, 0xffff).rom();
 }
 
@@ -232,6 +249,66 @@ void cgang_state::sound_map(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( cgang )
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Start (Hard)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start (Easy)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Dispenser")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+
+	PORT_START("SW1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
+
+	PORT_START("SW2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING( 0x00, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING( 0x01, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING( 0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING( 0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x04, 0x04, "Attract Play" ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x18, 0x18, "Ticket Points" ) PORT_DIPLOCATION("SW2:4,5") PORT_CONDITION("SW2", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING( 0x18, "5" )
+	PORT_DIPSETTING( 0x10, "10" )
+	PORT_DIPSETTING( 0x08, "15" )
+	PORT_DIPSETTING( 0x00, "20" )
+	PORT_DIPNAME( 0x18, 0x18, "Prize Points" ) PORT_DIPLOCATION("SW2:4,5") PORT_CONDITION("SW2", 0x20, EQUALS, 0x00)
+	PORT_DIPSETTING( 0x18, "20" )
+	PORT_DIPSETTING( 0x10, "40" )
+	PORT_DIPSETTING( 0x08, "60" )
+	PORT_DIPSETTING( 0x00, "80" )
+	PORT_DIPNAME( 0x20, 0x20, "Dispenser Mode" ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, "Ticket" )
+	PORT_DIPSETTING(    0x00, "Prize" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
+
+	PORT_START("SW3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW3:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW3:6"	)
+
+	PORT_START("SW4")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW4:1,2")
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW4:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Dispenser Enabled" ) PORT_DIPLOCATION("SW4:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 
@@ -276,14 +353,16 @@ void cgang_state::cgang(machine_config &config)
 	GENERIC_LATCH_8(config, m_latch[1]);
 
 	I8255(config, m_ppi[0]); // 0x9b: all = input
-	m_ppi[0]->in_pa_callback().set_constant(0);
+	m_ppi[0]->in_pa_callback().set_ioport("IN1");
 	m_ppi[0]->in_pb_callback().set_constant(0);
 	m_ppi[0]->in_pc_callback().set(FUNC(cgang_state::ppi0_c_r));
 
 	I8255(config, m_ppi[1]); // 0x9a: A & B = input, Clow = output, Chigh = input
 	m_ppi[1]->in_pa_callback().set_constant(0);
 	m_ppi[1]->in_pb_callback().set_constant(0);
-	m_ppi[1]->in_pc_callback().set_constant(0);
+	m_ppi[1]->in_pc_callback().set_ioport("SW4").lshift(4);
+	m_ppi[1]->out_pc_callback().set(FUNC(cgang_state::ppi1_c_w));
+	m_ppi[1]->tri_pc_callback().set_constant(0);
 
 	I8255(config, m_ppi[2]); // 0x80: all = output
 
@@ -297,12 +376,12 @@ void cgang_state::cgang(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	YM2151(config, m_ymsnd, 3.579545_MHz_XTAL);
-	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 0.5);
+	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	UPD7759(config, m_upd[0], 640_kHz_XTAL);
-	m_upd[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
-	UPD7759(config, m_upd[1], 640_kHz_XTAL);
-	m_upd[1]->add_route(ALL_OUTPUTS, "mono", 0.5);
+	UPD7759(config, m_adpcm[0], 640_kHz_XTAL);
+	m_adpcm[0]->add_route(ALL_OUTPUTS, "mono", 0.60);
+	UPD7759(config, m_adpcm[1], 640_kHz_XTAL);
+	m_adpcm[1]->add_route(ALL_OUTPUTS, "mono", 0.60);
 }
 
 
@@ -334,4 +413,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME   PARENT  MACHINE  INPUT  CLASS        INIT        MONITOR  COMPANY, FULLNAME, FLAGS */
-GAME( 1990, cgang, 0,      cgang,   cgang, cgang_state, empty_init, ROT0,    "Namco (Data East license)", "Cosmo Gang (US)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1990, cgang, 0,      cgang,   cgang, cgang_state, empty_init, ROT0,    "Namco (Data East license)", "Cosmo Gang (US)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
