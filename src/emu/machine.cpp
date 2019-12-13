@@ -263,6 +263,11 @@ void running_machine::start()
 	save().register_presave(save_prepost_delegate(FUNC(running_machine::presave_all_devices), this));
 	start_all_devices();
 	save().register_postload(save_prepost_delegate(FUNC(running_machine::postload_all_devices), this));
+
+	// save outputs created before start time
+	output().register_save();
+
+	// load cheat files
 	manager().load_cheatfiles(*this);
 
 	// start recording movie if specified

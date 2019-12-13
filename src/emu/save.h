@@ -216,9 +216,17 @@ public:
 
 	// global memory registration
 	template <typename ItemType>
-	void save_item(ItemType &value, const char *valname, int index = 0) { save_item(nullptr, "global", nullptr, index, value, valname); }
+	void save_item(ItemType &value, const char *valname, int index = 0)
+	{ save_item(nullptr, "global", nullptr, index, value, valname); }
+	template <typename ItemType, typename StructType, typename ElementType>
+	void save_item(ItemType &value, ElementType StructType::*element, const char *valname, int index = 0)
+	{ save_item(nullptr, "global", nullptr, index, value, element, valname); }
 	template <typename ItemType>
-	void save_pointer(ItemType *value, const char *valname, u32 count, int index = 0) { save_pointer(nullptr, "global", nullptr, index, value, valname, count); }
+	void save_pointer(ItemType &&value, const char *valname, u32 count, int index = 0)
+	{ save_pointer(nullptr, "global", nullptr, index, std::forward<ItemType>(value), valname, count); }
+	template <typename ItemType, typename StructType, typename ElementType>
+	void save_pointer(ItemType &&value, ElementType StructType::*element, const char *valname, u32 count, int index = 0)
+	{ save_pointer(nullptr, "global", nullptr, index, std::forward<ItemType>(value), element, valname, count); }
 
 	// file processing
 	static save_error check_file(running_machine &machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...));
