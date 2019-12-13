@@ -4590,6 +4590,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/zac_1.cpp",
 	MAME_DIR .. "src/mame/drivers/zac_2.cpp",
 	MAME_DIR .. "src/mame/drivers/zac_proto.cpp",
+	MAME_DIR .. "src/mame/drivers/zpinball.cpp",
 }
 
 --------------------------------------------------

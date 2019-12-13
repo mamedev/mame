@@ -33114,9 +33114,6 @@ madrace                         //
 zira                            //
 
 @source:play_3.cpp
-cobrapb                         //
-comeback                        //
-eballchps                       //
 fldragon                        //
 fldragona                       //
 ironball                        //
@@ -41279,6 +41276,11 @@ zodiack                         // (c) 1983 Orca + Esco Trading Co license
 
 @source:zorba.cpp
 zorba                           //
+
+@source:zpinball.cpp
+cobrapb                         //
+comeback                        //
+eballchps                       //
 
 @source:zr107.cpp
 jetwave                         // GX678 (c)1996 Euro EAB

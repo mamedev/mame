@@ -1430,6 +1430,7 @@ zaxxon.cpp
 zerozone.cpp
 zn.cpp
 zodiack.cpp
+zpinball.cpp
 zr107.cpp
 zwackery.cpp
 //exceptions + to add - to remove from imported list
