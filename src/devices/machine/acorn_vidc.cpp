@@ -57,19 +57,18 @@ acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, device_t
 	, device_memory_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
+	, m_bpp_mode(0)
+	, m_crtc_interlace(0)
+	, m_sound_frequency_latch(0)
+	, m_sound_mode(false)
 	, m_dac(*this, "dac%u", 0)
 	, m_lspeaker(*this, "lspeaker")
 	, m_rspeaker(*this, "rspeaker")
 	, m_vblank_cb(*this)
 	, m_sound_drq_cb(*this)
 	, m_pixel_clock(0)
-	, m_bpp_mode(0)
-	, m_crtc_interlace(0)
 	, m_cursor_enable(false)
-	, m_sound_frequency_latch(0)
 	, m_sound_frequency_test_bit(false)
-	, m_sound_mode(false)
-
 {
 	std::fill(std::begin(m_crtc_regs), std::end(m_crtc_regs), 0);
 	std::fill(std::begin(m_stereo_image), std::end(m_stereo_image), 0);
@@ -596,7 +595,7 @@ void arm_vidc20_device::device_config_complete()
 		screen().set_raw(clock() * 2 / 3, 1024,0,735, 624/2,0,292); // RiscOS 3 default screen settings
 
 	if (!screen().has_screen_update())
-		screen().set_screen_update(screen_update_rgb32_delegate(FUNC(arm_vidc20_device::screen_update), this));
+		screen().set_screen_update(*this, FUNC(arm_vidc20_device::screen_update));
 }
 
 u32 arm_vidc20_device::palette_entries() const

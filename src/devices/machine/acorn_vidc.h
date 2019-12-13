@@ -107,6 +107,7 @@ private:
 	DECLARE_WRITE32_MEMBER( control_w );
 	
 	u8 m_pixel_clock;
+	bool m_cursor_enable;
 	//bool m_flyback;
 	emu_timer *m_video_timer;
 	emu_timer *m_sound_timer;
@@ -118,13 +119,12 @@ private:
 	const u32 m_cursor_vram_mask = 0x7fff;
 	const u32 m_data_vram_size = m_data_vram_mask+1;
 	const u32 m_cursor_vram_size = m_cursor_vram_mask+1;
-	bool     m_cursor_enable;
 	void draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 *vram, u8 bpp, int xstart, int ystart, int xsize, int ysize, bool is_cursor);
 	inline void update_4bpp_palette(u16 index, u32 paldata);
 	u32 m_crtc_raw_horz[2];
 	inline u32 convert_crtc_hdisplay(u8 index);
 
-	bool     m_sound_frequency_test_bit;
+	bool m_sound_frequency_test_bit;
 	u8       m_stereo_image[8];
 	const float m_sound_input_gain = 0.05f;
 	const int m_sound_max_channels = 8;

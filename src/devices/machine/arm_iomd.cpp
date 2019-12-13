@@ -221,7 +221,7 @@ void arm_iomd_device::device_add_mconfig(machine_config &config)
 void arm7500fe_iomd_device::device_add_mconfig(machine_config &config)
 {
 	//DEVICE(config, ...);
-	//TODO: keyboard and mouse interfaces at very least, also they differs by device type
+	//TODO: above plus new sub-devices
 }
 
 //-------------------------------------------------
