@@ -166,7 +166,7 @@ void dio16_98265a_device::device_reset()
 				0x6007ff + (code * 0x10000),
 				read16_delegate(*this, FUNC(dio16_98265a_device::io_r)),
 				write16_delegate(*this, FUNC(dio16_98265a_device::io_w)));
-		program_space().install_device(0x6e0020, 0x6e003f, *m_spc, &mb87030_device::map, 0x00ff00ff);
+		program_space().install_device(0x600020 + (code * 0x10000), 0x60003f + (code * 0x10000), *m_spc, &mb87030_device::map, 0x00ff00ff);
 		m_installed_io = true;
 	}
 	m_control = 0;
