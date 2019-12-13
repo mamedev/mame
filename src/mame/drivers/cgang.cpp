@@ -34,7 +34,7 @@ Cabinet:
 - 2 lightguns
 - UFO with leds above cabinet
 - 7segs for scorekeeping
-- 2 ticket dispensers
+- ticket dispenser
 
 ******************************************************************************/
 
@@ -63,7 +63,8 @@ public:
 		m_ppi(*this, "ppi%u", 0),
 		m_adpcm(*this, "adpcm%u", 0),
 		m_ymsnd(*this, "ymsnd"),
-		m_dipsw(*this, "SW%u", 1)
+		m_dipsw(*this, "SW%u", 1),
+		m_out_digit(*this, "digit%u", 0U)
 	{ }
 
 	// machine drivers
@@ -82,6 +83,7 @@ private:
 	required_device_array<upd7759_device, 2> m_adpcm;
 	required_device<ym2151_device> m_ymsnd;
 	required_ioport_array<4> m_dipsw;
+	output_finder<10> m_out_digit;
 
 	// address maps
 	void main_map(address_map &map);
@@ -94,14 +96,15 @@ private:
 	DECLARE_WRITE8_MEMBER(main_firq_clear_w) { m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE); }
 	template<int N> DECLARE_WRITE8_MEMBER(motor_clock_w);
 
-	DECLARE_READ8_MEMBER(ppi0_c_r);
-	DECLARE_WRITE8_MEMBER(ppi1_c_w);
+	DECLARE_READ8_MEMBER(ppi1_c_r);
+	DECLARE_WRITE8_MEMBER(ppi2_c_w);
+	DECLARE_WRITE8_MEMBER(ppi3_c_w);
 
 	template<int N> DECLARE_WRITE8_MEMBER(adpcm_w);
 	DECLARE_WRITE8_MEMBER(spot_w);
 
-	DECLARE_WRITE8_MEMBER(ppi4_a_w);
-	DECLARE_READ8_MEMBER(ppi4_c_r);
+	DECLARE_WRITE8_MEMBER(ppi5_a_w);
+	DECLARE_READ8_MEMBER(ppi5_c_r);
 
 	int m_main_irq = 0;
 	int m_main_firq = 0;
@@ -109,6 +112,8 @@ private:
 
 void cgang_state::machine_start()
 {
+	m_out_digit.resolve();
+
 	// register for savestates
 	save_item(NAME(m_main_irq));
 	save_item(NAME(m_main_firq));
@@ -145,7 +150,7 @@ WRITE8_MEMBER(cgang_state::motor_clock_w)
 {
 }
 
-READ8_MEMBER(cgang_state::ppi0_c_r)
+READ8_MEMBER(cgang_state::ppi1_c_r)
 {
 	u8 data = 0;
 
@@ -155,7 +160,7 @@ READ8_MEMBER(cgang_state::ppi0_c_r)
 	return data;
 }
 
-WRITE8_MEMBER(cgang_state::ppi1_c_w)
+WRITE8_MEMBER(cgang_state::ppi2_c_w)
 {
 	// PC0: COUNTER
 	// PC1: LOCK-SOL
@@ -163,6 +168,18 @@ WRITE8_MEMBER(cgang_state::ppi1_c_w)
 	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 1));
 
 	// PC2,PC3: start lamps
+}
+
+WRITE8_MEMBER(cgang_state::ppi3_c_w)
+{
+	// PC0-PC3: 7448
+	// PC4-PC7: 7445
+	static const u8 ls48_map[0x10] =
+		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
+	u8 sel = data >> 4;
+
+	if (sel < 10)
+		m_out_digit[sel] = ls48_map[data & 0xf];
 }
 
 
@@ -182,14 +199,14 @@ WRITE8_MEMBER(cgang_state::spot_w)
 {
 }
 
-WRITE8_MEMBER(cgang_state::ppi4_a_w)
+WRITE8_MEMBER(cgang_state::ppi5_a_w)
 {
 	// PA0,PA1: ADPCM reset
 	m_adpcm[0]->reset_w(BIT(data, 0));
 	m_adpcm[1]->reset_w(BIT(data, 1));
 }
 
-READ8_MEMBER(cgang_state::ppi4_c_r)
+READ8_MEMBER(cgang_state::ppi5_c_r)
 {
 	u8 data = 0;
 
@@ -355,22 +372,23 @@ void cgang_state::cgang(machine_config &config)
 	I8255(config, m_ppi[0]); // 0x9b: all = input
 	m_ppi[0]->in_pa_callback().set_ioport("IN1");
 	m_ppi[0]->in_pb_callback().set_constant(0);
-	m_ppi[0]->in_pc_callback().set(FUNC(cgang_state::ppi0_c_r));
+	m_ppi[0]->in_pc_callback().set(FUNC(cgang_state::ppi1_c_r));
 
 	I8255(config, m_ppi[1]); // 0x9a: A & B = input, Clow = output, Chigh = input
 	m_ppi[1]->in_pa_callback().set_constant(0);
 	m_ppi[1]->in_pb_callback().set_constant(0);
 	m_ppi[1]->in_pc_callback().set_ioport("SW4").lshift(4);
-	m_ppi[1]->out_pc_callback().set(FUNC(cgang_state::ppi1_c_w));
+	m_ppi[1]->out_pc_callback().set(FUNC(cgang_state::ppi2_c_w));
 	m_ppi[1]->tri_pc_callback().set_constant(0);
 
 	I8255(config, m_ppi[2]); // 0x80: all = output
+	m_ppi[2]->out_pc_callback().set(FUNC(cgang_state::ppi3_c_w));
 
 	I8255(config, m_ppi[3]); // 0x80: all = output
 
 	I8255(config, m_ppi[4]); // 0x89: A & B = output, C = input
-	m_ppi[4]->out_pa_callback().set(FUNC(cgang_state::ppi4_a_w));
-	m_ppi[4]->in_pc_callback().set(FUNC(cgang_state::ppi4_c_r));
+	m_ppi[4]->out_pa_callback().set(FUNC(cgang_state::ppi5_a_w));
+	m_ppi[4]->in_pc_callback().set(FUNC(cgang_state::ppi5_c_r));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
