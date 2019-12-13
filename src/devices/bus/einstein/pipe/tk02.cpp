@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(TK02_80COL, tk02_device, "tk02", "TK02 80 Column Monochrome U
 
 void tk02_device::map(address_map &map)
 {
-//  AM_RANGE(0x00, 0x07) AM_SELECT(0xff00) AM_READWRITE(ram_r, ram_w) // no AM_SELECT (or AM_MASK) support here
+//  map(0x00, 0x07).select(0xff00).rw(FUNC(tk02_device::ram_r), FUNC(tk02_device::ram_w)); // no select() (or mask()) support here
 	map(0x08, 0x08).mirror(0xff00).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x09, 0x09).mirror(0xff00).w(m_crtc, FUNC(mc6845_device::register_w));
 	map(0x0c, 0x0c).mirror(0xff00).r(FUNC(tk02_device::status_r));
@@ -111,7 +111,7 @@ void tk02_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_screen("mono");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(tk02_device::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(tk02_device::crtc_update_row));
 	m_crtc->out_de_callback().set(FUNC(tk02_device::de_w));
 
 	TATUNG_PIPE(config, m_pipe, DERIVED_CLOCK(1, 1), tatung_pipe_cards, nullptr);
@@ -160,7 +160,7 @@ void tk02_device::device_start()
 void tk02_device::device_reset()
 {
 	io_space().install_device(0x40, 0x4f, *this, &tk02_device::map);
-	io_space().install_readwrite_handler(0x40, 0x47, 0, 0, 0xff00, read8_delegate(FUNC(tk02_device::ram_r), this), write8_delegate(FUNC(tk02_device::ram_w), this));
+	io_space().install_readwrite_handler(0x40, 0x47, 0, 0, 0xff00, read8_delegate(*this, FUNC(tk02_device::ram_r)), write8_delegate(*this, FUNC(tk02_device::ram_w)));
 }
 
 

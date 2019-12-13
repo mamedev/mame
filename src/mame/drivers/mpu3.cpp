@@ -904,10 +904,9 @@ void mpu3_state::init_m3hprvpr()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	m_disp_func=METER_PORT;
+	m_disp_func = METER_PORT;
 	m_current_chr_table = hprvpr_data;
-	space.install_readwrite_handler(0xc000, 0xc000 , read8_delegate(FUNC(mpu3_state::characteriser_r), this),write8_delegate(FUNC(mpu3_state::characteriser_w), this));
-
+	space.install_readwrite_handler(0xc000, 0xc000, read8_delegate(*this, FUNC(mpu3_state::characteriser_r)), write8_delegate(*this, FUNC(mpu3_state::characteriser_w)));
 }
 
 ROM_START( m3tst )
@@ -1303,6 +1302,13 @@ ROM_START( m3rockpl )
 ROM_END
 
 
+ROM_START( m3rolla ) // R-5LS V.30
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "ic1", 0x6000, 0x2000, CRC(16e320ae) SHA1(3489e81f52db025ca2239c4072fa01f77f4d8d31) )
+	// ic2,ic3 and ic4 empty, ic5 is a 74ls138n
+	ROM_COPY( "maincpu", 0x0000, 0x8000, 0x8000 )
+ROM_END
+
 ROM_START( m3rollem )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
 	ROM_LOAD( "roll-em.p1", 0x6000, 0x2000, CRC(2ec2cfa9) SHA1(461240315725f29f53fdcf89e767d17a4d2301eb) )
@@ -1629,6 +1635,7 @@ GAME(  198?, m3optunl,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, 
 GAMEL( 198?, m3razdaz,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Razzle Dazzle (Barcrest) (MPU3, set 1)", GAME_FLAGS, layout_m3razdaza )
 GAMEL( 198?, m3razdaza,  m3razdaz,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Razzle Dazzle (Barcrest) (MPU3, set 2)", GAME_FLAGS, layout_m3razdaza )
 GAMEL( 198?, m3razdazd,  m3razdaz,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Razzle Dazzle (Barcrest) [Dutch] (MPU3)", GAME_FLAGS, layout_m3razdaza )
+GAME(  198?, m3rolla,    0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Rollamatic 5-Line Special (Barcrest) (MPU3)", GAME_FLAGS ) // or 5-Line Special Rollamatic on the glass, using the title from the ROM
 GAMEL( 198?, m3rxchng,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Royal Exchange Club (Barcrest) (MPU3)", GAME_FLAGS, layout_m3rxchng )
 GAMEL( 198?, m3circle,   0,          mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Special Circle Club (Barcrest) (MPU3, set 1)", GAME_FLAGS, layout_m3circle )
 GAMEL( 198?, m3circlea,  m3circle,   mpu3base, mpu3, mpu3_state, init_m3hprvpr, ROT0, "Barcrest","Special Circle Club (Barcrest) (MPU3, set 2)", GAME_FLAGS, layout_m3circle )

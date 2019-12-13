@@ -238,7 +238,7 @@ void i7000_state::machine_start()
 	if (m_card->exists())
 	{
 		// 0x4000 - 0xbfff   32KB ROM
-		program.install_read_handler(0x4000, 0xbfff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_card));
+		program.install_read_handler(0x4000, 0xbfff, read8sm_delegate(*m_card, FUNC(generic_slot_device::read_rom)));
 	}
 }
 
@@ -255,37 +255,37 @@ void i7000_state::i7000_mem(address_map &map)
 	map(0x0000, 0x0fff).rom().region("boot", 0);
 	map(0x2000, 0x2fff).ram().share("videoram");
 	map(0x4000, 0xffff).ram();
-//  AM_RANGE(0x4000, 0xbfff) AM_ROM AM_REGION("cardslot", 0)
+//  map(0x4000, 0xbfff).rom().region("cardslot", 0);
 }
 
 void i7000_state::i7000_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-//  AM_RANGE(0x06, 0x06) AM_WRITE(i7000_io_?_w)
-//  AM_RANGE(0x08, 0x09) AM_WRITE(i7000_io_?_w) //printer perhaps?
-//  AM_RANGE(0x0c, 0x0c) AM_WRITE(i7000_io_?_w) //0x0C and 0x10 may be related to mem page swapping. (self-test "4. PAG")
-//  AM_RANGE(0x10, 0x10) AM_WRITE(i7000_io_?_w)
-//  AM_RANGE(0x14, 0x15) AM_WRITE(i7000_io_?_w)
+//  map(0x06, 0x06).w(FUNC(i7000_state::i7000_io_?_w));
+//  map(0x08, 0x09).w(FUNC(i7000_state::i7000_io_?_w)); //printer perhaps?
+//  map(0x0c, 0x0c).w(FUNC(i7000_state::i7000_io_?_w)); //0x0C and 0x10 may be related to mem page swapping. (self-test "4. PAG")
+//  map(0x10, 0x10).w(FUNC(i7000_state::i7000_io_?_w));
+//  map(0x14, 0x15).w(FUNC(i7000_state::i7000_io_?_w));
 
 	map(0x18, 0x1b).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 
-//  AM_RANGE(0x1c, 0x1c) AM_WRITE(i7000_io_printer_data_w) //ASCII data
+//  map(0x1c, 0x1c).w(FUNC(i7000_state::i7000_io_printer_data_w)); //ASCII data
 	map(0x1d, 0x1d).portr("DSW");
-//  AM_RANGE(0x1e, 0x1e) AM_READWRITE(i7000_io_printer_status_r, i7000_io_?_w)
-//  AM_RANGE(0x1f, 0x1f) AM_WRITE(i7000_io_printer_strobe_w) //self-test routine writes 0x08 and 0x09 (it seems that bit 0 is the strobe and bit 3 is an enable signal)
-//  AM_RANGE(0x20, 0x21) AM_READWRITE(i7000_io_keyboard_r, i7000_io_keyboard_w)
+//  map(0x1e, 0x1e).rw(FUNC(i7000_state::i7000_io_printer_status_r), FUNC(i7000_state::i7000_io_?_w));
+//  map(0x1f, 0x1f).w(FUNC(i7000_state::i7000_io_printer_strobe_w)); //self-test routine writes 0x08 and 0x09 (it seems that bit 0 is the strobe and bit 3 is an enable signal)
+//  map(0x20, 0x21).rw(FUNC(i7000_state::i7000_io_keyboard_r), FUNC(i7000_state::i7000_io_keyboard_w));
 
 	map(0x20, 0x21).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
 
-//  AM_RANGE(0x24, 0x24) AM_READ(i7000_io_?_r)
-//  AM_RANGE(0x25, 0x25) AM_WRITE(i7000_io_?_w)
+//  map(0x24, 0x24).r(FUNC(i7000_state::i7000_io_?_r));
+//  map(0x25, 0x25).w(FUNC(i7000_state::i7000_io_?_w));
 
-//  AM_RANGE(0x28, 0x2d) AM_READWRITE(i7000_io_joystick_r, i7000_io_joystick_w)
+//  map(0x28, 0x2d).rw(FUNC(i7000_state::i7000_io_joystick_r), FUNC(i7000_state::i7000_io_joystick_w));
 
-//  AM_RANGE(0x3b, 0x3b) AM_WRITE(i7000_io_?_w)
-//  AM_RANGE(0x66, 0x67) AM_WRITE(i7000_io_?_w)
-//  AM_RANGE(0xbb, 0xbb) AM_WRITE(i7000_io_?_w) //may be related to page-swapping...
+//  map(0x3b, 0x3b).w(FUNC(i7000_state::i7000_io_?_w));
+//  map(0x66, 0x67).w(FUNC(i7000_state::i7000_io_?_w));
+//  map(0xbb, 0xbb).w(FUNC(i7000_state::i7000_io_?_w)); //may be related to page-swapping...
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(i7000_state::card_load)
@@ -326,7 +326,7 @@ TILE_GET_INFO_MEMBER(i7000_state::get_bg_tile_info)
 
 void i7000_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(i7000_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(i7000_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
 }
 
 uint32_t i7000_state::screen_update_i7000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -364,7 +364,7 @@ void i7000_state::i7000(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(true);
 	crtc.set_char_width(8);
-	crtc.set_on_update_addr_change_callback(FUNC(i7000_state::crtc_addr), this);
+	crtc.set_on_update_addr_change_callback(FUNC(i7000_state::crtc_addr));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -387,7 +387,7 @@ void i7000_state::i7000(machine_config &config)
 	kbdc.in_ctrl_callback().set_constant(1);                            // TODO: Ctrl key
 
 	/* Cartridge slot */
-	GENERIC_CARTSLOT(config, "cardslot", generic_romram_plain_slot, "i7000_card", "rom").set_device_load(FUNC(i7000_state::card_load), this);
+	GENERIC_CARTSLOT(config, "cardslot", generic_romram_plain_slot, "i7000_card", "rom").set_device_load(FUNC(i7000_state::card_load));
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "card_list").set_original("i7000_card");

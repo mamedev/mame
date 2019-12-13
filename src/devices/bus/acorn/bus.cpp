@@ -28,20 +28,9 @@ DEFINE_DEVICE_TYPE(ACORN_BUS_SLOT, acorn_bus_slot_device, "acorn_bus_slot", "Aco
 //-------------------------------------------------
 acorn_bus_slot_device::acorn_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ACORN_BUS_SLOT, tag, owner, clock)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<device_acorn_bus_interface>(mconfig, *this)
 	, m_bus(*this, finder_base::DUMMY_TAG)
 {
-}
-
-//-------------------------------------------------
-//  device_validity_check - device-specific checks
-//-------------------------------------------------
-
-void acorn_bus_slot_device::device_validity_check(validity_checker &valid) const
-{
-	device_t *const card(get_card_device());
-	if (card && !dynamic_cast<device_acorn_bus_interface *>(card))
-		osd_printf_error("acorn_bus_slot_device: card device %s (%s) does not implement device_acorn_bus_interface\n", card->tag(), card->name());
 }
 
 //-------------------------------------------------
@@ -50,14 +39,9 @@ void acorn_bus_slot_device::device_validity_check(validity_checker &valid) const
 
 void acorn_bus_slot_device::device_start()
 {
-	device_t *const card(get_card_device());
-	if (card)
-	{
-		device_acorn_bus_interface *const intf(dynamic_cast<device_acorn_bus_interface *>(card));
-		if (!intf)
-			throw emu_fatalerror("acorn_bus_slot_device: card device %s (%s) does not implement device_acorn_bus_interface\n", card->tag(), card->name());
+	device_acorn_bus_interface *const intf(get_card_device());
+	if (intf)
 		intf->set_acorn_bus(*m_bus);
-	}
 
 	// tell acorn bus that there is one slot with the specified tag
 	m_bus->add_slot(*this);
@@ -132,7 +116,7 @@ WRITE_LINE_MEMBER(acorn_bus_device::nmi_w) { m_out_nmi_cb(state); }
 //-------------------------------------------------
 
 device_acorn_bus_interface::device_acorn_bus_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "acornbus")
 	, m_bus(nullptr)
 {
 }

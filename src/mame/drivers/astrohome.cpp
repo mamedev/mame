@@ -70,7 +70,7 @@ void astrocde_home_state::astrocade_mem(address_map &map)
 	map(0x0000, 0x0fff).rom().w(FUNC(astrocde_home_state::astrocade_funcgen_w));
 	map(0x1000, 0x3fff).rom(); /* Star Fortress writes in here?? */
 	map(0x4000, 0x4fff).ram().share("videoram"); /* ASG */
-	//AM_RANGE(0x5000, 0xffff) AM_DEVREADWRITE("exp", astrocade_exp_device, read, write)
+	//map(0x5000, 0xffff).rw("exp", FUNC(astrocade_exp_device::read), FUNC(astrocade_exp_device::write));
 }
 
 
@@ -184,7 +184,7 @@ void astrocde_home_state::astrocde(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &astrocde_home_state::astrocade_mem);
 	m_maincpu->set_addrmap(AS_IO, &astrocde_home_state::astrocade_io);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	MCFG_MACHINE_START_OVERRIDE(astrocde_home_state, astrocde)
 
@@ -263,14 +263,14 @@ void astrocde_state::init_astrocde()
 MACHINE_START_MEMBER(astrocde_home_state, astrocde)
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x3fff, read8_delegate(FUNC(astrocade_cart_slot_device::read_rom),(astrocade_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x3fff, read8_delegate(*m_cart, FUNC(astrocade_cart_slot_device::read_rom)));
 
 	// if no RAM is mounted and the handlers are installed, the system starts with garbage on screen and a RESET is necessary
 	// thus, install RAM only if an expansion is mounted
 	if (m_exp->get_card_mounted())
 	{
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x5000, 0xffff, read8_delegate(FUNC(astrocade_exp_device::read),(astrocade_exp_device*)m_exp), write8_delegate(FUNC(astrocade_exp_device::write),(astrocade_exp_device*)m_exp));
-		m_maincpu->space(AS_IO).install_readwrite_handler(0x0080, 0x00ff, 0x0000, 0x0000, 0xff00, read8_delegate(FUNC(astrocade_exp_device::read_io),(astrocade_exp_device*)m_exp), write8_delegate(FUNC(astrocade_exp_device::write_io),(astrocade_exp_device*)m_exp));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x5000, 0xffff, read8_delegate(*m_exp, FUNC(astrocade_exp_device::read)), write8_delegate(*m_exp, FUNC(astrocade_exp_device::write)));
+		m_maincpu->space(AS_IO).install_readwrite_handler(0x0080, 0x00ff, 0x0000, 0x0000, 0xff00, read8_delegate(*m_exp, FUNC(astrocade_exp_device::read_io)), write8_delegate(*m_exp, FUNC(astrocade_exp_device::write_io)));
 	}
 }
 

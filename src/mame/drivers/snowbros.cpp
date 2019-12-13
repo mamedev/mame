@@ -353,7 +353,7 @@ void snowbros_state::hyperpac_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x10ffff).ram().share("hyperpac_ram");
 	map(0x300001, 0x300001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-//  AM_RANGE(0x400000, 0x400001) ???
+//  map(0x400000, 0x400001) ???
 	map(0x500000, 0x500001).portr("DSW1");
 	map(0x500002, 0x500003).portr("DSW2");
 	map(0x500004, 0x500005).portr("SYSTEM");
@@ -506,7 +506,7 @@ void snowbros_state::finalttr_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x103fff).ram().share("hyperpac_ram");
 	map(0x300001, 0x300001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-//  AM_RANGE(0x400000, 0x400001) ???
+//  map(0x400000, 0x400001) ???
 
 	map(0x500000, 0x500001).portr("DSW1");
 	map(0x500002, 0x500003).portr("DSW2");
@@ -558,9 +558,9 @@ void snowbros_state::yutnori_map(address_map &map)
 
 	// could be one of the OKIs? but gets value to write from RAM, always seems to be 0?
 	map(0x30000c, 0x30000d).nopw();
-	map(0x30000e, 0x30000f).nopr(); //AM_READ( yutnori_unk_r ) // ??
+	map(0x30000e, 0x30000f).nopr(); //.r(FUNC(snowbros_state::yutnori_unk_r)); // ??
 
-//  AM_RANGE(0x400000, 0x400001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w) // maybe?
+//  map(0x400000, 0x400001).w("watchdog", FUNC(watchdog_timer_device::reset16_w)); // maybe?
 	map(0x400000, 0x400001).noprw();
 
 	map(0x500000, 0x5001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -1952,6 +1952,7 @@ void snowbros_state::finalttr(machine_config &config)
 	ymsnd.add_route(1, "mono", 0.08);
 
 	m_oki->set_clock(999900);
+	m_oki->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.4);
 }
 
 
@@ -2816,7 +2817,7 @@ void snowbros_state::init_4in1boot()
 			buffer[i] = src[i^0x4000];
 		memcpy(src,&buffer[0],len);
 	}
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::_4in1_02_read),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(*this, FUNC(snowbros_state::_4in1_02_read)));
 }
 
 void snowbros_state::init_snowbro3()
@@ -2843,7 +2844,7 @@ READ16_MEMBER(snowbros_state::_3in1_read)
 
 void snowbros_state::init_3in1semi()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::_3in1_read),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(*this, FUNC(snowbros_state::_3in1_read)));
 }
 
 
@@ -2854,7 +2855,7 @@ READ16_MEMBER(snowbros_state::cookbib3_read)
 
 void snowbros_state::init_cookbib3()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::cookbib3_read),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(*this, FUNC(snowbros_state::cookbib3_read)));
 }
 
 void snowbros_state::init_pzlbreak()
@@ -2892,7 +2893,7 @@ void snowbros_state::init_toto()
 	}
 
 	// protection? (just return 0x07)
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x500006, 0x500007, read16_delegate(FUNC(snowbros_state::toto_read),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x500006, 0x500007, read16_delegate(*this, FUNC(snowbros_state::toto_read)));
 }
 
 void snowbros_state::init_hyperpac()

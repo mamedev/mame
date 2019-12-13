@@ -568,7 +568,7 @@ void imds2ioc_device::device_add_mconfig(machine_config &config)
 	I8080A(config, m_ioccpu, IOC_XTAL_Y2 / 18);     // 2.448 MHz but running at 50% (due to wait states & DMA usage of bus)
 	m_ioccpu->set_addrmap(AS_PROGRAM, &imds2ioc_device::mem_map);
 	m_ioccpu->set_addrmap(AS_IO, &imds2ioc_device::io_map);
-	config.m_minimum_quantum = attotime::from_hz(100);
+	config.set_maximum_quantum(attotime::from_hz(100));
 
 	// The IOC CRT hw is a bit complex, as the character clock (CCLK) to i8275
 	// is varied according to the part of the video frame being scanned and according to
@@ -596,7 +596,7 @@ void imds2ioc_device::device_add_mconfig(machine_config &config)
 	I8275(config, m_ioccrtc, 22853600 / 14);
 	m_ioccrtc->set_character_width(14);
 	m_ioccrtc->set_refresh_hack(true);
-	m_ioccrtc->set_display_callback(FUNC(imds2ioc_device::crtc_display_pixels), this);
+	m_ioccrtc->set_display_callback(FUNC(imds2ioc_device::crtc_display_pixels));
 	m_ioccrtc->drq_wr_callback().set(m_iocdma, FUNC(i8257_device::dreq2_w));
 	m_ioccrtc->irq_wr_callback().set_inputline(m_ioccpu, I8085_INTR_LINE);
 	m_ioccrtc->set_screen("screen");

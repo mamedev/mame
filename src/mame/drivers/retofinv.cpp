@@ -424,7 +424,7 @@ void retofinv_state::retofinv(machine_config &config)
 
 	TAITO68705_MCU(config, m_68705, XTAL(18'432'000)/6);    /* XTAL and divider verified, 3.072 MHz */
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - enough for the sound CPU to read all commands */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* 100 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	LS259(config, m_mainlatch); // IC72 - probably shared between CPUs
 	m_mainlatch->q_out_cb<0>().set(FUNC(retofinv_state::irq0_ack_w));

@@ -333,12 +333,12 @@ void vrc5074_device::map_cpu_space()
 			winStart = regConfig & 0xffe00000;
 			if (winSize > 0) {
 				if (index == 0) {
-					m_cpu_space->install_read_handler(winStart, winStart + winSize - 1, read32_delegate(FUNC(vrc5074_device::pci0_r), this));
-					m_cpu_space->install_write_handler(winStart, winStart + winSize - 1, write32_delegate(FUNC(vrc5074_device::pci0_w), this));
+					m_cpu_space->install_read_handler(winStart, winStart + winSize - 1, read32_delegate(*this, FUNC(vrc5074_device::pci0_r)));
+					m_cpu_space->install_write_handler(winStart, winStart + winSize - 1, write32_delegate(*this, FUNC(vrc5074_device::pci0_w)));
 				}
 				else {
-					m_cpu_space->install_read_handler(winStart, winStart + winSize - 1, read32_delegate(FUNC(vrc5074_device::pci1_r), this));
-					m_cpu_space->install_write_handler(winStart, winStart + winSize - 1, write32_delegate(FUNC(vrc5074_device::pci1_w), this));
+					m_cpu_space->install_read_handler(winStart, winStart + winSize - 1, read32_delegate(*this, FUNC(vrc5074_device::pci1_r)));
+					m_cpu_space->install_write_handler(winStart, winStart + winSize - 1, write32_delegate(*this, FUNC(vrc5074_device::pci1_w)));
 				}
 			}
 			if (LOG_NILE | LOG_MAP)
@@ -362,8 +362,8 @@ void vrc5074_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 		winStart = 0x0;
 
 		winEnd = winStart + winSize -1;
-		memory_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(vrc5074_device::target1_r), this));
-		memory_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(vrc5074_device::target1_w), this));
+		memory_space->install_read_handler(winStart, winEnd, read32_delegate(*this, FUNC(vrc5074_device::target1_r)));
+		memory_space->install_write_handler(winStart, winEnd, write32_delegate(*this, FUNC(vrc5074_device::target1_w)));
 		if (LOG_NILE | LOG_MAP)
 			logerror("%s: map_extra Target Window 1 start=%08X end=%08X size=%08X\n", tag(), winStart, winEnd, winSize);
 	}
@@ -372,8 +372,8 @@ void vrc5074_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 	//  winStart = m_cpu_regs[NREG_PCITW2]&0xffe00000;
 	//  winEnd = winStart | (~(0xf0000000 | (((m_cpu_regs[NREG_PCITW2]>>13)&0x7f)<<21)));
 	//  winSize = winEnd - winStart + 1;
-	//  memory_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(vrc5074_device::target2_r), this));
-	//  memory_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(vrc5074_device::target2_w), this));
+	//  memory_space->install_read_handler(winStart, winEnd, read32_delegate(*this, FUNC(vrc5074_device::target2_r)));
+	//  memory_space->install_write_handler(winStart, winEnd, write32_delegate(*this, FUNC(vrc5074_device::target2_w)));
 	//  if (LOG_NILE)
 	//      logerror("%s: map_extra Target Window 2 start=%08X end=%08X size=%08X laddr=%08X\n", tag(), winStart, winEnd, winSize,  m_target2_laddr);
 	//}

@@ -142,7 +142,7 @@ void sdl_event_manager::process_window_event(running_machine &machine, SDL_Event
 //  customize_input_type_list
 //============================================================
 
-void sdl_osd_interface::customize_input_type_list(simple_list<input_type_entry> &typelist)
+void sdl_osd_interface::customize_input_type_list(std::vector<input_type_entry> &typelist)
 {
 	input_item_id mameid_code;
 	input_code ui_code;

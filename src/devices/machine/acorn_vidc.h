@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese, R. Belmont, Juergen Buchmueller
 /***************************************************************************
 
-	Acorn VIDC10 (VIDeo Controller) device chip
+    Acorn VIDC10 (VIDeo Controller) device chip
 
 ***************************************************************************/
 
@@ -114,7 +114,7 @@ private:
 	std::unique_ptr<u8[]> m_data_vram;
 	std::unique_ptr<u8[]> m_cursor_vram;
 	// TODO: correct data vram size
-	const u32 m_data_vram_mask = 0x1fffff; 
+	const u32 m_data_vram_mask = 0x1fffff;
 	const u32 m_cursor_vram_mask = 0x7fff;
 	const u32 m_data_vram_size = m_data_vram_mask+1;
 	const u32 m_cursor_vram_size = m_cursor_vram_mask+1;
@@ -126,7 +126,7 @@ private:
 
 	bool     m_sound_frequency_test_bit;
 	u8       m_stereo_image[8];
-	const float m_sound_input_gain = 0.05;
+	const float m_sound_input_gain = 0.05f;
 	const int m_sound_max_channels = 8;
 	int16_t  m_ulaw_lookup[256];
 	inline void refresh_stereo_image(u8 channel);

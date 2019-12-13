@@ -147,7 +147,7 @@ void archimedes_state::vidc_video_tick()
 	if(m_cursor_enabled == true)
 	{
 		uint32_t ccur_size = m_vidc->get_cursor_size();
-		
+
 		for(uint32_t ccur = 0; ccur < ccur_size; ccur++)
 			m_vidc->write_cram(ccur, space.read_byte(m_vidc_cinit+ccur));
 	}
@@ -545,7 +545,7 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 			---- --x- I2C clock
 			---- ---x I2C data
 			*/
-			
+
 			//m_ioc_regs[CONTROL] = data & 0x38;
 			//if(data & 0x40)
 			//  popmessage("Muting sound, contact MAME/MESSdev");
@@ -562,7 +562,7 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 			archimedes_request_irq_a((data & 0x80) ? ARCHIMEDES_IRQA_FORCE : 0);
 
 			//if(data & 0x08) //set up the VBLANK timer
-			//	m_vbl_timer->adjust(m_screen->time_until_pos(m_vidc_vblank_time));
+			//  m_vbl_timer->adjust(m_screen->time_until_pos(m_vidc_vblank_time));
 
 			break;
 
@@ -687,12 +687,12 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 							return 0xed; // ID for econet
 						case 0x3a0004:
 							return m_joy[0].read_safe(0xff);
-						case 0x3a0008: 
+						case 0x3a0008:
 							// Top Banana reads there and do various checks,
 							// disallowing player 1 joy use if they fails (?)
 							return m_joy[1].read_safe(0xff);
 					}
-					
+
 					logerror("IOC: Econet Read %08x at PC=%08x\n",ioc_addr, m_maincpu->pc());
 					return 0xffff;
 				case 3:
@@ -716,7 +716,7 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 							case 0x7c:
 								logerror("FDC: reading Joystick port %04x at PC=%08x\n",ioc_addr, m_maincpu->pc());
 								return 0xff;
-							
+
 						}
 					}
 
@@ -784,16 +784,16 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 								// TODO: understand how player 2 inputs routes, related somehow to CONTROL bit 6 (cfr. blitz in SW list)
 								// TODO: paradr2k polls here with bit 7 and fails detection (Vertical Twist)
 								uint8_t cur_joy_in = bitswap<8>(m_joy[0].read_safe(0xff),7,6,5,4,0,1,2,3);
-								
+
 								m_joy_serial_data = (data & 0xff) ^ 0xff;
 								bool serial_on = false;
-								
+
 								if (m_joy_serial_data == 0x20)
 									serial_on = true;
 								else if (m_joy_serial_data & cur_joy_in)
 									serial_on = true;
-								
-								
+
+
 								// wants printer irq for some reason (connected on parallel?)
 								if (serial_on == true)
 								{
@@ -805,7 +805,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 									archimedes_clear_irq_a(ARCHIMEDES_IRQA_PRINTER_BUSY);
 									//m_ioc_regs[CONTROL] &= ~0x40;
 								}
-								
+
 								return;
 							}
 							case 0x18: // latch B

@@ -15,6 +15,7 @@
 
 #include "bitmap.h"
 #include "imagedev/picture.h"
+#include "imagedev/avivideo.h"
 
 class vino_device : public device_t
 {
@@ -98,7 +99,7 @@ private:
 		ISR_CHB_EOF                 = (1 << 3),
 		ISR_CHB_FIFO                = (1 << 4),
 		ISR_CHB_DESC                = (1 << 5),
-		ISR_MASK					= 0x3f,
+		ISR_MASK                    = 0x3f,
 
 		ALPHA_MASK                  = 0xff,
 
@@ -247,6 +248,7 @@ private:
 	devcb_write_line m_interrupt_cb;
 
 	required_device<picture_image_device> m_picture;
+	required_device<avivideo_image_device> m_avivideo;
 	required_address_space m_space;
 
 	bitmap_argb32 *m_input_bitmap;

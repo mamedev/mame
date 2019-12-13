@@ -35,6 +35,7 @@ akaiax80.cpp
 alcat7100.cpp
 alesis.cpp
 alesis_qs.cpp
+alfaskop41xx.cpp
 alphasma.cpp
 alphatpx.cpp
 alphatro.cpp
@@ -136,8 +137,10 @@ cbnt2039.cpp
 cc40.cpp
 ccs2810.cpp
 ccs300.cpp
+cd100.cpp
 cd2650.cpp
 cdc721.cpp
+cdsys5.cpp
 cfx9850.cpp
 cgc7900.cpp
 cgenie.cpp
@@ -175,6 +178,8 @@ crvision.cpp
 ct486.cpp
 cvicny.cpp
 cxg_ch2001.cpp
+cxg_dominator.cpp
+cxg_sphinx40.cpp
 cxhumax.cpp
 cybiko.cpp
 cz101.cpp
@@ -187,6 +192,7 @@ daruma.cpp
 datum.cpp
 dbox.cpp
 dccons.cpp
+dcebridge.cpp
 dct11em.cpp
 debut.cpp
 decstation.cpp
@@ -220,6 +226,7 @@ ec184x.cpp
 ec65.cpp
 ec7915.cpp
 einstein.cpp
+eispc.cpp
 elan_eu3a05.cpp
 elan_eu3a14.cpp
 electron.cpp
@@ -240,6 +247,7 @@ esqkt.cpp
 esqmr.cpp
 et3400.cpp
 eti660.cpp
+eurit.cpp
 eurocom2.cpp
 europc.cpp
 eva.cpp
@@ -295,11 +303,13 @@ gamemachine.cpp
 gamepock.cpp
 gb.cpp
 gba.cpp
+generalplus_gpl32612.cpp
 geneve.cpp
 geniusiq.cpp
 geniusjr.cpp
 genpc.cpp
 gimix.cpp
+gkidabc.cpp
 gizmondo.cpp
 glcx.cpp
 gmaster.cpp
@@ -365,6 +375,7 @@ ibmpcjr.cpp
 icatel.cpp
 icebox.cpp
 ie15.cpp
+lx_jg7425.cpp
 if800.cpp
 ikt5a.cpp
 imds2.cpp
@@ -392,6 +403,7 @@ isbc.cpp
 isbc8010.cpp
 isbc8030.cpp
 iskr103x.cpp
+itc4.cpp
 itt1700.cpp
 itt3030.cpp
 itt9216.cpp
@@ -423,17 +435,20 @@ ktm3.cpp
 kyocera.cpp
 laser3k.cpp
 lb186.cpp
+lbpc.cpp
 lc80.cpp
 lcmate2.cpp
 leapfrog_leappad.cpp
 leapster.cpp
 learnwin.cpp
 lee1214.cpp
+lexibook_jg7425.cpp
 lft.cpp
 lg-dvd.cpp
 lilith.cpp
 lisa.cpp
 llc.cpp
+lms46.cpp
 lola8a.cpp
 lviv.cpp
 lwriter.cpp
@@ -463,6 +478,7 @@ mccpm.cpp
 mdisk.cpp
 megadriv.cpp
 megadriv_rad.cpp
+mekd1.cpp
 mekd2.cpp
 mekd3.cpp
 mekd4.cpp
@@ -527,6 +543,7 @@ msbc1.cpp
 mstation.cpp
 msx.cpp
 mt735.cpp
+mtd1256.cpp
 mtx.cpp
 multi16.cpp
 multi8.cpp
@@ -556,6 +573,7 @@ nds.cpp
 neogeocd.cpp
 nes.cpp
 nes_vt.cpp
+vt1682.cpp
 newbrain.cpp
 next.cpp
 nforcepc.cpp
@@ -693,8 +711,10 @@ rambo.cpp
 ravens.cpp
 rc702.cpp
 rc759.cpp
+rcm32p.cpp
 rd100.cpp
 rd110.cpp
+regence.cpp
 replicator.cpp
 rex6000.cpp
 riscpc.cpp
@@ -751,6 +771,7 @@ sk101bl.cpp
 slc1.cpp
 slc1a.cpp
 slicer.cpp
+slsstars.cpp
 sm1800.cpp
 sm7238.cpp
 smc777.cpp
@@ -789,6 +810,7 @@ svision.cpp
 svmu.cpp
 swtpc.cpp
 swtpc09.cpp
+swtpc8212.cpp
 swyft.cpp
 sym1.cpp
 symbolics.cpp
@@ -811,6 +833,7 @@ tek405x.cpp
 tek410x.cpp
 tek440x.cpp
 tekxp33x.cpp
+teleray10.cpp
 telex1192.cpp
 telex274.cpp
 telex277d.cpp
@@ -842,6 +865,7 @@ timex.cpp
 tispeak.cpp
 tispellb.cpp
 tk2000.cpp
+tk635.cpp
 tk80.cpp
 tk80bs.cpp
 tm990189.cpp
@@ -876,6 +900,7 @@ tvboy.cpp
 tvc.cpp
 tvgame.cpp
 tx0.cpp
+uchroma68.cpp
 uknc.cpp
 unichamp.cpp
 unior.cpp
@@ -889,10 +914,12 @@ v102.cpp
 v550.cpp
 v1050.cpp
 v6809.cpp
+vanguardmk1.cpp
 vax11.cpp
 vboy.cpp
 vc4000.cpp
 vcs80.cpp
+vd56sp.cpp
 vdm7932x.cpp
 vector06.cpp
 vector4.cpp

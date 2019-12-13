@@ -280,7 +280,7 @@ void exctsccr_state::exctsccr_sound_map(address_map &map)
 	map(0xc009, 0xc009).w("dac2", FUNC(dac_byte_interface::data_w));
 	map(0xc00c, 0xc00c).w("soundlatch", FUNC(generic_latch_8_device::clear_w));
 	map(0xc00d, 0xc00d).r("soundlatch", FUNC(generic_latch_8_device::read));
-//  AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP // ?
+//  map(0xc00f, 0xc00f).nopw(); // ?
 }
 
 void exctsccr_state::exctsccr_sound_io_map(address_map &map)
@@ -536,7 +536,7 @@ void champbas_state::talbot(machine_config &config)
 	m_mainlatch->q_out_cb<7>().set(FUNC(champbas_state::mcu_switch_w));
 
 	ALPHA_8201(config, m_alpha_8201, XTAL(18'432'000)/6/8);
-	config.m_perfect_cpu_quantum = subtag("alpha_8201:mcu");
+	config.set_perfect_quantum("alpha_8201:mcu");
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 
@@ -618,7 +618,7 @@ void champbas_state::champbasj(machine_config &config)
 	m_mainlatch->q_out_cb<7>().set(FUNC(champbas_state::mcu_switch_w));
 
 	ALPHA_8201(config, m_alpha_8201, XTAL(18'432'000)/6/8); // note: 8302 rom on champbb2 (same device!)
-	config.m_perfect_cpu_quantum = subtag("alpha_8201:mcu");
+	config.set_perfect_quantum("alpha_8201:mcu");
 }
 
 
@@ -689,7 +689,7 @@ void exctsccr_state::exctsccr(machine_config &config)
 	exc_snd_irq.set_start_delay(attotime::from_hz(75));
 
 	ALPHA_8201(config, m_alpha_8201, XTAL(18'432'000)/6/8); // note: 8302 rom, or 8303 on exctscc2 (same device!)
-	config.m_perfect_cpu_quantum = subtag("alpha_8201:mcu");
+	config.set_perfect_quantum("alpha_8201:mcu");
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 
@@ -747,7 +747,7 @@ void exctsccr_state::exctsccrb(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &exctsccr_state::champbas_sound_map);
 
 	ALPHA_8201(config, m_alpha_8201, XTAL(18'432'000)/6/8); // champbasj 8201 on pcb, though unused
-	config.m_perfect_cpu_quantum = subtag("alpha_8201:mcu");
+	config.set_perfect_quantum("alpha_8201:mcu");
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 

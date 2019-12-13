@@ -88,9 +88,9 @@ void darkmist_state::darkmist_palette(palette_device &palette) const
 
 void darkmist_state::video_start()
 {
-	m_bgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkmist_state::get_bgtile_info),this),TILEMAP_SCAN_ROWS,16,16,512,64 );
-	m_fgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkmist_state::get_fgtile_info),this),TILEMAP_SCAN_ROWS,16,16,64,256 );
-	m_txtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkmist_state::get_txttile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
+	m_bgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(darkmist_state::get_bgtile_info)), TILEMAP_SCAN_ROWS, 16, 16, 512, 64);
+	m_fgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(darkmist_state::get_fgtile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 256);
+	m_txtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(darkmist_state::get_txttile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 //  m_fgtilemap->set_transparent_pen(0);
 //  m_txtilemap->set_transparent_pen(0);
 

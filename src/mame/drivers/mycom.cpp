@@ -556,7 +556,7 @@ void mycom_state::mycom(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(mycom_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(mycom_state::crtc_update_row));
 
 	SPEAKER(config, "mono").front_center();
 	SN76489(config, m_audio, 10_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 1.50);

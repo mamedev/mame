@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+// thanks-to:rfka01
 #ifndef MAME_BUS_DMV_K230_H
 #define MAME_BUS_DMV_K230_H
 
@@ -51,7 +52,6 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	optional_memory_region      m_rom;
-	required_device<dmvcart_slot_device> m_bus;
 	int                         m_switch16;
 	int                         m_hold;
 

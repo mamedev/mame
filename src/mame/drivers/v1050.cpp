@@ -1030,11 +1030,9 @@ void v1050_state::v1050(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &v1050_state::v1050_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(v1050_state::v1050_int_ack));
 
-	config.m_perfect_cpu_quantum = subtag(Z80_TAG);
-
 	M6502(config, m_subcpu, 15.36_MHz_XTAL/16);
 	m_subcpu->set_addrmap(AS_PROGRAM, &v1050_state::v1050_crt_mem);
-	config.m_perfect_cpu_quantum = subtag(M6502_TAG);
+	config.set_perfect_quantum(m_subcpu);
 
 	// keyboard HACK
 	TIMER(config, "keyboard").configure_periodic(FUNC(v1050_state::v1050_keyboard_tick), attotime::from_hz(60));

@@ -62,7 +62,7 @@ void sm1800_state::sm1800_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).rom();
-	//AM_RANGE( 0x0fb0, 0x0fff ) AM_DEVWRITE("i8275", i8275_device, dack_w)
+	//map(0x0fb0, 0x0fff).w("i8275", FUNC(i8275_device::dack_w));
 	map(0x1000, 0x17ff).ram(); // videoram looks like 1080-17FF, normal ascii
 }
 
@@ -73,8 +73,8 @@ void sm1800_state::sm1800_io(address_map &map)
 	map(0x3c, 0x3d).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0x5c, 0x5d).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x6c, 0x6f).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	//AM_RANGE( 0x74, 0x74 ) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
-	//AM_RANGE( 0x75, 0x75 ) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w)
+	//map(0x74, 0x74).rw("i8279", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
+	//map(0x75, 0x75).rw("i8279", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
 }
 
 /* Input ports */
@@ -189,7 +189,7 @@ void sm1800_state::sm1800(machine_config &config)
 
 	I8275(config, m_crtc, 2000000);
 	m_crtc->set_character_width(8);
-	m_crtc->set_display_callback(FUNC(sm1800_state::crtc_display_pixels), this);
+	m_crtc->set_display_callback(FUNC(sm1800_state::crtc_display_pixels));
 
 	I8251(config, m_uart, 0);
 }

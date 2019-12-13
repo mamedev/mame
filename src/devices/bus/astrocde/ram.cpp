@@ -70,7 +70,7 @@ DEFINE_DEVICE_TYPE(ASTROCADE_RL64RAM,     astrocade_rl64ram_device,     "astroca
 
 astrocade_blueram_4k_device::astrocade_blueram_4k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_astrocade_card_interface(mconfig, *this)
+	, device_astrocade_exp_interface(mconfig, *this)
 	, m_write_prot(*this, "RAM_PROTECT")
 	, m_ramio(*this, "ramio")
 	, m_cassette(*this, "cassette")
@@ -93,23 +93,23 @@ astrocade_blueram_32k_device::astrocade_blueram_32k_device(const machine_config 
 }
 
 astrocade_viper_sys1_device::astrocade_viper_sys1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ASTROCADE_VIPER_SYS1, tag, owner, clock),
-		device_astrocade_card_interface(mconfig, *this),
-		m_write_prot(*this, "RAM_PROTECT")
+	: device_t(mconfig, ASTROCADE_VIPER_SYS1, tag, owner, clock)
+	, device_astrocade_exp_interface(mconfig, *this)
+	, m_write_prot(*this, "RAM_PROTECT")
 {
 }
 
 astrocade_whiteram_device::astrocade_whiteram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ASTROCADE_WHITERAM, tag, owner, clock),
-		device_astrocade_card_interface(mconfig, *this),
-		m_write_prot(*this, "RAM_PROTECT")
+	: device_t(mconfig, ASTROCADE_WHITERAM, tag, owner, clock)
+	, device_astrocade_exp_interface(mconfig, *this)
+	, m_write_prot(*this, "RAM_PROTECT")
 {
 }
 
 astrocade_rl64ram_device::astrocade_rl64ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ASTROCADE_RL64RAM, tag, owner, clock),
-		device_astrocade_card_interface(mconfig, *this),
-		m_write_prot(*this, "RAM_PROTECT")
+	: device_t(mconfig, ASTROCADE_RL64RAM, tag, owner, clock)
+	, device_astrocade_exp_interface(mconfig, *this)
+	, m_write_prot(*this, "RAM_PROTECT")
 {
 }
 

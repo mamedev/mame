@@ -106,7 +106,7 @@ public:
 		, m_user_pia(*this, "user_pia")
 		, m_display(*this, "display")
 		, m_brg(*this, "brg")
-		, m_baud_rate(*this, "baud_rate")
+		, m_baud_rate(*this, "BAUD_RATE")
 		, m_acia(*this, "acia")
 		, m_cass(*this, "cassette")
 		, m_keypad_columns(*this, "COL%u", 0)
@@ -144,7 +144,7 @@ private:
 	uint8_t m_digit;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<m6802_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_kpd_pia;
 	required_device<pia6821_device> m_user_pia;
 	required_device<pwm_display_device> m_display;
@@ -223,14 +223,14 @@ static INPUT_PORTS_START(mekd5)
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd5_state, keypad_changed, 0) PORT_NAME("D") PORT_CODE(KEYCODE_D)
 
 	/* RS232 baud rates available via J5. */
-	PORT_START("baud_rate")
+	PORT_START("BAUD_RATE")
 	PORT_CONFNAME(0x3f, 1, "RS232 Baud Rate")
-	PORT_CONFSETTING(0x01, "9600")
-	PORT_CONFSETTING(0x02, "4800")
-	PORT_CONFSETTING(0x04, "2400")
-	PORT_CONFSETTING(0x08, "1200")
-	PORT_CONFSETTING(0x10, "300")
 	PORT_CONFSETTING(0x20, "110")
+	PORT_CONFSETTING(0x10, "300")
+	PORT_CONFSETTING(0x08, "1200")
+	PORT_CONFSETTING(0x04, "2400")
+	PORT_CONFSETTING(0x02, "4800")
+	PORT_CONFSETTING(0x01, "9600")
 
 INPUT_PORTS_END
 
@@ -423,6 +423,8 @@ void mekd5_state::init_mekd5()
 
 void mekd5_state::machine_start()
 {
+	save_item(NAME(m_segment));
+	save_item(NAME(m_digit));
 }
 
 void mekd5_state::machine_reset()
@@ -456,6 +458,7 @@ DEVICE_INPUT_DEFAULTS_END
 void mekd5_state::mekd5(machine_config &config)
 {
 	M6802(config, m_maincpu, XTAL_MEKD5);        /* 894.8 kHz clock */
+	m_maincpu->set_ram_enable(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mekd5_state::mekd5_mem);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6802_IRQ_LINE);

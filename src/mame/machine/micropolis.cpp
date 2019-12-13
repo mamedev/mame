@@ -70,6 +70,7 @@ micropolis_device::micropolis_device(const machine_config &mconfig, const char *
 	m_read_dden(*this),
 	m_write_intrq(*this),
 	m_write_drq(*this),
+	m_floppy_drive(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG}),
 	m_data(0),
 	m_drive_num(0),
 	m_track(0),
@@ -83,7 +84,6 @@ micropolis_device::micropolis_device(const machine_config &mconfig, const char *
 	m_drive(nullptr)
 {
 	std::fill(std::begin(m_buffer), std::end(m_buffer), 0);
-	std::fill(std::begin(m_floppy_drive_tags), std::end(m_floppy_drive_tags), nullptr);
 }
 
 //-------------------------------------------------
@@ -115,18 +115,13 @@ void micropolis_device::device_start()
 
 void micropolis_device::device_reset()
 {
-	for (auto & elem : m_floppy_drive_tags)
+	for (auto &img : m_floppy_drive)
 	{
-		if (elem)
+		if (img.found())
 		{
-			legacy_floppy_image_device *img = siblingdevice<legacy_floppy_image_device>(elem);
-
-			if (img)
-			{
-				img->floppy_drive_set_controller(this);
-				//img->floppy_drive_set_index_pulse_callback(wd17xx_index_pulse_callback);
-				img->floppy_drive_set_rpm(300.);
-			}
+			img->floppy_drive_set_controller(this);
+			//img->floppy_drive_set_index_pulse_callback(wd17xx_index_pulse_callback);
+			img->floppy_drive_set_rpm(300.);
 		}
 	}
 
@@ -185,8 +180,7 @@ void micropolis_device::set_drive(uint8_t drive)
 	if (VERBOSE)
 		logerror("micropolis_set_drive: $%02x\n", drive);
 
-	if (m_floppy_drive_tags[drive])
-		m_drive = siblingdevice<legacy_floppy_image_device>(m_floppy_drive_tags[drive]);
+	m_drive = m_floppy_drive[drive].target();
 }
 
 

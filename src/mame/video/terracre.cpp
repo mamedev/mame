@@ -169,8 +169,8 @@ WRITE16_MEMBER(terracre_state::amazon_scrollx_w)
 
 void terracre_state::video_start()
 {
-	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(terracre_state::get_bg_tile_info),this),TILEMAP_SCAN_COLS,16,16,64,32);
-	m_foreground = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(terracre_state::get_fg_tile_info),this),TILEMAP_SCAN_COLS,8,8,64,32);
+	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(terracre_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 16,16, 64,32);
+	m_foreground = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(terracre_state::get_fg_tile_info)), TILEMAP_SCAN_COLS,  8, 8, 64,32);
 	m_foreground->set_transparent_pen(0xf);
 
 	/* register for saving */
@@ -186,6 +186,9 @@ uint32_t terracre_state::screen_update_amazon(screen_device &screen, bitmap_ind1
 		m_background->draw(screen, bitmap, cliprect, 0, 0 );
 
 	draw_sprites(bitmap,cliprect );
-	m_foreground->draw(screen, bitmap, cliprect, 0, 0 );
+
+	if ((m_xscroll & 0x1000) == 0)
+		m_foreground->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }

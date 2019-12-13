@@ -24,14 +24,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	void transfer_speed_w(u8 data);
-	void dma_mode_w(u8 data);
-	void bus_on_time_w(u8 data);
-	void bus_off_time_w(u8 data);
-	u8 fifo_data_r();
-	void fifo_data_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(aic_breq_w);
-
 	void i8085_base_map(address_map &map);
 	void scsi_add(machine_config &config);
 	void scsic_config(device_t *device);
@@ -40,11 +32,6 @@ protected:
 	required_device<aic6250_device> m_scsic;
 	required_device<upd765_family_device> m_fdc;
 	required_region_ptr<u8> m_bios;
-	required_shared_ptr<u8> m_fifo_data;
-
-	u8 m_fifo_read_index;
-	u8 m_fifo_write_index;
-	u8 m_dma_mode;
 };
 
 class aha1542a_device : public aha154x_device

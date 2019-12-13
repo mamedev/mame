@@ -30,10 +30,10 @@
 const s32 INVALID_AXIS_VALUE      = 0x7fffffff;
 
 // additional expanded input codes for sequences
-const input_code input_seq::end_code(DEVICE_CLASS_INTERNAL, 0, ITEM_CLASS_INVALID, ITEM_MODIFIER_NONE, ITEM_ID_SEQ_END);
-const input_code input_seq::default_code(DEVICE_CLASS_INTERNAL, 0, ITEM_CLASS_INVALID, ITEM_MODIFIER_NONE, ITEM_ID_SEQ_DEFAULT);
-const input_code input_seq::not_code(DEVICE_CLASS_INTERNAL, 0, ITEM_CLASS_INVALID, ITEM_MODIFIER_NONE, ITEM_ID_SEQ_NOT);
-const input_code input_seq::or_code(DEVICE_CLASS_INTERNAL, 0, ITEM_CLASS_INVALID, ITEM_MODIFIER_NONE, ITEM_ID_SEQ_OR);
+constexpr input_code input_seq::end_code;
+constexpr input_code input_seq::default_code;
+constexpr input_code input_seq::not_code;
+constexpr input_code input_seq::or_code;
 
 // constant sequences
 const input_seq input_seq::empty_seq;
@@ -377,14 +377,15 @@ static const code_string_table itemid_token_table[] =
 //  input sequence
 //-------------------------------------------------
 
-input_seq &input_seq::operator+=(input_code code)
+input_seq &input_seq::operator+=(input_code code) noexcept
 {
 	// if not enough room, return false
-	int curlength = length();
-	if (curlength < ARRAY_LENGTH(m_code) - 1)
+	const int curlength = length();
+	if (curlength < m_code.size())
 	{
-		m_code[curlength++] = code;
-		m_code[curlength] = end_code;
+		m_code[curlength] = code;
+		if ((curlength + 1) < m_code.size())
+			m_code[curlength + 1] = end_code;
 	}
 	return *this;
 }
@@ -396,17 +397,25 @@ input_seq &input_seq::operator+=(input_code code)
 //  before the new code
 //-------------------------------------------------
 
-input_seq &input_seq::operator|=(input_code code)
+input_seq &input_seq::operator|=(input_code code) noexcept
 {
 	// overwrite end/default with the new code
-	if (m_code[0] == end_code || m_code[0] == default_code)
+	if (m_code[0] == default_code)
+	{
 		m_code[0] = code;
-
-	// otherwise, append an OR token and then the new code
+		m_code[1] = end_code;
+	}
 	else
 	{
-		*this += or_code;
-		*this += code;
+		// otherwise, append an OR token and then the new code
+		const int curlength = length();
+		if ((curlength + 1) < m_code.size())
+		{
+			m_code[curlength] = or_code;
+			m_code[curlength + 1] = code;
+			if ((curlength + 2) < m_code.size())
+				m_code[curlength + 2] = end_code;
+		}
 	}
 	return *this;
 }
@@ -416,13 +425,13 @@ input_seq &input_seq::operator|=(input_code code)
 //  length - return the length of the sequence
 //-------------------------------------------------
 
-int input_seq::length() const
+int input_seq::length() const noexcept
 {
 	// find the end token; error if none found
-	for (int seqnum = 0; seqnum < ARRAY_LENGTH(m_code); seqnum++)
+	for (int seqnum = 0; seqnum < m_code.size(); seqnum++)
 		if (m_code[seqnum] == end_code)
 			return seqnum;
-	return ARRAY_LENGTH(m_code);
+	return m_code.size();
 }
 
 
@@ -431,20 +440,22 @@ int input_seq::length() const
 //  valid
 //-------------------------------------------------
 
-bool input_seq::is_valid() const
+bool input_seq::is_valid() const noexcept
 {
 	// "default" can only be of length 1
 	if (m_code[0] == default_code)
-		return (length() == 1);
+		return m_code[1] == end_code;
 
 	// scan the sequence for valid codes
 	input_item_class lastclass = ITEM_CLASS_INVALID;
 	input_code lastcode = INPUT_CODE_INVALID;
-	int positive_code_count = 0;
-	for (auto code : m_code)
+	decltype(m_code) positive_codes;
+	decltype(m_code) negative_codes;
+	auto positive_codes_end = positive_codes.begin();
+	auto negative_codes_end = negative_codes.begin();
+	for (input_code code : m_code)
 	{
 		// invalid codes are never permitted
-
 		if (code == INPUT_CODE_INVALID)
 			return false;
 
@@ -452,7 +463,7 @@ bool input_seq::is_valid() const
 		if (code == or_code || code == end_code)
 		{
 			// must be at least one positive code
-			if (positive_code_count == 0)
+			if (positive_codes.begin() == positive_codes_end)
 				return false;
 
 			// last code must not have been an internal code
@@ -464,23 +475,31 @@ bool input_seq::is_valid() const
 				return true;
 
 			// reset the state for the next chunk
-			positive_code_count = 0;
+			positive_codes_end = positive_codes.begin();
+			negative_codes_end = negative_codes.begin();
 			lastclass = ITEM_CLASS_INVALID;
 		}
-
-		// if we hit a NOT, make sure we don't have a double
 		else if (code == not_code)
 		{
+			// if we hit a NOT, make sure we don't have a double
 			if (lastcode == not_code)
 				return false;
 		}
-
-		// anything else
 		else
 		{
-			// count positive codes
+			// track positive codes, and don't allow positive and negative for the same code
 			if (lastcode != not_code)
-				positive_code_count++;
+			{
+				*positive_codes_end++ = code;
+				if (std::find(negative_codes.begin(), negative_codes_end, code) != negative_codes_end)
+					return false;
+			}
+			else
+			{
+				*negative_codes_end++ = code;
+				if (std::find(positive_codes.begin(), positive_codes_end, code) != positive_codes_end)
+					return false;
+			}
 
 			// non-switch items can't have a NOT
 			input_item_class itemclass = code.item_class();
@@ -503,32 +522,14 @@ bool input_seq::is_valid() const
 
 
 //-------------------------------------------------
-//  set - directly set up to the first 7 codes
-//-------------------------------------------------
-
-void input_seq::set(input_code code0, input_code code1, input_code code2, input_code code3, input_code code4, input_code code5, input_code code6)
-{
-	m_code[0] = code0;
-	m_code[1] = code1;
-	m_code[2] = code2;
-	m_code[3] = code3;
-	m_code[4] = code4;
-	m_code[5] = code5;
-	m_code[6] = code6;
-	for (int codenum = 7; codenum < ARRAY_LENGTH(m_code); codenum++)
-		m_code[codenum] = end_code;
-}
-
-
-//-------------------------------------------------
 //  backspace - "backspace" over the last entry in
 //  a sequence
 //-------------------------------------------------
 
-void input_seq::backspace()
+void input_seq::backspace() noexcept
 {
 	// if we have at least one entry, remove it
-	int curlength = length();
+	const int curlength = length();
 	if (curlength > 0)
 		m_code[curlength - 1] = end_code;
 }
@@ -539,9 +540,9 @@ void input_seq::backspace()
 //  with newcode in a sequence
 //-------------------------------------------------
 
-void input_seq::replace(input_code oldcode, input_code newcode)
+void input_seq::replace(input_code oldcode, input_code newcode) noexcept
 {
-	for (auto & elem : m_code)
+	for (input_code &elem : m_code)
 		if (elem == oldcode)
 			elem = newcode;
 }
@@ -556,10 +557,7 @@ void input_seq::replace(input_code oldcode, input_code newcode)
 //  input_manager - constructor
 //-------------------------------------------------
 
-input_manager::input_manager(running_machine &machine)
-	: m_machine(machine),
-		m_poll_seq_last_ticks(0),
-		m_poll_seq_class(ITEM_CLASS_SWITCH)
+input_manager::input_manager(running_machine &machine) : m_machine(machine)
 {
 	// reset code memory
 	reset_memory();
@@ -1340,136 +1338,14 @@ s32 input_manager::seq_axis_value(const input_seq &seq, input_item_class &itemcl
 
 
 //-------------------------------------------------
-//  seq_poll_start - begin polling for a new
-//  sequence of the given itemclass
-//-------------------------------------------------
-
-void input_manager::seq_poll_start(input_item_class itemclass, const input_seq *startseq)
-{
-	assert(itemclass == ITEM_CLASS_SWITCH || itemclass == ITEM_CLASS_ABSOLUTE || itemclass == ITEM_CLASS_RELATIVE);
-
-	// reset the recording count and the clock
-	m_poll_seq_last_ticks = 0;
-	m_poll_seq_class = itemclass;
-	m_poll_seq.reset();
-
-	// grab the starting sequence to append to, and append an OR
-	if (startseq != nullptr)
-	{
-		m_poll_seq = *startseq;
-		if (m_poll_seq.length() > 0)
-			m_poll_seq += input_seq::or_code;
-	}
-
-	// flush out any goobers
-	reset_polling();
-	input_code dummycode = KEYCODE_ENTER;
-	while (dummycode != INPUT_CODE_INVALID)
-		dummycode = (m_poll_seq_class == ITEM_CLASS_SWITCH) ? poll_switches() : poll_axes();
-}
-
-
-//-------------------------------------------------
-//  input_seq_poll - continue polling
-//-------------------------------------------------
-
-bool input_manager::seq_poll()
-{
-	int curlen = m_poll_seq.length();
-	input_code lastcode = m_poll_seq[curlen - 1];
-
-	// switch case: see if we have a new code to process
-	input_code newcode;
-	if (m_poll_seq_class == ITEM_CLASS_SWITCH)
-	{
-		newcode = poll_switches();
-		if (newcode != INPUT_CODE_INVALID)
-		{
-			// if code is duplicate, toggle the NOT state on the code
-			if (curlen > 0 && newcode == lastcode)
-			{
-				// back up over the existing code
-				m_poll_seq.backspace();
-
-				// if there was a NOT preceding it, delete it as well, otherwise append a fresh one
-				if (m_poll_seq[curlen - 2] == input_seq::not_code)
-					m_poll_seq.backspace();
-				else
-					m_poll_seq += input_seq::not_code;
-			}
-		}
-	}
-
-	// absolute/relative case: see if we have an analog change of sufficient amount
-	else
-	{
-		bool has_or = false;
-		if (lastcode == input_seq::or_code)
-		{
-			lastcode = m_poll_seq[curlen - 2];
-			has_or = true;
-		}
-		newcode = poll_axes();
-
-		// if the last code doesn't match absolute/relative of this code, ignore the new one
-		if ((lastcode.item_class() == ITEM_CLASS_ABSOLUTE && newcode.item_class() != ITEM_CLASS_ABSOLUTE) ||
-			(lastcode.item_class() == ITEM_CLASS_RELATIVE && newcode.item_class() != ITEM_CLASS_RELATIVE))
-			newcode = INPUT_CODE_INVALID;
-
-		// if the new code is valid, check for half-axis toggles on absolute controls
-		if (newcode != INPUT_CODE_INVALID && curlen > 0 && newcode.item_class() == ITEM_CLASS_ABSOLUTE)
-		{
-			input_code last_nomodifier = lastcode;
-			last_nomodifier.set_item_modifier(ITEM_MODIFIER_NONE);
-			if (newcode == last_nomodifier)
-			{
-				// increment the modifier, wrapping back to none
-				switch (lastcode.item_modifier())
-				{
-					case ITEM_MODIFIER_NONE:    newcode.set_item_modifier(ITEM_MODIFIER_POS);   break;
-					case ITEM_MODIFIER_POS:     newcode.set_item_modifier(ITEM_MODIFIER_NEG);   break;
-					default:
-					case ITEM_MODIFIER_NEG:     newcode.set_item_modifier(ITEM_MODIFIER_NONE);  break;
-				}
-
-				// back up over the previous code so we can re-append
-				if (has_or)
-					m_poll_seq.backspace();
-				m_poll_seq.backspace();
-			}
-		}
-	}
-
-	// if we got a new code to append it, append it and reset the timer
-	if (newcode != INPUT_CODE_INVALID)
-	{
-		m_poll_seq += newcode;
-		m_poll_seq_last_ticks = osd_ticks();
-	}
-
-	// if we're recorded at least one item and 2/3 of a second has passed, we're done
-	if (m_poll_seq_last_ticks != 0 && osd_ticks() > m_poll_seq_last_ticks + osd_ticks_per_second() * 2 / 3)
-	{
-		// if the final result is invalid, reset to nothing
-		if (!m_poll_seq.is_valid())
-			m_poll_seq.reset();
-
-		// return true to indicate that we are finished
-		return true;
-	}
-
-	// return false to indicate we are still polling
-	return false;
-}
-
-
-//-------------------------------------------------
 //  seq_clean - clean the sequence, removing
 //  any invalid bits
 //-------------------------------------------------
 
 input_seq input_manager::seq_clean(const input_seq &seq) const
 {
+	// make a copy of our sequence, removing any invalid bits
+	input_seq clean_codes;
 	int clean_index = 0;
 	for (int codenum = 0; seq[codenum] != input_seq::end_code; codenum++)
 	{
@@ -1477,17 +1353,19 @@ input_seq input_manager::seq_clean(const input_seq &seq) const
 		input_code code = seq[codenum];
 		if (!code.internal() && code_name(code).empty())
 		{
-			while (clean_index > 0 && seq[clean_index - 1].internal())
+			while (clean_index > 0 && clean_codes[clean_index - 1].internal())
+			{
+				clean_codes.backspace();
 				clean_index--;
+			}
 		}
-		else if (clean_index > 0 || !code.internal())
+		else if (clean_index > 0 || !code.internal() || code == input_seq::not_code)
+		{
+			clean_codes += code;
 			clean_index++;
+		}
 	}
-
-	input_seq cleaned_seq;
-	for (int i = 0; i < clean_index; i++)
-		cleaned_seq += seq[i];
-	return cleaned_seq;
+	return clean_codes;
 }
 
 
@@ -1503,7 +1381,7 @@ std::string input_manager::seq_name(const input_seq &seq) const
 
 	// special case: empty
 	if (cleaned_seq[0] == input_seq::end_code)
-		return std::string((seq.length() == 0) ? "None" : "n/a");
+		return std::string(seq.empty() ? "None" : "n/a");
 
 	// start with an empty buffer
 	std::string str;

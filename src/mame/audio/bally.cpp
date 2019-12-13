@@ -597,7 +597,6 @@ TIMER_CALLBACK_MEMBER(bally_squawk_n_talk_device::sound_int_sync)
 void bally_squawk_n_talk_device::squawk_n_talk_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x007f).ram();  // internal RAM, could also be jumpered to use a 6808
 	map(0x0080, 0x0083).mirror(0x4f6c).rw("pia2", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0090, 0x0093).mirror(0x4f6c).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1000, 0x1000).mirror(0x40ff).w("dac", FUNC(dac_byte_interface::data_w));
@@ -612,7 +611,7 @@ void bally_squawk_n_talk_device::squawk_n_talk_map(address_map &map)
 //-------------------------------------------------
 void bally_squawk_n_talk_device::device_add_mconfig(machine_config &config)
 {
-	M6802(config, m_cpu, DERIVED_CLOCK(1, 1));
+	M6802(config, m_cpu, DERIVED_CLOCK(1, 1)); // could also be jumpered to use a 6808
 	m_cpu->set_addrmap(AS_PROGRAM, &bally_squawk_n_talk_device::squawk_n_talk_map);
 
 	PIA6821(config, m_pia1, 0);

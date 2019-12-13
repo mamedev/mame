@@ -28,8 +28,8 @@ namespace devices
 		NETLIB_RESETI() {}
 
 	public:
-		nl_double vdd() { return m_vdd(); }
-		nl_double vss() { return m_vss(); }
+		nl_fptype vdd() { return m_vdd(); }
+		nl_fptype vss() { return m_vss(); }
 
 		analog_input_t m_vdd;
 		analog_input_t m_vss;

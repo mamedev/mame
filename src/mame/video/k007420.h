@@ -8,16 +8,16 @@
 #include "emupal.h"
 
 
-typedef device_delegate<void (int *code, int *color)> k007420_delegate;
-
 class k007420_device : public device_t
 {
 public:
+	using sprite_delegate = device_delegate<void (int *code, int *color)>;
+
 	k007420_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 	void set_bank_limit(int limit) { m_banklimit = limit; }
-	template <typename... T> void set_sprite_callback(T &&... args) { m_callback = k007420_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_sprite_callback(T &&... args) { m_callback.set(std::forward<T>(args)...); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -35,7 +35,7 @@ private:
 	uint8_t        m_regs[8];   // current code uses the 7342 regs!! (only [2])
 	required_device<palette_device> m_palette;
 	int                m_banklimit;
-	k007420_delegate m_callback;
+	sprite_delegate m_callback;
 };
 
 DECLARE_DEVICE_TYPE(K007420, k007420_device)

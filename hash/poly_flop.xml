@@ -10,7 +10,7 @@
 		<sharedfeat name="compatibility" value="PROTEUS" />
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="622592">
-				<rom name="cpm1-noskew.cpm" size="622592" crc="a96ef84a" sha1="fbddd9a8a0c97f7903a3c7c0586e48eea30f1cb3" offset="0"/>
+				<rom name="cpm1-noskew.cpm" size="622592" crc="a96ef84a" sha1="fbddd9a8a0c97f7903a3c7c0586e48eea30f1cb3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -22,7 +22,7 @@
 		<sharedfeat name="compatibility" value="PROTEUS" />
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="591360">
-				<rom name="flex.dsk" size="591360" crc="502feea7" sha1="9449239ff70840446fdd010cf1036daaaf9c644e" offset="0"/>
+				<rom name="flex.dsk" size="591360" crc="502feea7" sha1="9449239ff70840446fdd010cf1036daaaf9c644e"/>
 			</dataarea>
 		</part>
 	</software>

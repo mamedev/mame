@@ -2615,15 +2615,14 @@ void ymf262_update_one(void *_chip, OPL3SAMPLE **buffers, int length)
 	signed int *chanout = chip->chanout;
 	uint8_t       rhythm = chip->rhythm&0x20;
 
-	OPL3SAMPLE  *ch_a = buffers[0];
-	OPL3SAMPLE  *ch_b = buffers[1];
-	OPL3SAMPLE  *ch_c = buffers[2];
-	OPL3SAMPLE  *ch_d = buffers[3];
+	OPL3SAMPLE  *ch_a = buffers[0]; // DO2 (mixed) left output for OPL4
+	OPL3SAMPLE  *ch_b = buffers[1]; // DO2 (mixed) right output for OPL4
+	OPL3SAMPLE  *ch_c = buffers[2]; // DO0 (FM only) left output for OPL4
+	OPL3SAMPLE  *ch_d = buffers[3]; // DO0 (FM only) right output for OPL4
 
 	for( i=0; i < length ; i++ )
 	{
 		int a,b,c,d;
-
 
 		advance_lfo(chip);
 

@@ -143,6 +143,7 @@ Core Performance Options
 | :ref:`[no]refreshspeed <mame-commandline-norefreshspeed>`
 | :ref:`numprocessors <mame-commandline-numprocessors>`
 | :ref:`bench <mame-commandline-bench>`
+| :ref:`lowlatency <mame-commandline-lowlatency>`
 
 
 Core Rotation Options

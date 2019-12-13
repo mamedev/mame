@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+// thanks-to:rfka01
 #ifndef MAME_BUS_DMV_K220_H
 #define MAME_BUS_DMV_K220_H
 
@@ -44,7 +45,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_out1);
 	DECLARE_WRITE_LINE_MEMBER(write_out2);
 
-	required_device<dmvcart_slot_device> m_bus;
 	required_device<pit8253_device> m_pit;
 	required_device<i8255_device> m_ppi;
 	required_memory_region m_ram;

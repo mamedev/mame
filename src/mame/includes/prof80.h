@@ -40,7 +40,7 @@ public:
 		, m_fdc(*this, UPD765_TAG)
 		, m_ram(*this, RAM_TAG)
 		, m_floppy(*this, UPD765_TAG":%u", 0U)
-		, m_ecb(*this, ECBBUS_TAG)
+		, m_ecb(*this, "ecbbus")
 		, m_rs232a(*this, "rs232a")
 		, m_rs232b(*this, "rs232b")
 		, m_flra(*this, "z44")

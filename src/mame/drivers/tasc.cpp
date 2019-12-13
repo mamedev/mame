@@ -10,13 +10,14 @@ on PC, however the prototype Gideon 2.1(internally: Rebel 2.01) is not.
 
 R30 hardware notes:
 - ARM6 CPU(P60ARM/CG) @ 30MHz
-- 256KB ROM, 512KB program RAM, 128KB permanent RAM
+- 256KB system ROM (2*27C010)
+- 512KB program RAM (4*MT5C1008), 128KB permanent RAM (KM681000ALP-7L)
 - Toshiba LCD drivers (3*T7778A, T7900, T6963C), TC5565AFL-15
 - SB20 or SB30 "Smartboard" chessboard with piece recognition
 
 R40 hardware notes:
 - ARM6 CPU(VY86C061PSTC) @ 40MHz
-- +512KB extra RAM
+- +512KB extra RAM piggybacked
 - rest same as R30
 
 Documentation for the Toshiba chips is hard to find, but similar chips exist:
@@ -40,6 +41,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/arm/arm.h"
+#include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "machine/smartboard.h"
 #include "machine/timer.h"
@@ -87,6 +89,7 @@ private:
 	output_finder<2> m_out_leds;
 
 	void main_map(address_map &map);
+	void nvram_map(address_map &map);
 
 	bool m_bootrom_enabled;
 	uint32_t m_mux;
@@ -170,7 +173,13 @@ void tasc_state::main_map(address_map &map)
 	map(0x00000000, 0x0000000b).r(FUNC(tasc_state::bootrom_r));
 	map(0x01000000, 0x01000003).rw(FUNC(tasc_state::p1000_r), FUNC(tasc_state::p1000_w));
 	map(0x02000000, 0x0203ffff).rom().region("maincpu", 0);
-	map(0x03000000, 0x0307ffff).ram().share("nvram").umask32(0x000000ff);
+	map(0x03000000, 0x0307ffff).m("nvram_map", FUNC(address_map_bank_device::amap8)).umask32(0x000000ff);
+}
+
+void tasc_state::nvram_map(address_map &map)
+{
+	// nvram is 8-bit (128KB)
+	map(0x00000, 0x1ffff).ram().share("nvram");
 }
 
 
@@ -217,7 +226,8 @@ void tasc_state::tasc(machine_config &config)
 
 	TIMER(config, "disable_bootrom").configure_generic(FUNC(tasc_state::disable_bootrom));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	ADDRESS_MAP_BANK(config, "nvram_map").set_map(&tasc_state::nvram_map).set_options(ENDIANNESS_LITTLE, 8, 17);
 
 	LM24014H(config, m_lcd, 0);
 	m_lcd->set_fs(1); // font size 6x8
@@ -246,7 +256,7 @@ void tasc_state::tasc(machine_config &config)
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(bios))
 
 ROM_START( tascr30 )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION32_LE( 0x40000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS("v25")
 	ROM_SYSTEM_BIOS( 0, "v21", "System V0.31, Gideon 2.1" ) // 3-May-93, 3-Feb-93 (prototype, later released in 2012)
 	ROM_SYSTEM_BIOS( 1, "v22", "System V0.31, The King 2.20" ) // 3-May-93, 23-Apr-93

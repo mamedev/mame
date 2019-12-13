@@ -42,6 +42,9 @@ function str_to_version(str)
 	end
 	local cnt = 10000
 	for word in string.gmatch(str, '([^.]+)') do
+		if(tonumber(word) == nil) then
+			return val
+		end
 		val = val + tonumber(word) * cnt
 		cnt = cnt / 100
 	end
@@ -90,16 +93,10 @@ end
 function addprojectflags()
 	local version = str_to_version(_OPTIONS["gcc_version"])
 	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "gcc") then
-		if version >= 50100 then
-			buildoptions_cpp {
-				"-Wsuggest-override",
-			}
-		end
-		if version >= 60000 then
-			buildoptions_cpp {
-				"-flifetime-dse=1",
-			}
-		end
+		buildoptions_cpp {
+			"-Wsuggest-override",
+			"-flifetime-dse=1",
+		}
 	end
 end
 
@@ -769,22 +766,18 @@ end
 local version = str_to_version(_OPTIONS["gcc_version"])
 if string.find(_OPTIONS["gcc"], "clang") and ((version < 30500) or (_OPTIONS["targetos"]=="macosx" and (version <= 60000))) then
 	buildoptions_cpp {
-		"-x c++",
 		"-std=c++1y",
 	}
 
 	buildoptions_objcpp {
-		"-x objective-c++",
 		"-std=c++1y",
 	}
 else
 	buildoptions_cpp {
-		"-x c++",
 		"-std=c++14",
 	}
 
 	buildoptions_objcpp {
-		"-x objective-c++",
 		"-std=c++14",
 	}
 end
@@ -914,6 +907,7 @@ end
 configuration { "mingw-clang" }
 	buildoptions {
 		"-Xclang -flto-visibility-public-std", -- workround for __imp___ link errors
+		"-Wno-nonportable-include-path", -- workround for clang 9.0.0 case sensitivity bug when including GL/glext.h
 	}
 configuration {  }
 
@@ -1178,7 +1172,6 @@ configuration { "asmjs" }
 		"-s USE_SDL_TTF=2",
 	}
 	buildoptions_cpp {
-		"-x c++",
 		"-std=c++14",
 	}
 	linkoptions {
@@ -1194,7 +1187,6 @@ configuration { "android*" }
 		"-Wno-incompatible-ms-struct",
 	}
 	buildoptions_cpp {
-		"-x c++",
 		"-std=c++14",
 		"-Wno-extern-c-compat",
 		"-Wno-tautological-constant-out-of-range-compare",
@@ -1213,7 +1205,6 @@ configuration { "pnacl" }
 		"-Wno-inline-new-delete",
 	}
 	buildoptions_cpp {
-		"-x c++",
 		"-std=c++14",
 	}
 	archivesplit_size "20"
@@ -1443,6 +1434,29 @@ if _OPTIONS["vs"]=="intel-15" then
 		}
 end
 
+if _OPTIONS["vs"]=="clangcl" then
+		buildoptions {
+			"-Wno-enum-conversion",
+			"-Wno-ignored-qualifiers",
+			"-Wno-missing-braces",
+			"-Wno-missing-field-initializers",
+			"-Wno-new-returns-null",
+			"-Wno-nonportable-include-path",
+			"-Wno-pointer-bool-conversion",
+			"-Wno-pragma-pack",
+			"-Wno-switch",
+			"-Wno-tautological-constant-out-of-range-compare",
+			"-Wno-tautological-pointer-compare",
+			"-Wno-unknown-warning-option",
+			"-Wno-unused-const-variable",
+			"-Wno-unused-function",
+			"-Wno-unused-label",
+			"-Wno-unused-local-typedef",
+			"-Wno-unused-private-field",
+			"-Wno-unused-variable",
+		}
+end
+
 		linkoptions {
 			"/ignore:4221", -- LNK4221: This object file does not define any previously undefined public symbols, so it will not be used by any link operation that consumes this library
 		}
@@ -1497,25 +1511,21 @@ configuration { "vsllvm" }
 		}
 
 
--- adding this till we sort out asserts in debug mode
-configuration { "Debug", "gmake" }
-	buildoptions_cpp {
-		"-Wno-terminate",
-	}
-
 configuration { }
 
 if (_OPTIONS["SOURCES"] ~= nil) then
 	local str = _OPTIONS["SOURCES"]
+	local sourceargs = ""
 	for word in string.gmatch(str, '([^,]+)') do
-		if (not os.isfile(path.join(MAME_DIR ,word))) then
+		if (not os.isfile(path.join(MAME_DIR, word))) then
 			print("File " .. word.. " does not exist")
 			os.exit()
 		end
+		sourceargs = sourceargs .. " " .. word
 	end
-	OUT_STR = os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " target " .. _OPTIONS["subtarget"])
+	OUT_STR = os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py sourcesproject -r " .. MAME_DIR .. " -t " .. _OPTIONS["subtarget"] .. sourceargs )
 	load(OUT_STR)()
-	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " drivers " .. _OPTIONS["subtarget"] .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"]..".flt")
+	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py sourcesfilter" .. sourceargs .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"] .. ".flt" )
 end
 
 group "libs"

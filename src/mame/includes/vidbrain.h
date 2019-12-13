@@ -27,7 +27,7 @@ public:
 		m_smi(*this, F3853_TAG),
 		m_uv(*this, UV201_TAG),
 		m_dac(*this, "dac"),
-		m_exp(*this, VIDEOBRAIN_EXPANSION_SLOT_TAG),
+		m_exp(*this, "exp"),
 		m_io(*this, "IO%02u", 0),
 		m_uv201_31(*this, "UV201-31"),
 		m_joy_r(*this, "JOY-R"),

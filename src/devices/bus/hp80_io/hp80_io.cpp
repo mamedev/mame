@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(HP80_IO_SLOT, hp80_io_slot_device, "hp80_io_slot", "HP80 I/O 
 // +-------------------+
 hp80_io_slot_device::hp80_io_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, HP80_IO_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_hp80_io_interface>(mconfig, *this),
 	m_irl_cb_func(*this),
 	m_halt_cb_func(*this),
 	m_slot_no(0)
@@ -54,7 +54,7 @@ WRITE_LINE_MEMBER(hp80_io_slot_device::halt_w)
 
 void hp80_io_slot_device::inten()
 {
-	hp80_io_card_device *card = downcast<hp80_io_card_device*>(get_card_device());
+	device_hp80_io_interface *card = get_card_device();
 
 	if (card != nullptr) {
 		card->inten();
@@ -63,7 +63,7 @@ void hp80_io_slot_device::inten()
 
 void hp80_io_slot_device::clear_service()
 {
-	hp80_io_card_device *card = downcast<hp80_io_card_device*>(get_card_device());
+	device_hp80_io_interface *card = get_card_device();
 
 	if (card != nullptr) {
 		card->clear_service();
@@ -72,7 +72,7 @@ void hp80_io_slot_device::clear_service()
 
 void hp80_io_slot_device::install_read_write_handlers(address_space& space)
 {
-	hp80_io_card_device *card = downcast<hp80_io_card_device*>(get_card_device());
+	device_hp80_io_interface *card = get_card_device();
 
 	if (card != nullptr) {
 		card->install_read_write_handlers(space , get_base_addr());
@@ -81,7 +81,7 @@ void hp80_io_slot_device::install_read_write_handlers(address_space& space)
 
 uint8_t hp80_io_slot_device::get_sc() const
 {
-	const hp80_io_card_device *card = downcast<hp80_io_card_device*>(get_card_device());
+	const device_hp80_io_interface *card = get_card_device();
 
 	if (card != nullptr) {
 		return card->get_sc();
@@ -92,7 +92,7 @@ uint8_t hp80_io_slot_device::get_sc() const
 
 uint16_t hp80_io_slot_device::get_base_addr() const
 {
-	const hp80_io_card_device *card = downcast<hp80_io_card_device*>(get_card_device());
+	const device_hp80_io_interface *card = get_card_device();
 
 	if (card != nullptr) {
 		uint16_t addr = ((uint16_t)(card->get_sc() - HP80_IO_FIRST_SC) << 1) | 0xff50;
@@ -102,44 +102,43 @@ uint16_t hp80_io_slot_device::get_base_addr() const
 	}
 }
 
-// +-------------------+
-// |hp80_io_card_device|
-// +-------------------+
-uint8_t hp80_io_card_device::get_sc() const
+// +------------------------+
+// |device_hp80_io_interface|
+// +------------------------+
+uint8_t device_hp80_io_interface::get_sc() const
 {
 	return m_select_code_port->read() + HP80_IO_FIRST_SC;
 }
 
-void hp80_io_card_device::inten()
+void device_hp80_io_interface::inten()
 {
 }
 
-void hp80_io_card_device::clear_service()
+void device_hp80_io_interface::clear_service()
 {
 }
 
-hp80_io_card_device::hp80_io_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock),
-	device_slot_card_interface(mconfig, *this),
+device_hp80_io_interface::device_hp80_io_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "hp80io"),
 	m_select_code_port(*this , "SC")
 {
 }
 
-hp80_io_card_device::~hp80_io_card_device()
+device_hp80_io_interface::~device_hp80_io_interface()
 {
 }
 
-WRITE_LINE_MEMBER(hp80_io_card_device::irl_w)
+WRITE_LINE_MEMBER(device_hp80_io_interface::irl_w)
 {
-	LOG("irl_w card=%d\n" , state);
-	hp80_io_slot_device *slot = downcast<hp80_io_slot_device *>(owner());
+	if (VERBOSE & LOG_GENERAL) device().logerror("irl_w card=%d\n" , state);
+	hp80_io_slot_device *slot = downcast<hp80_io_slot_device *>(device().owner());
 	slot->irl_w(state);
 }
 
-WRITE_LINE_MEMBER(hp80_io_card_device::halt_w)
+WRITE_LINE_MEMBER(device_hp80_io_interface::halt_w)
 {
-	LOG("halt_w card=%d\n" , state);
-	hp80_io_slot_device *slot = downcast<hp80_io_slot_device *>(owner());
+	if (VERBOSE & LOG_GENERAL) device().logerror("halt_w card=%d\n" , state);
+	hp80_io_slot_device *slot = downcast<hp80_io_slot_device *>(device().owner());
 	slot->halt_w(state);
 }
 

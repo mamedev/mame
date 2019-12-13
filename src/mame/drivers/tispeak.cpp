@@ -1328,7 +1328,7 @@ void tispeak_state::sns_cd2801(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snspell", "vsm");
-	m_cart->set_device_load(FUNC(tispeak_state::cart_load), this);
+	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("snspell");
 }
@@ -1379,7 +1379,7 @@ void tispeak_state::snread(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snread", "vsm");
-	m_cart->set_device_load(FUNC(tispeak_state::cart_load), this);
+	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("snread");
 }
@@ -1398,7 +1398,7 @@ void tispeak_state::lantutor(machine_config &config)
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "lantutor", "vsm,bin");
 	m_cart->set_must_be_loaded(true);
-	m_cart->set_device_load(FUNC(tispeak_state::cart_load), this);
+	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("lantutor");
 }
@@ -1423,7 +1423,7 @@ void tispeak_state::snspellc(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snspell", "vsm");
-	m_cart->set_device_load(FUNC(tispeak_state::cart_load), this);
+	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("snspell");
 }
@@ -1463,7 +1463,7 @@ void tispeak_state::tntell(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "tntell", "vsm");
-	m_cart->set_device_load(FUNC(tispeak_state::cart_load), this);
+	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("tntell");
 }
@@ -1488,7 +1488,7 @@ void tispeak_state::k28m2(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "k28m2", "vsm");
-	m_cart->set_device_load(FUNC(tispeak_state::cart_load), this);
+	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("k28m2");
 }

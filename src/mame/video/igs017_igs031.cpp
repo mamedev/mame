@@ -66,6 +66,7 @@ igs017_igs031_device::igs017_igs031_device(const machine_config &mconfig, const 
 	, device_gfx_interface(mconfig, *this, gfxinfo, "palette")
 	, device_video_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)
+	, m_palette_scramble_cb(*this, FUNC(igs017_igs031_device::palette_callback_straight))
 	, m_space_config("igs017_igs031", ENDIANNESS_BIG, 8,15, 0, address_map_constructor(FUNC(igs017_igs031_device::map), this))
 	, m_spriteram(*this, "spriteram", 0)
 	, m_fg_videoram(*this, "fg_videoram", 0)
@@ -73,9 +74,8 @@ igs017_igs031_device::igs017_igs031_device(const machine_config &mconfig, const 
 	, m_palram(*this, "palram", 0)
 	, m_i8255(*this, finder_base::DUMMY_TAG)
 	, m_palette(*this, "palette")
+	, m_revbits(false)
 {
-	m_palette_scramble_cb = igs017_igs031_palette_scramble_delegate(FUNC(igs017_igs031_device::palette_callback_straight), this);
-	m_revbits = false;
 }
 
 device_memory_interface::space_config_vector igs017_igs031_device::memory_space_config() const
@@ -97,10 +97,10 @@ void igs017_igs031_device::device_add_mconfig(machine_config &config)
 
 void igs017_igs031_device::device_start()
 {
-	m_palette_scramble_cb.bind_relative_to(*owner());
+	m_palette_scramble_cb.resolve();
 
-	m_fg_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(igs017_igs031_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 64,32);
-	m_bg_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(igs017_igs031_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 64,32);
+	m_fg_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(igs017_igs031_device::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
+	m_bg_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(igs017_igs031_device::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
 
 	m_fg_tilemap->set_transparent_pen(0xf);
 	m_bg_tilemap->set_transparent_pen(0xf);

@@ -88,8 +88,8 @@ const uint8_t i8086_cpu_device::m_i8086_timing[] =
 
 /***************************************************************************/
 
-DEFINE_DEVICE_TYPE(I8086, i8086_cpu_device, "i8086", "Intel I8086")
-DEFINE_DEVICE_TYPE(I8088, i8088_cpu_device, "i8088", "Intel I8088")
+DEFINE_DEVICE_TYPE(I8086, i8086_cpu_device, "i8086", "Intel 8086")
+DEFINE_DEVICE_TYPE(I8088, i8088_cpu_device, "i8088", "Intel 8088")
 
 i8088_cpu_device::i8088_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i8086_cpu_device(mconfig, I8088, tag, owner, clock, 8)
@@ -2156,7 +2156,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 
 		case 0xf0: // i_lock
 		case 0xf1: // 0xf1 is 0xf0; verified on real CPU
-			logerror("%06x: Warning - BUSLOCK\n", m_pc);
+			//logerror("%06x: Warning - BUSLOCK\n", m_pc); // Why warn for using lock instruction?
 			m_lock = true;
 			m_no_interrupt = 1;
 			CLK(NOP);
@@ -2531,6 +2531,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 					CLKM(PUSH_R16,PUSH_M16);
 					break;
 				default:
+					m_icount -= 10;
 					logerror("%06x: FF Pre with unimplemented mod\n", m_pc);
 					break;
 				}

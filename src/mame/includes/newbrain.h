@@ -100,7 +100,7 @@ private:
 	int get_reset_t();
 	int get_pwrup_t();
 
-	void screen_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void do_screen_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void tvl(uint8_t data, int a6);
 
 	required_device<z80_device> m_maincpu;

@@ -66,7 +66,7 @@ TODO:
 
 - Sets cpoker & cpokert spit 660K of whatever they have in the hopper when keyout...
 - Check if the cpoker sets still lock at some point due to protection.
-- Fix lamps to cpoker101. 
+- Fix lamps to cpoker101.
 
 *****************************************************************************/
 
@@ -243,8 +243,8 @@ WRITE8_MEMBER(igspoker_state::fg_color_w)
 
 void igspoker_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igspoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8,  64, 32);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igspoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  32, 64, 8);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igspoker_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS,   8,  8,  64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igspoker_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,   8,  32, 64, 8);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }
@@ -263,7 +263,7 @@ uint32_t igspoker_state::screen_update_igs_video(screen_device &screen, bitmap_i
 
 VIDEO_START_MEMBER(igspoker_state,cpokerpk)
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igspoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8,  64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igspoker_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS,   8,  8,  64, 32);
 }
 
 uint32_t igspoker_state::screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -2215,10 +2215,10 @@ void igspoker_state::init_cpoker101()  // same decryption as cpokert
 
 /*  Patch to avoid traps at $0ec5 (cpoker101),
     $0ef0 (cpoker201f), $0f20 (cpoker210ks) and
-	$206e (cpoker101, cpoker201f & cpoker210ks),
+    $206e (cpoker101, cpoker201f & cpoker210ks),
     that run subs in RAM, operate registers,
     and finally lock the game at $732e (cpoker101),
-	$72c2 (cpoker201f) & $72c6 (cpoker210ks).
+    $72c2 (cpoker201f) & $72c6 (cpoker210ks).
 
     All these are triggered if RAM contents of $ff18
     matches the $ff19 (normally 0x20 due to an AND

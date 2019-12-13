@@ -637,9 +637,9 @@ void ppking_state::ppking_cpu3_map(address_map &map)
 
 void ppking_state::ppking_cpu1_io(address_map &map)
 {
-//  ADDRESS_MAP_GLOBAL_MASK(0xff)
+//  map.global_mask(0xff);
 	map(0xc000, 0xc007).w("mainlatch", FUNC(ls259_device::write_d0));
-//  map(0xc004, 0xc004) AM_NOP // WRITE(ppking_irq_patch_w)
+//  map(0xc004, 0xc004).noprw(); //.w(FUNC(ppking_state::ppking_irq_patch_w));
 	map(0xc09e, 0xc09f).r(FUNC(ppking_state::ppking_qx0_r)).w(FUNC(ppking_state::ppking_qx0_w));
 	map(0xc0bf, 0xc0bf).noprw(); // watchdog
 	map(0xc0c0, 0xc0c1).r(FUNC(ppking_state::ppking_qxcomu_r)).w(FUNC(ppking_state::ppking_qxcomu_w));
@@ -954,7 +954,7 @@ void ppking_state::ppking(machine_config &config)
 	MC6809(config, m_audiocpu, 12_MHz_XTAL/4);  /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ppking_state::ppking_cpu3_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MCFG_MACHINE_RESET_OVERRIDE(ppking_state, ppking)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -1056,7 +1056,7 @@ void gladiatr_state::gladiatr(machine_config &config)
 	m_csnd->t1_in_cb().set(FUNC(gladiatr_state::csnd_t1_r));
 
 	/* lazy way to make polled serial between MCUs work */
-	config.m_perfect_cpu_quantum = subtag("ucpu");
+	config.set_perfect_quantum(m_ucpu);
 
 	CLOCK(config, "tclk", 12_MHz_XTAL/8/128/2) /* verified on pcb */
 		.signal_handler().set(FUNC(gladiatr_state::tclk_w));

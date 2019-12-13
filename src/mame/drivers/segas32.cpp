@@ -558,16 +558,17 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 DEFINE_DEVICE_TYPE(SEGA_S32_PCB, segas32_state, "segas32_pcb", "Sega System 32 PCB")
 
 segas32_state::segas32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_S32_PCB, tag, owner, clock)
+	: segas32_state(mconfig, SEGA_S32_PCB, tag, owner, clock, false)
 {
 }
 
-segas32_state::segas32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+segas32_state::segas32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_multi32)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_z80_shared_ram(*this,"z80_shared_ram")
 	, m_system32_workram(*this,"workram")
 	, m_videoram(*this,"videoram", 0)
 	, m_spriteram(*this,"spriteram", 0)
+	, m_soundram(*this, "soundram")
 	, m_paletteram(*this,"paletteram.%u", 0, uint8_t(0))
 	, m_maincpu(*this, "maincpu")
 	, m_soundcpu(*this, "soundcpu")
@@ -583,7 +584,26 @@ segas32_state::segas32_state(const machine_config &mconfig, device_type type, co
 	, m_soundrom_bank(*this, "soundbank")
 	, m_multipcm_bank_hi(*this, "multipcmbankhi")
 	, m_multipcm_bank_lo(*this, "multipcmbanklo")
+	, m_is_multi32(is_multi32)
+	, m_sound_irq_input(0)
+	, m_sound_dummy_value(0)
+	, m_sound_bank(0)
+	, m_system32_tilebank_external(0)
+	, m_sprite_render_count(0)
+	, m_print_count(0)
+	, m_vblank_end_int_timer(nullptr)
+	, m_update_sprites_timer(nullptr)
 {
+	std::fill(std::begin(m_v60_irq_control), std::end(m_v60_irq_control), 0);
+	std::fill(std::begin(m_v60_irq_timer), std::end(m_v60_irq_timer), nullptr);
+	std::fill(std::begin(m_sound_irq_control), std::end(m_sound_irq_control), 0);
+	std::fill(std::begin(m_system32_displayenable), std::end(m_system32_displayenable), 0);
+	std::fill(std::begin(m_arescue_dsp_io), std::end(m_arescue_dsp_io), 0);
+	std::fill(std::begin(m_sprite_control_latched), std::end(m_sprite_control_latched), 0);
+	std::fill(std::begin(m_sprite_control), std::end(m_sprite_control), 0);
+
+	for (int i = 0; i < 2; i++)
+		std::fill(std::begin(m_mixer_control[i]), std::end(m_mixer_control[i]), 0);
 }
 
 
@@ -618,47 +638,22 @@ segas32_state::segas32_state(const machine_config &mconfig, device_type type, co
  *
  *************************************/
 
-void segas32_state::device_start()
-{
-	common_start(0);
-}
-
-void segas32_trackball_state::device_start()
-{
-	common_start(0);
-}
-
 void segas32_v25_state::device_start()
 {
-	common_start(0);
+	segas32_4player_state::device_start();
 	decrypt_protrom();
-}
-
-void segas32_upd7725_state::device_start()
-{
-	common_start(0);
 }
 
 void segas32_cd_state::device_start()
 {
-	common_start(0);
+	segas32_state::device_start();
 	m_lamps.resolve();
-}
-
-void sega_multi32_state::device_start()
-{
-	common_start(1);
 }
 
 void sega_multi32_analog_state::device_start()
 {
-	common_start(1);
+	sega_multi32_state::device_start();
 	m_analog_bank = 0;
-}
-
-void sega_multi32_6player_state::device_start()
-{
-	common_start(1);
 }
 
 void segas32_state::device_reset()
@@ -1242,7 +1237,7 @@ void segas32_state::system32_sound_portmap(address_map &map)
 void segas32_state::rf5c68_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).ram();
+	map(0x0000, 0xffff).ram().share("soundram");
 }
 
 
@@ -2371,7 +2366,7 @@ void segas32_state::device_add_mconfig(machine_config &config)
 DEFINE_DEVICE_TYPE(SEGA_S32_REGULAR_DEVICE, segas32_regular_state, "segas32_pcb_regular", "Sega System 32 regular PCB")
 
 segas32_regular_state::segas32_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_S32_REGULAR_DEVICE, tag, owner, clock)
+	: segas32_state(mconfig, SEGA_S32_REGULAR_DEVICE, tag, owner, clock, false)
 {
 }
 
@@ -2407,7 +2402,7 @@ segas32_analog_state::segas32_analog_state(const machine_config &mconfig, const 
 }
 
 segas32_analog_state::segas32_analog_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, type, tag, owner, clock)
+	: segas32_state(mconfig, type, tag, owner, clock, false)
 {
 }
 
@@ -2419,7 +2414,7 @@ void segas32_trackball_state::system32_trackball_map(address_map &map)
 {
 	map.unmap_value_high();
 	system32_map(map);
-	//AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_READWRITE8(sonic_custom_io_r, sonic_custom_io_w, 0x00ff)
+	//map(0xc00040, 0xc0005f).mirror(0x0fff80).rw(FUNC(segas32_trackball_state::sonic_custom_io_r), FUNC(segas32_trackball_state::sonic_custom_io_w)).umask16(0x00ff);
 	map(0xc00040, 0xc00047).mirror(0x0fff80).rw("upd1", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy_w)).umask16(0x00ff);
 	map(0xc00048, 0xc0004f).mirror(0x0fff80).rw("upd2", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy_w)).umask16(0x00ff);
 	map(0xc00050, 0xc00057).mirror(0x0fff80).rw("upd3", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy_w)).umask16(0x00ff);
@@ -2449,7 +2444,7 @@ void segas32_trackball_state::device_add_mconfig(machine_config &config)
 DEFINE_DEVICE_TYPE(SEGA_S32_TRACKBALL_DEVICE, segas32_trackball_state, "segas32_pcb_trackball", "Sega System 32 trackball PCB")
 
 segas32_trackball_state::segas32_trackball_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_S32_TRACKBALL_DEVICE, tag, owner, clock)
+	: segas32_state(mconfig, SEGA_S32_TRACKBALL_DEVICE, tag, owner, clock, false)
 {
 }
 
@@ -2484,7 +2479,7 @@ segas32_4player_state::segas32_4player_state(const machine_config &mconfig, cons
 }
 
 segas32_4player_state::segas32_4player_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, type, tag, owner, clock)
+	: segas32_state(mconfig, type, tag, owner, clock, false)
 {
 }
 
@@ -2605,7 +2600,7 @@ void segas32_cd_state::device_add_mconfig(machine_config &config)
 	scsi.set_slot_device(1, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 	scsi.slot(1).set_option_machine_config("cdrom", cdrom_config);
 
-	cxd1095_device &cxdio(CXD1095(config, "cxdio", 0));
+	cxd1095_device &cxdio(CXD1095(config, "cxdio"));
 	cxdio.out_porta_cb().set(FUNC(segas32_cd_state::lamps1_w));
 	cxdio.out_portb_cb().set(FUNC(segas32_cd_state::lamps2_w));
 	cxdio.in_portd_cb().set_constant(0xff); // Ports C-E used for IEEE-488 printer interface
@@ -2614,7 +2609,7 @@ void segas32_cd_state::device_add_mconfig(machine_config &config)
 DEFINE_DEVICE_TYPE(SEGA_S32_CD_DEVICE, segas32_cd_state, "segas32_pcb_cd", "Sega System 32 CD PCB")
 
 segas32_cd_state::segas32_cd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_S32_CD_DEVICE, tag, owner, clock)
+	: segas32_state(mconfig, SEGA_S32_CD_DEVICE, tag, owner, clock, false)
 	, m_lamps(*this, "lamp%u", 0U)
 {
 }
@@ -2705,7 +2700,7 @@ sega_multi32_state::sega_multi32_state(const machine_config &mconfig, const char
 }
 
 sega_multi32_state::sega_multi32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, type, tag, owner, clock)
+	: segas32_state(mconfig, type, tag, owner, clock, true)
 {
 }
 
@@ -2752,6 +2747,7 @@ DEFINE_DEVICE_TYPE(SEGA_MULTI32_ANALOG_DEVICE, sega_multi32_analog_state, "segas
 sega_multi32_analog_state::sega_multi32_analog_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sega_multi32_state(mconfig, SEGA_MULTI32_ANALOG_DEVICE, tag, owner, clock)
 	, m_analog_ports(*this, "ANALOG%u", 1)
+	, m_analog_bank(0)
 {
 }
 
@@ -3050,8 +3046,10 @@ ROM_START( arescue )
 
 	ROM_REGION( 0x20000, "mainpcb:dsp", 0 ) /* NEC uPD77P25 DSP Internal ROM */ // ONLY PRESENT ON ONE PCB STACK
 	ROM_LOAD( "d7725.01", 0x000000, 0x002800, CRC(a7ec5644) SHA1(e9b05c70b639ee289e557dfd9a6c724b36338e2b) )
-	ROM_REGION(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
-	ROM_REGION(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_REGION32_BE(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x0000, 0x0000, 0x2000 )
+	ROM_REGION16_BE(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x2000, 0x0000, 0x0800 )
 
 	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x4( "epr-14542.ic13",     0x000000, 0x020000, CRC(6d39fc18) SHA1(7fbddfb2605a020331e1e81a7bc4466196df17bd) ) /* 834-8526-05 (Export) */
@@ -3126,8 +3124,10 @@ ROM_START( arescueu )
 
 	ROM_REGION( 0x20000, "mainpcb:dsp", 0 ) /* NEC uPD77P25 DSP Internal ROM */ // ONLY PRESENT ON ONE PCB STACK
 	ROM_LOAD( "d7725.01", 0x000000, 0x002800, CRC(a7ec5644) SHA1(e9b05c70b639ee289e557dfd9a6c724b36338e2b) )
-	ROM_REGION(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
-	ROM_REGION(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_REGION32_BE(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x0000, 0x0000, 0x2000 )
+	ROM_REGION16_BE(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x2000, 0x0000, 0x0800 )
 
 	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x4( "epr-14540.ic13",     0x000000, 0x020000, CRC(c2b4e5d0) SHA1(69f8ddded5095df9012663d0ded61b78f1692a8d) )
@@ -3202,8 +3202,10 @@ ROM_START( arescuej )
 
 	ROM_REGION( 0x20000, "mainpcb:dsp", 0 ) /* NEC uPD77P25 DSP Internal ROM */ // ONLY PRESENT ON ONE PCB STACK
 	ROM_LOAD( "d7725.01", 0x000000, 0x002800, CRC(a7ec5644) SHA1(e9b05c70b639ee289e557dfd9a6c724b36338e2b) )
-	ROM_REGION(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
-	ROM_REGION(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_REGION32_BE(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x0000, 0x0000, 0x2000 )
+	ROM_REGION16_BE(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x2000, 0x0000, 0x0800 )
 
 	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x4( "epr-14515.ic13",     0x000000, 0x020000, CRC(fb5eefbd) SHA1(f2739ad2e168843fe992d7fb546ffd859fa6c17a) )
@@ -3574,6 +3576,11 @@ ROM_END
 /**************************************************************************************************************************
     Dark Edge (Japan)
     protected via FD1149 317-0204
+
+    Sega Game ID codes:
+       Game BD: 833-9230 DARK EDGE
+    ROM PCB No: 834-9231
+     A/D BD NO. 837-7968
 */
 ROM_START( darkedgej )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
@@ -5422,6 +5429,7 @@ void segas32_state::segas32_common_init()
 	uint8_t *Z80 = memregion("soundcpu")->base();
 	uint32_t size = memregion("soundcpu")->bytes();
 	m_soundrom_bank->configure_entries(0, size / 0x2000, &Z80[0], 0x2000);
+
 	/* reset the custom handlers and other pointers */
 	m_system32_prot_vblank = nullptr;
 	m_sw1_output = nullptr;
@@ -5667,11 +5675,11 @@ void segas32_new_state::init_arescue()
 	m_slavepcb->init_arescue(0);
 
 	m_dual_pcb_comms = std::make_unique<uint16_t[]>(0x1000/2);
-	m_mainpcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
-	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_masterslave),this));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)), write16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_masterslave)));
 
-	m_slavepcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
-	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_slave),this));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)), write16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_slave)));
 }
 
 void segas32_new_state::init_f1en() {
@@ -5681,11 +5689,11 @@ void segas32_new_state::init_f1en() {
 	m_dual_pcb_comms = std::make_unique<uint16_t[]>(0x1000/2);
 	memset(m_dual_pcb_comms.get(), 0xff, 0x1000 / 2);
 
-	m_mainpcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
-	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_masterslave),this));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)), write16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_masterslave)));
 
-	m_slavepcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
-	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_slave),this));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)), write16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_slave)));
 }
 
 void segas32_new_state::init_f1lap()
@@ -5698,7 +5706,7 @@ void segas32_new_state::init_f1lapt()
 	m_mainpcb->init_f1lapt();
 }
 
-void segas32_state::init_alien3(void)
+void segas32_state::init_alien3()
 {
 	segas32_common_init();
 	m_sw1_output = &segas32_state::alien3_sw1_output;
@@ -5707,73 +5715,53 @@ void segas32_state::init_alien3(void)
 void segas32_state::init_arescue(int m_hasdsp)
 {
 	segas32_common_init();
-	if (m_hasdsp) m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa00007, read16_delegate(FUNC(segas32_state::arescue_dsp_r),this), write16_delegate(FUNC(segas32_state::arescue_dsp_w),this));
+	if (m_hasdsp) m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa00007, read16_delegate(*this, FUNC(segas32_state::arescue_dsp_r)), write16_delegate(*this, FUNC(segas32_state::arescue_dsp_w)));
 
 	for (auto & elem : m_arescue_dsp_io)
 		elem = 0x00;
 
-	if (m_hasdsp)
-	{
-		// massages the data from the BPMicro-compatible dump to runnable form
-		uint8_t *dspsrc = (uint8_t *)memregion("dsp")->base();
-		uint32_t *dspprg = (uint32_t *)memregion("dspprg")->base();
-		uint16_t *dspdata = (uint16_t *)memregion("dspdata")->base();
-
-		// copy DSP program
-		for (int i = 0; i < 0x2000; i+= 4)
-		{
-			*dspprg = dspsrc[0+i]<<24 | dspsrc[1+i]<<16 | dspsrc[2+i]<<8;
-			dspprg++;
-		}
-
-		// copy DSP data
-		for (int i = 0; i < 0x800; i+= 2)
-		{
-			*dspdata++ = dspsrc[0x2000+i]<<8 | dspsrc[0x2001+i];
-		}
-	}
 	m_sw1_output = &segas32_state::arescue_sw1_output;
 }
 
 
-void segas32_state::init_arabfgt(void)
+void segas32_state::init_arabfgt()
 {
 	segas32_common_init();
 }
 
 
-void segas32_state::init_brival(void)
+void segas32_state::init_brival()
 {
 	segas32_common_init();
 
 	/* install protection handlers */
 	m_system32_protram = std::make_unique<uint16_t[]>(0x1000/2);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20ba00, 0x20ba07, read16_delegate(FUNC(segas32_state::brival_protection_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00000, 0xa00fff, write16_delegate(FUNC(segas32_state::brival_protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20ba00, 0x20ba07, read16_delegate(*this, FUNC(segas32_state::brival_protection_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00000, 0xa00fff, write16_delegate(*this, FUNC(segas32_state::brival_protection_w)));
 }
 
 
-void segas32_state::init_darkedge(void)
+void segas32_state::init_darkedge()
 {
 	segas32_common_init();
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa7ffff, read16_delegate(FUNC(segas32_state::darkedge_protection_r),this), write16_delegate(FUNC(segas32_state::darkedge_protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa7ffff, read16_delegate(*this, FUNC(segas32_state::darkedge_protection_r)), write16_delegate(*this, FUNC(segas32_state::darkedge_protection_w)));
 	m_system32_prot_vblank = &segas32_state::darkedge_fd1149_vblank;
 }
 
 
-void segas32_state::init_dbzvrvs(void)
+void segas32_state::init_dbzvrvs()
 {
 	segas32_common_init();
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa7ffff, read16_delegate(FUNC(segas32_state::dbzvrvs_protection_r),this), write16_delegate(FUNC(segas32_state::dbzvrvs_protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa7ffff, read16_delegate(*this, FUNC(segas32_state::dbzvrvs_protection_r)), write16_delegate(*this, FUNC(segas32_state::dbzvrvs_protection_w)));
 	// 0x810000 to 0x8107ff = link RAM? probably not a dual cabinet, though...
 }
 
 
-void segas32_state::init_f1en(void)
+void segas32_state::init_f1en()
 {
 	segas32_common_init();
 
@@ -5782,7 +5770,7 @@ void segas32_state::init_f1en(void)
 }
 
 
-void segas32_state::init_f1lap(void)
+void segas32_state::init_f1lap()
 {
 	segas32_common_init();
 	m_system32_prot_vblank = &segas32_state::f1lap_fd1149_vblank;
@@ -5793,7 +5781,7 @@ void segas32_state::init_f1lap(void)
 }
 
 
-void segas32_state::init_f1lapt(void)
+void segas32_state::init_f1lapt()
 {
 	segas32_common_init();
 
@@ -5803,13 +5791,13 @@ void segas32_state::init_f1lapt(void)
 }
 
 
-void segas32_state::init_ga2(void)
+void segas32_state::init_ga2()
 {
 	segas32_common_init();
 }
 
 
-void segas32_state::init_harddunk(void)
+void segas32_state::init_harddunk()
 {
 	segas32_common_init();
 	m_sw1_output = &segas32_state::harddunk_sw1_output;
@@ -5818,13 +5806,13 @@ void segas32_state::init_harddunk(void)
 }
 
 
-void segas32_state::init_holo(void)
+void segas32_state::init_holo()
 {
 	segas32_common_init();
 }
 
 
-void segas32_state::init_jpark(void)
+void segas32_state::init_jpark()
 {
 	/* Temp. Patch until we emulate the 'Drive Board', thanks to Malice */
 	uint16_t *pROM = (uint16_t *)m_maincpu_region->base();
@@ -5838,7 +5826,7 @@ void segas32_state::init_jpark(void)
 }
 
 
-void segas32_state::init_orunners(void)
+void segas32_state::init_orunners()
 {
 	segas32_common_init();
 	m_sw1_output = &segas32_state::orunners_sw1_output;
@@ -5848,7 +5836,7 @@ void segas32_state::init_orunners(void)
 }
 
 
-void segas32_state::init_radm(void)
+void segas32_state::init_radm()
 {
 	segas32_common_init();
 	m_sw1_output = &segas32_state::radm_sw1_output;
@@ -5856,7 +5844,7 @@ void segas32_state::init_radm(void)
 }
 
 
-void segas32_state::init_radr(void)
+void segas32_state::init_radr()
 {
 	segas32_common_init();
 	m_sw1_output = &segas32_state::radm_sw1_output;
@@ -5866,10 +5854,10 @@ void segas32_state::init_radr(void)
 }
 
 
-void segas32_state::init_scross(void)
+void segas32_state::init_scross()
 {
 	segas32_common_init();
-	m_soundcpu->space(AS_PROGRAM).install_write_handler(0xb0, 0xbf, write8_delegate(FUNC(segas32_state::scross_bank_w),this));
+	m_soundcpu->space(AS_PROGRAM).install_write_handler(0xb0, 0xbf, write8_delegate(*this, FUNC(segas32_state::scross_bank_w)));
 
 	m_sw1_output = &segas32_state::scross_sw1_output;
 	m_sw2_output = &segas32_state::scross_sw2_output;
@@ -5878,47 +5866,47 @@ void segas32_state::init_scross(void)
 }
 
 
-void segas32_state::init_slipstrm(void)
+void segas32_state::init_slipstrm()
 {
 	segas32_common_init();
 }
 
 
-void segas32_state::init_sonic(void)
+void segas32_state::init_sonic()
 {
 	segas32_common_init();
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20E5C4, 0x20E5C5, write16_delegate(FUNC(segas32_state::sonic_level_load_protection),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20E5C4, 0x20E5C5, write16_delegate(*this, FUNC(segas32_state::sonic_level_load_protection)));
 }
 
 
-void segas32_state::init_sonicp(void)
+void segas32_state::init_sonicp()
 {
 	segas32_common_init();
 }
 
 
-void segas32_state::init_spidman(void)
+void segas32_state::init_spidman()
 {
 	segas32_common_init();
 }
 
 
-void segas32_state::init_svf(void)
+void segas32_state::init_svf()
 {
 	segas32_common_init();
 }
 
 
-void segas32_state::init_jleague(void)
+void segas32_state::init_jleague()
 {
 	segas32_common_init();
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20F700, 0x20F705, write16_delegate(FUNC(segas32_state::jleague_protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20F700, 0x20F705, write16_delegate(*this, FUNC(segas32_state::jleague_protection_w)));
 }
 
 
-void segas32_state::init_titlef(void)
+void segas32_state::init_titlef()
 {
 	segas32_common_init();
 	m_sw1_output = &segas32_state::titlef_sw1_output;

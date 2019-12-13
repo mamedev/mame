@@ -46,8 +46,8 @@ WRITE16_MEMBER(pass_state::pass_fg_videoram_w)
 
 void pass_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pass_state::get_pass_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8,  64, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pass_state::get_pass_fg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 4, 128, 64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pass_state::get_pass_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8,  64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pass_state::get_pass_fg_tile_info)), TILEMAP_SCAN_ROWS, 4, 4, 128, 64);
 
 	m_fg_tilemap->set_transparent_pen(255);
 }

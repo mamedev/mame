@@ -132,8 +132,8 @@ WRITE8_MEMBER(cabaret_state::fg_color_w)
 
 void cabaret_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cabaret_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,    8,  32, 64, 8);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cabaret_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,    8,  8,  64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cabaret_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,    8,  32, 64, 8);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cabaret_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS,    8,  8,  64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_cols(64);
 }
@@ -369,7 +369,7 @@ INTERRUPT_GEN_MEMBER(cabaret_state::cabaret_interrupt)
 void cabaret_state::cabaret(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'000'000) / 2);
+	Z80180(config, m_maincpu, XTAL(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &cabaret_state::cabaret_map);
 	m_maincpu->set_addrmap(AS_IO, &cabaret_state::cabaret_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(cabaret_state::cabaret_interrupt));

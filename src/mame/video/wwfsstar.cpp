@@ -204,10 +204,10 @@ void wwfsstar_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 void wwfsstar_state::video_start()
 {
-	m_fg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wwfsstar_state::get_fg0_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	m_fg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wwfsstar_state::get_fg0_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg0_tilemap->set_transparent_pen(0);
 
-	m_bg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wwfsstar_state::get_bg0_tile_info),this),tilemap_mapper_delegate(FUNC(wwfsstar_state::bg0_scan),this), 16, 16,32,32);
+	m_bg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wwfsstar_state::get_bg0_tile_info)), tilemap_mapper_delegate(*this, FUNC(wwfsstar_state::bg0_scan)), 16, 16, 32, 32);
 	m_fg0_tilemap->set_transparent_pen(0);
 
 	save_item(NAME(m_vblank));

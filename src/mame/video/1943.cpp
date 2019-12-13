@@ -195,9 +195,9 @@ TILE_GET_INFO_MEMBER(_1943_state::get_fg_tile_info)
 
 void _1943_state::video_start()
 {
-	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(_1943_state::get_bg2_tile_info),this), TILEMAP_SCAN_COLS, 32, 32, 2048, 8);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(_1943_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 32, 32, 2048, 8);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(_1943_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(_1943_state::get_bg2_tile_info)), TILEMAP_SCAN_COLS, 32, 32, 2048, 8);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(_1943_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 32, 32, 2048, 8);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(_1943_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(1), 0x0f);
 	m_fg_tilemap->set_transparent_pen(0);

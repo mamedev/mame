@@ -12,12 +12,12 @@
     It supports alphablend with programmable factors per channel and for source and dest
     color.
 
-	TODO:
-	- Dither Mode;
-	- Draw select to Front buffer is untested, speculatively gonna be used for raster 
-	  effects;
-	- screen_update doesn't honor CRT Display Start registers,
-	  so far only psattack changes it on-the-fly, for unknown reasons;
+    TODO:
+    - Dither Mode;
+    - Draw select to Front buffer is untested, speculatively gonna be used for raster
+      effects;
+    - screen_update doesn't honor CRT Display Start registers,
+      so far only psattack changes it on-the-fly, for unknown reasons;
 
 *****************************************************************************************/
 
@@ -177,7 +177,7 @@ void vr0video_device::device_reset()
 {
 	memset(m_InternalPalette, 0, sizeof(m_InternalPalette));
 	m_LastPalUpdate = 0xffffffff;
-	
+
 	m_DisplayDest = m_DrawDest = m_frameram;
 }
 
@@ -551,7 +551,7 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr)
 	if (Packet0 & 0x800)
 	{
 		m_RenderState.SrcAlphaColor = Packet[17] | ((Packet[18] & 0xff) << 16);
-		m_RenderState.SrcBlend = (Packet[18] >> 8)	& 0x3f;
+		m_RenderState.SrcBlend = (Packet[18] >> 8)  & 0x3f;
 		m_RenderState.DstAlphaColor = Packet[19] | ((Packet[20] & 0xff) << 16);
 		m_RenderState.DstBlend = (Packet[20] >> 8) & 0x3f;
 	}
@@ -655,7 +655,7 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr)
 				Quad.Pal = m_InternalPalette + (m_RenderState.PaletteBank * 16);
 			else
 				Quad.Pal = m_InternalPalette;
-				
+
 			if (m_RenderState.TextureMode)   //Tiled
 				DrawTile[m_RenderState.PixelFormat + 4 * Mode](&Quad);
 			else

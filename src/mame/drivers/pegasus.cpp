@@ -199,10 +199,10 @@ READ8_MEMBER( pegasus_state::pegasus_protection_r )
 void pegasus_state::pegasus_mem(address_map &map)
 {
 	map.unmap_value_high();
-	//AM_RANGE(0x0000, 0x2fff)      // mapped by the cartslots 1-3
+	//map(0x0000, 0x2fff)      // mapped by the cartslots 1-3
 	map(0xb000, 0xbdff).ram();
 	map(0xbe00, 0xbfff).ram().share("videoram");
-	//AM_RANGE(0xc000, 0xdfff)      // mapped by the cartslots 4-5
+	//map(0xc000, 0xdfff)      // mapped by the cartslots 4-5
 	map(0xe000, 0xe1ff).r(FUNC(pegasus_state::pegasus_protection_r));
 	map(0xe200, 0xe3ff).rw(FUNC(pegasus_state::pegasus_pcg_r), FUNC(pegasus_state::pegasus_pcg_w));
 	map(0xe400, 0xe403).mirror(0x1fc).rw(m_pia_u, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -462,15 +462,15 @@ image_init_result pegasus_state::load_cart(device_image_interface &image, generi
 void pegasus_state::machine_start()
 {
 	if (m_exp_00->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_00));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8sm_delegate(*m_exp_00, FUNC(generic_slot_device::read_rom)));
 	if (m_exp_01->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_01));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8sm_delegate(*m_exp_01, FUNC(generic_slot_device::read_rom)));
 	if (m_exp_02->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x2fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_02));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x2fff, read8sm_delegate(*m_exp_02, FUNC(generic_slot_device::read_rom)));
 	if (m_exp_0c->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xcfff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_0c));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xcfff, read8sm_delegate(*m_exp_0c, FUNC(generic_slot_device::read_rom)));
 	if (m_exp_0d->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xd000, 0xdfff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_0d));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xd000, 0xdfff, read8sm_delegate(*m_exp_0d, FUNC(generic_slot_device::read_rom)));
 }
 
 void pegasus_state::machine_reset()
@@ -525,11 +525,11 @@ void pegasus_state::pegasus(machine_config &config)
 	m_pia_u->irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 	m_pia_u->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	GENERIC_SOCKET(config, "exp00", generic_plain_slot, "pegasus_cart").set_device_load(FUNC(pegasus_state::exp00_load), this);
-	GENERIC_SOCKET(config, "exp01", generic_plain_slot, "pegasus_cart").set_device_load(FUNC(pegasus_state::exp01_load), this);
-	GENERIC_SOCKET(config, "exp02", generic_plain_slot, "pegasus_cart").set_device_load(FUNC(pegasus_state::exp02_load), this);
-	GENERIC_SOCKET(config, "exp0c", generic_plain_slot, "pegasus_cart").set_device_load(FUNC(pegasus_state::exp0c_load), this);
-	GENERIC_SOCKET(config, "exp0d", generic_plain_slot, "pegasus_cart").set_device_load(FUNC(pegasus_state::exp0d_load), this);
+	GENERIC_SOCKET(config, "exp00", generic_plain_slot, "pegasus_cart").set_device_load(FUNC(pegasus_state::exp00_load));
+	GENERIC_SOCKET(config, "exp01", generic_plain_slot, "pegasus_cart").set_device_load(FUNC(pegasus_state::exp01_load));
+	GENERIC_SOCKET(config, "exp02", generic_plain_slot, "pegasus_cart").set_device_load(FUNC(pegasus_state::exp02_load));
+	GENERIC_SOCKET(config, "exp0c", generic_plain_slot, "pegasus_cart").set_device_load(FUNC(pegasus_state::exp0c_load));
+	GENERIC_SOCKET(config, "exp0d", generic_plain_slot, "pegasus_cart").set_device_load(FUNC(pegasus_state::exp0d_load));
 
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED|CASSETTE_MOTOR_ENABLED);

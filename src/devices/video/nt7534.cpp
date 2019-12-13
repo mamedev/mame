@@ -2,7 +2,7 @@
 // copyright-holders:Felipe Sanches, Sandro Ronco
 /***************************************************************************
 
-        NT7534 LCD controller
+        Novatek NT7534 LCD controller
 
         TODO:
         - determine video timings and busy flag duration
@@ -34,6 +34,7 @@ nt7534_device::nt7534_device(const machine_config &mconfig, const char *tag, dev
 
 nt7534_device::nt7534_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, m_pixel_update_cb(*this)
 {
 }
 
@@ -44,6 +45,8 @@ nt7534_device::nt7534_device(const machine_config &mconfig, device_type type, co
 void nt7534_device::device_start()
 {
 	m_busy_timer = timer_alloc(TIMER_BUSY);
+
+	m_pixel_update_cb.resolve();
 
 	// state saving
 	save_item(NAME(m_busy_flag));

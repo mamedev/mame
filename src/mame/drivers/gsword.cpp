@@ -436,7 +436,7 @@ void gsword_state::init_gsword()
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8_delegate(FUNC(gsword_state::hack_r),this));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8_delegate(*this, FUNC(gsword_state::hack_r)));
 #endif
 }
 
@@ -451,7 +451,7 @@ void gsword_state::init_gsword2()
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8_delegate(FUNC(gsword_state::hack_r),this));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8_delegate(*this, FUNC(gsword_state::hack_r)));
 #endif
 }
 
@@ -641,7 +641,7 @@ void josvolly_state::josvolly_cpu2_map(address_map &map)
 	/* NEC D8255A with silkscreen removed and replaced with "AA 007" */
 	map(0x8000, 0x8003).rw("aa_007", FUNC(i8255_device::read), FUNC(i8255_device::write));
 
-//  map(0x6000, 0x6000) AM_WRITE(adpcm_soundcommand_w)
+//  map(0x6000, 0x6000).w(FUNC(josvolly_state::adpcm_soundcommand_w));
 	map(0xA000, 0xA001).rw("mcu2", FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
 }
 
@@ -917,34 +917,34 @@ GFXDECODE_END
 void gsword_state::gsword(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(18'000'000)/6); /* verified on pcb */
+	Z80(config, m_maincpu, XTAL(18'000'000)/6); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &gsword_state::cpu1_map);
 	m_maincpu->set_addrmap(AS_IO, &gsword_state::cpu1_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gsword_state::irq0_line_hold));
 
-	Z80(config, m_subcpu, XTAL(18'000'000)/6);  /* verified on pcb */
+	Z80(config, m_subcpu, XTAL(18'000'000)/6); // verified on PCB
 	m_subcpu->set_addrmap(AS_PROGRAM, &gsword_state::cpu2_map);
 	m_subcpu->set_addrmap(AS_IO, &gsword_state::cpu2_io_map);
 	m_subcpu->set_periodic_int(FUNC(gsword_state::sound_interrupt), attotime::from_hz(4*60));
 
-	Z80(config, m_audiocpu, XTAL(18'000'000)/6);    /* verified on pcb */
+	Z80(config, m_audiocpu, XTAL(18'000'000)/6); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gsword_state::cpu3_map);
 
-	upi41_cpu_device &mcu1(I8041A(config, "mcu1", 12'000'000/2));        // clock unknown, using value from gladiatr
+	upi41_cpu_device &mcu1(I8041A(config, "mcu1", XTAL(12'000'000)/2)); // verified on PCB
 	mcu1.p1_in_cb().set([this] () { return ioport("MCU1.P1")->read() | BIT(m_mcu2_p1, 0); });
 	mcu1.p1_out_cb().set([this] (uint8_t data) { m_mcu1_p1 = data; });
 	mcu1.p2_in_cb().set_ioport("DSW2");
 	mcu1.t0_in_cb().set([this] () { return m_tclk_val ? 1 : 0; });      // serial clock
 	mcu1.t1_in_cb().set([this] () { return BIT(m_mcu2_p1, 1); });       // from P11 on other MCU
 
-	upi41_cpu_device &mcu2(I8041A(config, "mcu2", 12'000'000/2));        // clock unknown, using value from gladiatr
+	upi41_cpu_device &mcu2(I8041A(config, "mcu2", XTAL(12'000'000)/2)); // verified on PCB
 	mcu2.p1_in_cb().set(FUNC(gsword_state::mcu2_p1_r));
 	mcu2.p1_out_cb().set([this] (uint8_t data) { m_mcu2_p1 = data; });
 	mcu2.p2_in_cb().set_ioport("DSW1");
 	mcu2.t0_in_cb().set([this] () { return m_tclk_val ? 1 : 0; });      // serial clock
 	mcu2.t1_in_cb().set([this] () { return BIT(m_mcu1_p1, 1); });       // from P11 on other MCU
 
-	upi41_cpu_device &mcu3(I8041A(config, "mcu3", 12'000'000/2));        // clock unknown, using value from gladiatr
+	upi41_cpu_device &mcu3(I8041A(config, "mcu3", XTAL(12'000'000)/2)); // verified on PCB
 	mcu3.p1_in_cb().set_ioport("IN0");
 	mcu3.p2_in_cb().set_ioport("IN1");
 	mcu3.p2_out_cb().set(FUNC(gsword_state::mcu3_p2_w));
@@ -955,7 +955,7 @@ void gsword_state::gsword(machine_config &config)
 	CLOCK(config, "tclk", 12'000'000/8/128/2).signal_handler().set([this] (int state) { m_tclk_val = state != 0; });
 
 	// lazy way to ensure communication works
-	config.m_perfect_cpu_quantum = subtag("mcu1");
+	config.set_perfect_quantum("mcu1");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -980,7 +980,7 @@ void gsword_state::gsword(machine_config &config)
 	m_ay1->port_a_write_callback().set(FUNC(gsword_state::nmi_set_w));
 	m_ay1->add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	msm5205_device &msm(MSM5205(config, "msm", XTAL(400'000))); /* verified on pcb */
+	msm5205_device &msm(MSM5205(config, "msm", XTAL(400'000))); // verified on PCB
 	msm.set_prescaler_selector(msm5205_device::SEX_4B);  /* vclk input mode    */
 	msm.add_route(ALL_OUTPUTS, "mono", 0.60);
 }
@@ -1019,7 +1019,7 @@ void josvolly_state::josvolly(machine_config &config)
 	ppi.in_pc_callback().set_ioport("IN0");   // START
 
 	// the second MCU polls the first MCU's outputs, so it needs tight sync
-	config.m_perfect_cpu_quantum = subtag("mcu2");
+	config.set_perfect_quantum("mcu2");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

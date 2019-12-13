@@ -191,11 +191,11 @@ void cosmicos_state::cosmicos_mem(address_map &map)
 
 void cosmicos_state::cosmicos_io(address_map &map)
 {
-//  AM_RANGE(0x00, 0x00)
+//  map(0x00, 0x00)
 	map(0x01, 0x01).r(FUNC(cosmicos_state::video_on_r));
 	map(0x02, 0x02).rw(FUNC(cosmicos_state::video_off_r), FUNC(cosmicos_state::audio_latch_w));
-//  AM_RANGE(0x03, 0x03)
-//  AM_RANGE(0x04, 0x04)
+//  map(0x03, 0x03)
+//  map(0x04, 0x04)
 	map(0x05, 0x05).rw(FUNC(cosmicos_state::hex_keyboard_r), FUNC(cosmicos_state::hex_keylatch_w));
 	map(0x06, 0x06).rw(FUNC(cosmicos_state::reset_counter_r), FUNC(cosmicos_state::segment_w));
 	map(0x07, 0x07).rw(FUNC(cosmicos_state::data_r), FUNC(cosmicos_state::display_w));
@@ -549,7 +549,7 @@ void cosmicos_state::cosmicos(machine_config &config)
 	m_cti->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(cosmicos_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(cosmicos_state::quickload_cb));
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);

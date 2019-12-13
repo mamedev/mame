@@ -37,6 +37,7 @@ simple_menu_select_game::simple_menu_select_game(mame_ui_manager &mui, render_co
 	: menu(mui, container)
 	, m_error(false), m_rerandomize(false)
 	, m_search()
+	, m_skip_main_items(0)
 	, m_driverlist(driver_list::total() + 1)
 	, m_drivlist()
 	, m_cached_driver(nullptr)
@@ -275,7 +276,7 @@ void simple_menu_select_game::populate(float &customtop, float &custombottom)
 	{
 		item_append(menu_item_type::SEPARATOR);
 		item_append(_("Configure Options"), "", 0, (void *)1);
-		skip_main_items = 1;
+		m_skip_main_items = 1;
 	}
 
 	// configure the custom rendering
@@ -307,7 +308,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 			ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 
 	// determine the text to render below
-	driver = ((uintptr_t)selectedref > skip_main_items) ? (const game_driver *)selectedref : nullptr;
+	driver = ((uintptr_t)selectedref > m_skip_main_items) ? (const game_driver *)selectedref : nullptr;
 	if (driver)
 	{
 		// first line is game name

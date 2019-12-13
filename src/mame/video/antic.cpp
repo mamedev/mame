@@ -377,8 +377,7 @@ void antic_device::device_start()
 	LOG("atari prio_init\n");
 	prio_init();
 
-	for (int i = 0; i < screen().height(); i++)
-		m_video[i] = auto_alloc_clear(machine(), <VIDEO>());
+	m_video = make_unique_clear<VIDEO[]>(screen().height());
 
 	/* save states */
 	save_pointer(NAME((uint8_t *) &m_r), sizeof(m_r));
@@ -1572,7 +1571,7 @@ inline void antic_device::mode_gtia3(address_space &space, VIDEO *video, int byt
 
 void antic_device::render(address_space &space, int param1, int param2, int param3)
 {
-	VIDEO *video = m_video[m_scanline];
+	VIDEO *video = &m_video[m_scanline];
 	int add_bytes = 0, erase = 0;
 
 	if (param3 == 0 || param2 <= 1)

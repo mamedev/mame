@@ -278,7 +278,7 @@ TILE_GET_INFO_MEMBER( mgames_state::tile_info )
 
 void mgames_state::machine_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mgames_state::tile_info), this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mgames_state::tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_lamps.resolve();
 }
@@ -535,7 +535,7 @@ WRITE8_MEMBER(mgames_state::outport7_w)
 void mgames_state::main_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
-//  AM_RANGE(0x0158, 0x0158) AM_WRITE (muxed_w)
+//  map(0x0158, 0x0158).w(FUNC(mgames_state::muxed_w));
 	map(0x3800, 0x38ff).ram().share("nvram");   /* NVRAM = 2x SCM5101E */
 	map(0x4000, 0x47ff).ram().share("video");   /* 4x MM2114N-3 */
 	map(0x8000, 0x8000).portr("SW1");

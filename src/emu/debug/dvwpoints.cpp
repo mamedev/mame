@@ -113,7 +113,7 @@ debug_view_watchpoints::debug_view_watchpoints(running_machine &machine, debug_v
 {
 	// fail if no available sources
 	enumerate_sources();
-	if (m_source_list.count() == 0)
+	if (m_source_list.empty())
 		throw std::bad_alloc();
 }
 
@@ -135,18 +135,20 @@ debug_view_watchpoints::~debug_view_watchpoints()
 void debug_view_watchpoints::enumerate_sources()
 {
 	// start with an empty list
-	m_source_list.reset();
+	m_source_list.clear();
 
 	// iterate over devices with disassembly interfaces
 	for (device_disasm_interface &dasm : disasm_interface_iterator(machine().root_device()))
 	{
-		std::string name;
-		name = string_format("%s '%s'", dasm.device().name(), dasm.device().tag());
-		m_source_list.append(*global_alloc(debug_view_source(name.c_str(), &dasm.device())));
+		m_source_list.emplace_back(
+				std::make_unique<debug_view_source>(
+					util::string_format("%s '%s'", dasm.device().name(), dasm.device().tag()),
+					&dasm.device()));
 	}
 
 	// reset the source to a known good entry
-	set_source(*m_source_list.first());
+	if (!m_source_list.empty())
+		set_source(*m_source_list[0]);
 }
 
 
@@ -208,10 +210,10 @@ void debug_view_watchpoints::pad_ostream_to_length(std::ostream& str, int len)
 void debug_view_watchpoints::gather_watchpoints()
 {
 	m_buffer.resize(0);
-	for (const debug_view_source &source : m_source_list)
+	for (auto &source : m_source_list)
 	{
 		// Collect
-		device_debug &debugInterface = *source.device()->debug();
+		device_debug &debugInterface = *source->device()->debug();
 		for (int spacenum = 0; spacenum < debugInterface.watchpoint_space_count(); ++spacenum)
 		{
 			for (const auto &wp : debugInterface.watchpoint_vector(spacenum))

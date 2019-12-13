@@ -26,7 +26,6 @@
 #include "emu.h"
 #include "includes/s11b.h"
 
-#include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
@@ -313,6 +312,7 @@ void s11b_state::s11b(machine_config &config)
 
 	/* Add the soundcard */
 	M6802(config, m_audiocpu, XTAL(4'000'000));
+	m_audiocpu->set_ram_enable(false);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &s11b_state::s11b_audio_map);
 
 	SPEAKER(config, "speaker").front_center();
@@ -336,7 +336,7 @@ void s11b_state::s11b(machine_config &config)
 	/* Add the background music card */
 	MC6809E(config, m_bgcpu, XTAL(8'000'000) / 4); // MC68B09E
 	m_bgcpu->set_addrmap(AS_PROGRAM, &s11b_state::s11b_bg_map);
-	config.m_minimum_quantum = attotime::from_hz(50);
+	config.set_maximum_quantum(attotime::from_hz(50));
 
 	SPEAKER(config, "bg").front_center();
 	YM2151(config, m_ym, 3580000);

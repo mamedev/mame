@@ -42,15 +42,14 @@
 ************************************************************
 
     The device has active high(!) SO strobes triggered by
-    read accesses, which transfer data from the the 8 SI
-    lines to the bus. Logically SO0-7 and SI0-7 ought to
-    be hooked up to the same input matrix, but this only
-    appears to be the case with the Astrocade home systems.
-    The arcade games instead channel the SI inputs through
-    a quartet of MC14539B (pin-compatible with 74153) CMOS
-    multiplexers and connect the SO strobes to unrelated
-    outputs which generally use the upper 8 address bits
-    as data.
+    read accesses, which transfer data from the 8 SI lines
+    to the bus. Logically SO0-7 and SI0-7 ought to be hooked
+    up to the same input matrix, but this only appears to be
+    the case with the Astrocade home systems.  The arcade
+    games instead channel the SI inputs through a quartet of
+    MC14539B (pin-compatible with 74153) CMOS multiplexers
+    and connect the SO strobes to unrelated outputs which
+    generally use the upper 8 address bits as data.
 
 ***********************************************************/
 

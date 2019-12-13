@@ -36,7 +36,7 @@
 
     P2U
     ===
-    For paging via port 0x78A, a 16K RAM card with RAM at 0x0000 and 0x3fff and the banking logic (see above) is added to the the standard 48K memory card.
+    For paging via port 0x78A, a 16K RAM card with RAM at 0x0000 and 0x3fff and the banking logic (see above) is added to the standard 48K memory card.
     P2S, P2U: 2x 320K, double sided, 40 tracks, 16 sectors/track, 256 bytes/sector floppy disk drives
 
     P3, P4
@@ -308,13 +308,13 @@ void alphatp_34_state::alphatp3_map(address_map &map)
 void alphatp_34_state::alphatp3_io(address_map &map)
 {
 	map.unmap_value_high();
-	//AM_RANGE(0x00, 0x00) AM_READ // unknown
+	//map(0x00, 0x00).r(FUNC(alphatp_34_state::)); // unknown
 	map(0x04, 0x05).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x08, 0x09).rw(FUNC(alphatp_34_state::comm88_r), FUNC(alphatp_34_state::comm88_w));
 	map(0x10, 0x11).rw(m_kbdmcu, FUNC(i8041a_device::upi41_master_r), FUNC(i8041a_device::upi41_master_w));
 	map(0x12, 0x12).w(FUNC(alphatp_34_state::beep_w));
 	map(0x40, 0x41).r(FUNC(alphatp_34_state::start88_r));
-	//AM_RANGE(0x42, 0x42) AM_WRITE // unknown
+	//map(0x42, 0x42).w(FUNC(alphatp_34_state::)); // unknown
 	map(0x50, 0x53).rw(FUNC(alphatp_34_state::fdc_r), FUNC(alphatp_34_state::fdc_w));
 	map(0x54, 0x54).rw(FUNC(alphatp_34_state::fdc_stat_r), FUNC(alphatp_34_state::fdc_cmd_w));
 	map(0x78, 0x78).w(FUNC(alphatp_34_state::bank_w));
@@ -329,11 +329,11 @@ void alphatp_34_state::alphatp30_8088_map(address_map &map)
 
 void alphatp_34_state::alphatp30_8088_io(address_map &map)
 {
-	//AM_RANGE(0x008a, 0x008a) AM_READ // unknown
+	//map(0x008a, 0x008a).r(FUNC(alphatp_34_state::)); // unknown
 	map(0xf800, 0xf800).w(FUNC(alphatp_34_state::gfxext1_w));
 	map(0xf900, 0xf900).w(FUNC(alphatp_34_state::gfxext2_w));
 	map(0xfa00, 0xfa01).w(FUNC(alphatp_34_state::gfxext3_w));
-	//AM_RANGE(0xfb00, 0xfb0f) AM_WRITE // unknown possibly gfx ext
+	//map(0xfb00, 0xfb0f).w(FUNC(alphatp_34_state::)); // unknown possibly gfx ext
 	map(0xffe0, 0xffe1).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xffe4, 0xffe7).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xffe9, 0xffea).rw(FUNC(alphatp_34_state::comm85_r), FUNC(alphatp_34_state::comm85_w));
@@ -1210,7 +1210,7 @@ void alphatp_12_state::alphatp2(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &alphatp_12_state::alphatp2_mem);
 	maincpu.set_addrmap(AS_IO, &alphatp_12_state::alphatp2_io);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum("maincpu");
 
 	I8041A(config, m_kbdmcu, 12.8544_MHz_XTAL / 2);
 	m_kbdmcu->t0_in_cb().set(FUNC(alphatp_12_state::kbd_matrix_r));
@@ -1288,9 +1288,9 @@ void alphatp_34_state::alphatp3(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &alphatp_34_state::alphatp3_mem);
 	maincpu.set_addrmap(AS_IO, &alphatp_34_state::alphatp3_io);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum("maincpu");
 
-	I8041A(config, m_kbdmcu, 12.8544_MHz_XTAL /2);
+	I8041A(config, m_kbdmcu, 12.8544_MHz_XTAL / 2);
 	m_kbdmcu->t0_in_cb().set(FUNC(alphatp_34_state::kbd_matrix_r));
 	m_kbdmcu->p1_out_cb().set(FUNC(alphatp_34_state::kbd_matrix_w));
 	m_kbdmcu->p2_in_cb().set(FUNC(alphatp_34_state::kbd_port2_r));

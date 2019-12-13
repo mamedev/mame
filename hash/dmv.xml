@@ -390,7 +390,7 @@
 		</part>
 	</software>
 
-	<software name="zcom20hd" supported="no"> <!-- MS-DOS --> <!-- missing HDD emulation -->
+	<software name="zcom20hd">
 		<description>Z-Com v2.0 HD</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1282,7 +1282,7 @@
 		</part>
 	</software>
 
-	<software name="dos211hd" supported="no"> <!-- MS-DOS --> <!-- missing HDD emulation -->
+	<software name="dos211hd"> <!-- MS-DOS -->
 		<description>MS-DOS v2.11 HD</description>
 		<year>198?</year>
 		<publisher>Microsoft</publisher>
@@ -1294,7 +1294,7 @@
 		</part>
 	</software>
 
-	<software name="dos211hda" cloneof="dos211hd" supported="no"> <!-- MS-DOS --> <!-- missing HDD emulation -->
+	<software name="dos211hda" cloneof="dos211hd"> <!-- MS-DOS -->
 		<description>MS-DOS v2.11 HD (Alt)</description>
 		<year>198?</year>
 		<publisher>Microsoft</publisher>
@@ -1306,7 +1306,7 @@
 		</part>
 	</software>
 
-	<software name="dos211hdb" cloneof="dos211hd" supported="no"> <!-- MS-DOS --> <!-- missing HDD emulation -->
+	<software name="dos211hdb" cloneof="dos211hd"> <!-- MS-DOS -->
 		<description>MS-DOS v2.11 HD (Alt 2)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1318,7 +1318,7 @@
 		</part>
 	</software>
 
-	<software name="dos211hdc" cloneof="dos211hd" supported="no"> <!-- MS-DOS --> <!-- missing HDD emulation -->
+	<software name="dos211hdc" cloneof="dos211hd"> <!-- MS-DOS -->
 		<description>MS-DOS v2.11 HD (Alt 3)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>

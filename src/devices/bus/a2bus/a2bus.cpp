@@ -94,7 +94,7 @@ a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, const char *
 
 a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<device_a2bus_card_interface>(mconfig, *this)
 	, m_a2bus(*this, finder_base::DUMMY_TAG)
 {
 }
@@ -103,25 +103,15 @@ a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, device_type 
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void a2bus_slot_device::device_validity_check(validity_checker &valid) const
-{
-	device_t *const card(get_card_device());
-	if (card && !dynamic_cast<device_a2bus_card_interface *>(card))
-		osd_printf_error("Card device %s (%s) does not implement device_a2bus_card_interface\n", card->tag(), card->name());
-}
-
 void a2bus_slot_device::device_resolve_objects()
 {
-	device_a2bus_card_interface *const a2bus_card(dynamic_cast<device_a2bus_card_interface *>(get_card_device()));
+	device_a2bus_card_interface *const a2bus_card = get_card_device();
 	if (a2bus_card)
 		a2bus_card->set_a2bus(m_a2bus, tag());
 }
 
 void a2bus_slot_device::device_start()
 {
-	device_t *const card(get_card_device());
-	if (card && !dynamic_cast<device_a2bus_card_interface *>(card))
-		throw emu_fatalerror("a2bus_slot_device: card device %s (%s) does not implement device_a2bus_card_interface\n", card->tag(), card->name());
 }
 
 //**************************************************************************
@@ -280,7 +270,7 @@ WRITE_LINE_MEMBER( a2bus_device::nmi_w ) { m_out_nmi_cb(state); }
 //-------------------------------------------------
 
 device_a2bus_card_interface::device_a2bus_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "a2bus")
 	, m_a2bus_finder(device, finder_base::DUMMY_TAG), m_a2bus(nullptr)
 	, m_a2bus_slottag(nullptr), m_slot(-1), m_next(nullptr)
 {
@@ -303,8 +293,6 @@ void device_a2bus_card_interface::interface_validity_check(validity_checker &val
 
 void device_a2bus_card_interface::interface_pre_start()
 {
-	device_slot_card_interface::interface_pre_start();
-
 	if (!m_a2bus)
 	{
 		m_a2bus = m_a2bus_finder;

@@ -519,7 +519,7 @@ WRITE8_MEMBER( m5_state::mem64KBI_w ) //out 0x6c
 		//if AUTOSTART is on don't load any ROM cart
 		if (m_cart && (m_DIPS->read() & 2) != 2)
 		{
-			program.install_read_handler(0x2000, 0x6fff, read8_delegate(FUNC(m5_cart_slot_device::read_rom), (m5_cart_slot_device*)m_cart)); //m_cart pointer to rom cart
+			program.install_read_handler(0x2000, 0x6fff, read8_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom))); //m_cart pointer to rom cart
 			program.unmap_write(0x2000, 0x3fff);
 		}
 		else
@@ -680,7 +680,7 @@ WRITE8_MEMBER( m5_state::mem64KRX_w ) //out 0x7f
 	//if KRX ROM is paged out page in cart ROM if any
 	if (m_cart && BIT(m_ram_mode, 1) == 0 )
 	{
-		program.install_read_handler(0x2000, 0x6fff, read8_delegate(FUNC(m5_cart_slot_device::read_rom),(m5_cart_slot_device*)m_cart));
+		program.install_read_handler(0x2000, 0x6fff, read8_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
 		program.unmap_write(0x2000, 0x6fff);
 	}
 
@@ -730,7 +730,7 @@ void m5_state::m5_io(address_map &map)
 	map(0x37, 0x37).mirror(0x08).portr("JOY");
 	map(0x40, 0x40).mirror(0x0f).w("cent_data_out", FUNC(output_latch_device::bus_w));
 	map(0x50, 0x50).mirror(0x0f).rw(FUNC(m5_state::sts_r), FUNC(m5_state::com_w));
-//  AM_RANGE(0x60, 0x63) SIO
+//  map(0x60, 0x63) SIO
 	map(0x6c, 0x6c).rw(FUNC(m5_state::mem64KBI_r), FUNC(m5_state::mem64KBI_w)); //EM-64/64KBI paging
 	map(0x70, 0x73) /*.mirror(0x0c) don't know if necessary mirror this*/ .rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x7f, 0x7f).w(FUNC(m5_state::mem64KRX_w)); //64KRD/64KRX paging
@@ -1051,11 +1051,11 @@ void brno_state::brno_io(address_map &map)
 	map(0x37, 0x37).portr("JOY");
 	map(0x40, 0x40).mirror(0x0f).w("cent_data_out", FUNC(output_latch_device::bus_w));
 	map(0x50, 0x50).mirror(0x0f).rw(FUNC(brno_state::sts_r), FUNC(brno_state::com_w));
-//  AM_RANGE(0x60, 0x63)                                                                            //  SIO
+//  map(0x60, 0x63)                                                                            //  SIO
 	map(0x64, 0x67).rw(FUNC(brno_state::mmu_r), FUNC(brno_state::mmu_w));                           //  MMU - page select (ramdisk memory paging)
 	map(0x68, 0x6b).rw(FUNC(brno_state::ramsel_r), FUNC(brno_state::ramsel_w));                     //  CASEN 0=access to ramdisk enabled, 0xff=ramdisk access disabled(data protection), &80=ROM2+48k RAM, &81=ROM2+4k RAM
 	map(0x6c, 0x6f).rw(FUNC(brno_state::romsel_r), FUNC(brno_state::romsel_w));                     //  RAMEN 0=rom enable; 0xff=rom+sord ram disabled (ramdisk visible)
-//  AM_RANGE(0x70, 0x73) AM_MIRROR(0x04) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)     //  PIO
+//  map(0x70, 0x73).mirror(0x04).rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write)); //  PIO
 	map(0x78, 0x7b).rw(m_fdc, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write));     //  WD2797 registers -> 78 - status/cmd, 79 - track #, 7a - sector #, 7b - data
 	map(0x7c, 0x7c).rw(FUNC(brno_state::fd_r), FUNC(brno_state::fd_w));                             //  drive select
 }
@@ -1281,10 +1281,10 @@ void m5_state::machine_reset()
 			case EM_5:
 				program.install_rom(0x0000, 0x1fff, memregion(Z80_TAG)->base());
 				program.unmap_write(0x0000, 0x1fff);
-				program.install_readwrite_handler(0x8000, 0xffff, read8_delegate(FUNC(m5_cart_slot_device::read_ram),(m5_cart_slot_device*)m_cart_ram), write8_delegate(FUNC(m5_cart_slot_device::write_ram),(m5_cart_slot_device*)m_cart_ram));
+				program.install_readwrite_handler(0x8000, 0xffff, read8_delegate(*m_cart_ram, FUNC(m5_cart_slot_device::read_ram)), write8_delegate(*m_cart_ram, FUNC(m5_cart_slot_device::write_ram)));
 				if (m_cart)
 				{
-					program.install_read_handler(0x2000, 0x6fff, read8_delegate(FUNC(m5_cart_slot_device::read_rom),(m5_cart_slot_device*)m_cart));
+					program.install_read_handler(0x2000, 0x6fff, read8_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
 					program.unmap_write(0x2000, 0x6fff);
 				}
 				break;
@@ -1296,7 +1296,7 @@ void m5_state::machine_reset()
 				//if AUTOSTART is on then page out cart and start tape loading
 				if (m_cart && ((m_DIPS->read() & 2) != 2))
 				{
-					program.install_read_handler(0x2000, 0x3fff, read8_delegate(FUNC(m5_cart_slot_device::read_rom),(m5_cart_slot_device*)m_cart));
+					program.install_read_handler(0x2000, 0x3fff, read8_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
 					program.unmap_write(0x2000, 0x3fff);
 				}
 				else
@@ -1342,7 +1342,7 @@ void m5_state::machine_reset()
 		{
 			program.install_rom(0x0000, 0x1fff, memregion(Z80_TAG)->base());
 			program.unmap_write(0x0000, 0x1fff);
-			program.install_read_handler(0x2000, 0x6fff, read8_delegate(FUNC(m5_cart_slot_device::read_rom),(m5_cart_slot_device*)m_cart));
+			program.install_read_handler(0x2000, 0x6fff, read8_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
 			program.unmap_write(0x2000, 0x6fff);
 		}
 	m_ram_mode=0;
@@ -1381,7 +1381,7 @@ void brno_state::machine_reset()
 
 	if (m_cart)
 		{
-			program.install_read_handler(0x2000, 0x6fff, read8_delegate(FUNC(m5_cart_slot_device::read_rom),(m5_cart_slot_device*)m_cart));
+			program.install_read_handler(0x2000, 0x6fff, read8_delegate(*m_cart, FUNC(m5_cart_slot_device::read_rom)));
 			program.unmap_write(0x2000, 0x6fff);
 		}
 
@@ -1526,7 +1526,7 @@ void brno_state::brno(machine_config &config)
 	// only one floppy drive
 	//config.device_remove(WD2797_TAG":1");
 
-	//SNAPSHOT(config, "snapshot", "rmd", 0).set_load_callback(brno_state::snapshot_cb), this);
+	//SNAPSHOT(config, "snapshot", "rmd", 0).set_load_callback(brno_state::snapshot_cb));
 
 	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("m5_flop");

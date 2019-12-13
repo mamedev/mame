@@ -213,7 +213,7 @@ void elf2_state::machine_start()
 
 	/* setup memory banking */
 	program.install_read_bank(0x0000, 0x00ff, "bank1");
-	program.install_write_handler(0x0000, 0x00ff, write8_delegate(FUNC(elf2_state::memory_w), this));
+	program.install_write_handler(0x0000, 0x00ff, write8_delegate(*this, FUNC(elf2_state::memory_w)));
 	membank("bank1")->configure_entry(0, m_ram->pointer());
 	membank("bank1")->set_entry(0);
 
@@ -279,7 +279,7 @@ void elf2_state::elf2(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(elf2_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(elf2_state::quickload_cb));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256");

@@ -44,16 +44,19 @@ public:
 		, m_floppy1(*this, "fdc:1")
 		, m_floppy2(*this, "fdc:2")
 		, m_floppy3(*this, "fdc:3")
-		, m_interrupt_select(*this, "interrupt_select")
-		, m_address_mode(*this, "address_mode")
-		, m_two_control_regs(*this, "two_control_regs")
-		, m_ctrl_reg_bit7_side_select(*this, "ctrl_reg_bit7_side_select")
-		, m_expected_clock(*this, "expected_clock")
-		, m_expected_density(*this, "expected_density")
-		, m_expected_sectors(*this, "expected_sectors")
-		, m_track_zero_expected_sectors(*this, "track_zero_expected_sectors")
+		, m_interrupt_select(*this, "INTERRUPT_SELECT")
+		, m_address_mode(*this, "ADDRESS_MODE")
+		, m_two_control_regs(*this, "TWO_CONTROL_REGS")
+		, m_ctrl_reg_bit7_side_select(*this, "CTRL_REG_BIT7_SIDE_SELECT")
+		, m_expected_clock(*this, "EXPECTED_CLOCK")
+		, m_expected_density(*this, "EXPECTED_DENSITY")
+		, m_expected_sectors(*this, "EXPECTED_SECTORS")
+		, m_track_zero_expected_sectors(*this, "TRACK_ZERO_EXPECTED_SECTORS")
 	{
 	}
+
+	DECLARE_INPUT_CHANGED_MEMBER(ctrl_reg_bit7_side_select_change);
+	DECLARE_INPUT_CHANGED_MEMBER(expected_clock_change);
 
 protected:
 	virtual ioport_constructor device_input_ports() const override;
@@ -75,8 +78,9 @@ private:
 	uint8_t m_motor_timer_out;
 	emu_timer *m_floppy_motor_timer;
 	floppy_image_device *m_fdc_selected_floppy; // Current selected floppy.
-	uint8_t m_fdc_side;                // Current floppy side.
-	uint32_t m_fdc_clock;          // Current clock frequency.
+	uint8_t m_fdc_side;            // Current floppy side.
+	uint8_t m_fdc_clock_div;       // Current clock frequency divisor.
+	uint8_t m_fdc_prog_clock_div;      // Programmed clock frequency divisor.
 
 	TIMER_CALLBACK_MEMBER(floppy_motor_callback);
 
@@ -104,18 +108,18 @@ private:
 
 
 static INPUT_PORTS_START( dc5 )
-	PORT_START("interrupt_select")
+	PORT_START("INTERRUPT_SELECT")
 	PORT_DIPNAME(0xf, 0, "Interrupt select")
 	PORT_DIPSETTING(0, "N/C")
 	PORT_DIPSETTING(1, "IRQ")
 	PORT_DIPSETTING(2, "NMI/FIRQ")
 
-	PORT_START("address_mode")
+	PORT_START("ADDRESS_MODE")
 	PORT_DIPNAME(0xf, 1, "Address mode")
 	PORT_DIPSETTING(0, "4 address")
 	PORT_DIPSETTING(1, "16 address")
 
-	PORT_START("two_control_regs")
+	PORT_START("TWO_CONTROL_REGS")
 	PORT_DIPNAME(0xf, 0, "Two control registers")
 	PORT_DIPSETTING(0, "No, DC4 compatible")
 	PORT_DIPSETTING(1, "Yes, DC5 extension")
@@ -131,21 +135,21 @@ static INPUT_PORTS_START( dc5 )
 	// 3.5" 'standard'  -  1.2MHz
 	// 3.5" HD  -  2.0MHz
 	// 8" 360rpm  -  2.4MHz
-	PORT_START("expected_clock")
-	PORT_CONFNAME(0xffffff, 0, "FDC expected clock rate")
+	PORT_START("EXPECTED_CLOCK")
+	PORT_CONFNAME(0xf, 0, "FDC expected clock rate") PORT_CHANGED_MEMBER(DEVICE_SELF, ss50_dc5_device, expected_clock_change, 0)
 	PORT_CONFSETTING(0, "-")
-	PORT_CONFSETTING(1000000, "1.0 MHz")
-	PORT_CONFSETTING(1200000, "1.2 MHz")
-	PORT_CONFSETTING(2000000, "2.0 MHz")
-	PORT_CONFSETTING(2400000, "2.4 MHz")
+	PORT_CONFSETTING(12, "1.0 MHz")
+	PORT_CONFSETTING(10, "1.2 MHz")
+	PORT_CONFSETTING(6, "2.0 MHz")
+	PORT_CONFSETTING(5, "2.4 MHz")
 
 	// It is not uncommon to see drivers using bit 7 of the control
 	// register as a side selection. This conflicts with the DC5, and
 	// earlier controllers in this series, which use bit 7 to inhibit
 	// drive selection. These drivers need to be corrected, but this
 	// option helps identify this issue and work around it.
-	PORT_START("ctrl_reg_bit7_side_select")
-	PORT_CONFNAME(0x01, 0, "Control register bit 7")
+	PORT_START("CTRL_REG_BIT7_SIDE_SELECT")
+	PORT_CONFNAME(0x01, 0, "Control register bit 7") PORT_CHANGED_MEMBER(DEVICE_SELF, ss50_dc5_device, ctrl_reg_bit7_side_select_change, 0)
 	PORT_CONFSETTING(0, "Inhibits drive selection")
 	PORT_CONFSETTING(1, "Erroneous side select")
 
@@ -154,7 +158,7 @@ static INPUT_PORTS_START( dc5 )
 	// purely double density and often without properly implement driver
 	// support for that. This setting is an aid to report unexpected
 	// usage, and it attempts to correct that.
-	PORT_START("expected_density")
+	PORT_START("EXPECTED_DENSITY")
 	PORT_CONFNAME(0xff, 0, "Expected density")
 	PORT_CONFSETTING(0, "-")
 	PORT_CONFSETTING(1, "single density") // Purely single density.
@@ -166,14 +170,14 @@ static INPUT_PORTS_START( dc5 )
 	// FLEX disk images were developed for vitural machines that have
 	// little regard for the actual head and can work off the sector ID
 	// and their drivers can set the head incorrectly. E.g. a disk with 18
-	// sectors per side might have a drive set to switch heads for sectors
+	// sectors per side might have a driver switch heads for sectors
 	// above 10. Another issue is that double density disk images are
 	// often 'fixed' so that they are pure double density without being
-	// single density onthe first track, and the drivers might still set
-	// the head based track zero being single density. This aid is not
+	// single density on the first track, and the drivers might still set
+	// the head based on track zero being single density. This aid is not
 	// intended to be a substitute for fixing the drivers but it does help
 	// work through the issues while patching the disks.
-	PORT_START("expected_sectors")
+	PORT_START("EXPECTED_SECTORS")
 	PORT_CONFNAME(0xff, 0, "Expected sectors per side")
 	PORT_CONFSETTING(0, "-")
 	PORT_CONFSETTING(10, "10") // 5 1/4" single density 256B
@@ -185,7 +189,7 @@ static INPUT_PORTS_START( dc5 )
 	// 6800 disks did format track zero in single density and if the
 	// driver sticks to that and if using a double density disk then set a
 	// single density size here.
-	PORT_START("track_zero_expected_sectors")
+	PORT_START("TRACK_ZERO_EXPECTED_SECTORS")
 	PORT_CONFNAME(0xff, 0, "Track zero expected sectors per side")
 	PORT_CONFSETTING(0, "-")
 	PORT_CONFSETTING(10, "10") // 5 1/4" single density 256B
@@ -235,7 +239,7 @@ static void flex_floppies(device_slot_interface &device)
 
 void ss50_dc5_device::device_add_mconfig(machine_config &config)
 {
-	WD2797(config, m_fdc, 1_MHz_XTAL);
+	WD2797(config, m_fdc, 12_MHz_XTAL / 12); // divider is selectable
 	FLOPPY_CONNECTOR(config, "fdc:0", flex_floppies, "sssd35", ss50_dc5_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", flex_floppies, "sssd35", ss50_dc5_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:2", flex_floppies, "sssd35", ss50_dc5_device::floppy_formats).enable_sound(true);
@@ -249,10 +253,11 @@ void ss50_dc5_device::device_add_mconfig(machine_config &config)
 void ss50_dc5_device::device_reset()
 {
 	// Initialize to the expected rate if any, otherwise to 1MHz.
-	uint32_t clock = m_expected_clock->read();
-	clock = clock ? clock : 1000000;
-	m_fdc->set_unscaled_clock(clock);
-	m_fdc_clock = clock;
+	m_fdc_prog_clock_div = 12;
+	uint8_t expected_clock_div = m_expected_clock->read();
+	uint8_t clock_div = expected_clock_div ? expected_clock_div : m_fdc_prog_clock_div;
+	m_fdc->set_unscaled_clock(12_MHz_XTAL / clock_div);
+	m_fdc_clock_div = clock_div;
 
 	// The reset state of DDEN for the DC5 is one, so selecting single density.
 	m_fdc->dden_w(1);
@@ -265,8 +270,28 @@ void ss50_dc5_device::device_start()
 	m_fdc_side = 0;
 	m_floppy_motor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ss50_dc5_device::floppy_motor_callback),this));
 	m_motor_timer_out = 0;
+	m_fdc_prog_clock_div = 12;
+
+	save_item(NAME(m_fdc_status));
+	save_item(NAME(m_control_register));
+	save_item(NAME(m_motor_timer_out));
+	save_item(NAME(m_fdc_side));
+	save_item(NAME(m_fdc_clock_div));
+	save_item(NAME(m_fdc_prog_clock_div));
 }
 
+
+INPUT_CHANGED_MEMBER(ss50_dc5_device::ctrl_reg_bit7_side_select_change)
+{
+	control_register_update();
+}
+
+INPUT_CHANGED_MEMBER(ss50_dc5_device::expected_clock_change)
+{
+	uint8_t clock_div = newval ? newval : m_fdc_prog_clock_div;
+	m_fdc->set_unscaled_clock(12_MHz_XTAL / clock_div);
+	m_fdc_clock_div = clock_div;
+}
 
 /* Shared floppy support. */
 
@@ -384,7 +409,7 @@ uint8_t ss50_dc5_device::validate_fdc_sso(uint8_t cmd)
 	uint32_t two_regs = m_two_control_regs->read();
 	if (two_regs)
 	{
-		// How if drivers are attempting to use SSO to control the
+		// If drivers are attempting to use SSO to control the
 		// density then that might need correcting so report such
 		// usage.
 		logerror("%s Unexpected SSO flag set in two control registers mode\n", machine().describe_context());
@@ -436,13 +461,9 @@ WRITE_LINE_MEMBER( ss50_dc5_device::fdc_intrq_w )
 	uint8_t selection = m_interrupt_select->read();
 
 	if (selection == 1)
-	{
 		write_irq(state);
-	}
 	else if (selection == 2)
-	{
 		write_firq(state);
-	}
 }
 
 WRITE_LINE_MEMBER( ss50_dc5_device::fdc_drq_w )
@@ -560,7 +581,7 @@ void ss50_dc5_device::control_register_update()
 			// the most useful choice because drivers in error are
 			// most likely just writing to the wrong bit rather
 			// than inconsistently to both bits. This allows
-			// incremental correction of driver while spotting
+			// incremental correction of drivers while spotting
 			// remaining uses of bit 7 for side selection.
 			side |= bit7;
 		}
@@ -594,7 +615,7 @@ uint8_t ss50_dc5_device::register_read(offs_t offset)
 		uint32_t two_regs = m_two_control_regs->read();
 
 		// Note: access to this control register does not trigger the
-		// motor on and and does not reset the motor timer.
+		// motor on and does not reset the motor timer.
 
 		if (!two_regs || (offset & 2) == 0)
 		{
@@ -661,7 +682,7 @@ void ss50_dc5_device::register_write(offs_t offset, uint8_t data)
 			// Osc20 and osc12 control a clock divider.
 			uint8_t osc12 = BIT(data, 2);
 			uint8_t osc20 = BIT(data, 3);
-			uint32_t clock = 1000000;
+			uint8_t clock_div = 12;
 
 			// Note: supporting 2.4MHz is here is an extension to
 			// the published DC5 design, and appears necessary to
@@ -676,24 +697,28 @@ void ss50_dc5_device::register_write(offs_t offset, uint8_t data)
 			// 8" drives run at 300rpm; is there an error in the
 			// rates elsewhere?
 			if (osc20 && osc12)
-				clock = 2400000;
+				clock_div = 5;
 			else if (osc20)
-				clock = 2000000;
+				clock_div = 6;
 			else if (osc12)
-				clock = 1200000;
+				clock_div = 10;
 
-			// Compare to the expected clock rate if any.
-			uint32_t expected_clock = m_expected_clock->read();
-			if (expected_clock && clock != expected_clock)
+			// Note the programmed clock divisor, in case the
+			// expected changes.
+			m_fdc_prog_clock_div = clock_div;
+
+			// Compare to the expected clock divisor if any.
+			uint32_t expected_clock_div = m_expected_clock->read();
+			if (expected_clock_div && clock_div != expected_clock_div)
 			{
-				logerror("%s Unexpected clock rate of %dHz expected %dHz.\n", machine().describe_context(), clock, expected_clock);
-				clock = expected_clock;
+				logerror("%s Unexpected clock rate of %dHz expected %dHz.\n", machine().describe_context(), 12'000'000 / clock_div, 12'000'000 / expected_clock_div);
+				clock_div = expected_clock_div;
 			}
 
-			if (clock != m_fdc_clock)
+			if (clock_div != m_fdc_clock_div)
 			{
-				m_fdc->set_unscaled_clock(clock);
-				m_fdc_clock = clock;
+				m_fdc->set_unscaled_clock(12_MHz_XTAL / clock_div);
+				m_fdc_clock_div = clock_div;
 			}
 
 #if 0

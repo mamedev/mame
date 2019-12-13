@@ -423,7 +423,7 @@ void othello_state::othello(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(TILE_WIDTH);
-	crtc.set_update_row_callback(FUNC(othello_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(othello_state::crtc_update_row));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

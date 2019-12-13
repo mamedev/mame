@@ -283,8 +283,8 @@ void super6_state::super6_io(address_map &map)
 	map(0x16, 0x16).w(FUNC(super6_state::bank0_w));
 	map(0x17, 0x17).w(FUNC(super6_state::bank1_w));
 	map(0x18, 0x18).mirror(0x03).w(BR1945_TAG, FUNC(com8116_device::stt_str_w));
-//  AM_RANGE(0x40, 0x40) ?
-//  AM_RANGE(0xe0, 0xe7) HDC?
+//  map(0x40, 0x40) ?
+//  map(0xe0, 0xe7) HDC?
 }
 
 

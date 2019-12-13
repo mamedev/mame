@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+// thanks-to:rfka01
 /***************************************************************************
 
     K210 Centronics module
@@ -35,7 +36,7 @@ dmv_k210_device::dmv_k210_device(const machine_config &mconfig, const char *tag,
 	, m_centronics(*this, "centronics")
 	, m_cent_data_in(*this, "cent_data_in")
 	, m_cent_data_out(*this, "cent_data_out")
-	, m_bus(nullptr), m_clk1_timer(nullptr), m_portb(0), m_portc(0)
+	, m_clk1_timer(nullptr), m_portb(0), m_portc(0)
 {
 }
 
@@ -46,7 +47,10 @@ dmv_k210_device::dmv_k210_device(const machine_config &mconfig, const char *tag,
 void dmv_k210_device::device_start()
 {
 	m_clk1_timer = timer_alloc(0, nullptr);
-	m_bus = static_cast<dmvcart_slot_device*>(owner());
+
+	// register for state saving
+	save_item(NAME(m_portb));
+	save_item(NAME(m_portc));
 }
 
 //-------------------------------------------------
@@ -151,7 +155,7 @@ WRITE8_MEMBER( dmv_k210_device::portc_w )
 	m_centronics->write_init(!BIT(data, 1));
 	m_centronics->write_autofd(!BIT(data, 2));
 	m_centronics->write_ack(BIT(data, 6));
-	m_bus->m_out_irq_cb(BIT(data, 3));
+	out_irq(BIT(data, 3));
 }
 
 WRITE_LINE_MEMBER( dmv_k210_device::cent_ack_w )     { if (state) m_portb |= 0x04; else m_portb &= ~0x04; m_ppi->pc6_w(state); }

@@ -1837,7 +1837,7 @@ void vsnes_state::vsdual(machine_config &config)
 void vsnes_state::vsdual_pi(machine_config &config)
 {
 	vsdual(config);
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 	// need high level of interleave to keep screens in sync in Balloon Fight.
 	// however vsmahjng doesn't like perfect interleave? you end up needing to reset it to boot? maybe something in a bad default state? watchdog?
 	// as the board would always be running in 'perfect interleave' the fact the Mahjong game doesn't work like this needs investigating.
@@ -1933,7 +1933,7 @@ ROM_START( suprmrio ) /* Vs. Super Mario Bros. (Set E Rev 4) */
 	ROM_LOAD( "mds-sm4-4__1bor6b_e.1b or 6b", 0xc000, 0x2000, CRC(b1b87893) SHA1(8563ceaca664cf4495ef1020c07179ca7e4af9f3) )
 	ROM_LOAD( "mds-sm4-4__1aor6a_e.1a or 6a", 0xe000, 0x2000, CRC(1abf053c) SHA1(f17db88ce0c9bf1ed88dc16b9650f11d10835cec) )
 
-	ROM_REGION( 0x4000,"gfx1", 0  ) /* PPU memory */
+	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
 	ROM_LOAD( "mds-sm4-4__2bor8b_e.2b or 8b", 0x0000, 0x2000, CRC(42418d40) SHA1(22ab61589742cfa4cc6856f7205d7b4b8310bc4d) )
 	ROM_LOAD( "mds-sm4-4__2aor8a_e.2a or 8a", 0x2000, 0x2000, CRC(15506b86) SHA1(69ecf7a3cc8bf719c1581ec7c0d68798817d416f) )
 
@@ -1947,52 +1947,33 @@ ROM_START( suprmrioa ) /* Vs. Super Mario Bros. (Set unknown, possibly operator 
 	ROM_LOAD( "mds-sm4-4__1bor6b_e.1b or 6b", 0xc000, 0x2000, CRC(b1b87893) SHA1(8563ceaca664cf4495ef1020c07179ca7e4af9f3) )
 	ROM_LOAD( "mds-sm4-4__1aor6a_e.1a or 6a", 0xe000, 0x2000, CRC(1abf053c) SHA1(f17db88ce0c9bf1ed88dc16b9650f11d10835cec) )
 
-	ROM_REGION( 0x4000,"gfx1", 0  ) /* PPU memory */
+	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
 	ROM_LOAD( "mds-sm4-4__2bor8b_e.2b or 8b", 0x0000, 0x2000, CRC(42418d40) SHA1(22ab61589742cfa4cc6856f7205d7b4b8310bc4d) )
 	ROM_LOAD( "mds-sm4-4__2aor8a_e.2a or 8a", 0x2000, 0x2000, CRC(15506b86) SHA1(69ecf7a3cc8bf719c1581ec7c0d68798817d416f) )
 
 	PALETTE_2C04_0004("ppu1:palette")
 ROM_END
 
-
-
-ROM_START( suprmriobl2 )
-	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "4-27256.bin",  0x8000, 0x8000, CRC(663b1753) SHA1(b0d2057c4545f2d6534cafb16086826c8ba49f5a) )
-
-	ROM_REGION( 0x10000,"sub", 0 ) /* Z80 memory */
-	ROM_LOAD( "1-2764.bin",  0x0000, 0x2000, CRC(95856e07) SHA1(c681cfdb656e687bc59080df56c9c38e13be4bb8) )
-
-	ROM_REGION( 0x10000,"unk", 0 ) /* first half is some sort of table */
-	ROM_LOAD( "3-27256.bin",  0x0000, 0x8000, CRC(67a467f9) SHA1(61cd1db7cd52faa31153b89f6b98c9b78bf4ca4f) )
-
-	ROM_REGION( 0x4000,"gfx1", 0  ) /* PPU memory */
-	ROM_LOAD( "2-2764.bin",  0x0000, 0x2000, CRC(42418d40) SHA1(22ab61589742cfa4cc6856f7205d7b4b8310bc4d) )
-	ROM_LOAD( "5-2764.bin",  0x2000, 0x2000, CRC(15506b86) SHA1(69ecf7a3cc8bf719c1581ec7c0d68798817d416f) )
-
-	PALETTE_2C04_0004("ppu1:palette")
-ROM_END
-
 ROM_START( suprmriobl )
-	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "4.bin",  0x8000, 0x8000, CRC(6f857416) SHA1(05e2df8ac01a03bf09b73e34c30aaf5bf4715809) )
 
-	ROM_REGION( 0x10000,"sub", 0 ) /* Z80 memory */
+	ROM_REGION( 0x10000, "sub", 0 ) /* Z80 memory */
 	ROM_LOAD( "1.bin",  0x0000, 0x2000, CRC(9e3557f2) SHA1(11a0de2c0154f7ac120d9774cb5d1051e0156822) )
 
-	ROM_REGION( 0x10000,"unk", 0 ) /* first half is some sort of table */
+	ROM_REGION( 0x10000, "unk", 0 ) /* first half is some sort of table */
 	ROM_LOAD( "3.bin",  0x0000, 0x8000, CRC(67a467f9) SHA1(61cd1db7cd52faa31153b89f6b98c9b78bf4ca4f) )
 
-	ROM_REGION( 0x4000,"gfx1", 0  ) /* PPU memory */
+	ROM_REGION( 0x4000, "gfx1", 0 ) /* PPU memory */
 	ROM_LOAD( "2.bin",  0x0000, 0x2000, CRC(42418d40) SHA1(22ab61589742cfa4cc6856f7205d7b4b8310bc4d) )
 	ROM_LOAD( "5.bin",  0x2000, 0x2000, CRC(15506b86) SHA1(69ecf7a3cc8bf719c1581ec7c0d68798817d416f) )
 
-	/* this set has some extra files compared to the above one, they probably exist on that pcb too though */
-	ROM_REGION( 0x200,"proms", 0  )
+	/* this set has some extra files compared to "suprmriobl2", they probably exist on that pcb too though */
+	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "prom6301.1",  0x000, 0x100, CRC(a31dc330) SHA1(b652003f7e252bac3bdb19412839c2f03af7f8b8) )
 	ROM_LOAD( "prom6301.2",  0x100, 0x100, CRC(019c6141) SHA1(fdeda4dea6506807a3324fa941f0684208aa3b4b) )
 
-	ROM_REGION( 0x4000,"pals", 0  )
+	ROM_REGION( 0x4000, "pals", 0 )
 	ROM_LOAD( "pal16l8.1",  0x000, 0x104, CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) )
 	ROM_LOAD( "pal16r6a.2", 0x000, 0x104, NO_DUMP )
 	ROM_LOAD( "pal16r8.3",  0x000, 0x104, CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) )
@@ -2004,14 +1985,65 @@ ROM_START( suprmriobl )
 	PALETTE_2C04_0004("ppu1:palette")
 ROM_END
 
+ROM_START( suprmriobl2 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 6502 memory */
+	ROM_LOAD( "4-27256.bin",  0x8000, 0x8000, CRC(663b1753) SHA1(b0d2057c4545f2d6534cafb16086826c8ba49f5a) )
+
+	ROM_REGION( 0x10000, "sub", 0 ) /* Z80 memory */
+	ROM_LOAD( "1-2764.bin",  0x0000, 0x2000, CRC(95856e07) SHA1(c681cfdb656e687bc59080df56c9c38e13be4bb8) )
+
+	ROM_REGION( 0x10000, "unk", 0 ) /* first half is some sort of table */
+	ROM_LOAD( "3-27256.bin",  0x0000, 0x8000, CRC(67a467f9) SHA1(61cd1db7cd52faa31153b89f6b98c9b78bf4ca4f) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 ) /* PPU memory */
+	ROM_LOAD( "2-2764.bin",  0x0000, 0x2000, CRC(42418d40) SHA1(22ab61589742cfa4cc6856f7205d7b4b8310bc4d) )
+	ROM_LOAD( "5-2764.bin",  0x2000, 0x2000, CRC(15506b86) SHA1(69ecf7a3cc8bf719c1581ec7c0d68798817d416f) )
+
+	PALETTE_2C04_0004("ppu1:palette")
+ROM_END
+
+ROM_START( suprmriobl3 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // 6502 memory
+	ROM_LOAD( "sm_4.bin",  0x8000, 0x8000, CRC(663b1753) SHA1(b0d2057c4545f2d6534cafb16086826c8ba49f5a) )
+
+	ROM_REGION( 0x10000, "sub", 0 ) // Z80 memory
+	ROM_LOAD( "sm_1.bin",  0x0000, 0x2000, CRC(7f6dda4a) SHA1(0e92a1255ce13ae1215b531f268cd4874e20d611) )
+
+	ROM_REGION( 0x10000, "unk", 0 ) // First half is some sort of table
+	ROM_LOAD( "sm_3.bin",  0x0000, 0x8000, CRC(67a467f9) SHA1(61cd1db7cd52faa31153b89f6b98c9b78bf4ca4f) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 ) // PPU memory
+	ROM_LOAD( "sm_2.bin",  0x0000, 0x2000, CRC(a5f771d1) SHA1(b3f916700035d5556cca009ab83300fb662a868f) )
+	ROM_LOAD( "sm_5.bin",  0x2000, 0x2000, CRC(a08903ca) SHA1(7ecec519ac973168a84505ddede4f248b554fd85) )
+
+	/* this set has some extra files compared to "suprmriobl2", they probably exist on that pcb too though */
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "prom6301.1",  0x000, 0x100, BAD_DUMP CRC(a31dc330) SHA1(b652003f7e252bac3bdb19412839c2f03af7f8b8) ) // Not from this PCB
+	ROM_LOAD( "prom6301.2",  0x100, 0x100, BAD_DUMP CRC(019c6141) SHA1(fdeda4dea6506807a3324fa941f0684208aa3b4b) ) // Not from this PCB
+
+	ROM_REGION( 0x4000, "pals", 0 )
+	ROM_LOAD( "pal16l8.1",  0x000, 0x104, BAD_DUMP CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) ) // Not from this PCB
+	ROM_LOAD( "pal16r6a.2", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16r8.3",  0x000, 0x104, BAD_DUMP CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) ) // Not from this PCB
+	ROM_LOAD( "pal16l8.4",  0x000, 0x104, BAD_DUMP CRC(6f6de82d) SHA1(3d59b222d25457b2f89b559409721db37d6a81d8) ) // Not from this PCB
+	ROM_LOAD( "pal16r6.5",  0x000, 0x104, BAD_DUMP CRC(ceff7c7c) SHA1(52fd344c591478469369cd0862d1facfe23e12fb) ) // Not from this PCB
+	ROM_LOAD( "pal16r8.6",  0x000, 0x104, BAD_DUMP CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) ) // Not from this PCB
+	ROM_LOAD( "pal16r8a.7", 0x000, 0x104, BAD_DUMP CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) ) // Not from this PCB
+
+	ROM_REGION( 0x0100, "epld", 0 )
+	ROM_LOAD( "ep1200.bin",  0x000, 0x100, NO_DUMP ) // Not dumped
+
+	PALETTE_2C04_0004("ppu1:palette") // Not from this PCB
+ROM_END
+
 ROM_START( skatekds )
-	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-sm4-4__1dor6d_e.1d or 6d", 0x8000, 0x2000, CRC(be4d5436) SHA1(08162a7c987f1939d09bebdb676f596c86abf465) )
 	ROM_LOAD( "mds-sm4-4__1cor6c_e.1c or 6c", 0xa000, 0x2000, CRC(5e3fb550) SHA1(de4494e4dd52f7f7b04cf1d9019fd89fb90eaca9) )
 	ROM_LOAD( "mds-sm4-4__1bor6b_e.1b or 6b", 0xc000, 0x2000, CRC(b1b87893) SHA1(8563ceaca664cf4495ef1020c07179ca7e4af9f3) )
 	ROM_LOAD( "mds-sm4-4__1aor6a_e.1a or 6a", 0xe000, 0x2000, CRC(1abf053c) SHA1(f17db88ce0c9bf1ed88dc16b9650f11d10835cec) )
 
-	ROM_REGION( 0x4000,"gfx1", 0  ) /* PPU memory */
+	ROM_REGION( 0x4000, "gfx1", 0 ) /* PPU memory */
 	ROM_LOAD( "__skatekds,.2b",  0x0000, 0x2000,CRC(f3980303) SHA1(b9a25c906d1861c89e2e40e878a34d318daf6619) )
 	ROM_LOAD( "__skatekds,.2a",  0x2000, 0x2000,CRC(7a0ab7eb) SHA1(b6c32791481fafddc8504adb4eaed30a2fb3a03e) )
 
@@ -2850,6 +2882,7 @@ GAME( 1986, suprmrio, 0,         vsnes,         suprmrio, vsnes_state, init_vsno
 GAME( 1986, suprmrioa,suprmrio,  vsnes,         suprmrio, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set ?, harder)", 0 )
 GAME( 1986, suprmriobl,suprmrio, vsnes_bootleg, suprmrio, vsnes_state, init_vsnormal, ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 1)", MACHINE_NOT_WORKING ) // timer starts at 200(!)
 GAME( 1986, suprmriobl2,suprmrio,vsnes_bootleg, suprmrio, vsnes_state, init_vsnormal, ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 2)", MACHINE_NOT_WORKING ) // timer starts at 300
+GAME( 1986, suprmriobl3,suprmrio,vsnes_bootleg, suprmrio, vsnes_state, init_vsnormal, ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 3)", MACHINE_NOT_WORKING ) // timer starts at 300
 GAME( 1988, skatekds, suprmrio,  vsnes,         suprmrio, vsnes_state, init_vsnormal, ROT0, "hack (Two-Bit Score)",   "Vs. Skate Kids. (Graphic hack of Super Mario Bros.)", 0 )
 GAME( 1985, vsskykid, 0,         vsnes,         vsskykid, vsnes_state, init_MMC3,     ROT0, "Namco",                  "Vs. Super SkyKid", 0 )
 GAME( 1987, tkoboxng, 0,         vsnes,         tkoboxng, vsnes_state, init_tkoboxng, ROT0, "Namco / Data East USA",  "Vs. T.K.O. Boxing", 0 )

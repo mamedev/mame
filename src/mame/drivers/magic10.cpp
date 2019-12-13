@@ -253,9 +253,9 @@ TILE_GET_INFO_MEMBER(magic10_state::get_layer2_tile_info)
 
 void magic10_state::video_start()
 {
-	m_layer0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(magic10_state::get_layer0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_layer1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(magic10_state::get_layer1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_layer2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(magic10_state::get_layer2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_layer0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(magic10_state::get_layer0_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_layer1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(magic10_state::get_layer1_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_layer2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(magic10_state::get_layer2_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	m_layer1_tilemap->set_transparent_pen(0);
 	m_layer2_tilemap->set_transparent_pen(0);
@@ -405,8 +405,8 @@ void magic10_state::magic102_map(address_map &map)
 	map(0x500006, 0x500007).nopr(); // gives credits
 	map(0x50001a, 0x50001b).portr("IN0");
 	map(0x50001c, 0x50001d).portr("IN1");
-//  AM_RANGE(0x500002, 0x50001f) AM_READNOP
-//  AM_RANGE(0x500002, 0x50001f) AM_WRITENOP
+//  map(0x500002, 0x50001f).nopr();
+//  map(0x500002, 0x50001f).nopw();
 	map(0x600000, 0x603fff).ram();
 	map(0x700001, 0x700001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x700080, 0x700087).ram().share("vregs");   // video registers?

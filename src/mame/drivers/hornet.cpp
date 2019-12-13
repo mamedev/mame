@@ -1150,7 +1150,7 @@ void hornet_state::hornet(machine_config &config)
 	m_dsp->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
 	m_dsp->set_addrmap(AS_DATA, &hornet_state::sharc0_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -1431,7 +1431,7 @@ void hornet_state::init_hornet()
 	m_konppc->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
 	m_led_reg0 = m_led_reg1 = 0x7f;
 
-	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(FUNC(hornet_state::jamma_jvs_w), this));
+	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(*this, FUNC(hornet_state::jamma_jvs_w)));
 }
 
 void hornet_state::init_gradius4()
@@ -1458,7 +1458,7 @@ void hornet_state::init_sscope()
 	m_konppc->set_cgboard_texture_bank(1, "bank6", memregion("user5")->base());
 	m_led_reg0 = m_led_reg1 = 0x7f;
 
-	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(FUNC(hornet_state::jamma_jvs_w), this));
+	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(*this, FUNC(hornet_state::jamma_jvs_w)));
 }
 
 void hornet_state::init_sscope2() //fixme: eventually set sscope2 to load gfx roms from the comm board
@@ -1467,7 +1467,7 @@ void hornet_state::init_sscope2() //fixme: eventually set sscope2 to load gfx ro
 	m_konppc->set_cgboard_texture_bank(1, "bank6", memregion("user5")->base());
 	m_led_reg0 = m_led_reg1 = 0x7f;
 
-	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(FUNC(hornet_state::jamma_jvs_w), this));
+	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(*this, FUNC(hornet_state::jamma_jvs_w)));
 }
 
 /*****************************************************************************/

@@ -103,7 +103,7 @@ void bking_state::bking_io_map(address_map &map)
 	map(0x09, 0x09).w(FUNC(bking_state::bking_cont2_w));
 	map(0x0a, 0x0a).w(FUNC(bking_state::bking_cont3_w));
 	map(0x0b, 0x0b).w(FUNC(bking_state::bking_soundlatch_w));
-//  AM_RANGE(0x0c, 0x0c) AM_WRITE(bking_eport2_w)   this is not shown to be connected anywhere
+//  map(0x0c, 0x0c).w(FUNC(bking_state::bking_eport2_w));   this is not shown to be connected anywhere
 	map(0x0d, 0x0d).w(FUNC(bking_state::bking_hitclr_w));
 	map(0x07, 0x1f).r(FUNC(bking_state::bking_pos_r));
 }
@@ -123,7 +123,7 @@ void bking_state::bking3_io_map(address_map &map)
 	map(0x09, 0x09).w(FUNC(bking_state::bking_cont2_w));
 	map(0x0a, 0x0a).w(FUNC(bking_state::bking_cont3_w));
 	map(0x0b, 0x0b).w(FUNC(bking_state::bking_soundlatch_w));
-//  AM_RANGE(0x0c, 0x0c) AM_WRITE(bking_eport2_w)   this is not shown to be connected anywhere
+//  map(0x0c, 0x0c).w(FUNC(bking_state::bking_eport2_w));   this is not shown to be connected anywhere
 	map(0x0d, 0x0d).w(FUNC(bking_state::bking_hitclr_w));
 	map(0x07, 0x1f).r(FUNC(bking_state::bking_pos_r));
 	map(0x2f, 0x2f).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
@@ -452,7 +452,7 @@ void bking_state::bking3(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(bking_state,bking3)
 	MCFG_MACHINE_RESET_OVERRIDE(bking_state,bking3)
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 }
 
 

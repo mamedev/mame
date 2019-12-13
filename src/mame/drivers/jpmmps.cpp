@@ -187,13 +187,13 @@ void jpmmps_state::jpmmps_io_map(address_map &map)
 	map.global_mask(0x1ff);
 	map(0x0000, 0x003f).rw(UART_IC5, FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite));
 
-//  AM_RANGE(0x0040, 0x0041) // power fail
-//  AM_RANGE(0x0042, 0x0043) // wd timeout
-//  AM_RANGE(0x0044, 0x0045) // invalid access
-//  AM_RANGE(0x0046, 0x0047) // clear down
+//  map(0x0040, 0x0041) // power fail
+//  map(0x0042, 0x0043) // wd timeout
+//  map(0x0044, 0x0045) // invalid access
+//  map(0x0046, 0x0047) // clear down
 
-//  AM_RANGE(0x004c, 0x004d) // uart4 int
-//  AM_RANGE(0x004e, 0x004f) // uart2 int
+//  map(0x004c, 0x004d) // uart4 int
+//  map(0x004e, 0x004f) // uart2 int
 
 	map(0x0080, 0x00bf).rw(UART_IC10, FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite));
 	map(0x00c0, 0x00cf).w("mainlatch", FUNC(ls259_device::write_d0));

@@ -87,7 +87,7 @@ void uzebox_state::machine_start()
 	m_screen->register_screen_bitmap(m_bitmap);
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0xffff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0xffff, read8sm_delegate(m_cart, FUNC(generic_slot_device::read_rom)));
 }
 
 void uzebox_state::machine_reset()
@@ -307,7 +307,7 @@ void uzebox_state::uzebox(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "uzebox", "bin,uze");
 	m_cart->set_must_be_loaded(true);
-	m_cart->set_device_load(FUNC(uzebox_state::cart_load), this);
+	m_cart->set_device_load(FUNC(uzebox_state::cart_load));
 
 	SNES_CONTROL_PORT(config, m_ctrl1, snes_control_port_devices, "joypad");
 	SNES_CONTROL_PORT(config, m_ctrl2, snes_control_port_devices, "joypad");

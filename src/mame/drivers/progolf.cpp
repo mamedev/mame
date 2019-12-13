@@ -278,7 +278,7 @@ void progolf_state::main_cpu(address_map &map)
 	map(0x9800, 0x9800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x9801, 0x9801).w("crtc", FUNC(mc6845_device::register_w));
 	map(0x9a00, 0x9a00).portr("DSW2").w("soundlatch", FUNC(generic_latch_8_device::write));
-//  AM_RANGE(0x9e00, 0x9e00) AM_WRITENOP
+//  map(0x9e00, 0x9e00).nopw();
 	map(0xb000, 0xffff).rom();
 }
 
@@ -427,7 +427,7 @@ void progolf_state::progolf(machine_config &config)
 	M6502(config, m_audiocpu, 500000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &progolf_state::sound_cpu);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
 	soundlatch.data_pending_callback().set_inputline(m_audiocpu, 0);

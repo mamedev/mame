@@ -31,8 +31,8 @@ class h89_state : public driver_device
 {
 public:
 	h89_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{
 	}
 
@@ -69,25 +69,25 @@ void h89_state::h89_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-//  AM_RANGE(0x78, 0x7b)    expansion 1    // Options - Cassette I/O (only uses 0x78 - 0x79) Requires MTR-88 ROM
+//  map(0x78, 0x7b)    expansion 1    // Options - Cassette I/O (only uses 0x78 - 0x79) Requires MTR-88 ROM
 										   //         - H37 5-1/4" Soft-sectored Controller MTR-90 ROM
 										   //         - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
 										   //         - H67 8" Hard disk + 8" Floppy Drives - MTR-90 ROM
-//  AM_RANGE(0x7c, 0x7f)    expansion 2    // Options - 5-1/4" Hard-sectored Controller (works with ALL ROMs)
+//  map(0x7c, 0x7f)    expansion 2    // Options - 5-1/4" Hard-sectored Controller (works with ALL ROMs)
 										   //         - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
 										   //         - H67 8" Hard disk + 8" Floppy Drives - MTR-90 ROM
 
-//  AM_RANGE(0xd0, 0xd7)    8250 UART DCE
-//  AM_RANGE(0xd8, 0xdf)    8250 UART DTE - MODEM
-//  AM_RANGE(0xe0, 0xe7)    8250 UART DCE - LP
+//  map(0xd0, 0xd7)    8250 UART DCE
+//  map(0xd8, 0xdf)    8250 UART DTE - MODEM
+//  map(0xe0, 0xe7)    8250 UART DCE - LP
 	map(0xe8, 0xef).rw("ins8250", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w)); // 8250 UART console - this
 																								 // connects internally to a Terminal board
 																								 // that is also used in the H19. Ideally,
 																								 // the H19 code could be connected and ran
 																								 // as a separate thread.
-//  AM_RANGE(0xf0, 0xf1)        // ports defined on the H8 - on the H89, access to these addresses causes a NMI
+//  map(0xf0, 0xf1)        // ports defined on the H8 - on the H89, access to these addresses causes a NMI
 	map(0xf2, 0xf2).w(FUNC(h89_state::port_f2_w)).portr("SW501");
-//  AM_RANGE(0xf3, 0xf3)        // ports defined on the H8 - on the H89, access to these addresses causes a NMI
+//  map(0xf3, 0xf3)        // ports defined on the H8 - on the H89, access to these addresses causes a NMI
 }
 
 /* Input ports */
@@ -199,7 +199,7 @@ void h89_state::h89(machine_config & config)
 	rs232.rxd_handler().set("ins8250", FUNC(ins8250_uart_device::rx_w));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
-	TIMER(config, "irq_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(h89_state::h89_irq_timer), this), attotime::from_hz(100));
+	TIMER(config, "irq_timer", 0).configure_periodic(FUNC(h89_state::h89_irq_timer), attotime::from_hz(100));
 }
 
 /* ROM definition */

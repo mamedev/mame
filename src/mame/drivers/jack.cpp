@@ -1345,11 +1345,11 @@ ROM_START( striv )
 	ROM_LOAD( "s.triv_p1.2f",       0x0000, 0x1000, CRC(dcf5da6e) SHA1(e88c8226ae4d4a0af717f0760e551e0ce4c79c5e) )
 	ROM_LOAD( "s.triv_p2.3f",       0x1000, 0x1000, CRC(921610ba) SHA1(7dea7a57543dd79325da34cebd7b9dd8a767bb2a) )
 	ROM_LOAD( "pr3.5f",             0x2000, 0x1000, BAD_DUMP CRC(c36f0e21) SHA1(d036a56798bbb42bee269450524172ec071dcf03) ) // wasn't in the romset, but the other 3 ROMs match the ones from strivf
-	ROM_LOAD( "s.triv_cp4.f6",      0x3000, 0x1000, CRC(0dc98a97) SHA1(36c1c61d3330e2c00d9aa94ae80bcb1b9c5aea21) )
+	ROM_LOAD( "s.triv_cp4.6f",      0x3000, 0x1000, CRC(0dc98a97) SHA1(36c1c61d3330e2c00d9aa94ae80bcb1b9c5aea21) )
 	/* 0xc000 - 0xcfff questions rom space */
-	ROM_LOAD( "s.triv_c1.5e",       0xd000, 0x1000, CRC(2c2c7282) SHA1(91b983e8cd86579f6ebbe72ebaaa98814da27f9b) ) // FIXED BITS (x0xxxxxx)
-	ROM_LOAD( "s.triv_c2.e6",       0xe000, 0x1000, CRC(e21bd3ab) SHA1(a34056df2df3e5fcdfee78b65caff0eb82733d42) ) // FIXED BITS (x0xxxxxx)
-	ROM_LOAD( "s.triv_c3.e7",       0xf000, 0x1000, CRC(2f4b0570) SHA1(32f9fed9898de9059e39bc80700f65c2690383b6) )
+	ROM_LOAD( "s.triv_c3.7e",       0xd000, 0x1000, CRC(2f4b0570) SHA1(32f9fed9898de9059e39bc80700f65c2690383b6) )
+	ROM_LOAD( "s.triv_c2.6e",       0xe000, 0x1000, CRC(e21bd3ab) SHA1(a34056df2df3e5fcdfee78b65caff0eb82733d42) ) // FIXED BITS (x0xxxxxx)
+	ROM_LOAD( "s.triv_c1.5e",       0xf000, 0x1000, CRC(2c2c7282) SHA1(91b983e8cd86579f6ebbe72ebaaa98814da27f9b) ) // FIXED BITS (x0xxxxxx)
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "s.triv_sound.5a",       0x0000, 0x1000, CRC(b7ddf84f) SHA1(fa4cc0b2e5a88c82c62492c03e97ac6aa8a905b1) )
@@ -1626,7 +1626,7 @@ GAME( 1984, freeze,    0,        jack,     freeze,   jack_state, init_jack,     
 GAME( 1981, tripool,   0,        jack,     tripool,  jack_state, init_jack,     ROT90,  "Noma (Casino Tech license)", "Tri-Pool (Casino Tech)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, tripoola,  tripool,  jack,     tripool,  jack_state, init_jack,     ROT90,  "Noma (Costal Games license)", "Tri-Pool (Costal Games)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, sucasino,  0,        jack,     sucasino, jack_state, init_jack,     ROT90,  "Data Amusement", "Super Casino", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, striv,     0,        striv,    striv,    jack_state, init_striv,    ROT270, "Nova du Canada", "Super Triv (English questions)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // resets after displaying the first question
+GAME( 1985, striv,     0,        striv,    striv,    jack_state, init_striv,    ROT270, "Nova du Canada", "Super Triv (English questions)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, strivf,    striv,    striv,    striv,    jack_state, init_striv,    ROT270, "Nova du Canada", "Super Triv (French questions)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Hara Industries PCB
 GAME( 1983, joinem,    0,        joinem,   joinem,   jack_state, init_zzyzzyxx, ROT90,  "Global Corporation", "Joinem", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, unclepoo,  0,        unclepoo, unclepoo, jack_state, init_zzyzzyxx, ROT90,  "Diatec", "Uncle Poo", MACHINE_SUPPORTS_SAVE ) // based on Joinem?

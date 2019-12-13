@@ -10,7 +10,7 @@
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="195328">
-				<rom name="cp-m 2.2 boot disk (19xx)(digital research)(de).td0" size="139911" crc="ab5d7ae0" sha1="b73622c17306e32b42cef31d58616378329605ef" offset="0" />
+				<rom name="cp-m 2.2 boot disk (19xx)(digital research)(de).td0" size="139911" crc="ab5d7ae0" sha1="b73622c17306e32b42cef31d58616378329605ef"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="195328">
-				<rom name="cp-m 2.2 (19xx)(digital research).imd" size="188479" crc="602c4f18" sha1="c4158b4f84066514af2b74cb6d0915f661402819" offset="0" />
+				<rom name="cp-m 2.2 (19xx)(digital research).imd" size="188479" crc="602c4f18" sha1="c4158b4f84066514af2b74cb6d0915f661402819"/>
 			</dataarea>
 		</part>
 	</software>
@@ -34,7 +34,7 @@
 		<publisher>Perfect Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="195328">
-				<rom name="perfect calc v1.00 (1982)(perfect software).imd" size="163451" crc="d7c79f18" sha1="3666da3855bfc9c82a328fee67906ac04b6bd75b" offset="0" />
+				<rom name="perfect calc v1.00 (1982)(perfect software).imd" size="163451" crc="d7c79f18" sha1="3666da3855bfc9c82a328fee67906ac04b6bd75b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -45,7 +45,7 @@
 		<publisher>Perfect Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="195328">
-				<rom name="perfect speller (1982)(perfect software).imd" size="150160" crc="c03fc828" sha1="4a405c65a55b5ba9be17b638cfe9c0b539698fbc" offset="0" />
+				<rom name="perfect speller (1982)(perfect software).imd" size="150160" crc="c03fc828" sha1="4a405c65a55b5ba9be17b638cfe9c0b539698fbc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -56,7 +56,7 @@
 		<publisher>Perfect Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="195328">
-				<rom name="perfect writer (1982)(perfect software).imd" size="197701" crc="43cb00ac" sha1="67145d125f3f50e660ae8b2e299aad8200d59a7f" offset="0" />
+				<rom name="perfect writer (1982)(perfect software).imd" size="197701" crc="43cb00ac" sha1="67145d125f3f50e660ae8b2e299aad8200d59a7f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -67,7 +67,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="195328">
-				<rom name="perfect writer - docs and utilities (198x)(-).imd" size="151202" crc="94cda75d" sha1="46348510ff682ef3a8a1e5a27f1625beae21980e" offset="0" />
+				<rom name="perfect writer - docs and utilities (198x)(-).imd" size="151202" crc="94cda75d" sha1="46348510ff682ef3a8a1e5a27f1625beae21980e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -78,7 +78,7 @@
 		<publisher>Perfect Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="195328">
-				<rom name="perfect writer - lessons (198x)(perfect software).imd" size="180829" crc="b8bba8ca" sha1="6e18f014337efcb70248b8cff2483bc1d5c8ec4f" offset="0" />
+				<rom name="perfect writer - lessons (198x)(perfect software).imd" size="180829" crc="b8bba8ca" sha1="6e18f014337efcb70248b8cff2483bc1d5c8ec4f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -89,7 +89,7 @@
 		<publisher>Chang Laboratories</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="195328">
-				<rom name="profit plan (1982)(chang laboratories).imd" size="113909" crc="1d967882" sha1="03d00c14e57e0e84e0e1fa127ab36b47d1731ea4" offset="0" />
+				<rom name="profit plan (1982)(chang laboratories).imd" size="113909" crc="1d967882" sha1="03d00c14e57e0e84e0e1fa127ab36b47d1731ea4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -100,7 +100,7 @@
 		<publisher>Select Information Systems</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="195328">
-				<rom name="select - teach (1981)(select information systems).imd" size="148661" crc="459b51f0" sha1="7bb16452689cbb39a9c8a2088306a98b2f3ca31a" offset="0" />
+				<rom name="select - teach (1981)(select information systems).imd" size="148661" crc="459b51f0" sha1="7bb16452689cbb39a9c8a2088306a98b2f3ca31a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -111,7 +111,7 @@
 		<publisher>Select Information Systems</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="195328">
-				<rom name="select - work processor (1981)(select information systems).imd" size="106254" crc="ebcb98c5" sha1="1c8d1a3228e6ac5fdffe7409d921499db22fea72" offset="0" />
+				<rom name="select - work processor (1981)(select information systems).imd" size="106254" crc="ebcb98c5" sha1="1c8d1a3228e6ac5fdffe7409d921499db22fea72"/>
 			</dataarea>
 		</part>
 	</software>
@@ -122,7 +122,7 @@
 		<publisher>MicroPro</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="195328">
-				<rom name="wordstar v3.3 (1983)(micropro).imd" size="202296" crc="64e0f3d6" sha1="6abf468d538e65e82bc0b85cc5d656282048ce3c" offset="0" />
+				<rom name="wordstar v3.3 (1983)(micropro).imd" size="202296" crc="64e0f3d6" sha1="6abf468d538e65e82bc0b85cc5d656282048ce3c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -133,7 +133,7 @@
 		<publisher>Digital Keyboards</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="191031">
-				<rom name="synhcs.imd" size="191031" crc="c87f1400" sha1="550c6c35e7605956498345df3c151b6abd89b62d" offset="0" />
+				<rom name="synhcs.imd" size="191031" crc="c87f1400" sha1="550c6c35e7605956498345df3c151b6abd89b62d"/>
 			</dataarea>
 		</part>
 	</software>

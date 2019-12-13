@@ -173,7 +173,7 @@ void isa8_cga_tetriskr_device::device_start()
 {
 	m_bg_bank = 0;
 	isa8_cga_superimpose_device::device_start();
-	m_isa->install_device(0x3c0, 0x3c0, read8_delegate( FUNC(isa8_cga_tetriskr_device::bg_bank_r), this ), write8_delegate( FUNC(isa8_cga_tetriskr_device::bg_bank_w), this ) );
+	m_isa->install_device(0x3c0, 0x3c0, read8_delegate(*this, FUNC(isa8_cga_tetriskr_device::bg_bank_r)), write8_delegate(*this, FUNC(isa8_cga_tetriskr_device::bg_bank_w)));
 }
 
 WRITE8_MEMBER(isa8_cga_tetriskr_device::bg_bank_w)
@@ -399,7 +399,7 @@ void pcxt_state::tetriskr_io(address_map &map)
 	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
 	map(0x03c8, 0x03c8).portr("IN0");
 	map(0x03c9, 0x03c9).portr("IN1");
-//  AM_RANGE(0x03ce, 0x03ce) AM_READ_PORT("IN1") //read then discarded?
+//  map(0x03ce, 0x03ce).portr("IN1"); //read then discarded?
 }
 
 void pcxt_state::bank_map(address_map &map)
@@ -502,7 +502,11 @@ void pcxt_state::filetto(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcxt_state::filetto_map);
 	m_maincpu->set_addrmap(AS_IO, &pcxt_state::filetto_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
-	PCNOPPI_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
+
+	PCNOPPI_MOTHERBOARD(config, m_mb, 0).set_cputag(m_maincpu);
+	m_mb->int_callback().set_inputline(m_maincpu, 0);
+	m_mb->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", filetto_isa8_cards, "filetto", true); // FIXME: determine ISA bus clock
 
 	HC55516(config, "voice", 8000000/4).add_route(ALL_OUTPUTS, "mb:mono", 0.60); //8923S-UM5100 is a HC55536 with ROM hook-up
@@ -518,7 +522,10 @@ void pcxt_state::tetriskr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcxt_state::tetriskr_map);
 	m_maincpu->set_addrmap(AS_IO, &pcxt_state::tetriskr_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
-	PCNOPPI_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
+
+	PCNOPPI_MOTHERBOARD(config, m_mb, 0).set_cputag(m_maincpu);
+	m_mb->int_callback().set_inputline(m_maincpu, 0);
+	m_mb->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", filetto_isa8_cards, "tetriskr", true); // FIXME: determine ISA bus clock
 

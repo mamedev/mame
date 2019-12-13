@@ -450,8 +450,8 @@ ROM_END
 
 void starfire_state::init_starfire()
 {
-	m_input_read = read8_delegate(FUNC(starfire_state::starfire_input_r),this);
-	m_io2_write = write8_delegate(FUNC(starfire_state::starfire_sound_w),this);
+	m_input_read = read8_delegate(*this, FUNC(starfire_state::starfire_input_r));
+	m_io2_write = write8_delegate(*this, FUNC(starfire_state::starfire_sound_w));
 
 	/* register for state saving */
 	save_item(NAME(m_prev_sound));
@@ -459,8 +459,8 @@ void starfire_state::init_starfire()
 
 void starfire_state::init_fireone()
 {
-	m_input_read = read8_delegate(FUNC(starfire_state::fireone_input_r),this);
-	m_io2_write = write8_delegate(FUNC(starfire_state::fireone_sound_w),this);
+	m_input_read = read8_delegate(*this, FUNC(starfire_state::fireone_input_r));
+	m_io2_write = write8_delegate(*this, FUNC(starfire_state::fireone_sound_w));
 
 	/* register for state saving */
 	save_item(NAME(m_fireone_select));

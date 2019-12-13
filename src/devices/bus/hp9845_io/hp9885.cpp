@@ -225,7 +225,8 @@ enum : unsigned {
 };
 
 hp9885_device::hp9885_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hp98032_gpio_card_device(mconfig , HP9885 , tag , owner , clock)
+	: device_t(mconfig , HP9885 , tag , owner , clock)
+	, device_hp98032_gpio_interface(mconfig, *this)
 	, m_drive_connector{*this , "floppy"}
 {
 }
@@ -415,10 +416,11 @@ void hp9885_device::device_timer(emu_timer &timer, device_timer_id id, int param
 								return;
 							} else {
 								preset_crc();
-								m_word_cnt = 129;
 								if (m_op == OP_READ) {
+									m_word_cnt = 129;
 									set_state(FSM_RD_DATA);
 								} else {
+									m_word_cnt = 130;
 									set_state(FSM_WR_DATA);
 									m_pll.start_writing(m_pll.ctime);
 									m_had_transition = false;
@@ -484,17 +486,20 @@ void hp9885_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			case FSM_WR_DATA:
 				{
 					m_word_cnt--;
-					if (m_word_cnt > 1) {
+					if (m_word_cnt > 2) {
 						if (BIT(m_status , STS_XFER_COMPLETE)) {
 							wr_word(0);
 						} else {
 							wr_word(m_input);
-							if (m_word_cnt > 2) {
+							if (m_word_cnt > 3) {
 								set_ibf(false);
 							}
 						}
-					} else if (m_word_cnt == 1) {
+					} else if (m_word_cnt == 2) {
 						wr_word(m_crc);
+					} else if (m_word_cnt == 1) {
+						// Post-amble
+						wr_word(0);
 					} else {
 						m_pll.stop_writing(m_drive , m_pll.ctime);
 						// Move to next sector

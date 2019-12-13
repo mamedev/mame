@@ -62,10 +62,11 @@ private:
 void hawk_state::hawk_io(address_map &map)
 {
 	map.unmap_value_high();
-	//map.global_mask(0xff);
-	//map(0x18, 0x18).nopw();
-	//map(0x40, 0x4f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	//map(0xcd, 0xcd).noprw(); // 0x00
+	map(0x0010, 0x0010).mirror(0xff00).nopw();
+	map(0x0018, 0x0018).nopw();
+	map(0x003f, 0x003f).nopw();
+	map(0x0080, 0x00bf).noprw(); // Z180 internal registers
+	map(0x00c0, 0x00cf).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 }
 
 void hawk_state::hawk_mem(address_map &map)
@@ -102,7 +103,7 @@ void hawk_state::hawk_palette(palette_device &palette) const
 void hawk_state::hawk(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, 12.288_MHz_XTAL / 2); /* HD64B180R0F */
+	Z80180(config, m_maincpu, 12.288_MHz_XTAL); /* HD64B180R0F */
 	m_maincpu->set_addrmap(AS_PROGRAM, &hawk_state::hawk_mem);
 	m_maincpu->set_addrmap(AS_IO, &hawk_state::hawk_io);
 

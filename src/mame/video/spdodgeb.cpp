@@ -71,7 +71,7 @@ TILE_GET_INFO_MEMBER(spdodgeb_state::get_bg_tile_info)
 
 void spdodgeb_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spdodgeb_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(spdodgeb_state::background_scan),this),8,8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spdodgeb_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(spdodgeb_state::background_scan)), 8,8, 64,32);
 
 	membank("mainbank")->configure_entries(0, 2, memregion("maincpu")->base(), 0x4000);
 

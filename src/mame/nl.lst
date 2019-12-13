@@ -61,10 +61,16 @@ masao                           // bootleg
 palestra
 
 @source:popeye.cpp
+skyskipr
 popeye                          // (c) 1982
 popeyeu                         // (c) 1982
 popeyef                         // (c) 1982
 popeyebl                        // bootleg
+popeyeb2                        // bootleg
+popeyeb3                        // bootleg
+popeyej
+popeyejo
+popeyehs
 
 @source:testpat.cpp
 tp1983

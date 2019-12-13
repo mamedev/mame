@@ -401,8 +401,8 @@ void darkhors_state::video_start()
 {
 	common_state::video_start();
 
-	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
-	m_tmap2= &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
+	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(darkhors_state::get_tile_info_0)), TILEMAP_SCAN_ROWS, 16,16, 0x40,0x40);
+	m_tmap2= &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(darkhors_state::get_tile_info_1)), TILEMAP_SCAN_ROWS, 16,16, 0x40,0x40);
 	m_tmap->set_transparent_pen(0);
 	m_tmap2->set_transparent_pen(0);
 
@@ -598,9 +598,9 @@ void jclub2o_state::jclub2o_map(address_map &map)
 	map(0x490000, 0x490003).w(FUNC(jclub2o_state::eeprom_s29290_w));
 
 	map(0x4a0000, 0x4a0003).w(FUNC(jclub2o_state::out2_w));
-//  AM_RANGE(0x4a0010, 0x4a0013) AM_WRITE
-//  AM_RANGE(0x4a0020, 0x4a0023) AM_WRITE
-//  AM_RANGE(0x4a0030, 0x4a0033) AM_WRITE
+//  map(0x4a0010, 0x4a0013).w(FUNC(jclub2o_map::));
+//  map(0x4a0020, 0x4a0023).w(FUNC(jclub2o_map::));
+//  map(0x4a0030, 0x4a0033).w(FUNC(jclub2o_map::));
 
 	// ST-0016
 	map(0x4b0000, 0x4b0003).rw(FUNC(jclub2o_state::cmd1_word_r), FUNC(jclub2o_state::cmd1_word_w));
@@ -619,14 +619,14 @@ void jclub2o_state::jclub2o_map(address_map &map)
 	map(0x580008, 0x58000b).portr("COIN");
 	map(0x58000c, 0x58000f).w(FUNC(jclub2o_state::input_sel1_out3_w));
 	map(0x580010, 0x580013).w(FUNC(jclub2o_state::out1_w));
-//  AM_RANGE(0x580018, 0x58001b) AM_WRITE
-//  AM_RANGE(0x58001c, 0x58001f) AM_WRITE
+//  map(0x580018, 0x58001b).w(FUNC(jclub2o_map::));
+//  map(0x58001c, 0x58001f).w(FUNC(jclub2o_map::));
 
 	map(0x580200, 0x580201).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 
 	map(0x580401, 0x580401).rw(FUNC(jclub2o_state::console_r), FUNC(jclub2o_state::console_w));
-	map(0x580421, 0x580421).r(FUNC(jclub2o_state::console_status_r)); //AM_WRITE
-//  AM_RANGE(0x580440, 0x580443) AM_WRITE
+	map(0x580421, 0x580421).r(FUNC(jclub2o_state::console_status_r)); //.w(FUNC(jclub2o_map::));
+//  map(0x580440, 0x580443).w(FUNC(jclub2o_map::));
 
 	// ST-0020
 	map(0x600000, 0x67ffff).rw(m_st0020, FUNC(st0020_device::sprram_r), FUNC(st0020_device::sprram_w));
@@ -678,21 +678,21 @@ void jclub2o_state::st0016_mem(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("soundbank");
 	map(0xe800, 0xe8ff).ram();
-	//AM_RANGE(0xe900, 0xe9ff) // sound - internal
-	//AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
+	//map(0xe900, 0xe9ff) // sound - internal
+	//map(0xec00, 0xec1f).rw(FUNC(jclub2o_state::st0016_character_ram_r), FUNC(jclub2o_state::st0016_character_ram_w));
 	map(0xf000, 0xffff).ram();
 }
 
 void jclub2o_state::st0016_io(address_map &map)
 {
 	map.global_mask(0xff);
-	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
+	//map(0x00, 0xbf).rw(FUNC(jclub2o_state::st0016_vregs_r), FUNC(jclub2o_state::st0016_vregs_w));
 	map(0xc0, 0xc0).rw(FUNC(jclub2o_state::cmd1_r), FUNC(jclub2o_state::cmd1_w));
 	map(0xc1, 0xc1).rw(FUNC(jclub2o_state::cmd2_r), FUNC(jclub2o_state::cmd2_w));
 	map(0xc2, 0xc2).r(FUNC(jclub2o_state::cmd_stat_r));
 	map(0xe1, 0xe1).w(FUNC(jclub2o_state::st0016_rom_bank_w));
 	map(0xe7, 0xe7).nopw(); // watchdog?
-	//AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
+	//map(0xf0, 0xf0).r(FUNC(jclub2o_state::st0016_dma_r));
 }
 
 
@@ -737,14 +737,14 @@ void jclub2_state::jclub2_map(address_map &map)
 	map(0x580008, 0x58000b).portr("COIN");
 	map(0x58000c, 0x58000f).w(FUNC(jclub2_state::input_sel1_out3_w));
 	map(0x580010, 0x580013).w(FUNC(jclub2_state::out1_w));
-//  AM_RANGE(0x580018, 0x58001b) AM_WRITE
-//  AM_RANGE(0x58001c, 0x58001f) AM_WRITE
+//  map(0x580018, 0x58001b).w(FUNC(jclub2_map::));
+//  map(0x58001c, 0x58001f).w(FUNC(jclub2_map::));
 
 	map(0x580200, 0x580201).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 
 	map(0x580401, 0x580401).rw(FUNC(jclub2_state::console_r), FUNC(jclub2_state::console_w));
-	map(0x580421, 0x580421).r(FUNC(jclub2_state::console_status_r)); //AM_WRITE
-//  AM_RANGE(0x580440, 0x580443) AM_WRITE
+	map(0x580421, 0x580421).r(FUNC(jclub2_state::console_status_r));  //.w(FUNC(jclub2_map::));
+//  map(0x580440, 0x580443).w(FUNC(jclub2_map::));
 
 	// ST-0032
 	map(0x800000, 0x87ffff).rw(m_st0020, FUNC(st0020_device::sprram_r), FUNC(st0020_device::sprram_w));
@@ -818,11 +818,11 @@ void darkhors_state::darkhors_map(address_map &map)
 	map(0x580004, 0x580007).portr("COIN");
 	map(0x580008, 0x58000b).r(FUNC(darkhors_state::input_r));
 	map(0x58000c, 0x58000f).w(FUNC(darkhors_state::input_sel_w));
-//  AM_RANGE(0x580010, 0x580013) AM_WRITE
-//  AM_RANGE(0x580018, 0x58001b) AM_WRITE
-//  AM_RANGE(0x58001c, 0x58001f) AM_WRITE
+//  map(0x580010, 0x580013).w(FUNC(darkhors_state::));
+//  map(0x580018, 0x58001b).w(FUNC(darkhors_state::));
+//  map(0x58001c, 0x58001f).w(FUNC(darkhors_state::));
 	map(0x580084, 0x580084).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-//  AM_RANGE(0x58008c, 0x58008f) AM_WRITE
+//  map(0x58008c, 0x58008f).w(FUNC(darkhors_state::));
 	map(0x580200, 0x580201).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 
 	map(0x580401, 0x580401).rw(FUNC(darkhors_state::console_r), FUNC(darkhors_state::console_w));

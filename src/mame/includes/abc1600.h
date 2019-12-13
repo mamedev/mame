@@ -85,7 +85,7 @@ public:
 	required_device<z80dma_device> m_dma1;
 	required_device<z80dma_device> m_dma2;
 	required_device<z80dart_device> m_dart;
-	required_device<scc8530_t> m_scc;
+	required_device<scc8530_legacy_device> m_scc;
 	required_device<z8536_device> m_cio;
 	required_device<fd1797_device> m_fdc;
 	required_device<e0516_device> m_rtc;

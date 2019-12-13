@@ -923,17 +923,17 @@ void deco_mlc_state::descramble_sound(  )
 	for (u32 x = 0; x < length; x++)
 	{
 		const u32 addr = bitswap<24>(x,
-		23,22,21,0, 20,
-		19,18,17,16,
-		15,14,13,12,
-		11,10,9, 8,
-		7, 6, 5, 4,
-		3, 2, 1 );
+				23,22,21, 0,20,
+				19,18,17,16,
+				15,14,13,12,
+				11,10, 9, 8,
+				 7, 6, 5, 4,
+				 3, 2, 1);
 
 		buf[addr] = rom[x];
 	}
 
-	std::copy(buf.begin(),buf.end(),&rom[0]);
+	std::copy(buf.begin(), buf.end(), &rom[0]);
 }
 
 READ32_MEMBER(deco_mlc_state::avengrgs_speedup_r)
@@ -961,7 +961,7 @@ void deco_mlc_state::init_avengrgs()
 	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0280000, 0x029ffff, 0, &m_vram[0]);
 
 	m_irqLevel = 1;
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01089a0, 0x01089a3, read32_delegate(FUNC(deco_mlc_state::avengrgs_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01089a0, 0x01089a3, read32_delegate(*this, FUNC(deco_mlc_state::avengrgs_speedup_r)));
 	descramble_sound();
 }
 

@@ -324,7 +324,7 @@ void meyc8080_state::meyc8080_map(address_map &map)
 	map(0x4000, 0x5fff).ram().share("vram0");
 	map(0x6000, 0x7fff).ram().share("vram1");
 	map(0x8000, 0x9fff).ram().share("vram2");
-//  AM_RANGE(0xa000, 0xa0ff) AM_RAM     // unknown... filled with 00's at boot time or when entering the service mode.
+//  map(0xa000, 0xa0ff).ram();     // unknown... filled with 00's at boot time or when entering the service mode.
 	map(0xcd00, 0xcdff).ram().share("nvram");
 	map(0xf000, 0xf000).portr("BSW").w(FUNC(meyc8080_state::meyc8080_dac_1_w));
 	map(0xf004, 0xf004).portr("IN1").w(FUNC(meyc8080_state::lights_1_w));

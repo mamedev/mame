@@ -1,9 +1,5 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * pmain.cpp
- *
- */
 
 #include "pmain.h"
 
@@ -29,16 +25,10 @@ namespace plib {
 	}
 	#endif
 
-/***************************************************************************
-    Application
-***************************************************************************/
-
 	app::app()
 	: options()
-	, pout_strm()
-	, perr_strm()
-	, pout(&pout_strm)
-	, perr(&perr_strm)
+	, pout(&std::cout)
+	, perr(&std::cerr)
 	{
 
 	}

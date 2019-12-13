@@ -189,7 +189,7 @@ void palm_state::palm(machine_config &config)
 	m_maincpu->in_spim().set(FUNC(palm_state::palm_spim_in));
 	m_maincpu->spim_xch_trigger().set(FUNC(palm_state::palm_spim_exchange));
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));

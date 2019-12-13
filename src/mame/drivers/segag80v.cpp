@@ -406,7 +406,7 @@ void segag80v_state::opcodes_map(address_map &map)
 void segag80v_state::main_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xbc, 0xbc); /* AM_READ ??? */
+	map(0xbc, 0xbc); /* .r(FUNC(segag80v_state::)); ??? */
 	map(0xbd, 0xbe).w(FUNC(segag80v_state::multiply_w));
 	map(0xbe, 0xbe).r(FUNC(segag80v_state::multiply_r));
 	map(0xbf, 0xbf).w(FUNC(segag80v_state::unknown_w));
@@ -1303,8 +1303,8 @@ void segag80v_state::init_elim2()
 	m_decrypt = segag80_security(70);
 
 	/* configure sound */
-	iospace.install_write_handler(0x3e, 0x3e, write8_delegate(FUNC(segag80v_state::elim1_sh_w),this));
-	iospace.install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(segag80v_state::elim2_sh_w),this));
+	iospace.install_write_handler(0x3e, 0x3e, write8_delegate(*this, FUNC(segag80v_state::elim1_sh_w)));
+	iospace.install_write_handler(0x3f, 0x3f, write8_delegate(*this, FUNC(segag80v_state::elim2_sh_w)));
 }
 
 
@@ -1316,12 +1316,12 @@ void segag80v_state::init_elim4()
 	m_decrypt = segag80_security(76);
 
 	/* configure sound */
-	iospace.install_write_handler(0x3e, 0x3e, write8_delegate(FUNC(segag80v_state::elim1_sh_w),this));
-	iospace.install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(segag80v_state::elim2_sh_w),this));
+	iospace.install_write_handler(0x3e, 0x3e, write8_delegate(*this, FUNC(segag80v_state::elim1_sh_w)));
+	iospace.install_write_handler(0x3f, 0x3f, write8_delegate(*this, FUNC(segag80v_state::elim2_sh_w)));
 
 	/* configure inputs */
-	iospace.install_write_handler(0xf8, 0xf8, write8_delegate(FUNC(segag80v_state::spinner_select_w),this));
-	iospace.install_read_handler(0xfc, 0xfc, read8_delegate(FUNC(segag80v_state::elim4_input_r),this));
+	iospace.install_write_handler(0xf8, 0xf8, write8_delegate(*this, FUNC(segag80v_state::spinner_select_w)));
+	iospace.install_read_handler(0xfc, 0xfc, read8_delegate(*this, FUNC(segag80v_state::elim4_input_r)));
 }
 
 
@@ -1333,10 +1333,10 @@ void segag80v_state::init_spacfury()
 	m_decrypt = segag80_security(64);
 
 	/* configure sound */
-	iospace.install_write_handler(0x38, 0x38, write8_delegate(FUNC(speech_sound_device::data_w), (speech_sound_device*)m_speech));
-	iospace.install_write_handler(0x3b, 0x3b, write8_delegate(FUNC(speech_sound_device::control_w), (speech_sound_device*)m_speech));
-	iospace.install_write_handler(0x3e, 0x3e, write8_delegate(FUNC(segag80v_state::spacfury1_sh_w),this));
-	iospace.install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(segag80v_state::spacfury2_sh_w),this));
+	iospace.install_write_handler(0x38, 0x38, write8_delegate(*m_speech, FUNC(speech_sound_device::data_w)));
+	iospace.install_write_handler(0x3b, 0x3b, write8_delegate(*m_speech, FUNC(speech_sound_device::control_w)));
+	iospace.install_write_handler(0x3e, 0x3e, write8_delegate(*this, FUNC(segag80v_state::spacfury1_sh_w)));
+	iospace.install_write_handler(0x3f, 0x3f, write8_delegate(*this, FUNC(segag80v_state::spacfury2_sh_w)));
 }
 
 
@@ -1348,15 +1348,15 @@ void segag80v_state::init_zektor()
 	m_decrypt = segag80_security(82);
 
 	/* configure sound */
-	iospace.install_write_handler(0x38, 0x38, write8_delegate(FUNC(speech_sound_device::data_w), (speech_sound_device*)m_speech));
-	iospace.install_write_handler(0x3b, 0x3b, write8_delegate(FUNC(speech_sound_device::control_w), (speech_sound_device*)m_speech));
-	iospace.install_write_handler(0x3c, 0x3d, write8sm_delegate(FUNC(ay8912_device::address_data_w), (ay8912_device*)m_aysnd));
-	iospace.install_write_handler(0x3e, 0x3e, write8_delegate(FUNC(segag80v_state::zektor1_sh_w),this));
-	iospace.install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(segag80v_state::zektor2_sh_w),this));
+	iospace.install_write_handler(0x38, 0x38, write8_delegate(*m_speech, FUNC(speech_sound_device::data_w)));
+	iospace.install_write_handler(0x3b, 0x3b, write8_delegate(*m_speech, FUNC(speech_sound_device::control_w)));
+	iospace.install_write_handler(0x3c, 0x3d, write8sm_delegate(*m_aysnd, FUNC(ay8912_device::address_data_w)));
+	iospace.install_write_handler(0x3e, 0x3e, write8_delegate(*this, FUNC(segag80v_state::zektor1_sh_w)));
+	iospace.install_write_handler(0x3f, 0x3f, write8_delegate(*this, FUNC(segag80v_state::zektor2_sh_w)));
 
 	/* configure inputs */
-	iospace.install_write_handler(0xf8, 0xf8, write8_delegate(FUNC(segag80v_state::spinner_select_w),this));
-	iospace.install_read_handler(0xfc, 0xfc, read8_delegate(FUNC(segag80v_state::spinner_input_r),this));
+	iospace.install_write_handler(0xf8, 0xf8, write8_delegate(*this, FUNC(segag80v_state::spinner_select_w)));
+	iospace.install_read_handler(0xfc, 0xfc, read8_delegate(*this, FUNC(segag80v_state::spinner_input_r)));
 }
 
 
@@ -1369,13 +1369,13 @@ void segag80v_state::init_tacscan()
 	m_decrypt = segag80_security(76);
 
 	/* configure sound */
-	iospace.install_readwrite_handler(0x3f, 0x3f, read8_delegate(FUNC(usb_sound_device::status_r), (usb_sound_device*)m_usb), write8_delegate(FUNC(usb_sound_device::data_w), (usb_sound_device*)m_usb));
-	pgmspace.install_read_handler(0xd000, 0xdfff, read8_delegate(FUNC(usb_sound_device::ram_r), (usb_sound_device*)m_usb));
-	pgmspace.install_write_handler(0xd000, 0xdfff, write8_delegate(FUNC(segag80v_state::usb_ram_w),this));
+	iospace.install_readwrite_handler(0x3f, 0x3f, read8_delegate(*m_usb, FUNC(usb_sound_device::status_r)), write8_delegate(*m_usb, FUNC(usb_sound_device::data_w)));
+	pgmspace.install_read_handler(0xd000, 0xdfff, read8_delegate(*m_usb, FUNC(usb_sound_device::ram_r)));
+	pgmspace.install_write_handler(0xd000, 0xdfff, write8_delegate(*this, FUNC(segag80v_state::usb_ram_w)));
 
 	/* configure inputs */
-	iospace.install_write_handler(0xf8, 0xf8, write8_delegate(FUNC(segag80v_state::spinner_select_w),this));
-	iospace.install_read_handler(0xfc, 0xfc, read8_delegate(FUNC(segag80v_state::spinner_input_r),this));
+	iospace.install_write_handler(0xf8, 0xf8, write8_delegate(*this, FUNC(segag80v_state::spinner_select_w)));
+	iospace.install_read_handler(0xfc, 0xfc, read8_delegate(*this, FUNC(segag80v_state::spinner_input_r)));
 }
 
 
@@ -1388,16 +1388,16 @@ void segag80v_state::init_startrek()
 	m_decrypt = segag80_security(64);
 
 	/* configure sound */
-	iospace.install_write_handler(0x38, 0x38, write8_delegate(FUNC(speech_sound_device::data_w), (speech_sound_device*)m_speech));
-	iospace.install_write_handler(0x3b, 0x3b, write8_delegate(FUNC(speech_sound_device::control_w), (speech_sound_device*)m_speech));
+	iospace.install_write_handler(0x38, 0x38, write8_delegate(*m_speech, FUNC(speech_sound_device::data_w)));
+	iospace.install_write_handler(0x3b, 0x3b, write8_delegate(*m_speech, FUNC(speech_sound_device::control_w)));
 
-	iospace.install_readwrite_handler(0x3f, 0x3f, read8_delegate(FUNC(usb_sound_device::status_r), (usb_sound_device*)m_usb), write8_delegate(FUNC(usb_sound_device::data_w), (usb_sound_device*)m_usb));
-	pgmspace.install_read_handler(0xd000, 0xdfff, read8_delegate(FUNC(usb_sound_device::ram_r), (usb_sound_device*)m_usb));
-	pgmspace.install_write_handler(0xd000, 0xdfff, write8_delegate(FUNC(segag80v_state::usb_ram_w),this));
+	iospace.install_readwrite_handler(0x3f, 0x3f, read8_delegate(*m_usb, FUNC(usb_sound_device::status_r)), write8_delegate(*m_usb, FUNC(usb_sound_device::data_w)));
+	pgmspace.install_read_handler(0xd000, 0xdfff, read8_delegate(*m_usb, FUNC(usb_sound_device::ram_r)));
+	pgmspace.install_write_handler(0xd000, 0xdfff, write8_delegate(*this, FUNC(segag80v_state::usb_ram_w)));
 
 	/* configure inputs */
-	iospace.install_write_handler(0xf8, 0xf8, write8_delegate(FUNC(segag80v_state::spinner_select_w),this));
-	iospace.install_read_handler(0xfc, 0xfc, read8_delegate(FUNC(segag80v_state::spinner_input_r),this));
+	iospace.install_write_handler(0xf8, 0xf8, write8_delegate(*this, FUNC(segag80v_state::spinner_select_w)));
+	iospace.install_read_handler(0xfc, 0xfc, read8_delegate(*this, FUNC(segag80v_state::spinner_input_r)));
 }
 
 

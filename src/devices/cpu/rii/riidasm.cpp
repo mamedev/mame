@@ -16,8 +16,8 @@ using osd::u32;
 using util::BIT;
 using offs_t = u32;
 
-// FIXME: this set is an amalgam of ePG3231-EM202, EPD3332 and EPD3338
-const char *const riscii_disassembler::s_regs[0x60] =
+// TODO: add register sets for other models
+const char *const epg3231_disassembler::s_regs[0x60] =
 {
 	"INDF0", "FSR0", "PCL", "PCM", "PCH", "BSR", "STKPTR", "BSR1",
 	"INDF1", "FSR1", "ACC", "TABPTRL", "TABPTRM", "TABPTRH", "CPUCON", "STATUS",
@@ -27,8 +27,8 @@ const char *const riscii_disassembler::s_regs[0x60] =
 	"TR2CON", "TRLIR", nullptr, "POST_ID", "ADCON", "PAINTEN", "PAINTSTA", "PAWAKE",
 	"UARTCON", "UARTSTA", "PORTJ", "PORTK", "DCRB", "DCRC", "DCRDE", "DCRFG",
 	"DCRHI", "DCRJK", "PBCON", "PCCON", "PLLF", "T0CL", "T0CH", "SPICON",
-	"SPISTA", "SPRL", "SPRM", "SPRH", "SFCR", "ADDL1~ADDL4", "ADDM1~ADDM4", "ADDH1~ADDH4",
-	"ENV1~4/SPHDR", "MTCON1~4/SPHTCON", "MTRL1~4/SPHTRL", "VOCON", "TR1C", "TR2C", "ADCF", nullptr,
+	"SPISTA", "SPRL", "SPRM", "SPRH", "SFCR", "ADDL", "ADDM", "ADDH",
+	"ENV/SPHDR", "MTCON/SPHTCON", "MTRL/SPHTRL", "VOCON", "TR1C", "TR2C", "ADCF", nullptr,
 	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 };

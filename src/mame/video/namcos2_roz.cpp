@@ -44,7 +44,7 @@ namcos2_roz_device::namcos2_roz_device(const machine_config &mconfig, const char
 
 void namcos2_roz_device::device_start()
 {
-	m_tilemap_roz = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namcos2_roz_device::roz_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 256, 256);
+	m_tilemap_roz = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namcos2_roz_device::roz_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 256, 256);
 	m_tilemap_roz->set_transparent_pen(0xff);
 }
 

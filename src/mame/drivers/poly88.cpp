@@ -48,6 +48,7 @@ at least some models of the Poly-88 are known to have used.)
 #include "emu.h"
 #include "includes/poly88.h"
 
+#include "bus/s100/ascsasi.h"
 #include "bus/s100/poly16k.h"
 #include "bus/s100/polyfdc.h"
 #include "bus/s100/polyvti.h"
@@ -107,6 +108,7 @@ static void poly88_s100_devices(device_slot_interface &device)
 	device.option_add("8kscbb", S100_8K_SC_BB);
 	device.option_add("poly16k", S100_POLY_16K);
 	device.option_add("polyfdc", S100_POLY_FDC);
+	device.option_add("ascsasi", S100_ASC_SASI);
 }
 
 DEVICE_INPUT_DEFAULTS_START(poly88_vti_1800)
@@ -161,7 +163,7 @@ void poly88_state::poly88(machine_config &config)
 	m_brg->output_cb().set(FUNC(poly88_state::cassette_clock_w));
 
 	/* snapshot */
-	SNAPSHOT(config, "snapshot", "img", attotime::from_seconds(2)).set_load_callback(FUNC(poly88_state::snapshot_cb), this);
+	SNAPSHOT(config, "snapshot", "img", attotime::from_seconds(2)).set_load_callback(FUNC(poly88_state::snapshot_cb));
 
 	S100_BUS(config, m_s100, 16.5888_MHz_XTAL / 9);
 	m_s100->vi2().set(FUNC(poly88_state::vi2_w));

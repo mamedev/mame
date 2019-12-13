@@ -148,32 +148,30 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "speaker.h"
 
 
+template<int Chip>
+void mcatadv_state::get_banked_color(bool tiledim, u32 &color, u32 &pri, u32 &code)
+{
+	pri |= 0x8;
+	color += m_palette_bank[Chip] * 0x40;
+}
+
 /*** Main CPU ***/
 
 #if 0 // mcat only.. install read handler?
-WRITE16_MEMBER(mcatadv_state::mcat_coin_w)
+void mcatadv_state::mcat_coin_w(u8 data)
 {
-	if(ACCESSING_BITS_8_15)
-	{
-		machine().bookkeeping().coin_counter_w(0, data & 0x1000);
-		machine().bookkeeping().coin_counter_w(1, data & 0x2000);
-		machine().bookkeeping().coin_lockout_w(0, ~data & 0x4000);
-		machine().bookkeeping().coin_lockout_w(1, ~data & 0x8000);
-	}
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x40);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x80);
 }
 #endif
 
-READ16_MEMBER(mcatadv_state::mcat_wd_r)
+u16 mcatadv_state::mcat_wd_r()
 {
-	m_watchdog->watchdog_reset();
+	if (!machine().side_effects_disabled())
+		m_watchdog->watchdog_reset();
 	return 0xc00;
-}
-
-template<int Chip>
-WRITE16_MEMBER(mcatadv_state::vram_w)
-{
-	COMBINE_DATA(&m_vram[Chip][offset]);
-	m_tilemap[Chip]->mark_tile_dirty(offset / 2);
 }
 
 
@@ -182,13 +180,13 @@ void mcatadv_state::mcatadv_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x10ffff).ram();
 
-//  AM_RANGE(0x180018, 0x18001f) AM_READNOP // ?
+//  map(0x180018, 0x18001f).nopr(); // ?
 
-	map(0x200000, 0x200005).ram().share("scroll1");
-	map(0x300000, 0x300005).ram().share("scroll2");
+	map(0x200000, 0x200005).rw(m_tilemap[0], FUNC(tilemap038_device::vregs_r), FUNC(tilemap038_device::vregs_w));
+	map(0x300000, 0x300005).rw(m_tilemap[1], FUNC(tilemap038_device::vregs_r), FUNC(tilemap038_device::vregs_w));
 
-	map(0x400000, 0x401fff).ram().w(FUNC(mcatadv_state::vram_w<0>)).share("vram_1"); // Tilemap 0
-	map(0x500000, 0x501fff).ram().w(FUNC(mcatadv_state::vram_w<1>)).share("vram_2"); // Tilemap 1
+	map(0x400000, 0x401fff).m(m_tilemap[0], FUNC(tilemap038_device::vram_16x16_map)); // Tilemap 0
+	map(0x500000, 0x501fff).m(m_tilemap[1], FUNC(tilemap038_device::vram_16x16_map)); // Tilemap 1
 
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x602000, 0x602fff).ram(); // Bigger than needs to be?
@@ -198,7 +196,7 @@ void mcatadv_state::mcatadv_map(address_map &map)
 
 	map(0x800000, 0x800001).portr("P1");
 	map(0x800002, 0x800003).portr("P2");
-//  AM_RANGE(0x900000, 0x900001) AM_WRITE(mcat_coin_w) // Lockout / Counter MCAT Only
+//  map(0x900000, 0x900000).w(FUNC(mcatadv_state::mcat_coin_w)); // Lockout / Counter MCAT Only
 	map(0xa00000, 0xa00001).portr("DSW1");
 	map(0xa00002, 0xa00003).portr("DSW2");
 
@@ -212,7 +210,7 @@ void mcatadv_state::mcatadv_map(address_map &map)
 
 /*** Sound ***/
 
-WRITE8_MEMBER(mcatadv_state::mcatadv_sound_bw_w)
+void mcatadv_state::mcatadv_sound_bw_w(u8 data)
 {
 	m_soundbank->set_entry(data);
 }
@@ -408,14 +406,14 @@ INPUT_PORTS_END
 /*** GFX Decode ***/
 
 static GFXDECODE_START( gfx_mcatadv )
-	GFXDECODE_ENTRY( "bg0", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0, 0x200 )
-	GFXDECODE_ENTRY( "bg1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0, 0x200 )
+	GFXDECODE_ENTRY( "bg0", 0, gfx_8x8x4_packed_msb, 0, 0x200 )
+	GFXDECODE_ENTRY( "bg1", 0, gfx_8x8x4_packed_msb, 0, 0x200 )
 GFXDECODE_END
 
 
 void mcatadv_state::machine_start()
 {
-	uint32_t max = memregion("soundcpu")->bytes()/0x4000;
+	const u32 max = memregion("soundcpu")->bytes()/0x4000;
 
 	m_soundbank->configure_entries(0, max, memregion("soundcpu")->base(), 0x4000);
 	m_soundbank->set_entry(1);
@@ -446,6 +444,16 @@ void mcatadv_state::mcatadv(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mcatadv);
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 0x2000/2);
+
+	TMAP038(config, m_tilemap[0]);
+	m_tilemap[0]->set_gfxdecode_tag(m_gfxdecode);
+	m_tilemap[0]->set_gfx(0);
+	m_tilemap[0]->set_tile_callback(FUNC(mcatadv_state::get_banked_color<0>));
+
+	TMAP038(config, m_tilemap[1]);
+	m_tilemap[1]->set_gfxdecode_tag(m_gfxdecode);
+	m_tilemap[1]->set_gfx(1);
+	m_tilemap[1]->set_tile_callback(FUNC(mcatadv_state::get_banked_color<1>));
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 

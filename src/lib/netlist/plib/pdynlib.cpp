@@ -1,9 +1,5 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * dynlib.c
- *
- */
 
 #include "pdynlib.h"
 
@@ -136,12 +132,7 @@ dynlib::~dynlib()
 	}
 }
 
-bool dynlib::isLoaded() const
-{
-	return m_isLoaded;
-}
-
-void *dynlib::getsym_p(const pstring &name)
+void *dynlib::getsym_p(const pstring &name) const noexcept
 {
 #ifdef _WIN32
 	return (void *) GetProcAddress((HMODULE) m_lib, name.c_str());

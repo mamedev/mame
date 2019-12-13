@@ -3,27 +3,27 @@
 /**********************************************************************
 
     Geneve 9640 101-key XT/AT keyboard (High-level emulation)
-    
+
     Geneves may use any XT keyboard; some were delivered with a 101-key XT/AT
     keyboard.
 
     This is a high-level emulation in the sense that it is only emulated
     from its behavior, not from its actual chipset. This will be done as
-    soon as we have a ROM dump. 
-    
+    soon as we have a ROM dump.
+
     Although the keyboard is switchable between XT and AT mode, we will
     only emulate the XT mode here.
-    
+
     The code is copied from the previous implementation in genboard.cpp
     and appropriately adapted to use the pc_kbd interface.
 
     The XT keyboard interface is described in various places on the internet.
-    It does not comply with the PS2 protocol. The keyboard transmits 8-bit 
-    scancodes serially with one (1) or two (0,1) start bits, LSB to MSB, 
-    no parity and no stop bits. Each bit is read into the shift register 
+    It does not comply with the PS2 protocol. The keyboard transmits 8-bit
+    scancodes serially with one (1) or two (0,1) start bits, LSB to MSB,
+    no parity and no stop bits. Each bit is read into the shift register
     when the clock line is pulled low by the keyboard.
-        
-    MZ, August 2019    
+
+    MZ, August 2019
 
 ****************************************************************************/
 
@@ -204,7 +204,7 @@ geneve_xt_101_hle_keyboard_device::geneve_xt_101_hle_keyboard_device(const machi
 }
 
 /*
-	Called by the poll timer
+    Called by the poll timer
 */
 void geneve_xt_101_hle_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -218,14 +218,14 @@ void geneve_xt_101_hle_keyboard_device::device_timer(emu_timer &timer, device_ti
 		if (id==1)
 		{
 			// Send timer
-			if (m_shift_count==10) 
+			if (m_shift_count==10)
 			{
 				// Done, all sent
 				m_pc_kbdc->clock_write_from_kb(1);
 				m_pc_kbdc->data_write_from_kb(1);
 				m_send_timer->reset();
 				m_shift_count = 0;
-				
+
 				// Adjust the queue
 				m_queue_head = (m_queue_head + 1) % KEYQUEUESIZE;
 				m_queue_length--;
@@ -244,7 +244,7 @@ void geneve_xt_101_hle_keyboard_device::device_timer(emu_timer &timer, device_ti
 
 
 /*
-	Translations
+    Translations
 */
 static const uint8_t MF1_CODE[0xe] =
 {
@@ -252,19 +252,19 @@ static const uint8_t MF1_CODE[0xe] =
 	0x1c,   // KP Enter -> Return
 	0x1d,   // RCtrl -> LCtrl
 	0x38,   // AltGr -> LAlt
-	
+
 	// Extended key that is equivalent to a non-extended key with shift off
 	0x35,   // KP / -> /
 
 	// Extended keys that are equivalent to non-extended keys with numlock off
 	0x47,   // Home    -> KP 7 (Home)
 	0x48,   // Up      -> KP 8 (Up)
-	0x49,   // Page up -> KP 9 (PgUp) 
+	0x49,   // Page up -> KP 9 (PgUp)
 	0x4b,   // Left    -> KP 4 (Left)
 	0x4d,   // Right   -> KP 6 (Right)
 	0x4f,   // End     -> KP 1 (End)
 	0x50,   // Down    -> KP 2 (Down)
-	0x51,   // Page dn -> KP 3 (PgDn) 
+	0x51,   // Page dn -> KP 3 (PgDn)
 	0x52,   // Insert  -> KP 0 (Ins)
 	0x53    // Delete  -> KP . (Del)
 };
@@ -314,7 +314,7 @@ void geneve_xt_101_hle_keyboard_device::poll()
 					// We are here because the set of pressed keys has changed
 					// In the case that we have a fake shift/unshift,
 					// we have to release it.
-					
+
 					if (m_fake_shift_state)
 					{
 						/* Fake shift release */
@@ -329,7 +329,7 @@ void geneve_xt_101_hle_keyboard_device::poll()
 						post_in_key_queue(0x2a);
 						m_fake_unshift_state = false;
 					}
-						
+
 					switch (keycode)
 					{
 					case 0x2a:
@@ -356,7 +356,7 @@ void geneve_xt_101_hle_keyboard_device::poll()
 					default:
 						break;
 					}
-									
+
 					// Extended keycodes
 					if ((keycode >= 0x60) && (keycode < 0x6e))
 					{
@@ -364,14 +364,14 @@ void geneve_xt_101_hle_keyboard_device::poll()
 						{
 							// Handle shift state
 							if (keycode == 0x63)   // Slash
-							{   
+							{
 								if (m_left_shift || m_right_shift)
 								{
 									// Fake shift unpress
 									m_fake_unshift_state = true;
 								}
 							}
-							else 
+							else
 							{   // Key function with NumLock=0
 								if (m_numlock && (!m_left_shift) && (!m_right_shift))
 								{
@@ -381,7 +381,7 @@ void geneve_xt_101_hle_keyboard_device::poll()
 								else
 								{
 									if ((!m_numlock) && (m_left_shift || m_right_shift))
-									{	
+									{
 										// Fake shift unpress if shift is down
 										m_fake_unshift_state = true;
 									}
@@ -411,7 +411,7 @@ void geneve_xt_101_hle_keyboard_device::poll()
 						{
 							// Emulate Print Screen / System Request (F13) key
 							// this is a bit complex, as Alt+PrtScr -> SysRq
-							// Additionally, Ctrl+PrtScr involves no fake shift press 
+							// Additionally, Ctrl+PrtScr involves no fake shift press
 							if (m_left_alt || m_altgr)
 							{
 								// SysRq
@@ -428,7 +428,7 @@ void geneve_xt_101_hle_keyboard_device::poll()
 									post_in_key_queue(0x2a);
 									m_fake_shift_state = true;
 								}
-								
+
 								keycode = 0x37;
 								if (!pressed) keycode |= 0x80;
 								post_in_key_queue(0xe0);
@@ -437,11 +437,11 @@ void geneve_xt_101_hle_keyboard_device::poll()
 						}
 						else
 						{
-							if (keycode == 0x6f) 
+							if (keycode == 0x6f)
 							{
 								// Emulate pause (F15) key
 								// This is a bit complex, as Pause -> Ctrl+NumLock and
-								// Ctrl+Pause -> Ctrl+ScrLock. 
+								// Ctrl+Pause -> Ctrl+ScrLock.
 								// Furthermore, there is no repeat or release.
 								if (pressed)
 								{
@@ -470,26 +470,26 @@ void geneve_xt_101_hle_keyboard_device::poll()
 							}
 						}
 					}
-					
+
 				}
 				mask <<= 1;
 			}
 		}
 	}
-	
+
 	// Implement auto repeat
 	if (m_autorepeat_code != 0)
 	{
 		m_autorepeat_timer--;
 		if ((m_autorepeat_timer == 0) && (m_queue_length <= (KEYQUEUESIZE-MAXKEYMSGLENGTH)))
-		{	
+		{
 			// Extended code
 			if ((m_autorepeat_code >= 0x60) && (m_autorepeat_code < 0x6e))
 			{
 				post_in_key_queue(0xe0);
 				post_in_key_queue(MF1_CODE[m_autorepeat_code-0x60]);
 			}
-			else 
+			else
 			{
 				if (m_autorepeat_code == 0x6e)
 				{
@@ -503,7 +503,7 @@ void geneve_xt_101_hle_keyboard_device::poll()
 						post_in_key_queue(0x37);   // PrtScr
 					}
 				}
-				else 
+				else
 				{
 					if (m_autorepeat_code != 0x6f)   // Pause cannot do an auto-repeat
 					{
@@ -537,8 +537,8 @@ void geneve_xt_101_hle_keyboard_device::send_key()
 			{
 				LOGMASKED(LOG_TRANSFER, "Send keycode %02x\n", m_queue[m_queue_head]);
 				// Get the next key, add the two start bits to the right (0,1)
-				m_shift_reg = (m_queue[m_queue_head] << 2) | 0x02; 
-				m_send_timer->adjust(attotime::from_usec(1), 0, attotime::from_hz(10000));	
+				m_shift_reg = (m_queue[m_queue_head] << 2) | 0x02;
+				m_send_timer->adjust(attotime::from_usec(1), 0, attotime::from_hz(10000));
 			}
 		}
 		else
@@ -637,10 +637,10 @@ WRITE_LINE_MEMBER( geneve_xt_101_hle_keyboard_device::reset_line )
 		m_fake_shift_state = false;
 		m_fake_unshift_state = false;
 		m_autorepeat_code = 0;
-		
+
 		m_shift_reg = 0;
 		m_shift_count = 0;
-		
+
 		// Send the BAT (Basic assurance test) OK value (AA)
 		post_in_key_queue(0xaa);
 	}

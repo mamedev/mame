@@ -26,22 +26,21 @@ class device_bbc_rom_interface;
 
 class bbc_romslot_device : public device_t,
 							public device_image_interface,
-							public device_slot_interface
+							public device_single_card_slot_interface<device_bbc_rom_interface>
 {
 public:
-		// image-level overrides
+	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const override { return IO_ROM; }
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const char *image_interface() const override { return "bbc_rom"; }
-	virtual const char *file_extensions() const override { return "rom,bin"; }
+	virtual iodevice_t image_type() const noexcept override { return IO_ROM; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return false; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *image_interface() const noexcept override { return "bbc_rom"; }
+	virtual const char *file_extensions() const noexcept override { return "rom,bin"; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
@@ -50,12 +49,19 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
+	void set_fixed_ram(bool fixed) { this->set_fixed(fixed); this->set_user_loadable(!fixed); }
+
+	virtual bool present() { return is_loaded() || loaded_through_softlist() || !user_loadable(); }
+
 	uint32_t get_rom_size();
 	uint32_t get_slot_size() const { return m_slot_size; }
 
 protected:
 	// construction/destruction
 	bbc_romslot_device(const machine_config &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
+
+	// device_image_interface implementation
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -109,7 +115,7 @@ public:
 
 // ======================> device_bbc_rom_interface
 
-class device_bbc_rom_interface : public device_slot_card_interface
+class device_bbc_rom_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -117,7 +123,7 @@ public:
 
 	// reading and writing
 	virtual uint8_t read(offs_t offset) { return 0xff; }
-	virtual void write(offs_t offset, uint8_t data) { m_device.logerror("unhandled ROM write to %04X = %02X\n", offset | 0x8000, data); }
+	virtual void write(offs_t offset, uint8_t data) { device().logerror("unhandled ROM write to %04X = %02X\n", offset | 0x8000, data); }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);

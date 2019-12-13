@@ -193,30 +193,30 @@ void pc8001_state::pc8001_io(address_map &map)
 	map(0x40, 0x40).mirror(0x0f).rw(FUNC(pc8001_state::port40_r), FUNC(pc8001_state::port40_w));
 	map(0x50, 0x51).rw(m_crtc, FUNC(upd3301_device::read), FUNC(upd3301_device::write));
 	map(0x60, 0x68).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write));
-//  AM_RANGE(0x70, 0x7f) unused
-//  AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) AM_WRITE(pc8011_ext0_w)
-//  AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) AM_WRITE(pc8011_ext1_w)
-//  AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_WRITE(pc8011_ext2_w)
-//  AM_RANGE(0xb0, 0xb0) AM_READ(pc8011_gpio8_r)
-//  AM_RANGE(0xb1, 0xb1) AM_WRITE(pc8011_gpio8_w)
-//  AM_RANGE(0xb2, 0xb2) AM_READ(pc8011_gpio4_r)
-//  AM_RANGE(0xb3, 0xb3) AM_WRITE(pc8011_gpio4_w)
-//  AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE(PC8011_CH1_I8251_TAG, i8251_device, data_r, data_w)
-//  AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE(PC8011_CH1_I8251_TAG, i8251_device, status_r, control_w)
-//  AM_RANGE(0xc2, 0xc2) AM_DEVREADWRITE(PC8011_CH2_I8251_TAG, i8251_device, data_r, data_w)
-//  AM_RANGE(0xc3, 0xc3) AM_DEVREADWRITE(PC8011_CH2_I8251_TAG, i8251_device, status_r, control_w)
-//  AM_RANGE(0xc8, 0xc8) RS-232 output enable?
-//  AM_RANGE(0xca, 0xca) RS-232 output disable?
-//  AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE(PC8011_IEEE488_I8255A_TAG, i8255_device, read, write)
-//  AM_RANGE(0xd8, 0xd8) AM_READ(pc8011_ieee488_control_signal_input_r)
-//  AM_RANGE(0xda, 0xda) AM_READ(pc8011_ieee488_bus_address_mode_r)
-//  AM_RANGE(0xdc, 0xdc) AM_WRITE(pc8011_ieee488_nrfd_w)
-//  AM_RANGE(0xde, 0xde) AM_WRITE(pc8011_ieee488_bus_mode_control_w)
-//  AM_RANGE(0xe0, 0xe3) AM_WRITE(expansion_storage_mode_w)
-//  AM_RANGE(0xe4, 0xe4) AM_MIRROR(0x01) AM_WRITE(irq_level_w)
-//  AM_RANGE(0xe6, 0xe6) AM_WRITE(irq_mask_w)
-//  AM_RANGE(0xe7, 0xe7) AM_WRITE(pc8012_memory_mode_w)
-//  AM_RANGE(0xe8, 0xfb) unused
+//  map(0x70, 0x7f) unused
+//  map(0x80, 0x80).mirror(0x0f).w(FUNC(pc8001_state::pc8011_ext0_w));
+//  map(0x90, 0x90).mirror(0x0f).w(FUNC(pc8001_state::pc8011_ext1_w));
+//  map(0xa0, 0xa0).mirror(0x0f).w(FUNC(pc8001_state::pc8011_ext2_w));
+//  map(0xb0, 0xb0).r(FUNC(pc8001_state::pc8011_gpio8_r));
+//  map(0xb1, 0xb1).w(FUNC(pc8001_state::pc8011_gpio8_w));
+//  map(0xb2, 0xb2).r(FUNC(pc8001_state::pc8011_gpio4_r));
+//  map(0xb3, 0xb3).w(FUNC(pc8001_state::pc8011_gpio4_w));
+//  map(0xc0, 0xc0).rw(PC8011_CH1_I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+//  map(0xc1, 0xc1).rw(PC8011_CH1_I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+//  map(0xc2, 0xc2).rw(PC8011_CH2_I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+//  map(0xc3, 0xc3).rw(PC8011_CH2_I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+//  map(0xc8, 0xc8) RS-232 output enable?)
+//  map(0xca, 0xca) RS-232 output disable?
+//  map(0xd0, 0xd3).rw(PC8011_IEEE488_I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+//  map(0xd8, 0xd8).r(FUNC(pc8001_state::pc8011_ieee488_control_signal_input_r));
+//  map(0xda, 0xda).r(FUNC(pc8001_state::pc8011_ieee488_bus_address_mode_r));
+//  map(0xdc, 0xdc).w(FUNC(pc8001_state::pc8011_ieee488_nrfd_w));
+//  map(0xde, 0xde).w(FUNC(pc8001_state::pc8011_ieee488_bus_mode_control_w));
+//  map(0xe0, 0xe3).w(FUNC(pc8001_state::expansion_storage_mode_w));
+//  map(0xe4, 0xe4).mirror(0x01).w(FUNC(pc8001_state::irq_level_w));
+//  map(0xe6, 0xe6).w(FUNC(pc8001_state::irq_mask_w));
+//  map(0xe7, 0xe7).w(FUNC(pc8001_state::pc8012_memory_mode_w));
+//  map(0xe8, 0xfb) unused
 	map(0xfc, 0xff).rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
@@ -233,21 +233,21 @@ void pc8001mk2_state::pc8001mk2_io(address_map &map)
 	pc8001_io(map);
 	map(0x30, 0x30).w(FUNC(pc8001mk2_state::port30_w));
 	map(0x31, 0x31).w(FUNC(pc8001mk2_state::port31_w));
-//  AM_RANGE(0x5c, 0x5c) AM_WRITE(gram_on_w)
-//  AM_RANGE(0x5f, 0x5f) AM_WRITE(gram_off_w)
-//  AM_RANGE(0xe8, 0xe8) kanji_address_lo_w, kanji_data_lo_r
-//  AM_RANGE(0xe9, 0xe9) kanji_address_hi_w, kanji_data_hi_r
-//  AM_RANGE(0xea, 0xea) kanji_readout_start_w
-//  AM_RANGE(0xeb, 0xeb) kanji_readout_end_w
-//  AM_RANGE(0xf3, 0xf3) DMA type disk unit interface selection port
-//  AM_RANGE(0xf4, 0xf4) DMA type 8 inch control
-//  AM_RANGE(0xf5, 0xf5) DMA type 8 inch margin control
-//  AM_RANGE(0xf6, 0xf6) DMA type 8 inch FDC status
-//  AM_RANGE(0xf7, 0xf7) DMA type 8 inch FDC data register
-//  AM_RANGE(0xf8, 0xf8) DMA type 5 inch control
-//  AM_RANGE(0xf9, 0xf9) DMA type 5 inch margin control
-//  AM_RANGE(0xfa, 0xfa) DMA type 5 inch FDC status
-//  AM_RANGE(0xfb, 0xfb) DMA type 5 inch FDC data register
+//  map(0x5c, 0x5c).w(FUNC(pc8001mk2_state::gram_on_w));
+//  map(0x5f, 0x5f).w(FUNC(pc8001mk2_state::gram_off_w));
+//  map(0xe8, 0xe8) kanji_address_lo_w, kanji_data_lo_r
+//  map(0xe9, 0xe9) kanji_address_hi_w, kanji_data_hi_r
+//  map(0xea, 0xea) kanji_readout_start_w
+//  map(0xeb, 0xeb) kanji_readout_end_w
+//  map(0xf3, 0xf3) DMA type disk unit interface selection port
+//  map(0xf4, 0xf4) DMA type 8 inch control
+//  map(0xf5, 0xf5) DMA type 8 inch margin control
+//  map(0xf6, 0xf6) DMA type 8 inch FDC status
+//  map(0xf7, 0xf7) DMA type 8 inch FDC data register
+//  map(0xf8, 0xf8) DMA type 5 inch control
+//  map(0xf9, 0xf9) DMA type 5 inch margin control
+//  map(0xfa, 0xfa) DMA type 5 inch FDC status
+//  map(0xfb, 0xfb) DMA type 5 inch FDC data register
 }
 
 /* Input Ports */
@@ -511,7 +511,7 @@ void pc8001_state::pc8001(machine_config &config)
 
 	UPD3301(config, m_crtc, XTAL(14'318'181));
 	m_crtc->set_character_width(8);
-	m_crtc->set_display_callback(FUNC(pc8001_state::pc8001_display_pixels), this);
+	m_crtc->set_display_callback(FUNC(pc8001_state::pc8001_display_pixels));
 	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 	m_crtc->set_screen(SCREEN_TAG);
 
@@ -561,7 +561,7 @@ void pc8001mk2_state::pc8001mk2(machine_config &config)
 
 	UPD3301(config, m_crtc, XTAL(14'318'181));
 	m_crtc->set_character_width(8);
-	m_crtc->set_display_callback(FUNC(pc8001_state::pc8001_display_pixels), this);
+	m_crtc->set_display_callback(FUNC(pc8001_state::pc8001_display_pixels));
 	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 	m_crtc->set_screen(SCREEN_TAG);
 

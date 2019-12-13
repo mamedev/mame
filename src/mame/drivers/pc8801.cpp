@@ -1577,14 +1577,14 @@ void pc8801_state::pc8801_io(address_map &map)
 	map(0x71, 0x71).rw(FUNC(pc8801_state::pc8801_ext_rom_bank_r), FUNC(pc8801_state::pc8801_ext_rom_bank_w));
 	map(0x78, 0x78).w(FUNC(pc8801_state::pc8801_window_bank_inc_w));
 	map(0x90, 0x9f).rw(FUNC(pc8801_state::pc8801_cdrom_r), FUNC(pc8801_state::pc8801_cdrom_w));
-//  AM_RANGE(0xa0, 0xa3) AM_NOP                                     /* music & network */
+//  map(0xa0, 0xa3).noprw();                                     /* music & network */
 	map(0xa8, 0xad).rw(FUNC(pc8801_state::pc8801_opna_r), FUNC(pc8801_state::pc8801_opna_w));  /* second sound board */
-//  AM_RANGE(0xb4, 0xb5) AM_NOP                                     /* Video art board */
-//  AM_RANGE(0xc1, 0xc1) AM_NOP                                     /* (unknown) */
-//  AM_RANGE(0xc2, 0xcf) AM_NOP                                     /* music */
-//  AM_RANGE(0xd0, 0xd7) AM_NOP                                     /* music & GP-IB */
-//  AM_RANGE(0xd8, 0xd8) AM_NOP                                     /* GP-IB */
-//  AM_RANGE(0xdc, 0xdf) AM_NOP                                     /* MODEM */
+//  map(0xb4, 0xb5).noprw();                                     /* Video art board */
+//  map(0xc1, 0xc1).noprw();                                     /* (unknown) */
+//  map(0xc2, 0xcf).noprw();                                     /* music */
+//  map(0xd0, 0xd7).noprw();                                     /* music & GP-IB */
+//  map(0xd8, 0xd8).noprw();                                     /* GP-IB */
+//  map(0xdc, 0xdf).noprw();                                     /* MODEM */
 	map(0xe2, 0xe2).rw(FUNC(pc8801_state::pc8801_extram_mode_r), FUNC(pc8801_state::pc8801_extram_mode_w));            /* expand RAM mode */
 	map(0xe3, 0xe3).rw(FUNC(pc8801_state::pc8801_extram_bank_r), FUNC(pc8801_state::pc8801_extram_bank_w));            /* expand RAM bank */
 #if USE_PROPER_I8214
@@ -1594,14 +1594,14 @@ void pc8801_state::pc8801_io(address_map &map)
 	map(0xe4, 0xe4).w(FUNC(pc8801_state::pc8801_irq_level_w));
 	map(0xe6, 0xe6).w(FUNC(pc8801_state::pc8801_irq_mask_w));
 #endif
-//  AM_RANGE(0xe7, 0xe7) AM_NOP                                     /* Arcus writes here, almost likely to be a mirror of above */
+//  map(0xe7, 0xe7).noprw();                                     /* Arcus writes here, almost likely to be a mirror of above */
 	map(0xe8, 0xeb).rw(FUNC(pc8801_state::pc8801_kanji_r), FUNC(pc8801_state::pc8801_kanji_w));
 	map(0xec, 0xef).rw(FUNC(pc8801_state::pc8801_kanji_lv2_r), FUNC(pc8801_state::pc8801_kanji_lv2_w));
 	map(0xf0, 0xf0).w(FUNC(pc8801_state::pc8801_dic_bank_w));
 	map(0xf1, 0xf1).w(FUNC(pc8801_state::pc8801_dic_ctrl_w));
-//  AM_RANGE(0xf3, 0xf3) AM_NOP                                     /* DMA floppy (unknown) */
-//  AM_RANGE(0xf4, 0xf7) AM_NOP                                     /* DMA 5'floppy (may be not released) */
-//  AM_RANGE(0xf8, 0xfb) AM_NOP                                     /* DMA 8'floppy (unknown) */
+//  map(0xf3, 0xf3).noprw();                                     /* DMA floppy (unknown) */
+//  map(0xf4, 0xf7).noprw();                                     /* DMA 5'floppy (may be not released) */
+//  map(0xf8, 0xfb).noprw();                                     /* DMA 8'floppy (unknown) */
 	map(0xfc, 0xff).rw("d8255_master", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
@@ -2020,7 +2020,7 @@ static const cassette_interface pc88_cassette_interface =
 {
 	cassette_default_formats,   // we need T88 format support!
 	nullptr,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED,
 	"pc8801_cass"
 };
 #endif
@@ -2354,8 +2354,8 @@ void pc8801_state::pc8801(machine_config &config)
 	m_fdccpu->set_addrmap(AS_PROGRAM, &pc8801_state::pc8801fdc_mem);
 	m_fdccpu->set_addrmap(AS_IO, &pc8801_state::pc8801fdc_io);
 
-	//config.m_minimum_quantum = attotime::from_hz(300000);
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	//config.set_maximum_quantum(attotime::from_hz(300000));
+	config.set_perfect_quantum(m_maincpu);
 
 	i8255_device &d8255_master(I8255(config, "d8255_master"));
 	d8255_master.in_pa_callback().set("d8255_slave", FUNC(i8255_device::pb_r));

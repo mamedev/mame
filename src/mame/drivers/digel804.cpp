@@ -473,10 +473,10 @@ void digel804_state::z80_mem_804_1_4(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom(); // 3f in mapper = rom J3
-	//AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("main_ram") // 6f in mapper = RAM D43 (6164)
-	//AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("main_ram") // 77 in mapper = RAM D44 (6164)
-	//AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("main_ram") // 7b in mapper = RAM D45 (6164)
-	//AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("main_ram") // 7d in mapper = RAM D46 (6164)
+	//map(0x4000, 0x5fff).ram().share("main_ram"); // 6f in mapper = RAM D43 (6164)
+	//map(0x6000, 0x7fff).ram().share("main_ram"); // 77 in mapper = RAM D44 (6164)
+	//map(0x8000, 0x9fff).ram().share("main_ram"); // 7b in mapper = RAM D45 (6164)
+	//map(0xa000, 0xbfff).ram().share("main_ram"); // 7d in mapper = RAM D46 (6164)
 	map(0x4000, 0xbfff).bankrw("bankedram");
 	// c000-cfff is open bus in mapper, 7f
 	map(0xd000, 0xd7ff).ram(); // 7e in mapper = RAM P3 (6116)
@@ -489,13 +489,13 @@ void ep804_state::z80_mem_804_1_2(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).rom(); // 3f in mapper = rom D41
 	map(0x2000, 0x3fff).rom(); // 5f in mapper = rom D42
-	//AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("main_ram") // 6f in mapper = RAM D43 (6164)
-	//AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("main_ram") // 77 in mapper = RAM D44 (6164)
-	//AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("main_ram") // 7b in mapper = RAM D45 (6164)
-	//AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("main_ram") // 7d in mapper = RAM D46 (6164)
+	//map(0x4000, 0x5fff).ram().share("main_ram"); // 6f in mapper = RAM D43 (6164)
+	//map(0x6000, 0x7fff).ram().share("main_ram"); // 77 in mapper = RAM D44 (6164)
+	//map(0x8000, 0x9fff).ram().share("main_ram"); // 7b in mapper = RAM D45 (6164)
+	//map(0xa000, 0xbfff).ram().share("main_ram"); // 7d in mapper = RAM D46 (6164)
 	map(0x4000, 0xbfff).bankrw("bankedram");
 	// c000-cfff is open bus in mapper, 7f
-	//AM_RANGE(0xc000, 0xc7ff) AM_RAM // hack for now to test, since sometimes it writes to c3ff
+	//map(0xc000, 0xc7ff).ram(); // hack for now to test, since sometimes it writes to c3ff
 	map(0xd000, 0xd7ff).ram(); // 7e in mapper = RAM D47 (6116)
 	// d800-ffff is open bus in mapper, 7f
 }
@@ -525,7 +525,7 @@ void digel804_state::z80_io_1_4(address_map &map)
 	map(0x85, 0x85).mirror(0x38).r(FUNC(digel804_state::acia_command_r)); // (ACIA command reg)
 	map(0x86, 0x86).mirror(0x38).w(FUNC(digel804_state::acia_control_w)); // (ACIA control reg)
 	map(0x87, 0x87).mirror(0x38).r(FUNC(digel804_state::acia_control_r)); // (ACIA control reg)
-	//AM_RANGE(0x80,0x87) AM_MIRROR(0x38) AM_SHIFT(-1) AM_DEVREADWRITE("acia", mos6551_device, read, write) // this doesn't work since we lack an AM_SHIFT command
+	//map(0x80,0x87).mirror(0x38).shift(-1).rw("acia", FUNC(mos6551_device::read, FUNC(mos6551_device::write)); // this doesn't work since we lack a shift() command
 
 }
 
@@ -553,7 +553,7 @@ void ep804_state::z80_io_1_2(address_map &map)
 	map(0x85, 0x85).mirror(0x38).r(FUNC(ep804_state::acia_command_r)); // (ACIA command reg)
 	map(0x86, 0x86).mirror(0x38).w(FUNC(ep804_state::acia_control_w)); // (ACIA control reg)
 	map(0x87, 0x87).mirror(0x38).r(FUNC(ep804_state::acia_control_r)); // (ACIA control reg)
-	//AM_RANGE(0x80,0x87) AM_MIRROR(0x38) AM_SHIFT(-1) AM_DEVREADWRITE("acia", mos6551_device, read, write) // this doesn't work since we lack an AM_SHIFT command
+	//map(0x80,0x87).mirror(0x38).shift(-1).rw("acia", FUNC(mos6551_device::read, FUNC(mos6551_device::write)); // this doesn't work since we lack a shift() command
 
 }
 
@@ -637,7 +637,7 @@ void digel804_state::digel804(machine_config &config)
 	Z80(config, m_maincpu, 3.6864_MHz_XTAL/2); /* Z80A, X1(aka E0 on schematics): 3.6864Mhz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &digel804_state::z80_mem_804_1_4);
 	m_maincpu->set_addrmap(AS_IO, &digel804_state::z80_io_1_4);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	ROC10937(config, m_vfd); // RIGHT_TO_LEFT
 
@@ -695,10 +695,10 @@ void ep804_state::ep804(machine_config &config)
 
 /*
 "Hardware Revisions"
-For pcb 1.0, there are at least 6 hardware revisions (i.e. small changes/component changes/greenwire fixes)
-which revison the hardware is is shown on the sticker on the bottom.
+For pcb 1.0, there are at least 6 hardware revisions (i.e. small changes/component changes/greenwire fixes).
+The hardware revision is shown on the sticker on the bottom.
 
-known features:
+Known features:
 
 1.0 - ?
 1.1 - does not support driving pin 1 of the socket, i.e. max size is 27256; pin 1 is pulled high; several components unpopulated

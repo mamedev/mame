@@ -470,15 +470,15 @@ void rom_load_manager::display_rom_load_results(bool from_list)
 	if (m_errors != 0)
 	{
 		/* create the error message and exit fatally */
-		osd_printf_error("%s", m_errorstring.c_str());
-		fatalerror_exitcode(machine(), EMU_ERR_MISSING_FILES, "Required files are missing, the machine cannot be run.");
+		osd_printf_error("%s", m_errorstring);
+		throw emu_fatalerror(EMU_ERR_MISSING_FILES, "Required files are missing, the machine cannot be run.");
 	}
 
 	/* if we had warnings, output them, but continue */
 	if ((m_warnings) || (m_knownbad))
 	{
 		m_errorstring.append("WARNING: the machine might not run correctly.");
-		osd_printf_warning("%s\n", m_errorstring.c_str());
+		osd_printf_warning("%s\n", m_errorstring);
 	}
 }
 
@@ -595,7 +595,7 @@ int rom_load_manager::open_rom_file(const char *regiontag, const rom_entry *romp
 		}
 
 		if (tag5.find_first_of('%') != -1)
-			fatalerror("We do not support clones of clones!\n");
+			throw emu_fatalerror("We do not support clones of clones!\n");
 
 		// try to load from the available location(s):
 		// - if we are not using lists, we have regiontag only;
@@ -688,11 +688,11 @@ int rom_load_manager::read_rom_data(const rom_entry *parent_region, const rom_en
 
 	/* make sure we only fill within the region space */
 	if (ROM_GETOFFSET(romp) + numgroups * groupsize + (numgroups - 1) * skip > m_region->bytes())
-		fatalerror("Error in RomModule definition: %s out of memory region space\n", ROM_GETNAME(romp));
+		throw emu_fatalerror("Error in RomModule definition: %s out of memory region space\n", ROM_GETNAME(romp));
 
 	/* make sure the length was valid */
 	if (numbytes == 0)
-		fatalerror("Error in RomModule definition: %s has an invalid length\n", ROM_GETNAME(romp));
+		throw emu_fatalerror("Error in RomModule definition: %s has an invalid length\n", ROM_GETNAME(romp));
 
 	/* special case for simple loads */
 	if (datamask == 0xff && (groupsize == 1 || !reversed) && skip == 0)
@@ -790,11 +790,11 @@ void rom_load_manager::fill_rom_data(const rom_entry *romp)
 
 	// make sure we fill within the region space
 	if (ROM_GETOFFSET(romp) + numbytes > m_region->bytes())
-		fatalerror("Error in RomModule definition: FILL out of memory region space\n");
+		throw emu_fatalerror("Error in RomModule definition: FILL out of memory region space\n");
 
 	// make sure the length was valid
 	if (numbytes == 0)
-		fatalerror("Error in RomModule definition: FILL has an invalid length\n");
+		throw emu_fatalerror("Error in RomModule definition: FILL has an invalid length\n");
 
 	// for fill bytes, the byte that gets filled is the first byte of the hashdata string
 	u8 fill_byte = u8(strtol(ROM_GETHASHDATA(romp), nullptr, 0));
@@ -823,20 +823,20 @@ void rom_load_manager::copy_rom_data(const rom_entry *romp)
 
 	/* make sure we copy within the region space */
 	if (ROM_GETOFFSET(romp) + numbytes > m_region->bytes())
-		fatalerror("Error in RomModule definition: COPY out of target memory region space\n");
+		throw emu_fatalerror("Error in RomModule definition: COPY out of target memory region space\n");
 
 	/* make sure the length was valid */
 	if (numbytes == 0)
-		fatalerror("Error in RomModule definition: COPY has an invalid length\n");
+		throw emu_fatalerror("Error in RomModule definition: COPY has an invalid length\n");
 
 	/* make sure the source was valid */
 	memory_region *region = machine().root_device().memregion(srcrgntag);
 	if (region == nullptr)
-		fatalerror("Error in RomModule definition: COPY from an invalid region\n");
+		throw emu_fatalerror("Error in RomModule definition: COPY from an invalid region\n");
 
 	/* make sure we find within the region space */
 	if (srcoffs + numbytes > region->bytes())
-		fatalerror("Error in RomModule definition: COPY out of source memory region space\n");
+		throw emu_fatalerror("Error in RomModule definition: COPY out of source memory region space\n");
 
 	/* fill the data */
 	memcpy(base, region->base() + srcoffs, numbytes);
@@ -856,13 +856,13 @@ void rom_load_manager::process_rom_entries(const char *regiontag, const rom_entr
 	while (!ROMENTRY_ISREGIONEND(romp))
 	{
 		if (ROMENTRY_ISCONTINUE(romp))
-			fatalerror("Error in RomModule definition: ROM_CONTINUE not preceded by ROM_LOAD\n");
+			throw emu_fatalerror("Error in RomModule definition: ROM_CONTINUE not preceded by ROM_LOAD\n");
 
 		if (ROMENTRY_ISIGNORE(romp))
-			fatalerror("Error in RomModule definition: ROM_IGNORE not preceded by ROM_LOAD\n");
+			throw emu_fatalerror("Error in RomModule definition: ROM_IGNORE not preceded by ROM_LOAD\n");
 
 		if (ROMENTRY_ISRELOAD(romp))
-			fatalerror("Error in RomModule definition: ROM_RELOAD not preceded by ROM_LOAD\n");
+			throw emu_fatalerror("Error in RomModule definition: ROM_RELOAD not preceded by ROM_LOAD\n");
 
 		if (ROMENTRY_ISFILL(romp))
 		{
@@ -1005,7 +1005,7 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 		}
 
 		if (tag5.find_first_of('%') != -1)
-			fatalerror("We do not support clones of clones!\n");
+			throw emu_fatalerror("We do not support clones of clones!\n");
 
 		// try to load from the available location(s):
 		// - if we are not using lists, we have locationtag only;

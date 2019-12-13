@@ -1290,24 +1290,21 @@ void ay8910_device::build_mixer_table()
 
 void ay8910_device::ay8910_statesave()
 {
-	for (int chan = 0; chan < NUM_CHANNELS; chan++)
-	{
-		save_item(NAME(m_tone[chan].period), chan);
-		save_item(NAME(m_tone[chan].volume), chan);
-		save_item(NAME(m_tone[chan].duty), chan);
-		save_item(NAME(m_tone[chan].count), chan);
-		save_item(NAME(m_tone[chan].duty_cycle), chan);
-		save_item(NAME(m_tone[chan].output), chan);
+	save_item(STRUCT_MEMBER(m_tone, period));
+	save_item(STRUCT_MEMBER(m_tone, volume));
+	save_item(STRUCT_MEMBER(m_tone, duty));
+	save_item(STRUCT_MEMBER(m_tone, count));
+	save_item(STRUCT_MEMBER(m_tone, duty_cycle));
+	save_item(STRUCT_MEMBER(m_tone, output));
 
-		save_item(NAME(m_envelope[chan].period), chan);
-		save_item(NAME(m_envelope[chan].count), chan);
-		save_item(NAME(m_envelope[chan].step), chan);
-		save_item(NAME(m_envelope[chan].volume), chan);
-		save_item(NAME(m_envelope[chan].hold), chan);
-		save_item(NAME(m_envelope[chan].alternate), chan);
-		save_item(NAME(m_envelope[chan].attack), chan);
-		save_item(NAME(m_envelope[chan].holding), chan);
-	}
+	save_item(STRUCT_MEMBER(m_envelope, period));
+	save_item(STRUCT_MEMBER(m_envelope, count));
+	save_item(STRUCT_MEMBER(m_envelope, step));
+	save_item(STRUCT_MEMBER(m_envelope, volume));
+	save_item(STRUCT_MEMBER(m_envelope, hold));
+	save_item(STRUCT_MEMBER(m_envelope, alternate));
+	save_item(STRUCT_MEMBER(m_envelope, attack));
+	save_item(STRUCT_MEMBER(m_envelope, holding));
 
 	save_item(NAME(m_active));
 	save_item(NAME(m_register_latch));
@@ -1405,7 +1402,7 @@ void ay8910_device::set_volume(int channel,int volume)
 void ay8910_device::ay_set_clock(int clock)
 {
 	// FIXME: this doesn't belong here, it should be an input pin exposed via devcb
-	if ((m_feature & PSG_PIN26_IS_CLKSEL) && (m_flags & YM2149_PIN26_LOW))
+	if (((m_feature & PSG_PIN26_IS_CLKSEL) && (m_flags & YM2149_PIN26_LOW)) || (m_feature & PSG_HAS_INTERNAL_DIVIDER))
 		m_channel->set_sample_rate((m_feature & PSG_HAS_EXPANDED_MODE) ? clock : clock / 16);
 	else
 		m_channel->set_sample_rate((m_feature & PSG_HAS_EXPANDED_MODE) ? clock * 2 : clock / 8);
@@ -1740,5 +1737,13 @@ DEFINE_DEVICE_TYPE(YMZ294, ymz294_device, "ymz294", "YMZ294 SSGLP")
 
 ymz294_device::ymz294_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: ay8910_device(mconfig, YMZ294, tag, owner, clock, PSG_TYPE_YM, 1, 0)
+{
+}
+
+
+DEFINE_DEVICE_TYPE(SUNSOFT_5B_SOUND, sunsoft_5b_sound_device, "sunsoft_5b_sound", "Sunsoft/Yamaha 5B 6630B (Sound)")
+
+sunsoft_5b_sound_device::sunsoft_5b_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: ay8910_device(mconfig, SUNSOFT_5B_SOUND, tag, owner, clock, PSG_TYPE_YM, 1, 0, PSG_HAS_INTERNAL_DIVIDER)
 {
 }

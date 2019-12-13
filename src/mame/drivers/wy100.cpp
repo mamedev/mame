@@ -151,10 +151,9 @@ u8 wy100_state::memory_r(offs_t offset)
 		logerror("%s: Reading %02X from PCI register %d\n", machine().describe_context(), data, p2 & 3);
 	if (m_bs_enable && !machine().side_effects_disabled())
 	{
-		address_space &space = machine().dummy_space();
 		u8 chardata = (data & 0xe0) == 0x80 ? data : data & 0x7f;
-		m_crtc[0]->dack_w(space, 0, chardata);
-		m_crtc[1]->dack_w(space, 0, (chardata & 0xfe) | (BIT(data, 7) ? 0x00 : 0x01));
+		m_crtc[0]->dack_w(chardata);
+		m_crtc[1]->dack_w((chardata & 0xfe) | (BIT(data, 7) ? 0x00 : 0x01));
 	}
 	return data;
 }
@@ -166,9 +165,8 @@ void wy100_state::memory_w(offs_t offset, u8 data)
 	// CRTC access is write-only
 	if (!BIT(p2, 6))
 	{
-		address_space &space = machine().dummy_space();
-		m_crtc[0]->write(space, p2 & 1, data);
-		m_crtc[1]->write(space, p2 & 1, data);
+		m_crtc[0]->write(p2 & 1, data);
+		m_crtc[1]->write(p2 & 1, data);
 	}
 	else if (m_brdy)
 		m_bs_enable = true;
@@ -241,7 +239,7 @@ void wy100_state::wy100(machine_config &config)
 		crtc->set_screen("screen");
 		crtc->set_character_width(10);
 	}
-	m_crtc[0]->set_display_callback(FUNC(wy100_state::draw_character), this);
+	m_crtc[0]->set_display_callback(FUNC(wy100_state::draw_character));
 	m_crtc[0]->drq_wr_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_crtc[0]->drq_wr_callback().append(FUNC(wy100_state::brdy_w));
 	m_crtc[0]->lc_wr_callback().set("spkrgate", FUNC(input_merger_device::in_w<1>)).bit(3);

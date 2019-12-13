@@ -40,12 +40,7 @@ public:
 	auto sint() { return m_sint_handler.bind(); }
 
 	// inline configuration
-	void set_update_row_callback(update_row_delegate callback) { m_update_row_cb = callback; }
-	template <class FunctionClass> void set_update_row_callback(void (FunctionClass::*callback)(bitmap_rgb32 &, uint16_t *, uint8_t, uint16_t, int)
-		, const char *name)
-	{
-		set_update_row_callback(update_row_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_update_row_callback(T &&... args) { m_update_row_cb.set(std::forward<T>(args)...); }
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

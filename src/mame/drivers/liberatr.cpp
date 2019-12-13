@@ -324,7 +324,7 @@ void liberatr_state::liberat2_map(address_map &map)
 	map(0x4e00, 0x4e3f).nopr().w(FUNC(liberatr_state::earom_w));
 	map(0x5000, 0x501f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x5800, 0x581f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	//AM_RANGE(0x6000, 0x601f) AM_WRITE(pokey1_w) /* bug ??? */
+	//map(0x6000, 0x601f).w(FUNC(liberatr_state::pokey1_w)); /* bug ??? */
 	map(0x6000, 0xbfff).rom();
 	map(0xfffa, 0xffff).rom();
 }

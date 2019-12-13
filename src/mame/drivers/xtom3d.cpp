@@ -251,7 +251,7 @@ uint8_t xtom3d_state::piix4_config_r(int function, int reg)
 
 void xtom3d_state::piix4_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
 	m_piix4_config_reg[function][reg] = data;
 }
 
@@ -422,10 +422,8 @@ void xtom3d_state::xtom3d(machine_config &config)
 	pcat_common(config);
 
 	PCI_BUS_LEGACY(config, m_pcibus, 0, 0);
-	m_pcibus->set_device_read (0, FUNC(xtom3d_state::intel82439tx_pci_r), this);
-	m_pcibus->set_device_write(0, FUNC(xtom3d_state::intel82439tx_pci_w), this);
-	m_pcibus->set_device_read (7, FUNC(xtom3d_state::intel82371ab_pci_r), this);
-	m_pcibus->set_device_write(7, FUNC(xtom3d_state::intel82371ab_pci_w), this);
+	m_pcibus->set_device(0, FUNC(xtom3d_state::intel82439tx_pci_r), FUNC(xtom3d_state::intel82439tx_pci_w));
+	m_pcibus->set_device(7, FUNC(xtom3d_state::intel82371ab_pci_r), FUNC(xtom3d_state::intel82371ab_pci_w));
 
 	/* video hardware */
 	pcvideo_vga(config);

@@ -173,7 +173,7 @@ void pktgaldx_state::pktgaldb_map(address_map &map)
 	map(0x150000, 0x15000f).w(m_oki2, FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x150007, 0x150007).r(m_oki2, FUNC(okim6295_device::read));
 
-//  AM_RANGE(0x160000, 0x167fff) AM_RAM
+//  map(0x160000, 0x167fff).ram();
 	map(0x164800, 0x164801).w(FUNC(pktgaldx_state::pktgaldx_oki_bank_w));
 	map(0x16500a, 0x16500b).r(FUNC(pktgaldx_state::pckgaldx_unknown_r));
 	map(0x166800, 0x166801).w(FUNC(pktgaldx_state::vblank_ack_w));
@@ -368,8 +368,8 @@ void pktgaldx_state::pktgaldx(machine_config &config)
 	m_deco_tilegen->set_pf2_col_bank(0x10);
 	m_deco_tilegen->set_pf1_col_mask(0x0f);
 	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_bank1_callback(FUNC(pktgaldx_state::bank_callback), this);
-	m_deco_tilegen->set_bank2_callback(FUNC(pktgaldx_state::bank_callback), this);
+	m_deco_tilegen->set_bank1_callback(FUNC(pktgaldx_state::bank_callback));
+	m_deco_tilegen->set_bank2_callback(FUNC(pktgaldx_state::bank_callback));
 	m_deco_tilegen->set_pf12_8x8_bank(0);
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");

@@ -107,11 +107,8 @@ private:
 
 	devcb_write_line m_intrq_cb, m_drq_cb;
 
-	struct
-	{
-		harddisk_image_device *drive;
-		uint16_t cylinder;
-	} m_drives[4];
+	optional_device_array<harddisk_image_device, 4> m_drives;
+	uint16_t m_drive_cylinder[4];
 
 	uint16_t m_sector_base;
 

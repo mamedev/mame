@@ -26,10 +26,8 @@ According to Planet Virtual Boy, the following undumped protos exist
 			<feature name="u2" value="U2" />
 			<feature name="u3" value="U3" />
 			<feature name="battery" value="BT1" />
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="1048576" width="32" endianness="little">
 				<rom name="vue-vpbe-0.u1" size="1048576" crc="bb71b522" sha1="5177015a91442e56bd76af39447bca365e06c272" offset="000000" />
-				<rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -42,8 +40,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="VUE-VBHE-JPN, VUE-VBHE-USA"/>
 		<part name="cart" interface="vboy_cart">
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="32" endianness="little">
 				<rom name="bound high! (ju).bin" size="2097152" crc="e81a3703" sha1="1196ef8b9a96a0ff2f3634f8eb1c4865c0fb6b01" offset="000000" />
 			</dataarea>
 		</part>
@@ -57,10 +54,8 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="serial" value="VUE-VGPJ-JPN, VUE-VGPJ-USA"/>
 		<info name="release" value="19950701 (JPN), 19950814 (USA)"/>
 		<part name="cart" interface="vboy_cart">
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="1048576" width="32" endianness="little">
 				<rom name="galactic pinball (japan, usa).bin" size="1048576" crc="c9710a36" sha1="93a25abf4f86e71a49c1c3a470140bb40cb693d6" offset="000000" />
-				<rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -73,11 +68,10 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="serial" value="VUE-VVGE-USA"/>
 		<info name="release" value="199511xx"/>
 		<part name="cart" interface="vboy_cart">
-			<feature name="slot" value="vb_eeprom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="32" endianness="little">
 				<rom name="golf (usa).bin" size="2097152" crc="2199af41" sha1="23ce3c174789cdd306497d86cb2c4e76ba8b06e5" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x10000">
+			<dataarea name="sram" size="8192" width="8" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -90,10 +84,8 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="serial" value="VUE-VIMJ-JPN"/>
 		<info name="release" value="19951013"/>
 		<part name="cart" interface="vboy_cart">
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="1048576" width="32" endianness="little">
 				<rom name="innsmouth no yakata (japan).bin" size="1048576" crc="83cb6a00" sha1="37e06e53ce2810e870835c48decdd6c72079bfda" offset="000000" />
-				<rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -108,10 +100,8 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<feature name="pcb" value="VUE-AA-01(K)" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="1048576" width="32" endianness="little">
 				<rom name="vue-vjbe-0.u1" size="1048576" crc="a44de03c" sha1="0e086d7ef2bd8b97315196943fd0b71da07aa8f1" offset="000000" />
-				<rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -124,10 +114,8 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="serial" value="VUE-VJBJ-JPN"/>
 		<info name="release" value="19950929"/>
 		<part name="cart" interface="vboy_cart">
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="1048576" width="32" endianness="little">
 				<rom name="jack bros. no meiro de hiihoo! (japan).bin" size="1048576" crc="cab61e8b" sha1="a973406590382ee503037271330d68d2834b79db" offset="000000" />
-				<rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -142,10 +130,8 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<feature name="pcb" value="VUE-AA-01" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="1048576" width="32" endianness="little">
 				<rom name="vue-vmcj-0.u1" size="1048576" crc="a47de78c" sha1="7556a778b60490bdb81774bcbaa7413fc84cb985" offset="000000" />
-				<rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -158,12 +144,8 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="serial" value="VUE-VMTJ-JPN, VUE-VMTJ-USA"/>
 		<info name="release" value="19950721 (JPN), 19950814 (USA)"/>
 		<part name="cart" interface="vboy_cart">
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="524288" width="32" endianness="little">
 				<rom name="mario's tennis (japan, usa).bin" size="524288" crc="7ce7460d" sha1="5162f7fa9e3eae4338c53ccba641ba080c768754" offset="000000" />
-				<rom size="524288" offset="0x080000" loadflag="reload" />
-				<rom size="524288" offset="0x100000" loadflag="reload" />
-				<rom size="524288" offset="0x180000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -178,8 +160,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<feature name="pcb" value="VUE-AA-01" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="32" endianness="little">
 				<rom name="vue-vnfe-0.u1" size="2097152" crc="df4d56b4" sha1="f4a4c7928f15102cf14c90c5f044e5f7cc7c32f9" offset="000000" />
 			</dataarea>
 		</part>
@@ -191,10 +172,8 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<publisher>Bullet-Proof Software</publisher>
 		<info name="alt_title" value="ニコちゃんバトル"/>
 		<part name="cart" interface="vboy_cart">
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="1048576" width="32" endianness="little">
 				<rom name="nikochan battle (j)(prototype).bin" size="1048576" crc="f3cd40dd" sha1="217ca062f65d4e8b2848085918af5ac4b33b12d4" offset="000000" />
-				<rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -209,12 +188,8 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<feature name="pcb" value="VUE-AA-01" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="524288" width="32" endianness="little">
 				<rom name="vue-vh2e-0.u1" size="524288" crc="19bb2dfb" sha1="80216b2874cf162f301d571bb8aebc98d80b4f3e" offset="000000" />
-				<rom size="524288" offset="0x080000" loadflag="reload" />
-				<rom size="524288" offset="0x100000" loadflag="reload" />
-				<rom size="524288" offset="0x180000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -227,10 +202,8 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="serial" value="VUE-VREE-USA"/>
 		<info name="release" value="19950814"/>
 		<part name="cart" interface="vboy_cart">
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="1048576" width="32" endianness="little">
 				<rom name="red alarm (usa).bin" size="1048576" crc="aa10a7b4" sha1="494fa60cb8997880b4e8cd3270b21d6c2768a48a" offset="000000" />
-				<rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -243,10 +216,8 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="serial" value="VUE-VREJ-JPN"/>
 		<info name="release" value="19950721"/>
 		<part name="cart" interface="vboy_cart">
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="1048576" width="32" endianness="little">
 				<rom name="red alarm (japan).bin" size="1048576" crc="7e85c45d" sha1="f5057fa9bfd9d60b9dcfc004cfdd12aa8eb1cb4a" offset="000000" />
-				<rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -259,10 +230,8 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="serial" value="VUE-VSDJ-JPN"/>
 		<info name="release" value="19951222"/>
 		<part name="cart" interface="vboy_cart">
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="1048576" width="32" endianness="little">
 				<rom name="sd gundam - dimension war (japan).bin" size="1048576" crc="44788197" sha1="1a67f6bdb45db46e22b8aadea754a68ad379ae29" offset="000000" />
-				<rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -275,12 +244,8 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="serial" value="VUE-VSPJ-JPN"/>
 		<info name="release" value="19951201"/>
 		<part name="cart" interface="vboy_cart">
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="524288" width="32" endianness="little">
 				<rom name="space invaders - virtual collection (japan).bin" size="524288" crc="fa44402d" sha1="16ad904faafd24642dfd056d10a768e81f0d9bfa" offset="000000" />
-				<rom size="524288" offset="0x080000" loadflag="reload" />
-				<rom size="524288" offset="0x100000" loadflag="reload" />
-				<rom size="524288" offset="0x180000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -290,8 +255,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="vboy_cart">
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="32" endianness="little">
 				<rom name="space pinball prototype (j).bin" size="2097152" crc="44c2b723" sha1="dc182360c7c8d26323db8921f09db76638e81ced" offset="000000" />
 			</dataarea>
 		</part>
@@ -305,12 +269,8 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="serial" value="VUE-VSSJ-JPN"/>
 		<info name="release" value="19950929"/>
 		<part name="cart" interface="vboy_cart">
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="524288" width="32" endianness="little">
 				<rom name="space squash (japan).bin" size="524288" crc="60895693" sha1="3f08cae2b6f9e386529949ff954220860db1af64" offset="000000" />
-				<rom size="524288" offset="0x080000" loadflag="reload" />
-				<rom size="524288" offset="0x100000" loadflag="reload" />
-				<rom size="524288" offset="0x180000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -323,12 +283,10 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="serial" value="VUE-VTBJ-JPN, VUE-VTBJ-USA"/>
 		<info name="release" value="19950721 (JPN), 19950814 (USA)"/>
 		<part name="cart" interface="vboy_cart">
-			<feature name="slot" value="vb_eeprom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="1048576" width="32" endianness="little">
 				<rom name="teleroboxer (japan, usa).bin" size="1048576" crc="36103000" sha1="c59e020f9674774c5cbc022317ebba0eb1d744f7" offset="000000" />
-				<rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x10000">
+			<dataarea name="sram" size="8192" width="8" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -341,12 +299,8 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="serial" value="VUE-VH2J-JPN"/>
 		<info name="release" value="19950721"/>
 		<part name="cart" interface="vboy_cart">
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="524288" width="32" endianness="little">
 				<rom name="tobidase! panibon (japan).bin" size="524288" crc="40498f5e" sha1="b8a12a9677afa5cbce6ed43eb0effb5a02875534" offset="000000" />
-				<rom size="524288" offset="0x080000" loadflag="reload" />
-				<rom size="524288" offset="0x100000" loadflag="reload" />
-				<rom size="524288" offset="0x180000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -359,10 +313,8 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="serial" value="VUE-VVBJ-JPN"/>
 		<info name="release" value="19951222"/>
 		<part name="cart" interface="vboy_cart">
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="1048576" width="32" endianness="little">
 				<rom name="virtual bowling (japan).bin" size="1048576" crc="20688279" sha1="a5be7654037050f0a781e70efea0191f43d26f06" offset="000000" />
-				<rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -377,15 +329,13 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<feature name="pcb" value="VUE-AA3A-01" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="u2" value="U2 [HY6254ALLJ-10]" />
+			<feature name="u2" value="U2 [HY6264ALLJ-10]" />
 			<feature name="u3" value="U3 [??]" />
 			<feature name="battery" value="BT1" />
-			<feature name="slot" value="vb_eeprom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="1048576" width="32" endianness="little">
 				<rom name="vue-vvfj-0.u1" size="1048576" crc="526cc969" sha1="583b409b7215159219d08e789db46140062095f2" offset="000000" />
-				<rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x10000">
+			<dataarea name="sram" size="8192" width="8" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -398,10 +348,8 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="serial" value="VUE-VH3E-USA"/>
 		<info name="release" value="19951201"/>
 		<part name="cart" interface="vboy_cart">
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="1048576" width="32" endianness="little">
 				<rom name="vertical force (usa).bin" size="1048576" crc="4c32ba5e" sha1="38f9008f60b09deef1151d46b905b090a0338200" offset="000000" />
-				<rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -414,10 +362,8 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="serial" value="VUE-VH3J-JPN"/>
 		<info name="release" value="19950812"/>
 		<part name="cart" interface="vboy_cart">
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="1048576" width="32" endianness="little">
 				<rom name="vertical force (japan).bin" size="1048576" crc="9e9b8b92" sha1="c7204ba5cfe7d26394b5e22badc580c8ed8c0b37" offset="000000" />
-				<rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -430,11 +376,10 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="serial" value="VUE-VVGJ-JPN"/>
 		<info name="release" value="19950811"/>
 		<part name="cart" interface="vboy_cart">
-			<feature name="slot" value="vb_eeprom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="32" endianness="little">
 				<rom name="t&amp;e virtual golf (japan).bin" size="2097152" crc="6ba07915" sha1="c595285d42c69f14b2b418c1edfbe4a7f9a624b6" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x10000">
+			<dataarea name="sram" size="8192" width="8" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -449,10 +394,8 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<feature name="pcb" value="VUE-AA-01" />
 			<feature name="u1" value="U1 PRG" />
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="1048576" width="32" endianness="little">
 				<rom name="vue-vjvj-0.u1" size="1048576" crc="8989fe0a" sha1="d96c9f8aac5b4ea012a8fe659bb68fb1159a9c6d" offset="000000" />
-				<rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -465,10 +408,8 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="serial" value="VUE-VVPE-USA"/>
 		<info name="release" value="19950911"/>
 		<part name="cart" interface="vboy_cart">
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="1048576" width="32" endianness="little">
 				<rom name="virtual league baseball (usa).bin" size="1048576" crc="736b40d6" sha1="266fe615ee3df1160a20b456824699f16810fa28" offset="000000" />
-				<rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -481,10 +422,8 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="serial" value="VUE-VVPJ-JPN"/>
 		<info name="release" value="19950811"/>
 		<part name="cart" interface="vboy_cart">
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="1048576" width="32" endianness="little">
 				<rom name="virtual pro yakyuu '95 (japan).bin" size="1048576" crc="9ba8bb5e" sha1="ab8fa82b79512eefefccdccea6768078a374c4aa" offset="000000" />
-				<rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -497,12 +436,8 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="serial" value="VUE-VTRJ-JPN"/>
 		<info name="release" value="19950825"/>
 		<part name="cart" interface="vboy_cart">
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="524288" width="32" endianness="little">
 				<rom name="v-tetris (japan).bin" size="524288" crc="3ccb67ae" sha1="ff7d4dfc467e6e0d3fe8517102132a65a9d17589" offset="000000" />
-				<rom size="524288" offset="0x080000" loadflag="reload" />
-				<rom size="524288" offset="0x100000" loadflag="reload" />
-				<rom size="524288" offset="0x180000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -515,11 +450,10 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="serial" value="VUE-VWCJ-JPN, VUE-VWCJ-USA"/>
 		<info name="release" value="19951201 (JPN), 199511xx (USA)"/>
 		<part name="cart" interface="vboy_cart">
-			<feature name="slot" value="vb_eeprom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="32" endianness="little">
 				<rom name="virtual boy wario land (japan, usa).bin" size="2097152" crc="133e9372" sha1="274c328fbd904f20e69172ab826bf8f94ced1bdb" offset="000000" />
 			</dataarea>
-			<dataarea name="eeprom" size="0x10000">
+			<dataarea name="sram" size="8192" width="8" endianness="little">
 			</dataarea>
 		</part>
 	</software>
@@ -532,8 +466,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="serial" value="VUE-VWEE-USA"/>
 		<info name="release" value="19951221"/>
 		<part name="cart" interface="vboy_cart">
-			<feature name="slot" value="vb_rom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="2097152" width="32" endianness="little">
 				<rom name="waterworld (usa).bin" size="2097152" crc="82a95e51" sha1="dcc46484bd0acab0ac1ea178f425a0f5ccfb8dc2" offset="000000" />
 			</dataarea>
 		</part>

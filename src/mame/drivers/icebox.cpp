@@ -108,8 +108,8 @@ on the boards to say which of the four selects it responds to.
 The three byte fifo and a register jams a zero onto the data bus (when?), and we have the source for the CP/M version
 of the debugger/boot prom to see how interrupt handling occurs.
 
-When the floppy controller generates a DRQ or INTRQ it also generates a Z80 INT, which uses IM 0 
-and forces a NOP (00) onto the bus. This allows firmware and/or disk routines to resume after a HALT.  
+When the floppy controller generates a DRQ or INTRQ it also generates a Z80 INT, which uses IM 0
+and forces a NOP (00) onto the bus. This allows firmware and/or disk routines to resume after a HALT.
 
 I can sort of piece together what Terse implements and what it evolved from. I think it started as the Caltech FORTH
 implemented for the PDP-10 and 11 with a lot of words stripped out, and others added. This was submitted to DECUS as
@@ -209,10 +209,10 @@ void icebox_state::io_map(address_map &map)
 	map.unmap_value_high();
 	map(0xe0, 0xe1).rw(m_uart0, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xe2, 0xe3).rw(m_uart1, FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0xe4, 0xe7).lrw8("fdc_usage",
-					[this](offs_t offset) { return m_fdc->read(offset^3); },
-					[this](offs_t offset, u8 data) { m_fdc->write(offset^3, data); });
-	map(0xf1, 0xf1).lw8("port_F1", [this](u8 data) { port_f1_w(data); } );
+	map(0xe4, 0xe7).lrw8(
+					NAME([this] (offs_t offset) { return m_fdc->read(offset^3); }),
+					NAME([this] (offs_t offset, u8 data) { m_fdc->write(offset^3, data); }));
+	map(0xf1, 0xf1).lw8(NAME([this] (u8 data) { port_f1_w(data); }));
 }
 
 /* Input ports */

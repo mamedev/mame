@@ -15,13 +15,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define ADAMNET_TAG     "adamnet"
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -74,14 +67,18 @@ private:
 // ======================> adamnet_slot_device
 
 class adamnet_slot_device : public device_t,
-							public device_slot_interface
+							public device_single_card_slot_interface<device_adamnet_card_interface>
 {
 public:
+	// configuration
+	template <typename T> void set_bus(T &&tag) { m_bus.set_tag(std::forward<T>(tag)); }
+
 	// construction/destruction
-	template <typename T>
-	adamnet_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+	template <typename T, typename U>
+	adamnet_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus, U &&opts, char const *dflt)
 		: adamnet_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
+		set_bus(std::forward<T>(bus));
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
@@ -89,18 +86,18 @@ public:
 	}
 	adamnet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-protected:
 	// configuration
-	adamnet_device  *m_bus;
+	required_device<adamnet_device> m_bus;
 };
 
 
 // ======================> device_adamnet_card_interface
 
-class device_adamnet_card_interface : public device_slot_card_interface
+class device_adamnet_card_interface : public device_interface
 {
 	friend class adamnet_device;
 

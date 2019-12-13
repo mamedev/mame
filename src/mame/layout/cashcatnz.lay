@@ -111,7 +111,7 @@
 		</rect>
 		<text string="PLAY 9">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0.1" y="0.2" width="0.8" height="0.3" />
+			<bounds x="0.1" y="0.1" width="0.8" height="0.3" />
 		</text>
 		<text string="LINES">
 			<color red="0.0" green="0.0" blue="0.0" />

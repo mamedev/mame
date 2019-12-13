@@ -243,7 +243,7 @@ void gmaster_state::gmaster_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).rw(FUNC(gmaster_state::gmaster_io_r), FUNC(gmaster_state::gmaster_io_w));
-	//AM_RANGE(0x8000, 0xfeff)      // mapped by the cartslot
+	//map(0x8000, 0xfeff)      // mapped by the cartslot
 }
 
 
@@ -313,7 +313,7 @@ uint32_t gmaster_state::screen_update_gmaster(screen_device &screen, bitmap_ind1
 void gmaster_state::machine_start()
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xfeff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xfeff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 
 	save_item(NAME(m_video.data));
 	save_item(NAME(m_video.index));

@@ -186,8 +186,8 @@ nl_double matrix_solver_direct_t<m_N, storage_N>::compute_next_timestep()
 
 			n->m_h_n_m_1 = hn;
 			n->m_DD_n_m_1 = DD_n;
-			if (std::abs(DD2) > NL_FCONST(1e-30)) // avoid div-by-zero
-				new_net_timestep = std::sqrt(m_params.m_dynamic_lte / std::abs(NL_FCONST(0.5)*DD2));
+			if (plib::abs(DD2) > NL_FCONST(1e-30)) // avoid div-by-zero
+				new_net_timestep = std::sqrt(m_params.m_dynamic_lte / plib::abs(NL_FCONST(0.5)*DD2));
 			else
 				new_net_timestep = m_params.m_max_timestep;
 
@@ -549,7 +549,7 @@ nl_double matrix_solver_direct_t<m_N, storage_N>::delta(
 	const unsigned iN = this->N();
 	nl_double cerr = 0;
 	for (unsigned i = 0; i < iN; i++)
-		cerr = std::fmax(cerr, std::abs(V[i] - this->m_nets[i]->m_cur_Analog));
+		cerr = std::fmax(cerr, plib::abs(V[i] - this->m_nets[i]->m_cur_Analog));
 	return cerr;
 }
 

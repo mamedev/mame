@@ -274,11 +274,13 @@ public:
 		, m_display(*this, "display")
 		, m_user_pia(*this, "user_pia")
 		, m_brg(*this, "brg")
-		, m_tx_rate(*this, "tx_baud")
-		, m_rx_rate(*this, "rx_baud")
+		, m_rs232_tx_baud(*this, "RS232_TX_BAUD")
+		, m_rs232_rx_baud(*this, "RS232_RX_BAUD")
+		, m_rs232_cts_route(*this, "RS232_CTS_ROUTE")
+		, m_rs232_dcd_route(*this, "RS232_DCD_ROUTE")
 		, m_acia(*this, "acia")
 		, m_cass(*this, "cassette")
-		, m_jumper1(*this, "jumper1")
+		, m_jumper1(*this, "JUMPER1")
 		, m_keypad_columns(*this, "COL%u", 0)
 		  // MEK68R2
 		, m_mc6845(*this, "mc6845")
@@ -287,9 +289,9 @@ public:
 		, m_p_chargen(*this, "chargen")
 		, m_video_ram(*this, "videoram")
 		, m_r2_pia(*this, "r2_pia")
-		, m_r2_mode(*this, "r2_mode")
-		, m_r2_display_nationality(*this, "r2_display_nationality")
-		, m_r2_display_format(*this, "r2_display_format")
+		, m_r2_mode(*this, "R2_MODE")
+		, m_r2_display_nationality(*this, "R2_DISPLAY_NATIONALITY")
+		, m_r2_display_format(*this, "R2_DISPLAY_FORMAT")
 	{ }
 
 	void mekd4(machine_config &config);
@@ -297,6 +299,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(reset_key_w);
 	DECLARE_INPUT_CHANGED_MEMBER(keypad_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(rs232_cts_route_change);
+	DECLARE_INPUT_CHANGED_MEMBER(rs232_dcd_route_change);
 
 private:
 	DECLARE_READ8_MEMBER(main_r);
@@ -309,6 +313,9 @@ private:
 	DECLARE_WRITE8_MEMBER(stop_pia_pb_w);
 	DECLARE_READ_LINE_MEMBER(stop_pia_ca2_r);
 	uint16_t m_stop_address;
+
+	DECLARE_WRITE_LINE_MEMBER(rs232_route_cts);
+	DECLARE_WRITE_LINE_MEMBER(rs232_route_dcd);
 
 	// Clocks
 	DECLARE_WRITE_LINE_MEMBER(write_f1_clock);
@@ -337,11 +344,8 @@ private:
 
 	uint8_t m_rom_page; // aka ROP0, ROP1, ROP2
 	uint8_t m_ram_page; // aka RAP0, RAP1, RAP2
-	uint8_t m_cass_data[4];
 	uint8_t m_segment;
 	uint8_t m_digit;
-	bool m_cassbit;
-	bool m_cassold;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -351,12 +355,16 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_device<pia6821_device> m_user_pia;
 	required_device<mc14411_device> m_brg;
-	required_ioport m_tx_rate;
-	required_ioport m_rx_rate;
+	required_ioport m_rs232_tx_baud;
+	required_ioport m_rs232_rx_baud;
+	required_ioport m_rs232_cts_route;
+	required_ioport m_rs232_dcd_route;
 	required_device<acia6850_device> m_acia;
 	required_device<cassette_image_device> m_cass;
 	required_ioport m_jumper1;
 	required_ioport_array<4> m_keypad_columns;
+	int m_cts;
+	int m_dcd;
 
 	// MEK68R2
 	MC6845_UPDATE_ROW(update_row);
@@ -428,7 +436,7 @@ void mekd4_state::mekd4_mem(address_map &map)
 
 static INPUT_PORTS_START(mekd4)
 
-	PORT_START("jumper1")
+	PORT_START("JUMPER1")
 	PORT_DIPNAME(0x01, 0x00, "RS-232 console (D4B)")
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x01, DEF_STR(Off))
@@ -442,23 +450,35 @@ static INPUT_PORTS_START(mekd4)
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x08, DEF_STR(Off))
 
-	PORT_START("tx_baud")
+	PORT_START("RS232_TX_BAUD")
 	PORT_CONFNAME(0x3f, 1, "RS232 TX Baud Rate")
-	PORT_CONFSETTING(0x01, "9600")
-	PORT_CONFSETTING(0x02, "4800")
-	PORT_CONFSETTING(0x04, "1200")
-	PORT_CONFSETTING(0x08, "600")
-	PORT_CONFSETTING(0x10, "300")
 	PORT_CONFSETTING(0x20, "110")
+	PORT_CONFSETTING(0x10, "300")
+	PORT_CONFSETTING(0x08, "600")
+	PORT_CONFSETTING(0x04, "1200")
+	PORT_CONFSETTING(0x02, "4800")
+	PORT_CONFSETTING(0x01, "9600")
 
-	PORT_START("rx_baud")
+	PORT_START("RS232_RX_BAUD")
 	PORT_CONFNAME(0x3f, 1, "RS232 RX Baud Rate")
-	PORT_CONFSETTING(0x01, "9600")
-	PORT_CONFSETTING(0x02, "4800")
-	PORT_CONFSETTING(0x04, "1200")
-	PORT_CONFSETTING(0x08, "600")
-	PORT_CONFSETTING(0x10, "300")
 	PORT_CONFSETTING(0x20, "110")
+	PORT_CONFSETTING(0x10, "300")
+	PORT_CONFSETTING(0x08, "600")
+	PORT_CONFSETTING(0x04, "1200")
+	PORT_CONFSETTING(0x02, "4800")
+	PORT_CONFSETTING(0x01, "9600")
+
+	// RS232 CTS and DCD routing at the RS232 Conn. These need to be
+	// jumpered to logical low if not driven by the RS232 device. There is
+	// +12 and -12V available at this connector for this purpose.
+	PORT_START("RS232_CTS_ROUTE")
+	PORT_CONFNAME(0x1, 0, "RS232 CTS") PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, rs232_cts_route_change, 0)
+	PORT_CONFSETTING(0, "Jumper low")
+	PORT_CONFSETTING(1, "Pass through")
+	PORT_START("RS232_DCD_ROUTE")
+	PORT_CONFNAME(0x1, 0, "RS232 DCD") PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, rs232_dcd_route_change, 0)
+	PORT_CONFSETTING(0, "Jumper low")
+	PORT_CONFSETTING(1, "Pass through")
 
 	// RESET is not wired to the key matrix.
 	PORT_START("RESET")
@@ -504,17 +524,17 @@ static INPUT_PORTS_START(mekd4)
 
 	// MEK68R2
 
-	PORT_START("r2_mode")
+	PORT_START("R2_MODE")
 	PORT_DIPNAME(0x1, 0, "R2 Mode")
 	PORT_DIPSETTING(0, "Normal")
 	PORT_DIPSETTING(1, "Dumb terminal")
 
-	PORT_START("r2_display_nationality")
+	PORT_START("R2_DISPLAY_NATIONALITY")
 	PORT_DIPNAME(0x1, 1, "Display nationality")
 	PORT_DIPSETTING(0, "US")
 	PORT_DIPSETTING(1, "Europe")
 
-	PORT_START("r2_display_format")
+	PORT_START("R2_DISPLAY_FORMAT")
 	PORT_DIPNAME(0x0003, 2, "Display format")
 	PORT_DIPSETTING(0, "16 lines of 32 characters")
 	PORT_DIPSETTING(1, "16 lines of 64 characters")
@@ -660,7 +680,6 @@ WRITE8_MEMBER(mekd4_state::led_digit_w)
 	m_display->matrix(m_digit, ~m_segment);
 	// Update the keypad pressed output which depends on m_digit.
 	m_kpd_pia->cb1_w(mekd4_state::keypad_key_pressed());
-
 }
 
 
@@ -683,55 +702,89 @@ WRITE_LINE_MEMBER(mekd4_state::stop_pia_cb2_w)
 
 /***********************************************************
 
-  ACIA clocks
+  ACIA
 
 ************************************************************/
 
+WRITE_LINE_MEMBER(mekd4_state::rs232_route_cts)
+{
+	if (m_rs232_cts_route->read())
+		m_acia->write_cts(state);
+
+	// Cache the state, in case the ioport setting changes.
+	m_cts = state;
+}
+
+WRITE_LINE_MEMBER(mekd4_state::rs232_route_dcd)
+{
+	if (m_rs232_dcd_route->read())
+		m_acia->write_dcd(state);
+
+	// Cache the state, in case the ioport setting changes.
+	m_dcd = state;
+}
+
+INPUT_CHANGED_MEMBER(mekd4_state::rs232_cts_route_change)
+{
+	if (newval)
+		m_acia->write_cts(m_cts);
+	else
+		m_acia->write_cts(0);
+}
+
+INPUT_CHANGED_MEMBER(mekd4_state::rs232_dcd_route_change)
+{
+	if (newval)
+		m_acia->write_dcd(m_dcd);
+	else
+		m_acia->write_dcd(0);
+}
+
 WRITE_LINE_MEMBER(mekd4_state::write_f1_clock)
 {
-	if (BIT(m_tx_rate->read(), 0))
+	if (BIT(m_rs232_tx_baud->read(), 0))
 		m_acia->write_txc(state);
-	if (BIT(m_rx_rate->read(), 0))
+	if (BIT(m_rs232_rx_baud->read(), 0))
 		m_acia->write_rxc(state);
 }
 
 WRITE_LINE_MEMBER(mekd4_state::write_f3_clock)
 {
-	if (BIT(m_tx_rate->read(), 1))
+	if (BIT(m_rs232_tx_baud->read(), 1))
 		m_acia->write_txc(state);
-	if (BIT(m_rx_rate->read(), 1))
+	if (BIT(m_rs232_rx_baud->read(), 1))
 		m_acia->write_rxc(state);
 }
 
 WRITE_LINE_MEMBER(mekd4_state::write_f7_clock)
 {
-	if (BIT(m_tx_rate->read(), 2))
+	if (BIT(m_rs232_tx_baud->read(), 2))
 		m_acia->write_txc(state);
-	if (BIT(m_rx_rate->read(), 2))
+	if (BIT(m_rs232_rx_baud->read(), 2))
 		m_acia->write_rxc(state);
 }
 
 WRITE_LINE_MEMBER(mekd4_state::write_f8_clock)
 {
-	if (BIT(m_tx_rate->read(), 3))
+	if (BIT(m_rs232_tx_baud->read(), 3))
 		m_acia->write_txc(state);
-	if (BIT(m_rx_rate->read(), 3))
+	if (BIT(m_rs232_rx_baud->read(), 3))
 		m_acia->write_rxc(state);
 }
 
 WRITE_LINE_MEMBER(mekd4_state::write_f9_clock)
 {
-	if (BIT(m_tx_rate->read(), 4))
+	if (BIT(m_rs232_tx_baud->read(), 4))
 		m_acia->write_txc(state);
-	if (BIT(m_rx_rate->read(), 4))
+	if (BIT(m_rs232_rx_baud->read(), 4))
 		m_acia->write_rxc(state);
 }
 
 WRITE_LINE_MEMBER(mekd4_state::write_f13_clock)
 {
-	if (BIT(m_tx_rate->read(), 5))
+	if (BIT(m_rs232_tx_baud->read(), 5))
 		m_acia->write_txc(state);
-	if (BIT(m_rx_rate->read(), 5))
+	if (BIT(m_rs232_rx_baud->read(), 5))
 		m_acia->write_rxc(state);
 }
 
@@ -828,14 +881,14 @@ MC6845_UPDATE_ROW(mekd4_state::update_row)
 		  int pixel = ((ra & 0x0c) >> 1) + 1;
 		  int dout = BIT(code, pixel);
 		  int grey = BIT(code, 6);
-		  int color = ((dcursor ^ dout) && de) << !grey;
+		  int color = ((dcursor ^ dout) && de) << (grey ^ 1);
 		  bitmap.pix32(y, x++) = pen[color];
 		  bitmap.pix32(y, x++) = pen[color];
 		  bitmap.pix32(y, x++) = pen[color];
 		  bitmap.pix32(y, x++) = pen[color];
 		  pixel--;
 		  dout = BIT(code, pixel);
-		  color = ((dcursor ^ dout) && de) << !grey;
+		  color = ((dcursor ^ dout) && de) << (grey ^ 1);
 		  bitmap.pix32(y, x++) = pen[color];
 		  bitmap.pix32(y, x++) = pen[color];
 		  bitmap.pix32(y, x++) = pen[color];
@@ -869,6 +922,16 @@ void mekd4_state::init_mekd4()
 void mekd4_state::machine_start()
 {
 	m_banked_space = &subdevice<address_map_bank_device>("bankdev")->space(AS_PROGRAM);
+
+	save_item(NAME(m_stop_address));
+	save_item(NAME(m_rom_page));
+	save_item(NAME(m_ram_page));
+	save_item(NAME(m_segment));
+	save_item(NAME(m_digit));
+	save_item(NAME(m_cts));
+	save_item(NAME(m_dcd));
+	save_item(NAME(m_term_data));
+	save_item(NAME(m_r2_vsync));
 }
 
 void mekd4_state::machine_reset()
@@ -886,6 +949,12 @@ void mekd4_state::machine_reset()
 
 	m_brg->rsa_w(CLEAR_LINE);
 	m_brg->rsb_w(ASSERT_LINE);
+
+	// Write low here if jumpered low.
+	if (!m_rs232_cts_route->read())
+		m_acia->write_cts(0);
+	if (!m_rs232_dcd_route->read())
+		m_acia->write_dcd(0);
 
 	// MEK68R2
 	m_r2_pia->ca1_w(ASSERT_LINE);
@@ -939,6 +1008,7 @@ void mekd4_state::mekd4(machine_config &config)
 	// IRQ is not connected. RTS, CTS, and DCD are available.
 	ACIA6850(config, m_acia, 0);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	MC14411(config, m_brg, XTAL(1'843'200));
 	m_brg->out_f<1>().set(FUNC(mekd4_state::write_f1_clock));
@@ -950,6 +1020,8 @@ void mekd4_state::mekd4(machine_config &config)
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
+	rs232.cts_handler().set(FUNC(mekd4_state::rs232_route_cts));
+	rs232.dcd_handler().set(FUNC(mekd4_state::rs232_route_dcd));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	// Stop PIA. IRQB is NC.
@@ -986,10 +1058,10 @@ void mekd4_state::mekd4(machine_config &config)
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	MC6845(config, m_mc6845, XTAL(14'318'181)/8);
-	m_mc6845->set_screen("screen");
+	m_mc6845->set_screen(m_screen);
 	m_mc6845->set_show_border_area(false);
 	m_mc6845->set_char_width(8);
-	m_mc6845->set_update_row_callback(FUNC(mekd4_state::update_row), this);
+	m_mc6845->set_update_row_callback(FUNC(mekd4_state::update_row));
 	m_mc6845->out_hsync_callback().set(FUNC(mekd4_state::r2_hsync_changed));
 	m_mc6845->out_vsync_callback().set(FUNC(mekd4_state::r2_vsync_changed));
 

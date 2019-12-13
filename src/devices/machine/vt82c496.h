@@ -35,7 +35,7 @@ private:
 	required_device<cpu_device> m_cpu;
 	address_space* m_space;
 	required_device<ram_device> m_ram;
-	required_region_ptr<uint8_t> m_rom;
+	required_region_ptr<uint32_t> m_rom;
 
 	uint8_t m_reg[0x100];
 	uint8_t m_reg_select;

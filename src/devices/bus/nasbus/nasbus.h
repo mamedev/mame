@@ -95,41 +95,41 @@
 
 
 //**************************************************************************
-//  CONSTANTS / MACROS
-//**************************************************************************
-
-#define NASBUS_TAG "nasbus"
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
 // forward declaration
 class device_nasbus_card_interface;
+class nasbus_device;
 
 // ======================> nasbus_slot_device
 
-class nasbus_slot_device : public device_t, public device_slot_interface
+class nasbus_slot_device : public device_t, public device_single_card_slot_interface<device_nasbus_card_interface>
 {
 public:
 	// construction/destruction
-	template <typename T>
-	nasbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+	template <typename T, typename U>
+	nasbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus, U &&opts, char const *dflt)
 		: nasbus_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
+		set_bus(std::forward<T>(bus));
 	}
 	nasbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename T> void set_bus(T &&tag) { m_bus.set_tag(std::forward<T>(tag)); }
 
 protected:
 	nasbus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
+
+private:
+	required_device<nasbus_device> m_bus;
 };
 
 // device type definition
@@ -147,7 +147,7 @@ public:
 
 	auto ram_disable() { return m_ram_disable_handler.bind(); }
 
-	void add_card(device_nasbus_card_interface *card);
+	void add_card(device_nasbus_card_interface &card);
 
 	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program.set_tag(std::forward<T>(tag), spacenum); }
 	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io.set_tag(std::forward<T>(tag), spacenum); }
@@ -174,26 +174,30 @@ DECLARE_DEVICE_TYPE(NASBUS, nasbus_device)
 
 // ======================> device_nasbus_interface
 
-class device_nasbus_card_interface : public device_slot_card_interface
+class device_nasbus_card_interface : public device_interface
 {
 	template <class ElementType> friend class simple_list;
 public:
 	// construction/destruction
 	virtual ~device_nasbus_card_interface();
 
-	void set_nasbus_device(nasbus_device *nasbus);
+	void set_nasbus_device(nasbus_device &nasbus);
 
 	device_nasbus_card_interface *next() const { return m_next; }
 
 protected:
 	device_nasbus_card_interface(const machine_config &mconfig, device_t &device);
 
+	virtual void interface_pre_start() override;
+
+	DECLARE_WRITE_LINE_MEMBER( ram_disable_w ) { m_nasbus->ram_disable_w(state); }
+
 	address_space &program_space() { return *m_nasbus->m_program; }
 	address_space &io_space() { return *m_nasbus->m_io; }
 
+private:
 	nasbus_device *m_nasbus;
 
-private:
 	device_nasbus_card_interface *m_next;
 };
 

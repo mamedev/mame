@@ -100,7 +100,7 @@ WRITE_LINE_MEMBER(riscpc_state::iocr_od1_w)
 void riscpc_state::a7000_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).mirror(0x00800000).rom().region("user1", 0);
-//  AM_RANGE(0x01000000, 0x01ffffff) AM_NOP //expansion ROM
+//  map(0x01000000, 0x01ffffff).noprw(); //expansion ROM
 	//
 //  map(0x02000000, 0x027fffff).mirror(0x00800000).ram(); // VRAM, not installed on A7000 models
 //  I/O 03000000 - 033fffff
@@ -114,10 +114,11 @@ void riscpc_state::a7000_map(address_map &map)
 
 	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
 //  AM_RANGE(0x08000000, 0x08ffffff) AM_MIRROR(0x07000000) //EASI space
+
 	map(0x10000000, 0x13ffffff).ram(); //SIMM 0 bank 0
 	map(0x14000000, 0x17ffffff).ram(); //SIMM 0 bank 1
-//  AM_RANGE(0x18000000, 0x18ffffff) AM_MIRROR(0x03000000) AM_RAM //SIMM 1 bank 0
-//  AM_RANGE(0x1c000000, 0x1cffffff) AM_MIRROR(0x03000000) AM_RAM //SIMM 1 bank 1
+//  map(0x18000000, 0x18ffffff).mirror(0x03000000).ram(); //SIMM 1 bank 0
+//  map(0x1c000000, 0x1cffffff).mirror(0x03000000).ram(); //SIMM 1 bank 1
 }
 
 void riscpc_state::riscpc_map(address_map &map)
@@ -275,7 +276,7 @@ void riscpc_state::sarpc_j233(machine_config &config)
 }
 
 ROM_START(rpc600)
-	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.50
 	ROM_SYSTEM_BIOS( 0, "350", "RiscOS 3.50" )
 	ROMX_LOAD("0277,521-01.bin", 0x000000, 0x100000, CRC(8ba4444e) SHA1(1b31d7a6e924bef0e0056c3a00a3fed95e55b175), ROM_BIOS(0))
@@ -283,7 +284,7 @@ ROM_START(rpc600)
 ROM_END
 
 ROM_START(rpc700)
-	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.60
 	ROM_SYSTEM_BIOS( 0, "360", "RiscOS 3.60" )
 	ROMX_LOAD("1203,101-01.bin", 0x000000, 0x200000, CRC(2eeded56) SHA1(7217f942cdac55033b9a8eec4a89faa2dd63cd68), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
@@ -291,7 +292,7 @@ ROM_START(rpc700)
 ROM_END
 
 ROM_START(a7000)
-	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.60
 	ROM_SYSTEM_BIOS( 0, "360", "RiscOS 3.60" )
 	ROMX_LOAD("1203,101-01.bin", 0x000000, 0x200000, CRC(2eeded56) SHA1(7217f942cdac55033b9a8eec4a89faa2dd63cd68), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
@@ -299,7 +300,7 @@ ROM_START(a7000)
 ROM_END
 
 ROM_START(a7000p)
-	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.71
 	ROM_SYSTEM_BIOS( 0, "371", "RiscOS 3.71" )
 	ROMX_LOAD("1203,261-01.bin", 0x000000, 0x200000, CRC(8e3c570a) SHA1(ffccb52fa8e165d3f64545caae1c349c604386e9), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
@@ -315,7 +316,7 @@ ROM_START(a7000p)
 ROM_END
 
 ROM_START(sarpc)
-	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.70
 	ROM_SYSTEM_BIOS( 0, "370", "RiscOS 3.70" )
 	ROMX_LOAD("1203,191-01.bin", 0x000000, 0x200000, NO_DUMP, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
@@ -323,7 +324,7 @@ ROM_START(sarpc)
 ROM_END
 
 ROM_START(sarpc_j233)
-	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.71
 	ROM_SYSTEM_BIOS( 0, "371", "RiscOS 3.71" )
 	ROMX_LOAD("1203,261-01.bin", 0x000000, 0x200000, CRC(8e3c570a) SHA1(ffccb52fa8e165d3f64545caae1c349c604386e9), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))

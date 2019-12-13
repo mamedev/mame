@@ -400,7 +400,7 @@ void laserbas_state::laserbas(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(laserbas_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(laserbas_state::crtc_update_row));
 
 	PALETTE(config, m_palette).set_format(palette_device::RGB_332, 32);
 

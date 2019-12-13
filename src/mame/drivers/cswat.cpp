@@ -34,8 +34,8 @@ TODO:
 class cswat_state : public driver_device
 {
 public:
-	cswat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cswat_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram"),
@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(cswat_state::get_tile_info)
 
 void cswat_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cswat_state::get_tile_info),this), tilemap_mapper_delegate(FUNC(cswat_state::tilemap_scan_rows),this), 8, 8, 36, 28);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cswat_state::get_tile_info)), tilemap_mapper_delegate(*this, FUNC(cswat_state::tilemap_scan_rows)), 8, 8, 36, 28);
 }
 
 uint32_t cswat_state::screen_update_cswat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -143,13 +143,13 @@ void cswat_state::cswat_map(address_map &map)
 {
 	map(0x0000, 0x0bff).ram().w(FUNC(cswat_state::videoram_w)).share("videoram");
 	map(0x0c00, 0x0fff).ram();
-//  AM_RANGE(0x1800, 0x1800) AM_READNOP // ? reads here after writing to $4000
+//  map(0x1800, 0x1800).nopr(); // ? reads here after writing to $4000
 	map(0x2000, 0x2000).w(FUNC(cswat_state::irq_ack_w)); // writes 1 at end of vblank irq, 0 at gamestart
 	map(0x2000, 0x2001).r(FUNC(cswat_state::dipswitch_r));
 	map(0x2002, 0x2002).w(FUNC(cswat_state::irq_ack_w)); // writes 0 at start of vblank irq
 	map(0x2002, 0x2002).r(FUNC(cswat_state::sensors_r));
 	map(0x2003, 0x2003).portr("IN0");
-//  AM_RANGE(0x4000, 0x4009) AM_NOP // ?
+//  map(0x4000, 0x4009).noprw(); // ?
 	map(0x8000, 0xffff).rom();
 }
 

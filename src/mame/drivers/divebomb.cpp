@@ -400,7 +400,7 @@ void divebomb_state::divebomb(machine_config &config)
 	m_rozcpu->set_addrmap(AS_PROGRAM, &divebomb_state::divebomb_rozcpu_map);
 	m_rozcpu->set_addrmap(AS_IO, &divebomb_state::divebomb_rozcpu_iomap);
 
-	config.m_perfect_cpu_quantum = subtag("fgcpu");
+	config.set_perfect_quantum(m_fgcpu);
 
 	INPUT_MERGER_ANY_HIGH(config, m_fgcpu_irq).output_handler().set_inputline(m_fgcpu, INPUT_LINE_IRQ0);
 
@@ -419,14 +419,14 @@ void divebomb_state::divebomb(machine_config &config)
 	m_k051316[0]->set_bpp(8);
 	m_k051316[0]->set_wrap(0);
 	m_k051316[0]->set_offsets(-88, -16);
-	m_k051316[0]->set_zoom_callback(FUNC(divebomb_state::zoom_callback_1), this);
+	m_k051316[0]->set_zoom_callback(FUNC(divebomb_state::zoom_callback_1));
 
 	K051316(config, m_k051316[1], 0);
 	m_k051316[1]->set_palette(m_palette);
 	m_k051316[1]->set_bpp(8);
 	m_k051316[1]->set_wrap(0);
 	m_k051316[1]->set_offsets(-88, -16);
-	m_k051316[1]->set_zoom_callback(FUNC(divebomb_state::zoom_callback_2), this);
+	m_k051316[1]->set_zoom_callback(FUNC(divebomb_state::zoom_callback_2));
 
 	MCFG_MACHINE_START_OVERRIDE(divebomb_state, divebomb)
 	MCFG_MACHINE_RESET_OVERRIDE(divebomb_state, divebomb)

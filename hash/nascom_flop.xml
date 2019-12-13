@@ -9,7 +9,7 @@
 		<publisher>Richard C. Espley</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
-				<rom name="asteroid.dsk" size="655360" crc="96d6b7b6" sha1="ecf667413ec6fdec7a421ececcf572a00354ff10" offset="0" />
+				<rom name="asteroid.dsk" size="655360" crc="96d6b7b6" sha1="ecf667413ec6fdec7a421ececcf572a00354ff10"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20,7 +20,7 @@
 		<publisher>Lucas Logic</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
-				<rom name="avc-demo.dsk" size="655360" crc="81877f78" sha1="11fadb5ea69a949fdeadac3938683b14728b18df" offset="0" />
+				<rom name="avc-demo.dsk" size="655360" crc="81877f78" sha1="11fadb5ea69a949fdeadac3938683b14728b18df"/>
 			</dataarea>
 		</part>
 	</software>
@@ -31,7 +31,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
-				<rom name="divtools.dsk" size="655360" crc="58751dc6" sha1="7078e928c2ef17fccd53e1d1eb2fd9bfe9371c2c" offset="0" />
+				<rom name="divtools.dsk" size="655360" crc="58751dc6" sha1="7078e928c2ef17fccd53e1d1eb2fd9bfe9371c2c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -42,7 +42,7 @@
 		<publisher>Richard C. Espley</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
-				<rom name="dosadv.dsk" size="655360" crc="bd37aa35" sha1="b9483567951830955c6fe944c934c5b3ddf2007c" offset="0" />
+				<rom name="dosadv.dsk" size="655360" crc="bd37aa35" sha1="b9483567951830955c6fe944c934c5b3ddf2007c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -53,7 +53,7 @@
 		<publisher>Lucas Logic</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
-				<rom name="nas-sem.dsk" size="655360" crc="997e014a" sha1="ce86f41ebbb57322ff026b693dd49603e104f55c" offset="0" />
+				<rom name="nas-sem.dsk" size="655360" crc="997e014a" sha1="ce86f41ebbb57322ff026b693dd49603e104f55c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -64,7 +64,7 @@
 		<publisher>M F Hessey</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
-				<rom name="utd1066.dsk" size="655360" crc="ad1bf5b1" sha1="99c15344cdf4bdfe628a237f6e1759dc5b023e32" offset="0" />
+				<rom name="utd1066.dsk" size="655360" crc="ad1bf5b1" sha1="99c15344cdf4bdfe628a237f6e1759dc5b023e32"/>
 			</dataarea>
 		</part>
 	</software>
@@ -81,7 +81,7 @@
 		<publisher>Lucas Logic</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="394240">
-				<rom name="cpmv22s.dsk" size="394240" crc="dee5c9d2" sha1="00f187d9828d87fba14d8267cd020bd13d8cbdb9" offset="0" />
+				<rom name="cpmv22s.dsk" size="394240" crc="dee5c9d2" sha1="00f187d9828d87fba14d8267cd020bd13d8cbdb9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -92,7 +92,7 @@
 		<publisher>Lucas Logic</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="788480">
-				<rom name="cpmv22d.dsk" size="788480" crc="16724ed8" sha1="3db077c46c2cb52794443fa853621538323c352f" offset="0" />
+				<rom name="cpmv22d.dsk" size="788480" crc="16724ed8" sha1="3db077c46c2cb52794443fa853621538323c352f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -105,7 +105,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="394240">
-				<rom name="cpmgames.dsk" size="394240" crc="626c680a" sha1="9bd57fa8edce2017ad94a45d9721c86a37657d3b" offset="0" />
+				<rom name="cpmgames.dsk" size="394240" crc="626c680a" sha1="9bd57fa8edce2017ad94a45d9721c86a37657d3b"/>
 			</dataarea>
 		</part>
 	</software>

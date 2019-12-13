@@ -108,14 +108,14 @@ void esd16_state::tilemap0_color_jumppop_w(u16 data)
 
 void esd16_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 8, 8, 0x80, 0x40);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 8, 8, 0x80, 0x40);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(esd16_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 0x80, 0x40);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(esd16_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 0x80, 0x40);
 
 	/* swatpolc changes tilemap 0 to 16x16 at various times */
-	m_tilemap_16x16[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_16x16<0>),this), TILEMAP_SCAN_ROWS, 16,16, 0x40, 0x40);
+	m_tilemap_16x16[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(esd16_state::get_tile_info_16x16<0>)), TILEMAP_SCAN_ROWS, 16,16, 0x40, 0x40);
 
 	/* hedpanic changes tilemap 1 to 16x16 at various times */
-	m_tilemap_16x16[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_16x16<1>),this), TILEMAP_SCAN_ROWS, 16,16, 0x40, 0x40);
+	m_tilemap_16x16[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(esd16_state::get_tile_info_16x16<1>)), TILEMAP_SCAN_ROWS, 16,16, 0x40, 0x40);
 
 	m_tilemap[0]->set_scrolldx(-0x60 + 2, -0x60);
 	m_tilemap[1]->set_scrolldx(-0x60, -0x60 + 2);

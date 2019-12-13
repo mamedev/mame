@@ -75,9 +75,9 @@ void cpc_ddi1_device::device_start()
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 	address_space &space = m_slot->cpu().space(AS_IO);
 
-	space.install_write_handler(0xfa7e,0xfa7f,write8_delegate(FUNC(cpc_ddi1_device::motor_w),this));
-	space.install_readwrite_handler(0xfb7e,0xfb7f,read8_delegate(FUNC(cpc_ddi1_device::fdc_r),this),write8_delegate(FUNC(cpc_ddi1_device::fdc_w),this));
-	space.install_write_handler(0xdf00,0xdfff,write8_delegate(FUNC(cpc_ddi1_device::rombank_w),this));
+	space.install_write_handler(0xfa7e,0xfa7f, write8_delegate(*this, FUNC(cpc_ddi1_device::motor_w)));
+	space.install_readwrite_handler(0xfb7e,0xfb7f, read8_delegate(*this, FUNC(cpc_ddi1_device::fdc_r)), write8_delegate(*this, FUNC(cpc_ddi1_device::fdc_w)));
+	space.install_write_handler(0xdf00,0xdfff, write8_delegate(*this, FUNC(cpc_ddi1_device::rombank_w)));
 }
 
 //-------------------------------------------------

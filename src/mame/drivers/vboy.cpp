@@ -31,8 +31,8 @@
 
 #include "cpu/v810/v810.h"
 #include "bus/vboy/slot.h"
-#include "bus/vboy/rom.h"
 #include "machine/timer.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
@@ -85,7 +85,6 @@ public:
 	void vboy(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
@@ -130,7 +129,6 @@ private:
 	required_device<vboy_cart_slot_device> m_cart;
 	required_device<timer_device> m_maintimer;
 	required_device<palette_device> m_palette;
-	memory_region *m_cart_rom;
 
 	std::unique_ptr<uint16_t[]> m_font;
 	std::unique_ptr<uint16_t[]> m_bgmap;
@@ -191,7 +189,6 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_pad_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineL);
 
-	void vboy_io(address_map &map);
 	void vboy_mem(address_map &map);
 };
 
@@ -223,8 +220,8 @@ void vboy_state::put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,
 
 			if (dat)
 			{
-				uint8_t const res_x = x + xi;
-				uint8_t const res_y = y + yi;
+				uint16_t const res_x = x + xi;
+				uint16_t const res_y = y + yi;
 
 				if (cliprect.contains(res_x, res_y))
 				{
@@ -1063,7 +1060,7 @@ void vboy_state::vboy_mem(address_map &map)
 
 	map(0x00020000, 0x0003ffff).rw(FUNC(vboy_state::vboy_bgmap_r), FUNC(vboy_state::vboy_bgmap_w)); // VIPC memory
 
-	//AM_RANGE( 0x00040000, 0x0005ffff ) AM_RAM // VIPC
+	//map(0x00040000, 0x0005ffff).ram(); // VIPC
 	map(0x0005f800, 0x0005f87f).rw(FUNC(vboy_state::vip_r), FUNC(vboy_state::vip_w));
 
 	map(0x00078000, 0x00079fff).rw(FUNC(vboy_state::font0_r), FUNC(vboy_state::font0_w)); // Font 0-511 mirror
@@ -1073,40 +1070,10 @@ void vboy_state::vboy_mem(address_map &map)
 
 	map(0x01000000, 0x010005ff).rw("vbsnd", FUNC(vboysnd_device::read), FUNC(vboysnd_device::write));
 	map(0x02000000, 0x0200002b).mirror(0x0ffff00).rw(FUNC(vboy_state::io_r), FUNC(vboy_state::io_w)); // Hardware control registers mask 0xff
-	//AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
+	//map(0x04000000, 0x04ffffff) cartslot EXP
 	map(0x05000000, 0x0500ffff).mirror(0x0ff0000).ram().share("wram");// Main RAM - 64K mask 0xffff
-	map(0x06000000, 0x06003fff).rw(m_cart, FUNC(vboy_cart_slot_device::read_eeprom), FUNC(vboy_cart_slot_device::write_eeprom)); // Cart RAM - 8K NVRAM
-//  AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_DEVREAD("cartslot", vboy_cart_slot_device, read_cart) /* ROM */
-}
-
-void vboy_state::vboy_io(address_map &map)
-{
-	map.global_mask(0x07ffffff);
-	map(0x00000000, 0x00005fff).ram().share("l_frame_0"); // L frame buffer 0
-	map(0x00006000, 0x00007fff).rw(FUNC(vboy_state::font0_r), FUNC(vboy_state::font0_w)); // Font 0-511
-	map(0x00008000, 0x0000dfff).ram().share("l_frame_1"); // L frame buffer 1
-	map(0x0000e000, 0x0000ffff).rw(FUNC(vboy_state::font1_r), FUNC(vboy_state::font1_w)); // Font 512-1023
-	map(0x00010000, 0x00015fff).ram().share("r_frame_0"); // R frame buffer 0
-	map(0x00016000, 0x00017fff).rw(FUNC(vboy_state::font2_r), FUNC(vboy_state::font2_w)); // Font 1024-1535
-	map(0x00018000, 0x0001dfff).ram().share("r_frame_1"); // R frame buffer 1
-	map(0x0001e000, 0x0001ffff).rw(FUNC(vboy_state::font3_r), FUNC(vboy_state::font3_w)); // Font 1536-2047
-
-	map(0x00020000, 0x0003ffff).rw(FUNC(vboy_state::vboy_bgmap_r), FUNC(vboy_state::vboy_bgmap_w)); // VIPC memory
-
-	//AM_RANGE( 0x00040000, 0x0005ffff ) AM_RAM // VIPC
-	map(0x0005f800, 0x0005f87f).rw(FUNC(vboy_state::vip_r), FUNC(vboy_state::vip_w));
-
-	map(0x00078000, 0x00079fff).rw(FUNC(vboy_state::font0_r), FUNC(vboy_state::font0_w)); // Font 0-511 mirror
-	map(0x0007a000, 0x0007bfff).rw(FUNC(vboy_state::font1_r), FUNC(vboy_state::font1_w)); // Font 512-1023 mirror
-	map(0x0007c000, 0x0007dfff).rw(FUNC(vboy_state::font2_r), FUNC(vboy_state::font2_w)); // Font 1024-1535 mirror
-	map(0x0007e000, 0x0007ffff).rw(FUNC(vboy_state::font3_r), FUNC(vboy_state::font3_w)); // Font 1536-2047 mirror
-
-	map(0x01000000, 0x010005ff).rw("vbsnd", FUNC(vboysnd_device::read), FUNC(vboysnd_device::write));
-	map(0x02000000, 0x0200002b).mirror(0x0ffff00).rw(FUNC(vboy_state::io_r), FUNC(vboy_state::io_w)); // Hardware control registers mask 0xff
-//  AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
-	map(0x05000000, 0x0500ffff).mirror(0x0ff0000).ram().share("wram"); // Main RAM - 64K mask 0xffff
-	map(0x06000000, 0x06003fff).noprw(); // Cart RAM - 8K NVRAM ?
-//  AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_DEVREAD("cartslot", vboy_cart_slot_device, read_cart) /* ROM */
+	//map(0x06000000, 0x06ffffff) cartslot CHIP
+	//map(0x07000000, 0x07ffffff) cartslot ROM
 }
 
 /* Input ports */
@@ -1130,25 +1097,6 @@ static INPUT_PORTS_START( vboy )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED ) // Battery low
 INPUT_PORTS_END
 
-
-void vboy_state::machine_start()
-{
-	// install the cart ROM as a bank into the address map.
-	// this speeds up the rom access, by skipping the m_cart->read_rom
-	// trampoline (but forces us to alloc always a 0x200000-wide region)
-	if (m_cart->exists())
-	{
-		std::string region_tag;
-		m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(VBOYSLOT_ROM_REGION_TAG).c_str());
-
-		m_maincpu->space(AS_PROGRAM).install_read_bank(0x07000000, 0x071fffff, 0x0e00000, "prog_cart_bank");
-		m_maincpu->space(AS_IO).install_read_bank(0x07000000, 0x071fffff, 0x0e00000, "io_cart_bank");
-		membank("prog_cart_bank")->set_base(m_cart_rom->base());
-		membank("io_cart_bank")->set_base(m_cart_rom->base());
-
-		m_cart->save_eeprom();
-	}
-}
 
 void vboy_state::machine_reset()
 {
@@ -1299,18 +1247,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::vboy_scanlineR)
 #endif
 
 
-static void vboy_cart(device_slot_interface &device)
-{
-	device.option_add_internal("vb_rom",    VBOY_ROM_STD);
-	device.option_add_internal("vb_eeprom", VBOY_ROM_EEPROM);
-}
-
 void vboy_state::vboy(machine_config &config)
 {
 	/* basic machine hardware */
 	V810(config, m_maincpu, XTAL(20'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &vboy_state::vboy_mem);
-	m_maincpu->set_addrmap(AS_IO, &vboy_state::vboy_io);
+
 	TIMER(config, "scantimer_l").configure_scanline(FUNC(vboy_state::vboy_scanlineL), "3dleft", 0, 1);
 	//TIMER(config, "scantimer_r").configure_scanline(FUNC(vboy_state::vboy_scanlineR), "3dright", 0, 1);
 
@@ -1337,7 +1279,11 @@ void vboy_state::vboy(machine_config &config)
 	rscreen.set_palette(m_palette);
 
 	/* cartridge */
-	VBOY_CART_SLOT(config, m_cart, vboy_cart, nullptr);
+	VBOY_CART_SLOT(config, m_cart, vboy_carts, nullptr);
+	m_cart->intcro().set_inputline(m_maincpu, 2);
+	m_cart->set_exp(m_maincpu, AS_PROGRAM, 0x0400'0000);
+	m_cart->set_chip(m_maincpu, AS_PROGRAM, 0x0600'0000);
+	m_cart->set_rom(m_maincpu, AS_PROGRAM, 0x0700'0000);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("vboy");

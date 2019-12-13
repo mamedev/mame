@@ -125,6 +125,10 @@
   * add PSSJ-3 support for the later Tandy 1000 series computers.
   * NCR8496's output is inverted, PSSJ-3's output is not.
 
+  10/12/2019: Michael Zapf
+  * READY line handling by own emu_timer, not depending on sound_stream_update
+
+
   TODO: * Implement the TMS9919 - any difference to sn94624?
         * Implement the T6W28; has registers in a weird order, needs writes
           to be 'sanitized' first. Also is stereo, similar to game gear.
@@ -255,7 +259,6 @@ void sn76496_base_device::device_start()
 	m_RNG = m_feedback_mask;
 	m_output[3] = m_RNG & 1;
 
-	m_cycles_to_ready = 1;          // assume ready is not active immediately on init. is this correct?
 	m_stereo_mask = 0xFF;           // all channels enabled
 	m_current_clock = m_clock_divider-1;
 
@@ -282,6 +285,9 @@ void sn76496_base_device::device_start()
 
 	m_ready_state = true;
 
+	m_ready_timer = timer_alloc(0);
+	m_ready_handler(ASSERT_LINE);
+
 	register_for_save_states();
 }
 
@@ -297,16 +303,17 @@ void sn76496_base_device::stereo_w(u8 data)
 	else fatalerror("sn76496_base_device: Call to stereo write with mono chip!\n");
 }
 
+void sn76496_base_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	m_ready_handler(ASSERT_LINE);
+}
+
 void sn76496_base_device::write(u8 data)
 {
 	int n, r, c;
 
 	// update the output buffer before changing the registers
 	m_sound->update();
-
-	// set number of cycles until READY is active; this is always one
-	// 'sample', i.e. it equals the clock divider exactly
-	m_cycles_to_ready = 1;
 
 	if (data & 0x80)
 	{
@@ -355,26 +362,14 @@ void sn76496_base_device::write(u8 data)
 			}
 			break;
 	}
+
+	m_ready_handler(CLEAR_LINE);
+	m_ready_timer->adjust(attotime::from_hz(clock()/(4*m_clock_divider)));
 }
 
 inline bool sn76496_base_device::in_noise_mode()
 {
 	return ((m_register[6] & 4)!=0);
-}
-
-void sn76496_base_device::countdown_cycles()
-{
-	if (m_cycles_to_ready > 0)
-	{
-		m_cycles_to_ready--;
-		if (m_ready_state==true) m_ready_handler(CLEAR_LINE);
-		m_ready_state = false;
-	}
-	else
-	{
-		if (m_ready_state==false) m_ready_handler(ASSERT_LINE);
-		m_ready_state = true;
-	}
 }
 
 void sn76496_base_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
@@ -396,8 +391,6 @@ void sn76496_base_device::sound_stream_update(sound_stream &stream, stream_sampl
 		else // ready for new divided clock, make a new sample
 		{
 			m_current_clock = m_clock_divider-1;
-			// decrement Cycles to READY by one
-			countdown_cycles();
 
 			// handle channels 0,1,2
 			for (i = 0; i < 3; i++)
@@ -478,7 +471,6 @@ void sn76496_base_device::register_for_save_states()
 	save_item(NAME(m_period));
 	save_item(NAME(m_count));
 	save_item(NAME(m_output));
-	save_item(NAME(m_cycles_to_ready));
 //  save_item(NAME(m_sega_style_psg));
 }
 

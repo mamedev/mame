@@ -634,7 +634,7 @@ u32 mb86233_device::read_reg(u32 r)
 	case 0x34: return m_rpc;
 
 	default:
-		logerror("unimplemented read_reg(%02x)\n", r);
+		logerror("unimplemented read_reg(%02x) (%x)\n", r, m_ppc);
 		return 0;
 	}
 }
@@ -696,7 +696,7 @@ void mb86233_device::write_reg(u32 r, u32 v)
 	case 0x3c: m_mask = v; break;
 
 	default:
-		logerror("unimplemented write_reg(%02x, %08x)\n", r, v);
+		logerror("unimplemented write_reg(%02x, %08x) (%x)\n", r, v, m_ppc);
 		break;
 	}
 }
@@ -825,8 +825,8 @@ void mb86233_device::execute_run()
 			}
 
 			case 1: {
-				// mov mem + 0x200, mem (e)
-				u32 ea = ea_pre_0(r1) + 0x200*0;
+				// mov mem, mem (e)
+				u32 ea = ea_pre_0(r1);
 				u32 v = m_data->read_dword(ea);
 				if(m_stall) goto do_stall;
 				ea_post_0(r1);
@@ -941,14 +941,14 @@ void mb86233_device::execute_run()
 				}
 
 				default:
-					logerror("unhandler ld/mov subop 7/%x\n", r2 >> 6);
+					logerror("unhandled ld/mov subop 7/%x (%x)\n", r2 >> 6, m_ppc);
 					break;
 				}
 				break;
 			}
 
 			default:
-				logerror("unhandler ld/mov subop %x\n", op);
+				logerror("unhandled ld/mov subop %x (%x)\n", op, m_ppc);
 				break;
 			}
 
@@ -971,7 +971,7 @@ void mb86233_device::execute_run()
 				break;
 
 			default:
-				logerror("unimplemented opcode 0d/%x\n", sub2);
+				logerror("unimplemented opcode 0d/%x (%x)\n", sub2, m_ppc);
 				break;
 			}
 			break;
@@ -1030,7 +1030,7 @@ void mb86233_device::execute_run()
 				break;
 
 			default:
-				logerror("unimplemented opcode 0f/%x\n", sub2);
+				logerror("unimplemented opcode 0f/%x (%x)\n", sub2, m_ppc);
 				break;
 			}
 
@@ -1096,7 +1096,7 @@ void mb86233_device::execute_run()
 				break;
 
 			default:
-				logerror("unimplemented condition %x\n", cond);
+				logerror("unimplemented condition %x (%x)\n", cond, m_ppc);
 				break;
 			}
 			if(invert)
@@ -1161,7 +1161,7 @@ void mb86233_device::execute_run()
 				}
 
 				default:
-					logerror("unimplemented branch subtype %x\n", subtype);
+					logerror("unimplemented branch subtype %x (%x)\n", subtype, m_ppc);
 					break;
 				}
 			}
@@ -1189,7 +1189,7 @@ void mb86233_device::execute_run()
 		}
 
 		default:
-			logerror("unimplemented opcode type %02x\n", (opcode >> 26) & 0x3f);
+			logerror("unimplemented opcode type %02x (%x)\n", (opcode >> 26) & 0x3f, m_ppc);
 			break;
 		}
 

@@ -29,7 +29,7 @@ void radio86_state::radio86_mem(address_map &map)
 	map(0x0000, 0x0fff).bankrw("bank1"); // First bank
 	map(0x1000, 0x7fff).ram();  // RAM
 	map(0x8000, 0x8003).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
-	//AM_RANGE( 0xa000, 0xa003 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x1ffc)
+	//map(0xa000, 0xa003).rw(m_ppi8255_2, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
 	map(0xc000, 0xc001).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x1ffe); // video
 	map(0xe000, 0xffff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
 	map(0xf000, 0xffff).rom();  // System ROM
@@ -79,7 +79,7 @@ void radio86_state::radio86_16_mem(address_map &map)
 	map(0x1000, 0x3fff).ram();  // RAM
 	map(0x4000, 0x7fff).r(FUNC(radio86_state::radio_cpu_state_r));
 	map(0x8000, 0x8003).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
-	//AM_RANGE( 0xa000, 0xa003 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x1ffc)
+	//map(0xa000, 0xa003).rw(m_ppi8255_2, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
 	map(0xc000, 0xc001).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x1ffe); // video
 	map(0xe000, 0xffff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
 	map(0xf000, 0xffff).rom();  // System ROM
@@ -91,7 +91,7 @@ void radio86_state::mikron2_mem(address_map &map)
 	map(0x0000, 0x0fff).bankrw("bank1"); // First bank
 	map(0x1000, 0x7fff).ram();  // RAM
 	map(0xc000, 0xc003).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x00fc);
-	//AM_RANGE( 0xc100, 0xc103 ) AM_DEVREADWRITE_LEGACY("ppi8255_2", i8255a_r, i8255a_w) AM_MIRROR(0x00fc)
+	//map(0xc100, 0xc103).rw(m_ppi8255_2, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x00fc);
 	map(0xc200, 0xc201).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x00fe); // video
 	map(0xc300, 0xc3ff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
 	map(0xf000, 0xffff).rom();  // System ROM
@@ -476,7 +476,7 @@ void radio86_state::radio86(machine_config &config)
 
 	i8275_device &crtc(I8275(config, "i8275", XTAL(16'000'000) / 12));
 	crtc.set_character_width(6);
-	crtc.set_display_callback(FUNC(radio86_state::display_pixels), this);
+	crtc.set_display_callback(FUNC(radio86_state::display_pixels));
 	crtc.drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq2_w));
 
 	/* video hardware */

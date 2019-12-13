@@ -123,7 +123,6 @@ protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 	// handlers
-	void inkey_navigation();
 	virtual void inkey_export() = 0;
 	void inkey_dats();
 
@@ -156,7 +155,8 @@ protected:
 		return (uintptr_t(selected_ref) > skip_main_items) ? selected_ref : m_prev_selected;
 	}
 
-	int         visible_items;
+	int         m_available_items;
+	int         skip_main_items;
 	void        *m_prev_selected;
 	int         m_total_lines;
 	int         m_topline_datsview;
@@ -249,6 +249,7 @@ private:
 			}
 		}
 	}
+	void rotate_focus(int dir);
 
 	void draw_toolbar(float x1, float y1, float x2, float y2);
 	void draw_star(float x0, float y0);

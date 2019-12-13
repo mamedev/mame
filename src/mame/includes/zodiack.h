@@ -37,7 +37,7 @@ private:
 	uint8_t m_sound_nmi_enabled;
 
 	INTERRUPT_GEN_MEMBER(zodiack_sound_nmi_gen);
-	INTERRUPT_GEN_MEMBER(zodiack_main_nmi_gen);
+	DECLARE_WRITE_LINE_MEMBER(vblank_main_nmi_w);
 
 	void io_map(address_map &map);
 	void main_map(address_map &map);

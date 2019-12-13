@@ -11,13 +11,13 @@
 
 #include "bus/amiga/keyboard/keyboard.h"
 #include "bus/amiga/zorro/zorro.h"
+#include "bus/ata/ataintf.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/bankdev.h"
 #include "machine/6525tpi.h"
 #include "machine/mos6526.h"
 #include "machine/gayle.h"
-#include "machine/ataintf.h"
 #include "machine/dmac.h"
 #include "machine/nvram.h"
 #include "machine/i2cmem.h"
@@ -33,7 +33,6 @@
 //**************************************************************************
 
 #define EXP_SLOT_TAG "exp"
-#define ZORROBUS_TAG "zorrobus"
 
 
 //**************************************************************************
@@ -260,7 +259,7 @@ public:
 	a2000_state(const machine_config &mconfig, device_type type, const char *tag) :
 		amiga_state(mconfig, type, tag),
 		m_rtc(*this, "u65"),
-		m_zorro(*this, ZORROBUS_TAG),
+		m_zorro(*this, "zorrobus"),
 		m_zorro2_int2(0),
 		m_zorro2_int6(0)
 	{ }
@@ -287,7 +286,7 @@ protected:
 private:
 	// devices
 	required_device<msm6242_device> m_rtc;
-	required_device<zorro2_device> m_zorro;
+	required_device<zorro2_bus_device> m_zorro;
 
 	// internal state
 	int m_zorro2_int2;

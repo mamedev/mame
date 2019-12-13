@@ -409,7 +409,7 @@ void cyberbal_state::cyberbal_base(machine_config &config)
 	m_daccpu->set_addrmap(AS_PROGRAM, &cyberbal_state::sound_68k_map);
 	m_daccpu->set_periodic_int(FUNC(cyberbal_state::sound_68k_irq_gen), attotime::from_hz(10000));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	WATCHDOG_TIMER(config, "watchdog");
 

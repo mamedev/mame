@@ -1325,7 +1325,7 @@ void homedata_state::reikaids(machine_config &config)
 	audiocpu.pc_out_cb().set(FUNC(homedata_state::reikaids_upd7807_portc_w));
 	audiocpu.pt_in_cb().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 
-	config.m_minimum_quantum = attotime::from_hz(30000); // very high interleave required to sync for startup tests
+	config.set_maximum_quantum(attotime::from_hz(30000)); // very high interleave required to sync for startup tests
 
 	MCFG_MACHINE_START_OVERRIDE(homedata_state,reikaids)
 	MCFG_MACHINE_RESET_OVERRIDE(homedata_state,reikaids)
@@ -1384,7 +1384,7 @@ void homedata_state::pteacher(machine_config &config)
 	audiocpu.pc_out_cb().set(FUNC(homedata_state::pteacher_upd7807_portc_w));
 	audiocpu.pt_in_cb().set(FUNC(homedata_state::pteacher_keyboard_r));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  // should be enough
+	config.set_maximum_quantum(attotime::from_hz(6000));  // should be enough
 
 	MCFG_MACHINE_START_OVERRIDE(homedata_state,pteacher)
 	MCFG_MACHINE_RESET_OVERRIDE(homedata_state,pteacher)
@@ -1453,7 +1453,7 @@ void homedata_state::mjikaga(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &homedata_state::mjikaga_map);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &homedata_state::mjikaga_upd7807_map);
 
-	config.m_minimum_quantum = attotime::from_hz(9000); // boost synch a bit more, otherwise the game fails to start
+	config.set_maximum_quantum(attotime::from_hz(9000)); // boost synch a bit more, otherwise the game fails to start
 }
 
 static INPUT_PORTS_START( mirderby )
@@ -1579,7 +1579,7 @@ void homedata_state::mirderby(machine_config &config)
 	cpu1.set_disable();
 	//cpu1.set_vblank_int("screen", FUNC(homedata_state::mirderby_irq));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

@@ -1,14 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_opamps.h
- *
- */
-
-//#pragma once
 
 #ifndef NLD_OPAMPS_H_
 #define NLD_OPAMPS_H_
+
+///
+/// \file nld_opamps.h
+///
 
 #include "netlist/nl_setup.h"
 
@@ -21,4 +19,4 @@
 		NETDEV_PARAMI(name, MODEL, model)
 
 
-#endif /* NLD_OPAMPS_H_ */
+#endif // NLD_OPAMPS_H_

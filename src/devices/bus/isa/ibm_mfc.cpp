@@ -463,7 +463,7 @@ isa8_ibm_mfc_device::isa8_ibm_mfc_device(const machine_config &mconfig, const ch
 void isa8_ibm_mfc_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x2a20, 0x2a20 + 15, read8_delegate(FUNC(isa8_ibm_mfc_device::ibm_mfc_r), this), write8_delegate(FUNC(isa8_ibm_mfc_device::ibm_mfc_w), this));
+	m_isa->install_device(0x2a20, 0x2a20 + 15, read8_delegate(*this, FUNC(isa8_ibm_mfc_device::ibm_mfc_r)), write8_delegate(*this, FUNC(isa8_ibm_mfc_device::ibm_mfc_w)));
 }
 
 

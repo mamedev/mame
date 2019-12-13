@@ -47,6 +47,8 @@ NETLIST_START(tp1985)
 
 	TTL_INPUT(high, 1)
 	TTL_INPUT(low, 0)
+	NET_C(VCC, high.VCC, low.VCC)
+	NET_C(GND, high.GND, low.GND)
 
 	MAINCLOCK(clk, 4000000.0)
 

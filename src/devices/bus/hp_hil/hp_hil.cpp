@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(HP_HIL_SLOT, hp_hil_slot_device, "hp_hil_slot", "HP-HIL Slot"
 //-------------------------------------------------
 hp_hil_slot_device::hp_hil_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HP_HIL_SLOT, tag, owner, clock)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<device_hp_hil_interface>(mconfig, *this)
 	, m_mlc(*this, finder_base::DUMMY_TAG)
 {
 }
@@ -39,7 +39,7 @@ hp_hil_slot_device::hp_hil_slot_device(const machine_config &mconfig, const char
 
 void hp_hil_slot_device::device_start()
 {
-	device_hp_hil_interface *dev = dynamic_cast<device_hp_hil_interface *>(get_card_device());
+	device_hp_hil_interface *dev = get_card_device();
 	if (dev)
 		dev->set_hp_hil_mlc(*m_mlc);
 }
@@ -57,13 +57,13 @@ DEFINE_DEVICE_TYPE(HP_HIL_MLC, hp_hil_mlc_device, "hp_hil_mlc", "HP-HIL Master L
 //-------------------------------------------------
 hp_hil_mlc_device::hp_hil_mlc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HP_HIL_MLC, tag, owner, clock)
+	, m_loop(1)
 	, int_cb(*this)
 	, nmi_cb(*this)
 {
-	m_loop = 1;
 }
 
-void hp_hil_mlc_device::add_hp_hil_device( device_hp_hil_interface *device )
+void hp_hil_mlc_device::add_hp_hil_device(device_hp_hil_interface *device)
 {
 	m_device_list.append(*device);
 }
@@ -242,7 +242,7 @@ WRITE_LINE_MEMBER(hp_hil_mlc_device::ap_w)
 //-------------------------------------------------
 
 device_hp_hil_interface::device_hp_hil_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "hphil")
 	, m_hp_hil_mlc(nullptr)
 	, m_next(nullptr)
 {

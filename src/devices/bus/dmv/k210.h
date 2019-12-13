@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+// thanks-to:rfka01
 #ifndef MAME_BUS_DMV_K210_H
 #define MAME_BUS_DMV_K210_H
 
@@ -56,7 +57,6 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<input_buffer_device> m_cent_data_in;
 	required_device<output_latch_device> m_cent_data_out;
-	dmvcart_slot_device * m_bus;
 
 	emu_timer * m_clk1_timer;
 	uint8_t       m_portb;

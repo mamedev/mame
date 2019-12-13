@@ -77,6 +77,15 @@ class address_map_entry
 	static std::enable_if_t<is_addrmap_method<T, Ret, Params...>::value, address_map_constructor> make_delegate(Ret (T::*func)(Params...), const char *name, T *obj)
 	{ return address_map_constructor(func, name, obj); }
 
+	template <typename T, bool Reqd>
+	static device_t &find_device(const device_finder<T, Reqd> &finder) {
+		const std::pair<device_t &, const char *> target(finder.finder_target());
+		device_t *device(target.first.subdevice(target.second));
+		if (!device)
+			throw emu_fatalerror("Device %s not found in %s\n", target.second, target.first.tag());
+		return *device;
+	}
+
 	template <typename T, typename U>
 	static std::enable_if_t<std::is_convertible<std::add_pointer_t<U>, std::add_pointer_t<T> >::value, T *> make_pointer(U &obj)
 	{ return &downcast<T &>(obj); }
@@ -177,15 +186,15 @@ public:
 	// implicit base -> delegate converter
 	template <typename T, typename Ret, typename... Params>
 	address_map_entry &r(Ret (T::*read)(Params...), const char *read_name)
-	{ return r(emu::detail::make_delegate(read, read_name, m_devbase.tag(), make_pointer<T>(m_devbase))); }
+	{ return r(emu::detail::make_delegate(*make_pointer<T>(m_devbase), read, read_name)); }
 
 	template <typename T, typename Ret, typename... Params>
 	address_map_entry &w(Ret (T::*write)(Params...), const char *write_name)
-	{ return w(emu::detail::make_delegate(write, write_name, m_devbase.tag(), make_pointer<T>(m_devbase))); }
+	{ return w(emu::detail::make_delegate(*make_pointer<T>(m_devbase), write, write_name)); }
 
 	template <typename T, typename RetR, typename... ParamsR, typename U, typename RetW, typename... ParamsW>
 	address_map_entry &rw(RetR (T::*read)(ParamsR...), const char *read_name, RetW (U::*write)(ParamsW...), const char *write_name)
-	{ return r(emu::detail::make_delegate(read, read_name, m_devbase.tag(), make_pointer<T>(m_devbase))).w(emu::detail::make_delegate(write, write_name, m_devbase.tag(), make_pointer<U>(m_devbase))); }
+	{ return r(emu::detail::make_delegate(*make_pointer<T>(m_devbase), read, read_name)).w(emu::detail::make_delegate(*make_pointer<U>(m_devbase), write, write_name)); }
 
 	template <typename T, typename Ret, typename... Params>
 	address_map_entry &m(Ret (T::*map)(Params...), const char *map_name)
@@ -195,15 +204,15 @@ public:
 	// device tag -> delegate converter
 	template <typename T, typename Ret, typename... Params>
 	address_map_entry &r(const char *tag, Ret (T::*read)(Params...), const char *read_name)
-	{ return r(emu::detail::make_delegate(read, read_name, tag, nullptr)); }
+	{ return r(emu::detail::make_delegate(m_devbase, tag, read, read_name)); }
 
 	template <typename T, typename Ret, typename... Params>
 	address_map_entry &w(const char *tag, Ret (T::*write)(Params...), const char *write_name)
-	{ return w(emu::detail::make_delegate(write, write_name, tag, nullptr)); }
+	{ return w(emu::detail::make_delegate(m_devbase, tag, write, write_name)); }
 
 	template <typename T, typename RetR, typename... ParamsR, typename U, typename RetW, typename... ParamsW>
 	address_map_entry &rw(const char *tag, RetR (T::*read)(ParamsR...), const char *read_name, RetW (U::*write)(ParamsW...), const char *write_name)
-	{ return r(emu::detail::make_delegate(read, read_name, tag, nullptr)).w(emu::detail::make_delegate(write, write_name, tag, nullptr)); }
+	{ return r(emu::detail::make_delegate(m_devbase, tag, read, read_name)).w(emu::detail::make_delegate(m_devbase, tag, write, write_name)); }
 
 	template <typename T, typename Ret, typename... Params>
 	address_map_entry &m(const char *tag, Ret (T::*map)(Params...), const char *map_name)
@@ -213,15 +222,15 @@ public:
 	// device reference -> delegate converter
 	template <typename T, typename U, typename Ret, typename... Params>
 	address_map_entry &r(T &obj, Ret (U::*read)(Params...), const char *read_name)
-	{ return r(emu::detail::make_delegate(read, read_name, get_tag(obj), make_pointer<U>(obj))); }
+	{ return r(emu::detail::make_delegate(*make_pointer<U>(obj), read, read_name)); }
 
 	template <typename T, typename U, typename Ret, typename... Params>
 	address_map_entry &w(T &obj, Ret (U::*write)(Params...), const char *write_name)
-	{ return w(emu::detail::make_delegate(write, write_name, get_tag(obj), make_pointer<U>(obj))); }
+	{ return w(emu::detail::make_delegate(*make_pointer<U>(obj), write, write_name)); }
 
 	template <typename T, typename U, typename RetR, typename... ParamsR, typename V, typename RetW, typename... ParamsW>
 	address_map_entry &rw(T &obj, RetR (U::*read)(ParamsR...), const char *read_name, RetW (V::*write)(ParamsW...), const char *write_name)
-	{ return r(emu::detail::make_delegate(read, read_name, get_tag(obj), make_pointer<U>(obj))).w(emu::detail::make_delegate(write, write_name, get_tag(obj), make_pointer<V>(obj))); }
+	{ return r(emu::detail::make_delegate(*make_pointer<U>(obj), read, read_name)).w(emu::detail::make_delegate(make_pointer<V>(obj), write, write_name)); }
 
 	template <typename T, typename U, typename Ret, typename... Params>
 	address_map_entry &m(T &obj, Ret (U::*map)(Params...), const char *map_name)
@@ -230,86 +239,92 @@ public:
 
 	// device finder -> delegate converter
 	template <typename T, bool Reqd, typename U, typename Ret, typename... Params>
-	address_map_entry &r(device_finder<T, Reqd> &finder, Ret (U::*read)(Params...), const char *read_name)
-	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return r(emu::detail::make_delegate(read, read_name, device.tag(), make_pointer<U>(device))); }
+	address_map_entry &r(device_finder<T, Reqd> &finder, Ret (U::*read)(Params...), const char *read_name) {
+		device_t &device(find_device(finder));
+		return r(emu::detail::make_delegate(device, DEVICE_SELF, read, read_name));
+	}
 
 	template <typename T, bool Reqd, typename U, typename Ret, typename... Params>
-	address_map_entry &r(const device_finder<T, Reqd> &finder, Ret (U::*read)(Params...), const char *read_name)
-	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return r(emu::detail::make_delegate(read, read_name, device.tag(), make_pointer<U>(device))); }
+	address_map_entry &r(const device_finder<T, Reqd> &finder, Ret (U::*read)(Params...), const char *read_name) {
+		device_t &device(find_device(finder));
+		return r(emu::detail::make_delegate(device, DEVICE_SELF, read, read_name));
+	}
 
 	template <typename T, bool Reqd, typename U, typename Ret, typename... Params>
-	address_map_entry &w(device_finder<T, Reqd> &finder, Ret (U::*write)(Params...), const char *write_name)
-	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return w(emu::detail::make_delegate(write, write_name, device.tag(), make_pointer<U>(device))); }
+	address_map_entry &w(device_finder<T, Reqd> &finder, Ret (U::*write)(Params...), const char *write_name) {
+		device_t &device(find_device(finder));
+		return w(emu::detail::make_delegate(device, DEVICE_SELF, write, write_name));
+	}
 
 	template <typename T, bool Reqd, typename U, typename Ret, typename... Params>
-	address_map_entry &w(const device_finder<T, Reqd> &finder, Ret (U::*write)(Params...), const char *write_name)
-	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return w(emu::detail::make_delegate(write, write_name, device.tag(), make_pointer<U>(device))); }
+	address_map_entry &w(const device_finder<T, Reqd> &finder, Ret (U::*write)(Params...), const char *write_name) {
+		device_t &device(find_device(finder));
+		return w(emu::detail::make_delegate(device, DEVICE_SELF, write, write_name));
+	}
 
 	template <typename T, bool Reqd, typename U, typename RetR, typename... ParamsR, typename V, typename RetW, typename... ParamsW>
-	address_map_entry &rw(device_finder<T, Reqd> &finder, RetR (U::*read)(ParamsR...), const char *read_name, RetW (V::*write)(ParamsW...), const char *write_name)
-	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return r(emu::detail::make_delegate(read, read_name, device.tag(), make_pointer<U>(device))).w(emu::detail::make_delegate(write, write_name, device.tag(), make_pointer<V>(device))); }
+	address_map_entry &rw(device_finder<T, Reqd> &finder, RetR (U::*read)(ParamsR...), const char *read_name, RetW (V::*write)(ParamsW...), const char *write_name) {
+		device_t &device(find_device(finder));
+		return r(emu::detail::make_delegate(device, DEVICE_SELF, read, read_name))
+				.w(emu::detail::make_delegate(device, DEVICE_SELF, write, write_name));
+	}
 
 	template <typename T, bool Reqd, typename U, typename RetR, typename... ParamsR, typename V, typename RetW, typename... ParamsW>
-	address_map_entry &rw(const device_finder<T, Reqd> &finder, RetR (U::*read)(ParamsR...), const char *read_name, RetW (V::*write)(ParamsW...), const char *write_name)
-	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return r(emu::detail::make_delegate(read, read_name, device.tag(), make_pointer<U>(device))).w(emu::detail::make_delegate(write, write_name, device.tag(), make_pointer<V>(device))); }
+	address_map_entry &rw(const device_finder<T, Reqd> &finder, RetR (U::*read)(ParamsR...), const char *read_name, RetW (V::*write)(ParamsW...), const char *write_name) {
+		device_t &device(find_device(finder));
+		return r(emu::detail::make_delegate(device, DEVICE_SELF, read, read_name))
+				.w(emu::detail::make_delegate(device, DEVICE_SELF, write, write_name));
+	}
 
 	template <typename T, bool Reqd, typename U, typename Ret, typename... Params>
-	address_map_entry &m(device_finder<T, Reqd> &finder, Ret (U::*map)(Params...), const char *map_name)
-	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return m(&device, make_delegate(map, map_name, make_pointer<U>(device))); }
+	address_map_entry &m(device_finder<T, Reqd> &finder, Ret (U::*map)(Params...), const char *map_name) {
+		device_t &device(find_device(finder));
+		return m(&device, make_delegate(map, map_name, make_pointer<U>(device)));
+	}
 
 	template <typename T, bool Reqd, typename U, typename Ret, typename... Params>
-	address_map_entry &m(const device_finder<T, Reqd> &finder, Ret (U::*map)(Params...), const char *map_name)
-	{ const std::pair<device_t &, const char *> target(finder.finder_target()); device_t &device(*target.first.subdevice(target.second)); return m(make_delegate(map, map_name, make_pointer<U>(device))); }
+	address_map_entry &m(const device_finder<T, Reqd> &finder, Ret (U::*map)(Params...), const char *map_name) {
+		device_t &device(find_device(finder));
+		return m(&device, make_delegate(map, map_name, make_pointer<U>(device)));
+	}
 
 
 	// lambda -> delegate converter
-	template<typename _lr> address_map_entry &lr8(const char *name, _lr &&read) {
-		return r(emu::detail::make_lr8_delegate(read, name));
-	}
+	template <typename T> address_map_entry &lr8(T &&read, const char *name)
+	{ return r(emu::detail::make_lr8_delegate(m_devbase, std::forward<T>(read), name)); }
 
-	template<typename _lr> address_map_entry &lr16(const char *name, _lr &&read) {
-		return r(emu::detail::make_lr16_delegate(read, name));
-	}
+	template <typename T> address_map_entry &lr16(T &&read, const char *name)
+	{ return r(emu::detail::make_lr16_delegate(m_devbase, std::forward<T>(read), name)); }
 
-	template<typename _lr> address_map_entry &lr32(const char *name, _lr &&read) {
-		return r(emu::detail::make_lr32_delegate(read, name));
-	}
+	template <typename T> address_map_entry &lr32(T &&read, const char *name)
+	{ return r(emu::detail::make_lr32_delegate(m_devbase, std::forward<T>(read), name)); }
 
-	template<typename _lr> address_map_entry &lr64(const char *name, _lr &&read) {
-		return r(emu::detail::make_lr64_delegate(read, name));
-	}
+	template <typename T> address_map_entry &lr64(T &&read, const char *name)
+	{ return r(emu::detail::make_lr64_delegate(m_devbase, std::forward<T>(read), name)); }
 
-	template<typename _lw> address_map_entry &lw8(const char *name, _lw &&write) {
-		return w(emu::detail::make_lw8_delegate(write, name));
-	}
+	template <typename T> address_map_entry &lw8(T &&write, const char *name)
+	{ return w(emu::detail::make_lw8_delegate(m_devbase, std::forward<T>(write), name)); }
 
-	template<typename _lw> address_map_entry &lw16(const char *name, _lw &&write) {
-		return w(emu::detail::make_lw16_delegate(write, name));
-	}
+	template <typename T> address_map_entry &lw16(T &&write, const char *name)
+	{ return w(emu::detail::make_lw16_delegate(m_devbase, std::forward<T>(write), name)); }
 
-	template<typename _lw> address_map_entry &lw32(const char *name, _lw &&write) {
-		return w(emu::detail::make_lw32_delegate(write, name));
-	}
+	template <typename T> address_map_entry &lw32(T &&write, const char *name)
+	{ return w(emu::detail::make_lw32_delegate(m_devbase, std::forward<T>(write), name)); }
 
-	template<typename _lw> address_map_entry &lw64(const char *name, _lw &&write) {
-		return w(emu::detail::make_lw64_delegate(write, name));
-	}
+	template <typename T> address_map_entry &lw64(T &&write, const char *name)
+	{ return w(emu::detail::make_lw64_delegate(m_devbase, std::forward<T>(write), name)); }
 
-	template<typename _lr, typename _lw> address_map_entry &lrw8(const char *name, _lr &&read, _lw &&write) {
-		return r(emu::detail::make_lr8_delegate(read, name)).w(emu::detail::make_lw8_delegate(write, name));
-	}
+	template <typename T, typename U> address_map_entry &lrw8(T &&read, const char *read_name, U &&write, const char *write_name)
+	{ return r(emu::detail::make_lr8_delegate(m_devbase, std::forward<T>(read), read_name)).w(emu::detail::make_lw8_delegate(m_devbase, std::forward<U>(write), write_name)); }
 
-	template<typename _lr, typename _lw> address_map_entry &lrw16(const char *name, _lr &&read, _lw &&write) {
-		return r(emu::detail::make_lr16_delegate(read, name)).w(emu::detail::make_lw16_delegate(write, name));
-	}
+	template <typename T, typename U> address_map_entry &lrw16(T &&read, const char *read_name, U &&write, const char *write_name)
+	{ return r(emu::detail::make_lr16_delegate(m_devbase, std::forward<T>(read), read_name)).w(emu::detail::make_lw16_delegate(m_devbase, std::forward<U>(write), write_name)); }
 
-	template<typename _lr, typename _lw> address_map_entry &lrw32(const char *name, _lr &&read, _lw &&write) {
-		return r(emu::detail::make_lr32_delegate(read, name)).w(emu::detail::make_lw32_delegate(write, name));
-	}
+	template <typename T, typename U> address_map_entry &lrw32(T &&read, const char *read_name, U &&write, const char *write_name)
+	{ return r(emu::detail::make_lr32_delegate(m_devbase, std::forward<T>(read), read_name)).w(emu::detail::make_lw32_delegate(m_devbase, std::forward<U>(write), write_name)); }
 
-	template<typename _lr, typename _lw> address_map_entry &lrw64(const char *name, _lr &&read, _lw &&write) {
-		return r(emu::detail::make_lr64_delegate(read, name)).w(emu::detail::make_lw64_delegate(write, name));
-	}
+	template <typename T, typename U> address_map_entry &lrw64(T &&read, const char *read_name, U &&write, const char *write_name)
+	{ return r(emu::detail::make_lr64_delegate(m_devbase, std::forward<T>(read), read_name)).w(emu::detail::make_lw64_delegate(m_devbase, std::forward<U>(write), write_name)); }
 
 	// public state
 	address_map_entry *     m_next;                 // pointer to the next entry

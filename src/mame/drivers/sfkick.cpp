@@ -597,7 +597,7 @@ void sfkick_state::sfkick(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sfkick_state::sfkick_map);
 	m_maincpu->set_addrmap(AS_IO, &sfkick_state::sfkick_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60000);
+	config.set_maximum_quantum(attotime::from_hz(60000));
 
 	Z80(config, m_soundcpu, MASTER_CLOCK/6);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &sfkick_state::sfkick_sound_map);

@@ -350,8 +350,8 @@ some other components. It will be documented at a later date.
 
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
-#include "machine/ataintf.h"
-#include "machine/idehd.h"
+#include "bus/ata/ataintf.h"
+#include "bus/ata/idehd.h"
 #include "machine/lpci.h"
 #include "machine/timekpr.h"
 #include "machine/timer.h"
@@ -1745,35 +1745,35 @@ void viper_state::voodoo3_pci_w(int function, int reg, uint32_t data, uint32_t m
 
 READ64_MEMBER(viper_state::voodoo3_io_r)
 {
-	return read64be_with_32sle_device_handler(read32s_delegate(FUNC(voodoo_3_device::banshee_io_r), &(*m_voodoo)), offset, mem_mask);
+	return read64be_with_32sle_device_handler(read32s_delegate(*m_voodoo, FUNC(voodoo_3_device::banshee_io_r)), offset, mem_mask);
 }
 WRITE64_MEMBER(viper_state::voodoo3_io_w)
 {
 //  printf("voodoo3_io_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, m_maincpu->pc());
 
-	write64be_with_32sle_device_handler(write32s_delegate(FUNC(voodoo_3_device::banshee_io_w), &(*m_voodoo)), offset, data, mem_mask);
+	write64be_with_32sle_device_handler(write32s_delegate(*m_voodoo, FUNC(voodoo_3_device::banshee_io_w)), offset, data, mem_mask);
 }
 
 READ64_MEMBER(viper_state::voodoo3_r)
 {
-	return read64be_with_32sle_device_handler(read32s_delegate(FUNC(voodoo_3_device::banshee_r), &(*m_voodoo)), offset, mem_mask);
+	return read64be_with_32sle_device_handler(read32s_delegate(*m_voodoo, FUNC(voodoo_3_device::banshee_r)), offset, mem_mask);
 }
 WRITE64_MEMBER(viper_state::voodoo3_w)
 {
 //  printf("voodoo3_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, m_maincpu->pc());
 
-	write64be_with_32sle_device_handler(write32s_delegate(FUNC(voodoo_3_device::banshee_w), &(*m_voodoo)), offset, data, mem_mask);
+	write64be_with_32sle_device_handler(write32s_delegate(*m_voodoo, FUNC(voodoo_3_device::banshee_w)), offset, data, mem_mask);
 }
 
 READ64_MEMBER(viper_state::voodoo3_lfb_r)
 {
-	return read64be_with_32smle_device_handler(read32sm_delegate(FUNC(voodoo_3_device::banshee_fb_r), &(*m_voodoo)), offset, mem_mask);
+	return read64be_with_32smle_device_handler(read32sm_delegate(*m_voodoo, FUNC(voodoo_3_device::banshee_fb_r)), offset, mem_mask);
 }
 WRITE64_MEMBER(viper_state::voodoo3_lfb_w)
 {
 //  printf("voodoo3_lfb_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, m_maincpu->pc());
 
-	write64be_with_32sle_device_handler(write32s_delegate(FUNC(voodoo_3_device::banshee_fb_w), &(*m_voodoo)), offset, data, mem_mask);
+	write64be_with_32sle_device_handler(write32s_delegate(*m_voodoo, FUNC(voodoo_3_device::banshee_fb_w)), offset, data, mem_mask);
 }
 
 
@@ -2101,7 +2101,7 @@ WRITE64_MEMBER(viper_state::unk_serial_w)
 
 void viper_state::viper_map(address_map &map)
 {
-//  ADDRESS_MAP_UNMAP_HIGH
+//  map.unmap_value_high();
 	map(0x00000000, 0x00ffffff).mirror(0x1000000).ram().share("workram");
 	map(0x80000000, 0x800fffff).rw(FUNC(viper_state::epic_r), FUNC(viper_state::epic_w));
 	map(0x82000000, 0x83ffffff).rw(FUNC(viper_state::voodoo3_r), FUNC(viper_state::voodoo3_w));
@@ -2112,7 +2112,7 @@ void viper_state::viper_map(address_map &map)
 	// 0xff000000, 0xff000fff - cf_card_data_r/w (installed in DRIVER_INIT(vipercf))
 	// 0xff200000, 0xff200fff - cf_card_r/w (installed in DRIVER_INIT(vipercf))
 	// 0xff300000, 0xff300fff - ata_r/w (installed in DRIVER_INIT(viperhd))
-//  AM_RANGE(0xff400xxx, 0xff400xxx) ppp2nd sense device
+//  map(0xff400xxx, 0xff400xxx) ppp2nd sense device
 	map(0xffe00000, 0xffe00007).r(FUNC(viper_state::e00000_r));
 	map(0xffe00008, 0xffe0000f).rw(FUNC(viper_state::e00008_r), FUNC(viper_state::e00008_w));
 	map(0xffe08000, 0xffe08007).noprw();
@@ -2424,10 +2424,8 @@ void viper_state::viper(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(viper_state::viper_vblank));
 
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device_read ( 0, FUNC(viper_state::mpc8240_pci_r), this);
-	pcibus.set_device_write( 0, FUNC(viper_state::mpc8240_pci_w), this);
-	pcibus.set_device_read (12, FUNC(viper_state::voodoo3_pci_r), this);
-	pcibus.set_device_write(12, FUNC(viper_state::voodoo3_pci_w), this);
+	pcibus.set_device( 0, FUNC(viper_state::mpc8240_pci_r), FUNC(viper_state::mpc8240_pci_w));
+	pcibus.set_device(12, FUNC(viper_state::voodoo3_pci_r), FUNC(viper_state::voodoo3_pci_w));
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 
@@ -2469,17 +2467,17 @@ void viper_state::init_viperhd()
 {
 	init_viper();
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff300000, 0xff300fff, read64_delegate(FUNC(viper_state::ata_r), this), write64_delegate(FUNC(viper_state::ata_w), this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff300000, 0xff300fff, read64_delegate(*this, FUNC(viper_state::ata_r)), write64_delegate(*this, FUNC(viper_state::ata_w)));
 }
 
 void viper_state::init_vipercf()
 {
 	init_viper();
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff000000, 0xff000fff, read64_delegate(FUNC(viper_state::cf_card_data_r), this), write64_delegate(FUNC(viper_state::cf_card_data_w), this) );
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff200000, 0xff200fff, read64_delegate(FUNC(viper_state::cf_card_r), this), write64_delegate(FUNC(viper_state::cf_card_w), this) );
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff000000, 0xff000fff, read64_delegate(*this, FUNC(viper_state::cf_card_data_r)), write64_delegate(*this, FUNC(viper_state::cf_card_data_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff200000, 0xff200fff, read64_delegate(*this, FUNC(viper_state::cf_card_r)), write64_delegate(*this, FUNC(viper_state::cf_card_w)));
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff300000, 0xff300fff, read64_delegate(FUNC(viper_state::unk_serial_r), this), write64_delegate(FUNC(viper_state::unk_serial_w), this) );
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff300000, 0xff300fff, read64_delegate(*this, FUNC(viper_state::unk_serial_r)), write64_delegate(*this, FUNC(viper_state::unk_serial_w)));
 }
 
 

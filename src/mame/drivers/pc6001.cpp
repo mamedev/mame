@@ -231,7 +231,7 @@ void pc6001_state::pc6001_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom().nopw();
-//  AM_RANGE(0x4000, 0x5fff) // mapped by the cartslot
+//  map(0x4000, 0x5fff) // mapped by the cartslot
 	map(0x6000, 0x7fff).bankr("bank1");
 	map(0x8000, 0xffff).ram().share("ram");
 }
@@ -718,8 +718,8 @@ void pc6001mk2_state::pc6001mk2_io(address_map &map)
 	map(0xf1, 0xf1).rw(FUNC(pc6001mk2_state::mk2_bank_r1_r), FUNC(pc6001mk2_state::mk2_bank_r1_w));
 	map(0xf2, 0xf2).rw(FUNC(pc6001mk2_state::mk2_bank_w0_r), FUNC(pc6001mk2_state::mk2_bank_w0_w));
 	map(0xf3, 0xf3).w(FUNC(pc6001mk2_state::mk2_0xf3_w));
-//  AM_RANGE(0xf4
-//  AM_RANGE(0xf5
+//  map(0xf4
+//  map(0xf5
 	map(0xf6, 0xf6).w(FUNC(pc6001mk2_state::mk2_timer_adj_w));
 	map(0xf7, 0xf7).w(FUNC(pc6001mk2_state::mk2_timer_irqv_w));
 }
@@ -748,9 +748,9 @@ void pc6601_state::pc6601_io(address_map &map)
 	pc6001mk2_io(map);
 
 	// these are disk related
-//  AM_RANGE(0xb1
-//  AM_RANGE(0xb2
-//  AM_RANGE(0xb3
+//  map(0xb1
+//  map(0xb2
+//  map(0xb3
 
 	map(0xd0, 0xdf).rw(FUNC(pc6601_state::fdc_r), FUNC(pc6601_state::fdc_w));
 }
@@ -942,14 +942,14 @@ void pc6001sr_state::pc6001sr_io(address_map &map)
 
 	map(0xb0, 0xb0).w(FUNC(pc6001sr_state::sr_system_latch_w));
 	/* these are disk related */
-//  AM_RANGE(0xb1
+//  map(0xb1
 	map(0xb2, 0xb2).r(FUNC(pc6001sr_state::hw_rev_r));
-//  AM_RANGE(0xb3
+//  map(0xb3
 
 	map(0xb8, 0xbf).ram().share("irq_vectors");
-//  AM_RANGE(0xc0, 0xc0) AM_WRITE(mk2_col_bank_w)
-//  AM_RANGE(0xc1, 0xc1) AM_WRITE(mk2_vram_bank_w)
-//  AM_RANGE(0xc2, 0xc2) AM_WRITE(opt_bank_w)
+//  map(0xc0, 0xc0).w(FUNC(pc6001sr_state::mk2_col_bank_w));
+//  map(0xc1, 0xc1).w(FUNC(pc6001sr_state::mk2_vram_bank_w));
+//  map(0xc2, 0xc2).w(FUNC(pc6001sr_state::opt_bank_w));
 
 	map(0xc8, 0xc8).w(FUNC(pc6001sr_state::sr_mode_w));
 	map(0xc9, 0xc9).w(FUNC(pc6001sr_state::sr_vram_bank_w));
@@ -960,12 +960,12 @@ void pc6001sr_state::pc6001sr_io(address_map &map)
 
 	map(0xe0, 0xe3).mirror(0x0c).rw("upd7752", FUNC(upd7752_device::read), FUNC(upd7752_device::write));
 
-//  AM_RANGE(0xf0, 0xf0) AM_READWRITE(mk2_bank_r0_r, mk2_bank_r0_w)
-//  AM_RANGE(0xf1, 0xf1) AM_READWRITE(mk2_bank_r1_r, mk2_bank_r1_w)
-//  AM_RANGE(0xf2, 0xf2) AM_READWRITE(mk2_bank_w0_r, mk2_bank_w0_w)
+//  map(0xf0, 0xf0).rw(FUNC(pc6001sr_state::mk2_bank_r0_r), FUNC(pc6001sr_state::mk2_bank_r0_w));
+//  map(0xf1, 0xf1).rw(FUNC(pc6001sr_state::mk2_bank_r1_r), FUNC(pc6001sr_state::mk2_bank_r1_w));
+//  map(0xf2, 0xf2).rw(FUNC(pc6001sr_state::mk2_bank_w0_r), FUNC(pc6001sr_state::mk2_bank_w0_w));
 	map(0xf3, 0xf3).w(FUNC(pc6001sr_state::mk2_0xf3_w));
-//  AM_RANGE(0xf4
-//  AM_RANGE(0xf5
+//  map(0xf4
+//  map(0xf5
 	map(0xf6, 0xf6).w(FUNC(pc6001sr_state::mk2_timer_adj_w));
 	map(0xf7, 0xf7).w(FUNC(pc6001sr_state::mk2_timer_irqv_w));
 }
@@ -1349,7 +1349,7 @@ void pc6001_state::machine_reset()
 	set_videoram_bank(0xc000);
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());

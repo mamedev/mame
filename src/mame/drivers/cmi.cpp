@@ -785,9 +785,9 @@ void cmi_state::midicpu_map(address_map &map)
 {
 	map(0x000000, 0x003fff).rom();
 	map(0x040000, 0x05ffff).rw(FUNC(cmi_state::midi_dma_r), FUNC(cmi_state::midi_dma_w));
-//  AM_RANGE(0x060000, 0x06001f) TIMERS
-//  AM_RANGE(0x060050, 0x06005f) ACIA
-//  AM_RANGE(0x060070, 0x06007f) SMPTE
+//  map(0x060000, 0x06001f) TIMERS
+//  map(0x060050, 0x06005f) ACIA
+//  map(0x060070, 0x06007f) SMPTE
 	map(0x080000, 0x083fff).ram();
 }
 
@@ -1265,7 +1265,7 @@ void cmi_state::install_video_ram(int cpunum)
 {
 	address_space *space = (cpunum == CPU_1 ? m_cpu1space : m_cpu2space);
 
-	space->install_readwrite_handler(0x8000, 0xbfff, read8_delegate(FUNC(cmi_state::vram_r),this), write8_delegate(FUNC(cmi_state::vram_w),this));
+	space->install_readwrite_handler(0x8000, 0xbfff, read8_delegate(*this, FUNC(cmi_state::vram_r)), write8_delegate(*this, FUNC(cmi_state::vram_w)));
 }
 
 WRITE8_MEMBER( cmi_state::i8214_cpu1_w )
@@ -1287,7 +1287,7 @@ WRITE8_MEMBER( cmi_state::i8214_cpu2_w )
 	m_i8214[1]->b_w(data & 0x7);
 }
 
-// TODO: replace with AM_SHARE
+// TODO: replace with share()
 READ8_MEMBER( cmi_state::shared_ram_r )
 {
 	return m_shared_ram[offset];
@@ -1302,54 +1302,57 @@ void cmi_state::install_peripherals(int cpunum)
 {
 	address_space *space = (cpunum == CPU_1 ? m_cpu1space : m_cpu2space);
 
-	space->install_readwrite_handler(0xe000, 0xe03f, read8_delegate(FUNC(cmi_state::cmi02_r),this), write8_delegate(FUNC(cmi_state::cmi02_w),this));
+	space->install_readwrite_handler(0xe000, 0xe03f, read8_delegate(*this, FUNC(cmi_state::cmi02_r)), write8_delegate(*this, FUNC(cmi_state::cmi02_w)));
 
 	if (cpunum)
-		space->install_readwrite_handler(0xf000, 0xf7ff, read8_delegate(FUNC(cmi_state::rom_r<1>),this), write8_delegate(FUNC(cmi_state::map_ram_w),this));
+		space->install_readwrite_handler(0xf000, 0xf7ff, read8_delegate(*this, FUNC(cmi_state::rom_r<1>)), write8_delegate(*this, FUNC(cmi_state::map_ram_w)));
 	else
-		space->install_readwrite_handler(0xf000, 0xf7ff, read8_delegate(FUNC(cmi_state::rom_r<0>),this), write8_delegate(FUNC(cmi_state::map_ram_w),this));
+		space->install_readwrite_handler(0xf000, 0xf7ff, read8_delegate(*this, FUNC(cmi_state::rom_r<0>)), write8_delegate(*this, FUNC(cmi_state::map_ram_w)));
 
 	space->install_rom(0xf800, 0xfbff, m_q133_rom + (cpunum == CPU_2 ? 0x1800 : 0x2800));
 
-	space->install_readwrite_handler(0xfc40, 0xfc4f, read8_delegate(FUNC(cmi_state::parity_r),this), write8_delegate(FUNC(cmi_state::mapsel_w),this));
+	space->install_readwrite_handler(0xfc40, 0xfc4f, read8_delegate(*this, FUNC(cmi_state::parity_r)), write8_delegate(*this, FUNC(cmi_state::mapsel_w)));
 	space->nop_readwrite(0xfc5a, 0xfc5b); // Q077 HDD controller - not installed
-	space->install_readwrite_handler(0xfc5e, 0xfc5e, read8_delegate(FUNC(cmi_state::atomic_r),this), write8_delegate(FUNC(cmi_state::cpufunc_w),this));
+	space->install_readwrite_handler(0xfc5e, 0xfc5e, read8_delegate(*this, FUNC(cmi_state::atomic_r)), write8_delegate(*this, FUNC(cmi_state::cpufunc_w)));
 	if (cpunum)
-		space->install_readwrite_handler(0xfc5f, 0xfc5f, read8_delegate(FUNC(cmi_state::map_r<1>),this), write8_delegate(FUNC(cmi_state::map_w<1>),this));
+		space->install_readwrite_handler(0xfc5f, 0xfc5f, read8_delegate(*this, FUNC(cmi_state::map_r<1>)), write8_delegate(*this, FUNC(cmi_state::map_w<1>)));
 	else
-		space->install_readwrite_handler(0xfc5f, 0xfc5f, read8_delegate(FUNC(cmi_state::map_r<0>),this), write8_delegate(FUNC(cmi_state::map_w<0>),this));
+		space->install_readwrite_handler(0xfc5f, 0xfc5f, read8_delegate(*this, FUNC(cmi_state::map_r<0>)), write8_delegate(*this, FUNC(cmi_state::map_w<0>)));
 
-	space->install_readwrite_handler(0xfc80, 0xfc83, read8sm_delegate(FUNC(mos6551_device::read),m_q133_acia[0].target()), write8sm_delegate(FUNC(mos6551_device::write),m_q133_acia[0].target()));
-	space->install_readwrite_handler(0xfc84, 0xfc87, read8sm_delegate(FUNC(mos6551_device::read),m_q133_acia[1].target()), write8sm_delegate(FUNC(mos6551_device::write),m_q133_acia[1].target()));
-	space->install_readwrite_handler(0xfc88, 0xfc8b, read8sm_delegate(FUNC(mos6551_device::read),m_q133_acia[2].target()), write8sm_delegate(FUNC(mos6551_device::write),m_q133_acia[2].target()));
-	space->install_readwrite_handler(0xfc8c, 0xfc8f, read8sm_delegate(FUNC(mos6551_device::read),m_q133_acia[3].target()), write8sm_delegate(FUNC(mos6551_device::write),m_q133_acia[3].target()));
-	space->install_readwrite_handler(0xfc90, 0xfc97, read8sm_delegate(FUNC(ptm6840_device::read),m_q133_ptm.target()), write8sm_delegate(FUNC(ptm6840_device::write),m_q133_ptm.target()));
+	space->install_readwrite_handler(0xfc80, 0xfc83, read8sm_delegate(*m_q133_acia[0], FUNC(mos6551_device::read)), write8sm_delegate(*m_q133_acia[0], FUNC(mos6551_device::write)));
+	space->install_readwrite_handler(0xfc84, 0xfc87, read8sm_delegate(*m_q133_acia[1], FUNC(mos6551_device::read)), write8sm_delegate(*m_q133_acia[1], FUNC(mos6551_device::write)));
+	space->install_readwrite_handler(0xfc88, 0xfc8b, read8sm_delegate(*m_q133_acia[2], FUNC(mos6551_device::read)), write8sm_delegate(*m_q133_acia[2], FUNC(mos6551_device::write)));
+	space->install_readwrite_handler(0xfc8c, 0xfc8f, read8sm_delegate(*m_q133_acia[3], FUNC(mos6551_device::read)), write8sm_delegate(*m_q133_acia[3], FUNC(mos6551_device::write)));
+	space->install_readwrite_handler(0xfc90, 0xfc97, read8sm_delegate(*m_q133_ptm, FUNC(ptm6840_device::read)), write8sm_delegate(*m_q133_ptm, FUNC(ptm6840_device::write)));
 
-	space->install_readwrite_handler(0xfcbc, 0xfcbc, read8_delegate(FUNC(cmi_state::cmi07_r),this), write8_delegate(FUNC(cmi_state::cmi07_w),this));
+	space->install_readwrite_handler(0xfcbc, 0xfcbc, read8_delegate(*this, FUNC(cmi_state::cmi07_r)), write8_delegate(*this, FUNC(cmi_state::cmi07_w)));
 
-	space->install_read_handler(0xfcc0, 0xfcc3, read8_delegate(FUNC(cmi_state::lightpen_r),this));
-	space->install_readwrite_handler(0xfcc4, 0xfcc7, read8sm_delegate(FUNC(pia6821_device::read),m_q219_pia.target()), write8sm_delegate(FUNC(pia6821_device::write),m_q219_pia.target()));
-	space->install_readwrite_handler(0xfcc8, 0xfccf, read8sm_delegate(FUNC(ptm6840_device::read),m_q219_ptm.target()), write8sm_delegate(FUNC(ptm6840_device::write),m_q219_ptm.target()));
-	space->install_readwrite_handler(0xfcd0, 0xfcdc, read8_delegate(FUNC(cmi_state::video_r),this), write8_delegate(FUNC(cmi_state::video_w),this));
-	space->install_readwrite_handler(0xfce0, 0xfce1, read8_delegate(FUNC(cmi_state::fdc_r),this), write8_delegate(FUNC(cmi_state::fdc_w),this));
+	space->install_read_handler(0xfcc0, 0xfcc3, read8_delegate(*this, FUNC(cmi_state::lightpen_r)));
+	space->install_readwrite_handler(0xfcc4, 0xfcc7, read8sm_delegate(*m_q219_pia, FUNC(pia6821_device::read)), write8sm_delegate(*m_q219_pia, FUNC(pia6821_device::write)));
+	space->install_readwrite_handler(0xfcc8, 0xfccf, read8sm_delegate(*m_q219_ptm, FUNC(ptm6840_device::read)), write8sm_delegate(*m_q219_ptm, FUNC(ptm6840_device::write)));
+	space->install_readwrite_handler(0xfcd0, 0xfcdc, read8_delegate(*this, FUNC(cmi_state::video_r)), write8_delegate(*this, FUNC(cmi_state::video_w)));
+	space->install_readwrite_handler(0xfce0, 0xfce1, read8_delegate(*this, FUNC(cmi_state::fdc_r)), write8_delegate(*this, FUNC(cmi_state::fdc_w)));
 	space->nop_readwrite(0xfce2, 0xfcef); // Monitor ROM will attempt to detect floppy disk controller cards in this entire range
-	space->install_readwrite_handler(0xfcf0, 0xfcf7, read8sm_delegate(FUNC(pia6821_device::read),m_q133_pia[0].target()), write8sm_delegate(FUNC(pia6821_device::write),m_q133_pia[0].target()));
-	space->install_readwrite_handler(0xfcf8, 0xfcff, read8sm_delegate(FUNC(pia6821_device::read),m_q133_pia[1].target()), write8sm_delegate(FUNC(pia6821_device::write),m_q133_pia[1].target()));
+	space->install_readwrite_handler(0xfcf0, 0xfcf7, read8sm_delegate(*m_q133_pia[0], FUNC(pia6821_device::read)), write8sm_delegate(*m_q133_pia[0], FUNC(pia6821_device::write)));
+	space->install_readwrite_handler(0xfcf8, 0xfcff, read8sm_delegate(*m_q133_pia[1], FUNC(pia6821_device::read)), write8sm_delegate(*m_q133_pia[1], FUNC(pia6821_device::write)));
 
-	space->install_write_handler(0xfcfc, 0xfcfc, write8_delegate(FUNC(cmi_state::i8214_cpu1_w),this));
-	space->install_write_handler(0xfcfd, 0xfcfd, write8_delegate(FUNC(cmi_state::i8214_cpu2_w),this));
+	space->install_write_handler(0xfcfc, 0xfcfc, write8_delegate(*this, FUNC(cmi_state::i8214_cpu1_w)));
+	space->install_write_handler(0xfcfd, 0xfcfd, write8_delegate(*this, FUNC(cmi_state::i8214_cpu2_w)));
 
-	space->install_readwrite_handler(0xfd00, 0xfeff, read8_delegate(FUNC(cmi_state::shared_ram_r),this), write8_delegate(FUNC(cmi_state::shared_ram_w),this));
+	space->install_readwrite_handler(0xfd00, 0xfeff, read8_delegate(*this, FUNC(cmi_state::shared_ram_r)), write8_delegate(*this, FUNC(cmi_state::shared_ram_w)));
 
 	space->install_ram(0xff00, 0xfff7, &m_scratch_ram[cpunum][0]);
 	space->install_ram(0xfffa, 0xfffd, &m_scratch_ram[cpunum][0xfa]);
 
-	if (cpunum) {
-		space->install_readwrite_handler(0xfff8, 0xfff9, read8_delegate(FUNC(cmi_state::irq_ram_r<1>),this), write8_delegate(FUNC(cmi_state::irq_ram_w<1>),this));
-		space->install_read_handler(0xfffe, 0xffff, read8_delegate(FUNC(cmi_state::vector_r<1>),this));
-	} else {
-		space->install_readwrite_handler(0xfff8, 0xfff9, read8_delegate(FUNC(cmi_state::irq_ram_r<0>),this), write8_delegate(FUNC(cmi_state::irq_ram_w<0>),this));
-		space->install_read_handler(0xfffe, 0xffff, read8_delegate(FUNC(cmi_state::vector_r<0>),this));
+	if (cpunum)
+	{
+		space->install_readwrite_handler(0xfff8, 0xfff9, read8_delegate(*this, FUNC(cmi_state::irq_ram_r<1>)), write8_delegate(*this, FUNC(cmi_state::irq_ram_w<1>)));
+		space->install_read_handler(0xfffe, 0xffff, read8_delegate(*this, FUNC(cmi_state::vector_r<1>)));
+	}
+	else
+	{
+		space->install_readwrite_handler(0xfff8, 0xfff9, read8_delegate(*this, FUNC(cmi_state::irq_ram_r<0>)), write8_delegate(*this, FUNC(cmi_state::irq_ram_w<0>)));
+		space->install_read_handler(0xfffe, 0xffff, read8_delegate(*this, FUNC(cmi_state::vector_r<0>)));
 	}
 }
 
@@ -1476,7 +1479,7 @@ READ8_MEMBER( cmi_state::q133_1_porta_r )
 {
 	if (BIT(m_q133_pia[0]->b_output(), 1))
 	{
-		return m_msm5832->data_r(space, m_msm5832_addr) << 4;
+		return m_msm5832->data_r() << 4;
 	}
 	return 0xff;
 }
@@ -1623,12 +1626,11 @@ void cmi_state::cmi2x(machine_config &config)
 	MC6809E(config, m_maincpu1, Q209_CPU_CLOCK);
 	m_maincpu1->set_addrmap(AS_PROGRAM, &cmi_state::maincpu1_map);
 	m_maincpu1->set_irq_acknowledge_callback(FUNC(cmi_state::cpu1_interrupt_callback));
-	config.m_perfect_cpu_quantum = subtag("maincpu1");
+	config.set_perfect_quantum(m_maincpu1);
 
 	MC6809E(config, m_maincpu2, Q209_CPU_CLOCK);
 	m_maincpu2->set_addrmap(AS_PROGRAM, &cmi_state::maincpu2_map);
 	m_maincpu2->set_irq_acknowledge_callback(FUNC(cmi_state::cpu2_interrupt_callback));
-	config.m_perfect_cpu_quantum = subtag("maincpu2");
 
 	M68000(config, m_midicpu, 20_MHz_XTAL / 2);
 	m_midicpu->set_addrmap(AS_PROGRAM, &cmi_state::midicpu_map);

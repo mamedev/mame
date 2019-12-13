@@ -27,18 +27,16 @@
 
 typedef device_delegate<int (int bank)> deco16_bank_cb_delegate;
 
-class deco16ic_device : public device_t,
-						public device_video_interface
+class deco16ic_device : public device_t, public device_video_interface
 {
 public:
 	deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~deco16ic_device() {}
 
 	// configuration
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 //  void set_palette_tag(const char *tag);
-	template <typename... T> void set_bank1_callback(T &&... args) { m_bank1_cb = deco16_bank_cb_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_bank2_callback(T &&... args) { m_bank2_cb = deco16_bank_cb_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_bank1_callback(T &&... args) { m_bank1_cb.set(std::forward<T>(args)...); }
+	template <typename... T> void set_bank2_callback(T &&... args) { m_bank2_cb.set(std::forward<T>(args)...); }
 	void set_pf1_size(int size) { m_pf1_size = size; }
 	void set_pf2_size(int size) { m_pf2_size = size; }
 	void set_pf1_trans_mask(int mask) { m_pf1_trans_mask = mask; }
@@ -104,26 +102,25 @@ public:
 
 	template<class _BitmapClass>
 	void custom_tilemap_draw(
-	screen_device &screen,
-	_BitmapClass &bitmap,
-	const rectangle &cliprect,
-	tilemap_t *tilemap0_8x8,
-	tilemap_t *tilemap0_16x16,
-	tilemap_t *tilemap1_8x8,
-	tilemap_t *tilemap1_16x16,
-	const u16 *rowscroll_ptr,
-	const u16 scrollx,
-	const u16 scrolly,
-	const u16 control0,
-	const u16 control1,
-	int combine_mask,
-	int combine_shift,
-	int trans_mask,
-	int flags,
-	u8 priority,
-	int is_tattoo,
-	u8 pmask = 0xff
-	);
+			screen_device &screen,
+			_BitmapClass &bitmap,
+			const rectangle &cliprect,
+			tilemap_t *tilemap0_8x8,
+			tilemap_t *tilemap0_16x16,
+			tilemap_t *tilemap1_8x8,
+			tilemap_t *tilemap1_16x16,
+			const u16 *rowscroll_ptr,
+			const u16 scrollx,
+			const u16 scrolly,
+			const u16 control0,
+			const u16 control1,
+			int combine_mask,
+			int combine_shift,
+			int trans_mask,
+			int flags,
+			u8 priority,
+			int is_tattoo,
+			u8 pmask = 0xff);
 
 protected:
 	// device-level overrides

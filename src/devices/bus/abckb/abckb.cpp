@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(ABC_KEYBOARD_PORT, abc_keyboard_port_device, "abc_keyboard_po
 //-------------------------------------------------
 
 abc_keyboard_interface::abc_keyboard_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "abckb")
 {
 	m_slot = dynamic_cast<abc_keyboard_port_device *>(device.owner());
 }
@@ -45,23 +45,11 @@ abc_keyboard_interface::abc_keyboard_interface(const machine_config &mconfig, de
 
 abc_keyboard_port_device::abc_keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ABC_KEYBOARD_PORT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<abc_keyboard_interface>(mconfig, *this),
 	m_out_rx_handler(*this),
 	m_out_trxc_handler(*this),
 	m_out_keydown_handler(*this), m_card(nullptr)
 {
-}
-
-
-//-------------------------------------------------
-//  device_validity_check -
-//-------------------------------------------------
-
-void abc_keyboard_port_device::device_validity_check(validity_checker &valid) const
-{
-	device_t *const carddev = get_card_device();
-	if (carddev && !dynamic_cast<abc_keyboard_interface *>(carddev))
-		osd_printf_error("Card device %s (%s) does not implement abc_keyboard_interface\n", carddev->tag(), carddev->name());
 }
 
 
@@ -71,24 +59,12 @@ void abc_keyboard_port_device::device_validity_check(validity_checker &valid) co
 
 void abc_keyboard_port_device::device_start()
 {
-	device_t *const carddev = get_card_device();
-	m_card = dynamic_cast<abc_keyboard_interface *>(carddev);
-	if (carddev && !m_card)
-		fatalerror("Card device %s (%s) does not implement abc_keyboard_interface\n", carddev->tag(), carddev->name());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_out_rx_handler.resolve_safe();
 	m_out_trxc_handler.resolve_safe();
 	m_out_keydown_handler.resolve_safe();
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void abc_keyboard_port_device::device_reset()
-{
 }
 
 
@@ -108,7 +84,7 @@ WRITE_LINE_MEMBER( abc_keyboard_port_device::write_rx )
 
 WRITE_LINE_MEMBER( abc_keyboard_port_device::txd_w )
 {
-	if (m_card != nullptr)
+	if (m_card)
 		m_card->txd_w(state);
 }
 

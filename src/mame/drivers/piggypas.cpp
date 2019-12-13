@@ -26,8 +26,8 @@ game details unknown
 class piggypas_state : public driver_device
 {
 public:
-	piggypas_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	piggypas_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_hd44780(*this, "hd44780"),
 		m_ticket(*this, "ticket"),
@@ -218,7 +218,7 @@ void piggypas_state::piggypas(machine_config &config)
 
 	hd44780_device &hd44780(HD44780(config, "hd44780"));
 	hd44780.set_lcd_size(1, 16);
-	hd44780.set_pixel_update_cb(FUNC(piggypas_state::piggypas_pixel_update), this);
+	hd44780.set_pixel_update_cb(FUNC(piggypas_state::piggypas_pixel_update));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

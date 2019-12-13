@@ -1,12 +1,13 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/***************************************************************************
 
-    netlib.c
-
-    Discrete netlist implementation.
-
-****************************************************************************/
+// ***************************************************************************
+//
+//    netlib.c
+//
+//    Discrete netlist implementation.
+//
+// ***************************************************************************
 
 #include "net_lib.h"
 #include "netlist/nl_factory.h"
@@ -16,8 +17,7 @@
 #define xstr(s) # s
 
 #define NETLIB_DEVICE_DECL(chip) extern factory::constructor_ptr_t decl_ ## chip
-
-#define LIB_DECL(nic, decl) factory.register_device( decl ( pstring(xstr(nic))) );
+#define LIB_DECL(nic, decl) factory.register_device( decl ( xstr(nic)) );
 #define LIB_ENTRY(nic) { NETLIB_DEVICE_DECL(nic); LIB_DECL(NETLIB_NAME(nic), decl_ ## nic) }
 
 namespace netlist
@@ -40,7 +40,7 @@ namespace devices
 		LIB_ENTRY(CCCS)
 		LIB_ENTRY(LVCCS)
 		LIB_ENTRY(opamp)
-		LIB_ENTRY(dummy_input)
+		LIB_ENTRY(nc_pin)
 		LIB_ENTRY(frontier)   // not intended to be used directly
 		LIB_ENTRY(function)   // only for macro devices - NO FEEDBACK loops
 		LIB_ENTRY(QBJT_EB)
@@ -67,10 +67,12 @@ namespace devices
 		LIB_ENTRY(2102A_dip)
 		LIB_ENTRY(2716)
 		LIB_ENTRY(2716_dip)
-#if !(USE_TRUTHTABLE_7448)
+#if !(NL_USE_TRUTHTABLE_7448)
 		LIB_ENTRY(7448)
 		LIB_ENTRY(7448_dip)
 #endif
+		LIB_ENTRY(7442)
+		LIB_ENTRY(7442_dip)
 		LIB_ENTRY(7450)
 		LIB_ENTRY(7450_dip)
 		LIB_ENTRY(7473)
@@ -89,11 +91,13 @@ namespace devices
 		LIB_ENTRY(7485_dip)
 		LIB_ENTRY(7490)
 		LIB_ENTRY(7490_dip)
+		LIB_ENTRY(7492)
+		LIB_ENTRY(7492_dip)
 		LIB_ENTRY(7493)
 		LIB_ENTRY(7493_dip)
 		LIB_ENTRY(7497)
 		LIB_ENTRY(7497_dip)
-#if (!USE_TRUTHTABLE_74107)
+#if (!NL_USE_TRUTHTABLE_74107)
 		LIB_ENTRY(74107)
 		LIB_ENTRY(74107_dip)
 #endif
@@ -135,7 +139,7 @@ namespace devices
 		LIB_ENTRY(CD4316_GATE)
 		LIB_ENTRY(4538_dip)
 		LIB_ENTRY(schmitt_trigger)
-		/* entries with suffix WI are legacy only */
+		// entries with suffix WI are legacy only
 		//ENTRY(4066,                 CD_4066,              "+A,B")
 		LIB_ENTRY(NE555)
 		LIB_ENTRY(NE555_dip)

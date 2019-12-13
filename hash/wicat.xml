@@ -9,7 +9,7 @@
 		<publisher>WICAT Systems</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="104968">
-				<rom name="assembler.imd" size="104968" crc="b04aecaa" sha1="bed61b48cdc75ff5c7b40c6e748d9d39347ec51e" offset="0" />
+				<rom name="assembler.imd" size="104968" crc="b04aecaa" sha1="bed61b48cdc75ff5c7b40c6e748d9d39347ec51e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20,12 +20,12 @@
 		<publisher>WICAT Systems</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="444645">
-				<rom name="pascal_4.0_1.imd" size="444645" crc="31818acc" sha1="df4664bd699ad707f2d36d81d6a89e736f042b83" offset="0" />
+				<rom name="pascal_4.0_1.imd" size="444645" crc="31818acc" sha1="df4664bd699ad707f2d36d81d6a89e736f042b83"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="448737">
-				<rom name="pascal_4.0_2.imd" size="448737" crc="db1668fb" sha1="3022223b078e268b8797924fe27324fc10ec6f09" offset="0" />
+				<rom name="pascal_4.0_2.imd" size="448737" crc="db1668fb" sha1="3022223b078e268b8797924fe27324fc10ec6f09"/>
 			</dataarea>
 		</part>
 	</software>
@@ -36,42 +36,42 @@
 		<publisher>UniSoft Corp.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="550985">
-				<rom name="unx1.imd" size="550985" crc="98be4597" sha1="1de7c67091d88d5124c689fbc71227051204dcc4" offset="0" />
+				<rom name="unx1.imd" size="550985" crc="98be4597" sha1="1de7c67091d88d5124c689fbc71227051204dcc4"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="546893">
-				<rom name="unx2.imd" size="546893" crc="c71b7134" sha1="186cbe1a251b595354f88fe423cd8831c87c0f17"  offset="0" />
+				<rom name="unx2.imd" size="546893" crc="c71b7134" sha1="186cbe1a251b595354f88fe423cd8831c87c0f17" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="553031">
-				<rom name="unx3.imd" size="553031" crc="f676a3bb" sha1="69cd8bb13c1b4566358bfd104965ead02f872478" offset="0" />
+				<rom name="unx3.imd" size="553031" crc="f676a3bb" sha1="69cd8bb13c1b4566358bfd104965ead02f872478"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="566330">
-				<rom name="unx4.imd" size="566330" crc="5ce742eb" sha1="8a9f598b71ea768b0048313e06f321a50a2e9b12" offset="0" />
+				<rom name="unx4.imd" size="566330" crc="5ce742eb" sha1="8a9f598b71ea768b0048313e06f321a50a2e9b12"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="536663">
-				<rom name="unx5.imd" size="536663" crc="ca0e93b4" sha1="c48c9b57ae1aa41752c2be5e5c290b069522c3d5" offset="0" />
+				<rom name="unx5.imd" size="536663" crc="ca0e93b4" sha1="c48c9b57ae1aa41752c2be5e5c290b069522c3d5"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="376052">
-				<rom name="unx6.imd" size="376052" crc="c1c420a4" sha1="e2e7ff6fbc7b74639457e6962682efb4852df03d" offset="0" />
+				<rom name="unx6.imd" size="376052" crc="c1c420a4" sha1="e2e7ff6fbc7b74639457e6962682efb4852df03d"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
 			<dataarea name="flop" size="458915">
-				<rom name="unx7.imd" size="458915" crc="fbc3ed13" sha1="ce94db505770910a9cc2594b0bb06d3af7c56cb3" offset="0" />
+				<rom name="unx7.imd" size="458915" crc="fbc3ed13" sha1="ce94db505770910a9cc2594b0bb06d3af7c56cb3"/>
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_5_25">
 			<dataarea name="flop" size="406742">
-				<rom name="unx8.imd" size="406742" crc="6f729e47" sha1="a95dd5754135f3cf684136f28bc68b5a6d318933" offset="0" />
+				<rom name="unx8.imd" size="406742" crc="6f729e47" sha1="a95dd5754135f3cf684136f28bc68b5a6d318933"/>
 			</dataarea>
 		</part>
 	</software>

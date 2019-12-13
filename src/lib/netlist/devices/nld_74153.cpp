@@ -45,7 +45,7 @@ namespace devices
 
 		NETLIB_HANDLERI(sub)
 		{
-			constexpr const netlist_time delay[2] = { NLTIME_FROM_NS(23), NLTIME_FROM_NS(18) };
+			constexpr const std::array<netlist_time, 2> delay = { NLTIME_FROM_NS(23), NLTIME_FROM_NS(18) };
 			if (!m_G())
 			{
 				auto t = m_C[m_chan]();

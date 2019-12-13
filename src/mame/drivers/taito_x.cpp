@@ -822,7 +822,7 @@ void taitox_state::superman(machine_config &config)
 
 	TIMER(config, "cchip_irq_clear").configure_generic(FUNC(taitox_state::cchip_irq_clear_cb));
 
-	config.m_minimum_quantum = attotime::from_hz(600);   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	config.set_maximum_quantum(attotime::from_hz(600));   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
 
@@ -869,7 +869,7 @@ void taitox_state::daisenpu(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(16'000'000)/4); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitox_state::daisenpu_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	config.set_maximum_quantum(attotime::from_hz(600));   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
 
@@ -914,7 +914,7 @@ void taitox_state::gigandes(machine_config &config)
 	Z80(config, m_audiocpu, 4000000);  /* 4 MHz ??? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitox_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	config.set_maximum_quantum(attotime::from_hz(600));   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
 
@@ -961,7 +961,7 @@ void taitox_state::ballbros(machine_config &config)
 	Z80(config, m_audiocpu, 4000000);  /* 4 MHz ??? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitox_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	config.set_maximum_quantum(attotime::from_hz(600));   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
 

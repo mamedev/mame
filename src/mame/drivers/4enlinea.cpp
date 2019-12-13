@@ -329,8 +329,8 @@ void isa8_cga_4enlinea_device::device_start()
 	m_vram_size = 0x4000;
 	m_vram.resize(m_vram_size);
 
-	//m_isa->install_device(0x3bf, 0x3bf, 0, 0, nullptr, write8_delegate( FUNC(isa8_cga_4enlinea_device::_4enlinea_mode_control_w), this ) );
-	m_isa->install_device(0x3d0, 0x3df, read8_delegate( FUNC(isa8_cga_4enlinea_device::_4enlinea_io_read), this ), write8_delegate( FUNC(isa8_cga_device::io_write), this ) );
+	//m_isa->install_device(0x3bf, 0x3bf, 0, 0, nullptr, write8_delegate(*this, FUNC(isa8_cga_4enlinea_device::_4enlinea_mode_control_w)));
+	m_isa->install_device(0x3d0, 0x3df, read8_delegate(*this, FUNC(isa8_cga_4enlinea_device::_4enlinea_io_read)), write8_delegate(*this, FUNC(isa8_cga_device::io_write)));
 	m_isa->install_bank(0x8000, 0xbfff, "bank1", &m_vram[0]);
 
 	/* Initialise the cga palette */
@@ -379,7 +379,7 @@ READ8_MEMBER(_4enlinea_state::serial_r)
 void _4enlinea_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-//  AM_RANGE(0x8000, 0xbfff) AM_RAM // CGA VRAM
+//  map(0x8000, 0xbfff).ram(); // CGA VRAM
 	map(0xc000, 0xdfff).ram();
 
 	map(0xe000, 0xe001).r(FUNC(_4enlinea_state::serial_r));
@@ -389,7 +389,7 @@ void _4enlinea_state::main_portmap(address_map &map)
 {
 	map.global_mask(0x3ff);
 
-//  AM_RANGE(0x3d4, 0x3df) CGA regs
+//  map(0x3d4, 0x3df) CGA regs
 	map(0x3bf, 0x3bf).nopw(); // CGA mode control, TODO
 }
 

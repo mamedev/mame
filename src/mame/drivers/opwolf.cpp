@@ -908,7 +908,7 @@ void opwolf_state::opwolf(machine_config &config)
 
 	TIMER(config, "cchip_irq_clear").configure_generic(FUNC(opwolf_state::cchip_irq_clear_cb));
 
-	config.m_minimum_quantum = attotime::from_hz(600);  /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	config.set_maximum_quantum(attotime::from_hz(600));  /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MCFG_MACHINE_RESET_OVERRIDE(opwolf_state,opwolf)
 
@@ -930,7 +930,7 @@ void opwolf_state::opwolf(machine_config &config)
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_palette("palette");
-	m_pc090oj->set_colpri_callback(FUNC(opwolf_state::opwolf_colpri_cb), this);
+	m_pc090oj->set_colpri_callback(FUNC(opwolf_state::opwolf_colpri_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -984,7 +984,7 @@ void opwolf_state::opwolfb(machine_config &config) /* OSC clocks unknown for the
 	sub.set_addrmap(AS_PROGRAM, &opwolf_state::opwolfb_sub_z80_map);
 	sub.set_vblank_int("screen", FUNC(opwolf_state::irq0_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(600);  /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	config.set_maximum_quantum(attotime::from_hz(600));  /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1004,7 +1004,7 @@ void opwolf_state::opwolfb(machine_config &config) /* OSC clocks unknown for the
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_palette("palette");
-	m_pc090oj->set_colpri_callback(FUNC(opwolf_state::opwolf_colpri_cb), this);
+	m_pc090oj->set_colpri_callback(FUNC(opwolf_state::opwolf_colpri_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

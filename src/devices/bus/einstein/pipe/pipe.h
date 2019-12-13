@@ -51,7 +51,7 @@
 
 class device_tatung_pipe_interface;
 
-class tatung_pipe_device : public device_t, public device_slot_interface
+class tatung_pipe_device : public device_t, public device_single_card_slot_interface<device_tatung_pipe_interface>
 {
 	friend class device_tatung_pipe_interface;
 public:
@@ -88,7 +88,6 @@ protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	required_address_space m_program;
 	required_address_space m_io;
@@ -102,7 +101,7 @@ private:
 };
 
 // class representing interface-specific live pipe device
-class device_tatung_pipe_interface : public device_slot_card_interface
+class device_tatung_pipe_interface : public device_interface
 {
 public:
 	// construction/destruction

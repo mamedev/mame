@@ -7,22 +7,21 @@
     Controls execution of the core MAME system.
 
 ***************************************************************************/
-
 #ifndef MAME_FRONTEND_MAME_LUAENGINE_H
 #define MAME_FRONTEND_MAME_LUAENGINE_H
 
 #pragma once
 
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
+#include "iptseqpoll.h"
+
+#include <condition_variable>
+#include <map>
+#include <memory>
 
 #if defined(__GNUC__) && (__GNUC__ > 6)
 #pragma GCC diagnostic ignored "-Wnoexcept-type"
 #endif
 
-#include <map>
-#include <condition_variable>
 #define SOL_SAFE_USERTYPE
 //#define SOL_CHECK_ARGUMENTS
 #include "sol2/sol.hpp"
@@ -45,10 +44,11 @@ public:
 	void menu_populate(const std::string &menu, std::vector<std::tuple<std::string, std::string, std::string>> &menu_list);
 	bool menu_callback(const std::string &menu, int index, const std::string &event);
 
-	void set_machine(running_machine *machine) { m_machine = machine; }
+	void set_machine(running_machine *machine);
 	std::vector<std::string> &get_menu() { return m_menu; }
 	void attach_notifiers();
 	void on_frame_done();
+	void on_sound_update();
 	void on_periodic();
 	bool on_missing_mandatory_image(const std::string &instance_name);
 	void on_machine_before_load_settings();
@@ -109,11 +109,13 @@ public:
 	}
 
 	sol::state_view &sol() const { return *m_sol_state; }
+
 private:
 	// internal state
 	lua_State *m_lua_state;
 	std::unique_ptr<sol::state_view> m_sol_state;
 	running_machine *m_machine;
+	std::unique_ptr<input_sequence_poller> m_seq_poll;
 
 	std::vector<std::string> m_menu;
 
@@ -155,6 +157,9 @@ private:
 		void *base;
 		unsigned int size;
 		unsigned int count;
+		unsigned int valcount;
+		unsigned int blockcount;
+		unsigned int stride;
 	};
 
 	void close();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -9,16 +9,12 @@
 #include <bx/readerwriter.h>
 
 #if !BX_CRT_NONE
-#	include <stdio.h>  // remove
-#	include <dirent.h> // opendir
-
 #	if BX_CRT_MSVC
 #		include <direct.h>   // _getcwd
 #	else
-#		include <sys/stat.h> // mkdir
 #		include <unistd.h>   // getcwd
 #	endif // BX_CRT_MSVC
-#endif // 0
+#endif // !BX_CRT_NONE
 
 #if BX_PLATFORM_WINDOWS
 extern "C" __declspec(dllimport) unsigned long __stdcall GetTempPathA(unsigned long _max, char* _ptr);
@@ -154,7 +150,7 @@ namespace bx
 		return size;
 	}
 
-	static bool getEnv(char* _out, uint32_t* _inOutSize, const StringView& _name, FileInfo::Enum _type)
+	static bool getEnv(char* _out, uint32_t* _inOutSize, const StringView& _name, FileType::Enum _type)
 	{
 		uint32_t len = *_inOutSize;
 		*_out = '\0';
@@ -162,8 +158,8 @@ namespace bx
 		if (getEnv(_out, &len, _name) )
 		{
 			FileInfo fi;
-			if (stat(_out, fi)
-			&&  _type == fi.m_type)
+			if (stat(fi, _out)
+			&&  _type == fi.type)
 			{
 				*_inOutSize = len;
 				return true;
@@ -204,9 +200,9 @@ namespace bx
 	{
 		return false
 #if BX_PLATFORM_WINDOWS
-			|| getEnv(_out, _inOutSize, "USERPROFILE", FileInfo::Directory)
+			|| getEnv(_out, _inOutSize, "USERPROFILE", FileType::Dir)
 #endif // BX_PLATFORM_WINDOWS
-			|| getEnv(_out, _inOutSize, "HOME", FileInfo::Directory)
+			|| getEnv(_out, _inOutSize, "HOME", FileType::Dir)
 			;
 	}
 
@@ -232,7 +228,7 @@ namespace bx
 		{
 			uint32_t len = *_inOutSize;
 			*_out = '\0';
-			bool ok = getEnv(_out, &len, *tmp, FileInfo::Directory);
+			bool ok = getEnv(_out, &len, *tmp, FileType::Dir);
 
 			if (ok
 			&&  len != 0
@@ -244,8 +240,8 @@ namespace bx
 		}
 
 		FileInfo fi;
-		if (stat("/tmp", fi)
-		&&  FileInfo::Directory == fi.m_type)
+		if (stat(fi, "/tmp")
+		&&  FileType::Dir == fi.type)
 		{
 			strCopy(_out, *_inOutSize, "/tmp");
 			*_inOutSize = 4;
@@ -336,7 +332,12 @@ namespace bx
 		set(tmp);
 	}
 
-	const char* FilePath::get() const
+	FilePath::operator StringView() const
+	{
+		return StringView(m_filePath, strLen(m_filePath) );
+	}
+
+	const char* FilePath::getCPtr() const
 	{
 		return m_filePath;
 	}
@@ -360,7 +361,7 @@ namespace bx
 			return StringView(fileName.getPtr()+1);
 		}
 
-		return get();
+		return getCPtr();
 	}
 
 	StringView FilePath::getBaseName() const
@@ -385,7 +386,8 @@ namespace bx
 		const StringView fileName = getFileName();
 		if (!fileName.isEmpty() )
 		{
-			return strFind(fileName, '.');
+			const StringView dot = strFind(fileName, '.');
+			return StringView(dot.getPtr(), fileName.getTerm() );
 		}
 
 		return StringView();
@@ -401,173 +403,6 @@ namespace bx
 	bool FilePath::isEmpty() const
 	{
 		return 0 == strCmp(m_filePath, ".");
-	}
-
-	bool make(const FilePath& _filePath, Error* _err)
-	{
-		BX_ERROR_SCOPE(_err);
-
-		if (!_err->isOk() )
-		{
-			return false;
-		}
-
-#if BX_CRT_MSVC
-		int32_t result = ::_mkdir(_filePath.get() );
-#elif BX_CRT_MINGW
-		int32_t result = ::mkdir(_filePath.get());
-#elif BX_CRT_NONE
-		BX_UNUSED(_filePath);
-		int32_t result = -1;
-#else
-		int32_t result = ::mkdir(_filePath.get(), 0700);
-#endif // BX_CRT_MSVC
-
-		if (0 != result)
-		{
-			BX_ERROR_SET(_err, BX_ERROR_ACCESS, "The parent directory does not allow write permission to the process.");
-			return false;
-		}
-
-		return true;
-	}
-
-	bool makeAll(const FilePath& _filePath, Error* _err)
-	{
-		BX_ERROR_SCOPE(_err);
-
-		if (!_err->isOk() )
-		{
-			return false;
-		}
-
-		FileInfo fi;
-
-		if (stat(_filePath, fi) )
-		{
-			if (FileInfo::Directory == fi.m_type)
-			{
-				return true;
-			}
-
-			BX_ERROR_SET(_err, BX_ERROR_NOT_DIRECTORY, "File already exist, and is not directory.");
-			return false;
-		}
-
-		const StringView dir   = strRTrim(_filePath.get(), "/");
-		const StringView slash = strRFind(dir, '/');
-
-		if (!slash.isEmpty()
-		&&  slash.getPtr() - dir.getPtr() > 1)
-		{
-			if (!makeAll(StringView(dir.getPtr(), slash.getPtr() ), _err) )
-			{
-				return false;
-			}
-		}
-
-		FilePath path(dir);
-		return make(path, _err);
-	}
-
-	bool remove(const FilePath& _filePath, Error* _err)
-	{
-		BX_ERROR_SCOPE(_err);
-
-		if (!_err->isOk() )
-		{
-			return false;
-		}
-
-#if BX_CRT_MSVC
-		int32_t result = -1;
-		FileInfo fi;
-		if (stat(_filePath, fi) )
-		{
-			if (FileInfo::Directory == fi.m_type)
-			{
-				result = ::_rmdir(_filePath.get() );
-			}
-			else
-			{
-				result = ::remove(_filePath.get() );
-			}
-		}
-#elif BX_CRT_NONE
-		BX_UNUSED(_filePath);
-		int32_t result = -1;
-#else
-		int32_t result = ::remove(_filePath.get() );
-#endif // BX_CRT_MSVC
-
-		if (0 != result)
-		{
-			BX_ERROR_SET(_err, BX_ERROR_ACCESS, "The parent directory does not allow write permission to the process.");
-			return false;
-		}
-
-		return true;
-	}
-
-	bool removeAll(const FilePath& _filePath, Error* _err)
-	{
-		BX_ERROR_SCOPE(_err);
-
-		if (remove(_filePath, _err) )
-		{
-			return true;
-		}
-
-		_err->reset();
-
-		FileInfo fi;
-
-		if (!stat(_filePath, fi) )
-		{
-			BX_ERROR_SET(_err, BX_ERROR_ACCESS, "The parent directory does not allow write permission to the process.");
-			return false;
-		}
-
-		if (FileInfo::Directory != fi.m_type)
-		{
-			BX_ERROR_SET(_err, BX_ERROR_NOT_DIRECTORY, "File already exist, and is not directory.");
-			return false;
-		}
-
-#if BX_CRT_NONE
-		BX_UNUSED(_filePath);
-		return false;
-#elif  BX_PLATFORM_WINDOWS \
-	|| BX_PLATFORM_LINUX   \
-	|| BX_PLATFORM_OSX
-		DIR* dir = opendir(_filePath.get() );
-		if (NULL == dir)
-		{
-			BX_ERROR_SET(_err, BX_ERROR_NOT_DIRECTORY, "File already exist, and is not directory.");
-			return false;
-		}
-
-		for (dirent* item = readdir(dir); NULL != item; item = readdir(dir) )
-		{
-			if (0 == strCmp(item->d_name, ".")
-			||  0 == strCmp(item->d_name, "..") )
-			{
-				continue;
-			}
-
-			FilePath path(_filePath);
-			path.join(item->d_name);
-			if (!removeAll(path, _err) )
-			{
-				_err->reset();
-				break;
-			}
-		}
-
-		closedir(dir);
-#endif // !BX_CRT_NONE
-
-		return remove(_filePath, _err);
 	}
 
 } // namespace bx

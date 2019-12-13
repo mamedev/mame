@@ -96,7 +96,7 @@ enum
     Track 1 Sector 0 through N-2: optional disk program image loader
     Track 1 Sector N-1: copy of Track 0 Sector 0
     Track 1 Sector N: copy of Track 0 Sector 1
-    Last cylinder has disagnostic information (reported as .S$DIAG)
+    Last cylinder has diagnostic information (reported as .S$DIAG)
     Remaining sectors are used for fdr and data.
 */
 
@@ -214,7 +214,7 @@ struct ti990_fdr
 	UINT16BE    hkc;            /* hask key count: the number of file descriptor records that are present in the directory that hashed to this record number */
 	UINT16BE    hkv;            /* hask key value: the result of the hash algorithm for the file name actually covered in this record */
 	char        fnm[8];         /* file name */
-	uint8_t       rsv[2];         /* reserved */
+	uint8_t     rsv[2];         /* reserved */
 	UINT16BE    fl1;            /* flags word 1 */
 	UINT16BE    flg;            /* flags word 2 */
 	UINT16BE    prs;            /* physical record size */
@@ -227,31 +227,31 @@ struct ti990_fdr
 	UINT32BE    eom;            /* end of medium record number */
 	UINT32BE    bkm;            /* end of medium block number */
 	UINT16BE    ofm;            /* end of medium offset / */
-									/* prelog number for KIF */
+								/* prelog number for KIF */
 	UINT32BE    fbq;            /* free block queue head */
 	UINT16BE    btr;            /* B-tree roots block # */
 	UINT32BE    ebq;            /* empty block queue head */
 	UINT16BE    kdr;            /* key descriptions record # */
-	uint8_t       ud[6];          /* last update date */
-	uint8_t       cd[6];          /* creation date */
-	uint8_t       apb;            /* ADU's per block */
-	uint8_t       bpa;            /* blocks per ADU */
-	UINT16BE    mrs;            /* minimumu KIF record size */
-	uint8_t       sat[64];        /* secondary allocation table: 16 2-word entries.  The first word of an entry contains the size, in ADUs, of the secondary allocation.  The second word contains the starting ADU of the allocation. */
+	uint8_t     ud[6];          /* last update date */
+	uint8_t     cd[6];          /* creation date */
+	uint8_t     apb;            /* ADU's per block */
+	uint8_t     bpa;            /* blocks per ADU */
+	UINT16BE    mrs;            /* minimum KIF record size */
+	uint8_t     sat[64];        /* secondary allocation table: 16 2-word entries.  The first word of an entry contains the size, in ADUs, of the secondary allocation.  The second word contains the starting ADU of the allocation. */
 
 /* bytes >86 to >100 are optional */
-	uint8_t       res[10];        /* reserved: seem to be actually meaningful (at least under DX10 3.6.x) */
+	uint8_t     res[10];        /* reserved: seem to be actually meaningful (at least under DX10 3.6.x) */
 	char        uid[8];         /* user id of file creator */
 	UINT16BE    psa;            /* public security attribute */
 	ti990_ace   ace[9];         /* 9 access control entries */
-	uint8_t       fil[2];         /* not used */
+	uint8_t     fil[2];         /* not used */
 };
 
 /*
     ADR record: variant of FDR for Aliases
 
     The fields marked here with *** are in the ADR template to maintain
-    compatability with the FDR template.
+    compatibility with the FDR template.
 */
 struct ti990_adr
 {
@@ -284,19 +284,19 @@ struct ti990_cdr
 	UINT16BE    fill00;         /* reserved */
 	UINT16BE    fill01;         /* reserved */
 	UINT16BE    fdf;            /* flags (same as fdr.flg) */
-	uint8_t       flg;            /* channel flzgs */
-	uint8_t       iid;            /* owner task installed ID */
-	uint8_t       typ;            /* default resource type */
-	uint8_t       tf;             /* resource type flags */
+	uint8_t     flg;            /* channel flzgs */
+	uint8_t     iid;            /* owner task installed ID */
+	uint8_t     typ;            /* default resource type */
+	uint8_t     tf;             /* resource type flags */
 	UINT16BE    mxl;            /* maximum message length */
-	uint8_t       fill04[6];      /* reserved (and, no, I don't know where fill02 and fill03 have gone) */
+	uint8_t     fill04[6];      /* reserved (and, no, I don't know where fill02 and fill03 have gone) */
 	UINT16BE    rna;            /* record number of next CDR or ADR */
 	UINT16BE    raf;            /* record # of actual FDR */
-	uint8_t       fill05[110];    /* reserved */
+	uint8_t     fill05[110];    /* reserved */
 	char        uid[8];         /* user ID of channel creator */
 	UINT16BE    psa;            /* public security attribute */
-	uint8_t       scg[94];        /* "SDT with 9 control groups" (whatever it means - and, no, 94 is not dividable by 9) */
-	uint8_t       fill06[8];      /* reserved */
+	uint8_t     scg[94];        /* "SDT with 9 control groups" (whatever it means - and, no, 94 is not dividable by 9) */
+	uint8_t     fill06[8];      /* reserved */
 };
 
 /*
@@ -321,18 +321,17 @@ union directory_entry
 */
 struct tifile_header
 {
-	char tifiles[8];        /* always '\7TIFILES' */
-	uint8_t secsused_MSB;     /* file length in sectors (big-endian) */
-	uint8_t secsused_LSB;
-	uint8_t flags;            /* see enum above */
-	uint8_t recspersec;       /* records per sector */
-	uint8_t eof;              /* current position of eof in last sector (0->255)*/
-	uint8_t reclen;           /* bytes per record ([1,255] 0->256) */
-	uint8_t fixrecs_MSB;      /* file length in records (big-endian) */
-	uint8_t fixrecs_LSB;
-	uint8_t res[128-16];      /* reserved */
+	char        tifiles[8];     /* always '\7TIFILES' */
+	uint8_t     secsused_MSB;   /* file length in sectors (big-endian) */
+	uint8_t     secsused_LSB;
+	uint8_t     flags;          /* see enum above */
+	uint8_t     recspersec;     /* records per sector */
+	uint8_t     eof;            /* current position of eof in last sector (0->255)*/
+	uint8_t     reclen;         /* bytes per record ([1,255] 0->256) */
+	uint8_t     fixrecs_MSB;    /* file length in records (big-endian) */
+	uint8_t     fixrecs_LSB;
+	uint8_t     res[128-16];    /* reserved */
 };
-
 
 /*
     catalog entry (used for in-memory catalog)

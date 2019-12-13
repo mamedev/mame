@@ -134,7 +134,7 @@ void tmc600_state::tmc600_io_map(address_map &map)
 	map(0x03, 0x03).w(m_bwio, FUNC(cdp1852_device::write));
 	map(0x04, 0x04).w(CDP1852_TMC700_TAG, FUNC(cdp1852_device::write));
 	map(0x05, 0x05).rw(FUNC(tmc600_state::rtc_r), FUNC(tmc600_state::vismac_data_w));
-//  AM_RANGE(0x06, 0x06) AM_WRITE(floppy_w)
+//  map(0x06, 0x06).w(FUNC(tmc600_state::floppy_w);
 	map(0x07, 0x07).w(FUNC(tmc600_state::vismac_register_w));
 }
 
@@ -298,7 +298,7 @@ void tmc600_state::tmc600(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	// expansion bus connector
-	TMC600_EURO_BUS_SLOT(config, m_bus, tmc600_euro_bus_cards, nullptr);
+	TMC600_EUROBUS_SLOT(config, m_bus, tmc600_eurobus_cards, nullptr);
 
 	// internal RAM
 	RAM(config, RAM_TAG).set_default_size("8K");

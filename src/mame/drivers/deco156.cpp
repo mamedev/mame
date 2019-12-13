@@ -342,15 +342,15 @@ void deco156_state::hvysmsh(machine_config &config)
 	m_deco_tilegen->set_pf2_col_bank(0x10);
 	m_deco_tilegen->set_pf1_col_mask(0x0f);
 	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_bank1_callback(FUNC(deco156_state::bank_callback), this);
-	m_deco_tilegen->set_bank2_callback(FUNC(deco156_state::bank_callback), this);
+	m_deco_tilegen->set_bank1_callback(FUNC(deco156_state::bank_callback));
+	m_deco_tilegen->set_bank2_callback(FUNC(deco156_state::bank_callback));
 	m_deco_tilegen->set_pf12_8x8_bank(0);
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(2);
-	m_sprgen->set_pri_callback(FUNC(deco156_state::pri_callback), this);
+	m_sprgen->set_pri_callback(FUNC(deco156_state::pri_callback));
 	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
@@ -394,15 +394,15 @@ void deco156_state::wcvol95(machine_config &config)
 	m_deco_tilegen->set_pf2_col_bank(0x10);
 	m_deco_tilegen->set_pf1_col_mask(0x0f);
 	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_bank1_callback(FUNC(deco156_state::bank_callback), this);
-	m_deco_tilegen->set_bank2_callback(FUNC(deco156_state::bank_callback), this);
+	m_deco_tilegen->set_bank1_callback(FUNC(deco156_state::bank_callback));
+	m_deco_tilegen->set_bank2_callback(FUNC(deco156_state::bank_callback));
 	m_deco_tilegen->set_pf12_8x8_bank(0);
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(2);
-	m_sprgen->set_pri_callback(FUNC(deco156_state::pri_callback), this);
+	m_sprgen->set_pri_callback(FUNC(deco156_state::pri_callback));
 	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */

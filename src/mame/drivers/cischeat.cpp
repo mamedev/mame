@@ -182,10 +182,11 @@ Cisco Heat.
 #include "includes/cischeat.h"
 
 #include "cpu/m68000/m68000.h"
-#include "sound/ym2151.h"
-#include "sound/okim6295.h"
+#include "machine/adc0804.h"
 #include "machine/jalcrpt.h"
 #include "machine/nvram.h"
+#include "sound/okim6295.h"
+#include "sound/ym2151.h"
 #include "speaker.h"
 
 #include "cischeat.lh"
@@ -524,7 +525,7 @@ WRITE16_MEMBER(cischeat_state::scudhamm_motor_command_w)
 }
 
 
-READ16_MEMBER(cischeat_state::scudhamm_analog_r)
+uint8_t cischeat_state::scudhamm_analog_r()
 {
 	int i=ioport("IN1")->read(),j;
 
@@ -601,7 +602,7 @@ void cischeat_state::scudhamm_map(address_map &map)
 	map(0x100015, 0x100015).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));             // Sound
 	map(0x100019, 0x100019).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));             //
 	map(0x10001c, 0x10001d).w(FUNC(cischeat_state::scudhamm_enable_w));                                            // ?
-	map(0x100040, 0x100041).r(FUNC(cischeat_state::scudhamm_analog_r)).nopw();                         // A / D
+	map(0x100041, 0x100041).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write));                    // A / D
 	map(0x100044, 0x100045).r(FUNC(cischeat_state::scudhamm_motor_pos_r));                                  // Motor Position
 	map(0x100050, 0x100051).r(FUNC(cischeat_state::scudhamm_motor_status_r)).w(FUNC(cischeat_state::scudhamm_motor_command_w));        // Motor Limit Switches
 	map(0x10005c, 0x10005d).portr("IN2");                                                    // 2 x DSW
@@ -622,7 +623,7 @@ WRITE16_MEMBER(cischeat_state::armchmp2_motor_command_w)
 	COMBINE_DATA( &m_scudhamm_motor_command );
 }
 
-READ16_MEMBER(cischeat_state::armchmp2_analog_r)
+uint8_t cischeat_state::armchmp2_analog_r()
 {
 	int armdelta;
 
@@ -684,7 +685,7 @@ void cischeat_state::armchmp2_map(address_map &map)
 	map(0x100000, 0x100001).portr("IN2").w(FUNC(cischeat_state::scudhamm_oki_bank_w));                      // DSW + Sound
 	map(0x100004, 0x100005).portr("IN3");                                                    // DSW
 	map(0x100008, 0x100009).rw(FUNC(cischeat_state::armchmp2_buttons_r), FUNC(cischeat_state::armchmp2_leds_w));                      // Leds + Coin Counters + Buttons + Sensors
-	map(0x10000c, 0x10000d).r(FUNC(cischeat_state::armchmp2_analog_r)).nopw();                         // A / D
+	map(0x10000d, 0x10000d).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write));              // A / D
 	map(0x100010, 0x100011).rw(FUNC(cischeat_state::armchmp2_motor_status_r), FUNC(cischeat_state::armchmp2_motor_command_w));        // Motor Limit Switches?
 	map(0x100015, 0x100015).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));           // Sound
 	map(0x100019, 0x100019).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));           //
@@ -1643,7 +1644,7 @@ static INPUT_PORTS_START( armchmp2 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON3 ) // elbow (it always complains though)
 
 	PORT_START("IN1")   // A/D
-	PORT_BIT( 0x00ff, 0x0000, IPT_DIAL ) PORT_MINMAX(0x0000,0x00ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
 	PORT_START("IN2")   // DSW
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
@@ -1933,7 +1934,7 @@ void cischeat_state::bigrun(machine_config &config)
 	// timing set by the YM irqhandler
 //  m_soundcpu->set_periodic_int(FUNC(cischeat_state::irq4_line_hold), attotime::from_hz(16*30));
 
-	config.m_minimum_quantum = attotime::from_hz(1200);
+	config.set_maximum_quantum(attotime::from_hz(1200));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2050,7 +2051,7 @@ void cischeat_state::f1gpstr2(machine_config &config)
 	M68000(config, m_cpu5, 10000000);
 	m_cpu5->set_addrmap(AS_PROGRAM, &cischeat_state::f1gpstr2_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(12000);
+	config.set_maximum_quantum(attotime::from_hz(12000));
 }
 
 
@@ -2089,6 +2090,9 @@ void cischeat_state::scudhamm(machine_config &config)
 	M68000(config, m_maincpu, 12000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cischeat_state::scudhamm_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(cischeat_state::scudhamm_scanline), "screen", 0, 1);
+
+	adc0804_device &adc(ADC0804(config, "adc", 640000)); // unknown clock
+	adc.vin_callback().set(FUNC(cischeat_state::scudhamm_analog_r));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -2145,6 +2149,7 @@ void cischeat_state::armchmp2(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cischeat_state::armchmp2_map);
 	subdevice<timer_device>("scantimer")->set_callback(FUNC(cischeat_state::armchamp2_scanline));
+	subdevice<adc0804_device>("adc")->vin_callback().set(FUNC(cischeat_state::armchmp2_analog_r));
 }
 
 
@@ -2200,8 +2205,8 @@ void captflag_state::captflag(machine_config &config)
 	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 0x4e00/2);
 
 	// Motors
-	TIMER(config, m_motor_left).configure_generic(timer_device::expired_delegate());
-	TIMER(config, m_motor_right).configure_generic(timer_device::expired_delegate());
+	TIMER(config, m_motor_left).configure_generic(nullptr);
+	TIMER(config, m_motor_right).configure_generic(nullptr);
 
 	// Layout
 	config.set_default_layout(layout_captflag);

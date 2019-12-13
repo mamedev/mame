@@ -269,7 +269,7 @@ void econet_e01_device::device_add_mconfig(machine_config &config)
 	}
 
 	software_list_device &softlist(SOFTWARE_LIST(config, "flop_ls_e01"));
-	softlist.set_type("e01_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	softlist.set_original("e01_flop");
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(R6522_TAG, FUNC(via6522_device::write_ca1));
@@ -400,6 +400,7 @@ econet_e01_device::econet_e01_device(const machine_config &mconfig, device_type 
 	, m_floppy(*this, WD2793_TAG":%u", 0U)
 	, m_rom(*this, R65C102_TAG)
 	, m_centronics(*this, CENTRONICS_TAG)
+	, m_led(*this, "led_0")
 	, m_adlc_ie(0)
 	, m_hdc_ie(0)
 	, m_rtc_irq(CLEAR_LINE)
@@ -421,6 +422,8 @@ econet_e01_device::econet_e01_device(const machine_config &mconfig, device_type 
 
 void econet_e01_device::device_start()
 {
+	m_led.resolve();
+
 	// allocate timers
 	m_clk_timer = timer_alloc();
 
@@ -547,7 +550,7 @@ WRITE8_MEMBER( econet_e01_device::floppy_w )
 	// TODO floppy test
 
 	// mode LED
-	machine().output().set_value("led_0", BIT(data, 7));
+	m_led = BIT(data, 7);
 }
 
 

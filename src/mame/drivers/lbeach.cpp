@@ -142,9 +142,9 @@ TILE_GET_INFO_MEMBER(lbeach_state::get_fg_tile_info)
 
 void lbeach_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lbeach_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lbeach_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lbeach_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lbeach_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_screen->register_screen_bitmap(m_colmap_car);
@@ -234,12 +234,12 @@ void lbeach_state::lbeach_map(address_map &map)
 	map(0x8000, 0x8000).writeonly().share("scroll_y");
 	map(0x8001, 0x8001).writeonly().share("sprite_x");
 	map(0x8002, 0x8002).writeonly().share("sprite_code");
-//  AM_RANGE(0x8003, 0x8003) AM_WRITENOP // ?
-//  AM_RANGE(0x8004, 0x8004) AM_WRITENOP // ?
-//  AM_RANGE(0x8005, 0x8005) AM_WRITENOP // ?
+//  map(0x8003, 0x8003).nopw(); // ?
+//  map(0x8004, 0x8004).nopw(); // ?
+//  map(0x8005, 0x8005).nopw(); // ?
 	map(0x8007, 0x8007).nopw(); // probably watchdog
 	map(0xa000, 0xa000).portr("IN0");
-//  AM_RANGE(0xa003, 0xa003) AM_READNOP // ? tests d7 at game over
+//  map(0xa003, 0xa003).nopr(); // ? tests d7 at game over
 	map(0xc000, 0xcfff).rom();
 	map(0xf000, 0xffff).rom();
 }

@@ -219,7 +219,7 @@ void aquarius_state::aquarius_mem(address_map &map)
 
 void aquarius_state::aquarius_io(address_map &map)
 {
-//  AM_RANGE(0x7e, 0x7f) AM_MIRROR(0xff00) AM_READWRITE(modem_r, modem_w)
+//  map(0x7e, 0x7f).mirror(0xff00).rw(FUNC(aquarius_state::modem_r), FUNC(aquarius_state::modem_w));
 	map(0xf6, 0xf6).mirror(0xff00).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xf7, 0xf7).mirror(0xff00).w("ay8910", FUNC(ay8910_device::address_w));
 	map(0xfc, 0xfc).mirror(0xff00).rw(FUNC(aquarius_state::cassette_r), FUNC(aquarius_state::cassette_w));

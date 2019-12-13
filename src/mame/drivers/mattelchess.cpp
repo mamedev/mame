@@ -224,8 +224,8 @@ ROM_START( mchess )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD("ins8050-6hwu_n", 0x0000, 0x1000, CRC(de272323) SHA1(9ba323b614504e20b25c86d290c0667f0bbf6c6b) )
 
-	ROM_REGION( 796334, "screen", 0)
-	ROM_LOAD( "mchess.svg", 0, 796334, CRC(88792457) SHA1(cc8b654829532a8cbb7447176436c113ac584bba) )
+	ROM_REGION( 796406, "screen", 0)
+	ROM_LOAD( "mchess.svg", 0, 796406, CRC(795d66e0) SHA1(5f786c00bf33793bfba7065d8e9ec476e02e5c46) )
 ROM_END
 
 } // anonymous namespace

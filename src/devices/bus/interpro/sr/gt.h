@@ -12,12 +12,6 @@
 #include "machine/ram.h"
 #include "machine/z80scc.h"
 
-#include "bus/rs232/rs232.h"
-#include "bus/rs232/loopback.h"
-
-#include "bus/interpro/keyboard/keyboard.h"
-#include "bus/interpro/mouse/mouse.h"
-
 class gt_device_base : public device_t
 {
 protected:

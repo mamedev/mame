@@ -194,14 +194,14 @@ void model1io2_device::device_add_mconfig(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(6*20+1, 19);
 	screen.set_visarea(0, 6*20, 0, 19-1);
-	screen.set_screen_update("lcd", FUNC(hd44780_device::screen_update));
+	screen.set_screen_update(m_lcd, FUNC(hd44780_device::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(model1io2_device::lcd_palette), 3);
 
 	HD44780(config, m_lcd, 0);
 	m_lcd->set_lcd_size(2, 20);
-	m_lcd->set_pixel_update_cb(FUNC(model1io2_device::lcd_pixel_update), this);
+	m_lcd->set_pixel_update_cb(FUNC(model1io2_device::lcd_pixel_update));
 }
 
 

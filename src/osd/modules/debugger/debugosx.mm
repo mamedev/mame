@@ -211,7 +211,7 @@ void debugger_osx::build_menus()
 	{
 		NSMenuItem *item;
 
-		NSMenu *const debugMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Debug"];
+		NSMenu *const debugMenu = [[NSMenu alloc] initWithTitle:@"Debug"];
 		item = [[NSApp mainMenu] insertItemWithTitle:@"Debug" action:NULL keyEquivalent:@"" atIndex:1];
 		[item setSubmenu:debugMenu];
 		[debugMenu release];
@@ -243,7 +243,7 @@ void debugger_osx::build_menus()
 					   keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF3FunctionKey]]
 		 setKeyEquivalentModifierMask:NSShiftKeyMask];
 
-		NSMenu *const runMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Run"];
+		NSMenu *const runMenu = [[NSMenu alloc] initWithTitle:@"Run"];
 		item = [[NSApp mainMenu] insertItemWithTitle:@"Run"
 											  action:NULL
 									   keyEquivalent:@""

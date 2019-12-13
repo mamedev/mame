@@ -207,26 +207,21 @@ void es5503_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 void es5503_device::device_start()
 {
-	int osc;
-
 	m_irq_func.resolve_safe();
 	m_adc_func.resolve_safe(0);
 
 	rege0 = 0xff;
 
-	for (osc = 0; osc < 32; osc++)
-	{
-		save_item(NAME(oscillators[osc].freq), osc);
-		save_item(NAME(oscillators[osc].wtsize), osc);
-		save_item(NAME(oscillators[osc].control), osc);
-		save_item(NAME(oscillators[osc].vol), osc);
-		save_item(NAME(oscillators[osc].data), osc);
-		save_item(NAME(oscillators[osc].wavetblpointer), osc);
-		save_item(NAME(oscillators[osc].wavetblsize), osc);
-		save_item(NAME(oscillators[osc].resolution), osc);
-		save_item(NAME(oscillators[osc].accumulator), osc);
-		save_item(NAME(oscillators[osc].irqpend), osc);
-	}
+	save_pointer(STRUCT_MEMBER(oscillators, freq), 32);
+	save_pointer(STRUCT_MEMBER(oscillators, wtsize), 32);
+	save_pointer(STRUCT_MEMBER(oscillators, control), 32);
+	save_pointer(STRUCT_MEMBER(oscillators, vol), 32);
+	save_pointer(STRUCT_MEMBER(oscillators, data), 32);
+	save_pointer(STRUCT_MEMBER(oscillators, wavetblpointer), 32);
+	save_pointer(STRUCT_MEMBER(oscillators, wavetblsize), 32);
+	save_pointer(STRUCT_MEMBER(oscillators, resolution), 32);
+	save_pointer(STRUCT_MEMBER(oscillators, accumulator), 32);
+	save_pointer(STRUCT_MEMBER(oscillators, irqpend), 32);
 
 	output_rate = (clock() / 8) / (2 + oscsenabled);
 	m_stream = machine().sound().stream_alloc(*this, 0, output_channels, output_rate);

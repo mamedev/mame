@@ -162,7 +162,7 @@ TILE_GET_INFO_MEMBER(spool99_state::get_tile_info)
 
 void spool99_state::video_start()
 {
-	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spool99_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spool99_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 uint32_t spool99_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -296,7 +296,7 @@ void spool99_state::vcarn_map(address_map &map)
 	map(0xa800, 0xabff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 
 	map(0xb000, 0xdfff).ram();
-//  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE(vcarn_io_r,vcarn_io_w) AM_SHARE("vcarn_io")
+//  map(0xdf00, 0xdfff).rw(FUNC(spool99_state::vcarn_io_r), FUNC(spool99_state::vcarn_io_w)).share("vcarn_io");
 	map(0xe000, 0xefff).ram().w(FUNC(spool99_state::vram_w)).share("vram");
 	map(0xf000, 0xffff).ram().w(FUNC(spool99_state::cram_w)).share("cram");
 }

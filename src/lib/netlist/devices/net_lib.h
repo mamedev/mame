@@ -1,35 +1,50 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/***************************************************************************
-
-    net_lib.h
-
-    Discrete netlist implementation.
-
-****************************************************************************/
 
 #ifndef NET_LIB_H
 #define NET_LIB_H
+
+///
+/// \file net_lib.h
+///
+/// Discrete netlist implementation.
+///
 
 #include "netlist/nl_setup.h"
 
 //#define NL_AUTO_DEVICES 1
 
-#define SOLVER(name, freq)                                                  \
-		NET_REGISTER_DEV(SOLVER, name)                                      \
-		PARAM(name.FREQ, freq)
-
 #ifdef NL_AUTO_DEVICES
 #include "nld_devinc.h"
 
-#include "macro/nlm_cd4xxx.h"
-#include "macro/nlm_ttl74xx.h"
-#include "macro/nlm_opamp.h"
-#include "macro/nlm_other.h"
+// FIXME: copied from nld_twoterm.h
+#ifdef RES_R
+#warning "Do not include rescap.h in a netlist environment"
+#endif
+#ifndef RES_R
+#define RES_R(res) (res)
+#define RES_K(res) ((res) * 1e3)
+#define RES_M(res) ((res) * 1e6)
+#define CAP_U(cap) ((cap) * 1e-6)
+#define CAP_N(cap) ((cap) * 1e-9)
+#define CAP_P(cap) ((cap) * 1e-12)
+#define IND_U(ind) ((ind) * 1e-6)
+#define IND_N(ind) ((ind) * 1e-9)
+#define IND_P(ind) ((ind) * 1e-12)
+#endif
+
+#include "netlist/macro/nlm_cd4xxx.h"
+#include "netlist/macro/nlm_opamp.h"
+#include "netlist/macro/nlm_other.h"
+#include "netlist/macro/nlm_ttl74xx.h"
 
 #include "nld_7448.h"
 
 #else
+
+#define SOLVER(name, freq)                                                  \
+		NET_REGISTER_DEV(SOLVER, name)                                      \
+		PARAM(name.FREQ, freq)
 
 #include "nld_system.h"
 

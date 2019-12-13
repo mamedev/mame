@@ -60,26 +60,11 @@ public:
 
 	void set_is_slave(int slave) { m_is_slave = slave; }
 
-	template <typename Object> void set_dma_kludge_callback(Object &&cb) { m_dma_kludge_cb = std::forward<Object>(cb); }
-	template <class FunctionClass> void set_dma_kludge_callback(
-		int (FunctionClass::*callback)(uint32_t, uint32_t, uint32_t, int), const char *name)
-	{
-		set_dma_kludge_callback(dma_kludge_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_dma_kludge_callback(T &&... args) { m_dma_kludge_cb.set(std::forward<T>(args)...); }
 
-	template <typename Object> void set_dma_fifo_data_available_callback(Object &&cb) { m_dma_fifo_data_available_cb = std::forward<Object>(cb); }
-	template <class FunctionClass> void set_dma_fifo_data_available_callback(
-		int (FunctionClass::*callback)(uint32_t, uint32_t, uint32_t, int), const char *name)
-	{
-		set_dma_fifo_data_available_callback(dma_fifo_data_available_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_dma_fifo_data_available_callback(T &&... args) { m_dma_fifo_data_available_cb.set(std::forward<T>(args)...); }
 
-	template <typename Object> void set_ftcsr_read_callback(Object &&cb) { m_ftcsr_read_cb = std::forward<Object>(cb); }
-	template <class FunctionClass> void set_ftcsr_read_callback(void (FunctionClass::*callback)(uint32_t), const char *name)
-	{
-		set_ftcsr_read_callback(ftcsr_read_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-
+	template <typename... T> void set_ftcsr_read_callback(T &&... args) { m_ftcsr_read_cb.set(std::forward<T>(args)...); }
 
 	DECLARE_READ32_MEMBER(sh2_internal_a5);
 
@@ -230,11 +215,11 @@ protected:
 	virtual void device_stop() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 4; }
-	virtual uint32_t execute_input_lines() const override { return 16; }
-	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0; }
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 4; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 16; }
+	virtual uint32_t execute_default_irq_vector(int inputnum) const noexcept override { return 0; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -317,6 +302,7 @@ private:
 	int     m_internal_irq_vector;
 
 	emu_timer *m_timer;
+	emu_timer *m_wdtimer;
 	emu_timer *m_dma_current_active_timer[2];
 	int     m_dma_timer_active[2];
 	uint8_t  m_dma_irq[2];
@@ -354,9 +340,12 @@ private:
 	virtual void execute_one_f000(uint16_t opcode) override;
 
 	TIMER_CALLBACK_MEMBER( sh2_timer_callback );
+	TIMER_CALLBACK_MEMBER( sh2_wdtimer_callback );
 	TIMER_CALLBACK_MEMBER( sh2_dma_current_active_callback );
 	void sh2_timer_resync();
 	void sh2_timer_activate();
+	void sh2_wtcnt_recalc();
+	void sh2_wdt_activate();
 	void sh2_do_dma(int dmach);
 	virtual void sh2_exception(const char *message, int irqline) override;
 	void sh2_dmac_check(int dma);

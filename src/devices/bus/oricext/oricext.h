@@ -13,9 +13,9 @@
 
 #include "cpu/m6502/m6502.h"
 
-class oricext_device;
+class device_oricext_interface;
 
-class oricext_connector: public device_t, public device_slot_interface
+class oricext_connector: public device_t, public device_single_card_slot_interface<device_oricext_interface>
 {
 public:
 	template <typename T>
@@ -44,17 +44,16 @@ protected:
 	const char *cputag;
 };
 
-class oricext_device : public device_t,
-						public device_slot_card_interface
+class device_oricext_interface : public device_interface
 {
 public:
 	void set_cputag(const char *tag);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 
 protected:
-	oricext_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	device_oricext_interface(const machine_config &mconfig, device_t &device);
 
-	virtual void device_start() override;
+	virtual void interface_pre_start() override;
 
 	const char *cputag;
 	m6502_device *cpu;

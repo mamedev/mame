@@ -436,7 +436,7 @@ READ16_MEMBER(ssv_state::drifto94_unknown_r)
 void ssv_state::drifto94_map(address_map &map)
 {
 	ssv_map(map, 0xc00000);
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 1 at the start
+//  map(0x210002, 0x210003).nopw();                                      // ? 1 at the start
 	map(0x400000, 0x47ffff).writeonly();                                       // ?
 	map(0x480000, 0x480001).rw(FUNC(ssv_state::dsp_dr_r), FUNC(ssv_state::dsp_dr_w));
 	map(0x482000, 0x482fff).rw(FUNC(ssv_state::dsp_r), FUNC(ssv_state::dsp_w));
@@ -525,9 +525,9 @@ void ssv_state::hypreact_map(address_map &map)
 {
 	ssv_map(map, 0xf00000);
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                      // ? 5 at the start
+//  map(0x210002, 0x210003).nopw();                      // ? 5 at the start
 	map(0x21000e, 0x21000f).w(FUNC(ssv_state::lockout_inv_w));            // Inverted lockout lines
-//  AM_RANGE(0x280000, 0x280001) AM_READNOP                       // ? read at the start, value not used
+//  map(0x280000, 0x280001).nopr();                       // ? read at the start, value not used
 	map(0xc00000, 0xc00001).r(FUNC(ssv_state::hypreact_input_r));              // Inputs
 	map(0xc00006, 0xc00007).ram().share("input_sel");           //
 	map(0xc00008, 0xc00009).noprw();                                 //
@@ -542,9 +542,9 @@ void ssv_state::hypreac2_map(address_map &map)
 {
 	ssv_map(map, 0xe00000);
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 5 at the start
+//  map(0x210002, 0x210003).nopw();                          // ? 5 at the start
 	map(0x21000e, 0x21000f).w(FUNC(ssv_state::lockout_inv_w));                // Inverted lockout lines
-//  AM_RANGE(0x280000, 0x280001) AM_READNOP                           // ? read at the start, value not used
+//  map(0x280000, 0x280001).nopr();                           // ? read at the start, value not used
 	map(0x500000, 0x500001).r(FUNC(ssv_state::hypreact_input_r));                  // Inputs
 	map(0x500002, 0x500003).r(FUNC(ssv_state::hypreact_input_r));                  // (again?)
 	map(0x520000, 0x520001).writeonly().share("input_sel"); // Inputs
@@ -562,7 +562,7 @@ void ssv_state::janjans1_map(address_map &map)
 {
 	ssv_map(map, 0xc00000);
 	map(0x210000, 0x210001).nopw();                            // koikois2 but not janjans1
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1 at the start
+//  map(0x210002, 0x210003).nopw();                          // ? 1 at the start
 	map(0x210006, 0x210007).nopr();
 	map(0x800000, 0x800001).writeonly().share("input_sel"); // Inputs
 	map(0x800002, 0x800003).r(FUNC(ssv_state::srmp4_input_r));                     // Inputs
@@ -576,7 +576,7 @@ void ssv_state::janjans1_map(address_map &map)
 void ssv_state::keithlcy_map(address_map &map)
 {
 	ssv_map(map, 0xe00000);
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP  // ? 1 at the start
+//  map(0x210002, 0x210003).nopw();  // ? 1 at the start
 	map(0x210010, 0x210011).nopw();    //
 	map(0x21000e, 0x21000f).nopr(); //
 	map(0x400000, 0x47ffff).writeonly();   // ?
@@ -591,9 +591,9 @@ void ssv_state::meosism_map(address_map &map)
 {
 	ssv_map(map, 0xf00000);
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 5 at the start
-//  AM_RANGE(0x280000, 0x280001) AM_READNOP                                       // ? read once, value not used
-//  AM_RANGE(0x500004, 0x500005) AM_WRITENOP                                      // ? 0,58,18
+//  map(0x210002, 0x210003).nopw();                                      // ? 5 at the start
+//  map(0x280000, 0x280001).nopr();                                       // ? read once, value not used
+//  map(0x500004, 0x500005).nopw();                                      // ? 0,58,18
 	map(0x580000, 0x58ffff).ram().share("nvram");   // NVRAM
 }
 
@@ -617,9 +617,9 @@ void ssv_state::mslider_map(address_map &map)
 {
 	ssv_map(map, 0xf00000);
 	map(0x010000, 0x01ffff).rw(FUNC(ssv_state::mainram_r), FUNC(ssv_state::mainram_w)); // RAM Mirror
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1 at the start
+//  map(0x210002, 0x210003).nopw();                          // ? 1 at the start
 	map(0x400000, 0x47ffff).writeonly();                           // ?
-//  AM_RANGE(0x500000, 0x500001) AM_WRITENOP                          // ? ff at the start
+//  map(0x500000, 0x500001).nopw();                          // ? ff at the start
 }
 
 
@@ -631,7 +631,7 @@ void ssv_state::ryorioh_map(address_map &map)
 {
 	ssv_map(map, 0xc00000);
 	map(0x210000, 0x210001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP              // ? 1 at the start
+//  map(0x210002, 0x210003).nopw();              // ? 1 at the start
 }
 
 
@@ -655,7 +655,7 @@ void ssv_state::srmp4_map(address_map &map)
 {
 	ssv_map(map, 0xf00000);
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1,5 at the start
+//  map(0x210002, 0x210003).nopw();                          // ? 1,5 at the start
 	map(0xc0000a, 0xc0000b).r(FUNC(ssv_state::srmp4_input_r));                     // Inputs
 	map(0xc0000e, 0xc0000f).writeonly().share("input_sel"); // Inputs
 	map(0xc00010, 0xc00011).nopw();                            //
@@ -703,7 +703,7 @@ void ssv_state::srmp7_map(address_map &map)
 	ssv_map(map, 0xc00000);
 	map(0x010000, 0x050faf).ram();                                     // More RAM
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 0,4 at the start
+//  map(0x210002, 0x210003).nopw();                          // ? 0,4 at the start
 	map(0x21000e, 0x21000f).w(FUNC(ssv_state::lockout_inv_w));                // Coin Counters / Lockouts
 	map(0x300076, 0x300077).r(FUNC(ssv_state::srmp7_irqv_r));                      // Sound
 //  0x540000, 0x540003, related to lev 5 irq?
@@ -721,9 +721,9 @@ void ssv_state::survarts_map(address_map &map)
 {
 	ssv_map(map, 0xf00000);
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP              // ? 0,4 at the start
-//  AM_RANGE(0x290000, 0x290001) AM_READNOP               // ?
-//  AM_RANGE(0x2a0000, 0x2a0001) AM_READNOP               // ?
+//  map(0x210002, 0x210003).nopw();              // ? 0,4 at the start
+//  map(0x290000, 0x290001).nopr();               // ?
+//  map(0x2a0000, 0x2a0001).nopr();               // ?
 
 	map(0x400000, 0x43ffff).ram();                         // dyna
 
@@ -769,9 +769,9 @@ WRITE16_MEMBER(ssv_state::sxyreact_motor_w)
 void ssv_state::sxyreact_map(address_map &map)
 {
 	ssv_map(map, 0xe00000);
-//  AM_RANGE(0x020000, 0x03ffff) AM_READWRITE(mainram_r, mainram_w)             // sxyreac2 reads / writes here, why?
+//  map(0x020000, 0x03ffff).rw(FUNC(ssv_state::mainram_r), FUNC(ssv_state::mainram_w));             // sxyreac2 reads / writes here, why?
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 1 at the start
+//  map(0x210002, 0x210003).nopw();                                      // ? 1 at the start
 	map(0x21000e, 0x21000f).w(FUNC(ssv_state::lockout_inv_w));                            // Inverted lockout lines
 	map(0x500002, 0x500003).r(FUNC(ssv_state::sxyreact_ballswitch_r));                         // ?
 	map(0x500004, 0x500005).rw(FUNC(ssv_state::sxyreact_dial_r), FUNC(ssv_state::sxyreact_motor_w));        // Dial Value (serial)
@@ -807,7 +807,7 @@ void ssv_state::ultrax_map(address_map &map)
 	ssv_map(map, 0xe00000);
 	map(0x010000, 0x03ffff).ram();                         // More RAM
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r)); // Watchdog (also value is cmp.b with memory address 8)
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP              // ? 2,6 at the start
+//  map(0x210002, 0x210003).nopw();              // ? 2,6 at the start
 }
 
 /***************************************************************************
@@ -904,8 +904,8 @@ void ssv_state::eaglshot_map(address_map &map)
 {
 	ssv_map(map, 0xf00000);
 	map(0x180000, 0x1bffff).rw(FUNC(ssv_state::eaglshot_gfxram_r), FUNC(ssv_state::eaglshot_gfxram_w));
-	map(0x210000, 0x210001).nopr(); /*AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)*/                 // Watchdog
-//  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 0,4 at the start
+	map(0x210000, 0x210001).nopr(); // .r("watchdog", FUNC(watchdog_timer_device::reset16_r));                 // Watchdog
+//  map(0x210002, 0x210003).nopw();                                      // ? 0,4 at the start
 	map(0x21000e, 0x21000f).w(FUNC(ssv_state::lockout_inv_w));                            // Inverted lockout lines
 	map(0x800000, 0x800000).w(FUNC(ssv_state::eaglshot_gfxrom_bank_w));
 	map(0x900000, 0x900000).w(FUNC(ssv_state::eaglshot_trackball_w));
@@ -2624,7 +2624,7 @@ void ssv_state::drifto94(machine_config &config)
 	m_dsp->set_addrmap(AS_PROGRAM, &ssv_state::dsp_prg_map);
 	m_dsp->set_addrmap(AS_DATA, &ssv_state::dsp_data_map);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2798,7 +2798,7 @@ void ssv_state::stmblade(machine_config &config)
 	m_dsp->set_addrmap(AS_DATA, &ssv_state::dsp_data_map);
 
 	/* don't need this, game just does a simple check at boot then the DSP stalls into a tight loop. */
-	//config.m_perfect_cpu_quantum = subtag("maincpu");
+	//config.set_perfect_quantum(m_maincpu);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2907,7 +2907,7 @@ void ssv_state::twineag2(machine_config &config)
 	m_dsp->set_addrmap(AS_PROGRAM, &ssv_state::dsp_prg_map);
 	m_dsp->set_addrmap(AS_DATA, &ssv_state::dsp_data_map);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	WATCHDOG_TIMER(config, "watchdog");
 

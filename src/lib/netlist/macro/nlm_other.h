@@ -1,8 +1,13 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
+
 #ifndef NLM_OTHER_H_
 #define NLM_OTHER_H_
 
+///
+/// \file nlm_other.h
+///
+///
 #include "netlist/nl_setup.h"
 
 #ifndef __PLIB_PREPROCESSOR__

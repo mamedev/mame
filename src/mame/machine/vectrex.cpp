@@ -328,9 +328,9 @@ void vectrex_state::machine_start()
 	{
 		// install cart accesses
 		if (m_cart->get_type() == VECTREX_SRAM)
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x7fff, read8_delegate(FUNC(vectrex_cart_slot_device::read_rom),(vectrex_cart_slot_device*)m_cart), write8_delegate(FUNC(vectrex_cart_slot_device::write_ram),m_cart.target()));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x7fff, read8_delegate(*m_cart, FUNC(vectrex_cart_slot_device::read_rom)), write8_delegate(*m_cart, FUNC(vectrex_cart_slot_device::write_ram)));
 		else
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x7fff, read8_delegate(FUNC(vectrex_cart_slot_device::read_rom),m_cart.target()));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x7fff, read8_delegate(*m_cart, FUNC(vectrex_cart_slot_device::read_rom)));
 
 		// setup 3d imager and refresh timer
 

@@ -537,7 +537,7 @@ TILE_GET_INFO_MEMBER(avt_state::get_bg_tile_info)
 
 void avt_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(avt_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 28, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(avt_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 28, 32);
 }
 
 
@@ -649,7 +649,7 @@ void avt_state::avt_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x7fff).ram();
-	map(0x8000, 0x9fff).ram(); // AM_SHARE("nvram")
+	map(0x8000, 0x9fff).ram(); // .share("nvram");
 	map(0xa000, 0xa7ff).ram().w(FUNC(avt_state::avt_videoram_w)).share("videoram");
 	map(0xc000, 0xc7ff).ram().w(FUNC(avt_state::avt_colorram_w)).share("colorram");
 }

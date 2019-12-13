@@ -171,7 +171,7 @@ TILE_GET_INFO_MEMBER(blackt96_state::get_tx_tile_info)
 
 void blackt96_state::video_start()
 {
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blackt96_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(blackt96_state::get_tx_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(0);
 }
@@ -507,8 +507,10 @@ void blackt96_state::blackt96(machine_config &config)
 
 	SNK68_SPR(config, m_sprites, 0);
 	m_sprites->set_gfxdecode_tag(m_gfxdecode);
-	m_sprites->set_tile_indirect_cb(FUNC(blackt96_state::tile_callback), this);
+	m_sprites->set_tile_indirect_cb(FUNC(blackt96_state::tile_callback));
 	m_sprites->set_no_partial();
+	m_sprites->set_xpos_shift(12);
+	m_sprites->set_color_entry_mask(0x7f);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

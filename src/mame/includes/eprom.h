@@ -42,7 +42,6 @@ protected:
 	virtual void machine_reset() override;
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
-	DECLARE_READ16_MEMBER(special_port1_r);
 	DECLARE_READ8_MEMBER(adc_r);
 	DECLARE_WRITE16_MEMBER(eprom_latch_w);
 	template<bool maincpu> DECLARE_WRITE16_MEMBER(sync_w);

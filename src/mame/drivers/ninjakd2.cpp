@@ -1672,7 +1672,7 @@ void robokid_state::motion_error_kludge(uint16_t offset)
 	ROM[2] = 0x18;
 	ROM[3] = 0xf6; // jr $-8
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(offset, offset, read8_delegate(FUNC(robokid_state::motion_error_verbose_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(offset, offset, read8_delegate(*this, FUNC(robokid_state::motion_error_verbose_r)));
 }
 
 void robokid_state::init_robokid()

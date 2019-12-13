@@ -369,7 +369,7 @@ void rz1_state::rz1(machine_config &config)
 
 	HD44780(config, m_hd44780, 0);
 	m_hd44780->set_lcd_size(1, 16);
-	m_hd44780->set_pixel_update_cb(FUNC(rz1_state::lcd_pixel_update), this);
+	m_hd44780->set_pixel_update_cb(FUNC(rz1_state::lcd_pixel_update));
 
 	config.set_default_layout(layout_rz1);
 

@@ -21,21 +21,21 @@
     program with the correct data
 
     MAME driver by ElSemi
-	Additional work and refactoring by Angelo Salese
-	
-	TODO:
-	- provide NVRAM defaults where applicable;
-	- add an actual reset button (helps with inp record/playback);
-	- donghaer: needs "raster effect" for 2 players mode split screen, but no 
-	  interrupt is actually provided for the task so apparently not a timer 
-	  related effect;
-	- wulybuly: strips off main RAM to texture transfers except for text after 
-	  the first couple of frames;
-	- maldaiza: PIC protection.
-	- urachamu: some animation timings seems off, like bat hit animation before starting a given game.
-	  They were actually too fast before adding 30 Hz vblank for interlace mode, even if the game don't
-	  really read crtc blanking reg or use any other interrupt but the coin ones;
-	- urachamu: investigate what CDMA in test mode really do, assuming it's not a dud;
+    Additional work and refactoring by Angelo Salese
+
+    TODO:
+    - provide NVRAM defaults where applicable;
+    - add an actual reset button (helps with inp record/playback);
+    - donghaer: needs "raster effect" for 2 players mode split screen, but no
+      interrupt is actually provided for the task so apparently not a timer
+      related effect;
+    - wulybuly: strips off main RAM to texture transfers except for text after
+      the first couple of frames;
+    - maldaiza: PIC protection.
+    - urachamu: some animation timings seems off, like bat hit animation before starting a given game.
+      They were actually too fast before adding 30 Hz vblank for interlace mode, even if the game don't
+      really read crtc blanking reg or use any other interrupt but the coin ones;
+    - urachamu: investigate what CDMA in test mode really do, assuming it's not a dud;
 
 ========================================================================================================
 
@@ -559,7 +559,7 @@ void crystal_state::crystal(machine_config &config)
 
 	VRENDER0_SOC(config, m_vr0soc, 14318180 * 3);
 	m_vr0soc->set_host_cpu_tag(m_maincpu);
-	
+
 	DS1302(config, m_ds1302, 32.768_kHz_XTAL);
 }
 

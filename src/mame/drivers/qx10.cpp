@@ -827,7 +827,7 @@ void qx10_state::qx10(machine_config &config)
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("qx10_flop");
 
-	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(qx10_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(qx10_state::quickload_cb));
 }
 
 /* ROM definition */

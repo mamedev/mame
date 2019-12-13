@@ -42,8 +42,19 @@ public:
 	void set_busnum(int busnum) { m_busnum = busnum; }
 	void set_father(const char *father) { m_father = father; }
 
-	template <typename... T> void set_device_read(int num, T &&... args)  { m_read_callback[num] = pci_bus_legacy_read_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_device_write(int num, T &&... args) { m_write_callback[num] = pci_bus_legacy_write_delegate(std::forward<T>(args)...); }
+	template <typename F, typename G>
+	void set_device(int num, F &&read, const char *rname, G &&write, const char *wname)
+	{
+		m_read_callback[num].set(std::forward<F>(read), rname);
+		m_write_callback[num].set(std::forward<G>(write), wname);
+	}
+
+	template <typename T, typename F, typename G>
+	void set_device(int num, T &&target, F &&read, const char *rname, G &&write, const char *wname)
+	{
+		m_read_callback[num].set(target, std::forward<F>(read), rname);
+		m_write_callback[num].set(target, std::forward<G>(write), wname);
+	}
 
 	pci_bus_legacy_device *pci_search_bustree(int busnum, int devicenum, pci_bus_legacy_device *pcibus);
 	void add_sibling(pci_bus_legacy_device *sibling, int busnum);
@@ -56,8 +67,8 @@ protected:
 
 private:
 	uint8_t             m_busnum;
-	pci_bus_legacy_read_delegate m_read_callback[32];
-	pci_bus_legacy_write_delegate m_write_callback[32];
+	pci_bus_legacy_read_delegate::array<32> m_read_callback;
+	pci_bus_legacy_write_delegate::array<32> m_write_callback;
 	const char *        m_father;
 	pci_bus_legacy_device * m_siblings[8];
 	uint8_t             m_siblings_busnum[8];
@@ -71,6 +82,5 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(PCI_BUS_LEGACY, pci_bus_legacy_device)
-
 
 #endif // MAME_MACHINE_LPCI_H

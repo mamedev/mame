@@ -8,8 +8,6 @@
 #include "nlid_system.h"
 #include "netlist/analog/nlid_twoterm.h"
 
-#include <cmath>
-
 namespace netlist
 {
 	namespace devices
@@ -31,8 +29,8 @@ namespace netlist
 		, m_last_trig(*this, "m_last_trig", 0)
 		, m_state(*this, "m_state", 0)
 		, m_KP(*this, "m_KP", 0)
-		, m_K(*this, "K", (m_dev_type == 4538) ? 1.0 : 0.4) // CD4538 datasheet states PW=RC
-		, m_RI(*this, "RI", 400.0) // around 250 for HC series, 400 on LS/TTL, estimated from datasheets
+		, m_K(*this, "K", nlconst::magic((m_dev_type == 4538) ? 1.0 : 0.4)) // CD4538 datasheet states PW=RC
+		, m_RI(*this, "RI", nlconst::magic(400.0)) // around 250 for HC series, 400 on LS/TTL, estimated from datasheets
 		{
 			if ((m_dev_type != 9602) && (m_dev_type != 4538) )
 				m_dev_type = 74123;
@@ -74,10 +72,10 @@ namespace netlist
 
 		state_var<netlist_sig_t> m_last_trig;
 		state_var<unsigned>      m_state;
-		state_var<double>        m_KP;
+		state_var<nl_fptype>        m_KP;
 
-		param_double_t m_K;
-		param_double_t m_RI;
+		param_fp_t m_K;
+		param_fp_t m_RI;
 	};
 
 	NETLIB_OBJECT(74123_dip)
@@ -182,7 +180,7 @@ namespace netlist
 
 	NETLIB_UPDATE(74123)
 	{
-		netlist_sig_t m_trig;
+		netlist_sig_t m_trig(0);
 		netlist_sig_t res = !m_CLRQ();
 		netlist_time t_AB_to_Q = NLTIME_FROM_NS(10);
 		netlist_time t_C_to_Q = NLTIME_FROM_NS(10);
@@ -232,7 +230,7 @@ namespace netlist
 
 		if (m_state == 1)
 		{
-			const nl_double vLow = m_KP * m_RP.m_R.m_P();
+			const nl_fptype vLow = m_KP * m_RP.m_R.m_P();
 			if (m_CV() < vLow)
 			{
 				m_RN_Q.push(0, NLTIME_FROM_NS(10)); // R_OFF
@@ -241,7 +239,7 @@ namespace netlist
 		}
 		if (m_state == 2)
 		{
-			const nl_double vHigh = m_RP.m_R.m_P() * (1.0 - m_KP);
+			const nl_fptype vHigh = m_RP.m_R.m_P() * (nlconst::one() - m_KP);
 			if (m_CV() > vHigh)
 			{
 				m_RP_Q.push(0, NLTIME_FROM_NS(10)); // R_OFF
@@ -255,7 +253,7 @@ namespace netlist
 
 	NETLIB_RESET(74123)
 	{
-		m_KP = 1.0 / (1.0 + exp(m_K()));
+		m_KP = plib::reciprocal(nlconst::one() + plib::exp(m_K()));
 
 		m_RP.reset();
 		m_RN.reset();

@@ -1738,7 +1738,7 @@ void taitob_state::rastsag2(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -1792,7 +1792,7 @@ void taitob_state::masterw(machine_config &config)
 	Z80(config, m_audiocpu, 24_MHz_XTAL / 4);  /* 6 MHz Z80B */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::masterw_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
 	tc0040ioc.read_0_callback().set_ioport("DSWA");
@@ -1863,7 +1863,7 @@ void taitob_state::ashura(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -1917,7 +1917,7 @@ void taitob_state::crimec(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -1971,7 +1971,7 @@ void hitice_state::hitice(machine_config &config)
 	Z80(config, m_audiocpu, 24_MHz_XTAL / 4);  /* 6 MHz Z80B */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &hitice_state::viofight_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -2030,7 +2030,7 @@ void taitob_state::rambo3p(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -2084,7 +2084,7 @@ void taitob_state::rambo3(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4); /* 4MHz verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -2138,7 +2138,7 @@ void taitob_state::pbobble(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 2);  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -2197,7 +2197,7 @@ void taitob_state::spacedx(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -2256,7 +2256,7 @@ void taitob_state::spacedxo(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -2310,7 +2310,7 @@ void taitob_state::qzshowby(machine_config &config)
 	Z80(config, m_audiocpu, 4000000);  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -2369,7 +2369,7 @@ void taitob_state::viofight(machine_config &config)
 	Z80(config, m_audiocpu, 24_MHz_XTAL / 4);  /* 6 MHz verified */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::viofight_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -2428,7 +2428,7 @@ void taitob_state::silentd(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -2482,7 +2482,7 @@ void taitob_state::selfeena(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -2545,7 +2545,7 @@ void taitob_state::ryujin(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -2606,7 +2606,7 @@ void taitob_state::sbm(machine_config &config)
 	Z80(config, m_audiocpu, 4000000);  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0510NIO(config, m_tc0510nio, 0);
 	m_tc0510nio->read_0_callback().set_ioport("DSWA");
@@ -2660,7 +2660,7 @@ void taitob_c_state::realpunc(machine_config &config)
 	Z80(config, m_audiocpu, 6000000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_c_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0510NIO(config, m_tc0510nio, 0);
 	m_tc0510nio->read_0_callback().set_ioport("DSWA");

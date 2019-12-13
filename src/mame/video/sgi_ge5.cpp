@@ -16,7 +16,6 @@
  * TODO:
  *   - implement host dma
  *   - verify some operations
- *   - tidy up latch/timing logic
  *   - implement single stepping
  *   - redo disassembly
  *   - save state
@@ -29,6 +28,7 @@
 #define LOG_GENERAL   (1U << 0)
 #define LOG_TOKEN     (1U << 1)
 #define LOG_MEMORY    (1U << 2)
+#define LOG_DMA       (1U << 3)
 
 //#define VERBOSE       (LOG_GENERAL)
 #include "logmacro.h"
@@ -147,7 +147,7 @@ void sgi_ge5_device::device_add_mconfig(machine_config &config)
 {
 	WTL3132(config, m_fpu, clock());
 	m_fpu->out_fpcn().set([this](int state) { m_fpu_c = bool(state); });
-	m_fpu->out_port_x().set([this](u32 data) { m_bus = data; });
+	m_fpu->out_port_x().set([this](u32 data) { m_fpu_data = data; });
 }
 
 
@@ -186,6 +186,7 @@ void sgi_ge5_device::device_start()
 
 void sgi_ge5_device::device_reset()
 {
+	m_pc = 0;
 	m_sp = 0;
 	m_reptr = 0;
 	m_memptr = 0;
@@ -225,7 +226,7 @@ void sgi_ge5_device::execute_run()
 
 			// execute secondary operation
 			if (m_decode.secondary)
-				secondary(m_bus_latch);
+				secondary();
 
 			// increment memptr
 			if (m_decode.inc_memptr)
@@ -272,6 +273,7 @@ void sgi_ge5_device::execute_run()
 				break;
 			case 3: // fpu
 				m_decode.fpu |= (2ULL << wtl3132_device::S_IOCT);
+				m_bus = m_fpu_data;
 				break;
 			}
 			break;
@@ -341,7 +343,9 @@ void sgi_ge5_device::execute_run()
 						if (token < ARRAY_LENGTH(token_puc))
 							string = token_puc[token];
 					}
-					else if (space(1).read_dword(0x50d) == 0x004d0005 || space(1).read_dword(0x536) == 0x12345678)
+					else if (space(1).read_dword(0x50d) == 0x004d0005
+						|| space(1).read_dword(0x536) == 0x12345678
+						|| space(1).read_dword(0x540) == 0x12345678)
 					{
 						if (token < ARRAY_LENGTH(token_gl))
 							string = token_gl[token];
@@ -396,6 +400,8 @@ void sgi_ge5_device::execute_run()
 			case 0xf: // dma cycle
 				if (--m_dma_count)
 					m_pc -= m_decode.secondary ? 2 : 1;
+				else
+					LOGMASKED(LOG_DMA, "dma complete\n");
 				break;
 			}
 			break;
@@ -445,7 +451,6 @@ void sgi_ge5_device::execute_run()
 			}
 
 			// FIXME: fpu condition has additional 1 cycle latency
-			m_bus_latch = m_bus;
 			m_fpu_c_latch = m_fpu_c;
 
 			// fpu operation
@@ -487,7 +492,7 @@ void sgi_ge5_device::decode()
 	}
 }
 
-void sgi_ge5_device::secondary(u64 bus)
+void sgi_ge5_device::secondary()
 {
 	switch (m_decode.operation)
 	{
@@ -520,7 +525,7 @@ void sgi_ge5_device::secondary(u64 bus)
 		break;
 
 	case 0xb0: // load memptr
-		m_memptr = bus & 0x7fff;
+		m_memptr = m_bus & 0x7fff;
 		break;
 
 	case 0xb4: // set memptr
@@ -529,6 +534,7 @@ void sgi_ge5_device::secondary(u64 bus)
 
 	case 0xb6: // set memptr; set finish flag
 		m_memptr = m_decode.immediate & 0x7fff;
+		LOG("finish flag %d set (%s)\n", m_decode.immediate & 1, machine().describe_context());
 		m_finish[m_decode.immediate & 1] = 1;
 		break;
 
@@ -544,6 +550,7 @@ void sgi_ge5_device::secondary(u64 bus)
 		switch (m_decode.immediate)
 		{
 		case 0: // TODO: assert dma ready
+			LOGMASKED(LOG_DMA, "dma ready\n");
 			break;
 
 		default: // assert interrupt
@@ -557,10 +564,12 @@ void sgi_ge5_device::secondary(u64 bus)
 		switch (m_decode.immediate)
 		{
 		case 0: // TODO: reset dma?
+			LOGMASKED(LOG_DMA, "dma reset\n");
 			break;
 
 		default: // load dma count
 			m_dma_count = m_bus;
+			LOGMASKED(LOG_DMA, "dma count %d\n", m_dma_count);
 			break;
 		}
 		break;
@@ -592,22 +601,26 @@ void sgi_ge5_device::command_w(offs_t offset, u16 data, u16 mem_mask)
 		break;
 	}
 }
+template u32 sgi_ge5_device::code_r<false>(offs_t offset);
+template u32 sgi_ge5_device::code_r<true>(offs_t offset);
+template void sgi_ge5_device::code_w<false>(offs_t offset, u32 data, u32 mem_mask);
+template void sgi_ge5_device::code_w<true>(offs_t offset, u32 data, u32 mem_mask);
 
-u32 sgi_ge5_device::code_r(offs_t offset)
+template <bool High> u32 sgi_ge5_device::code_r(offs_t offset)
 {
 	m_pc = offset | offs_t(m_mar & 0x7f) << 8;
 	u64 const data = space(0).read_qword(m_pc);
 
-	return m_mar_msb ? u32(data >> 32) : u32(data);
+	return High ? u32(data >> 32) : u32(data);
 }
 
-void sgi_ge5_device::code_w(offs_t offset, u32 data, u32 mem_mask)
+template <bool High> void sgi_ge5_device::code_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	m_pc = offset | offs_t(m_mar & 0x7f) << 8;
 
-	LOGMASKED(LOG_MEMORY, "code_w msb %d offset 0x%08x data 0x%08x mask 0x%08x (%s)\n", m_mar_msb, m_pc, data, mem_mask, machine().describe_context());
+	LOGMASKED(LOG_MEMORY, "code_w msb %d offset 0x%08x data 0x%08x mask 0x%08x (%s)\n", High, m_pc, data, mem_mask, machine().describe_context());
 
-	if (m_mar_msb)
+	if (High)
 	{
 		u64 const mask = u64(mem_mask & 0x000000ffU) << 32;
 
@@ -626,16 +639,14 @@ void sgi_ge5_device::code_w(offs_t offset, u32 data, u32 mem_mask)
 
 u32 sgi_ge5_device::data_r(offs_t offset)
 {
-	// FIXME: 5 or 6 bits from MAR?
-	m_memptr = offset | offs_t(m_mar & 0x1f) << 8;
+	m_memptr = offset | offs_t(m_mar & 0x3f) << 8;
 
 	return space(1).read_dword(m_memptr);
 }
 
 void sgi_ge5_device::data_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	// FIXME: 5 or 6 bits from MAR?
-	m_memptr = offset | offs_t(m_mar & 0x1f) << 8;
+	m_memptr = offset | offs_t(m_mar & 0x3f) << 8;
 
 	space(1).write_dword(m_memptr, data, mem_mask);
 }
@@ -693,7 +704,7 @@ offs_t sgi_ge5_disassembler::disassemble(std::ostream &stream, offs_t pc, data_b
 	case 3:
 	case 5:
 	case 6:
-		fpu_ctrl |= 0x2'0000'0000; // ENCN=2
+		fpu_ctrl |= 0x1'0000'0000; // ENCN=1
 		break;
 	}
 

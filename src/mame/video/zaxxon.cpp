@@ -114,7 +114,7 @@ TILE_GET_INFO_MEMBER(zaxxon_state::congo_get_fg_tile_info)
  *
  *************************************/
 
-void zaxxon_state::video_start_common(tilemap_get_info_delegate fg_tile_info)
+void zaxxon_state::video_start_common(tilemap_get_info_delegate &&fg_tile_info)
 {
 	/* reset globals */
 	m_bg_enable = 0;
@@ -126,14 +126,14 @@ void zaxxon_state::video_start_common(tilemap_get_info_delegate fg_tile_info)
 	m_congo_color_bank = 0;
 	memset(m_congo_custom, 0, sizeof(m_congo_custom));
 
-	/* create a background and foreground tilemap */
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(zaxxon_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,512);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, fg_tile_info, TILEMAP_SCAN_ROWS,  8,8, 32,32);
+	// create a background and foreground tilemap
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(zaxxon_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,512);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, std::move(fg_tile_info), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 
-	/* configure the foreground tilemap */
+	// configure the foreground tilemap
 	m_fg_tilemap->set_transparent_pen(0);
 
-	/* register for save states */
+	// register for save states
 	save_item(NAME(m_bg_enable));
 	save_item(NAME(m_bg_color));
 	save_item(NAME(m_bg_position));
@@ -144,13 +144,13 @@ void zaxxon_state::video_start_common(tilemap_get_info_delegate fg_tile_info)
 
 void zaxxon_state::video_start()
 {
-	video_start_common(tilemap_get_info_delegate(FUNC(zaxxon_state::zaxxon_get_fg_tile_info),this));
+	video_start_common(tilemap_get_info_delegate(*this, FUNC(zaxxon_state::zaxxon_get_fg_tile_info)));
 }
 
 
 VIDEO_START_MEMBER(zaxxon_state,razmataz)
 {
-	video_start_common(tilemap_get_info_delegate(FUNC(zaxxon_state::razmataz_get_fg_tile_info),this));
+	video_start_common(tilemap_get_info_delegate(*this, FUNC(zaxxon_state::razmataz_get_fg_tile_info)));
 }
 
 
@@ -164,7 +164,7 @@ VIDEO_START_MEMBER(zaxxon_state,congo)
 	save_item(NAME(m_congo_color_bank));
 	save_item(NAME(m_congo_custom));
 
-	video_start_common(tilemap_get_info_delegate(FUNC(zaxxon_state::congo_get_fg_tile_info),this));
+	video_start_common(tilemap_get_info_delegate(*this, FUNC(zaxxon_state::congo_get_fg_tile_info)));
 }
 
 

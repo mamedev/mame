@@ -33,14 +33,14 @@ public:
 	virtual void call_unload() override;
 
 	// image device
-	virtual iodevice_t image_type() const override { return IO_MIDIOUT; }
-	virtual bool is_readable()  const override { return 0; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *file_extensions() const override { return "mid"; }
-	virtual bool core_opens_image_file() const override { return false; }
+	virtual iodevice_t image_type() const noexcept override { return IO_MIDIOUT; }
+	virtual bool is_readable()  const noexcept override { return false; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override { return "mid"; }
+	virtual bool core_opens_image_file() const noexcept override { return false; }
 
 	virtual void tx(uint8_t state) { rx_w(state); }
 

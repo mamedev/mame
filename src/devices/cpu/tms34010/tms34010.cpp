@@ -88,8 +88,12 @@ tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type
 	, m_pixperclock(0)
 	, m_scantimer(nullptr)
 	, m_icount(0)
+	, m_scanline_ind16_cb(*this)
+	, m_scanline_rgb32_cb(*this)
 	, m_output_int_cb(*this)
 	, m_ioreg_pre_write_cb(*this)
+	, m_to_shiftreg_cb(*this)
+	, m_from_shiftreg_cb(*this)
 {
 }
 
@@ -187,10 +191,13 @@ device_memory_interface::space_config_vector tms340x0_device::memory_space_confi
 #define OFFSET()       BREG(4)
 #define WSTART_X()     BREG_X(5)
 #define WSTART_Y()     BREG_Y(5)
+#define WSTART_XY()    BREG_XY(5)
 #define WEND_X()       BREG_X(6)
 #define WEND_Y()       BREG_Y(6)
+#define WEND_XY()      BREG_XY(6)
 #define DYDX_X()       BREG_X(7)
 #define DYDX_Y()       BREG_Y(7)
+#define DYDX_XY()      BREG_XY(7)
 #define COLOR0()       BREG(8)
 #define COLOR1()       BREG(9)
 #define COUNT()        BREG(10)
@@ -626,12 +633,12 @@ void tms340x0_device::check_interrupt()
 
 void tms340x0_device::device_start()
 {
-	m_scanline_ind16_cb.bind_relative_to(*owner());
-	m_scanline_rgb32_cb.bind_relative_to(*owner());
+	m_scanline_ind16_cb.resolve();
+	m_scanline_rgb32_cb.resolve();
 	m_output_int_cb.resolve();
 	m_ioreg_pre_write_cb.resolve();
-	m_to_shiftreg_cb.bind_relative_to(*owner());
-	m_from_shiftreg_cb.bind_relative_to(*owner());
+	m_to_shiftreg_cb.resolve();
+	m_from_shiftreg_cb.resolve();
 
 	m_external_host_access = false;
 
@@ -1496,7 +1503,7 @@ u16 tms34020_device::io_register_r(offs_t offset)
 {
 	int result, total;
 
-	LOGCONTROLREGS("%s: read %s\n", machine().describe_context(), ioreg_name[offset]);
+	LOGCONTROLREGS("%s: read %s\n", machine().describe_context(), ioreg020_name[offset]);
 
 	switch (offset)
 	{

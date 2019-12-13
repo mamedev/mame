@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
-	<element name="led" defstate="0">
+	<element name="led" defstate="1">
 		<disk state="0">
 			<color red="0.75" green="0.0" blue="0.0" />
 		</disk>

@@ -76,7 +76,7 @@ namespace netlist
 		logic_input_t m_DIN;
 		logic_output_t m_DOUTQ;
 
-		state_array<uint64_t, 4> m_ram; // 256 bits
+		state_container<std::array<uint64_t, 4>> m_ram; // 256 bits
 		state_var_u8 m_addr; // 256 bits
 		state_var_sig m_enq;
 		nld_power_pins m_power_pins;

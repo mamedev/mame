@@ -96,10 +96,10 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	int get_current_scanline() { return m_scanline; }
-	void set_scanline_callback( scanline_delegate &&cb ) { m_scanline_callback_proc = std::move(cb); m_scanline_callback_proc.bind_relative_to(*owner()); }
-	void set_hblank_callback( hblank_delegate &&cb ) { m_hblank_callback_proc = std::move(cb); m_hblank_callback_proc.bind_relative_to(*owner()); }
-	void set_vidaccess_callback( vidaccess_delegate &&cb ) { m_vidaccess_callback_proc = std::move(cb); m_vidaccess_callback_proc.bind_relative_to(*owner()); }
-	void set_scanlines_per_frame( int scanlines ) { m_scanlines_per_frame = scanlines; }
+	template <typename... T> void set_scanline_callback(T &&... args) { m_scanline_callback_proc.set(std::forward<T>(args)...); m_scanline_callback_proc.resolve(); /* FIXME: if this is supposed to be set at config time, it should be resolved on start */ }
+	template <typename... T> void set_hblank_callback(T &&... args) { m_hblank_callback_proc.set(std::forward<T>(args)...); m_hblank_callback_proc.resolve(); /* FIXME: if this is supposed to be set at config time, it should be resolved on start */ }
+	template <typename... T> void set_vidaccess_callback(T &&... args) { m_vidaccess_callback_proc.set(std::forward<T>(args)...); m_vidaccess_callback_proc.resolve(); /* FIXME: if this is supposed to be set at config time, it should be resolved on start */ }
+	void set_scanlines_per_frame(int scanlines) { m_scanlines_per_frame = scanlines; }
 
 	// MMC5 has to be able to check this
 	int is_sprite_8x16() { return m_regs[PPU_CONTROL0] & PPU_CONTROL0_SPRITE_SIZE; }
@@ -107,7 +107,7 @@ public:
 	int get_tilenum() { return m_tilecount; }
 
 	//27/12/2002 (HACK!)
-	void set_latch( latch_delegate &&cb ) { m_latch = std::move(cb); m_latch.bind_relative_to(*owner()); }
+	template <typename... T> void set_latch(T &&... args) { m_latch.set(std::forward<T>(args)...); m_latch.resolve(); /* FIXME: if this is supposed to be set at config time, it should be resolved on start */ }
 
 	//  void update_screen(bitmap_t &bitmap, const rectangle &cliprect);
 

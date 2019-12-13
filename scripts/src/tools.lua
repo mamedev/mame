@@ -133,6 +133,15 @@ files {
 configuration { "mingw*" or "vs*" }
 	targetextension ".exe"
 
+-- workaround for https://developercommunity.visualstudio.com/content/problem/752372/vs2019-v1631-c-internal-compiler-error-when-zi-opt.html
+-- should be fixed in 16.5
+configuration { "Debug", "vs2019" }
+	if _OPTIONS["vs"]==nil then
+		flags {
+			"NoEditAndContinue",
+		}
+	end
+
 configuration { }
 
 strip()
@@ -749,6 +758,15 @@ files {
 configuration { "mingw*" or "vs*" }
 	targetextension ".exe"
 
+-- workaround for https://developercommunity.visualstudio.com/content/problem/752372/vs2019-v1631-c-internal-compiler-error-when-zi-opt.html
+-- should be fixed in 16.5
+configuration { "Debug", "vs2019" }
+	if _OPTIONS["vs"]==nil then
+		flags {
+			"NoEditAndContinue",
+		}
+	end
+
 configuration { }
 
 strip()
@@ -813,6 +831,7 @@ if (_OPTIONS["osd"] == "sdl") then
 	end
 
 	links {
+		"utils",
 		"ocore_" .. _OPTIONS["osd"],
 		ext_lib("utf8proc"),
 	}
@@ -876,6 +895,7 @@ if (_OPTIONS["osd"] == "sdl") then
 
 	includedirs {
 		MAME_DIR .. "src/osd",
+		MAME_DIR .. "src/lib/util",
 	}
 
 	files {

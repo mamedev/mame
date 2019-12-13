@@ -388,10 +388,10 @@ void a5105_state::a5105_io(address_map &map)
 	map(0x98, 0x99).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
 
 	map(0x9c, 0x9c).w(FUNC(a5105_state::pcg_val_w));
-//  AM_RANGE(0x9d, 0x9d) crtc area (ff-based), palette routes here
+//  map(0x9d, 0x9d) crtc area (ff-based), palette routes here
 	map(0x9e, 0x9e).w(FUNC(a5105_state::pcg_addr_w));
 
-//  AM_RANGE(0xa0, 0xa1) ay8910?
+//  map(0xa0, 0xa1) ay8910?
 	map(0xa8, 0xa8).rw(FUNC(a5105_state::a5105_memsel_r), FUNC(a5105_state::a5105_memsel_w));
 	map(0xa9, 0xa9).r(FUNC(a5105_state::key_r));
 	map(0xaa, 0xaa).rw(FUNC(a5105_state::key_mux_r), FUNC(a5105_state::key_mux_w));

@@ -209,7 +209,7 @@ protected:
 
 // ======================> device_ieee488_interface
 
-class device_ieee488_interface : public device_slot_card_interface
+class device_ieee488_interface : public device_interface
 {
 	friend class ieee488_device;
 	template <class ElementType> friend class simple_list;

@@ -38,6 +38,9 @@ public:
 		subdevice<isa8_device>("isa")->set_iospace(std::forward<T>(tag), AS_IO);
 	}
 
+	auto int_callback() { return m_int_callback.bind(); }
+	auto nmi_callback() { return m_nmi_callback.bind(); }
+
 	void map(address_map &map);
 
 	uint8_t m_pit_out2;
@@ -56,6 +59,7 @@ protected:
 	ibm5160_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	// optional information overrides
@@ -74,6 +78,9 @@ protected:
 	required_device<isa8_device>            m_isabus;
 	optional_device<pc_kbdc_device>         m_pc_kbdc;
 	required_device<ram_device>             m_ram;
+
+	devcb_write_line m_int_callback;
+	devcb_write_line m_nmi_callback;
 
 	/* U73 is an LS74 - dual flip flop */
 	/* Q2 is set by OUT1 from the 8253 and goes to DRQ1 on the 8237 */

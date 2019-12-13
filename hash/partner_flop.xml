@@ -8,7 +8,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="disk1.cpm" size="819200" crc="98e7a956" sha1="348ecc7a7f77a20f26e1f36c79dde5cc303807ce" offset="0" />
+				<rom name="disk1.cpm" size="819200" crc="98e7a956" sha1="348ecc7a7f77a20f26e1f36c79dde5cc303807ce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19,7 +19,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="disk2.cpm" size="819200" crc="c687b93e" sha1="a4dfb26d207976bf7cd5b9901df54bd854aeba52" offset="0" />
+				<rom name="disk2.cpm" size="819200" crc="c687b93e" sha1="a4dfb26d207976bf7cd5b9901df54bd854aeba52"/>
 			</dataarea>
 		</part>
 	</software>

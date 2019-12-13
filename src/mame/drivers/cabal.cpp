@@ -590,7 +590,7 @@ void cabal_state::cabalbl(machine_config &config)
 	adpcm_2.set_addrmap(AS_IO, &cabal_state::cabalbl_talk2_portmap);
 	adpcm_2.set_periodic_int(FUNC(cabal_state::irq0_line_hold), attotime::from_hz(8000));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_START_OVERRIDE(cabal_state,cabalbl)
 	MCFG_MACHINE_RESET_OVERRIDE(cabal_state,cabalbl)

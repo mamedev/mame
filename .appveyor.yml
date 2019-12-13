@@ -1,9 +1,7 @@
 version: 1.0.{build}
 image:
   - Visual Studio 2017
-  - Visual Studio 2017 Preview
-  - Visual Studio 2019 Preview
-  - Previous Visual Studio 2017
+  - Visual Studio 2019
 
 shallow_clone: true
 clone_depth: 1
@@ -15,29 +13,32 @@ environment:
 
 matrix:
   exclude:
-    - image: Visual Studio 2017 Preview
-      BUILD: GCC
-    - image: Visual Studio 2019 Preview
-      BUILD: GCC
-    - image: Previous Visual Studio 2017
+    - image: Visual Studio 2017
+      BUILD: MSVC
+    - image: Visual Studio 2019
       BUILD: GCC
 
 install:
   - set "PATH=C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\Windows\System32;C:\Windows;%PATH%"
   - set MSYSTEM=MINGW64
-  - set PreferredToolArchitecture=x64
-  
-build_script:
-  - bash -lc "exec 0</dev/null && cd $APPVEYOR_BUILD_FOLDER && make SUBTARGET=tiny PTR64=1 TOOLS=1 OPTIMIZE=0 vs2017 -j4"
-  - msbuild "build\projects\windows\mametiny\vs2017\mametiny.sln" /m /p:ContinueOnError=false /p:StopOnFirstFailure=true /property:Configuration=Debug /property:Platform=x64 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
+build_script:
+  - bash -lc "exec 0</dev/null && cd $APPVEYOR_BUILD_FOLDER && export MINGW64=/mingw64 && make SUBTARGET=tiny PTR64=1 TOOLS=1 OPTIMIZE=0 vs2019 -j3"
+  - msbuild "build\projects\windows\mametiny\vs2019\mametiny.sln" /m /p:ContinueOnError=false /p:StopOnFirstFailure=true /property:Configuration=Debug /property:Platform=x64 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 for:
   -
     matrix:
       only:
         - BUILD: GCC
+    cache:
+      - C:\msys64\var\cache\pacman\pkg
+    install:
+      - set "PATH=C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\Windows\System32;C:\Windows;%PATH%"
+      - set MSYSTEM=MINGW64
+      - bash -lc "pacman -Syu --noconfirm"
+      - bash -lc "pacman -Syu --noconfirm"
     build_script:
-      - bash -lc "exec 0</dev/null && cd $APPVEYOR_BUILD_FOLDER && export MINGW64=/mingw64 && make SUBTARGET=tiny PTR64=1 OPTIMIZE=0 ARCHOPTS=-Wa,-mbig-obj IGNORE_GIT=1 -j4"
+      - bash -lc "exec 0</dev/null && cd $APPVEYOR_BUILD_FOLDER && export MINGW64=/mingw64 && make SUBTARGET=tiny PTR64=1 TOOLS=1 OPTIMIZE=1 IGNORE_GIT=1 -j3"
     test_script:
       - \projects\mame\mametiny64.exe -validate
     after_test:

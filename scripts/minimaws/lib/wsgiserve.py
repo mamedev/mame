@@ -13,13 +13,15 @@ import mimetypes
 import os.path
 import re
 import sys
-import wsgiref.simple_server
+import urllib
 import wsgiref.util
 
 if sys.version_info >= (3, ):
     import urllib.parse as urlparse
+    urlquote = urlparse.quote
 else:
     import urlparse
+    urlquote = urllib.quote
 
 
 class HandlerBase(object):
@@ -96,10 +98,10 @@ class QueryPageHandler(HandlerBase):
         self.dbcurs = app.dbconn.cursor()
 
     def machine_href(self, shortname):
-        return cgi.escape(urlparse.urljoin(self.application_uri, 'machine/%s' % (shortname, )), True)
+        return cgi.escape(urlparse.urljoin(self.application_uri, 'machine/%s' % (urlquote(shortname), )), True)
 
     def sourcefile_href(self, sourcefile):
-        return cgi.escape(urlparse.urljoin(self.application_uri, 'sourcefile/%s' % (sourcefile, )), True)
+        return cgi.escape(urlparse.urljoin(self.application_uri, 'sourcefile/%s' % (urlquote(sourcefile), )), True)
 
 
 class MachineRpcHandlerBase(QueryPageHandler):
@@ -174,21 +176,21 @@ class MachineHandler(QueryPageHandler):
             if parent:
                 yield (
                         '    <tr><th>Parent Machine:</th><td><a href="%s">%s (%s)</a></td></tr>\n' %
-                        (cgi.escape('%smachine/%s' % (self.application_uri, machine_info['cloneof']), True), cgi.escape(parent[1]), cgi.escape(machine_info['cloneof']))).encode('utf-8')
+                        (self.machine_href(machine_info['cloneof']), cgi.escape(parent[1]), cgi.escape(machine_info['cloneof']))).encode('utf-8')
             else:
                 yield (
                         '    <tr><th>Parent Machine:</th><td><a href="%s">%s</a></td></tr>\n' %
-                        (cgi.escape('%smachine/%s' % (self.application_uri, machine_info['cloneof']), True), cgi.escape(machine_info['cloneof']))).encode('utf-8')
+                        (self.machine_href(machine_info['cloneof']), cgi.escape(machine_info['cloneof']))).encode('utf-8')
         if (machine_info['romof'] is not None) and (machine_info['romof'] != machine_info['cloneof']):
             parent = self.dbcurs.listfull(machine_info['romof']).fetchone()
             if parent:
                 yield (
                         '    <tr><th>Parent ROM set:</th><td><a href="%s">%s (%s)</a></td></tr>\n' %
-                        (cgi.escape('%smachine/%s' % (self.application_uri, machine_info['romof']), True), cgi.escape(parent[1]), cgi.escape(machine_info['romof']))).encode('utf-8')
+                        (self.machine_href(machine_info['romof']), cgi.escape(parent[1]), cgi.escape(machine_info['romof']))).encode('utf-8')
             else:
                 yield (
                         '    <tr><th>Parent Machine:</th><td><a href="%s">%s</a></td></tr>\n' %
-                        (cgi.escape('%smachine/%s' % (self.application_uri, machine_info['romof']), True), cgi.escape(machine_info['romof']))).encode('utf-8')
+                        (self.machine_href(machine_info['romof']), cgi.escape(machine_info['romof']))).encode('utf-8')
         unemulated = []
         imperfect = []
         for feature, status, overall in self.dbcurs.get_feature_flags(id):
@@ -404,10 +406,10 @@ class SourceFileHandler(QueryPageHandler):
         uri = urlparse.urljoin(self.application_uri, 'sourcefile')
         title = ''
         for part in parts:
-            uri = urlparse.urljoin(uri + '/', part)
+            uri = urlparse.urljoin(uri + '/', urlquote(part))
             title += '<a href="{0}">{1}</a>/'.format(cgi.escape(uri, True), cgi.escape(part))
         if linkfinal:
-            uri = urlparse.urljoin(uri + '/', final)
+            uri = urlparse.urljoin(uri + '/', urlquote(final))
             return title + '<a href="{0}">{1}</a>'.format(cgi.escape(uri, True), cgi.escape(final))
         else:
             return title + final
@@ -422,6 +424,28 @@ class SourceFileHandler(QueryPageHandler):
                 manufacturer=cgi.escape(machine_info['manufacturer'] or ''),
                 runnable=cgi.escape('Yes' if machine_info['runnable'] else 'No'),
                 parent=cgi.escape(machine_info['cloneof'] or '')).encode('utf-8')
+
+
+class RomIdentHandler(QueryPageHandler):
+    def __init__(self, app, application_uri, environ, start_response, **kwargs):
+        super(QueryPageHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+        self.dbcurs = app.dbconn.cursor()
+
+    def __iter__(self):
+        if self.environ['PATH_INFO']:
+            self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
+            return self.error_page(404)
+        elif self.environ['REQUEST_METHOD'] != 'GET':
+            self.start_response('405 %s' % (self.STATUS_MESSAGE[405], ), [('Content-type', 'text/html; charset=utf-8'), ('Accept', 'GET, HEAD, OPTIONS'), ('Cache-Control', 'public, max-age=3600')])
+            return self.error_page(405)
+        else:
+            self.start_response('200 OK', [('Content-type', 'text/html; chearset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
+            return self.form_page()
+
+    def form_page(self):
+        yield htmltmpl.ROMIDENT_PAGE.substitute(
+                app=self.js_escape(cgi.escape(self.application_uri, True)),
+                assets=self.js_escape(cgi.escape(urlparse.urljoin(self.application_uri, 'static'), True))).encode('utf-8')
 
 
 class BiosRpcHandler(MachineRpcHandlerBase):
@@ -477,12 +501,86 @@ class SlotsRpcHandler(MachineRpcHandlerBase):
         yield json.dumps(result).encode('utf-8')
 
 
+class RomDumpsRpcHandler(QueryPageHandler):
+    def __init__(self, app, application_uri, environ, start_response, **kwargs):
+        super(RomDumpsRpcHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+
+    def __iter__(self):
+        if self.environ['PATH_INFO']:
+            self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
+            return self.error_page(404)
+        elif self.environ['REQUEST_METHOD'] != 'GET':
+            self.start_response('405 %s' % (self.STATUS_MESSAGE[405], ), [('Content-type', 'text/html; charset=utf-8'), ('Accept', 'GET, HEAD, OPTIONS'), ('Cache-Control', 'public, max-age=3600')])
+            return self.error_page(405)
+        else:
+            try:
+                args = urlparse.parse_qs(self.environ['QUERY_STRING'], keep_blank_values=True, strict_parsing=True)
+                crc = args.get('crc')
+                sha1 = args.get('sha1')
+                if (len(args) == 2) and (crc is not None) and (len(crc) == 1) and (sha1 is not None) and (len(sha1) == 1):
+                    crc = int(crc[0], 16)
+                    sha1 = sha1[0]
+                    self.start_response('200 OK', [('Content-type', 'application/json; chearset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
+                    return self.data_page(crc, sha1)
+            except BaseException as e:
+                pass
+            self.start_response('500 %s' % (self.STATUS_MESSAGE[500], ), [('Content-type', 'text/html; charset=utf-8'), ('Accept', 'GET, HEAD, OPTIONS'), ('Cache-Control', 'public, max-age=3600')])
+            return self.error_page(500)
+
+    def data_page(self, crc, sha1):
+        result = { }
+        for shortname, description, label, bad in self.dbcurs.get_rom_dumps(crc, sha1):
+            machine = result.get(shortname)
+            if machine is None:
+                machine = { 'description': description, 'matches': [ ] }
+                result[shortname] = machine
+            machine['matches'].append({ 'name': label, 'bad': bool(bad) })
+        yield json.dumps(result).encode('utf-8')
+
+
+class DiskDumpsRpcHandler(QueryPageHandler):
+    def __init__(self, app, application_uri, environ, start_response, **kwargs):
+        super(DiskDumpsRpcHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+
+    def __iter__(self):
+        if self.environ['PATH_INFO']:
+            self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
+            return self.error_page(404)
+        elif self.environ['REQUEST_METHOD'] != 'GET':
+            self.start_response('405 %s' % (self.STATUS_MESSAGE[405], ), [('Content-type', 'text/html; charset=utf-8'), ('Accept', 'GET, HEAD, OPTIONS'), ('Cache-Control', 'public, max-age=3600')])
+            return self.error_page(405)
+        else:
+            try:
+                args = urlparse.parse_qs(self.environ['QUERY_STRING'], keep_blank_values=True, strict_parsing=True)
+                sha1 = args.get('sha1')
+                if (len(args) == 1) and (sha1 is not None) and (len(sha1) == 1):
+                    sha1 = sha1[0]
+                    self.start_response('200 OK', [('Content-type', 'application/json; chearset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
+                    return self.data_page(sha1)
+            except BaseException as e:
+                pass
+            self.start_response('500 %s' % (self.STATUS_MESSAGE[500], ), [('Content-type', 'text/html; charset=utf-8'), ('Accept', 'GET, HEAD, OPTIONS'), ('Cache-Control', 'public, max-age=3600')])
+            return self.error_page(500)
+
+    def data_page(self, sha1):
+        result = { }
+        for shortname, description, label, bad in self.dbcurs.get_disk_dumps(sha1):
+            machine = result.get(shortname)
+            if machine is None:
+                machine = { 'description': description, 'matches': [ ] }
+                result[shortname] = machine
+            machine['matches'].append({ 'name': label, 'bad': bool(bad) })
+        yield json.dumps(result).encode('utf-8')
+
+
 class MiniMawsApp(object):
     JS_ESCAPE = re.compile('([\"\'\\\\])')
     RPC_SERVICES = {
-            'bios':     BiosRpcHandler,
-            'flags':    FlagsRpcHandler,
-            'slots':    SlotsRpcHandler }
+            'bios':         BiosRpcHandler,
+            'flags':        FlagsRpcHandler,
+            'slots':        SlotsRpcHandler,
+            'romdumps':     RomDumpsRpcHandler,
+            'diskdumps':    DiskDumpsRpcHandler }
 
     def __init__(self, dbfile, **kwargs):
         super(MiniMawsApp, self).__init__(**kwargs)
@@ -493,11 +591,15 @@ class MiniMawsApp(object):
 
     def __call__(self, environ, start_response):
         application_uri = wsgiref.util.application_uri(environ)
+        if application_uri[-1] != '/':
+            application_uri += '/'
         module = wsgiref.util.shift_path_info(environ)
         if module == 'machine':
             return MachineHandler(self, application_uri, environ, start_response)
         elif module == 'sourcefile':
             return SourceFileHandler(self, application_uri, environ, start_response)
+        elif module == 'romident':
+            return RomIdentHandler(self, application_uri, environ, start_response)
         elif module == 'static':
             return AssetHandler(self.assetsdir, self, application_uri, environ, start_response)
         elif module == 'rpc':
@@ -515,12 +617,3 @@ class MiniMawsApp(object):
 
     def js_escape(self, str):
         return self.JS_ESCAPE.sub('\\\\\\1', str).replace('\0', '\\0')
-
-
-def run_server(options):
-    application = MiniMawsApp(options.database)
-    server = wsgiref.simple_server.make_server(options.host, options.port, application)
-    try:
-        server.serve_forever()
-    except KeyboardInterrupt:
-        pass

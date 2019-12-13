@@ -318,7 +318,7 @@ void nexus3d_state::nexus3d(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nexus3d_state::nexus3d_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw((XTAL(14'318'180)*2), 454*2, 0, 640, 262*2, 0, 480); // not accurate, needs CRTC understanding
+	m_screen->set_raw((XTAL(14'318'181)*2), 454*2, 0, 640, 262*2, 0, 480); // not accurate, needs CRTC understanding
 	m_screen->set_screen_update(FUNC(nexus3d_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(nexus3d_state::screen_vblank));
 	m_screen->set_palette("palette");

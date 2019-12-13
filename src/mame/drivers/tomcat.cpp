@@ -343,7 +343,7 @@ void tomcat_state::tomcat(machine_config &config)
 	// OUTB PB0 - PB7   OUTPUT  Speech Data
 	// IRQ CB connected to IRQ line of 6502
 
-	config.m_minimum_quantum = attotime::from_hz(4000);
+	config.set_maximum_quantum(attotime::from_hz(4000));
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set_output("led1").invert();

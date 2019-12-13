@@ -77,7 +77,7 @@ WRITE8_MEMBER(liberate_state::deco16_bank_w)
 	m_bank = data;
 
 	if (m_bank)
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8_delegate(FUNC(liberate_state::deco16_io_r),this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8_delegate(*this, FUNC(liberate_state::deco16_io_r)));
 	else
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0x800f, "bank1");
 }
@@ -180,9 +180,9 @@ WRITE8_MEMBER(liberate_state::prosoccr_io_bank_w)
 	m_bank = data & 1;
 
 	if (m_bank)
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8_delegate(FUNC(liberate_state::deco16_io_r),this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8_delegate(*this, FUNC(liberate_state::deco16_io_r)));
 	else
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8_delegate(FUNC(liberate_state::prosoccr_charram_r),this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8_delegate(*this, FUNC(liberate_state::prosoccr_charram_r)));
 
 }
 
@@ -298,7 +298,7 @@ void liberate_state::deco16_io_map(address_map &map)
 void liberate_state::prosoccr_io_map(address_map &map)
 {
 	map(0x00, 0x00).portr("IN0").w(FUNC(liberate_state::prosoccr_io_bank_w));
-	//AM_RANGE(0x01, 0x01) AM_READ_PORT("TILT")
+	//map(0x01, 0x01).portr("TILT");
 }
 
 void liberate_state::liberatb_map(address_map &map)
@@ -753,7 +753,7 @@ void liberate_state::liberate_base(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &liberate_state::liberate_sound_map);
 	m_audiocpu->set_periodic_int(FUNC(liberate_state::nmi_line_pulse), attotime::from_hz(16*60)); /* ??? */
 
-	config.m_minimum_quantum = attotime::from_hz(12000);
+	config.set_maximum_quantum(attotime::from_hz(12000));
 
 	MCFG_MACHINE_START_OVERRIDE(liberate_state,liberate)
 	MCFG_MACHINE_RESET_OVERRIDE(liberate_state,liberate)
@@ -818,7 +818,7 @@ void liberate_state::prosoccr(machine_config &config)
 	m_audiocpu->set_clock(10000000/8); //xtal is 12 Mhz, divider is unknown
 	m_audiocpu->set_addrmap(AS_PROGRAM, &liberate_state::prosoccr_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(12000);
+	config.set_maximum_quantum(attotime::from_hz(12000));
 
 	subdevice<screen_device>("screen")->set_visarea(1*8, 31*8-1, 0*8, 32*8-1);
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(liberate_state::screen_update_prosoccr));
@@ -839,7 +839,7 @@ void liberate_state::prosport(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &liberate_state::liberate_sound_map);
 	m_audiocpu->set_periodic_int(FUNC(liberate_state::nmi_line_pulse), attotime::from_hz(16*60)); /* ??? */
 
-//  config.m_minimum_quantum = attotime::from_hz(12000);
+//  config.set_maximum_quantum(attotime::from_hz(12000));
 
 	MCFG_MACHINE_START_OVERRIDE(liberate_state,liberate)
 	MCFG_MACHINE_RESET_OVERRIDE(liberate_state,liberate)

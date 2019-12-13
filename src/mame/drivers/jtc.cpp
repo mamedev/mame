@@ -831,7 +831,7 @@ void jtc_state::basic(machine_config &config)
 	m_centronics->busy_handler().set(FUNC(jtc_state::write_centronics_busy));
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "jtc,bin", attotime::from_seconds(2)).set_load_callback(FUNC(jtc_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "jtc,bin", attotime::from_seconds(2)).set_load_callback(FUNC(jtc_state::quickload_cb));
 }
 
 void jtc_state::jtc(machine_config &config)

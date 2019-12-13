@@ -1836,7 +1836,7 @@ void namcos12_boothack_state::truckk(machine_config &config)
 	subdevice<h8_sci_device>("iocpu:sci0")->tx_handler().set("sub:sci0", FUNC(h8_sci_device::rx_w));
 	subdevice<h8_sci_device>("sub:sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
 
-	config.m_minimum_quantum = attotime::from_hz(2*115200);
+	config.set_maximum_quantum(attotime::from_hz(2*115200));
 }
 
 READ16_MEMBER(namcos12_state::iob_p4_r)
@@ -1912,7 +1912,7 @@ void namcos12_boothack_state::technodr(machine_config &config)
 	subdevice<h8_sci_device>("iocpu:sci0")->tx_handler().set("sub:sci0", FUNC(h8_sci_device::rx_w));
 	subdevice<h8_sci_device>("sub:sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
 
-	config.m_minimum_quantum = attotime::from_hz(2*115200);
+	config.set_maximum_quantum(attotime::from_hz(2*115200));
 }
 
 void namcos12_boothack_state::aplarail(machine_config &config)
@@ -1932,7 +1932,7 @@ void namcos12_boothack_state::aplarail(machine_config &config)
 	subdevice<h8_sci_device>("iocpu:sci0")->tx_handler().set("sub:sci0", FUNC(h8_sci_device::rx_w));
 	subdevice<h8_sci_device>("sub:sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
 
-	config.m_minimum_quantum = attotime::from_hz(2*115200);
+	config.set_maximum_quantum(attotime::from_hz(2*115200));
 }
 
 static INPUT_PORTS_START( namcos12 )

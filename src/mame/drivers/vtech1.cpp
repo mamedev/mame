@@ -457,7 +457,10 @@ void vtech1_state::laser110(machine_config &config)
 	m_memexp->set_io_space(m_maincpu, AS_IO);
 
 	// snapshot
-	SNAPSHOT(config, "snapshot", "vz", attotime::from_double(1.5)).set_load_callback(FUNC(vtech1_state::snapshot_cb), this);
+	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "vz"));
+	snapshot.set_delay(attotime::from_double(2.0));
+	snapshot.set_load_callback(FUNC(vtech1_state::snapshot_cb));
+	snapshot.set_interface("vzsnap");
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(vtech1_cassette_formats);
@@ -466,6 +469,7 @@ void vtech1_state::laser110(machine_config &config)
 	m_cassette->set_interface("vtech1_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("vz_cass");
+	SOFTWARE_LIST(config, "snap_list").set_original("vz_snap");
 }
 
 void vtech1_state::laser200(machine_config &config)

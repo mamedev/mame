@@ -9,7 +9,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="238734">
-				<rom name="epsnqx10.td0" size="238734" crc="f14a8b30" sha1="f951416a80caba395d4ce1e0fa0d14a8d0b5ea04" offset="0" />
+				<rom name="epsnqx10.td0" size="238734" crc="f14a8b30" sha1="f951416a80caba395d4ce1e0fa0d14a8d0b5ea04"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="214626">
-				<rom name="epsnvldc.td0" size="214626" crc="65487b11" sha1="40bffdc914a8afbfde9eeb6b859ac5da1a7a76f6" offset="0" />
+				<rom name="epsnvldc.td0" size="214626" crc="65487b11" sha1="40bffdc914a8afbfde9eeb6b859ac5da1a7a76f6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -34,14 +34,14 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk"/>
 			<dataarea name="flop" size="143444">
-				<rom name="cpm22m1.td0" size="143444" crc="7d2c8c24" sha1="391cab93776bb81b2fab9bbbf25fb3ff714068f9" offset="0" />
+				<rom name="cpm22m1.td0" size="143444" crc="7d2c8c24" sha1="391cab93776bb81b2fab9bbbf25fb3ff714068f9"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Diagnostics Programs"/>
 			<dataarea name="flop" size="21516">
-				<rom name="q10diags.td0" size="21516" crc="b5efabcb" sha1="962ac668e48e27bb54b40edbaf23c23cc63e1887" offset="0" />
+				<rom name="q10diags.td0" size="21516" crc="b5efabcb" sha1="962ac668e48e27bb54b40edbaf23c23cc63e1887"/>
 			</dataarea>
 		</part>
 	</software>
@@ -54,28 +54,28 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Boot Disk"/>
 			<dataarea name="flop" size="268249">
-				<rom name="cpls_sys.td0" status="baddump" size="268249" crc="6de5a463" sha1="a2742f27c5ff8f0df7d7054237b5819f203fd3e3" offset="0" />
+				<rom name="cpls_sys.td0" status="baddump" size="268249" crc="6de5a463" sha1="a2742f27c5ff8f0df7d7054237b5819f203fd3e3"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Programmer's Disk"/>
 			<dataarea name="flop" size="154362">
-				<rom name="cplsprgm.td0" size="154362" crc="490e6874" sha1="ca02c9d266e949632b162c1f77819c1b94617aa1" offset="0" />
+				<rom name="cplsprgm.td0" size="154362" crc="490e6874" sha1="ca02c9d266e949632b162c1f77819c1b94617aa1"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="GSX Libraries"/>
 			<dataarea name="flop" size="56948">
-				<rom name="q10gsx.td0" size="56948" crc="e687507e" sha1="51b77db3703058a9ea8fc37d1a73180f34151f40" offset="0" />
+				<rom name="q10gsx.td0" size="56948" crc="e687507e" sha1="51b77db3703058a9ea8fc37d1a73180f34151f40"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Utilities Disk"/>
 			<dataarea name="flop" size="108906">
-				<rom name="qpls-utl.td0" size="108906" crc="5f609110" sha1="ff8d95855941141352f650bdea291fec23e4e737" offset="0" />
+				<rom name="qpls-utl.td0" size="108906" crc="5f609110" sha1="ff8d95855941141352f650bdea291fec23e4e737"/>
 			</dataarea>
 		</part>
 	</software>

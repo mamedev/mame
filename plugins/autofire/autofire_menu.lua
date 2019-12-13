@@ -63,7 +63,7 @@ local function populate_main_menu(buttons)
 		-- Round to two decimal places
 		rate = math.floor(rate * 100) / 100
 		local text = button.button.name .. ' [' .. rate .. ' Hz]'
-		local subtext = manager:machine():input():code_name(button.key)
+		local subtext = manager:machine():input():seq_name(button.key)
 		menu[#menu + 1] = {text, subtext, ''}
 	end
 	content_height = #menu
@@ -98,7 +98,7 @@ end
 
 local function populate_configure_menu(menu)
 	local button_name = current_button.button and current_button.button.name or _('NOT SET')
-	local key_name = current_button.key and manager:machine():input():code_name(current_button.key) or _('NOT SET')
+	local key_name = current_button.key and manager:machine():input():seq_name(current_button.key) or _('NOT SET')
 	menu[#menu + 1] = {_('Input'), button_name, ''}
 	menu[#menu + 1] = {_('Hotkey'), key_name, ''}
 	menu[#menu + 1] = {_('On frames'), current_button.on_frames, current_button.on_frames > 1 and 'lr' or 'r'}
@@ -112,16 +112,22 @@ local function poll_for_hotkey()
 	manager:machine():video():frame_update(true)
 	input:seq_poll_start('switch')
 	local time = os.clock()
-	while (not input:seq_poll()) and (os.clock() < time + 1) do end
-	local tokens = input:seq_to_tokens(input:seq_poll_final())
-	manager:machine():popmessage()
-	manager:machine():video():frame_update(true)
-
-	local final_token = nil
-	for token in tokens:gmatch('%S+') do
-		final_token = token
+	local clearmsg = true
+	while (not input:seq_poll()) and (input:seq_poll_modified() or (os.clock() < time + 1)) do
+		if input:seq_poll_modified() then
+			if not input:seq_poll_valid() then
+				manager:machine():popmessage(_("Invalid sequence entered"))
+				clearmsg = false
+				break
+			end
+			manager:machine():popmessage(input:seq_name(input:seq_poll_sequence()))
+			manager:machine():video():frame_update(true)
+		end
 	end
-	return final_token and input:code_from_token(final_token) or nil
+	if clearmsg then
+		manager:machine():popmessage()
+	end
+	return input:seq_poll_valid() and input:seq_poll_final() or nil
 end
 
 local function handle_configure_menu(index, event)

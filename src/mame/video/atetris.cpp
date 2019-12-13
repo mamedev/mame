@@ -51,7 +51,7 @@ WRITE8_MEMBER(atetris_state::videoram_w)
 
 void atetris_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(atetris_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(atetris_state::get_tile_info)), TILEMAP_SCAN_ROWS,  8,8, 64,32);
 }
 
 

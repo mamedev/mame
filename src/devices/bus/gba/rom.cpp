@@ -59,11 +59,13 @@ gba_rom_sram_device::gba_rom_sram_device(const machine_config &mconfig, const ch
 
 gba_rom_drilldoz_device::gba_rom_drilldoz_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: gba_rom_sram_device(mconfig, GBA_ROM_DRILLDOZ, tag, owner, clock)
+	, m_rumble(*this, "Rumble")
 {
 }
 
 gba_rom_wariotws_device::gba_rom_wariotws_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: gba_rom_sram_device(mconfig, GBA_ROM_WARIOTWS, tag, owner, clock)
+	, m_rumble(*this, "Rumble")
 	, m_gyro_z(*this, "GYROZ")
 {
 }
@@ -162,8 +164,16 @@ void gba_rom_device::device_reset()
 	m_gpio_dirs = 0;
 }
 
+void gba_rom_drilldoz_device::device_start()
+{
+	gba_rom_device::device_start();
+	m_rumble.resolve();
+}
+
 void gba_rom_wariotws_device::device_start()
 {
+	gba_rom_device::device_start();
+	m_rumble.resolve();
 	save_item(NAME(m_last_val));
 	save_item(NAME(m_counter));
 }
@@ -187,6 +197,8 @@ void gba_rom_flash1m_device::device_reset()
 
 void gba_rom_eeprom_device::device_start()
 {
+	gba_rom_device::device_start();
+
 	// for the moment we use a custom eeprom implementation, so we alloc/save it as nvram
 	nvram_alloc(0x200);
 	m_eeprom = std::make_unique<gba_eeprom_device>(machine(), (uint8_t*)get_nvram_base(), get_nvram_size(), 6);
@@ -232,16 +244,19 @@ void gba_rom_boktai_device::device_reset()
 
 void gba_rom_flash_rtc_device::device_start()
 {
+	gba_rom_device::device_start();
 	m_rtc = std::make_unique<gba_s3511_device>(machine());
 }
 
 void gba_rom_flash1m_rtc_device::device_start()
 {
+	gba_rom_device::device_start();
 	m_rtc = std::make_unique<gba_s3511_device>(machine());
 }
 
 void gba_rom_3dmatrix_device::device_start()
 {
+	gba_rom_device::device_start();
 	save_item(NAME(m_src));
 	save_item(NAME(m_dst));
 	save_item(NAME(m_nblock));
@@ -353,7 +368,7 @@ void gba_rom_drilldoz_device::gpio_dev_write(uint16_t data, int gpio_dirs)
 	if ((gpio_dirs & 0x08))
 	{
 		// send impulse to Rumble sensor
-		machine().output().set_value("Rumble", BIT(data, 3));
+		m_rumble = BIT(data, 3);
 	}
 }
 
@@ -383,7 +398,7 @@ void gba_rom_wariotws_device::gpio_dev_write(uint16_t data, int gpio_dirs)
 	if ((gpio_dirs & 0x08))
 	{
 		// send impulse to Rumble sensor
-		machine().output().set_value("Rumble", BIT(data, 3));
+		m_rumble = BIT(data, 3);
 	}
 
 	if (gpio_dirs == 0x0b)
@@ -1060,7 +1075,7 @@ void gba_eeprom_device::write(uint32_t data)
 
 			if (m_bits == 0)
 			{
-				osd_printf_verbose("%s: EEPROM: %02x to %x\n", machine().describe_context().c_str(), m_eep_data, m_addr);
+				osd_printf_verbose("%s: EEPROM: %02x to %x\n", machine().describe_context(), m_eep_data, m_addr);
 				if (m_addr >= m_data_size)
 					fatalerror("eeprom: invalid address (%x)\n", m_addr);
 

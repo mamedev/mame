@@ -47,6 +47,7 @@ const uint32_t tms32082_mp_device::SHIFT_MASK[] =
 tms32082_mp_device::tms32082_mp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, TMS32082_MP, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(tms32082_mp_device::mp_internal_map), this))
+	, m_cmd_callback(*this)
 {
 }
 
@@ -68,11 +69,6 @@ device_memory_interface::space_config_vector tms32082_pp_device::memory_space_co
 std::unique_ptr<util::disasm_interface> tms32082_mp_device::create_disassembler()
 {
 	return std::make_unique<tms32082_mp_disassembler>();
-}
-
-void tms32082_mp_device::set_command_callback(write32_delegate callback)
-{
-	m_cmd_callback = callback;
 }
 
 
@@ -156,6 +152,7 @@ WRITE32_MEMBER(tms32082_mp_device::mp_param_w)
 void tms32082_mp_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
+	m_cmd_callback.resolve();
 
 	save_item(NAME(m_pc));
 	save_item(NAME(m_fetchpc));

@@ -41,6 +41,11 @@
 #include "modules/opengl/gl_shader_mgr.h"
 
 #if defined(SDLMAME_MACOSX) || defined(OSD_MAC)
+#include <string.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/sysctl.h>
+
 #ifndef APIENTRY
 #define APIENTRY
 #endif
@@ -1116,7 +1121,40 @@ int renderer_ogl::draw(const int update)
 		//   |_________|
 		// (0,h)     (w,h)
 
-		glViewport(0.0, 0.0, (GLsizei) m_width, (GLsizei) m_height);
+		GLsizei iScale = 1;
+
+		/*
+		    Mac hack: macOS version 10.15 and later flipped from assuming you don't support Retina to
+		    assuming you do support Retina.  SDL 2.0.11 is scheduled to fix this, but it's not out yet.
+		    So we double-scale everything if you're on 10.15 or later and SDL is not at least version 2.0.11.
+		*/
+		#if defined(SDLMAME_MACOSX) || defined(OSD_MAC)
+		SDL_version sdlVers;
+		SDL_GetVersion(&sdlVers);
+		// Only do this if SDL is not at least 2.0.11.
+		if ((sdlVers.major == 2) && (sdlVers.minor == 0) && (sdlVers.patch < 11))
+		{
+			// now get the Darwin kernel version
+			int dMaj, dMin, dPatch;
+			char versStr[64];
+			dMaj = dMin = dPatch = 0;
+			size_t size = sizeof(versStr);
+			int retVal = sysctlbyname("kern.osrelease", versStr, &size, NULL, 0);
+			if (retVal == 0)
+			{
+			  sscanf(versStr, "%d.%d.%d", &dMaj, &dMin, &dPatch);
+			  // 10.15 Catalina is Darwin version 19
+			  if (dMaj >= 19)
+			  {
+				  // do the workaround for Retina being forced on
+				  osd_printf_verbose("OpenGL: enabling Retina workaround\n");
+				  iScale = 2;
+			  }
+			}
+		}
+		#endif
+
+		glViewport(0.0, 0.0, (GLsizei) m_width * iScale, (GLsizei) m_height * iScale);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		glOrtho(0.0, (GLdouble) m_width, (GLdouble) m_height, 0.0, 0.0, -1.0);
@@ -1196,6 +1234,7 @@ int renderer_ogl::draw(const int update)
 
 				if(pendingPrimitive!=curPrimitive)
 				{
+					glLineWidth(prim.width);
 					glBegin(curPrimitive);
 					pendingPrimitive=curPrimitive;
 				}
@@ -2422,7 +2461,7 @@ static int compare_texture_primitive(const ogl_texture_info *texture, const rend
 		texture->texinfo.width == prim->texture.width &&
 		texture->texinfo.height == prim->texture.height &&
 		texture->texinfo.rowpixels == prim->texture.rowpixels &&
-		/* texture->texinfo.palette == prim->texture.palette && */
+		texture->texinfo.palette == prim->texture.palette &&
 		((texture->flags ^ prim->flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0)
 		return 1;
 	else

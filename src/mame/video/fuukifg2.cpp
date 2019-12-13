@@ -75,9 +75,9 @@ void fuuki16_state::fuuki16_palette(palette_device &palette) const
 
 void fuuki16_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fuuki16_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fuuki16_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fuuki16_state::get_tile_info<2>),this), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fuuki16_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fuuki16_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fuuki16_state::get_tile_info<2>)), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
 
 	m_tilemap[0]->set_transparent_pen(0x0f);    // 4 bits
 	m_tilemap[1]->set_transparent_pen(0xff);    // 8 bits

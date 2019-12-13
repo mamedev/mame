@@ -2256,7 +2256,7 @@ std::unique_ptr<util::disasm_interface> h6280_device::create_disassembler()
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t h6280_device::execute_min_cycles() const
+uint32_t h6280_device::execute_min_cycles() const noexcept
 {
 	return 2;
 }
@@ -2267,7 +2267,7 @@ uint32_t h6280_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t h6280_device::execute_max_cycles() const
+uint32_t h6280_device::execute_max_cycles() const noexcept
 {
 	return 17 + 6*65536;
 }
@@ -2278,7 +2278,7 @@ uint32_t h6280_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-uint32_t h6280_device::execute_input_lines() const
+uint32_t h6280_device::execute_input_lines() const noexcept
 {
 	return 4;
 }
@@ -2289,7 +2289,7 @@ uint32_t h6280_device::execute_input_lines() const
 //  the input line has an asynchronous edge trigger
 //-------------------------------------------------
 
-bool h6280_device::execute_input_edge_triggered(int inputnum) const
+bool h6280_device::execute_input_edge_triggered(int inputnum) const noexcept
 {
 	return inputnum == H6280_NMI_STATE;
 }

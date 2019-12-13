@@ -565,17 +565,17 @@ void srmp6_state::srmp6_map(address_map &map)
 	map(0x4d0000, 0x4d0001).r(FUNC(srmp6_state::irq_ack_r));
 	map(0x4e0000, 0x4e00ff).rw("nile", FUNC(nile_device::nile_snd_r), FUNC(nile_device::nile_snd_w));
 	map(0x4e0100, 0x4e0101).rw("nile", FUNC(nile_device::nile_sndctrl_r), FUNC(nile_device::nile_sndctrl_w));
-	//AM_RANGE(0x4e0110, 0x4e0111) AM_NOP // ? accessed once ($268dc, written $b.w)
+	//map(0x4e0110, 0x4e0111).noprw(); // ? accessed once ($268dc, written $b.w)
 
 	// CHR RAM: checked [$500000-$5fffff]
 	map(0x500000, 0x5fffff).rw(FUNC(srmp6_state::tileram_r), FUNC(srmp6_state::tileram_w)).share("chrram");
-	//AM_RANGE(0x5fff00, 0x5fff1f) AM_RAM // ? see routine $5ca8, video_regs related ???
-	//AM_RANGE(0x5fff00, 0x5fffff) AM_WRITE(dma_w) AM_SHARE("dmaram")
+	//map(0x5fff00, 0x5fff1f).ram(); // ? see routine $5ca8, video_regs related ???
+	//map(0x5fff00, 0x5fffff).w(FUNC(srmp6_state::dma_w)).share("dmaram");
 
 	map(0x600000, 0x7fffff).bankr("nile_bank");    // banked ROM (used by ROM check)
 	map(0x800000, 0x9fffff).rom().region("user1", 0);
-	//AM_RANGE(0xf00004, 0xf00005) AM_RAM // ?
-	//AM_RANGE(0xf00006, 0xf00007) AM_RAM // ?
+	//map(0xf00004, 0xf00005).ram(); // ?
+	//map(0xf00006, 0xf00007).ram(); // ?
 
 }
 
@@ -714,8 +714,8 @@ ROM_START( srmp6 )
 	ROM_LOAD16_BYTE( "sx011-10.4", 0x000001, 0x080000, CRC(8f4318a5) SHA1(44160968cca027b3d42805f2dd42662d11257ef6) )
 	ROM_LOAD16_BYTE( "sx011-11.5", 0x000000, 0x080000, CRC(7503d9cf) SHA1(03ab35f13b6166cb362aceeda18e6eda8d3abf50) )
 
-	ROM_REGION( 0x200000, "user1", 0 ) /* 68000 Data */
-	ROM_LOAD( "sx011-09.10", 0x000000, 0x200000, CRC(58f74438) SHA1(a256e39ca0406e513ab4dbd812fb0b559b4f61f2) )
+	ROM_REGION16_BE( 0x200000, "user1", 0 ) /* 68000 Data */
+	ROM_LOAD16_WORD_SWAP( "sx011-09.10", 0x000000, 0x200000, CRC(58f74438) SHA1(a256e39ca0406e513ab4dbd812fb0b559b4f61f2) )
 
 	/* these are accessed directly by the 68k, DMA device etc.  NOT decoded */
 	ROM_REGION( 0x2000000, "nile", 0)   /* Banked ROM */

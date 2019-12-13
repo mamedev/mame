@@ -19,7 +19,7 @@ namespace bus { namespace intellec4 {
 
 univ_slot_device::univ_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, INTELLEC4_UNIV_SLOT, tag, owner, clock)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<device_univ_card_interface>(mconfig, *this)
 	, m_bus(*this, finder_base::DUMMY_TAG)
 {
 }
@@ -29,27 +29,16 @@ univ_slot_device::univ_slot_device(machine_config const &mconfig, char const *ta
   device_t implementation
 ----------------------------------*/
 
-void univ_slot_device::device_validity_check(validity_checker &valid) const
-{
-	device_t *const card(get_card_device());
-	if (card && !dynamic_cast<device_univ_card_interface *>(card))
-		osd_printf_error("Card device %s (%s) does not implement device_univ_card_interface\n", card->tag(), card->name());
-}
-
 void univ_slot_device::device_resolve_objects()
 {
-	device_univ_card_interface *const univ_card(dynamic_cast<device_univ_card_interface *>(get_card_device()));
+	device_univ_card_interface *const univ_card(get_card_device());
 	if (univ_card)
 		univ_card->set_bus(*m_bus);
 }
 
 void univ_slot_device::device_start()
 {
-	device_t *const card(get_card_device());
-	if (card && !dynamic_cast<device_univ_card_interface *>(card))
-		throw emu_fatalerror("univ_slot_device: card device %s (%s) does not implement device_univ_card_interface\n", card->tag(), card->name());
 }
-
 
 
 /***********************************************************************
@@ -248,7 +237,7 @@ void univ_bus_device::set_user_reset(unsigned index, int state)
 ***********************************************************************/
 
 device_univ_card_interface::device_univ_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "intellec4")
 	, m_bus(nullptr)
 	, m_index(~unsigned(0))
 {
@@ -257,8 +246,6 @@ device_univ_card_interface::device_univ_card_interface(const machine_config &mco
 
 void device_univ_card_interface::interface_pre_start()
 {
-	device_slot_card_interface::interface_pre_start();
-
 	if (!m_bus)
 		throw device_missing_dependencies();
 }

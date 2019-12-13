@@ -349,7 +349,7 @@ void cv1k_state::cv1k_map(address_map &map)
 	map(0x10000000, 0x10000007).rw(FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
 	map(0x10400000, 0x10400007).w("ymz770", FUNC(ymz770_device::write));
 	map(0x10C00000, 0x10C00007).rw(FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
-//  AM_RANGE(0x18000000, 0x18000057) // blitter, installed on reset
+//  map(0x18000000, 0x18000057) // blitter, installed on reset
 	map(0xf0000000, 0xf0ffffff).ram(); // mem mapped cache (sh3 internal?)
 }
 
@@ -360,7 +360,7 @@ void cv1k_state::cv1k_d_map(address_map &map)
 	map(0x10000000, 0x10000007).rw(FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
 	map(0x10400000, 0x10400007).w("ymz770", FUNC(ymz770_device::write));
 	map(0x10C00000, 0x10C00007).rw(FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
-//  AM_RANGE(0x18000000, 0x18000057) // blitter, installed on reset
+//  map(0x18000000, 0x18000057) // blitter, installed on reset
 	map(0xf0000000, 0xf0ffffff).ram(); // mem mapped cache (sh3 internal?)
 }
 
@@ -472,7 +472,7 @@ void cv1k_state::cv1k(machine_config &config)
 	m_maincpu->set_sh4_clock(12.8_MHz_XTAL*8); // 102.4MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &cv1k_state::cv1k_map);
 	m_maincpu->set_addrmap(AS_IO, &cv1k_state::cv1k_port);
-	m_maincpu->set_vblank_int("screen", FUNC(cv1k_state::irq2_line_hold));
+	m_maincpu->set_vblank_int("screen", FUNC(cv1k_state::irq2_line_hold)); // irq2 actually asserted at V-sync pulse, not at V-blank
 
 	RTC9701(config, m_eeprom);
 	SERFLASH(config, m_serflash, 0);
@@ -900,7 +900,7 @@ void cv1k_state::install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_
 
 	m_maincpu->sh2drc_add_pcflush(idlepc+2);
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000000+m_idleramoffs, 0xc000000+m_idleramoffs+7, read64_delegate(FUNC(cv1k_state::speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000000+m_idleramoffs, 0xc000000+m_idleramoffs+7, read64_delegate(*this, FUNC(cv1k_state::speedup_r)));
 
 	m_maincpu->sh2drc_add_fastram(0x00000000, 0x003fffff, true,  m_rombase);
 

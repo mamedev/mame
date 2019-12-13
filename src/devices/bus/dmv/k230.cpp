@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+// thanks-to:rfka01
 /***************************************************************************
 
     K230 Internal 8088 module without interrupt controller
@@ -99,7 +100,6 @@ dmv_k230_device::dmv_k230_device(const machine_config &mconfig, device_type type
 	, device_dmvslot_interface(mconfig, *this)
 	, m_maincpu(*this, "maincpu")
 	, m_rom(*this, "rom")
-	, m_bus(*this, DEVICE_SELF_OWNER)
 	, m_switch16(0)
 	, m_hold(0)
 {
@@ -139,12 +139,18 @@ dmv_k235_device::dmv_k235_device(const machine_config &mconfig, const char *tag,
 
 void dmv_k230_device::device_start()
 {
+	// register for state saving
+	save_item(NAME(m_switch16));
+	save_item(NAME(m_hold));
 }
 
 void dmv_k234_device::device_start()
 {
 	dmv_k230_device::device_start();
-	m_bus->m_iospace->install_readwrite_handler(0xd8, 0xdf, read8_delegate(FUNC(dmv_k234_device::snr_r), this), write8_delegate(FUNC(dmv_k234_device::snr_w), this), 0);
+	iospace().install_readwrite_handler(0xd8, 0xdf, read8_delegate(*this, FUNC(dmv_k234_device::snr_r)), write8_delegate(*this, FUNC(dmv_k234_device::snr_w)), 0);
+
+	// register for state saving
+	save_item(NAME(m_snr));
 }
 
 //-------------------------------------------------
@@ -248,22 +254,22 @@ READ8_MEMBER(dmv_k230_device::rom_r)
 
 READ8_MEMBER( dmv_k230_device::io_r )
 {
-	return m_bus->m_iospace->read_byte(offset);
+	return iospace().read_byte(offset);
 }
 
 WRITE8_MEMBER( dmv_k230_device::io_w )
 {
-	m_bus->m_iospace->write_byte(offset, data);
+	iospace().write_byte(offset, data);
 }
 
 READ8_MEMBER( dmv_k230_device::program_r )
 {
-	return m_bus->m_prog_read_cb(space, offset);
+	return prog_read(space, offset);
 }
 
 WRITE8_MEMBER( dmv_k230_device::program_w )
 {
-	m_bus->m_prog_write_cb(space, offset, data);
+	prog_write(space, offset, data);
 }
 
 void dmv_k234_device::hold_w(int state)
@@ -278,7 +284,7 @@ void dmv_k234_device::switch16_w(int state)
 	{
 		m_snr = CLEAR_LINE;
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-		m_bus->m_out_thold_cb(CLEAR_LINE);
+		out_thold(CLEAR_LINE);
 		m_switch16 = state;
 	}
 }
@@ -288,7 +294,7 @@ READ8_MEMBER( dmv_k234_device::snr_r )
 	m_snr = ASSERT_LINE;
 	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	m_maincpu->reset();
-	m_bus->m_out_thold_cb(ASSERT_LINE);
+	out_thold(ASSERT_LINE);
 
 	return 0xff;
 }
@@ -298,5 +304,5 @@ WRITE8_MEMBER( dmv_k234_device::snr_w )
 	m_snr = ASSERT_LINE;
 	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	m_maincpu->reset();
-	m_bus->m_out_thold_cb(ASSERT_LINE);
+	out_thold(ASSERT_LINE);
 }

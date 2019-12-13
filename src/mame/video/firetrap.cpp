@@ -122,9 +122,9 @@ TILE_GET_INFO_MEMBER(firetrap_state::get_bg2_tile_info)
 
 void firetrap_state::video_start()
 {
-	m_fg_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(firetrap_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(firetrap_state::get_fg_memory_offset),this), 8, 8, 32, 32);
-	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(firetrap_state::get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(firetrap_state::get_bg_memory_offset),this), 16, 16, 32, 32);
-	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(firetrap_state::get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(firetrap_state::get_bg_memory_offset),this), 16, 16, 32, 32);
+	m_fg_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(firetrap_state::get_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(firetrap_state::get_fg_memory_offset)), 8, 8, 32, 32);
+	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(firetrap_state::get_bg1_tile_info)), tilemap_mapper_delegate(*this, FUNC(firetrap_state::get_bg_memory_offset)), 16, 16, 32, 32);
+	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(firetrap_state::get_bg2_tile_info)), tilemap_mapper_delegate(*this, FUNC(firetrap_state::get_bg_memory_offset)), 16, 16, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_bg1_tilemap->set_transparent_pen(0);

@@ -114,7 +114,7 @@ protected:
 	required_device<palette_device> m_pcgpalette;
 	required_device<mc68901_device> m_mfpdev;
 	required_device<rp5c15_device> m_rtc;
-	required_device<scc8530_t> m_scc;
+	required_device<scc8530_legacy_device> m_scc;
 	required_device<ym2151_device> m_ym2151;
 	required_device<i8255_device> m_ppi;
 	required_device<screen_device> m_screen;

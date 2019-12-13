@@ -1,25 +1,23 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nl_convert.h
- *
- */
-
-#pragma once
 
 #ifndef NL_CONVERT_H_
 #define NL_CONVERT_H_
 
+///
+/// \file nl_convert.h
+///
+
 #include "plib/plists.h"
-#include "plib/pparser.h"
 #include "plib/pstring.h"
+#include "plib/ptokenizer.h"
 #include "plib/ptypes.h"
 
 #include <memory>
 
-/*-------------------------------------------------
-    convert - convert a spice netlist
--------------------------------------------------*/
+// -------------------------------------------------
+//  convert - convert a spice netlist
+// -------------------------------------------------
 
 class nl_convert_base_t
 {
@@ -62,10 +60,10 @@ private:
 		explicit net_t(pstring aname)
 		: m_name(std::move(aname)), m_no_export(false) {}
 
-		const pstring &name() { return m_name;}
-		std::vector<pstring> &terminals() { return m_terminals; }
+		const pstring &name() const { return m_name;}
+		std::vector<pstring> &terminals(){ return m_terminals; }
 		void set_no_export() { m_no_export = true; }
-		bool is_no_export() { return m_no_export; }
+		bool is_no_export() const { return m_no_export; }
 
 	private:
 		pstring m_name;
@@ -100,13 +98,13 @@ private:
 		, m_has_val(false)
 		{}
 
-		const pstring &name() { return m_name;}
-		const pstring &type() { return m_type;}
-		const pstring &model() { return m_model;}
-		const double &value() { return m_val;}
+		const pstring &name() const { return m_name;}
+		const pstring &type() const { return m_type;}
+		const pstring &model() const { return m_model;}
+		double value() const { return m_val;}
 
-		bool has_model() { return m_model != ""; }
-		bool has_value() { return m_has_val; }
+		bool has_model() const { return m_model != ""; }
+		bool has_value() const { return m_has_val; }
 
 	private:
 		pstring m_type;
@@ -117,8 +115,8 @@ private:
 	};
 
 	struct unit_t {
-		const char *m_unit;
-		const char *m_func;
+		pstring m_unit;
+		pstring m_func;
 		double m_mult;
 	};
 
@@ -128,8 +126,8 @@ private:
 		pin_alias_t(pstring name, pstring alias)
 		: m_name(std::move(name)), m_alias(std::move(alias))
 		{}
-		const pstring &name() { return m_name; }
-		const pstring &alias() { return m_alias; }
+		const pstring &name() const { return m_name; }
+		const pstring &alias() const { return m_alias; }
 	private:
 		pstring m_name;
 		pstring m_alias;
@@ -139,14 +137,14 @@ private:
 
 	void add_device(plib::unique_ptr<dev_t> dev);
 
-	plib::postringstream m_buf;
+	std::stringstream m_buf;
 
 	std::vector<plib::unique_ptr<dev_t>> m_devs;
 	std::unordered_map<pstring, plib::unique_ptr<net_t> > m_nets;
 	std::vector<pstring> m_ext_alias;
 	std::unordered_map<pstring, plib::unique_ptr<pin_alias_t>> m_pins;
 
-	static unit_t m_units[];
+	std::vector<unit_t> m_units;
 	pstring m_numberchars;
 
 };
@@ -185,7 +183,7 @@ public:
 
 	protected:
 
-		void verror(const pstring &msg, int line_num, const pstring &line) override;
+		void verror(const pstring &msg) override;
 
 	private:
 		nl_convert_eagle_t &m_convert;
@@ -223,7 +221,7 @@ public:
 
 	protected:
 
-		void verror(const pstring &msg, int line_num, const pstring &line) override;
+		void verror(const pstring &msg) override;
 
 	private:
 		nl_convert_rinf_t &m_convert;
@@ -238,4 +236,4 @@ private:
 
 };
 
-#endif /* NL_CONVERT_H_ */
+#endif // NL_CONVERT_H_

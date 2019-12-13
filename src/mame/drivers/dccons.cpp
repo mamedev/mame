@@ -305,14 +305,14 @@ void dc_cons_state::init_dc()
 
 void dc_cons_state::init_dcus()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2303b0, 0xc2303b7, read64_delegate(FUNC(dc_cons_state::dcus_idle_skip_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2303b0, 0xc2303b7, read64_delegate(*this, FUNC(dc_cons_state::dcus_idle_skip_r)));
 
 	init_dc();
 }
 
 void dc_cons_state::init_dcjp()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2302f8, 0xc2302ff, read64_delegate(FUNC(dc_cons_state::dcjp_idle_skip_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2302f8, 0xc2302ff, read64_delegate(*this, FUNC(dc_cons_state::dcjp_idle_skip_r)));
 
 	init_dc();
 }
@@ -380,7 +380,7 @@ WRITE8_MEMBER(dc_cons_state::dc_flash_w)
 void dc_cons_state::dc_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom().nopw();             // BIOS
-	map(0x00200000, 0x0021ffff).rom().region("dcflash", 0);//AM_READWRITE8(dc_flash_r,dc_flash_w, 0xffffffffffffffffU)
+	map(0x00200000, 0x0021ffff).rom().region("dcflash", 0);//.rw(FUNC(dc_cons_state::dc_flash_r), FUNC(dc_cons_state::dc_flash_w));
 	map(0x005f6800, 0x005f69ff).rw(FUNC(dc_cons_state::dc_sysctrl_r), FUNC(dc_cons_state::dc_sysctrl_w));
 	map(0x005f6c00, 0x005f6cff).m(m_maple, FUNC(maple_dc_device::amap));
 	map(0x005f7000, 0x005f701f).rw(m_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w)).umask64(0x0000ffff0000ffff);
@@ -393,11 +393,11 @@ void dc_cons_state::dc_map(address_map &map)
 	map(0x00700000, 0x00707fff).rw(FUNC(dc_cons_state::dc_aica_reg_r), FUNC(dc_cons_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
 	map(0x00800000, 0x009fffff).rw(FUNC(dc_cons_state::soundram_r), FUNC(dc_cons_state::soundram_w));
-//  AM_RANGE(0x01000000, 0x01ffffff) G2 Ext Device #1
-//  AM_RANGE(0x02700000, 0x02707fff) AICA reg mirror
-//  AM_RANGE(0x02800000, 0x02ffffff) AICA wave mem mirror
+//  map(0x01000000, 0x01ffffff) G2 Ext Device #1
+//  map(0x02700000, 0x02707fff) AICA reg mirror
+//  map(0x02800000, 0x02ffffff) AICA wave mem mirror
 
-//  AM_RANGE(0x03000000, 0x03ffffff) G2 Ext Device #2
+//  map(0x03000000, 0x03ffffff) G2 Ext Device #2
 
 	/* Area 1 */
 	map(0x04000000, 0x04ffffff).ram().share("dc_texture_ram");      // texture memory 64 bit access
@@ -418,7 +418,7 @@ void dc_cons_state::dc_map(address_map &map)
 	map(0x12800000, 0x12ffffff).w(m_powervr2, FUNC(powervr2_device::ta_fifo_yuv_w));
 	map(0x13000000, 0x137fffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath1_w)).mirror(0x00800000); // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
 
-//  AM_RANGE(0x14000000, 0x17ffffff) G2 Ext Device #3
+//  map(0x14000000, 0x17ffffff) G2 Ext Device #3
 
 	map(0x8c000000, 0x8cffffff).ram().share("dc_ram");  // another RAM mirror
 
@@ -628,41 +628,13 @@ void dc_cons_state::dc(machine_config &config)
 	MAPLE_DC(config, m_maple, 0, m_maincpu);
 	m_maple->irq_callback().set(FUNC(dc_state::maple_irq));
 	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
-	dcctrl0.set_port_tag<0>("P1:0");
-	dcctrl0.set_port_tag<1>("P1:1");
-	dcctrl0.set_port_tag<2>("P1:A0");
-	dcctrl0.set_port_tag<3>("P1:A1");
-	dcctrl0.set_port_tag<4>("P1:A2");
-	dcctrl0.set_port_tag<5>("P1:A3");
-	dcctrl0.set_port_tag<6>("P1:A4");
-	dcctrl0.set_port_tag<7>("P1:A5");
+	dcctrl0.set_port_tags("P1:0", "P1:1", "P1:A0", "P1:A1", "P1:A2", "P1:A3", "P1:A4", "P1:A5");
 	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
-	dcctrl1.set_port_tag<0>("P2:0");
-	dcctrl1.set_port_tag<1>("P2:1");
-	dcctrl1.set_port_tag<2>("P2:A0");
-	dcctrl1.set_port_tag<3>("P2:A1");
-	dcctrl1.set_port_tag<4>("P2:A2");
-	dcctrl1.set_port_tag<5>("P2:A3");
-	dcctrl1.set_port_tag<6>("P2:A4");
-	dcctrl1.set_port_tag<7>("P2:A5");
+	dcctrl1.set_port_tags("P2:0", "P2:1", "P2:A0", "P2:A1", "P2:A2", "P2:A3", "P2:A4", "P2:A5");
 	dc_controller_device &dcctrl2(DC_CONTROLLER(config, "dcctrl2", 0, m_maple, 2));
-	dcctrl2.set_port_tag<0>("P3:0");
-	dcctrl2.set_port_tag<1>("P3:1");
-	dcctrl2.set_port_tag<2>("P3:A0");
-	dcctrl2.set_port_tag<3>("P3:A1");
-	dcctrl2.set_port_tag<4>("P3:A2");
-	dcctrl2.set_port_tag<5>("P3:A3");
-	dcctrl2.set_port_tag<6>("P3:A4");
-	dcctrl2.set_port_tag<7>("P3:A5");
+	dcctrl2.set_port_tags("P3:0", "P3:1", "P3:A0", "P3:A1", "P3:A2", "P3:A3", "P3:A4", "P3:A5");
 	dc_controller_device &dcctrl3(DC_CONTROLLER(config, "dcctrl3", 0, m_maple, 3));
-	dcctrl3.set_port_tag<0>("P4:0");
-	dcctrl3.set_port_tag<1>("P4:1");
-	dcctrl3.set_port_tag<2>("P4:A0");
-	dcctrl3.set_port_tag<3>("P4:A1");
-	dcctrl3.set_port_tag<4>("P4:A2");
-	dcctrl3.set_port_tag<5>("P4:A3");
-	dcctrl3.set_port_tag<6>("P4:A4");
-	dcctrl3.set_port_tag<7>("P4:A5");
+	dcctrl3.set_port_tags("P4:0", "P4:1", "P4:A0", "P4:A1", "P4:A2", "P4:A3", "P4:A4", "P4:A5");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -703,9 +675,8 @@ void dc_cons_state::dc(machine_config &config)
 // "MPR-21068 SEGA JAPAN / 9850 D" from VA0 837-13392-02 (171-7782B) NTSC-J unit
 // KABUTO Ver.1.011 CRC 34DA5C88 from pre-release US unit (private)
 
-// MPR-21933-X2 confirmed match MPR-21931 (v1.01d)
-
-// actual mask rom labels can have -X1 or -X2 added, presumable depending on mobo revision and/or type of rom used (5v or 3.3v), contents is the same
+// MPR-21933 (5v/VA0) confirmed match MPR-21931 (3.3v/VA1) - v1.01d
+// actual mask rom labels may have -X1 or -X2 added depending on chip manufacturer, contents is the same
 
 #define DREAMCAST_COMMON_BIOS \
 	ROM_REGION(0x200000, "maincpu", 0) \
@@ -719,7 +690,7 @@ void dc_cons_state::dc(machine_config &config)
 	ROM_LOAD_BIOS(3, "dc101d_ch.bin",   0x000000, 0x200000, CRC(a2564fad) SHA1(edc5d3d70a93c935703d26119b37731fd317d2bf) )
 // ^^^ dc101d_eu.bin ^^^ is selfmade chinese translation, doesn't work on real hardware, does it must be here at all ?
 
-/* note: Dreamcast Flash ROMs actually 256KB MBM29F002TC (VA0) or MBM29LV002TC (VA1) devices, only 2nd 128KB half is used, A17 pin tied to VCC
+/* note: Dreamcast Flash ROMs actually 256KB MBM29F002TC (5v/VA0) or MBM29LV002TC (3.3v/VA1) devices, only 2nd 128KB half is used, A17 pin tied to VCC
    sector SA5 (1A000 - 1BFFF) is read-only, contain information written during manufacture or repair, fully generated by software tool (except predefined list of creators)
 struct factory_sector
 {
@@ -776,14 +747,14 @@ struct cid_record
 ROM_START(dc)
 	DREAMCAST_COMMON_BIOS
 
-	ROM_REGION(0x020000, "dcflash", 0)
+	ROM_REGION64_LE(0x020000, "dcflash", 0)
 	ROM_LOAD( "dcus_ntsc.bin", 0x000000, 0x020000, CRC(4136c25b) SHA1(1efa00ab9d8357a9f91e5be931a3efd6236f2b79) )  // dumped from VA2.4 mobo with 1.022 BIOS
 ROM_END
 
 ROM_START( dceu )
 	DREAMCAST_COMMON_BIOS
 
-	ROM_REGION(0x020000, "dcflash", 0)
+	ROM_REGION64_LE(0x020000, "dcflash", 0)
 	ROM_LOAD( "dceu_pal.bin",  0x000000, 0x020000, CRC(7a102d05) SHA1(13e444e613dffe0a8bce073a01efa9a1d4626ba7) ) // VA1
 	ROM_LOAD( "dceu_pala.bin", 0x000000, 0x020000, CRC(2e8dfa07) SHA1(ca5fd977bbf8f48c28c1027a023b038123d57d39) ) // from VA1 with 1.01d BIOS
 ROM_END
@@ -793,7 +764,7 @@ ROM_START( dcjp )
 	ROM_SYSTEM_BIOS(4, "1004", "v1.004 (Japan)")    // oldest known mass production version, supports Japan region only
 	ROM_LOAD_BIOS(4, "mpr-21068.ic501", 0x000000, 0x200000, CRC(5454841f) SHA1(1ea132c0fbbf07ef76789eadc07908045c089bd6) )
 
-	ROM_REGION(0x020000, "dcflash", 0)
+	ROM_REGION64_LE(0x020000, "dcflash", 0)
 	ROM_LOAD( "dcjp_ntsc.bin", 0x000000, 0x020000, CRC(306023ab) SHA1(5fb66adb6d1b54a552fe9c2bb736e4c6960e447d) ) // from refurbished VA0 with 1.004 BIOS
 ROM_END
 
@@ -803,7 +774,7 @@ ROM_START( dctream )
 	// uses regular mpr-21931 BIOS chip, have region-free mod-chip installed, see driver init.
 	ROM_LOAD( "mpr-21931.ic501", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) )
 
-	ROM_REGION(0x020000, "dcflash", 0)
+	ROM_REGION64_LE(0x020000, "dcflash", 0)
 	ROM_LOAD( "dc_flash.bin", 0x000000, 0x020000, CRC(9d5515c4) SHA1(78a86fd4e8b58fc9d3535eef6591178f1b97ecf9) ) // VA1 NTSC-US
 ROM_END
 
@@ -815,18 +786,20 @@ ROM_START( dcdev )
 	ROM_LOAD_BIOS(0, "set5v1.011.ic507", 0x000000, 0x200000, CRC(2186e0e5) SHA1(6bd18fb83f8fdb56f1941e079580e5dd672a6dad) )
 	ROM_SYSTEM_BIOS(1, "1001", "Katana Set5 v1.001 (Japan)")    // BOOT flash rom update from WinCE SDK v1.0
 	ROM_LOAD_BIOS(1, "set5v1.001.ic507", 0x000000, 0x200000, CRC(5702d38f) SHA1(ea7a3ae1de73683008dd795c252941a4fc81b42e) )
+	ROM_SYSTEM_BIOS(2, "0976", "Katana Set5 v0.976 (Japan)")    // BOOT flash rom update from Katana SDK 1.20J
+	ROM_LOAD_BIOS(2, "set5v0.976.ic507", 0x000000, 0x200000, CRC(dcb2e86f) SHA1(c88b4b6704811e3a428ee225727e4f7df467a3b5) )
 
 	// 27C160 EPROM (DIP42) IC??? labeled
 	// SET5 7676
 	// V0.71 98/11/13
-	ROM_SYSTEM_BIOS(2, "071", "Katana Set5 Checker v0.71")
-	ROM_LOAD_BIOS(2, "set5v0.71.bin", 0x000000, 0x200000, CRC(52d01969) SHA1(28aec4a01419d2d2a664c540bef30ea289ca0644) )
+	ROM_SYSTEM_BIOS(3, "071", "Katana Set5 Checker v0.71")
+	ROM_LOAD_BIOS(3, "set5v0.71.bin", 0x000000, 0x200000, CRC(52d01969) SHA1(28aec4a01419d2d2a664c540bef30ea289ca0644) )
 	// SET5 FC52
 	// V0.41 98/08/27
-	ROM_SYSTEM_BIOS(3, "041", "Katana Set5 Checker v0.41")
-	ROM_LOAD_BIOS(3, "set5v0.41.bin", 0x000000, 0x200000, CRC(485877bd) SHA1(dc1af1f1248ffa87d57bc5ef2ea41aac95ecfc5e) )
+	ROM_SYSTEM_BIOS(4, "041", "Katana Set5 Checker v0.41")
+	ROM_LOAD_BIOS(4, "set5v0.41.bin", 0x000000, 0x200000, CRC(485877bd) SHA1(dc1af1f1248ffa87d57bc5ef2ea41aac95ecfc5e) )
 
-	ROM_REGION(0x020000, "dcflash", 0)
+	ROM_REGION64_LE(0x020000, "dcflash", 0)
 	ROM_LOAD( "hkt-0120-flash.bin", 0x000000, 0x020000, CRC(7784c304) SHA1(31ef57f550d8cd13e40263cbc657253089e53034) ) // Dev.Boxes have empty (FF filled) flash ROM
 ROM_END
 

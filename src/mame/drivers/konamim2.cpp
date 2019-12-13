@@ -217,9 +217,9 @@ Notes:
 
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
+#include "bus/ata/ataintf.h"
+#include "bus/ata/cr589.h"
 #include "machine/3dom2.h"
-#include "machine/ataintf.h"
-#include "machine/cr589.h"
 #include "machine/eepromser.h"
 #include "machine/timekpr.h"
 #include "sound/dac.h"
@@ -688,12 +688,8 @@ void konamim2_state::machine_start()
 	m_ppc1->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 	m_ppc2->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
-	// Breakpoints don't work with fast RAM
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
-	{
-		m_ppc1->ppcdrc_add_fastram(m_bda->ram_start(), m_bda->ram_end(), false, m_bda->ram_ptr());
-		m_ppc2->ppcdrc_add_fastram(m_bda->ram_start(), m_bda->ram_end(), false, m_bda->ram_ptr());
-	}
+	m_ppc1->ppcdrc_add_fastram(m_bda->ram_start(), m_bda->ram_end(), false, m_bda->ram_ptr());
+	m_ppc2->ppcdrc_add_fastram(m_bda->ram_start(), m_bda->ram_end(), false, m_bda->ram_ptr());
 
 	m_available_cdroms = cdrom_open(machine().rom_load().get_disk_handle(":cdrom"));
 
@@ -1453,8 +1449,8 @@ ROM_END
 
 void konamim2_state::install_m48t58()
 {
-	read8sm_delegate read_delegate(FUNC(m48t58_device::read), &(*m_m48t58));
-	write8sm_delegate write_delegate(FUNC(m48t58_device::write), &(*m_m48t58));
+	read8sm_delegate read_delegate(*m_m48t58, FUNC(m48t58_device::read));
+	write8sm_delegate write_delegate(*m_m48t58, FUNC(m48t58_device::write));
 
 	m_ppc1->space(AS_PROGRAM).install_readwrite_handler(0x36c00000, 0x36c03fff, read_delegate, write_delegate, 0xff00ff00ff00ff00ULL);
 	m_ppc2->space(AS_PROGRAM).install_readwrite_handler(0x36c00000, 0x36c03fff, read_delegate, write_delegate, 0xff00ff00ff00ff00ULL);
@@ -1462,8 +1458,8 @@ void konamim2_state::install_m48t58()
 
 void konamim2_state::install_ymz280b()
 {
-	read8sm_delegate read_delegate(FUNC(ymz280b_device::read), &(*m_ymz280b));
-	write8sm_delegate write_delegate(FUNC(ymz280b_device::write), &(*m_ymz280b));
+	read8sm_delegate read_delegate(*m_ymz280b, FUNC(ymz280b_device::read));
+	write8sm_delegate write_delegate(*m_ymz280b, FUNC(ymz280b_device::write));
 
 	m_ppc1->space(AS_PROGRAM).install_readwrite_handler(0x3e800000, 0x3e80000f, read_delegate, write_delegate, 0xff00ff0000000000ULL);
 	m_ppc2->space(AS_PROGRAM).install_readwrite_handler(0x3e800000, 0x3e80000f, read_delegate, write_delegate, 0xff00ff0000000000ULL);

@@ -16,22 +16,10 @@
 
 
 //**************************************************************************
-//  MACROS/CONSTANTS
-//**************************************************************************
-
-#define I8255_TAG       "u2"
-#define DS75160A_TAG    "u3"
-#define DS75161A_TAG    "u4"
-#define CENTRONICS_TAG  "p4"
-#define EXPANSION_TAG   "exp"
-
-
-
-//**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C64_BUSCARD, buscard_t, "c64_buscard", "C64 BusCard cartridge")
+DEFINE_DEVICE_TYPE(C64_BUSCARD, c64_buscard_device, "c64_buscard", "C64 BusCard cartridge")
 
 
 //-------------------------------------------------
@@ -51,7 +39,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *buscard_t::device_rom_region() const
+const tiny_rom_entry *c64_buscard_device::device_rom_region() const
 {
 	return ROM_NAME( buscard );
 }
@@ -93,7 +81,7 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-ioport_constructor buscard_t::device_input_ports() const
+ioport_constructor c64_buscard_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( buscard );
 }
@@ -103,7 +91,7 @@ ioport_constructor buscard_t::device_input_ports() const
 //  PPI interface
 //-------------------------------------------------
 
-READ8_MEMBER( buscard_t::ppi_pa_r )
+READ8_MEMBER( c64_buscard_device::ppi_pa_r )
 {
 	uint8_t data = 0xff;
 
@@ -120,7 +108,7 @@ READ8_MEMBER( buscard_t::ppi_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( buscard_t::ppi_pa_w )
+WRITE8_MEMBER( c64_buscard_device::ppi_pa_w )
 {
 	m_ieee1->write(space, 0, data);
 
@@ -134,7 +122,7 @@ WRITE8_MEMBER( buscard_t::ppi_pa_w )
 	m_centronics->write_data7(BIT(data, 7));
 }
 
-WRITE8_MEMBER( buscard_t::ppi_pb_w )
+WRITE8_MEMBER( c64_buscard_device::ppi_pb_w )
 {
 	/*
 
@@ -159,7 +147,7 @@ WRITE8_MEMBER( buscard_t::ppi_pb_w )
 	m_dipsw = BIT(data, 7);
 }
 
-READ8_MEMBER( buscard_t::ppi_pc_r )
+READ8_MEMBER( c64_buscard_device::ppi_pc_r )
 {
 	/*
 
@@ -189,7 +177,7 @@ READ8_MEMBER( buscard_t::ppi_pc_r )
 	return data;
 }
 
-WRITE8_MEMBER( buscard_t::ppi_pc_w )
+WRITE8_MEMBER( c64_buscard_device::ppi_pc_w )
 {
 	/*
 
@@ -222,7 +210,7 @@ WRITE8_MEMBER( buscard_t::ppi_pc_w )
 //  Centronics interface
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( buscard_t::busy_w )
+WRITE_LINE_MEMBER( c64_buscard_device::busy_w )
 {
 	m_busy = state;
 }
@@ -232,15 +220,15 @@ WRITE_LINE_MEMBER( buscard_t::busy_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void buscard_t::device_add_mconfig(machine_config &config)
+void c64_buscard_device::device_add_mconfig(machine_config &config)
 {
 	I8255A(config, m_ppi, 0);
-	m_ppi->in_pa_callback().set(FUNC(buscard_t::ppi_pa_r));
-	m_ppi->out_pa_callback().set(FUNC(buscard_t::ppi_pa_w));
+	m_ppi->in_pa_callback().set(FUNC(c64_buscard_device::ppi_pa_r));
+	m_ppi->out_pa_callback().set(FUNC(c64_buscard_device::ppi_pa_w));
 	m_ppi->in_pb_callback().set_constant(0xff);
-	m_ppi->out_pb_callback().set(FUNC(buscard_t::ppi_pb_w));
-	m_ppi->in_pc_callback().set(FUNC(buscard_t::ppi_pc_r));
-	m_ppi->out_pc_callback().set(FUNC(buscard_t::ppi_pc_w));
+	m_ppi->out_pb_callback().set(FUNC(c64_buscard_device::ppi_pb_w));
+	m_ppi->in_pc_callback().set(FUNC(c64_buscard_device::ppi_pc_r));
+	m_ppi->out_pc_callback().set(FUNC(c64_buscard_device::ppi_pc_w));
 
 	DS75160A(config, m_ieee1, 0);
 	m_ieee1->read_callback().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
@@ -268,7 +256,7 @@ void buscard_t::device_add_mconfig(machine_config &config)
 	ieee488_slot_device::add_cbm_defaults(config, nullptr);
 
 	CENTRONICS(config, m_centronics, centronics_devices, nullptr);
-	m_centronics->busy_handler().set(FUNC(buscard_t::busy_w));
+	m_centronics->busy_handler().set(FUNC(c64_buscard_device::busy_w));
 
 	C64_EXPANSION_SLOT(config, m_exp, DERIVED_CLOCK(1, 1), c64_expansion_cards, nullptr);
 	m_exp->set_passthrough();
@@ -281,18 +269,18 @@ void buscard_t::device_add_mconfig(machine_config &config)
 //**************************************************************************
 
 //-------------------------------------------------
-//  buscard_t - constructor
+//  c64_buscard_device - constructor
 //-------------------------------------------------
 
-buscard_t::buscard_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_buscard_device::c64_buscard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, C64_BUSCARD, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
-	m_ppi(*this, I8255_TAG),
-	m_ieee1(*this, DS75160A_TAG),
-	m_ieee2(*this, DS75161A_TAG),
+	m_ppi(*this, "u2"),
+	m_ieee1(*this, "u3"),
+	m_ieee2(*this, "u4"),
 	m_bus(*this, IEEE488_TAG),
-	m_centronics(*this, CENTRONICS_TAG),
-	m_exp(*this, EXPANSION_TAG),
+	m_centronics(*this, "p4"),
+	m_exp(*this, "exp"),
 	m_s1(*this, "S1"),
 	m_rom(*this, "rom"),
 	m_te(1),
@@ -308,7 +296,7 @@ buscard_t::buscard_t(const machine_config &mconfig, const char *tag, device_t *o
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void buscard_t::device_start()
+void c64_buscard_device::device_start()
 {
 	m_ieee1->pe_w(0);
 	m_ieee2->dc_w(0);
@@ -326,7 +314,7 @@ void buscard_t::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void buscard_t::device_reset()
+void c64_buscard_device::device_reset()
 {
 	m_ppi->reset();
 
@@ -339,7 +327,7 @@ void buscard_t::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t buscard_t::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_buscard_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	int cs = BIT(offset, 6) && BIT(offset, 7);
 
@@ -376,7 +364,7 @@ uint8_t buscard_t::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int 
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void buscard_t::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_buscard_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	int cs = BIT(offset, 6) && BIT(offset, 7);
 
@@ -393,7 +381,7 @@ void buscard_t::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int rom
 //  c64_game_r - cartridge GAME read
 //-------------------------------------------------
 
-int buscard_t::c64_game_r(offs_t offset, int sphi2, int ba, int rw)
+int c64_buscard_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw)
 {
 	return pd_pgm1(offset, sphi2) & m_exp->game_r(offset, sphi2, ba, rw, m_slot->loram(), m_slot->hiram());
 }
@@ -403,7 +391,7 @@ int buscard_t::c64_game_r(offs_t offset, int sphi2, int ba, int rw)
 //  c64_exrom_r - cartridge EXROM read
 //-------------------------------------------------
 
-int buscard_t::c64_exrom_r(offs_t offset, int sphi2, int ba, int rw)
+int c64_buscard_device::c64_exrom_r(offs_t offset, int sphi2, int ba, int rw)
 {
 	return (!pd_pgm1(offset, sphi2)) | m_exp->exrom_r(offset, sphi2, ba, rw, m_slot->loram(), m_slot->hiram());
 }
@@ -413,7 +401,7 @@ int buscard_t::c64_exrom_r(offs_t offset, int sphi2, int ba, int rw)
 //  pd_pgm1 - ROM 1 enable
 //-------------------------------------------------
 
-bool buscard_t::pd_pgm1(offs_t offset, int sphi2)
+bool c64_buscard_device::pd_pgm1(offs_t offset, int sphi2)
 {
 	if (sphi2 && m_slot->hiram())
 	{
@@ -436,7 +424,7 @@ bool buscard_t::pd_pgm1(offs_t offset, int sphi2)
 //  pd_pgm234 - ROM 2/3/4 enable
 //-------------------------------------------------
 
-bool buscard_t::pd_pgm234(offs_t offset, int sphi2, int bank)
+bool c64_buscard_device::pd_pgm234(offs_t offset, int sphi2, int bank)
 {
 	return !(sphi2 && m_slot->hiram() && m_slot->loram() && offset >= 0xa000 && offset < 0xc000 && m_basic && (m_bank == bank));
 }

@@ -834,7 +834,7 @@ void suna16_state::bssoccer(machine_config &config)
 	m_pcm2->set_addrmap(AS_PROGRAM, &suna16_state::bssoccer_pcm_2_map);
 	m_pcm2->set_addrmap(AS_IO, &suna16_state::bssoccer_pcm_2_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MCFG_MACHINE_START_OVERRIDE(suna16_state,bssoccer)
 
@@ -898,7 +898,7 @@ void suna16_state::uballoon(machine_config &config)
 
 	/* 2nd PCM Z80 missing */
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MCFG_MACHINE_START_OVERRIDE(suna16_state,uballoon)
 	MCFG_MACHINE_RESET_OVERRIDE(suna16_state,uballoon)
@@ -956,7 +956,7 @@ void suna16_state::sunaq(machine_config &config)
 
 	/* 2nd PCM Z80 missing */
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MCFG_MACHINE_START_OVERRIDE(suna16_state,uballoon)
 	MCFG_MACHINE_RESET_OVERRIDE(suna16_state,uballoon)
@@ -1019,7 +1019,7 @@ void suna16_state::bestbest(machine_config &config)
 
 	/* 2nd PCM Z80 missing */
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MCFG_MACHINE_START_OVERRIDE(suna16_state, bestbest)
 

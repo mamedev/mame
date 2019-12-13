@@ -165,7 +165,7 @@ void scramble_state::newsin7_map(address_map &map)
 	map(0x5080, 0x50ff).ram();
 	map(0x6800, 0x6800).w(FUNC(scramble_state::galaxold_coin_counter_1_w));
 	map(0x6801, 0x6801).w(FUNC(scramble_state::galaxold_stars_enable_w));
-	//AM_RANGE(0x6802, 0x6802) AM_WRITE(galaxold_nmi_enable_w)
+	//map(0x6802, 0x6802).w(FUNC(scramble_state::galaxold_nmi_enable_w));
 	map(0x6808, 0x6808).w(FUNC(scramble_state::galaxold_coin_counter_0_w));
 	map(0x6809, 0x6809).w(FUNC(scramble_state::galaxold_flip_screen_x_w));
 	map(0x680b, 0x680b).w(FUNC(scramble_state::galaxold_flip_screen_y_w));
@@ -1464,12 +1464,10 @@ void scramble_state::hotshock(machine_config &config)
 	m_palette->set_init(FUNC(scramble_state::galaxold_palette));
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,pisces)
 
-	subdevice<ay8910_device>("8910.1")->reset_routes();
-	subdevice<ay8910_device>("8910.1")->add_route(ALL_OUTPUTS, "mono", 0.33);
+	subdevice<ay8910_device>("8910.1")->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.33);
 
 	subdevice<ay8910_device>("8910.2")->port_a_read_callback().set(FUNC(scramble_state::hotshock_soundlatch_r));
-	subdevice<ay8910_device>("8910.2")->reset_routes();
-	subdevice<ay8910_device>("8910.2")->add_route(ALL_OUTPUTS, "mono", 0.33);
+	subdevice<ay8910_device>("8910.2")->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.33);
 }
 
 void scramble_state::cavelon(machine_config &config)
@@ -1514,8 +1512,7 @@ void scramble_state::triplep(machine_config &config)
 
 	/* sound hardware */
 	subdevice<ay8910_device>("8910.1")->set_clock(18432000/12); // triple punch/knock out ay clock is 1.535MHz, derived from main cpu xtal; verified on hardware
-	subdevice<ay8910_device>("8910.1")->reset_routes();
-	subdevice<ay8910_device>("8910.1")->add_route(ALL_OUTPUTS, "mono", 1.0);
+	subdevice<ay8910_device>("8910.1")->reset_routes().add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	config.device_remove("8910.2");
 }

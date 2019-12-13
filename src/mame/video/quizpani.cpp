@@ -68,8 +68,8 @@ WRITE16_MEMBER(quizpani_state::tilesbank_w)
 
 void quizpani_state::video_start()
 {
-	m_bg_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(quizpani_state::bg_tile_info),this), tilemap_mapper_delegate(FUNC(quizpani_state::bg_scan),this),16,16,256,32);
-	m_txt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(quizpani_state::txt_tile_info),this),tilemap_mapper_delegate(FUNC(quizpani_state::bg_scan),this),16,16,256,32);
+	m_bg_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(quizpani_state::bg_tile_info)),  tilemap_mapper_delegate(*this, FUNC(quizpani_state::bg_scan)), 16,16, 256,32);
+	m_txt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(quizpani_state::txt_tile_info)), tilemap_mapper_delegate(*this, FUNC(quizpani_state::bg_scan)), 16,16, 256,32);
 	m_txt_tilemap->set_transparent_pen(15);
 
 	save_item(NAME(m_bgbank));

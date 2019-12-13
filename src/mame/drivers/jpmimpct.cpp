@@ -629,22 +629,22 @@ void jpmimpct_state::awp68k_program_map(address_map &map)
 	map(0x00480084, 0x00480085).r(FUNC(jpmimpct_state::upd7759_r));
 	map(0x00480086, 0x0048009f).r(FUNC(jpmimpct_state::prot_1_r));
 	map(0x004800a0, 0x004800af).rw(FUNC(jpmimpct_state::jpmio_r), FUNC(jpmimpct_state::jpmioawp_w));
-//  AM_RANGE(0x004800b0, 0x004800df) AM_READ(prot_1_r)
-//  AM_RANGE(0x004800e0, 0x004800e1) AM_WRITE(unk_w)
-//  AM_RANGE(0x00480086, 0x006576ff) AM_READ(prot_1_r)
+//  map(0x004800b0, 0x004800df).r(FUNC(jpmimpct_state::prot_1_r));
+//  map(0x004800e0, 0x004800e1).w(FUNC(jpmimpct_state::unk_w));
+//  map(0x00480086, 0x006576ff).r(FUNC(jpmimpct_state::prot_1_r));
 	map(0x004801dc, 0x004801dd).r(FUNC(jpmimpct_state::prot_1_r));
 	map(0x004801de, 0x006575ff).r(FUNC(jpmimpct_state::prot_1_r));
 	map(0x00657600, 0x00657601).r(FUNC(jpmimpct_state::prot_0_r));
 	map(0x00657602, 0x00ffffff).r(FUNC(jpmimpct_state::prot_1_r));
 
-//  AM_RANGE(0x004801dc, 0x004801dd) AM_READ(unk_r)
-//  AM_RANGE(0x004801de, 0x004801df) AM_READ(unk_r)
-	//AM_RANGE(0x00657602, 0x00bfffff) AM_READ(prot_1_r)
-//  AM_RANGE(0x004801e0, 0x004801ff) AM_READWRITE(duart_2_r, duart_2_w)
-//  AM_RANGE(0x00c00000, 0x00cfffff) AM_ROM
-//  AM_RANGE(0x00d00000, 0x00dfffff) AM_ROM
-//  AM_RANGE(0x00e00000, 0x00efffff) AM_ROM
-//  AM_RANGE(0x00f00000, 0x00ffffff) AM_ROM
+//  map(0x004801dc, 0x004801dd).r(FUNC(jpmimpct_state::unk_r));
+//  map(0x004801de, 0x004801df).r(FUNC(jpmimpct_state::unk_r));
+//  map(0x00657602, 0x00bfffff).r(FUNC(jpmimpct_state::prot_1_r));
+//  map(0x004801e0, 0x004801ff).rw(FUNC(jpmimpct_state::duart_2_r), FUNC(jpmimpct_state::duart_2_w));
+//  map(0x00c00000, 0x00cfffff).rom();
+//  map(0x00d00000, 0x00dfffff).rom();
+//  map(0x00e00000, 0x00efffff).rom();
+//  map(0x00f00000, 0x00ffffff).rom();
 }
 
 
@@ -659,7 +659,7 @@ void jpmimpct_state::tms_program_map(address_map &map)
 	map(0x00000000, 0x003fffff).mirror(0xf8000000).ram().share("vram");
 	map(0x00800000, 0x00ffffff).mirror(0xf8000000).rom().region("user1", 0x100000);
 	map(0x02000000, 0x027fffff).mirror(0xf8000000).rom().region("user1", 0);
-//  AM_RANGE(0x01000000, 0x0100003f) AM_MIRROR(0xf87fffc0) AM_READWRITE(jpmimpct_bt477_r, jpmimpct_bt477_w)
+//  map(0x01000000, 0x0100003f).mirror(0xf87fffc0).rw(FUNC(jpmimpct_state::jpmimpct_bt477_r), FUNC(jpmimpct_state::jpmimpct_bt477_w));
 	map(0x01000000, 0x017fffff).mirror(0xf8000000).mask(0x1f).rw(FUNC(jpmimpct_state::jpmimpct_bt477_r), FUNC(jpmimpct_state::jpmimpct_bt477_w));
 	map(0x07800000, 0x07bfffff).mirror(0xf8400000).ram();
 }
@@ -853,7 +853,7 @@ void jpmimpct_state::jpmimpct(machine_config &config)
 	m_dsp->set_shiftreg_in_callback(FUNC(jpmimpct_state::to_shiftreg));
 	m_dsp->set_shiftreg_out_callback(FUNC(jpmimpct_state::from_shiftreg));
 
-	config.m_minimum_quantum = attotime::from_hz(30000);
+	config.set_maximum_quantum(attotime::from_hz(30000));
 	MCFG_MACHINE_START_OVERRIDE(jpmimpct_state,jpmimpct)
 	MCFG_MACHINE_RESET_OVERRIDE(jpmimpct_state,jpmimpct)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -1314,7 +1314,7 @@ void jpmimpct_state::impctawp(machine_config &config)
 	M68000(config, m_maincpu, 8000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jpmimpct_state::awp68k_program_map);
 
-	config.m_minimum_quantum = attotime::from_hz(30000);
+	config.set_maximum_quantum(attotime::from_hz(30000));
 	S16LF01(config, m_vfd);
 
 	MCFG_MACHINE_START_OVERRIDE(jpmimpct_state,impctawp)

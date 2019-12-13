@@ -27,7 +27,7 @@ public:
 	// construction/destruction
 	hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename... T> void set_display_callback(T &&... args) { m_display_cb = display_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_display_callback(T &&... args) { m_display_cb.set(std::forward<T>(args)...); }
 	void set_auto_configure_screen(bool auto_configure_screen) { m_auto_configure_screen = auto_configure_screen; }
 	void set_external_skew(int skew) { m_external_skew = skew; }
 

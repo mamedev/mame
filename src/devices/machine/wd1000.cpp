@@ -28,6 +28,7 @@ wd1000_device::wd1000_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, WD1000, tag, owner, clock)
 	, m_intrq_cb(*this)
 	, m_drq_cb(*this)
+	, m_drives(*this, "%u", 0)
 	, m_sector_base(0)
 	, m_buffer_index(0)
 	, m_buffer_end(0)
@@ -68,18 +69,29 @@ void wd1000_device::device_start()
 	m_buffer_index = 0;
 
 	for (int i = 0; i < 4; i++)
-	{
-		char name[2];
-		name[0] = '0' + i;
-		name[1] = 0;
-		m_drives[i].drive = subdevice<harddisk_image_device>(name);
-		m_drives[i].cylinder = 0;
-	}
+		m_drive_cylinder[i] = 0;
 
 	// Initialize the status as ready if the initial drive exists,
 	// and assume it has been restored so seek is complete.
-	if (m_drives[drive()].drive->exists())
+	if (m_drives[drive()] && m_drives[drive()]->exists())
 		m_status |= S_RDY | S_SC;
+
+	save_item(NAME(m_drive_cylinder));
+	save_item(NAME(m_sector_base));
+	save_item(NAME(m_buffer));
+	save_item(NAME(m_buffer_index));
+	save_item(NAME(m_buffer_end));
+	save_item(NAME(m_intrq));
+	save_item(NAME(m_drq));
+	save_item(NAME(m_stepping_rate));
+	save_item(NAME(m_command));
+	save_item(NAME(m_error));
+	save_item(NAME(m_precomp));
+	save_item(NAME(m_sector_count));
+	save_item(NAME(m_sector_number));
+	save_item(NAME(m_cylinder));
+	save_item(NAME(m_sdh));
+	save_item(NAME(m_status));
 }
 
 //-------------------------------------------------
@@ -92,9 +104,9 @@ void wd1000_device::device_reset()
 	m_sdh = 0x20;
 
 	for (int i = 0; i < 4; i++)
-		m_drives[i].cylinder = 0;
+		m_drive_cylinder[i] = 0;
 
-	if (m_drives[drive()].drive->exists())
+	if (m_drives[drive()] && m_drives[drive()]->exists())
 		m_status |= S_RDY | S_SC;
 }
 
@@ -108,7 +120,7 @@ void wd1000_device::device_timer(emu_timer &timer, device_timer_id tid, int para
 	{
 	case TIMER_SEEK:
 
-		m_drives[drive()].cylinder = param;
+		m_drive_cylinder[drive()] = param;
 		m_status |= S_SC;
 
 		switch (m_command >> 4)
@@ -228,7 +240,7 @@ void wd1000_device::end_command()
 
 int wd1000_device::get_lbasector()
 {
-	hard_disk_file *file = m_drives[drive()].drive->get_hard_disk_file();
+	hard_disk_file *file = m_drives[drive()]->get_hard_disk_file();
 	hard_disk_info *info = hard_disk_get_info(file);
 	int lbasector;
 
@@ -407,13 +419,13 @@ void wd1000_device::data_w(uint8_t data)
 	{
 		// Tranfer completed.
 		if ((m_command >> 4) == CMD_WRITE_SECTOR ||
-		    (m_command >> 4) == CMD_WRITE_FORMAT)
+			(m_command >> 4) == CMD_WRITE_FORMAT)
 		{
 			m_status |= S_BSY;
 			set_error(0);
 			// Implied seek
 			m_status &= ~S_SC;
-			int amount = abs(m_drives[drive()].cylinder - m_cylinder);
+			int amount = abs(m_drive_cylinder[drive()] - m_cylinder);
 			int target = m_cylinder;
 			m_seek_timer->adjust(get_stepping_rate() * amount, target);
 		}
@@ -476,7 +488,7 @@ WRITE8_MEMBER( wd1000_device::write )
 		// Update the drive ready flag in the status register which
 		// indicates the ready state for the selected drive.
 		// TODO should this also set the SC flag?
-		if (m_drives[drive].drive->exists())
+		if (m_drives[drive] && m_drives[drive]->exists())
 			m_status |= S_RDY;
 		else
 			m_status &= ~S_RDY;
@@ -519,7 +531,7 @@ WRITE8_MEMBER( wd1000_device::write )
 				start_command();
 				// Schedule an implied seek.
 				m_status &= ~S_SC;
-				int amount = m_drives[drive()].cylinder;
+				int amount = m_drive_cylinder[drive()];
 				int target = 0;
 				m_seek_timer->adjust(get_stepping_rate() * amount, target);
 				break;
@@ -529,7 +541,7 @@ WRITE8_MEMBER( wd1000_device::write )
 			case CMD_READ_SECTOR:
 			  {
 				start_command();
-				int amount = abs(m_drives[drive()].cylinder - m_cylinder);
+				int amount = abs(m_drive_cylinder[drive()] - m_cylinder);
 				int target = m_cylinder;
 				m_seek_timer->adjust(get_stepping_rate() * amount, target);
 				break;
@@ -558,9 +570,12 @@ void wd1000_device::cmd_restore()
 	end_command();
 }
 
+// These commands should only be reachable if the status flag S_RDY is
+// true, and that should only occur if the m_drives element is there,
+// so it is not necessary to guard that case in these functions.
 void wd1000_device::cmd_read_sector()
 {
-	hard_disk_file *file = m_drives[drive()].drive->get_hard_disk_file();
+	hard_disk_file *file = m_drives[drive()]->get_hard_disk_file();
 	uint8_t dma = BIT(m_command, 3);
 
 	hard_disk_read(file, get_lbasector(), m_buffer);
@@ -581,7 +596,7 @@ void wd1000_device::cmd_read_sector()
 
 void wd1000_device::cmd_write_sector()
 {
-	hard_disk_file *file = m_drives[drive()].drive->get_hard_disk_file();
+	hard_disk_file *file = m_drives[drive()]->get_hard_disk_file();
 
 	if (m_buffer_index != sector_bytes())
 	{
@@ -595,7 +610,7 @@ void wd1000_device::cmd_write_sector()
 
 void wd1000_device::cmd_format_sector()
 {
-	hard_disk_file *file = m_drives[drive()].drive->get_hard_disk_file();
+	hard_disk_file *file = m_drives[drive()]->get_hard_disk_file();
 	uint8_t buffer[512];
 
 	// The m_buffer appears to be loaded with an interleave table which is

@@ -169,6 +169,11 @@ Exidy Sorcerer Video/Disk Unit:
 #include "softlist.h"
 #include "speaker.h"
 
+#define FLOPPY_0 "floppy0"
+#define FLOPPY_1 "floppy1"
+#define FLOPPY_2 "floppy2"
+#define FLOPPY_3 "floppy3"
+
 
 void sorcerer_state::sorcerer_mem(address_map &map)
 {
@@ -488,18 +493,18 @@ void sorcerer_state::sorcerer(machine_config &config)
 	INPUT_BUFFER(config, "cent_status_in");
 
 	/* quickload */
-	SNAPSHOT(config, "snapshot", "snp", attotime::from_seconds(2)).set_load_callback(FUNC(sorcerer_state::snapshot_cb), this);
-	QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(3)).set_load_callback(FUNC(sorcerer_state::quickload_cb), this);
+	SNAPSHOT(config, "snapshot", "snp", attotime::from_seconds(2)).set_load_callback(FUNC(sorcerer_state::snapshot_cb));
+	QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(3)).set_load_callback(FUNC(sorcerer_state::quickload_cb));
 
 	CASSETTE(config, m_cassette1);
 	m_cassette1->set_formats(sorcerer_cassette_formats);
-	m_cassette1->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette1->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette1->add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
 	m_cassette1->set_interface("sorcerer_cass");
 
 	CASSETTE(config, m_cassette2);
 	m_cassette2->set_formats(sorcerer_cassette_formats);
-	m_cassette2->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette2->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette2->add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
 	m_cassette2->set_interface("sorcerer_cass");
 
@@ -528,8 +533,12 @@ void sorcerer_state::sorcererd(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(sorcerer_state, sorcererd )
 
 	MICROPOLIS(config, m_fdc, 0);
-	m_fdc->set_default_drive_tags();
-	legacy_floppy_image_device::add_4drives(config, &sorcerer_floppy_interface);
+	m_fdc->set_drive_tags(FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3);
+
+	LEGACY_FLOPPY(config, FLOPPY_0, 0, &sorcerer_floppy_interface);
+	LEGACY_FLOPPY(config, FLOPPY_1, 0, &sorcerer_floppy_interface);
+	LEGACY_FLOPPY(config, FLOPPY_2, 0, &sorcerer_floppy_interface);
+	LEGACY_FLOPPY(config, FLOPPY_3, 0, &sorcerer_floppy_interface);
 
 	FD1793(config, m_fdc2, 8_MHz_XTAL / 8);  // confirmed clock
 	m_fdc2->set_force_ready(true); // should be able to get rid of this when fdc issue is fixed
@@ -667,6 +676,11 @@ ROM_START(sorcererb)
 	ROM_IGNORE(0x800)
 	ROMX_LOAD("scua1.2e",    0xe800, 0x0800, CRC(aa9a6ca6) SHA1(bcaa7457a1b892ed82c1a04ee21a619faa7c1a16), ROM_BIOS(1) )
 	ROM_IGNORE(0x800)
+	ROM_SYSTEM_BIOS(2, "scuamon64dd", "SCUAMON64DD")
+	ROMX_LOAD("devinb.1e",   0xe000, 0x0800, CRC(a2ea2f93) SHA1(8f9298f1641806dfba819ead318a4838385223fe), ROM_BIOS(2) )
+	ROM_CONTINUE(0xe000, 0x800)
+	ROMX_LOAD("devinb.2e",   0xe800, 0x0800, CRC(4d9ea9a5) SHA1(1a3c8cf98d4caed6044b1b01cd79dcd9c61dc1e1), ROM_BIOS(2) )
+	ROM_CONTINUE(0xe800, 0x800)
 ROM_END
 
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     STATE           INIT           COMPANY      FULLNAME */

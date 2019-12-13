@@ -9,26 +9,28 @@
 
 #include <cstdio>
 
-/* From: https://ffmpeg.org/pipermail/ffmpeg-devel/2007-October/038122.html
- * The most compatible way to make a wav header for unknown length is to put
- * 0xffffffff in the header. 0 as the RIFF length and 0 as the data chunk length
- * is a common agreement in serious recording applications while
- * still recording the file. So a playback application can determine that the
- * given file is still being recorded. As soon as the recording application
- * finishes the ongoing recording, it writes the correct values for RIFF lenth
- * and data chunk length to the file.
- */
-/* http://de.wikipedia.org/wiki/RIFF_WAVE */
+// From: https://ffmpeg.org/pipermail/ffmpeg-devel/2007-October/038122.html
+// The most compatible way to make a wav header for unknown length is to put
+// 0xffffffff in the header. 0 as the RIFF length and 0 as the data chunk length
+// is a common agreement in serious recording applications while
+// still recording the file. So a playback application can determine that the
+// given file is still being recorded. As soon as the recording application
+// finishes the ongoing recording, it writes the correct values for RIFF lenth
+// and data chunk length to the file.
+//
+// http://de.wikipedia.org/wiki/RIFF_WAVE
+//
 
 class wav_t
 {
 public:
 	// XXNOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
-	wav_t(plib::postream &strm, std::size_t sr, std::size_t channels)
+	wav_t(std::ostream &strm, bool is_seekable, std::size_t sr, std::size_t channels)
 	: m_f(strm)
-	/* force "play" to play and warn about eof instead of being silent */
+	, m_stream_is_seekable(is_seekable)
+	// force "play" to play and warn about eof instead of being silent
 	, m_fmt(static_cast<std::uint16_t>(channels), static_cast<std::uint32_t>(sr))
-	, m_data(m_f.seekable() ? 0 : 0xffffffff)
+	, m_data(is_seekable ? 0 : 0xffffffff)
 	{
 
 		write(m_fh);
@@ -40,7 +42,7 @@ public:
 
 	~wav_t()
 	{
-		if (m_f.seekable())
+		if (m_stream_is_seekable)
 		{
 			m_fh.filelen = m_data.len + sizeof(m_data) + sizeof(m_fh) + sizeof(m_fmt) - 8;
 			m_f.seekp(0);
@@ -52,13 +54,13 @@ public:
 		}
 	}
 
-	std::size_t channels() { return m_fmt.channels; }
-	std::size_t sample_rate() { return m_fmt.sample_rate; }
+	std::size_t channels() const { return m_fmt.channels; }
+	std::size_t sample_rate() const { return m_fmt.sample_rate; }
 
 	template <typename T>
 	void write(const T &val)
 	{
-		m_f.write(reinterpret_cast<const plib::postream::char_type *>(&val), sizeof(T));
+		m_f.write(reinterpret_cast<const std::ostream::char_type *>(&val), sizeof(T));
 	}
 
 	void write_sample(int *sample)
@@ -66,7 +68,7 @@ public:
 		m_data.len += m_fmt.block_align;
 		for (std::size_t i = 0; i < channels(); i++)
 		{
-			auto ps = static_cast<int16_t>(sample[i]); /* 16 bit sample, FIXME: Endianess? */
+			auto ps = static_cast<int16_t>(sample[i]); // 16 bit sample, FIXME: Endianess?
 			write(ps);
 		}
 	}
@@ -74,9 +76,9 @@ public:
 private:
 	struct riff_chunk_t
 	{
-		uint8_t    group_id[4]   = {'R','I','F','F'};
-		uint32_t   filelen       = 0;
-		uint8_t    rifftype[4]   = {'W','A','V','E'};
+		std::array<uint8_t, 4> group_id = {{'R','I','F','F'}};
+		uint32_t               filelen  = 0;
+		std::array<uint8_t, 4> rifftype = {{'W','A','V','E'}};
 	};
 
 	struct riff_format_t
@@ -88,7 +90,7 @@ private:
 			block_align = channels * ((bits_sample + 7) / 8);
 			bytes_per_second = sample_rate * block_align;
 		}
-		uint8_t             signature[4] = {'f','m','t',' '};
+		std::array<uint8_t, 4> signature = {{'f','m','t',' '}};
 		uint32_t            fmt_length   = 16;
 		uint16_t            format_tag   = 0x0001; // PCM
 		uint16_t            channels;
@@ -100,13 +102,14 @@ private:
 
 	struct riff_data_t
 	{
-		riff_data_t(uint32_t alen) : len(alen) {}
-		uint8_t     signature[4] = {'d','a','t','a'};
+		explicit riff_data_t(uint32_t alen) : len(alen) {}
+		std::array<uint8_t, 4> signature = {{'d','a','t','a'}};
 		uint32_t    len;
 		// data follows
 	};
 
-	plib::postream &m_f;
+	std::ostream &m_f;
+	bool m_stream_is_seekable;
 
 	riff_chunk_t m_fh;
 	riff_format_t m_fmt;
@@ -155,7 +158,7 @@ public:
 		return success;
 	}
 
-	void process(std::vector<plib::unique_ptr<plib::pistream>> &is)
+	void process(std::vector<plib::unique_ptr<std::istream>> &is)
 	{
 		std::vector<plib::putf8_reader> readers;
 		for (auto &i : is)
@@ -238,7 +241,7 @@ private:
 class wavwriter
 {
 public:
-	wavwriter(plib::postream &fo, std::size_t channels, std::size_t sample_rate, double ampa)
+	wavwriter(std::ostream &fo, bool is_seekable, std::size_t channels, std::size_t sample_rate, double ampa)
 	: mean(channels, 0.0)
 	, means(channels, 0.0)
 	, maxsam(channels, -1e9)
@@ -248,7 +251,7 @@ public:
 	, m_last_time(0)
 	, m_fo(fo)
 	, m_amp(ampa)
-	, m_wo(m_fo, sample_rate, channels)
+	, m_wo(m_fo, is_seekable, sample_rate, channels)
 	{ }
 
 	void process(std::size_t chan, double time, double outsam)
@@ -279,7 +282,7 @@ public:
 
 private:
 
-	plib::postream &m_fo;
+	std::ostream &m_fo;
 	double m_amp;
 	wav_t m_wo;
 };
@@ -294,7 +297,7 @@ public:
 		ANALOG
 	};
 
-	vcdwriter(plib::postream &fo, const std::vector<pstring> &channels,
+	vcdwriter(std::ostream &fo, const std::vector<pstring> &channels,
 		format_e format, double high_level = 2.0, double low_level = 1.0)
 	: m_channels(channels.size())
 	, m_last_time(0)
@@ -316,9 +319,9 @@ public:
 		{
 			//      $var real 64 N1X1 N1X1 $end
 			if (format == ANALOG)
-				write(pstring("$var real 64 ") + m_ids[i++] + " " + ch + " $end\n");
+				write("$var real 64 " + m_ids[i++] + " " + ch + " $end\n");
 			else if (format == DIGITAL)
-				write(pstring("$var wire 1 ") + m_ids[i++] + " " + ch + " $end\n");
+				write("$var wire 1 " + m_ids[i++] + " " + ch + " $end\n");
 		}
 		write("$enddefinitions $end\n");
 		if (format == ANALOG)
@@ -326,7 +329,7 @@ public:
 			write("$dumpvars\n");
 			//r0.0 N1X1
 			for (i = 0; i < channels.size(); i++)
-				write(pstring("r0.0 ") + m_ids[i] + "\n");
+				write("r0.0 " + m_ids[i] + "\n");
 			write("$end\n");
 		}
 
@@ -336,7 +339,7 @@ public:
 	{
 		if (time > m_last_time)
 		{
-			write(pstring("#") + plib::to_string(static_cast<std::int64_t>(m_last_time * 1e9)) + " ");
+			write("#" + plib::to_string(static_cast<std::int64_t>(m_last_time * 1e9)) + " ");
 			write(m_buf + "\n");
 			m_buf = "";
 			m_last_time = time;
@@ -346,22 +349,22 @@ public:
 		else
 		{
 			if (outsam >= m_high_level)
-				m_buf += pstring("1") + m_ids[chan] + " ";
+				m_buf += "1" + m_ids[chan] + " ";
 			else if (outsam <= m_low_level)
-				m_buf += pstring("0") + m_ids[chan] + " ";
+				m_buf += "0" + m_ids[chan] + " ";
 		}
 	}
 
 private:
 	void write(const pstring &line)
 	{
-		m_fo.write(line.c_str(), plib::strlen(line.c_str()));
+		m_fo.write(line.c_str(), static_cast<std::streamsize>(plib::strlen(line.c_str())));
 	}
 
 	std::size_t m_channels;
 	double m_last_time;
 
-	plib::postream &m_fo;
+	std::ostream &m_fo;
 	std::vector<pstring> m_ids;
 	pstring m_buf;
 	double m_high_level;
@@ -394,16 +397,16 @@ public:
 		opt_ex1(*this, "./nlwav -f vcdd -o x.vcd log_V*",
 			"convert all files starting with \"log_V\" into a digital vcd file"),
 		opt_ex2(*this, "./nlwav -f wav -o x.wav log_V*",
-			"convert all files starting with \"log_V\" into a multichannel wav file"),
-		m_outstrm(nullptr)
+			"convert all files starting with \"log_V\" into a multichannel wav file")
 	{}
 
 	int execute() override;
 	pstring usage() override;
 
 private:
-	void convert_wav();
-	void convert_vcd(vcdwriter::format_e format);
+	void convert_wav(std::ostream &ostrm);
+	void convert_vcd(std::ostream &ostrm, vcdwriter::format_e format);
+	void convert(std::ostream &ostrm);
 
 	plib::option_str_limit<unsigned> opt_fmt;
 	plib::option_str    opt_out;
@@ -418,18 +421,15 @@ private:
 	plib::option_bool   opt_help;
 	plib::option_example   opt_ex1;
 	plib::option_example   opt_ex2;
-	plib::pstdin pin_strm;
-
-	std::vector<plib::unique_ptr<plib::pistream>> m_instrms;
-	plib::postream *m_outstrm;
+	std::vector<plib::unique_ptr<std::istream>> m_instrms;
 };
 
-void nlwav_app::convert_wav()
+void nlwav_app::convert_wav(std::ostream &ostrm)
 {
 
 	double dt = 1.0 / static_cast<double>(opt_rate());
 
-	plib::unique_ptr<wavwriter> wo = plib::make_unique<wavwriter>(*m_outstrm, m_instrms.size(), opt_rate(), opt_amp());
+	plib::unique_ptr<wavwriter> wo = plib::make_unique<wavwriter>(ostrm, opt_out() != "-", m_instrms.size(), opt_rate(), opt_amp());
 	plib::unique_ptr<aggregator> ago = plib::make_unique<aggregator>(m_instrms.size(), dt, aggregator::callback_type(&wavwriter::process, wo.get()));
 	aggregator::callback_type agcb = log_processor::callback_type(&aggregator::process, ago.get());
 
@@ -448,10 +448,10 @@ void nlwav_app::convert_wav()
 	}
 }
 
-void nlwav_app::convert_vcd(vcdwriter::format_e format)
+void nlwav_app::convert_vcd(std::ostream &ostrm, vcdwriter::format_e format)
 {
 
-	plib::unique_ptr<vcdwriter> wo = plib::make_unique<vcdwriter>(*m_outstrm, opt_args(),
+	plib::unique_ptr<vcdwriter> wo = plib::make_unique<vcdwriter>(ostrm, opt_args(),
 		format, opt_high(), opt_low());
 	log_processor::callback_type agcb = log_processor::callback_type(&vcdwriter::process, wo.get());
 
@@ -476,11 +476,26 @@ pstring nlwav_app::usage()
 			"nlwav [OPTION] ... [FILE] ...");
 }
 
+void nlwav_app::convert(std::ostream &ostrm)
+{
+	switch (opt_fmt())
+	{
+		case 0:
+			convert_wav(ostrm); break;
+		case 1:
+			convert_vcd(ostrm, vcdwriter::ANALOG); break;
+		case 2:
+			convert_vcd(ostrm, vcdwriter::DIGITAL); break;
+		default:
+			// tease compiler - can't happen
+			break;
+	}
+}
 
 int nlwav_app::execute()
 {
 	for (auto &i : opt_args())
-		pout(pstring("Hello : ") + i + "\n");
+		pout("Hello : " + i + "\n");
 	if (opt_help())
 	{
 		pout(usage());
@@ -499,55 +514,59 @@ int nlwav_app::execute()
 		return 0;
 	}
 
-	m_outstrm = (opt_out() == "-" ? &pout_strm : plib::pnew<plib::pofilestream>(opt_out()));
-
 	for (auto &oi: opt_args())
 	{
-		plib::unique_ptr<plib::pistream> fin = (oi == "-" ?
-			  plib::make_unique<plib::pstdin>()
-			: plib::make_unique<plib::pifilestream>(oi));
+		plib::unique_ptr<std::istream> fin;
+
+		if (oi == "-")
+		{
+			auto temp(plib::make_unique<std::stringstream>());
+			plib::copystream(*temp, std::cin);
+			fin = std::move(temp);
+		}
+		else
+			fin = plib::make_unique<std::ifstream>(plib::filesystem::u8path(oi));
+		fin->imbue(std::locale::classic());
 		m_instrms.push_back(std::move(fin));
 	}
 
-	switch (opt_fmt())
-	{
-		case 0:
-			convert_wav(); break;
-		case 1:
-			convert_vcd(vcdwriter::ANALOG); break;
-		case 2:
-			convert_vcd(vcdwriter::DIGITAL); break;
-		default:
-			// tease compiler - can't happen
-			break;
-	}
-
 	if (opt_out() != "-")
-		plib::pdelete(m_outstrm);
+	{
+		auto outstrm(std::ofstream(plib::filesystem::u8path(opt_out())));
+		if (outstrm.fail())
+			plib::pthrow<plib::file_open_e>(opt_out());
+		outstrm.imbue(std::locale::classic());
+		convert(outstrm);
+	}
+	else
+	{
+		std::cout.imbue(std::locale::classic());
+		convert(std::cout);
+	}
 
 	return 0;
 }
 
 PMAIN(nlwav_app)
 
-/*
-Der Daten-Abschnitt enth??lt die Abtastwerte:
-Offset  L??nge  Inhalt  Beschreibung
-36 (0x24)   4   'data'  Header-Signatur
-40 (0x28)   4   <length>    L??nge des Datenblocks, max. <Dateigr????e>?????????44
-
-0 (0x00)    char    4   'RIFF'
-4 (0x04)    unsigned    4   <Dateigr????e>?????????8
-8 (0x08)    char    4   'WAVE'
-
-Der fmt-Abschnitt (24 Byte) beschreibt das Format der einzelnen Abtastwerte:
-Offset  L??nge  Inhalt  Beschreibung
-12 (0x0C)   4   'fmt '  Header-Signatur (folgendes Leerzeichen beachten)
-16 (0x10)   4   <fmt length>    L??nge des restlichen fmt-Headers (16 Bytes)
-20 (0x14)   2   <format tag>    Datenformat der Abtastwerte (siehe separate Tabelle weiter unten)
-22 (0x16)   2   <channels>  Anzahl der Kan??le: 1 = mono, 2 = stereo; mittlerweile sind auch mehr als 2 Kan??le (z. B. f??r Raumklang) m??glich.[2]
-24 (0x18)   4   <sample rate>   Samples pro Sekunde je Kanal (z. B. 44100)
-28 (0x1C)   4   <bytes/second>  Abtastrate????????Frame-Gr????e
-32 (0x20)   2   <block align>   Frame-Gr????e = <Anzahl der Kan??le>????????((<Bits/Sample (eines Kanals)>???+???7)???/???8)   (Division ohne Rest)
-34 (0x22)   2   <bits/sample>   Anzahl der Datenbits pro Samplewert je Kanal (z. B. 12)
-*/
+//
+// Der Daten-Abschnitt enth??lt die Abtastwerte:
+// Offset  L??nge  Inhalt  Beschreibung
+// 36 (0x24)   4   'data'  Header-Signatur
+// 40 (0x28)   4   <length>    L??nge des Datenblocks, max. <Dateigr????e>?????????44
+//
+// 0 (0x00)    char    4   'RIFF'
+// 4 (0x04)    unsigned    4   <Dateigr????e>?????????8
+// 8 (0x08)    char    4   'WAVE'
+//
+// Der fmt-Abschnitt (24 Byte) beschreibt das Format der einzelnen Abtastwerte:
+// Offset  L??nge  Inhalt  Beschreibung
+// 12 (0x0C)   4   'fmt '  Header-Signatur (folgendes Leerzeichen beachten)
+// 16 (0x10)   4   <fmt length>    L??nge des restlichen fmt-Headers (16 Bytes)
+// 20 (0x14)   2   <format tag>    Datenformat der Abtastwerte (siehe separate Tabelle weiter unten)
+// 22 (0x16)   2   <channels>  Anzahl der Kan??le: 1 = mono, 2 = stereo; mittlerweile sind auch mehr als 2 Kan??le (z. B. f??r Raumklang) m??glich.[2]
+// 24 (0x18)   4   <sample rate>   Samples pro Sekunde je Kanal (z. B. 44100)
+// 28 (0x1C)   4   <bytes/second>  Abtastrate????????Frame-Gr????e
+// 32 (0x20)   2   <block align>   Frame-Gr????e = <Anzahl der Kan??le>????????((<Bits/Sample (eines Kanals)>???+???7)???/???8)   (Division ohne Rest)
+// 34 (0x22)   2   <bits/sample>   Anzahl der Datenbits pro Samplewert je Kanal (z. B. 12)
+//

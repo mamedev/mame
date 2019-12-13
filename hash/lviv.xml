@@ -12,12 +12,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="152">
-				<rom name="aerocobr.lvt" size="152" crc="1d32ef0d" sha1="c31442fad478ba6e8bd297b7c4fac1b5832a53eb" offset="0" />
+				<rom name="aerocobr.lvt" size="152" crc="1d32ef0d" sha1="c31442fad478ba6e8bd297b7c4fac1b5832a53eb"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="9933">
-				<rom name="aerocobr.lv0" size="9933" crc="34423dbe" sha1="ba30edbe93d14e5984bed63461748e3a1246407d" offset="0" />
+				<rom name="aerocobr.lv0" size="9933" crc="34423dbe" sha1="ba30edbe93d14e5984bed63461748e3a1246407d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -29,7 +29,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="9023">
-				<rom name="alibaba.lvt" size="9023" crc="89cf714d" sha1="cb94567265bc2230976657acb7df4d86f2dcee57" offset="0" />
+				<rom name="alibaba.lvt" size="9023" crc="89cf714d" sha1="cb94567265bc2230976657acb7df4d86f2dcee57"/>
 			</dataarea>
 		</part>
 	</software>
@@ -41,27 +41,27 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="2293">
-				<rom name="arcanoid.lvt" size="2293" crc="7bbe1be7" sha1="e8da25025f7a7d6b376bd960d003ef8604615265" offset="0" />
+				<rom name="arcanoid.lvt" size="2293" crc="7bbe1be7" sha1="e8da25025f7a7d6b376bd960d003ef8604615265"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="11927">
-				<rom name="arcanoid.lv0" size="11927" crc="ce7b642e" sha1="db89a8840ef4c2eb287f8fabe1a49a510a14a68c" offset="0" />
+				<rom name="arcanoid.lv0" size="11927" crc="ce7b642e" sha1="db89a8840ef4c2eb287f8fabe1a49a510a14a68c"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="lviv_cass">
 			<dataarea name="cass" size="2583">
-				<rom name="arcanoid.lv1" size="2583" crc="c324ec99" sha1="590ed59b43060f4454056d32f4473d176cefce6b" offset="0" />
+				<rom name="arcanoid.lv1" size="2583" crc="c324ec99" sha1="590ed59b43060f4454056d32f4473d176cefce6b"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="lviv_cass">
 			<dataarea name="cass" size="16406">
-				<rom name="arcanoid.lv2" size="16406" crc="fbccb4ad" sha1="bb93045f5c09559671a6c1b9808a8540618786ce" offset="0" />
+				<rom name="arcanoid.lv2" size="16406" crc="fbccb4ad" sha1="bb93045f5c09559671a6c1b9808a8540618786ce"/>
 			</dataarea>
 		</part>
 		<part name="cass5" interface="lviv_cass">
 			<dataarea name="cass" size="4120">
-				<rom name="arcanoid.lv3" size="4120" crc="a41d91c2" sha1="717ca83b6d3424373b076792c3fc40caaca20122" offset="0" />
+				<rom name="arcanoid.lv3" size="4120" crc="a41d91c2" sha1="717ca83b6d3424373b076792c3fc40caaca20122"/>
 			</dataarea>
 		</part>
 	</software>
@@ -73,12 +73,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="3343">
-				<rom name="arktic.lvt" size="3343" crc="585fe795" sha1="f6d50449ff0b1e66553c95e1e589595c672e5b03" offset="0" />
+				<rom name="arktic.lvt" size="3343" crc="585fe795" sha1="f6d50449ff0b1e66553c95e1e589595c672e5b03"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="18773">
-				<rom name="arktic.lv0" size="18773" crc="37e0783e" sha1="9e87e444cc43ee96307b7f29ea17ea9de69f6151" offset="0" />
+				<rom name="arktic.lv0" size="18773" crc="37e0783e" sha1="9e87e444cc43ee96307b7f29ea17ea9de69f6151"/>
 			</dataarea>
 		</part>
 	</software>
@@ -90,12 +90,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="4209">
-				<rom name="ataka2.lvt" size="4209" crc="2ffe6752" sha1="357e9a57d1de8ef6a25c90cd6f6d9f673bd57711" offset="0" />
+				<rom name="ataka2.lvt" size="4209" crc="2ffe6752" sha1="357e9a57d1de8ef6a25c90cd6f6d9f673bd57711"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="11542">
-				<rom name="ataka2.lv0" size="11542" crc="37cd40df" sha1="d8409c66052cc87defca73620fcb4849ff4748d7" offset="0" />
+				<rom name="ataka2.lv0" size="11542" crc="37cd40df" sha1="d8409c66052cc87defca73620fcb4849ff4748d7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -107,12 +107,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="6725">
-				<rom name="ball.lvt" size="6725" crc="8dc53902" sha1="a352383eece1cee4879c36cfa60f30b782a8d1fb" offset="0" />
+				<rom name="ball.lvt" size="6725" crc="8dc53902" sha1="a352383eece1cee4879c36cfa60f30b782a8d1fb"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="2169">
-				<rom name="ball.lv0" size="2169" crc="1aab736a" sha1="210018b25a3b1dc8eef37e33c0d6f058d810e553" offset="0" />
+				<rom name="ball.lv0" size="2169" crc="1aab736a" sha1="210018b25a3b1dc8eef37e33c0d6f058d810e553"/>
 			</dataarea>
 		</part>
 	</software>
@@ -124,12 +124,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="4491">
-				<rom name="banan.lvt" size="4491" crc="c422a77e" sha1="da638f0ac818c60de93fbba57c38e1ce0cc9fe99" offset="0" />
+				<rom name="banan.lvt" size="4491" crc="c422a77e" sha1="da638f0ac818c60de93fbba57c38e1ce0cc9fe99"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="7735">
-				<rom name="banan.lv0" size="7735" crc="a520df65" sha1="950e5410e03f00d7da110ae89425634312feed45" offset="0" />
+				<rom name="banan.lv0" size="7735" crc="a520df65" sha1="950e5410e03f00d7da110ae89425634312feed45"/>
 			</dataarea>
 		</part>
 	</software>
@@ -141,12 +141,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="3551">
-				<rom name="barmen.lvt" size="3551" crc="35de58e3" sha1="6bcb69e4627e2591b374cc40e1031669f397666b" offset="0" />
+				<rom name="barmen.lvt" size="3551" crc="35de58e3" sha1="6bcb69e4627e2591b374cc40e1031669f397666b"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="24218">
-				<rom name="barmen.lv0" size="24218" crc="cc3cfebe" sha1="d4e4866f94b92422036cff60f940b1853ae86749" offset="0" />
+				<rom name="barmen.lv0" size="24218" crc="cc3cfebe" sha1="d4e4866f94b92422036cff60f940b1853ae86749"/>
 			</dataarea>
 		</part>
 	</software>
@@ -158,7 +158,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="3720">
-				<rom name="bear.lvt" size="3720" crc="4f507e47" sha1="d45c1feda39d1fe89ba8b1bb7cad97433871e2cf" offset="0" />
+				<rom name="bear.lvt" size="3720" crc="4f507e47" sha1="d45c1feda39d1fe89ba8b1bb7cad97433871e2cf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -170,7 +170,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="3720">
-				<rom name="bear_bee.lvt" size="3720" crc="20b08b1a" sha1="fc4d7b3686762de1b0b8319245fe58c2b6c12d44" offset="0" />
+				<rom name="bear_bee.lvt" size="3720" crc="20b08b1a" sha1="fc4d7b3686762de1b0b8319245fe58c2b6c12d44"/>
 			</dataarea>
 		</part>
 	</software>
@@ -182,7 +182,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="5359">
-				<rom name="boks.lvt" size="5359" crc="f4678825" sha1="9eda0209bc44e06db90b72aece2be998f1ea7f95" offset="0" />
+				<rom name="boks.lvt" size="5359" crc="f4678825" sha1="9eda0209bc44e06db90b72aece2be998f1ea7f95"/>
 			</dataarea>
 		</part>
 	</software>
@@ -194,7 +194,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="5023">
-				<rom name="bomb_it.lvt" size="5023" crc="103fc796" sha1="06387e97f5f70a50158a9e4bbd21d923cb38b401" offset="0" />
+				<rom name="bomb_it.lvt" size="5023" crc="103fc796" sha1="06387e97f5f70a50158a9e4bbd21d923cb38b401"/>
 			</dataarea>
 		</part>
 	</software>
@@ -206,12 +206,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="7116">
-				<rom name="breach.lvt" size="7116" crc="63fed805" sha1="404efc35a14771c15fa1220e77cfaa84305baef9" offset="0" />
+				<rom name="breach.lvt" size="7116" crc="63fed805" sha1="404efc35a14771c15fa1220e77cfaa84305baef9"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="26423">
-				<rom name="breach.lv0" size="26423" crc="6e6a445f" sha1="ee2452ac04a7c787222949081caf0c4a3ca60d85" offset="0" />
+				<rom name="breach.lv0" size="26423" crc="6e6a445f" sha1="ee2452ac04a7c787222949081caf0c4a3ca60d85"/>
 			</dataarea>
 		</part>
 	</software>
@@ -223,7 +223,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4817">
-				<rom name="bulbul.lvt" size="4817" crc="58fed647" sha1="ad915d32674bbb73bc75f1a24304946bf18a8927" offset="0" />
+				<rom name="bulbul.lvt" size="4817" crc="58fed647" sha1="ad915d32674bbb73bc75f1a24304946bf18a8927"/>
 			</dataarea>
 		</part>
 	</software>
@@ -235,7 +235,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="5431">
-				<rom name="cave.lvt" size="5431" crc="c7e5c14f" sha1="658c03d86e5e12407f3d41501f62d8f85a921d4b" offset="0" />
+				<rom name="cave.lvt" size="5431" crc="c7e5c14f" sha1="658c03d86e5e12407f3d41501f62d8f85a921d4b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -247,12 +247,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="6460">
-				<rom name="cave_d.lvt" size="6460" crc="9af7f457" sha1="0d38a146f899a01f36820d5ba707a717d426a716" offset="0" />
+				<rom name="cave_d.lvt" size="6460" crc="9af7f457" sha1="0d38a146f899a01f36820d5ba707a717d426a716"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="3792">
-				<rom name="cave_d.lv0" size="3792" crc="0a1245a0" sha1="10393b56515f602a6ecd8f678a2c62ef13d404a8" offset="0" />
+				<rom name="cave_d.lv0" size="3792" crc="0a1245a0" sha1="10393b56515f602a6ecd8f678a2c62ef13d404a8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -264,7 +264,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="7353">
-				<rom name="chess-2.lvt" size="7353" crc="2b4fee2c" sha1="4df02918b7a1997c468dbceb5a2db25312056dd9" offset="0" />
+				<rom name="chess-2.lvt" size="7353" crc="2b4fee2c" sha1="4df02918b7a1997c468dbceb5a2db25312056dd9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -276,7 +276,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="7288">
-				<rom name="chess-2a.lvt" size="7288" crc="3e504359" sha1="26dd2cb39f55b3c9a14c7b904af18b549987644d" offset="0" />
+				<rom name="chess-2a.lvt" size="7288" crc="3e504359" sha1="26dd2cb39f55b3c9a14c7b904af18b549987644d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -288,7 +288,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="19635">
-				<rom name="chess.lvt" size="19635" crc="4315a4d6" sha1="9daa872310896925af4b345be5857dfacf589eb3" offset="0" />
+				<rom name="chess.lvt" size="19635" crc="4315a4d6" sha1="9daa872310896925af4b345be5857dfacf589eb3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -300,12 +300,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="1300">
-				<rom name="columns.lvt" size="1300" crc="3c9859ae" sha1="1d4b880eebf442ba3964939154972ef72465c0f6" offset="0" />
+				<rom name="columns.lvt" size="1300" crc="3c9859ae" sha1="1d4b880eebf442ba3964939154972ef72465c0f6"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="2543">
-				<rom name="columns.lv0" size="2543" crc="7d38f8f9" sha1="911ee80775b02ca9b9c1ab8d16197957a2bd2a81" offset="0" />
+				<rom name="columns.lv0" size="2543" crc="7d38f8f9" sha1="911ee80775b02ca9b9c1ab8d16197957a2bd2a81"/>
 			</dataarea>
 		</part>
 	</software>
@@ -317,7 +317,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="14043">
-				<rom name="corn.lvt" size="14043" crc="9fa9c545" sha1="8dbc2fb0d2fd459ac5c3c29ddc6e2e3c50d9682e" offset="0" />
+				<rom name="corn.lvt" size="14043" crc="9fa9c545" sha1="8dbc2fb0d2fd459ac5c3c29ddc6e2e3c50d9682e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -329,7 +329,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="5519">
-				<rom name="digger.lvt" size="5519" crc="465d6f47" sha1="71068cf48f3846a7b810b9edfd8fb99f7e1c8d5f" offset="0" />
+				<rom name="digger.lvt" size="5519" crc="465d6f47" sha1="71068cf48f3846a7b810b9edfd8fb99f7e1c8d5f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -341,7 +341,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="2487">
-				<rom name="digger2.lvt" size="2487" crc="04692239" sha1="bad4ae2d4e6799347ff1f8686c6d5b6b38a9d11e" offset="0" />
+				<rom name="digger2.lvt" size="2487" crc="04692239" sha1="bad4ae2d4e6799347ff1f8686c6d5b6b38a9d11e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -353,7 +353,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="3014">
-				<rom name="digger3.lvt" size="3014" crc="cfe81a9f" sha1="651c62f3005ab5233371046b5373d47e2b525c0e" offset="0" />
+				<rom name="digger3.lvt" size="3014" crc="cfe81a9f" sha1="651c62f3005ab5233371046b5373d47e2b525c0e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -365,12 +365,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="2216">
-				<rom name="ducks.lvt" size="2216" crc="14e690aa" sha1="de00b09bec0e2af19fb93e8df53952475b815682" offset="0" />
+				<rom name="ducks.lvt" size="2216" crc="14e690aa" sha1="de00b09bec0e2af19fb93e8df53952475b815682"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="12421">
-				<rom name="ducks.lv0" size="12421" crc="9cfeb1f3" sha1="81c6981348f3189bebe2e2b27c9791206a5351c9" offset="0" />
+				<rom name="ducks.lv0" size="12421" crc="9cfeb1f3" sha1="81c6981348f3189bebe2e2b27c9791206a5351c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -382,7 +382,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="17431">
-				<rom name="f16.lvt" size="17431" crc="b485111a" sha1="957e0d1006a21b0bdf57a2ad7a3cf6dfa914c2e9" offset="0" />
+				<rom name="f16.lvt" size="17431" crc="b485111a" sha1="957e0d1006a21b0bdf57a2ad7a3cf6dfa914c2e9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -394,12 +394,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="3856">
-				<rom name="fireman.lvt" size="3856" crc="62446c1c" sha1="89c84baa7ceeb09ee20be9d3956cdcbe8727186d" offset="0" />
+				<rom name="fireman.lvt" size="3856" crc="62446c1c" sha1="89c84baa7ceeb09ee20be9d3956cdcbe8727186d"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="11220">
-				<rom name="fireman.lv0" size="11220" crc="222e9ff3" sha1="3c5adca4bfb743e6e70d9e5d1053c2a3ea938655" offset="0" />
+				<rom name="fireman.lv0" size="11220" crc="222e9ff3" sha1="3c5adca4bfb743e6e70d9e5d1053c2a3ea938655"/>
 			</dataarea>
 		</part>
 	</software>
@@ -411,12 +411,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="3046">
-				<rom name="flight.lvt" size="3046" crc="d995508e" sha1="2c474dfe8dc40b9d1770da53ad8e689a34ad1f30" offset="0" />
+				<rom name="flight.lvt" size="3046" crc="d995508e" sha1="2c474dfe8dc40b9d1770da53ad8e689a34ad1f30"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="10360">
-				<rom name="flight.lv0" size="10360" crc="d890d6fd" sha1="647359da5ebbda5b3be9fcdaca47079f627eed8e" offset="0" />
+				<rom name="flight.lv0" size="10360" crc="d890d6fd" sha1="647359da5ebbda5b3be9fcdaca47079f627eed8e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -428,12 +428,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="1676">
-				<rom name="gibbon.lvt" size="1676" crc="1eccb07e" sha1="1f0c3fc45b071554986b7ff04030ec0485fb64dc" offset="0" />
+				<rom name="gibbon.lvt" size="1676" crc="1eccb07e" sha1="1f0c3fc45b071554986b7ff04030ec0485fb64dc"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="13370">
-				<rom name="gibbon.lv0" size="13370" crc="8be3f26b" sha1="c6bfe1d81b5e841c406577ca999a51e8f7b89227" offset="0" />
+				<rom name="gibbon.lv0" size="13370" crc="8be3f26b" sha1="c6bfe1d81b5e841c406577ca999a51e8f7b89227"/>
 			</dataarea>
 		</part>
 	</software>
@@ -445,12 +445,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="2417">
-				<rom name="golkiper.lvt" size="2417" crc="8495952a" sha1="93eb129006139572d3a93c1240424888681923e4" offset="0" />
+				<rom name="golkiper.lvt" size="2417" crc="8495952a" sha1="93eb129006139572d3a93c1240424888681923e4"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="2915">
-				<rom name="golkiper.lv0" size="2915" crc="6a15e9c8" sha1="15f6c8cb1fcafb0e98664a41efc5748b2bfebdcb" offset="0" />
+				<rom name="golkiper.lv0" size="2915" crc="6a15e9c8" sha1="15f6c8cb1fcafb0e98664a41efc5748b2bfebdcb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -462,12 +462,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="2288">
-				<rom name="horse.lvt" size="2288" crc="166be4e5" sha1="688e5a53111e99a0324cf5d58dbb34d4e9884282" offset="0" />
+				<rom name="horse.lvt" size="2288" crc="166be4e5" sha1="688e5a53111e99a0324cf5d58dbb34d4e9884282"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="10415">
-				<rom name="horse.lv0" size="10415" crc="3ee3f467" sha1="255463cdc765682182ff57e09c612b644d8dd91d" offset="0" />
+				<rom name="horse.lv0" size="10415" crc="3ee3f467" sha1="255463cdc765682182ff57e09c612b644d8dd91d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -479,12 +479,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="4209">
-				<rom name="iraq91.lvt" size="4209" crc="e80caa57" sha1="a6d60d8a7301f62a910ac9ce746ce154fa3ab749" offset="0" />
+				<rom name="iraq91.lvt" size="4209" crc="e80caa57" sha1="a6d60d8a7301f62a910ac9ce746ce154fa3ab749"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="12055">
-				<rom name="iraq91.lv0" size="12055" crc="4bbb78e2" sha1="dad4f965f166b69deb2517a8991f4c6486aa4b4c" offset="0" />
+				<rom name="iraq91.lv0" size="12055" crc="4bbb78e2" sha1="dad4f965f166b69deb2517a8991f4c6486aa4b4c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -496,7 +496,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4722">
-				<rom name="jetman.lvt" size="4722" crc="b89ef4da" sha1="b38b5ad8ce0c01e6524a34fd8e80cbea0da2eae5" offset="0" />
+				<rom name="jetman.lvt" size="4722" crc="b89ef4da" sha1="b38b5ad8ce0c01e6524a34fd8e80cbea0da2eae5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -508,7 +508,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="8023">
-				<rom name="jump-2.lvt" size="8023" crc="8cb31c68" sha1="91a6f02abb14839e46ef6c9242f166d28927755a" offset="0" />
+				<rom name="jump-2.lvt" size="8023" crc="8cb31c68" sha1="91a6f02abb14839e46ef6c9242f166d28927755a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -520,7 +520,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="5951">
-				<rom name="jump_2.lvt" size="5951" crc="6b936f02" sha1="e8c48d6313962f9b677435ad9a66e86531122569" offset="0" />
+				<rom name="jump_2.lvt" size="5951" crc="6b936f02" sha1="e8c48d6313962f9b677435ad9a66e86531122569"/>
 			</dataarea>
 		</part>
 	</software>
@@ -532,12 +532,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="7823">
-				<rom name="king_v.lvt" size="7823" crc="82e9680c" sha1="0bdd7933fd84dd76c68f271c45bc66ce7d1b629b" offset="0" />
+				<rom name="king_v.lvt" size="7823" crc="82e9680c" sha1="0bdd7933fd84dd76c68f271c45bc66ce7d1b629b"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="8759">
-				<rom name="king_v.lv0" size="8759" crc="61154116" sha1="8e9131dc9a29edeed8a10493c9b4a0a355b75b28" offset="0" />
+				<rom name="king_v.lv0" size="8759" crc="61154116" sha1="8e9131dc9a29edeed8a10493c9b4a0a355b75b28"/>
 			</dataarea>
 		</part>
 	</software>
@@ -549,12 +549,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="1924">
-				<rom name="kobra.lvt" size="1924" crc="5db6dee7" sha1="422d61121e73ac444dfe0a6f208db25dc10884b0" offset="0" />
+				<rom name="kobra.lvt" size="1924" crc="5db6dee7" sha1="422d61121e73ac444dfe0a6f208db25dc10884b0"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="2106">
-				<rom name="kobra.lv0" size="2106" crc="661ef350" sha1="082dffc4f4facffca030e790cf2b347326c928d9" offset="0" />
+				<rom name="kobra.lv0" size="2106" crc="661ef350" sha1="082dffc4f4facffca030e790cf2b347326c928d9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -566,12 +566,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="2558">
-				<rom name="korona.lvt" size="2558" crc="7be4a6a1" sha1="bed2586cf1a72460a33c3f8699f0e6438e7df085" offset="0" />
+				<rom name="korona.lvt" size="2558" crc="7be4a6a1" sha1="bed2586cf1a72460a33c3f8699f0e6438e7df085"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="24048">
-				<rom name="korona.lv0" size="24048" crc="359eb35e" sha1="d31e6257f7295ca86f8db0854f687890f15eefbf" offset="0" />
+				<rom name="korona.lv0" size="24048" crc="359eb35e" sha1="d31e6257f7295ca86f8db0854f687890f15eefbf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -583,7 +583,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="12823">
-				<rom name="kos_prog.lvt" size="12823" crc="1a929698" sha1="62a5ed5911ef24d111aef4b56049ab2fd7de2df6" offset="0" />
+				<rom name="kos_prog.lvt" size="12823" crc="1a929698" sha1="62a5ed5911ef24d111aef4b56049ab2fd7de2df6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -595,7 +595,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="6023">
-				<rom name="kosmos.lvt" size="6023" crc="2cd78f52" sha1="4415e095789ade2943dd5869782ff3a8de009f75" offset="0" />
+				<rom name="kosmos.lvt" size="6023" crc="2cd78f52" sha1="4415e095789ade2943dd5869782ff3a8de009f75"/>
 			</dataarea>
 		</part>
 	</software>
@@ -607,12 +607,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="14193">
-				<rom name="krepost.lvt" size="14193" crc="86e9a9ee" sha1="05073058656687d96216c30a2ad744ea302ec158" offset="0" />
+				<rom name="krepost.lvt" size="14193" crc="86e9a9ee" sha1="05073058656687d96216c30a2ad744ea302ec158"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="12880">
-				<rom name="krepost.lv0" size="12880" crc="f37d31d0" sha1="fd4c4c6ada8f31b1a3791cf10fe3a1499bf7ba28" offset="0" />
+				<rom name="krepost.lv0" size="12880" crc="f37d31d0" sha1="fd4c4c6ada8f31b1a3791cf10fe3a1499bf7ba28"/>
 			</dataarea>
 		</part>
 	</software>
@@ -624,12 +624,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="3548">
-				<rom name="krot.lvt" size="3548" crc="ea35fb8d" sha1="25df371b62c013332318d3f923ce58d23106a15f" offset="0" />
+				<rom name="krot.lvt" size="3548" crc="ea35fb8d" sha1="25df371b62c013332318d3f923ce58d23106a15f"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="8924">
-				<rom name="krot.lv0" size="8924" crc="acbb2552" sha1="594d36e6482a9f399ff1e995f49f8c4c3cb8fb6b" offset="0" />
+				<rom name="krot.lv0" size="8924" crc="acbb2552" sha1="594d36e6482a9f399ff1e995f49f8c4c3cb8fb6b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -641,12 +641,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="15985">
-				<rom name="laguna.lvt" size="15985" crc="7e86854e" sha1="cb24f58c6ca898020bf9e6f60cdcbd19707e8d74" offset="0" />
+				<rom name="laguna.lvt" size="15985" crc="7e86854e" sha1="cb24f58c6ca898020bf9e6f60cdcbd19707e8d74"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="12307">
-				<rom name="laguna.lv0" size="12307" crc="ddf6cf46" sha1="c38b4b58eba7767a8d5f2bd8ff6f15111f14dbc2" offset="0" />
+				<rom name="laguna.lv0" size="12307" crc="ddf6cf46" sha1="c38b4b58eba7767a8d5f2bd8ff6f15111f14dbc2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -658,12 +658,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="1137">
-				<rom name="lapy.lvt" size="1137" crc="27a9d211" sha1="673e897fef1fe2b04629d30b4b4e789d3d9d62a6" offset="0" />
+				<rom name="lapy.lvt" size="1137" crc="27a9d211" sha1="673e897fef1fe2b04629d30b4b4e789d3d9d62a6"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="2130">
-				<rom name="lapy.lv0" size="2130" crc="b020c7e6" sha1="ebcbac46d656d42b3da0b453f15bea7cd83d8188" offset="0" />
+				<rom name="lapy.lv0" size="2130" crc="b020c7e6" sha1="ebcbac46d656d42b3da0b453f15bea7cd83d8188"/>
 			</dataarea>
 		</part>
 	</software>
@@ -675,7 +675,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1267">
-				<rom name="lifter.lvt" size="1267" crc="f4737ffc" sha1="24cfc55d145e289de5b85356ca762207afefd412" offset="0" />
+				<rom name="lifter.lvt" size="1267" crc="f4737ffc" sha1="24cfc55d145e289de5b85356ca762207afefd412"/>
 			</dataarea>
 		</part>
 	</software>
@@ -687,7 +687,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1267">
-				<rom name="lifter2.lvt" size="1267" crc="54332e80" sha1="3a75ca49a58c325f540380a6b2e723e498cab86c" offset="0" />
+				<rom name="lifter2.lvt" size="1267" crc="54332e80" sha1="3a75ca49a58c325f540380a6b2e723e498cab86c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -699,12 +699,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="9969">
-				<rom name="m_mouse.lvt" size="9969" crc="588071ba" sha1="d2afa6b228f63873d4fdb1349d1d8cac4ae9a699" offset="0" />
+				<rom name="m_mouse.lvt" size="9969" crc="588071ba" sha1="d2afa6b228f63873d4fdb1349d1d8cac4ae9a699"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="2498">
-				<rom name="m_mouse.lv0" size="2498" crc="ddb865d6" sha1="22ca7dad46a979adc7f35d201fa8461f8014e92c" offset="0" />
+				<rom name="m_mouse.lv0" size="2498" crc="ddb865d6" sha1="22ca7dad46a979adc7f35d201fa8461f8014e92c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -716,12 +716,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="10115">
-				<rom name="m_mouse2.lvt" size="10115" crc="48dd434f" sha1="9fdd8af9591f43265fc0a20fa796678aa91f136a" offset="0" />
+				<rom name="m_mouse2.lvt" size="10115" crc="48dd434f" sha1="9fdd8af9591f43265fc0a20fa796678aa91f136a"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="2498">
-				<rom name="m_mouse2.lv0" size="2498" crc="50908c8f" sha1="6d8c0cabe5121d039ac98af6e9b1f58b3940cd95" offset="0" />
+				<rom name="m_mouse2.lv0" size="2498" crc="50908c8f" sha1="6d8c0cabe5121d039ac98af6e9b1f58b3940cd95"/>
 			</dataarea>
 		</part>
 	</software>
@@ -733,7 +733,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1815">
-				<rom name="mines.lvt" size="1815" crc="17a08f6c" sha1="cbc365ab27b4bfe69d0aa7bff5cb8475dd2b21d1" offset="0" />
+				<rom name="mines.lvt" size="1815" crc="17a08f6c" sha1="cbc365ab27b4bfe69d0aa7bff5cb8475dd2b21d1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -745,12 +745,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="4070">
-				<rom name="moonbase.lvt" size="4070" crc="d2ad4946" sha1="2a8627095b61db427729778edac53ef540057142" offset="0" />
+				<rom name="moonbase.lvt" size="4070" crc="d2ad4946" sha1="2a8627095b61db427729778edac53ef540057142"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="11508">
-				<rom name="moonbase.lv0" size="11508" crc="5bf601b0" sha1="3a0c4c4d79068acafc7afa881f2980e14b404830" offset="0" />
+				<rom name="moonbase.lv0" size="11508" crc="5bf601b0" sha1="3a0c4c4d79068acafc7afa881f2980e14b404830"/>
 			</dataarea>
 		</part>
 	</software>
@@ -762,7 +762,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="12438">
-				<rom name="otello.lvt" size="12438" crc="1a0c255a" sha1="1ecf66625b9d68c2b64191d3615c70ae8fcc1dc3" offset="0" />
+				<rom name="otello.lvt" size="12438" crc="1a0c255a" sha1="1ecf66625b9d68c2b64191d3615c70ae8fcc1dc3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -774,12 +774,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="10304">
-				<rom name="oxota.lvt" size="10304" crc="2b81bec2" sha1="329aac80176bfc83f6d293c4f54875e1c1be7bc9" offset="0" />
+				<rom name="oxota.lvt" size="10304" crc="2b81bec2" sha1="329aac80176bfc83f6d293c4f54875e1c1be7bc9"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="6465">
-				<rom name="oxota.lv0" size="6465" crc="60d32e91" sha1="396b91aeca1e66213331197a83f3629260e1c0a9" offset="0" />
+				<rom name="oxota.lv0" size="6465" crc="60d32e91" sha1="396b91aeca1e66213331197a83f3629260e1c0a9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -791,7 +791,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="6523">
-				<rom name="pacman.lvt" size="6523" crc="c108aa3a" sha1="9d6f91202d436a30c9840f37ced5461dfa89c7dd" offset="0" />
+				<rom name="pacman.lvt" size="6523" crc="c108aa3a" sha1="9d6f91202d436a30c9840f37ced5461dfa89c7dd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -803,7 +803,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="16065">
-				<rom name="patrol.lvt" size="16065" crc="2dbdf549" sha1="13a94b79b9a0aa1a302c27bd3f44450e0a2fb66c" offset="0" />
+				<rom name="patrol.lvt" size="16065" crc="2dbdf549" sha1="13a94b79b9a0aa1a302c27bd3f44450e0a2fb66c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -815,7 +815,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4294">
-				<rom name="pirog.lvt" size="4294" crc="431def76" sha1="5609da439752a3a167acc1c15649e25a4238f1f9" offset="0" />
+				<rom name="pirog.lvt" size="4294" crc="431def76" sha1="5609da439752a3a167acc1c15649e25a4238f1f9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -827,7 +827,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="5142">
-				<rom name="podz-2.lvt" size="5142" crc="119127a7" sha1="9de990c80f558717888cbfe06a4af24a239e2583" offset="0" />
+				<rom name="podz-2.lvt" size="5142" crc="119127a7" sha1="9de990c80f558717888cbfe06a4af24a239e2583"/>
 			</dataarea>
 		</part>
 	</software>
@@ -839,12 +839,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="3621">
-				<rom name="pool.lvt" size="3621" crc="a62a1118" sha1="5eca44bd77d514dec396b7d34763ee070100a950" offset="0" />
+				<rom name="pool.lvt" size="3621" crc="a62a1118" sha1="5eca44bd77d514dec396b7d34763ee070100a950"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="7182">
-				<rom name="pool.lv0" size="7182" crc="abe846ee" sha1="8045b6d84702b03705812cbfa470fa1187363f21" offset="0" />
+				<rom name="pool.lv0" size="7182" crc="abe846ee" sha1="8045b6d84702b03705812cbfa470fa1187363f21"/>
 			</dataarea>
 		</part>
 	</software>
@@ -856,17 +856,17 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="7762">
-				<rom name="popc_2hw.lvt" size="7762" crc="82c9070f" sha1="faf44b340bd639f389b576f774415f0b8bbde84d" offset="0" />
+				<rom name="popc_2hw.lvt" size="7762" crc="82c9070f" sha1="faf44b340bd639f389b576f774415f0b8bbde84d"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="1454">
-				<rom name="popc_2hw.lv0" size="1454" crc="b4bbf5d8" sha1="cec40f9aaa8fbee34c8af473611cda4eca4af5d3" offset="0" />
+				<rom name="popc_2hw.lv0" size="1454" crc="b4bbf5d8" sha1="cec40f9aaa8fbee34c8af473611cda4eca4af5d3"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="lviv_cass">
 			<dataarea name="cass" size="2292">
-				<rom name="popc_2hw.lv1" size="2292" crc="ea0cd548" sha1="6fc2629a7aff2bd59a21532087e81434b402f20e" offset="0" />
+				<rom name="popc_2hw.lv1" size="2292" crc="ea0cd548" sha1="6fc2629a7aff2bd59a21532087e81434b402f20e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -878,7 +878,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="3863">
-				<rom name="popcorn.lvt" size="3863" crc="07f47686" sha1="60294f3bd786b105a3fc1c207b17bf8db82d128d" offset="0" />
+				<rom name="popcorn.lvt" size="3863" crc="07f47686" sha1="60294f3bd786b105a3fc1c207b17bf8db82d128d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -890,22 +890,22 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="159">
-				<rom name="popcorn2.lvt" size="159" crc="27cb0313" sha1="9fcf9a97d6bc7256baf64a54ccbdf1df2129abaf" offset="0" />
+				<rom name="popcorn2.lvt" size="159" crc="27cb0313" sha1="9fcf9a97d6bc7256baf64a54ccbdf1df2129abaf"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="7603">
-				<rom name="popcorn2.lv0" size="7603" crc="456b3b47" sha1="3d06f0632330b4c9ebf6194ba75f18d1a90e9ebc" offset="0" />
+				<rom name="popcorn2.lv0" size="7603" crc="456b3b47" sha1="3d06f0632330b4c9ebf6194ba75f18d1a90e9ebc"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="lviv_cass">
 			<dataarea name="cass" size="1454">
-				<rom name="popcorn2.lv1" size="1454" crc="b4bbf5d8" sha1="cec40f9aaa8fbee34c8af473611cda4eca4af5d3" offset="0" />
+				<rom name="popcorn2.lv1" size="1454" crc="b4bbf5d8" sha1="cec40f9aaa8fbee34c8af473611cda4eca4af5d3"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="lviv_cass">
 			<dataarea name="cass" size="2292">
-				<rom name="popcorn2.lv2" size="2292" crc="ea0cd548" sha1="6fc2629a7aff2bd59a21532087e81434b402f20e" offset="0" />
+				<rom name="popcorn2.lv2" size="2292" crc="ea0cd548" sha1="6fc2629a7aff2bd59a21532087e81434b402f20e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -917,7 +917,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="16438">
-				<rom name="pretty.lvt" size="16438" crc="62ff78bb" sha1="f7c8c987b6871a248a0eee1e0bc2f5fe3d1e1176" offset="0" />
+				<rom name="pretty.lvt" size="16438" crc="62ff78bb" sha1="f7c8c987b6871a248a0eee1e0bc2f5fe3d1e1176"/>
 			</dataarea>
 		</part>
 	</software>
@@ -929,7 +929,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="12823">
-				<rom name="revansh.lvt" size="12823" crc="876f18fa" sha1="6782a005ce920bf5f0dbc815589ee315aeff657b" offset="0" />
+				<rom name="revansh.lvt" size="12823" crc="876f18fa" sha1="6782a005ce920bf5f0dbc815589ee315aeff657b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -941,12 +941,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="1757">
-				<rom name="ricoshet.lvt" size="1757" crc="fc97a40e" sha1="bb7df3e4924de3ee5530882ee1fc5633bb6d0000" offset="0" />
+				<rom name="ricoshet.lvt" size="1757" crc="fc97a40e" sha1="bb7df3e4924de3ee5530882ee1fc5633bb6d0000"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="13529">
-				<rom name="ricoshet.lv0" size="13529" crc="d7d5ddc5" sha1="12108b55bf6adc8bf3f5fbe29a3012241f98f5ae" offset="0" />
+				<rom name="ricoshet.lv0" size="13529" crc="d7d5ddc5" sha1="12108b55bf6adc8bf3f5fbe29a3012241f98f5ae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -958,12 +958,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="15985">
-				<rom name="rybak.lvt" size="15985" crc="2f94b38c" sha1="59083e819d0afba4e9d227fb7a414b855a0d8537" offset="0" />
+				<rom name="rybak.lvt" size="15985" crc="2f94b38c" sha1="59083e819d0afba4e9d227fb7a414b855a0d8537"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="12184">
-				<rom name="rybak.lv0" size="12184" crc="ce008fb4" sha1="2f88e71a052c2e446daf69c4a3db783dd127d88b" offset="0" />
+				<rom name="rybak.lv0" size="12184" crc="ce008fb4" sha1="2f88e71a052c2e446daf69c4a3db783dd127d88b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -975,7 +975,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="19298">
-				<rom name="s_labir.lvt" size="19298" crc="bce5b84e" sha1="8928f03eae8e44bd78cd05acad0dfe41d916f8a6" offset="0" />
+				<rom name="s_labir.lvt" size="19298" crc="bce5b84e" sha1="8928f03eae8e44bd78cd05acad0dfe41d916f8a6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -987,7 +987,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="19298">
-				<rom name="s_labir2.lv0" size="19298" crc="bce5b84e" sha1="8928f03eae8e44bd78cd05acad0dfe41d916f8a6" offset="0" />
+				<rom name="s_labir2.lv0" size="19298" crc="bce5b84e" sha1="8928f03eae8e44bd78cd05acad0dfe41d916f8a6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -999,7 +999,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1393">
-				<rom name="s_labir2.lvt" size="1393" crc="a6ea63b5" sha1="cbaaa25f45ef5cd848bc36a04b44bcd0951048ff" offset="0" />
+				<rom name="s_labir2.lvt" size="1393" crc="a6ea63b5" sha1="cbaaa25f45ef5cd848bc36a04b44bcd0951048ff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1011,12 +1011,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="2324">
-				<rom name="safari.lvt" size="2324" crc="34197236" sha1="71052dc5452602b74281cf086999cdb4a2a2a524" offset="0" />
+				<rom name="safari.lvt" size="2324" crc="34197236" sha1="71052dc5452602b74281cf086999cdb4a2a2a524"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="19761">
-				<rom name="safari.lv0" size="19761" crc="5d1dddc7" sha1="fb143f7a3eca49034a73067ca1ce11d98dbded43" offset="0" />
+				<rom name="safari.lv0" size="19761" crc="5d1dddc7" sha1="fb143f7a3eca49034a73067ca1ce11d98dbded43"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1028,12 +1028,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="1988">
-				<rom name="saski.lvt" size="1988" crc="e9872e33" sha1="7e2d8428435f09a43f43d800f3b451f958a949c5" offset="0" />
+				<rom name="saski.lvt" size="1988" crc="e9872e33" sha1="7e2d8428435f09a43f43d800f3b451f958a949c5"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="6757">
-				<rom name="saski.lv0" size="6757" crc="e549f81b" sha1="22d32d05f8158aad0a552e5692178a51909f4c9d" offset="0" />
+				<rom name="saski.lv0" size="6757" crc="e549f81b" sha1="22d32d05f8158aad0a552e5692178a51909f4c9d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1045,12 +1045,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="2594">
-				<rom name="shar.lvt" size="2594" crc="21b41e90" sha1="555e9cc6fa5176d3aa13b5e3db4a2771448ee3d9" offset="0" />
+				<rom name="shar.lvt" size="2594" crc="21b41e90" sha1="555e9cc6fa5176d3aa13b5e3db4a2771448ee3d9"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="9927">
-				<rom name="shar.lv0" size="9927" crc="f2d7b772" sha1="87954d23f567963a83e50e1c10ce12978fcdd95c" offset="0" />
+				<rom name="shar.lv0" size="9927" crc="f2d7b772" sha1="87954d23f567963a83e50e1c10ce12978fcdd95c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1062,7 +1062,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="16438">
-				<rom name="shelwien.lvt" size="16438" crc="9ee40c5b" sha1="562fb992f2b7614b52ba9cfe377d9a97e27f9aa1" offset="0" />
+				<rom name="shelwien.lvt" size="16438" crc="9ee40c5b" sha1="562fb992f2b7614b52ba9cfe377d9a97e27f9aa1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1074,12 +1074,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="2398">
-				<rom name="slalom.lvt" size="2398" crc="779b7405" sha1="16b1a522c66442fb3843ee3f0507019658d574ed" offset="0" />
+				<rom name="slalom.lvt" size="2398" crc="779b7405" sha1="16b1a522c66442fb3843ee3f0507019658d574ed"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="11838">
-				<rom name="slalom.lv0" size="11838" crc="25c9b3d9" sha1="b2f797d5c7aafc892622f6b617de3a717427ce87" offset="0" />
+				<rom name="slalom.lv0" size="11838" crc="25c9b3d9" sha1="b2f797d5c7aafc892622f6b617de3a717427ce87"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1091,7 +1091,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="8215">
-				<rom name="snake.lvt" size="8215" crc="9099b229" sha1="35a636383ad5b99448f9bb072ed497608069605e" offset="0" />
+				<rom name="snake.lvt" size="8215" crc="9099b229" sha1="35a636383ad5b99448f9bb072ed497608069605e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1103,12 +1103,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="6255">
-				<rom name="spaces.lvt" size="6255" crc="4f5c135f" sha1="40278c87eba8b59a855082478bcf85104964df7a" offset="0" />
+				<rom name="spaces.lvt" size="6255" crc="4f5c135f" sha1="40278c87eba8b59a855082478bcf85104964df7a"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="6519">
-				<rom name="spaces.lv0" size="6519" crc="ae1f5909" sha1="b14d6dfc01e5fca4975560a6838a02dcc3225ce4" offset="0" />
+				<rom name="spaces.lv0" size="6519" crc="ae1f5909" sha1="b14d6dfc01e5fca4975560a6838a02dcc3225ce4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1120,7 +1120,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="5183">
-				<rom name="squash.lvt" size="5183" crc="f0ff41b3" sha1="b5dcd884591b3b694ea2054b828ea00195b133b5" offset="0" />
+				<rom name="squash.lvt" size="5183" crc="f0ff41b3" sha1="b5dcd884591b3b694ea2054b828ea00195b133b5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1132,12 +1132,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="625">
-				<rom name="starfigh.lvt" size="625" crc="6bf04429" sha1="fd8b8488b2cb88db025f5fe49f05b877156ddb6a" offset="0" />
+				<rom name="starfigh.lvt" size="625" crc="6bf04429" sha1="fd8b8488b2cb88db025f5fe49f05b877156ddb6a"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="19352">
-				<rom name="starfigh.lv0" size="19352" crc="df853ae8" sha1="4e02dce8a7f49ca1d147dbf5d1e47885468444dd" offset="0" />
+				<rom name="starfigh.lv0" size="19352" crc="df853ae8" sha1="4e02dce8a7f49ca1d147dbf5d1e47885468444dd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1149,7 +1149,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="16615">
-				<rom name="storm.lvt" size="16615" crc="871ac681" sha1="2bebf6195058a0282cc8812be5e203a1cae77d77" offset="0" />
+				<rom name="storm.lvt" size="16615" crc="871ac681" sha1="2bebf6195058a0282cc8812be5e203a1cae77d77"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1161,12 +1161,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="1913">
-				<rom name="tennis.lvt" size="1913" crc="a7f81d34" sha1="2d01d1180348259d78991be8440c5b1d2cfc5d9f" offset="0" />
+				<rom name="tennis.lvt" size="1913" crc="a7f81d34" sha1="2d01d1180348259d78991be8440c5b1d2cfc5d9f"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="6023">
-				<rom name="tennis.lv0" size="6023" crc="13a6b73b" sha1="b8113200b4c28c6165fb9ef2e729e55b90626d46" offset="0" />
+				<rom name="tennis.lv0" size="6023" crc="13a6b73b" sha1="b8113200b4c28c6165fb9ef2e729e55b90626d46"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1178,7 +1178,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="5846">
-				<rom name="terror.lvt" size="5846" crc="fb1efafc" sha1="d9d036482f278e201a41adbf279395f575492561" offset="0" />
+				<rom name="terror.lvt" size="5846" crc="fb1efafc" sha1="d9d036482f278e201a41adbf279395f575492561"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1190,12 +1190,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="5038">
-				<rom name="tetris.lvt" size="5038" crc="1c05a62d" sha1="67d4f10cf806f78a76bce929b4369b24efc6aaba" offset="0" />
+				<rom name="tetris.lvt" size="5038" crc="1c05a62d" sha1="67d4f10cf806f78a76bce929b4369b24efc6aaba"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="4619">
-				<rom name="tetris.lv0" size="4619" crc="98dbf6c9" sha1="00eed067a32506354e1f7d2b4d47196473811e78" offset="0" />
+				<rom name="tetris.lv0" size="4619" crc="98dbf6c9" sha1="00eed067a32506354e1f7d2b4d47196473811e78"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1207,7 +1207,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="9438">
-				<rom name="torpedos.lvt" size="9438" crc="f4ad4f11" sha1="8d73f5019a03160bd7ef620a25958b63cc7706dc" offset="0" />
+				<rom name="torpedos.lvt" size="9438" crc="f4ad4f11" sha1="8d73f5019a03160bd7ef620a25958b63cc7706dc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1219,12 +1219,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="1663">
-				<rom name="totami.lvt" size="1663" crc="c709d27d" sha1="44ab0bff01c259897194f12ac2ae83077b3af3b0" offset="0" />
+				<rom name="totami.lvt" size="1663" crc="c709d27d" sha1="44ab0bff01c259897194f12ac2ae83077b3af3b0"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="20720">
-				<rom name="totami.lv0" size="20720" crc="f0152729" sha1="ce7c9553cc246499d22b6a83c0a452488be1c1df" offset="0" />
+				<rom name="totami.lv0" size="20720" crc="f0152729" sha1="ce7c9553cc246499d22b6a83c0a452488be1c1df"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1236,12 +1236,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="2473">
-				<rom name="tower.lvt" size="2473" crc="2654be15" sha1="a6a3d19ec11da22408843db042a37f2bc3a43e76" offset="0" />
+				<rom name="tower.lvt" size="2473" crc="2654be15" sha1="a6a3d19ec11da22408843db042a37f2bc3a43e76"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="6755">
-				<rom name="tower.lv0" size="6755" crc="7c2281b5" sha1="e818d3d034d3cd59f803d9847cdc0c4e211c33aa" offset="0" />
+				<rom name="tower.lv0" size="6755" crc="7c2281b5" sha1="e818d3d034d3cd59f803d9847cdc0c4e211c33aa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1253,12 +1253,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="3968">
-				<rom name="volcano.lvt" size="3968" crc="e466b08c" sha1="790c322f1a83d4117ad0d6370bf80a2b26a99167" offset="0" />
+				<rom name="volcano.lvt" size="3968" crc="e466b08c" sha1="790c322f1a83d4117ad0d6370bf80a2b26a99167"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="14386">
-				<rom name="volcano.lv0" size="14386" crc="842546db" sha1="4869791d39d974133eb881cafec022480897c3eb" offset="0" />
+				<rom name="volcano.lv0" size="14386" crc="842546db" sha1="4869791d39d974133eb881cafec022480897c3eb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1270,12 +1270,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="2673">
-				<rom name="way.lvt" size="2673" crc="20ab787b" sha1="6db8664ea5ba25573d4f9a986499bd04b40d6ee5" offset="0" />
+				<rom name="way.lvt" size="2673" crc="20ab787b" sha1="6db8664ea5ba25573d4f9a986499bd04b40d6ee5"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="11446">
-				<rom name="way.lv0" size="11446" crc="16dc192e" sha1="e3a156a34d08bc41f7cac6e94435d0a50a667c66" offset="0" />
+				<rom name="way.lv0" size="11446" crc="16dc192e" sha1="e3a156a34d08bc41f7cac6e94435d0a50a667c66"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1287,12 +1287,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="1393">
-				<rom name="worms.lvt" size="1393" crc="991d4acd" sha1="4c8bbd08cc99f79fe8070b4bf4c0769913b2dd2d" offset="0" />
+				<rom name="worms.lvt" size="1393" crc="991d4acd" sha1="4c8bbd08cc99f79fe8070b4bf4c0769913b2dd2d"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="6292">
-				<rom name="worms.lv0" size="6292" crc="cad58fa8" sha1="471c085d62e07b36bd99a1d625e8d103a051fb73" offset="0" />
+				<rom name="worms.lv0" size="6292" crc="cad58fa8" sha1="471c085d62e07b36bd99a1d625e8d103a051fb73"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1304,7 +1304,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1815">
-				<rom name="xonix.lvt" size="1815" crc="20d8975b" sha1="83f3035ac325c88fd71e3c2c95dcc05c4407acee" offset="0" />
+				<rom name="xonix.lvt" size="1815" crc="20d8975b" sha1="83f3035ac325c88fd71e3c2c95dcc05c4407acee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1316,7 +1316,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="9494">
-				<rom name="zoo.lvt" size="9494" crc="14996712" sha1="d384b43af93df726dc317343fdca78bfb7ea2cc9" offset="0" />
+				<rom name="zoo.lvt" size="9494" crc="14996712" sha1="d384b43af93df726dc317343fdca78bfb7ea2cc9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1331,7 +1331,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="5102">
-				<rom name="a-warez.lvt" size="5102" crc="f43197bb" sha1="915da56ead766488a55e6c478e36cb47f2fa3c56" offset="0" />
+				<rom name="a-warez.lvt" size="5102" crc="f43197bb" sha1="915da56ead766488a55e6c478e36cb47f2fa3c56"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1343,7 +1343,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4519">
-				<rom name="almazy.lvr" size="4519" crc="e1f8291e" sha1="9e3a885050ca03824457f176d55a13141adfb62a" offset="0" />
+				<rom name="almazy.lvr" size="4519" crc="e1f8291e" sha1="9e3a885050ca03824457f176d55a13141adfb62a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1355,7 +1355,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="10986">
-				<rom name="anketa.lvt" size="10986" crc="e3dfe0e5" sha1="382b349d499c9de480191adf94b1338873a04c2c" offset="0" />
+				<rom name="anketa.lvt" size="10986" crc="e3dfe0e5" sha1="382b349d499c9de480191adf94b1338873a04c2c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1367,7 +1367,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="5718">
-				<rom name="artill.lvt" size="5718" crc="6f5ab7a6" sha1="349acaa42304baaf4ccf39fa51b6d4b31b4bb9cc" offset="0" />
+				<rom name="artill.lvt" size="5718" crc="6f5ab7a6" sha1="349acaa42304baaf4ccf39fa51b6d4b31b4bb9cc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1379,7 +1379,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="2791">
-				<rom name="astra.lvt" size="2791" crc="494b5427" sha1="69b479a3fa1d267b8434fe54f3013ee108220a45" offset="0" />
+				<rom name="astra.lvt" size="2791" crc="494b5427" sha1="69b479a3fa1d267b8434fe54f3013ee108220a45"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1391,7 +1391,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="5324">
-				<rom name="b_n_c.lvt" size="5324" crc="65e5eee2" sha1="dda806644abdba366825d6a3ffa63fe6ec8b2fe8" offset="0" />
+				<rom name="b_n_c.lvt" size="5324" crc="65e5eee2" sha1="dda806644abdba366825d6a3ffa63fe6ec8b2fe8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1403,7 +1403,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1103">
-				<rom name="bank.lvt" size="1103" crc="77b0204c" sha1="591fdfd2abf0884cd4c33db7c958f4baa892dd43" offset="0" />
+				<rom name="bank.lvt" size="1103" crc="77b0204c" sha1="591fdfd2abf0884cd4c33db7c958f4baa892dd43"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1415,7 +1415,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4346">
-				<rom name="bearhome.lvt" size="4346" crc="cc1ed515" sha1="78faea5b96ea821d24f505b2fa6e5bf5ec577c00" offset="0" />
+				<rom name="bearhome.lvt" size="4346" crc="cc1ed515" sha1="78faea5b96ea821d24f505b2fa6e5bf5ec577c00"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1427,7 +1427,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="3412">
-				<rom name="biorythm.lvt" size="3412" crc="8c478ea0" sha1="bcdeef25a344d4aaf01a955d0bd1c15ec901863a" offset="0" />
+				<rom name="biorythm.lvt" size="3412" crc="8c478ea0" sha1="bcdeef25a344d4aaf01a955d0bd1c15ec901863a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1439,7 +1439,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="18735">
-				<rom name="blacjack.lvt" size="18735" crc="71851f3a" sha1="ae2c0f15a50ee0bd6546c1ae3b6972f4a45fa0c0" offset="0" />
+				<rom name="blacjack.lvt" size="18735" crc="71851f3a" sha1="ae2c0f15a50ee0bd6546c1ae3b6972f4a45fa0c0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1451,7 +1451,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="14439">
-				<rom name="bura.lvt" size="14439" crc="15a59683" sha1="d0a2d04a66e383f3e3ccf34f3fd5fec867989240" offset="0" />
+				<rom name="bura.lvt" size="14439" crc="15a59683" sha1="d0a2d04a66e383f3e3ccf34f3fd5fec867989240"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1463,7 +1463,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="3210">
-				<rom name="castle.lvt" size="3210" crc="141d889e" sha1="d456881741ced33bee9d839e57bbe029a8459b4f" offset="0" />
+				<rom name="castle.lvt" size="3210" crc="141d889e" sha1="d456881741ced33bee9d839e57bbe029a8459b4f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1475,7 +1475,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="2111">
-				<rom name="darkkosm.lvt" size="2111" crc="8e53f293" sha1="15db76e35e3f2767aabdd4f6dab93babed5d4894" offset="0" />
+				<rom name="darkkosm.lvt" size="2111" crc="8e53f293" sha1="15db76e35e3f2767aabdd4f6dab93babed5d4894"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1487,7 +1487,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4468">
-				<rom name="delit.lvt" size="4468" crc="0d256f6a" sha1="e9038eb771f9e9b72fba7583410a6a75dcb0de08" offset="0" />
+				<rom name="delit.lvt" size="4468" crc="0d256f6a" sha1="e9038eb771f9e9b72fba7583410a6a75dcb0de08"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1499,7 +1499,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="9372">
-				<rom name="deti_tst.lvt" size="9372" crc="38c72c93" sha1="860f526326b60dd7981e3f6be7af1f61e47b2c1a" offset="0" />
+				<rom name="deti_tst.lvt" size="9372" crc="38c72c93" sha1="860f526326b60dd7981e3f6be7af1f61e47b2c1a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1511,7 +1511,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="5589">
-				<rom name="diaman.lvt" size="5589" crc="2f1c9f21" sha1="34d4ac8c72d2ebc9e3dd23edf55b19cbdae616b5" offset="0" />
+				<rom name="diaman.lvt" size="5589" crc="2f1c9f21" sha1="34d4ac8c72d2ebc9e3dd23edf55b19cbdae616b5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1523,7 +1523,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="6315">
-				<rom name="domino.lvt" size="6315" crc="a6b65ad8" sha1="5efb035d3448e31514ce7f5237287a62f1acfd62" offset="0" />
+				<rom name="domino.lvt" size="6315" crc="a6b65ad8" sha1="5efb035d3448e31514ce7f5237287a62f1acfd62"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1535,7 +1535,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="5594">
-				<rom name="dracon.lvt" size="5594" crc="e7207004" sha1="9647e9fef673b30eae8996a7ce0116142d5642bf" offset="0" />
+				<rom name="dracon.lvt" size="5594" crc="e7207004" sha1="9647e9fef673b30eae8996a7ce0116142d5642bf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1547,7 +1547,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="2103">
-				<rom name="dragonf.lvt" size="2103" crc="936a4d22" sha1="ca0ff226afff9ef93d596a0c288846d07c9a7887" offset="0" />
+				<rom name="dragonf.lvt" size="2103" crc="936a4d22" sha1="ca0ff226afff9ef93d596a0c288846d07c9a7887"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1559,7 +1559,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="15907">
-				<rom name="f_hell.lvt" size="15907" crc="57de1b13" sha1="c2ecf742b71dfdb2bd8fd8d7fa573d82a6a954de" offset="0" />
+				<rom name="f_hell.lvt" size="15907" crc="57de1b13" sha1="c2ecf742b71dfdb2bd8fd8d7fa573d82a6a954de"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1571,12 +1571,12 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="2897">
-				<rom name="faraon.lvt" size="2897" crc="7152f2e2" sha1="0db8792e7a6ee1a7b6dbdf4f1a0fc788a1f53546" offset="0" />
+				<rom name="faraon.lvt" size="2897" crc="7152f2e2" sha1="0db8792e7a6ee1a7b6dbdf4f1a0fc788a1f53546"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="4823">
-				<rom name="faraon.lv0" size="4823" crc="d0d87c8b" sha1="7aefd6b741e980005fbd6176746e3faa2b48f3e7" offset="0" />
+				<rom name="faraon.lv0" size="4823" crc="d0d87c8b" sha1="7aefd6b741e980005fbd6176746e3faa2b48f3e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1588,22 +1588,22 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="4758">
-				<rom name="fruct.lvr" size="4758" crc="52836e88" sha1="a6fa8477872b5ba7a65f4609e7a34549c454a30d" offset="0" />
+				<rom name="fruct.lvr" size="4758" crc="52836e88" sha1="a6fa8477872b5ba7a65f4609e7a34549c454a30d"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="2071">
-				<rom name="fruct.lv0" size="2071" crc="448ff174" sha1="16180a2c18101c4a8e10e71b38123fadf6f14f53" offset="0" />
+				<rom name="fruct.lv0" size="2071" crc="448ff174" sha1="16180a2c18101c4a8e10e71b38123fadf6f14f53"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="lviv_cass">
 			<dataarea name="cass" size="1463">
-				<rom name="fruct.lv1" size="1463" crc="e6d514c3" sha1="c9b28ff3d52ecbf3af0ec006ce87411d93a1d8b4" offset="0" />
+				<rom name="fruct.lv1" size="1463" crc="e6d514c3" sha1="c9b28ff3d52ecbf3af0ec006ce87411d93a1d8b4"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="lviv_cass">
 			<dataarea name="cass" size="123">
-				<rom name="fruct.lv2" size="123" crc="cb366752" sha1="32b5265e20bcbfa583dac46a95f51d9f7793e9be" offset="0" />
+				<rom name="fruct.lv2" size="123" crc="cb366752" sha1="32b5265e20bcbfa583dac46a95f51d9f7793e9be"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1615,7 +1615,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="5047">
-				<rom name="hgm_tst.lvt" size="5047" crc="c821b940" sha1="f0562bde154f715bfd36267276b3c75ec8e94bc2" offset="0" />
+				<rom name="hgm_tst.lvt" size="5047" crc="c821b940" sha1="f0562bde154f715bfd36267276b3c75ec8e94bc2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1627,7 +1627,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="13496">
-				<rom name="japgor.lvt" size="13496" crc="81dbbd2b" sha1="2739f413894636da5a6606c238c7fe099701fe36" offset="0" />
+				<rom name="japgor.lvt" size="13496" crc="81dbbd2b" sha1="2739f413894636da5a6606c238c7fe099701fe36"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1639,7 +1639,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="9723">
-				<rom name="karate.lvt" size="9723" crc="f48d858f" sha1="2c0efd2bccc76aec6ee630ee822c12f355818955" offset="0" />
+				<rom name="karate.lvt" size="9723" crc="f48d858f" sha1="2c0efd2bccc76aec6ee630ee822c12f355818955"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1651,7 +1651,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="11235">
-				<rom name="kart_tst.lvt" size="11235" crc="ef114c34" sha1="30fa5dc3050c15f034392def06a86a946b598a97" offset="0" />
+				<rom name="kart_tst.lvt" size="11235" crc="ef114c34" sha1="30fa5dc3050c15f034392def06a86a946b598a97"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1663,7 +1663,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4261">
-				<rom name="klad.lvr" size="4261" crc="43313a39" sha1="8b35a4a7aea607c6556ef796837b761b3ff246cc" offset="0" />
+				<rom name="klad.lvr" size="4261" crc="43313a39" sha1="8b35a4a7aea607c6556ef796837b761b3ff246cc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1675,7 +1675,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="3376">
-				<rom name="klady.lvt" size="3376" crc="af3b39d0" sha1="1649d51b02b3b5e4e8cd69c00273ca8d78a33dda" offset="0" />
+				<rom name="klady.lvt" size="3376" crc="af3b39d0" sha1="1649d51b02b3b5e4e8cd69c00273ca8d78a33dda"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1687,7 +1687,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="7483">
-				<rom name="korol_e.lvt" size="7483" crc="9afd76bb" sha1="4a8314b0f12fd882dbc3ec538a9de243197567bd" offset="0" />
+				<rom name="korol_e.lvt" size="7483" crc="9afd76bb" sha1="4a8314b0f12fd882dbc3ec538a9de243197567bd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1699,7 +1699,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="2362">
-				<rom name="kosm_p.lvt" size="2362" crc="ebb24155" sha1="d9fb387c6c6be1684114c9624d45a772d26055c4" offset="0" />
+				<rom name="kosm_p.lvt" size="2362" crc="ebb24155" sha1="d9fb387c6c6be1684114c9624d45a772d26055c4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1711,7 +1711,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="3904">
-				<rom name="krokodyl.lvt" size="3904" crc="39e1aa68" sha1="73eaf55cb8c7f458edfbd9ca97dfad3098145dc1" offset="0" />
+				<rom name="krokodyl.lvt" size="3904" crc="39e1aa68" sha1="73eaf55cb8c7f458edfbd9ca97dfad3098145dc1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1723,7 +1723,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="13625">
-				<rom name="kwadro.lvt" size="13625" crc="0c345add" sha1="ad764b1f502fa0c4ec82c2c11812fd2adef9fcf6" offset="0" />
+				<rom name="kwadro.lvt" size="13625" crc="0c345add" sha1="ad764b1f502fa0c4ec82c2c11812fd2adef9fcf6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1735,7 +1735,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1840">
-				<rom name="labirynt.lvt" size="1840" crc="2429c115" sha1="10842052950e930128b29735b084da8d7bcc3671" offset="0" />
+				<rom name="labirynt.lvt" size="1840" crc="2429c115" sha1="10842052950e930128b29735b084da8d7bcc3671"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1747,7 +1747,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="3278">
-				<rom name="laserstr.lvt" size="3278" crc="52db3f97" sha1="54313be04c2e60a445a99e659370a7ab741cbf18" offset="0" />
+				<rom name="laserstr.lvt" size="3278" crc="52db3f97" sha1="54313be04c2e60a445a99e659370a7ab741cbf18"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1759,7 +1759,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1088">
-				<rom name="lazer.lvt" size="1088" crc="5972ebda" sha1="78c69388dee1dd699e14e034442d8f46cdb17d51" offset="0" />
+				<rom name="lazer.lvt" size="1088" crc="5972ebda" sha1="78c69388dee1dd699e14e034442d8f46cdb17d51"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1771,12 +1771,12 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="10429">
-				<rom name="lev.lvt" size="10429" crc="36983f16" sha1="5495ab364bf11d5847341fc16438b107c1c2e362" offset="0" />
+				<rom name="lev.lvt" size="10429" crc="36983f16" sha1="5495ab364bf11d5847341fc16438b107c1c2e362"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="2498">
-				<rom name="lev.lv0" size="2498" crc="ddb865d6" sha1="22ca7dad46a979adc7f35d201fa8461f8014e92c" offset="0" />
+				<rom name="lev.lv0" size="2498" crc="ddb865d6" sha1="22ca7dad46a979adc7f35d201fa8461f8014e92c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1788,7 +1788,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="7250">
-				<rom name="lifetest.lvt" size="7250" crc="2c0fe80f" sha1="e2ae19ab4a4c8fd7d1fd3c4703183ee3e90544e7" offset="0" />
+				<rom name="lifetest.lvt" size="7250" crc="2c0fe80f" sha1="e2ae19ab4a4c8fd7d1fd3c4703183ee3e90544e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1800,7 +1800,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="5663">
-				<rom name="luna.lvt" size="5663" crc="a2bceb2a" sha1="03393f66ffff46ad4ed676e050914a9c0dea8169" offset="0" />
+				<rom name="luna.lvt" size="5663" crc="a2bceb2a" sha1="03393f66ffff46ad4ed676e050914a9c0dea8169"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1812,7 +1812,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="8800">
-				<rom name="m-land.lvt" size="8800" crc="2d0dcd3a" sha1="c14bd5d00b7c3ed712a367d359fe8b6bff23f901" offset="0" />
+				<rom name="m-land.lvt" size="8800" crc="2d0dcd3a" sha1="c14bd5d00b7c3ed712a367d359fe8b6bff23f901"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1824,7 +1824,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="23805">
-				<rom name="m-land2.lvt" size="23805" crc="33a5b125" sha1="e22d1c9320e5e1df5bf6aa408e35a43707c8738e" offset="0" />
+				<rom name="m-land2.lvt" size="23805" crc="33a5b125" sha1="e22d1c9320e5e1df5bf6aa408e35a43707c8738e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1836,7 +1836,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4529">
-				<rom name="mars.lvt" size="4529" crc="b815d373" sha1="2dd088da76e3397d893ee342ec32a7615ead877b" offset="0" />
+				<rom name="mars.lvt" size="4529" crc="b815d373" sha1="2dd088da76e3397d893ee342ec32a7615ead877b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1848,7 +1848,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4276">
-				<rom name="mars0.lvt" size="4276" crc="3c367d1e" sha1="0a177d0f26c3ff990a4746784de8a123beb9f1ce" offset="0" />
+				<rom name="mars0.lvt" size="4276" crc="3c367d1e" sha1="0a177d0f26c3ff990a4746784de8a123beb9f1ce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1860,7 +1860,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="3493">
-				<rom name="mars3.lvr" size="3493" crc="df68b772" sha1="daa6da3bc09b3ff3f25c74138cd2eccfe586a445" offset="0" />
+				<rom name="mars3.lvr" size="3493" crc="df68b772" sha1="daa6da3bc09b3ff3f25c74138cd2eccfe586a445"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1872,7 +1872,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="3820">
-				<rom name="minom.lvt" size="3820" crc="d15ed115" sha1="c8d0e50a9d78766f529c02397156ed78dd5b3283" offset="0" />
+				<rom name="minom.lvt" size="3820" crc="d15ed115" sha1="c8d0e50a9d78766f529c02397156ed78dd5b3283"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1884,7 +1884,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4956">
-				<rom name="mod_mag.lvt" size="4956" crc="af9930b8" sha1="cc16ae94b7f626b05a1c0a295d2862370f87bd9e" offset="0" />
+				<rom name="mod_mag.lvt" size="4956" crc="af9930b8" sha1="cc16ae94b7f626b05a1c0a295d2862370f87bd9e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1896,7 +1896,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="6865">
-				<rom name="monopol.lvt" size="6865" crc="948c565f" sha1="358a71cf6516fefe92d12850b2e85afa7371eec2" offset="0" />
+				<rom name="monopol.lvt" size="6865" crc="948c565f" sha1="358a71cf6516fefe92d12850b2e85afa7371eec2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1908,7 +1908,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="5359">
-				<rom name="morbattl.lvt" size="5359" crc="45578f48" sha1="810ee9311b95b56279e62715cf89a0a8c32fd258" offset="0" />
+				<rom name="morbattl.lvt" size="5359" crc="45578f48" sha1="810ee9311b95b56279e62715cf89a0a8c32fd258"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1920,7 +1920,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="14976">
-				<rom name="oregon.lvt" size="14976" crc="42d59ecd" sha1="9daa8a0d84078de06e2a4545d167c6fc2be607e6" offset="0" />
+				<rom name="oregon.lvt" size="14976" crc="42d59ecd" sha1="9daa8a0d84078de06e2a4545d167c6fc2be607e6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1932,7 +1932,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="11715">
-				<rom name="ostrov.lvt" size="11715" crc="87f94c44" sha1="afcfa9bb6be6891ede87a1d1eb0ebd15a06599ba" offset="0" />
+				<rom name="ostrov.lvt" size="11715" crc="87f94c44" sha1="afcfa9bb6be6891ede87a1d1eb0ebd15a06599ba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1944,7 +1944,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="5598">
-				<rom name="p_guard.lvt" size="5598" crc="278fed04" sha1="6240fb6651301f56e1c512b9fabd713857165dc9" offset="0" />
+				<rom name="p_guard.lvt" size="5598" crc="278fed04" sha1="6240fb6651301f56e1c512b9fabd713857165dc9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1956,12 +1956,12 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="5618">
-				<rom name="parovoz.lvt" size="5618" crc="082a2e54" sha1="5c638801073661d8ec4001169f291e991a4576e6" offset="0" />
+				<rom name="parovoz.lvt" size="5618" crc="082a2e54" sha1="5c638801073661d8ec4001169f291e991a4576e6"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="2498">
-				<rom name="parovoz.lv0" size="2498" crc="76ee6cb2" sha1="079fdfb0e069ab82f7c61a3974498f7961586b58" offset="0" />
+				<rom name="parovoz.lv0" size="2498" crc="76ee6cb2" sha1="079fdfb0e069ab82f7c61a3974498f7961586b58"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1973,7 +1973,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4911">
-				<rom name="piton.lvr" size="4911" crc="7dd7bd95" sha1="554d85272533f084438bb41b9dfd6d8a10a2e2a2" offset="0" />
+				<rom name="piton.lvr" size="4911" crc="7dd7bd95" sha1="554d85272533f084438bb41b9dfd6d8a10a2e2a2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1985,7 +1985,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="10383">
-				<rom name="povd_tst.lvt" size="10383" crc="2d2a19f3" sha1="b5c72ac266078507792cab2c73eac6297a537c45" offset="0" />
+				<rom name="povd_tst.lvt" size="10383" crc="2d2a19f3" sha1="b5c72ac266078507792cab2c73eac6297a537c45"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1997,7 +1997,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="15751">
-				<rom name="preziden.lvt" size="15751" crc="c5826f0a" sha1="5673c7dbb43117c7ccd705416d5c5291a1db916c" offset="0" />
+				<rom name="preziden.lvt" size="15751" crc="c5826f0a" sha1="5673c7dbb43117c7ccd705416d5c5291a1db916c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2009,7 +2009,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="5159">
-				<rom name="raketa.lvt" size="5159" crc="ab929551" sha1="c5f26e5054e469e5107c9a1d9b01e17f310422a2" offset="0" />
+				<rom name="raketa.lvt" size="5159" crc="ab929551" sha1="c5f26e5054e469e5107c9a1d9b01e17f310422a2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2021,7 +2021,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4783">
-				<rom name="raketa2.lvt" size="4783" crc="02b2bfb7" sha1="9502ecd834a0d04c0722d5d7e853bc3d9d7fe7a4" offset="0" />
+				<rom name="raketa2.lvt" size="4783" crc="02b2bfb7" sha1="9502ecd834a0d04c0722d5d7e853bc3d9d7fe7a4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2033,7 +2033,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="3443">
-				<rom name="ralli.lvt" size="3443" crc="092a1373" sha1="8b66e1e00dd950718dcd98b03b13c04e5b5c9d09" offset="0" />
+				<rom name="ralli.lvt" size="3443" crc="092a1373" sha1="8b66e1e00dd950718dcd98b03b13c04e5b5c9d09"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2045,7 +2045,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4437">
-				<rom name="robot.lvt" size="4437" crc="309a3d4b" sha1="5275a41c267c26c92f2e64ca8304cd08172daec1" offset="0" />
+				<rom name="robot.lvt" size="4437" crc="309a3d4b" sha1="5275a41c267c26c92f2e64ca8304cd08172daec1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2057,7 +2057,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="9934">
-				<rom name="robots_w.lvt" size="9934" crc="9220ea54" sha1="08a45887a030f6a74d05b2ad7c3c3d059ecf37d5" offset="0" />
+				<rom name="robots_w.lvt" size="9934" crc="9220ea54" sha1="08a45887a030f6a74d05b2ad7c3c3d059ecf37d5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2069,7 +2069,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="8998">
-				<rom name="rodi_tst.lvt" size="8998" crc="421a0259" sha1="7932d43af2d51540fd377f05bc46943e7581c12c" offset="0" />
+				<rom name="rodi_tst.lvt" size="8998" crc="421a0259" sha1="7932d43af2d51540fd377f05bc46943e7581c12c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2081,7 +2081,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1974">
-				<rom name="samolet.lvt" size="1974" crc="31ae44f2" sha1="426758b5d70d400b3485011a3ab31ece6ee2e9cf" offset="0" />
+				<rom name="samolet.lvt" size="1974" crc="31ae44f2" sha1="426758b5d70d400b3485011a3ab31ece6ee2e9cf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2093,7 +2093,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1232">
-				<rom name="sball.lvt" size="1232" crc="2de84b64" sha1="c36bfd7ed0f96d04acf19b4a8b80f1bbc30eaf8e" offset="0" />
+				<rom name="sball.lvt" size="1232" crc="2de84b64" sha1="c36bfd7ed0f96d04acf19b4a8b80f1bbc30eaf8e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2105,7 +2105,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="7229">
-				<rom name="serpantn.lvt" size="7229" crc="ef52d1a0" sha1="1b16130b1eb625ea665e86c07b8a6799c93fc538" offset="0" />
+				<rom name="serpantn.lvt" size="7229" crc="ef52d1a0" sha1="1b16130b1eb625ea665e86c07b8a6799c93fc538"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2117,7 +2117,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="9358">
-				<rom name="soco_b.lvt" size="9358" crc="1444048e" sha1="ecb34521b6b9f8cb92f77dee0f279ba0542583ad" offset="0" />
+				<rom name="soco_b.lvt" size="9358" crc="1444048e" sha1="ecb34521b6b9f8cb92f77dee0f279ba0542583ad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2129,7 +2129,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="9451">
-				<rom name="soco_bx.lvt" size="9451" crc="ad5f186b" sha1="890ba45909933d3543c9c74171bbac8fe9004f7f" offset="0" />
+				<rom name="soco_bx.lvt" size="9451" crc="ad5f186b" sha1="890ba45909933d3543c9c74171bbac8fe9004f7f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2141,7 +2141,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="8588">
-				<rom name="soco_gr1.lvt" size="8588" crc="f06ce3ae" sha1="b88b0b54cc3942d68be6291aed31a2314ffd72a2" offset="0" />
+				<rom name="soco_gr1.lvt" size="8588" crc="f06ce3ae" sha1="b88b0b54cc3942d68be6291aed31a2314ffd72a2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2153,7 +2153,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="11828">
-				<rom name="soco_gr2.lvt" size="11828" crc="77c072b3" sha1="12b393b23b33c09a69459ff1b1d81c410b78adfe" offset="0" />
+				<rom name="soco_gr2.lvt" size="11828" crc="77c072b3" sha1="12b393b23b33c09a69459ff1b1d81c410b78adfe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2165,7 +2165,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="9535">
-				<rom name="son_tst.lvt" size="9535" crc="34cad48e" sha1="15eb78043b1701afbc49e0d1bf69ec0d393b5f66" offset="0" />
+				<rom name="son_tst.lvt" size="9535" crc="34cad48e" sha1="15eb78043b1701afbc49e0d1bf69ec0d393b5f66"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2177,7 +2177,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1862">
-				<rom name="spacefig.lvt" size="1862" crc="cb4dd4fb" sha1="597936d01cd4e1de5da3181fd7d5ab2213e1010e" offset="0" />
+				<rom name="spacefig.lvt" size="1862" crc="cb4dd4fb" sha1="597936d01cd4e1de5da3181fd7d5ab2213e1010e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2189,7 +2189,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="8069">
-				<rom name="speedtst.lvt" size="8069" crc="2d4d2d69" sha1="8185445e162907ca8e5fa0945b926d98a62f7aec" offset="0" />
+				<rom name="speedtst.lvt" size="8069" crc="2d4d2d69" sha1="8185445e162907ca8e5fa0945b926d98a62f7aec"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2201,7 +2201,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="6118">
-				<rom name="sprut.lvt" size="6118" crc="1c028d95" sha1="378461fe08f847b48506fb6f9aba0835d0a6b245" offset="0" />
+				<rom name="sprut.lvt" size="6118" crc="1c028d95" sha1="378461fe08f847b48506fb6f9aba0835d0a6b245"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2213,7 +2213,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="7871">
-				<rom name="tir.lvt" size="7871" crc="b12bfdce" sha1="094b7f43d3e443882789552dbd12d59e70dc81d6" offset="0" />
+				<rom name="tir.lvt" size="7871" crc="b12bfdce" sha1="094b7f43d3e443882789552dbd12d59e70dc81d6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2225,7 +2225,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="5254">
-				<rom name="tomat.lvr" size="5254" crc="e6a5323d" sha1="4ce8872435f13972cf9b58266a68f9022f93affb" offset="0" />
+				<rom name="tomat.lvr" size="5254" crc="e6a5323d" sha1="4ce8872435f13972cf9b58266a68f9022f93affb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2237,7 +2237,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4328">
-				<rom name="trev_tst.lvt" size="4328" crc="cb6104d2" sha1="44081c44955bb8635d49f7fe09ca4d296c363bf3" offset="0" />
+				<rom name="trev_tst.lvt" size="4328" crc="cb6104d2" sha1="44081c44955bb8635d49f7fe09ca4d296c363bf3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2249,7 +2249,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="416">
-				<rom name="viner.lvt" size="416" crc="6efb3131" sha1="c7006e1661ab2b587df1691f9608f62d26596f40" offset="0" />
+				<rom name="viner.lvt" size="416" crc="6efb3131" sha1="c7006e1661ab2b587df1691f9608f62d26596f40"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2261,7 +2261,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="3645">
-				<rom name="wall.lvt" size="3645" crc="03b09ad7" sha1="0875e9a30b8fc5e12433759759ed4dc92c2b45f1" offset="0" />
+				<rom name="wall.lvt" size="3645" crc="03b09ad7" sha1="0875e9a30b8fc5e12433759759ed4dc92c2b45f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2273,7 +2273,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="3579">
-				<rom name="wampire.lvt" size="3579" crc="555ef0ec" sha1="9450cace7f05c697c10f985ed7401b232dc2992c" offset="0" />
+				<rom name="wampire.lvt" size="3579" crc="555ef0ec" sha1="9450cace7f05c697c10f985ed7401b232dc2992c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2285,12 +2285,12 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="4500">
-				<rom name="zamok.lvt" size="4500" crc="1934e90c" sha1="f0ffe0f37e20373e5ad9133d5e618f8b0ca532d1" offset="0" />
+				<rom name="zamok.lvt" size="4500" crc="1934e90c" sha1="f0ffe0f37e20373e5ad9133d5e618f8b0ca532d1"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="10223">
-				<rom name="zamok.lv0" size="10223" crc="dfe2c736" sha1="a7eacb6d49cf922b5cd5b83b99215ca9052424ae" offset="0" />
+				<rom name="zamok.lv0" size="10223" crc="dfe2c736" sha1="a7eacb6d49cf922b5cd5b83b99215ca9052424ae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2308,7 +2308,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="271">
-				<rom name="69e3.lvt" size="271" crc="32ee58b9" sha1="24bc7b7ab85dd75d4ac44c4224ef58c039de9f1f" offset="0" />
+				<rom name="69e3.lvt" size="271" crc="32ee58b9" sha1="24bc7b7ab85dd75d4ac44c4224ef58c039de9f1f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2320,7 +2320,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="3811">
-				<rom name="artist.lvt" size="3811" crc="ba297fcd" sha1="d5ffee12b8127f3e3bfa076eb69a0ef7b6d0ede9" offset="0" />
+				<rom name="artist.lvt" size="3811" crc="ba297fcd" sha1="d5ffee12b8127f3e3bfa076eb69a0ef7b6d0ede9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2332,7 +2332,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="10639">
-				<rom name="ass-91.lvt" size="10639" crc="66fada44" sha1="76e1aa7bd5e861fb93b7b8521d89c997610c3d7b" offset="0" />
+				<rom name="ass-91.lvt" size="10639" crc="66fada44" sha1="76e1aa7bd5e861fb93b7b8521d89c997610c3d7b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2344,7 +2344,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="6683">
-				<rom name="ass-91h.lvt" size="6683" crc="01d0715f" sha1="125ca373b57ac44ac374a61f760ede3badd81c67" offset="0" />
+				<rom name="ass-91h.lvt" size="6683" crc="01d0715f" sha1="125ca373b57ac44ac374a61f760ede3badd81c67"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2356,12 +2356,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="9692">
-				<rom name="ass90.lvt" size="9692" crc="0fff9b0b" sha1="44e780f0628ab7495de2bdeaa0eb553c5301c11b" offset="0" />
+				<rom name="ass90.lvt" size="9692" crc="0fff9b0b" sha1="44e780f0628ab7495de2bdeaa0eb553c5301c11b"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="7452">
-				<rom name="ass90.lv0" size="7452" crc="7f59ebae" sha1="451c52f6cc3fcc2c29f9bd45c4f353ddec6872cc" offset="0" />
+				<rom name="ass90.lv0" size="7452" crc="7f59ebae" sha1="451c52f6cc3fcc2c29f9bd45c4f353ddec6872cc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2373,7 +2373,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1923">
-				<rom name="c-copy.lvt" size="1923" crc="45ffb917" sha1="17baf083464f5890345c03853de283a58e4473b1" offset="0" />
+				<rom name="c-copy.lvt" size="1923" crc="45ffb917" sha1="17baf083464f5890345c03853de283a58e4473b1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2385,7 +2385,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="2070">
-				<rom name="comprt.lvt" size="2070" crc="98aece55" sha1="2422cc49e8bea963638eb6f40f9ea45b6a169e53" offset="0" />
+				<rom name="comprt.lvt" size="2070" crc="98aece55" sha1="2422cc49e8bea963638eb6f40f9ea45b6a169e53"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2397,7 +2397,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1191">
-				<rom name="comprt2.lvt" size="1191" crc="4ba39034" sha1="a6e18adf244f4e3b1784f76a4a7534bfa0dbd90e" offset="0" />
+				<rom name="comprt2.lvt" size="1191" crc="4ba39034" sha1="a6e18adf244f4e3b1784f76a4a7534bfa0dbd90e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2409,7 +2409,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="786">
-				<rom name="cop-2m.lvt" size="786" crc="b64dd2a8" sha1="dab3efeb00f0474894ec165baad36a159285b874" offset="0" />
+				<rom name="cop-2m.lvt" size="786" crc="b64dd2a8" sha1="dab3efeb00f0474894ec165baad36a159285b874"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2421,7 +2421,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="490">
-				<rom name="copym3.lvt" size="490" crc="19477a2f" sha1="f43c8460b0dbeb70eeca13ded15f11cf310857f6" offset="0" />
+				<rom name="copym3.lvt" size="490" crc="19477a2f" sha1="f43c8460b0dbeb70eeca13ded15f11cf310857f6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2433,7 +2433,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="706">
-				<rom name="data.lvt" size="706" crc="40f7ac07" sha1="470b5517f44cbee136ecbb89a8abb62482cbcee8" offset="0" />
+				<rom name="data.lvt" size="706" crc="40f7ac07" sha1="470b5517f44cbee136ecbb89a8abb62482cbcee8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2445,7 +2445,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="883">
-				<rom name="data2.lvt" size="883" crc="7b90c011" sha1="edd075ecc197566ac4b82858d39c4ee7d585ce6e" offset="0" />
+				<rom name="data2.lvt" size="883" crc="7b90c011" sha1="edd075ecc197566ac4b82858d39c4ee7d585ce6e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2457,7 +2457,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="5973">
-				<rom name="debug1m.lvt" size="5973" crc="328b1ec7" sha1="ce090d99e235a4802fa2edc0289889f4b2c1ecf1" offset="0" />
+				<rom name="debug1m.lvt" size="5973" crc="328b1ec7" sha1="ce090d99e235a4802fa2edc0289889f4b2c1ecf1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2469,7 +2469,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="3302">
-				<rom name="disas91.lvt" size="3302" crc="f3ed163c" sha1="79d6bb48c1579470e09f59f47cfe661c8ebe6052" offset="0" />
+				<rom name="disas91.lvt" size="3302" crc="f3ed163c" sha1="79d6bb48c1579470e09f59f47cfe661c8ebe6052"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2481,7 +2481,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1744">
-				<rom name="disas91h.lvt" size="1744" crc="737cd555" sha1="a9b509fbcdaa1f2aa170c2685b0593657542ba78" offset="0" />
+				<rom name="disas91h.lvt" size="1744" crc="737cd555" sha1="a9b509fbcdaa1f2aa170c2685b0593657542ba78"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2493,7 +2493,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4118">
-				<rom name="dissas90.lvt" size="4118" crc="ebecbb6a" sha1="7286c2b4fe5f169bb51457732b2c91963877debf" offset="0" />
+				<rom name="dissas90.lvt" size="4118" crc="ebecbb6a" sha1="7286c2b4fe5f169bb51457732b2c91963877debf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2505,7 +2505,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1846">
-				<rom name="doctor.lvt" size="1846" crc="265fdde2" sha1="4702038b8ddf7ea89b3607d27ea1d4a509f93b78" offset="0" />
+				<rom name="doctor.lvt" size="1846" crc="265fdde2" sha1="4702038b8ddf7ea89b3607d27ea1d4a509f93b78"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2517,7 +2517,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="3646">
-				<rom name="ed_sam_h.lvt" size="3646" crc="3ef72696" sha1="5fd90029e77ebd9514eabbca52695ebbdfc5663c" offset="0" />
+				<rom name="ed_sam_h.lvt" size="3646" crc="3ef72696" sha1="5fd90029e77ebd9514eabbca52695ebbdfc5663c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2529,7 +2529,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="3571">
-				<rom name="ed_sam_r.lvt" size="3571" crc="158a56bb" sha1="f031b9a5689ab64c22c54cfca817a9b9bc32bb50" offset="0" />
+				<rom name="ed_sam_r.lvt" size="3571" crc="158a56bb" sha1="f031b9a5689ab64c22c54cfca817a9b9bc32bb50"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2541,12 +2541,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="8103">
-				<rom name="editor.lvt" size="8103" crc="d3e1b7b6" sha1="331571de783bb32de24d64105fffc13a14ad6456" offset="0" />
+				<rom name="editor.lvt" size="8103" crc="d3e1b7b6" sha1="331571de783bb32de24d64105fffc13a14ad6456"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="4712">
-				<rom name="editor.lv0" size="4712" crc="e6469f66" sha1="433c0707e3fba4b8c5dbaa762bcc18fae2898478" offset="0" />
+				<rom name="editor.lv0" size="4712" crc="e6469f66" sha1="433c0707e3fba4b8c5dbaa762bcc18fae2898478"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2558,12 +2558,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="8697">
-				<rom name="ekr2.lvt" size="8697" crc="61ecc96f" sha1="4d30a7b7696234b6f433825ad131804c7a1c262f" offset="0" />
+				<rom name="ekr2.lvt" size="8697" crc="61ecc96f" sha1="4d30a7b7696234b6f433825ad131804c7a1c262f"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="6363">
-				<rom name="ekr2.lv0" size="6363" crc="3c33951e" sha1="571200e3bfb4685d49e9cc66527e39343fae2e69" offset="0" />
+				<rom name="ekr2.lv0" size="6363" crc="3c33951e" sha1="571200e3bfb4685d49e9cc66527e39343fae2e69"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2575,7 +2575,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="6260">
-				<rom name="expert1.lvt" size="6260" crc="69d4a92e" sha1="6e2d7db8c426de1b722fe49165a01635b75b0996" offset="0" />
+				<rom name="expert1.lvt" size="6260" crc="69d4a92e" sha1="6e2d7db8c426de1b722fe49165a01635b75b0996"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2587,12 +2587,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="5895">
-				<rom name="grf.lvt" size="5895" crc="e78849d6" sha1="5bab46627ddad569a6ce3d122206ed55c11ed5ea" offset="0" />
+				<rom name="grf.lvt" size="5895" crc="e78849d6" sha1="5bab46627ddad569a6ce3d122206ed55c11ed5ea"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="2352">
-				<rom name="grf.lv0" size="2352" crc="a34f2c31" sha1="f59f796d76d0a1682f3185b9eaa2a71ffa141f26" offset="0" />
+				<rom name="grf.lv0" size="2352" crc="a34f2c31" sha1="f59f796d76d0a1682f3185b9eaa2a71ffa141f26"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2604,7 +2604,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="3607">
-				<rom name="ibm.lvt" size="3607" crc="673aad97" sha1="1a5ff6596c587d2d0999bb434a9a45004fb21416" offset="0" />
+				<rom name="ibm.lvt" size="3607" crc="673aad97" sha1="1a5ff6596c587d2d0999bb434a9a45004fb21416"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2616,7 +2616,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1777">
-				<rom name="instr3.lvt" size="1777" crc="5edc8d9b" sha1="ceb312406a07eb4b57c117949965faa1624d9122" offset="0" />
+				<rom name="instr3.lvt" size="1777" crc="5edc8d9b" sha1="ceb312406a07eb4b57c117949965faa1624d9122"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2628,7 +2628,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="2560">
-				<rom name="lom_v2.lvt" size="2560" crc="9480cb23" sha1="46a377f3da42c1c3cc60f940986cd13bc534ce1d" offset="0" />
+				<rom name="lom_v2.lvt" size="2560" crc="9480cb23" sha1="46a377f3da42c1c3cc60f940986cd13bc534ce1d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2640,7 +2640,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="159">
-				<rom name="lptdrv.lvt" size="159" crc="e3584bef" sha1="b7f38736a0de962caa2bf854034368f37438f42a" offset="0" />
+				<rom name="lptdrv.lvt" size="159" crc="e3584bef" sha1="b7f38736a0de962caa2bf854034368f37438f42a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2652,7 +2652,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="612">
-				<rom name="lpthlp.lvt" size="612" crc="8e90079c" sha1="b467b4bebb571a51fcb3dcf4b528a596779da555" offset="0" />
+				<rom name="lpthlp.lvt" size="612" crc="8e90079c" sha1="b467b4bebb571a51fcb3dcf4b528a596779da555"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2664,7 +2664,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="226">
-				<rom name="mem.lvt" size="226" crc="ff03521c" sha1="4345e5e0028baf26a12846ff5689e4ef787112c3" offset="0" />
+				<rom name="mem.lvt" size="226" crc="ff03521c" sha1="4345e5e0028baf26a12846ff5689e4ef787112c3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2676,7 +2676,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="97">
-				<rom name="mirror.lvt" size="97" crc="b1f6ca0b" sha1="b42841b9757566b65ea25d18e0c59494a78e2eaa" offset="0" />
+				<rom name="mirror.lvt" size="97" crc="b1f6ca0b" sha1="b42841b9757566b65ea25d18e0c59494a78e2eaa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2688,7 +2688,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4456">
-				<rom name="mon90.lvt" size="4456" crc="68231900" sha1="ad782ed3bd1af0b29fd3af8fdb4380edb36690c9" offset="0" />
+				<rom name="mon90.lvt" size="4456" crc="68231900" sha1="ad782ed3bd1af0b29fd3af8fdb4380edb36690c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2700,7 +2700,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="8482">
-				<rom name="mon_plus.lvt" size="8482" crc="ed5ee7a7" sha1="643a6e6ba42130269dbf062fcd8152adac98e1a2" offset="0" />
+				<rom name="mon_plus.lvt" size="8482" crc="ed5ee7a7" sha1="643a6e6ba42130269dbf062fcd8152adac98e1a2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2712,7 +2712,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="159">
-				<rom name="ms6312.lvt" size="159" crc="9c1fff19" sha1="c75fe3377d677e5ef0d8179679eb685b2ef194ef" offset="0" />
+				<rom name="ms6312.lvt" size="159" crc="9c1fff19" sha1="c75fe3377d677e5ef0d8179679eb685b2ef194ef"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2724,7 +2724,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="9802">
-				<rom name="mult.lvt" size="9802" crc="1cfb7663" sha1="ce193d346d0be9a7d5b8e7d09db729bbd0711efa" offset="0" />
+				<rom name="mult.lvt" size="9802" crc="1cfb7663" sha1="ce193d346d0be9a7d5b8e7d09db729bbd0711efa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2736,7 +2736,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="9986">
-				<rom name="mult2.lvt" size="9986" crc="e42578f2" sha1="b7b26fe58eef1cb8e0523f243b51a3c3d1d8d073" offset="0" />
+				<rom name="mult2.lvt" size="9986" crc="e42578f2" sha1="b7b26fe58eef1cb8e0523f243b51a3c3d1d8d073"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2748,12 +2748,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="2807">
-				<rom name="o32.lvt" size="2807" crc="c43f4970" sha1="2a790605137f25be580800835d67c8e126b7d3c4" offset="0" />
+				<rom name="o32.lvt" size="2807" crc="c43f4970" sha1="2a790605137f25be580800835d67c8e126b7d3c4"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="7451">
-				<rom name="o32.lv0" size="7451" crc="59c98d08" sha1="8cee402f93e7f974fa3752201c5357e59e2438d1" offset="0" />
+				<rom name="o32.lv0" size="7451" crc="59c98d08" sha1="8cee402f93e7f974fa3752201c5357e59e2438d1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2765,7 +2765,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="187">
-				<rom name="pirat.lvt" size="187" crc="ace14759" sha1="c73121f23abb76bb86b6a9cf05dc2341279e699c" offset="0" />
+				<rom name="pirat.lvt" size="187" crc="ace14759" sha1="c73121f23abb76bb86b6a9cf05dc2341279e699c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2777,7 +2777,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="290">
-				<rom name="pirat2.lvt" size="290" crc="d713489a" sha1="a418264fba9c7ef7d4912e1e5113eedea51eb54c" offset="0" />
+				<rom name="pirat2.lvt" size="290" crc="d713489a" sha1="a418264fba9c7ef7d4912e1e5113eedea51eb54c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2789,7 +2789,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="257">
-				<rom name="rasch.lvt" size="257" crc="2c9320ce" sha1="c4fc37874569dd4175cd826369ebfd29f5f62e2e" offset="0" />
+				<rom name="rasch.lvt" size="257" crc="2c9320ce" sha1="c4fc37874569dd4175cd826369ebfd29f5f62e2e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2801,7 +2801,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="2070">
-				<rom name="rashir.lvt" size="2070" crc="876e161d" sha1="fb54e86a4e4aec83195e58d9a6d4a2d27ec45298" offset="0" />
+				<rom name="rashir.lvt" size="2070" crc="876e161d" sha1="fb54e86a4e4aec83195e58d9a6d4a2d27ec45298"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2813,7 +2813,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="2071">
-				<rom name="rashir2.lvt" size="2071" crc="448ff174" sha1="16180a2c18101c4a8e10e71b38123fadf6f14f53" offset="0" />
+				<rom name="rashir2.lvt" size="2071" crc="448ff174" sha1="16180a2c18101c4a8e10e71b38123fadf6f14f53"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2825,7 +2825,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1516">
-				<rom name="renum.lvt" size="1516" crc="dc15d20c" sha1="5272adeec113ff1f3d4d45bfaa334e020d7b7925" offset="0" />
+				<rom name="renum.lvt" size="1516" crc="dc15d20c" sha1="5272adeec113ff1f3d4d45bfaa334e020d7b7925"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2837,7 +2837,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1744">
-				<rom name="renum2.lvt" size="1744" crc="27fc4ac8" sha1="5faf8b7d307984a76bfdcb00025696ac4e60605c" offset="0" />
+				<rom name="renum2.lvt" size="1744" crc="27fc4ac8" sha1="5faf8b7d307984a76bfdcb00025696ac4e60605c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2849,7 +2849,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="488">
-				<rom name="rsm.lvt" size="488" crc="c0f5b8b5" sha1="c33ceaf72036b41d9db63052ce0f1ad59b799bcd" offset="0" />
+				<rom name="rsm.lvt" size="488" crc="c0f5b8b5" sha1="c33ceaf72036b41d9db63052ce0f1ad59b799bcd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2861,7 +2861,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1074">
-				<rom name="rsm_h.lvt" size="1074" crc="c4624746" sha1="2a7f9d0c9bbec181b805b7292b7427779713239b" offset="0" />
+				<rom name="rsm_h.lvt" size="1074" crc="c4624746" sha1="2a7f9d0c9bbec181b805b7292b7427779713239b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2873,7 +2873,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1106">
-				<rom name="s-copy.lvt" size="1106" crc="9388dec2" sha1="974c8de9e6911a74efcaa8618fc44040b5888bd4" offset="0" />
+				<rom name="s-copy.lvt" size="1106" crc="9388dec2" sha1="974c8de9e6911a74efcaa8618fc44040b5888bd4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2885,7 +2885,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="8214">
-				<rom name="samara.lvt" size="8214" crc="79fb6228" sha1="ca155e1ca448c17f74ff58abee6b8b6e1965d791" offset="0" />
+				<rom name="samara.lvt" size="8214" crc="79fb6228" sha1="ca155e1ca448c17f74ff58abee6b8b6e1965d791"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2897,7 +2897,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1896">
-				<rom name="syn_h.lvt" size="1896" crc="bd31e797" sha1="b082b9e4045af64dd32b2822677b07b10fd5d6e1" offset="0" />
+				<rom name="syn_h.lvt" size="1896" crc="bd31e797" sha1="b082b9e4045af64dd32b2822677b07b10fd5d6e1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2909,7 +2909,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4118">
-				<rom name="syn_t.lvt" size="4118" crc="cebc2cdf" sha1="6988d7242d657eea3281bc58366ded324ae9c943" offset="0" />
+				<rom name="syn_t.lvt" size="4118" crc="cebc2cdf" sha1="6988d7242d657eea3281bc58366ded324ae9c943"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2921,7 +2921,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="896">
-				<rom name="syntez.lvt" size="896" crc="1e0eef04" sha1="21aa1c9c3201504702e003e499de324c618c323c" offset="0" />
+				<rom name="syntez.lvt" size="896" crc="1e0eef04" sha1="21aa1c9c3201504702e003e499de324c618c323c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2933,7 +2933,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="2838">
-				<rom name="taper2.lvt" size="2838" crc="46fa801a" sha1="24d78d1df337d143fcf25b468e4e78cf6d288cd9" offset="0" />
+				<rom name="taper2.lvt" size="2838" crc="46fa801a" sha1="24d78d1df337d143fcf25b468e4e78cf6d288cd9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2945,7 +2945,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="705">
-				<rom name="tfcopy.lvt" size="705" crc="307772b3" sha1="feae3306d4b0bc14a5d1b94976c32f0e52131ed8" offset="0" />
+				<rom name="tfcopy.lvt" size="705" crc="307772b3" sha1="feae3306d4b0bc14a5d1b94976c32f0e52131ed8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2957,7 +2957,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1379">
-				<rom name="trap_0.lvt" size="1379" crc="273dc9b4" sha1="ddedc6ccfdebfcd9f16bf2c93822a9ce7fcb676c" offset="0" />
+				<rom name="trap_0.lvt" size="1379" crc="273dc9b4" sha1="ddedc6ccfdebfcd9f16bf2c93822a9ce7fcb676c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2969,7 +2969,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1272">
-				<rom name="trap_h.lvt" size="1272" crc="8c05902f" sha1="1ccdd77747d9b771426f82a810c7beccfa8e52af" offset="0" />
+				<rom name="trap_h.lvt" size="1272" crc="8c05902f" sha1="1ccdd77747d9b771426f82a810c7beccfa8e52af"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2981,7 +2981,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="2723">
-				<rom name="turbo.lvt" size="2723" crc="3a1d349e" sha1="d144999cfcf5e5fddf94fb88b1fc318c22039cd2" offset="0" />
+				<rom name="turbo.lvt" size="2723" crc="3a1d349e" sha1="d144999cfcf5e5fddf94fb88b1fc318c22039cd2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2993,7 +2993,7 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="2600">
-				<rom name="turbo0.lvt" size="2600" crc="e661fed9" sha1="360f0fd755c9b60da473ffd7bb606a7436f0ae87" offset="0" />
+				<rom name="turbo0.lvt" size="2600" crc="e661fed9" sha1="360f0fd755c9b60da473ffd7bb606a7436f0ae87"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3005,12 +3005,12 @@
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />
 		<part name="cass1" interface="lviv_cass">
 			<dataarea name="cass" size="1595">
-				<rom name="voice.lvt" size="1595" crc="7ece101b" sha1="3f820b9ab8cdbf610f7fdb59bd2775a1b191c424" offset="0" />
+				<rom name="voice.lvt" size="1595" crc="7ece101b" sha1="3f820b9ab8cdbf610f7fdb59bd2775a1b191c424"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="lviv_cass">
 			<dataarea name="cass" size="178">
-				<rom name="voice.lv0" size="178" crc="03afc1ca" sha1="1e471e2d06a299bf7a22f141220b4da5bbd2d803" offset="0" />
+				<rom name="voice.lv0" size="178" crc="03afc1ca" sha1="1e471e2d06a299bf7a22f141220b4da5bbd2d803"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3025,7 +3025,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="5396">
-				<rom name="_rlci_.lvt" size="5396" crc="5ee3963b" sha1="8062dab94a51b8f0d34241aeac61a72fc5fca417" offset="0" />
+				<rom name="_rlci_.lvt" size="5396" crc="5ee3963b" sha1="8062dab94a51b8f0d34241aeac61a72fc5fca417"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3037,7 +3037,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1240">
-				<rom name="assmm0.lvt" size="1240" crc="e65c3a92" sha1="aff6dc8dae11d883d191f57f8602a37107776e51" offset="0" />
+				<rom name="assmm0.lvt" size="1240" crc="e65c3a92" sha1="aff6dc8dae11d883d191f57f8602a37107776e51"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3049,7 +3049,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="5218">
-				<rom name="assmm1.lvt" size="5218" crc="a1ec96d5" sha1="81c370432202ce23d83a659889740e194a8b974f" offset="0" />
+				<rom name="assmm1.lvt" size="5218" crc="a1ec96d5" sha1="81c370432202ce23d83a659889740e194a8b974f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3061,7 +3061,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="7515">
-				<rom name="assmm2.lvt" size="7515" crc="037b00a1" sha1="5b3f44b13e30355cdd93b2df0e1d076bec6f1fb3" offset="0" />
+				<rom name="assmm2.lvt" size="7515" crc="037b00a1" sha1="5b3f44b13e30355cdd93b2df0e1d076bec6f1fb3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3073,7 +3073,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="8312">
-				<rom name="assmm3.lvt" size="8312" crc="f25d30d0" sha1="b9dc22e8475203897f5e4bbd2be91a1f67967024" offset="0" />
+				<rom name="assmm3.lvt" size="8312" crc="f25d30d0" sha1="b9dc22e8475203897f5e4bbd2be91a1f67967024"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3085,7 +3085,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="13529">
-				<rom name="bsdass.lvt" size="13529" crc="5e321fd0" sha1="5098e69a0ebcabd00f8b1310407d14a5654b8672" offset="0" />
+				<rom name="bsdass.lvt" size="13529" crc="5e321fd0" sha1="5098e69a0ebcabd00f8b1310407d14a5654b8672"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3097,7 +3097,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="2692">
-				<rom name="bstect.lvt" size="2692" crc="b335b1b2" sha1="da32a10cf13fb680d5e35b673e36820041fdfb68" offset="0" />
+				<rom name="bstect.lvt" size="2692" crc="b335b1b2" sha1="da32a10cf13fb680d5e35b673e36820041fdfb68"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3109,7 +3109,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1726">
-				<rom name="codemen.lvt" size="1726" crc="35d8a736" sha1="08d6e6ae60133af2455c8a8daf31bf003d0b798f" offset="0" />
+				<rom name="codemen.lvt" size="1726" crc="35d8a736" sha1="08d6e6ae60133af2455c8a8daf31bf003d0b798f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3121,7 +3121,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4371">
-				<rom name="dizasm.lvt" size="4371" crc="868dc3e1" sha1="91f376c4f496b79d667d4655ce2bf3b8be3b594c" offset="0" />
+				<rom name="dizasm.lvt" size="4371" crc="868dc3e1" sha1="91f376c4f496b79d667d4655ce2bf3b8be3b594c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3133,7 +3133,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4163">
-				<rom name="dizasm0.lvt" size="4163" crc="cc892afa" sha1="d534a39db17313df39354760a7e9ad8b6ad18b65" offset="0" />
+				<rom name="dizasm0.lvt" size="4163" crc="cc892afa" sha1="d534a39db17313df39354760a7e9ad8b6ad18b65"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3145,7 +3145,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4319">
-				<rom name="dizasm2.lvt" size="4319" crc="348c5dc4" sha1="11ec1f6c1bc4f653037670a27df0522a5f1ffd4e" offset="0" />
+				<rom name="dizasm2.lvt" size="4319" crc="348c5dc4" sha1="11ec1f6c1bc4f653037670a27df0522a5f1ffd4e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3157,7 +3157,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="11922">
-				<rom name="geograph.lvt" size="11922" crc="9c05f6f5" sha1="e9e80e2f2c8103e1a8d553bea2e82feacffb0947" offset="0" />
+				<rom name="geograph.lvt" size="11922" crc="9c05f6f5" sha1="e9e80e2f2c8103e1a8d553bea2e82feacffb0947"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3169,7 +3169,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="3446">
-				<rom name="graphics.lvt" size="3446" crc="9627aa3d" sha1="481078b3b5aa5a232927fef5e73271b3806883aa" offset="0" />
+				<rom name="graphics.lvt" size="3446" crc="9627aa3d" sha1="481078b3b5aa5a232927fef5e73271b3806883aa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3181,7 +3181,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="3148">
-				<rom name="heat.lvt" size="3148" crc="cba03c4f" sha1="49bbcd6b52d91ccf5e86e0aca05bba385e39a643" offset="0" />
+				<rom name="heat.lvt" size="3148" crc="cba03c4f" sha1="49bbcd6b52d91ccf5e86e0aca05bba385e39a643"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3193,7 +3193,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="6220">
-				<rom name="lm-22.lvt" size="6220" crc="179c5dd1" sha1="db4a74985835cd33d387ec0597e47cec4db6bc13" offset="0" />
+				<rom name="lm-22.lvt" size="6220" crc="179c5dd1" sha1="db4a74985835cd33d387ec0597e47cec4db6bc13"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3205,7 +3205,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4149">
-				<rom name="mon_ar.lvt" size="4149" crc="eadba46e" sha1="cb9c4aa2ecaeaeea44c56f1f039f14f30617a976" offset="0" />
+				<rom name="mon_ar.lvt" size="4149" crc="eadba46e" sha1="cb9c4aa2ecaeaeea44c56f1f039f14f30617a976"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3217,7 +3217,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4030">
-				<rom name="monitore.lvt" size="4030" crc="b03f0fa7" sha1="7189a4f05f7118c68ef3725ccd291057d7a251d0" offset="0" />
+				<rom name="monitore.lvt" size="4030" crc="b03f0fa7" sha1="7189a4f05f7118c68ef3725ccd291057d7a251d0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3229,7 +3229,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="6141">
-				<rom name="morze.lvt" size="6141" crc="524ebd7f" sha1="97b18525e26e3fda313c2f3ba1108a9ae453ff16" offset="0" />
+				<rom name="morze.lvt" size="6141" crc="524ebd7f" sha1="97b18525e26e3fda313c2f3ba1108a9ae453ff16"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3241,7 +3241,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4741">
-				<rom name="music.lvt" size="4741" crc="49177d51" sha1="f33cdf3f2aec2cc6269efb10c456467cace5206c" offset="0" />
+				<rom name="music.lvt" size="4741" crc="49177d51" sha1="f33cdf3f2aec2cc6269efb10c456467cace5206c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3253,7 +3253,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4866">
-				<rom name="ozu_v1.lvt" size="4866" crc="ba17f83e" sha1="2f3a473fa832412439b362b0aca54b5685b71ea2" offset="0" />
+				<rom name="ozu_v1.lvt" size="4866" crc="ba17f83e" sha1="2f3a473fa832412439b362b0aca54b5685b71ea2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3265,7 +3265,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1458">
-				<rom name="p_prog.lvt" size="1458" crc="54c67d74" sha1="7b6541380b323a1f9c26a988e20be44f657fa8b6" offset="0" />
+				<rom name="p_prog.lvt" size="1458" crc="54c67d74" sha1="7b6541380b323a1f9c26a988e20be44f657fa8b6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3277,7 +3277,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1027">
-				<rom name="p_prog_h.lvt" size="1027" crc="ba6991e2" sha1="30da0c234f6d10ae14c7649b19ac8a081089fc62" offset="0" />
+				<rom name="p_prog_h.lvt" size="1027" crc="ba6991e2" sha1="30da0c234f6d10ae14c7649b19ac8a081089fc62"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3289,7 +3289,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4263">
-				<rom name="service.lvt" size="4263" crc="4cb7b233" sha1="aae52d1ac146460e325ecbd1c4cf98e6d5b40756" offset="0" />
+				<rom name="service.lvt" size="4263" crc="4cb7b233" sha1="aae52d1ac146460e325ecbd1c4cf98e6d5b40756"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3301,7 +3301,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="4440">
-				<rom name="simvol2.lvt" size="4440" crc="930d985f" sha1="94c3432d064705dedcb9bbb2f426a742cb5d4bb5" offset="0" />
+				<rom name="simvol2.lvt" size="4440" crc="930d985f" sha1="94c3432d064705dedcb9bbb2f426a742cb5d4bb5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3313,7 +3313,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="6944">
-				<rom name="symbol.lvt" size="6944" crc="c1800766" sha1="2cada4d96047481fb2ca4582686e528435f5ab17" offset="0" />
+				<rom name="symbol.lvt" size="6944" crc="c1800766" sha1="2cada4d96047481fb2ca4582686e528435f5ab17"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3325,7 +3325,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="2205">
-				<rom name="trans.lvt" size="2205" crc="3553482f" sha1="4c5639af32d9dd3d8d825ae0d0e7795cdec135d0" offset="0" />
+				<rom name="trans.lvt" size="2205" crc="3553482f" sha1="4c5639af32d9dd3d8d825ae0d0e7795cdec135d0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3337,7 +3337,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="727">
-				<rom name="typer.lvt" size="727" crc="87195372" sha1="ee22d45a4d339a838b77faa12e55ec62f5458dd3" offset="0" />
+				<rom name="typer.lvt" size="727" crc="87195372" sha1="ee22d45a4d339a838b77faa12e55ec62f5458dd3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3349,7 +3349,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1025">
-				<rom name="uravn_g.lvt" size="1025" crc="389b6143" sha1="f5684d291eb1c90eb6f46bf2f35bee5c7ae6f32a" offset="0" />
+				<rom name="uravn_g.lvt" size="1025" crc="389b6143" sha1="f5684d291eb1c90eb6f46bf2f35bee5c7ae6f32a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3361,7 +3361,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="12206">
-				<rom name="voc-ar.lvt" size="12206" crc="1cfabbf8" sha1="4373fb1cd96895ea3d05a0b4f57a37ec45bd368a" offset="0" />
+				<rom name="voc-ar.lvt" size="12206" crc="1cfabbf8" sha1="4373fb1cd96895ea3d05a0b4f57a37ec45bd368a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3373,7 +3373,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="2923">
-				<rom name="vvod16.lvt" size="2923" crc="5de5f0b2" sha1="9ed35b8e75442c8b24b03ea017ab87b01ed66284" offset="0" />
+				<rom name="vvod16.lvt" size="2923" crc="5de5f0b2" sha1="9ed35b8e75442c8b24b03ea017ab87b01ed66284"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3385,7 +3385,7 @@
 		<info name="usage" value="Load with CLOAD&quot;&quot;" />
 		<part name="cass" interface="lviv_cass">
 			<dataarea name="cass" size="1351">
-				<rom name="vvod16_h.lvt" size="1351" crc="f39f9800" sha1="d39dc7c907daf327d96f9989b0f3eee0da310330" offset="0" />
+				<rom name="vvod16_h.lvt" size="1351" crc="f39f9800" sha1="d39dc7c907daf327d96f9989b0f3eee0da310330"/>
 			</dataarea>
 		</part>
 	</software>

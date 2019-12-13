@@ -41,7 +41,6 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "screen.h"
 #include "ctrl.h"
 // slot devices
 #include "4score.h"
@@ -78,7 +77,7 @@ DEFINE_DEVICE_TYPE(NES_CONTROL_PORT, nes_control_port_device, "nes_control_port"
 //-------------------------------------------------
 
 device_nes_control_port_interface::device_nes_control_port_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_interface(device, "nesctrl")
 {
 	m_port = dynamic_cast<nes_control_port_device *>(device.owner());
 }
@@ -104,7 +103,7 @@ device_nes_control_port_interface::~device_nes_control_port_interface()
 
 nes_control_port_device::nes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NES_CONTROL_PORT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_nes_control_port_interface>(mconfig, *this),
 	m_screen(*this, finder_base::DUMMY_TAG),
 	m_device(nullptr)
 {
@@ -126,7 +125,7 @@ nes_control_port_device::~nes_control_port_device()
 
 void nes_control_port_device::device_start()
 {
-	m_device = dynamic_cast<device_nes_control_port_interface *>(get_card_device());
+	m_device = get_card_device();
 }
 
 

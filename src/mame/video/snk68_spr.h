@@ -7,25 +7,26 @@
 
 #include "screen.h"
 
-typedef device_delegate<void (int&, int&, int&, int&)> snk68_tile_indirection_delegate;
-
 
 class snk68_spr_device : public device_t
 {
 public:
+	typedef device_delegate<void (int &, int &, int &, int &)> tile_indirection_delegate;
+
 	snk68_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
-	template <typename... T> void set_tile_indirect_cb(T &&... args) { m_newtilecb = snk68_tile_indirection_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_tile_indirect_cb(T &&... args) { m_newtilecb.set(std::forward<T>(args)...); }
 	void set_no_partial() { m_partialupdates = 0; }
+	void set_xpos_shift(u8 data) { m_xpos_shift = data; }
+	void set_color_entry_mask(u16 data) { m_color_entry_mask = data; }
 
 	DECLARE_READ16_MEMBER(spriteram_r);
 	DECLARE_WRITE16_MEMBER(spriteram_w);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int group);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int group, u16 start_offset, u16 end_offset);
 	void draw_sprites_all(bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	snk68_tile_indirection_delegate m_newtilecb;
+	void draw_sprites_alt(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void tile_callback_noindirect(int& tile, int& fx, int& fy, int& region);
 	void set_flip(bool flip);
@@ -35,11 +36,14 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	tile_indirection_delegate m_newtilecb;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_device<screen_device> m_screen;
 	bool m_flipscreen;
 	int m_partialupdates; // the original hardware needs this, the cloned hardware does not.
+	u8  m_xpos_shift;
+	u16 m_color_entry_mask;
 };
 
 

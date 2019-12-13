@@ -278,10 +278,12 @@
 #include "emu.h"
 #include "audio/dcs.h"
 
+#include "bus/ata/idehd.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/mips/mips3.h"
 #include "machine/idectrl.h"
-#include "machine/idehd.h"
+#include "machine/ins8250.h"
 #include "machine/midwayic.h"
 #include "machine/smc91c9x.h"
 #include "machine/timekpr.h"
@@ -290,8 +292,6 @@
 #include "machine/pci-ide.h"
 #include "video/voodoo_pci.h"
 #include "screen.h"
-#include "machine/ins8250.h"
-#include "bus/rs232/rs232.h"
 
 #include "sf2049.lh"
 
@@ -1702,7 +1702,7 @@ void vegas_state::vegas_cs2_map(address_map &map)
 void vegas_state::vegas_cs3_map(address_map &map)
 {
 	map(0x00000000, 0x00000003).rw(FUNC(vegas_state::analog_port_r), FUNC(vegas_state::analog_port_w));
-	//AM_RANGE(0x00001000, 0x00001003) AM_READWRITE(lcd_r, lcd_w)
+	//map(0x00001000, 0x00001003).rw(FUNC(vegas_state::lcd_r), FUNC(vegas_state::lcd_w));
 }
 
 void vegas_state::vegas_cs4_map(address_map &map)
@@ -1727,7 +1727,7 @@ void vegas_state::vegas_cs6_map(address_map &map)
 
 void vegas_state::vegas_cs7_map(address_map &map)
 {
-	//AM_RANGE(0x00000000, 0x00000003) AM_READWRITE8(nss_r, nss_w, 0xffffffff)
+	//map(0x00000000, 0x00000003).rw(FUNC(vegas_state::nss_r), FUNC(vegas_state::nss_w));
 	map(0x00001000, 0x0000100f).rw(FUNC(vegas_state::ethernet_r), FUNC(vegas_state::ethernet_w));
 	map(0x00005000, 0x00005003).w(m_dcs, FUNC(dcs_audio_device::dsio_idma_addr_w)); // if (m_dcs_idma_cs == 7)
 	map(0x00007000, 0x00007003).rw(m_dcs, FUNC(dcs_audio_device::dsio_idma_data_r), FUNC(dcs_audio_device::dsio_idma_data_w)); // if (m_dcs_idma_cs == 7)

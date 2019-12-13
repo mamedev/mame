@@ -98,7 +98,7 @@ void stereo_fx_device::stereo_fx_io(address_map &map)
 	map(0xFF00, 0xFF00).w(FUNC(stereo_fx_device::port00_w));
 	map(0xFF10, 0xFF10).w("rdac", FUNC(dac_byte_interface::data_w));
 	map(0xFF20, 0xFF20).w(FUNC(stereo_fx_device::port20_w));
-	//AM_RANGE(0xFF30, 0xFF30) AM_WRITE()  //  used only on reset and undocumented cmd 0xc4
+	//map(0xFF30, 0xFF30).w(FUNC(stereo_fx_device::));  //  used only on reset and undocumented cmd 0xc4
 	map(0xFF40, 0xFF40).rw(FUNC(stereo_fx_device::dev_dsp_data_r), FUNC(stereo_fx_device::dev_dsp_data_w));
 	map(0xFF50, 0xFF50).w(FUNC(stereo_fx_device::raise_drq_w));
 	map(0xFF60, 0xFF60).w(FUNC(stereo_fx_device::dev_host_irq_w));
@@ -207,16 +207,16 @@ stereo_fx_device::stereo_fx_device(const machine_config &mconfig, const char *ta
 
 void stereo_fx_device::device_start()
 {
-	ym3812_device *ym3812 = subdevice<ym3812_device>("ym3812");
+	ym3812_device &ym3812 = *subdevice<ym3812_device>("ym3812");
 	set_isa_device();
 
-	m_isa->install_device(0x0200, 0x0207, read8_delegate(FUNC(pc_joy_device::joy_port_r), subdevice<pc_joy_device>("pc_joy")), write8_delegate(FUNC(pc_joy_device::joy_port_w), subdevice<pc_joy_device>("pc_joy")));
-	m_isa->install_device(0x0226, 0x0227, read8_delegate(FUNC(stereo_fx_device::invalid_r), this), write8_delegate(FUNC(stereo_fx_device::dsp_reset_w), this));
-	m_isa->install_device(0x022a, 0x022b, read8_delegate(FUNC(stereo_fx_device::dsp_data_r), this), write8_delegate(FUNC(stereo_fx_device::invalid_w), this) );
-	m_isa->install_device(0x022c, 0x022d, read8_delegate(FUNC(stereo_fx_device::dsp_wbuf_status_r), this), write8_delegate(FUNC(stereo_fx_device::dsp_cmd_w), this) );
-	m_isa->install_device(0x022e, 0x022f, read8_delegate(FUNC(stereo_fx_device::dsp_rbuf_status_r), this), write8_delegate(FUNC(stereo_fx_device::invalid_w), this) );
-	m_isa->install_device(0x0388, 0x0389, read8sm_delegate(FUNC(ym3812_device::read), ym3812), write8sm_delegate(FUNC(ym3812_device::write), ym3812));
-	m_isa->install_device(0x0228, 0x0229, read8sm_delegate(FUNC(ym3812_device::read), ym3812), write8sm_delegate(FUNC(ym3812_device::write), ym3812));
+	m_isa->install_device(0x0200, 0x0207, read8_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_r)), write8_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_w)));
+	m_isa->install_device(0x0226, 0x0227, read8_delegate(*this, FUNC(stereo_fx_device::invalid_r)), write8_delegate(*this, FUNC(stereo_fx_device::dsp_reset_w)));
+	m_isa->install_device(0x022a, 0x022b, read8_delegate(*this, FUNC(stereo_fx_device::dsp_data_r)), write8_delegate(*this, FUNC(stereo_fx_device::invalid_w)));
+	m_isa->install_device(0x022c, 0x022d, read8_delegate(*this, FUNC(stereo_fx_device::dsp_wbuf_status_r)), write8_delegate(*this, FUNC(stereo_fx_device::dsp_cmd_w)));
+	m_isa->install_device(0x022e, 0x022f, read8_delegate(*this, FUNC(stereo_fx_device::dsp_rbuf_status_r)), write8_delegate(*this, FUNC(stereo_fx_device::invalid_w)));
+	m_isa->install_device(0x0388, 0x0389, read8sm_delegate(ym3812, FUNC(ym3812_device::read)), write8sm_delegate(ym3812, FUNC(ym3812_device::write)));
+	m_isa->install_device(0x0228, 0x0229, read8sm_delegate(ym3812, FUNC(ym3812_device::read)), write8sm_delegate(ym3812, FUNC(ym3812_device::write)));
 	m_timer = timer_alloc();
 	m_timer->adjust(attotime::from_hz(2000000), 0, attotime::from_hz(2000000));
 	m_isa->set_dma_channel(1, this, false);

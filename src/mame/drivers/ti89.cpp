@@ -464,11 +464,11 @@ void ti68k_state::machine_start()
 
 		if (initial_pc > 0x400000)
 		{
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x400000, 0x5fffff, read16_delegate(FUNC(ti68k_state::rom_r), this));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x400000, 0x5fffff, read16_delegate(*this, FUNC(ti68k_state::rom_r)));
 		}
 		else
 		{
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x3fffff, read16_delegate(FUNC(ti68k_state::rom_r), this));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x3fffff, read16_delegate(*this, FUNC(ti68k_state::rom_r)));
 		}
 	}
 

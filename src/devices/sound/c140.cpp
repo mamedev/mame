@@ -10,12 +10,7 @@ This chip controls 24 channels (C140) or 16 (219) of PCM.
 16 bytes are associated with each channel.
 Channels can be 8 bit signed PCM, or 12 bit signed PCM.
 
-Timer behavior is not yet handled.
-
-Unmapped registers:
-    0x1f8:timer interval?   (Nx0.1 ms)
-    0x1fa:irq ack? timer restart?
-    0x1fe:timer switch?(0:off 1:on)
+TODO: What does the INT0 pin do? Normally Namco tied it to VOL0 (with VOL1 = VCC).
 
 --------------
 

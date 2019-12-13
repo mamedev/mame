@@ -209,6 +209,51 @@ void spg2xx_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_
 	}
 }
 
+void spg2xx_video_device::draw_bitmap(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t* regs)
+{
+	if ((scanline < 0) || (scanline >= 240))
+		return;
+
+	address_space& space = m_cpu->space(AS_PROGRAM);
+	const int linewidth = 320 / 2;
+	int sourcebase = 0x3f0000; // this is correct for Texas Hold'em - TODO: get from a register?
+
+	sourcebase++; // why is this needed?
+	int bitmapline = scanline - 20; // should be from scrolly?
+
+	// at least for Texas Hold'em there is only enough memory for this size bitmap, and other reads would be outside of memory and generate excessive logging
+	// maybe we just need to silence logging instead tho?
+	if ((bitmapline < 0) || (bitmapline >= 200))
+		return;
+
+	sourcebase += bitmapline * linewidth;
+
+	uint32_t* dest = &m_screenbuf[320 * scanline];
+
+	for (int i = 0; i < 320 / 2; i++)
+	{
+		uint8_t palette_entry;
+		uint16_t color;
+		const uint16_t data = space.read_word(sourcebase + i);
+
+		palette_entry = (data & 0x00ff);
+		color = m_paletteram[palette_entry];
+
+		if (!(color & 0x8000))
+		{
+			dest[(i * 2)+0] = m_rgb555_to_rgb888[color & 0x7fff];
+		}
+
+		palette_entry = (data & 0xff00) >> 8;
+		color = m_paletteram[palette_entry];
+
+		if (!(color & 0x8000))
+		{
+			dest[(i * 2)+1] = m_rgb555_to_rgb888[color & 0x7fff];
+		}
+	}
+}
+
 void spg2xx_video_device::draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t *regs)
 {
 	uint32_t xscroll = regs[0];
@@ -228,6 +273,13 @@ void spg2xx_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 	{
 		return;
 	}
+
+	if (ctrl & 0x0001) // Bitmap mode!
+	{
+		draw_bitmap(cliprect, scanline, priority, bitmap_addr, regs);
+		return;
+	}
+
 
 	uint32_t tile_h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
 	uint32_t tile_w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);

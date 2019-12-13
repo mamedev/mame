@@ -159,18 +159,18 @@ void pirates_state::pirates_map(address_map &map)
 	map(0x100000, 0x10ffff).ram(); // main ram
 	map(0x300000, 0x300001).portr("INPUTS");
 	map(0x400000, 0x400001).portr("SYSTEM");
-//  AM_RANGE(0x500000, 0x5007ff) AM_RAM
+//  map(0x500000, 0x5007ff).ram();
 	map(0x500000, 0x5007ff).writeonly().share("spriteram");
-//  AM_RANGE(0x500800, 0x50080f) AM_WRITENOP
+//  map(0x500800, 0x50080f).nopw();
 	map(0x600000, 0x600001).w(FUNC(pirates_state::out_w));
 	map(0x700000, 0x700001).writeonly().share("scroll");    // scroll reg
 	map(0x800000, 0x803fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x900000, 0x90017f).ram();  // more of tilemaps ?
 	map(0x900180, 0x90137f).ram().w(FUNC(pirates_state::tx_tileram_w)).share("tx_tileram");
 	map(0x901380, 0x902a7f).ram().w(FUNC(pirates_state::fg_tileram_w)).share("fg_tileram");
-//  AM_RANGE(0x902580, 0x902a7f) AM_RAM  // more of tilemaps ?
+//  map(0x902580, 0x902a7f).ram();  // more of tilemaps ?
 	map(0x902a80, 0x904187).ram().w(FUNC(pirates_state::bg_tileram_w)).share("bg_tileram");
-//  AM_RANGE(0x903c80, 0x904187) AM_RAM  // more of tilemaps ?
+//  map(0x903c80, 0x904187).ram();  // more of tilemaps ?
 	map(0xa00001, 0xa00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
@@ -461,7 +461,7 @@ void pirates_state::init_genix()
 
 	/* If this value is increased then something has gone wrong and the protection failed */
 	/* Write-protect it for now */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x109e98, 0x109e9b, read16_delegate(FUNC(pirates_state::genix_prot_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x109e98, 0x109e9b, read16_delegate(*this, FUNC(pirates_state::genix_prot_r)));
 }
 
 /* GAME */

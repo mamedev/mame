@@ -175,11 +175,11 @@ void olyboss_state::olyboss_io(address_map &map)
 	map.unmap_value_high();
 	map(0x0, 0x8).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	map(0x10, 0x11).m(m_fdc, FUNC(upd765a_device::map));
-	//AM_RANGE(0x20, 0x20) //beeper?
+	//map(0x20, 0x20) //beeper?
 	map(0x30, 0x30).rw(m_uic, FUNC(am9519_device::data_r), FUNC(am9519_device::data_w));
 	map(0x31, 0x31).rw(m_uic, FUNC(am9519_device::stat_r), FUNC(am9519_device::cmd_w));
 	map(0x40, 0x43).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	//AM_RANGE(0x50, 0x53) COM2651
+	//map(0x50, 0x53) COM2651
 	map(0x60, 0x60).rw(FUNC(olyboss_state::fdcctrl_r), FUNC(olyboss_state::fdcctrl_w));
 	map(0x80, 0x81).rw(m_crtc, FUNC(upd3301_device::read), FUNC(upd3301_device::write));
 	map(0x82, 0x84).w(FUNC(olyboss_state::vchrmap_w));
@@ -468,7 +468,7 @@ void olyboss_state::olybossd(machine_config &config)
 
 	UPD3301(config, m_crtc, XTAL(14'318'181));
 	m_crtc->set_character_width(8);
-	m_crtc->set_display_callback(FUNC(olyboss_state::olyboss_display_pixels), this);
+	m_crtc->set_display_callback(FUNC(olyboss_state::olyboss_display_pixels));
 	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 	m_crtc->int_wr_callback().set(m_uic, FUNC(am9519_device::ireq0_w)).invert();
 	m_crtc->set_screen(SCREEN_TAG);

@@ -280,22 +280,27 @@ void powerins_state::init_powerinsc()
 void powerins_state::powerins(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);   /* 12MHz */
+	M68000(config, m_maincpu, XTAL(12'000'000));   /* 12MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &powerins_state::powerins_map);
 
-	Z80(config, m_soundcpu, 6000000); /* 6 MHz */
+	Z80(config, m_soundcpu, XTAL(12'000'000) / 2); /* 6 MHz */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &powerins_state::powerins_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &powerins_state::powerins_sound_io_map);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(56);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(320, 256);
-	m_screen->set_visarea(0, 320-1, 0+16, 256-16-1);
+	m_screen->set_raw(XTAL(14'000'000) / 2, 448, 0, 320, 278, 16, 240); // confirmed
 	m_screen->set_screen_update(FUNC(powerins_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(powerins_state::screen_vblank));
 	m_screen->set_palette(m_palette);
+
+	NMK_16BIT_SPRITE(config, m_spritegen, XTAL(14'000'000) / 2);
+	m_spritegen->set_colpri_callback(FUNC(powerins_state::get_colour_6bit));
+	m_spritegen->set_ext_callback(FUNC(powerins_state::get_flip_extcode));
+	m_spritegen->set_mask(0x3ff, 0x3ff);
+	m_spritegen->set_screen_size(320, 256);
+	m_spritegen->set_max_sprite_clock(448 * 263); // not verified?
+	m_spritegen->set_videoshift(32);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_powerins);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 2048);
@@ -305,15 +310,15 @@ void powerins_state::powerins(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	okim6295_device &oki1(OKIM6295(config, "oki1", 4000000, okim6295_device::PIN7_LOW));
-	oki1.add_route(ALL_OUTPUTS, "mono", 0.15);
-
-	okim6295_device &oki2(OKIM6295(config, "oki2", 4000000, okim6295_device::PIN7_LOW));
-	oki2.add_route(ALL_OUTPUTS, "mono", 0.15);
-
-	ym2203_device &ym2203(YM2203(config, "ym2203", 12000000 / 8));
+	ym2203_device &ym2203(YM2203(config, "ym2203", XTAL(12'000'000) / 8));
 	ym2203.irq_handler().set_inputline(m_soundcpu, 0);
 	ym2203.add_route(ALL_OUTPUTS, "mono", 2.0);
+
+	okim6295_device &oki1(OKIM6295(config, "oki1", XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW));
+	oki1.add_route(ALL_OUTPUTS, "mono", 0.15);
+
+	okim6295_device &oki2(OKIM6295(config, "oki2", XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW));
+	oki2.add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");

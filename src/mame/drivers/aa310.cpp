@@ -179,7 +179,7 @@ void aa310_state::init_aa310()
 	uint32_t ram_size = m_ram->size();
 
 	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x02000000, 0x02ffffff);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler( 0x02000000, 0x02000000+(ram_size-1), read32_delegate(FUNC(aa310_state::aa310_psy_wram_r), this), write32_delegate(FUNC(aa310_state::aa310_psy_wram_w), this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler( 0x02000000, 0x02000000+(ram_size-1), read32_delegate(*this, FUNC(aa310_state::aa310_psy_wram_r)), write32_delegate(*this, FUNC(aa310_state::aa310_psy_wram_w)));
 
 	archimedes_driver_init();
 }
@@ -610,8 +610,8 @@ ROM_START( aa305 )
 	ROMX_LOAD( "0276,148-01.ic26", 0x000002, 0x10000, CRC(1ab02f2d) SHA1(dd7d216967524e64d1a03076a6081461ec8528c3), ROM_BIOS(8) | ROM_SKIP(3) )
 	ROMX_LOAD( "0276,149-01.ic27", 0x000003, 0x10000, CRC(5fd6a406) SHA1(790af8a4c74d0f6714d528f7502443ce5898a618), ROM_BIOS(8) | ROM_SKIP(3) )
 
-	
-	ROM_REGION( 0x400000, "extension", ROMREGION_ERASE00 )
+
+	ROM_REGION32_LE( 0x400000, "extension", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
 	ROMX_LOAD( "cmos_arthur.bin",  0x0000, 0x0100, CRC(017cdf3b) SHA1(03aa58fc8578de2019a34c6eeb4072e953f3444f), ROM_BIOS(0) )
@@ -654,8 +654,8 @@ ROM_START( aa3000 )
 	ROM_SYSTEM_BIOS( 5, "319", "RISC OS 3.19 (09 Jun 1993)" ) // Parts 0296,241-01, 0296,242-01, 0296,243-01, 0296,244-01,
 	ROMX_LOAD( "riscos319.bin", 0x000000, 0x200000, CRC(00c7a3d3) SHA1(be7a8cba5d6c6c0e1c4838712524056cf4b8c8cb), ROM_BIOS(5) )
 
-	
-	ROM_REGION( 0x400000, "extension", ROMREGION_ERASE00 )
+
+	ROM_REGION32_LE( 0x400000, "extension", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
 	ROMX_LOAD( "cmos_riscos2.bin", 0x0000, 0x0100, CRC(763b14e3) SHA1(0ccd41648a798ba4a5d92c19c24b605a8927fb76), ROM_BIOS(0) )
@@ -691,8 +691,8 @@ ROM_START( aa5000 )
 	ROM_SYSTEM_BIOS( 3, "319", "RISC OS 3.19 (09 Jun 1993)" ) // Parts 0296,241-01, 0296,242-01, 0296,243-01, 0296,244-01,
 	ROMX_LOAD( "riscos319.bin", 0x000000, 0x200000, CRC(00c7a3d3) SHA1(be7a8cba5d6c6c0e1c4838712524056cf4b8c8cb), ROM_BIOS(3) )
 
-	
-	ROM_REGION( 0x400000, "extension", ROMREGION_ERASE00 )
+
+	ROM_REGION32_LE( 0x400000, "extension", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
 	ROM_LOAD( "cmos_riscos3.bin", 0x0000, 0x0100, CRC(0da2d31d) SHA1(4a5277f27e23f0eae9daa8cc5a4818a322f579a5) )
@@ -705,8 +705,8 @@ ROM_START( aa4 )
 	ROM_LOAD32_WORD( "0296,061-01.ic4",  0x000000, 0x100000, CRC(b77fe215) SHA1(57b19ea4b97a9b6a240aa61211c2c134cb295aa0) )
 	ROM_LOAD32_WORD( "0296,062-01.ic15", 0x000002, 0x100000, CRC(d42e196e) SHA1(64243d39d1bca38b10761f66a8042c883bde87a4) )
 
-	
-	ROM_REGION( 0x400000, "extension", ROMREGION_ERASE00 )
+
+	ROM_REGION32_LE( 0x400000, "extension", ROMREGION_ERASE00 )
 	/* Power Management */
 	ROM_LOAD32_BYTE( "0296,063-01.ic38", 0x000003, 0x010000, CRC(9ca3a6be) SHA1(75905b031f49960605d55c3e7350d309559ed440) )
 
@@ -719,8 +719,8 @@ ROM_START( aa3010 )
 	ROM_LOAD32_WORD( "0296,061-02.ic17", 0x000000, 0x100000, CRC(552fc3aa) SHA1(b2f1911e53d7377f2e69e1a870139745d3df494b) )
 	ROM_LOAD32_WORD( "0296,062-02.ic18", 0x000002, 0x100000, CRC(308d5a4a) SHA1(b309e1dd85670a06d77ec504dbbec6c42336329f) )
 
-	
-	ROM_REGION( 0x400000, "extension", ROMREGION_ERASE00 )
+
+	ROM_REGION32_LE( 0x400000, "extension", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
 	ROM_LOAD( "cmos_riscos3.bin", 0x0000, 0x0100, CRC(0da2d31d) SHA1(4a5277f27e23f0eae9daa8cc5a4818a322f579a5))

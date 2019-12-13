@@ -504,7 +504,7 @@ void fireball_state::fireball(machine_config &config)
 	m_maincpu->port_out_cb<3>().set(FUNC(fireball_state::p3_w));
 
 	//9ms from scope reading 111Hz take care of this in the handler
-	TIMER(config, "int_0", 0).configure_periodic(timer_device::expired_delegate(FUNC(fireball_state::int_0), this), attotime::from_hz(555));
+	TIMER(config, "int_0", 0).configure_periodic(FUNC(fireball_state::int_0), attotime::from_hz(555));
 
 	EEPROM_X24C44_16BIT(config, "eeprom");
 

@@ -402,7 +402,7 @@ void tourvision_state::tourvision(machine_config &config)
 	m_maincpu->add_route(0, "lspeaker", 1.00);
 	m_maincpu->add_route(1, "rspeaker", 1.00);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	I8085A(config, m_subcpu, 18000000/3 /*?*/);
 	m_subcpu->set_addrmap(AS_PROGRAM, &tourvision_state::tourvision_8085_map);
@@ -433,7 +433,7 @@ void tourvision_state::tourvision(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "tourvision_cart", "bin"));
-	cartslot.set_device_load(FUNC(tourvision_state::cart_load), this);
+	cartslot.set_device_load(FUNC(tourvision_state::cart_load));
 	cartslot.set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "tv_list").set_original("pce_tourvision");

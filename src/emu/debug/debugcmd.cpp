@@ -114,16 +114,16 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	/* add all single-entry save state globals */
 	for (int itemnum = 0; itemnum < MAX_GLOBALS; itemnum++)
 	{
-		u32 valsize, valcount;
 		void *base;
+		u32 valsize, valcount, blockcount, stride;
 
 		/* stop when we run out of items */
-		const char* name = m_machine.save().indexed_item(itemnum, base, valsize, valcount);
-		if (name == nullptr)
+		const char* name = m_machine.save().indexed_item(itemnum, base, valsize, valcount, blockcount, stride);
+		if (!name)
 			break;
 
 		/* if this is a single-entry global, add it */
-		if (valcount == 1 && strstr(name, "/globals/"))
+		if ((valcount == 1) && (blockcount == 1) && strstr(name, "/globals/"))
 		{
 			char symname[100];
 			sprintf(symname, ".%s", strrchr(name, '/') + 1);
@@ -169,6 +169,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("observe",   CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_observe, this, _1, _2));
 	m_console.register_command("suspend",   CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_suspend, this, _1, _2));
 	m_console.register_command("resume",    CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_resume, this, _1, _2));
+	m_console.register_command("cpulist",   CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_cpulist, this, _1, _2));
 
 	m_console.register_command("comadd",    CMDFLAG_NONE, 0, 1, 2, std::bind(&debugger_commands::execute_comment_add, this, _1, _2));
 	m_console.register_command("//",        CMDFLAG_NONE, 0, 1, 2, std::bind(&debugger_commands::execute_comment_add, this, _1, _2));
@@ -1178,6 +1179,21 @@ void debugger_commands::execute_resume(int ref, const std::vector<std::string> &
 	}
 }
 
+//-------------------------------------------------
+//  execute_cpulist - list all CPUs
+//-------------------------------------------------
+
+void debugger_commands::execute_cpulist(int ref, const std::vector<std::string> &params)
+{
+	int index = 0;
+	for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
+	{
+		device_state_interface *state;
+		if (exec.device().interface(state) && state->state_find_entry(STATE_GENPCBASE) != nullptr)
+			m_console.printf("[%s%d] %s\n", &exec.device() == m_cpu.get_visible_cpu() ? "*" : "", index++, exec.device().tag());
+	}
+}
+
 /*-------------------------------------------------
     execute_comment - add a comment to a line
 -------------------------------------------------*/
@@ -2034,12 +2050,12 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 	if (params.size() > 4 && !validate_number_parameter(params[4], ascii))
 		return;
 
-	u64 rowsize = 16;
-	if (params.size() > 5 && !validate_number_parameter(params[5], rowsize))
-		return;
-
 	address_space *space;
 	if (!validate_cpu_space_parameter((params.size() > 6) ? params[6].c_str() : nullptr, ref, space))
+		return;
+
+	u64 rowsize = space->byte_to_address(16);
+	if (params.size() > 5 && !validate_number_parameter(params[5], rowsize))
 		return;
 
 	int shift = space->addr_shift();
@@ -2060,9 +2076,9 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 		m_console.printf("Invalid width! (must be at least %d)\n", granularity);
 		return;
 	}
-	if (rowsize == 0 || (rowsize % width) != 0)
+	if (rowsize == 0 || (rowsize % space->byte_to_address(width)) != 0)
 	{
-		m_console.printf("Invalid row size! (must be a positive multiple of %d)\n", width);
+		m_console.printf("Invalid row size! (must be a positive multiple of %d)\n", space->byte_to_address(width));
 		return;
 	}
 
@@ -2081,10 +2097,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 	util::ovectorstream output;
 	output.reserve(200);
 
-	if (shift > 0)
-		width <<= shift;
-	else if(shift < 0)
-		width >>= -shift;
+	const unsigned delta = (shift >= 0) ? (width << shift) : (width >> -shift);
 
 	auto dis = space->device().machine().disable_side_effects();
 	bool be = space->endianness() == ENDIANNESS_BIG;
@@ -2098,7 +2111,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 		util::stream_format(output, "%0*X: ", space->logaddrchars(), i);
 
 		/* print the bytes */
-		for (u64 j = 0; j < rowsize; j += width)
+		for (u64 j = 0; j < rowsize; j += delta)
 		{
 			if (i + j <= endoffset)
 			{
@@ -2134,7 +2147,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 		if (ascii)
 		{
 			util::stream_format(output, "  ");
-			for (u64 j = 0; j < rowsize && (i + j) <= endoffset; j += width)
+			for (u64 j = 0; j < rowsize && (i + j) <= endoffset; j += delta)
 			{
 				offs_t curaddr = i + j;
 				if (space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr))

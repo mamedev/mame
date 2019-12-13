@@ -8,10 +8,10 @@
 
     TODO:
     - Compact Flash hookup;
-	- Requires timed based FIFO renderer, loops until both rear and front 
-	  are equal.
+    - Requires timed based FIFO renderer, loops until both rear and front
+      are equal.
     - Enables wavetable IRQ, even if so far no channel enables the submask;
-	- Unemulated 93C86 EEPROM device;
+    - Unemulated 93C86 EEPROM device;
 
 =============================================================================
 
@@ -126,11 +126,11 @@ GUN_xP are 6 pin gun connectors (pins 3-6 match the UNICO sytle guns):
 ****************************************************************************/
 
 #include "emu.h"
+#include "bus/ata/ataintf.h"
 #include "cpu/se3208/se3208.h"
 #include "machine/nvram.h"
 #include "machine/eepromser.h"
 #include "machine/vrender0.h"
-#include "machine/ataintf.h"
 #include "emupal.h"
 
 
@@ -164,7 +164,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void psattack_mem(address_map &map);
-	
+
 	DECLARE_READ16_MEMBER(cfcard_data_r);
 	DECLARE_READ8_MEMBER(cfcard_regs_r);
 	DECLARE_WRITE8_MEMBER(cfcard_regs_w);
@@ -212,7 +212,7 @@ void psattack_state::psattack_mem(address_map &map)
 	map(0x01500000, 0x01500003).portr("IN0").w(FUNC(psattack_state::output_w));
 	map(0x01500004, 0x01500007).portr("IN1");
 	map(0x01500008, 0x0150000b).portr("IN2");
-//	0x0150000c is prolly eeprom
+//  0x0150000c is prolly eeprom
 
 	map(0x01800000, 0x01ffffff).m(m_vr0soc, FUNC(vrender0soc_device::regs_map));
 //  map(0x01802410, 0x01802413) peripheral chip select for cf?

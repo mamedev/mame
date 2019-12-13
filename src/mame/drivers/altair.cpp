@@ -68,7 +68,7 @@ void altair_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	// TODO: Remove AM_MIRROR() and use SIO address S0-S7
+	// TODO: Remove mirror() and use SIO address S0-S7
 	map(0x00, 0x01).mirror(0x10).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 }
 
@@ -119,7 +119,7 @@ void altair_state::altair(machine_config &config)
 	uart_clock.signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(altair_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(altair_state::quickload_cb));
 }
 
 /* ROM definition */

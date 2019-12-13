@@ -146,6 +146,9 @@ public:
 		m_biosbank(*this, TO8_BIOS_BANK),
 		m_cartlobank(*this, MO6_CART_LO),
 		m_carthibank(*this, MO6_CART_HI),
+		m_cart_rom(*this, "cartridge"),
+		m_to7qdd(*this, "to7qdd"),
+		m_thmfc(*this, "thmfc"),
 		m_floppy_led(*this, "floppy"),
 		m_floppy_image(*this, "floppy%u", 0U)
 	{
@@ -343,25 +346,20 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(thom_vblank);
 	DECLARE_VIDEO_START( thom );
 
-	DECLARE_READ8_MEMBER( to7_5p14_r );
-	DECLARE_WRITE8_MEMBER( to7_5p14_w );
-	DECLARE_READ8_MEMBER( to7_5p14sd_r );
-	DECLARE_WRITE8_MEMBER( to7_5p14sd_w );
-	DECLARE_READ8_MEMBER( to7_qdd_r );
-	DECLARE_WRITE8_MEMBER( to7_qdd_w );
-	TIMER_CALLBACK_MEMBER( thmfc_floppy_cmd_complete_cb );
-	DECLARE_READ8_MEMBER( thmfc_floppy_r );
-	DECLARE_WRITE8_MEMBER( thmfc_floppy_w );
+	uint8_t to7_5p14_r(offs_t offset);
+	void to7_5p14_w(offs_t offset, uint8_t data);
+	uint8_t to7_5p14sd_r(offs_t offset);
+	void to7_5p14sd_w(offs_t offset, uint8_t data);
 	TIMER_CALLBACK_MEMBER( ans4 );
 	TIMER_CALLBACK_MEMBER( ans3 );
 	TIMER_CALLBACK_MEMBER( ans2 );
 	TIMER_CALLBACK_MEMBER( ans );
-	DECLARE_READ8_MEMBER( to7_network_r );
-	DECLARE_WRITE8_MEMBER( to7_network_w );
-	DECLARE_READ8_MEMBER( to7_floppy_r );
-	DECLARE_WRITE8_MEMBER( to7_floppy_w );
-	DECLARE_READ8_MEMBER( to9_floppy_r );
-	DECLARE_WRITE8_MEMBER( to9_floppy_w );
+	uint8_t to7_network_r(offs_t offset);
+	void to7_network_w(offs_t offset, uint8_t data);
+	uint8_t to7_floppy_r(offs_t offset);
+	void to7_floppy_w(offs_t offset, uint8_t data);
+	uint8_t to9_floppy_r(offs_t offset);
+	void to9_floppy_w(offs_t offset, uint8_t data);
 	WRITE_LINE_MEMBER( fdc_index_0_w );
 	WRITE_LINE_MEMBER( fdc_index_1_w );
 	WRITE_LINE_MEMBER( fdc_index_2_w );
@@ -429,7 +427,10 @@ private:
 	optional_memory_bank m_biosbank;
 	optional_memory_bank m_cartlobank;
 	optional_memory_bank m_carthibank;
+	required_region_ptr<uint8_t> m_cart_rom;
 
+	required_device<cq90_028_device> m_to7qdd;
+	required_device<thmfc1_device> m_thmfc;
 	output_finder<> m_floppy_led;
 	required_device_array<legacy_floppy_image_device, 4> m_floppy_image;
 
@@ -545,6 +546,11 @@ private:
 	emu_timer *m_thom_init_timer;
 	void (thomson_state::*m_thom_init_cb)( int init );
 
+	uint8_t m_to7_controller_type;
+	uint8_t m_to7_floppy_bank;
+	uint8_t m_to7_5p14_select;
+	uint8_t m_to7_5p14sd_select;
+
 	int to7_get_cassette();
 	int mo5_get_cassette();
 	void mo5_set_cassette( int data );
@@ -609,41 +615,16 @@ private:
 	unsigned to7_lightpen_gpl( int decx, int decy );
 	void thom_configure_palette( double gamma, const uint16_t* pal, palette_device& palette );
 
-	int thom_floppy_make_addr( chrn_id id, uint8_t* dst, int sector_size );
-	int thom_floppy_make_sector( legacy_floppy_image_device* img, chrn_id id, uint8_t* dst, int sector_size );
-	int thom_floppy_make_track( legacy_floppy_image_device* img, uint8_t* dst, int sector_size, int side );
-	int thom_qdd_make_addr( int sector, uint8_t* dst );
-	int thom_qdd_make_sector( legacy_floppy_image_device* img, int sector, uint8_t* dst );
-	int thom_qdd_make_disk ( legacy_floppy_image_device* img, uint8_t* dst );
 	void to7_5p14_reset();
 	void to7_5p14_init();
 	void to7_5p14_index_pulse_callback( int state );
 	void to7_5p14sd_reset();
 	void to7_5p14sd_init();
-	void to7_qdd_index_pulse_cb( int state );
-	legacy_floppy_image_device * to7_qdd_image();
-	void to7_qdd_stat_update();
-	uint8_t to7_qdd_read_byte();
-	void to7_qdd_write_byte( uint8_t data );
-	void to7_qdd_reset();
-	void to7_qdd_init();
-	legacy_floppy_image_device * thmfc_floppy_image();
-	int thmfc_floppy_is_qdd( legacy_floppy_image_device *image );
-	void thmfc_floppy_index_pulse_cb( int index, int state );
-	int thmfc_floppy_find_sector( chrn_id* dst );
-	void thmfc_floppy_cmd_complete();
-	uint8_t thmfc_floppy_read_byte();
-	uint8_t thmfc_floppy_raw_read_byte();
-	void thmfc_floppy_qdd_write_byte( uint8_t data );
-	void thmfc_floppy_write_byte( uint8_t data );
-	void thmfc_floppy_format_byte( uint8_t data );
-	void thmfc_floppy_reset();
-	void thmfc_floppy_init();
 	void to7_network_init();
 	void to7_network_reset();
-	void to7_floppy_init( void* base );
+	void to7_floppy_init();
 	void to7_floppy_reset();
-	void to9_floppy_init(void* int_base, void* ext_base);
+	void to9_floppy_init(void* int_base);
 	void to9_floppy_reset();
 };
 

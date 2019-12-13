@@ -22,7 +22,7 @@
     - Some gfx problems in ladykill, 3kokushi, puzzli, gakusai, seem related to how we handle
       windows, wrapping, read-modify-write areas;
     - puzzli: emulate hblank irq and fix video routines here (water effect not emulated?);
-	- Fix flipped screen behavior
+    - Fix flipped screen behavior
 
 ============================================================================
 
@@ -196,7 +196,7 @@ void imagetek_i4220_device::v2_map(address_map &map)
 	// repeated here in Puzzlet compatibility mode
 	map(0x78800, 0x78801).rw(FUNC(imagetek_i4220_device::sprite_count_r), FUNC(imagetek_i4220_device::sprite_count_w));
 	// ... this one breaks Blazing Tornado tho
-//  AM_RANGE(0x78802, 0x78803) AM_READWRITE(sprite_priority_r,   sprite_priority_w)
+//  map(0x78802, 0x78803).rw(FUNC(imagetek_i4220_device::sprite_priority_r), FUNC(imagetek_i4220_device::sprite_priority_w));
 	map(0x78804, 0x78805).rw(FUNC(imagetek_i4220_device::sprite_yoffset_r), FUNC(imagetek_i4220_device::sprite_yoffset_w));
 	map(0x78806, 0x78807).rw(FUNC(imagetek_i4220_device::sprite_xoffset_r), FUNC(imagetek_i4220_device::sprite_xoffset_w));
 	map(0x78808, 0x78809).rw(FUNC(imagetek_i4220_device::sprite_color_code_r), FUNC(imagetek_i4220_device::sprite_color_code_w));

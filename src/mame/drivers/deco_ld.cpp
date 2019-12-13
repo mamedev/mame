@@ -278,7 +278,7 @@ void deco_ld_state::rblaster_map(address_map &map)
 	map(0x1003, 0x1003).portr("IN1");
 	map(0x1004, 0x1004).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(FUNC(deco_ld_state::decold_sound_cmd_w));
 	map(0x1005, 0x1005).r(FUNC(deco_ld_state::sound_status_r));
-	//AM_RANGE(0x1006, 0x1007) AM_DEVREADWRITE("acia", acia6850_device, read, write)
+	//map(0x1006, 0x1007).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x1006, 0x1006).r(FUNC(deco_ld_state::acia_status_hack_r));
 	map(0x1007, 0x1007).rw(m_laserdisc, FUNC(sony_ldp1000_device::status_r), FUNC(sony_ldp1000_device::command_w));
 	map(0x1800, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
@@ -471,7 +471,7 @@ void deco_ld_state::rblaster(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &deco_ld_state::rblaster_sound_map);
 	m_audiocpu->set_periodic_int(FUNC(deco_ld_state::sound_interrupt), attotime::from_hz(640));
 
-//  config.m_minimum_quantum = attotime::from_hz(6000);
+//  config.set_maximum_quantum(attotime::from_hz(6000));
 
 	SONY_LDP1000(config, m_laserdisc, 0);
 	m_laserdisc->set_overlay(256, 256, FUNC(deco_ld_state::screen_update_rblaster));

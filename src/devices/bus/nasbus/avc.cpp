@@ -34,7 +34,7 @@ void nascom_avc_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(6);
-	m_crtc->set_update_row_callback(FUNC(nascom_avc_device::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(nascom_avc_device::crtc_update_row));
 }
 
 
@@ -78,9 +78,9 @@ void nascom_avc_device::device_start()
 
 void nascom_avc_device::device_reset()
 {
-	io_space().install_write_handler(0xb0, 0xb0, write8smo_delegate(FUNC(mc6845_device::address_w), m_crtc.target()));
-	io_space().install_readwrite_handler(0xb1, 0xb1, read8smo_delegate(FUNC(mc6845_device::register_r), m_crtc.target()), write8smo_delegate(FUNC(mc6845_device::register_w), m_crtc.target()));
-	io_space().install_write_handler(0xb2, 0xb2, write8_delegate(FUNC(nascom_avc_device::control_w), this));
+	io_space().install_write_handler(0xb0, 0xb0, write8smo_delegate(*m_crtc, FUNC(mc6845_device::address_w)));
+	io_space().install_readwrite_handler(0xb1, 0xb1, read8smo_delegate(*m_crtc, FUNC(mc6845_device::register_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::register_w)));
+	io_space().install_write_handler(0xb2, 0xb2, write8_delegate(*this, FUNC(nascom_avc_device::control_w)));
 }
 
 
@@ -131,13 +131,13 @@ WRITE8_MEMBER( nascom_avc_device::control_w )
 	// page video ram in?
 	if (((m_control & 0x07) == 0) && (data & 0x07))
 	{
-		m_nasbus->ram_disable_w(0);
-		program_space().install_readwrite_handler(0x8000, 0xbfff, read8_delegate(FUNC(nascom_avc_device::vram_r), this), write8_delegate(FUNC(nascom_avc_device::vram_w), this));
+		ram_disable_w(0);
+		program_space().install_readwrite_handler(0x8000, 0xbfff, read8_delegate(*this, FUNC(nascom_avc_device::vram_r)), write8_delegate(*this, FUNC(nascom_avc_device::vram_w)));
 	}
 	else if ((data & 0x07) == 0)
 	{
 		program_space().unmap_readwrite(0x8000, 0xbfff);
-		m_nasbus->ram_disable_w(1);
+		ram_disable_w(1);
 	}
 
 	m_control = data;

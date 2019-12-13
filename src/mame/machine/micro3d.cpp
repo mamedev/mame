@@ -524,8 +524,8 @@ void micro3d_state::init_botss()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* Required to pass the hardware version check */
-	space.install_read_handler(0x140000, 0x140001, read16_delegate(FUNC(micro3d_state::botss_140000_r),this));
-	space.install_read_handler(0x180000, 0x180001, read16_delegate(FUNC(micro3d_state::botss_180000_r),this));
+	space.install_read_handler(0x140000, 0x140001, read16_delegate(*this, FUNC(micro3d_state::botss_140000_r)));
+	space.install_read_handler(0x180000, 0x180001, read16_delegate(*this, FUNC(micro3d_state::botss_180000_r)));
 
 	init_micro3d();
 }

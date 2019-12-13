@@ -335,24 +335,24 @@ void cpu30_state::cpu30_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x00000000, 0x00000007).ram().w(FUNC(cpu30_state::bootvect_w));   /* After first write we act as RAM */
 	map(0x00000000, 0x00000007).rom().r(FUNC(cpu30_state::bootvect_r));   /* ROM mirror just during reset */
-//  AM_RANGE (0x00000008, 0x003fffff) AM_RAM /* RAM  installed in machine start */
+//  map(0x00000008, 0x003fffff).ram(); /* RAM  installed in machine start */
 	map(0xff000000, 0xff7fffff).rom().region("roms", 0x000000);
 	map(0xff800c00, 0xff800dff).rw(m_pit1, FUNC(pit68230_device::read), FUNC(pit68230_device::write));
 	map(0xff800e00, 0xff800fff).rw(m_pit2, FUNC(pit68230_device::read), FUNC(pit68230_device::write));
 	map(0xff802000, 0xff8021ff).rw(m_dusccterm, FUNC(duscc68562_device::read), FUNC(duscc68562_device::write)); /* Port 1&2 - Dual serial port DUSCC   */
 	map(0xff802200, 0xff8023ff).rw("duscc2", FUNC(duscc68562_device::read), FUNC(duscc68562_device::write)); /* Port 3&4 - Dual serial port DUSCC   */
 	map(0xff803000, 0xff8031ff).rw(m_rtc, FUNC(rtc72423_device::read), FUNC(rtc72423_device::write));
-//  AM_RANGE (0xff803400, 0xff8035ff) AM_DEVREADWRITE8("scsi", mb87033_device, read, write, 0xffffffff) /* TODO: implement MB87344 SCSI device */
+//  map(0xff803400, 0xff8035ff).rw("scsi", FUNC(mb87033_device::read), FUNC(mb87033_device::write)); /* TODO: implement MB87344 SCSI device */
 	map(0xff803400, 0xff8035ff).rw(FUNC(cpu30_state::scsi_r), FUNC(cpu30_state::scsi_w)).umask32(0x000000ff); /* mock driver to log calls to device */
-//  AM_RANGE (0xff803800, 0xff80397f) AM_DEVREADWRITE8("fdc", wd37c65c_device, read, write, 0xffffffff) /* TODO: implement WD3/C65C fdc controller */
+//  map(0xff803800, 0xff80397f).rw("fdc", FUNC(wd37c65c_device::read), FUNC(wd37c65c_device::write)); /* TODO: implement WD3/C65C fdc controller */
 	map(0xff803800, 0xff80397f).rw(FUNC(cpu30_state::fdc_r), FUNC(cpu30_state::fdc_w)).umask32(0x000000ff); /* mock driver to log calls to device */
 	map(0xff803980, 0xff8039ff).r(FUNC(cpu30_state::slot1_status_r)).umask32(0x000000ff);
 	map(0xffc00000, 0xffcfffff).ram().share("nvram"); /* On-board SRAM with battery backup (nvram) */
 	map(0xffd00000, 0xffdfffff).rw(m_fga002, FUNC(fga002_device::read), FUNC(fga002_device::write));  /* FGA-002 Force Gate Array */
 	map(0xffe00000, 0xffefffff).rom().region("roms", 0x800000);
 
-	//AM_RANGE(0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
-	//AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
+	//map(0x100000, 0xfeffff).rw(FUNC(cpu30_state::vme_a24_r), FUNC(cpu30_state::vme_a24_w)); /* VMEbus Rev B addresses (24 bits) - not verified */
+	//map(0xff0000, 0xffffff).rw(FUNC(cpu30_state::vme_a16_r), FUNC(cpu30_state::vme_a16_w)); /* VMEbus Rev B addresses (16 bits) - not verified */
 }
 
 /* Input ports */
@@ -661,7 +661,7 @@ static void fccpu30_vme_cards(device_slot_interface &device)
 
 void cpu30_state::cpu_space_map(address_map &map)
 {
-	map(0xfffffff2, 0xffffffff).lr16("fga002 irq", [this](offs_t offset) -> u16 { return m_fga002->iack(); });
+	map(0xfffffff2, 0xffffffff).lr16(NAME([this] (offs_t offset) -> u16 { return m_fga002->iack(); }));
 }
 
 void cpu30_state::cpu30(machine_config &config)

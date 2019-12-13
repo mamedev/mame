@@ -455,10 +455,8 @@ void gamecstl_state::gamecstl(machine_config &config)
 	pcat_common(config);
 
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device_read (0, FUNC(gamecstl_state::intel82439tx_pci_r), this);
-	pcibus.set_device_write(0, FUNC(gamecstl_state::intel82439tx_pci_w), this);
-	pcibus.set_device_read (7, FUNC(gamecstl_state::intel82371ab_pci_r), this);
-	pcibus.set_device_write(7, FUNC(gamecstl_state::intel82371ab_pci_w), this);
+	pcibus.set_device(0, FUNC(gamecstl_state::intel82439tx_pci_r), FUNC(gamecstl_state::intel82439tx_pci_w));
+	pcibus.set_device(7, FUNC(gamecstl_state::intel82371ab_pci_r), FUNC(gamecstl_state::intel82371ab_pci_w));
 
 	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));

@@ -144,26 +144,10 @@ public:
 	/* k543210 = k5 ... k0 returns bit0: kr1, bit1: kr2 */
 	/* all are, in contrast to actual hardware, ACTIVE_HIGH */
 	typedef device_delegate<uint8_t (uint8_t k543210)> kb_cb_delegate;
-	void set_keyboard_callback(kb_cb_delegate callback) { m_keyboard_r = callback; }
-	template <class FunctionClass> void set_keyboard_callback(const char *devname, uint8_t (FunctionClass::*callback)(uint8_t), const char *name)
-	{
-		set_keyboard_callback(kb_cb_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_keyboard_callback(uint8_t (FunctionClass::*callback)(uint8_t), const char *name)
-	{
-		set_keyboard_callback(kb_cb_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_keyboard_callback(T &&... args) { m_keyboard_r.set(std::forward<T>(args)...); }
 
 	typedef device_delegate<void (int mask)> int_cb_delegate;
-	void set_interrupt_callback(int_cb_delegate callback) { m_irq_f = callback; }
-	template <class FunctionClass> void set_interrupt_callback(const char *devname, void (FunctionClass::*callback)(int), const char *name)
-	{
-		set_interrupt_callback(int_cb_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_interrupt_callback(void (FunctionClass::*callback)(int), const char *name)
-	{
-		set_interrupt_callback(int_cb_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_interrupt_callback(T &&... args) { m_irq_f.set(std::forward<T>(args)...); }
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -215,7 +199,7 @@ protected:
 
 	virtual void execute_run() override;
 
-	//virtual uint32_t execute_min_cycles() const { return 114; }
+	//virtual uint32_t execute_min_cycles() const noexcept override { return 114; }
 	// other internal states
 	int m_icount;
 

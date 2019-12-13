@@ -28,11 +28,11 @@ public:
 		: device_t(mconfig, SS50_MPS2, tag, owner, clock)
 		, ss50_card_interface(mconfig, *this)
 		, m_acia_upper(*this, "acia_upper")
-		, m_tx_rate_upper_jumper(*this, "tx_baud_upper")
-		, m_rx_rate_upper_jumper(*this, "rx_baud_upper")
+		, m_tx_rate_upper_jumper(*this, "TX_BAUD_UPPER")
+		, m_rx_rate_upper_jumper(*this, "RX_BAUD_UPPER")
 		, m_acia_lower(*this, "acia_lower")
-		, m_tx_rate_lower_jumper(*this, "tx_baud_lower")
-		, m_rx_rate_lower_jumper(*this, "rx_baud_lower")
+		, m_tx_rate_lower_jumper(*this, "TX_BAUD_LOWER")
+		, m_rx_rate_lower_jumper(*this, "RX_BAUD_LOWER")
 	{
 	}
 
@@ -62,37 +62,37 @@ private:
 
 
 static INPUT_PORTS_START( mps2 )
-	PORT_START("tx_baud_upper")
+	PORT_START("TX_BAUD_UPPER")
 	PORT_DIPNAME(0x1f, 0x1d, "Upper TX Baud Rate")
-	PORT_DIPSETTING(0x1d, "9600 / 38400")
-	PORT_DIPSETTING(0x17, "4800 / 19200")
-	PORT_DIPSETTING(0x0f, "1200 / 4800")
-	PORT_DIPSETTING(0x1b, "300 / 1200")
 	PORT_DIPSETTING(0x1e, "110 / 440")
+	PORT_DIPSETTING(0x1b, "300 / 1200")
+	PORT_DIPSETTING(0x0f, "1200 / 4800")
+	PORT_DIPSETTING(0x17, "4800 / 19200")
+	PORT_DIPSETTING(0x1d, "9600 / 38400")
 
-	PORT_START("rx_baud_upper")
+	PORT_START("RX_BAUD_UPPER")
 	PORT_DIPNAME(0x1f, 0x1d, "Upper RX Baud Rate")
-	PORT_DIPSETTING(0x1d, "9600 / 38400")
-	PORT_DIPSETTING(0x17, "4800 / 19200")
-	PORT_DIPSETTING(0x0f, "1200 / 4800")
-	PORT_DIPSETTING(0x1b, "300 / 1200")
 	PORT_DIPSETTING(0x1e, "110 / 440")
+	PORT_DIPSETTING(0x1b, "300 / 1200")
+	PORT_DIPSETTING(0x0f, "1200 / 4800")
+	PORT_DIPSETTING(0x17, "4800 / 19200")
+	PORT_DIPSETTING(0x1d, "9600 / 38400")
 
-	PORT_START("tx_baud_lower")
+	PORT_START("TX_BAUD_LOWER")
 	PORT_DIPNAME(0x1f, 0x1d, "Lower TX Baud Rate")
-	PORT_DIPSETTING(0x1d, "9600 / 38400")
-	PORT_DIPSETTING(0x17, "4800 / 19200")
-	PORT_DIPSETTING(0x0f, "1200 / 4800")
-	PORT_DIPSETTING(0x1b, "300 / 1200")
 	PORT_DIPSETTING(0x1e, "110 / 440")
+	PORT_DIPSETTING(0x1b, "300 / 1200")
+	PORT_DIPSETTING(0x0f, "1200 / 4800")
+	PORT_DIPSETTING(0x17, "4800 / 19200")
+	PORT_DIPSETTING(0x1d, "9600 / 38400")
 
-	PORT_START("rx_baud_lower")
+	PORT_START("RX_BAUD_LOWER")
 	PORT_DIPNAME(0x1f, 0x1d, "Lower RX Baud Rate")
-	PORT_DIPSETTING(0x1d, "9600 / 38400")
-	PORT_DIPSETTING(0x17, "4800 / 19200")
-	PORT_DIPSETTING(0x0f, "1200 / 4800")
-	PORT_DIPSETTING(0x1b, "300 / 1200")
 	PORT_DIPSETTING(0x1e, "110 / 440")
+	PORT_DIPSETTING(0x1b, "300 / 1200")
+	PORT_DIPSETTING(0x0f, "1200 / 4800")
+	PORT_DIPSETTING(0x17, "4800 / 19200")
+	PORT_DIPSETTING(0x1d, "9600 / 38400")
 
 INPUT_PORTS_END
 
@@ -134,20 +134,24 @@ void ss50_mps2_device::device_add_mconfig(machine_config &config)
 {
 	ACIA6850(config, m_acia_upper, 0);
 	m_acia_upper->txd_handler().set("rs232_upper", FUNC(rs232_port_device::write_txd));
-	//m_acia_upper->rts_handler().set(FUNC(ss50_mps2_device::reader_control_w));
+	m_acia_upper->rts_handler().set("rs232_upper", FUNC(rs232_port_device::write_rts));
 	m_acia_upper->irq_handler().set("irq", FUNC(input_merger_device::in_w<0>));
 
 	rs232_port_device &rs232_upper(RS232_PORT(config, "rs232_upper", default_rs232_devices, "terminal"));
 	rs232_upper.rxd_handler().set(m_acia_upper, FUNC(acia6850_device::write_rxd));
+	rs232_upper.cts_handler().set(m_acia_upper, FUNC(acia6850_device::write_cts));
+	rs232_upper.dcd_handler().set(m_acia_upper, FUNC(acia6850_device::write_dcd));
 	rs232_upper.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal_upper));
 
 	ACIA6850(config, m_acia_lower, 0);
 	m_acia_lower->txd_handler().set("rs232_lower", FUNC(rs232_port_device::write_txd));
-	//m_acia_lower->rts_handler().set(FUNC(ss50_mps2_device::reader_control_w));
+	m_acia_lower->rts_handler().set("rs232_lower", FUNC(rs232_port_device::write_rts));
 	m_acia_lower->irq_handler().set("irq", FUNC(input_merger_device::in_w<1>));
 
 	rs232_port_device &rs232_lower(RS232_PORT(config, "rs232_lower", default_rs232_devices, "terminal"));
 	rs232_lower.rxd_handler().set(m_acia_lower, FUNC(acia6850_device::write_rxd));
+	rs232_lower.cts_handler().set(m_acia_lower, FUNC(acia6850_device::write_cts));
+	rs232_lower.dcd_handler().set(m_acia_lower, FUNC(acia6850_device::write_dcd));
 	rs232_lower.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal_lower));
 
 	INPUT_MERGER_ANY_HIGH(config, "irq").output_handler().set(FUNC(ss50_mps2_device::write_irq));

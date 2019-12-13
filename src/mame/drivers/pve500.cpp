@@ -394,7 +394,7 @@ void pve500_state::pve500(machine_config &config)
 	m_subcpu->out_pa_callback().set(FUNC(pve500_state::eeprom_w));
 
 	// ICG3: I/O Expander
-	CXD1095(config, m_cxdio, 0);
+	CXD1095(config, m_cxdio);
 	m_cxdio->out_porta_cb().set(FUNC(pve500_state::io_sc_w));
 	m_cxdio->out_portb_cb().set(FUNC(pve500_state::io_le_w));
 	m_cxdio->in_portc_cb().set(FUNC(pve500_state::io_ky_r));

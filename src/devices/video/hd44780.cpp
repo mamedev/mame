@@ -55,6 +55,7 @@ hd44780_device::hd44780_device(const machine_config &mconfig, const char *tag, d
 
 hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, m_pixel_update_cb(*this)
 	, m_cgrom(nullptr)
 	, m_cgrom_region(*this, DEVICE_SELF)
 	, m_rs_input(0)
@@ -94,7 +95,7 @@ void hd44780_device::device_start()
 {
 	m_cgrom = m_cgrom_region.found() ? m_cgrom_region : memregion("cgrom")->base();
 
-	m_pixel_update_cb.bind_relative_to(*owner());
+	m_pixel_update_cb.resolve();
 
 	m_busy_timer = timer_alloc(TIMER_BUSY);
 	m_blink_timer = timer_alloc(TIMER_BLINKING);
@@ -470,7 +471,7 @@ void hd44780_device::control_write(u8 data)
 		// function set
 		if (!m_first_cmd && m_data_len == (BIT(m_ir, 4) ? 8 : 4) && (m_char_size != (BIT(m_ir, 2) ? 10 : 8) || m_num_line != (BIT(m_ir, 3) + 1)))
 		{
-			logerror("HD44780 '%s': function set cannot be executed after other instructions unless the interface data length is changed\n", tag());
+			logerror("HD44780: function set cannot be executed after other instructions unless the interface data length is changed\n");
 			return;
 		}
 
@@ -538,6 +539,9 @@ void hd44780_device::control_write(u8 data)
 		m_disp_shift = 0;
 		memset(m_ddram, 0x20, sizeof(m_ddram));
 		set_busy_flag(1520);
+
+		// Some machines do a "clear display" first, even though the datasheet insists "function set" must come before all else
+		return;
 	}
 
 	m_first_cmd = false;

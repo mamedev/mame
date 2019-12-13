@@ -33,7 +33,7 @@ cpc_pds_device::cpc_pds_device(const machine_config &mconfig, const char *tag, d
 	device_t(mconfig, CPC_PDS, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this),
 	m_slot(nullptr),
-	m_pio(*this,"pio")
+	m_pio(*this, "pio")
 {
 }
 
@@ -46,7 +46,7 @@ void cpc_pds_device::device_start()
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 	address_space &space = m_slot->cpu().space(AS_IO);
 
-	space.install_readwrite_handler(0xfbec,0xfbef,read8_delegate(FUNC(cpc_pds_device::pio_r),this),write8_delegate(FUNC(cpc_pds_device::pio_w),this));
+	space.install_readwrite_handler(0xfbec,0xfbef, read8_delegate(*this, FUNC(cpc_pds_device::pio_r)), write8_delegate(*this, FUNC(cpc_pds_device::pio_w)));
 }
 
 //-------------------------------------------------

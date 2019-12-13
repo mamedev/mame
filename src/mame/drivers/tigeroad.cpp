@@ -118,7 +118,7 @@ void tigeroad_state::main_map(address_map &map)
 	map(0xfe0800, 0xfe0cff).ram().share("spriteram");
 	map(0xfe0d00, 0xfe1807).ram();     /* still part of OBJ RAM */
 	map(0xfe4000, 0xfe4001).portr("P1_P2").w(FUNC(tigeroad_state::tigeroad_videoctrl_w));   /* char bank, coin counters, + ? */
-	map(0xfe4002, 0xfe4003).portr("SYSTEM").w(FUNC(tigeroad_state::tigeroad_soundcmd_w)); /* AM_WRITE(tigeroad_soundcmd_w) is replaced in init for for f1dream protection */
+	map(0xfe4002, 0xfe4003).portr("SYSTEM").w(FUNC(tigeroad_state::tigeroad_soundcmd_w)); /* .w(FUNC(tigeroad_state::tigeroad_soundcmd_w)); is replaced in init for for f1dream protection */
 	map(0xfe4004, 0xfe4005).portr("DSW");
 	map(0xfe8000, 0xfe8003).w(FUNC(tigeroad_state::tigeroad_scroll_w));
 	map(0xfe800e, 0xfe800f).writeonly();    /* fe800e = watchdog or IRQ acknowledge */
@@ -714,7 +714,7 @@ void tigeroad_state::f1dream_comad(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tigeroad_state::comad_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &tigeroad_state::comad_sound_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(3600);
+	config.set_maximum_quantum(attotime::from_hz(3600));
 
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, "spriteram");

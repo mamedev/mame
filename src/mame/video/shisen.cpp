@@ -49,7 +49,7 @@ TILE_GET_INFO_MEMBER(shisen_state::get_bg_tile_info)
 void shisen_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(shisen_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
+			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(shisen_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,
 			8, 8, 64, 32);
 
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);

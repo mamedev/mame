@@ -820,7 +820,7 @@ void fantland_state::fantland(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(fantland_state::fantland_sound_irq), attotime::from_hz(8000));
 	// NMI when soundlatch is written
 
-	config.m_minimum_quantum = attotime::from_hz(8000);  // sound irq must feed the DAC at 8kHz
+	config.set_maximum_quantum(attotime::from_hz(8000));  // sound irq must feed the DAC at 8kHz
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

@@ -17,7 +17,7 @@
 #include "cpu/nanoprocessor/nanoprocessor.h"
 #include "dirtc.h"
 
-class hp98035_io_card_device : public hp9845_io_card_device, public device_rtc_interface
+class hp98035_io_card_device : public device_t, public device_hp9845_io_interface, public device_rtc_interface
 {
 public:
 	// construction/destruction

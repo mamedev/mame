@@ -820,7 +820,7 @@ void m20_state::m20(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(16);
-	crtc.set_update_row_callback(FUNC(m20_state::update_row), this);
+	crtc.set_update_row_callback(FUNC(m20_state::update_row));
 
 	I8255A(config, m_i8255, 0);
 

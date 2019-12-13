@@ -155,6 +155,7 @@ private:
 	void mstworld_io_map(address_map &map);
 	void mstworld_sound_map(address_map &map);
 	void pangba_sound_map(address_map &map);
+	void pkladiesbl_io_map(address_map &map);
 	void spangbl_io_map(address_map &map);
 	void spangbl_map(address_map &map);
 	void spangbl_sound_map(address_map &map);

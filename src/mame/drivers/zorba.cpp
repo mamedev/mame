@@ -217,7 +217,7 @@ void zorba_state::zorba(machine_config &config)
 	I8275(config, m_crtc, 14.318'181_MHz_XTAL / 8); // TODO: character clock divider is 9 during HRTC
 	m_crtc->set_character_width(8);
 	m_crtc->set_refresh_hack(true);
-	m_crtc->set_display_callback(FUNC(zorba_state::zorba_update_chr), this);
+	m_crtc->set_display_callback(FUNC(zorba_state::zorba_update_chr));
 	m_crtc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
 	m_crtc->irq_wr_callback().set("irq0", FUNC(input_merger_device::in_w<1>));
 	m_crtc->set_screen("screen");
@@ -409,7 +409,7 @@ WRITE8_MEMBER(zorba_state::io_write_byte)
 	address_space& prog_space = m_maincpu->space(AS_IO);
 
 	if (offset == 0x10)
-		m_crtc->dack_w(space, 0, data);
+		m_crtc->dack_w(data);
 	else
 		prog_space.write_byte(offset, data);
 }

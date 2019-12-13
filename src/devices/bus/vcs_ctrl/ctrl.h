@@ -24,22 +24,22 @@ class vcs_control_port_device;
 
 // ======================> device_vcs_control_port_interface
 
-class device_vcs_control_port_interface : public device_slot_card_interface
+class device_vcs_control_port_interface : public device_interface
 {
 public:
-	// construction/destruction
-	device_vcs_control_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_vcs_control_port_interface() { }
 
-	virtual uint8_t vcs_joy_r() { return 0xff; };
-	virtual uint8_t vcs_pot_x_r() { return 0xff; };
-	virtual uint8_t vcs_pot_y_r() { return 0xff; };
-	virtual void vcs_joy_w(uint8_t data) { };
+	virtual uint8_t vcs_joy_r() { return 0xff; }
+	virtual uint8_t vcs_pot_x_r() { return 0xff; }
+	virtual uint8_t vcs_pot_y_r() { return 0xff; }
+	virtual void vcs_joy_w(uint8_t data) { }
 
 	virtual bool has_pot_x() { return false; }
 	virtual bool has_pot_y() { return false; }
 
 protected:
+	device_vcs_control_port_interface(const machine_config &mconfig, device_t &device);
+
 	vcs_control_port_device *m_port;
 };
 

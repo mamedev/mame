@@ -52,9 +52,7 @@ DasmWindow::DasmWindow(running_machine* machine, QWidget* parent) :
 
 	// Populate the combo box & set the proper cpu
 	populateComboBox();
-	//const debug_view_source *source = mem->views[0]->view->source_for_device(curcpu);
-	//gtk_combo_box_set_active(zone_w, mem->views[0]->view->source_list().indexof(*source));
-	//mem->views[0]->view->set_source(*source);
+	setToCurrentCpu();
 
 
 	// Layout
@@ -121,7 +119,7 @@ DasmWindow::~DasmWindow()
 
 void DasmWindow::cpuChanged(int index)
 {
-	m_dasmView->view()->set_source(*m_dasmView->view()->source_list().find(index));
+	m_dasmView->view()->set_source(*m_dasmView->view()->source(index));
 	m_dasmView->viewport()->update();
 }
 
@@ -253,9 +251,24 @@ void DasmWindow::populateComboBox()
 		return;
 
 	m_cpuComboBox->clear();
-	for (const debug_view_source &source : m_dasmView->view()->source_list())
+	for (auto &source : m_dasmView->view()->source_list())
 	{
-		m_cpuComboBox->addItem(source.name());
+		m_cpuComboBox->addItem(source->name());
+	}
+}
+
+
+void DasmWindow::setToCurrentCpu()
+{
+	device_t* curCpu = m_machine->debugger().cpu().get_visible_cpu();
+	if (curCpu)
+	{
+		const debug_view_source *source = m_dasmView->view()->source_for_device(curCpu);
+		if (source)
+		{
+			const int listIndex = m_dasmView->view()->source_index(*source);
+			m_cpuComboBox->setCurrentIndex(listIndex);
+		}
 	}
 }
 

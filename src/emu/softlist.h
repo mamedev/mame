@@ -49,9 +49,9 @@ public:
 	feature_list_item& operator=(feature_list_item &&) = delete;
 
 	// getters
-	feature_list_item *next() const { return m_next; }
-	const std::string &name() const { return m_name; }
-	const std::string &value() const { return m_value; }
+	feature_list_item *next() const noexcept { return m_next; }
+	const std::string &name() const noexcept { return m_name; }
+	const std::string &value() const noexcept { return m_value; }
 
 private:
 	// internal state
@@ -77,16 +77,16 @@ public:
 	software_part& operator=(software_part &&) = delete;
 
 	// getters
-	software_part *next() const { return m_next; }
-	software_info &info() const { return m_info; }
-	const std::string &name() const { return m_name; }
-	const std::string &interface() const { return m_interface; }
-	const std::list<feature_list_item> &featurelist() const { return m_featurelist; }
-	const std::vector<rom_entry> &romdata() const { return m_romdata; }
+	software_part *next() const noexcept { return m_next; }
+	software_info &info() const noexcept { return m_info; }
+	const std::string &name() const noexcept { return m_name; }
+	const std::string &interface() const noexcept { return m_interface; }
+	const std::list<feature_list_item> &featurelist() const noexcept { return m_featurelist; }
+	const std::vector<rom_entry> &romdata() const noexcept { return m_romdata; }
 
 	// helpers
-	bool matches_interface(const char *interface) const;
-	const char *feature(const std::string &feature_name) const;
+	bool matches_interface(const char *interface_list) const noexcept;
+	const char *feature(const std::string &feature_name) const noexcept;
 
 private:
 	// internal state

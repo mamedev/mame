@@ -114,7 +114,7 @@ void ltd_state::ltd4_map(address_map &map)
 	map(0x1000, 0x1000).w("aysnd_0", FUNC(ay8910_device::address_w));
 	map(0x1400, 0x1400).w("aysnd_0", FUNC(ay8910_device::reset_w));
 	map(0x1800, 0x1800).w("aysnd_1", FUNC(ay8910_device::address_w));
-	//AM_RANGE(0x2800, 0x2800) AM_WRITE(auxlamps_w)
+	//map(0x2800, 0x2800).w(FUNC(ltd_state::auxlamps_w));
 	map(0x3000, 0x3000).w("aysnd_0", FUNC(ay8910_device::data_w));
 	map(0x3800, 0x3800).w("aysnd_1", FUNC(ay8910_device::data_w));
 	map(0xc000, 0xdfff).rom().mirror(0x2000).region("roms", 0);
@@ -524,8 +524,9 @@ TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 void ltd_state::ltd3(machine_config &config)
 {
 	/* basic machine hardware */
-	M6802(config, m_maincpu, XTAL(3'579'545));
-	m_maincpu->set_addrmap(AS_PROGRAM, &ltd_state::ltd3_map);
+	m6802_cpu_device &maincpu(M6802(config, m_maincpu, XTAL(3'579'545)));
+	maincpu.set_ram_enable(false); // FIXME: needs standby support
+	maincpu.set_addrmap(AS_PROGRAM, &ltd_state::ltd3_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

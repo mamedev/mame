@@ -65,7 +65,7 @@
 
 // ======================> device_z88cart_interface
 
-class device_z88cart_interface : public device_slot_card_interface
+class device_z88cart_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -86,7 +86,7 @@ protected:
 
 class z88cart_slot_device : public device_t,
 							public device_image_interface,
-							public device_slot_interface
+							public device_single_card_slot_interface<device_z88cart_interface>
 {
 public:
 	// construction/destruction
@@ -106,16 +106,15 @@ public:
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 1; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *image_interface() const override { return "z88_cart"; }
-	virtual const char *file_extensions() const override { return "epr,bin"; }
+	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *image_interface() const noexcept override { return "z88_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "epr,bin"; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
@@ -129,6 +128,9 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	// device_image_interface implementation
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 private:
 	static constexpr device_timer_id TIMER_FLP_CLEAR = 0;

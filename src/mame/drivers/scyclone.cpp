@@ -339,8 +339,8 @@ void scyclone_state::scyclone_sub_map(address_map &map)
 	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("dac", FUNC(dac_byte_interface::data_w)); // music
 	map(0x3001, 0x3001).w(FUNC(scyclone_state::snd_3001_w)); // written at the same time, with the same data as 0x3005
 	map(0x3002, 0x3002).w("dac2", FUNC(dac_byte_interface::data_w)); // speech
-//  AM_RANGE(0x3003, 0x3003) AM_WRITE(snd_3003_w) // writes 02 or 00
-//  AM_RANGE(0x3004, 0x3004) AM_WRITE(snd_3004_w) // always writes 00?
+//  map(0x3003, 0x3003).w(FUNC(scyclone_state::snd_3003_w)); // writes 02 or 00
+//  map(0x3004, 0x3004).w(FUNC(scyclone_state::snd_3004_w)); // always writes 00?
 	map(0x3005, 0x3005).w(FUNC(scyclone_state::snd_3005_w)); // written at the same time, with the same data as 0x3001
 }
 

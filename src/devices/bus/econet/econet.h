@@ -112,7 +112,7 @@ private:
 
 // ======================> device_econet_interface
 
-class device_econet_interface : public device_slot_card_interface
+class device_econet_interface : public device_interface
 {
 	friend class econet_device;
 	template <class ElementType> friend class simple_list;

@@ -391,7 +391,7 @@ void ep64_state::ep64_io(address_map &map)
 void ep64_state::dave_64k_mem(address_map &map)
 {
 	map(0x000000, 0x007fff).rom().region(Z80_TAG, 0);
-	//AM_RANGE(0x010000, 0x01ffff)      // mapped by the cartslot
+	//map(0x010000, 0x01ffff)      // mapped by the cartslot
 	map(0x3f0000, 0x3fffff).m(m_nick, FUNC(nick_device::vram_map));
 }
 
@@ -544,7 +544,7 @@ INPUT_PORTS_END
 void ep64_state::machine_start()
 {
 	if (m_cart->exists())
-		m_dave->space(AS_PROGRAM).install_read_handler(0x010000, 0x01ffff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_dave->space(AS_PROGRAM).install_read_handler(0x010000, 0x01ffff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 
 	// state saving
 	save_item(NAME(m_key));

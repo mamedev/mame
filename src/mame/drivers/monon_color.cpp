@@ -154,7 +154,7 @@ void monon_color_state::monon_color(machine_config &config)
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "monon_color_cart", "bin"));
 	cartslot.set_width(GENERIC_ROM8_WIDTH);
-	cartslot.set_device_load(FUNC(monon_color_state::cart_load), this);
+	cartslot.set_device_load(FUNC(monon_color_state::cart_load));
 	cartslot.set_must_be_loaded(true);
 
 	/* software lists */
