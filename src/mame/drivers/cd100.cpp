@@ -253,7 +253,7 @@ ROM_START(cd100b)
 	ROM_SYSTEM_BIOS(0, "v27", "Version 2.7")
 	ROM_SYSTEM_BIOS(1, "v30", "Version 3.0")
 	ROM_SYSTEM_BIOS(2, "v40", "Version 4.0")
-	ROM_SYSTEM_BIOS(3, "ccc", "Unknown version") // TODO: determine actual version
+	ROM_SYSTEM_BIOS(3, "v41", "Version 4.1")
 	ROMX_LOAD("70039903.v27", 0x00000, 0x10000, CRC(2aa0c0dc) SHA1(f0be4f7c26b9e798790c169370c8dc2d2c2edbbb), ROM_BIOS(0))
 	ROMX_LOAD("70042704.v30", 0x00000, 0x20000, CRC(3e1af9ac) SHA1(2ee4ff59963270fa34ff61f0428bd3d1a01a743a), ROM_BIOS(1))
 	ROMX_LOAD("70042704.v40", 0x00000, 0x20000, CRC(66ba3ede) SHA1(22d9ee14fadef81b1ed7d95c1432d235bea5eba7), ROM_BIOS(2))
