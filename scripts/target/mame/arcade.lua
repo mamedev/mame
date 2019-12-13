@@ -2234,6 +2234,8 @@ files {
 	MAME_DIR .. "src/mame/video/jalblend.h",
 	MAME_DIR .. "src/mame/video/ms1_tmap.cpp",
 	MAME_DIR .. "src/mame/video/ms1_tmap.h",
+	MAME_DIR .. "src/mame/video/ms32_sprite.cpp",
+	MAME_DIR .. "src/mame/video/ms32_sprite.h",
 }
 
 createMAMEProjects(_target, _subtarget, "jpm")
