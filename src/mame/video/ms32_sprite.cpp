@@ -795,7 +795,7 @@ inline void ms32_sprite_device::draw_sprite_core(BitmapType &dest, const rectang
 	do {
 		assert(dest.valid());
 		assert(dest.cliprect().contains(cliprect));
-		assert(code < elements());
+		assert(code < gfx(0)->elements());
 
 		// ignore empty/invalid cliprects
 		if (cliprect.empty())
@@ -901,7 +901,7 @@ inline void ms32_sprite_device::draw_sprite_core(BitmapType &dest, const rectang
 		assert(dest.valid());
 		assert(priority.valid());
 		assert(dest.cliprect().contains(cliprect));
-		assert(code < elements());
+		assert(code < gfx(0)->elements());
 
 		// ignore empty/invalid cliprects
 		if (cliprect.empty())
