@@ -52,7 +52,7 @@ void acorn_vidc10_device::regs_map(address_map &map)
 }
 
 
-acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
@@ -75,7 +75,7 @@ acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, const ch
 }
 
 
-acorn_vidc10_lcd_device::acorn_vidc10_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+acorn_vidc10_lcd_device::acorn_vidc10_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: acorn_vidc10_device(mconfig, ACORN_VIDC10_LCD, tag, owner, clock)
 {
   	m_space_config = address_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, 0, address_map_constructor(FUNC(acorn_vidc10_lcd_device::regs_map), this));
@@ -117,7 +117,7 @@ void acorn_vidc10_lcd_device::device_add_mconfig(machine_config &config)
 	// TODO: verify !Configure with automatic type detection, there must be an ID telling this is a LCD machine.
 }
 
-uint32_t acorn_vidc10_device::palette_entries() const
+u32 acorn_vidc10_device::palette_entries() const
 {
 	return 0x100+0x10+4; // 8bpp + 1/2/4bpp + 2bpp for cursor
 }
@@ -174,8 +174,8 @@ void acorn_vidc10_device::device_start()
 	// TODO: manual mentions a format difference between VIDC10 revisions
 	for (int rawval = 0; rawval < 256; rawval++)
 	{
-		uint8_t chord = rawval >> 5;
-		uint8_t point = (rawval & 0x1e) >> 1;
+		u8 chord = rawval >> 5;
+		u8 point = (rawval & 0x1e) >> 1;
 		bool sign = rawval & 1;
 		int16_t result = ((16+point)<<chord)-16;
 
@@ -287,13 +287,13 @@ inline void acorn_vidc10_device::screen_dynamic_res_change()
 WRITE32_MEMBER( acorn_vidc10_device::write )
 {
 	// TODO: check against mem_mask not 32-bit wide
-	uint8_t reg = data >> 24;
-	uint32_t val = data & 0xffffff;
+	u8 reg = data >> 24;
+	u32 val = data & 0xffffff;
 	
 	this->space(AS_IO).write_dword(reg, val);
 }
 
-inline void acorn_vidc10_device::update_4bpp_palette(uint16_t index, uint32_t paldata)
+inline void acorn_vidc10_device::update_4bpp_palette(u16 index, u32 paldata)
 {
 	int r,g,b;
 
@@ -345,9 +345,9 @@ WRITE32_MEMBER( acorn_vidc10_device::control_w )
 	screen_dynamic_res_change();
 }
 
-inline uint32_t acorn_vidc10_device::convert_crtc_hdisplay(uint8_t index)
+inline u32 acorn_vidc10_device::convert_crtc_hdisplay(u8 index)
 {
-	const uint8_t x_step[4] = { 19, 11, 7, 5 };
+	const u8 x_step[4] = { 19, 11, 7, 5 };
 	return (m_crtc_raw_horz[index]*2)+x_step[m_bpp_mode];
 }
 
@@ -392,7 +392,7 @@ WRITE32_MEMBER( acorn_vidc10_device::crtc_w )
 	screen_dynamic_res_change();
 }
 
-inline void acorn_vidc10_device::refresh_stereo_image(uint8_t channel)
+inline void acorn_vidc10_device::refresh_stereo_image(u8 channel)
 {
 	/*
 		-111 full right
@@ -415,7 +415,7 @@ inline void acorn_vidc10_device::refresh_stereo_image(uint8_t channel)
 
 WRITE32_MEMBER( acorn_vidc10_device::stereo_image_w )
 {
-	uint8_t channel = (offset + 7) & 0x7;
+	u8 channel = (offset + 7) & 0x7;
 	m_stereo_image[channel] = data & 0x7;
 	refresh_stereo_image(channel);
 }
@@ -432,7 +432,7 @@ WRITE32_MEMBER( acorn_vidc10_device::sound_frequency_w )
 //  MEMC comms
 //**************************************************************************
 
-void acorn_vidc10_device::write_dac(uint8_t channel, uint8_t data)
+void acorn_vidc10_device::write_dac(u8 channel, u8 data)
 { 
 	int16_t res;
 	res = m_ulaw_lookup[data];
@@ -458,7 +458,7 @@ void acorn_vidc10_device::refresh_sound_frequency()
 //  Screen Update / VBlank / HBlank
 //**************************************************************************
 
-void acorn_vidc10_device::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 *vram, uint8_t bpp, int xstart, int ystart, int xsize, int ysize, bool is_cursor)
+void acorn_vidc10_device::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 *vram, u8 bpp, int xstart, int ystart, int xsize, int ysize, bool is_cursor)
 {
 	const u16 pen_base = (bpp == 3 ? 0 : m_pal_4bpp_base) + (is_cursor == true ? m_pal_cursor_base : 0);
 	const u16 pen_masks[4] = { 1, 3, 0xf, 0xff };
@@ -591,7 +591,7 @@ void arm_vidc20_device::device_config_complete()
 		screen().set_screen_update(screen_update_rgb32_delegate(FUNC(arm_vidc20_device::screen_update), this));
 }
 
-uint32_t arm_vidc20_device::palette_entries() const
+u32 arm_vidc20_device::palette_entries() const
 {
 	return 0x100+4; // 8bpp + 2bpp for cursor
 }
@@ -622,7 +622,7 @@ void arm_vidc20_device::device_timer(emu_timer &timer, device_timer_id id, int p
 	acorn_vidc10_device::device_timer(timer, id, param, ptr);
 }
 
-inline void arm_vidc20_device::update_8bpp_palette(uint16_t index, uint32_t paldata)
+inline void arm_vidc20_device::update_8bpp_palette(u16 index, u32 paldata)
 {
 	int r,g,b;
 
@@ -638,7 +638,7 @@ inline void arm_vidc20_device::update_8bpp_palette(uint16_t index, uint32_t pald
 
 WRITE32_MEMBER(arm_vidc20_device::vidc20_pal_data_display_w)
 {
-	uint8_t ext_data = offset & 0xf;
+	u8 ext_data = offset & 0xf;
 	update_8bpp_palette(m_pal_data_index, (ext_data<<24) | data);
 	m_pal_data_index ++;
 	m_pal_data_index &= 0xff;
@@ -651,8 +651,8 @@ WRITE32_MEMBER( arm_vidc20_device::vidc20_pal_data_index_w )
 
 WRITE32_MEMBER( arm_vidc20_device::vidc20_pal_data_cursor_w )
 {
-	uint8_t ext_data = offset & 0xf;
-	uint8_t cursor_pal_index = (offset >> 4) & 3;
+	u8 ext_data = offset & 0xf;
+	u8 cursor_pal_index = (offset >> 4) & 3;
 	update_8bpp_palette(m_pal_cursor_base + cursor_pal_index, (ext_data<<24) | data);
 }
 
@@ -679,7 +679,7 @@ WRITE32_MEMBER(arm_vidc20_device::vidc20_crtc_w)
 	if (offset & 0x8)
 		throw emu_fatalerror("%s accessing CRTC test register %02x, please call the ambulance",this->tag(),offset+0x80);
 	
-	const uint8_t crtc_offset = (offset & 0x7) | ((offset & 0x10) >> 1);
+	const u8 crtc_offset = (offset & 0x7) | ((offset & 0x10) >> 1);
 
 	switch(crtc_offset)
 	{
@@ -751,7 +751,7 @@ WRITE32_MEMBER( arm_vidc20_device::vidc20_sound_frequency_w )
 		refresh_sound_frequency();
 }
 
-void arm_vidc20_device::write_dac32(uint8_t channel, uint16_t data)
+void arm_vidc20_device::write_dac32(u8 channel, u16 data)
 { 
 	m_dac[channel & 1]->write(data);
 }
