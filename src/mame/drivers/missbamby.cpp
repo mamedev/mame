@@ -177,5 +177,5 @@ ROM_START( gwinner )
 ROM_END
 
 
-GAME( 1987, msbamby, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",    MACHINE_IS_SKELETON_MECHANICAL ) // 1987 is the date of its legal homologation on Spain
+GAME( 198?, msbamby, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",    MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1983, gwinner, 0, gldwinner, missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner", MACHINE_IS_SKELETON_MECHANICAL )
