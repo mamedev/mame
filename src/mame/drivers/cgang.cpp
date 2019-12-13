@@ -44,6 +44,8 @@ Cabinet:
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/ripple_counter.h"
+#include "sound/upd7759.h"
+#include "sound/ym2151.h"
 #include "speaker.h"
 
 
@@ -58,7 +60,9 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_latch(*this, "latch%u", 0),
 		m_pit(*this, "pit%u", 0),
-		m_ppi(*this, "ppi%u", 0)
+		m_ppi(*this, "ppi%u", 0),
+		m_upd(*this, "adpcm%u", 0),
+		m_ymsnd(*this, "ymsnd")
 	{ }
 
 	// machine drivers
@@ -74,6 +78,8 @@ private:
 	required_device_array<generic_latch_8_device, 2> m_latch;
 	required_device_array<pit8253_device, 2> m_pit;
 	required_device_array<i8255_device, 5> m_ppi;
+	required_device_array<upd7759_device, 2> m_upd;
+	required_device<ym2151_device> m_ymsnd;
 
 	// address maps
 	void main_map(address_map &map);
@@ -85,10 +91,12 @@ private:
 	DECLARE_WRITE8_MEMBER(main_irq_clear_w) { m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); }
 	DECLARE_WRITE8_MEMBER(main_firq_clear_w) { m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE); }
 
-	DECLARE_WRITE8_MEMBER(spot_w);
-
 	DECLARE_READ8_MEMBER(ppi0_c_r);
 
+	template<int N> DECLARE_WRITE8_MEMBER(adpcm_w);
+	DECLARE_WRITE8_MEMBER(spot_w);
+
+	DECLARE_WRITE8_MEMBER(ppi4_a_w);
 	DECLARE_READ8_MEMBER(ppi4_c_r);
 
 	int m_main_irq = 0;
@@ -141,13 +149,34 @@ READ8_MEMBER(cgang_state::ppi0_c_r)
 
 // audiocpu
 
+template<int N>
+WRITE8_MEMBER(cgang_state::adpcm_w)
+{
+	m_upd[N]->port_w(data);
+
+	// also strobes start
+	m_upd[N]->start_w(0);
+	m_upd[N]->start_w(1);
+}
+
 WRITE8_MEMBER(cgang_state::spot_w)
 {
+}
+
+WRITE8_MEMBER(cgang_state::ppi4_a_w)
+{
+	// PA0,PA1: ADPCM reset
+	m_upd[0]->reset_w(BIT(data, 0));
+	m_upd[1]->reset_w(BIT(data, 1));
 }
 
 READ8_MEMBER(cgang_state::ppi4_c_r)
 {
 	u8 data = 0;
+
+	// PC0,PC1: ADPCM busy
+	data |= m_upd[0]->busy_r() ? 0 : 1;
+	data |= m_upd[1]->busy_r() ? 0 : 2;
 
 	// PC2: CALL-CPU2
 	data |= m_latch[0]->pending_r() ? 0 : 4;
@@ -182,9 +211,12 @@ void cgang_state::sound_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1001).rw(m_ymsnd, FUNC(ym2151_device::status_r), FUNC(ym2151_device::write));
 	map(0x2000, 0x2003).mirror(0x0ffc).rw(m_ppi[4], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x3000, 0x3000).mirror(0x0fff).r(m_latch[0], FUNC(generic_latch_8_device::read));
 	map(0x4000, 0x4000).mirror(0x0fff).w(m_latch[1], FUNC(generic_latch_8_device::write));
+	map(0x5000, 0x5000).mirror(0x0fff).w(FUNC(cgang_state::adpcm_w<0>));
+	map(0x6000, 0x6000).mirror(0x0fff).w(FUNC(cgang_state::adpcm_w<1>));
 	map(0x7000, 0x7000).mirror(0x0fff).w(FUNC(cgang_state::spot_w));
 	map(0x8000, 0xffff).rom();
 }
@@ -249,10 +281,19 @@ void cgang_state::cgang(machine_config &config)
 	I8255(config, m_ppi[3]); // 0x80: all = output
 
 	I8255(config, m_ppi[4]); // 0x89: A & B = output, C = input
+	m_ppi[4]->out_pa_callback().set(FUNC(cgang_state::ppi4_a_w));
 	m_ppi[4]->in_pc_callback().set(FUNC(cgang_state::ppi4_c_r));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+
+	YM2151(config, m_ymsnd, 3.579545_MHz_XTAL);
+	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 0.5);
+
+	UPD7759(config, m_upd[0], 640_kHz_XTAL);
+	m_upd[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
+	UPD7759(config, m_upd[1], 640_kHz_XTAL);
+	m_upd[1]->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -283,5 +324,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS */
-CONS( 1990, cgang, 0,      0,      cgang,   cgang, cgang_state, empty_init, "Namco (Data East license)", "Cosmo Gang (US)", MACHINE_MECHANICAL | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+/*    YEAR  NAME   PARENT  MACHINE  INPUT  CLASS        INIT        MONITOR  COMPANY, FULLNAME, FLAGS */
+GAME( 1990, cgang, 0,      cgang,   cgang, cgang_state, empty_init, ROT0,    "Namco (Data East license)", "Cosmo Gang (US)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
