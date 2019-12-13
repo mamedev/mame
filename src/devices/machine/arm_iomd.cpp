@@ -358,14 +358,8 @@ WRITE32_MEMBER( arm_iomd_device::iocr_w )
 {
 	m_iocr_ddr = (data & 0x0b);
 	m_iocr_write_id_cb(BIT(m_iocr_ddr,3));
-	// TODO: i2c cares about the order of this!?
-	// tetfight reaches PC=0x106c if initialization has success
-	m_iocr_write_od_cb[0](BIT(m_iocr_ddr,0));
 	m_iocr_write_od_cb[1](BIT(m_iocr_ddr,1));
-	// rpc700 doesn't like above and go into supervisor mode even with a valid NVRAM, wants order below
-	//m_iocr_write_od_cb[1](BIT(m_iocr_ddr,1));
-	//m_iocr_write_od_cb[0](BIT(m_iocr_ddr,0));
-
+	m_iocr_write_od_cb[0](BIT(m_iocr_ddr,0));
 }
 
 READ32_MEMBER( arm_iomd_device::kbddat_r )

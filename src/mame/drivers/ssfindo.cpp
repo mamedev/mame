@@ -213,6 +213,8 @@ public:
 protected:
 
 private:
+	bool m_i2cdata_hack;
+
 	void tetfight_map(address_map &map);
 
 	DECLARE_READ_LINE_MEMBER(iocr_od0_r);
@@ -221,7 +223,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(iocr_od1_w);
 	DECLARE_READ32_MEMBER(tetfight_unk_r);
 	DECLARE_WRITE32_MEMBER(tetfight_unk_w);
-
 };
 
 //TODO: eeprom  24c01 & 24c02
@@ -261,13 +262,18 @@ READ_LINE_MEMBER(tetfight_state::iocr_od0_r)
 
 WRITE_LINE_MEMBER(tetfight_state::iocr_od1_w)
 {
-	m_i2cmem->write_sda(state == true ? 1 : 0);
+	// TODO: i2c cares about the order of this!?
+	// tetfight reaches PC=0x106c if initialization has success
+	// rpc700 doesn't like above and go into supervisor mode even with a valid NVRAM, wants clock first then data
+	m_i2cdata_hack = state == true;
+	//m_i2cmem->write_sda(state == true ? 1 : 0);
 }
 
 WRITE_LINE_MEMBER(tetfight_state::iocr_od0_w)
 {
 	m_i2cmem_clock = state;
 	m_i2cmem->write_scl(state == true ? 1 : 0);
+	m_i2cmem->write_sda(m_i2cdata_hack == true ? 1 : 0);
 }
 
 void ssfindo_state::ssfindo_speedups()
