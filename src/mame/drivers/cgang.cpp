@@ -9,6 +9,8 @@ It is an electromechanical arcade lightgun game with ticket redemption.
 There is no screen, feedback is with motorized elements, lamps and 7segs,
 and of course sounds and music.
 
+The hardware has similarities with Gator Panic/Wacky Gator.
+
 TODO:
 - almost everything
 
