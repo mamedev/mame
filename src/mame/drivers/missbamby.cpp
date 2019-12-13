@@ -164,7 +164,7 @@ ROM_START( msbamby )
 	ROM_LOAD( "2.bin", 0x2000, 0x2000, CRC(6048d5cd) SHA1(a3bbf43b1474de75aef9957b967ead96b9a18fc5) )
 
 	ROM_REGION(0x20, "prom", 0)
-	ROM_LOAD( "prom.bin", 0x00, 0x20, NO_DUMP )
+	ROM_LOAD( "prom.bin", 0x00, 0x20, CRC(f7013c11) SHA1(6e4e6d7f2a041d44359a7f5662bb4302da234ace) ) // Unknown manufacturer, dumped as 82s123
 ROM_END
 
 ROM_START( gwinner )
@@ -177,5 +177,5 @@ ROM_START( gwinner )
 ROM_END
 
 
-GAME( 198?, msbamby, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",    MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, msbamby, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",    MACHINE_IS_SKELETON_MECHANICAL ) // 1987 is the date of its legal homologation on Spain
 GAME( 1983, gwinner, 0, gldwinner, missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner", MACHINE_IS_SKELETON_MECHANICAL )
