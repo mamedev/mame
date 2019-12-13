@@ -15,7 +15,7 @@
 #include <algorithm>
 
 
-#define OUTPUT_VERBOSE  0
+#define OUTPUT_VERBOSE 0
 
 
 
@@ -107,6 +107,9 @@ void output_manager::register_save()
 
 	// register the reserved space for saving
 	machine().save().save_pointer(nullptr, "output", nullptr, 0, NAME(m_save_data), m_itemtable.size());
+	if (OUTPUT_VERBOSE)
+		osd_printf_verbose("Registered %u outputs for save states\n", m_itemtable.size());
+
 }
 
 
@@ -114,7 +117,7 @@ void output_manager::register_save()
     find_item - find an item based on a string
 -------------------------------------------------*/
 
-output_manager::output_item* output_manager::find_item(const char *string)
+output_manager::output_item *output_manager::find_item(char const *string)
 {
 	auto item = m_itemtable.find(std::string(string));
 	if (item != m_itemtable.end())
@@ -128,8 +131,11 @@ output_manager::output_item* output_manager::find_item(const char *string)
     create_new_item - create a new item
 -------------------------------------------------*/
 
-output_manager::output_item &output_manager::create_new_item(const char *outname, s32 value)
+output_manager::output_item &output_manager::create_new_item(char const *outname, s32 value)
 {
+	if (OUTPUT_VERBOSE)
+		osd_printf_verbose("Creating output %s = %d%s\n", outname, value, m_save_data ? " (will not be saved)" : "");
+
 	auto const ins(m_itemtable.emplace(
 			std::piecewise_construct,
 			std::forward_as_tuple(outname),
@@ -138,7 +144,7 @@ output_manager::output_item &output_manager::create_new_item(const char *outname
 	return ins.first->second;
 }
 
-output_manager::output_item &output_manager::find_or_create_item(const char *outname, s32 value)
+output_manager::output_item &output_manager::find_or_create_item(char const *outname, s32 value)
 {
 	output_item *const item = find_item(outname);
 	return item ? *item : create_new_item(outname, value);
@@ -186,7 +192,7 @@ void output_manager::postload()
     output_set_value - set the value of an output
 -------------------------------------------------*/
 
-void output_manager::set_value(const char *outname, s32 value)
+void output_manager::set_value(char const *outname, s32 value)
 {
 	output_item *const item = find_item(outname);
 
@@ -203,7 +209,7 @@ void output_manager::set_value(const char *outname, s32 value)
     output
 -------------------------------------------------*/
 
-s32 output_manager::get_value(const char *outname)
+s32 output_manager::get_value(char const *outname)
 {
 	output_item const *const item = find_item(outname);
 
@@ -218,7 +224,7 @@ s32 output_manager::get_value(const char *outname)
     if nullptr is specified
 -------------------------------------------------*/
 
-void output_manager::set_notifier(const char *outname, notifier_func callback, void *param)
+void output_manager::set_notifier(char const *outname, notifier_func callback, void *param)
 {
 	// if an item is specified, find/create it
 	if (outname)
@@ -238,7 +244,7 @@ void output_manager::set_notifier(const char *outname, notifier_func callback, v
     a given name
 -------------------------------------------------*/
 
-u32 output_manager::name_to_id(const char *outname)
+u32 output_manager::name_to_id(char const *outname)
 {
 	// if no item, ID is 0
 	output_item const *const item = find_item(outname);
@@ -251,12 +257,12 @@ u32 output_manager::name_to_id(const char *outname)
     to a given unique ID
 -------------------------------------------------*/
 
-const char *output_manager::id_to_name(u32 id)
+char const *output_manager::id_to_name(u32 id)
 {
 	for (auto &item : m_itemtable)
 		if (item.second.id() == id)
 			return item.second.name().c_str();
 
-	/* nothing found, return nullptr */
+	// nothing found, return nullptr
 	return nullptr;
 }

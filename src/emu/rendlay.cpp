@@ -3315,18 +3315,12 @@ layout_view::item::item(
 	, m_color(render_color_multiply(env.parse_color(itemnode.get_child("color")), color))
 	, m_blend_mode(get_blend_mode(env, itemnode))
 {
-	// outputs need resolving
-	if (m_have_output)
-		m_output.resolve();
-
 	// fetch common data
 	int index = env.get_attribute_int(itemnode, "index", -1);
 	if (index != -1)
 		m_screen = screen_device_iterator(env.machine().root_device()).byindex(index);
 	for (u32 mask = m_input_mask; (mask != 0) && (~mask & 1); mask >>= 1)
 		m_input_shift++;
-	if (m_have_output && m_element)
-		m_output = m_element->default_state();
 
 	// sanity checks
 	if (strcmp(itemnode.get_name(), "screen") == 0)
@@ -3411,6 +3405,13 @@ int layout_view::item::state() const
 
 void layout_view::item::resolve_tags()
 {
+	if (m_have_output)
+	{
+		m_output.resolve();
+		if (m_element)
+			m_output = m_element->default_state();
+	}
+
 	if (!m_input_tag.empty())
 	{
 		m_input_port = m_element->machine().root_device().ioport(m_input_tag.c_str());
