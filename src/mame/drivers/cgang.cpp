@@ -94,7 +94,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(main_firq_w);
 	DECLARE_WRITE8_MEMBER(main_irq_clear_w) { m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); }
 	DECLARE_WRITE8_MEMBER(main_firq_clear_w) { m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE); }
-	template<int N> DECLARE_WRITE8_MEMBER(motor_clock_w);
+	template<int N> DECLARE_WRITE_LINE_MEMBER(motor_clock_w);
 
 	DECLARE_READ8_MEMBER(ppi1_c_r);
 	DECLARE_WRITE8_MEMBER(ppi2_c_w);
@@ -146,7 +146,7 @@ WRITE_LINE_MEMBER(cgang_state::main_firq_w)
 }
 
 template<int N>
-WRITE8_MEMBER(cgang_state::motor_clock_w)
+WRITE_LINE_MEMBER(cgang_state::motor_clock_w)
 {
 }
 
