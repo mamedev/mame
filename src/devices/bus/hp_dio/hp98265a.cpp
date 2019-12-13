@@ -42,9 +42,9 @@ void dio16_98265a_device::device_add_mconfig(machine_config &config)
 	default_scsi_devices(NSCSI_CONNECTOR(config, "scsibus:3", 0));
 	default_scsi_devices(NSCSI_CONNECTOR(config, "scsibus:4", 0));
 
-	nscsi_connector &scsicon6(NSCSI_CONNECTOR(config, "scsibus:5", 0));
-	default_scsi_devices(scsicon6);
-	scsicon6.set_default_option("cdrom");
+	nscsi_connector &scsicon5(NSCSI_CONNECTOR(config, "scsibus:5", 0));
+	default_scsi_devices(scsicon5);
+	scsicon5.set_default_option("cdrom");
 
 	default_scsi_devices(NSCSI_CONNECTOR(config, "scsibus:6", 0));
 	nscsi_connector &scsicon7(NSCSI_CONNECTOR(config, "scsibus:7", 0));
