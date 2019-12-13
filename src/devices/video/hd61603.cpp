@@ -51,11 +51,6 @@ void hd61603_device::device_start()
 //  handlers
 //-------------------------------------------------
 
-void hd61603_device::refresh_output()
-{
-	m_write_segs(0, m_blank ? 0 : m_ram);
-}
-
 void hd61603_device::data_w(u8 data)
 {
 	// 1-byte nop command
@@ -96,6 +91,6 @@ void hd61603_device::data_w(u8 data)
 				break;
 		}
 
-		refresh_output();
+		m_write_segs(0, m_blank ? 0 : m_ram);
 	}
 }

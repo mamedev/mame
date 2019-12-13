@@ -47,11 +47,8 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_post_load() override { refresh_output(); }
 
 private:
-	void refresh_output();
-
 	u8 m_count = 0;
 	u16 m_data = 0;
 	u64 m_ram = 0;
