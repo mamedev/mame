@@ -9922,6 +9922,9 @@ ccs2810                         //
 @source:ccs300.cpp
 ccs300                          //
 
+@source:cd100.cpp
+cd100b                          //
+
 @source:cd2650.cpp
 cd2650                          //
 
