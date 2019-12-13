@@ -264,7 +264,8 @@ WRITE_LINE_MEMBER(tetfight_state::iocr_od1_w)
 {
 	// TODO: i2c cares about the order of this!?
 	// tetfight reaches PC=0x106c if initialization has success
-	// rpc700 doesn't like above and go into supervisor mode even with a valid NVRAM, wants clock first then data
+	// rpc700 doesn't like above and go into supervisor mode even with a valid NVRAM
+	// both wants clock first then data, not sure where the issue actually is
 	m_i2cdata_hack = state == true;
 	//m_i2cmem->write_sda(state == true ? 1 : 0);
 }
