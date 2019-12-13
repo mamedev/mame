@@ -90,6 +90,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(main_firq_w);
 	DECLARE_WRITE8_MEMBER(main_irq_clear_w) { m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); }
 	DECLARE_WRITE8_MEMBER(main_firq_clear_w) { m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE); }
+	template<int N> DECLARE_WRITE8_MEMBER(motor_clock_w);
 
 	DECLARE_READ8_MEMBER(ppi0_c_r);
 
@@ -136,6 +137,11 @@ WRITE_LINE_MEMBER(cgang_state::main_firq_w)
 	m_main_firq = state;
 }
 
+template<int N>
+WRITE8_MEMBER(cgang_state::motor_clock_w)
+{
+}
+
 READ8_MEMBER(cgang_state::ppi0_c_r)
 {
 	u8 data = 0;
@@ -143,7 +149,7 @@ READ8_MEMBER(cgang_state::ppi0_c_r)
 	// PC7: CALL-CPU1
 	data |= m_latch[1]->pending_r() ? 0 : 0x80;
 
-	return data | 0x7f;
+	return data;
 }
 
 
@@ -175,13 +181,13 @@ READ8_MEMBER(cgang_state::ppi4_c_r)
 	u8 data = 0;
 
 	// PC0,PC1: ADPCM busy
-	data |= m_upd[0]->busy_r() ? 0 : 1;
-	data |= m_upd[1]->busy_r() ? 0 : 2;
+	data |= m_upd[0]->busy_r() ? 1 : 0;
+	data |= m_upd[1]->busy_r() ? 2 : 0;
 
 	// PC2: CALL-CPU2
 	data |= m_latch[0]->pending_r() ? 0 : 4;
 
-	return data | 0xfb;
+	return data;
 }
 
 
@@ -192,7 +198,6 @@ READ8_MEMBER(cgang_state::ppi4_c_r)
 
 void cgang_state::main_map(address_map &map)
 {
-	map.unmap_value_high();
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x2003).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x2004, 0x2007).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -209,7 +214,6 @@ void cgang_state::main_map(address_map &map)
 
 void cgang_state::sound_map(address_map &map)
 {
-	map.unmap_value_high();
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x1001).rw(m_ymsnd, FUNC(ym2151_device::status_r), FUNC(ym2151_device::write));
 	map(0x2000, 0x2003).mirror(0x0ffc).rw(m_ppi[4], FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -217,7 +221,7 @@ void cgang_state::sound_map(address_map &map)
 	map(0x4000, 0x4000).mirror(0x0fff).w(m_latch[1], FUNC(generic_latch_8_device::write));
 	map(0x5000, 0x5000).mirror(0x0fff).w(FUNC(cgang_state::adpcm_w<0>));
 	map(0x6000, 0x6000).mirror(0x0fff).w(FUNC(cgang_state::adpcm_w<1>));
-	map(0x7000, 0x7000).mirror(0x0fff).w(FUNC(cgang_state::spot_w));
+	map(0x7000, 0x7000).mirror(0x0fff).w(FUNC(cgang_state::spot_w)).nopr();
 	map(0x8000, 0xffff).rom();
 }
 
@@ -250,11 +254,16 @@ void cgang_state::cgang(machine_config &config)
 	m_pit[0]->set_clk<0>(4_MHz_XTAL/4);
 	m_pit[0]->set_clk<1>(4_MHz_XTAL/4);
 	m_pit[0]->set_clk<2>(4_MHz_XTAL/4);
+	m_pit[0]->out_handler<0>().set(FUNC(cgang_state::motor_clock_w<0>));
+	m_pit[0]->out_handler<1>().set(FUNC(cgang_state::motor_clock_w<1>));
+	m_pit[0]->out_handler<2>().set(FUNC(cgang_state::motor_clock_w<2>));
 
 	PIT8253(config, m_pit[1], 0);
 	m_pit[1]->set_clk<0>(4_MHz_XTAL/4);
 	m_pit[1]->set_clk<1>(4_MHz_XTAL/4);
 	m_pit[1]->set_clk<2>(4_MHz_XTAL/4);
+	m_pit[1]->out_handler<0>().set(FUNC(cgang_state::motor_clock_w<3>));
+	m_pit[1]->out_handler<1>().set(FUNC(cgang_state::motor_clock_w<4>));
 	m_pit[1]->out_handler<2>().set("int_clk", FUNC(ripple_counter_device::clock_w));
 
 	ripple_counter_device &int_clk(RIPPLE_COUNTER(config, "int_clk")); // 4040
@@ -267,14 +276,14 @@ void cgang_state::cgang(machine_config &config)
 	GENERIC_LATCH_8(config, m_latch[1]);
 
 	I8255(config, m_ppi[0]); // 0x9b: all = input
-	m_ppi[0]->in_pa_callback().set_constant(0xff);
-	m_ppi[0]->in_pb_callback().set_constant(0xff);
+	m_ppi[0]->in_pa_callback().set_constant(0);
+	m_ppi[0]->in_pb_callback().set_constant(0);
 	m_ppi[0]->in_pc_callback().set(FUNC(cgang_state::ppi0_c_r));
 
 	I8255(config, m_ppi[1]); // 0x9a: A & B = input, Clow = output, Chigh = input
-	m_ppi[1]->in_pa_callback().set_constant(0xff);
-	m_ppi[1]->in_pb_callback().set_constant(0xff);
-	m_ppi[1]->in_pc_callback().set_constant(0xff);
+	m_ppi[1]->in_pa_callback().set_constant(0);
+	m_ppi[1]->in_pb_callback().set_constant(0);
+	m_ppi[1]->in_pc_callback().set_constant(0);
 
 	I8255(config, m_ppi[2]); // 0x80: all = output
 
