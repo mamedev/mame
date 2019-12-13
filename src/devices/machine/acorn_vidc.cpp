@@ -160,8 +160,8 @@ void acorn_vidc10_device::device_start()
 	save_item(NAME(m_cursor_enable));
 	save_pointer(NAME(m_crtc_regs), CRTC_VCER+1);
 	save_pointer(NAME(m_crtc_raw_horz), 2);
-	m_data_vram = auto_alloc_array_clear(machine(), u8, m_data_vram_size);
-	m_cursor_vram = auto_alloc_array_clear(machine(), u8, m_cursor_vram_size);
+	m_data_vram = make_unique_clear<u8[]>(m_data_vram_size);
+	m_cursor_vram = make_unique_clear<u8[]>(m_cursor_vram_size);
 	save_pointer(NAME(m_data_vram), m_data_vram_size);
 	save_pointer(NAME(m_cursor_vram), m_cursor_vram_size);
 	save_pointer(NAME(m_stereo_image), m_sound_max_channels);
@@ -197,8 +197,6 @@ void acorn_vidc10_device::device_start()
 void acorn_vidc10_device::device_reset()
 {
 	m_cursor_enable = false;
-	memset(m_data_vram, 0, m_data_vram_size);
-	memset(m_cursor_vram, 0, m_cursor_vram_size);
 	memset(m_stereo_image, 4, m_sound_max_channels);
 	for (int ch=0;ch<m_sound_max_channels;ch++)
 		refresh_stereo_image(ch);
@@ -522,7 +520,7 @@ u32 acorn_vidc10_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	if (xsize <= 0 || ysize <= 0)
 		return 0;
 
-	draw(bitmap, cliprect, m_data_vram, m_bpp_mode, xstart, ystart, xsize, ysize, false);
+	draw(bitmap, cliprect, m_data_vram.get(), m_bpp_mode, xstart, ystart, xsize, ysize, false);
 	if (m_cursor_enable == true)
 	{
 		xstart = m_crtc_regs[CRTC_HCSR] - m_crtc_regs[CRTC_HBSR];
@@ -530,7 +528,7 @@ u32 acorn_vidc10_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		xsize = 32;
 		ysize = m_crtc_regs[CRTC_VCER] - m_crtc_regs[CRTC_VCSR];
 		if (ysize > 0)
-			draw(bitmap, cliprect, m_cursor_vram, 1, xstart, ystart, xsize, ysize, true);
+			draw(bitmap, cliprect, m_cursor_vram.get(), 1, xstart, ystart, xsize, ysize, true);
 	}
 
 	return 0;

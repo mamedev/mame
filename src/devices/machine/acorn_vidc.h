@@ -111,8 +111,8 @@ private:
 	emu_timer *m_video_timer;
 	emu_timer *m_sound_timer;
 		
-	u8 	     *m_data_vram;
-	u8       *m_cursor_vram;
+	std::unique_ptr<u8[]> m_data_vram;
+	std::unique_ptr<u8[]> m_cursor_vram;
 	// TODO: correct data vram size
 	const u32 m_data_vram_mask = 0x1fffff; 
 	const u32 m_cursor_vram_mask = 0x7fff;
