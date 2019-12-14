@@ -5183,23 +5183,6 @@
 		</part>
 	</software>
 
-	<software name="marble">
-		<description>Marble Madness</description>
-		<year>1986</year>
-		<publisher>Electronic Arts</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="marble_madness1.dsk" size="143360" crc="ffb2fc00" sha1="0985fce38eafd30dd56ea273e72049a43dd42ebc" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="marble_madness2.dsk" size="143360" crc="ffb2fc00" sha1="0985fce38eafd30dd56ea273e72049a43dd42ebc" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mario">
 		<description>Mario Bros.</description>
 		<year>1983</year>
