@@ -3156,6 +3156,111 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+	<software name="muppetgop1" cloneof="muppetgo">
+		<description>The Muppets on the Go! (prototype 19950721)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="110702">
+				<rom name="the muppets on the go prototype 19950721.bin" size="110702" crc="0c46ce64" sha1="bcac49c86efcfed1c9118c4474db613d3a6cdd45" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="muppetgop2" cloneof="muppetgo">
+		<description>The Muppets on the Go! (prototype 19960301)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="512310">
+				<rom name="the muppets on the go prototype 19960301.bin" size="512310" crc="40c166a8" sha1="4cba6235d7313dd6e29baca19d3da12254543f65" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="muppetgop3" cloneof="muppetgo">
+		<description>The Muppets on the Go! (prototype 19960313)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="">
+				<rom name="the muppets on the go prototype 19960313.bin" size="520855" crc="78c4ca77" sha1="1dee90992fc6bb3107320ae8b5c3049d6282cd28" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="muppetgop4" cloneof="muppetgo">
+		<description>The Muppets on the Go! (prototype 19960322, set 1)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="MK-49046"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="">
+				<rom name="the muppets on the go prototype 19960322-1.bin" size="522092" crc="5ccc16bb" sha1="76aa37de7502e09c1aaeb94d2cae9877abd574fd" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="muppetgop5" cloneof="muppetgo">
+		<description>The Muppets on the Go! (prototype 19960322, set 2)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="MK-49046"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="">
+				<rom name="the muppets on the go prototype 19960322-2.bin" size="522092" crc="46424c1e" sha1="026af855e55ce53c351798375d8c8cb38f756b6c" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="muppetgop6" cloneof="muppetgo">
+		<description>The Muppets on the Go! (prototype 19960324)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="MK-49046"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="523960">
+				<rom name="the muppets on the go prototype 19960324.bin" size="523960" crc="73c3bd73" sha1="286ca64d8e17f3ccc2b3802184f087e6a53837e8" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="muppetgop7" cloneof="muppetgo">
+		<description>The Muppets on the Go! (prototype 19960329)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="MK-49046"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="">
+				<rom name="the muppets on the go prototype 19960329.bin" size="520292" crc="f40d01d1" sha1="205adadb250a5d448b87f1826961bfd40b960d42" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="muppetgop8" cloneof="muppetgo">
+		<description>The Muppets on the Go! (prototype 19960330, set 1)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="MK-49046"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="">
+				<rom name="the muppets on the go prototype 19960330-1.bin" size="520340" crc="bfc3bbf0" sha1="9454341cd62bc9366a9f798cdeed66baf809048c" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="muppetgop9" cloneof="muppetgo">
+		<description>The Muppets on the Go! (prototype 19960330, set 2)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="MK-49046"/>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="">
+				<rom name="the muppets on the go prototype 19960330-2.bin" size="520362" crc="9abda6e4" sha1="cbf212d45b92dca2042b9c71231acfaae0992dbc" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mushikin">
 		<description>Mushiking Atsumete Asobou Kouchuu Zukan (Jpn)</description>
 		<year>2005</year>
