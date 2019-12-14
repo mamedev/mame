@@ -121,5 +121,4 @@ void poly_fdc_device::device_add_mconfig(machine_config &config)
 	m_pio->out_pa_callback().set(FUNC(poly_fdc_device::pa_w));
 	m_pio->in_pb_callback().set(FUNC(poly_fdc_device::pb_r));
 	m_pio->out_pc_callback().set(FUNC(poly_fdc_device::pc_w));
-	m_pio->tri_pc_callback().set_constant(0xfe);
 }

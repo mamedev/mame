@@ -414,7 +414,6 @@ void cgang_state::cgang(machine_config &config)
 	m_ppi[1]->in_pb_callback().set_constant(0);
 	m_ppi[1]->in_pc_callback().set_ioport("SW4").lshift(4);
 	m_ppi[1]->out_pc_callback().set(FUNC(cgang_state::ppi2_c_w));
-	m_ppi[1]->tri_pc_callback().set_constant(0);
 
 	I8255(config, m_ppi[2]); // 0x80: all = output
 	m_ppi[2]->out_pc_callback().set(FUNC(cgang_state::ppi3_c_w));

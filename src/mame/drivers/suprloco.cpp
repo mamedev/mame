@@ -178,7 +178,6 @@ void suprloco_state::suprloco(machine_config &config)
 
 	i8255_device &ppi(I8255A(config, "ppi"));
 	ppi.out_pb_callback().set(FUNC(suprloco_state::control_w));
-	ppi.tri_pb_callback().set_constant(0);
 	ppi.out_pc_callback().set_output("lamp0").bit(0).invert(); // set by 8255 bit mode when no credits inserted
 	ppi.out_pc_callback().append_inputline(m_audiocpu, INPUT_LINE_NMI).bit(7).invert();
 

@@ -727,7 +727,6 @@ void rulechan_state::rulechan(machine_config &config)
 	ppi1.in_pa_callback().set(FUNC(rulechan_state::port30_r));
 	ppi1.out_pb_callback().set(FUNC(rulechan_state::port31_w));  // Must read back as 0x00 at power-up.
 	ppi1.out_pc_callback().set(FUNC(rulechan_state::port32_w));
-	ppi1.tri_pc_callback().set_constant(0xf0);                   // Motor off at startup
 
 	/* video hardware */
 	v9938_device &v9938(V9938(config, "v9938", VID_CLOCK));

@@ -995,7 +995,6 @@ void kingdrby_state::kingdrby(machine_config &config)
 	// 6000-6003 PPI group modes 0/0 - B & C (lower) as input, A & C (upper) as output.
 	I8255A(config, m_ppi[1]);
 	m_ppi[1]->out_pa_callback().set(FUNC(kingdrby_state::sound_cmd_w));
-	m_ppi[1]->tri_pa_callback().set_constant(0x7f);
 	m_ppi[1]->in_pb_callback().set(FUNC(kingdrby_state::key_matrix_r));
 	m_ppi[1]->in_pc_callback().set(FUNC(kingdrby_state::input_mux_r));
 	m_ppi[1]->out_pc_callback().set(FUNC(kingdrby_state::outport2_w));
@@ -1032,7 +1031,6 @@ void kingdrby_state::kingdrbb(machine_config &config)
 	/* C as input, (all) as output */
 	m_ppi[0]->out_pa_callback().set(FUNC(kingdrby_state::sound_cmd_w));
 	m_ppi[0]->in_pa_callback().set_constant(0);
-	m_ppi[0]->tri_pa_callback().set_constant(0x7f);
 	m_ppi[0]->in_pb_callback().set_ioport("IN0");
 	m_ppi[0]->out_pb_callback().set(FUNC(kingdrby_state::outportb_w));
 	m_ppi[0]->in_pc_callback().set_ioport("IN1");
