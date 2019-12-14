@@ -7,6 +7,8 @@
 // the BBL 380 - 180 in 1 features similar menus / presentation / games to the 'ORB Gaming Retro Arcade Pocket Handheld Games Console with 153 Games' (eg has Matchstick Man, Gang Tie III etc.)
 // https://www.youtube.com/watch?v=NacY2WHd-CY
 
+// unkmandd contains unsp code, but no obvious startup code / vectors, so it's probably booting from another device / bootstrapped
+
 #include "emu.h"
 
 #include "screen.h"
