@@ -29,12 +29,6 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-
-	u8 cart_r(offs_t offset);
-
-	void prog_map(address_map &map);
-	void ext_map(address_map &map);
-
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 };
