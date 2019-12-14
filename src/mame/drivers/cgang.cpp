@@ -432,7 +432,7 @@ READ8_MEMBER(cgang_state::ppi5_c_r)
 	// PC5-PC7: SW1
 	data |= m_dipsw[0]->read() << 5;
 
-	return data | 0x18;
+	return data;
 }
 
 
