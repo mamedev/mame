@@ -258,7 +258,7 @@ void zpinball_state::zpinball(machine_config &config)
 	m_zpuctc->set_clk<0>(8_MHz_XTAL / 4);
 	m_zpuctc->set_clk<2>(100); // rectified from power supply
 	m_zpuctc->set_clk<3>(100);
-	m_zpuctc->int_callback().set_inputline(m_zpumpu, INPUT_LINE_IRQ0);
+	m_zpuctc->intr_callback().set_inputline(m_zpumpu, INPUT_LINE_IRQ0);
 	m_zpuctc->zc_callback<0>().set(FUNC(zpinball_state::shift_toggle_w));
 	m_zpuctc->zc_callback<0>().append(m_zpuctc, FUNC(z80ctc_device::trg1));
 	m_zpuctc->zc_callback<1>().set(FUNC(zpinball_state::clock_off_w));
