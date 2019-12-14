@@ -51,7 +51,7 @@ INPUT_PORTS_END
 
 void unkmandd_state::unkmandd(machine_config &config)
 {
-	// unknown CPU
+	// unknown CPU, unsp based
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);

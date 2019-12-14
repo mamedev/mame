@@ -51,7 +51,7 @@ INPUT_PORTS_END
 
 void bbl380_state::bbl380(machine_config &config)
 {
-	// unknown CPU
+	// unknown CPU, 6502 based
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
