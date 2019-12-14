@@ -2342,7 +2342,7 @@ CONS( 200?, dgun2500,  0,  0,  nes_vt_dg, nes_vt, nes_vt_dg_state, empty_init, "
 // don't even get to menu. very enhanced chipset, VT368/9?
 CONS( 2012, dgun2561,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "dreamGEAR", "dreamGEAR My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
 CONS( 200?, lxcmcy,    0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcysw,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Star Wars", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcysw,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING )
 // Also Lexibook Compact Cyber Arcade - Disney Princesses
 //      Lexibook Compact Cyber Arcade - Cars
 //      Lexibook Compact Cyber Arcade - Frozen
