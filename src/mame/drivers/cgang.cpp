@@ -68,7 +68,9 @@ public:
 		m_adpcm(*this, "adpcm%u", 0),
 		m_ymsnd(*this, "ymsnd"),
 		m_digits(*this, "digits"),
+		m_inputs(*this, "IN%u", 1),
 		m_dipsw(*this, "SW%u", 1),
+		m_gun_lamps(*this, "gun_lamp%u", 0U),
 		m_spot_lamps(*this, "spot_lamp%u", 0U),
 		m_ufo_lamps(*this, "ufo_lamp%u", 0U),
 		m_ufo_mouth(*this, "ufo_mouth")
@@ -90,7 +92,9 @@ private:
 	required_device_array<upd7759_device, 2> m_adpcm;
 	required_device<ym2151_device> m_ymsnd;
 	required_device<pwm_display_device> m_digits;
+	required_ioport_array<3> m_inputs;
 	required_ioport_array<4> m_dipsw;
+	output_finder<8> m_gun_lamps;
 	output_finder<8> m_spot_lamps;
 	output_finder<8> m_ufo_lamps;
 	output_finder<> m_ufo_mouth;
@@ -107,8 +111,10 @@ private:
 	template<int N> DECLARE_WRITE_LINE_MEMBER(motor_clock_w);
 
 	DECLARE_READ8_MEMBER(ppi1_c_r);
+	DECLARE_READ8_MEMBER(ppi2_a_r);
 	DECLARE_WRITE8_MEMBER(ppi2_c_w);
 	DECLARE_WRITE8_MEMBER(ppi3_c_w);
+	DECLARE_WRITE8_MEMBER(ppi4_c_w);
 
 	template<int N> DECLARE_WRITE8_MEMBER(adpcm_w);
 	DECLARE_WRITE8_MEMBER(spot_w);
@@ -124,6 +130,7 @@ private:
 void cgang_state::machine_start()
 {
 	// resolve outputs
+	m_gun_lamps.resolve();
 	m_spot_lamps.resolve();
 	m_ufo_lamps.resolve();
 	m_ufo_mouth.resolve();
@@ -174,6 +181,20 @@ READ8_MEMBER(cgang_state::ppi1_c_r)
 	return data;
 }
 
+READ8_MEMBER(cgang_state::ppi2_a_r)
+{
+	u8 data = 0;
+
+	// PA0-PA4: character hit lightsensors
+	for (int i = 0; i < 2; i++)
+	{
+		u8 mask = m_gun_lamps[i] ? 0x1f : 0;
+		data |= m_inputs[i + 1]->read() & mask;
+	}
+
+	return data;
+}
+
 WRITE8_MEMBER(cgang_state::ppi2_c_w)
 {
 	// PC0: coincounter
@@ -193,6 +214,13 @@ WRITE8_MEMBER(cgang_state::ppi3_c_w)
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 	m_digits->matrix((1 << (data >> 4 & 0xf)) & 0x3ff, ls48_map[data & 0xf]);
+}
+
+WRITE8_MEMBER(cgang_state::ppi4_c_w)
+{
+	// PC0,PC1: gun xenon lamps
+	for (int i = 0; i < 2; i++)
+		m_gun_lamps[i] = BIT(~data, i);
 }
 
 
@@ -230,7 +258,7 @@ WRITE8_MEMBER(cgang_state::ppi5_a_w)
 	m_adpcm[0]->set_output_gain(ALL_OUTPUTS, mute ? 0.0 : (BIT(data, 3) ? 0.25 : 1.0));
 	m_adpcm[1]->set_output_gain(ALL_OUTPUTS, mute ? 0.0 : (BIT(data, 3) ? 0.25 : 1.0));
 
-	// PA7: ufo mouth solenoid
+	// PA7: ufo boss mouth solenoid
 	m_ufo_mouth = BIT(data, 7);
 }
 
@@ -311,6 +339,20 @@ static INPUT_PORTS_START( cgang )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
+	PORT_START("IN2") // fake inputs, indicating gun is aimed at target
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Aim Target 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Aim Target 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Aim Target 3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Aim Target 4")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Aim Target 5")
+
+	PORT_START("IN3") // "
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Aim Target 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Aim Target 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Aim Target 3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Aim Target 4")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Aim Target 5")
+
 	PORT_START("SW1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
@@ -323,8 +365,8 @@ static INPUT_PORTS_START( cgang )
 	PORT_DIPSETTING( 0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING( 0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0x04, 0x04, "Attract Play" ) PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x18, 0x18, "Ticket Points" ) PORT_DIPLOCATION("SW2:4,5") PORT_CONDITION("SW2", 0x20, EQUALS, 0x20)
 	PORT_DIPSETTING( 0x18, "5" )
 	PORT_DIPSETTING( 0x10, "10" )
@@ -410,7 +452,7 @@ void cgang_state::cgang(machine_config &config)
 	m_ppi[0]->in_pc_callback().set(FUNC(cgang_state::ppi1_c_r));
 
 	I8255(config, m_ppi[1]); // 0x9a: A & B = input, Clow = output, Chigh = input
-	m_ppi[1]->in_pa_callback().set_constant(0);
+	m_ppi[1]->in_pa_callback().set(FUNC(cgang_state::ppi2_a_r));
 	m_ppi[1]->in_pb_callback().set_constant(0);
 	m_ppi[1]->in_pc_callback().set_ioport("SW4").lshift(4);
 	m_ppi[1]->out_pc_callback().set(FUNC(cgang_state::ppi2_c_w));
@@ -419,6 +461,7 @@ void cgang_state::cgang(machine_config &config)
 	m_ppi[2]->out_pc_callback().set(FUNC(cgang_state::ppi3_c_w));
 
 	I8255(config, m_ppi[3]); // 0x80: all = output
+	m_ppi[3]->out_pc_callback().set(FUNC(cgang_state::ppi4_c_w));
 
 	I8255(config, m_ppi[4]); // 0x89: A & B = output, C = input
 	m_ppi[4]->out_pa_callback().set(FUNC(cgang_state::ppi5_a_w));
