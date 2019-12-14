@@ -1,6 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+// These both have similar looking internals / games
+// They might not be the same hardware
+//
+// the BBL 380 - 180 in 1 features similar menus / presentation / games to the 'ORB Gaming Retro Arcade Pocket Handheld Games Console with 153 Games' (eg has Matchstick Man, Gang Tie III etc.)
+// https://www.youtube.com/watch?v=NacY2WHd-CY
+
 #include "emu.h"
 
 #include "screen.h"
@@ -73,4 +79,11 @@ ROM_START( unkmandd )
 	ROM_LOAD( "8718_en25f32.bin", 0x000000, 0x400000, CRC(cc138db4) SHA1(379af3d94ae840f52c06416d6cf32e25923af5ae) )
 ROM_END
 
-CONS( 201?, unkmandd,      0,       0,      unkmandd,   unkmandd, unkmandd_state, empty_init, "M&D", "Unknown M&D Handheld", MACHINE_IS_SKELETON )
+ROM_START( bbl380 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "bbl 380 180 in 1.bin", 0x000000, 0x400000, CRC(146c88da) SHA1(7f18526a6d8cf991f86febce3418d35aac9f49ad) )
+ROM_END
+
+
+CONS( 200?, unkmandd,      0,       0,      unkmandd,   unkmandd, unkmandd_state, empty_init, "M&D", "Unknown M&D Handheld", MACHINE_IS_SKELETON )
+CONS( 200?, bbl380,        0,       0,      unkmandd,   unkmandd, unkmandd_state, empty_init, "BaoBaoLong", "BBL380 - 180 in 1", MACHINE_IS_SKELETON )
