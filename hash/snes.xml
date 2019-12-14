@@ -2751,9 +2751,7 @@ Beyond that last category are the roms waiting to be classified.
 			<feature name="u12" value="U12 MM1134" />
 			<feature name="u13" value="U13 HCU04" />
 			<feature name="u14" value="U14 CIC F411" />
-			<feature name="dipswitch" value="SW1" />
-			<feature name="dipswitch" value="SW2" />
-			<feature name="dipswitch" value="SW3" />
+			<feature name="dipswitch" value="SW1,SW2,SW3" />
 			<feature name="battery" value="BT1" />
 			<feature name="cart_model" value="n/a" />
 			<feature name="slot" value="lorom_gsu2" />
@@ -4589,8 +4587,7 @@ more investigation needed...
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
-			<feature name="enhancement" value="DSP1" />
-			<feature name="enhancement" value="EVENT" /> <!-- possibly the same as the 1992 challenge one -->
+			<feature name="enhancement" value="DSP1,EVENT" /> <!-- possibly the same as the 1992 challenge one -->
 			<feature name="pcb" value="" /> <!-- Assy p/n 29638A (c) 1994 Nintendo of America Made in USA -->
 			<feature name="u1" value="" /> <!-- memory decoder ? -->
 			<feature name="u2" value="" /> <!-- memory decoder ? -->

@@ -17128,7 +17128,7 @@
 			<feature name="u2" value="U2 HuC3 [HuC-3]" />
 			<feature name="u3" value="U3 RAM [LH52256CT-10LL]" />
 			<feature name="u4" value="U4 [26A]" />
-			<feature name="u4" value="U5 [LVX04]" />
+			<feature name="u5" value="U5 [LVX04]" />
 			<feature name="batt" value="BATT CR2025" />
 			<feature name="slot" value="rom_huc3" />
 			<dataarea name="rom" size="524288">
@@ -17739,8 +17739,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APSE-USA, DMG-APSE-USA-1, DMG-APSU-AUS, DMG-APSU-EUR" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="enhancement" value="sgb" />
-			<feature name="enhancement" value="gbc" />
+			<feature name="enhancement" value="sgb,gbc" />
 			<feature name="pcb" value="DMG-A02-01" />
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5 [MBC-5]" /> <!-- Also found with [MBC5 P-1] -->
@@ -17763,8 +17762,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APSF-FRA" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="enhancement" value="sgb" />
-			<feature name="enhancement" value="gbc" />
+			<feature name="enhancement" value="sgb,gbc" />
 			<feature name="pcb" value="DMG-A02-01" />
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5 [MBC-5]" />
@@ -17786,8 +17784,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APSD-NOE" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="enhancement" value="sgb" />
-			<feature name="enhancement" value="gbc" />
+			<feature name="enhancement" value="sgb,gbc" />
 			<feature name="pcb" value="DMG-A02-01" />
 			<feature name="u1" value="U1 2M/4M/8M-MROM" />
 			<feature name="u2" value="U2 MBC-5 [MBC-5]" /> <!-- Also found with [MBC5 P-1] -->

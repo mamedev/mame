@@ -141,6 +141,71 @@ class SchemaQueries(object):
             '    size            INTEGER NOT NULL,\n' \
             '    FOREIGN KEY (machine) REFERENCES machine (id),\n' \
             '    FOREIGN KEY (machine, size) REFERENCES ramoption (machine, size))'
+    CREATE_SOFTWAREINFOTYPE = \
+            'CREATE TABLE softwareinfotype (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    name            TEXT    NOT NULL,\n' \
+            '    UNIQUE (name ASC))'
+    CREATE_SOFTWARESHAREDFEATTYPE = \
+            'CREATE TABLE softwaresharedfeattype (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    name            TEXT    NOT NULL,\n' \
+            '    UNIQUE (name ASC))'
+    CREATE_SOFTWAREPARTFEATURETYPE = \
+            'CREATE TABLE softwarepartfeaturetype (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    name            TEXT    NOT NULL,\n' \
+            '    UNIQUE (name ASC))'
+    CREATE_SOFTWARELIST = \
+            'CREATE TABLE softwarelist (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    shortname       TEXT    NOT NULL,\n' \
+            '    description     TEXT    NOT NULL,\n' \
+            '    UNIQUE (shortname ASC))'
+    CREATE_SOFTWARE = \
+            'CREATE TABLE software (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    softwarelist    INTEGER NOT NULL,\n' \
+            '    shortname       TEXT    NOT NULL,\n' \
+            '    supported       INTEGER NOT NULL,\n' \
+            '    description     TEXT    NOT NULL,\n' \
+            '    year            TEXT    NOT NULL,\n' \
+            '    publisher       TEXT    NOT NULL,\n' \
+            '    UNIQUE (softwarelist ASC, shortname ASC),\n' \
+            '    FOREIGN KEY (softwarelist) REFERENCES softwarelist (id))'
+    CREATE_SOFTWAREINFO = \
+            'CREATE TABLE softwareinfo (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    software        INTEGER NOT NULL,\n' \
+            '    infotype        INTEGER NOT NULL,\n' \
+            '    value           TEXT    NOT NULL,\n' \
+            '    FOREIGN KEY (software) REFERENCES software (id),\n' \
+            '    FOREIGN KEY (infotype) REFERENCES softwareinfotype (id))'
+    CREATE_SOFTWARESHAREDFEAT = \
+            'CREATE TABLE softwaresharedfeat (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    software        INTEGER NOT NULL,\n' \
+            '    sharedfeattype  INTEGER NOT NULL,\n' \
+            '    value           TEXT    NOT NULL,\n' \
+            '    UNIQUE (software ASC, sharedfeattype ASC),\n' \
+            '    FOREIGN KEY (software) REFERENCES software (id),\n' \
+            '    FOREIGN KEY (sharedfeattype) REFERENCES softwaresharedfeattype (id))'
+    CREATE_SOFTWAREPART = \
+            'CREATE TABLE softwarepart (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    software        INTEGER NOT NULL,\n' \
+            '    shortname       TEXT    NOT NULL,\n' \
+            '    interface       TEXT    NOT NULL,\n' \
+            '    UNIQUE (software ASC, shortname ASC))'
+    CREATE_SOFTWAREPARTFEATURE = \
+            'CREATE TABLE softwarepartfeature (\n' \
+            '    id              INTEGER PRIMARY KEY,\n' \
+            '    part            INTEGER NOT NULL,\n' \
+            '    featuretype     INTEGER NOT NULL,\n' \
+            '    value           TEXT    NOT NULL,\n' \
+            '    UNIQUE (part ASC, featuretype ASC),\n' \
+            '    FOREIGN KEY (part) REFERENCES softwarepart (id),\n' \
+            '    FOREIGN KEY (featuretype) REFERENCES softwarepartfeaturetype (id))'
     CREATE_ROM = \
             'CREATE TABLE rom (\n' \
             '    id              INTEGER PRIMARY KEY,\n' \
@@ -193,6 +258,22 @@ class SchemaQueries(object):
 
     INDEX_DIPSWITCH_MACHINE_ISCONFIG = 'CREATE INDEX dipswitch_machine_isconfig ON dipswitch (machine ASC, isconfig ASC)'
 
+    INDEX_SOFTWARE_SOFTWARELIST_SUPPORTED = 'CREATE INDEX software_softwarelist_supported ON software (softwarelist ASC, supported ASC)'
+    INDEX_SOFTWARE_SOFTWARELIST_YEAR = 'CREATE INDEX software_softwarelist_year ON software (softwarelist ASC, year ASC)'
+    INDEX_SOFTWARE_SOFTWARELIST_PUBLISHER = 'CREATE INDEX software_softwarelist_publisher ON software (softwarelist ASC, publisher ASC)'
+    INDEX_SOFTWARE_SHORTNAME_SOFTWARELIST = 'CREATE INDEX software_shortname_softwarelist ON software (shortname ASC, softwarelist ASC)'
+    INDEX_SOFTWARE_YEAR_SOFTWARELIST = 'CREATE INDEX software_year_softwarelist ON software (year ASC, softwarelist ASC)'
+    INDEX_SOFTWARE_PUBLISHER_SOFTWARELIST = 'CREATE INDEX software_publisher_softwarelist ON software (publisher ASC, softwarelist ASC)'
+
+    INDEX_SOFTWAREINFO_SOFTWARE_INFOTYPE = 'CREATE INDEX softwareinfo_software_infotype ON softwareinfo (software ASC, infotype ASC)'
+    INDEX_SOFTWAREINFO_INFOTYPE_VALUE_SOFTWARE = 'CREATE INDEX softwareinfo_infotype_value_software ON softwareinfo (infotype ASC, value ASC, software ASC)'
+
+    INDEX_SOFTWARESHAREDFEAT_SHAREDFEATTYPE_VALUE_SOFTWARE = 'CREATE INDEX softwaresharedfeat_sharedfeattype_value_software ON softwaresharedfeat (sharedfeattype ASC, value ASC, software ASC)'
+
+    INDEX_SOFTWAREPART_INTERFACE_SOFTWARE = 'CREATE INDEX softwarepart_interface_software ON softwarepart (interface ASC, software ASC)'
+
+    INDEX_SOFTWAREPARTFEATURE_FEATURETYPE_VALUE_PART = 'CREATE INDEX softwarepartfeature_featuretype_value_part ON softwarepartfeature (featuretype ASC, value ASC, part ASC)'
+
     INDEX_ROMDUMP_ROM = 'CREATE INDEX romdump_rom ON romdump (rom ASC)'
 
     INDEX_DISKDUMP_DISK = 'CREATE INDEX diskdump_disk ON diskdump (disk ASC)'
@@ -210,6 +291,22 @@ class SchemaQueries(object):
     DROP_CLONEOF_PARENT = 'DROP INDEX IF EXISTS cloneof_parent'
 
     DROP_DIPSWITCH_MACHINE_ISCONFIG = 'DROP INDEX IF EXISTS dipswitch_machine_isconfig'
+
+    DROP_SOFTWARE_SOFTWARELIST_SUPPORTED = 'DROP INDEX IF EXISTS software_softwarelist_supported'
+    DROP_SOFTWARE_SOFTWARELIST_YEAR = 'DROP INDEX IF EXISTS software_softwarelist_year'
+    DROP_SOFTWARE_SOFTWARELIST_PUBLISHER = 'DROP INDEX IF EXISTS software_softwarelist_publisher'
+    DROP_SOFTWARE_SHORTNAME_SOFTWARELIST = 'DROP INDEX IF EXISTS software_shortname_softwarelist'
+    DROP_SOFTWARE_YEAR_SOFTWARELIST = 'DROP INDEX IF EXISTS software_year_softwarelist'
+    DROP_SOFTWARE_PUBLISHER_SOFTWARELIST = 'DROP INDEX IF EXISTS software_publisher_softwarelist'
+
+    DROP_SOFTWAREINFO_SOFTWARE_INFOTYPE = 'DROP INDEX IF EXISTS softwareinfo_software_infotype'
+    DROP_SOFTWAREINFO_INFOTYPE_VALUE_SOFTWARE = 'DROP INDEX IF EXISTS softwareinfo_infotype_value_software'
+
+    DROP_SOFTWARESHAREDFEAT_SHAREDFEATTYPE_VALUE_SOFTWARE = 'DROP INDEX IF EXISTS softwaresharedfeat_sharedfeattype_value_software'
+
+    DROP_SOFTWAREPART_INTERFACE_SOFTWARE = 'DROP INDEX IF EXISTS softwarepart_interface_software'
+
+    DROP_SOFTWAREPARTFEATURE_FEATURETYPE_VALUE_PART = 'DROP INDEX IF EXISTS softwarepartfeature_featuretype_value_part'
 
     DROP_ROMDUMP_ROM = 'DROP INDEX IF EXISTS romdump_rom'
 
@@ -234,6 +331,15 @@ class SchemaQueries(object):
             CREATE_SLOTDEFAULT,
             CREATE_RAMOPTION,
             CREATE_RAMDEFAULT,
+            CREATE_SOFTWAREINFOTYPE,
+            CREATE_SOFTWARESHAREDFEATTYPE,
+            CREATE_SOFTWAREPARTFEATURETYPE,
+            CREATE_SOFTWARELIST,
+            CREATE_SOFTWARE,
+            CREATE_SOFTWAREINFO,
+            CREATE_SOFTWARESHAREDFEAT,
+            CREATE_SOFTWAREPART,
+            CREATE_SOFTWAREPARTFEATURE,
             CREATE_ROM,
             CREATE_ROMDUMP,
             CREATE_DISK,
@@ -254,6 +360,17 @@ class SchemaQueries(object):
             INDEX_ROMOF_PARENT,
             INDEX_CLONEOF_PARENT,
             INDEX_DIPSWITCH_MACHINE_ISCONFIG,
+            INDEX_SOFTWARE_SOFTWARELIST_SUPPORTED,
+            INDEX_SOFTWARE_SOFTWARELIST_YEAR,
+            INDEX_SOFTWARE_SOFTWARELIST_PUBLISHER,
+            INDEX_SOFTWARE_SHORTNAME_SOFTWARELIST,
+            INDEX_SOFTWARE_YEAR_SOFTWARELIST,
+            INDEX_SOFTWARE_PUBLISHER_SOFTWARELIST,
+            INDEX_SOFTWAREINFO_SOFTWARE_INFOTYPE,
+            INDEX_SOFTWAREINFO_INFOTYPE_VALUE_SOFTWARE,
+            INDEX_SOFTWARESHAREDFEAT_SHAREDFEATTYPE_VALUE_SOFTWARE,
+            INDEX_SOFTWAREPART_INTERFACE_SOFTWARE,
+            INDEX_SOFTWAREPARTFEATURE_FEATURETYPE_VALUE_PART,
             INDEX_ROMDUMP_ROM,
             INDEX_DISKDUMP_DISK)
 
@@ -267,6 +384,17 @@ class SchemaQueries(object):
             DROP_ROMOF_PARENT,
             DROP_CLONEOF_PARENT,
             DROP_DIPSWITCH_MACHINE_ISCONFIG,
+            DROP_SOFTWARE_SOFTWARELIST_SUPPORTED,
+            DROP_SOFTWARE_SOFTWARELIST_YEAR,
+            DROP_SOFTWARE_SOFTWARELIST_PUBLISHER,
+            DROP_SOFTWARE_SHORTNAME_SOFTWARELIST,
+            DROP_SOFTWARE_YEAR_SOFTWARELIST,
+            DROP_SOFTWARE_PUBLISHER_SOFTWARELIST,
+            DROP_SOFTWAREINFO_SOFTWARE_INFOTYPE,
+            DROP_SOFTWAREINFO_INFOTYPE_VALUE_SOFTWARE,
+            DROP_SOFTWARESHAREDFEAT_SHAREDFEATTYPE_VALUE_SOFTWARE,
+            DROP_SOFTWAREPART_INTERFACE_SOFTWARE,
+            DROP_SOFTWAREPARTFEATURE_FEATURETYPE_VALUE_PART,
             DROP_ROMDUMP_ROM,
             DROP_DISKDUMP_DISK)
 
@@ -287,6 +415,15 @@ class UpdateQueries(object):
     ADD_SLOT = 'INSERT INTO slot (machine, name) VALUES (?, ?)'
     ADD_RAMOPTION = 'INSERT INTO ramoption (machine, size, name) VALUES (?, ?, ?)'
     ADD_RAMDEFAULT = 'INSERT INTO ramdefault (machine, size) VALUES (?, ?)'
+    ADD_SOFTWAREINFOTYPE = 'INSERT OR IGNORE INTO softwareinfotype (name) VALUES (?)'
+    ADD_SOFTWARESHAREDFEATTYPE = 'INSERT OR IGNORE INTO softwaresharedfeattype (name) VALUES (?)'
+    ADD_SOFTWAREPARTFEATURETYPE = 'INSERT OR IGNORE INTO softwarepartfeaturetype (name) VALUES(?)'
+    ADD_SOFTWARELIST = 'INSERT INTO softwarelist (shortname, description) VALUES (?, ?)'
+    ADD_SOFTWARE = 'INSERT INTO software (softwarelist, shortname, supported, description, year, publisher) VALUES (?, ?, ?, ?, ?, ?)'
+    ADD_SOFTWAREINFO = 'INSERT INTO softwareinfo (software, infotype, value) SELECT ?, id, ? FROM softwareinfotype WHERE name = ?'
+    ADD_SOFTWARESHAREDFEAT = 'INSERT INTO softwaresharedfeat (software, sharedfeattype, value) SELECT ?, id, ? FROM softwaresharedfeattype WHERE name = ?'
+    ADD_SOFTWAREPART = 'INSERT INTO softwarepart (software, shortname, interface) VALUES (?, ?, ?)'
+    ADD_SOFTWAREPARTFEATURE = 'INSERT INTO softwarepartfeature (part, featuretype, value) SELECT ?, id, ? FROM softwarepartfeaturetype WHERE name = ?'
     ADD_ROM = 'INSERT OR IGNORE INTO rom (crc, sha1) VALUES (?, ?)'
     ADD_ROMDUMP = 'INSERT OR IGNORE INTO romdump (machine, rom, name, bad) SELECT ?, id, ?, ? FROM rom WHERE crc = ? AND sha1 = ?'
     ADD_DISK = 'INSERT OR IGNORE INTO disk (sha1) VALUES (?)'
@@ -597,6 +734,39 @@ class UpdateCursor(object):
 
     def add_ramdefault(self, machine, size):
         self.dbcurs.execute(UpdateQueries.ADD_RAMDEFAULT, (machine, size))
+        return self.dbcurs.lastrowid
+
+    def add_softwarelist(self, shortname, description):
+        self.dbcurs.execute(UpdateQueries.ADD_SOFTWARELIST, (shortname, description))
+        return self.dbcurs.lastrowid
+
+    def add_softwareinfotype(self, name):
+        self.dbcurs.execute(UpdateQueries.ADD_SOFTWAREINFOTYPE, (name, ))
+
+    def add_softwaresharedfeattype(self, name):
+        self.dbcurs.execute(UpdateQueries.ADD_SOFTWARESHAREDFEATTYPE, (name, ))
+
+    def add_softwarepartfeaturetype(self, name):
+        self.dbcurs.execute(UpdateQueries.ADD_SOFTWAREPARTFEATURETYPE, (name, ))
+
+    def add_software(self, softwarelist, shortname, supported, description, year, publisher):
+        self.dbcurs.execute(UpdateQueries.ADD_SOFTWARE, (softwarelist, shortname, supported, description, year, publisher))
+        return self.dbcurs.lastrowid
+
+    def add_softwareinfo(self, software, infotype, value):
+        self.dbcurs.execute(UpdateQueries.ADD_SOFTWAREINFO, (software, value, infotype))
+        return self.dbcurs.lastrowid
+
+    def add_softwaresharedfeat(self, software, sharedfeattype, value):
+        self.dbcurs.execute(UpdateQueries.ADD_SOFTWARESHAREDFEAT, (software, value, sharedfeattype))
+        return self.dbcurs.lastrowid
+
+    def add_softwarepart(self, software, shortname, interface):
+        self.dbcurs.execute(UpdateQueries.ADD_SOFTWAREPART, (software, shortname, interface))
+        return self.dbcurs.lastrowid
+
+    def add_softwarepartfeature(self, part, featuretype, value):
+        self.dbcurs.execute(UpdateQueries.ADD_SOFTWAREPARTFEATURE, (part, value, featuretype))
         return self.dbcurs.lastrowid
 
     def add_rom(self, crc, sha1):
