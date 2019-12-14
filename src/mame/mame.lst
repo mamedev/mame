@@ -3184,6 +3184,9 @@ mechattj                        // A8002 'MA' (c) 1989
 mechattu                        // A8002 'MA' (c) 1989
 mechattu1                       // A8002 'MA' (c) 1989
 
+@source:bbl380.cpp
+bbl380
+
 @source:bcs3.cpp
 bcs3                            //
 bcs3a                           //
@@ -39313,7 +39316,6 @@ unkhorse                        //
 
 @source:unkmandd.cpp
 unkmandd
-bbl380
 
 @source:unkpoker.cpp
 unkpoker                         //
