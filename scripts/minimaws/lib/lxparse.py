@@ -406,7 +406,8 @@ def load_info(options):
     if options.softwarepath:
         parser.setContentHandler(SoftwareListHandler(dbconn))
         for path in options.softwarepath:
-            for filename in [os.path.join(path, f) for f in os.listdir(path) if f.endswith('.xml')]:
+            files = [os.path.join(path, f) for f in os.listdir(path) if f.endswith('.xml')]
+            for filename in files:
                 parser.parse(filename)
 
     dbconn.finalise_load()

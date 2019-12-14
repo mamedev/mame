@@ -644,6 +644,20 @@ class QueryCursor(object):
                 'ORDER BY ramoption.size',
                 (machine, ))
 
+    def get_softwarelists(self, pattern):
+        if pattern is not None:
+            return self.dbcurs.execute(
+                    'SELECT softwarelist.shortname AS shortname, softwarelist.description AS description, COUNT(*) AS total, COUNT(CASE software.supported WHEN 0 THEN 1 ELSE NULL END) AS supported, COUNT(CASE software.supported WHEN 1 THEN 1 ELSE NULL END) AS partiallysupported, COUNT(CASE software.supported WHEN 2 THEN 1 ELSE NULL END) AS unsupported ' \
+                    'FROM softwarelist LEFT JOIN software ON softwarelist.id = software.softwarelist ' \
+                    'WHERE softwarelist.shortname GLOB ? ' \
+                    'GROUP BY softwarelist.id',
+                    (pattern, ))
+        else:
+            return self.dbcurs.execute(
+                    'SELECT softwarelist.shortname AS shortname, softwarelist.description AS description, COUNT(*) AS total, COUNT(CASE software.supported WHEN 0 THEN 1 ELSE NULL END) AS supported, COUNT(CASE software.supported WHEN 1 THEN 1 ELSE NULL END) AS partiallysupported, COUNT(CASE software.supported WHEN 2 THEN 1 ELSE NULL END) AS unsupported ' \
+                    'FROM softwarelist LEFT JOIN software ON softwarelist.id = software.softwarelist ' \
+                    'GROUP BY softwarelist.id')
+
     def get_rom_dumps(self, crc, sha1):
         return self.dbcurs.execute(
                 'SELECT machine.shortname AS shortname, machine.description AS description, romdump.name AS label, romdump.bad AS bad ' \

@@ -103,6 +103,9 @@ class QueryPageHandler(HandlerBase):
     def sourcefile_href(self, sourcefile):
         return cgi.escape(urlparse.urljoin(self.application_uri, 'sourcefile/%s' % (urlquote(sourcefile), )), True)
 
+    def softwarelist_href(self, softwarelist):
+        return cgi.escape(urlparse.urljoin(self.application_uri, 'softwarelist/%s' % (urlquote(softwarelist), )), True)
+
 
 class MachineRpcHandlerBase(QueryPageHandler):
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
@@ -426,6 +429,43 @@ class SourceFileHandler(QueryPageHandler):
                 parent=cgi.escape(machine_info['cloneof'] or '')).encode('utf-8')
 
 
+class SoftwareListHandler(QueryPageHandler):
+    def __init__(self, app, application_uri, environ, start_response, **kwargs):
+        super(SoftwareListHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+
+    def __iter__(self):
+        self.filename = self.environ['PATH_INFO']
+        if self.filename and (self.filename[0] == '/'):
+            self.filename = self.filename[1:]
+        if (not self.filename) or ('*' in self.filename) or ('?' in self.filename):
+            if self.environ['REQUEST_METHOD'] != 'GET':
+                self.start_response('405 %s' % (self.STATUS_MESSAGE[405], ), [('Content-type', 'text/html; charset=utf-8'), ('Accept', 'GET, HEAD, OPTIONS'), ('Cache-Control', 'public, max-age=3600')])
+                return self.error_page(405)
+            else:
+                self.start_response('200 OK', [('Content-type', 'text/html; chearset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
+                return self.softwarelist_listing_page(self.filename if self.filename else None)
+
+    def softwarelist_listing_page(self, pattern):
+        if not pattern:
+            title = heading = 'All Software Lists'
+        else:
+            title = heading = 'Software Lists: ' + cgi.escape(pattern)
+        yield htmltmpl.SOFTWARELIST_LIST_PROLOGUE.substitute(
+                assets=cgi.escape(urlparse.urljoin(self.application_uri, 'static'), True),
+                title=title,
+                heading=heading).encode('utf-8')
+        for shortname, description, total, supported, partiallysupported, unsupported in self.dbcurs.get_softwarelists(pattern):
+            yield htmltmpl.SOFTWARELIST_LIST_ROW.substitute(
+                    href=self.softwarelist_href(shortname),
+                    shortname=cgi.escape(shortname),
+                    description=cgi.escape(description),
+                    total=cgi.escape('%d' % total),
+                    supported=cgi.escape('%d' % supported),
+                    partiallysupported=cgi.escape('%d' % partiallysupported),
+                    unsupported=cgi.escape('%d' % unsupported)).encode('utf-8')
+        yield '    </tbody>\n</table>\n<script>make_table_sortable(document.getElementById("tbl-softwarelists"));</script>\n</body>\n</html>\n'.encode('utf-8')
+
+
 class RomIdentHandler(QueryPageHandler):
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
         super(QueryPageHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
@@ -598,6 +638,8 @@ class MiniMawsApp(object):
             return MachineHandler(self, application_uri, environ, start_response)
         elif module == 'sourcefile':
             return SourceFileHandler(self, application_uri, environ, start_response)
+        elif module == 'softwarelist':
+            return SoftwareListHandler(self, application_uri, environ, start_response)
         elif module == 'romident':
             return RomIdentHandler(self, application_uri, environ, start_response)
         elif module == 'static':

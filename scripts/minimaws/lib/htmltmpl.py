@@ -164,6 +164,45 @@ SOURCEFILE_LIST_ROW = string.Template(
         '            <td style="text-align: right">${machines}</td>\n' \
         '        </tr>\n')
 
+
+SOFTWARELIST_LIST_PROLOGUE = string.Template(
+        '<!DOCTYPE html>\n' \
+        '<html>\n' \
+        '<head>\n' \
+        '    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">\n' \
+        '    <meta http-equiv="Content-Style-Type" content="text/css">\n' \
+        '    <meta http-equiv="Content-Script-Type" content="text/javascript">\n' \
+        '    <link rel="stylesheet" type="text/css" href="${assets}/style.css">\n' \
+        '    <script type="text/javascript">var assetsurl="${assets}"</script>\n' \
+        '    <script type="text/javascript" src="${assets}/common.js"></script>\n' \
+        '    <title>${title}</title>\n' \
+        '</head>\n' \
+        '<body>\n' \
+        '<h1>${heading}</h1>\n' \
+        '<table id="tbl-softwarelists">\n' \
+        '    <thead>\n' \
+        '        <tr>\n' \
+        '            <th>Short name</th>\n' \
+        '            <th>Description</th>\n' \
+        '            <th class="numeric">Total</th>\n' \
+        '            <th class="numeric">Supported</th>\n' \
+        '            <th class="numeric">Partially supported</th>\n' \
+        '            <th class="numeric">Unsupported</th>\n' \
+        '        </tr>\n' \
+        '    </thead>\n' \
+        '    <tbody>\n')
+
+SOFTWARELIST_LIST_ROW = string.Template(
+        '        <tr>\n' \
+        '            <td><a href="${href}">${shortname}</a></td>\n' \
+        '            <td><a href="${href}">${description}</a></td>\n' \
+        '            <td style="text-align: right">${total}</td>\n' \
+        '            <td style="text-align: right">${supported}</td>\n' \
+        '            <td style="text-align: right">${partiallysupported}</td>\n' \
+        '            <td style="text-align: right">${unsupported}</td>\n' \
+        '        </tr>\n')
+
+
 ROMIDENT_PAGE = string.Template(
         '<!DOCTYPE html>\n' \
         '<html>\n' \
