@@ -31124,7 +31124,8 @@ ablpinb
 mc_dgear
 dgun2500
 dgun2561
-lexcyber
+lxcmcy
+lxcmcysw
 cybar120
 mc_dg101
 mc_aa2
@@ -39309,6 +39310,9 @@ uts20                           //
 
 @source:unkhorse.cpp
 unkhorse                        //
+
+@source:unkmandd.cpp
+unkmandd
 
 @source:unkpoker.cpp
 unkpoker                         //
