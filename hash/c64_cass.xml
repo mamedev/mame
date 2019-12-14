@@ -920,7 +920,7 @@
 	</software>
 
 	<software name="bmxracers">
-		<description>BMX Racers</description>
+		<description>BMX Racers (set 1, Mastertronic Burner loader)</description>
 		<year>1984</year>
 		<publisher>Mastertronic</publisher>
 
@@ -932,7 +932,7 @@
 	</software>
 
 	<software name="bmxracersa" cloneof="bmxracers">
-		<description>BMX Racers (alt)</description>
+		<description>BMX Racers (set 2, Burner loader)</description>
 		<year>1984</year>
 		<publisher>Mastertronic</publisher>
 
@@ -944,13 +944,24 @@
 	</software>
 
 	<software name="bmxracersa2" cloneof="bmxracers">
-		<description>BMX Racers (alt2)</description>
+		<description>BMX Racers (set 3)</description>
 		<year>1984</year>
 		<publisher>Mastertronic</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="892713">
 				<rom name="BMX_Racers_a2.tap" size="892713" crc="2226578c" sha1="d24e9266961eca704769543e3511c7df60301272"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bmxracersa3" cloneof="bmxracers">
+		<description>BMX Racers (set 4, Visiload T1 loader)</description>
+		<year>1984</year>
+		<publisher>Mastertronic</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="478027">
+				<rom name="bmx racers.tap" size="478027" crc="44efcf46" sha1="b813aae24a6abfe77afb1d4c151d1a5f36dac06f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3002,6 +3013,17 @@
 		</part>
 	</software>
 
+	<software name="hotgt">
+		<description>Hero of the Golden Talisman</description>
+		<year>1985</year>
+		<publisher>Mastertronic Added Dimension</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="737275">
+				<rom name="hero of the golden talisman.tap" size="737275" crc="188a8887" sha1="f8f57df8de811bb8bcf6fe9eeb93688da86c947d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hexpert">
 		<description>Hexpert</description>
 		<year>1983</year>
@@ -4319,6 +4341,17 @@
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="1096384">
 				<rom name="Olympic_Skier.tap" size="1096384" crc="88f3f83b" sha1="873180f63408f6d60b10b7e25103365c5f427b85"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="octennis">
+		<description>On Court Tennis</description>
+		<year>1984</year>
+		<publisher>Firebird Silver</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="517364">
+				<rom name="on court tennis.tap" size="517364" crc="b2351874" sha1="b055f200043ac0fee774976f8de495134f731de7"/>
 			</dataarea>
 		</part>
 	</software>
