@@ -28,7 +28,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(ARM_IOMD, arm_iomd_device, "arm_iomd", "ARM IOMD controller")
 // TODO: ssfindo.cpp actually uses a Cirrus Logic 7500FE, is it rebadged?
-DEFINE_DEVICE_TYPE(ARM7500FE_IOMD, arm7500fe_iomd_device, "arm_7500FE_SoC", "ARM 7500FE SoC")
+DEFINE_DEVICE_TYPE(ARM7500FE_IOMD, arm7500fe_iomd_device, "arm_7500fe_soc", "ARM 7500FE SoC")
 
 
 //**************************************************************************
