@@ -84,7 +84,9 @@ public:
 		m_spot_lamps(*this, "spot_lamp%u", 0U),
 		m_misc_lamps(*this, "misc_lamp%u", 0U),
 		m_ufo_lamps(*this, "ufo_lamp%u", 0U),
-		m_ufo_mouth(*this, "ufo_mouth")
+		m_ufo_sol(*this, "ufo_sol"),
+		m_en_sol(*this, "en_sol%u", 0U),
+		m_cg_sol(*this, "cg_sol%u", 0U)
 	{ }
 
 	// machine drivers
@@ -108,9 +110,11 @@ private:
 	required_ioport_array<4> m_dipsw;
 	output_finder<2> m_gun_lamps;
 	output_finder<8> m_spot_lamps;
-	output_finder<2> m_misc_lamps;
+	output_finder<2+3+1+2+3> m_misc_lamps;
 	output_finder<8> m_ufo_lamps;
-	output_finder<> m_ufo_mouth;
+	output_finder<> m_ufo_sol;
+	output_finder<5> m_en_sol;
+	output_finder<5> m_cg_sol;
 
 	// address maps
 	void main_map(address_map &map);
@@ -124,10 +128,16 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(gate_motor_tick);
 	template<int N> DECLARE_WRITE_LINE_MEMBER(motor_clock_w);
 
+	DECLARE_READ8_MEMBER(ppi1_b_r);
 	DECLARE_READ8_MEMBER(ppi1_c_r);
 	DECLARE_READ8_MEMBER(ppi2_a_r);
+	DECLARE_READ8_MEMBER(ppi2_b_r);
 	DECLARE_WRITE8_MEMBER(ppi2_c_w);
+	DECLARE_WRITE8_MEMBER(ppi3_a_w);
+	DECLARE_WRITE8_MEMBER(ppi3_b_w);
 	DECLARE_WRITE8_MEMBER(ppi3_c_w);
+	DECLARE_WRITE8_MEMBER(ppi4_a_w);
+	DECLARE_WRITE8_MEMBER(ppi4_b_w);
 	DECLARE_WRITE8_MEMBER(ppi4_c_w);
 
 	template<int N> DECLARE_WRITE8_MEMBER(adpcm_w);
@@ -137,28 +147,41 @@ private:
 	DECLARE_WRITE8_MEMBER(ppi5_b_w);
 	DECLARE_READ8_MEMBER(ppi5_c_r);
 
+	int m_watchdog_clk = 0;
 	int m_main_irq = 0;
 	int m_main_firq = 0;
 	u8 m_gate_motor_on = 0;
 	int m_gate_motor_pos = 0;
-	int m_watchdog_clk = 0;
+	u8 m_cg_motor_on = 0;
+	u8 m_cg_motor_dir = 0;
+
+	int m_cg_motor_clk[5];
 };
 
 void cgang_state::machine_start()
 {
+	for (int i = 0; i < 5; i++)
+	{
+		m_cg_motor_clk[i] = 0;
+	}
+
 	// resolve outputs
 	m_gun_lamps.resolve();
 	m_spot_lamps.resolve();
 	m_misc_lamps.resolve();
 	m_ufo_lamps.resolve();
-	m_ufo_mouth.resolve();
+	m_ufo_sol.resolve();
+	m_en_sol.resolve();
+	m_cg_sol.resolve();
 
 	// register for savestates
+	save_item(NAME(m_watchdog_clk));
 	save_item(NAME(m_main_irq));
 	save_item(NAME(m_main_firq));
 	save_item(NAME(m_gate_motor_on));
 	save_item(NAME(m_gate_motor_pos));
-	save_item(NAME(m_watchdog_clk));
+	save_item(NAME(m_cg_motor_on));
+	save_item(NAME(m_cg_motor_dir));
 }
 
 
@@ -198,14 +221,32 @@ TIMER_DEVICE_CALLBACK_MEMBER(cgang_state::gate_motor_tick)
 template<int N>
 WRITE_LINE_MEMBER(cgang_state::motor_clock_w)
 {
+	// clock stepper motor
+	if (state && !m_cg_motor_clk[N])
+	{
+		;
+	}
+
+	m_cg_motor_clk[N] = state;
+}
+
+READ8_MEMBER(cgang_state::ppi1_b_r)
+{
+	u8 data = 0;
+
+	//data |= 0xff;
+
+	return data;
 }
 
 READ8_MEMBER(cgang_state::ppi1_c_r)
 {
 	u8 data = 0;
 
-	// PC7: CALL-CPU1
+	// PC7: audiocpu mailbox status
 	data |= m_latch[1]->pending_r() ? 0 : 0x80;
+
+	//data |= 0x7f;
 
 	return data;
 }
@@ -229,6 +270,17 @@ READ8_MEMBER(cgang_state::ppi2_a_r)
 	else if (m_gate_motor_pos == GATE_MOTOR_LIMIT)
 		data ^= 0x40;
 
+	//data |= 0x1e;
+
+	return data;
+}
+
+READ8_MEMBER(cgang_state::ppi2_b_r)
+{
+	u8 data = 0;
+
+	//data |= 0xff;
+
 	return data;
 }
 
@@ -245,6 +297,28 @@ WRITE8_MEMBER(cgang_state::ppi2_c_w)
 	m_misc_lamps[1] = BIT(data, 3);
 }
 
+WRITE8_MEMBER(cgang_state::ppi3_a_w)
+{
+	// PA0-PA4: cosmogang motor direction
+	m_cg_motor_dir = data & 0x1f;
+
+	// PA5,PA6: ufo left/right lamps
+	for (int i = 0; i < 2; i++)
+		m_misc_lamps[i + 6] = BIT(data, i + 5);
+}
+
+WRITE8_MEMBER(cgang_state::ppi3_b_w)
+{
+	// PA0-PA4: cosmogang motor power
+	m_cg_motor_on = data & 0x1f;
+
+	// PB5: game over(winning) lamp
+	// PB6: 1P lamp
+	// PB7: 2P lamp
+	for (int i = 0; i < 3; i++)
+		m_misc_lamps[i + 8] = BIT(data, i + 5);
+}
+
 WRITE8_MEMBER(cgang_state::ppi3_c_w)
 {
 	// PC0-PC3: 7448
@@ -253,6 +327,31 @@ WRITE8_MEMBER(cgang_state::ppi3_c_w)
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 	m_digits->matrix((1 << (data >> 4 & 0xf)) & 0x3ff, ls48_map[data & 0xf]);
+}
+
+WRITE8_MEMBER(cgang_state::ppi4_a_w)
+{
+	// PA2-PA4: round leds
+	for (int i = 0; i < 3; i++)
+		m_misc_lamps[i + 2] = BIT(data, i + 2);
+
+	// PA5-PA7: energy container solenoids (1-3)
+	for (int i = 0; i < 3; i++)
+		m_en_sol[i] = BIT(data, i + 5);
+}
+
+WRITE8_MEMBER(cgang_state::ppi4_b_w)
+{
+	// PB0,PB1: energy container solenoids (4-5)
+	for (int i = 0; i < 2; i++)
+		m_en_sol[i + 3] = BIT(data, i);
+
+	// PB2-PB6: cosmogang solenoids
+	for (int i = 0; i < 2; i++)
+		m_cg_sol[i] = BIT(data, i + 2);
+
+	// PB7: target lamp
+	m_misc_lamps[5] = BIT(data, 7);
 }
 
 WRITE8_MEMBER(cgang_state::ppi4_c_w)
@@ -309,7 +408,7 @@ WRITE8_MEMBER(cgang_state::ppi5_a_w)
 	m_adpcm[1]->set_output_gain(ALL_OUTPUTS, mute ? 0.0 : (BIT(data, 3) ? 0.25 : 1.0));
 
 	// PA7: ufo boss mouth solenoid
-	m_ufo_mouth = BIT(data, 7);
+	m_ufo_sol = BIT(data, 7);
 }
 
 WRITE8_MEMBER(cgang_state::ppi5_b_w)
@@ -327,7 +426,7 @@ READ8_MEMBER(cgang_state::ppi5_c_r)
 	data |= m_adpcm[0]->busy_r() ? 1 : 0;
 	data |= m_adpcm[1]->busy_r() ? 2 : 0;
 
-	// PC2: CALL-CPU2
+	// PC2: maincpu mailbox status
 	data |= m_latch[0]->pending_r() ? 0 : 4;
 
 	// PC5-PC7: SW1
@@ -498,19 +597,23 @@ void cgang_state::cgang(machine_config &config)
 
 	I8255(config, m_ppi[0]); // 0x9b: all = input
 	m_ppi[0]->in_pa_callback().set_ioport("IN1");
-	m_ppi[0]->in_pb_callback().set_constant(0);
+	m_ppi[0]->in_pb_callback().set(FUNC(cgang_state::ppi1_b_r));
 	m_ppi[0]->in_pc_callback().set(FUNC(cgang_state::ppi1_c_r));
 
 	I8255(config, m_ppi[1]); // 0x9a: A & B = input, Clow = output, Chigh = input
 	m_ppi[1]->in_pa_callback().set(FUNC(cgang_state::ppi2_a_r));
-	m_ppi[1]->in_pb_callback().set_constant(0);
+	m_ppi[1]->in_pb_callback().set(FUNC(cgang_state::ppi2_b_r));
 	m_ppi[1]->in_pc_callback().set_ioport("SW4").lshift(4);
 	m_ppi[1]->out_pc_callback().set(FUNC(cgang_state::ppi2_c_w));
 
 	I8255(config, m_ppi[2]); // 0x80: all = output
+	m_ppi[2]->out_pa_callback().set(FUNC(cgang_state::ppi3_a_w));
+	m_ppi[2]->out_pb_callback().set(FUNC(cgang_state::ppi3_b_w));
 	m_ppi[2]->out_pc_callback().set(FUNC(cgang_state::ppi3_c_w));
 
 	I8255(config, m_ppi[3]); // 0x80: all = output
+	m_ppi[3]->out_pa_callback().set(FUNC(cgang_state::ppi4_a_w));
+	m_ppi[3]->out_pb_callback().set(FUNC(cgang_state::ppi4_b_w));
 	m_ppi[3]->out_pc_callback().set(FUNC(cgang_state::ppi4_c_w));
 
 	I8255(config, m_ppi[4]); // 0x89: A & B = output, C = input
