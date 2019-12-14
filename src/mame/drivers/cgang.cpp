@@ -36,6 +36,7 @@ Cabinet:
 - 2 lightguns
 - UFO with leds above cabinet
 - 7segs for scorekeeping
+- 2 speakers (but final mix is mono!)
 - ticket dispenser
 
 ******************************************************************************/
@@ -48,6 +49,7 @@ Cabinet:
 #include "machine/ripple_counter.h"
 #include "sound/upd7759.h"
 #include "sound/ym2151.h"
+#include "video/pwm.h"
 #include "speaker.h"
 
 
@@ -65,8 +67,11 @@ public:
 		m_ppi(*this, "ppi%u", 0),
 		m_adpcm(*this, "adpcm%u", 0),
 		m_ymsnd(*this, "ymsnd"),
+		m_digits(*this, "digits"),
 		m_dipsw(*this, "SW%u", 1),
-		m_out_digit(*this, "digit%u", 0U)
+		m_spot_lamps(*this, "spot_lamp%u", 0U),
+		m_ufo_lamps(*this, "ufo_lamp%u", 0U),
+		m_ufo_mouth(*this, "ufo_mouth")
 	{ }
 
 	// machine drivers
@@ -84,8 +89,11 @@ private:
 	required_device_array<i8255_device, 5> m_ppi;
 	required_device_array<upd7759_device, 2> m_adpcm;
 	required_device<ym2151_device> m_ymsnd;
+	required_device<pwm_display_device> m_digits;
 	required_ioport_array<4> m_dipsw;
-	output_finder<10> m_out_digit;
+	output_finder<8> m_spot_lamps;
+	output_finder<8> m_ufo_lamps;
+	output_finder<> m_ufo_mouth;
 
 	// address maps
 	void main_map(address_map &map);
@@ -106,6 +114,7 @@ private:
 	DECLARE_WRITE8_MEMBER(spot_w);
 
 	DECLARE_WRITE8_MEMBER(ppi5_a_w);
+	DECLARE_WRITE8_MEMBER(ppi5_b_w);
 	DECLARE_READ8_MEMBER(ppi5_c_r);
 
 	int m_main_irq = 0;
@@ -114,7 +123,10 @@ private:
 
 void cgang_state::machine_start()
 {
-	m_out_digit.resolve();
+	// resolve outputs
+	m_spot_lamps.resolve();
+	m_ufo_lamps.resolve();
+	m_ufo_mouth.resolve();
 
 	// register for savestates
 	save_item(NAME(m_main_irq));
@@ -164,12 +176,13 @@ READ8_MEMBER(cgang_state::ppi1_c_r)
 
 WRITE8_MEMBER(cgang_state::ppi2_c_w)
 {
-	// PC0: COUNTER
-	// PC1: LOCK-SOL
+	// PC0: coincounter
+	// PC1: coinlock solenoid
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 1));
 
-	// PC2,PC3: start lamps
+	// PC2: start button lamp (normal)
+	// PC3: start button lamp (pro)
 }
 
 WRITE8_MEMBER(cgang_state::ppi3_c_w)
@@ -178,10 +191,8 @@ WRITE8_MEMBER(cgang_state::ppi3_c_w)
 	// PC4-PC7: 7445
 	static const u8 ls48_map[0x10] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
-	u8 sel = data >> 4;
 
-	if (sel < 10)
-		m_out_digit[sel] = ls48_map[data & 0xf];
+	m_digits->matrix((1 << (data >> 4 & 0xf)) & 0x3ff, ls48_map[data & 0xf]);
 }
 
 
@@ -199,6 +210,10 @@ WRITE8_MEMBER(cgang_state::adpcm_w)
 
 WRITE8_MEMBER(cgang_state::spot_w)
 {
+	// d0-d2: ufo boss spotlights
+	// d3-d7: cosmo spotlights
+	for (int i = 0; i < 8; i++)
+		m_spot_lamps[i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(cgang_state::ppi5_a_w)
@@ -206,6 +221,24 @@ WRITE8_MEMBER(cgang_state::ppi5_a_w)
 	// PA0,PA1: ADPCM reset
 	m_adpcm[0]->reset_w(BIT(data, 0));
 	m_adpcm[1]->reset_w(BIT(data, 1));
+
+	// PA2: music volume
+	// PA3: voice volume
+	// PA4: mute
+	bool mute = BIT(~data, 4);
+	m_ymsnd->set_output_gain(ALL_OUTPUTS, mute ? 0.0 : (BIT(data, 2) ? 0.25 : 1.0));
+	m_adpcm[0]->set_output_gain(ALL_OUTPUTS, mute ? 0.0 : (BIT(data, 3) ? 0.25 : 1.0));
+	m_adpcm[1]->set_output_gain(ALL_OUTPUTS, mute ? 0.0 : (BIT(data, 3) ? 0.25 : 1.0));
+
+	// PA7: ufo mouth solenoid
+	m_ufo_mouth = BIT(data, 7);
+}
+
+WRITE8_MEMBER(cgang_state::ppi5_b_w)
+{
+	// PB0-PB7: ufo lamps
+	for (int i = 0; i < 8; i++)
+		m_ufo_lamps[i] = BIT(data, i);
 }
 
 READ8_MEMBER(cgang_state::ppi5_c_r)
@@ -390,7 +423,14 @@ void cgang_state::cgang(machine_config &config)
 
 	I8255(config, m_ppi[4]); // 0x89: A & B = output, C = input
 	m_ppi[4]->out_pa_callback().set(FUNC(cgang_state::ppi5_a_w));
+	m_ppi[4]->out_pb_callback().set(FUNC(cgang_state::ppi5_b_w));
 	m_ppi[4]->in_pc_callback().set(FUNC(cgang_state::ppi5_c_r));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_digits).set_size(10, 7);
+	m_digits->set_segmask(0x3ff, 0x7f);
+
+	//config.set_default_layout(layout_cgang);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -399,9 +439,9 @@ void cgang_state::cgang(machine_config &config)
 	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	UPD7759(config, m_adpcm[0], 640_kHz_XTAL);
-	m_adpcm[0]->add_route(ALL_OUTPUTS, "mono", 0.60);
+	m_adpcm[0]->add_route(ALL_OUTPUTS, "mono", 0.65);
 	UPD7759(config, m_adpcm[1], 640_kHz_XTAL);
-	m_adpcm[1]->add_route(ALL_OUTPUTS, "mono", 0.60);
+	m_adpcm[1]->add_route(ALL_OUTPUTS, "mono", 0.65);
 }
 
 
