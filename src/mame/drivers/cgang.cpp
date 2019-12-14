@@ -17,13 +17,14 @@ TODO:
 Hardware notes:
 
 Main CPU side:
-- HD6809P @ 4MHz
+- Hitachi HD6809P @ 4MHz
+- Hitachi HA1835P watchdog timer
 - 32KB ROM(27C256), 8KB RAM(HM6264AP-10)
 - 4*M5L8255AP-5 PPI, 2*M5L8253P-5 PIT
 - 5*MB8713 motor drivers
 
 Audio CPU side:
-- HD68B09EP @ 2MHz (8MHz XTAL)
+- Hitachi HD68B09EP @ 2MHz (8MHz XTAL)
 - 32KB ROM(27C256), 16KB RAM(2*HM6264AP-10, some pins N/C)
 - M5L8255AP-5 PPI
 - Namco CUS121 sound interface, same chip used in Namco System 1
@@ -42,18 +43,26 @@ Cabinet:
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/ripple_counter.h"
+#include "machine/timer.h"
+#include "machine/watchdog.h"
 #include "sound/upd7759.h"
 #include "sound/ym2151.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 
 namespace {
+
+// length of the gate/door in msec (time it takes to open or close)
+static constexpr int GATE_MOTOR_LIMIT = 2500;
+
 
 class cgang_state : public driver_device
 {
@@ -62,6 +71,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_watchdog(*this, "watchdog"),
 		m_latch(*this, "latch%u", 0),
 		m_pit(*this, "pit%u", 0),
 		m_ppi(*this, "ppi%u", 0),
@@ -72,6 +82,7 @@ public:
 		m_dipsw(*this, "SW%u", 1),
 		m_gun_lamps(*this, "gun_lamp%u", 0U),
 		m_spot_lamps(*this, "spot_lamp%u", 0U),
+		m_misc_lamps(*this, "misc_lamp%u", 0U),
 		m_ufo_lamps(*this, "ufo_lamp%u", 0U),
 		m_ufo_mouth(*this, "ufo_mouth")
 	{ }
@@ -86,6 +97,7 @@ private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device_array<generic_latch_8_device, 2> m_latch;
 	required_device_array<pit8253_device, 2> m_pit;
 	required_device_array<i8255_device, 5> m_ppi;
@@ -94,8 +106,9 @@ private:
 	required_device<pwm_display_device> m_digits;
 	required_ioport_array<3> m_inputs;
 	required_ioport_array<4> m_dipsw;
-	output_finder<8> m_gun_lamps;
+	output_finder<2> m_gun_lamps;
 	output_finder<8> m_spot_lamps;
+	output_finder<2> m_misc_lamps;
 	output_finder<8> m_ufo_lamps;
 	output_finder<> m_ufo_mouth;
 
@@ -108,6 +121,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(main_firq_w);
 	DECLARE_WRITE8_MEMBER(main_irq_clear_w) { m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); }
 	DECLARE_WRITE8_MEMBER(main_firq_clear_w) { m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE); }
+	TIMER_DEVICE_CALLBACK_MEMBER(gate_motor_tick);
 	template<int N> DECLARE_WRITE_LINE_MEMBER(motor_clock_w);
 
 	DECLARE_READ8_MEMBER(ppi1_c_r);
@@ -125,6 +139,9 @@ private:
 
 	int m_main_irq = 0;
 	int m_main_firq = 0;
+	u8 m_gate_motor_on = 0;
+	int m_gate_motor_pos = 0;
+	int m_watchdog_clk = 0;
 };
 
 void cgang_state::machine_start()
@@ -132,12 +149,16 @@ void cgang_state::machine_start()
 	// resolve outputs
 	m_gun_lamps.resolve();
 	m_spot_lamps.resolve();
+	m_misc_lamps.resolve();
 	m_ufo_lamps.resolve();
 	m_ufo_mouth.resolve();
 
 	// register for savestates
 	save_item(NAME(m_main_irq));
 	save_item(NAME(m_main_firq));
+	save_item(NAME(m_gate_motor_on));
+	save_item(NAME(m_gate_motor_pos));
+	save_item(NAME(m_watchdog_clk));
 }
 
 
@@ -166,6 +187,14 @@ WRITE_LINE_MEMBER(cgang_state::main_firq_w)
 	m_main_firq = state;
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(cgang_state::gate_motor_tick)
+{
+	if (m_gate_motor_on & 2 && m_gate_motor_pos < GATE_MOTOR_LIMIT)
+		m_gate_motor_pos++;
+	else if (m_gate_motor_on & 1 && m_gate_motor_pos > 0)
+		m_gate_motor_pos--;
+}
+
 template<int N>
 WRITE_LINE_MEMBER(cgang_state::motor_clock_w)
 {
@@ -192,6 +221,14 @@ READ8_MEMBER(cgang_state::ppi2_a_r)
 		data |= m_inputs[i + 1]->read() & mask;
 	}
 
+	// PA5: gate down limit switch
+	// PA6: gate up limit switch
+	data |= 0x60;
+	if (m_gate_motor_pos == 0)
+		data ^= 0x20;
+	else if (m_gate_motor_pos == GATE_MOTOR_LIMIT)
+		data ^= 0x40;
+
 	return data;
 }
 
@@ -204,6 +241,8 @@ WRITE8_MEMBER(cgang_state::ppi2_c_w)
 
 	// PC2: start button lamp (normal)
 	// PC3: start button lamp (pro)
+	m_misc_lamps[0] = BIT(data, 2);
+	m_misc_lamps[1] = BIT(data, 3);
 }
 
 WRITE8_MEMBER(cgang_state::ppi3_c_w)
@@ -221,6 +260,17 @@ WRITE8_MEMBER(cgang_state::ppi4_c_w)
 	// PC0,PC1: gun xenon lamps
 	for (int i = 0; i < 2; i++)
 		m_gun_lamps[i] = BIT(~data, i);
+
+	// PC5: gate motor reverse
+	// PC6: gate motor
+	m_gate_motor_on = data >> 5 & 3;
+
+	// PC7: watchdog P-RUN
+	int wd = BIT(data, 7);
+	if (wd && !m_watchdog_clk)
+		m_watchdog->reset_w();
+
+	m_watchdog_clk = wd;
 }
 
 
@@ -467,6 +517,11 @@ void cgang_state::cgang(machine_config &config)
 	m_ppi[4]->out_pa_callback().set(FUNC(cgang_state::ppi5_a_w));
 	m_ppi[4]->out_pb_callback().set(FUNC(cgang_state::ppi5_b_w));
 	m_ppi[4]->in_pc_callback().set(FUNC(cgang_state::ppi5_c_r));
+
+	WATCHDOG_TIMER(config, m_watchdog); // HA1835P
+	m_watchdog->set_time(attotime::from_msec(100)); // approximation
+
+	TIMER(config, "gate_motor").configure_periodic(FUNC(cgang_state::gate_motor_tick), attotime::from_msec(1));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_digits).set_size(10, 7);
