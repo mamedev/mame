@@ -229,9 +229,7 @@ void cc1_state::cc1(machine_config &config)
 	I8255(config, m_ppi8255);
 	m_ppi8255->in_pa_callback().set(FUNC(cc1_state::ppi_porta_r));
 	m_ppi8255->out_pb_callback().set(FUNC(cc1_state::ppi_portb_w));
-	m_ppi8255->tri_pb_callback().set_constant(0);
 	m_ppi8255->out_pc_callback().set(FUNC(cc1_state::ppi_portc_w));
-	m_ppi8255->tri_pc_callback().set_constant(0);
 
 	TIMER(config, "delay").configure_generic(nullptr);
 
