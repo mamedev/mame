@@ -716,15 +716,15 @@ class QueryCursor(object):
     def get_softwarelist_software(self, id, pattern):
         if pattern is not None:
             return self.dbcurs.execute(
-                    'SELECT software.shortname AS shortname, software.description AS description, software.year AS year, software.publisher AS publisher, software.supported AS supported, COUNT(*) AS parts ' \
-                    'FROM software JOIN softwarepart ON software.id = softwarepart.software ' \
+                    'SELECT software.shortname AS shortname, software.description AS description, software.year AS year, software.publisher AS publisher, software.supported AS supported, COUNT(DISTINCT softwarepart.id) AS parts, COUNT(softwareromdump.rom) + COUNT(softwarediskdump.disk) AS baddumps ' \
+                    'FROM software JOIN softwarepart ON software.id = softwarepart.software LEFT JOIN softwareromdump ON softwarepart.id = softwareromdump.part AND softwareromdump.bad = 1 LEFT JOIN softwarediskdump ON softwarepart.id = softwarediskdump.part AND softwarediskdump.bad = 1 ' \
                     'WHERE software.softwarelist = ? AND software.shortname GLOB ? ' \
                     'GROUP BY software.id',
                     (id, pattern))
         else:
             return self.dbcurs.execute(
-                    'SELECT software.shortname AS shortname, software.description AS description, software.year AS year, software.publisher AS publisher, software.supported AS supported, COUNT(*) AS parts ' \
-                    'FROM software JOIN softwarepart ON software.id = softwarepart.software ' \
+                    'SELECT software.shortname AS shortname, software.description AS description, software.year AS year, software.publisher AS publisher, software.supported AS supported, COUNT(DISTINCT softwarepart.id) AS parts, COUNT(softwareromdump.rom) + COUNT(softwarediskdump.disk) AS baddumps ' \
+                    'FROM software JOIN softwarepart ON software.id = softwarepart.software LEFT JOIN softwareromdump ON softwarepart.id = softwareromdump.part AND softwareromdump.bad = 1 LEFT JOIN softwarediskdump ON softwarepart.id = softwarediskdump.part AND softwarediskdump.bad = 1 ' \
                     'WHERE software.softwarelist = ? ' \
                     'GROUP BY software.id',
                     (id, ))

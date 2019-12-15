@@ -241,6 +241,7 @@ SOFTWARELIST_ROW = string.Template(
         '            <td>${publisher}</td>\n' \
         '            <td>${supported}</td>\n' \
         '            <td style="text-align: right">${parts}</td>\n' \
+        '            <td style="text-align: right">${baddumps}</td>\n' \
         '        </tr>\n')
 
 

@@ -60,8 +60,6 @@ private:
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<ps2_keyboard_controller_device> m_kbdc;
 
-	uint8_t m_i2c_clk;
-
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 

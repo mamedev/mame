@@ -5,6 +5,8 @@ var matched_names = new Array();
 var unmatched_names = new Array();
 var dump_info = Object.create(null);
 var machine_info = Object.create(null);
+var softwarelist_info = Object.create(null);
+var software_info = Object.create(null);
 var crc_table = new Uint32Array(256);
 
 for (var i = 0; i < 256; i++)
@@ -97,6 +99,34 @@ function add_matches(table, names, matches)
 }
 
 
+function add_software_matches(table, names, part, matches)
+{
+	for (var i = 0; i < names.length; i++)
+	{
+		var row = table.appendChild(document.createElement('tr'));
+		var name = row.appendChild(document.createElement('th'));
+		name.textContent = names[i];
+		if (matches !== null)
+		{
+			name.setAttribute('rowspan', matches.length);
+			row.appendChild(document.createElement('td')).textContent = part;
+			row.appendChild(document.createElement('td')).textContent = matches[0].name;
+			var bad = row.appendChild(document.createElement('td'));
+			if (matches[0].bad)
+				bad.textContent = 'BAD';
+			for (var j = 1; j < matches.length; j++)
+			{
+				row = table.appendChild(document.createElement('tr'));
+				row.appendChild(document.createElement('td')).textContent = matches[j].name;
+				bad = row.appendChild(document.createElement('td'));
+				if (matches[j].bad)
+					bad.textContent = 'BAD';
+			}
+		}
+	}
+}
+
+
 function add_unmatched(names, crc, sha1)
 {
 	var table;
@@ -159,6 +189,53 @@ function get_machine_table(shortname, description)
 }
 
 
+function get_softwarelist_div(shortname, description)
+{
+	if (Object.hasOwnProperty.call(softwarelist_info, shortname))
+	{
+		return softwarelist_info[shortname];
+	}
+	else
+	{
+		software_info[shortname] = Object.create(null)
+		var div = document.getElementById('div-software');
+		if (!div.hasChildNodes())
+		{
+			var heading = div.appendChild(document.createElement('h2'));
+			heading.textContent = 'Software';
+		}
+		div = div.appendChild(document.createElement('div'));
+		var heading = div.appendChild(document.createElement('h3'));
+		var link = heading.appendChild(document.createElement('a'));
+		link.textContent = description;
+		link.setAttribute('href', appurl + 'softwarelist/' + encodeURIComponent(shortname));
+		softwarelist_info[shortname] = div;
+		return div;
+	}
+}
+
+
+function get_software_table(softwarelist, shortname, description)
+{
+	if (Object.hasOwnProperty.call(software_info, softwarelist) && Object.hasOwnProperty.call(software_info[softwarelist], shortname))
+	{
+		return software_info[softwarelist][shortname];
+	}
+	else
+	{
+		var div = softwarelist_info[softwarelist];
+		var heading = div.appendChild(document.createElement('h4'));
+		var link = heading.appendChild(document.createElement('a'));
+		link.textContent = description;
+		link.setAttribute('href', appurl + 'softwarelist/' + encodeURIComponent(softwarelist) + '/' + encodeURIComponent(shortname));
+		var table = div.appendChild(document.createElement('table'));
+		software_info[softwarelist][shortname] = table;
+		add_software_matches(table, matched_names, null, null);
+		return table;
+	}
+}
+
+
 function request_dumps(name, group, crc, sha1, url, progress)
 {
 	var req = new XMLHttpRequest();
@@ -169,34 +246,123 @@ function request_dumps(name, group, crc, sha1, url, progress)
 				if (req.status == 200)
 				{
 					var machines = Object.create(null);
+					var software = Object.create(null);
 					var matched = Object.keys(req.response.machines);
+					var softwarelists = Object.keys(req.response.software);
+
 					if (matched.length > 0)
 					{
 						Object.keys(machine_info).forEach(
 								function (shortname)
 								{
-									var table = machine_info[shortname];
+									var machine_table = machine_info[shortname];
 									if (Object.hasOwnProperty.call(req.response.machines, shortname))
 									{
 										machines[shortname] = req.response.machines[shortname].matches;
-										add_matches(table, group.names, req.response.machines[shortname].matches);
+										add_matches(machine_table, group.names, req.response.machines[shortname].matches);
 									}
 									else
 									{
-										add_matches(table, group.names, null);
+										add_matches(machine_table, group.names, null);
 									}
 								});
+						if (softwarelists.length <= 0)
+						{
+							Object.keys(software_info).forEach(
+									function (listname)
+									{
+										Object.keys(software_info[listname]).forEach(
+												function (softwarename)
+												{
+													var software_table = software_info[listname][softwarename];
+													add_software_matches(software_table, group.names, null, null);
+												});
+									});
+						}
 						matched.forEach(
 								function (shortname)
 								{
 									if (!Object.hasOwnProperty.call(machine_info, shortname))
 									{
-										var info = req.response.machines[shortname];
-										var table = get_machine_table(shortname, info.description);
+										var machine_details = req.response.machines[shortname];
+										var machine_table = get_machine_table(shortname, machine_details.description);
 										machines[shortname] = req.response.machines[shortname].matches;
-										add_matches(table, group.names, info.matches);
+										add_matches(machine_table, group.names, machine_details.matches);
 									}
 								});
+					}
+
+					if (softwarelists.length > 0)
+					{
+						if (matched.length <= 0)
+						{
+							Object.keys(machine_info).forEach(
+									function (shortname)
+									{
+										var machine_table = machine_info[shortname];
+										add_matches(machine_table, group.names, null);
+									});
+						}
+						Object.keys(software_info).forEach(
+								function (listname)
+								{
+									var haslist = Object.hasOwnProperty.call(req.response.software, listname);
+									Object.keys(software_info[listname]).forEach(
+											function (softwarename)
+											{
+												var software_table = software_info[listname][softwarename];
+												if (haslist && Object.hasOwnProperty.call(req.response.software[listname].software, softwarename))
+												{
+													if (!Object.hasOwnProperty.call(software, listname))
+														software[listname] = Object.create(null);
+													if (!Object.hasOwnProperty.call(software[listname], softwarename))
+														software[listname][softwarename] = Object.create(null);
+													var software_details = req.response.software[listname].software[softwarename];
+													Object.keys(software_details.parts).forEach(
+															function (partname)
+															{
+																var matches = software_details.parts[partname].matches;
+																software[listname][softwarename][partname] = matches;
+																add_software_matches(software_table, group.names, partname, matches);
+															});
+												}
+												else
+												{
+													add_software_matches(software_table, group.names, null, null);
+												}
+											});
+								});
+						softwarelists.forEach(
+								function (listname)
+								{
+									var haslist = Object.hasOwnProperty.call(software_info, listname);
+									var softwarelist_details = req.response.software[listname];
+									var softwarelist_div = get_softwarelist_div(listname, softwarelist_details.description);
+									Object.keys(softwarelist_details.software).forEach(
+											function (softwarename)
+											{
+												if (!haslist || !Object.hasOwnProperty.call(software_info[listname], softwarename))
+												{
+													if (!Object.hasOwnProperty.call(software, listname))
+														software[listname] = Object.create(null);
+													if (!Object.hasOwnProperty.call(software[listname], softwarename))
+														software[listname][softwarename] = Object.create(null);
+													var software_details = softwarelist_details.software[softwarename];
+													var software_table = get_software_table(listname, softwarename, software_details.description);
+													Object.keys(software_details.parts).forEach(
+															function (partname)
+															{
+																var matches = software_details.parts[partname].matches;
+																software[listname][softwarename][partname] = matches;
+																add_software_matches(software_table, group.names, partname, matches);
+															});
+												}
+											});
+								});
+					}
+
+					if ((matched.length > 0) | (softwarelists.length > 0))
+					{
 						for (var i = 0; i < group.names.length; i++)
 							matched_names.push(group.names[i]);
 					}
@@ -204,7 +370,9 @@ function request_dumps(name, group, crc, sha1, url, progress)
 					{
 						add_unmatched(group.names, crc, sha1);
 					}
+
 					group.machines = machines;
+					group.software = software;
 					progress.parentNode.removeChild(progress);
 				}
 				else
@@ -247,18 +415,43 @@ function add_name(group, name, crc, sha1)
 		if (group.hasOwnProperty('machines'))
 		{
 			var machines = group.machines;
+			var software = group.software;
 			var names = [ name ];
-			if (Object.keys(machines).length > 0)
+			if ((Object.keys(machines).length > 0) || (Object.keys(software).length > 0))
 			{
 				Object.keys(machine_info).forEach(
 						function (shortname)
 						{
-							var table = machine_info[shortname];
+							var machine_table = machine_info[shortname];
 							if (Object.hasOwnProperty.call(machines, shortname))
-								add_matches(table, names, machines[shortname]);
+								add_matches(machine_table, names, machines[shortname]);
 							else
-								add_matches(table, names, null);
+								add_matches(machine_table, names, null);
 						});
+
+				Object.keys(software_info).forEach(
+						function (listname)
+						{
+							var haslist = Object.hasOwnProperty.call(software, listname);
+							Object.keys(software_info[listname]).forEach(
+									function (softwarename)
+									{
+										var software_table = software_info[listname][softwarename];
+										if (haslist && Object.hasOwnProperty.call(software[listname], softwarename))
+										{
+											Object.keys(software[listname][softwarename]).forEach(
+													function (partname)
+													{
+														add_software_matches(software_table, names, partname, software[listname][softwarename][partname]);
+													});
+										}
+										else
+										{
+											add_software_matches(software_table, names, null, null);
+										}
+									});
+						});
+
 				matched_names.push(name);
 			}
 			else

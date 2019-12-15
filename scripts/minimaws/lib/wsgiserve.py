@@ -47,7 +47,7 @@ class HandlerBase(object):
         self.start_response = start_response
 
     def error_page(self, code):
-        yield htmltmpl.ERROR_PAGE.substitute(code=cgi.escape('%d' % code), message=cgi.escape(self.STATUS_MESSAGE[code])).encode('utf-8')
+        yield htmltmpl.ERROR_PAGE.substitute(code=cgi.escape('%d' % (code, )), message=cgi.escape(self.STATUS_MESSAGE[code])).encode('utf-8')
 
 
 class ErrorPageHandler(HandlerBase):
@@ -371,7 +371,7 @@ class SourceFileHandler(QueryPageHandler):
         for filename, machines in self.dbcurs.get_sourcefiles(pattern):
             yield htmltmpl.SOURCEFILE_LIST_ROW.substitute(
                     sourcefile=self.linked_title(filename, True),
-                    machines=cgi.escape('%d' % machines)).encode('utf-8')
+                    machines=cgi.escape('%d' % (machines, ))).encode('utf-8')
         yield '    </tbody>\n</table>\n<script>make_table_sortable(document.getElementById("tbl-sourcefiles"));</script>\n</body>\n</html>\n'.encode('utf-8')
 
     def sourcefile_page(self, id):
@@ -486,7 +486,7 @@ class SoftwareListHandler(QueryPageHandler):
                     href=self.softwarelist_href(shortname),
                     shortname=cgi.escape(shortname),
                     description=cgi.escape(description),
-                    total=cgi.escape('%d' % total),
+                    total=cgi.escape('%d' % (total, )),
                     supported=cgi.escape('%.1f%%' % (supported * 100.0 / (total or 1), )),
                     partiallysupported=cgi.escape('%.1f%%' % (partiallysupported * 100.0 / (total or 1), )),
                     unsupported=cgi.escape('%.1f%%' % (unsupported * 100.0 / (total or 1), ))).encode('utf-8')
@@ -525,6 +525,7 @@ class SoftwareListHandler(QueryPageHandler):
                         '            <th>Publisher</th>\n' \
                         '            <th>Supported</th>\n' \
                         '            <th class="numeric">Parts</th>\n' \
+                        '            <th class="numeric">Bad dumps</th>\n' \
                         '        </tr>\n' \
                         '    </thead>\n' \
                         '    <tbody>\n'.encode('utf-8')
@@ -573,7 +574,8 @@ class SoftwareListHandler(QueryPageHandler):
                 year=cgi.escape(software_info['year']),
                 publisher=cgi.escape(software_info['publisher']),
                 supported=cgi.escape('Yes' if software_info['supported'] == 0 else 'Partial' if software_info['supported'] == 1 else 'No'),
-                parts=cgi.escape('%d' % software_info['parts'])).encode('utf-8')
+                parts=cgi.escape('%d' % (software_info['parts'], )),
+                baddumps=cgi.escape('%d' % (software_info['baddumps'], ))).encode('utf-8')
 
 
 class RomIdentHandler(QueryPageHandler):
