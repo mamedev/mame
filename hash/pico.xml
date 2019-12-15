@@ -3183,7 +3183,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="">
+			<dataarea name="rom" size="520855">
 				<rom name="the muppets on the go prototype 19960313.bin" size="520855" crc="78c4ca77" sha1="1dee90992fc6bb3107320ae8b5c3049d6282cd28" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -3195,7 +3195,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK-49046"/>
 		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="">
+			<dataarea name="rom" size="522092">
 				<rom name="the muppets on the go prototype 19960322-1.bin" size="522092" crc="5ccc16bb" sha1="76aa37de7502e09c1aaeb94d2cae9877abd574fd" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -3207,7 +3207,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK-49046"/>
 		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="">
+			<dataarea name="rom" size="522092">
 				<rom name="the muppets on the go prototype 19960322-2.bin" size="522092" crc="46424c1e" sha1="026af855e55ce53c351798375d8c8cb38f756b6c" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -3231,7 +3231,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK-49046"/>
 		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="">
+			<dataarea name="rom" size="520292">
 				<rom name="the muppets on the go prototype 19960329.bin" size="520292" crc="f40d01d1" sha1="205adadb250a5d448b87f1826961bfd40b960d42" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -3243,7 +3243,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK-49046"/>
 		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="">
+			<dataarea name="rom" size="520340">
 				<rom name="the muppets on the go prototype 19960330-1.bin" size="520340" crc="bfc3bbf0" sha1="9454341cd62bc9366a9f798cdeed66baf809048c" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -3255,7 +3255,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK-49046"/>
 		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="">
+			<dataarea name="rom" size="520362">
 				<rom name="the muppets on the go prototype 19960330-2.bin" size="520362" crc="9abda6e4" sha1="cbf212d45b92dca2042b9c71231acfaae0992dbc" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
