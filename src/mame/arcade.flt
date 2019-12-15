@@ -207,8 +207,10 @@ cdi.cpp
 cedar_magnet.cpp
 centiped.cpp
 cesclass.cpp
+cgang.cpp
 chaknpop.cpp
 cham24.cpp
+chameleonrx1.cpp
 champbas.cpp
 champbwl.cpp
 chanbara.cpp
@@ -991,6 +993,7 @@ r2dtank.cpp
 r2dx_v33.cpp
 rabbit.cpp
 raiden.cpp
+raiden_ms.cpp
 raiden2.cpp
 rallyx.cpp
 rampart.cpp
@@ -1428,6 +1431,7 @@ zaxxon.cpp
 zerozone.cpp
 zn.cpp
 zodiack.cpp
+zpinball.cpp
 zr107.cpp
 zwackery.cpp
 //exceptions + to add - to remove from imported list

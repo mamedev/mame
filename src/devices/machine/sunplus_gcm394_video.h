@@ -45,24 +45,25 @@ public:
 	DECLARE_WRITE16_MEMBER(unk_vid2_gfxbase_lsb_w);
 	DECLARE_WRITE16_MEMBER(unk_vid2_gfxbase_msb_w);
 
-	DECLARE_WRITE16_MEMBER(unk_vid0_gfxbase_lsb_w);
-	DECLARE_WRITE16_MEMBER(unk_vid0_gfxbase_msb_w);
-	DECLARE_WRITE16_MEMBER(unk_vid0_extra_w);
+	DECLARE_WRITE16_MEMBER(sprite_7022_gfxbase_lsb_w);
+	DECLARE_WRITE16_MEMBER(sprite_702d_gfxbase_msb_w);
+	DECLARE_READ16_MEMBER(sprite_7042_extra_r);
+	DECLARE_WRITE16_MEMBER(sprite_7042_extra_w);
 
 	DECLARE_WRITE16_MEMBER(video_dma_source_w);
 	DECLARE_WRITE16_MEMBER(video_dma_dest_w);
-	DECLARE_READ16_MEMBER(video_dma_size_r);
-	DECLARE_WRITE16_MEMBER(video_dma_size_w);
+	DECLARE_READ16_MEMBER(video_dma_size_busy_r);
+	DECLARE_WRITE16_MEMBER(video_dma_size_trigger_w);
 	DECLARE_WRITE16_MEMBER(video_dma_unk_w);
 
-	DECLARE_READ16_MEMBER(video_703a_r);
-	DECLARE_WRITE16_MEMBER(video_703a_w);
+	DECLARE_READ16_MEMBER(video_703a_palettebank_r);
+	DECLARE_WRITE16_MEMBER(video_703a_palettebank_w);
 
 	DECLARE_READ16_MEMBER(video_7062_r);
 	DECLARE_WRITE16_MEMBER(video_7062_w);
 
-	DECLARE_READ16_MEMBER(video_7063_r);
-	DECLARE_WRITE16_MEMBER(video_7063_w);
+	DECLARE_READ16_MEMBER(video_7063_videoirq_source_r);
+	DECLARE_WRITE16_MEMBER(video_7063_videoirq_source_ack_w);
 
 	DECLARE_WRITE16_MEMBER(video_702a_w);
 	DECLARE_READ16_MEMBER(video_7030_brightness_r);
@@ -88,6 +89,9 @@ public:
 
 	DECLARE_READ16_MEMBER(palette_r);
 	DECLARE_WRITE16_MEMBER(palette_w);
+
+	DECLARE_WRITE16_MEMBER(spriteram_w);
+	DECLARE_READ16_MEMBER(spriteram_r);
 
 	DECLARE_READ16_MEMBER(video_7051_r);
 
@@ -141,7 +145,7 @@ protected:
 	};
 
 	template<blend_enable_t Blend, rowscroll_enable_t RowScroll, flipx_t FlipX>
-	void draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t bitmap_addr, uint32_t tile, int32_t h, int32_t w, uint8_t bpp, uint32_t yflipmask, uint32_t palette_offset);
+	void draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t bitmap_addr, uint32_t tile, int32_t h, int32_t w, uint8_t bpp, uint32_t yflipmask, uint32_t palette_offset, int addressing_mode);
 	void draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t *regs);
 	void draw_sprites(const rectangle& cliprect, uint32_t scanline, int priority);
 	void draw_sprite(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t base_addr);
@@ -153,7 +157,6 @@ protected:
 	required_device<unsp_device> m_cpu;
 	required_device<screen_device> m_screen;
 //  required_shared_ptr<uint16_t> m_scrollram;
-	required_shared_ptr<uint16_t> m_spriteram;
 
 	uint16_t m_page0_addr_lsb;
 	uint16_t m_page0_addr_msb;
@@ -161,7 +164,7 @@ protected:
 	uint16_t m_page1_addr_lsb;
 	uint16_t m_page1_addr_msb;
 
-	uint16_t m_videodma_bank;
+	uint16_t m_707e_videodma_bank;
 	uint16_t m_videodma_size;
 	uint16_t m_videodma_dest;
 	uint16_t m_videodma_source;
@@ -174,7 +177,7 @@ protected:
 	uint16_t m_tmap1_regs[0x6];
 
 	uint16_t m_707f;
-	uint16_t m_703a;
+	uint16_t m_703a_palettebank;
 	uint16_t m_7062;
 	uint16_t m_7063;
 
@@ -182,6 +185,7 @@ protected:
 	uint16_t m_7030_brightness;
 	uint16_t m_703c;
 
+	uint16_t m_7042_sprite;
 
 	uint16_t m_7080;
 	uint16_t m_7081;
@@ -193,8 +197,8 @@ protected:
 	uint16_t m_7087;
 	uint16_t m_7088;
 
-	uint16_t m_unk_vid0_gfxbase_lsb;
-	uint16_t m_unk_vid0_gfxbase_msb;
+	uint16_t m_sprite_7022_gfxbase_lsb;
+	uint16_t m_sprite_702d_gfxbase_msb;
 	uint16_t m_unk_vid1_gfxbase_lsb;
 	uint16_t m_unk_vid1_gfxbase_msb;
 	uint16_t m_unk_vid2_gfxbase_lsb;
@@ -204,7 +208,8 @@ protected:
 
 	uint16_t m_video_irq_status;
 
-	uint16_t m_spriteextra[0x100];
+	uint16_t m_spriteram[0x400];
+	uint16_t m_spriteextra[0x400];
 	uint16_t m_paletteram[0x100*0x10];
 
 	required_device<palette_device> m_palette;

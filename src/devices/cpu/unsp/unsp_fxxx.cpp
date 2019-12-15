@@ -16,6 +16,10 @@ inline void unsp_device::execute_fxxx_000_group(uint16_t op)
 	// DS Reg   1 1 1 1   - - - 0   0 0 1 0   w r r r
 	// FR Reg   1 1 1 1   - - - 0   0 0 1 1   w r r r
 
+	// FR = 'inner flag register' on ISA1.2+
+	// does this mean 1.2+ do not store the registers in the upper bits of SR, or is this something else?
+	// smartfp IRQ4 reads this and puts in on the stack
+
 	if (((op & 0xffc0) == 0xfe00) && m_iso >= 12)
 	{
 		// ds = imm6
@@ -242,13 +246,15 @@ void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 		return;
 
 	case 0xf144: case 0xf344: case 0xf544: case 0xf744: case 0xf944: case 0xfb44: case 0xfd44: case 0xff44:
-		logerror("fir_mov on\n");
-		unimplemented_opcode(op);
+		logerror("unimplemented: fir_mov on\n");
+		m_core->m_icount -= 1; 
+		//unimplemented_opcode(op); // generalplus_gpac800 games do this on startup
 		return;
 
 	case 0xf145: case 0xf345: case 0xf545: case 0xf745: case 0xf945: case 0xfb45: case 0xfd45: case 0xff45:
-		logerror("fir_mov off\n");
-		unimplemented_opcode(op);
+		logerror("unimplemented: fir_mov off\n"); 
+		m_core->m_icount -= 1; 
+		//unimplemented_opcode(op); // generalplus_gpac800 games do this on startup
 		return;
 
 	case 0xf161: case 0xf361: case 0xf561: case 0xf761: case 0xf961: case 0xfb61: case 0xfd61: case 0xff61:

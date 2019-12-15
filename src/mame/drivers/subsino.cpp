@@ -2696,9 +2696,7 @@ void subsino_state::victor21(machine_config &config)
 
 	i8255_device &ppi(I8255A(config, "ppi"));
 	ppi.out_pa_callback().set(FUNC(subsino_state::out_a_w));
-	ppi.tri_pa_callback().set_constant(0);
 	ppi.out_pb_callback().set(FUNC(subsino_state::out_b_w));
-	ppi.tri_pb_callback().set_constant(0);
 	ppi.in_pc_callback().set_ioport("INC");
 
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);

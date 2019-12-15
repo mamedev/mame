@@ -9,12 +9,43 @@ driver by David Haywood
 
 
 todo:
-
-PIC from Action Hollywood still needs deprotecting + dumping
-
-Both games have problems with the Eeprom (settings are not saved)
+  PIC from Action Hollywood still needs deprotecting + dumping
+  Both games have problems with the Eeprom (settings are not saved)
 
 
+Main board: PRO-3/B
++-------------------------------------------+
+|       IC13   PIC16C57                16MHz|
+|VOL    M6295                   +----+ 65764|
+|                               |1020|      |
+|                               +----+ 65764|
+|J    65764 65764                           |
+|A    65764 65764               +----+ IC36 |
+|M                              |1020| IC35 |
+|M                              +----+ IC34 |
+|A    62256 62256               +----+ IC33 |
+|  SW   IC5 IC6                 |1020| IC32 |
+|12MHz MC68000P12               +----+ IC31 |
+|MACH1111                62256         IC30 |
+|     93C46N             62256         IC29 |
++-------------------------------------------+
+
+   CPU: MC68000P12
+        PIC16C57-XT/P
+ Sound: OKI M6295 (rebadged as U6295)
+   OSC: 16.000MHz, 12.000MHz
+   RAM: UM62256D-70LL - 32Kx8 SRAM (x4)
+        HM3-65764E-5 - 8Kx8 SRAM (x6)
+EEPROM: 93C46N
+ Other: TI TPC1020BFN-084C (x3)
+        AMD MACH111-15CJ
+        VOL - volume pot
+        SW - push button service switch
+
+Measured clocks:
+    68000 - 12MHz
+ PIC16C57 - 4MHz
+    M6295 - 1MHz
 */
 
 /* Notes
@@ -392,7 +423,7 @@ void kickgoal_state::kickgoal(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &kickgoal_state::program_map);
 	m_maincpu->set_vblank_int("screen", FUNC(kickgoal_state::irq6_line_hold));
 
-	PIC16C57(config, m_audiocpu, XTAL(12'000'000)/3);  /* 4MHz ? */
+	PIC16C57(config, m_audiocpu, XTAL(12'000'000)/3);  /* 4MHz */
 	m_audiocpu->write_a().set(FUNC(kickgoal_state::soundio_port_a_w));
 	m_audiocpu->read_b().set(FUNC(kickgoal_state::soundio_port_b_r));
 	m_audiocpu->write_b().set(FUNC(kickgoal_state::soundio_port_b_w));
@@ -422,7 +453,7 @@ void kickgoal_state::kickgoal(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	OKIM6295(config, m_oki, XTAL(12'000'000)/12, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki, XTAL(12'000'000)/12, okim6295_device::PIN7_LOW);  /* 1MHz */
 	m_oki->set_addrmap(0, &kickgoal_state::oki_map);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
 }

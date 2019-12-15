@@ -240,9 +240,9 @@ void emu_timer::register_save()
 	int index = 0;
 	std::string name;
 
-	// for non-device timers, it is an index based on the callback function name
 	if (m_device == nullptr)
 	{
+		// for non-device timers, it is an index based on the callback function name
 		name = m_callback.name() ? m_callback.name() : "unnamed";
 		for (emu_timer *curtimer = machine().scheduler().first_timer(); curtimer != nullptr; curtimer = curtimer->next())
 			if (!curtimer->m_temporary && curtimer->m_device == nullptr)
@@ -253,13 +253,12 @@ void emu_timer::register_save()
 					index++;
 			}
 	}
-
-	// for device timers, it is an index based on the device and timer ID
 	else
 	{
+		// for device timers, it is an index based on the device and timer ID
 		name = string_format("%s/%d", m_device->tag(), m_id);
 		for (emu_timer *curtimer = machine().scheduler().first_timer(); curtimer != nullptr; curtimer = curtimer->next())
-			if (!curtimer->m_temporary && curtimer->m_device != nullptr && curtimer->m_device == m_device && curtimer->m_id == m_id)
+			if (!curtimer->m_temporary && curtimer->m_device == m_device && curtimer->m_id == m_id)
 				index++;
 	}
 

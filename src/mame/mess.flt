@@ -137,6 +137,7 @@ cbnt2039.cpp
 cc40.cpp
 ccs2810.cpp
 ccs300.cpp
+cd100.cpp
 cd2650.cpp
 cdc721.cpp
 cdsys5.cpp
@@ -302,6 +303,7 @@ gamemachine.cpp
 gamepock.cpp
 gb.cpp
 gba.cpp
+generalplus_gpl32612.cpp
 geneve.cpp
 geniusiq.cpp
 geniusjr.cpp

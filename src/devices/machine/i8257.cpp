@@ -313,18 +313,9 @@ void i8257_device::device_start()
 	save_item(NAME(m_status));
 	save_item(NAME(m_request));
 
-	save_item(NAME(m_channel[0].m_address));
-	save_item(NAME(m_channel[0].m_count));
-	save_item(NAME(m_channel[0].m_mode));
-	save_item(NAME(m_channel[1].m_address));
-	save_item(NAME(m_channel[1].m_count));
-	save_item(NAME(m_channel[1].m_mode));
-	save_item(NAME(m_channel[2].m_address));
-	save_item(NAME(m_channel[2].m_count));
-	save_item(NAME(m_channel[2].m_mode));
-	save_item(NAME(m_channel[3].m_address));
-	save_item(NAME(m_channel[3].m_count));
-	save_item(NAME(m_channel[3].m_mode));
+	save_item(STRUCT_MEMBER(m_channel, m_address));
+	save_item(STRUCT_MEMBER(m_channel, m_count));
+	save_item(STRUCT_MEMBER(m_channel, m_mode));
 }
 
 

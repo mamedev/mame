@@ -298,10 +298,8 @@ void ccx_state::acr(machine_config &config)
 
 	I8255(config, m_ppi8255);
 	m_ppi8255->out_pa_callback().set(FUNC(ccx_state::ppi_porta_w));
-	m_ppi8255->tri_pa_callback().set_constant(0);
 	m_ppi8255->in_pb_callback().set_constant(0);
 	m_ppi8255->out_pb_callback().set(FUNC(ccx_state::ppi_portb_w));
-	m_ppi8255->tri_pb_callback().set_constant(0);
 	m_ppi8255->in_pc_callback().set(FUNC(ccx_state::ppi_portc_r));
 	m_ppi8255->out_pc_callback().set(FUNC(ccx_state::ppi_portc_w));
 

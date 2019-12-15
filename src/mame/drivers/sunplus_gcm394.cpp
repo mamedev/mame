@@ -34,8 +34,9 @@ public:
 		m_romregion(*this, "maincpu")
 	{
 	}
-
+	
 	void base(machine_config &config);
+
 
 protected:
 	virtual void machine_start() override;
@@ -43,7 +44,7 @@ protected:
 
 	void switch_bank(uint32_t bank);
 
-	required_device<sunplus_gcm394_device> m_maincpu;
+	required_device<sunplus_gcm394_base_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
 	optional_memory_bank m_bank;
@@ -54,10 +55,6 @@ protected:
 	virtual void mem_map_4m(address_map &map);
 
 	required_region_ptr<uint16_t> m_romregion;
-private:
-
-	uint32_t m_current_bank;
-	int m_numbanks;
 
 	DECLARE_READ16_MEMBER(porta_r);
 	DECLARE_READ16_MEMBER(portb_r);
@@ -67,6 +64,12 @@ private:
 
 	virtual DECLARE_READ16_MEMBER(read_external_space);
 	virtual DECLARE_WRITE16_MEMBER(write_external_space);
+
+private:
+
+	uint32_t m_current_bank;
+	int m_numbanks;
+
 };
 
 class wrlshunt_game_state : public gcm394_game_state
@@ -100,6 +103,33 @@ private:
 	virtual DECLARE_READ16_MEMBER(read_external_space) override;
 	virtual DECLARE_WRITE16_MEMBER(write_external_space) override;
 };
+
+
+class generalplus_gpac800_game_state : public gcm394_game_state
+{
+public:
+	generalplus_gpac800_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		gcm394_game_state(mconfig, type, tag),
+		m_mainram(*this, "mainram")
+	{
+	}
+
+	void generalplus_gpac800(machine_config &config);
+
+	void nand_init();
+
+protected:
+	virtual void machine_reset() override;
+
+	void generalplus_gpac800_map(address_map &map);
+
+private:
+	required_shared_ptr<u16> m_mainram;
+	std::vector<uint8_t> m_strippedrom;
+};
+
+
+
 
 READ16_MEMBER(gcm394_game_state::read_external_space)
 {
@@ -201,6 +231,8 @@ void gcm394_game_state::base(machine_config &config)
 	m_maincpu->space_write_callback().set(FUNC(gcm394_game_state::write_external_space));
 	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(sunplus_gcm394_base_device::irq_vector_cb));
 	m_maincpu->mapping_write_callback().set(FUNC(gcm394_game_state::mapping_w));	
+	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -211,9 +243,6 @@ void gcm394_game_state::base(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
-
 }
 
 READ16_MEMBER(wrlshunt_game_state::hunt_porta_r)
@@ -243,9 +272,26 @@ void wrlshunt_game_state::wrlshunt(machine_config &config)
 
 	m_screen->set_size(320*2, 262*2);
 	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
+}
 
+void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
+{
+	gcm394_game_state::base(config);
+
+	GPAC800(config.replace(), m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_gpac800_game_state::generalplus_gpac800_map);
+	m_maincpu->porta_in().set(FUNC(generalplus_gpac800_game_state::porta_r));
+	m_maincpu->portb_in().set(FUNC(generalplus_gpac800_game_state::portb_r));
+	m_maincpu->porta_out().set(FUNC(generalplus_gpac800_game_state::porta_w));
+	m_maincpu->space_read_callback().set(FUNC(generalplus_gpac800_game_state::read_external_space));
+	m_maincpu->space_write_callback().set(FUNC(generalplus_gpac800_game_state::write_external_space));
+	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(sunplus_gcm394_base_device::irq_vector_cb));
+	m_maincpu->mapping_write_callback().set(FUNC(generalplus_gpac800_game_state::mapping_w));	
+	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
 }
+
 
 void gcm394_game_state::switch_bank(uint32_t bank)
 {
@@ -300,6 +346,12 @@ void wrlshunt_game_state::wrlshunt_map(address_map &map)
 	map(0x000000, 0x00ffff).rom().region("maincpu", 0); // non-banked area on this SoC?
 	map(0x030000, 0x3fffff).ram().share("mainram");
 }
+
+void generalplus_gpac800_game_state::generalplus_gpac800_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).ram().share("mainram");
+}
+
 
 static INPUT_PORTS_START( gcm394 )
 	PORT_START("P1")
@@ -492,11 +544,113 @@ ROM_START( wlsair60 )
 	ROM_LOAD16_WORD_SWAP( "wlsair60.nand", 0x0000, 0x8400000, CRC(eec23b97) SHA1(1bb88290cf54579a5bb51c08a02d793cd4d79f7a) )
 ROM_END
 
+ROM_START( jak_gtg )
+	ROM_REGION( 0x4200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "goldentee.bin", 0x0000, 0x4200000, CRC(87d5e815) SHA1(5dc46cd753b791449cc41d5eff4928c0dcaf35c0) )
+ROM_END
 
+ROM_START( jak_car2 )
+	ROM_REGION( 0x4200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "cars2.bin", 0x0000, 0x4200000, CRC(4d610e09) SHA1(bc59f5f7f676a8f2a78dfda7fb62c804bbf850b6) )
+ROM_END
+
+ROM_START( jak_tsm )
+	ROM_REGION( 0x4200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "toystorymania.bin", 0x0000, 0x4200000, CRC(183b20a5) SHA1(eb4fa5ee9dfac58f5244d00d4e833b1e461cc52c) )
+ROM_END
+
+ROM_START( vbaby )
+	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "vbaby.bin", 0x0000, 0x8400000, CRC(d904441b) SHA1(3742bc4e1e403f061ce2813ecfafc6f30a44d287) )
+ROM_END
+
+ROM_START( beambox )
+	ROM_REGION( 0x4200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "beambox.bin", 0x0000, 0x4200000, CRC(a486f04e) SHA1(73c7d99d8922eba58d94e955e254b9c3baa4443e) )
+ROM_END
+
+// the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
 CONS(2011, wrlshunt, 0, 0, wrlshunt, wrlshunt, wrlshunt_game_state, empty_init, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 CONS(2009, smartfp, 0, 0, base, gcm394, gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // Fun 2 Learn 3-in-1 SMART SPORTS  ?
 
-// NAND dumps w/ internal bootstrap (and u'nSP 2.0 extended opcodes)
-CONS(2010, wlsair60, 0, 0, base, gcm394, gcm394_game_state, empty_init, "Jungle Soft / Kids Station Toys Inc", "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+void generalplus_gpac800_game_state::machine_reset()
+{
+	address_space& mem = m_maincpu->space(AS_PROGRAM);
+
+	/* Offset(h) 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
+	   00000000 (50 47 61 6E 64 6E 61 6E 64 6E)-- -- -- -- -- --  PGandnandn------
+	   00000010  -- -- -- -- -- bb -- -- -- -- -- -- -- -- -- --  ----------------
+
+	   bb = where to copy first block
+
+	   The header is GPnandnand (byteswapped) then some params
+	   one of the params appears to be for the initial code copy operation done
+	   by the bootstrap
+	*/
+
+	// probably more bytes are used
+	int dest = m_strippedrom[0x15] << 8;
+
+	// copy a block of code from the NAND to RAM
+	for (int i = 0; i < 0x2000; i++)
+	{
+		uint16_t word = m_strippedrom[(i * 2) + 0] | (m_strippedrom[(i * 2) + 1] << 8);
+
+		mem.write_word(dest+i, word);
+	}
+
+	mem.write_word(0xfff7, dest+0x20); // point boot vector at code in RAM
+	m_maincpu->reset(); // reset CPU so vector gets read etc.
+}
+
+
+void generalplus_gpac800_game_state::nand_init()
+{
+	uint8_t* rom = memregion("maincpu")->base();
+	int size = memregion("maincpu")->bytes();
+
+	const int blocksize = 0x210;
+	const int blocksize_stripped = 0x200;
+
+	int numblocks = size / blocksize;
+
+	m_strippedrom.resize(numblocks * blocksize_stripped);
+
+	for (int i = 0; i < numblocks; i++)
+	{
+		const int base = i * blocksize;
+		const int basestripped = i * blocksize_stripped;
+
+		for (int j = 0; j < blocksize_stripped; j++)
+		{ 
+			m_strippedrom[basestripped + j] = rom[base + j];
+		}
+	}
+
+	// debug to allow for easy use of unidasm.exe
+	if (0)
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"stripped_%s", machine().system().name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(&m_strippedrom[0], blocksize_stripped * numblocks, 1, fp);
+			fclose(fp);
+		}
+	}
+}
+
+
+// NAND dumps w/ internal bootstrap (and u'nSP 2.0 extended opcodes)  (have gpnandnand strings)
+// the JAKKS ones seem to be known as 'Generalplus GPAC800' hardware
+CONS(2010, wlsair60, 0, 0, generalplus_gpac800, gcm394, generalplus_gpac800_game_state, nand_init, "Jungle Soft / Kids Station Toys Inc", "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_gtg,  0, 0, generalplus_gpac800, gcm394, generalplus_gpac800_game_state, nand_init, "JAKKS Pacific Inc", "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_car2, 0, 0, generalplus_gpac800, gcm394, generalplus_gpac800_game_state, nand_init, "JAKKS Pacific Inc", "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_tsm , 0, 0, generalplus_gpac800, gcm394, generalplus_gpac800_game_state, nand_init, "JAKKS Pacific Inc", "Toy Story Mania (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, vbaby,    0, 0, generalplus_gpac800, gcm394, generalplus_gpac800_game_state, nand_init, "VTech", "V.Baby",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, beambox,  0, 0, generalplus_gpac800, gcm394, generalplus_gpac800_game_state, nand_init, "Hasbro", "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

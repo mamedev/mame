@@ -716,10 +716,7 @@ void hp_hybrid_cpu_device::emc_start()
 	state_add(HPHYBRID_R26, "R26" , m_reg_r26).noshow();
 	state_add(HPHYBRID_R27, "R27" , m_reg_r27).noshow();
 
-	save_item(NAME(m_reg_ar2[ 0 ]));
-	save_item(NAME(m_reg_ar2[ 1 ]));
-	save_item(NAME(m_reg_ar2[ 2 ]));
-	save_item(NAME(m_reg_ar2[ 3 ]));
+	save_item(NAME(m_reg_ar2));
 	save_item(NAME(m_reg_se));
 	save_item(NAME(m_reg_r25));
 	save_item(NAME(m_reg_r26));
@@ -1749,12 +1746,7 @@ void hp_5061_3001_cpu_device::device_start()
 	state_add(HPHYBRID_R35, "R35" , m_reg_aec[ 3 ]);
 	state_add(HPHYBRID_R36, "R36" , m_reg_aec[ 4 ]);
 	state_add(HPHYBRID_R37, "R37" , m_reg_aec[ 5 ]);
-	save_item(NAME(m_reg_aec[ 0 ]));
-	save_item(NAME(m_reg_aec[ 1 ]));
-	save_item(NAME(m_reg_aec[ 2 ]));
-	save_item(NAME(m_reg_aec[ 3 ]));
-	save_item(NAME(m_reg_aec[ 4 ]));
-	save_item(NAME(m_reg_aec[ 5 ]));
+	save_item(NAME(m_reg_aec));
 }
 
 void hp_5061_3001_cpu_device::device_reset()

@@ -110,6 +110,7 @@ void mcpx_isalpc_device::internal_io_map(address_map &map)
 	map(0x0070, 0x0073).rw("rtc", FUNC(ds12885ext_device::read_extended), FUNC(ds12885ext_device::write_extended));
 	map(0x0080, 0x0080).w(FUNC(mcpx_isalpc_device::boot_state_w));
 	map(0x00a0, 0x00a3).rw("pic8259_2", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x00e0, 0x00e3).nopw();
 }
 
 void mcpx_isalpc_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -460,7 +461,23 @@ void mcpx_isalpc_device::set_virtual_line(int line, int state)
 		}
 		return;
 	}
-	//line = line - 16;
+/* Will be updated to support dma
+	line = line - 16;
+	if (line < 4)
+	{
+		switch (line)
+		{
+		case 0:
+			break;
+		case 1:
+			break;
+		case 2:
+			break;
+		case 3:
+			break;
+		}
+	}
+*/
 }
 
 void mcpx_isalpc_device::remap()
@@ -1183,15 +1200,22 @@ void mcpx_ide_device::device_add_mconfig(machine_config &config)
 void mcpx_ide_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
+	// in compatibility mode the addresses are fixed, but the io enable bit in the command register is still used
 	if (~pclass & 1) // compatibility mode
 	{
-		io_space->install_device(0x1f0, 0x1f7, *this, &mcpx_ide_device::ide_pri_command);
-		io_space->install_device(0x3f4, 0x3f7, *this, &mcpx_ide_device::ide_pri_control);
+		if (command & 1)
+		{
+			io_space->install_device(0x1f0, 0x1f7, *this, &mcpx_ide_device::ide_pri_command);
+			io_space->install_device(0x3f4, 0x3f7, *this, &mcpx_ide_device::ide_pri_control);
+		}
 	}
 	if (~pclass & 4)
 	{
-		io_space->install_device(0x170, 0x177, *this, &mcpx_ide_device::ide_sec_command);
-		io_space->install_device(0x374, 0x377, *this, &mcpx_ide_device::ide_sec_control);
+		if (command & 1)
+		{
+			io_space->install_device(0x170, 0x177, *this, &mcpx_ide_device::ide_sec_command);
+			io_space->install_device(0x374, 0x377, *this, &mcpx_ide_device::ide_sec_control);
+		}
 	}
 }
 
@@ -1215,7 +1239,7 @@ WRITE32_MEMBER(mcpx_ide_device::class_rev_w)
 				bank_infos[0].flags &= ~M_DISABLED;
 				bank_infos[1].flags &= ~M_DISABLED;
 			}
-			if (~pclass & 1) // compatibility mode
+			if (~pclass & 4) // compatibility mode
 			{
 				bank_infos[2].flags |= M_DISABLED;
 				bank_infos[3].flags |= M_DISABLED;
@@ -1232,29 +1256,21 @@ WRITE32_MEMBER(mcpx_ide_device::class_rev_w)
 
 READ8_MEMBER(mcpx_ide_device::pri_read_cs1_r)
 {
-	if (!(command & 1))
-		return 0xff;
 	return m_pri->read_cs1(1, 0xff0000) >> 16;
 }
 
 WRITE8_MEMBER(mcpx_ide_device::pri_write_cs1_w)
 {
-	if (!(command & 1))
-		return;
 	m_pri->write_cs1(1, data << 16, 0xff0000);
 }
 
 READ8_MEMBER(mcpx_ide_device::sec_read_cs1_r)
 {
-	if (!(command & 1))
-		return 0xff;
 	return m_sec->read_cs1(1, 0xff0000) >> 16;
 }
 
 WRITE8_MEMBER(mcpx_ide_device::sec_write_cs1_w)
 {
-	if (!(command & 1))
-		return;
 	m_sec->write_cs1(1, data << 16, 0xff0000);
 }
 
@@ -1302,7 +1318,7 @@ READ32_MEMBER(nv2a_agp_device::unknown_r)
 	// 45 8
 	// 46 8
 	// 47 8
-	printf("R %08X %08X\n",0x40+offset*4,mem_mask);
+	//printf("R %08X %08X\n",0x40+offset*4,mem_mask);
 	if (offset == 3)
 		return 1;
 	return 0;
@@ -1310,7 +1326,7 @@ READ32_MEMBER(nv2a_agp_device::unknown_r)
 
 WRITE32_MEMBER(nv2a_agp_device::unknown_w)
 {
-	printf("W %08X %08X %08X\n", 0x40+offset*4, mem_mask, data);
+	//printf("W %08X %08X %08X\n", 0x40+offset*4, mem_mask, data);
 }
 
 /*

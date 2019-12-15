@@ -42,9 +42,9 @@ void dio16_98265a_device::device_add_mconfig(machine_config &config)
 	default_scsi_devices(NSCSI_CONNECTOR(config, "scsibus:3", 0));
 	default_scsi_devices(NSCSI_CONNECTOR(config, "scsibus:4", 0));
 
-	nscsi_connector &scsicon6(NSCSI_CONNECTOR(config, "scsibus:5", 0));
-	default_scsi_devices(scsicon6);
-	scsicon6.set_default_option("cdrom");
+	nscsi_connector &scsicon5(NSCSI_CONNECTOR(config, "scsibus:5", 0));
+	default_scsi_devices(scsicon5);
+	scsicon5.set_default_option("cdrom");
 
 	default_scsi_devices(NSCSI_CONNECTOR(config, "scsibus:6", 0));
 	nscsi_connector &scsicon7(NSCSI_CONNECTOR(config, "scsibus:7", 0));
@@ -166,7 +166,7 @@ void dio16_98265a_device::device_reset()
 				0x6007ff + (code * 0x10000),
 				read16_delegate(*this, FUNC(dio16_98265a_device::io_r)),
 				write16_delegate(*this, FUNC(dio16_98265a_device::io_w)));
-		program_space().install_device(0x6e0020, 0x6e003f, *m_spc, &mb87030_device::map, 0x00ff00ff);
+		program_space().install_device(0x600020 + (code * 0x10000), 0x60003f + (code * 0x10000), *m_spc, &mb87030_device::map, 0x00ff00ff);
 		m_installed_io = true;
 	}
 	m_control = 0;

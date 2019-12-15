@@ -489,8 +489,8 @@
 		<element name="digit2" ref="digit"><bounds x="43.0" y="91" width="4" height="6" /></element>
 		<element name="digit3" ref="digit"><bounds x="47.5" y="91" width="4" height="6" /></element>
 
-		<element name="dp0" ref="ldot"><bounds x="42.13" y="92.55" width="0.6" height="0.6" /></element>
-		<element name="dp0" ref="ldot"><bounds x="41.97" y="94.75" width="0.6" height="0.6" /></element>
+		<element name="lcd0.16" ref="ldot"><bounds x="42.13" y="92.55" width="0.6" height="0.6" /></element>
+		<element name="lcd0.16" ref="ldot"><bounds x="41.97" y="94.75" width="0.6" height="0.6" /></element>
 	</group>
 
 	<group name="lcd2">
@@ -501,8 +501,8 @@
 		<element name="digit6" ref="digit"><bounds x="43.0" y="91" width="4" height="6" /></element>
 		<element name="digit7" ref="digit"><bounds x="47.5" y="91" width="4" height="6" /></element>
 
-		<element name="dp1" ref="ldot"><bounds x="42.13" y="92.55" width="0.6" height="0.6" /></element>
-		<element name="dp1" ref="ldot"><bounds x="41.97" y="94.75" width="0.6" height="0.6" /></element>
+		<element name="lcd1.16" ref="ldot"><bounds x="42.13" y="92.55" width="0.6" height="0.6" /></element>
+		<element name="lcd1.16" ref="ldot"><bounds x="41.97" y="94.75" width="0.6" height="0.6" /></element>
 	</group>
 
 
@@ -537,7 +537,7 @@
 	<element name="text_l3"><text string="CHECK" align="1"><color red="1" green="1" blue="1" /></text></element>
 	<element name="text_l4"><text string="MATE" align="1"><color red="1" green="1" blue="1" /></text></element>
 	<element name="text_l5"><text string="DRAW" align="1"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l6"><text string="3RD REPET." align="1"><color red="1" green="1" blue="1" /></text></element>
+	<element name="text_l6"><text string="3RD REPET" align="1"><color red="1" green="1" blue="1" /></text></element>
 	<element name="text_l7"><text string="RESIGN" align="1"><color red="1" green="1" blue="1" /></text></element>
 
 	<element name="text_r1"><text string="ENTER POSITION" align="2"><color red="1" green="1" blue="1" /></text></element>

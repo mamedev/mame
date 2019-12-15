@@ -238,91 +238,91 @@ protected:
 private:
 	address_space_config m_program_config, m_decrypted_program_config;
 
-	uint32_t  m_cpu_off;
-	uint32_t  m_test_irq;
+	uint32_t  m_cpu_off = 0;
+	uint32_t  m_test_irq = 0;
 
 	int8_t    m_irq_line_state[17];
 
 	address_space *m_internal;
 	// SCI
-	uint8_t m_smr, m_brr, m_scr, m_tdr, m_ssr;
+	uint8_t m_smr = 0, m_brr = 0, m_scr = 0, m_tdr = 0, m_ssr = 0;
 	// FRT / FRC
-	uint8_t m_tier, m_ftcsr, m_frc_tcr, m_tocr;
-	uint16_t m_frc;
-	uint16_t m_ocra, m_ocrb, m_frc_icr;
+	uint8_t m_tier = 0, m_ftcsr = 0, m_frc_tcr = 0, m_tocr = 0;
+	uint16_t m_frc = 0;
+	uint16_t m_ocra = 0, m_ocrb = 0, m_frc_icr = 0;
 	// INTC
 	struct {
-		uint8_t frc;
-		uint8_t sci;
-		uint8_t divu;
-		uint8_t dmac;
-		uint8_t wdt;
+		uint8_t frc = 0;
+		uint8_t sci = 0;
+		uint8_t divu = 0;
+		uint8_t dmac = 0;
+		uint8_t wdt = 0;
 	} m_irq_level;
 	struct {
-		uint8_t fic;
-		uint8_t foc;
-		uint8_t fov;
-		uint8_t divu;
-		uint8_t dmac[2];
+		uint8_t fic = 0;
+		uint8_t foc = 0;
+		uint8_t fov = 0;
+		uint8_t divu = 0;
+		uint8_t dmac[2] = { 0, 0 };
 	} m_irq_vector;
-	uint16_t m_ipra, m_iprb;
-	uint16_t m_vcra, m_vcrb, m_vcrc, m_vcrd, m_vcrwdt, m_vcrdiv, m_intc_icr, m_vcrdma[2];
-	bool m_vecmd, m_nmie;
+	uint16_t m_ipra = 0, m_iprb = 0;
+	uint16_t m_vcra = 0, m_vcrb = 0, m_vcrc = 0, m_vcrd = 0, m_vcrwdt = 0, m_vcrdiv = 0, m_intc_icr = 0, m_vcrdma[2] = { 0, 0, };
+	bool m_vecmd = false, m_nmie = false;
 
 	// DIVU
-	bool m_divu_ovf, m_divu_ovfie;
-	uint32_t m_dvsr, m_dvdntl, m_dvdnth;
+	bool m_divu_ovf = false, m_divu_ovfie = false;
+	uint32_t m_dvsr = 0, m_dvdntl = 0, m_dvdnth = 0;
 
 	// WTC
-	uint8_t m_wtcnt, m_wtcsr;
-	uint8_t m_rstcsr;
-	uint16_t m_wtcw[2];
+	uint8_t m_wtcnt = 0, m_wtcsr = 0;
+	uint8_t m_rstcsr = 0;
+	uint16_t m_wtcw[2] = { 0, 0 };
 
 	// DMAC
 	struct {
-		uint8_t drcr;
-		uint32_t sar;
-		uint32_t dar;
-		uint32_t tcr;
-		uint32_t chcr;
+		uint8_t drcr = 0;
+		uint32_t sar = 0;
+		uint32_t dar = 0;
+		uint32_t tcr = 0;
+		uint32_t chcr = 0;
 	} m_dmac[2];
-	uint8_t m_dmaor;
+	uint8_t m_dmaor = 0;
 
 	// misc
-	uint8_t m_sbycr, m_ccr;
+	uint8_t m_sbycr = 0, m_ccr = 0;
 
 	// BSC
-	uint32_t m_bcr1, m_bcr2, m_wcr, m_mcr, m_rtcsr, m_rtcor, m_rtcnt;
+	uint32_t m_bcr1 = 0, m_bcr2 = 0, m_wcr = 0, m_mcr = 0, m_rtcsr = 0, m_rtcor = 0, m_rtcnt = 0;
 
-	int8_t  m_nmi_line_state;
+	int8_t  m_nmi_line_state = 0;
 
-	uint64_t  m_frc_base;
+	uint64_t  m_frc_base = 0;
 
-	int     m_frt_input;
-	int     m_internal_irq_vector;
+	int     m_frt_input = 0;
+	int     m_internal_irq_vector = 0;
 
-	emu_timer *m_timer;
-	emu_timer *m_wdtimer;
-	emu_timer *m_dma_current_active_timer[2];
-	int     m_dma_timer_active[2];
-	uint8_t  m_dma_irq[2];
+	emu_timer *m_timer = nullptr;
+	emu_timer *m_wdtimer = nullptr;
+	emu_timer *m_dma_current_active_timer[2] { nullptr, nullptr };
+	int     m_dma_timer_active[2] = { 0, 0 };
+	uint8_t  m_dma_irq[2] = { 0, 0 };
 
-	int m_active_dma_incs[2];
-	int m_active_dma_incd[2];
-	int m_active_dma_size[2];
-	int m_active_dma_steal[2];
-	uint32_t m_active_dma_src[2];
-	uint32_t m_active_dma_dst[2];
-	uint32_t m_active_dma_count[2];
+	int m_active_dma_incs[2] = { 0, 0 };
+	int m_active_dma_incd[2] = { 0, 0 };
+	int m_active_dma_size[2] = { 0, 0 };
+	int m_active_dma_steal[2] = { 0, 0 };
+	uint32_t m_active_dma_src[2] = { 0, 0 };
+	uint32_t m_active_dma_dst[2] = { 0, 0 };
+	uint32_t m_active_dma_count[2] = { 0, 0 };
 
-	int     m_is_slave;
+	int     m_is_slave = 0;
 	dma_kludge_delegate              m_dma_kludge_cb;
 	dma_fifo_data_available_delegate m_dma_fifo_data_available_cb;
 	ftcsr_read_delegate              m_ftcsr_read_cb;
 
 	std::unique_ptr<sh2_frontend>      m_drcfe;                  /* pointer to the DRC front-end state */
 
-	uint32_t m_debugger_temp;
+	uint32_t m_debugger_temp = 0;
 
 	virtual uint8_t RB(offs_t A) override;
 	virtual uint16_t RW(offs_t A) override;
@@ -385,12 +385,12 @@ private:
 	uint16_t m_sh7021_regs[0x200];
 	struct
 	{
-		uint32_t              sar;    /**< Source Address Register */
-		uint32_t              dar;    /**< Destination Address Register */
-		uint16_t              tcr;    /**< Transfer Count Register */
-		uint16_t              chcr;   /**< Channel Control Register */
+		uint32_t              sar = 0;    /**< Source Address Register */
+		uint32_t              dar = 0;    /**< Destination Address Register */
+		uint16_t              tcr = 0;    /**< Transfer Count Register */
+		uint16_t              chcr = 0;   /**< Channel Control Register */
 	} m_dma[4];
-	uint16_t m_dmaor;                 /**< DMA Operation Register (status flags) */
+	uint16_t m_dmaor = 0;                 /**< DMA Operation Register (status flags) */
 
 };
 

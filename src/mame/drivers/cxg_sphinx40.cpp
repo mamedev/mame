@@ -6,7 +6,7 @@
 CXG Sphinx 40 / 50
 
 This is a modular chesscomputer, similar to Mephisto's 3-drawers one.
-Chesscomputer on the right, LCD in the middle, and future expansion(?) on the left.
+Chesscomputer on the right, LCD in the middle, and future expansion on the left.
 The only difference between 40 and 50 is the board size (40cm vs 50cm).
 
 The chess engine is Cyrus 68K, by Mark Taylor, with advice from David Levy.
@@ -18,8 +18,6 @@ incarnation of Frans Morsch's Dominator program.
 TODO:
 - unmapped read from 0x200000, looks like expansion ROM
 - verify XTAL and irq source/frequency
-- identify buttons
-- lcd
 
 Hardware notes:
 
@@ -52,6 +50,7 @@ LCD module
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/pwm.h"
+#include "video/hd61603.h"
 #include "speaker.h"
 
 // internal artwork
@@ -67,10 +66,12 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pia(*this, "pia"),
+		m_lcd(*this, "lcd"),
 		m_display(*this, "display"),
 		m_board(*this, "board"),
-		m_dac(*this, "dac"),
-		m_inputs(*this, "IN.%u", 0)
+		m_inputs(*this, "IN.%u", 0),
+		m_out_digit(*this, "digit%u", 0U),
+		m_out_lcd(*this, "lcd%u", 0U)
 	{ }
 
 	// machine drivers
@@ -83,24 +84,28 @@ private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
+	required_device<hd61603_device> m_lcd;
 	required_device<pwm_display_device> m_display;
 	required_device<sensorboard_device> m_board;
-	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<4> m_inputs;
+	output_finder<8> m_out_digit;
+	output_finder<64> m_out_lcd;
 
 	// address maps
 	void main_map(address_map &map);
 	void nvram_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(input_w);
-	DECLARE_WRITE8_MEMBER(lcd_w);
+	DECLARE_WRITE64_MEMBER(lcd_seg_w);
 
 	void update_display();
 	DECLARE_WRITE8_MEMBER(cb_mux_w);
 	DECLARE_WRITE8_MEMBER(cb_leds_w);
 	DECLARE_READ8_MEMBER(cb_r);
+
+	DECLARE_READ8_MEMBER(input_r);
+	DECLARE_WRITE8_MEMBER(input_w);
+	DECLARE_WRITE8_MEMBER(lcd_w);
 
 	u8 m_cb_mux = 0;
 	u8 m_led_data = 0;
@@ -109,6 +114,9 @@ private:
 
 void sphinx40_state::machine_start()
 {
+	m_out_digit.resolve();
+	m_out_lcd.resolve();
+
 	// register for savestates
 	save_item(NAME(m_cb_mux));
 	save_item(NAME(m_led_data));
@@ -120,6 +128,23 @@ void sphinx40_state::machine_start()
 /******************************************************************************
     I/O
 ******************************************************************************/
+
+// HD61603 LCD
+
+WRITE64_MEMBER(sphinx40_state::lcd_seg_w)
+{
+	// output individual segments
+	for (int i = 0; i < 64; i++)
+		m_out_lcd[i] = BIT(data, i);
+
+	// output digits
+	for (int i = 0; i < 8; i++)
+	{
+		m_out_digit[i] = data & 0x7f;
+		data >>= 8;
+	}
+}
+
 
 // 6821 PIA
 
@@ -167,18 +192,18 @@ READ8_MEMBER(sphinx40_state::input_r)
 {
 	u8 data = 0;
 
-	// d0-d7: multiplexed inputs (buttons)
+	// d0-d4: multiplexed inputs (buttons)
 	for (int i = 0; i < 4; i++)
 		if (BIT(m_inp_mux, i))
 			data |= m_inputs[i]->read();
 
-	return ~data;
+	return ~data & 0x1f;
 }
 
 WRITE8_MEMBER(sphinx40_state::lcd_w)
 {
 	// d0-d3: HD61603 data
-	//printf("%X ",data);
+	m_lcd->data_w(data & 0xf);
 }
 
 
@@ -213,44 +238,32 @@ void sphinx40_state::nvram_map(address_map &map)
 
 static INPUT_PORTS_START( sphinx40 )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Clock")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("Move")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Function")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Hint")
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) // rook
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) // bishop
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4) PORT_NAME("Rook")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_NAME("Black")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("Forwards")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("What If?")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3) PORT_NAME("Bishop")
 
 	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) // knight
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) // sound?
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) // pawn
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2) PORT_NAME("Knight")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Sound")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("Backwards")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Analysis")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1) PORT_NAME("Pawn")
 
 	PORT_START("IN.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) // king
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_X)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) // pawn?
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) // new game?
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) // queen
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6) PORT_NAME("King")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("White")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Set-Up")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5) PORT_NAME("Queen")
 INPUT_PORTS_END
 
 
@@ -271,7 +284,7 @@ void sphinx40_state::sphinx40(machine_config &config)
 	PIA6821(config, m_pia, 0);
 	m_pia->writepa_handler().set(FUNC(sphinx40_state::cb_mux_w));
 	m_pia->writepb_handler().set(FUNC(sphinx40_state::cb_leds_w));
-	m_pia->cb2_handler().set(m_dac, FUNC(dac_bit_interface::write));
+	m_pia->cb2_handler().set("dac", FUNC(dac_bit_interface::write));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	ADDRESS_MAP_BANK(config, "nvram_map").set_map(&sphinx40_state::nvram_map).set_options(ENDIANNESS_BIG, 8, 11);
@@ -281,13 +294,15 @@ void sphinx40_state::sphinx40(machine_config &config)
 	m_board->set_delay(attotime::from_msec(150));
 
 	/* video hardware */
+	HD61603(config, m_lcd, 0);
+	m_lcd->write_segs().set(FUNC(sphinx40_state::lcd_seg_w));
 
 	PWM_DISPLAY(config, m_display).set_size(8, 8);
 	config.set_default_layout(layout_cxg_sphinx40);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25);
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
@@ -312,4 +327,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS */
-CONS( 1987, sphinx40, 0,      0,      sphinx40, sphinx40, sphinx40_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx 40", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1987, sphinx40, 0,      0,      sphinx40, sphinx40, sphinx40_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx 40", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

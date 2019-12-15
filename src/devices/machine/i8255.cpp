@@ -249,9 +249,9 @@ void i8255_device::device_resolve_objects()
 	m_out_pa_cb.resolve_safe();
 	m_out_pb_cb.resolve_safe();
 	m_out_pc_cb.resolve_safe();
-	m_tri_pa_cb.resolve_safe(0xff);
-	m_tri_pb_cb.resolve_safe(0xff);
-	m_tri_pc_cb.resolve_safe(0xff);
+	m_tri_pa_cb.resolve_safe(0);
+	m_tri_pb_cb.resolve_safe(0);
+	m_tri_pc_cb.resolve_safe(0);
 }
 
 //-------------------------------------------------

@@ -9922,6 +9922,9 @@ ccs2810                         //
 @source:ccs300.cpp
 ccs300                          //
 
+@source:cd100.cpp
+cd100b                          //
+
 @source:cd2650.cpp
 cd2650                          //
 
@@ -9987,6 +9990,9 @@ tsclass                         //
 @source:cfx9850.cpp
 cfx9850                         // Casio CFX-9850
 
+@source:cgang.cpp
+cgang
+
 @source:cgc7900.cpp
 cgc7900                         //
 
@@ -9999,6 +10005,9 @@ chaknpop                        // AO4 (c) 1983 Taito Corporation
 
 @source:cham24.cpp
 cham24                          // 2002
+
+@source:chameleonrx1.cpp
+chamrx1                         // 2003
 
 @source:champbas.cpp
 champbas                        // (c) 1983 Sega
@@ -14470,6 +14479,10 @@ superbwl                        // (c) 1982 Greyhound Electronics
 suprpokr                        // (c) 1986 Grayhound Electronics
 suprpokra                       // (c) 1986 Grayhound Electronics
 suprpokrb                       // (c) 1986 Grayhound Electronics
+
+@source:generalplus_gpl32612.cpp
+jak_tmnthp
+jak_swbstrik
 
 @source:geneve.cpp
 geneve                          // 1987 Myarc Geneve 9640
@@ -22347,6 +22360,7 @@ bublpong                        // bootleg on enhanced hardware
 missb2                          // bootleg on enhanced hardware
 
 @source:missbamby.cpp
+gwinner                         //
 msbamby                         // 198?
 
 @source:missile.cpp
@@ -31147,6 +31161,7 @@ gprnrs1
 gprnrs16
 ddrdismx                        // (c) 2006 Majesco / Konami [(c) 2001 Disney on title screen]
 ddrstraw                        // (c) 2006 Majesco / Konami
+majkon
 ablping
 vgpocket
 vgpmini
@@ -31165,10 +31180,13 @@ fcpocket
 mog_m320
 fapocket
 zdog
+ts_handy11
 
 @source:vt1682.cpp
 ii8in1
 ii32in1
+miwi2_16
+intact89
 
 @source:newbrain.cpp
 newbrain                        //
@@ -33096,9 +33114,6 @@ madrace                         //
 zira                            //
 
 @source:play_3.cpp
-cobrapb                         //
-comeback                        //
-eballchps                       //
 fldragon                        //
 fldragona                       //
 ironball                        //
@@ -33954,6 +33969,9 @@ raident                         // (c) 1990 Seibu Kaihatsu + Liang HWA Electroni
 raidenu                         // (c) 1990 Seibu Kaihatsu + Fabtek license
 raidenua                        // (c) 1990 Seibu Kaihatsu + Fabtek license
 raidenub                        // (c) 1990 Seibu Kaihatsu + Fabtek license
+
+@source:raiden_ms.cpp
+raidenm                         // bootleg
 
 @source:raiden2.cpp
 raiden2                         // (c) 1993 Seibu Kaihatsu + Fabtek license
@@ -36589,6 +36607,7 @@ vreadercafr                     // (c) 2011 V.Tech
 storio                          // (c) 2011 V.Tech
 storiode                        // (c) 2011 V.Tech
 storioes                        // (c) 2011 V.Tech
+storioesa                       // (c) 2011 V.Tech
 storiofr                        // (c) 2011 V.Tech
 storionl                        // (c) 2011 V.Tech
 
@@ -37292,6 +37311,12 @@ starfigh                        // (c) 1990 SunA
 smartfp                         // Smart Fit Park
 wlsair60                        // Wireless Air 60
 wrlshunt                        // Wireless: Hunting Video Game System
+jak_car2
+jak_gtg
+jak_tsm
+vbaby
+beambox
+
 
 @source:supbtime.cpp
 chinatwn                        // MAK (c) 1991 Data East Corporation (Japan)
@@ -39618,6 +39643,7 @@ vigilanto                       // (c) 1988 (US)
 jak_capb                        //
 jak_spdmo                       //
 conyteni                        //
+conyping                        //
 
 @source:vii.cpp
 jak_batm                        // The Batman, 2004
@@ -39660,7 +39686,8 @@ icanpian                        //
 tvgogo                          //
 pvmil                           //
 taikeegr                        //
-sentx6p                        //
+shredmjr                        //
+sentx6p                         //
 
 @source:vsmile.cpp
 vsmile                          //
@@ -40853,6 +40880,7 @@ popira2                         //
 taikodp                         //
 jpopira                         //
 evio                            //
+gcslottv                        //
 ttv_sw                          //
 ttv_lotr                        //
 ttv_mx                          //
@@ -40958,6 +40986,7 @@ bombkicka                       // (c) 1998 Yun Sung
 magicbub                        // (c) Yun Sung
 magicbuba                       // (c) Yun Sung
 magicbubb                       // (c) Yun Sung
+magicbubc                       // (c) Yun Sung
 paprazzi                        // (c) 1996 Yun Sung
 shocking                        // (c) 1997 Yun Sung
 shockingk                       // (c) 1997 Yun Sung
@@ -41250,6 +41279,11 @@ zodiack                         // (c) 1983 Orca + Esco Trading Co license
 
 @source:zorba.cpp
 zorba                           //
+
+@source:zpinball.cpp
+cobrapb                         //
+comeback                        //
+eballchps                       //
 
 @source:zr107.cpp
 jetwave                         // GX678 (c)1996 Euro EAB

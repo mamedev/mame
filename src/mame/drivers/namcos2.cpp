@@ -2055,6 +2055,7 @@ void namcos2_state::luckywld(machine_config &config)
 	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_luckywld_am);
 
 	configure_c169roz_standard(config);
+	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namcos2_state::RozCB_luckywld, this));
 }
 
 void namcos2_state::metlhawk(machine_config &config)
@@ -2080,6 +2081,7 @@ void namcos2_state::metlhawk(machine_config &config)
 	configure_namcos2_sprite_standard(config);
 	configure_c123tmap_standard(config);
 	configure_c169roz_standard(config);
+	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namcos2_state::RozCB_metlhawk, this));
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, metlhawk)
 
