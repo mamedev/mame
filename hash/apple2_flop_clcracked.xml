@@ -35697,4 +35697,36 @@
 		</part>
 	</software>
 
+	<software name="mchess20">
+		<description>MicroChess (Version 2.0) (cleanly cracked)</description>
+		<year>1978</year>
+		<publisher>Personal Software</publisher>
+		<info name="release" value="2019-12-08"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="microchess 2.0 (4am crack).dsk" size="143360" crc="9fc08a09" sha1="b52c1b418187e89d6e941be49b99c1ae98578a26"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spyntham">
+		<description>The Spy's Adventures in North America (Version 1987-10-31) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Polarware</publisher>
+		<info name="release" value="2019-12-12"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the spy's adventures in north america v1987-10-31 (4am crack) side a.dsk" size="143360" crc="812f1df0" sha1="05918f348c77e2514e2d3b4476ef0d7483013f39"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the spy's adventures in north america v1987-10-31 (4am crack) side b (boot).dsk" size="143360" crc="71682a55" sha1="a93665520b5293770d8ae46fb4dd89bb49ddcef9"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
