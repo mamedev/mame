@@ -33970,6 +33970,9 @@ raidenu                         // (c) 1990 Seibu Kaihatsu + Fabtek license
 raidenua                        // (c) 1990 Seibu Kaihatsu + Fabtek license
 raidenub                        // (c) 1990 Seibu Kaihatsu + Fabtek license
 
+@source:raiden_ms.cpp
+raidenm                         // bootleg
+
 @source:raiden2.cpp
 raiden2                         // (c) 1993 Seibu Kaihatsu + Fabtek license
 raiden2dx                       // (c) 1993 Seibu Kaihatsu

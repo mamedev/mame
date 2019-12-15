@@ -3608,6 +3608,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/raiden.cpp",
 	MAME_DIR .. "src/mame/includes/raiden.h",
 	MAME_DIR .. "src/mame/video/raiden.cpp",
+	MAME_DIR .. "src/mame/drivers/raiden_ms.cpp",
 	MAME_DIR .. "src/mame/drivers/raiden2.cpp",
 	MAME_DIR .. "src/mame/includes/raiden2.h",
 	MAME_DIR .. "src/mame/video/raiden2.cpp",

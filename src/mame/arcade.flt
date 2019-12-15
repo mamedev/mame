@@ -993,6 +993,7 @@ r2dtank.cpp
 r2dx_v33.cpp
 rabbit.cpp
 raiden.cpp
+raiden_ms.cpp
 raiden2.cpp
 rallyx.cpp
 rampart.cpp
