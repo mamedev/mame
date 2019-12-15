@@ -1931,17 +1931,16 @@ Core Input Options
 
 **-joystick_map** *<map>* / **-joymap** *<map>*
 
-    Controls how joystick values map to digital joystick controls.   
+    Controls how analog joystick values map to digital joystick controls.   
     
-    Systems such as Pac-Man use a 4-way joystick and will actually exhibit
+    Systems such as Pac-Man use a 4-way digital joystick and will exhibit
     undesired behavior when a diagonal is triggered; in the case of Pac-Man,
     movement will stop completely at intersections when diagonals are triggered
     and the game will be considerably harder to play correctly.  Many other
     arcade cabinets used 4-way or 8-way joysticks (as opposed to full analog
-    joysticks), so for PC-style true analog joysticks this then needs to be
-    mapped down to the expected 4-way or 8-way digital joystick values.  This
-    is because MAME accepts all joystick input from your controller as analog
-    data.
+    joysticks), so for true analog joysticks such as flight sticks and analog
+    thumb sticks, this then needs to be mapped down to the expected
+    4-way or 8-way digital joystick values.
     
     To do this, MAME divides the analog range into a 9x9 grid that looks
     like this:
@@ -1967,7 +1966,7 @@ Core Input Options
     of the current system.
 
     Generally you will want to set up the **-joystick_map** setting in the
-    per-system ``<system>.cfg`` file as opposed to the main ``MAME.INI``
+    per-system ``<system>.ini`` file as opposed to the main ``MAME.INI``
     file so that the mapping only affects the systems you want it to.  See 
     :ref:`Multiple Configuration Files <advanced-multi-CFG>` for further
     details on per-system configuration.
