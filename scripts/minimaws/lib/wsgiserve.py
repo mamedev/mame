@@ -106,6 +106,9 @@ class QueryPageHandler(HandlerBase):
     def softwarelist_href(self, softwarelist):
         return cgi.escape(urlparse.urljoin(self.application_uri, 'softwarelist/%s' % (urlquote(softwarelist), )), True)
 
+    def software_href(self, softwarelist, software):
+        return cgi.escape(urlparse.urljoin(self.application_uri, 'softwarelist/%s/%s' % (urlquote(softwarelist), urlquote(software))), True)
+
 
 class MachineRpcHandlerBase(QueryPageHandler):
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
@@ -146,7 +149,7 @@ class MachineHandler(QueryPageHandler):
             self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
             return self.error_page(404)
         else:
-            machine_info = self.dbcurs.get_machine_info(self.shortname).fetchone()
+            machine_info = self.dbcurs.get_machine_details(self.shortname).fetchone()
             if not machine_info:
                 self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
                 return self.error_page(404)
@@ -432,18 +435,42 @@ class SourceFileHandler(QueryPageHandler):
 class SoftwareListHandler(QueryPageHandler):
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
         super(SoftwareListHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+        self.shortname = wsgiref.util.shift_path_info(environ)
+        self.software = wsgiref.util.shift_path_info(environ)
 
     def __iter__(self):
-        self.filename = self.environ['PATH_INFO']
-        if self.filename and (self.filename[0] == '/'):
-            self.filename = self.filename[1:]
-        if (not self.filename) or ('*' in self.filename) or ('?' in self.filename):
+        if self.environ['PATH_INFO']:
+            self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
+            return self.error_page(404)
+        elif self.software and ('*' not in self.software) and ('?' not in self.software):
+            software_info = self.dbcurs.get_software_details(self.shortname, self.software).fetchone()
+            if not software_info:
+                self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
+                return self.error_page(404)
+            elif self.environ['REQUEST_METHOD'] != 'GET':
+                self.start_response('405 %s' % (self.STATUS_MESSAGE[405], ), [('Content-type', 'text/html; charset=utf-8'), ('Accept', 'GET, HEAD, OPTIONS'), ('Cache-Control', 'public, max-age=3600')])
+                return self.error_page(405)
+            else:
+                self.start_response('200 OK', [('Content-type', 'text/html; chearset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
+                return self.software_page(software_info)
+        elif self.software or (self.shortname and ('*' not in self.shortname) and ('?' not in self.shortname)):
+            softwarelist_info = self.dbcurs.get_softwarelist_details(self.shortname, self.software or None).fetchone()
+            if not softwarelist_info:
+                self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
+                return self.error_page(404)
+            elif self.environ['REQUEST_METHOD'] != 'GET':
+                self.start_response('405 %s' % (self.STATUS_MESSAGE[405], ), [('Content-type', 'text/html; charset=utf-8'), ('Accept', 'GET, HEAD, OPTIONS'), ('Cache-Control', 'public, max-age=3600')])
+                return self.error_page(405)
+            else:
+                self.start_response('200 OK', [('Content-type', 'text/html; chearset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
+                return self.softwarelist_page(softwarelist_info, self.software or None)
+        else:
             if self.environ['REQUEST_METHOD'] != 'GET':
                 self.start_response('405 %s' % (self.STATUS_MESSAGE[405], ), [('Content-type', 'text/html; charset=utf-8'), ('Accept', 'GET, HEAD, OPTIONS'), ('Cache-Control', 'public, max-age=3600')])
                 return self.error_page(405)
             else:
                 self.start_response('200 OK', [('Content-type', 'text/html; chearset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
-                return self.softwarelist_listing_page(self.filename if self.filename else None)
+                return self.softwarelist_listing_page(self.shortname or None)
 
     def softwarelist_listing_page(self, pattern):
         if not pattern:
@@ -460,10 +487,93 @@ class SoftwareListHandler(QueryPageHandler):
                     shortname=cgi.escape(shortname),
                     description=cgi.escape(description),
                     total=cgi.escape('%d' % total),
-                    supported=cgi.escape('%d' % supported),
-                    partiallysupported=cgi.escape('%d' % partiallysupported),
-                    unsupported=cgi.escape('%d' % unsupported)).encode('utf-8')
+                    supported=cgi.escape('%.1f%%' % (supported * 100.0 / (total or 1), )),
+                    partiallysupported=cgi.escape('%.1f%%' % (partiallysupported * 100.0 / (total or 1), )),
+                    unsupported=cgi.escape('%.1f%%' % (unsupported * 100.0 / (total or 1), ))).encode('utf-8')
         yield '    </tbody>\n</table>\n<script>make_table_sortable(document.getElementById("tbl-softwarelists"));</script>\n</body>\n</html>\n'.encode('utf-8')
+
+    def softwarelist_page(self, softwarelist_info, pattern):
+        if not pattern:
+            title = 'Software List: %s (%s)' % (cgi.escape(softwarelist_info['description']), cgi.escape(softwarelist_info['shortname']))
+            heading = cgi.escape(softwarelist_info['description'])
+        else:
+            title = 'Software List: %s (%s): %s' % (cgi.escape(softwarelist_info['description']), cgi.escape(softwarelist_info['shortname']), cgi.escape(pattern))
+            heading = '<a href="%s">%s</a>: %s' % (self.softwarelist_href(softwarelist_info['shortname']), cgi.escape(softwarelist_info['description']), cgi.escape(pattern))
+        yield htmltmpl.SOFTWARELIST_PROLOGUE.substitute(
+                assets=cgi.escape(urlparse.urljoin(self.application_uri, 'static'), True),
+                title=title,
+                heading=heading,
+                shortname=cgi.escape(softwarelist_info['shortname']),
+                total=cgi.escape('%d' % (softwarelist_info['total'], )),
+                supported=cgi.escape('%d' % (softwarelist_info['supported'], )),
+                supportedpc=cgi.escape('%.1f' % (softwarelist_info['supported'] * 100.0 / (softwarelist_info['total'] or 1), )),
+                partiallysupported=cgi.escape('%d' % (softwarelist_info['partiallysupported'], )),
+                partiallysupportedpc=cgi.escape('%.1f' % (softwarelist_info['partiallysupported'] * 100.0 / (softwarelist_info['total'] or 1), )),
+                unsupported=cgi.escape('%d' % (softwarelist_info['unsupported'], )),
+                unsupportedpc=cgi.escape('%.1f' % (softwarelist_info['unsupported'] * 100.0 / (softwarelist_info['total'] or 1), ))).encode('utf-8')
+
+        first = True
+        for software_info in self.dbcurs.get_softwarelist_software(softwarelist_info['id'], self.software or None):
+            if first:
+                yield \
+                        '<table id="tbl-software">\n' \
+                        '    <thead>\n' \
+                        '        <tr>\n' \
+                        '            <th>Short name</th>\n' \
+                        '            <th>Description</th>\n' \
+                        '            <th>Year</th>\n' \
+                        '            <th>Publisher</th>\n' \
+                        '            <th>Supported</th>\n' \
+                        '            <th class="numeric">Parts</th>\n' \
+                        '        </tr>\n' \
+                        '    </thead>\n' \
+                        '    <tbody>\n'.encode('utf-8')
+                first = False
+            yield self.software_row(software_info)
+        if first:
+            yield '<p>No software found.</p>\n'.encode('utf-8')
+        else:
+            yield '    </tbody>\n</table>\n<script>make_table_sortable(document.getElementById("tbl-software"));</script>\n'.encode('utf-8')
+
+        yield '</body>\n</html>\n'.encode('utf-8')
+
+    def software_page(self, software_info):
+        yield htmltmpl.SOFTWARE_PROLOGUE.substitute(
+                assets=cgi.escape(urlparse.urljoin(self.application_uri, 'static'), True),
+                title=cgi.escape(software_info['description']),
+                heading=cgi.escape(software_info['description']),
+                softwarelisthref=self.softwarelist_href(self.shortname),
+                softwarelistdescription=cgi.escape(software_info['softwarelistdescription']),
+                softwarelist=cgi.escape(self.shortname),
+                shortname=cgi.escape(software_info['shortname']),
+                year=cgi.escape(software_info['year']),
+                publisher=cgi.escape(software_info['publisher']),
+                supported=cgi.escape('Yes' if software_info['supported'] == 0 else 'Partial' if software_info['supported'] == 1 else 'No')).encode('utf-8')
+        for name, value in self.dbcurs.get_software_info(software_info['id']):
+            yield ('    <tr><th>%s:</th><td>%s</td>\n' % (cgi.escape(name), cgi.escape(value))).encode('utf-8')
+        yield '</table>\n\n'.encode('utf-8')
+
+        parts = self.dbcurs.get_software_parts(software_info['id']).fetchall()
+        for id, partname, interface, part_id in parts:
+            yield htmltmpl.SOFTWARE_PART_PROLOGUE.substitute(
+                    heading=cgi.escape(('%s (%s)' % (part_id, partname)) if part_id is not None else partname),
+                    shortname=cgi.escape(partname),
+                    interface=cgi.escape(interface)).encode('utf-8')
+            for name, value in self.dbcurs.get_softwarepart_features(id):
+                yield ('    <tr><th>%s:</th><td>%s</td>\n' % (cgi.escape(name), cgi.escape(value))).encode('utf-8')
+            yield '</table>\n\n'.encode('utf-8')
+
+        yield '</body>\n</html>\n'.encode('utf-8')
+
+    def software_row(self, software_info):
+        return htmltmpl.SOFTWARELIST_ROW.substitute(
+                softwarehref=self.software_href(self.shortname, software_info['shortname']),
+                shortname=cgi.escape(software_info['shortname']),
+                description=cgi.escape(software_info['description']),
+                year=cgi.escape(software_info['year']),
+                publisher=cgi.escape(software_info['publisher']),
+                supported=cgi.escape('Yes' if software_info['supported'] == 0 else 'Partial' if software_info['supported'] == 1 else 'No'),
+                parts=cgi.escape('%d' % software_info['parts'])).encode('utf-8')
 
 
 class RomIdentHandler(QueryPageHandler):
@@ -568,13 +678,33 @@ class RomDumpsRpcHandler(QueryPageHandler):
             return self.error_page(500)
 
     def data_page(self, crc, sha1):
-        result = { }
+        machines = { }
         for shortname, description, label, bad in self.dbcurs.get_rom_dumps(crc, sha1):
-            machine = result.get(shortname)
+            machine = machines.get(shortname)
             if machine is None:
                 machine = { 'description': description, 'matches': [ ] }
-                result[shortname] = machine
+                machines[shortname] = machine
             machine['matches'].append({ 'name': label, 'bad': bool(bad) })
+
+        software = { }
+        for softwarelist, softwarelistdescription, shortname, description, part, part_id, label, bad in self.dbcurs.get_software_rom_dumps(crc, sha1):
+            listinfo = software.get(softwarelist)
+            if listinfo is None:
+                listinfo = { 'description': softwarelistdescription, 'software': { } }
+                software[softwarelist] = listinfo
+            softwareinfo = listinfo['software'].get(shortname)
+            if softwareinfo is None:
+                softwareinfo = { 'description': description, 'parts': { } }
+                listinfo['software'][shortname] = softwareinfo
+            partinfo = softwareinfo['parts'].get(part)
+            if partinfo is None:
+                partinfo = { 'matches': [ ] }
+                if part_id is not None:
+                    partinfo['description'] = part_id
+                softwareinfo['parts'][part] = partinfo
+            partinfo['matches'].append({ 'name': label, 'bad': bool(bad) })
+
+        result = { 'machines': machines, 'software': software }
         yield json.dumps(result).encode('utf-8')
 
 
@@ -603,13 +733,33 @@ class DiskDumpsRpcHandler(QueryPageHandler):
             return self.error_page(500)
 
     def data_page(self, sha1):
-        result = { }
+        machines = { }
         for shortname, description, label, bad in self.dbcurs.get_disk_dumps(sha1):
-            machine = result.get(shortname)
+            machine = machines.get(shortname)
             if machine is None:
                 machine = { 'description': description, 'matches': [ ] }
-                result[shortname] = machine
+                machines[shortname] = machine
             machine['matches'].append({ 'name': label, 'bad': bool(bad) })
+
+        software = { }
+        for softwarelist, softwarelistdescription, shortname, description, part, part_id, label, bad in self.dbcurs.get_software_disk_dumps(sha1):
+            listinfo = software.get(softwarelist)
+            if listinfo is None:
+                listinfo = { 'description': softwarelistdescription, 'software': { } }
+                software[softwarelist] = listinfo
+            softwareinfo = listinfo['software'].get(shortname)
+            if softwareinfo is None:
+                softwareinfo = { 'description': description, 'parts': { } }
+                listinfo['software'][shortname] = softwareinfo
+            partinfo = softwareinfo['parts'].get(part)
+            if partinfo is None:
+                partinfo = { 'matches': [ ] }
+                if part_id is not None:
+                    partinfo['description'] = part_id
+                softwareinfo['parts'][part] = partinfo
+            partinfo['matches'].append({ 'name': label, 'bad': bool(bad) })
+
+        result = { 'machines': machines, 'software': software }
         yield json.dumps(result).encode('utf-8')
 
 

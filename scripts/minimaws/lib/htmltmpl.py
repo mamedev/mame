@@ -165,6 +165,85 @@ SOURCEFILE_LIST_ROW = string.Template(
         '        </tr>\n')
 
 
+SOFTWARE_PROLOGUE = string.Template(
+        '<!DOCTYPE html>\n' \
+        '<html>\n' \
+        '<head>\n' \
+        '    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">\n' \
+        '    <meta http-equiv="Content-Style-Type" content="text/css">\n' \
+        '    <meta http-equiv="Content-Script-Type" content="text/javascript">\n' \
+        '    <link rel="stylesheet" type="text/css" href="${assets}/style.css">\n' \
+        '    <script type="text/javascript">var assetsurl="${assets}"</script>\n' \
+        '    <script type="text/javascript" src="${assets}/common.js"></script>\n' \
+        '    <title>${title}</title>\n' \
+        '</head>\n' \
+        '<body>\n' \
+        '<h1>${heading}</h1>\n' \
+        '<table class="sysinfo">\n' \
+        '    <tr><th>Software list:</th><td><a href="${softwarelisthref}">${softwarelistdescription} (${softwarelist})</a></td></tr>\n' \
+        '    <tr><th>Short name:</th><td>${shortname}</td></tr>\n' \
+        '    <tr><th>Year:</th><td>${year}</td></tr>\n' \
+        '    <tr><th>Publisher:</th><td>${publisher}</td></tr>\n' \
+        '    <tr><th>Suported:</th><td>${supported}</td></tr>\n');
+
+SOFTWARE_PART_PROLOGUE = string.Template(
+        '<h2>${heading}</h2>\n' \
+        '<table class="sysinfo">\n' \
+        '    <tr><th>Short name:</th><td>${shortname}</td></tr>\n' \
+        '    <tr><th>Interface:</th><td>${interface}</td></tr>\n')
+
+
+SOFTWARELIST_PROLOGUE = string.Template(
+        '<!DOCTYPE html>\n' \
+        '<html>\n' \
+        '<head>\n' \
+        '    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">\n' \
+        '    <meta http-equiv="Content-Style-Type" content="text/css">\n' \
+        '    <meta http-equiv="Content-Script-Type" content="text/javascript">\n' \
+        '    <link rel="stylesheet" type="text/css" href="${assets}/style.css">\n' \
+        '    <script type="text/javascript">var assetsurl="${assets}"</script>\n' \
+        '    <script type="text/javascript" src="${assets}/common.js"></script>\n' \
+        '    <title>${title}</title>\n' \
+        '</head>\n' \
+        '<body>\n' \
+        '<h1>${heading}</h1>\n' \
+        '<table class="sysinfo">\n' \
+        '    <tr>\n' \
+        '        <th>Short name:</th>\n' \
+        '        <td>${shortname}</td>\n' \
+        '    </tr>\n' \
+        '    <tr>\n' \
+        '        <th>Total:</th>\n' \
+        '        <td style="text-align: right">${total}</td>\n' \
+        '    </tr>\n' \
+        '    <tr>\n' \
+        '        <th>Supported:</th>\n' \
+        '        <td style="text-align: right">${supported}</td>\n' \
+        '        <td style="text-align: right">(${supportedpc}%)</td>\n' \
+        '    </tr>\n' \
+        '    <tr>\n' \
+        '        <th>Partially supported:</th>\n' \
+        '        <td style="text-align: right">${partiallysupported}</td>\n' \
+        '        <td style="text-align: right">(${partiallysupportedpc}%)</td>\n' \
+        '    </tr>\n' \
+        '    <tr>\n' \
+        '        <th>Unsupported:</th>\n' \
+        '        <td style="text-align: right">${unsupported}</td>\n' \
+        '        <td style="text-align: right">(${unsupportedpc}%)</td>\n' \
+        '    </tr>\n' \
+        '</table>\n')
+
+SOFTWARELIST_ROW = string.Template(
+        '        <tr>\n' \
+        '            <td><a href="${softwarehref}">${shortname}</a></td>\n' \
+        '            <td><a href="${softwarehref}">${description}</a></td>\n' \
+        '            <td>${year}</td>\n' \
+        '            <td>${publisher}</td>\n' \
+        '            <td>${supported}</td>\n' \
+        '            <td style="text-align: right">${parts}</td>\n' \
+        '        </tr>\n')
+
+
 SOFTWARELIST_LIST_PROLOGUE = string.Template(
         '<!DOCTYPE html>\n' \
         '<html>\n' \
@@ -229,5 +308,6 @@ ROMIDENT_PAGE = string.Template(
         '<input id="input-dumps" type="file" multiple onchange="add_dump_files(this.files)" style="display: none">\n' \
         '<div id="div-progress"></div>\n' \
         '<div id="div-machines"></div>\n' \
+        '<div id="div-software"></div>\n' \
         '</body>\n' \
         '</html>\n')

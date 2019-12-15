@@ -286,7 +286,47 @@ class ListXmlHandler(ElementHandler):
         pass
 
 
+class DataAreaHandler(ElementHandler):
+    def __init__(self, parent, **kwargs):
+        super(DataAreaHandler, self).__init__(parent=parent, **kwargs)
+        self.dbcurs = parent.dbcurs
+        self.part = parent.id
+
+    def startChildElement(self, name, attrs):
+        if name == 'rom':
+            crc = attrs.get('crc')
+            sha1 = attrs.get('sha1')
+            if ('name' in attrs) and (crc is not None) and (sha1 is not None):
+                crc = int(crc, 16)
+                sha1 = sha1.lower()
+                self.dbcurs.add_rom(crc, sha1)
+                status = attrs.get('status', 'good')
+                self.dbcurs.add_softwareromdump(self.part, attrs['name'], crc, sha1, status != 'good')
+        self.setChildHandler(name, attrs, self.IGNORE)
+
+
+class DiskAreaHandler(ElementHandler):
+    def __init__(self, parent, **kwargs):
+        super(DiskAreaHandler, self).__init__(parent=parent, **kwargs)
+        self.dbcurs = parent.dbcurs
+        self.part = parent.id
+
+    def startChildElement(self, name, attrs):
+        if name == 'disk':
+            sha1 = attrs.get('sha1')
+            if sha1 is not None:
+                sha1 = sha1.lower()
+                self.dbcurs.add_disk(sha1)
+                status = attrs.get('status', 'good')
+                self.dbcurs.add_softwarediskdump(self.part, attrs['name'], sha1, status != 'good')
+        self.setChildHandler(name, attrs, self.IGNORE)
+
+
 class SoftwarePartHandler(ElementHandler):
+    CHILD_HANDLERS = {
+            'dataarea':         DataAreaHandler,
+            'diskarea':         DiskAreaHandler }
+
     def __init__(self, parent, **kwargs):
         super(SoftwarePartHandler, self).__init__(parent=parent, **kwargs)
         self.dbcurs = parent.dbcurs
@@ -296,10 +336,13 @@ class SoftwarePartHandler(ElementHandler):
         self.id = self.dbcurs.add_softwarepart(self.software, attrs['name'], attrs['interface'])
 
     def startChildElement(self, name, attrs):
-        if name == 'feature':
-            self.dbcurs.add_softwarepartfeaturetype(attrs['name'])
-            self.dbcurs.add_softwarepartfeature(self.id, attrs['name'], attrs['value'])
-        self.setChildHandler(name, attrs, self.IGNORE)
+        if name in self.CHILD_HANDLERS:
+            self.setChildHandler(name, attrs, self.CHILD_HANDLERS[name](self))
+        else:
+            if name == 'feature':
+                self.dbcurs.add_softwarepartfeaturetype(attrs['name'])
+                self.dbcurs.add_softwarepartfeature(self.id, attrs['name'], attrs['value'])
+            self.setChildHandler(name, attrs, self.IGNORE)
 
 
 class SoftwareHandler(ElementHandler):

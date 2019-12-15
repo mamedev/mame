@@ -142,7 +142,12 @@ function get_machine_table(shortname, description)
 	else
 	{
 		var div = document.getElementById('div-machines');
-		var heading = div.appendChild(document.createElement('h2'));
+		if (!div.hasChildNodes())
+		{
+			var heading = div.appendChild(document.createElement('h2'));
+			heading.textContent = 'Machines';
+		}
+		var heading = div.appendChild(document.createElement('h3'));
 		var link = heading.appendChild(document.createElement('a'));
 		link.textContent = description;
 		link.setAttribute('href', appurl + 'machine/' + encodeURIComponent(shortname));
@@ -164,17 +169,17 @@ function request_dumps(name, group, crc, sha1, url, progress)
 				if (req.status == 200)
 				{
 					var machines = Object.create(null);
-					var matched = Object.keys(req.response);
+					var matched = Object.keys(req.response.machines);
 					if (matched.length > 0)
 					{
 						Object.keys(machine_info).forEach(
 								function (shortname)
 								{
 									var table = machine_info[shortname];
-									if (Object.hasOwnProperty.call(req.response, shortname))
+									if (Object.hasOwnProperty.call(req.response.machines, shortname))
 									{
-										machines[shortname] = req.response[shortname].matches;
-										add_matches(table, group.names, req.response[shortname].matches);
+										machines[shortname] = req.response.machines[shortname].matches;
+										add_matches(table, group.names, req.response.machines[shortname].matches);
 									}
 									else
 									{
@@ -186,9 +191,9 @@ function request_dumps(name, group, crc, sha1, url, progress)
 								{
 									if (!Object.hasOwnProperty.call(machine_info, shortname))
 									{
-										var info = req.response[shortname];
+										var info = req.response.machines[shortname];
 										var table = get_machine_table(shortname, info.description);
-										machines[shortname] = req.response[shortname].matches;
+										machines[shortname] = req.response.machines[shortname].matches;
 										add_matches(table, group.names, info.matches);
 									}
 								});
