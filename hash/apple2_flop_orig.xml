@@ -9220,4 +9220,261 @@
 		</part>
 	</software>
 
+	<software name="swdthrst">
+		<description>SwordThrust</description>
+		<year>1981</year>
+		<publisher>CE Software</publisher>
+		<info name="release" value="2019-12-13"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - The King's Testing Ground"/>
+			<dataarea name="flop" size="234803">
+				<rom name="swordthrust 1 - the king's testing ground.woz" size="234803" crc="2fc15f87" sha1="2485fabc0bdb7c0510aba117bbb2c061132e5308"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - The Vampyre Caves"/>
+			<dataarea name="flop" size="234795">
+				<rom name="swordthrust 2 - the vampyre caves.woz" size="234795" crc="ae2a955a" sha1="7535103884553e0e76cc6431bef451781f824625"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Kidnapper's Cove"/>
+			<dataarea name="flop" size="234794">
+				<rom name="swordthrust 3 - kidnapper's cove.woz" size="234794" crc="0b6a7b1f" sha1="8d8a082318dbd1dbbe2f70345bfb20370b09d778"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - The Case of the Sultan's Pearl"/>
+			<dataarea name="flop" size="234808">
+				<rom name="swordthrust 4 - the case of the sultan's pearl.woz" size="234808" crc="44f9dd98" sha1="92a92e08f88d532baac14ded24e715eb0927e4a2"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5 - The Green Plague"/>
+			<dataarea name="flop" size="234794">
+				<rom name="swordthrust 5 - the green plague.woz" size="234794" crc="1c31328c" sha1="1f6259ded174a8e6c92106e70ddbe2e81ff8188e"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6 - The Eternal Curse"/>
+			<dataarea name="flop" size="234795">
+				<rom name="swordthrust 6 - the eternal curse.woz" size="234795" crc="aa3ddc2d" sha1="63f26fe03b5c07a6acd114770337c0b6230c58f7"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 7 - The Hall of Alchemie"/>
+			<dataarea name="flop" size="234797">
+				<rom name="swordthrust 7 - the hall of alchemie.woz" size="234797" crc="c1342b27" sha1="c64d8b50d94e899181dda44d9077b39e5bcd953e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redoctbr">
+		<description>The Hunt for Red October</description>
+		<year>1988</year>
+		<publisher>Datasoft</publisher>
+		<info name="release" value="2019-12-14"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234814">
+				<rom name="the hunt for red october side a.woz" size="234814" crc="45889aad" sha1="b5480e897774e02d351133dec715aae15c434748"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="234814">
+				<rom name="the hunt for red october side b (boot).woz" size="234814" crc="d37c8b65" sha1="9d2c0caffb1999f987954a4337232ad68fee1135"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galattk">
+		<description>Galactic Attack</description>
+		<year>1980</year>
+		<publisher>Sir-Tech</publisher>
+		<info name="release" value="2019-12-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234790">
+				<rom name="galactic attack.woz" size="234790" crc="013efc71" sha1="68975194ff1b597ed4e2773649bb8880d050a1cd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="journey">
+		<description>Journey (version 16)</description>
+		<year>1989</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2019-12-14"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="234863">
+				<rom name="journey side 1.woz" size="234863" crc="590b865d" sha1="65dcb44b636ac6f612b3fc53a69f8430205b5798"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="234863">
+				<rom name="journey side 2.woz" size="234863" crc="6a5ca90b" sha1="8a5a75b251a55ab1d215011d084aba3cf6277712"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="234863">
+				<rom name="journey side 3.woz" size="234863" crc="b630f8c3" sha1="d6a1d079d3eab8a151009c442c93d548cce436bc"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side 4"/>
+			<dataarea name="flop" size="234863">
+				<rom name="journey side 4.woz" size="234863" crc="18343fa8" sha1="0b89081e7dd389e6a3e84117c80cde562743439c"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Side 5"/>
+			<dataarea name="flop" size="234863">
+				<rom name="journey side 5.woz" size="234863" crc="7d133bcb" sha1="ea92c49226e060015a941debe86dbc51386508c3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sthcmnd">
+		<description>Southern Command</description>
+		<year>1981</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2019-12-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple ][+ or later. -->
+		<!--"Southern Command" is a 1981 strategy game created by Roger Keating and published by Strategic Simulations. It requires a 48K Apple ][+ or later.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234863">
+				<rom name="southern command.woz" size="234863" crc="e04bb52c" sha1="bc53a1a66fc347859c17238a28b3bd4a8b178739"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizrdry4">
+		<description>Wizardry IV: The Return of Werdna</description>
+		<year>1987</year>
+		<publisher>Sir-Tech</publisher>
+		<info name="release" value="2019-12-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234833">
+				<rom name="wizardry iv - the return of werdna side a.woz" size="234833" crc="0c6ac6a0" sha1="f465fb3b88eb38c197e24da1ae1962f6d0a58cd9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234833">
+				<rom name="wizardry iv - the return of werdna side b.woz" size="234833" crc="179d1324" sha1="7bff6956d76129cc82d5e5ac6ba30d8806054bdf"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C"/>
+			<dataarea name="flop" size="234833">
+				<rom name="wizardry iv - the return of werdna side c.woz" size="234833" crc="0493f3d5" sha1="22efb911669d42525a8e8ab35b2a34ca5ef2fdbd"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side D"/>
+			<dataarea name="flop" size="234833">
+				<rom name="wizardry iv - the return of werdna side d.woz" size="234833" crc="897eb0dc" sha1="21f4d0bd66d9d3a275678dbfc7cabb0cc023910f"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Side E"/>
+			<dataarea name="flop" size="234833">
+				<rom name="wizardry iv - the return of werdna side e.woz" size="234833" crc="0fd25eba" sha1="eb07e89850635da688a5aa1d372eebbc19594c9e"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Side F"/>
+			<dataarea name="flop" size="234833">
+				<rom name="wizardry iv - the return of werdna side f.woz" size="234833" crc="3a8a7986" sha1="a2684a58605af6ddbd6554bc99333ab3947dd4e9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arthurqe">
+		<description>Arthur: The Quest for Excalibur</description>
+		<year>1989</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2019-12-15"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="234839">
+				<rom name="arthur side 1.woz" size="234839" crc="8534268e" sha1="4162e37f10fd7651f75aa66a6892840f472e7af0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="234839">
+				<rom name="arthur side 2.woz" size="234839" crc="18b74288" sha1="ee97de7925d9292f474168102caa91c618335893"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="234839">
+				<rom name="arthur side 3.woz" size="234839" crc="0c73db6b" sha1="c9bc4068148fcef5871cd43a1aef2b60130148d9"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side 4"/>
+			<dataarea name="flop" size="234839">
+				<rom name="arthur side 4.woz" size="234839" crc="00d35f7c" sha1="1c8f142f965b2b7fd992a992cfc6c8bf8d51c113"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Side 5"/>
+			<dataarea name="flop" size="234839">
+				<rom name="arthur side 5.woz" size="234839" crc="f0d35742" sha1="d955728b5aca8bb88b8f6027ff7979bbc88b5303"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brdstale">
+		<description>The Bard's Tale</description>
+		<year>1985</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2019-12-15"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Boot disk"/>
+			<dataarea name="flop" size="228117">
+				<rom name="the bard's tale - boot disk.woz" size="228117" crc="ca391217" sha1="2965afea19b022330efdc4c4be3890f7558018d9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Character disk"/>
+			<dataarea name="flop" size="234773">
+				<rom name="the bard's tale - character disk.woz" size="234773" crc="92e2f239" sha1="1f1967c425c64118addb3d8bae0e2821259d4b89"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Dungeon disk"/>
+			<dataarea name="flop" size="234773">
+				<rom name="the bard's tale - dungeon disk.woz" size="234773" crc="b9099a69" sha1="45c9eb7161bc5c71fdbe2fc5c2ef99002cc81fed"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
