@@ -5072,6 +5072,18 @@
 		</part>
 	</software>
 
+	<software name="radrampr">
+		<description>Rad Ramp Racer</description>
+		<year></year>
+		<publisher></publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="526551">
+				<rom name="rad ramp racer.tap" size="526551" crc="edec25d7" sha1="f1e7cfb474c97c98cb528651800b4a53bdd6ad03"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ragbeast">
 		<description>Raging Beast</description>
 		<year>1985</year>
@@ -5546,6 +5558,18 @@
 		</part>
 	</software>
 
+	<software name="runtheg">
+		<description>Run the Gauntlet</description>
+		<year></year>
+		<publisher></publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="2223542">
+				<rom name="run the gauntlet.tap" size="2223542" crc="d0e77cb1" sha1="8592b26a06bde96cdb6a0877ceda75e4ed8db256"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rygar">
 		<description>Rygar</description>
 		<year>19??</year>
@@ -5642,6 +5666,18 @@
 		</part>
 	</software>
 
+	<software name="shrtcirc">
+		<description>Short Circuit</description>
+		<year></year>
+		<publisher></publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="522420">
+				<rom name="short circuit.tap" size="522420" crc="46fa6a6a" sha1="0d122e2b6a250dd482e603c986ba0e4d10dfede1"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="silkworm">
 		<description>Silkworm</description>
 		<year>1992</year>
@@ -5650,6 +5686,18 @@
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="536687">
 				<rom name="Silkworm.tap" size="536687" crc="41f022d1" sha1="a43f046e36b646af4b5f3b39bef32c21399f298b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skatrock">
+		<description>Skate Rock Simulator</description>
+		<year></year>
+		<publisher></publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="389641">
+				<rom name="skate rock simulator.tap" size="389641" crc="4466ca79" sha1="8cc217ccc2025cd7d74a0213482c5b96edf4da19"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5840,6 +5888,18 @@
 		</part>
 	</software>
 
+	<software name="spacehnt">
+		<description>Space Hunter</description>
+		<year></year>
+		<publisher></publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="565246">
+				<rom name="space hunter.tap" size="565246" crc="11c74761" sha1="5ee2e011ea5afa76823964000d7bd5c57e1ec863"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spacewalk">
 		<description>Space Walk</description>
 		<year>1984</year>
@@ -5891,6 +5951,18 @@
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="571101">
 				<rom name="Speedboat_Race.tap" size="571101" crc="6ad559bb" sha1="36a4604dc0ae095c188297383c8b9a22ad94304f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spellbnd">
+		<description>Spellbound</description>
+		<year></year>
+		<publisher></publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="746474">
+				<rom name="spellbound.tap" size="746474" crc="e93aabc7" sha1="af2c9c92e1c9b5b2580e57b89c2b98b2620714f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7226,13 +7298,25 @@
 	</software>
 
 	<software name="yogisesc">
-		<description>Yogi's Great Escape</description>
+		<description>Yogi's Great Escape (set 1)</description>
 		<year>1990</year>
 		<publisher>HiTEC Software</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="664250">
 				<rom name="Yogi's_Great_Escape.tap" size="664250" crc="d4ee781f" sha1="e200d3a7b4522f4bceb4ed431eb98c22fced8c7a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yogisesc1">
+		<description>Yogi's Great Escape (set 2)</description>
+		<year>1990</year>
+		<publisher>HiTEC Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="665130">
+				<rom name="Yogi's_Great_Escape_a.tap" size="665130" crc="268e5891" sha1="bca798fa1f984ace680442205c63fc7ee06e67ec"/>
 			</dataarea>
 		</part>
 	</software>
