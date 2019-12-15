@@ -1891,7 +1891,7 @@ ROM_START( ht12a )
 ROM_END
 
 
-// ***** 286 motherboards using the 5 chip SUNTAC chipset
+// ***** motherboards using the six chip SUNTAC chipset: ST62BC001-B, ST62BC002-B, ST62BC003-B, ST62C006, ST62BC004-B1, ST62BC005-B
 
 // Magitronic B233 (8 ISA slots)
 // SUNTAC Chipset, http://toastytech.com/manuals/Magitronic%20B233%20Manual.pdf
@@ -1919,14 +1919,6 @@ ROM_START( aubam12s2 )
 	ROMX_LOAD( "st-ph-h.rom", 0x00000, 0x10000, CRC(5b4fd7ee) SHA1(821fe868da5c7ff28f2c7b9bae03d0b8a76af796), ROM_SKIP(1))
 ROM_END
 
-// BIOS ROMs are marked TCI, Award 286 Modular BIOS Version 3.03HLS
-// complains about "refresh timing error, but works - BIOS release date:: 15-11-1985
-ROM_START( suntac5 )
-	ROM_REGION16_LE(0x20000, "bios", 0)
-	ROMX_LOAD( "suntac_80286_lo.bin", 0x18000, 0x4000, CRC(f7bf6c49) SHA1(d8e813c264008f096006f46b90769c0927e44da9), ROM_SKIP(1))
-	ROMX_LOAD( "suntac_80286_hi.bin", 0x18001, 0x4000, CRC(5f382e78) SHA1(8ba222df9d7028513e37978598d8139906e8834c), ROM_SKIP(1))
-ROM_END
-
 // HLB-286 MBA-009 - BIOS: 286 Modular BIOS Version 3.03 HL - HLB-286 System
 // SUNTAC ST62BC002-B, ST62BC005-B, ST62BC003-B, ST62BC001-B, ST62C00B, ST62BC004-B1
 ROM_START( mba009 )
@@ -1949,6 +1941,38 @@ ROM_START( ev1815 )
 	ROMX_LOAD( "award_v3.03gs_ev1815_odd.bin", 0x10001, 0x8000, CRC(5bcd9421) SHA1(f32e5a39da593c6982f964fb05b0802d54c3de45), ROM_SKIP(1) | ROM_BIOS(1) )
 ROM_END
 
+// Mintek BAY-1000C V1.01 - Chipset: SUNTAC ST62BC002-B, ST62C005-B, ST62BC001-B, ST62BC003-B, ST62BC004-B1, ST62C008
+// CPU: AMD N80L286-12/S - RAM: 4xSIMM30, 18x18pin/16pin, 8x20pin, 4x16pin - OSC: 12.000, 14.31818, 25.000MHz - ISA8: 2, ISA16: 6
+// BIOS-String:  Phoenix 80286 ROM BIOS PLUS Version 3.10 00 / LYI-CHENG ENTERPRISE CO., LTD.
+ROM_START( bay1000c )
+	ROM_REGION16_LE( 0x20000, "bios", 0)
+	ROM_LOAD16_BYTE( "286-suntac_bay-1000c-ic22_32k.bin", 0x10000, 0x8000, CRC(105d3257) SHA1(cf10d09db57f65fee649adcb39058d9d9aefe9e9))
+	ROM_LOAD16_BYTE( "286-suntac_bay-1000c-ic23_32k.bin", 0x10001, 0x8000, CRC(3b997bb1) SHA1(70d3bb9e57624c9f64d70bc5f3c00305a08a8b2e))
+ROM_END
+
+ROM_START( suntac6 )
+	ROM_REGION16_LE(0x20000, "bios", 0)
+	// CPU: AMD N80L286-12/S - RAM: 36 sockets 18pin/16pin, fitted: 36x41C256P-8 - BIOS: Award 286 - Keyboard-BIOS: M5L8042-165P
+	// ISA8: 2, ISA16: 6 - OSC: 12.000 MHz, 24.000, 14.31818
+	// 0: BIOS-String: 286 Modular BIOS Version 3.03 01 Copyright Award Software Inc.
+	ROM_SYSTEM_BIOS(0, "terraat", "Terra AT")
+	ROMX_LOAD( "286-suntac-award_a2132439lo.bin", 0x18000, 0x4000, CRC(5fa269f8) SHA1(4167017aaeb63f4eedde155ba29f33ae2a94403b), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD( "286-suntac-award_a2132439hi.bin", 0x18001, 0x4000, CRC(114604c3) SHA1(db957783e6b16f6e1b8a831130d37fe51da84430), ROM_SKIP(1) | ROM_BIOS(0) )
+	// 1: BIOS-String: 286 Modular BIOS Version 0N3.03 NFS / ELT - board is identical to #0
+	ROM_SYSTEM_BIOS(1, "286suntacelt", "286 SUNTAC ELT")
+	ROMX_LOAD( "286-suntac-award_a2184058lo.bin", 0x18000, 0x4000, CRC(dbf48678) SHA1(75cb7971519cf55f9bb024eed70b831af1799506), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "286-suntac-award_a2184058hi.bin", 0x18001, 0x4000, CRC(2abea425) SHA1(1183d1fc665eab11042643c4f2e0eaa0490bb3df), ROM_SKIP(1) | ROM_BIOS(1) )
+	// 2: BIOS-String: DSUN-1105-043089-K0 - Keyboard-BIOS: AMI Keyboard BIOS PLUS A086031
+	// CPU: Intel N80286-12 - RAM: 36x16pin/16pin, used 36xTC511000AP-80 - ISA8: 2, ISA16: 6 - BIOS: AMI 286 BIOS PLUS SA073155
+	ROM_SYSTEM_BIOS(2, "sa073155", "SA073155")
+	ROMX_LOAD( "286-suntac_sa073155_ic22.bin", 0x00000, 0x10000, CRC(abf6c367) SHA1(79a07b9b9af2e1963cfcae75fafc3478885237cb), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "286-suntac_sa073155_ic23.bin", 0x00001, 0x10000, CRC(1d286cd9) SHA1(31be40c5008dc67cb24f4418cffaa57682e654c0), ROM_SKIP(1) | ROM_BIOS(2) )
+	// 3: BIOS ROMs are marked TCI, Award 286 Modular BIOS Version 3.03HLS
+	// complains about "refresh timing error, but works - BIOS release date:: 15-11-1985
+	ROM_SYSTEM_BIOS(3, "tci", "TCI")
+	ROMX_LOAD( "suntac_80286_lo.bin", 0x18000, 0x4000, CRC(f7bf6c49) SHA1(d8e813c264008f096006f46b90769c0927e44da9), ROM_SKIP(1) | ROM_BIOS(3) )
+	ROMX_LOAD( "suntac_80286_hi.bin", 0x18001, 0x4000, CRC(5f382e78) SHA1(8ba222df9d7028513e37978598d8139906e8834c), ROM_SKIP(1) | ROM_BIOS(3) )
+ROM_END
 
 // ***** 286 motherboards using the 5 chip VLSI chipset
 
@@ -2007,6 +2031,14 @@ ROM_END
 //**************************************************************************
 //  80286 Desktop
 //**************************************************************************
+
+// Profex PC 33 - Chipset: SUNTAC ST62BC004-B1, ST62BC003-B, ST62C008, ST62C005-B, ST62BC001-B, ST72BC002-B
+// RAM: 2xSIPP30, 18x18pin/16pin, 8x20pin, 4x16pin - OSC: 12.000, 14.31818, 24.000MHz - ISA8: 2, ISA16: 6
+// BIOS: Award A2245250 - Keyboard-BIOS: Award - BIOS-String: 286 Modular BIOS 3.03 Copyright Award Software Inc. / GCH
+ROM_START( profpc33 )
+	ROM_REGION16_LE(0x20000, "bios", 0)
+	ROM_LOAD( "st62-pro.bio", 0x10000, 0x10000, CRC(a42f9d0e) SHA1(384f4ddaf92307a5eeb70646a85ad991d904c2d2))
+ROM_END
 
 // Epson PC AX / Equity III+ - 102-System Board Error (according to the technical manual this means
 // "TlMER SPEED CHECK: An error was detected in timer controller counter 0."
@@ -2405,6 +2437,14 @@ ROM_END
 //**************************************************************************
 //  80386 SX and DX motherboard
 //**************************************************************************
+
+// 3SIUD-1.1 - CPU: AMD Am386SX/SXL-25 - Chipset: SiS 85C206, UMC (unreadable) - RAM: SIMM30x4, 8x20pin, 4x16pin
+// BIOS: AMI 386SX BIOS 70167 - Keyboard-BIOS: NEC KB-BIOS VER7 - ISA8: 1, ISA16: 5 - OSC: 50.000000MHz, 14.31818MHz
+// BIOS-String: 30-0200-ZZ1266-00101111-050591-UMC386SX-0 / 3SIUD-1.0
+ROM_START( 3siud )
+	ROM_REGION16_LE(0x20000, "bios", 0)
+	ROM_LOAD( "3siud_bios.bin", 0x10000, 0x10000, CRC(24fa8491) SHA1(635ce3db872e39d84f299356b960b0a16e2cf082))
+ROM_END
 
 // AMI 386 BABY SCREAMER - BIOS: AMI MARK V BABY SCREAMER - Chipset: VLSI VL82C331-FC, VL82C332-FC, Megatrends MG-9275, Chips ??? - OSC: 14.31818, 66.666, 24.000MHz
 // BIOS-String: 40-0301-000000-00101111-070791-SCREAMER-0 / BIOS RELEASE 42121691 - On board: 2xserial, parallel, floppy, 1xIDE
@@ -3196,6 +3236,8 @@ ROM_START( um82c481af )
 	ROMX_LOAD( "3umr001.bin", 0x10000, 0x10000, CRC(466a115e) SHA1(077d797c653528062f1c87b03c608427c35c5505), ROM_BIOS(0))
 	// 1: BIOS-String: 40-0100-001266-00101111-121291-UMCAUTO-0 - 3DIUD-1.2
 	// Chipset: // UMC UM92C206F, UM82C482AF, UM82C481BF - MB manufacturer according to BIOS is Modula Tech Co
+	// ISA8: 1, ISA16: 6 - RAM: 8xSIMM30, Cache: 9x28pin, used: 4xIS61C256AH-20N, 1xW2465AK-20, CPU: AMD 386DX-40
+	// CPU and FPU sockets provided - BIOS: AMI 386 BIOS, Keyboard-BIOS: AMI
 	ROM_SYSTEM_BIOS(1, "3diud", "386 UMC 3DIUD")
 	ROMX_LOAD( "386-umc-3flud.bin", 0x10000, 0x10000, CRC(2e795a01) SHA1(02e9e2871c1c1a542f44ab5eef66aee4b04225c1), ROM_BIOS(1))
 ROM_END
@@ -4407,7 +4449,7 @@ COMP( 198?, magb236,   ibm5170, 0,       ibm5162,   0,     at_state,     init_at
 COMP( 19??, mat286,    ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "unknown",     "MAT286 Rev.D", MACHINE_NOT_WORKING )
 COMP( 1986, pcd2,      ibm5170, 0,       ibm5170,   0,     at_state,     init_at,        "Siemens",     "PCD-2", MACHINE_NOT_WORKING )
 COMP( 19??, ht12a,     ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "unknown",     "unknown 286 AT clones (HT12/A chipset)", MACHINE_NOT_WORKING )
-COMP( 199?, suntac5,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "<unknown>", "286 motherboards with 5-chip SUNTAC chipset", MACHINE_NOT_WORKING )
+COMP( 199?, suntac6,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "<unknown>", "286 motherboards with 6-chip SUNTAC chipset", MACHINE_NOT_WORKING )
 COMP( 199?, headg2,    ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "<unknown>", "286 motherboards with Headland G2 chipset", MACHINE_NOT_WORKING )
 COMP( 198?, vlsi5,     ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "<unknown>", "286 motherboards with 5-chip VLSI chipset", MACHINE_NOT_WORKING )
 COMP( 198?, suntac303, ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "<unknown>", "286 motherboards with Suntac ST62C303-A chipset", MACHINE_NOT_WORKING )
@@ -4420,6 +4462,7 @@ COMP( 199?, mb1212c,   ibm5170, 0,       atturbo,   0,     at_state,     init_at
 COMP( 199?, cdtekg2,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "CDTEK", "286 mainboard with Headland G2 chipset", MACHINE_NOT_WORKING )
 COMP( 198?, cmpa286,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "CMP enterprise CO.LTD.", "286 motherboard", MACHINE_NOT_WORKING )
 COMP( 1988, dsys200,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Dell Computer Corporation",    "System 200", MACHINE_NOT_WORKING )
+COMP( 198?, bay1000c,  ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Mintek", "BAY-1000C V1.01", MACHINE_NOT_WORKING )
 COMP( 198?, mkp286,    ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Morse", "KP-286", MACHINE_NOT_WORKING )
 COMP( 199?, octekg2,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Octek", "286 motherboard with Headland G2 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, olim203,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Olivetti", "M203 motherboard", MACHINE_NOT_WORKING )
@@ -4436,6 +4479,7 @@ COMP( 1990, n8810m16v, ibm5170, 0,       atturbo,   0,     at_state,     init_at
 COMP( 198?, o286foxii, ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Octek",       "Fox II", MACHINE_NOT_WORKING )
 COMP( 1987, m290,      ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Olivetti",    "M290", MACHINE_NOT_WORKING )
 COMP( 1991, pcd204,    ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Philips",     "PCD204 (PCD200 series)", MACHINE_NOT_WORKING )
+COMP( 1990, profpc33,  ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Profex", "PC 33", MACHINE_NOT_WORKING )
 COMP( 1981, wpc250,    ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Wang Laboratories, Inc.", "PC-250/16", MACHINE_NOT_WORKING )
 COMP( 1990, n8810m30,  ibm5170, 0,       neat,      0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M30", MACHINE_NOT_WORKING )
 COMP( 198?, elt286b,   ibm5170, 0,       neat,      0,     at_state,     init_at,        "Chaintech", "ELT-286B-160B(E)", MACHINE_NOT_WORKING )
@@ -4461,6 +4505,7 @@ COMP( 199?, alim1217,  ibm5170, 0,       at386sx,   0,     at_state,     init_at
 COMP( 199?, op82c283,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "<unknown>",   "386sx motherboards using the OPTi 82C283 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, op82c291,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "<unknown>",   "386sx motherboards using the OPTi 82C291 chipset", MACHINE_NOT_WORKING )
 COMP( 19??, ht18c,     ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "<unknown>",     "unknown 286 AT clones (HT18/C chipset)", MACHINE_NOT_WORKING )
+COMP( 199?, 3siud,     ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "<unknown>",   "3SIUD-1.1", MACHINE_NOT_WORKING )
 COMP( 199?, asc486slc, ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Computechnik", "ASC486SLC", MACHINE_NOT_WORKING )
 COMP( 199?, ocpanii,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Octek",       "Panther II", MACHINE_NOT_WORKING )
 COMP( 199?, pt319a,    ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Pine",        "PT-319A", MACHINE_NOT_WORKING )
