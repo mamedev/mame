@@ -42,73 +42,73 @@ offs_t unsp_20_disassembler::disassemble_extended_group(std::ostream& stream, of
 		case 0x00: // add
 			// A += B
 			util::stream_format(stream, "(Extended group 0) %s += %s", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-														             , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+																	 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 			break;
 
 		case 0x01: // adc
 			// A += B, Carry
 			util::stream_format(stream, "(Extended group 0) %s += %s, carry", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-														                    , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+																			, (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 			break;
 
 		case 0x02: // sub
 			// A -= B
 			util::stream_format(stream, "(Extended group 0) %s -= %s", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-														             , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+																	 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 			break;
 
 		case 0x03: // sbc
 			// A -= B, Carry
 			util::stream_format(stream, "(Extended group 0) %s -= %s, carry", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-														                    , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+																			, (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 			break;
 
 		case 0x04: // cmp
 			// CMP A,B
 			util::stream_format(stream, "(Extended group 0) cmp %s, %s", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-														               , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+																	   , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 			break;
 
 		case 0x06: // neg
 			// A = -B
 			util::stream_format(stream, "(Extended group 0) %s = -%s", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-													              	 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+																	 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 			break;
 
 		case 0x08: // xor
 			// A ^= B
 			util::stream_format(stream, "(Extended group 0) %s ^= %s", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-														             , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+																	 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 			break;
 
 		case 0x09: // load
 			// A = B
 			util::stream_format(stream, "(Extended group 0) %s = %s", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-													                , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+																	, (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 			break;
 
 		case 0x0a: // or
 			// A |= B
 			util::stream_format(stream, "(Extended group 0) %s |= %s", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-													                 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+																	 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 			break;
 
 		case 0x0b: // and
 			// A &= B
 			util::stream_format(stream, "(Extended group 0) %s &= %s", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-													                 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+																	 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 			break;
 
 		case 0x0c: // test
 			// TEST A,B
 			util::stream_format(stream, "(Extended group 0) test %s, %s", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-													  	                , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+																		, (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 			break;
 
 		case 0x0d: // store
 			// B = A
 			util::stream_format(stream, "(Extended group 0) %s = %s", (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-				                                                    , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]);
+																	, (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]);
 			break;
 
 		case 0x05: // invalid
@@ -180,35 +180,35 @@ offs_t unsp_20_disassembler::disassemble_extended_group(std::ostream& stream, of
 		case 0x00: // add
 			// A = B + C
 			util::stream_format(stream, "(Extended group 1) %s = %s + %04x", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-															               , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-															               , imm16_2);
+																		   , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+																		   , imm16_2);
 			break;
 
 		case 0x01: // adc
 			// A = B + C, Carry
 			util::stream_format(stream, "(Extended group 1) %s = %s + %04x, carry", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-															                      , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-															                      , imm16_2);
+																				  , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+																				  , imm16_2);
 			break;
 
 		case 0x02: // sub
 			// A = B - C
 			util::stream_format(stream, "(Extended group 1) %s = %s - %04x", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-															               , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-															               , imm16_2);
+																		   , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+																		   , imm16_2);
 			break;
 
 		case 0x03: // sbc
 			// A = B - C, Carry
 			util::stream_format(stream, "(Extended group 1) %s = %s - %04x, carry", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-															                      , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-															                      , imm16_2);
+																				  , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+																				  , imm16_2);
 			break;
 
 		case 0x04: // cmp
 			// CMP B,C
 			util::stream_format(stream, "(Extended group 1) cmp %s, %04x", (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-															             , imm16_2);
+																		 , imm16_2);
 			break;
 
 		case 0x06: // neg
@@ -220,34 +220,34 @@ offs_t unsp_20_disassembler::disassemble_extended_group(std::ostream& stream, of
 		case 0x08: // xor
 			// A = B ^ C
 			util::stream_format(stream, "(Extended group 1) %s = %s ^ %04x", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-															               , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-															               , imm16_2);
+																		   , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+																		   , imm16_2);
 			break;
 
 		case 0x09: // load
 			// A = C
 			util::stream_format(stream, "(Extended group 1) %s = %04x", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-															          , imm16_2);
+																	  , imm16_2);
 			break;
 
 		case 0x0a: // or
 			// A = B | C
 			util::stream_format(stream, "(Extended group 1) %s = %s | %04x", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-															               , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-															               , imm16_2);
+																		   , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+																		   , imm16_2);
 			break;
 
 		case 0x0b: // and
 			// A = B & C
 			util::stream_format(stream, "(Extended group 1) %s = %s & %04x", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-															               , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-															               , imm16_2);
+																		   , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+																		   , imm16_2);
 			break;
 
 		case 0x0c: // test
 			// TEST B,C
 			util::stream_format(stream, "(Extended group 1) test %s, %04x", (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-															              , imm16_2);
+																		  , imm16_2);
 			break;
 
 		case 0x0d: // store, C = B, invalid for this mode (would store to immediate)
@@ -267,11 +267,11 @@ offs_t unsp_20_disassembler::disassemble_extended_group(std::ostream& stream, of
 	{
 		// 3 param form
 
-		// Ra = Rb op [A16] 
+		// Ra = Rb op [A16]
 
 		// A = Ra
 		// B = Rb
-		// C = [A16] 
+		// C = [A16]
 
 		len = 3;
 		uint16_t imm16_2 = opcodes.r16(pc + 2);
@@ -286,68 +286,68 @@ offs_t unsp_20_disassembler::disassemble_extended_group(std::ostream& stream, of
 		case 0x00: // add
 			// A = B + C
 			util::stream_format(stream, "(Extended group 2) %s = %s + [%04x]", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-																             , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-																             , imm16_2);
+																			 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+																			 , imm16_2);
 			break;
 
 		case 0x01: // adc
 			// A = B + C, Carry
 			util::stream_format(stream, "(Extended group 2) %s = %s + [%04x], carry", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-																                    , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-																                    , imm16_2);
+																					, (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+																					, imm16_2);
 			break;
 
 		case 0x02: // sub
 			// A = B - C
 			util::stream_format(stream, "(Extended group 2) %s = %s - [%04x]", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-																             , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-																             , imm16_2);
+																			 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+																			 , imm16_2);
 			break;
 
 		case 0x03: // sbc
 			// A = B - C, Carry
 			util::stream_format(stream, "(Extended group 2) %s = %s - [%04x], carry", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-																                    , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-																                    , imm16_2);
+																					, (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+																					, imm16_2);
 			break;
 
 		case 0x04: // cmp
 			// CMP B,C
 			util::stream_format(stream, "(Extended group 2) cmp %s, [%04x]", (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-															               , imm16_2);
+																		   , imm16_2);
 			break;
 
 		case 0x06: // neg
 			// A = -C
 			util::stream_format(stream, "(Extended group 2) %s = -[%04x]", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-														                 , imm16_2);
+																		 , imm16_2);
 			break;
 
 		case 0x08: // xor
 			// A = B ^ C
 			util::stream_format(stream, "(Extended group 2) %s = %s ^ [%04x]", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-																             , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-																             , imm16_2);
+																			 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+																			 , imm16_2);
 			break;
 
 		case 0x09: // load
 			// A = C
 			util::stream_format(stream, "(Extended group 2) %s = [%04x]", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-														                , imm16_2);
+																		, imm16_2);
 			break;
 
 		case 0x0a: // or
 			// A = B | C
 			util::stream_format(stream, "(Extended group 2) %s = %s | [%04x]", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-																             , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-															             	 , imm16_2);
+																			 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+																			 , imm16_2);
 			break;
 
 		case 0x0b: // and
 			// A = B & C
 			util::stream_format(stream, "(Extended group 2) %s = %s & [%04x]", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-															              	 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-																             , imm16_2);
+																			 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+																			 , imm16_2);
 			break;
 
 		case 0x0c: // test
@@ -359,7 +359,7 @@ offs_t unsp_20_disassembler::disassemble_extended_group(std::ostream& stream, of
 		case 0x0d: // store
 			// C = B
 			util::stream_format(stream, "(Extended group 2) [%04x] = %s", imm16_2
-			                                                            , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+																		, (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 			break;
 
 		case 0x05: // invalid
@@ -397,80 +397,80 @@ offs_t unsp_20_disassembler::disassemble_extended_group(std::ostream& stream, of
 		case 0x00: // add
 			// A = B + C
 			util::stream_format(stream, "(Extended group 3) [%04x] = %s + %s", imm16_2
-				                                                             , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-			                                             	                 , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]);
+																			 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+																			 , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]);
 			break;
 
 		case 0x01: // adc
 			// A = B + C, Carry
 			util::stream_format(stream, "(Extended group 3) [%04x] = %s + %s, carry", imm16_2
-				                                                                    , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-			                                             	                        , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]);
+																					, (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+																					, (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]);
 			break;
 
 		case 0x02: // sub
 			// A = B - C
 			util::stream_format(stream, "(Extended group 3) [%04x] = %s - %s", imm16_2
-				                                                             , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-			                                             	                 , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]);
+																			 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+																			 , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]);
 			break;
 
 		case 0x03: // sbc
 			// A = B - C, Carry
 			util::stream_format(stream, "(Extended group 3) [%04x] = %s - %s, carry", imm16_2
-				                                                                    , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-			                                             	                        , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]);
+																					, (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+																					, (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]);
 			break;
 
 		case 0x04: // cmp  (is this even a valid form? [A16] not even used)
 			// CMP B,C
 			util::stream_format(stream, "(Extended group 3) cmp %s, %s", (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-			                                                           , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]);
+																	   , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]);
 			break;
 
 		case 0x06: // neg
 			// A = -C
 			util::stream_format(stream, "(Extended group 3) [%04x] = -%s", imm16_2
-			                                                             , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]);
+																		 , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]);
 			break;
 
 		case 0x08: // xor
 			// A = B ^ C
 			util::stream_format(stream, "(Extended group 3) [%04x] = %s ^ %s", imm16_2
-				                                                             , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-			                                             	                 , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]);
+																			 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+																			 , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]);
 			break;
 
 		case 0x09: // load
 			// A = C
 			util::stream_format(stream, "(Extended group 3) [%04x] = %s", imm16_2
-			                                                            , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]);
+																		, (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]);
 			break;
 
 		case 0x0a: // or
 			// A = B | C
 			util::stream_format(stream, "(Extended group 3) [%04x] = %s | %s", imm16_2
-				                                                             , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-			                                             	                 , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]);
+																			 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+																			 , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]);
 			break;
 
 		case 0x0b: // and
 			// A = B & C
 			util::stream_format(stream, "(Extended group 3) [%04x] = %s & %s", imm16_2
-				                                                             , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-			                                             	                 , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]);
+																			 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+																			 , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]);
 			break;
 
 		case 0x0c: // test  (is this even a valid form? [A16] not even used)
 			// TEST B,C
 			util::stream_format(stream, "(Extended group 3) test %s, %s", (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
-			                                                            , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]);
+																		, (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]);
 			break;
 
 		case 0x0d: // store  (is this even a valid form? [A16] not even used)
 			// C = B
 			util::stream_format(stream, "(Extended group 3) [%04x] = %s", imm16_2
-				                                                        , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+																		, (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 			break;
 
 		case 0x05: // invalid

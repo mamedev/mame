@@ -89,7 +89,7 @@ void unsp_disassembler::print_alu_op3(std::ostream &stream, uint8_t op0, uint8_t
 		"%s - ",
 		"%s - ", // with carry
 		"cmp %s, ",
-		"<BAD>", 
+		"<BAD>",
 		"-", // neg
 		"<BAD>",
 		"%s ^ ",

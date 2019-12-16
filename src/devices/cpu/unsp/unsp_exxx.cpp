@@ -120,7 +120,7 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 			const uint16_t opb = op & 7;
 			m_core->m_icount -= 12;
 
-			logerror("%s: MUL su with %04x (signed) * %04x (unsigned) : ", machine().describe_context(), m_core->m_r[opa], m_core->m_r[opb]); 
+			logerror("%s: MUL su with %04x (signed) * %04x (unsigned) : ", machine().describe_context(), m_core->m_r[opa], m_core->m_r[opb]);
 
 			uint32_t lres = m_core->m_r[opa] * m_core->m_r[opb];
 			if (m_core->m_r[opa] & 0x8000)
@@ -130,7 +130,7 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 			m_core->m_r[REG_R4] = lres >> 16;
 			m_core->m_r[REG_R3] = (uint16_t)lres;
 
-			logerror("result was : %08x\n", lres); 
+			logerror("result was : %08x\n", lres);
 
 			return;
 		}

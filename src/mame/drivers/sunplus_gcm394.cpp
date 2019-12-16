@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 /*
     SunPlus unSP based hardware, SPG-??? (6xx?) (die is GCM394)
-	
+
     Compared to vii.cpp this is clearly newer, has extra opcodes, different internal map etc. also scaling and higher resolutions based on Spongebob
 
         Smart Fit Park
@@ -34,7 +34,7 @@ public:
 		m_romregion(*this, "maincpu")
 	{
 	}
-	
+
 	void base(machine_config &config);
 
 
@@ -89,7 +89,7 @@ protected:
 	//virtual void machine_reset() override;
 
 	void wrlshunt_map(address_map &map);
-	
+
 private:
 
 	DECLARE_READ16_MEMBER(hunt_porta_r);
@@ -178,7 +178,7 @@ READ16_MEMBER(wrlshunt_game_state::read_external_space)
 
 WRITE16_MEMBER(wrlshunt_game_state::write_external_space)
 {
-//	logerror("DMA writing to external space (RAM?) %08x %04x\n", offset, data);
+//  logerror("DMA writing to external space (RAM?) %08x %04x\n", offset, data);
 
 	if (offset & 0x0800000)
 	{
@@ -220,7 +220,7 @@ READ16_MEMBER(gcm394_game_state::portb_r)
 WRITE16_MEMBER(gcm394_game_state::porta_w)
 {
 	logerror("%s: Port A:WRITE %04x\n", machine().describe_context(), data);
-}	
+}
 
 
 void gcm394_game_state::base(machine_config &config)
@@ -233,7 +233,7 @@ void gcm394_game_state::base(machine_config &config)
 	m_maincpu->space_read_callback().set(FUNC(gcm394_game_state::read_external_space));
 	m_maincpu->space_write_callback().set(FUNC(gcm394_game_state::write_external_space));
 	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(sunplus_gcm394_base_device::irq_vector_cb));
-	m_maincpu->mapping_write_callback().set(FUNC(gcm394_game_state::mapping_w));	
+	m_maincpu->mapping_write_callback().set(FUNC(gcm394_game_state::mapping_w));
 	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
@@ -289,7 +289,7 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 	m_maincpu->space_read_callback().set(FUNC(generalplus_gpac800_game_state::read_external_space));
 	m_maincpu->space_write_callback().set(FUNC(generalplus_gpac800_game_state::write_external_space));
 	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(sunplus_gcm394_base_device::irq_vector_cb));
-	m_maincpu->mapping_write_callback().set(FUNC(generalplus_gpac800_game_state::mapping_w));	
+	m_maincpu->mapping_write_callback().set(FUNC(generalplus_gpac800_game_state::mapping_w));
 	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
@@ -375,9 +375,9 @@ static INPUT_PORTS_START( gcm394 )
 
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_A) PORT_NAME("Circle / Red") // hold button Circle and Star on startup for test menu (other conditions? doesn't always work?)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_S) PORT_NAME("Square / Orange")
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_D) PORT_NAME("Triangle / Yellow") 
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_D) PORT_NAME("Triangle / Yellow")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_F) PORT_NAME("Star / Blue")
-	 
+
 	PORT_START("P2")
 	PORT_DIPNAME( 0x0001, 0x0001, "P2" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
@@ -625,7 +625,7 @@ void generalplus_gpac800_game_state::nand_init(int blocksize, int blocksize_stri
 		const int basestripped = i * blocksize_stripped;
 
 		for (int j = 0; j < blocksize_stripped; j++)
-		{ 
+		{
 			m_strippedrom[basestripped + j] = rom[base + j];
 		}
 	}

@@ -346,6 +346,7 @@ protected:
 	virtual void execute_fxxx_101_group(uint16_t op) override;
 	virtual void execute_exxx_group(uint16_t op) override;
 
+
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
@@ -361,7 +362,23 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void execute_extended_group(uint16_t op) override;
 
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
 private:
+	uint32_t m_secondary_r[8];
+
+	enum
+	{
+		UNSP20_R8 = 0,
+		UNSP20_R9,
+		UNSP20_R10,
+		UNSP20_R11,
+		UNSP20_R12,
+		UNSP20_R13,
+		UNSP20_R14,
+		UNSP20_R15
+	};
 };
 
 

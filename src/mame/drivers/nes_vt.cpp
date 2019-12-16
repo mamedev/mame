@@ -215,7 +215,7 @@ private:
 
 	int calculate_real_video_address(int addr, int extended, int readtype);
 
-	
+
 	required_memory_bank m_prgbank0;
 	required_memory_bank m_prgbank1;
 	required_memory_bank m_prgbank2;
@@ -246,7 +246,7 @@ class nes_vt_ts_state : public nes_vt_state
 public:
 	nes_vt_ts_state(const machine_config& mconfig, device_type type, const char* tag) :
 		nes_vt_state(mconfig, type, tag)
-	{ 	
+	{
 		m_initial_e000_bank = 0x03; // or the banking is just different / ROM is scrambled
 	}
 
