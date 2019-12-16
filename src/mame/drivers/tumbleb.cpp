@@ -69,7 +69,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
             8      Stratosphere
             9      Space
 
-      * As levels x-9 and 9-x are only constitued of a "big boss", you can't
+      * As levels x-9 and 9-x are only constituted of a "big boss", you can't
         edit them !
       * All data is stored within the range 0x02b8c8-0x02d2c9, but it should be
         extended to 0x02ebeb (and perhaps 0x02ffff). TO BE CONFIRMED !
@@ -2405,7 +2405,7 @@ void tumbleb_state::chokchok(machine_config &config)
 	htchctch(config);
 
 	/* basic machine hardware */
-	at89c52_device &prot(AT89C52(config, "protection", 16000000));
+	i87c52_device &prot(I87C52(config, "protection", 16000000));
 	prot.port_out_cb<0>().set(FUNC(tumbleb_state::prot_p0_w));
 	prot.port_out_cb<1>().set(FUNC(tumbleb_state::prot_p1_w));
 	prot.port_out_cb<2>().set(FUNC(tumbleb_state::prot_p2_w));
