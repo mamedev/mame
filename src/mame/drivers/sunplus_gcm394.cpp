@@ -116,7 +116,8 @@ public:
 
 	void generalplus_gpac800(machine_config &config);
 
-	void nand_init();
+	void nand_init210();
+	void nand_init840();
 
 protected:
 	virtual void machine_reset() override;
@@ -124,6 +125,8 @@ protected:
 	void generalplus_gpac800_map(address_map &map);
 
 private:
+	void nand_init(int blocksize, int blocksize_stripped);
+
 	required_shared_ptr<u16> m_mainram;
 	std::vector<uint8_t> m_strippedrom;
 };
@@ -595,7 +598,7 @@ void generalplus_gpac800_game_state::machine_reset()
 	int dest = m_strippedrom[0x15] << 8;
 
 	// copy a block of code from the NAND to RAM
-	for (int i = 0; i < 0x2000; i++)
+	for (int i = 0; i < 0x7000-dest; i++)
 	{
 		uint16_t word = m_strippedrom[(i * 2) + 0] | (m_strippedrom[(i * 2) + 1] << 8);
 
@@ -607,13 +610,10 @@ void generalplus_gpac800_game_state::machine_reset()
 }
 
 
-void generalplus_gpac800_game_state::nand_init()
+void generalplus_gpac800_game_state::nand_init(int blocksize, int blocksize_stripped)
 {
 	uint8_t* rom = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
-
-	const int blocksize = 0x210;
-	const int blocksize_stripped = 0x200;
 
 	int numblocks = size / blocksize;
 
@@ -631,7 +631,7 @@ void generalplus_gpac800_game_state::nand_init()
 	}
 
 	// debug to allow for easy use of unidasm.exe
-	if (0)
+	if (1)
 	{
 		FILE *fp;
 		char filename[256];
@@ -645,12 +645,21 @@ void generalplus_gpac800_game_state::nand_init()
 	}
 }
 
+void generalplus_gpac800_game_state::nand_init210()
+{
+	nand_init(0x210, 0x200);
+}
+
+void generalplus_gpac800_game_state::nand_init840()
+{
+	nand_init(0x840, 0x800);
+}
 
 // NAND dumps w/ internal bootstrap (and u'nSP 2.0 extended opcodes)  (have gpnandnand strings)
 // the JAKKS ones seem to be known as 'Generalplus GPAC800' hardware
-CONS(2010, wlsair60, 0, 0, generalplus_gpac800, gcm394, generalplus_gpac800_game_state, nand_init, "Jungle Soft / Kids Station Toys Inc", "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, jak_gtg,  0, 0, generalplus_gpac800, gcm394, generalplus_gpac800_game_state, nand_init, "JAKKS Pacific Inc", "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, jak_car2, 0, 0, generalplus_gpac800, gcm394, generalplus_gpac800_game_state, nand_init, "JAKKS Pacific Inc", "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, jak_tsm , 0, 0, generalplus_gpac800, gcm394, generalplus_gpac800_game_state, nand_init, "JAKKS Pacific Inc", "Toy Story Mania (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, vbaby,    0, 0, generalplus_gpac800, gcm394, generalplus_gpac800_game_state, nand_init, "VTech", "V.Baby",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, beambox,  0, 0, generalplus_gpac800, gcm394, generalplus_gpac800_game_state, nand_init, "Hasbro", "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2010, wlsair60, 0, 0, generalplus_gpac800, gcm394, generalplus_gpac800_game_state, nand_init840, "Jungle Soft / Kids Station Toys Inc", "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_gtg,  0, 0, generalplus_gpac800, gcm394, generalplus_gpac800_game_state, nand_init210, "JAKKS Pacific Inc", "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_car2, 0, 0, generalplus_gpac800, gcm394, generalplus_gpac800_game_state, nand_init210, "JAKKS Pacific Inc", "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_tsm , 0, 0, generalplus_gpac800, gcm394, generalplus_gpac800_game_state, nand_init210, "JAKKS Pacific Inc", "Toy Story Mania (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, vbaby,    0, 0, generalplus_gpac800, gcm394, generalplus_gpac800_game_state, nand_init840, "VTech", "V.Baby",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, beambox,  0, 0, generalplus_gpac800, gcm394, generalplus_gpac800_game_state, nand_init210, "Hasbro", "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

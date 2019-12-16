@@ -120,6 +120,7 @@ char const* const unsp_device::bitops[] =
 	"tstb", "setb", "clrb", "invb"
 };
 
+// log/barrel shift
 char const* const unsp_device::lsft[] =
 {
 	"asr", "asror", "lsl", "lslor", "lsr", "lsror", "rol", "ror"

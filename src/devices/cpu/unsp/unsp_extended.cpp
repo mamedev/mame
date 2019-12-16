@@ -99,10 +99,36 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 		uint8_t ra = (ximm & 0x0e00) >> 9;
 		ra |= (ximm & 0x0100) >> 5;
 
-		logerror("(Ext) %s = %s %s %04x\n", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
+
+		switch (aluop)
+		{
+		case 0x00: // add
+		case 0x01: // adc
+		case 0x02: // sub
+		case 0x03: // sbc
+		case 0x04: // cmp
+		case 0x06: // neg
+		case 0x08: // xor
+		case 0x09: // load
+		case 0x0a: // or
+		case 0x0b: // and
+		case 0x0c: // test
+		case 0x0d: // store
+			logerror("(Ext***) %s = %s %s %04x\n", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
 														   , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
 														   , aluops[aluop]
 														   , ximm_2);
+			break;
+
+		case 0x05: // invalid
+		case 0x07: // invalid
+		case 0x0e: // invalid
+		case 0x0f: // invalid
+			logerror("(Ext) %s = %s <INVALID> %04x\n", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
+															   , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
+															   , ximm_2);
+			break;
+		}
 
 		unimplemented_opcode(op, ximm, ximm_2);
 		return;
@@ -141,7 +167,7 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 		uint8_t ra = (ximm & 0x0e00) >> 9;
 		ra |= (ximm & 0x0100) >> 5;
 
-		logerror("(Ext) [0x4x] = %s %s %s\n", ximm_2
+		logerror("(Ext) [%04x] = %s %s %s\n", ximm_2
 															 , (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
 															 , aluops[aluop]
 															 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
