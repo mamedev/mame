@@ -444,7 +444,7 @@ WRITE8_MEMBER(cgang_state::ppi3_a_w)
 
 WRITE8_MEMBER(cgang_state::ppi3_b_w)
 {
-	// PB0-PB4: cosmogang motor power
+	// PA0-PA4: cosmogang motor power
 	m_cg_motor_on = data & 0x1f;
 
 	// PB5: game over(winning) lamp

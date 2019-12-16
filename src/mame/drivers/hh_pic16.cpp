@@ -68,9 +68,6 @@
 
 #include "hh_pic16_test.lh" // common test-layout - use external artwork
 
-// workaround to disable default LMB on IPT_BUTTON1 when running MAME with -mouse, conflict with clickable artwork
-#define PORT_BUTTON1_NOMOUSE PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(JOYCODE_BUTTON1_INDEXED(0))
-
 
 class hh_pic16_state : public driver_device
 {
@@ -263,7 +260,7 @@ static INPUT_PORTS_START( touchme )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Skill")
 
 	PORT_START("IN.1") // B1 port A
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_BUTTON1_NOMOUSE PORT_NAME("Blue Button")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Blue Button")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Yellow Button")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Red Button")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Green Button")
@@ -605,7 +602,7 @@ WRITE8_MEMBER(maniac_state::write_c)
 
 static INPUT_PORTS_START( maniac )
 	PORT_START("IN.0") // port A
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_BUTTON1_NOMOUSE PORT_PLAYER(1) // top button, increment clockwise
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // top button, increment clockwise
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
@@ -729,7 +726,7 @@ WRITE8_MEMBER(matchme_state::write_c)
 
 static INPUT_PORTS_START( matchme )
 	PORT_START("IN.0") // C4 port C
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_BUTTON1_NOMOUSE // purple
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // purple
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) // pink
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) // yellow
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) // blue
