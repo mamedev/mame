@@ -651,12 +651,12 @@ void spg2xx_game_state::switch_bank(uint32_t bank)
 
 WRITE8_MEMBER(spg2xx_game_state::i2c_w)
 {
-    logerror("%s: i2c_w %05x %04x\n", machine().describe_context(), offset, data);
+	logerror("%s: i2c_w %05x %04x\n", machine().describe_context(), offset, data);
 }
 
 READ8_MEMBER(spg2xx_game_state::i2c_r)
 {
-    logerror("%s: i2c_r %04x\n", machine().describe_context(), offset);
+	logerror("%s: i2c_r %04x\n", machine().describe_context(), offset);
 	return 0x0000;
 }
 
@@ -686,7 +686,7 @@ WRITE16_MEMBER(wireless60_state::wireless60_porta_w)
 WRITE16_MEMBER(zone40_state::zone40_porta_w)
 {
 	wireless60_porta_w(space, offset, data);
-	
+
 	if ((data & 0x00ff) != m_z40_rombase)
 	{
 		m_z40_rombase = data & 0x00ff;
@@ -2556,7 +2556,7 @@ void wireless60_state::machine_start()
 
 	save_item(NAME(m_w60_controller_input));
 	save_item(NAME(m_w60_porta_data));
-	
+
 	m_w60_p1_ctrl_mask = 0x0400;
 	m_w60_p2_ctrl_mask = 0x0800;
 }
@@ -2625,7 +2625,7 @@ DEVICE_IMAGE_LOAD_MEMBER(vii_state::cart_load_vii)
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
-	
+
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
@@ -3838,14 +3838,14 @@ void zone40_state::init_zone40()
 		ROM[i] = ROM[i] ^ 0xbb88;
 
 		ROM[i] = bitswap<16>(ROM[i], 11, 10, 3,  2,  4,  12, 5,  13,
-			                         9,  1,  8,  0,  6,  7,  14, 15);
+									 9,  1,  8,  0,  6,  7,  14, 15);
 	}
 }
 
 void wireless60_state::init_lx_jg7415()
 {
 	uint8_t blocks[32] = {
-		// these parts of the ROM contain the code that gets selected		
+		// these parts of the ROM contain the code that gets selected
 		0x00, 0x01, 0x06, 0x07, 0x08, 0x09, 0x0e, 0x0f,   0x10, 0x11, 0x16, 0x17, 0x18, 0x19, 0x1e, 0x1f,
 		// these parts of the ROM contain code / data but go unused, this seems intentional, some of these areas don't read consistently so likely this double size ROM was used knowing that some areas were bad and could be avoided
 		0x02, 0x03, 0x04, 0x05, 0x0a, 0x0b, 0x0c, 0x0d,   0x12, 0x13, 0x14, 0x15, 0x1a, 0x1b, 0x1c, 0x1d
@@ -3855,7 +3855,7 @@ void wireless60_state::init_lx_jg7415()
 	std::vector<u8> buffer(0x10000000);
 
 	for (int addr = 0; addr < 0x10000000; addr++)
-	{                    
+	{
 		int bank = (addr & 0xf800000) >> 23;
 		int newbank = blocks[bank];
 		int newaddr = (addr & 0x07fffff) | (newbank << 23);
@@ -3928,7 +3928,7 @@ CONS( 2007, icanguit,  0,        0, icanguit, icanguit,   icanguit_state, empty_
 CONS( 2006, icanpian,  0,        0, icanpian, icanpian,   icanpian_state, empty_init, "Fisher-Price", "I Can Play Piano",  MACHINE_IMPERFECT_SOUND ) // 2006 date from Manual
 
 // Toyquest games
-CONS( 2005, tvgogo,  0,        0, tvgogo, tvgogo,   tvgogo_state, empty_init, "Toyquest", "TV Go Go",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, tvgogo,  0,        0, tvgogo, tvgogo,   tvgogo_state, empty_init, "Toyquest", "GoGo TV Video Vision",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // or TV Go Go - the game addons call it the 'Video Vision console'
 
 // Similar, SPG260?, scrambled
 CONS( 200?, lexizeus,    0,     0,        lexizeus,     lexizeus, spg2xx_game_state, init_zeus, "Lexibook", "Zeus IG900 20-in-1 (US?)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad sound and some corrupt bg tilemap entries in Tiger Rescue, verify ROM data (same game runs in Zone 60 without issue)

@@ -215,7 +215,7 @@ private:
 
 	int calculate_real_video_address(int addr, int extended, int readtype);
 
-	
+
 	required_memory_bank m_prgbank0;
 	required_memory_bank m_prgbank1;
 	required_memory_bank m_prgbank2;
@@ -246,7 +246,7 @@ class nes_vt_ts_state : public nes_vt_state
 public:
 	nes_vt_ts_state(const machine_config& mconfig, device_type type, const char* tag) :
 		nes_vt_state(mconfig, type, tag)
-	{ 	
+	{
 		m_initial_e000_bank = 0x03; // or the banking is just different / ROM is scrambled
 	}
 
@@ -2266,6 +2266,11 @@ ROM_START( mc_tv200 )
 	ROM_LOAD( "s29gl064n90.bin", 0x00000, 0x800000, CRC(ae1905d2) SHA1(11582055713ba937c1ad32c4ada8683eebc1c83c) )
 ROM_END
 
+ROM_START( unkra200 ) // "Winbond 25Q64FVSIG 1324" SPI ROM
+    ROM_REGION( 0x800000, "mainrom", 0 )
+    ROM_LOAD( "retro_machine_rom", 0x00000, 0x800000, CRC(0e824aa7) SHA1(957e98868559ecc22b3fa42c76692417b76bf132) )
+ROM_END
+
 ROM_START( fcpocket )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
 	ROM_LOAD( "s29gl01gp.bin", 0x00000, 0x8000000, CRC(8703b18a) SHA1(07943443294e80ca93f83181c8bdbf950b87c52f) )
@@ -2434,6 +2439,8 @@ CONS( 201?, mc_hh210,   0,        0,  nes_vt_xx, nes_vt, nes_vt_state, empty_ini
 CONS( 201?, dvnimbus,   0,        0,  nes_vt_vg, nes_vt, nes_vt_hh_state, empty_init, "<unknown>", "DVTech Nimbus 176 in 1", MACHINE_NOT_WORKING )
 // Works fine, VT02 based
 CONS( 201?, mc_tv200,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "Thumbs Up", "200 in 1 Retro TV Game", MACHINE_IMPERFECT_GRAPHICS )
+ // probably another Thumbs Up product? cursor doesn't work unless nes_vt_hh machine is used? possibly newer than VT02 as it runs from an SPI ROM, might just not use enhanced features.  Some minor game name changes to above (eg Smackdown just becomes Wrestling)
+CONS( 201?, unkra200,   mc_tv200, 0,  nes_vt_hh, nes_vt, nes_vt_hh_state, empty_init, "<unknown>", "200 in 1 Retro Arcade", MACHINE_IMPERFECT_GRAPHICS )
 // New platform with scrambled opcodes, same as DGUN-2561. Runs fine with minor GFX and sound issues in menu
 // Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a GPIO
 CONS( 2016, fcpocket,   0,        0,  nes_vt_fp, nes_vt_fp, nes_vt_hh_state, empty_init, "<unknown>",   "FC Pocket 600 in 1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
