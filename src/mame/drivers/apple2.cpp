@@ -88,6 +88,7 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "bus/a2bus/ssbapple.h"
 #include "bus/a2bus/4play.h"
 #include "bus/a2bus/computereyes2.h"
+#include "bus/a2bus/transwarp.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -1264,6 +1265,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("ssbapple", A2BUS_SSBAPPLE);  /* SSB Apple speech board */
 	device.option_add("4play", A2BUS_4PLAY); /* 4Play Joystick Card (Rev. B) */
 	device.option_add("ceyes2", A2BUS_COMPUTEREYES2); /* ComputerEyes/2 Video Digitizer */
+	device.option_add("twarp", A2BUS_TRANSWARP);    /* AE TransWarp accelerator */
 //  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);    /* Magic Musician Card */
 }
 
