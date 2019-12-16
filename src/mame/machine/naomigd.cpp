@@ -403,9 +403,9 @@ void naomi_gdrom_board::write_from_qword(uint8_t *region, uint64_t qword)
 
 naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: naomi_board(mconfig, NAOMI_GDROM_BOARD, tag, owner, clock),
-	picdata(*this, finder_base::DUMMY_TAG),
 	m_maincpu(*this, "dimmcpu"),
-	m_securitycpu(*this, "pic")
+	m_securitycpu(*this, "pic"),
+	picdata(*this, finder_base::DUMMY_TAG)
 {
 	image_tag = nullptr;
 }
