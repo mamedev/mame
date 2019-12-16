@@ -2403,6 +2403,13 @@ void tumbleb_state::cookbib(machine_config &config)
 void tumbleb_state::chokchok(machine_config &config)
 {
 	htchctch(config);
+
+	/* basic machine hardware */
+	at89c52_device &prot(AT89C52(config, "protection", 16000000));
+	prot.port_out_cb<0>().set(FUNC(tumbleb_state::prot_p0_w));
+	prot.port_out_cb<1>().set(FUNC(tumbleb_state::prot_p1_w));
+	prot.port_out_cb<2>().set(FUNC(tumbleb_state::prot_p2_w));
+
 	m_palette->set_format(palette_device::xBGR_444, 1024);
 	// some PCBs have left factory with a 3.57mhz while some have a 4.096 which matches other games, assuming the former are factory errors
 	m_oki->set_clock(4096000/4);
@@ -3238,12 +3245,8 @@ ROM_START( chokchok )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "ub5.bin", 0x00000, 0x10000 , CRC(30c2171d) SHA1(3954e286d57b955af6ba9b1a0b49c442d7f295ae) )
 
-	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x2000, NO_DUMP ) /* can't be dumped */
-
-	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
-	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
-	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(0bd39834) SHA1(2860c2b7fcb74546afde11a59d4b359612ab6e68) )
+	ROM_REGION( 0x2000, "protection", 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "p87c52ebpn.bin", 0x00000, 0x2000, CRC(0d6b4918) SHA1(cfa2c035ef214a4097df12f868b13d4d10f00d0b) ) // decapped
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "uc1.bin", 0x00000, 0x40000, CRC(f3f57abd) SHA1(601dc669020ef9156fa221e768be9b88454e3f55) )
@@ -3762,12 +3765,15 @@ void tumbleb_state::init_bcstory()
 
 void tumbleb_state::init_htchctch()
 {
-	uint16_t *PROTDATA = (uint16_t*)memregion("user1")->base();
-	int i, len = memregion("user1")->bytes();
-	/* simulate RAM initialization done by the protection MCU */
+	if (memregion("user1") != nullptr)
+	{
+		uint16_t *PROTDATA = (uint16_t*)memregion("user1")->base();
+		int len = memregion("user1")->bytes();
+		/* simulate RAM initialization done by the protection MCU */
 
-	for (i = 0; i < len / 2; i++)
-		m_mainram[0x000/2 + i] = PROTDATA[i];
+		for (int i = 0; i < len / 2; i++)
+			m_mainram[0x000/2 + i] = PROTDATA[i];
+	}
 
 	tumblepb_gfx_rearrange(1);
 
@@ -3880,7 +3886,7 @@ GAME( 1994, metlsavr, 0,       metlsavr,    metlsavr, tumbleb_state, init_chokch
 
 GAME( 1994, magicbal, 0,       metlsavr,    magicbal, tumbleb_state, init_chokchok, ROT0, "SemiCom", "Magicball Fighting (Korea)", MACHINE_SUPPORTS_SAVE) // also still has the Metal Saver (c)1994 First Amusement tiles in the GFX
 
-GAME( 1995, chokchok, 0,       chokchok,    chokchok, tumbleb_state, init_chokchok, ROT0, "SemiCom", "Choky! Choky!", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE  )
+GAME( 1995, chokchok, 0,       chokchok,    chokchok, tumbleb_state, init_chokchok, ROT0, "SemiCom", "Choky! Choky!", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE  ) // MCU dump not hooked up yet
 
 GAME( 1995, wlstar,   0,       cookbib_mcu, wlstar, tumbleb_state,   init_wlstar,   ROT0, "Mijin",   "Wonder League Star - Sok-Magicball Fighting (Korea)", MACHINE_SUPPORTS_SAVE ) // translates to 'Wonder League Star - Return of Magicball Fighting'
 
