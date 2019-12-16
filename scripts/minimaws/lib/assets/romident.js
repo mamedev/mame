@@ -142,7 +142,6 @@ function add_unmatched(names, crc, sha1)
 		table = document.body.insertBefore(document.createElement('table'), div);
 		table.setAttribute('id', 'table-unmatched');
 	}
-	var row = table.appendChild(document.createElement('tr'));
 	var content;
 	if (crc === null)
 	{
@@ -156,6 +155,7 @@ function add_unmatched(names, crc, sha1)
 	}
 	for (var i = 0; i < names.length; i++)
 	{
+		var row = table.appendChild(document.createElement('tr'));
 		row.appendChild(document.createElement('th')).textContent = names[i];
 		row.appendChild(document.createElement('td')).textContent = content;
 		unmatched_names.push(names[i]);
