@@ -2189,6 +2189,8 @@ void amigo_device::device_start()
 {
 	m_mainboard = downcast<mainboard8_device*>(owner());
 
+	std::fill(std::begin(m_base_register), std::end(m_base_register), 0);
+
 	save_item(NAME(m_memen));
 	save_pointer(NAME(m_base_register),16);
 	save_item(NAME(m_logical_space));
