@@ -161,6 +161,8 @@ void a2bus_transwarp_device::device_start()
 	m_timer = timer_alloc(0);
 
 	save_item(NAME(m_bEnabled));
+	save_item(NAME(m_bReadA2ROM));
+	save_item(NAME(m_bIn1MHzMode));
 }
 
 void a2bus_transwarp_device::device_reset()
