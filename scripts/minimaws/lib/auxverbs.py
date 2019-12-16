@@ -18,7 +18,7 @@ class _Identifier(object):
     def __init__(self, dbcurs, **kwargs):
         super(_Identifier, self).__init__(**kwargs)
         self.dbcurs = dbcurs
-        self.shortnamewitdh = 0
+        self.shortnamewidth = 0
         self.pathwidth = 0
         self.labelwidth = 0
         self.machines = { }
@@ -38,7 +38,7 @@ class _Identifier(object):
             sys.stderr.write('Error identifying \'%s\': %s\n' % (path, e))
 
     def printResults(self):
-        nw = self.shortnamewitdh - (self.shortnamewitdh % 4) + 4
+        nw = self.shortnamewidth - (self.shortnamewidth % 4) + 4
         pw = self.pathwidth - (self.pathwidth % 4) + 4
         lw = self.labelwidth - (self.labelwidth % 4) + 4
         first = True
@@ -58,9 +58,9 @@ class _Identifier(object):
                 sys.stdout.write('%-*s%s\n' % (nw, '%s:%s' % (softwarelist, shortname), softwareinfo[0]))
                 for part, partinfo in sorted(softwareinfo[1].items()):
                     if partinfo[0] is not None:
-                        sys.stdout.write('%-*s%s\n' % (nw, part, partinfo[0]))
+                        sys.stdout.write('%-*s%s\n' % (nw, '  ' + part, partinfo[0]))
                     else:
-                        sys.stdout.write('%s\n' % (part, ))
+                        sys.stdout.write('  %s\n' % (part, ))
                     self.printMatches(partinfo[1], pw, lw)
         if self.unmatched:
             if first:
@@ -101,12 +101,12 @@ class _Identifier(object):
         matched = False
         for shortname, description, label, bad in self.dbcurs.get_rom_dumps(crc, sha1):
             matched = True
-            self.shortnamewitdh = max(len(shortname), self.shortnamewitdh)
+            self.shortnamewidth = max(len(shortname), self.shortnamewidth)
             self.labelwidth = max(len(label), self.labelwidth)
             self.getMachineMatches(shortname, description).append((path, label, bad))
         for softwarelist, softwarelistdescription, shortname, description, part, part_id, label, bad in self.dbcurs.get_software_rom_dumps(crc, sha1):
             matched = True
-            self.shortnamewitdh = max(len(softwarelist) + 1 + len(shortname), len(part), self.shortnamewitdh)
+            self.shortnamewidth = max(len(softwarelist) + 1 + len(shortname), 2 + len(part), self.shortnamewidth)
             self.labelwidth = max(len(label), self.labelwidth)
             self.getSoftwareMatches(softwarelist, softwarelistdescription, shortname, description, part, part_id).append((path, label, bad))
         if not matched:
@@ -116,12 +116,12 @@ class _Identifier(object):
         matched = False
         for shortname, description, label, bad in self.dbcurs.get_disk_dumps(sha1):
             matched = True
-            self.shortnamewitdh = max(len(shortname), self.shortnamewitdh)
+            self.shortnamewidth = max(len(shortname), self.shortnamewidth)
             self.labelwidth = max(len(label), self.labelwidth)
             self.getMachineMatches(shortname, description).append((path, label, bad))
         for softwarelist, softwarelistdescription, shortname, description, part, part_id, label, bad in self.dbcurs.get_software_disk_dumps(sha1):
             matched = True
-            self.shortnamewitdh = max(len(softwarelist) + 1 + len(shortname), len(part), self.shortnamewitdh)
+            self.shortnamewidth = max(len(softwarelist) + 1 + len(shortname), 2 + len(part), self.shortnamewidth)
             self.labelwidth = max(len(label), self.labelwidth)
             self.getSoftwareMatches(softwarelist, softwarelistdescription, shortname, description, part, part_id).append((path, label, bad))
         if not matched:
@@ -140,13 +140,6 @@ class _Identifier(object):
                 else:
                     self.processChd(path, sha1)
         self.pathwidth = max(len(path), self.pathwidth)
-
-    def printMatches(self, matches, pathwidth, labelwidth):
-        for path, label, bad in matches:
-            if bad:
-                sys.stdout.write('    %-*s= %-*s(BAD)\n' % (pathwidth, path, labelwidth, label))
-            else:
-                sys.stdout.write('    %-*s= %s\n' % (pathwidth, path, label))
 
     @staticmethod
     def iterateBlocks(f, s=65536):
@@ -193,6 +186,14 @@ class _Identifier(object):
         if len(buf) != 20:
             return None
         return codecs.getencoder('hex_codec')(buf)[0].decode('ascii')
+
+    @staticmethod
+    def printMatches(matches, pathwidth, labelwidth):
+        for path, label, bad in matches:
+            if bad:
+                sys.stdout.write('    %-*s= %-*s(BAD)\n' % (pathwidth, path, labelwidth, label))
+            else:
+                sys.stdout.write('    %-*s= %s\n' % (pathwidth, path, label))
 
 
 def do_listfull(options):

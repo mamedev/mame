@@ -296,6 +296,7 @@ ROMIDENT_PAGE = string.Template(
         '        var assetsurl="${assets}"\n' \
         '    </script>\n' \
         '    <script type="text/javascript" src="${assets}/common.js"></script>\n' \
+        '    <script type="text/javascript" src="${assets}/digest.js"></script>\n' \
         '    <script type="text/javascript" src="${assets}/romident.js"></script>\n' \
         '    <title>Identify ROM/Disk Dumps</title>\n' \
         '</head>\n' \
@@ -308,6 +309,8 @@ ROMIDENT_PAGE = string.Template(
         '</div>\n' \
         '<input id="input-dumps" type="file" multiple onchange="add_dump_files(this.files)" style="display: none">\n' \
         '<div id="div-progress"></div>\n' \
+        '<div id="div-issues"></div>\n' \
+        '<div id="div-unmatched"></div>\n' \
         '<div id="div-machines"></div>\n' \
         '<div id="div-software"></div>\n' \
         '</body>\n' \

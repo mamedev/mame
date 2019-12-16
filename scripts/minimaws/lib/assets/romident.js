@@ -7,15 +7,6 @@ var dump_info = Object.create(null);
 var machine_info = Object.create(null);
 var softwarelist_info = Object.create(null);
 var software_info = Object.create(null);
-var crc_table = new Uint32Array(256);
-
-for (var i = 0; i < 256; i++)
-{
-	var crc = i;
-	for (var b = 0; b < 8; b++)
-		crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0x00000000);
-	crc_table[i] = crc;
-}
 
 
 function get_chd_sha1(header)
@@ -136,10 +127,10 @@ function add_unmatched(names, crc, sha1)
 	}
 	else
 	{
-		var div = document.getElementById('div-machines');
-		var heading = document.body.insertBefore(document.createElement('h2'), div);
+		var div = document.getElementById('div-unmatched');
+		var heading = div.appendChild(document.createElement('h2'));
 		heading.textContent = 'Unmatched';
-		table = document.body.insertBefore(document.createElement('table'), div);
+		table = div.appendChild(document.createElement('table'));
 		table.setAttribute('id', 'table-unmatched');
 	}
 	var content;
@@ -163,6 +154,63 @@ function add_unmatched(names, crc, sha1)
 }
 
 
+function add_issues(name)
+{
+	var div = document.getElementById('div-issues');
+	var list;
+	if (!div.hasChildNodes())
+	{
+		div.appendChild(document.createElement('h2')).textContent = 'Potential Issues';
+		list = div.appendChild(document.createElement('dl'));
+	}
+	else
+	{
+		list = div.lastChild;
+	}
+	list.appendChild(document.createElement('dt')).textContent = name;
+	var table = list.appendChild(document.createElement('dd')).appendChild(document.createElement('table'));
+	table.setAttribute('class', 'sysinfo');
+	return table;
+}
+
+
+function add_stuck_bits(table, stuck)
+{
+	function format_stuck_bits(bits, mask)
+	{
+		var result = '';
+		for (var i = 0; i < bits.length; i++)
+		{
+			if (i > 0)
+				result += ' ';
+			for (var j = 0; j < 8; j++)
+			{
+				if (!((mask[i] >> (7 - j)) & 0x01))
+					result += '-';
+				else if ((bits[i] >> (7 - j)) & 0x01)
+					result += '1';
+				else
+					result += '0';
+			}
+		}
+		var cell = document.createElement('td');
+		cell.appendChild(document.createElement('tt')).textContent = result;
+		return cell;
+	}
+
+	var row = table.appendChild(document.createElement('tr'));
+	var header = row.appendChild(document.createElement('th'));
+	header.textContent = 'Fixed data bits:';
+	header.setAttribute('rowspan', stuck.length);
+	row.appendChild(format_stuck_bits(stuck[0].bits, stuck[0].mask));
+	for (var i = 1; i < stuck.length; i++)
+	{
+		row = table.appendChild(document.createElement('tr'));
+		row.appendChild(format_stuck_bits(stuck[i].bits, stuck[i].mask));
+	}
+}
+
+
 function get_machine_table(shortname, description)
 {
 	if (Object.hasOwnProperty.call(machine_info, shortname))
@@ -173,10 +221,7 @@ function get_machine_table(shortname, description)
 	{
 		var div = document.getElementById('div-machines');
 		if (!div.hasChildNodes())
-		{
-			var heading = div.appendChild(document.createElement('h2'));
-			heading.textContent = 'Machines';
-		}
+			div.appendChild(document.createElement('h2')).textContent = 'Machines';
 		var heading = div.appendChild(document.createElement('h3'));
 		var link = heading.appendChild(document.createElement('a'));
 		link.textContent = description;
@@ -200,10 +245,7 @@ function get_softwarelist_div(shortname, description)
 		software_info[shortname] = Object.create(null)
 		var div = document.getElementById('div-software');
 		if (!div.hasChildNodes())
-		{
-			var heading = div.appendChild(document.createElement('h2'));
-			heading.textContent = 'Software';
-		}
+			div.appendChild(document.createElement('h2')).textContent = 'Software';
 		div = div.appendChild(document.createElement('div'));
 		var heading = div.appendChild(document.createElement('h3'));
 		var link = heading.appendChild(document.createElement('a'));
@@ -466,114 +508,9 @@ function add_name(group, name, crc, sha1)
 function identify_file(file, trychd, progress)
 {
 	var digested = 0;
-	var crc = 0xffffffff;
-	var sha1st = new Uint32Array(5);
-	var sha1cnt = new Uint32Array(2);
-	var sha1buf = new DataView(new ArrayBuffer(64));
-
-	function rol(x, n)
-	{
-		return ((x << n) | (x >>> (32 - n))) & 0xffffffff;
-	}
-
-	function sha1_process(data)
-	{
-		var d = new Uint32Array(sha1st);
-
-		function b(i)
-		{
-			var r = data.getUint32(((i + 13) & 15) << 2, false);
-			r ^= data.getUint32(((i + 8) & 15) << 2, false);
-			r ^= data.getUint32(((i + 2) & 15) << 2, false);
-			r ^= data.getUint32((i & 15) << 2, false);
-			r = rol(r, 1);
-			data.setUint32((i & 15) << 2, r, false);
-			return r;
-		}
-		function r0(i)
-		{
-			d[i % 5] = 0xffffffff & (d[i % 5] + ((d[(i + 3) % 5] & (d[(i + 2) % 5] ^ d[(i + 1) % 5])) ^ d[(i + 1) % 5]) + data.getUint32(i << 2, false) + 0x5a827999 + rol(d[(i + 4) % 5], 5));
-			d[(i + 3) % 5] = rol(d[(i + 3) % 5], 30);
-		}
-		function r1(i)
-		{
-			d[i % 5] = 0xffffffff & (d[i % 5] + ((d[(i + 3) % 5] & (d[(i + 2) % 5] ^ d[(i + 1) % 5])) ^ d[(i + 1) % 5])+ b(i) + 0x5a827999 + rol(d[(i + 4) % 5], 5));
-			d[(i + 3) % 5] = rol(d[(i + 3) % 5], 30);
-		}
-		function r2(i)
-		{
-			d[i % 5] = 0xffffffff & (d[i % 5] + (d[(i + 3) % 5] ^ d[(i + 2) % 5] ^ d[(i + 1) % 5]) + b(i) + 0x6ed9eba1 + rol(d[(i + 4) % 5], 5));
-			d[(i + 3) % 5] = rol(d[(i + 3) % 5], 30);
-		}
-		function r3(i)
-		{
-			d[i % 5] = 0xffffffff & (d[i % 5] + (((d[(i + 3) % 5] | d[(i + 2) % 5]) & d[(i + 1) % 5]) | (d[(i + 3) % 5] & d[(i + 2) % 5])) + b(i) + 0x8f1bbcdc + rol(d[(i + 4) % 5], 5));
-			d[(i + 3) % 5] = rol(d[(i + 3) % 5], 30);
-		}
-		function r4(i)
-		{
-			d[i % 5] = 0xffffffff & (d[i % 5] + (d[(i + 3) % 5] ^ d[(i + 2) % 5] ^ d[(i + 1) % 5]) + b(i) + 0xca62c1d6 + rol(d[(i + 4) % 5], 5));
-			d[(i + 3) % 5] = rol(d[(i + 3) % 5], 30);
-		}
-
-		var i = 0;
-		while (i < 16)
-			r0(i++);
-		while (i < 20)
-			r1(i++);
-		while (i < 40)
-			r2(i++);
-		while (i < 60)
-			r3(i++);
-		while (i < 80)
-			r4(i++);
-		for (i = 0; i < sha1st.length; i++)
-			sha1st[i] = (sha1st[i] + d[i]) & 0xffffffff;
-	}
-
-	function sha1_digest(data, view)
-	{
-		var residual = sha1cnt[0];
-		sha1cnt[0] = (sha1cnt[0] + (view.length << 3)) & 0xffffffff;
-		if (residual > sha1cnt[0])
-			sha1cnt[1]++;
-		sha1cnt[1] += (view.length >>> 29);
-		residual = (residual >>> 3) & 63;
-		var offset = 0;
-		if ((residual + view.length) >= 64)
-		{
-			if (residual > 0)
-			{
-				for (offset = 0; (offset + residual) < 64; offset++)
-					sha1buf.setUint8(offset + residual, view[offset]);
-				sha1_process(sha1buf);
-				residual = 0;
-			}
-			for ( ; (view.length - offset) >= 64; offset += 64)
-				sha1_process(new DataView(data, offset, 64));
-		}
-		for ( ; offset < view.length; residual++, offset++)
-			sha1buf.setUint8(residual, view[offset]);
-	}
-
-	function sha1_finalise()
-	{
-		var lenbuf = new ArrayBuffer(8);
-		var lenview = new DataView(lenbuf);
-		lenview.setUint32(0, sha1cnt[1], false);
-		lenview.setUint32(4, sha1cnt[0], false);
-		var padbuf = new ArrayBuffer(64 - (63 & ((sha1cnt[0] >>> 3) + 8)));
-		var padview = new Uint8Array(padbuf);
-		padview[0] = 0x80;
-		for (var i = 1; i < padview.length; i++)
-			padview[i] = 0x00;
-		sha1_digest(padbuf, padview);
-		sha1_digest(lenbuf, new Uint8Array(lenbuf));
-		var result = new Array(20);
-		for (var i = 0; i < 20; i++)
-			result[i] = (sha1st[4 - (i >>> 2)] >> ((3 - (i & 3)) << 3)) & 0x000000ff;
-		return result.map(x => x.toString(16).padStart(2, '0')).join('');
-	}
+	var crcproc = new Crc32Digester();
+	var sha1proc = new Sha1Digester();
+	var stuckbitsproc = new StuckBitsDigester();
 
 	function process_chunk(e)
 	{
@@ -602,9 +539,9 @@ function identify_file(file, trychd, progress)
 				}
 			}
 			var view = new Uint8Array(data);
-			for (var i = 0; i < view.length; i++)
-				crc = (crc >>> 8) ^ crc_table[(crc & 0x000000ff) ^ view[i]];
-			sha1_digest(data, view);
+			crcproc.digest(data, view);
+			sha1proc.digest(data, view);
+			stuckbitsproc.digest(data, view);
 			digested += data.byteLength;
 			if (digested < file.size)
 			{
@@ -612,20 +549,35 @@ function identify_file(file, trychd, progress)
 			}
 			else
 			{
-				crc ^= 0xffffffff;
-				var sha1 = sha1_finalise();
+				var crc = crcproc.finalise();
+				var sha1 = sha1proc.finalise();
+				var stuckbits = stuckbitsproc.finalise();
+
 				var sha1grp = get_sha1_group(sha1);
+				var crcgrp;
 				if (!Object.hasOwnProperty.call(sha1grp.crc, crc))
 				{
-					var crcgrp = new Object();
+					crcgrp = new Object();
 					crcgrp.names = [ file.name ];
 					sha1grp.crc[crc] = crcgrp;
+					if (stuckbits.length)
+					{
+						crcgrp.issues = add_issues(file.name);
+						add_stuck_bits(crcgrp.issues, stuckbits);
+					}
+					else
+					{
+						crcgrp.issues = null;
+					}
 					var crcstr = ((crc < 0) ? (0xffffffff + crc + 1) : crc).toString(16).padStart(8, '0');
 					request_dumps(file.name, crcgrp, crc, sha1, appurl + 'rpc/romdumps?crc=' + crcstr + '&sha1=' + sha1, progress);
 				}
 				else
 				{
-					add_name(sha1grp.crc[crc], file.name, crc, sha1);
+					crcgrp = sha1grp.crc[crc];
+					if (crcgrp.issues !== null)
+						crcgrp.issues.parentNode.parentNode.insertBefore(document.createElement('dl'), crcgrp.issues.parentNode).textContent = file.name;
+					add_name(crcgrp, file.name, crc, sha1);
 					progress.parentNode.removeChild(progress);
 				}
 			}
@@ -645,13 +597,6 @@ function identify_file(file, trychd, progress)
 		reader.readAsArrayBuffer(chunk);
 	};
 
-	sha1st[0] = 0xc3d2e1f0;
-	sha1st[1] = 0x10325476;
-	sha1st[2] = 0x98badcfe;
-	sha1st[3] = 0xefcdab89;
-	sha1st[4] = 0x67452301;
-	sha1cnt[0] = 0;
-	sha1cnt[1] = 0;
 	progress.textContent = 'Identifying \u201C' + file.name + '\u201D\u2026';
 	read_block();
 }
