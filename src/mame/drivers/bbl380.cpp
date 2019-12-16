@@ -24,6 +24,10 @@ public:
 	void bbl380(machine_config &config);
 
 private:
+	void cs3_command_w(u8 data);
+	u8 cs3_data_r();
+	void cs3_data_w(u8 data);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -49,9 +53,28 @@ void bbl380_state::machine_reset()
 {
 }
 
+void bbl380_state::cs3_command_w(u8 data)
+{
+	logerror("%s: CS3 command $%02X\n", machine().describe_context(), data);
+}
+
+u8 bbl380_state::cs3_data_r()
+{
+	if (!machine().side_effects_disabled())
+		logerror("%s: CS3 data read\n", machine().describe_context());
+	return 0;
+}
+
+void bbl380_state::cs3_data_w(u8 data)
+{
+	logerror("%s: CS3 data $%02X\n", machine().describe_context(), data);
+}
+
 void bbl380_state::bbl380_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom().region("maincpu", 0); // not correct
+	map(0x600000, 0x600000).w(FUNC(bbl380_state::cs3_command_w));
+	map(0x604000, 0x604000).rw(FUNC(bbl380_state::cs3_data_r), FUNC(bbl380_state::cs3_data_w));
 }
 
 static INPUT_PORTS_START( bbl380 )
