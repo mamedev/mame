@@ -97,6 +97,7 @@ banctec.cpp
 basic52.cpp
 bbc.cpp
 bbcbc.cpp
+bbl380.cpp
 bcs3.cpp
 bebox.cpp
 beehive.cpp
@@ -902,6 +903,7 @@ tvgame.cpp
 tx0.cpp
 uchroma68.cpp
 uknc.cpp
+unkmandd.cpp
 unichamp.cpp
 unior.cpp
 unistar.cpp
