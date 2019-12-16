@@ -3864,15 +3864,15 @@ void tumbleb_state::init_dquizgo()
 /******************************************************************************/
 
 /* Misc 'bootleg' hardware - close to base Tumble Pop */
-GAME( 1991, tumbleb,  tumblep, tumblepb,    tumblepb, tumbleb_state, init_tumblepb, ROT0, "bootleg", "Tumble Pop (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE  )
-GAME( 1991, tumbleb2, tumblep, tumbleb2,    tumblepb, tumbleb_state, init_tumbleb2, ROT0, "bootleg", "Tumble Pop (bootleg with PIC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE  ) // PIC is protected, sound simulation not 100%
-GAME( 1991, tumblepba,tumblep, tumblepba,   tumblepb, tumbleb_state, init_tumblepba,ROT0, "bootleg (Playmark)", "Tumble Pop (Playmark bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING  ) // Playmark stickers on ROMs, offset pf1_alt tilemap, OKI not hooked up
+GAME( 1991, tumbleb,  tumblep, tumblepb,    tumblepb, tumbleb_state, init_tumblepb, ROT0, "bootleg", "Tumble Pop (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tumbleb2, tumblep, tumbleb2,    tumblepb, tumbleb_state, init_tumbleb2, ROT0, "bootleg", "Tumble Pop (bootleg with PIC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // PIC is protected, sound simulation not 100%
+GAME( 1991, tumblepba,tumblep, tumblepba,   tumblepb, tumbleb_state, init_tumblepba,ROT0, "bootleg (Playmark)", "Tumble Pop (Playmark bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // Playmark stickers on ROMs, offset pf1_alt tilemap, OKI not hooked up
 
 GAME( 1992, funkyjetb,funkyjet,funkyjetb,   tumblepb, tumbleb_pic_state, init_tumblepb, ROT0, "bootleg", "Funky Jet (bootleg)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // wrong palette, inputs not working, PIC driving an OKI
 
 GAME( 1993, jumpkids, 0,       jumpkids,    tumblepb, tumbleb_state, init_jumpkids, ROT0, "Comad",    "Jump Kids", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, pangpang, 0,       pangpang,    tumblepb, tumbleb_state, init_tumbleb2, ROT0, "Dong Gue La Mi Ltd.", "Pang Pang", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE  ) // PIC is protected, sound simulation not 100%
+GAME( 1994, pangpang, 0,       pangpang,    tumblepb, tumbleb_state, init_tumbleb2, ROT0, "Dong Gue La Mi Ltd.", "Pang Pang", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // PIC is protected, sound simulation not 100%
 
 /* Misc 'bootleg' hardware - more changes from base hardware */
 GAME( 1994, suprtrio, 0,       suprtrio,    suprtrio, tumbleb_state, init_suprtrio, ROT0, "Gameace", "Super Trio", MACHINE_SUPPORTS_SAVE )
@@ -3884,9 +3884,9 @@ GAME( 1996, magipur,  0,       magipur,     magipur, tumbleb_state,  init_magipu
 /* First Amusement / Mijin / SemiCom hardware (MCU protected) */
 GAME( 1994, metlsavr, 0,       metlsavr,    metlsavr, tumbleb_state, init_chokchok, ROT0, "First Amusement", "Metal Saver", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, magicbal, 0,       metlsavr,    magicbal, tumbleb_state, init_chokchok, ROT0, "SemiCom", "Magicball Fighting (Korea)", MACHINE_SUPPORTS_SAVE) // also still has the Metal Saver (c)1994 First Amusement tiles in the GFX
+GAME( 1994, magicbal, 0,       metlsavr,    magicbal, tumbleb_state, init_chokchok, ROT0, "SemiCom", "Magicball Fighting (Korea)", MACHINE_SUPPORTS_SAVE ) // also still has the Metal Saver (c)1994 First Amusement tiles in the GFX
 
-GAME( 1995, chokchok, 0,       chokchok,    chokchok, tumbleb_state, init_chokchok, ROT0, "SemiCom", "Choky! Choky!", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE  ) // MCU dump not hooked up yet
+GAME( 1995, chokchok, 0,       chokchok,    chokchok, tumbleb_state, init_chokchok, ROT0, "SemiCom", "Choky! Choky!", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1995, wlstar,   0,       cookbib_mcu, wlstar, tumbleb_state,   init_wlstar,   ROT0, "Mijin",   "Wonder League Star - Sok-Magicball Fighting (Korea)", MACHINE_SUPPORTS_SAVE ) // translates to 'Wonder League Star - Return of Magicball Fighting'
 
@@ -3895,7 +3895,7 @@ GAME( 1995, htchctch, 0,       htchctch,    htchctch, tumbleb_state, init_htchct
 GAME( 1995, cookbib,  0,       cookbib,     cookbib, tumbleb_state,  init_htchctch, ROT0, "SemiCom", "Cookie & Bibi (set 1)" , MACHINE_SUPPORTS_SAVE ) // not 100% sure about gfx offsets
 GAME( 1995, cookbiba, cookbib, cookbib,     cookbib, tumbleb_state,  init_htchctch, ROT0, "SemiCom", "Cookie & Bibi (set 2)" , MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, carket,   0,       htchctch,    carket,  tumbleb_state,  init_carket,   ROT0, "SemiCom", "Carket Ball", MACHINE_SUPPORTS_SAVE  )
+GAME( 1996, carket,   0,       htchctch,    carket,  tumbleb_state,  init_carket,   ROT0, "SemiCom", "Carket Ball", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1996, wondl96,  0,       cookbib_mcu, wondl96, tumbleb_state,  init_wondl96,  ROT0, "SemiCom", "Wonder League '96 (Korea)", MACHINE_SUPPORTS_SAVE )
 
