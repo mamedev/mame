@@ -49,7 +49,6 @@ public:
 	{ }
 
 	void c2_color(machine_config &config);
-	void leapfrog_mfleappad(machine_config &config);
 
 private:
 	virtual void machine_start() override;

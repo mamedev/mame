@@ -3184,6 +3184,9 @@ mechattj                        // A8002 'MA' (c) 1989
 mechattu                        // A8002 'MA' (c) 1989
 mechattu1                       // A8002 'MA' (c) 1989
 
+@source:bbl380.cpp
+bbl380
+
 @source:bcs3.cpp
 bcs3                            //
 bcs3a                           //
@@ -31133,7 +31136,8 @@ ablpinb
 mc_dgear
 dgun2500
 dgun2561
-lexcyber
+lxcmcy
+lxcmcysw
 cybar120
 mc_dg101
 mc_aa2
@@ -39318,6 +39322,9 @@ uts20                           //
 
 @source:unkhorse.cpp
 unkhorse                        //
+
+@source:unkmandd.cpp
+unkmandd
 
 @source:unkpoker.cpp
 unkpoker                         //
