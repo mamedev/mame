@@ -3928,7 +3928,7 @@ CONS( 2007, icanguit,  0,        0, icanguit, icanguit,   icanguit_state, empty_
 CONS( 2006, icanpian,  0,        0, icanpian, icanpian,   icanpian_state, empty_init, "Fisher-Price", "I Can Play Piano",  MACHINE_IMPERFECT_SOUND ) // 2006 date from Manual
 
 // Toyquest games
-CONS( 2005, tvgogo,  0,        0, tvgogo, tvgogo,   tvgogo_state, empty_init, "Toyquest", "TV Go Go",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, tvgogo,  0,        0, tvgogo, tvgogo,   tvgogo_state, empty_init, "Toyquest", "GoGo TV Video Vision",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // or TV Go Go - the game addons call it the 'Video Vision console'
 
 // Similar, SPG260?, scrambled
 CONS( 200?, lexizeus,    0,     0,        lexizeus,     lexizeus, spg2xx_game_state, init_zeus, "Lexibook", "Zeus IG900 20-in-1 (US?)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad sound and some corrupt bg tilemap entries in Tiger Rescue, verify ROM data (same game runs in Zone 60 without issue)
