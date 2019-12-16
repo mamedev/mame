@@ -44,6 +44,9 @@
 
 //#include "hh_cop400_test.lh" // common test-layout - use external artwork
 
+// workaround to disable default LMB on IPT_BUTTON1 when running MAME with -mouse, conflict with clickable artwork
+#define PORT_BUTTON1_NOMOUSE PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(JOYCODE_BUTTON1_INDEXED(0))
+
 
 class hh_cop400_state : public driver_device
 {
@@ -203,7 +206,7 @@ static INPUT_PORTS_START( ctstein )
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN.2") // G2 port L
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Red Button")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_BUTTON1_NOMOUSE PORT_NAME("Red Button")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Yellow Button")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Green Button")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Blue Button")
@@ -898,7 +901,7 @@ static INPUT_PORTS_START( funjacks )
 
 	PORT_START("IN.2") // D2 port G
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // positioned at 1 o'clock on panel, increment clockwise
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_BUTTON1_NOMOUSE // positioned at 1 o'clock on panel, increment clockwise
 
 	PORT_START("IN.3") // port G
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1349,7 +1352,7 @@ READ8_MEMBER(lightfgt_state::read_g)
 static INPUT_PORTS_START( lightfgt )
 	PORT_START("IN.0") // SO port G
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) // note: button 1 is on the left side from player perspective
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_BUTTON1_NOMOUSE // note: button 1 is on the left side from player perspective
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_COCKTAIL
 
