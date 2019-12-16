@@ -187,15 +187,22 @@ void a2bus_transwarp_device::device_reset()
 
 void a2bus_transwarp_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if (!(m_dsw2->read() & 0x80))
+	if (m_bIn1MHzMode)
 	{
-		if (m_dsw1->read() & 0x80)
+		m_ourcpu->set_unscaled_clock(1021800);
+	}
+	else
+	{
+		if (!(m_dsw2->read() & 0x80))
 		{
-			m_ourcpu->set_unscaled_clock(A2BUS_7M_CLOCK / 4);
-		}
-		else
-		{
-			m_ourcpu->set_unscaled_clock(A2BUS_7M_CLOCK / 2);
+			if (m_dsw1->read() & 0x80)
+			{
+				m_ourcpu->set_unscaled_clock(A2BUS_7M_CLOCK / 4);
+			}
+			else
+			{
+				m_ourcpu->set_unscaled_clock(A2BUS_7M_CLOCK / 2);
+			}
 		}
 	}
 	m_timer->adjust(attotime::never);
@@ -250,10 +257,12 @@ WRITE8_MEMBER( a2bus_transwarp_device::dma_w )
 			{
 				m_ourcpu->set_unscaled_clock(A2BUS_7M_CLOCK / 2);
 			}
+			m_bIn1MHzMode = false;
 		}
 		else if (data == 1)
 		{
 			m_ourcpu->set_unscaled_clock(1021800);
+			m_bIn1MHzMode = true;
 		}
 		else if (data == 3)
 		{
