@@ -42,6 +42,8 @@ private:
 	uint32_t screen_update_gpl32612(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void nand_init(int blocksize, int blocksize_stripped);
+
+	std::vector<uint8_t> m_strippedrom;
 };
 
 uint32_t generalplus_gpl32612_game_state::screen_update_gpl32612(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
