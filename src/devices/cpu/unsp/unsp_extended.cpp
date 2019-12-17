@@ -152,42 +152,64 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 		if (ximm & 0x8000)
 		{
 			// just skip for now, as nothing really even uses the extended registers yet
-			/*
-			uint8_t rb =   (ximm & 0x000f) >> 0;
+
+			uint8_t rb = (ximm & 0x000f) >> 0;
 			uint8_t size = (ximm & 0x7000) >> 12;
-			uint8_t rx   = (ximm & 0x0e00) >> 9;
+			uint8_t rx = (ximm & 0x0e00) >> 9;
 
 			if (size == 0) size = 8;
-			size -= 1;
 
-			if ((rx-size) >= 0)
-			    logerror("(Ext) push %s, %s to [%s]\n",
-			           extregs[rx-size], extregs[rx], (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+			if ((rx - (size - 1)) >= 0)
+			{
+				//logerror("(Ext) push %s, %s to [%s]\n",
+				//  extregs[rx - size], extregs[rx], (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+
+				while (size--)
+				{
+					if (rb & 0x8)
+						push(m_secondary_r[rx--], &m_secondary_r[rb & 0x7]);
+					else
+						push(m_secondary_r[rx--], &m_core->m_r[rb & 0x7]);
+				}
+			}
 			else
-			    logerror("(Ext) push <BAD>\n");
-			*/
-			//unimplemented_opcode(op, ximm);
+			{
+				logerror("(Ext) push <BAD>\n");
+				unimplemented_opcode(op, ximm);
+			}
+			
 			return;
 		}
 		else
 		{
-			// just skip for now, as nothing really even uses the extended registers yet
-			/*
-			uint8_t rb =   (ximm & 0x000f) >> 0;
+			uint8_t rb = (ximm & 0x000f) >> 0;
 			uint8_t size = (ximm & 0x7000) >> 12;
-			uint8_t rx   = (ximm & 0x0e00) >> 9;
+			uint8_t rx = (ximm & 0x0e00) >> 9;
+
 
 			if (size == 0) size = 8;
-			size -= 1;
 
+			if ((rx - (size - 1)) >= 0)
+			{
+				//logerror("(Ext) pop %s, %s from [%s]\n",
+				//	extregs[rx - size], extregs[rx], (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+				int realrx = 7 - rx;
 
-			if ((rx-size) >= 0)
-			    logerror("(Ext) pop %s, %s from [%s]\n",
-			           extregs[rx-size], extregs[rx], (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+				while (size--)
+				{
+					if (rb & 0x8)
+						m_secondary_r[realrx++] = pop(&m_secondary_r[rb & 0x07]);
+					else
+						m_secondary_r[realrx++] = pop(&m_core->m_r[rb & 0x07]);
+				}
+			}
 			else
-			    logerror("(Ext) pop <BAD>\n");
-			*/
-			//unimplemented_opcode(op, ximm);
+			{
+				logerror("(Ext) pop <BAD>\n");
+				unimplemented_opcode(op, ximm);
+			}
+
+
 			return;
 		}
 		return;

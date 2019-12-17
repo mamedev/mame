@@ -509,11 +509,30 @@ READ16_MEMBER(generalplus_gpac800_device::unkarea_7850_r)
 	return machine().rand();
 }
 
+READ16_MEMBER(generalplus_gpac800_device::unkarea_7854_r)
+{
+	m_testval ^= 1;
+
+	logerror("%s:sunplus_gcm394_base_device::unkarea_7854_r\n", machine().describe_context());
+
+	// jak_tsm code looks for various 'magic values'
+
+	if (m_testval == 1)
+		return 0xc2;
+	else
+		return 0x58;
+}
+
+// all tilemap registers etc. appear to be in the same place as the above system, including the 'extra' ones not on the earlier models
+// so it's likely this is built on top of that just with NAND support
 void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
 {
 	sunplus_gcm394_base_device::gcm394_internal_map(map);
 
-	map(0x007850, 0x007850).r(FUNC(generalplus_gpac800_device::unkarea_7850_r));	
+	// there is an extra command-based device at 785x, what it returns is important to code flow
+	// code is littered with NOPs so clearly the device can't accept commands too quickly and doesn't return data immediately
+	map(0x007850, 0x007850).r(FUNC(generalplus_gpac800_device::unkarea_7850_r)); // 'device ready' status flag?
+	map(0x007854, 0x007854).r(FUNC(generalplus_gpac800_device::unkarea_7854_r)); // data read port (timing appears to be important)
 }
 	
 void sunplus_gcm394_base_device::device_start()
