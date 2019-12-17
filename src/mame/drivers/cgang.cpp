@@ -8,11 +8,14 @@ Data East, they titled it "Cosmo Gang".
 It is an electromechanical arcade lightgun game. There is no screen, feedback
 is with motorized elements, lamps and 7segs, and of course sounds and music.
 
+To shoot the targets in MAME, either enable -mouse and click on one of the
+cosmogang lanes(left mouse button doubles as gun trigger by default).
+Or, configure the gun aim inputs and share them with the trigger. For example
+use Z,X,C,V,B for the gun aims, and "Z or X or C or V or B" for the trigger.
+
 TODO:
-- internal artwork
-- game can't really be played within MAME's constraints (mechanical stuff,
+- game can't be played properly within MAME's constraints (mechanical stuff,
   and the lightguns linked to it)
-- ppi2_b_r cabinet center sensors, doesn't seem to affect the game at all
 
 -------------------------------------------------------------------------------
 
@@ -63,6 +66,9 @@ Overall, the hardware has similarities with Wacky Gator, see wacky_gator.cpp.
 
 #include "speaker.h"
 
+// internal artwork
+#include "cgang.lh" // clickable
+
 
 namespace {
 
@@ -70,8 +76,9 @@ namespace {
 static constexpr int DOOR_MOTOR_LIMIT = 2000;
 
 // length of each cosmogang lane, in motor steps
-// at game start, one cosmo going forward takes around 6-7 seconds (compared to video recording)
-static constexpr int CG_MOTOR_LIMIT = 850;
+// At game start, one cosmo going forward takes around 7 seconds, and if the player does nothing
+// at the 1st round, game is lost with around 10 seconds remaining (compared to video recording).
+static constexpr int CG_MOTOR_LIMIT = 1000;
 
 
 class cgang_state : public driver_device
@@ -181,7 +188,7 @@ private:
 
 	int m_cg_motor_clk[5];
 	int m_cg_motor_pos[5];
-	int m_en_motor_pos[5];
+	int m_en_pos[5];
 
 	emu_timer *m_sol_filter[5];
 	TIMER_CALLBACK_MEMBER(output_sol) { m_en_sol[param >> 1] = param & 1; }
@@ -214,7 +221,7 @@ void cgang_state::machine_start()
 	save_item(NAME(m_cg_motor_dir));
 	save_item(NAME(m_cg_motor_clk));
 	save_item(NAME(m_cg_motor_pos));
-	save_item(NAME(m_en_motor_pos));
+	save_item(NAME(m_en_pos));
 }
 
 void cgang_state::machine_reset()
@@ -227,7 +234,7 @@ void cgang_state::machine_reset()
 	{
 		m_cg_motor_clk[i] = 0;
 		m_cg_motor_pos[i] = 0;
-		m_en_motor_pos[i] = CG_MOTOR_LIMIT;
+		m_en_pos[i] = CG_MOTOR_LIMIT;
 		m_en_sol[i] = 0;
 	}
 
@@ -287,33 +294,33 @@ WRITE_LINE_MEMBER(cgang_state::motor_clock_w)
 void cgang_state::cg_motor_tick(int i)
 {
 	// note: the cosmogangs are stuck on the drive belts(5),
-	// and the energy crates can lock(or loosen) themselves from the belt
+	// and the energy crates can lock themselves into position
 
 	if (BIT(m_cg_motor_dir, i))
 	{
 		if (m_cg_motor_pos[i] > 0)
 		{
-			m_cg_motor_pos[i]--;
+			// pull energy crate
+			if (m_en_sol[i] && m_cg_motor_pos[i] == m_en_pos[i])
+				m_en_pos[i]--;
 
-			// 'pull' energy crate
-			if (m_en_sol[i])
-				m_en_motor_pos[i]--;
+			m_cg_motor_pos[i]--;
 		}
 	}
 	else
 	{
-		// 'push' energy crate
-		if (m_en_sol[i])
+		if (m_cg_motor_pos[i] < CG_MOTOR_LIMIT)
 		{
-			if (m_en_motor_pos[i] < CG_MOTOR_LIMIT)
-			{
-				m_en_motor_pos[i]++;
+			if (m_cg_motor_pos[i] < m_en_pos[i])
 				m_cg_motor_pos[i]++;
+
+			// push energy crate
+			else if (m_en_sol[i])
+			{
+				m_cg_motor_pos[i]++;
+				m_en_pos[i]++;
 			}
 		}
-
-		else if (m_cg_motor_pos[i] < m_en_motor_pos[i])
-			m_cg_motor_pos[i]++;
 	}
 
 	refresh_motor_output();
@@ -335,7 +342,7 @@ void cgang_state::refresh_motor_output()
 	for (int i = 0; i < 5; i++)
 	{
 		m_cg_count[i] = int((m_cg_motor_pos[i] / float(CG_MOTOR_LIMIT)) * 100.0 + 0.5);
-		m_en_count[i] = int((m_en_motor_pos[i] / float(CG_MOTOR_LIMIT)) * 100.0 + 0.5);
+		m_en_count[i] = int((m_en_pos[i] / float(CG_MOTOR_LIMIT)) * 100.0 + 0.5);
 	}
 
 	m_door_count = int((m_door_motor_pos / float(DOOR_MOTOR_LIMIT)) * 100.0 + 0.5);
@@ -350,7 +357,7 @@ READ8_MEMBER(cgang_state::ppi1_b_r)
 
 	// PB0-PB4: cabinet front limit (CR1INI-CR5INI)
 	for (int i = 0; i < 5; i++)
-		if (m_en_motor_pos[i] == CG_MOTOR_LIMIT)
+		if (m_en_pos[i] == CG_MOTOR_LIMIT)
 			data ^= 1 << i;
 
 	// PB5-PB7: cabinet back limit (HST1-HST3)
@@ -372,7 +379,7 @@ READ8_MEMBER(cgang_state::ppi1_c_r)
 
 	// PC2-PC6: cosmogang-energy crate collision (CR1-CR5)
 	for (int i = 0; i < 5; i++)
-		if (m_cg_motor_pos[i] == m_en_motor_pos[i])
+		if (m_cg_motor_pos[i] == m_en_pos[i])
 			data ^= 1 << (i + 2);
 
 	// PC7: audiocpu mailbox status
@@ -414,7 +421,9 @@ READ8_MEMBER(cgang_state::ppi2_b_r)
 	u8 data = 0x1f;
 
 	// PB0-PB4: cabinet center (G1POG-G5POG)
-	// how this is sensed?
+	for (int i = 0; i < 5; i++)
+		if (m_cg_motor_pos[i] < (CG_MOTOR_LIMIT / 8))
+			data ^= 1 << i;
 
 	return data;
 }
@@ -444,7 +453,7 @@ WRITE8_MEMBER(cgang_state::ppi3_a_w)
 
 WRITE8_MEMBER(cgang_state::ppi3_b_w)
 {
-	// PA0-PA4: cosmogang motor power
+	// PB0-PB4: cosmogang motor power
 	m_cg_motor_on = data & 0x1f;
 
 	// PB5: game over(winning) lamp
@@ -792,7 +801,7 @@ void cgang_state::cgang(machine_config &config)
 	PWM_DISPLAY(config, m_digits).set_size(10, 7);
 	m_digits->set_segmask(0x3ff, 0x7f);
 
-	//config.set_default_layout(layout_cgang);
+	config.set_default_layout(layout_cgang);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -835,4 +844,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME   PARENT  MACHINE  INPUT  CLASS        INIT        MONITOR  COMPANY, FULLNAME, FLAGS */
-GAME( 1990, cgang, 0,      cgang,   cgang, cgang_state, empty_init, ROT0,    "Namco (Data East license)", "Cosmo Gang (US)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1990, cgang, 0,      cgang,   cgang, cgang_state, empty_init, ROT0,    "Namco (Data East license)", "Cosmo Gang (US)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
