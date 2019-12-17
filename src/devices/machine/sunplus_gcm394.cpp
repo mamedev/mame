@@ -531,6 +531,9 @@ void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
 
 	// there is an extra command-based device at 785x, what it returns is important to code flow
 	// code is littered with NOPs so clearly the device can't accept commands too quickly and doesn't return data immediately
+	//
+	// this should be the NAND device, as the games attempt to do a DMA operation with '7854' as the source, and the target
+	// as the RAM location where code needs to end up before jumping to it
 	map(0x007850, 0x007850).r(FUNC(generalplus_gpac800_device::unkarea_7850_r)); // 'device ready' status flag?
 	map(0x007854, 0x007854).r(FUNC(generalplus_gpac800_device::unkarea_7854_r)); // data read port (timing appears to be important)
 }
