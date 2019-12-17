@@ -290,13 +290,26 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			break;
 
 		case 0x09: // load
+		{
 			// A = C
-			logerror( "(Extended group 1) %s = %04x\n", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-													  , imm16_2);
-			unimplemented_opcode(op, ximm, imm16_2);
+			//logerror("(Extended group 1) %s = %04x\n", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
+			//	                                     , imm16_2);
+			m_core->m_icount -= 1; // TODO
+
+			uint16_t lres = imm16_2;
+			update_nz(lres);
+			if (ra & 0x8)
+			{
+				m_secondary_r[ra & 0x7] = (uint16_t)lres;
+			}
+			else
+			{
+				m_core->m_r[ra & 0x7] = (uint16_t)lres;
+			}
+
 			return;
 			break;
-
+		}
 		case 0x0a: // or
 			// A = B | C
 			logerror( "(Extended group 1) %s = %s | %04x\n", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
@@ -578,13 +591,31 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			return;
 			break;
 
-		case 0x0d: // store  (is this even a valid form? [A16] not even used)
+		case 0x0d: // store  (is this even a valid form? [A16] not even used if C = B form below is used, code needs to write to A)
+		{
 			// C = B
-			logerror( "(Extended group 3) [%04x] = %s\n", imm16_2
-														, (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
-			unimplemented_opcode(op, ximm, imm16_2);
+			//logerror( "(Extended group 3) [%04x] = %s\n", imm16_2
+			//											, (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+			m_core->m_icount -= 1; // TODO
+
+			if (ra != rb)
+			{
+				logerror("(Extended group 3) store ra != rb");
+				unimplemented_opcode(op, ximm, imm16_2);
+			}
+
+			if (rb & 0x8)
+			{
+				write16(imm16_2, m_secondary_r[rb & 0x07]);
+			}
+			else
+			{
+				write16(imm16_2, m_core->m_r[rb & 0x07]);
+			}
+
 			return;
 			break;
+		}
 
 		case 0x05: // invalid
 		case 0x07: // invalid
@@ -926,11 +957,19 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			break;
 
 		case 0x09: // load
+		{
 			// A = B
-			logerror( "(Extended group 6) %s = %02x\n", extregs[rx], imm6 );
-			unimplemented_opcode(op, ximm);
+			//logerror( "(Extended group 6) %s = %02x\n", extregs[rx], imm6 );
+
+			m_core->m_icount -= 1; // TODO
+
+			uint16_t lres = imm6;
+			update_nz(lres);
+			m_secondary_r[rx] = (uint16_t)lres;
+
 			return;
 			break;
+		}
 
 		case 0x0a: // or
 			// A |= B

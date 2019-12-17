@@ -230,6 +230,9 @@ protected:
 	void push(uint32_t value, uint32_t *reg);
 	uint16_t pop(uint32_t *reg);
 
+	void update_nz(uint32_t value);
+	void update_nzsc(uint32_t value, uint16_t r0, uint16_t r1);
+
 private:
 	// compilation boundaries -- how far back/forward does the analysis extend?
 	enum : uint32_t
@@ -266,8 +269,6 @@ private:
 	uint32_t m_log_ops;
 #endif
 
-	void update_nz(uint32_t value);
-	void update_nzsc(uint32_t value, uint16_t r0, uint16_t r1);
 	inline void trigger_fiq();
 	inline void trigger_irq(int line);
 	void check_irqs();
