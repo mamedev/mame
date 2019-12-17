@@ -181,11 +181,11 @@ class MachineHandler(QueryPageHandler):
             parent = self.dbcurs.listfull(machine_info['cloneof']).fetchone()
             if parent:
                 yield (
-                        '    <tr><th>Parent Machine:</th><td><a href="%s">%s (%s)</a></td></tr>\n' %
+                        '    <tr><th>Parent machine:</th><td><a href="%s">%s (%s)</a></td></tr>\n' %
                         (self.machine_href(machine_info['cloneof']), cgi.escape(parent[1]), cgi.escape(machine_info['cloneof']))).encode('utf-8')
             else:
                 yield (
-                        '    <tr><th>Parent Machine:</th><td><a href="%s">%s</a></td></tr>\n' %
+                        '    <tr><th>Parent machine:</th><td><a href="%s">%s</a></td></tr>\n' %
                         (self.machine_href(machine_info['cloneof']), cgi.escape(machine_info['cloneof']))).encode('utf-8')
         if (machine_info['romof'] is not None) and (machine_info['romof'] != machine_info['cloneof']):
             parent = self.dbcurs.listfull(machine_info['romof']).fetchone()
@@ -195,7 +195,7 @@ class MachineHandler(QueryPageHandler):
                         (self.machine_href(machine_info['romof']), cgi.escape(parent[1]), cgi.escape(machine_info['romof']))).encode('utf-8')
             else:
                 yield (
-                        '    <tr><th>Parent Machine:</th><td><a href="%s">%s</a></td></tr>\n' %
+                        '    <tr><th>Parent machine:</th><td><a href="%s">%s</a></td></tr>\n' %
                         (self.machine_href(machine_info['romof']), cgi.escape(machine_info['romof']))).encode('utf-8')
         unemulated = []
         imperfect = []
@@ -214,6 +214,20 @@ class MachineHandler(QueryPageHandler):
                     ('    <tr><th>Imperfect Features:</th><td>%s' + (', %s' * (len(imperfect) - 1)) + '</td></tr>\n') %
                     tuple(imperfect)).encode('utf-8');
         yield '</table>\n'.encode('utf-8')
+
+        first = True
+        for clone, clonedescription, cloneyear, clonemanufacturer in self.dbcurs.get_clones(self.shortname):
+            if first:
+                yield htmltmpl.MACHINE_CLONES_PROLOGUE.substitute().encode('utf-8')
+                first = False
+            yield htmltmpl.MACHINE_CLONES_ROW.substitute(
+                    href=self.machine_href(clone),
+                    shortname=cgi.escape(clone),
+                    description=cgi.escape(clonedescription),
+                    year=cgi.escape(cloneyear or ''),
+                    manufacturer=cgi.escape(clonemanufacturer or '')).encode('utf-8')
+        if not first:
+            yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-clones').encode('utf-8')
 
         # allow system BIOS selection
         haveoptions = False
@@ -372,7 +386,7 @@ class SourceFileHandler(QueryPageHandler):
             yield htmltmpl.SOURCEFILE_LIST_ROW.substitute(
                     sourcefile=self.linked_title(filename, True),
                     machines=cgi.escape('%d' % (machines, ))).encode('utf-8')
-        yield '    </tbody>\n</table>\n<script>make_table_sortable(document.getElementById("tbl-sourcefiles"));</script>\n</body>\n</html>\n'.encode('utf-8')
+        yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-sourcefiles').encode('utf-8')
 
     def sourcefile_page(self, id):
         yield htmltmpl.SOURCEFILE_PROLOGUE.substitute(
@@ -401,7 +415,7 @@ class SourceFileHandler(QueryPageHandler):
         if first:
             yield '<p>No machines found.</p>\n'.encode('utf-8')
         else:
-            yield '    </tbody>\n</table>\n<script>make_table_sortable(document.getElementById("tbl-machines"));</script>\n'.encode('utf-8')
+            yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-machines').encode('utf-8')
 
         yield '</body>\n</html>\n'.encode('utf-8')
 
@@ -490,7 +504,7 @@ class SoftwareListHandler(QueryPageHandler):
                     supported=cgi.escape('%.1f%%' % (supported * 100.0 / (total or 1), )),
                     partiallysupported=cgi.escape('%.1f%%' % (partiallysupported * 100.0 / (total or 1), )),
                     unsupported=cgi.escape('%.1f%%' % (unsupported * 100.0 / (total or 1), ))).encode('utf-8')
-        yield '    </tbody>\n</table>\n<script>make_table_sortable(document.getElementById("tbl-softwarelists"));</script>\n</body>\n</html>\n'.encode('utf-8')
+        yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-softwarelists').encode('utf-8')
 
     def softwarelist_page(self, softwarelist_info, pattern):
         if not pattern:
@@ -513,28 +527,24 @@ class SoftwareListHandler(QueryPageHandler):
                 unsupportedpc=cgi.escape('%.1f' % (softwarelist_info['unsupported'] * 100.0 / (softwarelist_info['total'] or 1), ))).encode('utf-8')
 
         first = True
+        for machine_info in self.dbcurs.get_softwarelist_machines(softwarelist_info['id']):
+            if first:
+                yield htmltmpl.SOFTWARELIST_MACHINE_TABLE_HEADER.substitute().encode('utf-8')
+                first = False
+            yield self.machine_row(machine_info)
+        if not first:
+            yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-machines').encode('utf-8')
+
+        first = True
         for software_info in self.dbcurs.get_softwarelist_software(softwarelist_info['id'], self.software or None):
             if first:
-                yield \
-                        '<table id="tbl-software">\n' \
-                        '    <thead>\n' \
-                        '        <tr>\n' \
-                        '            <th>Short name</th>\n' \
-                        '            <th>Description</th>\n' \
-                        '            <th>Year</th>\n' \
-                        '            <th>Publisher</th>\n' \
-                        '            <th>Supported</th>\n' \
-                        '            <th class="numeric">Parts</th>\n' \
-                        '            <th class="numeric">Bad dumps</th>\n' \
-                        '        </tr>\n' \
-                        '    </thead>\n' \
-                        '    <tbody>\n'.encode('utf-8')
+                yield htmltmpl.SOFTWARELIST_SOFTWARE_TABLE_HEADER.substitute().encode('utf-8')
                 first = False
             yield self.software_row(software_info)
         if first:
             yield '<p>No software found.</p>\n'.encode('utf-8')
         else:
-            yield '    </tbody>\n</table>\n<script>make_table_sortable(document.getElementById("tbl-software"));</script>\n'.encode('utf-8')
+            yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-software').encode('utf-8')
 
         yield '</body>\n</html>\n'.encode('utf-8')
 
@@ -548,14 +558,29 @@ class SoftwareListHandler(QueryPageHandler):
                 softwarelist=cgi.escape(self.shortname),
                 shortname=cgi.escape(software_info['shortname']),
                 year=cgi.escape(software_info['year']),
-                publisher=cgi.escape(software_info['publisher']),
-                supported=cgi.escape('Yes' if software_info['supported'] == 0 else 'Partial' if software_info['supported'] == 1 else 'No')).encode('utf-8')
+                publisher=cgi.escape(software_info['publisher'])).encode('utf-8')
+        if software_info['parent'] is not None:
+            yield ('    <tr><th>Parent:</th><td><a href="%s">%s</a></td>\n' % (self.software_href(software_info['parentsoftwarelist'], software_info['parent']), cgi.escape(software_info['parentdescription']))).encode('utf-8')
+        yield ('    <tr><th>Supported:</th><td>%s</td>\n' % (self.format_supported(software_info['supported']), )).encode('utf-8')
         for name, value in self.dbcurs.get_software_info(software_info['id']):
             yield ('    <tr><th>%s:</th><td>%s</td>\n' % (cgi.escape(name), cgi.escape(value))).encode('utf-8')
         yield '</table>\n\n'.encode('utf-8')
 
+        first = True
+        for clone_info in self.dbcurs.get_software_clones(software_info['id']):
+            if first:
+                yield htmltmpl.SOFTWARE_CLONES_PROLOGUE.substitute().encode('utf-8')
+                first = False
+            yield self.clone_row(clone_info)
+        if not first:
+            yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-clones').encode('utf-8')
+
         parts = self.dbcurs.get_software_parts(software_info['id']).fetchall()
+        first = True
         for id, partname, interface, part_id in parts:
+            if first:
+                yield '<h2>Parts</h2>\n'.encode('utf-8')
+                first = False
             yield htmltmpl.SOFTWARE_PART_PROLOGUE.substitute(
                     heading=cgi.escape(('%s (%s)' % (part_id, partname)) if part_id is not None else partname),
                     shortname=cgi.escape(partname),
@@ -567,15 +592,39 @@ class SoftwareListHandler(QueryPageHandler):
         yield '</body>\n</html>\n'.encode('utf-8')
 
     def software_row(self, software_info):
-        return htmltmpl.SOFTWARELIST_ROW.substitute(
+        parent = software_info['parent']
+        return htmltmpl.SOFTWARELIST_SOFTWARE_ROW.substitute(
                 softwarehref=self.software_href(self.shortname, software_info['shortname']),
                 shortname=cgi.escape(software_info['shortname']),
                 description=cgi.escape(software_info['description']),
                 year=cgi.escape(software_info['year']),
                 publisher=cgi.escape(software_info['publisher']),
-                supported=cgi.escape('Yes' if software_info['supported'] == 0 else 'Partial' if software_info['supported'] == 1 else 'No'),
+                supported=self.format_supported(software_info['supported']),
                 parts=cgi.escape('%d' % (software_info['parts'], )),
-                baddumps=cgi.escape('%d' % (software_info['baddumps'], ))).encode('utf-8')
+                baddumps=cgi.escape('%d' % (software_info['baddumps'], )),
+                parent='<a href="%s">%s</a>' % (self.software_href(software_info['parentsoftwarelist'], parent), cgi.escape(parent)) if parent is not None else '').encode('utf-8')
+
+    def clone_row(self, clone_info):
+        return htmltmpl.SOFTWARE_CLONES_ROW.substitute(
+                href=self.software_href(clone_info['softwarelist'], clone_info['shortname']),
+                shortname=cgi.escape(clone_info['shortname']),
+                description=cgi.escape(clone_info['description']),
+                year=cgi.escape(clone_info['year']),
+                publisher=cgi.escape(clone_info['publisher']),
+                supported=self.format_supported(clone_info['supported'])).encode('utf-8')
+
+    def machine_row(self, machine_info):
+        return htmltmpl.SOFTWARELIST_MACHINE_TABLE_ROW.substitute(
+                machinehref=self.machine_href(machine_info['shortname']),
+                shortname=cgi.escape(machine_info['shortname']),
+                description=cgi.escape(machine_info['description']),
+                year=cgi.escape(machine_info['year'] or ''),
+                manufacturer=cgi.escape(machine_info['manufacturer'] or ''),
+                status=cgi.escape(machine_info['status'])).encode('utf-8')
+
+    @staticmethod
+    def format_supported(supported):
+        return 'Yes' if supported == 0 else 'Partial' if supported == 1 else 'No'
 
 
 class RomIdentHandler(QueryPageHandler):

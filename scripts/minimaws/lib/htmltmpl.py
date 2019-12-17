@@ -24,6 +24,7 @@ SORTABLE_TABLE_EPILOGUE = string.Template(
         '</table>\n'
         '<script>make_table_sortable(document.getElementById("${id}"));</script>\n')
 
+
 MACHINE_PROLOGUE = string.Template(
         '<!DOCTYPE html>\n' \
         '<html>\n' \
@@ -47,6 +48,27 @@ MACHINE_PROLOGUE = string.Template(
         '    <tr><th>Is device:</th><td>${isdevice}</td></tr>\n' \
         '    <tr><th>Runnable:</th><td>${runnable}</td></tr>\n' \
         '    <tr><th>Source file:</th><td><a href="${sourcehref}">${sourcefile}</a></td></tr>\n')
+
+MACHINE_CLONES_PROLOGUE = string.Template(
+        '<h2>Clones</h2>\n' \
+        '<table id="tbl-clones">\n' \
+        '    <thead>\n' \
+        '        <tr>\n' \
+        '            <th>Short name</th>\n' \
+        '            <th>Description</th>\n' \
+        '            <th>Year</th>\n' \
+        '            <th>Manufacturer</th>\n' \
+        '        </tr>\n' \
+        '    </thead>\n' \
+        '    <tbody>\n')
+
+MACHINE_CLONES_ROW = string.Template(
+        '        <tr>\n' \
+        '            <td><a href="${href}">${shortname}</a></td>\n' \
+        '            <td><a href="${href}">${description}</a></td>\n' \
+        '            <td>${year}</td>\n' \
+        '            <td>${manufacturer}</td>\n' \
+        '        </tr>\n')
 
 MACHINE_OPTIONS_HEADING = string.Template(
         '<h2>Options</h2>\n' \
@@ -183,11 +205,33 @@ SOFTWARE_PROLOGUE = string.Template(
         '    <tr><th>Software list:</th><td><a href="${softwarelisthref}">${softwarelistdescription} (${softwarelist})</a></td></tr>\n' \
         '    <tr><th>Short name:</th><td>${shortname}</td></tr>\n' \
         '    <tr><th>Year:</th><td>${year}</td></tr>\n' \
-        '    <tr><th>Publisher:</th><td>${publisher}</td></tr>\n' \
-        '    <tr><th>Suported:</th><td>${supported}</td></tr>\n');
+        '    <tr><th>Publisher:</th><td>${publisher}</td></tr>\n');
+
+SOFTWARE_CLONES_PROLOGUE = string.Template(
+        '<h2>Clones</h2>\n' \
+        '<table id="tbl-clones">\n' \
+        '    <thead>\n' \
+        '        <tr>\n' \
+        '            <th>Short name</th>\n' \
+        '            <th>Description</th>\n' \
+        '            <th>Year</th>\n' \
+        '            <th>Publisher</th>\n' \
+        '            <th>Supported</th>\n' \
+        '        </tr>\n' \
+        '    </thead>\n' \
+        '    <tbody>\n')
+
+SOFTWARE_CLONES_ROW = string.Template(
+        '        <tr>\n' \
+        '            <td><a href="${href}">${shortname}</a></td>\n' \
+        '            <td><a href="${href}">${description}</a></td>\n' \
+        '            <td>${year}</td>\n' \
+        '            <td>${publisher}</td>\n' \
+        '            <td>${supported}</td>\n' \
+        '        </tr>\n')
 
 SOFTWARE_PART_PROLOGUE = string.Template(
-        '<h2>${heading}</h2>\n' \
+        '<h3>${heading}</h3>\n' \
         '<table class="sysinfo">\n' \
         '    <tr><th>Short name:</th><td>${shortname}</td></tr>\n' \
         '    <tr><th>Interface:</th><td>${interface}</td></tr>\n')
@@ -233,7 +277,47 @@ SOFTWARELIST_PROLOGUE = string.Template(
         '    </tr>\n' \
         '</table>\n')
 
-SOFTWARELIST_ROW = string.Template(
+SOFTWARELIST_MACHINE_TABLE_HEADER = string.Template(
+        '<h2>Machines</h2>\n' \
+        '<table id="tbl-machines">\n' \
+        '    <thead>\n' \
+        '        <tr>\n' \
+        '            <th>Short name</th>\n' \
+        '            <th>Description</th>\n' \
+        '            <th>Year</th>\n' \
+        '            <th>Manufacturer</th>\n' \
+        '            <th>Status</th>\n' \
+        '        </tr>\n' \
+        '    </thead>\n' \
+        '    <tbody>\n')
+
+SOFTWARELIST_MACHINE_TABLE_ROW = string.Template(
+        '        <tr>\n' \
+        '            <td><a href="${machinehref}">${shortname}</a></td>\n' \
+        '            <td><a href="${machinehref}">${description}</a></td>\n' \
+        '            <td>${year}</td>\n' \
+        '            <td>${manufacturer}</td>\n' \
+        '            <td>${status}</td>\n' \
+        '        </tr>\n')
+
+SOFTWARELIST_SOFTWARE_TABLE_HEADER = string.Template(
+        '<h2>Software</h2>\n' \
+        '<table id="tbl-software">\n' \
+        '    <thead>\n' \
+        '        <tr>\n' \
+        '            <th>Short name</th>\n' \
+        '            <th>Description</th>\n' \
+        '            <th>Year</th>\n' \
+        '            <th>Publisher</th>\n' \
+        '            <th>Supported</th>\n' \
+        '            <th class="numeric">Parts</th>\n' \
+        '            <th class="numeric">Bad dumps</th>\n' \
+        '            <th>Parent</th>\n' \
+        '        </tr>\n' \
+        '    </thead>\n' \
+        '    <tbody>\n')
+
+SOFTWARELIST_SOFTWARE_ROW = string.Template(
         '        <tr>\n' \
         '            <td><a href="${softwarehref}">${shortname}</a></td>\n' \
         '            <td><a href="${softwarehref}">${description}</a></td>\n' \
@@ -242,6 +326,7 @@ SOFTWARELIST_ROW = string.Template(
         '            <td>${supported}</td>\n' \
         '            <td style="text-align: right">${parts}</td>\n' \
         '            <td style="text-align: right">${baddumps}</td>\n' \
+        '            <td>${parent}</td>\n' \
         '        </tr>\n')
 
 
