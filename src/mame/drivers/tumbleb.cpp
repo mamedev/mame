@@ -2213,15 +2213,14 @@ void tumbleb_pic_state::funkyjetb(machine_config &config)
 	m_oki->set_addrmap(0, &tumbleb_pic_state::funkyjetb_oki_map);
 }
 
-void tumbleb_state::jumpkids(machine_config &config)
+void tumbleb_state::jumpkids(machine_config &config) // OSCs: 12MHz, 8MHz & 14.31818MHz
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::jumpkids_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tumbleb_state::irq6_line_hold));
 
-	/* z80? */
-	Z80(config, m_audiocpu, 8000000/2);
+	Z80(config, m_audiocpu, 8_MHz_XTAL/2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tumbleb_state::jumpkids_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
@@ -2251,13 +2250,13 @@ void tumbleb_state::jumpkids(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	OKIM6295(config, m_oki, 8000000/8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.70);
+	OKIM6295(config, m_oki, 8_MHz_XTAL/8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.70);
 }
 
-void tumbleb_state::fncywld(machine_config &config)
+void tumbleb_state::fncywld(machine_config &config) // OSCs: 12MHz, 4MHz & 28.63636MHz
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::fncywld_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tumbleb_state::irq6_line_hold));
 
@@ -2287,13 +2286,12 @@ void tumbleb_state::fncywld(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2151(config, "ymsnd", 32220000/9).add_route(ALL_OUTPUTS, "mono", 0.10);
+	YM2151(config, "ymsnd", 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	OKIM6295(config, m_oki, 1023924, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, 4_MHz_XTAL/4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
 }
 
-/// OSCs: 12MHz, 4MHz, 28.63636MHz, not the same PCB as fncywld
-void tumbleb_state::magipur(machine_config &config)
+void tumbleb_state::magipur(machine_config &config) // OSCs: 12MHz, 4MHz, 28.63636MHz, not the same PCB as fncywld
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(12'000'000));
@@ -2347,14 +2345,14 @@ MACHINE_RESET_MEMBER(tumbleb_state,htchctch)
 	MACHINE_RESET_CALL_MEMBER(tumbleb);
 }
 
-void tumbleb_state::htchctch(machine_config &config)
+void tumbleb_state::htchctch(machine_config &config) // OSCs: 15MHz, 4.096MHz
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 15000000); /* verified */
+	M68000(config, m_maincpu, 15_MHz_XTAL); /* verified */
 	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::htchctch_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tumbleb_state::irq6_line_hold));
 
-	Z80(config, m_audiocpu, 15000000/4); /* verified on dquizgo */
+	Z80(config, m_audiocpu, 15_MHz_XTAL/4); /* 3.75MHz verified on dquizgo */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tumbleb_state::semicom_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
@@ -2385,12 +2383,12 @@ void tumbleb_state::htchctch(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* on at least hatch catch, cookie & bibi and choky choky the YM2151 clock is connected directly to the Z80 clock so the speed should match */
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 15000000/4));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 15_MHz_XTAL/4)); /* 3.75MHz verified */
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.10);
 
 	/* correct for cookie & bibi and hatch catch, (4096000/4) */
-	OKIM6295(config, m_oki, 1024000, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki, 4.096_MHz_XTAL/4, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -2400,27 +2398,26 @@ void tumbleb_state::cookbib(machine_config &config)
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_semicom_altoffsets));
 }
 
-void tumbleb_state::chokchok(machine_config &config)
+// some Choky! Choky! PCBs have left factory with a 3.57mhz while some have a 4.096 which matches other games, assuming the former are factory errors
+void tumbleb_state::chokchok(machine_config &config) // OSCs: 15MHz, 4.096MHz
 {
 	htchctch(config);
 
 	/* basic machine hardware */
-	i87c52_device &prot(I87C52(config, "protection", 16000000));
+	i87c52_device &prot(I87C52(config, "protection", 15_MHz_XTAL));
 	prot.port_out_cb<0>().set(FUNC(tumbleb_state::prot_p0_w));
 	prot.port_out_cb<1>().set(FUNC(tumbleb_state::prot_p1_w));
 	prot.port_out_cb<2>().set(FUNC(tumbleb_state::prot_p2_w));
 
 	m_palette->set_format(palette_device::xBGR_444, 1024);
-	// some PCBs have left factory with a 3.57mhz while some have a 4.096 which matches other games, assuming the former are factory errors
-	m_oki->set_clock(4096000/4);
 }
 
-void tumbleb_state::cookbib_mcu(machine_config &config)
+void tumbleb_state::cookbib_mcu(machine_config &config) // OSCs: 15MHz, 4.096MHz
 {
 	htchctch(config);
 
 	/* basic machine hardware */
-	at89c52_device &prot(AT89C52(config, "protection", 16000000));
+	at89c52_device &prot(AT89C52(config, "protection", 15_MHz_XTAL));
 	prot.port_out_cb<0>().set(FUNC(tumbleb_state::prot_p0_w));
 	prot.port_out_cb<1>().set(FUNC(tumbleb_state::prot_p1_w));
 	prot.port_out_cb<2>().set(FUNC(tumbleb_state::prot_p2_w));
@@ -2429,43 +2426,42 @@ void tumbleb_state::cookbib_mcu(machine_config &config)
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_semicom_altoffsets));
 }
 
-void tumbleb_state::bcstory(machine_config &config)
+void tumbleb_state::bcstory(machine_config &config) // OSCs: 15MHz, 4.096MHz
 {
 	htchctch(config);
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_bcstory));
-
-	subdevice<ym2151_device>("ymsnd")->set_clock(3427190);
 }
 
-void tumbleb_state::semibase(machine_config &config)
+void tumbleb_state::semibase(machine_config &config) // OSCs: 15MHz, 4.096MHz
 {
-	bcstory(config);
+	htchctch(config);
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_semibase));
 }
 
-void tumbleb_state::sdfight(machine_config &config)
+void tumbleb_state::sdfight(machine_config &config) // OSCs: 15MHz, 4.096MHz
 {
-	bcstory(config);
+	htchctch(config);
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,sdfight)
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_sdfight));
 }
 
-void tumbleb_state::metlsavr(machine_config &config)
+void tumbleb_state::metlsavr(machine_config &config)// OSCs: 14MHz, 3.579545MHz
 {
 	cookbib(config);
 	m_palette->set_format(palette_device::xBGR_444, 1024);
 
-	subdevice<ym2151_device>("ymsnd")->set_clock(3427190);
+	subdevice<ym2151_device>("ymsnd")->set_clock(3.579545_MHz_XTAL);
 }
 
-void tumbleb_state::suprtrio(machine_config &config)
+
+void tumbleb_state::suprtrio(machine_config &config) // OSCs: 14MHz, 12MHz & 8MHz
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 14000000); /* 14mhz should be correct, but lots of sprite flicker later in game */
+	M68000(config, m_maincpu, 14_MHz_XTAL); /* 14mhz should be correct, but lots of sprite flicker later in game */
 	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::suprtrio_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tumbleb_state::irq6_line_hold));
 
-	Z80(config, m_audiocpu, 8000000);
+	Z80(config, m_audiocpu, 8_MHz_XTAL/2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tumbleb_state::suprtrio_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
@@ -2495,14 +2491,14 @@ void tumbleb_state::suprtrio(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	OKIM6295(config, m_oki, 875000, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki, 8_MHz_XTAL/8, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-void tumbleb_state::pangpang(machine_config &config)
+void tumbleb_state::pangpang(machine_config &config) // OSCs: 14MHz, 12MHz & 8MHz
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 14000000);
+	M68000(config, m_maincpu, 14_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::pangpang_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tumbleb_state::tumbleb2_interrupt));
 
@@ -2531,7 +2527,7 @@ void tumbleb_state::pangpang(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, 8000000/10, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki, 8_MHz_XTAL/8, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.70);
 }
 
@@ -3267,8 +3263,6 @@ ROM_START( chokchok )
 	ROM_LOAD16_BYTE( "uor3.bin",  0x100000, 0x80000, CRC(e2dc3e12) SHA1(9e2571f93d27b9048fe8e42d3f13a8e509b3adca) )
 	ROM_LOAD16_BYTE( "uor4.bin",  0x100001, 0x80000, CRC(6f377530) SHA1(1367987e3af0baa8e22f09d1b40ad838f33371bc) )
 ROM_END
-
-
 
 
 /* Date Quiz Go Go */
