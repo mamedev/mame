@@ -71,7 +71,7 @@ void unsp_disassembler::print_alu_op_start(std::ostream &stream, uint8_t op0, ui
 		"%s = ", // load
 		"%s |= ",
 		"%s &= ",
-		"test %s, "
+		"test %s, ",
 		"store", // syntax changes
 		"<BAD>", // bad
 		"<BAD>", // bad

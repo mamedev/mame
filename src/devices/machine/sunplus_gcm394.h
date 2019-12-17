@@ -283,6 +283,7 @@ public:
 		generalplus_gpac800_device(mconfig, tag, owner, clock)
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
+		m_testval = 0;
 	}
 
 	generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -292,6 +293,9 @@ protected:
 
 private:
 	DECLARE_READ16_MEMBER(unkarea_7850_r);
+	DECLARE_READ16_MEMBER(unkarea_7854_r);
+
+	int m_testval;
 };
 
 
