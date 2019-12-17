@@ -427,12 +427,30 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			break;
 
 		case 0x09: // load
+		{
 			// A = C
-			logerror( "(Extended group 2) %s = [%04x]\n", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-														, imm16_2);
-			unimplemented_opcode(op, ximm, imm16_2);
+			//logerror("(Extended group 2) %s = [%04x]\n", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
+		    //                                      	 , imm16_2);
+			//unimplemented_opcode(op, ximm, imm16_2);
+
+			m_core->m_icount -= 1; // TODO
+
+			//uin32_t lreg = UNSP_LREG_I(imm16_2);
+
+			uint16_t lres = read16(imm16_2);
+			update_nz(lres);
+			if (ra & 0x8)
+			{
+				m_secondary_r[ra & 0x7] = (uint16_t)lres;
+			}
+			else
+			{
+				m_core->m_r[ra & 0x7] = (uint16_t)lres;
+			}
+
 			return;
 			break;
+		}
 
 		case 0x0a: // or
 			// A = B | C
@@ -909,39 +927,46 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 		{
 		case 0x00: // add
 			// A += B
-			logerror( "(Extended group 6) %s += %02x\n", extregs[rx], imm6 );
+			logerror("(Extended group 6) %s += %02x\n", extregs[rx], imm6);
 			unimplemented_opcode(op, ximm);
 			return;
 			break;
 
 		case 0x01: // adc
 			// A += B, Carry
-			logerror( "(Extended group 6) %s += %02x, carry\n", extregs[rx], imm6 );
+			logerror("(Extended group 6) %s += %02x, carry\n", extregs[rx], imm6);
 			unimplemented_opcode(op, ximm);
 			return;
 			break;
 
 		case 0x02: // sub
 			// A -= B
-			logerror( "(Extended group 6) %s -= %02x\n", extregs[rx], imm6 );
+			logerror("(Extended group 6) %s -= %02x\n", extregs[rx], imm6);
 			unimplemented_opcode(op, ximm);
 			return;
 			break;
 
 		case 0x03: // sbc
 			// A -= B, Carry
-			logerror( "(Extended group 6) %s -= %02x, carry\n", extregs[rx], imm6 );
+			logerror("(Extended group 6) %s -= %02x, carry\n", extregs[rx], imm6);
 			unimplemented_opcode(op, ximm);
 			return;
 			break;
 
 		case 0x04: // cmp
+		{
 			// CMP A,B
-			logerror( "(Extended group 6) cmp %s, %02x\n", extregs[rx], imm6 );
-			unimplemented_opcode(op, ximm);
+			//logerror("(Extended group 6) cmp %s, %02x\n", extregs[rx], imm6);
+			
+			m_core->m_icount -= 1; // TODO
+
+			uint16_t lres = m_secondary_r[rx] + (uint16_t)(~imm6) + uint32_t(1);
+			update_nzsc(lres, m_secondary_r[rx] , ~imm6);
+			
+			//unimplemented_opcode(op, ximm);
 			return;
 			break;
-
+		}
 		case 0x06: // neg
 			// A = -B
 			logerror( "(Extended group 6) %s = -%02x\n", extregs[rx], imm6 );

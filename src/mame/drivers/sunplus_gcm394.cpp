@@ -631,7 +631,7 @@ void generalplus_gpac800_game_state::nand_init(int blocksize, int blocksize_stri
 	}
 
 	// debug to allow for easy use of unidasm.exe
-	if (0)
+	if (1)
 	{
 		FILE *fp;
 		char filename[256];
