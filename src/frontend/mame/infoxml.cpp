@@ -1942,9 +1942,9 @@ void output_software_lists(std::ostream &out, device_t &root, const char *root_t
 {
 	for (const software_list_device &swlist : software_list_device_iterator(root))
 	{
-		if (&static_cast<device_t &>(swlist) == &root)
+		if (&static_cast<const device_t &>(swlist) == &root)
 		{
-			assert(swlist.list_name.empty());
+			assert(swlist.list_name().empty());
 			continue;
 		}
 
