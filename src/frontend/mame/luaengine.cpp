@@ -1672,10 +1672,11 @@ void lua_engine::initialize()
  *
  * space.name - address space name
  * space.shift - address bus shift, bitshift required for a bytewise address
- *               to map onto this space's addess resolution (addressing granularity).
+ *               to map onto this space's address resolution (addressing granularity).
  *               positive value means leftshift, negative means rightshift.
  * space.index
  * space.address_mask
+ * space.data_width
  * space.endianness
  *
  * space.map[] - table of address map entries (k=index, v=address_map_entry)
@@ -1734,6 +1735,7 @@ void lua_engine::initialize()
 	addr_space_type.set("shift", sol::property([](addr_space &sp) { return sp.space.addr_shift(); }));
 	addr_space_type.set("index", sol::property([](addr_space &sp) { return sp.space.spacenum(); }));
 	addr_space_type.set("address_mask", sol::property([](addr_space &sp) { return sp.space.addrmask(); }));
+	addr_space_type.set("data_width", sol::property([](addr_space &sp) { return sp.space.data_width(); }));
 	addr_space_type.set("endianness", sol::property([](addr_space &sp) {
 			std::string endianness;
 			switch (sp.space.endianness())
