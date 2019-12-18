@@ -20,6 +20,11 @@ vt5x_cpu_device::vt5x_cpu_device(const machine_config &mconfig, device_type type
 	, m_ram_config("data", ENDIANNESS_LITTLE, 8, 6 + ybits, 0) // actually 7 bits wide
 	, m_rom_cache(nullptr)
 	, m_ram_cache(nullptr)
+	, m_uart_rd_callback(*this)
+	, m_uart_xd_callback(*this)
+	, m_ur_flag_callback(*this)
+	, m_ut_flag_callback(*this)
+	, m_ruf_callback(*this)
 	, m_bbits(bbits)
 	, m_ybits(ybits)
 	, m_pc(0)
@@ -33,9 +38,11 @@ vt5x_cpu_device::vt5x_cpu_device(const machine_config &mconfig, device_type type
 	, m_x8(false)
 	, m_cursor_ff(false)
 	, m_video_process(false)
+	, m_ram_do(0)
 	, m_t(0)
 	, m_write_ff(false)
 	, m_flag_test_ff(false)
+	, m_m2u_ff(false)
 	, m_load_pc(false)
 	, m_qa_e23(0)
 	, m_icount(0)
@@ -72,8 +79,19 @@ device_memory_interface::space_config_vector vt5x_cpu_device::memory_space_confi
 	};
 }
 
+void vt5x_cpu_device::device_resolve_objects()
+{
+	// resolve callbacks
+	m_uart_rd_callback.resolve_safe(0);
+	m_uart_xd_callback.resolve_safe();
+	m_ur_flag_callback.resolve_safe(0);
+	m_ut_flag_callback.resolve_safe(0);
+	m_ruf_callback.resolve_safe();
+}
+
 void vt5x_cpu_device::device_start()
 {
+	// acquire address spaces
 	m_rom_cache = space(AS_PROGRAM).cache<0, 0, ENDIANNESS_LITTLE>();
 	m_ram_cache = space(AS_DATA).cache<0, 0, ENDIANNESS_LITTLE>();
 
@@ -96,6 +114,7 @@ void vt5x_cpu_device::device_start()
 	state_add(VT5X_CFF, "CFF", m_cursor_ff);
 	state_add(VT5X_VID, "VID", m_video_process);
 
+	// save state
 	save_item(NAME(m_pc));
 	save_item(NAME(m_rom_bank));
 	save_item(NAME(m_mode_ff));
@@ -107,9 +126,11 @@ void vt5x_cpu_device::device_start()
 	save_item(NAME(m_x8));
 	save_item(NAME(m_cursor_ff));
 	save_item(NAME(m_video_process));
+	save_item(NAME(m_ram_do));
 	save_item(NAME(m_t));
 	save_item(NAME(m_write_ff));
 	save_item(NAME(m_flag_test_ff));
+	save_item(NAME(m_m2u_ff));
 	save_item(NAME(m_load_pc));
 	save_item(NAME(m_qa_e23));
 }
@@ -119,10 +140,23 @@ void vt5x_cpu_device::device_reset()
 	m_pc = 0;
 	m_rom_bank = 0;
 	m_video_process = false;
+
+	// CPU is initialized in weird state that does not allow first instruction to fully execute
 	m_t = 7;
 	m_flag_test_ff = false;
 	m_load_pc = false;
 	m_qa_e23 = false;
+}
+
+offs_t vt5x_cpu_device::translate_xy() const
+{
+	const u8 x = m_x ^ (m_x8 ? 8 : 0);
+	const offs_t y_shifted = (offs_t(m_y) << (10 - m_ybits)) & 01700;
+	const offs_t ram_bank = offs_t(m_y & ((1 << (m_ybits - 4)) - 1)) << 10;
+	if (BIT(x, 6) || (y_shifted & 01400) == 01400)
+		return (x & 0017) | (y_shifted & 01400) >> 4 | y_shifted | 01400 | ram_bank;
+	else
+		return x | y_shifted | ram_bank;
 }
 
 void vt5x_cpu_device::execute_te(u8 inst)
@@ -135,6 +169,7 @@ void vt5x_cpu_device::execute_te(u8 inst)
 			// ZXZY
 			m_x = 0;
 			m_y = 0;
+			m_x8 = false;
 			break;
 
 		case 0020:
@@ -166,6 +201,7 @@ void vt5x_cpu_device::execute_te(u8 inst)
 		case 0140:
 			// ZX
 			m_x = 0;
+			m_x8 = false;
 			break;
 
 		case 0160:
@@ -175,10 +211,18 @@ void vt5x_cpu_device::execute_te(u8 inst)
 		}
 	}
 
+	if (m_m2u_ff)
+	{
+		m_uart_xd_callback(m_ram_do);
+		m_m2u_ff = false;
+	}
+
 	m_flag_test_ff = false;
 	m_load_pc = false;
 	if (!BIT(inst, 7))
 		m_done_ff = false;
+	else if (!m_mode_ff)
+		m_ac = (m_ac + 1) & 0177;
 }
 
 void vt5x_cpu_device::execute_tf(u8 inst)
@@ -225,6 +269,9 @@ void vt5x_cpu_device::execute_tf(u8 inst)
 			break;
 		}
 	}
+
+	// RUF is transparently latched from U2M decode
+	m_ruf_callback((inst & 0362) == 0122 ? 0 : 1);
 }
 
 void vt5x_cpu_device::execute_tw(u8 inst)
@@ -277,51 +324,134 @@ void vt5x_cpu_device::execute_tw(u8 inst)
 		m_flag_test_ff = true;
 
 	// set FF for instructions that write to RAM
-	m_write_ff = (BIT(inst, 7) && !m_done_ff) || inst == 022 || inst == 042 || inst == 062;
+	if (BIT(inst, 7))
+		m_write_ff = (m_mode_ff || m_ac >= m_ram_do) && !m_done_ff;
+	else
+		m_write_ff = (inst & 0162) == 0022 || (inst & 0162) == 0062 || (inst & 0162) == 0122;
 	if (m_write_ff)
 		m_done_ff = true;
 }
 
-void vt5x_cpu_device::execute_tg(u8 inst)
+void vt50_cpu_device::execute_tg(u8 inst)
 {
-	// TODO
+	switch (inst & 0362)
+	{
+	case 0022:
+		// A2M
+		m_ram_do = m_ac;
+		break;
 
+	case 0062:
+		// L40M (http://catb.org/jargon/html/O/octal-forty.html)
+		m_ram_do = 040;
+		break;
+
+	case 0122:
+		// U2M
+		m_ram_do = m_uart_rd_callback() & 0177;
+		break;
+
+	default:
+		// LD
+		m_ram_do = inst & 0177;
+		break;
+	}
+
+	m_ram_cache->write_byte(translate_xy(), m_ram_do);
+	m_write_ff = false;
+}
+
+void vt52_cpu_device::execute_tg(u8 inst)
+{
+	switch (inst & 0362)
+	{
+	case 0022:
+		// A2M
+		m_ram_do = m_ac;
+		break;
+
+	case 0062:
+		// B2M
+		m_ram_do = m_buffer;
+		break;
+
+	case 0122:
+		// U2M
+		m_ram_do = m_uart_rd_callback() & 0177;
+		break;
+
+	default:
+		// LD
+		m_ram_do = inst & 0177;
+		break;
+	}
+
+	m_ram_cache->write_byte(translate_xy(), m_ram_do);
 	m_write_ff = false;
 }
 
 void vt5x_cpu_device::execute_th(u8 inst)
 {
+	if (inst == 0002)
+	{
+		// M2A
+		m_ac = m_ram_do;
+	}
+	else if (inst == 0042)
+	{
+		// M2U
+		m_m2u_ff = true;
+	}
+	else if (inst == 0102)
+	{
+		// M2X
+		m_x = m_ram_do;
+	}
+	else if (inst == 0142)
+	{
+		// M2B
+		m_buffer = m_ram_do & ((1 << m_bbits) - 1);
+	}
+
 	if (m_flag_test_ff)
 	{
 		switch (inst & 0160)
 		{
 		case 0000:
 			// M0: PSCJ (TODO)
-			// M1: URJ (TODO)
+			// M1: URJ
+			if (m_mode_ff)
+				m_load_pc = m_ur_flag_callback();
 			break;
 
 		case 0020:
 			// M0: TABJ
-			// M1: AEMJ (TODO)
-			if (!m_mode_ff)
+			// M1: AEMJ
+			if (m_mode_ff)
+				m_load_pc = m_ac == m_ram_do;
+			else
 				m_load_pc = (m_ac & 7) == 7;
 			break;
 
 		case 0040:
 			// M0: KCLJ (TODO)
-			// M1: ALMJ (TODO)
+			// M1: ALMJ
+			if (m_mode_ff)
+				m_load_pc = m_ac < m_ram_do;
 			break;
 
 		case 0060:
 			// M0: FRQJ (TODO)
 			// M1: ADXJ
 			if (m_mode_ff)
-				m_load_pc = m_ac != m_x;
+				m_load_pc = m_ac != (m_x ^ (m_x8 ? 8 : 0));
 			break;
 
 		case 0100:
 			// M0: PRQJ (TODO)
-			// M1: AEM2J (TODO)
+			// M1: AEM2J
+			if (m_mode_ff)
+				m_load_pc = m_ac == m_ram_do;
 			break;
 
 		case 0120:
@@ -330,13 +460,17 @@ void vt5x_cpu_device::execute_th(u8 inst)
 			break;
 
 		case 0140:
-			// M0: UTJ (TODO)
+			// M0: UTJ
 			// M1: VSCJ (TODO)
+			if (!m_mode_ff)
+				m_load_pc = !m_ut_flag_callback();
 			break;
 
 		case 0160:
 			// M0: TOSJ (TODO)
-			// M1: KEYJ (TODO)
+			// M1: KEYJ (TODO; hacked for now)
+			if (m_mode_ff)
+				m_load_pc = (m_ac & 077) != 0;
 			break;
 		}
 	}
@@ -375,6 +509,8 @@ void vt5x_cpu_device::execute_run()
 		case 2:
 			if (!m_qa_e23)
 				execute_tf(m_rom_cache->read_byte(m_pc));
+			if (!m_write_ff)
+				m_ram_do = m_ram_cache->read_byte(translate_xy()) & 0177;
 			m_t = 3;
 			break;
 

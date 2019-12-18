@@ -43,6 +43,8 @@ protected:
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	DECLARE_READ_LINE_MEMBER(xrdy_eoc_r);
+
 	void rom_1k(address_map &map);
 	void ram_2k(address_map &map);
 
@@ -58,6 +60,11 @@ void vt52_state::machine_start()
 u32 vt52_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
+}
+
+READ_LINE_MEMBER(vt52_state::xrdy_eoc_r)
+{
+	return m_uart->tbmt_r() || m_uart->eoc_r();
 }
 
 void vt52_state::rom_1k(address_map &map)
@@ -78,6 +85,11 @@ void vt52_state::vt52(machine_config &mconfig)
 	VT52_CPU(mconfig, m_maincpu, 13.824_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt52_state::rom_1k);
 	m_maincpu->set_addrmap(AS_DATA, &vt52_state::ram_2k);
+	m_maincpu->uart_rd_callback().set(m_uart, FUNC(ay51013_device::receive));
+	m_maincpu->uart_xd_callback().set(m_uart, FUNC(ay51013_device::transmit));
+	m_maincpu->ur_flag_callback().set(m_uart, FUNC(ay51013_device::dav_r));
+	m_maincpu->ut_flag_callback().set(FUNC(vt52_state::xrdy_eoc_r));
+	m_maincpu->ruf_callback().set(m_uart, FUNC(ay51013_device::write_rdav));
 
 	AY51013(mconfig, m_uart); // TR1402 or equivalent
 

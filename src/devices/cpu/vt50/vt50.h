@@ -16,11 +16,19 @@ public:
 		VT5X_CFF, VT5X_VID
 	};
 
+	// callback configuration
+	auto uart_rd_callback() { return m_uart_rd_callback.bind(); }
+	auto uart_xd_callback() { return m_uart_xd_callback.bind(); }
+	auto ur_flag_callback() { return m_ur_flag_callback.bind(); }
+	auto ut_flag_callback() { return m_ut_flag_callback.bind(); }
+	auto ruf_callback() { return m_ruf_callback.bind(); }
+
 protected:
 	// construction/destruction
 	vt5x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int bbits, int ybits);
 
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -33,12 +41,14 @@ protected:
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-private:
+	// address translation
+	offs_t translate_xy() const;
+
 	// execution helpers
 	void execute_te(u8 inst);
 	void execute_tf(u8 inst);
+	virtual void execute_tg(u8 inst) = 0;
 	void execute_tw(u8 inst);
-	void execute_tg(u8 inst);
 	void execute_th(u8 inst);
 	void execute_tj(u8 dest);
 
@@ -47,6 +57,13 @@ private:
 	address_space_config m_ram_config;
 	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_rom_cache;
 	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_ram_cache;
+
+	// device callbacks
+	devcb_read8 m_uart_rd_callback;
+	devcb_write8 m_uart_xd_callback;
+	devcb_read_line m_ur_flag_callback;
+	devcb_read_line m_ut_flag_callback;
+	devcb_write_line m_ruf_callback;
 
 	// register dimensions
 	const u8 m_bbits;
@@ -64,11 +81,13 @@ private:
 	bool m_x8;
 	bool m_cursor_ff;
 	bool m_video_process;
+	u8 m_ram_do;
 
 	// execution phases
 	u8 m_t;
 	bool m_write_ff;
 	bool m_flag_test_ff;
+	bool m_m2u_ff;
 	bool m_load_pc;
 	bool m_qa_e23;
 	s32 m_icount;
@@ -83,6 +102,8 @@ public:
 protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	virtual void execute_tg(u8 inst) override;
 };
 
 class vt52_cpu_device : public vt5x_cpu_device
@@ -94,6 +115,8 @@ public:
 protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	virtual void execute_tg(u8 inst) override;
 };
 
 DECLARE_DEVICE_TYPE(VT50_CPU, vt50_cpu_device)
