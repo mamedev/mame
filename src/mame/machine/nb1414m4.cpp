@@ -48,12 +48,8 @@ nb1414m4_device::nb1414m4_device(const machine_config &mconfig, const char *tag,
 
 void nb1414m4_device::device_start()
 {
-	m_previous_0200_command = 0xffff;
-	m_previous_0200_command_frame = 0;
 	m_flickering_cycle = 0;
 	m_in_game = false;
-	save_item(NAME(m_previous_0200_command));
-	save_item(NAME(m_previous_0200_command_frame));
 	save_item(NAME(m_flickering_cycle));
 	save_item(NAME(m_in_game));
 }
@@ -64,8 +60,6 @@ void nb1414m4_device::device_start()
 
 void nb1414m4_device::device_reset()
 {
-	m_previous_0200_command = 0xffff;
-	m_previous_0200_command_frame = 0;
 	m_flickering_cycle = 0;
 	m_in_game = false;
 }
@@ -193,16 +187,9 @@ void nb1414m4_device::_0200(uint16_t mcu_cmd, uint8_t *vram)
 {
 	uint16_t dst;
 
-  // In any game, this bit is set when now playing.
+	// In any game, this bit is set when now playing.
 	// If it is set, "INSERT COIN" etc. are not displayed.
 	m_in_game = (mcu_cmd & 0x80) != 0;
-
-  // If the same command in an extremely short cycle (1 frame or less), ignored it.
-	// This is required to displaying continue screen of ninjaemak.
-	// ninjaemak calls this command to clear the screen, draw the continuation screen, and then immediately call the same command.
-	// This second command must be ignored in order not to corrupt the continue screen.
-	if (m_previous_0200_command == mcu_cmd && (screen().frame_number() - m_previous_0200_command_frame) <= 1)
-		return;
 
 	dst = (m_data[0x330+((mcu_cmd & 0xf)*2)]<<8)|(m_data[0x331+((mcu_cmd & 0xf)*2)]&0xff);
 
@@ -212,9 +199,6 @@ void nb1414m4_device::_0200(uint16_t mcu_cmd, uint8_t *vram)
 		fill(0x0000,m_data[dst],m_data[dst+1],vram);
 	else // src -> dst
 		dma(dst,0x0000,0x400,1,vram);
-
-	m_previous_0200_command = mcu_cmd;
-	m_previous_0200_command_frame = screen().frame_number();
 }
 
 /*
