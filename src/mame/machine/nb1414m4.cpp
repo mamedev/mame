@@ -17,7 +17,6 @@ TODO:
 - where is the condition that makes "insert coin" text to properly blink?
 - first byte meaning is completely unknown;
 - Ninja Emaki triggers unknown commands 0x8000 & 0xff20;
-- Ninja Emaki continue screen is corrupt;
 
 Notes:
 - Just before any string in the "MCU" rom, there's a control byte, this meaning is as follows:
@@ -48,7 +47,11 @@ nb1414m4_device::nb1414m4_device(const machine_config &mconfig, const char *tag,
 
 void nb1414m4_device::device_start()
 {
+	m_previous_0200_command = 0xffff;
+	m_previous_0200_command_frame = 0;
 	m_in_game = false;
+	save_item(NAME(m_previous_0200_command));
+	save_item(NAME(m_previous_0200_command_frame));
 	save_item(NAME(m_in_game));
 }
 
@@ -58,6 +61,8 @@ void nb1414m4_device::device_start()
 
 void nb1414m4_device::device_reset()
 {
+	m_previous_0200_command = 0xffff;
+	m_previous_0200_command_frame = 0;
 	m_in_game = false;
 }
 
@@ -186,6 +191,13 @@ void nb1414m4_device::_0200(uint16_t mcu_cmd, uint8_t *vram)
 	// If it is set, "INSERT COIN" etc. are not displayed.
 	m_in_game = (mcu_cmd & 0x80) != 0;
 
+	// If the same command in an extremely short cycle (1 frame or less), ignored it.
+	// This is required to displaying continue screen of ninjaemak.
+	// ninjaemak calls this command to clear the screen, draw the continuation screen, and then immediately call the same command.
+	// This second command must be ignored in order not to corrupt the continue screen.
+	if (m_previous_0200_command == mcu_cmd && (screen().frame_number() - m_previous_0200_command_frame) <= 1)
+		return;
+
 	dst = (m_data[0x330+((mcu_cmd & 0xf)*2)]<<8)|(m_data[0x331+((mcu_cmd & 0xf)*2)]&0xff);
 
 	dst &= 0x3fff;
@@ -194,6 +206,9 @@ void nb1414m4_device::_0200(uint16_t mcu_cmd, uint8_t *vram)
 		fill(0x0000,m_data[dst],m_data[dst+1],vram);
 	else // src -> dst
 		dma(dst,0x0000,0x400,1,vram);
+
+	m_previous_0200_command = mcu_cmd;
+	m_previous_0200_command_frame = screen().frame_number();
 }
 
 /*
