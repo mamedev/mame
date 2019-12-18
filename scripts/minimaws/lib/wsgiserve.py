@@ -109,6 +109,76 @@ class QueryPageHandler(HandlerBase):
     def software_href(self, softwarelist, software):
         return cgi.escape(urlparse.urljoin(self.application_uri, 'softwarelist/%s/%s' % (urlquote(softwarelist), urlquote(software))), True)
 
+    def bios_data(self, machine):
+        result = { }
+        for name, description, isdefault in self.dbcurs.get_biossets(machine):
+            result[name] = { 'description': description, 'isdefault': True if isdefault else False }
+        return result
+
+    def flags_data(self, machine):
+        result = { 'features': { } }
+        for feature, status, overall in self.dbcurs.get_feature_flags(machine):
+            detail = { }
+            if status == 1:
+                detail['status'] = 'imperfect'
+            elif status > 1:
+                detail['status'] = 'unemulated'
+            if overall == 1:
+                detail['overall'] = 'imperfect'
+            elif overall > 1:
+                detail['overall'] = 'unemulated'
+            result['features'][feature] = detail
+        return result
+
+    def slot_data(self, machine):
+        result = { 'defaults': { }, 'slots': { } }
+
+        # get defaults and slot options
+        for slot, default in self.dbcurs.get_slot_defaults(machine):
+            result['defaults'][slot] = default
+        prev = None
+        for slot, option, shortname, description in self.dbcurs.get_slot_options(machine):
+            if slot != prev:
+                if slot in result['slots']:
+                    options = result['slots'][slot]
+                else:
+                    options = { }
+                    result['slots'][slot] = options
+                prev = slot
+            options[option] = { 'device': shortname, 'description': description }
+
+        # remove slots that come from default cards in other slots
+        for slot in tuple(result['slots'].keys()):
+            slot += ':'
+            for candidate in tuple(result['slots'].keys()):
+                if candidate.startswith(slot):
+                    del result['slots'][candidate]
+
+        return result
+
+    def softwarelist_data(self, machine):
+        result = { }
+
+        # get software lists referenced by machine
+        for softwarelist in self.dbcurs.get_machine_softwarelists(machine):
+            result[softwarelist['tag']] = {
+                    'status':               softwarelist['status'],
+                    'shortname':            softwarelist['shortname'],
+                    'description':          softwarelist['description'],
+                    'total':                softwarelist['total'],
+                    'supported':            softwarelist['supported'],
+                    'partiallysupported':   softwarelist['partiallysupported'],
+                    'unsupported':          softwarelist['unsupported'] }
+
+        # remove software lists that come from default cards in slots
+        for slot, default in self.dbcurs.get_slot_defaults(machine):
+            slot += ':'
+            for candidate in tuple(result.keys()):
+                if candidate.startswith(slot):
+                    del result[candidate]
+
+        return result
+
 
 class MachineRpcHandlerBase(QueryPageHandler):
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
@@ -215,6 +285,7 @@ class MachineHandler(QueryPageHandler):
                     tuple(imperfect)).encode('utf-8');
         yield '</table>\n'.encode('utf-8')
 
+        # make a table of clones
         first = True
         for clone, clonedescription, cloneyear, clonemanufacturer in self.dbcurs.get_clones(self.shortname):
             if first:
@@ -228,6 +299,21 @@ class MachineHandler(QueryPageHandler):
                     manufacturer=cgi.escape(clonemanufacturer or '')).encode('utf-8')
         if not first:
             yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-clones').encode('utf-8')
+
+        # make a table of software lists
+        yield htmltmpl.MACHINE_SOFTWARELISTS_TABLE_PROLOGUE.substitute().encode('utf-8')
+        for softwarelist in self.dbcurs.get_machine_softwarelists(id):
+            total = softwarelist['total']
+            yield htmltmpl.MACHINE_SOFTWARELISTS_TABLE_ROW.substitute(
+                    href=self.softwarelist_href(softwarelist['shortname']),
+                    shortname=cgi.escape(softwarelist['shortname']),
+                    description=cgi.escape(softwarelist['description']),
+                    status=cgi.escape(softwarelist['status']),
+                    total=cgi.escape('%d' % (total, )),
+                    supported=cgi.escape('%.1f%%' % (softwarelist['supported'] * 100.0 / (total or 1), )),
+                    partiallysupported=cgi.escape('%.1f%%' % (softwarelist['partiallysupported'] * 100.0 / (total or 1), )),
+                    unsupported=cgi.escape('%.1f%%' % (softwarelist['unsupported'] * 100.0 / (total or 1), ))).encode('utf-8')
+        yield htmltmpl.MACHINE_SOFTWARELISTS_TABLE_EPILOGUE.substitute().encode('utf-8')
 
         # allow system BIOS selection
         haveoptions = False
@@ -264,8 +350,28 @@ class MachineHandler(QueryPageHandler):
             if not haveoptions:
                 haveoptions = True
                 yield htmltmpl.MACHINE_OPTIONS_HEADING.substitute().encode('utf-8')
-            yield htmltmpl.MACHINE_SLOTS_PLACEHOLDER.substitute(
-                    machine=self.js_escape(self.shortname)).encode('utf=8')
+            yield htmltmpl.MACHINE_SLOTS_PLACEHOLDER_PROLOGUE.substitute().encode('utf=8')
+            pending = set((self.shortname, ))
+            added = set((self.shortname, ))
+            haveextra = set()
+            while pending:
+                requested = pending.pop()
+                slots = self.slot_data(self.dbcurs.get_machine_id(requested))
+                yield ('    slot_info[%s] = %s;\n' % (self.sanitised_json(requested), self.sanitised_json(slots))).encode('utf-8')
+                for slotname, slot in slots['slots'].items():
+                    for choice, card in slot.items():
+                        carddev = card['device']
+                        if carddev not in added:
+                            pending.add(carddev)
+                            added.add(carddev)
+                        if (carddev not in haveextra) and (slots['defaults'].get(slotname) == choice):
+                            haveextra.add(carddev)
+                            cardid = self.dbcurs.get_machine_id(carddev)
+                            carddev = self.sanitised_json(carddev)
+                            yield ('    bios_sets[%s] = %s;\n' % (carddev, self.sanitised_json(self.bios_data(cardid)))).encode('utf-8')
+                            yield ('    machine_flags[%s] = %s;\n' % (carddev, self.sanitised_json(self.flags_data(cardid)))).encode('utf-8')
+            yield htmltmpl.MACHINE_SLOTS_PLACEHOLDER_EPILOGUE.substitute(
+                    machine=self.sanitised_json(self.shortname)).encode('utf=8')
 
         # list devices referenced by this system/device
         first = True
@@ -331,6 +437,10 @@ class MachineHandler(QueryPageHandler):
                 shortname=cgi.escape(shortname),
                 description=cgi.escape(description or ''),
                 sourcefile=cgi.escape(sourcefile or '')).encode('utf-8')
+
+    @staticmethod
+    def sanitised_json(data):
+        return json.dumps(data).replace('<', '\\u003c').replace('>', '\\u003e')
 
 
 class SourceFileHandler(QueryPageHandler):
@@ -531,7 +641,13 @@ class SoftwareListHandler(QueryPageHandler):
             if first:
                 yield htmltmpl.SOFTWARELIST_MACHINE_TABLE_HEADER.substitute().encode('utf-8')
                 first = False
-            yield self.machine_row(machine_info)
+            yield htmltmpl.SOFTWARELIST_MACHINE_TABLE_ROW.substitute(
+                    machinehref=self.machine_href(machine_info['shortname']),
+                    shortname=cgi.escape(machine_info['shortname']),
+                    description=cgi.escape(machine_info['description']),
+                    year=cgi.escape(machine_info['year'] or ''),
+                    manufacturer=cgi.escape(machine_info['manufacturer'] or ''),
+                    status=cgi.escape(machine_info['status'])).encode('utf-8')
         if not first:
             yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-machines').encode('utf-8')
 
@@ -613,15 +729,6 @@ class SoftwareListHandler(QueryPageHandler):
                 publisher=cgi.escape(clone_info['publisher']),
                 supported=self.format_supported(clone_info['supported'])).encode('utf-8')
 
-    def machine_row(self, machine_info):
-        return htmltmpl.SOFTWARELIST_MACHINE_TABLE_ROW.substitute(
-                machinehref=self.machine_href(machine_info['shortname']),
-                shortname=cgi.escape(machine_info['shortname']),
-                description=cgi.escape(machine_info['description']),
-                year=cgi.escape(machine_info['year'] or ''),
-                manufacturer=cgi.escape(machine_info['manufacturer'] or ''),
-                status=cgi.escape(machine_info['status'])).encode('utf-8')
-
     @staticmethod
     def format_supported(supported):
         return 'Yes' if supported == 0 else 'Partial' if supported == 1 else 'No'
@@ -659,47 +766,17 @@ class BiosRpcHandler(MachineRpcHandlerBase):
 
 class FlagsRpcHandler(MachineRpcHandlerBase):
     def data_page(self, machine):
-        result = { 'features': { } }
-        for feature, status, overall in self.dbcurs.get_feature_flags(machine):
-            detail = { }
-            if status == 1:
-                detail['status'] = 'imperfect'
-            elif status > 1:
-                detail['status'] = 'unemulated'
-            if overall == 1:
-                detail['overall'] = 'imperfect'
-            elif overall > 1:
-                detail['overall'] = 'unemulated'
-            result['features'][feature] = detail
-        yield json.dumps(result).encode('utf-8')
+        yield json.dumps(self.flags_data(machine)).encode('utf-8')
 
 
 class SlotsRpcHandler(MachineRpcHandlerBase):
     def data_page(self, machine):
-        result = { 'defaults': { }, 'slots': { } }
+        yield json.dumps(self.slot_data(machine)).encode('utf-8')
 
-        # get defaults and slot options
-        for slot, default in self.dbcurs.get_slot_defaults(machine):
-            result['defaults'][slot] = default
-        prev = None
-        for slot, option, shortname, description in self.dbcurs.get_slot_options(machine):
-            if slot != prev:
-                if slot in result['slots']:
-                    options = result['slots'][slot]
-                else:
-                    options = { }
-                    result['slots'][slot] = options
-                prev = slot
-            options[option] = { 'device': shortname, 'description': description }
 
-        # remove slots that come from default cards in other slots
-        for slot in tuple(result['slots'].keys()):
-            slot += ':'
-            for candidate in tuple(result['slots'].keys()):
-                if candidate.startswith(slot):
-                    del result['slots'][candidate]
-
-        yield json.dumps(result).encode('utf-8')
+class SoftwareListsRpcHandler(MachineRpcHandlerBase):
+    def data_page(self, machine):
+        yield json.dumps(self.softwarelist_data(machine)).encode('utf-8')
 
 
 class RomDumpsRpcHandler(QueryPageHandler):
@@ -817,11 +894,12 @@ class DiskDumpsRpcHandler(QueryPageHandler):
 class MiniMawsApp(object):
     JS_ESCAPE = re.compile('([\"\'\\\\])')
     RPC_SERVICES = {
-            'bios':         BiosRpcHandler,
-            'flags':        FlagsRpcHandler,
-            'slots':        SlotsRpcHandler,
-            'romdumps':     RomDumpsRpcHandler,
-            'diskdumps':    DiskDumpsRpcHandler }
+            'bios':             BiosRpcHandler,
+            'flags':            FlagsRpcHandler,
+            'slots':            SlotsRpcHandler,
+            'softwarelists':    SoftwareListsRpcHandler,
+            'romdumps':         RomDumpsRpcHandler,
+            'diskdumps':        DiskDumpsRpcHandler }
 
     def __init__(self, dbfile, **kwargs):
         super(MiniMawsApp, self).__init__(**kwargs)
