@@ -928,7 +928,6 @@ void mips1core_device_base::handle_cop0(u32 const op)
 
 u32 mips1core_device_base::get_cop0_reg(unsigned const reg)
 {
-	machine().debug_break();
 	return m_cop0[reg];
 }
 
