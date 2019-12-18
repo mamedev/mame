@@ -9235,6 +9235,9 @@ skysmash                        // (c) 1990 Nihon System Inc.
 weststry                        // bootleg
 weststrya                       // bootleg
 
+@source:bloodbro_ms.cpp
+bloodbrom                       // bootleg
+
 @source:blstroid.cpp
 blstroid                        // 136057           (c) 1987
 blstroid2                       // 136057           (c) 1987

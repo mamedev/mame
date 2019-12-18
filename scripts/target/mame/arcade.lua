@@ -3573,6 +3573,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/bloodbro.cpp",
 	MAME_DIR .. "src/mame/includes/bloodbro.h",
 	MAME_DIR .. "src/mame/video/bloodbro.cpp",
+	MAME_DIR .. "src/mame/drivers/bloodbro_ms.cpp",
 	MAME_DIR .. "src/mame/drivers/cabal.cpp",
 	MAME_DIR .. "src/mame/includes/cabal.h",
 	MAME_DIR .. "src/mame/video/cabal.cpp",
