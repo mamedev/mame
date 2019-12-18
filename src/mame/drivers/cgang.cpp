@@ -551,8 +551,7 @@ WRITE8_MEMBER(cgang_state::spot_w)
 	// d0-d2: ufo boss spotlights
 	// d3-d7: cosmo spotlights
 	// it strobes them for dimming
-	for (int i = 0; i < 8; i++)
-		m_spot->matrix(1, data);
+	m_spot->matrix(1, data);
 }
 
 WRITE8_MEMBER(cgang_state::ppi5_a_w)
