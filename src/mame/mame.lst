@@ -11409,6 +11409,7 @@ dc                              // 1999 Sega Dreamcast (USA)
 dcdev                           // 1998 Sega HKT-0120 Sega Dreamcast Development Box
 dceu                            // 1999 Sega Dreamcast (Europe)
 dcjp                            // 1998 Sega Dreamcast (Japan)
+dcfish                          // 2000 Fish Life
 dctream                         // 200? Treamcast
 
 @source:dcebridge.cpp

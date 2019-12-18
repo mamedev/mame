@@ -32,7 +32,6 @@
     - Tetris 4D: hangs at BPS FMV (bp 0C0B0C4E)
 
     Notes:
-    - DC US and DC PAL flash ROMs are definitely hacked, they are set to have Chinese instead of Japanese.
     - 0x1a002 of flash ROM returns the region type (0x30=Japan, 0x31=USA, 0x32=Europe). Amusingly, if the value
       on a non-jp console is different than these ones, the system shows a black swirl (and nothing boots).
     - gdi file for DCLP (a Dreamcast tester) doesn't have first two tracks info, they are:
@@ -41,6 +40,8 @@
       serial i/o also fails on that, work ram addresses that needs to be patched with 0x0009 (nop) are:
       0xc0196da
       0xc0196ec
+      Testers may be run in different modes if hold controller buttons while booting (A+B, Right+X, Left+X, Down+A+B+X, Down+X, Up+X and few others),
+       require emulated Maple DMA "swap endian" mode (SB_MMSEL register = 0).
     SH4 TEST:
         UBC test (0101):
             ok
@@ -592,6 +593,29 @@ static INPUT_PORTS_START( dc )
 	PORT_CONFSETTING(    0x03, "S-Video" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dcfish )
+	PORT_START("P1:0")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("CONFIG")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("MAMEDEBUG")
+	PORT_CONFNAME( 0x01, 0x00, "Bilinear Filtering" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+
+	PORT_START("SCREEN_TYPE")
+	PORT_CONFNAME( 0x03, 0x03, "Screen Connection Type" )
+	PORT_CONFSETTING(    0x00, "VGA" )
+	PORT_CONFSETTING(    0x02, "Composite" )
+	PORT_CONFSETTING(    0x03, "S-Video" )
+INPUT_PORTS_END
+
 void dc_cons_state::gdrom_config(device_t *device)
 {
 	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
@@ -599,7 +623,7 @@ void dc_cons_state::gdrom_config(device_t *device)
 	cdda->add_route(1, "^^aica", 1.0);
 }
 
-void dc_cons_state::dc(machine_config &config)
+void dc_cons_state::dc_base(machine_config &config)
 {
 	/* basic machine hardware */
 	SH4LE(config, m_maincpu, CPU_CLOCK);
@@ -627,14 +651,6 @@ void dc_cons_state::dc(machine_config &config)
 
 	MAPLE_DC(config, m_maple, 0, m_maincpu);
 	m_maple->irq_callback().set(FUNC(dc_state::maple_irq));
-	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
-	dcctrl0.set_port_tags("P1:0", "P1:1", "P1:A0", "P1:A1", "P1:A2", "P1:A3", "P1:A4", "P1:A5");
-	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
-	dcctrl1.set_port_tags("P2:0", "P2:1", "P2:A0", "P2:A1", "P2:A2", "P2:A3", "P2:A4", "P2:A5");
-	dc_controller_device &dcctrl2(DC_CONTROLLER(config, "dcctrl2", 0, m_maple, 2));
-	dcctrl2.set_port_tags("P3:0", "P3:1", "P3:A0", "P3:A1", "P3:A2", "P3:A3", "P3:A4", "P3:A5");
-	dc_controller_device &dcctrl3(DC_CONTROLLER(config, "dcctrl3", 0, m_maple, 3));
-	dcctrl3.set_port_tags("P4:0", "P4:1", "P4:A0", "P4:A1", "P4:A2", "P4:A3", "P4:A4", "P4:A5");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -663,10 +679,31 @@ void dc_cons_state::dc(machine_config &config)
 	ata_0.option_add("gdrom", GDROM);
 	ata_0.set_option_machine_config("gdrom", gdrom_config);
 	ata_0.set_default_option("gdrom");
+}
+
+void dc_cons_state::dc(machine_config &config)
+{
+	dc_base(config);
+
+	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
+	dcctrl0.set_port_tags("P1:0", "P1:1", "P1:A0", "P1:A1", "P1:A2", "P1:A3", "P1:A4", "P1:A5");
+	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
+	dcctrl1.set_port_tags("P2:0", "P2:1", "P2:A0", "P2:A1", "P2:A2", "P2:A3", "P2:A4", "P2:A5");
+	dc_controller_device &dcctrl2(DC_CONTROLLER(config, "dcctrl2", 0, m_maple, 2));
+	dcctrl2.set_port_tags("P3:0", "P3:1", "P3:A0", "P3:A1", "P3:A2", "P3:A3", "P3:A4", "P3:A5");
+	dc_controller_device &dcctrl3(DC_CONTROLLER(config, "dcctrl3", 0, m_maple, 3));
+	dcctrl3.set_port_tags("P4:0", "P4:1", "P4:A0", "P4:A1", "P4:A2", "P4:A3", "P4:A4", "P4:A5");
 
 	SOFTWARE_LIST(config, "cd_list").set_original("dc");
 }
 
+void dc_cons_state::dc_fish(machine_config &config)
+{
+	dc_base(config);
+
+	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
+	dcctrl0.set_port_tag<0>("P1:0");
+}
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios))
@@ -688,7 +725,7 @@ void dc_cons_state::dc(machine_config &config)
 	ROM_LOAD_BIOS(2, "mpr-21871.ic501", 0x000000, 0x200000, CRC(2f551bc5) SHA1(1ede8d5be49116a4c6f3fe0961175469537a0434) ) \
 	ROM_SYSTEM_BIOS(3, "101dch", "v1.01d (Chinese hack)") \
 	ROM_LOAD_BIOS(3, "dc101d_ch.bin",   0x000000, 0x200000, CRC(a2564fad) SHA1(edc5d3d70a93c935703d26119b37731fd317d2bf) )
-// ^^^ dc101d_eu.bin ^^^ is selfmade chinese translation, doesn't work on real hardware, does it must be here at all ?
+// ^^^ dc101d_ch.bin ^^^ is selfmade Chinese translation, doesn't work on real hardware, does it must be here at all ?
 
 /* note: Dreamcast Flash ROMs actually 256KB MBM29F002TC (5v/VA0) or MBM29LV002TC (3.3v/VA1) devices, only 2nd 128KB half is used, A17 pin tied to VCC
    sector SA5 (1A000 - 1BFFF) is read-only, contain information written during manufacture or repair, fully generated by software tool (except predefined list of creators)
@@ -809,3 +846,58 @@ CONS( 1998, dcjp,    0,      0,      dc,      dc,    dc_cons_state, init_dcjp, "
 CONS( 1999, dceu,    dcjp,   0,      dc,      dc,    dc_cons_state, init_dcus, "Sega", "Dreamcast (Europe, PAL)", MACHINE_NOT_WORKING )
 CONS( 200?, dctream, dcjp,   0,      dc,      dc,    dc_cons_state, init_tream,"<unknown>", "Treamcast", MACHINE_NOT_WORKING )
 CONS( 1998, dcdev,   0,      0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "HKT-0120 Sega Dreamcast Development Box", MACHINE_NOT_WORKING )
+
+/*
+Fish Life - interactive aquarium simulator
+Consists of HKS-0300 main unit and HKS-0100 LCD with touch screen
+
+  HKS-0300
+  Fish Life
+  670-14239A
+  (c) 2000 Sega
+  components:
+    Dreamcast VA1 motherboard
+    GD-ROM drive
+    PSU
+    173-8100B / 837-14049 IC BD SW FL
+      backplate with up/down/left/right/A/B/Start buttons
+    171-8097B / 837-14046 IC BD FL
+      main components:
+        315-6211-AB - Dreamcast game controller IC
+        315-6182    - Dreamcast microphone controller IC
+        connectors
+
+ HKS-0100 touch screen wired to SH-4's SCIF serial port. Communication is one-way, touch packet format is:
+ 0100000T 00xxxxxx 00XXXXXX 00yyyyyy 00YYYYYY 00--zzzz 00------
+  T: 1 - touch, 0 - release
+  x: X value low bits
+  X: X value high bits
+  y: Y value low bits
+  Y: Y value high bits
+  z: unused
+ X/Y values range seems 3000x2294
+
+ Known software:
+  HDR-0093 Fish Life Red Sea Playful Edition
+ *HDR-0094 Fish Life Amazon Playful Edition
+  HDR-0095 Fish Life Episode 1 Basic Edition
+  HDR-0096 Fish Life Episode 2 Basic Edition
+  HDR-0097 Fish Life Episode 2 Basic Edition
+
+  Press down+B for Test Mode
+*/
+ROM_START( dcfish )
+	ROM_REGION64_LE(0x200000, "maincpu", 0)
+	ROM_LOAD( "mpr-21931.ic501", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) ) // regular v1.0d 3.3v BIOS
+
+	// similar Dreamcast flashes, machine_name was changed to "Fish Life", machine_code2 is 0xff (verified  by software)
+	// dumped from used device, should be replaced with cleaned binary when flash programming will be emulated
+	ROM_REGION64_LE(0x020000, "dcflash", 0)
+	ROM_LOAD( "fish_flash.bin", 0x000000, 0x020000, BAD_DUMP CRC(73cbc49b) SHA1(c55caf64eb0ac5f8e73a1a385064606ad12947b7) ) // VA1 NTSC-JP
+
+	DISK_REGION( "ata:0:gdrom" )
+	DISK_IMAGE_READONLY( "fish_life_amazon", 0, SHA1(2cbba727b219bbbeddf551d0f3e80c5f8ecbe21f) ) // HDR-0094
+ROM_END
+
+/*    YEAR  NAME     PARENT  MACHINE  INPUT  CLASS          INIT       MONITOR COMPANY FULLNAME */
+GAME( 2000, dcfish,  0,      dc_fish, dcfish,dc_cons_state, init_dcjp, ROT0,   "Sega", "Fish Life Amazon Playful Edition (Japan)", MACHINE_NOT_WORKING )
