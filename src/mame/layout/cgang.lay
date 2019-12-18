@@ -483,7 +483,7 @@
 		<!-- boss spotlights are behind the led panel -->
 		<element name="spot_lamp2" ref="spotr"><bounds x="22.5" y="82.5" width="8.5" height="3" /></element>
 		<element name="spot_lamp0" ref="spotr"><bounds x="31.0" y="82.5" width="8.5" height="3" /></element>
-		<element name="spot_lamp1" ref="spotr"><bounds x="26.75" y="82.5" width="8.5" height="3" /></element>
+		<element name="spot_lamp1" ref="spotr"><bounds x="28.166" y="82.5" width="5.666" height="3" /></element>
 
 		<repeat count="8">
 			<param name="x" start="23.5" increment="2" />

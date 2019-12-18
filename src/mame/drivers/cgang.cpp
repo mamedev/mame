@@ -14,6 +14,7 @@ Or, configure the gun aim inputs and share them with the trigger. For example
 use Z,X,C,V,B for the gun aims, and "Z or X or C or V or B" for the trigger.
 
 TODO:
+- dump/add Japanese version
 - game can't be played properly within MAME's constraints (mechanical stuff,
   and the lightguns linked to it)
 
