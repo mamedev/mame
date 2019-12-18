@@ -223,7 +223,7 @@ protected:
 
 	// internal stuff
 	int m_icount;
-	enum branch_state_t : unsigned
+	enum branch_state : unsigned
 	{
 		NONE      = 0,
 		DELAY     = 1, // delay slot instruction active
@@ -351,6 +351,7 @@ public:
 
 protected:
 	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 class r3051_device : public mips1core_device_base
