@@ -3080,7 +3080,7 @@ ROM_START( htchctch )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "p02.b5", 0x00000, 0x10000 , CRC(c5a03186) SHA1(42561ab36e6d7a43828d3094e64bd1229ab893ba) )
 
-	ROM_REGION( 0x10000, "protection", 0 ) /* Intel 87C52 MCU Code */
+	ROM_REGION( 0x2000, "protection", 0 ) /* Intel 87C52 MCU Code */
 	ROM_LOAD( "87c51fa.bin", 0x00000, 0x2000, CRC(a30312f3) SHA1(e61a89b4ed9555252fc1a64c50d345085f7674c7) ) // decapped
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
@@ -3275,8 +3275,8 @@ ROM_START( dquizgo )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "ub5",    0x00000, 0x10000, CRC(e40481da) SHA1(1c1fabcb67693235eaa6ff59ae12a35854b5564a) )
 
-	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x2000, NO_DUMP ) /* can't be dumped */
+	ROM_REGION( 0x2000, "protection", 0 ) // P87C52EBPN MCU, after decapping the die was 87C51RA+
+	ROM_LOAD( "87c51rap.bin", 0x00000, 0x2000, CRC(c46c77a6) SHA1(a0c7221dfdd6e26a3b909dcdb9e830447069bffa) ) // decapped, but not hooked up yet
 
 	ROM_REGION16_BE( 0x400, "user1", ROMREGION_ERASE00 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
@@ -3900,4 +3900,4 @@ GAME( 1997, bcstrya,  bcstry,  bcstory,      bcstory, tumbleb_state,  init_bcsto
 
 GAME( 1997, semibase, 0,       semibase,     semibase, tumbleb_state, init_bcstory,  ROT0, "SemiCom / DMD", "MuHanSeungBu (SemiCom Baseball) (Korea)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )// sprite offsets..
 
-GAME( 1998, dquizgo,  0,       cookbib,      dquizgo, tumbleb_state,  init_dquizgo,  ROT0, "SemiCom / AceVer", "Date Quiz Go Go (Korea)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // check layer offsets
+GAME( 1998, dquizgo,  0,       cookbib,      dquizgo, tumbleb_state,  init_dquizgo,  ROT0, "SemiCom / AceVer", "Date Quiz Go Go (Korea)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // hook up MCU dump, check layer offsets
