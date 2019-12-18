@@ -184,8 +184,7 @@ void mips1core_device_base::device_start()
 	// initialise cpu id register
 	m_cop0[COP0_PRId] = m_cpurev;
 
-	std::fill(std::begin(m_cop0), std::end(m_cop0), 0);
-	std::fill(std::begin(m_r), std::end(m_r), 0);
+	m_r[0] = 0;
 }
 
 void r3041_device::device_start()
@@ -1197,8 +1196,6 @@ void mips1_device_base::device_start()
 		for (unsigned i = 0; i < ARRAY_LENGTH(m_f); i++)
 			state_add(MIPS1_F0 + i, util::string_format("F%d", i * 2).c_str(), m_f[i]);
 	}
-
-	std::fill(std::begin(m_f), std::end(m_f), 0);
 
 	save_item(NAME(m_reset_time));
 	save_item(NAME(m_tlb));
