@@ -97,4 +97,4 @@ ROM_START(vt52)
 	ROM_LOAD("23-002b4.e1", 0x000, 0x400, NO_DUMP)
 ROM_END
 
-COMP(1975, vt52, 0, 0, vt52, vt52, vt52_state, empty_init, "DEC", "VT52", MACHINE_IS_SKELETON)
+COMP(1975, vt52, 0, 0, vt52, vt52, vt52_state, empty_init, "Digital Equipment Corporation", "VT52", MACHINE_IS_SKELETON)

@@ -103,7 +103,7 @@ offs_t vt5x_disassembler::disassemble(std::ostream &stream, offs_t pc, const vt5
 			if (m_jumps_h[1][(opcode & 0160) >> 4] != nullptr)
 				util::stream_format(stream, "/%sJ", m_jumps_h[1][(opcode & 0160) >> 4]);
 
-			u16 nextpc = pc + 2;
+			u16 nextpc = pc + 1;
 			if ((opcode & 0164) == 0124) // IROM!TRUJ adjustment
 				nextpc += 0400;
 			util::stream_format(stream, " %04o", (nextpc & 01400) | opcodes.r8(pc + 1));

@@ -34,6 +34,14 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 private:
+	// execution helpers
+	void execute_te(u8 inst);
+	void execute_tf(u8 inst);
+	void execute_tw(u8 inst);
+	void execute_tg(u8 inst);
+	void execute_th(u8 inst);
+	void execute_tj(u8 dest);
+
 	// address spaces
 	address_space_config m_rom_config;
 	address_space_config m_ram_config;
@@ -56,6 +64,13 @@ private:
 	bool m_x8;
 	bool m_cursor_ff;
 	bool m_video_process;
+
+	// execution phases
+	u8 m_t;
+	bool m_write_ff;
+	bool m_flag_test_ff;
+	bool m_load_pc;
+	bool m_qa_e23;
 	s32 m_icount;
 };
 
