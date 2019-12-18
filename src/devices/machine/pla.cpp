@@ -12,9 +12,11 @@
 #include "plaparse.h"
 
 #define LOG_TERMS (1 << 0U)
-//#define VERBOSE (LOG_TERMS)
-#include "logmacro.h"
 
+//#define VERBOSE (LOG_TERMS)
+//#define LOG_OUTPUT_STREAM std::cout
+
+#include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(PLA, pla_device, "pla", "PLA")
 DEFINE_DEVICE_TYPE(PLS100, pls100_device, "pls100", "82S100-series PLA")
@@ -123,6 +125,8 @@ void pla_device::parse_fusemap()
 		return;
 	}
 
+	LOGMASKED(LOG_TERMS, "PLA read and parsed, %d fuses in %s format\n", jed.numfuses, jed.binfmt == MAXLOADER ? "Maxloader" : "DataIO" );
+
 	// parse it
 	uint32_t fusenum = 0;
 
@@ -135,11 +139,21 @@ void pla_device::parse_fusemap()
 
 		for (int i = 0; i < m_inputs; i++)
 		{
-			// complement
-			term->and_mask |= (uint64_t)jed_get_fuse(&jed, fusenum++) << (i + 32);
-
-			// true
-			term->and_mask |= (uint64_t)jed_get_fuse(&jed, fusenum++) << i;
+			if (jed.binfmt == MAXLOADER)
+			{
+				term->and_mask |= (uint64_t)jed_get_fuse(&jed, fusenum++) << (i + 32); // complement
+				term->and_mask |= (uint64_t)jed_get_fuse(&jed, fusenum++) << i;        // true
+			}
+			else if (jed.binfmt == DATAIO)
+			{
+				term->and_mask |= (uint64_t)jed_get_fuse(&jed, fusenum++) << i;        // true
+				term->and_mask |= (uint64_t)jed_get_fuse(&jed, fusenum++) << (i + 32); // complement
+			}
+			else
+			{
+				logerror("PLA parser: Unknown JED format\n");
+				break;
+			}
 		}
 
 		// OR mask
