@@ -169,7 +169,7 @@ ROM_START( bloodbrom )
 	ROM_LOAD( "4-3_403_gal16v8-25hb1.ic29",    0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "4-3-a_p0403_pal16r8acn.ic29",   0x000, 0x104, NO_DUMP )
 	ROM_LOAD( "4-3-b_403_gal16v8-25hb1.ic19",  0x000, 0x117, NO_DUMP )
-	ROM_LOAD( "51_1_503_gal16v8-25lp.ic48",    0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "51-1_503_gal16v8-25lp.ic48",    0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "51-1-b_5146_gal16v8-20hb1.ic9", 0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "51-1-b_5246_gal16v8-20hb1.ic8", 0x000, 0x117, NO_DUMP )
 ROM_END
