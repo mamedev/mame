@@ -17,6 +17,9 @@ TODO:
 - dump/add Japanese version
 - game can't be played properly within MAME's constraints (mechanical stuff,
   and the lightguns linked to it)
+- shot target is sometimes ignored, maybe a BTANB? since it's easy to dismiss
+  on the real thing as a missed aim. It turns on the lightgun lamp but then
+  doesn't read the lightsensor.
 
 -------------------------------------------------------------------------------
 
