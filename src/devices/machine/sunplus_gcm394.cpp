@@ -184,7 +184,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7835_w) { LOGMASKED(LOG_GCM39
 READ16_MEMBER(sunplus_gcm394_base_device::ioarea_7860_porta_r)
 {
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::ioarea_7860_porta_r\n", machine().describe_context());
-	return m_porta_in();
+	return machine().rand();// m_porta_in();
 }
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::ioarea_7860_porta_w)
@@ -228,7 +228,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7863_w)
 READ16_MEMBER(sunplus_gcm394_base_device::ioarea_7870_portb_r)
 {
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::ioarea_7870_portb_r\n", machine().describe_context());
-	return m_portb_in();
+	return 0xffff;// machine().rand();// m_portb_in();
 }
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::ioarea_7870_portb_w)
@@ -257,6 +257,12 @@ READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7883_r) { LOGMASKED(LOG_GCM394
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7883_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7883_w %04x\n", machine().describe_context(), data); m_7883 = data; }
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_78a0_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78a0_w %04x\n", machine().describe_context(), data); m_78a0 = data; }
+
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_78a0_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78a0_r\n", machine().describe_context());
+	return machine().rand();
+}
 
 READ16_MEMBER(sunplus_gcm394_base_device::unkarea_78a1_r)
 {
@@ -455,7 +461,7 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 	map(0x007882, 0x007882).rw(FUNC(sunplus_gcm394_base_device::unkarea_7882_r), FUNC(sunplus_gcm394_base_device::unkarea_7882_w));
 	map(0x007883, 0x007883).rw(FUNC(sunplus_gcm394_base_device::unkarea_7883_r), FUNC(sunplus_gcm394_base_device::unkarea_7883_w));
 
-	map(0x0078a0, 0x0078a0).w(FUNC(sunplus_gcm394_base_device::unkarea_78a0_w));
+	map(0x0078a0, 0x0078a0).rw(FUNC(sunplus_gcm394_base_device::unkarea_78a0_r), FUNC(sunplus_gcm394_base_device::unkarea_78a0_w));
 
 	map(0x0078a1, 0x0078a1).r(FUNC(sunplus_gcm394_base_device::unkarea_78a1_r));
 

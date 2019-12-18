@@ -900,7 +900,7 @@ READ16_MEMBER(gcm394_base_video_device::video_707f_r)
 {
 	uint16_t retdata = m_707f;
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707f_r (returning %04x)\n", machine().describe_context(), retdata);
-	return retdata;
+	return machine().rand();
 }
 WRITE16_MEMBER(gcm394_base_video_device::video_707f_w)
 {

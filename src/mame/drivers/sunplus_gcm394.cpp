@@ -626,6 +626,8 @@ void generalplus_gpac800_game_state::machine_reset()
 	mem.write_word(0xfffe, 0x6ffc);
 	mem.write_word(0xffff, 0x6ffe);
 
+	// 3f368 4841  cars 2
+
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 }
 

@@ -213,6 +213,7 @@ private:
 
 	DECLARE_WRITE16_MEMBER(unkarea_78a0_w);
 
+	DECLARE_READ16_MEMBER(unkarea_78a0_r);
 	DECLARE_READ16_MEMBER(unkarea_78a1_r);
 
 	DECLARE_WRITE16_MEMBER(unkarea_78a4_w);
