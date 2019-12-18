@@ -126,6 +126,7 @@ Pipi & Bibis     | Fix Eight        | V-Five           | Snow Bros. 2     |
 #include "emu.h"
 #include "gp9001.h"
 #include "screen.h"
+#include "drawgfxt.ipp"
 
 /*
  Single VDP mixing priority note:
@@ -626,12 +627,29 @@ READ_LINE_MEMBER(gp9001vdp_device::fblank_r)
     Sprite Handlers
 ***************************************************************************/
 
+#define PIXEL_OP_REBASE_TRANSPEN_PRIORITY_GREATER_OR_EQUALS(DEST, PRIORITY, SOURCE) \
+do                                                                                  \
+{                                                                                   \
+	const u8 srcdata = (SOURCE);                                                    \
+	if (srcdata != trans_pen)                                                       \
+	{                                                                               \
+		if ((PRIORITY) <= srcpri)                                                   \
+		{                                                                           \
+			(DEST) = color + srcdata;                                               \
+			(PRIORITY) = srcpri;                                                    \
+		}                                                                           \
+	}                                                                               \
+}                                                                                   \
+while (0)
+
 void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const u8* primap )
 {
 	const u16 *source = (m_sp.use_sprite_buffer) ? m_spriteram->buffer() : m_spriteram->live();
 
 	const u32 total_elements = gfx(1)->elements();
+	const u32 colorbase = gfx(1)->colorbase();
 	const u32 total_colors = gfx(1)->colors();
+	const u32 granularity = gfx(1)->granularity();
 
 	int old_x = (-(m_sp.scrollx)) & 0x1ff;
 	int old_y = (-(m_sp.scrolly)) & 0x1ff;
@@ -642,7 +660,7 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 		int sx_base, sy_base;
 
 		const u16 attrib = source[offs];
-		const int priority = primap[(attrib >> 8) & GP9001_PRIMASK] + 1;
+		const int srcpri = primap[(attrib >> 8) & GP9001_PRIMASK] + 1;
 
 		if ((attrib & 0x8000))
 		{
@@ -709,6 +727,7 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 			flipy = (flipy ^ (m_sp.flip & SPRITE_FLIPY));
 
 			/***** Draw the complete sprites using the dimension info *****/
+			color = colorbase + ((color * granularity) % total_colors);
 			for (int dim_y = 0; dim_y < sprite_sizey; dim_y += 8)
 			{
 				if (flipy) sy = sy_base - dim_y;
@@ -725,70 +744,9 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 					    sx,sy,0);
 					*/
 					sprite %= total_elements;
-					color %= total_colors;
-					const pen_t *paldata = &palette().pen(color * 16);
-					{
-						const u8* srcdata = gfx(1)->get_data(sprite);
-						int count = 0;
-						int ystart, yend, yinc;
-						int xstart, xend, xinc;
-
-						if (flipy)
-						{
-							ystart = 7;
-							yend = -1;
-							yinc = -1;
-						}
-						else
-						{
-							ystart = 0;
-							yend = 8;
-							yinc = 1;
-						}
-
-						if (flipx)
-						{
-							xstart = 7;
-							xend = -1;
-							xinc = -1;
-						}
-						else
-						{
-							xstart = 0;
-							xend = 8;
-							xinc = 1;
-						}
-
-						for (int yy = ystart; yy != yend; yy += yinc)
-						{
-							const int drawyy = yy + sy;
-
-							for (int xx = xstart; xx != xend; xx += xinc)
-							{
-								const int drawxx = xx + sx;
-
-								if (cliprect.contains(drawxx, drawyy))
-								{
-									const u8 pix = srcdata[count];
-									u16* dstptr = &bitmap.pix16(drawyy, drawxx);
-									u8* dstpri = &this->custom_priority_bitmap->pix8(drawyy, drawxx);
-
-									if (priority >= dstpri[0])
-									{
-										if (pix & 0xf)
-										{
-											dstptr[0] = paldata[pix];
-											dstpri[0] = priority;
-										}
-									}
-								}
-
-								count++;
-							}
-						}
-					}
-
-					sprite++;
+					gfx(1)->drawgfx_core(bitmap, cliprect, sprite++,
+							flipx, flipy, sx, sy, *this->custom_priority_bitmap,
+							[color, srcpri, trans_pen = 0x0](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN_PRIORITY_GREATER_OR_EQUALS(destp, pri, srcp); });
 				}
 			}
 		}
