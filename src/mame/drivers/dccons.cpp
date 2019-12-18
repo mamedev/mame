@@ -882,7 +882,7 @@ Consists of HKS-0300 main unit and HKS-0100 LCD with touch screen
  *HDR-0094 Fish Life Amazon Playful Edition
   HDR-0095 Fish Life Episode 1 Basic Edition
   HDR-0096 Fish Life Episode 2 Basic Edition
-  HDR-0097 Fish Life Episode 2 Basic Edition
+  HDR-0097 Fish Life Episode 3 Basic Edition
 
   Press down+B for Test Mode
 */
