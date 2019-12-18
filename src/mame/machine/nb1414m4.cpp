@@ -99,7 +99,7 @@ void nb1414m4_device::fill(uint16_t dst, uint8_t tile, uint8_t pal, uint8_t *vra
 
 void nb1414m4_device::insert_coin_msg(uint8_t *vram)
 {
-  if (m_in_game)
+	if (m_in_game)
 		return;
 
 	m_flickering_cycle++;
