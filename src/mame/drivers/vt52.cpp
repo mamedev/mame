@@ -106,7 +106,7 @@ ROM_START(vt52)
 	ROM_LOAD_NIB_HIGH("23-127a9.e21", 0x200, 0x200, CRC(56c1c0d6) SHA1(ab0eb6e7bbafcc3d28481b62de3d3490f01c0174))
 
 	ROM_REGION(0x400, "chargen", 0) // 2608 character generator
-	ROM_LOAD("23-002b4.e1", 0x000, 0x400, NO_DUMP)
+	ROM_LOAD("23-002b4.e1", 0x000, 0x400, CRC(b486500c) SHA1(029f07424d6c23ee083db42d9f9c252ac728ccd0))
 ROM_END
 
 COMP(1975, vt52, 0, 0, vt52, vt52, vt52_state, empty_init, "Digital Equipment Corporation", "VT52", MACHINE_IS_SKELETON)
