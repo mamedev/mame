@@ -291,11 +291,21 @@ public:
 protected:
 	void gpac800_internal_map(address_map &map);
 
+	//virtual void device_start() override;
+	virtual void device_reset() override;
+
 private:
 	DECLARE_READ16_MEMBER(unkarea_7850_r);
 	DECLARE_READ16_MEMBER(unkarea_7854_r);
 
+	DECLARE_WRITE16_MEMBER(flash_addr_low_w);
+	DECLARE_WRITE16_MEMBER(flash_addr_high_w);
+
 	int m_testval;
+
+	uint16_t m_flash_addr_low;
+	uint16_t m_flash_addr_high;
+
 };
 
 

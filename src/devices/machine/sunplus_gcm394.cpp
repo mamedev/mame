@@ -518,10 +518,30 @@ READ16_MEMBER(generalplus_gpac800_device::unkarea_7854_r)
 	// jak_tsm code looks for various 'magic values'
 
 	if (m_testval == 1)
-		return 0xc2;
+		return 0x98;
 	else
-		return 0x58;
+		return 0x79;
+
 }
+
+// 7998
+
+WRITE16_MEMBER(generalplus_gpac800_device::flash_addr_low_w)
+{
+	//printf("%s:sunplus_gcm394_base_device::flash_addr_low_w %04x\n", machine().describe_context().c_str(), data);
+	m_flash_addr_low = data;
+}
+
+WRITE16_MEMBER(generalplus_gpac800_device::flash_addr_high_w)
+{
+	//printf("%s:sunplus_gcm394_base_device::flash_addr_high_w %04x\n", machine().describe_context().c_str(), data);
+	m_flash_addr_high = data;
+
+	uint32_t address = (m_flash_addr_high << 16) | m_flash_addr_low;
+
+	logerror("flash address is now %08x\n", address);
+}
+
 
 // all tilemap registers etc. appear to be in the same place as the above system, including the 'extra' ones not on the earlier models
 // so it's likely this is built on top of that just with NAND support
@@ -535,6 +555,11 @@ void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
 	// this should be the NAND device, as the games attempt to do a DMA operation with '7854' as the source, and the target
 	// as the RAM location where code needs to end up before jumping to it
 	map(0x007850, 0x007850).r(FUNC(generalplus_gpac800_device::unkarea_7850_r)); // 'device ready' status flag?
+
+	map(0x007852, 0x007852).w(FUNC(generalplus_gpac800_device::flash_addr_low_w));
+	map(0x007853, 0x007853).w(FUNC(generalplus_gpac800_device::flash_addr_high_w));
+
+
 	map(0x007854, 0x007854).r(FUNC(generalplus_gpac800_device::unkarea_7854_r)); // data read port (timing appears to be important)
 }
 	
@@ -635,6 +660,14 @@ void sunplus_gcm394_base_device::device_reset()
 	m_gfxregion = memregion(":maincpu")->base();
 	m_gfxregionsize = memregion(":maincpu")->bytes();
 
+}
+
+void generalplus_gpac800_device::device_reset()
+{
+	sunplus_gcm394_base_device::device_reset();
+
+	m_flash_addr_low = 0x0000;
+	m_flash_addr_high = 0x0000;
 }
 
 IRQ_CALLBACK_MEMBER(sunplus_gcm394_base_device::irq_vector_cb)

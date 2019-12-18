@@ -605,7 +605,27 @@ void generalplus_gpac800_game_state::machine_reset()
 		mem.write_word(dest+i, word);
 	}
 
+	int rambase = 0x30000;
+	for (int i = 0x4000/2; i < 0x37c000/2; i++)
+	{
+		uint16_t word = m_strippedrom[(i * 2) + 0] | (m_strippedrom[(i * 2) + 1] << 8);
+
+		m_mainram[rambase] = word;
+		rambase++;
+	}
+
+	mem.write_word(0xfff5, 0x6fea);
+	mem.write_word(0xfff6, 0x6fec);
 	mem.write_word(0xfff7, dest+0x20); // point boot vector at code in RAM
+	mem.write_word(0xfff8, 0x6ff0);
+	mem.write_word(0xfff9, 0x6ff2);
+	mem.write_word(0xfffa, 0x6ff4);
+	mem.write_word(0xfffb, 0x6ff6);
+	mem.write_word(0xfffc, 0x6ff8);
+	mem.write_word(0xfffd, 0x6ffa);
+	mem.write_word(0xfffe, 0x6ffc);
+	mem.write_word(0xffff, 0x6ffe);
+
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 }
 
