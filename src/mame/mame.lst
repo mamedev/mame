@@ -39880,6 +39880,9 @@ vstennisb                       // (c) 1984 Nintendo Co., Ltd. / Nintendo of Ame
 vstetris                        // (c) 1988 Atari
 wrecking                        // (c) 1984 Nintendo
 
+@source:vt52.cpp
+vt52                            // 1975 Digital Equipment Corporation
+
 @source:vt100.cpp
 vt100                           // 1978 Digital Equipment Corporation
 vt100ac                         // 1979 Digital Equipment Corporation
