@@ -47,7 +47,11 @@ nb1414m4_device::nb1414m4_device(const machine_config &mconfig, const char *tag,
 
 void nb1414m4_device::device_start()
 {
+	m_previous_0200_command = 0xffff;
+	m_previous_0200_command_frame = 0;
 	m_in_game = false;
+	save_item(NAME(m_previous_0200_command));
+	save_item(NAME(m_previous_0200_command_frame));
 	save_item(NAME(m_in_game));
 }
 
