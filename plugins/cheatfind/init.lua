@@ -280,6 +280,7 @@ function cheatfind.startplugin()
 	local name = 1
 	local name_player = 1
 	local name_type = 1
+	local name_other = ""
 
 	local function start()
 		devtable = {}
@@ -381,7 +382,7 @@ function cheatfind.startplugin()
 
 		if cheat_save then
 			local cplayer = { "All", "P1", "P2", "P3", "P4" }
-			local ctype = { "Infinite Credits", "Infinite Time", "Infinite Lives", "Infinite Energy", "Infinite Ammo", "Infinite Bombs", "Invincibility" }
+			local ctype = { "Infinite Credits", "Infinite Time", "Infinite Lives", "Infinite Energy", "Infinite Ammo", "Infinite Bombs", "Invincibility", _("Other: ") }
 			menu[#menu + 1] = function() return { _("Save Cheat"), "", "off" }, nil end
 			menu[#menu + 1] = function() return { "---", "", "off" }, nil end
 			menu[#menu + 1] = function()
@@ -405,9 +406,28 @@ function cheatfind.startplugin()
 					return m, function(event) local r name_player, r = incdec(event, name_player, 1, #cplayer) return r end
 				end
 				menu[#menu + 1] = function()
-					local m = { _("Type"), ctype[name_type], 0 }
+					local m = { _("Type"), ctype[name_type] .. (name_type == #ctype and (#name_other ~= 0 and name_other or _("(empty)")) or ""), 0 }
 					menu_lim(name_type, 1, #ctype, m)
-					return m, function(event) local r name_type, r = incdec(event, name_type, 1, #ctype) return r end
+					local function f(event)
+						local r
+						name_type, r = incdec(event, name_type, 1, #ctype)
+						if name_type == #ctype then
+							local char = tonumber(event)
+							if char then
+								if #name_other > 0 and (char == 8 or char == 0x7f) then
+									name_other = name_other:sub(1, utf8.offset(name_other, -1) - 1)
+									r = true
+								elseif char > 0x1f and (char & ~0x7f) ~= 0x80 and (char & ~0xf) ~= 0xfdd0 and (char & ~0xfffe) ~= 0xfffe then
+									name_other = name_other .. utf8.char(char)
+									r = true
+								end
+							elseif event == "select" or event == "comment" or event == "right" then
+								manager:machine():popmessage(_("You can enter any type name"))
+							end
+						end
+						return r
+					end
+					return m, f
 				end
 			end
 			menu[#menu + 1] = function()
@@ -417,10 +437,13 @@ function cheatfind.startplugin()
 						local desc
 						local written = false
 						if name == 2 then
-							if cplayer[name_player] == "All" then
-								desc = ctype[name_type]
-							else
-								desc = cplayer[name_player] .. " " .. ctype[name_type]
+							desc = name_type ~= #ctype and ctype[name_type] or name_other
+							if #desc == 0 then
+								manager:machine():popmessage(_("Type name is empty"))
+								return
+							end
+							if cplayer[name_player] ~= "All" then
+								desc = cplayer[name_player] .. " " .. desc
 							end
 						else
 							desc = cheat_save.name

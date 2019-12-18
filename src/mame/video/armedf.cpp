@@ -45,7 +45,8 @@ TILE_GET_INFO_MEMBER(armedf_state::get_nb1414m4_tx_tile_info)
 	{
 		attributes = m_text_videoram[tile_index + 0x400] & 0xff;
 
-		if(tile_index < 0x12) /* don't draw the NB1414M4 params! TODO: could be a better fix */
+		// TODO: skip drawing the NB1414M4 params, how the HW actually handles this?
+		if(tile_index < 0x12)
 			tile_number = attributes = 0x00;
 	}
 

@@ -22,6 +22,7 @@
 #define VERBOSE     (0)
 #include "logmacro.h"
 
+
 /*************************************
  *
  *  CMOS reads/writes
@@ -62,15 +63,15 @@ WRITE16_MEMBER(midxunit_state::midxunit_io_w)
 			break;
 
 		default:
-			/* Gun Outputs for RevX */
-			/* Note: The Gun for the Coin slot you use is supposed to rumble when you insert coins, and it doesn't for P3. */
-			/* Perhaps an Input is hooked up wrong. */
-			output().set_value("Player1_Gun_Recoil", data & 0x1 );
-			output().set_value("Player2_Gun_Recoil", (data & 0x2) >> 1 );
-			output().set_value("Player3_Gun_Recoil", (data & 0x4) >> 2 );
-			output().set_value("Player1_Gun_LED", (~data & 0x10) >> 4 );
-			output().set_value("Player2_Gun_LED", (~data & 0x20) >> 5 );
-			output().set_value("Player3_Gun_LED", (~data & 0x40) >> 6 );
+			// Gun Outputs for RevX
+			// Note: The Gun for the Coin slot you use is supposed to rumble when you insert coins, and it doesn't for P3.
+			// Perhaps an Input is hooked up wrong.
+			m_gun_recoil[0] = BIT(data, 0);
+			m_gun_recoil[1] = BIT(data, 1);
+			m_gun_recoil[2] = BIT(data, 2);
+			m_gun_led[0] = BIT(~data, 4);
+			m_gun_led[1] = BIT(~data, 5);
+			m_gun_led[2] = BIT(~data, 6);
 
 			LOGMASKED(LOG_IO, "%s: I/O write to %d = %04X\n", machine().describe_context(), offset, data);
 			break;
@@ -249,6 +250,9 @@ WRITE16_MEMBER(midxunit_state::midxunit_uart_w)
 
 void midxunit_state::machine_start()
 {
+	m_gun_recoil.resolve();
+	m_gun_led.resolve();
+
 	save_item(NAME(m_cmos_write_enable));
 	save_item(NAME(m_iodata));
 	save_item(NAME(m_ioshuffle));

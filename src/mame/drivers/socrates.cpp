@@ -117,8 +117,9 @@ public:
 		m_kbdrow(*this, "IN%u", 0)
 	{ }
 
-	void socrates_pal(machine_config &config);
 	void socrates(machine_config &config);
+	void socrates_pal(machine_config &config);
+	void vpainter_pal(machine_config &config);
 
 	void init_socrates();
 	void init_iqunlimz();
@@ -135,7 +136,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<socrates_snd_device> m_sound;
 	required_device<screen_device> m_screen;
-	required_device<generic_slot_device> m_cart;
+	optional_device<generic_slot_device> m_cart;
 	memory_region *m_cart_reg;
 	required_memory_region m_bios_reg;
 	required_memory_region m_vram_reg;
@@ -371,7 +372,7 @@ void socrates_state::machine_start()
 
 void socrates_state::machine_reset()
 {
-	m_cart_reg = memregion(util::string_format("%s%s", m_cart->tag(), GENERIC_ROM_REGION_TAG).c_str());
+	m_cart_reg = m_cart ? memregion(util::string_format("%s%s", m_cart->tag(), GENERIC_ROM_REGION_TAG).c_str()) : nullptr;
 	kbmcu_sim_reset();
 	m_kb_spi_request = true;
 	m_oldkeyvalue = 0;
@@ -470,8 +471,9 @@ READ8_MEMBER(socrates_state::socrates_cart_r)
 	offset = ((offset&0x3FFFF)|((offset&0xF80000)>>1));
 	if (m_cart_reg)
 	{
-		offset &= (m_cart->get_rom_size()-1);
-		return (*(m_cart_reg->base()+offset));
+		assert(m_cart);
+		offset &= m_cart->get_rom_size()-1;
+		return *(m_cart_reg->base()+offset);
 	}
 	else
 		return 0xF3;
@@ -1533,6 +1535,14 @@ void socrates_state::socrates_pal(machine_config &config)
 	m_sound->set_clock(XTAL(26'601'712)/(512+256)); // this is correct, as strange as it sounds.
 }
 
+void socrates_state::vpainter_pal(machine_config &config)
+{
+	socrates_pal(config);
+
+	config.device_remove("cartslot");
+	config.device_remove("cart_list");
+}
+
 void iqunlimz_state::iqunlimz(machine_config &config)
 {
 	/* basic machine hardware */
@@ -1700,5 +1710,5 @@ COMP( 1988, profweis, socrates, 0,      socrates_pal, socrates, socrates_state, 
 
 COMP( 1991, iqunlimz, 0,        0,      iqunlimz,     iqunlimz, iqunlimz_state, init_iqunlimz, "Video Technology",        "IQ Unlimited (Z80)",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-COMP( 1991, vpainter, 0,        0,      socrates_pal, socrates, socrates_state, init_vpainter, "Video Technology",        "Video Painter (PAL)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1991, vpainter, 0,        0,      vpainter_pal, socrates, socrates_state, init_vpainter, "Video Technology",        "Video Painter (PAL)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // Master Video Painter goes here

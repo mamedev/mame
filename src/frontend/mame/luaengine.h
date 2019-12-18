@@ -157,6 +157,9 @@ private:
 		void *base;
 		unsigned int size;
 		unsigned int count;
+		unsigned int valcount;
+		unsigned int blockcount;
+		unsigned int stride;
 	};
 
 	void close();

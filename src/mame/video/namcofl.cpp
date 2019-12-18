@@ -58,7 +58,7 @@ void namcofl_state::RozCB(uint16_t code, int *tile, int *mask, int which)
 }
 
 
-uint32_t namcofl_state::screen_update_namcofl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t namcofl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* compute window for custom screen blanking */
 	rectangle clip;
@@ -92,7 +92,7 @@ uint32_t namcofl_state::screen_update_namcofl(screen_device &screen, bitmap_ind1
 //        groups of sprites.  I am unsure how to differentiate those groups
 //        at this time however.
 
-WRITE32_MEMBER(namcofl_state::namcofl_spritebank_w)
+WRITE32_MEMBER(namcofl_state::spritebank_w)
 {
 	COMBINE_DATA(&m_sprbank);
 }

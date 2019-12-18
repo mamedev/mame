@@ -21,10 +21,9 @@
          D - SPG243 - Wall-E
          D - SPG243 - KenSingTon / Siatronics / Jungle Soft Vii
  Partial D - SPG200 - VTech V.Smile
-        ND - unknown - Zone 40
+         D - unknown - Zone 40
          D - SPG243 - Zone 60
          D - SPG243 - Wireless 60
-        ND - unknown - Wireless Air 60
         ND - Likely many more
 
 **********************************************************************/
@@ -56,8 +55,8 @@ public:
 
 	template <size_t Line> auto adc_in() { return m_adc_in[Line].bind(); }
 
-	auto eeprom_w() { return m_eeprom_w.bind(); }
-	auto eeprom_r() { return m_eeprom_r.bind(); }
+	auto i2c_w() { return m_i2c_w.bind(); }
+	auto i2c_r() { return m_i2c_r.bind(); }
 
 	auto uart_tx() { return m_uart_tx.bind(); }
 
@@ -109,8 +108,8 @@ protected:
 
 	devcb_read16 m_adc_in[2];
 
-	devcb_write8 m_eeprom_w;
-	devcb_read8 m_eeprom_r;
+	devcb_write8 m_i2c_w;
+	devcb_read8 m_i2c_r;
 
 	devcb_write8 m_uart_tx;
 
@@ -130,8 +129,8 @@ protected:
 	DECLARE_WRITE16_MEMBER(portc_w) { m_portc_out(offset, data, mem_mask); }
 	template <size_t Line> DECLARE_READ16_MEMBER(adc_r) { return m_adc_in[Line](); }
 
-	DECLARE_WRITE8_MEMBER(eepromx_w) { m_eeprom_w(offset, data, mem_mask); }
-	DECLARE_READ8_MEMBER(eepromx_r) { return m_eeprom_r(); };
+	DECLARE_WRITE8_MEMBER(eepromx_w) { m_i2c_w(offset, data, mem_mask); }
+	DECLARE_READ8_MEMBER(eepromx_r) { return m_i2c_r(); };
 
 	DECLARE_WRITE8_MEMBER(tx_w) { m_uart_tx(offset, data, mem_mask); }
 	DECLARE_WRITE8_MEMBER(cs_w) { m_chip_sel(offset, data, mem_mask); }

@@ -37,11 +37,13 @@ public:
 	{ }
 
 	void jumppop(machine_config &config);
+	void esd16_nosound(machine_config &config);
 	void esd16(machine_config &config);
 	void tangtang(machine_config &config);
 	void mchampdx(machine_config &config);
 	void hedpanio(machine_config &config);
 	void hedpanic(machine_config &config);
+	void fantstry(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -67,11 +69,11 @@ private:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_device<decospr_device> m_sprgen;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<generic_latch_8_device> m_soundlatch;
+	optional_device<generic_latch_8_device> m_soundlatch;
 
 	void sound_command_w(u8 data);
 	void hedpanic_platform_w(u16 data);

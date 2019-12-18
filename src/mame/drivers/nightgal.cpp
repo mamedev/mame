@@ -374,7 +374,6 @@ WRITE8_MEMBER(nightgal_state::output_w)
 
 void nightgal_state::common_nsc_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();
 	map(0x0080, 0x0080).portr("BLIT_PORT");
 	map(0x0081, 0x0083).r(FUNC(nightgal_state::royalqn_nsc_blit_r));
 	map(0x00a0, 0x00af).w(m_blitter, FUNC(jangou_blitter_device::vregs_w));
@@ -481,7 +480,6 @@ void nightgal_state::sgaltrop_nsc_map(address_map &map)
 
 void nightgal_state::sexygal_audio_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();
 	map(0x0080, 0x0080).r(FUNC(nightgal_state::sexygal_unknown_sound_r));
 	map(0x1000, 0x1000).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x2000, 0x207f).ram().share("sound_ram");

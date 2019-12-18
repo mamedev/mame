@@ -1796,6 +1796,8 @@ if (BUSES["S100"]~=null) then
 		MAME_DIR .. "src/devices/bus/s100/s100.h",
 		MAME_DIR .. "src/devices/bus/s100/am310.cpp",
 		MAME_DIR .. "src/devices/bus/s100/am310.h",
+		MAME_DIR .. "src/devices/bus/s100/ascsasi.cpp",
+		MAME_DIR .. "src/devices/bus/s100/ascsasi.h",
 		MAME_DIR .. "src/devices/bus/s100/dg640.cpp",
 		MAME_DIR .. "src/devices/bus/s100/dg640.h",
 		MAME_DIR .. "src/devices/bus/s100/dj2db.cpp",
@@ -2283,6 +2285,8 @@ if (BUSES["A2GAMEIO"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2gameio/joystick.h",
 		MAME_DIR .. "src/devices/bus/a2gameio/joyport.cpp",
 		MAME_DIR .. "src/devices/bus/a2gameio/joyport.h",
+		MAME_DIR .. "src/devices/bus/a2gameio/paddles.cpp",
+		MAME_DIR .. "src/devices/bus/a2gameio/paddles.h",
 	}
 end
 

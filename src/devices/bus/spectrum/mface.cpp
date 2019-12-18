@@ -149,6 +149,8 @@ ROM_START(mface1)
 	ROMX_LOAD("mf1_21_e4.rom", 0x0000, 0x2000, CRC(4b31a971) SHA1(ba28754a3cc31a4ca579829ed4310c313409cf5d), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "mu21e7", "MU 2.1 E7")  // last known version?
 	ROMX_LOAD("mf1_21_e7.rom", 0x0000, 0x2000, CRC(670f0ec2) SHA1(50fba2d628f3a2e9219f72980e4efd62fc9ec1f8), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(4, "bc96", "Brazilian clone 96")  // Brazilian clone, unknown pcb version
+	ROMX_LOAD("mf1_bc_96.rom", 0x0000, 0x2000, CRC(e6fe4507) SHA1(a7e03e7fee3aa05ce1501072aab4534ea7bae257), ROM_BIOS(4))
 ROM_END
 
 /* Todo ...
@@ -162,8 +164,8 @@ ROM_END
     ROM_SYSTEM_BIOS(?, "mu2090", "MU 2.0, 90")  // pokes only or full toolkit?       NO DUMP?
     ROMX_LOAD("mf1_20_90.rom", 0x0000, 0x2000, CRC(2eaf8e41) SHA1(?), ROM_BIOS(?))
 
-    ROM_SYSTEM_BIOS(?, "v24", "MU ?? 93 (Brazilian clone)")  //                      NO DUMP?
-    ROMX_LOAD("mf1_bc_fe.rom", 0x0000, 0x2000, CRC(8c17113b) SHA1(?), ROM_BIOS(?))
+    ROM_SYSTEM_BIOS(?, "bc93", "Brazilian clone 93")  //                             NO DUMP?
+    ROMX_LOAD("mf1_bc_93.rom", 0x0000, 0x2000, CRC(8c17113b) SHA1(?), ROM_BIOS(?))
 */
 
 ROM_START(mface128)

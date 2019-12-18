@@ -42,6 +42,7 @@ protected:
 private:
 	bool m_bEnabled;
 	bool m_bReadA2ROM;
+	bool m_bIn1MHzMode;
 	emu_timer *m_timer;
 
 	required_device<cpu_device> m_ourcpu;

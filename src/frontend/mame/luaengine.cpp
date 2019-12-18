@@ -8,7 +8,6 @@
 
 ***************************************************************************/
 
-#include <thread>
 #include <lua.hpp>
 #include "emu.h"
 #include "mame.h"
@@ -26,6 +25,10 @@
 #include "pluginopts.h"
 #include "softlist.h"
 #include "inputdev.h"
+
+#include <cstring>
+#include <thread>
+
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wshift-count-overflow"
@@ -1072,61 +1075,88 @@ void lua_engine::initialize()
  */
 
 	auto item_type = emu.create_simple_usertype<save_item>(sol::call_constructor, sol::initializers([this](save_item &item, int index) {
-					if(!machine().save().indexed_item(index, item.base, item.size, item.count))
+					if(machine().save().indexed_item(index, item.base, item.size, item.valcount, item.blockcount, item.stride))
+					{
+						item.count = item.valcount * item.blockcount;
+					}
+					else
 					{
 						item.base = nullptr;
 						item.size = 0;
-						item.count= 0;
+						item.count = 0;
+						item.valcount = 0;
+						item.blockcount = 0;
+						item.stride = 0;
 					}
 				}));
 	item_type.set("size", sol::readonly(&save_item::size));
 	item_type.set("count", sol::readonly(&save_item::count));
 	item_type.set("read", [this](save_item &item, int offset) -> sol::object {
-			uint64_t ret = 0;
-			if(!item.base || (offset > item.count))
+			if(!item.base || (offset >= item.count))
 				return sol::make_object(sol(), sol::nil);
+			const void *const data = reinterpret_cast<const uint8_t *>(item.base) + (item.size * item.stride * (offset / item.valcount));
+			uint64_t ret = 0;
 			switch(item.size)
 			{
 				case 1:
 				default:
-					ret = ((uint8_t *)item.base)[offset];
+					ret = reinterpret_cast<const uint8_t *>(data)[offset % item.valcount];
 					break;
 				case 2:
-					ret = ((uint16_t *)item.base)[offset];
+					ret = reinterpret_cast<const uint16_t *>(data)[offset % item.valcount];
 					break;
 				case 4:
-					ret = ((uint32_t *)item.base)[offset];
+					ret = reinterpret_cast<const uint32_t *>(data)[offset % item.valcount];
 					break;
 				case 8:
-					ret = ((uint64_t *)item.base)[offset];
+					ret = reinterpret_cast<const uint64_t *>(data)[offset % item.valcount];
 					break;
 			}
 			return sol::make_object(sol(), ret);
 		});
 	item_type.set("read_block", [](save_item &item, int offset, sol::buffer *buff) {
 			if(!item.base || ((offset + buff->get_len()) > (item.size * item.count)))
+			{
 				buff->set_len(0);
+			}
 			else
-				memcpy(buff->get_ptr(), (uint8_t *)item.base + offset, buff->get_len());
+			{
+				const uint32_t blocksize = item.size * item.valcount;
+				const uint32_t bytestride = item.size * item.stride;
+				uint32_t remaining = buff->get_len();
+				uint8_t *dest = reinterpret_cast<uint8_t *>(buff->get_ptr());
+				while(remaining)
+				{
+					const uint32_t blockno = offset / blocksize;
+					const uint32_t available = blocksize - (offset % blocksize);
+					const uint32_t chunk = (available < remaining) ? available : remaining;
+					const void *const source = reinterpret_cast<const uint8_t *>(item.base) + (blockno * bytestride) + (offset % blocksize);
+					std::memcpy(dest, source, chunk);
+					offset += chunk;
+					remaining -= chunk;
+					dest += chunk;
+				}
+			}
 			return buff;
 		});
 	item_type.set("write", [](save_item &item, int offset, uint64_t value) {
-			if(!item.base || (offset > item.count))
+			if(!item.base || (offset >= item.count))
 				return;
+			void *const data = reinterpret_cast<uint8_t *>(item.base) + (item.size * item.stride * (offset / item.valcount));
 			switch(item.size)
 			{
 				case 1:
 				default:
-					((uint8_t *)item.base)[offset] = (uint8_t)value;
+					reinterpret_cast<uint8_t *>(data)[offset % item.valcount] = uint8_t(value);
 					break;
 				case 2:
-					((uint16_t *)item.base)[offset] = (uint16_t)value;
+					reinterpret_cast<uint16_t *>(data)[offset % item.valcount] = uint16_t(value);
 					break;
 				case 4:
-					((uint32_t *)item.base)[offset] = (uint32_t)value;
+					reinterpret_cast<uint32_t *>(data)[offset % item.valcount] = uint32_t(value);
 					break;
 				case 8:
-					((uint64_t *)item.base)[offset] = (uint64_t)value;
+					reinterpret_cast<uint64_t *>(data)[offset % item.valcount] = uint64_t(value);
 					break;
 			}
 		});
@@ -1611,9 +1641,9 @@ void lua_engine::initialize()
 			{
 				std::string name;
 				const char *item;
-				unsigned int size, count;
 				void *base;
-				item = dev.machine().save().indexed_item(i, base, size, count);
+				uint32_t size, valcount, blockcount, stride;
+				item = dev.machine().save().indexed_item(i, base, size, valcount, blockcount, stride);
 				if(!item)
 					break;
 				name = &(strchr(item, '/')[1]);

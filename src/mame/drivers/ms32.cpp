@@ -481,7 +481,7 @@ Notes from Charles MacDonald
 
 CUSTOM_INPUT_MEMBER(ms32_state::mahjong_ctrl_r)
 {
-	uint32_t mj_input;
+	u32 mj_input;
 
 	switch (m_mahjong_input_select[0])
 	{
@@ -687,7 +687,7 @@ void ms32_state::ms32_map(address_map &map)
 
 
 /* F1 Super Battle has an extra linemap for the road, and am unknown maths chip (mcu?) handling perspective calculations for the road / corners etc. */
-/* it should use it's own memory map */
+/* it should use its own memory map */
 
 WRITE16_MEMBER(ms32_state::ms32_extra_w16)
 {
@@ -1562,42 +1562,6 @@ INPUT_PORTS_END
 
 /********** GFX DECODE **********/
 
-/* sprites are contained in 256x256 "tiles" */
-static const uint32_t sprite_xoffset[256] =
-{
-	STEP8(8*8*8*0,    8), STEP8(8*8*8*1,    8), STEP8(8*8*8*2,    8), STEP8(8*8*8*3,    8),
-	STEP8(8*8*8*4,    8), STEP8(8*8*8*5,    8), STEP8(8*8*8*6,    8), STEP8(8*8*8*7,    8),
-	STEP8(8*8*8*8,    8), STEP8(8*8*8*9,    8), STEP8(8*8*8*10,   8), STEP8(8*8*8*11,   8),
-	STEP8(8*8*8*12,   8), STEP8(8*8*8*13,   8), STEP8(8*8*8*14,   8), STEP8(8*8*8*15,   8),
-	STEP8(8*8*8*16,   8), STEP8(8*8*8*17,   8), STEP8(8*8*8*18,   8), STEP8(8*8*8*19,   8),
-	STEP8(8*8*8*20,   8), STEP8(8*8*8*21,   8), STEP8(8*8*8*22,   8), STEP8(8*8*8*23,   8),
-	STEP8(8*8*8*24,   8), STEP8(8*8*8*25,   8), STEP8(8*8*8*26,   8), STEP8(8*8*8*27,   8),
-	STEP8(8*8*8*28,   8), STEP8(8*8*8*29,   8), STEP8(8*8*8*30,   8), STEP8(8*8*8*31,   8)
-};
-static const uint32_t sprite_yoffset[256] =
-{
-	STEP8(8*8*8*0,  8*8), STEP8(8*8*8*32, 8*8), STEP8(8*8*8*64, 8*8), STEP8(8*8*8*96, 8*8),
-	STEP8(8*8*8*128,8*8), STEP8(8*8*8*160,8*8), STEP8(8*8*8*192,8*8), STEP8(8*8*8*224,8*8),
-	STEP8(8*8*8*256,8*8), STEP8(8*8*8*288,8*8), STEP8(8*8*8*320,8*8), STEP8(8*8*8*352,8*8),
-	STEP8(8*8*8*384,8*8), STEP8(8*8*8*416,8*8), STEP8(8*8*8*448,8*8), STEP8(8*8*8*480,8*8),
-	STEP8(8*8*8*512,8*8), STEP8(8*8*8*544,8*8), STEP8(8*8*8*576,8*8), STEP8(8*8*8*608,8*8),
-	STEP8(8*8*8*640,8*8), STEP8(8*8*8*672,8*8), STEP8(8*8*8*704,8*8), STEP8(8*8*8*736,8*8),
-	STEP8(8*8*8*768,8*8), STEP8(8*8*8*800,8*8), STEP8(8*8*8*832,8*8), STEP8(8*8*8*864,8*8),
-	STEP8(8*8*8*896,8*8), STEP8(8*8*8*928,8*8), STEP8(8*8*8*960,8*8), STEP8(8*8*8*992,8*8)
-};
-static const gfx_layout spritelayout =
-{
-	256, 256,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP8(0,1) },
-	EXTENDED_XOFFS,
-	EXTENDED_YOFFS,
-	256*256*8,
-	sprite_xoffset,
-	sprite_yoffset
-};
-
 static GFXLAYOUT_RAW( bglayout, 16, 16, 16*8, 16*16*8 )
 static GFXLAYOUT_RAW( txlayout, 8, 8, 8*8, 8*8*8 )
 
@@ -1605,14 +1569,12 @@ static GFXLAYOUT_RAW( f1layout, 2048, 1, 2048*8, 2048*8 )
 
 
 static GFXDECODE_START( gfx_ms32 )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0x0000, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,     0x2000, 0x10 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout,     0x1000, 0x10 )
 	GFXDECODE_ENTRY( "gfx4", 0, txlayout,     0x6000, 0x10 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_f1superb )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0x0000, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,     0x2000, 0x10 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout,     0x1000, 0x10 )
 	GFXDECODE_ENTRY( "gfx4", 0, txlayout,     0x6000, 0x10 )
@@ -1741,17 +1703,16 @@ void ms32_state::machine_reset()
 void ms32_state::ms32(machine_config &config)
 {
 	/* basic machine hardware */
-	V70(config, m_maincpu, 20000000); // D70632GD-20 20MHz
+	V70(config, m_maincpu, XTAL(40'000'000)/2); // D70632GD-20 20MHz (40MHz / 2)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_state::ms32_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(ms32_state::irq_callback));
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(ms32_state::ms32_interrupt), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, 8000000); // Z0840008PSC, Clock from notes
+	Z80(config, m_audiocpu, 8000000); // Z0840008PSC, Clock from notes (40MHz / 5 or 48MHz / 6?)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ms32_state::ms32_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(60000));
-
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1760,10 +1721,15 @@ void ms32_state::ms32(machine_config &config)
 	m_screen->set_size(40*8, 28*8);
 	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
 	m_screen->set_screen_update(FUNC(ms32_state::screen_update_ms32));
+	m_screen->screen_vblank().set(FUNC(ms32_state::screen_vblank_ms32));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ms32);
 	PALETTE(config, m_palette).set_entries(0x10000);
 
+	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(48'000'000)); // 48MHz for video?
+	m_sprite->set_palette(m_palette);
+	m_sprite->set_color_base(0);
+	m_sprite->set_color_entries(16);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1772,7 +1738,7 @@ void ms32_state::ms32(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ymf271_device &ymf(YMF271(config, "ymf", 16934400));
+	ymf271_device &ymf(YMF271(config, "ymf", XTAL(16'934'400))); // 16.9344MHz
 	ymf.add_route(0, "lspeaker", 1.0);
 	ymf.add_route(1, "rspeaker", 1.0);
 //  ymf.add_route(2, "lspeaker", 1.0); Output 2/3 not used?
@@ -1801,7 +1767,7 @@ ROM_START( bbbxing )
 	ROM_LOAD32_BYTE( "mb93138a_29_ver1.3.29", 0x000001, 0x80000, CRC(85bbbe79) SHA1(bc5ebb96491762e6a0d202ddf7faeb57c66211b4) )
 	ROM_LOAD32_BYTE( "mb93138a_31_ver1.3.31", 0x000000, 0x80000, CRC(e0c865ed) SHA1(f21e8dc174c50d7afdd3f82c1c66dfcc002bdd07) )
 
-	ROM_REGION( 0x1100000, "gfx1", 0 ) /* sprites */
+	ROM_REGION( 0x1100000, "sprite", 0 ) /* sprites */
 	ROM_LOAD32_WORD( "mr92042-07.1",          0x0000002, 0x200000, CRC(c1c10c3b) SHA1(e1f739f38e148c4d7aff6b81b3e42131c5c6c3dd) )
 	ROM_LOAD32_WORD( "mr92042-06.13",         0x0000000, 0x200000, CRC(4b8c1574) SHA1(c389c70b532d54528a175f460ca3f329b34cf67c) )
 	ROM_LOAD32_WORD( "mr92042-09.2",          0x0400002, 0x200000, CRC(03b77c1e) SHA1(f156ae6a4f2a8ae99815eb5a7b28425d273c1c3e) )
@@ -1840,7 +1806,7 @@ ROM_START( suchie2 )
 	ROM_LOAD32_BYTE( "mb-93166-28_ver1.1.28", 0x000001, 0x80000, CRC(aa49eec2) SHA1(173afc596caa1c464fc3247cb64d36c1d97a1520) )
 	ROM_LOAD32_BYTE( "mb-93166-29_ver1.1.29", 0x000000, 0x80000, CRC(92763e41) SHA1(eb593bbb586661c4c4e8728d845b146974d0bdf8) )
 
-	ROM_REGION( 0x1000000, "gfx1", 0 ) /* sprites */
+	ROM_REGION( 0x1000000, "sprite", 0 ) /* sprites */
 	ROM_LOAD32_WORD( "mb94019-02.1",  0x000002, 0x200000, CRC(f9d692f2) SHA1(666df55d26e00be39073173fa3616ac9dafbe615) )
 	ROM_LOAD32_WORD( "mb94019-01.13", 0x000000, 0x200000, CRC(1ddfe825) SHA1(27fbf492fdb4f0b4b8db18330e840c130213e15e) )
 	ROM_LOAD32_WORD( "mb94019-04.2",  0x400002, 0x200000, CRC(24ca77ec) SHA1(a5c575224ab276cbed5785f40fc0d35dd2748e74) )
@@ -1877,7 +1843,7 @@ ROM_START( suchie2o )
 	ROM_LOAD32_BYTE( "mb-93166-28_ver1.0.28", 0x000001, 0x80000, CRC(b1261d51) SHA1(3f393aeb7a076c4d2d2cc7f22ead05f405186d80) )
 	ROM_LOAD32_BYTE( "mb-93166-29_ver1.0.29", 0x000000, 0x80000, CRC(9211c82a) SHA1(0aa3f93293b81e0f66b985046eb5e91708693959) )
 
-	ROM_REGION( 0x1000000, "gfx1", 0 ) /* sprites */
+	ROM_REGION( 0x1000000, "sprite", 0 ) /* sprites */
 	ROM_LOAD32_WORD( "mb94019-02.1",  0x000002, 0x200000, CRC(f9d692f2) SHA1(666df55d26e00be39073173fa3616ac9dafbe615) )
 	ROM_LOAD32_WORD( "mb94019-01.13", 0x000000, 0x200000, CRC(1ddfe825) SHA1(27fbf492fdb4f0b4b8db18330e840c130213e15e) )
 	ROM_LOAD32_WORD( "mb94019-04.2",  0x400002, 0x200000, CRC(24ca77ec) SHA1(a5c575224ab276cbed5785f40fc0d35dd2748e74) )
@@ -1914,7 +1880,7 @@ ROM_START( desertwr )
 	ROM_LOAD32_BYTE( "mb93166_ver1.0-28.28", 0x000001, 0x80000, CRC(0de40efb) SHA1(c49c3b27939e428dec1f642b7fdb9a1ff760289a) )
 	ROM_LOAD32_BYTE( "mb93166_ver1.0-29.29", 0x000000, 0x80000, CRC(fc25eae2) SHA1(a4d47fcb4d4c3285cf67d77d8a21478f344b98ca) )
 
-	ROM_REGION( 0x1000000, "gfx1", 0 ) /* sprites */
+	ROM_REGION( 0x1000000, "sprite", 0 ) /* sprites */
 	ROM_LOAD32_WORD( "mb94038-01.13", 0x000000, 0x200000, CRC(f11f83e2) SHA1(e3c99e6583003210483163c79182cb14aa334702) )
 	ROM_LOAD32_WORD( "mb94038-02.1",  0x000002, 0x200000, CRC(3d1fa710) SHA1(5fae3e8c714cca88e22e432dd7275c6898c631a8) )
 	ROM_LOAD32_WORD( "mb94038-03.14", 0x400000, 0x200000, CRC(84fd5790) SHA1(6187ff32a63f3b4105ea875f52237f0d4314f8b6) )
@@ -1953,7 +1919,7 @@ ROM_START( f1superb )
 	ROM_LOAD32_BYTE( "f1sb28.bin", 0x000001, 0x80000, CRC(cfda8003) SHA1(460146556f606bf213d7e2ab29d2eb8827131bd0) )
 	ROM_LOAD32_BYTE( "f1sb29.bin", 0x000000, 0x80000, CRC(f21f1481) SHA1(97a97ff3b9a71b1a024d8f2cfe57a1d02cec5ea4) )
 
-	ROM_REGION( 0x2000000, "gfx1", 0 ) /* 8x8 not all? */
+	ROM_REGION( 0x2000000, "sprite", 0 ) /* 8x8 not all? */
 	ROM_LOAD32_WORD( "f1sb1.bin",  0x0000002, 0x200000, CRC(53a3a97b) SHA1(c8cd501ae10d9eb48a02e4e59a1ce389a27afc44) )
 	ROM_LOAD32_WORD( "f1sb13.bin", 0x0000000, 0x200000, CRC(36565a99) SHA1(db08ff3107dcc07ca31140715d7d4b7bd27fa4c5) )
 	ROM_LOAD32_WORD( "f1sb2.bin",  0x0400002, 0x200000, CRC(a452f50a) SHA1(3782a37203b652ea5df5b04dc74a0fdace7b14cc) )
@@ -2007,7 +1973,7 @@ ROM_START( gratia )
 	ROM_LOAD32_BYTE( "94019_28_ver1.0.28", 0x000001, 0x80000, CRC(e0762e89) SHA1(a567c347e7f73f1ef1c753d14ac4f58311380fac) ) /* Labeled 94019  (28)Ver1,0  with the Kanji verson of the game name before "(28)" */
 	ROM_LOAD32_BYTE( "94019_29_ver1.0.29", 0x000000, 0x80000, CRC(8059800b) SHA1(7548d01b6ea15e962353b3585db6515e5819e5ce) ) /* Labeled 94019  (29)Ver1,0  with the Kanji verson of the game name before "(29)" */
 
-	ROM_REGION( 0x0c00000, "gfx1", 0 ) /* sprites */
+	ROM_REGION( 0x0c00000, "sprite", 0 ) /* sprites */
 	ROM_LOAD32_WORD( "mr94019-01.13", 0x000000, 0x200000, CRC(92d8ae9b) SHA1(02b36e6e14b28a9830e07fd328772dbb20b76889) )
 	ROM_LOAD32_WORD( "mr94019-02.1",  0x000002, 0x200000, CRC(f7bd9cc4) SHA1(5658bfb4081439ab06c6ade2531581aa60d1c6be) )
 	ROM_LOAD32_WORD( "mr94019-03.14", 0x400000, 0x200000, CRC(62a69590) SHA1(d95cc1e1ec85161ee6cd1ae77b405cf8ef81217a) )
@@ -2043,7 +2009,7 @@ ROM_START( gratiaa )
 	ROM_LOAD32_BYTE( "94019_28_ver1.0.28", 0x000001, 0x80000, CRC(e0762e89) SHA1(a567c347e7f73f1ef1c753d14ac4f58311380fac) ) /* Labeled 94019  (28)Ver1,0  with the Kanji verson of the game name before "(28)" */
 	ROM_LOAD32_BYTE( "94019_29_ver1.0.29", 0x000000, 0x80000, CRC(8059800b) SHA1(7548d01b6ea15e962353b3585db6515e5819e5ce) ) /* Labeled 94019  (29)Ver1,0  with the Kanji verson of the game name before "(29)" */
 
-	ROM_REGION( 0x0c00000, "gfx1", 0 ) /* sprites */
+	ROM_REGION( 0x0c00000, "sprite", 0 ) /* sprites */
 	ROM_LOAD32_WORD( "mr94019-01.13", 0x000000, 0x200000, CRC(92d8ae9b) SHA1(02b36e6e14b28a9830e07fd328772dbb20b76889) )
 	ROM_LOAD32_WORD( "mr94019-02.1",  0x000002, 0x200000, CRC(f7bd9cc4) SHA1(5658bfb4081439ab06c6ade2531581aa60d1c6be) )
 	ROM_LOAD32_WORD( "mr94019-03.14", 0x400000, 0x200000, CRC(62a69590) SHA1(d95cc1e1ec85161ee6cd1ae77b405cf8ef81217a) )
@@ -2079,7 +2045,7 @@ ROM_START( gametngk )
 	ROM_LOAD32_BYTE( "mb94166_ver1.0-28.28", 0x000001, 0x80000, CRC(b3738934) SHA1(cd07572e55e83807e76179cfc6b97e0410067911) )
 	ROM_LOAD32_BYTE( "mb94166_ver1.0-29.29", 0x000000, 0x80000, CRC(45154a45) SHA1(4c7c2c6738fdfe54ebe41a0ac6222cbfce5d7757) )
 
-	ROM_REGION( 0x1000000, "gfx1", 0 ) /* sprites */
+	ROM_REGION( 0x1000000, "sprite", 0 ) /* sprites */
 	ROM_LOAD32_WORD( "mr94041-01.13", 0x0000000, 0x200000, CRC(3f99adf7) SHA1(cbb8d2fc253b0c58e7eb9286c66e6b36daf9d4af) )
 	ROM_LOAD32_WORD( "mr94041-02.1",  0x0000002, 0x200000, CRC(c3c5ae69) SHA1(5ed7f57a7139f87c680c68e44ea4022b917a9381) )
 	ROM_LOAD32_WORD( "mr94041-03.14", 0x0400000, 0x200000, CRC(d858b6de) SHA1(a06cf529c9508c8c8508894e2e004373edd9debf) )
@@ -2118,7 +2084,7 @@ ROM_START( hayaosi2 )
 	ROM_LOAD32_BYTE( "mb93138a.29", 0x000001, 0x80000, CRC(e6fe3d0d) SHA1(9a0caab82b160991b4f2ac993e7e4b4c5d3bb15e) )
 	ROM_LOAD32_BYTE( "mb93138a.31", 0x000000, 0x80000, CRC(d944bf8c) SHA1(ce93b5d2ebe886b38dc42b1e554b17dc951a51b4) )
 
-	ROM_REGION( 0x900000, "gfx1", 0 ) /* sprites */
+	ROM_REGION( 0x900000, "sprite", 0 ) /* sprites */
 	ROM_LOAD32_WORD( "mr93038.04",  0x000000, 0x200000, CRC(ab5edb11) SHA1(b7742aefbce9efc512c3526714b6f20a6c03af60) )
 	ROM_LOAD32_WORD( "mr93038.05",  0x000002, 0x200000, CRC(274522f1) SHA1(717435d6bf1b2a2220a2f0a53b070bb81cc2ed2b) )
 	ROM_LOAD32_WORD( "mr93038.06",  0x400000, 0x200000, CRC(f9961ebf) SHA1(e91b160cb5a76e3f6044cc71681dadf2fbff7e8b) )
@@ -2220,7 +2186,7 @@ ROM_START( hayaosi3 )
 	ROM_LOAD32_BYTE( "mb93138_29_ver1.5.29", 0x000001, 0x80000, CRC(da891976) SHA1(27e8c395e92ca01b47bffdf766bc95a6c2150815) )
 	ROM_LOAD32_BYTE( "mb93138_31_ver1.5.31", 0x000000, 0x80000, CRC(2d17bb06) SHA1(623b603c4002734427c882424a1e0dc889cf7e02) )
 
-	ROM_REGION( 0x1000000, "gfx1", 0 ) /* sprites */
+	ROM_REGION( 0x1000000, "sprite", 0 ) /* sprites */
 	ROM_LOAD32_WORD( "mr94027.01",  0x000000, 0x200000, CRC(c72e5c6e) SHA1(b98cd656c48c775953d00b5d8bafd4ffde76d8df) )
 	ROM_LOAD32_WORD( "mr94027.02",  0x000002, 0x200000, CRC(59976568) SHA1(a280c352d612913834c76b8e23d86c937fd21281) )
 	ROM_LOAD32_WORD( "mr94027.03",  0x400000, 0x200000, CRC(3ff68f4f) SHA1(1e367b92560c32c87e27fc0e99be3bdb5eb0510b) )
@@ -2257,7 +2223,7 @@ ROM_START( hayaosi3a )
 	ROM_LOAD32_BYTE( "mb93138_29_ver1.2.29", 0x000001, 0x80000, CRC(8999b41b) SHA1(95b94112105bfa2b708bad44bbbdc33616ad2182) )
 	ROM_LOAD32_BYTE( "mb93138_31_ver1.2.31", 0x000000, 0x80000, CRC(f5d4ef54) SHA1(ed208cb6ed171acac312cb282b2fabc8af70610e) )
 
-	ROM_REGION( 0x1000000, "gfx1", 0 ) /* sprites */
+	ROM_REGION( 0x1000000, "sprite", 0 ) /* sprites */
 	ROM_LOAD32_WORD( "mr94027.01",  0x000000, 0x200000, CRC(c72e5c6e) SHA1(b98cd656c48c775953d00b5d8bafd4ffde76d8df) )
 	ROM_LOAD32_WORD( "mr94027.02",  0x000002, 0x200000, CRC(59976568) SHA1(a280c352d612913834c76b8e23d86c937fd21281) )
 	ROM_LOAD32_WORD( "mr94027.03",  0x400000, 0x200000, CRC(3ff68f4f) SHA1(1e367b92560c32c87e27fc0e99be3bdb5eb0510b) )
@@ -2294,7 +2260,7 @@ ROM_START( kirarast )
 	ROM_LOAD32_BYTE( "mr95025.28", 0x000001, 0x80000, CRC(6df8c384) SHA1(3ad01d3d51cfc1f48029c16ee1cc74fc59d7603c) )
 	ROM_LOAD32_BYTE( "mr95025.29", 0x000000, 0x80000, CRC(3b6e681b) SHA1(148fa10631db53a4ad1dcdfb60b4f0654e077396) )
 
-	ROM_REGION( 0x1000000, "gfx1", 0 ) /* sprites */
+	ROM_REGION( 0x1000000, "sprite", 0 ) /* sprites */
 	ROM_LOAD32_WORD( "mr95025.01",  0x000000, 0x200000, CRC(02279069) SHA1(fb3ce00701271d0163f72e4f2e56faa9f16d8fd0) )
 	ROM_LOAD32_WORD( "mr95025.02",  0x000002, 0x200000, CRC(885161d4) SHA1(1bc82de0b2759758d437db3ef9f0f7805f759b59) )
 	ROM_LOAD32_WORD( "mr95025.03",  0x400000, 0x200000, CRC(1ae06df9) SHA1(e1493a386fd8c54c88afab43d13d73869ae467ee) )
@@ -2332,7 +2298,7 @@ ROM_START( akiss )
 	ROM_LOAD32_BYTE( "mb93166_ver1.0-28.28", 0x000001, 0x80000, CRC(20565478) SHA1(d532ab55be287f45d8d81317bb844c675eb1292c) )
 	ROM_LOAD32_BYTE( "mb93166_ver1.0-29.29", 0x000000, 0x80000, CRC(ff454f0d) SHA1(db81aaaf4160eb62badbe08fc01543463470ac97) )
 
-	ROM_REGION( 0x1000000, "gfx1", 0 ) /* sprites */
+	ROM_REGION( 0x1000000, "sprite", 0 ) /* sprites */
 	ROM_LOAD32_WORD( "mb95008-01.13", 0x000000, 0x200000, CRC(1be66420) SHA1(9fc85e6108f230418e012ad05586010235139039) )
 	ROM_LOAD32_WORD( "mb95008-02.1",  0x000002, 0x200000, CRC(1cc4808e) SHA1(70a19d66b4f187320c67760bc453b6afb7d66f9a) )
 	ROM_LOAD32_WORD( "mb95008-03.14", 0x400000, 0x200000, CRC(4045f0dc) SHA1(5ba9786618ecad9410dbdf3664f9dda848a754f7) )
@@ -2369,7 +2335,7 @@ ROM_START( p47aces )
 	ROM_LOAD32_BYTE( "p47-28.28", 0x000001, 0x80000, CRC(4742a5f7) SHA1(cd297aa150082c545647c9a755cf2cdbdc98c988) ) /* Need to verify - might be: P-47 ACES 3/31 ROM 28 Ver1.1 */
 	ROM_LOAD32_BYTE( "p47-29.29", 0x000000, 0x80000, CRC(86e17d8b) SHA1(73004f243c6dfb86ce4cc61475dc7caaf452750e) ) /* Need to verify - might be: P-47 ACES 3/31 ROM 29 Ver1.1 */
 
-	ROM_REGION( 0xe00000, "gfx1", 0 ) /* sprites */
+	ROM_REGION( 0xe00000, "sprite", 0 ) /* sprites */
 	ROM_LOAD32_WORD( "mr94020-02.1",  0x000002, 0x200000, CRC(28732d3c) SHA1(15b2687bcad31793fc7d6a9dc3eccb7ad9b5f659) )
 	ROM_LOAD32_WORD( "mr94020-01.13", 0x000000, 0x200000, CRC(a6ccf999) SHA1(5d32fb6f6987ede6c125bec9581da4695ad64dff) )
 	ROM_LOAD32_WORD( "mr94020-04.2",  0x400002, 0x200000, CRC(128db576) SHA1(f6561f54f6b95842a5f14d29682449bf0d837a85) )
@@ -2408,7 +2374,7 @@ ROM_START( tetrisp )
 	ROM_LOAD32_BYTE( "mb93166_ver1.0-28.28", 0x000001, 0x80000, CRC(87522e16) SHA1(4f0d8abec046884d89c559e3a4a5ac9e0e47a0dc) )
 	ROM_LOAD32_BYTE( "mb93166_ver1.0-29.29", 0x000000, 0x80000, CRC(43a61941) SHA1(a097c88c45d8486eb6ffdd13904b6eb2a3fa45b9) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 ) /* sprites */
+	ROM_REGION( 0x400000, "sprite", 0 ) /* sprites */
 	ROM_LOAD32_WORD( "mr95024-01.01", 0x000002, 0x200000, CRC(cb0e92b9) SHA1(179cc9e2d819d7f6238e924184e8a383d172aa72) )
 	ROM_LOAD32_WORD( "mr95024-02.13", 0x000000, 0x200000, CRC(4a825990) SHA1(f99ba9f88f5582259ba0e50480451d4e9d1d03b7) )
 
@@ -2439,7 +2405,7 @@ ROM_START( tp2m32 )
 	ROM_LOAD32_BYTE( "mp2_28.ver1.0.28", 0x000001, 0x80000, CRC(041aac23) SHA1(3f7863ffa897978493e98445fe020dccbe521752) ) /* labeled M  P2 28 Ver1.0  - game name in Kanji between M and P2 */
 	ROM_LOAD32_BYTE( "mp2_29.ver1.0.29", 0x000000, 0x80000, CRC(4e83b2ca) SHA1(2766793f050a6952f4f53a763686f95bd7544f3f) ) /* labeled M  P2 29 Ver1.0  - game name in Kanji between M and P2 */
 
-	ROM_REGION( 0x800000, "gfx1", 0 ) /* sprites */
+	ROM_REGION( 0x800000, "sprite", 0 ) /* sprites */
 	ROM_LOAD32_WORD( "mr96019-01.13", 0x000000, 0x400000, CRC(06f7dc64) SHA1(722c51b707b9854c0293afdff18b27ec7cae6719) )
 	ROM_LOAD32_WORD( "mr96019-02.1",  0x000002, 0x400000, CRC(3e613bed) SHA1(038b5e43fa3d69654107c8093126eeb2e8fa4ddc) )
 
@@ -2471,7 +2437,7 @@ ROM_START( bnstars ) /* ver 1.1 */
 	ROM_LOAD32_BYTE( "vsjanshi_28_ver1.1.28", 0x000001, 0x80000, CRC(d075cfb6) SHA1(f70741e9f536d5c7604126d36c7aa8ed8f25c329) )
 	ROM_LOAD32_BYTE( "vsjanshi_29_ver1.1.29", 0x000000, 0x80000, CRC(bc395b50) SHA1(84d7cc492a11a5a9402e929f0bd138ad63e3d079) )
 
-	ROM_REGION( 0x1000000, "gfx1", 0 ) /* sprites */
+	ROM_REGION( 0x1000000, "sprite", 0 ) /* sprites */
 	ROM_LOAD32_WORD( "mr96004-01.13", 0x000000, 0x200000, CRC(3366d104) SHA1(2de0cabe2ead777b5b02cade7f2003ef7f90b75b) )
 	ROM_LOAD32_WORD( "mr96004-02.1",  0x000002, 0x200000, CRC(ad556664) SHA1(4b36f8d8d9efa37cf515af41d14433e7eafa27a2) )
 	ROM_LOAD32_WORD( "mr96004-03.14", 0x400000, 0x200000, CRC(b399e2b1) SHA1(9b6a00a219db8d66dcf592160b7b5f7a86b8f0c9) )
@@ -2545,7 +2511,7 @@ ROM_START( wpksocv2 )
 	ROM_LOAD32_BYTE( "pk_soccer_v2_rom_29_ver._1.1.29", 0x000001, 0x80000, CRC(22acd835) SHA1(0fa96a6dfde737d541842f85dc257776044e15b5) )
 	ROM_LOAD32_BYTE( "pk_soccer_v2_rom_31_ver._1.1.31", 0x000000, 0x80000, CRC(f25e50f5) SHA1(b58722f11a8b94ef053caf531ac94a959350288a) )
 
-	ROM_REGION( 0xc00000, "gfx1", 0 ) /* sprites */
+	ROM_REGION( 0xc00000, "sprite", 0 ) /* sprites */
 	ROM_LOAD32_WORD( "mr95033-01.13", 0x000000, 0x200000, CRC(1f76ed57) SHA1(af9076b4b4c26b362825d892f46d2c04b4bb9d07) )
 	ROM_LOAD32_WORD( "mr95033-02.1",  0x000002, 0x200000, CRC(5b119910) SHA1(aff44e355227dd159e388ab85a5b6d48644ff421) )
 	ROM_LOAD32_WORD( "mr95033-03.14", 0x400000, 0x200000, CRC(8b6099ed) SHA1(c514cec1491aed00a5714c0b8d17c96e87ba50aa) )
@@ -2584,7 +2550,7 @@ void ms32_state::configure_banks()
 
 void ms32_state::init_ms32_common()
 {
-	m_nvram_8 = std::make_unique<uint8_t[]>(0x2000);
+	m_nvram_8 = std::make_unique<u8[]>(0x2000);
 	configure_banks();
 }
 
@@ -2633,7 +2599,7 @@ void ms32_state::init_suchie2()
 void ms32_state::init_f1superb()
 {
 #if 0 // we shouldn't need this hack, something else is wrong, and the x offsets are never copied either, v70 problems??
-	uint32_t *pROM = (uint32_t *)memregion("maincpu")->base();
+	u32 *pROM = (u32 *)memregion("maincpu")->base();
 	pROM[0x19d04/4]=0x167a021a; // bne->br  : sprite Y offset table is always copied to RAM
 #endif
 	init_ss92046_01();
@@ -2667,4 +2633,4 @@ GAME( 1997, bnstars,   bnstars1, ms32, suchie2,  ms32_state, init_bnstars,    RO
 GAME( 1996, wpksocv2,  0,        ms32, wpksocv2, ms32_state, init_ss92046_01, ROT0,   "Jaleco",         "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 /* these boot and show something */
-GAME( 1994, f1superb, 0,        f1superb, f1superb, ms32_state, init_f1superb, ROT0,   "Jaleco",        "F-1 Super Battle", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, f1superb, 0,        f1superb, f1superb, ms32_state, init_f1superb, ROT0,   "Jaleco",        "F-1 Super Battle", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )

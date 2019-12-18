@@ -112,7 +112,7 @@ ROM_START( fearless )
 	/* Internal rom of IGS027A ARM based MCU */
 	ROM_LOAD( "fearless_igs027a", 0x00000, 0x4000, NO_DUMP ) // sticker marked 'F1'
 
-	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "fearlessp_v-101us.u37", 0x000000, 0x80000, CRC(2522873c) SHA1(8db709877311b6d2796353fc9a44a820937e35c2) )
 
 	ROM_REGION( 0x10000, "plcc", 0 )

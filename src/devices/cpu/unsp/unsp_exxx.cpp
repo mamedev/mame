@@ -116,10 +116,12 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 		if (op & 0x0100)
 		{
 			// MUL su ( unsigned * signed )
-			logerror("MUL su\n"); 
 			const uint16_t opa = (op >> 9) & 7;
 			const uint16_t opb = op & 7;
 			m_core->m_icount -= 12;
+
+			logerror("%s: MUL su with %04x (signed) * %04x (unsigned) : ", machine().describe_context(), m_core->m_r[opa], m_core->m_r[opb]);
+
 			uint32_t lres = m_core->m_r[opa] * m_core->m_r[opb];
 			if (m_core->m_r[opa] & 0x8000)
 			{
@@ -127,6 +129,9 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 			}
 			m_core->m_r[REG_R4] = lres >> 16;
 			m_core->m_r[REG_R3] = (uint16_t)lres;
+
+			logerror("result was : %08x\n", lres);
+
 			return;
 		}
 		else
@@ -175,32 +180,36 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 			return;
 
 		case 0x02:
-			logerror("pc:%06x: %s = %s lsl %s (%04x %04x)\n", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
-			m_core->m_r[rd] = m_core->m_r[rd] << m_core->m_r[rs];
+			logerror("pc:%06x: %s = %s lsl %s (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
+			m_core->m_r[rd] = (uint16_t)((m_core->m_r[rd]&0xffff) << (m_core->m_r[rs] & 0x0f));
+			logerror("result %04x\n", m_core->m_r[rd]);
 			return;
 
 		case 0x03:
 		{
 			// wrlshunt uses this
-			logerror("pc:%06x: %s = %s lslor %s  (%04x %04x)\n", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
+			logerror("pc:%06x: %s = %s lslor %s  (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
 			uint16_t tmp = m_core->m_r[rd];
-			m_core->m_r[rd] = m_core->m_r[rd] << m_core->m_r[rs];
+			m_core->m_r[rd] = (uint16_t)((m_core->m_r[rd]&0xffff) << (m_core->m_r[rs] & 0x0f));
 			m_core->m_r[rd] |= tmp; // guess
+			logerror("result %04x\n", m_core->m_r[rd]);
 			return;
 		}
 
 		case 0x04:
 			// smartfp loops increasing shift by 4 up to values of 28? (but regs are 16-bit?)
-			logerror("pc:%06x: %s = %s lsr %s  (%04x %04x)\n", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
-			m_core->m_r[rd] = m_core->m_r[rd] >> m_core->m_r[rs];
+			logerror("pc:%06x: %s = %s lsr %s  (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
+			m_core->m_r[rd] = (uint16_t)((m_core->m_r[rd]&0xffff) >> (m_core->m_r[rs] & 0xf));
+			logerror("result %04x\n", m_core->m_r[rd]);
 			return;
 
 		case 0x05:
 		{
-			logerror("pc:%06x: %s = %s lsror %s  (%04x %04x)\n", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
+			logerror("pc:%06x: %s = %s lsror %s  (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
 			uint16_t tmp = m_core->m_r[rd];
-			m_core->m_r[rd] = m_core->m_r[rd] >> m_core->m_r[rs];
+			m_core->m_r[rd] = (uint16_t)((m_core->m_r[rd]&0xffff) >> (m_core->m_r[rs] & 0x0f));
 			m_core->m_r[rd] |= tmp; // guess
+			logerror("result %04x\n", m_core->m_r[rd]);
 			return;
 		}
 

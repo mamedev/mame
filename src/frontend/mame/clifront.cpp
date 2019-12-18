@@ -66,7 +66,7 @@
 #define CLICOMMAND_ROMIDENT             "romident"
 #define CLICOMMAND_LISTDEVICES          "listdevices"
 #define CLICOMMAND_LISTSLOTS            "listslots"
-#define CLICOMMAND_LISTMEDIA            "listmedia"     // needed by MESS
+#define CLICOMMAND_LISTMEDIA            "listmedia"
 #define CLICOMMAND_LISTSOFTWARE         "listsoftware"
 #define CLICOMMAND_VERIFYSOFTWARE       "verifysoftware"
 #define CLICOMMAND_GETSOFTLIST          "getsoftlist"
@@ -1203,8 +1203,6 @@ void cli_frontend::output_single_softlist(FILE *out, software_list_device &swlis
     software supported by a given game or set of
     games
     TODO: Add all information read from the source files
-    Possible improvement: use a sorted list for
-        identifying duplicate lists.
 -------------------------------------------------*/
 
 void cli_frontend::listsoftware(const std::vector<std::string> &args)
@@ -1273,7 +1271,7 @@ void cli_frontend::verifysoftware(const std::vector<std::string> &args)
 
 		for (software_list_device &swlistdev : software_list_device_iterator(drivlist.config()->root_device()))
 		{
-			if (swlistdev.list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM)
+			if (swlistdev.is_original())
 			{
 				if (list_map.insert(swlistdev.list_name()).second)
 				{

@@ -973,7 +973,7 @@ void ti99_4x_state::ti99_4_common(machine_config& config)
 	RAM(config, TI99_EXPRAM_TAG).set_default_size("32K").set_default_value(0);
 
 	// Software list
-	SOFTWARE_LIST(config, "cart_list_ti99").set_type("ti99_cart", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cart_list_ti99").set_original("ti99_cart");
 
 	// Cassette drives. Second drive is record-only.
 	SPEAKER(config, "cass_out").front_center();

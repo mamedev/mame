@@ -57,7 +57,7 @@ private:
 
 	void _6802_mem(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m6802_cpu_device> m_maincpu;
 	required_device<votrax_sc01_device> m_votrax;
 	required_device<clock_device> m_clock;
 };
@@ -140,6 +140,7 @@ void votrtnt_state::votrtnt(machine_config &config)
 {
 	/* basic machine hardware */
 	M6802(config, m_maincpu, 2.4576_MHz_XTAL);  // 2.4576MHz XTAL, verified; divided by 4 inside the MC6802
+	m_maincpu->set_ram_enable(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &votrtnt_state::_6802_mem);
 
 	/* video hardware */

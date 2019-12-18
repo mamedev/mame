@@ -74,7 +74,7 @@ namespace
 	void output_features(std::ostream &out, device_type type, device_t::feature_type unemulated, device_t::feature_type imperfect);
 	void output_images(std::ostream &out, device_t &device, const char *root_tag);
 	void output_slots(std::ostream &out, machine_config &config, device_t &device, const char *root_tag, device_type_set *devtypes);
-	void output_software_list(std::ostream &out, device_t &root);
+	void output_software_lists(std::ostream &out, device_t &root, const char *root_tag);
 	void output_ramoptions(std::ostream &out, device_t &root);
 
 	void output_one_device(std::ostream &out, machine_config &config, device_t &device, const char *devtag);
@@ -240,6 +240,7 @@ static const char s_dtd_string[] =
 "\t\t\t\t<!ATTLIST slotoption default (yes|no) \"no\">\n"
 "\t\t<!ELEMENT softwarelist EMPTY>\n"
 "\t\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n"
+"\t\t\t<!ATTLIST softwarelist tag CDATA #REQUIRED>\n"
 "\t\t\t<!ATTLIST softwarelist status (original|compatible) #REQUIRED>\n"
 "\t\t\t<!ATTLIST softwarelist filter CDATA #IMPLIED>\n"
 "\t\t<!ELEMENT ramoption (#PCDATA)>\n"
@@ -619,7 +620,7 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 	output_features(out, driver.type, overall_unemulated, overall_imperfect);
 	output_images(out, config.root_device(), "");
 	output_slots(out, config, config.root_device(), "", devtypes);
-	output_software_list(out, config.root_device());
+	output_software_lists(out, config.root_device(), "");
 	output_ramoptions(out, config.root_device());
 
 	// close the topmost tag
@@ -688,6 +689,7 @@ void output_one_device(std::ostream &out, machine_config &config, device_t &devi
 	output_features(out, device.type(), overall_unemulated, overall_imperfect);
 	output_images(out, device, devtag);
 	output_slots(out, config, device, devtag, nullptr);
+	output_software_lists(out, device, devtag);
 	out << util::string_format("\t</%s>\n", XML_TOP);
 }
 
@@ -1932,15 +1934,24 @@ void output_slots(std::ostream &out, machine_config &config, device_t &device, c
 
 
 //-------------------------------------------------
-//  output_software_list - print the information
+//  output_software_lists - print the information
 //  for all known software lists for this system
 //-------------------------------------------------
 
-void output_software_list(std::ostream &out, device_t &root)
+void output_software_lists(std::ostream &out, device_t &root, const char *root_tag)
 {
 	for (const software_list_device &swlist : software_list_device_iterator(root))
 	{
-		out << util::string_format("\t\t<softwarelist name=\"%s\" status=\"%s\"", normalize_string(swlist.list_name().c_str()), (swlist.list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM) ? "original" : "compatible");
+		if (&static_cast<const device_t &>(swlist) == &root)
+		{
+			assert(swlist.list_name().empty());
+			continue;
+		}
+
+		std::string newtag(swlist.tag()), oldtag(":");
+		newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
+
+		out << util::string_format("\t\t<softwarelist tag=\"%s\" name=\"%s\" status=\"%s\"", normalize_string(newtag.c_str()), normalize_string(swlist.list_name().c_str()), swlist.is_original() ? "original" : "compatible");
 		if (swlist.filter())
 			out << util::string_format(" filter=\"%s\"", normalize_string(swlist.filter()));
 		out << "/>\n";

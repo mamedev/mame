@@ -141,7 +141,7 @@ void s6_state::s6_main_map(address_map &map)
 void s6_state::s6_audio_map(address_map &map)
 {
 	map.global_mask(0x7fff);
-	map(0x0000, 0x00ff).ram();
+	map(0x0080, 0x00ff).ram(); // external 6810 RAM
 	map(0x0400, 0x0403).rw(m_pias, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x3000, 0x7fff).rom().region("audioroms", 0);
 }

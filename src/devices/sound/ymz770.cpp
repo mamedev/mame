@@ -98,47 +98,40 @@ void ymz770_device::device_start()
 	save_item(NAME(m_bsl));
 	save_item(NAME(m_cpl));
 
-	for (int ch = 0; ch < 16; ch++) // TODO array size
-	{
-		save_item(NAME(m_channels[ch].phrase), ch);
-		save_item(NAME(m_channels[ch].pan), ch);
-		save_item(NAME(m_channels[ch].pan_delay), ch);
-		save_item(NAME(m_channels[ch].pan1), ch);
-		save_item(NAME(m_channels[ch].pan1_delay), ch);
-		save_item(NAME(m_channels[ch].volume), ch);
-		save_item(NAME(m_channels[ch].volume_target), ch);
-		save_item(NAME(m_channels[ch].volume_delay), ch);
-		save_item(NAME(m_channels[ch].volume2), ch);
-		save_item(NAME(m_channels[ch].loop), ch);
-		save_item(NAME(m_channels[ch].is_playing), ch);
-		save_item(NAME(m_channels[ch].last_block), ch);
-		save_item(NAME(m_channels[ch].is_paused), ch);
-		save_item(NAME(m_channels[ch].output_remaining), ch);
-		save_item(NAME(m_channels[ch].output_ptr), ch);
-		save_item(NAME(m_channels[ch].atbl), ch);
-		save_item(NAME(m_channels[ch].pptr), ch);
-		save_item(NAME(m_channels[ch].output_data), ch);
-	}
-	for (int ch = 0; ch < 8; ch++)
-	{
-		save_item(NAME(m_sequences[ch].delay), ch);
-		save_item(NAME(m_sequences[ch].sequence), ch);
-		save_item(NAME(m_sequences[ch].timer), ch);
-		save_item(NAME(m_sequences[ch].stopchan), ch);
-		save_item(NAME(m_sequences[ch].loop), ch);
-		save_item(NAME(m_sequences[ch].bank), ch);
-		save_item(NAME(m_sequences[ch].is_playing), ch);
-		save_item(NAME(m_sequences[ch].is_paused), ch);
-		save_item(NAME(m_sequences[ch].offset), ch);
-	}
-	for (int ch = 0; ch < 8; ch++)
-	{
-		save_item(NAME(m_sqcs[ch].sqc), ch);
-		save_item(NAME(m_sqcs[ch].loop), ch);
-		save_item(NAME(m_sqcs[ch].is_playing), ch);
-		save_item(NAME(m_sqcs[ch].is_waiting), ch);
-		save_item(NAME(m_sqcs[ch].offset), ch);
-	}
+	save_item(STRUCT_MEMBER(m_channels, phrase));
+	save_item(STRUCT_MEMBER(m_channels, pan));
+	save_item(STRUCT_MEMBER(m_channels, pan_delay));
+	save_item(STRUCT_MEMBER(m_channels, pan1));
+	save_item(STRUCT_MEMBER(m_channels, pan1_delay));
+	save_item(STRUCT_MEMBER(m_channels, volume));
+	save_item(STRUCT_MEMBER(m_channels, volume_target));
+	save_item(STRUCT_MEMBER(m_channels, volume_delay));
+	save_item(STRUCT_MEMBER(m_channels, volume2));
+	save_item(STRUCT_MEMBER(m_channels, loop));
+	save_item(STRUCT_MEMBER(m_channels, is_playing));
+	save_item(STRUCT_MEMBER(m_channels, last_block));
+	save_item(STRUCT_MEMBER(m_channels, is_paused));
+	save_item(STRUCT_MEMBER(m_channels, output_remaining));
+	save_item(STRUCT_MEMBER(m_channels, output_ptr));
+	save_item(STRUCT_MEMBER(m_channels, atbl));
+	save_item(STRUCT_MEMBER(m_channels, pptr));
+	save_item(STRUCT_MEMBER(m_channels, output_data));
+
+	save_item(STRUCT_MEMBER(m_sequences, delay));
+	save_item(STRUCT_MEMBER(m_sequences, sequence));
+	save_item(STRUCT_MEMBER(m_sequences, timer));
+	save_item(STRUCT_MEMBER(m_sequences, stopchan));
+	save_item(STRUCT_MEMBER(m_sequences, loop));
+	save_item(STRUCT_MEMBER(m_sequences, bank));
+	save_item(STRUCT_MEMBER(m_sequences, is_playing));
+	save_item(STRUCT_MEMBER(m_sequences, is_paused));
+	save_item(STRUCT_MEMBER(m_sequences, offset));
+
+	save_item(STRUCT_MEMBER(m_sqcs, sqc));
+	save_item(STRUCT_MEMBER(m_sqcs, loop));
+	save_item(STRUCT_MEMBER(m_sqcs, is_playing));
+	save_item(STRUCT_MEMBER(m_sqcs, is_waiting));
+	save_item(STRUCT_MEMBER(m_sqcs, offset));
 }
 
 

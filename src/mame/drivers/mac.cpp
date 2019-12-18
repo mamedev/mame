@@ -950,7 +950,7 @@ void mac_state::add_scsi(machine_config &config, bool cdrom)
 	m_ncr5380->set_scsi_port("scsi");
 	m_ncr5380->irq_callback().set(FUNC(mac_state::mac_scsi_irq));
 
-	SOFTWARE_LIST(config, "hdd_list").set_type("mac_hdd", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 }
 
 void mac_state::add_via1_adb(machine_config &config, bool macii)
@@ -1089,7 +1089,7 @@ void mac_state::add_macplus_additions(machine_config &config)
 	m_ram->set_extra_options("1M,2M,2560K,4M");
 
 	// software list
-	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 }
 
 void mac_state::add_nubus(machine_config &config, bool bank1, bool bank2)
@@ -1225,7 +1225,7 @@ void mac_state::macii(machine_config &config, bool cpu, asc_device::asc_type asc
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("8M,32M,64M,96M,128M");
 
-	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 }
 
 void mac_state::maciihmu(machine_config &config)
@@ -1260,7 +1260,7 @@ void mac_state::maciifx(machine_config &config)
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("8M,16M,32M,64M,96M,128M");
 
-	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 
 	add_nubus(config);
 }
@@ -1421,7 +1421,7 @@ void mac_state::macse30(machine_config &config)
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("8M,16M,32M,48M,64M,96M,128M");
 
-	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 }
 
 void mac_state::macpb140(machine_config &config)
@@ -1446,7 +1446,7 @@ void mac_state::macpb140(machine_config &config)
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("4M,6M,8M");
 
-	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 }
 
 // PowerBook 145 = 140 @ 25 MHz (still 2MB RAM - the 145B upped that to 4MB)
@@ -1491,7 +1491,7 @@ void mac_state::macpb160(machine_config &config)
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("8M,12M,16M");
 
-	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 }
 
 void mac_state::macpb180(machine_config &config)
@@ -1678,7 +1678,7 @@ void mac_state::macqd700(machine_config &config)
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("8M,16M,32M,64M,68M,72M,80M,96M,128M");
 
-	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 }
 
 static INPUT_PORTS_START( macadb )

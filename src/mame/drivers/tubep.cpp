@@ -103,7 +103,6 @@ TP-S.1 TP-S.2 TP-S.3 TP-B.1  8212 TP-B.2 TP-B.3          TP-B.4
 #include "emu.h"
 #include "includes/tubep.h"
 
-#include "cpu/m6800/m6800.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "machine/74259.h"
@@ -836,6 +835,7 @@ void tubep_state::tubep(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &tubep_state::tubep_sound_portmap);
 
 	NSC8105(config, m_mcu, 6000000);        /* 6 MHz Xtal - divided internally ??? */
+	m_mcu->set_ram_enable(false);
 	m_mcu->set_addrmap(AS_PROGRAM, &tubep_state::nsc_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
@@ -885,6 +885,7 @@ void tubep_state::tubepb(machine_config &config)
 	tubep(config);
 
 	M6802(config.replace(), m_mcu, 6000000); /* ? MHz Xtal */
+	m_mcu->set_ram_enable(false);
 	m_mcu->set_addrmap(AS_PROGRAM, &tubep_state::nsc_map);
 
 	//m_screen->screen_vblank().set_inputline(m_mcu, INPUT_LINE_NMI);
@@ -908,6 +909,7 @@ void tubep_state::rjammer(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	NSC8105(config, m_mcu, 6000000);    /* 6 MHz Xtal - divided internally ??? */
+	m_mcu->set_ram_enable(false);
 	m_mcu->set_addrmap(AS_PROGRAM, &tubep_state::nsc_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 3A

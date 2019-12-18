@@ -459,7 +459,7 @@ ROM_START(rhnation)
 	ROM_LOAD( "rhythm_nation_rev_3.1.5_m27v322.u13", 0x000000, 0x400000, CRC(456f043d) SHA1(cc166897fdbdaa3583e44816da9dfbbf303f5c61) )
 
 	ROM_REGION(0x80000, "pic", 0)       /* PIC18c242 program - read-protected, need dumped */
-	ROM_LOAD( " pic18c242-i-sp.u22", 0x000000, 0x80000, NO_DUMP )
+	ROM_LOAD( "pic18c242-i-sp.u22", 0x000000, 0x80000, NO_DUMP )
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY("rhn010104", 0, SHA1(5bc2e5817b29bf42ec483414242795fd76d749d9) )

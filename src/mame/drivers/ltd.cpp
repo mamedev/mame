@@ -524,8 +524,9 @@ TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 void ltd_state::ltd3(machine_config &config)
 {
 	/* basic machine hardware */
-	M6802(config, m_maincpu, XTAL(3'579'545));
-	m_maincpu->set_addrmap(AS_PROGRAM, &ltd_state::ltd3_map);
+	m6802_cpu_device &maincpu(M6802(config, m_maincpu, XTAL(3'579'545)));
+	maincpu.set_ram_enable(false); // FIXME: needs standby support
+	maincpu.set_addrmap(AS_PROGRAM, &ltd_state::ltd3_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

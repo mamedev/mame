@@ -5326,16 +5326,16 @@
 		</part>
 	</software>
 
-  <software name="nfs334b" cloneof="nfs334">
-	<description>Acorn NFS 3.34B</description>
-	<year>198?</year>
-	<publisher>Acorn</publisher>
-	<part name="rom1" interface="bbc_rom">
-		<dataarea name="rom" size="8192">
-			<rom name="Acorn-NFS-3.34B.rom" size="8192" crc="9ddc1456" sha1="212cb90ba5e7c96457718ae9d818fb8ece5cc32a"/>
-		</dataarea>
-	</part>
-  </software>
+	<software name="nfs334b" cloneof="nfs334">
+		<description>Acorn NFS 3.34B</description>
+		<year>198?</year>
+		<publisher>Acorn</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Acorn-NFS-3.34B.rom" size="8192" crc="9ddc1456" sha1="212cb90ba5e7c96457718ae9d818fb8ece5cc32a"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="nfs360">
 		<description>Acorn NFS 3.60</description>
@@ -5740,16 +5740,16 @@
 		</part>
 	</software>
 
-  <software name="prestelt471" cloneof="prestel" supported="no">
-	<description>Prestel Trial 4.71r</description>
-	<year>1984</year>
-	<publisher>Acorn</publisher>
-	<part name="rom1" interface="bbc_rom">
-		<dataarea name="rom" size="8192">
-			<rom name="PrestelTrial-4.71r.rom" size="8192" crc="c6067294" sha1="5702b0b895cfabb30ffdcf9fe2718de2276315ef"/>
-		</dataarea>
-	</part>
-  </software>
+	<software name="prestelt471" cloneof="prestel" supported="no">
+		<description>Prestel Trial 4.71r</description>
+		<year>1984</year>
+		<publisher>Acorn</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="PrestelTrial-4.71r.rom" size="8192" crc="c6067294" sha1="5702b0b895cfabb30ffdcf9fe2718de2276315ef"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="prestel" supported="no">
 		<description>Prestel 4.8n</description>
@@ -7758,16 +7758,16 @@
 		</part>
 	</software>
 
-  <software name="tfs031" cloneof="tfs">
-	<description>Acorn TFS 0.31</description>
-	<year>1982</year>
-	<publisher>Acorn</publisher>
-	<part name="rom1" interface="bbc_rom">
-		<dataarea name="rom" size="16384">
-			<rom name="TFS-0.31.rom" size="16384" crc="eb6b9097" sha1="07c54e8afc5fe686a8f86c33d15220327d6c9cc8"/>
-		</dataarea>
-	</part>
-  </software>
+	<software name="tfs031" cloneof="tfs">
+		<description>Acorn TFS 0.31</description>
+		<year>1982</year>
+		<publisher>Acorn</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="TFS-0.31.rom" size="16384" crc="eb6b9097" sha1="07c54e8afc5fe686a8f86c33d15220327d6c9cc8"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="tfs100" cloneof="tfs">
 		<description>Acorn TFS 1.00</description>

@@ -47,7 +47,7 @@ class HandlerBase(object):
         self.start_response = start_response
 
     def error_page(self, code):
-        yield htmltmpl.ERROR_PAGE.substitute(code=cgi.escape('%d' % code), message=cgi.escape(self.STATUS_MESSAGE[code])).encode('utf-8')
+        yield htmltmpl.ERROR_PAGE.substitute(code=cgi.escape('%d' % (code, )), message=cgi.escape(self.STATUS_MESSAGE[code])).encode('utf-8')
 
 
 class ErrorPageHandler(HandlerBase):
@@ -103,6 +103,12 @@ class QueryPageHandler(HandlerBase):
     def sourcefile_href(self, sourcefile):
         return cgi.escape(urlparse.urljoin(self.application_uri, 'sourcefile/%s' % (urlquote(sourcefile), )), True)
 
+    def softwarelist_href(self, softwarelist):
+        return cgi.escape(urlparse.urljoin(self.application_uri, 'softwarelist/%s' % (urlquote(softwarelist), )), True)
+
+    def software_href(self, softwarelist, software):
+        return cgi.escape(urlparse.urljoin(self.application_uri, 'softwarelist/%s/%s' % (urlquote(softwarelist), urlquote(software))), True)
+
 
 class MachineRpcHandlerBase(QueryPageHandler):
     def __init__(self, app, application_uri, environ, start_response, **kwargs):
@@ -143,7 +149,7 @@ class MachineHandler(QueryPageHandler):
             self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
             return self.error_page(404)
         else:
-            machine_info = self.dbcurs.get_machine_info(self.shortname).fetchone()
+            machine_info = self.dbcurs.get_machine_details(self.shortname).fetchone()
             if not machine_info:
                 self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
                 return self.error_page(404)
@@ -175,11 +181,11 @@ class MachineHandler(QueryPageHandler):
             parent = self.dbcurs.listfull(machine_info['cloneof']).fetchone()
             if parent:
                 yield (
-                        '    <tr><th>Parent Machine:</th><td><a href="%s">%s (%s)</a></td></tr>\n' %
+                        '    <tr><th>Parent machine:</th><td><a href="%s">%s (%s)</a></td></tr>\n' %
                         (self.machine_href(machine_info['cloneof']), cgi.escape(parent[1]), cgi.escape(machine_info['cloneof']))).encode('utf-8')
             else:
                 yield (
-                        '    <tr><th>Parent Machine:</th><td><a href="%s">%s</a></td></tr>\n' %
+                        '    <tr><th>Parent machine:</th><td><a href="%s">%s</a></td></tr>\n' %
                         (self.machine_href(machine_info['cloneof']), cgi.escape(machine_info['cloneof']))).encode('utf-8')
         if (machine_info['romof'] is not None) and (machine_info['romof'] != machine_info['cloneof']):
             parent = self.dbcurs.listfull(machine_info['romof']).fetchone()
@@ -189,7 +195,7 @@ class MachineHandler(QueryPageHandler):
                         (self.machine_href(machine_info['romof']), cgi.escape(parent[1]), cgi.escape(machine_info['romof']))).encode('utf-8')
             else:
                 yield (
-                        '    <tr><th>Parent Machine:</th><td><a href="%s">%s</a></td></tr>\n' %
+                        '    <tr><th>Parent machine:</th><td><a href="%s">%s</a></td></tr>\n' %
                         (self.machine_href(machine_info['romof']), cgi.escape(machine_info['romof']))).encode('utf-8')
         unemulated = []
         imperfect = []
@@ -208,6 +214,20 @@ class MachineHandler(QueryPageHandler):
                     ('    <tr><th>Imperfect Features:</th><td>%s' + (', %s' * (len(imperfect) - 1)) + '</td></tr>\n') %
                     tuple(imperfect)).encode('utf-8');
         yield '</table>\n'.encode('utf-8')
+
+        first = True
+        for clone, clonedescription, cloneyear, clonemanufacturer in self.dbcurs.get_clones(self.shortname):
+            if first:
+                yield htmltmpl.MACHINE_CLONES_PROLOGUE.substitute().encode('utf-8')
+                first = False
+            yield htmltmpl.MACHINE_CLONES_ROW.substitute(
+                    href=self.machine_href(clone),
+                    shortname=cgi.escape(clone),
+                    description=cgi.escape(clonedescription),
+                    year=cgi.escape(cloneyear or ''),
+                    manufacturer=cgi.escape(clonemanufacturer or '')).encode('utf-8')
+        if not first:
+            yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-clones').encode('utf-8')
 
         # allow system BIOS selection
         haveoptions = False
@@ -365,8 +385,8 @@ class SourceFileHandler(QueryPageHandler):
         for filename, machines in self.dbcurs.get_sourcefiles(pattern):
             yield htmltmpl.SOURCEFILE_LIST_ROW.substitute(
                     sourcefile=self.linked_title(filename, True),
-                    machines=cgi.escape('%d' % machines)).encode('utf-8')
-        yield '    </tbody>\n</table>\n<script>make_table_sortable(document.getElementById("tbl-sourcefiles"));</script>\n</body>\n</html>\n'.encode('utf-8')
+                    machines=cgi.escape('%d' % (machines, ))).encode('utf-8')
+        yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-sourcefiles').encode('utf-8')
 
     def sourcefile_page(self, id):
         yield htmltmpl.SOURCEFILE_PROLOGUE.substitute(
@@ -395,7 +415,7 @@ class SourceFileHandler(QueryPageHandler):
         if first:
             yield '<p>No machines found.</p>\n'.encode('utf-8')
         else:
-            yield '    </tbody>\n</table>\n<script>make_table_sortable(document.getElementById("tbl-machines"));</script>\n'.encode('utf-8')
+            yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-machines').encode('utf-8')
 
         yield '</body>\n</html>\n'.encode('utf-8')
 
@@ -424,6 +444,187 @@ class SourceFileHandler(QueryPageHandler):
                 manufacturer=cgi.escape(machine_info['manufacturer'] or ''),
                 runnable=cgi.escape('Yes' if machine_info['runnable'] else 'No'),
                 parent=cgi.escape(machine_info['cloneof'] or '')).encode('utf-8')
+
+
+class SoftwareListHandler(QueryPageHandler):
+    def __init__(self, app, application_uri, environ, start_response, **kwargs):
+        super(SoftwareListHandler, self).__init__(app=app, application_uri=application_uri, environ=environ, start_response=start_response, **kwargs)
+        self.shortname = wsgiref.util.shift_path_info(environ)
+        self.software = wsgiref.util.shift_path_info(environ)
+
+    def __iter__(self):
+        if self.environ['PATH_INFO']:
+            self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
+            return self.error_page(404)
+        elif self.software and ('*' not in self.software) and ('?' not in self.software):
+            software_info = self.dbcurs.get_software_details(self.shortname, self.software).fetchone()
+            if not software_info:
+                self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
+                return self.error_page(404)
+            elif self.environ['REQUEST_METHOD'] != 'GET':
+                self.start_response('405 %s' % (self.STATUS_MESSAGE[405], ), [('Content-type', 'text/html; charset=utf-8'), ('Accept', 'GET, HEAD, OPTIONS'), ('Cache-Control', 'public, max-age=3600')])
+                return self.error_page(405)
+            else:
+                self.start_response('200 OK', [('Content-type', 'text/html; chearset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
+                return self.software_page(software_info)
+        elif self.software or (self.shortname and ('*' not in self.shortname) and ('?' not in self.shortname)):
+            softwarelist_info = self.dbcurs.get_softwarelist_details(self.shortname, self.software or None).fetchone()
+            if not softwarelist_info:
+                self.start_response('404 %s' % (self.STATUS_MESSAGE[404], ), [('Content-type', 'text/html; charset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
+                return self.error_page(404)
+            elif self.environ['REQUEST_METHOD'] != 'GET':
+                self.start_response('405 %s' % (self.STATUS_MESSAGE[405], ), [('Content-type', 'text/html; charset=utf-8'), ('Accept', 'GET, HEAD, OPTIONS'), ('Cache-Control', 'public, max-age=3600')])
+                return self.error_page(405)
+            else:
+                self.start_response('200 OK', [('Content-type', 'text/html; chearset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
+                return self.softwarelist_page(softwarelist_info, self.software or None)
+        else:
+            if self.environ['REQUEST_METHOD'] != 'GET':
+                self.start_response('405 %s' % (self.STATUS_MESSAGE[405], ), [('Content-type', 'text/html; charset=utf-8'), ('Accept', 'GET, HEAD, OPTIONS'), ('Cache-Control', 'public, max-age=3600')])
+                return self.error_page(405)
+            else:
+                self.start_response('200 OK', [('Content-type', 'text/html; chearset=utf-8'), ('Cache-Control', 'public, max-age=3600')])
+                return self.softwarelist_listing_page(self.shortname or None)
+
+    def softwarelist_listing_page(self, pattern):
+        if not pattern:
+            title = heading = 'All Software Lists'
+        else:
+            title = heading = 'Software Lists: ' + cgi.escape(pattern)
+        yield htmltmpl.SOFTWARELIST_LIST_PROLOGUE.substitute(
+                assets=cgi.escape(urlparse.urljoin(self.application_uri, 'static'), True),
+                title=title,
+                heading=heading).encode('utf-8')
+        for shortname, description, total, supported, partiallysupported, unsupported in self.dbcurs.get_softwarelists(pattern):
+            yield htmltmpl.SOFTWARELIST_LIST_ROW.substitute(
+                    href=self.softwarelist_href(shortname),
+                    shortname=cgi.escape(shortname),
+                    description=cgi.escape(description),
+                    total=cgi.escape('%d' % (total, )),
+                    supported=cgi.escape('%.1f%%' % (supported * 100.0 / (total or 1), )),
+                    partiallysupported=cgi.escape('%.1f%%' % (partiallysupported * 100.0 / (total or 1), )),
+                    unsupported=cgi.escape('%.1f%%' % (unsupported * 100.0 / (total or 1), ))).encode('utf-8')
+        yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-softwarelists').encode('utf-8')
+
+    def softwarelist_page(self, softwarelist_info, pattern):
+        if not pattern:
+            title = 'Software List: %s (%s)' % (cgi.escape(softwarelist_info['description']), cgi.escape(softwarelist_info['shortname']))
+            heading = cgi.escape(softwarelist_info['description'])
+        else:
+            title = 'Software List: %s (%s): %s' % (cgi.escape(softwarelist_info['description']), cgi.escape(softwarelist_info['shortname']), cgi.escape(pattern))
+            heading = '<a href="%s">%s</a>: %s' % (self.softwarelist_href(softwarelist_info['shortname']), cgi.escape(softwarelist_info['description']), cgi.escape(pattern))
+        yield htmltmpl.SOFTWARELIST_PROLOGUE.substitute(
+                assets=cgi.escape(urlparse.urljoin(self.application_uri, 'static'), True),
+                title=title,
+                heading=heading,
+                shortname=cgi.escape(softwarelist_info['shortname']),
+                total=cgi.escape('%d' % (softwarelist_info['total'], )),
+                supported=cgi.escape('%d' % (softwarelist_info['supported'], )),
+                supportedpc=cgi.escape('%.1f' % (softwarelist_info['supported'] * 100.0 / (softwarelist_info['total'] or 1), )),
+                partiallysupported=cgi.escape('%d' % (softwarelist_info['partiallysupported'], )),
+                partiallysupportedpc=cgi.escape('%.1f' % (softwarelist_info['partiallysupported'] * 100.0 / (softwarelist_info['total'] or 1), )),
+                unsupported=cgi.escape('%d' % (softwarelist_info['unsupported'], )),
+                unsupportedpc=cgi.escape('%.1f' % (softwarelist_info['unsupported'] * 100.0 / (softwarelist_info['total'] or 1), ))).encode('utf-8')
+
+        first = True
+        for machine_info in self.dbcurs.get_softwarelist_machines(softwarelist_info['id']):
+            if first:
+                yield htmltmpl.SOFTWARELIST_MACHINE_TABLE_HEADER.substitute().encode('utf-8')
+                first = False
+            yield self.machine_row(machine_info)
+        if not first:
+            yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-machines').encode('utf-8')
+
+        first = True
+        for software_info in self.dbcurs.get_softwarelist_software(softwarelist_info['id'], self.software or None):
+            if first:
+                yield htmltmpl.SOFTWARELIST_SOFTWARE_TABLE_HEADER.substitute().encode('utf-8')
+                first = False
+            yield self.software_row(software_info)
+        if first:
+            yield '<p>No software found.</p>\n'.encode('utf-8')
+        else:
+            yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-software').encode('utf-8')
+
+        yield '</body>\n</html>\n'.encode('utf-8')
+
+    def software_page(self, software_info):
+        yield htmltmpl.SOFTWARE_PROLOGUE.substitute(
+                assets=cgi.escape(urlparse.urljoin(self.application_uri, 'static'), True),
+                title=cgi.escape(software_info['description']),
+                heading=cgi.escape(software_info['description']),
+                softwarelisthref=self.softwarelist_href(self.shortname),
+                softwarelistdescription=cgi.escape(software_info['softwarelistdescription']),
+                softwarelist=cgi.escape(self.shortname),
+                shortname=cgi.escape(software_info['shortname']),
+                year=cgi.escape(software_info['year']),
+                publisher=cgi.escape(software_info['publisher'])).encode('utf-8')
+        if software_info['parent'] is not None:
+            yield ('    <tr><th>Parent:</th><td><a href="%s">%s</a></td>\n' % (self.software_href(software_info['parentsoftwarelist'], software_info['parent']), cgi.escape(software_info['parentdescription']))).encode('utf-8')
+        yield ('    <tr><th>Supported:</th><td>%s</td>\n' % (self.format_supported(software_info['supported']), )).encode('utf-8')
+        for name, value in self.dbcurs.get_software_info(software_info['id']):
+            yield ('    <tr><th>%s:</th><td>%s</td>\n' % (cgi.escape(name), cgi.escape(value))).encode('utf-8')
+        yield '</table>\n\n'.encode('utf-8')
+
+        first = True
+        for clone_info in self.dbcurs.get_software_clones(software_info['id']):
+            if first:
+                yield htmltmpl.SOFTWARE_CLONES_PROLOGUE.substitute().encode('utf-8')
+                first = False
+            yield self.clone_row(clone_info)
+        if not first:
+            yield htmltmpl.SORTABLE_TABLE_EPILOGUE.substitute(id='tbl-clones').encode('utf-8')
+
+        parts = self.dbcurs.get_software_parts(software_info['id']).fetchall()
+        first = True
+        for id, partname, interface, part_id in parts:
+            if first:
+                yield '<h2>Parts</h2>\n'.encode('utf-8')
+                first = False
+            yield htmltmpl.SOFTWARE_PART_PROLOGUE.substitute(
+                    heading=cgi.escape(('%s (%s)' % (part_id, partname)) if part_id is not None else partname),
+                    shortname=cgi.escape(partname),
+                    interface=cgi.escape(interface)).encode('utf-8')
+            for name, value in self.dbcurs.get_softwarepart_features(id):
+                yield ('    <tr><th>%s:</th><td>%s</td>\n' % (cgi.escape(name), cgi.escape(value))).encode('utf-8')
+            yield '</table>\n\n'.encode('utf-8')
+
+        yield '</body>\n</html>\n'.encode('utf-8')
+
+    def software_row(self, software_info):
+        parent = software_info['parent']
+        return htmltmpl.SOFTWARELIST_SOFTWARE_ROW.substitute(
+                softwarehref=self.software_href(self.shortname, software_info['shortname']),
+                shortname=cgi.escape(software_info['shortname']),
+                description=cgi.escape(software_info['description']),
+                year=cgi.escape(software_info['year']),
+                publisher=cgi.escape(software_info['publisher']),
+                supported=self.format_supported(software_info['supported']),
+                parts=cgi.escape('%d' % (software_info['parts'], )),
+                baddumps=cgi.escape('%d' % (software_info['baddumps'], )),
+                parent='<a href="%s">%s</a>' % (self.software_href(software_info['parentsoftwarelist'], parent), cgi.escape(parent)) if parent is not None else '').encode('utf-8')
+
+    def clone_row(self, clone_info):
+        return htmltmpl.SOFTWARE_CLONES_ROW.substitute(
+                href=self.software_href(clone_info['softwarelist'], clone_info['shortname']),
+                shortname=cgi.escape(clone_info['shortname']),
+                description=cgi.escape(clone_info['description']),
+                year=cgi.escape(clone_info['year']),
+                publisher=cgi.escape(clone_info['publisher']),
+                supported=self.format_supported(clone_info['supported'])).encode('utf-8')
+
+    def machine_row(self, machine_info):
+        return htmltmpl.SOFTWARELIST_MACHINE_TABLE_ROW.substitute(
+                machinehref=self.machine_href(machine_info['shortname']),
+                shortname=cgi.escape(machine_info['shortname']),
+                description=cgi.escape(machine_info['description']),
+                year=cgi.escape(machine_info['year'] or ''),
+                manufacturer=cgi.escape(machine_info['manufacturer'] or ''),
+                status=cgi.escape(machine_info['status'])).encode('utf-8')
+
+    @staticmethod
+    def format_supported(supported):
+        return 'Yes' if supported == 0 else 'Partial' if supported == 1 else 'No'
 
 
 class RomIdentHandler(QueryPageHandler):
@@ -528,13 +729,33 @@ class RomDumpsRpcHandler(QueryPageHandler):
             return self.error_page(500)
 
     def data_page(self, crc, sha1):
-        result = { }
+        machines = { }
         for shortname, description, label, bad in self.dbcurs.get_rom_dumps(crc, sha1):
-            machine = result.get(shortname)
+            machine = machines.get(shortname)
             if machine is None:
                 machine = { 'description': description, 'matches': [ ] }
-                result[shortname] = machine
+                machines[shortname] = machine
             machine['matches'].append({ 'name': label, 'bad': bool(bad) })
+
+        software = { }
+        for softwarelist, softwarelistdescription, shortname, description, part, part_id, label, bad in self.dbcurs.get_software_rom_dumps(crc, sha1):
+            listinfo = software.get(softwarelist)
+            if listinfo is None:
+                listinfo = { 'description': softwarelistdescription, 'software': { } }
+                software[softwarelist] = listinfo
+            softwareinfo = listinfo['software'].get(shortname)
+            if softwareinfo is None:
+                softwareinfo = { 'description': description, 'parts': { } }
+                listinfo['software'][shortname] = softwareinfo
+            partinfo = softwareinfo['parts'].get(part)
+            if partinfo is None:
+                partinfo = { 'matches': [ ] }
+                if part_id is not None:
+                    partinfo['description'] = part_id
+                softwareinfo['parts'][part] = partinfo
+            partinfo['matches'].append({ 'name': label, 'bad': bool(bad) })
+
+        result = { 'machines': machines, 'software': software }
         yield json.dumps(result).encode('utf-8')
 
 
@@ -563,13 +784,33 @@ class DiskDumpsRpcHandler(QueryPageHandler):
             return self.error_page(500)
 
     def data_page(self, sha1):
-        result = { }
+        machines = { }
         for shortname, description, label, bad in self.dbcurs.get_disk_dumps(sha1):
-            machine = result.get(shortname)
+            machine = machines.get(shortname)
             if machine is None:
                 machine = { 'description': description, 'matches': [ ] }
-                result[shortname] = machine
+                machines[shortname] = machine
             machine['matches'].append({ 'name': label, 'bad': bool(bad) })
+
+        software = { }
+        for softwarelist, softwarelistdescription, shortname, description, part, part_id, label, bad in self.dbcurs.get_software_disk_dumps(sha1):
+            listinfo = software.get(softwarelist)
+            if listinfo is None:
+                listinfo = { 'description': softwarelistdescription, 'software': { } }
+                software[softwarelist] = listinfo
+            softwareinfo = listinfo['software'].get(shortname)
+            if softwareinfo is None:
+                softwareinfo = { 'description': description, 'parts': { } }
+                listinfo['software'][shortname] = softwareinfo
+            partinfo = softwareinfo['parts'].get(part)
+            if partinfo is None:
+                partinfo = { 'matches': [ ] }
+                if part_id is not None:
+                    partinfo['description'] = part_id
+                softwareinfo['parts'][part] = partinfo
+            partinfo['matches'].append({ 'name': label, 'bad': bool(bad) })
+
+        result = { 'machines': machines, 'software': software }
         yield json.dumps(result).encode('utf-8')
 
 
@@ -598,6 +839,8 @@ class MiniMawsApp(object):
             return MachineHandler(self, application_uri, environ, start_response)
         elif module == 'sourcefile':
             return SourceFileHandler(self, application_uri, environ, start_response)
+        elif module == 'softwarelist':
+            return SoftwareListHandler(self, application_uri, environ, start_response)
         elif module == 'romident':
             return RomIdentHandler(self, application_uri, environ, start_response)
         elif module == 'static':

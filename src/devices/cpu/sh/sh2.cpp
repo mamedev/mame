@@ -269,11 +269,13 @@ sh2_device::sh2_device(const machine_config &mconfig, device_type type, const ch
 sh2a_device::sh2a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sh2_device(mconfig, SH2A, tag, owner, clock, CPU_TYPE_SH2, address_map_constructor(FUNC(sh2a_device::sh7021_map), this), 28)
 {
+	std::fill(std::begin(m_sh7021_regs), std::end(m_sh7021_regs), 0);
 }
 
 sh1_device::sh1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sh2_device(mconfig, SH1, tag, owner, clock, CPU_TYPE_SH1, address_map_constructor(FUNC(sh1_device::sh7032_map), this), 28)
 {
+	std::fill(std::begin(m_sh7032_regs), std::end(m_sh7032_regs), 0);
 }
 
 device_memory_interface::space_config_vector sh2_device::memory_space_config() const

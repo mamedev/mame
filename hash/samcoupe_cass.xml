@@ -23,8 +23,16 @@
 			</dataarea>
 		</part>
 	</software>
+	<!-- extracted from covertape of Crash magazine issue 92 (the full game was never released) -->
+	<software name="f16demo">
+		<description>F-16 Combat Pilot (Demo)</description>
+		<year>1991</year>
+		<publisher>Digital Integration</publisher>
+		<part name="cass" interface="samcoupe_cass">
+			<!-- only side/section A-2 is for the Sam Coupe, see spectrum_cass.xml for full image -->
+			<dataarea name="cass" size="91381">
+				<rom name="f-16 combat pilot (demo).tzx" size="91381" crc="91e9b7f6" sha1="2849059091d59041f13a36db0e8d5dc44020fa48"/>
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
-
-
-
-

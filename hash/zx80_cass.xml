@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- ZX80 Cassettes -->
+<!-- Sinclair ZX80 Cassettes -->
 
-<softwarelist name="zx80_cass" description="ZX80 cassettes">
+<softwarelist name="zx80_cass" description="Sinclair ZX80 cassettes">
 
 	<software name="breakout">
 		<description>1K Breakout</description>

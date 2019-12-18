@@ -114,15 +114,6 @@ void sensorboard_device::device_start()
 	m_custom_init_cb(1);
 	memcpy(m_history[0], m_curstate, m_height * m_width);
 
-	for (int i = 0; i < m_maxspawn; i++)
-	{
-		// output spawn icons (done only once)
-		if (m_custom_output_cb.isnull())
-			m_out_pui[i + 1] = i + 1;
-		else
-			m_custom_output_cb(i + 0x101, i + 1);
-	}
-
 	m_undotimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sensorboard_device::undo_tick),this));
 	m_sensortimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sensorboard_device::sensor_off),this));
 	cancel_sensor();
@@ -288,6 +279,15 @@ u16 sensorboard_device::read_rank(u8 y, bool reverse)
 void sensorboard_device::refresh()
 {
 	bool custom_out = !m_custom_output_cb.isnull();
+
+	// output spawn icons
+	for (int i = 0; i < m_maxspawn; i++)
+	{
+		if (custom_out)
+			m_custom_output_cb(i + 0x101, i + 1);
+		else
+			m_out_pui[i + 1] = i + 1;
+	}
 
 	// output hand piece
 	if (custom_out)

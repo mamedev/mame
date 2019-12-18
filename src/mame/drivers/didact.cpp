@@ -649,7 +649,6 @@ void modulab_state::machine_start()
 // This address map is traced from pcb
 void modulab_state::modulab_map(address_map &map)
 {
-	//map(0x0000, 0x007f).ram() // Schematics holds RAM enable low so that the M6802 internal RAM is disabled.
 	map(0x0000, 0x03ff).ram().mirror(0xe000); // RAM0 always present 2114
 	map(0x0400, 0x07ff).ram().mirror(0xe000); // RAM1 optional 2114
 	// map(0x0800, 0x13ff).ram().mirror(0xe000); // expansion port area consisting of 3 chip selects each selecting 0x3ff byte addresses
@@ -781,8 +780,9 @@ INPUT_CHANGED_MEMBER(didact_state::trigger_reset)
 
 void modulab_state::modulab(machine_config &config)
 {
-	M6802(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &modulab_state::modulab_map);
+	m6802_cpu_device &maincpu(M6802(config, m_maincpu, XTAL(4'000'000)));
+	maincpu.set_ram_enable(false); // Schematics holds RAM enable low so that the M6802 internal RAM is disabled.
+	maincpu.set_addrmap(AS_PROGRAM, &modulab_state::modulab_map);
 	config.set_default_layout(layout_modulab);
 
 	/* Devices */
@@ -805,8 +805,9 @@ void modulab_state::modulab(machine_config &config)
 
 void md6802_state::md6802(machine_config &config)
 {
-	M6802(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &md6802_state::md6802_map);
+	m6802_cpu_device &maincpu(M6802(config, m_maincpu, XTAL(4'000'000)));
+	maincpu.set_ram_enable(false);
+	maincpu.set_addrmap(AS_PROGRAM, &md6802_state::md6802_map);
 	config.set_default_layout(layout_md6802);
 
 	/* Devices */
