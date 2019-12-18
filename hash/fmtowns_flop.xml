@@ -51,10 +51,7 @@ Dennou Kyoushi (Cyber Teacher)                                Nikkonren Kikaku  
 Dennou Sakka DX                                               Nikkonren Kikaku                  1993/?     FD×02
 Dennou Sakka DX (Cyber Writer Deluxe)                         Nikkonren Kikaku                  1993/?     FD
 Dennou Seito (Cyber Pupil)                                    Nikkonren Kikaku                  1993/?     FD
-Dor                                                           D.O.                              1992/5     FD×04
-Dor Part 3                                                    D.O.                              1992/11    FD×04
 D-Return                                                      Nikkonren Kikaku                  1990/11    FD×02
-Elle                                                          Elf                               1991/11    FD×05
 Euphony V1.1                                                  Fujitsu                           1989/7     FD
 F-ISAM386 V1.1                                                Fujitsu                           1991/3     FD
 F-ISAM386 V3.1                                                Fujitsu                           1992/11    FD
@@ -459,6 +456,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Abunai Tengu Densetsu</description>
 		<year>1990</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
+		<info name="alt_title" value="あぶないてんぐ伝説" />
 		<info name="release" value="199004xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
@@ -485,6 +483,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Asuka 120% Burning Fest.</description>
 		<year>1994</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
+		<info name="alt_title" value="あすか 120% BURNING Fest." />
 		<info name="release" value="199403xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
@@ -511,6 +510,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Brandish</description>
 		<year>1991</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<info name="alt_title" value="ブランディッシュ" />
 		<info name="release" value="199112xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1283840">
@@ -533,8 +533,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Cameltry</description>
 		<year>1994</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
-		<info name="release" value="199411xx" />
 		<info name="alt_title" value="キャメルトライ" />
+		<info name="release" value="199411xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="3599768">
 				<rom name="cameltry.mfm" size="3599768" crc="cc2a33a3" sha1="7cdcc7cc20f3ceeaad14e4b56c285c8d2657f95a"/>
@@ -547,6 +547,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Columns</description>
 		<year>1990</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<info name="alt_title" value="コラムス" />
 		<info name="release" value="199012xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1282512">
@@ -560,11 +561,76 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Daisenryaku III '90 Map Collection Vol. 1</description>
 		<year>1992</year>
 		<publisher>ペガサスジャパン (Pegasus Japan)</publisher>
+		<info name="alt_title" value="大戦略III'90 マップコレクション Vol.1" />
 		<info name="release" value="199205xx" />
 		<info name="usage" value="Expansion disk for Daisenryaku III '90. Load the main game, insert this disk in any floppy drive, and press F1 in the map screen to select the load option." />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="daisenryaku iii '90 map collection vol. 1.hdm" size="1261568" crc="2828cff9" sha1="d62df199fbac964580aaffd392ff51ce00279395"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dor">
+		<description>DOR</description>
+		<year>1992</year>
+		<publisher>ディー・オー (D.O.)</publisher>
+		<info name="alt_title" value="ドア" />
+		<info name="release" value="199205xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dor_system_disk.hdm" size="1261568" crc="fe8fe5e9" sha1="4d8b41771f6e0c6db927e9b2b9f754abb0b40630"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Scenario Disk 1 - Planetarium" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dor_scenario1.hdm" size="1261568" crc="77840bf7" sha1="a59f9d0113276dcd1f6d920da6e3f2d2c88d3a7a"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Scenario Disk 2 - Telephone Scandal" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dor_scenario2.hdm" size="1261568" crc="54f4cc1d" sha1="a0c1eb76209bf2731b2e5a6f4cb4fd305e749351"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Scenario Disk 3 - Kanako-san no Yuuutsu" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dor_scenario3.hdm" size="1261568" crc="cff4d8a5" sha1="8729e3f468e4fec5aa40a056809513b72911f9bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dor3">
+		<description>DOR Part 3</description>
+		<year>1992</year>
+		<publisher>ディー・オー (D.O.)</publisher>
+		<info name="alt_title" value="ドア ～ＰＡＲＴ３～" />
+		<info name="release" value="199211xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dor_part3_system_disk.hdm" size="1261568" crc="6c9299ea" sha1="dfc078468168e9d66ee17a1696cf8cdf4063ee9c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Scenario Disk 1 - 5-ji kara 9-ji made" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dor_part3_scenario1.hdm" size="1261568" crc="14902af2" sha1="008e6f35ffc982f21aee785e759f5c9dd2cdd5b8"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Scenario Disk 2 - Ashita e no Touhikou" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dor_part3_scenario2.hdm" size="1261568" crc="9c020322" sha1="45d6ceb7e946a30283ededb0a43ebfbda49d85ef"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Scenario Disk 3 - Nakahara-kun no Himitsu" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dor_part3_scenario3.hdm" size="1261568" crc="e0fcbd2b" sha1="97fe50ba75ad82cda6776957e0adb157c3ef760e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -687,6 +753,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Dinosaur</description>
 		<year>1991</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<info name="alt_title" value="ダイナソア" />
+		<info name="release" value="199110xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1261568">
@@ -801,10 +869,49 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<software name="elle">
+		<description>Elle</description>
+		<year>1991</year>
+		<publisher>エルフ (Elf)</publisher>
+		<info name="alt_title" value="エル" />
+		<info name="release" value="199111xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="elle_disk_a.hdm" size="1261568" crc="0c51b3d5" sha1="86b4c7a99eab58aaa0de6cd3a9be7b38bcb71e1a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="elle_disk_b.hdm" size="1261568" crc="51f89d02" sha1="b28957925eaf83ed1ae34d47b7b2901105486ec1"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="elle_disk_c.hdm" size="1261568" crc="ffce2739" sha1="0bd349b377fdf6acfdbfa81727fdd21226b1b60a"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size="1261568">
+				<rom name="elle_disk_d.hdm" size="1261568" crc="366a37b5" sha1="a62f90d370a671c3aef5343a7c720c03910746cf"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk E" />
+			<dataarea name="flop" size="1261568">
+				<rom name="elle_disk_e.hdm" size="1261568" crc="b8cf0367" sha1="011efbade6a0244606f0bb8cf7b44ae76485df34"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="futoph02">
 		<description>Futoppara FD Heisei #02</description>
 		<year>199?</year>
 		<publisher>SoftBank</publisher>
+		<info name="alt_title" value="太っ腹FD平成2号" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="futoppara fd heisei #02.hdm" size="1261568" crc="cca4f1ae" sha1="7d73d7e2f6174f09273c7b38218294ce32380fb9"/>
@@ -816,6 +923,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Futoppara FD Heisei #03</description>
 		<year>199?</year>
 		<publisher>SoftBank</publisher>
+		<info name="alt_title" value="太っ腹FD平成3号" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="futoppara fd heisei #03.hdm" size="1261568" crc="1009e7c2" sha1="2f3af3115de077a0a69dc045085851d9001814a8"/>
@@ -827,6 +935,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Futoppara FD Heisei #04</description>
 		<year>199?</year>
 		<publisher>SoftBank</publisher>
+		<info name="alt_title" value="太っ腹FD平成4号" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="futoppara fd heisei #04.hdm" size="1261568" crc="75ceb8be" sha1="0650754491576875b02e07b573c4a5a06e275ba5"/>
@@ -838,6 +947,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Futoppara FD Heisei #05</description>
 		<year>199?</year>
 		<publisher>SoftBank</publisher>
+		<info name="alt_title" value="太っ腹FD平成5号" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="futoppara fd heisei #05.hdm" size="1261568" crc="bb41215a" sha1="655f955ad7ee44dc1035c238f8e17b91a34b6bc6"/>
@@ -849,6 +959,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Futoppara FD Heisei #06</description>
 		<year>199?</year>
 		<publisher>SoftBank</publisher>
+		<info name="alt_title" value="太っ腹FD平成6号" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="futoppara fd heisei #06.hdm" size="1261568" crc="14bdb0d5" sha1="d6f32df1be6fa3aaa54ec3209af84d4a430ff5cb"/>
@@ -860,6 +971,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Futoppara FD Heisei #07</description>
 		<year>199?</year>
 		<publisher>SoftBank</publisher>
+		<info name="alt_title" value="太っ腹FD平成7号" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="futoppara fd heisei #07.hdm" size="1261568" crc="91d8bc3f" sha1="54eef9754dec15b4ede6a4f16fe2c15eb101255c"/>
@@ -871,6 +983,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Futoppara FD Heisei #08</description>
 		<year>199?</year>
 		<publisher>SoftBank</publisher>
+		<info name="alt_title" value="太っ腹FD平成8号" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="futoppara fd heisei #08.hdm" size="1261568" crc="f8061488" sha1="fbe9fa3a916b38154ddae4576993855354120ee6"/>
@@ -882,6 +995,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Futoppara FD Heisei #09</description>
 		<year>199?</year>
 		<publisher>SoftBank</publisher>
+		<info name="alt_title" value="太っ腹FD平成9号" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="futoppara fd heisei #09.hdm" size="1261568" crc="8d917956" sha1="10560f07227a6ce945b27deac9a86df96fef0edd"/>
@@ -893,6 +1007,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Futoppara FD Heisei #10</description>
 		<year>199?</year>
 		<publisher>SoftBank</publisher>
+		<info name="alt_title" value="太っ腹FD平成10号" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="futoppara fd heisei #10.hdm" size="1261568" crc="ae02ab66" sha1="39a2921484d1f6b141fe43af046003593b07cf0d"/>
@@ -904,6 +1019,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Houma Hunter Lime Vol. 01</description>
 		<year>1993</year>
 		<publisher>タケル (Takeru)</publisher>
+		<info name="alt_title" value="宝魔ハンターライム Vol. 01" />
 		<info name="release" value="199305xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
@@ -921,6 +1037,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Houma Hunter Lime Vol. 02</description>
 		<year>1993</year>
 		<publisher>タケル (Takeru)</publisher>
+		<info name="alt_title" value="宝魔ハンターライム Vol. 02" />
 		<info name="release" value="199306xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
@@ -938,6 +1055,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Houma Hunter Lime Vol. 03</description>
 		<year>1993</year>
 		<publisher>タケル (Takeru)</publisher>
+		<info name="alt_title" value="宝魔ハンターライム Vol. 03" />
 		<info name="release" value="199308xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
@@ -955,6 +1073,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Houma Hunter Lime Vol. 04</description>
 		<year>1993</year>
 		<publisher>タケル (Takeru)</publisher>
+		<info name="alt_title" value="宝魔ハンターライム Vol. 04" />
 		<info name="release" value="199309xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
@@ -972,6 +1091,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Houma Hunter Lime Vol. 05</description>
 		<year>1993</year>
 		<publisher>タケル (Takeru)</publisher>
+		<info name="alt_title" value="宝魔ハンターライム Vol. 05" />
 		<info name="release" value="199310xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
@@ -989,6 +1109,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Houma Hunter Lime Vol. 06</description>
 		<year>1993</year>
 		<publisher>タケル (Takeru)</publisher>
+		<info name="alt_title" value="宝魔ハンターライム Vol. 06" />
 		<info name="release" value="199311xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
@@ -1006,6 +1127,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Houma Hunter Lime Vol. 07</description>
 		<year>1993</year>
 		<publisher>タケル (Takeru)</publisher>
+		<info name="alt_title" value="宝魔ハンターライム Vol. 07" />
 		<info name="release" value="199312xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
@@ -1028,6 +1150,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Houma Hunter Lime Vol. 08</description>
 		<year>1994</year>
 		<publisher>タケル (Takeru)</publisher>
+		<info name="alt_title" value="宝魔ハンターライム Vol. 08" />
 		<info name="release" value="199401xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
@@ -1050,6 +1173,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Houma Hunter Lime Vol. 09</description>
 		<year>1994</year>
 		<publisher>タケル (Takeru)</publisher>
+		<info name="alt_title" value="宝魔ハンターライム Vol. 09" />
 		<info name="release" value="199402xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
@@ -1072,6 +1196,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Houma Hunter Lime Vol. 10</description>
 		<year>1994</year>
 		<publisher>タケル (Takeru)</publisher>
+		<info name="alt_title" value="宝魔ハンターライム Vol. 10" />
 		<info name="release" value="199403xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
@@ -1094,6 +1219,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Houma Hunter Lime Vol. 11</description>
 		<year>1994</year>
 		<publisher>タケル (Takeru)</publisher>
+		<info name="alt_title" value="宝魔ハンターライム Vol. 11" />
 		<info name="release" value="199404xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
@@ -1116,6 +1242,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Houma Hunter Lime Vol. 12</description>
 		<year>1994</year>
 		<publisher>タケル (Takeru)</publisher>
+		<info name="alt_title" value="宝魔ハンターライム Vol. 12" />
 		<info name="release" value="199405xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
@@ -1160,6 +1287,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Irium</description>
 		<year>1993</year>
 		<publisher>オレンジハウス (Orange House)</publisher>
+		<info name="alt_title" value="イリウム" />
 		<info name="release" value="199306xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
@@ -1197,6 +1325,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Kawarazaki-ke no Ichizoku</description>
 		<year>1993</year>
 		<publisher>シルキーズ (Silky's)</publisher>
+		<info name="alt_title" value="河原崎家の一族" />
 		<info name="release" value="199312xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
@@ -1237,6 +1366,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Illusion City - Gen'ei Toshi</description>
 		<year>1993</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
+		<info name="alt_title" value="幻影都市" />
 		<info name="release" value="199303xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -1316,6 +1446,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Premium 2</description>
 		<year>1993</year>
 		<publisher>シルキーズ (Silky's)</publisher>
+		<info name="alt_title" value="プレミアム２" />
 		<info name="release" value="199301xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
@@ -1344,6 +1475,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Rance - Hikari o Motomete</description>
 		<year>1990</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
+		<info name="alt_title" value="ランス 光をもとめて" />
 		<info name="release" value="199003xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
@@ -1372,6 +1504,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Rance 2 - Hangyaku no Shoujotachi</description>
 		<year>1990</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
+		<info name="alt_title" value="ランス２ 反逆の少女たち" />
 		<info name="release" value="199006xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
@@ -1415,6 +1548,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Reira</description>
 		<year>1994</year>
 		<publisher>シルキーズ (Silky's)</publisher>
+		<info name="alt_title" value="レイラ" />
 		<info name="release" value="199407xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
@@ -1458,6 +1592,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Reira (Alt Disk 1)</description>
 		<year>1994</year>
 		<publisher>シルキーズ (Silky's)</publisher>
+		<info name="alt_title" value="レイラ" />
 		<info name="release" value="199407xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
@@ -1501,6 +1636,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Shougi Seiten</description>
 		<year>1992</year>
 		<publisher>ホームデータ (Home Data)</publisher>
+		<info name="alt_title" value="将棋・聖天" />
 		<info name="release" value="199204xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
@@ -1526,6 +1662,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Soreyuke Nanpa-kun</description>
 		<year>1991</year>
 		<publisher>ヴァージンハウス (Virgin House)</publisher>
+		<info name="alt_title" value="そけゆけナンパくん" />
 		<info name="release" value="199108xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
@@ -1594,6 +1731,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Sweet Angel</description>
 		<year>1992</year>
 		<publisher>アクティブ (Active)</publisher>
+		<info name="alt_title" value="スウィート・エンジェル" />
 		<info name="release" value="199211xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
@@ -1626,6 +1764,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Toushin Toshi</description>
 		<year>1991</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
+		<info name="alt_title" value="闘神都市" />
+		<info name="release" value="199012xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="toushin toshi (disk 1).hdm" size="1261568" crc="a003c2f4" sha1="cc0f908542051f011d9f620ed9cb9632c60a46f1"/>
@@ -1668,6 +1808,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Toushin Toshi (Alt Disk 2)</description>
 		<year>1991</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
+		<info name="alt_title" value="闘神都市" />
+		<info name="release" value="199012xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="toushin toshi (disk 1).hdm" size="1261568" crc="a003c2f4" sha1="cc0f908542051f011d9f620ed9cb9632c60a46f1"/>
@@ -1709,6 +1851,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Ushinawareta Rakuen</description>
 		<year>1995</year>
 		<publisher>シルキーズ (Silky's)</publisher>
+		<info name="alt_title" value="失われた楽園" />
 		<info name="release" value="199504xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
@@ -1774,6 +1917,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Wrestle Angels</description>
 		<year>1993</year>
 		<publisher>グレイト (Great)</publisher>
+		<info name="alt_title" value="レッスル エンジェルス" />
 		<info name="release" value="199306xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
@@ -1805,6 +1949,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Wrestle Angels 2</description>
 		<year>1993</year>
 		<publisher>グレイト (Great)</publisher>
+		<info name="alt_title" value="レッスル エンジェルス 2" />
 		<info name="release" value="199310xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
@@ -1842,6 +1987,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<description>Wrestle Angels 2 (Alt)</description>
 		<year>1993</year>
 		<publisher>グレイト (Great)</publisher>
+		<info name="alt_title" value="レッスル エンジェルス 2" />
 		<info name="release" value="199310xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />

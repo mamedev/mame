@@ -1,14 +1,11 @@
 local datfile = {}
 local db = require("data/database")
 
-function datfile.open(file, vertag, fixupcb)
-	if not db then
-		return nil
-	end
+local function readret(file)
 	local function read(tag1, tag2, set)
 		local data
 		local stmt = db.prepare("SELECT f.data FROM \"" .. file .. "_idx\" AS fi, \"" .. file .. [["
-		 AS f WHERE fi.type = ? AND fi.val = ? AND fi.romset = ? AND f.rowid = fi.data]])
+		AS f WHERE fi.type = ? AND fi.val = ? AND fi.romset = ? AND f.rowid = fi.data]])
 		db.check("reading " .. tag1 .. " - " .. tag2 .. " - " .. set)
 		stmt:bind_values(tag1, tag2, set)
 		if stmt:step() == db.ROW then
@@ -17,7 +14,14 @@ function datfile.open(file, vertag, fixupcb)
 		stmt:finalize()
 		return data
 	end
+	return read
+end
 
+
+function datfile.open(file, vertag, fixupcb)
+	if not db then
+		return nil
+	end
 	local ver, dbver
 	local filepath
 	local fh
@@ -42,7 +46,7 @@ function datfile.open(file, vertag, fixupcb)
 
 	if not fh and dbver then
 		-- data in database but missing file, just use what we have
-		return read, dbver
+		return readret(file), dbver
 	elseif not fh then
 		return nil
 	elseif not dbver then
@@ -60,7 +64,7 @@ function datfile.open(file, vertag, fixupcb)
 
 	if vertag then
 		for line in fh:lines() do
-			local match = line:match(vertag .. "%s*([^%s]+)")
+			local match = line:match(vertag .. "%s*(%S+)")
 			if match then
 				ver = match
 				break
@@ -73,7 +77,7 @@ function datfile.open(file, vertag, fixupcb)
 	end
 	if ver == dbver then
 		fh:close()
-		return read, dbver
+		return readret(file), dbver
 	end
 
 	if dbver then
@@ -92,7 +96,6 @@ function datfile.open(file, vertag, fixupcb)
 	stmt:finalize()
 
 	do
-		local inblock = false
 		fh:seek("set")
 		local buffer = fh:read("a")
 		db.exec("BEGIN TRANSACTION")
@@ -100,61 +103,63 @@ function datfile.open(file, vertag, fixupcb)
 		local function gmatchpos()
 			local pos = 1
 			local function iter()
-				local tag1, tag2, data, start, inblock = false
+				local tags, data
 				while not data do
-					local spos, epos, match = buffer:find("\n($[^\n\r]*)", pos)
+					local npos
+					local spos, epos = buffer:find("[\n\r]$[^=]*=[^\n\r]*", pos)
 					if not spos then
 						return nil
 					end
-					if match ~= "$end" and not inblock then
-						if not tag1 then
-							tag1 = match
-						else
-							tag2 = match
-							start = epos + 1
-							inblock = true
-						end
-					elseif inblock == true then
-						data = buffer:sub(start, spos)
-						inblock = false
+					npos, epos = buffer:find("[\n\r]$%w*[\n\r]+", epos)
+					if not npos then
+						return nil
 					end
-					pos = epos
+					tags = buffer:sub(spos, epos)
+					spos, npos = buffer:find("[\n\r]$end[\n\r]", epos)
+					if not spos then
+						return nil
+					end
+					data = buffer:sub(epos, spos)
+					pos = npos
 				end
-				return tag1, tag2, data
+				return tags, data
 			end
 			return iter
 		end
-		for info1, info2, data in gmatchpos() do
-			local tag, set = info1:match("^%$([^%s=]+)=?([^%s]*)")
-			if set and set ~= "" then
-				local tags = {}
-				local sets = {}
-				tag:gsub("([^,]+)", function(s) tags[#tags + 1] = s end)
-				set:gsub("([^,]+)", function(s) sets[#sets + 1] = s end)
-				if #tags > 0 and #sets > 0 then
-					local tag1 = info2:match("^$([^%s]*)")
-					data = data:gsub("\r", "") -- strip crs
-					if fixupcb then
-						data = fixupcb(data)
-					end
-					stmt = db.prepare("INSERT INTO \"" .. file .. "\" VALUES (?)")
-					db.check("inserting values")
-					stmt:bind_values(data)
-					stmt:step()
-					local row = stmt:last_insert_rowid()
-					stmt:finalize()
-					for num1, tag2 in pairs(tags) do
-						for num2, set in pairs(sets) do
-							if fixupcb then
-								fixupcb(data)
-							end
-							stmt = db.prepare("INSERT INTO \"" .. file .. "_idx\" VALUES (?, ?, ?, ?)")
-							db.check("inserting into index")
-							stmt:bind_values(tag1, tag2, set, row)
-							stmt:step()
-							stmt:finalize()
+		for info, data in gmatchpos() do
+			local tags = {}
+			local infotype
+			for s in info:gmatch("[\n\r]$([^\n\r]*)") do
+				if s:find("=", 1, true) then
+					local m1, m2 = s:match("([^=]*)=(.*)")
+					for tag in m1:gmatch("[^,]+") do
+						for set in m2:gmatch("[^,]+") do
+							tags[#tags + 1] = { tag = tag, set = set }
 						end
 					end
+				else
+					infotype = s
+					break
+				end
+			end
+
+			if #tags > 0 and infotype then
+				data = data:gsub("\r", "") -- strip crs
+				if fixupcb then
+					data = fixupcb(data)
+				end
+				stmt = db.prepare("INSERT INTO \"" .. file .. "\" VALUES (?)")
+				db.check("inserting values")
+				stmt:bind_values(data)
+				stmt:step()
+				local row = stmt:last_insert_rowid()
+				stmt:finalize()
+				for num, tag in pairs(tags) do
+					stmt = db.prepare("INSERT INTO \"" .. file .. "_idx\" VALUES (?, ?, ?, ?)")
+					db.check("inserting into index")
+					stmt:bind_values(infotype, tag.tag, tag.set, row)
+					stmt:step()
+					stmt:finalize()
 				end
 			end
 		end
@@ -163,7 +168,7 @@ function datfile.open(file, vertag, fixupcb)
 	end
 	fh:close()
 
-	return read, ver
+	return readret(file), ver
 end
 
 return datfile

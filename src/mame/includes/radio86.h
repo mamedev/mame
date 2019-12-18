@@ -44,7 +44,6 @@ public:
 	{ }
 
 	uint8_t m_tape_value;
-	uint8_t m_mikrosha_font_page;
 	int m_keyboard_mask;
 	std::unique_ptr<uint8_t[]> m_radio_ram_disk;
 	uint8_t m_romdisk_lsb;
@@ -68,7 +67,6 @@ public:
 	uint8_t radio86ram_romdisk_porta_r();
 	void radio86_romdisk_portb_w(uint8_t data);
 	void radio86_romdisk_portc_w(uint8_t data);
-	void mikrosha_8255_font_page_w(uint8_t data);
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);

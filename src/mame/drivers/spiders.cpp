@@ -399,7 +399,6 @@ void spiders_state::spiders_main_map(address_map &map)
 
 void spiders_state::spiders_audio_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();
 	map(0x0080, 0x0083).rw("pia4", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xf800, 0xffff).rom();
 }

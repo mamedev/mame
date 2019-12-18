@@ -654,6 +654,9 @@ ROM_START(sorcerer2)
 	ROM_SYSTEM_BIOS(5, "tvc", "TVI-MON-C-V1.5") // unknown disk support
 	ROMX_LOAD("tvc-1.1e",    0xe000, 0x0800, CRC(efc15a18) SHA1(3dee821270a0d83453b18baed88a024dfd0d7a6c), ROM_BIOS(5) )
 	ROMX_LOAD("tvc-2.2e",    0xe800, 0x0800, CRC(bc194487) SHA1(dcfd916558e3e3be22091c5558ea633c332cf6c7), ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS(6, "sm658", "Standard Monitor 658 ver 1.3C")
+	ROMX_LOAD("13c.1e",      0xe000, 0x0800, CRC(c3c56505) SHA1(6b88f9911b897825b10f8184ddf27af5d8cbdc4d), ROM_BIOS(6) )
+	ROMX_LOAD("13c.2e",      0xe800, 0x0800, CRC(e1ac92a8) SHA1(302096c500cc87f0441f000a01b5ddfa3c102662), ROM_BIOS(6) )
 ROM_END
 
 ROM_START(sorcerera)

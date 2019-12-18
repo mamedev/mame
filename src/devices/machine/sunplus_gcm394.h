@@ -22,7 +22,12 @@ class sunplus_gcm394_base_device : public unsp_20_device, public device_mixer_in
 {
 public:
 	sunplus_gcm394_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
-		unsp_20_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(sunplus_gcm394_base_device::internal_map), this)),
+		sunplus_gcm394_base_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(sunplus_gcm394_base_device::gcm394_internal_map), this))
+	{
+	}
+
+	sunplus_gcm394_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock, address_map_constructor internal) :
+		unsp_20_device(mconfig, type, tag, owner, clock, internal),
 		device_mixer_interface(mconfig, *this, 2),
 		m_screen(*this, finder_base::DUMMY_TAG),
 		m_spg_video(*this, "spgvideo"),
@@ -59,7 +64,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	void internal_map(address_map &map);
+	void gcm394_internal_map(address_map &map);
 
 	required_device<screen_device> m_screen;
 	required_device<gcm394_video_device> m_spg_video;
@@ -181,8 +186,8 @@ private:
 	DECLARE_READ16_MEMBER(unkarea_782d_r);
 	DECLARE_WRITE16_MEMBER(unkarea_782d_w);
 
-	DECLARE_READ16_MEMBER(ioport_a_r);
-	DECLARE_WRITE16_MEMBER(ioport_a_w);
+	DECLARE_READ16_MEMBER(ioarea_7860_porta_r);
+	DECLARE_WRITE16_MEMBER(ioarea_7860_porta_w);
 
 	DECLARE_READ16_MEMBER(unkarea_7861_r);
 
@@ -191,8 +196,8 @@ private:
 	DECLARE_READ16_MEMBER(unkarea_7863_r);
 	DECLARE_WRITE16_MEMBER(unkarea_7863_w);
 
-	DECLARE_READ16_MEMBER(unkarea_7870_r);
-	DECLARE_WRITE16_MEMBER(unkarea_7870_w);
+	DECLARE_READ16_MEMBER(ioarea_7870_portb_r);
+	DECLARE_WRITE16_MEMBER(ioarea_7870_portb_w);
 
 	DECLARE_READ16_MEMBER(unkarea_7871_r);
 
@@ -260,8 +265,8 @@ class sunplus_gcm394_device : public sunplus_gcm394_base_device
 {
 public:
 	template <typename T>
-	sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag)
-		: sunplus_gcm394_device(mconfig, tag, owner, clock)
+	sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag) :
+		sunplus_gcm394_device(mconfig, tag, owner, clock)
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
 	}
@@ -270,6 +275,32 @@ public:
 };
 
 
+class generalplus_gpac800_device : public sunplus_gcm394_base_device
+{
+public:
+	template <typename T>
+	generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag) :
+		generalplus_gpac800_device(mconfig, tag, owner, clock)
+	{
+		m_screen.set_tag(std::forward<T>(screen_tag));
+		m_testval = 0;
+	}
+
+	generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	void gpac800_internal_map(address_map &map);
+
+private:
+	DECLARE_READ16_MEMBER(unkarea_7850_r);
+	DECLARE_READ16_MEMBER(unkarea_7854_r);
+
+	int m_testval;
+};
+
+
+
 DECLARE_DEVICE_TYPE(GCM394, sunplus_gcm394_device)
+DECLARE_DEVICE_TYPE(GPAC800, generalplus_gpac800_device)
 
 #endif // MAME_MACHINE_SUNPLUS_GCM394_H

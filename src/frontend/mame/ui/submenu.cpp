@@ -43,6 +43,7 @@ std::vector<submenu::option> const submenu::advanced_options = {
 	{ submenu::option_type::EMU,  __("Sleep"),                                   OPTION_SLEEP },
 	{ submenu::option_type::EMU,  __("Speed"),                                   OPTION_SPEED },
 	{ submenu::option_type::EMU,  __("Refresh speed"),                           OPTION_REFRESHSPEED },
+	{ submenu::option_type::EMU,  __("Low latency"),                             OPTION_LOWLATENCY },
 
 	{ submenu::option_type::HEAD, __("Rotation Options") },
 	{ submenu::option_type::EMU,  __("Rotate"),                                  OPTION_ROTATE },

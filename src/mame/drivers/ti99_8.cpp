@@ -723,7 +723,7 @@ void ti99_8_state::ti99_8(machine_config& config)
 	RAM(config, TI998_DRAM_TAG).set_default_size("64K").set_default_value(0);
 
 	// Software list
-	SOFTWARE_LIST(config, "cart_list_ti99").set_type("ti99_cart", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cart_list_ti99").set_original("ti99_cart");
 
 	// I/O port
 	TI99_IOPORT(config, m_ioport, 0, ti99_ioport_options_plain, nullptr);

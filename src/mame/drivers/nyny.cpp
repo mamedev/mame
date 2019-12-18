@@ -452,7 +452,6 @@ void nyny_state::nyny_main_map(address_map &map)
 void nyny_state::nyny_audio_1_map(address_map &map)
 {
 	map.global_mask(0x7fff);
-	map(0x0000, 0x007f).ram();     /* internal RAM */
 	map(0x0080, 0x0fff).noprw();
 	map(0x1000, 0x1000).mirror(0x0fff).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(nyny_state::audio_1_answer_w));
 	map(0x2000, 0x2000).mirror(0x0fff).portr("SW3");
@@ -470,7 +469,6 @@ void nyny_state::nyny_audio_1_map(address_map &map)
 void nyny_state::nyny_audio_2_map(address_map &map)
 {
 	map.global_mask(0x7fff);
-	map(0x0000, 0x007f).ram();     /* internal RAM */
 	map(0x0080, 0x0fff).noprw();
 	map(0x1000, 0x1000).mirror(0x0fff).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
 	map(0x2000, 0x2000).mirror(0x0ffe).r("ay3", FUNC(ay8910_device::data_r));

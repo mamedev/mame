@@ -154,9 +154,9 @@ private:
 	required_device<m6803_cpu_device> m_fddcpu;
 	required_device<rs232_port_device> m_fdd_serial;
 	std::deque<int> m_fdd_debug_rx_bits;
-	size_t m_fdd_debug_rx_bit_count;
-	size_t m_fdd_debug_rx_byte_count;
-	size_t m_fdd_debug_rx_recv_count;
+	uint32_t m_fdd_debug_rx_bit_count;
+	uint32_t m_fdd_debug_rx_byte_count;
+	uint32_t m_fdd_debug_rx_recv_count;
 	uint8_t m_fdd_ctrl;
 	uint8_t m_fdd_port1;
 	uint8_t m_fdd_track;

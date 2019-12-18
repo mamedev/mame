@@ -88,6 +88,7 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "bus/a2bus/ssbapple.h"
 #include "bus/a2bus/4play.h"
 #include "bus/a2bus/computereyes2.h"
+#include "bus/a2bus/transwarp.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -745,7 +746,7 @@ READ8_MEMBER(apple2_state::inh_r)
 
 WRITE8_MEMBER(apple2_state::inh_w)
 {
-	if (m_inh_slot != -1)
+	if ((m_inh_slot != -1) && (m_slotdevice[m_inh_slot] != nullptr))
 	{
 		m_slotdevice[m_inh_slot]->write_inh_rom(offset + 0xd000, data);
 	}
@@ -962,7 +963,7 @@ static const uint8_t a2_key_remap[0x32][4] =
 	{ 0x38,0x28,0x38,0x28 },    /* 8 (     05     */
 	{ 0x39,0x29,0x39,0x29 },    /* 9 )     06     */
 	{ 0x30,0x30,0x30,0x30 },    /* 0       07     */
-	{ 0x3a,0x2a,0x3b,0x2a },    /* : *     08     */
+	{ 0x3a,0x2a,0x3a,0x2a },    /* : *     08     */
 	{ 0x2d,0x3d,0x2d,0x3d },    /* - =     09     */
 	{ 0x51,0x51,0x11,0x11 },    /* q Q     0a     */
 	{ 0x57,0x57,0x17,0x17 },    /* w W     0b     */
@@ -1000,9 +1001,9 @@ static const uint8_t a2_key_remap[0x32][4] =
 	{ 0x1b,0x1b,0x1b,0x1b },    /* Escape  2b     */
 	{ 0x41,0x41,0x01,0x01 },    /* a A     2c     */
 	{ 0x20,0x20,0x20,0x20 },    /* Space   2d     */
-	{ 0x00,0x00,0x00,0x00 },    /* 0x2e unused    */
-	{ 0x00,0x00,0x00,0x00 },    /* 0x2f unused    */
-	{ 0x00,0x00,0x00,0x00 },    /* 0x30 unused    */
+	{ 0x00,0x00,0x20,0x00 },    /* 0x2e unused    */
+	{ 0x00,0x00,0x20,0x00 },    /* 0x2f unused    */
+	{ 0x00,0x00,0x20,0x00 },    /* 0x30 unused    */
 	{ 0x0d,0x0d,0x0d,0x0d },    /* Enter   31     */
 };
 
@@ -1264,6 +1265,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("ssbapple", A2BUS_SSBAPPLE);  /* SSB Apple speech board */
 	device.option_add("4play", A2BUS_4PLAY); /* 4Play Joystick Card (Rev. B) */
 	device.option_add("ceyes2", A2BUS_COMPUTEREYES2); /* ComputerEyes/2 Video Digitizer */
+	device.option_add("twarp", A2BUS_TRANSWARP);    /* AE TransWarp accelerator */
 //  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);    /* Magic Musician Card */
 }
 
@@ -1413,7 +1415,10 @@ ROM_START(apple2) /* the classic, non-autoboot apple2 with integer basic in rom.
 	ROM_LOAD ( "341-0001-00.e0", 0x2000, 0x0800, CRC(c0a4ad3b) SHA1(bf32195efcb34b694c893c2d342321ec3a24b98f)) /* Needs verification. From eBay: Label: S7925E // C48077 // 3410001-00 // (C)APPLE78 E0 */
 	ROM_LOAD ( "341-0002-00.e8", 0x2800, 0x0800, CRC(a99c2cf6) SHA1(9767d92d04fc65c626223f25564cca31f5248980)) /* Needs verification. From eBay: Label: S7916E // C48078 // 3410002-00 // (C)APPLE78 E8 */
 	ROM_LOAD ( "341-0003-00.f0", 0x3000, 0x0800, CRC(62230d38) SHA1(f268022da555e4c809ca1ae9e5d2f00b388ff61c)) /* Needs verification. From eBay: Label: S7908E // C48709 // 3410003 // CAPPLE78 F0 */
-	ROM_LOAD ( "341-0004-00.f8", 0x3800, 0x0800, CRC(020a86d0) SHA1(52a18bd578a4694420009cad7a7a5779a8c00226))
+	ROM_SYSTEM_BIOS(0, "default", "Original Monitor")
+	ROMX_LOAD ( "341-0004-00.f8", 0x3800, 0x0800, CRC(020a86d0) SHA1(52a18bd578a4694420009cad7a7a5779a8c00226), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "autostart", "Autostart Monitor")
+	ROMX_LOAD ( "341-0020-00.f8", 0x3800, 0x0800, CRC(079589c4) SHA1(a28852ff997b4790e53d8d0352112c4b1a395098), ROM_BIOS(1)) /* 341-0020-00: Autostart Monitor/Applesoft Basic $f800; Was sometimes mounted on Language card; Label(from Apple Language Card - Front.jpg): S 8115 // C68018 // 341-0020-00 */
 	ROM_END
 
 ROM_START(apple2p) /* the autoboot apple2+ with applesoft (microsoft-written) basic in rom; optional card with monitor and integer basic was possible but isn't yet supported */

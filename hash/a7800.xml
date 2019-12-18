@@ -1565,7 +1565,6 @@ almost nothing like the prototype.
 		<publisher>Atari / Electronic Arts</publisher>
 		<info name="serial" value="CX7824"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
@@ -1579,7 +1578,6 @@ almost nothing like the prototype.
 		<year>1987</year>
 		<publisher>Atari / Electronic Arts</publisher>
 		<info name="serial" value="CX7824"/>
-		<sharedfeat name="compatibility" value="PAL"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />

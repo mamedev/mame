@@ -47,7 +47,7 @@ void eurit_state::eurit30(machine_config &config)
 
 
 ROM_START(eurit30)
-	ROM_REGION16_LE(0x20000, "firmware", 0)
+	ROM_REGION16_LE(0x20000, "firmware", 0) // Firmware 2.210 deutsch
 	ROM_LOAD("d_2.210", 0x00000, 0x20000, CRC(c77be0ac) SHA1(1eaba66dcb4f64cc33565ca85de25341572ddb2e))
 ROM_END
 

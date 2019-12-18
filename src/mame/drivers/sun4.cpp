@@ -554,6 +554,8 @@ protected:
 	DECLARE_WRITE32_MEMBER( debugger_w );
 
 	DECLARE_READ32_MEMBER( sl0_id );
+	DECLARE_READ32_MEMBER( async_timeout_r );
+	DECLARE_WRITE32_MEMBER( async_timeout_w );
 	DECLARE_READ32_MEMBER( timer_r );
 	DECLARE_WRITE32_MEMBER( timer_w );
 	DECLARE_READ8_MEMBER( irq_r );
@@ -709,10 +711,12 @@ void sun4_base_state::debugger_map(address_map &map)
 
 void sun4_base_state::type1space_base_map(address_map &map)
 {
+	map(0x00000000, 0xffffffff).rw(m_mmu, FUNC(sun4_mmu_base_device::type1_timeout_r), FUNC(sun4_mmu_base_device::type1_timeout_w));
 	map(0x00000000, 0x0000000f).rw(m_scc1, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff00ff00);
 	map(0x01000000, 0x0100000f).rw(m_scc2, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff00ff00);
 	map(0x02000000, 0x020007ff).rw(m_timekpr, FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
 	map(0x03000000, 0x0300000f).rw(FUNC(sun4_base_state::timer_r), FUNC(sun4_base_state::timer_w)).mirror(0xfffff0);
+	map(0x04000000, 0x04000007).rw(m_mmu, FUNC(sun4_mmu_base_device::parity_r), FUNC(sun4_mmu_base_device::parity_w));
 	map(0x05000000, 0x05000003).rw(FUNC(sun4_base_state::irq_r), FUNC(sun4_base_state::irq_w));
 	map(0x06000000, 0x0607ffff).rom().region("user1", 0);
 	map(0x07200000, 0x07200007).rw(FUNC(sun4_base_state::fdc_r), FUNC(sun4_base_state::fdc_w));

@@ -52,27 +52,25 @@ void hd63450_device::device_start()
 
 	// Initialise timers and registers
 	for (int x = 0; x < 4; x++)
-	{
 		m_timer[x] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hd63450_device::dma_transfer_timer), this));
 
-		save_item(NAME(m_reg[x].csr), x);
-		save_item(NAME(m_reg[x].cer), x);
-		save_item(NAME(m_reg[x].dcr), x);
-		save_item(NAME(m_reg[x].ocr), x);
-		save_item(NAME(m_reg[x].scr), x);
-		save_item(NAME(m_reg[x].ccr), x);
-		save_item(NAME(m_reg[x].mtc), x);
-		save_item(NAME(m_reg[x].mar), x);
-		save_item(NAME(m_reg[x].dar), x);
-		save_item(NAME(m_reg[x].btc), x);
-		save_item(NAME(m_reg[x].niv), x);
-		save_item(NAME(m_reg[x].eiv), x);
-		save_item(NAME(m_reg[x].mfc), x);
-		save_item(NAME(m_reg[x].cpr), x);
-		save_item(NAME(m_reg[x].dfc), x);
-		save_item(NAME(m_reg[x].bfc), x);
-		save_item(NAME(m_reg[x].gcr), x);
-	}
+	save_item(STRUCT_MEMBER(m_reg, csr));
+	save_item(STRUCT_MEMBER(m_reg, cer));
+	save_item(STRUCT_MEMBER(m_reg, dcr));
+	save_item(STRUCT_MEMBER(m_reg, ocr));
+	save_item(STRUCT_MEMBER(m_reg, scr));
+	save_item(STRUCT_MEMBER(m_reg, ccr));
+	save_item(STRUCT_MEMBER(m_reg, mtc));
+	save_item(STRUCT_MEMBER(m_reg, mar));
+	save_item(STRUCT_MEMBER(m_reg, dar));
+	save_item(STRUCT_MEMBER(m_reg, btc));
+	save_item(STRUCT_MEMBER(m_reg, niv));
+	save_item(STRUCT_MEMBER(m_reg, eiv));
+	save_item(STRUCT_MEMBER(m_reg, mfc));
+	save_item(STRUCT_MEMBER(m_reg, cpr));
+	save_item(STRUCT_MEMBER(m_reg, dfc));
+	save_item(STRUCT_MEMBER(m_reg, bfc));
+	save_item(STRUCT_MEMBER(m_reg, gcr));
 
 	save_item(NAME(m_transfer_size));
 	save_item(NAME(m_halted));

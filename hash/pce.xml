@@ -3241,6 +3241,21 @@
 		</part>
 	</software>
 
+  <!-- later revision, password parser bugfix for passwords with 8 lives -->
+  <software name="rtypep21" cloneof="rtypep2">
+		<description>R-Type Part-2 (Alt)</description>
+		<year>1988</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="HC63009"/>
+		<info name="release" value="19880603"/>
+		<info name="alt_title" value="アールタイプ II"/>
+		<part name="cart" interface="pce_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="r-type part-2 (japan) [a].pce" size="262144" crc="417b961d" sha1="198eb4e62a1a0e591c1505ef188e74eff8415e0a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rabiolep">
 		<description>Rabio Lepus Special</description>
 		<year>1990</year>

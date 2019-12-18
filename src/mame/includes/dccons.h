@@ -50,7 +50,9 @@ public:
 //  DECLARE_WRITE8_MEMBER( dc_flash_w );
 
 	static void gdrom_config(device_t *device);
+	void dc_base(machine_config &config);
 	void dc(machine_config &config);
+	void dc_fish(machine_config &config);
 	void aica_map(address_map &map);
 	void dc_audio_map(address_map &map);
 	void dc_map(address_map &map);

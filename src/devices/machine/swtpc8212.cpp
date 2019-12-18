@@ -421,7 +421,6 @@ void swtpc8212_device::device_reset()
 
 void swtpc8212_device::mem_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();
 	map(0x0080, 0x0083).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0088, 0x0088).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0089, 0x0089).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));

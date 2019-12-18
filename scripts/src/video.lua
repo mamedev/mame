@@ -353,6 +353,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/hd61603.h,VIDEOS["HD61603"] = true
+--------------------------------------------------
+
+if (VIDEOS["HD61603"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/hd61603.cpp",
+		MAME_DIR .. "src/devices/video/hd61603.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/hd61830.h,VIDEOS["HD61830"] = true
 --------------------------------------------------
 
@@ -540,6 +552,18 @@ if (VIDEOS["IMS_CVC"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/ims_cvc.cpp",
 		MAME_DIR .. "src/devices/video/ims_cvc.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/lc7582.h,VIDEOS["LC7582"] = true
+--------------------------------------------------
+
+if (VIDEOS["LC7582"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/lc7582.cpp",
+		MAME_DIR .. "src/devices/video/lc7582.h",
 	}
 end
 

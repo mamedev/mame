@@ -233,7 +233,7 @@ void snes_ppu_device::device_start()
 		}
 	}
 
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < ARRAY_LENGTH(m_scanlines); i++)
 	{
 		save_item(NAME(m_scanlines[i].enable), i);
 		save_item(NAME(m_scanlines[i].clip), i);
@@ -243,33 +243,30 @@ void snes_ppu_device::device_start()
 		save_item(NAME(m_scanlines[i].blend_exception), i);
 	}
 
-	for (int i = 0; i < 6; i++)
-	{
-		save_item(NAME(m_layer[i].window1_enabled), i);
-		save_item(NAME(m_layer[i].window1_invert), i);
-		save_item(NAME(m_layer[i].window2_enabled), i);
-		save_item(NAME(m_layer[i].window2_invert), i);
-		save_item(NAME(m_layer[i].wlog_mask), i);
-		save_item(NAME(m_layer[i].color_math), i);
-		save_item(NAME(m_layer[i].charmap), i);
-		save_item(NAME(m_layer[i].tilemap), i);
-		save_item(NAME(m_layer[i].tilemap_size), i);
-		save_item(NAME(m_layer[i].tile_size), i);
-		save_item(NAME(m_layer[i].tile_mode), i);
-		save_item(NAME(m_layer[i].mosaic_enabled), i);
-		save_item(NAME(m_layer[i].main_window_enabled), i);
-		save_item(NAME(m_layer[i].sub_window_enabled), i);
-		save_item(NAME(m_layer[i].main_bg_enabled), i);
-		save_item(NAME(m_layer[i].sub_bg_enabled), i);
-		save_item(NAME(m_layer[i].hoffs), i);
-		save_item(NAME(m_layer[i].voffs), i);
-		save_item(NAME(m_layer[i].priority[0]), i);
-		save_item(NAME(m_layer[i].priority[1]), i);
-		save_item(NAME(m_layer[i].mosaic_counter), i);
-		save_item(NAME(m_layer[i].mosaic_offset), i);
+	save_item(STRUCT_MEMBER(m_layer, window1_enabled));
+	save_item(STRUCT_MEMBER(m_layer, window1_invert));
+	save_item(STRUCT_MEMBER(m_layer, window2_enabled));
+	save_item(STRUCT_MEMBER(m_layer, window2_invert));
+	save_item(STRUCT_MEMBER(m_layer, wlog_mask));
+	save_item(STRUCT_MEMBER(m_layer, color_math));
+	save_item(STRUCT_MEMBER(m_layer, charmap));
+	save_item(STRUCT_MEMBER(m_layer, tilemap));
+	save_item(STRUCT_MEMBER(m_layer, tilemap_size));
+	save_item(STRUCT_MEMBER(m_layer, tile_size));
+	save_item(STRUCT_MEMBER(m_layer, tile_mode));
+	save_item(STRUCT_MEMBER(m_layer, mosaic_enabled));
+	save_item(STRUCT_MEMBER(m_layer, main_window_enabled));
+	save_item(STRUCT_MEMBER(m_layer, sub_window_enabled));
+	save_item(STRUCT_MEMBER(m_layer, main_bg_enabled));
+	save_item(STRUCT_MEMBER(m_layer, sub_bg_enabled));
+	save_item(STRUCT_MEMBER(m_layer, hoffs));
+	save_item(STRUCT_MEMBER(m_layer, voffs));
+	save_item(STRUCT_MEMBER(m_layer, priority));
+	save_item(STRUCT_MEMBER(m_layer, mosaic_counter));
+	save_item(STRUCT_MEMBER(m_layer, mosaic_offset));
 
+	for (int i = 0; i < ARRAY_LENGTH(m_clipmasks); i++)
 		save_item(NAME(m_clipmasks[i]), i);
-	}
 
 	save_item(NAME(m_oam.address));
 	save_item(NAME(m_oam.base_address));
@@ -281,10 +278,7 @@ void snes_ppu_device::device_start()
 	save_item(NAME(m_oam.write_latch));
 	save_item(NAME(m_oam.data_latch));
 	save_item(NAME(m_oam.interlace));
-	save_item(NAME(m_oam.priority[0]));
-	save_item(NAME(m_oam.priority[1]));
-	save_item(NAME(m_oam.priority[2]));
-	save_item(NAME(m_oam.priority[3]));
+	save_item(NAME(m_oam.priority));
 
 	save_item(NAME(m_beam.latch_horz));
 	save_item(NAME(m_beam.latch_vert));
@@ -305,18 +299,15 @@ void snes_ppu_device::device_start()
 	save_item(NAME(m_mode7.ver_offset));
 	save_item(NAME(m_mode7.extbg));
 
-	for (int i = 0; i < ARRAY_LENGTH(m_objects); i++)
-	{
-		save_item(NAME(m_objects[i].x), i);
-		save_item(NAME(m_objects[i].y), i);
-		save_item(NAME(m_objects[i].character), i);
-		save_item(NAME(m_objects[i].name_select), i);
-		save_item(NAME(m_objects[i].vflip), i);
-		save_item(NAME(m_objects[i].hflip), i);
-		save_item(NAME(m_objects[i].pri), i);
-		save_item(NAME(m_objects[i].pal), i);
-		save_item(NAME(m_objects[i].size), i);
-	}
+	save_item(STRUCT_MEMBER(m_objects, x));
+	save_item(STRUCT_MEMBER(m_objects, y));
+	save_item(STRUCT_MEMBER(m_objects, character));
+	save_item(STRUCT_MEMBER(m_objects, name_select));
+	save_item(STRUCT_MEMBER(m_objects, vflip));
+	save_item(STRUCT_MEMBER(m_objects, hflip));
+	save_item(STRUCT_MEMBER(m_objects, pri));
+	save_item(STRUCT_MEMBER(m_objects, pal));
+	save_item(STRUCT_MEMBER(m_objects, size));
 
 	save_item(NAME(m_mosaic_size));
 	save_item(NAME(m_clip_to_black));

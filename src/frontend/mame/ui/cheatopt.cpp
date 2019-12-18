@@ -121,10 +121,7 @@ void menu_cheat::populate(float &customtop, float &custombottom)
 	std::string text;
 	std::string subtext;
 
-	/* add a separator */
-	item_append(menu_item_type::SEPARATOR);
-
-	// add other cheats
+	// add cheats
 	if (!mame_machine_manager::instance()->cheat().entries().empty()) {
 		for (auto &curcheat : mame_machine_manager::instance()->cheat().entries())
 		{

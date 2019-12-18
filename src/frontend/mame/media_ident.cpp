@@ -332,73 +332,61 @@ void media_identifier::digest_data(std::vector<file_info> &info, char const *nam
 
 void media_identifier::match_hashes(std::vector<file_info> &info)
 {
-	std::unordered_set<std::string> listnames;
-
-	// iterate over drivers
-	m_drivlist.reset();
-	while (m_drivlist.next())
-	{
-		// iterate over regions and files within the region
-		device_t &device = m_drivlist.config()->root_device();
-		for (romload::region const &region : romload::entries(device.rom_region()).get_regions())
-		{
-			for (romload::file const &rom : region.get_files())
+	auto match_device =
+			[&info, listnames = std::unordered_set<std::string>()] (device_t &device) mutable
 			{
-				util::hash_collection const romhashes(rom.get_hashdata());
-				if (!romhashes.flag(util::hash_collection::FLAG_NO_DUMP))
+				// iterate over regions and files within the region
+				for (romload::region const &region : romload::entries(device.rom_region()).get_regions())
 				{
-					for (file_info &file : info)
-						file.match(device, rom, romhashes);
-				}
-			}
-		}
-
-		// next iterate over softlists
-		for (software_list_device &swlistdev : software_list_device_iterator(device))
-		{
-			if (listnames.insert(swlistdev.list_name()).second)
-			{
-				for (software_info const &swinfo : swlistdev.get_info())
-				{
-					for (software_part const &part : swinfo.parts())
+					for (romload::file const &rom : region.get_files())
 					{
-						for (rom_entry const *region = part.romdata().data(); region; region = rom_next_region(region))
+						util::hash_collection const romhashes(rom.get_hashdata());
+						if (!romhashes.flag(util::hash_collection::FLAG_NO_DUMP))
 						{
-							for (rom_entry const *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+							for (file_info &file : info)
+								file.match(device, rom, romhashes);
+						}
+					}
+				}
+
+				// next iterate over softlists
+				for (software_list_device &swlistdev : software_list_device_iterator(device))
+				{
+					if (!listnames.insert(swlistdev.list_name()).second)
+						continue;
+
+					for (software_info const &swinfo : swlistdev.get_info())
+					{
+						for (software_part const &part : swinfo.parts())
+						{
+							for (rom_entry const *region = part.romdata().data(); region; region = rom_next_region(region))
 							{
-								util::hash_collection romhashes(ROM_GETHASHDATA(rom));
-								if (!romhashes.flag(util::hash_collection::FLAG_NO_DUMP))
+								for (rom_entry const *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 								{
-									for (file_info &file : info)
-										file.match(swlistdev.list_name(), swinfo, *rom, romhashes);
+									util::hash_collection romhashes(ROM_GETHASHDATA(rom));
+									if (!romhashes.flag(util::hash_collection::FLAG_NO_DUMP))
+									{
+										for (file_info &file : info)
+											file.match(swlistdev.list_name(), swinfo, *rom, romhashes);
+									}
 								}
 							}
 						}
 					}
 				}
-			}
-		}
-	}
+			};
 
-	// iterator over devices
+	// iterate over drivers
+	m_drivlist.reset();
+	while (m_drivlist.next())
+		match_device(m_drivlist.config()->root_device());
+
+	// iterator over registered device types
 	machine_config config(GAME_NAME(___empty), m_drivlist.options());
 	machine_config::token const tok(config.begin_configuration(config.root_device()));
 	for (device_type type : registered_device_types)
 	{
-		// iterate over regions and files within the region
-		device_t *const device = config.device_add("_tmp", type, 0);
-		for (romload::region const &region : romload::entries(device->rom_region()).get_regions())
-		{
-			for (romload::file const &rom : region.get_files())
-			{
-				util::hash_collection const romhashes(rom.get_hashdata());
-				if (!romhashes.flag(util::hash_collection::FLAG_NO_DUMP))
-				{
-					for (file_info &file : info)
-						file.match(*device, rom, romhashes);
-				}
-			}
-		}
+		match_device(*config.device_add("_tmp", type, 0));
 		config.device_remove("_tmp");
 	}
 }

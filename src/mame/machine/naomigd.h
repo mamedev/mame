@@ -6,6 +6,7 @@
 #pragma once
 
 #include "machine/naomibd.h"
+#include "cpu/pic16c62x/pic16c62x.h"
 
 
 class naomi_gdrom_board : public naomi_board
@@ -30,6 +31,9 @@ public:
 
 	naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual void device_add_mconfig(machine_config &config) override;
+	void sh4_map(address_map &map);
+
 	void set_image_tag(const char *_image_tag)
 	{
 		image_tag = _image_tag;
@@ -49,6 +53,9 @@ protected:
 
 private:
 	enum { FILENAME_LENGTH=24 };
+
+	required_device<sh4_device> m_maincpu;
+	required_device<pic16c621a_device> m_securitycpu;
 
 	const char *image_tag;
 	optional_region_ptr<uint8_t> picdata;

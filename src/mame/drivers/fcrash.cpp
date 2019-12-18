@@ -1352,8 +1352,6 @@ void fcrash_state::fcrash_render_layer( screen_device &screen, bitmap_ind16 &bit
 
 void fcrash_state::fcrash_render_high_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer )
 {
-	bitmap_ind16 dummy_bitmap;
-
 	switch (layer)
 	{
 		case 0:
@@ -1362,7 +1360,7 @@ void fcrash_state::fcrash_render_high_layer( screen_device &screen, bitmap_ind16
 		case 1:
 		case 2:
 		case 3:
-			m_bg_tilemap[layer - 1]->draw(screen, dummy_bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
+			m_bg_tilemap[layer - 1]->draw(screen, m_dummy_bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
 			break;
 	}
 }
@@ -1901,9 +1899,9 @@ ROM_END
 GAME( 1990, cawingbl,   cawing,  cawingbl,  cawingbl,  fcrash_state,  init_cawingbl,  ROT0,    "bootleg",  "Carrier Air Wing (bootleg with 2xYM2203 + 2xMSM5205, set 1)",  MACHINE_SUPPORTS_SAVE ) // 901012 ETC
 GAME( 1990, cawingb2,   cawing,  cawingbl,  cawingbl,  fcrash_state,  init_cawingbl,  ROT0,    "bootleg",  "Carrier Air Wing (bootleg with 2xYM2203 + 2xMSM5205, set 2)",  MACHINE_SUPPORTS_SAVE ) // 901012 ETC
 
-GAME( 1990, fcrash,     ffight,  fcrash,    fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg (Playmark)",  "Final Crash (bootleg of Final Fight)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ffightbl,   ffight,  fcrash,    fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg",  "Final Fight (bootleg)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ffightbla,  ffight,  fcrash,    fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg",  "Final Fight (bootleg on Final Crash PCB)",  MACHINE_SUPPORTS_SAVE ) // same as Final Crash without the modified graphics
+GAME( 1990, fcrash,     ffight,  fcrash,    fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg (Playmark)",  "Final Crash (bootleg of Final Fight)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ffightbl,   ffight,  fcrash,    fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg",  "Final Fight (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ffightbla,  ffight,  fcrash,    fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg",  "Final Fight (bootleg on Final Crash PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // same as Final Crash without the modified graphics
 
 GAME( 1991, kodb,       kod,     kodb,      kodb,      fcrash_state,  init_kodb,      ROT0,    "bootleg (Playmark)",  "The King of Dragons (bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 910731  "ETC"
 

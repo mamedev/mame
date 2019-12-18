@@ -208,6 +208,10 @@ void gal3_state::video_start()
 
 uint32_t gal3_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(0xff, cliprect); // TODO : actually laserdisc layer
+	screen.priority().fill(0, cliprect);
+	m_c355spr[0]->get_sprites(); // TODO : buffered?
+
 	int i;
 	char mst[18], slv[18];
 	static int pivot = 15;
@@ -258,6 +262,10 @@ uint32_t gal3_state::screen_update_left(screen_device &screen, bitmap_ind16 &bit
 
 uint32_t gal3_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(0xff, cliprect); // TODO : actually laserdisc layer
+	screen.priority().fill(0, cliprect);
+	m_c355spr[1]->get_sprites(); // TODO : buffered?
+
 	static int pivot = 15;
 	int pri;
 
@@ -629,6 +637,7 @@ void gal3_state::gal3(machine_config &config)
 	m_c355spr[0]->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
 	m_c355spr[0]->set_palxor(0xf); // reverse mapping
 	m_c355spr[0]->set_color_base(0x1000); // TODO : verify palette offset
+	m_c355spr[0]->set_external_prifill(true);
 
 	NAMCOS21_3D(config, m_namcos21_3d[0], 0);
 	m_namcos21_3d[0]->set_zz_shift_mult(11, 0x200);
@@ -658,6 +667,7 @@ void gal3_state::gal3(machine_config &config)
 	m_c355spr[1]->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
 	m_c355spr[1]->set_palxor(0xf); // reverse mapping
 	m_c355spr[1]->set_color_base(0x1000); // TODO : verify palette offset
+	m_c355spr[1]->set_external_prifill(true);
 
 	NAMCOS21_3D(config, m_namcos21_3d[1], 0);
 	m_namcos21_3d[1]->set_zz_shift_mult(11, 0x200);

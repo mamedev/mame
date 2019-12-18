@@ -803,7 +803,6 @@ void atarisy1_state::atarisy1(machine_config &config)
 void atarisy1_state::marble(machine_config &config)
 {
 	atarisy1(config);
-	add_adc(config);
 	SLAPSTIC(config, "slapstic", 103, true);
 }
 

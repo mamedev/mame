@@ -54,7 +54,7 @@ DEFINE_DEVICE_TYPE(R3071,       r3071_device,     "r3071",   "IDT R3071")
 DEFINE_DEVICE_TYPE(R3081,       r3081_device,     "r3081",   "IDT R3081")
 DEFINE_DEVICE_TYPE(SONYPS2_IOP, iop_device,       "sonyiop", "Sony Playstation 2 IOP")
 
-ALLOW_SAVE_TYPE(mips1core_device_base::branch_state_t);
+ALLOW_SAVE_TYPE(mips1core_device_base::branch_state);
 
 mips1core_device_base::mips1core_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size)
 	: cpu_device(mconfig, type, tag, owner, clock)
@@ -183,6 +183,10 @@ void mips1core_device_base::device_start()
 
 	// initialise cpu id register
 	m_cop0[COP0_PRId] = m_cpurev;
+
+	m_cop0[COP0_Cause] = 0;
+
+	m_r[0] = 0;
 }
 
 void r3041_device::device_start()
@@ -195,6 +199,10 @@ void r3041_device::device_start()
 	state_add(MIPS1_COP0 + COP0_Count,    "Count", m_cop0[COP0_Count]);
 	state_add(MIPS1_COP0 + COP0_PortSize, "PortSize", m_cop0[COP0_PortSize]);
 	state_add(MIPS1_COP0 + COP0_Compare,  "Compare", m_cop0[COP0_Compare]);
+
+	m_cop0[COP0_BusCtrl] = 0x20130b00U;
+	m_cop0[COP0_Config] = 0x40000000U;
+	m_cop0[COP0_PortSize] = 0;
 }
 
 void mips1core_device_base::device_reset()
@@ -208,6 +216,14 @@ void mips1core_device_base::device_reset()
 
 	m_data_spacenum = 0;
 	m_bus_error = false;
+}
+
+void r3041_device::device_reset()
+{
+	mips1core_device_base::device_reset();
+
+	m_cop0[COP0_Count] = 0;
+	m_cop0[COP0_Compare] = 0x00ffffffU;
 }
 
 void mips1core_device_base::execute_run()

@@ -59,6 +59,11 @@ public:
 	template <insn_data_mode MODE> uint32_t insn_data_r(const uint32_t offset, const uint32_t mem_mask);
 	template <insn_data_mode MODE> void insn_data_w(const uint32_t offset, const uint32_t data, const uint32_t mem_mask);
 
+	uint32_t type1_timeout_r(uint32_t offset);
+	void type1_timeout_w(uint32_t offset, uint32_t data);
+	uint32_t parity_r(uint32_t offset, uint32_t mem_mask);
+	void parity_w(uint32_t offset, uint32_t data, uint32_t mem_mask);
+
 	// sparc_mmu_device overrides
 	uint32_t fetch_insn(const bool supervisor, const uint32_t offset) override;
 	uint32_t read_asi(uint8_t asi, uint32_t offset, uint32_t mem_mask) override;
@@ -67,6 +72,19 @@ public:
 
 protected:
 	sun4_mmu_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	struct page_entry
+	{
+		uint32_t valid;
+		uint32_t writable;
+		uint32_t supervisor;
+		uint32_t uncached;
+		uint32_t accessed;
+		uint32_t modified;
+		uint32_t page;
+		uint8_t type;
+		uint8_t pad[3];
+	};
 
 	static const device_timer_id TIMER_RESET = 0;
 
@@ -77,8 +95,10 @@ protected:
 	uint32_t page_entry_to_uint(uint32_t index);
 	void merge_page_entry(uint32_t index, uint32_t data, uint32_t mem_mask);
 
-	uint32_t cache_flush_r();
-	void cache_flush_w();
+	bool cache_fetch(page_entry &entry, uint32_t vaddr, uint32_t paddr, uint32_t &cached_data);
+	void segment_flush_w(const uint32_t vaddr);
+	void context_flush_w(const uint32_t vaddr);
+	void page_flush_w(const uint32_t vaddr);
 	uint32_t system_r(const uint32_t offset, const uint32_t mem_mask);
 	void system_w(const uint32_t offset, const uint32_t data, const uint32_t mem_mask);
 	uint32_t segment_map_r(const uint32_t offset, const uint32_t mem_mask);
@@ -108,19 +128,6 @@ protected:
 		PM_MODIFIED     = 0x01000000     // modified flag
 	};
 
-	struct page_entry
-	{
-		uint32_t valid;
-		uint32_t writable;
-		uint32_t supervisor;
-		uint32_t uncached;
-		uint32_t accessed;
-		uint32_t modified;
-		uint32_t page;
-		uint8_t type;
-		uint8_t pad[3];
-	};
-
 	required_device<cpu_device> m_cpu;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
@@ -147,7 +154,11 @@ protected:
 	uint32_t m_cache_context;
 	uint8_t m_system_enable;
 	bool m_fetch_bootrom;
-	uint32_t m_buserr[4];
+	uint32_t m_buserr[16];
+	uint32_t m_type1_offset;
+	uint32_t m_parity_err_reg;
+	uint32_t m_memory_err_reg;
+	uint32_t m_parity_err;
 
 	// Pre-computed data for optimization purposes
 	std::unique_ptr<std::unique_ptr<uint32_t[]>[]> m_segmap_masked;
@@ -163,10 +174,12 @@ protected:
 	uint32_t m_seg_entry_mask;
 	uint32_t m_page_entry_mask;
 	uint32_t m_cache_mask;
+	uint32_t m_cache_tag_mask;
 	uint32_t m_ram_set_mask[4]; // Used for mirroring within 4 megabyte sets
 	uint32_t m_ram_set_base[4];
 	uint32_t m_populated_ram_words;
 	emu_timer *m_reset_timer;
+	bool m_log_mem;
 };
 
 class sun4_mmu_device : public sun4_mmu_base_device

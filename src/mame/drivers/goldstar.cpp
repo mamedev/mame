@@ -733,13 +733,13 @@ void goldstar_state::wcherry_map(address_map &map)
 	map(0xf660, 0xf660).nopw();    //.w(FUNC(goldstar_state::output_w));  // unknown register: 0x3e
 	map(0xf670, 0xf670).w("snsnd", FUNC(sn76489_device::write));    /* guess... device is initialized, but doesn't seems to be used.*/
 
-	map(0xf800, 0xffff).ram();
+	map(0xfc00, 0xffff).rom();
 }
 
 void goldstar_state::wcherry_readwriteport(address_map &map)
 {
 	map.global_mask(0xff);
-	}
+}
 
 /* wcherry findings...
 

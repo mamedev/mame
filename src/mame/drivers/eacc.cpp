@@ -85,7 +85,7 @@ private:
 	bool m_nmi;
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
-	required_device<cpu_device> m_maincpu;
+	required_device<m6802_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
 	required_shared_ptr<uint8_t> m_p_nvram;
 	output_finder<7> m_digits;
@@ -249,6 +249,7 @@ void eacc_state::eacc(machine_config &config)
 {
 	/* basic machine hardware */
 	M6802(config, m_maincpu, XTAL(3'579'545));  /* Divided by 4 inside the m6802*/
+	m_maincpu->set_ram_enable(false); // FIXME: needs standby support
 	m_maincpu->set_addrmap(AS_PROGRAM, &eacc_state::eacc_mem);
 
 	config.set_default_layout(layout_eacc);

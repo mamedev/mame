@@ -1401,8 +1401,8 @@ void mac128_state::mac512ke(machine_config &config)
 	MACPDS_SLOT(config, "pds", "macpds", mac_pds_cards, nullptr);
 
 	// software list
-	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
-	SOFTWARE_LIST(config, "hdd_list").set_type("mac_hdd", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
+	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 }
 
 void mac128_state::mac128k(machine_config &config)

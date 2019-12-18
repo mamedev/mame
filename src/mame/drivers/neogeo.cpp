@@ -2009,7 +2009,7 @@ void mvs_led_state::mv1(machine_config &config)
 
 	cartslot_config(config, 1);
 
-	SOFTWARE_LIST(config, "cart_list").set_type("neogeo", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cart_list").set_original("neogeo");
 }
 
 void mvs_led_state::mv1f(machine_config &config)
@@ -2024,7 +2024,7 @@ void mvs_led_state::mv1f(machine_config &config)
 
 	cartslot_config(config, 1);
 
-	SOFTWARE_LIST(config, "cart_list").set_type("neogeo", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cart_list").set_original("neogeo");
 }
 
 void mvs_state::mv1fz(machine_config &config)
@@ -2036,7 +2036,7 @@ void mvs_state::mv1fz(machine_config &config)
 
 	cartslot_config(config, 1);
 
-	SOFTWARE_LIST(config, "cart_list").set_type("neogeo", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cart_list").set_original("neogeo");
 }
 
 void mvs_led_el_state::mv2f(machine_config &config)
@@ -2053,7 +2053,7 @@ void mvs_led_el_state::mv2f(machine_config &config)
 
 	cartslot_config(config, 2);
 
-	SOFTWARE_LIST(config, "cart_list").set_type("neogeo", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cart_list").set_original("neogeo");
 }
 
 void mvs_led_el_state::mv4f(machine_config &config)
@@ -2070,7 +2070,7 @@ void mvs_led_el_state::mv4f(machine_config &config)
 
 	cartslot_config(config, 4);
 
-	SOFTWARE_LIST(config, "cart_list").set_type("neogeo", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cart_list").set_original("neogeo");
 }
 
 void mvs_led_el_state::mv6f(machine_config &config)
@@ -2087,7 +2087,7 @@ void mvs_led_el_state::mv6f(machine_config &config)
 
 	cartslot_config(config, 6);
 
-	SOFTWARE_LIST(config, "cart_list").set_type("neogeo", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cart_list").set_original("neogeo");
 }
 
 void mvs_led_state::mv1_fixed(machine_config &config)
@@ -2146,7 +2146,7 @@ void aes_state::aes(machine_config &config)
 	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_controls, "joy", false);
 	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_controls, "joy", false);
 
-	SOFTWARE_LIST(config, "cart_list").set_type("neogeo", SOFTWARE_LIST_ORIGINAL_SYSTEM).set_filter("AES");
+	SOFTWARE_LIST(config, "cart_list").set_original("neogeo").set_filter("AES");
 }
 
 

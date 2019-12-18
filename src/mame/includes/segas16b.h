@@ -44,7 +44,6 @@ public:
 		, m_ym2151(*this, "ym2151")
 		, m_ym2413(*this, "ym2413")
 		, m_upd7759(*this, "upd")
-		, m_dac(*this, "dac")
 		, m_multiplier(*this, "multiplier")
 		, m_cmptimer_1(*this, "cmptimer_1")
 		, m_cmptimer_2(*this, "cmptimer_2")
@@ -97,7 +96,6 @@ public:
 	void system16b_fd1094(machine_config &config);
 	void fpointbl(machine_config &config);
 	void lockonph(machine_config &config);
-	void dfjail(machine_config &config);
 
 	// ROM board-specific driver init
 	void init_generic_5521();
@@ -154,13 +152,6 @@ protected:
 	DECLARE_READ8_MEMBER( upd7759_status_r );
 	DECLARE_WRITE16_MEMBER( sound_w16 );
 
-	// dfjail
-	DECLARE_WRITE8_MEMBER( dfjail_sound_control_w );
-	DECLARE_WRITE8_MEMBER( dfjail_dac_data_w );
-	INTERRUPT_GEN_MEMBER( dfjail_soundirq_cb );
-	bool m_dfjail_nmi_enable;
-	uint16_t m_dfjail_dac_data;
-
 	// other callbacks
 	DECLARE_WRITE_LINE_MEMBER(upd7759_generate_nmi);
 	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
@@ -181,7 +172,6 @@ protected:
 	void fpointbl_map(address_map &map);
 	void fpointbl_sound_map(address_map &map);
 	void lockonph_map(address_map &map);
-	void dfjail_map(address_map &map);
 	void lockonph_sound_iomap(address_map &map);
 	void lockonph_sound_map(address_map &map);
 	void map_fpointbla(address_map &map);
@@ -191,7 +181,6 @@ protected:
 	void sound_portmap(address_map &map);
 	void bootleg_sound_map(address_map &map);
 	void bootleg_sound_portmap(address_map &map);
-	void dfjail_sound_iomap(address_map &map);
 	void system16b_bootleg_map(address_map &map);
 	void system16b_map(address_map &map);
 	void system16c_map(address_map &map);
@@ -252,7 +241,6 @@ protected:
 	optional_device<ym2151_device> m_ym2151;
 	optional_device<ym2413_device> m_ym2413;
 	optional_device<upd7759_device> m_upd7759;
-	optional_device<dac_word_interface> m_dac; // dfjail
 	optional_device<sega_315_5248_multiplier_device> m_multiplier;
 	optional_device<sega_315_5250_compare_timer_device> m_cmptimer_1;
 	optional_device<sega_315_5250_compare_timer_device> m_cmptimer_2;
@@ -296,14 +284,43 @@ protected:
 	output_finder<2> m_lamps;
 };
 
+class dfjail_state : public segas16b_state
+{
+public:
+	// construction/destruction
+	dfjail_state(const machine_config &mconfig, device_type type, const char *tag)
+		: segas16b_state(mconfig, type, tag)
+		, m_nmi_enable(false)
+		, m_dac_data(0)
+		, m_dac(*this, "dac")
+	{ }
+
+	void dfjail(machine_config &config);
+
+protected:
+	DECLARE_WRITE8_MEMBER( sound_control_w );
+	DECLARE_WRITE8_MEMBER( dac_data_w );
+	INTERRUPT_GEN_MEMBER( soundirq_cb );
+	bool m_nmi_enable;
+	uint16_t m_dac_data;
+
+	void dfjail_map(address_map &map);
+	void dfjail_sound_iomap(address_map &map);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	required_device<dac_word_interface> m_dac;
+};
+
 class afighter_16b_analog_state : public segas16b_state
 {
 public:
 	// construction/destruction
 	afighter_16b_analog_state(const machine_config &mconfig, device_type type, const char *tag)
-		: segas16b_state(mconfig, type, tag),
-			m_accel(*this, "ACCEL"),
-			m_steer(*this, "STEER")
+		: segas16b_state(mconfig, type, tag)
+		, m_accel(*this, "ACCEL")
+		, m_steer(*this, "STEER")
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(afighter_accel_r);
@@ -323,20 +340,20 @@ class isgsm_state : public segas16b_state
 public:
 	// construction/destruction
 	isgsm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: segas16b_state(mconfig, type, tag),
-			m_read_xor(0),
-			m_cart_addrlatch(0),
-			m_cart_addr(0),
-			m_data_type(0),
-			m_data_addr(0),
-			m_data_mode(0),
-			m_addr_latch(0),
-			m_security_value(0),
-			m_security_latch(0),
-			m_rle_control_position(8),
-			m_rle_control_byte(0),
-			m_rle_latched(false),
-			m_rle_byte(0)
+		: segas16b_state(mconfig, type, tag)
+		, m_read_xor(0)
+		, m_cart_addrlatch(0)
+		, m_cart_addr(0)
+		, m_data_type(0)
+		, m_data_addr(0)
+		, m_data_mode(0)
+		, m_addr_latch(0)
+		, m_security_value(0)
+		, m_security_latch(0)
+		, m_rle_control_position(8)
+		, m_rle_control_byte(0)
+		, m_rle_latched(false)
+		, m_rle_byte(0)
 	{ }
 
 	void isgsm(machine_config &config);
@@ -367,6 +384,7 @@ private:
 	uint32_t tetrbx_security(uint32_t input);
 
 	// driver overrides
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	// configuration

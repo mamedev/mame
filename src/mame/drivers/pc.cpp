@@ -1394,6 +1394,34 @@ ROM_START( coppc400 )
 	ROM_LOAD("f800ffff.rom", 0x8000, 0x8000, CRC(3d9b6594) SHA1(41f85e692e2020326fd580f7c436c23c76840119))
 ROM_END
 
+/************************************************************ Thomson TO16 ***
+Form factor: Desktop
+CPU: 8088 9.54MHz / 4.77MHz, FPU socket provided
+RAM: 512KB-768KB
+ROM: 32KB ROM BIOS, 16KB character generator (not dumped)
+On board video: Plantronics Colorplus (MDA/Hercules/CGA/Plantronics), EGA card (GB100) on XPHD
+On board: RS232C, parallel
+Mass storage: 1x5.25" DS/DD (TO16PCDD / TO16 XP), additional 20MB HDD (TO16 XP HD)
+Options: Modem (TO16 PCM, ISA card)
+ISA8: 2 (PC, PCM), 4 (XPDD, XPHD)
+RTC: on XPDD and XPHD
+
+*****************************************************************************/
+
+ROM_START( to16 )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("to16_103.bin", 0x8000, 0x8000, CRC(a2d55e16) SHA1(fcc61bbfe49164c4b79c368fb782d1ecc17e0a42))
+ROM_END
+
+/********************************************************** Sanyo SPC-400D ***
+ROM BIOS Version 1.18
+*****************************************************************************/
+
+ROM_START( spc400d )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("fb896.u6", 0xc000, 0x4000, CRC(a6f3ad8c) SHA1(1ee012f9a1757eb68150fedc9db16ff356722f72))
+ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -1435,9 +1463,11 @@ COMP( 198?, nms9100,        ibm5150, 0,      pccga,          pccga,    pc_state,
 COMP( 1989, ssam88s,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Samsung",                         "Samtron 88S",           MACHINE_NOT_WORKING )
 COMP( 1988, sx16,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sanyo",                           "SX-16",                 MACHINE_NOT_WORKING )
 COMP( 198?, mbc16,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sanyo",                           "MBC-16",                MACHINE_NOT_WORKING )
+COMP( 198?, spc400d,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sanyo",                           "SPC-400D",              MACHINE_NOT_WORKING )
 COMP( 1992, iskr3104,       ibm5150, 0,      iskr3104,       pccga,    pc_state, empty_init,    "Schetmash",                       "Iskra 3104",            MACHINE_NOT_WORKING )
 COMP( 1985, sicpc1605,      ibm5150, 0,      siemens,        pccga,    pc_state, empty_init,    "Siemens",                         "Sicomp PC16-05",        MACHINE_NOT_WORKING )
 COMP( 1985, pc7000,         ibm5150, 0,      eagle1600,      pccga,    pc_state, empty_init,    "Sharp",                           "PC-7000",               MACHINE_NOT_WORKING )
+COMP( 1987, to16,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Thomson SIMIV",                   "TO16",                  MACHINE_NOT_WORKING )
 COMP( 198?, hstrtpls,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Vendex",                          "HeadStart Plus",        MACHINE_NOT_WORKING )
 COMP( 1988, laser_turbo_xt, ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "VTech",                           "Laser Turbo XT",        0 )
 COMP( 1989, laser_xt3,      ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "VTech",                           "Laser XT/3",            0 )

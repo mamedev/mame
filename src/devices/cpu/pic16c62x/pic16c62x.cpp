@@ -165,6 +165,14 @@ pic16c622a_device::pic16c622a_device(const machine_config &mconfig, const char *
 }
 
 
+device_memory_interface::space_config_vector pic16c62x_device::memory_space_config() const
+{
+	return space_config_vector{
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
+}
+
 std::unique_ptr<util::disasm_interface> pic16c62x_device::create_disassembler()
 {
 	return std::make_unique<pic16c62x_disassembler>();
