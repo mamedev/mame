@@ -3368,13 +3368,13 @@ ROM_START( at486 )
 	// 9: BIOS-String: 06/27/95-VT82C505-2A4L4000-00 / Version 5.15S - Chipset: S3 Trio64, FDC 37665GT, VT82C496G, VT82C406MV
 	ROM_SYSTEM_BIOS(9, "ficgpak2", "FIC 486-PAK-2 5.15S") /* includes Phoenix S3 TRIO64 Enhanced VGA BIOS 1.4-01 */
 	ROMX_LOAD( "515sbd8a.awd", 0x00000, 0x20000, CRC(778247e1) SHA1(07d8f0f2464abf507be1e8dfa06cd88737782411), ROM_BIOS(9))
-	// 10: runs into Award BootBlock BIOS - Chipset: VIA VT82C505, VT82C416, VT82C496G, Winbond W83787F
+	// 10: BIOS-String: 04/01/96-VT496G-2A4L6F0IC-00 0000C-00 - runs into Award BootBlock BIOS - Chipset: VIA VT82C505, VT82C416, VT82C496G, Winbond W83787F
 	ROM_SYSTEM_BIOS(10, "ficpio3g7", "FIC 486-PIO-3 1.15G705") // pnp  - ISA16: 4, PCI: 3
 	ROMX_LOAD( "115g705.awd",  0x00000, 0x20000, CRC(ddb1544a) SHA1(d165c9ecdc9397789abddfe0fef69fdf954fa41b), ROM_BIOS(10))
-	// 11: runs into Award BootBlock BIOS
+	// 11: BIOS-String: 04/01/96-VT496G-2A4L6F0IC-00 0000C-00 - runs into Award BootBlock BIOS
 	ROM_SYSTEM_BIOS(11, "ficpio3g1", "FIC 486-PIO-3 1.15G105") /* non-pnp */
 	ROMX_LOAD( "115g105.awd",  0x00000, 0x20000, CRC(b327eb83) SHA1(9e1ff53e07ca035d8d43951bac345fec7131678d), ROM_BIOS(11))
-	// 12: runs into Award BootBlock BIOS
+	// 12: BIOS-String: 11/27/96-VT496G-2A4L6F0IC-00 0000C-00 - runs into Award BootBlock BIOS
 	ROM_SYSTEM_BIOS(12, "ficpos", "FIC 486-POS")
 	ROMX_LOAD( "116di6b7.bin", 0x00000, 0x20000, CRC(d1d84616) SHA1(2f2b27ce100cf784260d8e155b48db8cfbc63285), ROM_BIOS(12))
 	// 13: BIOS-String: 06/27/95-VT82C505-2A4L4000-00 / Version 5.15 / Chipset: VIA VT82C496G PC/AT
@@ -3411,18 +3411,37 @@ ROM_START( at486 )
 	ROMX_LOAD("486-cam.bin", 0x10000, 0x10000, CRC(d36a13ea) SHA1(14db51dbcf8decf1cb333c57a36971ef578c89b4), ROM_BIOS(21))
 	// 22: 486-PIO3 1.1 - Chipset: Winbond W83787F, VIA VT82C505, VT82C416, VT82C496G - ISA16: 4, PCI:3 - BIOS: AWARD F 4825803 1.14G705 (32pin) - CPU: Socket 3
 	// RAM: 2xSIMM72, Cache: 9 sockets marked SRAM 128Kx8 (2 banks +1) - On board: 2xIDE, Floppy, par, 2xser
-	ROM_SYSTEM_BIOS(22, "pio3", "486-PIO-3") // runs into BootBlock BIOS
+	// BIOS-String: 02/01/96-VT496G-2A4L6F0IC-00 0000C-00 . runs into BootBlock BIOS
+	ROM_SYSTEM_BIOS(22, "pio3", "486-PIO-3")
 	ROMX_LOAD("486-pio3.bin", 0x00000, 0x20000, CRC(1edb5600) SHA1(36887cd08881dfa063b37c7c11a6b65c443bd741), ROM_BIOS(22))
-	// 34: 486 G486IP IMS - Chipset: IMS 8848 IMS 8849 - CPU: i486DX2-66 - BIOS: AMI 486DX ISA BIOS AB5870352 - Keyboard-BIOS: MEGAKEY (AMI/Intel) - ISA8: 1, ISA16: 4, PCI: 3
+	// 23: 486 G486IP IMS - Chipset: IMS 8848 IMS 8849 - CPU: i486DX2-66 - BIOS: AMI 486DX ISA BIOS AB5870352 - Keyboard-BIOS: MEGAKEY (AMI/Intel) - ISA8: 1, ISA16: 4, PCI: 3
 	// RAM: SIMM30: 4, SIMM72: 2, Cache: 10 sockets (UM61256AK-15) - BIOS-String: 41-0000-ZZ1124-00101111-060692-IMS8849-0 / PCI BIOS, Dated JUN-16-94 / FOR G486IP
 	ROM_SYSTEM_BIOS(23, "g486ip", "G486IP")
 	ROMX_LOAD("g486ip_ims.bin", 0x00000, 0x20000, CRC(4431794a) SHA1(f70e8c326455229c3bb7f305c2f51c4ac11979ed), ROM_BIOS(23))
+	// 24: EFA 486 UPIO
+	// BIOS-String: 11/09/95-UMC-881/886A-2A4X5E39C-00 00 / N486U-PIO/A, Rev 1.03 ROM - NOT FOR SALE - boots into BootBlock BIOS
+	ROM_SYSTEM_BIOS(24, "486upio", "486 UPIO")
+	ROMX_LOAD("upio_103.bin", 0x00000, 0x20000, CRC(4e9139cd) SHA1(f2b00356957c712ca652c3751b31161b3110ec69), ROM_BIOS(24))
 ROM_END
 
 
 //**************************************************************************
 //  80486 motherboard
 //**************************************************************************
+
+// EFA 486 APIO all BIOS versions boot into BootBlock BIOS
+ROM_START( 486apio )
+	ROM_REGION32_LE(0x20000, "bios", 0)
+	// 0: 
+	ROM_SYSTEM_BIOS(0, "a2", "A2")
+	ROMX_LOAD( "apioa2.bin", 0x00000, 0x20000, CRC(0cf343be) SHA1(3a5757c802a30fb0d8d4fd623bee02af3b91fdd7), ROM_BIOS(0))
+	// 1: 07/23/96-ALI-1487/89-2A4KDE3HC-00 / N486APIO Ver 2.00 SMC665GT
+	ROM_SYSTEM_BIOS(1, "20sm", "2.0SM")
+	ROMX_LOAD( "apio2smc.bin", 0x00000, 0x20000, CRC(1ced0692) SHA1(8afca17f0d793a3266b04ce8d70a359a29de3af7), ROM_BIOS(1))
+	// 2: BIOS-String: 03/05/96-ALI-1487/89-2A4KDE3JC-00 / N486APIO, Rev 2.1
+	ROM_SYSTEM_BIOS(2, "ag2", "AG2")
+	ROMX_LOAD( "1019ag2.bin", 0x00000, 0x20000, CRC(4066124e) SHA1(7adbf528d8132122da4f950ee78931abd5d949e4), ROM_BIOS(2))
+ROM_END
 
 // Abit 486 EISA-AE4 - Chipset: SiS 85C406, 85C411, three other SiS chips unreadable - CPU: 486, FPU socket provided - RAM: 8xSIMM30, Cache: 8x28pin
 // ISA16: 2, EISA: 6 - BIOS: Award EISA486/CU - Keyboard-BIOS: NEC KB-BIOS VER:400 JU-JET 1989 -  OSC: 50.000MHz, 14.31818MHz
@@ -3449,7 +3468,8 @@ ROM_START( gc10a )
 ROM_END
 
 // Arstoria AS496 - Chipset: SiS 85C495, 95C497, Winbond - CPU: Socket 3 - RAM: SIMM72x4, Cache: 4+1 - BIOS: 32pin  Keyboard-BIOS: BESTKEY - ISA16: 4, PCI: 3
-ROM_START( as496 ) // lands in Boot Block BIOS
+// BIOS-String: 09/12/96-SiS-496-497/A/B-2A4IBR2CC-00 / ARSTORIA AS496 V2 09/12/96 - lands in Boot Block BIOS
+ROM_START( as496 ) 
 	ROM_REGION32_LE(0x20000, "bios", 0)
 	ROM_LOAD( "as496.bin", 0x00000, 0x20000, CRC(745f8cc8) SHA1(46b9be25a7027a879482a412c9fe5687bbb28f08))
 ROM_END
@@ -3538,7 +3558,6 @@ ROM_END
 
 // Vintage Sprite SM 486-50USC - Chipset: UM82C491F - BIOS: EPROM/MR-BIOS 1.50 - Keyboard-BIOS: JETkey V3.0
 // CPU: Intel 486DX2-66 - OSC: 33.333000MHz, 14.31818MHz - ISA16: 5, ISA16/VL: 2
-
 ROM_START( sm48650usc ) // constant reset
 	ROM_REGION32_LE(0x20000, "bios", 0)
 	ROM_LOAD( "mrbios_1150usc_um82c491f.bin", 0x10000, 0x10000, CRC(b6ef1220) SHA1(94511df49713ec30467c8d9b18eb04e83fa7a809))
@@ -3663,10 +3682,10 @@ ROM_END
 // ISA16: 3, PCI: 3, PISA: 1 - OSC: 14.3F5P - CPU: Socket 3 - BIOS: Award D2317569, 32pin
 ROM_START( abpb4 ) // both BIOS versions end up in the Boot Block BIOS
 	ROM_REGION32_LE(0x20000, "bios", 0)
-	// 0:
+	// 0: BIOS-String: 10/30/95-ALI-1487/89-2A4KDA12C-5E / GREEN 486 PCI SYSTEM BIOS
 	ROM_SYSTEM_BIOS( 0, "pb4", "PB4")
 	ROMX_LOAD( "486-ab-pb4.bin", 0x00000, 0x20000, CRC(90884abc) SHA1(1ee11b026cb783b28cc4728ab896dbeac14eb954), ROM_BIOS(0))
-	// 1:
+	// 1: BIOS-String: 07/03/96-ALI-1487/89-2A4KDA1BC-F2 / GREEN PCI/ISA SYSTEM ROM
 	ROM_SYSTEM_BIOS( 1, "pb4pf2", "PB4P-F2")
 	ROMX_LOAD( "pb4p_f2.bin", 0x00000, 0x20000, CRC(9ab8d277) SHA1(10e424f5dd5c98877a5a7c9ae6205b2c442ac0e0), ROM_BIOS(1))
 ROM_END
@@ -3796,7 +3815,8 @@ ROM_END
 
 // Abit AB-PI4(T) - Bios: 32pin - Keyboard-BIOS: Winbond 83C42 - CPU: Socket 3 - ISA16: 4, PCI: 3 - Chipset: SiS 85C495, 85C497
 // RAM: 4xSIMM72, Cache: 9x32pin (occupied: 4xW24512AK-20, 1xW2457AK) - On board: 2xIDE
-ROM_START( abpi4 ) // boots into "boot block" rescue BIOS
+// BIOS-String: &09/25/95-SiS-496-497/A/B-2A4IBA11C-0B / GREEN 486 PCI SYSTEM BIOS - boots into "boot block" rescue BIOS
+ROM_START( abpi4 ) 
 	ROM_REGION32_LE(0x20000, "bios", 0)
 	ROM_LOAD( "pi4_0b.bin", 0x00000, 0x20000, CRC(2cd67f19) SHA1(4cf0b4ff10645371361d3782c8be06c463e70219))
 ROM_END
@@ -3808,7 +3828,7 @@ ROM_START( aa486s )
 	// 0: BIOS-String: 05/22/95/SiS-496-497B-PCI-A486-0-00 / #401A0-0203
 	ROM_SYSTEM_BIOS(0, "v203", "ASUS PCI/I-A486S V2.03")
 	ROMX_LOAD( "si4a0203.awd", 0x00000, 0x20000, CRC(95fcb7c6) SHA1(c19164d67af18c774e6eb06bd1570d95a24b2856), ROM_BIOS(0))
-	// 1 boots into "boot block" rescue BIOS
+	// 1: BIOS-String: 11/27/95-SiS-496-497B-PI-A486SC-00 / #401A0-0304 -  boots into "boot block" rescue BIOS
 	ROM_SYSTEM_BIOS(1, "v304", "ASUS PCI/I-A486S V3.04")
 	ROMX_LOAD( "si4a0304.awd", 0x00000, 0x20000, CRC(a00ad907) SHA1(598d97ea29f930a9359429dc540d27bfdd0fcd20), ROM_BIOS(1))
 ROM_END
@@ -3823,10 +3843,10 @@ ROM_START( a486sp3 )
 	// 1: BIOS-String: 07/22/94-SATURN-P/I-4SP3-00 / #401A0-0207
 	ROM_SYSTEM_BIOS(1, "v2737", "ASUS PVI-486SP3 V2.07 #2")
 	ROMX_LOAD( "awsi2737.bin", 0x00000, 0x20000, CRC(8cd9a89c) SHA1(6c68c23cc5e8ae66261e9fe931f2ce07efe767b6), ROM_BIOS(1))
-	// 2: lands in Award BootBlock BIOS V1.0
+	// 2: BIOS-String: 06/25/96-SiS-496-497B-PVI-4SP3C-00 / #401A0-0306 - lands in Award BootBlock BIOS V1.0
 	ROM_SYSTEM_BIOS(2, "v306", "ASUA PVI-486SP3 V3.06")
 	ROMX_LOAD( "si4i0306.awd", 0x00000, 0x20000, CRC(fc70371a) SHA1(96b10cfa97c5d1d023687f01e8acb54f263069b2), ROM_BIOS(2))
-	// 3: lands in Award BootBlock BIOS V1.0
+	// 3: BIOS-String: 02/11/98-SiS-496-497B-PVI-4SP3C-00 / #401A0-0307 - lands in Award BootBlock BIOS V1.0
 	ROM_SYSTEM_BIOS(3, "v307", "ASUA PVI-486SP3 V3.07")
 	ROMX_LOAD( "si4i0307h.bin", 0x00000, 0x20000, CRC(99473cc0) SHA1(a01d253cf434a31e0ca6f6cd2b9026ca424eb463), ROM_BIOS(3))
 ROM_END
@@ -3856,25 +3876,25 @@ ROM_END
 // from v4.00 onward it needs FLASH instead of EPROM to update the ESCD at boot time
 ROM_START( zito4dps ) // all revisions land in the Award Boot block BIOS
 	ROM_REGION32_LE(0x20000, "bios", 0)
-	// 0:
+	// 0: BIOS-String: 01/10/96-SiS-496-497/A/B-2A4IBZ11C-00 / 4DPS  VER 1.5 (2301952A4IBZ11)
 	ROM_SYSTEM_BIOS( 0, "4dps01", "Tomato 4DPS #1")
 	ROMX_LOAD( "4siw004.bin", 0x00000, 0x20000, CRC(0c57cc33) SHA1(04ce27dc89ae15d70c14076ad4f82b50a4f1e6dd), ROM_BIOS(0))
-	// 1:
+	// 1: BIOS-String: 06/17/1998-SiS-496-497/A-2A4IBZ11C-00 / 4DPS V4.00A (17/06/98)
 	ROM_SYSTEM_BIOS( 1, "4dps02", "Tomato 4DPS #2")
 	ROMX_LOAD( "4dps02.bin", 0x00000, 0x20000, CRC(757a5ef7) SHA1(e35146f34329a6a7033b1ed9d95a77692826a060), ROM_BIOS(1))
-	// 2:
-	ROM_SYSTEM_BIOS( 2, "170", "Tomato 4DPS v1.70")
+	// 2: BIOS-String: 10/17/96-SiS-496-497/A/B-2A4IBZ11C-00 / 4DPS  VER 1.71 (1710962A4IBZ11)
+	ROM_SYSTEM_BIOS( 2, "171", "Tomato 4DPS v1.71")
 	ROMX_LOAD( "4dps_170.bin", 0x00000, 0x20000, CRC(10b43a85) SHA1(d77bb2420b98c030add5de52fc90c88384b2036b), ROM_BIOS(2))
-	// 3:
-	ROM_SYSTEM_BIOS( 3, "172g", "Tomato 4DPS v1.72g")
+	// 3: BIOS-String: 07/08/97-SiS-496-497/A/B-2A4IBZ1AC-00 / 4DPS VER 1.72F (10072A4IBZ1A)
+	ROM_SYSTEM_BIOS( 3, "172f", "Tomato 4DPS v1.72f")
 	ROMX_LOAD( "4dps172g.bin", 0x00000, 0x20000, CRC(184eeeba) SHA1(248555567e35d4d6a0cfad5abc989e8193a72351), ROM_BIOS(3))
-	// 4:
+	// 4: BIOS-String: 06/17/1998-SiS-496-497/A-2A4IBZ11C-00 / 4DPS V4.00A (17/06/98)
 	ROM_SYSTEM_BIOS( 4, "400a", "Tomato 4DPS v4.00a")
 	ROMX_LOAD( "4dps400a.bin", 0x00000, 0x20000, CRC(494da2da) SHA1(9dcae9aa403627df03d5777c1b4de0b9f98bb24f), ROM_BIOS(4))
-	// 5:
+	// 5: BIOS-String: 01/10/96-SiS-496-497/A/B-2A4IBZ11C-00 / Tomato 4DPS v4.01 (Y2K ready)
 	ROM_SYSTEM_BIOS( 5, "401e", "Tomato 4DPS v4.01e")
 	ROMX_LOAD( "4dps401e.bin", 0x00000, 0x20000, CRC(e84b2bb2) SHA1(5dd8e801decf87af90ff90e3096819354f657b5a), ROM_BIOS(5))
-	// 6: v2.11, also marked v400a
+	// 6: v2.11, also marked v400a - BIOS-String: 06/17/1998-SiS-496-497/A-2A4IBZ11C-00 / 4DPS V4.00A (17/06/98)
 	ROM_SYSTEM_BIOS( 6, "4dps03", "Tomato 4DPS #3")
 	ROMX_LOAD( "4dps400b.bin", 0x00000, 0x20000, CRC(5910fa95) SHA1(934845038298d2d50f5bd4b20e0a4ccd9aa74e82), ROM_BIOS(6))
 ROM_END
@@ -3902,10 +3922,10 @@ ROM_START( ls486e )
 	// 1: LS486E Rev.D SiS496/497(PR/NU) EDO Support AWARD 10/21/96 - 10/21/96-SiS-496-497/A/B-2A4IBL12C-00 - 486E 96/10/24 UMC8669 PLUG & PLAY BIOS
 	ROM_SYSTEM_BIOS( 1, "revd01", "Rev.D #1") // lands in BootBlock BIOS
 	ROMX_LOAD( "ls486-d.awa", 0x00000, 0x20000, CRC(5a51a3a3) SHA1(6712ab742676156802fdfc4d08d687c1482f2702), ROM_BIOS(1))
-	// 2: Lucky Star LS486E rev.C,Winbond,SiS496/497  - BIOS Award PNP v4.50PG (486E 96/5/17 W83787)
+	// 2: Lucky Star LS486E rev.C,Winbond,SiS496/497  - BIOS Award PNP v4.50PG (486E 96/5/17 W83787) - BIOS-String: 03/14/96-SiS-496-497/A/B-2A4IBL13C-00 / 486E 96/5/17 W83787
 	ROM_SYSTEM_BIOS( 2, "revc02", "Rev.C #2") // lands in BootBlock BIOS
 	ROMX_LOAD( "ls486e-c.awd", 0x00000, 0x20000, CRC(8c290f20) SHA1(33d9a96e5d6b3bd5776480f5535bb1eb1d7cff57), ROM_BIOS(2))
-	//3: lands in BootBlock BIOS
+	//3: BIOS-String: 03/14/96-SiS-496-497/A/B-2A4IBL13C-00 / 486E 96/7/19 W83787 PLUG & PLAY BIOS - lands in BootBlock BIOS
 	ROM_SYSTEM_BIOS( 3, "revc1", "Rev.C1")
 	ROMX_LOAD( "ls486ec1.bin", 0x00000, 0x20000, CRC(e96d1bbc) SHA1(64d0726c4e9ecee8fddf4cc39d92aecaa8184d5c), ROM_BIOS(3))
 	// 4: BootBlock BIOS
@@ -3923,10 +3943,10 @@ ROM_START( ms4144 )
 	// 1: no display
 	ROM_SYSTEM_BIOS(1, "af54", "AF54")
 	ROMX_LOAD( "ms-4144_af54s.rom", 0x00000, 0x20000, CRC(1eb02779) SHA1(b18cc771fc5a820437a4daca06806188ee1a27a5), ROM_BIOS(1))
-	// 2: lands in BootBlock BIOS
+	// 2: BIOS-String: 03/20/96-SiS-496-497/A/B-2A4IBM49C-00 / WF53S 032096 - lands in BootBlock BIOS
 	ROM_SYSTEM_BIOS(2, "wf53", "WF53")
 	ROMX_LOAD( "ms-4144_wf53s.bin", 0x00000, 0x20000, CRC(df83f099) SHA1(b7dc61a2cb71754cddd06d12d3bf81ffce442c89), ROM_BIOS(2))
-	// 3: lands in BootBlock BIOS
+	// 3: BIOS-String: 02/07/96-SiS-496-497/A/B-2A4IBM49C-00 / WF54S 020896 - lands in BootBlock BIOS
 	ROM_SYSTEM_BIOS(3, "wf54", "WF54")
 	ROMX_LOAD( "ms-4144_wf54s.bin", 0x00000, 0x20000, CRC(c0ff31df) SHA1(4e138558781a220b340977d56ccbfa61a907d4f5), ROM_BIOS(3))
 	// 4: no display - VER 2.1 - BIOS: AMI 486DX ISA BIOS AC8999569 (32pin)- Keyboard-BIOS: AMIKEY-2
@@ -4610,6 +4630,7 @@ COMP( 199?, pkm0038s,  ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, gc10a,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Eagle", "EAGLEN486 GC10A", MACHINE_NOT_WORKING )
 COMP( 199?, 4dmshl3g,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "EFA",   "4DMS HL3G-L4-VI", MACHINE_NOT_WORKING )
 COMP( 199?, 4dmuhl3s,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "EFA",   "4DMU HL3S", MACHINE_NOT_WORKING )
+COMP( 199?, 486apio,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "EFA",   "486 APIO", MACHINE_NOT_WORKING )
 COMP( 199?, um486,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Elitegroup", "UM486/UM486sx", MACHINE_NOT_WORKING )
 COMP( 199?, um486v,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Elitegroup", "UM486V-AIO", MACHINE_NOT_WORKING )
 COMP( 199?, ec4915aio, ibm5170, 0,       at486,     0,     at_state,     init_at,        "Elitegroup", "UC4915 A AIO", MACHINE_NOT_WORKING )
