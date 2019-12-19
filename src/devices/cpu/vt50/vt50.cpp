@@ -25,6 +25,7 @@ vt5x_cpu_device::vt5x_cpu_device(const machine_config &mconfig, device_type type
 	, m_ur_flag_callback(*this)
 	, m_ut_flag_callback(*this)
 	, m_ruf_callback(*this)
+	, m_key_up_callback(*this)
 	, m_bbits(bbits)
 	, m_ybits(ybits)
 	, m_pc(0)
@@ -87,6 +88,7 @@ void vt5x_cpu_device::device_resolve_objects()
 	m_ur_flag_callback.resolve_safe(0);
 	m_ut_flag_callback.resolve_safe(0);
 	m_ruf_callback.resolve_safe();
+	m_key_up_callback.resolve_safe(1);
 }
 
 void vt5x_cpu_device::device_start()
@@ -468,9 +470,9 @@ void vt5x_cpu_device::execute_th(u8 inst)
 
 		case 0160:
 			// M0: TOSJ (TODO)
-			// M1: KEYJ (TODO; hacked for now)
+			// M1: KEYJ (TODO)
 			if (m_mode_ff)
-				m_load_pc = (m_ac & 077) != 0;
+				m_load_pc = m_key_up_callback(m_ac) & 1;
 			break;
 		}
 	}
