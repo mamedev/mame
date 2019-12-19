@@ -451,6 +451,15 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 			<dataarea name="rom" size="1048576">
 				<rom name="9k0-0041a-rv.ic1" size="1048576" crc="a10118a5" sha1="b9fce10b2558f73048d30398410b0e3340e87610" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
+			<dataarea name="pages" size="0x2000000"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="25146736" crc="bb9bf256" sha1="64ee0df89f8995b8cf847b0a3381e624e48ee1a4" offset="0"/>
+				<rom name="0 - 0002.png" size="26243330" crc="9aabec1a" sha1="044748f6af5becc08650935136749e855258c938" offset="0"/>
+				<rom name="0 - 0003.png" size="25927952" crc="43fdc28c" sha1="04e7df5119a04940ca5b217cc7814438a1a66852" offset="0"/>
+				<rom name="0 - 0004.png" size="27207842" crc="291b9b5f" sha1="abcef241c2065d22342f276096590bc01a5082a5" offset="0"/>
+				<rom name="0 - 0005.png" size="28869718" crc="4a435395" sha1="1748c5aa0f0a5d0a7efaf0e2a9735659d637e255" offset="0"/>
+				<rom name="0 - 0006.png" size="29680612" crc="1e1287a7" sha1="cc92ef1bb6f20c06ee61287da02eb4e147484f1d" offset="0"/>
+				<rom name="0 - 0007.png" size="27665504" crc="6562d21c" sha1="f0d66aca4178aa0ac45ad91271c0bd863e117774" offset="0"/>
+			</dataarea>
 		</part>
 	</software>
 
