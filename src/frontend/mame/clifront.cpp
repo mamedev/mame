@@ -1136,7 +1136,7 @@ void cli_frontend::output_single_softlist(std::ostream &out, software_list_devic
 						// dump checksum information only if there is a known dump
 						util::hash_collection hashes(ROM_GETHASHDATA(rom));
 						if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP))
-							util::stream_format(out, " %s", util::xml::normalize_string(hashes.attribute_string().c_str()));
+							util::stream_format(out, " %s", hashes.attribute_string());
 						else
 							out << " status=\"nodump\"";
 
