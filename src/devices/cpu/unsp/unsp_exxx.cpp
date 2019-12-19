@@ -181,7 +181,9 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 
 		case 0x02:
 			logerror("pc:%06x: %s = %s lsl %s (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
-			m_core->m_r[rd] = (uint16_t)((m_core->m_r[rd]&0xffff) << (m_core->m_r[rs] & 0x0f));
+			
+			m_core->m_r[rd] = (uint16_t)((m_core->m_r[rd]&0xffff) << (m_core->m_r[rs] & 0x01f));
+			
 			logerror("result %04x\n", m_core->m_r[rd]);
 			return;
 
@@ -189,26 +191,38 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 		{
 			// wrlshunt uses this
 			logerror("pc:%06x: %s = %s lslor %s  (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
-			uint16_t tmp = m_core->m_r[rd];
-			m_core->m_r[rd] = (uint16_t)((m_core->m_r[rd]&0xffff) << (m_core->m_r[rs] & 0x0f));
-			m_core->m_r[rd] |= tmp; // guess
+
+			uint32_t res = (uint16_t)(m_core->m_r[rd]);
+				
+			res	<<= (m_core->m_r[rs] & 0x01f);
+
+			m_core->m_r[rd] = (res & 0xffff);
+			m_core->m_r[rd ^ 1] |= (res >> 16); // register bleeding?
+
 			logerror("result %04x\n", m_core->m_r[rd]);
 			return;
 		}
 
 		case 0x04:
-			// smartfp loops increasing shift by 4 up to values of 28? (but regs are 16-bit?)
+			// smartfp loops increasing shift by 4 up to values of 28? (but regs are 16-bit?)		
 			logerror("pc:%06x: %s = %s lsr %s  (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
-			m_core->m_r[rd] = (uint16_t)((m_core->m_r[rd]&0xffff) >> (m_core->m_r[rs] & 0xf));
+			m_core->m_r[rd] = (uint16_t)((m_core->m_r[rd]&0xffff) >> (m_core->m_r[rs] & 0x1f));
 			logerror("result %04x\n", m_core->m_r[rd]);
 			return;
 
 		case 0x05:
 		{
 			logerror("pc:%06x: %s = %s lsror %s  (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
-			uint16_t tmp = m_core->m_r[rd];
-			m_core->m_r[rd] = (uint16_t)((m_core->m_r[rd]&0xffff) >> (m_core->m_r[rs] & 0x0f));
-			m_core->m_r[rd] |= tmp; // guess
+
+			uint32_t res = (uint16_t)(m_core->m_r[rd]);
+
+			res <<= 16;
+			
+			res = res >> (m_core->m_r[rs] & 0x01f);
+
+			m_core->m_r[rd] = (res >> 16);
+			m_core->m_r[rd ^ 1] |= (res & 0xffff); // register bleeding?
+
 			logerror("result %04x\n", m_core->m_r[rd]);
 			return;
 		}

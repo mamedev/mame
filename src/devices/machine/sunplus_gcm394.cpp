@@ -184,7 +184,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7835_w) { LOGMASKED(LOG_GCM39
 READ16_MEMBER(sunplus_gcm394_base_device::ioarea_7860_porta_r)
 {
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::ioarea_7860_porta_r\n", machine().describe_context());
-	return machine().rand();// m_porta_in();
+	return m_porta_in();
 }
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::ioarea_7860_porta_w)
@@ -228,7 +228,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7863_w)
 READ16_MEMBER(sunplus_gcm394_base_device::ioarea_7870_portb_r)
 {
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::ioarea_7870_portb_r\n", machine().describe_context());
-	return 0xffff;// machine().rand();// m_portb_in();
+	return m_portb_in();
 }
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::ioarea_7870_portb_w)

@@ -389,24 +389,24 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 {
 	uint32_t xscroll = regs[0];
 	uint32_t yscroll = regs[1];
-	uint32_t attr = regs[2];
-	uint32_t ctrl = regs[3];
+	uint32_t attr_reg = regs[2];
+	uint32_t ctrl_reg = regs[3];
 	uint32_t tilemap = regs[4];
 	uint32_t palette_map = regs[5];
 	address_space &space = m_cpu->space(AS_PROGRAM);
 
-	if (!(ctrl & PAGE_ENABLE_MASK))
+	if (!(ctrl_reg & PAGE_ENABLE_MASK))
 	{
 		return;
 	}
 
-	if (((attr & PAGE_PRIORITY_FLAG_MASK) >> PAGE_PRIORITY_FLAG_SHIFT) != priority)
+	if (((attr_reg & PAGE_PRIORITY_FLAG_MASK) >> PAGE_PRIORITY_FLAG_SHIFT) != priority)
 	{
 		return;
 	}
 
-	uint32_t tile_h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-	uint32_t tile_w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+	uint32_t tile_h = 8 << ((attr_reg & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
+	uint32_t tile_w = 8 << ((attr_reg & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
 
 	uint32_t tile_count_x = 512 / tile_w;
 
@@ -419,23 +419,22 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 	{
 		uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & 0xff) - 0x10;
 		uint32_t xx = (tile_w * x0 - xscroll) & 0x1ff;
-		uint32_t tile = (ctrl & PAGE_WALLPAPER_MASK) ? space.read_word(tilemap) : space.read_word(tilemap + tile_address);
+		uint32_t tile = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(tilemap) : space.read_word(tilemap + tile_address);
 
-		uint16_t palette = (ctrl & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
+		uint16_t palette = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
 		if (x0 & 1)
 			palette >>= 8;
 
-		tile |= (palette & 0x0007) << 16;
 
 		if (!tile)
 			continue;
 
 
-		uint32_t tileattr = attr;
-		uint32_t tilectrl = ctrl;
+		uint32_t tileattr = attr_reg;
+		uint32_t tilectrl = ctrl_reg;
 
 #if 0
-		if ((ctrl & 2) == 0)
+		if ((ctrl_reg & 2) == 0)
 		{   // -(1) bld(1) flip(2) pal(4)
 			tileattr &= ~0x000c;
 			tileattr |= (palette >> 2) & 0x000c;    // flip
@@ -447,32 +446,52 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 			tilectrl |= (palette << 2) & 0x0100;    // blend
 		}
 #endif
-		const bool blend = (tileattr & 0x4000 || tilectrl & 0x0100);
-		const bool row_scroll = (tilectrl & 0x0010);
-		const bool flip_x = (tileattr & TILE_X_FLIP);
-		const uint32_t yflipmask = tileattr & TILE_Y_FLIP ? tile_h - 1 : 0;
-		uint32_t palette_offset = (tileattr & 0x0f00) >> 4;
+		bool blend;
+		bool row_scroll;
+		bool flip_x;
+		uint32_t yflipmask;
+		uint32_t palette_offset;
+
+		blend = (tileattr & 0x4000 || tilectrl & 0x0100);
+		row_scroll = (tilectrl & 0x0010);
+		
+		if ((ctrl_reg & 2) == 0)
+		{
+			flip_x = 0;
+			yflipmask = 0;
+			palette_offset = (palette & 0x0f) << 4;
+		}
+		else
+		{
+			flip_x = (tileattr & TILE_X_FLIP);
+			yflipmask = tileattr & TILE_Y_FLIP ? tile_h - 1 : 0;
+			palette_offset = (tileattr & 0x0f00) >> 4;
+			tile |= (palette & 0x0007) << 16;
+		}
+		
 
 		//palette_offset |= 0x0900;
 		palette_offset |= 0x0100;
 
 		const uint8_t bpp = tileattr & 0x0003;
 
+		int use_alt_drawmode = 0;
+
 		if (blend)
 		{
 			if (row_scroll)
 			{
 				if (flip_x)
-					draw<BlendOn, RowScrollOn, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, 0);
+					draw<BlendOn, RowScrollOn, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
 				else
-					draw<BlendOn, RowScrollOn, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, 0);
+					draw<BlendOn, RowScrollOn, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
 			}
 			else
 			{
 				if (flip_x)
-					draw<BlendOn, RowScrollOff, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, 0);
+					draw<BlendOn, RowScrollOff, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
 				else
-					draw<BlendOn, RowScrollOff, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, 0);
+					draw<BlendOn, RowScrollOff, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
 			}
 		}
 		else
@@ -480,16 +499,16 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 			if (row_scroll)
 			{
 				if (flip_x)
-					draw<BlendOff, RowScrollOn, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, 0);
+					draw<BlendOff, RowScrollOn, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
 				else
-					draw<BlendOff, RowScrollOn, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, 0);
+					draw<BlendOff, RowScrollOn, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
 			}
 			else
 			{
 				if (flip_x)
-					draw<BlendOff, RowScrollOff, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, 0);
+					draw<BlendOff, RowScrollOff, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
 				else
-					draw<BlendOff, RowScrollOff, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, 0);
+					draw<BlendOff, RowScrollOff, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
 			}
 		}
 	}
@@ -900,7 +919,7 @@ READ16_MEMBER(gcm394_base_video_device::video_707f_r)
 {
 	uint16_t retdata = m_707f;
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707f_r (returning %04x)\n", machine().describe_context(), retdata);
-	return machine().rand();
+	return retdata;
 }
 WRITE16_MEMBER(gcm394_base_video_device::video_707f_w)
 {
