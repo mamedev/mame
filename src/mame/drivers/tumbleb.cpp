@@ -3276,12 +3276,7 @@ ROM_START( dquizgo )
 	ROM_LOAD( "ub5",    0x00000, 0x10000, CRC(e40481da) SHA1(1c1fabcb67693235eaa6ff59ae12a35854b5564a) )
 
 	ROM_REGION( 0x2000, "protection", 0 ) // P87C52EBPN MCU, after decapping the die was 87C51RA+
-	ROM_LOAD( "87c51rap.bin", 0x00000, 0x2000, CRC(c46c77a6) SHA1(a0c7221dfdd6e26a3b909dcdb9e830447069bffa) ) // decapped, but not hooked up yet
-
-	ROM_REGION16_BE( 0x400, "user1", ROMREGION_ERASE00 ) /* Data from Shared RAM */
-	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
-	/* It seems to put some data at 0x000-0x1ff too, but it looks like garbage, and doesn't appear to be used */
-	ROM_LOAD16_WORD( "protdata.bin", 0x200, 0x200 , CRC(6064b9e0) SHA1(546bd8f9201427118940de2d1916b258b60710c6) )
+	ROM_LOAD( "87c51rap.bin", 0x00000, 0x2000, CRC(03bc1f83) SHA1(9ccd49edd8e47a04c5dfe4ac163fbd98ea90aea3) ) // decapped
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "uc1",    0x00000, 0x40000, CRC(d0f4c4ba) SHA1(669a04a977e98d8a594cc1621cbb9526c9081ec0) )
@@ -3851,6 +3846,8 @@ void tumbleb_state::init_wondl96()
 void tumbleb_state::init_dquizgo()
 {
 	tumblepb_gfx_rearrange(1);
+
+	m_protbase = 0x0200;
 }
 
 
@@ -3900,4 +3897,4 @@ GAME( 1997, bcstrya,  bcstry,  bcstory,      bcstory, tumbleb_state,  init_bcsto
 
 GAME( 1997, semibase, 0,       semibase,     semibase, tumbleb_state, init_bcstory,  ROT0, "SemiCom / DMD", "MuHanSeungBu (SemiCom Baseball) (Korea)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )// sprite offsets..
 
-GAME( 1998, dquizgo,  0,       cookbib,      dquizgo, tumbleb_state,  init_dquizgo,  ROT0, "SemiCom / AceVer", "Date Quiz Go Go (Korea)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // hook up MCU dump, check layer offsets
+GAME( 1998, dquizgo,  0,       cookbib_mcu,  dquizgo, tumbleb_state,  init_dquizgo,  ROT0, "SemiCom / AceVer", "Date Quiz Go Go (Korea)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // check layer offsets
