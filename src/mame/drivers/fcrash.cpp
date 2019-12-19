@@ -17,11 +17,9 @@
     *1 these seem to be only CPS1.5/Q sound games?
     *2 this is original configuration, but non-Capcom (usually single-board) hardware.
 
-
     As per the above, this file now only contains games in second and last catergories.
     Eventually only Final Crash, other Final Fight bootlegs and Carrier Air Wing bootlegs will remain here.
 */
-
 
 /*
 
@@ -78,41 +76,13 @@ likely won't write any sprite clearing values otherwise.
 None of this is hooked up currently due to issues with row scroll on the scroll2 layer.
 
 
-
 Status of each game:
 --------------------
-cawingb2, cawingbl: ok
-
-dinopic: no sound   (moved to cps1bl_pic.cpp)
-
-dinopic2: no sound, one bad graphics ROM. Copying 8.bin from dinopic fixes it.   (moved to cps1bl_pic.cpp)
-
-fcrash, kodb: old sprites show on next screen. Patch used.
-
-punipic, punipic2: no sound. Problems in Central Park. Patches used.   (moved to cps1bl_pic.cpp)
-
-punipic3: same as punipic, and doors are missing.   (moved to cps1bl_pic.cpp)
-
-sf2m1: crowd is missing. Plane's tail comes off a bit. Patch used.
-
-sf2mdt, sf2mdtb: ok   (moved to cps1bl_5205.cpp)
-
-sf2mdta, sf2ceb: scroll 2X has strange 0x200 writes that cause missing fighters' portraits at the vs. screen    (moved to cps1bl_5205.cpp)
-                 and glitched backgrounds during fights. Masking them out seems a hack.
-
-sgyxz, wofabl: garbage left behind. A priority problem can be seen in 3rd demo where
-               the fighters walk through the crowd instead of behind.
-
-slampic: no sound. Some minor gfx issues (sprites on character select screen)   (moved to cps1bl_pic.cpp)
-
-slampic2: no sound. All gfx issues confirmed present on real board.   (moved to cps1bl_pic.cpp)
-
-captcommb2: ok    (moved to cps1bl_5205.cpp)
-
-knightsb3: ok    (moved to cps1bl_5205.cpp)
-
-dinopic3: no sound. Some minor gfx priority issues, confirmed present on real board.   (moved to cps1bl_pic.cpp)
-
+cawingb2, cawingbl: OK.
+fcrash, kodb:       Old sprites show on next screen. Patch used.
+sf2m1:              Crowd is missing. Plane's tail comes off a bit. Patch used.
+sgyxz, wofabl:      Garbage left behind. A priority problem can be seen in 3rd demo where
+                    the fighters walk through the crowd instead of behind.
 */
 
 #include "emu.h"
