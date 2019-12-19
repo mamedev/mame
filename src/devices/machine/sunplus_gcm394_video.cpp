@@ -985,6 +985,12 @@ WRITE16_MEMBER(gcm394_base_video_device::video_7063_videoirq_source_ack_w)
 
 WRITE16_MEMBER(gcm394_base_video_device::video_702a_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_702a_w %04x\n", machine().describe_context(), data); m_702a = data; }
 
+READ16_MEMBER(gcm394_base_video_device::video_curline_r)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s: video_r: Current Line: %04x\n", machine().describe_context(), m_screen->vpos());
+	return m_screen->vpos();
+}
+
 // read in IRQ
 READ16_MEMBER(gcm394_base_video_device::video_7030_brightness_r)
 {
