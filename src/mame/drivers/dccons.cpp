@@ -889,9 +889,8 @@ ROM_START( dcfish )
 	ROM_LOAD( "mpr-21931.ic501", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) ) // regular v1.0d 3.3v BIOS
 
 	// similar Dreamcast flashes, machine_name was changed to "Fish Life", machine_code2 is 0xff (verified  by software)
-	// dumped from used device, should be replaced with cleaned binary when flash programming will be emulated
 	ROM_REGION64_LE(0x040000, "dcflash", ROMREGION_ERASEFF)
-	ROM_LOAD( "fish_flash.bin", 0x020000, 0x020000, BAD_DUMP CRC(73cbc49b) SHA1(c55caf64eb0ac5f8e73a1a385064606ad12947b7) ) // VA1 NTSC-JP
+	ROM_LOAD( "fish_flash.bin", 0x020000, 0x020000, CRC(f7f36b7b) SHA1(f49d18de85c519c16d5447ca8ae39b62d1b8e483) ) // VA1 NTSC-JP
 
 	DISK_REGION( "ata:0:gdrom" )
 	DISK_IMAGE_READONLY( "fish_life_amazon", 0, SHA1(2cbba727b219bbbeddf551d0f3e80c5f8ecbe21f) ) // HDR-0094
