@@ -199,39 +199,39 @@ void alfaskop4110_state::mem_map(address_map &map)
 						  NAME([this](offs_t offset, uint8_t data) { LOGIO("KBD acia_w %04x: %02x\n", offset, data); m_kbd_acia->write(offset & 1, data); }));
 
 	map(0xf7fc, 0xf7fc).mirror(0x00).lr8(NAME([this](offs_t offset) -> uint8_t { LOGIO("Address Switch 0-7\n"); return 0; }));
-#if 1
-	map(0xf800, 0xffff).rom().region("roms", 0);
 
-#else /* The following section  needs another PLA in order to work properly, a few secret features discovered such as no AM during CRC check due to faked DMA cycle etc. */
 	map(0xf800, 0xffe7).rom().region("roms", 0);
 
 	// IRQ mask setting
-	map(0xffe8, 0xfff7).rom().lrw8(NAME([this](offs_t offset) -> uint8_t
-						{
-						  if (!machine().side_effects_disabled())
-						LOGIO("AMSK read set %04x\n", offset >> 1);
-						  m_imsk = (offset >> 1) & 7;
-						  return ((uint8_t *) memregion("roms")->base() + 0x7e8)[offset];
-						}),
-					   NAME([this](offs_t offset, uint8_t data) { if (!machine().side_effects_disabled()) LOGIO("AMSK write set %04x\n", offset); m_imsk = (offset >> 1) & 7; }));
+	map(0xffe8, 0xfff7).rom().lrw8( NAME([this](offs_t offset) -> uint8_t
+				        {
+						if (!machine().side_effects_disabled())	LOGIO("AMSK read set %04x\n", offset >> 1);
+						m_imsk = (offset >> 1) & 7;
+						return ((uint8_t *) memregion("roms")->base() + 0x7e8)[offset];
+					}),
+					NAME([this](offs_t offset, uint8_t data)
+					{
+						if (!machine().side_effects_disabled()) LOGIO("AMSK write set %04x\n", offset);
+						m_imsk = (offset >> 1) & 7;
+					}));
 
-	// Address modification TODO: Do only modify MCU accesses, not for DMA
-	map(0xfff8, 0xfff9).rom().lrw8(NAME([this](offs_t offset) -> uint8_t
+	// Address modification
+	map(0xfff8, 0xfff9).rom().lrw8( NAME([this](offs_t offset) -> uint8_t
+				        {
+						uint16_t ploffs = (~m_irq & 0xff) | ((m_imsk & 0x07) << 8) | 0x000 | (0x18 << 11);
+						uint8_t tmp =  ((uint8_t *) memregion("roms")->base())[0x7e0 | offset | ((m_pla->read(ploffs) & 0xf0) >> 3)];
+						if (!machine().side_effects_disabled())
 						{
-						  //uint16_t ploffs = (m_irq & 0xff) | ((m_imsk & 0x07) << 8) | 0x800 | (((0xfff8) & 0x1e) << 11);
-						  uint16_t ploffs = (m_irq & 0xff) | ((m_imsk & 0x07) << 8) | 0x000 | (0x18 << 11);
-						  //uint8_t tmp =  ((uint8_t *) memregion("roms")->base())[0x7e0 | offset | ((m_pla->read(ploffs) & 0xf0) >> 3)];
-						  uint8_t tmp =  ((uint8_t *) memregion("roms")->base() + 0x7f8)[offset];
-						  if (!machine().side_effects_disabled())
-						  {
-						LOGIO("AMOD read %04x: %02x\n", offset, tmp);
-						LOGIO("AMOD pla read %04x: %02x ==> %04x\n", ploffs, m_pla->read(ploffs), (0xffe0 | offset | ((m_pla->read(ploffs) & 0xf0) >> 3)));
-						  }
-						  return tmp; }),
-					   NAME([this](offs_t offset, uint8_t data) { if (!machine().side_effects_disabled()) LOGIO("AMOD write %04x\n", offset); })); // TODO: Check what a write does if anything
+							LOGIO("AMOD read %04x: %02x\n", offset, tmp);
+							LOGIO("AMOD pla read %04x: %02x ==> %04x\n", ploffs, m_pla->read(ploffs), (0xffe0 | offset | ((m_pla->read(ploffs) & 0xf0) >> 3)));
+						}
+						return tmp; }),
+					NAME([this](offs_t offset, uint8_t data) // TODO: Check what a write does if anything
+					{
+						if (!machine().side_effects_disabled()) LOGIO("AMOD write %04x\n", offset);
+					}));
 
 	map(0xfffa, 0xffff).rom().region("roms", 0x7fa);
-#endif
 }
 
 void alfaskop4120_state::mem_map(address_map &map)
@@ -471,7 +471,7 @@ void alfaskop4110_state::machine_start()
 {
 	save_item(NAME(m_irq));
 	save_item(NAME(m_imsk));
-	timer_set(attotime::from_msec(10000), TIMER_POLL_START);
+	timer_set(attotime::from_msec(5000), TIMER_POLL_START);
 }
 
 void alfaskop4110_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
