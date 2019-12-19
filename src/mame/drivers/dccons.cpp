@@ -366,22 +366,20 @@ WRITE64_MEMBER(dc_cons_state::dc_pdtra_w )
 	PDTRA = (data & 0xffff);
 }
 
-#if 0
 READ8_MEMBER(dc_cons_state::dc_flash_r)
 {
-	return m_dcflash->read(offset);
+	return m_dcflash->read(offset+0x20000);
 }
 
 WRITE8_MEMBER(dc_cons_state::dc_flash_w)
 {
-	m_dcflash->write(offset,data);
+	m_dcflash->write(offset+0x20000,data);
 }
-#endif
 
 void dc_cons_state::dc_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom().nopw();             // BIOS
-	map(0x00200000, 0x0021ffff).rom().region("dcflash", 0);//.rw(FUNC(dc_cons_state::dc_flash_r), FUNC(dc_cons_state::dc_flash_w));
+	map(0x00200000, 0x0021ffff).rw(FUNC(dc_cons_state::dc_flash_r), FUNC(dc_cons_state::dc_flash_w)).region("dcflash", 0x20000);
 	map(0x005f6800, 0x005f69ff).rw(FUNC(dc_cons_state::dc_sysctrl_r), FUNC(dc_cons_state::dc_sysctrl_w));
 	map(0x005f6c00, 0x005f6cff).m(m_maple, FUNC(maple_dc_device::amap));
 	map(0x005f7000, 0x005f701f).rw(m_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w)).umask64(0x0000ffff0000ffff);
@@ -647,7 +645,7 @@ void dc_cons_state::dc_base(machine_config &config)
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_cons_state,dc_console )
 
-//  MACRONIX_29LV160TMC(config, "dcflash");
+	FUJITSU_29LV002TC(config, "dcflash");
 
 	MAPLE_DC(config, m_maple, 0, m_maincpu);
 	m_maple->irq_callback().set(FUNC(dc_state::maple_irq));
@@ -784,16 +782,16 @@ struct cid_record
 ROM_START(dc)
 	DREAMCAST_COMMON_BIOS
 
-	ROM_REGION64_LE(0x020000, "dcflash", 0)
-	ROM_LOAD( "dcus_ntsc.bin", 0x000000, 0x020000, CRC(4136c25b) SHA1(1efa00ab9d8357a9f91e5be931a3efd6236f2b79) )  // dumped from VA2.4 mobo with 1.022 BIOS
+	ROM_REGION64_LE(0x040000, "dcflash", ROMREGION_ERASEFF)
+	ROM_LOAD( "dcus_ntsc.bin", 0x020000, 0x020000, CRC(4136c25b) SHA1(1efa00ab9d8357a9f91e5be931a3efd6236f2b79) )  // dumped from VA2.4 mobo with 1.022 BIOS
 ROM_END
 
 ROM_START( dceu )
 	DREAMCAST_COMMON_BIOS
 
-	ROM_REGION64_LE(0x020000, "dcflash", 0)
-	ROM_LOAD( "dceu_pal.bin",  0x000000, 0x020000, CRC(7a102d05) SHA1(13e444e613dffe0a8bce073a01efa9a1d4626ba7) ) // VA1
-	ROM_LOAD( "dceu_pala.bin", 0x000000, 0x020000, CRC(2e8dfa07) SHA1(ca5fd977bbf8f48c28c1027a023b038123d57d39) ) // from VA1 with 1.01d BIOS
+	ROM_REGION64_LE(0x040000, "dcflash", ROMREGION_ERASEFF)
+	ROM_LOAD( "dceu_pal.bin",  0x020000, 0x020000, CRC(7a102d05) SHA1(13e444e613dffe0a8bce073a01efa9a1d4626ba7) ) // VA1
+	ROM_LOAD( "dceu_pala.bin", 0x020000, 0x020000, CRC(2e8dfa07) SHA1(ca5fd977bbf8f48c28c1027a023b038123d57d39) ) // from VA1 with 1.01d BIOS
 ROM_END
 
 ROM_START( dcjp )
@@ -801,8 +799,8 @@ ROM_START( dcjp )
 	ROM_SYSTEM_BIOS(4, "1004", "v1.004 (Japan)")    // oldest known mass production version, supports Japan region only
 	ROM_LOAD_BIOS(4, "mpr-21068.ic501", 0x000000, 0x200000, CRC(5454841f) SHA1(1ea132c0fbbf07ef76789eadc07908045c089bd6) )
 
-	ROM_REGION64_LE(0x020000, "dcflash", 0)
-	ROM_LOAD( "dcjp_ntsc.bin", 0x000000, 0x020000, CRC(306023ab) SHA1(5fb66adb6d1b54a552fe9c2bb736e4c6960e447d) ) // from refurbished VA0 with 1.004 BIOS
+	ROM_REGION64_LE(0x040000, "dcflash", ROMREGION_ERASEFF)
+	ROM_LOAD( "dcjp_ntsc.bin", 0x020000, 0x020000, CRC(306023ab) SHA1(5fb66adb6d1b54a552fe9c2bb736e4c6960e447d) ) // from refurbished VA0 with 1.004 BIOS
 ROM_END
 
 // unauthorised portable modification
@@ -811,8 +809,8 @@ ROM_START( dctream )
 	// uses regular mpr-21931 BIOS chip, have region-free mod-chip installed, see driver init.
 	ROM_LOAD( "mpr-21931.ic501", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) )
 
-	ROM_REGION64_LE(0x020000, "dcflash", 0)
-	ROM_LOAD( "dc_flash.bin", 0x000000, 0x020000, CRC(9d5515c4) SHA1(78a86fd4e8b58fc9d3535eef6591178f1b97ecf9) ) // VA1 NTSC-US
+	ROM_REGION64_LE(0x040000, "dcflash", ROMREGION_ERASEFF)
+	ROM_LOAD( "dc_flash.bin", 0x020000, 0x020000, CRC(9d5515c4) SHA1(78a86fd4e8b58fc9d3535eef6591178f1b97ecf9) ) // VA1 NTSC-US
 ROM_END
 
 // normally, with DIP switch 4 off, HKT-0100/0110/0120 AKA "Katana Set 5.xx", will be booted from flash ROM IC507 (first 2 dumps below)
@@ -836,8 +834,8 @@ ROM_START( dcdev )
 	ROM_SYSTEM_BIOS(4, "041", "Katana Set5 Checker v0.41")
 	ROM_LOAD_BIOS(4, "set5v0.41.bin", 0x000000, 0x200000, CRC(485877bd) SHA1(dc1af1f1248ffa87d57bc5ef2ea41aac95ecfc5e) )
 
-	ROM_REGION64_LE(0x020000, "dcflash", 0)
-	ROM_LOAD( "hkt-0120-flash.bin", 0x000000, 0x020000, CRC(7784c304) SHA1(31ef57f550d8cd13e40263cbc657253089e53034) ) // Dev.Boxes have empty (FF filled) flash ROM
+	ROM_REGION64_LE(0x040000, "dcflash", ROMREGION_ERASEFF)
+	// Dev.Boxes have empty (FF filled) flash ROM
 ROM_END
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS          INIT       COMPANY FULLNAME */
@@ -892,8 +890,8 @@ ROM_START( dcfish )
 
 	// similar Dreamcast flashes, machine_name was changed to "Fish Life", machine_code2 is 0xff (verified  by software)
 	// dumped from used device, should be replaced with cleaned binary when flash programming will be emulated
-	ROM_REGION64_LE(0x020000, "dcflash", 0)
-	ROM_LOAD( "fish_flash.bin", 0x000000, 0x020000, BAD_DUMP CRC(73cbc49b) SHA1(c55caf64eb0ac5f8e73a1a385064606ad12947b7) ) // VA1 NTSC-JP
+	ROM_REGION64_LE(0x040000, "dcflash", ROMREGION_ERASEFF)
+	ROM_LOAD( "fish_flash.bin", 0x020000, 0x020000, BAD_DUMP CRC(73cbc49b) SHA1(c55caf64eb0ac5f8e73a1a385064606ad12947b7) ) // VA1 NTSC-JP
 
 	DISK_REGION( "ata:0:gdrom" )
 	DISK_IMAGE_READONLY( "fish_life_amazon", 0, SHA1(2cbba727b219bbbeddf551d0f3e80c5f8ecbe21f) ) // HDR-0094
