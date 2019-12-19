@@ -30,7 +30,7 @@ vt5x_cpu_device::vt5x_cpu_device(const machine_config &mconfig, device_type type
 	, m_bbits(bbits)
 	, m_ybits(ybits)
 	, m_pc(0)
-	, m_rom_bank(0)
+	, m_rom_page(0)
 	, m_mode_ff(false)
 	, m_done_ff(false)
 	, m_ac(0)
@@ -108,7 +108,7 @@ void vt5x_cpu_device::device_start()
 	state_add<u8>(STATE_GENFLAGS, "CURFLAGS", [this]() {
 		return (m_mode_ff ? 1 : 0) | (m_done_ff ? 2 : 0);
 	}).formatstr("%7s").noshow();
-	state_add(VT5X_BANK, "BANK", m_rom_bank).mask(3);
+	state_add(VT5X_PAGE, "PAGE", m_rom_page).mask(3);
 	state_add(VT5X_MODE, "MODE", m_mode_ff).noshow();
 	state_add(VT5X_DONE, "DONE", m_done_ff).noshow();
 	state_add(VT5X_AC, "AC", m_ac).formatstr("%03O").mask(0177);
@@ -121,7 +121,7 @@ void vt5x_cpu_device::device_start()
 
 	// save state
 	save_item(NAME(m_pc));
-	save_item(NAME(m_rom_bank));
+	save_item(NAME(m_rom_page));
 	save_item(NAME(m_mode_ff));
 	save_item(NAME(m_done_ff));
 	save_item(NAME(m_ac));
@@ -144,7 +144,7 @@ void vt5x_cpu_device::device_start()
 void vt5x_cpu_device::device_reset()
 {
 	m_pc = 0;
-	m_rom_bank = 0;
+	m_rom_page = 0;
 	m_video_process = false;
 
 	// CPU is initialized in weird state that does not allow first instruction to fully execute
@@ -261,7 +261,7 @@ void vt5x_cpu_device::execute_tf(u8 inst)
 
 		case 0120:
 			// IROM
-			m_rom_bank = (m_rom_bank + 1) & 3;
+			m_rom_page = (m_rom_page + 1) & 3;
 			break;
 
 		case 0140:
@@ -486,14 +486,14 @@ void vt5x_cpu_device::execute_th(u8 inst)
 	}
 
 	if ((m_pc & 0377) == 0377)
-		m_rom_bank = (m_rom_bank + 1) & 3;
+		m_rom_page = (m_rom_page + 1) & 3;
 	m_pc = (m_pc + 1) & 03777;
 }
 
 void vt5x_cpu_device::execute_tj(u8 dest)
 {
 	if (m_load_pc)
-		m_pc = u16(m_rom_bank) << 8 | dest;
+		m_pc = u16(m_rom_page) << 8 | dest;
 	else
 		m_pc = (m_pc + 1) & 03777;
 }

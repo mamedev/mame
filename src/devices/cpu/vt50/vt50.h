@@ -10,7 +10,7 @@ class vt5x_cpu_device : public cpu_device
 {
 public:
 	enum {
-		VT5X_PC, VT5X_BANK,
+		VT5X_PC, VT5X_PAGE,
 		VT5X_MODE, VT5X_DONE,
 		VT5X_AC, VT5X_B, VT5X_X, VT5X_Y, VT5X_X8,
 		VT5X_CFF, VT5X_VID
@@ -75,7 +75,7 @@ protected:
 
 	// internal state
 	u16 m_pc;
-	u8 m_rom_bank;
+	u8 m_rom_page;
 	bool m_mode_ff;
 	bool m_done_ff;
 	u8 m_ac;
