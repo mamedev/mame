@@ -32,6 +32,8 @@ private:
 
 	required_region_ptr<uint8_t> m_data;
 	uint16_t m_flickering_cycle;
+	uint16_t m_previous_0200_command;
+	uint64_t m_previous_0200_command_frame;
 	bool m_in_game;
 };
 

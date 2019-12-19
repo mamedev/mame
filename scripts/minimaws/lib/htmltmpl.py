@@ -70,6 +70,45 @@ MACHINE_CLONES_ROW = string.Template(
         '            <td>${manufacturer}</td>\n' \
         '        </tr>\n')
 
+MACHINE_SOFTWARELISTS_TABLE_PROLOGUE = string.Template(
+        '<h2 id="heading-softwarelists">Software Lists</h2>\n' \
+        '<table id="tbl-softwarelists">\n' \
+        '    <thead>\n' \
+        '        <tr>\n' \
+        '            <th>Short name</th>\n' \
+        '            <th>Description</th>\n' \
+        '            <th>Status</th>\n' \
+        '            <th class="numeric">Total</th>\n' \
+        '            <th class="numeric">Supported</th>\n' \
+        '            <th class="numeric">Partially supported</th>\n' \
+        '            <th class="numeric">Unsupported</th>\n' \
+        '        </tr>\n' \
+        '    </thead>\n' \
+        '    <tbody>\n')
+
+MACHINE_SOFTWARELISTS_TABLE_ROW = string.Template(
+        '        <tr>\n' \
+        '            <td><a href="${href}">${shortname}</a></td>\n' \
+        '            <td><a href="${href}">${description}</a></td>\n' \
+        '            <td>${status}</td>\n' \
+        '            <td style="text-align: right">${total}</td>\n' \
+        '            <td style="text-align: right">${supported}</td>\n' \
+        '            <td style="text-align: right">${partiallysupported}</td>\n' \
+        '            <td style="text-align: right">${unsupported}</td>\n' \
+        '        </tr>\n')
+
+MACHINE_SOFTWARELISTS_TABLE_EPILOGUE = string.Template(
+        '    </tbody>\n' \
+        '</table>\n' \
+        '<script>\n' \
+        '    make_table_sortable(document.getElementById("tbl-softwarelists"));\n' \
+        '    if (!document.getElementById("tbl-softwarelists").tBodies[0].rows.length)\n' \
+        '    {\n' \
+        '        document.getElementById("heading-softwarelists").style.display = "none";\n' \
+        '        document.getElementById("tbl-softwarelists").style.display = "none";\n' \
+        '    }\n' \
+        '</script>\n')
+
 MACHINE_OPTIONS_HEADING = string.Template(
         '<h2>Options</h2>\n' \
         '<p>\n' \
@@ -92,10 +131,14 @@ MACHINE_RAM_PROLOGUE = string.Template(
 MACHINE_RAM_OPTION = string.Template(
         '    <option value="${name}" data-isdefault="${isdefault}">${name} (${size})</option>\n')
 
-MACHINE_SLOTS_PLACEHOLDER = string.Template(
+MACHINE_SLOTS_PLACEHOLDER_PROLOGUE = string.Template(
         '<h3>Slots</h3>\n' \
         '<p id="para-slots-placeholder">Loading slot information&hellip;<p>\n' \
-        '<script>fetch_slots("${machine}");</script>\n')
+        '<script>\n')
+
+MACHINE_SLOTS_PLACEHOLDER_EPILOGUE = string.Template(
+        '    populate_slots(${machine});\n'
+        '</script>\n')
 
 MACHINE_ROW = string.Template(
         '        <tr>\n' \

@@ -148,6 +148,7 @@ CPUS["F2MC16"] = true
 CPUS["CR16B"] = true
 CPUS["FR"] = true
 CPUS["DSP56000"] = true
+CPUS["VT50"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -2069,6 +2070,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/vax11.cpp",
 	MAME_DIR .. "src/mame/drivers/rainbow.cpp",
 	MAME_DIR .. "src/mame/drivers/vk100.cpp",
+	MAME_DIR .. "src/mame/drivers/vt52.cpp",
 	MAME_DIR .. "src/mame/drivers/vt100.cpp",
 	MAME_DIR .. "src/mame/drivers/vt220.cpp",
 	MAME_DIR .. "src/mame/drivers/vt240.cpp",

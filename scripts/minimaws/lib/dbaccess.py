@@ -771,6 +771,14 @@ class QueryCursor(object):
                 'ORDER BY ramoption.size',
                 (machine, ))
 
+    def get_machine_softwarelists(self, machine):
+        return self.dbcurs.execute(
+                'SELECT machinesoftwarelist.tag AS tag, machinesoftwareliststatustype.value AS status, softwarelist.shortname AS shortname, softwarelist.description AS description, COUNT(software.id) AS total, COUNT(CASE software.supported WHEN 0 THEN 1 ELSE NULL END) AS supported, COUNT(CASE software.supported WHEN 1 THEN 1 ELSE NULL END) AS partiallysupported, COUNT(CASE software.supported WHEN 2 THEN 1 ELSE NULL END) AS unsupported ' \
+                'FROM machinesoftwarelist LEFT JOIN machinesoftwareliststatustype ON machinesoftwarelist.status = machinesoftwareliststatustype.id LEFT JOIN softwarelist ON machinesoftwarelist.softwarelist = softwarelist.id LEFT JOIN software ON softwarelist.id = software.softwarelist ' \
+                'WHERE machinesoftwarelist.machine = ? ' \
+                'GROUP BY machinesoftwarelist.id',
+                (machine, ))
+
     def get_softwarelist_id(self, shortname):
         return (self.dbcurs.execute('SELECT id FROM softwarelist WHERE shortname = ?', (shortname, )).fetchone() or (None, ))[0]
 
@@ -1075,6 +1083,8 @@ class UpdateConnection(object):
     def prepare_for_load(self):
         # here be dragons - this is a poor man's DROP ALL TABLES etc.
         self.dbconn.execute('PRAGMA foreign_keys = OFF')
+        for query in self.dbconn.execute('SELECT \'DROP VIEW \' || name FROM sqlite_master WHERE type = \'view\'').fetchall():
+            self.dbconn.execute(query[0])
         for query in self.dbconn.execute('SELECT \'DROP INDEX \' || name FROM sqlite_master WHERE type = \'index\' AND NOT name GLOB \'sqlite_autoindex_*\'').fetchall():
             self.dbconn.execute(query[0])
         for query in self.dbconn.execute('SELECT \'DROP TABLE \' || name FROM sqlite_master WHERE type = \'table\'').fetchall():

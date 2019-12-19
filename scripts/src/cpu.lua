@@ -2997,3 +2997,20 @@ if (CPUS["DSP56000"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56000/dsp56000d.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56000/dsp56000d.h")
 end
+
+--------------------------------------------------
+-- DEC VT50/VT52
+--@src/devices/cpu/vt50/vt50.h,CPUS["VT50"] = true
+--------------------------------------------------
+
+if (CPUS["VT50"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/vt50/vt50.cpp",
+		MAME_DIR .. "src/devices/cpu/vt50/vt50.h",
+	}
+end
+
+if (CPUS["VT50"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/vt50/vt50dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/vt50/vt50dasm.h")
+end

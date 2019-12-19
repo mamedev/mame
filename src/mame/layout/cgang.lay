@@ -136,11 +136,11 @@
 	</element>
 
 	<element name="spotr" defstate="0">
-		<rect state="0"><color red="0.2" green="0.0" blue="0.0" /></rect>
-		<rect state="1"><color red="0.3" green="0.0" blue="0.0" /></rect>
-		<rect state="2"><color red="0.4" green="0.0" blue="0.0" /></rect>
-		<rect state="3"><color red="0.5" green="0.0" blue="0.0" /></rect>
-		<rect state="4"><color red="0.6" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.22" green="0.0" blue="0.0" /></rect>
+		<rect state="1"><color red="0.29" green="0.0" blue="0.0" /></rect>
+		<rect state="2"><color red="0.36" green="0.0" blue="0.0" /></rect>
+		<rect state="3"><color red="0.43" green="0.0" blue="0.0" /></rect>
+		<rect state="4"><color red="0.5" green="0.0" blue="0.0" /></rect>
 	</element>
 
 	<element name="leda" defstate="0">
@@ -484,6 +484,14 @@
 		<element name="spot_lamp2" ref="spotr"><bounds x="22.5" y="82.5" width="8.5" height="3" /></element>
 		<element name="spot_lamp0" ref="spotr"><bounds x="31.0" y="82.5" width="8.5" height="3" /></element>
 		<element name="spot_lamp1" ref="spotr"><bounds x="28.166" y="82.5" width="5.666" height="3" /></element>
+
+		<element name="spot_lamp2" ref="spotr"><bounds x="25.9" y="82.5" width="3.4" height="3" /></element>
+		<element name="spot_lamp1" ref="spotr" blend="add"><bounds x="25.9" y="82.5" width="3.4" height="3" /></element>
+		<element ref="black"><bounds x="25.9" y="82.5" width="3.4" height="3" /><color alpha="0.5" /></element>
+
+		<element name="spot_lamp1" ref="spotr"><bounds x="32.7" y="82.5" width="3.4" height="3" /></element>
+		<element name="spot_lamp0" ref="spotr" blend="add"><bounds x="32.7" y="82.5" width="3.4" height="3" /></element>
+		<element ref="black"><bounds x="32.7" y="82.5" width="3.4" height="3" /><color alpha="0.5" /></element>
 
 		<repeat count="8">
 			<param name="x" start="23.5" increment="2" />
