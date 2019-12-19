@@ -26,6 +26,7 @@ vt5x_cpu_device::vt5x_cpu_device(const machine_config &mconfig, device_type type
 	, m_ut_flag_callback(*this)
 	, m_ruf_callback(*this)
 	, m_key_up_callback(*this)
+	, m_bell_callback(*this)
 	, m_bbits(bbits)
 	, m_ybits(ybits)
 	, m_pc(0)
@@ -44,6 +45,7 @@ vt5x_cpu_device::vt5x_cpu_device(const machine_config &mconfig, device_type type
 	, m_write_ff(false)
 	, m_flag_test_ff(false)
 	, m_m2u_ff(false)
+	, m_bell_ff(false)
 	, m_load_pc(false)
 	, m_qa_e23(0)
 	, m_icount(0)
@@ -89,6 +91,7 @@ void vt5x_cpu_device::device_resolve_objects()
 	m_ut_flag_callback.resolve_safe(0);
 	m_ruf_callback.resolve_safe();
 	m_key_up_callback.resolve_safe(1);
+	m_bell_callback.resolve_safe();
 }
 
 void vt5x_cpu_device::device_start()
@@ -133,6 +136,7 @@ void vt5x_cpu_device::device_start()
 	save_item(NAME(m_write_ff));
 	save_item(NAME(m_flag_test_ff));
 	save_item(NAME(m_m2u_ff));
+	save_item(NAME(m_bell_ff));
 	save_item(NAME(m_load_pc));
 	save_item(NAME(m_qa_e23));
 }
@@ -298,7 +302,9 @@ void vt5x_cpu_device::execute_tw(u8 inst)
 			break;
 
 		case 0060:
-			// CBFF (TODO)
+			// CBFF
+			m_bell_ff = !m_bell_ff;
+			m_bell_callback(m_bell_ff);
 			break;
 
 		case 0100:
@@ -330,6 +336,8 @@ void vt5x_cpu_device::execute_tw(u8 inst)
 		m_write_ff = (m_mode_ff || m_ac >= m_ram_do) && !m_done_ff;
 	else
 		m_write_ff = (inst & 0162) == 0022 || (inst & 0162) == 0062 || (inst & 0162) == 0122;
+
+	// DONE is set by any RAM write, not just LD
 	if (m_write_ff)
 		m_done_ff = true;
 }
@@ -470,7 +478,7 @@ void vt5x_cpu_device::execute_th(u8 inst)
 
 		case 0160:
 			// M0: TOSJ (TODO)
-			// M1: KEYJ (TODO)
+			// M1: KEYJ
 			if (m_mode_ff)
 				m_load_pc = m_key_up_callback(m_ac) & 1;
 			break;

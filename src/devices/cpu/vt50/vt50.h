@@ -23,6 +23,7 @@ public:
 	auto ut_flag_callback() { return m_ut_flag_callback.bind(); }
 	auto ruf_callback() { return m_ruf_callback.bind(); }
 	auto key_up_callback() { return m_key_up_callback.bind(); }
+	auto bell_callback() { return m_bell_callback.bind(); }
 
 protected:
 	// construction/destruction
@@ -66,6 +67,7 @@ protected:
 	devcb_read_line m_ut_flag_callback;
 	devcb_write_line m_ruf_callback;
 	devcb_read8 m_key_up_callback;
+	devcb_write_line m_bell_callback;
 
 	// register dimensions
 	const u8 m_bbits;
@@ -90,6 +92,7 @@ protected:
 	bool m_write_ff;
 	bool m_flag_test_ff;
 	bool m_m2u_ff;
+	bool m_bell_ff;
 	bool m_load_pc;
 	bool m_qa_e23;
 	s32 m_icount;

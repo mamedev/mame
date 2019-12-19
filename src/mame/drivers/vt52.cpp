@@ -23,7 +23,9 @@
 //#include "bus/rs232/rs232.h"
 #include "cpu/vt50/vt50.h"
 #include "machine/ay31015.h"
+#include "sound/spkrdev.h"
 #include "screen.h"
+#include "speaker.h"
 
 class vt52_state : public driver_device
 {
@@ -202,12 +204,16 @@ void vt52_state::vt52(machine_config &mconfig)
 	m_maincpu->ut_flag_callback().set(FUNC(vt52_state::xrdy_eoc_r));
 	m_maincpu->ruf_callback().set(m_uart, FUNC(ay51013_device::write_rdav));
 	m_maincpu->key_up_callback().set(FUNC(vt52_state::key_r));
+	m_maincpu->bell_callback().set("bell", FUNC(speaker_sound_device::level_w));
 
 	AY51013(mconfig, m_uart); // TR1402 or equivalent
 
 	screen_device &screen(SCREEN(mconfig, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(13.824_MHz_XTAL, 900, 0, 720, 256, 0, 192);
 	screen.set_screen_update(FUNC(vt52_state::screen_update));
+
+	SPEAKER(mconfig, "mono").front_center();
+	SPEAKER_SOUND(mconfig, "bell").add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 ROM_START(vt52)
