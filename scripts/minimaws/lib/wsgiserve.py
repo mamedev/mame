@@ -133,9 +133,7 @@ class QueryPageHandler(HandlerBase):
     def slot_data(self, machine):
         result = { 'defaults': { }, 'slots': { } }
 
-        # get defaults and slot options
-        for slot, default in self.dbcurs.get_slot_defaults(machine):
-            result['defaults'][slot] = default
+        # get slot options
         prev = None
         for slot, option, shortname, description in self.dbcurs.get_slot_options(machine):
             if slot != prev:
@@ -147,12 +145,17 @@ class QueryPageHandler(HandlerBase):
                 prev = slot
             options[option] = { 'device': shortname, 'description': description }
 
-        # remove slots that come from default cards in other slots
-        for slot in tuple(result['slots'].keys()):
-            slot += ':'
-            for candidate in tuple(result['slots'].keys()):
-                if candidate.startswith(slot):
-                    del result['slots'][candidate]
+        # if there are any slots, get defaults
+        if result['slots']:
+            for slot, default in self.dbcurs.get_slot_defaults(machine):
+                result['defaults'][slot] = default
+
+            # remove slots that come from default cards in other slots
+            for slot in tuple(result['slots'].keys()):
+                slot += ':'
+                for candidate in tuple(result['slots'].keys()):
+                    if candidate.startswith(slot):
+                        del result['slots'][candidate]
 
         return result
 
@@ -171,11 +174,12 @@ class QueryPageHandler(HandlerBase):
                     'unsupported':          softwarelist['unsupported'] }
 
         # remove software lists that come from default cards in slots
-        for slot, default in self.dbcurs.get_slot_defaults(machine):
-            slot += ':'
-            for candidate in tuple(result.keys()):
-                if candidate.startswith(slot):
-                    del result[candidate]
+        if result:
+            for slot, default in self.dbcurs.get_slot_defaults(machine):
+                slot += ':'
+                for candidate in tuple(result.keys()):
+                    if candidate.startswith(slot):
+                        del result[candidate]
 
         return result
 
@@ -305,6 +309,7 @@ class MachineHandler(QueryPageHandler):
         for softwarelist in self.dbcurs.get_machine_softwarelists(id):
             total = softwarelist['total']
             yield htmltmpl.MACHINE_SOFTWARELISTS_TABLE_ROW.substitute(
+                    rowid=cgi.escape(softwarelist['tag'].replace(':', '-'), True),
                     href=self.softwarelist_href(softwarelist['shortname']),
                     shortname=cgi.escape(softwarelist['shortname']),
                     description=cgi.escape(softwarelist['description']),
@@ -368,8 +373,9 @@ class MachineHandler(QueryPageHandler):
                             haveextra.add(carddev)
                             cardid = self.dbcurs.get_machine_id(carddev)
                             carddev = self.sanitised_json(carddev)
-                            yield ('    bios_sets[%s] = %s;\n' % (carddev, self.sanitised_json(self.bios_data(cardid)))).encode('utf-8')
-                            yield ('    machine_flags[%s] = %s;\n' % (carddev, self.sanitised_json(self.flags_data(cardid)))).encode('utf-8')
+                            yield (
+                                    '    bios_sets[%s] = %s;\n    machine_flags[%s] = %s;\n    softwarelist_info[%s] = %s;\n' %
+                                    (carddev, self.sanitised_json(self.bios_data(cardid)), carddev, self.sanitised_json(self.flags_data(cardid)), carddev, self.sanitised_json(self.softwarelist_data(cardid)))).encode('utf-8')
             yield htmltmpl.MACHINE_SLOTS_PLACEHOLDER_EPILOGUE.substitute(
                     machine=self.sanitised_json(self.shortname)).encode('utf=8')
 

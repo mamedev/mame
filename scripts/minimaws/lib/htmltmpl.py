@@ -75,6 +75,7 @@ MACHINE_SOFTWARELISTS_TABLE_PROLOGUE = string.Template(
         '<table id="tbl-softwarelists">\n' \
         '    <thead>\n' \
         '        <tr>\n' \
+        '            <th>Card</th>\n' \
         '            <th>Short name</th>\n' \
         '            <th>Description</th>\n' \
         '            <th>Status</th>\n' \
@@ -87,7 +88,8 @@ MACHINE_SOFTWARELISTS_TABLE_PROLOGUE = string.Template(
         '    <tbody>\n')
 
 MACHINE_SOFTWARELISTS_TABLE_ROW = string.Template(
-        '        <tr>\n' \
+        '        <tr id="row-softwarelists-${rowid}">\n' \
+        '            <td></td>\n' \
         '            <td><a href="${href}">${shortname}</a></td>\n' \
         '            <td><a href="${href}">${description}</a></td>\n' \
         '            <td>${status}</td>\n' \
