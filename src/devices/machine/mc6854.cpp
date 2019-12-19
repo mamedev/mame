@@ -33,20 +33,18 @@
 #include "emu.h"
 #include "mc6854.h"
 
-#define LOG_SETUP    (1U << 1)
-#define LOG_BITS     (1U << 2)
+#define LOG_SETUP    ( 1U << 1 )
+#define LOG_BITS     ( 1U << 2 )
+#define LOG_IRQ      ( 1U << 3 )
 
-//#define VERBOSE (LOG_BITS|LOG_GENERAL | LOG_SETUP)
+//#define VERBOSE (LOG_IRQ | LOG_BITS | LOG_GENERAL | LOG_SETUP)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
 
-#define LOGSETUP(...)   LOGMASKED(LOG_SETUP,    __VA_ARGS__)
+#define LOGSETUP(...)   LOGMASKED(LOG_SETUP,   __VA_ARGS__)
 #define LOGBITS(...)    LOGMASKED(LOG_BITS,    __VA_ARGS__)
-
-//#define VERBOSE 1
-//#include "logmacro.h"
-
+#define LOGIRQ(...)     LOGMASKED(LOG_IRQ,     __VA_ARGS__)
 
 
 /******************* parameters ******************/
@@ -718,15 +716,23 @@ void mc6854_device::update_sr1( )
 		m_sr1 &= ~RDA;
 
 	/* update IRQ */
+	LOGIRQ("\nUpdate IRQ in: %d\n", (m_sr1 & IRQ) ? 1 : 0);
 	m_sr1 &= ~IRQ;
-	if ( TIE && (m_sr1 & (TU | TDRA)) && !TDSR )
-		m_sr1 |= IRQ;
-	if ( RIE && !RDSR )
+	if ( TIE )
 	{
-		if ( m_sr1 & (S2RQ | RDA | CTS) )
-			m_sr1 |= IRQ;
-		if ( m_sr2 & (ERR | FV | DCD | OVRN | RABT | RIDLE | AP) )
-			m_sr1 |= IRQ;
+		if ( m_sr1 & TU ) m_sr1 |= IRQ;
+		LOGIRQ(" - Update IRQ TU: %d\n", (m_sr1 & IRQ) ? 1 : 0);
+		if ( ( m_sr1 & TDRA ) && !TDSR ) m_sr1 |= IRQ; // TDRA will not cause interrupt if in DMA mode
+		LOGIRQ(" - Update IRQ TDRA: %d\n", (m_sr1 & IRQ) ? 1 : 0);
+	}
+	if ( RIE )
+	{
+		if ( m_sr1 & (S2RQ | CTS) ) m_sr1 |= IRQ;
+		LOGIRQ(" - Update IRQ S2RQ(%02x)|CTS(%d): %d\n", (m_sr2 & 0x7f), (m_sr1 & CTS) ? 1 : 0, (m_sr1 & IRQ) ? 1 : 0);
+		if ( ( m_sr1 & RDA ) && !RDSR ) m_sr1 |= IRQ; // RDA will not cause interrupt if in DMA mode
+		LOGIRQ(" - Update IRQ RDA(%d) && !RDSR(%d): %d\n", (m_sr1 & RDA) ? 1 : 0, RDSR ? 1 : 0, (m_sr1 & IRQ) ? 1 : 0);
+		if ( m_sr2 & (ERR | FV | DCD | OVRN | RABT | RIDLE | AP) ) m_sr1 |= IRQ;
+		LOGIRQ(" - Update IRQ ERR: %d\n", (m_sr1 & IRQ) ? 1 : 0);
 	}
 
 	m_out_irq_cb((m_sr1 & IRQ) ? ASSERT_LINE : CLEAR_LINE);
