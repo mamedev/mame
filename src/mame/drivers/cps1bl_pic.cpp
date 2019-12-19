@@ -20,7 +20,16 @@
     Unless any un-protected PIcs ever turn up (unlikely) then "decapping" of working chips is probably the
     only way valid dumps will ever be made.
 
-    *** see fcrash.cpp for game status ***
+Status of each game:
+--------------------
+dinopic:           No sound.
+dinopic2:          No sound, one bad graphics ROM. Copying 8.bin from dinopic fixes it.
+dinopic3:          No sound. Some minor gfx priority issues, confirmed present on real board.
+punipic, punipic2: No sound. Problems in Central Park. Patches used.
+punipic3:          Same as punipic, and doors are missing.
+slampic:           No sound. Some minor gfx issues (sprites on character select screen).
+slampic2:          No sound. All gfx issues confirmed present on real board.
+
 */
 
 #include "emu.h"
