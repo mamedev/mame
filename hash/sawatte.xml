@@ -27,6 +27,18 @@
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-19040.ic1" size="524288" crc="0c9bae2f" sha1="bc5030fab99e8f4b1bcc8ed77c1cc07d8407df93"/>
 			</dataarea>
+			<dataarea name="pages" size="0x2000000"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="7990102" crc="c3e1abe3" sha1="699019a3edb8e6f8750f1ae171d439e5bb48beef" offset="0"/>
+				<rom name="0 - 0002.png" size="8126259" crc="9f551c16" sha1="99dd7c3c05ddd173afafabaf629e9fc805ea66f4" offset="0"/>
+				<rom name="0 - 0003.png" size="8719411" crc="35a6b984" sha1="dfb0eda798efbc7cc9c33b39d9d05d604224a27f" offset="0"/>
+				<rom name="0 - 0004.png" size="8035124" crc="724e0cc4" sha1="a0b648223564b75e995e6fefa4d890f5510af9d9" offset="0"/>
+				<rom name="0 - 0005.png" size="7732789" crc="a727b3d6" sha1="39b6c9314ffd59a4f69d68078f8e78a68ee99d85" offset="0"/>
+				<rom name="0 - 0006.png" size="8105364" crc="66711279" sha1="4c90904c2581657c924a5b68ffbd1033ac88ae01" offset="0"/>
+				<rom name="0 - 0007.png" size="7953623" crc="ee483049" sha1="3f08f071f558a3d61ae2d124381adda125d7eba1" offset="0"/>
+				<rom name="0 - 0008.png" size="5667933" crc="771f89d5" sha1="39e991eab0b0b825e8dace0c0d9ebdb0a42b20a5" offset="0"/>
+				<rom name="0 - 0009.png" size="5420956" crc="33bad398" sha1="3e80900dec29de2998749909d29c3f570b333585" offset="0"/>
+				<rom name="0 - 0010.png" size="5577261" crc="b62d448b" sha1="fa3522cbe7125582649b9577ae8171384b4e0658" offset="0"/>
+			</dataarea>
 		</part>
 	</software>
 
@@ -100,6 +112,18 @@
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-19041.ic1" size="524288" crc="ec924165" sha1="b25a5637c8cc1f2f6224595853d540195be86ec9"/>
 			</dataarea>
+			<dataarea name="pages" size="0x2000000"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="7542084" crc="6fd1fdf9" sha1="e4648b1ca06db75682db593950b9ccfaddeeedda" offset="0"/>
+				<rom name="0 - 0002.png" size="6653961" crc="db5d33fb" sha1="6d9782c1dc4f96629ac3744309631e6ba2f63123" offset="0"/>
+				<rom name="0 - 0003.png" size="6795708" crc="37e3a3d3" sha1="bd7495438f430ae1aa2715897a13d7aba6b0ef46" offset="0"/>
+				<rom name="0 - 0004.png" size="7354011" crc="d22ca428" sha1="ab33525b3221fcb8634a866f1ecde503c1baa7e4" offset="0"/>
+				<rom name="0 - 0005.png" size="6516805" crc="1f78d397" sha1="67ec4c4dca78dcbefccfa22167bd40f7206dcb8f" offset="0"/>
+				<rom name="0 - 0006.png" size="7667615" crc="ceb8515e" sha1="bcdfef959b327f6ef044a52ac82e7b20468c0fd8" offset="0"/>
+				<rom name="0 - 0007.png" size="7209365" crc="fa32954b" sha1="77722ec2ec5975ee02efd8bc0418d6b35c34b44a" offset="0"/>
+				<rom name="0 - 0008.png" size="8179876" crc="a90c6b64" sha1="cee0fb447372dc92b1ed9efb85cc379ef22e90ac" offset="0"/>
+				<rom name="0 - 0009.png" size="6683838" crc="b0f97114" sha1="d4738f9f8c3d07c6ad83057fadcb26691c71225b" offset="0"/>
+				<rom name="0 - 0010.png" size="5460093" crc="872830fa" sha1="5296cec65ab3ac74afcbd549965d541d7e19def5" offset="0"/>
+			</dataarea>
 		</part>
 	</software>
 
@@ -157,6 +181,18 @@
 			<feature name="ic1" value="MPR-19828-T" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-19828-t.ic1" size="524288" crc="57988dc7" sha1="438a35b2a46ec82b5e31478d9e244928f98891ab"/>
+			</dataarea>
+			<dataarea name="pages" size="0x2000000"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="8822099" crc="5406451f" sha1="3f996c7e15656a618d7e7e9c4a3baae5f58e5439" offset="0"/>
+				<rom name="0 - 0002.png" size="8512982" crc="d45517e2" sha1="42634fa530a702366c2285071dbe0ddc998c6357" offset="0"/>
+				<rom name="0 - 0003.png" size="8416449" crc="40b740a0" sha1="5cc0c58c8b5a0d6d127eb19bfbea9f528a81c005" offset="0"/>
+				<rom name="0 - 0004.png" size="8684377" crc="39a13064" sha1="80b1c0144b21df782b686ab96147254280bd95b2" offset="0"/>
+				<rom name="0 - 0005.png" size="8380978" crc="7cce8ef9" sha1="b10a92b8c4d23972b055b140ee769c0823504fa7" offset="0"/>
+				<rom name="0 - 0006.png" size="8253402" crc="4fd8a1b6" sha1="ac29a4c2b5b9ea51bcb4e5e8327d80f35757a890" offset="0"/>
+				<rom name="0 - 0007.png" size="8504365" crc="1970e627" sha1="4c195665d22d5a48005977ed6167d0184e1f12ea" offset="0"/>
+				<rom name="0 - 0008.png" size="8288967" crc="cdddbb28" sha1="a6b7a35a72da55e94bdfd057b322e6fac30d9ae0" offset="0"/>
+				<rom name="0 - 0009.png" size="7968781" crc="90a60704" sha1="575044f121fe0005f48c4f74749697d695c29cfd" offset="0"/>
+				<rom name="0 - 0010.png" size="5668176" crc="8ae2a2ae" sha1="2a925b4d54826f5391f5df1b48212aeb9b54b283" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
