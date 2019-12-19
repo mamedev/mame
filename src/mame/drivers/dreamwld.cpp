@@ -86,11 +86,11 @@ Stephh's notes (based on the game M68EC020 code and some tests) :
     probably a leftover from hardware development as the test menu is mostly
     incomplete.
 
-   All: sprite priority, the original psikyo.c HW has sprite<->tilemap
+   All: sprite priority, the original psikyo.cpp HW has sprite<->tilemap
     priority but we don't support it here, does the clone HW support it?
 
-   All: sprite zooming, again the original psikyo.c HW supports this, but we
-    don't support it here.  The Strikers 1945 bootleg in psikyo.c doesn't
+   All: sprite zooming, again the original psikyo.cpp HW supports this, but we
+    don't support it here.  The Strikers 1945 bootleg in psikyo.cpp doesn't
     appear to support it properly either, so it might be missing on these
     clone boards.
 
@@ -1110,8 +1110,8 @@ ROM_START( dreamwld )
 	ROM_LOAD32_BYTE( "1.bin", 0x000002, 0x040000, CRC(35c94ee5) SHA1(3440a65a807622b619c97bc2a88fd7d875c26f66) )
 	ROM_LOAD32_BYTE( "2.bin", 0x000003, 0x040000, CRC(5409e7fc) SHA1(2f94a6a8e4c94b36b43f0b94d58525f594339a9d) )
 
-	ROM_REGION( 0x02000, "mcu", 0 ) /* 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x02000 , NO_DUMP ) /* can't be dumped. */
+	ROM_REGION( 0x02000, "mcu", 0 ) // chip marked P87C52EBPN, die shows 87C51RA+ after decapping
+	ROM_LOAD( "87c51rap.bin", 0x00000, 0x02000 , CRC(987bbfe8) SHA1(7717ed5cf97bc11c104356f6ff1d893d1606bcf0) ) // not hooked up yet, from 0x3c onwards it contains the exact same data as in the extracted protdata.bin below
 
 	ROM_REGION( 0x6c9, "prot", 0 ) /* Protection data  */
 	/* The MCU supplies this data.
@@ -1231,4 +1231,4 @@ GAME( 1998, cutefght, 0,        dreamwld, cutefght, dreamwld_state, empty_init, 
 GAME( 1999, rolcrush, 0,        baryon,   rolcrush, dreamwld_state, empty_init, ROT0,   "SemiCom / Exit (Trust license)", "Rolling Crush (version 1.07.E - 1999/02/11, Trust license)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, rolcrusha,rolcrush, baryon,   rolcrush, dreamwld_state, empty_init, ROT0,   "SemiCom / Exit",                 "Rolling Crush (version 1.03.E - 1999/01/29)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1999, gaialast, 0,        baryon,   gaialast, dreamwld_state, empty_init, ROT0,   "SemiCom / XESS",                 "Gaia - The Last Choice of Earth",                            MACHINE_SUPPORTS_SAVE )
-GAME( 2000, dreamwld, 0,        dreamwld, dreamwld, dreamwld_state, empty_init, ROT0,   "SemiCom",                        "Dream World",                                                MACHINE_SUPPORTS_SAVE )
+GAME( 2000, dreamwld, 0,        dreamwld, dreamwld, dreamwld_state, empty_init, ROT0,   "SemiCom",                        "Dream World",                                                MACHINE_SUPPORTS_SAVE ) // MCU dump not hooked up yet
