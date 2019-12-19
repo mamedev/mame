@@ -45,14 +45,14 @@ inline void unsp_device::execute_fxxx_000_group(uint16_t op)
 	{
 		int r = op & 0x7;
 		logerror("%s = fr\n", regs[r]);
-		unimplemented_opcode(op);
+	//	unimplemented_opcode(op);
 		return;
 	}
 	else if (((op & 0xf1f8) == 0xf038) && m_iso >= 12)
 	{
 		int r = op & 0x7;
 		logerror("fr = %s\n", regs[r]);
-		unimplemented_opcode(op);
+	//	unimplemented_opcode(op);
 		return;
 	}
 

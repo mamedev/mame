@@ -35,12 +35,32 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 		switch (aluop)
 		{
 		case 0x00: // add
+		{
 			// A += B
-			logerror( "(Extended group 0) %s += %s\n", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-													 , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
-			unimplemented_opcode(op, ximm);
+			//logerror( "(Extended group 0) %s += %s\n", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
+			//										   , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+			m_core->m_icount -= 1; // TODO
+
+			uint16_t r0 = (ra & 0x8) ? m_secondary_r[ra & 0x7] : m_core->m_r[ra & 0x7];
+			uint16_t r1 = (rb & 0x8) ? m_secondary_r[rb & 0x7] : m_core->m_r[rb & 0x7];
+
+			uint32_t lres = r0 + r1;
+
+			update_nzsc(lres, r0, r1);
+
+			if (ra & 0x8)
+			{
+				m_secondary_r[ra & 0x7] = (uint16_t)lres;
+			}
+			else
+			{
+				m_core->m_r[ra & 0x7] = (uint16_t)lres;
+			}
+
+			//unimplemented_opcode(op, ximm);
 			return;
 			break;
+		}
 
 		case 0x01: // adc
 			// A += B, Carry
@@ -67,12 +87,22 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			break;
 
 		case 0x04: // cmp
+		{
 			// CMP A,B
-			logerror( "(Extended group 0) cmp %s, %s\n", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-													   , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
-			unimplemented_opcode(op, ximm);
+			//logerror( "(Extended group 0) cmp %s, %s\n", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
+			//										   , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+			m_core->m_icount -= 1; // TODO
+
+			uint16_t r0 = (ra & 0x8) ? m_secondary_r[ra & 0x7] : m_core->m_r[ra & 0x7];
+			uint16_t r1 = (rb & 0x8) ? m_secondary_r[rb & 0x7] : m_core->m_r[rb & 0x7];
+
+			uint32_t lres = r0 + (uint16_t)(~r1) + uint32_t(1);
+			update_nzsc(lres, r0 , ~r1);
+
+			//unimplemented_opcode(op, ximm);
 			return;
 			break;
+		}
 
 		case 0x06: // neg
 			// A = -B
@@ -91,13 +121,26 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			break;
 
 		case 0x09: // load
+		{
 			// A = B
-			logerror( "(Extended group 0) %s = %s\n", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
-													, (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
-			unimplemented_opcode(op, ximm);
+			//logerror("(Extended group 0) %s = %s\n", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
+			//								 	     , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
+			m_core->m_icount -= 1; // TODO
+
+			uint32_t lres = (rb & 0x8) ? m_secondary_r[rb & 0x7] : m_core->m_r[rb & 0x7];
+			update_nz(lres);
+			if (ra & 0x8)
+			{
+				m_secondary_r[ra & 0x7] = (uint16_t)lres;
+			}
+			else
+			{
+				m_core->m_r[ra & 0x7] = (uint16_t)lres;
+			}
+
 			return;
 			break;
-
+		}
 		case 0x0a: // or
 			// A |= B
 			logerror( "(Extended group 0) %s |= %s\n", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
@@ -296,7 +339,7 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			//	                                     , imm16_2);
 			m_core->m_icount -= 1; // TODO
 
-			uint16_t lres = imm16_2;
+			uint32_t lres = imm16_2;
 			update_nz(lres);
 			if (ra & 0x8)
 			{
@@ -437,7 +480,7 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 			//uin32_t lreg = UNSP_LREG_I(imm16_2);
 
-			uint16_t lres = read16(imm16_2);
+			uint32_t lres = read16(imm16_2);
 			update_nz(lres);
 			if (ra & 0x8)
 			{
@@ -960,7 +1003,7 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			
 			m_core->m_icount -= 1; // TODO
 
-			uint16_t lres = m_secondary_r[rx] + (uint16_t)(~imm6) + uint32_t(1);
+			uint32_t lres = m_secondary_r[rx] + (uint16_t)(~imm6) + uint32_t(1);
 			update_nzsc(lres, m_secondary_r[rx] , ~imm6);
 			
 			//unimplemented_opcode(op, ximm);
@@ -988,7 +1031,7 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 			m_core->m_icount -= 1; // TODO
 
-			uint16_t lres = imm6;
+			uint32_t lres = imm6;
 			update_nz(lres);
 			m_secondary_r[rx] = (uint16_t)lres;
 
@@ -1042,18 +1085,46 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 		switch (aluop)
 		{
 		case 0x00: // add
+		{
 			// A += B
-			logerror( "(Extended group 7) %s += [BP+%02x]\n", extregs[rx], imm6 );
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
+			// logerror( "(Extended group 7) %s += [BP+%02x]\n", extregs[rx], imm6 );
+			m_core->m_icount -= 1; // TODO
 
-		case 0x01: // adc
-			// A += B, Carry
-			logerror( "(Extended group 7) %s += [BP+%02x], carry\n", extregs[rx], imm6 );
-			unimplemented_opcode(op, ximm);
+			uint16_t addr = (uint16_t)(m_core->m_r[REG_BP] + (imm6 & 0x3f));
+			uint16_t r0 = m_secondary_r[rx];
+			uint16_t r1 = read16(addr);
+
+			uint32_t lres = r0 + r1;
+
+			update_nzsc(lres, r0, r1);
+
+			m_secondary_r[rx] = lres;
+
+			//unimplemented_opcode(op, ximm);
 			return;
 			break;
+		}
+		case 0x01: // adc
+		{
+			// A += B, Carry
+			//logerror( "(Extended group 7) %s += [BP+%02x], carry\n", extregs[rx], imm6 );
+			m_core->m_icount -= 1; // TODO
+
+			uint32_t c = (m_core->m_r[REG_SR] & UNSP_C) ? 1 : 0;
+			uint16_t addr = (uint16_t)(m_core->m_r[REG_BP] + (imm6 & 0x3f));
+			uint16_t r0 = m_secondary_r[rx];
+			uint16_t r1 = read16(addr);
+
+			uint32_t lres = r0 + r1 + c;
+				
+			update_nzsc(lres, r0, r1);
+	
+			m_secondary_r[rx] = lres;
+
+			//unimplemented_opcode(op, ximm);
+			return;
+			break;
+		}
 
 		case 0x02: // sub
 			// A -= B
