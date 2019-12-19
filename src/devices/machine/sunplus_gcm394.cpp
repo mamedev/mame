@@ -534,18 +534,18 @@ READ16_MEMBER(generalplus_gpac800_device::unkarea_7854_r)
 
 WRITE16_MEMBER(generalplus_gpac800_device::flash_addr_low_w)
 {
-	//printf("%s:sunplus_gcm394_base_device::flash_addr_low_w %04x\n", machine().describe_context().c_str(), data);
+	//logerror("%s:sunplus_gcm394_base_device::flash_addr_low_w %04x\n", machine().describe_context(), data);
 	m_flash_addr_low = data;
 }
 
 WRITE16_MEMBER(generalplus_gpac800_device::flash_addr_high_w)
 {
-	//printf("%s:sunplus_gcm394_base_device::flash_addr_high_w %04x\n", machine().describe_context().c_str(), data);
+	//logerror("%s:sunplus_gcm394_base_device::flash_addr_high_w %04x\n", machine().describe_context(), data);
 	m_flash_addr_high = data;
 
 	uint32_t address = (m_flash_addr_high << 16) | m_flash_addr_low;
 
-	logerror("flash address is now %08x\n", address);
+	logerror("%s: flash address is now %08x\n", machine().describe_context(), address);
 }
 
 
@@ -678,7 +678,7 @@ void generalplus_gpac800_device::device_reset()
 
 IRQ_CALLBACK_MEMBER(sunplus_gcm394_base_device::irq_vector_cb)
 {
-	//printf("irq_vector_cb %d\n", irqline);
+	//logerror("irq_vector_cb %d\n", irqline);
 
 	if (irqline == UNSP_IRQ6_LINE)
 		set_state_unsynced(UNSP_IRQ6_LINE, CLEAR_LINE);

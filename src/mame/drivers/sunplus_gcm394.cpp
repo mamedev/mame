@@ -5,12 +5,29 @@
 
     Compared to vii.cpp this is clearly newer, has extra opcodes, different internal map etc. also scaling and higher resolutions based on Spongebob
 
+
+	GPL600
         Smart Fit Park
         SpongeBob SquarePants Bikini Bottom 500
         Spiderman - The Masked Menace 'Spider Sense' (pad type with Spiderman model)
         (Wireless Hunting? - maybe, register map looks the same even if it sets stack to 2fff not 6fff)
 
-    as these use newer opcodes in the FExx range they probably need a derived unSP type too
+	GPL800 (== GPL600 with NAND support + maybe more)
+		Wireless Air 60
+		Golden Tee Golf
+		Cars 2
+		Toy Story Mania
+		V.Baby
+		Playskool Heroes Transformers Rescue Bots Beam Box
+
+	GPL500 (unknown, might be GPL600 but without the higher resolution support?)
+		The Price is Right
+		Bejeweled? (might be GPL600)
+
+	Notes
+		smartfp: hold button Circle, Star and Home on startup for Test Menu
+
+    these are both unsp 2.0 type, as they use the extended ocpodes
 */
 
 #include "emu.h"
@@ -373,7 +390,7 @@ static INPUT_PORTS_START( gcm394 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("10")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON16 ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("11")
 
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_A) PORT_NAME("Circle / Red") // hold button Circle and Star on startup for test menu (other conditions? doesn't always work?)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_A) PORT_NAME("Circle / Red") 
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_S) PORT_NAME("Square / Orange")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_D) PORT_NAME("Triangle / Yellow")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_F) PORT_NAME("Star / Blue")
@@ -714,9 +731,12 @@ void generalplus_gpac800_game_state::machine_reset()
 	mem.write_word(0xfffe, 0x6ffc);
 	mem.write_word(0xffff, 0x6ffe);
 
-	mem.write_word(0x3f368, 0x4841); 	// cars 2 wait hack
+	// note, these patch the code copied to SRAM so the 'PROGRAM ROM' check fails (it passes otherwise)
+	if (mem.read_word(0x3f368) == 0x4840)
+		mem.write_word(0x3f368, 0x4841); 	// cars 2 wait hack
 
-
+	if (mem.read_word(0x4368c) == 0x4846)
+		mem.write_word(0x4368c, 0x4840); 	// cars 2 force service mode
 
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 }
@@ -743,7 +763,7 @@ void generalplus_gpac800_game_state::nand_init(int blocksize, int blocksize_stri
 	}
 
 	// debug to allow for easy use of unidasm.exe
-	if (1)
+	if (0)
 	{
 		FILE *fp;
 		char filename[256];

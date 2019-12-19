@@ -455,11 +455,14 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 		blend = (tileattr & 0x4000 || tilectrl & 0x0100);
 		row_scroll = (tilectrl & 0x0010);
 		
+		int use_alt_drawmode;
+
 		if ((ctrl_reg & 2) == 0)
 		{
 			flip_x = 0;
 			yflipmask = 0;
 			palette_offset = (palette & 0x0f) << 4;
+			use_alt_drawmode = 1;
 		}
 		else
 		{
@@ -467,6 +470,7 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 			yflipmask = tileattr & TILE_Y_FLIP ? tile_h - 1 : 0;
 			palette_offset = (tileattr & 0x0f00) >> 4;
 			tile |= (palette & 0x0007) << 16;
+			use_alt_drawmode = 0;
 		}
 		
 
@@ -475,7 +479,6 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 
 		const uint8_t bpp = tileattr & 0x0003;
 
-		int use_alt_drawmode = 0;
 
 		if (blend)
 		{

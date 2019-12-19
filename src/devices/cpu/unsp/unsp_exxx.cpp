@@ -185,6 +185,7 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 			m_core->m_r[rd] = (uint16_t)((m_core->m_r[rd]&0xffff) << (m_core->m_r[rs] & 0x01f));
 			
 			logerror("result %04x\n", m_core->m_r[rd]);
+
 			return;
 
 		case 0x03:
@@ -192,12 +193,15 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 			// wrlshunt uses this
 			logerror("pc:%06x: %s = %s lslor %s  (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
 
+			if (rd != 3) // 4 = R4 3 = R3 - the 'register bleeding' is only verified as needed between r3/r4, so bail for other regs until verified
+				unimplemented_opcode(op);
+
 			uint32_t res = (uint16_t)(m_core->m_r[rd]);
 				
 			res	<<= (m_core->m_r[rs] & 0x01f);
 
 			m_core->m_r[rd] = (res & 0xffff);
-			m_core->m_r[rd ^ 1] |= (res >> 16); // register bleeding?
+			m_core->m_r[rd + 1] |= (res >> 16); // register bleeding?
 
 			logerror("result %04x\n", m_core->m_r[rd]);
 			return;
@@ -214,14 +218,26 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 		{
 			logerror("pc:%06x: %s = %s lsror %s  (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
 
+			if (rd != 4) // 4 = R4 3 = R3 - the 'register bleeding' is only verified as needed between r3/r4, so bail for other regs until verified
+				unimplemented_opcode(op);
+
 			uint32_t res = (uint16_t)(m_core->m_r[rd]);
 
 			res <<= 16;
 			
 			res = res >> (m_core->m_r[rs] & 0x01f);
 
+			// register bleeding behavior needed (for example) in jak_cars2 nand browser when increasing upper digits of address
+			// TODO: check if I'm missing something becaus this doesn't really seem logical, maybe other code is meant to take care of those bits?
+			//  (although R3/R4 are the 'MR' register used for multiply stuff, so maybe there is some logic to this?)
+
+			// code attempts to put a 32-bit value in r4/r3 then shift it like this?
+			//3c990: e92a            r4 = r4 lsl r2
+			//3c991: e73a            r3 = r3 lslor r2
+
 			m_core->m_r[rd] = (res >> 16);
-			m_core->m_r[rd ^ 1] |= (res & 0xffff); // register bleeding?
+			m_core->m_r[rd - 1] |= (res & 0xffff); // register bleeding?
+
 
 			logerror("result %04x\n", m_core->m_r[rd]);
 			return;
