@@ -60808,26 +60808,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 <!-- nointro -->
-	<software name="3dblocka" cloneof="3dblock" supported="no">
-		<description>3-D Block (Asia, Hwang Shinwei)</description>
-		<year>1990</year>
-		<publisher>Hwang Shinwei</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="3dblock" />
-			<feature name="pcb" value="NES-CNROM" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="prg" size="32768">
-				<rom name="3-d block (asia) (hwang shinwei) (unl).prg" size="32768" crc="86dba660" sha1="56cba51568b0f1458aa7e0de6575d1225e40f7a1" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-<!-- nointro -->
 	<software name="3dblock">
-		<description>3-D Block (Asia, RCM)</description>
+		<description>3-D Block (Asia, unprotected, RCM)</description>
 		<year>1990</year>
 		<publisher>RCM</publisher>
 		<part name="cart" interface="nes_cart">
@@ -60840,6 +60822,26 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dblocka" cloneof="3dblock" supported="no">
+		<description>3-D Block (Asia, protected set 1, Hwang Shinwei)</description>
+		<year>1990</year>
+		<publisher>Hwang Shinwei</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="3dblock" />
+			<feature name="pcb" value="NES-CNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="3-d block (asia) (hwang shinwei) (unl).prg" size="32768" crc="86dba660" sha1="56cba51568b0f1458aa7e0de6575d1225e40f7a1" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<dataarea name="pic16c54" size="32768">
+				<rom name="3d_block_pic16c54.bin" size="0x400" crc="116c9bdf" sha1="00fdd312986a1eebf4e115c87f4c9317b2d315f0" offset="00000" />
+			</dataarea>			
 		</part>
 	</software>
 
@@ -61227,7 +61229,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="blockfrc">
-		<description>Block Force (Asia, Ripped from Tetris Family 9 in 1?)</description>
+		<description>Block Force (Asia, unprotected, Ripped from Tetris Family 9 in 1?)</description>
 		<year>19??</year>
 		<publisher>Hwang Shinwei</publisher>
 		<part name="cart" interface="nes_cart">
@@ -61242,6 +61244,27 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="blockfrca" supported="blockfrc">
+		<description>Block Force (Asia, protected)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="3dblock" />
+			<feature name="pcb" value="NES-NROM-256" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">	
+				<rom name="square force (unl).prg" size="32768" crc="3c43939d" sha1="d326485501ac08b5c3815bfd8dff3979c97556c6" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<dataarea name="pic16c54" size="32768">
+				<rom name="block_force_pic16c54.bin" size="0x400" crc="590e426d" sha1="d6dbb81d0a9b6fbfeb22684a137c1618e2a3bd6c" offset="00000" />
+			</dataarea>				
+		</part>
+	</software>
+
 
 	<software name="bloodjur" supported="no">
 		<description>Blood of Jurassic (GD-98)</description>
@@ -63940,7 +63963,7 @@ have been all tagged as NES-TLROM at the moment, but it would be nice to add the
 from the NEStopia source, hence they would require confirmation. -->
 
 	<software name="3dblockb" cloneof="3dblock" supported="no">
-		<description>3-D Block (Asia, Alt 2)</description>
+		<description>3-D Block (Asia, protected set 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -63953,6 +63976,9 @@ from the NEStopia source, hence they would require confirmation. -->
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<dataarea name="pic16c54" size="32768">
+				<rom name="3d_block_pic16c54.bin" size="0x400" crc="116c9bdf" sha1="00fdd312986a1eebf4e115c87f4c9317b2d315f0" offset="00000" />
+			</dataarea>						
 		</part>
 	</software>
 
@@ -65406,22 +65432,6 @@ All musics were removed in this game.
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="space boy (unl).prg" size="32768" crc="70db619a" sha1="8e87e75105baaed7c37b6c02241127ae1471c9e3" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="squaref" supported="no">
-		<description>Square Force (Asia)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="uxrom" />
-			<feature name="pcb" value="NES-UNROM" />
-			<dataarea name="prg" size="32768">
-				<rom name="square force (unl).prg" size="32768" crc="3c43939d" sha1="d326485501ac08b5c3815bfd8dff3979c97556c6" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>

@@ -262,7 +262,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("gs2004",           NES_GS2004);
 	device.option_add_internal("gs2013",           NES_GS2013);
 	device.option_add_internal("tf9in1",           NES_TF9IN1);
-	device.option_add_internal("3dblock",          NES_3DBLOCK);    // NROM + IRQ?
+	device.option_add_internal("3dblock",          NES_3DBLOCK);    // NROM + IRQ? (has PIC16c54)
 	device.option_add_internal("racermate",        NES_RACERMATE);  // mapper 168
 	device.option_add_internal("agci_50282",       NES_AGCI_50282);
 	device.option_add_internal("dreamtech01",      NES_DREAMTECH01);
