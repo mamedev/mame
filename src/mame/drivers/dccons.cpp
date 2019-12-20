@@ -897,4 +897,4 @@ ROM_START( dcfish )
 ROM_END
 
 /*    YEAR  NAME     PARENT  COMPAT MACHINE  INPUT  CLASS          INIT       COMPANY FULLNAME */
-SYST( 2000, dcfish,  0,      0,     dc_fish, dcfish,dc_cons_state, init_dcjp, "Sega", "Fish Life Amazon Playful Edition (Japan)", MACHINE_NOT_WORKING )
+GAME( 2000, dcfish,  0,      0,     dc_fish, dcfish,dc_cons_state, init_dcjp, "Sega", "Fish Life Amazon Playful Edition (Japan)", MACHINE_NOT_WORKING )
