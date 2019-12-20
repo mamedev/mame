@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+﻿// license:LGPL-2.1+
 // copyright-holders:Angelo Salese, R. Belmont
 /*
     dccons.cpp - Sega Dreamcast driver
@@ -875,13 +875,20 @@ Consists of HKS-0300 main unit and HKS-0100 LCD with touch screen
   z: unused
  X/Y values range seems 3000x2294
 
- Known software:
-  HDR-0093 Fish Life Red Sea Playful Edition
- *HDR-0094 Fish Life Amazon Playful Edition
-  HDR-0095 Fish Life Episode 1 Basic Edition
-  HDR-0096 Fish Life Episode 2 Basic Edition
-  HDR-0097 Fish Life Episode 3 Basic Edition
+ HKS-0200 software GD-ROMs:
+  HDR-0093 673-01613 Fish Life Red Sea Playful Edition
+ *HDR-0094 673-01672 Fish Life Amazon Playful Edition
+  HDR-0095 673-01??? Fish Life Episode 1 Basic Edition
+  HDR-0096 673-01??? Fish Life Episode 2 Basic Edition
+  HDR-0097 673-01??? Fish Life Episode 3 Basic Edition
+ * denotes these games are archived.
 
+ Machines high likely based on Fish Life:
+  タッチであそぼ！ / Play with a touch! (2001) - touch screen cabinet for McDonald's Japan https://www.famitsu.com/game/news/2001/09/13/103,1000362656,1276,0,0.html
+  タッチでポン！ / Pong by touch! (2001) - sushi ordering system https://web.archive.org/web/20180421214402/sega.jp/fb/creators/vol_13/1.html
+
+ notes:
+  Some sources claims Playful and Basic editions hardware is not the same, has to be verified.
   Press down+B for Test Mode
 */
 ROM_START( dcfish )
