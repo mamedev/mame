@@ -1024,8 +1024,8 @@ CONS( 1991, cdi910,   0,      0,      cdi910,   cdimono2, cdi_state, empty_init,
 CONS( 1991, cdi490a,  0,      0,      cdimono1, cdi,      cdi_state, empty_init, "Philips",    "CD-i 490",   MACHINE_NOT_WORKING )
 
 // The Quizard games are RETAIL CD-i units, with additional JAMMA adapters & dongles for protection, hence being 'clones' of the system.
-/*    YEAR  NAME         PARENT    MACHINE        INPUT     DEVICE     INIT         MONITOR     COMPANY         FULLNAME */
-GAME( 1995, cdibios,     0,        cdimono1_base, quizard,  cdi_state, empty_init,  ROT0,      "Philips",      "CD-i (Mono-I) (PAL) BIOS", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IS_BIOS_ROOT )
+/*    YEAR  NAME         PARENT    MACHINE        INPUT     DEVICE          INIT         MONITOR     COMPANY         FULLNAME */
+GAME( 1995, cdibios,     0,        cdimono1_base, quizard,  quizard_state,  empty_init,  ROT0,      "Philips",      "CD-i (Mono-I) (PAL) BIOS", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IS_BIOS_ROOT )
 
 GAME( 1995, quizard,     cdibios,  quizard,       quizard,  quizard1_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.8)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1995, quizard_17,  quizard,  quizard,       quizard,  quizard1_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.7)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )

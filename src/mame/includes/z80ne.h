@@ -202,6 +202,7 @@ public:
 
 protected:
 	virtual void machine_reset() override;
+	virtual void driver_init() override { }
 
 private:
 	void main_mem(address_map &map);
