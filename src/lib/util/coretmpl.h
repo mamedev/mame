@@ -795,6 +795,7 @@ public:
 			m_mapping.insert(it);
 		assert(m_elements.size() == m_size);
 		assert(m_mapping.size() == m_size);
+		return *this;
 	}
 
 private:
