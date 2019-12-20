@@ -186,6 +186,7 @@ public:
 	uint32_t screen_update_amcoe1a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void cm(machine_config &config);
+	void cm97(machine_config &config);
 	void cmasterc(machine_config &config);
 	void amcoe1a(machine_config &config);
 	void nfm(machine_config &config);
@@ -195,6 +196,7 @@ public:
 	void amcoe1_portmap(address_map &map);
 	void amcoe2_portmap(address_map &map);
 	void cm_portmap(address_map &map);
+	void cm97_portmap(address_map &map);
 	void chryangl_decrypted_opcodes_map(address_map &map);
 
 protected:
@@ -284,7 +286,7 @@ public:
 	void cb3c(machine_config &config);
 	void cb3e(machine_config &config);
 	void ncb3(machine_config &config);
-	void cm97(machine_config &config);
+	void eldoradd(machine_config &config);
 	void ncb3_map(address_map &map);
 	void chryangla_map(address_map &map);
 	void chryangla_decrypted_opcodes_map(address_map &map);
