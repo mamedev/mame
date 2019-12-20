@@ -896,5 +896,5 @@ ROM_START( dcfish )
 	DISK_IMAGE_READONLY( "fish_life_amazon", 0, SHA1(2cbba727b219bbbeddf551d0f3e80c5f8ecbe21f) ) // HDR-0094
 ROM_END
 
-/*    YEAR  NAME     PARENT  COMPAT MACHINE  INPUT  CLASS          INIT       COMPANY FULLNAME */
-GAME( 2000, dcfish,  0,      0,     dc_fish, dcfish,dc_cons_state, init_dcjp, "Sega", "Fish Life Amazon Playful Edition (Japan)", MACHINE_NOT_WORKING )
+/*    YEAR  NAME     PARENT  MACHINE  INPUT  CLASS          INIT       ROT   COMPANY FULLNAME */
+GAME( 2000, dcfish,  0,      dc_fish, dcfish,dc_cons_state, init_dcjp, ROT0, "Sega", "Fish Life Amazon Playful Edition (Japan)", MACHINE_NOT_WORKING )

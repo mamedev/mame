@@ -1099,8 +1099,8 @@ end
 				}
 			end
 		else
-			if (version < 50000) then
-				print("GCC version 5.0 or later needed")
+			if (version < 70000) then
+				print("GCC version 7.0 or later needed")
 				os.exit(-1)
 			end
 				buildoptions {
