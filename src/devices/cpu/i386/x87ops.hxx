@@ -146,6 +146,7 @@ uint32_t i386_device::Getx87EA(uint8_t modrm, int rwn)
 		m_x87_data_ptr = ea;
 	else
 		m_x87_data_ptr = ea + (segment << 4);
+	m_x87_opcode = ((m_opcode << 8) | modrm) & 0x7ff;
 	return ret;
 }
 
