@@ -2770,6 +2770,31 @@ Beyond that last category are the roms waiting to be classified.
 		</part>
 	</software>
 
+	<software name="snovap" cloneof="snova">
+		<description>Super Nova (prototype)</description>
+		<year>1993</year>
+		<publisher>Taito</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM [M2704001-12F1]" />
+			<feature name="u2" value="U2 EPROM [M2704001-12F1]" />
+			<feature name="u3" value="U3 EPROM" /> <!-- empty socket -->
+			<feature name="u4" value="U4 EPROM" /> <!-- empty socket -->
+			<feature name="u5" value="U5 SRAM" /> <!-- empty socket -->
+			<feature name="u6" value="U6 PLD [EP330-15CN]" />
+			<feature name="u7" value="U7 74LS157 [SN74LS157N]" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="lockout" value="D411A 9307 BA" />
+			<feature name="battery" value="BATT CR2032 [empty]" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="dara 0.u1" size="524288" crc="df7d8cf7" sha1="198c0896e7355fb0792a17de21cc61c22e0c3fc9" offset="0x000000" /> <!-- ダラ 0 -->
+				<rom name="dara 1.u2" size="524288" crc="afbc322c" sha1="e5aa3c37e44d221bb568a6748db6d15c99eef9b0" offset="0x080000" /> <!-- ダラ 1 -->
+			</dataarea>
+		</part>
+	</software>
+
 <!--
     <software name="spinbalup" cloneof="spinbal">
         <!- - retrogamesuk - ->
