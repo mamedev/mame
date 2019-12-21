@@ -3910,6 +3910,17 @@
 		</part>
 	</software>
 
+	<software name="mermaidm">
+		<description>Mermaid Madness</description>
+		<year>1986</year>
+		<publisher>Firebird Silver</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="430865">
+				<rom name="mermaid madness.tap" size="430865" crc="c9984f7d" sha1="ddcf116b3b5ce2e174110f93008b36861c48786f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="metrox">
 		<description>Metro Cross</description>
 		<year>1988</year>
@@ -4376,6 +4387,17 @@
 		</part>
 	</software>
 
+	<software name="offootb">
+		<description>On Field Football</description>
+		<year>1985</year>
+		<publisher>Firebird Silver</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="522986">
+				<rom name="on field football.tap" size="522986" crc="3017a952" sha1="5ea48ba9d6f69b8b29479124564d03a488e0750e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="omahd">
 		<description>One Man and His Droid</description>
 		<year>1985</year>
@@ -4455,6 +4477,22 @@
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="301459">
 				<rom name="Outlaw.tap" size="301459" crc="3523d8df" sha1="4d872001ff59ff70df1d3628a59d4bf0c7624b2c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outlaws">
+		<description>Outlaws</description>
+		<year>1985</year>
+		<publisher>Ricochet</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="16387950">
+				<rom name="outlaws side a.wav" size="16387950" crc="b048919a" sha1="65660170e42b2239ddba44b021dd58c0e299b4c8"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="16378130">
+				<rom name="outlaws side b.wav" size="16378130" crc="e71d5da2" sha1="55b0036ff24c5c98f58c21a72085e7fb4382ae54"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5074,12 +5112,11 @@
 
 	<software name="radrampr">
 		<description>Rad Ramp Racer</description>
-		<year></year>
-		<publisher></publisher>
-
+		<year>1990</year>
+		<publisher>Mastertronic Plus</publisher>
 		<part name="cass1" interface="cbm_cass">
-			<dataarea name="cass" size="526551">
-				<rom name="rad ramp racer.tap" size="526551" crc="edec25d7" sha1="f1e7cfb474c97c98cb528651800b4a53bdd6ad03"/>
+			<dataarea name="cass" size="526363">
+				<rom name="rad ramp racer.tap" size="526363" crc="1ab3938b" sha1="65b7a3c1dde85ef83e2b7d139b16218d2258bfa1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5560,12 +5597,16 @@
 
 	<software name="runtheg">
 		<description>Run the Gauntlet</description>
-		<year></year>
-		<publisher></publisher>
-
+		<year>1989</year>
+		<publisher>The Hit Squad</publisher>
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="2223542">
-				<rom name="run the gauntlet.tap" size="2223542" crc="d0e77cb1" sha1="8592b26a06bde96cdb6a0877ceda75e4ed8db256"/>
+				<rom name="run the gauntlet side a.tap" size="2223542" crc="d0e77cb1" sha1="8592b26a06bde96cdb6a0877ceda75e4ed8db256"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="2217669">
+				<rom name="run the gauntlet side b.tap" size="2217669" crc="493bae24" sha1="17ff144092680f6635414e05586cb7af405772de"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5668,12 +5709,11 @@
 
 	<software name="shrtcirc">
 		<description>Short Circuit</description>
-		<year></year>
-		<publisher></publisher>
-
+		<year>1987</year>
+		<publisher>The Hit Squad</publisher>
 		<part name="cass1" interface="cbm_cass">
-			<dataarea name="cass" size="522420">
-				<rom name="short circuit.tap" size="522420" crc="46fa6a6a" sha1="0d122e2b6a250dd482e603c986ba0e4d10dfede1"/>
+			<dataarea name="cass" size="522357">
+				<rom name="short circuit.tap" size="522357" crc="8f9cde33" sha1="534878fbe66ab1498f4393886de5bbec484179d0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5692,12 +5732,16 @@
 
 	<software name="skatrock">
 		<description>Skate Rock Simulator</description>
-		<year></year>
-		<publisher></publisher>
-
+		<year>1988</year>
+		<publisher>Ricochet</publisher>
 		<part name="cass1" interface="cbm_cass">
-			<dataarea name="cass" size="389641">
-				<rom name="skate rock simulator.tap" size="389641" crc="4466ca79" sha1="8cc217ccc2025cd7d74a0213482c5b96edf4da19"/>
+			<dataarea name="cass" size="384129">
+				<rom name="skate rock simulator side a.tap" size="384129" crc="6206b92b" sha1="a41536410684885f1f3d32f0c0841cfc57503a36"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="373450">
+				<rom name="skate rock simulator side b.tap" size="373450" crc="b62714a6" sha1="d97a307473e269811974050e3bb370e09420b35d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5890,12 +5934,16 @@
 
 	<software name="spacehnt">
 		<description>Space Hunter</description>
-		<year></year>
-		<publisher></publisher>
-
+		<year>1985</year>
+		<publisher>Mastertronic</publisher>
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="565246">
-				<rom name="space hunter.tap" size="565246" crc="11c74761" sha1="5ee2e011ea5afa76823964000d7bd5c57e1ec863"/>
+				<rom name="space hunter side a.tap" size="565246" crc="11c74761" sha1="5ee2e011ea5afa76823964000d7bd5c57e1ec863"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="">
+				<rom name="space hunter side b.tap" size="562360" crc="3f93d15b" sha1="27c9d41cb322cae98a40e462ffbd596ee289268a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5957,12 +6005,16 @@
 
 	<software name="spellbnd">
 		<description>Spellbound</description>
-		<year></year>
-		<publisher></publisher>
-
+		<year>1985</year>
+		<publisher>Mastertronic Added Dimension</publisher>
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="746474">
-				<rom name="spellbound.tap" size="746474" crc="e93aabc7" sha1="af2c9c92e1c9b5b2580e57b89c2b98b2620714f1"/>
+				<rom name="spellbound side a.tap" size="746474" crc="e93aabc7" sha1="af2c9c92e1c9b5b2580e57b89c2b98b2620714f1"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="739097">
+				<rom name="spellbound side b.tap" size="739097" crc="b5fccac8" sha1="5d89eec43f411237b72a8e4d238e1db879c549e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6627,6 +6679,22 @@
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="483706">
 				<rom name="T-Bird.tap" size="483706" crc="c4fc6eb9" sha1="9b9201078ea14c28943d0a2886f48bf902d59304"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="taladega">
+		<description>Talladega</description>
+		<year>1985</year>
+		<publisher>Americana</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="9586010">
+				<rom name="talladega side a.wav" size="9586010" crc="01c0818d" sha1="95d85240fad0bd24ad35dcff31a07cbe098a1987"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="9876600">
+				<rom name="talladega side b.wav" size="9876600" crc="1bcc0a7e" sha1="d8b1625572636eb31bc04ea4cea5f7af592179ab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7313,10 +7381,14 @@
 		<description>Yogi's Great Escape (set 2)</description>
 		<year>1990</year>
 		<publisher>HiTEC Software</publisher>
-
 		<part name="cass1" interface="cbm_cass">
-			<dataarea name="cass" size="665130">
-				<rom name="Yogi's_Great_Escape_a.tap" size="665130" crc="268e5891" sha1="bca798fa1f984ace680442205c63fc7ee06e67ec"/>
+			<dataarea name="cass" size="664916">
+				<rom name="yogi's great escape side a.tap" size="664916" crc="e07c6a8c" sha1="777a03d414eaebceca0ff28a3df3dbe61e9f6494"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="">
+				<rom name="yogi's great escape side b.tap" size="665130" crc="268e5891" sha1="bca798fa1f984ace680442205c63fc7ee06e67ec"/>
 			</dataarea>
 		</part>
 	</software>
