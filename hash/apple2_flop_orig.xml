@@ -9477,4 +9477,76 @@
 		</part>
 	</software>
 
+	<software name="advconst">
+		<description>Adventure Construction Set</description>
+		<year>1985</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2019-12-17"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="228148">
+				<rom name="adventure construction set disk 1a.woz" size="228148" crc="022a20bc" sha1="5594992d7ffeaeb01f74f9c37ba2456a86526a9c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="234811">
+				<rom name="adventure construction set disk 1b.woz" size="234811" crc="2adc0181" sha1="f2d67823dd388d908b54ed3a369aa75afaf438dc"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="234801">
+				<rom name="adventure construction set disk 2a.woz" size="234801" crc="fa373c36" sha1="9c415fbfa4ecb4dc99b17f58f0846c3c744d77f2"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="234808">
+				<rom name="adventure construction set disk 2b.woz" size="234808" crc="60c30a5e" sha1="fabefc06dd40ef79952a4f099b1cad70b386b02e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="artowar">
+		<description>The Ancient Art of War</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2019-12-18"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234786">
+				<rom name="the ancient art of war side a.woz" size="234786" crc="eeb41109" sha1="d3310c0abb88c1c51df4982eeb6c32f2844f2a77"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234786">
+				<rom name="the ancient art of war side b.woz" size="234786" crc="86261140" sha1="6e5e4a0b030f83ecd0f0939b166a0b9ff57e8e0a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="borg">
+		<description>Borg</description>
+		<year>1981</year>
+		<publisher>Sirius Software</publisher>
+		<info name="release" value="2019-12-18"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!-- Note: this game is not currently playable in-browser due to its copy protection not being fully supported by the emulator. You can download it and play it in a supporting emulator.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="214789">
+				<rom name="borg.woz" size="214789" crc="2b69a453" sha1="d315d7b642986409f79257465f2d6ed99220ad07"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
