@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<softwarelist name="apple2_flop_clcracked" description="Apple II cleanly cracked 5.25 disks">
+<softwarelist name="apple2_flop_clcracked" description="Apple II cleanly cracked 5.25&quot; disks">
 
 	<!-- Several sets are missing disks. As of July 21st, 2019 we don't have
 	complete dumps for the following sets:
@@ -18352,12 +18352,14 @@
 		<description>Music Construction Set (cleanly cracked)</description>
 		<year>1983</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="release" value="2017-03-02"/>
+		<info name="release" value="2019-12-09"/>
+		<!-- This crack was updated on 2019-12-09 to fix corruption on track
+		$20. -->
 		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="music construction set (4am and san inc crack).dsk" size="143360" crc="07fb5f2f" sha1="d266f61abf5ca1c013449748eac3fb43edb7c63b" />
+				<rom name="music construction set (4am and san inc crack).dsk" size="143360" crc="221034cd" sha1="ff22eb248c1a6d270ebb97f4660c97ff832cf0a2" />
 			</dataarea>
 		</part>
 	</software>
@@ -28592,7 +28594,7 @@
 	</software>
 
 	<software name="simlineq">
-		<description>Simultaneous Linear Functions (cleanly cracked)</description>
+		<description>Simultaneous Linear Equations (cleanly cracked)</description>
 		<year>1984</year>
 		<publisher>Microcomputer Workshops</publisher>
 		<info name="release" value="2017-04-18"/>
@@ -35657,6 +35659,134 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="the railroad works (clean crack).do" size="143360" crc="779b1050" sha1="9be6c43573692aa3042439fc27f34b622ea963f4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boyjesus">
+		<description>The Boy Jesus (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Educational Publishing Concepts</publisher>
+		<info name="release" value="2019-11-23"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the boy jesus (4am crack) side a.dsk" size="143360" crc="88c20d44" sha1="17d9afc0952ea153a502768a1316fe33d5bc699c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the boy jesus (4am crack) side b.dsk" size="143360" crc="7b549ae0" sha1="d75c8e9301b81b50ec101906016e72692ae83674"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amzthgr0">
+		<description>In Search of the Most Amazing Thing (First Revision) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Spinnaker Software</publisher>
+		<info name="release" value="2019-11-30"/>
+		<!-- This is the first release.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="in search of the most amazing thing r0 (4am crack).dsk" size="143360" crc="5045cc20" sha1="f2cbef99f1144124957e03b3db1f882997669c34"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mchess20">
+		<description>MicroChess (Version 2.0) (cleanly cracked)</description>
+		<year>1978</year>
+		<publisher>Personal Software</publisher>
+		<info name="release" value="2019-12-08"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="microchess 2.0 (4am crack).dsk" size="143360" crc="9fc08a09" sha1="b52c1b418187e89d6e941be49b99c1ae98578a26"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spyntham">
+		<description>The Spy's Adventures in North America (Version 1987-10-31) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Polarware</publisher>
+		<info name="release" value="2019-12-12"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the spy's adventures in north america v1987-10-31 (4am crack) side a.dsk" size="143360" crc="812f1df0" sha1="05918f348c77e2514e2d3b4476ef0d7483013f39"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the spy's adventures in north america v1987-10-31 (4am crack) side b (boot).dsk" size="143360" crc="71682a55" sha1="a93665520b5293770d8ae46fb4dd89bb49ddcef9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmailr11">
+		<description>Magic Mailer (Version 1.1) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>ArtSci</publisher>
+		<info name="release" value="2019-12-16"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="magic mailer v1.1 (4am crack).dsk" size="143360" crc="d4f7f600" sha1="cb04683075e506bf169f578faa39273c6b6ab4e0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mindminr">
+		<description>Mind Over Minors (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Human Edge Software</publisher>
+		<info name="release" value="2019-12-16"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mind over minors (4am crack) disk 1a.dsk" size="143360" crc="81d1b2f5" sha1="57b039650596b4403060c1ed9e7ce7fd533c5dde"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mind over minors (4am crack) disk 1b.dsk" size="143360" crc="4c54738d" sha1="b4f21f2f1bac110d6f49f397bf5453b47b779151"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mind over minors (4am crack) disk 2.dsk" size="143360" crc="72fafddd" sha1="95f28e618f6b32d324707e91e64ecaba74f59a6b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toapshai">
+		<description>Temple of Apshai (cleanly cracked)</description>
+		<year>1979</year>
+		<publisher>Automated Simulations</publisher>
+		<info name="release" value="2019-12-16"/>
+		<!-- 4am has this to say about this disk:
+		There were several releases of this game. One only booted
+		on 13-sector drives and had no title screen at all. Another 
+		booted on 13-sector drives but had a title screen.
+		
+		This release only boots on 16-sector drives and has a title
+		screen and a hi-res character generator. There is at least one
+		later version that has all the features of this one, plus allows
+		you to choose between "Old English" and "Standard" hi-res
+		fonts. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="temple of apshai (4am crack).dsk" size="143360" crc="dd57eac2" sha1="b0b20e251ab5ffdf6981ffeaf4991ae31256e0e8"/>
 			</dataarea>
 		</part>
 	</software>
