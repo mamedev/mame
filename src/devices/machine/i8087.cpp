@@ -261,7 +261,8 @@ void i8087_device::execute()
 
 WRITE32_MEMBER(i8087_device::insn_w)
 {
-	m_ppc = m_pc = data;
+	m_ppc = m_pc;
+	m_pc = data;
 }
 
 WRITE32_MEMBER(i8087_device::addr_w)
@@ -4185,12 +4186,17 @@ void i8087_device::fstcw(u8 modrm)
 
 void i8087_device::fldenv(u8 modrm)
 {
-	// TODO: Pointers and selectors
 	u32 ea = m_ea;
+	u16 temp;
 
 	write_cw(READ16(ea));
 	m_sw = READ16(ea + 2);
 	m_tw = READ16(ea + 4);
+	m_ppc = READ16(ea + 6);
+	temp = READ16(ea + 8);
+	m_opcode = temp & 0x7ff;
+	m_ppc |= ((temp & 0xf000) << 4);
+	m_ea = READ16(ea + 10) | ((READ16(ea + 12) & 0xf000) << 4);
 
 	check_exceptions();
 
@@ -4205,6 +4211,10 @@ void i8087_device::fstenv(u8 modrm)
 	WRITE16(ea + 0, m_cw);
 	WRITE16(ea + 2, m_sw);
 	WRITE16(ea + 4, m_tw);
+	WRITE16(ea + 6, m_ppc & 0xffff);
+	WRITE16(ea + 8, (m_opcode & 0x07ff) | ((m_ppc & 0x0f0000) >> 4));
+	WRITE16(ea + 10, m_ea & 0xffff);
+	WRITE16(ea + 12, (m_ea & 0x0f0000) >> 4);
 	CYCLES(67);
 }
 
@@ -4215,6 +4225,10 @@ void i8087_device::fsave(u8 modrm)
 	WRITE16(ea + 0, m_cw);
 	WRITE16(ea + 2, m_sw);
 	WRITE16(ea + 4, m_tw);
+	WRITE16(ea + 6, m_ppc & 0xffff);
+	WRITE16(ea + 8, (m_opcode & 0x07ff) | ((m_ppc & 0x0f0000) >> 4));
+	WRITE16(ea + 10, m_ea & 0xffff);
+	WRITE16(ea + 12, (m_ea & 0x0f0000) >> 4);
 
 	for (int i = 0; i < 8; ++i)
 		WRITE80(ea + i*10, ST(i));
@@ -4225,10 +4239,16 @@ void i8087_device::fsave(u8 modrm)
 void i8087_device::frstor(u8 modrm)
 {
 	u32 ea = m_ea;
+	u16 temp;
 
 	write_cw(READ16(ea));
 	m_sw = READ16(ea + 2);
 	m_tw = READ16(ea + 4);
+	m_ppc = READ16(ea + 6);
+	temp = READ16(ea + 8);
+	m_opcode = temp & 0x7ff;
+	m_ppc |= ((temp & 0xf000) << 4);
+	m_ea = READ16(ea + 10) | ((READ16(ea + 12) & 0xf000) << 4);
 
 	for (int i = 0; i < 8; ++i)
 		write_stack(i, READ80(ea + i*10), false);
