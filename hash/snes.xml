@@ -521,7 +521,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="arcanap" cloneof="arcana">
 		<description>Arcana (USA, prototype)</description>
 		<year>1992</year>
-		<publisher>Atlus</publisher>
+		<publisher>HAL America</publisher>
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-2P3B-01" />
 			<feature name="u1" value="U1 EPROM(J) [TC574000D-150]" />
