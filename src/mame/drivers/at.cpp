@@ -3807,15 +3807,6 @@ ROM_END
 
 // ***** 486 motherboards using the SiS 85C496/85C497 chipset
 
-// 486 motherboard used in the Funworld "Photo Play 1999" PC-based arcade
-// CPU: Socket3/Intel DX4-100 - Chipset: SiS 85C496, 85C497 - RAM: 4xSIMM72, Cache: 5xIS61C256AH-15N (cache sockets are 32pin)
-// BIOS: funworld 2/99 - BIOS-String: 03/14/96-SiS-496-496/A/B-2A41IBL13C-00 / 06/7/19 W8387 PLUG & PLAY BIOS (from screenshot, boots into BootBlock)
-// on board: 2xIDE, Floppy - ISA16: 3, PCI: 3 - OSC: 24.00
-ROM_START( funwrldpp99 )
-	ROM_REGION32_LE(0x20000, "bios", 0)
-	ROM_LOAD( "funworld_1999_award_v4.51g_at29c010a.bin", 0x00000, 0x20000, CRC(af7ff1d4) SHA1(72eeecf798a03817ce7ba4d65cd4128ed3ef7e68))
-ROM_END
-
 // Abit AB-PI4(T) - Bios: 32pin - Keyboard-BIOS: Winbond 83C42 - CPU: Socket 3 - ISA16: 4, PCI: 3 - Chipset: SiS 85C495, 85C497
 // RAM: 4xSIMM72, Cache: 9x32pin (occupied: 4xW24512AK-20, 1xW2457AK) - On board: 2xIDE
 // BIOS-String: &09/25/95-SiS-496-497/A/B-2A4IBA11C-0B / GREEN 486 PCI SYSTEM BIOS - boots into "boot block" rescue BIOS
@@ -4607,7 +4598,6 @@ COMP( 199?, op82c392,  ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, sis85c471, ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboards using the SiS 85C471/85C407 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, um8886,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboards using the UMC UM8886/UM8881 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, um8498f,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboards using the UMC UM8498F, UM8496F chipset", MACHINE_NOT_WORKING )
-COMP( 199?, funwrldpp99,ibm5170,0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboard used in the 'Funworld Photo Play 1999' PC-based arcade", MACHINE_NOT_WORKING )
 COMP( 199?, abae4,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Abit", "486 EISA-AE4", MACHINE_NOT_WORKING )
 COMP( 199?, abah4,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Abit", "AB-AH4", MACHINE_NOT_WORKING )
 COMP( 199?, abpb4,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Abit", "AB-PB4", MACHINE_NOT_WORKING )

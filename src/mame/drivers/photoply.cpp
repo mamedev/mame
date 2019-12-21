@@ -369,6 +369,28 @@ ROM_START(photoply2k4)
 	DISK_IMAGE( "pp2004", 0, SHA1(a3f8861cf91cf7e7446ec931f812e774ada20802) )
 ROM_END
 
+// 486 motherboard used in the Funworld "Photo Play 1999" PC-based arcade, it's probably a LuckyStar LS-486E
+// CPU: Socket3/Intel DX4-100 - Chipset: SiS 85C496, 85C497 - RAM: 4xSIMM72, Cache: 5xIS61C256AH-15N (cache sockets are 32pin)
+// BIOS: funworld 2/99 - BIOS-String: 03/14/96-SiS-496-496/A/B-2A41IBL13C-00 / 06/7/19 W8387 PLUG & PLAY BIOS (from screenshot, boots into BootBlock)
+// on board: 2xIDE, Floppy - ISA16: 3, PCI: 3 - OSC: 24.00
+ROM_START( photoply99 )
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_LOAD( "funworld_1999_award_v4.51g_at29c010a.bin", 0x00000, 0x20000, CRC(af7ff1d4) SHA1(72eeecf798a03817ce7ba4d65cd4128ed3ef7e68))
+
+	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) /* multifunction board with a ESS AudioDrive chip,  M27128A */
+//  ROM_LOAD("enhanced bios.bin", 0x000000, 0x4000, CRC(a216404e) SHA1(c9067cf87d5c8106de00866bb211eae3a6c02c65) )
+//  ROM_RELOAD(                   0x004000, 0x4000 )
+//  ROM_RELOAD(                   0x008000, 0x4000 )
+//  ROM_RELOAD(                   0x00c000, 0x4000 )
+
+	ROM_REGION(0x8000, "video_bios", 0 )
+	ROM_LOAD("vga.bin", 0x000000, 0x8000, CRC(7a859659) SHA1(ff667218261969c48082ec12aa91088a01b0cb2a) )
+
+//  DISK_REGION( "ide:0:hdd:image" )
+//  DISK_IMAGE( "pp201", 0, SHA1(23e1940d485d19401e7d0ad912ddad2cf2ea10b4) )
+ROM_END
+
 
 GAME( 199?, photoply,     0,  photoply, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2000 (v2.01)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
 GAME( 2004, photoply2k4,  0,  photoply, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2004", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+GAME( 199?, photoply99,   0,  photoply, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 1999", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )

@@ -2682,7 +2682,6 @@ suntac6                         // motherboards using the six chip SUNTAC chipse
 bay1000c                        // Mintek BAY-1000C V1.01 motherboard (286()
 profpc33                        // Profex PC 33 (286)
 3siud                           // 3SIUD-1.1 motherboard (386sx)
-funwrldpp99                     // Funworld Photo Play 1999 motherboard (486)
 486apio                         // EFA 486 APIO motherboard
 
 @source:atari_s1.cpp
@@ -33005,6 +33004,7 @@ kok                             //
 @source:photoply.cpp
 photoply                        //
 photoply2k4                     //
+photoply99                     // Funworld Photo Play 1999 on a Luckystar LS-486E motherboard
 
 @source:phunsy.cpp
 phunsy                          //
