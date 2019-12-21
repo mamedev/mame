@@ -4518,7 +4518,6 @@ void i386_device::x87_fldenv(uint8_t modrm)
 {
 	if (x87_mf_fault())
 		return;
-	// TODO: Pointers and selectors
 	uint32_t ea = Getx87EA(modrm, 0);
 
 	if (m_operand_size)
@@ -4545,8 +4544,7 @@ void i386_device::x87_fstenv(uint8_t modrm)
 {
 	uint32_t ea = Getx87EA(modrm, 1);
 
-	// TODO: Pointers and selectors
-	switch((m_cr[0] & 1)|(m_operand_size & 1)<<1)
+	switch(((PROTECTED_MODE && !V8086_MODE) ? 1 : 0) | (m_operand_size & 1)<<1)
 	{
 		case 0: // 16-bit real mode
 			WRITE16(ea + 0, m_x87_cw);
@@ -4594,8 +4592,7 @@ void i386_device::x87_fsave(uint8_t modrm)
 {
 	uint32_t ea = Getx87EA(modrm, 1);
 
-	// TODO: Pointers and selectors
-	switch((m_cr[0] & 1)|(m_operand_size & 1)<<1)
+	switch(((PROTECTED_MODE && !V8086_MODE) ? 1 : 0) | (m_operand_size & 1)<<1)
 	{
 		case 0: // 16-bit real mode
 			WRITE16(ea + 0, m_x87_cw);
@@ -4652,8 +4649,7 @@ void i386_device::x87_frstor(uint8_t modrm)
 	uint32_t ea = Getx87EA(modrm, 0);
 	uint32 temp;
 
-	// TODO: Pointers and selectors
-	switch((m_cr[0] & 1)|(m_operand_size & 1)<<1)
+	switch(((PROTECTED_MODE && !V8086_MODE) ? 1 : 0) | (m_operand_size & 1)<<1)
 	{
 		case 0: // 16-bit real mode
 			x87_write_cw(READ16(ea));
