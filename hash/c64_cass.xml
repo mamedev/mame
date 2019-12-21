@@ -7377,7 +7377,7 @@
 		</part>
 	</software>
 
-	<software name="yogisesc1">
+	<software name="yogisesc1" cloneof="yogisesc">
 		<description>Yogi's Great Escape (set 2)</description>
 		<year>1990</year>
 		<publisher>HiTEC Software</publisher>
