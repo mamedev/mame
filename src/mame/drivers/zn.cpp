@@ -205,7 +205,7 @@ void zn_state::zn2(machine_config &config)
 {
 	/* basic machine hardware */
 	CXD8661R(config, m_maincpu, XTAL(100'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &zn2_state::zn_rom_base_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::zn_rom_base_map);
 	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
 
 	auto &sio0(*m_maincpu->subdevice<psxsio0_device>("sio0"));
@@ -217,7 +217,7 @@ void zn_state::zn2(machine_config &config)
 	m_cat702[0]->dataout_handler().set(FUNC(zn_state::cat702_dataout<0>));
 
 	ZNMCU(config, m_znmcu, 0);
-	m_znmcu->dataout_handler().set(FUNC(zn2_state::znmcu_dataout));
+	m_znmcu->dataout_handler().set(FUNC(zn_state::znmcu_dataout));
 	m_znmcu->dsr_handler().set("maincpu:sio0", FUNC(psxsio0_device::write_dsr));
 	m_znmcu->dsw_handler().set_ioport("DSW");
 	m_znmcu->analog1_handler().set_ioport("ANALOG1");
