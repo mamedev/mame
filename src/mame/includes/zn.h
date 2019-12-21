@@ -18,12 +18,15 @@
 #include "cpu/z80/z80.h"
 #include "machine/7200fifo.h"
 #include "machine/at28c16.h"
+#include "machine/ataflash.h"
 #include "machine/bankdev.h"
 #include "machine/cat702.h"
 #include "machine/gen_latch.h"
+#include "machine/intelfsh.h"
 #include "machine/mb3773.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
+#include "machine/rf5c296.h"
 #include "machine/vt83c461.h"
 #include "machine/watchdog.h"
 #include "machine/znmcu.h"
@@ -37,6 +40,8 @@
 
 #include "screen.h"
 #include "speaker.h"
+
+#include <algorithm>
 
 class zn_state : public driver_device
 {
@@ -57,6 +62,7 @@ public:
 
 	void zn_1mb_vram(machine_config &config);
 	void zn_2mb_vram(machine_config &config);
+	void zn2(machine_config &config);
 	void gameboard_cat702(machine_config &config);
 
 protected:
@@ -70,6 +76,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(coin_w);
 
 	void zn_base_map(address_map &map);
+	void zn_rom_base_map(address_map &map);
 
 	virtual void machine_start() override;
 
@@ -162,7 +169,6 @@ public:
 	{
 	}
 
-	void zn2(machine_config &config);
 	void coh3002c(machine_config &config);
 };
 
@@ -483,6 +489,76 @@ public:
 	}
 
 	void coh1002tb(machine_config &config);
+};
+
+//
+// Taito GNET (see taitogn.cpp)
+//
+
+class taitogn_state : public zn_state
+{
+public:
+	taitogn_state(const machine_config &mconfig, device_type type, const char *tag) :
+		zn_state(mconfig, type, tag),
+		m_mn10200(*this, "taito_zoom:mn10200"),
+		m_pccard(*this, "pccard"),
+		m_flashbank(*this, "flashbank"),
+		m_mb3773(*this, "mb3773"),
+		m_zoom(*this, "taito_zoom"),
+		m_pgmflash(*this, "pgmflash"),
+		m_sndflash(*this, "sndflash%u", 0U),
+		m_jp1(*this, "JP1"),
+		m_has_zoom(true)
+	{
+	}
+
+	void init_coh3002t_nz();
+
+	void base_config(machine_config &config);
+	void coh3002t_t2_mp(machine_config &config);
+	void coh3002t(machine_config &config);
+	void coh3002t_t1_mp(machine_config &config);
+	void coh3002t_cf(machine_config &config);
+	void coh3002t_t2(machine_config &config);
+	void coh3002t_t1(machine_config &config);
+
+private:
+	DECLARE_READ8_MEMBER(control_r);
+	DECLARE_WRITE8_MEMBER(control_w);
+	DECLARE_WRITE16_MEMBER(control2_w);
+	DECLARE_READ8_MEMBER(control3_r);
+	DECLARE_WRITE8_MEMBER(control3_w);
+	DECLARE_READ16_MEMBER(gn_1fb70000_r);
+	DECLARE_WRITE16_MEMBER(gn_1fb70000_w);
+	DECLARE_READ16_MEMBER(hack1_r);
+	DECLARE_WRITE8_MEMBER(coin_w);
+	DECLARE_READ8_MEMBER(coin_r);
+	DECLARE_READ8_MEMBER(gnet_mahjong_panel_r);
+	DECLARE_READ32_MEMBER(zsg2_ext_r);
+
+	void flashbank_map(address_map &map);
+	void main_map(address_map &map);
+	void main_mp_map(address_map &map);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	required_device<cpu_device> m_mn10200;
+	required_device<pccard_slot_device> m_pccard;
+	required_device<address_map_bank_device> m_flashbank;
+	required_device<mb3773_device> m_mb3773;
+	required_device<taito_zoom_device> m_zoom;
+	required_device<intelfsh16_device> m_pgmflash;
+	required_device_array<intelfsh16_device, 3> m_sndflash;
+	required_ioport m_jp1;
+
+	bool m_has_zoom;
+	uint8_t m_control;
+	uint16_t m_control2;
+	uint8_t m_control3;
+	int m_v;
+
+	uint8_t m_coin_info;
 };
 
 //

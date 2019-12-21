@@ -13,8 +13,6 @@
 #include "emu.h"
 #include "includes/zn.h"
 
-#include <algorithm>
-
 #define VERBOSE_LEVEL ( 0 )
 
 inline void ATTR_PRINTF(3,4) zn_state::verboselog( int n_level, const char *s_fmt, ... )
@@ -144,19 +142,24 @@ void zn_state::zn_base_map(address_map &map)
 	map(0x1fa10100, 0x1fa10103).portr("P4");
 	map(0x1fa10200, 0x1fa10200).r(FUNC(zn_state::boardconfig_r));
 	map(0x1fa10300, 0x1fa10300).rw(FUNC(zn_state::znsecsel_r), FUNC(zn_state::znsecsel_w));
-	map(0x1fa20000, 0x1fa20000).w(FUNC(zn_state::coin_w));
-	map(0x1fa30000, 0x1fa30003).noprw(); /* ?? */
 	map(0x1fa40000, 0x1fa40003).nopr(); /* ?? */
 	map(0x1fa60000, 0x1fa60003).nopr(); /* ?? */
 	map(0x1faf0000, 0x1faf07ff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)); /* EEPROM */
 	map(0x1fb20000, 0x1fb20007).r(FUNC(zn_state::unknown_r));
 }
 
+void zn_state::zn_rom_base_map(address_map &map)
+{
+	zn_base_map(map);
+	map(0x1fa20000, 0x1fa20000).w(FUNC(zn_state::coin_w));
+	map(0x1fa30000, 0x1fa30003).noprw(); /* ?? */
+}
+
 void zn_state::zn_1mb_vram(machine_config &config)
 {
 	/* basic machine hardware */
 	CXD8530CQ(config, m_maincpu, XTAL(67'737'600));
-	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::zn_base_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::zn_rom_base_map);
 
 	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
 
@@ -197,11 +200,12 @@ void zn_state::zn_2mb_vram(machine_config &config)
 	CXD8561Q(config.replace(), "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
 }
 
-void zn2_state::zn2(machine_config &config)
+// used in Capcom ZN2, Taito GNET
+void zn_state::zn2(machine_config &config)
 {
 	/* basic machine hardware */
 	CXD8661R(config, m_maincpu, XTAL(100'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &zn2_state::zn_base_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zn2_state::zn_rom_base_map);
 	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
 
 	auto &sio0(*m_maincpu->subdevice<psxsio0_device>("sio0"));
@@ -383,7 +387,7 @@ INTERRUPT_GEN_MEMBER(capcom_zn_state::qsound_interrupt)
 
 void capcom_zn_state::main_map(address_map &map)
 {
-	zn_base_map(map);
+	zn_rom_base_map(map);
 
 	map(0x1f000000, 0x1f3fffff).rom().region("bankedroms", 0);
 	map(0x1f400000, 0x1f7fffff).bankr("rombank");
@@ -843,7 +847,7 @@ WRITE8_MEMBER(taito_fx1a_state::sound_bankswitch_w)
 
 void taito_fx1a_state::main_map(address_map &map)
 {
-	zn_base_map(map);
+	zn_rom_base_map(map);
 
 	map(0x1f000000, 0x1f7fffff).bankr("rombank");
 	map(0x1fb40000, 0x1fb40000).w(FUNC(taito_fx1a_state::bank_w));
@@ -927,7 +931,7 @@ READ8_MEMBER(taito_fx1b_state::fram_r)
 
 void taito_fx1b_state::main_map(address_map &map)
 {
-	zn_base_map(map);
+	zn_rom_base_map(map);
 	map(0x1f000000, 0x1f7fffff).bankr("rombank");
 	map(0x1fb00000, 0x1fb003ff).rw(FUNC(taito_fx1b_state::fram_r), FUNC(taito_fx1b_state::fram_w)).umask32(0x00ff00ff);
 	map(0x1fb40000, 0x1fb40000).w(FUNC(taito_fx1b_state::bank_w));
@@ -1200,7 +1204,7 @@ void primrag2_state::machine_start()
 
 void primrag2_state::main_map(address_map &map)
 {
-	zn_base_map(map);
+	zn_rom_base_map(map);
 	map(0x1f000000, 0x1f1fffff).rom().region("roms", 0);
 	map(0x1f000000, 0x1f000003).w("watchdog", FUNC(watchdog_timer_device::reset16_w)).umask16(0xffff); // ds1232s
 	map(0x1f7e8000, 0x1f7e8003).noprw();
@@ -1385,7 +1389,7 @@ WRITE8_MEMBER(raizing_zn_state::sound_irq_w)
 
 void raizing_zn_state::main_map(address_map &map)
 {
-	zn_base_map(map);
+	zn_rom_base_map(map);
 
 	map(0x1f000000, 0x1f7fffff).bankr("rombank");
 	map(0x1fa10300, 0x1fa10300).w(FUNC(raizing_zn_state::bank_w));
@@ -1572,7 +1576,7 @@ READ16_MEMBER(bam2_state::unk_r)
 
 void bam2_state::main_map(address_map &map)
 {
-	zn_base_map(map);
+	zn_rom_base_map(map);
 
 	map(0x1f000000, 0x1f3fffff).rom().region("bankedroms", 0);
 	map(0x1f400000, 0x1f7fffff).bankr("rombank");
@@ -1879,7 +1883,7 @@ WRITE8_MEMBER(nbajamex_state::backup_w)
 
 void acclaim_zn_state::coh1000a_map(address_map &map)
 {
-	zn_base_map(map);
+	zn_rom_base_map(map);
 	map(0x1fbfff00, 0x1fbfff03).w(FUNC(acclaim_zn_state::acpsx_00_w));
 	map(0x1fbfff12, 0x1fbfff13).w(FUNC(acclaim_zn_state::acpsx_10_w));
 }
@@ -2106,7 +2110,7 @@ WRITE8_MEMBER(atlus_zn_state::bank_w)
 
 void atlus_zn_state::main_map(address_map &map)
 {
-	zn_base_map(map);
+	zn_rom_base_map(map);
 
 	map(0x1f000000, 0x1f7fffff).bankr("rombank");
 	map(0x1fb00000, 0x1fb00001).w(m_soundlatch16, FUNC(generic_latch_16_device::write));
@@ -2171,7 +2175,7 @@ WRITE8_MEMBER(visco_zn_state::bank_w)
 
 void visco_zn_state::main_map(address_map &map)
 {
-	zn_base_map(map);
+	zn_rom_base_map(map);
 	map(0x1f000000, 0x1f27ffff).rom().region("fixedroms", 0);
 	map(0x1fb00000, 0x1fbfffff).bankr("rombank");
 	map(0x1fb00000, 0x1fb00000).w(FUNC(visco_zn_state::bank_w));
@@ -2362,7 +2366,7 @@ WRITE8_MEMBER(tecmo_zn_state::bank_w)
 
 void tecmo_zn_state::base_map(address_map &map)
 {
-	zn_base_map(map);
+	zn_rom_base_map(map);
 	map(0x1f000000, 0x1f7fffff).bankr("rombank");
 	map(0x1fb00006, 0x1fb00006).w(FUNC(tecmo_zn_state::bank_w));
 }
