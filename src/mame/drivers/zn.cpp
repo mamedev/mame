@@ -143,7 +143,6 @@ void zn_state::zn_base_map(address_map &map)
 	map(0x1fa10200, 0x1fa10200).r(FUNC(zn_state::boardconfig_r));
 	map(0x1fa10300, 0x1fa10300).rw(FUNC(zn_state::znsecsel_r), FUNC(zn_state::znsecsel_w));
 	map(0x1fa40000, 0x1fa40003).nopr(); /* ?? */
-	map(0x1fa60000, 0x1fa60003).nopr(); /* ?? */
 	map(0x1faf0000, 0x1faf07ff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)); /* EEPROM */
 	map(0x1fb20000, 0x1fb20007).r(FUNC(zn_state::unknown_r));
 }
@@ -153,6 +152,7 @@ void zn_state::zn_rom_base_map(address_map &map)
 	zn_base_map(map);
 	map(0x1fa20000, 0x1fa20000).w(FUNC(zn_state::coin_w));
 	map(0x1fa30000, 0x1fa30003).noprw(); /* ?? */
+	map(0x1fa60000, 0x1fa60003).nopr(); /* ?? */
 }
 
 void zn_state::zn_1mb_vram(machine_config &config)
