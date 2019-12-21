@@ -78,6 +78,7 @@ protected:
 
 	void internal_map(address_map &map);
 
+	DECLARE_WRITE8_MEMBER(fiq_vector_w);
 	DECLARE_WRITE_LINE_MEMBER(videoirq_w);
 	DECLARE_WRITE_LINE_MEMBER(audioirq_w);
 	DECLARE_WRITE_LINE_MEMBER(timerirq_w);
@@ -116,6 +117,8 @@ protected:
 	devcb_write8 m_chip_sel;
 
 	emu_timer *m_screenpos_timer;
+
+	uint8_t m_fiq_vector;
 
 	required_device<screen_device> m_screen;
 

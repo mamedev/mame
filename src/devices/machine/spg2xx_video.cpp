@@ -76,7 +76,6 @@ void spg2xx_video_device::device_start()
 	m_rowscrolloffset_read_cb.resolve_safe(0);
 
 	m_video_irq_cb.resolve();
-
 }
 
 void spg2xx_video_device::device_reset()
