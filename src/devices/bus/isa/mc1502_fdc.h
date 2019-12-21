@@ -50,6 +50,7 @@ private:
 	required_device<fd1793_device> m_fdc;
 	int motor_on;
 	emu_timer *motor_timer;
+	required_device<cpu_device> m_maincpu;
 
 public:
 	void mc1502_wd17xx_aux_w(uint8_t data);

@@ -24,7 +24,8 @@ i82439tx_device::i82439tx_device(const machine_config &mconfig, const char *tag,
 	m_cpu_tag(nullptr),
 	m_region_tag(nullptr),
 	m_space(nullptr),
-	m_rom(nullptr)
+	m_rom(nullptr),
+	m_cpu(*this, finder_base::DUMMY_TAG)
 {
 	m_smram.smiact_n = 1;
 }
@@ -442,10 +443,7 @@ void i82439tx_device::device_start()
 {
 	northbridge_device::device_start();
 	// get address space we are working on
-	device_t *cpu = machine().device(m_cpu_tag);
-	assert(cpu != nullptr);
-
-	m_space = &cpu->memory().space(AS_PROGRAM);
+	m_space = &((device_memory_interface *)m_cpu.target())->memory().space(AS_PROGRAM);
 
 	// get rom region
 	m_rom = machine().root_device().memregion(m_region_tag)->base();

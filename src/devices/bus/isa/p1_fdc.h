@@ -45,6 +45,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(p1_fdc_irq_drq);
 
 	required_device<fd1793_device> m_fdc;
+	required_device<cpu_device> m_maincpu;
 
 public:
 	void p1_wd17xx_aux_w(int data);

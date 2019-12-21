@@ -48,7 +48,7 @@ WRITE8_MEMBER(at586_state::boot_state_w)
 
 void at586_state::tx_config(device_t *device)
 {
-	downcast<i82439tx_device *>(device)->set_cpu("maincpu");
+	downcast<i82439tx_device *>(device)->set_cpu(":maincpu");
 	downcast<i82439tx_device *>(device)->set_region("isa");
 }
 
