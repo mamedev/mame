@@ -116,6 +116,7 @@ void vt5x_cpu_device::device_start()
 	state_add(VT5X_X, "X", m_x).formatstr("%03O").mask(0177);
 	state_add(VT5X_Y, "Y", m_y).formatstr("%02O").mask((1 << m_ybits) - 1);
 	state_add(VT5X_X8, "X8", m_x8);
+	state_add<u16>(VT5X_XYAD, "XYAD", [this]() { return translate_xy(); }).formatstr("%04O").mask((1 << (6 + m_ybits)) - 1);
 	state_add(VT5X_CFF, "CFF", m_cursor_ff);
 	state_add(VT5X_VID, "VID", m_video_process);
 
@@ -156,13 +157,17 @@ void vt5x_cpu_device::device_reset()
 
 offs_t vt5x_cpu_device::translate_xy() const
 {
+	//                              A9 A8 A7 A6 A5 A4 A3 A2 A1 A0
+	// Screen RAM, columns 0–63:    y3 y2 y1 y0 x5 x4 x3 x2 x1 x0
+	// Screen RAM, columns 64–79:    1  1 y1 y0 y3 y2 x3 x2 x1 x0
+	// Scratchpad (not displayed):   1  1 y1 y0  1  1 x3 x2 x1 x0
 	const u8 x = m_x ^ (m_x8 ? 8 : 0);
 	const offs_t y_shifted = (offs_t(m_y) << (10 - m_ybits)) & 01700;
-	const offs_t ram_bank = offs_t(m_y & ((1 << (m_ybits - 4)) - 1)) << 10;
+	const offs_t page_sel = offs_t(m_y & ((1 << (m_ybits - 4)) - 1)) << 10;
 	if (BIT(x, 6) || (y_shifted & 01400) == 01400)
-		return (x & 0017) | (y_shifted & 01400) >> 4 | y_shifted | 01400 | ram_bank;
+		return (x & 0017) | (y_shifted & 01400) >> 4 | y_shifted | 01400 | page_sel;
 	else
-		return x | y_shifted | ram_bank;
+		return x | y_shifted | page_sel;
 }
 
 void vt5x_cpu_device::execute_te(u8 inst)

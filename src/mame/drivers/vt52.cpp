@@ -209,7 +209,7 @@ void vt52_state::vt52(machine_config &mconfig)
 	AY51013(mconfig, m_uart); // TR1402 or equivalent
 
 	screen_device &screen(SCREEN(mconfig, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(13.824_MHz_XTAL, 900, 0, 720, 256, 0, 192);
+	screen.set_raw(13.824_MHz_XTAL, 900, 0, 720, 256, 0, 240);
 	screen.set_screen_update(FUNC(vt52_state::screen_update));
 
 	SPEAKER(mconfig, "mono").front_center();
