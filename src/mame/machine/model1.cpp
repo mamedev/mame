@@ -231,7 +231,7 @@ WRITE32_MEMBER(model1_state::copro_atan_w)
 
 READ32_MEMBER(model1_state::copro_atan_r)
 {
-	u32 idx = m_copro_atan_base[3];
+	u32 idx = m_copro_atan_base[3] & 0xffff;
 	if(idx & 0xc000)
 		idx = 0x3fff;
 	u32 result = m_copro_tables[idx | 0x4000];
