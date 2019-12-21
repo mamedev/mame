@@ -887,6 +887,7 @@ void systeme_state::systeme(machine_config &config)
 
 	I8255(config, m_ppi);
 	m_ppi->out_pb_callback().set(FUNC(systeme_state::coin_counters_write));
+	m_ppi->tri_pb_callback().set_constant(0);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(10'738'635)/2,

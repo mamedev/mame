@@ -868,7 +868,7 @@ Unreleased (possibly no prototypes exist):
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- throws exception after few seconds on title screen -->
 	<software name="tempst2k" supported="no">
 		<description>Tempest 2000</description>
@@ -1028,7 +1028,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, sound buzz when selecting new game, can eventually black screen or throw an exception --> 
+	<!-- boot OK, sound buzz when selecting new game, can eventually black screen or throw an exception -->
 	<software name="wolfn3d" supported="no">
 		<description>Wolfenstein 3D</description>
 		<year>1994</year>

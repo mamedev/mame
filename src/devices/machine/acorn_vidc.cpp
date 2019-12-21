@@ -77,7 +77,7 @@ acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, device_t
 acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: acorn_vidc10_device(mconfig, ACORN_VIDC10, tag, owner, clock)
 {
-  	m_space_config = address_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, 0, address_map_constructor(FUNC(acorn_vidc10_device::regs_map), this));
+	m_space_config = address_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, 0, address_map_constructor(FUNC(acorn_vidc10_device::regs_map), this));
 	m_pal_4bpp_base = 0x100;
 	m_pal_cursor_base = 0x10;
 	m_pal_border_base = 0x110;
@@ -87,7 +87,7 @@ acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, const ch
 acorn_vidc10_lcd_device::acorn_vidc10_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: acorn_vidc10_device(mconfig, ACORN_VIDC10_LCD, tag, owner, clock)
 {
-  	m_space_config = address_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, 0, address_map_constructor(FUNC(acorn_vidc10_lcd_device::regs_map), this));
+	m_space_config = address_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, 0, address_map_constructor(FUNC(acorn_vidc10_lcd_device::regs_map), this));
 	// TODO: confirm being identical to raster version
 	m_pal_4bpp_base = 0x100;
 	m_pal_cursor_base = 0x10;
@@ -296,7 +296,7 @@ WRITE32_MEMBER( acorn_vidc10_device::write )
 	// TODO: check against mem_mask not 32-bit wide
 	u8 reg = data >> 24;
 	u32 val = data & 0xffffff;
-	
+
 	this->space(AS_IO).write_dword(reg, val);
 }
 
@@ -346,7 +346,7 @@ WRITE32_MEMBER( acorn_vidc10_device::control_w )
 	//m_test_mode = (data & 0xc100) != 0xc100;
 
 	//todo: vga/svga modes sets 0x1000?
-	m_crtc_regs[CRTC_HDSR] = convert_crtc_hdisplay(0); 
+	m_crtc_regs[CRTC_HDSR] = convert_crtc_hdisplay(0);
 	m_crtc_regs[CRTC_HDER] = convert_crtc_hdisplay(1);
 	screen_vblank_line_update();
 	screen_dynamic_res_change();
@@ -362,18 +362,18 @@ WRITE32_MEMBER( acorn_vidc10_device::crtc_w )
 {
 	switch(offset)
 	{
-		case CRTC_HCR:  m_crtc_regs[CRTC_HCR] =  ((data >> 14)<<1)+2;    	break;
-//		case CRTC_HSWR: m_crtc_regs[CRTC_HSWR] = (data >> 14)+1;   			break;
-		case CRTC_HBSR: m_crtc_regs[CRTC_HBSR] = ((data >> 14)<<1)+1;    	break;
-		case CRTC_HDSR: 
+		case CRTC_HCR:  m_crtc_regs[CRTC_HCR] =  ((data >> 14)<<1)+2;       break;
+//      case CRTC_HSWR: m_crtc_regs[CRTC_HSWR] = (data >> 14)+1;            break;
+		case CRTC_HBSR: m_crtc_regs[CRTC_HBSR] = ((data >> 14)<<1)+1;       break;
+		case CRTC_HDSR:
 			m_crtc_raw_horz[0] = (data >> 14);
-			m_crtc_regs[CRTC_HDSR] = convert_crtc_hdisplay(0); 
+			m_crtc_regs[CRTC_HDSR] = convert_crtc_hdisplay(0);
 			break;
-		case CRTC_HDER: 
+		case CRTC_HDER:
 			m_crtc_raw_horz[1] = (data >> 14);
-			m_crtc_regs[CRTC_HDER] = convert_crtc_hdisplay(1); 
+			m_crtc_regs[CRTC_HDER] = convert_crtc_hdisplay(1);
 			break;
-		case CRTC_HBER: m_crtc_regs[CRTC_HBER] = ((data >> 14)<<1)+1;    	break;
+		case CRTC_HBER: m_crtc_regs[CRTC_HBER] = ((data >> 14)<<1)+1;       break;
 		case CRTC_HCSR: m_crtc_regs[CRTC_HCSR] = ((data >> 13) & 0x7ff) + 6; return;
 //      case CRTC_HIR: // ...
 
@@ -440,7 +440,7 @@ WRITE32_MEMBER( acorn_vidc10_device::sound_frequency_w )
 //**************************************************************************
 
 void acorn_vidc10_device::write_dac(u8 channel, u8 data)
-{ 
+{
 	int16_t res;
 	res = m_ulaw_lookup[data];
 	m_dac[channel & 7]->write(res);
@@ -572,7 +572,7 @@ void arm_vidc20_device::regs_map(address_map &map)
 arm_vidc20_device::arm_vidc20_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: acorn_vidc10_device(mconfig, ARM_VIDC20, tag, owner, clock)
 {
-  	m_space_config = address_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, -2, address_map_constructor(FUNC(arm_vidc20_device::regs_map), this));
+	m_space_config = address_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, -2, address_map_constructor(FUNC(arm_vidc20_device::regs_map), this));
 	m_pal_4bpp_base = 0x000;
 	m_pal_cursor_base = 0x100;
 	m_pal_border_base = 0x100;
@@ -634,7 +634,7 @@ inline void arm_vidc20_device::update_8bpp_palette(u16 index, u32 paldata)
 	int r,g,b;
 
 	// TODO: ext hookup, supremacy plus other stuff according to the manual
-//	ext = (paldata & 0x0f000000) >> 24;
+//  ext = (paldata & 0x0f000000) >> 24;
 	b =   (paldata & 0x00ff0000) >> 16;
 	g =   (paldata & 0x0000ff00) >> 8;
 	r =   (paldata & 0x000000ff) >> 0;
@@ -670,14 +670,14 @@ u32 arm_vidc20_device::get_pixel_clock()
 	//printf("%d %02x %02x %d %d\n",this->clock(), 1 << m_pixel_rate, m_pixel_source, m_vco_v_modulo, m_vco_r_modulo);
 	if (m_pixel_source == 2) // RCLK
 		return (this->clock() << 1) >> m_pixel_rate;
-	
+
 	// VCLK source is just an external connection
-	// TODO: get clock from outside world, understand how the modulos are really used, 
-	//       understand if SW do some VCO testing before setting CRTC params, 
+	// TODO: get clock from outside world, understand how the modulos are really used,
+	//       understand if SW do some VCO testing before setting CRTC params,
 	//       if there isn't a monitor ID mechanism that copes with this
 	if (m_pixel_source == 0) // VCLK
 		return (25175000);
-	
+
 	throw emu_fatalerror("%s unhandled pixel source %02x selected",this->tag(), m_pixel_source);
 }
 
@@ -685,7 +685,7 @@ WRITE32_MEMBER(arm_vidc20_device::vidc20_crtc_w)
 {
 	if (offset & 0x8)
 		throw emu_fatalerror("%s accessing CRTC test register %02x, please call the ambulance",this->tag(),offset+0x80);
-	
+
 	const u8 crtc_offset = (offset & 0x7) | ((offset & 0x10) >> 1);
 
 	switch(crtc_offset)
@@ -697,23 +697,23 @@ WRITE32_MEMBER(arm_vidc20_device::vidc20_crtc_w)
 		case CRTC_HDER: m_crtc_regs[CRTC_HDER] = (data&0x7ffe) + 18; break;
 		case CRTC_HBER: m_crtc_regs[CRTC_HBER] = (data&0x7ffe) + 12; break;
 		case CRTC_HCSR: m_crtc_regs[CRTC_HCSR] = (data&0x7fff) + 17; return;
-//		case CRTC_HIR:
+//      case CRTC_HIR:
 		case CRTC_VCR:  m_crtc_regs[CRTC_VCR] = (data&0x3fff) + 2; break;
 		case CRTC_VSWR: m_crtc_regs[CRTC_VSWR] = (data&0x3fff) + 1; break;
 		case CRTC_VBSR: m_crtc_regs[CRTC_VBSR] = (data&0x3fff) + 1; break;
 		case CRTC_VDSR: m_crtc_regs[CRTC_VDSR] = (data&0x3fff) + 1; break;
-		case CRTC_VDER: 
-			m_crtc_regs[CRTC_VDER] = (data&0x3fff) + 1; 
+		case CRTC_VDER:
+			m_crtc_regs[CRTC_VDER] = (data&0x3fff) + 1;
 			screen_vblank_line_update();
 			break;
 		case CRTC_VBER: m_crtc_regs[CRTC_VBER] = (data&0x3fff) + 1; break;
 		// TODO: bits 15-14 specific for duplex LCD mode
-		case CRTC_VCSR: 
-			m_crtc_regs[CRTC_VCSR] = (data&0x3fff) + 1; 
+		case CRTC_VCSR:
+			m_crtc_regs[CRTC_VCSR] = (data&0x3fff) + 1;
 			return;
 		case CRTC_VCER: m_crtc_regs[CRTC_VCER] = (data&0x3fff) + 1; return;
 	}
-	
+
 	screen_dynamic_res_change();
 }
 
@@ -722,7 +722,7 @@ WRITE32_MEMBER( arm_vidc20_device::fsynreg_w )
 	m_vco_r_modulo = data & 0x3f;
 	m_vco_v_modulo = (data >> 8) & 0x3f;
 	// bits 15-14 and 7-6 are test bits
-	
+
 	screen_dynamic_res_change();
 }
 
@@ -740,7 +740,7 @@ WRITE32_MEMBER( arm_vidc20_device::vidc20_control_w )
 	// (data & 0xf0000) >> 16 test mode
 	m_bpp_mode = (data & 0xe0) >> 5;
 	m_crtc_interlace = BIT(data, 12);
-	
+
 	screen_vblank_line_update();
 	screen_dynamic_res_change();
 }
@@ -759,7 +759,7 @@ WRITE32_MEMBER( arm_vidc20_device::vidc20_sound_frequency_w )
 }
 
 void arm_vidc20_device::write_dac32(u8 channel, u16 data)
-{ 
+{
 	m_dac[channel & 1]->write(data);
 }
 

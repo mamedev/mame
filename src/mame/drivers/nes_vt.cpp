@@ -25,7 +25,7 @@
         Adds scrambled opcodes (XORed with 0xA1) and RGB444 palette mode,
         and more advanced PCM modes (CPU and video working, sound NYI)
 
-    VT368 (?) - used in DGUN2561, lexcyber
+    VT368 (?) - used in DGUN2561, lxcmcy
         Various enhancements not yet emulated. Different banking, possibly an ALU,
         larger palette space
 
@@ -48,7 +48,7 @@
   todo (newer VTxx):
 
   new PCM audio in FC Pocket and DGUN-2573
-    add support for VT368 (?) in DGUN-2561 and lexcyber
+    add support for VT368 (?) in DGUN-2561 and lxcmcy
     add support for the VT369 (?) featurs used by the MOGIS M320
 
   todo (general)
@@ -215,7 +215,7 @@ private:
 
 	int calculate_real_video_address(int addr, int extended, int readtype);
 
-	
+
 	required_memory_bank m_prgbank0;
 	required_memory_bank m_prgbank1;
 	required_memory_bank m_prgbank2;
@@ -246,7 +246,7 @@ class nes_vt_ts_state : public nes_vt_state
 public:
 	nes_vt_ts_state(const machine_config& mconfig, device_type type, const char* tag) :
 		nes_vt_state(mconfig, type, tag)
-	{ 	
+	{
 		m_initial_e000_bank = 0x03; // or the banking is just different / ROM is scrambled
 	}
 
@@ -2019,9 +2019,17 @@ ROM_START( dgun2561 )
 	ROM_LOAD( "dgun2561.bin", 0x00000, 0x4000000, CRC(a6e627b4) SHA1(2667d2feb02de349387f9dcfa5418e7ed3afeef6) )
 ROM_END
 
-ROM_START( lexcyber )
+
+// The maximum address space a VT chip can see is 32MB, so these 64MB roms are actually 2 programs (there are vectors in the first half and the 2nd half)
+// there must be a bankswitch bit that switches the whole 32MB space.  Loading the 2nd half in Star Wars does actually boot straight to a game.
+ROM_START( lxcmcy )
 	ROM_REGION( 0x4000000, "mainrom", 0 )
-	ROM_LOAD( "lexcyber.bin", 0x00000, 0x4000000, CRC(3f3af72c) SHA1(76127054291568fcce1431d21af71f775cfb05a6) )
+	ROM_LOAD( "lxcmcy.bin", 0x00000, 0x4000000, CRC(3f3af72c) SHA1(76127054291568fcce1431d21af71f775cfb05a6) )
+ROM_END
+
+ROM_START( lxcmcysw )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "jl2365swr-1.u2", 0x00000, 0x4000000, CRC(60ece391) SHA1(655de6b36ba596d873de2839522b948ccf45e006) )
 ROM_END
 
 ROM_START( cybar120 )
@@ -2258,6 +2266,11 @@ ROM_START( mc_tv200 )
 	ROM_LOAD( "s29gl064n90.bin", 0x00000, 0x800000, CRC(ae1905d2) SHA1(11582055713ba937c1ad32c4ada8683eebc1c83c) )
 ROM_END
 
+ROM_START( unkra200 ) // "Winbond 25Q64FVSIG 1324" SPI ROM
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "retro_machine_rom", 0x00000, 0x800000, CRC(0e824aa7) SHA1(957e98868559ecc22b3fa42c76692417b76bf132) )
+ROM_END
+
 ROM_START( fcpocket )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
 	ROM_LOAD( "s29gl01gp.bin", 0x00000, 0x8000000, CRC(8703b18a) SHA1(07943443294e80ca93f83181c8bdbf950b87c52f) )
@@ -2333,7 +2346,16 @@ CONS( 200?, dgun2500,  0,  0,  nes_vt_dg, nes_vt, nes_vt_dg_state, empty_init, "
 
 // don't even get to menu. very enhanced chipset, VT368/9?
 CONS( 2012, dgun2561,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "dreamGEAR", "dreamGEAR My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
-CONS( 200?, lexcyber,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcy,    0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcysw,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING )
+// Also Lexibook Compact Cyber Arcade - Disney Princesses
+//      Lexibook Compact Cyber Arcade - Cars
+//      Lexibook Compact Cyber Arcade - Frozen
+//      Lexibook Compact Cyber Arcade - Paw Patrol
+//      Lexibook Compact Cyber Arcade - Barbie
+//      Lexibook Compact Cyber Arcade - Finding Dory
+// more?
+
 
 // boots, same platform with scrambled opcodes as FC pocket
 // palette issues in some games because they actually use the old VT style palette
@@ -2417,6 +2439,8 @@ CONS( 201?, mc_hh210,   0,        0,  nes_vt_xx, nes_vt, nes_vt_state, empty_ini
 CONS( 201?, dvnimbus,   0,        0,  nes_vt_vg, nes_vt, nes_vt_hh_state, empty_init, "<unknown>", "DVTech Nimbus 176 in 1", MACHINE_NOT_WORKING )
 // Works fine, VT02 based
 CONS( 201?, mc_tv200,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "Thumbs Up", "200 in 1 Retro TV Game", MACHINE_IMPERFECT_GRAPHICS )
+ // probably another Thumbs Up product? cursor doesn't work unless nes_vt_hh machine is used? possibly newer than VT02 as it runs from an SPI ROM, might just not use enhanced features.  Some minor game name changes to above (eg Smackdown just becomes Wrestling)
+CONS( 201?, unkra200,   mc_tv200, 0,  nes_vt_hh, nes_vt, nes_vt_hh_state, empty_init, "<unknown>", "200 in 1 Retro Arcade", MACHINE_IMPERFECT_GRAPHICS )
 // New platform with scrambled opcodes, same as DGUN-2561. Runs fine with minor GFX and sound issues in menu
 // Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a GPIO
 CONS( 2016, fcpocket,   0,        0,  nes_vt_fp, nes_vt_fp, nes_vt_hh_state, empty_init, "<unknown>",   "FC Pocket 600 in 1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

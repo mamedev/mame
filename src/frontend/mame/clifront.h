@@ -72,7 +72,7 @@ private:
 	template <typename T> void apply_device_action(const std::vector<std::string> &args, T &&action);
 	void execute_commands(const char *exename);
 	void display_help(const char *exename);
-	void output_single_softlist(FILE *out, software_list_device &swlist);
+	void output_single_softlist(std::ostream &out, software_list_device &swlist);
 	void start_execution(mame_machine_manager *manager, const std::vector<std::string> &args);
 	static const info_command_struct *find_command(const std::string &s);
 

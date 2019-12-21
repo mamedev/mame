@@ -531,7 +531,7 @@ void meritum_state::meritum2(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &meritum_state::io_map2);
 	I8255(config, "flopppi", 0); // floppy disk interface
 	m_screen->set_screen_update(FUNC(meritum_state::screen_update_meritum2));
-	
+
 }
 
 

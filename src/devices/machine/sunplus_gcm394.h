@@ -213,6 +213,7 @@ private:
 
 	DECLARE_WRITE16_MEMBER(unkarea_78a0_w);
 
+	DECLARE_READ16_MEMBER(unkarea_78a0_r);
 	DECLARE_READ16_MEMBER(unkarea_78a1_r);
 
 	DECLARE_WRITE16_MEMBER(unkarea_78a4_w);
@@ -283,6 +284,7 @@ public:
 		generalplus_gpac800_device(mconfig, tag, owner, clock)
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
+		m_testval = 0;
 	}
 
 	generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -290,8 +292,21 @@ public:
 protected:
 	void gpac800_internal_map(address_map &map);
 
+	//virtual void device_start() override;
+	virtual void device_reset() override;
+
 private:
 	DECLARE_READ16_MEMBER(unkarea_7850_r);
+	DECLARE_READ16_MEMBER(unkarea_7854_r);
+
+	DECLARE_WRITE16_MEMBER(flash_addr_low_w);
+	DECLARE_WRITE16_MEMBER(flash_addr_high_w);
+
+	int m_testval;
+
+	uint16_t m_flash_addr_low;
+	uint16_t m_flash_addr_high;
+
 };
 
 

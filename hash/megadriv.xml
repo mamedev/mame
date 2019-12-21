@@ -32916,19 +32916,6 @@ This dump is either a bad dump or a wrongly patched one.
 			<dataarea name="rom" width="16" endianness="big" size="0x400000">
 				<rom name="titan-overdrivemegademo.bin" size="0x3f01be" crc="3deb19a9" sha1="6085182099d6a9ad2c8242eae263507e42269b66"/>
 			</dataarea>
-		<!-- non-rom extras (should be marked as optional?) -->
-			<dataarea name="misc" size="0x7af9">
-				<rom name="titan-overdrivemegademo.nfo"        size="0x7af9"    crc="d560530a" sha1="f3a130881878e95a1db6e32268e7b1b001965c1a"/>
-			</dataarea>
-			<dataarea name="misc2" size="0x13489c0">
-				<rom name="titan-overdrivemegademo_inlay.pdf"  size="0x13489c0" crc="ae55e12d" sha1="620fcba1600563b87543b027c42687da7d876b03"/>
-			</dataarea>
-			<dataarea name="misc3" size="0xa68cf">
-				<rom name="titan-overdrivemegademo_label.pdf"  size="0xa68cf"   crc="a527c826" sha1="449c945a0ddcbb145c7c92bc01fac543fc1352da"/>
-			</dataarea>
-			<dataarea name="misc4" size="0x1c985d">
-				<rom name="titan-overdrivemegademo_poster.png" size="0x1c985d"  crc="0dfeac10" sha1="cdfd4ff93e199da66cab3ef49d39828f3eb6040c"/>
-			</dataarea>
 		</part>
 	</software>
 </softwarelist>

@@ -301,7 +301,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 	</software>
 
 	<software name="poohcornsw" cloneof="poohcorn">
-		<description>Ett År med Nalle Puh (Swe)</description>
+		<description>Ett år med Nalle Puh (Swe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK-49021-24"/>
@@ -310,6 +310,9 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 			<feature name="ic1" value="MPR-18576-T" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-18576-t.ic1" size="524288" crc="0a48bbb9" sha1="a702d91a72066bea72e7cff9013f1b94f2623761" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="pages" size="0x2000000"> <!-- book pages -->
+				<rom name="0.png" size="31345139" crc="33fbbbb4" sha1="30534e90d2f0fdb17d66dce66fbaa9e03b2d5295" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -441,12 +444,21 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<info name="alt_title" value="アンパンマンピコ わくわくパン工場 ~ Anpanman Pico Wakuwaku Pan Koujou"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-7967" />
-			<feature name="ic1" value="9K0-0041A" />
+			<feature name="ic1" value="9K0-0041A-RV" />
 			<feature name="ic2" value="HC32" />
 			<feature name="ic3" value="HC74" />
 			<feature name="ic4" value="HC125" />
 			<dataarea name="rom" size="1048576">
 				<rom name="9k0-0041a-rv.ic1" size="1048576" crc="a10118a5" sha1="b9fce10b2558f73048d30398410b0e3340e87610" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="pages" size="0x2000000"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="25146736" crc="bb9bf256" sha1="64ee0df89f8995b8cf847b0a3381e624e48ee1a4" offset="0"/>
+				<rom name="0 - 0002.png" size="26243330" crc="9aabec1a" sha1="044748f6af5becc08650935136749e855258c938" offset="0"/>
+				<rom name="0 - 0003.png" size="25927952" crc="43fdc28c" sha1="04e7df5119a04940ca5b217cc7814438a1a66852" offset="0"/>
+				<rom name="0 - 0004.png" size="27207842" crc="291b9b5f" sha1="abcef241c2065d22342f276096590bc01a5082a5" offset="0"/>
+				<rom name="0 - 0005.png" size="28869718" crc="4a435395" sha1="1748c5aa0f0a5d0a7efaf0e2a9735659d637e255" offset="0"/>
+				<rom name="0 - 0006.png" size="29680612" crc="1e1287a7" sha1="cc92ef1bb6f20c06ee61287da02eb4e147484f1d" offset="0"/>
+				<rom name="0 - 0007.png" size="27665504" crc="6562d21c" sha1="f0d66aca4178aa0ac45ad91271c0bd863e117774" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -683,11 +695,25 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<description>Cooking Pico (Jpn)</description>
 		<year>1999</year>
 		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6076"/>
+		<info name="alt_title" value="クッキング ピコ みんなといっしょに はじめてクッキング!"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-7967" />
 			<feature name="ic1" value="9K0-0001A-RV" />
+			<feature name="ic2" value="HC32" />
+			<feature name="ic3" value="HC74" />
+			<feature name="ic4" value="HC125" />
 			<dataarea name="rom" size="2097152">
 				<rom name="9k0-0001a-rv.ic1" size="2097152" crc="b94f7d54" sha1="dabeb440adbb7477cc880c51fb0cfc1e5f99d23b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="pages" size="0x2000000"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="26511733" crc="a1dc0a41" sha1="67ec8a3f88cbe8512b6375cace94cb8ae8cd4686" offset="0"/>
+				<rom name="0 - 0002.png" size="25239655" crc="e2c78528" sha1="a258003c48def8d6a0005e069795497dcdd92878" offset="0"/>
+				<rom name="0 - 0003.png" size="28739986" crc="40545907" sha1="89a898e6183e0c4e8399c5713e08adf6775068ac" offset="0"/>
+				<rom name="0 - 0004.png" size="29404938" crc="5575999c" sha1="b312e3198a16b6d70a55a6dbbd34459cf85e7a33" offset="0"/>
+				<rom name="0 - 0005.png" size="29654672" crc="d3cfe54c" sha1="b473266eee621a23d825524c65451400a259630d" offset="0"/>
+				<rom name="0 - 0006.png" size="30111054" crc="d897e4b6" sha1="b00de9e37c4a90f722eb49b203afcb1888033288" offset="0"/>
+				<rom name="0 - 0007.png" size="28981434" crc="5455c241" sha1="edcdcaed03062095541326184a28ccba1b62f5b2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2607,8 +2633,9 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-		<software name="lionkingsw" cloneof="lionking" supported="no">
-		<description>Lejonkungen Äventyr (Swe)</description>
+	<!-- The booklet is not translated and is identical to "lionking" -->
+	<software name="lionkingsw" cloneof="lionking" supported="no">
+		<description>Lejonkungen - Äventyr (Swe)</description>
 		<year>19??</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK-49037-24"/>
@@ -2635,7 +2662,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-<!-- This was also released for the Swedish market with serial MK-49026-24, pcb 171-6882A. ROM is marked MPR-17729-T but contents match -->
+<!-- This was also released for the Swedish market with serial MK-49026-24, pcb 171-6882A. ROM is marked MPR-17729-T but contents and booklet match -->
 	<software name="magiccra">
 		<description>Magic Crayons (Euro)</description>
 		<year>1994</year>
@@ -3896,7 +3923,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 	</software>
 
 	<software name="profpicos" cloneof="profpico" supported="no">
-		<description>El Profesor Pico en el Mundo de los Colores  (Spa)</description>
+		<description>El Profesor Pico en el Mundo de los Colores (Spa)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="49041-06" />

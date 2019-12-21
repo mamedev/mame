@@ -604,13 +604,13 @@ ROM_END
 
 /*
 
- This ROM came from a prototype bartop field-test machine from an 
+ This ROM came from a prototype bartop field-test machine from an
 ex-Atari Employee.
 
 PCB is screened : A044809
 
- The PCB does not draw its power from the JAMMA connector, instead a 
-small AC voltage is taken onboard and regulated down as this pcb has 
+ The PCB does not draw its power from the JAMMA connector, instead a
+small AC voltage is taken onboard and regulated down as this pcb has
 only a small power requirement!
 
  The label on the rom says :
@@ -622,7 +622,7 @@ B4FF
 
 The cabinet is completely custom made by Atari, and this pcb differs
 greatly from the production pcb that we know of. The machine was operated
-on location at a local bar but did not perform well so they decided it 
+on location at a local bar but did not perform well so they decided it
 wasn't a viable game to make, its the only known example.
 
 */

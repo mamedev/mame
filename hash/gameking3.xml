@@ -73,7 +73,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="vagrant" supported="partial">
 		<description>Vagrant</description>
 		<year>200?</year>
@@ -83,6 +83,6 @@
 				<rom name="vagrant.gk3" size="524288" crc="db50e1c9" sha1="80f27ec7973d336e12ee506f090440db35ecf183"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 </softwarelist>

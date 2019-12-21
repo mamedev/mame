@@ -31,6 +31,8 @@ private:
 	void _0e00(uint16_t mcu_cmd, uint8_t *vram);
 
 	required_region_ptr<uint8_t> m_data;
+	uint16_t m_previous_0200_command;
+	uint64_t m_previous_0200_command_frame;
 	bool m_in_game;
 };
 

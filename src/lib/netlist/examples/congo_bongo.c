@@ -10,8 +10,8 @@
 
 /* set to 1 to use optimizations increasing performance significantly */
 
-#define USE_OPTMIZATIONS	1
-#define USE_FRONTIERS		1
+#define USE_OPTMIZATIONS    1
+#define USE_FRONTIERS       1
 
 /* ----------------------------------------------------------------------------
  *  Library section header START
@@ -19,7 +19,7 @@
 
 #ifndef __PLIB_PREPROCESSOR__
 
-#define LM358_DIP(_name)            			                               \
+#define LM358_DIP(_name)                                                       \
 		NET_REGISTER_DEV_X(LM358_DIP, _name)
 
 #define G501534_DIP(_name)                                                     \
@@ -391,8 +391,8 @@ NETLIST_START(G501534_DIP)
 	 * 12:   VCC
 	 *  4:   GND
 	 *  1:   IN
-	 *  3:	 OUT
-	 * 13:	 CV
+	 *  3:   OUT
+	 * 13:   CV
 	 *  2:   RDL - connected via Capacitor to ground
 	 */
 

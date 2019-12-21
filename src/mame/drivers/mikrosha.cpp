@@ -225,6 +225,7 @@ void mikrosha_state::mikrosha(machine_config &config)
 
 	I8255(config, m_ppi8255_2);
 	m_ppi8255_2->out_pb_callback().set(FUNC(mikrosha_state::mikrosha_8255_font_page_w));
+	m_ppi8255_2->tri_pb_callback().set_constant(0);
 
 	i8275_device &i8275(I8275(config, "i8275", XTAL(16'000'000) / 12));
 	i8275.set_character_width(6);

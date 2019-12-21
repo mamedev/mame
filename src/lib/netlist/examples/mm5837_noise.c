@@ -9,24 +9,24 @@
 
 NETLIST_START(ne555_astable)
 
-    /*
-     * Astable ne555
-     *
-     */
+	/*
+	 * Astable ne555
+	 *
+	 */
 
-    /* Standard stuff */
+	/* Standard stuff */
 
-    SOLVER(Solver, 48000)
+	SOLVER(Solver, 48000)
 
-    ANALOG_INPUT(V12, 12)  // 5V
+	ANALOG_INPUT(V12, 12)  // 5V
 
-    /* Wiring up the ne555 */
+	/* Wiring up the ne555 */
 
-    // astable NE555, 1.13 ms period
+	// astable NE555, 1.13 ms period
 
-    MM5837_DIP(NOISE)
+	MM5837_DIP(NOISE)
 
-    RES(R, 10000)
+	RES(R, 10000)
 
 	NET_C(NOISE.1, NOISE.2, R.2, GND)
 	NET_C(NOISE.4, V12)

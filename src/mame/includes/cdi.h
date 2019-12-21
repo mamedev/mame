@@ -22,8 +22,6 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_planea(*this, "mcd212:planea")
-		, m_input1(*this, "INPUT1")
-		, m_input2(*this, "INPUT2")
 		, m_slave_hle(*this, "slave_hle")
 		, m_servo(*this, "servo")
 		, m_slave(*this, "slave")
@@ -34,6 +32,21 @@ public:
 		, m_dmadac(*this, "dac%u", 1U)
 	{ }
 
+	void cdimono1_base(machine_config &config);
+	void cdimono1(machine_config &config);
+	void cdimono2(machine_config &config);
+	void cdi910(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+
+	void cdimono1_mem(address_map &map);
+
+	required_device<scc68070_device> m_maincpu;
+
+private:
+	virtual void video_start() override;
+
 	enum servo_portc_bit_t
 	{
 		INV_JUC_OUT = (1 << 2),
@@ -41,10 +54,17 @@ public:
 		INV_CADDYSWITCH_IN = (1 << 7)
 	};
 
-	required_device<scc68070_device> m_maincpu;
+	void draw_lcd(int y);
+	uint32_t screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void cdi910_mem(address_map &map);
+	void cdimono2_mem(address_map &map);
+	void cdi070_cpuspace(address_map &map);
+
+	DECLARE_READ16_MEMBER(dvc_r);
+	DECLARE_WRITE16_MEMBER(dvc_w);
+
 	required_shared_ptr<uint16_t> m_planea;
-	optional_ioport m_input1;
-	optional_ioport m_input2;
 	optional_device<cdislave_device> m_slave_hle;
 	optional_device<m68hc05c8_device> m_servo;
 	optional_device<m68hc05c8_device> m_slave;
@@ -55,58 +75,92 @@ public:
 
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
 
-	INTERRUPT_GEN_MEMBER( mcu_frame );
-
-	uint8_t m_timer_set;
-	emu_timer *m_test_timer;
-
 	bitmap_rgb32 m_lcdbitmap;
+};
+
+class quizard_state : public cdi_state
+{
+public:
+	quizard_state(const machine_config &mconfig, device_type type, const char *tag)
+		: cdi_state(mconfig, type, tag)
+		, m_input1(*this, "INPUT1")
+		, m_input2(*this, "INPUT2")
+	{ }
+
+	void quizard(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(mcu_input);
 
-	virtual void machine_start() override { }
-	virtual void video_start() override;
+protected:
+	void set_mcu_value(uint16_t value);
+	void set_mcu_ack(uint8_t ack);
 
-	DECLARE_MACHINE_RESET(cdimono1);
-	DECLARE_MACHINE_RESET(cdimono2);
-	DECLARE_MACHINE_RESET(quizard1);
-	DECLARE_MACHINE_RESET(quizard2);
-	DECLARE_MACHINE_RESET(quizard3);
-	DECLARE_MACHINE_RESET(quizard4);
+private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(quizard_mcu_p1_r);
+	DECLARE_READ8_MEMBER(mcu_p1_r);
 
-	void draw_lcd(int y);
-	uint32_t screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void mcu_tx(uint8_t data);
+	void mcu_calculate_state();
+	void mcu_set_seeds(uint8_t *rx);
+	void mcu_rx(uint8_t data);
 
-	void cdimono1(machine_config &config);
-	void cdimono2(machine_config &config);
-	void quizard4(machine_config &config);
-	void cdimono1_base(machine_config &config);
-	void cdi910(machine_config &config);
-	void quizard2(machine_config &config);
-	void quizard3(machine_config &config);
-	void quizard1(machine_config &config);
-	void quizard(machine_config &config);
-
-	void cdi910_mem(address_map &map);
-	void cdimono1_mem(address_map &map);
-	void cdimono2_mem(address_map &map);
-	void cdi070_cpuspace(address_map &map);
-
-	// Quizard Protection HLE
-	void set_quizard_mcu_value(uint16_t value);
-	void set_quizard_mcu_ack(uint8_t ack);
-	void quizard_rx(uint8_t data);
-	void quizard_calculate_state();
-	void quizard_set_seeds(uint8_t *rx);
-	void quizard_handle_byte_tx(uint8_t data);
+	required_ioport m_input1;
+	required_ioport m_input2;
 
 	uint16_t m_seeds[10];
 	uint8_t m_state[8];
 
 	uint16_t m_mcu_value;
 	uint8_t m_mcu_ack;
+};
+
+class quizard1_state : public quizard_state
+{
+public:
+	quizard1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: quizard_state(mconfig, type, tag)
+	{
+		set_mcu_value(0x021f);
+		set_mcu_ack(0x5a);
+	}
+};
+
+class quizard2_state : public quizard_state
+{
+public:
+	quizard2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: quizard_state(mconfig, type, tag)
+	{
+		// 0x2b1: Italian
+		// 0x001: French
+		// 0x188: German
+		set_mcu_value(0x0188);
+		set_mcu_ack(0x59);
+	}
+};
+
+class quizard3_state : public quizard_state
+{
+public:
+	quizard3_state(const machine_config &mconfig, device_type type, const char *tag)
+		: quizard_state(mconfig, type, tag)
+	{
+		set_mcu_value(0x00ae);
+		set_mcu_ack(0x58);
+	}
+};
+
+class quizard4_state : public quizard_state
+{
+public:
+	quizard4_state(const machine_config &mconfig, device_type type, const char *tag)
+		: quizard_state(mconfig, type, tag)
+	{
+		set_mcu_value(0x011f);
+		set_mcu_ack(0x57);
+	}
 };
 
 #endif // MAME_INCLUDES_CDI_H

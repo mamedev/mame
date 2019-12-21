@@ -386,6 +386,7 @@ void cabaret_state::cabaret(machine_config &config)
 
 	i8255_device &ppi3(I8255(config, "ppi3"));
 	ppi3.out_pa_callback().set(FUNC(cabaret_state::nmi_and_coins_w));
+	ppi3.tri_pa_callback().set_constant(0xf0);
 	ppi3.in_pb_callback().set_ioport("DSW1");
 	ppi3.in_pc_callback().set_ioport("DSW2");
 

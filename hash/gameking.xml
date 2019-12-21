@@ -43,24 +43,24 @@ S2: to VCC (most likely WE)
 S3: to GND (most likely OE)
 S1: is on some carts directly connected to VCC
 
-	there are multiple cartridge types with different dates stamped on the PCB
-	
-	128KB capacity
-	
-	2007 / APR 02 04 / REV:1.0
-	2007 / APR 28 04 / REV:2.0
-	
-	512KB capacity
-	
-	2007B / OCT 28 04 / REV:1.0
-	2007D / APR 23 05 / REV:1.0
-	
-	1024KB capacity
-	2007E / JUN 16 05 / REV:1.0
-	
-	the dates are not the release dates for the individual games.
-	
-	all GameKing 3 cartridges seen have been the 2007D type
+    there are multiple cartridge types with different dates stamped on the PCB
+
+    128KB capacity
+
+    2007 / APR 02 04 / REV:1.0
+    2007 / APR 28 04 / REV:2.0
+
+    512KB capacity
+
+    2007B / OCT 28 04 / REV:1.0
+    2007D / APR 23 05 / REV:1.0
+
+    1024KB capacity
+    2007E / JUN 16 05 / REV:1.0
+
+    the dates are not the release dates for the individual games.
+
+    all GameKing 3 cartridges seen have been the 2007D type
 
 -->
 

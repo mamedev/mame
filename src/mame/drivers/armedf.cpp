@@ -1119,7 +1119,7 @@ void armedf_state::video_config(machine_config &config, int hchar_start, int vst
 	// assume all games on this HW running at ~59.1358Hz (trusted for Big Fighter)
 	// TODO: recheck if visible area isn't just 320x240 for everything (overscan may be masked by the text layer).
 	// TODO: bootlegs may not run at this speed
-	m_screen->set_raw(XTAL(16'000'000)/2,531,hchar_start*8,(64-hchar_start)*8, 255, vstart, vend); 
+	m_screen->set_raw(XTAL(16'000'000)/2,531,hchar_start*8,(64-hchar_start)*8, 255, vstart, vend);
 	m_screen->set_palette(m_palette);
 	m_screen->set_screen_update(FUNC(armedf_state::screen_update_armedf));
 	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));

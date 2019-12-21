@@ -49,9 +49,18 @@ WRITE_LINE_MEMBER(pc9801_86_device::sound_irq)
 
 void pc9801_86_device::pc9801_86_config(machine_config &config)
 {
+	// TODO: "SecondBus86" PCB contents differs from current hookup
+	// XTAL 15.9744 (X1)
+	// HD641180X0 MCU (U7) (!)
+	// YM2608B (U11)
+	// CS4231A (U15)
+	// OPL4 YMF278 + YRW801 (U21 + U22)
+	// TC55257CFL-10 (U15)
+	// unknown chip (most likely surface scratched) U3)
+
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	YM2608(config, m_opna, 7.987_MHz_XTAL);
+	YM2608(config, m_opna, 7.987_MHz_XTAL); // actually YM2608B
 	m_opna->irq_handler().set(FUNC(pc9801_86_device::sound_irq));
 	m_opna->set_flags(AY8910_SINGLE_OUTPUT);
 	m_opna->port_a_read_callback().set(FUNC(pc9801_86_device::opn_porta_r));

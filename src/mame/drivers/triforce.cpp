@@ -1162,7 +1162,7 @@ ROM_END
 //   For instance, the dump of mkartagp skips two blocks in its lookup list, and the 16 'lanes' in the
 //   0x78020-0x7802f area are 00 except for two values, which are 1. The corresponding two skipped blocks
 //   in the flash area are all zero/unused.
-//   Likewise, with mkartagp2, there are three 1 value and one 2 values in the table, 
+//   Likewise, with mkartagp2, there are three 1 value and one 2 values in the table,
 //   and mkartagp2 skips 5 blocks in its mapping table.
 // * 0x79ffc-0x79fff contains what may be a checksum of the 0x78000-0x79ffb area? unclear.
 

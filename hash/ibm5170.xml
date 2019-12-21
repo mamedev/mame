@@ -12292,6 +12292,28 @@
 		</part>
 	</software>
 
+	<software name="sleepwalker">
+		<description>Sleepwalker</description>
+		<year>1993</year>
+		<publisher>Ocean</publisher>
+		<info name="developer" value="C.T.A. Developments" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "4215420">
+				<rom name="Sleepwalker [Ocean] [1993] [3.5HD] [Disk 1 of 3].mfm" size="4215420" crc="05da623d" sha1="b4ed81efbae60e0bf12fabe25cd60de30e8be821"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "4192605">
+				<rom name="Sleepwalker [Ocean] [1993] [3.5HD] [Disk 2 of 3].mfm" size="4192605" crc="0d5e83aa" sha1="8eefd8df3b23d88be5dfab933b4673a0685aa15b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "2159681">
+				<rom name="Sleepwalker [Ocean] [1993] [3.5HD] [Disk 3 of 3].mfm" size="2159681" crc="f08d4015" sha1="d7e3919a5d2a51e6e915ffe5d44dd8de07b3ec30"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sq5">
 		<description>Space Quest V: The Next Mutation (3.5", v1.04)</description>
 		<year>1993</year>
@@ -12767,6 +12789,27 @@
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="UFO - Enemy Unknown (Europe) (Disk 3).img" size="1474560" crc="b809f0d2" sha1="c391ef6ddb9ff80764a5f86eaa6ade2582d3fa5f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ufoeuita" cloneof="ufoeu">
+		<description>UFO - Enemy Unknown (Italy)</description>
+		<year>1994</year>
+		<publisher>Microprose</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ufo Enemy Unknown (Italy) [Microprose] [1994] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="e6cac594" sha1="ff9e23147c99fa8bf101c556a6727a6261542893"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ufo Enemy Unknown (Italy) [Microprose] [1994] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="eff641db" sha1="7a6f9b9b0efa9aa5268d4983c54206505f551495"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ufo Enemy Unknown (Italy) [Microprose] [1994] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="bb4c55f2" sha1="fea81ce17b795d33c004ae8fee26b66227a9f6ee"/>
 			</dataarea>
 		</part>
 	</software>

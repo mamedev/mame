@@ -5,14 +5,23 @@
 『コズモギャングス』 (COSMOGANGS) by Namco, 1990. USA distribution was handled by
 Data East, they titled it "Cosmo Gang".
 
-It is an electromechanical arcade lightgun game with ticket redemption.
-There is no screen, feedback is with motorized elements, lamps and 7segs,
-and of course sounds and music.
+It is an electromechanical arcade lightgun game. There is no screen, feedback
+is with motorized elements, lamps and 7segs, and of course sounds and music.
 
-The hardware has similarities with Gator Panic/Wacky Gator.
+To shoot the targets in MAME, either enable -mouse and click on one of the
+cosmogang lanes(left mouse button doubles as gun trigger by default).
+Or, configure the gun aim inputs and share them with the trigger. For example
+use Z,X,C,V,B for the gun aims, and "Z or X or C or V or B" for the trigger.
 
 TODO:
-- almost everything
+- dump/add Japanese version
+- game can't be played properly within MAME's constraints (mechanical stuff,
+  and the lightguns linked to it)
+- shot target is sometimes ignored, maybe a BTANB? since it's easy to dismiss
+  on the real thing as a missed aim. It turns on the lightgun lamp but then
+  doesn't read the lightsensor.
+
+-------------------------------------------------------------------------------
 
 Hardware notes:
 
@@ -33,12 +42,15 @@ Audio CPU side:
 
 Cabinet:
 - 5 lanes with movable aliens, lightsensor under mouth
-- 5 'energy containers', aliens will try to steal them
+- 5 'energy crates', aliens will try to steal them
 - 2 lightguns
 - UFO with leds above cabinet
+- sliding door (only for Japan version?)
 - 7segs for scorekeeping
 - 2 speakers (but final mix is mono!)
-- ticket dispenser
+- optional ticket/prize dispenser
+
+Overall, the hardware has similarities with Wacky Gator, see wacky_gator.cpp.
 
 ******************************************************************************/
 
@@ -49,6 +61,7 @@ Cabinet:
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/ripple_counter.h"
+#include "machine/ticket.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/upd7759.h"
@@ -57,11 +70,19 @@ Cabinet:
 
 #include "speaker.h"
 
+// internal artwork
+#include "cgang.lh" // clickable
+
 
 namespace {
 
-// length of the gate/door in msec (time it takes to open or close)
-static constexpr int GATE_MOTOR_LIMIT = 2500;
+// length of the sliding door in msec (time it takes to open or close)
+static constexpr int DOOR_MOTOR_LIMIT = 2000;
+
+// length of each cosmogang lane, in motor steps
+// At game start, one cosmo going forward takes around 7 seconds, and if the player does nothing
+// at the 1st round, game is lost with around 10 seconds remaining (compared to video recording).
+static constexpr int CG_MOTOR_LIMIT = 1000;
 
 
 class cgang_state : public driver_device
@@ -75,10 +96,13 @@ public:
 		m_latch(*this, "latch%u", 0),
 		m_pit(*this, "pit%u", 0),
 		m_ppi(*this, "ppi%u", 0),
+		m_ticket(*this, "ticket"),
 		m_adpcm(*this, "adpcm%u", 0),
 		m_ymsnd(*this, "ymsnd"),
+		m_spot(*this, "spot"),
 		m_digits(*this, "digits"),
-		m_inputs(*this, "IN%u", 1),
+		m_fake(*this, "FAKE%u", 1),
+		m_conf(*this, "CONF1"),
 		m_dipsw(*this, "SW%u", 1),
 		m_gun_lamps(*this, "gun_lamp%u", 0U),
 		m_spot_lamps(*this, "spot_lamp%u", 0U),
@@ -86,7 +110,10 @@ public:
 		m_ufo_lamps(*this, "ufo_lamp%u", 0U),
 		m_ufo_sol(*this, "ufo_sol"),
 		m_en_sol(*this, "en_sol%u", 0U),
-		m_cg_sol(*this, "cg_sol%u", 0U)
+		m_cg_sol(*this, "cg_sol%u", 0U),
+		m_door_count(*this, "door_count"),
+		m_en_count(*this, "en_count%u", 0U),
+		m_cg_count(*this, "cg_count%u", 0U)
 	{ }
 
 	// machine drivers
@@ -94,6 +121,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	// devices/pointers
@@ -103,10 +131,13 @@ private:
 	required_device_array<generic_latch_8_device, 2> m_latch;
 	required_device_array<pit8253_device, 2> m_pit;
 	required_device_array<i8255_device, 5> m_ppi;
+	required_device<ticket_dispenser_device> m_ticket;
 	required_device_array<upd7759_device, 2> m_adpcm;
 	required_device<ym2151_device> m_ymsnd;
+	required_device<pwm_display_device> m_spot;
 	required_device<pwm_display_device> m_digits;
-	required_ioport_array<3> m_inputs;
+	required_ioport_array<2> m_fake;
+	required_ioport m_conf;
 	required_ioport_array<4> m_dipsw;
 	output_finder<2> m_gun_lamps;
 	output_finder<8> m_spot_lamps;
@@ -115,6 +146,9 @@ private:
 	output_finder<> m_ufo_sol;
 	output_finder<5> m_en_sol;
 	output_finder<5> m_cg_sol;
+	output_finder<> m_door_count;
+	output_finder<5> m_en_count;
+	output_finder<5> m_cg_count;
 
 	// address maps
 	void main_map(address_map &map);
@@ -123,10 +157,12 @@ private:
 	// I/O handlers
 	DECLARE_WRITE_LINE_MEMBER(main_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(main_firq_w);
-	DECLARE_WRITE8_MEMBER(main_irq_clear_w) { m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); }
-	DECLARE_WRITE8_MEMBER(main_firq_clear_w) { m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE); }
-	TIMER_DEVICE_CALLBACK_MEMBER(gate_motor_tick);
+	DECLARE_WRITE8_MEMBER(main_irq_clear_w);
+	DECLARE_WRITE8_MEMBER(main_firq_clear_w);
 	template<int N> DECLARE_WRITE_LINE_MEMBER(motor_clock_w);
+	void cg_motor_tick(int i);
+	TIMER_DEVICE_CALLBACK_MEMBER(door_motor_tick);
+	void refresh_motor_output();
 
 	DECLARE_READ8_MEMBER(ppi1_b_r);
 	DECLARE_READ8_MEMBER(ppi1_c_r);
@@ -136,12 +172,14 @@ private:
 	DECLARE_WRITE8_MEMBER(ppi3_a_w);
 	DECLARE_WRITE8_MEMBER(ppi3_b_w);
 	DECLARE_WRITE8_MEMBER(ppi3_c_w);
+	void set_en_sol(int i, int state);
 	DECLARE_WRITE8_MEMBER(ppi4_a_w);
 	DECLARE_WRITE8_MEMBER(ppi4_b_w);
 	DECLARE_WRITE8_MEMBER(ppi4_c_w);
 
 	template<int N> DECLARE_WRITE8_MEMBER(adpcm_w);
 	DECLARE_WRITE8_MEMBER(spot_w);
+	DECLARE_WRITE8_MEMBER(output_spot_w) { m_spot_lamps[offset >> 6] = data; }
 
 	DECLARE_WRITE8_MEMBER(ppi5_a_w);
 	DECLARE_WRITE8_MEMBER(ppi5_b_w);
@@ -150,20 +188,23 @@ private:
 	int m_watchdog_clk = 0;
 	int m_main_irq = 0;
 	int m_main_firq = 0;
-	u8 m_gate_motor_on = 0;
-	int m_gate_motor_pos = 0;
+	u8 m_door_motor_on = 0;
+	int m_door_motor_pos = 0;
 	u8 m_cg_motor_on = 0;
 	u8 m_cg_motor_dir = 0;
 
 	int m_cg_motor_clk[5];
+	int m_cg_motor_pos[5];
+	int m_en_pos[5];
+
+	emu_timer *m_sol_filter[5];
+	TIMER_CALLBACK_MEMBER(output_sol) { m_en_sol[param >> 1] = param & 1; }
 };
 
 void cgang_state::machine_start()
 {
 	for (int i = 0; i < 5; i++)
-	{
-		m_cg_motor_clk[i] = 0;
-	}
+		m_sol_filter[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cgang_state::output_sol),this));
 
 	// resolve outputs
 	m_gun_lamps.resolve();
@@ -173,15 +214,42 @@ void cgang_state::machine_start()
 	m_ufo_sol.resolve();
 	m_en_sol.resolve();
 	m_cg_sol.resolve();
+	m_door_count.resolve();
+	m_en_count.resolve();
+	m_cg_count.resolve();
 
 	// register for savestates
 	save_item(NAME(m_watchdog_clk));
 	save_item(NAME(m_main_irq));
 	save_item(NAME(m_main_firq));
-	save_item(NAME(m_gate_motor_on));
-	save_item(NAME(m_gate_motor_pos));
+	save_item(NAME(m_door_motor_on));
+	save_item(NAME(m_door_motor_pos));
 	save_item(NAME(m_cg_motor_on));
 	save_item(NAME(m_cg_motor_dir));
+	save_item(NAME(m_cg_motor_clk));
+	save_item(NAME(m_cg_motor_pos));
+	save_item(NAME(m_en_pos));
+}
+
+void cgang_state::machine_reset()
+{
+	m_main_irq = 0;
+	m_main_firq = 0;
+
+	// initial motor positions
+	for (int i = 0; i < 5; i++)
+	{
+		m_cg_motor_clk[i] = 0;
+		m_cg_motor_pos[i] = 0;
+		m_en_pos[i] = CG_MOTOR_LIMIT;
+		m_en_sol[i] = 0;
+	}
+
+	m_door_motor_pos = 0;
+	m_door_motor_on = 0;
+	m_cg_motor_on = 0;
+
+	refresh_motor_output();
 }
 
 
@@ -190,7 +258,7 @@ void cgang_state::machine_start()
     I/O
 ******************************************************************************/
 
-// maincpu
+// maincpu (misc)
 
 WRITE_LINE_MEMBER(cgang_state::main_irq_w)
 {
@@ -210,76 +278,159 @@ WRITE_LINE_MEMBER(cgang_state::main_firq_w)
 	m_main_firq = state;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(cgang_state::gate_motor_tick)
+WRITE8_MEMBER(cgang_state::main_irq_clear_w)
 {
-	if (m_gate_motor_on & 2 && m_gate_motor_pos < GATE_MOTOR_LIMIT)
-		m_gate_motor_pos++;
-	else if (m_gate_motor_on & 1 && m_gate_motor_pos > 0)
-		m_gate_motor_pos--;
+	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+}
+
+WRITE8_MEMBER(cgang_state::main_firq_clear_w)
+{
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 template<int N>
 WRITE_LINE_MEMBER(cgang_state::motor_clock_w)
 {
-	// clock stepper motor
-	if (state && !m_cg_motor_clk[N])
-	{
-		;
-	}
+	// clock stepper motors
+	if (state && !m_cg_motor_clk[N] && BIT(m_cg_motor_on, N))
+		cg_motor_tick(N);
 
 	m_cg_motor_clk[N] = state;
 }
 
+void cgang_state::cg_motor_tick(int i)
+{
+	// note: the cosmogangs are stuck on the drive belts(5),
+	// and the energy crates can lock themselves into position
+
+	if (BIT(m_cg_motor_dir, i))
+	{
+		if (m_cg_motor_pos[i] > 0)
+		{
+			// pull energy crate
+			if (m_en_sol[i] && m_cg_motor_pos[i] == m_en_pos[i])
+				m_en_pos[i]--;
+
+			m_cg_motor_pos[i]--;
+		}
+	}
+	else
+	{
+		if (m_cg_motor_pos[i] < CG_MOTOR_LIMIT)
+		{
+			if (m_cg_motor_pos[i] < m_en_pos[i])
+				m_cg_motor_pos[i]++;
+
+			// push energy crate
+			else if (m_en_sol[i])
+			{
+				m_cg_motor_pos[i]++;
+				m_en_pos[i]++;
+			}
+		}
+	}
+
+	refresh_motor_output();
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(cgang_state::door_motor_tick)
+{
+	if (m_door_motor_on & 2 && m_door_motor_pos < DOOR_MOTOR_LIMIT)
+		m_door_motor_pos++;
+	else if (m_door_motor_on & 1 && m_door_motor_pos > 0)
+		m_door_motor_pos--;
+
+	refresh_motor_output();
+}
+
+void cgang_state::refresh_motor_output()
+{
+	// output motor positions in range 0-100
+	for (int i = 0; i < 5; i++)
+	{
+		m_cg_count[i] = int((m_cg_motor_pos[i] / float(CG_MOTOR_LIMIT)) * 100.0 + 0.5);
+		m_en_count[i] = int((m_en_pos[i] / float(CG_MOTOR_LIMIT)) * 100.0 + 0.5);
+	}
+
+	m_door_count = int((m_door_motor_pos / float(DOOR_MOTOR_LIMIT)) * 100.0 + 0.5);
+}
+
+
+// maincpu (PPI1-PPI4)
+
 READ8_MEMBER(cgang_state::ppi1_b_r)
 {
-	u8 data = 0;
+	u8 data = 0xff;
 
-	//data |= 0xff;
+	// PB0-PB4: cabinet front limit (CR1INI-CR5INI)
+	for (int i = 0; i < 5; i++)
+		if (m_en_pos[i] == CG_MOTOR_LIMIT)
+			data ^= 1 << i;
+
+	// PB5-PB7: cabinet back limit (HST1-HST3)
+	for (int i = 0; i < 3; i++)
+		if (m_cg_motor_pos[i] == 0)
+			data ^= 1 << (i + 5);
 
 	return data;
 }
 
 READ8_MEMBER(cgang_state::ppi1_c_r)
 {
-	u8 data = 0;
+	u8 data = 0x7f;
+
+	// PC0-PC1: cabinet back limit (HST4-HST5)
+	for (int i = 0; i < 2; i++)
+		if (m_cg_motor_pos[i + 3] == 0)
+			data ^= 1 << i;
+
+	// PC2-PC6: cosmogang-energy crate collision (CR1-CR5)
+	for (int i = 0; i < 5; i++)
+		if (m_cg_motor_pos[i] == m_en_pos[i])
+			data ^= 1 << (i + 2);
 
 	// PC7: audiocpu mailbox status
 	data |= m_latch[1]->pending_r() ? 0 : 0x80;
-
-	//data |= 0x7f;
 
 	return data;
 }
 
 READ8_MEMBER(cgang_state::ppi2_a_r)
 {
-	u8 data = 0;
+	u8 data = 0x60;
 
-	// PA0-PA4: character hit lightsensors
+	// PA0-PA4: cosmogang hit lightsensors (G1HIT-G5HIT)
 	for (int i = 0; i < 2; i++)
 	{
 		u8 mask = m_gun_lamps[i] ? 0x1f : 0;
-		data |= m_inputs[i + 1]->read() & mask;
+		data |= m_fake[i]->read() & mask;
 	}
 
-	// PA5: gate down limit switch
-	// PA6: gate up limit switch
-	data |= 0x60;
-	if (m_gate_motor_pos == 0)
+	// lightsensors masked with SW3
+	data |= ~m_dipsw[2]->read() & 0x1f;
+
+	// PA5: door down limit switch
+	// PA6: door up limit switch
+	if (m_door_motor_pos == 0)
 		data ^= 0x20;
-	else if (m_gate_motor_pos == GATE_MOTOR_LIMIT)
+	else if (m_door_motor_pos == DOOR_MOTOR_LIMIT)
 		data ^= 0x40;
 
-	//data |= 0x1e;
+	// force door limit switches low to disable
+	if (~m_conf->read() & 1)
+		data &= ~0x60;
 
 	return data;
 }
 
 READ8_MEMBER(cgang_state::ppi2_b_r)
 {
-	u8 data = 0;
+	u8 data = 0x1f;
 
-	//data |= 0xff;
+	// PB0-PB4: cabinet center (G1POG-G5POG)
+	for (int i = 0; i < 5; i++)
+		if (m_cg_motor_pos[i] < (CG_MOTOR_LIMIT / 8))
+			data ^= 1 << i;
 
 	return data;
 }
@@ -291,8 +442,8 @@ WRITE8_MEMBER(cgang_state::ppi2_c_w)
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 1));
 
-	// PC2: start button lamp (normal)
-	// PC3: start button lamp (pro)
+	// PC2: start button lamp (easy)
+	// PC3: start button lamp (hard)
 	m_misc_lamps[0] = BIT(data, 2);
 	m_misc_lamps[1] = BIT(data, 3);
 }
@@ -309,7 +460,7 @@ WRITE8_MEMBER(cgang_state::ppi3_a_w)
 
 WRITE8_MEMBER(cgang_state::ppi3_b_w)
 {
-	// PA0-PA4: cosmogang motor power
+	// PB0-PB4: cosmogang motor power
 	m_cg_motor_on = data & 0x1f;
 
 	// PB5: game over(winning) lamp
@@ -329,25 +480,32 @@ WRITE8_MEMBER(cgang_state::ppi3_c_w)
 	m_digits->matrix((1 << (data >> 4 & 0xf)) & 0x3ff, ls48_map[data & 0xf]);
 }
 
+void cgang_state::set_en_sol(int i, int state)
+{
+	// put a filter on energy crate solenoids, since game keeps strobing them
+	if (state != (m_sol_filter[i]->param() & 1))
+		m_sol_filter[i]->adjust(attotime::from_msec(1), i << 1 | state);
+}
+
 WRITE8_MEMBER(cgang_state::ppi4_a_w)
 {
 	// PA2-PA4: round leds
 	for (int i = 0; i < 3; i++)
 		m_misc_lamps[i + 2] = BIT(data, i + 2);
 
-	// PA5-PA7: energy container solenoids (1-3)
+	// PA5-PA7: energy crate solenoids (1-3)
 	for (int i = 0; i < 3; i++)
-		m_en_sol[i] = BIT(data, i + 5);
+		set_en_sol(i, BIT(data, i + 5));
 }
 
 WRITE8_MEMBER(cgang_state::ppi4_b_w)
 {
-	// PB0,PB1: energy container solenoids (4-5)
+	// PB0,PB1: energy crate solenoids (4-5)
 	for (int i = 0; i < 2; i++)
-		m_en_sol[i + 3] = BIT(data, i);
+		set_en_sol(i + 3, BIT(data, i));
 
 	// PB2-PB6: cosmogang solenoids
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 5; i++)
 		m_cg_sol[i] = BIT(data, i + 2);
 
 	// PB7: target lamp
@@ -360,9 +518,12 @@ WRITE8_MEMBER(cgang_state::ppi4_c_w)
 	for (int i = 0; i < 2; i++)
 		m_gun_lamps[i] = BIT(~data, i);
 
-	// PC5: gate motor reverse
-	// PC6: gate motor
-	m_gate_motor_on = data >> 5 & 3;
+	// PC4: ticket motor
+	m_ticket->motor_w(BIT(data, 4));
+
+	// PC5: door motor reverse
+	// PC6: door motor
+	m_door_motor_on = data >> 5 & 3;
 
 	// PC7: watchdog P-RUN
 	int wd = BIT(data, 7);
@@ -389,8 +550,8 @@ WRITE8_MEMBER(cgang_state::spot_w)
 {
 	// d0-d2: ufo boss spotlights
 	// d3-d7: cosmo spotlights
-	for (int i = 0; i < 8; i++)
-		m_spot_lamps[i] = BIT(data, i);
+	// it strobes them for dimming
+	m_spot->matrix(1, data);
 }
 
 WRITE8_MEMBER(cgang_state::ppi5_a_w)
@@ -488,19 +649,24 @@ static INPUT_PORTS_START( cgang )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
-	PORT_START("IN2") // fake inputs, indicating gun is aimed at target
+	PORT_START("FAKE1") // fake inputs, indicating gun is aimed at target
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Aim Target 1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Aim Target 2")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Aim Target 3")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Aim Target 4")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Aim Target 5")
 
-	PORT_START("IN3") // "
+	PORT_START("FAKE2") // "
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Aim Target 1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Aim Target 2")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Aim Target 3")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Aim Target 4")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Aim Target 5")
+
+	PORT_START("CONF1") // motorized sliding door in front of ufo entrance
+	PORT_CONFNAME( 0x01, 0x01, "Sliding Door System")
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 
 	PORT_START("SW1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
@@ -509,36 +675,46 @@ static INPUT_PORTS_START( cgang )
 
 	PORT_START("SW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING( 0x00, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING( 0x01, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING( 0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING( 0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0x04, 0x04, "Attract Play" ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, "Ticket Points" ) PORT_DIPLOCATION("SW2:4,5") PORT_CONDITION("SW2", 0x20, EQUALS, 0x20)
-	PORT_DIPSETTING( 0x18, "5" )
-	PORT_DIPSETTING( 0x10, "10" )
-	PORT_DIPSETTING( 0x08, "15" )
-	PORT_DIPSETTING( 0x00, "20" )
-	PORT_DIPNAME( 0x18, 0x18, "Prize Points" ) PORT_DIPLOCATION("SW2:4,5") PORT_CONDITION("SW2", 0x20, EQUALS, 0x00)
-	PORT_DIPSETTING( 0x18, "20" )
-	PORT_DIPSETTING( 0x10, "40" )
-	PORT_DIPSETTING( 0x08, "60" )
-	PORT_DIPSETTING( 0x00, "80" )
+	PORT_DIPNAME( 0x18, 0x18, "Points per Ticket" ) PORT_DIPLOCATION("SW2:4,5") PORT_CONDITION("SW2", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x18, "5" )
+	PORT_DIPSETTING(    0x10, "10" )
+	PORT_DIPSETTING(    0x08, "15" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0x18, 0x18, "Points per Prize" ) PORT_DIPLOCATION("SW2:4,5") PORT_CONDITION("SW2", 0x20, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x18, "20" )
+	PORT_DIPSETTING(    0x10, "40" )
+	PORT_DIPSETTING(    0x08, "60" )
+	PORT_DIPSETTING(    0x00, "80" )
 	PORT_DIPNAME( 0x20, 0x20, "Dispenser Mode" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, "Ticket" )
 	PORT_DIPSETTING(    0x00, "Prize" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
 
-	PORT_START("SW3")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW3:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW3:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW3:6"	)
+	PORT_START("SW3") // disables one of the lanes in case of hardware malfunction
+	PORT_DIPNAME( 0x01, 0x01, "Drive System 1" ) PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Drive System 2" ) PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Drive System 3" ) PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Drive System 4" ) PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Drive System 5" ) PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW3:6" )
 
 	PORT_START("SW4")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW4:1,2")
@@ -621,16 +797,29 @@ void cgang_state::cgang(machine_config &config)
 	m_ppi[4]->out_pb_callback().set(FUNC(cgang_state::ppi5_b_w));
 	m_ppi[4]->in_pc_callback().set(FUNC(cgang_state::ppi5_c_r));
 
+	for (int i = 0; i < 5; i++)
+	{
+		m_ppi[i]->tri_pa_callback().set_constant(0);
+		m_ppi[i]->tri_pb_callback().set_constant(0);
+		m_ppi[i]->tri_pc_callback().set_constant(0);
+	}
+
 	WATCHDOG_TIMER(config, m_watchdog); // HA1835P
 	m_watchdog->set_time(attotime::from_msec(100)); // approximation
 
-	TIMER(config, "gate_motor").configure_periodic(FUNC(cgang_state::gate_motor_tick), attotime::from_msec(1));
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(3000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+
+	TIMER(config, "door_motor").configure_periodic(FUNC(cgang_state::door_motor_tick), attotime::from_msec(1));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_digits).set_size(10, 7);
 	m_digits->set_segmask(0x3ff, 0x7f);
 
-	//config.set_default_layout(layout_cgang);
+	PWM_DISPLAY(config, m_spot).set_size(1, 8);
+	m_spot->output_x().set(FUNC(cgang_state::output_spot_w));
+	m_spot->set_bri_levels(0.0576, 0.144, 0.36, 0.9); // dimmed lights
+
+	config.set_default_layout(layout_cgang);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -639,9 +828,9 @@ void cgang_state::cgang(machine_config &config)
 	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	UPD7759(config, m_adpcm[0], 640_kHz_XTAL);
-	m_adpcm[0]->add_route(ALL_OUTPUTS, "mono", 0.65);
+	m_adpcm[0]->add_route(ALL_OUTPUTS, "mono", 0.75);
 	UPD7759(config, m_adpcm[1], 640_kHz_XTAL);
-	m_adpcm[1]->add_route(ALL_OUTPUTS, "mono", 0.65);
+	m_adpcm[1]->add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 
@@ -673,4 +862,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME   PARENT  MACHINE  INPUT  CLASS        INIT        MONITOR  COMPANY, FULLNAME, FLAGS */
-GAME( 1990, cgang, 0,      cgang,   cgang, cgang_state, empty_init, ROT0,    "Namco (Data East license)", "Cosmo Gang (US)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1990, cgang, 0,      cgang,   cgang, cgang_state, empty_init, ROT0,    "Namco (Data East license)", "Cosmo Gang (US)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

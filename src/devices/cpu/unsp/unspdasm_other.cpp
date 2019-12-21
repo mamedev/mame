@@ -133,12 +133,14 @@ offs_t unsp_disassembler::disassemble_remaining(std::ostream& stream, offs_t pc,
 			// alu, direct memory
 		case 2:
 			// TaiKee Guitar has this with op0 == 9
+
+			// 4 is cmp, 12 is tst, 6 is neg, 9 is load (all ops that only use one param)
 			if ((op0 == 4 || op0 == 12 || op0 == 6 /*|| op0 == 9*/) && opA != opB)
 			{
 				util::stream_format(stream, "<BAD>");
 				return UNSP_DASM_OK;
 			}
-			if (op0 != 4 && op0 != 12)
+			if (op0 != 4 && op0 != 12) // 4 is cmp, 12 is tst
 				util::stream_format(stream, "%s = ", regs[opA]);
 			print_alu_op3(stream, op0, opB);
 			len = 2;

@@ -272,6 +272,7 @@ void rotaryf_state::rotaryf(machine_config &config)
 	ppi.out_pa_callback().set(FUNC(rotaryf_state::porta_w));
 	ppi.in_pb_callback().set(FUNC(rotaryf_state::portb_r));
 	ppi.out_pc_callback().set(FUNC(rotaryf_state::portc_w));
+	ppi.tri_pc_callback().set_constant(0);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

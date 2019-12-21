@@ -149,6 +149,7 @@ blockhl.cpp
 blockout.cpp
 blocktax.cpp
 bloodbro.cpp
+bloodbro_ms.cpp
 blstroid.cpp
 blueprnt.cpp
 bmcbowl.cpp

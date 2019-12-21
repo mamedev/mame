@@ -4,8 +4,8 @@
 
 /*****************************************************************************
 
-	unlike earlier SunPlus / GeneralPlus based SoCs this one seems to be
-	ARM based
+    unlike earlier SunPlus / GeneralPlus based SoCs this one seems to be
+    ARM based
 
 *****************************************************************************/
 
@@ -29,6 +29,8 @@ public:
 
 	void gpl32612(machine_config &config);
 
+	void nand_init840();
+
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -38,6 +40,10 @@ private:
 	required_device<screen_device> m_screen;
 
 	uint32_t screen_update_gpl32612(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void nand_init(int blocksize, int blocksize_stripped);
+
+	std::vector<uint8_t> m_strippedrom;
 };
 
 uint32_t generalplus_gpl32612_game_state::screen_update_gpl32612(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -83,9 +89,50 @@ ROM_START( jak_swbstrik )
 	ROM_LOAD( "starwarsblaster.bin", 0x000000, 0x8400000, CRC(02c3c4d6) SHA1(a6ae05a7d7b2015023113f6baad25458f3c01102) )
 ROM_END
 
+void generalplus_gpl32612_game_state::nand_init(int blocksize, int blocksize_stripped)
+{
+	uint8_t* rom = memregion("maincpu")->base();
+	int size = memregion("maincpu")->bytes();
+
+	int numblocks = size / blocksize;
+
+	m_strippedrom.resize(numblocks * blocksize_stripped);
+
+	for (int i = 0; i < numblocks; i++)
+	{
+		const int base = i * blocksize;
+		const int basestripped = i * blocksize_stripped;
+
+		for (int j = 0; j < blocksize_stripped; j++)
+		{
+			m_strippedrom[basestripped + j] = rom[base + j];
+		}
+	}
+
+	// debug to allow for easy use of unidasm.exe
+	if (0)
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"stripped_%s", machine().system().name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(&m_strippedrom[0], blocksize_stripped * numblocks, 1, fp);
+			fclose(fp);
+		}
+	}
+}
+
+void generalplus_gpl32612_game_state::nand_init840()
+{
+	nand_init(0x840, 0x800);
+}
+
+
 //    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags
-CONS( 200?, jak_tmnthp,      0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "JAKKS Pacific Inc", "Teenage Mutanat Ninja Turtles Hero Portal", MACHINE_IS_SKELETON )
-CONS( 200?, jak_swbstrik,    0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init, "JAKKS Pacific Inc", "Star Wars Blaster Strike", MACHINE_IS_SKELETON )
-// Hero Portal Dreamworks Dragons 
-// Hero Portal Power Rangers 
-// Hero Portal DC Super Heroes 
+CONS( 200?, jak_tmnthp,      0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Teenage Mutanat Ninja Turtles Hero Portal", MACHINE_IS_SKELETON )
+CONS( 200?, jak_swbstrik,    0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Star Wars Blaster Strike", MACHINE_IS_SKELETON )
+// Hero Portal Dreamworks Dragons
+// Hero Portal Power Rangers
+// Hero Portal DC Super Heroes

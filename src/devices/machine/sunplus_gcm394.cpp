@@ -56,7 +56,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
 	uint32_t dest = m_dma_params[2] | (m_dma_params[5] << 16) ;
 	uint32_t length = m_dma_params[3] | (m_dma_params[6] << 16);
 
-	LOGMASKED(LOG_GCM394_SYSDMA, "%s:possible DMA operation (7abf) (trigger %04x) with params mode:%04x source:%08x (word offset) dest:%08x (word offset) length:%08x (words)\n", machine().describe_context(), data, mode, source, dest, length );  
+	LOGMASKED(LOG_GCM394_SYSDMA, "%s:possible DMA operation (7abf) (trigger %04x) with params mode:%04x source:%08x (word offset) dest:%08x (word offset) length:%08x (words)\n", machine().describe_context(), data, mode, source, dest, length );
 
 	if (source >= 0x20000)
 		LOGMASKED(LOG_GCM394_SYSDMA, " likely transfer from ROM %08x - %08x\n", (source - 0x20000) * 2, (source - 0x20000) * 2 + (length * 2)- 1);
@@ -66,8 +66,8 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
 	// mode 0x0089 == no source inc, used for memory clear operations? (source usually points at stack value)
 	// mode 0x0009 == regular copy? (smartfp does 2 copies like this after the initial clears, source definitely points at a correctly sized data structure)
 	// what does having bit 0x4000 on mode set mean? (first transfer on wrlshunt - maybe an IRQ disable?)
-	
-	if ((mode == 0x0089) || (mode == 0x0009) || (mode == 0x4009)) 
+
+	if ((mode == 0x0089) || (mode == 0x0009) || (mode == 0x4009))
 	{
 		for (int i = 0; i < length; i++)
 		{
@@ -258,6 +258,12 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7883_w) { LOGMASKED(LOG_GCM39
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_78a0_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78a0_w %04x\n", machine().describe_context(), data); m_78a0 = data; }
 
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_78a0_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78a0_r\n", machine().describe_context());
+	return machine().rand();
+}
+
 READ16_MEMBER(sunplus_gcm394_base_device::unkarea_78a1_r)
 {
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78a1_r\n", machine().describe_context());
@@ -367,6 +373,7 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 	map(0x00702f, 0x00702f).w(m_spg_video, FUNC(gcm394_base_video_device::unk_vid2_gfxbase_msb_w));    // written with other unknown_video_device2 regs (roz layer or line layer?)
 
 	map(0x007030, 0x007030).rw(m_spg_video, FUNC(gcm394_base_video_device::video_7030_brightness_r), FUNC(gcm394_base_video_device::video_7030_brightness_w));
+	map(0x007038, 0x007038).r(m_spg_video, FUNC(gcm394_base_video_device::video_curline_r));
 	map(0x00703a, 0x00703a).rw(m_spg_video, FUNC(gcm394_base_video_device::video_703a_palettebank_r), FUNC(gcm394_base_video_device::video_703a_palettebank_w));
 	map(0x00703c, 0x00703c).w(m_spg_video, FUNC(gcm394_base_video_device::video_703c_w)); // TV Control 1
 
@@ -427,7 +434,7 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 	map(0x007816, 0x007816).w(FUNC(sunplus_gcm394_base_device::unkarea_7816_w));
 	map(0x007817, 0x007817).w(FUNC(sunplus_gcm394_base_device::unkarea_7817_w));
 
-	                                                                             // wrlshunt                                                               | smartfp
+																				 // wrlshunt                                                               | smartfp
 	map(0x007820, 0x007820).w(FUNC(sunplus_gcm394_base_device::unkarea_7820_w)); // 7f8a (7f8a before DMA from ROM to RAM, 008a after DMA from ROM to RAM) | 3f04
 	map(0x007821, 0x007821).w(FUNC(sunplus_gcm394_base_device::unkarea_7821_w)); // 7f47                                                                   | 0044
 	map(0x007822, 0x007822).w(FUNC(sunplus_gcm394_base_device::unkarea_7822_w)); // 0047                                                                   | 1f44
@@ -455,7 +462,7 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 	map(0x007882, 0x007882).rw(FUNC(sunplus_gcm394_base_device::unkarea_7882_r), FUNC(sunplus_gcm394_base_device::unkarea_7882_w));
 	map(0x007883, 0x007883).rw(FUNC(sunplus_gcm394_base_device::unkarea_7883_r), FUNC(sunplus_gcm394_base_device::unkarea_7883_w));
 
-	map(0x0078a0, 0x0078a0).w(FUNC(sunplus_gcm394_base_device::unkarea_78a0_w));
+	map(0x0078a0, 0x0078a0).rw(FUNC(sunplus_gcm394_base_device::unkarea_78a0_r), FUNC(sunplus_gcm394_base_device::unkarea_78a0_w));
 
 	map(0x0078a1, 0x0078a1).r(FUNC(sunplus_gcm394_base_device::unkarea_78a1_r));
 
@@ -509,13 +516,60 @@ READ16_MEMBER(generalplus_gpac800_device::unkarea_7850_r)
 	return machine().rand();
 }
 
+READ16_MEMBER(generalplus_gpac800_device::unkarea_7854_r)
+{
+	m_testval ^= 1;
+
+	logerror("%s:sunplus_gcm394_base_device::unkarea_7854_r\n", machine().describe_context());
+
+	// jak_tsm code looks for various 'magic values'
+
+	if (m_testval == 1)
+		return 0x98;
+	else
+		return 0x79;
+
+}
+
+// 7998
+
+WRITE16_MEMBER(generalplus_gpac800_device::flash_addr_low_w)
+{
+	//logerror("%s:sunplus_gcm394_base_device::flash_addr_low_w %04x\n", machine().describe_context(), data);
+	m_flash_addr_low = data;
+}
+
+WRITE16_MEMBER(generalplus_gpac800_device::flash_addr_high_w)
+{
+	//logerror("%s:sunplus_gcm394_base_device::flash_addr_high_w %04x\n", machine().describe_context(), data);
+	m_flash_addr_high = data;
+
+	uint32_t address = (m_flash_addr_high << 16) | m_flash_addr_low;
+
+	logerror("%s: flash address is now %08x\n", machine().describe_context(), address);
+}
+
+
+// all tilemap registers etc. appear to be in the same place as the above system, including the 'extra' ones not on the earlier models
+// so it's likely this is built on top of that just with NAND support
 void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
 {
 	sunplus_gcm394_base_device::gcm394_internal_map(map);
 
-	map(0x007850, 0x007850).r(FUNC(generalplus_gpac800_device::unkarea_7850_r));	
+	// there is an extra command-based device at 785x, what it returns is important to code flow
+	// code is littered with NOPs so clearly the device can't accept commands too quickly and doesn't return data immediately
+	//
+	// this should be the NAND device, as the games attempt to do a DMA operation with '7854' as the source, and the target
+	// as the RAM location where code needs to end up before jumping to it
+	map(0x007850, 0x007850).r(FUNC(generalplus_gpac800_device::unkarea_7850_r)); // 'device ready' status flag?
+
+	map(0x007852, 0x007852).w(FUNC(generalplus_gpac800_device::flash_addr_low_w));
+	map(0x007853, 0x007853).w(FUNC(generalplus_gpac800_device::flash_addr_high_w));
+
+
+	map(0x007854, 0x007854).r(FUNC(generalplus_gpac800_device::unkarea_7854_r)); // data read port (timing appears to be important)
 }
-	
+
 void sunplus_gcm394_base_device::device_start()
 {
 	unsp_20_device::device_start();
@@ -615,9 +669,17 @@ void sunplus_gcm394_base_device::device_reset()
 
 }
 
+void generalplus_gpac800_device::device_reset()
+{
+	sunplus_gcm394_base_device::device_reset();
+
+	m_flash_addr_low = 0x0000;
+	m_flash_addr_high = 0x0000;
+}
+
 IRQ_CALLBACK_MEMBER(sunplus_gcm394_base_device::irq_vector_cb)
 {
-	//printf("irq_vector_cb %d\n", irqline);
+	//logerror("irq_vector_cb %d\n", irqline);
 
 	if (irqline == UNSP_IRQ6_LINE)
 		set_state_unsynced(UNSP_IRQ6_LINE, CLEAR_LINE);
@@ -632,10 +694,10 @@ IRQ_CALLBACK_MEMBER(sunplus_gcm394_base_device::irq_vector_cb)
 void sunplus_gcm394_base_device::checkirq6()
 {
 /*
-	if (m_7935 & 0x0100)
-		set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
-	else
-		set_state_unsynced(UNSP_IRQ6_LINE, CLEAR_LINE);
+    if (m_7935 & 0x0100)
+        set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
+    else
+        set_state_unsynced(UNSP_IRQ6_LINE, CLEAR_LINE);
 */
 }
 
@@ -674,7 +736,7 @@ void sunplus_gcm394_base_device::device_timer(emu_timer &timer, device_timer_id 
 		set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
 		//set_state_unsynced(UNSP_IRQ4_LINE, ASSERT_LINE);
 
-	//	checkirq6();
+	//  checkirq6();
 		break;
 	}
 	}
@@ -693,8 +755,8 @@ WRITE_LINE_MEMBER(sunplus_gcm394_base_device::videoirq_w)
 
 uint16_t sunplus_gcm394_base_device::read_space(uint32_t offset)
 {
-//	uint16_t b = m_gfxregion[(offset * 2) & (m_gfxregionsize - 1)] | (m_gfxregion[(offset * 2 + 1) & (m_gfxregionsize - 1)] << 8);
-//	return b;
+//  uint16_t b = m_gfxregion[(offset * 2) & (m_gfxregionsize - 1)] | (m_gfxregion[(offset * 2 + 1) & (m_gfxregionsize - 1)] << 8);
+//  return b;
 	address_space& mem = this->space(AS_PROGRAM);
 	uint16_t retdata = mem.read_word(offset);
 	return retdata;

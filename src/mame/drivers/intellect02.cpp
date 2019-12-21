@@ -239,6 +239,7 @@ void intel02_state::intel02(machine_config &config)
 	I8255(config, m_ppi8255);
 	m_ppi8255->in_pa_callback().set(FUNC(intel02_state::input_r));
 	m_ppi8255->out_pb_callback().set(FUNC(intel02_state::digit_w));
+	m_ppi8255->tri_pb_callback().set_constant(0);
 	m_ppi8255->out_pc_callback().set(FUNC(intel02_state::control_w));
 	m_ppi8255->tri_pc_callback().set_constant(0x80);
 

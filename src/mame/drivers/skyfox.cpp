@@ -14,8 +14,8 @@ Other:  2 HM6116LP-3 (one on each board)
 
 TODO:
 - The background rendering is entirely guesswork;
-- DMA trigger happens at vpos 24 with legacy video parameters, 
-  needs H/VSync PCB calculations, also notice that 62.65 Hz comes from the 
+- DMA trigger happens at vpos 24 with legacy video parameters,
+  needs H/VSync PCB calculations, also notice that 62.65 Hz comes from the
   bootleg and may be different for original;
 
 2008-07
@@ -64,7 +64,7 @@ void skyfox_state::skyfox_map(address_map &map)
 	map(0xe001, 0xe001).portr("DSW0");
 	map(0xe002, 0xe002).portr("DSW1");
 	map(0xe008, 0xe009).w(FUNC(skyfox_state::output_w));
-//	map(0xe00a, 0xe00e) // POST only?
+//  map(0xe00a, 0xe00e) // POST only?
 	map(0xe00f, 0xe00f).nopw(); // DMA trigger
 	map(0xf001, 0xf001).portr("DSW2");
 }
@@ -223,8 +223,8 @@ void skyfox_state::skyfox(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(8'000'000)/2); /* Verified at 4MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &skyfox_state::skyfox_map);
-	// IM0, never enables ei opcode 
-	
+	// IM0, never enables ei opcode
+
 	Z80(config, m_audiocpu, XTAL(14'318'181)/8); /* Verified at 1.789772MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &skyfox_state::skyfox_sound_map);
 

@@ -211,6 +211,8 @@ class MachineHandler(ElementHandler):
                 status = 0 if 'status' not in attrs else 2 if attrs['status'] == 'unemulated' else 1
                 overall = status if 'overall' not in attrs else 2 if attrs['overall'] == 'unemulated' else 1
                 self.dbcurs.add_feature(self.id, attrs['type'], status, overall)
+            elif name == 'softwarelist':
+                self.dbcurs.add_machinesoftwarelist(self.id, attrs['name'], attrs['tag'], attrs['status'])
             elif name == 'rom':
                 crc = attrs.get('crc')
                 sha1 = attrs.get('sha1')
@@ -385,6 +387,8 @@ class SoftwareHandler(ElementHandler):
         elif name == 'publisher':
             self.publisher = handler.text
             self.id = self.dbcurs.add_software(self.softwarelist, self.shortname, self.supported, self.description, self.year, self.publisher)
+            if self.cloneof is not None:
+                self.dbcurs.add_softwarecloneof(self.id, self.cloneof)
 
 
 class SoftwareListHandler(ElementHandler):
@@ -439,18 +443,17 @@ def load_info(options):
     dbconn.prepare_for_load()
     parser = xml.sax.make_parser()
 
+    parser.setContentHandler(SoftwareListHandler(dbconn))
+    for path in options.softwarepath:
+        files = [os.path.join(path, f) for f in os.listdir(path) if f.endswith('.xml')]
+        for filename in files:
+            parser.parse(filename)
+
     parser.setContentHandler(ListXmlHandler(dbconn))
     if options.executable is not None:
         task = subprocess.Popen([options.executable, '-listxml'], stdout=subprocess.PIPE)
         parser.parse(task.stdout)
     else:
         parser.parse(options.file)
-
-    if options.softwarepath:
-        parser.setContentHandler(SoftwareListHandler(dbconn))
-        for path in options.softwarepath:
-            files = [os.path.join(path, f) for f in os.listdir(path) if f.endswith('.xml')]
-            for filename in files:
-                parser.parse(filename)
 
     dbconn.finalise_load()

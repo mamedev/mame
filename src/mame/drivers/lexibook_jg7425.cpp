@@ -55,9 +55,9 @@ private:
 void lexibook_jg7425_state::machine_start()
 {
 	// I think this code should be running from RAM at least, probably some kind of bootstrap / internal ROM to copy it? (hyperscan.cpp indicates that SoC can have internal ROM at least)
-	
+
 	// first 0x20 bytes are probably pointers, code starts at 0x20 and is offset, maps at 0x500000
-	
+
 	for (int i = 0; i < 0x80000 / 4; i++)
 	{
 		m_mainram[i+(0x500000/4) - (0x20/4)] = m_romregion[i];
@@ -101,7 +101,7 @@ void lexibook_jg7425_state::lexibook_jg7425(machine_config &config)
 ROM_START( lx_jg7425 )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_32BIT | ROMREGION_LE )
 	ROM_LOAD32_DWORD( "mx29lv160.u6", 0x000000, 0x200000, CRC(43c90080) SHA1(4c9e5c8f880d40bd684357ce67ae45c3f5d24b62) )
-	
+
 	DISK_REGION( "ata:0:hdd:image" ) /* 4GB SD Card */
 	DISK_IMAGE( "lexibook_jg7425_4gbsd", 0, SHA1(dc0985103edec3992efdd493feef6185daedb3fd) )
 ROM_END

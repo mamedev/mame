@@ -45,14 +45,14 @@ inline void unsp_device::execute_fxxx_000_group(uint16_t op)
 	{
 		int r = op & 0x7;
 		logerror("%s = fr\n", regs[r]);
-		unimplemented_opcode(op);
+	//  unimplemented_opcode(op);
 		return;
 	}
 	else if (((op & 0xf1f8) == 0xf038) && m_iso >= 12)
 	{
 		int r = op & 0x7;
 		logerror("fr = %s\n", regs[r]);
-		unimplemented_opcode(op);
+	//  unimplemented_opcode(op);
 		return;
 	}
 
@@ -247,13 +247,13 @@ void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 
 	case 0xf144: case 0xf344: case 0xf544: case 0xf744: case 0xf944: case 0xfb44: case 0xfd44: case 0xff44:
 		logerror("unimplemented: fir_mov on\n");
-		m_core->m_icount -= 1; 
+		m_core->m_icount -= 1;
 		//unimplemented_opcode(op); // generalplus_gpac800 games do this on startup
 		return;
 
 	case 0xf145: case 0xf345: case 0xf545: case 0xf745: case 0xf945: case 0xfb45: case 0xfd45: case 0xff45:
-		logerror("unimplemented: fir_mov off\n"); 
-		m_core->m_icount -= 1; 
+		logerror("unimplemented: fir_mov off\n");
+		m_core->m_icount -= 1;
 		//unimplemented_opcode(op); // generalplus_gpac800 games do this on startup
 		return;
 
@@ -303,7 +303,7 @@ void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 		{
 			m_core->m_r[REG_R2] = count_leading_zeros(r4) - 17; // -17 because count_leading_zeros works with 32-bit values
 		}
-		
+
 		return;
 	}
 

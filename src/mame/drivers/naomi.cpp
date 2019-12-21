@@ -8061,14 +8061,14 @@ G-MAIN2
 |       RTC72423      JP6                                    |
 |                       IC3        52256 52256  315-5338A    |
 | TOS1                JP1                              LEDs  |
-|         CR2032	    IC2      JP2-5  SW1  SW2  SW3  SW4   |
+|         CR2032        IC2      JP2-5  SW1  SW2  SW3  SW4   |
 |------------------------------------------------------------|
 Notes:
  MC68360   - Motorola MC68360EM25L 'QUICC' QUad Integrated Communications Controller
  IC2       - EPR-24482 27C4002 EEPROM (DIP40)
  IC3       - EEPROM DIP40 (not populated)
  4C256K16  - 2x Alliance AS4C256K16F0 256k x16 CMOS DRAM (Fast Page Mode)
- 52256     - 2x Sharp LH52256CN-70LL 32k x8 CMOS SRAM 
+ 52256     - 2x Sharp LH52256CN-70LL 32k x8 CMOS SRAM
  COM20020  - 2x SMsC COM20020ILJP 5Mbps ARCNET controller
  315-5296  - 2x Sega I/O ASIC
  315-5338A - Sega I/O ASIC

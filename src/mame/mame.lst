@@ -3184,6 +3184,9 @@ mechattj                        // A8002 'MA' (c) 1989
 mechattu                        // A8002 'MA' (c) 1989
 mechattu1                       // A8002 'MA' (c) 1989
 
+@source:bbl380.cpp
+bbl380
+
 @source:bcs3.cpp
 bcs3                            //
 bcs3a                           //
@@ -9232,6 +9235,9 @@ skysmash                        // (c) 1990 Nihon System Inc.
 weststry                        // bootleg
 weststrya                       // bootleg
 
+@source:bloodbro_ms.cpp
+bloodbrom                       // bootleg
+
 @source:blstroid.cpp
 blstroid                        // 136057           (c) 1987
 blstroid2                       // 136057           (c) 1987
@@ -11406,6 +11412,7 @@ dc                              // 1999 Sega Dreamcast (USA)
 dcdev                           // 1998 Sega HKT-0120 Sega Dreamcast Development Box
 dceu                            // 1999 Sega Dreamcast (Europe)
 dcjp                            // 1998 Sega Dreamcast (Japan)
+dcfish                          // 2000 Fish Life
 dctream                         // 200? Treamcast
 
 @source:dcebridge.cpp
@@ -12812,6 +12819,7 @@ electron                        // 1983 Acorn Electron
 electront                       // 1983 Acorn Electron (Trial)
 btm2105                         // 1985 BT Merlin M2105
 electron64                      // 1987 Acorn Electron (64K Master RAM Board)
+electronsp                      // 1991 Acorn Electron (Stop Press 64i)
 
 @source:elekscmp.cpp
 elekscmp                        //
@@ -13906,6 +13914,7 @@ losttomb                        // (c) 1982 Stern
 losttombh                       // (c) 1982 Stern
 luctoday                        // 1980 Sigma
 mandinga                        // bootleg (Artemi)
+mandingaeg                      // bootleg (Electrogame)
 mandingarf                      // bootleg (Recreativos Franco S.A.)
 mandingac                       // bootleg (Centromatic)
 mltiwars                        // bootleg (Gayton Games)
@@ -16515,6 +16524,7 @@ wcbowldx                        // (c) 1999 Incredible Technologies
 
 @source:itech8.cpp
 arlingtn                        // (c) 1991 Strata/Incredible Technologies
+arlingtna                       // (c) 1991 Strata/Incredible Technologies
 dynobop                         // (c) 1990 Grand Products/Incredible Technologies
 gpgolf                          // (c) 1992 Strata/Incredible Technologies
 grmatch                         // (c) 1989 Yankee Game Technology
@@ -21867,6 +21877,7 @@ dodgectyb                       // (c) 1986 Merit
 dodgectyc                       // (c) 1986 Merit
 dtrvwz5                         // (c) 1987 Merit
 iowapp                          // (c) 1990 Merit
+matchemg                        // (c) 1986 Merit
 misdraw                         // (c) 1986 Merit / Big Apple Games
 mdchoice                        // (c) 1983 Merit
 mpchoice                        // (c) 1983 Merit
@@ -31133,7 +31144,8 @@ ablpinb
 mc_dgear
 dgun2500
 dgun2561
-lexcyber
+lxcmcy
+lxcmcysw
 cybar120
 mc_dg101
 mc_aa2
@@ -31176,6 +31188,7 @@ mc_hh210
 dvnimbus
 cbrs8
 mc_tv200
+unkra200
 fcpocket
 mog_m320
 fapocket
@@ -38848,6 +38861,7 @@ shippumd                        // (c) 1994 Raizing/8ing
 snowbro2                        // TP-033 (c) 1994 Hanafram
 snowbro2b                       //
 snowbro2b2                      //
+snowbro2ny                      // TP-033 (c) 1994 Nyanko
 sstriker                        // (c) 1993 Raizing
 sstrikerk                       // (c) 1993 Raizing
 tekipaki                        // TP-020 (c) 1991 Toaplan
@@ -39318,6 +39332,9 @@ uts20                           //
 
 @source:unkhorse.cpp
 unkhorse                        //
+
+@source:unkmandd.cpp
+unkmandd
 
 @source:unkpoker.cpp
 unkpoker                         //
@@ -39866,6 +39883,9 @@ vstennisa                       // (c) 1984 Nintendo Co., Ltd. / Nintendo of Ame
 vstennisb                       // (c) 1984 Nintendo Co., Ltd. / Nintendo of America
 vstetris                        // (c) 1988 Atari
 wrecking                        // (c) 1984 Nintendo
+
+@source:vt52.cpp
+vt52                            // 1975 Digital Equipment Corporation
 
 @source:vt100.cpp
 vt100                           // 1978 Digital Equipment Corporation

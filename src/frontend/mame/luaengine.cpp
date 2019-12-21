@@ -1672,9 +1672,12 @@ void lua_engine::initialize()
  *
  * space.name - address space name
  * space.shift - address bus shift, bitshift required for a bytewise address
- *               to map onto this space's addess resolution (addressing granularity).
+ *               to map onto this space's address resolution (addressing granularity).
  *               positive value means leftshift, negative means rightshift.
  * space.index
+ * space.address_mask
+ * space.data_width
+ * space.endianness
  *
  * space.map[] - table of address map entries (k=index, v=address_map_entry)
  */
@@ -1731,6 +1734,22 @@ void lua_engine::initialize()
 	addr_space_type.set("name", sol::property([](addr_space &sp) { return sp.space.name(); }));
 	addr_space_type.set("shift", sol::property([](addr_space &sp) { return sp.space.addr_shift(); }));
 	addr_space_type.set("index", sol::property([](addr_space &sp) { return sp.space.spacenum(); }));
+	addr_space_type.set("address_mask", sol::property([](addr_space &sp) { return sp.space.addrmask(); }));
+	addr_space_type.set("data_width", sol::property([](addr_space &sp) { return sp.space.data_width(); }));
+	addr_space_type.set("endianness", sol::property([](addr_space &sp) {
+			std::string endianness;
+			switch (sp.space.endianness())
+			{
+				case endianness_t::ENDIANNESS_BIG:
+					endianness = "big";
+					break;
+				case endianness_t::ENDIANNESS_LITTLE:
+					endianness = "little";
+					break;
+			}
+			return endianness;
+		}));
+
 
 /* address_map_entry library
  *
@@ -2595,9 +2614,9 @@ void lua_engine::initialize()
  *
  * manager:machine():memory()
  *
- * memory.banks[] - table of memory banks
- * memory.regions[] - table of memory regions
- * memory.shares[] - table of memory shares
+ * memory.banks[] - table of memory banks (k=tag, v=memory_bank)
+ * memory.regions[] - table of memory regions (k=tag, v=memory_region)
+ * memory.shares[] - table of memory shares (k=tag, v=memory_share)
  */
 
 	auto memory_type = sol().registry().create_simple_usertype<memory_manager>("new", sol::no_constructor);

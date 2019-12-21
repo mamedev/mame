@@ -206,32 +206,32 @@ protected:
 	const address_space_config m_icache_config;
 	const address_space_config m_dcache_config;
 
-	int m_data_spacenum= 0;
+	int m_data_spacenum;
 
 	// configuration
-	u32 m_cpurev= 0;
-	endianness_t m_endianness= ENDIANNESS_BIG;
+	u32 const m_cpurev;
+	endianness_t m_endianness;
 
 	// core registers
-	u32 m_pc= 0;
+	u32 m_pc;
 	u32 m_r[32];
-	u32 m_hi= 0;
-	u32 m_lo = 0;
+	u32 m_hi;
+	u32 m_lo;
 
 	// cop0 registers
 	u32 m_cop0[32];
 
 	// internal stuff
-	int m_icount = 0;
-	enum branch_state_t : unsigned
+	int m_icount;
+	enum branch_state : unsigned
 	{
 		NONE      = 0,
 		DELAY     = 1, // delay slot instruction active
 		BRANCH    = 2, // branch instruction active
 		EXCEPTION = 3, // exception triggered
 	}
-	m_branch_state = NONE;
-	u32 m_branch_target = 0;
+	m_branch_state;
+	u32 m_branch_target;
 
 	// cache memory
 	size_t const m_icache_size;
@@ -239,7 +239,7 @@ protected:
 
 	// I/O
 	devcb_read_line m_in_brcond[4];
-	bool m_bus_error = false;
+	bool m_bus_error;
 };
 
 class mips1_device_base : public mips1core_device_base
@@ -307,17 +307,17 @@ protected:
 	template <typename T> void set_cop1_reg(unsigned const reg, T const data);
 
 private:
-	u64 m_reset_time = 0;
+	u64 m_reset_time;
 	u32 m_tlb[64][2]; // 0 is hi, 1 is lo
 	unsigned m_tlb_mru[3][64];
 
 	// cop1 registers
 	u64 m_f[16];
-	u32 m_fcr0 = 0;
-	u32 m_fcr30 = 0;
-	u32 m_fcr31 = 0;
+	u32 m_fcr0;
+	u32 m_fcr30;
+	u32 m_fcr31;
 
-	unsigned m_fpu_irq = 0;
+	unsigned m_fpu_irq;
 };
 
 class r2000_device : public mips1_device_base
@@ -351,6 +351,7 @@ public:
 
 protected:
 	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 class r3051_device : public mips1core_device_base
