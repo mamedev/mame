@@ -121,7 +121,7 @@ void galivan_state::ninjemak_io_map(address_map &map)
 	map(0x83, 0x83).portr("SERVICE");
 	map(0x84, 0x84).portr("DSW1");
 	map(0x85, 0x85).portr("DSW2").w(FUNC(galivan_state::galivan_sound_command_w));
-	map(0x86, 0x86).w(FUNC(galivan_state::blit_trigger_w)); 
+	map(0x86, 0x86).w(FUNC(galivan_state::blit_trigger_w));
 	map(0x87, 0x87).w(FUNC(galivan_state::vblank_ack_w));
 }
 
@@ -439,7 +439,7 @@ void galivan_state::video_config(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: not measured, ~60 Hz
-	m_screen->set_raw(XTAL(12'000'000)/2,382,0,32*8, 262, 2*8, 30*8); 
+	m_screen->set_raw(XTAL(12'000'000)/2,382,0,32*8, 262, 2*8, 30*8);
 	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	m_screen->set_palette(m_palette);
 }
@@ -465,7 +465,7 @@ void galivan_state::galivan(machine_config &config)
 	m_screen->set_screen_update(FUNC(galivan_state::screen_update_galivan));
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galivan);
 	PALETTE(config, m_palette, FUNC(galivan_state::galivan_palette), 16*16+16*16+256*16, 256);
-	
+
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 

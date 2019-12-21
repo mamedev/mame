@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-	ARM IOMD device emulation
+    ARM IOMD device emulation
 
 ***************************************************************************/
 
@@ -63,11 +63,11 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	
+
 	void base_map(address_map &map);
 	u16 m_id;
 	u8 m_version;
-	
+
 	enum {
 		IRQA = 0,
 		IRQB,
@@ -97,12 +97,12 @@ private:
 
 	DECLARE_READ32_MEMBER( iocr_r );
 	DECLARE_WRITE32_MEMBER( iocr_w );
-	
+
 	DECLARE_READ32_MEMBER( kbddat_r );
 	DECLARE_WRITE32_MEMBER( kbddat_w );
 	DECLARE_READ32_MEMBER( kbdcr_r );
 	DECLARE_WRITE32_MEMBER( kbdcr_w );
-	
+
 	u32 m_vidinita, m_vidend;
 	bool m_vidlast, m_videqual;
 	bool m_video_enable;
@@ -116,7 +116,7 @@ private:
 	bool m_cursor_enable;
 	DECLARE_READ32_MEMBER( cursinit_r );
 	DECLARE_WRITE32_MEMBER( cursinit_w );
-	
+
 	static constexpr int sounddma_ch_size = 2;
 	u32 m_sndcur, m_sndend;
 	u32 m_sndcur_reg[sounddma_ch_size], m_sndend_reg[sounddma_ch_size];
@@ -148,22 +148,22 @@ private:
 	u16 m_timer_in[2];
 	u16 m_timer_out[2];
 	int m_timer_counter[2];
-	u8 	m_timer_readinc[2];
+	u8  m_timer_readinc[2];
 	emu_timer *m_timer[2];
-	
+
 	template <unsigned Which> DECLARE_READ32_MEMBER( tNlow_r );
 	template <unsigned Which> DECLARE_READ32_MEMBER( tNhigh_r );
 	template <unsigned Which> DECLARE_WRITE32_MEMBER( tNlow_w );
 	template <unsigned Which> DECLARE_WRITE32_MEMBER( tNhigh_w );
 	template <unsigned Which> DECLARE_WRITE32_MEMBER( tNgo_w );
 	template <unsigned Which> DECLARE_WRITE32_MEMBER( tNlatch_w );
-	
+
 	template <unsigned Nibble> DECLARE_READ32_MEMBER( id_r );
 	DECLARE_READ32_MEMBER( version_r );
-	
+
 	// used in vidcr_r / sndcr_r, documentation hints this is a purged idea during chip development, to be checked out
 	static constexpr u8 dmaid_size = 0x10; // qword transfer
-//	constexpr u8 dmaid_mask = 0x1f;
+//  constexpr u8 dmaid_mask = 0x1f;
 };
 
 class arm7500fe_iomd_device : public arm_iomd_device
@@ -188,11 +188,11 @@ private:
 	inline void refresh_host_cpu_clocks();
 	DECLARE_READ32_MEMBER( clkctl_r );
 	DECLARE_WRITE32_MEMBER( clkctl_w );
-	
+
 	u8 m_iolines_ddr;
 	DECLARE_READ32_MEMBER( iolines_r );
 	DECLARE_WRITE32_MEMBER( iolines_w );
-	
+
 	DECLARE_READ32_MEMBER( msecr_r );
 	DECLARE_WRITE32_MEMBER( msecr_w );
 };

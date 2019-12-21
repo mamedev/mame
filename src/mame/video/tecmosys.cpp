@@ -41,24 +41,24 @@ void tecmosys_state::render_sprites_to_bitmap(const rectangle &cliprect, u16 ext
 	for (int i = (m_spritelist * 0x4000) / 2; i < ((m_spritelist + 1) * 0x4000) / 2; i += 8)
 	{
 		/*
-			sprite format (16 bytes per each sprite)
-				fedcba98 76543210
-			00	------xx xxxxxxxx X position (10 bit signed)
-			02	-------x xxxxxxxx Y position (9 bit signed)
-			04	----iiii ffffffff Zoom X (add destination X position per each X counter, 4.8(8.8?) fixed point)*
-			06	----iiii ffffffff Zoom Y (add destination Y position per each Y counter, 4.8(8.8?) fixed point)*
-			08	x------- -------- Disable this sprite
-				--xxxxxx -------- Palette select (256 color each)
-				-------- x------- Flip Y
-				-------- -x------ Flip X
-				-------- --xx---- Priority
-				-------- ----xxxx ROM offset MSB
-			0a	xxxxxxxx xxxxxxxx ROM offset LSB (256 byte each)
-			0c	xxxxxxxx -------- Source Width (16 pixel each)
-				-------- xxxxxxxx Source Height (16 pixel each)
-			0e  -------- -------- Unused
+		    sprite format (16 bytes per each sprite)
+		        fedcba98 76543210
+		    00  ------xx xxxxxxxx X position (10 bit signed)
+		    02  -------x xxxxxxxx Y position (9 bit signed)
+		    04  ----iiii ffffffff Zoom X (add destination X position per each X counter, 4.8(8.8?) fixed point)*
+		    06  ----iiii ffffffff Zoom Y (add destination Y position per each Y counter, 4.8(8.8?) fixed point)*
+		    08  x------- -------- Disable this sprite
+		        --xxxxxx -------- Palette select (256 color each)
+		        -------- x------- Flip Y
+		        -------- -x------ Flip X
+		        -------- --xx---- Priority
+		        -------- ----xxxx ROM offset MSB
+		    0a  xxxxxxxx xxxxxxxx ROM offset LSB (256 byte each)
+		    0c  xxxxxxxx -------- Source Width (16 pixel each)
+		        -------- xxxxxxxx Source Height (16 pixel each)
+		    0e  -------- -------- Unused
 
-			* : i = integer value, f = fraction value
+		    * : i = integer value, f = fraction value
 		*/
 
 		if (m_spriteram[i+4] & 0x8000)

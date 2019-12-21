@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(SUN4C_MMU, sun4c_mmu_device, "sun4c_mmu", "Sun 4c MMU")
 #define LOG_TYPE1_TIMEOUT   (1U << 12)
 #define LOG_UNKNOWN_SPACE   (1U << 13)
 #define LOG_WRITE_PROTECT   (1U << 14)
-#define LOG_PARITY			(1U << 15)
+#define LOG_PARITY          (1U << 15)
 #define LOG_ALL_ASI         (1U << 16) // WARNING: Heavy!
 
 #define VERBOSE (0)
@@ -433,7 +433,7 @@ void sun4_mmu_base_device::system_w(const uint32_t offset, const uint32_t data, 
 			m_cachetags[(offset >> 3) & m_cache_tag_mask] = data & 0x03f8fffc;
 			/*if (m_cpu->pc() == 0xFFE8B4F8)
 			{
-				m_log_mem = true;
+			    m_log_mem = true;
 			}*/
 			return;
 

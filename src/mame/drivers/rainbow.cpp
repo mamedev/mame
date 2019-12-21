@@ -3391,7 +3391,7 @@ ROM_START(rainbow100a)
 
 	ROM_LOAD("23-176e4-00.e89", 0xfa000, 0x2000, CRC(405e9619) SHA1(86604dccea84b46e05d705abeda25b12f7cc8c59)) // ROM (FA000-FBFFF) (E89) 8 K
 	ROM_LOAD("23-177e4-00.e90", 0xfc000, 0x2000, CRC(1ec72a66) SHA1(ed19944ae711e97d6bec34c885be04c4c3c95852)) // ROM (FC000-FDFFF) (E90) 8 K
-	ROM_FILL(0xfa26d, 1, 0x00) // [0xFA000 + 0x026d] disable CRC check   [100-A ROM] 
+	ROM_FILL(0xfa26d, 1, 0x00) // [0xFA000 + 0x026d] disable CRC check   [100-A ROM]
 	ROM_FILL(0xfadea, 1, 0x00) // [0xFA000 + 0x0dea] Floppy workaround: in case of Z80 RESPONSE FAILURE ($80 bit set in AL), don't block floppy access
 
 	// SOCKETED LANGUAGE ROM (E91) with 1 single localization per ROM -
@@ -3424,7 +3424,7 @@ ROM_START(rainbow)
 	// BOOT ROM
 	ROM_LOAD("23-022e5-00.bin", 0xf0000, 0x4000, CRC(9d1332b4) SHA1(736306d2a36bd44f95a39b36ebbab211cc8fea6e))
 	ROM_RELOAD(0xf4000, 0x4000)
-	ROM_FILL(0xf4303, 1, 0x00) // [0xf4000 + 0x0303] disable CRC check   [100-B ROM] 
+	ROM_FILL(0xf4303, 1, 0x00) // [0xf4000 + 0x0303] disable CRC check   [100-B ROM]
 	ROM_FILL(0xf535e, 1, 0x00) // [0xf4000 + 0x135e] Floppy workaround: in case of Z80 RESPONSE FAILURE ($80 bit set in AL), don't block floppy access
 
 

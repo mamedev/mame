@@ -165,7 +165,7 @@ void xxx_state::xxx(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_xxx);
-	
+
 	PALETTE(config, m_palette, FUNC(xxx_state::xxx_palette), 8);
 
 	/* sound hardware */

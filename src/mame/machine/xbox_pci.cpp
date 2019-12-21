@@ -462,21 +462,21 @@ void mcpx_isalpc_device::set_virtual_line(int line, int state)
 		return;
 	}
 /* Will be updated to support dma
-	line = line - 16;
-	if (line < 4)
-	{
-		switch (line)
-		{
-		case 0:
-			break;
-		case 1:
-			break;
-		case 2:
-			break;
-		case 3:
-			break;
-		}
-	}
+    line = line - 16;
+    if (line < 4)
+    {
+        switch (line)
+        {
+        case 0:
+            break;
+        case 1:
+            break;
+        case 2:
+            break;
+        case 3:
+            break;
+        }
+    }
 */
 }
 

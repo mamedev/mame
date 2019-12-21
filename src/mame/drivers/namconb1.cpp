@@ -888,7 +888,7 @@ static INPUT_PORTS_START( namconb1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 INPUT_PORTS_END
 
-	
+
 /****************************************************************************/
 
 void namconb1_state::init_nebulray()

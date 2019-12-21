@@ -239,20 +239,20 @@ READ32_MEMBER(model1_state::copro_atan_r)
 	// Correct for table bug, it seems that the hardware does something equivalent somehow,
 	// or maybe there are boards with updated opr roms
 
-    u16 dt = (result >> 16) + result;
-    if(dt & 0x001) {
+	u16 dt = (result >> 16) + result;
+	if(dt & 0x001) {
 		if((result & 0x00f) == 0x00e)
 			result -= 0x00000001;
 		else
 			result -= 0x00010000;
 	}
-    if(dt & 0x010) {
+	if(dt & 0x010) {
 		if((result & 0x0f0) == 0x0e0)
 			result -= 0x00000010;
 		else
 			result -= 0x00100000;
 	}
-    if(dt & 0x100) {
+	if(dt & 0x100) {
 		if((result & 0xf00) == 0xe00)
 			result -= 0x00000100;
 		else

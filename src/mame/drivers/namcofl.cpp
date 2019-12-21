@@ -156,8 +156,8 @@ OSC3: 48.384MHz
 13E : HN58C65 EEPROM
 
 TODO
-	finalapr : Some objects aren't displayed, Wrong shadow behavior
-	speedrcr : Incorrect ROZ layer
+    finalapr : Some objects aren't displayed, Wrong shadow behavior
+    speedrcr : Incorrect ROZ layer
 */
 
 #include "emu.h"

@@ -178,7 +178,7 @@ private:
 	DECLARE_WRITE8_MEMBER(prot_p1_w);
 	DECLARE_WRITE8_MEMBER(prot_p2_w);
 	DECLARE_READ8_MEMBER(prot_p2_r);
-	
+
 	DECLARE_WRITE32_MEMBER(to_prot_w);
 
 
@@ -813,7 +813,7 @@ void dreamwld_state::baryon(machine_config &config)
 	m_mcu->port_out_cb<1>().set(FUNC(dreamwld_state::prot_p1_w));
 	m_mcu->port_out_cb<2>().set(FUNC(dreamwld_state::prot_p2_w));
 	m_mcu->port_in_cb<2>().set(FUNC(dreamwld_state::prot_p2_r));
-		
+
 	//config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */

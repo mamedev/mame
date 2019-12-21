@@ -2695,7 +2695,7 @@ ROM_START( gondou )
 	ROM_LOAD( "dt17.f11", 0x50000, 0x08000, CRC(3bbcff0d) SHA1(a8f7aa56ff49ed6b29240c3504d6c9945944953b) ) // Unique data to the US set
 	ROM_LOAD( "dt21.f16", 0x60000, 0x10000, CRC(1c5f682d) SHA1(4b7022cce930a9e9a0087c91e8344269fe7ed889) )
 	ROM_LOAD( "dt22.f18", 0x70000, 0x08000, CRC(c1876a5f) SHA1(66122ce765723765e20036bd4d461a210c8b94d3) ) // Unique data to the US set
-	
+
 	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles */
 	ROM_LOAD( "dt08.h10", 0x00000, 0x08000, CRC(aec483f5) SHA1(1d6de823ab0eeb9c89e9c227428ff278663627f3) ) // Tiles data is the same for all 3 regions
 	ROM_CONTINUE(         0x10000, 0x08000 )

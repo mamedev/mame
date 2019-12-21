@@ -15,8 +15,8 @@
     for disciple, must use matching rom/system disk versions:
     v2 rom -> system disk/system tape ver 2, 2b, 2c
     v3 rom -> system disk/system tape ver 3a, 3b or 3d
-	
-	for plusd, must use matching rom/system disk versions:
+
+    for plusd, must use matching rom/system disk versions:
     v1  rom -> system disk/system tape ver 1
     v1a rom -> system disk/system tape ver 2a
 -->

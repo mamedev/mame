@@ -57,7 +57,7 @@ void pc9801_86_device::pc9801_86_config(machine_config &config)
 	// OPL4 YMF278 + YRW801 (U21 + U22)
 	// TC55257CFL-10 (U15)
 	// unknown chip (most likely surface scratched) U3)
-	
+
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	YM2608(config, m_opna, 7.987_MHz_XTAL); // actually YM2608B

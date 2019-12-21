@@ -261,17 +261,17 @@ private:
 	} mode;
 	enum LogicalDevice
 	{
-		FDC = 0,		// Floppy disk controller
-		Parallel,		// Parallel port
-		Serial1,		// Serial port 1
-		Serial2,		// Serial port 2
-		Keyboard = 5,	// Keyboard controller
-		ConsumerIR,		// Consumer IR
-		Gpio1,			// Game port, MIDI, GPIO set 1
-		Gpio2,			// GPIO set 2
-		Gpio34,			// GPIO set 3 and 4
-		ACPI,			// ACPI
-		Gpio567 = 12	// GPIO set 5, 6 and 7
+		FDC = 0,        // Floppy disk controller
+		Parallel,       // Parallel port
+		Serial1,        // Serial port 1
+		Serial2,        // Serial port 2
+		Keyboard = 5,   // Keyboard controller
+		ConsumerIR,     // Consumer IR
+		Gpio1,          // Game port, MIDI, GPIO set 1
+		Gpio2,          // GPIO set 2
+		Gpio34,         // GPIO set 3 and 4
+		ACPI,           // ACPI
+		Gpio567 = 12    // GPIO set 5, 6 and 7
 	};
 	int config_key_step;
 	int config_index;

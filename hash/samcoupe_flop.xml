@@ -3,21 +3,21 @@
 
 <!-- to boot disks type 'BOOT' and press return
   alternatively press numpad 9 which seems to do the same thing
-  
+
   disk image formats:
   .mgt  .dsk  .sad
   confusingly there seems to be two types of .dsk image, one is just the same as .mgt in all but the extension,
   the other is "extended DSK disk image" (sometimes with .edsk extension) which is often used for Amstrad CPC and Spectrum +3 images.
   .sad seems to be a more advanced format that allows copy-protected images etc.
-  
+
   currently only .mgt/.dsk is supported in coupedsk.cpp
   should be trivial to add "extended DSK disk image" support as it's already in Mame.
-  
+
   most game images have trainers/pokes.
   all Sam Coupe games will probably need re-dumping at some point as there seems to be very few clean images available.
   TOSEC and GoodSamC don't have much, mostly hacked, demos, unlicensed/homebrew etc.
   www.worldofsam.org is a good source of infomation but most commercial games are not available for download.
-  
+
   SAMDOS disks include the official MGT ZX Spectrum emulator.
 -->
 

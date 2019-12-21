@@ -985,7 +985,7 @@ void a2_video_device::hgr_update_tk2000(screen_device &screen, bitmap_ind16 &bit
 					}
 					break;
 
-               case 1:
+			   case 1:
 					w >>= 7;
 					if (vram_row[col] & 0x80)
 					{
@@ -1142,8 +1142,8 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 }
 
 /*
-	Latest Apple II NTSC palette from "Apple II Video Display Theory"
-	https://docs.google.com/spreadsheets/d/1rKR6A_bVniSCtIP_rrv8QLWJdj4h6jEU1jJj0AebWwg/
+    Latest Apple II NTSC palette from "Apple II Video Display Theory"
+    https://docs.google.com/spreadsheets/d/1rKR6A_bVniSCtIP_rrv8QLWJdj4h6jEU1jJj0AebWwg/
 */
 static const rgb_t apple2_palette[] =
 {

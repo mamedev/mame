@@ -9,17 +9,17 @@
 
 NETLIST_START(7414_astable)
 
-    /*
-     * Simple oscillator with 74LS14
-     *
-     * ./nltool -f nl_examples/7414.cpp -l C37.1 -l U4A1.Q
-     *
-     */
+	/*
+	 * Simple oscillator with 74LS14
+	 *
+	 * ./nltool -f nl_examples/7414.cpp -l C37.1 -l U4A1.Q
+	 *
+	 */
 
-    /* Standard stuff */
+	/* Standard stuff */
 
-    SOLVER(Solver, 48000)
-    PARAM(Solver.ACCURACY, 1e-8)
+	SOLVER(Solver, 48000)
+	PARAM(Solver.ACCURACY, 1e-8)
 
 	TTL_74LS14_GATE(U4A1)
 	//TTL_7404_GATE(U4A1)

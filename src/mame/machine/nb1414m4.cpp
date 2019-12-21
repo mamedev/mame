@@ -6,12 +6,12 @@ Nichibutsu 1414M4 device emulation
 
 Written by Angelo Salese, based on researches by Tomasz Slanina with Legion
 
-This is some fancy blitter DMA or MCU or even a discrete structure that copies text strings to a 8-bit text layer in 
+This is some fancy blitter DMA or MCU or even a discrete structure that copies text strings to a 8-bit text layer in
 various Nihon Bussan games;
 
 TODO:
-- Identify what exactly this "device" is; 
-- The overlying text layer should actually be a base device for this (and used where not applicable like galivan, 
+- Identify what exactly this "device" is;
+- The overlying text layer should actually be a base device for this (and used where not applicable like galivan,
   armedf and bigfightr);
 - Command triggering condition not understood (and diverges between galivan.cpp and armedf.cpp);
 - where is the condition that makes "insert coin" text to properly blink?
@@ -333,7 +333,7 @@ void nb1414m4_device::_0e00(uint16_t mcu_cmd, uint8_t *vram)
 void nb1414m4_device::vblank_trigger()
 {
 	// TODO: use this for frame number synchronization instead of screen().frame_number()
-	//  real HW references definitely syncs insert coin blinking after POST so whatever is the host actually 
+	//  real HW references definitely syncs insert coin blinking after POST so whatever is the host actually
 	//  have an interest over vblank signal.
 }
 

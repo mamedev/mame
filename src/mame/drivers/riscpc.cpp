@@ -8,11 +8,11 @@
     based on work by Tomasz Slanina and Sarah Walker
 
     TODO:
-	- IOMD currently hardwired with ARM7500FE flavour for all machines, needs information about 
-	  which uses what;
-	- PS/2 keyboard doesn't work properly;
+    - IOMD currently hardwired with ARM7500FE flavour for all machines, needs information about
+      which uses what;
+    - PS/2 keyboard doesn't work properly;
     - Fix pendingUnd fatalerror from ARM7 core;
-	- Fix pendingAbtD fatalerror for RiscOS 4.xx;
+    - Fix pendingAbtD fatalerror for RiscOS 4.xx;
 
 ****************************************************************************/
 
@@ -65,7 +65,7 @@ private:
 
 	void a7000_map(address_map &map);
 	void riscpc_map(address_map &map);
-	
+
 	bool m_i2cmem_clock;
 	DECLARE_READ_LINE_MEMBER(iocr_od0_r);
 	DECLARE_READ_LINE_MEMBER(iocr_od1_r);
@@ -196,7 +196,7 @@ void riscpc_state::base_config(machine_config &config)
 	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(m_iomd, FUNC(arm_iomd_device::vblank_irq));
 	m_vidc->sound_drq().set(m_iomd, FUNC(arm_iomd_device::sound_drq));
-	
+
 	m_iomd->set_host_cpu_tag(m_maincpu);
 	m_iomd->set_vidc_tag(m_vidc);
 	m_iomd->set_kbdc_tag(m_kbdc);
@@ -209,7 +209,7 @@ void riscpc_state::base_config(machine_config &config)
 void riscpc_state::rpc600(machine_config &config)
 {
 	constexpr XTAL cpuxtal(60_MHz_XTAL/2);
-	
+
 	ARM7(config, m_maincpu, cpuxtal); // really ARM610
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
@@ -252,7 +252,7 @@ void riscpc_state::a7000p(machine_config &config)
 void riscpc_state::sarpc(machine_config &config)
 {
 	// TODO: ranges from 160 to 233 MHz
-	constexpr XTAL cpuxtal(200'000'000); 
+	constexpr XTAL cpuxtal(200'000'000);
 
 	SA1110(config, m_maincpu, cpuxtal); // StrongARM
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);

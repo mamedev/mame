@@ -875,7 +875,7 @@ ROM_START( optiger )
 	ROM_LOAD( "e63-05_palce16v8h-10-4.ic36", 0x3f4, 0x117, CRC(e27e9734) SHA1(77dadfbedb625b65617640bb73c59c9e5b0c927f) )
 	ROM_LOAD( "e63-06_palce16v8h-10-4.ic41", 0x50b, 0x117, CRC(75184422) SHA1(d35e98e0278d713139eb1c833f41f57ed0dd3c9f) )
 	ROM_LOAD( "e63-07_palce16v8h-10-4.ic43", 0x622, 0x117, CRC(eb77b03f) SHA1(567f92a4fd1fa919d5e9047ee15c058bf40855fb) )
-	ROM_LOAD( "e63-08_palce16v8h-15-4.ic49", 0x739, 0x117, CRC(c305c56d) SHA1(49592fa43c548ac6b08951d03677a3f23e9c8de8) )	
+	ROM_LOAD( "e63-08_palce16v8h-15-4.ic49", 0x739, 0x117, CRC(c305c56d) SHA1(49592fa43c548ac6b08951d03677a3f23e9c8de8) )
 ROM_END
 
 GAME( 1998, optiger, 0, taitopjc, taitopjc, taitopjc_state, init_optiger, ROT0, "Taito", "Operation Tiger (Ver 2.14 O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

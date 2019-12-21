@@ -49,7 +49,7 @@ public:
 	void update_sound_mode(bool state) { m_sound_mode = state; refresh_sound_frequency(); }
 	void set_cursor_enable(bool state) { m_cursor_enable = state; }
 	u32 get_cursor_size() { return (m_crtc_regs[CRTC_VCER] - m_crtc_regs[CRTC_VCSR]) * (32/4); }
-	
+
 protected:
 	acorn_vidc10_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
@@ -105,13 +105,13 @@ private:
 	DECLARE_WRITE32_MEMBER( crtc_w );
 	DECLARE_WRITE32_MEMBER( sound_frequency_w );
 	DECLARE_WRITE32_MEMBER( control_w );
-	
+
 	u8 m_pixel_clock;
 	bool m_cursor_enable;
 	//bool m_flyback;
 	emu_timer *m_video_timer;
 	emu_timer *m_sound_timer;
-		
+
 	std::unique_ptr<u8[]> m_data_vram;
 	std::unique_ptr<u8[]> m_cursor_vram;
 	// TODO: correct data vram size
@@ -176,7 +176,7 @@ private:
 	DECLARE_WRITE32_MEMBER( vidc20_sound_frequency_w );
 	DECLARE_WRITE32_MEMBER( vidc20_sound_control_w );
 	DECLARE_WRITE32_MEMBER( fsynreg_w );
-	
+
 	u8 m_pal_data_index;
 	inline void update_8bpp_palette(u16 index, u32 paldata);
 	bool m_dac_serial_mode;

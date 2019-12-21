@@ -196,7 +196,7 @@ TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_tx_tile_info)
 	// TODO: skip drawing the NB1414M4 params, how the HW actually handles this?
 	if (index < 0x12)
 		index = 0x12;
-		
+
 	int attr = m_videoram[index + 0x400];
 	int code = m_videoram[index] | ((attr & 0x03) << 8);
 	SET_TILE_INFO_MEMBER(0,

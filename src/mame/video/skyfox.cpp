@@ -217,7 +217,7 @@ void skyfox_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipre
 		   This PCB seems does not support background flip. */
 
 		/* This looks perfect at first glance.
-		   but when strict compared on "1UP START" screen, 
+		   but when strict compared on "1UP START" screen,
 		   it seems the blinking pattern in each star may be different. */
 		if (((m_bg_ctrl >> 4) & 3) != (pen & 3) || !blinking)
 			bitmap.pix16(y % 256, x % 512) = pen;

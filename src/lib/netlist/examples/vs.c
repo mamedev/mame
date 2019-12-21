@@ -11,10 +11,10 @@
 
 NETLIST_START(vs)
 
-    /* Standard stuff */
+	/* Standard stuff */
 
-    SOLVER(Solver, 480)
-    PARAM(Solver.ACCURACY, 1e-6)
+	SOLVER(Solver, 480)
+	PARAM(Solver.ACCURACY, 1e-6)
 	PARAM(Solver.METHOD, "MAT_CR")
 	PARAM(Solver.DYNAMIC_TS, 1)
 
@@ -26,7 +26,7 @@ NETLIST_START(vs)
 	NET_C(R1.2, VS1.N)
 	NET_C(GND, VS1.N)
 
-    //LOG(tt, VS1.P)
-    //LOG(tt1, R1.1)
+	//LOG(tt, VS1.P)
+	//LOG(tt1, R1.1)
 
 NETLIST_END()

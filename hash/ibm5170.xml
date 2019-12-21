@@ -12291,7 +12291,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sleepwalker">
 		<description>Sleepwalker</description>
 		<year>1993</year>
@@ -12792,7 +12792,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ufoeuita" cloneof="ufoeu">
 		<description>UFO - Enemy Unknown (Italy)</description>
 		<year>1994</year>

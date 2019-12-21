@@ -56,7 +56,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
 	uint32_t dest = m_dma_params[2] | (m_dma_params[5] << 16) ;
 	uint32_t length = m_dma_params[3] | (m_dma_params[6] << 16);
 
-	LOGMASKED(LOG_GCM394_SYSDMA, "%s:possible DMA operation (7abf) (trigger %04x) with params mode:%04x source:%08x (word offset) dest:%08x (word offset) length:%08x (words)\n", machine().describe_context(), data, mode, source, dest, length );  
+	LOGMASKED(LOG_GCM394_SYSDMA, "%s:possible DMA operation (7abf) (trigger %04x) with params mode:%04x source:%08x (word offset) dest:%08x (word offset) length:%08x (words)\n", machine().describe_context(), data, mode, source, dest, length );
 
 	if (source >= 0x20000)
 		LOGMASKED(LOG_GCM394_SYSDMA, " likely transfer from ROM %08x - %08x\n", (source - 0x20000) * 2, (source - 0x20000) * 2 + (length * 2)- 1);
@@ -66,8 +66,8 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
 	// mode 0x0089 == no source inc, used for memory clear operations? (source usually points at stack value)
 	// mode 0x0009 == regular copy? (smartfp does 2 copies like this after the initial clears, source definitely points at a correctly sized data structure)
 	// what does having bit 0x4000 on mode set mean? (first transfer on wrlshunt - maybe an IRQ disable?)
-	
-	if ((mode == 0x0089) || (mode == 0x0009) || (mode == 0x4009)) 
+
+	if ((mode == 0x0089) || (mode == 0x0009) || (mode == 0x4009))
 	{
 		for (int i = 0; i < length; i++)
 		{
@@ -434,7 +434,7 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 	map(0x007816, 0x007816).w(FUNC(sunplus_gcm394_base_device::unkarea_7816_w));
 	map(0x007817, 0x007817).w(FUNC(sunplus_gcm394_base_device::unkarea_7817_w));
 
-	                                                                             // wrlshunt                                                               | smartfp
+																				 // wrlshunt                                                               | smartfp
 	map(0x007820, 0x007820).w(FUNC(sunplus_gcm394_base_device::unkarea_7820_w)); // 7f8a (7f8a before DMA from ROM to RAM, 008a after DMA from ROM to RAM) | 3f04
 	map(0x007821, 0x007821).w(FUNC(sunplus_gcm394_base_device::unkarea_7821_w)); // 7f47                                                                   | 0044
 	map(0x007822, 0x007822).w(FUNC(sunplus_gcm394_base_device::unkarea_7822_w)); // 0047                                                                   | 1f44
@@ -569,7 +569,7 @@ void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
 
 	map(0x007854, 0x007854).r(FUNC(generalplus_gpac800_device::unkarea_7854_r)); // data read port (timing appears to be important)
 }
-	
+
 void sunplus_gcm394_base_device::device_start()
 {
 	unsp_20_device::device_start();
@@ -694,10 +694,10 @@ IRQ_CALLBACK_MEMBER(sunplus_gcm394_base_device::irq_vector_cb)
 void sunplus_gcm394_base_device::checkirq6()
 {
 /*
-	if (m_7935 & 0x0100)
-		set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
-	else
-		set_state_unsynced(UNSP_IRQ6_LINE, CLEAR_LINE);
+    if (m_7935 & 0x0100)
+        set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
+    else
+        set_state_unsynced(UNSP_IRQ6_LINE, CLEAR_LINE);
 */
 }
 
@@ -736,7 +736,7 @@ void sunplus_gcm394_base_device::device_timer(emu_timer &timer, device_timer_id 
 		set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
 		//set_state_unsynced(UNSP_IRQ4_LINE, ASSERT_LINE);
 
-	//	checkirq6();
+	//  checkirq6();
 		break;
 	}
 	}
@@ -755,8 +755,8 @@ WRITE_LINE_MEMBER(sunplus_gcm394_base_device::videoirq_w)
 
 uint16_t sunplus_gcm394_base_device::read_space(uint32_t offset)
 {
-//	uint16_t b = m_gfxregion[(offset * 2) & (m_gfxregionsize - 1)] | (m_gfxregion[(offset * 2 + 1) & (m_gfxregionsize - 1)] << 8);
-//	return b;
+//  uint16_t b = m_gfxregion[(offset * 2) & (m_gfxregionsize - 1)] | (m_gfxregion[(offset * 2 + 1) & (m_gfxregionsize - 1)] << 8);
+//  return b;
 	address_space& mem = this->space(AS_PROGRAM);
 	uint16_t retdata = mem.read_word(offset);
 	return retdata;

@@ -2267,8 +2267,8 @@ ROM_START( mc_tv200 )
 ROM_END
 
 ROM_START( unkra200 ) // "Winbond 25Q64FVSIG 1324" SPI ROM
-    ROM_REGION( 0x800000, "mainrom", 0 )
-    ROM_LOAD( "retro_machine_rom", 0x00000, 0x800000, CRC(0e824aa7) SHA1(957e98868559ecc22b3fa42c76692417b76bf132) )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "retro_machine_rom", 0x00000, 0x800000, CRC(0e824aa7) SHA1(957e98868559ecc22b3fa42c76692417b76bf132) )
 ROM_END
 
 ROM_START( fcpocket )

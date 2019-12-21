@@ -235,7 +235,7 @@ READ8_MEMBER(samcoupe_state::samcoupe_keyboard_r)
 
 	/* bit 7, external memory */
 	data |= 1 << 7;
-	
+
 	/* joysticks */
 	if (!BIT(offset, 12)) data &= m_joy1->read() | (0xff ^ 0x1f);
 	if (!BIT(offset, 11)) data &= m_joy2->read() | (0xff ^ 0x1f);

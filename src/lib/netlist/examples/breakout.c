@@ -9,45 +9,45 @@
 //2 555 timers
 static Astable555Desc b2_555_desc(OHM(560.0), M_OHM(1.8), U_FARAD(0.1));
 
-static Mono555Desc c9_555_desc(OHM(47.0), U_FARAD(1.0));	// R33, C21
+static Mono555Desc c9_555_desc(OHM(47.0), U_FARAD(1.0));    // R33, C21
 
 //check these values
 //static Paddle1HorizontalDesc pad1_desc(15047.0, 47.0, &c9_555_desc);
 
 static CapacitorDesc c32_desc(U_FARAD(0.1));
-static CapacitorDesc c36_desc(N_FARAD(1.0));	//0.001uF = 1nF
+static CapacitorDesc c36_desc(N_FARAD(1.0));    //0.001uF = 1nF
 static CapacitorDesc c37_desc(P_FARAD(330.0));
 static BufferDesc pad_en_buf_desc(DELAY_NS(15.0), DELAY_NS(15.0)); // Prevents 12ns glitch on PAD_EN_n signal from resetting C9. TODO: is this accurate?
 
 #if 0
 static VIDEO_DESC( breakout )
-    VIDEO_RESISTANCE(1, K_OHM(0.0))
-    VIDEO_RESISTANCE(2, K_OHM(3.9))
-    VIDEO_RESISTANCE(3, K_OHM(3.9))
-    VIDEO_RESISTANCE(4, K_OHM(3.9))
-    VIDEO_RESISTANCE(5, K_OHM(3.9))
-    VIDEO_RESISTANCE(6, K_OHM(3.9))
-    //VIDEO_RESISTANCE(Video::HBLANK_PIN, K_OHM(0.0))
-    VIDEO_ORIENTATION(ROTATE_90)
-    VIDEO_CONTRAST(4.0)
+	VIDEO_RESISTANCE(1, K_OHM(0.0))
+	VIDEO_RESISTANCE(2, K_OHM(3.9))
+	VIDEO_RESISTANCE(3, K_OHM(3.9))
+	VIDEO_RESISTANCE(4, K_OHM(3.9))
+	VIDEO_RESISTANCE(5, K_OHM(3.9))
+	VIDEO_RESISTANCE(6, K_OHM(3.9))
+	//VIDEO_RESISTANCE(Video::HBLANK_PIN, K_OHM(0.0))
+	VIDEO_ORIENTATION(ROTATE_90)
+	VIDEO_CONTRAST(4.0)
 
-    // Values guessed based on screenshots. TODO: Make more accurate
-    //             X,         Y,   W,        H,    R,    G,    B
-    VIDEO_OVERLAY( 15.570e-6, 0.0, 1.911e-6, -1.0, 0.80, 0.15, 0.05 ) // Red Bricks
-    VIDEO_OVERLAY( 17.481e-6, 0.0, 1.956e-6, -1.0, 0.95, 0.65, 0.05 ) // Amber Bricks
-    VIDEO_OVERLAY( 19.437e-6, 0.0, 1.956e-6, -1.0, 0.05, 0.65, 0.25 ) // Green Bricks
-    VIDEO_OVERLAY( 21.393e-6, 0.0, 1.955e-6, -1.0, 0.95, 0.95, 0.20 ) // Yellow Bricks
-    VIDEO_OVERLAY( 51.345e-6, 0.0, 1.956e-6, -1.0, 0.05, 0.65, 0.95 ) // Blue Paddle
+	// Values guessed based on screenshots. TODO: Make more accurate
+	//             X,         Y,   W,        H,    R,    G,    B
+	VIDEO_OVERLAY( 15.570e-6, 0.0, 1.911e-6, -1.0, 0.80, 0.15, 0.05 ) // Red Bricks
+	VIDEO_OVERLAY( 17.481e-6, 0.0, 1.956e-6, -1.0, 0.95, 0.65, 0.05 ) // Amber Bricks
+	VIDEO_OVERLAY( 19.437e-6, 0.0, 1.956e-6, -1.0, 0.05, 0.65, 0.25 ) // Green Bricks
+	VIDEO_OVERLAY( 21.393e-6, 0.0, 1.955e-6, -1.0, 0.95, 0.95, 0.20 ) // Yellow Bricks
+	VIDEO_OVERLAY( 51.345e-6, 0.0, 1.956e-6, -1.0, 0.05, 0.65, 0.95 ) // Blue Paddle
 
-    // TODO: Different overlays for cocktail cabinet
+	// TODO: Different overlays for cocktail cabinet
 VIDEO_DESC_END
 
 static AUDIO_DESC( breakout )
-    AUDIO_RESISTANCE(1, K_OHM(47.0))
-    AUDIO_RESISTANCE(2, K_OHM(47.0))
-    AUDIO_RESISTANCE(3, K_OHM(47.0))
-    AUDIO_RESISTANCE(4, K_OHM(47.0))
-    AUDIO_GAIN(3.0)
+	AUDIO_RESISTANCE(1, K_OHM(47.0))
+	AUDIO_RESISTANCE(2, K_OHM(47.0))
+	AUDIO_RESISTANCE(3, K_OHM(47.0))
+	AUDIO_RESISTANCE(4, K_OHM(47.0))
+	AUDIO_GAIN(3.0)
 VIDEO_DESC_END
 #endif
 
@@ -63,26 +63,26 @@ static Dipswitch53137Desc dipswitch1_desc("bonus_credit", "Bonus Credit", 3, "No
 //static DipswitchDesc dipswitch4_desc("ball_count", "Ball Count", 0, "3", "5");
 
 CIRCUIT_LAYOUT( breakout )
-  	CHIP("S1", 53137, &dipswitch1_desc)
+	CHIP("S1", 53137, &dipswitch1_desc)
 	CHIP("S2", DIPSWITCH, &dipswitch2_desc)
 	CHIP("S3", DIPSWITCH, &dipswitch3_desc)
 	CHIP("S4", DIPSWITCH, &dipswitch4_desc)
 
-    SOLVER(Solver, 48000)
-    PARAM(Solver.ACCURACY, 1e-7) // works and is sufficient
-    //CHIP("CLOCK", CLOCK_14_318_MHZ)
-    MAINCLOCK(Y1, 14318000.0)
+	SOLVER(Solver, 48000)
+	PARAM(Solver.ACCURACY, 1e-7) // works and is sufficient
+	//CHIP("CLOCK", CLOCK_14_318_MHZ)
+	MAINCLOCK(Y1, 14318000.0)
 
-    ANALOG_INPUT(V5, 5)
+	ANALOG_INPUT(V5, 5)
 #define VCC "V5", Q
 #define GND "GND", Q
 
-    //CHIP("Y1", CLOCK_14_318_MHZ)	//Y1
+	//CHIP("Y1", CLOCK_14_318_MHZ)  //Y1
 
 	CHIP_CAPACITOR(C32, &c32_desc)
 	CHIP_CAPACITOR(C36, &c36_desc)
- 	CHIP_CAPACITOR(C37, &c37_desc)
- 	CHIP("PAD_EN_BUF", BUFFER, &pad_en_buf_desc)
+	CHIP_CAPACITOR(C37, &c37_desc)
+	CHIP("PAD_EN_BUF", BUFFER, &pad_en_buf_desc)
 
 	CHIP("A3", 7474)
 	CHIP("A4", 7408)
@@ -91,7 +91,7 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP_9602_Mono(A7, &a7_desc)
 	CHIP_9602_Mono(A8, &a8_desc)
 
-    CHIP_555_Astable(B2, &b2_555_desc)
+	CHIP_555_Astable(B2, &b2_555_desc)
 	CHIP("B3", 7402)
 	CHIP("B4", 9316)
 	CHIP("B5", 74193)
@@ -107,7 +107,7 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP("C6", 7486)
 	CHIP("C7", 9316)
 	CHIP("C8", 9316)
-    CHIP_555_Mono(C9, &c9_555_desc)
+	CHIP_555_Mono(C9, &c9_555_desc)
 
 	CHIP("D2", 7432)
 	CHIP("D3", 7474)
@@ -116,7 +116,7 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP("D6", 7408)
 	CHIP("D7", 7411)
 	CHIP("D8", 7400)
-//	CHIP("D9", 4016)	//quad bilateral switch
+//  CHIP("D9", 4016)    //quad bilateral switch
 
 	CHIP("E1", 7404)
 	CHIP("E2", 7486)
@@ -144,7 +144,7 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP("H4", 7400)
 	CHIP("H5", 9312)
 	CHIP("H6", 9310)
-	CHIP("H7", 7408)	//sometimes looks like N7 on schematic
+	CHIP("H7", 7408)    //sometimes looks like N7 on schematic
 	CHIP("H8", 7474)
 	CHIP("H9", 7474)
 
@@ -165,18 +165,18 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP("K5", 9312)
 	CHIP("K6", 9310)
 	CHIP("K7", 7486)
-	CHIP("K8", 7474)	//TODO: one more than bom?
+	CHIP("K8", 7474)    //TODO: one more than bom?
 	CHIP("K9", 74107)
 
 	CHIP("L1", 9316)
 	CHIP("L2", 7486)
-	CHIP("L3", 82S16)	//RAM
+	CHIP("L3", 82S16)   //RAM
 	CHIP("L4", 7411)
 	CHIP("L5", 9312)
 	CHIP("L6", 9310)
 	CHIP("L7", 7486)
 	CHIP("L8", 74193)
-	CHIP("L9", 7400)	//TODO: 1 more chip than on bom?
+	CHIP("L9", 7400)    //TODO: 1 more chip than on bom?
 
 	CHIP("M1", 9316)
 	CHIP("M2", 7483)
@@ -193,232 +193,232 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP("N4", 7411)
 	CHIP("N5", 9312)
 	CHIP("N6", 9310)
-	CHIP("N7", 7408)	//sometimes looks like H7 on schematic
+	CHIP("N7", 7408)    //sometimes looks like H7 on schematic
 	CHIP_9602_Mono(N8, &n8_desc)
 	CHIP("N9", 74192)
 
-	//LM380			//speaker amplifier
-	//LM323			//regulator
+	//LM380         //speaker amplifier
+	//LM323         //regulator
 
 //    CHIP("CREDIT_LIGHT1", LAMP)
 //    CHIP("CREDIT_LIGHT2", LAMP)
 //    CHIP("SERVE_LIGHT", LAMP)
 
-    CHIP("PAD1", PADDLE1_HORIZONTAL_INPUT, &pad1_desc)
-    PADDLE_CONNECTION("PAD1", "C9")
+	CHIP("PAD1", PADDLE1_HORIZONTAL_INPUT, &pad1_desc)
+	PADDLE_CONNECTION("PAD1", "C9")
 
-    CHIP_LATCH(LATCH)
-    CHIP("COIN1", COIN_INPUT)
+	CHIP_LATCH(LATCH)
+	CHIP("COIN1", COIN_INPUT)
 
-    //CHIP("COIN2", COIN_INPUT)
+	//CHIP("COIN2", COIN_INPUT)
 
-    CHIP("START", START_INPUT)
+	CHIP("START", START_INPUT)
 
-    CHIP("SERVE", BUTTONS1_INPUT)
+	CHIP("SERVE", BUTTONS1_INPUT)
 
-    //TODO: coin2 and start 2
+	//TODO: coin2 and start 2
 
-    VIDEO(breakout)
-    AUDIO(breakout)
+	VIDEO(breakout)
+	AUDIO(breakout)
 
 #ifdef DEBUG
 	CHIP("LOG1", VCD_LOG, &vcd_log_desc)
 #endif
 
    //HSYNC and VSYNC
-   #define H1_d 		"L1", 14
-   #define H2_d 		"L1", 13
-   #define H4_d 		"L1", 12
-   #define H8_d 		"L1", 11
-   #define H8_n 	"J2", 2
-   #define H16_d  	"K1", 14
-   #define H16_n 	"J2", 6
-   #define H32_d 	 	"K1", 13
-   #define H32_n 	"J2", 4
-   #define H64_d 	 	"K1", 12
-   #define H128_d  	"K1", 11
+   #define H1_d         "L1", 14
+   #define H2_d         "L1", 13
+   #define H4_d         "L1", 12
+   #define H8_d         "L1", 11
+   #define H8_n     "J2", 2
+   #define H16_d    "K1", 14
+   #define H16_n    "J2", 6
+   #define H32_d        "K1", 13
+   #define H32_n    "J2", 4
+   #define H64_d        "K1", 12
+   #define H128_d   "K1", 11
 
-   #define V1_d 	 	"M1", 14
-   #define V2_d 	 	"M1", 13
-   #define V4_d 	 	"M1", 12
-   #define V8_d 	 	"M1", 11
-   #define V16_d 	 	"N1", 14
-   #define V16_n 	"J2", 10
-   #define V32_d 	 	"N1", 13
-   #define V64_d 	 	"N1", 12
-   #define V64I  	"H7", 11
-   #define V64_n 	"M9", 10
-   #define V128_d  	"N1", 11
+   #define V1_d         "M1", 14
+   #define V2_d         "M1", 13
+   #define V4_d         "M1", 12
+   #define V8_d         "M1", 11
+   #define V16_d        "N1", 14
+   #define V16_n    "J2", 10
+   #define V32_d        "N1", 13
+   #define V64_d        "N1", 12
+   #define V64I     "H7", 11
+   #define V64_n    "M9", 10
+   #define V128_d   "N1", 11
 
-   #define H1		"L2", 8
-   #define H2		"L2", 11
-   #define H4		"L2", 3
-   #define H8		"L2", 6
-   #define H16		"K2", 8
-   #define H32		"K2", 11
-   #define H64		"K2", 3
-   #define H128		"K2", 6
+   #define H1       "L2", 8
+   #define H2       "L2", 11
+   #define H4       "L2", 3
+   #define H8       "L2", 6
+   #define H16      "K2", 8
+   #define H32      "K2", 11
+   #define H64      "K2", 3
+   #define H128     "K2", 6
 
    //#define V1
-   #define V2		"M3", 3
-   #define V4		"M3", 6
-   #define V8		"M3", 11
-   #define V16		"N3", 8
-   #define V32		"N3", 3
-   #define V64		"N3", 6
-   #define V128		"N3", 11
+   #define V2       "M3", 3
+   #define V4       "M3", 6
+   #define V8       "M3", 11
+   #define V16      "N3", 8
+   #define V32      "N3", 3
+   #define V64      "N3", 6
+   #define V128     "N3", 11
 
-   #define HSYNC  	"J1", 2
-   #define HSYNC_n  	"J1", 3
-   #define VSYNC  	"J1", 7
-   #define VSYNC_n  	"J1", 6
-   #define PSYNC  	"J1", 11
-   #define PSYNC_n  	"J1", 10
-   #define BSYNC  	"J1", 15
-   #define BSYNC_n  	"J1", 14
+   #define HSYNC    "J1", 2
+   #define HSYNC_n      "J1", 3
+   #define VSYNC    "J1", 7
+   #define VSYNC_n      "J1", 6
+   #define PSYNC    "J1", 11
+   #define PSYNC_n      "J1", 10
+   #define BSYNC    "J1", 15
+   #define BSYNC_n      "J1", 14
 
-   #define BALL 	"D7", 6
+   #define BALL     "D7", 6
    #define BALL_DISPLAY "A4", 6
-   #define PLAYFIELD 	"H4", 3
-   #define SCORE 	"D3", 5
-   #define VERT_TRIG_n 	"H1", 8
+   #define PLAYFIELD    "H4", 3
+   #define SCORE    "D3", 5
+   #define VERT_TRIG_n  "H1", 8
 
-   #define CLOCK 	"H1", 11
-   #define SCLOCK 	"K1", 15
-   #define CKBH 	"F1", 13
+   #define CLOCK    "H1", 11
+   #define SCLOCK   "K1", 15
+   #define CKBH     "F1", 13
 
-   #define PAD_n 	"K3", 8
-   #define PAD_EN_n 	"C2", 8
+   #define PAD_n    "K3", 8
+   #define PAD_EN_n     "C2", 8
 
    //#define P VCC
    #define P "V5", Q
 
-   #define COIN 		"L9", 6
-   #define COIN1_n 		"F8", 5
-   #define COIN2_n 		"H9", 5
-   #define CREDIT_1_OR_2 	"L9", 3
-   #define CREDIT_1_OR_2_n 	"F9", 8
-   #define CREDIT2 		"F9", 6
-   #define CREDIT2_n 		"M8", 8
-   #define CR_START1 		"E8", 5
-   #define CR_START1_n 		"E8", 6	//Schematic shows E8.6 as positive CR_START1, but this can't be right?
-   #define CR_START2 		"E8", 9
-   #define CR_START2_n 		"E8", 8
-   #define CSW1 		"F9", 12
-   #define CSW2 		"F9", 2
+   #define COIN         "L9", 6
+   #define COIN1_n      "F8", 5
+   #define COIN2_n      "H9", 5
+   #define CREDIT_1_OR_2    "L9", 3
+   #define CREDIT_1_OR_2_n  "F9", 8
+   #define CREDIT2      "F9", 6
+   #define CREDIT2_n        "M8", 8
+   #define CR_START1        "E8", 5
+   #define CR_START1_n      "E8", 6 //Schematic shows E8.6 as positive CR_START1, but this can't be right?
+   #define CR_START2        "E8", 9
+   #define CR_START2_n      "E8", 8
+   #define CSW1         "F9", 12
+   #define CSW2         "F9", 2
 
-   #define P2_CONDITIONAL	"H1", 3
-   #define P2_CONDITIONAL_dash 	"H7", 8
-   #define PLAYER_2 		"B4", 14
-   #define PLAYER_2_n 		"M9", 8
+   #define P2_CONDITIONAL   "H1", 3
+   #define P2_CONDITIONAL_dash  "H7", 8
+   #define PLAYER_2         "B4", 14
+   #define PLAYER_2_n       "M9", 8
 
-   #define START_GAME 		"D8", 6
-   #define START_GAME1_n 	"M9", 4
-   #define START_GAME_n 	"M9", 6
+   #define START_GAME       "D8", 6
+   #define START_GAME1_n    "M9", 4
+   #define START_GAME_n     "M9", 6
 
-   #define BG1_n	"K8", 9
-   #define BG1 		"K8", 8
-   #define BG2_n	"K8", 5
-   #define BG2		"K8", 6
+   #define BG1_n    "K8", 9
+   #define BG1      "K8", 8
+   #define BG2_n    "K8", 5
+   #define BG2      "K8", 6
 
-   #define FREE_GAME_TONE	"N7", 3
-   #define BONUS_COIN		"L9", 11
+   #define FREE_GAME_TONE   "N7", 3
+   #define BONUS_COIN       "L9", 11
 
    //#define Q        "E9", 6
-   #define LAT_Q	"E9", 6
-   #define Q_n 		"LATCH", 3
-   #define SBD_n 	"D2", 11
+   #define LAT_Q    "E9", 6
+   #define Q_n      "LATCH", 3
+   #define SBD_n    "D2", 11
 
-   #define PLAY_CP 	"D2", 8
-   #define PLGM2_n 	"F7", 7
-   #define VB_HIT_n 	"A5", 6
+   #define PLAY_CP  "D2", 8
+   #define PLGM2_n  "F7", 7
+   #define VB_HIT_n     "A5", 6
 
-   #define SERVE_n 	"SERVE", 1
-   #define SERVE_WAIT 	"A3", 9
+   #define SERVE_n  "SERVE", 1
+   #define SERVE_WAIT   "A3", 9
    #define SERVE_WAIT_n "A3", 8
 
-   #define BRICK_DISPLAY 	"E3", 1
-   #define BRICK_HIT 		"E6", 5
-   #define BRICK_HIT_n 		"E6", 6
+   #define BRICK_DISPLAY    "E3", 1
+   #define BRICK_HIT        "E6", 5
+   #define BRICK_HIT_n      "E6", 6
 
-   //#define EGL 		"A4", 3
-   #define EGL		"C37" , 2
-   #define EGL_n 	"C5", 2
+   //#define EGL        "A4", 3
+   #define EGL      "C37" , 2
+   #define EGL_n    "C5", 2
 
-   #define RAM_PLAYER1 	"E7", 4
-   #define A1 		"H6", 14
-   #define B1 		"H6", 13
-   #define C1 		"H6", 12
-   #define D1 		"H6", 11
-   #define E1 		"J6", 14
-   #define F1 		"J6", 13
-   #define G1 		"J6", 12
-   #define H01 		"J6", 11
-   #define I1 		"K6", 14
-   #define J1 		"K6", 13
-   #define K1 		"K6", 12
-   #define L1 		"K6", 11
-   #define A2 		"N6", 14
-   #define B2 		"N6", 13
-   #define C2 		"N6", 12
-   #define D2 		"N6", 11
-   #define E2 		"M6", 14
-   #define F2 		"M6", 13
-   #define G2 		"M6", 12
-   #define H02 		"M6", 11	//TODO: better name for these signals
-   #define I2 		"L6", 14
-   #define J2 		"L6", 13
-   #define K2 		"L6", 12
-   #define L2 		"L6", 11
+   #define RAM_PLAYER1  "E7", 4
+   #define A1       "H6", 14
+   #define B1       "H6", 13
+   #define C1       "H6", 12
+   #define D1       "H6", 11
+   #define E1       "J6", 14
+   #define F1       "J6", 13
+   #define G1       "J6", 12
+   #define H01      "J6", 11
+   #define I1       "K6", 14
+   #define J1       "K6", 13
+   #define K1       "K6", 12
+   #define L1       "K6", 11
+   #define A2       "N6", 14
+   #define B2       "N6", 13
+   #define C2       "N6", 12
+   #define D2       "N6", 11
+   #define E2       "M6", 14
+   #define F2       "M6", 13
+   #define G2       "M6", 12
+   #define H02      "M6", 11    //TODO: better name for these signals
+   #define I2       "L6", 14
+   #define J2       "L6", 13
+   #define K2       "L6", 12
+   #define L2       "L6", 11
 
-   #define CX0 		"C6", 11
-   #define CX1 		"C6", 6
-   #define X0 		"C5", 10
-   #define X1 		"B6", 3
-   #define X2 		"C6", 3
-   #define Y0 		"B6", 11
-   #define Y1 		"B6", 6
-   #define Y2 		"A6", 6
-   #define DN 		"C4", 3
-   #define PC 		"D4", 12
-   #define PD 		"D4", 11
-   #define SU_n 	"D5", 8
-   #define V_SLOW 	"C5", 8
+   #define CX0      "C6", 11
+   #define CX1      "C6", 6
+   #define X0       "C5", 10
+   #define X1       "B6", 3
+   #define X2       "C6", 3
+   #define Y0       "B6", 11
+   #define Y1       "B6", 6
+   #define Y2       "A6", 6
+   #define DN       "C4", 3
+   #define PC       "D4", 12
+   #define PD       "D4", 11
+   #define SU_n     "D5", 8
+   #define V_SLOW   "C5", 8
 
-   #define PLNR 	"E3", 4
-   #define SCI_n 	"H4", 6
-   #define SFL_n 	"E9", 12	//score flash
-   #define TOP_n 	"E9", 2
+   #define PLNR     "E3", 4
+   #define SCI_n    "H4", 6
+   #define SFL_n    "E9", 12    //score flash
+   #define TOP_n    "E9", 2
 
-   #define BP_HIT_n 	"A5", 8
-   #define BTB_HIT_n 	"C3", 3
+   #define BP_HIT_n     "A5", 8
+   #define BTB_HIT_n    "C3", 3
 
-   #define SET_BRICKS 	"D3", 9
+   #define SET_BRICKS   "D3", 9
    #define SET_BRICKS_n "D3", 8
 
-   #define BALL_A 	"B4", 13
-   #define BALL_B 	"B4", 12
-   #define BALL_C 	"B4", 11
+   #define BALL_A   "B4", 13
+   #define BALL_B   "B4", 12
+   #define BALL_C   "B4", 11
 
-   #define FPD1 	"F3", 10
-   #define FPD1_n 	"F3", 9
-   #define FPD2 	"F3", 6
-   #define FPD2_n 	"F3", 7
+   #define FPD1     "F3", 10
+   #define FPD1_n   "F3", 9
+   #define FPD2     "F3", 6
+   #define FPD2_n   "F3", 7
 
-   #define COUNT 	"N7", 11
-   #define COUNT_1 	"N7", 8
-   #define COUNT_2 	"N7", 6
+   #define COUNT    "N7", 11
+   #define COUNT_1  "N7", 8
+   #define COUNT_2  "N7", 6
 
-   #define ATTRACT 	"E6", 8
-   #define ATTRACT_n 	"E6", 9
+   #define ATTRACT  "E6", 8
+   #define ATTRACT_n    "E6", 9
 
-   #define BRICK_SOUND 	"B8", 14
-   #define P_HIT_SOUND 	"B7", 12
+   #define BRICK_SOUND  "B8", 14
+   #define P_HIT_SOUND  "B7", 12
    #define VB_HIT_SOUND "B7", 11
 
-   #define LH_SIDE 	"J3", 13
-   #define RH_SIDE 	"H2", 3
-   #define TOP_BOUND 	"K4", 6
+   #define LH_SIDE  "J3", 13
+   #define RH_SIDE  "H2", 3
+   #define TOP_BOUND    "K4", 6
 
 //   CONNECTION(CREDIT_1_OR_2, "CREDIT_LIGHT1", 1)
 //   CONNECTION(CREDIT2, "CREDIT_LIGHT2", 1)
@@ -1065,7 +1065,7 @@ CIRCUIT_LAYOUT( breakout )
 
    //COIN2 circuit
    //CONNECTION("COIN2", 1, "F9", 1)
-   CONNECTION(GND, "F9", 1)		//TODO: coin2 not implemented
+   CONNECTION(GND, "F9", 1)     //TODO: coin2 not implemented
 
    CONNECTION(CSW2, "F9", 3)
    CONNECTION(CSW2, "H9", 10)
@@ -1132,10 +1132,10 @@ CIRCUIT_LAYOUT( breakout )
    //TODO: hows this whole latch stuff work? what about Q_n going to COIN1_n and COIN2_n
    CONNECTION(CREDIT_1_OR_2_n, "D8", 13)
    CONNECTION(EGL, "D8", 12)
-   CONNECTION("LATCH", 1, "D8", 11)		//set
-   CONNECTION("LATCH", 2, COIN1_n)		//reset
-   //CONNECTION("LATCH", 3, COIN2_n)		//set	//TODO: coin2 here
-   CONNECTION( "LATCH", 3, "E9", 5)		//output
+   CONNECTION("LATCH", 1, "D8", 11)     //set
+   CONNECTION("LATCH", 2, COIN1_n)      //reset
+   //CONNECTION("LATCH", 3, COIN2_n)        //set   //TODO: coin2 here
+   CONNECTION( "LATCH", 3, "E9", 5)     //output
 
 
    CONNECTION(LAT_Q, "D6", 1)
@@ -1441,21 +1441,21 @@ CIRCUIT_LAYOUT( breakout )
 
 
 #ifdef DEBUG
-    // RAM access
-    /*CONNECTION("LOG1", 3, H4)		//A
-    CONNECTION("LOG1", 4, H8)		//B
-    CONNECTION("LOG1", 5, H16)	//C
-    CONNECTION("LOG1", 6, V32)		//D
-    CONNECTION("LOG1", 7, V64)		//E
-    CONNECTION("LOG1", 8, V128)	//F
-    CONNECTION("LOG1", 9, V16)	//G
-    CONNECTION("LOG1", 10, RAM_PLAYER1)		//H
-    CONNECTION("LOG1", 11, H32)		//I
-    CONNECTION("LOG1", 12, H128)		//J
-    CONNECTION("LOG1", 13, "H4", 8)	//K
-    CONNECTION("LOG1", 14, "E1", 4)	//L
-    CONNECTION("LOG1", 15, "F2", 12)	//M
-    CONNECTION("LOG1", 16, "L3", 6)*/	//N
+	// RAM access
+	/*CONNECTION("LOG1", 3, H4)     //A
+	CONNECTION("LOG1", 4, H8)       //B
+	CONNECTION("LOG1", 5, H16)  //C
+	CONNECTION("LOG1", 6, V32)      //D
+	CONNECTION("LOG1", 7, V64)      //E
+	CONNECTION("LOG1", 8, V128) //F
+	CONNECTION("LOG1", 9, V16)  //G
+	CONNECTION("LOG1", 10, RAM_PLAYER1)     //H
+	CONNECTION("LOG1", 11, H32)     //I
+	CONNECTION("LOG1", 12, H128)        //J
+	CONNECTION("LOG1", 13, "H4", 8) //K
+	CONNECTION("LOG1", 14, "E1", 4) //L
+	CONNECTION("LOG1", 15, "F2", 12)    //M
+	CONNECTION("LOG1", 16, "L3", 6)*/   //N
 #endif
 
 CIRCUIT_LAYOUT_END

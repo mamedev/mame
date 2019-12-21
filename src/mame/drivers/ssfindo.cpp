@@ -158,7 +158,7 @@ protected:
 	required_device<arm7500fe_iomd_device> m_iomd;
 	optional_device<i2cmem_device> m_i2cmem;
 	required_region_ptr<uint16_t> m_flashrom;
-	
+
 	void init_common();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -194,7 +194,7 @@ private:
 
 	void ppcar_map(address_map &map);
 	void ssfindo_map(address_map &map);
-	
+
 	DECLARE_READ8_MEMBER(iolines_r);
 	DECLARE_WRITE8_MEMBER(iolines_w);
 	bool m_flash_bank_select;
@@ -301,7 +301,7 @@ READ32_MEMBER(ssfindo_state::io_r)
 	{
 		case 0:
 			//bit 0 of IOLINES  = flash select ( 5/6 or 3/2 )
-			if (m_flash_bank_select) 
+			if (m_flash_bank_select)
 				adr+=0x400000;
 			break;
 
@@ -565,7 +565,7 @@ void ssfindo_state::ssfindo(machine_config &config)
 	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(m_iomd, FUNC(arm_iomd_device::vblank_irq));
 	m_vidc->sound_drq().set(m_iomd, FUNC(arm_iomd_device::sound_drq));
-	
+
 	ARM7500FE_IOMD(config, m_iomd, 54000000);
 	m_iomd->set_host_cpu_tag(m_maincpu);
 	m_iomd->set_vidc_tag(m_vidc);
@@ -589,7 +589,7 @@ void tetfight_state::tetfight(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tetfight_state::tetfight_map);
 
 	I2C_24C02(config, m_i2cmem);
-	
+
 	m_iomd->iocr_read_od<0>().set(FUNC(tetfight_state::iocr_od0_r));
 	m_iomd->iocr_read_od<1>().set(FUNC(tetfight_state::iocr_od1_r));
 	m_iomd->iocr_write_od<0>().set(FUNC(tetfight_state::iocr_od0_w));

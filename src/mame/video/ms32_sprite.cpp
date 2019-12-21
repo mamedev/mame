@@ -3,13 +3,13 @@
 /*
     Jaleco Megasystem 32 sprite hardware
 
-	TODO:
-		verify hardware configuration
+    TODO:
+        verify hardware configuration
 
     used by:
     ms32.cpp
-	bnstars.cpp (Dual screen configuration)
-	tetrisp2.cpp (Slightly different - no zoom, etc)
+    bnstars.cpp (Dual screen configuration)
+    tetrisp2.cpp (Slightly different - no zoom, etc)
 
     Sprite format (16 byte per each sprite):
     Offset Bits              Description
