@@ -1717,8 +1717,8 @@ GAME( 1983, hyprolym,   trackfld, trackfld,  trackfld, trackfld_state, init_trac
 GAME( 1983, hyprolymb,  trackfld, hyprolyb,  trackfld, trackfld_state, init_trackfld,   ROT0,  "bootleg",                              "Hyper Olympic (bootleg, set 1)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hyprolymba, trackfld, hyprolyb,  trackfld, trackfld_state, init_trackfld,   ROT0,  "bootleg",                              "Hyper Olympic (bootleg, set 2)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hipoly,     trackfld, hyprolyb,  trackfld, trackfld_state, init_trackfld,   ROT0,  "bootleg",                              "Hipoly (bootleg of Hyper Olympic)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, atlantol,   trackfld, atlantol,  atlantol, trackfld_state, init_atlantol,   ROT0,  "bootleg",                              "Atlant Olimpic",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1982, trackfldnz, trackfld, trackfld,  trackfld, trackfld_state, init_trackfldnz, ROT0,  "bootleg? (Goldberg Enterprizes Inc.)", "Track & Field (NZ bootleg?)",          MACHINE_SUPPORTS_SAVE) // bootleg of the Centuri version
+GAME( 1996, atlantol,   trackfld, atlantol,  atlantol, trackfld_state, init_atlantol,   ROT0,  "bootleg",                              "Atlant Olimpic (Italian bootleg)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1982, trackfldnz, trackfld, trackfld,  trackfld, trackfld_state, init_trackfldnz, ROT0,  "bootleg? (Goldberg Enterprizes Inc.)", "Track & Field (NZ bootleg?)",          MACHINE_SUPPORTS_SAVE ) // bootleg of the Centuri version
 
 GAME( 1988, mastkin,    0,        mastkin,   mastkin,  trackfld_state, init_mastkin,    ROT0,  "Du Tech",                              "The Masters of Kin", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 
