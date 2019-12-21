@@ -210,7 +210,7 @@ void zn2_state::zn2(machine_config &config)
 	sio0.txd_handler().set(m_cat702[0], FUNC(cat702_device::write_datain));
 
 	CAT702(config, m_cat702[0], 0);
-	m_cat702[0]->dataout_handler().set(FUNC(zn_state::cat702_dataout<0>));
+	m_cat702[0]->dataout_handler().set(FUNC(zn2_state::cat702_dataout<0>));
 
 	ZNMCU(config, m_znmcu, 0);
 	m_znmcu->dataout_handler().set(FUNC(zn2_state::znmcu_dataout));
