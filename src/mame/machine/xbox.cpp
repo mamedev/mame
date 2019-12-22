@@ -36,7 +36,7 @@ bool xbox_base_state::find_bios_hash(int bios, uint32_t &crc32)
 	{
 		if (ROMENTRY_ISFILE(re))
 		{
-			if (ROM_GETBIOSFLAGS(re) == (bios + 1))
+			if (ROM_GETBIOSFLAGS(re) == (uint32_t)(bios + 1))
 			{
 				const std::string &h = re.hashdata();
 				util::hash_collection hc(h.c_str());

@@ -23,7 +23,10 @@ public:
 	auto ut_flag_callback() { return m_ut_flag_callback.bind(); }
 	auto ruf_callback() { return m_ruf_callback.bind(); }
 	auto key_up_callback() { return m_key_up_callback.bind(); }
+	auto kclk_callback() { return m_kclk_callback.bind(); }
+	auto frq_callback() { return m_frq_callback.bind(); }
 	auto bell_callback() { return m_bell_callback.bind(); }
+	auto cen_callback() { return m_cen_callback.bind(); }
 
 protected:
 	// construction/destruction
@@ -51,8 +54,9 @@ protected:
 	void execute_tf(u8 inst);
 	virtual void execute_tg(u8 inst) = 0;
 	void execute_tw(u8 inst);
-	void execute_th(u8 inst);
+	virtual void execute_th(u8 inst);
 	void execute_tj(u8 dest);
+	void clock_video_counters();
 
 	// address spaces
 	address_space_config m_rom_config;
@@ -67,7 +71,10 @@ protected:
 	devcb_read_line m_ut_flag_callback;
 	devcb_write_line m_ruf_callback;
 	devcb_read8 m_key_up_callback;
+	devcb_read_line m_kclk_callback;
+	devcb_read_line m_frq_callback;
 	devcb_write_line m_bell_callback;
+	devcb_write_line m_cen_callback;
 
 	// register dimensions
 	const u8 m_bbits;
@@ -84,6 +91,7 @@ protected:
 	u8 m_y;
 	bool m_x8;
 	bool m_cursor_ff;
+	bool m_cursor_active;
 	bool m_video_process;
 	u8 m_ram_do;
 
@@ -94,8 +102,12 @@ protected:
 	bool m_m2u_ff;
 	bool m_bell_ff;
 	bool m_load_pc;
-	bool m_qa_e23;
 	s32 m_icount;
+
+	// video timing
+	u8 m_horiz_count;
+	u16 m_vert_count;
+	bool m_top_of_screen;
 };
 
 class vt50_cpu_device : public vt5x_cpu_device
@@ -117,11 +129,20 @@ public:
 	// device type constructor
 	vt52_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	auto graphic_callback() { return m_graphic_callback.bind(); }
+
 protected:
+	// device-level overrides
+	virtual void device_resolve_objects() override;
+
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual void execute_tg(u8 inst) override;
+	virtual void execute_th(u8 inst) override;
+
+private:
+	devcb_write8 m_graphic_callback;
 };
 
 DECLARE_DEVICE_TYPE(VT50_CPU, vt50_cpu_device)

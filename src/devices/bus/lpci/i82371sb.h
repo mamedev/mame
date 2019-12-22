@@ -61,6 +61,7 @@ private:
 	int m_apmc;
 	int m_apms;
 	uint32_t m_base;
+	required_device<cpu_device> m_maincpu;
 };
 
 // device type definition

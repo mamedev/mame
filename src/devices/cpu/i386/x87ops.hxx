@@ -4708,20 +4708,59 @@ void i386_device::x87_fldenv(uint8_t modrm)
 	if (x87_mf_fault())
 		return;
 	uint32_t ea = Getx87EA(modrm, 0);
+	uint32_t temp;
 
-	if (m_operand_size)
+	switch(((PROTECTED_MODE && !V8086_MODE) ? 1 : 0) | (m_operand_size & 1)<<1)
 	{
-		// 32-bit real/protected mode
-		x87_write_cw(READ16(ea));
-		m_x87_sw = READ16(ea + 4);
-		m_x87_tw = READ16(ea + 8);
-	}
-	else
-	{
-		// 16-bit real/protected mode
-		x87_write_cw(READ16(ea));
-		m_x87_sw = READ16(ea + 2);
-		m_x87_tw = READ16(ea + 4);
+		case 0: // 16-bit real mode
+			x87_write_cw(READ16(ea));
+			m_x87_sw = READ16(ea + 2);
+			m_x87_tw = READ16(ea + 4);
+			m_x87_inst_ptr = READ16(ea + 6);
+			temp = READ16(ea + 8);
+			m_x87_opcode = temp & 0x7ff;
+			m_x87_inst_ptr |= ((temp & 0xf000) << 4);
+			m_x87_data_ptr = READ16(ea + 10) | ((READ16(ea + 12) & 0xf000) << 4);
+			m_x87_cs = 0;
+			m_x87_ds = 0;
+			ea += 14;
+			break;
+		case 1: // 16-bit protected mode
+			x87_write_cw(READ16(ea));
+			m_x87_sw = READ16(ea + 2);
+			m_x87_tw = READ16(ea + 4);
+			m_x87_inst_ptr = READ16(ea + 6);
+			m_x87_opcode = 0;
+			m_x87_cs = READ16(ea + 8);
+			m_x87_data_ptr = READ16(ea + 10);
+			m_x87_ds = READ16(ea + 12);
+			ea += 14;
+			break;
+		case 2: // 32-bit real mode
+			x87_write_cw(READ16(ea));
+			m_x87_sw = READ16(ea + 4);
+			m_x87_tw = READ16(ea + 8);
+			m_x87_inst_ptr = READ16(ea + 12);
+			temp = READ32(ea + 16);
+			m_x87_opcode = temp & 0x7ff;
+			m_x87_inst_ptr |= ((temp & 0xffff000) << 4);
+			m_x87_data_ptr = READ16(ea + 20) | ((READ32(ea + 24) & 0xffff000) << 4);
+			m_x87_cs = 0;
+			m_x87_ds = 0;
+			ea += 28;
+			break;
+		case 3: // 32-bit protected mode
+			x87_write_cw(READ16(ea));
+			m_x87_sw = READ16(ea + 4);
+			m_x87_tw = READ16(ea + 8);
+			m_x87_inst_ptr = READ32(ea + 12);
+			temp = READ32(ea + 16);
+			m_x87_opcode = (temp >> 16) & 0x7ff;
+			m_x87_cs = temp & 0xffff;
+			m_x87_data_ptr = READ32(ea + 20);
+			m_x87_ds = READ16(ea + 24);
+			ea += 28;
+			break;
 	}
 
 	x87_check_exceptions();
@@ -4836,7 +4875,7 @@ void i386_device::x87_frstor(uint8_t modrm)
 	if (x87_mf_fault())
 		return;
 	uint32_t ea = GetEA(modrm, 0);
-	uint32 temp;
+	uint32_t temp;
 
 	switch(((PROTECTED_MODE && !V8086_MODE) ? 1 : 0) | (m_operand_size & 1)<<1)
 	{
@@ -5225,6 +5264,8 @@ void i386_device::build_x87_opcode_table_db()
 				case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf: ptr = &i386_device::x87_fcmovne_sti;  break;
 				case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7: ptr = &i386_device::x87_fcmovnbe_sti; break;
 				case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf: ptr = &i386_device::x87_fcmovnu_sti;  break;
+ 				case 0xe0: ptr = &i386_device::x87_fnop;          break; /* FENI */
+				case 0xe1: ptr = &i386_device::x87_fnop;          break; /* FDISI */
 				case 0xe2: ptr = &i386_device::x87_fclex;         break;
 				case 0xe3: ptr = &i386_device::x87_finit;         break;
 				case 0xe4: ptr = &i386_device::x87_fnop;          break; /* FSETPM */

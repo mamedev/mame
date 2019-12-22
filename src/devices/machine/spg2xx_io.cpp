@@ -57,6 +57,7 @@ spg2xx_io_device::spg2xx_io_device(const machine_config &mconfig, device_type ty
 	, m_external_irq_cb(*this)
 	, m_ffreq_tmr1_irq_cb(*this)
 	, m_ffreq_tmr2_irq_cb(*this)
+	, m_fiq_vector_w(*this)
 {
 }
 
@@ -92,6 +93,8 @@ void spg2xx_io_device::device_start()
 	m_external_irq_cb.resolve();
 	m_ffreq_tmr1_irq_cb.resolve();
 	m_ffreq_tmr2_irq_cb.resolve();
+
+	m_fiq_vector_w.resolve();
 
 	m_tmb1 = timer_alloc(TIMER_TMB1);
 	m_tmb2 = timer_alloc(TIMER_TMB2);
@@ -131,6 +134,8 @@ void spg2xx_io_device::device_start()
 
 	save_item(NAME(m_uart_baud_rate));
 
+	save_item(NAME(m_sio_bits_remaining));
+	save_item(NAME(m_sio_writing));
 }
 
 void spg2xx_io_device::device_reset()
@@ -160,10 +165,12 @@ void spg2xx_io_device::device_reset()
 
 	m_rng_timer->adjust(attotime::from_hz(1234), 0, attotime::from_hz(1234)); // timer value is arbitrary, maybe should match system clock, but that would result in heavy switching
 
-
 	m_2khz_divider = 0;
 	m_1khz_divider = 0;
 	m_4hz_divider = 0;
+
+	m_sio_bits_remaining = 0;
+	m_sio_writing = false;
 }
 
 /*************************
@@ -321,7 +328,7 @@ READ16_MEMBER(spg2xx_io_device::io_extended_r)
 			LOGMASKED(LOG_UART, "UART Rx data is available, clearing bits\n");
 			if (m_uart_rx_fifo_count)
 			{
-				LOGMASKED(LOG_UART, "Remaining count %d, value %02x\n", m_uart_rx_fifo_count, m_uart_rx_fifo[m_uart_rx_fifo_start]);
+				LOGMASKED(LOG_UART, "%s: Remaining count %d, value %02x\n", machine().describe_context(), m_uart_rx_fifo_count, m_uart_rx_fifo[m_uart_rx_fifo_start]);
 				m_io_regs[0x36] = m_uart_rx_fifo[m_uart_rx_fifo_start];
 				val = m_io_regs[0x36];
 				m_uart_rx_fifo_start = (m_uart_rx_fifo_start + 1) % ARRAY_LENGTH(m_uart_rx_fifo);
@@ -357,8 +364,25 @@ READ16_MEMBER(spg2xx_io_device::io_extended_r)
 		LOGMASKED(LOG_UART, "%s: io_r: UART Rx FIFO Control = %04x\n", machine().describe_context(), val);
 		break;
 
-	case 0x51: // unknown, polled by ClickStart cartridges ( clikstrt )
-		return 0x8000;
+	case 0x50: // SIO Setup
+		LOGMASKED(LOG_SIO, "%s: io_r: SIO Setup = %04x\n", machine().describe_context(), val);
+		break;
+
+	case 0x51: // SIO Status
+		LOGMASKED(LOG_SIO, "%s: io_r: SIO Status = %04x\n", machine().describe_context(), val);
+		break;
+
+	case 0x54: // SIO Data
+		LOGMASKED(LOG_SIO, "%s: io_r: SIO Data = %04x\n", machine().describe_context(), val);
+		if ((m_io_regs[0x51] & 0x8000) && !m_sio_writing)
+		{
+			m_sio_bits_remaining--;
+			if (m_sio_bits_remaining == 0)
+			{
+				m_io_regs[0x51] &= ~0x8000;
+			}
+		}
+		break;
 
 	case 0x58: // I2C Command ( tvgogo )
 		LOGMASKED(LOG_I2C, "%s: io_r: I2C Command = %04x\n", machine().describe_context(), val);
@@ -607,6 +631,9 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 
 	case 0x11: // Timebase Clear
 		LOGMASKED(LOG_TIMERS, "%s: io_w: Timebase Clear = %04x\n", machine().describe_context(), data);
+		m_2khz_divider = 0;
+		m_1khz_divider = 0;
+		m_4hz_divider = 0;
 		break;
 
 	case 0x12: // Timer A Data
@@ -748,7 +775,7 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 		LOGMASKED(LOG_IRQS, "%s: io_w: IRQ Enable = %04x\n", machine().describe_context(), data);
 		const uint16_t old = IO_IRQ_ENABLE;
 		m_io_regs[offset] = data;
-		const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
+		const uint16_t changed = (IO_IRQ_STATUS & old) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
 		if (changed)
 			check_irqs(changed);
 		break;
@@ -878,6 +905,7 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 		};
 		LOGMASKED(LOG_FIQ, "%s: io_w: FIQ Source Select (not yet implemented) = %04x, %s\n", machine().describe_context(), data, s_fiq_select[data & 7]);
 		m_io_regs[offset] = data;
+		m_fiq_vector_w(data & 7);
 		break;
 	}
 
@@ -1002,19 +1030,37 @@ WRITE16_MEMBER(spg2xx_io_device::io_extended_w)
 			, BIT(data, 11), BIT(data, 10), BIT(data, 9), BIT(data, 8), BIT(data, 7) ? 16 : 8, BIT(data, 6));
 		LOGMASKED(LOG_SIO, "                                         (Mode:%s, RWProtocol:%d, Rate:sysclk%s, AddrMode:%s)\n"
 			, BIT(data, 5), BIT(data, 4), s_baud_rate[(data >> 2) & 3], s_addr_mode[data & 3]);
+		if (BIT(data, 10))
+		{
+			m_io_regs[0x51] |= 0x8000;
+			m_sio_bits_remaining = BIT(data, 7) ? 16 : 8;
+			m_sio_writing = BIT(data, 5);
+		}
+		else
+		{
+			m_io_regs[0x51] &= ~0x8000;
+		}
 		break;
 	}
 
 	case 0x52: // SIO Start Address (low)
-		LOGMASKED(LOG_SIO, "%s: io_w: SIO Stat Address (low) (not implemented) = %04x\n", machine().describe_context(), data);
+		LOGMASKED(LOG_SIO, "%s: io_w: SIO Start Address (low) (not implemented) = %04x\n", machine().describe_context(), data);
 		break;
 
 	case 0x53: // SIO Start Address (hi)
-		LOGMASKED(LOG_SIO, "%s: io_w: SIO Stat Address (hi) (not implemented) = %04x\n", machine().describe_context(), data);
+		LOGMASKED(LOG_SIO, "%s: io_w: SIO Start Address (hi) (not implemented) = %04x\n", machine().describe_context(), data);
 		break;
 
 	case 0x54: // SIO Data
 		LOGMASKED(LOG_SIO, "%s: io_w: SIO Data (not implemented) = %04x\n", machine().describe_context(), data);
+		if ((m_io_regs[0x51] & 0x8000) && m_sio_writing)
+		{
+			m_sio_bits_remaining--;
+			if (m_sio_bits_remaining == 0)
+			{
+				m_io_regs[0x51] &= ~0x8000;
+			}
+		}
 		break;
 
 	case 0x55: // SIO Automatic Transmit Count

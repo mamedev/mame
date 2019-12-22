@@ -18398,6 +18398,9 @@ koikoi                          // (c) 1983 Kiwako
 @source:konamigq.cpp
 cryptklr                        // Crypt Killer (GQ420 UAA)
 
+@source:konamigs.cpp
+musclhit                        // 2000.11 Muscle Ranking Kinniku Banzuke Spray Hitter
+
 @source:konamigv.cpp
 btchamp                         // GV053, UAA01
 hyperath                        // GV021, Japan 1.00

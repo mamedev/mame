@@ -42,7 +42,7 @@ const char *const vt50_disassembler::s_opcodes_g[8] = {
 };
 
 const char *const vt52_disassembler::s_opcodes_g[8] = {
-	"M2A", "A2M", "M2U", "B2M", "M2X", "U2M", "M2B", "SPARE"
+	"M2A", "A2M", "M2U", "B2M", "M2X", "U2M", "M2B", "GRAPHIC"
 };
 
 const char *const vt5x_disassembler::s_jumps_h[2][8] = {

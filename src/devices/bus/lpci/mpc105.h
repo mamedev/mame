@@ -47,6 +47,7 @@ private:
 	uint32_t m_bank_registers[8];
 
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 };
 
 

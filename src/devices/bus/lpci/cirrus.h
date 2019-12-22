@@ -32,6 +32,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	required_device<vga_device> m_vga;
 };
 
 

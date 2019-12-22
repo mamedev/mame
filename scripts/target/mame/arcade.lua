@@ -2417,6 +2417,7 @@ files {
 	MAME_DIR .. "src/mame/video/jailbrek.cpp",
 	MAME_DIR .. "src/mame/drivers/junofrst.cpp",
 	MAME_DIR .. "src/mame/drivers/konamigq.cpp",
+	MAME_DIR .. "src/mame/drivers/konamigs.cpp",
 	MAME_DIR .. "src/mame/drivers/konamigv.cpp",
 	MAME_DIR .. "src/mame/drivers/konamigx.cpp",
 	MAME_DIR .. "src/mame/includes/konamigx.h",

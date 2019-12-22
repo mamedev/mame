@@ -54,12 +54,15 @@ private:
 
 	struct saa1099_noise
 	{
-		saa1099_noise() { }
+		saa1099_noise() { (void)pad; }
 
 		/* vars to simulate the noise generator output */
 		double counter = 0.0;
 		double freq = 0.0;
 		u32 level = 0xffffffffU;    // noise polynomial shifter
+
+	private:
+		u32 pad; // pad out structure to multiple of sizeof(double)
 	};
 
 	void envelope_w(int ch);

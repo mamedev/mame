@@ -79,7 +79,7 @@ public:
 	DECLARE_WRITE64_MEMBER( write_64be );
 
 	void set_busnum(int busnum) { m_busnum = busnum; }
-	void set_father(const char *father) { m_father = father; }
+	void set_father(const char* father) { m_father = father; m_pcifather.set_tag(m_father); }
 	void set_device(int num, const char *tag) {
 		m_devtag[num] = tag; }
 
@@ -109,6 +109,8 @@ private:
 	int8_t                m_devicenum; // device number we are addressing
 	int8_t                m_busnumber; // pci bus number we are addressing
 	pci_bus_device *    m_busnumaddr; // pci bus we are addressing
+
+	optional_device<pci_bus_device> m_pcifather;
 };
 
 // device type definition
