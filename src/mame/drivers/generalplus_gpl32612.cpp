@@ -7,6 +7,12 @@
     unlike earlier SunPlus / GeneralPlus based SoCs this one seems to be
     ARM based
 
+
+	NAND types
+	
+	Star Wars Blaster MX30LF1G08AA (2048+64) x 64 x 512
+	TMNT Hero Portal MX30LF1G08AA (2048+64) x 64 x 512
+
 *****************************************************************************/
 
 

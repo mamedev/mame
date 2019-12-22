@@ -28,6 +28,17 @@
         smartfp: hold button Circle, Star and Home on startup for Test Menu
 
     these are both unsp 2.0 type, as they use the extended ocpodes
+
+
+	NAND types:
+
+	Toy Story Mania H27U518S2C dumped as HY27US08121A (512+16) x 32 x 4096
+	Beam Box GPR27P512A dumped as HY27US08121A (512+16) x 32 x 4096
+	Golden Tee GPR27P512A dumped as HY27US08121A (512+16) x 32 x 4096
+	Cars 2 GPR27P512A dumped as HY27US08121A (512+16) x 32 x 4096
+
+	V.Baby HY27UF081G2A (2048+64) x 64 x 1024
+
 */
 
 #include "emu.h"
