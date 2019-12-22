@@ -92,6 +92,7 @@ void spg2xx_device::device_start()
 void spg2xx_device::device_reset()
 {
 	unsp_device::device_reset();
+	m_fiq_vector = 0xff;
 }
 
 WRITE8_MEMBER(spg2xx_device::fiq_vector_w)
