@@ -11934,6 +11934,10 @@ digijet                         //
 @source:dim68k.cpp
 dim68k                          //
 
+@source:dinoking.cpp
+dkbattle                        //
+dkkids                          //
+
 @source:discoboy.cpp
 discoboy                        // (c) 1993 Soft Art Co.
 discoboyp                       // (c) 1993 Soft Art Co. (Promat license?)

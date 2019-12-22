@@ -3881,6 +3881,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/darius.cpp",
 	MAME_DIR .. "src/mame/includes/darius.h",
 	MAME_DIR .. "src/mame/video/darius.cpp",
+	MAME_DIR .. "src/mame/drivers/dinoking.cpp",
 	MAME_DIR .. "src/mame/drivers/exzisus.cpp",
 	MAME_DIR .. "src/mame/includes/exzisus.h",
 	MAME_DIR .. "src/mame/video/exzisus.cpp",
