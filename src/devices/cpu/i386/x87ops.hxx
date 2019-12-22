@@ -5225,6 +5225,8 @@ void i386_device::build_x87_opcode_table_db()
 				case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf: ptr = &i386_device::x87_fcmovne_sti;  break;
 				case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7: ptr = &i386_device::x87_fcmovnbe_sti; break;
 				case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf: ptr = &i386_device::x87_fcmovnu_sti;  break;
+				case 0xe0: ptr = &i386_device::x87_fnop;          break; /* FENI */
+				case 0xe1: ptr = &i386_device::x87_fnop;          break; /* FDISI */
 				case 0xe2: ptr = &i386_device::x87_fclex;         break;
 				case 0xe3: ptr = &i386_device::x87_finit;         break;
 				case 0xe4: ptr = &i386_device::x87_fnop;          break; /* FSETPM */
