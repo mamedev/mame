@@ -27,6 +27,8 @@ public:
 	auto frq_callback() { return m_frq_callback.bind(); }
 	auto bell_callback() { return m_bell_callback.bind(); }
 	auto cen_callback() { return m_cen_callback.bind(); }
+	auto ccf_callback() { return m_ccf_callback.bind(); }
+	auto csf_callback() { return m_csf_callback.bind(); }
 
 protected:
 	// construction/destruction
@@ -75,6 +77,8 @@ protected:
 	devcb_read_line m_frq_callback;
 	devcb_write_line m_bell_callback;
 	devcb_write_line m_cen_callback;
+	devcb_read_line m_csf_callback;
+	devcb_read_line m_ccf_callback;
 
 	// register dimensions
 	const u8 m_bbits;

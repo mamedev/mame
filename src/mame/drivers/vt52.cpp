@@ -186,7 +186,7 @@ static INPUT_PORTS_START(vt52)
 	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CHAR(UCHAR_SHIFT_1) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) // S49(L)/S60(R)
 
 	PORT_START("KEYCLICK")
-	PORT_DIPNAME(1, 1, "Key Click") PORT_DIPLOCATION("S4:1") // actually two switches, but with only one effect
+	PORT_DIPNAME(1, 1, DEF_STR(Unused)) PORT_DIPLOCATION("S4:1") // not tested by VT52, and possibly not even populated
 	PORT_DIPSETTING(0, DEF_STR(Off))
 	PORT_DIPSETTING(1, DEF_STR(On))
 
@@ -215,10 +215,11 @@ void vt52_state::vt52(machine_config &mconfig)
 
 	screen_device &screen(SCREEN(mconfig, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(13.824_MHz_XTAL, 900, 0, 720, 256, 0, 240);
+	//screen.set_raw(13.824_MHz_XTAL, 900, 0, 720, 307.2, 0, 264); // not a whole number of scans
 	screen.set_screen_update(FUNC(vt52_state::screen_update));
 
 	SPEAKER(mconfig, "mono").front_center();
-	SPEAKER_SOUND(mconfig, "bell").add_route(ALL_OUTPUTS, "mono", 0.05);
+	SPEAKER_SOUND(mconfig, "bell").add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 ROM_START(vt52)

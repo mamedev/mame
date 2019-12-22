@@ -30,6 +30,8 @@ vt5x_cpu_device::vt5x_cpu_device(const machine_config &mconfig, device_type type
 	, m_frq_callback(*this)
 	, m_bell_callback(*this)
 	, m_cen_callback(*this)
+	, m_csf_callback(*this)
+	, m_ccf_callback(*this)
 	, m_bbits(bbits)
 	, m_ybits(ybits)
 	, m_pc(0)
@@ -102,6 +104,8 @@ void vt5x_cpu_device::device_resolve_objects()
 	m_frq_callback.resolve_safe(1);
 	m_bell_callback.resolve_safe();
 	m_cen_callback.resolve_safe();
+	m_csf_callback.resolve_safe(1);
+	m_ccf_callback.resolve_safe(1);
 }
 
 void vt52_cpu_device::device_resolve_objects()
@@ -460,12 +464,12 @@ void vt5x_cpu_device::execute_th(u8 inst)
 		switch (inst & 0160)
 		{
 		case 0000:
-			// M0: PSCJ (TODO: printer flag)
+			// M0: PSCJ
 			// M1: URJ
 			if (m_mode_ff)
 				m_load_pc = m_ur_flag_callback();
 			else
-				m_load_pc = true;
+				m_load_pc = m_csf_callback();
 			break;
 
 		case 0020:
@@ -496,12 +500,12 @@ void vt5x_cpu_device::execute_th(u8 inst)
 			break;
 
 		case 0100:
-			// M0: PRQJ (TODO: printer flag)
+			// M0: PRQJ
 			// M1: AEM2J
 			if (m_mode_ff)
 				m_load_pc = m_ac == m_ram_do;
 			else
-				m_load_pc = true;
+				m_load_pc = m_ccf_callback();
 			break;
 
 		case 0120:
