@@ -84,7 +84,7 @@ protected:
 
 	uint16_t m_7807;
 
-	uint16_t m_7810;
+	uint16_t m_membankswitch_7810;
 
 	uint16_t m_7816;
 	uint16_t m_7817;
@@ -92,11 +92,7 @@ protected:
 
 	uint16_t m_7819;
 
-	uint16_t m_7820;
-	uint16_t m_7821;
-	uint16_t m_7822;
-	uint16_t m_7823;
-	uint16_t m_7824;
+	uint16_t m_782x[5];
 
 	uint16_t m_782d;
 
@@ -169,8 +165,8 @@ private:
 
 	DECLARE_WRITE16_MEMBER(unkarea_7807_w);
 
-	DECLARE_READ16_MEMBER(unkarea_7810_r);
-	DECLARE_WRITE16_MEMBER(unkarea_7810_w);
+	DECLARE_READ16_MEMBER(membankswitch_7810_r);
+	DECLARE_WRITE16_MEMBER(membankswitch_7810_w);
 
 	DECLARE_WRITE16_MEMBER(unkarea_7816_w);
 	DECLARE_WRITE16_MEMBER(unkarea_7817_w);
@@ -178,11 +174,7 @@ private:
 	DECLARE_READ16_MEMBER(unkarea_7819_r);
 	DECLARE_WRITE16_MEMBER(unkarea_7819_w);
 
-	DECLARE_WRITE16_MEMBER(unkarea_7820_w);
-	DECLARE_WRITE16_MEMBER(unkarea_7821_w);
-	DECLARE_WRITE16_MEMBER(unkarea_7822_w);
-	DECLARE_WRITE16_MEMBER(unkarea_7823_w);
-	DECLARE_WRITE16_MEMBER(unkarea_7824_w);
+	DECLARE_WRITE16_MEMBER(chipselect_csx_memory_device_control_w);
 
 	DECLARE_WRITE16_MEMBER(unkarea_7835_w);
 

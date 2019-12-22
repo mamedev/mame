@@ -185,38 +185,34 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7803_w) { LOGMASKED(LOG_GCM39
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7807_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7807_w %04x\n", machine().describe_context(), data); m_7807 = data; }
 
 
-// this gets stored / modified / restored before certain memory accesses (in practical terms it just seems to flip from 0/1) maybe it changes the memory mapping (as 7820 seems to)
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7810_r)
+// this gets stored / modified / restored before certain memory accesses (
+// used extensively during SDRAM checks in jak_gtg and jak_car2
+
+READ16_MEMBER(sunplus_gcm394_base_device::membankswitch_7810_r)
 {
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7810_r\n", machine().describe_context());
-	return m_7810;
+//	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::membankswitch_7810_r\n", machine().describe_context());
+	return m_membankswitch_7810;
 }
 
-WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7810_w)
+WRITE16_MEMBER(sunplus_gcm394_base_device::membankswitch_7810_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7810_w %04x\n", machine().describe_context(), data);
-	m_7810 = data;
+//	if (m_membankswitch_7810 != data)
+	LOGMASKED(LOG_GCM394,"%s:sunplus_gcm394_base_device::membankswitch_7810_w %04x\n", machine().describe_context(), data);
+	m_membankswitch_7810 = data;
 }
 
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7816_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7816_w %04x\n", machine().describe_context(), data); m_7816 = data; }
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7817_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7817_w %04x\n", machine().describe_context(), data); m_7817 = data; }
 
-WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7820_w)
+WRITE16_MEMBER(sunplus_gcm394_base_device::chipselect_csx_memory_device_control_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7820_w (Rom Mapping control?) %04x\n", machine().describe_context(), data);
-	m_7820 = data;
-	m_mapping_write_cb(data);
-}
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::chipselect_csx_memory_device_control_w %04x (782x registers offset %d)\n", machine().describe_context(), data, offset);
+	m_782x[offset] = data;
 
-WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7821_w)
-{
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7821_w %04x\n", machine().describe_context(), data); m_7821 = data;
+	if (offset == 0)
+		m_mapping_write_cb(data);
 }
-// these seem to be related to the above but don't change after startup.  maybe it's how different devices see memory?
-WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7822_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7822_w %04x\n", machine().describe_context(), data); m_7822 = data; }
-WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7823_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7823_w %04x\n", machine().describe_context(), data); m_7823 = data; }
-WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7824_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7824_w %04x\n", machine().describe_context(), data); m_7824 = data; }
 
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7835_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7835_w %04x\n", machine().describe_context(), data); m_7835 = data; }
@@ -472,7 +468,7 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 
 	map(0x00780f, 0x00780f).r(FUNC(sunplus_gcm394_base_device::unkarea_780f_status_r));
 
-	map(0x007810, 0x007810).rw(FUNC(sunplus_gcm394_base_device::unkarea_7810_r), FUNC(sunplus_gcm394_base_device::unkarea_7810_w));  // 7810 Bank Switch Control Register  (P_BankSwitch_Ctrl) (maybe)
+	map(0x007810, 0x007810).rw(FUNC(sunplus_gcm394_base_device::membankswitch_7810_r), FUNC(sunplus_gcm394_base_device::membankswitch_7810_w));  // 7810 Bank Switch Control Register  (P_BankSwitch_Ctrl) (maybe)
 
 	map(0x007819, 0x007819).rw(FUNC(sunplus_gcm394_base_device::unkarea_7819_r), FUNC(sunplus_gcm394_base_device::unkarea_7819_w));
 
@@ -482,12 +478,12 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 	// ######################################################################################################################################################################################
 	// 782x region = memory config / control
 	// ######################################################################################################################################################################################
-																				 // wrlshunt                                                               | smartfp   
-	map(0x007820, 0x007820).w(FUNC(sunplus_gcm394_base_device::unkarea_7820_w)); // 7f8a (7f8a before DMA from ROM to RAM, 008a after DMA from ROM to RAM) | 3f04      7821 Chip Select (CS0) Memory Device Control (P_MC50_Ctrl)
-	map(0x007821, 0x007821).w(FUNC(sunplus_gcm394_base_device::unkarea_7821_w)); // 7f47                                                                   | 0044      7822 Chip Select (CS1) Memory Device Control (P_MC51_Ctrl)
-	map(0x007822, 0x007822).w(FUNC(sunplus_gcm394_base_device::unkarea_7822_w)); // 0047                                                                   | 1f44      7823 Chip Select (CS2) Memory Device Control (P_MC52_Ctrl)
-	map(0x007823, 0x007823).w(FUNC(sunplus_gcm394_base_device::unkarea_7823_w)); // 0047                                                                   | 0044      7824 Chip Select (CS3) Memory Device Control (P_MC53_Ctrl)
-	map(0x007824, 0x007824).w(FUNC(sunplus_gcm394_base_device::unkarea_7824_w)); // 0047                                                                   | 0044      7825 Chip Select (CS4) Memory Device Control (P_MC54_Ctrl)
+																			                             // wrlshunt                                                               | smartfp   
+	map(0x007820, 0x007824).w(FUNC(sunplus_gcm394_base_device::chipselect_csx_memory_device_control_w)); // 7f8a (7f8a before DMA from ROM to RAM, 008a after DMA from ROM to RAM) | 3f04      7820 Chip Select (CS0) Memory Device Control (P_MC50_Ctrl)
+	                                                                                                     // 7f47                                                                   | 0044      7821 Chip Select (CS1) Memory Device Control (P_MC51_Ctrl)
+	                                                                                                     // 0047                                                                   | 1f44      7822 Chip Select (CS2) Memory Device Control (P_MC52_Ctrl)
+                              	                                                                         // 0047                                                                   | 0044      7823 Chip Select (CS3) Memory Device Control (P_MC53_Ctrl)
+                                                                                                         // 0047                                                                   | 0044      7824 Chip Select (CS4) Memory Device Control (P_MC54_Ctrl)
 
 	map(0x00782d, 0x00782d).rw(FUNC(sunplus_gcm394_base_device::unkarea_782d_r), FUNC(sunplus_gcm394_base_device::unkarea_782d_w)); // on startup
 	// 782f
@@ -729,18 +725,18 @@ void sunplus_gcm394_base_device::device_reset()
 
 	m_7807 = 0x0000;
 
-	m_7810 = 0x0000;
+	m_membankswitch_7810 = 0x0000;
 
 	m_7816 = 0x0000;
 	m_7817 = 0x0000;
 
 	m_7819 = 0x0000;
 
-	m_7820 = 0x0000;
-	m_7821 = 0x0000;
-	m_7822 = 0x0000;
-	m_7823 = 0x0000;
-	m_7824 = 0x0000;
+	m_782x[0] = 0x0000;
+	m_782x[1] = 0x0000;
+	m_782x[2] = 0x0000;
+	m_782x[3] = 0x0000;
+	m_782x[4] = 0x0000;
 
 	m_7835 = 0x0000;
 
