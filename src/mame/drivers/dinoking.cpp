@@ -55,10 +55,6 @@ static INPUT_PORTS_START( dinoking )
 INPUT_PORTS_END
 
 
-static GFXDECODE_START( gfx_dinoking )
-GFXDECODE_END
-
-
 void dinoking_state::dinoking(machine_config &config)
 {
 	H8S2394(config, m_maincpu, 20_MHz_XTAL);
