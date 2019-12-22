@@ -26,7 +26,10 @@ vt5x_cpu_device::vt5x_cpu_device(const machine_config &mconfig, device_type type
 	, m_ut_flag_callback(*this)
 	, m_ruf_callback(*this)
 	, m_key_up_callback(*this)
+	, m_kclk_callback(*this)
+	, m_frq_callback(*this)
 	, m_bell_callback(*this)
+	, m_cen_callback(*this)
 	, m_bbits(bbits)
 	, m_ybits(ybits)
 	, m_pc(0)
@@ -39,6 +42,7 @@ vt5x_cpu_device::vt5x_cpu_device(const machine_config &mconfig, device_type type
 	, m_y(0)
 	, m_x8(false)
 	, m_cursor_ff(false)
+	, m_cursor_active(false)
 	, m_video_process(false)
 	, m_ram_do(0)
 	, m_t(0)
@@ -61,6 +65,7 @@ vt50_cpu_device::vt50_cpu_device(const machine_config &mconfig, const char *tag,
 
 vt52_cpu_device::vt52_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: vt5x_cpu_device(mconfig, VT52_CPU, tag, owner, clock, 7, 5)
+	, m_graphic_callback(*this)
 {
 }
 
@@ -91,7 +96,17 @@ void vt5x_cpu_device::device_resolve_objects()
 	m_ut_flag_callback.resolve_safe(0);
 	m_ruf_callback.resolve_safe();
 	m_key_up_callback.resolve_safe(1);
+	m_kclk_callback.resolve_safe(1);
+	m_frq_callback.resolve_safe(1);
 	m_bell_callback.resolve_safe();
+	m_cen_callback.resolve_safe();
+}
+
+void vt52_cpu_device::device_resolve_objects()
+{
+	vt5x_cpu_device::device_resolve_objects();
+
+	m_graphic_callback.resolve_safe();
 }
 
 void vt5x_cpu_device::device_start()
@@ -131,6 +146,7 @@ void vt5x_cpu_device::device_start()
 	save_item(NAME(m_y));
 	save_item(NAME(m_x8));
 	save_item(NAME(m_cursor_ff));
+	save_item(NAME(m_cursor_active));
 	save_item(NAME(m_video_process));
 	save_item(NAME(m_ram_do));
 	save_item(NAME(m_t));
@@ -323,11 +339,13 @@ void vt5x_cpu_device::execute_tw(u8 inst)
 			break;
 
 		case 0140:
-			// EPR (TODO: start printer)
+			// EPR
+			m_cen_callback(1);
 			break;
 
 		case 0160:
-			// HPR!ZY (TODO: halt printer)
+			// HPR!ZY
+			m_cen_callback(0);
 			m_y = 0;
 			break;
 		}
@@ -367,8 +385,8 @@ void vt50_cpu_device::execute_tg(u8 inst)
 		break;
 
 	default:
-		// LD
-		m_ram_do = inst & 0177;
+		// LD (TODO: B/C masking in mode 0 is determined by optional jumpers)
+		m_ram_do = inst & (!m_mode_ff && m_cursor_ff ? 0037 : 0177);
 		break;
 	}
 
@@ -396,8 +414,8 @@ void vt52_cpu_device::execute_tg(u8 inst)
 		break;
 
 	default:
-		// LD
-		m_ram_do = inst & 0177;
+		// LD (TODO: B/C masking in mode 0 is determined by optional jumpers)
+		m_ram_do = inst & (!m_mode_ff && m_cursor_ff ? 0037 : 0177);
 		break;
 	}
 
@@ -407,25 +425,27 @@ void vt52_cpu_device::execute_tg(u8 inst)
 
 void vt5x_cpu_device::execute_th(u8 inst)
 {
-	if (inst == 0002)
+	switch (inst & 0362)
 	{
+	case 0002:
 		// M2A
 		m_ac = m_ram_do;
-	}
-	else if (inst == 0042)
-	{
+		break;
+
+	case 0042:
 		// M2U
 		m_m2u_ff = true;
-	}
-	else if (inst == 0102)
-	{
+		break;
+
+	case 0102:
 		// M2X
 		m_x = m_ram_do;
-	}
-	else if (inst == 0142)
-	{
+		break;
+
+	case 0142:
 		// M2B
 		m_buffer = m_ram_do & ((1 << m_bbits) - 1);
+		break;
 	}
 
 	if (m_flag_test_ff)
@@ -437,6 +457,8 @@ void vt5x_cpu_device::execute_th(u8 inst)
 			// M1: URJ
 			if (m_mode_ff)
 				m_load_pc = m_ur_flag_callback();
+			else
+				m_load_pc = true;
 			break;
 
 		case 0020:
@@ -449,17 +471,21 @@ void vt5x_cpu_device::execute_th(u8 inst)
 			break;
 
 		case 0040:
-			// M0: KCLJ (TODO)
+			// M0: KCLJ
 			// M1: ALMJ
 			if (m_mode_ff)
 				m_load_pc = m_ac < m_ram_do;
+			else
+				m_load_pc = m_kclk_callback();
 			break;
 
 		case 0060:
-			// M0: FRQJ (TODO)
+			// M0: FRQJ
 			// M1: ADXJ
 			if (m_mode_ff)
 				m_load_pc = m_ac != (m_x ^ (m_x8 ? 8 : 0));
+			else
+				m_load_pc = m_frq_callback();
 			break;
 
 		case 0100:
@@ -467,6 +493,8 @@ void vt5x_cpu_device::execute_th(u8 inst)
 			// M1: AEM2J
 			if (m_mode_ff)
 				m_load_pc = m_ac == m_ram_do;
+			else
+				m_load_pc = true;
 			break;
 
 		case 0120:
@@ -493,6 +521,15 @@ void vt5x_cpu_device::execute_th(u8 inst)
 	if ((m_pc & 0377) == 0377)
 		m_rom_page = (m_rom_page + 1) & 3;
 	m_pc = (m_pc + 1) & 03777;
+}
+
+void vt52_cpu_device::execute_th(u8 inst)
+{
+	// not actually synchronized to TH
+	if ((inst & 0362) == 0162)
+		m_graphic_callback(m_ram_do);
+
+	vt5x_cpu_device::execute_th(inst);
 }
 
 void vt5x_cpu_device::execute_tj(u8 dest)
@@ -526,6 +563,7 @@ void vt5x_cpu_device::execute_run()
 				execute_tf(m_rom_cache->read_byte(m_pc));
 			if (!m_write_ff)
 				m_ram_do = m_ram_cache->read_byte(translate_xy()) & 0177;
+			m_cursor_active = m_ac == (m_x ^ (m_x8 ? 8 : 0));
 			m_t = 3;
 			break;
 
