@@ -466,6 +466,9 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 	map(0x007803, 0x007803).rw(FUNC(sunplus_gcm394_base_device::unkarea_7803_r), FUNC(sunplus_gcm394_base_device::unkarea_7803_w));
 
 	map(0x007807, 0x007807).w(FUNC(sunplus_gcm394_base_device::unkarea_7807_w));
+	// 7808
+
+	// 780a
 
 	map(0x00780f, 0x00780f).r(FUNC(sunplus_gcm394_base_device::unkarea_780f_status_r));
 
@@ -487,8 +490,17 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 	map(0x007824, 0x007824).w(FUNC(sunplus_gcm394_base_device::unkarea_7824_w)); // 0047                                                                   | 0044      7825 Chip Select (CS4) Memory Device Control (P_MC54_Ctrl)
 
 	map(0x00782d, 0x00782d).rw(FUNC(sunplus_gcm394_base_device::unkarea_782d_r), FUNC(sunplus_gcm394_base_device::unkarea_782d_w)); // on startup
+	// 782f
 
 	map(0x007835, 0x007835).w(FUNC(sunplus_gcm394_base_device::unkarea_7835_w));
+
+	// 783a
+	// 783b
+	// 783c
+	// 783d
+	// 783e
+
+	// 7841
 
 	// ######################################################################################################################################################################################
 	// 786x - 787x - IO related?
@@ -510,6 +522,9 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 	map(0x007871, 0x007871).r(FUNC(sunplus_gcm394_base_device::unkarea_7871_r)); // 7871  I/O PortC Buffer Register
 	map(0x007872, 0x007872).rw(FUNC(sunplus_gcm394_base_device::unkarea_7872_r), FUNC(sunplus_gcm394_base_device::unkarea_7872_w)); // 7872  I/O PortC Direction Register
 	map(0x007873, 0x007873).rw(FUNC(sunplus_gcm394_base_device::unkarea_7873_r), FUNC(sunplus_gcm394_base_device::unkarea_7873_w)); // 7873  I/O PortC Attribute Register
+	// 7874 (data 0x1249)
+	// 787c (data 0x1249)
+	// 787e (data 0x1249)
 
 	// 7878  I/O PortD Data Register
 	// 7879  I/O PortD Buffer Register
@@ -519,8 +534,13 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 	// ######################################################################################################################################################################################
 	// 788x - more IO?
 	// ######################################################################################################################################################################################
+	
+	// 7880
+
 	map(0x007882, 0x007882).rw(FUNC(sunplus_gcm394_base_device::unkarea_7882_r), FUNC(sunplus_gcm394_base_device::unkarea_7882_w));
 	map(0x007883, 0x007883).rw(FUNC(sunplus_gcm394_base_device::unkarea_7883_r), FUNC(sunplus_gcm394_base_device::unkarea_7883_w));
+
+	// 0x7888 (data 0x1249)
 
 	// ######################################################################################################################################################################################
 	// 78ax - interrupt controller?
@@ -573,6 +593,8 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 	map(0x007a3a, 0x007a3a).r(FUNC(sunplus_gcm394_base_device::system_7a3a_r));
 
 	map(0x007a80, 0x007a86).rw(FUNC(sunplus_gcm394_base_device::system_dma_params_r), FUNC(sunplus_gcm394_base_device::system_dma_params_w));
+	
+	// 7abe - written with DMA stuff
 	map(0x007abf, 0x007abf).rw(FUNC(sunplus_gcm394_base_device::system_dma_status_r), FUNC(sunplus_gcm394_base_device::system_dma_trigger_w));
 
 	// ######################################################################################################################################################################################
