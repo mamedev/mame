@@ -122,6 +122,12 @@ void bebox_state::mpc105_config(device_t *device)
 	mpc105.set_bank_base_default(0);
 }
 
+void bebox_state::cirrus_config(device_t *device)
+{
+	pci_cirrus_svga_device &cirruspci = *downcast<pci_cirrus_svga_device *>(device);
+	cirruspci.set_vga(":vga");
+}
+
 /*************************************
  *
  *  Keyboard
@@ -188,7 +194,7 @@ void bebox_state::bebox_peripherals(machine_config &config)
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(cirrus_gd5428_device::screen_update));
 
-	cirrus_gd5428_device &vga(CIRRUS_GD5428(config, "vga", 0));
+	cirrus_gd5428_device &vga(CIRRUS_GD5428(config, m_vga, 0));
 	vga.set_screen("screen");
 
 	speaker_device &speaker(SPEAKER(config, "mono"));
@@ -219,7 +225,8 @@ void bebox_state::bebox_peripherals(machine_config &config)
 
 	pci_connector_device &pcislot0 = add_pci_slot(config, "pcibus:0", 0, "mpc105");
 	pcislot0.set_option_machine_config("mpc105", mpc105_config);
-	add_pci_slot(config, "pcibus:1", 1, "cirrus");
+	pci_connector_device &pcislot1 = add_pci_slot(config, "pcibus:1", 1, "cirrus");
+	pcislot1.set_option_machine_config("cirrus", cirrus_config);
 
 	/*PCI_BUS_LEGACY_DEVICE(12, nullptr, scsi53c810_pci_read, scsi53c810_pci_write)*/
 
