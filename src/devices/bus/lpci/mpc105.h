@@ -14,6 +14,7 @@
 #pragma once
 
 #include "pci.h"
+#include "machine/ram.h"
 
 #define MPC105_MEMORYBANK_COUNT     8
 

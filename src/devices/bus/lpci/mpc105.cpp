@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/ram.h"
 #include "mpc105.h"
 
 #define LOG_MPC105      0
