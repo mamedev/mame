@@ -156,13 +156,17 @@ READ32_MEMBER(model1_state::copro_ramadr_r)
 
 WRITE32_MEMBER(model1_state::copro_ramdata_w)
 {
-	COMBINE_DATA(&m_copro_ram_data[m_copro_ram_adr[offset >> 3] & 0x1fff]);
+	if(m_copro_ram_adr[offset >> 3] & 0x40000) {
+		COMBINE_DATA(&m_copro_ram_data[0x1000 | (m_copro_ram_adr[offset >> 3] & 0x1fff)]);
+	} else {
+		COMBINE_DATA(&m_copro_ram_data[m_copro_ram_adr[offset >> 3] & 0x1fff]);
+	}
 	m_copro_ram_adr[offset >> 3] ++;
 }
 
 READ32_MEMBER(model1_state::copro_ramdata_r)
 {
-	u32 val = m_copro_ram_data[m_copro_ram_adr[offset >> 3] & 0x1fff];
+	u32 val = (m_copro_ram_adr[offset >> 3] & 0x40000) ? m_copro_ram_data[0x1000 | (m_copro_ram_adr[offset >> 3] & 0x1fff)] : m_copro_ram_data[m_copro_ram_adr[offset >> 3] & 0x1fff];
 	if(!machine().side_effects_disabled())
 		m_copro_ram_adr[offset >> 3] ++;
 	return val;
