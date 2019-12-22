@@ -38433,13 +38433,37 @@ List of unclassified roms
 	</software>
 
 	<software name="ejimus" cloneof="ejim">
-		<description>Earthworm Jim (USA, GamesMaster Special Edition)</description>
+		<description>Earthworm Jim - GamesMaster Special Edition (USA, prototype 19940804)</description>
 		<year>1994</year>
 		<publisher>Playmates Interactive</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-8PV5B-01" />
+			<feature name="u1" value="U1 4/8M EPROM(J)" />
+			<feature name="u2" value="U2 4/8M EPROM(J)" />
+			<feature name="u3" value="U3 4/8M EPROM(J)" />
+			<feature name="u4" value="U4 4/8M EPROM(J)" />
+			<feature name="u5" value="U5 4/8M EPROM(J)" />
+			<feature name="u6" value="U6 4/8M EPROM(J)" />
+			<feature name="u7" value="U7 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u8" value="U8 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u9" value="U9 16/64/256K SRAM" /> <!-- empty socket -->
+			<feature name="u10" value="U10 MM1134 [1134B]" />
+			<feature name="u11" value="U11 EP330 [EP330-15CN]" />
+			<feature name="u12" value="U12 EP330 [EP330-15CN]" />
+			<feature name="u13" value="U13 LS157" />
+			<feature name="u14" value="U14 CIC" />
+			<feature name="lockout" value="D413A" />
+			<feature name="dipswitch" value="DSW1" /> <!-- (.''..'..) -->
+			<feature name="battery" value="BATT1 CR2032" />
+			<feature name="cart_model" value="no shell" />
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="3145728">
-				<rom name="earthworm jim (usa) (gamesmaster special edition).sfc" size="3145728" crc="b1eaad9e" sha1="681d17432e2d337aaeeab4039117733c35575235" offset="0x000000" />
+				<rom name="ewj-gm 1 04-08-94.u1" size="524288" crc="7461fe8d" sha1="168b03f255e4512f4f2758eadf9c497cf2bc794e" offset="0x000000" /> <!-- EWJ-GM ① 04/08/94 -->
+				<rom name="ewj-gm 2 04-08-94.u2" size="524288" crc="ef8c7931" sha1="6f4eda60d53957a96f66e5965f1d5db06e6e1cbb" offset="0x080000" /> <!-- EWJ-GM ② 04/08/94 -->
+				<rom name="ewj-gm 3 04-08-94.u3" size="524288" crc="2e3fbf37" sha1="bbb801d98e0f80e14cccb0e37498485c89c9e5b3" offset="0x100000" /> <!-- EWJ-GM ③ 04/08/94 -->
+				<rom name="ewj-gm 4 04-08-94.u4" size="524288" crc="0d8ac762" sha1="3ea48fd49b4769d8df5c0e14c69c56708f9d5872" offset="0x180000" /> <!-- EWJ-GM ④ 04/08/94 -->
+				<rom name="ewj-gm 5 04-08-94.u5" size="524288" crc="c1811921" sha1="583b7003daf67ba15ecaec008abf444c4bcbe0d2" offset="0x200000" /> <!-- EWJ-GM ⑤ 04/08/94 -->
+				<rom name="ewj-gm 6 04-08-94.u6" size="524288" crc="47e381ff" sha1="8bb418fefe840b22a9ac1f23eda4d075d0d83c2b" offset="0x280000" /> <!-- EWJ-GM ⑥ 04/08/94 -->
 			</dataarea>
 		</part>
 	</software>
