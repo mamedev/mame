@@ -460,7 +460,7 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 	map(0x007400, 0x0077ff).rw(m_spg_video, FUNC(gcm394_base_video_device::spriteram_r), FUNC(gcm394_base_video_device::spriteram_w));
 
 	// ######################################################################################################################################################################################
-	// 78xx region = io + other?
+	// 78xx region = system regs?
 	// ######################################################################################################################################################################################
 
 	map(0x007803, 0x007803).rw(FUNC(sunplus_gcm394_base_device::unkarea_7803_r), FUNC(sunplus_gcm394_base_device::unkarea_7803_w));
@@ -469,71 +469,100 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 
 	map(0x00780f, 0x00780f).r(FUNC(sunplus_gcm394_base_device::unkarea_780f_status_r));
 
-	map(0x007810, 0x007810).rw(FUNC(sunplus_gcm394_base_device::unkarea_7810_r), FUNC(sunplus_gcm394_base_device::unkarea_7810_w));
+	map(0x007810, 0x007810).rw(FUNC(sunplus_gcm394_base_device::unkarea_7810_r), FUNC(sunplus_gcm394_base_device::unkarea_7810_w));  // 7810 Bank Switch Control Register  (P_BankSwitch_Ctrl) (maybe)
 
 	map(0x007819, 0x007819).rw(FUNC(sunplus_gcm394_base_device::unkarea_7819_r), FUNC(sunplus_gcm394_base_device::unkarea_7819_w));
 
 	map(0x007816, 0x007816).w(FUNC(sunplus_gcm394_base_device::unkarea_7816_w));
 	map(0x007817, 0x007817).w(FUNC(sunplus_gcm394_base_device::unkarea_7817_w));
 
-																				 // wrlshunt                                                               | smartfp
-	map(0x007820, 0x007820).w(FUNC(sunplus_gcm394_base_device::unkarea_7820_w)); // 7f8a (7f8a before DMA from ROM to RAM, 008a after DMA from ROM to RAM) | 3f04
-	map(0x007821, 0x007821).w(FUNC(sunplus_gcm394_base_device::unkarea_7821_w)); // 7f47                                                                   | 0044
-	map(0x007822, 0x007822).w(FUNC(sunplus_gcm394_base_device::unkarea_7822_w)); // 0047                                                                   | 1f44
-	map(0x007823, 0x007823).w(FUNC(sunplus_gcm394_base_device::unkarea_7823_w)); // 0047                                                                   | 0044
-	map(0x007824, 0x007824).w(FUNC(sunplus_gcm394_base_device::unkarea_7824_w)); // 0047                                                                   | 0044
+	// ######################################################################################################################################################################################
+	// 782x region = memory config / control
+	// ######################################################################################################################################################################################
+																				 // wrlshunt                                                               | smartfp   
+	map(0x007820, 0x007820).w(FUNC(sunplus_gcm394_base_device::unkarea_7820_w)); // 7f8a (7f8a before DMA from ROM to RAM, 008a after DMA from ROM to RAM) | 3f04      7821 Chip Select (CS0) Memory Device Control (P_MC50_Ctrl)
+	map(0x007821, 0x007821).w(FUNC(sunplus_gcm394_base_device::unkarea_7821_w)); // 7f47                                                                   | 0044      7822 Chip Select (CS1) Memory Device Control (P_MC51_Ctrl)
+	map(0x007822, 0x007822).w(FUNC(sunplus_gcm394_base_device::unkarea_7822_w)); // 0047                                                                   | 1f44      7823 Chip Select (CS2) Memory Device Control (P_MC52_Ctrl)
+	map(0x007823, 0x007823).w(FUNC(sunplus_gcm394_base_device::unkarea_7823_w)); // 0047                                                                   | 0044      7824 Chip Select (CS3) Memory Device Control (P_MC53_Ctrl)
+	map(0x007824, 0x007824).w(FUNC(sunplus_gcm394_base_device::unkarea_7824_w)); // 0047                                                                   | 0044      7825 Chip Select (CS4) Memory Device Control (P_MC54_Ctrl)
 
 	map(0x00782d, 0x00782d).rw(FUNC(sunplus_gcm394_base_device::unkarea_782d_r), FUNC(sunplus_gcm394_base_device::unkarea_782d_w)); // on startup
 
 	map(0x007835, 0x007835).w(FUNC(sunplus_gcm394_base_device::unkarea_7835_w));
 
-	map(0x007860, 0x007860).rw(FUNC(sunplus_gcm394_base_device::ioarea_7860_porta_r), FUNC(sunplus_gcm394_base_device::ioarea_7860_porta_w));
+	// ######################################################################################################################################################################################
+	// 786x - 787x - IO related?
+	// ######################################################################################################################################################################################
 
-	map(0x007861, 0x007861).r(FUNC(sunplus_gcm394_base_device::unkarea_7861_r));
-	map(0x007862, 0x007862).rw(FUNC(sunplus_gcm394_base_device::unkarea_7862_r), FUNC(sunplus_gcm394_base_device::unkarea_7862_w));
-	map(0x007863, 0x007863).rw(FUNC(sunplus_gcm394_base_device::unkarea_7863_r), FUNC(sunplus_gcm394_base_device::unkarea_7863_w));
+	map(0x007860, 0x007860).rw(FUNC(sunplus_gcm394_base_device::ioarea_7860_porta_r), FUNC(sunplus_gcm394_base_device::ioarea_7860_porta_w)); // 	7860  I/O PortA Data Register
+	map(0x007861, 0x007861).r(FUNC(sunplus_gcm394_base_device::unkarea_7861_r)); // 7861  I/O PortA Buffer Register
+	map(0x007862, 0x007862).rw(FUNC(sunplus_gcm394_base_device::unkarea_7862_r), FUNC(sunplus_gcm394_base_device::unkarea_7862_w));  // 7862  I/O PortA Direction Register
+	map(0x007863, 0x007863).rw(FUNC(sunplus_gcm394_base_device::unkarea_7863_r), FUNC(sunplus_gcm394_base_device::unkarea_7863_w)); // 	7863  I/O PortA Attribute Register
 
-	map(0x007868, 0x007868).r(FUNC(sunplus_gcm394_base_device::unkarea_7868_r)); // on startup
+	map(0x007868, 0x007868).r(FUNC(sunplus_gcm394_base_device::unkarea_7868_r)); // on startup   // 7868  I/O PortB Data Register
+	// 7869  I/O PortB Buffer Register
+	// 786a  I/O PortB Direction Register
+	// 786b  I/O PortB Attribute Register
+	// 786a  I/O PortB Direction Register
+	// 786c  I/O PortB Latch / Wakeup
 
-	map(0x007870, 0x007870).rw(FUNC(sunplus_gcm394_base_device::ioarea_7870_portb_r) ,FUNC(sunplus_gcm394_base_device::ioarea_7870_portb_w));
+	map(0x007870, 0x007870).rw(FUNC(sunplus_gcm394_base_device::ioarea_7870_portb_r) ,FUNC(sunplus_gcm394_base_device::ioarea_7870_portb_w)); // 7870  I/O PortC Data Register
+	map(0x007871, 0x007871).r(FUNC(sunplus_gcm394_base_device::unkarea_7871_r)); // 7871  I/O PortC Buffer Register
+	map(0x007872, 0x007872).rw(FUNC(sunplus_gcm394_base_device::unkarea_7872_r), FUNC(sunplus_gcm394_base_device::unkarea_7872_w)); // 7872  I/O PortC Direction Register
+	map(0x007873, 0x007873).rw(FUNC(sunplus_gcm394_base_device::unkarea_7873_r), FUNC(sunplus_gcm394_base_device::unkarea_7873_w)); // 7873  I/O PortC Attribute Register
 
-	map(0x007871, 0x007871).r(FUNC(sunplus_gcm394_base_device::unkarea_7871_r));
-	map(0x007872, 0x007872).rw(FUNC(sunplus_gcm394_base_device::unkarea_7872_r), FUNC(sunplus_gcm394_base_device::unkarea_7872_w));
-	map(0x007873, 0x007873).rw(FUNC(sunplus_gcm394_base_device::unkarea_7873_r), FUNC(sunplus_gcm394_base_device::unkarea_7873_w));
+	// 7878  I/O PortD Data Register
+	// 7879  I/O PortD Buffer Register
+	// 787a  I/O PortD Direction Register
+	// 787b  I/O PortD Attribute Register
 
+	// ######################################################################################################################################################################################
+	// 788x - more IO?
+	// ######################################################################################################################################################################################
 	map(0x007882, 0x007882).rw(FUNC(sunplus_gcm394_base_device::unkarea_7882_r), FUNC(sunplus_gcm394_base_device::unkarea_7882_w));
 	map(0x007883, 0x007883).rw(FUNC(sunplus_gcm394_base_device::unkarea_7883_r), FUNC(sunplus_gcm394_base_device::unkarea_7883_w));
 
-	map(0x0078a0, 0x0078a0).rw(FUNC(sunplus_gcm394_base_device::unkarea_78a0_r), FUNC(sunplus_gcm394_base_device::unkarea_78a0_w));
+	// ######################################################################################################################################################################################
+	// 78ax - interrupt controller?
+	// ######################################################################################################################################################################################
 
+	map(0x0078a0, 0x0078a0).rw(FUNC(sunplus_gcm394_base_device::unkarea_78a0_r), FUNC(sunplus_gcm394_base_device::unkarea_78a0_w));
 	map(0x0078a1, 0x0078a1).r(FUNC(sunplus_gcm394_base_device::unkarea_78a1_r));
 
 	map(0x0078a4, 0x0078a4).w(FUNC(sunplus_gcm394_base_device::unkarea_78a4_w));
 	map(0x0078a5, 0x0078a5).w(FUNC(sunplus_gcm394_base_device::unkarea_78a5_w));
 	map(0x0078a6, 0x0078a6).w(FUNC(sunplus_gcm394_base_device::unkarea_78a6_w));
 
-	map(0x0078a8, 0x0078a8).w(FUNC(sunplus_gcm394_base_device::unkarea_78a8_w));
+	map(0x0078a8, 0x0078a8).w(FUNC(sunplus_gcm394_base_device::unkarea_78a8_w));  
 
-	map(0x0078b0, 0x0078b0).w(FUNC(sunplus_gcm394_base_device::unkarea_78b0_w));
-	map(0x0078b1, 0x0078b1).w(FUNC(sunplus_gcm394_base_device::unkarea_78b1_w));
+	// ######################################################################################################################################################################################
+	// 78bx - timer control?
+	// ######################################################################################################################################################################################
 
-	map(0x0078b2, 0x0078b2).r(FUNC(sunplus_gcm394_base_device::unkarea_78b2_r));
-	map(0x0078b2, 0x0078b2).w(FUNC(sunplus_gcm394_base_device::unkarea_78b2_w));
+	map(0x0078b0, 0x0078b0).w(FUNC(sunplus_gcm394_base_device::unkarea_78b0_w));  // 78b0 TimeBase A Control Register (P_TimeBaseA_Ctrl)
+	map(0x0078b1, 0x0078b1).w(FUNC(sunplus_gcm394_base_device::unkarea_78b1_w));  // 78b1 TimeBase B Control Register (P_TimeBaseB_Ctrl)
+	map(0x0078b2, 0x0078b2).rw(FUNC(sunplus_gcm394_base_device::unkarea_78b2_r), FUNC(sunplus_gcm394_base_device::unkarea_78b2_w));  // 78b2 TimeBase C Control Register (P_TimeBaseC_Ctrl)
 
-	map(0x0078b8, 0x0078b8).w(FUNC(sunplus_gcm394_base_device::unkarea_78b8_w));
+	map(0x0078b8, 0x0078b8).w(FUNC(sunplus_gcm394_base_device::unkarea_78b8_w));  // 78b8 TimeBase Counter Reset Register  (P_TimeBase_Reset)
+
+	// ######################################################################################################################################################################################
+	// 78fx - unknown
+	// ######################################################################################################################################################################################
 
 	map(0x0078f0, 0x0078f0).w(FUNC(sunplus_gcm394_base_device::unkarea_78f0_w));
 
 	map(0x0078fb, 0x0078fb).r(FUNC(sunplus_gcm394_base_device::unkarea_78fb_status_r));
 
 	// ######################################################################################################################################################################################
-	// 79xx region = timers?
+	// 79xx - misc?
 	// ######################################################################################################################################################################################
 
+	// possible rtc?
 	map(0x007934, 0x007934).rw(FUNC(sunplus_gcm394_base_device::unkarea_7934_r), FUNC(sunplus_gcm394_base_device::unkarea_7934_w));
 	map(0x007935, 0x007935).rw(FUNC(sunplus_gcm394_base_device::unkarea_7935_r), FUNC(sunplus_gcm394_base_device::unkarea_7935_w));
 	map(0x007936, 0x007936).rw(FUNC(sunplus_gcm394_base_device::unkarea_7936_r), FUNC(sunplus_gcm394_base_device::unkarea_7936_w));
 
+	// possible adc?
 	map(0x007960, 0x007960).w(FUNC(sunplus_gcm394_base_device::unkarea_7960_w));
 	map(0x007961, 0x007961).rw(FUNC(sunplus_gcm394_base_device::unkarea_7961_r), FUNC(sunplus_gcm394_base_device::unkarea_7961_w));
 
