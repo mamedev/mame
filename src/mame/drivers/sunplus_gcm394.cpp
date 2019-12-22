@@ -140,15 +140,31 @@ protected:
 	virtual void machine_reset() override;
 
 	void generalplus_gpac800_map(address_map &map);
+	DECLARE_READ8_MEMBER(read_nand);
 
 private:
 	void nand_init(int blocksize, int blocksize_stripped);
 
 	required_shared_ptr<u16> m_mainram;
 	std::vector<uint8_t> m_strippedrom;
+	int m_strippedsize;
+
+	virtual DECLARE_WRITE16_MEMBER(write_external_space) override;
 };
 
+READ8_MEMBER(generalplus_gpac800_game_state::read_nand)
+{
+	return m_strippedrom[offset & (m_strippedsize-1)];
+}
 
+WRITE16_MEMBER(generalplus_gpac800_game_state::write_external_space)
+{
+	if (offset < 0x0400000)
+	{
+		m_mainram[offset] = data;
+		//  logerror("DMA writing to external space (RAM?) %08x %04x\n", offset, data);
+	}
+}
 
 
 READ16_MEMBER(gcm394_game_state::read_external_space)
@@ -309,6 +325,9 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 	m_maincpu->mapping_write_callback().set(FUNC(generalplus_gpac800_game_state::mapping_w));
 	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+
+	m_maincpu->nand_read_callback().set(FUNC(generalplus_gpac800_game_state::read_nand));
+
 
 }
 
@@ -825,20 +844,6 @@ void generalplus_gpac800_game_state::machine_reset()
 	mem.write_word(0xfffe, 0x6ffc);
 	mem.write_word(0xffff, 0x6ffe);
 
-	// note, these patch the code copied to SRAM so the 'PROGRAM ROM' check fails (it passes otherwise)
-	if (mem.read_word(0x3f368) == 0x4840)
-		mem.write_word(0x3f368, 0x4841);    // cars 2 IRQ? wait hack
-
-	if (mem.read_word(0x4368c) == 0x4846)
-		mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
-
-	if (mem.read_word(0x4d8d4) == 0x4840)
-		mem.write_word(0x4d8d4, 0x4841);    // golden tee IRQ? wait hack
-
-	if (mem.read_word(0x34410) == 0x4846)
-		mem.write_word(0x34410, 0x4840);    // golden tee force service mode
-
-
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 }
 
@@ -849,8 +854,8 @@ void generalplus_gpac800_game_state::nand_init(int blocksize, int blocksize_stri
 	int size = memregion("maincpu")->bytes();
 
 	int numblocks = size / blocksize;
-
-	m_strippedrom.resize(numblocks * blocksize_stripped);
+	m_strippedsize = numblocks * blocksize_stripped;
+	m_strippedrom.resize(m_strippedsize);
 
 	for (int i = 0; i < numblocks; i++)
 	{

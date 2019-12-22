@@ -35,6 +35,7 @@ public:
 		m_porta_in(*this),
 		m_portb_in(*this),
 		m_porta_out(*this),
+		m_nand_read_cb(*this),
 		m_space_read_cb(*this),
 		m_space_write_cb(*this),
 		m_mapping_write_cb(*this)
@@ -52,6 +53,7 @@ public:
 	auto space_write_callback() { return m_space_write_cb.bind(); }
 	auto mapping_write_callback() { return m_mapping_write_cb.bind(); }
 
+	auto nand_read_callback() { return m_nand_read_cb.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(vblank) { m_spg_video->vblank(state); }
 
@@ -143,6 +145,8 @@ protected:
 	uint16_t m_7960;
 	uint16_t m_7961;
 
+	devcb_read16 m_nand_read_cb;
+
 private:
 	devcb_read16 m_space_read_cb;
 	devcb_write16 m_space_write_cb;
@@ -152,9 +156,10 @@ private:
 	DECLARE_WRITE16_MEMBER(unk_w);
 
 
+	DECLARE_READ16_MEMBER(system_dma_params_r);
 	DECLARE_WRITE16_MEMBER(system_dma_params_w);
-	DECLARE_WRITE16_MEMBER(system_dma_trigger_w);
 	DECLARE_READ16_MEMBER(system_dma_status_r);
+	DECLARE_WRITE16_MEMBER(system_dma_trigger_w);
 
 	DECLARE_READ16_MEMBER(unkarea_780f_status_r);
 	DECLARE_READ16_MEMBER(unkarea_78fb_status_r);
@@ -249,6 +254,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(videoirq_w);
 	DECLARE_WRITE_LINE_MEMBER(audioirq_w);
 
+	DECLARE_READ16_MEMBER(system_7a3a_r)
+	{
+		return machine().rand();
+	}
+
 	void checkirq6();
 
 	emu_timer *m_unk_timer;
@@ -299,13 +309,19 @@ private:
 	DECLARE_READ16_MEMBER(unkarea_7850_r);
 	DECLARE_READ16_MEMBER(unkarea_7854_r);
 
+	DECLARE_WRITE16_MEMBER(nand_command_w);
+
 	DECLARE_WRITE16_MEMBER(flash_addr_low_w);
 	DECLARE_WRITE16_MEMBER(flash_addr_high_w);
 
 	int m_testval;
 
+	uint16_t m_nandcommand;
+
 	uint16_t m_flash_addr_low;
 	uint16_t m_flash_addr_high;
+
+	int m_curblockaddr;
 
 };
 
