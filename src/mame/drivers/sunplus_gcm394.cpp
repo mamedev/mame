@@ -97,7 +97,6 @@ private:
 
 	uint32_t m_current_bank;
 	int m_numbanks;
-
 };
 
 class wrlshunt_game_state : public gcm394_game_state
@@ -138,7 +137,8 @@ class generalplus_gpac800_game_state : public gcm394_game_state
 public:
 	generalplus_gpac800_game_state(const machine_config& mconfig, device_type type, const char* tag) :
 		gcm394_game_state(mconfig, type, tag),
-		m_mainram(*this, "mainram")
+		m_mainram(*this, "mainram"),
+		m_initial_copy_words(0x2000)
 	{
 	}
 
@@ -146,6 +146,8 @@ public:
 
 	void nand_init210();
 	void nand_init840();
+	void nand_wlsair60();
+	void nand_vbaby();
 
 protected:
 	virtual void machine_reset() override;
@@ -159,6 +161,8 @@ private:
 	required_shared_ptr<u16> m_mainram;
 	std::vector<uint8_t> m_strippedrom;
 	int m_strippedsize;
+
+	int m_initial_copy_words;
 
 	virtual DECLARE_WRITE16_MEMBER(write_external_space) override;
 };
@@ -827,20 +831,11 @@ void generalplus_gpac800_game_state::machine_reset()
 	int dest = m_strippedrom[0x15] << 8;
 
 	// copy a block of code from the NAND to RAM
-	for (int i = 0; i < 0x7000-dest; i++)
+	for (int i = 0; i < m_initial_copy_words; i++)
 	{
 		uint16_t word = m_strippedrom[(i * 2) + 0] | (m_strippedrom[(i * 2) + 1] << 8);
 
 		mem.write_word(dest+i, word);
-	}
-
-	int rambase = 0x30000;
-	for (int i = 0x4000/2; i < 0x37c000/2; i++)
-	{
-		uint16_t word = m_strippedrom[(i * 2) + 0] | (m_strippedrom[(i * 2) + 1] << 8);
-
-		m_mainram[rambase] = word;
-		rambase++;
 	}
 
 	mem.write_word(0xfff5, 0x6fea);
@@ -904,11 +899,26 @@ void generalplus_gpac800_game_state::nand_init840()
 	nand_init(0x840, 0x800);
 }
 
+void generalplus_gpac800_game_state::nand_wlsair60()
+{
+	nand_init840();
+	m_initial_copy_words = 0x2800;
+}
+
+void generalplus_gpac800_game_state::nand_vbaby()
+{
+	nand_init840();
+	m_initial_copy_words = 0x1000;
+}
+
+
+
+
 // NAND dumps w/ internal bootstrap (and u'nSP 2.0 extended opcodes)  (have gpnandnand strings)
 // the JAKKS ones seem to be known as 'Generalplus GPAC800' hardware
-CONS(2010, wlsair60, 0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_init840, "Jungle Soft / Kids Station Toys Inc", "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, jak_gtg,  0, 0, generalplus_gpac800, jak_gtg,  generalplus_gpac800_game_state, nand_init210, "JAKKS Pacific Inc", "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, jak_car2, 0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_init210, "JAKKS Pacific Inc", "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, jak_tsm , 0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_init210, "JAKKS Pacific Inc", "Toy Story Mania (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, vbaby,    0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_init840, "VTech", "V.Baby",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, beambox,  0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_init210, "Hasbro", "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2010, wlsair60, 0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_wlsair60, "Jungle Soft / Kids Station Toys Inc", "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_gtg,  0, 0, generalplus_gpac800, jak_gtg,  generalplus_gpac800_game_state, nand_init210,  "JAKKS Pacific Inc", "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_car2, 0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_init210,  "JAKKS Pacific Inc", "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_tsm , 0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_init210,  "JAKKS Pacific Inc", "Toy Story Mania (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, vbaby,    0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_vbaby,    "VTech", "V.Baby",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, beambox,  0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_init210,  "Hasbro", "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
