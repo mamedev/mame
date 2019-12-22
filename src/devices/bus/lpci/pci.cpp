@@ -91,8 +91,8 @@ DEFINE_DEVICE_TYPE(PCI_BUS, pci_bus_device, "pci_bus", "PCI Bus")
 //-------------------------------------------------
 pci_bus_device::pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PCI_BUS, tag, owner, clock), m_busnum(0),
-	m_father(nullptr), m_address(0), m_devicenum(0), m_busnumber(0), m_busnumaddr(nullptr),
-	m_pcifather(*this, finder_base::DUMMY_TAG)
+	m_address(0), m_devicenum(0), m_busnumber(0), m_busnumaddr(nullptr),
+	m_father(*this, finder_base::DUMMY_TAG)
 {
 	for (auto & elem : m_devtag) {
 		elem= nullptr;
@@ -285,8 +285,8 @@ void pci_bus_device::device_start()
 			m_device[i] = nullptr;
 	}
 
-	if (m_pcifather.found())
-		m_pcifather->add_sibling(this, m_busnum);
+	if (m_father.found())
+		m_father->add_sibling(this, m_busnum);
 
 	/* register pci states */
 	save_item(NAME(m_address));
