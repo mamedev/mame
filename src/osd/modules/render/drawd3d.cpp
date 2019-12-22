@@ -801,8 +801,12 @@ void renderer_d3d9::update_gamma_ramp()
 //  device_create
 //============================================================
 
-int renderer_d3d9::device_create(HWND device_hwnd)
+int renderer_d3d9::device_create(HWND hwnd)
 {
+	// identify the actual window; this is needed so that -attach_window
+	// can work on a non-root HWND
+	HWND device_hwnd = GetAncestor(hwnd, GA_ROOT);
+
 	// if a device exists, free it
 	if (m_device != nullptr)
 	{
