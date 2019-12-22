@@ -121,8 +121,8 @@ public:
 	void bebox_set_irq_bit(unsigned int interrupt_bit, int val);
 	void bebox_update_interrupts();
 
-	static void mpc105_config(device_t *device);
-	static void cirrus_config(device_t *device);
+	void mpc105_config(device_t *device);
+	void cirrus_config(device_t *device);
 
 	pci_connector_device & add_pci_slot(machine_config &config, const char *tag, size_t index, const char *default_tag);
 	void bebox_peripherals(machine_config &config);
