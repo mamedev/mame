@@ -51,8 +51,10 @@ vt5x_cpu_device::vt5x_cpu_device(const machine_config &mconfig, device_type type
 	, m_m2u_ff(false)
 	, m_bell_ff(false)
 	, m_load_pc(false)
-	, m_qa_e23(0)
 	, m_icount(0)
+	, m_horiz_count(0)
+	, m_vert_count(0)
+	, m_top_of_screen(false)
 {
 	m_rom_config.m_is_octal = true;
 	m_ram_config.m_is_octal = true;
@@ -155,7 +157,9 @@ void vt5x_cpu_device::device_start()
 	save_item(NAME(m_m2u_ff));
 	save_item(NAME(m_bell_ff));
 	save_item(NAME(m_load_pc));
-	save_item(NAME(m_qa_e23));
+	save_item(NAME(m_horiz_count));
+	save_item(NAME(m_vert_count));
+	save_item(NAME(m_top_of_screen));
 }
 
 void vt5x_cpu_device::device_reset()
@@ -168,7 +172,10 @@ void vt5x_cpu_device::device_reset()
 	m_t = 7;
 	m_flag_test_ff = false;
 	m_load_pc = false;
-	m_qa_e23 = false;
+
+	m_horiz_count = 0;
+	m_vert_count = 0;
+	m_top_of_screen = true;
 }
 
 offs_t vt5x_cpu_device::translate_xy() const
@@ -453,7 +460,7 @@ void vt5x_cpu_device::execute_th(u8 inst)
 		switch (inst & 0160)
 		{
 		case 0000:
-			// M0: PSCJ (TODO)
+			// M0: PSCJ (TODO: printer flag)
 			// M1: URJ
 			if (m_mode_ff)
 				m_load_pc = m_ur_flag_callback();
@@ -489,7 +496,7 @@ void vt5x_cpu_device::execute_th(u8 inst)
 			break;
 
 		case 0100:
-			// M0: PRQJ (TODO)
+			// M0: PRQJ (TODO: printer flag)
 			// M1: AEM2J
 			if (m_mode_ff)
 				m_load_pc = m_ac == m_ram_do;
@@ -504,16 +511,20 @@ void vt5x_cpu_device::execute_th(u8 inst)
 
 		case 0140:
 			// M0: UTJ
-			// M1: VSCJ (TODO)
-			if (!m_mode_ff)
+			// M1: VSCJ
+			if (m_mode_ff)
+				m_load_pc = m_horiz_count >= 8;
+			else
 				m_load_pc = !m_ut_flag_callback();
 			break;
 
 		case 0160:
-			// M0: TOSJ (TODO)
+			// M0: TOSJ
 			// M1: KEYJ
 			if (m_mode_ff)
 				m_load_pc = m_key_up_callback(m_ac) & 1;
+			else
+				m_load_pc = !m_top_of_screen;
 			break;
 		}
 	}
@@ -540,41 +551,70 @@ void vt5x_cpu_device::execute_tj(u8 dest)
 		m_pc = (m_pc + 1) & 03777;
 }
 
+void vt5x_cpu_device::clock_video_counters()
+{
+	if ((m_horiz_count & 9) == 9)
+	{
+		m_horiz_count = (m_horiz_count & (15 * 16)) + 16;
+		if (m_vert_count == 07777)
+		{
+			m_vert_count = m_frq_callback() ? 03000 : 02000;
+			m_horiz_count = 0;
+			m_top_of_screen = true;
+		}
+		else
+		{
+			m_vert_count++;
+			if (m_horiz_count == 10 * 16)
+				m_horiz_count = 0;
+		}
+	}
+	else
+	{
+		m_horiz_count++;
+		if (m_horiz_count == 8)
+			m_top_of_screen = false;
+	}
+}
+
 void vt5x_cpu_device::execute_run()
 {
 	while (m_icount > 0)
 	{
+		bool en_cycle = BIT(m_horiz_count, 0);
 		switch (m_t)
 		{
 		case 0:
-			if (!m_qa_e23)
+			if (!en_cycle)
 				debugger_instruction_hook(m_pc);
 			m_t = 1;
 			break;
 
 		case 1:
-			if (!m_qa_e23)
+			if (!en_cycle)
 				execute_te(m_rom_cache->read_byte(m_pc));
 			m_t = 2;
 			break;
 
 		case 2:
-			if (!m_qa_e23)
+			if (!en_cycle)
 				execute_tf(m_rom_cache->read_byte(m_pc));
 			if (!m_write_ff)
 				m_ram_do = m_ram_cache->read_byte(translate_xy()) & 0177;
 			m_cursor_active = m_ac == (m_x ^ (m_x8 ? 8 : 0));
+			if (m_video_process && m_horiz_count >= 2 * 16)
+				m_x = (m_x + 1) & 0177;
 			m_t = 3;
 			break;
 
 		case 3:
-			if (m_qa_e23 && m_write_ff)
+			if (en_cycle && m_write_ff)
 				execute_tg(m_rom_cache->read_byte(m_pc));
 			m_t = 4;
 			break;
 
 		case 4:
-			if (m_qa_e23)
+			if (en_cycle)
 				execute_th(m_rom_cache->read_byte(m_pc));
 			m_t = 5;
 			break;
@@ -584,20 +624,20 @@ void vt5x_cpu_device::execute_run()
 			break;
 
 		case 6:
-			if (m_qa_e23 && m_flag_test_ff)
+			if (en_cycle && m_flag_test_ff)
 				execute_tj(m_rom_cache->read_byte(m_pc));
 			m_t = 7;
 			break;
 
 		case 7:
-			if (!m_qa_e23)
+			if (!en_cycle)
 				execute_tw(m_rom_cache->read_byte(m_pc));
 			m_t = 8;
 			break;
 
 		case 8:
 			m_t = 0;
-			m_qa_e23 = !m_qa_e23;
+			clock_video_counters();
 			break;
 		}
 

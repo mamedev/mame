@@ -56,6 +56,7 @@ protected:
 	void execute_tw(u8 inst);
 	virtual void execute_th(u8 inst);
 	void execute_tj(u8 dest);
+	void clock_video_counters();
 
 	// address spaces
 	address_space_config m_rom_config;
@@ -101,8 +102,12 @@ protected:
 	bool m_m2u_ff;
 	bool m_bell_ff;
 	bool m_load_pc;
-	bool m_qa_e23;
 	s32 m_icount;
+
+	// video timing
+	u8 m_horiz_count;
+	u16 m_vert_count;
+	bool m_top_of_screen;
 };
 
 class vt50_cpu_device : public vt5x_cpu_device
