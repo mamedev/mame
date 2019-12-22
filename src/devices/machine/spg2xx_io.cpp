@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(SPG28X_IO, spg28x_io_device, "spg28x_io", "SPG280-series Syst
 #define LOG_IO              (LOG_IO_READS | LOG_IO_WRITES | LOG_IRQS | LOG_GPIO | LOG_UART | LOG_I2C | LOG_TIMERS | LOG_EXTINT | LOG_UNKNOWN_IO)
 #define LOG_ALL             (LOG_IO | LOG_VLINES | LOG_SEGMENT | LOG_WATCHDOG | LOG_FIQ | LOG_SIO | LOG_EXT_MEM)
 
-#define VERBOSE             (LOG_UART)
+#define VERBOSE             (0)
 #include "logmacro.h"
 
 
