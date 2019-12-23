@@ -398,7 +398,7 @@ void gcm394_game_state::machine_reset()
 	map(0x000000, 0x006fff) internal RAM
 	map(0x007000, 0x007fff) internal peripherals
 	map(0x008000, 0x00ffff) internal ROM (lower 32kwords) - can also be configured to mirror CS0 308000 area with external pin for boot from external ROM
-	map(0x010000, 0x027fff) internal ROM (upper 96kwords) - can't be siwtched
+	map(0x010000, 0x027fff) internal ROM (upper 96kwords) - can't be switched
 	map(0x028000, 0x02ffff) reserved
 
 	map(0x030000, 0x0.....) view into external spaces (CS0 area starts here. followed by CS1 area, CS2 area etc.)
