@@ -79,8 +79,9 @@ public:
 	kungfur_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_adpcm1(*this, "adpcm1"),
-		m_adpcm2(*this, "adpcm2"),
+		m_ppi(*this, "ppi%u", 0),
+		m_adpcm(*this, "adpcm%u", 0),
+		m_adpcm_region(*this, "adpcm%u", 0),
 		m_digits(*this, "digit%u", 0U),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
@@ -95,8 +96,9 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<msm5205_device> m_adpcm1;
-	required_device<msm5205_device> m_adpcm2;
+	required_device_array<i8255_device, 2> m_ppi;
+	required_device_array<msm5205_device, 2> m_adpcm;
+	required_memory_region_array<2> m_adpcm_region;
 	output_finder<14> m_digits;
 	output_finder<8> m_lamps;
 
@@ -106,14 +108,10 @@ private:
 	// I/O handlers
 	INTERRUPT_GEN_MEMBER(interrupt);
 	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_WRITE8_MEMBER(latch1_w);
-	DECLARE_WRITE8_MEMBER(latch2_w);
-	DECLARE_WRITE8_MEMBER(latch3_w);
 	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(adpcm1_w);
-	DECLARE_WRITE8_MEMBER(adpcm2_w);
-	DECLARE_WRITE_LINE_MEMBER(adpcm1_int);
-	DECLARE_WRITE_LINE_MEMBER(adpcm2_int);
+	template<int N> DECLARE_WRITE8_MEMBER(digit_data_w) { m_digit_data[N] = data; }
+	template<int N> DECLARE_WRITE8_MEMBER(adpcm_data_w) { m_adpcm_data[N] = data; }
+	template<int N> DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
 	u8 m_control = 0;
 	u8 m_digit_data[3] = { 0, 0, 0 };
@@ -187,24 +185,6 @@ WRITE8_MEMBER(kungfur_state::output_w)
 	machine().bookkeeping().coin_counter_w(0, data & 0x40);
 }
 
-
-// lamp output latches
-WRITE8_MEMBER(kungfur_state::latch1_w)
-{
-	m_digit_data[0] = data;
-}
-
-WRITE8_MEMBER(kungfur_state::latch2_w)
-{
-	m_digit_data[1] = data;
-}
-
-WRITE8_MEMBER(kungfur_state::latch3_w)
-{
-	m_digit_data[2] = data;
-}
-
-
 WRITE8_MEMBER(kungfur_state::control_w)
 {
 	// d0-d3: N/C
@@ -213,53 +193,31 @@ WRITE8_MEMBER(kungfur_state::control_w)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 
 	// d5: watchdog reset?
+
 	// d6-d7: sound trigger (edge)
-	if ((data ^ m_control) & 0x40)
-	{
-		m_adpcm1->reset_w(BIT(data, 6));
-		m_adpcm_pos[0] = m_adpcm_data[0] * 0x400;
-		m_adpcm_sel[0] = 0;
-	}
-	if ((data ^ m_control) & 0x80)
-	{
-		m_adpcm2->reset_w(BIT(data, 7));
-		m_adpcm_pos[1] = m_adpcm_data[1] * 0x400;
-		m_adpcm_sel[1] = 0;
-	}
+	for (int i = 0; i < 2; i++)
+		if (BIT(data ^ m_control, i + 6))
+		{
+			m_adpcm[i]->reset_w(BIT(data, i + 6));
+			m_adpcm_pos[i] = m_adpcm_data[i] * 0x400;
+			m_adpcm_sel[i] = 0;
+		}
 
 	m_control = data;
 }
 
-// adpcm latches
-WRITE8_MEMBER(kungfur_state::adpcm1_w)
+template<int N>
+WRITE_LINE_MEMBER(kungfur_state::adpcm_int)
 {
-	m_adpcm_data[0] = data;
-}
+	if (!state)
+		return;
 
-WRITE8_MEMBER(kungfur_state::adpcm2_w)
-{
-	m_adpcm_data[1] = data;
-}
+	u8 *ROM = m_adpcm_region[N]->base();
+	u8 data = ROM[m_adpcm_pos[N] & (m_adpcm_region[N]->bytes() - 1)];
 
-// adpcm callbacks
-WRITE_LINE_MEMBER(kungfur_state::adpcm1_int)
-{
-	u8 *ROM = memregion("adpcm1")->base();
-	u8 data = ROM[m_adpcm_pos[0] & 0x1ffff];
-
-	m_adpcm1->write_data(m_adpcm_sel[0] ? data & 0xf : data >> 4 & 0xf);
-	m_adpcm_pos[0] += m_adpcm_sel[0];
-	m_adpcm_sel[0] ^= 1;
-}
-
-WRITE_LINE_MEMBER(kungfur_state::adpcm2_int)
-{
-	u8 *ROM = memregion("adpcm2")->base();
-	u8 data = ROM[m_adpcm_pos[1] & 0x3ffff];
-
-	m_adpcm2->write_data(m_adpcm_sel[1] ? data & 0xf : data >> 4 & 0xf);
-	m_adpcm_pos[1] += m_adpcm_sel[1];
-	m_adpcm_sel[1] ^= 1;
+	m_adpcm[N]->write_data(m_adpcm_sel[N] ? data & 0xf : data >> 4 & 0xf);
+	m_adpcm_pos[N] += m_adpcm_sel[N];
+	m_adpcm_sel[N] ^= 1;
 }
 
 
@@ -271,10 +229,10 @@ WRITE_LINE_MEMBER(kungfur_state::adpcm2_int)
 void kungfur_state::main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x4000, 0x4000).w(FUNC(kungfur_state::adpcm1_w));
-	map(0x4004, 0x4004).w(FUNC(kungfur_state::adpcm2_w));
-	map(0x4008, 0x400b).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x400c, 0x400f).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x4000, 0x4000).w(FUNC(kungfur_state::adpcm_data_w<0>));
+	map(0x4004, 0x4004).w(FUNC(kungfur_state::adpcm_data_w<1>));
+	map(0x4008, 0x400b).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x400c, 0x400f).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xc000, 0xffff).rom();
 }
 
@@ -324,34 +282,32 @@ void kungfur_state::kungfur(machine_config &config)
 	const attotime irq_period = attotime::from_hz(4000000 / 0x1000); // = 976.5Hz, accurate
 	m_maincpu->set_periodic_int(FUNC(kungfur_state::interrupt), irq_period);
 
-	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
-	// $4008 - always $83 (PPI mode 0, ports B & lower C as input)
-	ppi0.out_pa_callback().set(FUNC(kungfur_state::output_w));
-	ppi0.tri_pa_callback().set_constant(0);
-	ppi0.in_pb_callback().set_ioport("IN0");
-	ppi0.in_pc_callback().set_ioport("IN1");
-	ppi0.out_pc_callback().set(FUNC(kungfur_state::control_w));
+	I8255(config, m_ppi[0]); // $4008 - always $83 (PPI mode 0, ports B & lower C as input)
+	m_ppi[0]->out_pa_callback().set(FUNC(kungfur_state::output_w));
+	m_ppi[0]->tri_pa_callback().set_constant(0);
+	m_ppi[0]->in_pb_callback().set_ioport("IN0");
+	m_ppi[0]->in_pc_callback().set_ioport("IN1");
+	m_ppi[0]->out_pc_callback().set(FUNC(kungfur_state::control_w));
 
-	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
-	// $400c - always $80 (PPI mode 0, all ports as output)
-	ppi1.out_pa_callback().set(FUNC(kungfur_state::latch1_w));
-	ppi1.out_pb_callback().set(FUNC(kungfur_state::latch2_w));
-	ppi1.out_pc_callback().set(FUNC(kungfur_state::latch3_w));
+	I8255(config, m_ppi[1]); // $400c - always $80 (PPI mode 0, all ports as output)
+	m_ppi[1]->out_pa_callback().set(FUNC(kungfur_state::digit_data_w<0>));
+	m_ppi[1]->out_pb_callback().set(FUNC(kungfur_state::digit_data_w<1>));
+	m_ppi[1]->out_pc_callback().set(FUNC(kungfur_state::digit_data_w<2>));
 
 	/* no video! */
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center(); // 2 speakers, but likely mono sound mix
 
-	MSM5205(config, m_adpcm1, 384_kHz_XTAL); // clock verified with recording
-	m_adpcm1->vck_legacy_callback().set(FUNC(kungfur_state::adpcm1_int));
-	m_adpcm1->set_prescaler_selector(msm5205_device::S48_4B);
-	m_adpcm1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	MSM5205(config, m_adpcm[0], 384_kHz_XTAL); // clock verified with recording
+	m_adpcm[0]->vck_callback().set(FUNC(kungfur_state::adpcm_int<0>));
+	m_adpcm[0]->set_prescaler_selector(msm5205_device::S48_4B);
+	m_adpcm[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MSM5205(config, m_adpcm2, 384_kHz_XTAL); // clock verified with recording
-	m_adpcm2->vck_legacy_callback().set(FUNC(kungfur_state::adpcm2_int));
-	m_adpcm2->set_prescaler_selector(msm5205_device::S48_4B);
-	m_adpcm2->add_route(ALL_OUTPUTS, "mono", 1.0);
+	MSM5205(config, m_adpcm[1], 384_kHz_XTAL); // clock verified with recording
+	m_adpcm[1]->vck_callback().set(FUNC(kungfur_state::adpcm_int<1>));
+	m_adpcm[1]->set_prescaler_selector(msm5205_device::S48_4B);
+	m_adpcm[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -362,16 +318,16 @@ void kungfur_state::kungfur(machine_config &config)
 
 ROM_START( kungfur )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "kr1.bin",   0x0c000, 0x04000, CRC(f5b93cc7) SHA1(ed962915aeafea823a6562e6f284a88422f09a08) )
+	ROM_LOAD( "kr1.bin", 0x0c000, 0x04000, CRC(f5b93cc7) SHA1(ed962915aeafea823a6562e6f284a88422f09a08) )
 
-	ROM_REGION( 0x20000, "adpcm1", 0 )
-	ROM_LOAD( "kr2.bin",   0x00000, 0x10000, CRC(13f5eba8) SHA1(a3ae2d54ec60d48bfff6192e61033ec583e3603f) )
-	ROM_LOAD( "kr3.bin",   0x10000, 0x10000, CRC(05fd1301) SHA1(6871d872315ffb025fea7d2ccd9a203863dc142d) )
+	ROM_REGION( 0x20000, "adpcm0", 0 )
+	ROM_LOAD( "kr2.bin", 0x00000, 0x10000, CRC(13f5eba8) SHA1(a3ae2d54ec60d48bfff6192e61033ec583e3603f) )
+	ROM_LOAD( "kr3.bin", 0x10000, 0x10000, CRC(05fd1301) SHA1(6871d872315ffb025fea7d2ccd9a203863dc142d) )
 
-	ROM_REGION( 0x40000, "adpcm2", 0 )
-	ROM_LOAD( "kr4.bin",   0x00000, 0x10000, CRC(58929279) SHA1(d90f68dd8cf2ddc5e73ed40eb31ebbb0be7e35a4) )
-	ROM_LOAD( "kr5.bin",   0x10000, 0x10000, CRC(31ed39c8) SHA1(8da50b2183a287fe3a41ec13078aff7fb40c43a3) )
-	ROM_LOAD( "kr6.bin",   0x20000, 0x10000, CRC(9ea75d4a) SHA1(57445ccb961acb11a25cdac81f2e543d92bcb7f9) )
+	ROM_REGION( 0x40000, "adpcm1", ROMREGION_ERASE00 )
+	ROM_LOAD( "kr4.bin", 0x00000, 0x10000, CRC(58929279) SHA1(d90f68dd8cf2ddc5e73ed40eb31ebbb0be7e35a4) )
+	ROM_LOAD( "kr5.bin", 0x10000, 0x10000, CRC(31ed39c8) SHA1(8da50b2183a287fe3a41ec13078aff7fb40c43a3) )
+	ROM_LOAD( "kr6.bin", 0x20000, 0x10000, CRC(9ea75d4a) SHA1(57445ccb961acb11a25cdac81f2e543d92bcb7f9) )
 ROM_END
 
 } // anonymous namespace
