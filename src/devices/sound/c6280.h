@@ -36,7 +36,6 @@ private:
 		s32 noise_counter;
 		u32 noise_frequency;
 		u32 noise_seed;
-		u32 counter;
 		s32 tick;
 	};
 

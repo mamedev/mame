@@ -24,12 +24,7 @@
 
     - Verify LFO frequency from real hardware.
 
-    - Add shared index for waveform playback and sample writes. Almost every
-      game will reset the index prior to playback so this isn't an issue.
-
-    - While the noise emulation is complete, the data for the pseudo-random
-      bitstream is calculated by machine().rand() and is not a representation of what
-      the actual hardware does.
+    - Noise generating algorithm is shared in all channels?
 
     For some background on Hudson Soft's C62 chipset:
 
@@ -89,6 +84,7 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 					{
 						chan->noise_counter = step << 6; // 32 * 2
 						const u32 seed = chan->noise_seed;
+						// based on Charles MacDonald's research
 						chan->noise_seed = (seed >> 1) | ((BIT(seed, 0) ^ BIT(seed, 1) ^ BIT(seed, 11) ^ BIT(seed, 12) ^ BIT(seed, 17)) << 17);
 					}
 					outputs[0][i] += (s16)(vll * (data - 16));
@@ -121,25 +117,25 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 							if (m_lfo_control & 0x80) // reset LFO
 							{
 								lfo_srcchan->tick = lfo_step * m_lfo_frequency;
-								lfo_srcchan->counter = 0;
+								lfo_srcchan->index = 0;
 							}
 							else
 							{
-								const s16 lfo_data = lfo_srcchan->waveform[lfo_srcchan->counter];
+								const s16 lfo_data = lfo_srcchan->waveform[lfo_srcchan->index];
 								lfo_srcchan->tick--;
 								if (lfo_srcchan->tick <= 0)
 								{
 									lfo_srcchan->tick = lfo_step * m_lfo_frequency; // verified from manual
-									lfo_srcchan->counter = (lfo_srcchan->counter + 1) & 0x1f;
+									lfo_srcchan->index = (lfo_srcchan->index + 1) & 0x1f;
 								}
 								step += ((lfo_data - 16) << (((m_lfo_control & 3)-1)<<1)); // verified from manual
 							}
-							const s16 data = lfo_dstchan->waveform[lfo_dstchan->counter];
+							const s16 data = lfo_dstchan->waveform[lfo_dstchan->index];
 							lfo_dstchan->tick--;
 							if (lfo_dstchan->tick <= 0)
 							{
 								lfo_dstchan->tick = step;
-								lfo_dstchan->counter = (lfo_dstchan->counter + 1) & 0x1f;
+								lfo_dstchan->index = (lfo_dstchan->index + 1) & 0x1f;
 							}
 							outputs[0][i] += (s16)(vll * (data - 16));
 							outputs[1][i] += (s16)(vlr * (data - 16));
@@ -152,12 +148,12 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 					const u32 step = chan->frequency ? chan->frequency : 0x1000;
 					for (int i = 0; i < samples; i += 1)
 					{
-						const s16 data = chan->waveform[chan->counter];
+						const s16 data = chan->waveform[chan->index];
 						chan->tick--;
 						if (chan->tick <= 0)
 						{
 							chan->tick = step;
-							chan->counter = (chan->counter + 1) & 0x1f;
+							chan->index = (chan->index + 1) & 0x1f;
 						}
 						outputs[0][i] += (s16)(vll * (data - 16));
 						outputs[1][i] += (s16)(vlr * (data - 16));
@@ -266,7 +262,8 @@ WRITE8_MEMBER( c6280_device::c6280_w )
 			{
 				case 0x00: // Waveform
 					chan->waveform[chan->index & 0x1f] = data & 0x1f;
-					chan->index = (chan->index + 1) & 0x1f;
+					if (!(chan->control & 0x80))
+						chan->index = (chan->index + 1) & 0x1f;
 					break;
 
 				case 0x40: // Direct D/A
@@ -348,7 +345,6 @@ void c6280_device::device_start()
 	save_item(STRUCT_MEMBER(m_channel, noise_control));
 	save_item(STRUCT_MEMBER(m_channel, noise_counter));
 	save_item(STRUCT_MEMBER(m_channel, noise_seed));
-	save_item(STRUCT_MEMBER(m_channel, counter));
 	save_item(STRUCT_MEMBER(m_channel, tick));
 }
 
@@ -357,7 +353,7 @@ void c6280_device::device_reset()
 	for (int ch = 0; ch < 6; ch++)
 	{
 		channel *chan = &m_channel[ch];
-		chan->counter = 0;
+		chan->index = 0;
 		if (ch >= 4)
 			chan->noise_seed = 1;
 	}
