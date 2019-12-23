@@ -270,7 +270,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void kungfur_state::kungfur(machine_config &config)
