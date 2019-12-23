@@ -2285,6 +2285,11 @@ ROM_START( hbarrel ) /* DE-0289-2 main board, DE-0293-1 sub/rom board */
 	ROM_LOAD( "mb7122e.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) ) /* Also known to be labeled as A-2 */
 ROM_END
 
+/*
+There are known PCBs with ROMs 01 & 04 stamped as "-1" revision
+At least 1 PCB was spotted with ROM labels as "MYF HEAVY BARREL 01-2" & "MYF HEAVY BARREL 04-2"
+Niether version has been dumped to verify they are indeed different versions
+*/
 ROM_START( hbarrelu ) /* DE-0297-1 main board, DE-0299-0 sub/rom board */
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "heavy_barrel_04.3c", 0x00000, 0x10000, CRC(4877b09e) SHA1(30c653b2f59fece881d088b675192ff2599adbe3) )
