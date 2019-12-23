@@ -262,7 +262,7 @@ WRITE8_MEMBER( c6280_device::c6280_w )
 			{
 				case 0x00: // Waveform
 					chan->waveform[chan->index & 0x1f] = data & 0x1f;
-					if (!(chan->control & 0x80))
+					if (!(chan->control & 0x80)) // TODO : wave pointer is increased at writing data when sound playback is off??
 						chan->index = (chan->index + 1) & 0x1f;
 					break;
 
