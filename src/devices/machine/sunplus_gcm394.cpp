@@ -237,9 +237,6 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::membankswitch_7810_w)
 //	if (m_membankswitch_7810 != data)
 //	LOGMASKED(LOG_GCM394,"%s:sunplus_gcm394_base_device::membankswitch_7810_w %04x\n", machine().describe_context(), data);
 
-	if ((data != 0x00) && (data != 0x01) && (data !=0x02))
-		printf("%s:sunplus_gcm394_base_device::membankswitch_7810_w %04x\n", machine().describe_context().c_str(), data);
-
 	m_membankswitch_7810 = data;
 }
 
