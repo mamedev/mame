@@ -31,6 +31,7 @@ gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig
 	, m_palette(*this, "palette")
 	, m_gfxdecode(*this, "gfxdecode")
 	, m_space_read_cb(*this)
+	, m_global_y_mask(0x1ff)
 {
 }
 
@@ -301,9 +302,9 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 	uint32_t nbits = 0;
 	uint32_t y = line;
 
-	int yy = (yoff + y) & 0x1ff;
-	if (yy >= 0x01c0)
-		yy -= 0x0200;
+	int yy = (yoff + y);// &0x1ff;
+	//if (yy >= 0x01c0)
+	//	yy -= 0x0200;
 
 	if (yy > cliprect.max_y || yy < 0)
 		return;
@@ -415,14 +416,14 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 
 	uint32_t tile_count_x = total_width / tile_w;
 
-	uint32_t bitmap_y = (scanline + yscroll) & 0xff;
+	uint32_t bitmap_y = (scanline + yscroll);// &0xff;
 	uint32_t y0 = bitmap_y / tile_h;
 	uint32_t tile_scanline = bitmap_y % tile_h;
 	uint32_t tile_address = tile_count_x * y0;
 
 	for (uint32_t x0 = 0; x0 < tile_count_x; x0++, tile_address++)
 	{
-		uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & 0xff) - 0x10;
+		uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & m_global_y_mask) - 0x10;
 		uint32_t xx = (tile_w * x0 - xscroll);// &0x1ff;
 		uint32_t tile = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(tilemap) : space.read_word(tilemap + tile_address);
 

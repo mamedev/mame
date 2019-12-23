@@ -227,6 +227,7 @@ protected:
 	int m_maxgfxelement;
 	void decodegfx(const char* tag);
 
+	int m_global_y_mask;
 };
 
 class gcm394_video_device : public gcm394_base_video_device
