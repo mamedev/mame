@@ -12938,6 +12938,8 @@ deluxe5                         // (c) 2000 ESD
 deluxe5a                        // (c) 2000 ESD
 deluxe5b                        // (c) 2000 ESD
 deluxe4u                        // (c) 2000 ESD
+fantstry                        // (c) 2002 Z Soft
+fantstrya                       // (c) 2002 Z Soft
 hedpanic                        // (c) 2000 ESD
 hedpanica                       // (c) 1999 ESD
 hedpanicf                       // (c) 2000 ESD + Fuuki, Co. Ltd.
@@ -12952,7 +12954,6 @@ multchmpa                       // (c) 1998 (World)
 multchmpk                       // (c) 1998 (Korea)
 swatpolc                        // (c) 2001 ESD
 tangtang                        // (c) 2000 ESD
-fantstry                        // (c) 2002 Z Soft
 
 @source:esh.cpp
 esh                             // (c) 1984 Funai / Gakken

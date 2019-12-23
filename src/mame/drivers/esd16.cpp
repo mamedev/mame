@@ -193,6 +193,14 @@ void esd16_state::multchmp_map(address_map &map)
 	map(0x700008, 0x70000b).nopr(); // unused protection?
 }
 
+void esd16_state::fantstrya_map(address_map &map)
+{
+	multchmp_map(map);
+
+	map(0x100000, 0x10ffff).unmaprw();
+	map(0x900000, 0x90ffff).ram();
+}
+
 void esd16_state::jumppop_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
@@ -743,6 +751,15 @@ void esd16_state::fantstry(machine_config& config)
 
 	OKIM6295(config, "okisfx", XTAL(16'000'000) / 8, okim6295_device::PIN7_LOW);
 	OKIM6295(config, "okimusic", XTAL(16'000'000) / 8, okim6295_device::PIN7_LOW);
+}
+
+void esd16_state::fantstrya(machine_config& config)
+{
+	fantstry(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &esd16_state::fantstrya_map);
+
+	config.device_remove("okisfx");
 }
 
 void esd16_state::esd16(machine_config& config)
@@ -1764,6 +1781,27 @@ ROM_START( fantstry )
 	ROM_LOAD16_BYTE( "graphics_rom_1", 0x200000, 0x080000, CRC(c8caa752) SHA1(cecc7a18a0bb59554316ed24ed0dc01d58d6ae53) ) // 1bpp
 ROM_END
 
+// the following set has a worse sound section: only one OKI with only 0x80000 of ROM.
+ROM_START( fantstrya ) // PCB marked: PNXND-MULTI 2002 01 01 - Only EPROMs dumped for now, marked the flash ROMs as BAD_DUMP but they should match
+	ROM_REGION( 0x80000, "maincpu", 0 ) // only difference from the above set seems to be they moved the RAM base from 0x100000 to 0x900000
+	ROM_LOAD16_WORD_SWAP( "system_rom", 0x00000, 0x80000, CRC(38471eed) SHA1(02f311ea5bdea41092e6754ed120e5e3e6994623) ) // 27c040, sldh
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "pic16f84a", 0x00000, 0x10000, NO_DUMP ) // did they change the program to take into account the one less OKI?
+
+	ROM_REGION( 0x80000, "okimusic", 0 )
+	ROM_LOAD( "sound_rom", 0x00000, 0x80000, CRC(44424914) SHA1(5bbe296d2c8de89b9271914164ef178239fa3e05) ) // 27c4000, sldh
+
+	ROM_REGION( 0x400000, "bgs", 0 )
+	ROM_LOAD32_WORD( "graphics_rom_4", 0x000000, 0x200000, BAD_DUMP CRC(82d5104a) SHA1(23067ca2698eb1ec39a77af75beb79431c054fa9) )
+	ROM_LOAD32_WORD( "graphics_rom_5", 0x000002, 0x200000, BAD_DUMP CRC(9178c370) SHA1(2c0f29c62d36cdb29380a3e63945da1a80e8d170) )
+
+	ROM_REGION( 0x300000, "spr", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "graphics_rom_3", 0x000000, 0x100000, BAD_DUMP CRC(1bd2b5fc) SHA1(21f32e9d2673c376c0781137db0f2d267b64bc0c) ) // 2bpp
+	ROM_LOAD16_WORD_SWAP( "graphics_rom_2", 0x100000, 0x100000, BAD_DUMP CRC(2020add8) SHA1(a7d950c6485f6abdcf4fc609a85f60df2bafe34e) ) // 2bpp
+	ROM_LOAD16_BYTE( "graphics_rom_1", 0x200000, 0x080000, CRC(c8caa752) SHA1(cecc7a18a0bb59554316ed24ed0dc01d58d6ae53) ) // 1bpp, 27c040
+ROM_END
+
 /***************************************************************************
 
 
@@ -1773,34 +1811,35 @@ ROM_END
 ***************************************************************************/
 
 /* ESD 11-09-98 */
-GAME( 1999, multchmp,  0,        esd16,    multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (World, ver. 2.5)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1998, multchmpk, multchmp, esd16,    multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (Korea, older)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1998, multchmpa, multchmp, esd16,    multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (World, older)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1999, multchmp,  0,        esd16,     multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (World, ver. 2.5)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1998, multchmpk, multchmp, esd16,     multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (Korea, older)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1998, multchmpa, multchmp, esd16,     multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (World, older)",                 MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, jumppop,   0,        jumppop,  jumppop,  esd16_state, empty_init, ROT0, "ESD",         "Jumping Pop (set 1)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 2001, jumppope,  jumppop,  jumppop,  jumppop,  esd16_state, empty_init, ROT0, "Emag Soft",   "Jumping Pop (set 2)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 2001, jumppop,   0,        jumppop,   jumppop,  esd16_state, empty_init, ROT0, "ESD",         "Jumping Pop (set 1)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 2001, jumppope,  jumppop,  jumppop,   jumppop,  esd16_state, empty_init, ROT0, "Emag Soft",   "Jumping Pop (set 2)",                        MACHINE_SUPPORTS_SAVE )
 
 /* ESD 05-28-99 */
-GAME( 1999, hedpanico, hedpanic, hedpanio, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hedpanico, hedpanic, hedpanio,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)",         MACHINE_SUPPORTS_SAVE )
 
 /* ESD 06-10-1999 */
-GAME( 1999, hedpanica, hedpanic, hedpanic, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 0702, 02/07/1999)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hedpanica, hedpanic, hedpanic,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 0702, 02/07/1999)",         MACHINE_SUPPORTS_SAVE )
 
 /* ESD 08-26-1999 */
-GAME( 2000, mchampdx,  0,        mchampdx, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ Deluxe (ver. 0106, 06/01/2000)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, mchampdxa, mchampdx, mchampdx, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1126, 26/11/1999)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, mchampdxb, mchampdx, mchampdx, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1114, 14/11/1999)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, hedpanic,  0,        hedpanic, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 0117, 17/01/2000)",         MACHINE_SUPPORTS_SAVE )
-GAME( 2000, hedpanicf, hedpanic, hedpanic, hedpanic, esd16_state, empty_init, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mchampdx,  0,        mchampdx,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ Deluxe (ver. 0106, 06/01/2000)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, mchampdxa, mchampdx, mchampdx,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1126, 26/11/1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, mchampdxb, mchampdx, mchampdx,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1114, 14/11/1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hedpanic,  0,        hedpanic,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 0117, 17/01/2000)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hedpanicf, hedpanic, hedpanic,  hedpanic, esd16_state, empty_init, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)",         MACHINE_SUPPORTS_SAVE )
 
 /* ESD - This PCB looks identical to the ESD 08-26-1999 PCB */
-GAME( 2000, deluxe5,   0,        tangtang, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 1)",    MACHINE_SUPPORTS_SAVE ) // all 4 sets report the same version number?
-GAME( 2000, deluxe5a,  deluxe5,  tangtang, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 2)",    MACHINE_SUPPORTS_SAVE )
-GAME( 2000, deluxe5b,  deluxe5,  tangtang, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 3)",    MACHINE_SUPPORTS_SAVE )
-GAME( 2000, deluxe4u,  deluxe5,  tangtang, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 4 U (ver. 0107, 07/01/2000)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, deluxe5,   0,        tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 1)",    MACHINE_SUPPORTS_SAVE ) // all 4 sets report the same version number?
+GAME( 2000, deluxe5a,  deluxe5,  tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 2)",    MACHINE_SUPPORTS_SAVE )
+GAME( 2000, deluxe5b,  deluxe5,  tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 3)",    MACHINE_SUPPORTS_SAVE )
+GAME( 2000, deluxe4u,  deluxe5,  tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 4 U (ver. 0107, 07/01/2000)",         MACHINE_SUPPORTS_SAVE )
 
-GAME( 2000, tangtang,  0,        tangtang, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)",          MACHINE_SUPPORTS_SAVE )
-GAME( 2001, swatpolc,  0,        hedpanic, swatpolc, esd16_state, empty_init, ROT0, "ESD",         "SWAT Police",                                MACHINE_SUPPORTS_SAVE )
+GAME( 2000, tangtang,  0,        tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)",          MACHINE_SUPPORTS_SAVE )
+GAME( 2001, swatpolc,  0,        hedpanic,  swatpolc, esd16_state, empty_init, ROT0, "ESD",         "SWAT Police",                                MACHINE_SUPPORTS_SAVE )
 
 /* Z Soft PCB, uses PIC instead of Z80 */
-GAME( 2002, fantstry,  0,        fantstry, fantstry, esd16_state, empty_init, ROT0, "Z Soft",      "Fantasy Story",                              MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // playable, just no sound
+GAME( 2002, fantstry,  0,        fantstry,  fantstry, esd16_state, empty_init, ROT0, "Z Soft",      "Fantasy Story (set 1)",                      MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // playable, just no sound
+GAME( 2002, fantstrya, fantstry, fantstrya, fantstry, esd16_state, empty_init, ROT0, "Z Soft",      "Fantasy Story (set 2)",                      MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // same
