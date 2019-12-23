@@ -409,9 +409,9 @@ void isa8_device::eop_w(int channel, int state)
 		m_dma_device[channel]->eop_w(state);
 }
 
-void isa8_device::set_ready(bool ready)
+void isa8_device::set_ready(int state)
 {
-	m_write_iochrdy(ready);
+	m_write_iochrdy(state);
 }
 
 void isa8_device::nmi()

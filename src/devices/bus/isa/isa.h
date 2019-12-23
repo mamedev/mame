@@ -182,7 +182,7 @@ public:
 	void dack_line_w(int line, int state);
 	void eop_w(int channels, int state);
 
-	void set_ready(bool ready);
+	void set_ready(int state);
 	void nmi();
 
 	virtual void set_dma_channel(uint8_t channel, device_isa8_card_interface *dev, bool do_eop);
