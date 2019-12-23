@@ -17,6 +17,8 @@ public:
 	};
 
 	// callback configuration
+	auto baud_9600_callback() { return m_baud_9600_callback.bind(); }
+	auto vert_count_callback() { return m_vert_count_callback.bind(); }
 	auto uart_rd_callback() { return m_uart_rd_callback.bind(); }
 	auto uart_xd_callback() { return m_uart_xd_callback.bind(); }
 	auto ur_flag_callback() { return m_ur_flag_callback.bind(); }
@@ -54,8 +56,8 @@ protected:
 	// execution helpers
 	void execute_te(u8 inst);
 	void execute_tf(u8 inst);
+	virtual void execute_tw(u8 inst);
 	virtual void execute_tg(u8 inst) = 0;
-	void execute_tw(u8 inst);
 	virtual void execute_th(u8 inst);
 	void execute_tj(u8 dest);
 	void clock_video_counters();
@@ -67,6 +69,8 @@ protected:
 	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_ram_cache;
 
 	// device callbacks
+	devcb_write_line m_baud_9600_callback;
+	devcb_write8 m_vert_count_callback;
 	devcb_read8 m_uart_rd_callback;
 	devcb_write8 m_uart_xd_callback;
 	devcb_read_line m_ur_flag_callback;
@@ -142,6 +146,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
+	virtual void execute_tw(u8 inst) override;
 	virtual void execute_tg(u8 inst) override;
 	virtual void execute_th(u8 inst) override;
 
