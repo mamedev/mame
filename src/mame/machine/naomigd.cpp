@@ -408,12 +408,70 @@ naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *
 	picdata(*this, finder_base::DUMMY_TAG)
 {
 	image_tag = nullptr;
+	picbus = 0;
+	picbus_pullup = 0xf;
+	picbus_io[0] = 0xf;
+	picbus_io[1] = 0xf;
+	picbus_used = false;
 }
 
-void naomi_gdrom_board::sh4_map(address_map& map)
+void naomi_gdrom_board::sh4_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom().region("bios", 0);
 	map.unmap_value_high();
+}
+
+void naomi_gdrom_board::sh4_io_map(address_map &map)
+{
+	map(0x00, 0x0f).rw(FUNC(naomi_gdrom_board::i2cmem_dimm_r), FUNC(naomi_gdrom_board::i2cmem_dimm_w));
+}
+
+READ64_MEMBER(naomi_gdrom_board::i2cmem_dimm_r)
+{
+	if (picbus_used == true)
+		return ((picbus | picbus_pullup) & 0xf) << 2;
+	else
+		return 0;
+}
+
+WRITE64_MEMBER(naomi_gdrom_board::i2cmem_dimm_w)
+{
+	if (data & 0x0200)
+	{
+		picbus_used = true;
+		picbus_io[0] = (uint8_t)(~data >> (16 + 5 * 2 - 3)) & 0x8; // clock only for now
+		picbus = (data >> 2) & 0xf;
+		picbus_pullup = (picbus_io[0] & picbus_io[1]) & 0xf; // high if both are inputs
+		// TODO: abort timeslice of sh4
+	}
+	else
+		picbus_used = false;
+}
+
+void naomi_gdrom_board::pic_map(address_map &map)
+{
+	map(0x00, 0x1f).rw(FUNC(naomi_gdrom_board::pic_dimm_r), FUNC(naomi_gdrom_board::pic_dimm_w));
+}
+
+READ8_MEMBER(naomi_gdrom_board::pic_dimm_r)
+{
+	if (offset == 1)
+		return picbus | picbus_pullup;
+	return 0;
+}
+
+WRITE8_MEMBER(naomi_gdrom_board::pic_dimm_w)
+{
+	if (offset == 1)
+	{
+		picbus = data;
+		// TODO: abort timeslice of pic
+	}
+	if (offset == 3)
+	{
+		picbus_io[1] = data; // for each bit specify direction, 0 out 1 in
+		picbus_pullup = (picbus_io[0] & picbus_io[1]) & 0xf; // high if both are inputs
+	}
 }
 
 void naomi_gdrom_board::find_file(const char *name, const uint8_t *dir_sector, uint32_t &file_start, uint32_t &file_size)
@@ -494,7 +552,7 @@ void naomi_gdrom_board::device_start()
 			memcpy((uint8_t*)m_securitycpu->space(AS_PROGRAM).get_read_ptr(0), picdata, 0x400);
 		} else {
 			// use extracted pic data
-	//      printf("This PIC key hasn't been converted to a proper PIC binary yet!\n");
+			// printf("This PIC key hasn't been converted to a proper PIC binary yet!\n");
 			memcpy(name, picdata+33, 7);
 			memcpy(name+7, picdata+25, 7);
 
@@ -591,6 +649,10 @@ void naomi_gdrom_board::device_start()
 	}
 
 	save_item(NAME(dimm_cur_address));
+	save_item(NAME(picbus));
+	save_item(NAME(picbus_pullup));
+	save_item(NAME(picbus_io));
+	save_item(NAME(picbus_used));
 }
 
 void naomi_gdrom_board::device_reset()
@@ -620,7 +682,7 @@ void naomi_gdrom_board::board_advance(uint32_t size)
 
 #define CPU_CLOCK 200000000 // need to set the correct value here
 
-void naomi_gdrom_board::device_add_mconfig(machine_config& config)
+void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 {
 	SH4LE(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_md(0, 1);
@@ -634,8 +696,10 @@ void naomi_gdrom_board::device_add_mconfig(machine_config& config)
 	m_maincpu->set_md(8, 0);
 	m_maincpu->set_sh4_clock(CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &naomi_gdrom_board::sh4_map);
+	m_maincpu->set_addrmap(AS_IO, &naomi_gdrom_board::sh4_io_map);
 	m_maincpu->set_disable();
-	PIC16C621A(config, m_securitycpu, 1000000); // need to set the correct value for clock
+	PIC16C621A(config, m_securitycpu, 2000000); // need to set the correct value for clock
+	m_securitycpu->set_addrmap(AS_IO, &naomi_gdrom_board::pic_map);
 	m_securitycpu->set_disable();
 }
 
