@@ -77,7 +77,7 @@ protected:
 
 	devcb_write16 m_porta_out;
 
-	uint16_t m_dma_params[7];
+	uint16_t m_dma_params[7][2];
 
 	// unk 78xx
 	uint16_t m_7803;
@@ -150,10 +150,15 @@ private:
 
 	DECLARE_READ16_MEMBER(unk_r);
 	DECLARE_WRITE16_MEMBER(unk_w);
+	
+	void write_dma_params(int channel, int offset, uint16_t data);
+	uint16_t read_dma_params(int channel, int offset);
+	void trigger_systemm_dma(address_space &space, int channel, uint16_t data);
 
-
-	DECLARE_READ16_MEMBER(system_dma_params_r);
-	DECLARE_WRITE16_MEMBER(system_dma_params_w);
+	DECLARE_READ16_MEMBER(system_dma_params_channel0_r);
+	DECLARE_WRITE16_MEMBER(system_dma_params_channel0_w);
+	DECLARE_READ16_MEMBER(system_dma_params_channel1_r);
+	DECLARE_WRITE16_MEMBER(system_dma_params_channel1_w);
 	DECLARE_READ16_MEMBER(system_dma_status_r);
 	DECLARE_WRITE16_MEMBER(system_dma_trigger_w);
 
@@ -164,6 +169,8 @@ private:
 	DECLARE_WRITE16_MEMBER(unkarea_7803_w);
 
 	DECLARE_WRITE16_MEMBER(unkarea_7807_w);
+
+	DECLARE_WRITE16_MEMBER(waitmode_enter_780c_w);
 
 	DECLARE_READ16_MEMBER(membankswitch_7810_r);
 	DECLARE_WRITE16_MEMBER(membankswitch_7810_w);

@@ -5,6 +5,7 @@
 
     Compared to vii.cpp this is clearly newer, has extra opcodes, different internal map etc. also scaling and higher resolutions based on Spongebob
 
+	note, these SoC types always have a 128Kwords internal ROM, which the JAKKS games appear to use for basic bootstrap purposes.
 
     GPL600
         Smart Fit Park
@@ -138,7 +139,8 @@ public:
 	generalplus_gpac800_game_state(const machine_config& mconfig, device_type type, const char* tag) :
 		gcm394_game_state(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
-		m_initial_copy_words(0x2000)
+		m_initial_copy_words(0x2000),
+		m_nandreadbase(0)
 	{
 	}
 
@@ -148,6 +150,7 @@ public:
 	void nand_init840();
 	void nand_wlsair60();
 	void nand_vbaby();
+	void nand_tsm();
 
 protected:
 	virtual void machine_reset() override;
@@ -163,13 +166,14 @@ private:
 	int m_strippedsize;
 
 	int m_initial_copy_words;
+	int m_nandreadbase;
 
 	virtual DECLARE_WRITE16_MEMBER(write_external_space) override;
 };
 
 READ8_MEMBER(generalplus_gpac800_game_state::read_nand)
 {
-	return m_strippedrom[offset & (m_strippedsize-1)];
+	return m_strippedrom[(offset + m_nandreadbase) & (m_strippedsize - 1)];
 }
 
 WRITE16_MEMBER(generalplus_gpac800_game_state::write_external_space)
@@ -386,6 +390,21 @@ void gcm394_game_state::machine_reset()
 {
 	m_current_bank = 0;
 }
+
+
+/*
+	map info
+
+	map(0x000000, 0x006fff) internal RAM
+	map(0x007000, 0x007fff) internal peripherals
+	map(0x008000, 0x00ffff) internal ROM (lower 32kwords) - can also be configured to mirror CS0 308000 area with external pin for boot from external ROM
+	map(0x010000, 0x027fff) internal ROM (upper 96kwords) - can't be siwtched
+	map(0x028000, 0x02ffff) reserved
+
+	map(0x030000, 0x0.....) view into external spaces (CS0 area starts here. followed by CS1 area, CS2 area etc.)
+	
+	map(0x200000, 0x3fffff) continued view into external spaces, but this area is banked with m_membankswitch_7810 (valid bank values 0x00-0x3f)
+*/
 
 void gcm394_game_state::mem_map_4m(address_map &map)
 {
@@ -911,6 +930,19 @@ void generalplus_gpac800_game_state::nand_vbaby()
 	m_initial_copy_words = 0x1000;
 }
 
+void generalplus_gpac800_game_state::nand_tsm()
+{
+	nand_init210();
+
+	// something odd must be going on with the bootloader?
+	// structure has the first 0x4000 block repeated 3 times (must appear in RAM on startup?)
+	// then it has a 0x10000 block repeated 4 times (must get copied to 0x30000 by code)
+	// then it has the larger, main payload, just the once.
+
+	// the addresses written to the NAND device don't compensate for these data repeats, however dump seems ok as no other data is being repeated?
+	// reads after startup still need checking
+	m_nandreadbase = (0x2000 + 0x2000 + 0x8000 + 0x8000 + 0x8000) * 2;
+}
 
 
 
@@ -919,6 +951,6 @@ void generalplus_gpac800_game_state::nand_vbaby()
 CONS(2010, wlsair60, 0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_wlsair60, "Jungle Soft / Kids Station Toys Inc", "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, jak_gtg,  0, 0, generalplus_gpac800, jak_gtg,  generalplus_gpac800_game_state, nand_init210,  "JAKKS Pacific Inc", "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, jak_car2, 0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_init210,  "JAKKS Pacific Inc", "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, jak_tsm , 0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_init210,  "JAKKS Pacific Inc", "Toy Story Mania (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_tsm , 0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_tsm,      "JAKKS Pacific Inc", "Toy Story Mania (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, vbaby,    0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_vbaby,    "VTech", "V.Baby",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, beambox,  0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_init210,  "Hasbro", "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

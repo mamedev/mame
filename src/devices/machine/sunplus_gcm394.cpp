@@ -37,32 +37,59 @@ generalplus_gpac800_device::generalplus_gpac800_device(const machine_config &mco
 
 // **************************************** SYSTEM DMA device *************************************************
 
-READ16_MEMBER(sunplus_gcm394_base_device::system_dma_params_r)
+uint16_t sunplus_gcm394_base_device::read_dma_params(int channel, int offset)
 {
-	uint16_t retdata = m_dma_params[offset];
-	LOGMASKED(LOG_GCM394_SYSDMA, "%s:sunplus_gcm394_base_device::system_dma_params_r %01x returning %04x\n", machine().describe_context(), offset, retdata);
+	uint16_t retdata = m_dma_params[offset][channel];
+	LOGMASKED(LOG_GCM394_SYSDMA, "%s:sunplus_gcm394_base_device::read_dma_params (channel %01x) %01x returning %04x\n", machine().describe_context(), channel, offset, retdata);
 	return retdata;
 }
 
-WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_params_w)
+void sunplus_gcm394_base_device::write_dma_params(int channel, int offset, uint16_t data)
 {
-	m_dma_params[offset] = data;
-	LOGMASKED(LOG_GCM394_SYSDMA, "%s:sunplus_gcm394_base_device::sys_dma_params_w %01x %04x\n", machine().describe_context(), offset, data);
+	m_dma_params[offset][channel] = data;
+	LOGMASKED(LOG_GCM394_SYSDMA, "%s:sunplus_gcm394_base_device::write_dma_params (channel %01x) %01x %04x\n", machine().describe_context(), channel, offset, data);
 }
+
+
+READ16_MEMBER(sunplus_gcm394_base_device::system_dma_params_channel0_r)
+{
+	return read_dma_params(0, offset);
+}
+
+
+WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_params_channel0_w)
+{
+	write_dma_params(0, offset, data);
+}
+
+READ16_MEMBER(sunplus_gcm394_base_device::system_dma_params_channel1_r)
+{
+	return read_dma_params(1, offset);
+}
+
+WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_params_channel1_w)
+{
+	write_dma_params(1, offset, data);
+}
+
 
 
 READ16_MEMBER(sunplus_gcm394_base_device::system_dma_status_r)
 {
 	LOGMASKED(LOG_GCM394_SYSDMA, "%s:sunplus_gcm394_base_device::system_dma_status_r (7abf)\n", machine().describe_context());
-	return 0x0001;
+
+	// bit 0 = channel 0 ready
+	// bit 1 = channel 1 ready
+
+	return 0x0003;
 }
 
-WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
+void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int channel, uint16_t data)
 {
-	uint16_t mode = m_dma_params[0];
-	uint32_t source = m_dma_params[1] | (m_dma_params[4] << 16);
-	uint32_t dest = m_dma_params[2] | (m_dma_params[5] << 16) ;
-	uint32_t length = m_dma_params[3] | (m_dma_params[6] << 16);
+	uint16_t mode = m_dma_params[0][channel];
+	uint32_t source = m_dma_params[1][channel] | (m_dma_params[4][channel] << 16);
+	uint32_t dest = m_dma_params[2][channel] | (m_dma_params[5][channel] << 16) ;
+	uint32_t length = m_dma_params[3][channel] | (m_dma_params[6][channel] << 16);
 
 	LOGMASKED(LOG_GCM394_SYSDMA, "%s:possible DMA operation (7abf) (trigger %04x) with params mode:%04x source:%08x (word offset) dest:%08x (word offset) length:%08x (words)\n", machine().describe_context(), data, mode, source, dest, length );
 
@@ -147,8 +174,14 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
 		LOGMASKED(LOG_GCM394_SYSDMA, "unhandled!\n");
 	}
 
-	m_dma_params[0] = m_dma_params[1] = m_dma_params[2] = m_dma_params[3] = m_dma_params[4] = m_dma_params[5] = m_dma_params[6] = 0x0000;
+	m_dma_params[0][channel] = m_dma_params[1][channel] = m_dma_params[2][channel] = m_dma_params[3][channel] = m_dma_params[4][channel] = m_dma_params[5][channel] = m_dma_params[6][channel] = 0x0000;
 	//machine().debug_break();
+}
+
+WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
+{
+	if (data & 0x01) trigger_systemm_dma(space, 0, data);
+	if (data & 0x02) trigger_systemm_dma(space, 1, data);
 }
 
 
@@ -184,6 +217,11 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7803_w) { LOGMASKED(LOG_GCM39
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7807_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7807_w %04x\n", machine().describe_context(), data); m_7807 = data; }
 
+WRITE16_MEMBER(sunplus_gcm394_base_device::waitmode_enter_780c_w)
+{
+	// LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::waitmode_enter_780c_w %04x\n", machine().describe_context(), data);
+	// must be followed by 6 nops to ensure wait mode is entered
+}
 
 // this gets stored / modified / restored before certain memory accesses (
 // used extensively during SDRAM checks in jak_gtg and jak_car2
@@ -197,7 +235,11 @@ READ16_MEMBER(sunplus_gcm394_base_device::membankswitch_7810_r)
 WRITE16_MEMBER(sunplus_gcm394_base_device::membankswitch_7810_w)
 {
 //	if (m_membankswitch_7810 != data)
-	LOGMASKED(LOG_GCM394,"%s:sunplus_gcm394_base_device::membankswitch_7810_w %04x\n", machine().describe_context(), data);
+//	LOGMASKED(LOG_GCM394,"%s:sunplus_gcm394_base_device::membankswitch_7810_w %04x\n", machine().describe_context(), data);
+
+	if ((data != 0x00) && (data != 0x01) && (data !=0x02))
+		printf("%s:sunplus_gcm394_base_device::membankswitch_7810_w %04x\n", machine().describe_context().c_str(), data);
+
 	m_membankswitch_7810 = data;
 }
 
@@ -212,6 +254,23 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::chipselect_csx_memory_device_control_
 
 	if (offset == 0)
 		m_mapping_write_cb(data);
+
+
+	static const char* const md[] =
+	{
+		"(00) ROM / SRAM",
+		"(01) ROM / SRAM",
+		"(10) NOR FLASH",
+		"(11) NAND FLASH",
+	};
+
+	uint8_t cs_wait =  data & 0x000f;
+	uint8_t cs_warat = (data & 0x0030)>>4;
+	uint8_t cs_md    = (data & 0x00c0)>>6;
+	int cs_size  = (data & 0xff00)>>8;
+
+	logerror("CS%d set to size: %02x (%08x words) md: %01x %s   warat: %01x wait: %01x\n", offset, cs_size, (cs_size+1)*0x10000, cs_md, md[cs_md], cs_warat, cs_wait);
+
 }
 
 
@@ -466,6 +525,8 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 
 	// 780a
 
+	map(0x00780c, 0x00780c).w(FUNC(sunplus_gcm394_base_device::waitmode_enter_780c_w));
+
 	map(0x00780f, 0x00780f).r(FUNC(sunplus_gcm394_base_device::unkarea_780f_status_r));
 
 	map(0x007810, 0x007810).rw(FUNC(sunplus_gcm394_base_device::membankswitch_7810_r), FUNC(sunplus_gcm394_base_device::membankswitch_7810_w));  // 7810 Bank Switch Control Register  (P_BankSwitch_Ctrl) (maybe)
@@ -588,9 +649,11 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 
 	map(0x007a3a, 0x007a3a).r(FUNC(sunplus_gcm394_base_device::system_7a3a_r));
 
-	map(0x007a80, 0x007a86).rw(FUNC(sunplus_gcm394_base_device::system_dma_params_r), FUNC(sunplus_gcm394_base_device::system_dma_params_w));
-	
-	// 7abe - written with DMA stuff
+	map(0x007a80, 0x007a86).rw(FUNC(sunplus_gcm394_base_device::system_dma_params_channel0_r), FUNC(sunplus_gcm394_base_device::system_dma_params_channel0_w));
+
+	map(0x007a88, 0x007a8e).rw(FUNC(sunplus_gcm394_base_device::system_dma_params_channel1_r), FUNC(sunplus_gcm394_base_device::system_dma_params_channel1_w)); // jak_tsm writes here
+
+	// 7abe - written with DMA stuff (source type for each channel so that device handles timings properly?)
 	map(0x007abf, 0x007abf).rw(FUNC(sunplus_gcm394_base_device::system_dma_status_r), FUNC(sunplus_gcm394_base_device::system_dma_trigger_w));
 
 	// ######################################################################################################################################################################################
@@ -665,7 +728,9 @@ WRITE16_MEMBER(generalplus_gpac800_device::flash_addr_high_w)
 
 	uint32_t address = (m_flash_addr_high << 16) | m_flash_addr_low;
 
+
 	logerror("%s: flash address is now %08x\n", machine().describe_context(), address);
+
 	m_curblockaddr = 0;
 }
 
@@ -713,9 +778,12 @@ void sunplus_gcm394_base_device::device_reset()
 {
 	unsp_20_device::device_reset();
 
-	for (int i = 0; i < 7; i++)
+	for (int j = 0; j < 2; j++)
 	{
-		m_dma_params[i] = 0x0000;
+		for (int i = 0; i < 7; i++)
+		{
+			m_dma_params[i][j] = 0x0000;
+		}
 	}
 
 	// 78xx unknown
