@@ -347,6 +347,8 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 
 	m_maincpu->nand_read_callback().set(FUNC(generalplus_gpac800_game_state::read_nand));
 
+	m_screen->set_size(320*2, 262*2);
+	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
 
 }
 

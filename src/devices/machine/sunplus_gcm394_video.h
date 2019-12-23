@@ -29,11 +29,15 @@ public:
 
 	DECLARE_READ16_MEMBER(tmap0_regs_r);
 	DECLARE_WRITE16_MEMBER(tmap0_regs_w);
+	DECLARE_READ16_MEMBER(tmap0_tilebase_lsb_r);
+	DECLARE_READ16_MEMBER(tmap0_tilebase_msb_r);
 	DECLARE_WRITE16_MEMBER(tmap0_tilebase_lsb_w);
 	DECLARE_WRITE16_MEMBER(tmap0_tilebase_msb_w);
 
 	DECLARE_READ16_MEMBER(tmap1_regs_r);
 	DECLARE_WRITE16_MEMBER(tmap1_regs_w);
+	DECLARE_READ16_MEMBER(tmap1_tilebase_lsb_r);
+	DECLARE_READ16_MEMBER(tmap1_tilebase_msb_r);
 	DECLARE_WRITE16_MEMBER(tmap1_tilebase_lsb_w);
 	DECLARE_WRITE16_MEMBER(tmap1_tilebase_msb_w);
 
@@ -44,6 +48,9 @@ public:
 	DECLARE_WRITE16_MEMBER(unk_vid2_regs_w);
 	DECLARE_WRITE16_MEMBER(unk_vid2_gfxbase_lsb_w);
 	DECLARE_WRITE16_MEMBER(unk_vid2_gfxbase_msb_w);
+	
+	DECLARE_READ16_MEMBER(sprite_7022_gfxbase_lsb_r);
+	DECLARE_READ16_MEMBER(sprite_702d_gfxbase_msb_r);
 
 	DECLARE_WRITE16_MEMBER(sprite_7022_gfxbase_lsb_w);
 	DECLARE_WRITE16_MEMBER(sprite_702d_gfxbase_msb_w);
