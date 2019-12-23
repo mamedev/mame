@@ -22,6 +22,9 @@ http://www.wshin.com/games/review/ka/kung-fu-roushi.htm
 http://www.youtube.com/watch?v=ssEfw-RbSjs
 http://www.youtube.com/watch?v=1YacVjpUG8g
 
+TODO:
+- verify XTAL and CPU type(small chance it's an "E")
+
 ---------------------------------------------------------------------------
 
 Game Panel:
@@ -53,7 +56,6 @@ menkyokaiden(full certification)
 
 The 4 buttons are labeled:
 mae(forward), migi(right), ushiro(back), hidari(left)
-
 
 ***************************************************************************/
 
@@ -179,7 +181,7 @@ WRITE8_MEMBER(kungfur_state::kungfur_control_w)
 	if (~data & 0x10)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 
-	// d5: ?
+	// d5: watchdog reset?
 	// d6-d7: sound trigger (edge)
 	if ((data ^ m_control) & 0x40)
 	{
@@ -300,13 +302,16 @@ void kungfur_state::machine_reset()
 void kungfur_state::kungfur(machine_config &config)
 {
 	/* basic machine hardware */
-	M6809(config, m_maincpu, 8000000/2); // 4MHz?
+	MC6809(config, m_maincpu, 4000000); // 4MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &kungfur_state::kungfur_map);
-	m_maincpu->set_periodic_int(FUNC(kungfur_state::kungfur_irq), attotime::from_hz(8000000/2 / 0x1000));
+
+	const attotime irq_period = attotime::from_hz(4000000 / 0x1000); // = 976.5Hz, accurate
+	m_maincpu->set_periodic_int(FUNC(kungfur_state::kungfur_irq), irq_period);
 
 	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
 	// $4008 - always $83 (PPI mode 0, ports B & lower C as input)
 	ppi0.out_pa_callback().set(FUNC(kungfur_state::kungfur_output_w));
+	ppi0.tri_pa_callback().set_constant(0);
 	ppi0.in_pb_callback().set_ioport("IN0");
 	ppi0.in_pc_callback().set_ioport("IN1");
 	ppi0.out_pc_callback().set(FUNC(kungfur_state::kungfur_control_w));
@@ -322,12 +327,12 @@ void kungfur_state::kungfur(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center(); // 2 speakers, but likely mono sound mix
 
-	MSM5205(config, m_adpcm1, XTAL(384'000)); // clock verified with recording
+	MSM5205(config, m_adpcm1, 384_kHz_XTAL); // clock verified with recording
 	m_adpcm1->vck_legacy_callback().set(FUNC(kungfur_state::kfr_adpcm1_int));
 	m_adpcm1->set_prescaler_selector(msm5205_device::S48_4B);
 	m_adpcm1->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MSM5205(config, m_adpcm2, XTAL(384'000)); // clock verified with recording
+	MSM5205(config, m_adpcm2, 384_kHz_XTAL); // clock verified with recording
 	m_adpcm2->vck_legacy_callback().set(FUNC(kungfur_state::kfr_adpcm2_int));
 	m_adpcm2->set_prescaler_selector(msm5205_device::S48_4B);
 	m_adpcm2->add_route(ALL_OUTPUTS, "mono", 1.0);
