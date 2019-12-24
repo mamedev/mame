@@ -556,7 +556,7 @@ void vt5x_cpu_device::execute_th(u8 inst)
 
 void vt52_cpu_device::execute_th(u8 inst)
 {
-	// not actually synchronized to TH
+	// not actually synchronized to TH (but may be gated externally with EN CYCLE)
 	if ((inst & 0362) == 0162)
 		m_graphic_callback(m_ram_do);
 

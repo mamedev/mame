@@ -116,10 +116,12 @@ void vt52_state::vert_count_w(u8 data)
 			m_uart->write_tcp(clk);
 		}
 		else
+		{
 			m_uart->write_rcp((~(baud | data) & 0x0e) == 0);
+			m_uart->write_tcp((~(baud | data) & 0x71) == 0);
+		}
 	}
-
-	if ((baud & 0x0380) == 0x0380)
+	else if ((baud & 0x0380) == 0x0380)
 		m_uart->write_tcp((~(baud | data) & 0x71) == 0);
 }
 
@@ -325,7 +327,7 @@ void vt52_state::vt52(machine_config &mconfig)
 	screen.set_screen_update(FUNC(vt52_state::screen_update));
 
 	SPEAKER(mconfig, "mono").front_center();
-	SPEAKER_SOUND(mconfig, "bell").add_route(ALL_OUTPUTS, "mono", 1.0);
+	SPEAKER_SOUND(mconfig, "bell").add_route(ALL_OUTPUTS, "mono", 1.0); // FIXME: uses a flyback diode circuit
 }
 
 ROM_START(vt52)
@@ -339,4 +341,4 @@ ROM_START(vt52)
 	ROM_LOAD("23-002b4.e1", 0x000, 0x400, CRC(b486500c) SHA1(029f07424d6c23ee083db42d9f9c252ac728ccd0))
 ROM_END
 
-COMP(1975, vt52, 0, 0, vt52, vt52, vt52_state, empty_init, "Digital Equipment Corporation", "VT52 Video Display Terminal", MACHINE_NOT_WORKING)
+COMP(1975, vt52, 0, 0, vt52, vt52, vt52_state, empty_init, "Digital Equipment Corporation", "VT52 Video Display Terminal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
