@@ -2334,12 +2334,13 @@ ROM_START( akiss )
 	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
+// Supposedly a Ver1.1 also exists, on the same ROM board (MB-94166 EB91022-20101)
 ROM_START( p47aces )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
-	ROM_LOAD32_BYTE( "p47-26.26", 0x000003, 0x80000, CRC(e017b819) SHA1(942fb48e8bb3a263534a0351a1a9979d786bc475) ) /* Need to verify - might be: P-47 ACES 3/31 ROM 26 Ver1.1 - uses MB-94166 EB91022-20101 rom board */
-	ROM_LOAD32_BYTE( "p47-27.27", 0x000002, 0x80000, CRC(bd1b81e0) SHA1(b15f157fe3a30295f999a4c285da2d6f22d7fba6) ) /* Need to verify - might be: P-47 ACES 3/31 ROM 27 Ver1.1 */
-	ROM_LOAD32_BYTE( "p47-28.28", 0x000001, 0x80000, CRC(4742a5f7) SHA1(cd297aa150082c545647c9a755cf2cdbdc98c988) ) /* Need to verify - might be: P-47 ACES 3/31 ROM 28 Ver1.1 */
-	ROM_LOAD32_BYTE( "p47-29.29", 0x000000, 0x80000, CRC(86e17d8b) SHA1(73004f243c6dfb86ce4cc61475dc7caaf452750e) ) /* Need to verify - might be: P-47 ACES 3/31 ROM 29 Ver1.1 */
+	ROM_LOAD32_BYTE( "p47-26.26", 0x000003, 0x80000, CRC(e017b819) SHA1(942fb48e8bb3a263534a0351a1a9979d786bc475) ) /* Labeled "P-47 Ver1.0 -26" */
+	ROM_LOAD32_BYTE( "p47-27.27", 0x000002, 0x80000, CRC(bd1b81e0) SHA1(b15f157fe3a30295f999a4c285da2d6f22d7fba6) ) /* Labeled "P-47 Ver1.0 -27" */
+	ROM_LOAD32_BYTE( "p47-28.28", 0x000001, 0x80000, CRC(4742a5f7) SHA1(cd297aa150082c545647c9a755cf2cdbdc98c988) ) /* Labeled "P-47 Ver1.0 -28" */
+	ROM_LOAD32_BYTE( "p47-29.29", 0x000000, 0x80000, CRC(86e17d8b) SHA1(73004f243c6dfb86ce4cc61475dc7caaf452750e) ) /* Labeled "P-47 Ver1.0 -29" */
 
 	ROM_REGION( 0xe00000, "sprite", 0 ) /* sprites */
 	ROM_LOAD32_WORD( "mr94020-02.1",  0x000002, 0x200000, CRC(28732d3c) SHA1(15b2687bcad31793fc7d6a9dc3eccb7ad9b5f659) )
@@ -2360,10 +2361,10 @@ ROM_START( p47aces )
 	ROM_LOAD( "mr94020-09.9",  0x200000, 0x200000, CRC(226014a6) SHA1(090bdc1f6d2b9d33b431dbb49a457a4bb36cd3ad) )
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
-	ROM_LOAD( "p-47_ver1.0-30.30", 0x000000, 0x080000, CRC(7ba90fad) SHA1(c0a3d4458816f00b8f5eb4b6d4531d1abeaccbe5) )
+	ROM_LOAD( "p-47_ver1.0-30.30", 0x000000, 0x080000, CRC(7ba90fad) SHA1(c0a3d4458816f00b8f5eb4b6d4531d1abeaccbe5) ) /* Labeled "P-47 Ver1.0 -30" */
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
-	ROM_LOAD( "p-47_ver1.0-21.21", 0x000000, 0x040000, CRC(f2d43927) SHA1(69ac20f339a515d58cafbcd6f7d7982ca5cda681) )
+	ROM_LOAD( "p-47_ver1.0-21.21", 0x000000, 0x040000, CRC(f2d43927) SHA1(69ac20f339a515d58cafbcd6f7d7982ca5cda681) ) /* Labeled "P-47 Ver1.0 -21" */
 
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples - 8-bit signed PCM */
 	ROM_LOAD( "mr92042-01.22", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
