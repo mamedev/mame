@@ -69,4 +69,4 @@ ROM_START( unkmandd )
 	ROM_LOAD( "8718_en25f32.bin", 0x000000, 0x400000, CRC(cc138db4) SHA1(379af3d94ae840f52c06416d6cf32e25923af5ae) )
 ROM_END
 
-CONS( 200?, unkmandd,      0,       0,      unkmandd,   unkmandd, unkmandd_state, empty_init, "M&D", "Unknown M&D Handheld", MACHINE_IS_SKELETON )
+CONS( 200?, unkmandd,      0,       0,      unkmandd,   unkmandd, unkmandd_state, empty_init, "M&D", "unknown M&D handheld", MACHINE_IS_SKELETON )
