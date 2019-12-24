@@ -459,7 +459,7 @@ function add_name(group, name, crc, sha1)
 		{
 			var issues = group.issues;
 			if (issues !== null)
-				issues.parentNode.parentNode.insertBefore(document.createElement('dl'), issues.parentNode).textContent = name;
+				issues.parentNode.parentNode.insertBefore(document.createElement('dt'), issues.parentNode).textContent = name;
 		}
 
 		if (group.hasOwnProperty('machines'))
