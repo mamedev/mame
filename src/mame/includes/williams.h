@@ -133,6 +133,10 @@ protected:
 
 	virtual void main_map(address_map &map);
 
+	void video_control_w(u8 data);
+
+	required_device<address_map_bank_device> m_bankc000;
+
 private:
 	virtual void machine_start() override { }
 	virtual void machine_reset() override;
@@ -141,9 +145,6 @@ private:
 	virtual void sound_map(address_map &map) override;
 
 	void bank_select_w(u8 data);
-	void video_control_w(u8 data);
-
-	required_device<address_map_bank_device> m_bankc000;
 };
 
 class defndjeu_state : public defender_state
