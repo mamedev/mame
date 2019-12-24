@@ -1688,6 +1688,29 @@ Beyond that last category are the roms waiting to be classified.
     </software>
 -->
 
+	<software name="missile" cloneof="arcadeac">
+		<description>Missile Command (prototype 19970210)</description>
+		<year>1997</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2P3B-01" /> 
+			<feature name="u1" value="U1 EPROM(J)" />
+			<feature name="u2" value="U2 EPROM(J)" /> <!-- empty socket -->
+			<feature name="u3" value="U3 SRAM [LH5168FB-10TL]" />
+			<feature name="u4" value="U4 74F139" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="lockout" value="D411A 9334 BA" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="u1 2-10 mc.u1" size="524288" crc="c725c96d" sha1="0580dc6375471c4c88697d65998d09d8d962124f" /> <!-- U1 2/10 MC -->
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mk3up" cloneof="mk3">
 		<!-- legrospixel.com -->
 		<description>Mortal Kombat 3 (USA, Prototype 19950713)</description>
