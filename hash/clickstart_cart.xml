@@ -33,8 +33,8 @@
 		</part>
 	</software>
 
-	<software name="backyardingans" supported="no">
-		<description>Nick Jr. The Backyardingans (UK)</description>
+	<software name="backyardigans" supported="no">
+		<description>Nick Jr. The Backyardigans (UK)</description>
 		<year>2007</year>
 		<publisher>LeapFrog / VIACOM</publisher>
 		<part name="cart" interface="clickstart_cart">
@@ -42,7 +42,7 @@
 			<feature name="pcbtype" value="LF300-10485-0A" />
 			<feature name="pcbdate" value="03262007" />
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-12892-a - the backyardingans (uk).bin" size="0x400000" crc="d33777fd" sha1="3245cd4f86cf7d1e59f9484eeb61078981fcf6e8"/>
+				<rom name="500-12892-a - the backyardigans (uk).bin" size="0x400000" crc="d33777fd" sha1="3245cd4f86cf7d1e59f9484eeb61078981fcf6e8"/>
 			</dataarea>
 		</part>
 	</software>
