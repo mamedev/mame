@@ -31,6 +31,7 @@ gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig
 	, m_palette(*this, "palette")
 	, m_gfxdecode(*this, "gfxdecode")
 	, m_space_read_cb(*this)
+	, m_global_y_mask(0x1ff)
 {
 }
 
@@ -301,9 +302,9 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 	uint32_t nbits = 0;
 	uint32_t y = line;
 
-	int yy = (yoff + y) & 0x1ff;
-	if (yy >= 0x01c0)
-		yy -= 0x0200;
+	int yy = (yoff + y);// &0x1ff;
+	//if (yy >= 0x01c0)
+	//	yy -= 0x0200;
 
 	if (yy > cliprect.max_y || yy < 0)
 		return;
@@ -355,9 +356,9 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 		if (RowScroll)
 			xx -= 0;// (int16_t)m_scrollram[yy & 0x1ff];
 
-		xx &= 0x01ff;
-		if (xx >= 0x01c0)
-			xx -= 0x0200;
+		//xx &= 0x01ff;
+		//if (xx >= 0x01c0)
+		//	xx -= 0x0200;
 
 		if (xx >= 0 && xx <= cliprect.max_x)
 		{
@@ -408,17 +409,22 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 	uint32_t tile_h = 8 << ((attr_reg & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
 	uint32_t tile_w = 8 << ((attr_reg & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
 
-	uint32_t tile_count_x = 512 / tile_w;
+	int total_width = 512;
 
-	uint32_t bitmap_y = (scanline + yscroll) & 0xff;
+	if ((attr_reg >> 14) & 0x2)
+		total_width = 1024;
+
+	uint32_t tile_count_x = total_width / tile_w;
+
+	uint32_t bitmap_y = (scanline + yscroll);// &0xff;
 	uint32_t y0 = bitmap_y / tile_h;
 	uint32_t tile_scanline = bitmap_y % tile_h;
 	uint32_t tile_address = tile_count_x * y0;
 
 	for (uint32_t x0 = 0; x0 < tile_count_x; x0++, tile_address++)
 	{
-		uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & 0xff) - 0x10;
-		uint32_t xx = (tile_w * x0 - xscroll) & 0x1ff;
+		uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & m_global_y_mask) - 0x10;
+		uint32_t xx = (tile_w * x0 - xscroll);// &0x1ff;
 		uint32_t tile = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(tilemap) : space.read_word(tilemap + tile_address);
 
 		uint16_t palette = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
@@ -694,11 +700,21 @@ WRITE16_MEMBER(gcm394_base_video_device::tmap0_regs_w)
 	write_tmap_regs(0, m_tmap0_regs, offset, data);
 }
 
+READ16_MEMBER(gcm394_base_video_device::tmap0_tilebase_lsb_r)
+{
+	return m_page0_addr_lsb;
+}
+
 WRITE16_MEMBER(gcm394_base_video_device::tmap0_tilebase_lsb_w)
 {
 	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap0_tilebase_lsb_w %04x\n", machine().describe_context(), data);
 	m_page0_addr_lsb = data;
 	LOGMASKED(LOG_GCM394_TMAP, "\t(tmap0 tilegfxbase is now %04x%04x)\n", m_page0_addr_msb, m_page0_addr_lsb);
+}
+
+READ16_MEMBER(gcm394_base_video_device::tmap0_tilebase_msb_r)
+{
+	return m_page0_addr_msb;
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap0_tilebase_msb_w)
@@ -718,11 +734,22 @@ WRITE16_MEMBER(gcm394_base_video_device::tmap1_regs_w)
 	write_tmap_regs(1, m_tmap1_regs, offset, data);
 }
 
+READ16_MEMBER(gcm394_base_video_device::tmap1_tilebase_lsb_r)
+{
+	return m_page1_addr_lsb;
+}
+
+
 WRITE16_MEMBER(gcm394_base_video_device::tmap1_tilebase_lsb_w)
 {
 	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap1_tilebase_lsb_w %04x\n", machine().describe_context(), data);
 	m_page1_addr_lsb = data;
 	LOGMASKED(LOG_GCM394_TMAP, "\t(tmap1 tilegfxbase is now %04x%04x)\n", m_page1_addr_msb, m_page1_addr_lsb);
+}
+
+READ16_MEMBER(gcm394_base_video_device::tmap1_tilebase_msb_r)
+{
+	return m_page1_addr_msb;
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap1_tilebase_msb_w)
@@ -811,11 +838,21 @@ WRITE16_MEMBER(gcm394_base_video_device::unk_vid2_gfxbase_msb_w)
 
 // set to 001264c0 in wrlshunt, which point at the menu selectors (game names, arrows etc.)
 
+READ16_MEMBER(gcm394_base_video_device::sprite_7022_gfxbase_lsb_r)
+{
+	return m_sprite_7022_gfxbase_lsb;
+}
+
 WRITE16_MEMBER(gcm394_base_video_device::sprite_7022_gfxbase_lsb_w)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::sprite_7022_gfxbase_lsb_w %04x\n", machine().describe_context(), data);
 	m_sprite_7022_gfxbase_lsb = data;
 	LOGMASKED(LOG_GCM394_TMAP, "\t(sprite tilebase is now %04x%04x)\n", m_sprite_702d_gfxbase_msb, m_sprite_7022_gfxbase_lsb);
+}
+
+READ16_MEMBER(gcm394_base_video_device::sprite_702d_gfxbase_msb_r)
+{
+	return m_sprite_702d_gfxbase_msb;
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::sprite_702d_gfxbase_msb_w)
