@@ -5188,7 +5188,8 @@ READ8_MEMBER(vt_vt1682_state::maincpu_irq_vector_hack_r)
 	return rom_8000_to_ffff_r(space, (0xfff8 - 0x8000)+offset);
 }
 
-// intg5410 writes a new program without resetting the CPU when selecting from the 'arcade' game main menu, this is problematic, minimize damage here.
+// intg5410 writes a new program without resetting the CPU when selecting from the 'arcade' game main menu, this is problematic
+// it does appear to rewrite the vectors first, so maybe there is some hardware side-effect of this putting the CPU in reset state??
 WRITE8_MEMBER(vt_vt1682_state::vt1682_sound_reset_hack_w)
 {
 	m_sound_share[0x0ff4 + offset] = data;
