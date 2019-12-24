@@ -48314,7 +48314,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1572864">
-				<rom name="mr. tuff (europe) (en,fr,de,es,it) (proto) (1994-12-05).sfc" size="1572864" crc="78cd52d5" sha1="52e7d817807a2488555e68f4273aa859c07efd87" offset="0x000000" />
+				<rom name="mr. tuff (europe) (en,fr,de,es,it) (proto) (1994-12-05).sfc" size="1572864" crc="83f87bb7" sha1="17efa7bf116a462abedd3ea2cb59ddd1b8f9c327" />
 			</dataarea>
 		</part>
 	</software>
