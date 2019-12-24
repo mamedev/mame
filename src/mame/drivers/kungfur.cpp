@@ -86,7 +86,7 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void kungfur(machine_config &config);
 
 protected:

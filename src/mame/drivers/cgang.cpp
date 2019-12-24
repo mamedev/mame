@@ -116,7 +116,7 @@ public:
 		m_cg_count(*this, "cg_count%u", 0U)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void cgang(machine_config &config);
 
 protected:
