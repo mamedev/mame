@@ -472,7 +472,8 @@ private:
 	DECLARE_READ8_MEMBER(soundcpu_irq_vector_hack_r);
 	DECLARE_READ8_MEMBER(maincpu_irq_vector_hack_r);
 	DECLARE_WRITE8_MEMBER(vt1682_sound_reset_hack_w);
-	
+	bool m_scpu_is_in_reset;
+
 	/* System Helpers */
 
 	uint16_t get_dma_sr_addr()
@@ -861,6 +862,7 @@ void vt_vt1682_state::machine_reset()
 	m_bank->set_entry(0);
 
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_scpu_is_in_reset = true;
 }
 
 /*
@@ -2555,10 +2557,12 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2106_enable_regs_w)
 	if (data & 0x20)
 	{
 		m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_scpu_is_in_reset = false;
 	}
 	else
 	{
 		m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		m_scpu_is_in_reset = true;
 	}
 }
 
@@ -5018,7 +5022,7 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x1fff).ram().share("sound_share");
-	map(0x1fff, 0x1fff).w(FUNC(vt_vt1682_state::vt1682_sound_reset_hack_w));
+	map(0x1ff4, 0x1fff).w(FUNC(vt_vt1682_state::vt1682_sound_reset_hack_w));
 
 	/* Video */
 	map(0x2000, 0x2000).rw(FUNC(vt_vt1682_state::vt1682_2000_r), FUNC(vt_vt1682_state::vt1682_2000_w));
@@ -5187,13 +5191,13 @@ READ8_MEMBER(vt_vt1682_state::maincpu_irq_vector_hack_r)
 // intg5410 writes a new program without resetting the CPU when selecting from the 'arcade' game main menu, this is problematic, minimize damage here.
 WRITE8_MEMBER(vt_vt1682_state::vt1682_sound_reset_hack_w)
 {
-	m_sound_share[0xfff] = data;
+	m_sound_share[0x0ff4 + offset] = data;
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(vt_vt1682_state::soundcpu_timera_irq)
 {
-	if (state)
+	if (state && !m_scpu_is_in_reset)
 		m_soundcpu->set_input_line(0, ASSERT_LINE);
 	else
 		m_soundcpu->set_input_line(0, CLEAR_LINE);
@@ -5226,7 +5230,7 @@ WRITE_LINE_MEMBER(vt_vt1682_state::maincpu_timer_irq)
 	*/
 
 	if (state)
-		m_maincpu->set_input_line(0, ASSERT_LINE);R
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 	else
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -5252,7 +5256,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(vt_vt1682_state::scanline)
 		if (m_2000 & 0x01)
 		{
 			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-			m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // same enable? (NMI_EN on sub is 'wakeup NMI')
+			if (!m_scpu_is_in_reset)
+				m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // same enable? (NMI_EN on sub is 'wakeup NMI')
 		}
 	}
 }
