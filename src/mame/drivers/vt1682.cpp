@@ -5653,6 +5653,11 @@ ROM_START( miwi2_16 )
 	ROM_LOAD( "miwi 2 16 arcade games and drum master vt168.bin", 0x00000, 0x1000000, CRC(00c115c5) SHA1(fa5fdb448dd9b963351d71fe94e2072f5c872a18) )
 ROM_END
 
+ROM_START( miwi2_7 )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "miwi 2 sports 7 in 1 vt168.bin", 0x00000, 0x1000000, CRC(fcefb956) SHA1(fea8f041d42bcbae3716ce8b942a01e64504061e) )
+ROM_END
+
 ROM_START( intact89 )
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "89n1.bin", 0x00000, 0x4000000, CRC(bbcba068) SHA1(0ec1ecc55e9a7050ca20b1349b9712319fd21629) )
@@ -5672,7 +5677,7 @@ CONS( 200?, ii32in1,   0,  0,  intech_interact,    intec, intec_interact_state, 
 // a 40-in-1 also exists which combines the above
 
 CONS( 200?, miwi2_16,  0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "<unknown>", "MiWi2 16-in-1 + Drum Master", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // clearly older code, Highway has uncensored title screen, selection screen has 'Arcase' instead of 'Arcade'
-// miwi2 7-in-1 Sports
+CONS( 200?, miwi2_7,   0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "<unknown>", "MiWi2 7-in-1 Sports", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // ViMax seems to be identical software to MiWi2
 
 CONS( 200?, intact89,  0,  0,  intech_interact_bank, miwi2, intec_interact_state, banked_init,  "Intec", "InterAct Complete Video Game - 89-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
