@@ -2892,6 +2892,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/vt1682.cpp",
 	MAME_DIR .. "src/mame/machine/vt1682_io.h",
 	MAME_DIR .. "src/mame/machine/vt1682_io.cpp",
+	MAME_DIR .. "src/mame/machine/vt1682_uio.h",
+	MAME_DIR .. "src/mame/machine/vt1682_uio.cpp",
 	MAME_DIR .. "src/mame/machine/vt1682_alu.h",
 	MAME_DIR .. "src/mame/machine/vt1682_alu.cpp",
 	MAME_DIR .. "src/mame/machine/vt1682_timer.h",
