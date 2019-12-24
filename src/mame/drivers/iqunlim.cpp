@@ -64,16 +64,14 @@ public:
 	iqunlim_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_cart(*this, "cartslot"),
-		m_cart_region(nullptr)
-	{ }
+		m_cart(*this, "cartslot")
+		{ }
 
 	void iqunlim(machine_config &config);
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
-	memory_region *m_cart_region;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
