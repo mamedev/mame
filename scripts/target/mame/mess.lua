@@ -2071,6 +2071,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/rainbow.cpp",
 	MAME_DIR .. "src/mame/drivers/vk100.cpp",
 	MAME_DIR .. "src/mame/drivers/vt52.cpp",
+	MAME_DIR .. "src/mame/drivers/vt62.cpp",
 	MAME_DIR .. "src/mame/drivers/vt100.cpp",
 	MAME_DIR .. "src/mame/drivers/vt220.cpp",
 	MAME_DIR .. "src/mame/drivers/vt240.cpp",

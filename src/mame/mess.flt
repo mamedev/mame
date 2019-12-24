@@ -945,6 +945,7 @@ vsmile.cpp
 vsmileb.cpp
 vsmilepro.cpp
 vt52.cpp
+vt62.cpp
 vt100.cpp
 vt220.cpp
 vt240.cpp
