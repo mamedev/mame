@@ -3092,7 +3092,8 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_211c_regs_ext2421_w)
 
 	if (data & 0x10)
 	{
-		printf("Sound CPU IRQ Request\n");
+		// not seen used
+		logerror("Sound CPU IRQ Request\n");
 	}
 }
 
@@ -3982,12 +3983,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_211c_reg_irqctrl_w)
 
 	if (data & 0x10)
 	{
-		printf("Main CPU IRQ Request from Sound CPU\n");
+		// not seen used
+		logerror("Main CPU IRQ Request from Sound CPU\n");
 	}
 
 	if (data & 0x08)
 	{
-		printf("SCU Sleep\n");
+		// documentation indicates that Sleep mode is buggy, so this probably never gets used
+		popmessage("SCU Sleep\n");
 	}
 }
 
