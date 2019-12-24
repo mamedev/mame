@@ -454,6 +454,14 @@ function add_name(group, name, crc, sha1)
 	if (group.names.indexOf(name) < 0)
 	{
 		group.names.push(name);
+
+		if (group.hasOwnProperty('issues'))
+		{
+			var issues = group.issues;
+			if (issues !== null)
+				issues.parentNode.parentNode.insertBefore(document.createElement('dl'), issues.parentNode).textContent = name;
+		}
+
 		if (group.hasOwnProperty('machines'))
 		{
 			var machines = group.machines;
@@ -575,8 +583,6 @@ function identify_file(file, trychd, progress)
 				else
 				{
 					crcgrp = sha1grp.crc[crc];
-					if (crcgrp.issues !== null)
-						crcgrp.issues.parentNode.parentNode.insertBefore(document.createElement('dl'), crcgrp.issues.parentNode).textContent = file.name;
 					add_name(crcgrp, file.name, crc, sha1);
 					progress.parentNode.removeChild(progress);
 				}
