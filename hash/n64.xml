@@ -3040,8 +3040,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Rockstar Games</publisher>
 		<info name="serial" value="NUS-NJME-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
-				<rom name="earthworm jim 3d (usa).bin" size="16777216" crc="1017be14" sha1="1b0aa4d94194edc885d9a9c2a4f37000c963756a" offset="000000" />
+				<rom name="nus-njme-0.u1" size="16777216" crc="1017be14" sha1="1b0aa4d94194edc885d9a9c2a4f37000c963756a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3064,8 +3068,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NUS-NWIE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="33554432">
-				<rom name="ecw hardcore revolution (usa).bin" size="33554432" crc="4ba40079" sha1="8bc52ec9d4a66f4c7a8dd2349c5da90aa2dd3684" offset="000000" />
+				<rom name="nus-nwie-0.u1" size="33554432" crc="4ba40079" sha1="8bc52ec9d4a66f4c7a8dd2349c5da90aa2dd3684" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3090,8 +3098,12 @@ This cart features a RTC, currently unemulated
 		<publisher>NewKidCo</publisher>
 		<info name="serial" value="NUS-NELE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="8388608">
-				<rom name="elmo's letter adventure (usa).bin" size="8388608" crc="710011fb" sha1="4c8e68cc1c5af546bc9ac26de423458141346e2c" offset="000000" />
+				<rom name="nus-nele-0.u1" size="8388608" crc="710011fb" sha1="4c8e68cc1c5af546bc9ac26de423458141346e2c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3102,8 +3114,12 @@ This cart features a RTC, currently unemulated
 		<publisher>NewKidCo</publisher>
 		<info name="serial" value="NUS-NENE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
-				<rom name="elmo's number journey (usa).bin" size="8388608" crc="b7ad0f05" sha1="72419fd0a80cbdeea635f094d6b0d086ebbb2750" offset="000000" />
+				<rom name="nus-nene-0.u1" size="8388608" crc="b7ad0f05" sha1="72419fd0a80cbdeea635f094d6b0d086ebbb2750" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3149,7 +3165,7 @@ This cart features a RTC, currently unemulated
 	</software>
 
 	<software name="excitbikud" cloneof="excitbik">
-		<description>Excitebike 64 (USA, Demo Kiosk)</description>
+		<description>Excitebike 64 (USA, kiosk demo)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -3221,8 +3237,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NUS-NEGE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
-				<rom name="extreme-g (usa).bin" size="8388608" crc="a43a0b17" sha1="3544a3779af1b7bca0c03e2298aad0acbb3c0b2a" offset="000000" />
+				<rom name="nus-nege-0.u1" size="8388608" crc="a43a0b17" sha1="3544a3779af1b7bca0c03e2298aad0acbb3c0b2a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3259,8 +3279,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NUS-NG2E-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="extreme-g xg2 (usa).bin" size="12582912" crc="849c18ce" sha1="e27268a708b6d6a707b6e01af94d062ea9cbc26d" offset="000000" />
+				<rom name="nus-ng2e-0.u1" size="12582912" crc="849c18ce" sha1="e27268a708b6d6a707b6e01af94d062ea9cbc26d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3332,8 +3356,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Video System</publisher>
 		<info name="serial" value="NUS-NFWE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [BK4D-NUS]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="f-1 world grand prix (usa).bin" size="12582912" crc="4d203242" sha1="ca05633242b31e3ec808945e9afeafc2fe4de652" offset="000000" />
+				<rom name="nus-nfwe-0.u1" size="12582912" crc="4d203242" sha1="ca05633242b31e3ec808945e9afeafc2fe4de652" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3388,10 +3416,16 @@ This cart features a RTC, currently unemulated
 		<description>F-Zero X (USA)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NUS-NFZE-USA"/>
+		<info name="serial" value="NUS-CFZE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-03A-01" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [LH52V246A]" />
+			<feature name="u3" value="U3 [BU9803A]" />
+			<feature name="u4" value="U4 [CIC-NUS-6106]" />
+			<feature name="bt1" value="BT1 [CR2032]" />
 			<dataarea name="rom" size="16777216">
-				<rom name="f-zero x (usa).bin" size="16777216" crc="9408c2c1" sha1="c322c80a676604cda4b605558b5bd8aa6f1a2060" offset="000000" />
+				<rom name="nus-cfze-0.u1" size="16777216" crc="9408c2c1" sha1="c322c80a676604cda4b605558b5bd8aa6f1a2060" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3414,8 +3448,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="NUS-NHGE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
-				<rom name="f1 pole position 64 (usa) (en,fr,de).bin" size="8388608" crc="873bc45a" sha1="bbc6ca8fe4c5bdb77d9963696ba8bf8e46fb39a6" offset="000000" />
+				<rom name="nus-nhge-0.u1" size="8388608" crc="873bc45a" sha1="bbc6ca8fe4c5bdb77d9963696ba8bf8e46fb39a6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3525,8 +3563,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="NUS-N9FE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
-				<rom name="fifa 99 (usa) (en,fr,de,es,it,nl,pt,sv).bin" size="16777216" crc="d69dd3d1" sha1="5a085f6d871fb697a672f56b4023cf3b822e4cf9" offset="000000" />
+				<rom name="nus-n9fe-0.u1" size="16777216" crc="d69dd3d1" sha1="5a085f6d871fb697a672f56b4023cf3b822e4cf9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3549,8 +3591,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="NUS-N7IE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
-				<rom name="fifa soccer 64 (usa) (en,fr,de).bin" size="8388608" crc="3b22f9f2" sha1="a27a2ba02bb02eaac999e60e3cedd67fb937b580" offset="000000" />
+				<rom name="nus-n7ie-0.u1" size="8388608" crc="3b22f9f2" sha1="a27a2ba02bb02eaac999e60e3cedd67fb937b580" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3597,8 +3643,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Ocean</publisher>
 		<info name="serial" value="NUS-NKAE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="fighters destiny (usa).bin" size="12582912" crc="a625973f" sha1="2fba94ec3a6eac33e2680e1db661178c3e320bc4" offset="000000" />
+				<rom name="nus-nkae-0.u1" size="12582912" crc="a625973f" sha1="2fba94ec3a6eac33e2680e1db661178c3e320bc4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3653,8 +3703,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Crave Entertainment</publisher>
 		<info name="serial" value="NUS-NFFE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
-				<rom name="fighting force 64 (usa).bin" size="16777216" crc="ade7dca4" sha1="3ce2ddafaa5101d3b2f49210ab6e6976994e5fbe" offset="000000" />
+				<rom name="nus-nffe-0.u1" size="16777216" crc="ade7dca4" sha1="3ce2ddafaa5101d3b2f49210ab6e6976994e5fbe" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3677,8 +3731,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Natsume</publisher>
 		<info name="serial" value="NUS-NFDE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="flying dragon (usa).bin" size="12582912" crc="87e4e352" sha1="25fd5cc411092d917d18c6d6ba3d7749b2f27f1a" offset="000000" />
+				<rom name="nus-nfde-0.u1" size="12582912" crc="87e4e352" sha1="25fd5cc411092d917d18c6d6ba3d7749b2f27f1a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3713,8 +3771,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NUS-NFOE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
-				<rom name="forsaken 64 (usa).bin" size="8388608" crc="f970e4a4" sha1="7741fa3cc164e7b51d79079e14c46edd5be205bf" offset="000000" />
+				<rom name="nus-nfoe-0.u1" size="8388608" crc="f970e4a4" sha1="7741fa3cc164e7b51d79079e14c46edd5be205bf" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3725,19 +3787,59 @@ This cart features a RTC, currently unemulated
 		<publisher>Fox Interactive</publisher>
 		<info name="serial" value="NUS-NF9E-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="fox sports college hoops '99 (usa).bin" size="12582912" crc="fede3ef8" sha1="86d16b039abe70bc5b8b16805dd48483477fbdf6" offset="000000" />
+				<rom name="nus-nf9e-0.u1" size="12582912" crc="fede3ef8" sha1="86d16b039abe70bc5b8b16805dd48483477fbdf6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="frogger2">
-		<description>Frogger 2 (USA, Prototype Rev. A)</description>
+		<description>Frogger 2 (USA, prototype)</description>
 		<year>1999</year>
 		<publisher>Hasbro Interactive</publisher>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-16F32SB-01" />
+			<feature name="u1" value="U1" /> <!-- Linear Voltage Regulator -->
+			<feature name="u2" value="U2" /> <!-- EPM7128SQC100-10? -->
+			<feature name="u3" value="U3" /> <!-- CIC-NUS-7103? -->
+			<feature name="u4" value="U4 N64_EEPROM" />
+			<feature name="u5" value="U5" /> <!-- unknown -->
+			<feature name="u6" value="U6" /> <!-- LV2416? -->
+			<feature name="u7" value="U7" /> <!-- LH52V246AD? -->
+			<feature name="u8" value="U8 32M FLASH MEMORY" />
+			<feature name="u9" value="U9 32M FLASH MEMORY" />
+			<feature name="u10" value="U10 32M FLASH MEMORY" />
+			<feature name="u11" value="U11 32M FLASH MEMORY" />
+			<feature name="u12" value="U12 32M FLASH MEMORY" />
+			<feature name="u13" value="U13 32M FLASH MEMORY" />
+			<feature name="u14" value="U14 32M FLASH MEMORY" />
+			<feature name="u15" value="U15 32M FLASH MEMORY" />
+			<feature name="u16" value="U16 32M FLASH MEMORY [empty]" />
+			<feature name="u17" value="U17 32M FLASH MEMORY [empty]" />
+			<feature name="u18" value="U18 32M FLASH MEMORY [empty]" />
+			<feature name="u19" value="U19 32M FLASH MEMORY [empty]" />
+			<feature name="u20" value="U20 32M FLASH MEMORY [empty]" />
+			<feature name="u21" value="U21 32M FLASH MEMORY [empty]" />
+			<feature name="u22" value="U22 32M FLASH MEMORY [empty]" />
+			<feature name="u23" value="U23 32M FLASH MEMORY [empty]" />
+			<feature name="batt1" value="BATT1 [CR2032]" />
 			<dataarea name="rom" size="33554432">
 				<rom name="frogger 2 (usa) (rev a) (proto).bin" size="33554432" crc="dc59ece7" sha1="f16b3d87c243f0e25c1f71eb8c388178757dcdf9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogger2a" cloneof="frogger2">
+		<description>Frogger 2 (USA, prototype, "Milestone 4")</description>
+		<year>1999</year>
+		<publisher>Hasbro Interactive</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="frogger 2.bin" size="8388608" crc="8273bfa5" sha1="d2bc7a66d95510c7f51934823ef5ba2de76b6d9c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3854,10 +3956,14 @@ This cart features a RTC, currently unemulated
 		<description>Gauntlet Legends (USA)</description>
 		<year>1999</year>
 		<publisher>Midway</publisher>
-		<info name="serial" value="NUS-NGDE-USA"/>
+		<info name="serial" value="NUS-NGXE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
-				<rom name="gauntlet legends (usa).bin" size="16777216" crc="7e90c0a8" sha1="5debf6cc5dc00b962b29079caf505cdf50914e1d" offset="000000" />
+				<rom name="nus-ngxe-0.u1" size="16777216" crc="7e90c0a8" sha1="5debf6cc5dc00b962b29079caf505cdf50914e1d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3906,8 +4012,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Crave Entertainment</publisher>
 		<info name="serial" value="NUS-NX3E-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="33554432">
-				<rom name="gex 3 - deep cover gecko (usa).bin" size="33554432" crc="3571f3bd" sha1="4d26566ba00f6f633fb41384a01a4464a7371000" offset="000000" />
+				<rom name="nus-nx3e-0.u1" size="33554432" crc="3571f3bd" sha1="4d26566ba00f6f633fb41384a01a4464a7371000" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3930,8 +4040,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Midway</publisher>
 		<info name="serial" value="NUS-NX2E-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
-				<rom name="gex 64 - enter the gecko (usa).bin" size="16777216" crc="3f90e7c2" sha1="8c10971d9052ef796973f4ce137858109a63a598" offset="000000" />
+				<rom name="nus-nx2e-0.u1" size="16777216" crc="3f90e7c2" sha1="8c10971d9052ef796973f4ce137858109a63a598" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3954,8 +4068,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Hasbro Interactive</publisher>
 		<info name="serial" value="NUS-NGVE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [BK4D-NUS]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
-				<rom name="glover (usa).bin" size="8388608" crc="d024893a" sha1="ed756cae1582a4940ddb854b5376a0013f7f5634" offset="000000" />
+				<rom name="nus-ngve-0.u1" size="8388608" crc="d024893a" sha1="ed756cae1582a4940ddb854b5376a0013f7f5634" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3963,7 +4081,7 @@ This cart features a RTC, currently unemulated
 <!-- reported as not working on the real hardware, incorrect internal checksum
      rom with the crc 5f0ad6da is fixed with a correct checksum -->
 	<software name="gloverp" cloneof="glover">
-		<description>Glover (Prototype, 1998-07-16)</description>
+		<description>Glover (prototype 19980716)</description>
 		<year>1998</year>
 		<publisher>Hasbro Interactive</publisher>
 		<part name="cart" interface="n64_cart">
@@ -3974,7 +4092,7 @@ This cart features a RTC, currently unemulated
 	</software>
 
 	<software name="glover2">
-		<description>Glover 2 (Prototype, Newer)</description>
+		<description>Glover 2 (prototype, newer)</description>
 		<year>1999</year>
 		<publisher>Hasbro Interactive</publisher>
 		<part name="cart" interface="n64_cart">
@@ -3985,7 +4103,7 @@ This cart features a RTC, currently unemulated
 	</software>
 
 	<software name="glover2o" cloneof="glover2">
-		<description>Glover 2 (Prototype)</description>
+		<description>Glover 2 (prototype)</description>
 		<year>1999</year>
 		<publisher>Hasbro Interactive</publisher>
 		<part name="cart" interface="n64_cart">
@@ -4015,8 +4133,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NGME-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
-				<rom name="goemon's great adventure (usa).bin" size="16777216" crc="e3c7a184" sha1="fb5f82d315ec99e5cd1ed5edda0d2f289231851e" offset="000000" />
+				<rom name="nus-ngme-0.u1" size="16777216" crc="e3c7a184" sha1="fb5f82d315ec99e5cd1ed5edda0d2f289231851e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4027,8 +4149,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="NUS-NGNE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
-				<rom name="golden nugget 64 (usa).bin" size="8388608" crc="9670a4b7" sha1="543310e808dec437a0e499410a9c39694430a7c7" offset="000000" />
+				<rom name="nus-ngne-0.u1" size="8388608" crc="9670a4b7" sha1="543310e808dec437a0e499410a9c39694430a7c7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4051,8 +4177,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Ocean</publisher>
 		<info name="serial" value="NUS-NGCE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [BK16D]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="gt64 - championship edition (usa).bin" size="12582912" crc="b6dc4cfd" sha1="bbf4039865fdcf30e403a45478dc6c8450944512" offset="000000" />
+				<rom name="nus-ngce-0.u1" size="12582912" crc="b6dc4cfd" sha1="bbf4039865fdcf30e403a45478dc6c8450944512" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4091,8 +4221,14 @@ This cart features a RTC, currently unemulated
 		<publisher>Natsume</publisher>
 		<info name="serial" value="NUS-NYWE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-03A-01" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [LH52V246A]" />
+			<feature name="u3" value="U3 [74LV2416]" />
+			<feature name="u4" value="U4 [CIC-NUS-6102A]" />
+			<feature name="bt1" value="BT1 [CR2032]" />
 			<dataarea name="rom" size="16777216">
-				<rom name="harvest moon 64 (usa).bin" size="16777216" crc="d2ee315f" sha1="7fcab48a10a9b3b7ba5834347ff180c74d7b932c" offset="000000" />
+				<rom name="nus-nywe-0.u1" size="16777216" crc="d2ee315f" sha1="7fcab48a10a9b3b7ba5834347ff180c74d7b932c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4129,8 +4265,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Titus</publisher>
 		<info name="serial" value="NUS-NHCE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
-				<rom name="hercules - the legendary journeys (usa).bin" size="16777216" crc="cf90bc4a" sha1="09e56e035981831a2bb0b932774e4ebe34ea175f" offset="000000" />
+				<rom name="nus-nhce-0.u1" size="16777216" crc="cf90bc4a" sha1="09e56e035981831a2bb0b932774e4ebe34ea175f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4191,8 +4331,12 @@ This cart features a RTC, currently unemulated
 		<publisher>GT Interactive</publisher>
 		<info name="serial" value="NUS-NHXE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
-				<rom name="hexen (usa).bin" size="8388608" crc="d2b22343" sha1="5b58cc647fb10178c89d4dacc97cd25f5fbff2d0" offset="000000" />
+				<rom name="nus-nhxe-0.u1" size="8388608" crc="d2b22343" sha1="5b58cc647fb10178c89d4dacc97cd25f5fbff2d0" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4345,8 +4489,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="NUS-NHWE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="hot wheels - turbo racing (usa).bin" size="12582912" crc="525e8f8f" sha1="477818165666648bfbe8452f2f89f42277add932" offset="000000" />
+				<rom name="nus-nhwe-0.u1" size="12582912" crc="525e8f8f" sha1="477818165666648bfbe8452f2f89f42277add932" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4409,8 +4557,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NHVE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
-				<rom name="hybrid heaven (usa).bin" size="16777216" crc="7ce3ea39" sha1="a0f6777dcecf8b956f12ff69ec5051a9be4c234f" offset="000000" />
+				<rom name="nus-nhve-0.u1" size="16777216" crc="7ce3ea39" sha1="a0f6777dcecf8b956f12ff69ec5051a9be4c234f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4445,8 +4597,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Midway</publisher>
 		<info name="serial" value="NUS-NHTE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="33554432">
-				<rom name="hydro thunder (usa).bin" size="33554432" crc="6b78c2c8" sha1="665e3d9773b0a6802814cd3e7b930cab62fc583d" offset="000000" />
+				<rom name="nus-nhte-0.u1" size="33554432" crc="6b78c2c8" sha1="665e3d9773b0a6802814cd3e7b930cab62fc583d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4497,8 +4653,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NUS-NWBE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="4194304">
-				<rom name="iggy's reckin' balls (usa).bin" size="4194304" crc="5953567e" sha1="289a26f3a0d656ff522252caabc0e005c760faca" offset="000000" />
+				<rom name="nus-nwbe-0.u1" size="4194304" crc="5953567e" sha1="289a26f3a0d656ff522252caabc0e005c760faca" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4545,8 +4705,8 @@ This cart features a RTC, currently unemulated
 		</part>
 	</software>
 
-	<software name="indyinfm">
-		<description>Indiana Jones and the Infernal Machine (Euro, Prototype)</description>
+	<software name="indyinfmp" cloneof="indyinfm">>
+		<description>Indiana Jones and the Infernal Machine (Australia, prototype)</description>
 		<year>2000</year>
 		<publisher>LucasArts</publisher>
 		<part name="cart" interface="n64_cart">
@@ -4556,14 +4716,18 @@ This cart features a RTC, currently unemulated
 		</part>
 	</software>
 
-	<software name="indyinfmu" cloneof="indyinfm">
+	<software name="indyinfm"
 		<description>Indiana Jones and the Infernal Machine (USA)</description>
 		<year>2000</year>
 		<publisher>LucasArts</publisher>
 		<info name="serial" value="NUS-NIJE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-03" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="33554432">
-				<rom name="indiana jones and the infernal machine (usa).bin" size="33554432" crc="a8f86eb6" sha1="9d326652e881d80742e49c51d60fa3ffea21207c" offset="000000" />
+				<rom name="nus-nije-0.u1" size="33554432" crc="a8f86eb6" sha1="9d326652e881d80742e49c51d60fa3ffea21207c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4574,8 +4738,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="NUS-NICE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
-				<rom name="indy racing 2000 (usa).bin" size="16777216" crc="1c622354" sha1="b8983fa34d9614af433fee6dfd331bf8793a4dd1" offset="000000" />
+				<rom name="nus-nice-0.u1" size="16777216" crc="1c622354" sha1="b8983fa34d9614af433fee6dfd331bf8793a4dd1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4639,8 +4807,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NISE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
-				<rom name="international superstar soccer 2000 (usa) (en,es).bin" size="16777216" crc="bb1824b8" sha1="d86386eeee1b5b32ce43bc9a4149314a23a6320b" offset="000000" />
+				<rom name="nus-nise-0.u1" size="16777216" crc="bb1824b8" sha1="d86386eeee1b5b32ce43bc9a4149314a23a6320b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4663,8 +4835,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NJPE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
-				<rom name="international superstar soccer 64 (usa).bin" size="8388608" crc="91cb6803" sha1="94d4969597596c9e990754aefdd506d3c75177ba" offset="000000" />
+				<rom name="nus-njpe-0.u1" size="8388608" crc="91cb6803" sha1="94d4969597596c9e990754aefdd506d3c75177ba" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4687,8 +4863,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-N3HE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="international track &amp; field 2000 (usa).bin" size="12582912" crc="f93868a3" sha1="d5b614b9a95086b2366c5470659fa5b89facec68" offset="000000" />
+				<rom name="nus-n3he-0.u1" size="12582912" crc="f93868a3" sha1="d5b614b9a95086b2366c5470659fa5b89facec68" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4797,8 +4977,12 @@ This cart features a RTC, currently unemulated
 		<publisher>GameTek</publisher>
 		<info name="serial" value="NUS-NJOE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="4194304">
-				<rom name="jeopardy! (usa).bin" size="4194304" crc="82b2ab69" sha1="6f22227ea9a64f16f4b8a5a8b84a30fac55fd84c" offset="000000" />
+				<rom name="nus-njoe-0.u1" size="4194304" crc="82b2ab69" sha1="6f22227ea9a64f16f4b8a5a8b84a30fac55fd84c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4864,7 +5048,7 @@ This cart features a RTC, currently unemulated
 	</software>
 
 	<software name="jetforceu1" cloneof="jetforce">
-		<description>Jet Force Gemini (USA, Demo Kiosk)</description>
+		<description>Jet Force Gemini (USA, kiosk demo)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -5262,8 +5446,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NKJE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-06A-01" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [29L1100KC-15B0]" />
+			<feature name="u3" value="U3 [CIC-NUS-6103]" />
 			<dataarea name="rom" size="16777216">
-				<rom name="ken griffey jr.'s slugfest (usa).bin" size="16777216" crc="42d1ed42" sha1="ec8497ee9ebe1333032472b39206f9899c9213b3" offset="000000" />
+				<rom name="nus-nkje-0.u1" size="16777216" crc="42d1ed42" sha1="ec8497ee9ebe1333032472b39206f9899c9213b3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6932,7 +7120,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<publisher>Midway</publisher>
 		<info name="serial" value="NUS-NXGE-USA"/>
 		<part name="cart" interface="n64_cart">
-			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="pcb" value="NUS-01A-01" /> <!-- Also with NUS-01A-02 -->
 			<feature name="u1" value="NUS-NXGE-0" />
 			<feature name="u2" value="[empty]" />
 			<feature name="u3" value="CIC-NUS-6102" />
