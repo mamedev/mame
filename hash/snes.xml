@@ -64721,7 +64721,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 				<rom name="lh28f800sut-z1.u1" size="1048576" crc="2b92dc3c" sha1="854b9fb625584ac454ae1a9f0b15a42062e9ab73" />
 			</dataarea>
 			<dataarea name="nvram" size="4096">
-			<rom name="cxk581000am-70ll.u5" size="4096" crc="dcc196ae" sha1="3aeb01a2809beec48ea58930ee31eb67804aaef2" />
+				<rom name="cxk581000am-70ll.u5" size="4096" crc="dcc196ae" sha1="3aeb01a2809beec48ea58930ee31eb67804aaef2" />
 			</dataarea>
 		</part>
 	</software>
