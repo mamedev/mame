@@ -25195,6 +25195,25 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="sonic3p1" cloneof="sonic3">
+		<description>Sonic the Hedgehog 3 (World, prototype 19931103)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="megadriv_cart"/>
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="sonic 3 0 md 3-11 2.eprom" size="262144" crc="f1013d40" sha1="dba64a8a12cc8b3a2b92684a4f06df8fc9bbb20e" /> <!-- Sonic 3 0 MD 3\11 2 -->
+				<rom name="sonic 3 1 md 3-11 2.eprom" size="262144" crc="87765386" sha1="fb1c803f9a40892a5d4125bfec163f9372357c46" /> <!-- Sonic 3 1 MD 3\11 2 -->
+				<rom name="sonic 3 2 md 3-11 2.eprom" size="262144" crc="4e0d637f" sha1="5b8f8048a68b7a41fbaa096742b62eb89a474086" /> <!-- Sonic 3 2 MD 3\11 2 -->
+				<rom name="sonic 3 3 md 3-11 2.eprom" size="262144" crc="46546c5b" sha1="f4be05074ee1e883fe99a0a5136989b061f837fd" /> <!-- Sonic 3 3 MD 3\11 2 -->
+				<rom name="sonic 3 4 md 3-11 2.eprom" size="262144" crc="4a6f9ad9" sha1="a386d8e7b24d50c4ce6796e240e1595dff1cf1db" /> <!-- Sonic 3 4 MD 3\11 2 -->
+				<rom name="sonic 3 5 md 3-11 2.eprom" size="262144" crc="d064c206" sha1="b979be1ce6c7c7accd824146aea50e8cd5ebce5b" /> <!-- Sonic 3 5 MD 3\11 2 -->
+				<rom name="sonic 3 6 md 3-11 2.eprom" size="262144" crc="fa68199e" sha1="37104cf987361a1a52edae10a30abdf01c42c129" /> <!-- Sonic 3 6 MD 3\11 2 -->
+				<rom name="sonic 3 7 md 3-11 2.eprom" size="262144" crc="81987c07" sha1="a5c227ea2b7cd388863b4721ac6989800652dfe7" /> <!-- Sonic 3 7 MD 3\11 2 -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sorcerk">
 		<description>Sorcerer's Kingdom (USA, v1.1)</description>
 		<year>1992</year>
