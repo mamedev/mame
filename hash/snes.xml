@@ -64698,11 +64698,30 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<description>NUS-64 Cassette Checker (Jpn)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
-		<info name="alt_title" value="Cassette Kensaki - NUS" />
+		<info name="alt_title" value="カセット検査器 NUS用Sカセット" />
 		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-D(F)PV7R-01" />
+			<feature name="u1" value="U1 8/16M FLASH(X16) [LH28F800SUT-Z1]" />
+			<feature name="u2" value="U2 8/16M FLASH(X16) [empty]" />
+			<feature name="u3" value="U3 8/16M FLASH(X16) [empty]" />
+			<feature name="u4" value="U4 8/16M FLASH(X16) [empty]" />
+			<feature name="u5" value="U5 1M/512K/256K SRAM [CXK581000AM-70LL]" />
+			<feature name="u6" value="U6 EP330-15 [0111]" />
+			<feature name="u7" value="U7 LS157 [74LS157]" />
+			<feature name="u8" value="U8 MM1134BFK [134B]" />
+			<feature name="u9" value="U9 F411 [F411B]" />
+			<feature name="u10" value="U10 LS157 [74LS157]" />
+			<feature name="u11" value="U11 HC00" />
+			<feature name="u12" value="U12 HC32" />
+			<feature name="u13" value="U13 [empty]" />
+			<feature name="dipswitch" value="SW1" /> <!-- ('.'''''') -->
+			<feature name="battery" value="BATT [CR2032]" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="nus-64 (japan) (en).sfc" size="1048576" crc="2b92dc3c" sha1="854b9fb625584ac454ae1a9f0b15a42062e9ab73" offset="0x000000" />
+				<rom name="lh28f800sut-z1.u1" size="1048576" crc="2b92dc3c" sha1="854b9fb625584ac454ae1a9f0b15a42062e9ab73" />
+			</dataarea>
+			<dataarea name="nvram" size="4096">
+			<rom name="cxk581000am-70ll.u5" size="4096" crc="dcc196ae" sha1="3aeb01a2809beec48ea58930ee31eb67804aaef2" />
 			</dataarea>
 		</part>
 	</software>
