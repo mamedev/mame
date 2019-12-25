@@ -18,11 +18,9 @@ Quizard does not work for unknown reasons.
 
 TODO:
 
-- Proper abstraction of the 68070's internal devices (UART,DMA,Timers etc.)
-- Mono-I: Full emulation of the CDIC, SLAVE and/or MCD212 customs
-- Mono-II: SERVO and SLAVE I/O device hookup
+- Mono-I: Low-level emulation of the CDIC custom and SLAVE MCU
+- Mono-II: More complete SERVO and SLAVE MCU hookup
 - Mono-II: DSP56k hookup
-- Mono-II: Move 68HC05 I/O device hookup into CPU core
 
 *******************************************************************************/
 
@@ -53,7 +51,7 @@ TODO:
 #define VERBOSE         (LOG_ALL)
 #include "logmacro.h"
 
-#define ENABLE_UART_PRINTING (0)
+#define ENABLE_UART_PRINTING (1)
 
 /*************************
 *      Memory maps       *
@@ -65,7 +63,7 @@ void cdi_state::cdimono1_mem(address_map &map)
 	map(0x00200000, 0x0027ffff).ram().share("mcd212:planeb");
 	map(0x00300000, 0x00303bff).rw(m_cdic, FUNC(cdicdic_device::ram_r), FUNC(cdicdic_device::ram_w));
 #if ENABLE_UART_PRINTING
-	map(0x00301400, 0x00301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
+	map(0x00301400, 0x00301403).r(FUNC(cdi_state::uart_loopback_enable));
 #endif
 	map(0x00303c00, 0x00303fff).rw(m_cdic, FUNC(cdicdic_device::regs_r), FUNC(cdicdic_device::regs_w));
 	map(0x00310000, 0x00317fff).rw(m_slave_hle, FUNC(cdislave_device::slave_r), FUNC(cdislave_device::slave_w));
@@ -75,23 +73,29 @@ void cdi_state::cdimono1_mem(address_map &map)
 	map(0x004fffe0, 0x004fffff).rw(m_mcd212, FUNC(mcd212_device::regs_r), FUNC(mcd212_device::regs_w));
 	map(0x00500000, 0x0057ffff).ram();
 	map(0x00580000, 0x00cfffff).noprw();
+	map(0x00d00000, 0x00ffffff).noprw();
+}
+
+void cdi_state::cdimono1_dvc_mem(address_map &map)
+{
 	map(0x00d00000, 0x00dfffff).ram(); // DVC RAM block 1
-	map(0x00e00000, 0x00e7ffff).rw(FUNC(cdi_state::dvc_r), FUNC(cdi_state::dvc_w));
+	map(0x00e00000, 0x00e3ffff).rw(FUNC(cdi_state::dvc_r), FUNC(cdi_state::dvc_w));
+	map(0x00e40000, 0x00e7ffff).rom().region("dvc", 0);
 	map(0x00e80000, 0x00efffff).ram(); // DVC RAM block 2
 	map(0x00f00000, 0x00ffffff).noprw();
 }
 
-void cdi_state::cdimono2_mem(address_map &map)
+void cdimono2_state::cdimono2_mem(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).ram().share("mcd212:planea");
 	map(0x00200000, 0x0027ffff).ram().share("mcd212:planeb");
+	map(0x00300000, 0x0030ffff).rw(FUNC(cdimono2_state::dsp_r), FUNC(cdimono2_state::dsp_w));
 #if ENABLE_UART_PRINTING
-	map(0x00301400, 0x00301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
+	map(0x00300006, 0x00300007).r(FUNC(cdimono2_state::uart_loopback_enable2));
 #endif
-	//map(0x00300000, 0x00303bff).rw("cdic", FUNC(cdicdic_device::ram_r), FUNC(cdicdic_device::ram_w));
 	//map(0x00303c00, 0x00303fff).rw("cdic", FUNC(cdicdic_device::regs_r), FUNC(cdicdic_device::regs_w));
-	//map(0x00310000, 0x00317fff).rw("slave", FUNC(cdislave_device::slave_r), FUNC(cdicdic_device::slave_w));
-	//map(0x00318000, 0x0031ffff).noprw();
+	map(0x00310000, 0x00317fff).rw(FUNC(cdimono2_state::slave_glue_r), FUNC(cdimono2_state::slave_glue_w));
+	map(0x00318000, 0x0031ffff).noprw();
 	map(0x00320000, 0x00323fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);    /* nvram (only low bytes used) */
 	map(0x00400000, 0x0047ffff).rom().region("maincpu", 0);
 	map(0x004fffe0, 0x004fffff).rw(m_mcd212, FUNC(mcd212_device::regs_r), FUNC(mcd212_device::regs_w));
@@ -100,14 +104,14 @@ void cdi_state::cdimono2_mem(address_map &map)
 	//map(0x00e00000, 0x00efffff).ram();
 }
 
-void cdi_state::cdi910_mem(address_map &map)
+void cdimono2_state::cdi910_mem(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).ram().share("mcd212:planea");
 	map(0x00180000, 0x001fffff).rom().region("maincpu", 0); // boot vectors point here
 
 	map(0x00200000, 0x0027ffff).ram().share("mcd212:planeb");
 #if ENABLE_UART_PRINTING
-	map(0x00301400, 0x00301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
+	map(0x00301400, 0x00301403).r(FUNC(cdimono2_state::uart_loopback_enable));
 #endif
 //  map(0x00300000, 0x00303bff).rw("cdic", FUNC(cdicdic_device::ram_r), FUNC(cdicdic_device::ram_w));
 //  map(0x00303c00, 0x00303fff).rw("cdic", FUNC(cdicdic_device::regs_r), FUNC(cdicdic_device::regs_w));
@@ -120,6 +124,73 @@ void cdi_state::cdi910_mem(address_map &map)
 //  map(0x00e00000, 0x00efffff).ram(); // DVC
 }
 
+
+/*************************
+*      Debug ports       *
+*************************/
+
+READ16_MEMBER( cdi_state::uart_loopback_enable )
+{
+	return 0x1234;
+}
+
+READ16_MEMBER( cdimono2_state::uart_loopback_enable2 )
+{
+	return 0xffaa;
+}
+
+/*************************
+*    SLAVE MCU logic     *
+*************************/
+
+READ8_MEMBER(cdimono2_state::slave_glue_r)
+{
+	m_portd_data |= 0x80;
+	logerror("%s: slave_glue_r: %02x = %02x\n", machine().describe_context(), offset, m_porta_data);
+	m_slave->set_input_line(M68HC05_IRQ_LINE, ASSERT_LINE);
+	m_slave->set_input_line(M68HC05_IRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	return m_porta_data;
+}
+
+WRITE8_MEMBER(cdimono2_state::slave_glue_w)
+{
+	logerror("%s: slave_glue_w: %02x = %02x\n", machine().describe_context(), offset, data);
+	m_portc_data = 0xfc | ((offset >> 1) & 3);
+	m_porta_data = data & 0xff;
+	m_slave->set_input_line(M68HC05_IRQ_LINE, ASSERT_LINE);
+	m_slave->set_input_line(M68HC05_IRQ_LINE, CLEAR_LINE);
+	m_portd_data &= ~0x80;
+	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+}
+
+WRITE8_MEMBER(cdimono2_state::controller_tx)
+{
+	logerror("%s: controller_tx: %02x\n", machine().describe_context(), data);
+	m_slave->uart_rx(0x55);
+}
+
+/*************************
+*       DSP logic        *
+*************************/
+
+READ8_MEMBER(cdimono2_state::dsp_r)
+{
+	uint8_t data = 0;
+	switch (offset)
+	{
+	case 5:
+		data = 3;
+		break;
+	}
+	logerror("%s: dsp_r: %04x = %02x\n", machine().describe_context(), offset << 1, data);
+	return data;
+}
+
+WRITE8_MEMBER(cdimono2_state::dsp_w)
+{
+	logerror("%s: dsp_w: %04x = %02x\n", machine().describe_context(), offset << 1, data);
+}
 
 /*************************
 *      Input ports       *
@@ -257,11 +328,28 @@ INPUT_PORTS_END
 *  Machine Initialization  *
 ***************************/
 
+void cdimono2_state::machine_start()
+{
+	save_item(NAME(m_porta_data));
+	save_item(NAME(m_portb_data));
+	save_item(NAME(m_portc_data));
+	save_item(NAME(m_portd_data));
+}
+
 void cdi_state::machine_reset()
 {
 	uint16_t *src   = (uint16_t*)memregion("maincpu")->base();
 	uint16_t *dst   = m_planea;
 	memcpy(dst, src, 0x8);
+}
+
+void cdimono2_state::machine_reset()
+{
+	cdi_state::machine_reset();
+	m_porta_data = 0x00;
+	m_portb_data = 0x00;
+	m_portc_data = 0xfc;
+	m_portd_data = 0x20;
 }
 
 void quizard_state::machine_start()
@@ -461,13 +549,18 @@ READ8_MEMBER(quizard_state::mcu_p1_r)
 
 READ16_MEMBER( cdi_state::dvc_r )
 {
-	logerror("%s: dvc_r: %08x = 0000 & %04x\n", machine().describe_context(), 0xe80000 + (offset << 1), mem_mask);
-	return 0;
+	uint16_t data = 0;
+	if (offset == 0x3018/2)
+	{
+		data = 1;
+	}
+	logerror("%s: dvc_r: %08x = %04x & %04x\n", machine().describe_context(), 0xe00000 + (offset << 1), data, mem_mask);
+	return data;
 }
 
 WRITE16_MEMBER( cdi_state::dvc_w )
 {
-	logerror("%s: dvc_w: %08x = %04x & %04x\n", machine().describe_context(), 0xe80000 + (offset << 1), data, mem_mask);
+	logerror("%s: dvc_w: %08x = %04x & %04x\n", machine().describe_context(), 0xe00000 + (offset << 1), data, mem_mask);
 }
 
 /*************************
@@ -537,6 +630,70 @@ uint32_t cdi_state::screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb
 	return 0;
 }
 
+READ8_MEMBER(cdimono2_state::slave_porta_r)
+{
+	logerror("%s: slave_porta_r: %02x & %02x\n", machine().describe_context(), m_porta_data, mem_mask);
+	return m_porta_data & mem_mask;
+}
+
+READ8_MEMBER(cdimono2_state::slave_portb_r)
+{
+	logerror("%s: slave_portb_r: %02x & %02x\n", machine().describe_context(), m_portb_data, mem_mask);
+	return m_portb_data & mem_mask;
+}
+
+READ8_MEMBER(cdimono2_state::slave_portc_r)
+{
+	logerror("%s: slave_portc_r: %02x & %02x\n", machine().describe_context(), m_portc_data, mem_mask);
+	return m_portc_data & mem_mask;
+}
+
+READ8_MEMBER(cdimono2_state::slave_portd_r)
+{
+	logerror("%s: slave_portd_r: %02x & %02x\n", machine().describe_context(), m_portd_data, mem_mask);
+	return m_portd_data & mem_mask;
+}
+
+WRITE8_MEMBER(cdimono2_state::slave_porta_w)
+{
+	logerror("%s: slave_porta_w: %02x\n", machine().describe_context(), data);
+	m_porta_data &= ~mem_mask;
+	m_porta_data |= data & mem_mask;
+}
+
+WRITE8_MEMBER(cdimono2_state::slave_portb_w)
+{
+	const uint8_t old = m_portb_data;
+	m_portb_data = data;
+	logerror("%s: slave_portb_w: %02x\n", machine().describe_context(), data);
+	if (!(old & 0x40) && (data & 0x40))
+	{
+		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	}
+}
+
+WRITE8_MEMBER(cdimono2_state::servo_portb_w)
+{
+	logerror("%s: servo_portb_w: %02x\n", machine().describe_context(), data);
+	if (BIT(data, 7))
+		m_portd_data &= ~0x20;
+	else
+		m_portd_data |= 0x20;
+}
+
+WRITE8_MEMBER(cdimono2_state::slave_portc_w)
+{
+	logerror("%s: slave_portc_w: %02x DISDAT=%u DISCLK=%u DISEN=%u RTSUART=%u\n", machine().describe_context(), data, 1-BIT(data,3), 1-BIT(data,4), 1-BIT(data,5), 1-BIT(data,6));
+	m_portc_data &= ~mem_mask;
+	m_portc_data |= data & mem_mask;
+	m_portc_data |= 0x80;
+}
+
+WRITE8_MEMBER(cdimono2_state::slave_portd_w)
+{
+	logerror("%s: slave_portd_w: %02x\n", machine().describe_context(), data);
+}
+
 /*************************
 *    Machine Drivers     *
 *************************/
@@ -551,14 +708,15 @@ void cdi_state::cdimono1_base(machine_config &config)
 	MCD212(config, m_mcd212, CLOCK_A);
 	m_mcd212->set_screen("screen");
 	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
-	m_mcd212->set_scanline_callback(FUNC(cdi_state::draw_lcd));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(384, 302);
-	screen.set_visarea(0, 384-1, 22, 302-1); // TODO: dynamic resolution
+	screen.set_size(384, 262);
+	screen.set_visarea(0, 384-1, 0, 262-1); // TODO: dynamic resolution
 	screen.set_screen_update("mcd212", FUNC(mcd212_device::screen_update));
+	screen.scanline().set(m_mcd212, FUNC(mcd212_device::scanline_cb));
+	screen.screen_vblank().set(m_mcd212, FUNC(mcd212_device::vblank_cb));
 
 	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
 	m_lcd->set_refresh_hz(60);
@@ -598,36 +756,53 @@ void cdi_state::cdimono1_base(machine_config &config)
 }
 
 // CD-i model 220 (Mono-II, NTSC)
-void cdi_state::cdimono2(machine_config &config)
+void cdimono2_state::cdimono2(machine_config &config)
 {
 	SCC68070(config, m_maincpu, CLOCK_A);
-	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdimono2_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cdimono2_state::cdimono2_mem);
 
 	MCD212(config, m_mcd212, CLOCK_A);
 	m_mcd212->set_screen("screen");
 	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
-	m_mcd212->set_scanline_callback(FUNC(cdi_state::draw_lcd));
+	m_mcd212->set_scanline_callback(FUNC(cdimono2_state::draw_lcd));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(384, 302);
-	screen.set_visarea(0, 384-1, 22, 302-1); // TODO: dynamic resolution
+	screen.set_size(384, 262);
+	screen.set_visarea(0, 384-1, 0, 262-1); // TODO: dynamic resolution
 	screen.set_screen_update("mcd212", FUNC(mcd212_device::screen_update));
+	screen.scanline().set(m_mcd212, FUNC(mcd212_device::scanline_cb));
+	screen.screen_vblank().set(m_mcd212, FUNC(mcd212_device::vblank_cb));
 
 	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
 	m_lcd->set_refresh_hz(60);
 	m_lcd->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_lcd->set_size(192, 22);
 	m_lcd->set_visarea(0, 192-1, 0, 22-1);
-	m_lcd->set_screen_update(FUNC(cdi_state::screen_update_cdimono1_lcd));
+	m_lcd->set_screen_update(FUNC(cdimono2_state::screen_update_cdimono1_lcd));
 
 	PALETTE(config, "palette").set_entries(0x100);
 
 	config.set_default_layout(layout_cdi);
 
 	M68HC05C8(config, m_servo, 4_MHz_XTAL);
+	m_servo->portb_w().set(FUNC(cdimono2_state::servo_portb_w));
+	m_servo->sck_out().set(m_slave, FUNC(m68hc05c8_device::sck_in));
+	m_servo->sda_out().set(m_slave, FUNC(m68hc05c8_device::sda_in));
+
 	M68HC05C8(config, m_slave, 4_MHz_XTAL);
+	m_slave->uart_tx().set(FUNC(cdimono2_state::controller_tx));
+	m_slave->porta_r().set(FUNC(cdimono2_state::slave_porta_r));
+	m_slave->portb_r().set(FUNC(cdimono2_state::slave_portb_r));
+	m_slave->portc_r().set(FUNC(cdimono2_state::slave_portc_r));
+	m_slave->portd_r().set(FUNC(cdimono2_state::slave_portd_r));
+	m_slave->porta_w().set(FUNC(cdimono2_state::slave_porta_w));
+	m_slave->portb_w().set(FUNC(cdimono2_state::slave_portb_w));
+	m_slave->portc_w().set(FUNC(cdimono2_state::slave_portc_w));
+	m_slave->portd_w().set(FUNC(cdimono2_state::slave_portd_w));
+	m_slave->sck_out().set(m_servo, FUNC(m68hc05c8_device::sck_in));
+	m_slave->sda_out().set(m_servo, FUNC(m68hc05c8_device::sda_in));
 
 	CDROM(config, "cdrom").set_interface("cdi_cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
@@ -649,29 +824,31 @@ void cdi_state::cdimono2(machine_config &config)
 	MK48T08(config, "mk48t08");
 }
 
-void cdi_state::cdi910(machine_config &config)
+void cdimono2_state::cdi910(machine_config &config)
 {
 	SCC68070(config, m_maincpu, CLOCK_A);
-	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdi910_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cdimono2_state::cdi910_mem);
 
 	MCD212(config, m_mcd212, CLOCK_A);
 	m_mcd212->set_screen("screen");
 	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
-	m_mcd212->set_scanline_callback(FUNC(cdi_state::draw_lcd));
+	m_mcd212->set_scanline_callback(FUNC(cdimono2_state::draw_lcd));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(384, 302);
-	screen.set_visarea(0, 384-1, 22, 302-1); // TODO: dynamic resolution
+	screen.set_size(384, 262);
+	screen.set_visarea(0, 384-1, 0, 262-1); // TODO: dynamic resolution
 	screen.set_screen_update("mcd212", FUNC(mcd212_device::screen_update));
+	screen.scanline().set(m_mcd212, FUNC(mcd212_device::scanline_cb));
+	screen.screen_vblank().set(m_mcd212, FUNC(mcd212_device::vblank_cb));
 
 	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
 	m_lcd->set_refresh_hz(60);
 	m_lcd->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_lcd->set_size(192, 22);
 	m_lcd->set_visarea(0, 192-1, 0, 22-1);
-	m_lcd->set_screen_update(FUNC(cdi_state::screen_update_cdimono1_lcd));
+	m_lcd->set_screen_update(FUNC(cdimono2_state::screen_update_cdimono1_lcd));
 
 	PALETTE(config, "palette").set_entries(0x100);
 
@@ -709,6 +886,16 @@ void cdi_state::cdimono1(machine_config &config)
 	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
 }
 
+// CD-i Mono-I, with DVC cartridge and images
+void cdi_state::cdimono1_dvc(machine_config &config)
+{
+	cdimono1_base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdimono1_dvc_mem);
+
+	CDROM(config, "cdrom").set_interface("cdi_cdrom");
+	SOFTWARE_LIST(config, "cd_list").set_original("cdi");
+}
+
 void quizard_state::quizard(machine_config &config)
 {
 	cdimono1_base(config);
@@ -739,7 +926,25 @@ ROM_START( cdimono1 )
 	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 ROM_END
 
+ROM_START( cdimono1_dvc )
+	ROM_REGION(0x80000, "maincpu", 0) // these roms need byteswapping
+	ROM_SYSTEM_BIOS( 0, "mcdi200", "Magnavox CD-i 200" )
+	ROMX_LOAD( "cdi200.rom", 0x000000, 0x80000, CRC(40c4e6b9) SHA1(d961de803c89b3d1902d656ceb9ce7c02dccb40a), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "pcdi220", "Philips CD-i 220 F2" )
+	ROMX_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "pcdi220_alt", "Philips CD-i 220?" ) // doesn't boot
+	ROMX_LOAD( "cdi220.rom", 0x000000, 0x80000, CRC(584c0af8) SHA1(5d757ab46b8c8fc36361555d978d7af768342d47), ROM_BIOS(2) )
 
+	ROM_REGION(0x2000, "cdic", 0)
+	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+
+	ROM_REGION(0x2000, "slave", 0)
+	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+
+	ROM_REGION16_BE(0x40000, "dvc", 0)
+	ROM_LOAD16_BYTE( "cdi-fmv1.bin", 0x00000, 0x10000, CRC(12345678) SHA1(1234567812345678123456781234567812345678) )
+	ROM_LOAD16_BYTE( "cdi-fmv2.bin", 0x00001, 0x10000, CRC(12345678) SHA1(1234567812345678123456781234567812345678) )
+ROM_END
 
 ROM_START( cdi910 )
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -1016,12 +1221,13 @@ ROM_END
 *      Game driver(s)    *
 *************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS      INIT        COMPANY       FULLNAME */
+/*    YEAR  NAME          PARENT    COMPAT    MACHINE   INPUT     CLASS      INIT        COMPANY       FULLNAME */
 // BIOS / System
-CONS( 1991, cdimono1, 0,      0,      cdimono1, cdi,      cdi_state, empty_init, "Philips",    "CD-i (Mono-I) (PAL)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 1991, cdimono2, 0,      0,      cdimono2, cdimono2, cdi_state, empty_init, "Philips",    "CD-i (Mono-II) (NTSC)",   MACHINE_NOT_WORKING )
-CONS( 1991, cdi910,   0,      0,      cdi910,   cdimono2, cdi_state, empty_init, "Philips",    "CD-i 910-17P Mini-MMC (PAL)",   MACHINE_NOT_WORKING )
-CONS( 1991, cdi490a,  0,      0,      cdimono1, cdi,      cdi_state, empty_init, "Philips",    "CD-i 490",   MACHINE_NOT_WORKING )
+CONS( 1991, cdimono1,     0,        0,        cdimono1, cdi,      cdi_state,      empty_init, "Philips",    "CD-i (Mono-I) (PAL)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1991, cdimono1_dvc, cdimono1, cdimono1, cdimono1, cdi,      cdi_state,      empty_init, "Philips",    "CD-i (Mono-I) (PAL) (w/ DVC)",   MACHINE_NOT_WORKING )
+CONS( 1991, cdimono2,     0,        0,        cdimono2, cdimono2, cdimono2_state, empty_init, "Philips",    "CD-i (Mono-II) (NTSC)",   MACHINE_NOT_WORKING )
+CONS( 1991, cdi910,       0,        0,        cdi910,   cdimono2, cdimono2_state, empty_init, "Philips",    "CD-i 910-17P Mini-MMC (PAL)",   MACHINE_NOT_WORKING )
+CONS( 1991, cdi490a,      0,        0,        cdimono1, cdi,      cdi_state,      empty_init, "Philips",    "CD-i 490",   MACHINE_NOT_WORKING )
 
 // The Quizard games are RETAIL CD-i units, with additional JAMMA adapters & dongles for protection, hence being 'clones' of the system.
 /*    YEAR  NAME         PARENT    MACHINE        INPUT     DEVICE          INIT         MONITOR     COMPANY         FULLNAME */

@@ -23,8 +23,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_planea(*this, "mcd212:planea")
 		, m_slave_hle(*this, "slave_hle")
-		, m_servo(*this, "servo")
-		, m_slave(*this, "slave")
 		, m_cdic(*this, "cdic")
 		, m_cdda(*this, "cdda")
 		, m_mcd212(*this, "mcd212")
@@ -34,18 +32,19 @@ public:
 
 	void cdimono1_base(machine_config &config);
 	void cdimono1(machine_config &config);
-	void cdimono2(machine_config &config);
-	void cdi910(machine_config &config);
+	void cdimono1_dvc(machine_config &config);
 
 protected:
+	virtual void machine_start() override { }
 	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	void cdimono1_mem(address_map &map);
+	void cdimono1_dvc_mem(address_map &map);
 
 	required_device<scc68070_device> m_maincpu;
 
-private:
-	virtual void video_start() override;
+	DECLARE_READ16_MEMBER(uart_loopback_enable);
 
 	enum servo_portc_bit_t
 	{
@@ -57,17 +56,11 @@ private:
 	void draw_lcd(int y);
 	uint32_t screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void cdi910_mem(address_map &map);
-	void cdimono2_mem(address_map &map);
-	void cdi070_cpuspace(address_map &map);
-
 	DECLARE_READ16_MEMBER(dvc_r);
 	DECLARE_WRITE16_MEMBER(dvc_w);
 
 	required_shared_ptr<uint16_t> m_planea;
 	optional_device<cdislave_device> m_slave_hle;
-	optional_device<m68hc05c8_device> m_servo;
-	optional_device<m68hc05c8_device> m_slave;
 	optional_device<cdicdic_device> m_cdic;
 	required_device<cdda_device> m_cdda;
 	required_device<mcd212_device> m_mcd212;
@@ -76,6 +69,55 @@ private:
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
 
 	bitmap_rgb32 m_lcdbitmap;
+};
+
+class cdimono2_state : public cdi_state
+{
+public:
+	cdimono2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: cdi_state(mconfig, type, tag)
+		, m_servo(*this, "servo")
+		, m_slave(*this, "slave")
+	{ }
+
+	void cdimono2(machine_config &config);
+	void cdi910(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	void cdi910_mem(address_map &map);
+	void cdimono2_mem(address_map &map);
+
+	DECLARE_READ8_MEMBER(slave_porta_r);
+	DECLARE_READ8_MEMBER(slave_portb_r);
+	DECLARE_READ8_MEMBER(slave_portc_r);
+	DECLARE_READ8_MEMBER(slave_portd_r);
+	DECLARE_WRITE8_MEMBER(slave_porta_w);
+	DECLARE_WRITE8_MEMBER(slave_portb_w);
+	DECLARE_WRITE8_MEMBER(slave_portc_w);
+	DECLARE_WRITE8_MEMBER(slave_portd_w);
+	DECLARE_WRITE8_MEMBER(servo_portb_w);
+
+	DECLARE_READ8_MEMBER(slave_glue_r);
+	DECLARE_WRITE8_MEMBER(slave_glue_w);
+
+	DECLARE_READ8_MEMBER(dsp_r);
+	DECLARE_WRITE8_MEMBER(dsp_w);
+
+	DECLARE_WRITE8_MEMBER(controller_tx);
+
+	DECLARE_READ16_MEMBER(uart_loopback_enable2);
+
+	required_device<m68hc05c8_device> m_servo;
+	required_device<m68hc05c8_device> m_slave;
+
+	uint8_t m_porta_data;
+	uint8_t m_portb_data;
+	uint8_t m_portc_data;
+	uint8_t m_portd_data;
 };
 
 class quizard_state : public cdi_state

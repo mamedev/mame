@@ -33,8 +33,10 @@ determines both the COP watchdog timeout and the real-time interrupt rate
 #define LOG_IOPORT  (1U <<  2)
 #define LOG_TIMER   (1U <<  3)
 #define LOG_COP     (1U <<  4)
+#define LOG_UART    (1U <<  5)
+#define LOG_SPI     (1U <<  6)
 
-//#define VERBOSE (LOG_GENERAL | LOG_INT | LOG_IOPORT | LOG_TIMER | LOG_COP)
+#define VERBOSE (LOG_GENERAL | LOG_INT | LOG_IOPORT | LOG_COP | LOG_UART | LOG_SPI)
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
 
@@ -42,6 +44,8 @@ determines both the COP watchdog timeout and the real-time interrupt rate
 #define LOGIOPORT(...)  LOGMASKED(LOG_IOPORT, __VA_ARGS__)
 #define LOGTIMER(...)   LOGMASKED(LOG_TIMER,  __VA_ARGS__)
 #define LOGCOP(...)     LOGMASKED(LOG_COP,    __VA_ARGS__)
+#define LOGUART(...)    LOGMASKED(LOG_UART,   __VA_ARGS__)
+#define LOGSPI(...)     LOGMASKED(LOG_SPI,    __VA_ARGS__)
 
 
 namespace {
@@ -94,8 +98,8 @@ ROM_START( m68hc705c8a )
 ROM_END
 
 
-//constexpr u16 M68HC05_VECTOR_SPI        = 0xfff4;
-//constexpr u16 M68HC05_VECTOR_SCI        = 0xfff6;
+constexpr u16 M68HC05_VECTOR_SPI        = 0xfff4;
+constexpr u16 M68HC05_VECTOR_SCI        = 0xfff6;
 constexpr u16 M68HC05_VECTOR_TIMER      = 0xfff8;
 constexpr u16 M68HC05_VECTOR_IRQ        = 0xfffa;
 constexpr u16 M68HC05_VECTOR_SWI        = 0xfffc;
@@ -103,8 +107,10 @@ constexpr u16 M68HC05_VECTOR_SWI        = 0xfffc;
 
 constexpr u16 M68HC05_INT_IRQ           = u16(1) << 0;
 constexpr u16 M68HC05_INT_TIMER         = u16(1) << 1;
+constexpr u16 M68HC05_INT_SCI           = u16(1) << 2;
+constexpr u16 M68HC05_INT_SPI           = u16(1) << 3;
 
-constexpr u16 M68HC05_INT_MASK          = M68HC05_INT_IRQ | M68HC05_INT_TIMER;
+constexpr u16 M68HC05_INT_MASK          = M68HC05_INT_IRQ | M68HC05_INT_TIMER | M68HC05_INT_SCI | M68HC05_INT_SPI;
 
 } // anonymous namespace
 
@@ -154,6 +160,9 @@ m68hc05_device::m68hc05_device(
 	, m_port_irq_state(false)
 	, m_irq_line_state(false)
 	, m_irq_latch(0)
+	, m_uart_tx_cb(*this)
+	, m_sck_out_cb(*this)
+	, m_sda_out_cb(*this)
 	, m_tcmp_cb(*this)
 	, m_tcap_state(false)
 	, m_tcr(0x00)
@@ -163,11 +172,6 @@ m68hc05_device::m68hc05_device(
 	, m_inhibit_cap(false), m_inhibit_cmp(false)
 	, m_trl_buf{ 0xfc, 0xfc }
 	, m_trl_latched{ false, false }
-	, m_pcop_cnt(0)
-	, m_ncop_cnt(0)
-	, m_coprst(0x00)
-	, m_copcr(0x00)
-	, m_ncope(0)
 {
 }
 
@@ -261,6 +265,203 @@ WRITE8_MEMBER(m68hc05_device::port_ddr_w)
 	}
 }
 
+u8 m68hc05_device::spcr_spr_divider() const
+{
+	static const uint32_t s_rate_values[4] = { 2, 4, 16, 32 };
+	return s_rate_values[spcr_spr()];
+}
+
+READ8_MEMBER(m68hc05_device::spcr_r)
+{
+	return m_spcr;
+}
+
+WRITE8_MEMBER(m68hc05_device::spcr_w)
+{
+	data &= 0xdf;
+	m_spcr = data;
+	LOGSPI("write SPCR: SPIE=%u SPE=%u MSTR=%u CPOL=%u CPHA=%u SPR=%u (divider %u)\n",
+		spcr_spie(), spcr_spe(), spcr_mstr(), spcr_cpol(), spcr_cpha(), spcr_spr(), spcr_spr_divider());
+	if (m_spi_tx_clocks == ~0U)
+	{
+		m_sck = spcr_cpol() ? 1 : 0;
+	}
+}
+
+READ8_MEMBER(m68hc05_device::spsr_r)
+{
+	return m_spsr;
+}
+
+WRITE8_MEMBER(m68hc05_device::spsr_w)
+{
+	LOGSPI("write SPSR (ignored): %02x\n", data);
+}
+
+READ8_MEMBER(m68hc05_device::spdr_r)
+{
+	LOGSPI("%s: read SPDR: %02x\n", machine().describe_context(), m_spdr);
+	m_spsr &= ~0xd0;
+	return m_spdr;
+}
+
+WRITE8_MEMBER(m68hc05_device::spdr_w)
+{
+	LOGSPI("%s: write SPDR: %02x\n", machine().describe_context(), data);
+	m_spdr = data;
+	if (spcr_spe())
+	{
+		if (m_spi_tx_clocks != ~0U)
+		{
+			// flag write collision
+			m_spsr |= 0x40;
+		}
+		else
+		{
+			m_spi_tx_clocks = spcr_spr_divider() >> 1;
+			m_spi_tx_cnt = 8;
+			m_spi_run_clocks = 0;
+		}
+	}
+}
+
+WRITE_LINE_MEMBER(m68hc05_device::sck_in)
+{
+	LOGSPI("sck_in: %d\n", state);
+	u8 old = m_sck;
+	m_sck = state;
+	if (spcr_spe())
+	{
+		if (old != m_sck && m_sck != spcr_cpol())
+		{
+			if (m_spi_rx_cnt == 0)
+			{
+				m_spdr = 0;
+			}
+			m_spdr |= (m_sda ? 1 : 0) << m_spi_rx_cnt;
+			m_spi_rx_cnt++;
+			if (m_spi_rx_cnt == 8)
+			{
+				m_spi_rx_cnt = 0;
+				m_spsr |= 0x80;
+				if (spsr_spif() && spcr_spie())
+				{
+					m_pending_interrupts |= M68HC05_INT_SPI;
+				}
+				else
+				{
+					m_pending_interrupts &= ~M68HC05_INT_SPI;
+				}
+			}
+		}
+	}
+}
+
+WRITE_LINE_MEMBER(m68hc05_device::sda_in)
+{
+	LOGSPI("sda_in: %d\n", state);
+	m_sda = state;
+}
+
+u8 m68hc05_device::baud_scp_count() const
+{
+	static const uint32_t s_prescale_values[4] = { 1, 3, 4, 13 };
+	return s_prescale_values[baud_scp()];
+}
+
+READ8_MEMBER(m68hc05_device::baud_r)
+{
+	return m_baud;
+}
+
+WRITE8_MEMBER(m68hc05_device::baud_w)
+{
+	data &= 0x37;
+	m_baud = data;
+	LOGUART("write BAUD: SCP=%u SCR=%u (prescale=%u clocks, rate=%u clocks)\n",
+		baud_scp(), baud_scr(), baud_scp_count(), baud_scr_count());
+}
+
+READ8_MEMBER(m68hc05_device::sccr1_r)
+{
+	return m_sccr1;
+}
+
+WRITE8_MEMBER(m68hc05_device::sccr1_w)
+{
+	data &= 0xd8;
+	m_sccr1 = data;
+	LOGUART("write SCCR1: R8=%u T8=%u M=%u WAKE=%u\n",
+		sccr1_r8(), sccr1_t8(), sccr1_m(), sccr1_wake());
+}
+
+READ8_MEMBER(m68hc05_device::sccr2_r)
+{
+	return m_sccr2;
+}
+
+WRITE8_MEMBER(m68hc05_device::sccr2_w)
+{
+	m_sccr2 = data;
+	LOGUART("write SCCR2: TIE=%u TCIE=%u RIE=%u ILIE=%u TE=%u RE=%u RWU=%u SBK=%u\n",
+		sccr2_tie(), sccr2_tcie(), sccr2_rie(), sccr2_ilie(), sccr2_te(), sccr2_re(), sccr2_rwu(), sccr2_sbk());
+	if (sccr2_te() && m_tdr_pending)
+	{
+		m_uart_tx_clocks = 32 * baud_scp_count() * baud_scr_count();
+	}
+	if (sccr2_re() && m_rdr_pending)
+	{
+		m_uart_rx_clocks = 32 * baud_scp_count() * baud_scr_count();
+	}
+}
+
+READ8_MEMBER(m68hc05_device::scsr_r)
+{
+	return m_scsr;
+}
+
+READ8_MEMBER(m68hc05_device::rdr_r)
+{
+	m_scsr &= ~0x20;
+	if (m_scsr & m_sccr2 & 0xf0)
+		m_pending_interrupts |= M68HC05_INT_SCI;
+	else
+		m_pending_interrupts &= ~M68HC05_INT_SCI;
+	LOGUART("%s: read RDR: %02x\n", machine().describe_context(), m_rdr);
+	return m_rdr;
+}
+
+void m68hc05_device::uart_rx(u8 data)
+{
+	m_rdr = data;
+	if (sccr2_re())
+	{
+		m_uart_rx_clocks = 32 * baud_scp_count() * baud_scr_count();
+	}
+	else
+	{
+		m_rdr_pending = true;
+	}
+}
+
+WRITE8_MEMBER(m68hc05_device::tdr_w)
+{
+	m_tdr = data;
+	LOGUART("write TDR: %02x\n", data);
+	m_scsr &= ~0xc0;
+	if (m_scsr & m_sccr2 & 0xf0)
+		m_pending_interrupts |= M68HC05_INT_SCI;
+	else
+		m_pending_interrupts &= ~M68HC05_INT_SCI;
+	if (sccr2_te())
+	{
+		m_uart_tx_clocks = 32 * baud_scp_count() * baud_scr_count();
+	}
+	else
+	{
+		m_tdr_pending = true;
+	}
+}
 
 READ8_MEMBER(m68hc05_device::tcr_r)
 {
@@ -405,7 +606,7 @@ READ8_MEMBER(m68hc05_device::timer_r)
 }
 
 
-WRITE8_MEMBER(m68hc05_device::coprst_w)
+WRITE8_MEMBER(m68hc705_device::coprst_w)
 {
 	LOGCOP("write COPRST=%02x%s\n", data, ((0xaa == data) && (0x55 == m_coprst)) ? ", reset" : "");
 	if (0x55 == data)
@@ -419,7 +620,7 @@ WRITE8_MEMBER(m68hc05_device::coprst_w)
 	}
 }
 
-READ8_MEMBER(m68hc05_device::copcr_r)
+READ8_MEMBER(m68hc705_device::copcr_r)
 {
 	if (copcr_copf()) LOGCOP("read COPCR, clear COPF\n");
 	u8 const result(m_copcr);
@@ -427,14 +628,14 @@ READ8_MEMBER(m68hc05_device::copcr_r)
 	return result;
 }
 
-WRITE8_MEMBER(m68hc05_device::copcr_w)
+WRITE8_MEMBER(m68hc705_device::copcr_w)
 {
 	LOGCOP("write COPCR: CME=%u PCOPE=%u [%s] CM=%u\n",
 			BIT(data, 3), BIT(data, 2), (!copcr_pcope() && BIT(data, 2)) ? "set" : "ignored", data & 0x03);
 	m_copcr = (m_copcr & 0xf4) | (data & 0x0f); // PCOPE is set-only, hence the mask overlap
 }
 
-WRITE8_MEMBER(m68hc05_device::copr_w)
+WRITE8_MEMBER(m68hc705_device::copr_w)
 {
 	LOGCOP("write COPR: COPC=%u\n", BIT(data, 0));
 	if (!BIT(data, 0)) m_ncop_cnt = 0;
@@ -448,6 +649,9 @@ void m68hc05_device::device_start()
 	// resolve callbacks
 	for (devcb_read8 &cb : m_port_cb_r) cb.resolve();
 	for (devcb_write8 &cb : m_port_cb_w) cb.resolve_safe();
+	m_uart_tx_cb.resolve_safe();
+	m_sck_out_cb.resolve_safe();
+	m_sda_out_cb.resolve_safe();
 	m_tcmp_cb.resolve_safe();
 
 	// save digital I/O
@@ -458,6 +662,29 @@ void m68hc05_device::device_start()
 	save_item(NAME(m_port_irq_state));
 	save_item(NAME(m_irq_line_state));
 	save_item(NAME(m_irq_latch));
+
+	// save UART
+	save_item(NAME(m_baud));
+	save_item(NAME(m_sccr1));
+	save_item(NAME(m_sccr2));
+	save_item(NAME(m_scsr));
+	save_item(NAME(m_rdr));
+	save_item(NAME(m_tdr));
+	save_item(NAME(m_rdr_pending));
+	save_item(NAME(m_tdr_pending));
+	save_item(NAME(m_uart_tx_clocks));
+	save_item(NAME(m_uart_rx_clocks));
+
+	// save SPI
+	save_item(NAME(m_spcr));
+	save_item(NAME(m_spsr));
+	save_item(NAME(m_spdr));
+	save_item(NAME(m_spi_rx_cnt));
+	save_item(NAME(m_spi_tx_cnt));
+	save_item(NAME(m_spi_tx_clocks));
+	save_item(NAME(m_spi_run_clocks));
+	save_item(NAME(m_sck));
+	save_item(NAME(m_sda));
 
 	// save timer/counter
 	save_item(NAME(m_tcap_state));
@@ -473,18 +700,34 @@ void m68hc05_device::device_start()
 	save_item(NAME(m_trl_buf));
 	save_item(NAME(m_trl_latched));
 
-	// save COP watchdogs
-	save_item(NAME(m_pcop_cnt));
-	save_item(NAME(m_ncop_cnt));
-	save_item(NAME(m_coprst));
-	save_item(NAME(m_copcr));
-	save_item(NAME(m_ncope));
-
 	// digital I/O state unaffected by reset
 	std::fill(std::begin(m_port_interrupt), std::end(m_port_interrupt), 0x00);
 	std::fill(std::begin(m_port_input), std::end(m_port_input), 0xff);
 	std::fill(std::begin(m_port_latch), std::end(m_port_latch), 0xff);
 	m_irq_line_state = false;
+
+	// some UART state unaffected by reset
+	m_baud = 0x00;
+	m_sccr1 = 0x00;
+	m_sccr2 = 0x00;
+	m_scsr = 0x00;
+	m_rdr = 0x00;
+	m_tdr = 0x00;
+	m_rdr_pending = false;
+	m_tdr_pending = false;
+	m_uart_tx_clocks = ~0U;
+	m_uart_rx_clocks = ~0U;
+
+	// some SPI sate unaffected by reset
+	m_spcr = 0x00;
+	m_spsr = 0x00;
+	m_spdr = 0x00;
+	m_spi_rx_cnt = 0;
+	m_spi_tx_cnt = 0;
+	m_spi_tx_clocks = ~0U;
+	m_spi_run_clocks = 0;
+	m_sck = 0x00;
+	m_sda = 0x00;
 
 	// timer state unaffected by reset
 	m_tcap_state = false;
@@ -492,12 +735,6 @@ void m68hc05_device::device_start()
 	m_tsr = 0x00;
 	m_icr = 0x0000;
 	m_ocr = 0x0000;
-
-	// COP watchdog state unaffected by reset
-	m_pcop_cnt = 0;
-	m_coprst = 0x00;
-	m_copcr = 0x00;
-	m_ncope = 0;
 
 	// expose most basic state to debugger
 	state_add(M68HC05_IRQLATCH, "IRQLATCH", m_irq_latch).mask(0x01);
@@ -512,6 +749,23 @@ void m68hc05_device::device_reset()
 	m_irq_latch = 0;
 	update_port_irq();
 
+	// UART reset
+	m_baud &= 0x07;
+	m_sccr2 = 0x00;
+	m_scsr = 0xc0;
+	m_uart_tx_clocks = ~0U;
+	m_uart_rx_clocks = ~0U;
+
+	// SPI reset
+	m_spcr &= 0x2f;
+	m_spsr &= 0x2f;
+	m_spi_rx_cnt = 0;
+	m_spi_tx_cnt = 0;
+	m_spi_tx_clocks = ~0U;
+	m_spi_run_clocks = 0;
+	m_sck = 0x00;
+	m_sda = 0x00;
+
 	// timer reset
 	m_tcr &= 0x02;
 	m_tsr_seen = 0x00;
@@ -520,6 +774,29 @@ void m68hc05_device::device_reset()
 	m_inhibit_cap = m_inhibit_cmp = false;
 	m_trl_buf[0] = m_trl_buf[1] = u8(m_counter);
 	m_trl_latched[0] = m_trl_latched[1] = false;
+}
+
+void m68hc705_device::device_start()
+{
+	m68hc05_device::device_start();
+
+	// save COP watchdogs
+	save_item(NAME(m_pcop_cnt));
+	save_item(NAME(m_ncop_cnt));
+	save_item(NAME(m_coprst));
+	save_item(NAME(m_copcr));
+	save_item(NAME(m_ncope));
+
+	// COP watchdog state unaffected by reset
+	m_pcop_cnt = 0;
+	m_coprst = 0x00;
+	m_copcr = 0x00;
+	m_ncope = 0;
+}
+
+void m68hc705_device::device_reset()
+{
+	m68hc05_device::device_reset();
 
 	// COP watchdog reset
 	m_ncop_cnt = 0;
@@ -600,6 +877,16 @@ void m68hc05_device::interrupt()
 			LOGINT("servicing timer interrupt\n");
 			rm16(M68HC05_VECTOR_TIMER & m_params.m_vector_mask, m_pc);
 		}
+		else if (m_pending_interrupts & M68HC05_INT_SCI)
+		{
+			LOGINT("servicing SCI interrupt\n");
+			rm16(M68HC05_VECTOR_SCI & m_params.m_vector_mask, m_pc);
+		}
+		else if (m_pending_interrupts & M68HC05_INT_SPI)
+		{
+			LOGINT("servicing SPI interrupt\n");
+			rm16(M68HC05_VECTOR_SPI & m_params.m_vector_mask, m_pc);
+		}
 		else
 		{
 			fatalerror("m68hc05[%s]: unknown pending interrupt(s) %x", tag(), m_pending_interrupts);
@@ -612,6 +899,33 @@ void m68hc05_device::interrupt()
 bool m68hc05_device::test_il()
 {
 	return m_irq_line_state;
+}
+
+void m68hc05_device::run_cop(unsigned count)
+{
+	// C4 and C8 devices don't have a COP or watchdog
+}
+
+void m68hc705_device::run_cop(unsigned count)
+{
+	// run programmable COP
+	u32 const pcop_timeout(u32(1) << ((copcr_cm() << 1) + 15));
+	if (copcr_pcope() && (pcop_timeout <= ((m_pcop_cnt & (pcop_timeout - 1)) + count)))
+	{
+		LOGCOP("PCOP reset\n");
+		m_copcr |= 0x10;
+		pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+	}
+	m_pcop_cnt = (m_pcop_cnt + count) & ((u32(1) << 21) - 1);
+
+	// run non-programmable COP
+	m_ncop_cnt += count;
+	if ((u32(1) << 17) <= m_ncop_cnt)
+	{
+		pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+		LOGCOP("NCOP reset\n");
+	}
+	m_ncop_cnt &= (u32(1) << 17) - 1;
 }
 
 void m68hc05_device::burn_cycles(unsigned count)
@@ -641,24 +955,81 @@ void m68hc05_device::burn_cycles(unsigned count)
 	}
 	if (m_tcr & m_tsr & 0xe0) m_pending_interrupts |= M68HC05_INT_TIMER;
 
-	// run programmable COP
-	u32 const pcop_timeout(u32(1) << ((copcr_cm() << 1) + 15));
-	if (copcr_pcope() && (pcop_timeout <= ((m_pcop_cnt & (pcop_timeout - 1)) + count)))
-	{
-		LOGCOP("PCOP reset\n");
-		m_copcr |= 0x10;
-		pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-	}
-	m_pcop_cnt = (m_pcop_cnt + count) & ((u32(1) << 21) - 1);
+	run_cop(count);
 
-	// run non-programmable COP
-	m_ncop_cnt += count;
-	if ((u32(1) << 17) <= m_ncop_cnt)
+	// run SPI Tx
+	if (m_spi_tx_clocks != ~0U)
 	{
-		pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-		LOGCOP("NCOP reset\n");
+		m_spi_run_clocks += count * ps_opt;
+		while (m_spi_run_clocks > m_spi_tx_clocks && m_spi_tx_cnt > 0)
+		{
+			m_spi_run_clocks -= m_spi_tx_clocks;
+
+			if (m_sck == !spcr_cpol())
+			{
+				logerror("Transmitting SPI bit %u: %u\n", 8 - m_spi_tx_cnt, BIT(m_spdr, 8 - m_spi_tx_cnt));
+				m_sda_out_cb(BIT(m_spdr, 8 - m_spi_tx_cnt));
+				m_spi_tx_cnt--;
+				if (m_spi_tx_cnt == 0)
+				{
+					m_spi_tx_clocks = ~0U;
+					m_spi_run_clocks = 0;
+					m_spsr |= 0x80;
+					if (spsr_spif() && spcr_spie())
+					{
+						m_pending_interrupts |= M68HC05_INT_SPI;
+					}
+					else
+					{
+						m_pending_interrupts &= ~M68HC05_INT_SPI;
+					}
+				}
+			}
+			m_sck_out_cb(m_sck);
+			m_sck = 1 - m_sck;
+		}
 	}
-	m_ncop_cnt &= (u32(1) << 17) - 1;
+
+	// run UART Tx
+	if (m_uart_tx_clocks != ~0U)
+	{
+		if (m_uart_tx_clocks > count * ps_opt)
+		{
+			m_uart_tx_clocks -= count * ps_opt;
+		}
+		else
+		{
+			logerror("Transmitting %02x\n", m_tdr);
+			m_tdr_pending = false;
+			m_uart_tx_clocks = ~0U;
+			m_scsr |= 0xc0;
+			m_uart_tx_cb(m_tdr);
+			if (m_scsr & m_sccr2 & 0xf0)
+				m_pending_interrupts |= M68HC05_INT_SCI;
+			else
+				m_pending_interrupts &= ~M68HC05_INT_SCI;
+		}
+	}
+
+	// run UART Rx
+	if (m_uart_rx_clocks != ~0U && sccr2_re())
+	{
+		if (m_uart_rx_clocks > count * ps_opt)
+		{
+			m_uart_rx_clocks -= count * ps_opt;
+		}
+		else
+		{
+			logerror("Receiving %02x\n", m_rdr);
+			m_rdr_pending = false;
+			m_uart_rx_clocks = ~0U;
+			m_scsr |= 0x20;
+			if (m_scsr & m_sccr2 & 0xf0)
+				m_pending_interrupts |= M68HC05_INT_SCI;
+			else
+				m_pending_interrupts &= ~M68HC05_INT_SCI;
+		}
+	}
 }
 
 
@@ -686,14 +1057,14 @@ void m68hc05_device::add_timer_state()
 	state_add(M68HC05_TR, "TR", m_counter).mask(0xffff);
 }
 
-void m68hc05_device::add_pcop_state()
+void m68hc705_device::add_pcop_state()
 {
 	state_add(M68HC05_COPRST, "COPRST", m_coprst).mask(0xff);
 	state_add(M68HC05_COPCR, "COPCR", m_copcr).mask(0x1f);
 	state_add(M68HC05_PCOP, "PCOP", m_pcop_cnt).mask(0x001fffff);
 }
 
-void m68hc05_device::add_ncop_state()
+void m68hc705_device::add_ncop_state()
 {
 	state_add(M68HC05_NCOPE, "NCOPE", m_ncope).mask(0x01);
 	state_add(M68HC05_NCOP, "NCOP", m_ncop_cnt).mask(0x0001ffff);
@@ -739,6 +1110,11 @@ m68hc705_device::m68hc705_device(
 		u32 addr_width,
 		address_map_constructor internal_map)
 	: m68hc05_device(mconfig, tag, owner, clock, type, addr_width, (1U << addr_width) - 1, internal_map)
+	, m_pcop_cnt(0)
+	, m_ncop_cnt(0)
+	, m_coprst(0x00)
+	, m_copcr(0x00)
+	, m_ncope(0)
 {
 }
 
@@ -756,14 +1132,14 @@ void m68hc05c4_device::c4_map(address_map &map)
 	map(0x0000, 0x0003).rw(FUNC(m68hc05c4_device::port_read), FUNC(m68hc05c4_device::port_latch_w));
 	map(0x0004, 0x0006).rw(FUNC(m68hc05c4_device::port_ddr_r), FUNC(m68hc05c4_device::port_ddr_w));
 	// 0x0007-0x0009 unused
-	// 0x000a SPCR
-	// 0x000b SPSR
-	// 0x000c SPDR
-	// 0x000d BAUD
-	// 0x000e SCCR1
-	// 0x000f SCCR2
-	// 0x0010 SCSR
-	// 0x0011 SCDR
+	map(0x000a, 0x000a).rw(FUNC(m68hc05c4_device::spcr_r), FUNC(m68hc05c4_device::spcr_w));
+	map(0x000b, 0x000b).rw(FUNC(m68hc05c4_device::spsr_r), FUNC(m68hc05c4_device::spsr_w));
+	map(0x000c, 0x000c).rw(FUNC(m68hc05c4_device::spdr_r), FUNC(m68hc05c4_device::spdr_w));
+	map(0x000d, 0x000d).rw(FUNC(m68hc05c4_device::baud_r), FUNC(m68hc05c4_device::baud_w));
+	map(0x000e, 0x000e).rw(FUNC(m68hc05c4_device::sccr1_r), FUNC(m68hc05c4_device::sccr1_w));
+	map(0x000f, 0x000f).rw(FUNC(m68hc05c4_device::sccr2_r), FUNC(m68hc05c4_device::sccr2_w));
+	map(0x0010, 0x0010).r(FUNC(m68hc05c4_device::scsr_r));
+	map(0x0011, 0x0011).rw(FUNC(m68hc05c4_device::rdr_r), FUNC(m68hc05c4_device::tdr_w));
 	map(0x0012, 0x0012).rw(FUNC(m68hc05c4_device::tcr_r), FUNC(m68hc05c4_device::tcr_w));
 	map(0x0013, 0x0013).r(FUNC(m68hc05c4_device::tsr_r));
 	map(0x0014, 0x0015).r(FUNC(m68hc05c4_device::icr_r));
@@ -824,14 +1200,14 @@ void m68hc05c8_device::c8_map(address_map &map)
 	map(0x0000, 0x0003).rw(FUNC(m68hc05c8_device::port_read), FUNC(m68hc05c8_device::port_latch_w));
 	map(0x0004, 0x0006).rw(FUNC(m68hc05c8_device::port_ddr_r), FUNC(m68hc05c8_device::port_ddr_w));
 	// 0x0007-0x0009 unused
-	// 0x000a SPCR
-	// 0x000b SPSR
-	// 0x000c SPDR
-	// 0x000d BAUD
-	// 0x000e SCCR1
-	// 0x000f SCCR2
-	// 0x0010 SCSR
-	// 0x0011 SCDR
+	map(0x000a, 0x000a).rw(FUNC(m68hc05c8_device::spcr_r), FUNC(m68hc05c8_device::spcr_w));
+	map(0x000b, 0x000b).rw(FUNC(m68hc05c8_device::spsr_r), FUNC(m68hc05c8_device::spsr_w));
+	map(0x000c, 0x000c).rw(FUNC(m68hc05c8_device::spdr_r), FUNC(m68hc05c8_device::spdr_w));
+	map(0x000d, 0x000d).rw(FUNC(m68hc05c8_device::baud_r), FUNC(m68hc05c8_device::baud_w));
+	map(0x000e, 0x000e).rw(FUNC(m68hc05c8_device::sccr1_r), FUNC(m68hc05c8_device::sccr1_w));
+	map(0x000f, 0x000f).rw(FUNC(m68hc05c8_device::sccr2_r), FUNC(m68hc05c8_device::sccr2_w));
+	map(0x0010, 0x0010).r(FUNC(m68hc05c8_device::scsr_r));
+	map(0x0011, 0x0011).rw(FUNC(m68hc05c8_device::rdr_r), FUNC(m68hc05c8_device::tdr_w));
 	map(0x0012, 0x0012).rw(FUNC(m68hc05c8_device::tcr_r), FUNC(m68hc05c8_device::tcr_w));
 	map(0x0013, 0x0013).r(FUNC(m68hc05c8_device::tsr_r));
 	map(0x0014, 0x0015).r(FUNC(m68hc05c8_device::icr_r));
@@ -891,14 +1267,14 @@ void m68hc705c8a_device::c8a_map(address_map &map)
 	map(0x0000, 0x0003).rw(FUNC(m68hc705c8a_device::port_read), FUNC(m68hc705c8a_device::port_latch_w));
 	map(0x0004, 0x0006).rw(FUNC(m68hc705c8a_device::port_ddr_r), FUNC(m68hc705c8a_device::port_ddr_w));
 	// 0x0007-0x0009 unused
-	// 0x000a SPCR
-	// 0x000b SPSR
-	// 0x000c SPDR
-	// 0x000d BAUD
-	// 0x000e SCCR1
-	// 0x000f SCCR2
-	// 0x0010 SCSR
-	// 0x0011 SCDR
+	map(0x000a, 0x000a).rw(FUNC(m68hc705c8a_device::spcr_r), FUNC(m68hc705c8a_device::spcr_w));
+	map(0x000b, 0x000b).rw(FUNC(m68hc705c8a_device::spsr_r), FUNC(m68hc705c8a_device::spsr_w));
+	map(0x000c, 0x000c).rw(FUNC(m68hc705c8a_device::spdr_r), FUNC(m68hc705c8a_device::spdr_w));
+	map(0x000d, 0x000d).rw(FUNC(m68hc705c8a_device::baud_r), FUNC(m68hc705c8a_device::baud_w));
+	map(0x000e, 0x000e).rw(FUNC(m68hc705c8a_device::sccr1_r), FUNC(m68hc705c8a_device::sccr1_w));
+	map(0x000f, 0x000f).rw(FUNC(m68hc705c8a_device::sccr2_r), FUNC(m68hc705c8a_device::sccr2_w));
+	map(0x0010, 0x0010).r(FUNC(m68hc705c8a_device::scsr_r));
+	map(0x0011, 0x0011).rw(FUNC(m68hc705c8a_device::rdr_r), FUNC(m68hc705c8a_device::tdr_w));
 	map(0x0012, 0x0012).rw(FUNC(m68hc705c8a_device::tcr_r), FUNC(m68hc705c8a_device::tcr_w));
 	map(0x0013, 0x0013).r(FUNC(m68hc705c8a_device::tsr_r));
 	map(0x0014, 0x0015).r(FUNC(m68hc705c8a_device::icr_r));
@@ -1048,11 +1424,11 @@ void m68hc05l9_device::l9_map(address_map &map)
 	// 0x0009-0x000a configuration
 	// 0x000b minute alarm
 	// 0x000c hour alarm
-	// 0x000d BAUD
-	// 0x000e SCCR1
-	// 0x000f SCCR2
-	// 0x0010 SCSR
-	// 0x0011 SCDR
+	map(0x000d, 0x000d).rw(FUNC(m68hc05l9_device::baud_r), FUNC(m68hc05l9_device::baud_w));
+	map(0x000e, 0x000e).rw(FUNC(m68hc05l9_device::sccr1_r), FUNC(m68hc05l9_device::sccr1_w));
+	map(0x000f, 0x000f).rw(FUNC(m68hc05l9_device::sccr2_r), FUNC(m68hc05l9_device::sccr2_w));
+	map(0x0010, 0x0010).r(FUNC(m68hc05l9_device::scsr_r));
+	map(0x0011, 0x0011).rw(FUNC(m68hc05l9_device::rdr_r), FUNC(m68hc05l9_device::tdr_w));
 	map(0x0012, 0x0012).rw(FUNC(m68hc05l9_device::tcr_r), FUNC(m68hc05l9_device::tcr_w));
 	map(0x0013, 0x0013).r(FUNC(m68hc05l9_device::tsr_r));
 	map(0x0014, 0x0015).r(FUNC(m68hc05l9_device::icr_r));
@@ -1121,11 +1497,11 @@ void m68hc05l11_device::l11_map(address_map &map)
 	// 0x000a port F direction
 	// 0x000b minute alarm
 	// 0x000c hour alarm
-	// 0x000d BAUD
-	// 0x000e SCCR1
-	// 0x000f SCCR2
-	// 0x0010 SCSR
-	// 0x0011 SCDR
+	map(0x000d, 0x000d).rw(FUNC(m68hc05l11_device::baud_r), FUNC(m68hc05l11_device::baud_w));
+	map(0x000e, 0x000e).rw(FUNC(m68hc05l11_device::sccr1_r), FUNC(m68hc05l11_device::sccr1_w));
+	map(0x000f, 0x000f).rw(FUNC(m68hc05l11_device::sccr2_r), FUNC(m68hc05l11_device::sccr2_w));
+	map(0x0010, 0x0010).r(FUNC(m68hc05l11_device::scsr_r));
+	map(0x0011, 0x0011).rw(FUNC(m68hc05l11_device::rdr_r), FUNC(m68hc05l11_device::tdr_w));
 	map(0x0012, 0x0012).rw(FUNC(m68hc05l11_device::tcr_r), FUNC(m68hc05l11_device::tcr_w));
 	map(0x0013, 0x0013).r(FUNC(m68hc05l11_device::tsr_r));
 	map(0x0014, 0x0015).r(FUNC(m68hc05l11_device::icr_r));

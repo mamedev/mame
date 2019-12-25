@@ -41,6 +41,13 @@ public:
 	auto portc_w() { return m_port_cb_w[2].bind(); }
 	auto portd_w() { return m_port_cb_w[3].bind(); }
 	auto tcmp() { return m_tcmp_cb.bind(); }
+	auto uart_tx() { return m_uart_tx_cb.bind(); }
+	void uart_rx(u8 data);
+
+	auto sck_out() { return m_sck_out_cb.bind(); }
+	auto sda_out() { return m_sda_out_cb.bind(); }
+	DECLARE_WRITE_LINE_MEMBER(sck_in);
+	DECLARE_WRITE_LINE_MEMBER(sda_in);
 
 protected:
 	// state index constants
@@ -97,6 +104,23 @@ protected:
 	DECLARE_READ8_MEMBER(port_ddr_r);
 	DECLARE_WRITE8_MEMBER(port_ddr_w);
 
+	DECLARE_READ8_MEMBER(baud_r);
+	DECLARE_WRITE8_MEMBER(baud_w);
+	DECLARE_READ8_MEMBER(sccr1_r);
+	DECLARE_WRITE8_MEMBER(sccr1_w);
+	DECLARE_READ8_MEMBER(sccr2_r);
+	DECLARE_WRITE8_MEMBER(sccr2_w);
+	DECLARE_READ8_MEMBER(scsr_r);
+	DECLARE_READ8_MEMBER(rdr_r);
+	DECLARE_WRITE8_MEMBER(tdr_w);
+
+	DECLARE_READ8_MEMBER(spcr_r);
+	DECLARE_WRITE8_MEMBER(spcr_w);
+	DECLARE_READ8_MEMBER(spsr_r);
+	DECLARE_WRITE8_MEMBER(spsr_w);
+	DECLARE_READ8_MEMBER(spdr_r);
+	DECLARE_WRITE8_MEMBER(spdr_w);
+
 	DECLARE_READ8_MEMBER(tcr_r);
 	DECLARE_WRITE8_MEMBER(tcr_w);
 	DECLARE_READ8_MEMBER(tsr_r);
@@ -104,12 +128,6 @@ protected:
 	DECLARE_READ8_MEMBER(ocr_r);
 	DECLARE_WRITE8_MEMBER(ocr_w);
 	DECLARE_READ8_MEMBER(timer_r);
-
-	void set_ncope(bool state) { m_ncope = state ? 1 : 0; }
-	DECLARE_WRITE8_MEMBER(coprst_w);
-	DECLARE_READ8_MEMBER(copcr_r);
-	DECLARE_WRITE8_MEMBER(copcr_w);
-	DECLARE_WRITE8_MEMBER(copr_w);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -126,12 +144,49 @@ protected:
 
 	void add_port_state(std::array<bool, PORT_COUNT> const &ddr);
 	void add_timer_state();
-	void add_pcop_state();
-	void add_ncop_state();
+
+	virtual void run_cop(unsigned count);
 
 private:
 	u8 port_value(unsigned offset) const;
 	void update_port_irq();
+
+	bool	sccr1_r8() const	{ return BIT(m_sccr1, 7); }
+	bool	sccr1_t8() const	{ return BIT(m_sccr1, 6); }
+	bool	sccr1_m() const		{ return BIT(m_sccr1, 4); }
+	bool	sccr1_wake() const	{ return BIT(m_sccr1, 3); }
+
+	bool	sccr2_tie() const	{ return BIT(m_sccr2, 7); }
+	bool	sccr2_tcie() const	{ return BIT(m_sccr2, 6); }
+	bool	sccr2_rie() const	{ return BIT(m_sccr2, 5); }
+	bool	sccr2_ilie() const	{ return BIT(m_sccr2, 4); }
+	bool	sccr2_te() const	{ return BIT(m_sccr2, 3); }
+	bool	sccr2_re() const	{ return BIT(m_sccr2, 2); }
+	bool	sccr2_rwu() const	{ return BIT(m_sccr2, 1); }
+	bool	sccr2_sbk() const	{ return BIT(m_sccr2, 0); }
+
+	bool	scsr_tdre() const	{ return BIT(m_scsr, 7); }
+	bool	scsr_tc() const		{ return BIT(m_scsr, 6); }
+	bool	scsr_rdrf() const	{ return BIT(m_scsr, 5); }
+	bool	scsr_idle() const	{ return BIT(m_scsr, 4); }
+	bool	scsr_or() const		{ return BIT(m_scsr, 3); }
+	bool	scsr_nf() const		{ return BIT(m_scsr, 2); }
+	bool	scsr_fe() const		{ return BIT(m_scsr, 1); }
+
+	u8		baud_scp() const	{ return (m_baud >> 4) & 0x03; }
+	u8		baud_scr() const	{ return m_baud & 0x07; }
+	u8		baud_scp_count() const;
+	u8		baud_scr_count() const { return 1U << baud_scr(); }
+
+	bool	spcr_spie() const	{ return BIT(m_spcr, 7); }
+	bool	spcr_spe() const	{ return BIT(m_spcr, 6); }
+	bool	spcr_mstr() const	{ return BIT(m_spcr, 4); }
+	bool	spcr_cpol() const	{ return BIT(m_spcr, 3); }
+	bool	spcr_cpha() const	{ return BIT(m_spcr, 2); }
+	u8		spcr_spr() const	{ return m_spcr & 0x03; }
+	u8		spcr_spr_divider() const;
+
+	bool	spsr_spif() const	{ return BIT(m_spsr, 7); }
 
 	bool    tcr_icie() const    { return BIT(m_tcr, 7); }
 	bool    tcr_ocie() const    { return BIT(m_tcr, 6); }
@@ -142,11 +197,6 @@ private:
 	bool    tsr_icf() const     { return BIT(m_tsr, 7); }
 	bool    tsr_ocf() const     { return BIT(m_tsr, 6); }
 	bool    tsr_tof() const     { return BIT(m_tsr, 5); }
-
-	bool    copcr_copf() const  { return BIT(m_copcr, 4); }
-	bool    copcr_cme() const   { return BIT(m_copcr, 3); }
-	bool    copcr_pcope() const { return BIT(m_copcr, 2); }
-	u8      copcr_cm() const    { return m_copcr & 0x03; }
 
 	// digital I/O
 	devcb_read8         m_port_cb_r[PORT_COUNT];
@@ -159,6 +209,32 @@ private:
 	bool                m_port_irq_state, m_irq_line_state;
 	u8                  m_irq_latch;
 
+	// UART
+	u8                  m_baud;
+	u8					m_sccr1;
+	u8					m_sccr2;
+	u8					m_scsr;
+	u8                  m_rdr;
+	u8                  m_tdr;
+	bool				m_rdr_pending;
+	bool				m_tdr_pending;
+	u32					m_uart_tx_clocks;
+	u32					m_uart_rx_clocks;
+	devcb_write8		m_uart_tx_cb;
+
+	// SPI
+	u8					m_spcr;
+	u8					m_spsr;
+	u8					m_spdr;
+	u8					m_spi_rx_cnt;
+	u8					m_spi_tx_cnt;
+	u32					m_spi_tx_clocks;
+	u32					m_spi_run_clocks;
+	u8					m_sck;
+	u8					m_sda;
+	devcb_write_line	m_sck_out_cb;
+	devcb_write_line	m_sda_out_cb;
+
 	// timer/counter
 	devcb_write_line    m_tcmp_cb;
 	bool                m_tcap_state;
@@ -169,11 +245,6 @@ private:
 	bool                m_inhibit_cap, m_inhibit_cmp;
 	u8                  m_trl_buf[2];
 	bool                m_trl_latched[2];
-
-	// COP watchdogs
-	u32                 m_pcop_cnt, m_ncop_cnt;
-	u8                  m_coprst, m_copcr;
-	u8                  m_ncope;
 };
 
 
@@ -190,6 +261,30 @@ protected:
 			device_type type,
 			u32 addr_width,
 			address_map_constructor internal_map);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual void run_cop(unsigned count) override;
+
+	void add_pcop_state();
+	void add_ncop_state();
+
+	void set_ncope(bool state) { m_ncope = state ? 1 : 0; }
+	DECLARE_WRITE8_MEMBER(coprst_w);
+	DECLARE_READ8_MEMBER(copcr_r);
+	DECLARE_WRITE8_MEMBER(copcr_w);
+	DECLARE_WRITE8_MEMBER(copr_w);
+
+	bool    copcr_copf() const  { return BIT(m_copcr, 4); }
+	bool    copcr_cme() const   { return BIT(m_copcr, 3); }
+	bool    copcr_pcope() const { return BIT(m_copcr, 2); }
+	u8      copcr_cm() const    { return m_copcr & 0x03; }
+
+	// COP watchdogs
+	u32                 m_pcop_cnt, m_ncop_cnt;
+	u8                  m_coprst, m_copcr;
+	u8                  m_ncope;
 };
 
 

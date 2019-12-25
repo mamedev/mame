@@ -38,8 +38,6 @@ TODO:
 
 #include "logmacro.h"
 
-#define ENABLE_UART_PRINTING (0)
-
 // device type definition
 DEFINE_DEVICE_TYPE(SCC68070, scc68070_device, "scc68070", "Philips SCC68070")
 
@@ -453,7 +451,7 @@ TIMER_CALLBACK_MEMBER( scc68070_device::timer0_callback )
 
 void scc68070_device::uart_rx_check()
 {
-	if ((m_uart.command_register & 3) == 1)
+	if ((m_uart.command_register & 3) == 1 && m_uart.receive_pointer >= 0)
 	{
 		uint32_t div = 0x10000 >> ((m_uart.clock_select >> 4) & 7);
 		m_uart.rx_timer->adjust(attotime::from_hz((49152000 / div) / 8));
@@ -494,6 +492,7 @@ void scc68070_device::uart_rx(uint8_t data)
 {
 	m_uart.receive_pointer++;
 	m_uart.receive_buffer[m_uart.receive_pointer] = data;
+	logerror("scc68070 uart_rx: %02x\n", data);
 	uart_rx_check();
 }
 
@@ -527,20 +526,33 @@ TIMER_CALLBACK_MEMBER( scc68070_device::rx_callback )
 			update_ipl();
 
 			m_uart.status_register |= USR_RXRDY;
-			uint32_t div = 0x10000 >> ((m_uart.clock_select >> 4) & 7);
-			m_uart.rx_timer->adjust(attotime::from_hz((49152000 / div) / 8));
+
+			for (int index = 0; index < m_uart.receive_pointer; index++)
+			{
+				m_uart.receive_buffer[index] = m_uart.receive_buffer[index + 1];
+			}
+			m_uart.receive_pointer--;
+			if (m_uart.receive_pointer < 0)
+			{
+				m_uart.rx_timer->adjust(attotime::never);
+			}
+			else
+			{
+				uint32_t div = 0x10000 >> ((m_uart.clock_select >> 4) & 7);
+				m_uart.rx_timer->adjust(attotime::from_hz((49152000 / div) / 8));
+			}
 		}
 		else
 		{
+			m_uart.rx_timer->adjust(attotime::never);
 			m_uart.status_register &= ~USR_RXRDY;
 		}
 	}
 	else
 	{
+		m_uart.rx_timer->adjust(attotime::never);
 		m_uart.status_register &= ~USR_RXRDY;
 	}
-
-	uart_rx_check();
 }
 
 TIMER_CALLBACK_MEMBER( scc68070_device::tx_callback )
@@ -555,15 +567,22 @@ TIMER_CALLBACK_MEMBER( scc68070_device::tx_callback )
 			m_uart.transmit_holding_register = m_uart.transmit_buffer[0];
 			m_uart_tx_callback(m_uart.transmit_holding_register);
 
-			LOGMASKED(LOG_UART, "tx_callback: Transmitting %02x\n", machine().describe_context(), m_uart.transmit_holding_register);
+			LOGMASKED(LOG_UART, "%s: tx_callback: Transmitting %02x\n", machine().describe_context(), m_uart.transmit_holding_register);
 			for(int index = 0; index < m_uart.transmit_pointer; index++)
 			{
 				m_uart.transmit_buffer[index] = m_uart.transmit_buffer[index+1];
 			}
 			m_uart.transmit_pointer--;
 
-			uint32_t div = 0x10000 >> (m_uart.clock_select & 7);
-			m_uart.tx_timer->adjust(attotime::from_hz((49152000 / div) / 8));
+			if (m_uart.receive_pointer < 0)
+			{
+				m_uart.rx_timer->adjust(attotime::never);
+			}
+			else
+			{
+				uint32_t div = 0x10000 >> (m_uart.clock_select & 7);
+				m_uart.tx_timer->adjust(attotime::from_hz((49152000 / div) / 8));
+			}
 		}
 		else
 		{
@@ -808,6 +827,8 @@ uint8_t scc68070_device::uth_r()
 void scc68070_device::uth_w(uint8_t data)
 {
 	LOGMASKED(LOG_UART, "%s: UART Transmit Holding Register Write: %02x ('%c')\n", machine().describe_context(), data, (data >= 0x20 && data < 0x7f) ? data : ' ');
+	if ((data >= 0x20 && data < 0x7f) || data == 0x0a || data == 0x0d)
+		printf("%c", data);
 	uart_tx(data);
 	m_uart.transmit_holding_register = data;
 }
@@ -817,8 +838,6 @@ uint8_t scc68070_device::urh_r()
 	// UART receive holding register: 8000201b
 	if (!machine().side_effects_disabled())
 	{
-		LOGMASKED(LOG_UART, "%s: UART Receive Holding Register Read: %02x\n", machine().describe_context(), m_uart.receive_holding_register);
-
 		if (m_uart_rx_int)
 		{
 			m_uart_rx_int = false;
@@ -826,14 +845,8 @@ uint8_t scc68070_device::urh_r()
 		}
 
 		m_uart.receive_holding_register = m_uart.receive_buffer[0];
-		if (m_uart.receive_pointer >= 0)
-		{
-			for(int index = 0; index < m_uart.receive_pointer; index++)
-			{
-				m_uart.receive_buffer[index] = m_uart.receive_buffer[index + 1];
-			}
-			m_uart.receive_pointer--;
-		}
+
+		LOGMASKED(LOG_UART, "%s: UART Receive Holding Register Read: %02x\n", machine().describe_context(), m_uart.receive_holding_register);
 	}
 	return m_uart.receive_holding_register;
 }
@@ -1215,10 +1228,3 @@ void scc68070_device::mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		break;
 	}
 }
-
-#if ENABLE_UART_PRINTING
-READ16_MEMBER( scc68070_device::uart_loopback_enable )
-{
-	return 0x1234;
-}
-#endif

@@ -131,7 +131,8 @@ public:
 	// device members
 	DECLARE_READ16_MEMBER( regs_r );
 	DECLARE_WRITE16_MEMBER( regs_w );
-	TIMER_CALLBACK_MEMBER( perform_scan );
+	DECLARE_WRITE32_MEMBER( scanline_cb );
+	DECLARE_WRITE_LINE_MEMBER( vblank_cb );
 
 	bitmap_rgb32& get_bitmap() { return m_bitmap; }
 
