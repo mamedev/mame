@@ -5942,7 +5942,7 @@
 			</dataarea>
 		</part>
 		<part name="cass2" interface="cbm_cass">
-			<dataarea name="cass" size="">
+			<dataarea name="cass" size="562360">
 				<rom name="space hunter side b.tap" size="562360" crc="3f93d15b" sha1="27c9d41cb322cae98a40e462ffbd596ee289268a"/>
 			</dataarea>
 		</part>
@@ -7387,7 +7387,7 @@
 			</dataarea>
 		</part>
 		<part name="cass2" interface="cbm_cass">
-			<dataarea name="cass" size="">
+			<dataarea name="cass" size="665130">
 				<rom name="yogi's great escape side b.tap" size="665130" crc="268e5891" sha1="bca798fa1f984ace680442205c63fc7ee06e67ec"/>
 			</dataarea>
 		</part>
