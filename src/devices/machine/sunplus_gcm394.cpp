@@ -414,7 +414,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unk_w)
 	}
 }
 
-void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
+void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 {
 	map(0x000000, 0x006fff).ram();
 	map(0x007000, 0x007fff).rw(FUNC(sunplus_gcm394_base_device::unk_r), FUNC(sunplus_gcm394_base_device::unk_w)); // catch unhandled
@@ -642,13 +642,30 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 	map(0x007c00, 0x007dff).rw(m_spg_audio, FUNC(sunplus_gcm394_audio_device::audio_r), FUNC(sunplus_gcm394_audio_device::audio_w));
 	map(0x007e00, 0x007fff).rw(m_spg_audio, FUNC(sunplus_gcm394_audio_device::audio_phase_r), FUNC(sunplus_gcm394_audio_device::audio_phase_w));
 
-	// 128kwords internal ROM
-	map(0x08000, 0x0ffff).rom().region("internal", 0); // lower 32kwords of internal ROM is visible / shadowed depending on boot pins and register
-	map(0x10000, 0x27fff).rom().region("internal", 0x10000); // upper 96kwords of internal ROM is always visible
-	map(0x28000, 0x2ffff).noprw(); // reserved
+}
 
-	// 0x30000+ is CS access
+void sunplus_gcm394_base_device::gcm394_internal_map(address_map& map)
+{
+	sunplus_gcm394_base_device::base_internal_map(map);
 
+	// no internal ROM on this model?
+
+	map(0x08000, 0x0ffff).r(FUNC(sunplus_gcm394_base_device::internalrom_lower32_r)).nopw();
+	// 0x20000+ is CS access
+}
+
+READ16_MEMBER(sunplus_gcm394_base_device::internalrom_lower32_r)
+{
+	if (m_boot_mode == 0)
+	{
+		uint16_t* introm = (uint16_t*)m_internalrom->base();
+		return introm[offset];
+	}
+	else
+	{
+		uint16_t val = m_space_read_cb(space, offset + 0x28000);
+		return val;
+	}
 }
 
 READ16_MEMBER(generalplus_gpac800_device::unkarea_7850_r)
@@ -725,7 +742,7 @@ WRITE16_MEMBER(generalplus_gpac800_device::flash_addr_high_w)
 // so it's likely this is built on top of that just with NAND support
 void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
 {
-	sunplus_gcm394_base_device::gcm394_internal_map(map);
+	sunplus_gcm394_base_device::base_internal_map(map);
 
 	// 785x = NAND device
 	map(0x007850, 0x007850).r(FUNC(generalplus_gpac800_device::unkarea_7850_r)); // NAND Control Reg
@@ -734,6 +751,14 @@ void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
 	map(0x007853, 0x007853).w(FUNC(generalplus_gpac800_device::flash_addr_high_w)); // NAND High Address Reg
 	map(0x007854, 0x007854).r(FUNC(generalplus_gpac800_device::unkarea_7854_r)); // NAND Data Reg
 //  map(0x007855, 0x007855).w(FUNC(generalplus_gpac800_device::nand_dma_ctrl_w)); // NAND DMA / INT Control
+
+	// 128kwords internal ROM
+	//map(0x08000, 0x0ffff).rom().region("internal", 0); // lower 32kwords of internal ROM is visible / shadowed depending on boot pins and register
+	map(0x08000, 0x0ffff).r(FUNC(generalplus_gpac800_device::internalrom_lower32_r)).nopw();
+	map(0x10000, 0x27fff).rom().region("internal", 0x10000); // upper 96kwords of internal ROM is always visible
+	map(0x28000, 0x2ffff).noprw(); // reserved
+	// 0x30000+ is CS access
+
 }
 
 void sunplus_gcm394_base_device::device_start()

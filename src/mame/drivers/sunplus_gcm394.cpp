@@ -150,7 +150,7 @@ public:
 
 	void base(machine_config &config);
 
-	void cs_map(address_map &map);
+	void cs_map_base(address_map &map);
 
 protected:
 	virtual void machine_start() override;
@@ -165,7 +165,7 @@ protected:
 	required_ioport m_io_p1;
 	required_ioport m_io_p2;
 
-	virtual void mem_map_4m(address_map &map);
+	void mem_map_4m_base(address_map &map);
 
 	required_region_ptr<uint16_t> m_romregion;
 	required_device<full_memory_device> m_memory;
@@ -212,10 +212,16 @@ WRITE16_MEMBER(gcm394_game_state::cs0_w)
 }
 
 
-void gcm394_game_state::cs_map(address_map &map)
+void gcm394_game_state::cs_map_base(address_map &map)
 {
-	map(0x000000, 0x02ffff).rw(FUNC(gcm394_game_state::pre_cs_r), FUNC(gcm394_game_state::pre_cs_w));
-	map(0x030000, 0x43ffff).rw(FUNC(gcm394_game_state::cs0_r), FUNC(gcm394_game_state::cs0_w));
+	map(0x000000, 0x01ffff).rw(FUNC(gcm394_game_state::pre_cs_r), FUNC(gcm394_game_state::pre_cs_w));
+	map(0x020000, 0x41ffff).rw(FUNC(gcm394_game_state::cs0_r), FUNC(gcm394_game_state::cs0_w));
+}
+
+void gcm394_game_state::mem_map_4m_base(address_map &map)
+{
+	/*  0x000000  0x01ffff - internal area */
+	map(0x020000, 0x3fffff).rw(FUNC(gcm394_game_state::cs0_r), FUNC(gcm394_game_state::cs0_w));
 }
 
 
@@ -236,6 +242,7 @@ protected:
 	//virtual void machine_reset() override;
 
 	void wrlshunt_map(address_map &map);
+
 
 private:
 
@@ -273,6 +280,8 @@ public:
 	void nand_vbaby();
 	void nand_tsm();
 
+	void cs_map_gpac800(address_map& map);
+
 protected:
 	virtual void machine_reset() override;
 
@@ -297,6 +306,18 @@ private:
 	virtual DECLARE_READ16_MEMBER(cs0_r) override;
 	virtual DECLARE_WRITE16_MEMBER(cs0_w) override;
 };
+
+void generalplus_gpac800_game_state::cs_map_gpac800(address_map &map)
+{
+	map(0x000000, 0x02ffff).rw(FUNC(generalplus_gpac800_game_state::pre_cs_r), FUNC(generalplus_gpac800_game_state::pre_cs_w));
+	map(0x030000, 0x42ffff).rw(FUNC(generalplus_gpac800_game_state::cs0_r), FUNC(generalplus_gpac800_game_state::cs0_w));
+}
+
+void generalplus_gpac800_game_state::generalplus_gpac800_map(address_map &map)
+{
+	/*  0x000000  0x02ffff - internal area */
+	map(0x030000, 0x3fffff).rw(FUNC(generalplus_gpac800_game_state::cs0_r), FUNC(generalplus_gpac800_game_state::cs0_w));
+}
 
 
 READ16_MEMBER(generalplus_gpac800_game_state::cs0_r)
@@ -323,19 +344,19 @@ READ16_MEMBER(generalplus_gpac800_game_state::read_external_space)
 
 WRITE16_MEMBER(generalplus_gpac800_game_state::write_external_space)
 {
-	return m_memory->get_program()->write_word(offset, data);
+	m_memory->get_program()->write_word(offset, data);
 }
 
 
 READ16_MEMBER(gcm394_game_state::read_external_space)
 {
 	//logerror("reading offset %04x\n", offset * 2);
-	return m_romregion[offset];
+	return m_memory->get_program()->read_word(offset);
 }
 
 WRITE16_MEMBER(gcm394_game_state::write_external_space)
 {
-	logerror("DMA writing to external space (RAM?) %08x %04x\n", offset, data);
+	m_memory->get_program()->write_word(offset, data);
 }
 
 WRITE16_MEMBER(wrlshunt_game_state::mapping_w)
@@ -419,7 +440,7 @@ WRITE16_MEMBER(gcm394_game_state::porta_w)
 void gcm394_game_state::base(machine_config &config)
 {
 	GCM394(config, m_maincpu, XTAL(27'000'000), m_screen);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gcm394_game_state::mem_map_4m);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gcm394_game_state::mem_map_4m_base);
 	m_maincpu->porta_in().set(FUNC(gcm394_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(gcm394_game_state::portb_r));
 	m_maincpu->porta_out().set(FUNC(gcm394_game_state::porta_w));
@@ -429,9 +450,9 @@ void gcm394_game_state::base(machine_config &config)
 	m_maincpu->mapping_write_callback().set(FUNC(gcm394_game_state::mapping_w));
 	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
-
+	m_maincpu->set_bootmode(1); // boot from external ROM / CS mirror
 	
-	FULL_MEMORY(config, m_memory).set_map(&gcm394_game_state::cs_map);
+	FULL_MEMORY(config, m_memory).set_map(&gcm394_game_state::cs_map_base);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -475,9 +496,7 @@ void wrlshunt_game_state::wrlshunt(machine_config &config)
 
 void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 {
-	gcm394_game_state::base(config);
-
-	GPAC800(config.replace(), m_maincpu, XTAL(27'000'000), m_screen);
+	GPAC800(config, m_maincpu, XTAL(27'000'000), m_screen);
 	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_gpac800_game_state::generalplus_gpac800_map);
 	m_maincpu->porta_in().set(FUNC(generalplus_gpac800_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(generalplus_gpac800_game_state::portb_r));
@@ -488,12 +507,21 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 	m_maincpu->mapping_write_callback().set(FUNC(generalplus_gpac800_game_state::mapping_w));
 	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_maincpu->set_bootmode(0); // boot from internal ROM (NAND bootstrap)
 
 	m_maincpu->nand_read_callback().set(FUNC(generalplus_gpac800_game_state::read_nand));
 
+	FULL_MEMORY(config, m_memory).set_map(&generalplus_gpac800_game_state::cs_map_gpac800);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320*2, 262*2);
 	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
+	m_screen->set_screen_update("maincpu", FUNC(sunplus_gcm394_device::screen_update));
+	m_screen->screen_vblank().set(m_maincpu, FUNC(sunplus_gcm394_device::vblank));
 
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 }
 
 
@@ -526,23 +554,11 @@ void gcm394_game_state::machine_reset()
 	map(0x200000, 0x3fffff) continued view into external spaces, but this area is banked with m_membankswitch_7810 (valid bank values 0x00-0x3f)
 */
 
-void gcm394_game_state::mem_map_4m(address_map &map)
-{
-	map(0x000000, 0x00ffff).rom().region("maincpu", 0); // non-banked area on this SoC?
-
-	// smartfp really expects the ROM at 0 to map here, so maybe this is how the newer SoC works
-	map(0x020000, 0x3fffff).bankr("cartbank");
-}
 
 void wrlshunt_game_state::wrlshunt_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom().region("maincpu", 0); // non-banked area on this SoC?
 	map(0x030000, 0x1fffff).ram().share("mainram");
-}
-
-void generalplus_gpac800_game_state::generalplus_gpac800_map(address_map &map)
-{
-	map(0x030000, 0x43ffff).rw(FUNC(generalplus_gpac800_game_state::cs0_r), FUNC(generalplus_gpac800_game_state::cs0_w));
 }
 
 
@@ -889,8 +905,8 @@ ROM_START(wrlshunt)
 ROM_END
 
 ROM_START(smartfp)
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	//ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // not used, configured to external ROM boot mode
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model?
+	//ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP )
 
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("smartfitpark.bin", 0x000000, 0x800000, CRC(ada84507) SHA1(a3a80bf71fae62ebcbf939166a51d29c24504428))

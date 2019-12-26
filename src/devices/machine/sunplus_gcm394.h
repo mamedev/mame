@@ -71,11 +71,12 @@ protected:
 	virtual void device_reset() override;
 
 	void gcm394_internal_map(address_map &map);
+	void base_internal_map(address_map &map);
 
 	required_device<screen_device> m_screen;
 	required_device<gcm394_video_device> m_spg_video;
 	required_device<sunplus_gcm394_audio_device> m_spg_audio;
-	required_memory_region m_internalrom;
+	optional_memory_region m_internalrom;
 
 	devcb_read16 m_porta_in;
 	devcb_read16 m_portb_in;
@@ -147,6 +148,8 @@ protected:
 	uint16_t m_7961;
 
 	devcb_read16 m_nand_read_cb;
+
+	DECLARE_READ16_MEMBER(internalrom_lower32_r);
 
 private:
 	devcb_read16 m_space_read_cb;
