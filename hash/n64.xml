@@ -4367,8 +4367,12 @@ This cart features a RTC, currently unemulated
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NPGE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-03" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [BK4D-NUS]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
-				<rom name="hey you, pikachu! (usa).bin" size="16777216" crc="0149e9f6" sha1="615835390e80921f37cb9c081d27fea42920fcce" offset="000000" />
+				<rom name="nus-npge-0.u1" size="16777216" crc="0149e9f6" sha1="615835390e80921f37cb9c081d27fea42920fcce" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8065,8 +8069,12 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<publisher>Midway</publisher>
 		<info name="serial" value="NUS-NOFE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
-				<rom name="off road challenge (usa).bin" size="16777216" crc="129badcc" sha1="914239aa8172c91c44280a09e34b6e7ce046ca1b" offset="000000" />
+				<rom name="nus-nofe-0.u1" size="16777216" crc="129badcc" sha1="914239aa8172c91c44280a09e34b6e7ce046ca1b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8229,8 +8237,12 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<publisher>Midway</publisher>
 		<info name="serial" value="NUS-NYPE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="paperboy (usa).bin" size="12582912" crc="2fceeff6" sha1="0dccd178f9af55a2fcbc5b963b60e7a897e237ff" offset="000000" />
+				<rom name="nus-nype-0.u1" size="12582912" crc="2fceeff6" sha1="0dccd178f9af55a2fcbc5b963b60e7a897e237ff" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8281,8 +8293,12 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="NUS-NCRE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [BK4D-NUS]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
-				<rom name="penny racers (usa).bin" size="8388608" crc="06beea3f" sha1="f8ca8a70653dbe488749fd3ea3e428fb9b1f72c8" offset="000000" />
+				<rom name="nus-ncre-0.u1" size="8388608" crc="06beea3f" sha1="f8ca8a70653dbe488749fd3ea3e428fb9b1f72c8" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8388,8 +8404,12 @@ patched out (+ a fix for internal checksum)
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="NUS-NEAE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
-				<rom name="pga european tour (usa).bin" size="16777216" crc="2b07f591" sha1="6417f608e7dd002dc1193641d8c846328c3faab2" offset="000000" />
+				<rom name="nus-neae-0.u1" size="16777216" crc="2b07f591" sha1="6417f608e7dd002dc1193641d8c846328c3faab2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8460,8 +8480,12 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NPWE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
-				<rom name="pilotwings 64 (usa).bin" size="8388608" crc="c445f7e3" sha1="0576080dd468ff528d90cf2de6c4a7790e4923f3" offset="000000" />
+				<rom name="nus-npwe-0.u1" size="8388608" crc="c445f7e3" sha1="0576080dd468ff528d90cf2de6c4a7790e4923f3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8564,8 +8588,12 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NPNE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-06A-01" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [29LL1100KC-15B0]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="33554432">
-				<rom name="pokemon puzzle league (usa).bin" size="33554432" crc="281afb0d" sha1="e52af5a60ea9bd2dae34e4252d71bedaf496cdb3" offset="000000" />
+				<rom name="nus-npne-0.u1" size="33554432" crc="281afb0d" sha1="e52af5a60ea9bd2dae34e4252d71bedaf496cdb3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8760,13 +8788,17 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokestadu1" cloneof="pokestad">
-		<description>Pokémon Stadium (USA, Rev. A)</description>
+		<description>Pokémon Stadium (USA, rev 1)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NPOE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-06A-01" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [29LL1100KC-15B0]" />
+			<feature name="u3" value="U3 [CIC-NUS-6103A]" />
 			<dataarea name="rom" size="33554432">
-				<rom name="pokemon stadium (usa) (rev a).bin" size="33554432" crc="7bb7489f" sha1="d5b479461cd45db31e896143519c85b7136cfe2e" offset="000000" />
+				<rom name="nus-npoe-1.u1" size="33554432" crc="7bb7489f" sha1="d5b479461cd45db31e896143519c85b7136cfe2e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8867,8 +8899,12 @@ patched out (+ a fix for internal checksum)
 		<publisher>Vatical Entertainment</publisher>
 		<info name="serial" value="NUS-NPXE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-03" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="polaris snocross (usa).bin" size="12582912" crc="ba3ec852" sha1="2a9585e5819fa7984877848c58fbf9973380d624" offset="000000" />
+				<rom name="nus-npxe-0.u1" size="12582912" crc="ba3ec852" sha1="2a9585e5819fa7984877848c58fbf9973380d624" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8905,8 +8941,12 @@ patched out (+ a fix for internal checksum)
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="NUS-NPUE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-03" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="power rangers - lightspeed rescue (usa).bin" size="12582912" crc="eb8ce95b" sha1="a7523544e7e293f58207ecea9ca44f713e9deee2" offset="000000" />
+				<rom name="nus-npue-0.u1" size="12582912" crc="eb8ce95b" sha1="a7523544e7e293f58207ecea9ca44f713e9deee2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8917,8 +8957,12 @@ patched out (+ a fix for internal checksum)
 		<publisher>BAM! Entertainment</publisher>
 		<info name="serial" value="NUS-NPQE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-03" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="8388608">
-				<rom name="powerpuff girls, the - chemical x-traction (usa).bin" size="8388608" crc="4ee7cd7e" sha1="8f982bab4f1857d6562113d120bce82bd316f78d" offset="000000" />
+				<rom name="nus-npqe-0.u1" size="8388608" crc="4ee7cd7e" sha1="8f982bab4f1857d6562113d120bce82bd316f78d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9035,10 +9079,14 @@ patched out (+ a fix for internal checksum)
 		<description>Quake 64 (USA)</description>
 		<year>1998</year>
 		<publisher>Midway</publisher>
-		<info name="serial" value="NUS-NKQE-USA"/>
+		<info name="serial" value="NUS-NQKE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="quake 64 (usa).bin" size="12582912" crc="06d5cdbb" sha1="4df581ebf44eb0e6060c331995febd39a04ccedd" offset="000000" />
+				<rom name="nus-nqke-0.u1" size="12582912" crc="06d5cdbb" sha1="4df581ebf44eb0e6060c331995febd39a04ccedd" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9061,8 +9109,12 @@ patched out (+ a fix for internal checksum)
 		<publisher>Activision</publisher>
 		<info name="serial" value="NUS-NQ2E-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="quake ii (usa).bin" size="12582912" crc="5d880e55" sha1="24b792fef01fca18faf73a1b980e9c738822298f" offset="000000" />
+				<rom name="nus-nq2e-0.u1" size="12582912" crc="5d880e55" sha1="24b792fef01fca18faf73a1b980e9c738822298f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9173,8 +9225,12 @@ patched out (+ a fix for internal checksum)
 		<publisher>Midway</publisher>
 		<info name="serial" value="NUS-NRPE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="rampage - world tour (usa).bin" size="12582912" crc="6fe4da23" sha1="5dd821436db22ce9b4168088189ee5788270d044" offset="000000" />
+				<rom name="nus-nrpe-0.u1" size="12582912" crc="6fe4da23" sha1="5dd821436db22ce9b4168088189ee5788270d044" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9197,8 +9253,12 @@ patched out (+ a fix for internal checksum)
 		<publisher>Midway</publisher>
 		<info name="serial" value="NUS-N2PE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="rampage 2 - universal tour (usa).bin" size="12582912" crc="75e8c2ad" sha1="bb3af2fc085e58befa528051b7a91a54f9f38e8f" offset="000000" />
+				<rom name="nus-n2pe-0.u1" size="12582912" crc="75e8c2ad" sha1="bb3af2fc085e58befa528051b7a91a54f9f38e8f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9221,8 +9281,12 @@ patched out (+ a fix for internal checksum)
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="NUS-NRTE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="8388608">
-				<rom name="rat attack! (usa) (en,fr,de,es,it,nl).bin" size="8388608" crc="78f6ffa2" sha1="6814ee444c67f1289f11a9f7decacb75176bf634" offset="000000" />
+				<rom name="nus-nrte-0.u1" size="8388608" crc="78f6ffa2" sha1="6814ee444c67f1289f11a9f7decacb75176bf634" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9245,8 +9309,12 @@ patched out (+ a fix for internal checksum)
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="NUS-NY2E-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="33554432">
-				<rom name="rayman 2 - the great escape (usa) (en,fr,de,es,it).bin" size="33554432" crc="72ee54b2" sha1="4d7a58f7a87928e592416b75b364e3563bbeed2f" offset="000000" />
+				<rom name="nus-ny2e-0.u1" size="33554432" crc="72ee54b2" sha1="4d7a58f7a87928e592416b75b364e3563bbeed2f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9269,8 +9337,12 @@ patched out (+ a fix for internal checksum)
 		<publisher>Crave Entertainment</publisher>
 		<info name="serial" value="NUS-NFQE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-03" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="8388608">
-				<rom name="razor freestyle scooter (usa).bin" size="8388608" crc="208350c5" sha1="8af56990d73f7eae9212c44cd9f417b27ed78649" offset="000000" />
+				<rom name="nus-nfqe-0.u1" size="8388608" crc="208350c5" sha1="8af56990d73f7eae9212c44cd9f417b27ed78649" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9293,8 +9365,12 @@ patched out (+ a fix for internal checksum)
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NUS-NRVE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="re-volt (usa).bin" size="12582912" crc="9366c53c" sha1="bffc68e662338cdf03b619b3a62ef880f1db025d" offset="000000" />
+				<rom name="nus-nrve-0.u1" size="12582912" crc="9366c53c" sha1="bffc68e662338cdf03b619b3a62ef880f1db025d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9317,8 +9393,12 @@ patched out (+ a fix for internal checksum)
 		<publisher>Midway</publisher>
 		<info name="serial" value="NUS-NRDE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="33554432">
-				<rom name="ready 2 rumble boxing (usa).bin" size="33554432" crc="e8d926f3" sha1="667083f0dbbd428216475ddcad1883ad04207cfd" offset="000000" />
+				<rom name="nus-nrde-0.u1" size="33554432" crc="e8d926f3" sha1="667083f0dbbd428216475ddcad1883ad04207cfd" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9329,8 +9409,12 @@ patched out (+ a fix for internal checksum)
 		<publisher>Midway</publisher>
 		<info name="serial" value="NUS-N22E-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-03" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="33554432">
-				<rom name="ready 2 rumble boxing - round 2 (usa).bin" size="33554432" crc="a64fdf28" sha1="3e6b280a6b8925c0528c63add72f0861156d07d6" offset="000000" />
+				<rom name="nus-n22e-0.u1" size="33554432" crc="a64fdf28" sha1="3e6b280a6b8925c0528c63add72f0861156d07d6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9348,7 +9432,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="revil2u" cloneof="revil2">
-		<description>Resident Evil 2 (USA, Rev. A)</description>
+		<description>Resident Evil 2 (USA, rev 1)</description>
 		<year>1999</year>
 		<publisher>Capcom USA</publisher>
 		<info name="serial" value="NUS-NREE-USA-1"/>
@@ -9409,8 +9493,12 @@ patched out (+ a fix for internal checksum)
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="NUS-NROE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="33554432">
-				<rom name="road rash 64 (usa).bin" size="33554432" crc="2da44585" sha1="4990b922e946aa0ee45fd8355e447dedc92ec352" offset="000000" />
+				<rom name="nus-nroe-0.u1" size="33554432" crc="2da44585" sha1="4990b922e946aa0ee45fd8355e447dedc92ec352" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9433,8 +9521,12 @@ patched out (+ a fix for internal checksum)
 		<publisher>Titus</publisher>
 		<info name="serial" value="NUS-NRRE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="roadsters trophy (usa) (en,fr,es).bin" size="12582912" crc="f68d139e" sha1="e2827c55874a4883c5d969eb34944324d639af06" offset="000000" />
+				<rom name="nus-nrre-0.u1" size="12582912" crc="f68d139e" sha1="e2827c55874a4883c5d969eb34944324d639af06" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9506,8 +9598,12 @@ patched out (+ a fix for internal checksum)
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="NUS-NSUE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="rocket - robot on wheels (usa).bin" size="12582912" crc="b0f36d79" sha1="5dfcd4cdb0a2ea1412fa5d92236d0a066231d9ac" offset="000000" />
+				<rom name="nus-nsue-0.u1" size="12582912" crc="b0f36d79" sha1="5dfcd4cdb0a2ea1412fa5d92236d0a066231d9ac" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9555,8 +9651,12 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NRZE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [BK16DA]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="33554432">
-				<rom name="rr64 - ridge racer 64 (usa).bin" size="33554432" crc="7ccb9749" sha1="79db18ac171142f287a45271ef3a7cf6341a17f8" offset="000000" />
+				<rom name="nus-nrze-0.u1" size="33554432" crc="7ccb9749" sha1="79db18ac171142f287a45271ef3a7cf6341a17f8" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9579,8 +9679,12 @@ patched out (+ a fix for internal checksum)
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="NUS-NRGE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
-				<rom name="rugrats - scavenger hunt (usa).bin" size="16777216" crc="ea79ad0a" sha1="f69a4a88bc2374fea96dfb06a42dbb5b9a5eb6b1" offset="000000" />
+				<rom name="nus-nrge-0.u1" size="16777216" crc="ea79ad0a" sha1="f69a4a88bc2374fea96dfb06a42dbb5b9a5eb6b1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9632,8 +9736,12 @@ patched out (+ a fix for internal checksum)
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="NUS-NRKE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-03" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
-				<rom name="rugrats in paris - the movie (usa).bin" size="16777216" crc="8f09af37" sha1="42fba753590296b288537162437357741b7f5596" offset="000000" />
+				<rom name="nus-nrke-0.u1" size="16777216" crc="8f09af37" sha1="42fba753590296b288537162437357741b7f5596" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9730,8 +9838,12 @@ patched out (+ a fix for internal checksum)
 		<publisher>Midway</publisher>
 		<info name="serial" value="NUS-NSFE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
-				<rom name="san francisco rush - extreme racing (usa) (en,fr,de).bin" size="8388608" crc="32e250ba" sha1="8980d1e967d63cb13f794ee5de15bef299b93935" offset="000000" />
+				<rom name="nus-nsfe-0.u1" size="8388608" crc="32e250ba" sha1="8980d1e967d63cb13f794ee5de15bef299b93935" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -11178,8 +11290,12 @@ clips onto the player's ear.
 		<publisher>Red Storm Entertainment</publisher>
 		<info name="serial" value="NUS-NR6E-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
-				<rom name="tom clancy's rainbow six (usa).bin" size="16777216" crc="67f3d120" sha1="1effa41aeaf6ebf626ea8e26093e0609015e1007" offset="000000" />
+				<rom name="nus-nr6e-0.u1" size="16777216" crc="67f3d120" sha1="1effa41aeaf6ebf626ea8e26093e0609015e1007" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
