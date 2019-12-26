@@ -28,38 +28,6 @@ enum
 	JAGUAR_R24,JAGUAR_R25,JAGUAR_R26,JAGUAR_R27,JAGUAR_R28,JAGUAR_R29,JAGUAR_R30,JAGUAR_R31
 };
 
-enum
-{
-	G_FLAGS = 0,
-	G_MTXC,
-	G_MTXA,
-	G_END,
-	G_PC,
-	G_CTRL,
-	G_HIDATA,
-	G_DIVCTRL,
-	G_DUMMY,
-	G_REMAINDER,
-	G_CTRLMAX
-};
-
-enum
-{
-	D_FLAGS = 0,
-	D_MTXC,
-	D_MTXA,
-	D_END,
-	D_PC,
-	D_CTRL,
-	D_MOD,
-	D_DIVCTRL,
-	D_MACHI,
-	D_REMAINDER,
-	D_CTRLMAX
-};
-
-
-
 /***************************************************************************
     INTERRUPT CONSTANTS
 ***************************************************************************/
@@ -81,7 +49,7 @@ DECLARE_DEVICE_TYPE(JAGUARGPU, jaguargpu_cpu_device)
 DECLARE_DEVICE_TYPE(JAGUARDSP, jaguardsp_cpu_device)
 
 
-class jaguar_cpu_device :  public cpu_device
+class jaguar_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
@@ -90,8 +58,9 @@ public:
 	// configuration helpers
 	auto irq() { return m_cpu_interrupt.bind(); }
 
-	virtual void ctrl_w(offs_t offset, u32 data, u32 mem_mask = ~0) = 0;
-	virtual u32 ctrl_r(offs_t offset) = 0;
+	void iobus_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 iobus_r(offs_t offset, u32 mem_mask = ~0);
+	DECLARE_WRITE_LINE_MEMBER(go_w);
 
 protected:
 	jaguar_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 version, bool isdsp, address_map_constructor io_map);
@@ -159,7 +128,6 @@ protected:
 	u32 *    m_b1;
 
 	/* control registers */
-	u32      m_ctrl[G_CTRLMAX];
 	u32      m_ppc;
 	u64      m_accum;
 
@@ -303,9 +271,6 @@ public:
 	// construction/destruction
 	jaguargpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// TODO: rename, interface with bus, un-DRY
-	void ctrl_w(offs_t offset, u32 data, u32 mem_mask = ~0) override;
-	u32 ctrl_r(offs_t offset) override;
 	void io_map(address_map &map);
 
 protected:
@@ -323,9 +288,6 @@ public:
 	// construction/destruction
 	jaguardsp_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// TODO: interface with bus
-	void ctrl_w(offs_t offset, u32 data, u32 mem_mask = ~0) override;
-	u32 ctrl_r(offs_t offset) override;
 	void io_map(address_map &map);
 
 protected:

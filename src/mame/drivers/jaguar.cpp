@@ -456,8 +456,8 @@ void jaguar_state::machine_reset()
 	dsp_resume();
 
 	/* halt the CPUs */
-	m_gpu->ctrl_w(G_CTRL, 0);
-	m_dsp->ctrl_w(D_CTRL, 0);
+	m_gpu->go_w(false);
+	m_dsp->go_w(false);
 
 	/* set blitter idle flag */
 	m_blitter_status = 1;
@@ -637,8 +637,8 @@ WRITE32_MEMBER(jaguar_state::misc_control_w)
 		dsp_resume();
 
 		/* halt the CPUs */
-		m_gpu->ctrl_w(G_CTRL, 0);
-		m_dsp->ctrl_w(D_CTRL, 0);
+		m_gpu->go_w(false);
+		m_dsp->go_w(false);
 	}
 
 	/* adjust banking */
@@ -660,16 +660,13 @@ WRITE32_MEMBER(jaguar_state::misc_control_w)
 
 READ32_MEMBER(jaguar_state::gpuctrl_r)
 {
-	return m_gpu->ctrl_r(offset);
+	return m_gpu->iobus_r(offset, mem_mask);
 }
-
 
 WRITE32_MEMBER(jaguar_state::gpuctrl_w)
 {
-	m_gpu->ctrl_w(offset, data, mem_mask);
+	m_gpu->iobus_w(offset, data, mem_mask);
 }
-
-
 
 /*************************************
  *
@@ -679,15 +676,13 @@ WRITE32_MEMBER(jaguar_state::gpuctrl_w)
 
 READ32_MEMBER(jaguar_state::dspctrl_r)
 {
-	return m_dsp->ctrl_r(offset);
+	return m_dsp->iobus_r(offset, mem_mask);
 }
-
 
 WRITE32_MEMBER(jaguar_state::dspctrl_w)
 {
-	m_dsp->ctrl_w(offset, data, mem_mask);
+	m_dsp->iobus_w(offset, data, mem_mask);
 }
-
 
 /*************************************
  *

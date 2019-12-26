@@ -362,7 +362,6 @@ void jaguar_cpu_device::device_start()
 
 	save_item(NAME(m_r));
 	save_item(NAME(m_a));
-	save_item(NAME(m_ctrl));
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_go));
 	save_item(NAME(m_int_latch));
@@ -393,7 +392,6 @@ void jaguar_cpu_device::device_start()
 
 	std::fill(std::begin(m_r), std::end(m_r), 0);
 	std::fill(std::begin(m_a), std::end(m_a), 0);
-	std::fill(std::begin(m_ctrl), std::end(m_ctrl), 0);
 	m_ppc = 0;
 	m_accum = 0;
 	m_bankswitch_icount = 0;
@@ -1407,16 +1405,19 @@ READ32_MEMBER(jaguar_cpu_device::status_r)
 	return result;
 }
 
+WRITE_LINE_MEMBER(jaguar_cpu_device::go_w)
+{
+	m_go = state;
+	set_input_line(INPUT_LINE_HALT, (m_go == true) ? CLEAR_LINE : ASSERT_LINE);
+	yield();
+}
+
 WRITE32_MEMBER(jaguar_cpu_device::control_w)
 {
 	COMBINE_DATA(&m_io_status);
 	bool new_go = BIT(m_io_status, 0);
 	if (new_go != m_go)
-	{
-		m_go = new_go;
-		set_input_line(INPUT_LINE_HALT, (m_go == true) ? CLEAR_LINE : ASSERT_LINE);
-		yield();
-	}
+		go_w(new_go);
 	
 	if (BIT(m_io_status, 1))
 		m_cpu_interrupt(ASSERT_LINE);
@@ -1460,97 +1461,15 @@ WRITE32_MEMBER(jaguardsp_cpu_device::modulo_w)
 	COMBINE_DATA(&m_modulo);
 }
 
-u32 jaguargpu_cpu_device::ctrl_r(offs_t offset)
+u32 jaguar_cpu_device::iobus_r(offs_t offset, u32 mem_mask)
 {
-	if (LOG_GPU_IO) logerror("GPU read register @ F021%02X\n", offset * 4);
-
-	return m_io->read_dword(offset*4);
-/*	u32 res = m_ctrl[offset];
-	if (offset == G_CTRL)
-		res |= (m_version & 0xf) << 12;
-
-	return res;*/
+	return m_io->read_dword(offset*4, mem_mask);
 }
 
 
-void jaguargpu_cpu_device::ctrl_w(offs_t offset, u32 data, u32 mem_mask)
+void jaguar_cpu_device::iobus_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	if (LOG_GPU_IO && offset != G_HIDATA)
-		logerror("GPU write register @ F021%02X = %08X\n", offset * 4, data);
-
 	m_io->write_dword(offset*4, data, mem_mask);
-
-	# if 0
-	/* remember the old and set the new */
-	const u32 oldval = m_ctrl[offset];
-	u32 newval = oldval;
-	COMBINE_DATA(&newval);
-
-	/* handle the various registers */
-	switch (offset)
-	{
-		case G_FLAGS:
-
-			/* combine the data properly */
-			m_ctrl[offset] = newval & (ZFLAG | CFLAG | NFLAG | EINT04FLAGS | RPAGEFLAG);
-			if (newval & IFLAG)
-				m_ctrl[offset] |= oldval & IFLAG;
-
-			/* clear interrupts */
-			m_ctrl[G_CTRL] &= ~((newval & CINT04FLAGS) >> 3);
-
-			/* determine which register bank should be active */
-			update_register_banks();
-
-			/* update IRQs */
-			check_irqs();
-			break;
-
-		case G_MTXC:
-		case G_MTXA:
-			m_ctrl[offset] = newval;
-			break;
-
-		case G_END:
-			m_ctrl[offset] = newval;
-			if ((newval & 7) != 7)
-				logerror("GPU to set to little-endian!\n");
-			break;
-
-		case G_PC:
-			m_pc = newval & 0xffffff;
-			break;
-
-		case G_CTRL:
-			m_ctrl[offset] = newval;
-			if ((oldval ^ newval) & 0x01)
-			{
-				set_input_line(INPUT_LINE_HALT, (newval & 1) ? CLEAR_LINE : ASSERT_LINE);
-				yield();
-			}
-			if (newval & 0x02)
-			{
-				m_cpu_interrupt(ASSERT_LINE);
-				m_ctrl[offset] &= ~0x02;
-			}
-			if (newval & 0x04)
-			{
-				m_ctrl[G_CTRL] |= 1 << 6;
-				m_ctrl[offset] &= ~0x04;
-				check_irqs();
-			}
-			if (newval & 0x18)
-			{
-				logerror("GPU single stepping was enabled!\n");
-			}
-			break;
-
-		case G_HIDATA:
-		case G_DIVCTRL:
-			m_ctrl[offset] = newval;
-			break;
-	}
-	#endif
 }
 
 
@@ -1558,95 +1477,6 @@ void jaguargpu_cpu_device::ctrl_w(offs_t offset, u32 data, u32 mem_mask)
 /***************************************************************************
     I/O HANDLING
 ***************************************************************************/
-
-u32 jaguardsp_cpu_device::ctrl_r(offs_t offset)
-{
-	if (LOG_DSP_IO && offset != D_FLAGS)
-		logerror("DSP read register @ F1A1%02X\n", offset * 4);
-
-	return m_io->read_dword(offset*4);
-}
-
-
-void jaguardsp_cpu_device::ctrl_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	if (LOG_DSP_IO && offset != D_FLAGS)
-		logerror("DSP write register @ F1A1%02X = %08X\n", offset * 4, data);
-
-	m_io->write_dword(offset*4, data, mem_mask);
-#if 0
-	/* remember the old and set the new */
-	const u32 oldval = m_ctrl[offset];
-	u32 newval = oldval;
-	COMBINE_DATA(&newval);
-
-	/* handle the various registers */
-	switch (offset)
-	{
-		case D_FLAGS:
-
-			/* combine the data properly */
-			m_ctrl[offset] = newval & (ZFLAG | CFLAG | NFLAG | EINT04FLAGS | EINT5FLAG | RPAGEFLAG);
-			if (newval & IFLAG)
-				m_ctrl[offset] |= oldval & IFLAG;
-
-			/* clear interrupts */
-			m_ctrl[D_CTRL] &= ~((newval & CINT04FLAGS) >> 3);
-			m_ctrl[D_CTRL] &= ~((newval & CINT5FLAG) >> 1);
-
-			/* determine which register bank should be active */
-			update_register_banks();
-
-			/* update IRQs */
-			check_irqs();
-			break;
-
-		case D_MTXC:
-		case D_MTXA:
-			m_ctrl[offset] = newval;
-			break;
-
-		case D_END:
-			m_ctrl[offset] = newval;
-			if ((newval & 7) != 7)
-				logerror("DSP to set to little-endian!\n");
-			break;
-
-		case D_PC:
-			m_pc = newval & 0xffffff;
-			break;
-
-		case D_CTRL:
-			m_ctrl[offset] = newval;
-			if ((oldval ^ newval) & 0x01)
-			{
-				set_input_line(INPUT_LINE_HALT, (newval & 1) ? CLEAR_LINE : ASSERT_LINE);
-				yield();
-			}
-			if (newval & 0x02)
-			{
-				m_cpu_interrupt(ASSERT_LINE);
-				m_ctrl[offset] &= ~0x02;
-			}
-			if (newval & 0x04)
-			{
-				m_ctrl[D_CTRL] |= 1 << 6;
-				m_ctrl[offset] &= ~0x04;
-				check_irqs();
-			}
-			if (newval & 0x18)
-			{
-				logerror("DSP single stepping was enabled!\n");
-			}
-			break;
-
-		case D_MOD:
-		case D_DIVCTRL:
-			m_ctrl[offset] = newval;
-			break;
-	}
-#endif
-}
 
 std::unique_ptr<util::disasm_interface> jaguargpu_cpu_device::create_disassembler()
 {
