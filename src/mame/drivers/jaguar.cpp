@@ -1116,7 +1116,7 @@ void jaguar_state::console_base_map(address_map &map)
 	map(0xe00000, 0xe1ffff).rom().region("mainrom", 0);
 	map(0xf00000, 0xf003ff).rw(FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w)); // might be reversed endian of the others..
 	map(0xf00400, 0xf005ff).mirror(0x000200).rw(FUNC(jaguar_state::gpu_clut_r16), FUNC(jaguar_state::gpu_clut_w16));
-	map(0xf02100, 0xf021ff).mirror(0x008000).rw(FUNC(jaguar_state::gpuctrl_r16), FUNC(jaguar_state::gpuctrl_w16));
+	map(0xf02100, 0xf021ff).rw(FUNC(jaguar_state::gpuctrl_r16), FUNC(jaguar_state::gpuctrl_w16));
 	map(0xf02200, 0xf022ff).mirror(0x008000).rw(FUNC(jaguar_state::blitter_r16), FUNC(jaguar_state::blitter_w16));
 	map(0xf03000, 0xf03fff).mirror(0x008000).rw(FUNC(jaguar_state::gpu_ram_r16), FUNC(jaguar_state::gpu_ram_w16));
 	map(0xf10000, 0xf103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w)); // might be reversed endian of the others..
@@ -1448,7 +1448,7 @@ void jaguar_state::console_base_gpu_map(address_map &map)
 	map(0xe00000, 0xe1ffff).r(FUNC(jaguar_state::rom_base_r));
 	map(0xf00000, 0xf003ff).rw(FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w));
 	map(0xf00400, 0xf005ff).mirror(0x000200).ram().share("gpuclut");
-	map(0xf02100, 0xf021ff).mirror(0x008000).rw(FUNC(jaguar_state::gpuctrl_r), FUNC(jaguar_state::gpuctrl_w));
+	map(0xf02100, 0xf021ff).rw(FUNC(jaguar_state::gpuctrl_r), FUNC(jaguar_state::gpuctrl_w));
 	map(0xf02200, 0xf022ff).mirror(0x008000).rw(FUNC(jaguar_state::blitter_r), FUNC(jaguar_state::blitter_w));
 	map(0xf03000, 0xf03fff).mirror(0x008000).ram().share("gpuram");
 	map(0xf10000, 0xf103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
