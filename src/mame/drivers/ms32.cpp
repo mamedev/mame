@@ -775,10 +775,10 @@ confirm them by looking at the code. The ROM string is in quotes.
 FFE00DE8  ; irq_0  probably "1msec interrupt"
 FFE00DF4  ; irq_1  "sound cpu interrupt"
 FFE00878  ; irq_2  probably "fpu 1-1 interrupt"
-FFE00884  ; irq_3  unused and labelled "fpu 0-1 interrupt"
-FFE00898  ; irq_4  unused and labelled "fpu 1-0 interrupt"
+FFE00884  ; irq_3  unused and labeled "fpu 0-1 interrupt"
+FFE00898  ; irq_4  unused and labeled "fpu 1-0 interrupt"
 FFE008AC  ; irq_5  probably "fpu 0-0 interrupt", x coords (and y) populated from here
-FFE008D0  ; irq_6  unused and labelled "option 2 interrupt"
+FFE008D0  ; irq_6  unused and labeled "option 2 interrupt"
 FFE008E4  ; irq_7  same as 5 - probably "option 1 interrupt"
 FFE01034  ; irq_9  VBL at 60Hz this would be "16msec interrupt"
 FFE01094  ; irq_10 loads of processing in the 0xfc000000 area : must be "32msec interrupt"
@@ -2334,13 +2334,13 @@ ROM_START( akiss )
 	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
-// Supposedly a Ver1.1 also exists, on the same ROM board (MB-94166 EB91022-20101)
+// Version 1.1 known to exist, labeled as: P-47 ACES 3/31 ROM 26 Ver1.1 - uses the same MB-94166 EB91022-20101 rom board.
 ROM_START( p47aces )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
-	ROM_LOAD32_BYTE( "p47-26.26", 0x000003, 0x80000, CRC(e017b819) SHA1(942fb48e8bb3a263534a0351a1a9979d786bc475) ) /* Labeled "P-47 Ver1.0 -26" */
-	ROM_LOAD32_BYTE( "p47-27.27", 0x000002, 0x80000, CRC(bd1b81e0) SHA1(b15f157fe3a30295f999a4c285da2d6f22d7fba6) ) /* Labeled "P-47 Ver1.0 -27" */
-	ROM_LOAD32_BYTE( "p47-28.28", 0x000001, 0x80000, CRC(4742a5f7) SHA1(cd297aa150082c545647c9a755cf2cdbdc98c988) ) /* Labeled "P-47 Ver1.0 -28" */
-	ROM_LOAD32_BYTE( "p47-29.29", 0x000000, 0x80000, CRC(86e17d8b) SHA1(73004f243c6dfb86ce4cc61475dc7caaf452750e) ) /* Labeled "P-47 Ver1.0 -29" */
+	ROM_LOAD32_BYTE( "p47_ver1.0-26.26", 0x000003, 0x80000, CRC(e017b819) SHA1(942fb48e8bb3a263534a0351a1a9979d786bc475) ) /* Labeled "P-47 Ver1.0 -26" */
+	ROM_LOAD32_BYTE( "p47_ver1.0-27.27", 0x000002, 0x80000, CRC(bd1b81e0) SHA1(b15f157fe3a30295f999a4c285da2d6f22d7fba6) ) /* Labeled "P-47 Ver1.0 -27" */
+	ROM_LOAD32_BYTE( "p47_ver1.0-28.28", 0x000001, 0x80000, CRC(4742a5f7) SHA1(cd297aa150082c545647c9a755cf2cdbdc98c988) ) /* Labeled "P-47 Ver1.0 -28" */
+	ROM_LOAD32_BYTE( "p47_ver1.0-29.29", 0x000000, 0x80000, CRC(86e17d8b) SHA1(73004f243c6dfb86ce4cc61475dc7caaf452750e) ) /* Labeled "P-47 Ver1.0 -29" */
 
 	ROM_REGION( 0xe00000, "sprite", 0 ) /* sprites */
 	ROM_LOAD32_WORD( "mr94020-02.1",  0x000002, 0x200000, CRC(28732d3c) SHA1(15b2687bcad31793fc7d6a9dc3eccb7ad9b5f659) )
@@ -2630,7 +2630,7 @@ GAME( 1994, suchie2o,  suchie2,  ms32, suchie2,  ms32_state, init_suchie2,    RO
 GAME( 1995, desertwr,  0,        ms32, desertwr, ms32_state, init_ss91022_10, ROT270, "Jaleco",        "Desert War / Wangan Sensou (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, gametngk,  0,        ms32, gametngk, ms32_state, init_ss91022_10, ROT270, "Jaleco",        "The Game Paradise - Master of Shooting! / Game Tengoku - The Game Paradise (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, tetrisp,   0,        ms32, tetrisp,  ms32_state, init_ss92046_01, ROT0,   "Jaleco / BPS",  "Tetris Plus (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, p47aces,   0,        ms32, p47aces,  ms32_state, init_ss92048_01, ROT0,   "Jaleco",         "P-47 Aces", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, p47aces,   0,        ms32, p47aces,  ms32_state, init_ss92048_01, ROT0,   "Jaleco",         "P-47 Aces (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, akiss,     0,        ms32, suchie2,  ms32_state, init_kirarast,   ROT0,   "Jaleco",         "Mahjong Angel Kiss (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, gratia,    0,        ms32, gratia,   ms32_state, init_ss92047_01, ROT0,   "Jaleco",         "Gratia - Second Earth (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, gratiaa,   gratia,   ms32, gratia,   ms32_state, init_ss91022_10, ROT0,   "Jaleco",         "Gratia - Second Earth (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
