@@ -146,6 +146,7 @@ READ16_MEMBER( cdimono2_state::uart_loopback_enable2 )
 READ8_MEMBER(cdimono2_state::slave_glue_r)
 {
 	m_portd_data |= 0x80;
+	m_portc_data = 0xfc | ((offset >> 1) & 3);
 	logerror("%s: slave_glue_r: %02x = %02x\n", machine().describe_context(), offset, m_porta_data);
 	m_slave->set_input_line(M68HC05_IRQ_LINE, ASSERT_LINE);
 	m_slave->set_input_line(M68HC05_IRQ_LINE, CLEAR_LINE);
@@ -645,7 +646,7 @@ READ8_MEMBER(cdimono2_state::slave_portb_r)
 READ8_MEMBER(cdimono2_state::slave_portc_r)
 {
 	logerror("%s: slave_portc_r: %02x & %02x\n", machine().describe_context(), m_portc_data, mem_mask);
-	return m_portc_data & mem_mask;
+	return (m_portc_data & mem_mask) & 0x7f;
 }
 
 READ8_MEMBER(cdimono2_state::slave_portd_r)
@@ -657,8 +658,7 @@ READ8_MEMBER(cdimono2_state::slave_portd_r)
 WRITE8_MEMBER(cdimono2_state::slave_porta_w)
 {
 	logerror("%s: slave_porta_w: %02x\n", machine().describe_context(), data);
-	m_porta_data &= ~mem_mask;
-	m_porta_data |= data & mem_mask;
+	m_porta_data = data;
 }
 
 WRITE8_MEMBER(cdimono2_state::slave_portb_w)
@@ -683,10 +683,13 @@ WRITE8_MEMBER(cdimono2_state::servo_portb_w)
 
 WRITE8_MEMBER(cdimono2_state::slave_portc_w)
 {
-	logerror("%s: slave_portc_w: %02x DISDAT=%u DISCLK=%u DISEN=%u RTSUART=%u\n", machine().describe_context(), data, 1-BIT(data,3), 1-BIT(data,4), 1-BIT(data,5), 1-BIT(data,6));
-	m_portc_data &= ~mem_mask;
-	m_portc_data |= data & mem_mask;
-	m_portc_data |= 0x80;
+	m_portc_data = data | 0x80;
+
+	uint8_t disdat = BIT(data | ~mem_mask, 3);
+	uint8_t disclk = BIT(data | ~mem_mask, 4);
+	uint8_t disen  = BIT(data | ~mem_mask, 5);
+	logerror("%s: slave_portc_w: %02x / %02x DISDAT=%u DISCLK=%u DISEN=%u RTSUART=%u\n", machine().describe_context(),
+		data, mem_mask, disdat, disclk, disen, BIT(data,6));
 }
 
 WRITE8_MEMBER(cdimono2_state::slave_portd_w)
