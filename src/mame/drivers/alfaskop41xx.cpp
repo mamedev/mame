@@ -93,7 +93,7 @@ private:
 	required_device<mc6845_device> m_crtc;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_vram;
-		required_device<pls100_device> m_pla;
+	required_device<pls100_device> m_pla;
 
 	/* Video controller */
 	required_region_ptr<uint8_t> m_chargen;

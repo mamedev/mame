@@ -105,11 +105,10 @@ void mc6844_device::device_resolve_objects()
 	m_in_memr_cb.resolve_safe(0);
 	m_out_memw_cb.resolve_safe();
 
-	for(auto &cb : m_in_ior_cb)
-			cb.resolve_safe(0);
-	for(auto &cb : m_out_iow_cb)
-			cb.resolve_safe();
-
+	for (auto &cb : m_in_ior_cb)
+		cb.resolve_safe(0);
+	for (auto &cb : m_out_iow_cb)
+		cb.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -129,6 +128,14 @@ void mc6844_device::device_start()
 	save_item(NAME(m_current_channel));
 	save_item(NAME(m_last_channel));
 	save_item(NAME(m_dgrnt));
+	save_item(NAME(m_dreq));
+
+	save_item(STRUCT_MEMBER( m_m6844_channel, active));
+	save_item(STRUCT_MEMBER( m_m6844_channel, address));
+	save_item(STRUCT_MEMBER( m_m6844_channel, counter));
+	save_item(STRUCT_MEMBER( m_m6844_channel, control));
+	save_item(STRUCT_MEMBER( m_m6844_channel, start_address));
+	save_item(STRUCT_MEMBER( m_m6844_channel, start_counter));
 }
 
 //-------------------------------------------------
@@ -173,12 +180,12 @@ void mc6844_device::execute_run()
 	{
 		switch (m_state)
 		{
-		case STATE_SI:  // IDLE state, will suspend until a DMA request comes through
-			{   //                    Hi ------> Lo
+		case STATE_SI: // IDLE state, will suspend until a DMA request comes through
+			{      //                             Hi ------> Lo
 				int const priorities[][4] = {{ 1, 2, 3, 0 },
-							   { 2, 3, 0, 1 },
-							   { 3, 0, 1, 2 },
-							   { 0, 1, 2, 3 }};
+							     { 2, 3, 0, 1 },
+							     { 3, 0, 1, 2 },
+							     { 0, 1, 2, 3 }};
 
 				LOGSTATE("DMA state SI\n");
 				for (int prio = 0; prio < 4; prio++)
@@ -186,7 +193,7 @@ void mc6844_device::execute_run()
 					// Rotating or static channel prioritizations
 					int current_channel = priorities[((m_m6844_priority & 0x80) ? m_last_channel : 3) & 3][prio];
 
-				if (m_m6844_channel[current_channel].active == 1 && m_dreq[current_channel] == ASSERT_LINE)
+					if (m_m6844_channel[current_channel].active == 1 && m_dreq[current_channel] == ASSERT_LINE)
 					{
 						m_current_channel = m_last_channel = current_channel;
 						m_state = STATE_S0;
@@ -252,7 +259,6 @@ void mc6844_device::execute_run()
 				{
 					if (!(m_m6844_channel[m_current_channel].control & 0x01))
 					{
-						//uint8_t data = 0x55;
 						uint8_t data = m_in_ior_cb[m_current_channel]();
 						LOGTFR("DMA%d from device to memory location %04x: <- %02x\n", m_current_channel, m_m6844_channel[m_current_channel].address, data );
 						m_out_memw_cb(m_m6844_channel[m_current_channel].address, data);
@@ -260,8 +266,8 @@ void mc6844_device::execute_run()
 					else // dma write to device from memory
 					{
 						uint8_t data = 0;
-						LOGTFR("DMA from memory location to device %04x: -> %02x\n", m_m6844_channel[m_current_channel].address, data );
 						//uint8_t data = m_in_memr_cb(m_m6844_channel[m_current_channel].address);
+						LOGTFR("DMA from memory location to device %04x: -> %02x\n", m_m6844_channel[m_current_channel].address, data );
 						//m_out_iow_cb[m_current_channel](data);
 					}
 
@@ -323,7 +329,6 @@ void mc6844_device::execute_run()
 			logerror("MC6844: bad state, please report error\n");
 			break;
 		}
-
 		m_icount--;
 	} while (m_icount > 0);
 }

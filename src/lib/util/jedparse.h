@@ -29,10 +29,9 @@
 #define JEDERR_BAD_XMIT_SUM     2
 #define JEDERR_BAD_FUSE_SUM     3
 
-enum fileformats {
-  MAXLOADER,
-  DATAIO
-};
+/* binary file formats */
+#define  MAXLOADER 0
+#define  DATAIO    1
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -40,9 +39,9 @@ enum fileformats {
 
 struct jed_data
 {
-	uint32_t      numfuses;           /* number of defined fuses */
-	uint8_t       fusemap[JED_MAX_FUSES / 8];/* array of bit-packed data */
-	fileformats   binfmt; /* file format MAXLOADER or DATAIO */
+	uint32_t      numfuses;                   /* number of defined fuses */
+	uint8_t       fusemap[JED_MAX_FUSES / 8]; /* array of bit-packed data */
+	uint8_t	      binfmt;                     /* file format MAXLOADER or DATAIO */
 };
 
 
