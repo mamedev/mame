@@ -641,6 +641,10 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 	map(0x007b80, 0x007bbf).rw(m_spg_audio, FUNC(sunplus_gcm394_audio_device::control_r), FUNC(sunplus_gcm394_audio_device::control_w));
 	map(0x007c00, 0x007dff).rw(m_spg_audio, FUNC(sunplus_gcm394_audio_device::audio_r), FUNC(sunplus_gcm394_audio_device::audio_w));
 	map(0x007e00, 0x007fff).rw(m_spg_audio, FUNC(sunplus_gcm394_audio_device::audio_phase_r), FUNC(sunplus_gcm394_audio_device::audio_phase_w));
+
+	map(0x08000, 0x27fff).rom().region("internal", 0);
+	map(0x28000, 0x2ffff).noprw(); // reserved
+
 }
 
 READ16_MEMBER(generalplus_gpac800_device::unkarea_7850_r)
@@ -719,11 +723,7 @@ void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
 {
 	sunplus_gcm394_base_device::gcm394_internal_map(map);
 
-	// there is an extra command-based device at 785x, what it returns is important to code flow
-	// code is littered with NOPs so clearly the device can't accept commands too quickly and doesn't return data immediately
-	//
-	// this should be the NAND device, as the games attempt to do a DMA operation with '7854' as the source, and the target
-	// as the RAM location where code needs to end up before jumping to it
+	// 785x = NAND device
 	map(0x007850, 0x007850).r(FUNC(generalplus_gpac800_device::unkarea_7850_r)); // NAND Control Reg
 	map(0x007851, 0x007851).w(FUNC(generalplus_gpac800_device::nand_command_w)); // NAND Command Reg
 	map(0x007852, 0x007852).w(FUNC(generalplus_gpac800_device::flash_addr_low_w)); // NAND Low Address Reg
