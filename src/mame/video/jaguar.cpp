@@ -617,6 +617,8 @@ WRITE16_MEMBER( jaguar_state::tom_regs_w )
 				m_cpu_irq_state &= ~(m_gpu_regs[INT1] >> 8);
 				update_cpu_irq();
 				break;
+			
+			// TODO: INT2 bus mechanism
 
 			case VMODE:
 				if (reg_store != m_gpu_regs[offset])

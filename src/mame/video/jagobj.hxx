@@ -1085,9 +1085,13 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 				break;
 			}
 
+			case 6:
+				// kasumi: F7000000 00F0311E (nop? bad align?)
+				break;
+
 			default:
 				fprintf(stderr, "%08X %08X\n", objdata[0], objdata[1]);
-				done = 1;
+				//done = 1;
 				break;
 		}
 	}

@@ -590,7 +590,8 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- hangs at the NBA Jam TE logo -->
+	<!-- exception on non-debug, on debug gameplay sports no sprite GFXs -->
+	<!-- minor glitch on team box when selecting one (blitter not filling properly) -->
 	<software name="nbajamte" supported="no">
 		<description>NBA Jam T.E. - Tournament Edition</description>
 		<year>1996</year>

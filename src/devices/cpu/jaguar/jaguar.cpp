@@ -713,7 +713,7 @@ void jaguar_cpu_device::imacn_rn_rn(u16 op)
 	const u32 r1 = m_r[(op >> 5) & 31];
 	const u32 r2 = m_r[op & 31];
 	m_accum += (s64)((int16_t)r1 * (int16_t)r2);
-	// TODO: ???
+	// TODO: what's really "unexpected"?
 	logerror("Unexpected IMACN instruction!\n");
 }
 
