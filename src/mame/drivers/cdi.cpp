@@ -168,7 +168,6 @@ WRITE8_MEMBER(cdimono2_state::slave_glue_w)
 WRITE8_MEMBER(cdimono2_state::controller_tx)
 {
 	logerror("%s: controller_tx: %02x\n", machine().describe_context(), data);
-	m_slave->uart_rx(0x55);
 }
 
 /*************************
@@ -335,6 +334,15 @@ void cdimono2_state::machine_start()
 	save_item(NAME(m_portb_data));
 	save_item(NAME(m_portc_data));
 	save_item(NAME(m_portd_data));
+	save_item(NAME(m_disdat));
+	save_item(NAME(m_disclk));
+	save_item(NAME(m_disen));
+	save_item(NAME(m_disdata));
+	save_item(NAME(m_disbit));
+	save_item(NAME(m_mouse_buffer));
+	save_item(NAME(m_mouse_idx));
+
+	m_mouse_timer = timer_alloc(0);
 }
 
 void cdi_state::machine_reset()
@@ -351,6 +359,14 @@ void cdimono2_state::machine_reset()
 	m_portb_data = 0x00;
 	m_portc_data = 0xfc;
 	m_portd_data = 0x20;
+	m_disdat = 0x00;
+	m_disclk = 0x01;
+	m_disen = 0x00;
+	m_disdata = 0x00;
+	m_disbit = 0x00;
+	m_mouse_idx = 0x00;
+	m_mouse_timer->adjust(attotime::never);
+	m_servo->ss_in(0);
 }
 
 void quizard_state::machine_start()
@@ -645,7 +661,7 @@ READ8_MEMBER(cdimono2_state::slave_portb_r)
 
 READ8_MEMBER(cdimono2_state::slave_portc_r)
 {
-	logerror("%s: slave_portc_r: %02x & %02x\n", machine().describe_context(), m_portc_data, mem_mask);
+	//logerror("%s: slave_portc_r: %02x & %02x\n", machine().describe_context(), m_portc_data, mem_mask);
 	return (m_portc_data & mem_mask) & 0x7f;
 }
 
@@ -661,6 +677,20 @@ WRITE8_MEMBER(cdimono2_state::slave_porta_w)
 	m_porta_data = data;
 }
 
+void cdimono2_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id == 0)
+	{
+		m_slave->uart_rx(m_mouse_buffer[m_mouse_idx]);
+		m_mouse_idx++;
+		if (m_mouse_idx == 6)
+		{
+			m_mouse_idx = 0;
+			m_mouse_timer->adjust(attotime::never);
+		}
+	}
+}
+
 WRITE8_MEMBER(cdimono2_state::slave_portb_w)
 {
 	const uint8_t old = m_portb_data;
@@ -670,26 +700,53 @@ WRITE8_MEMBER(cdimono2_state::slave_portb_w)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
+	if (!(old & 0x10) && (data & 0x10))
+	{
+		m_slave->uart_rx(0x55);
+	}
+	else if ((old & 0x10) && !(data & 0x10))
+	{
+		m_mouse_timer->adjust(attotime::from_ticks(10, 9600), 0, attotime::from_ticks(10, 9600));
+		m_mouse_buffer[0] = 0x4d;
+		m_mouse_buffer[1] = 0x20;
+		m_mouse_buffer[2] = 0x41;
+		m_mouse_buffer[3] = 0x22;
+		m_mouse_buffer[4] = 0x43;
+		m_mouse_buffer[5] = 0x24;
+	}
+	m_maincpu->in2_w(1 - BIT(data, 5));
 }
 
 WRITE8_MEMBER(cdimono2_state::servo_portb_w)
 {
 	logerror("%s: servo_portb_w: %02x\n", machine().describe_context(), data);
 	if (BIT(data, 7))
-		m_portd_data &= ~0x20;
+		m_slave->ss_in(0);
 	else
-		m_portd_data |= 0x20;
+		m_slave->ss_in(1);
 }
 
 WRITE8_MEMBER(cdimono2_state::slave_portc_w)
 {
 	m_portc_data = data | 0x80;
 
-	uint8_t disdat = BIT(data | ~mem_mask, 3);
-	uint8_t disclk = BIT(data | ~mem_mask, 4);
-	uint8_t disen  = BIT(data | ~mem_mask, 5);
-	logerror("%s: slave_portc_w: %02x / %02x DISDAT=%u DISCLK=%u DISEN=%u RTSUART=%u\n", machine().describe_context(),
-		data, mem_mask, disdat, disclk, disen, BIT(data,6));
+	uint8_t old_clk = m_disclk;
+	m_disdat = BIT(data | ~mem_mask, 3);
+	m_disclk = BIT(data | ~mem_mask, 4);
+	m_disen  = 1 - BIT(data | ~mem_mask, 5);
+	//logerror("%s: slave_portc_w: %02x / %02x DISDAT=%u DISCLK=%u DISEN=%u RTSUART=%u\n", machine().describe_context(),
+		//data, mem_mask, m_disdat, m_disclk, m_disen, BIT(data,6));
+	if (!old_clk && m_disclk)
+	{
+		m_disdata |= m_disdat << (7 - m_disbit);
+		m_disbit++;
+		if (m_disbit == 8)
+		{
+			logerror("display data: %02x\n", m_disdata);
+			m_disbit = 0;
+			m_disdata = 0;
+		}
+	}
 }
 
 WRITE8_MEMBER(cdimono2_state::slave_portd_w)

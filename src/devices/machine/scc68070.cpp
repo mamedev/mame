@@ -34,7 +34,7 @@ TODO:
 #define LOG_UNKNOWN     (1 << 7)
 #define LOG_ALL         (LOG_I2C | LOG_UART | LOG_TIMERS | LOG_DMA | LOG_MMU | LOG_IRQS | LOG_UNKNOWN)
 
-#define VERBOSE         (LOG_UART)
+#define VERBOSE         (0)
 
 #include "logmacro.h"
 

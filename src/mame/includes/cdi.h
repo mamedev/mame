@@ -86,6 +86,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	void cdi910_mem(address_map &map);
@@ -118,6 +119,16 @@ private:
 	uint8_t m_portb_data;
 	uint8_t m_portc_data;
 	uint8_t m_portd_data;
+
+	uint8_t m_disdat;
+	uint8_t m_disclk;
+	uint8_t m_disen;
+	uint8_t m_disdata;
+	uint8_t m_disbit;
+
+	uint8_t m_mouse_buffer[6];
+	uint8_t m_mouse_idx;
+	emu_timer *m_mouse_timer;
 };
 
 class quizard_state : public cdi_state

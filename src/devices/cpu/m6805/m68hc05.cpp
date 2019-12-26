@@ -36,7 +36,7 @@ determines both the COP watchdog timeout and the real-time interrupt rate
 #define LOG_UART    (1U <<  5)
 #define LOG_SPI     (1U <<  6)
 
-#define VERBOSE (LOG_GENERAL | LOG_INT | LOG_IOPORT | LOG_COP | LOG_UART | LOG_SPI)
+#define VERBOSE (LOG_GENERAL | LOG_INT | LOG_COP | LOG_UART | LOG_SPI)
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
 
@@ -273,14 +273,23 @@ u8 m68hc05_device::spcr_spr_divider() const
 
 READ8_MEMBER(m68hc05_device::spcr_r)
 {
+	LOGSPI("%s: read SPCR: %02x\n", machine().describe_context(), m_spcr);
 	return m_spcr;
 }
 
 WRITE8_MEMBER(m68hc05_device::spcr_w)
 {
+	if (spsr_modf())
+	{
+		m_spsr &= ~0x10;
+		if (!spcr_spie() || !spsr_spif())
+		{
+			m_pending_interrupts &= ~M68HC05_INT_SPI;
+		}
+	}
 	data &= 0xdf;
 	m_spcr = data;
-	LOGSPI("write SPCR: SPIE=%u SPE=%u MSTR=%u CPOL=%u CPHA=%u SPR=%u (divider %u)\n",
+	LOGSPI("%s: write SPCR: SPIE=%u SPE=%u MSTR=%u CPOL=%u CPHA=%u SPR=%u (divider %u)\n", machine().describe_context(),
 		spcr_spie(), spcr_spe(), spcr_mstr(), spcr_cpol(), spcr_cpha(), spcr_spr(), spcr_spr_divider());
 	if (m_spi_tx_clocks == ~0U)
 	{
@@ -290,6 +299,7 @@ WRITE8_MEMBER(m68hc05_device::spcr_w)
 
 READ8_MEMBER(m68hc05_device::spsr_r)
 {
+	LOGSPI("%s: read SPSR: %02x\n", machine().describe_context(), m_spsr);
 	return m_spsr;
 }
 
@@ -300,14 +310,19 @@ WRITE8_MEMBER(m68hc05_device::spsr_w)
 
 READ8_MEMBER(m68hc05_device::spdr_r)
 {
-	LOGSPI("%s: read SPDR: %02x\n", machine().describe_context(), m_spdr);
+	LOGSPI("%s: read SPDR: %02x\n", machine().describe_context(), m_sprr);
 	m_spsr &= ~0xd0;
-	return m_spdr;
+	return m_sprr;
 }
 
 WRITE8_MEMBER(m68hc05_device::spdr_w)
 {
 	LOGSPI("%s: write SPDR: %02x\n", machine().describe_context(), data);
+	if (spcr_mstr() && spsr_spif())
+	{
+		LOGSPI("%s: SPDR write inhibited due to MSTR and SPIF both set\n", machine().describe_context());
+		return;
+	}
 	m_spdr = data;
 	if (spcr_spe())
 	{
@@ -327,6 +342,11 @@ WRITE8_MEMBER(m68hc05_device::spdr_w)
 
 WRITE_LINE_MEMBER(m68hc05_device::sck_in)
 {
+	if (!spcr_mstr() && m_ss)
+	{
+		LOGSPI("sck_in (ignored due to high SS and non-master): %d\n", state);
+		return;
+	}
 	LOGSPI("sck_in: %d\n", state);
 	u8 old = m_sck;
 	m_sck = state;
@@ -342,6 +362,7 @@ WRITE_LINE_MEMBER(m68hc05_device::sck_in)
 			m_spi_rx_cnt++;
 			if (m_spi_rx_cnt == 8)
 			{
+				m_sprr = m_spdr;
 				m_spi_rx_cnt = 0;
 				m_spsr |= 0x80;
 				if (spsr_spif() && spcr_spie())
@@ -359,8 +380,32 @@ WRITE_LINE_MEMBER(m68hc05_device::sck_in)
 
 WRITE_LINE_MEMBER(m68hc05_device::sda_in)
 {
+	if (!spcr_mstr() && m_ss)
+	{
+		LOGSPI("sda_in (ignored due to high SS and non-master): %d\n", state);
+		return;
+	}
 	LOGSPI("sda_in: %d\n", state);
 	m_sda = state;
+}
+
+WRITE_LINE_MEMBER(m68hc05_device::ss_in)
+{
+	LOGSPI("ss_in: %d\n", state);
+	u8 old = m_ss;
+	m_ss = state;
+	if (old != m_ss)
+	{
+		if (spcr_mstr() && state)
+		{
+			m_spsr |= 0x10;
+			m_spcr &= ~0x50;
+			if (spcr_spie())
+			{
+				m_pending_interrupts |= M68HC05_INT_SPI;
+			}
+		}
+	}
 }
 
 u8 m68hc05_device::baud_scp_count() const
@@ -407,12 +452,16 @@ WRITE8_MEMBER(m68hc05_device::sccr2_w)
 		sccr2_tie(), sccr2_tcie(), sccr2_rie(), sccr2_ilie(), sccr2_te(), sccr2_re(), sccr2_rwu(), sccr2_sbk());
 	if (sccr2_te() && m_tdr_pending)
 	{
-		m_uart_tx_clocks = 32 * baud_scp_count() * baud_scr_count();
+		m_uart_tx_clocks = 10 * 32 * baud_scp_count() * baud_scr_count();
 	}
 	if (sccr2_re() && m_rdr_pending)
 	{
-		m_uart_rx_clocks = 32 * baud_scp_count() * baud_scr_count();
+		m_uart_rx_clocks = 10 * 32 * baud_scp_count() * baud_scr_count();
 	}
+	if (m_scsr & m_sccr2 & 0xf0)
+		m_pending_interrupts |= M68HC05_INT_SCI;
+	else
+		m_pending_interrupts &= ~M68HC05_INT_SCI;
 }
 
 READ8_MEMBER(m68hc05_device::scsr_r)
@@ -679,12 +728,14 @@ void m68hc05_device::device_start()
 	save_item(NAME(m_spcr));
 	save_item(NAME(m_spsr));
 	save_item(NAME(m_spdr));
+	save_item(NAME(m_sprr));
 	save_item(NAME(m_spi_rx_cnt));
 	save_item(NAME(m_spi_tx_cnt));
 	save_item(NAME(m_spi_tx_clocks));
 	save_item(NAME(m_spi_run_clocks));
 	save_item(NAME(m_sck));
 	save_item(NAME(m_sda));
+	save_item(NAME(m_ss));
 
 	// save timer/counter
 	save_item(NAME(m_tcap_state));
@@ -722,12 +773,14 @@ void m68hc05_device::device_start()
 	m_spcr = 0x00;
 	m_spsr = 0x00;
 	m_spdr = 0x00;
+	m_sprr = 0x00;
 	m_spi_rx_cnt = 0;
 	m_spi_tx_cnt = 0;
 	m_spi_tx_clocks = ~0U;
 	m_spi_run_clocks = 0;
 	m_sck = 0x00;
 	m_sda = 0x00;
+	m_ss = 0x01;
 
 	// timer state unaffected by reset
 	m_tcap_state = false;
@@ -765,6 +818,7 @@ void m68hc05_device::device_reset()
 	m_spi_run_clocks = 0;
 	m_sck = 0x00;
 	m_sda = 0x00;
+	m_ss = 0x01;
 
 	// timer reset
 	m_tcr &= 0x02;
@@ -960,8 +1014,8 @@ void m68hc05_device::burn_cycles(unsigned count)
 	// run SPI Tx
 	if (m_spi_tx_clocks != ~0U)
 	{
-		m_spi_run_clocks += count * ps_opt;
-		while (m_spi_run_clocks > m_spi_tx_clocks && m_spi_tx_cnt > 0)
+		m_spi_run_clocks += count << ps_opt;
+		while (m_spi_run_clocks >= m_spi_tx_clocks && m_spi_tx_cnt > 0)
 		{
 			m_spi_run_clocks -= m_spi_tx_clocks;
 
@@ -993,9 +1047,9 @@ void m68hc05_device::burn_cycles(unsigned count)
 	// run UART Tx
 	if (m_uart_tx_clocks != ~0U)
 	{
-		if (m_uart_tx_clocks > count * ps_opt)
+		if (m_uart_tx_clocks > count)
 		{
-			m_uart_tx_clocks -= count * ps_opt;
+			m_uart_tx_clocks -= count;
 		}
 		else
 		{
@@ -1014,9 +1068,9 @@ void m68hc05_device::burn_cycles(unsigned count)
 	// run UART Rx
 	if (m_uart_rx_clocks != ~0U && sccr2_re())
 	{
-		if (m_uart_rx_clocks > count * ps_opt)
+		if (m_uart_rx_clocks > count)
 		{
-			m_uart_rx_clocks -= count * ps_opt;
+			m_uart_rx_clocks -= count;
 		}
 		else
 		{

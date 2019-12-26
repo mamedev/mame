@@ -48,6 +48,7 @@ public:
 	auto sda_out() { return m_sda_out_cb.bind(); }
 	DECLARE_WRITE_LINE_MEMBER(sck_in);
 	DECLARE_WRITE_LINE_MEMBER(sda_in);
+	DECLARE_WRITE_LINE_MEMBER(ss_in);
 
 protected:
 	// state index constants
@@ -187,6 +188,7 @@ private:
 	u8		spcr_spr_divider() const;
 
 	bool	spsr_spif() const	{ return BIT(m_spsr, 7); }
+	bool	spsr_modf() const	{ return BIT(m_spsr, 4); }
 
 	bool    tcr_icie() const    { return BIT(m_tcr, 7); }
 	bool    tcr_ocie() const    { return BIT(m_tcr, 6); }
@@ -226,12 +228,14 @@ private:
 	u8					m_spcr;
 	u8					m_spsr;
 	u8					m_spdr;
+	u8					m_sprr;
 	u8					m_spi_rx_cnt;
 	u8					m_spi_tx_cnt;
 	u32					m_spi_tx_clocks;
 	u32					m_spi_run_clocks;
 	u8					m_sck;
 	u8					m_sda;
+	u8					m_ss;
 	devcb_write_line	m_sck_out_cb;
 	devcb_write_line	m_sda_out_cb;
 
