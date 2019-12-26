@@ -964,7 +964,7 @@ Unreleased (possibly no prototypes exist):
 	</software>
 
 	<!-- boot OK, no BGMs, has minor GFX pitch issue when action summary message pops up after a play -->
-	<software name="troyaik" supported="no">
+	<software name="troyaik" supported="partial">
 		<description>Troy Aikman NFL Football</description>
 		<year>1995</year>
 		<publisher>Williams Entertainment</publisher>

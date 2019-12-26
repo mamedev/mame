@@ -58,6 +58,7 @@ public:
 	// configuration helpers
 	auto irq() { return m_cpu_interrupt.bind(); }
 
+	// TODO: add which device triggered the I/O
 	void iobus_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 iobus_r(offs_t offset, u32 mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(go_w);
@@ -296,6 +297,8 @@ protected:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	DECLARE_WRITE32_MEMBER(modulo_w);
+	DECLARE_WRITE32_MEMBER(dsp_end_w);
+	DECLARE_READ32_MEMBER(high_accum_r);
 };
 
 

@@ -176,7 +176,7 @@ jaguar_cpu_device::jaguar_cpu_device(const machine_config &mconfig, device_type 
 	, m_div_remainder(0)
 	, m_div_offset(false)
 	, m_hidata(0)
-	, m_modulo(0)
+	, m_modulo(0xffffffff)
 {
 	if (isdsp)
 	{
@@ -465,6 +465,7 @@ void jaguar_cpu_device::device_reset()
 {
 	m_b0 = m_r;
 	m_b1 = m_a;
+	m_modulo = 0xffffffff;
 }
 
 
@@ -610,8 +611,7 @@ void jaguar_cpu_device::addqmod_n_rn(u16 op)  /* DSP only */
 	const u32 r1 = convert_zero[(op >> 5) & 31];
 	const u32 r2 = m_r[dreg];
 	u32 res = r2 + r1;
-	res = (res & ~m_modulo) | (r2 & ~m_modulo);
-	printf("ADDQMOD %08x\n",m_modulo);
+	res = (res & ~m_modulo) | (r2 & m_modulo);
 	m_r[dreg] = res;
 	CLR_ZNC(); SET_ZNC_ADD(r2, r1, res);
 }
@@ -713,6 +713,7 @@ void jaguar_cpu_device::imacn_rn_rn(u16 op)
 	const u32 r1 = m_r[(op >> 5) & 31];
 	const u32 r2 = m_r[op & 31];
 	m_accum += (s64)((int16_t)r1 * (int16_t)r2);
+	// TODO: ???
 	logerror("Unexpected IMACN instruction!\n");
 }
 
@@ -1007,7 +1008,6 @@ void jaguar_cpu_device::pack_rn(u16 op)       /* GPU only */
 void jaguar_cpu_device::resmac_rn(u16 op)
 {
 	m_r[op & 31] = (u32)m_accum;
-	printf("%08x RESMAC detected\n", m_pc);
 }
 
 void jaguar_cpu_device::ror_rn_rn(u16 op)
@@ -1257,8 +1257,7 @@ void jaguar_cpu_device::subqmod_n_rn(u16 op)  /* DSP only */
 	const u32 r1 = convert_zero[(op >> 5) & 31];
 	const u32 r2 = m_r[dreg];
 	u32 res = r2 - r1;
-	res = (res & ~m_modulo) | (r2 & ~m_modulo);
-	printf("SUBQMOD %08x\n",m_modulo);
+	res = (res & ~m_modulo) | (r2 & m_modulo);
 	m_r[dreg] = res;
 	CLR_ZNC(); SET_ZNC_SUB(r2, r1, res);
 }
@@ -1293,7 +1292,7 @@ void jaguar_cpu_device::io_common_map(address_map &map)
 	map(0x00, 0x03).rw(FUNC(jaguar_cpu_device::flags_r), FUNC(jaguar_cpu_device::flags_w));
 	map(0x04, 0x07).w(FUNC(jaguar_cpu_device::matrix_control_w));
 	map(0x08, 0x0b).w(FUNC(jaguar_cpu_device::matrix_address_w));
-	map(0x0c, 0x0f).w(FUNC(jaguar_cpu_device::end_w));
+//	map(0x0c, 0x0f) endian
 	map(0x10, 0x13).w(FUNC(jaguar_cpu_device::pc_w));
 	map(0x14, 0x17).rw(FUNC(jaguar_cpu_device::status_r), FUNC(jaguar_cpu_device::control_w));
 //	map(0x18, 0x1b) implementation specific
@@ -1304,6 +1303,7 @@ void jaguar_cpu_device::io_common_map(address_map &map)
 void jaguargpu_cpu_device::io_map(address_map &map)
 {
 	jaguar_cpu_device::io_common_map(map);
+	map(0x0c, 0x0f).w(FUNC(jaguargpu_cpu_device::end_w));
 	map(0x18, 0x1b).rw(FUNC(jaguargpu_cpu_device::hidata_r), FUNC(jaguargpu_cpu_device::hidata_w));
 }
 
@@ -1311,8 +1311,9 @@ void jaguargpu_cpu_device::io_map(address_map &map)
 void jaguardsp_cpu_device::io_map(address_map &map)
 {
 	jaguar_cpu_device::io_common_map(map);
+	map(0x0c, 0x0f).w(FUNC(jaguardsp_cpu_device::dsp_end_w));
 	map(0x18, 0x1b).w(FUNC(jaguardsp_cpu_device::modulo_w));
-//	map(0x20, 0x23) // ...
+	map(0x20, 0x23).r(FUNC(jaguardsp_cpu_device::high_accum_r));
 }
 
 READ32_MEMBER(jaguar_cpu_device::flags_r)
@@ -1375,11 +1376,19 @@ WRITE32_MEMBER(jaguar_cpu_device::pc_w)
  * ---- --x- Pixel endianness (GPU only)
  * ----	---x I/O endianness
  */
+// TODO: just log if anything farts for now, change to bit struct once we have something to test out
 WRITE32_MEMBER(jaguar_cpu_device::end_w)
 {
-	// TODO: just log if anything farts for now, change to bit struct when we have something to test out
 	COMBINE_DATA(&m_io_end);
-	if (m_io_end != 0x00070007)
+	if ((m_io_end & 0x7) != 0x7)
+		throw emu_fatalerror("%s: fatal endian setup %08x", this->tag(), m_io_end);
+}
+
+WRITE32_MEMBER(jaguardsp_cpu_device::dsp_end_w)
+{
+	COMBINE_DATA(&m_io_end);
+	// wolfn3d writes a '0' to bit 1 (which is a NOP for DSP)
+	if ((m_io_end & 0x5) != 0x5)
 		throw emu_fatalerror("%s: fatal endian setup %08x", this->tag(), m_io_end);
 }
 
@@ -1432,6 +1441,7 @@ WRITE32_MEMBER(jaguar_cpu_device::control_w)
 	// TODO: single step handling
 	
 	m_bus_hog = BIT(m_io_status, 11);
+	// TODO: protect/protectse uses this, why?
 	if (m_bus_hog == true)
 		logerror("%s: bus hog enabled\n", this->tag());
 }
@@ -1448,6 +1458,7 @@ WRITE32_MEMBER(jaguargpu_cpu_device::hidata_w)
 
 READ32_MEMBER(jaguar_cpu_device::div_remainder_r)
 {
+	// TODO: truly 32-bit?
 	return m_div_remainder;
 }
 
@@ -1461,21 +1472,24 @@ WRITE32_MEMBER(jaguardsp_cpu_device::modulo_w)
 	COMBINE_DATA(&m_modulo);
 }
 
+READ32_MEMBER(jaguardsp_cpu_device::high_accum_r)
+{
+	printf("%s: high 16-bit accumulator read\n", this->tag());
+	return (m_accum >> 32) & 0xff;
+}
+
 u32 jaguar_cpu_device::iobus_r(offs_t offset, u32 mem_mask)
 {
 	return m_io->read_dword(offset*4, mem_mask);
 }
-
 
 void jaguar_cpu_device::iobus_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	m_io->write_dword(offset*4, data, mem_mask);
 }
 
-
-
 /***************************************************************************
-    I/O HANDLING
+    DASM
 ***************************************************************************/
 
 std::unique_ptr<util::disasm_interface> jaguargpu_cpu_device::create_disassembler()
