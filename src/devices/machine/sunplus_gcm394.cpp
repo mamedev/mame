@@ -91,7 +91,7 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 	uint32_t dest = m_dma_params[2][channel] | (m_dma_params[5][channel] << 16) ;
 	uint32_t length = m_dma_params[3][channel] | (m_dma_params[6][channel] << 16);
 
-	LOGMASKED(LOG_GCM394_SYSDMA, "%s:possible DMA operation (7abf) (trigger %04x) with params mode:%04x source:%08x (word offset) dest:%08x (word offset) length:%08x (words)\n", machine().describe_context(), data, mode, source, dest, length );
+	printf( "%s:possible DMA operation (7abf) (trigger %04x) with params mode:%04x source:%08x (word offset) dest:%08x (word offset) length:%08x (words)\n", machine().describe_context().c_str(), data, mode, source, dest, length );
 
 	if ((source&0x0fffffff) >= 0x20000)
 		LOGMASKED(LOG_GCM394_SYSDMA, " likely transfer from ROM %08x - %08x\n", (source - 0x20000) * 2, (source - 0x20000) * 2 + (length * 2)- 1);
@@ -140,29 +140,8 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 	{
 		for (int i = 0; i < length; i++)
 		{
-			uint16_t val = 0x0000;
-
-			address_space& mem = this->space(AS_PROGRAM);
-
-			if (source < 0x20000)
-			{
-				val = mem.read_word(source);
-			}
-			else
-			{
-				// maybe the -0x20000 here should be handled in external space handlers instead
-				val = m_space_read_cb(space, source - 0x20000);
-			}
-
-			if (dest < 0x20000)
-			{
-				mem.write_word(dest, val);
-			}
-			else
-			{
-				// maybe the -0x20000 here should be handled in external space handlers instead
-				m_space_write_cb(space, dest - 0x20000, val);
-			}
+			uint16_t val = m_space_read_cb(space, source);
+			m_space_write_cb(space, dest , val);
 
 			dest += 1;
 			if ((mode&0x3fff) == 0x0009)

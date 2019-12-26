@@ -50,6 +50,89 @@
 #include "speaker.h"
 
 
+
+
+class full_memory_device :
+	public device_t,
+	public device_memory_interface
+{
+public:
+	// construction/destruction
+	full_memory_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	// configuration helpers
+	template <typename... T> full_memory_device& set_map(T &&... args) { set_addrmap(0, std::forward<T>(args)...); return *this; }
+
+	template <typename... T> full_memory_device& map(T &&... args) { set_addrmap(0, std::forward<T>(args)...); return *this; }
+
+	address_space* get_program() { return m_program; }
+
+protected:
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
+
+	// device_memory_interface overrides
+	virtual space_config_vector memory_space_config() const override;
+
+
+private:
+	// internal state
+	address_space_config m_program_config;
+	address_space *m_program;
+	int m_shift;
+};
+
+
+// device type definition
+DECLARE_DEVICE_TYPE(FULL_MEMORY, full_memory_device)
+
+// device type definition
+DEFINE_DEVICE_TYPE(FULL_MEMORY, full_memory_device, "full_memory", "SunPlus Full CS Memory Map")
+
+full_memory_device::full_memory_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, FULL_MEMORY, tag, owner, clock),
+	device_memory_interface(mconfig, *this),
+	m_program(nullptr)
+{
+}
+
+device_memory_interface::space_config_vector full_memory_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
+/*
+':maincpu' (00F87F):possible DMA operation (7abf) (trigger 0001) with params mode:4009 source:00040000 (word offset) dest:00830000 (word offset) length:00007800 (words)
+':maincpu' (002384):possible DMA operation (7abf) (trigger 0001) with params mode:0009 source:00180000 (word offset) dest:00840000 (word offset) length:00160000 (words)
+
+':maincpu' (05048D):possible DMA operation (7abf) (trigger 0001) with params mode:0089 source:00006fa3 (word offset) dest:000025bc (word offset) length:000001e0 (words)
+':maincpu' (05048D):possible DMA operation (7abf) (trigger 0001) with params mode:0089 source:00006fa3 (word offset) dest:000024cc (word offset) length:000000f0 (words)
+':maincpu' (05048D):possible DMA operation (7abf) (trigger 0001) with params mode:0089 source:00006fa3 (word offset) dest:00000002 (word offset) length:00000400 (words)
+':maincpu' (05048D):possible DMA operation (7abf) (trigger 0001) with params mode:0089 source:00006fa3 (word offset) dest:00000402 (word offset) length:00000400 (words)
+':maincpu' (05048D):possible DMA operation (7abf) (trigger 0001) with params mode:0089 source:00006fa3 (word offset) dest:00000802 (word offset) length:00000400 (words)
+
+gtg
+':maincpu' (005ACE):possible DMA operation (7abf) (trigger 0001) with params mode:1089 source:30007854 (word offset) dest:00030000 (word offset) length:00000200 (words)
+':maincpu' (005ACE):possible DMA operation (7abf) (trigger 0001) with params mode:1089 source:30007854 (word offset) dest:00030100 (word offset) length:00000200 (words)
+':maincpu' (005ACE):possible DMA operation (7abf) (trigger 0001) with params mode:1089 source:30007854 (word offset) dest:00030200 (word offset) length:00000200 (words)
+':maincpu' (005ACE):possible DMA operation (7abf) (trigger 0001) with params mode:1089 source:30007854 (word offset) dest:00030300 (word offset) length:00000200 (words)
+':maincpu' (005ACE):possible DMA operation (7abf) (trigger 0001) with params mode:1089 source:30007854 (word offset) dest:00030400 (word offset) length:00000200 (words)
+
+*/
+
+void full_memory_device::device_config_complete()
+{
+	m_program_config = address_space_config( "program", ENDIANNESS_BIG, 16, 32, -1 );
+}
+
+void full_memory_device::device_start()
+{
+	m_program = &space(AS_PROGRAM);
+}
+
+
 class gcm394_game_state : public driver_device
 {
 public:
@@ -60,12 +143,14 @@ public:
 		m_bank(*this, "cartbank"),
 		m_io_p1(*this, "P1"),
 		m_io_p2(*this, "P2"),
-		m_romregion(*this, "maincpu")
+		m_romregion(*this, "maincpu"),
+		m_memory(*this, "memory")
 	{
 	}
 
 	void base(machine_config &config);
 
+	void cs_map(address_map &map);
 
 protected:
 	virtual void machine_start() override;
@@ -84,6 +169,7 @@ protected:
 	virtual void mem_map_4m(address_map &map);
 
 	required_region_ptr<uint16_t> m_romregion;
+	required_device<full_memory_device> m_memory;
 
 	DECLARE_READ16_MEMBER(porta_r);
 	DECLARE_READ16_MEMBER(portb_r);
@@ -94,11 +180,48 @@ protected:
 	virtual DECLARE_READ16_MEMBER(read_external_space);
 	virtual DECLARE_WRITE16_MEMBER(write_external_space);
 
+	virtual DECLARE_READ16_MEMBER(cs0_r);
+	virtual DECLARE_WRITE16_MEMBER(cs0_w);
+
+
+	DECLARE_READ16_MEMBER(pre_cs_r);
+	DECLARE_WRITE16_MEMBER(pre_cs_w);
+
 private:
 
 	uint32_t m_current_bank;
 	int m_numbanks;
 };
+
+READ16_MEMBER(gcm394_game_state::pre_cs_r)
+{
+	return m_maincpu->space(AS_PROGRAM).read_word(offset);
+}
+
+WRITE16_MEMBER(gcm394_game_state::pre_cs_w)
+{
+	m_maincpu->space(AS_PROGRAM).write_word(offset, data);
+}
+
+
+READ16_MEMBER(gcm394_game_state::cs0_r)
+{
+	printf("cs0_r %04x\n", offset);
+	return 0x0000;
+}
+
+WRITE16_MEMBER(gcm394_game_state::cs0_w)
+{
+	printf("cs0_w %04x %04x\n", offset, data);
+}
+
+
+void gcm394_game_state::cs_map(address_map &map)
+{
+	map(0x000000, 0x02ffff).rw(FUNC(gcm394_game_state::pre_cs_r), FUNC(gcm394_game_state::pre_cs_w));
+	map(0x030000, 0x43ffff).rw(FUNC(gcm394_game_state::cs0_r), FUNC(gcm394_game_state::cs0_w));
+}
+
 
 class wrlshunt_game_state : public gcm394_game_state
 {
@@ -133,12 +256,14 @@ private:
 };
 
 
+
+
 class generalplus_gpac800_game_state : public gcm394_game_state
 {
 public:
 	generalplus_gpac800_game_state(const machine_config& mconfig, device_type type, const char* tag) :
 		gcm394_game_state(mconfig, type, tag),
-		m_mainram(*this, "mainram"),
+	//	m_mainram(*this, "mainram"),
 		m_initial_copy_words(0x2000),
 		m_nandreadbase(0)
 	{
@@ -161,28 +286,48 @@ protected:
 private:
 	void nand_init(int blocksize, int blocksize_stripped);
 
-	required_shared_ptr<u16> m_mainram;
+//	required_shared_ptr<u16> m_mainram;
+	std::vector<uint16_t> m_sdram;
+
 	std::vector<uint8_t> m_strippedrom;
 	int m_strippedsize;
 
 	int m_initial_copy_words;
 	int m_nandreadbase;
 
+	virtual DECLARE_READ16_MEMBER(read_external_space) override;
 	virtual DECLARE_WRITE16_MEMBER(write_external_space) override;
+
+	virtual DECLARE_READ16_MEMBER(cs0_r) override;
+	virtual DECLARE_WRITE16_MEMBER(cs0_w) override;
 };
+
+
+READ16_MEMBER(generalplus_gpac800_game_state::cs0_r)
+{
+	return m_sdram[offset];
+}
+
+WRITE16_MEMBER(generalplus_gpac800_game_state::cs0_w)
+{
+	m_sdram[offset] = data;
+}
 
 READ8_MEMBER(generalplus_gpac800_game_state::read_nand)
 {
 	return m_strippedrom[(offset + m_nandreadbase) & (m_strippedsize - 1)];
 }
 
+READ16_MEMBER(generalplus_gpac800_game_state::read_external_space)
+{
+	//logerror("reading offset %04x\n", offset * 2);
+	return m_memory->get_program()->read_word(offset);
+}
+
+
 WRITE16_MEMBER(generalplus_gpac800_game_state::write_external_space)
 {
-	if (offset < 0x0400000)
-	{
-		m_mainram[offset] = data;
-		//  logerror("DMA writing to external space (RAM?) %08x %04x\n", offset, data);
-	}
+	return m_memory->get_program()->write_word(offset, data);
 }
 
 
@@ -288,6 +433,9 @@ void gcm394_game_state::base(machine_config &config)
 	m_maincpu->mapping_write_callback().set(FUNC(gcm394_game_state::mapping_w));
 	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+
+	
+	FULL_MEMORY(config, m_memory).set_map(&gcm394_game_state::cs_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -419,12 +567,14 @@ void gcm394_game_state::mem_map_4m(address_map &map)
 void wrlshunt_game_state::wrlshunt_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom().region("maincpu", 0); // non-banked area on this SoC?
-	map(0x030000, 0x3fffff).ram().share("mainram");
+	map(0x030000, 0x1fffff).ram().share("mainram");
 }
 
 void generalplus_gpac800_game_state::generalplus_gpac800_map(address_map &map)
 {
-	map(0x000000, 0x3fffff).ram().share("mainram");
+	map(0x008000, 0x027fff).ram(); // internal ROM!
+
+	map(0x030000, 0x43ffff).rw(FUNC(generalplus_gpac800_game_state::cs0_r), FUNC(generalplus_gpac800_game_state::cs0_w));
 }
 
 
@@ -877,6 +1027,9 @@ void generalplus_gpac800_game_state::machine_reset()
 
 void generalplus_gpac800_game_state::nand_init(int blocksize, int blocksize_stripped)
 {
+	m_sdram.resize(0x400000); // 0x400000 bytes, 0x800000 words
+
+
 	uint8_t* rom = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
 
