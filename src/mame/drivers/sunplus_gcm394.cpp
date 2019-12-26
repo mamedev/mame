@@ -156,7 +156,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void switch_bank(uint32_t bank);
 
 	required_device<sunplus_gcm394_base_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -189,8 +188,6 @@ protected:
 
 private:
 
-	uint32_t m_current_bank;
-	int m_numbanks;
 };
 
 READ16_MEMBER(gcm394_game_state::pre_cs_r)
@@ -206,13 +203,12 @@ WRITE16_MEMBER(gcm394_game_state::pre_cs_w)
 
 READ16_MEMBER(gcm394_game_state::cs0_r)
 {
-	printf("cs0_r %04x\n", offset);
-	return 0x0000;
+	return m_romregion[offset & 0x3fffff];
 }
 
 WRITE16_MEMBER(gcm394_game_state::cs0_w)
 {
-	printf("cs0_w %04x %04x\n", offset, data);
+	logerror("cs0_w %04x %04x (to ROM!)\n", offset, data);
 }
 
 
@@ -501,44 +497,18 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 }
 
 
-void gcm394_game_state::switch_bank(uint32_t bank)
-{
-	if (!m_bank)
-		return;
-
-	if (bank != m_current_bank)
-	{
-		m_current_bank = bank;
-		m_bank->set_entry(bank);
-		m_maincpu->invalidate_cache();
-	}
-}
 
 void gcm394_game_state::machine_start()
 {
 	if (m_bank)
 	{
-		int i;
-		for (i = 0; i < (m_romregion.bytes() / 0x800000); i++)
-		{
-			m_bank->configure_entry(i, &m_romregion[i * 0x800000]);
-		}
-
-		m_numbanks = i;
-
+		m_bank->configure_entry(0, &m_romregion[0]);
 		m_bank->set_entry(0);
 	}
-	else
-	{
-		m_numbanks = 0;
-	}
-
-	save_item(NAME(m_current_bank));
 }
 
 void gcm394_game_state::machine_reset()
 {
-	m_current_bank = 0;
 }
 
 
@@ -1046,6 +1016,9 @@ void generalplus_gpac800_game_state::machine_reset()
 	internal[0x7ffd] = 0x6ffa;
 	internal[0x7ffe] = 0x6ffc;
 	internal[0x7fff] = 0x6ffe;
+
+	internal[0x8000] = 0xb00b;
+
 
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 }

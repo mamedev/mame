@@ -642,8 +642,12 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 	map(0x007c00, 0x007dff).rw(m_spg_audio, FUNC(sunplus_gcm394_audio_device::audio_r), FUNC(sunplus_gcm394_audio_device::audio_w));
 	map(0x007e00, 0x007fff).rw(m_spg_audio, FUNC(sunplus_gcm394_audio_device::audio_phase_r), FUNC(sunplus_gcm394_audio_device::audio_phase_w));
 
-	map(0x08000, 0x27fff).rom().region("internal", 0);
+	// 128kwords internal ROM
+	map(0x08000, 0x0ffff).rom().region("internal", 0); // lower 32kwords of internal ROM is visible / shadowed depending on boot pins and register
+	map(0x10000, 0x27fff).rom().region("internal", 0x10000); // upper 96kwords of internal ROM is always visible
 	map(0x28000, 0x2ffff).noprw(); // reserved
+
+	// 0x30000+ is CS access
 
 }
 

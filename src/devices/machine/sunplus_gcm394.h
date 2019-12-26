@@ -32,13 +32,15 @@ public:
 		m_screen(*this, finder_base::DUMMY_TAG),
 		m_spg_video(*this, "spgvideo"),
 		m_spg_audio(*this, "spgaudio"),
+		m_internalrom(*this, "internal"),
 		m_porta_in(*this),
 		m_portb_in(*this),
 		m_porta_out(*this),
 		m_nand_read_cb(*this),
 		m_space_read_cb(*this),
 		m_space_write_cb(*this),
-		m_mapping_write_cb(*this)
+		m_mapping_write_cb(*this),
+		m_boot_mode(0)
 	{
 	}
 
@@ -59,6 +61,8 @@ public:
 
 	virtual void device_add_mconfig(machine_config& config) override;
 
+	void set_bootmode(int mode) { m_boot_mode = mode; }
+
 	IRQ_CALLBACK_MEMBER(irq_vector_cb);
 
 protected:
@@ -71,6 +75,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<gcm394_video_device> m_spg_video;
 	required_device<sunplus_gcm394_audio_device> m_spg_audio;
+	required_memory_region m_internalrom;
 
 	devcb_read16 m_porta_in;
 	devcb_read16 m_portb_in;
@@ -267,6 +272,8 @@ private:
 	uint32_t m_gfxregionsize;
 	uint16_t read_space(uint32_t offset);
 
+	// config registers (external pins)
+	int m_boot_mode; // 2 pins determine boot mode, likely only read at power-on
 };
 
 
