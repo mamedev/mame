@@ -1565,14 +1565,6 @@ u32 jaguardsp_cpu_device::ctrl_r(offs_t offset)
 		logerror("DSP read register @ F1A1%02X\n", offset * 4);
 
 	return m_io->read_dword(offset*4);
-#if 0
-	/* switch to the target context */
-	u32 res = m_ctrl[offset];
-	if (offset == D_CTRL)
-		res |= (m_version & 0xf) << 12;
-
-	return res;
-#endif
 }
 
 
