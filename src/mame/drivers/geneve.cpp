@@ -513,6 +513,8 @@ READ8_MEMBER( geneve_state::memread )
 	offs_t dramadd;
 	offs_t pboxadd;
 	offs_t addr13 = offset & 0x1fff;
+	// For debugging
+	int page = m_gatearray->get_prefix(FULLGNM) >> 13;
 
 	if (machine().side_effects_disabled())
 	{
@@ -528,7 +530,7 @@ READ8_MEMBER( geneve_state::memread )
 	if (m_gatearray->csr_out()==ASSERT_LINE)
 	{
 		value = m_video->read((offset>>1)&3);   // M1=A13, M0=A14
-		LOGMASKED(LOG_READ, "Read video %04x -> %02x\n", offset, value);
+		LOGMASKED(LOG_READ, "Video %04x -> %02x\n", offset, value);
 	}
 
 	// All of the following parts are accessed in parallel and can set the
@@ -555,7 +557,7 @@ READ8_MEMBER( geneve_state::memread )
 		else
 			value |= ((offset & 0x001f)+1) & 0xf0;
 
-		LOGMASKED(LOG_READ, "Read clock %04x -> %02x\n", offset, value);
+		LOGMASKED(LOG_READ, "Clock %04x -> %02x\n", offset, value);
 	}
 
 	// DRAM (also for GROM simulator)
@@ -565,9 +567,10 @@ READ8_MEMBER( geneve_state::memread )
 	{
 		dramadd = m_gatearray->get_dram_address();
 		value = m_dram->pointer()[dramadd];
+		int dpage = dramadd >> 13;
 
 		const char* ramtype = (m_gatearray->accessing_grom())? "GROM" : "DRAM";
-		LOGMASKED(LOG_READ, "Read %s %04x (%06x) -> %02x\n", ramtype, offset, dramadd, value);
+		LOGMASKED(LOG_READ, "%s %02x:%04x -> %02x\n", ramtype, dpage, addr13, value);
 	}
 
 	// Boot ROM or PFM (normal and Genmod)
@@ -579,7 +582,7 @@ READ8_MEMBER( geneve_state::memread )
 	{
 		sramadd = m_gatearray->get_prefix(AB1 | AB2) | addr13;
 		value = m_sram->pointer()[sramadd];
-		LOGMASKED(LOG_READ, "Read SRAM %04x (%04x) -> %02x\n", offset, sramadd, value);
+		LOGMASKED(LOG_READ, "SRAM %02x:%04x -> %02x\n", page, addr13, value);
 	}
 
 	// Expanded SRAM 32K (not in Genmod)
@@ -591,10 +594,10 @@ READ8_MEMBER( geneve_state::memread )
 			{
 				sramadd = m_gatearray->get_prefix(AB1 | AB2) | addr13;
 				value = m_sramx->pointer()[sramadd];
-				LOGMASKED(LOG_READ, "Read SRAMX %04x (%04x) -> %02x\n", offset, sramadd, value);
+				LOGMASKED(LOG_READ, "SRAMX %02x:%04x -> %02x\n", page, addr13, value);
 			}
 			else
-				LOGMASKED(LOG_WARN, "Access to SRAMX %04x, but no SRAM expansion available\n", offset);
+				LOGMASKED(LOG_WARN, "Access to SRAMX page %02x, but no SRAM expansion available\n", page);
 		}
 	}
 
@@ -605,7 +608,7 @@ READ8_MEMBER( geneve_state::memread )
 		pboxadd = m_gatearray->get_prefix(m_genmod? FULLGNM : FULLGEN) | addr13;
 		m_peribox->readz(pboxadd, &value);
 		m_peribox->memen_in(CLEAR_LINE);
-		LOGMASKED(LOG_READ, "Read P-Box [%s] %04x (%06x) -> %02x\n", m_genmod? "GeM" : "Gen", offset, pboxadd, value);
+		LOGMASKED(LOG_READ, "PEB %02x:%04x -> %02x\n", page, addr13, value);
 	}
 
 	// In case we had a debugger read, reset the flag.
@@ -621,6 +624,8 @@ WRITE8_MEMBER( geneve_state::memwrite )
 	offs_t pboxadd = 0;
 
 	offs_t addr13 = offset & 0x1fff;
+	// For debugging
+	int page = m_gatearray->get_prefix(FULLGNM) >> 13;
 
 	if (machine().side_effects_disabled())
 	{
@@ -633,13 +638,13 @@ WRITE8_MEMBER( geneve_state::memwrite )
 
 		// The debugger does not call setaddress, so we do it here
 		// Also, the decode result is replaced by the debugger version
-		setaddress_debug(true, offset, 0);
+		setaddress_debug(true, addr13, 0);
 	}
 
 	// Video write (never by debugger)
 	if (m_gatearray->csw_out()==ASSERT_LINE)
 	{
-		LOGMASKED(LOG_WRITE, "Write video %04x <- %02x\n", offset, data);
+		LOGMASKED(LOG_WRITE, "Video %04x <- %02x\n", offset, data);
 		m_video->write((offset>>1)&3, data);   // M1=A13, M0=A14
 	}
 
@@ -650,7 +655,7 @@ WRITE8_MEMBER( geneve_state::memwrite )
 	// Clock
 	if (m_gatearray->rtcen_out()==ASSERT_LINE)
 	{
-		LOGMASKED(LOG_WRITE, "Write clock %04x <- %02x\n", offset, data);
+		LOGMASKED(LOG_WRITE, "Clock %04x <- %02x\n", offset, data);
 		m_rtc->write(offset & 0x000f, data);
 	}
 
@@ -665,14 +670,14 @@ WRITE8_MEMBER( geneve_state::memwrite )
 			dramadd = m_gatearray->get_dram_address();
 			m_dram->pointer()[dramadd] = data;
 			const char* ramtype = (m_gatearray->accessing_grom())? "GROM" : "DRAM";
-			LOGMASKED(LOG_WRITE, "Write %s %04x (%06x) <- %02x\n", ramtype, offset, dramadd, data);
+			LOGMASKED(LOG_WRITE, "%s %02x:%04x <- %02x\n", ramtype, page, addr13, data);
 		}
 	}
 
 	// Sound
 	if (m_gatearray->snden_out()==ASSERT_LINE)
 	{
-		LOGMASKED(LOG_WRITE, "Write sound <- %02x\n", data);
+		LOGMASKED(LOG_WRITE, "Sound %04x <- %02x\n", offset, data);
 		m_sound->write(data);
 	}
 
@@ -684,7 +689,7 @@ WRITE8_MEMBER( geneve_state::memwrite )
 	if (m_gatearray->ramen_out()==ASSERT_LINE)
 	{
 		sramadd = m_gatearray->get_prefix(AB1 | AB2) | addr13;
-		LOGMASKED(LOG_WRITE, "Write SRAM %04x (%04x) <- %02x\n", offset, sramadd, data);
+		LOGMASKED(LOG_WRITE, "SRAM %02x:%04x <- %02x\n", page, addr13, data);
 		m_sram->pointer()[sramadd] = data;
 	}
 
@@ -696,11 +701,11 @@ WRITE8_MEMBER( geneve_state::memwrite )
 			if (m_sram_exp)
 			{
 				sramadd = m_gatearray->get_prefix(AB1 | AB2) | addr13;
-				LOGMASKED(LOG_WRITE, "Write SRAMX %04x (%04x) <- %02x\n", offset, sramadd, data);
+				LOGMASKED(LOG_WRITE, "SRAMX %02x:%04x <- %02x\n", page, addr13, data);
 				m_sramx->pointer()[sramadd] = data;
 			}
 			else
-				LOGMASKED(LOG_WARN, "Access to SRAMX %04x, but no SRAM expansion available\n", offset);
+				LOGMASKED(LOG_WARN, "Access to SRAMX page %02x, but no SRAM expansion available\n", page);
 		}
 	}
 
@@ -709,7 +714,7 @@ WRITE8_MEMBER( geneve_state::memwrite )
 		|| (!m_genmod && m_gatearray->dben_out()==ASSERT_LINE))
 	{
 		pboxadd = m_gatearray->get_prefix(m_genmod? FULLGNM : FULLGEN) | addr13;
-		LOGMASKED(LOG_WRITE, "Write P-Box [%s] %04x (%06x) <- %02x\n", m_genmod? "GeM" : "Gen", offset, pboxadd, data);
+		LOGMASKED(LOG_WRITE, "PEB %02x:%04x <- %02x\n", page, addr13, data);
 		m_peribox->write(pboxadd, data);
 		m_peribox->memen_in(CLEAR_LINE);
 	}
@@ -748,31 +753,32 @@ void geneve_state::read_eprom_or_pfm(offs_t offset, uint8_t& value)
 {
 	int pfmaddress;
 	offs_t addr13 = offset & 0x1fff;
+	int page = m_gatearray->get_prefix(FULLGNM) >> 13;
 
 	switch (m_boot_rom)
 	{
 	case GENEVE_EPROM:
 		// Mirrors at pages F0, F2, F4,... FE, and F1, F3, ... FF.
 		value = m_eprom[addr13 | m_gatearray->get_prefix(AB2)];
-		LOGMASKED(LOG_READ, "Read EPROM %04x -> %02x\n", offset, value);
+		LOGMASKED(LOG_READ, "EPROM %02x:%04x -> %02x\n", page, addr13, value);
 		break;
 	case GENEVE_PFM512:
 		pfmaddress = addr13 | m_gatearray->get_prefix(AMA | AB0 | AB1 | AB2) | m_pfm_prefix;
 		if (m_pfm_oe)
 		{
 			value = m_pfm512->read(pfmaddress);
-			LOGMASKED(LOG_PFM, "PFM %05x -> %02x\n", pfmaddress, value);
+			LOGMASKED(LOG_PFM, "PFM %02x:%04x -> %02x\n", page, addr13, value);
 		}
-		else LOGMASKED(LOG_PFM, "PFM %05x disabled\n", pfmaddress);
+		else LOGMASKED(LOG_PFM, "PFM512 disabled\n");
 		break;
 	case GENEVE_PFM512A:
 		pfmaddress = addr13 | m_gatearray->get_prefix(AMA | AB0 | AB1 | AB2) | m_pfm_prefix;
 		if (m_pfm_oe)
 		{
 			value = m_pfm512a->read(pfmaddress);
-			LOGMASKED(LOG_PFM, "PFM %05x -> %02x\n", pfmaddress, value);
+			LOGMASKED(LOG_PFM, "PFM %02x:%04x -> %02x\n", page, addr13, value);
 		}
-		else LOGMASKED(LOG_PFM, "PFM %05x disabled\n", pfmaddress);
+		else LOGMASKED(LOG_PFM, "PFM512a disabled\n");
 		break;
 	default:
 		LOGMASKED(LOG_WARN, "Illegal mode for reading boot ROM: %d\n", m_boot_rom);
@@ -785,19 +791,20 @@ void geneve_state::write_pfm(offs_t offset, uint8_t data)
 	// of the 9995 will attempt to write the return vector into the flash EEPROM
 	offs_t addr13 = offset & 0x1fff;
 	int pfmaddress = addr13 | m_gatearray->get_prefix(AMA | AB0 | AB1 | AB2) | m_pfm_prefix;
+	int page = m_gatearray->get_prefix(FULLGNM) >> 13;
 
 	switch (m_boot_rom)
 	{
 	case GENEVE_EPROM:
-		LOGMASKED(LOG_WARN, "Write to EPROM at %05x ignored\n");
+		LOGMASKED(LOG_WARN, "Write to EPROM at %02x:%04x ignored\n", page, addr13);
 		break;
 	case GENEVE_PFM512:
 		m_pfm512->write(pfmaddress, data);
-		LOGMASKED(LOG_PFM, "PFM %05x <- %02x\n", pfmaddress, data);
+		LOGMASKED(LOG_PFM, "PFM %02x:%04x <- %02x\n", page, addr13, data);
 		break;
 	case GENEVE_PFM512A:
 		m_pfm512a->write(pfmaddress, data);
-		LOGMASKED(LOG_PFM, "PFM %05x <- %02x\n", pfmaddress, data);
+		LOGMASKED(LOG_PFM, "PFMa %02x:%04x <- %02x\n", page, addr13, data);
 		break;
 	default:
 		LOGMASKED(LOG_WARN, "Illegal mode for writing to PFM: %d\n", m_boot_rom);

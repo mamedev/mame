@@ -753,6 +753,15 @@ void geneve_gate_array_device::decode_physical(geneve_gate_array_device::decdata
 	{
 		if (dec->function == MLGROM)
 		{
+			// If map byte 6 is not set to 03, ignore the access
+			// This seems to be a safety feature, or a glitch in the design
+			// of the Gate array.
+			if (m_map[6] != 0x03)
+			{
+				dec->function = MUNDEF;
+				return;
+			}
+
 			// GROM is actually DRAM; substitute the address and update the address counter
 			// The page has already been set in get_page
 			LOGMASKED(LOG_GROM, "GROM address = %04x\n", m_grom_address);
