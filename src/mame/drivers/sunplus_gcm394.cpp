@@ -442,15 +442,6 @@ READ16_MEMBER(gcm394_game_state::portb_r)
 WRITE16_MEMBER(gcm394_game_state::porta_w)
 {
 	logerror("%s: Port A:WRITE %04x\n", machine().describe_context(), data);
-	
-	// HACK
-	address_space& mem = m_maincpu->space(AS_PROGRAM);
-
-	printf("%08x\n", mem.read_word(0x5b354));
-
-	if (mem.read_word(0x5b354) == 0xafd0)  	// wrlshubt - skip check (EEPROM?)
-		mem.write_word(0x5b354, 0xB403);
-
 }
 
 
@@ -507,6 +498,11 @@ READ16_MEMBER(wrlshunt_game_state::hunt_porta_r)
 WRITE16_MEMBER(wrlshunt_game_state::hunt_porta_w)
 {
 	logerror("%s: Port A:WRITE %04x\n", machine().describe_context(), data);
+
+	// HACK
+	address_space& mem = m_maincpu->space(AS_PROGRAM);
+	if (mem.read_word(0x5b354) == 0xafd0)  	// wrlshubt - skip check (EEPROM?)
+		mem.write_word(0x5b354, 0xB403);
 }
 
 
