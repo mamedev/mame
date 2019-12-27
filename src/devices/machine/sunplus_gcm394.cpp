@@ -33,6 +33,10 @@ generalplus_gpac800_device::generalplus_gpac800_device(const machine_config &mco
 {
 }
 
+void sunplus_gcm394_base_device::default_cs_callback(int base, uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4)
+{
+	printf("callback not hooked\n");
+}
 
 
 // **************************************** SYSTEM DMA device *************************************************
@@ -216,7 +220,8 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::membankswitch_7810_w)
 //	if (m_membankswitch_7810 != data)
 //	LOGMASKED(LOG_GCM394,"%s:sunplus_gcm394_base_device::membankswitch_7810_w %04x\n", machine().describe_context(), data);
 
-	popmessage("bankswitch %04x -> %04x", m_membankswitch_7810, data);
+	if (m_membankswitch_7810 != data)
+		popmessage("bankswitch %04x -> %04x", m_membankswitch_7810, data);
 
 	m_membankswitch_7810 = data;
 }
@@ -248,6 +253,9 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::chipselect_csx_memory_device_control_
 	int cs_size  = (data & 0xff00)>>8;
 
 	logerror("CS%d set to size: %02x (%08x words) md: %01x %s   warat: %01x wait: %01x\n", offset, cs_size, (cs_size+1)*0x10000, cs_md, md[cs_md], cs_warat, cs_wait);
+
+
+	m_cs_callback(m_csbase, m_782x[0], m_782x[1], m_782x[2], m_782x[3], m_782x[4]);
 
 }
 
@@ -765,10 +773,13 @@ void sunplus_gcm394_base_device::device_start()
 {
 	unsp_20_device::device_start();
 
+	m_cs_callback.resolve();
+
 	m_porta_in.resolve_safe(0);
 	m_portb_in.resolve_safe(0);
 
 	m_porta_out.resolve();
+
 
 
 	m_space_read_cb.resolve_safe(0);

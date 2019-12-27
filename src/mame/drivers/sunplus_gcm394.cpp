@@ -155,6 +155,7 @@ public:
 	virtual DECLARE_READ16_MEMBER(cs0_r);
 	virtual DECLARE_WRITE16_MEMBER(cs0_w);
 
+	void cs_callback(int base, uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4);
 
 protected:
 	virtual void machine_start() override;
@@ -188,7 +189,6 @@ protected:
 	DECLARE_WRITE16_MEMBER(pre_cs_w);
 
 private:
-
 };
 
 READ16_MEMBER(gcm394_game_state::pre_cs_r)
@@ -224,41 +224,6 @@ void gcm394_game_state::mem_map_4m_base(address_map &map)
 	/*  0x000000  0x01ffff - internal area */
 	map(0x020000, 0x3fffff).rw(FUNC(gcm394_game_state::cs0_r), FUNC(gcm394_game_state::cs0_w));
 }
-
-
-class wrlshunt_game_state : public gcm394_game_state
-{
-public:
-	wrlshunt_game_state(const machine_config& mconfig, device_type type, const char* tag) :
-		gcm394_game_state(mconfig, type, tag),
-		m_mapping(0),
-		m_mainram(*this, "mainram")
-	{
-	}
-
-	void wrlshunt(machine_config &config);
-
-protected:
-	//virtual void machine_start() override;
-	//virtual void machine_reset() override;
-
-	void wrlshunt_map(address_map &map);
-
-
-private:
-
-	DECLARE_READ16_MEMBER(hunt_porta_r);
-	DECLARE_WRITE16_MEMBER(hunt_porta_w);
-
-	virtual DECLARE_WRITE16_MEMBER(mapping_w) override;
-	uint16_t m_mapping;
-
-	required_shared_ptr<u16> m_mainram;
-
-	virtual DECLARE_READ16_MEMBER(read_external_space) override;
-	virtual DECLARE_WRITE16_MEMBER(write_external_space) override;
-};
-
 
 
 
@@ -307,6 +272,43 @@ private:
 	virtual DECLARE_READ16_MEMBER(cs0_r) override;
 	virtual DECLARE_WRITE16_MEMBER(cs0_w) override;
 };
+
+
+
+class wrlshunt_game_state : public generalplus_gpac800_game_state
+{
+public:
+	wrlshunt_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		generalplus_gpac800_game_state(mconfig, type, tag),
+		m_mapping(0),
+		m_mainram(*this, "mainram")
+	{
+	}
+
+	void wrlshunt(machine_config &config);
+
+protected:
+	//virtual void machine_start() override;
+	//virtual void machine_reset() override;
+
+	void wrlshunt_map(address_map &map);
+
+
+private:
+
+	DECLARE_READ16_MEMBER(hunt_porta_r);
+	DECLARE_WRITE16_MEMBER(hunt_porta_w);
+
+	virtual DECLARE_WRITE16_MEMBER(mapping_w) override;
+	uint16_t m_mapping;
+
+	required_shared_ptr<u16> m_mainram;
+
+	virtual DECLARE_READ16_MEMBER(read_external_space) override;
+	virtual DECLARE_WRITE16_MEMBER(write_external_space) override;
+};
+
+
 
 void generalplus_gpac800_game_state::cs_map_gpac800(address_map &map)
 {
@@ -452,7 +454,8 @@ void gcm394_game_state::base(machine_config &config)
 	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 	m_maincpu->set_bootmode(1); // boot from external ROM / CS mirror
-	
+	m_maincpu->set_cs_config_callback(FUNC(gcm394_game_state::cs_callback));
+
 	FULL_MEMORY(config, m_memory).set_map(&gcm394_game_state::cs_map_base);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -483,17 +486,6 @@ WRITE16_MEMBER(wrlshunt_game_state::hunt_porta_w)
 }
 
 
-void wrlshunt_game_state::wrlshunt(machine_config &config)
-{
-	gcm394_game_state::base(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &wrlshunt_game_state::wrlshunt_map);
-
-	m_maincpu->porta_in().set(FUNC(wrlshunt_game_state::hunt_porta_r));
-	m_maincpu->porta_out().set(FUNC(wrlshunt_game_state::hunt_porta_w));
-
-	m_screen->set_size(320*2, 262*2);
-	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
-}
 
 void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 {
@@ -509,6 +501,7 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 	m_maincpu->set_bootmode(0); // boot from internal ROM (NAND bootstrap)
+	m_maincpu->set_cs_config_callback(FUNC(gcm394_game_state::cs_callback));
 
 	m_maincpu->nand_read_callback().set(FUNC(generalplus_gpac800_game_state::read_nand));
 
@@ -525,6 +518,17 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 }
 
+void wrlshunt_game_state::wrlshunt(machine_config &config)
+{
+	generalplus_gpac800_game_state::generalplus_gpac800(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wrlshunt_game_state::wrlshunt_map);
+
+	m_maincpu->porta_in().set(FUNC(wrlshunt_game_state::hunt_porta_r));
+	m_maincpu->porta_out().set(FUNC(wrlshunt_game_state::hunt_porta_w));
+
+	m_screen->set_size(320*2, 262*2);
+	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
+}
 
 
 void gcm394_game_state::machine_start()
@@ -565,6 +569,13 @@ void wrlshunt_game_state::wrlshunt_map(address_map &map)
 	map(0x000000, 0x00ffff).rom().region("maincpu", 0); // non-banked area on this SoC?
 	map(0x030000, 0x1fffff).ram().share("mainram");
 }
+
+
+void gcm394_game_state::cs_callback(int base, uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4)
+{
+	printf("gcm394_game_state::cs_callback   callback not hooked\n");
+}
+
 
 
 static INPUT_PORTS_START( gcm394 )
@@ -1000,6 +1011,10 @@ void generalplus_gpac800_game_state::machine_reset()
 {
 	m_memory->get_program()->unmap_readwrite(0x030000, 0x42ffff);
 	m_memory->get_program()->install_readwrite_handler( 0x030000, 0x42ffff, read16_delegate(*this, FUNC(gcm394_game_state::cs0_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs0_w)));
+
+	// up to 256 pages (16384kw) for each space
+
+	// (size of cs0 + cs1 + cs2 + cs3 + cs4) <= 81920kwords
 
 	// simulate bootstrap / internal ROM
 

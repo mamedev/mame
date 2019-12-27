@@ -17,6 +17,7 @@
 #include "sunplus_gcm394_video.h"
 #include "spg2xx_audio.h"
 
+typedef device_delegate<void (int, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)> sunplus_gcm394_cs_callback_device;
 
 class sunplus_gcm394_base_device : public unsp_20_device, public device_mixer_interface
 {
@@ -37,10 +38,12 @@ public:
 		m_portb_in(*this),
 		m_porta_out(*this),
 		m_nand_read_cb(*this),
+		m_csbase(0x20000),
 		m_space_read_cb(*this),
 		m_space_write_cb(*this),
 		m_mapping_write_cb(*this),
-		m_boot_mode(0)
+		m_boot_mode(0),
+		m_cs_callback(*this, DEVICE_SELF, FUNC(sunplus_gcm394_base_device::default_cs_callback))
 	{
 	}
 
@@ -64,6 +67,8 @@ public:
 	void set_bootmode(int mode) { m_boot_mode = mode; }
 
 	IRQ_CALLBACK_MEMBER(irq_vector_cb);
+	template <typename... T> void set_cs_config_callback(T &&... args) { m_cs_callback.set(std::forward<T>(args)...); }
+	void default_cs_callback(int base, uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4 );
 
 protected:
 
@@ -148,6 +153,7 @@ protected:
 	uint16_t m_7961;
 
 	devcb_read16 m_nand_read_cb;
+	int m_csbase;
 
 	DECLARE_READ16_MEMBER(internalrom_lower32_r);
 
@@ -277,6 +283,8 @@ private:
 
 	// config registers (external pins)
 	int m_boot_mode; // 2 pins determine boot mode, likely only read at power-on
+	sunplus_gcm394_cs_callback_device m_cs_callback;
+
 };
 
 
@@ -304,6 +312,7 @@ public:
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
 		m_testval = 0;
+		m_csbase = 0x30000;
 	}
 
 	generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
