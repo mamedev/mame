@@ -15,13 +15,13 @@
     for disciple, must use matching rom/system disk versions:
     v2 rom -> system disk/system tape ver 2, 2b, 2c
     v3 rom -> system disk/system tape ver 3a, 3b or 3d
-	
-	for plusd, must use matching rom/system disk versions:
+
+    for plusd, must use matching rom/system disk versions:
     v1  rom -> system disk/system tape ver 1
     v1a rom -> system disk/system tape ver 2a
 -->
 
-<softwarelist name="spectrum_mgt_flop" description="ZX Spectrum MGT Disciple/Plus D disks">
+<softwarelist name="spectrum_mgt_flop" description="ZX Spectrum MGT DISCiPLE/+D disks">
 	<software name="plusdsys">
 		<description>Plus D System Disk v2a</description>
 		<year>1986</year>

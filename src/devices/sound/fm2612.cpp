@@ -1697,21 +1697,16 @@ static inline void CSMKeyControll(fm2612_FM_OPN *OPN, fm2612_FM_CH *CH)
 /* FM channel save , internal state only */
 static void FMsave_state_channel(device_t *device,fm2612_FM_CH *CH,int num_ch)
 {
-	int slot , ch;
+	/* channel */
+	device->save_pointer(STRUCT_MEMBER(CH, op1_out), num_ch);
+	device->save_pointer(STRUCT_MEMBER(CH, fc), num_ch);
 
-	for(ch=0;ch<num_ch;ch++,CH++)
+	/* slots */
+	for(int ch=0;ch<num_ch;ch++,CH++)
 	{
-		/* channel */
-		device->save_item(NAME(CH->op1_out), ch);
-		device->save_item(NAME(CH->fc), ch);
-		/* slots */
-		for(slot=0;slot<4;slot++)
-		{
-			fm2612_FM_SLOT *SLOT = &CH->SLOT[slot];
-			device->save_item(NAME(SLOT->phase), ch * 4 + slot);
-			device->save_item(NAME(SLOT->state), ch * 4 + slot);
-			device->save_item(NAME(SLOT->volume), ch * 4 + slot);
-		}
+		device->save_item(STRUCT_MEMBER(CH->SLOT, phase), ch);
+		device->save_item(STRUCT_MEMBER(CH->SLOT, state), ch);
+		device->save_item(STRUCT_MEMBER(CH->SLOT, volume), ch);
 	}
 }
 

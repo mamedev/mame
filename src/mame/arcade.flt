@@ -149,6 +149,7 @@ blockhl.cpp
 blockout.cpp
 blocktax.cpp
 bloodbro.cpp
+bloodbro_ms.cpp
 blstroid.cpp
 blueprnt.cpp
 bmcbowl.cpp
@@ -207,8 +208,10 @@ cdi.cpp
 cedar_magnet.cpp
 centiped.cpp
 cesclass.cpp
+cgang.cpp
 chaknpop.cpp
 cham24.cpp
+chameleonrx1.cpp
 champbas.cpp
 champbwl.cpp
 chanbara.cpp
@@ -321,6 +324,7 @@ destroyr.cpp
 dfruit.cpp
 dgpix.cpp
 dietgo.cpp
+dinoking.cpp
 discoboy.cpp
 divebomb.cpp
 diverboy.cpp
@@ -621,6 +625,7 @@ kncljoe.cpp
 koftball.cpp
 koikoi.cpp
 konamigq.cpp
+konamigs.cpp
 konamigv.cpp
 konamigx.cpp
 konamim2.cpp
@@ -991,6 +996,7 @@ r2dtank.cpp
 r2dx_v33.cpp
 rabbit.cpp
 raiden.cpp
+raiden_ms.cpp
 raiden2.cpp
 rallyx.cpp
 rampart.cpp
@@ -1109,6 +1115,7 @@ shtzone.cpp
 shuuz.cpp
 sidearms.cpp
 sidepckt.cpp
+sigma21.cpp
 sigmab52.cpp
 sigmab98.cpp
 silkroad.cpp
@@ -1224,6 +1231,7 @@ suprridr.cpp
 suprslam.cpp
 supstarf.cpp
 surpratk.cpp
+sweetland.cpp
 system1.cpp
 system16.cpp
 tagteam.cpp
@@ -1426,6 +1434,7 @@ zaxxon.cpp
 zerozone.cpp
 zn.cpp
 zodiack.cpp
+zpinball.cpp
 zr107.cpp
 zwackery.cpp
 //exceptions + to add - to remove from imported list

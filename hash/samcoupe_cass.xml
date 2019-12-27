@@ -25,7 +25,7 @@
 	</software>
 	<!-- extracted from covertape of Crash magazine issue 92 (the full game was never released) -->
 	<software name="f16demo">
-		<description>F-16 Combat Pilot (Demo)</description>
+		<description>F-16 Combat Pilot (demo)</description>
 		<year>1991</year>
 		<publisher>Digital Integration</publisher>
 		<part name="cass" interface="samcoupe_cass">

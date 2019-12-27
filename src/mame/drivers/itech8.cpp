@@ -16,7 +16,7 @@
         * Golden Tee Golf II [3 sets]
         * Slick Shot [3 sets]
         * Dyno-Bop
-        * Arlington Horse Racing
+        * Arlington Horse Racing [2 sets]
         * Neck & Neck
         * Peggle [2 sets]
         * Poker Dice
@@ -2348,44 +2348,44 @@ ROM_START( pokrdice )
 ROM_END
 
 
-ROM_START( hstennis )
+ROM_START( hstennis ) /* PCB  p/n 1030 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tenbim.v11", 0x00000, 0x10000, CRC(faffab5c) SHA1(4de525f6adb16205c47788b78aecdebd57008295) )
+	ROM_LOAD( "ten.bim_v1.1_u5.u5", 0x00000, 0x10000, CRC(faffab5c) SHA1(4de525f6adb16205c47788b78aecdebd57008295) ) /* labeled as TEN.BIM V1.1 (U5) */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "tensnd.v1", 0x08000, 0x8000, CRC(f034a694) SHA1(3540e2edff2ce47504260ec856bab9b638d9260d) )
+	ROM_LOAD( "tensnd.bim_v1_u27.u27", 0x08000, 0x8000, CRC(f034a694) SHA1(3540e2edff2ce47504260ec856bab9b638d9260d) ) /* labeled as TENSND.BIM V1 U27 */
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "grom0.bin", 0x00000, 0x20000, CRC(1e69ebae) SHA1(a32e2c2f4e4a527ae6b57adeccd2c4d2045ab5fe) )
-	ROM_LOAD( "grom1.bin", 0x20000, 0x20000, CRC(4e6a22d5) SHA1(3c2d51dd874f61c0a557ea2c1968afa02d9bfc42) )
-	ROM_LOAD( "grom2.bin", 0x40000, 0x20000, CRC(c0b643a9) SHA1(d240f703a55c39ce4a969612fbb9cd76e4b849ac) )
-	ROM_LOAD( "grom3.bin", 0x60000, 0x20000, CRC(54afb456) SHA1(0a7f10b1a490825a85489ac3f678eb1e11a0ac65) )
-	ROM_LOAD( "grom4.bin", 0x80000, 0x20000, CRC(ee09d645) SHA1(8233cfbd17d9de548ae3ca5e30928061712e0781) )
+	ROM_LOAD( "t_grom0.bim.grom0", 0x00000, 0x20000, CRC(1e69ebae) SHA1(a32e2c2f4e4a527ae6b57adeccd2c4d2045ab5fe) ) /* labeled as T GROM0.BIM, ect... */
+	ROM_LOAD( "t_grom1.bim.grom1", 0x20000, 0x20000, CRC(4e6a22d5) SHA1(3c2d51dd874f61c0a557ea2c1968afa02d9bfc42) )
+	ROM_LOAD( "t_grom2.bim.grom2", 0x40000, 0x20000, CRC(c0b643a9) SHA1(d240f703a55c39ce4a969612fbb9cd76e4b849ac) )
+	ROM_LOAD( "t_grom3.bim.grom3", 0x60000, 0x20000, CRC(54afb456) SHA1(0a7f10b1a490825a85489ac3f678eb1e11a0ac65) )
+	ROM_LOAD( "t_grom4.bim.grom4", 0x80000, 0x20000, CRC(ee09d645) SHA1(8233cfbd17d9de548ae3ca5e30928061712e0781) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "srom0.bin", 0x00000, 0x20000, CRC(d9ce58c3) SHA1(92574e60497d86b8608fba6278ccfc9036cb7f22) )
+	ROM_LOAD( "tennis.vr_srom0.srom0", 0x00000, 0x20000, CRC(d9ce58c3) SHA1(92574e60497d86b8608fba6278ccfc9036cb7f22) ) /* labeled as TENNIS.VR SROM0 */
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16l8-itvs.u11", 0x0000, 0x0104, CRC(fee03727) SHA1(e784ff18505cdccc1020dbe5cb0e7cc9efc068a4) )
 ROM_END
 
 
-ROM_START( hstennis10 )
+ROM_START( hstennis10 ) /* PCB  p/n 1030 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tenbim.v10", 0x00000, 0x10000, CRC(d108a6e0) SHA1(1041e1d95b10245fc50f6484e710803db2706f9a) )
+	ROM_LOAD( "ten.bim_v1.0_u5.u5", 0x00000, 0x10000, CRC(d108a6e0) SHA1(1041e1d95b10245fc50f6484e710803db2706f9a) ) /* labeled as TEN.BIM V1.0 (U5) */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "tensnd.v1", 0x08000, 0x8000, CRC(f034a694) SHA1(3540e2edff2ce47504260ec856bab9b638d9260d) )
+	ROM_LOAD( "tensnd.bim_v1_u27.u27", 0x08000, 0x8000, CRC(f034a694) SHA1(3540e2edff2ce47504260ec856bab9b638d9260d) ) /* labeled as TENSND.BIM V1 U27 */
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "grom0.bin", 0x00000, 0x20000, CRC(1e69ebae) SHA1(a32e2c2f4e4a527ae6b57adeccd2c4d2045ab5fe) )
-	ROM_LOAD( "grom1.bin", 0x20000, 0x20000, CRC(4e6a22d5) SHA1(3c2d51dd874f61c0a557ea2c1968afa02d9bfc42) )
-	ROM_LOAD( "grom2.bin", 0x40000, 0x20000, CRC(c0b643a9) SHA1(d240f703a55c39ce4a969612fbb9cd76e4b849ac) )
-	ROM_LOAD( "grom3.bin", 0x60000, 0x20000, CRC(54afb456) SHA1(0a7f10b1a490825a85489ac3f678eb1e11a0ac65) )
-	ROM_LOAD( "grom4.bin", 0x80000, 0x20000, CRC(ee09d645) SHA1(8233cfbd17d9de548ae3ca5e30928061712e0781) )
+	ROM_LOAD( "t_grom0.bim.grom0", 0x00000, 0x20000, CRC(1e69ebae) SHA1(a32e2c2f4e4a527ae6b57adeccd2c4d2045ab5fe) ) /* labeled as T GROM0.BIM, ect... */
+	ROM_LOAD( "t_grom1.bim.grom1", 0x20000, 0x20000, CRC(4e6a22d5) SHA1(3c2d51dd874f61c0a557ea2c1968afa02d9bfc42) )
+	ROM_LOAD( "t_grom2.bim.grom2", 0x40000, 0x20000, CRC(c0b643a9) SHA1(d240f703a55c39ce4a969612fbb9cd76e4b849ac) )
+	ROM_LOAD( "t_grom3.bim.grom3", 0x60000, 0x20000, CRC(54afb456) SHA1(0a7f10b1a490825a85489ac3f678eb1e11a0ac65) )
+	ROM_LOAD( "t_grom4.bim.grom4", 0x80000, 0x20000, CRC(ee09d645) SHA1(8233cfbd17d9de548ae3ca5e30928061712e0781) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "srom0.bin", 0x00000, 0x20000, CRC(d9ce58c3) SHA1(92574e60497d86b8608fba6278ccfc9036cb7f22) )
+	ROM_LOAD( "tennis.vr_srom0.srom0", 0x00000, 0x20000, CRC(d9ce58c3) SHA1(92574e60497d86b8608fba6278ccfc9036cb7f22) ) /* labeled as TENNIS.VR SROM0 */
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16l8-itvs.u11", 0x0000, 0x0104, CRC(fee03727) SHA1(e784ff18505cdccc1020dbe5cb0e7cc9efc068a4) )
@@ -2394,19 +2394,37 @@ ROM_END
 
 ROM_START( arlingtn ) /* PCB  p/n 1030 rev. 1A */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ahr-d_v_1.21.u5", 0x00000, 0x10000, CRC(00aae02e) SHA1(3bcfbd256c34ae222dde24ba9544f19da70b698e) ) /* Service menu reports version as 1.21-D */
+	ROM_LOAD( "ahr-d_v_1.40_u5.u5", 0x00000, 0x10000, CRC(02338ddd) SHA1(8e8e0c319c0b7533511089aa7a671a112169a4a1) ) /* labeled AHR-D V 1.40 (U5) - service menu reports version as 1.40-D */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "ahr_snd_v1.1.u27", 0x08000, 0x8000, CRC(dec57dca) SHA1(21a8ead10b0434629f41f6b067c49b6622569a6c) )
+	ROM_LOAD( "ahr_snd_v1.1_u27.u27", 0x08000, 0x8000, CRC(dec57dca) SHA1(21a8ead10b0434629f41f6b067c49b6622569a6c) ) /* labeled AHR SND V1.1 (U27) */
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "grom0.grom0", 0x00000, 0x20000, CRC(5ef57fe5) SHA1(e877979e034a61968b432037501e25a302a17a9a) )
-	ROM_LOAD( "grom1.grom1", 0x20000, 0x20000, CRC(6aca95c0) SHA1(da7a899bf0812a7af178e48b5a626ce56a836579) )
-	ROM_LOAD( "grom2.grom2", 0x40000, 0x10000, CRC(6d6fde1b) SHA1(aaabc45d4b566be42e8d28d767e4771a96d9caae) )
+	ROM_LOAD( "ahr_grom0.grom0", 0x00000, 0x20000, CRC(5ef57fe5) SHA1(e877979e034a61968b432037501e25a302a17a9a) )
+	ROM_LOAD( "ahr_grom1.grom1", 0x20000, 0x20000, CRC(6aca95c0) SHA1(da7a899bf0812a7af178e48b5a626ce56a836579) )
+	ROM_LOAD( "ahr_grom2.grom2", 0x40000, 0x10000, CRC(6d6fde1b) SHA1(aaabc45d4b566be42e8d28d767e4771a96d9caae) )
 	/* GROM3, GROM4 & GROM5 are unpopulated */
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "srom0.srom0", 0x00000, 0x40000, CRC(56087f81) SHA1(1d4a1f396ee9d8ed51d0417ea94b0b379312d72f) )
+	ROM_LOAD( "ahr_srom0.srom0", 0x00000, 0x40000, CRC(56087f81) SHA1(1d4a1f396ee9d8ed51d0417ea94b0b379312d72f) )
+ROM_END
+
+
+ROM_START( arlingtna ) /* PCB  p/n 1030 rev. 1A */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ahr-d_v_1.21_u5.u5", 0x00000, 0x10000, CRC(00aae02e) SHA1(3bcfbd256c34ae222dde24ba9544f19da70b698e) ) /* labeled AHR-D V 1.21 (U5) - service menu reports version as 1.21-D */
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "ahr_snd_v1.1_u27.u27", 0x08000, 0x8000, CRC(dec57dca) SHA1(21a8ead10b0434629f41f6b067c49b6622569a6c) ) /* labeled AHR SND V 1.1 (U27) */
+
+	ROM_REGION( 0xc0000, "grom", 0 )
+	ROM_LOAD( "ahr_grom0.grom0", 0x00000, 0x20000, CRC(5ef57fe5) SHA1(e877979e034a61968b432037501e25a302a17a9a) )
+	ROM_LOAD( "ahr_grom1.grom1", 0x20000, 0x20000, CRC(6aca95c0) SHA1(da7a899bf0812a7af178e48b5a626ce56a836579) )
+	ROM_LOAD( "ahr_grom2.grom2", 0x40000, 0x10000, CRC(6d6fde1b) SHA1(aaabc45d4b566be42e8d28d767e4771a96d9caae) )
+	/* GROM3, GROM4 & GROM5 are unpopulated */
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "ahr_srom0.srom0", 0x00000, 0x40000, CRC(56087f81) SHA1(1d4a1f396ee9d8ed51d0417ea94b0b379312d72f) )
 ROM_END
 
 
@@ -2730,7 +2748,8 @@ GAME( 1991, pokrdice,   0,         slikshot_lo_noz80, pokrdice, itech8_state, em
 /* Hot Shots Tennis-style PCB */
 GAME( 1990, hstennis,   0,         hstennis_hi,       hstennis, itech8_state, init_hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.1)", 0 )
 GAME( 1990, hstennis10, hstennis,  hstennis_hi,       hstennis, itech8_state, init_hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.0)", 0 )
-GAME( 1991, arlingtn,   0,         hstennis_hi,       arlingtn, itech8_state, init_arligntn, ROT0,   "Strata/Incredible Technologies", "Arlington Horse Racing (v1.21-D)", 0 )
+GAME( 1991, arlingtn,   0,         hstennis_hi,       arlingtn, itech8_state, init_arligntn, ROT0,   "Strata/Incredible Technologies", "Arlington Horse Racing (v1.40-D)", 0 )
+GAME( 1991, arlingtna,  arlingtn,  hstennis_hi,       arlingtn, itech8_state, init_arligntn, ROT0,   "Strata/Incredible Technologies", "Arlington Horse Racing (v1.21-D)", 0 )
 GAME( 1991, peggle,     0,         hstennis_lo,       peggle,   itech8_state, init_peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Joystick, v1.0)", 0 )
 GAME( 1991, pegglet,    peggle,    hstennis_lo,       pegglet,  itech8_state, init_peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Trackball, v1.0)", 0 )
 GAME( 1992, neckneck,   0,         hstennis_lo,       neckneck, itech8_state, init_neckneck, ROT0,   "Bundra Games/Incredible Technologies", "Neck-n-Neck (v1.2)", 0 )

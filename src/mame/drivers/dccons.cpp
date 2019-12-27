@@ -32,7 +32,6 @@
     - Tetris 4D: hangs at BPS FMV (bp 0C0B0C4E)
 
     Notes:
-    - DC US and DC PAL flash ROMs are definitely hacked, they are set to have Chinese instead of Japanese.
     - 0x1a002 of flash ROM returns the region type (0x30=Japan, 0x31=USA, 0x32=Europe). Amusingly, if the value
       on a non-jp console is different than these ones, the system shows a black swirl (and nothing boots).
     - gdi file for DCLP (a Dreamcast tester) doesn't have first two tracks info, they are:
@@ -41,6 +40,8 @@
       serial i/o also fails on that, work ram addresses that needs to be patched with 0x0009 (nop) are:
       0xc0196da
       0xc0196ec
+      Testers may be run in different modes if hold controller buttons while booting (A+B, Right+X, Left+X, Down+A+B+X, Down+X, Up+X and few others),
+       require emulated Maple DMA "swap endian" mode (SB_MMSEL register = 0).
     SH4 TEST:
         UBC test (0101):
             ok
@@ -365,22 +366,20 @@ WRITE64_MEMBER(dc_cons_state::dc_pdtra_w )
 	PDTRA = (data & 0xffff);
 }
 
-#if 0
 READ8_MEMBER(dc_cons_state::dc_flash_r)
 {
-	return m_dcflash->read(offset);
+	return m_dcflash->read(offset+0x20000);
 }
 
 WRITE8_MEMBER(dc_cons_state::dc_flash_w)
 {
-	m_dcflash->write(offset,data);
+	m_dcflash->write(offset+0x20000,data);
 }
-#endif
 
 void dc_cons_state::dc_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom().nopw();             // BIOS
-	map(0x00200000, 0x0021ffff).rom().region("dcflash", 0);//.rw(FUNC(dc_cons_state::dc_flash_r), FUNC(dc_cons_state::dc_flash_w));
+	map(0x00200000, 0x0021ffff).rw(FUNC(dc_cons_state::dc_flash_r), FUNC(dc_cons_state::dc_flash_w)).region("dcflash", 0x20000);
 	map(0x005f6800, 0x005f69ff).rw(FUNC(dc_cons_state::dc_sysctrl_r), FUNC(dc_cons_state::dc_sysctrl_w));
 	map(0x005f6c00, 0x005f6cff).m(m_maple, FUNC(maple_dc_device::amap));
 	map(0x005f7000, 0x005f701f).rw(m_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w)).umask64(0x0000ffff0000ffff);
@@ -592,6 +591,29 @@ static INPUT_PORTS_START( dc )
 	PORT_CONFSETTING(    0x03, "S-Video" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dcfish )
+	PORT_START("P1:0")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("CONFIG")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("MAMEDEBUG")
+	PORT_CONFNAME( 0x01, 0x00, "Bilinear Filtering" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+
+	PORT_START("SCREEN_TYPE")
+	PORT_CONFNAME( 0x03, 0x03, "Screen Connection Type" )
+	PORT_CONFSETTING(    0x00, "VGA" )
+	PORT_CONFSETTING(    0x02, "Composite" )
+	PORT_CONFSETTING(    0x03, "S-Video" )
+INPUT_PORTS_END
+
 void dc_cons_state::gdrom_config(device_t *device)
 {
 	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
@@ -599,7 +621,7 @@ void dc_cons_state::gdrom_config(device_t *device)
 	cdda->add_route(1, "^^aica", 1.0);
 }
 
-void dc_cons_state::dc(machine_config &config)
+void dc_cons_state::dc_base(machine_config &config)
 {
 	/* basic machine hardware */
 	SH4LE(config, m_maincpu, CPU_CLOCK);
@@ -623,18 +645,10 @@ void dc_cons_state::dc(machine_config &config)
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_cons_state,dc_console )
 
-//  MACRONIX_29LV160TMC(config, "dcflash");
+	FUJITSU_29LV002TC(config, "dcflash");
 
 	MAPLE_DC(config, m_maple, 0, m_maincpu);
 	m_maple->irq_callback().set(FUNC(dc_state::maple_irq));
-	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
-	dcctrl0.set_port_tags("P1:0", "P1:1", "P1:A0", "P1:A1", "P1:A2", "P1:A3", "P1:A4", "P1:A5");
-	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
-	dcctrl1.set_port_tags("P2:0", "P2:1", "P2:A0", "P2:A1", "P2:A2", "P2:A3", "P2:A4", "P2:A5");
-	dc_controller_device &dcctrl2(DC_CONTROLLER(config, "dcctrl2", 0, m_maple, 2));
-	dcctrl2.set_port_tags("P3:0", "P3:1", "P3:A0", "P3:A1", "P3:A2", "P3:A3", "P3:A4", "P3:A5");
-	dc_controller_device &dcctrl3(DC_CONTROLLER(config, "dcctrl3", 0, m_maple, 3));
-	dcctrl3.set_port_tags("P4:0", "P4:1", "P4:A0", "P4:A1", "P4:A2", "P4:A3", "P4:A4", "P4:A5");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -663,10 +677,31 @@ void dc_cons_state::dc(machine_config &config)
 	ata_0.option_add("gdrom", GDROM);
 	ata_0.set_option_machine_config("gdrom", gdrom_config);
 	ata_0.set_default_option("gdrom");
+}
+
+void dc_cons_state::dc(machine_config &config)
+{
+	dc_base(config);
+
+	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
+	dcctrl0.set_port_tags("P1:0", "P1:1", "P1:A0", "P1:A1", "P1:A2", "P1:A3", "P1:A4", "P1:A5");
+	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
+	dcctrl1.set_port_tags("P2:0", "P2:1", "P2:A0", "P2:A1", "P2:A2", "P2:A3", "P2:A4", "P2:A5");
+	dc_controller_device &dcctrl2(DC_CONTROLLER(config, "dcctrl2", 0, m_maple, 2));
+	dcctrl2.set_port_tags("P3:0", "P3:1", "P3:A0", "P3:A1", "P3:A2", "P3:A3", "P3:A4", "P3:A5");
+	dc_controller_device &dcctrl3(DC_CONTROLLER(config, "dcctrl3", 0, m_maple, 3));
+	dcctrl3.set_port_tags("P4:0", "P4:1", "P4:A0", "P4:A1", "P4:A2", "P4:A3", "P4:A4", "P4:A5");
 
 	SOFTWARE_LIST(config, "cd_list").set_original("dc");
 }
 
+void dc_cons_state::dc_fish(machine_config &config)
+{
+	dc_base(config);
+
+	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
+	dcctrl0.set_port_tag<0>("P1:0");
+}
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios))
@@ -675,9 +710,8 @@ void dc_cons_state::dc(machine_config &config)
 // "MPR-21068 SEGA JAPAN / 9850 D" from VA0 837-13392-02 (171-7782B) NTSC-J unit
 // KABUTO Ver.1.011 CRC 34DA5C88 from pre-release US unit (private)
 
-// MPR-21933-X2 confirmed match MPR-21931 (v1.01d)
-
-// actual mask rom labels can have -X1 or -X2 added, presumable depending on mobo revision and/or type of rom used (5v or 3.3v), contents is the same
+// MPR-21933 (5v/VA0) confirmed match MPR-21931 (3.3v/VA1) - v1.01d
+// actual mask rom labels may have -X1 or -X2 added depending on chip manufacturer, contents is the same
 
 #define DREAMCAST_COMMON_BIOS \
 	ROM_REGION(0x200000, "maincpu", 0) \
@@ -689,9 +723,9 @@ void dc_cons_state::dc(machine_config &config)
 	ROM_LOAD_BIOS(2, "mpr-21871.ic501", 0x000000, 0x200000, CRC(2f551bc5) SHA1(1ede8d5be49116a4c6f3fe0961175469537a0434) ) \
 	ROM_SYSTEM_BIOS(3, "101dch", "v1.01d (Chinese hack)") \
 	ROM_LOAD_BIOS(3, "dc101d_ch.bin",   0x000000, 0x200000, CRC(a2564fad) SHA1(edc5d3d70a93c935703d26119b37731fd317d2bf) )
-// ^^^ dc101d_eu.bin ^^^ is selfmade chinese translation, doesn't work on real hardware, does it must be here at all ?
+// ^^^ dc101d_ch.bin ^^^ is selfmade Chinese translation, doesn't work on real hardware, does it must be here at all ?
 
-/* note: Dreamcast Flash ROMs actually 256KB MBM29F002TC (VA0) or MBM29LV002TC (VA1) devices, only 2nd 128KB half is used, A17 pin tied to VCC
+/* note: Dreamcast Flash ROMs actually 256KB MBM29F002TC (5v/VA0) or MBM29LV002TC (3.3v/VA1) devices, only 2nd 128KB half is used, A17 pin tied to VCC
    sector SA5 (1A000 - 1BFFF) is read-only, contain information written during manufacture or repair, fully generated by software tool (except predefined list of creators)
 struct factory_sector
 {
@@ -748,16 +782,16 @@ struct cid_record
 ROM_START(dc)
 	DREAMCAST_COMMON_BIOS
 
-	ROM_REGION64_LE(0x020000, "dcflash", 0)
-	ROM_LOAD( "dcus_ntsc.bin", 0x000000, 0x020000, CRC(4136c25b) SHA1(1efa00ab9d8357a9f91e5be931a3efd6236f2b79) )  // dumped from VA2.4 mobo with 1.022 BIOS
+	ROM_REGION64_LE(0x040000, "dcflash", ROMREGION_ERASEFF)
+	ROM_LOAD( "dcus_ntsc.bin", 0x020000, 0x020000, CRC(4136c25b) SHA1(1efa00ab9d8357a9f91e5be931a3efd6236f2b79) )  // dumped from VA2.4 mobo with 1.022 BIOS
 ROM_END
 
 ROM_START( dceu )
 	DREAMCAST_COMMON_BIOS
 
-	ROM_REGION64_LE(0x020000, "dcflash", 0)
-	ROM_LOAD( "dceu_pal.bin",  0x000000, 0x020000, CRC(7a102d05) SHA1(13e444e613dffe0a8bce073a01efa9a1d4626ba7) ) // VA1
-	ROM_LOAD( "dceu_pala.bin", 0x000000, 0x020000, CRC(2e8dfa07) SHA1(ca5fd977bbf8f48c28c1027a023b038123d57d39) ) // from VA1 with 1.01d BIOS
+	ROM_REGION64_LE(0x040000, "dcflash", ROMREGION_ERASEFF)
+	ROM_LOAD( "dceu_pal.bin",  0x020000, 0x020000, CRC(7a102d05) SHA1(13e444e613dffe0a8bce073a01efa9a1d4626ba7) ) // VA1
+	ROM_LOAD( "dceu_pala.bin", 0x020000, 0x020000, CRC(2e8dfa07) SHA1(ca5fd977bbf8f48c28c1027a023b038123d57d39) ) // from VA1 with 1.01d BIOS
 ROM_END
 
 ROM_START( dcjp )
@@ -765,8 +799,8 @@ ROM_START( dcjp )
 	ROM_SYSTEM_BIOS(4, "1004", "v1.004 (Japan)")    // oldest known mass production version, supports Japan region only
 	ROM_LOAD_BIOS(4, "mpr-21068.ic501", 0x000000, 0x200000, CRC(5454841f) SHA1(1ea132c0fbbf07ef76789eadc07908045c089bd6) )
 
-	ROM_REGION64_LE(0x020000, "dcflash", 0)
-	ROM_LOAD( "dcjp_ntsc.bin", 0x000000, 0x020000, CRC(306023ab) SHA1(5fb66adb6d1b54a552fe9c2bb736e4c6960e447d) ) // from refurbished VA0 with 1.004 BIOS
+	ROM_REGION64_LE(0x040000, "dcflash", ROMREGION_ERASEFF)
+	ROM_LOAD( "dcjp_ntsc.bin", 0x020000, 0x020000, CRC(306023ab) SHA1(5fb66adb6d1b54a552fe9c2bb736e4c6960e447d) ) // from refurbished VA0 with 1.004 BIOS
 ROM_END
 
 // unauthorised portable modification
@@ -775,8 +809,8 @@ ROM_START( dctream )
 	// uses regular mpr-21931 BIOS chip, have region-free mod-chip installed, see driver init.
 	ROM_LOAD( "mpr-21931.ic501", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) )
 
-	ROM_REGION64_LE(0x020000, "dcflash", 0)
-	ROM_LOAD( "dc_flash.bin", 0x000000, 0x020000, CRC(9d5515c4) SHA1(78a86fd4e8b58fc9d3535eef6591178f1b97ecf9) ) // VA1 NTSC-US
+	ROM_REGION64_LE(0x040000, "dcflash", ROMREGION_ERASEFF)
+	ROM_LOAD( "dc_flash.bin", 0x020000, 0x020000, CRC(9d5515c4) SHA1(78a86fd4e8b58fc9d3535eef6591178f1b97ecf9) ) // VA1 NTSC-US
 ROM_END
 
 // normally, with DIP switch 4 off, HKT-0100/0110/0120 AKA "Katana Set 5.xx", will be booted from flash ROM IC507 (first 2 dumps below)
@@ -787,19 +821,21 @@ ROM_START( dcdev )
 	ROM_LOAD_BIOS(0, "set5v1.011.ic507", 0x000000, 0x200000, CRC(2186e0e5) SHA1(6bd18fb83f8fdb56f1941e079580e5dd672a6dad) )
 	ROM_SYSTEM_BIOS(1, "1001", "Katana Set5 v1.001 (Japan)")    // BOOT flash rom update from WinCE SDK v1.0
 	ROM_LOAD_BIOS(1, "set5v1.001.ic507", 0x000000, 0x200000, CRC(5702d38f) SHA1(ea7a3ae1de73683008dd795c252941a4fc81b42e) )
+	ROM_SYSTEM_BIOS(2, "0976", "Katana Set5 v0.976 (Japan)")    // BOOT flash rom update from Katana SDK 1.20J
+	ROM_LOAD_BIOS(2, "set5v0.976.ic507", 0x000000, 0x200000, CRC(dcb2e86f) SHA1(c88b4b6704811e3a428ee225727e4f7df467a3b5) )
 
 	// 27C160 EPROM (DIP42) IC??? labeled
 	// SET5 7676
 	// V0.71 98/11/13
-	ROM_SYSTEM_BIOS(2, "071", "Katana Set5 Checker v0.71")
-	ROM_LOAD_BIOS(2, "set5v0.71.bin", 0x000000, 0x200000, CRC(52d01969) SHA1(28aec4a01419d2d2a664c540bef30ea289ca0644) )
+	ROM_SYSTEM_BIOS(3, "071", "Katana Set5 Checker v0.71")
+	ROM_LOAD_BIOS(3, "set5v0.71.bin", 0x000000, 0x200000, CRC(52d01969) SHA1(28aec4a01419d2d2a664c540bef30ea289ca0644) )
 	// SET5 FC52
 	// V0.41 98/08/27
-	ROM_SYSTEM_BIOS(3, "041", "Katana Set5 Checker v0.41")
-	ROM_LOAD_BIOS(3, "set5v0.41.bin", 0x000000, 0x200000, CRC(485877bd) SHA1(dc1af1f1248ffa87d57bc5ef2ea41aac95ecfc5e) )
+	ROM_SYSTEM_BIOS(4, "041", "Katana Set5 Checker v0.41")
+	ROM_LOAD_BIOS(4, "set5v0.41.bin", 0x000000, 0x200000, CRC(485877bd) SHA1(dc1af1f1248ffa87d57bc5ef2ea41aac95ecfc5e) )
 
-	ROM_REGION64_LE(0x020000, "dcflash", 0)
-	ROM_LOAD( "hkt-0120-flash.bin", 0x000000, 0x020000, CRC(7784c304) SHA1(31ef57f550d8cd13e40263cbc657253089e53034) ) // Dev.Boxes have empty (FF filled) flash ROM
+	ROM_REGION64_LE(0x040000, "dcflash", ROMREGION_ERASEFF)
+	// Dev.Boxes have empty (FF filled) flash ROM
 ROM_END
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS          INIT       COMPANY FULLNAME */
@@ -808,3 +844,64 @@ CONS( 1998, dcjp,    0,      0,      dc,      dc,    dc_cons_state, init_dcjp, "
 CONS( 1999, dceu,    dcjp,   0,      dc,      dc,    dc_cons_state, init_dcus, "Sega", "Dreamcast (Europe, PAL)", MACHINE_NOT_WORKING )
 CONS( 200?, dctream, dcjp,   0,      dc,      dc,    dc_cons_state, init_tream,"<unknown>", "Treamcast", MACHINE_NOT_WORKING )
 CONS( 1998, dcdev,   0,      0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "HKT-0120 Sega Dreamcast Development Box", MACHINE_NOT_WORKING )
+
+/*
+Fish Life - interactive aquarium simulator
+Consists of HKS-0300 main unit and HKS-0100 LCD with touch screen
+
+  HKS-0300
+  Fish Life
+  670-14239A
+  (c) 2000 Sega
+  components:
+    Dreamcast VA1 motherboard
+    GD-ROM drive
+    PSU
+    173-8100B / 837-14049 IC BD SW FL
+      backplate with up/down/left/right/A/B/Start buttons
+    171-8097B / 837-14046 IC BD FL
+      main components:
+        315-6211-AB - Dreamcast game controller IC
+        315-6182    - Dreamcast microphone controller IC
+        connectors
+
+ HKS-0100 touch screen wired to SH-4's SCIF serial port. Communication is one-way, touch packet format is:
+ 0100000T 00xxxxxx 00XXXXXX 00yyyyyy 00YYYYYY 00--zzzz 00------
+  T: 1 - touch, 0 - release
+  x: X value low bits
+  X: X value high bits
+  y: Y value low bits
+  Y: Y value high bits
+  z: unused
+ X/Y values range seems 3000x2294
+
+ HKS-0200 software GD-ROMs:
+  HDR-0093 673-01613 Fish Life Red Sea Playful Edition
+ *HDR-0094 673-01672 Fish Life Amazon Playful Edition
+  HDR-0095 673-01??? Fish Life Episode 1 Basic Edition
+  HDR-0096 673-01??? Fish Life Episode 2 Basic Edition
+  HDR-0097 673-01??? Fish Life Episode 3 Basic Edition
+ * denotes these games are archived.
+
+ Machines high likely based on Fish Life:
+  タッチであそぼ！ / Play with a touch! (2001) - touch screen cabinet for McDonald's Japan https://www.famitsu.com/game/news/2001/09/13/103,1000362656,1276,0,0.html
+  タッチでポン！ / Pong by touch! (2001) - sushi ordering system https://web.archive.org/web/20180421214402/sega.jp/fb/creators/vol_13/1.html
+
+ notes:
+  Some sources claims Playful and Basic editions hardware is not the same, has to be verified.
+  Press down+B for Test Mode
+*/
+ROM_START( dcfish )
+	ROM_REGION64_LE(0x200000, "maincpu", 0)
+	ROM_LOAD( "mpr-21931.ic501", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) ) // regular v1.0d 3.3v BIOS
+
+	// similar Dreamcast flashes, machine_name was changed to "Fish Life", machine_code2 is 0xff (verified  by software)
+	ROM_REGION64_LE(0x040000, "dcflash", ROMREGION_ERASEFF)
+	ROM_LOAD( "fish_flash.bin", 0x020000, 0x020000, CRC(f7f36b7b) SHA1(f49d18de85c519c16d5447ca8ae39b62d1b8e483) ) // VA1 NTSC-JP
+
+	DISK_REGION( "ata:0:gdrom" )
+	DISK_IMAGE_READONLY( "fish_life_amazon", 0, SHA1(2cbba727b219bbbeddf551d0f3e80c5f8ecbe21f) ) // HDR-0094
+ROM_END
+
+/*    YEAR  NAME     PARENT  MACHINE  INPUT  CLASS          INIT       ROT   COMPANY FULLNAME */
+GAME( 2000, dcfish,  0,      dc_fish, dcfish,dc_cons_state, init_dcjp, ROT0, "Sega", "Fish Life Amazon Playful Edition (Japan)", MACHINE_NOT_WORKING )

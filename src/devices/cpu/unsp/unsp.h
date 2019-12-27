@@ -164,7 +164,7 @@ protected:
 
 	struct internal_unsp_state
 	{
-		uint32_t m_r[8];
+		uint32_t m_r[8]; // why are these 32-bit? they're 16-bit regs? (changing to uint16_t causes crashes tho, so something is depending on this)
 		uint32_t m_enable_irq;
 		uint32_t m_enable_fiq;
 		uint32_t m_irq;
@@ -230,6 +230,9 @@ protected:
 	void push(uint32_t value, uint32_t *reg);
 	uint16_t pop(uint32_t *reg);
 
+	void update_nz(uint32_t value);
+	void update_nzsc(uint32_t value, uint16_t r0, uint16_t r1);
+
 private:
 	// compilation boundaries -- how far back/forward does the analysis extend?
 	enum : uint32_t
@@ -266,8 +269,6 @@ private:
 	uint32_t m_log_ops;
 #endif
 
-	void update_nz(uint32_t value);
-	void update_nzsc(uint32_t value, uint16_t r0, uint16_t r1);
 	inline void trigger_fiq();
 	inline void trigger_irq(int line);
 	void check_irqs();
@@ -346,6 +347,7 @@ protected:
 	virtual void execute_fxxx_101_group(uint16_t op) override;
 	virtual void execute_exxx_group(uint16_t op) override;
 
+
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
@@ -361,7 +363,23 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void execute_extended_group(uint16_t op) override;
 
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
 private:
+	uint32_t m_secondary_r[8];
+
+	enum
+	{
+		UNSP20_R8 = 0,
+		UNSP20_R9,
+		UNSP20_R10,
+		UNSP20_R11,
+		UNSP20_R12,
+		UNSP20_R13,
+		UNSP20_R14,
+		UNSP20_R15
+	};
 };
 
 

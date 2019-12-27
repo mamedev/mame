@@ -86,10 +86,10 @@ SETADDRESS_DBIN_MEMBER( snug_enhanced_video_device::setaddress_dbin )
 
 	m_address = offset;
 	bool reading = (state==ASSERT_LINE);
-	int offbase = (m_address & 0xfc01);
+	int offbase = (m_address & 0x7fc01); // The 7 represents the AMA/B/C lines
 
 	// Sound
-	m_sound_accessed = ((m_address & 0xff01)==0x8400) && !reading;
+	m_sound_accessed = ((m_address & 0x7ff01)==0x78400) && !reading;
 
 	// Video space
 	// 8800 / 8802 / 8804 / 8806
@@ -97,15 +97,15 @@ SETADDRESS_DBIN_MEMBER( snug_enhanced_video_device::setaddress_dbin )
 	//
 	// Bits 1000 1w00 0000 0xx0
 	// Mask 1111 1000 0000 0001
-	m_video_accessed = ((offbase==0x8800) && reading) || ((offbase==0x8c00) && !reading);
+	m_video_accessed = ((offbase==0x78800) && reading) || ((offbase==0x78c00) && !reading);
 
 	// Read a byte in evpc DSR space
 	// 0x4000 - 0x5eff   DSR (paged)
 	// 0x5f00 - 0x5fef   NOVRAM
 	// 0x5ff0 - 0x5fff   Palette
-	m_inDsrArea = ((m_address & 0xe000)==0x4000);
-	m_novram_accessed = ((m_address & 0xff00)==0x5f00);
-	m_palette_accessed = ((m_address & 0xfff0)==0x5ff0);
+	m_inDsrArea = in_dsr_space(m_address, true);
+	m_novram_accessed = ((m_address & 0x7ff00)==0x75f00);
+	m_palette_accessed = ((m_address & 0x7fff0)==0x75ff0);
 
 	// Note that we check the selection in reverse order so that the overlap is avoided
 }
@@ -413,8 +413,6 @@ void snug_enhanced_video_device::device_start()
 
 void snug_enhanced_video_device::device_reset()
 {
-	m_select_mask = 0x7e000;
-	m_select_value = 0x74000;
 	m_dsr_page = 0;
 	m_RAMEN = false;
 	m_selected = false;

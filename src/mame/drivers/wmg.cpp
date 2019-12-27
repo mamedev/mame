@@ -82,11 +82,11 @@ of save-state is also needed.
 #define MASTER_CLOCK        (XTAL(12'000'000))
 #define SOUND_CLOCK         (XTAL(3'579'545))
 
-class wmg_state : public williams_state
+class wmg_state : public defender_state
 {
 public:
 	wmg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: williams_state(mconfig, type, tag)
+		: defender_state(mconfig, type, tag)
 		, m_p_ram(*this, "nvram")
 		, m_keyboard(*this, "X%d", 0)
 		, m_codebank(*this, "codebank")
@@ -95,17 +95,16 @@ public:
 
 	void wmg(machine_config &config);
 
-	void init_wmg();
-
 	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(wmg_mux_r);
 
 private:
+	virtual void driver_init() override;
+
 	u8 wmg_nvram_r(offs_t offset);
 	void wmg_nvram_w(offs_t offset, u8 data);
 	u8 wmg_pia_0_r(offs_t offset);
 	void wmg_c400_w(u8 data);
 	void wmg_d000_w(u8 data);
-	DECLARE_WRITE8_MEMBER(wmg_blitter_w);
 	DECLARE_WRITE_LINE_MEMBER(wmg_port_select_w);
 	void wmg_sound_reset_w(u8 data);
 	void wmg_vram_select_w(u8 data);
@@ -154,15 +153,15 @@ void wmg_state::wmg_cpu2(address_map &map)
 void wmg_state::wmg_banked_map(address_map &map)
 {
 	map(0x0000, 0x000f).mirror(0x03e0).writeonly().share("paletteram");
-	map(0x0010, 0x001f).mirror(0x03e0).w(FUNC(williams_state::defender_video_control_w));
+	map(0x0010, 0x001f).mirror(0x03e0).w(FUNC(wmg_state::video_control_w));
 	map(0x0400, 0x0400).w(FUNC(wmg_state::wmg_c400_w));
 	map(0x0401, 0x0401).w(FUNC(wmg_state::wmg_sound_reset_w));
 	map(0x0804, 0x0807).r(FUNC(wmg_state::wmg_pia_0_r)).w(m_pia[0], FUNC(pia6821_device::write));
 	map(0x080c, 0x080f).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0900, 0x09ff).w(FUNC(wmg_state::wmg_vram_select_w));
-	map(0x0a00, 0x0a07).w(FUNC(wmg_state::wmg_blitter_w));
-	map(0x0b00, 0x0bff).r(FUNC(williams_state::williams_video_counter_r));
-	map(0x0bff, 0x0bff).w(FUNC(williams_state::williams_watchdog_reset_w));
+	map(0x0a00, 0x0a07).w(FUNC(wmg_state::blitter_w));
+	map(0x0b00, 0x0bff).r(FUNC(wmg_state::video_counter_r));
+	map(0x0bff, 0x0bff).w(FUNC(wmg_state::watchdog_reset_w));
 	map(0x0c00, 0x0fff).rw(FUNC(wmg_state::wmg_nvram_r), FUNC(wmg_state::wmg_nvram_w));
 	map(0x1000, 0x4fff).rom().region("maincpu", 0x68000); // Defender roms
 /* These next one is actually banked in CPU 1, but its not something Mame can handle very well. Placed here instead. */
@@ -337,17 +336,6 @@ void wmg_state::wmg_nvram_w(offs_t offset, u8 data)
 
 /*************************************
  *
- *  Blitter
- *
- *************************************/
-
-WRITE8_MEMBER( wmg_state::wmg_blitter_w )
-{
-	williams_blitter_w(m_maincpu->space(AS_PROGRAM), offset, data, mem_mask);
-}
-
-/*************************************
- *
  *  Bankswitching
  *
  *************************************/
@@ -502,7 +490,7 @@ u8 wmg_state::wmg_pia_0_r(offs_t offset)
  *  Driver Initialisation
  *
  *************************************/
-void wmg_state::init_wmg()
+void wmg_state::driver_init()
 {
 	m_blitter_config = WILLIAMS_BLITTER_SC1;
 	m_blitter_clip_address = 0xc000;
@@ -527,10 +515,10 @@ void wmg_state::wmg(machine_config &config)
 	ADDRESS_MAP_BANK(config, "bankc000").set_map(&wmg_state::wmg_banked_map).set_options(ENDIANNESS_BIG, 8, 16, 0x1000);
 
 	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
-	TIMER(config, "scan_timer").configure_scanline(FUNC(williams_state::williams_va11_callback), "screen", 0, 32);
+	TIMER(config, "scan_timer").configure_scanline(FUNC(wmg_state::va11_callback), "screen", 0, 32);
 
 	// also set a timer to go off on scanline 240
-	TIMER(config, "240_timer").configure_scanline(FUNC(williams_state::williams_count240_callback), "screen", 0, 240);
+	TIMER(config, "240_timer").configure_scanline(FUNC(wmg_state::count240_callback), "screen", 0, 240);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -538,11 +526,9 @@ void wmg_state::wmg(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE);
 	m_screen->set_raw(MASTER_CLOCK*2/3, 512, 6, 298, 260, 7, 247);
-	m_screen->set_screen_update(FUNC(williams_state::screen_update_williams));
+	m_screen->set_screen_update(FUNC(wmg_state::screen_update));
 
-	MCFG_VIDEO_START_OVERRIDE(williams_state,williams)
-
-	PALETTE(config, m_palette, FUNC(williams_state::williams_palette), 256);
+	PALETTE(config, m_palette, FUNC(wmg_state::palette_init), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -564,7 +550,7 @@ void wmg_state::wmg(machine_config &config)
 
 	pia6821_device &pia1(PIA6821(config, "pia_1", 0));
 	pia1.readpa_handler().set_ioport("IN2");
-	pia1.writepb_handler().set(FUNC(williams_state::williams_snd_cmd_w));
+	pia1.writepb_handler().set(FUNC(wmg_state::snd_cmd_w));
 	pia1.irqa_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<0>));
 	pia1.irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
 
@@ -610,4 +596,4 @@ ROM_END
  *
  *******************************************************/
 
-GAME( 2001, wmg, 0, wmg, wmg, wmg_state, init_wmg, ROT0, "hack (Clay Cowgill)", "Williams Multigame", 0 )
+GAME( 2001, wmg, 0, wmg, wmg, wmg_state, empty_init, ROT0, "hack (Clay Cowgill)", "Williams Multigame", 0 )

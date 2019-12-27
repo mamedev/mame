@@ -19,7 +19,14 @@
     Often the 2x M5205 are clocked with a 400KHz xtal (should really be 384KHz) so pitch of samples is slightly out as well.
     The sf2 sets seem to have quite a few missing samples?
 
-    *** see fcrash.cpp for game status ***
+Status of each game:
+--------------------
+sf2mdt, sf2mdtb: OK.
+sf2mdta, sf2ceb: Scroll 2X has strange 0x200 writes that cause missing fighters' portraits at the vs. screen
+                 and glitched backgrounds during fights. Masking them out seems a hack.
+captcommb2:      OK.
+knightsb3:       OK.
+
 */
 
 #include "emu.h"

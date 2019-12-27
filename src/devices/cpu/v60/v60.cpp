@@ -152,17 +152,17 @@ std::unique_ptr<util::disasm_interface> v60_device::create_disassembler()
 #define SetSZPF_Word(x)     {_Z = ((uint16_t)(x) == 0);  _S = ((x)&0x8000) ? 1 : 0; }
 #define SetSZPF_Long(x)     {_Z = ((uint32_t)(x) == 0);  _S = ((x)&0x80000000) ? 1 : 0; }
 
-#define ORB(dst, src)       { (dst) |= (src); _CY = _OV = 0; SetSZPF_Byte(dst); }
-#define ORW(dst, src)       { (dst) |= (src); _CY = _OV = 0; SetSZPF_Word(dst); }
-#define ORL(dst, src)       { (dst) |= (src); _CY = _OV = 0; SetSZPF_Long(dst); }
+#define ORB(dst, src)       { (dst) |= (src); _OV = 0; SetSZPF_Byte(dst); }
+#define ORW(dst, src)       { (dst) |= (src); _OV = 0; SetSZPF_Word(dst); }
+#define ORL(dst, src)       { (dst) |= (src); _OV = 0; SetSZPF_Long(dst); }
 
-#define ANDB(dst, src)      { (dst) &= (src); _CY = _OV = 0; SetSZPF_Byte(dst); }
-#define ANDW(dst, src)      { (dst) &= (src); _CY = _OV = 0; SetSZPF_Word(dst); }
-#define ANDL(dst, src)      { (dst) &= (src); _CY = _OV = 0; SetSZPF_Long(dst); }
+#define ANDB(dst, src)      { (dst) &= (src); _OV = 0; SetSZPF_Byte(dst); }
+#define ANDW(dst, src)      { (dst) &= (src); _OV = 0; SetSZPF_Word(dst); }
+#define ANDL(dst, src)      { (dst) &= (src); _OV = 0; SetSZPF_Long(dst); }
 
-#define XORB(dst, src)      { (dst) ^= (src); _CY = _OV = 0; SetSZPF_Byte(dst); }
-#define XORW(dst, src)      { (dst) ^= (src); _CY = _OV = 0; SetSZPF_Word(dst); }
-#define XORL(dst, src)      { (dst) ^= (src); _CY = _OV = 0; SetSZPF_Long(dst); }
+#define XORB(dst, src)      { (dst) ^= (src); _OV = 0; SetSZPF_Byte(dst); }
+#define XORW(dst, src)      { (dst) ^= (src); _OV = 0; SetSZPF_Word(dst); }
+#define XORL(dst, src)      { (dst) ^= (src); _OV = 0; SetSZPF_Long(dst); }
 
 #define SUBB(dst, src)      { unsigned res = (dst) - (src); SetCFB(res); SetOFB_Sub(res, src, dst); SetSZPF_Byte(res); dst = (uint8_t)res; }
 #define SUBW(dst, src)      { unsigned res = (dst) - (src); SetCFW(res); SetOFW_Sub(res, src, dst); SetSZPF_Word(res); dst = (uint16_t)res; }
@@ -498,7 +498,7 @@ void v60_device::device_start()
 	state_add( STATE_GENPC, "GENPC", PC).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_PPC ).noshow();
 	state_add( STATE_GENSP, "GENSP", SP ).noshow();
-	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).noshow();
+	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).callimport().formatstr("%7s").noshow();
 
 	set_icountptr(m_icount);
 }
@@ -514,6 +514,18 @@ void v60_device::state_export(const device_state_entry &entry)
 	}
 }
 
+void v60_device::state_string_export(const device_state_entry &entry, std::string &str) const
+{
+		switch(entry.index()) {
+		case STATE_GENFLAGS:
+				str = string_format("%c%c%c%c",
+												PSW & 1 ? 'Z' : '.',
+												PSW & 2 ? 'S' : '.',
+												PSW & 4 ? 'O' : '.',
+												PSW & 8 ? 'C' : '.');
+				break;
+		}
+}
 
 void v60_device::state_import(const device_state_entry &entry)
 {

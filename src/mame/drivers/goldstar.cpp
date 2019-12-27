@@ -733,13 +733,13 @@ void goldstar_state::wcherry_map(address_map &map)
 	map(0xf660, 0xf660).nopw();    //.w(FUNC(goldstar_state::output_w));  // unknown register: 0x3e
 	map(0xf670, 0xf670).w("snsnd", FUNC(sn76489_device::write));    /* guess... device is initialized, but doesn't seems to be used.*/
 
-	map(0xf800, 0xffff).ram();
+	map(0xfc00, 0xffff).rom();
 }
 
 void goldstar_state::wcherry_readwriteport(address_map &map)
 {
 	map.global_mask(0xff);
-	}
+}
 
 /* wcherry findings...
 
@@ -846,6 +846,19 @@ void cmaster_state::cm_portmap(address_map &map)
 	map(0x12, 0x12).w(FUNC(cmaster_state::p1_lamps_w));
 	map(0x13, 0x13).w(FUNC(cmaster_state::background_col_w));
 	map(0x14, 0x14).w(FUNC(cmaster_state::girl_scroll_w));
+}
+
+void cmaster_state::cm97_portmap(address_map &map) // TODO: other reads/writes
+{
+	map.global_mask(0xff);
+	map(0x09, 0x09).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x0a, 0x0b).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x0c, 0x0c).portr("DSW1");
+	map(0x0d, 0x0d).portr("DSW2");
+	map(0x0e, 0x0e).portr("DSW3");
+	map(0x10, 0x10).portr("IN0");
+	map(0x11, 0x11).portr("IN1");
+	map(0x12, 0x12).portr("IN2").w(FUNC(cmaster_state::outport0_w));
 }
 
 void cmaster_state::chryangl_decrypted_opcodes_map(address_map &map)
@@ -8781,12 +8794,11 @@ void cb3_state::cherrys(machine_config &config)
 	m_gfxdecode->set_info(gfx_cherrys);
 }
 
-void cb3_state::cm97(machine_config &config)
+void cb3_state::eldoradd(machine_config &config)
 {
 	ncb3(config);
 	m_gfxdecode->set_info(gfx_cm97);
 }
-
 
 void goldstar_state::wcherry(machine_config &config)
 {
@@ -8878,6 +8890,18 @@ void cmaster_state::cmasterc(machine_config &config)
 {
 	cm(config);
 	m_gfxdecode->set_info(gfx_cmasterc);
+}
+
+void cmaster_state::cm97(machine_config &config)
+{
+	cm(config);
+
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::cm97_portmap);
+
+	m_gfxdecode->set_info(gfx_cm97);
+
+	config.device_remove("ppi8255_0");
+	config.device_remove("ppi8255_1");
 }
 
 void cmaster_state::chryangl(machine_config &config)
@@ -14981,7 +15005,7 @@ ROM_START( eldoradd )
 	ROM_REGION( 0x300, "proms", 0 )
 	ROM_LOAD( "mb7114.e8",  0x000, 0x100, CRC(fa274678) SHA1(6712cb1f7ead1a7aa703ec799e7199c33ace857c) )
 	ROM_LOAD( "mb7114.e10", 0x100, 0x100, CRC(e58877ea) SHA1(30fa873fc05d91610ef68eef54b78f2c7301a62a) )
-	ROM_LOAD( "mb7114.e12", 0x100, 0x100, CRC(781b2842) SHA1(566667d4f81e93b29bb01dbc51bf144c02dff75d) )
+	ROM_LOAD( "mb7114.e12", 0x200, 0x100, CRC(781b2842) SHA1(566667d4f81e93b29bb01dbc51bf144c02dff75d) )
 
 	ROM_REGION( 0x400, "plds", 0 ) // available as brute-forced dumps, need to be verified and converted
 	ROM_LOAD( "pal16l8.d13", 0x000, 0x104, NO_DUMP )
@@ -17980,8 +18004,7 @@ GAMEL( 199?, cb3e,      ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,
 GAMEL( 199?, chryglda,  ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Gold I (set 2, encrypted bootleg)",    0,                 layout_chrygld )  // Runs in CB3e hardware.
 GAME(  1994, chryangla, ncb3,     chryangla,ncb3,     cb3_state,      init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (encrypted, W-4 hardware)",      MACHINE_NOT_WORKING ) // DYNA CB3  V1.40 string, decrypted but only test screens work
 
-GAME(  1996, cmast97,   ncb3,     cm97,     chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Master '97",                           MACHINE_NOT_WORKING) // fix prom decode
-GAME(  1991, eldoradd,  0,        cm97,     chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado",                                   MACHINE_NOT_WORKING) // everything
+GAME(  1991, eldoradd,  0,        eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado",                                   MACHINE_NOT_WORKING) // everything
 
 // looks like a hack of Cherry Bonus 3
 GAME(  1994, chryangl,  ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel",                                MACHINE_NOT_WORKING ) // SKY SUPERCB 1.0 string, decrypted but hangs when betting
@@ -18021,6 +18044,7 @@ GAME(  199?, chthree,   cmaster,  cm,       cmaster,  cmaster_state,  init_chthr
 
 GAME(  1991, cmast91,   0,        cmast91,  cmast91,  goldstar_state, init_cmast91,   ROT0, "Dyna",              "Cherry Master '91 (ver.1.30)",                0 )
 GAME(  1992, cmast92,   0,        cmast91,  cmast91,  goldstar_state, init_cmast91,   ROT0, "Dyna",              "Cherry Master '92",                           MACHINE_NOT_WORKING ) // no gfx roms are dumped
+GAME(  1996, cmast97,   0,        cm97,     cmv801,   cmaster_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97",                           MACHINE_NOT_WORKING) // fix prom decode, reels
 GAME(  1999, cmast99,   0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master '99 (V9B.00)",                  MACHINE_NOT_WORKING )
 GAME(  1999, cmast99b,  cmast99,  cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cherry Master '99 (V9B.00 bootleg / hack)",   MACHINE_NOT_WORKING )
 GAME(  1993, aplan,     0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "WeaShing H.K.",     "A-Plan",                                      MACHINE_NOT_WORKING )

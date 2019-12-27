@@ -247,12 +247,12 @@ private:
 	// internal information about the state of inputs
 	class device_input
 	{
-		static const int USE_STORED_VECTOR = 0xff000000;
+		static constexpr int USE_STORED_VECTOR = 0xff000000;
 
 	public:
 		device_input();
 
-		void start(device_execute_interface *execute, int linenum);
+		void start(device_execute_interface &execute, int linenum);
 		void reset();
 
 		void set_state_synced(int state, int vector = USE_STORED_VECTOR);

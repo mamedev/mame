@@ -330,34 +330,21 @@ Type 3 (PCMCIA Compact Flash Adaptor + Compact Flash card, sealed together with 
 */
 
 #include "emu.h"
-#include "audio/taito_zm.h"
+#include "includes/zn.h"
 
-#include "cpu/psx/psx.h"
-#include "machine/at28c16.h"
 #include "machine/ataflash.h"
-#include "machine/bankdev.h"
-#include "machine/cat702.h"
 #include "machine/intelfsh.h"
-#include "machine/mb3773.h"
-#include "machine/ram.h"
 #include "machine/rf5c296.h"
-#include "machine/znmcu.h"
-#include "sound/spu.h"
-#include "video/psx.h"
-#include "screen.h"
-#include "speaker.h"
 
-#include <algorithm>
+//
+// Taito GNET specific
+//
 
-class taitogn_state : public driver_device
+class taitogn_state : public zn_state
 {
 public:
 	taitogn_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_sio0(*this, "maincpu:sio0"),
-		m_cat702(*this, "cat702_%u", 1U),
-		m_znmcu(*this, "znmcu"),
-		m_maincpu(*this, "maincpu"),
+		zn_state(mconfig, type, tag),
 		m_mn10200(*this, "taito_zoom:mn10200"),
 		m_pccard(*this, "pccard"),
 		m_flashbank(*this, "flashbank"),
@@ -366,14 +353,13 @@ public:
 		m_pgmflash(*this, "pgmflash"),
 		m_sndflash(*this, "sndflash%u", 0U),
 		m_jp1(*this, "JP1"),
-		m_has_zoom(true),
-		m_znmcu_dataout(1)
+		m_has_zoom(true)
 	{
-		std::fill(std::begin(m_cat702_dataout), std::end(m_cat702_dataout), 1);
 	}
 
 	void init_coh3002t_nz();
 
+	void base_config(machine_config &config);
 	void coh3002t_t2_mp(machine_config &config);
 	void coh3002t(machine_config &config);
 	void coh3002t_t1_mp(machine_config &config);
@@ -382,9 +368,6 @@ public:
 	void coh3002t_t1(machine_config &config);
 
 private:
-	template<int Chip> DECLARE_WRITE_LINE_MEMBER(cat702_dataout) { m_cat702_dataout[Chip] = state; update_sio0_rxd(); }
-	DECLARE_WRITE_LINE_MEMBER(znmcu_dataout) { m_znmcu_dataout = state; update_sio0_rxd(); }
-	void update_sio0_rxd() { m_sio0->write_rxd(m_cat702_dataout[0] && m_cat702_dataout[1] && m_znmcu_dataout); }
 	DECLARE_READ8_MEMBER(control_r);
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE16_MEMBER(control2_w);
@@ -393,25 +376,18 @@ private:
 	DECLARE_READ16_MEMBER(gn_1fb70000_r);
 	DECLARE_WRITE16_MEMBER(gn_1fb70000_w);
 	DECLARE_READ16_MEMBER(hack1_r);
-	DECLARE_READ8_MEMBER(znsecsel_r);
-	DECLARE_WRITE8_MEMBER(znsecsel_w);
-	DECLARE_READ8_MEMBER(boardconfig_r);
 	DECLARE_WRITE8_MEMBER(coin_w);
 	DECLARE_READ8_MEMBER(coin_r);
 	DECLARE_READ8_MEMBER(gnet_mahjong_panel_r);
 	DECLARE_READ32_MEMBER(zsg2_ext_r);
 
 	void flashbank_map(address_map &map);
-	void taitogn_map(address_map &map);
-	void taitogn_mp_map(address_map &map);
+	void main_map(address_map &map);
+	void main_mp_map(address_map &map);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	required_device<psxsio0_device> m_sio0;
-	required_device_array<cat702_device, 2> m_cat702;
-	required_device<znmcu_device> m_znmcu;
-	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mn10200;
 	required_device<pccard_slot_device> m_pccard;
 	required_device<address_map_bank_device> m_flashbank;
@@ -427,14 +403,8 @@ private:
 	uint8_t m_control3;
 	int m_v;
 
-	uint8_t m_n_znsecsel;
-
 	uint8_t m_coin_info;
-
-	int m_cat702_dataout[2];
-	int m_znmcu_dataout;
 };
-
 
 // Misc. controls
 
@@ -513,7 +483,8 @@ READ16_MEMBER(taitogn_state::hack1_r)
 	switch (offset)
 	{
 		case 0:
-			m_v = m_v ^ 8;
+			if (!machine().side_effects_disabled())
+				m_v = m_v ^ 8;
 			// Probably something to do with MCU
 			return m_v;
 
@@ -524,30 +495,6 @@ READ16_MEMBER(taitogn_state::hack1_r)
 	return 0;
 }
 
-
-
-// Lifted from zn.c
-
-READ8_MEMBER(taitogn_state::znsecsel_r)
-{
-	return m_n_znsecsel;
-}
-
-WRITE8_MEMBER(taitogn_state::znsecsel_w)
-{
-	m_cat702[0]->write_select(BIT(data, 2));
-	m_cat702[1]->write_select(BIT(data, 3));
-	m_znmcu->write_select((data & 0x8c) != 0x8c);
-	// BIT(data,4); // read analogue controls?
-
-	m_n_znsecsel = data;
-}
-
-READ8_MEMBER(taitogn_state::boardconfig_r)
-{
-	// see zn.c
-	return 64|32|8;
-}
 
 
 WRITE8_MEMBER(taitogn_state::coin_w)
@@ -605,14 +552,12 @@ READ32_MEMBER(taitogn_state::zsg2_ext_r)
 
 void taitogn_state::machine_start()
 {
+	zn_state::machine_start();
 	save_item(NAME(m_control));
 	save_item(NAME(m_control2));
 	save_item(NAME(m_control3));
 	save_item(NAME(m_v));
-	save_item(NAME(m_n_znsecsel));
 	save_item(NAME(m_coin_info));
-	save_item(NAME(m_cat702_dataout));
-	save_item(NAME(m_znmcu_dataout));
 }
 
 void taitogn_state::machine_reset()
@@ -629,22 +574,15 @@ void taitogn_state::init_coh3002t_nz()
 	m_has_zoom = false;
 }
 
-void taitogn_state::taitogn_map(address_map &map)
+void taitogn_state::main_map(address_map &map)
 {
+	zn_base_map(map);
+
 	map(0x1f000000, 0x1f7fffff).m(m_flashbank, FUNC(address_map_bank_device::amap16));
-	map(0x1fa00000, 0x1fa00003).portr("P1");
-	map(0x1fa00100, 0x1fa00103).portr("P2");
-	map(0x1fa00200, 0x1fa00203).portr("SERVICE");
-	map(0x1fa00300, 0x1fa00303).portr("SYSTEM");
-	map(0x1fa10000, 0x1fa10003).portr("P3");
-	map(0x1fa10100, 0x1fa10103).portr("P4");
-	map(0x1fa10200, 0x1fa10200).r(FUNC(taitogn_state::boardconfig_r));
-	map(0x1fa10300, 0x1fa10300).rw(FUNC(taitogn_state::znsecsel_r), FUNC(taitogn_state::znsecsel_w));
 	map(0x1fa20000, 0x1fa20000).rw(FUNC(taitogn_state::coin_r), FUNC(taitogn_state::coin_w));
 	map(0x1fa30000, 0x1fa30000).rw(FUNC(taitogn_state::control3_r), FUNC(taitogn_state::control3_w));
 	map(0x1fa51c00, 0x1fa51dff).nopr(); // systematic read at spu_address + 250000, result dropped, maybe other accesses
 	map(0x1fa60000, 0x1fa60003).r(FUNC(taitogn_state::hack1_r));
-	map(0x1faf0000, 0x1faf07ff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)); /* eeprom */
 	map(0x1fb00000, 0x1fb0ffff).rw("rf5c296", FUNC(rf5c296_device::io_r), FUNC(rf5c296_device::io_w));
 	map(0x1fb40000, 0x1fb40000).rw(FUNC(taitogn_state::control_r), FUNC(taitogn_state::control_w));
 	map(0x1fb60000, 0x1fb60001).w(FUNC(taitogn_state::control2_w));
@@ -674,9 +612,9 @@ void taitogn_state::flashbank_map(address_map &map)
 	map(0x10200000, 0x103fffff).rw("biosflash", FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
 }
 
-void taitogn_state::taitogn_mp_map(address_map &map)
+void taitogn_state::main_mp_map(address_map &map)
 {
-	taitogn_map(map);
+	main_map(map);
 	map(0x1fa10100, 0x1fa10100).r(FUNC(taitogn_state::gnet_mahjong_panel_r));
 }
 
@@ -690,33 +628,12 @@ void slot_ataflash(device_slot_interface &device)
 
 void taitogn_state::coh3002t(machine_config &config)
 {
+	zn2(config);
+	gameboard_cat702(config);
+
 	/* basic machine hardware */
-	CXD8661R(config, m_maincpu, XTAL(100'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &taitogn_state::taitogn_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitogn_state::main_map);
 
-	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
-
-	auto &sio0(*m_maincpu->subdevice<psxsio0_device>("sio0"));
-	sio0.sck_handler().set(m_cat702[0], FUNC(cat702_device::write_clock));
-	sio0.sck_handler().append(m_cat702[1], FUNC(cat702_device::write_clock));
-	sio0.sck_handler().append(m_znmcu, FUNC(znmcu_device::write_clock));
-	sio0.txd_handler().set(m_cat702[0], FUNC(cat702_device::write_datain));
-	sio0.txd_handler().append(m_cat702[1], FUNC(cat702_device::write_datain));
-
-	CAT702(config, m_cat702[0], 0);
-	m_cat702[0]->dataout_handler().set(FUNC(taitogn_state::cat702_dataout<0>));
-
-	CAT702(config, m_cat702[1], 0);
-	m_cat702[1]->dataout_handler().set(FUNC(taitogn_state::cat702_dataout<1>));
-
-	ZNMCU(config, m_znmcu, 0);
-	m_znmcu->dataout_handler().set(FUNC(taitogn_state::znmcu_dataout));
-	m_znmcu->dsr_handler().set("maincpu:sio0", FUNC(psxsio0_device::write_dsr));
-	m_znmcu->dsw_handler().set_ioport("DSW");
-	m_znmcu->analog1_handler().set_ioport("ANALOG1");
-	m_znmcu->analog2_handler().set_ioport("ANALOG2");
-
-	AT28C16(config, "at28c16", 0);
 	RF5C296(config, "rf5c296", 0).set_pccard("pccard");
 
 	PCCARD_SLOT(config, m_pccard, slot_ataflash, nullptr);
@@ -731,21 +648,9 @@ void taitogn_state::coh3002t(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, "flashbank").set_map(&taitogn_state::flashbank_map).set_options(ENDIANNESS_LITTLE, 16, 32, 0x8000000);
 
-	// 5MHz NEC uPD78081 MCU:
-	// we don't have a 78K0 emulation core yet..
-
-	/* video hardware */
-	CXD8654Q(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
-
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
-
-	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, subdevice<psxcpu_device>("maincpu")));
-	spu.add_route(0, "lspeaker", 0.3);
-	spu.add_route(1, "rspeaker", 0.3);
+	subdevice<spu_device>("spu")->reset_routes();
+	subdevice<spu_device>("spu")->add_route(0, "lspeaker", 0.3);
+	subdevice<spu_device>("spu")->add_route(1, "rspeaker", 0.3);
 
 	TAITO_ZOOM(config, m_zoom);
 	m_zoom->set_use_flash();
@@ -772,7 +677,7 @@ void taitogn_state::coh3002t_t1_mp(machine_config &config)
 	coh3002t_t1(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &taitogn_state::taitogn_mp_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitogn_state::main_mp_map);
 }
 
 void taitogn_state::coh3002t_t2_mp(machine_config &config)
@@ -780,7 +685,7 @@ void taitogn_state::coh3002t_t2_mp(machine_config &config)
 	coh3002t_t2(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &taitogn_state::taitogn_mp_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitogn_state::main_mp_map);
 }
 
 void taitogn_state::coh3002t_cf(machine_config &config)

@@ -1686,7 +1686,7 @@ ROM_END
 
 ROM_START( pkladiesbl )
 	ROM_REGION( 0x50000*2, "maincpu", 0 )
-	// only 1.ic112 is encrypted (only opcodes). Encryption scheme seems to involve XORs and bitswaps, based on addresses. 
+	// only 1.ic112 is encrypted (only opcodes). Encryption scheme seems to involve XORs and bitswaps, based on addresses.
 	ROM_LOAD( "1.ic112", 0x50000, 0x08000, CRC(ca4cfaf9) SHA1(97ad3c526e4494f347db45c986ba23aff07e6321) )
 	ROM_CONTINUE(0x00000,0x08000)
 	ROM_LOAD( "2.ic126", 0x60000, 0x10000, CRC(5c73e9b6) SHA1(5fbfb4c79e2df8e1edd3f29ac63f9961dd3724b1) )

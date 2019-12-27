@@ -54,6 +54,7 @@
 #include "emu.h"
 #include "machine/m6502_vt1682.h"
 #include "machine/vt1682_io.h"
+#include "machine/vt1682_uio.h"
 #include "machine/vt1682_alu.h"
 #include "machine/vt1682_timer.h"
 #include "machine/bankdev.h"
@@ -96,9 +97,12 @@ public:
 	vt_vt1682_state(const machine_config& mconfig, device_type type, const char* tag) :
 		driver_device(mconfig, type, tag),
 		m_io(*this, "io"),
+		m_uio(*this, "uio"),
 		m_leftdac(*this, "leftdac"),
 		m_rightdac(*this, "rightdac"),
 		m_maincpu(*this, "maincpu"),
+		m_fullrom(*this, "fullrom"),
+		m_bank(*this, "cartbank"),
 		m_soundcpu(*this, "soundcpu"),
 		m_maincpu_alu(*this, "mainalu"),
 		m_soundcpu_alu(*this, "soundalu"),
@@ -106,7 +110,6 @@ public:
 		m_soundcpu_timer_b_dev(*this, "snd_timerb_dev"),
 		m_system_timer_dev(*this, "sys_timer_dev"),
 		m_screen(*this, "screen"),
-		m_fullrom(*this, "fullrom"),
 		m_spriteram(*this, "spriteram"),
 		m_vram(*this, "vram"),
 		m_sound_share(*this, "sound_share"),
@@ -116,6 +119,7 @@ public:
 	{ }
 
 	void vt_vt1682(machine_config& config);
+	void regular_init();
 
 protected:
 	virtual void machine_start() override;
@@ -123,10 +127,16 @@ protected:
 	virtual void video_start() override;
 
 	required_device<vrt_vt1682_io_device> m_io;
+	required_device<vrt_vt1682_uio_device> m_uio;
 	required_device<dac_12bit_r2r_device> m_leftdac;
 	required_device<dac_12bit_r2r_device> m_rightdac;
-private:
 	required_device<cpu_device> m_maincpu;
+
+	void vt_vt1682_map(address_map& map);
+
+	required_device<address_map_bank_device> m_fullrom;
+	required_memory_bank m_bank;
+private:
 	required_device<cpu_device> m_soundcpu;
 	required_device<vrt_vt1682_alu_device> m_maincpu_alu;
 	required_device<vrt_vt1682_alu_device> m_soundcpu_alu;
@@ -136,7 +146,6 @@ private:
 	required_device<vrt_vt1682_timer_device> m_system_timer_dev;
 
 	required_device<screen_device> m_screen;
-	required_device<address_map_bank_device> m_fullrom;
 	required_device<address_map_bank_device> m_spriteram;
 	required_device<address_map_bank_device> m_vram;
 	required_shared_ptr<uint8_t> m_sound_share;
@@ -145,8 +154,9 @@ private:
 	required_device<timer_device> m_render_timer;
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
-	void vt_vt1682_map(address_map& map);
 	void vt_vt1682_sound_map(address_map& map);
+
+
 
 	void rom_map(address_map& map);
 
@@ -461,6 +471,8 @@ private:
 
 	DECLARE_READ8_MEMBER(soundcpu_irq_vector_hack_r);
 	DECLARE_READ8_MEMBER(maincpu_irq_vector_hack_r);
+	DECLARE_WRITE8_MEMBER(vt1682_sound_reset_hack_w);
+	bool m_scpu_is_in_reset;
 
 	/* System Helpers */
 
@@ -596,7 +608,10 @@ public:
 		m_io_p4(*this, "IN3")
 	{ }
 
+	void banked_init();
+
 	void intech_interact(machine_config& config);
+	void intech_interact_bank(machine_config& config);
 
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(portb_r) { return 0x00;/*uint8_t ret = machine().rand() & 0xf; LOGMASKED(LOG_OTHER, "%s: portb_r returning: %1x\n", machine().describe_context(), ret); return ret;*/ };
@@ -608,14 +623,18 @@ public:
 	DECLARE_WRITE8_MEMBER(portc_w) { LOGMASKED(LOG_OTHER, "%s: portc_w writing: %1x\n", machine().describe_context(), data & 0xf); };
 	DECLARE_WRITE8_MEMBER(portd_w) { LOGMASKED(LOG_OTHER, "%s: portd_w writing: %1x\n", machine().describe_context(), data & 0xf); };
 
+	DECLARE_WRITE8_MEMBER(ext_rombank_w);
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
+
 	uint8_t m_previous_port_b;
 	int m_input_sense;
 	int m_input_pos;
+	int m_current_bank;
 
 	required_ioport m_io_p1;
 	required_ioport m_io_p2;
@@ -840,7 +859,10 @@ void vt_vt1682_state::machine_reset()
 
 	update_banks();
 
+	m_bank->set_entry(0);
+
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_scpu_is_in_reset = true;
 }
 
 /*
@@ -1146,7 +1168,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2001_vblank_r)
 	uint8_t ret = 0x00;
 
 	int sp_err = 0; // too many sprites per lien
-	int vblank = m_screen->vpos() > 240 ? 1 : 0; // in vblank?
+	int vblank = m_screen->vpos() > 239 ? 1 : 0; // in vblank, the pinball game in miwi2_16 under 'drum master' requires this to become set before the VBL interrupt fires
 
 	ret |= sp_err << 6;
 	ret |= vblank << 7;
@@ -2528,17 +2550,19 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2106_enable_regs_r)
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2106_enable_regs_w)
 {
 	// COMR6 is used for banking
-	LOGMASKED(LOG_OTHER, "%s: vt1682_2106_enable_regs_w writing: %02x (scpurn:%1x scpuon:%1x spion:%1x uarton:%1x tvon:%1x lcdon:%1x)\n", machine().describe_context(), data,
+	LOGMASKED(LOG_OTHER, "%s: vt1682_2106_enable_regs_w writing: %02x (scpurn:%1x scpuon:%1x spion:%1x uarton:%1x tvon:%1x lcdon:%1x)\n", machine().describe_context().c_str(), data,
 		(data & 0x20) >> 5, (data & 0x10) >> 4, (data & 0x08) >> 3, (data & 0x04) >> 2, (data & 0x02) >> 1, (data & 0x01));
 	m_2106_enable_reg = data;
 
 	if (data & 0x20)
 	{
 		m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_scpu_is_in_reset = false;
 	}
 	else
 	{
 		m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		m_scpu_is_in_reset = true;
 	}
 }
 
@@ -3068,7 +3092,8 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_211c_regs_ext2421_w)
 
 	if (data & 0x10)
 	{
-		printf("Sound CPU IRQ Request\n");
+		// not seen used
+		logerror("Sound CPU IRQ Request\n");
 	}
 }
 
@@ -3958,7 +3983,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_211c_reg_irqctrl_w)
 
 	if (data & 0x10)
 	{
-		printf("Main CPU IRQ Request from Sound CPU\n");
+		// not seen used
+		logerror("Main CPU IRQ Request from Sound CPU\n");
+	}
+
+	if (data & 0x08)
+	{
+		// documentation indicates that Sleep mode is buggy, so this probably never gets used
+		popmessage("SCU Sleep\n");
 	}
 }
 
@@ -4904,6 +4936,9 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 			// TODO: bit 0x8000 in palette can cause the layer to 'dig through'
 			// palette layers can also be turned off, or just sent to lcd / just sent to tv
 			// layers can also blend 50/50 rather than using depth
+
+			// the transparency fallthrough here works for Boxing, but appears to be incorrect for Lawn Purge title screen (assuming it isn't an offset issue)
+
 			if (pri1 <= pri2)
 			{
 				if (pix1) dstptr[x] = paldata[pix1 | 0x100];
@@ -4931,7 +4966,7 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 // VT1682 can address 25-bit address space (32MB of ROM)
 void vt_vt1682_state::rom_map(address_map &map)
 {
-	map(0x0000000, 0x1ffffff).rom().region("mainrom", 0);
+	map(0x0000000, 0x1ffffff).bankr("cartbank");
 }
 
 // 11-bits (0x800 bytes) for sprites
@@ -4990,6 +5025,7 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x1fff).ram().share("sound_share");
+	map(0x1ff4, 0x1fff).w(FUNC(vt_vt1682_state::vt1682_sound_reset_hack_w));
 
 	/* Video */
 	map(0x2000, 0x2000).rw(FUNC(vt_vt1682_state::vt1682_2000_r), FUNC(vt_vt1682_state::vt1682_2000_w));
@@ -5089,9 +5125,9 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x2126, 0x2126).rw(FUNC(vt_vt1682_state::vt1682_2126_dma_sr_bank_addr_22_15_r), FUNC(vt_vt1682_state::vt1682_2126_dma_sr_bank_addr_22_15_w));
 	map(0x2127, 0x2127).rw(FUNC(vt_vt1682_state::vt1682_2127_dma_status_r), FUNC(vt_vt1682_state::vt1682_2127_dma_size_trigger_w));
 	map(0x2128, 0x2128).rw(FUNC(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_r), FUNC(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w));
-	// 2129 UIO
-	// 212a UIO
-	// 212b UIO
+	map(0x2129, 0x2129).rw(m_uio, FUNC(vrt_vt1682_uio_device::inteact_2129_uio_a_data_r), FUNC(vrt_vt1682_uio_device::inteact_2129_uio_a_data_w));  // 2129 UIO A
+	map(0x212a, 0x212a).rw(m_uio, FUNC(vrt_vt1682_uio_device::inteact_212a_uio_a_direction_r), FUNC(vrt_vt1682_uio_device::inteact_212a_uio_a_direction_w));  // 212a UIO A
+	map(0x212b, 0x212b).rw(m_uio, FUNC(vrt_vt1682_uio_device::inteact_212b_uio_a_attribute_r), FUNC(vrt_vt1682_uio_device::inteact_212b_uio_a_attribute_w));  // 2129 UIO A
 	map(0x212c, 0x212c).rw(FUNC(vt_vt1682_state::vt1682_212c_prng_r), FUNC(vt_vt1682_state::vt1682_212c_prng_seed_w));
 	// 212d PLL
 	// 212e unused
@@ -5104,6 +5140,11 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x2135, 0x2135).rw(m_maincpu_alu, FUNC(vrt_vt1682_alu_device::alu_out_6_r), FUNC(vrt_vt1682_alu_device::alu_oprand_6_mult_w));
 	map(0x2136, 0x2136).w(m_maincpu_alu, FUNC(vrt_vt1682_alu_device::alu_oprand_5_div_w));
 	map(0x2137, 0x2137).w(m_maincpu_alu, FUNC(vrt_vt1682_alu_device::alu_oprand_6_div_w));
+
+	map(0x2149, 0x2149).rw(m_uio, FUNC(vrt_vt1682_uio_device::inteact_2149_uio_b_data_r), FUNC(vrt_vt1682_uio_device::inteact_2149_uio_b_data_w));  // 2129 UIO A
+	map(0x214a, 0x214a).rw(m_uio, FUNC(vrt_vt1682_uio_device::inteact_214a_uio_b_direction_r), FUNC(vrt_vt1682_uio_device::inteact_214a_uio_b_direction_w));  // 212a UIO A
+	map(0x214b, 0x214b).rw(m_uio, FUNC(vrt_vt1682_uio_device::inteact_214b_uio_b_attribute_r), FUNC(vrt_vt1682_uio_device::inteact_214b_uio_b_attribute_w));  // 2129 UIO A
+
 
 	// 3000-3fff internal ROM if enabled
 	map(0x4000, 0x7fff).r(FUNC(vt_vt1682_state::rom_4000_to_7fff_r));
@@ -5150,10 +5191,17 @@ READ8_MEMBER(vt_vt1682_state::maincpu_irq_vector_hack_r)
 	return rom_8000_to_ffff_r(space, (0xfff8 - 0x8000)+offset);
 }
 
+// intg5410 writes a new program without resetting the CPU when selecting from the 'arcade' game main menu, this is problematic
+// it does appear to rewrite the vectors first, so maybe there is some hardware side-effect of this putting the CPU in reset state??
+WRITE8_MEMBER(vt_vt1682_state::vt1682_sound_reset_hack_w)
+{
+	m_sound_share[0x0ff4 + offset] = data;
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+}
 
 WRITE_LINE_MEMBER(vt_vt1682_state::soundcpu_timera_irq)
 {
-	if (state)
+	if (state && !m_scpu_is_in_reset)
 		m_soundcpu->set_input_line(0, ASSERT_LINE);
 	else
 		m_soundcpu->set_input_line(0, CLEAR_LINE);
@@ -5212,7 +5260,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(vt_vt1682_state::scanline)
 		if (m_2000 & 0x01)
 		{
 			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-			m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // same enable? (NMI_EN on sub is 'wakeup NMI')
+			if (!m_scpu_is_in_reset)
+				m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // same enable? (NMI_EN on sub is 'wakeup NMI')
 		}
 	}
 }
@@ -5318,6 +5367,7 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_test);
 
 	VT_VT1682_IO(config, m_io, 0);
+	VT_VT1682_UIO(config, m_uio, 0);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -5348,6 +5398,7 @@ void intec_interact_state::machine_start()
 	save_item(NAME(m_previous_port_b));
 	save_item(NAME(m_input_sense));
 	save_item(NAME(m_input_pos));
+	save_item(NAME(m_current_bank));
 }
 
 void intec_interact_state::machine_reset()
@@ -5356,7 +5407,29 @@ void intec_interact_state::machine_reset()
 	m_previous_port_b = 0x0;
 	m_input_sense = 0;
 	m_input_pos = 0;
+	m_current_bank = 0;
+	if (m_bank)
+		m_bank->set_entry(m_current_bank & 0x03);
+
 }
+
+WRITE8_MEMBER(intec_interact_state::ext_rombank_w)
+{
+	LOGMASKED(LOG_OTHER, "%s: ext_rombank_w writing: %1x\n", machine().describe_context(), data);
+
+	// Seems no way to unset a bank once set? program will write 0 here, and even taking into account direction
+	// registers that would result in the bank bits being cleared, when running from a higher bank, which
+	// crashes the program.  The game offers no 'back' option, so maybe this really is the correct logic.
+
+	if (data & 0x01)
+		m_current_bank |= 1;
+
+	if (data & 0x02)
+		m_current_bank |= 2;
+
+	m_bank->set_entry(m_current_bank & 0x03);
+};
+
 
 WRITE8_MEMBER(intec_interact_state::porta_w)
 {
@@ -5408,6 +5481,14 @@ static INPUT_PORTS_START( intec )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( miwi2 )
+	PORT_INCLUDE( intec )
+
+	PORT_MODIFY("IN3") // the 2nd drum appears to act like a single 2nd player controller? (even if none of the player 2 controls work in this port for intec?)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // Pink Drum in Drum Master
+INPUT_PORTS_END
+
 
 // this controller code is just designed to feed the games with data they're happy with, it probably has no grounds in reality
 // as I don't know how they really work.  presumably wireless with timeouts, sending signals for brief periods that need to be
@@ -5532,25 +5613,94 @@ void intec_interact_state::intech_interact(machine_config& config)
 	m_rightdac->add_route(0, "mono", 0.5);
 }
 
+void intec_interact_state::intech_interact_bank(machine_config& config)
+{
+	intech_interact(config);
+
+	m_uio->porta_out().set(FUNC(intec_interact_state::ext_rombank_w));
+}
+
+void vt_vt1682_state::regular_init()
+{
+	m_bank->configure_entry(0, memregion("mainrom")->base() + 0x0000000);
+}
+
+
+void intec_interact_state::banked_init()
+{
+	int size = memregion("mainrom")->bytes();
+	for (int i = 0; i < 4; i++)
+	{
+		m_bank->configure_entry(i, memregion("mainrom")->base() + ((i*0x2000000) & (size-1)));
+	}
+}
+
+
+
+
+
+// the VT1682 can have 0x1000 bytes of internal ROM, but none of the software dumped makes use of it.
 
 ROM_START( ii8in1 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "ii8in1.bin", 0x00000, 0x2000000, CRC(7aee7464) SHA1(7a9cf7f54a350f0853a17459f2dcbef34f4f7c30) ) // 2ND HALF EMPTY
-
-	// possible undumped 0x1000 bytes of Internal ROM (software doesn't appear to make use of it)
 ROM_END
 
 ROM_START( ii32in1 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "ii32in1.bin", 0x00000, 0x2000000, CRC(ddee4eac) SHA1(828c0c18a66bb4872299f9a43d5e3647482c5925) )
+ROM_END
 
-	// possible undumped 0x1000 bytes of Internal ROM (software doesn't appear to make use of it)
+ROM_START( miwi2_16 )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "miwi 2 16 arcade games and drum master vt168.bin", 0x00000, 0x1000000, CRC(00c115c5) SHA1(fa5fdb448dd9b963351d71fe94e2072f5c872a18) )
+ROM_END
+
+ROM_START( miwi2_7 )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "miwi 2 sports 7 in 1 vt168.bin", 0x00000, 0x1000000, CRC(fcefb956) SHA1(fea8f041d42bcbae3716ce8b942a01e64504061e) )
+ROM_END
+
+ROM_START( intact89 )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "89n1.bin", 0x00000, 0x4000000, CRC(bbcba068) SHA1(0ec1ecc55e9a7050ca20b1349b9712319fd21629) )
+ROM_END
+
+ROM_START( intg5410 )
+	ROM_REGION( 0x8000000, "mainrom", 0 )
+	ROM_LOAD( "interact_intg5410_111games_plus_42songs.bin", 0x00000, 0x8000000, CRC(d32dc914) SHA1(269fa262bb036ad5246dee9f83ee33dbb1543210) )
 ROM_END
 
 // TODO: this is a cartridge based system (actually, verify this, it seems some versions simply had built in games) move these to SL if verified as from cartridge config
-CONS( 200?, ii8in1,    0,  0,  intech_interact,    intec, intec_interact_state, empty_init,  "Intec", "InterAct 8-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, ii32in1,   0,  0,  intech_interact,    intec, intec_interact_state, empty_init,  "Intec", "InterAct 32-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+//  actually it appears that for the cart based systems these are 'fake systems' anyway, where the base unit is just a Famiclone but as soon as you plug in a cart none of
+//  the internal hardware gets used at all.
+
+CONS( 200?, ii8in1,    0,  0,  intech_interact,    intec, intec_interact_state, regular_init,  "Intec", "InterAct 8-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, ii32in1,   0,  0,  intech_interact,    intec, intec_interact_state, regular_init,  "Intec", "InterAct 32-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // a 40-in-1 also exists which combines the above
 
-// Intec Interact Infrazone 15 Shooting Games, 42 Mi kara, 96 Arcade Games + more should run here too
-// MiWi(2?) and other Mi Kara units should fit here as well
+CONS( 200?, miwi2_16,  0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "<unknown>", "MiWi2 16-in-1 + Drum Master", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // clearly older code, Highway has uncensored title screen, selection screen has 'Arcase' instead of 'Arcade'
+CONS( 200?, miwi2_7,   0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "<unknown>", "MiWi2 7-in-1 Sports", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// ViMax seems to be identical software to MiWi2
+
+CONS( 200?, intact89,  0,  0,  intech_interact_bank, miwi2, intec_interact_state, banked_init,  "Intec", "InterAct Complete Video Game - 89-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+/*
+Box shows 
+
+InterAct
+Complete Video Game System
+Sistema Completo De Video Juegos
+111 Games & 42 Songs
+
+96 Arcade Games:
+8 of them are Sports Games,
+& 3 of the are Drum Master Games.
+Plus 15 Shooting Games
+
+Unit has 'InfraZone' text on it, but this isn't used anywhere in product description.
+
+*/
+CONS( 200?, intg5410,  0,  0,  intech_interact_bank, miwi2, intec_interact_state, banked_init,  "Intec", "InterAct Complete Video Game - 111 Games & 42 Songs (G5410)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need to hook up gun controls etc. and verify others, also sometimes crashes on game change (due to crashing sound CPU?)
+
+// Other standalone Mi Kara units should fit here as well

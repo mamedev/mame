@@ -87,8 +87,15 @@ ToDo:
 
 void esd16_state::sound_command_w(u8 data)
 {
-	m_soundlatch->write(data & 0xff);
-	m_maincpu->spin_until_time(attotime::from_usec(50));  // Allow the other CPU to reply
+	if (m_soundlatch)
+	{
+		m_soundlatch->write(data & 0xff);
+		m_maincpu->spin_until_time(attotime::from_usec(50));  // Allow the other CPU to reply
+	}
+	else
+	{
+		logerror("%s: sound_command_w %02x without soundlatch\n", machine().describe_context(), data);
+	}
 }
 
 template<unsigned Layer>
@@ -184,6 +191,14 @@ void esd16_state::multchmp_map(address_map &map)
 	io_area_dsw(map, 0x600000);
 
 	map(0x700008, 0x70000b).nopr(); // unused protection?
+}
+
+void esd16_state::fantstrya_map(address_map &map)
+{
+	multchmp_map(map);
+
+	map(0x100000, 0x10ffff).unmaprw();
+	map(0x900000, 0x90ffff).ram();
 }
 
 void esd16_state::jumppop_map(address_map &map)
@@ -441,6 +456,89 @@ static INPUT_PORTS_START( multchmp )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( fantstry )
+	PORT_START("P1_P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x000e, 0x000e, "Game Level" )
+	PORT_DIPSETTING(      0x000c, "1" )
+	PORT_DIPSETTING(      0x000a, "2" )
+	PORT_DIPSETTING(      0x000e, "3" )
+	PORT_DIPSETTING(      0x0008, "4" )
+	PORT_DIPSETTING(      0x0006, "5" )
+	PORT_DIPSETTING(      0x0004, "6" )
+	PORT_DIPSETTING(      0x0002, "7" )
+	PORT_DIPSETTING(      0x0000, "8" )
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Language ) )
+	PORT_DIPSETTING(      0x0100, "Korean" )
+	PORT_DIPSETTING(      0x0000, "English" )
+	PORT_DIPNAME( 0x1e00, 0x1e00, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(      0x1800, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( 4C_2C ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_4C ) )
+	PORT_DIPSETTING(      0x1a00, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x1200, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(      0x0a00, DEF_STR( 3C_3C ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(      0x1c00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x1400, DEF_STR( 2C_2C ) )
+	PORT_DIPSETTING(      0x1e00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x1600, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0c00, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( 2C_4C ) )
+	PORT_DIPSETTING(      0x0e00, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0600, DEF_STR( 1C_4C ) )
+
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
+	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( hedpanic )
 	PORT_START("P1_P2")
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -592,9 +690,11 @@ GFXDECODE_END
 
 void esd16_state::machine_start()
 {
-	uint8_t *AUDIO = memregion("audiocpu")->base();
-
-	m_audiobank->configure_entries(0, 16, &AUDIO[0x0000], 0x4000);
+	if (m_audiobank)
+	{
+		uint8_t* AUDIO = memregion("audiocpu")->base();
+		m_audiobank->configure_entries(0, 16, &AUDIO[0x0000], 0x4000);
+	}
 
 	save_item(NAME(m_tilemap_color));
 }
@@ -613,17 +713,12 @@ DECOSPR_PRIORITY_CB_MEMBER(esd16_state::pri_callback)
 		return 0; // above everything
 }
 
-void esd16_state::esd16(machine_config &config)
+void esd16_state::esd16_nosound(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(16'000'000));  /* 16MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &esd16_state::multchmp_map);
 	m_maincpu->set_vblank_int("screen", FUNC(esd16_state::irq6_line_hold));
-
-	Z80(config, m_audiocpu, XTAL(16'000'000)/4); /* 4MHz */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &esd16_state::sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &esd16_state::sound_io_map);
-	m_audiocpu->set_periodic_int(FUNC(esd16_state::nmi_line_pulse), attotime::from_hz(32*60));    /* IRQ By Main CPU */
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -643,6 +738,38 @@ void esd16_state::esd16(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_esd16);
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x1000/2);
+}
+
+void esd16_state::fantstry(machine_config& config)
+{
+	esd16_nosound(config);
+
+	// PIC16F84A-04/P for sound CPU
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	OKIM6295(config, "okisfx", XTAL(16'000'000) / 8, okim6295_device::PIN7_LOW);
+	OKIM6295(config, "okimusic", XTAL(16'000'000) / 8, okim6295_device::PIN7_LOW);
+}
+
+void esd16_state::fantstrya(machine_config& config)
+{
+	fantstry(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &esd16_state::fantstrya_map);
+
+	config.device_remove("okisfx");
+}
+
+void esd16_state::esd16(machine_config& config)
+{
+	esd16_nosound(config);
+
+	Z80(config, m_audiocpu, XTAL(16'000'000)/4); /* 4MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &esd16_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &esd16_state::sound_io_map);
+	m_audiocpu->set_periodic_int(FUNC(esd16_state::nmi_line_pulse), attotime::from_hz(32*60));    /* IRQ By Main CPU */
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -653,7 +780,6 @@ void esd16_state::esd16(machine_config &config)
 
 	OKIM6295(config, "oki", XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60); /* 1MHz */
 }
-
 
 void esd16_state::jumppop(machine_config &config)
 {
@@ -990,6 +1116,7 @@ ROM_START( mchampdxb )
 	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 ) // factory default settings because game doesn't init them properly otherwise
 	ROM_LOAD16_WORD_SWAP( "eeprom1114", 0x0000, 0x0080, CRC(427d90d2) SHA1(39983f9b22b1e9221f7f745f7e84ddcf44d03a08) )
 ROM_END
+
 
 /***************************************************************************
 
@@ -1630,6 +1757,50 @@ ROM_START( jumppope ) /* Running on an original ESD 11-09-98 PCB with original E
 	ROM_LOAD( "at27c020.su10", 0x00000, 0x40000, CRC(066f30a7) SHA1(6bdd0210001c597819f7132ffa1dc1b1d55b4e0a) ) // samples.bin             IDENTICAL
 ROM_END
 
+/* Fantasy Story - not an ESD PCB */
+ROM_START( fantstry )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "system_rom", 0x00000, 0x80000, CRC(3d7f19ce) SHA1(eb163489adda25a0ece1a21292bfe5818b52cddc) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* PIC16F84A-04/P Code */
+	ROM_LOAD( "pic16f84a", 0x00000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x040000, "okisfx", 0 )
+	ROM_LOAD( "voice_rom", 0x00000, 0x040000, CRC(3353e8df) SHA1(22998100e0afa14927ab219dfdbf21c1fd7e27c6) ) // single bank
+
+	ROM_REGION( 0x200000, "okimusic", 0 )
+	ROM_LOAD( "sound_rom", 0x00000, 0x200000, CRC(46e3c7fd) SHA1(56ae5c67f05d01bf2679e2c3fe864a38d3bb7f9d) ) // multiple banks, one sample in each
+
+	ROM_REGION( 0x400000, "bgs", 0 )
+	ROM_LOAD32_WORD( "graphics_rom_4", 0x000000, 0x200000, CRC(82d5104a) SHA1(23067ca2698eb1ec39a77af75beb79431c054fa9) )
+	ROM_LOAD32_WORD( "graphics_rom_5", 0x000002, 0x200000, CRC(9178c370) SHA1(2c0f29c62d36cdb29380a3e63945da1a80e8d170) )
+
+	ROM_REGION( 0x300000, "spr", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "graphics_rom_3", 0x000000, 0x100000, CRC(1bd2b5fc) SHA1(21f32e9d2673c376c0781137db0f2d267b64bc0c) ) // 2bpp
+	ROM_LOAD16_WORD_SWAP( "graphics_rom_2", 0x100000, 0x100000, CRC(2020add8) SHA1(a7d950c6485f6abdcf4fc609a85f60df2bafe34e) ) // 2bpp
+	ROM_LOAD16_BYTE( "graphics_rom_1", 0x200000, 0x080000, CRC(c8caa752) SHA1(cecc7a18a0bb59554316ed24ed0dc01d58d6ae53) ) // 1bpp
+ROM_END
+
+// the following set has a worse sound section: only one OKI with only 0x80000 of ROM.
+ROM_START( fantstrya ) // PCB marked: PNXND-MULTI 2002 01 01 - Only EPROMs dumped for now, marked the flash ROMs as BAD_DUMP but they should match
+	ROM_REGION( 0x80000, "maincpu", 0 ) // only difference from the above set seems to be they moved the RAM base from 0x100000 to 0x900000
+	ROM_LOAD16_WORD_SWAP( "system_rom", 0x00000, 0x80000, CRC(38471eed) SHA1(02f311ea5bdea41092e6754ed120e5e3e6994623) ) // 27c040, sldh
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "pic16f84a", 0x00000, 0x10000, NO_DUMP ) // did they change the program to take into account the one less OKI?
+
+	ROM_REGION( 0x80000, "okimusic", 0 )
+	ROM_LOAD( "sound_rom", 0x00000, 0x80000, CRC(44424914) SHA1(5bbe296d2c8de89b9271914164ef178239fa3e05) ) // 27c4000, sldh
+
+	ROM_REGION( 0x400000, "bgs", 0 )
+	ROM_LOAD32_WORD( "graphics_rom_4", 0x000000, 0x200000, BAD_DUMP CRC(82d5104a) SHA1(23067ca2698eb1ec39a77af75beb79431c054fa9) )
+	ROM_LOAD32_WORD( "graphics_rom_5", 0x000002, 0x200000, BAD_DUMP CRC(9178c370) SHA1(2c0f29c62d36cdb29380a3e63945da1a80e8d170) )
+
+	ROM_REGION( 0x300000, "spr", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "graphics_rom_3", 0x000000, 0x100000, BAD_DUMP CRC(1bd2b5fc) SHA1(21f32e9d2673c376c0781137db0f2d267b64bc0c) ) // 2bpp
+	ROM_LOAD16_WORD_SWAP( "graphics_rom_2", 0x100000, 0x100000, BAD_DUMP CRC(2020add8) SHA1(a7d950c6485f6abdcf4fc609a85f60df2bafe34e) ) // 2bpp
+	ROM_LOAD16_BYTE( "graphics_rom_1", 0x200000, 0x080000, CRC(c8caa752) SHA1(cecc7a18a0bb59554316ed24ed0dc01d58d6ae53) ) // 1bpp, 27c040
+ROM_END
 
 /***************************************************************************
 
@@ -1640,31 +1811,35 @@ ROM_END
 ***************************************************************************/
 
 /* ESD 11-09-98 */
-GAME( 1999, multchmp,  0,        esd16,    multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (World, ver. 2.5)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1998, multchmpk, multchmp, esd16,    multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (Korea, older)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1998, multchmpa, multchmp, esd16,    multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (World, older)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1999, multchmp,  0,        esd16,     multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (World, ver. 2.5)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1998, multchmpk, multchmp, esd16,     multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (Korea, older)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1998, multchmpa, multchmp, esd16,     multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (World, older)",                 MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, jumppop,   0,        jumppop,  jumppop,  esd16_state, empty_init, ROT0, "ESD",         "Jumping Pop (set 1)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 2001, jumppope,  jumppop,  jumppop,  jumppop,  esd16_state, empty_init, ROT0, "Emag Soft",   "Jumping Pop (set 2)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 2001, jumppop,   0,        jumppop,   jumppop,  esd16_state, empty_init, ROT0, "ESD",         "Jumping Pop (set 1)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 2001, jumppope,  jumppop,  jumppop,   jumppop,  esd16_state, empty_init, ROT0, "Emag Soft",   "Jumping Pop (set 2)",                        MACHINE_SUPPORTS_SAVE )
 
 /* ESD 05-28-99 */
-GAME( 1999, hedpanico, hedpanic, hedpanio, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hedpanico, hedpanic, hedpanio,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)",         MACHINE_SUPPORTS_SAVE )
 
 /* ESD 06-10-1999 */
-GAME( 1999, hedpanica, hedpanic, hedpanic, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 0702, 02/07/1999)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hedpanica, hedpanic, hedpanic,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 0702, 02/07/1999)",         MACHINE_SUPPORTS_SAVE )
 
 /* ESD 08-26-1999 */
-GAME( 2000, mchampdx,  0,        mchampdx, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ Deluxe (ver. 0106, 06/01/2000)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, mchampdxa, mchampdx, mchampdx, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1126, 26/11/1999)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, mchampdxb, mchampdx, mchampdx, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1114, 14/11/1999)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, hedpanic,  0,        hedpanic, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 0117, 17/01/2000)",         MACHINE_SUPPORTS_SAVE )
-GAME( 2000, hedpanicf, hedpanic, hedpanic, hedpanic, esd16_state, empty_init, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mchampdx,  0,        mchampdx,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ Deluxe (ver. 0106, 06/01/2000)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, mchampdxa, mchampdx, mchampdx,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1126, 26/11/1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, mchampdxb, mchampdx, mchampdx,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1114, 14/11/1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hedpanic,  0,        hedpanic,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 0117, 17/01/2000)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hedpanicf, hedpanic, hedpanic,  hedpanic, esd16_state, empty_init, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)",         MACHINE_SUPPORTS_SAVE )
 
 /* ESD - This PCB looks identical to the ESD 08-26-1999 PCB */
-GAME( 2000, deluxe5,   0,        tangtang, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 1)",    MACHINE_SUPPORTS_SAVE ) // all 4 sets report the same version number?
-GAME( 2000, deluxe5a,  deluxe5,  tangtang, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 2)",    MACHINE_SUPPORTS_SAVE )
-GAME( 2000, deluxe5b,  deluxe5,  tangtang, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 3)",    MACHINE_SUPPORTS_SAVE )
-GAME( 2000, deluxe4u,  deluxe5,  tangtang, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 4 U (ver. 0107, 07/01/2000)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, deluxe5,   0,        tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 1)",    MACHINE_SUPPORTS_SAVE ) // all 4 sets report the same version number?
+GAME( 2000, deluxe5a,  deluxe5,  tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 2)",    MACHINE_SUPPORTS_SAVE )
+GAME( 2000, deluxe5b,  deluxe5,  tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 3)",    MACHINE_SUPPORTS_SAVE )
+GAME( 2000, deluxe4u,  deluxe5,  tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 4 U (ver. 0107, 07/01/2000)",         MACHINE_SUPPORTS_SAVE )
 
-GAME( 2000, tangtang,  0,        tangtang, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)",          MACHINE_SUPPORTS_SAVE )
-GAME( 2001, swatpolc,  0,        hedpanic, swatpolc, esd16_state, empty_init, ROT0, "ESD",         "SWAT Police",                                MACHINE_SUPPORTS_SAVE )
+GAME( 2000, tangtang,  0,        tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)",          MACHINE_SUPPORTS_SAVE )
+GAME( 2001, swatpolc,  0,        hedpanic,  swatpolc, esd16_state, empty_init, ROT0, "ESD",         "SWAT Police",                                MACHINE_SUPPORTS_SAVE )
+
+/* Z Soft PCB, uses PIC instead of Z80 */
+GAME( 2002, fantstry,  0,        fantstry,  fantstry, esd16_state, empty_init, ROT0, "Z Soft",      "Fantasy Story (set 1)",                      MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // playable, just no sound
+GAME( 2002, fantstrya, fantstry, fantstrya, fantstry, esd16_state, empty_init, ROT0, "Z Soft",      "Fantasy Story (set 2)",                      MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // same

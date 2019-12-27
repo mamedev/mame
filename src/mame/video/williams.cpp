@@ -167,23 +167,23 @@ void williams_state::state_save_register()
 }
 
 
-VIDEO_START_MEMBER(williams_state,williams)
+void williams_state::video_start()
 {
 	blitter_init(m_blitter_config, nullptr);
 	state_save_register();
 }
 
 
-VIDEO_START_MEMBER(blaster_state,blaster)
+void blaster_state::video_start()
 {
 	blitter_init(m_blitter_config, memregion("proms")->base());
 	state_save_register();
-	save_item(NAME(m_blaster_color0));
-	save_item(NAME(m_blaster_video_control));
+	save_item(NAME(m_color0));
+	save_item(NAME(m_video_control));
 }
 
 
-VIDEO_START_MEMBER(williams2_state,williams2)
+void williams2_state::video_start()
 {
 	blitter_init(m_blitter_config, nullptr);
 
@@ -193,7 +193,7 @@ VIDEO_START_MEMBER(williams2_state,williams2)
 
 	state_save_register();
 	save_item(NAME(m_tilemap_xscroll));
-	save_item(NAME(m_williams2_fg_color));
+	save_item(NAME(m_fg_color));
 }
 
 
@@ -204,7 +204,7 @@ VIDEO_START_MEMBER(williams2_state,williams2)
  *
  *************************************/
 
-uint32_t williams_state::screen_update_williams(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t williams_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	rgb_t pens[16];
 	int x, y;
@@ -231,32 +231,31 @@ uint32_t williams_state::screen_update_williams(screen_device &screen, bitmap_rg
 }
 
 
-uint32_t blaster_state::screen_update_blaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t blaster_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	rgb_t pens[16];
-	int x, y;
 
 	/* precompute the palette */
-	for (x = 0; x < 16; x++)
+	for (int x = 0; x < 16; x++)
 		pens[x] = m_palette->pen_color(m_paletteram[x]);
 
 	/* if we're blitting from the top, start with a 0 for color 0 */
-	if (cliprect.min_y == screen.visible_area().min_y || !(m_blaster_video_control & 1))
-		m_blaster_color0 = m_palette->pen_color(m_blaster_palette_0[0] ^ 0xff);
+	if (cliprect.min_y == screen.visible_area().min_y || !(m_video_control & 1))
+		m_color0 = m_palette->pen_color(m_palette_0[0] ^ 0xff);
 
 	/* loop over rows */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		int erase_behind = m_blaster_video_control & m_blaster_scanline_control[y] & 2;
+		int erase_behind = m_video_control & m_scanline_control[y] & 2;
 		uint8_t *source = &m_videoram[y];
 		uint32_t *dest = &bitmap.pix32(y);
 
 		/* latch a new color0 pen? */
-		if (m_blaster_video_control & m_blaster_scanline_control[y] & 1)
-			m_blaster_color0 = m_palette->pen_color(m_blaster_palette_0[y] ^ 0xff);
+		if (m_video_control & m_scanline_control[y] & 1)
+			m_color0 = m_palette->pen_color(m_palette_0[y] ^ 0xff);
 
 		/* loop over columns */
-		for (x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
+		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
 			int pix = source[(x/2) * 256];
 
@@ -265,34 +264,33 @@ uint32_t blaster_state::screen_update_blaster(screen_device &screen, bitmap_rgb3
 				source[(x/2) * 256] = 0;
 
 			/* now draw */
-			dest[x+0] = (pix & 0xf0) ? pens[pix >> 4] : rgb_t(m_blaster_color0 | pens[0]);
-			dest[x+1] = (pix & 0x0f) ? pens[pix & 0x0f] : rgb_t(m_blaster_color0 | pens[0]);
+			dest[x+0] = (pix & 0xf0) ? pens[pix >> 4] : rgb_t(m_color0 | pens[0]);
+			dest[x+1] = (pix & 0x0f) ? pens[pix & 0x0f] : rgb_t(m_color0 | pens[0]);
 		}
 	}
 	return 0;
 }
 
 
-uint32_t williams2_state::screen_update_williams2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t williams2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	rgb_t pens[16];
-	int x, y;
 
 	/* draw the background */
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* fetch the relevant pens */
-	for (x = 1; x < 16; x++)
-		pens[x] = m_palette->pen_color(m_williams2_fg_color * 16 + x);
+	for (int x = 1; x < 16; x++)
+		pens[x] = m_palette->pen_color(m_fg_color * 16 + x);
 
 	/* loop over rows */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint8_t *source = &m_videoram[y];
 		uint32_t *dest = &bitmap.pix32(y);
 
 		/* loop over columns */
-		for (x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
+		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
 			int pix = source[(x/2) * 256];
 
@@ -313,7 +311,7 @@ uint32_t williams2_state::screen_update_williams2(screen_device &screen, bitmap_
  *
  *************************************/
 
-void williams_state::williams_palette(palette_device &palette) const
+void williams_state::palette_init(palette_device &palette) const
 {
 	static constexpr int resistances_rg[3] = { 1200, 560, 330 };
 	static constexpr int resistances_b[2]  = { 560, 330 };
@@ -340,7 +338,7 @@ void williams_state::williams_palette(palette_device &palette) const
 
 
 
-void williams2_state::williams2_paletteram_w(offs_t offset, u8 data)
+void williams2_state::paletteram_w(offs_t offset, u8 data)
 {
 	static const uint8_t ztable[16] =
 	{
@@ -365,9 +363,9 @@ void williams2_state::williams2_paletteram_w(offs_t offset, u8 data)
 }
 
 
-void williams2_state::williams2_fg_select_w(u8 data)
+void williams2_state::fg_select_w(u8 data)
 {
-	m_williams2_fg_color = data & 0x3f;
+	m_fg_color = data & 0x3f;
 }
 
 
@@ -378,7 +376,7 @@ void williams2_state::williams2_fg_select_w(u8 data)
  *
  *************************************/
 
-u8 williams_state::williams_video_counter_r()
+u8 williams_state::video_counter_r()
 {
 	if (m_screen->vpos() < 0x100)
 		return m_screen->vpos() & 0xfc;
@@ -397,77 +395,78 @@ u8 williams_state::williams_video_counter_r()
 TILE_GET_INFO_MEMBER(williams2_state::get_tile_info)
 {
 	int mask = m_gfxdecode->gfx(0)->elements() - 1;
-	int data = m_williams2_tileram[tile_index];
+	int data = m_tileram[tile_index];
 	int y = (tile_index >> 1) & 7;
-	int color = 0;
 
-	switch (m_williams2_tilemap_config)
-	{
-		case WILLIAMS_TILEMAP_MYSTICM:
-		{
-			/* IC79 is a 74LS85 comparator that controls the low bit */
-			int a = 1 | ((color & 1) << 2) | ((color & 1) << 3);
-			int b = ((y & 6) >> 1);
-			int casc = (y & 1);
-			color = (a > b) || ((a == b) && !casc);
-			break;
-		}
-
-		case WILLIAMS_TILEMAP_TSHOOT:
-			/* IC79 is a 74LS157 selector jumpered to be enabled */
-			color = y;
-			break;
-
-		case WILLIAMS_TILEMAP_JOUST2:
-			/* IC79 is a 74LS157 selector jumpered to be disabled */
-			color = 0;
-			break;
-	}
+	/* On tshoot and inferno, IC79 is a 74LS157 selector jumpered to be enabled */
+	int color = y;
 
 	SET_TILE_INFO_MEMBER(0, data & mask, color, (data & ~mask) ? TILE_FLIPX : 0);
 }
 
-
-void williams2_state::williams2_bg_select_w(u8 data)
+TILE_GET_INFO_MEMBER(mysticm_state::get_tile_info)
 {
-	/* based on the tilemap config, only certain bits are used */
-	/* the rest are determined by other factors */
-	switch (m_williams2_tilemap_config)
-	{
-		case WILLIAMS_TILEMAP_MYSTICM:
-			/* IC79 is a 74LS85 comparator that controls the low bit */
-			data &= 0x3e;
-			break;
+	int mask = m_gfxdecode->gfx(0)->elements() - 1;
+	int data = m_tileram[tile_index];
+	int y = (tile_index >> 1) & 7;
+	int color = 0; // TODO: This seems highly suspect. Could it be why the palette doesn't work in mysticm?
 
-		case WILLIAMS_TILEMAP_TSHOOT:
-			/* IC79 is a 74LS157 selector jumpered to be enabled */
-			data &= 0x38;
-			break;
+	/* IC79 is a 74LS85 comparator that controls the low bit */
+	int a = 1 | ((color & 1) << 2) | ((color & 1) << 3);
+	int b = ((y & 6) >> 1);
+	int casc = (y & 1);
+	color = (a > b) || ((a == b) && !casc);
 
-		case WILLIAMS_TILEMAP_JOUST2:
-			/* IC79 is a 74LS157 selector jumpered to be disabled */
-			data &= 0x3f;
-			break;
-	}
-	m_bg_tilemap->set_palette_offset(data * 16);
+	SET_TILE_INFO_MEMBER(0, data & mask, color, (data & ~mask) ? TILE_FLIPX : 0);
 }
 
-
-void williams2_state::williams2_tileram_w(offs_t offset, u8 data)
+TILE_GET_INFO_MEMBER(joust2_state::get_tile_info)
 {
-	m_williams2_tileram[offset] = data;
+	int mask = m_gfxdecode->gfx(0)->elements() - 1;
+	int data = m_tileram[tile_index];
+
+	/* IC79 is a 74LS157 selector jumpered to be disabled */
+	int color = 0;
+
+	SET_TILE_INFO_MEMBER(0, data & mask, color, (data & ~mask) ? TILE_FLIPX : 0);
+}
+
+/* based on the board type, only certain bits are used */
+/* the rest are determined by other factors */
+
+void williams2_state::bg_select_w(u8 data)
+{
+	/* IC79 is a 74LS157 selector jumpered to be enabled */
+	m_bg_tilemap->set_palette_offset((data & 0x38) << 4);
+}
+
+void mysticm_state::bg_select_w(u8 data)
+{
+	/* IC79 is a 74LS85 comparator that controls the low bit */
+	m_bg_tilemap->set_palette_offset((data & 0x3e) << 4);
+}
+
+void joust2_state::bg_select_w(u8 data)
+{
+	/* IC79 is a 74LS157 selector jumpered to be disabled */
+	m_bg_tilemap->set_palette_offset((data & 0x3f) << 4);
+}
+
+void williams2_state::tileram_w(offs_t offset, u8 data)
+{
+	m_tileram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-void williams2_state::williams2_xscroll_low_w(u8 data)
+void williams2_state::xscroll_low_w(u8 data)
 {
 	m_tilemap_xscroll = (m_tilemap_xscroll & ~0x00f) | ((data & 0x80) >> 4) | (data & 0x07);
 	m_bg_tilemap->set_scrollx(0, (m_tilemap_xscroll & 7) + ((m_tilemap_xscroll >> 3) * 6));
 }
 
 
-void williams2_state::williams2_xscroll_high_w(u8 data)
+void williams2_state::xscroll_high_w(u8 data)
 {
 	m_tilemap_xscroll = (m_tilemap_xscroll & 0x00f) | (data << 4);
 	m_bg_tilemap->set_scrollx(0, (m_tilemap_xscroll & 7) + ((m_tilemap_xscroll >> 3) * 6));
@@ -481,16 +480,16 @@ void williams2_state::williams2_xscroll_high_w(u8 data)
  *
  *************************************/
 
-void blaster_state::blaster_remap_select_w(u8 data)
+void blaster_state::remap_select_w(u8 data)
 {
 	m_blitter_remap_index = data;
 	m_blitter_remap = m_blitter_remap_lookup.get() + data * 256;
 }
 
 
-void blaster_state::blaster_video_control_w(u8 data)
+void blaster_state::video_control_w(u8 data)
 {
-	m_blaster_video_control = data;
+	m_video_control = data;
 }
 
 
@@ -504,7 +503,6 @@ void blaster_state::blaster_video_control_w(u8 data)
 void williams_state::blitter_init(int blitter_config, const uint8_t *remap_prom)
 {
 	static const uint8_t dummy_table[] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
-	int i,j;
 
 	/* by default, there is no clipping window - this will be touched only by games that have one */
 	m_blitter_window_enable = 0;
@@ -516,20 +514,17 @@ void williams_state::blitter_init(int blitter_config, const uint8_t *remap_prom)
 	m_blitter_remap_lookup = std::make_unique<uint8_t[]>(256 * 256);
 	m_blitter_remap_index = 0;
 	m_blitter_remap = m_blitter_remap_lookup.get();
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
 		const uint8_t *table = remap_prom ? (remap_prom + (i & 0x7f) * 16) : dummy_table;
-		for (j = 0; j < 256; j++)
+		for (int j = 0; j < 256; j++)
 			m_blitter_remap_lookup[i * 256 + j] = (table[j >> 4] << 4) | table[j & 0x0f];
 	}
 }
 
 
-WRITE8_MEMBER(williams_state::williams_blitter_w)
+WRITE8_MEMBER(williams_state::blitter_w)
 {
-	int sstart, dstart, w, h, accesses;
-	int estimated_clocks_at_4MHz;
-
 	/* store the data */
 	m_blitterram[offset] = data;
 
@@ -538,28 +533,29 @@ WRITE8_MEMBER(williams_state::williams_blitter_w)
 		return;
 
 	/* compute the starting locations */
-	sstart = (m_blitterram[2] << 8) + m_blitterram[3];
-	dstart = (m_blitterram[4] << 8) + m_blitterram[5];
+	int sstart = (m_blitterram[2] << 8) + m_blitterram[3];
+	int dstart = (m_blitterram[4] << 8) + m_blitterram[5];
 
 	/* compute the width and height */
-	w = m_blitterram[6] ^ m_blitter_xor;
-	h = m_blitterram[7] ^ m_blitter_xor;
+	int w = m_blitterram[6] ^ m_blitter_xor;
+	int h = m_blitterram[7] ^ m_blitter_xor;
 
 	/* adjust the width and height */
 	if (w == 0) w = 1;
 	if (h == 0) h = 1;
 
 	/* do the actual blit */
-	accesses = blitter_core(space, sstart, dstart, w, h, data);
+	int accesses = blitter_core(space, sstart, dstart, w, h, data);
 
 	/* based on the number of memory accesses needed to do the blit, compute how long the blit will take */
+	int estimated_clocks_at_4MHz = 4;
 	if(data & WMS_BLITTER_CONTROLBYTE_SLOW)
 	{
-		estimated_clocks_at_4MHz = 4 + 4 * (accesses + 2);
+		estimated_clocks_at_4MHz += 4 * (accesses + 2);
 	}
 	else
 	{
-		estimated_clocks_at_4MHz = 4 + 2 * (accesses + 3);
+		estimated_clocks_at_4MHz += 2 * (accesses + 3);
 	}
 
 	m_maincpu->adjust_icount(-((estimated_clocks_at_4MHz + 3) / 4));
@@ -575,7 +571,7 @@ WRITE8_MEMBER(williams_state::williams_blitter_w)
 }
 
 
-void williams2_state::williams2_blit_window_enable_w(u8 data)
+void williams2_state::blit_window_enable_w(u8 data)
 {
 	m_blitter_window_enable = data & 0x01;
 }
@@ -636,27 +632,24 @@ inline void williams_state::blit_pixel(address_space &space, int dstaddr, int sr
 
 int williams_state::blitter_core(address_space &space, int sstart, int dstart, int w, int h, int controlbyte)
 {
-	int source, sxadv, syadv;
-	int dest, dxadv, dyadv;
-	int x, y;
 	int accesses = 0;
 
 	/* compute how much to advance in the x and y loops */
-	sxadv = (controlbyte & WMS_BLITTER_CONTROLBYTE_SRC_STRIDE_256) ? 0x100 : 1;
-	syadv = (controlbyte & WMS_BLITTER_CONTROLBYTE_SRC_STRIDE_256) ? 1 : w;
-	dxadv = (controlbyte & WMS_BLITTER_CONTROLBYTE_DST_STRIDE_256) ? 0x100 : 1;
-	dyadv = (controlbyte & WMS_BLITTER_CONTROLBYTE_DST_STRIDE_256) ? 1 : w;
+	int sxadv = (controlbyte & WMS_BLITTER_CONTROLBYTE_SRC_STRIDE_256) ? 0x100 : 1;
+	int syadv = (controlbyte & WMS_BLITTER_CONTROLBYTE_SRC_STRIDE_256) ? 1 : w;
+	int dxadv = (controlbyte & WMS_BLITTER_CONTROLBYTE_DST_STRIDE_256) ? 0x100 : 1;
+	int dyadv = (controlbyte & WMS_BLITTER_CONTROLBYTE_DST_STRIDE_256) ? 1 : w;
 
-	int pixdata=0;
+	int pixdata = 0;
 
 	/* loop over the height */
-	for (y = 0; y < h; y++)
+	for (int y = 0; y < h; y++)
 	{
-		source = sstart & 0xffff;
-		dest = dstart & 0xffff;
+		int source = sstart & 0xffff;
+		int dest = dstart & 0xffff;
 
 		/* loop over the width */
-		for (x = 0; x < w; x++)
+		for (int x = 0; x < w; x++)
 		{
 			if (!(controlbyte & WMS_BLITTER_CONTROLBYTE_SHIFT)) //no shift
 			{

@@ -22,14 +22,14 @@
 
 NETLIST_START(main)
 
-    /* Standard stuff */
+	/* Standard stuff */
 
-    //VARCLOCK(clk, "0.5 / pow(10, 1 + T * 4)")
-    //CLOCK(clk, 1000)
-    SOLVER(Solver, 48000)
-    PARAM(Solver.ACCURACY, 1e-7)
-    PARAM(Solver.NR_LOOPS, 300)
-    PARAM(Solver.DYNAMIC_TS, 1)
+	//VARCLOCK(clk, "0.5 / pow(10, 1 + T * 4)")
+	//CLOCK(clk, 1000)
+	SOLVER(Solver, 48000)
+	PARAM(Solver.ACCURACY, 1e-7)
+	PARAM(Solver.NR_LOOPS, 300)
+	PARAM(Solver.DYNAMIC_TS, 1)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 1e-7)
 
 	VS(vs, 0)
@@ -59,36 +59,36 @@ NETLIST_START(main)
 	PARAM(vs.R, 0.001)
 	ALIAS(clk, vs.1)
 	NET_C(vs.2, GND)
-    ANALOG_INPUT(V12, 12)
-    ANALOG_INPUT(VM12, -12)
+	ANALOG_INPUT(V12, 12)
+	ANALOG_INPUT(VM12, -12)
 
-    OPAMP(op, OPAMP_TEST)
+	OPAMP(op, OPAMP_TEST)
 
-    NET_C(op.GND, VM12)
-    NET_C(op.VCC, V12)
+	NET_C(op.GND, VM12)
+	NET_C(op.VCC, V12)
 
-    /* Opamp B wired as inverting amplifier connected to output of first opamp */
+	/* Opamp B wired as inverting amplifier connected to output of first opamp */
 
-    RES(R1, 100)
-    RES(RP, 100)
-    RES(R2, 10000000)
+	RES(R1, 100)
+	RES(RP, 100)
+	RES(R2, 10000000)
 
-    NET_C(op.PLUS, RP.1)
+	NET_C(op.PLUS, RP.1)
 	NET_C(RP.2, GND)
-    NET_C(op.MINUS, R2.2)
-    NET_C(op.MINUS, R1.2)
+	NET_C(op.MINUS, R2.2)
+	NET_C(op.MINUS, R1.2)
 
- 	NET_C(clk, R1.1)
-    NET_C(op.OUT, R2.1)
+	NET_C(clk, R1.1)
+	NET_C(op.OUT, R2.1)
 
-    RES(RL, 2000)
-    NET_C(RL.2, GND)
-    NET_C(RL.1, op.OUT)
+	RES(RL, 2000)
+	NET_C(RL.2, GND)
+	NET_C(RL.1, op.OUT)
 
 	AFUNC(f, 1, "A0 * 1000")
 	NET_C(f.A0, op.OUT)
 #if 1
-    LOG(log_Y, R1.1)
-    LOG(log_Z, f)
+	LOG(log_Y, R1.1)
+	LOG(log_Z, f)
 #endif
 NETLIST_END()

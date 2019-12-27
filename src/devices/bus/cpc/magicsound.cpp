@@ -96,10 +96,7 @@ void al_magicsound_device::device_start()
 
 	m_ramptr = machine().device<ram_device>(":" RAM_TAG);
 
-	for(int x=0;x<4;x++)
-	{
-		save_item(NAME(m_output[x]),x);
-	}
+	save_item(NAME(m_output));
 }
 
 //-------------------------------------------------

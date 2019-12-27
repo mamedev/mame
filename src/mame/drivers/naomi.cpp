@@ -702,7 +702,11 @@ Melty Blood Actress Again Version A (Rev A)         841-0061C    24455        6 
 Pokasuka Ghost!                                     840-0170C    not present  5 (512Mb)   present  317-0461-COM  present  requires 837-14672 sensor board (SH4 based)
 Radirgy Noa                                         841-0062C    not present  4 (512Mb)   present  317-5138-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A"
 Rhythm Tengoku                                      841-0177C    not present  4 (512Mb)   present  317-0503-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A"
+Star Horse Progress Returns (main screen left)      840-0183C    24480        4 (512Mb)   present  not present   present  IC2# is labeled "VER.2", requires 837-13785 ARCNET&IO BD
+Star Horse Progress Returns (main screen right)     840-0184C    not present  2 (512Mb)   present  not present   present  IC2# is labeled "VER.2", requires 837-13785 ARCNET&IO BD
+Star Horse Progress Returns (live and voice)        840-0185C    not present  4 (512Mb)   present  not present   present  IC2# is labeled "VER.2", requires 837-13785 ARCNET&IO BD
 Star Horse Progress Returns (satellite)             840-0186C    not present  2 (512Mb)   present  not present   present  IC2# is labeled "VER.2", requires 837-13785 ARCNET&IO BD
+Star Horse Progress Returns (sound)                 840-0187C    24481        4 (512Mb)   present  not present   present  IC2# is labeled "VER.2", requires 837-13785 ARCNET&IO BD
 Shooting Love 2007                                  841-0057C    not present  4 (512Mb)   present  317-5129-JPN  present  IC2# is labeled "VER.2"
 Touch De Zunou (Rev A)                              840-0166C    not present  2 (512Mb)   present  317-0435-JPN  present  IC4# is marked "18", requires 837-14672 sensor board (SH4 based)
 
@@ -8036,14 +8040,193 @@ ROM_END
 
 
 /***** Star Horse Progress Returns *****/
-// VIDEO R, 837-14922-01 VIDEO BD SHE PROG RET LGE, SHE-0020 ASSY VIDEO BD R SHE
-// VIDEO L, 837-14923-01 VIDEO BD SHE P RET & HORSE D L, SHE-0030 ASSY VIDEO BD L SHE
-// SOUND, 837-14924-01 SOUND BD SHE PROG RET LGE, SHE-0040 ASSY SOUND BD SHE
-// LIVE, 837-14925-01 LIVE & VOICE BD SHE P RET L
-// 834-14921, SHE-0010, communication? unit, not NAOMI-based, uses 2x Motorola MC68360 QUICC
+// complete game set -  5 NAOMI units and 2 Motorola 'QUICC' MC68360 based units.
 
-// currently we have only Satellite unit ROM board dumped, server/control and large screen units is missing.
-// Satellite, ID# 837-14926, SATL BD SHE PROG RET
+/*
+Main unit, ID# 834-14921
+3 custom PCBs stack (from lower to upper):
+
+G-MAIN2
+837-13126-91
+|------------------------------------------------------------|
+|                   ---CN2---           ---CN1---            |
+| TOS5  COM20020                                             |
+|                             315-5296                       |
+| TOS4  COM20020                                             |
+|                          20MHz   -CN-EX1-                  |
+|                                                            |
+| TOS3  315-6032             32MHz -CN-EX2-    315-5296      |
+|                 MC68360                                    |
+| TOS2                             4C256K16 4C256K16         |
+|       RTC72423      JP6                                    |
+|                       IC3        52256 52256  315-5338A    |
+| TOS1                JP1                              LEDs  |
+|         CR2032        IC2      JP2-5  SW1  SW2  SW3  SW4   |
+|------------------------------------------------------------|
+Notes:
+ MC68360   - Motorola MC68360EM25L 'QUICC' QUad Integrated Communications Controller
+ IC2       - EPR-24482 27C4002 EEPROM (DIP40)
+ IC3       - EEPROM DIP40 (not populated)
+ 4C256K16  - 2x Alliance AS4C256K16F0 256k x16 CMOS DRAM (Fast Page Mode)
+ 52256     - 2x Sharp LH52256CN-70LL 32k x8 CMOS SRAM
+ COM20020  - 2x SMsC COM20020ILJP 5Mbps ARCNET controller
+ 315-5296  - 2x Sega I/O ASIC
+ 315-5338A - Sega I/O ASIC
+ 315-6032  - Lattice MACH211 CPLD
+ RTC72423  - Epson RTC-72423 real time clock
+ TOS 1-5   - 5x TOSLINK connectors
+ SW 1-4    - x8 DIP Switch
+
+BD CARRIER CNTRL BD
+837-13768-91
+834-14372-01
+|------------------------------------------------------------|
+|          ---CN1---                       4C256K16 4C256K16 |
+|                                                            |
+| TOS2     315-6252       7054    315-6306 4C256K16 4C256K16 |
+|                                                            |
+|                            --CN2--                52256    |
+| TOS1                                                       |
+|           MC68360         MC68360                 52256    |
+| 4C256K16 4C256K16                                          |
+|  IC3             315-6251                                  |
+|----------------------|      IC1    IC2     CR2032          |
+                       |-------------------------------------|
+Notes:
+ MC68360   - 2x Motorola MC68360EM25L 'QUICC' QUad Integrated Communications Controller
+ IC1       - EPR-24483 27C4002 EEPROM (DIP40)
+ 4C256K16  - 6x Alliance AS4C256K16F0 256k x16 CMOS DRAM (Fast Page Mode)
+ 52256     - 2x Sharp LH52256CN-70LL 32k x8 CMOS SRAM
+ 7054      - IDT7054 4k x8 four-port SRAM
+ 315-6251  - Xilinx XC9536 CPLD
+ 315-6252  - Xilinx XC9572 CPLD
+ 315-6306  - Xilinx XC9536 CPLD
+ TOS 1-2   - 2x TOSLINK connectors
+ IC2-3     - EEPROM DIP40 (not populated)
+
+CGAL MEMORY BD
+837-13809-01
+|------------------------|
+|       315-6309         |
+|                        |
+| 62148           CR2032 |
+|                        |
+|    --CN1--     LEDs    |
+|------------------------|
+Notes:
+ 315-6309 - Xilinx XC9536 CPLD
+ 62148    - Cypress CY62148BLL 512k x8 SRAM
+*/
+
+/*
+Matrix unit, ID# 834-?????
+2 custom PCBs stack (from lower to upper):
+
+G-MAIN2
+837-13126-91
+same PCB as used in Main unit, but populated both IC2 and IC3 EEPROMs
+
+DOT CONT BD
+837-14378
+|-------------------------------|
+|           --CN1--       16MHz |
+|        IC12                   |
+|                               |
+|     --CN-EX1--                |
+|                     8431 8431 |
+|     --CN-EX2--                |
+|                               |
+| 8431 8431 8431 8431 8431 8431 |
+|-------------------------------|
+Notes:
+ IC12 - Altera FLEX EPF8282ALC84-4 FPGA
+ 8431 - 8x Fujitsu MB8431-90LP 2k x8 Dual-Port CMOS SRAM
+*/
+
+// Video Right, ID# 837-14922 REV.B, VIDEO BD SHE PROG RET
+// ROM board ID# 840-0184B
+ROM_START( shorseprvr )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "fpr-24493.ic8",  0x00000000, 0x4000000, CRC(038fe419) SHA1(1b92879e1fd42589df35fe37ee5277449cdb8a11) )
+	ROM_LOAD( "fpr-24494.ic9",  0x04000000, 0x4000000, CRC(8a6c1cee) SHA1(2730dfbd86a94676d6550112eaa125b27740b255) )
+
+	// PIC not populated
+	ROM_REGION( 0x800, "pic_readout", ROMREGION_ERASE00 )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )
+
+	// TODO: following should be separate sets or devices
+	// Main unit
+	ROM_REGION(0x100000, "main_unit", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr-24482.ic2", 0x00000, 0x80000, CRC(0d1aa9f3) SHA1(93d03f75eb3837713da7f5deba608090470bb7b3) ) // 837-13126-91 PCB
+	ROM_LOAD( "epr-24483.ic1", 0x80000, 0x80000, CRC(034adee6) SHA1(b49a90378988132621c8e188e0bb10e90fc7b9a1) ) // 837-13768-91 PCB
+
+	// Matrix unit
+	ROM_REGION(0x100000, "matrix_unit", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr-24484.ic2", 0x00000, 0x80000, CRC(99ba7d7b) SHA1(1bf76acc126f48aa3072c466b88c7d450ced936f) )
+	ROM_LOAD( "epr-24485.ic3", 0x80000, 0x80000, CRC(5dbea04c) SHA1(657bf0c4b383f5d5c5e4611baaebce497bf328ef) )
+ROM_END
+
+// Video Left, ID# 837-14923 REV.B, VIDEO BD SHE P RET & HORSE D
+// ROM board ID# 840-0183B
+ROM_START( shorseprvl )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x10000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "fpr-24479.ic8",  0x00000000, 0x4000000, CRC(9b60b0f3) SHA1(7ac7c514171690bc3de254313e5d8d90ef85e1b6) )
+	ROM_LOAD( "epr-24480.ic7",  0x00000000, 0x0400000, CRC(c865c71e) SHA1(d0b4b93b6cde13c368afe6338d23f439d7d9bef8) )
+	ROM_LOAD( "fpr-24480.ic9",  0x04000000, 0x4000000, CRC(91e15bc4) SHA1(d29d52bd6641964fee37c90f453215caf617f468) )
+	ROM_LOAD( "fpr-24481.ic10", 0x08000000, 0x4000000, CRC(df6e5461) SHA1(232758c7a5e28b76782b428eec2b20837d864908) )
+	ROM_LOAD( "fpr-24482.ic11", 0x0c000000, 0x4000000, CRC(9613d44b) SHA1(1b811d67dadda3de0584717ea41af269a79669ad) )
+
+	// PIC not populated
+	ROM_REGION( 0x800, "pic_readout", ROMREGION_ERASE00 )
+
+	ROM_PARAMETER( ":rom_board:id", "5584" )
+ROM_END
+
+// Sound, ID# 837-14924 REV.A, SOUND BD SHE PROG RET
+// ROM board ID# 840-0187B
+ROM_START( shorseprs )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x10000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "fpr-24479.ic8",  0x00000000, 0x4000000, CRC(9b60b0f3) SHA1(7ac7c514171690bc3de254313e5d8d90ef85e1b6) )
+	ROM_LOAD( "epr-24481.ic7",  0x00000000, 0x0400000, CRC(5903b123) SHA1(fe15d4eedb49d4ce9b88ae160bbac837744e2c9b) )
+	ROM_LOAD( "fpr-24480.ic9",  0x04000000, 0x4000000, CRC(91e15bc4) SHA1(d29d52bd6641964fee37c90f453215caf617f468) )
+	ROM_LOAD( "fpr-24481.ic10", 0x08000000, 0x4000000, CRC(df6e5461) SHA1(232758c7a5e28b76782b428eec2b20837d864908) )
+	ROM_LOAD( "fpr-24482.ic11", 0x0c000000, 0x4000000, CRC(9613d44b) SHA1(1b811d67dadda3de0584717ea41af269a79669ad) )
+
+	// PIC not populated
+	ROM_REGION( 0x800, "pic_readout", ROMREGION_ERASE00 )
+
+	ROM_PARAMETER( ":rom_board:id", "5584" )
+ROM_END
+
+// Live, ID# 837-14925 REV.A, LIVE & VOICE BD SHE PROG RET
+// ROM board ID# 840-0185B
+ROM_START( shorseprl )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x10000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "fpr-24486.ic8",  0x00000000, 0x4000000, CRC(05231d7c) SHA1(41ac151044d4b2cbc633948ffef7d9f8a9c18cad) )
+	ROM_LOAD( "fpr-24487.ic9",  0x04000000, 0x4000000, CRC(f45cccb6) SHA1(ad8e74f4f833e11026ddb6bfc11bc090d7388f45) )
+	ROM_LOAD( "fpr-24488.ic10", 0x08000000, 0x4000000, CRC(665b6cab) SHA1(fa6e83a5234f2551d3c715418425b55ab6a43aa5) )
+	ROM_LOAD( "fpr-24497.ic11", 0x0c000000, 0x4000000, CRC(78e0e303) SHA1(e6e596bd29c0701366e37c177752ac618895b6ec) )
+
+	// PIC not populated
+	ROM_REGION( 0x800, "pic_readout", ROMREGION_ERASE00 )
+
+	ROM_PARAMETER( ":rom_board:id", "5504" )
+ROM_END
+
+// Satellite, ID# 837-14926 REV.A, SATL BD SHE PROG RET
 // ROM board ID# 840-0186B
 ROM_START( shorsepr )
 	NAOMI_BIOS
@@ -11197,7 +11380,11 @@ ROM_END
 /* 0175    */ GAME( 2007, asndynmto, asndynmt, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Asian Dynamite / Dynamite Deka EX (older)", GAME_FLAGS ) // no revision stickers, presumably older revision but might be release for Asian market
 /* 0177    */ GAME( 2007, rhytngk,   naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega / Nintendo - J.P ROOM", "Rhythm Tengoku (Japan)", GAME_FLAGS )
 /* 0180    */ GAME( 2007, mushik4e,  naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking IV / V / VI (World)", GAME_FLAGS ) // not for Japan or Korea, version can be changed in secret menu, ~equivalent of Japanese 2K6 versions.
+/* 0183    */ GAME( 2009, shorseprvl,shorsepr, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse Progress Returns (main screen left)", GAME_FLAGS )
+/* 0184    */ GAME( 2009, shorseprvr,shorsepr, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse Progress Returns (main screen right)", GAME_FLAGS )
+/* 0185    */ GAME( 2009, shorseprl, shorsepr, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse Progress Returns (live and voice)", GAME_FLAGS )
 /* 0186    */ GAME( 2009, shorsepr,  naomi,    naomim4, naomi,   naomi_state, init_naomi,  ROT270,"Sega", "Star Horse Progress Returns (satellite)", GAME_FLAGS )
+/* 0187    */ GAME( 2009, shorseprs, shorsepr, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse Progress Returns (sound)", GAME_FLAGS )
 // 00xx Mayjinsen (Formation Battle in May) - prototype, never released
 // 01xx Mushiking 2K3 1ST (Japan)
 // 01xx Mushiking 2K4 1ST (Japan)
@@ -11205,7 +11392,6 @@ ROM_END
 // 0xxx Nittere Shiki! Mirai Yosou Studio
 // 0xxx Star Horse 2001 (main screens, server)
 // 0xxx Star Horse 2002 (whole set)
-// 0xxx Star Horse Progress Returns (main screens, server)
 
 /* Cartridge prototypes of games released on GD-ROM */
 /* none */ GAME( 2003, puyofevp,  puyofev,  naomim1, naomi, naomi_state, init_naomi, ROT0, "Sega", "Puyo Puyo Fever (prototype ver 0.01)", GAME_FLAGS )

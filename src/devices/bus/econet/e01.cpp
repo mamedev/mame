@@ -269,7 +269,7 @@ void econet_e01_device::device_add_mconfig(machine_config &config)
 	}
 
 	software_list_device &softlist(SOFTWARE_LIST(config, "flop_ls_e01"));
-	softlist.set_type("e01_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	softlist.set_original("e01_flop");
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(R6522_TAG, FUNC(via6522_device::write_ca1));

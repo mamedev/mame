@@ -17,7 +17,6 @@
 
  TODO:
      Really understand ASIC chip
-     Remove device_post_load once outputs support savestates
 
 ***********************************/
 
@@ -52,7 +51,6 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void device_post_load() override;
 
 private:
 	DECLARE_WRITE8_MEMBER(vram_w);
@@ -80,7 +78,6 @@ private:
 
 	uint8_t m_video;
 	uint8_t m_hsync_q;
-	uint8_t m_lamps_cache[8];
 
 	required_device<i80c32_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -94,18 +91,12 @@ void cardline_state::machine_start()
 	m_lamps.resolve();
 	m_video = 0;
 	m_hsync_q = 1;
-	memset(m_lamps_cache, 0, sizeof(m_lamps_cache));
+
 	for (int i = 0; i < 0x2000; i++)
 		m_maincpu.target()->space(AS_IO).write_byte(i, 0x73);
+
 	save_item(NAME(m_video));
 	save_item(NAME(m_hsync_q));
-	save_item(NAME(m_lamps_cache));
-}
-
-void cardline_state::device_post_load()
-{
-	for (int i = 0; i < 8; i++)
-		m_lamps[i] = m_lamps_cache[i];
 }
 
 MC6845_BEGIN_UPDATE( cardline_state::crtc_begin_update )
@@ -217,14 +208,14 @@ READ8_MEMBER(cardline_state::hsync_r)
 WRITE8_MEMBER(cardline_state::lamps_w)
 {
 	/* button lamps 1-8 (collect, card 1-5, bet, start) */
-	m_lamps_cache[5] = m_lamps[5] = BIT(data, 0);
-	m_lamps_cache[0] = m_lamps[0] = BIT(data, 1);
-	m_lamps_cache[1] = m_lamps[1] = BIT(data, 2);
-	m_lamps_cache[2] = m_lamps[2] = BIT(data, 3);
-	m_lamps_cache[3] = m_lamps[3] = BIT(data, 4);
-	m_lamps_cache[4] = m_lamps[4] = BIT(data, 5);
-	m_lamps_cache[6] = m_lamps[6] = BIT(data, 6);
-	m_lamps_cache[7] = m_lamps[7] = BIT(data, 7);
+	m_lamps[5] = BIT(data, 0);
+	m_lamps[0] = BIT(data, 1);
+	m_lamps[1] = BIT(data, 2);
+	m_lamps[2] = BIT(data, 3);
+	m_lamps[3] = BIT(data, 4);
+	m_lamps[4] = BIT(data, 5);
+	m_lamps[6] = BIT(data, 6);
+	m_lamps[7] = BIT(data, 7);
 }
 
 void cardline_state::mem_prg(address_map &map)

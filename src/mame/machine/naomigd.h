@@ -6,6 +6,7 @@
 #pragma once
 
 #include "machine/naomibd.h"
+#include "cpu/pic16c62x/pic16c62x.h"
 
 
 class naomi_gdrom_board : public naomi_board
@@ -30,6 +31,11 @@ public:
 
 	naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual void device_add_mconfig(machine_config &config) override;
+	void sh4_map(address_map &map);
+	void sh4_io_map(address_map &map);
+	void pic_map(address_map &map);
+
 	void set_image_tag(const char *_image_tag)
 	{
 		image_tag = _image_tag;
@@ -38,6 +44,11 @@ public:
 	uint8_t *memory(uint32_t &size) { size = dimm_data_size; return dimm_data; }
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	DECLARE_READ64_MEMBER(i2cmem_dimm_r);
+	DECLARE_WRITE64_MEMBER(i2cmem_dimm_w);
+	DECLARE_READ8_MEMBER(pic_dimm_r);
+	DECLARE_WRITE8_MEMBER(pic_dimm_w);
 
 protected:
 	virtual void device_start() override;
@@ -50,10 +61,17 @@ protected:
 private:
 	enum { FILENAME_LENGTH=24 };
 
+	required_device<sh4_device> m_maincpu;
+	required_device<pic16c621a_device> m_securitycpu;
+
 	const char *image_tag;
 	optional_region_ptr<uint8_t> picdata;
 
 	uint32_t dimm_cur_address;
+	uint8_t picbus;
+	uint8_t picbus_pullup;
+	uint8_t picbus_io[2]; // 0 for sh4, 1 for pic
+	bool picbus_used;
 
 	// Note: voluntarily not saved into the state
 	uint8_t *dimm_data;

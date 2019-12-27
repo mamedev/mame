@@ -729,7 +729,7 @@ ROM_END
 /-------------------------------------------------------------------*/
 ROM_START(tmacltd4)
 	ROM_REGION(0x2000, "roms", 0)
-	ROM_LOAD("tm4-l.bin", 0x0000, 0x1000, NO_DUMP)
+	ROM_LOAD("tm4-l.bin", 0x0000, 0x1000, CRC(69691662) SHA1(3d86314967075e3f5b168c8d7bf6b26bbbb957bd))
 	ROM_LOAD("tm4-h.bin", 0x1000, 0x1000, CRC(f5f97992) SHA1(ba31f71a600e7061b500e0750f50643503e52a80))
 ROM_END
 

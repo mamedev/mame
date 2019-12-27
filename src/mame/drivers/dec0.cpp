@@ -56,6 +56,30 @@ ToDo:
 - background pen in Birdie Try is presumably wrong.
 - Pixel clock frequency isn't verified
 
+Bad Dudes MCU implements a command to calculate a program ROM checksum and
+compare the low byte of the result to a value supplied by the host CPU, but it
+doesn't work.  Here's the code in question:
+
+0AB0: 51 50    acall   $0A50
+0AB2: C3       clr     c
+0AB3: 48       orl     a,r0
+0AB4: 70 02    jnz     $0AB8
+0AB6: 80 89    sjmp    $0A41
+0AB8: 21 F0    ajmp    $09F0
+
+The function at $0A50 reads the expected value from the host, $0A41 is the
+normal command response, and $09F0 is the error response.  The orl instruction
+doesn't make sense here.  However, changing it from 48 to 60 makes it an xrl
+instruction which would work as expected.  The game doesn't issue this command.
+The checksum function can't be used to verify that the program is good because
+the expected value mod 256 has to be supplied by the host.
+
+Bad Dudes only seems to use commands $0B (sync), $01 (reset if parameter is not
+$3B), $07 (return table index if parameter matches table, otherwise reset), and
+$09 (set table index to zero).  Dragonninja only seems to use commands $03 (on
+startup), $07 (same function as Bad Dudes) and $09 (same function as Bad Dudes).
+Most of the MCU program isn't utilised.
+
 
 Guru-Readme for Data East 16 bit games (Updated 7-Feb-2017)
 
@@ -2261,6 +2285,11 @@ ROM_START( hbarrel ) /* DE-0289-2 main board, DE-0293-1 sub/rom board */
 	ROM_LOAD( "mb7122e.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) ) /* Also known to be labeled as A-2 */
 ROM_END
 
+/*
+There are known PCBs with ROMs 01 & 04 stamped as "-1" revision
+At least 1 PCB was spotted with ROM labels as "MYF HEAVY BARREL 01-2" & "MYF HEAVY BARREL 04-2"
+Niether version has been dumped to verify they are indeed different versions
+*/
 ROM_START( hbarrelu ) /* DE-0297-1 main board, DE-0299-0 sub/rom board */
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "heavy_barrel_04.3c", 0x00000, 0x10000, CRC(4877b09e) SHA1(30c653b2f59fece881d088b675192ff2599adbe3) )

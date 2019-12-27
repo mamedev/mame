@@ -264,8 +264,10 @@ peribox_device::peribox_device(const machine_config &mconfig, device_type type, 
 peribox_device::peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: peribox_device(mconfig, TI99_PERIBOX, tag, owner, clock)
 {
+	// The address prefix represents a set of pull-up resistors for the
+	// additional address lines AMA, AMB, AMC. They are contained in the
+	// Flex Cable Interface.
 	m_address_prefix = 0x70000;
-	m_genmod = false;
 }
 
 READ8Z_MEMBER(peribox_device::readz)
@@ -308,6 +310,17 @@ void peribox_device::cruwrite(offs_t offset, uint8_t data)
 	for (int i=2; i <= 8; i++)
 	{
 		if (m_slot[i]!=nullptr) m_slot[i]->cruwrite(offset, data);
+	}
+}
+
+/*
+    RESET line from the console.
+*/
+WRITE_LINE_MEMBER(peribox_device::reset_in)
+{
+	for (int i=2; i <= 8; i++)
+	{
+		if (m_slot[i]!=nullptr) m_slot[i]->reset_in(state);
 	}
 }
 
@@ -428,8 +441,6 @@ void peribox_device::ready_join(int slot, int state)
 void peribox_device::set_slot_loaded(int slot, peribox_slot_device* slotdev)
 {
 	m_slot[slot] = slotdev;
-	if (slotdev != nullptr)
-		slotdev->set_genmod(m_genmod);
 }
 
 void peribox_device::device_start()
@@ -500,7 +511,6 @@ peribox_ev_device::peribox_ev_device(const machine_config &mconfig, const char *
 	: peribox_device(mconfig, TI99_PERIBOX_EV, tag, owner, clock)
 {
 	m_address_prefix = 0x70000;
-	m_genmod = false;
 }
 
 void ti99_peribox_slot_evpc(device_slot_interface &device)
@@ -548,13 +558,11 @@ peribox_gen_device::peribox_gen_device(const machine_config &mconfig, device_typ
 peribox_gen_device::peribox_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: peribox_gen_device(mconfig, TI99_PERIBOX_GEN, tag, owner, clock)
 {
-	m_genmod = false;
 }
 
 peribox_genmod_device::peribox_genmod_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: peribox_gen_device(mconfig, TI99_PERIBOX_GENMOD, tag, owner, clock)
 {
-	m_genmod = true;
 }
 
 // The BwG controller will not run with the Geneve due to its wait state
@@ -601,8 +609,9 @@ void peribox_genmod_device::device_add_mconfig(machine_config &config)
 peribox_sg_device::peribox_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : peribox_device(mconfig, TI99_PERIBOX_SG, tag, owner, clock)
 {
+	// The SGCPU card contains pull-up registers for the AMA/AMB/AMC lines
+	// like the Flex Cable Interface
 	m_address_prefix = 0x70000;
-	m_genmod = false;
 }
 
 void ti99_peribox_slot_sgcpu(device_slot_interface &device)
@@ -685,12 +694,9 @@ WRITE_LINE_MEMBER( peribox_slot_device::clock_in )
 	m_card->clock_in(state);
 }
 
-/*
-    Genmod support
-*/
-void peribox_slot_device::set_genmod(bool set)
+WRITE_LINE_MEMBER( peribox_slot_device::reset_in )
 {
-	m_card->m_genmod = set;
+	m_card->reset_in(state);
 }
 
 void peribox_slot_device::device_start()
@@ -738,18 +744,31 @@ WRITE_LINE_MEMBER( peribox_slot_device::set_ready )
 device_ti99_peribox_card_interface::device_ti99_peribox_card_interface(const machine_config &mconfig, device_t &device):
 	device_interface(device, "ti99peb"),
 	m_selected(false),
-	m_cru_base(0),
-	m_select_mask(0),
-	m_select_value(0)
+	m_cru_base(0)
 {
 	m_senila = CLEAR_LINE;
 	m_senilb = CLEAR_LINE;
-	m_genmod = false;
 }
 
 void device_ti99_peribox_card_interface::interface_config_complete()
 {
 	m_slot = dynamic_cast<peribox_slot_device*>(device().owner());
+}
+
+bool device_ti99_peribox_card_interface::in_dsr_space(offs_t offset, bool amadec)
+{
+	if (amadec)
+		return (offset & 0x7e000)==0x74000;
+	else
+		return (offset & 0x0e000)==0x04000;
+}
+
+bool device_ti99_peribox_card_interface::in_cart_space(offs_t offset, bool amadec)
+{
+	if (amadec)
+		return (offset & 0x7e000)==0x76000;
+	else
+		return (offset & 0x0e000)==0x06000;
 }
 
 } } } // end namespace bus::ti99::peb

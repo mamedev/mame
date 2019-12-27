@@ -4,6 +4,11 @@
 #define MAME_MACHINE_NFORCEPC_H
 
 #pragma once
+// floppy disk controller
+#include "machine/upd765.h"
+#include "imagedev/floppy.h"
+#include "formats/pc_dsk.h"
+#include "formats/naslite_dsk.h"
 // keyboard
 #include "machine/8042kbdc.h"
 // parallel port
@@ -197,10 +202,13 @@ public:
 	void map_serial1(address_map& map);
 	void map_serial2(address_map& map);
 	void map_keyboard(address_map &map);
-	void unmap_keyboard(address_map &map);
 
+	// floppy disk controller
+	DECLARE_WRITE_LINE_MEMBER(irq_floppy_w);
+	DECLARE_WRITE_LINE_MEMBER(drq_floppy_w);
 	// parallel port
 	DECLARE_WRITE_LINE_MEMBER(irq_parallel_w);
+	DECLARE_WRITE_LINE_MEMBER(drq_parallel_w);
 	// uarts
 	DECLARE_WRITE_LINE_MEMBER(irq_serial1_w);
 	DECLARE_WRITE_LINE_MEMBER(txd_serial1_w);
@@ -253,17 +261,17 @@ private:
 	} mode;
 	enum LogicalDevice
 	{
-		FDC = 0,		// Floppy disk controller
-		Parallel,		// Parallel port
-		Serial1,		// Serial port 1
-		Serial2,		// Serial port 2
-		Keyboard = 5,	// Keyboard controller
-		ConsumerIR,		// Consumer IR
-		Gpio1,			// Game port, MIDI, GPIO set 1
-		Gpio2,			// GPIO set 2
-		Gpio34,			// GPIO set 3 and 4
-		ACPI,			// ACPI
-		Gpio567 = 12	// GPIO set 5, 6 and 7
+		FDC = 0,        // Floppy disk controller
+		Parallel,       // Parallel port
+		Serial1,        // Serial port 1
+		Serial2,        // Serial port 2
+		Keyboard = 5,   // Keyboard controller
+		ConsumerIR,     // Consumer IR
+		Gpio1,          // Game port, MIDI, GPIO set 1
+		Gpio2,          // GPIO set 2
+		Gpio34,         // GPIO set 3 and 4
+		ACPI,           // ACPI
+		Gpio567 = 12    // GPIO set 5, 6 and 7
 	};
 	int config_key_step;
 	int config_index;
@@ -278,6 +286,7 @@ private:
 	devcb_write_line m_txd2_callback;
 	devcb_write_line m_ndtr2_callback;
 	devcb_write_line m_nrts2_callback;
+	required_device<pc_fdc_interface> floppy_controller_fdcdev;
 	required_device<pc_lpt_device> pc_lpt_lptdev;
 	required_device<ns16450_device> pc_serial1_comdev;
 	required_device<ns16450_device> pc_serial2_comdev;
@@ -294,18 +303,21 @@ private:
 	void internal_memory_map(address_map &map);
 	void internal_io_map(address_map &map);
 	uint16_t get_base_address(int logical, int index);
+	void map_fdc_addresses();
 	void map_lpt_addresses();
 	void map_serial1_addresses();
 	void map_serial2_addresses();
 	void map_keyboard_addresses();
 	void write_global_configuration_register(int index, int data);
 	void write_logical_configuration_register(int index, int data);
+	void write_fdd_configuration_register(int index, int data);
 	void write_parallel_configuration_register(int index, int data);
 	void write_serial1_configuration_register(int index, int data);
 	void write_serial2_configuration_register(int index, int data);
 	void write_keyboard_configuration_register(int index, int data);
 	uint16_t read_global_configuration_register(int index);
 	uint16_t read_logical_configuration_register(int index);
+	uint16_t read_fdd_configuration_register(int index) { return configuration_registers[LogicalDevice::FDC][index]; }
 	uint16_t read_parallel_configuration_register(int index) { return configuration_registers[LogicalDevice::Parallel][index]; }
 	uint16_t read_serial1_configuration_register(int index) { return configuration_registers[LogicalDevice::Serial1][index]; }
 	uint16_t read_serial2_configuration_register(int index) { return configuration_registers[LogicalDevice::Serial2][index]; }

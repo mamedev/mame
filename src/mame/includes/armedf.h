@@ -8,6 +8,7 @@
 #include "machine/nb1414m4.h"
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
+#include "screen.h"
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -15,17 +16,18 @@ class armedf_state : public driver_device
 {
 public:
 	armedf_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_extra(*this, "extra"),
-		m_nb1414m4(*this, "nb1414m4"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_spriteram(*this, "spriteram"),
-		m_soundlatch(*this, "soundlatch"),
-		m_spr_pal_clut(*this, "spr_pal_clut"),
-		m_fg_videoram(*this, "fg_videoram"),
-		m_bg_videoram(*this, "bg_videoram")
+		driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_extra(*this, "extra")
+		, m_nb1414m4(*this, "nb1414m4")
+		, m_screen(*this, "screen")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_spriteram(*this, "spriteram")
+		, m_soundlatch(*this, "soundlatch")
+		, m_spr_pal_clut(*this, "spr_pal_clut")
+		, m_fg_videoram(*this, "fg_videoram")
+		, m_bg_videoram(*this, "bg_videoram")
 	{ }
 
 	void init_cclimbr2();
@@ -37,7 +39,6 @@ public:
 	void init_terraf();
 	void init_terrafjb();
 
-	void terraf_sound(machine_config &config);
 	void terraf(machine_config &config);
 	void terrafb(machine_config &config);
 	void legion_common(machine_config &config);
@@ -55,11 +56,14 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void video_config(machine_config &config, int hchar_start, int vstart, int vend);
+	void sound_config(machine_config &config);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_extra;
 	optional_device<nb1414m4_device> m_nb1414m4;
+	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<buffered_spriteram16_device> m_spriteram;

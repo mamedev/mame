@@ -429,7 +429,7 @@ private:
 	void verify_length_and_hash(const char *name, u32 explength, const util::hash_collection &hashes);
 	void display_loading_rom_message(const char *name, bool from_list);
 	void display_rom_load_results(bool from_list);
-	void region_post_process(const char *rgntag, bool invert);
+	void region_post_process(memory_region *region, bool invert);
 	int open_rom_file(const char *regiontag, const rom_entry *romp, std::string &tried_file_names, bool from_list);
 	int rom_fread(u8 *buffer, int length, const rom_entry *parent_region);
 	int read_rom_data(const rom_entry *parent_region, const rom_entry *romp);
@@ -483,20 +483,11 @@ const rom_entry *rom_next_file(const rom_entry *romp);
 /* return the expected size of a file given the ROM description */
 u32 rom_file_size(const rom_entry *romp);
 
-/* return the appropriate name for a rom region */
-std::string rom_region_name(const device_t &device, const rom_entry *romp);
-
 /* return pointer to the first per-game parameter */
 const rom_entry *rom_first_parameter(const device_t &device);
 
 /* return pointer to the next per-game parameter */
 const rom_entry *rom_next_parameter(const rom_entry *romp);
-
-/* return the appropriate name for a per-game parameter */
-std::string rom_parameter_name(const device_t &device, const rom_entry *romp);
-
-/* return the value for a per-game parameter */
-std::string rom_parameter_value(const rom_entry *romp);
 
 // builds a rom_entry vector from a tiny_rom_entry array
 std::vector<rom_entry> rom_build_entries(const tiny_rom_entry *tinyentries);

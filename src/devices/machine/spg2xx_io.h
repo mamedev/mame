@@ -23,8 +23,8 @@ public:
 
 	template <size_t Line> auto adc_in() { return m_adc_in[Line].bind(); }
 
-	auto eeprom_w() { return m_eeprom_w.bind(); }
-	auto eeprom_r() { return m_eeprom_r.bind(); }
+	auto i2c_w() { return m_i2c_w.bind(); }
+	auto i2c_r() { return m_i2c_r.bind(); }
 
 	auto uart_tx() { return m_uart_tx.bind(); }
 
@@ -40,7 +40,6 @@ public:
 	virtual DECLARE_READ16_MEMBER(io_extended_r);
 	virtual DECLARE_WRITE16_MEMBER(io_extended_w);
 
-
 	auto pal_read_callback() { return m_pal_read_cb.bind(); };
 
 	auto write_timer_irq_callback() { return m_timer_irq_cb.bind(); };
@@ -48,6 +47,8 @@ public:
 	auto write_external_irq_callback() { return m_external_irq_cb.bind(); };
 	auto write_ffrq_tmr1_irq_callback() { return m_ffreq_tmr1_irq_cb.bind(); };
 	auto write_ffrq_tmr2_irq_callback() { return m_ffreq_tmr2_irq_cb.bind(); };
+
+	auto write_fiq_vector_callback() { return m_fiq_vector_w.bind(); };
 
 protected:
 	spg2xx_io_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint32_t sprite_limit)
@@ -112,8 +113,8 @@ protected:
 
 	devcb_read16 m_adc_in[2];
 
-	devcb_write8 m_eeprom_w;
-	devcb_read8 m_eeprom_r;
+	devcb_write8 m_i2c_w;
+	devcb_read8 m_i2c_r;
 
 	devcb_write8 m_uart_tx;
 
@@ -140,6 +141,9 @@ protected:
 
 	emu_timer *m_rng_timer;
 
+	uint8_t m_sio_bits_remaining;
+	bool m_sio_writing;
+
 	required_device<unsp_device> m_cpu;
 	required_device<screen_device> m_screen;
 
@@ -150,6 +154,8 @@ protected:
 	devcb_write_line m_external_irq_cb;
 	devcb_write_line m_ffreq_tmr1_irq_cb;
 	devcb_write_line m_ffreq_tmr2_irq_cb;
+
+	devcb_write8 m_fiq_vector_w;
 };
 
 class spg24x_io_device : public spg2xx_io_device

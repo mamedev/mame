@@ -1176,6 +1176,39 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 						offs_t const length = region.get_length();
 						if (entry.m_rgnoffs + spaceconfig.addr2byte(entry.m_addrend - entry.m_addrstart + 1) > length)
 							osd_printf_error("%s space memory map entry %X-%X extends beyond region '%s' size (%X)\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_region, length);
+
+						device_t *rgndev = dev.subdevice(region.get_tag());
+						if (rgndev != m_device)
+						{
+							int rgnwidth = region.get_width();
+							bool rgnisbe = region.is_bigendian();
+
+							// memory interface sets region width when tags are the same
+							device_memory_interface *memintf;
+							if (rgndev != nullptr && rgndev->interface(memintf))
+							{
+								const address_space_config *rgncfg = memintf->space_config(0);
+								if (rgncfg != nullptr)
+								{
+									rgnwidth = rgncfg->data_width();
+									rgnisbe = rgncfg->endianness() == ENDIANNESS_BIG;
+								}
+							}
+
+							// verify data width
+							if (rgnwidth != spaceconfig.data_width())
+								osd_printf_error("%s space is %d-bit but references %d-bit region '%s'\n", spaceconfig.m_name, spaceconfig.data_width(), rgnwidth, dev.subtag(region.get_tag()));
+
+							// verify endianness
+							if (rgnwidth != 8)
+							{
+								if (!rgnisbe && spaceconfig.endianness() == ENDIANNESS_BIG)
+									osd_printf_error("%s space is big-endian but references little-endian region '%s'\n", spaceconfig.m_name, dev.subtag(region.get_tag()));
+								else if (rgnisbe && spaceconfig.endianness() == ENDIANNESS_LITTLE)
+									osd_printf_error("%s space is little-endian but references big-endian region '%s'\n", spaceconfig.m_name, dev.subtag(region.get_tag()));
+							}
+						}
+
 						found = true;
 					}
 				}

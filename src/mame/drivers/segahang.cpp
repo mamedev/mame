@@ -1539,10 +1539,16 @@ ROM_END
 //  CPU: FD1089B (317-0013A)
 //  YM2151 sound board
 //
+//  ASSY CPU BD 837-6000 ENDURO RACER
 //   ASSY CPU BD 837-6001-01
 //   ASSY CONTROL BD 837-6002-01
 //   ASSY ROM BD 837-6004-01
-//   ASSY SOUND BD 837-6003-01? (not verified)
+//  ASSY SOUND BD 834-6003 ENDURO RACER  (production sticker:  860715.0509E)
+//   ASSY SOUND BD 837-6005
+//
+//   Missing dumps from the ASSY SOUND BD:
+//    315-5205   - silckscreened CK2605 (DIP20) at IC67 (8J)
+//    315-5206   - silckscreened 82S153 (DIP20) at IC38 (5E)
 //
 ROM_START( enduror )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -1600,11 +1606,11 @@ ROM_START( enduror )
 	ROM_LOAD( "epr-7633.ic1", 0x0000, 0x8000, CRC(6f146210) SHA1(2f58f0c3563b434ed02700b9ca1545a696a5716e) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
-	ROM_LOAD( "epr-7682.rom", 0x00000, 0x8000, CRC(c4efbf48) SHA1(2bcbc4757d98f291fcaec467abc36158b3f59be3) )
+	ROM_LOAD( "epr-7682.ic58", 0x00000, 0x8000, CRC(c4efbf48) SHA1(2bcbc4757d98f291fcaec467abc36158b3f59be3) )
 
 	ROM_REGION( 0x20000, "pcm", 0 ) // Sega PCM sound data
-	ROM_LOAD( "epr-7681.rom", 0x00000, 0x8000, CRC(bc0c4d12) SHA1(3de71bde4c23e3c31984f20fc4bc7e221354c56f) )
-	ROM_LOAD( "epr-7680.rom", 0x10000, 0x8000, CRC(627b3c8c) SHA1(806fe7dce619ad19c09178061be4607d2beba14d) )
+	ROM_LOAD( "epr-7681.ic8", 0x00000, 0x8000, CRC(bc0c4d12) SHA1(3de71bde4c23e3c31984f20fc4bc7e221354c56f) )
+	ROM_LOAD( "epr-7680.ic7", 0x10000, 0x8000, CRC(627b3c8c) SHA1(806fe7dce619ad19c09178061be4607d2beba14d) )
 
 	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
@@ -1618,10 +1624,16 @@ ROM_END
 //  CPU: FD1089B (317-0013A)
 //  YM2151 sound board
 //
+//  ASSY CPU BD 837-6000 ENDURO RACER
 //   ASSY CPU BD 837-6001-01
 //   ASSY CONTROL BD 837-6002-01
 //   ASSY ROM BD 837-6004-02 (with jumpers J2, J3, J7 & J8 made)
-//   ASSY SOUND BD 837-6003-01? (not verified)
+//  ASSY SOUND BD 834-6003 ENDURO RACER  (production sticker:  860715.0509E)
+//   ASSY SOUND BD 837-6005
+//
+//   Missing dumps from the ASSY SOUND BD:
+//    315-5205   - silckscreened CK2605 (DIP20) at IC67 (8J)
+//    315-5206   - silckscreened 82S153 (DIP20) at IC38 (5E)
 //
 ROM_START( endurora )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -1655,11 +1667,11 @@ ROM_START( endurora )
 	ROM_LOAD( "epr-7633.ic1", 0x0000, 0x8000, CRC(6f146210) SHA1(2f58f0c3563b434ed02700b9ca1545a696a5716e) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
-	ROM_LOAD( "epr-7682.rom", 0x00000, 0x8000, CRC(c4efbf48) SHA1(2bcbc4757d98f291fcaec467abc36158b3f59be3) )
+	ROM_LOAD( "epr-7682.ic58", 0x00000, 0x8000, CRC(c4efbf48) SHA1(2bcbc4757d98f291fcaec467abc36158b3f59be3) )
 
 	ROM_REGION( 0x20000, "pcm", 0 ) // Sega PCM sound data
-	ROM_LOAD( "epr-7681.rom", 0x00000, 0x8000, CRC(bc0c4d12) SHA1(3de71bde4c23e3c31984f20fc4bc7e221354c56f) )
-	ROM_LOAD( "epr-7680.rom", 0x10000, 0x8000, CRC(627b3c8c) SHA1(806fe7dce619ad19c09178061be4607d2beba14d) )
+	ROM_LOAD( "epr-7681.ic8", 0x00000, 0x8000, CRC(bc0c4d12) SHA1(3de71bde4c23e3c31984f20fc4bc7e221354c56f) )
+	ROM_LOAD( "epr-7680.ic7", 0x10000, 0x8000, CRC(627b3c8c) SHA1(806fe7dce619ad19c09178061be4607d2beba14d) )
 
 	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
@@ -1727,11 +1739,11 @@ ROM_START( endurord )
 	ROM_LOAD( "epr-7633.ic1", 0x0000, 0x8000, CRC(6f146210) SHA1(2f58f0c3563b434ed02700b9ca1545a696a5716e) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
-	ROM_LOAD( "epr-7682.rom", 0x00000, 0x8000, CRC(c4efbf48) SHA1(2bcbc4757d98f291fcaec467abc36158b3f59be3) )
+	ROM_LOAD( "epr-7682.ic58", 0x00000, 0x8000, CRC(c4efbf48) SHA1(2bcbc4757d98f291fcaec467abc36158b3f59be3) )
 
 	ROM_REGION( 0x20000, "pcm", 0 ) // Sega PCM sound data
-	ROM_LOAD( "epr-7681.rom", 0x00000, 0x8000, CRC(bc0c4d12) SHA1(3de71bde4c23e3c31984f20fc4bc7e221354c56f) )
-	ROM_LOAD( "epr-7680.rom", 0x10000, 0x8000, CRC(627b3c8c) SHA1(806fe7dce619ad19c09178061be4607d2beba14d) )
+	ROM_LOAD( "epr-7681.ic8", 0x00000, 0x8000, CRC(bc0c4d12) SHA1(3de71bde4c23e3c31984f20fc4bc7e221354c56f) )
+	ROM_LOAD( "epr-7680.ic7", 0x10000, 0x8000, CRC(627b3c8c) SHA1(806fe7dce619ad19c09178061be4607d2beba14d) )
 
 	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
@@ -2028,8 +2040,8 @@ ROM_START( endurob2 )
 	ROM_LOAD( "enduro.a16", 0x00000, 0x8000, CRC(d2cb6eb5) SHA1(80c5fab16ec4ddfa67fae94808026b2e6285b7f1) )
 
 	ROM_REGION( 0x20000, "pcm", 0 ) // Sega PCM sound data
-	ROM_LOAD( "epr-7681.rom", 0x00000, 0x8000, CRC(bc0c4d12) SHA1(3de71bde4c23e3c31984f20fc4bc7e221354c56f) )
-	ROM_LOAD( "epr-7680.rom", 0x10000, 0x8000, CRC(627b3c8c) SHA1(806fe7dce619ad19c09178061be4607d2beba14d) )
+	ROM_LOAD( "epr-7681.ic8", 0x00000, 0x8000, CRC(bc0c4d12) SHA1(3de71bde4c23e3c31984f20fc4bc7e221354c56f) )
+	ROM_LOAD( "epr-7680.ic7", 0x10000, 0x8000, CRC(627b3c8c) SHA1(806fe7dce619ad19c09178061be4607d2beba14d) )
 
 	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )

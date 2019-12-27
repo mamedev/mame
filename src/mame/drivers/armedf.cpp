@@ -27,9 +27,11 @@ actually bootlegs.
 
 TODO:
 - identify and decap the NB1414M4 chip, it could be either a MCU or a fancy blitter chip;
-- time over doesn't kill the player in Kozure Ookami, check (1) note;
 - Fix Armed F and Tatakae Big Fighter text tilemap usage, they both doesn't use the NB1414M4
   (as shown by the per-game kludge)
+- kozure: time over doesn't kill the player, check (1) note for further details (kludged to work for now);
+- kozure: POST screen should have green as backdrop, this is actually drawn by the text layer but not seen
+  because being mapped on pen 15 (-> unimplemented opaque flag?)
 
 Notes:
 - the initial level color fade in effect in Armed F is confirmed on real HW, i.e. goes from
@@ -185,7 +187,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 Tatakae! Big Fighter (c)1989 Nichibutsu
 
- based on armedf.c
+ based on armedf.cpp
 
  TODO:
  - scroll
@@ -322,7 +324,6 @@ Notes:
 #include "sound/3812intf.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "screen.h"
 #include "speaker.h"
 
 #define LEGION_HACK 0
@@ -345,7 +346,6 @@ Notes:
     ---- ---- ---- --x- coin counter 1
     ---- ---- ---- ---x coin counter 0
 */
-
 WRITE16_MEMBER(armedf_state::terraf_io_w)
 {
 	if(data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
@@ -402,11 +402,15 @@ READ8_MEMBER(armedf_state::soundlatch_clear_r)
 
 WRITE16_MEMBER(armedf_state::irq_lv1_ack_w)
 {
+	if (m_nb1414m4 != nullptr)
+		m_nb1414m4->vblank_trigger();
 	m_maincpu->set_input_line(1, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(armedf_state::irq_lv2_ack_w)
 {
+	if (m_nb1414m4 != nullptr)
+		m_nb1414m4->vblank_trigger();
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
@@ -557,7 +561,7 @@ void armedf_state::armedf_map(address_map &map)
 	map(0x06d006, 0x06d007).w(FUNC(armedf_state::armedf_fg_scrollx_w));
 	map(0x06d008, 0x06d009).w(FUNC(armedf_state::armedf_fg_scrolly_w));
 	map(0x06d00a, 0x06d00b).w(FUNC(armedf_state::sound_command_w));
-	map(0x06d00c, 0x06d00d).nopw(); //watchdog
+	map(0x06d00c, 0x06d00d).nopw(); //watchdog?
 	map(0x06d00e, 0x06d00f).w(FUNC(armedf_state::irq_lv1_ack_w));
 }
 
@@ -566,152 +570,6 @@ READ16_MEMBER(bigfghtr_state::latch_r)
 	m_mcu->set_input_line(MCS51_INT0_LINE, HOLD_LINE);
 	return 0;
 }
-
-#if 0
-// reference code, in case anything goes bad
-WRITE16_MEMBER(bigfghtr_state::sharedram_w)
-{
-	data &= mem_mask;
-	COMBINE_DATA(&m_sharedram[offset]);
-
-	switch(offset)
-	{
-		case 0x40/2:
-			m_mcu_input_snippet = (data == 0x100);
-			m_mcu_jsr_snippet = (data == 0x300);
-			break;
-	}
-}
-
-READ16_MEMBER(bigfghtr_state::sharedram_r)
-{
-	if(m_mcu_input_snippet)
-	{
-		switch(offset+0x600/2)
-		{
-			case 0x640/2:
-				if(m_read_latch)
-				{
-					m_read_latch = 0;
-					return machine().rand(); // TODO
-				}
-				break;
-
-			case 0x642/2:
-				return (ioport("DSW0")->read() & 0xffff) ^ 0xffff;
-
-			case 0x644/2:
-				return (ioport("DSW1")->read() & 0xffff) ^ 0xffff;
-
-			case 0x646/2:
-				return (ioport("P1")->read() & 0xffff) ^ 0xffff;
-
-			case 0x648/2:
-				return (ioport("P2")->read() & 0xffff) ^ 0xffff;
-		}
-	}
-
-	if(m_mcu_jsr_snippet)
-	{
-		switch(offset+0x600/2)
-		{
-			case 0x640/2:
-				if(m_read_latch)
-				{
-					m_read_latch = 0;
-					return machine().rand(); // TODO
-				}
-				break;
-			case 0x642/2:
-				return (ioport("DSW0")->read() & 0xffff) ^ 0xffff;
-
-			case 0x644/2:
-				return (ioport("DSW1")->read() & 0xffff) ^ 0xffff;
-
-			case 0x646/2:
-				return (ioport("P1")->read() & 0xffff) ^ 0xffff;
-
-			case 0x648/2:
-				return (ioport("P2")->read() & 0xffff) ^ 0xffff;
-
-			/*
-			protection controls where the program code should jump to.
-
-			example snippet:
-			00DB2A: 41FA FE86                  lea     (-$17a,PC), A0; ($d9b2) ;base program vector
-			00DB2E: 4DF9 0008 0E2A             lea     $80e2a.l, A6 ;base RAM vector, used by the i8751 to send the value, this value is added to the above A0
-			00DB34: 3039 0008 0E62             move.w  $80e62.l, D0 ;number of snippets to execute
-			00DB3A: 6100 00F0                  bsr     $dc2c
-			*/
-
-			/* bp daee, A0 = 0xdd02, A6 = 0x808ca, D0 = 0x80902 */
-			//case 0x902/2:
-			//  return 0x0001;
-			//case (0x90a+0x24)/2:
-			//  return 0x0001;
-			//case (0x902+8)/2:
-			//  return 0x0004; // 0xf86a
-
-			/* bp db02, A0 = 0xdc2e, A6 = 0x80912, D0 = 0x8094a */
-			//case 0x94a/2:
-			//  return 1;
-			//case (0x94a+8)/2:
-			//  return 0x00dc; // 0xd62e
-
-			/* bp db16, A0 = 0xda86, A6 = 0x80c22, D0 = 0x80c5a */
-			//case 0xc5a/2:
-			//  return 1;
-			//case (0xc5a+8)/2:
-			//  return 0x0288; // 0x345f4
-
-			/* bp db2a, A0 = 0xd9b2, A6 = 0x80e2a, D0 = 0x80e62 */
-
-			/* bp db3e, A0 = 0xd8da, A6 = 0x81132, D0 = 0x8116a */
-
-			/* bp db52, A0 = 0xd806, A6 = 0x8133a, D0 = 0x81372 */
-
-			/* bp db66, A0 = 0xd7aa, A6 = 0x81742, D0 = 0x8177a */
-
-			/* bp db7a, A0 = 0xd746, A6 = 0x81b4a, D0 = 0x81b82 */
-
-			/* bp db8e, A0 = 0xd672, A6 = 0x81f52, D0 = 0x81f8a */
-
-			/* bp dba4, A0 = 0xd5ae, A6 = 0x8205a, D0 = 0x82092 */
-
-			/* bp dbba, A0 = 0xd5be, A6 = 0x82862, D0 = 0x8289a */
-
-			/* bp dbd0, A0 = 0xd512, A6 = 0x8296a, D0 = 0x829a2 */
-
-			/* bp dbe6, A0 = 0xd466, A6 = 0x82d72, D0 = 0x82daa */
-
-			/* bp dbfc, A0 = 0xd43e, A6 = 0x8357a, D0 = 0x835b2 */
-
-			/* following is separated from the others, dunno why ... */
-			/* bp dc14, A0 = 0xd3aa, A6 = 0x835a2, D0 = 0x835b2 */
-
-
-			/*case 0x
-			case 0x94a/2:
-			    return 0x0002*4;
-			case (0x90a+2*0x40)/2:
-			case (0x90a+3*0x40)/2:
-			    return 0x0003*4;
-			case (0x90a+4*0x40)/2:
-			    return 0x000c*4; // 0x13d74
-			case (0x90a+5*0x40)/2:
-			    return 0x000d*4; // 0x130f6
-			case (0x90a+6*0x40)/2:
-			    return 0x000e*4; // 0x1817e
-			case (0x90a+7*0x40)/2:
-			    return 0x0010*4; // 0x15924
-			//case (0x90a+0x25)/2:
-			//  return 2;*/
-		}
-	}
-
-	return m_sharedram[offset];
-}
-#endif
 
 READ8_MEMBER(bigfghtr_state::main_sharedram_r)
 {
@@ -1220,7 +1078,7 @@ static GFXDECODE_START( gfx_armedf )
 	GFXDECODE_ENTRY( "gfx1", 0, char_layout,         0*16,  32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,        64*16,  32 )
 	GFXDECODE_ENTRY( "gfx3", 0, tile_layout,        96*16,  32 )
-	GFXDECODE_ENTRY( "gfx4", 0, sprite_layout,  32*16,  32 )
+	GFXDECODE_ENTRY( "gfx4", 0, sprite_layout,      32*16,  32 )
 GFXDECODE_END
 
 
@@ -1255,8 +1113,24 @@ void armedf_state::machine_reset()
 	m_bg_scrolly = 0;
 }
 
+void armedf_state::video_config(machine_config &config, int hchar_start, int vstart, int vend)
+{
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// assume all games on this HW running at ~59.1358Hz (trusted for Big Fighter)
+	// TODO: recheck if visible area isn't just 320x240 for everything (overscan may be masked by the text layer).
+	// TODO: bootlegs may not run at this speed
+	m_screen->set_raw(XTAL(16'000'000)/2,531,hchar_start*8,(64-hchar_start)*8, 255, vstart, vend);
+	m_screen->set_palette(m_palette);
+	m_screen->set_screen_update(FUNC(armedf_state::screen_update_armedf));
+	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 
-void armedf_state::terraf_sound(machine_config &config)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_armedf);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
+
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+}
+
+void armedf_state::sound_config(machine_config &config)
 {
 	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(24'000'000)/6));      // 4mhz
 	audiocpu.set_addrmap(AS_PROGRAM, &armedf_state::sound_map);
@@ -1278,37 +1152,21 @@ void armedf_state::terraf_sound(machine_config &config)
 
 void armedf_state::terraf(machine_config &config)
 {
-	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(16'000'000)/2);   // 8mhz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &armedf_state::terraf_map);
 	m_maincpu->set_vblank_int("screen", FUNC(armedf_state::irq1_line_assert));
 
 	NB1414M4(config, m_nb1414m4, 0);
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(12*8, (64-12)*8-1, 1*8, 31*8-1 );
-	screen.set_palette(m_palette);
-	screen.set_screen_update(FUNC(armedf_state::screen_update_armedf));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
-
+	video_config(config, 12, 8, 248);
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_armedf);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
-
-	BUFFERED_SPRITERAM16(config, m_spriteram);
-
 	/* sound hardware */
-	terraf_sound(config);
+	sound_config(config);
 }
 
 void armedf_state::terrafjb(machine_config &config)
 {
-	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(16'000'000)/2);   // 8mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &armedf_state::terraf_map);
 	m_maincpu->set_vblank_int("screen", FUNC(armedf_state::irq1_line_assert));
@@ -1322,22 +1180,8 @@ void armedf_state::terrafjb(machine_config &config)
 	m_extra->set_addrmap(AS_PROGRAM, &armedf_state::terrafjb_extraz80_map);
 	m_extra->set_addrmap(AS_IO, &armedf_state::terrafjb_extraz80_portmap);
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(12*8, (64-12)*8-1, 1*8, 31*8-1 );
-	screen.set_palette(m_palette);
-	screen.set_screen_update(FUNC(armedf_state::screen_update_armedf));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
-
+	video_config(config, 12, 8, 248);
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_armedf);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
-
-	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1361,7 +1205,6 @@ void armedf_state::terrafb(machine_config &config)
 
 void armedf_state::kozure(machine_config &config)
 {
-	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(16'000'000)/2);   // 8mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &armedf_state::kozure_map);
 	m_maincpu->set_vblank_int("screen", FUNC(armedf_state::irq1_line_assert));
@@ -1369,29 +1212,15 @@ void armedf_state::kozure(machine_config &config)
 	NB1414M4(config, m_nb1414m4, 0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(12*8, (64-12)*8-1, 1*8, 31*8-1 ); // 320 x 240, trusted
-	screen.set_palette(m_palette);
-	screen.set_screen_update(FUNC(armedf_state::screen_update_armedf));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
-
+	video_config(config, 12, 8, 248);
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_armedf);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
-
-	BUFFERED_SPRITERAM16(config, m_spriteram);
-
 	/* sound hardware */
-	terraf_sound(config);
+	sound_config(config);
 }
 
 void armedf_state::armedf(machine_config &config)
 {
-	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(16'000'000)/2);   // 8mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &armedf_state::armedf_map);
 	m_maincpu->set_vblank_int("screen", FUNC(armedf_state::irq1_line_assert));
@@ -1401,22 +1230,8 @@ void armedf_state::armedf(machine_config &config)
 	audiocpu.set_addrmap(AS_IO, &armedf_state::sound_portmap);
 	audiocpu.set_periodic_int(FUNC(armedf_state::irq0_line_hold), attotime::from_hz(XTAL(8'000'000)/2/512));    // ?
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(12*8, (64-12)*8-1, 1*8, 31*8-1 );
-	screen.set_palette(m_palette);
-	screen.set_screen_update(FUNC(armedf_state::screen_update_armedf));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
-
+	video_config(config, 12, 16, 240);
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,armedf)
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_armedf);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
-
-	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1425,8 +1240,8 @@ void armedf_state::armedf(machine_config &config)
 
 	YM3812(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, "speaker", 0.5);      // 4mhz
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
@@ -1434,7 +1249,6 @@ void armedf_state::armedf(machine_config &config)
 
 void armedf_state::cclimbr2(machine_config &config)
 {
-	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(16'000'000)/2);   // 8mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &armedf_state::cclimbr2_map);
 	m_maincpu->set_vblank_int("screen", FUNC(armedf_state::irq2_line_assert));
@@ -1446,22 +1260,8 @@ void armedf_state::cclimbr2(machine_config &config)
 
 	NB1414M4(config, m_nb1414m4, 0);
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1 );
-	screen.set_palette(m_palette);
-	screen.set_screen_update(FUNC(armedf_state::screen_update_armedf));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
-
+	video_config(config, 14, 16, 240);
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_armedf);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
-
-	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1470,8 +1270,8 @@ void armedf_state::cclimbr2(machine_config &config)
 
 	YM3812(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, "speaker", 0.5); // or YM3526?
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // unknown DAC
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
@@ -1479,7 +1279,6 @@ void armedf_state::cclimbr2(machine_config &config)
 
 void armedf_state::legion_common(machine_config &config)
 {
-	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(16'000'000)/2);   // 8mhz
 	m_maincpu->set_vblank_int("screen", FUNC(armedf_state::irq2_line_assert));
 
@@ -1487,30 +1286,16 @@ void armedf_state::legion_common(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &armedf_state::cclimbr2_soundmap);
 	audiocpu.set_periodic_int(FUNC(armedf_state::irq0_line_hold), attotime::from_hz(XTAL(8'000'000)/2/512));    // ?
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1 );
-	screen.set_palette(m_palette);
-	screen.set_screen_update(FUNC(armedf_state::screen_update_armedf));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
-
+	video_config(config, 14, 16, 240);
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_armedf);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
-
-	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // 10-pin SIP with 74HC374P latch
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // 10-pin SIP with 74HC374P latch
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // 10-pin SIP with 74HC374P latch
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.8); // 10-pin SIP with 74HC374P latch
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT).add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
@@ -1549,7 +1334,6 @@ void armedf_state::legionjb2(machine_config &config)
 
 void bigfghtr_state::bigfghtr(machine_config &config)
 {
-
 	M68000(config, m_maincpu, XTAL(16'000'000)/2);   // verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &bigfghtr_state::bigfghtr_map);
 	m_maincpu->set_vblank_int("screen", FUNC(armedf_state::irq1_line_assert));
@@ -1559,22 +1343,10 @@ void bigfghtr_state::bigfghtr(machine_config &config)
 	mcu.set_addrmap(AS_IO, &bigfghtr_state::bigfghtr_mcu_io_map);
 	mcu.port_in_cb<1>().set_constant(0xdf); // bit 5: bus contention related?
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(16'000'000)/2,531,12*8,(64-12)*8, 254, 1*8, 31*8); // guess, matches 59.3 Hz from reference - measured at 59.1358Hz
-	screen.set_palette(m_palette);
-	screen.set_screen_update(FUNC(armedf_state::screen_update_armedf));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
-
+	video_config(config, 12, 8, 248);
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,armedf)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_armedf);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
-
-	BUFFERED_SPRITERAM16(config, m_spriteram);
-
-	/* sound hardware */
-	terraf_sound(config);
+	sound_config(config);
 }
 
 /*************************************

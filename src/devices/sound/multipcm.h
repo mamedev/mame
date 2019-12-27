@@ -79,7 +79,6 @@ private:
 
 	struct slot_t
 	{
-		uint8_t m_slot_index;
 		uint8_t m_regs[8];
 		bool m_playing;
 		sample_t m_sample;

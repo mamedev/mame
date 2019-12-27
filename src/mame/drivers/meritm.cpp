@@ -2195,7 +2195,7 @@ ROM_START( megat4tea ) /* Dallas DS1204V security key at U5 labeled 9255-50-01 U
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
-ROM_START( megat4st ) /* Dallas DS1204V security key at U5 labeled 9255-51-01 U5-B-RO1 C1996 MII */
+ROM_START( megat4st ) /* Dallas DS1204V security key at U5 labeled 9255-51-01 U5-RO C1996 MII */
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD( "9255-41-01_u32-r0",  0x000000, 0x100000, CRC(f51ae565) SHA1(99c58063bfa24b4383c8b37a1eab670fa6e4c62c) ) /* Location U32 */
 	ROM_LOAD( "qs9255-02_u36-r0",   0x100000, 0x80000,  CRC(57322328) SHA1(12bc604c9d34cde431ef7cd2aa33c7b12ac01833) ) /* Location U36 */
@@ -2206,7 +2206,7 @@ ROM_START( megat4st ) /* Dallas DS1204V security key at U5 labeled 9255-51-01 U5
 	ROM_RELOAD(                     0x380000, 0x080000 )
 
 	ROM_REGION( 0x000022, "ds1204", 0 )
-	ROM_LOAD( "9255-51-01_u5-b-r01_c1996_mii", 0x000000, 0x000022, BAD_DUMP CRC(14e4dfa8) SHA1(6a6a2a49c6862bbba3bde766e8f000828b1b3998) )
+	ROM_LOAD( "9255-51-01_u5-r0_c1996_mii", 0x000000, 0x000022, BAD_DUMP CRC(14e4dfa8) SHA1(6a6a2a49c6862bbba3bde766e8f000828b1b3998) )
 
 	ROM_REGION( 0x8000, "nvram", 0 ) // DS1644 nv ram
 	ROM_LOAD( "mt4st_ds1644.u31",  0x00000,  0x8000,   CRC(c6226d91) SHA1(20c9fa7ad135ac229c6bdf85b901629a0ecb8a81) ) /* No actual label, so use a unique name for this set */
@@ -2218,7 +2218,7 @@ ROM_START( megat4st ) /* Dallas DS1204V security key at U5 labeled 9255-51-01 U5
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
-ROM_START( megat4stg ) /* Dallas DS1204V security key at U5 labeled 9255-51-50 U5-B-RO1 C1996 MII */
+ROM_START( megat4stg ) /* Dallas DS1204V security key at U5 labeled 9255-51-01 U5-RO C1996 MII */
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD( "9255-41-01_u32-r0",  0x000000, 0x100000, CRC(f51ae565) SHA1(99c58063bfa24b4383c8b37a1eab670fa6e4c62c) ) /* Location U32 */
 	ROM_LOAD( "qs9255-02_u36-r0",   0x100000, 0x80000,  CRC(57322328) SHA1(12bc604c9d34cde431ef7cd2aa33c7b12ac01833) ) /* Location U36 */
@@ -2229,7 +2229,7 @@ ROM_START( megat4stg ) /* Dallas DS1204V security key at U5 labeled 9255-51-50 U
 	ROM_RELOAD(                     0x380000, 0x080000 )
 
 	ROM_REGION( 0x000022, "ds1204", 0 )
-	ROM_LOAD( "9255-51-50_u5-b-r01_c1996_mii", 0x000000, 0x000022, CRC(14e4dfa8) SHA1(6a6a2a49c6862bbba3bde766e8f000828b1b3998) )
+	ROM_LOAD( "9255-51-01_u5-r0_c1996_mii", 0x000000, 0x000022, BAD_DUMP CRC(14e4dfa8) SHA1(6a6a2a49c6862bbba3bde766e8f000828b1b3998) )
 
 	ROM_REGION( 0x8000, "nvram", 0 ) // DS1644 nv ram
 	ROM_LOAD( "mt4stg_ds1644.u31",  0x00000,  0x8000,   CRC(7f6f8e57) SHA1(d65f20ae19afc05b33d7605143b8362d6e955e89) ) /* No actual label, so use a unique name for this set */
@@ -2291,6 +2291,28 @@ ROM_START( megat5nj ) /* Dallas DS1204V security key at U5 labeled 9255-60-01 U5
 
 	ROM_REGION( 0x000022, "ds1204", 0 )
 	ROM_LOAD( "9255-60-01_u5-b-r01_c1998_mii", 0x000000, 0x000022, BAD_DUMP CRC(81f1c9b1) SHA1(e03ab8fae8225332edd353725039ad0cedcd9493) )
+
+	ROM_REGION( 0x1000, "user2", 0 ) // PALs
+	ROM_LOAD( "sc3943.u20",     0x000, 0x117, CRC(5a72fe78) SHA1(4b1a36904eb7048518507fe14bdade5c2589dbd7) )
+	ROM_LOAD( "sc3944-0a.u19",  0x000, 0x2dd, CRC(4cc46c5e) SHA1(0bab970df1539ce905f43603ad13171b05449a01) )
+	ROM_LOAD( "sc3980.u40",     0x000, 0x117, CRC(ee0cdab5) SHA1(216fef50a8a0f6a33b704d3501a4c5c3cbac2bad) )
+	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
+ROM_END
+
+ROM_START( megat5g ) /* Dallas DS1204V security key at U5 labeled 9255-60-01 U5-B-RO1 C1998 MII */
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD( "9255-70-50_u32-r0",  0x000000, 0x100000, CRC(f57e4d36) SHA1(c16587c95fa1abe2e7df37027deb2cfbadb27038) ) /* This set requires 9255-70-50 not the standard 9255-60-1 ROM */
+	ROM_LOAD( "qs9255-05_u36-r0",   0x100000, 0x80000,  CRC(0bed9e27) SHA1(1414385ce562b127e1ddeccc20ea4ff2a7098b7e) )
+	ROM_RELOAD(                     0x180000, 0x80000)
+	ROM_LOAD( "qs9255-05_u37-r0",   0x200000, 0x80000,  CRC(b713a1c5) SHA1(d6ccba2ea90fd0e2ecf15249514231eed54000c1) )
+	ROM_RELOAD(                     0x280000, 0x80000)
+	ROM_LOAD( "9255-60-50_u38-r0g", 0x300000, 0x100000, CRC(45e356f2) SHA1(adf8ed861bc74a223f29d1a4dac0708c5560b382) ) /* Location U38, 08/12/1997 11:26:58 - Bi-Lingual GER/ENG Version */
+
+	ROM_REGION( 0x000022, "ds1204", 0 )
+	ROM_LOAD( "9255-60-01_u5-b-r01_c1998_mii", 0x000000, 0x000022, BAD_DUMP CRC(81f1c9b1) SHA1(e03ab8fae8225332edd353725039ad0cedcd9493) )
+
+	ROM_REGION( 0x8000, "nvram", 0 ) // DS1644 nv ram
+	ROM_LOAD( "mt5g_ds1644.u31",  0x00000, 0x8000, CRC(68e3fdcc) SHA1(a540480a5e93ba94247e59f02a075f860c93e9d3) ) /* No actual label, so use a unique name for this set - will NOT start without a valid NVRAM */
 
 	ROM_REGION( 0x1000, "user2", 0 ) // PALs
 	ROM_LOAD( "sc3943.u20",     0x000, 0x117, CRC(5a72fe78) SHA1(4b1a36904eb7048518507fe14bdade5c2589dbd7) )
@@ -2450,6 +2472,7 @@ GAME( 1996, megat4stg, megat4, crt260, meritm_crt260, meritm_state, init_megat3t
 GAME( 1997, megat5,    0,      crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch 5 (9255-60-01 R0I, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, megat5a,   megat5, crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch 5 (9255-60-01 R0C, Standard version)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_NOT_WORKING )
 GAME( 1998, megat5nj,  megat5, crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch 5 (9255-60-07 R0N, New Jersey version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, megat5g,   megat5, crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch 5 (9255-60-50 R0G, Bi-Lingual GER/ENG version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, megat5t,   megat5, crt260, meritm_crt260, meritm_state, init_megat3te, ROT0, "Merit", "Megatouch 5 Tournament Edition (9255-70-01 R0C, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, megat5tg,  megat5, crt260, meritm_crt260, meritm_state, init_megat3te, ROT0, "Merit", "Megatouch 5 Turnier Version (9255-70-50 R0D, Bi-Lingual GER/ENG version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, megat6,    0,      crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch 6 (9255-80-01 R0A, Standard version)", MACHINE_IMPERFECT_GRAPHICS )

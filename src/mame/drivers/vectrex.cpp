@@ -142,7 +142,7 @@ void vectrex_state::vectrex(machine_config &config)
 	vectrex_cart(slot);
 
 	/* software lists */
-	SOFTWARE_LIST(config, "cart_list").set_type("vectrex", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cart_list").set_original("vectrex");
 }
 
 ROM_START(vectrex)

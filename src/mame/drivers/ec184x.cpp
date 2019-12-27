@@ -236,7 +236,7 @@ void ec184x_state::ec1847_io(address_map &map)
 // XXX verify everything
 void ec184x_state::ec1840(machine_config &config)
 {
-	I8088(config, m_maincpu, 4096000);
+	I8086(config, m_maincpu, 4096000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ec184x_state::ec1840_map);
 	m_maincpu->set_addrmap(AS_IO, &ec184x_state::ec1840_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
@@ -293,7 +293,7 @@ void ec184x_state::ec1841(machine_config &config)
 // XXX verify everything
 void ec184x_state::ec1847(machine_config &config)
 {
-	I8088(config, m_maincpu, 4772720);
+	I8086(config, m_maincpu, 4772720);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ec184x_state::ec1847_map);
 	m_maincpu->set_addrmap(AS_IO, &ec184x_state::ec1847_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));

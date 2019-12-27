@@ -588,9 +588,13 @@ ROM_START( atetb3482 )
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "f8-d2.bin", 0x0000, 0x10000, CRC(84a1939f) SHA1(d8577985fc8ed4e74f74c68b7c00c4855b7c3270) )
 
-	ROM_REGION( 0x08000, "tunes", 0 ) // Not hooked up. Same 8K repeated four times
-	ROM_LOAD( "k1-d3.bin", 0x00000, 0x08000, CRC(ce51c82b) SHA1(f90ed16f817e6b2a22b69db20348386b9c1ecb67) )
+	ROM_REGION( 0x8000, "soundcpu", 0 ) // Not hooked up
+	ROM_LOAD( "k1-d3.bin", 0x0000, 0x8000, CRC(ce51c82b) SHA1(f90ed16f817e6b2a22b69db20348386b9c1ecb67) ) // Same 8K repeated four times
 
+	// See http://www.seanriddle.com/um348x/ for notes about the UM3482
+	ROM_REGION( 0x01c0, "um3482", 0 ) // Not hooked up
+	ROM_LOAD( "um3482araw.bin", 0x0000, 0x01c0, BAD_DUMP CRC(5871d564) SHA1(4203b6513ad08ece26177778e5defeb862d1a81d) ) // Raw dump from visual decap, needs further analysis
+	
 	/* Not dumped, unused */
 	ROM_REGION( 0x71c, "plds", 0 )
 	ROM_LOAD( "pal16r4.1n" , 0x000, 0x104, NO_DUMP )
@@ -604,13 +608,13 @@ ROM_END
 
 /*
 
- This ROM came from a prototype bartop field-test machine from an 
+ This ROM came from a prototype bartop field-test machine from an
 ex-Atari Employee.
 
 PCB is screened : A044809
 
- The PCB does not draw its power from the JAMMA connector, instead a 
-small AC voltage is taken onboard and regulated down as this pcb has 
+ The PCB does not draw its power from the JAMMA connector, instead a
+small AC voltage is taken onboard and regulated down as this pcb has
 only a small power requirement!
 
  The label on the rom says :
@@ -622,7 +626,7 @@ B4FF
 
 The cabinet is completely custom made by Atari, and this pcb differs
 greatly from the production pcb that we know of. The machine was operated
-on location at a local bar but did not perform well so they decided it 
+on location at a local bar but did not perform well so they decided it
 wasn't a viable game to make, its the only known example.
 
 */

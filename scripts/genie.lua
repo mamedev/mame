@@ -1082,7 +1082,6 @@ end
 				"-Wno-tautological-compare",
 				"-Wno-unused-value",
 				"-Wno-constant-logical-operand",
-				"-Wno-missing-braces", -- clang is not as permissive as GCC about std::array initialization
 				"-fdiagnostics-show-note-include-stack",
 			}
 			if (version >= 30500) then
@@ -1099,8 +1098,8 @@ end
 				}
 			end
 		else
-			if (version < 50000) then
-				print("GCC version 5.0 or later needed")
+			if (version < 70000) then
+				print("GCC version 7.0 or later needed")
 				os.exit(-1)
 			end
 				buildoptions {
@@ -1335,6 +1334,7 @@ end
 
 		buildoptions {
 			"/WX",     -- Treats all compiler warnings as errors.
+			"/w45038", -- warning C5038: data member 'member1' will be initialized after data member 'member2'
 			"/wd4025", -- warning C4025: 'number' : based pointer passed to function with variable arguments: parameter number
 			"/wd4003", -- warning C4003: not enough actual parameters for macro 'xxx'
 			"/wd4018", -- warning C4018: 'x' : signed/unsigned mismatch
@@ -1396,6 +1396,18 @@ end
 			"/wd4800", -- warning C4800: 'type' : forcing value to bool 'true' or 'false' (performance warning)
 			"/wd4371", -- warning C4371: layout of class may have changed from a previous version of the compiler due to better packing of member 'member'
 			"/wd4548", -- warning C4548: expression before comma has no effect; expected expression with side-effect
+
+			"/wd4334", -- warning C4334: '<<': result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?)
+			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
+			"/wd4457", -- warning C4457: declaration of 'xxx' hides function parameter
+			"/wd4458", -- warning C4458: declaration of 'xxx' hides class member
+			"/wd4459", -- warning C4459: declaration of 'xxx' hides global declaration
+			"/wd4838", -- warning C4838: conversion from 'xxx' to 'yyy' requires a narrowing conversion
+			"/wd4091", -- warning C4091: 'typedef ': ignored on left of '' when no variable is declared
+			"/wd4463", -- warning C4463: overflow; assigning 1 to bit-field that can only hold values from -1 to 0
+			"/wd4297", -- warning C4297: 'xxx::~xxx': function assumed not to throw an exception but does
+			"/wd4319", -- warning C4319: 'operator' : zero extending 'type' to 'type' of greater size
+			"/wd4592", -- warning C4592: symbol will be dynamically initialized (implementation limitation)
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
@@ -1462,20 +1474,6 @@ end
 		}
 		includedirs {
 			MAME_DIR .. "3rdparty/dxsdk/Include"
-		}
-configuration { "vs201*" }
-		buildoptions {
-			"/wd4334", -- warning C4334: '<<': result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?)
-			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
-			"/wd4457", -- warning C4457: declaration of 'xxx' hides function parameter
-			"/wd4458", -- warning C4458: declaration of 'xxx' hides class member
-			"/wd4459", -- warning C4459: declaration of 'xxx' hides global declaration
-			"/wd4838", -- warning C4838: conversion from 'xxx' to 'yyy' requires a narrowing conversion
-			"/wd4091", -- warning C4091: 'typedef ': ignored on left of '' when no variable is declared
-			"/wd4463", -- warning C4463: overflow; assigning 1 to bit-field that can only hold values from -1 to 0
-			"/wd4297", -- warning C4297: 'xxx::~xxx': function assumed not to throw an exception but does
-			"/wd4319", -- warning C4319: 'operator' : zero extending 'type' to 'type' of greater size
-			"/wd4592", -- warning C4592: symbol will be dynamically initialized (implementation limitation)
 		}
 configuration { "winphone8* or winstore8*" }
 	linkoptions {

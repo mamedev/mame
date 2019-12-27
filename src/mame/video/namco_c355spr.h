@@ -19,6 +19,7 @@ public:
 	//void set_ram_words(u32 size) { m_ramsize = size; }
 	void set_palxor(int palxor) { m_palxor = palxor; }
 	void set_buffer(int buffer) { m_buffer = buffer; }
+	void set_external_prifill(bool external) { m_external_prifill = external; }
 
 	u16 spriteram_r(offs_t offset);
 	void spriteram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -37,6 +38,7 @@ public:
 
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);
+	void get_sprites();
 
 
 protected:
@@ -71,7 +73,6 @@ private:
 	// C355 Motion Object internals
 	void get_single_sprite(const u16 *pSource, c355_sprite *sprite_ptr);
 	void get_list(int no, const u16 *pSpriteList16, const u16 *pSpriteTable);
-	void get_sprites();
 	template<class BitmapClass> void draw_sprites(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int pri);
 
 	std::unique_ptr<c355_sprite []> m_spritelist[2];
@@ -84,6 +85,7 @@ private:
 	int m_scrolloffs[2];
 	//u32 m_ramsize;
 	int m_buffer;
+	bool m_external_prifill;
 
 	required_memory_region m_gfx_region;
 	u16 m_colbase;

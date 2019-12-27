@@ -201,22 +201,19 @@ void dspp_device::device_start()
 	save_item(NAME(m_output_fifo_start));
 	save_item(NAME(m_output_fifo_count));
 
-	for (uint32_t i = 0; i < NUM_DMA_CHANNELS; ++i)
-	{
-		save_item(NAME(m_fifo_dma[i].m_current_addr), i);
-		save_item(NAME(m_fifo_dma[i].m_current_count), i);
-		save_item(NAME(m_fifo_dma[i].m_next_addr), i);
-		save_item(NAME(m_fifo_dma[i].m_next_count), i);
-		save_item(NAME(m_fifo_dma[i].m_prev_value), i);
-		save_item(NAME(m_fifo_dma[i].m_prev_current), i);
-		save_item(NAME(m_fifo_dma[i].m_go_forever), i);
-		save_item(NAME(m_fifo_dma[i].m_next_valid), i);
-		save_item(NAME(m_fifo_dma[i].m_reserved), i);
-		save_item(NAME(m_fifo_dma[i].m_fifo), i);
-		save_item(NAME(m_fifo_dma[i].m_dma_ptr), i);
-		save_item(NAME(m_fifo_dma[i].m_dspi_ptr), i);
-		save_item(NAME(m_fifo_dma[i].m_depth), i);
-	}
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_current_addr));
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_current_count));
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_next_addr));
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_next_count));
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_prev_value));
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_prev_current));
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_go_forever));
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_next_valid));
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_reserved));
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_fifo));
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_dma_ptr));
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_dspi_ptr));
+	save_item(STRUCT_MEMBER(m_fifo_dma, m_depth));
 
 	save_item(NAME(m_last_frame_clock));
 	save_item(NAME(m_last_osc_count));

@@ -147,6 +147,7 @@ private:
 	uint16_t m_gpe0_enable;
 	uint16_t m_global_smi_control;
 	uint8_t m_smi_command_port;
+	uint8_t m_gpio_mode[26];
 	lpcbus_device_interface *lpcdevices[16];
 	uint8_t m_speaker;
 	bool m_refresh;

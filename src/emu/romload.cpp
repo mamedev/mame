@@ -144,39 +144,6 @@ const rom_entry *rom_next_parameter(const rom_entry *romp)
 
 
 /*-------------------------------------------------
-    rom_region_name - return the appropriate name
-    for a rom region
--------------------------------------------------*/
-
-std::string rom_region_name(const device_t &device, const rom_entry *romp)
-{
-	return device.subtag(ROM_GETNAME(romp));
-}
-
-
-/*-------------------------------------------------
-    rom_parameter_name - return the appropriate name
-    for a per-game parameter
--------------------------------------------------*/
-
-std::string rom_parameter_name(const device_t &device, const rom_entry *romp)
-{
-	return device.subtag(romp->name().c_str());
-}
-
-
-/*-------------------------------------------------
-    rom_parameter_name - return the value for a
-    per-game parameter
--------------------------------------------------*/
-
-std::string rom_parameter_value(const rom_entry *romp)
-{
-	return romp->hashdata();
-}
-
-
-/*-------------------------------------------------
     rom_file_size - return the expected size of a
     file given the ROM description
 -------------------------------------------------*/
@@ -488,12 +455,8 @@ void rom_load_manager::display_rom_load_results(bool from_list)
     byte swapping and inverting data as necessary
 -------------------------------------------------*/
 
-void rom_load_manager::region_post_process(const char *rgntag, bool invert)
+void rom_load_manager::region_post_process(memory_region *region, bool invert)
 {
-	memory_region *region = machine().root_device().memregion(rgntag);
-	u8 *base;
-	int i, j;
-
 	// do nothing if no region
 	if (region == nullptr)
 		return;
@@ -505,7 +468,8 @@ void rom_load_manager::region_post_process(const char *rgntag, bool invert)
 	if (invert)
 	{
 		LOG("+ Inverting region\n");
-		for (i = 0, base = region->base(); i < region->bytes(); i++)
+		u8 *base = region->base();
+		for (int i = 0; i < region->bytes(); i++)
 			*base++ ^= 0xff;
 	}
 
@@ -514,11 +478,12 @@ void rom_load_manager::region_post_process(const char *rgntag, bool invert)
 	{
 		LOG("+ Byte swapping region\n");
 		int datawidth = region->bytewidth();
-		for (i = 0, base = region->base(); i < region->bytes(); i += datawidth)
+		u8 *base = region->base();
+		for (int i = 0; i < region->bytes(); i += datawidth)
 		{
 			u8 temp[8];
 			memcpy(temp, base, datawidth);
-			for (j = datawidth - 1; j >= 0; j--)
+			for (int j = datawidth - 1; j >= 0; j--)
 				*base++ = temp[j];
 		}
 	}
@@ -1285,7 +1250,6 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 {
 	std::string locationtag(swlist.list_name()), breakstr("%");
 	const rom_entry *region;
-	std::string regiontag;
 
 	m_errorstring.clear();
 	m_softwarningstring.clear();
@@ -1330,7 +1294,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 	{
 		u32 regionlength = ROMREGION_GETLENGTH(region);
 
-		regiontag = device.subtag(ROMREGION_GETTAG(region));
+		std::string regiontag = device.subtag(ROMREGION_GETTAG(region));
 		LOG("Processing region \"%s\" (length=%X)\n", regiontag.c_str(), regionlength);
 
 		/* the first entry must be a region */
@@ -1382,10 +1346,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 
 	/* now go back and post-process all the regions */
 	for (region = start_region; region != nullptr; region = rom_next_region(region))
-	{
-		regiontag = device.subtag(ROMREGION_GETTAG(region));
-		region_post_process(regiontag.c_str(), ROMREGION_ISINVERTED(region));
-	}
+		region_post_process(device.memregion(ROMREGION_GETTAG(region)), ROMREGION_ISINVERTED(region));
 
 	/* display the results and exit */
 	display_rom_load_results(true);
@@ -1398,8 +1359,6 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 
 void rom_load_manager::process_region_list()
 {
-	std::string regiontag;
-
 	/* loop until we hit the end */
 	device_iterator deviter(machine().root_device());
 	for (device_t &device : deviter)
@@ -1407,7 +1366,7 @@ void rom_load_manager::process_region_list()
 		{
 			u32 regionlength = ROMREGION_GETLENGTH(region);
 
-			regiontag = rom_region_name(device, region);
+			std::string regiontag = device.subtag(ROM_GETNAME(region));
 			LOG("Processing region \"%s\" (length=%X)\n", regiontag.c_str(), regionlength);
 
 			/* the first entry must be a region */
@@ -1448,17 +1407,14 @@ void rom_load_manager::process_region_list()
 	/* now go back and post-process all the regions */
 	for (device_t &device : deviter)
 		for (const rom_entry *region = rom_first_region(device); region != nullptr; region = rom_next_region(region))
-		{
-			regiontag = rom_region_name(device, region);
-			region_post_process(regiontag.c_str(), ROMREGION_ISINVERTED(region));
-		}
+			region_post_process(device.memregion(ROM_GETNAME(region)), ROMREGION_ISINVERTED(region));
 
 	/* and finally register all per-game parameters */
 	for (device_t &device : deviter)
 		for (const rom_entry *param = rom_first_parameter(device); param != nullptr; param = rom_next_parameter(param))
 		{
-			regiontag = rom_parameter_name(device, param);
-			machine().parameters().add(regiontag, rom_parameter_value(param));
+			std::string regiontag = device.subtag(param->name().c_str());
+			machine().parameters().add(regiontag, param->hashdata());
 		}
 }
 

@@ -44,6 +44,26 @@ Notes:
 
 /*
 
+ VTech PC Super Color (Spain)
+ __________________________________     _______________|||||||||||||____
+ |                                 |   |               ||||||||||||| ___|
+ |                                 |   |                             |
+ |                                 |___|              TI CSM10233AN  |__
+ |                                 ____      ____              __\_____ |
+ |      _____________              ____     (GLOB)             |_______||
+ |      |S2564RL-100 |             ____     _____                 _____ |
+ |      |____________|             ____     |    |                |    ||
+ |                                 ____     |Z80 |   S2564RL-100->|    ||
+ |     ______________              ____     |    |                |    ||
+ |     | 27-5560-01  |             ____     |    |<-Z84C0008PEC   |    ||
+ |     |_____________|             |   |    |    | __________     |____||
+  \                                |   |    |____| |_________|  ________|
+   \_____              ____________|   |           SN74HC244N   |
+         ||||||||||||||                |__|||||_____         ___|
+         ||||||||||||||                            |||||||||||
+*/
+
+/*
     Undumped cartridges:
 
     80-1410   Super Science
@@ -64,7 +84,6 @@ Notes:
 */
 
 /*
-
     TODO:
 
     - identify unknown chips (maybe related to the sound??)
@@ -75,7 +94,6 @@ Notes:
     - cartridges
 
 */
-
 
 #include "emu.h"
 
@@ -862,6 +880,14 @@ ROM_START( glscolor )
 	ROM_LOAD( "27-5488-00.u5", 0x00000, 0x080000, CRC(e6cf7702) SHA1(ce40418a7777b331bf8c4c881d51732aeb384582) )    // identical to 'Genius Leader Color'
 ROM_END
 
+ROM_START( pcscolor )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "27-5560-01.u5", 0x00000, 0x080000, CRC(e21e7ecd) SHA1(f3eeb19a88f1856406b357f2966880113b7340dc) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD( "csm10233an.u1", 0x0000, 0x2000, NO_DUMP ) // TSP50C10 (8K bytes of ROM) labeled "51CTCJT VIDEO TECH CSM10233AN"
+ROM_END
+
 ROM_START( snotec )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "27-5616-01.u6", 0x00000, 0x080000, CRC(74093f5b) SHA1(3495b07e297315051888261d608680513a05c08b) )
@@ -898,6 +924,7 @@ ROM_END
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY   FULLNAME                                FLAGS
 COMP( 1994, glcolor,  0,       0,      glcolor,  glcolor,  prestige_state, empty_init, "VTech",  "Genius Leader Color (Germany)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1994, glscolor, glcolor, 0,      glcolor,  glcolor,  prestige_state, empty_init, "VTech",  "Genius Leader Super Color (Germany)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1994, pcscolor, 0,       0,      glcolor,  glcolor,  prestige_state, empty_init, "VTech",  "PC Super Color (Spain)",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1995, snotec,   0,       0,      snotec,   glcolor,  prestige_state, empty_init, "Bandai", "Super Note Club (Japan)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1996, snotecex, 0,       0,      snotec,   glcolor,  prestige_state, empty_init, "Bandai", "Super Note Club EX (Japan)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1996, glmcolor, 0,       0,      glmcolor, glmcolor, prestige_state, empty_init, "VTech",  "Genius Leader Magic Color (Germany)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

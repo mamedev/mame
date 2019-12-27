@@ -440,7 +440,7 @@ static INPUT_PORTS_START( victnine )
 	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( Cocktail ) )
 	PORT_DIPSETTING(    0x00, "MA / MB" )  // This is a small single player sit-down cab called 'Taito MA' or 'Taito MB', with only 1 joystick and 3 buttons.
-                                           // Only Player 1 can play and only buttons A, C and c are active.
+										   // Only Player 1 can play and only buttons A, C and c are active.
 
 	PORT_START("SWB")      /* D801 */
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SWB:1,2,3,4")

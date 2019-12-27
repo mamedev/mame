@@ -90,7 +90,7 @@ Undumped VTech laptops possibly on similar hardware:
 
   1x Unknown CPU inside an epoxy blob (more than 100 connections) @ U? (covered with the blob).
   1x VTech LH532HJT mask ROM (originary from Sharp) also silkscreened '9811D' @ U3.
-  1x Texas Instruments 84C91HT (CSM10150AN) speech synth with 8-bit microprocessor @ U2.
+  1x Texas Instruments TSP50C10 (CSM10150AN) speech synth with 8-bit microprocessor @ U2.
   1x SN74HC00N @ U5.
   1x SN74HC244N @ U4.
 
@@ -172,7 +172,7 @@ Undumped VTech laptops possibly on similar hardware:
                 '---------'
 
 
-  U2 - Texas Instruments 84C91HT (CSM10150AN).
+  U2 - Texas Instruments TSP50C10 (CSM10150AN).
 
        Speech Generator with 8-bit microprocessor, 8K ROM, 112 bytes RAM.
        Maximum Clock Frequency = 9.6 MHz.
@@ -338,6 +338,9 @@ ROM_START( pitagjr )
 
 	ROM_REGION( 0x40000, "extrom", 0 )
 	ROM_LOAD( "lh532hjt_9811d.u3", 0x00000, 0x40000, CRC(23878b45) SHA1(8f3c41c10cfde9d76763c3a8701ec6616db4ab40) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD( "csm10150an.u2", 0x0000, 0x2000, NO_DUMP ) // TSP50C10 (8K bytes of ROM) labeled "CSM10150AN"
 ROM_END
 
 ROM_START( gjrstar )
@@ -378,6 +381,9 @@ ROM_START( pitagor )
 
 	ROM_REGION( 0x80000, "extrom", 0 )
 	ROM_LOAD( "27-5374-00.u2", 0x000000, 0x80000, CRC(89a8fe7d) SHA1(dff06f7313af22c6c19b1f00c0651a64cc505fe2))
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD( "csm10150an.u1", 0x0000, 0x2000, NO_DUMP ) // TSP50C10 (8K bytes of ROM) labeled "64C_4TT VIDEO TECH CSM10150AN"
 ROM_END
 
 ROM_START( gls )
