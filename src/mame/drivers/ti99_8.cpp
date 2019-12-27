@@ -609,6 +609,9 @@ WRITE_LINE_MEMBER( ti99_8_state::console_reset )
 		// Setting ready to false so that automatic wait states are enabled
 		m_cpu->ready_line(CLEAR_LINE);
 		m_cpu->reset_line(ASSERT_LINE);
+
+		// Send RESET to the IOPort
+		m_ioport->reset_in(state);
 	}
 }
 

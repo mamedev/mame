@@ -37,6 +37,7 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER( memen_in ) { }
 	virtual DECLARE_WRITE_LINE_MEMBER( msast_in ) { }
 	virtual DECLARE_WRITE_LINE_MEMBER( clock_in ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( reset_in ) { }
 
 	void set_ioport(ioport_device* ioport) { m_ioport = ioport; }
 
@@ -78,6 +79,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( memen_in );
 	DECLARE_WRITE_LINE_MEMBER( msast_in );
 	DECLARE_WRITE_LINE_MEMBER( clock_in );
+	DECLARE_WRITE_LINE_MEMBER( reset_in );
 
 	// Callbacks
 	auto extint_cb() { return m_console_extint.bind(); }
