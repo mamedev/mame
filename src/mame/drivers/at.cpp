@@ -2032,6 +2032,31 @@ ROM_END
 //  80286 Desktop
 //**************************************************************************
 
+// Atari PC 4, PC4X motherboard - Chipset: NEAT CS8221 (P82C206, P82C211, P82C212, P82C215) - ISA8: 1, ISA16: 4 - RAM: 8XSIPP30
+// Paradise Systems PVGA1A-JK, IMSG171P
+// on board: external and internal floppy, digital and analog video, ser, par, keyboard, mouse
+ROM_START( ataripc4 ) // initializes video, then halts
+	ROM_REGION16_LE(0x20000, "bios", 0)
+	ROM_LOAD16_BYTE( "ami_pc4x_1.7_even.bin", 0x10000, 0x8000, CRC(9f142377) SHA1(b3e5c5dfaec133646295d9a16bc1eec54fe2bc35))
+	ROM_LOAD16_BYTE( "ami_pc4x_1.7_odd.bin", 0x10001, 0x8000, CRC(ae3d4cb6) SHA1(d7915ef013462aff4f189cda8f6dc0a486777b63))
+
+	ROM_REGION16_LE(0x10000, "pvga", 0)
+	ROM_LOAD16_BYTE( "pvga_pc4x_even.bin", 0x00000, 0x8000, CRC(ff222896) SHA1(e22cdcd9c69fc4feef6b8c2903e3506c79ff531b))
+	ROM_LOAD16_BYTE( "pvga_pc4x_odd.bin", 0x00001, 0x8000, CRC(8ca04b2f) SHA1(7705d866ecf366bd6ea95071bf5767877461d2d5))
+ROM_END
+
+// Atari ABC 286/30, PC4LC motherboard (low cost, compared to PC4) - BIOS-String: DNET-0000-092588-K0- ISA16: 3 - RAM: 4xSIPP30
+// NEAT CS8221 (P82C206, P82C211, P82C212, P82C215) - http://www.atari-computermuseum.de/abc286.htm
+// on board: internal floppy, digital video (EGA), ser, par, keyboard, mouse
+ROM_START( atariabc286 )
+	ROM_REGION16_LE(0x20000, "bios", 0)
+	ROM_LOAD16_BYTE( "ami_pc4x_1.x_even.bin", 0x10000, 0x8000, CRC(930447c7) SHA1(fb7212b413ff8aa056bd23baadc22691ce714f8d))
+	ROM_LOAD16_BYTE( "ami_pc4x_1.x_odd.bin", 0x10001, 0x8000, CRC(0891fd25) SHA1(4722b1db1b2c985c67f9a9b807ce68c06a905232))
+
+	// ROM_REGION(0x40000, "ega", 0)
+	// ROM_LOAD( "p82c441_ega_bios_v1.0.6.bin", 0x00000, 0x40000, BAD_DUMP CRC(80c11ef2) SHA1(90852d3cbb64504c8d57b469a594c22c247c9a39))
+ROM_END
+
 // Profex PC 33 - Chipset: SUNTAC ST62BC004-B1, ST62BC003-B, ST62C008, ST62C005-B, ST62BC001-B, ST72BC002-B
 // RAM: 2xSIPP30, 18x18pin/16pin, 8x20pin, 4x16pin - OSC: 12.000, 14.31818, 24.000MHz - ISA8: 2, ISA16: 6
 // BIOS: Award A2245250 - Keyboard-BIOS: Award - BIOS-String: 286 Modular BIOS 3.03 Copyright Award Software Inc. / GCH
@@ -3258,6 +3283,16 @@ ROM_END
 //**************************************************************************
 //  80386 SX and DX Desktop
 //**************************************************************************
+
+// Atari PC 5 - American Megatrends 386XT Series-4 motherboard - on board EGA
+// screen remains blank, 1 beep repeated (DRAM refresh failure)
+ROM_START( ataripc5 )
+	ROM_REGION32_LE(0x20000, "bios", 0)
+	ROM_LOAD32_BYTE("ami_pc5_1.00_rom0.bin", 0x00000, 0x8000, CRC(496149a6) SHA1(81033b22af830af8306abfde03a194739fe54355))
+	ROM_LOAD32_BYTE("ami_pc5_1.00_rom1.bin", 0x00001, 0x8000, CRC(3c82fe66) SHA1(dd6c2c3c3635761b1d928912269b8937cbdc09ae))
+	ROM_LOAD32_BYTE("ami_pc5_1.00_rom2.bin", 0x00002, 0x8000, CRC(7dc5b53b) SHA1(33e138baa84a8acc629bde5a6b54e47d0d4508f1))
+	ROM_LOAD32_BYTE("ami_pc5_1.00_rom3.bin", 0x00003, 0x8000, CRC(b588b7a8) SHA1(2f2597b14e54d03cf957cce47536266f68d3aa66))
+ROM_END
 
 // Datavan Book-Size LAN Station - CPU: Am386SX/SXL-25 - Chipset: Headland HT18/C, RAM: 4xSIMM30
 // BIOS: AMI 386SX BIOS PLUS S/NO. 232659 - Keyboard-BIOS: AMI KEYBOARD BIOS PLUS S/NO. 232659
@@ -4626,6 +4661,8 @@ COMP( 198?, pccm205,   ibm5170, 0,       atturbo,   0,     at_state,     init_at
 COMP( 198?, pccm216,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "PC-Chips", "M216", MACHINE_NOT_WORKING )
 COMP( 198?, snomi286,  ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Snobol", "Mini 286", MACHINE_NOT_WORKING )
 COMP( 198?, u3911v3,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Uniron", "U3911-V3", MACHINE_NOT_WORKING )
+COMP( 1987, ataripc4,  ibm5170, 0,       neat,      0,     at_state,     init_at,        "Atari", "PC4", MACHINE_NOT_WORKING )
+COMP( 1989, atariabc286,ibm5170,0,       neat,      0,     at_state,     init_at,        "Atari", "ABC-286/30", MACHINE_NOT_WORKING )
 COMP( 199?, micral45,  ibm5170, 0,       micral45,  0,     at_state,     init_at,        "Bull", "Micral 45", MACHINE_NOT_WORKING )
 COMP( 1986, ncrpc8,    ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "NCR",         "PC-8", MACHINE_NOT_WORKING )
 COMP( 1988, comslt286, ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Compaq",      "SLT/286", MACHINE_NOT_WORKING )
@@ -4724,6 +4761,7 @@ COMP( 198?, hot304,    ibm5170, 0,       at386,     0,     at_state,     init_at
 COMP( 198?, hot307h,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Shuttle Computer International", "HOT-307H", MACHINE_NOT_WORKING )
 COMP( 199?, sy019hi,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Soyo", "SY-019H and SY-019I", MACHINE_NOT_WORKING )
 COMP( 199?, uni386w,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "UNICHIP", "386W 367C REV 1.0", MACHINE_NOT_WORKING )
+COMP( 1988, ataripc5,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "Atari", "PC5", MACHINE_NOT_WORKING )
 COMP( 1992, walk386dx, ibm5170, 0,       at386,     0,     at_state,     init_at,        "Triumph-Adler", "Walkstation 386DX", MACHINE_NOT_WORKING ) // screen remains blank
 COMP( 199?, via4386vio,ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "Via 4386 VIO / Highscreen universal board", MACHINE_NOT_WORKING )
 COMP( 199?, nat48pv,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "NAT48PV-1.00 VL", MACHINE_NOT_WORKING )

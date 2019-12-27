@@ -285,6 +285,7 @@ ROM_START(pc)
 	// American Research Corp., Copyright 1985, ARC TURBO BIOS VERSION 1.23 6/27/85
 	ROM_SYSTEM_BIOS(50, "arc123", "ARC Turbo BIOS 1.23")
 	ROMX_LOAD( "arcturbobios.bin", 0xe000, 0x2000, CRC(07692e7b) SHA1(27aa350dbc0d846cee8f9149bde0ef72d3862254), ROM_BIOS(50))
+
 ROM_END
 
 // BIOS versions specifically for NEC V20 CPUs, don't run on plain 8088
