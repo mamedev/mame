@@ -70,6 +70,8 @@ public:
 	template <typename... T> void set_cs_config_callback(T &&... args) { m_cs_callback.set(std::forward<T>(args)...); }
 	void default_cs_callback(int base, uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4 );
 
+	void set_cs_space(address_space* csspace) { m_cs_space = csspace; }
+
 protected:
 
 	virtual void device_start() override;
@@ -156,6 +158,11 @@ protected:
 	int m_csbase;
 
 	DECLARE_READ16_MEMBER(internalrom_lower32_r);
+
+	address_space* m_cs_space;
+
+	DECLARE_READ16_MEMBER(cs_space_r);
+	DECLARE_WRITE16_MEMBER(cs_space_w);
 
 private:
 	devcb_read16 m_space_read_cb;

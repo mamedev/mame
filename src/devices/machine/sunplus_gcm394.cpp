@@ -659,8 +659,20 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map& map)
 	// no internal ROM on this model?
 
 	map(0x08000, 0x0ffff).r(FUNC(sunplus_gcm394_base_device::internalrom_lower32_r)).nopw();
-	// 0x20000+ is CS access
+
+	map(0x20000, 0x3fffff).rw(FUNC(sunplus_gcm394_base_device::cs_space_r), FUNC(sunplus_gcm394_base_device::cs_space_w));
 }
+
+READ16_MEMBER(sunplus_gcm394_base_device::cs_space_r)
+{
+	return m_cs_space->read_word(offset + m_csbase);
+}
+
+WRITE16_MEMBER(sunplus_gcm394_base_device::cs_space_w)
+{
+	m_cs_space->write_word(offset + m_csbase, data);
+}
+
 
 READ16_MEMBER(sunplus_gcm394_base_device::internalrom_lower32_r)
 {
@@ -671,7 +683,7 @@ READ16_MEMBER(sunplus_gcm394_base_device::internalrom_lower32_r)
 	}
 	else
 	{
-		uint16_t val = m_space_read_cb(space, offset + 0x28000);
+		uint16_t val = m_space_read_cb(space, offset + m_csbase + 0x8000);
 		return val;
 	}
 }
@@ -766,6 +778,8 @@ void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
 	map(0x10000, 0x27fff).rom().region("internal", 0x10000); // upper 96kwords of internal ROM is always visible
 	map(0x28000, 0x2ffff).noprw(); // reserved
 	// 0x30000+ is CS access
+	
+	map(0x30000, 0x3fffff).rw(FUNC(generalplus_gpac800_device::cs_space_r), FUNC(generalplus_gpac800_device::cs_space_w));
 
 }
 

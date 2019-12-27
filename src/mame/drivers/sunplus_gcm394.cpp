@@ -237,8 +237,6 @@ void gcm394_game_state::cs_map_base(address_map &map)
 
 void gcm394_game_state::mem_map_4m_base(address_map &map)
 {
-	/*  0x000000  0x01ffff - internal area */
-	map(0x020000, 0x3fffff).rw(FUNC(gcm394_game_state::cs0_r), FUNC(gcm394_game_state::cs0_w));
 }
 
 
@@ -332,29 +330,31 @@ private:
 
 READ16_MEMBER(wrlshunt_game_state::cs0_r)
 {
-	return 0x0000;// m_sdram2[offset & 0xffff];
+	return m_romregion[offset & 0x3ffffff];
 }
 
 WRITE16_MEMBER(wrlshunt_game_state::cs0_w)
 {
-	//m_sdram2[offset & 0xffff] = data;
+	printf("cs0_w write to ROM?\n");
+	//m_romregion[offset & 0x3ffffff] = data;
 }
 
 READ16_MEMBER(wrlshunt_game_state::cs1_r)
 {
-	return 0x0000;// m_sdram[offset & 0x3fffff];
+	return m_sdram[offset & 0x3fffff];
 }
 
 WRITE16_MEMBER(wrlshunt_game_state::cs1_w)
 {
-	//m_sdram[offset & 0x3fffff] = data;
+	m_sdram[offset & 0x3fffff] = data;
 }
 
 
 void wrlshunt_game_state::machine_reset()
 {
 	m_memory->get_program()->unmap_readwrite(0x030000, 0x42ffff);
-	m_memory->get_program()->install_readwrite_handler( 0x030000, 0x42ffff, read16_delegate(*this, FUNC(gcm394_game_state::cs0_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs0_w)));
+	m_memory->get_program()->install_readwrite_handler( 0x030000, 0x42ffff, read16_delegate(*this, FUNC(wrlshunt_game_state::cs0_r)), write16_delegate(*this, FUNC(wrlshunt_game_state::cs0_w)));
+	m_maincpu->set_cs_space(m_memory->get_program());
 
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 }
@@ -376,9 +376,6 @@ void generalplus_gpac800_game_state::cs_map_gpac800(address_map &map)
 
 void generalplus_gpac800_game_state::generalplus_gpac800_map(address_map &map)
 {
-	/*  0x000000  0x02ffff - internal area */
-	map(0x030000, 0x03ffff).rw(FUNC(generalplus_gpac800_game_state::cs0_r), FUNC(generalplus_gpac800_game_state::cs0_w));
-	map(0x040000, 0x3fffff).rw(FUNC(generalplus_gpac800_game_state::cs1_r), FUNC(generalplus_gpac800_game_state::cs1_w));
 }
 
 
@@ -531,6 +528,7 @@ void wrlshunt_game_state::wrlshunt(machine_config &config)
 
 	m_maincpu->porta_in().set(FUNC(wrlshunt_game_state::hunt_porta_r));
 	m_maincpu->porta_out().set(FUNC(wrlshunt_game_state::hunt_porta_w));
+	m_maincpu->set_bootmode(1); // boot from external ROM / CS mirror
 
 	m_screen->set_size(320*2, 262*2);
 	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
@@ -545,6 +543,7 @@ void gcm394_game_state::machine_reset()
 {
 	m_memory->get_program()->unmap_readwrite(0x020000, 0x42ffff);
 	m_memory->get_program()->install_readwrite_handler( 0x020000, 0x41ffff, read16_delegate(*this, FUNC(gcm394_game_state::cs0_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs0_w)));
+	m_maincpu->set_cs_space(m_memory->get_program());
 
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 }
@@ -567,8 +566,6 @@ void gcm394_game_state::machine_reset()
 
 void wrlshunt_game_state::wrlshunt_map(address_map &map)
 {
-//	map(0x000000, 0x00ffff).rom().region("maincpu", 0); // non-banked area on this SoC?
-//	map(0x030000, 0x1fffff).ram().share("mainram");
 }
 
 
@@ -962,8 +959,8 @@ ROM_START(wrlshunt)
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	//ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // not used, configured to external ROM boot mode
 
-	ROM_REGION(0x8000000, "nandrom", ROMREGION_ERASE00)
-	ROM_LOAD16_WORD_SWAP("wireless.bin", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796))
+	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("wireless.bin", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796))		
 ROM_END
 
 /*
@@ -1049,6 +1046,7 @@ void generalplus_gpac800_game_state::machine_reset()
 {
 	m_memory->get_program()->unmap_readwrite(0x030000, 0x42ffff);
 	m_memory->get_program()->install_readwrite_handler( 0x030000, 0x42ffff, read16_delegate(*this, FUNC(gcm394_game_state::cs0_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs0_w)));
+	m_maincpu->set_cs_space(m_memory->get_program());
 
 	if (m_has_nand)
 	{
