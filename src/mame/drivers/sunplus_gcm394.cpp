@@ -176,7 +176,6 @@ protected:
 	required_ioport m_io_p1;
 	required_ioport m_io_p2;
 
-	void mem_map_4m_base(address_map &map);
 
 	optional_region_ptr<uint16_t> m_romregion;
 	required_device<full_memory_device> m_memory;
@@ -235,10 +234,6 @@ void gcm394_game_state::cs_map_base(address_map &map)
 	//map(0x020000, 0x41ffff).rw(FUNC(gcm394_game_state::cs0_r), FUNC(gcm394_game_state::cs0_w));
 }
 
-void gcm394_game_state::mem_map_4m_base(address_map &map)
-{
-}
-
 
 
 class generalplus_gpac800_game_state : public gcm394_game_state
@@ -266,7 +261,6 @@ public:
 protected:
 	virtual void machine_reset() override;
 
-	void generalplus_gpac800_map(address_map &map);
 	DECLARE_READ8_MEMBER(read_nand);
 	std::vector<uint16_t> m_sdram;
 	std::vector<uint16_t> m_sdram2;
@@ -308,8 +302,6 @@ public:
 protected:
 	//virtual void machine_start() override;
 	virtual void machine_reset() override;
-
-	void wrlshunt_map(address_map &map);
 
 	std::vector<uint16_t> m_sdram;
 
@@ -354,20 +346,14 @@ WRITE16_MEMBER(wrlshunt_game_state::cs1_w)
 
 void wrlshunt_game_state::machine_reset()
 {
-	m_memory->get_program()->unmap_readwrite(0x020000, 0x41ffff);
-	m_memory->get_program()->install_readwrite_handler( 0x020000, 0x41ffff, read16_delegate(*this, FUNC(wrlshunt_game_state::cs0_r)), write16_delegate(*this, FUNC(wrlshunt_game_state::cs0_w)));
+	cs_callback(0x20000, 0x00, 0x00, 0x00, 0x00, 0x00);
 	m_maincpu->set_cs_space(m_memory->get_program());
-
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 }
-
-
 
 void wrlshunt_game_state::init_wrlshunt()
 {
 	m_sdram.resize(0x400000); // 0x400000 bytes, 0x800000 words
-//	m_sdram2.resize(0x10000);
-
 }
 
 void generalplus_gpac800_game_state::cs_map_gpac800(address_map &map)
@@ -375,11 +361,6 @@ void generalplus_gpac800_game_state::cs_map_gpac800(address_map &map)
 	map(0x000000, 0x02ffff).rw(FUNC(generalplus_gpac800_game_state::pre_cs_r), FUNC(generalplus_gpac800_game_state::pre_cs_w));
 //	map(0x030000, 0x42ffff).rw(FUNC(generalplus_gpac800_game_state::cs0_r), FUNC(generalplus_gpac800_game_state::cs0_w));
 }
-
-void generalplus_gpac800_game_state::generalplus_gpac800_map(address_map &map)
-{
-}
-
 
 READ16_MEMBER(generalplus_gpac800_game_state::cs0_r)
 {
@@ -448,7 +429,6 @@ WRITE16_MEMBER(gcm394_game_state::porta_w)
 void gcm394_game_state::base(machine_config &config)
 {
 	GCM394(config, m_maincpu, XTAL(27'000'000), m_screen);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gcm394_game_state::mem_map_4m_base);
 	m_maincpu->porta_in().set(FUNC(gcm394_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(gcm394_game_state::portb_r));
 	m_maincpu->porta_out().set(FUNC(gcm394_game_state::porta_w));
@@ -477,7 +457,6 @@ void gcm394_game_state::base(machine_config &config)
 void wrlshunt_game_state::wrlshunt(machine_config &config)
 {
 	gcm394_game_state::base(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &wrlshunt_game_state::wrlshunt_map);
 
 	m_maincpu->porta_in().set(FUNC(wrlshunt_game_state::hunt_porta_r));
 	m_maincpu->porta_out().set(FUNC(wrlshunt_game_state::hunt_porta_w));
@@ -510,7 +489,6 @@ WRITE16_MEMBER(wrlshunt_game_state::hunt_porta_w)
 void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 {
 	GPAC800(config, m_maincpu, XTAL(27'000'000), m_screen);
-	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_gpac800_game_state::generalplus_gpac800_map);
 	m_maincpu->porta_in().set(FUNC(generalplus_gpac800_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(generalplus_gpac800_game_state::portb_r));
 	m_maincpu->porta_out().set(FUNC(generalplus_gpac800_game_state::porta_w));
@@ -546,8 +524,7 @@ void gcm394_game_state::machine_start()
 
 void gcm394_game_state::machine_reset()
 {
-	m_memory->get_program()->unmap_readwrite(0x020000, 0x42ffff);
-	m_memory->get_program()->install_readwrite_handler( 0x020000, 0x41ffff, read16_delegate(*this, FUNC(gcm394_game_state::cs0_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs0_w)));
+	cs_callback(0x20000, 0x00, 0x00, 0x00, 0x00, 0x00);
 	m_maincpu->set_cs_space(m_memory->get_program());
 
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
@@ -567,11 +544,6 @@ void gcm394_game_state::machine_reset()
 	
 	map(0x200000, 0x3fffff) continued view into external spaces, but this area is banked with m_membankswitch_7810 (valid bank values 0x00-0x3f)
 */
-
-
-void wrlshunt_game_state::wrlshunt_map(address_map &map)
-{
-}
 
 
 void gcm394_game_state::cs_callback(int base, uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4)
@@ -1051,8 +1023,7 @@ CONS(2011, wrlshunt, 0, 0, wrlshunt, wrlshunt, wrlshunt_game_state, init_wrlshun
 
 void generalplus_gpac800_game_state::machine_reset()
 {
-	m_memory->get_program()->unmap_readwrite(0x030000, 0x42ffff);
-	m_memory->get_program()->install_readwrite_handler( 0x030000, 0x42ffff, read16_delegate(*this, FUNC(gcm394_game_state::cs0_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs0_w)));
+	cs_callback(0x30000, 0x00, 0x00, 0x00, 0x00, 0x00);
 	m_maincpu->set_cs_space(m_memory->get_program());
 
 	if (m_has_nand)
