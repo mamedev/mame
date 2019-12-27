@@ -266,7 +266,7 @@ inline bool jaguar_state::adjust_object_timer(int vc)
  *
  *************************************/
 
-void jaguar_state::update_cpu_irq()
+inline void jaguar_state::verify_host_cpu_irq()
 {
 	if ((m_cpu_irq_state & m_gpu_regs[INT1] & 0x1f) != 0)
 		m_maincpu->set_input_line(m_is_r3000 ? INPUT_LINE_IRQ4 : M68K_IRQ_6, ASSERT_LINE);
@@ -274,17 +274,21 @@ void jaguar_state::update_cpu_irq()
 		m_maincpu->set_input_line(m_is_r3000 ? INPUT_LINE_IRQ4 : M68K_IRQ_6, CLEAR_LINE);
 }
 
+inline void jaguar_state::trigger_host_cpu_irq(int level)
+{
+	m_cpu_irq_state |= 1 << level;
+	verify_host_cpu_irq();
+}
+
 
 WRITE_LINE_MEMBER( jaguar_state::gpu_cpu_int )
 {
-	m_cpu_irq_state |= 2;
-	update_cpu_irq();
+	trigger_host_cpu_irq(1);
 }
 
 WRITE_LINE_MEMBER( jaguar_state::dsp_cpu_int )
 {
-	m_cpu_irq_state |= 16;
-	update_cpu_irq();
+	trigger_host_cpu_irq(4);
 }
 
 
@@ -568,7 +572,9 @@ READ16_MEMBER( jaguar_state::tom_regs_r )
 	switch (offset)
 	{
 		case INT1:
+		{
 			return m_cpu_irq_state;
+		}
 
 		case HC:
 			return m_screen->hpos() % (m_screen->width() / 2);
@@ -615,7 +621,7 @@ WRITE16_MEMBER( jaguar_state::tom_regs_w )
 
 			case INT1:
 				m_cpu_irq_state &= ~(m_gpu_regs[INT1] >> 8);
-				update_cpu_irq();
+				verify_host_cpu_irq();
 				break;
 			
 			// TODO: INT2 bus mechanism
@@ -626,8 +632,7 @@ WRITE16_MEMBER( jaguar_state::tom_regs_w )
 				break;
 
 			case OBF:   /* clear GPU interrupt */
-				m_cpu_irq_state &= 0xfd;
-				update_cpu_irq();
+				m_gpu->set_input_line(3, CLEAR_LINE);
 				break;
 
 			case HP:
@@ -717,10 +722,7 @@ void jaguar_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 		case TID_PIT:
 			if (m_gpu_regs[INT1] & 0x8)
-			{
-				m_cpu_irq_state |= 8;
-				update_cpu_irq();
-			}
+				trigger_host_cpu_irq(3);
 			if (m_gpu_regs[PIT0] != 0)
 			{
 				attotime sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), m_gpu->clock()/2);
@@ -791,10 +793,7 @@ void jaguar_state::scanline_update(int param)
 	{
 		/* handle vertical interrupts */
 		if (vc == m_gpu_regs[VI])
-		{
-			m_cpu_irq_state |= 1;
-			update_cpu_irq();
-		}
+			trigger_host_cpu_irq(0);
 
 		/* point to the next counter value */
 		if (++vc / 2 >= m_screen->height())
@@ -826,7 +825,7 @@ void jaguar_state::video_start()
 
 void jaguar_state::device_postload()
 {
-	update_cpu_irq();
+	verify_host_cpu_irq();
 }
 
 

@@ -1380,6 +1380,7 @@ WRITE32_MEMBER(jaguar_cpu_device::pc_w)
 WRITE32_MEMBER(jaguar_cpu_device::end_w)
 {
 	COMBINE_DATA(&m_io_end);
+	// sburnout sets bit 1 == 0
 	if ((m_io_end & 0x7) != 0x7)
 		throw emu_fatalerror("%s: fatal endian setup %08x", this->tag(), m_io_end);
 }

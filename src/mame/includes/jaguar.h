@@ -301,7 +301,8 @@ private:
 	void get_crosshair_xy(int player, int &x, int &y);
 	int effective_hvalue(int value);
 	bool adjust_object_timer(int vc);
-	void update_cpu_irq();
+	inline void trigger_host_cpu_irq(int level);
+	inline void verify_host_cpu_irq();
 	uint8_t *memory_base(uint32_t offset) { return reinterpret_cast<uint8_t *>(m_gpu->space(AS_PROGRAM).get_read_ptr(offset)); }
 	void blitter_run();
 	void scanline_update(int param);
