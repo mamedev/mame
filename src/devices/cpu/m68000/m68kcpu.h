@@ -463,7 +463,6 @@ void set_irq_line(int irqline, int state);
 void m68k_cause_bus_error();
 
 
-
 static const u8    m68ki_shift_8_table[65];
 static const u16   m68ki_shift_16_table[65];
 static const u32   m68ki_shift_32_table[65];

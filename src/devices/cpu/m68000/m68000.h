@@ -170,6 +170,8 @@ public:
 	void set_buserror_details(u32 fault_addr, u8 rw, u8 fc);
 	void disable_interrupt_mixer() { m_interrupt_mixer = false; }
 	void set_cpu_space(int space_id) { m_cpu_space_id = space_id; }
+	void assert_dtackn();
+	void clear_dtackn();
 
 protected:
 	m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock,
@@ -216,6 +218,7 @@ protected:
 	u32 m_sr_mask;      /* Implemented status register bits */
 	u32 m_instr_mode;   /* Stores whether we are in instruction mode or group 0/1 exception mode */
 	u32 m_run_mode;     /* Stores whether we are processing a reset, bus error, address error, or something else */
+	int    m_dtackn;    /* Stores whether we are currently holding for data transfer acknowledge */
 	int    m_has_pmmu;     /* Indicates if a PMMU available (yes on 030, 040, no on EC030) */
 	int    m_has_hmmu;     /* Indicates if an Apple HMMU is available in place of the 68851 (020 only) */
 	int    m_pmmu_enabled; /* Indicates if the PMMU is enabled */

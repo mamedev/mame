@@ -748,6 +748,16 @@ void m68000_base_device::postload()
 	m68ki_jump(m_pc);
 }
 
+void m68000_base_device::assert_dtackn()
+{
+	m_dtackn = 1;
+}
+
+void m68000_base_device::clear_dtackn()
+{
+	m_dtackn = 0;
+}
+
 void m68000_base_device::m68k_cause_bus_error()
 {
 	m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
@@ -851,6 +861,13 @@ void m68000_base_device::execute_run()
 		if (m_icount <= 0) return;
 	}
 
+	if (m_dtackn)
+	{
+		logerror("%s: entered execute_run with /DTACK asserted, bailing\n", machine().describe_context());
+		yield();
+		return;
+	}
+
 	/* See if interrupts came in */
 	m68ki_check_interrupts();
 
@@ -901,12 +918,27 @@ void m68000_base_device::execute_run()
 			{
 			if (!m_pmmu_enabled)
 			{
+				u32 tmp_dar[16];
+				memcpy(tmp_dar, m_dar, sizeof(u32) * 16);
+
 				m_run_mode = RUN_MODE_NORMAL;
 				/* Read an instruction and call its handler */
 				m_ir = m68ki_read_imm_16();
 				u16 state = m_state_table[m_ir];
 				(this->*m68k_handler_table[state])();
-				m_icount -= m_cyc_instruction[m_ir];
+				if (m_dtackn)
+				{
+					m_pc = m_ppc;
+					logerror("%s: instruction flagged /DTACK, bailing\n", machine().describe_context());
+					memcpy(m_dar, tmp_dar, sizeof(u32) * 16);
+					m_icount--;
+					yield();
+					return;
+				}
+				else
+				{
+					m_icount -= m_cyc_instruction[m_ir];
+				}
 			}
 			else
 			{
@@ -1021,6 +1053,9 @@ void m68000_base_device::init_cpu_common(void)
 	m_pmmu_enabled     = 0;
 	m_hmmu_enabled     = 0;
 
+	/* initialize /DTACK */
+	m_dtackn           = 0;
+
 	/* The first call to this function initializes the opcode handler jump table */
 	if(!emulation_initialized)
 	{
@@ -1049,6 +1084,7 @@ void m68000_base_device::init_cpu_common(void)
 	save_item(NAME(m_reset_cycles));
 	save_item(NAME(m_virq_state));
 	save_item(NAME(m_nmi_pending));
+	save_item(NAME(m_dtackn));
 	save_item(NAME(m_has_pmmu));
 	save_item(NAME(m_has_hmmu));
 	save_item(NAME(m_pmmu_enabled));
@@ -1330,10 +1366,10 @@ void m68000_base_device::init16(address_space &space, address_space &ospace)
 	auto ocache = ospace.cache<1, 0, ENDIANNESS_BIG>();
 
 	m_readimm16 = [ocache](offs_t address) -> u16 { return ocache->read_word(address); };
-	m_read8   = [this](offs_t address) -> u8     { return m_space->read_byte(address); };
-	m_read16  = [this](offs_t address) -> u16    { return m_space->read_word(address); };
-	m_read32  = [this](offs_t address) -> u32    { return m_space->read_dword(address); };
-	m_write8  = [this](offs_t address, u8 data)  { m_space->write_word(address & ~1, data | (data << 8), address & 1 ? 0x00ff : 0xff00); };
+	m_read8   = [this](offs_t address) -> u8      { return m_space->read_byte(address); };
+	m_read16  = [this](offs_t address) -> u16     { return m_space->read_word(address); };
+	m_read32  = [this](offs_t address) -> u32     { return m_space->read_dword(address); };
+	m_write8  = [this](offs_t address, u8 data)   { m_space->write_word(address & ~1, data | (data << 8), address & 1 ? 0x00ff : 0xff00); };
 	m_write16 = [this](offs_t address, u16 data)  { m_space->write_word(address, data); };
 	m_write32 = [this](offs_t address, u32 data)  { m_space->write_dword(address, data); };
 }

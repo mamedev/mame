@@ -145,24 +145,52 @@ READ16_MEMBER( cdimono2_state::uart_loopback_enable2 )
 
 READ8_MEMBER(cdimono2_state::slave_glue_r)
 {
-	m_portd_data |= 0x80;
-	m_portc_data = 0xfc | ((offset >> 1) & 3);
+	if (m_maincpu_waiting)
+	{
+		logerror("%s: slave_glue_r: main CPU is waiting, bailing\n", machine().describe_context());
+		return 0;
+	}
+
+	if (!m_dtack_triggered)
+	{
+		logerror("%s: slave_glue_r: /DTACK not yet triggered, bailing\n", machine().describe_context());
+		m_portd_data |= 0x80;
+		m_portc_data = 0xfc | ((offset >> 1) & 3);
+		m_slave->set_input_line(M68HC05_IRQ_LINE, ASSERT_LINE);
+		m_slave->set_input_line(M68HC05_IRQ_LINE, CLEAR_LINE);
+		m_maincpu->assert_dtackn();
+		m_maincpu_waiting = true;
+		return 0;
+	}
+
+	m_dtack_triggered = false;
 	logerror("%s: slave_glue_r: %02x = %02x\n", machine().describe_context(), offset, m_porta_data);
-	m_slave->set_input_line(M68HC05_IRQ_LINE, ASSERT_LINE);
-	m_slave->set_input_line(M68HC05_IRQ_LINE, CLEAR_LINE);
-	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	return m_porta_data;
 }
 
 WRITE8_MEMBER(cdimono2_state::slave_glue_w)
 {
-	logerror("%s: slave_glue_w: %02x = %02x\n", machine().describe_context(), offset, data);
+	m_porta_data = data;
 	m_portc_data = 0xfc | ((offset >> 1) & 3);
-	m_porta_data = data & 0xff;
-	m_slave->set_input_line(M68HC05_IRQ_LINE, ASSERT_LINE);
-	m_slave->set_input_line(M68HC05_IRQ_LINE, CLEAR_LINE);
 	m_portd_data &= ~0x80;
-	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	if (!m_dtack_triggered && !m_maincpu_waiting)
+	{
+		logerror("%s: slave_glue_w: %02x = %02x, asserting /DTACK\n", machine().describe_context(), offset, m_porta_data);
+		m_maincpu->assert_dtackn();
+		m_slave->set_input_line(M68HC05_IRQ_LINE, ASSERT_LINE);
+		m_slave->set_input_line(M68HC05_IRQ_LINE, CLEAR_LINE);
+		m_maincpu_waiting = true;
+		m_dtack_triggered = false;
+	}
+	else if (m_maincpu_waiting)
+	{
+		logerror("%s: slave_glue_w: %02x = %02x, main CPU waiting\n", machine().describe_context(), offset, m_porta_data);
+	}
+	else
+	{
+		logerror("%s: slave_glue_w: %02x = %02x, /DTACK released\n", machine().describe_context(), offset, m_porta_data);
+		m_dtack_triggered = false;
+	}
 }
 
 WRITE8_MEMBER(cdimono2_state::controller_tx)
@@ -341,6 +369,9 @@ void cdimono2_state::machine_start()
 	save_item(NAME(m_disbit));
 	save_item(NAME(m_mouse_buffer));
 	save_item(NAME(m_mouse_idx));
+	save_item(NAME(m_dtack_triggered));
+	save_item(NAME(m_eat_write_dtack));
+	save_item(NAME(m_maincpu_waiting));
 
 	m_mouse_timer = timer_alloc(0);
 }
@@ -356,7 +387,7 @@ void cdimono2_state::machine_reset()
 {
 	cdi_state::machine_reset();
 	m_porta_data = 0x00;
-	m_portb_data = 0x00;
+	m_portb_data = 0x40;
 	m_portc_data = 0xfc;
 	m_portd_data = 0x20;
 	m_disdat = 0x00;
@@ -367,6 +398,9 @@ void cdimono2_state::machine_reset()
 	m_mouse_idx = 0x00;
 	m_mouse_timer->adjust(attotime::never);
 	m_servo->ss_in(0);
+	m_dtack_triggered = false;
+	m_eat_write_dtack = false;
+	m_maincpu_waiting = false;
 }
 
 void quizard_state::machine_start()
@@ -650,31 +684,32 @@ uint32_t cdi_state::screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb
 READ8_MEMBER(cdimono2_state::slave_porta_r)
 {
 	logerror("%s: slave_porta_r: %02x & %02x\n", machine().describe_context(), m_porta_data, mem_mask);
-	return m_porta_data & mem_mask;
+	return m_porta_data;
 }
 
 READ8_MEMBER(cdimono2_state::slave_portb_r)
 {
 	logerror("%s: slave_portb_r: %02x & %02x\n", machine().describe_context(), m_portb_data, mem_mask);
-	return m_portb_data & mem_mask;
+	return m_portb_data;
 }
 
 READ8_MEMBER(cdimono2_state::slave_portc_r)
 {
 	//logerror("%s: slave_portc_r: %02x & %02x\n", machine().describe_context(), m_portc_data, mem_mask);
-	return (m_portc_data & mem_mask) & 0x7f;
+	return m_portc_data;
 }
 
 READ8_MEMBER(cdimono2_state::slave_portd_r)
 {
 	logerror("%s: slave_portd_r: %02x & %02x\n", machine().describe_context(), m_portd_data, mem_mask);
-	return m_portd_data & mem_mask;
+	return m_portd_data;
 }
 
 WRITE8_MEMBER(cdimono2_state::slave_porta_w)
 {
-	logerror("%s: slave_porta_w: %02x\n", machine().describe_context(), data);
-	m_porta_data = data;
+	logerror("%s: slave_porta_w: %02x & %02x\n", machine().describe_context(), data, mem_mask);
+	m_porta_data &= ~mem_mask;
+	m_porta_data |= data & mem_mask;
 }
 
 void cdimono2_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -694,11 +729,20 @@ void cdimono2_state::device_timer(emu_timer &timer, device_timer_id id, int para
 WRITE8_MEMBER(cdimono2_state::slave_portb_w)
 {
 	const uint8_t old = m_portb_data;
-	m_portb_data = data;
-	logerror("%s: slave_portb_w: %02x\n", machine().describe_context(), data);
-	if (!(old & 0x40) && (data & 0x40))
+	m_portb_data &= ~mem_mask;
+	m_portb_data |= data & mem_mask;
+	logerror("%s: slave_portb_w: %02x & %02x\n", machine().describe_context(), data, mem_mask);
+	if ((old & 0x40) && !(data & 0x40))
 	{
-		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		if (!m_eat_write_dtack)
+		{
+			logerror("%s: slave_portb_w: flagging /DTACK as triggered\n", machine().describe_context());
+			m_maincpu->clear_dtackn();
+			m_slave->yield();
+			m_dtack_triggered = true;
+			m_maincpu_waiting = false;
+		}
+		m_eat_write_dtack = false;
 	}
 	if (!(old & 0x10) && (data & 0x10))
 	{

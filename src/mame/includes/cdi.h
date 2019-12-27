@@ -129,6 +129,10 @@ private:
 	uint8_t m_mouse_buffer[6];
 	uint8_t m_mouse_idx;
 	emu_timer *m_mouse_timer;
+
+	bool m_dtack_triggered;
+	bool m_eat_write_dtack;
+	bool m_maincpu_waiting;
 };
 
 class quizard_state : public cdi_state

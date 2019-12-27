@@ -277,15 +277,24 @@ READ8_MEMBER(m68hc05_device::spcr_r)
 	return m_spcr;
 }
 
+void m68hc05_device::check_spi_interrupts()
+{
+	if (spcr_spie() && (m_spsr & 0x90))
+	{
+		m_pending_interrupts |= M68HC05_INT_SPI;
+	}
+	else
+	{
+		m_pending_interrupts &= ~M68HC05_INT_SPI;
+	}
+}
+
 WRITE8_MEMBER(m68hc05_device::spcr_w)
 {
 	if (spsr_modf())
 	{
 		m_spsr &= ~0x10;
-		if (!spcr_spie() || !spsr_spif())
-		{
-			m_pending_interrupts &= ~M68HC05_INT_SPI;
-		}
+		check_spi_interrupts();
 	}
 	data &= 0xdf;
 	m_spcr = data;
@@ -299,7 +308,7 @@ WRITE8_MEMBER(m68hc05_device::spcr_w)
 
 READ8_MEMBER(m68hc05_device::spsr_r)
 {
-	LOGSPI("%s: read SPSR: %02x\n", machine().describe_context(), m_spsr);
+	//LOGSPI("%s: read SPSR: %02x\n", machine().describe_context(), m_spsr);
 	return m_spsr;
 }
 
@@ -312,6 +321,7 @@ READ8_MEMBER(m68hc05_device::spdr_r)
 {
 	LOGSPI("%s: read SPDR: %02x\n", machine().describe_context(), m_sprr);
 	m_spsr &= ~0xd0;
+	check_spi_interrupts();
 	return m_sprr;
 }
 
@@ -324,6 +334,11 @@ WRITE8_MEMBER(m68hc05_device::spdr_w)
 		return;
 	}
 	m_spdr = data;
+	if (spsr_spif())
+	{
+		m_spsr &= ~0x80;
+		check_spi_interrupts();
+	}
 	if (spcr_spe())
 	{
 		if (m_spi_tx_clocks != ~0U)
@@ -365,14 +380,7 @@ WRITE_LINE_MEMBER(m68hc05_device::sck_in)
 				m_sprr = m_spdr;
 				m_spi_rx_cnt = 0;
 				m_spsr |= 0x80;
-				if (spsr_spif() && spcr_spie())
-				{
-					m_pending_interrupts |= M68HC05_INT_SPI;
-				}
-				else
-				{
-					m_pending_interrupts &= ~M68HC05_INT_SPI;
-				}
+				check_spi_interrupts();
 			}
 		}
 	}
@@ -400,10 +408,7 @@ WRITE_LINE_MEMBER(m68hc05_device::ss_in)
 		{
 			m_spsr |= 0x10;
 			m_spcr &= ~0x50;
-			if (spcr_spie())
-			{
-				m_pending_interrupts |= M68HC05_INT_SPI;
-			}
+			check_spi_interrupts();
 		}
 	}
 }
@@ -1029,14 +1034,7 @@ void m68hc05_device::burn_cycles(unsigned count)
 					m_spi_tx_clocks = ~0U;
 					m_spi_run_clocks = 0;
 					m_spsr |= 0x80;
-					if (spsr_spif() && spcr_spie())
-					{
-						m_pending_interrupts |= M68HC05_INT_SPI;
-					}
-					else
-					{
-						m_pending_interrupts &= ~M68HC05_INT_SPI;
-					}
+					check_spi_interrupts();
 				}
 			}
 			m_sck_out_cb(m_sck);

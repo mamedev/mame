@@ -148,6 +148,8 @@ protected:
 
 	virtual void run_cop(unsigned count);
 
+	void check_spi_interrupts();
+
 private:
 	u8 port_value(unsigned offset) const;
 	void update_port_irq();
