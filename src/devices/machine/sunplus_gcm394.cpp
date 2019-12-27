@@ -95,7 +95,7 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 	uint32_t dest = m_dma_params[2][channel] | (m_dma_params[5][channel] << 16) ;
 	uint32_t length = m_dma_params[3][channel] | (m_dma_params[6][channel] << 16);
 
-	printf( "%s:possible DMA operation (7abf) (trigger %04x) with params mode:%04x source:%08x (word offset) dest:%08x (word offset) length:%08x (words)\n", machine().describe_context().c_str(), data, mode, source, dest, length );
+	LOGMASKED(LOG_GCM394_SYSDMA, "%s:possible DMA operation (7abf) (trigger %04x) with params mode:%04x source:%08x (word offset) dest:%08x (word offset) length:%08x (words)\n", machine().describe_context().c_str(), data, mode, source, dest, length );
 
 	if ((source&0x0fffffff) >= 0x20000)
 		LOGMASKED(LOG_GCM394_SYSDMA, " likely transfer from ROM %08x - %08x\n", (source - 0x20000) * 2, (source - 0x20000) * 2 + (length * 2)- 1);
@@ -811,7 +811,7 @@ void sunplus_gcm394_base_device::device_reset()
 
 	m_7807 = 0x0000;
 
-	m_membankswitch_7810 = 0x0000;
+	m_membankswitch_7810 = 0x0001;
 
 	m_7816 = 0x0000;
 	m_7817 = 0x0000;
@@ -869,10 +869,6 @@ void sunplus_gcm394_base_device::device_reset()
 
 
 	m_unk_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
-
-	m_gfxregion = memregion(":maincpu")->base();
-	m_gfxregionsize = memregion(":maincpu")->bytes();
-
 }
 
 void generalplus_gpac800_device::device_reset()
@@ -961,8 +957,7 @@ WRITE_LINE_MEMBER(sunplus_gcm394_base_device::videoirq_w)
 
 uint16_t sunplus_gcm394_base_device::read_space(uint32_t offset)
 {
-//  uint16_t b = m_gfxregion[(offset * 2) & (m_gfxregionsize - 1)] | (m_gfxregion[(offset * 2 + 1) & (m_gfxregionsize - 1)] << 8);
-//  return b;
+	// TODO: use read_external_space instead
 	address_space& mem = this->space(AS_PROGRAM);
 	uint16_t retdata = mem.read_word(offset);
 	return retdata;

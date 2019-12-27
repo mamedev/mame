@@ -140,7 +140,6 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_bank(*this, "cartbank"),
 		m_io_p1(*this, "P1"),
 		m_io_p2(*this, "P2"),
 		m_romregion(*this, "maincpu"),
@@ -173,14 +172,13 @@ protected:
 	required_device<sunplus_gcm394_base_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
-	optional_memory_bank m_bank;
 
 	required_ioport m_io_p1;
 	required_ioport m_io_p2;
 
 	void mem_map_4m_base(address_map &map);
 
-	required_region_ptr<uint16_t> m_romregion;
+	optional_region_ptr<uint16_t> m_romregion;
 	required_device<full_memory_device> m_memory;
 
 	DECLARE_READ16_MEMBER(porta_r);
@@ -251,6 +249,7 @@ public:
 	generalplus_gpac800_game_state(const machine_config& mconfig, device_type type, const char* tag) :
 		gcm394_game_state(mconfig, type, tag),
 	//	m_mainram(*this, "mainram"),
+		m_has_nand(false),
 		m_initial_copy_words(0x2000),
 		m_nandreadbase(0)
 	{
@@ -271,28 +270,25 @@ protected:
 
 	void generalplus_gpac800_map(address_map &map);
 	DECLARE_READ8_MEMBER(read_nand);
-
-private:
-	void nand_init(int blocksize, int blocksize_stripped);
-
-//	required_shared_ptr<u16> m_mainram;
 	std::vector<uint16_t> m_sdram;
 	std::vector<uint16_t> m_sdram2;
-
-	std::vector<uint8_t> m_strippedrom;
-	int m_strippedsize;
-
-	int m_initial_copy_words;
-	int m_nandreadbase;
-
-	virtual DECLARE_READ16_MEMBER(read_external_space) override;
-	virtual DECLARE_WRITE16_MEMBER(write_external_space) override;
 
 	virtual DECLARE_READ16_MEMBER(cs0_r) override;
 	virtual DECLARE_WRITE16_MEMBER(cs0_w) override;
 	virtual DECLARE_READ16_MEMBER(cs1_r) override;
 	virtual DECLARE_WRITE16_MEMBER(cs1_w) override;
 
+	bool m_has_nand;
+private:
+	void nand_init(int blocksize, int blocksize_stripped);
+
+//	required_shared_ptr<u16> m_mainram;
+
+	std::vector<uint8_t> m_strippedrom;
+	int m_strippedsize;
+
+	int m_initial_copy_words;
+	int m_nandreadbase;
 };
 
 
@@ -302,19 +298,20 @@ class wrlshunt_game_state : public generalplus_gpac800_game_state
 public:
 	wrlshunt_game_state(const machine_config& mconfig, device_type type, const char* tag) :
 		generalplus_gpac800_game_state(mconfig, type, tag),
-		m_mapping(0),
-		m_mainram(*this, "mainram")
+		m_mapping(0)
+		//m_mainram(*this, "mainram")
 	{
 	}
 
 	void wrlshunt(machine_config &config);
 
+	void init_wrlshunt();
+
 protected:
 	//virtual void machine_start() override;
-	//virtual void machine_reset() override;
+	virtual void machine_reset() override;
 
 	void wrlshunt_map(address_map &map);
-
 
 private:
 
@@ -324,13 +321,52 @@ private:
 	virtual DECLARE_WRITE16_MEMBER(mapping_w) override;
 	uint16_t m_mapping;
 
-	required_shared_ptr<u16> m_mainram;
+	//required_shared_ptr<u16> m_mainram;
 
-	virtual DECLARE_READ16_MEMBER(read_external_space) override;
-	virtual DECLARE_WRITE16_MEMBER(write_external_space) override;
+	virtual DECLARE_READ16_MEMBER(cs0_r) override;
+	virtual DECLARE_WRITE16_MEMBER(cs0_w) override;
+	virtual DECLARE_READ16_MEMBER(cs1_r) override;
+	virtual DECLARE_WRITE16_MEMBER(cs1_w) override;
 };
 
 
+READ16_MEMBER(wrlshunt_game_state::cs0_r)
+{
+	return 0x0000;// m_sdram2[offset & 0xffff];
+}
+
+WRITE16_MEMBER(wrlshunt_game_state::cs0_w)
+{
+	//m_sdram2[offset & 0xffff] = data;
+}
+
+READ16_MEMBER(wrlshunt_game_state::cs1_r)
+{
+	return 0x0000;// m_sdram[offset & 0x3fffff];
+}
+
+WRITE16_MEMBER(wrlshunt_game_state::cs1_w)
+{
+	//m_sdram[offset & 0x3fffff] = data;
+}
+
+
+void wrlshunt_game_state::machine_reset()
+{
+	m_memory->get_program()->unmap_readwrite(0x030000, 0x42ffff);
+	m_memory->get_program()->install_readwrite_handler( 0x030000, 0x42ffff, read16_delegate(*this, FUNC(gcm394_game_state::cs0_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs0_w)));
+
+	m_maincpu->reset(); // reset CPU so vector gets read etc.
+}
+
+
+
+void wrlshunt_game_state::init_wrlshunt()
+{
+	m_sdram.resize(0x400000); // 0x400000 bytes, 0x800000 words
+//	m_sdram2.resize(0x10000);
+
+}
 
 void generalplus_gpac800_game_state::cs_map_gpac800(address_map &map)
 {
@@ -368,21 +404,11 @@ WRITE16_MEMBER(generalplus_gpac800_game_state::cs1_w)
 
 READ8_MEMBER(generalplus_gpac800_game_state::read_nand)
 {
+	if (!m_has_nand)
+		return 0x0000;
+
 	return m_strippedrom[(offset + m_nandreadbase) & (m_strippedsize - 1)];
 }
-
-READ16_MEMBER(generalplus_gpac800_game_state::read_external_space)
-{
-	//logerror("reading offset %04x\n", offset * 2);
-	return m_memory->get_program()->read_word(offset);
-}
-
-
-WRITE16_MEMBER(generalplus_gpac800_game_state::write_external_space)
-{
-	m_memory->get_program()->write_word(offset, data);
-}
-
 
 READ16_MEMBER(gcm394_game_state::read_external_space)
 {
@@ -397,60 +423,7 @@ WRITE16_MEMBER(gcm394_game_state::write_external_space)
 
 WRITE16_MEMBER(wrlshunt_game_state::mapping_w)
 {
-	m_mapping = data;
-	logerror("change mapping %04x\n", data);
 }
-
-READ16_MEMBER(wrlshunt_game_state::read_external_space)
-{
-	if (m_mapping == 0x7f8a)
-	{
-	//logerror("reading offset %04x\n", offset * 2);
-		return m_romregion[offset];
-	}
-	else if (m_mapping == 0x008a)
-	{
-		address_space& mem = m_maincpu->space(AS_PROGRAM);
-		uint16_t retdata = mem.read_word(offset + 0x20000);
-		logerror("reading from RAM instead offset %08x returning %04x\n", offset * 2, retdata);
-		return retdata;
-	}
-	else
-	{
-		uint16_t retdata = 0x0000;
-		logerror("reading from unknown source instead offset %08x returning %04x\n", offset * 2, retdata);
-		return retdata;
-	}
-}
-
-
-
-
-WRITE16_MEMBER(wrlshunt_game_state::write_external_space)
-{
-//  logerror("DMA writing to external space (RAM?) %08x %04x\n", offset, data);
-
-	if (offset & 0x0800000)
-	{
-		offset &= 0x03fffff;
-
-		if (offset < 0x03d0000)
-		{
-			m_mainram[offset] = data;
-			//logerror("DMA writing to external space (RAM?) %08x %04x\n", offset, data);
-
-		}
-		else
-		{
-			logerror("DMA writing to external space (RAM?) (out of bounds) %08x %04x\n", offset, data);
-		}
-	}
-	else
-	{
-		logerror("DMA writing to external space (RAM?) (unknown handling) %08x %04x\n", offset, data);
-	}
-}
-
 
 
 READ16_MEMBER(gcm394_game_state::porta_r)
@@ -514,8 +487,8 @@ WRITE16_MEMBER(wrlshunt_game_state::hunt_porta_w)
 	logerror("%s: Port A:WRITE %04x\n", machine().describe_context(), data);
 
 	// skip check (EEPROM?)
-	if (m_mainram[0x5b354 - 0x30000] == 0xafd0)
-		m_mainram[0x5b354 - 0x30000] = 0xB403;
+	//if (m_mainram[0x5b354 - 0x30000] == 0xafd0)
+	//	m_mainram[0x5b354 - 0x30000] = 0xB403;
 }
 
 
@@ -566,11 +539,6 @@ void wrlshunt_game_state::wrlshunt(machine_config &config)
 
 void gcm394_game_state::machine_start()
 {
-	if (m_bank)
-	{
-		m_bank->configure_entry(0, &m_romregion[0]);
-		m_bank->set_entry(0);
-	}
 }
 
 void gcm394_game_state::machine_reset()
@@ -599,8 +567,8 @@ void gcm394_game_state::machine_reset()
 
 void wrlshunt_game_state::wrlshunt_map(address_map &map)
 {
-	map(0x000000, 0x00ffff).rom().region("maincpu", 0); // non-banked area on this SoC?
-	map(0x030000, 0x1fffff).ram().share("mainram");
+//	map(0x000000, 0x00ffff).rom().region("maincpu", 0); // non-banked area on this SoC?
+//	map(0x030000, 0x1fffff).ram().share("mainram");
 }
 
 
@@ -994,7 +962,7 @@ ROM_START(wrlshunt)
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	//ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // not used, configured to external ROM boot mode
 
-	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASE00)
+	ROM_REGION(0x8000000, "nandrom", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("wireless.bin", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796))
 ROM_END
 
@@ -1025,7 +993,7 @@ ROM_START( wlsair60 )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
-	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x8400000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "wlsair60.nand", 0x0000, 0x8400000, CRC(eec23b97) SHA1(1bb88290cf54579a5bb51c08a02d793cd4d79f7a) )
 ROM_END
 
@@ -1033,7 +1001,7 @@ ROM_START( jak_gtg )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
-	ROM_REGION( 0x4200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "goldentee.bin", 0x0000, 0x4200000, CRC(87d5e815) SHA1(5dc46cd753b791449cc41d5eff4928c0dcaf35c0) )
 ROM_END
 
@@ -1041,7 +1009,7 @@ ROM_START( jak_car2 )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
-	ROM_REGION( 0x4200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "cars2.bin", 0x0000, 0x4200000, CRC(4d610e09) SHA1(bc59f5f7f676a8f2a78dfda7fb62c804bbf850b6) )
 ROM_END
 
@@ -1049,7 +1017,7 @@ ROM_START( jak_tsm )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
-	ROM_REGION( 0x4200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "toystorymania.bin", 0x0000, 0x4200000, CRC(183b20a5) SHA1(eb4fa5ee9dfac58f5244d00d4e833b1e461cc52c) )
 ROM_END
 
@@ -1057,7 +1025,7 @@ ROM_START( vbaby )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
-	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x8400000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "vbaby.bin", 0x0000, 0x8400000, CRC(d904441b) SHA1(3742bc4e1e403f061ce2813ecfafc6f30a44d287) )
 ROM_END
 
@@ -1065,15 +1033,16 @@ ROM_START( beambox )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
-	ROM_REGION( 0x4200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "beambox.bin", 0x0000, 0x4200000, CRC(a486f04e) SHA1(73c7d99d8922eba58d94e955e254b9c3baa4443e) )
 ROM_END
 
 // the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
-CONS(2011, wrlshunt, 0, 0, wrlshunt, wrlshunt, wrlshunt_game_state, empty_init, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-
 CONS(2009, smartfp, 0, 0, base, gcm394, gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // Fun 2 Learn 3-in-1 SMART SPORTS  ?
+
+
+CONS(2011, wrlshunt, 0, 0, wrlshunt, wrlshunt, wrlshunt_game_state, init_wrlshunt, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 
 void generalplus_gpac800_game_state::machine_reset()
@@ -1081,52 +1050,54 @@ void generalplus_gpac800_game_state::machine_reset()
 	m_memory->get_program()->unmap_readwrite(0x030000, 0x42ffff);
 	m_memory->get_program()->install_readwrite_handler( 0x030000, 0x42ffff, read16_delegate(*this, FUNC(gcm394_game_state::cs0_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs0_w)));
 
-	// up to 256 pages (16384kw) for each space
-
-	// (size of cs0 + cs1 + cs2 + cs3 + cs4) <= 81920kwords
-
-	// simulate bootstrap / internal ROM
-
-	address_space& mem = m_maincpu->space(AS_PROGRAM);
-
-	/* Offset(h) 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
-	   00000000 (50 47 61 6E 64 6E 61 6E 64 6E)-- -- -- -- -- --  PGandnandn------
-	   00000010  -- -- -- -- -- bb -- -- -- -- -- -- -- -- -- --  ----------------
-
-	   bb = where to copy first block
-
-	   The header is GPnandnand (byteswapped) then some params
-	   one of the params appears to be for the initial code copy operation done
-	   by the bootstrap
-	*/
-
-	// probably more bytes are used
-	int dest = m_strippedrom[0x15] << 8;
-
-	// copy a block of code from the NAND to RAM
-	for (int i = 0; i < m_initial_copy_words; i++)
+	if (m_has_nand)
 	{
-		uint16_t word = m_strippedrom[(i * 2) + 0] | (m_strippedrom[(i * 2) + 1] << 8);
+		// up to 256 pages (16384kw) for each space
 
-		mem.write_word(dest+i, word);
+		// (size of cs0 + cs1 + cs2 + cs3 + cs4) <= 81920kwords
+
+		// simulate bootstrap / internal ROM
+
+		address_space& mem = m_maincpu->space(AS_PROGRAM);
+
+		/* Offset(h) 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
+		   00000000 (50 47 61 6E 64 6E 61 6E 64 6E)-- -- -- -- -- --  PGandnandn------
+		   00000010  -- -- -- -- -- bb -- -- -- -- -- -- -- -- -- --  ----------------
+
+		   bb = where to copy first block
+
+		   The header is GPnandnand (byteswapped) then some params
+		   one of the params appears to be for the initial code copy operation done
+		   by the bootstrap
+		*/
+
+		// probably more bytes are used
+		int dest = m_strippedrom[0x15] << 8;
+
+		// copy a block of code from the NAND to RAM
+		for (int i = 0; i < m_initial_copy_words; i++)
+		{
+			uint16_t word = m_strippedrom[(i * 2) + 0] | (m_strippedrom[(i * 2) + 1] << 8);
+
+			mem.write_word(dest + i, word);
+		}
+
+		// these vectors must either directly point to RAM, or at least redirect there after some code
+		uint16_t* internal = (uint16_t*)memregion("maincpu:internal")->base();
+		internal[0x7ff5] = 0x6fea;
+		internal[0x7ff6] = 0x6fec;
+		internal[0x7ff7] = dest + 0x20; // point boot vector at code in RAM (probably in reality points to internal code that copies the first block)
+		internal[0x7ff8] = 0x6ff0;
+		internal[0x7ff9] = 0x6ff2;
+		internal[0x7ffa] = 0x6ff4;
+		internal[0x7ffb] = 0x6ff6;
+		internal[0x7ffc] = 0x6ff8;
+		internal[0x7ffd] = 0x6ffa;
+		internal[0x7ffe] = 0x6ffc;
+		internal[0x7fff] = 0x6ffe;
+
+		internal[0x8000] = 0xb00b;
 	}
-
-	// these vectors must either directly point to RAM, or at least redirect there after some code
-	uint16_t* internal = (uint16_t*)memregion("maincpu:internal")->base();
-	internal[0x7ff5] = 0x6fea;
-	internal[0x7ff6] = 0x6fec;
-	internal[0x7ff7] = dest+0x20; // point boot vector at code in RAM (probably in reality points to internal code that copies the first block)
-	internal[0x7ff8] = 0x6ff0;
-	internal[0x7ff9] = 0x6ff2;
-	internal[0x7ffa] = 0x6ff4;
-	internal[0x7ffb] = 0x6ff6;
-	internal[0x7ffc] = 0x6ff8;
-	internal[0x7ffd] = 0x6ffa;
-	internal[0x7ffe] = 0x6ffc;
-	internal[0x7fff] = 0x6ffe;
-
-	internal[0x8000] = 0xb00b;
-
 
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 }
@@ -1137,8 +1108,8 @@ void generalplus_gpac800_game_state::nand_init(int blocksize, int blocksize_stri
 	m_sdram.resize(0x400000); // 0x400000 bytes, 0x800000 words
 	m_sdram2.resize(0x10000);
 
-	uint8_t* rom = memregion("maincpu")->base();
-	int size = memregion("maincpu")->bytes();
+	uint8_t* rom = memregion("nandrom")->base();
+	int size = memregion("nandrom")->bytes();
 
 	int numblocks = size / blocksize;
 	m_strippedsize = numblocks * blocksize_stripped;
@@ -1168,6 +1139,8 @@ void generalplus_gpac800_game_state::nand_init(int blocksize, int blocksize_stri
 			fclose(fp);
 		}
 	}
+
+	m_has_nand = true;
 }
 
 void generalplus_gpac800_game_state::nand_init210()

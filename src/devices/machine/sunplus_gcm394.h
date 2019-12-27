@@ -277,8 +277,6 @@ private:
 	emu_timer *m_unk_timer;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	uint8_t* m_gfxregion;
-	uint32_t m_gfxregionsize;
 	uint16_t read_space(uint32_t offset);
 
 	// config registers (external pins)
