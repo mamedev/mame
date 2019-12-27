@@ -10298,6 +10298,17 @@
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="goal">
+		<description>Goal!</description>
+		<year>1993</year>
+		<publisher>Virgin Interactive</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "4252733">
+				<rom name="Goal! [Virgin Games] [1993] [3.5''HD] [Disk 1 of 1].mfm" size="4252733" crc="7b3476a9" sha1="6a47b37798f62580b2d68ced87e60944d4dd92ab"/>
+			</dataarea>
+		</part>
+	</software>	
 
 	<software name="pharkas">
 		<description>Freddy Pharkas, Frontier Pharmacist</description>
@@ -12157,6 +12168,28 @@
 		</part>
 	</software>
 
+	<software name="sf2">
+		<description>Street Fighter II</description>
+		<year>1993</year>
+		<publisher>US Gold</publisher>
+		<info name="developer" value="Capcom USA" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Street Fighter II [Capcom USA] [1992] [3.5''HD] [Disk 1 of 3].img" size="1474560" crc="8f19a1ba" sha1="4b8cb0adff1e7df836450738eeac74653de5654e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Street Fighter II [Capcom USA] [1992] [3.5''HD] [Disk 2 of 3].img" size="1474560" crc="696cccce" sha1="147845702699b98e08a22aa448f0a2d0e522a395"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Street Fighter II [Capcom USA] [1992] [3.5''HD] [Disk 3 of 3].img" size="1474560" crc="6cd1c68e" sha1="33dfd74a8a138d5605cae69f6c17e992612dff81"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="sserv2">
 		<!-- Dumped via Kryoflux, shows as good and unmodified -->
 		<description>Silent Service II (Version 457.01)</description>
