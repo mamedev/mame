@@ -291,11 +291,11 @@ private:
 
 
 
-class wrlshunt_game_state : public generalplus_gpac800_game_state
+class wrlshunt_game_state : public gcm394_game_state
 {
 public:
 	wrlshunt_game_state(const machine_config& mconfig, device_type type, const char* tag) :
-		generalplus_gpac800_game_state(mconfig, type, tag),
+		gcm394_game_state(mconfig, type, tag),
 		m_mapping(0)
 		//m_mainram(*this, "mainram")
 	{
@@ -310,6 +310,8 @@ protected:
 	virtual void machine_reset() override;
 
 	void wrlshunt_map(address_map &map);
+
+	std::vector<uint16_t> m_sdram;
 
 private:
 
@@ -352,8 +354,8 @@ WRITE16_MEMBER(wrlshunt_game_state::cs1_w)
 
 void wrlshunt_game_state::machine_reset()
 {
-	m_memory->get_program()->unmap_readwrite(0x030000, 0x42ffff);
-	m_memory->get_program()->install_readwrite_handler( 0x030000, 0x42ffff, read16_delegate(*this, FUNC(wrlshunt_game_state::cs0_r)), write16_delegate(*this, FUNC(wrlshunt_game_state::cs0_w)));
+	m_memory->get_program()->unmap_readwrite(0x020000, 0x41ffff);
+	m_memory->get_program()->install_readwrite_handler( 0x020000, 0x41ffff, read16_delegate(*this, FUNC(wrlshunt_game_state::cs0_r)), write16_delegate(*this, FUNC(wrlshunt_game_state::cs0_w)));
 	m_maincpu->set_cs_space(m_memory->get_program());
 
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
@@ -440,6 +442,15 @@ READ16_MEMBER(gcm394_game_state::portb_r)
 WRITE16_MEMBER(gcm394_game_state::porta_w)
 {
 	logerror("%s: Port A:WRITE %04x\n", machine().describe_context(), data);
+	
+	// HACK
+	address_space& mem = m_maincpu->space(AS_PROGRAM);
+
+	printf("%08x\n", mem.read_word(0x5b354));
+
+	if (mem.read_word(0x5b354) == 0xafd0)  	// wrlshubt - skip check (EEPROM?)
+		mem.write_word(0x5b354, 0xB403);
+
 }
 
 
@@ -472,6 +483,20 @@ void gcm394_game_state::base(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 }
 
+void wrlshunt_game_state::wrlshunt(machine_config &config)
+{
+	gcm394_game_state::base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wrlshunt_game_state::wrlshunt_map);
+
+	m_maincpu->porta_in().set(FUNC(wrlshunt_game_state::hunt_porta_r));
+	m_maincpu->porta_out().set(FUNC(wrlshunt_game_state::hunt_porta_w));
+	m_maincpu->set_bootmode(1); // boot from external ROM / CS mirror
+
+	m_screen->set_size(320*2, 262*2);
+	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
+}
+
+
 READ16_MEMBER(wrlshunt_game_state::hunt_porta_r)
 {
 	uint16_t data = m_io_p1->read();
@@ -482,10 +507,6 @@ READ16_MEMBER(wrlshunt_game_state::hunt_porta_r)
 WRITE16_MEMBER(wrlshunt_game_state::hunt_porta_w)
 {
 	logerror("%s: Port A:WRITE %04x\n", machine().describe_context(), data);
-
-	// skip check (EEPROM?)
-	//if (m_mainram[0x5b354 - 0x30000] == 0xafd0)
-	//	m_mainram[0x5b354 - 0x30000] = 0xB403;
 }
 
 
@@ -521,18 +542,6 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 }
 
-void wrlshunt_game_state::wrlshunt(machine_config &config)
-{
-	generalplus_gpac800_game_state::generalplus_gpac800(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &wrlshunt_game_state::wrlshunt_map);
-
-	m_maincpu->porta_in().set(FUNC(wrlshunt_game_state::hunt_porta_r));
-	m_maincpu->porta_out().set(FUNC(wrlshunt_game_state::hunt_porta_w));
-	m_maincpu->set_bootmode(1); // boot from external ROM / CS mirror
-
-	m_screen->set_size(320*2, 262*2);
-	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
-}
 
 
 void gcm394_game_state::machine_start()
@@ -879,6 +888,15 @@ ROM_START(smartfp)
 	ROM_LOAD16_WORD_SWAP("smartfitpark.bin", 0x000000, 0x800000, CRC(ada84507) SHA1(a3a80bf71fae62ebcbf939166a51d29c24504428))
 ROM_END
 
+ROM_START(wrlshunt)
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
+	//ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("wireless.bin", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796))		
+ROM_END
+
+
 /*
 Wireless Hunting Video Game System
 (info provided with dump)
@@ -955,13 +973,6 @@ which is also found in the Wireless Air 60 ROM.
 
 */
 
-ROM_START(wrlshunt)
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	//ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // not used, configured to external ROM boot mode
-
-	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD16_WORD_SWAP("wireless.bin", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796))		
-ROM_END
 
 /*
 Wireless Air 60

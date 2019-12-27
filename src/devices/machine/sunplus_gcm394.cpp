@@ -138,7 +138,7 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 
 		if (mem.read_word(0x34410) == 0x4846)
 			mem.write_word(0x34410, 0x4840);    // golden tee force service mode
-
+		
 	}
 	else if ((mode == 0x0089) || (mode == 0x0009) || (mode == 0x4009))
 	{
