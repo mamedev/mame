@@ -154,6 +154,14 @@ public:
 
 	virtual DECLARE_READ16_MEMBER(cs0_r);
 	virtual DECLARE_WRITE16_MEMBER(cs0_w);
+	virtual DECLARE_READ16_MEMBER(cs1_r);
+	virtual DECLARE_WRITE16_MEMBER(cs1_w);
+	virtual DECLARE_READ16_MEMBER(cs2_r);
+	virtual DECLARE_WRITE16_MEMBER(cs2_w);
+	virtual DECLARE_READ16_MEMBER(cs3_r);
+	virtual DECLARE_WRITE16_MEMBER(cs3_w);
+	virtual DECLARE_READ16_MEMBER(cs4_r);
+	virtual DECLARE_WRITE16_MEMBER(cs4_w);
 
 	void cs_callback(int base, uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4);
 
@@ -212,6 +220,16 @@ WRITE16_MEMBER(gcm394_game_state::cs0_w)
 	logerror("cs0_w %04x %04x (to ROM!)\n", offset, data);
 }
 
+READ16_MEMBER(gcm394_game_state::cs1_r) { logerror("cs1_r %06n", offset); return 0x0000; }
+WRITE16_MEMBER(gcm394_game_state::cs1_w) { logerror("cs1_w %06x %04x\n", offset, data); }
+READ16_MEMBER(gcm394_game_state::cs2_r) { logerror("cs2_r %06n", offset); return 0x0000; }
+WRITE16_MEMBER(gcm394_game_state::cs2_w) { logerror("cs2_w %06x %04x\n", offset, data); }
+READ16_MEMBER(gcm394_game_state::cs3_r) { logerror("cs3_r %06n", offset); return 0x0000; }
+WRITE16_MEMBER(gcm394_game_state::cs3_w) { logerror("cs3_w %06x %04x\n", offset, data); }
+READ16_MEMBER(gcm394_game_state::cs4_r) { logerror("cs4_r %06n", offset); return 0x0000; }
+WRITE16_MEMBER(gcm394_game_state::cs4_w) { logerror("cs4_w %06x %04x\n", offset, data); }
+
+
 
 void gcm394_game_state::cs_map_base(address_map &map)
 {
@@ -259,6 +277,7 @@ private:
 
 //	required_shared_ptr<u16> m_mainram;
 	std::vector<uint16_t> m_sdram;
+	std::vector<uint16_t> m_sdram2;
 
 	std::vector<uint8_t> m_strippedrom;
 	int m_strippedsize;
@@ -271,6 +290,9 @@ private:
 
 	virtual DECLARE_READ16_MEMBER(cs0_r) override;
 	virtual DECLARE_WRITE16_MEMBER(cs0_w) override;
+	virtual DECLARE_READ16_MEMBER(cs1_r) override;
+	virtual DECLARE_WRITE16_MEMBER(cs1_w) override;
+
 };
 
 
@@ -319,18 +341,29 @@ void generalplus_gpac800_game_state::cs_map_gpac800(address_map &map)
 void generalplus_gpac800_game_state::generalplus_gpac800_map(address_map &map)
 {
 	/*  0x000000  0x02ffff - internal area */
-	map(0x030000, 0x3fffff).rw(FUNC(generalplus_gpac800_game_state::cs0_r), FUNC(generalplus_gpac800_game_state::cs0_w));
+	map(0x030000, 0x03ffff).rw(FUNC(generalplus_gpac800_game_state::cs0_r), FUNC(generalplus_gpac800_game_state::cs0_w));
+	map(0x040000, 0x3fffff).rw(FUNC(generalplus_gpac800_game_state::cs1_r), FUNC(generalplus_gpac800_game_state::cs1_w));
 }
 
 
 READ16_MEMBER(generalplus_gpac800_game_state::cs0_r)
 {
-	return m_sdram[offset];
+	return m_sdram2[offset & 0xffff];
 }
 
 WRITE16_MEMBER(generalplus_gpac800_game_state::cs0_w)
 {
-	m_sdram[offset] = data;
+	m_sdram2[offset & 0xffff] = data;
+}
+
+READ16_MEMBER(generalplus_gpac800_game_state::cs1_r)
+{
+	return m_sdram[offset & 0x3fffff];
+}
+
+WRITE16_MEMBER(generalplus_gpac800_game_state::cs1_w)
+{
+	m_sdram[offset & 0x3fffff] = data;
 }
 
 READ8_MEMBER(generalplus_gpac800_game_state::read_nand)
@@ -573,7 +606,43 @@ void wrlshunt_game_state::wrlshunt_map(address_map &map)
 
 void gcm394_game_state::cs_callback(int base, uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4)
 {
-	printf("gcm394_game_state::cs_callback   callback not hooked\n");
+	// wipe existing mappings;
+	m_memory->get_program()->unmap_readwrite(base, (base+0x8000000*5)-1);
+
+	int start_address = base;
+	int end_address;
+
+	int size; // cs region sizes in kwords
+	
+	size = (((cs0 & 0xff00) >> 8) + 1) * 0x10000; 
+	end_address = start_address + (size - 1);
+	printf("installing cs0 handler start_address %08x end_address %08x\n", start_address, end_address);
+	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs0_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs0_w)));
+	start_address += size;
+
+	size = (((cs1 & 0xff00) >> 8) + 1) * 0x10000; 
+	end_address = start_address + (size - 1);
+	printf("installing cs1 handler start_address %08x end_address %08x\n", start_address, end_address);
+	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs1_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs1_w)));
+	start_address += size;
+
+	size = (((cs2 & 0xff00) >> 8) + 1) * 0x10000; 
+	end_address = start_address + (size - 1);
+	printf("installing cs2 handler start_address %08x end_address %08x\n", start_address, end_address);
+	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs2_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs2_w)));
+	start_address += size;
+
+	size = (((cs3 & 0xff00) >> 8) + 1) * 0x10000; 
+	end_address = start_address + (size - 1);
+	printf("installing cs3 handler start_address %08x end_address %08x\n", start_address, end_address);
+	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs3_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs3_w)));
+	start_address += size;
+
+	size = (((cs4 & 0xff00) >> 8) + 1) * 0x10000; 
+	end_address = start_address + (size - 1);
+	printf("installing cs4 handler start_address %08x end_address %08x\n", start_address, end_address);
+	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs4_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs4_w)));
+	//start_address += size;
 }
 
 
@@ -1066,7 +1135,7 @@ void generalplus_gpac800_game_state::machine_reset()
 void generalplus_gpac800_game_state::nand_init(int blocksize, int blocksize_stripped)
 {
 	m_sdram.resize(0x400000); // 0x400000 bytes, 0x800000 words
-
+	m_sdram2.resize(0x10000);
 
 	uint8_t* rom = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
