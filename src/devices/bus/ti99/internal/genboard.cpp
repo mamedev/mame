@@ -924,8 +924,9 @@ READ_LINE_MEMBER(geneve_gate_array_device::csr_out)
 
 READ_LINE_MEMBER(geneve_gate_array_device::romen_out)
 {
+	// Do not restrict to read-only, as we could have a PFM here
 	decdata* dec = (m_debug)? &m_decdebug : &m_decoded;
-	return ((dec->function == MPEPROM) && dec->read)? ASSERT_LINE : CLEAR_LINE;
+	return (dec->function == MPEPROM)? ASSERT_LINE : CLEAR_LINE;
 }
 
 READ_LINE_MEMBER(geneve_gate_array_device::ramen_out)

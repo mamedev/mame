@@ -314,7 +314,8 @@ private:
 	required_device<at29c040_device>     m_pfm512;
 	required_device<at29c040a_device>    m_pfm512a;
 	void read_eprom_or_pfm(offs_t offset, uint8_t& value);
-	DECLARE_WRITE8_MEMBER( write_pfm );
+	void write_pfm(offs_t offset, uint8_t data);
+
 	DECLARE_WRITE_LINE_MEMBER( pfm_a17 );
 	DECLARE_WRITE_LINE_MEMBER( pfm_a18 );
 	DECLARE_WRITE_LINE_MEMBER( pfm_oe );
@@ -675,6 +676,10 @@ WRITE8_MEMBER( geneve_state::memwrite )
 		m_sound->write(data);
 	}
 
+	// Boot ROM or PFM (normal and Genmod)
+	if (m_gatearray->romen_out()==ASSERT_LINE)
+		write_pfm(offset, data);
+
 	// Stock SRAM 32K
 	if (m_gatearray->ramen_out()==ASSERT_LINE)
 	{
@@ -774,22 +779,25 @@ void geneve_state::read_eprom_or_pfm(offs_t offset, uint8_t& value)
 	}
 }
 
-WRITE8_MEMBER( geneve_state::write_pfm )
+void geneve_state::write_pfm(offs_t offset, uint8_t data)
 {
 	// Nota bene: The PFM must be write protected on startup, or the RESET
 	// of the 9995 will attempt to write the return vector into the flash EEPROM
 	offs_t addr13 = offset & 0x1fff;
 	int pfmaddress = addr13 | m_gatearray->get_prefix(AMA | AB0 | AB1 | AB2) | m_pfm_prefix;
 
-	LOGMASKED(LOG_PFM, "Writing to PFM at address %05x <- %02x\n", pfmaddress, data);
-
 	switch (m_boot_rom)
 	{
+	case GENEVE_EPROM:
+		LOGMASKED(LOG_WARN, "Write to EPROM at %05x ignored\n");
+		break;
 	case GENEVE_PFM512:
 		m_pfm512->write(pfmaddress, data);
+		LOGMASKED(LOG_PFM, "PFM %05x <- %02x\n", pfmaddress, data);
 		break;
 	case GENEVE_PFM512A:
 		m_pfm512a->write(pfmaddress, data);
+		LOGMASKED(LOG_PFM, "PFM %05x <- %02x\n", pfmaddress, data);
 		break;
 	default:
 		LOGMASKED(LOG_WARN, "Illegal mode for writing to PFM: %d\n", m_boot_rom);
