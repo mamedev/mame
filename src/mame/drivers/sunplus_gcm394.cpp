@@ -152,6 +152,10 @@ public:
 
 	void cs_map_base(address_map &map);
 
+	virtual DECLARE_READ16_MEMBER(cs0_r);
+	virtual DECLARE_WRITE16_MEMBER(cs0_w);
+
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -178,9 +182,6 @@ protected:
 
 	virtual DECLARE_READ16_MEMBER(read_external_space);
 	virtual DECLARE_WRITE16_MEMBER(write_external_space);
-
-	virtual DECLARE_READ16_MEMBER(cs0_r);
-	virtual DECLARE_WRITE16_MEMBER(cs0_w);
 
 
 	DECLARE_READ16_MEMBER(pre_cs_r);
@@ -215,7 +216,7 @@ WRITE16_MEMBER(gcm394_game_state::cs0_w)
 void gcm394_game_state::cs_map_base(address_map &map)
 {
 	map(0x000000, 0x01ffff).rw(FUNC(gcm394_game_state::pre_cs_r), FUNC(gcm394_game_state::pre_cs_w));
-	map(0x020000, 0x41ffff).rw(FUNC(gcm394_game_state::cs0_r), FUNC(gcm394_game_state::cs0_w));
+	//map(0x020000, 0x41ffff).rw(FUNC(gcm394_game_state::cs0_r), FUNC(gcm394_game_state::cs0_w));
 }
 
 void gcm394_game_state::mem_map_4m_base(address_map &map)
@@ -310,7 +311,7 @@ private:
 void generalplus_gpac800_game_state::cs_map_gpac800(address_map &map)
 {
 	map(0x000000, 0x02ffff).rw(FUNC(generalplus_gpac800_game_state::pre_cs_r), FUNC(generalplus_gpac800_game_state::pre_cs_w));
-	map(0x030000, 0x42ffff).rw(FUNC(generalplus_gpac800_game_state::cs0_r), FUNC(generalplus_gpac800_game_state::cs0_w));
+//	map(0x030000, 0x42ffff).rw(FUNC(generalplus_gpac800_game_state::cs0_r), FUNC(generalplus_gpac800_game_state::cs0_w));
 }
 
 void generalplus_gpac800_game_state::generalplus_gpac800_map(address_map &map)
@@ -537,6 +538,10 @@ void gcm394_game_state::machine_start()
 
 void gcm394_game_state::machine_reset()
 {
+	m_memory->get_program()->unmap_readwrite(0x020000, 0x42ffff);
+	m_memory->get_program()->install_readwrite_handler( 0x020000, 0x41ffff, read16_delegate(*this, FUNC(gcm394_game_state::cs0_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs0_w)));
+
+	m_maincpu->reset(); // reset CPU so vector gets read etc.
 }
 
 
@@ -820,6 +825,15 @@ static INPUT_PORTS_START( jak_gtg )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
+ROM_START(smartfp)
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
+	//ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("smartfitpark.bin", 0x000000, 0x800000, CRC(ada84507) SHA1(a3a80bf71fae62ebcbf939166a51d29c24504428))
+ROM_END
+
 /*
 Wireless Hunting Video Game System
 (info provided with dump)
@@ -904,15 +918,6 @@ ROM_START(wrlshunt)
 	ROM_LOAD16_WORD_SWAP("wireless.bin", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796))
 ROM_END
 
-ROM_START(smartfp)
-	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model?
-	//ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP )
-
-	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD16_WORD_SWAP("smartfitpark.bin", 0x000000, 0x800000, CRC(ada84507) SHA1(a3a80bf71fae62ebcbf939166a51d29c24504428))
-ROM_END
-
-
 /*
 Wireless Air 60
 (info provided with dump)
@@ -993,6 +998,9 @@ CONS(2009, smartfp, 0, 0, base, gcm394, gcm394_game_state, empty_init, "Fisher-P
 
 void generalplus_gpac800_game_state::machine_reset()
 {
+	m_memory->get_program()->unmap_readwrite(0x030000, 0x42ffff);
+	m_memory->get_program()->install_readwrite_handler( 0x030000, 0x42ffff, read16_delegate(*this, FUNC(gcm394_game_state::cs0_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs0_w)));
+
 	// simulate bootstrap / internal ROM
 
 	address_space& mem = m_maincpu->space(AS_PROGRAM);
