@@ -20,13 +20,6 @@ Canceled games (possibly never got to the proto stage)
 -->
 
 <!--
-Most of the pcbs (Resident Evil 2 being the exception) lack a marked description on the pcb itself, so I've marked them as
-"location" - "chip markings"
-to avoid pointless lines like
-"u1" - "U1"
--->
-
-<!--
 
 Info on N64 chip labels (from The Cart Scan Repository)
 
@@ -55,7 +48,6 @@ Info on N64 chip labels (from The Cart Scan Repository)
 
 <softwarelist name="n64" description="Nintendo 64 cartridges">
 
-
 	<software name="007goldn">
 		<description>007 - GoldenEye (Australia, Europe)</description>
 		<year>1997</year>
@@ -64,7 +56,13 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<part name="cart" interface="n64_cart">
 			<feature name="cart_model" value="NUS-006(EUR)" />
 			<dataarea name="rom" size="12582912">
-				<rom name="007 - goldeneye (europe).bin" size="12582912" crc="7425ae2d" sha1="63627dba22be2b357c0e370e68dc5af56eeb0a24" />
+				<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NGEP-0]" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101]" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<feature name="cart_back_label" value="NUS-EUR-1" />
+				<rom name="nus-ngep-0.u1" size="12582912" crc="7425ae2d" sha1="63627dba22be2b357c0e370e68dc5af56eeb0a24" />
 			</dataarea>
 		</part>
 	</software>
@@ -78,7 +76,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<info name="alt_title" value="ゴールデンアイ 007"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1 [MX23L9602-35]" />
+			<feature name="u1" value="U1 [NUS-NGEJ-0]" />
 			<feature name="u2" value="U2 [BK4D-NUS]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<feature name="cart_model" value="NUS-006(JPN)" />
@@ -102,7 +100,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN" /> <!-- also found with NUS-USA/CAN-1 -->
 			<dataarea name="rom" size="12582912">
-				<rom name="nus-ngee-0.u1" size="12582912" crc="8b70cb5b" sha1="7dd376e996d77d108316ac7ced087125c5674fa4" offset="000000" />
+				<rom name="nus-ngee-0.u1" size="12582912" crc="8b70cb5b" sha1="7dd376e996d77d108316ac7ced087125c5674fa4" />
 			</dataarea>
 		</part>
 	</software>
@@ -111,15 +109,16 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>007 - The World Is Not Enough (Europe)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="NUS-N07P-(UKV,FRA,NOE)" />
+		<info name="serial" value="NUS-N07P-FRA, NUS-N07P-NOE, NUS-N07P-UKV" />
+		<info name="alt_title" value="Le Monde ne Suffit Pas"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="NUS-N07P-0" />
-			<feature name="u2" value="[empty]" />
-			<feature name="u3" value="CIC-NUS-7101A" />
+			<feature name="u1" value="U1 [NUS-N07P-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101A]" />
 			<feature name="cart_model" value="NUS-006(EUR)" />
 			<dataarea name="rom" size="33554432">
-				<rom name="nus-n07p-0.u1" size="33554432" crc="7f030d3a" sha1="441bdf924566e6475aa49bab7a199dc06d32a6d5" offset="000000" />
+				<rom name="nus-n07p-0.u1" size="33554432" crc="7f030d3a" sha1="441bdf924566e6475aa49bab7a199dc06d32a6d5" />
 			</dataarea>
 		</part>
 	</software>
@@ -131,11 +130,11 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<info name="serial" value="NUS-N07E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-N07E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="33554432">
-				<rom name="nus-n07e-0.u1" size="33554432" crc="34f0ee5b" sha1="e93005466ac84bc1d19b40673d0c50b604a8753c" offset="000000" />
+				<rom name="nus-n07e-0.u1" size="33554432" crc="34f0ee5b" sha1="e93005466ac84bc1d19b40673d0c50b604a8753c" />
 			</dataarea>
 		</part>
 	</software>
@@ -152,21 +151,21 @@ Info on N64 chip labels (from The Cart Scan Repository)
 	</software>
 
 	<software name="1080snow">
-		<description>1080° Snowboarding (Europe)</description>
+		<description>1080° Snowboarding (Australia, Europe)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NUS-NTEP-(EUR,AUS)"/>
+		<info name="serial" value="NUS-NTEP-AUS, NUS-NTEP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-03A-01" />
-			<feature name="u1" value="NUS-NTEP-0" />
-			<feature name="u2" value="LH52V246AD" />
-			<feature name="u3" value="B4ALEJT" />
-			<feature name="u4" value="CIC-NUS-7103" />
-			<feature name="bt1" value="CR2032" />
+			<feature name="u1" value="U1 [NUS-NTEP-0]" />
+			<feature name="u2" value="U2 [LH52V246AD]" />
+			<feature name="u3" value="U3 [B4ALEJT]" />
+			<feature name="u4" value="U4 [CIC-NUS-7103]" />
+			<feature name="bt1" value="BT1 [CR2032]" />
 			<feature name="cart_model" value="NUS-006(-01)(EUR)" />
 			<feature name="cart_back_label" value="NUS-EUR-1" />
 			<dataarea name="rom" size="16777216">
-				<rom name="nus-ntep-0.u1" size="16777216" crc="b0256101" sha1="da7bcb78cf78333d7515b77f676fd45473b5b506" offset="000000" />
+				<rom name="nus-ntep-0.u1" size="16777216" crc="b0256101" sha1="da7bcb78cf78333d7515b77f676fd45473b5b506" />
 			</dataarea>
 		</part>
 	</software>
@@ -180,15 +179,15 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<info name="alt_title" value="1080°テン・エイティ スノーボーディング"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-03A-01" />
-			<feature name="u1" value="NUS-NTEA-0" />
-			<feature name="u2" value="LH52V246" />
-			<feature name="u3" value="BU9803A" />
-			<feature name="u4" value="CIC-NUS-6103" />
-			<feature name="bt1" value="CR2032" />
+			<feature name="u1" value="U1 [NUS-NTEA-0]" />
+			<feature name="u2" value="U2 [LH52V246]" />
+			<feature name="u3" value="U3 [BU9803A]" />
+			<feature name="u4" value="U4 [CIC-NUS-6103]" />
+			<feature name="bt1" value="BT1 [CR2032]" />
 			<feature name="cart_model" value="NUS-006(JPN)" />
 			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="16777216">
-				<rom name="nus-ntea-0.u1" size="16777216" crc="d1744951" sha1="5f837c13a2fb3c8cdfd6fb720bd4a963ab515632" offset="000000" />
+				<rom name="nus-ntea-0.u1" size="16777216" crc="d1744951" sha1="5f837c13a2fb3c8cdfd6fb720bd4a963ab515632" />
 			</dataarea>
 		</part>
 	</software>
@@ -224,7 +223,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 			<feature name="u23" value="U23 32M FLASH MEMORY [empty]" />
 			<feature name="batt1" value="BATT1 [CR2032]" />
 			<dataarea name="rom" size="33554432">
-				<rom name="40 winks (europe) (en,es,it) (proto).bin" size="33554432" crc="366ed851" sha1="2ea62384321e12e2b9c33196ae662a77b2125ae4" offset="000000" />
+				<rom name="40 winks (europe) (en,es,it) (proto).bin" size="33554432" crc="366ed851" sha1="2ea62384321e12e2b9c33196ae662a77b2125ae4" />
 			</dataarea>
 		</part>
 	</software>
@@ -5729,7 +5728,7 @@ This cart features a RTC, currently unemulated
 	</software>
 
 	<software name="zeldamajd" cloneof="zeldamaj">
-		<description>The Legend of Zelda - Majora's Mask (Europe, Debug Build, 20000929)</description>
+		<description>The Legend of Zelda - Majora's Mask (Europe, prototype 20000929)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -5743,9 +5742,10 @@ This cart features a RTC, currently unemulated
 	</software>
 
 	<software name="zeldamaju2" cloneof="zeldamaj">
-		<description>The Legend of Zelda - Majora's Mask (USA, Demo)</description>
+		<description>The Legend of Zelda - Majora's Mask (USA, preview demo)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
+		<info name="serial" value="DIS-NUS-NZSE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="legend of zelda, the - majora's mask (usa) (demo).bin" size="33554432" crc="f97c02ce" sha1="99d8b0e3000dceaf494ea18941d7c31e796bfc78" offset="000000" />
@@ -10377,7 +10377,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="ssiliconj" cloneof="ssilicon">
-		<description>SpaceStation Silicon Valley (Japan, Prototype)</description>
+		<description>SpaceStation Silicon Valley (Japan, prototype)</description>
 		<year>1998</year>
 		<publisher>Take Two Interactive</publisher>
 		<part name="cart" interface="n64_cart">
@@ -10585,7 +10585,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="swshadowp" cloneof="swshadow">
-		<description>Star Wars - Shadows of the Empire (Prototype)</description>
+		<description>Star Wars - Shadows of the Empire (prototype 19961015)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -10768,7 +10768,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="starcrftg" cloneof="starcrft">
-		<description>StarCraft 64 (Germany, Prototype)</description>
+		<description>StarCraft 64 (Germany, prototype)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -10797,7 +10797,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="starcrftup" cloneof="starcrft">
-		<description>StarCraft 64 (USA, Prototype)</description>
+		<description>StarCraft 64 (USA, prototype)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -11092,7 +11092,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="supermanp" cloneof="superman">
-		<description>Superman (Prototype)</description>
+		<description>Superman (prototype 19980906)</description>
 		<year>1999</year>
 		<publisher>Titus</publisher>
 		<part name="cart" interface="n64_cart">
@@ -11133,7 +11133,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="sydney2k">
-		<description>Sydney 2000 (Europe, Prototype)</description>
+		<description>Sydney 2000 (Europe, prototype)</description>
 		<year>2000</year>
 		<publisher>Eidos</publisher>
 		<part name="cart" interface="n64_cart">
@@ -11144,7 +11144,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="sydney2ku" cloneof="sydney2k">
-		<description>Sydney 2000 (USA, Prototype)</description>
+		<description>Sydney 2000 (USA, prototype)</description>
 		<year>2000</year>
 		<publisher>Eidos</publisher>
 		<part name="cart" interface="n64_cart">
@@ -11155,7 +11155,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="tamiyarc" cloneof="miniracr">
-		<description>Tamiya Racing 64 (Prototype)</description>
+		<description>Tamiya Racing 64 (prototype)</description>
 		<year>1999</year>
 		<publisher>Looking Glass Studios</publisher>
 		<part name="cart" interface="n64_cart">
@@ -11230,7 +11230,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="tazexpru" cloneof="tazexpr">
-		<description>Taz Express (USA, Prototype)</description>
+		<description>Taz Express (USA, prototype 20000515)</description>
 		<year>2000?</year>
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="n64_cart">
@@ -11425,8 +11425,8 @@ clips onto the player's ear.
 	</software>
 
 	<software name="tommyth">
-		<description>Tommy Thunder (USA, Prototype)</description>
-		<year>1998</year>
+		<description>Tommy Thunder (USA, prototype 19971001)</description>
+		<year>1997</year>
 		<publisher>Player 1</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
@@ -11548,7 +11548,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="toonpan">
-		<description>Toon Panic (Japan, Prototype)</description>
+		<description>Toon Panic (Japan, prototype)</description>
 		<year>2000</year>
 		<publisher>Bottom Up</publisher>
 		<part name="cart" interface="n64_cart">
@@ -11596,6 +11596,17 @@ clips onto the player's ear.
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
 				<rom name="nus-ngbe-0.u1" size="16777216" crc="3e9ce2af" sha1="4a146c7a53fb979bceedd79cc1719bd6130698a3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tghp" cloneof="tgh">
+		<description>Top Gear Hyper-Bike (prototype)</description>
+		<year>2000</year>
+		<publisher>Kemco</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="top gear hyper-bike (2000)(kemco)(beta).bin" size="33554432" crc="00c0278a" sha1="d3ae07e2c4360ec4eb06a70c6e48d848eec532dd" />
 			</dataarea>
 		</part>
 	</software>
