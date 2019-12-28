@@ -2505,7 +2505,6 @@ headg2                          // motherboards with Headland G2 chipset (286)
 mb1212c                         // Biostar MB-1212C motherboard (286)
 bam16a0                         // VIP-M21502A BAM16-A0 motherboard (286)
 cmpa286                         // CMP enterprise CO.LTD. motherboard (286)
-suntac5                         // 286 motherboards using the 5-chip SUNTAC chipset
 ht12a                           // 286 motherboards using the Headland HT12/A chipset
 ht18c                           // 286 motherboards using the Headland HT18/C chipset
 vlsi5                           // 286 motherboards using the 5-chip VLSI chipset
@@ -2636,6 +2635,7 @@ um8886                          // 486 motherboards using the UMC UM8886BF/UM888
 gete486vl                       // GENOA TurboExpress 486 VL motherboard (486)
 pck486dx                        // Peacock PCK 486 DX motherboard
 sis85c471                       // 486 motherboards using the SiS 85C471/85C407 chipset
+sis85c496                       // 486 motherboards using the SiS 85C496/85C497 chipset
 um8498f                         // 486 motherboards using the UMC UM8498F, UM8496F chipset
 486ccv                          // Diamond Flower, Inc. (DFI) 486-CCV motherboard (486)
 alaleolx                        // RYC Alaris LEOPARD LX REV D (486)
@@ -2647,6 +2647,7 @@ op82c392                        // 486 motherboards using the OPTi OPTi 82C392, 
 ls486e                          // LuckyStar LS-486E Rev:C motherboard (486)
 pm486pu                         // PROTECH PM486PU-S7 motherboard (486)
 ec4913                          // Elitegroup UC4913 REV:1.1 motherboard (486)
+ms4134                          // MSI MS-4134 motherboard (486)
 ms4144                          // MSI MS-4144 motherboard (486)
 pt432b                          // Pine PT-432b aka SR-M401-A motherboard (486)
 ochipdca2                       // Octek Hippo DCA2 motherboard (486)
@@ -2676,7 +2677,25 @@ pci48af                         // TMC Research Corporation PCI48AF motherboard 
 ft486f55                        // Freetech 486FT55 motherboard (486)
 ga486am                         // Gigabyte GA486AM/S motherboard (486)
 jwj446a                         // Jetway J-446A motherboard (486)
-
+bluenote                        // Highscreen Colani Blue Note (486)
+4dmshl3g                        // EFA 4DMS HL3G-L4-VI motherboard (486)
+4dmuhl3s                        // EFA 4DMU HL3S motherboard (486)
+suntac6                         // motherboards using the six chip SUNTAC chipset (286)
+bay1000c                        // Mintek BAY-1000C V1.01 motherboard (286()
+profpc33                        // Profex PC 33 (286)
+3siud                           // 3SIUD-1.1 motherboard (386sx)
+486apio                         // EFA 486 APIO motherboard
+exp4044                         // ExpertChip EXP4044 motherboard (486)
+ed486vl3h                       // Edom 486VL3H motherboard (486)
+zi4dvs                          // Zida 4DVS motherboard (486)
+td4ipaio                        // TD-4IP-UMC-AIO motherboard (486)
+atc1415                         // A-Trend ATC-1415 motherboard (486)
+dvbslan                         // Datavan Book-Size LAN station (386sx)
+486igb21                        // 486IG-B-2-1 motherboard (486)
+ch48633c                        // Chicony CH-486-33C motherboard (486)
+ataripc4                        // Atari PC4 (286)
+ataripc5                        // Atari PC5 (386)
+atariabc286                     // Atari ABC-286/30
 
 @source:atari_s1.cpp
 aavenger                        //
@@ -14527,6 +14546,7 @@ pcega                           // 1987 PC with EGA
 pcherc                          // 1987 PC with Hercules (for testing hercules)
 pcmda                           // 1987 PC with MDA
 pcvga                           // 198? PC-XT (VGA, MF2 Keyboard)
+pcv20
 
 @source:ggconnie.cpp
 fishingm                        // (c) 1997 Capcom
