@@ -207,7 +207,9 @@ void gcm394_base_video_device::device_start()
 
 	m_maxgfxelement = 0;
 
-	decodegfx(":maincpu");
+	// debug helper only
+	if (memregion(":maincpu"))
+		decodegfx(":maincpu");
 
 	save_item(NAME(m_spriteextra));
 	save_item(NAME(m_spriteram));

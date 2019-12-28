@@ -50,6 +50,89 @@
 #include "speaker.h"
 
 
+
+
+class full_memory_device :
+	public device_t,
+	public device_memory_interface
+{
+public:
+	// construction/destruction
+	full_memory_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	// configuration helpers
+	template <typename... T> full_memory_device& set_map(T &&... args) { set_addrmap(0, std::forward<T>(args)...); return *this; }
+
+	template <typename... T> full_memory_device& map(T &&... args) { set_addrmap(0, std::forward<T>(args)...); return *this; }
+
+	address_space* get_program() { return m_program; }
+
+protected:
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
+
+	// device_memory_interface overrides
+	virtual space_config_vector memory_space_config() const override;
+
+
+private:
+	// internal state
+	address_space_config m_program_config;
+	address_space *m_program;
+	int m_shift;
+};
+
+
+// device type definition
+DECLARE_DEVICE_TYPE(FULL_MEMORY, full_memory_device)
+
+// device type definition
+DEFINE_DEVICE_TYPE(FULL_MEMORY, full_memory_device, "full_memory", "SunPlus Full CS Memory Map")
+
+full_memory_device::full_memory_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, FULL_MEMORY, tag, owner, clock),
+	device_memory_interface(mconfig, *this),
+	m_program(nullptr)
+{
+}
+
+device_memory_interface::space_config_vector full_memory_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
+/*
+':maincpu' (00F87F):possible DMA operation (7abf) (trigger 0001) with params mode:4009 source:00040000 (word offset) dest:00830000 (word offset) length:00007800 (words)
+':maincpu' (002384):possible DMA operation (7abf) (trigger 0001) with params mode:0009 source:00180000 (word offset) dest:00840000 (word offset) length:00160000 (words)
+
+':maincpu' (05048D):possible DMA operation (7abf) (trigger 0001) with params mode:0089 source:00006fa3 (word offset) dest:000025bc (word offset) length:000001e0 (words)
+':maincpu' (05048D):possible DMA operation (7abf) (trigger 0001) with params mode:0089 source:00006fa3 (word offset) dest:000024cc (word offset) length:000000f0 (words)
+':maincpu' (05048D):possible DMA operation (7abf) (trigger 0001) with params mode:0089 source:00006fa3 (word offset) dest:00000002 (word offset) length:00000400 (words)
+':maincpu' (05048D):possible DMA operation (7abf) (trigger 0001) with params mode:0089 source:00006fa3 (word offset) dest:00000402 (word offset) length:00000400 (words)
+':maincpu' (05048D):possible DMA operation (7abf) (trigger 0001) with params mode:0089 source:00006fa3 (word offset) dest:00000802 (word offset) length:00000400 (words)
+
+gtg
+':maincpu' (005ACE):possible DMA operation (7abf) (trigger 0001) with params mode:1089 source:30007854 (word offset) dest:00030000 (word offset) length:00000200 (words)
+':maincpu' (005ACE):possible DMA operation (7abf) (trigger 0001) with params mode:1089 source:30007854 (word offset) dest:00030100 (word offset) length:00000200 (words)
+':maincpu' (005ACE):possible DMA operation (7abf) (trigger 0001) with params mode:1089 source:30007854 (word offset) dest:00030200 (word offset) length:00000200 (words)
+':maincpu' (005ACE):possible DMA operation (7abf) (trigger 0001) with params mode:1089 source:30007854 (word offset) dest:00030300 (word offset) length:00000200 (words)
+':maincpu' (005ACE):possible DMA operation (7abf) (trigger 0001) with params mode:1089 source:30007854 (word offset) dest:00030400 (word offset) length:00000200 (words)
+
+*/
+
+void full_memory_device::device_config_complete()
+{
+	m_program_config = address_space_config( "program", ENDIANNESS_BIG, 16, 32, -1 );
+}
+
+void full_memory_device::device_start()
+{
+	m_program = &space(AS_PROGRAM);
+}
+
+
 class gcm394_game_state : public driver_device
 {
 public:
@@ -57,33 +140,45 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_bank(*this, "cartbank"),
 		m_io_p1(*this, "P1"),
 		m_io_p2(*this, "P2"),
-		m_romregion(*this, "maincpu")
+		m_romregion(*this, "maincpu"),
+		m_memory(*this, "memory")
 	{
 	}
 
 	void base(machine_config &config);
 
+	void cs_map_base(address_map &map);
+
+	virtual DECLARE_READ16_MEMBER(cs0_r);
+	virtual DECLARE_WRITE16_MEMBER(cs0_w);
+	virtual DECLARE_READ16_MEMBER(cs1_r);
+	virtual DECLARE_WRITE16_MEMBER(cs1_w);
+	virtual DECLARE_READ16_MEMBER(cs2_r);
+	virtual DECLARE_WRITE16_MEMBER(cs2_w);
+	virtual DECLARE_READ16_MEMBER(cs3_r);
+	virtual DECLARE_WRITE16_MEMBER(cs3_w);
+	virtual DECLARE_READ16_MEMBER(cs4_r);
+	virtual DECLARE_WRITE16_MEMBER(cs4_w);
+
+	void cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4);
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void switch_bank(uint32_t bank);
 
 	required_device<sunplus_gcm394_base_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
-	optional_memory_bank m_bank;
 
 	required_ioport m_io_p1;
 	required_ioport m_io_p2;
 
-	virtual void mem_map_4m(address_map &map);
 
-	required_region_ptr<uint16_t> m_romregion;
+	optional_region_ptr<uint16_t> m_romregion;
+	required_device<full_memory_device> m_memory;
 
 	DECLARE_READ16_MEMBER(porta_r);
 	DECLARE_READ16_MEMBER(portb_r);
@@ -95,42 +190,47 @@ protected:
 	virtual DECLARE_WRITE16_MEMBER(write_external_space);
 
 private:
-
-	uint32_t m_current_bank;
-	int m_numbanks;
 };
 
-class wrlshunt_game_state : public gcm394_game_state
+READ16_MEMBER(gcm394_game_state::cs0_r)
 {
-public:
-	wrlshunt_game_state(const machine_config& mconfig, device_type type, const char* tag) :
-		gcm394_game_state(mconfig, type, tag),
-		m_mapping(0),
-		m_mainram(*this, "mainram")
-	{
-	}
+	return m_romregion[offset & 0x3fffff];
+}
 
-	void wrlshunt(machine_config &config);
+WRITE16_MEMBER(gcm394_game_state::cs0_w)
+{
+	logerror("cs0_w %04x %04x (to ROM!)\n", offset, data);
+}
 
-protected:
-	//virtual void machine_start() override;
-	//virtual void machine_reset() override;
+READ16_MEMBER(gcm394_game_state::cs1_r) { logerror("cs1_r %06n", offset); return 0x0000; }
+WRITE16_MEMBER(gcm394_game_state::cs1_w) { logerror("cs1_w %06x %04x\n", offset, data); }
+READ16_MEMBER(gcm394_game_state::cs2_r) { logerror("cs2_r %06n", offset); return 0x0000; }
+WRITE16_MEMBER(gcm394_game_state::cs2_w) { logerror("cs2_w %06x %04x\n", offset, data); }
+READ16_MEMBER(gcm394_game_state::cs3_r) { logerror("cs3_r %06n", offset); return 0x0000; }
+WRITE16_MEMBER(gcm394_game_state::cs3_w) { logerror("cs3_w %06x %04x\n", offset, data); }
+READ16_MEMBER(gcm394_game_state::cs4_r) { logerror("cs4_r %06n", offset); return 0x0000; }
+WRITE16_MEMBER(gcm394_game_state::cs4_w) { logerror("cs4_w %06x %04x\n", offset, data); }
 
-	void wrlshunt_map(address_map &map);
 
-private:
+/*
+	map info (NAND type)
 
-	DECLARE_READ16_MEMBER(hunt_porta_r);
-	DECLARE_WRITE16_MEMBER(hunt_porta_w);
+	map(0x000000, 0x006fff) internal RAM
+	map(0x007000, 0x007fff) internal peripherals
+	map(0x008000, 0x00ffff) internal ROM (lower 32kwords) - can also be configured to mirror CS0 308000 area with external pin for boot from external ROM
+	map(0x010000, 0x027fff) internal ROM (upper 96kwords) - can't be switched
+	map(0x028000, 0x02ffff) reserved
 
-	virtual DECLARE_WRITE16_MEMBER(mapping_w) override;
-	uint16_t m_mapping;
+	map(0x030000, 0x0.....) view into external spaces (CS0 area starts here. followed by CS1 area, CS2 area etc.)
+	
+	map(0x200000, 0x3fffff) continued view into external spaces, but this area is banked with m_membankswitch_7810 (valid bank values 0x00-0x3f)
+*/
 
-	required_shared_ptr<u16> m_mainram;
 
-	virtual DECLARE_READ16_MEMBER(read_external_space) override;
-	virtual DECLARE_WRITE16_MEMBER(write_external_space) override;
-};
+
+void gcm394_game_state::cs_map_base(address_map& map)
+{
+}
 
 
 class generalplus_gpac800_game_state : public gcm394_game_state
@@ -138,7 +238,7 @@ class generalplus_gpac800_game_state : public gcm394_game_state
 public:
 	generalplus_gpac800_game_state(const machine_config& mconfig, device_type type, const char* tag) :
 		gcm394_game_state(mconfig, type, tag),
-		m_mainram(*this, "mainram"),
+		m_has_nand(false),
 		m_initial_copy_words(0x2000),
 		m_nandreadbase(0)
 	{
@@ -155,105 +255,131 @@ public:
 protected:
 	virtual void machine_reset() override;
 
-	void generalplus_gpac800_map(address_map &map);
 	DECLARE_READ8_MEMBER(read_nand);
+	std::vector<uint16_t> m_sdram;
+	std::vector<uint16_t> m_sdram2;
 
+	virtual DECLARE_READ16_MEMBER(cs0_r) override;
+	virtual DECLARE_WRITE16_MEMBER(cs0_w) override;
+	virtual DECLARE_READ16_MEMBER(cs1_r) override;
+	virtual DECLARE_WRITE16_MEMBER(cs1_w) override;
+
+	bool m_has_nand;
 private:
 	void nand_init(int blocksize, int blocksize_stripped);
 
-	required_shared_ptr<u16> m_mainram;
 	std::vector<uint8_t> m_strippedrom;
 	int m_strippedsize;
 
 	int m_initial_copy_words;
 	int m_nandreadbase;
-
-	virtual DECLARE_WRITE16_MEMBER(write_external_space) override;
 };
+
+
+
+class wrlshunt_game_state : public gcm394_game_state
+{
+public:
+	wrlshunt_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		gcm394_game_state(mconfig, type, tag)
+	{
+	}
+
+	void wrlshunt(machine_config &config);
+
+	void init_wrlshunt();
+
+protected:
+	//virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	std::vector<uint16_t> m_sdram;
+
+private:
+
+	DECLARE_READ16_MEMBER(hunt_porta_r);
+	DECLARE_WRITE16_MEMBER(hunt_porta_w);
+
+	//required_shared_ptr<u16> m_mainram;
+
+	virtual DECLARE_READ16_MEMBER(cs0_r) override;
+	virtual DECLARE_WRITE16_MEMBER(cs0_w) override;
+	virtual DECLARE_READ16_MEMBER(cs1_r) override;
+	virtual DECLARE_WRITE16_MEMBER(cs1_w) override;
+};
+
+
+READ16_MEMBER(wrlshunt_game_state::cs0_r)
+{
+	return m_romregion[offset & 0x3ffffff];
+}
+
+WRITE16_MEMBER(wrlshunt_game_state::cs0_w)
+{
+	logerror("cs0_w write to ROM?\n");
+	//m_romregion[offset & 0x3ffffff] = data;
+}
+
+READ16_MEMBER(wrlshunt_game_state::cs1_r)
+{
+	return m_sdram[offset & 0x3fffff];
+}
+
+WRITE16_MEMBER(wrlshunt_game_state::cs1_w)
+{
+	m_sdram[offset & 0x3fffff] = data;
+}
+
+
+void wrlshunt_game_state::machine_reset()
+{
+	cs_callback(0x00, 0x00, 0x00, 0x00, 0x00);
+	m_maincpu->set_cs_space(m_memory->get_program());
+	m_maincpu->reset(); // reset CPU so vector gets read etc.
+}
+
+void wrlshunt_game_state::init_wrlshunt()
+{
+	m_sdram.resize(0x400000); // 0x400000 bytes, 0x800000 words
+}
+
+READ16_MEMBER(generalplus_gpac800_game_state::cs0_r)
+{
+	return m_sdram2[offset & 0xffff];
+}
+
+WRITE16_MEMBER(generalplus_gpac800_game_state::cs0_w)
+{
+	m_sdram2[offset & 0xffff] = data;
+}
+
+READ16_MEMBER(generalplus_gpac800_game_state::cs1_r)
+{
+	return m_sdram[offset & 0x3fffff];
+}
+
+WRITE16_MEMBER(generalplus_gpac800_game_state::cs1_w)
+{
+	m_sdram[offset & 0x3fffff] = data;
+}
 
 READ8_MEMBER(generalplus_gpac800_game_state::read_nand)
 {
+	if (!m_has_nand)
+		return 0x0000;
+
 	return m_strippedrom[(offset + m_nandreadbase) & (m_strippedsize - 1)];
 }
 
-WRITE16_MEMBER(generalplus_gpac800_game_state::write_external_space)
-{
-	if (offset < 0x0400000)
-	{
-		m_mainram[offset] = data;
-		//  logerror("DMA writing to external space (RAM?) %08x %04x\n", offset, data);
-	}
-}
-
-
 READ16_MEMBER(gcm394_game_state::read_external_space)
 {
-	//logerror("reading offset %04x\n", offset * 2);
-	return m_romregion[offset];
+	return m_memory->get_program()->read_word(offset);
 }
 
 WRITE16_MEMBER(gcm394_game_state::write_external_space)
 {
-	logerror("DMA writing to external space (RAM?) %08x %04x\n", offset, data);
+	m_memory->get_program()->write_word(offset, data);
 }
-
-WRITE16_MEMBER(wrlshunt_game_state::mapping_w)
-{
-	m_mapping = data;
-	logerror("change mapping %04x\n", data);
-}
-
-READ16_MEMBER(wrlshunt_game_state::read_external_space)
-{
-	if (m_mapping == 0x7f8a)
-	{
-	//logerror("reading offset %04x\n", offset * 2);
-		return m_romregion[offset];
-	}
-	else if (m_mapping == 0x008a)
-	{
-		address_space& mem = m_maincpu->space(AS_PROGRAM);
-		uint16_t retdata = mem.read_word(offset + 0x20000);
-		logerror("reading from RAM instead offset %08x returning %04x\n", offset * 2, retdata);
-		return retdata;
-	}
-	else
-	{
-		uint16_t retdata = 0x0000;
-		logerror("reading from unknown source instead offset %08x returning %04x\n", offset * 2, retdata);
-		return retdata;
-	}
-}
-
-
-
-
-WRITE16_MEMBER(wrlshunt_game_state::write_external_space)
-{
-//  logerror("DMA writing to external space (RAM?) %08x %04x\n", offset, data);
-
-	if (offset & 0x0800000)
-	{
-		offset &= 0x03fffff;
-
-		if (offset < 0x03d0000)
-		{
-			m_mainram[offset] = data;
-			//logerror("DMA writing to external space (RAM?) %08x %04x\n", offset, data);
-
-		}
-		else
-		{
-			logerror("DMA writing to external space (RAM?) (out of bounds) %08x %04x\n", offset, data);
-		}
-	}
-	else
-	{
-		logerror("DMA writing to external space (RAM?) (unknown handling) %08x %04x\n", offset, data);
-	}
-}
-
-
 
 READ16_MEMBER(gcm394_game_state::porta_r)
 {
@@ -278,7 +404,6 @@ WRITE16_MEMBER(gcm394_game_state::porta_w)
 void gcm394_game_state::base(machine_config &config)
 {
 	GCM394(config, m_maincpu, XTAL(27'000'000), m_screen);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gcm394_game_state::mem_map_4m);
 	m_maincpu->porta_in().set(FUNC(gcm394_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(gcm394_game_state::portb_r));
 	m_maincpu->porta_out().set(FUNC(gcm394_game_state::porta_w));
@@ -288,6 +413,10 @@ void gcm394_game_state::base(machine_config &config)
 	m_maincpu->mapping_write_callback().set(FUNC(gcm394_game_state::mapping_w));
 	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_maincpu->set_bootmode(1); // boot from external ROM / CS mirror
+	m_maincpu->set_cs_config_callback(FUNC(gcm394_game_state::cs_callback));
+
+	FULL_MEMORY(config, m_memory).set_map(&gcm394_game_state::cs_map_base);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -300,6 +429,19 @@ void gcm394_game_state::base(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 }
 
+void wrlshunt_game_state::wrlshunt(machine_config &config)
+{
+	gcm394_game_state::base(config);
+
+	m_maincpu->porta_in().set(FUNC(wrlshunt_game_state::hunt_porta_r));
+	m_maincpu->porta_out().set(FUNC(wrlshunt_game_state::hunt_porta_w));
+	m_maincpu->set_bootmode(1); // boot from external ROM / CS mirror
+
+	m_screen->set_size(320*2, 262*2);
+	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
+}
+
+
 READ16_MEMBER(wrlshunt_game_state::hunt_porta_r)
 {
 	uint16_t data = m_io_p1->read();
@@ -311,30 +453,17 @@ WRITE16_MEMBER(wrlshunt_game_state::hunt_porta_w)
 {
 	logerror("%s: Port A:WRITE %04x\n", machine().describe_context(), data);
 
-	// skip check (EEPROM?)
-	if (m_mainram[0x5b354 - 0x30000] == 0xafd0)
-		m_mainram[0x5b354 - 0x30000] = 0xB403;
+	// HACK
+	address_space& mem = m_maincpu->space(AS_PROGRAM);
+	if (mem.read_word(0x5b354) == 0xafd0)  	// wrlshubt - skip check (EEPROM?)
+		mem.write_word(0x5b354, 0xB403);
 }
 
 
-void wrlshunt_game_state::wrlshunt(machine_config &config)
-{
-	gcm394_game_state::base(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &wrlshunt_game_state::wrlshunt_map);
-
-	m_maincpu->porta_in().set(FUNC(wrlshunt_game_state::hunt_porta_r));
-	m_maincpu->porta_out().set(FUNC(wrlshunt_game_state::hunt_porta_w));
-
-	m_screen->set_size(320*2, 262*2);
-	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
-}
 
 void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 {
-	gcm394_game_state::base(config);
-
-	GPAC800(config.replace(), m_maincpu, XTAL(27'000'000), m_screen);
-	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_gpac800_game_state::generalplus_gpac800_map);
+	GPAC800(config, m_maincpu, XTAL(27'000'000), m_screen);
 	m_maincpu->porta_in().set(FUNC(generalplus_gpac800_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(generalplus_gpac800_game_state::portb_r));
 	m_maincpu->porta_out().set(FUNC(generalplus_gpac800_game_state::porta_w));
@@ -344,88 +473,80 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 	m_maincpu->mapping_write_callback().set(FUNC(generalplus_gpac800_game_state::mapping_w));
 	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_maincpu->set_bootmode(0); // boot from internal ROM (NAND bootstrap)
+	m_maincpu->set_cs_config_callback(FUNC(gcm394_game_state::cs_callback));
 
 	m_maincpu->nand_read_callback().set(FUNC(generalplus_gpac800_game_state::read_nand));
 
+	FULL_MEMORY(config, m_memory).set_map(&generalplus_gpac800_game_state::cs_map_base);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320*2, 262*2);
 	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
+	m_screen->set_screen_update("maincpu", FUNC(sunplus_gcm394_device::screen_update));
+	m_screen->screen_vblank().set(m_maincpu, FUNC(sunplus_gcm394_device::vblank));
 
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 }
 
 
-void gcm394_game_state::switch_bank(uint32_t bank)
-{
-	if (!m_bank)
-		return;
-
-	if (bank != m_current_bank)
-	{
-		m_current_bank = bank;
-		m_bank->set_entry(bank);
-		m_maincpu->invalidate_cache();
-	}
-}
 
 void gcm394_game_state::machine_start()
 {
-	if (m_bank)
-	{
-		int i;
-		for (i = 0; i < (m_romregion.bytes() / 0x800000); i++)
-		{
-			m_bank->configure_entry(i, &m_romregion[i * 0x800000]);
-		}
-
-		m_numbanks = i;
-
-		m_bank->set_entry(0);
-	}
-	else
-	{
-		m_numbanks = 0;
-	}
-
-	save_item(NAME(m_current_bank));
 }
 
 void gcm394_game_state::machine_reset()
 {
-	m_current_bank = 0;
+	cs_callback(0x00, 0x00, 0x00, 0x00, 0x00);
+	m_maincpu->set_cs_space(m_memory->get_program());
+
+	m_maincpu->reset(); // reset CPU so vector gets read etc.
 }
 
 
-/*
-	map info
+void gcm394_game_state::cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4)
+{
+	// wipe existing mappings;
+	m_memory->get_program()->unmap_readwrite(0, (0x8000000*5)-1);
 
-	map(0x000000, 0x006fff) internal RAM
-	map(0x007000, 0x007fff) internal peripherals
-	map(0x008000, 0x00ffff) internal ROM (lower 32kwords) - can also be configured to mirror CS0 308000 area with external pin for boot from external ROM
-	map(0x010000, 0x027fff) internal ROM (upper 96kwords) - can't be switched
-	map(0x028000, 0x02ffff) reserved
+	int start_address = 0;
+	int end_address;
 
-	map(0x030000, 0x0.....) view into external spaces (CS0 area starts here. followed by CS1 area, CS2 area etc.)
+	int size; // cs region sizes in kwords
 	
-	map(0x200000, 0x3fffff) continued view into external spaces, but this area is banked with m_membankswitch_7810 (valid bank values 0x00-0x3f)
-*/
+	size = (((cs0 & 0xff00) >> 8) + 1) * 0x10000; 
+	end_address = start_address + (size - 1);
+	logerror("installing cs0 handler start_address %08x end_address %08x\n", start_address, end_address);
+	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs0_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs0_w)));
+	start_address += size;
 
-void gcm394_game_state::mem_map_4m(address_map &map)
-{
-	map(0x000000, 0x00ffff).rom().region("maincpu", 0); // non-banked area on this SoC?
+	size = (((cs1 & 0xff00) >> 8) + 1) * 0x10000; 
+	end_address = start_address + (size - 1);
+	logerror("installing cs1 handler start_address %08x end_address %08x\n", start_address, end_address);
+	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs1_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs1_w)));
+	start_address += size;
 
-	// smartfp really expects the ROM at 0 to map here, so maybe this is how the newer SoC works
-	map(0x020000, 0x3fffff).bankr("cartbank");
+	size = (((cs2 & 0xff00) >> 8) + 1) * 0x10000; 
+	end_address = start_address + (size - 1);
+	logerror("installing cs2 handler start_address %08x end_address %08x\n", start_address, end_address);
+	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs2_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs2_w)));
+	start_address += size;
+
+	size = (((cs3 & 0xff00) >> 8) + 1) * 0x10000; 
+	end_address = start_address + (size - 1);
+	logerror("installing cs3 handler start_address %08x end_address %08x\n", start_address, end_address);
+	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs3_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs3_w)));
+	start_address += size;
+
+	size = (((cs4 & 0xff00) >> 8) + 1) * 0x10000; 
+	end_address = start_address + (size - 1);
+	logerror("installing cs4 handler start_address %08x end_address %08x\n", start_address, end_address);
+	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs4_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs4_w)));
+	//start_address += size;
 }
 
-void wrlshunt_game_state::wrlshunt_map(address_map &map)
-{
-	map(0x000000, 0x00ffff).rom().region("maincpu", 0); // non-banked area on this SoC?
-	map(0x030000, 0x3fffff).ram().share("mainram");
-}
-
-void generalplus_gpac800_game_state::generalplus_gpac800_map(address_map &map)
-{
-	map(0x000000, 0x3fffff).ram().share("mainram");
-}
 
 
 static INPUT_PORTS_START( gcm394 )
@@ -686,6 +807,24 @@ static INPUT_PORTS_START( jak_gtg )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
+ROM_START(smartfp)
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
+	//ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("smartfitpark.bin", 0x000000, 0x800000, CRC(ada84507) SHA1(a3a80bf71fae62ebcbf939166a51d29c24504428))
+ROM_END
+
+ROM_START(wrlshunt)
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
+	//ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("wireless.bin", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796))		
+ROM_END
+
+
 /*
 Wireless Hunting Video Game System
 (info provided with dump)
@@ -762,16 +901,6 @@ which is also found in the Wireless Air 60 ROM.
 
 */
 
-ROM_START(wrlshunt)
-	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD16_WORD_SWAP("wireless.bin", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796))
-ROM_END
-
-ROM_START(smartfp)
-	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD16_WORD_SWAP("smartfitpark.bin", 0x000000, 0x800000, CRC(ada84507) SHA1(a3a80bf71fae62ebcbf939166a51d29c24504428))
-ROM_END
-
 
 /*
 Wireless Air 60
@@ -797,79 +926,122 @@ https://web.archive.org/web/20180106005235/http://www.lcis.com.tw/paper_store/pa
 */
 
 ROM_START( wlsair60 )
-	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+
+	ROM_REGION16_BE( 0x8400000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "wlsair60.nand", 0x0000, 0x8400000, CRC(eec23b97) SHA1(1bb88290cf54579a5bb51c08a02d793cd4d79f7a) )
 ROM_END
 
 ROM_START( jak_gtg )
-	ROM_REGION( 0x4200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+
+	ROM_REGION16_BE( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "goldentee.bin", 0x0000, 0x4200000, CRC(87d5e815) SHA1(5dc46cd753b791449cc41d5eff4928c0dcaf35c0) )
 ROM_END
 
 ROM_START( jak_car2 )
-	ROM_REGION( 0x4200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+
+	ROM_REGION16_BE( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "cars2.bin", 0x0000, 0x4200000, CRC(4d610e09) SHA1(bc59f5f7f676a8f2a78dfda7fb62c804bbf850b6) )
 ROM_END
 
 ROM_START( jak_tsm )
-	ROM_REGION( 0x4200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+
+	ROM_REGION16_BE( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "toystorymania.bin", 0x0000, 0x4200000, CRC(183b20a5) SHA1(eb4fa5ee9dfac58f5244d00d4e833b1e461cc52c) )
 ROM_END
 
 ROM_START( vbaby )
-	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+
+	ROM_REGION16_BE( 0x8400000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "vbaby.bin", 0x0000, 0x8400000, CRC(d904441b) SHA1(3742bc4e1e403f061ce2813ecfafc6f30a44d287) )
 ROM_END
 
 ROM_START( beambox )
-	ROM_REGION( 0x4200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+
+	ROM_REGION16_BE( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "beambox.bin", 0x0000, 0x4200000, CRC(a486f04e) SHA1(73c7d99d8922eba58d94e955e254b9c3baa4443e) )
 ROM_END
 
 // the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
-CONS(2011, wrlshunt, 0, 0, wrlshunt, wrlshunt, wrlshunt_game_state, empty_init, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-
 CONS(2009, smartfp, 0, 0, base, gcm394, gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // Fun 2 Learn 3-in-1 SMART SPORTS  ?
 
 
+CONS(2011, wrlshunt, 0, 0, wrlshunt, wrlshunt, wrlshunt_game_state, init_wrlshunt, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+
 void generalplus_gpac800_game_state::machine_reset()
 {
+	// configure CS defaults
 	address_space& mem = m_maincpu->space(AS_PROGRAM);
+	mem.write_word(0x007820, 0x0047);
+	mem.write_word(0x007821, 0xff47);
+	mem.write_word(0x007822, 0x00c7);
+	mem.write_word(0x007823, 0x0047);
+	mem.write_word(0x007824, 0x0047);
 
-	/* Offset(h) 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
-	   00000000 (50 47 61 6E 64 6E 61 6E 64 6E)-- -- -- -- -- --  PGandnandn------
-	   00000010  -- -- -- -- -- bb -- -- -- -- -- -- -- -- -- --  ----------------
 
-	   bb = where to copy first block
+	m_maincpu->set_cs_space(m_memory->get_program());
 
-	   The header is GPnandnand (byteswapped) then some params
-	   one of the params appears to be for the initial code copy operation done
-	   by the bootstrap
-	*/
-
-	// probably more bytes are used
-	int dest = m_strippedrom[0x15] << 8;
-
-	// copy a block of code from the NAND to RAM
-	for (int i = 0; i < m_initial_copy_words; i++)
+	if (m_has_nand)
 	{
-		uint16_t word = m_strippedrom[(i * 2) + 0] | (m_strippedrom[(i * 2) + 1] << 8);
+		// up to 256 pages (16384kw) for each space
 
-		mem.write_word(dest+i, word);
+		// (size of cs0 + cs1 + cs2 + cs3 + cs4) <= 81920kwords
+
+		// simulate bootstrap / internal ROM
+
+		address_space& mem = m_maincpu->space(AS_PROGRAM);
+
+		/* Offset(h) 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
+		   00000000 (50 47 61 6E 64 6E 61 6E 64 6E)-- -- -- -- -- --  PGandnandn------
+		   00000010  -- -- -- -- -- bb -- -- -- -- -- -- -- -- -- --  ----------------
+
+		   bb = where to copy first block
+
+		   The header is GPnandnand (byteswapped) then some params
+		   one of the params appears to be for the initial code copy operation done
+		   by the bootstrap
+		*/
+
+		// probably more bytes are used
+		int dest = m_strippedrom[0x15] << 8;
+
+		// copy a block of code from the NAND to RAM
+		for (int i = 0; i < m_initial_copy_words; i++)
+		{
+			uint16_t word = m_strippedrom[(i * 2) + 0] | (m_strippedrom[(i * 2) + 1] << 8);
+
+			mem.write_word(dest + i, word);
+		}
+
+		// these vectors must either directly point to RAM, or at least redirect there after some code
+		uint16_t* internal = (uint16_t*)memregion("maincpu:internal")->base();
+		internal[0x7ff5] = 0x6fea;
+		internal[0x7ff6] = 0x6fec;
+		internal[0x7ff7] = dest + 0x20; // point boot vector at code in RAM (probably in reality points to internal code that copies the first block)
+		internal[0x7ff8] = 0x6ff0;
+		internal[0x7ff9] = 0x6ff2;
+		internal[0x7ffa] = 0x6ff4;
+		internal[0x7ffb] = 0x6ff6;
+		internal[0x7ffc] = 0x6ff8;
+		internal[0x7ffd] = 0x6ffa;
+		internal[0x7ffe] = 0x6ffc;
+		internal[0x7fff] = 0x6ffe;
+
+		internal[0x8000] = 0xb00b;
 	}
-
-	mem.write_word(0xfff5, 0x6fea);
-	mem.write_word(0xfff6, 0x6fec);
-	mem.write_word(0xfff7, dest+0x20); // point boot vector at code in RAM
-	mem.write_word(0xfff8, 0x6ff0);
-	mem.write_word(0xfff9, 0x6ff2);
-	mem.write_word(0xfffa, 0x6ff4);
-	mem.write_word(0xfffb, 0x6ff6);
-	mem.write_word(0xfffc, 0x6ff8);
-	mem.write_word(0xfffd, 0x6ffa);
-	mem.write_word(0xfffe, 0x6ffc);
-	mem.write_word(0xffff, 0x6ffe);
 
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 }
@@ -877,8 +1049,11 @@ void generalplus_gpac800_game_state::machine_reset()
 
 void generalplus_gpac800_game_state::nand_init(int blocksize, int blocksize_stripped)
 {
-	uint8_t* rom = memregion("maincpu")->base();
-	int size = memregion("maincpu")->bytes();
+	m_sdram.resize(0x400000); // 0x400000 bytes, 0x800000 words
+	m_sdram2.resize(0x10000);
+
+	uint8_t* rom = memregion("nandrom")->base();
+	int size = memregion("nandrom")->bytes();
 
 	int numblocks = size / blocksize;
 	m_strippedsize = numblocks * blocksize_stripped;
@@ -908,6 +1083,8 @@ void generalplus_gpac800_game_state::nand_init(int blocksize, int blocksize_stri
 			fclose(fp);
 		}
 	}
+
+	m_has_nand = true;
 }
 
 void generalplus_gpac800_game_state::nand_init210()

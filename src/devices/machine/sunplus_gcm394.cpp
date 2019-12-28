@@ -33,6 +33,10 @@ generalplus_gpac800_device::generalplus_gpac800_device(const machine_config &mco
 {
 }
 
+void sunplus_gcm394_base_device::default_cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4)
+{
+	logerror("callback not hooked\n");
+}
 
 
 // **************************************** SYSTEM DMA device *************************************************
@@ -91,7 +95,7 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 	uint32_t dest = m_dma_params[2][channel] | (m_dma_params[5][channel] << 16) ;
 	uint32_t length = m_dma_params[3][channel] | (m_dma_params[6][channel] << 16);
 
-	LOGMASKED(LOG_GCM394_SYSDMA, "%s:possible DMA operation (7abf) (trigger %04x) with params mode:%04x source:%08x (word offset) dest:%08x (word offset) length:%08x (words)\n", machine().describe_context(), data, mode, source, dest, length );
+	LOGMASKED(LOG_GCM394_SYSDMA, "%s:possible DMA operation (7abf) (trigger %04x) with params mode:%04x source:%08x (word offset) dest:%08x (word offset) length:%08x (words) while csbank is %02x\n", machine().describe_context().c_str(), data, mode, source, dest, length, m_membankswitch_7810 );
 
 	if ((source&0x0fffffff) >= 0x20000)
 		LOGMASKED(LOG_GCM394_SYSDMA, " likely transfer from ROM %08x - %08x\n", (source - 0x20000) * 2, (source - 0x20000) * 2 + (length * 2)- 1);
@@ -109,14 +113,14 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 
 		for (int i = 0; i < length/2; i++)
 		{
-			uint16_t val1 = mem.read_word(source);
-			uint16_t val2 = mem.read_word(source);
+			uint16_t val1 = read_space(source);
+			uint16_t val2 = read_space(source);
 
-			//printf("val1 %04x val2 %04x\n", val1, val2);
+			//logerror("val1 %04x val2 %04x\n", val1, val2);
 
 			uint16_t val = (val2 << 8) | val1;
 
-			m_space_write_cb(space, dest, val);
+			write_space(dest, val);
 			dest += 1;
 		}
 
@@ -126,45 +130,26 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 		if (mem.read_word(0x3f368) == 0x4840)
 			mem.write_word(0x3f368, 0x4841);    // cars 2 IRQ? wait hack
 
-		if (mem.read_word(0x4368c) == 0x4846)
-			mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
+		//if (mem.read_word(0x4368c) == 0x4846)
+		//	mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
 
 		if (mem.read_word(0x4d8d4) == 0x4840)
 			mem.write_word(0x4d8d4, 0x4841);    // golden tee IRQ? wait hack
 
-		if (mem.read_word(0x34410) == 0x4846)
-			mem.write_word(0x34410, 0x4840);    // golden tee force service mode
-
+		//if (mem.read_word(0x34410) == 0x4846)
+		//	mem.write_word(0x34410, 0x4840);    // golden tee force service mode
+		
 	}
 	else if ((mode == 0x0089) || (mode == 0x0009) || (mode == 0x4009))
 	{
 		for (int i = 0; i < length; i++)
 		{
-			uint16_t val = 0x0000;
 
-			address_space& mem = this->space(AS_PROGRAM);
+			uint16_t val = read_space(source);
 
-			if (source < 0x20000)
-			{
-				val = mem.read_word(source);
-			}
-			else
-			{
-				// maybe the -0x20000 here should be handled in external space handlers instead
-				val = m_space_read_cb(space, source - 0x20000);
-			}
-
-			if (dest < 0x20000)
-			{
-				mem.write_word(dest, val);
-			}
-			else
-			{
-				// maybe the -0x20000 here should be handled in external space handlers instead
-				m_space_write_cb(space, dest - 0x20000, val);
-			}
-
+			write_space(dest , val);
 			dest += 1;
+			
 			if ((mode&0x3fff) == 0x0009)
 				source += 1;
 		}
@@ -237,7 +222,8 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::membankswitch_7810_w)
 //	if (m_membankswitch_7810 != data)
 //	LOGMASKED(LOG_GCM394,"%s:sunplus_gcm394_base_device::membankswitch_7810_w %04x\n", machine().describe_context(), data);
 
-	popmessage("bankswitch %04x -> %04x", m_membankswitch_7810, data);
+	if (m_membankswitch_7810 != data)
+		popmessage("bankswitch %04x -> %04x", m_membankswitch_7810, data);
 
 	m_membankswitch_7810 = data;
 }
@@ -253,7 +239,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::chipselect_csx_memory_device_control_
 
 	if (offset == 0)
 		m_mapping_write_cb(data);
-
+	
 
 	static const char* const md[] =
 	{
@@ -269,6 +255,9 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::chipselect_csx_memory_device_control_
 	int cs_size  = (data & 0xff00)>>8;
 
 	logerror("CS%d set to size: %02x (%08x words) md: %01x %s   warat: %01x wait: %01x\n", offset, cs_size, (cs_size+1)*0x10000, cs_md, md[cs_md], cs_warat, cs_wait);
+
+
+	m_cs_callback(m_782x[0], m_782x[1], m_782x[2], m_782x[3], m_782x[4]);
 
 }
 
@@ -435,7 +424,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unk_w)
 	}
 }
 
-void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
+void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 {
 	map(0x000000, 0x006fff).ram();
 	map(0x007000, 0x007fff).rw(FUNC(sunplus_gcm394_base_device::unk_r), FUNC(sunplus_gcm394_base_device::unk_w)); // catch unhandled
@@ -662,6 +651,77 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 	map(0x007b80, 0x007bbf).rw(m_spg_audio, FUNC(sunplus_gcm394_audio_device::control_r), FUNC(sunplus_gcm394_audio_device::control_w));
 	map(0x007c00, 0x007dff).rw(m_spg_audio, FUNC(sunplus_gcm394_audio_device::audio_r), FUNC(sunplus_gcm394_audio_device::audio_w));
 	map(0x007e00, 0x007fff).rw(m_spg_audio, FUNC(sunplus_gcm394_audio_device::audio_phase_r), FUNC(sunplus_gcm394_audio_device::audio_phase_w));
+
+}
+
+void sunplus_gcm394_base_device::gcm394_internal_map(address_map& map)
+{
+	sunplus_gcm394_base_device::base_internal_map(map);
+
+	// no internal ROM on this model?
+
+	map(0x08000, 0x0ffff).r(FUNC(sunplus_gcm394_base_device::internalrom_lower32_r)).nopw();
+
+	map(0x020000, 0x1fffff).rw(FUNC(sunplus_gcm394_base_device::cs_space_r), FUNC(sunplus_gcm394_base_device::cs_space_w));
+	map(0x200000, 0x3fffff).rw(FUNC(sunplus_gcm394_base_device::cs_bank_space_r), FUNC(sunplus_gcm394_base_device::cs_bank_space_w));
+}
+
+READ16_MEMBER(sunplus_gcm394_base_device::cs_space_r)
+{
+	return m_cs_space->read_word(offset);
+}
+
+WRITE16_MEMBER(sunplus_gcm394_base_device::cs_space_w)
+{
+	m_cs_space->write_word(offset, data);
+}
+READ16_MEMBER(sunplus_gcm394_base_device::cs_bank_space_r)
+{
+	int bank = m_membankswitch_7810 & 0x3f;
+	int realoffset = offset + (bank * 0x200000) - m_csbase;
+
+	if (realoffset < 0)
+	{
+		logerror("read real offset < 0\n");
+		return 0;
+	}
+
+	//return m_cs_space->read_word(offset + (0x200000 - m_csbase));
+	return m_cs_space->read_word(realoffset);
+
+}
+
+WRITE16_MEMBER(sunplus_gcm394_base_device::cs_bank_space_w)
+{
+	int bank = m_membankswitch_7810 & 0x3f;
+	int realoffset = offset + (bank * 0x200000) - m_csbase;
+
+	if (realoffset < 0)
+	{
+		logerror("write real offset < 0\n");
+		return;
+	}
+
+	m_cs_space->write_word(realoffset, data);
+}
+
+
+
+READ16_MEMBER(sunplus_gcm394_base_device::internalrom_lower32_r)
+{
+	if (m_boot_mode == 0)
+	{
+		uint16_t* introm = (uint16_t*)m_internalrom->base();
+		return introm[offset];
+	}
+	else
+	{
+		if (!m_cs_space)
+			return 0x0000;
+
+		uint16_t val = m_cs_space->read_word(offset+0x8000);
+		return val;
+	}
 }
 
 READ16_MEMBER(generalplus_gpac800_device::unkarea_7850_r)
@@ -691,7 +751,7 @@ READ16_MEMBER(generalplus_gpac800_device::unkarea_7854_r)
 		uint32_t nandaddress = (m_flash_addr_high << 16) | m_flash_addr_low;
 		uint8_t data = m_nand_read_cb((nandaddress * 2) + m_curblockaddr);
 
-		//printf("reading nand byte %02x\n", data);
+		//logerror("reading nand byte %02x\n", data);
 
 		m_curblockaddr++;
 
@@ -738,29 +798,38 @@ WRITE16_MEMBER(generalplus_gpac800_device::flash_addr_high_w)
 // so it's likely this is built on top of that just with NAND support
 void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
 {
-	sunplus_gcm394_base_device::gcm394_internal_map(map);
+	sunplus_gcm394_base_device::base_internal_map(map);
 
-	// there is an extra command-based device at 785x, what it returns is important to code flow
-	// code is littered with NOPs so clearly the device can't accept commands too quickly and doesn't return data immediately
-	//
-	// this should be the NAND device, as the games attempt to do a DMA operation with '7854' as the source, and the target
-	// as the RAM location where code needs to end up before jumping to it
+	// 785x = NAND device
 	map(0x007850, 0x007850).r(FUNC(generalplus_gpac800_device::unkarea_7850_r)); // NAND Control Reg
 	map(0x007851, 0x007851).w(FUNC(generalplus_gpac800_device::nand_command_w)); // NAND Command Reg
 	map(0x007852, 0x007852).w(FUNC(generalplus_gpac800_device::flash_addr_low_w)); // NAND Low Address Reg
 	map(0x007853, 0x007853).w(FUNC(generalplus_gpac800_device::flash_addr_high_w)); // NAND High Address Reg
 	map(0x007854, 0x007854).r(FUNC(generalplus_gpac800_device::unkarea_7854_r)); // NAND Data Reg
 //  map(0x007855, 0x007855).w(FUNC(generalplus_gpac800_device::nand_dma_ctrl_w)); // NAND DMA / INT Control
+
+	// 128kwords internal ROM
+	//map(0x08000, 0x0ffff).rom().region("internal", 0); // lower 32kwords of internal ROM is visible / shadowed depending on boot pins and register
+	map(0x08000, 0x0ffff).r(FUNC(generalplus_gpac800_device::internalrom_lower32_r)).nopw();
+	map(0x10000, 0x27fff).rom().region("internal", 0x10000); // upper 96kwords of internal ROM is always visible
+	map(0x28000, 0x2ffff).noprw(); // reserved
+	// 0x30000+ is CS access
+	
+	map(0x030000, 0x1fffff).rw(FUNC(generalplus_gpac800_device::cs_space_r), FUNC(generalplus_gpac800_device::cs_space_w));
+	map(0x200000, 0x3fffff).rw(FUNC(generalplus_gpac800_device::cs_bank_space_r), FUNC(generalplus_gpac800_device::cs_bank_space_w));
 }
 
 void sunplus_gcm394_base_device::device_start()
 {
 	unsp_20_device::device_start();
 
+	m_cs_callback.resolve();
+
 	m_porta_in.resolve_safe(0);
 	m_portb_in.resolve_safe(0);
 
 	m_porta_out.resolve();
+
 
 
 	m_space_read_cb.resolve_safe(0);
@@ -792,7 +861,7 @@ void sunplus_gcm394_base_device::device_reset()
 
 	m_7807 = 0x0000;
 
-	m_membankswitch_7810 = 0x0000;
+	m_membankswitch_7810 = 0x0001;
 
 	m_7816 = 0x0000;
 	m_7817 = 0x0000;
@@ -850,10 +919,6 @@ void sunplus_gcm394_base_device::device_reset()
 
 
 	m_unk_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
-
-	m_gfxregion = memregion(":maincpu")->base();
-	m_gfxregionsize = memregion(":maincpu")->bytes();
-
 }
 
 void generalplus_gpac800_device::device_reset()
@@ -942,12 +1007,33 @@ WRITE_LINE_MEMBER(sunplus_gcm394_base_device::videoirq_w)
 
 uint16_t sunplus_gcm394_base_device::read_space(uint32_t offset)
 {
-//  uint16_t b = m_gfxregion[(offset * 2) & (m_gfxregionsize - 1)] | (m_gfxregion[(offset * 2 + 1) & (m_gfxregionsize - 1)] << 8);
-//  return b;
-	address_space& mem = this->space(AS_PROGRAM);
-	uint16_t retdata = mem.read_word(offset);
-	return retdata;
+	address_space& space = this->space(AS_PROGRAM);
+	uint16_t val;
+	if (offset < m_csbase)
+	{
+		val = space.read_word(offset);
+	}
+	else
+	{
+		val = m_cs_space->read_word(offset-m_csbase);
+	}
+
+	return val;
 }
+
+void sunplus_gcm394_base_device::write_space(uint32_t offset, uint16_t data)
+{
+	address_space& space = this->space(AS_PROGRAM);
+	if (offset < m_csbase)
+	{
+		space.write_word(offset, data);
+	}
+	else
+	{
+		m_cs_space->write_word(offset-m_csbase, data);
+	}
+}
+
 
 
 void sunplus_gcm394_base_device::device_add_mconfig(machine_config &config)

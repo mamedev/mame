@@ -17,6 +17,7 @@
 #include "sunplus_gcm394_video.h"
 #include "spg2xx_audio.h"
 
+typedef device_delegate<void (uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)> sunplus_gcm394_cs_callback_device;
 
 class sunplus_gcm394_base_device : public unsp_20_device, public device_mixer_interface
 {
@@ -32,13 +33,17 @@ public:
 		m_screen(*this, finder_base::DUMMY_TAG),
 		m_spg_video(*this, "spgvideo"),
 		m_spg_audio(*this, "spgaudio"),
+		m_internalrom(*this, "internal"),
 		m_porta_in(*this),
 		m_portb_in(*this),
 		m_porta_out(*this),
 		m_nand_read_cb(*this),
+		m_csbase(0x20000),
 		m_space_read_cb(*this),
 		m_space_write_cb(*this),
-		m_mapping_write_cb(*this)
+		m_mapping_write_cb(*this),
+		m_boot_mode(0),
+		m_cs_callback(*this, DEVICE_SELF, FUNC(sunplus_gcm394_base_device::default_cs_callback))
 	{
 	}
 
@@ -59,7 +64,13 @@ public:
 
 	virtual void device_add_mconfig(machine_config& config) override;
 
+	void set_bootmode(int mode) { m_boot_mode = mode; }
+
 	IRQ_CALLBACK_MEMBER(irq_vector_cb);
+	template <typename... T> void set_cs_config_callback(T &&... args) { m_cs_callback.set(std::forward<T>(args)...); }
+	void default_cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4 );
+
+	void set_cs_space(address_space* csspace) { m_cs_space = csspace; }
 
 protected:
 
@@ -67,10 +78,12 @@ protected:
 	virtual void device_reset() override;
 
 	void gcm394_internal_map(address_map &map);
+	void base_internal_map(address_map &map);
 
 	required_device<screen_device> m_screen;
 	required_device<gcm394_video_device> m_spg_video;
 	required_device<sunplus_gcm394_audio_device> m_spg_audio;
+	optional_memory_region m_internalrom;
 
 	devcb_read16 m_porta_in;
 	devcb_read16 m_portb_in;
@@ -142,6 +155,16 @@ protected:
 	uint16_t m_7961;
 
 	devcb_read16 m_nand_read_cb;
+	int m_csbase;
+
+	DECLARE_READ16_MEMBER(internalrom_lower32_r);
+
+	address_space* m_cs_space;
+
+	DECLARE_READ16_MEMBER(cs_space_r);
+	DECLARE_WRITE16_MEMBER(cs_space_w);
+	DECLARE_READ16_MEMBER(cs_bank_space_r);
+	DECLARE_WRITE16_MEMBER(cs_bank_space_w);
 
 private:
 	devcb_read16 m_space_read_cb;
@@ -263,9 +286,12 @@ private:
 	emu_timer *m_unk_timer;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	uint8_t* m_gfxregion;
-	uint32_t m_gfxregionsize;
-	uint16_t read_space(uint32_t offset);
+	inline uint16_t read_space(uint32_t offset);
+	inline void write_space(uint32_t offset, uint16_t data);
+
+	// config registers (external pins)
+	int m_boot_mode; // 2 pins determine boot mode, likely only read at power-on
+	sunplus_gcm394_cs_callback_device m_cs_callback;
 
 };
 
@@ -294,6 +320,7 @@ public:
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
 		m_testval = 0;
+		m_csbase = 0x30000;
 	}
 
 	generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
