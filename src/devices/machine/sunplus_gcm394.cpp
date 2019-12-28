@@ -35,7 +35,7 @@ generalplus_gpac800_device::generalplus_gpac800_device(const machine_config &mco
 
 void sunplus_gcm394_base_device::default_cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4)
 {
-	printf("callback not hooked\n");
+	logerror("callback not hooked\n");
 }
 
 
@@ -116,7 +116,7 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 			uint16_t val1 = read_space(source);
 			uint16_t val2 = read_space(source);
 
-			//printf("val1 %04x val2 %04x\n", val1, val2);
+			//logerror("val1 %04x val2 %04x\n", val1, val2);
 
 			uint16_t val = (val2 << 8) | val1;
 
@@ -130,14 +130,14 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 		if (mem.read_word(0x3f368) == 0x4840)
 			mem.write_word(0x3f368, 0x4841);    // cars 2 IRQ? wait hack
 
-		if (mem.read_word(0x4368c) == 0x4846)
-			mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
+		//if (mem.read_word(0x4368c) == 0x4846)
+		//	mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
 
 		if (mem.read_word(0x4d8d4) == 0x4840)
 			mem.write_word(0x4d8d4, 0x4841);    // golden tee IRQ? wait hack
 
-		if (mem.read_word(0x34410) == 0x4846)
-			mem.write_word(0x34410, 0x4840);    // golden tee force service mode
+		//if (mem.read_word(0x34410) == 0x4846)
+		//	mem.write_word(0x34410, 0x4840);    // golden tee force service mode
 		
 	}
 	else if ((mode == 0x0089) || (mode == 0x0009) || (mode == 0x4009))
@@ -682,7 +682,7 @@ READ16_MEMBER(sunplus_gcm394_base_device::cs_bank_space_r)
 
 	if (realoffset < 0)
 	{
-		printf("read real offset < 0\n");
+		logerror("read real offset < 0\n");
 		return 0;
 	}
 
@@ -698,7 +698,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::cs_bank_space_w)
 
 	if (realoffset < 0)
 	{
-		printf("write real offset < 0\n");
+		logerror("write real offset < 0\n");
 		return;
 	}
 
@@ -751,7 +751,7 @@ READ16_MEMBER(generalplus_gpac800_device::unkarea_7854_r)
 		uint32_t nandaddress = (m_flash_addr_high << 16) | m_flash_addr_low;
 		uint8_t data = m_nand_read_cb((nandaddress * 2) + m_curblockaddr);
 
-		//printf("reading nand byte %02x\n", data);
+		//logerror("reading nand byte %02x\n", data);
 
 		m_curblockaddr++;
 
