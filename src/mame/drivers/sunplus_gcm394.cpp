@@ -189,23 +189,8 @@ protected:
 	virtual DECLARE_READ16_MEMBER(read_external_space);
 	virtual DECLARE_WRITE16_MEMBER(write_external_space);
 
-
-	DECLARE_READ16_MEMBER(pre_cs_r);
-	DECLARE_WRITE16_MEMBER(pre_cs_w);
-
 private:
 };
-
-READ16_MEMBER(gcm394_game_state::pre_cs_r)
-{
-	return m_maincpu->space(AS_PROGRAM).read_word(offset);
-}
-
-WRITE16_MEMBER(gcm394_game_state::pre_cs_w)
-{
-	m_maincpu->space(AS_PROGRAM).write_word(offset, data);
-}
-
 
 READ16_MEMBER(gcm394_game_state::cs0_r)
 {
@@ -228,10 +213,8 @@ WRITE16_MEMBER(gcm394_game_state::cs4_w) { logerror("cs4_w %06x %04x\n", offset,
 
 
 
-void gcm394_game_state::cs_map_base(address_map &map)
+void gcm394_game_state::cs_map_base(address_map& map)
 {
-	map(0x000000, 0x01ffff).rw(FUNC(gcm394_game_state::pre_cs_r), FUNC(gcm394_game_state::pre_cs_w));
-	//map(0x020000, 0x41ffff).rw(FUNC(gcm394_game_state::cs0_r), FUNC(gcm394_game_state::cs0_w));
 }
 
 
@@ -289,9 +272,7 @@ class wrlshunt_game_state : public gcm394_game_state
 {
 public:
 	wrlshunt_game_state(const machine_config& mconfig, device_type type, const char* tag) :
-		gcm394_game_state(mconfig, type, tag),
-		m_mapping(0)
-		//m_mainram(*this, "mainram")
+		gcm394_game_state(mconfig, type, tag)
 	{
 	}
 
@@ -309,9 +290,6 @@ private:
 
 	DECLARE_READ16_MEMBER(hunt_porta_r);
 	DECLARE_WRITE16_MEMBER(hunt_porta_w);
-
-	virtual DECLARE_WRITE16_MEMBER(mapping_w) override;
-	uint16_t m_mapping;
 
 	//required_shared_ptr<u16> m_mainram;
 
@@ -346,7 +324,7 @@ WRITE16_MEMBER(wrlshunt_game_state::cs1_w)
 
 void wrlshunt_game_state::machine_reset()
 {
-	cs_callback(0x20000, 0x00, 0x00, 0x00, 0x00, 0x00);
+	cs_callback(0, 0x00, 0x00, 0x00, 0x00, 0x00);
 	m_maincpu->set_cs_space(m_memory->get_program());
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 }
@@ -358,8 +336,6 @@ void wrlshunt_game_state::init_wrlshunt()
 
 void generalplus_gpac800_game_state::cs_map_gpac800(address_map &map)
 {
-	map(0x000000, 0x02ffff).rw(FUNC(generalplus_gpac800_game_state::pre_cs_r), FUNC(generalplus_gpac800_game_state::pre_cs_w));
-//	map(0x030000, 0x42ffff).rw(FUNC(generalplus_gpac800_game_state::cs0_r), FUNC(generalplus_gpac800_game_state::cs0_w));
 }
 
 READ16_MEMBER(generalplus_gpac800_game_state::cs0_r)
@@ -392,7 +368,6 @@ READ8_MEMBER(generalplus_gpac800_game_state::read_nand)
 
 READ16_MEMBER(gcm394_game_state::read_external_space)
 {
-	//logerror("reading offset %04x\n", offset * 2);
 	return m_memory->get_program()->read_word(offset);
 }
 
@@ -400,11 +375,6 @@ WRITE16_MEMBER(gcm394_game_state::write_external_space)
 {
 	m_memory->get_program()->write_word(offset, data);
 }
-
-WRITE16_MEMBER(wrlshunt_game_state::mapping_w)
-{
-}
-
 
 READ16_MEMBER(gcm394_game_state::porta_r)
 {
@@ -524,7 +494,7 @@ void gcm394_game_state::machine_start()
 
 void gcm394_game_state::machine_reset()
 {
-	cs_callback(0x20000, 0x00, 0x00, 0x00, 0x00, 0x00);
+	cs_callback(0, 0x00, 0x00, 0x00, 0x00, 0x00);
 	m_maincpu->set_cs_space(m_memory->get_program());
 
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
@@ -1023,7 +993,7 @@ CONS(2011, wrlshunt, 0, 0, wrlshunt, wrlshunt, wrlshunt_game_state, init_wrlshun
 
 void generalplus_gpac800_game_state::machine_reset()
 {
-	cs_callback(0x30000, 0x00, 0x00, 0x00, 0x00, 0x00);
+	cs_callback(0, 0x00, 0x00, 0x00, 0x00, 0x00);
 	m_maincpu->set_cs_space(m_memory->get_program());
 
 	if (m_has_nand)

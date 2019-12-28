@@ -257,7 +257,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::chipselect_csx_memory_device_control_
 	logerror("CS%d set to size: %02x (%08x words) md: %01x %s   warat: %01x wait: %01x\n", offset, cs_size, (cs_size+1)*0x10000, cs_md, md[cs_md], cs_warat, cs_wait);
 
 
-	m_cs_callback(m_csbase, m_782x[0], m_782x[1], m_782x[2], m_782x[3], m_782x[4]);
+	m_cs_callback(0, m_782x[0], m_782x[1], m_782x[2], m_782x[3], m_782x[4]);
 
 }
 
@@ -667,12 +667,12 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map& map)
 
 READ16_MEMBER(sunplus_gcm394_base_device::cs_space_r)
 {
-	return m_cs_space->read_word(offset + m_csbase);
+	return m_cs_space->read_word(offset);
 }
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::cs_space_w)
 {
-	m_cs_space->write_word(offset + m_csbase, data);
+	m_cs_space->write_word(offset, data);
 }
 
 
@@ -685,7 +685,10 @@ READ16_MEMBER(sunplus_gcm394_base_device::internalrom_lower32_r)
 	}
 	else
 	{
-		uint16_t val = m_space_read_cb(space, offset + m_csbase + 0x8000);
+		if (!m_cs_space)
+			return 0x0000;
+
+		uint16_t val = m_cs_space->read_word(offset+0x8000);
 		return val;
 	}
 }
@@ -981,7 +984,7 @@ uint16_t sunplus_gcm394_base_device::read_space(uint32_t offset)
 	}
 	else
 	{
-		val = m_space_read_cb(space, offset);
+		val = m_cs_space->read_word(offset-m_csbase);
 	}
 
 	return val;
@@ -996,7 +999,7 @@ void sunplus_gcm394_base_device::write_space(uint32_t offset, uint16_t data)
 	}
 	else
 	{
-		m_space_write_cb(space, offset, data);
+		m_cs_space->write_word(offset-m_csbase, data);
 	}
 }
 
