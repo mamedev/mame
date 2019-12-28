@@ -284,7 +284,8 @@ private:
 	emu_timer *m_unk_timer;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	uint16_t read_space(uint32_t offset);
+	inline uint16_t read_space(uint32_t offset);
+	inline void write_space(uint32_t offset, uint16_t data);
 
 	// config registers (external pins)
 	int m_boot_mode; // 2 pins determine boot mode, likely only read at power-on

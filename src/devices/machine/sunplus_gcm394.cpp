@@ -113,14 +113,14 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 
 		for (int i = 0; i < length/2; i++)
 		{
-			uint16_t val1 = mem.read_word(source);
-			uint16_t val2 = mem.read_word(source);
+			uint16_t val1 = read_space(source);
+			uint16_t val2 = read_space(source);
 
 			//printf("val1 %04x val2 %04x\n", val1, val2);
 
 			uint16_t val = (val2 << 8) | val1;
 
-			m_space_write_cb(space, dest, val);
+			write_space(dest, val);
 			dest += 1;
 		}
 
@@ -144,10 +144,12 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 	{
 		for (int i = 0; i < length; i++)
 		{
-			uint16_t val = m_space_read_cb(space, source);
-			m_space_write_cb(space, dest , val);
 
+			uint16_t val = read_space(source);
+
+			write_space(dest , val);
 			dest += 1;
+			
 			if ((mode&0x3fff) == 0x0009)
 				source += 1;
 		}
@@ -971,11 +973,33 @@ WRITE_LINE_MEMBER(sunplus_gcm394_base_device::videoirq_w)
 
 uint16_t sunplus_gcm394_base_device::read_space(uint32_t offset)
 {
-	// TODO: use read_external_space instead
-	address_space& mem = this->space(AS_PROGRAM);
-	uint16_t retdata = mem.read_word(offset);
-	return retdata;
+	address_space& space = this->space(AS_PROGRAM);
+	uint16_t val;
+	if (offset < m_csbase)
+	{
+		val = space.read_word(offset);
+	}
+	else
+	{
+		val = m_space_read_cb(space, offset);
+	}
+
+	return val;
 }
+
+void sunplus_gcm394_base_device::write_space(uint32_t offset, uint16_t data)
+{
+	address_space& space = this->space(AS_PROGRAM);
+	if (offset < m_csbase)
+	{
+		space.write_word(offset, data);
+	}
+	else
+	{
+		m_space_write_cb(space, offset, data);
+	}
+}
+
 
 
 void sunplus_gcm394_base_device::device_add_mconfig(machine_config &config)
