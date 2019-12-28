@@ -60,7 +60,7 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 			return;
 
 		case 0x03:
-			fatalerror("UNSP: unknown opcode invb Rd,offset (%04x) at %04x\n", op, UNSP_LPC);
+			m_core->m_r[rd] ^= (1 << offset);
 			return;
 		}
 		return;

@@ -116,7 +116,7 @@ public:
 		m_cg_count(*this, "cg_count%u", 0U)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void cgang(machine_config &config);
 
 protected:
@@ -733,7 +733,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void cgang_state::cgang(machine_config &config)

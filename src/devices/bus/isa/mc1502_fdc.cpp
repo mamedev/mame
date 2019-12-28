@@ -113,8 +113,8 @@ uint8_t mc1502_fdc_device::mc1502_wd17xx_drq_r()
 	if (!m_fdc->drq_r() && !m_fdc->intrq_r())
 	{
 		// fake cpu wait by resetting PC one insn back
-		m_maincpu->set_state_int(I8086_IP, m_maincpu->state_int(I8086_IP) - 1);
-		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_cpu->set_state_int(I8086_IP, m_cpu->state_int(I8086_IP) - 1);
+		m_isa->set_ready(ASSERT_LINE); // assert I/O CH RDY
 	}
 
 	return m_fdc->drq_r();
@@ -128,7 +128,7 @@ uint8_t mc1502_fdc_device::mc1502_wd17xx_motor_r()
 WRITE_LINE_MEMBER(mc1502_fdc_device::mc1502_fdc_irq_drq)
 {
 	if (state)
-		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_isa->set_ready(CLEAR_LINE); // deassert I/O CH RDY
 }
 
 READ8_MEMBER(mc1502_fdc_device::mc1502_fdc_r)
@@ -191,7 +191,7 @@ mc1502_fdc_device::mc1502_fdc_device(const machine_config &mconfig, const char *
 	, m_fdc(*this, "fdc")
 	, motor_on(0)
 	, motor_timer(nullptr)
-	, m_maincpu(*this, ":maincpu")
+	, m_cpu(*this, finder_base::DUMMY_TAG)
 {
 }
 

@@ -356,25 +356,6 @@ private:
 	DECLARE_WRITE8_MEMBER(wingwar360_outputs_w);
 	DECLARE_WRITE8_MEMBER(netmerc_outputs_w);
 	DECLARE_WRITE8_MEMBER(drive_board_w);
-
-	struct racc {
-		u32 adr;
-		u32 val;
-		bool write;
-	};
-
-	std::function<void ()> check_hle;
-	int count;
-	int m_check_fipos, m_check_rampos;
-	std::vector<u32> m_check_fi;
-	std::vector<u32> m_check_fo;
-	std::vector<int> m_check_pfi;
-	std::vector<std::pair<u32, bool>> m_check_pfo;
-	std::vector<racc> m_check_ram;
-	std::vector<racc> m_check_pram;
-	void check();
-	u32 hle_ram_r(u32 address);
-	void hle_ram_w(u32 address, u32 data);
 };
 
 #endif // MAME_INCLUDES_MODEL1_H

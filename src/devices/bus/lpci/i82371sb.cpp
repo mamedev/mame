@@ -38,7 +38,7 @@ i82371sb_device::i82371sb_device(const machine_config &mconfig, const char *tag,
 	, m_apmc(0)
 	, m_apms(0)
 	, m_base(0)
-	, m_maincpu(*this, ":maincpu")
+	, m_cpu(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -250,7 +250,7 @@ void i82371sb_device::remap(int space_id, offs_t start, offs_t end)
 
 void i82371sb_device::device_start()
 {
-	address_space& spaceio = ((device_memory_interface *)m_maincpu.target())->memory().space(AS_IO);
+	address_space& spaceio = m_cpu->space(AS_IO);
 
 	southbridge_device::device_start();
 	m_ide_io_ports_enabled = false;

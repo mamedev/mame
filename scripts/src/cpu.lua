@@ -3014,3 +3014,20 @@ if (CPUS["VT50"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/vt50/vt50dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/vt50/vt50dasm.h")
 end
+
+--------------------------------------------------
+-- National Semiconductor PACE/INS8900
+--@src/devices/cpu/pace/pace.h,CPUS["PACE"] = true
+--------------------------------------------------
+
+if (CPUS["PACE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/pace/pace.cpp",
+		MAME_DIR .. "src/devices/cpu/pace/pace.h",
+	}
+end
+
+if (CPUS["PACE"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pace/pacedasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pace/pacedasm.h")
+end

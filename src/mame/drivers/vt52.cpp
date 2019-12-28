@@ -35,18 +35,26 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_uart(*this, "uart")
 		, m_keys(*this, "KEY%d", 0U)
+		, m_baud_sw(*this, "BAUD")
+		, m_data_sw(*this, "DATABITS")
 	{
 	}
 
 	void vt52(machine_config &mconfig);
 
+	DECLARE_WRITE_LINE_MEMBER(break_w);
+
 protected:
-	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	u8 key_r(offs_t offset);
+	DECLARE_WRITE_LINE_MEMBER(baud_9600_w);
+	void vert_count_w(u8 data);
+	void uart_xd_w(u8 data);
+	DECLARE_WRITE_LINE_MEMBER(serial_out_w);
 	DECLARE_READ_LINE_MEMBER(xrdy_eoc_r);
 
 	void rom_1k(address_map &map);
@@ -55,10 +63,19 @@ private:
 	required_device<vt5x_cpu_device> m_maincpu;
 	required_device<ay31015_device> m_uart;
 	required_ioport_array<8> m_keys;
+	required_ioport m_baud_sw;
+	required_ioport m_data_sw;
 };
 
-void vt52_state::machine_start()
+void vt52_state::machine_reset()
 {
+	bool db = m_data_sw->read();
+	m_uart->write_nb1(BIT(db, 0));
+	m_uart->write_np(BIT(db, 0));
+	m_uart->write_eps(BIT(db, 1));
+	m_uart->write_nb2(1);
+	m_uart->write_tsb(!BIT(m_baud_sw->read(), 11));
+	m_uart->write_cs(1);
 	m_uart->write_swe(0);
 }
 
@@ -71,6 +88,61 @@ u8 vt52_state::key_r(offs_t offset)
 {
 	// double negative logic courtesy of 7430 NOR gates and 74150 multiplexer
 	return !BIT(~m_keys[offset & 7]->read() & 0x3ff, (offset & 0170) >> 3);
+}
+
+WRITE_LINE_MEMBER(vt52_state::baud_9600_w)
+{
+	u16 baud = m_baud_sw->read();
+	if (!BIT(baud, 13))
+	{
+		m_uart->write_rcp(state);
+		if ((baud & 0x0380) != 0x0380)
+			m_uart->write_tcp(state);
+	}
+}
+
+void vt52_state::vert_count_w(u8 data)
+{
+	u16 baud = m_baud_sw->read();
+
+	// TODO: subcounter for 110 baud
+
+	if ((baud & 0x2400) == 0x2400)
+	{
+		if ((baud & 0x1b80) != 0x1b80)
+		{
+			bool clk = (~(baud | data) & 0x7f) == 0;
+			m_uart->write_rcp(clk);
+			m_uart->write_tcp(clk);
+		}
+		else
+		{
+			m_uart->write_rcp((~(baud | data) & 0x0e) == 0);
+			m_uart->write_tcp((~(baud | data) & 0x71) == 0);
+		}
+	}
+	else if ((baud & 0x0380) == 0x0380)
+		m_uart->write_tcp((~(baud | data) & 0x71) == 0);
+}
+
+void vt52_state::uart_xd_w(u8 data)
+{
+	if (BIT(m_data_sw->read(), 2))
+		m_uart->set_transmit_data(data | 0x80);
+	else
+		m_uart->set_transmit_data(data & 0x7f);
+}
+
+WRITE_LINE_MEMBER(vt52_state::serial_out_w)
+{
+	// TODO: break, on-line modes
+	if (!BIT(m_baud_sw->read(), 9))
+		m_uart->write_si(state);
+}
+
+WRITE_LINE_MEMBER(vt52_state::break_w)
+{
+	// TODO
 }
 
 READ_LINE_MEMBER(vt52_state::xrdy_eoc_r)
@@ -134,11 +206,11 @@ static INPUT_PORTS_START(vt52)
 	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('d') PORT_CHAR('D') PORT_CODE(KEYCODE_D) // S36
 	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('=') PORT_CHAR('+') PORT_CODE(KEYCODE_EQUALS) // S13
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('e') PORT_CHAR('E') PORT_CODE(KEYCODE_E) // S20
-	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad C (unlabeled)") PORT_CODE(KEYCODE_ASTERISK) // S67
-	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad A (unlabeled)") PORT_CODE(KEYCODE_NUMLOCK) // S65
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad Blank (right)") PORT_CODE(KEYCODE_ASTERISK) // S67
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad Blank (left)") PORT_CODE(KEYCODE_NUMLOCK) // S65
 
 	PORT_START("KEY4")
-	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad B (unlabeled)") PORT_CODE(KEYCODE_SLASH_PAD) // S66
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad Blank (center)") PORT_CODE(KEYCODE_SLASH_PAD) // S66
 	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('8') PORT_CHAR('*') PORT_CODE(KEYCODE_8) // S9
 	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('i') PORT_CHAR('I') PORT_CODE(KEYCODE_I) // S25
 	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('u') PORT_CHAR('U') PORT_CODE(KEYCODE_U) // S24
@@ -147,7 +219,7 @@ static INPUT_PORTS_START(vt52)
 	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('`') PORT_CHAR('~') PORT_CODE(KEYCODE_TILDE) // S14
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('k') PORT_CHAR('K') PORT_CODE(KEYCODE_K) // S41
 	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_CODE(KEYCODE_UP) // S68
-	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_PAUSE) // S16
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE // S33
 
 	PORT_START("KEY5")
 	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(1_PAD)) PORT_CODE(KEYCODE_1_PAD) // S77
@@ -180,13 +252,46 @@ static INPUT_PORTS_START(vt52)
 	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('/') PORT_CHAR('?') PORT_CODE(KEYCODE_SLASH) // S59
 	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('\'') PORT_CHAR('"') PORT_CODE(KEYCODE_QUOTE) // S44
 	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('-') PORT_CHAR('_') PORT_CODE(KEYCODE_MINUS) // S12
-	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Copy") PORT_CODE(KEYCODE_RCONTROL) // S62
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Copy") PORT_CHAR(UCHAR_MAMEKEY(PRTSCR)) PORT_CODE(KEYCODE_RCONTROL) // S62
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('[') PORT_CHAR(']') PORT_CODE(KEYCODE_OPENBRACE) // S28
 	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_CODE(KEYCODE_LEFT) // S80
 	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CHAR(UCHAR_SHIFT_1) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) // S49(L)/S60(R)
 
+	PORT_START("BREAK") // on keyboard but divorced from matrix (position taken over by Caps Lock) and not readable by CPU
+	PORT_BIT(1, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_PAUSE) PORT_WRITE_LINE_MEMBER(vt52_state, break_w) // S16
+
+	PORT_START("BAUD") // 7-position rotary switches under keyboard, set in combination
+	PORT_DIPNAME(0x03f1, 0x01f1, "Transmitting Speed") PORT_DIPLOCATION("S1:7,4,5,6,2,3,1")
+	PORT_DIPSETTING(0x01f1, "Off-Line (XCLK = RCLK)") // S1:1
+	PORT_DIPSETTING(0x02f1, "Full Duplex (XCLK = RCLK)") // S1:3
+	PORT_DIPSETTING(0x0371, "Full Duplex, Local Copy (XCLK = RCLK)") // S1:2
+	PORT_DIPSETTING(0x03b1, "75 Baud") // S1:6
+	PORT_DIPSETTING(0x03d1, "150 Baud") // S1:5
+	PORT_DIPSETTING(0x03e1, "300 Baud") // S1:4
+	PORT_DIPSETTING(0x03f0, "4800 Baud") // S1:7
+	PORT_DIPNAME(0x3c0e, 0x1c0e, "Receiving Speed") PORT_DIPLOCATION("S2:6,5,4,2,1,3,7") // positions labeled A through G
+	PORT_DIPSETTING(0x2c0e, "Match (Bell 103) (RCLK = XCLK)") // S2:C
+	PORT_DIPSETTING(0x340e, "Match (Bell 103), Local Copy (RCLK = XCLK)") // S2:A
+	PORT_DIPSETTING(0x380e, "110 Baud with 2 Stop Bits") // S2:B (TODO: not supported yet)
+	PORT_DIPSETTING(0x3c06, "600 Baud") // S2:D
+	PORT_DIPSETTING(0x3c0a, "1200 Baud") // S2:E
+	PORT_DIPSETTING(0x3c0c, "2400 Baud") // S2:F
+	PORT_DIPSETTING(0x1c0e, "9600 Baud") // S2:G
+	// Any combination of XCLK = RCLK with RCLK = XCLK is illegal (both lines are pulled up, halting the UART)
+
+	PORT_START("DATABITS")
+	PORT_DIPNAME(0x1, 0x1, "Data Bits") PORT_DIPLOCATION("S3:1")
+	PORT_DIPSETTING(0x0, "7 (with parity)")
+	PORT_DIPSETTING(0x1, "8 (no parity)")
+	PORT_DIPNAME(0x2, 0x2, "Parity") PORT_DIPLOCATION("W6:1")
+	PORT_DIPSETTING(0x2, "Even")
+	PORT_DIPSETTING(0x0, "Odd")
+	PORT_DIPNAME(0x4, 0x0, "Data Bit 7") PORT_DIPLOCATION("W5:1")
+	PORT_DIPSETTING(0x0, "Spacing")
+	PORT_DIPSETTING(0x4, "Marking")
+
 	PORT_START("KEYCLICK")
-	PORT_DIPNAME(1, 1, "Key Click") PORT_DIPLOCATION("S4:1") // actually two switches, but with only one effect
+	PORT_DIPNAME(1, 1, DEF_STR(Unused)) PORT_DIPLOCATION("S4:1") // not tested by VT52, and possibly not even populated
 	PORT_DIPSETTING(0, DEF_STR(Off))
 	PORT_DIPSETTING(1, DEF_STR(On))
 
@@ -201,8 +306,10 @@ void vt52_state::vt52(machine_config &mconfig)
 	VT52_CPU(mconfig, m_maincpu, 13.824_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt52_state::rom_1k);
 	m_maincpu->set_addrmap(AS_DATA, &vt52_state::ram_2k);
+	m_maincpu->baud_9600_callback().set(FUNC(vt52_state::baud_9600_w));
+	m_maincpu->vert_count_callback().set(FUNC(vt52_state::vert_count_w));
 	m_maincpu->uart_rd_callback().set(m_uart, FUNC(ay51013_device::receive));
-	m_maincpu->uart_xd_callback().set(m_uart, FUNC(ay51013_device::transmit));
+	m_maincpu->uart_xd_callback().set(FUNC(vt52_state::uart_xd_w));
 	m_maincpu->ur_flag_callback().set(m_uart, FUNC(ay51013_device::dav_r));
 	m_maincpu->ut_flag_callback().set(FUNC(vt52_state::xrdy_eoc_r));
 	m_maincpu->ruf_callback().set(m_uart, FUNC(ay51013_device::write_rdav));
@@ -212,13 +319,15 @@ void vt52_state::vt52(machine_config &mconfig)
 	m_maincpu->bell_callback().set("bell", FUNC(speaker_sound_device::level_w));
 
 	AY51013(mconfig, m_uart); // TR1402 or equivalent
+	m_uart->write_so_callback().set(FUNC(vt52_state::serial_out_w));
 
 	screen_device &screen(SCREEN(mconfig, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(13.824_MHz_XTAL, 900, 0, 720, 256, 0, 240);
+	//screen.set_raw(13.824_MHz_XTAL, 900, 0, 720, 307.2, 0, 264); // not a whole number of scans
 	screen.set_screen_update(FUNC(vt52_state::screen_update));
 
 	SPEAKER(mconfig, "mono").front_center();
-	SPEAKER_SOUND(mconfig, "bell").add_route(ALL_OUTPUTS, "mono", 0.05);
+	SPEAKER_SOUND(mconfig, "bell").add_route(ALL_OUTPUTS, "mono", 1.0); // FIXME: uses a flyback diode circuit
 }
 
 ROM_START(vt52)
@@ -232,4 +341,4 @@ ROM_START(vt52)
 	ROM_LOAD("23-002b4.e1", 0x000, 0x400, CRC(b486500c) SHA1(029f07424d6c23ee083db42d9f9c252ac728ccd0))
 ROM_END
 
-COMP(1975, vt52, 0, 0, vt52, vt52, vt52_state, empty_init, "Digital Equipment Corporation", "VT52", MACHINE_IS_SKELETON)
+COMP(1975, vt52, 0, 0, vt52, vt52, vt52_state, empty_init, "Digital Equipment Corporation", "VT52 Video Display Terminal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

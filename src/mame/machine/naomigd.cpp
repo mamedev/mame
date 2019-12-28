@@ -405,15 +405,95 @@ naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *
 	: naomi_board(mconfig, NAOMI_GDROM_BOARD, tag, owner, clock),
 	m_maincpu(*this, "dimmcpu"),
 	m_securitycpu(*this, "pic"),
+	m_i2c0(*this, "i2c_0"),
+	m_i2c1(*this, "i2c_1"),
+	m_eeprom(*this, "eeprom"),
 	picdata(*this, finder_base::DUMMY_TAG)
 {
 	image_tag = nullptr;
+	picbus = 0;
+	picbus_pullup = 0xf;
+	picbus_io[0] = 0xf;
+	picbus_io[1] = 0xf;
+	picbus_used = false;
 }
 
-void naomi_gdrom_board::sh4_map(address_map& map)
+void naomi_gdrom_board::sh4_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom().region("bios", 0);
 	map.unmap_value_high();
+}
+
+void naomi_gdrom_board::sh4_io_map(address_map &map)
+{
+	map(0x00, 0x0f).rw(FUNC(naomi_gdrom_board::i2cmem_dimm_r), FUNC(naomi_gdrom_board::i2cmem_dimm_w));
+}
+
+READ64_MEMBER(naomi_gdrom_board::i2cmem_dimm_r)
+{
+	uint8_t ret;
+
+	ret = m_i2c0->read_sda();
+	ret |= m_i2c1->read_sda();
+	ret = ret << 1;
+	if (picbus_used == true)
+		ret |= ((picbus | picbus_pullup) & 0xf) << 2;
+	else
+		ret |= m_eeprom->do_read() << 5;
+	return ret;
+}
+
+WRITE64_MEMBER(naomi_gdrom_board::i2cmem_dimm_w)
+{
+	if (data & 0x40000)
+	{
+		m_i2c0->write_sda((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+		m_i2c1->write_sda((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+	}
+	m_i2c0->write_scl((data & 0x1) ? ASSERT_LINE : CLEAR_LINE);
+	m_i2c1->write_scl((data & 0x1) ? ASSERT_LINE : CLEAR_LINE);
+	if (data & 0x0200)
+	{
+		picbus_used = true;
+		picbus_io[0] = (uint8_t)(~data >> (16 + 5 * 2 - 3)) & 0x8; // clock only for now
+		picbus = (data >> 2) & 0xf;
+		picbus_pullup = (picbus_io[0] & picbus_io[1]) & 0xf; // high if both are inputs
+		// TODO: abort timeslice of sh4
+	}
+	else
+	{
+		picbus_used = false;
+		// TODO: check if the states should be inverted
+		m_eeprom->di_write((data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->cs_write((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->clk_write((data & 0x8) ? ASSERT_LINE : CLEAR_LINE);
+	}
+}
+
+void naomi_gdrom_board::pic_map(address_map &map)
+{
+	map(0x00, 0x1f).rw(FUNC(naomi_gdrom_board::pic_dimm_r), FUNC(naomi_gdrom_board::pic_dimm_w));
+}
+
+READ8_MEMBER(naomi_gdrom_board::pic_dimm_r)
+{
+	if (offset == 1)
+		return picbus | picbus_pullup;
+	return 0;
+}
+
+WRITE8_MEMBER(naomi_gdrom_board::pic_dimm_w)
+{
+	if (offset == 1)
+	{
+		picbus = data;
+		// TODO: abort timeslice of pic
+	}
+	if (offset == 3)
+	{
+		picbus_io[1] = data; // for each bit specify direction, 0 out 1 in
+		picbus_pullup = (picbus_io[0] & picbus_io[1]) & 0xf; // high if both are inputs
+	}
 }
 
 void naomi_gdrom_board::find_file(const char *name, const uint8_t *dir_sector, uint32_t &file_start, uint32_t &file_size)
@@ -494,7 +574,7 @@ void naomi_gdrom_board::device_start()
 			memcpy((uint8_t*)m_securitycpu->space(AS_PROGRAM).get_read_ptr(0), picdata, 0x400);
 		} else {
 			// use extracted pic data
-	//      printf("This PIC key hasn't been converted to a proper PIC binary yet!\n");
+			// printf("This PIC key hasn't been converted to a proper PIC binary yet!\n");
 			memcpy(name, picdata+33, 7);
 			memcpy(name+7, picdata+25, 7);
 
@@ -591,6 +671,10 @@ void naomi_gdrom_board::device_start()
 	}
 
 	save_item(NAME(dimm_cur_address));
+	save_item(NAME(picbus));
+	save_item(NAME(picbus_pullup));
+	save_item(NAME(picbus_io));
+	save_item(NAME(picbus_used));
 }
 
 void naomi_gdrom_board::device_reset()
@@ -620,7 +704,7 @@ void naomi_gdrom_board::board_advance(uint32_t size)
 
 #define CPU_CLOCK 200000000 // need to set the correct value here
 
-void naomi_gdrom_board::device_add_mconfig(machine_config& config)
+void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 {
 	SH4LE(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_md(0, 1);
@@ -634,9 +718,18 @@ void naomi_gdrom_board::device_add_mconfig(machine_config& config)
 	m_maincpu->set_md(8, 0);
 	m_maincpu->set_sh4_clock(CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &naomi_gdrom_board::sh4_map);
+	m_maincpu->set_addrmap(AS_IO, &naomi_gdrom_board::sh4_io_map);
 	m_maincpu->set_disable();
-	PIC16C621A(config, m_securitycpu, 1000000); // need to set the correct value for clock
+	PIC16C621A(config, m_securitycpu, 2000000); // need to set the correct value for clock
+	m_securitycpu->set_addrmap(AS_IO, &naomi_gdrom_board::pic_map);
 	m_securitycpu->set_disable();
+	I2C_24C01(config, m_i2c0, 0);
+	m_i2c0->set_e0(0);
+	m_i2c0->set_wc(1);
+	I2C_24C01(config, m_i2c1, 0);
+	m_i2c1->set_e0(1);
+	m_i2c1->set_wc(1);
+	EEPROM_93C46_8BIT(config, m_eeprom, 0);
 }
 
 // DIMM firmwares:
@@ -691,6 +784,13 @@ ROM_START( dimm )
 
 	// dynamically filled with data
 	ROM_REGION(0x400, "pic", ROMREGION_ERASE00)
+	// filled with test data until actual dumps of serial memories are available
+	ROM_REGION(0x80, "i2c_0", ROMREGION_ERASE00)
+	ROM_FILL(0, 1, 0x40) ROM_FILL(1, 1, 0x00) ROM_FILL(2, 1, 0x01) ROM_FILL(3, 1, 0x02) ROM_FILL(4, 1, 0x03)
+	ROM_REGION(0x80, "i2c_1", ROMREGION_ERASE00)
+	ROM_FILL(0, 1, 0x40) ROM_FILL(1, 1, 0x80) ROM_FILL(2, 1, 0x81) ROM_FILL(3, 1, 0x82) ROM_FILL(4, 1, 0x83)
+	ROM_REGION(0x80, "eeprom", ROMREGION_ERASE00)
+	ROM_FILL(0, 1, 'M') ROM_FILL(1, 1, 'A') ROM_FILL(2, 1, 'M') ROM_FILL(3, 1, 'E') ROM_FILL(4, 12, 0x20)
 ROM_END
 
 const tiny_rom_entry *naomi_gdrom_board::device_rom_region() const

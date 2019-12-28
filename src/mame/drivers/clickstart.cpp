@@ -411,7 +411,7 @@ static INPUT_PORTS_START( clickstart )
 	PORT_BIT(0xff00, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-// There is a SEEPROM on the motherboard (type?)
+// There is a 24C08AN SEEPROM on the motherboard
 
 void clickstart_state::clickstart(machine_config &config)
 {

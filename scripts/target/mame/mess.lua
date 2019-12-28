@@ -149,6 +149,7 @@ CPUS["CR16B"] = true
 CPUS["FR"] = true
 CPUS["DSP56000"] = true
 CPUS["VT50"] = true
+CPUS["PACE"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -2071,6 +2072,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/rainbow.cpp",
 	MAME_DIR .. "src/mame/drivers/vk100.cpp",
 	MAME_DIR .. "src/mame/drivers/vt52.cpp",
+	MAME_DIR .. "src/mame/drivers/vt62.cpp",
 	MAME_DIR .. "src/mame/drivers/vt100.cpp",
 	MAME_DIR .. "src/mame/drivers/vt220.cpp",
 	MAME_DIR .. "src/mame/drivers/vt240.cpp",
@@ -2786,6 +2788,7 @@ files {
 createMESSProjects(_target, _subtarget, "natsemi")
 files {
 	MAME_DIR .. "src/mame/drivers/hh_cop400.cpp",
+	MAME_DIR .. "src/mame/drivers/ns5652.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "ncd")
@@ -2892,6 +2895,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/vt1682.cpp",
 	MAME_DIR .. "src/mame/machine/vt1682_io.h",
 	MAME_DIR .. "src/mame/machine/vt1682_io.cpp",
+	MAME_DIR .. "src/mame/machine/vt1682_uio.h",
+	MAME_DIR .. "src/mame/machine/vt1682_uio.cpp",
 	MAME_DIR .. "src/mame/machine/vt1682_alu.h",
 	MAME_DIR .. "src/mame/machine/vt1682_alu.cpp",
 	MAME_DIR .. "src/mame/machine/vt1682_timer.h",

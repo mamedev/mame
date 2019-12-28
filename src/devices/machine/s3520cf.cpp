@@ -25,7 +25,7 @@ TODO:
 
 // device type definition
 DEFINE_DEVICE_TYPE(S3520CF, s3520cf_device, "s3520cf", "Seiko Epson S-3520CF RTC")
-DEFINE_DEVICE_TYPE(RTC4553, rtc4553_device, "rtc4553", "Epson RTC-4553 RTC/EEPROM") // functionally same as above but integrated oscillator
+DEFINE_DEVICE_TYPE(RTC4553, rtc4553_device, "rtc4553", "Epson RTC-4553 RTC/SRAM") // functionally same as above but integrated oscillator
 
 
 //**************************************************************************
@@ -44,6 +44,7 @@ s3520cf_device::s3520cf_device(const machine_config &mconfig, const char *tag, d
 s3520cf_device::s3520cf_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
+	, m_region(*this, DEVICE_SELF)
 	, m_dir(0), m_latch(0), m_reset_line(0), m_read_latch(0), m_bitstream(0), m_stream_pos(0), m_mode(0), m_sysr(0), m_cntrl1(0), m_cntrl2(0)
 {
 }
@@ -156,7 +157,14 @@ void s3520cf_device::device_reset()
 void s3520cf_device::nvram_default()
 {
 	for (auto & elem : m_nvdata)
-		elem = 0xff;
+		elem = 0x00;
+
+	if (!m_region.found())
+		logerror("s3520cf(%s) region not found\n", tag());
+	else if (m_region->bytes() != 15)
+		logerror("s3520cf(%s) region length 0x%x expected 0x%x\n", tag(), m_region->bytes(), 15);
+	else
+		memcpy(m_nvdata, m_region->base(), 15);
 }
 
 //-------------------------------------------------

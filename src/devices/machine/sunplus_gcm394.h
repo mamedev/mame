@@ -17,6 +17,7 @@
 #include "sunplus_gcm394_video.h"
 #include "spg2xx_audio.h"
 
+typedef device_delegate<void (uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)> sunplus_gcm394_cs_callback_device;
 
 class sunplus_gcm394_base_device : public unsp_20_device, public device_mixer_interface
 {
@@ -32,12 +33,17 @@ public:
 		m_screen(*this, finder_base::DUMMY_TAG),
 		m_spg_video(*this, "spgvideo"),
 		m_spg_audio(*this, "spgaudio"),
+		m_internalrom(*this, "internal"),
 		m_porta_in(*this),
 		m_portb_in(*this),
 		m_porta_out(*this),
+		m_nand_read_cb(*this),
+		m_csbase(0x20000),
 		m_space_read_cb(*this),
 		m_space_write_cb(*this),
-		m_mapping_write_cb(*this)
+		m_mapping_write_cb(*this),
+		m_boot_mode(0),
+		m_cs_callback(*this, DEVICE_SELF, FUNC(sunplus_gcm394_base_device::default_cs_callback))
 	{
 	}
 
@@ -52,12 +58,19 @@ public:
 	auto space_write_callback() { return m_space_write_cb.bind(); }
 	auto mapping_write_callback() { return m_mapping_write_cb.bind(); }
 
+	auto nand_read_callback() { return m_nand_read_cb.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(vblank) { m_spg_video->vblank(state); }
 
 	virtual void device_add_mconfig(machine_config& config) override;
 
+	void set_bootmode(int mode) { m_boot_mode = mode; }
+
 	IRQ_CALLBACK_MEMBER(irq_vector_cb);
+	template <typename... T> void set_cs_config_callback(T &&... args) { m_cs_callback.set(std::forward<T>(args)...); }
+	void default_cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4 );
+
+	void set_cs_space(address_space* csspace) { m_cs_space = csspace; }
 
 protected:
 
@@ -65,24 +78,26 @@ protected:
 	virtual void device_reset() override;
 
 	void gcm394_internal_map(address_map &map);
+	void base_internal_map(address_map &map);
 
 	required_device<screen_device> m_screen;
 	required_device<gcm394_video_device> m_spg_video;
 	required_device<sunplus_gcm394_audio_device> m_spg_audio;
+	optional_memory_region m_internalrom;
 
 	devcb_read16 m_porta_in;
 	devcb_read16 m_portb_in;
 
 	devcb_write16 m_porta_out;
 
-	uint16_t m_dma_params[7];
+	uint16_t m_dma_params[7][2];
 
 	// unk 78xx
 	uint16_t m_7803;
 
 	uint16_t m_7807;
 
-	uint16_t m_7810;
+	uint16_t m_membankswitch_7810;
 
 	uint16_t m_7816;
 	uint16_t m_7817;
@@ -90,11 +105,7 @@ protected:
 
 	uint16_t m_7819;
 
-	uint16_t m_7820;
-	uint16_t m_7821;
-	uint16_t m_7822;
-	uint16_t m_7823;
-	uint16_t m_7824;
+	uint16_t m_782x[5];
 
 	uint16_t m_782d;
 
@@ -143,6 +154,18 @@ protected:
 	uint16_t m_7960;
 	uint16_t m_7961;
 
+	devcb_read16 m_nand_read_cb;
+	int m_csbase;
+
+	DECLARE_READ16_MEMBER(internalrom_lower32_r);
+
+	address_space* m_cs_space;
+
+	DECLARE_READ16_MEMBER(cs_space_r);
+	DECLARE_WRITE16_MEMBER(cs_space_w);
+	DECLARE_READ16_MEMBER(cs_bank_space_r);
+	DECLARE_WRITE16_MEMBER(cs_bank_space_w);
+
 private:
 	devcb_read16 m_space_read_cb;
 	devcb_write16 m_space_write_cb;
@@ -150,11 +173,17 @@ private:
 
 	DECLARE_READ16_MEMBER(unk_r);
 	DECLARE_WRITE16_MEMBER(unk_w);
+	
+	void write_dma_params(int channel, int offset, uint16_t data);
+	uint16_t read_dma_params(int channel, int offset);
+	void trigger_systemm_dma(address_space &space, int channel, uint16_t data);
 
-
-	DECLARE_WRITE16_MEMBER(system_dma_params_w);
-	DECLARE_WRITE16_MEMBER(system_dma_trigger_w);
+	DECLARE_READ16_MEMBER(system_dma_params_channel0_r);
+	DECLARE_WRITE16_MEMBER(system_dma_params_channel0_w);
+	DECLARE_READ16_MEMBER(system_dma_params_channel1_r);
+	DECLARE_WRITE16_MEMBER(system_dma_params_channel1_w);
 	DECLARE_READ16_MEMBER(system_dma_status_r);
+	DECLARE_WRITE16_MEMBER(system_dma_trigger_w);
 
 	DECLARE_READ16_MEMBER(unkarea_780f_status_r);
 	DECLARE_READ16_MEMBER(unkarea_78fb_status_r);
@@ -164,8 +193,10 @@ private:
 
 	DECLARE_WRITE16_MEMBER(unkarea_7807_w);
 
-	DECLARE_READ16_MEMBER(unkarea_7810_r);
-	DECLARE_WRITE16_MEMBER(unkarea_7810_w);
+	DECLARE_WRITE16_MEMBER(waitmode_enter_780c_w);
+
+	DECLARE_READ16_MEMBER(membankswitch_7810_r);
+	DECLARE_WRITE16_MEMBER(membankswitch_7810_w);
 
 	DECLARE_WRITE16_MEMBER(unkarea_7816_w);
 	DECLARE_WRITE16_MEMBER(unkarea_7817_w);
@@ -173,11 +204,7 @@ private:
 	DECLARE_READ16_MEMBER(unkarea_7819_r);
 	DECLARE_WRITE16_MEMBER(unkarea_7819_w);
 
-	DECLARE_WRITE16_MEMBER(unkarea_7820_w);
-	DECLARE_WRITE16_MEMBER(unkarea_7821_w);
-	DECLARE_WRITE16_MEMBER(unkarea_7822_w);
-	DECLARE_WRITE16_MEMBER(unkarea_7823_w);
-	DECLARE_WRITE16_MEMBER(unkarea_7824_w);
+	DECLARE_WRITE16_MEMBER(chipselect_csx_memory_device_control_w);
 
 	DECLARE_WRITE16_MEMBER(unkarea_7835_w);
 
@@ -249,14 +276,22 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(videoirq_w);
 	DECLARE_WRITE_LINE_MEMBER(audioirq_w);
 
+	DECLARE_READ16_MEMBER(system_7a3a_r)
+	{
+		return machine().rand();
+	}
+
 	void checkirq6();
 
 	emu_timer *m_unk_timer;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	uint8_t* m_gfxregion;
-	uint32_t m_gfxregionsize;
-	uint16_t read_space(uint32_t offset);
+	inline uint16_t read_space(uint32_t offset);
+	inline void write_space(uint32_t offset, uint16_t data);
+
+	// config registers (external pins)
+	int m_boot_mode; // 2 pins determine boot mode, likely only read at power-on
+	sunplus_gcm394_cs_callback_device m_cs_callback;
 
 };
 
@@ -285,6 +320,7 @@ public:
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
 		m_testval = 0;
+		m_csbase = 0x30000;
 	}
 
 	generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -299,13 +335,19 @@ private:
 	DECLARE_READ16_MEMBER(unkarea_7850_r);
 	DECLARE_READ16_MEMBER(unkarea_7854_r);
 
+	DECLARE_WRITE16_MEMBER(nand_command_w);
+
 	DECLARE_WRITE16_MEMBER(flash_addr_low_w);
 	DECLARE_WRITE16_MEMBER(flash_addr_high_w);
 
 	int m_testval;
 
+	uint16_t m_nandcommand;
+
 	uint16_t m_flash_addr_low;
 	uint16_t m_flash_addr_high;
+
+	int m_curblockaddr;
 
 };
 

@@ -44,6 +44,7 @@ public:
 	void hedpanio(machine_config &config);
 	void hedpanic(machine_config &config);
 	void fantstry(machine_config &config);
+	void fantstrya(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -87,6 +88,7 @@ private:
 	template<unsigned Layer> TILE_GET_INFO_MEMBER(get_tile_info_16x16);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
+	void fantstrya_map(address_map &map);
 	void hedpanic_map(address_map &map);
 	void jumppop_map(address_map &map);
 	void mchampdx_map(address_map &map);

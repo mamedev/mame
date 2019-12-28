@@ -246,16 +246,16 @@ public:
 	void init_omegrace();
 
 private:
+	TIMER_CALLBACK_MEMBER(periodic_int);
 	DECLARE_READ8_MEMBER(omegrace_vg_go_r);
 	DECLARE_READ8_MEMBER(omegrace_spinner1_r);
 	DECLARE_WRITE8_MEMBER(omegrace_leds_w);
-	DECLARE_WRITE8_MEMBER(omegrace_soundlatch_w);
 	void main_map(address_map &map);
 	void port_map(address_map &map);
 	void sound_map(address_map &map);
 	void sound_port(address_map &map);
 
-	virtual void machine_start() override { m_leds.resolve(); }
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	required_device<cpu_device> m_maincpu;
@@ -263,6 +263,7 @@ private:
 	required_device<dvg_device> m_dvg;
 	required_device<generic_latch_8_device> m_soundlatch;
 	output_finder<4> m_leds;
+	emu_timer *m_gbnmi;
 };
 
 
@@ -272,10 +273,26 @@ private:
  *
  *************************************/
 
+void omegrace_state::machine_start()
+{
+	m_leds.resolve();
+
+	// Interrupt caused by overflow pulses from 74LS161 clocked by 74LS393 dividing .75 MHz output of 74LS161
+	attotime period = attotime::from_hz(12_MHz_XTAL/16/256/12); // ~250 Hz
+	m_gbnmi = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(omegrace_state::periodic_int), this));
+	m_gbnmi->adjust(period, 0, period); // first NMI must not arrive immediately
+}
+
 void omegrace_state::machine_reset()
 {
 	/* Omega Race expects the vector processor to be ready. */
 	m_dvg->reset_w();
+}
+
+TIMER_CALLBACK_MEMBER(omegrace_state::periodic_int)
+{
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -354,13 +371,6 @@ WRITE8_MEMBER(omegrace_state::omegrace_leds_w)
 }
 
 
-WRITE8_MEMBER(omegrace_state::omegrace_soundlatch_w)
-{
-	m_soundlatch->write(data);
-	m_audiocpu->set_input_line(0, HOLD_LINE);
-}
-
-
 
 /*************************************
  *
@@ -390,7 +400,7 @@ void omegrace_state::port_map(address_map &map)
 	map(0x11, 0x11).portr("IN0");                /* Player 1 input */
 	map(0x12, 0x12).portr("IN1");                /* Player 2 input */
 	map(0x13, 0x13).w(FUNC(omegrace_state::omegrace_leds_w));          /* coin counters, leds, flip screen */
-	map(0x14, 0x14).w(FUNC(omegrace_state::omegrace_soundlatch_w));    /* Sound command */
+	map(0x14, 0x14).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x15, 0x15).r(FUNC(omegrace_state::omegrace_spinner1_r));       /* 1st controller */
 	map(0x16, 0x16).portr("SPIN1");              /* 2nd controller (cocktail) */
 }
@@ -520,23 +530,21 @@ void omegrace_state::omegrace(machine_config &config)
 	/* main CPU */
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS161, Pin 13 = divide by 4 */
-	Z80(config, m_maincpu, XTAL(12'000'000)/4);
+	Z80(config, m_maincpu, 12_MHz_XTAL/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &omegrace_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &omegrace_state::port_map);
-	m_maincpu->set_periodic_int(FUNC(omegrace_state::irq0_line_hold), attotime::from_hz(250));
 
 	/* audio CPU */
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS161, Pin 12 = divide by 8 */
 	/* Fed to CPU as 1.5mhz though line J4-D */
-	Z80(config, m_audiocpu, XTAL(12'000'000)/8);
+	Z80(config, m_audiocpu, 12_MHz_XTAL/8);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &omegrace_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &omegrace_state::sound_port);
-	m_audiocpu->set_periodic_int(FUNC(omegrace_state::nmi_line_pulse), attotime::from_hz(250));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5101 + battery
 
-	WATCHDOG_TIMER(config, "watchdog");
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_hz(12_MHz_XTAL/16/256/256));
 
 	/* video hardware */
 	VECTOR(config, "vector", 0);
@@ -553,12 +561,13 @@ void omegrace_state::omegrace(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
 
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS92, Pin 8 = divide by 12 */
-	AY8912(config, "ay1", XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8912(config, "ay1", 12_MHz_XTAL/12).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	AY8912(config, "ay2", XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8912(config, "ay2", 12_MHz_XTAL/12).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 

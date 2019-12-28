@@ -279,7 +279,7 @@
 	</software>
 
 	<software name="benkei1" cloneof="benkei">
-		<description>Benkei Gaiden (Alt)</description>
+		<description>Benkei Gaiden (alt)</description>
 		<year>1989</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SS89002"/>
@@ -307,7 +307,7 @@
 	</software>
 
 	<software name="bikkuri1" cloneof="bikkuri">
-		<description>Bikkuriman World (Alt)</description>
+		<description>Bikkuriman World (alt)</description>
 		<year>1987</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="HC62002"/>
@@ -550,7 +550,7 @@
 	</software>
 
 	<software name="chikuden1" cloneof="chikuden">
-		<description>Chikudenya Toubei - Kubikiri Yakata Yori (Alt)</description>
+		<description>Chikudenya Toubei - Kubikiri Yakata Yori (alt)</description>
 		<year>1990</year>
 		<publisher>Naxat</publisher>
 		<info name="serial" value="NX89004"/>
@@ -634,7 +634,7 @@
 	</software>
 
 	<software name="coryoon1" cloneof="coryoon">
-		<description>Coryoon - Child of Dragon (Alt)</description>
+		<description>Coryoon - Child of Dragon (alt)</description>
 		<year>1991</year>
 		<publisher>Naxat</publisher>
 		<info name="serial" value="NX91004"/>
@@ -910,7 +910,7 @@
 	</software>
 
 	<software name="download1" cloneof="download">
-		<description>Download (Alt)</description>
+		<description>Download (alt)</description>
 		<year>1990</year>
 		<publisher>NEC Avenue</publisher>
 		<info name="serial" value="NAPH-1007"/>
@@ -952,7 +952,7 @@
 	</software>
 
 	<software name="dsaber1" cloneof="dsaber">
-		<description>Dragon Saber - After Story of Dragon Spirit (Alt)</description>
+		<description>Dragon Saber - After Story of Dragon Spirit (alt)</description>
 		<year>1991</year>
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NC91005"/>
@@ -994,7 +994,7 @@
 	</software>
 
 	<software name="droprock1" cloneof="droprock">
-		<description>Drop Rock Hora Hora (Alt)</description>
+		<description>Drop Rock Hora Hora (alt)</description>
 		<year>1990</year>
 		<publisher>Data East</publisher>
 		<info name="serial" value="DE90005"/>
@@ -1106,7 +1106,7 @@
 	</software>
 
 	<software name="f1circus1" cloneof="f1circus">
-		<description>F1 Circus (Alt)</description>
+		<description>F1 Circus (alt)</description>
 		<year>1990</year>
 		<publisher>Nihon Bussan</publisher>
 		<info name="serial" value="NB90002"/>
@@ -1699,7 +1699,7 @@
 	</software>
 
 	<software name="jinmu1" cloneof="jinmu">
-		<description>Jinmu Denshou (Alt)</description>
+		<description>Jinmu Denshou (alt)</description>
 		<year>1989</year>
 		<publisher>Big Club</publisher>
 		<info name="serial" value="BG01003"/>
@@ -1727,7 +1727,7 @@
 	</software>
 
 	<software name="juuouki1" cloneof="juuouki">
-		<description>Juuouki (Alt)</description>
+		<description>Juuouki (alt)</description>
 		<year>1989</year>
 		<publisher>NEC</publisher>
 		<info name="serial" value="H68G-1006"/>
@@ -1956,7 +1956,7 @@
 	</software>
 
 	<software name="ladyswrd1" cloneof="ladyswrd">
-		<description>Lady Sword (Alt)</description>
+		<description>Lady Sword (alt)</description>
 		<year>19??</year>
 		<publisher>Game Express</publisher>
 		<part name="cart" interface="pce_cart">
@@ -2051,7 +2051,7 @@
 	</software>
 
 	<software name="mjgakmld1" cloneof="mjgakmld">
-		<description>Mahjong Gakuen Mild - Touma Soushirou Toujou (Alt)</description>
+		<description>Mahjong Gakuen Mild - Touma Soushirou Toujou (alt)</description>
 		<year>1990</year>
 		<publisher>Face</publisher>
 		<info name="serial" value="FA02-004"/>
@@ -2345,7 +2345,7 @@
 	</software>
 
 	<software name="motorod2a" cloneof="motorod2">
-		<description>Moto Roader II (Alt)</description>
+		<description>Moto Roader II (alt)</description>
 		<year>1991</year>
 		<publisher>Masiya</publisher>
 		<info name="serial" value="NCS91002"/>
@@ -2373,7 +2373,7 @@
 	</software>
 
 	<software name="mrheli1" cloneof="mrheli">
-		<description>Mr. Heli no Daibouken (Alt)</description>
+		<description>Mr. Heli no Daibouken (alt)</description>
 		<year>1989</year>
 		<publisher>Irem</publisher>
 		<info name="serial" value="IC01002"/>
@@ -2803,7 +2803,7 @@
 	</software>
 
 	<software name="pcdenja" cloneof="pcdenj">
-		<description>PC Denjin - Punkic Cyborgs (Alt)</description>
+		<description>PC Denjin - Punkic Cyborgs (alt)</description>
 		<year>1992</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="HC92053"/>
@@ -2831,7 +2831,7 @@
 	</software>
 
 	<software name="pcgenja" cloneof="pcgenj">
-		<description>PC Genjin - Pithecanthropus Computerurus (Alt)</description>
+		<description>PC Genjin - Pithecanthropus Computerurus (alt)</description>
 		<year>1989</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="HC89024"/>
@@ -2911,7 +2911,7 @@
 	</software>
 
 	<software name="populous1" cloneof="populous">
-		<description>Populous (Alt)</description>
+		<description>Populous (alt)</description>
 		<year>1991</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="HC91041"/>
@@ -2940,7 +2940,7 @@
 	</software>
 
 	<software name="pdrift1" cloneof="pdrift">
-		<description>Power Drift (Alt)</description>
+		<description>Power Drift (alt)</description>
 		<year>1990</year>
 		<publisher>Asmik</publisher>
 		<info name="serial" value="AS02002"/>
@@ -3243,7 +3243,7 @@
 
   <!-- later revision, password parser bugfix for passwords with 8 lives -->
   <software name="rtypep21" cloneof="rtypep2">
-		<description>R-Type Part-2 (Alt)</description>
+		<description>R-Type Part-2 (alt)</description>
 		<year>1988</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="HC63009"/>
@@ -3839,7 +3839,7 @@
 	</software>
 
 	<software name="shingen1" cloneof="shingen">
-		<description>Takeda Shingen (Alt)</description>
+		<description>Takeda Shingen (alt)</description>
 		<year>1989</year>
 		<publisher>Aicom</publisher>
 		<info name="serial" value="AC89002"/>
@@ -3867,7 +3867,7 @@
 	</software>
 
 	<software name="tatsujinp" cloneof="tatsujin">
-		<description>Tatsujin (Prototype)</description>
+		<description>Tatsujin (prototype)</description>
 		<year>1992</year>
 		<publisher>Taito</publisher>
 		<part name="cart" interface="pce_cart">

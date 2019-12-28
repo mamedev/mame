@@ -20,6 +20,8 @@ vt5x_cpu_device::vt5x_cpu_device(const machine_config &mconfig, device_type type
 	, m_ram_config("data", ENDIANNESS_LITTLE, 8, 6 + ybits, 0) // actually 7 bits wide
 	, m_rom_cache(nullptr)
 	, m_ram_cache(nullptr)
+	, m_baud_9600_callback(*this)
+	, m_vert_count_callback(*this)
 	, m_uart_rd_callback(*this)
 	, m_uart_xd_callback(*this)
 	, m_ur_flag_callback(*this)
@@ -30,6 +32,8 @@ vt5x_cpu_device::vt5x_cpu_device(const machine_config &mconfig, device_type type
 	, m_frq_callback(*this)
 	, m_bell_callback(*this)
 	, m_cen_callback(*this)
+	, m_csf_callback(*this)
+	, m_ccf_callback(*this)
 	, m_bbits(bbits)
 	, m_ybits(ybits)
 	, m_pc(0)
@@ -92,6 +96,8 @@ device_memory_interface::space_config_vector vt5x_cpu_device::memory_space_confi
 void vt5x_cpu_device::device_resolve_objects()
 {
 	// resolve callbacks
+	m_baud_9600_callback.resolve_safe();
+	m_vert_count_callback.resolve_safe();
 	m_uart_rd_callback.resolve_safe(0);
 	m_uart_xd_callback.resolve_safe();
 	m_ur_flag_callback.resolve_safe(0);
@@ -102,6 +108,8 @@ void vt5x_cpu_device::device_resolve_objects()
 	m_frq_callback.resolve_safe(1);
 	m_bell_callback.resolve_safe();
 	m_cen_callback.resolve_safe();
+	m_csf_callback.resolve_safe(1);
+	m_ccf_callback.resolve_safe(1);
 }
 
 void vt52_cpu_device::device_resolve_objects()
@@ -176,6 +184,9 @@ void vt5x_cpu_device::device_reset()
 	m_horiz_count = 0;
 	m_vert_count = 0;
 	m_top_of_screen = true;
+
+	m_baud_9600_callback(0);
+	m_vert_count_callback(0);
 }
 
 offs_t vt5x_cpu_device::translate_xy() const
@@ -372,6 +383,15 @@ void vt5x_cpu_device::execute_tw(u8 inst)
 		m_done_ff = true;
 }
 
+void vt52_cpu_device::execute_tw(u8 inst)
+{
+	vt5x_cpu_device::execute_tw(inst);
+
+	// ZCAV also borrows from the upper half of AC on the VT52
+	if (inst == 0100)
+		m_ac = (m_ac - 020) & 0177;
+}
+
 void vt50_cpu_device::execute_tg(u8 inst)
 {
 	switch (inst & 0362)
@@ -460,21 +480,21 @@ void vt5x_cpu_device::execute_th(u8 inst)
 		switch (inst & 0160)
 		{
 		case 0000:
-			// M0: PSCJ (TODO: printer flag)
+			// M0: PSCJ
 			// M1: URJ
 			if (m_mode_ff)
 				m_load_pc = m_ur_flag_callback();
 			else
-				m_load_pc = true;
+				m_load_pc = m_csf_callback();
 			break;
 
 		case 0020:
-			// M0: TABJ
+			// M0: TABJ (jump on 74H10 NAND of AC0–2; documentation incorrectly suggests the opposite)
 			// M1: AEMJ
 			if (m_mode_ff)
 				m_load_pc = m_ac == m_ram_do;
 			else
-				m_load_pc = (m_ac & 7) == 7;
+				m_load_pc = (m_ac & 7) != 7;
 			break;
 
 		case 0040:
@@ -496,12 +516,12 @@ void vt5x_cpu_device::execute_th(u8 inst)
 			break;
 
 		case 0100:
-			// M0: PRQJ (TODO: printer flag)
+			// M0: PRQJ
 			// M1: AEM2J
 			if (m_mode_ff)
 				m_load_pc = m_ac == m_ram_do;
 			else
-				m_load_pc = true;
+				m_load_pc = m_ccf_callback();
 			break;
 
 		case 0120:
@@ -536,7 +556,7 @@ void vt5x_cpu_device::execute_th(u8 inst)
 
 void vt52_cpu_device::execute_th(u8 inst)
 {
-	// not actually synchronized to TH
+	// not actually synchronized to TH (but may be gated externally with EN CYCLE)
 	if ((inst & 0362) == 0162)
 		m_graphic_callback(m_ram_do);
 
@@ -561,19 +581,26 @@ void vt5x_cpu_device::clock_video_counters()
 			m_vert_count = m_frq_callback() ? 03000 : 02000;
 			m_horiz_count = 0;
 			m_top_of_screen = true;
+			m_vert_count_callback(0);
 		}
 		else
 		{
 			m_vert_count++;
 			if (m_horiz_count == 10 * 16)
 				m_horiz_count = 0;
+			m_vert_count_callback(m_vert_count & 0177);
 		}
 	}
 	else
 	{
 		m_horiz_count++;
 		if (m_horiz_count == 8)
+		{
 			m_top_of_screen = false;
+			m_baud_9600_callback(0);
+		}
+		else if (m_horiz_count == 4)
+			m_baud_9600_callback(1);
 	}
 }
 
@@ -602,7 +629,7 @@ void vt5x_cpu_device::execute_run()
 			if (!m_write_ff)
 				m_ram_do = m_ram_cache->read_byte(translate_xy()) & 0177;
 			m_cursor_active = m_ac == (m_x ^ (m_x8 ? 8 : 0));
-			if (m_video_process && m_horiz_count >= 2 * 16)
+			if (m_video_process && u8(m_horiz_count - 2) >= 2 * 16)
 				m_x = (m_x + 1) & 0177;
 			m_t = 3;
 			break;
