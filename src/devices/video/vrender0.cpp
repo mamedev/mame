@@ -24,13 +24,15 @@
 #include "emu.h"
 #include "vrender0.h"
 
+#include <algorithm>
+
 /*****************************************************************************
  DEVICE INTERFACE
  *****************************************************************************/
 
 DEFINE_DEVICE_TYPE(VIDEO_VRENDER0, vr0video_device, "vr0video", "MagicEyes VRender0 Video Engine")
 
-vr0video_device::vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vr0video_device::vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, VIDEO_VRENDER0, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_idleskip_cb(*this)
@@ -125,6 +127,16 @@ WRITE16_MEMBER(vr0video_device::flip_count_w)
 
 void vr0video_device::device_start()
 {
+	for (int color = 0; color < 0x100; color++)
+	{
+		m_multiply_lookup[color] = std::make_unique<u8[]>(0x100 + 1);
+		m_additive_lookup[color] = std::make_unique<u8[]>(0x100 + 1);
+		for (int level = 0; level < 0x100 + 1; level++)
+		{
+			m_multiply_lookup[color][level] = std::max(0, std::min(0xff, (color * level) >> 8));
+			m_additive_lookup[color][level] = std::min(0xff, color + level);
+		}
+	}
 	m_idleskip_cb.resolve_safe();
 
 	save_item(NAME(m_InternalPalette));
@@ -162,9 +174,9 @@ void vr0video_device::device_start()
 	save_item(NAME(m_dither_mode));
 }
 
-void vr0video_device::set_areas(uint16_t *textureram, uint16_t *frameram)
+void vr0video_device::set_areas(u16 *textureram, u16 *frameram)
 {
-	m_textureram = (uint8_t *)textureram;
+	m_textureram = (u8 *)textureram;
 	m_packetram = textureram;
 	m_frameram = frameram;
 }
@@ -185,74 +197,63 @@ void vr0video_device::device_reset()
  IMPLEMENTATION
  *****************************************************************************/
 
-struct QuadInfo
-{
-	uint16_t *Dest;
-	uint32_t Pitch;   //in UINT16s
-	uint32_t w,h;
-	uint32_t Tx;
-	uint32_t Ty;
-	uint32_t Txdx;
-	uint32_t Tydx;
-	uint32_t Txdy;
-	uint32_t Tydy;
-	uint16_t TWidth;
-	uint16_t THeight;
-	union _u
-	{
-		uint8_t *Imageb;
-		uint16_t *Imagew;
-	} u;
-	uint16_t *Tile;
-	uint16_t *Pal;
-	uint32_t TransColor;
-	uint32_t Shade;
-	uint8_t Clamp;
-	uint8_t Trans;
-	uint8_t SrcAlpha;
-	uint32_t SrcColor;
-	uint8_t DstAlpha;
-	uint32_t DstColor;
-};
-
 /*
 Pick a rare enough color to disable transparency (that way I save a cmp per loop to check
 if I must draw transparent or not. The palette build will take this color in account so
 no color in the palette will have this value
 */
-#define NOTRANSCOLOR    0xecda
+static constexpr unsigned ALPHA_BIT = 1;
+static constexpr unsigned SHADE_BIT = 2;
 
-#define RGB32(r,g,b) ((r << 16) | (g << 8) | (b << 0))
-#define RGB16(r,g,b) ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3)
+static constexpr u16 NOTRANSCOLOR = 0xecda;
 
-static inline uint16_t RGB32TO16(uint32_t rgb)
+static inline u32 RGB32(u8 r, u8 g, u8 b) { return (r << 16) | (g << 8) | (b << 0); }
+static inline u16 RGB16(u8 r, u8 g, u8 b) { return ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3); }
+
+static inline u16 RGB32TO16(u32 rgb)
 {
 	return (((rgb >> (16 + 3)) & 0x1f) << 11) | (((rgb >> (8 + 2)) & 0x3f) << 5) | (((rgb >> (3)) & 0x1f) << 0);
 }
 
-#define EXTRACTR8(Src)  (((Src >> 11) << 3) & 0xff)
-#define EXTRACTG8(Src)  (((Src >>  5) << 2) & 0xff)
-#define EXTRACTB8(Src)  (((Src >>  0) << 3) & 0xff)
+static inline u8 EXTRACTR8(u16 Src) { return ((Src >> 11) << 3) & 0xff; }
+static inline u8 EXTRACTG8(u16 Src) { return ((Src >>  5) << 2) & 0xff; }
+static inline u8 EXTRACTB8(u16 Src) { return ((Src >>  0) << 3) & 0xff; }
 
-static inline uint16_t Shade(uint16_t Src, uint32_t Shade)
+inline void vr0video_device::DrawPixel(QuadInfo *Quad, u16 *Dst, u16 Src)
 {
-	uint32_t scr = (EXTRACTR8(Src) * ((Shade >> 16) & 0xff)) >> 8;
-	uint32_t scg = (EXTRACTG8(Src) * ((Shade >>  8) & 0xff)) >> 8;
-	uint32_t scb = (EXTRACTB8(Src) * ((Shade >>  0) & 0xff)) >> 8;
+	if (Quad->Blend & ALPHA_BIT)
+		*Dst = Alpha(Quad, Src, *Dst);
+	else if (Quad->Blend & SHADE_BIT)
+		*Dst = Shade(Quad, Src);
+	else
+		*Dst = Src;
+}
+
+inline u16 vr0video_device::Shade(QuadInfo *Quad, u16 Src)
+{
+	u32 scr = m_multiply_lookup[EXTRACTR8(Src)][(Quad->Shade >> 16) & 0xff];
+	u32 scg = m_multiply_lookup[EXTRACTG8(Src)][(Quad->Shade >>  8) & 0xff];
+	u32 scb = m_multiply_lookup[EXTRACTB8(Src)][(Quad->Shade >>  0) & 0xff];
 	return RGB16(scr, scg, scb);
 }
 
-static uint16_t Alpha(QuadInfo *Quad, uint16_t Src, uint16_t Dst)
+u16 vr0video_device::Alpha(QuadInfo *Quad, u16 Src, u16 Dst)
 {
-	uint32_t scr = (EXTRACTR8(Src) * ((Quad->Shade >> 16) & 0xff)) >> 8;
-	uint32_t scg = (EXTRACTG8(Src) * ((Quad->Shade >>  8) & 0xff)) >> 8;
-	uint32_t scb = (EXTRACTB8(Src) * ((Quad->Shade >>  0) & 0xff)) >> 8;
-	uint32_t dcr = EXTRACTR8(Dst);
-	uint32_t dcg = EXTRACTG8(Dst);
-	uint32_t dcb = EXTRACTB8(Dst);
+	u32 scr = EXTRACTR8(Src);
+	u32 scg = EXTRACTG8(Src);
+	u32 scb = EXTRACTB8(Src);
+	if (Quad->Blend & SHADE_BIT)
+	{
+		scr = m_multiply_lookup[scr][(Quad->Shade >> 16) & 0xff];
+		scg = m_multiply_lookup[scg][(Quad->Shade >>  8) & 0xff];
+		scb = m_multiply_lookup[scb][(Quad->Shade >>  0) & 0xff];
+	}
+	u32 dcr = EXTRACTR8(Dst);
+	u32 dcg = EXTRACTG8(Dst);
+	u32 dcb = EXTRACTB8(Dst);
 
-	uint32_t smulr, smulg, smulb;
-	uint32_t dmulr, dmulg, dmulb;
+	u32 smulr, smulg, smulb;
+	u32 dmulr, dmulg, dmulb;
 
 	switch (Quad->SrcAlpha & 0x1f)
 	{
@@ -321,202 +322,127 @@ static uint16_t Alpha(QuadInfo *Quad, uint16_t Src, uint16_t Dst)
 			break;
 	}
 
-	if (Quad->DstAlpha&0x20)
+	if (Quad->DstAlpha & 0x20)
 	{
 		dmulr = 0x100 - dmulr;
 		dmulg = 0x100 - dmulg;
 		dmulb = 0x100 - dmulb;
 	}
 
-
-	dcr = (scr * smulr + dcr * dmulr) >> 8;
-	if (dcr > 0xff)
-		dcr = 0xff;
-
-	dcg = (scg * smulg + dcg * dmulg) >> 8;
-	if (dcg > 0xff)
-		dcg = 0xff;
-
-	dcb = (scb * smulb + dcb * dmulb) >> 8;
-	if (dcb > 0xff)
-		dcb = 0xff;
+	dcr = m_additive_lookup[m_multiply_lookup[scr][smulr]][m_multiply_lookup[dcr][dmulr]];
+	dcg = m_additive_lookup[m_multiply_lookup[scg][smulg]][m_multiply_lookup[dcg][dmulg]];
+	dcb = m_additive_lookup[m_multiply_lookup[scb][smulb]][m_multiply_lookup[dcb][dmulb]];
 
 	return RGB16(dcr, dcg, dcb);
 }
 
-#define TILENAME(bpp, t, a) \
-static void DrawQuad##bpp##t##a(QuadInfo *Quad)
-
 //TRUST ON THE COMPILER OPTIMIZATIONS
-#define TILETEMPL(bpp, t, a) \
-TILENAME(bpp, t, a)\
-{\
-	uint32_t TransColor = Quad->Trans ? RGB32TO16(Quad->TransColor) : NOTRANSCOLOR;\
-	uint32_t x, y;\
-	uint16_t *line = Quad->Dest;\
-	uint32_t y_tx = Quad->Tx, y_ty = Quad->Ty;\
-	uint32_t x_tx, x_ty;\
-	uint32_t Maskw = Quad->TWidth - 1;\
-	uint32_t Maskh = Quad->THeight - 1;\
-	uint32_t W = Quad->TWidth >> 3;\
-\
-	for (y = 0; y < Quad->h; ++y)\
-	{\
-		uint16_t *pixel = line;\
-		x_tx = y_tx;\
-		x_ty = y_ty;\
-		for (x = 0; x < Quad->w; ++x)\
-		{\
-			uint32_t Offset;\
-			uint32_t tx = x_tx >> 9;\
-			uint32_t ty = x_ty >> 9;\
-			uint16_t Color;\
-			if (Quad->Clamp)\
-			{\
-				if (tx > Maskw)\
-					goto Clamped;\
-				if (ty > Maskh)\
-					goto Clamped;\
-			}\
-			else\
-			{\
-				tx &= Maskw;\
-				ty &= Maskh;\
-			}\
-\
-			if(t)\
-			{\
-				uint32_t Index=Quad->Tile[(ty>>3)*(W)+(tx>>3)];\
-				Offset=(Index<<6)+((ty&7)<<3)+(tx&7);\
-				if(Index==0) goto Clamped;\
-			}\
-			else\
-				Offset = ty * (Quad->TWidth) + tx;\
-\
-			if (bpp == 4)\
-			{\
-				uint8_t Texel = Quad->u.Imageb[Offset / 2];\
-				if (Offset & 1)\
-					Texel &= 0xf;\
-				else\
-					Texel = (Texel >> 4) & 0xf;\
-				Color = Quad->Pal[Texel];\
-			}\
-			else if (bpp == 8)\
-			{\
-				uint8_t Texel = Quad->u.Imageb[Offset];\
-				Color = Quad->Pal[Texel];\
-			}\
-			else if (bpp == 16)\
-			{\
-				Color = Quad->u.Imagew[Offset];\
-			}\
-			if (Color != TransColor)\
-			{\
-				if (a == 1)\
-					*pixel = Alpha(Quad, Color, *pixel);\
-				else if (a == 2)\
-					*pixel = Shade(Color, Quad->Shade);\
-				else\
-					*pixel = Color;\
-			}\
-			Clamped:\
-			++pixel;\
-			x_tx += Quad->Txdx;\
-			x_ty += Quad->Tydx;\
-		}\
-		line += Quad->Pitch;\
-		y_tx += Quad->Txdy;\
-		y_ty += Quad->Tydy;\
-	}\
-}
-TILETEMPL(16,0,0) TILETEMPL(16,0,1) TILETEMPL(16,0,2)
-TILETEMPL(16,1,0) TILETEMPL(16,1,1) TILETEMPL(16,1,2)
-
-TILETEMPL(8,0,0) TILETEMPL(8,0,1) TILETEMPL(8,0,2)
-TILETEMPL(8,1,0) TILETEMPL(8,1,1) TILETEMPL(8,1,2)
-
-TILETEMPL(4,0,0) TILETEMPL(4,0,1) TILETEMPL(4,0,2)
-TILETEMPL(4,1,0) TILETEMPL(4,1,1) TILETEMPL(4,1,2)
-
-#undef TILENAME
-#define TILENAME(bpp, t, a) \
-DrawQuad##bpp##t##a
-
-
-static void DrawQuadFill(QuadInfo *Quad)
+void vr0video_device::DrawQuad(u8 bpp, bool tiled, QuadInfo *Quad)
 {
-	uint32_t x, y;
-	uint16_t *line = Quad->Dest;
-	uint16_t ShadeColor = RGB32TO16(Quad->Shade);
-	for (y = 0; y < Quad->h; ++y)
+	const u32 TransColor = Quad->Trans ? RGB32TO16(Quad->TransColor) : NOTRANSCOLOR;
+	u16 *line = Quad->Dest;
+	u32 y_tx = Quad->Tx, y_ty = Quad->Ty;
+	const u32 Maskw = Quad->TWidth - 1;
+	const u32 Maskh = Quad->THeight - 1;
+	const u32 W = Quad->TWidth >> 3;
+
+	for (u32 y = 0; y < Quad->h; ++y)
 	{
-		uint16_t *pixel = line;
-		for (x = 0; x < Quad->w; ++x)
+		u16 *pixel = line;
+		u32 x_tx = y_tx;
+		u32 x_ty = y_ty;
+		for (u32 x = 0; x < Quad->w; ++x)
 		{
-			if (Quad->SrcAlpha)
-				*pixel = Alpha(Quad, Quad->Shade, *pixel);
+			u32 Offset;
+			u32 tx = x_tx >> 9;
+			u32 ty = x_ty >> 9;
+			u16 Color = ~0;
+			if (Quad->Clamp)
+			{
+				if (tx > Maskw)
+					goto Clamped;
+				if (ty > Maskh)
+					goto Clamped;
+			}
 			else
-				*pixel = ShadeColor;
+			{
+				tx &= Maskw;
+				ty &= Maskh;
+			}
+
+			if (tiled)
+			{
+				const u32 Index = Quad->Tile[(ty >> 3) * (W) + (tx >> 3)];
+				Offset=(Index << 6) + ((ty & 7) << 3) + (tx & 7);
+				if (Index == 0) goto Clamped;
+			}
+			else
+				Offset = ty * (Quad->TWidth) + tx;
+
+			if (bpp == 4)
+			{
+				u8 Texel = Quad->u.Imageb[Offset / 2];
+				if (Offset & 1)
+					Texel &= 0xf;
+				else
+					Texel = (Texel >> 4) & 0xf;
+				Color = Quad->Pal[Texel];
+			}
+			else if (bpp == 8)
+			{
+				const u8 Texel = Quad->u.Imageb[Offset];
+				Color = Quad->Pal[Texel];
+			}
+			else if (bpp == 16)
+			{
+				Color = Quad->u.Imagew[Offset];
+			}
+			if (Color != TransColor)
+			{
+				DrawPixel(Quad, pixel, Color);
+			}
+			Clamped:
+			++pixel;
+			x_tx += Quad->Txdx;
+			x_ty += Quad->Tydx;
+		}
+		line += Quad->Pitch;
+		y_tx += Quad->Txdy;
+		y_ty += Quad->Tydy;
+	}
+}
+
+
+void vr0video_device::DrawQuadFill(QuadInfo *Quad)
+{
+	u16 *line = Quad->Dest;
+	for (u32 y = 0; y < Quad->h; ++y)
+	{
+		u16 *pixel = line;
+		for (u32 x = 0; x < Quad->w; ++x)
+		{
+			DrawPixel(Quad, pixel, ~0);
 			++pixel;
 		}
 		line += Quad->Pitch;
 	}
 }
 
-typedef void (*_DrawTemplate)(QuadInfo *);
-
-static const _DrawTemplate DrawImage[]=
-{
-	TILENAME(4,0,0),
-	TILENAME(8,0,0),
-	TILENAME(16,0,0),
-	TILENAME(16,0,0),
-
-	TILENAME(4,0,1),
-	TILENAME(8,0,1),
-	TILENAME(16,0,1),
-	TILENAME(16,0,1),
-
-	TILENAME(4,0,2),
-	TILENAME(8,0,2),
-	TILENAME(16,0,2),
-	TILENAME(16,0,2),
-};
-
-static const _DrawTemplate DrawTile[]=
-{
-	TILENAME(4,1,0),
-	TILENAME(8,1,0),
-	TILENAME(16,1,0),
-	TILENAME(16,1,0),
-
-	TILENAME(4,1,1),
-	TILENAME(8,1,1),
-	TILENAME(16,1,1),
-	TILENAME(16,1,1),
-
-	TILENAME(4,1,2),
-	TILENAME(8,1,2),
-	TILENAME(16,1,2),
-	TILENAME(16,1,2),
-};
-
 //Returns true if the operation was a flip (sync or async)
 // TODO: async loading actually doesn't stop rendering but just flips the render bank
-int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr)
+int vr0video_device::vrender0_ProcessPacket(u32 PacketPtr)
 {
-	uint16_t *Packet = m_packetram;
-	uint8_t *TEXTURE = m_textureram;
+	u8 bpp[4] = {4, 8, 16, 16};
+	const u16 *Packet = m_packetram;
+	const u8 *TEXTURE = m_textureram;
 
 	Packet += PacketPtr;
 
-	uint32_t Dx = Packet[1] & 0x3ff;
-	uint32_t Dy = Packet[2] & 0x1ff;
-	uint32_t Endx = Packet[3] & 0x3ff;
-	uint32_t Endy = Packet[4] & 0x1ff;
-	uint32_t Mode = 0;
-	uint16_t Packet0 = Packet[0];
+	const u32 Dx = Packet[1] & 0x3ff;
+	const u32 Dy = Packet[2] & 0x1ff;
+	const u32 Endx = Packet[3] & 0x3ff;
+	const u32 Endy = Packet[4] & 0x1ff;
+	const u16 Packet0 = Packet[0];
 
 	if (Packet0 & 0x81) //Sync or ASync flip
 	{
@@ -565,7 +491,7 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr)
 		m_RenderState.FontOffset = Packet[26];
 		m_RenderState.PalOffset = Packet[27] >> 3;
 		m_RenderState.PaletteBank = (Packet[28] >> 8) & 0xf;
-		m_RenderState.TextureMode = Packet[28] & 0x1000;
+		m_RenderState.TextureMode = (Packet[28] >> 12) & 0x1;
 		m_RenderState.PixelFormat = (Packet[28] >> 6) & 3;
 		m_RenderState.Width  = 8 << ((Packet[28] >> 0) & 0x7);
 		m_RenderState.Height = 8 << ((Packet[28] >> 3) & 0x7);
@@ -573,13 +499,12 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr)
 
 	if (Packet0 & 0x40 && m_RenderState.PalOffset != m_LastPalUpdate)
 	{
-		uint32_t *Pal = (uint32_t*) (TEXTURE + 1024 * m_RenderState.PalOffset);
-		uint16_t Trans = RGB32TO16(m_RenderState.TransColor);
-		int i;
-		for (i = 0; i < 256; ++i)
+		const u32 *Pal = (u32*) (TEXTURE + 1024 * m_RenderState.PalOffset);
+		const u16 Trans = RGB32TO16(m_RenderState.TransColor);
+		for (int i = 0; i < 256; ++i)
 		{
-			uint32_t p = Pal[i];
-			uint16_t v = RGB32TO16(p);
+			const u32 p = Pal[i];
+			u16 v = RGB32TO16(p);
 			// TODO: this is most likely an artifact of not emulating the dither modes,
 			//       and it's wrong anyway: topbladv gameplay fighters sports a slighty visible square shadow block.
 			if ((v == Trans && p != m_RenderState.TransColor) || v == NOTRANSCOLOR)  //Error due to conversion. caused transparent
@@ -598,6 +523,7 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr)
 	{
 		QuadInfo Quad;
 
+		Quad.Blend = 0;
 		Quad.Pitch = 1024;
 
 //      assert(Endx >= Dx && Endy >= Dy);
@@ -608,7 +534,7 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr)
 			Quad.DstAlpha = m_RenderState.DstBlend;
 			Quad.SrcColor = m_RenderState.SrcAlphaColor;
 			Quad.DstColor = m_RenderState.DstAlphaColor;
-			Mode = 1;
+			Quad.Blend |= ALPHA_BIT;
 		}
 		else
 			Quad.SrcAlpha = 0;
@@ -628,8 +554,7 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr)
 		if (Packet0 & 0x10)
 		{
 			Quad.Shade = m_RenderState.ShadeColor;
-			if (!Mode)      //Alpha includes Shade
-				Mode = 2;
+			Quad.Blend |= SHADE_BIT;
 			/*
 			//simulate shade with alphablend (SLOW!!!)
 			if (!Quad.SrcAlpha && (Packet0 & 0x8))
@@ -650,16 +575,13 @@ int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr)
 		if (Packet0 & 0x8)  //Texture Enable
 		{
 			Quad.u.Imageb = TEXTURE + 128 * m_RenderState.FontOffset;
-			Quad.Tile = (uint16_t*) (TEXTURE + 128 * m_RenderState.TileOffset);
+			Quad.Tile = (u16*) (TEXTURE + 128 * m_RenderState.TileOffset);
 			if (!m_RenderState.PixelFormat)
 				Quad.Pal = m_InternalPalette + (m_RenderState.PaletteBank * 16);
 			else
 				Quad.Pal = m_InternalPalette;
 
-			if (m_RenderState.TextureMode)   //Tiled
-				DrawTile[m_RenderState.PixelFormat + 4 * Mode](&Quad);
-			else
-				DrawImage[m_RenderState.PixelFormat + 4 * Mode](&Quad);
+			DrawQuad(bpp[m_RenderState.PixelFormat], m_RenderState.TextureMode, &Quad);
 		}
 		else
 			DrawQuadFill(&Quad);
@@ -672,9 +594,9 @@ void vr0video_device::execute_flipping()
 	if (m_render_start == false)
 		return;
 
-	uint32_t B0 = 0x000000;
-	uint32_t B1 = (m_bank1_select == true ? 0x400000 : 0x100000)/2;
-	uint16_t *Front, *Back;
+	const u32 B0 = 0x000000;
+	const u32 B1 = (m_bank1_select == true ? 0x400000 : 0x100000)/2;
+	u16 *Front, *Back;
 	int DoFlip = 0;
 
 	if (m_display_bank & 1)
@@ -710,11 +632,11 @@ void vr0video_device::execute_flipping()
 	}
 }
 
-uint32_t vr0video_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 vr0video_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const uint32_t width = cliprect.width();
+	const u32 width = cliprect.width();
 
-	uint32_t const dx = cliprect.left();
+	u32 const dx = cliprect.left();
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		std::copy_n(&m_DisplayDest[(y * 1024) + dx], width, &bitmap.pix16(y, dx));
 
