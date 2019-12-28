@@ -162,7 +162,7 @@ public:
 	virtual DECLARE_READ16_MEMBER(cs4_r);
 	virtual DECLARE_WRITE16_MEMBER(cs4_w);
 
-	void cs_callback(int base, uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4);
+	void cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4);
 
 protected:
 	virtual void machine_start() override;
@@ -324,7 +324,7 @@ WRITE16_MEMBER(wrlshunt_game_state::cs1_w)
 
 void wrlshunt_game_state::machine_reset()
 {
-	cs_callback(0, 0x00, 0x00, 0x00, 0x00, 0x00);
+	cs_callback(0x00, 0x00, 0x00, 0x00, 0x00);
 	m_maincpu->set_cs_space(m_memory->get_program());
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 }
@@ -494,7 +494,7 @@ void gcm394_game_state::machine_start()
 
 void gcm394_game_state::machine_reset()
 {
-	cs_callback(0, 0x00, 0x00, 0x00, 0x00, 0x00);
+	cs_callback(0x00, 0x00, 0x00, 0x00, 0x00);
 	m_maincpu->set_cs_space(m_memory->get_program());
 
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
@@ -516,12 +516,12 @@ void gcm394_game_state::machine_reset()
 */
 
 
-void gcm394_game_state::cs_callback(int base, uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4)
+void gcm394_game_state::cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4)
 {
 	// wipe existing mappings;
-	m_memory->get_program()->unmap_readwrite(base, (base+0x8000000*5)-1);
+	m_memory->get_program()->unmap_readwrite(0, (0x8000000*5)-1);
 
-	int start_address = base;
+	int start_address = 0;
 	int end_address;
 
 	int size; // cs region sizes in kwords
@@ -993,7 +993,7 @@ CONS(2011, wrlshunt, 0, 0, wrlshunt, wrlshunt, wrlshunt_game_state, init_wrlshun
 
 void generalplus_gpac800_game_state::machine_reset()
 {
-	cs_callback(0, 0x00, 0x00, 0x00, 0x00, 0x00);
+	cs_callback(0x00, 0x00, 0x00, 0x00, 0x00);
 	m_maincpu->set_cs_space(m_memory->get_program());
 
 	if (m_has_nand)

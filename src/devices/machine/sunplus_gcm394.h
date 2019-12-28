@@ -17,7 +17,7 @@
 #include "sunplus_gcm394_video.h"
 #include "spg2xx_audio.h"
 
-typedef device_delegate<void (int, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)> sunplus_gcm394_cs_callback_device;
+typedef device_delegate<void (uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)> sunplus_gcm394_cs_callback_device;
 
 class sunplus_gcm394_base_device : public unsp_20_device, public device_mixer_interface
 {
@@ -68,7 +68,7 @@ public:
 
 	IRQ_CALLBACK_MEMBER(irq_vector_cb);
 	template <typename... T> void set_cs_config_callback(T &&... args) { m_cs_callback.set(std::forward<T>(args)...); }
-	void default_cs_callback(int base, uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4 );
+	void default_cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4 );
 
 	void set_cs_space(address_space* csspace) { m_cs_space = csspace; }
 
