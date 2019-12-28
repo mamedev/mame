@@ -983,7 +983,15 @@ CONS(2011, wrlshunt, 0, 0, wrlshunt, wrlshunt, wrlshunt_game_state, init_wrlshun
 
 void generalplus_gpac800_game_state::machine_reset()
 {
-	cs_callback(0x00, 0x00, 0x00, 0x00, 0x00);
+	// configure CS defaults
+	address_space& mem = m_maincpu->space(AS_PROGRAM);
+	mem.write_word(0x007820, 0x0047);
+	mem.write_word(0x007821, 0xff47);
+	mem.write_word(0x007822, 0x00c7);
+	mem.write_word(0x007823, 0x0047);
+	mem.write_word(0x007824, 0x0047);
+
+
 	m_maincpu->set_cs_space(m_memory->get_program());
 
 	if (m_has_nand)
