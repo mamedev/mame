@@ -163,10 +163,6 @@ READ64_MEMBER(gsan_state::portc_r)
 }
 WRITE64_MEMBER(gsan_state::portc_w)
 {
-#if 0
-	if (m_portc_data != data)
-		logerror("PORT_C %02X\n", (u8)data);
-#endif
 	m_portc_data = data;
 	m_hopper->motor_w(data & 0x80);
 	machine().bookkeeping().coin_counter_w(0, data & 4);
@@ -180,12 +176,9 @@ WRITE64_MEMBER(gsan_state::porte_w)
 {
 	// lamps
 #if 0
-	if ((m_porte_data ^ data) & 0xff)
-	{
-		u8 mask = (m_porte_data ^ data) & 0xff;
-		u8 nval = data & mask;
-		logerror("PORT_E mask %02X val %02X\n", mask, nval);
-	}
+	u8 mask = m_porte_data ^ data;
+	if (mask)
+		logerror("PORT_E mask %02X val %02X\n", mask, data & mask);
 #endif
 	m_porte_data = data;
 }
@@ -372,7 +365,50 @@ void gsan_state::fill_quad(u16 cmd, u16 *data)
 
 void gsan_state::draw_line(u16 cmd, u16 *data)
 {
-	// TODO, test mode only
+	if (cmd & 0x7ff)
+		logerror("Q2SD unhandled line mode %04X\n", cmd);
+
+	u16 color = *data++;
+	u16 count = *data++;
+	while (count > 1)
+	{
+		s16 x0 = *data++;
+		s16 y0 = *data++;
+		s16 x1 = data[0];
+		s16 y1 = data[1];
+		--count;
+
+		int dx = abs(x1 - x0);
+		int dy = -abs(y1 - y0);
+		int sx = x0 < x1 ? 1 : -1;
+		int sy = y0 < y1 ? 1 : -1;
+		int err = dx + dy;
+
+		s16 sclipx = m_gpuregs[0x90 / 2];
+		s16 sclipy = m_gpuregs[0x92 / 2];
+		u32 fg_offs = (m_gpuregs[0x014 / 2] & 0x7f) << 15;
+
+		while (true)
+		{
+			if ((x0 >= 0 && x0 <= sclipx) && (y0 >= 0 && y0 <= sclipy))
+				m_vram[fg_offs + pix_address(x0, y0)] = color;
+
+			if (x0 == x1 && y0 == y1)
+				break;
+
+			int e2 = 2 * err;
+			if (e2 >= dy)
+			{
+				err += dy;
+				x0 += sx;
+			}
+			if (e2 <= dx)
+			{
+				err += dx;
+				y0 += sy;
+			}
+		}
+	}
 }
 
 u32 gsan_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
