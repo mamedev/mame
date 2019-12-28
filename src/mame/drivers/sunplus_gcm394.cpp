@@ -212,11 +212,25 @@ READ16_MEMBER(gcm394_game_state::cs4_r) { logerror("cs4_r %06n", offset); return
 WRITE16_MEMBER(gcm394_game_state::cs4_w) { logerror("cs4_w %06x %04x\n", offset, data); }
 
 
+/*
+	map info (NAND type)
+
+	map(0x000000, 0x006fff) internal RAM
+	map(0x007000, 0x007fff) internal peripherals
+	map(0x008000, 0x00ffff) internal ROM (lower 32kwords) - can also be configured to mirror CS0 308000 area with external pin for boot from external ROM
+	map(0x010000, 0x027fff) internal ROM (upper 96kwords) - can't be switched
+	map(0x028000, 0x02ffff) reserved
+
+	map(0x030000, 0x0.....) view into external spaces (CS0 area starts here. followed by CS1 area, CS2 area etc.)
+	
+	map(0x200000, 0x3fffff) continued view into external spaces, but this area is banked with m_membankswitch_7810 (valid bank values 0x00-0x3f)
+*/
+
+
 
 void gcm394_game_state::cs_map_base(address_map& map)
 {
 }
-
 
 
 class generalplus_gpac800_game_state : public gcm394_game_state
@@ -224,7 +238,6 @@ class generalplus_gpac800_game_state : public gcm394_game_state
 public:
 	generalplus_gpac800_game_state(const machine_config& mconfig, device_type type, const char* tag) :
 		gcm394_game_state(mconfig, type, tag),
-	//	m_mainram(*this, "mainram"),
 		m_has_nand(false),
 		m_initial_copy_words(0x2000),
 		m_nandreadbase(0)
@@ -238,8 +251,6 @@ public:
 	void nand_wlsair60();
 	void nand_vbaby();
 	void nand_tsm();
-
-	void cs_map_gpac800(address_map& map);
 
 protected:
 	virtual void machine_reset() override;
@@ -256,8 +267,6 @@ protected:
 	bool m_has_nand;
 private:
 	void nand_init(int blocksize, int blocksize_stripped);
-
-//	required_shared_ptr<u16> m_mainram;
 
 	std::vector<uint8_t> m_strippedrom;
 	int m_strippedsize;
@@ -332,10 +341,6 @@ void wrlshunt_game_state::machine_reset()
 void wrlshunt_game_state::init_wrlshunt()
 {
 	m_sdram.resize(0x400000); // 0x400000 bytes, 0x800000 words
-}
-
-void generalplus_gpac800_game_state::cs_map_gpac800(address_map &map)
-{
 }
 
 READ16_MEMBER(generalplus_gpac800_game_state::cs0_r)
@@ -473,7 +478,7 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 
 	m_maincpu->nand_read_callback().set(FUNC(generalplus_gpac800_game_state::read_nand));
 
-	FULL_MEMORY(config, m_memory).set_map(&generalplus_gpac800_game_state::cs_map_gpac800);
+	FULL_MEMORY(config, m_memory).set_map(&generalplus_gpac800_game_state::cs_map_base);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -499,21 +504,6 @@ void gcm394_game_state::machine_reset()
 
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 }
-
-
-/*
-	map info
-
-	map(0x000000, 0x006fff) internal RAM
-	map(0x007000, 0x007fff) internal peripherals
-	map(0x008000, 0x00ffff) internal ROM (lower 32kwords) - can also be configured to mirror CS0 308000 area with external pin for boot from external ROM
-	map(0x010000, 0x027fff) internal ROM (upper 96kwords) - can't be switched
-	map(0x028000, 0x02ffff) reserved
-
-	map(0x030000, 0x0.....) view into external spaces (CS0 area starts here. followed by CS1 area, CS2 area etc.)
-	
-	map(0x200000, 0x3fffff) continued view into external spaces, but this area is banked with m_membankswitch_7810 (valid bank values 0x00-0x3f)
-*/
 
 
 void gcm394_game_state::cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4)
