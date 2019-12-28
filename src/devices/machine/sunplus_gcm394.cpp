@@ -95,7 +95,7 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 	uint32_t dest = m_dma_params[2][channel] | (m_dma_params[5][channel] << 16) ;
 	uint32_t length = m_dma_params[3][channel] | (m_dma_params[6][channel] << 16);
 
-	LOGMASKED(LOG_GCM394_SYSDMA, "%s:possible DMA operation (7abf) (trigger %04x) with params mode:%04x source:%08x (word offset) dest:%08x (word offset) length:%08x (words)\n", machine().describe_context().c_str(), data, mode, source, dest, length );
+	LOGMASKED(LOG_GCM394_SYSDMA, "%s:possible DMA operation (7abf) (trigger %04x) with params mode:%04x source:%08x (word offset) dest:%08x (word offset) length:%08x (words) while csbank is %02x\n", machine().describe_context().c_str(), data, mode, source, dest, length, m_membankswitch_7810 );
 
 	if ((source&0x0fffffff) >= 0x20000)
 		LOGMASKED(LOG_GCM394_SYSDMA, " likely transfer from ROM %08x - %08x\n", (source - 0x20000) * 2, (source - 0x20000) * 2 + (length * 2)- 1);
@@ -239,7 +239,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::chipselect_csx_memory_device_control_
 
 	if (offset == 0)
 		m_mapping_write_cb(data);
-
+	
 
 	static const char* const md[] =
 	{
@@ -662,7 +662,8 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map& map)
 
 	map(0x08000, 0x0ffff).r(FUNC(sunplus_gcm394_base_device::internalrom_lower32_r)).nopw();
 
-	map(0x20000, 0x3fffff).rw(FUNC(sunplus_gcm394_base_device::cs_space_r), FUNC(sunplus_gcm394_base_device::cs_space_w));
+	map(0x020000, 0x1fffff).rw(FUNC(sunplus_gcm394_base_device::cs_space_r), FUNC(sunplus_gcm394_base_device::cs_space_w));
+	map(0x200000, 0x3fffff).rw(FUNC(sunplus_gcm394_base_device::cs_bank_space_r), FUNC(sunplus_gcm394_base_device::cs_bank_space_w));
 }
 
 READ16_MEMBER(sunplus_gcm394_base_device::cs_space_r)
@@ -674,6 +675,18 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::cs_space_w)
 {
 	m_cs_space->write_word(offset, data);
 }
+READ16_MEMBER(sunplus_gcm394_base_device::cs_bank_space_r)
+{
+	//int bank = m_membankswitch_7810 & 0x3f;
+	return m_cs_space->read_word(offset + (0x200000 - m_csbase));
+}
+
+WRITE16_MEMBER(sunplus_gcm394_base_device::cs_bank_space_w)
+{
+	//int bank = m_membankswitch_7810 & 0x3f;
+	m_cs_space->write_word(offset + (0x200000 - m_csbase), data);
+}
+
 
 
 READ16_MEMBER(sunplus_gcm394_base_device::internalrom_lower32_r)
@@ -784,8 +797,8 @@ void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
 	map(0x28000, 0x2ffff).noprw(); // reserved
 	// 0x30000+ is CS access
 	
-	map(0x30000, 0x3fffff).rw(FUNC(generalplus_gpac800_device::cs_space_r), FUNC(generalplus_gpac800_device::cs_space_w));
-
+	map(0x030000, 0x1fffff).rw(FUNC(generalplus_gpac800_device::cs_space_r), FUNC(generalplus_gpac800_device::cs_space_w));
+	map(0x200000, 0x3fffff).rw(FUNC(generalplus_gpac800_device::cs_bank_space_r), FUNC(generalplus_gpac800_device::cs_bank_space_w));
 }
 
 void sunplus_gcm394_base_device::device_start()

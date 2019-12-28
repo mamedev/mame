@@ -163,6 +163,8 @@ protected:
 
 	DECLARE_READ16_MEMBER(cs_space_r);
 	DECLARE_WRITE16_MEMBER(cs_space_w);
+	DECLARE_READ16_MEMBER(cs_bank_space_r);
+	DECLARE_WRITE16_MEMBER(cs_bank_space_w);
 
 private:
 	devcb_read16 m_space_read_cb;
