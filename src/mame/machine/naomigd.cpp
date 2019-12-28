@@ -405,6 +405,9 @@ naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *
 	: naomi_board(mconfig, NAOMI_GDROM_BOARD, tag, owner, clock),
 	m_maincpu(*this, "dimmcpu"),
 	m_securitycpu(*this, "pic"),
+	m_i2c0(*this, "i2c_0"),
+	m_i2c1(*this, "i2c_1"),
+	m_eeprom(*this, "eeprom"),
 	picdata(*this, finder_base::DUMMY_TAG)
 {
 	image_tag = nullptr;
@@ -428,14 +431,27 @@ void naomi_gdrom_board::sh4_io_map(address_map &map)
 
 READ64_MEMBER(naomi_gdrom_board::i2cmem_dimm_r)
 {
+	uint8_t ret;
+
+	ret = m_i2c0->read_sda();
+	ret |= m_i2c1->read_sda();
+	ret = ret << 1;
 	if (picbus_used == true)
-		return ((picbus | picbus_pullup) & 0xf) << 2;
+		ret |= ((picbus | picbus_pullup) & 0xf) << 2;
 	else
-		return 0;
+		ret |= m_eeprom->do_read() << 5;
+	return ret;
 }
 
 WRITE64_MEMBER(naomi_gdrom_board::i2cmem_dimm_w)
 {
+	if (data & 0x40000)
+	{
+		m_i2c0->write_sda((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+		m_i2c1->write_sda((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+	}
+	m_i2c0->write_scl((data & 0x1) ? ASSERT_LINE : CLEAR_LINE);
+	m_i2c1->write_scl((data & 0x1) ? ASSERT_LINE : CLEAR_LINE);
 	if (data & 0x0200)
 	{
 		picbus_used = true;
@@ -445,7 +461,13 @@ WRITE64_MEMBER(naomi_gdrom_board::i2cmem_dimm_w)
 		// TODO: abort timeslice of sh4
 	}
 	else
+	{
 		picbus_used = false;
+		// TODO: check if the states should be inverted
+		m_eeprom->di_write((data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->cs_write((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->clk_write((data & 0x8) ? ASSERT_LINE : CLEAR_LINE);
+	}
 }
 
 void naomi_gdrom_board::pic_map(address_map &map)
@@ -701,6 +723,13 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 	PIC16C621A(config, m_securitycpu, 2000000); // need to set the correct value for clock
 	m_securitycpu->set_addrmap(AS_IO, &naomi_gdrom_board::pic_map);
 	m_securitycpu->set_disable();
+	I2C_24C01(config, m_i2c0, 0);
+	m_i2c0->set_e0(0);
+	m_i2c0->set_wc(1);
+	I2C_24C01(config, m_i2c1, 0);
+	m_i2c1->set_e0(1);
+	m_i2c1->set_wc(1);
+	EEPROM_93C46_8BIT(config, m_eeprom, 0);
 }
 
 // DIMM firmwares:
@@ -755,6 +784,13 @@ ROM_START( dimm )
 
 	// dynamically filled with data
 	ROM_REGION(0x400, "pic", ROMREGION_ERASE00)
+	// filled with test data until actual dumps of serial memories are available
+	ROM_REGION(0x80, "i2c_0", ROMREGION_ERASE00)
+	ROM_FILL(0, 1, 0x40) ROM_FILL(1, 1, 0x00) ROM_FILL(2, 1, 0x01) ROM_FILL(3, 1, 0x02) ROM_FILL(4, 1, 0x03)
+	ROM_REGION(0x80, "i2c_1", ROMREGION_ERASE00)
+	ROM_FILL(0, 1, 0x40) ROM_FILL(1, 1, 0x80) ROM_FILL(2, 1, 0x81) ROM_FILL(3, 1, 0x82) ROM_FILL(4, 1, 0x83)
+	ROM_REGION(0x80, "eeprom", ROMREGION_ERASE00)
+	ROM_FILL(0, 1, 'M') ROM_FILL(1, 1, 'A') ROM_FILL(2, 1, 'M') ROM_FILL(3, 1, 'E') ROM_FILL(4, 12, 0x20)
 ROM_END
 
 const tiny_rom_entry *naomi_gdrom_board::device_rom_region() const

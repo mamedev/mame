@@ -7,7 +7,8 @@
 
 #include "machine/naomibd.h"
 #include "cpu/pic16c62x/pic16c62x.h"
-
+#include "machine/i2cmem.h"
+#include "machine/eepromser.h"
 
 class naomi_gdrom_board : public naomi_board
 {
@@ -63,6 +64,9 @@ private:
 
 	required_device<sh4_device> m_maincpu;
 	required_device<pic16c621a_device> m_securitycpu;
+	required_device<i2cmem_device> m_i2c0;
+	required_device<i2cmem_device> m_i2c1;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	const char *image_tag;
 	optional_region_ptr<uint8_t> picdata;
