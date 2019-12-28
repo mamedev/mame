@@ -2359,8 +2359,8 @@ CONS( 200?, lxcmcysw,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "
 //      Lexibook Compact Cyber Arcade - Paw Patrol
 //      Lexibook Compact Cyber Arcade - Barbie
 //      Lexibook Compact Cyber Arcade - Finding Dory
-//      Lexibook Compact Cyber Arcade - Marvel ultimate Spiderman
-//      Lexibook Compact Cyber Arcade - PJ Mask
+//      Lexibook Compact Cyber Arcade - Marvel Ultimate Spiderman
+//      Lexibook Compact Cyber Arcade - PJ Masks
 // more?
 
 
