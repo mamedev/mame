@@ -4,6 +4,12 @@
 
     Atari Jaguar hardware
 
+	TODO (list of exceptions):
+	jaguar_state::generic_blitter()
+	- atarikrt, bretth, brutalsp, nbajamte, spacewar, spacewarp, tempst2k
+	jaguar_state::blitter_09800009_000020_000020()
+	- ruinerp
+
 ****************************************************************************
 
     ------------------------------------------------------------
