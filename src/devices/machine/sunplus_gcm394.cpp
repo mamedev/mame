@@ -677,14 +677,32 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::cs_space_w)
 }
 READ16_MEMBER(sunplus_gcm394_base_device::cs_bank_space_r)
 {
-	//int bank = m_membankswitch_7810 & 0x3f;
-	return m_cs_space->read_word(offset + (0x200000 - m_csbase));
+	int bank = m_membankswitch_7810 & 0x3f;
+	int realoffset = offset + (bank * 0x200000) - m_csbase;
+
+	if (realoffset < 0)
+	{
+		printf("read real offset < 0\n");
+		return 0;
+	}
+
+	//return m_cs_space->read_word(offset + (0x200000 - m_csbase));
+	return m_cs_space->read_word(realoffset);
+
 }
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::cs_bank_space_w)
 {
-	//int bank = m_membankswitch_7810 & 0x3f;
-	m_cs_space->write_word(offset + (0x200000 - m_csbase), data);
+	int bank = m_membankswitch_7810 & 0x3f;
+	int realoffset = offset + (bank * 0x200000) - m_csbase;
+
+	if (realoffset < 0)
+	{
+		printf("write real offset < 0\n");
+		return;
+	}
+
+	m_cs_space->write_word(realoffset, data);
 }
 
 
