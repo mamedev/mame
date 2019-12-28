@@ -272,12 +272,21 @@ inline bool jaguar_state::adjust_object_timer(int vc)
  *
  *************************************/
 
+// TODO: new TOM install irq handler
 inline void jaguar_state::verify_host_cpu_irq()
 {
-	if ((m_cpu_irq_state & m_gpu_regs[INT1] & 0x1f) != 0)
-		m_maincpu->set_input_line(m_is_r3000 ? INPUT_LINE_IRQ4 : M68K_IRQ_6, ASSERT_LINE);
+	// jaguar uses irq 2
+	if (m_is_cojag == false)
+		m_maincpu->set_input_line(M68K_IRQ_2, ((m_cpu_irq_state & m_gpu_regs[INT1] & 0x1f) != 0) ? ASSERT_LINE : CLEAR_LINE);
 	else
-		m_maincpu->set_input_line(m_is_r3000 ? INPUT_LINE_IRQ4 : M68K_IRQ_6, CLEAR_LINE);
+	{
+		// cojag r3000 uses irq 4
+		// cojag 68020 uses irq 6		
+		if ((m_cpu_irq_state & m_gpu_regs[INT1] & 0x1f) != 0)
+			m_maincpu->set_input_line(m_is_r3000 ? INPUT_LINE_IRQ4 : M68K_IRQ_6, ASSERT_LINE);
+		else
+			m_maincpu->set_input_line(m_is_r3000 ? INPUT_LINE_IRQ4 : M68K_IRQ_6, CLEAR_LINE);	
+	}
 }
 
 inline void jaguar_state::trigger_host_cpu_irq(int level)

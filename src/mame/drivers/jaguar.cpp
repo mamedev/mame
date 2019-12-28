@@ -1133,7 +1133,7 @@ void jaguar_state::jaguar_map(address_map &map)
 void jaguar_state::cpu_space_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffffd, 0xfffffd).lr8([] () -> u8 { return 0x40; }, "level6");
+	map(0xfffff5, 0xfffff5).lr8([] () -> u8 { return 0x40; }, "level2");
 }
 
 /*
@@ -1894,6 +1894,7 @@ void jaguar_state::fix_endian( void *base, uint32_t size )
 
 void jaguar_state::init_jaguar()
 {
+	m_is_cojag = false;
 	m_hacks_enabled = false;
 	save_item(NAME(m_joystick_data));
 
