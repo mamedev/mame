@@ -38637,6 +38637,7 @@ spellb79                        //
 
 @source:tk2000.cpp
 tk2000                          // Microdigital TK2000
+mpf2				// Multitech MPF-II
 
 @source:tk635.cpp
 tk635                           // (c) 199? Termtek

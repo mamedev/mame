@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont
+// copyright-holders:R. Belmont, M. Capdeville
 /***************************************************************************
 
     tk2000.cpp - Microdigital TK2000
@@ -13,6 +13,8 @@
 
     $C05A - banks RAM from c100-ffff
     $C05B - banks ROM from c100-ffff
+
+    Added Multitech MPF-II support ( another not so apple2 compatible )
 
 ************************************************************************/
 
@@ -62,6 +64,7 @@ public:
 	{ }
 
 	void tk2000(machine_config &config);
+	void mpf2(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -620,6 +623,10 @@ void tk2000_state::tk2000(machine_config &config)
 	m_printer->busy_handler().set(FUNC(tk2000_state::printer_busy_w));
 }
 
+void tk2000_state::mpf2(machine_config &config) {
+	tk2000(config);
+}
+
 /***************************************************************************
 
   Game driver(s)
@@ -630,5 +637,11 @@ ROM_START(tk2000)
 	ROM_LOAD( "tk2000.rom",   0x000000, 0x004000, CRC(dfdbacc3) SHA1(bb37844c31616046630868a4399ee3d55d6df277) )
 ROM_END
 
+ROM_START(mpf2)
+	ROM_REGION(0x4000,"maincpu",0)
+	ROM_LOAD( "MPF_II.rom",   0x000000, 0x004000, CRC(8780189f) SHA1(92378b0db561632b58a9b36a85f8fb00796198bb) )
+ROM_END
+
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY         FULLNAME */
 COMP( 1984, tk2000, 0,      0,      tk2000,  tk2000, tk2000_state, empty_init, "Microdigital", "TK2000 Color Computer", MACHINE_NOT_WORKING )
+COMP( 1982, mpf2,   tk2000, 0,      tk2000,  tk2000, tk2000_state, empty_init, "Multitech",    "Microprofessor II",     MACHINE_NOT_WORKING )
