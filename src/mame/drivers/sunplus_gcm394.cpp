@@ -79,7 +79,6 @@ private:
 	// internal state
 	address_space_config m_program_config;
 	address_space *m_program;
-	int m_shift;
 };
 
 
