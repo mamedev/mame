@@ -57,11 +57,12 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
+		m_inputs(*this, "IN%u", 0),
 		m_digits(*this, "digit%u", 0U),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void _30test(machine_config &config);
+	void namco_30test(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -69,11 +70,13 @@ protected:
 private:
 	required_device<mc68hc11_cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
+	required_ioport_array<4> m_inputs;
 	output_finder<72> m_digits;
 	output_finder<8> m_lamps;
 
-	uint8_t m_mux_data = 0;
+	void main_map(address_map &map);
 
+	void output_digit(int i, u8 data);
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_WRITE8_MEMBER(led_rank_w);
 	DECLARE_WRITE8_MEMBER(lamps_w);
@@ -82,19 +85,38 @@ private:
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_WRITE8_MEMBER(okibank_w);
 
-	void main_map(address_map &map);
+	u8 m_mux_data = 0;
 };
 
+void namco_30test_state::machine_start()
+{
+	m_digits.resolve();
+	m_lamps.resolve();
 
-static const uint8_t led_map[16] =
-	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x77,0x7c,0x39,0x5e,0x79,0x00 };
+	save_item(NAME(m_mux_data));
+}
+
+
+
+/******************************************************************************
+    I/O
+******************************************************************************/
+
+void namco_30test_state::output_digit(int i, u8 data)
+{
+	// assume it's using a 7448
+	static const u8 led_map[16] =
+		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
+
+	m_digits[i] = led_map[data & 0xf];
+}
 
 WRITE8_MEMBER(namco_30test_state::led_w)
 {
 	// 0-29: playfield
 	// 30,31: time
-	m_digits[offset * 2] = led_map[data >> 4];
-	m_digits[1 + offset * 2] =  led_map[data & 0x0f];
+	output_digit(offset * 2, data >> 4);
+	output_digit(1 + offset * 2,  data & 0x0f);
 }
 
 WRITE8_MEMBER(namco_30test_state::led_rank_w)
@@ -103,8 +125,8 @@ WRITE8_MEMBER(namco_30test_state::led_rank_w)
 	// 1: 2nd place
 	// 2: 3rd place
 	// 3: current / last play score
-	m_digits[64 + offset * 2] = led_map[data >> 4];
-	m_digits[65 + offset * 2] = led_map[data & 0x0f];
+	output_digit(64 + offset * 2, data >> 4);
+	output_digit(65 + offset * 2, data & 0x0f);
 }
 
 WRITE8_MEMBER(namco_30test_state::lamps_w)
@@ -125,22 +147,19 @@ WRITE8_MEMBER(namco_30test_state::coin_w)
 
 READ8_MEMBER(namco_30test_state::mux_r)
 {
-	uint8_t res = 0xff;
+	u8 data = 0xff;
 
-	switch(m_mux_data)
+	for (int i = 0; i < 4; i++)
 	{
-		case 0x01: res = ioport("IN0")->read(); break;
-		case 0x02: res = ioport("IN1")->read(); break;
-		case 0x04: res = ioport("IN2")->read(); break;
-		case 0x08: res = ioport("IN3")->read(); break;
+		if (BIT(m_mux_data, i))
+			data &= m_inputs[i]->read();
 	}
 
-	return res;
+	return data;
 }
 
 WRITE8_MEMBER(namco_30test_state::mux_w)
 {
-	//printf("%X ",data);
 	m_mux_data = data;
 }
 
@@ -150,6 +169,10 @@ WRITE8_MEMBER(namco_30test_state::okibank_w)
 }
 
 
+
+/******************************************************************************
+    Address Maps
+******************************************************************************/
 
 void namco_30test_state::main_map(address_map &map)
 {
@@ -161,6 +184,11 @@ void namco_30test_state::main_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
+
+
+/******************************************************************************
+    Input Ports
+******************************************************************************/
 
 static INPUT_PORTS_START( 30test )
 	PORT_START("IN0")
@@ -215,14 +243,12 @@ static INPUT_PORTS_START( 30test )
 INPUT_PORTS_END
 
 
-void namco_30test_state::machine_start()
-{
-	m_digits.resolve();
-	m_lamps.resolve();
-	save_item(NAME(m_mux_data));
-}
 
-void namco_30test_state::_30test(machine_config &config)
+/******************************************************************************
+    Machine Configs
+******************************************************************************/
+
+void namco_30test_state::namco_30test(machine_config &config)
 {
 	/* basic machine hardware */
 	MC68HC11K1(config, m_maincpu, 16_MHz_XTAL);
@@ -242,11 +268,11 @@ void namco_30test_state::_30test(machine_config &config)
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-/***************************************************************************
 
-  Game driver(s)
 
-***************************************************************************/
+/******************************************************************************
+    ROM Definitions
+******************************************************************************/
 
 ROM_START( 30test )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -256,4 +282,11 @@ ROM_START( 30test )
 	ROM_LOAD( "tt1-voi0.7p",   0x0000, 0x80000, CRC(b4fc5921) SHA1(92a88d5adb50dae48715847f12e88a35e37ef78c) )
 ROM_END
 
-GAMEL( 1997, 30test, 0, _30test, 30test, namco_30test_state, empty_init, ROT0, "Namco", "30 Test (remake)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_30test )
+
+
+/******************************************************************************
+    Drivers
+******************************************************************************/
+
+/*     YEAR  NAME    PARENT  MACHINE       INPUT   CLASS               INIT        MONITOR  COMPANY, FULLNAME, FLAGS */
+GAMEL( 1997, 30test, 0,      namco_30test, 30test, namco_30test_state, empty_init, ROT0,    "Namco", "30 Test (remake)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_30test )
