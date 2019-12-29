@@ -426,8 +426,11 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 	{
 		popmessage("bitmap mode %08x\n", bitmap_addr);
 
-		uint32_t linebase = space.read_word(tilemap + (scanline | 1)); // every other word is unused, but there are only enough entries for 240 lines then, sometimes to do with interlace mode?
-		uint16_t palette = space.read_word(palette_map + scanline * 8);
+		uint32_t linebase = space.read_word(tilemap + scanline); // every other word is unused, but there are only enough entries for 240 lines then, sometimes to do with interlace mode?
+		uint16_t palette = space.read_word(palette_map + (scanline / 2));
+
+		if (scanline & 1)
+			palette >>= 8;
 
 		//if (linebase != 0)
 		//	printf("scanline %d linebase %04x palette %04x\n", scanline, linebase, palette);
@@ -436,7 +439,7 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 
 		int gfxbase = bitmap_addr + linebase;
 
-		for (int i = 0; i < 320; i++)
+		for (int i = 0; i < 160; i++) // will have to be 320 for jak_car2 ingame
 		{
 			uint16_t pix = m_space_read_cb((gfxbase++)&0xffffff);
 			int xx;
@@ -445,8 +448,8 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 
 			if ((scanline >= 0) && (scanline < 480))
 			{
-				xx = i * 2;
-				pal = (pix >> 8) + 0x100;
+				xx = (i * 2);
+				pal = (pix & 0xff) | 0x100;
 
 				if (xx >= 0 && xx <= cliprect.max_x)
 				{
@@ -460,8 +463,8 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 					}
 				}
 
-				xx = (i * 2) + 1;
-				pal = (pix & 0xff) | 0x100;
+				xx = (i * 2)+1;
+				pal = (pix >> 8) + 0x100;
 
 				if (xx >= 0 && xx <= cliprect.max_x)
 				{
