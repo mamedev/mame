@@ -11,7 +11,9 @@
 
 DEFINE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device, "gcm394_video", "SunPlus GCM394 System-on-a-Chip (Video)")
 
-#define LOG_GCM394_VIDEO_DMA      (1U << 3)
+#define LOG_GCM394_VIDEO_PALETTE  (1U << 5)
+#define LOG_GCM394_VIDEO_DMA      (1U << 4)
+#define LOG_GCM394_TMAP_EXTRA     (1U << 3)
 #define LOG_GCM394_TMAP           (1U << 2)
 #define LOG_GCM394_VIDEO          (1U << 1)
 
@@ -754,7 +756,7 @@ READ16_MEMBER(gcm394_base_video_device::tmap0_regs_r)
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap0_regs_w)
 {
-	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap0_regs_w %01x %04x\n", machine().describe_context(), offset, data);
+	LOGMASKED(LOG_GCM394_TMAP_EXTRA, "%s:gcm394_base_video_device::tmap0_regs_w %01x %04x\n", machine().describe_context(), offset, data);
 	if (offset < 2)
 	{
 		write_tmap_scroll(0, m_tmap0_scroll, offset, data);
@@ -806,7 +808,7 @@ READ16_MEMBER(gcm394_base_video_device::tmap1_regs_r)
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap1_regs_w)
 {
-	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap1_regs_w %01x %04x\n", machine().describe_context(), offset, data);
+	LOGMASKED(LOG_GCM394_TMAP_EXTRA, "%s:gcm394_base_video_device::tmap1_regs_w %01x %04x\n", machine().describe_context(), offset, data);
 	if (offset < 2)
 	{
 		write_tmap_scroll(1, m_tmap1_scroll, offset, data);
@@ -857,7 +859,7 @@ READ16_MEMBER(gcm394_base_video_device::tmap2_regs_r)
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap2_regs_w)
 {
-	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap2_regs_w %01x %04x\n", machine().describe_context(), offset, data);
+	LOGMASKED(LOG_GCM394_TMAP_EXTRA, "%s:gcm394_base_video_device::tmap2_regs_w %01x %04x\n", machine().describe_context(), offset, data);
 	if (offset < 4)
 	{
 		write_tmap_extrascroll(2, m_tmap2_scroll, offset, data);
@@ -909,7 +911,7 @@ READ16_MEMBER(gcm394_base_video_device::tmap3_regs_r)
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap3_regs_w)
 {
-	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap3_regs_w %01x %04x\n", machine().describe_context(), offset, data);
+	LOGMASKED(LOG_GCM394_TMAP_EXTRA, "%s:gcm394_base_video_device::tmap3_regs_w %01x %04x\n", machine().describe_context(), offset, data);
 	if (offset < 4)
 	{
 		write_tmap_extrascroll(3, m_tmap3_scroll, offset, data);
@@ -1109,8 +1111,17 @@ WRITE16_MEMBER(gcm394_base_video_device::video_703a_palettebank_w)
 	m_703a_palettebank = data;
 }
 
-READ16_MEMBER(gcm394_base_video_device::video_7062_r) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7062_r\n", machine().describe_context()); return m_7062; }
-WRITE16_MEMBER(gcm394_base_video_device::video_7062_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7062_w %04x\n", machine().describe_context(), data); m_7062 = data; }
+READ16_MEMBER(gcm394_base_video_device::videoirq_source_enable_r)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::videoirq_source_enable_r\n", machine().describe_context());
+	return m_7062;
+}
+
+WRITE16_MEMBER(gcm394_base_video_device::videoirq_source_enable_w)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::videoirq_source_enable_w %04x\n", machine().describe_context(), data);
+	m_7062 = data;
+}
 
 READ16_MEMBER(gcm394_base_video_device::video_7063_videoirq_source_r)
 {
@@ -1222,7 +1233,7 @@ READ16_MEMBER(gcm394_base_video_device::spriteram_r)
 
 WRITE16_MEMBER(gcm394_base_video_device::palette_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::palette_w %04x : %04x (value of 0x703a is %04x)\n", machine().describe_context(), offset, data, m_703a_palettebank);
+	LOGMASKED(LOG_GCM394_VIDEO_PALETTE, "%s:gcm394_base_video_device::palette_w %04x : %04x (value of 0x703a is %04x)\n", machine().describe_context(), offset, data, m_703a_palettebank);
 
 	if (m_703a_palettebank & 0xfff0)
 	{

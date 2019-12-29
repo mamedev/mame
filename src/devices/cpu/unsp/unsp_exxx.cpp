@@ -9,6 +9,14 @@
 
 #include "unspdasm.h"
 
+#define LOG_UNSP_SHIFTS          (1U << 2)
+#define LOG_UNSP_MULS            (1U << 1)
+
+#define VERBOSE             (0)
+
+#include "logmacro.h"
+
+
 void unsp_device::execute_exxx_group(uint16_t op)
 {
 	// several exxx opcodes have already been decoded as jumps by the time we get here
@@ -120,7 +128,7 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 			const uint16_t opb = op & 7;
 			m_core->m_icount -= 12;
 
-			logerror("%s: MUL su with %04x (signed) * %04x (unsigned) : ", machine().describe_context(), m_core->m_r[opa], m_core->m_r[opb]);
+			LOGMASKED(LOG_UNSP_MULS, "%s: MUL su with %04x (signed) * %04x (unsigned) : ", machine().describe_context(), m_core->m_r[opa], m_core->m_r[opb]);
 
 			uint32_t lres = m_core->m_r[opa] * m_core->m_r[opb];
 			if (m_core->m_r[opa] & 0x8000)
@@ -130,7 +138,7 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 			m_core->m_r[REG_R4] = lres >> 16;
 			m_core->m_r[REG_R3] = (uint16_t)lres;
 
-			logerror("result was : %08x\n", lres);
+			LOGMASKED(LOG_UNSP_MULS, "result was : %08x\n", lres);
 
 			return;
 		}
@@ -156,7 +164,7 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 		// MULS uu or MULS su (invalid?)
 		print_muls(stream, op);
 		*/
-		logerror("MULS uu or su\n");
+		LOGMASKED(LOG_UNSP_MULS, "MULS uu or su\n");
 		unimplemented_opcode(op);
 		return;
 	}
@@ -170,28 +178,52 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 		switch (shift)
 		{
 		case 0x00:
-			logerror("%s = %s asr %s\n", regs[rd], regs[rd], regs[rs]);
+			LOGMASKED(LOG_UNSP_SHIFTS, "%s = %s asr %s\n", regs[rd], regs[rd], regs[rs]);
 			unimplemented_opcode(op);
 			return;
 
-		case 0x01:
-			logerror("%s = %s asror %s\n", regs[rd], regs[rd], regs[rs]);
-			unimplemented_opcode(op);
+		case 0x01: // jak_car2 on starting a game
+		{
+			LOGMASKED(LOG_UNSP_SHIFTS, "%s = %s asror %s\n", regs[rd], regs[rd], regs[rs]);
+			if (rd != 4) // 4 = R4 3 = R3 - the 'register bleeding' is only verified as needed between r3/r4, so bail for other regs until verified
+				unimplemented_opcode(op);
+
+			uint32_t res = (uint16_t)(m_core->m_r[rd]);
+			int shift = (m_core->m_r[rs] & 0x01f);
+			res <<= 16;
+
+			if (res & 0x80000000)
+			{
+				res = res >> shift;
+				res |= (0xffffffff << (32 - shift));
+
+				m_core->m_r[rd] = (res >> 16);
+				m_core->m_r[rd - 1] |= (res & 0xffff); // register bleeding?
+			}
+			else
+			{
+				res = res >> shift;
+				m_core->m_r[rd] = (res >> 16);
+				m_core->m_r[rd - 1] |= (res & 0xffff); // register bleeding?
+			}
+
+			LOGMASKED(LOG_UNSP_SHIFTS, "result %04x\n", m_core->m_r[rd]);
 			return;
+		}
 
 		case 0x02:
-			logerror("pc:%06x: %s = %s lsl %s (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
+			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lsl %s (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
 
 			m_core->m_r[rd] = (uint16_t)((m_core->m_r[rd]&0xffff) << (m_core->m_r[rs] & 0x01f));
 
-			logerror("result %04x\n", m_core->m_r[rd]);
+			LOGMASKED(LOG_UNSP_SHIFTS, "result %04x\n", m_core->m_r[rd]);
 
 			return;
 
 		case 0x03:
 		{
 			// wrlshunt uses this
-			logerror("pc:%06x: %s = %s lslor %s  (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
+			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lslor %s  (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
 
 			if (rd != 3) // 4 = R4 3 = R3 - the 'register bleeding' is only verified as needed between r3/r4, so bail for other regs until verified
 				unimplemented_opcode(op);
@@ -203,20 +235,20 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 			m_core->m_r[rd] = (res & 0xffff);
 			m_core->m_r[rd + 1] |= (res >> 16); // register bleeding?
 
-			logerror("result %04x\n", m_core->m_r[rd]);
+			LOGMASKED(LOG_UNSP_SHIFTS, "result %04x\n", m_core->m_r[rd]);
 			return;
 		}
 
 		case 0x04:
 			// smartfp loops increasing shift by 4 up to values of 28? (but regs are 16-bit?)
-			logerror("pc:%06x: %s = %s lsr %s  (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
+			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lsr %s  (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
 			m_core->m_r[rd] = (uint16_t)((m_core->m_r[rd]&0xffff) >> (m_core->m_r[rs] & 0x1f));
-			logerror("result %04x\n", m_core->m_r[rd]);
+			LOGMASKED(LOG_UNSP_SHIFTS, "result %04x\n", m_core->m_r[rd]);
 			return;
 
 		case 0x05:
 		{
-			logerror("pc:%06x: %s = %s lsror %s  (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
+			LOGMASKED(LOG_UNSP_SHIFTS, "pc:%06x: %s = %s lsror %s  (%04x %04x) : ", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
 
 			if (rd != 4) // 4 = R4 3 = R3 - the 'register bleeding' is only verified as needed between r3/r4, so bail for other regs until verified
 				unimplemented_opcode(op);
@@ -239,17 +271,17 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 			m_core->m_r[rd - 1] |= (res & 0xffff); // register bleeding?
 
 
-			logerror("result %04x\n", m_core->m_r[rd]);
+			LOGMASKED(LOG_UNSP_SHIFTS, "result %04x\n", m_core->m_r[rd]);
 			return;
 		}
 
 		case 0x06:
-			logerror("%s = %s rol %s\n", regs[rd], regs[rd], regs[rs]);
+			LOGMASKED(LOG_UNSP_SHIFTS, "%s = %s rol %s\n", regs[rd], regs[rd], regs[rs]);
 			unimplemented_opcode(op);
 			return;
 
 		case 0x07:
-			logerror("%s = %s ror %s\n", regs[rd], regs[rd], regs[rs]);
+			LOGMASKED(LOG_UNSP_SHIFTS, "%s = %s ror %s\n", regs[rd], regs[rd], regs[rs]);
 			unimplemented_opcode(op);
 			return;
 		}

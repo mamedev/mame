@@ -169,6 +169,17 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
 	if (data & 0x02) trigger_systemm_dma(space, 1, data);
 }
 
+READ16_MEMBER(sunplus_gcm394_base_device::system_dma_memtype_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::system_dma_memtype_r\n", machine().describe_context());
+	return m_system_dma_memtype; 
+}
+
+WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_memtype_w)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::system_dma_memtype_w %04x\n", machine().describe_context(), data);
+	m_system_dma_memtype = data;
+}
 
 
 // **************************************** 78xx region with some handling *************************************************
@@ -463,7 +474,7 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 
 	map(0x007051, 0x007051).r(m_spg_video, FUNC(gcm394_base_video_device::video_7051_r)); // wrlshunt checks this (doesn't exist on older SPG?)
 
-	map(0x007062, 0x007062).rw(m_spg_video, FUNC(gcm394_base_video_device::video_7062_r), FUNC(gcm394_base_video_device::video_7062_w));
+	map(0x007062, 0x007062).rw(m_spg_video, FUNC(gcm394_base_video_device::videoirq_source_enable_r), FUNC(gcm394_base_video_device::videoirq_source_enable_w));
 	map(0x007063, 0x007063).rw(m_spg_video, FUNC(gcm394_base_video_device::video_7063_videoirq_source_r), FUNC(gcm394_base_video_device::video_7063_videoirq_source_ack_w));
 
 	// note, 70 / 71 / 72 are the same offsets used for DMA as in spg2xx video device
@@ -633,12 +644,9 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	// ######################################################################################################################################################################################
 
 	map(0x007a3a, 0x007a3a).r(FUNC(sunplus_gcm394_base_device::system_7a3a_r));
-
 	map(0x007a80, 0x007a86).rw(FUNC(sunplus_gcm394_base_device::system_dma_params_channel0_r), FUNC(sunplus_gcm394_base_device::system_dma_params_channel0_w));
-
 	map(0x007a88, 0x007a8e).rw(FUNC(sunplus_gcm394_base_device::system_dma_params_channel1_r), FUNC(sunplus_gcm394_base_device::system_dma_params_channel1_w)); // jak_tsm writes here
-
-	// 7abe - written with DMA stuff (source type for each channel so that device handles timings properly?)
+	map(0x007abe, 0x007abe).rw(FUNC(sunplus_gcm394_base_device::system_dma_memtype_r), FUNC(sunplus_gcm394_base_device::system_dma_memtype_w)); // 7abe - written with DMA stuff (source type for each channel so that device handles timings properly?)
 	map(0x007abf, 0x007abf).rw(FUNC(sunplus_gcm394_base_device::system_dma_status_r), FUNC(sunplus_gcm394_base_device::system_dma_trigger_w));
 
 	// ######################################################################################################################################################################################
@@ -913,6 +921,7 @@ void sunplus_gcm394_base_device::device_reset()
 	m_7960 = 0x0000;
 	m_7961 = 0x0000;
 
+	m_system_dma_memtype = 0x0000;
 
 	m_unk_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 }

@@ -154,6 +154,8 @@ protected:
 	uint16_t m_7960;
 	uint16_t m_7961;
 
+	uint16_t m_system_dma_memtype;
+
 	devcb_read16 m_nand_read_cb;
 	int m_csbase;
 
@@ -183,6 +185,8 @@ private:
 	DECLARE_WRITE16_MEMBER(system_dma_params_channel1_w);
 	DECLARE_READ16_MEMBER(system_dma_status_r);
 	DECLARE_WRITE16_MEMBER(system_dma_trigger_w);
+	DECLARE_READ16_MEMBER(system_dma_memtype_r);
+	DECLARE_WRITE16_MEMBER(system_dma_memtype_w);
 
 	DECLARE_READ16_MEMBER(unkarea_780f_status_r);
 	DECLARE_READ16_MEMBER(unkarea_78fb_status_r);

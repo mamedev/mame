@@ -77,8 +77,8 @@ public:
 	DECLARE_READ16_MEMBER(video_703a_palettebank_r);
 	DECLARE_WRITE16_MEMBER(video_703a_palettebank_w);
 
-	DECLARE_READ16_MEMBER(video_7062_r);
-	DECLARE_WRITE16_MEMBER(video_7062_w);
+	DECLARE_READ16_MEMBER(videoirq_source_enable_r);
+	DECLARE_WRITE16_MEMBER(videoirq_source_enable_w);
 
 	DECLARE_READ16_MEMBER(video_7063_videoirq_source_r);
 	DECLARE_WRITE16_MEMBER(video_7063_videoirq_source_ack_w);
