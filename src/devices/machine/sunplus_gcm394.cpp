@@ -130,14 +130,14 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 		if (mem.read_word(0x3f368) == 0x4840)
 			mem.write_word(0x3f368, 0x4841);    // cars 2 IRQ? wait hack
 
-		//if (mem.read_word(0x4368c) == 0x4846)
-		//	mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
+		if (mem.read_word(0x4368c) == 0x4846)
+			mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
 
 		if (mem.read_word(0x4d8d4) == 0x4840)
 			mem.write_word(0x4d8d4, 0x4841);    // golden tee IRQ? wait hack
 
-		//if (mem.read_word(0x34410) == 0x4846)
-		//	mem.write_word(0x34410, 0x4840);    // golden tee force service mode
+		if (mem.read_word(0x34410) == 0x4846)
+			mem.write_word(0x34410, 0x4840);    // golden tee force service mode
 		
 	}
 	else if ((mode == 0x0089) || (mode == 0x0009) || (mode == 0x4009))

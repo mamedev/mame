@@ -71,6 +71,7 @@ public:
 	void set_cs_space(address_space* csspace) { m_cs_space = csspace; }
 	
 	void set_paldisplaybank_high_hack(int pal_displaybank_high) { m_spg_video->set_paldisplaybank_high(pal_displaybank_high); }
+	void set_alt_tile_addressing_hack(int alt_tile_addressing) { m_spg_video->set_alt_tile_addressing(alt_tile_addressing); }
 
 protected:
 

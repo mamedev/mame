@@ -34,7 +34,8 @@ gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig
 	m_gfxdecode(*this, "gfxdecode"),
 	m_space_read_cb(*this),
 	m_global_y_mask(0x1ff),
-	m_pal_displaybank_high(0)
+	m_pal_displaybank_high(0),
+	m_alt_tile_addressing(0)
 {
 }
 
@@ -426,9 +427,14 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 		popmessage("bitmap mode %08x\n", bitmap_addr);
 
 		uint32_t linebase = space.read_word(tilemap + (scanline | 1)); // every other word is unused, but there are only enough entries for 240 lines then, sometimes to do with interlace mode?
-		//uint16_t palette = space.read_word(palette_map + scanline);
+		uint16_t palette = space.read_word(palette_map + scanline * 8);
 
-		int gfxbase = bitmap_addr + (linebase/2);
+		//if (linebase != 0)
+		//	printf("scanline %d linebase %04x palette %04x\n", scanline, linebase, palette);
+
+		linebase |= ((palette >> 8) << 16);
+
+		int gfxbase = bitmap_addr + linebase;
 
 		for (int i = 0; i < 320; i++)
 		{
@@ -477,18 +483,18 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 		uint32_t tile_w = 8 << ((attr_reg & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
 
 		int total_width;
-		int use_alt_drawmode;
+		int use_alt_drawmode = m_alt_tile_addressing;
 
 		// just a guess based on this being set on the higher resolution tilemaps we've seen, could be 100% incorrect register
 		if ((attr_reg >> 14) & 0x2)
 		{
 			total_width = 1024;
-			use_alt_drawmode = 1; // probably doesn't control this
+		//	use_alt_drawmode = 1; // probably doesn't control this
 		}
 		else
 		{
 			total_width = 512;
-			use_alt_drawmode = 0; // probably doesn't control this
+		//	use_alt_drawmode = 0; // probably doesn't control this
 		}
 
 		uint32_t tile_count_x = total_width / tile_w;
