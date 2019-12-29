@@ -1621,7 +1621,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 	</software>
 
 	<software name="calspeedp" cloneof="calspeed">
-		<description>California Speed (Europe, Prototype)</description>
+		<description>California Speed (Europe, prototype)</description>
 		<year>1999?</year>
 		<publisher>Midway</publisher>
 		<part name="cart" interface="n64_cart">
@@ -1684,7 +1684,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 	</software>
 
 	<software name="cvaniau" cloneof="cvania">
-		<description>Castlevania (USA, Rev. B)</description>
+		<description>Castlevania (USA, rev 2)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-ND3E-USA"/>
@@ -2258,7 +2258,7 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="crusnwld">
+	<software name="crusnwld1" cloneof="crusnwld">
 		<description>Cruis'n World (Europe)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
@@ -2266,6 +2266,18 @@ patched out (+ a fix for internal checksum)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="cruis'n world (europe).bin" size="12582912" crc="2a8b3094" sha1="e0efbb03b343cc9ace4e98306250436604054b6e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crusnwld">
+		<description>Cruis'n World (Europe, rev 1)</description>
+		<year>1998</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NCWP-EUR"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="12582912">
+				<rom name="cruis'n world (europe) (rev. 1).bin" size="12582912" crc="e962672d" sha1="48e4722765644ef98d46195d1abb1e79f99f7cfb" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2449,7 +2461,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="dstall64p" cloneof="dstall64">
-		<description>Derby Stallion 64 (Japan, Prototype)</description>
+		<description>Derby Stallion 64 (Japan, prototype)</description>
 		<year>2001</year>
 		<publisher>Media Factory</publisher>
 		<part name="cart" interface="n64_cart">
@@ -3075,6 +3087,17 @@ This cart features a RTC, currently unemulated
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="ecw hardcore revolution (europe).bin" size="33554432" crc="2fac2c41" sha1="8718a6e6c75ba0db8d2266f5a2fb0361807ac988" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ecwhardg" cloneof="ecwhard">
+		<description>ECW Hardcore Revolution (Germany)</description>
+		<year>2000</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="ecw hardcore revolution (germany).bin" size="33554432" crc="61503331" sha1="5747161ac3666fb5a5c876013207568253a2d279" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4826,7 +4849,7 @@ This cart features a RTC, currently unemulated
 		</part>
 	</software>
 
-	<software name="iss2ku" cloneof="iss2k">
+	<software name="iss2ku1" cloneof="iss2k">
 		<description>International Superstar Soccer 2000 (USA)</description>
 		<year>2000</year>
 		<publisher>Konami</publisher>
@@ -4838,6 +4861,24 @@ This cart features a RTC, currently unemulated
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
 				<rom name="nus-nise-0.u1" size="16777216" crc="bb1824b8" sha1="d86386eeee1b5b32ce43bc9a4149314a23a6320b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iss2ku" cloneof="iss2k">
+		<description>International Superstar Soccer 2000 (USA, rev 1)</description>
+		<year>2000</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="NUS-NISE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-03" />
+			<feature name="u1" value="U1 [NUS-NISE-1]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="16777216">
+				<rom name="nus-nise-1.u1" size="16777216" crc="8b73672c" sha1="aa53928967839fcdd864b3f384f23fda435e3e5e" />
 			</dataarea>
 		</part>
 	</software>
@@ -5476,7 +5517,7 @@ This cart features a RTC, currently unemulated
 			<feature name="u2" value="U2 [29L1100KC-15B0]" />
 			<feature name="u3" value="U3 [CIC-NUS-6103]" />
 			<dataarea name="rom" size="16777216">
-				<rom name="nus-nkje-0.u1" size="16777216" crc="12d8f3e9" sha1="ec33cd4d44bba163f89e435c2aefbf7313d8cece" offset="000000" />
+				<rom name="nus-nkje-0.u1" size="16777216" crc="42d1ed42" sha1="ec8497ee9ebe1333032472b39206f9899c9213b3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5506,7 +5547,7 @@ This cart features a RTC, currently unemulated
 	</software>
 
 	<software name="kigoldu1" cloneof="kigold">
-		<description>Killer Instinct Gold (USA, Rev. A)</description>
+		<description>Killer Instinct Gold (USA, rev 1)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NKIE-USA"/>
@@ -6085,7 +6126,7 @@ This cart features a RTC, currently unemulated
 		</part>
 	</software>
 
-	<software name="madden99u" cloneof="madden99">
+	<software name="madden99u1" cloneof="madden99">
 		<description>Madden NFL 99 (USA)</description>
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
@@ -6099,6 +6140,24 @@ This cart features a RTC, currently unemulated
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="12582912">
 				<rom name="nus-n9me-0.u1" size="12582912" crc="ac21a5bf" sha1="fd5da6fef67461fb5d6767d933663dcfa6e0f054" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="madden99u" cloneof="madden99">
+		<description>Madden NFL 99 (USA, rev 1)</description>
+		<year>1999</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="NUS-N9ME-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-N9ME-1]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-n9me-1.u1" size="12582912" crc="e05b574d" sha1="c686a44e43df6b4e5ecd816d113a402ae9e1570b" />
 			</dataarea>
 		</part>
 	</software>
@@ -8404,6 +8463,7 @@ The original cart contained an Altera MAX7000 series CPLD intercepting the AD16 
 We currently don't emulate this, and thus we include also this version where the dongle checks have been
 patched out (+ a fix for internal checksum)
 -->
+<!-- Why is this a different size than encrypted? -->
 	<software name="pdarkuph" cloneof="pdark">
 		<description>Perfect Dark (USA, Prototype Debug, Decrypted)</description>
 		<year>2000</year>
@@ -10387,7 +10447,7 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="ssiliconu" cloneof="ssilicon">
+	<software name="ssiliconu1" cloneof="ssilicon">
 		<description>SpaceStation Silicon Valley (USA)</description>
 		<year>1998</year>
 		<publisher>Take Two Interactive</publisher>
@@ -10399,6 +10459,24 @@ patched out (+ a fix for internal checksum)
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
 				<rom name="nus-nsve-0.u1" size="8388608" crc="76db1da1" sha1="8ae14d65342f5a1ff8d0f09251ef46e24c29ff2b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssiliconu" cloneof="ssilicon">
+		<description>SpaceStation Silicon Valley (USA, rev 1)</description>
+		<year>1998</year>
+		<publisher>Take Two Interactive</publisher>
+		<info name="serial" value="NUS-NSVE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NSVE-1]" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="8388608">
+				<rom name="nus-nsve-1.u1" size="8388608" crc="0bcf3f2e" sha1="9d826f67dd8b6567de9c9259e795e97f9a02e3f5" />
 			</dataarea>
 		</part>
 	</software>
@@ -10514,7 +10592,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="swrogue">
-		<description>Star Wars - Rogue Squadron (Europe, Rev. A)</description>
+		<description>Star Wars - Rogue Squadron (Europe, rev 1)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NRSP-(EUR,AUS)"/>
@@ -10612,7 +10690,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="swshadowu1" cloneof="swshadow">
-		<description>Star Wars - Shadows of the Empire (USA, Rev. A)</description>
+		<description>Star Wars - Shadows of the Empire (USA, rev 1)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NSWE-USA" />
@@ -11695,6 +11773,24 @@ clips onto the player's ear.
 		</part>
 	</software>
 
+	<software name="tgrallya" cloneof="tgrally">
+		<description>Top Gear Rally (Asia)</description>
+		<year>1997</year>
+		<publisher>Kemco</publisher>
+		<info name="serial" value="NUS-NGRX-ASM"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NGRX-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-ASM" />
+			<dataarea name="rom" size="8388608">
+				<rom name="nus-ngrx-0.u1" size="8388608" crc="c85372cf" sha1="7339e97dcc7fca10788fb29f100c8d2316b7305e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tgrally2">
 		<description>Top Gear Rally 2 (Europe)</description>
 		<year>1999</year>
@@ -11733,6 +11829,17 @@ clips onto the player's ear.
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="12582912">
 				<rom name="nus-nl2e-0.u1" size="12582912" crc="7e4e181c" sha1="2c51ef2ca9b738daa5f70b8199a64cd765a44243" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tgrally2p" cloneof="tgrally2">
+		<description>Top Gear Rally 2 (prototype 19990831)</description>
+		<year>1999</year>
+		<publisher>Kemco</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="16777216">
+				<rom name="top gear rally 2 rev 19990831 (1999)(kemco)(beta).bin" size="16777216" crc="3c77c5d6" sha1="168dd383edd88a921d25cf7eaeb18b2da29c744a" />
 			</dataarea>
 		</part>
 	</software>
@@ -11974,7 +12081,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="turokua" cloneof="turok">
-		<description>Turok - Dinosaur Hunter (USA, Rev. A)</description>
+		<description>Turok - Dinosaur Hunter (USA, rev 1)</description>
 		<year>1997</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NUS-NTUE-USA"/>
@@ -12074,18 +12181,19 @@ clips onto the player's ear.
 	</software>
 
 	<software name="turok2p" cloneof="turok2">
-		<description>Turok 2 - Seeds of Evil (Europe, Demo Kiosk)</description>
+		<description>Turok 2 - Seeds of Evil (Europe, kiosk demo)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NUS-NTYP-UKV"/>
 		<part name="cart" interface="n64_cart">
-			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="pcb" value="NUS-01A-02" />
 			<feature name="u1" value="NUS-NTYP-0" />
 			<feature name="u2" value="[empty]" />
 			<feature name="u3" value="CIC-NUS-7101" />
 			<feature name="cart_model" value="NUS-006(EUR)" />
+			<feature name="cart_back_label" value="NUS-EUR-1" />
 			<dataarea name="rom" size="12582912">
-				<rom name="nus-ntyp-0.u1" size="12582912" crc="38b017d5" sha1="4d47eabe2740d6327207539cd229d7c9a27b51f0" offset="000000" />
+				<rom name="nus-ntyp-0.u1" size="12582912" crc="38b017d5" sha1="4d47eabe2740d6327207539cd229d7c9a27b51f0" />
 			</dataarea>
 		</part>
 	</software>
@@ -12127,7 +12235,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="turok2ud" cloneof="turok2">
-		<description>Turok 2 - Seeds of Evil (USA, Demo Kiosk)</description>
+		<description>Turok 2 - Seeds of Evil (USA, kiosk demo)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="n64_cart">
@@ -12184,7 +12292,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="turok3up1" cloneof="turok3">
-		<description>Turok 3 - Shadow of Oblivion (USA, Prototype)</description>
+		<description>Turok 3 - Shadow of Oblivion (USA, prototype 20000710, version N4TKER18)</description>
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="n64_cart">
@@ -12195,12 +12303,23 @@ clips onto the player's ear.
 	</software>
 
 	<software name="turok3up2" cloneof="turok3">
-		<description>Turok 3 - Shadow of Oblivion (USA, Prototype 20000531)</description>
+		<description>Turok 3 - Shadow of Oblivion (USA, prototype 20000531, version N4TKER09)</description>
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="turok 3 - shadow of oblivion (usa) (2000-05-31) (beta).bin" size="33554432" crc="505e9066" sha1="12a22310e653b2389110e7708831634e3f9f18db" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turok3up3" cloneof="turok3">
+		<description>Turok 3 - Shadow of Oblivion (USA, prototype 20000606)</description>
+		<year>2000</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="turok 3 - shadow of oblivion (2000)(acclaim)(beta).bin" size="33554432" crc="bf082a47" sha1="26f6558d5c824d17174782ec9a3bed4689828a76" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -12486,7 +12605,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="waialae">
-		<description>Waialae Country Club - True Golf Classics (Europe, Rev. A)</description>
+		<description>Waialae Country Club - True Golf Classics (Europe, rev 1)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NWLP-EUR"/>
@@ -12705,7 +12824,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="wg3dhu" cloneof="wg3dh">
-		<description>Wayne Gretzky's 3D Hockey (USA, Rev. A)</description>
+		<description>Wayne Gretzky's 3D Hockey (USA, rev 1)</description>
 		<year>1996</year>
 		<publisher>Midway</publisher>
 		<info name="serial" value="NUS-NWGE-USA"/>
@@ -12945,7 +13064,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="wildwatr">
-		<description>Wildwaters (USA, Prototype)</description>
+		<description>Wildwaters (USA, prototype 19990615)</description>
 		<year>2000</year>
 		<publisher>Looking Glass Studios</publisher>
 		<part name="cart" interface="n64_cart">
@@ -13033,6 +13152,31 @@ clips onto the player's ear.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="wipeout 64 (usa).bin" size="8388608" crc="3e8cce96" sha1="4b9d19e3010756d3106f8b20b2b90daddb80bc1c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wipeoutp" cloneof="wipeout">
+		<description>Wipeout 64 (prototype)</description>
+		<year>1998</year>
+		<publisher>Midway</publisher>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-8F16F-01" />
+			<feature name="u1" value="U1 [29F016-90PFTN]" />
+			<feature name="u2" value="U2 [29F016-90PFTN]" />
+			<feature name="u3" value="U3 [29F016-90PFTR]" />
+			<feature name="u4" value="U4 [29F016-90PFTR]" />
+			<feature name="u5" value="U5 [29F016-90PFTN]" />
+			<feature name="u6" value="U6 [29F016-90PFTN]" />
+			<feature name="u7" value="U7 [29F016-90PFTR]" />
+			<feature name="u8" value="U8 [29F016-90PFTR]" />
+			<feature name="u9" value="U9 [EPM7128SQC100-12]" />
+			<feature name="u10" value="U10 [CIC-NUS-7101]" />
+			<feature name="u11" value="U11 N64_EEPROM [BU9850]" />
+			<feature name="u12" value="U12 [17805]" />
+			<feature name="u13" value="U13" /> <!-- unknown -->
+			<dataarea name="rom" size="16777216">
+				<rom name="wipeout 64 (europe) (proto).bin" size="16777216" crc="944b258f" sha1="a05a1f4c9f4ee67159db0cd15c37e05f255d35d0" />
 			</dataarea>
 		</part>
 	</software>
