@@ -423,7 +423,53 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 
 	if (ctrl_reg & 0x01) // bitmap mode jak_car2 uses this ingame
 	{
-		popmessage("bitmap mode\n");
+		popmessage("bitmap mode %08x\n", bitmap_addr);
+
+		uint32_t linebase = space.read_word(tilemap + (scanline | 1)); // every other word is unused, but there are only enough entries for 240 lines then, sometimes to do with interlace mode?
+		//uint16_t palette = space.read_word(palette_map + scanline);
+
+		int gfxbase = bitmap_addr + (linebase/2);
+
+		for (int i = 0; i < 320; i++)
+		{
+			uint16_t pix = m_space_read_cb((gfxbase++)&0xffffff);
+			int xx;
+			int y_index = scanline * m_screen->width();
+			uint16_t pal;
+
+			if ((scanline >= 0) && (scanline < 480))
+			{
+				xx = i * 2;
+				pal = (pix >> 8) + 0x100;
+
+				if (xx >= 0 && xx <= cliprect.max_x)
+				{
+					int pix_index = xx + y_index;
+
+					uint16_t rgb = m_paletteram[pal];
+
+					if (!(rgb & 0x8000))
+					{
+						m_screenbuf[pix_index] = m_rgb555_to_rgb888[rgb];
+					}
+				}
+
+				xx = (i * 2) + 1;
+				pal = (pix & 0xff) | 0x100;
+
+				if (xx >= 0 && xx <= cliprect.max_x)
+				{
+					int pix_index = xx + y_index;
+
+					uint16_t rgb = m_paletteram[pal];
+
+					if (!(rgb & 0x8000))
+					{
+						m_screenbuf[pix_index] = m_rgb555_to_rgb888[rgb];
+					}
+				}
+			}
+		}
 	}
 	else
 	{
