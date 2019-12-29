@@ -1311,6 +1311,9 @@ public:
 	optional_device<screen_device> m_screen_finder; // the screen we are acting on
 	optional_device<cpu_device> m_cpu_finder;   // the CPU we interact with
 
+	std::unique_ptr<uint8_t[]> m_fbmem_alloc;
+	std::unique_ptr<uint8_t[]> m_tmumem_alloc[2];
+
 	uint8_t             index;                  // index of board
 	screen_device *     m_screen;               // the screen we are acting on
 	cpu_device *        m_cpu;                  // the CPU we interact with
@@ -1335,7 +1338,7 @@ public:
 	banshee_info        banshee;                // Banshee state
 
 	legacy_poly_manager * poly;                 // polygon manager
-	stats_block *       thread_stats;           // per-thread statistics
+	std::unique_ptr<stats_block[]> thread_stats; // per-thread statistics
 
 	voodoo_stats        stats;                  // internal statistics
 
