@@ -336,7 +336,6 @@ u16 vr0video_device::Alpha(QuadInfo *Quad, u16 Src, u16 Dst)
 	return RGB16(dcr, dcg, dcb);
 }
 
-//TRUST ON THE COMPILER OPTIMIZATIONS
 void vr0video_device::DrawQuad(u8 bpp, bool tiled, QuadInfo *Quad)
 {
 	const u32 TransColor = Quad->Trans ? RGB32TO16(Quad->TransColor) : NOTRANSCOLOR;
