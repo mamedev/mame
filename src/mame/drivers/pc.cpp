@@ -1181,7 +1181,7 @@ ROM_START( sicpc1605 )
 
 	// ROM for INS8039N-11 keyboard MCU in Siemens KB-097B/SI keyboard
 	ROM_REGION(0x8000,"kbd", 0)
-	ROM_LOAD("kb097b-st_v1.0.bin", 0x0000, 0x8000, CRC(5fc5903f) SHA1(5fc14d12800e22bb354e4b329c6ffc25efa0397c))
+	ROM_LOAD("kb097b-st_v1.0.bin", 0x0000, 0x2000, CRC(5fc5903f) SHA1(5fc14d12800e22bb354e4b329c6ffc25efa0397c))
 ROM_END
 
 
