@@ -336,7 +336,7 @@ u16 vr0video_device::Alpha(QuadInfo *Quad, u16 Src, u16 Dst)
 	return RGB16(dcr, dcg, dcb);
 }
 
-void vr0video_device::DrawQuad(u8 bpp, bool tiled, QuadInfo *Quad)
+void vr0video_device::DrawQuad(QuadInfo *Quad)
 {
 	const u32 TransColor = Quad->Trans ? RGB32TO16(Quad->TransColor) : NOTRANSCOLOR;
 	u16 *line = Quad->Dest;
@@ -369,7 +369,7 @@ void vr0video_device::DrawQuad(u8 bpp, bool tiled, QuadInfo *Quad)
 				ty &= Maskh;
 			}
 
-			if (tiled)
+			if (Quad->Tiled)
 			{
 				const u32 Index = Quad->Tile[(ty >> 3) * (W) + (tx >> 3)];
 				Offset=(Index << 6) + ((ty & 7) << 3) + (tx & 7);
@@ -378,23 +378,27 @@ void vr0video_device::DrawQuad(u8 bpp, bool tiled, QuadInfo *Quad)
 			else
 				Offset = ty * (Quad->TWidth) + tx;
 
-			if (bpp == 4)
+			u8 Texel;
+			switch (Quad->bpp)
 			{
-				u8 Texel = Quad->u.Imageb[Offset / 2];
+			case 4:
+				Texel = Quad->u.Imageb[Offset / 2];
 				if (Offset & 1)
 					Texel &= 0xf;
 				else
 					Texel = (Texel >> 4) & 0xf;
 				Color = Quad->Pal[Texel];
-			}
-			else if (bpp == 8)
-			{
-				const u8 Texel = Quad->u.Imageb[Offset];
+				break;
+			case 8:
+				Texel = Quad->u.Imageb[Offset];
 				Color = Quad->Pal[Texel];
-			}
-			else if (bpp == 16)
-			{
+				break;
+			case 16:
 				Color = Quad->u.Imagew[Offset];
+				break;
+			default:
+				Color = ~0;
+				break;
 			}
 			if (Color != TransColor)
 			{
@@ -573,14 +577,16 @@ int vr0video_device::vrender0_ProcessPacket(u32 PacketPtr)
 
 		if (Packet0 & 0x8)  //Texture Enable
 		{
+			Quad.Tiled = m_RenderState.TextureMode;
+			Quad.bpp = bpp[m_RenderState.PixelFormat];
 			Quad.u.Imageb = TEXTURE + 128 * m_RenderState.FontOffset;
 			Quad.Tile = (u16*) (TEXTURE + 128 * m_RenderState.TileOffset);
-			if (!m_RenderState.PixelFormat)
+			if (Quad.bpp == 4)
 				Quad.Pal = m_InternalPalette + (m_RenderState.PaletteBank * 16);
 			else
 				Quad.Pal = m_InternalPalette;
 
-			DrawQuad(bpp[m_RenderState.PixelFormat], m_RenderState.TextureMode, &Quad);
+			DrawQuad(&Quad);
 		}
 		else
 			DrawQuadFill(&Quad);

@@ -78,6 +78,8 @@ private:
 			const u8 *Imageb;
 			const u16 *Imagew;
 		} u;
+		bool Tiled;
+		u8 bpp;
 		u16 *Tile;
 		u16 *Pal;
 		u32 TransColor;
@@ -97,7 +99,7 @@ private:
 
 	std::unique_ptr<u8[]> m_multiply_lookup[0x100];
 	std::unique_ptr<u8[]> m_additive_lookup[0x100];
-	void DrawQuad(u8 bpp, bool tiled, QuadInfo *Quad);
+	void DrawQuad(QuadInfo *Quad);
 	void DrawQuadFill(QuadInfo *Quad);
 	inline void DrawPixel(QuadInfo *Quad, u16 *Dst, u16 Src);
 	inline u16 Shade(QuadInfo *Quad, u16 Src);
