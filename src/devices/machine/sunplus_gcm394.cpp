@@ -435,8 +435,8 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 
 	// note, tilemaps are at the same address offsets in video device as spg2xx (but unknown devices are extra)
 
-	map(0x007000, 0x007007).w(m_spg_video, FUNC(gcm394_base_video_device::unk_vid1_regs_w)); // written with other unknown_video_device1 LSB/MSB regs below (roz layer or line layer?)
-	map(0x007008, 0x00700f).w(m_spg_video, FUNC(gcm394_base_video_device::unk_vid2_regs_w)); // written with other unknown_video_device2 LSB/MSB regs below (roz layer or line layer?)
+	map(0x007000, 0x007007).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap2_regs_r), FUNC(gcm394_base_video_device::tmap2_regs_w)); // written with other unknown_video_device1 LSB/MSB regs below (roz layer or line layer?)
+	map(0x007008, 0x00700f).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap3_regs_r), FUNC(gcm394_base_video_device::tmap3_regs_w)); // written with other unknown_video_device2 LSB/MSB regs below (roz layer or line layer?)
 
 	map(0x007010, 0x007015).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap0_regs_r), FUNC(gcm394_base_video_device::tmap0_regs_w));
 	map(0x007016, 0x00701b).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap1_regs_r), FUNC(gcm394_base_video_device::tmap1_regs_w));
@@ -445,8 +445,8 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	map(0x007020, 0x007020).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap0_tilebase_lsb_r), FUNC(gcm394_base_video_device::tmap0_tilebase_lsb_w));      // tilebase, written with other tmap0 regs
 	map(0x007021, 0x007021).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap1_tilebase_lsb_r), FUNC(gcm394_base_video_device::tmap1_tilebase_lsb_w));      // tilebase, written with other tmap1 regs
 	map(0x007022, 0x007022).rw(m_spg_video, FUNC(gcm394_base_video_device::sprite_7022_gfxbase_lsb_r), FUNC(gcm394_base_video_device::sprite_7022_gfxbase_lsb_w)); // sprite tilebase written as 7022, 702d and 7042 group
-	map(0x007023, 0x007023).w(m_spg_video, FUNC(gcm394_base_video_device::unk_vid1_gfxbase_lsb_w));    // written with other unknown_video_device1 regs (roz layer or line layer?)
-	map(0x007024, 0x007024).w(m_spg_video, FUNC(gcm394_base_video_device::unk_vid2_gfxbase_lsb_w));    // written with other unknown_video_device2 regs (roz layer or line layer?)
+	map(0x007023, 0x007023).rw(m_spg_video, FUNC(gcm394_base_video_device::unk_vid1_gfxbase_lsb_r), FUNC(gcm394_base_video_device::unk_vid1_gfxbase_lsb_w));    // written with other unknown_video_device1 regs (roz layer or line layer?)
+	map(0x007024, 0x007024).rw(m_spg_video, FUNC(gcm394_base_video_device::unk_vid2_gfxbase_lsb_r), FUNC(gcm394_base_video_device::unk_vid2_gfxbase_lsb_w));    // written with other unknown_video_device2 regs (roz layer or line layer?)
 
 	map(0x00702a, 0x00702a).w(m_spg_video, FUNC(gcm394_base_video_device::video_702a_w)); // blend level control
 
@@ -454,8 +454,8 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	map(0x00702b, 0x00702b).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap0_tilebase_msb_r), FUNC(gcm394_base_video_device::tmap0_tilebase_msb_w));      // written with other tmap0 regs
 	map(0x00702c, 0x00702c).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap1_tilebase_msb_r), FUNC(gcm394_base_video_device::tmap1_tilebase_msb_w));      // written with other tmap1 regs
 	map(0x00702d, 0x00702d).rw(m_spg_video, FUNC(gcm394_base_video_device::sprite_702d_gfxbase_msb_r), FUNC(gcm394_base_video_device::sprite_702d_gfxbase_msb_w)); // sprites, written as 7022, 702d and 7042 group
-	map(0x00702e, 0x00702e).w(m_spg_video, FUNC(gcm394_base_video_device::unk_vid1_gfxbase_msb_w));    // written with other unknown_video_device1 regs (roz layer or line layer?)
-	map(0x00702f, 0x00702f).w(m_spg_video, FUNC(gcm394_base_video_device::unk_vid2_gfxbase_msb_w));    // written with other unknown_video_device2 regs (roz layer or line layer?)
+	map(0x00702e, 0x00702e).rw(m_spg_video, FUNC(gcm394_base_video_device::unk_vid1_gfxbase_msb_r), FUNC(gcm394_base_video_device::unk_vid1_gfxbase_msb_w));    // written with other unknown_video_device1 regs (roz layer or line layer?)
+	map(0x00702f, 0x00702f).rw(m_spg_video, FUNC(gcm394_base_video_device::unk_vid2_gfxbase_msb_r), FUNC(gcm394_base_video_device::unk_vid2_gfxbase_msb_w));    // written with other unknown_video_device2 regs (roz layer or line layer?)
 
 	map(0x007030, 0x007030).rw(m_spg_video, FUNC(gcm394_base_video_device::video_7030_brightness_r), FUNC(gcm394_base_video_device::video_7030_brightness_w));
 	map(0x007038, 0x007038).r(m_spg_video, FUNC(gcm394_base_video_device::video_curline_r));

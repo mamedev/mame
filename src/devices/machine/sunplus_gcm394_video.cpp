@@ -219,10 +219,20 @@ void gcm394_base_video_device::device_start()
 
 void gcm394_base_video_device::device_reset()
 {
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		m_tmap0_regs[i] = 0x0000;
 		m_tmap1_regs[i] = 0x0000;
+		m_tmap2_regs[i] = 0x0000;
+		m_tmap3_regs[i] = 0x0000;
+		m_tmap2_scroll[i] = 0x0000;
+		m_tmap3_scroll[i] = 0x0000;
+	}
+
+	for (int i = 0; i < 2; i++)
+	{
+		m_tmap0_scroll[i] = 0x0000;
+		m_tmap1_scroll[i] = 0x0000;
 	}
 
 	for (int i = 0; i < 0x400; i++)
@@ -388,14 +398,14 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 	}
 }
 
-void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t *regs)
+void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t *regs, uint16_t *scroll)
 {
-	uint32_t xscroll = regs[0];
-	uint32_t yscroll = regs[1];
-	uint32_t attr_reg = regs[2];
-	uint32_t ctrl_reg = regs[3];
-	uint32_t tilemap = regs[4];
-	uint32_t palette_map = regs[5];
+	uint32_t xscroll = scroll[0];
+	uint32_t yscroll = scroll[1];
+	uint32_t attr_reg = regs[0];
+	uint32_t ctrl_reg = regs[1];
+	uint32_t tilemap = regs[2];
+	uint32_t palette_map = regs[3];
 	address_space &space = m_cpu->space(AS_PROGRAM);
 
 	if (!(ctrl_reg & PAGE_ENABLE_MASK))
@@ -625,19 +635,17 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 {
 	memset(&m_screenbuf[m_screen->width() * cliprect.min_y], 0, 4 *  m_screen->width() * ((cliprect.max_y - cliprect.min_y) + 1));
 
-	const uint32_t page0_addr = (m_page0_addr_lsb | (m_page0_addr_msb<<16));
-	const uint32_t page1_addr = (m_page1_addr_lsb | (m_page1_addr_msb<<16));
-	uint16_t* page0_regs = m_tmap0_regs;
-	uint16_t* page1_regs = m_tmap1_regs;
-
 	for (uint32_t scanline = (uint32_t)cliprect.min_y; scanline <= (uint32_t)cliprect.max_y; scanline++)
 	{
 		for (int i = 0; i < 4; i++)
 		{
 			if (1)
 			{
-				draw_page(cliprect, scanline, i, page0_addr, page0_regs);
-				draw_page(cliprect, scanline, i, page1_addr, page1_regs);
+				draw_page(cliprect, scanline, i, (m_page0_addr_lsb | (m_page0_addr_msb<<16)), m_tmap0_regs, m_tmap0_scroll);
+				draw_page(cliprect, scanline, i, (m_page1_addr_lsb | (m_page1_addr_msb<<16)), m_tmap1_regs, m_tmap1_scroll);
+				draw_page(cliprect, scanline, i, (m_unk_vid1_gfxbase_lsb | (m_unk_vid1_gfxbase_msb<<16)), m_tmap2_regs, m_tmap2_scroll);
+				draw_page(cliprect, scanline, i, (m_unk_vid2_gfxbase_lsb | (m_unk_vid2_gfxbase_msb<<16)), m_tmap3_regs, m_tmap3_scroll);
+
 			}
 			draw_sprites(cliprect, scanline, i);
 		}
@@ -654,52 +662,106 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 }
 
 
-void gcm394_base_video_device::write_tmap_regs(int tmap, uint16_t* regs, int offset, uint16_t data)
+void gcm394_base_video_device::write_tmap_scroll(int tmap, uint16_t* regs, int offset, uint16_t data)
 {
 	switch (offset)
 	{
 	case 0x0: // Page X scroll
-		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d X Scroll = %04x\n", machine().describe_context(), tmap, data & 0x01ff);
-		regs[offset] = data & 0x01ff;
+		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d X Scroll = %04x\n", machine().describe_context(), tmap, data);
+		regs[offset] = data;
 		break;
 
 	case 0x1: // Page Y scroll
-		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Y Scroll = %04x\n",  machine().describe_context(), tmap, data & 0x00ff);
-		regs[offset] = data & 0x00ff;
+		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Y Scroll = %04x\n", machine().describe_context(), tmap, data);
+		regs[offset] = data;
 		break;
+	}
+}
 
-	case 0x2: // Page Attributes
+void gcm394_base_video_device::write_tmap_regs(int tmap, uint16_t* regs, int offset, uint16_t data)
+{
+	switch (offset)
+	{
+	case 0x0: // Page Attributes
 		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Attributes = %04x (unk %01x: Depth:%d, Palette:%d, VSize:%d, HSize:%d, FlipY:%d, FlipX:%d, BPP:%d)\n",  machine().describe_context(), tmap, data,
 			(data & 0xc000) >> 14, (data >> 12) & 3, (data >> 8) & 15, 8 << ((data >> 6) & 3), 8 << ((data >> 4) & 3), BIT(data, 3), BIT(data, 2), 2 * ((data & 3) + 1));
 		regs[offset] = data;
 		break;
 
-	case 0x3: // Page Control
+	case 0x1: // Page Control
 		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Control = %04x (unk:%02x Blend:%d, HiColor:%d, unk:%d, unk%d, RowScroll:%d, Enable:%d, Wallpaper:%d, RegSet:%d, Bitmap:%d)\n",  machine().describe_context(), tmap, data,
 			(data & 0xfe00) >> 9, BIT(data, 8), BIT(data, 7), BIT(data, 6), BIT(data, 5), BIT(data, 4), BIT(data, 3), BIT(data, 2), BIT(data, 1), BIT(data, 0));
 		regs[offset] = data;
 		break;
 
-	case 0x4: // Page Tile Address
+	case 0x2: // Page Tile Address
 		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Tile Address = %04x\n",  machine().describe_context(), tmap, data);
 		regs[offset] = data;
 		break;
 
-	case 0x5: // Page Attribute write_tmap_regs
+	case 0x3: // Page Attribute Address
 		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Attribute Address = %04x\n",  machine().describe_context(), tmap, data);
 		regs[offset] = data;
 		break;
 	}
 }
 
+
+// offsets 0,1,4,5,6,7 used in main IRQ code
+// offsets 2,3 only cleared on startup
+
+// Based on code analysis this seems to be the same as the regular tilemap regs, except for the addition of regs 2,3 which shift the remaining ones along.
+// As the hardware appears to support ROZ these are probably 2 extra tile layers, with the 2 additional words being the ROZ parameters?
+
+
+void gcm394_base_video_device::write_tmap_extrascroll(int tmap, uint16_t* regs, int offset, uint16_t data)
+{
+	switch (offset)
+	{
+	case 0x0: // Page X scroll
+	case 0x1: // Page Y scroll
+		write_tmap_scroll(tmap, regs, offset, data);
+		break;
+
+	case 0x2: //
+		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d X Unk Rotation Zoom Attribute1 = %04x\n", machine().describe_context(), tmap, data);
+		regs[offset] = data;
+		break;
+
+	case 0x3:
+		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d X Unk Rotation Zoom Attribute = %04x\n", machine().describe_context(), tmap, data);
+		regs[offset] = data;
+		break;
+
+	}
+}
+
+
 // **************************************** TILEMAP 0 *************************************************
 
-READ16_MEMBER(gcm394_base_video_device::tmap0_regs_r) { return m_tmap0_regs[offset]; }
+READ16_MEMBER(gcm394_base_video_device::tmap0_regs_r)
+{
+	if (offset < 2)
+	{
+		return m_tmap0_scroll[offset];
+	}
+	else
+	{
+		return m_tmap0_regs[offset-2];
+	}
+}
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap0_regs_w)
 {
 	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap0_regs_w %01x %04x\n", machine().describe_context(), offset, data);
-	write_tmap_regs(0, m_tmap0_regs, offset, data);
+	if (offset < 2)
+	{
+		write_tmap_scroll(0, m_tmap0_scroll, offset, data);
+	}
+	else
+	{
+		write_tmap_regs(0, m_tmap0_regs, offset-2, data);
+	}
 }
 
 READ16_MEMBER(gcm394_base_video_device::tmap0_tilebase_lsb_r)
@@ -728,19 +790,36 @@ WRITE16_MEMBER(gcm394_base_video_device::tmap0_tilebase_msb_w)
 
 // **************************************** TILEMAP 1 *************************************************
 
-READ16_MEMBER(gcm394_base_video_device::tmap1_regs_r) { return m_tmap1_regs[offset]; }
+
+READ16_MEMBER(gcm394_base_video_device::tmap1_regs_r)
+{
+	if (offset < 2)
+	{
+		return m_tmap1_scroll[offset];
+	}
+	else
+	{
+		return m_tmap1_regs[offset-2];
+	}
+}
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap1_regs_w)
 {
 	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap1_regs_w %01x %04x\n", machine().describe_context(), offset, data);
-	write_tmap_regs(1, m_tmap1_regs, offset, data);
+	if (offset < 2)
+	{
+		write_tmap_scroll(1, m_tmap1_scroll, offset, data);
+	}
+	else
+	{
+		write_tmap_regs(1, m_tmap1_regs, offset-2, data);
+	}
 }
 
 READ16_MEMBER(gcm394_base_video_device::tmap1_tilebase_lsb_r)
 {
 	return m_page1_addr_lsb;
 }
-
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap1_tilebase_lsb_w)
 {
@@ -761,51 +840,49 @@ WRITE16_MEMBER(gcm394_base_video_device::tmap1_tilebase_msb_w)
 	LOGMASKED(LOG_GCM394_TMAP, "\t(tmap1 tilegfxbase is now %04x%04x)\n", m_page1_addr_msb, m_page1_addr_lsb);
 }
 
-// **************************************** unknown video device handler for below  *************************************************
+// **************************************** unknown video device 1 (another tilemap? roz? line? zooming sprite layer?) *************************************************
 
-// offsets 0,1,4,5,6,7 used in main IRQ code
-// offsets 2,3 only cleared on startup
-
-// Based on code analysis this seems to be the same as the regular tilemap regs, except for the addition of regs 2,3 which shift the remaining ones along.
-// As the hardware appears to support ROZ these are probably 2 extra tile layers, with the 2 additional words being the ROZ parameters?
-void gcm394_base_video_device::unk_vid_regs_w(int which, int offset, uint16_t data)
+READ16_MEMBER(gcm394_base_video_device::tmap2_regs_r)
 {
-	switch (offset)
+	if (offset < 4)
 	{
-	case 0x0:
-		LOGMASKED(LOG_GCM394_VIDEO, "%s: unk_vid_regs_w (unk chip %d) (offset %01x) (data %04x) (X scroll?)\n", machine().describe_context(), which, offset, data); // masked with 0x3ff in code like x-scroll for tilemaps
-		break;
-	case 0x1:
-		LOGMASKED(LOG_GCM394_VIDEO, "%s: unk_vid_regs_w (unk chip %d) (offset %01x) (data %04x) (y scroll?)\n", machine().describe_context(), which, offset, data); // masked with 0x3ff in code like x-scroll for tilemaps
-		break;
-
-	case 0x05: // seems to be similar / the same as Page Control for tilemaps (written with same basic code, but for these layers)
-		LOGMASKED(LOG_GCM394_VIDEO, "%s: unk_vid_regs_w (unk chip %d) (offset %01x) (data %04x) (Page Control?)\n", machine().describe_context(), which, offset, data);
-		break;
-
-	case 0x02: // startup?
-	case 0x03: // startup?
-	case 0x04:
-	case 0x06:
-	case 0x07:
-		LOGMASKED(LOG_GCM394_VIDEO, "%s: unk_vid_regs_w (unk chip %d) (offset %01x) (data %04x)\n", machine().describe_context(), which, offset, data);
-		break;
-
+		return m_tmap2_scroll[offset];
+	}
+	else
+	{
+		return m_tmap2_regs[offset-4];
 	}
 }
 
-// **************************************** unknown video device 1 (another tilemap? roz? line? zooming sprite layer?) *************************************************
-
-WRITE16_MEMBER(gcm394_base_video_device::unk_vid1_regs_w)
+WRITE16_MEMBER(gcm394_base_video_device::tmap2_regs_w)
 {
-	unk_vid_regs_w(0, offset, data);
+	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap2_regs_w %01x %04x\n", machine().describe_context(), offset, data);
+	if (offset < 4)
+	{
+		write_tmap_extrascroll(2, m_tmap2_scroll, offset, data);
+	}
+	else
+	{
+		write_tmap_regs(2, m_tmap2_regs, offset-4, data);
+	}
 }
+
+READ16_MEMBER(gcm394_base_video_device::unk_vid1_gfxbase_lsb_r)
+{
+	return m_unk_vid1_gfxbase_lsb;
+}
+
 
 WRITE16_MEMBER(gcm394_base_video_device::unk_vid1_gfxbase_lsb_w)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid1_gfxbase_lsb_w %04x\n", machine().describe_context(), data);
 	m_unk_vid1_gfxbase_lsb = data;
 	LOGMASKED(LOG_GCM394_TMAP, "\t(unk_vid1 tilegfxbase is now %04x%04x)\n", m_unk_vid1_gfxbase_msb, m_unk_vid1_gfxbase_lsb);
+}
+
+READ16_MEMBER(gcm394_base_video_device::unk_vid1_gfxbase_msb_r)
+{
+	return m_unk_vid1_gfxbase_msb;
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::unk_vid1_gfxbase_msb_w)
@@ -817,10 +894,36 @@ WRITE16_MEMBER(gcm394_base_video_device::unk_vid1_gfxbase_msb_w)
 
 // **************************************** unknown video device 2 (another tilemap? roz? lines? zooming sprite layer?) *************************************************
 
-WRITE16_MEMBER(gcm394_base_video_device::unk_vid2_regs_w)
+READ16_MEMBER(gcm394_base_video_device::tmap3_regs_r)
 {
-	unk_vid_regs_w(1, offset, data);
+	if (offset < 4)
+	{
+		return m_tmap3_scroll[offset];
+	}
+	else
+	{
+		return m_tmap3_regs[offset-4];
+	}
 }
+
+WRITE16_MEMBER(gcm394_base_video_device::tmap3_regs_w)
+{
+	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap3_regs_w %01x %04x\n", machine().describe_context(), offset, data);
+	if (offset < 4)
+	{
+		write_tmap_extrascroll(3, m_tmap3_scroll, offset, data);
+	}
+	else
+	{
+		write_tmap_regs(3, m_tmap3_regs, offset-4, data);
+	}
+}
+
+READ16_MEMBER(gcm394_base_video_device::unk_vid2_gfxbase_lsb_r)
+{
+	return m_unk_vid2_gfxbase_lsb;
+}
+
 
 WRITE16_MEMBER(gcm394_base_video_device::unk_vid2_gfxbase_lsb_w)
 {
@@ -828,6 +931,12 @@ WRITE16_MEMBER(gcm394_base_video_device::unk_vid2_gfxbase_lsb_w)
 	m_unk_vid2_gfxbase_lsb = data;
 	LOGMASKED(LOG_GCM394_TMAP, "\t(unk_vid2 tilegfxbase is now %04x%04x)\n", m_unk_vid2_gfxbase_msb, m_unk_vid2_gfxbase_lsb);
 }
+
+READ16_MEMBER(gcm394_base_video_device::unk_vid2_gfxbase_msb_r)
+{
+	return m_unk_vid2_gfxbase_msb;
+}
+
 
 WRITE16_MEMBER(gcm394_base_video_device::unk_vid2_gfxbase_msb_w)
 {

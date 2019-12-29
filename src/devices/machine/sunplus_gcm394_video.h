@@ -25,6 +25,9 @@ public:
 
 	auto space_read_callback() { return m_space_read_cb.bind(); }
 
+	void write_tmap_scroll(int tmap, uint16_t* regs, int offset, uint16_t data);
+	void write_tmap_extrascroll(int tmap, uint16_t* regs, int offset, uint16_t data);
+
 	void write_tmap_regs(int tmap, uint16_t* regs, int offset, uint16_t data);
 
 	DECLARE_READ16_MEMBER(tmap0_regs_r);
@@ -41,11 +44,17 @@ public:
 	DECLARE_WRITE16_MEMBER(tmap1_tilebase_lsb_w);
 	DECLARE_WRITE16_MEMBER(tmap1_tilebase_msb_w);
 
-	DECLARE_WRITE16_MEMBER(unk_vid1_regs_w);
+	DECLARE_READ16_MEMBER(tmap2_regs_r);
+	DECLARE_WRITE16_MEMBER(tmap2_regs_w);
+	DECLARE_READ16_MEMBER(unk_vid1_gfxbase_lsb_r);
+	DECLARE_READ16_MEMBER(unk_vid1_gfxbase_msb_r);
 	DECLARE_WRITE16_MEMBER(unk_vid1_gfxbase_lsb_w);
 	DECLARE_WRITE16_MEMBER(unk_vid1_gfxbase_msb_w);
 
-	DECLARE_WRITE16_MEMBER(unk_vid2_regs_w);
+	DECLARE_READ16_MEMBER(tmap3_regs_r);
+	DECLARE_WRITE16_MEMBER(tmap3_regs_w);
+	DECLARE_READ16_MEMBER(unk_vid2_gfxbase_lsb_r);
+	DECLARE_READ16_MEMBER(unk_vid2_gfxbase_msb_r);
 	DECLARE_WRITE16_MEMBER(unk_vid2_gfxbase_lsb_w);
 	DECLARE_WRITE16_MEMBER(unk_vid2_gfxbase_msb_w);
 	
@@ -154,7 +163,7 @@ protected:
 
 	template<blend_enable_t Blend, rowscroll_enable_t RowScroll, flipx_t FlipX>
 	void draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t bitmap_addr, uint32_t tile, int32_t h, int32_t w, uint8_t bpp, uint32_t yflipmask, uint32_t palette_offset, int addressing_mode);
-	void draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t *regs);
+	void draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t *regs, uint16_t *scroll);
 	void draw_sprites(const rectangle& cliprect, uint32_t scanline, int priority);
 	void draw_sprite(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t base_addr);
 
@@ -181,8 +190,19 @@ protected:
 
 
 	// video 70xx
-	uint16_t m_tmap0_regs[0x6];
-	uint16_t m_tmap1_regs[0x6];
+	uint16_t m_tmap0_regs[0x4];
+	uint16_t m_tmap1_regs[0x4];
+
+	uint16_t m_tmap2_regs[0x4];
+	uint16_t m_tmap3_regs[0x4];
+
+
+	uint16_t m_tmap0_scroll[0x2];
+	uint16_t m_tmap1_scroll[0x2];
+
+	uint16_t m_tmap2_scroll[0x4];
+	uint16_t m_tmap3_scroll[0x4];
+
 
 	uint16_t m_707f;
 	uint16_t m_703a_palettebank;
