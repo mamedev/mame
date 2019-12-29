@@ -421,118 +421,132 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 		return;
 	}
 
-	uint32_t tile_h = 8 << ((attr_reg & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-	uint32_t tile_w = 8 << ((attr_reg & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
-
-	int total_width = 512;
-
-	if ((attr_reg >> 14) & 0x2)
-		total_width = 1024;
-
-	uint32_t tile_count_x = total_width / tile_w;
-
-	uint32_t bitmap_y = (scanline + yscroll);// &0xff;
-	uint32_t y0 = bitmap_y / tile_h;
-	uint32_t tile_scanline = bitmap_y % tile_h;
-	uint32_t tile_address = tile_count_x * y0;
-
-	for (uint32_t x0 = 0; x0 < tile_count_x; x0++, tile_address++)
+	if (ctrl_reg & 0x01) // bitmap mode jak_car2 uses this ingame
 	{
-		uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & m_global_y_mask) - 0x10;
-		uint32_t xx = (tile_w * x0 - xscroll);// &0x1ff;
-		uint32_t tile = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(tilemap) : space.read_word(tilemap + tile_address);
+		popmessage("bitmap mode\n");
+	}
+	else
+	{
+		uint32_t tile_h = 8 << ((attr_reg & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
+		uint32_t tile_w = 8 << ((attr_reg & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
 
-		uint16_t palette = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
-		if (x0 & 1)
-			palette >>= 8;
-
-
-		if (!tile)
-			continue;
-
-
-		uint32_t tileattr = attr_reg;
-		uint32_t tilectrl = ctrl_reg;
-
-#if 0
-		if ((ctrl_reg & 2) == 0)
-		{   // -(1) bld(1) flip(2) pal(4)
-			tileattr &= ~0x000c;
-			tileattr |= (palette >> 2) & 0x000c;    // flip
-
-			tileattr &= ~0x0f00;
-			tileattr |= (palette << 8) & 0x0f00;    // palette
-
-			tilectrl &= ~0x0100;
-			tilectrl |= (palette << 2) & 0x0100;    // blend
-		}
-#endif
-		bool blend;
-		bool row_scroll;
-		bool flip_x;
-		uint32_t yflipmask;
-		uint32_t palette_offset;
-
-		blend = (tileattr & 0x4000 || tilectrl & 0x0100);
-		row_scroll = (tilectrl & 0x0010);
-
+		int total_width;
 		int use_alt_drawmode;
 
-		if ((ctrl_reg & 2) == 0)
+		// just a guess based on this being set on the higher resolution tilemaps we've seen, could be 100% incorrect register
+		if ((attr_reg >> 14) & 0x2)
 		{
-			flip_x = 0;
-			yflipmask = 0;
-			palette_offset = (palette & 0x0f) << 4;
-			use_alt_drawmode = 1;
+			total_width = 1024;
+			use_alt_drawmode = 1; // probably doesn't control this
 		}
 		else
 		{
-			flip_x = (tileattr & TILE_X_FLIP);
-			yflipmask = tileattr & TILE_Y_FLIP ? tile_h - 1 : 0;
-			palette_offset = (tileattr & 0x0f00) >> 4;
-			tile |= (palette & 0x0007) << 16;
-			use_alt_drawmode = 0;
+			total_width = 512;
+			use_alt_drawmode = 0; // probably doesn't control this
 		}
 
+		uint32_t tile_count_x = total_width / tile_w;
 
-		//palette_offset |= 0x0900;
-		palette_offset |= 0x0100;
+		uint32_t bitmap_y = (scanline + yscroll);// &0xff;
+		uint32_t y0 = bitmap_y / tile_h;
+		uint32_t tile_scanline = bitmap_y % tile_h;
+		uint32_t tile_address = tile_count_x * y0;
 
-		const uint8_t bpp = tileattr & 0x0003;
-
-
-		if (blend)
+		for (uint32_t x0 = 0; x0 < tile_count_x; x0++, tile_address++)
 		{
-			if (row_scroll)
+			uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & m_global_y_mask) - 0x10;
+			uint32_t xx = (tile_w * x0 - xscroll);// &0x1ff;
+			uint32_t tile = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(tilemap) : space.read_word(tilemap + tile_address);
+
+			uint16_t palette = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
+			if (x0 & 1)
+				palette >>= 8;
+
+
+			if (!tile)
+				continue;
+
+
+			uint32_t tileattr = attr_reg;
+			uint32_t tilectrl = ctrl_reg;
+
+#if 0
+			if ((ctrl_reg & 2) == 0)
+			{   // -(1) bld(1) flip(2) pal(4)
+				tileattr &= ~0x000c;
+				tileattr |= (palette >> 2) & 0x000c;    // flip
+
+				tileattr &= ~0x0f00;
+				tileattr |= (palette << 8) & 0x0f00;    // palette
+
+				tilectrl &= ~0x0100;
+				tilectrl |= (palette << 2) & 0x0100;    // blend
+			}
+#endif
+			bool blend;
+			bool row_scroll;
+			bool flip_x;
+			uint32_t yflipmask;
+			uint32_t palette_offset;
+
+			blend = (tileattr & 0x4000 || tilectrl & 0x0100);
+			row_scroll = (tilectrl & 0x0010);
+
+
+			if ((ctrl_reg & 2) == 0)
 			{
-				if (flip_x)
-					draw<BlendOn, RowScrollOn, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
+				flip_x = 0;
+				yflipmask = 0;
+				palette_offset = (palette & 0x0f) << 4;
+			}
+			else // jak_car2 uses this mode for sky ingame
+			{
+				flip_x = (tileattr & TILE_X_FLIP);
+				yflipmask = tileattr & TILE_Y_FLIP ? tile_h - 1 : 0;
+				palette_offset = (tileattr & 0x0f00) >> 4;
+				tile |= (palette & 0x0007) << 16;
+			}
+
+
+			//palette_offset |= 0x0900;
+			palette_offset |= 0x0100;
+
+			const uint8_t bpp = tileattr & 0x0003;
+
+
+			if (blend)
+			{
+				if (row_scroll)
+				{
+					if (flip_x)
+						draw<BlendOn, RowScrollOn, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
+					else
+						draw<BlendOn, RowScrollOn, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
+				}
 				else
-					draw<BlendOn, RowScrollOn, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
+				{
+					if (flip_x)
+						draw<BlendOn, RowScrollOff, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
+					else
+						draw<BlendOn, RowScrollOff, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
+				}
 			}
 			else
 			{
-				if (flip_x)
-					draw<BlendOn, RowScrollOff, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
+				if (row_scroll)
+				{
+					if (flip_x)
+						draw<BlendOff, RowScrollOn, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
+					else
+						draw<BlendOff, RowScrollOn, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
+				}
 				else
-					draw<BlendOn, RowScrollOff, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
-			}
-		}
-		else
-		{
-			if (row_scroll)
-			{
-				if (flip_x)
-					draw<BlendOff, RowScrollOn, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
-				else
-					draw<BlendOff, RowScrollOn, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
-			}
-			else
-			{
-				if (flip_x)
-					draw<BlendOff, RowScrollOff, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
-				else
-					draw<BlendOff, RowScrollOff, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
+				{
+					if (flip_x)
+						draw<BlendOff, RowScrollOff, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
+					else
+						draw<BlendOff, RowScrollOff, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
+				}
 			}
 		}
 	}
