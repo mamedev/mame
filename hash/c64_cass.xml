@@ -6671,6 +6671,22 @@
 		</part>
 	</software>
 
+	<software name="sweep">
+		<description>Sweep</description>
+		<year>19??</year>
+		<publisher>Mastertronic</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="400020">
+				<rom name="sweep (c64) (side a).tap" size="400020" crc="5c9225bf" sha1="d1c27f0d9833b91b5fc506087c83d49578f93257"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="388837">
+				<rom name="sweep (c64) (side b).tap" size="388837" crc="ab92b874" sha1="0a24b3db81b5ffd378dbb50e82f13daf4a645072"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tbird">
 		<description>T-Bird</description>
 		<year>1988</year>
