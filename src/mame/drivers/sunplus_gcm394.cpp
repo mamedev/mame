@@ -184,8 +184,6 @@ protected:
 	DECLARE_READ16_MEMBER(portb_r);
 	DECLARE_WRITE16_MEMBER(porta_w);
 
-	virtual DECLARE_WRITE16_MEMBER(mapping_w) {}
-
 	virtual DECLARE_READ16_MEMBER(read_external_space);
 	virtual DECLARE_WRITE16_MEMBER(write_external_space);
 
@@ -336,6 +334,8 @@ void wrlshunt_game_state::machine_reset()
 	cs_callback(0x00, 0x00, 0x00, 0x00, 0x00);
 	m_maincpu->set_cs_space(m_memory->get_program());
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
+
+	m_maincpu->set_paldisplaybank_high_hack(1);
 }
 
 void wrlshunt_game_state::init_wrlshunt()
@@ -410,7 +410,6 @@ void gcm394_game_state::base(machine_config &config)
 	m_maincpu->space_read_callback().set(FUNC(gcm394_game_state::read_external_space));
 	m_maincpu->space_write_callback().set(FUNC(gcm394_game_state::write_external_space));
 	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(sunplus_gcm394_base_device::irq_vector_cb));
-	m_maincpu->mapping_write_callback().set(FUNC(gcm394_game_state::mapping_w));
 	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 	m_maincpu->set_bootmode(1); // boot from external ROM / CS mirror
@@ -470,7 +469,6 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 	m_maincpu->space_read_callback().set(FUNC(generalplus_gpac800_game_state::read_external_space));
 	m_maincpu->space_write_callback().set(FUNC(generalplus_gpac800_game_state::write_external_space));
 	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(sunplus_gcm394_base_device::irq_vector_cb));
-	m_maincpu->mapping_write_callback().set(FUNC(generalplus_gpac800_game_state::mapping_w));
 	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 	m_maincpu->set_bootmode(0); // boot from internal ROM (NAND bootstrap)
@@ -503,6 +501,8 @@ void gcm394_game_state::machine_reset()
 	m_maincpu->set_cs_space(m_memory->get_program());
 
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
+
+	m_maincpu->set_paldisplaybank_high_hack(1);
 }
 
 
@@ -1044,6 +1044,8 @@ void generalplus_gpac800_game_state::machine_reset()
 	}
 
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
+
+	m_maincpu->set_paldisplaybank_high_hack(0);
 }
 
 

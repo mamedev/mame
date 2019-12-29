@@ -41,7 +41,6 @@ public:
 		m_csbase(0x20000),
 		m_space_read_cb(*this),
 		m_space_write_cb(*this),
-		m_mapping_write_cb(*this),
 		m_boot_mode(0),
 		m_cs_callback(*this, DEVICE_SELF, FUNC(sunplus_gcm394_base_device::default_cs_callback))
 	{
@@ -56,7 +55,6 @@ public:
 
 	auto space_read_callback() { return m_space_read_cb.bind(); }
 	auto space_write_callback() { return m_space_write_cb.bind(); }
-	auto mapping_write_callback() { return m_mapping_write_cb.bind(); }
 
 	auto nand_read_callback() { return m_nand_read_cb.bind(); }
 
@@ -71,6 +69,8 @@ public:
 	void default_cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4 );
 
 	void set_cs_space(address_space* csspace) { m_cs_space = csspace; }
+	
+	void set_paldisplaybank_high_hack(int pal_displaybank_high) { m_spg_video->set_paldisplaybank_high(pal_displaybank_high); }
 
 protected:
 
@@ -169,7 +169,6 @@ protected:
 private:
 	devcb_read16 m_space_read_cb;
 	devcb_write16 m_space_write_cb;
-	devcb_write16 m_mapping_write_cb;
 
 	DECLARE_READ16_MEMBER(unk_r);
 	DECLARE_WRITE16_MEMBER(unk_w);

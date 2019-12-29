@@ -222,8 +222,8 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::membankswitch_7810_w)
 //	if (m_membankswitch_7810 != data)
 //	LOGMASKED(LOG_GCM394,"%s:sunplus_gcm394_base_device::membankswitch_7810_w %04x\n", machine().describe_context(), data);
 
-	if (m_membankswitch_7810 != data)
-		popmessage("bankswitch %04x -> %04x", m_membankswitch_7810, data);
+//	if (m_membankswitch_7810 != data)
+//		popmessage("bankswitch %04x -> %04x", m_membankswitch_7810, data);
 
 	m_membankswitch_7810 = data;
 }
@@ -237,9 +237,6 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::chipselect_csx_memory_device_control_
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::chipselect_csx_memory_device_control_w %04x (782x registers offset %d)\n", machine().describe_context(), data, offset);
 	m_782x[offset] = data;
 
-	if (offset == 0)
-		m_mapping_write_cb(data);
-	
 
 	static const char* const md[] =
 	{
@@ -834,7 +831,6 @@ void sunplus_gcm394_base_device::device_start()
 
 	m_space_read_cb.resolve_safe(0);
 	m_space_write_cb.resolve();
-	m_mapping_write_cb.resolve();
 
 	m_nand_read_cb.resolve_safe(0);
 

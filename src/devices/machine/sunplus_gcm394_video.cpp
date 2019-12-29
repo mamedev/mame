@@ -20,18 +20,19 @@ DEFINE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device, "gcm394_video", "SunPlus G
 #include "logmacro.h"
 
 
-gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	//, device_gfx_interface(mconfig, *this, nullptr)
-	, device_video_interface(mconfig, *this)
-	, m_cpu(*this, finder_base::DUMMY_TAG)
-	, m_screen(*this, finder_base::DUMMY_TAG)
-//  , m_scrollram(*this, "scrollram")
-	, m_video_irq_cb(*this)
-	, m_palette(*this, "palette")
-	, m_gfxdecode(*this, "gfxdecode")
-	, m_space_read_cb(*this)
-	, m_global_y_mask(0x1ff)
+gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	//device_gfx_interface(mconfig, *this, nullptr),
+	device_video_interface(mconfig, *this),
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_screen(*this, finder_base::DUMMY_TAG),
+//  m_scrollram(*this, "scrollram"),
+	m_video_irq_cb(*this),
+	m_palette(*this, "palette"),
+	m_gfxdecode(*this, "gfxdecode"),
+	m_space_read_cb(*this),
+	m_global_y_mask(0x1ff),
+	m_pal_displaybank_high(0)
 {
 }
 
@@ -347,8 +348,8 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 		{
 			// 2bpp
 			// 4bpp
-
-			current_palette_offset |= 0x0800;
+			if (m_pal_displaybank_high) // how is this set?
+				current_palette_offset |= 0x0800;
 
 		}
 		else if (nc_bpp < 8)

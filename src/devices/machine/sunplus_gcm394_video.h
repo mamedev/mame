@@ -30,6 +30,8 @@ public:
 
 	void write_tmap_regs(int tmap, uint16_t* regs, int offset, uint16_t data);
 
+	void set_paldisplaybank_high(int pal_displaybank_high) { m_pal_displaybank_high = pal_displaybank_high; }
+
 	DECLARE_READ16_MEMBER(tmap0_regs_r);
 	DECLARE_WRITE16_MEMBER(tmap0_regs_w);
 	DECLARE_READ16_MEMBER(tmap0_tilebase_lsb_r);
@@ -248,6 +250,9 @@ protected:
 	void decodegfx(const char* tag);
 
 	int m_global_y_mask;
+
+	int m_pal_displaybank_high;
+
 };
 
 class gcm394_video_device : public gcm394_base_video_device
