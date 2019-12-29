@@ -99,7 +99,7 @@ private:
 
 	std::unique_ptr<u8[]> m_multiply_lookup[0x100];
 	std::unique_ptr<u8[]> m_additive_lookup[0x100];
-	void DrawQuad(QuadInfo *Quad);
+	void DrawQuadTexture(QuadInfo *Quad);
 	void DrawQuadFill(QuadInfo *Quad);
 	inline void DrawPixel(QuadInfo *Quad, u16 *Dst, u16 Src);
 	inline u16 Shade(QuadInfo *Quad, u16 Src);

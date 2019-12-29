@@ -336,7 +336,7 @@ u16 vr0video_device::Alpha(QuadInfo *Quad, u16 Src, u16 Dst)
 	return RGB16(dcr, dcg, dcb);
 }
 
-void vr0video_device::DrawQuad(QuadInfo *Quad)
+void vr0video_device::DrawQuadTexture(QuadInfo *Quad)
 {
 	const u32 TransColor = Quad->Trans ? RGB32TO16(Quad->TransColor) : NOTRANSCOLOR;
 	u16 *line = Quad->Dest;
@@ -586,7 +586,7 @@ int vr0video_device::vrender0_ProcessPacket(u32 PacketPtr)
 			else
 				Quad.Pal = m_InternalPalette;
 
-			DrawQuad(&Quad);
+			DrawQuadTexture(&Quad);
 		}
 		else
 			DrawQuadFill(&Quad);
