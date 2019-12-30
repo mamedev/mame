@@ -1131,6 +1131,19 @@ public:
 	}
 };
 
+void retro_osd_interface::process_events_buf()
+{
+	input_poll_cb();
+}
+
+void retro_osd_interface::poll_inputs(running_machine &machine)
+{
+	m_keyboard_input->poll_if_necessary(machine);
+	m_mouse_input->poll_if_necessary(machine);
+	m_lightgun_input->poll_if_necessary(machine);
+	m_joystick_input->poll_if_necessary(machine);
+}
+
 MODULE_DEFINITION(KEYBOARDINPUT_RETRO, keyboard_input_retro)
 MODULE_DEFINITION(MOUSEINPUT_RETRO, mouse_input_retro)
 MODULE_DEFINITION(JOYSTICKINPUT_RETRO, joystick_input_retro)

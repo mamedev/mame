@@ -279,7 +279,7 @@ void retro_osd_interface::init(running_machine &machine)
 //============================================================
 //  customize_input_type_list
 //============================================================
-void retro_osd_interface::customize_input_type_list(simple_list<input_type_entry> &typelist)
+void retro_osd_interface::customize_input_type_list(std::vector<input_type_entry> &typelist)
 {
 	// This function is called on startup, before reading the
 	// configuration from disk. Scan the list, and change the
