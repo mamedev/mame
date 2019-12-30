@@ -22,6 +22,7 @@ public:
 	{ }
 
 	void att630(machine_config &config);
+	void att730x(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -32,7 +33,8 @@ private:
 	u8 bram_r(offs_t offset);
 	void bram_w(offs_t offset, u8 data);
 
-	void mem_map(address_map &map);
+	void att630_map(address_map &map);
+	void att730_map(address_map &map);
 
 	required_device<m68000_device> m_maincpu;
 	required_shared_ptr<u16> m_vram;
@@ -67,7 +69,7 @@ void att630_state::bram_w(offs_t offset, u8 data)
 	m_bram_data[offset] = data;
 }
 
-void att630_state::mem_map(address_map &map)
+void att630_state::att630_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
 	map(0x040000, 0x0fffff).noprw(); // additional space for rom
@@ -81,13 +83,22 @@ void att630_state::mem_map(address_map &map)
 	map(0xe00000, 0xe03fff).mirror(0x1fc000).rw(FUNC(att630_state::bram_r), FUNC(att630_state::bram_w)).umask16(0x00ff);
 }
 
+void att630_state::att730_map(address_map &map)
+{
+	att630_map(map);
+	map(0x040000, 0x05ffff).rom().region("maincpu", 0x40000);
+	map(0x100000, 0x15ffff).rom().region("cart", 0);
+	map(0x800000, 0x800fff).ram();
+	map(0xde0000, 0xdfffff).rom().region("starlan", 0);
+}
+
 static INPUT_PORTS_START( att630 )
 INPUT_PORTS_END
 
 void att630_state::att630(machine_config &config)
 {
 	M68000(config, m_maincpu, 40_MHz_XTAL / 4); // clock not confirmed
-	m_maincpu->set_addrmap(AS_PROGRAM, &att630_state::mem_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &att630_state::att630_map);
 	m_maincpu->set_cpu_space(AS_PROGRAM); // vectors are in BRAM
 
 	NVRAM(config, "bram", nvram_device::DEFAULT_ALL_0); // 5264 + battery
@@ -100,6 +111,12 @@ void att630_state::att630(machine_config &config)
 	SCN2681(config, "duart1", 3.6864_MHz_XTAL);
 
 	SCN2681(config, "duart2", 3.6864_MHz_XTAL);
+}
+
+void att630_state::att730x(machine_config &config)
+{
+	att630(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &att630_state::att730_map);
 }
 
 
@@ -143,4 +160,4 @@ ROM_START( att730x )
 ROM_END
 
 COMP( 1986, att630, 0, 0, att630, att630, att630_state, empty_init, "AT&T", "630 MTG", MACHINE_IS_SKELETON )
-COMP( 1990, att730x, 0, 0, att630, att630, att630_state, empty_init, "AT&T", "730X", MACHINE_IS_SKELETON )
+COMP( 1990, att730x, 0, 0, att730x, att630, att630_state, empty_init, "AT&T", "730X", MACHINE_IS_SKELETON )
