@@ -34,7 +34,7 @@ TODO:
 - add the missing machines.. including the very rare overclocked 'TM' Tournament Machines
 - match I/S= diag speed test with real hardware (good test for proper waitstates)
 - remove gen32/gen32l ROM patch
-- move berlin to its own driver file
+- move berlin to its own driver file -- will do
 
 Undocumented buttons:
 - holding ENTER and LEFT cursor on cold boot runs diagnostics on modular 680x0 boards
@@ -450,7 +450,7 @@ ROM_START( berl16l )
 	ROM_LOAD16_BYTE("berlin_68000_london_odd.bin", 0x00001, 0x10000, CRC(5edac658) SHA1(18ebebc5ceffd9a01798d8a3709875120bd096f7))
 ROM_END
 
-ROM_START( bpl32 )
+ROM_START( berlinpl )
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_LOAD("bpl32.bin", 0x00000, 0x40000, CRC(d75e170f) SHA1(ac0ebdaa114abd4fef87361a03df56928768b1ae))
 ROM_END
@@ -478,4 +478,4 @@ CONS( 1996, lond16,  lond32,  0,      van16,   alm16,   mmodular_state, empty_in
 CONS( 1992, berl16,  0,       0,      berl16,  berlinp, berlinp_state,  empty_init, "Hegener + Glaser", "Mephisto Berlin 68000",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1994, berlinp, 0,       0,      berlinp, berlinp, berlinp_state,  empty_init, "Hegener + Glaser", "Mephisto Berlin Professional 68020",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1996, berl16l, berl16,  0,      berl16,  berlinp, berlinp_state,  empty_init, "Richard Lang",     "Mephisto Berlin 68000 (London upgrade)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1996, bpl32,   berlinp, 0,      berlinp, berlinp, berlinp_state,  empty_init, "Richard Lang",     "Mephisto Berlin Professional 68020 (London upgrade)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1996, berlinpl,   berlinp, 0,      berlinp, berlinp, berlinp_state,  empty_init, "Richard Lang",     "Mephisto Berlin Professional 68020 (London upgrade)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )

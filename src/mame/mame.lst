@@ -21866,7 +21866,7 @@ lond32                          // 1996 Mephisto London 32 Bit
 berl16                          // 1992 Mephisto Berlin 68000
 berlinp                         // 1994 Mephisto Berlin Pro 68020
 berl16l                         // 1996 Mephisto Berlin 68000 London Upgrade
-bpl32                           // 1996 Mephisto Berlin Pro London Upgrade
+berlinpl                        // 1996 Mephisto Berlin Pro London Upgrade
 
 @source:mephisto_mondial68k.cpp
 mondl68k                        // 1988 Mephisto Mondial 68000XL
