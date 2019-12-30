@@ -10,6 +10,7 @@
 
 //#include "bus/rs232/rs232.h"
 #include "cpu/m6502/m6502.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/mc68681.h"
 //#include "machine/nvram.h"
 #include "video/scn2674.h"
@@ -65,6 +66,8 @@ void tv924_state::tv924(machine_config &config)
 	M6502(config, m_maincpu, 1'723'560); // R6502AP (clock guessed)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tv924_state::mem_map);
 
+	I8049(config, "kbdc", 5.7143_MHz_XTAL).set_disable();
+
 	scn2681_device &duart(SCN2681(config, "duart", 3.6864_MHz_XTAL)); // SCN2681A
 	duart.irq_cb().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 
@@ -87,6 +90,9 @@ ROM_START(tv924)
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD("350_rn_118_2333-5006_8000142.u10", 0x0000, 0x1000, NO_DUMP) // VTI 24-pin mask ROM
+
+	ROM_REGION(0x800, "kbdc", 0)
+	ROM_LOAD("d8049hc.bin", 0x000, 0x800, NO_DUMP)
 ROM_END
 
 COMP(1984, tv924, 0, 0, tv924, tv924, tv924_state, empty_init, "TeleVideo Systems", "TeleVideo 924 Video Display Terminal", MACHINE_IS_SKELETON)
