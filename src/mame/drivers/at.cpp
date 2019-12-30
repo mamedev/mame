@@ -3329,16 +3329,17 @@ ROM_START( mbc18nb )
 ROM_END
 
 // Siemens-Nixdorf PCD-3Nsx notebook
-// Intel NG680386SX-16, DP8473V, CHIPS F82C601, DS??87, unknown QFP100, ADC0833BCN (on PCU sub)
-// Microcontrollers: N8042AH (KBC),  N80C51BH (KBE)
+// CPU: Intel NG680386SX-16 or -20 - 1MB RAM,upgradeable to 5MB, 40MB harddisk (-16 model)
+// 2MB, upgradeable to 8MB, 80MB harddisk (-20 model), 9" mono VGA LCD, 1.44MB floppy drive
+// Chipset: Headland HT21/E, , DP8473V, CHIPS F82C601, DS??87, unknown QFP100, ADC0833BCN (on PCU sub), CL-GD610-320C-C+CL-GD620-C
+// Microcontrollers: N8042AH (KBC),  N80C51RH  (KBE)
+// OSC: 14.318, 32.00024.0090
 ROM_START( pcd3nsx )
 	ROM_REGION16_LE( 0x20000, "bios", 0 )
-	// Phoenix 80386 ROM BIOS PLUS Version 1.10.00 - failure at 100000-10FFFF - Resume memory backup failure
-	ROM_SYSTEM_BIOS(0, "pcd3nsxno1", "pcd3nsxno1")
-	ROMX_LOAD( "3n102l30.bin", 0x00000, 0x20000, CRC(02384c19) SHA1(552dc41b40272027e2b031187f8ab1e1513751b9), ROM_BIOS(0) )
-	// Phoenix 80386 ROM BIOS PLUS Version 1.10.00 - Memory high address failure at 100000-10FFFF - Resume memory backup failure
-	ROM_SYSTEM_BIOS(1, "pcd3nsxno2", "pcd3nsxno2")
-	ROMX_LOAD( "3n120l40.bin", 0x00000, 0x20000, CRC(1336dd75) SHA1(80306d85f417c51a5235ac2f02ceb58bdb51205f), ROM_BIOS(1) )
+	ROM_LOAD( "337-7_2400_3f_10-15-91.bin", 0x00000, 0x20000, CRC(99befce7) SHA1(150cd6a1476ca0ea970a1103b2a2c668c984433a) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD("33b_pcu_rev_3r.bin", 0x0000, 0x1000, CRC(d99308ec) SHA1(26621db2db37ab2bd1da972abb7398f9514329b2) )
 
 	ROM_REGION( 0x800, "kbc", 0 )
 	ROM_LOAD("kbc_c3f.bin", 0x000, 0x800, NO_DUMP)
@@ -3346,6 +3347,19 @@ ROM_START( pcd3nsx )
 	ROM_REGION( 0x1000, "kbe", 0 )
 	ROM_LOAD("kbe_e3d.bin", 0x0000, 0x1000, NO_DUMP)
 ROM_END
+
+// Siemens-Nixdorf PCD-3Nsl - CPU: 80386SL@25MHz - 2MB RAM, upgradeable to 8MB - 85MB harddisk - 10" mono LCD VGA
+// 1.44MB floppy drive
+ROM_START( pcd3nsl )
+	ROM_REGION16_LE( 0x20000, "bios", 0 )
+	// Phoenix 80386 ROM BIOS PLUS Version 1.10.00 - failure at 100000-10FFFF - Resume memory backup failure
+	ROM_SYSTEM_BIOS(0, "pcd3nsxno1", "pcd3nsxno1")
+	ROMX_LOAD( "3n102l30.bin", 0x00000, 0x20000, CRC(02384c19) SHA1(552dc41b40272027e2b031187f8ab1e1513751b9), ROM_BIOS(0) )
+	// Phoenix 80386 ROM BIOS PLUS Version 1.10.00 - Memory high address failure at 100000-10FFFF - Resume memory backup failure
+	ROM_SYSTEM_BIOS(1, "pcd3nsxno2", "pcd3nsxno2")
+	ROMX_LOAD( "3n120l40.bin", 0x00000, 0x20000, CRC(1336dd75) SHA1(80306d85f417c51a5235ac2f02ceb58bdb51205f), ROM_BIOS(1) )
+ROM_END
+
 
 // Toshiba T2000SX
 // 1MB RAM on board, up to 9MB with 2MB, 4MB or 8MB expansion cards - 16 level grayscale VGA 640x480 display, PVGA1F display controller, 256KB VRAM
@@ -4706,6 +4720,7 @@ COMP( 199?, td70a,     ibm5170, 0,       at386sx,   0,     at_state,     init_at
 COMP( 199?, td70n,     ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "<unknown>",   "TD70N", MACHINE_NOT_WORKING )
 COMP( 199?, pccm396f,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "PC-Chips",    "M396F", MACHINE_NOT_WORKING )
 COMP( 199?, elt386sx,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Elitegroup",  "ELT-386SX-160BE", MACHINE_NOT_WORKING )
+COMP( 199?, pcd3nsl,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-3Nsl Notebook Computer", MACHINE_NOT_WORKING )
 COMP( 199?, pcd3nsx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-3Nsx Notebook Computer", MACHINE_NOT_WORKING )
 COMP( 199?, mbc18nb,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Sanyo",       "MBC-18NB", MACHINE_NOT_WORKING )
 COMP( 1992, walk386sx, ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Triumph-Adler", "Walkstation 386 SX", MACHINE_NOT_WORKING ) // screen remains blank
