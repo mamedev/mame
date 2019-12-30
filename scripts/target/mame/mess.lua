@@ -3565,6 +3565,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ts816.cpp",
 	MAME_DIR .. "src/mame/drivers/tv910.cpp",
 	MAME_DIR .. "src/mame/drivers/tv912.cpp",
+	MAME_DIR .. "src/mame/drivers/tv924.cpp",
 	MAME_DIR .. "src/mame/drivers/tv950.cpp",
 	MAME_DIR .. "src/mame/drivers/tv955.cpp",
 	MAME_DIR .. "src/mame/drivers/tv965.cpp",
