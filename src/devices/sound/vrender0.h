@@ -102,7 +102,7 @@ private:
 		}
 
 		u32 CurSAddr = 0; // 22.10 Fixed Point
-		s32 EnvVol = 0; // S.7.16 Fixed Point (Not Implemented)
+		s32 EnvVol = 0; // Envelope Volume (Overall Volume), S.7.16 Fixed Point
 		u8 EnvStage = 1; // Envelope Stage (Not Implemented)
 		u16 dSAddr = 0; // 6.10 Fixed Point
 		u8 Modes = 0; // Modes
