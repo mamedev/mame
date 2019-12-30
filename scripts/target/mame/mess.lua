@@ -1753,6 +1753,7 @@ files {
 createMESSProjects(_target, _subtarget, "att")
 files {
 	MAME_DIR .. "src/mame/drivers/att4425.cpp",
+	MAME_DIR .. "src/mame/drivers/att610.cpp",
 	MAME_DIR .. "src/mame/drivers/att630.cpp",
 	MAME_DIR .. "src/mame/drivers/unixpc.cpp",
 }

@@ -84,6 +84,7 @@ atm.cpp
 atom.cpp
 atpci.cpp
 att4425.cpp
+att610.cpp
 att630.cpp
 attache.cpp
 aussiebyte.cpp
