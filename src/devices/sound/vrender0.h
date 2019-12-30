@@ -85,7 +85,7 @@ private:
 
 	enum
 	{
-		CTRL_RS = (1 << 15), // Enable Overall
+		CTRL_RS = (1 << 15), // Enable Sound
 		CTRL_TM = (1 << 5), // Texture Memory Select
 		CTRL_RE = (1 << 4), // Reverb Enable (Not Implemented)
 		CTRL_CW = (1 << 2), // 32bit Adder Wait (Not Implemented)
@@ -101,18 +101,18 @@ private:
 			std::fill(std::begin(EnvTarget), std::end(EnvTarget), 0);
 		}
 
-		u32 CurSAddr = 0; // 22.10 Fixed Point
+		u32 CurSAddr = 0; // Current Address Pointer, 22.10 Fixed Point
 		s32 EnvVol = 0; // Envelope Volume (Overall Volume), S.7.16 Fixed Point
 		u8 EnvStage = 1; // Envelope Stage (Not Implemented)
-		u16 dSAddr = 0; // 6.10 Fixed Point
+		u16 dSAddr = 0; // Frequency, 6.10 Fixed Point
 		u8 Modes = 0; // Modes
 		bool LD = true; // Loop Direction (Not Implemented)
-		u32 LoopBegin = 0; // High 22 Bits
-		u32 LoopEnd = 0; // High 22 Bits
-		u8 LChnVol = 0; // Left Volume
-		u8 RChnVol = 0; // Right Volume
-		s32 EnvRate[4]; // Envenloe Rate; S.16 Fixed Point (Not Implemented)
-		u8 EnvTarget[4]; // Envelope Target Volume; High 7 Bits (Not Implemented)
+		u32 LoopBegin = 0; // Loop Start Pointer, High 22 Bits
+		u32 LoopEnd = 0; // Loop End Pointer, High 22 Bits
+		u8 LChnVol = 0; // Left Volume, 7 bit unsigned
+		u8 RChnVol = 0; // Right Volume, 7 bit unsigned
+		s32 EnvRate[4]; // Envenloe Rate, S.16 Fixed Point (Not Implemented)
+		u8 EnvTarget[4]; // Envelope Target Volume, High 7 Bits (Not Implemented)
 		u16 read(offs_t offset);
 		void write(offs_t offset, u16 data, u16 mem_mask);
 	};
