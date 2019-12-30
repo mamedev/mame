@@ -93,14 +93,12 @@ void berlin_state::berlin_mem(address_map &map)
 void berlin_state::berlinp_mem(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-
+	map(0x400000, 0x4fffff).ram();
 	map(0x800000, 0x800000).r(FUNC(berlin_state::input_r));
 	map(0x900000, 0x900000).w(m_board, FUNC(mephisto_board_device::mux_w));
 	map(0xa00000, 0xa00000).w(m_board, FUNC(mephisto_board_device::led_w));
 	map(0xb00000, 0xb00000).w("display", FUNC(mephisto_display_modul_device::io_w));
 	map(0xc00000, 0xc00000).w("display", FUNC(mephisto_display_modul_device::latch_w));
-
-	map(0x400000, 0x4fffff).ram();
 	map(0xd00000, 0xd07fff).m("nvram_map", FUNC(address_map_bank_device::amap8)).umask32(0xff000000);
 }
 
@@ -148,7 +146,7 @@ void berlin_state::berlinp(machine_config &config)
 	berlin(config);
 
 	/* basic machine hardware */
-	M68020(config.replace(), m_maincpu, 24.576_MHz_XTAL);
+	M68EC020(config.replace(), m_maincpu, 24.576_MHz_XTAL); // M68EC020RP25
 	m_maincpu->set_addrmap(AS_PROGRAM, &berlin_state::berlinp_mem);
 	m_maincpu->set_periodic_int(FUNC(berlin_state::irq2_line_hold), attotime::from_hz(750));
 }
@@ -171,7 +169,7 @@ ROM_END
 
 ROM_START( berlinp )
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
-	ROM_LOAD("berlin_020.u2", 0x00000, 0x40000, CRC(82fbaf6e) SHA1(729b7cef3dfaecc4594a6178fc4ba6015afa6202) )
+	ROM_LOAD("berlin_020_v400.u2", 0x00000, 0x40000, CRC(82fbaf6e) SHA1(729b7cef3dfaecc4594a6178fc4ba6015afa6202) )
 ROM_END
 
 ROM_START( berl16l )
