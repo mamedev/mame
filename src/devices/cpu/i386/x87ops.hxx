@@ -141,7 +141,7 @@ uint32_t i386_device::Getx87EA(uint8_t modrm, int rwn)
 	uint32_t ea;
 	modrm_to_EA(modrm, &ea, &segment);
 	uint32_t ret = i386_translate(segment, ea, rwn);
-	m_x87_ds = segment;
+	m_x87_ds = m_sreg[segment].selector;
 	if (PROTECTED_MODE && !V8086_MODE)
 		m_x87_data_ptr = ea;
 	else
