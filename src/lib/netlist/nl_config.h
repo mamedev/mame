@@ -10,6 +10,20 @@
 #include "plib/pconfig.h"
 #include "plib/pexception.h"
 
+///
+/// \brief Version - Major.
+///
+#define NL_VERSION_MAJOR           0
+///
+/// \brief Version - Minor.
+///
+#define NL_VERSION_MINOR  		   4
+///
+/// \brief Version - Patch level.
+///
+#define NL_VERSION_PATCHLEVEL      1
+
+///
 /// \addtogroup compiledefine
 /// \{
 
