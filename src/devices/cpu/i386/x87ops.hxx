@@ -2943,11 +2943,9 @@ void i386_device::x87_fst_m32real(uint8_t modrm)
 		value = ST(0);
 	}
 
+	uint32_t m32real = floatx80_to_float32(value);
 	if (x87_check_exceptions(true))
-	{
-		uint32_t m32real = floatx80_to_float32(value);
 		WRITE32(ea, m32real);
-	}
 
 	CYCLES(7);
 }
@@ -2970,11 +2968,9 @@ void i386_device::x87_fst_m64real(uint8_t modrm)
 		value = ST(0);
 	}
 
+	uint64_t m64real = floatx80_to_float64(value);
 	if (x87_check_exceptions(true))
-	{
-		uint64_t m64real = floatx80_to_float64(value);
 		WRITE64(ea, m64real);
-	}
 
 	CYCLES(8);
 }
@@ -3024,9 +3020,9 @@ void i386_device::x87_fstp_m32real(uint8_t modrm)
 		value = ST(0);
 	}
 
+	uint32_t m32real = floatx80_to_float32(value);
 	if (x87_check_exceptions(true))
 	{
-		uint32_t m32real = floatx80_to_float32(value);
 		WRITE32(ea, m32real);
 		x87_inc_stack();
 	}
@@ -3053,9 +3049,9 @@ void i386_device::x87_fstp_m64real(uint8_t modrm)
 
 
 	uint32_t ea = Getx87EA(modrm, 1);
+	uint64_t m64real = floatx80_to_float64(value);
 	if (x87_check_exceptions(true))
 	{
-		uint64_t m64real = floatx80_to_float64(value);
 		WRITE64(ea, m64real);
 		x87_inc_stack();
 	}
