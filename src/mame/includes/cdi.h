@@ -78,10 +78,13 @@ public:
 		: cdi_state(mconfig, type, tag)
 		, m_servo(*this, "servo")
 		, m_slave(*this, "slave")
+		, m_joyinfo(*this, "JOYINFO")
 	{ }
 
 	void cdimono2(machine_config &config);
 	void cdi910(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(mouse_update);
 
 protected:
 	virtual void machine_start() override;
@@ -100,7 +103,14 @@ private:
 	DECLARE_WRITE8_MEMBER(slave_portb_w);
 	DECLARE_WRITE8_MEMBER(slave_portc_w);
 	DECLARE_WRITE8_MEMBER(slave_portd_w);
+
+	DECLARE_READ8_MEMBER(servo_porta_r);
+	DECLARE_READ8_MEMBER(servo_portb_r);
+	DECLARE_READ8_MEMBER(servo_portc_r);
+	DECLARE_READ8_MEMBER(servo_portd_r);
+	DECLARE_WRITE8_MEMBER(servo_porta_w);
 	DECLARE_WRITE8_MEMBER(servo_portb_w);
+	DECLARE_WRITE8_MEMBER(servo_portc_w);
 
 	DECLARE_READ8_MEMBER(slave_glue_r);
 	DECLARE_WRITE8_MEMBER(slave_glue_w);
@@ -112,13 +122,21 @@ private:
 
 	DECLARE_READ16_MEMBER(uart_loopback_enable2);
 
+	DECLARE_WRITE_LINE_MEMBER(input_poll);
+
 	required_device<m68hc05c8_device> m_servo;
 	required_device<m68hc05c8_device> m_slave;
+	required_ioport m_joyinfo;
 
-	uint8_t m_porta_data;
-	uint8_t m_portb_data;
-	uint8_t m_portc_data;
-	uint8_t m_portd_data;
+	uint8_t m_slave_porta_data;
+	uint8_t m_slave_portb_data;
+	uint8_t m_slave_portc_data;
+	uint8_t m_slave_portd_data;
+
+	uint8_t m_servo_porta_data;
+	uint8_t m_servo_portb_data;
+	uint8_t m_servo_portc_data;
+	uint8_t m_servo_portd_data;
 
 	uint8_t m_disdat;
 	uint8_t m_disclk;
@@ -129,9 +147,9 @@ private:
 	uint8_t m_mouse_buffer[6];
 	uint8_t m_mouse_idx;
 	emu_timer *m_mouse_timer;
+	bool m_slave_rts_flagged;
 
 	bool m_dtack_triggered;
-	bool m_eat_write_dtack;
 	bool m_maincpu_waiting;
 };
 

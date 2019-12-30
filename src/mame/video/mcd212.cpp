@@ -1168,7 +1168,7 @@ void mcd212_device::draw_cursor(uint32_t *scanline, int y)
 	if (m_channel[0].cursor_control & MCD212_CURCNT_EN)
 	{
 		uint16_t curx =  m_channel[0].cursor_position        & 0x3ff;
-		uint16_t cury = ((m_channel[0].cursor_position >> 12) & 0x3ff) + 22;
+		uint16_t cury = ((m_channel[0].cursor_position >> 12) & 0x3ff);
 		if (y >= cury && y < (cury + 16))
 		{
 			uint32_t color = s_4bpp_color[m_channel[0].cursor_control & MCD212_CURCNT_COLOR];
@@ -1318,13 +1318,16 @@ WRITE16_MEMBER( mcd212_device::regs_w )
 WRITE_LINE_MEMBER(mcd212_device::vblank_cb)
 {
 	// Process ICA
-	LOGMASKED(LOG_FRAMES, "%s", "Frame Start\n" );
-	m_channel[0].csrr &= 0x7f;
-	for (int index = 0; index < 2; index++)
+	if (state)
 	{
-		if (m_channel[index].dcr & MCD212_DCR_ICA)
+		LOGMASKED(LOG_FRAMES, "%s", "Frame Start\n" );
+		m_channel[0].csrr &= 0x7f;
+		for (int index = 0; index < 2; index++)
 		{
-			process_ica(index);
+			if (m_channel[index].dcr & MCD212_DCR_ICA)
+			{
+				process_ica(index);
+			}
 		}
 	}
 }

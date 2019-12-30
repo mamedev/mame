@@ -148,6 +148,7 @@ protected:
 
 	virtual void run_cop(unsigned count);
 
+	void check_sci_interrupts();
 	void check_spi_interrupts();
 
 private:

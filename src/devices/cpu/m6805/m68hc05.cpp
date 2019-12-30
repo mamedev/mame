@@ -36,7 +36,7 @@ determines both the COP watchdog timeout and the real-time interrupt rate
 #define LOG_UART    (1U <<  5)
 #define LOG_SPI     (1U <<  6)
 
-#define VERBOSE (LOG_GENERAL | LOG_INT | LOG_COP | LOG_UART | LOG_SPI)
+#define VERBOSE (LOG_GENERAL | LOG_INT | LOG_COP | LOG_UART)
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
 
@@ -450,6 +450,17 @@ READ8_MEMBER(m68hc05_device::sccr2_r)
 	return m_sccr2;
 }
 
+void m68hc05_device::check_sci_interrupts()
+{
+	if (m_scsr & m_sccr2 & 0xf0)
+	{
+		LOGUART("SCI active because SCSR %02x & SCCR2 %02x & 0xf0 != 0\n", m_scsr, m_sccr2);
+		m_pending_interrupts |= M68HC05_INT_SCI;
+	}
+	else
+		m_pending_interrupts &= ~M68HC05_INT_SCI;
+}
+
 WRITE8_MEMBER(m68hc05_device::sccr2_w)
 {
 	m_sccr2 = data;
@@ -463,10 +474,7 @@ WRITE8_MEMBER(m68hc05_device::sccr2_w)
 	{
 		m_uart_rx_clocks = 10 * 32 * baud_scp_count() * baud_scr_count();
 	}
-	if (m_scsr & m_sccr2 & 0xf0)
-		m_pending_interrupts |= M68HC05_INT_SCI;
-	else
-		m_pending_interrupts &= ~M68HC05_INT_SCI;
+	check_sci_interrupts();
 }
 
 READ8_MEMBER(m68hc05_device::scsr_r)
@@ -477,10 +485,7 @@ READ8_MEMBER(m68hc05_device::scsr_r)
 READ8_MEMBER(m68hc05_device::rdr_r)
 {
 	m_scsr &= ~0x20;
-	if (m_scsr & m_sccr2 & 0xf0)
-		m_pending_interrupts |= M68HC05_INT_SCI;
-	else
-		m_pending_interrupts &= ~M68HC05_INT_SCI;
+	check_sci_interrupts();
 	LOGUART("%s: read RDR: %02x\n", machine().describe_context(), m_rdr);
 	return m_rdr;
 }
@@ -503,10 +508,7 @@ WRITE8_MEMBER(m68hc05_device::tdr_w)
 	m_tdr = data;
 	LOGUART("write TDR: %02x\n", data);
 	m_scsr &= ~0xc0;
-	if (m_scsr & m_sccr2 & 0xf0)
-		m_pending_interrupts |= M68HC05_INT_SCI;
-	else
-		m_pending_interrupts &= ~M68HC05_INT_SCI;
+	check_sci_interrupts();
 	if (sccr2_te())
 	{
 		m_uart_tx_clocks = 32 * baud_scp_count() * baud_scr_count();
@@ -1026,7 +1028,7 @@ void m68hc05_device::burn_cycles(unsigned count)
 
 			if (m_sck == !spcr_cpol())
 			{
-				logerror("Transmitting SPI bit %u: %u\n", 8 - m_spi_tx_cnt, BIT(m_spdr, 8 - m_spi_tx_cnt));
+				LOGSPI("Transmitting SPI bit %u: %u\n", 8 - m_spi_tx_cnt, BIT(m_spdr, 8 - m_spi_tx_cnt));
 				m_sda_out_cb(BIT(m_spdr, 8 - m_spi_tx_cnt));
 				m_spi_tx_cnt--;
 				if (m_spi_tx_cnt == 0)
@@ -1051,15 +1053,12 @@ void m68hc05_device::burn_cycles(unsigned count)
 		}
 		else
 		{
-			logerror("Transmitting %02x\n", m_tdr);
+			LOGUART("Transmitting %02x\n", m_tdr);
 			m_tdr_pending = false;
 			m_uart_tx_clocks = ~0U;
 			m_scsr |= 0xc0;
 			m_uart_tx_cb(m_tdr);
-			if (m_scsr & m_sccr2 & 0xf0)
-				m_pending_interrupts |= M68HC05_INT_SCI;
-			else
-				m_pending_interrupts &= ~M68HC05_INT_SCI;
+			check_sci_interrupts();
 		}
 	}
 
@@ -1072,14 +1071,11 @@ void m68hc05_device::burn_cycles(unsigned count)
 		}
 		else
 		{
-			logerror("Receiving %02x\n", m_rdr);
+			LOGUART("Receiving %02x\n", m_rdr);
 			m_rdr_pending = false;
 			m_uart_rx_clocks = ~0U;
 			m_scsr |= 0x20;
-			if (m_scsr & m_sccr2 & 0xf0)
-				m_pending_interrupts |= M68HC05_INT_SCI;
-			else
-				m_pending_interrupts &= ~M68HC05_INT_SCI;
+			check_sci_interrupts();
 		}
 	}
 }
