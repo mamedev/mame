@@ -39,6 +39,7 @@ public:
 		m_porta_out(*this),
 		m_nand_read_cb(*this),
 		m_csbase(0x20000),
+		m_romtype(0),
 		m_space_read_cb(*this),
 		m_space_write_cb(*this),
 		m_boot_mode(0),
@@ -72,6 +73,7 @@ public:
 	
 	void set_paldisplaybank_high_hack(int pal_displaybank_high) { m_spg_video->set_paldisplaybank_high(pal_displaybank_high); }
 	void set_alt_tile_addressing_hack(int alt_tile_addressing) { m_spg_video->set_alt_tile_addressing(alt_tile_addressing); }
+	void set_romtype(int romtype) { m_romtype = romtype; }
 
 protected:
 
@@ -168,6 +170,7 @@ protected:
 	DECLARE_WRITE16_MEMBER(cs_space_w);
 	DECLARE_READ16_MEMBER(cs_bank_space_r);
 	DECLARE_WRITE16_MEMBER(cs_bank_space_w);
+	int m_romtype;
 
 private:
 	devcb_read16 m_space_read_cb;
@@ -296,7 +299,6 @@ private:
 	// config registers (external pins)
 	int m_boot_mode; // 2 pins determine boot mode, likely only read at power-on
 	sunplus_gcm394_cs_callback_device m_cs_callback;
-
 };
 
 
@@ -352,7 +354,6 @@ private:
 	uint16_t m_flash_addr_high;
 
 	int m_curblockaddr;
-
 };
 
 

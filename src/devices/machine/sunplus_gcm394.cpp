@@ -21,15 +21,15 @@
 
 DEFINE_DEVICE_TYPE(GCM394, sunplus_gcm394_device, "gcm394", "SunPlus GCM394 System-on-a-Chip")
 
-sunplus_gcm394_device::sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sunplus_gcm394_base_device(mconfig, GCM394, tag, owner, clock)
+sunplus_gcm394_device::sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	sunplus_gcm394_base_device(mconfig, GCM394, tag, owner, clock)
 {
 }
 
 DEFINE_DEVICE_TYPE(GPAC800, generalplus_gpac800_device, "gpac800", "GeneralPlus GPAC800 System-on-a-Chip")
 
-generalplus_gpac800_device::generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sunplus_gcm394_base_device(mconfig, GPAC800, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpac800_device::gpac800_internal_map), this))
+generalplus_gpac800_device::generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	sunplus_gcm394_base_device(mconfig, GPAC800, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpac800_device::gpac800_internal_map), this))
 {
 }
 
@@ -130,14 +130,14 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 		if (mem.read_word(0x3f368) == 0x4840)
 			mem.write_word(0x3f368, 0x4841);    // cars 2 IRQ? wait hack
 
-		//if (mem.read_word(0x4368c) == 0x4846)
-		//	mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
+		if (mem.read_word(0x4368c) == 0x4846)
+			mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
 
 		if (mem.read_word(0x4d8d4) == 0x4840)
 			mem.write_word(0x4d8d4, 0x4841);    // golden tee IRQ? wait hack
 
-		//if (mem.read_word(0x34410) == 0x4846)
-		//	mem.write_word(0x34410, 0x4840);    // golden tee force service mode
+		if (mem.read_word(0x34410) == 0x4846)
+			mem.write_word(0x34410, 0x4840);    // golden tee force service mode
 		
 	}
 	else if ((mode == 0x0089) || (mode == 0x0009) || (mode == 0x4009))
@@ -734,40 +734,109 @@ READ16_MEMBER(generalplus_gpac800_device::unkarea_7850_r)
 	return machine().rand();
 }
 
+
+
+// GPR27P512A   = C2 76  
+// HY27UF081G2A = AD F1 80 1D
+// H27U518S2C   = AD 76
+
 READ16_MEMBER(generalplus_gpac800_device::unkarea_7854_r)
 {
+	// TODO: use actual NAND / Smart Media devices once this is better understood.
+	// The games have extensive checks on startup to determine the flash types, but then it appears that
+	// certain games (eg jak_tsm) will only function correctly with specific ones, even if the code
+	// continues regardless.  Others will bail early if they don't get what they want.
 
-	//logerror("%s:sunplus_gcm394_base_device::unkarea_7854_r\n", machine().describe_context());
-
-	// jak_tsm code looks for various 'magic values'
-
-	if (m_nandcommand == 0x90) // read ident
+	if (m_romtype == 0)
 	{
-		m_testval ^= 1;
+		//logerror("%s:sunplus_gcm394_base_device::unkarea_7854_r\n", machine().describe_context());
 
-		if (m_testval == 0)
-			return 0x73;
+		// jak_tsm code looks for various 'magic values'
+
+		if (m_nandcommand == 0x90) // read ident
+		{
+			uint8_t data = 0x00;
+
+			if (m_curblockaddr == 0)
+				data = 0xc2;
+			else
+				data = 0x76;
+
+			m_curblockaddr++;
+
+			return data;
+		}
+		else if (m_nandcommand == 0x00) // read data
+		{
+			//uint8_t d
+			uint32_t nandaddress = (m_flash_addr_high << 16) | m_flash_addr_low;
+			uint8_t data = m_nand_read_cb((nandaddress * 2) + m_curblockaddr);
+
+			//logerror("reading nand byte %02x\n", data);
+
+			m_curblockaddr++;
+
+			return data;
+		}
+		else if (m_nandcommand == 0x70) // read status
+		{
+			return 0xffff;
+		}
+
+		return 0x0000;
+	}
+	else if (m_romtype == 1)
+	{
+		if (m_nandcommand == 0x90) // read ident
+		{
+			uint8_t data = 0x00;
+
+			if (m_curblockaddr == 0)
+				data = 0xAD;
+			else
+				data = 0x76;
+
+			m_curblockaddr++;
+
+			return data;
+		}
 		else
-			return 0x98;
+		{
+			return 0x0000;
+		}
+
+		return 0x0000;
 	}
-	else if (m_nandcommand == 0x00) // read data
+	else if (m_romtype == 2)
 	{
-		//uint8_t d
-		uint32_t nandaddress = (m_flash_addr_high << 16) | m_flash_addr_low;
-		uint8_t data = m_nand_read_cb((nandaddress * 2) + m_curblockaddr);
+		if (m_nandcommand == 0x90) // read ident
+		{
+			uint8_t data = 0x00;
 
-		//logerror("reading nand byte %02x\n", data);
+			if (m_curblockaddr == 0)
+				data = 0xAD;
+			else if (m_curblockaddr == 1)
+				data = 0xF1;
+			else if (m_curblockaddr == 2)
+				data = 0x80;
+			else if (m_curblockaddr == 3)
+				data = 0x1D;
+			
+			m_curblockaddr++;
+			    
+			return data;
+		}
+		else
+		{
+			return 0x0000;
+		}
 
-		m_curblockaddr++;
-
-		return data;
+		return 0x0000;
 	}
-	else if (m_nandcommand == 0x70) // read status
+	else
 	{
-		return 0xffff;
+		return 0x0000;
 	}
-
-	return 0x00;
 }
 
 // 7998

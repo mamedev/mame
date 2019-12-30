@@ -248,6 +248,7 @@ public:
 	void nand_wlsair60();
 	void nand_vbaby();
 	void nand_tsm();
+	void nand_beambox();
 
 protected:
 	virtual void machine_reset() override;
@@ -270,6 +271,7 @@ private:
 
 	int m_initial_copy_words;
 	int m_nandreadbase;
+	int m_vectorbase;
 };
 
 
@@ -1029,17 +1031,17 @@ void generalplus_gpac800_game_state::machine_reset()
 
 		// these vectors must either directly point to RAM, or at least redirect there after some code
 		uint16_t* internal = (uint16_t*)memregion("maincpu:internal")->base();
-		internal[0x7ff5] = 0x6fea;
-		internal[0x7ff6] = 0x6fec;
+		internal[0x7ff5] = m_vectorbase + 0x0a;
+		internal[0x7ff6] = m_vectorbase + 0x0c;
 		internal[0x7ff7] = dest + 0x20; // point boot vector at code in RAM (probably in reality points to internal code that copies the first block)
-		internal[0x7ff8] = 0x6ff0;
-		internal[0x7ff9] = 0x6ff2;
-		internal[0x7ffa] = 0x6ff4;
-		internal[0x7ffb] = 0x6ff6;
-		internal[0x7ffc] = 0x6ff8;
-		internal[0x7ffd] = 0x6ffa;
-		internal[0x7ffe] = 0x6ffc;
-		internal[0x7fff] = 0x6ffe;
+		internal[0x7ff8] = m_vectorbase + 0x10;
+		internal[0x7ff9] = m_vectorbase + 0x12;
+		internal[0x7ffa] = m_vectorbase + 0x14;
+		internal[0x7ffb] = m_vectorbase + 0x16;
+		internal[0x7ffc] = m_vectorbase + 0x18;
+		internal[0x7ffd] = m_vectorbase + 0x1a;
+		internal[0x7ffe] = m_vectorbase + 0x1c;
+		internal[0x7fff] = m_vectorbase + 0x1e;
 
 		internal[0x8000] = 0xb00b;
 	}
@@ -1089,6 +1091,7 @@ void generalplus_gpac800_game_state::nand_init(int blocksize, int blocksize_stri
 	}
 
 	m_has_nand = true;
+	m_vectorbase = 0x6fe0;
 }
 
 void generalplus_gpac800_game_state::nand_init210()
@@ -1111,11 +1114,11 @@ void generalplus_gpac800_game_state::nand_vbaby()
 {
 	nand_init840();
 	m_initial_copy_words = 0x1000;
+	m_maincpu->set_romtype(2);
 }
 
 void generalplus_gpac800_game_state::nand_tsm()
 {
-	nand_init210();
 
 	// something odd must be going on with the bootloader?
 	// structure has the first 0x4000 block repeated 3 times (must appear in RAM on startup?)
@@ -1124,7 +1127,15 @@ void generalplus_gpac800_game_state::nand_tsm()
 
 	// the addresses written to the NAND device don't compensate for these data repeats, however dump seems ok as no other data is being repeated?
 	// reads after startup still need checking
-	m_nandreadbase = (0x2000 + 0x2000 + 0x8000 + 0x8000 + 0x8000) * 2;
+	nand_init210();
+	//m_nandreadbase = (0x2000 + 0x2000 + 0x8000 + 0x8000 + 0x8000) * 2;
+	m_maincpu->set_romtype(1);
+}
+
+void generalplus_gpac800_game_state::nand_beambox()
+{
+	nand_init210();
+	m_vectorbase = 0x2fe0;
 }
 
 
@@ -1136,4 +1147,4 @@ CONS(200?, jak_gtg,  0, 0, generalplus_gpac800, jak_gtg,  generalplus_gpac800_ga
 CONS(200?, jak_car2, 0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_init210,  "JAKKS Pacific Inc", "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, jak_tsm , 0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_tsm,      "JAKKS Pacific Inc", "Toy Story Mania (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, vbaby,    0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_vbaby,    "VTech", "V.Baby",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, beambox,  0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_init210,  "Hasbro", "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, beambox,  0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_beambox,  "Hasbro", "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
