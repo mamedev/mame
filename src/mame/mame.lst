@@ -21815,6 +21815,12 @@ mekd5                           // 1980 Motorola Evaluation Kit
 crzyddz2                        // 2006 Sealy
 menghong                        // 2004? Sealy
 
+@source:mephisto_berlin.cpp
+berl16                          // 1992 Mephisto Berlin 68000
+berlinp                         // 1994 Mephisto Berlin Pro 68020
+berl16l                         // 1996 Mephisto Berlin 68000 London Upgrade
+berlinpl                        // 1996 Mephisto Berlin Pro London Upgrade
+
 @source:mephisto_brikett.cpp
 mephisto
 mephisto2
@@ -21850,7 +21856,6 @@ rebel5                          // Mephisto Rebell 5.0
 @source:mephisto_modena.cpp
 modena                          // 1992 Mephisto Modena
 
-@source:mephisto_modular.cpp
 alm16                           // 1988 Mephisto Almeria 16 Bit
 alm32                           // 1988 Mephisto Almeria 32 Bit
 port16                          // 1989 Mephisto Portorose 16 Bit
@@ -21863,10 +21868,6 @@ gen32                           // 1993 Mephisto Genius 68030
 gen32l                          // 1996 Mephisto Genius 68030 London Upgrade
 lond16                          // 1996 Mephisto London 16 Bit
 lond32                          // 1996 Mephisto London 32 Bit
-berl16                          // 1992 Mephisto Berlin 68000
-berlinp                         // 1994 Mephisto Berlin Pro 68020
-berl16l                         // 1996 Mephisto Berlin 68000 London Upgrade
-berlinpl                        // 1996 Mephisto Berlin Pro London Upgrade
 
 @source:mephisto_mondial68k.cpp
 mondl68k                        // 1988 Mephisto Mondial 68000XL
