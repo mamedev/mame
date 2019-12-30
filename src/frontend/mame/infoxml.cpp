@@ -1950,8 +1950,8 @@ void output_software_lists(std::ostream &out, device_t &root, const char *root_t
 
 		std::string newtag(swlist.tag()), oldtag(":");
 		newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
+		out << util::string_format("\t\t<softwarelist name=\"%s\" tag=\"%s\" status=\"%s\"", normalize_string(swlist.list_name().c_str()), normalize_string(newtag.c_str()), swlist.is_original() ? "original" : "compatible");
 
-		out << util::string_format("\t\t<softwarelist tag=\"%s\" name=\"%s\" status=\"%s\"", normalize_string(newtag.c_str()), normalize_string(swlist.list_name().c_str()), swlist.is_original() ? "original" : "compatible");
 		if (swlist.filter())
 			out << util::string_format(" filter=\"%s\"", normalize_string(swlist.filter()));
 		out << "/>\n";
