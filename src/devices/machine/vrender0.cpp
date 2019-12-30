@@ -100,7 +100,7 @@ void vrender0soc_device::audiovideo_map(address_map &map)
 	map(0x00000000, 0x0000ffff).m(m_vr0vid, FUNC(vr0video_device::regs_map));
 	map(0x00800000, 0x00ffffff).rw(FUNC(vrender0soc_device::textureram_r), FUNC(vrender0soc_device::textureram_w));
 	map(0x01000000, 0x017fffff).rw(FUNC(vrender0soc_device::frameram_r), FUNC(vrender0soc_device::frameram_w));
-	map(0x01800000, 0x01800fff).rw(m_vr0snd, FUNC(vr0sound_device::vr0_snd_read), FUNC(vr0sound_device::vr0_snd_write));
+	map(0x01800000, 0x01800fff).m(m_vr0snd, FUNC(vr0sound_device::sound_map));
 }
 
 //-------------------------------------------------
