@@ -3353,10 +3353,10 @@ ROM_END
 ROM_START( pcd3nsl )
 	ROM_REGION16_LE( 0x20000, "bios", 0 )
 	// Phoenix 80386 ROM BIOS PLUS Version 1.10.00 - failure at 100000-10FFFF - Resume memory backup failure
-	ROM_SYSTEM_BIOS(0, "pcd3nsxno1", "pcd3nsxno1")
+	ROM_SYSTEM_BIOS(0, "05-13-93", "05/13/93")
 	ROMX_LOAD( "3n102l30.bin", 0x00000, 0x20000, CRC(02384c19) SHA1(552dc41b40272027e2b031187f8ab1e1513751b9), ROM_BIOS(0) )
 	// Phoenix 80386 ROM BIOS PLUS Version 1.10.00 - Memory high address failure at 100000-10FFFF - Resume memory backup failure
-	ROM_SYSTEM_BIOS(1, "pcd3nsxno2", "pcd3nsxno2")
+	ROM_SYSTEM_BIOS(1, "01-26-94", "01/26/94")
 	ROMX_LOAD( "3n120l40.bin", 0x00000, 0x20000, CRC(1336dd75) SHA1(80306d85f417c51a5235ac2f02ceb58bdb51205f), ROM_BIOS(1) )
 ROM_END
 
