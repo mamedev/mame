@@ -5,7 +5,7 @@
 Namco NA-1 / NA-2 System
 
 NA-1 Games:
--   Bakuretsu Quiz Ma-Q Dai Bouken (C3??)
+-   Bakuretsu Quiz Ma-Q Dai Bouken (C348)
 -   F/A / Fighter & Attacker (C3??)
 -   Super World Court (C357)
 -   Exvania (C350)
