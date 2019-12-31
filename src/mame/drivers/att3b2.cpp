@@ -8,6 +8,9 @@
 
 #include "emu.h"
 #include "cpu/we32000/we32100.h"
+#include "machine/am9517a.h"
+#include "machine/mc68681.h"
+#include "machine/pit8253.h"
 
 class att3b2_state : public driver_device
 {
@@ -30,6 +33,10 @@ private:
 void att3b2_state::mem_map(address_map &map)
 {
 	map(0x00000000, 0x00007fff).rom().region("bootstrap", 0);
+	map(0x00042000, 0x0004200f).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0x000000ff);
+	map(0x00048000, 0x0004800f).rw("dmac", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x00049000, 0x0004900f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
+	map(0x02000000, 0x02003fff).ram();
 }
 
 
@@ -41,7 +48,13 @@ void att3b2_state::att3b2(machine_config &config)
 	WE32100(config, m_maincpu, 10_MHz_XTAL); // special WE32102 XTAL runs at 1x or 2x speed
 	m_maincpu->set_addrmap(AS_PROGRAM, &att3b2_state::mem_map);
 
-	// TODO: devices
+	PIT8253(config, "pit"); // D8253C-5; unknown clocks
+
+	AM9517A(config, "dmac", 2'500'000); // AM9517A-5DC; unknown clock
+
+	SCN2681(config, "duart", 3'686'400); // MC2681P
+
+	// TODO: disk controllers (D7621AD, TMS2797NL)
 }
 
 ROM_START(3b2_300)
