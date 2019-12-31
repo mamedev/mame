@@ -73,6 +73,8 @@ void att3b2_state::att3b2(machine_config &config)
 	// TODO: hard disk controller (NEC D7261AD)
 
 	WD2797(config, "fdc", 1'000'000); // TMS2797NL
+
+	// TODO: RTC (MM58174AN)
 }
 
 void att3b2_state::att3b26(machine_config &config)
