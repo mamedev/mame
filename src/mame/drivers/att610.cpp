@@ -125,11 +125,12 @@ void att610_state::att610(machine_config &config)
 	m_screen->set_raw(21.6675_MHz_XTAL, 963, 0, 720, 375, 0, 351);
 	//m_screen->set_raw(27.72_MHz_XTAL, 1232, 0, 924, 375, 0, 351);
 	m_screen->set_screen_update(FUNC(att610_state::screen_update));
+	m_screen->screen_vblank().set("ctc", FUNC(z80ctc_device::trg0));
 }
 
 ROM_START(att610)
 	ROM_REGION(0x6000, "firmware", 0)
-	ROM_LOAD("455798-1.d4", 0x0000, 0x2000, CRC(4a704dbe) SHA1(728bf1e5edacfb9749f795e3c2fd58cef9f509d3) BAD_DUMP) // MBM27128-25 (dumped half size)
+	ROM_LOAD("455798-1.d4", 0x0000, 0x4000, CRC(91bd636f) SHA1(53bc886ba580dd64446ebe9b8a042414ff8834d6)) // MBM27128-25
 	ROM_LOAD("455799-1.b4", 0x4000, 0x2000, CRC(7fd75ee0) SHA1(597b23c43b3f283b49b51b9dee60109ff683b041)) // MBM2764-25
 
 	ROM_REGION(0x6000, "cartridge", ROMREGION_ERASE00) // optional
@@ -138,4 +139,4 @@ ROM_START(att610)
 	ROM_LOAD("att-tc85_456309-1.h7", 0x0000, 0x2000, CRC(d313e022) SHA1(a24df1d8d8c55413e4cdb0734783c0fa244bdf00)) // HN27C64G-15
 ROM_END
 
-COMP(1985, att610, 0, 0, att610, att610, att610_state, empty_init, "AT&T", "610 Business Communication Terminal", MACHINE_IS_SKELETON)
+COMP(1986, att610, 0, 0, att610, att610, att610_state, empty_init, "AT&T", "610 Business Communication Terminal", MACHINE_IS_SKELETON)
