@@ -27,7 +27,7 @@ private:
 	void dasm_srcw(std::ostream &stream, offs_t &pc, const data_buffer &opcodes);
 	void dasm_dst(std::ostream &stream, offs_t &pc, const data_buffer &opcodes);
 	void dasm_dstw(std::ostream &stream, offs_t &pc, const data_buffer &opcodes);
-	void dasm_ea(std::ostream &stream, offs_t &pc, const data_buffer &opcodes);
+	void dasm_ea(std::ostream &stream, offs_t &pc, offs_t ppc, const data_buffer &opcodes);
 	void dasm_sr(std::ostream &stream, offs_t &pc, const data_buffer &opcodes);
 	void dasm_bdisp(std::ostream &stream, offs_t &pc, const data_buffer &opcodes, bool byte);
 	offs_t dasm_30xx(std::ostream &stream, offs_t &pc, const data_buffer &opcodes);

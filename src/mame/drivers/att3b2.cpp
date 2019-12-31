@@ -11,6 +11,8 @@
 #include "machine/am9517a.h"
 #include "machine/mc68681.h"
 #include "machine/pit8253.h"
+//#include "machine/upd7261.h"
+#include "machine/wd_fdc.h"
 
 class att3b2_state : public driver_device
 {
@@ -38,6 +40,8 @@ void att3b2_state::mem_map_300(address_map &map)
 	map(0x00042000, 0x0004200f).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0x000000ff);
 	map(0x00048000, 0x0004800f).rw("dmac", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x00049000, 0x0004900f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
+	//map(0x0004a000, 0x0004a001).rw("hdc", FUNC(upd7261_device::read), FUNC(upd7261_device::write));
+	map(0x0004d000, 0x0004d003).rw("fdc", FUNC(wd2797_device::read), FUNC(wd2797_device::write));
 	map(0x02000000, 0x02003fff).ram();
 }
 
@@ -47,6 +51,7 @@ void att3b2_state::mem_map_600(address_map &map)
 	map(0x00041000, 0x0004100f).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0x000000ff);
 	map(0x00048000, 0x0004800f).rw("dmac", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x00049000, 0x0004900f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
+	map(0x0004a000, 0x0004a003).rw("fdc", FUNC(wd2797_device::read), FUNC(wd2797_device::write));
 	map(0x02000000, 0x02003fff).mirror(0x1000000).ram();
 }
 
@@ -65,7 +70,9 @@ void att3b2_state::att3b2(machine_config &config)
 
 	SCN2681(config, "duart", 3'686'400); // MC2681P
 
-	// TODO: disk controllers (D7621AD, TMS2797NL)
+	// TODO: hard disk controller (NEC D7261AD)
+
+	WD2797(config, "fdc", 1'000'000); // TMS2797NL
 }
 
 void att3b2_state::att3b26(machine_config &config)
