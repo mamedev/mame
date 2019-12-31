@@ -35214,9 +35214,10 @@ zektor                          // (c) 1982
 @source:segahang.cpp
 endurob2                        // (c) 1985 (Beta bootleg)
 endurobl                        // (c) 1985 (Herb bootleg)
-enduror                         // (c) 1985 (YM2151, FD1089B)
+enduror                         // (c) 1985 (Rev A, YM2151, FD1089B)
 enduror1                        // (c) 1985 (YM2203, FD1089B)
-endurora                        // (c) 1985 (YM2151, Mask ROM sprites, FD1089B)
+endurora                        // (c) 1985 (Rev A, YM2151, Mask ROM sprites, FD1089B)
+endurorb                        // (c) 1985 (YM2151, FD1089B)
 enduror1d                       // bootleg
 endurord                        // bootleg
 hangon                          // (c) 1985 (Rev A)
