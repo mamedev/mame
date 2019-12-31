@@ -88,7 +88,7 @@ void att630_state::att730_map(address_map &map)
 	att630_map(map);
 	map(0x040000, 0x05ffff).rom().region("maincpu", 0x40000);
 	map(0x100000, 0x15ffff).rom().region("cart", 0);
-	map(0x800000, 0x800fff).ram();
+	map(0x800000, 0x83ffff).ram(); // expansion RAM
 	map(0xde0000, 0xdfffff).rom().region("starlan", 0);
 }
 
