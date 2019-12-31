@@ -150,6 +150,7 @@ CPUS["FR"] = true
 CPUS["DSP56000"] = true
 CPUS["VT50"] = true
 CPUS["PACE"] = true
+CPUS["WE32000"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -1752,6 +1753,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "att")
 files {
+	MAME_DIR .. "src/mame/drivers/att3b2.cpp",
 	MAME_DIR .. "src/mame/drivers/att4425.cpp",
 	MAME_DIR .. "src/mame/drivers/att610.cpp",
 	MAME_DIR .. "src/mame/drivers/att630.cpp",

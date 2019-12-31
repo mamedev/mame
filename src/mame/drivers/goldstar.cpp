@@ -8308,7 +8308,7 @@ GFXDECODE_END
 static GFXDECODE_START( gfx_cmast91 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128+64, 4 ) // or is there a register for the +64?
-	GFXDECODE_ENTRY( "user1", 0, tiles256x128x4_layout, 128, 4 ) // wrong... FIXME.
+	GFXDECODE_ENTRY( "user1", 0, tiles256x128x4_layout, 128, 4 )
 GFXDECODE_END
 
 #if 0 // decodes an extra plane for cmv4 / cmasterb, not sure if we need to
@@ -8377,7 +8377,8 @@ static const gfx_layout tiles8x8_3bpp_layout =
 
 static GFXDECODE_START( gfx_nfm )
 	GFXDECODE_ENTRY( "tilegfx", 0, tiles8x8_3bpp_layout, 0, 16 )
-	GFXDECODE_ENTRY( "reelgfx", 0, tiles8x32_4bpp_layout, 0, 16 )
+	GFXDECODE_ENTRY( "reelgfx", 0, tiles8x32_4bpp_layout, 128+64, 4 )
+	GFXDECODE_ENTRY( "user1", 0, tiles128x128x4_layout, 128, 4 ) // wrong, needs correct decoding
 GFXDECODE_END
 
 
@@ -8711,6 +8712,19 @@ void goldstar_state::lucky8_palette(palette_device &palette) const
 		uint8_t const data = proms[i];
 		palette.set_pen_color(i + 0x80, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
+}
+
+void goldstar_state::nfm_palette(palette_device &palette) const
+{
+	// BBGGGRRR
+	uint8_t const *const colours = memregion("colours")->base();
+	for (int i = 0; i < 0x100; i++)
+	{
+		uint8_t const data = bitswap<8>(colours[0x000 + i], 3, 2, 1, 0, 7, 6, 5, 4);
+		palette.set_pen_color(i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
+	}
+
+	// TODO: what's 0x100-0x1ff for? For the currently undecoded user1 ROM?
 }
 
 
@@ -9450,6 +9464,8 @@ void cmaster_state::nfm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::nfm_map);
 
 	m_gfxdecode->set_info(gfx_nfm);
+
+	m_palette->set_init(FUNC(cmaster_state::nfm_palette));
 }
 
 
@@ -11418,8 +11434,8 @@ ROM_START( cmast91 )
 	ROM_LOAD( "1.bin",  0x10000, 0x8000, CRC(71bdab69) SHA1(d2c594ed88d6368df15b623c48eecc1c219b839e) )
 	ROM_LOAD( "2.bin",  0x18000, 0x8000, CRC(fccd48d7) SHA1(af564f5ef9ff5b6363897ce6bdf0b21123911fd4) )
 
-	ROM_REGION( 0x40000, "user1", 0 ) /* unknown, bitmaps, or sound? */
-	ROM_LOAD( "9.bin",  0x00000, 0x40000, CRC(92342276) SHA1(f9436752f2ec67cf873fd01c729c7c113dc18be0) ) // ?
+	ROM_REGION( 0x40000, "user1", 0 ) // girls GFX
+	ROM_LOAD( "9.bin",  0x00000, 0x40000, CRC(92342276) SHA1(f9436752f2ec67cf873fd01c729c7c113dc18be0) )
 
 	ROM_REGION( 0x300, "proms", 0 )
 	ROM_LOAD( "p1.bin", 0x0000, 0x0100, CRC(ac529f04) SHA1(5bc92e50c85bb23e609172cc15c430ddea7fdcb5) )
@@ -14812,22 +14828,61 @@ ROM_START( nfm )
 	ROM_CONTINUE(0xf000,0x1000)
 
 	ROM_REGION( 0x10000, "reelgfx", 0 )
-	ROM_LOAD( "fruit1", 0x00000, 0x04000, CRC(dd096dae) SHA1(ab34942cfa4fe7d46892819372c42f566c249f8c) )
-	ROM_CONTINUE(0x0000, 0x4000)
-	ROM_LOAD( "fruit2", 0x04000, 0x04000, CRC(6a37a16f) SHA1(7adb08d3e4de9768a8e41760a044bf52509da211) )
-	ROM_CONTINUE(0x0000, 0x4000)
-	ROM_LOAD( "fruit3", 0x08000, 0x04000, CRC(f3361ba7) SHA1(1a7b9c4f685656447bd6ce5f361e6e4af63012e3) )
+	ROM_LOAD( "fruit4", 0x00000, 0x04000, CRC(99ac5ddf) SHA1(65b6abb98f3156f4c0c55478d09c612eed5ae555) )
+	ROM_LOAD( "fruit3", 0x04000, 0x04000, CRC(f3361ba7) SHA1(1a7b9c4f685656447bd6ce5f361e6e4af63012e3) )
+	ROM_CONTINUE(0x4000, 0x4000)
+	ROM_LOAD( "fruit2", 0x08000, 0x04000, CRC(6a37a16f) SHA1(7adb08d3e4de9768a8e41760a044bf52509da211) )
 	ROM_CONTINUE(0x8000, 0x4000)
-	ROM_LOAD( "fruit4", 0x0c000, 0x04000, CRC(99ac5ddf) SHA1(65b6abb98f3156f4c0c55478d09c612eed5ae555) )
+	ROM_LOAD( "fruit1", 0x0c000, 0x04000, CRC(dd096dae) SHA1(ab34942cfa4fe7d46892819372c42f566c249f8c) )
+	ROM_CONTINUE(0xc000, 0x4000)
 
-	// do these graphics really belong with this set? a lot of the tiles seem wrong for it
 	ROM_REGION( 0x18000, "tilegfx", 0 )
-	ROM_LOAD( "fruit5", 0x00000, 0x08000, CRC(a7a8f08d) SHA1(76c93194133ba85c0dde1f364260e16d5b647134) )
+	ROM_LOAD( "fruit7", 0x00000, 0x08000, CRC(3ade6709) SHA1(9cdf2814e50c5433c582fc40265c5df2a16e99e7) )
 	ROM_LOAD( "fruit6", 0x08000, 0x08000, CRC(39d5b89a) SHA1(4cf52fa557ffc792d3e13f7dbb5d45fd617bac85) )
-	ROM_LOAD( "fruit7", 0x10000, 0x08000, CRC(3ade6709) SHA1(9cdf2814e50c5433c582fc40265c5df2a16e99e7) )
+	ROM_LOAD( "fruit5", 0x10000, 0x08000, CRC(a7a8f08d) SHA1(76c93194133ba85c0dde1f364260e16d5b647134) )
 
-	ROM_REGION( 0x18000, "proms", 0 ) // colours?
-	ROM_LOAD( "fruiprg2", 0x00000, 0x08000, CRC(13925ff5) SHA1(236415a244ef6092834f8080cf0d2e04bbfa2650) )
+	ROM_REGION( 0x40000, "user1", 0 )
+	ROM_LOAD( "8_f29c51002t.u53",  0x00000, 0x40000, CRC(ff9d5b6d) SHA1(a84fe241ff9958740dcdbd4650bd16a0aa6e01ca) )
+
+	ROM_REGION( 0x8000, "colours", 0 ) // colours, only 0x200 used
+	ROM_LOAD( "fruiprg2", 0x0000, 0x08000, CRC(13925ff5) SHA1(236415a244ef6092834f8080cf0d2e04bbfa2650) )
+ROM_END
+
+ROM_START( nfma )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "9_27c512.u53", 0x00000, 0x01000, CRC(127b2a17) SHA1(973815f99d744e055f8bdff7753c3e70a892250c) )
+	ROM_CONTINUE(0x5000,0x1000)
+	ROM_CONTINUE(0x7000,0x1000)
+	ROM_CONTINUE(0xa000,0x1000)
+	ROM_CONTINUE(0x2000,0x1000) //?
+	ROM_CONTINUE(0xb000,0x1000) //?
+	ROM_CONTINUE(0x9000,0x1000)
+	ROM_CONTINUE(0xc000,0x1000)
+	ROM_CONTINUE(0x1000,0x1000)
+	ROM_CONTINUE(0x3000,0x1000)
+	ROM_CONTINUE(0x6000,0x1000)
+	ROM_CONTINUE(0x4000,0x1000)
+	ROM_CONTINUE(0x8000,0x1000)
+	ROM_CONTINUE(0xd000,0x1000) // ?
+	ROM_CONTINUE(0xe000,0x1000)
+	ROM_CONTINUE(0xf000,0x1000)
+
+	ROM_REGION( 0x10000, "reelgfx", 0 )
+	ROM_LOAD( "4_27c128.u15", 0x00000, 0x04000, CRC(99ac5ddf) SHA1(65b6abb98f3156f4c0c55478d09c612eed5ae555) ) // matches nfm
+	ROM_LOAD( "3_27c128.u10", 0x04000, 0x04000, CRC(e8fbe05e) SHA1(a9439a91953d5caa211587eb837f6bfe52be0a00) ) // matches nfm, once taken into account this is correct size ROM
+	ROM_LOAD( "2_27c128.u14", 0x08000, 0x04000, CRC(6540a218) SHA1(78f5b78b9c7198c5cf6b2d1a7e02e9ac7b422b10) ) // matches nfm, once taken into account this is correct size ROM
+	ROM_LOAD( "1_27c128.u9",  0x0c000, 0x04000, CRC(af41b0c0) SHA1(ce463035b7f5509a92ae727020c3ecc511ed1d30) ) // matches nfm, once taken into account this is correct size ROM
+
+	ROM_REGION( 0x18000, "tilegfx", 0 )
+	ROM_LOAD( "7_27c256.u16", 0x00000, 0x08000, CRC(3ade6709) SHA1(9cdf2814e50c5433c582fc40265c5df2a16e99e7) ) // matches nfm
+	ROM_LOAD( "6_27c256.u11", 0x08000, 0x08000, CRC(39d5b89a) SHA1(4cf52fa557ffc792d3e13f7dbb5d45fd617bac85) ) // matches nfm
+	ROM_LOAD( "5_27c256.u4",  0x10000, 0x08000, CRC(a7a8f08d) SHA1(76c93194133ba85c0dde1f364260e16d5b647134) ) // matches nfm
+
+	ROM_REGION( 0x40000, "user1", 0 )
+	ROM_LOAD( "8_f29c51002t.u53",  0x00000, 0x40000, CRC(ff9d5b6d) SHA1(a84fe241ff9958740dcdbd4650bd16a0aa6e01ca) )
+
+	ROM_REGION( 0x8000, "colours", 0 ) // colours, only 0x200 used
+	ROM_LOAD( "10bp_27c257.u62", 0x0000, 0x8000, CRC(13925ff5) SHA1(236415a244ef6092834f8080cf0d2e04bbfa2650) ) // matches nfm
 ROM_END
 
 
@@ -18158,7 +18213,8 @@ GAME( 1996, nfb96sec,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init
 GAME( 2002, carb2002,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg", "Carriage Bonus 2002 (bootleg)",                                            MACHINE_WRONG_COLORS )
 GAME( 2003, carb2003,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg", "Carriage Bonus 2003 (bootleg)",                                            MACHINE_WRONG_COLORS )
 
-GAME( 2003, nfm,       0,        nfm,      nfm,       cmaster_state,  empty_init,     ROT0, "Ming-Yang Electronic", "New Fruit Machine (Ming-Yang Electronic)",                    MACHINE_NOT_WORKING ) // vFB02-07A "Copyright By Ms. Liu Orchis 2003/03/06"
+GAME( 2003, nfm,       0,        nfm,      nfm,       cmaster_state,  empty_init,     ROT0, "Ming-Yang Electronic", "New Fruit Machine (Ming-Yang Electronic, vFB02-07A)",         MACHINE_NOT_WORKING ) // vFB02-07A "Copyright By Ms. Liu Orchis 2003/03/06", needs correct PROM and USER1 regions decode
+GAME( 2003, nfma,      nfm,      nfm,      nfm,       cmaster_state,  empty_init,     ROT0, "Ming-Yang Electronic", "New Fruit Machine (Ming-Yang Electronic, vFB02-01A)",         MACHINE_NOT_WORKING ) // vFB02-01A "Copyright By Ms. Liu Orchis 2003/03/06", needs correct PROM and USER1 regions decode
 
 
 // super cherry master sets...

@@ -71,7 +71,8 @@ New code to better emulate the protection was added in 0.194, but it turned
 out to harbour a bug (see MT 07310). Therefore the previous patches have been
 restored, and the protection routine has been nullified (but still there in
 case someone wants to revisit it).
- ***************************************************************************/
+
+***************************************************************************/
 
 #include "emu.h"
 #include "includes/route16.h"
@@ -87,11 +88,73 @@ case someone wants to revisit it).
 
 /*************************************
  *
- *  Shared RAM handling
+ *  Drivers specific initialization
  *
  *************************************/
 
+MACHINE_START_MEMBER(route16_state, speakres)
+{
+	save_item(NAME(m_speakres_vrx));
+}
 
+MACHINE_START_MEMBER(route16_state, jongpute)
+{
+	save_item(NAME(m_jongpute_port_select));
+}
+
+void route16_state::init_route16()
+{
+	// hack out the protection
+	u8 *rom = memregion("cpu1")->base();
+	rom[0x105] = 0; // remove jp nz,4109
+	rom[0x106] = 0;
+	rom[0x107] = 0;
+
+	rom[0x72a] = 0; // remove jp nz,4238
+	rom[0x72b] = 0;
+	rom[0x72c] = 0;
+	init_route16c();
+}
+
+void route16_state::init_route16a()
+{
+	save_item(NAME(m_protection_data));
+	// hack out the protection
+	u8 *rom = memregion("cpu1")->base();
+	rom[0x105] = 0; // remove jp nz,4109
+	rom[0x106] = 0;
+	rom[0x107] = 0;
+
+	rom[0x731] = 0; // remove jp nz,4238
+	rom[0x732] = 0;
+	rom[0x733] = 0;
+
+	rom[0x0e9] = 0x3a; // remove call 2CCD
+
+	rom[0x747] = 0xc3; // skip protection checking
+	rom[0x748] = 0x56;
+	rom[0x749] = 0x07;
+}
+
+void route16_state::init_route16c()
+{
+	save_item(NAME(m_protection_data));
+	// hack out the protection
+	u8 *rom = memregion("cpu1")->base();
+	rom[0x0e9] = 0x3a; // remove call 2CD8
+
+	rom[0x754] = 0xc3; // skip protection checking
+	rom[0x755] = 0x63;
+	rom[0x756] = 0x07;
+}
+
+
+
+/*************************************
+ *
+ *  Shared RAM handling
+ *
+ *************************************/
 
 template<bool cpu1> WRITE8_MEMBER(route16_state::route16_sharedram_w)
 {
@@ -103,6 +166,29 @@ template<bool cpu1> WRITE8_MEMBER(route16_state::route16_sharedram_w)
 		// Let the other CPU run
 		(cpu1 ? m_cpu1 : m_cpu2)->yield();
 	}
+}
+
+
+
+/*************************************
+ *
+ *  Protection handling
+ *
+ *************************************/
+
+READ8_MEMBER(route16_state::routex_prot_read)
+{
+	if (m_cpu1->pc() == 0x2f) return 0xfb;
+
+	logerror ("cpu '%s' (PC=%08X): unmapped prot read\n", m_cpu1->tag(), m_cpu1->pc());
+	return 0x00;
+}
+
+// never called, see notes.
+READ8_MEMBER(route16_state::route16_prot_read)
+{
+	m_protection_data++;
+	return (1 << ((m_protection_data >> 1) & 7));
 }
 
 
@@ -139,11 +225,9 @@ WRITE8_MEMBER(route16_state::stratvox_sn76477_w)
 
 /***************************************************
  *
- *  Jongputer and T.T Mahjong's multiplixed ports
+ *  Jongputer and T.T Mahjong's multiplexed ports
  *
  ***************************************************/
-
-
 
 WRITE8_MEMBER(route16_state::jongpute_input_port_matrix_w)
 {
@@ -307,16 +391,22 @@ void route16_state::cpu1_io_map(address_map &map)
 
 
 
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
+
 static INPUT_PORTS_START( route16 )
 	PORT_START("DSW")       /* DSW 1 */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) ) // Doesn't seem to
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )                    // be referenced
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) ) // Doesn't seem to be referenced
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) // Doesn't seem to
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )                    // be referenced
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) // Doesn't seem to be referenced
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
@@ -360,7 +450,7 @@ static INPUT_PORTS_START( stratvox )
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
-	PORT_DIPNAME( 0x02, 0x00, "Replenish Astronouts" )
+	PORT_DIPNAME( 0x02, 0x00, "Replenish Astronauts" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x0c, 0x00, "2 Attackers At Wave" )
@@ -451,7 +541,7 @@ static INPUT_PORTS_START( spacecho )
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
-	PORT_DIPNAME( 0x02, 0x00, "Replenish Astronouts" )
+	PORT_DIPNAME( 0x02, 0x00, "Replenish Astronauts" )
 	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x0c, 0x00, "2 Attackers At Wave" )
@@ -494,7 +584,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( jongpute )
 	PORT_START("DSW")       /* IN0 */
-	PORT_DIPNAME( 0x0c, 0x08, "Timer Descrement Speed" )
+	PORT_DIPNAME( 0x0c, 0x08, "Timer Decrement Speed" )
 	PORT_DIPSETTING(    0x00, "Very Fast" )
 	PORT_DIPSETTING(    0x04, "Fast" )
 	PORT_DIPSETTING(    0x08, "Normal" )
@@ -581,61 +671,13 @@ static INPUT_PORTS_START( jongpute )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 
-MACHINE_START_MEMBER(route16_state, speakres)
-{
-	save_item(NAME(m_speakres_vrx));
-}
 
-MACHINE_START_MEMBER(route16_state, jongpute)
-{
-	save_item(NAME(m_jongpute_port_select));
-}
 
-void route16_state::init_route16()
-{
-	// hack out the protection
-	u8 *rom = memregion("cpu1")->base();
-	rom[0x105] = 0; // remove jp nz,4109
-	rom[0x106] = 0;
-	rom[0x107] = 0;
-
-	rom[0x72a] = 0; // remove jp nz,4238
-	rom[0x72b] = 0;
-	rom[0x72c] = 0;
-	init_route16c();
-}
-
-void route16_state::init_route16a()
-{
-	save_item(NAME(m_protection_data));
-	// hack out the protection
-	u8 *rom = memregion("cpu1")->base();
-	rom[0x105] = 0; // remove jp nz,4109
-	rom[0x106] = 0;
-	rom[0x107] = 0;
-
-	rom[0x731] = 0; // remove jp nz,4238
-	rom[0x732] = 0;
-	rom[0x733] = 0;
-
-	rom[0x0e9] = 0x3a; // remove call 2CCD
-
-	rom[0x747] = 0xc3; // skip protection checking
-	rom[0x748] = 0x56;
-	rom[0x749] = 0x07;
-}
-
-void route16_state::init_route16c()
-{
-	save_item(NAME(m_protection_data));
-	// hack out the protection
-	u8 *rom = memregion("cpu1")->base();
-	rom[0x0e9] = 0x3a; // remove call 2CD8
-
-	rom[0x754] = 0xc3; // skip protection checking
-	rom[0x755] = 0x63;
-	rom[0x756] = 0x07;
-}
+/*************************************
+ *
+ *  Machine configs
+ *
+ *************************************/
 
 void route16_state::route16(machine_config &config)
 {
@@ -749,7 +791,7 @@ void route16_state::jongpute(machine_config &config)
  *
  *************************************/
 
-	ROM_START( route16 )
+ROM_START( route16 )
 	ROM_REGION( 0x10000, "cpu1", 0 )
 	ROM_LOAD( "tvg54.a0",     0x0000, 0x0800, CRC(aef9ffc1) SHA1(178d23e4963336ded93c13cb17940a4ae98270c5) )
 	ROM_LOAD( "tvg55.a1",     0x0800, 0x0800, CRC(389bc077) SHA1(b0606f6e647e81ceae7148bda96bd4673a51e823) )
@@ -1087,38 +1129,6 @@ ROM_START( jongpute )
 	ROM_LOAD( "ju03",         0x0000, 0x0100, BAD_DUMP CRC(27d47624) SHA1(ee04ce8043216be8b91413b546479419fca2b917) )
 	ROM_LOAD( "ju09",         0x0100, 0x0100, BAD_DUMP CRC(27d47624) SHA1(ee04ce8043216be8b91413b546479419fca2b917) )
 ROM_END
-
-
-/*************************************
- *
- *  Protection handling
- *
- *************************************/
-
-READ8_MEMBER(route16_state::routex_prot_read)
-{
-	if (m_cpu1->pc() == 0x2f) return 0xfb;
-
-	logerror ("cpu '%s' (PC=%08X): unmapped prot read\n", m_cpu1->tag(), m_cpu1->pc());
-	return 0x00;
-}
-
-// never called, see notes.
-READ8_MEMBER(route16_state::route16_prot_read)
-{
-	m_protection_data++;
-	return (1 << ((m_protection_data >> 1) & 7));
-}
-
-
-/*************************************
- *
- *  Drivers specific initialization
- *
- *************************************/
-
-
-
 
 
 

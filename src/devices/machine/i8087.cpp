@@ -434,7 +434,7 @@ int i8087_device::dec_stack()
  *
  *************************************/
 
-int i8087_device::check_exceptions()
+int i8087_device::check_exceptions(bool store)
 {
 	/* Update the exceptions from SoftFloat */
 	if (float_exception_flags & float_flag_invalid)
@@ -457,13 +457,21 @@ int i8087_device::check_exceptions()
 		m_sw |= X87_SW_PE;
 		float_exception_flags &= ~float_flag_inexact;
 	}
+	if (float_exception_flags & float_flag_divbyzero)
+	{
+		m_sw |= X87_SW_ZE;
+		float_exception_flags &= ~float_flag_divbyzero;
+	}
+
+	u16 unmasked = (m_sw & ~m_cw) & 0x3f;
 
 	if ((m_sw & ~m_cw) & 0x3f)
 	{
 		// interrupt handler
 		if (!(m_cw & X87_CW_IEM)) { m_sw |= X87_SW_ES; m_int_handler(1); }
 		logerror("Unmasked x87 exception (CW:%.4x, SW:%.4x)\n", m_cw, m_sw);
-		return 0;
+		if (store || !(unmasked & (X87_SW_OE | X87_SW_UE)))
+			return 0;
 	}
 
 	return 1;
@@ -2761,11 +2769,9 @@ void i8087_device::fst_m32real(u8 modrm)
 		value = ST(0);
 	}
 
-	if (check_exceptions())
-	{
-		u32 m32real = floatx80_to_float32(value);
+	u32 m32real = floatx80_to_float32(value);
+	if (check_exceptions(true))
 		WRITE32(ea, m32real);
-	}
 
 	CYCLES(7);
 }
@@ -2786,11 +2792,9 @@ void i8087_device::fst_m64real(u8 modrm)
 		value = ST(0);
 	}
 
-	if (check_exceptions())
-	{
-		uint64_t m64real = floatx80_to_float64(value);
+	u64 m64real = floatx80_to_float64(value);
+	if (check_exceptions(true))
 		WRITE64(ea, m64real);
-	}
 
 	CYCLES(8);
 }
@@ -2833,9 +2837,9 @@ void i8087_device::fstp_m32real(u8 modrm)
 		value = ST(0);
 	}
 
-	if (check_exceptions())
+	u32 m32real = floatx80_to_float32(value);
+	if (check_exceptions(true))
 	{
-		u32 m32real = floatx80_to_float32(value);
 		WRITE32(ea, m32real);
 		inc_stack();
 	}
@@ -2860,9 +2864,9 @@ void i8087_device::fstp_m64real(u8 modrm)
 
 
 	u32 ea = m_ea;
-	if (check_exceptions())
+	u64 m64real = floatx80_to_float64(value);
+	if (check_exceptions(true))
 	{
-		uint64_t m64real = floatx80_to_float64(value);
 		WRITE64(ea, m64real);
 		inc_stack();
 	}
@@ -2886,7 +2890,7 @@ void i8087_device::fstp_m80real(u8 modrm)
 	}
 
 	u32 ea = m_ea;
-	if (check_exceptions())
+	if (check_exceptions(true))
 	{
 		WRITE80(ea, value);
 		inc_stack();
@@ -2945,7 +2949,7 @@ void i8087_device::fist_m16int(u8 modrm)
 	}
 
 	u32 ea = m_ea;
-	if (check_exceptions())
+	if (check_exceptions(true))
 	{
 		WRITE16(ea, m16int);
 	}
@@ -2978,7 +2982,7 @@ void i8087_device::fist_m32int(u8 modrm)
 	}
 
 	u32 ea = m_ea;
-	if (check_exceptions())
+	if (check_exceptions(true))
 	{
 		WRITE32(ea, m32int);
 	}
@@ -3011,7 +3015,7 @@ void i8087_device::fistp_m16int(u8 modrm)
 	}
 
 	u32 ea = m_ea;
-	if (check_exceptions())
+	if (check_exceptions(true))
 	{
 		WRITE16(ea, m16int);
 		inc_stack();
@@ -3045,7 +3049,7 @@ void i8087_device::fistp_m32int(u8 modrm)
 	}
 
 	u32 ea = m_ea;
-	if (check_exceptions())
+	if (check_exceptions(true))
 	{
 		WRITE32(ea, m32int);
 		inc_stack();
@@ -3079,7 +3083,7 @@ void i8087_device::fistp_m64int(u8 modrm)
 	}
 
 	u32 ea = m_ea;
-	if (check_exceptions())
+	if (check_exceptions(true))
 	{
 		WRITE64(ea, m64int);
 		inc_stack();
@@ -3114,7 +3118,7 @@ void i8087_device::fbstp(u8 modrm)
 	}
 
 	u32 ea = m_ea;
-	if (check_exceptions())
+	if (check_exceptions(true))
 	{
 		WRITE80(ea, result);
 		inc_stack();
