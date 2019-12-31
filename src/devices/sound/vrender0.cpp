@@ -121,12 +121,13 @@ DEFINE_DEVICE_TYPE(SOUND_VRENDER0, vr0sound_device, "vr0sound", "MagicEyes VRend
 //  vr0sound_device - constructor
 //-------------------------------------------------
 
-vr0sound_device::vr0sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, SOUND_VRENDER0, tag, owner, clock),
-	device_sound_interface(mconfig, *this),
-	m_TexBase(nullptr),
-	m_FBBase(nullptr),
-	m_stream(nullptr)
+vr0sound_device::vr0sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, SOUND_VRENDER0, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, device_memory_interface(mconfig, *this)
+	, m_texture_config("texture", ENDIANNESS_LITTLE, 16, 23) // 64 MBit (8 MB) Texture Memory Support
+	, m_frame_config("frame", ENDIANNESS_LITTLE, 16, 23) // 64 MBit (8 MB) Framebuffer Memory Support
+	, m_stream(nullptr)
 {
 }
 
@@ -137,6 +138,13 @@ vr0sound_device::vr0sound_device(const machine_config &mconfig, const char *tag,
 
 void vr0sound_device::device_start()
 {
+	// Find our direct access
+	m_texcache = space(AS_TEXTURE).cache<1, 0, ENDIANNESS_LITTLE>();
+	m_fbcache = space(AS_FRAME).cache<1, 0, ENDIANNESS_LITTLE>();
+	m_texcache_ctrl = m_fbcache;
+	for (auto &elem : m_channel)
+		elem.Cache = m_fbcache;
+
 	m_stream = stream_alloc(0, 2, 44100); // TODO : Related to clock?
 
 	save_item(STRUCT_MEMBER(m_channel, CurSAddr));
@@ -163,6 +171,18 @@ void vr0sound_device::device_start()
 	save_item(NAME(m_Ctrl));
 }
 
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+device_memory_interface::space_config_vector vr0sound_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_TEXTURE, &m_texture_config),
+		std::make_pair(AS_FRAME, &m_frame_config)
+	};
+}
 
 //-------------------------------------------------
 //  sound_stream_update - handle update requests
@@ -181,7 +201,13 @@ u16 vr0sound_device::channel_r(offs_t offset)
 
 void vr0sound_device::channel_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	channel_t *channel = &m_channel[(offset >> 4) & 0x1f];
+	u16 old_mode = channel->Modes;
 	m_channel[(offset >> 4) & 0x1f].write(offset & 0xf, data, mem_mask);
+	if ((old_mode ^ channel->Modes) & MODE_TEXTURE)
+	{
+		channel->Cache = (channel->Modes & MODE_TEXTURE) ? m_texcache_ctrl : m_fbcache;
+	}
 }
 
 u16 vr0sound_device::status_r(offs_t offset)
@@ -195,7 +221,6 @@ void vr0sound_device::status_w(offs_t offset, u16 data)
 	{
 		u32 c = data & 0x1f;
 		m_Status |= 1 << c;
-		m_channel[c].CurSAddr = m_channel[c].LoopBegin << 10; // TODO : correct?
 	}
 	else
 	{
@@ -303,7 +328,10 @@ u16 vr0sound_device::ctrl_r(offs_t offset)
 
 void vr0sound_device::ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	const u16 old_ctrl = m_Ctrl;
 	COMBINE_DATA(&m_Ctrl);
+	if ((old_ctrl ^ m_Ctrl) & CTRL_TM)
+		m_texcache_ctrl = (m_Ctrl & CTRL_TM) ? m_texcache : m_fbcache;
 }
 
 /*
@@ -447,12 +475,6 @@ void vr0sound_device::channel_t::write(offs_t offset, u16 data, u16 mem_mask)
 	}
 }
 
-void vr0sound_device::set_areas(u16 *texture, u16 *frame)
-{
-	m_TexBase=(s16 *)texture;
-	m_FBBase=(s16 *)frame;
-}
-
 /*
 Bit 0 Attack (0)
 Bit 1 Decay (1)
@@ -471,13 +493,7 @@ static inline u8 get_envstate(u8 stage)
 
 void vr0sound_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_sample_t *r)
 {
-	s16 *SAMPLES;
 	int div;
-
-	if (m_Ctrl & CTRL_TM)
-		SAMPLES = m_TexBase;
-	else
-		SAMPLES = m_FBBase;
 
 	if (m_ChnClkNum)
 		div = ((30 << 16) | 0x8000) / (m_ChnClkNum + 1);
@@ -490,9 +506,9 @@ void vr0sound_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_s
 		for (int i = 0; i <= m_MaxChn; i++)
 		{
 			channel_t *channel = &m_channel[i];
-			s32 wave = 0;
-			u32 cur = channel->CurSAddr;
-			u32 a = (cur >> 10);
+			s32 sample = 0;
+			const u32 loopbegin_scaled = channel->LoopBegin << 10;
+			const u32 loopend_scaled = channel->LoopEnd << 10;
 
 			s32 DSADD = (channel->dSAddr * div) >> 16;
 
@@ -501,31 +517,27 @@ void vr0sound_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_s
 
 			if (channel->Modes & MODE_ULAW)       //u-law
 			{
-				wave = SAMPLES[a];
-				if ((cur & 0x200))
-					wave >>= 8;
-				wave = (s16)ULawTo16[wave & 0xff];
+				sample = channel->Cache->read_byte(channel->CurSAddr >> 9);
+				sample = (s16)ULawTo16[sample & 0xff];
 			}
 			else
 			{
 				if (channel->Modes & MODE_8BIT)   //8bit
 				{
-					wave = SAMPLES[a];
-					if ((cur & 0x200))
-						wave >>= 8;
-					wave = (s16)(((s8)(wave & 0xff)) << 8);
+					sample = channel->Cache->read_byte(channel->CurSAddr >> 9);
+					sample = (s16)(((s8)(sample & 0xff)) << 8);
 				}
 				else                //16bit
 				{
-					wave = SAMPLES[a];
+					sample = (s16)(channel->Cache->read_word((channel->CurSAddr >> 9) & ~1));
 				}
 			}
 
 			channel->CurSAddr += DSADD;
-			if ((channel->CurSAddr >> 10) >= channel->LoopEnd)
+			if (channel->CurSAddr >= loopend_scaled)
 			{
 				if (channel->Modes & MODE_LOOP)  //Loop
-					channel->CurSAddr = channel->LoopBegin << 10;
+					channel->CurSAddr = (channel->CurSAddr - loopend_scaled) + loopbegin_scaled;
 				else
 				{
 					m_Status &= ~(1 << (i & 0x1f));
@@ -534,9 +546,9 @@ void vr0sound_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_s
 			}
 
 			s32 v = channel->EnvVol >> 16;
-			wave = (wave * v) >> 8;
-			lsample += (wave * channel->LChnVol) >> 8;
-			rsample += (wave * channel->RChnVol) >> 8;
+			sample = (sample * v) >> 8;
+			lsample += (sample * channel->LChnVol) >> 8;
+			rsample += (sample * channel->RChnVol) >> 8;
 		}
 		l[s] = std::max(-32768, std::min(32767, lsample));
 		r[s] = std::max(-32768, std::min(32767, rsample));

@@ -15,9 +15,16 @@
 // ======================> vr0sound_device
 
 class vr0sound_device : public device_t,
-						public device_sound_interface
+						public device_sound_interface,
+						public device_memory_interface
 {
 public:
+	enum
+	{
+		AS_TEXTURE = 0,
+		AS_FRAME
+	};
+
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
 	vr0sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -61,8 +68,6 @@ public:
 	u16 ctrl_r(offs_t offset);
 	void ctrl_w(offs_t offset, u16 data, u16 mem_mask);
 
-	void set_areas(u16 *texture, u16 *frame);
-
 	void sound_map(address_map &map);
 protected:
 	// device-level overrides
@@ -71,6 +76,11 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
+	// device_memory_interface configuration
+	virtual space_config_vector memory_space_config() const override;
+
+	address_space_config m_texture_config;
+	address_space_config m_frame_config;
 private:
 	enum
 	{
@@ -80,13 +90,13 @@ private:
 		MODE_PINGPONG = (1 << 3), // Pingpong Loop (Not Implemented)
 		MODE_ULAW = (1 << 4), // u-Law
 		MODE_8BIT = (1 << 5), // 8 Bit (1) / 16 Bit (0) samples
-		MODE_TEXTURE = (1 << 6) // Wave Source (1 = Texture memory, 0 = Frame memory) (Not Implemented)
+		MODE_TEXTURE = (1 << 6) // Wave Source (1 = Texture memory, 0 = Frame memory)
 	};
 
 	enum
 	{
 		CTRL_RS = (1 << 15), // Enable Sound
-		CTRL_TM = (1 << 5), // Texture Memory Select
+		CTRL_TM = (1 << 5), // Texture Memory Select (1 = Texture memory, 0 = Frame memory)
 		CTRL_RE = (1 << 4), // Reverb Enable (Not Implemented)
 		CTRL_CW = (1 << 2), // 32bit Adder Wait (Not Implemented)
 		CTRL_AW = (1 << 1), // 16bit Adder Wait (Not Implemented)
@@ -101,6 +111,7 @@ private:
 			std::fill(std::begin(EnvTarget), std::end(EnvTarget), 0);
 		}
 
+		memory_access_cache<1, 0, ENDIANNESS_LITTLE> *Cache;
 		u32 CurSAddr = 0; // Current Address Pointer, 22.10 Fixed Point
 		s32 EnvVol = 0; // Envelope Volume (Overall Volume), S.7.16 Fixed Point
 		u8 EnvStage = 1; // Envelope Stage (Not Implemented)
@@ -117,9 +128,11 @@ private:
 		void write(offs_t offset, u16 data, u16 mem_mask);
 	};
 
+	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_texcache;
+	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_fbcache;
+	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_texcache_ctrl;
+
 	channel_t m_channel[32];
-	s16 *m_TexBase;
-	s16 *m_FBBase;
 	sound_stream *m_stream;
 
 	// Registers

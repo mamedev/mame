@@ -97,6 +97,8 @@ public:
 
 	void regs_map(address_map &map);
 	void audiovideo_map(address_map &map);
+	void texture_map(address_map &map);
+	void frame_map(address_map &map);
 	template<class T> void set_host_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
 	void set_external_vclk(const uint32_t vclk) { m_ext_vclk = vclk; }
 	void set_external_vclk(const XTAL vclk) { m_ext_vclk = vclk.value(); }
