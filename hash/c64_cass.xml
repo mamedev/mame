@@ -956,12 +956,17 @@
 	</software>
 
 	<software name="bmxracersa3" cloneof="bmxracers">
-		<description>BMX Racers (set 4, Visiload T1 loader)</description>
+		<description>BMX Racers (set 4, Visiload loaders)</description>
 		<year>1984</year>
 		<publisher>Mastertronic</publisher>
 		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="485799">
+				<rom name="bmx racers side a.tap" size="485799" crc="109ceaef" sha1="7bbaa334f90f202aefc065588755b5eb69c4aed1"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="478027">
-				<rom name="bmx racers.tap" size="478027" crc="44efcf46" sha1="b813aae24a6abfe77afb1d4c151d1a5f36dac06f"/>
+				<rom name="bmx racers side b.tap" size="478027" crc="44efcf46" sha1="b813aae24a6abfe77afb1d4c151d1a5f36dac06f"/>
 			</dataarea>
 		</part>
 	</software>
