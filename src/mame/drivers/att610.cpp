@@ -124,6 +124,7 @@ void att610_state::att610(machine_config &config)
 	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	scn2681_device &duart(SCN2681(config, "duart", 3'686'400)); // MC2681P (adjacent XTAL not legible)
+	duart.irq_cb().set("sio", FUNC(z80sio_device::syncb_w)).invert();
 	duart.outport_cb().set("sio", FUNC(z80sio_device::rxcb_w)).bit(3);
 	duart.outport_cb().append("sio", FUNC(z80sio_device::txcb_w)).bit(3);
 
