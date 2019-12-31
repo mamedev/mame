@@ -167,9 +167,9 @@ void we32100_disassembler::dasm_am(std::ostream &stream, offs_t &pc, const we321
 			util::stream_format(stream, "reserved(0x%02x)", n);
 		else
 		{
-			if (!BIT(n, 0))
+			if (!BIT(n, 1))
 				util::stream_format(stream, "{%cword}", BIT(n, 2) ? 's' : 'u');
-			else if (!BIT(n, 1))
+			else if (!BIT(n, 0))
 				util::stream_format(stream, "{%chalf}", BIT(n, 2) ? 's' : 'u');
 			else
 				util::stream_format(stream, "{%cbyte}", BIT(n, 2) ? 's' : 'u');
