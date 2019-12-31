@@ -125,15 +125,22 @@ void mmodular_state::init_gen32()
 
 WRITE8_MEMBER(mmodular_state::bavaria_w)
 {
+	// d0-d5: select square?
+	// d6: ?
+	// d7: start search
 }
 
 READ8_MEMBER(mmodular_state::bavaria1_r)
 {
+	// d0-d3: piece id?
+	// other: unused?
 	return 0;
 }
 
 READ8_MEMBER(mmodular_state::bavaria2_r)
 {
+	// d7: busy signal?
+	// other: ?
 	return 0;
 }
 
@@ -168,9 +175,9 @@ void mmodular_state::port16_mem(address_map &map)
 {
 	alm16_mem(map);
 
-	map(0xe80004, 0xe80005).w(FUNC(mmodular_state::bavaria_w));
-	map(0xe80002, 0xe80003).r(FUNC(mmodular_state::bavaria1_r));
-	map(0xe80006, 0xe80007).r(FUNC(mmodular_state::bavaria2_r));
+	map(0xe80002, 0xe80002).r(FUNC(mmodular_state::bavaria1_r));
+	map(0xe80004, 0xe80004).w(FUNC(mmodular_state::bavaria_w));
+	map(0xe80006, 0xe80006).r(FUNC(mmodular_state::bavaria2_r));
 }
 
 void mmodular_state::van16_mem(address_map &map)
@@ -200,9 +207,9 @@ void mmodular_state::port32_mem(address_map &map)
 {
 	alm32_mem(map);
 
-	map(0x98000008, 0x9800000b).w(FUNC(mmodular_state::bavaria_w));
-	map(0x98000004, 0x98000007).r(FUNC(mmodular_state::bavaria1_r));
-	map(0x9800000c, 0x9800000f).r(FUNC(mmodular_state::bavaria2_r));
+	map(0x98000004, 0x98000004).r(FUNC(mmodular_state::bavaria1_r));
+	map(0x98000008, 0x98000008).w(FUNC(mmodular_state::bavaria_w));
+	map(0x9800000c, 0x9800000c).r(FUNC(mmodular_state::bavaria2_r));
 }
 
 void mmodular_state::van32_mem(address_map &map)
@@ -221,9 +228,9 @@ void mmodular_state::gen32_mem(address_map &map)
 	map(0xc0000000, 0xc0000000).r("board", FUNC(mephisto_board_device::input_r));
 	map(0xc8000004, 0xc8000004).w("board", FUNC(mephisto_board_device::mux_w));
 	map(0xd0000004, 0xd0000004).w("board", FUNC(mephisto_board_device::led_w));
-	map(0xd8000008, 0xd800000b).w(FUNC(mmodular_state::bavaria_w));
-	map(0xd8000004, 0xd8000007).r(FUNC(mmodular_state::bavaria1_r));
-	map(0xd800000c, 0xd800000f).r(FUNC(mmodular_state::bavaria2_r));
+	map(0xd8000004, 0xd8000004).r(FUNC(mmodular_state::bavaria1_r));
+	map(0xd8000008, 0xd8000008).w(FUNC(mmodular_state::bavaria_w));
+	map(0xd800000c, 0xd800000c).r(FUNC(mmodular_state::bavaria2_r));
 	map(0xe0000000, 0xe0000000).w("display", FUNC(mephisto_display_modul_device::latch_w));
 	map(0xe0000010, 0xe0000010).w("display", FUNC(mephisto_display_modul_device::io_w));
 	map(0xe8000000, 0xe8007fff).m("nvram_map", FUNC(address_map_bank_device::amap8)).umask32(0xff000000);
@@ -469,8 +476,8 @@ CONS( 1988, alm32,   0,       0,      alm32,   alm32,  mmodular_state, empty_ini
 CONS( 1988, alm16,   alm32,   0,      alm16,   alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 16 Bit",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1989, port32,  0,       0,      port32,  alm32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1989, port16,  port32,  0,      port16,  alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, lyon32,  0,       0,      alm32,   alm32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 32 Bit",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, lyon16,  lyon32,  0,      alm16,   alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 16 Bit",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, lyon32,  0,       0,      port32,  alm32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 32 Bit",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, lyon16,  lyon32,  0,      port16,  alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 16 Bit",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1991, van32,   0,       0,      van32,   alm32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1991, van16,   van32,   0,      van16,   alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1993, gen32,   0,       0,      gen32,   gen32,  mmodular_state, init_gen32, "Hegener + Glaser", "Mephisto Genius 68030",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
