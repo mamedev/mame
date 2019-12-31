@@ -22,21 +22,32 @@ public:
 	}
 
 	void att3b2(machine_config &config);
+	void att3b26(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map_300(address_map &map);
+	void mem_map_600(address_map &map);
 
 	required_device<we32100_device> m_maincpu;
 };
 
 
-void att3b2_state::mem_map(address_map &map)
+void att3b2_state::mem_map_300(address_map &map)
 {
 	map(0x00000000, 0x00007fff).rom().region("bootstrap", 0);
 	map(0x00042000, 0x0004200f).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0x000000ff);
 	map(0x00048000, 0x0004800f).rw("dmac", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x00049000, 0x0004900f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
 	map(0x02000000, 0x02003fff).ram();
+}
+
+void att3b2_state::mem_map_600(address_map &map)
+{
+	map(0x00000000, 0x0001ffff).rom().region("bootstrap", 0);
+	map(0x00041000, 0x0004100f).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0x000000ff);
+	map(0x00048000, 0x0004800f).rw("dmac", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x00049000, 0x0004900f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
+	map(0x02000000, 0x02003fff).mirror(0x1000000).ram();
 }
 
 
@@ -46,15 +57,22 @@ INPUT_PORTS_END
 void att3b2_state::att3b2(machine_config &config)
 {
 	WE32100(config, m_maincpu, 10_MHz_XTAL); // special WE32102 XTAL runs at 1x or 2x speed
-	m_maincpu->set_addrmap(AS_PROGRAM, &att3b2_state::mem_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &att3b2_state::mem_map_300);
 
 	PIT8253(config, "pit"); // D8253C-5; unknown clocks
 
-	AM9517A(config, "dmac", 2'500'000); // AM9517A-5DC; unknown clock
+	AM9517A(config, "dmac", 5'000'000); // AM9517A-5DC; unknown clock
 
 	SCN2681(config, "duart", 3'686'400); // MC2681P
 
 	// TODO: disk controllers (D7621AD, TMS2797NL)
+}
+
+void att3b2_state::att3b26(machine_config &config)
+{
+	att3b2(config);
+	m_maincpu->set_clock(18'000'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &att3b2_state::mem_map_600);
 }
 
 ROM_START(3b2_300)
@@ -81,6 +99,15 @@ ROM_START(3b2_400)
 	ROM_LOAD32_BYTE("3b2-aayyf-4.bin", 0x0003, 0x2000, CRC(85b8c5d3) SHA1(85bdf3f889f6c14cbf33ce81421f1f1d02328223))
 ROM_END
 
+ROM_START(3b2_600)
+	ROM_REGION32_BE(0x20000, "bootstrap", 0)
+	ROM_LOAD32_BYTE("abtry.bin", 0x0000, 0x8000, CRC(fa8d488b) SHA1(2e169f4171bd30aba1a9cd550a418c943eb78ceb))
+	ROM_LOAD32_BYTE("abtrw.bin", 0x0001, 0x8000, CRC(8705cb68) SHA1(f41365cd0b4f90d8ad0335655b0ac04a7d14d6c6))
+	ROM_LOAD32_BYTE("abtru.bin", 0x0002, 0x8000, CRC(ea9e127b) SHA1(6618998ead5a5e07ead8c572619a6bcf71d84497))
+	ROM_LOAD32_BYTE("abtrt.bin", 0x0003, 0x8000, CRC(0f075161) SHA1(b67c9c4549dc789df33b5a38e4b35fe26fdfbea6))
+ROM_END
+
 COMP(1985, 3b2_300, 0,       0, att3b2, att3b2, att3b2_state, empty_init, "AT&T", "3B2/300", MACHINE_IS_SKELETON)
 COMP(198?, 3b2_310, 3b2_300, 0, att3b2, att3b2, att3b2_state, empty_init, "AT&T", "3B2/310", MACHINE_IS_SKELETON)
 COMP(198?, 3b2_400, 3b2_300, 0, att3b2, att3b2, att3b2_state, empty_init, "AT&T", "3B2/400", MACHINE_IS_SKELETON)
+COMP(198?, 3b2_600, 0,       0, att3b26, att3b2, att3b2_state, empty_init, "AT&T", "3B2/600", MACHINE_IS_SKELETON)
