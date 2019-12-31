@@ -108,9 +108,11 @@ void att630_state::att630(machine_config &config)
 	screen.set_color(rgb_t::amber());
 	screen.set_screen_update(FUNC(att630_state::screen_update));
 
-	SCN2681(config, "duart1", 3.6864_MHz_XTAL);
+	scn2681_device &duart1(SCN2681(config, "duart1", 3.6864_MHz_XTAL));
+	duart1.irq_cb().set_inputline(m_maincpu, M68K_IRQ_3);
 
-	SCN2681(config, "duart2", 3.6864_MHz_XTAL);
+	scn2681_device &duart2(SCN2681(config, "duart2", 3.6864_MHz_XTAL));
+	duart2.irq_cb().set_inputline(m_maincpu, M68K_IRQ_2);
 }
 
 void att630_state::att730x(machine_config &config)
