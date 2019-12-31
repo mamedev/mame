@@ -217,14 +217,14 @@ u16 vr0sound_device::status_r(offs_t offset)
 
 void vr0sound_device::status_w(offs_t offset, u16 data)
 {
+	const u32 c = data & 0x1f;
 	if (data & 0x8000)
 	{
-		u32 c = data & 0x1f;
 		m_Status |= 1 << c;
 	}
 	else
 	{
-		m_Status &= ~(1 << (data & 0x1f));
+		m_Status &= ~(1 << c);
 	}
 }
 
@@ -235,14 +235,14 @@ u16 vr0sound_device::noteon_r(offs_t offset)
 
 void vr0sound_device::noteon_w(offs_t offset, u16 data)
 {
+	const u32 c = data & 0x1f;
 	if (data & 0x8000)
 	{
-		u32 c = data & 0x1f;
 		m_NoteOn |= 1 << c;
 	}
 	else
 	{
-		m_NoteOn &= ~(1 << (data & 0x1f));
+		m_NoteOn &= ~(1 << c);
 	}
 }
 
