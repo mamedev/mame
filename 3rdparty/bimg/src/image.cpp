@@ -1834,327 +1834,340 @@ namespace bimg
 			return;
 		}
 
-		BitReader bit(_src);
+		uint8_t src[16];
+		bx::memCopy(src, _src, 16);
 
-		uint8_t mode = uint8_t(bit.read(2) );
-		if (mode & 2)
-		{
-			// 5-bit mode
-			mode |= bit.read(3) << 2;
-		}
+		BitReader bit(src);
 
-		const Bc6hModeInfo& mi = s_bc6hModeInfo[mode];
-		if (0 == mi.endpointBits)
-		{
-			bx::memSet(_dst, 0, 16*3*2);
-			return;
-		}
+		uint8_t mode = uint8_t(bit.read(2));
 
 		uint16_t epR[4] = { /* rw, rx, ry, rz */ };
 		uint16_t epG[4] = { /* gw, gx, gy, gz */ };
 		uint16_t epB[4] = { /* bw, bx, by, bz */ };
 
-		switch (mode)
+		if (mode & 2)
 		{
-		case 0:
-			epG[2] |= bit.read( 1) <<  4;
-			epB[2] |= bit.read( 1) <<  4;
-			epB[3] |= bit.read( 1) <<  4;
-			epR[0] |= bit.read(10) <<  0;
-			epG[0] |= bit.read(10) <<  0;
-			epB[0] |= bit.read(10) <<  0;
-			epR[1] |= bit.read( 5) <<  0;
-			epG[3] |= bit.read( 1) <<  4;
-			epG[2] |= bit.read( 4) <<  0;
-			epG[1] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  0;
-			epG[3] |= bit.read( 4) <<  0;
-			epB[1] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  1;
-			epB[2] |= bit.read( 4) <<  0;
-			epR[2] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  2;
-			epR[3] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  3;
-			break;
+			// 5-bit mode
+			mode |= bit.read(3) << 2;
 
-		case 1:
-			epG[2] |= bit.read( 1) <<  5;
-			epG[3] |= bit.read( 1) <<  4;
-			epG[3] |= bit.read( 1) <<  5;
-			epR[0] |= bit.read( 7) <<  0;
-			epB[3] |= bit.read( 1) <<  0;
-			epB[3] |= bit.read( 1) <<  1;
-			epB[2] |= bit.read( 1) <<  4;
-			epG[0] |= bit.read( 7) <<  0;
-			epB[2] |= bit.read( 1) <<  5;
-			epB[3] |= bit.read( 1) <<  2;
-			epG[2] |= bit.read( 1) <<  4;
-			epB[0] |= bit.read( 7) <<  0;
-			epB[3] |= bit.read( 1) <<  3;
-			epB[3] |= bit.read( 1) <<  5;
-			epB[3] |= bit.read( 1) <<  4;
-			epR[1] |= bit.read( 6) <<  0;
-			epG[2] |= bit.read( 4) <<  0;
-			epG[1] |= bit.read( 6) <<  0;
-			epG[3] |= bit.read( 4) <<  0;
-			epB[1] |= bit.read( 6) <<  0;
-			epB[2] |= bit.read( 4) <<  0;
-			epR[2] |= bit.read( 6) <<  0;
-			epR[3] |= bit.read( 6) <<  0;
-			break;
+			if (0 == s_bc6hModeInfo[mode].endpointBits)
+			{
+				bx::memSet(_dst, 0, 16*3*2);
+				return;
+			}
 
-		case 2:
-			epR[0] |= bit.read(10) <<  0;
-			epG[0] |= bit.read(10) <<  0;
-			epB[0] |= bit.read(10) <<  0;
-			epR[1] |= bit.read( 5) <<  0;
-			epR[0] |= bit.read( 1) << 10;
-			epG[2] |= bit.read( 4) <<  0;
-			epG[1] |= bit.read( 4) <<  0;
-			epG[0] |= bit.read( 1) << 10;
-			epB[3] |= bit.read( 1) <<  0;
-			epG[3] |= bit.read( 4) <<  0;
-			epB[1] |= bit.read( 4) <<  0;
-			epB[0] |= bit.read( 1) << 10;
-			epB[3] |= bit.read( 1) <<  1;
-			epB[2] |= bit.read( 4) <<  0;
-			epR[2] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  2;
-			epR[3] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  3;
-			break;
+			switch (mode)
+			{
+			case 2:
+				epR[0] |= bit.read(10) <<  0;
+				epG[0] |= bit.read(10) <<  0;
+				epB[0] |= bit.read(10) <<  0;
+				epR[1] |= bit.read( 5) <<  0;
+				epR[0] |= bit.read( 1) << 10;
+				epG[2] |= bit.read( 4) <<  0;
+				epG[1] |= bit.read( 4) <<  0;
+				epG[0] |= bit.read( 1) << 10;
+				epB[3] |= bit.read( 1) <<  0;
+				epG[3] |= bit.read( 4) <<  0;
+				epB[1] |= bit.read( 4) <<  0;
+				epB[0] |= bit.read( 1) << 10;
+				epB[3] |= bit.read( 1) <<  1;
+				epB[2] |= bit.read( 4) <<  0;
+				epR[2] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  2;
+				epR[3] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  3;
+				break;
 
-		case 3:
-			epR[0] |= bit.read(10) <<  0;
-			epG[0] |= bit.read(10) <<  0;
-			epB[0] |= bit.read(10) <<  0;
-			epR[1] |= bit.read(10) <<  0;
-			epG[1] |= bit.read(10) <<  0;
-			epB[1] |= bit.read(10) <<  0;
-			break;
+			case 3:
+				epR[0] |= bit.read(10) <<  0;
+				epG[0] |= bit.read(10) <<  0;
+				epB[0] |= bit.read(10) <<  0;
+				epR[1] |= bit.read(10) <<  0;
+				epG[1] |= bit.read(10) <<  0;
+				epB[1] |= bit.read(10) <<  0;
+				break;
 
-		case 6:
-			epR[0] |= bit.read(10) <<  0;
-			epG[0] |= bit.read(10) <<  0;
-			epB[0] |= bit.read(10) <<  0;
-			epR[1] |= bit.read( 4) <<  0;
-			epR[0] |= bit.read( 1) << 10;
-			epG[3] |= bit.read( 1) <<  4;
-			epG[2] |= bit.read( 4) <<  0;
-			epG[1] |= bit.read( 5) <<  0;
-			epG[0] |= bit.read( 1) << 10;
-			epG[3] |= bit.read( 4) <<  0;
-			epB[1] |= bit.read( 4) <<  0;
-			epB[0] |= bit.read( 1) << 10;
-			epB[3] |= bit.read( 1) <<  1;
-			epB[2] |= bit.read( 4) <<  0;
-			epR[2] |= bit.read( 4) <<  0;
-			epB[3] |= bit.read( 1) <<  0;
-			epB[3] |= bit.read( 1) <<  2;
-			epR[3] |= bit.read( 4) <<  0;
-			epG[2] |= bit.read( 1) <<  4;
-			epB[3] |= bit.read( 1) <<  3;
-			break;
+			case 6:
+				epR[0] |= bit.read(10) <<  0;
+				epG[0] |= bit.read(10) <<  0;
+				epB[0] |= bit.read(10) <<  0;
+				epR[1] |= bit.read( 4) <<  0;
+				epR[0] |= bit.read( 1) << 10;
+				epG[3] |= bit.read( 1) <<  4;
+				epG[2] |= bit.read( 4) <<  0;
+				epG[1] |= bit.read( 5) <<  0;
+				epG[0] |= bit.read( 1) << 10;
+				epG[3] |= bit.read( 4) <<  0;
+				epB[1] |= bit.read( 4) <<  0;
+				epB[0] |= bit.read( 1) << 10;
+				epB[3] |= bit.read( 1) <<  1;
+				epB[2] |= bit.read( 4) <<  0;
+				epR[2] |= bit.read( 4) <<  0;
+				epB[3] |= bit.read( 1) <<  0;
+				epB[3] |= bit.read( 1) <<  2;
+				epR[3] |= bit.read( 4) <<  0;
+				epG[2] |= bit.read( 1) <<  4;
+				epB[3] |= bit.read( 1) <<  3;
+				break;
 
-		case 7:
-			epR[0] |= bit.read(10) <<  0;
-			epG[0] |= bit.read(10) <<  0;
-			epB[0] |= bit.read(10) <<  0;
-			epR[1] |= bit.read( 9) <<  0;
-			epR[0] |= bit.read( 1) << 10;
-			epG[1] |= bit.read( 9) <<  0;
-			epG[0] |= bit.read( 1) << 10;
-			epB[1] |= bit.read( 9) <<  0;
-			epB[0] |= bit.read( 1) << 10;
-			break;
+			case 7:
+				epR[0] |= bit.read(10) <<  0;
+				epG[0] |= bit.read(10) <<  0;
+				epB[0] |= bit.read(10) <<  0;
+				epR[1] |= bit.read( 9) <<  0;
+				epR[0] |= bit.read( 1) << 10;
+				epG[1] |= bit.read( 9) <<  0;
+				epG[0] |= bit.read( 1) << 10;
+				epB[1] |= bit.read( 9) <<  0;
+				epB[0] |= bit.read( 1) << 10;
+				break;
 
-		case 10:
-			epR[0] |= bit.read(10) <<  0;
-			epG[0] |= bit.read(10) <<  0;
-			epB[0] |= bit.read(10) <<  0;
-			epR[1] |= bit.read( 4) <<  0;
-			epR[0] |= bit.read( 1) << 10;
-			epB[2] |= bit.read( 1) <<  4;
-			epG[2] |= bit.read( 4) <<  0;
-			epG[1] |= bit.read( 4) <<  0;
-			epG[0] |= bit.read( 1) << 10;
-			epB[3] |= bit.read( 1) <<  0;
-			epG[3] |= bit.read( 4) <<  0;
-			epB[1] |= bit.read( 5) <<  0;
-			epB[0] |= bit.read( 1) << 10;
-			epB[2] |= bit.read( 4) <<  0;
-			epR[2] |= bit.read( 4) <<  0;
-			epB[3] |= bit.read( 1) <<  1;
-			epB[3] |= bit.read( 1) <<  2;
-			epR[3] |= bit.read( 4) <<  0;
-			epB[3] |= bit.read( 1) <<  4;
-			epB[3] |= bit.read( 1) <<  3;
-			break;
+			case 10:
+				epR[0] |= bit.read(10) <<  0;
+				epG[0] |= bit.read(10) <<  0;
+				epB[0] |= bit.read(10) <<  0;
+				epR[1] |= bit.read( 4) <<  0;
+				epR[0] |= bit.read( 1) << 10;
+				epB[2] |= bit.read( 1) <<  4;
+				epG[2] |= bit.read( 4) <<  0;
+				epG[1] |= bit.read( 4) <<  0;
+				epG[0] |= bit.read( 1) << 10;
+				epB[3] |= bit.read( 1) <<  0;
+				epG[3] |= bit.read( 4) <<  0;
+				epB[1] |= bit.read( 5) <<  0;
+				epB[0] |= bit.read( 1) << 10;
+				epB[2] |= bit.read( 4) <<  0;
+				epR[2] |= bit.read( 4) <<  0;
+				epB[3] |= bit.read( 1) <<  1;
+				epB[3] |= bit.read( 1) <<  2;
+				epR[3] |= bit.read( 4) <<  0;
+				epB[3] |= bit.read( 1) <<  4;
+				epB[3] |= bit.read( 1) <<  3;
+				break;
 
-		case 11:
-			epR[0] |= bit.read(10) <<  0;
-			epG[0] |= bit.read(10) <<  0;
-			epB[0] |= bit.read(10) <<  0;
-			epR[1] |= bit.read( 8) <<  0;
-			epR[0] |= bit.read( 1) << 11;
-			epR[0] |= bit.read( 1) << 10;
-			epG[1] |= bit.read( 8) <<  0;
-			epG[0] |= bit.read( 1) << 11;
-			epG[0] |= bit.read( 1) << 10;
-			epB[1] |= bit.read( 8) <<  0;
-			epB[0] |= bit.read( 1) << 11;
-			epB[0] |= bit.read( 1) << 10;
-			break;
+			case 11:
+				epR[0] |= bit.read(10) <<  0;
+				epG[0] |= bit.read(10) <<  0;
+				epB[0] |= bit.read(10) <<  0;
+				epR[1] |= bit.read( 8) <<  0;
+				epR[0] |= bit.read( 1) << 11;
+				epR[0] |= bit.read( 1) << 10;
+				epG[1] |= bit.read( 8) <<  0;
+				epG[0] |= bit.read( 1) << 11;
+				epG[0] |= bit.read( 1) << 10;
+				epB[1] |= bit.read( 8) <<  0;
+				epB[0] |= bit.read( 1) << 11;
+				epB[0] |= bit.read( 1) << 10;
+				break;
 
-		case 14:
-			epR[0] |= bit.read( 9) <<  0;
-			epB[2] |= bit.read( 1) <<  4;
-			epG[0] |= bit.read( 9) <<  0;
-			epG[2] |= bit.read( 1) <<  4;
-			epB[0] |= bit.read( 9) <<  0;
-			epB[3] |= bit.read( 1) <<  4;
-			epR[1] |= bit.read( 5) <<  0;
-			epG[3] |= bit.read( 1) <<  4;
-			epG[2] |= bit.read( 4) <<  0;
-			epG[1] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  0;
-			epG[3] |= bit.read( 4) <<  0;
-			epB[1] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  1;
-			epB[2] |= bit.read( 4) <<  0;
-			epR[2] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  2;
-			epR[3] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  3;
-			break;
+			case 14:
+				epR[0] |= bit.read( 9) <<  0;
+				epB[2] |= bit.read( 1) <<  4;
+				epG[0] |= bit.read( 9) <<  0;
+				epG[2] |= bit.read( 1) <<  4;
+				epB[0] |= bit.read( 9) <<  0;
+				epB[3] |= bit.read( 1) <<  4;
+				epR[1] |= bit.read( 5) <<  0;
+				epG[3] |= bit.read( 1) <<  4;
+				epG[2] |= bit.read( 4) <<  0;
+				epG[1] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  0;
+				epG[3] |= bit.read( 4) <<  0;
+				epB[1] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  1;
+				epB[2] |= bit.read( 4) <<  0;
+				epR[2] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  2;
+				epR[3] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  3;
+				break;
 
-		case 15:
-			epR[0] |= bit.read(10) <<  0;
-			epG[0] |= bit.read(10) <<  0;
-			epB[0] |= bit.read(10) <<  0;
-			epR[1] |= bit.read( 4) <<  0;
-			epR[0] |= bit.read( 1) << 15;
-			epR[0] |= bit.read( 1) << 14;
-			epR[0] |= bit.read( 1) << 13;
-			epR[0] |= bit.read( 1) << 12;
-			epR[0] |= bit.read( 1) << 11;
-			epR[0] |= bit.read( 1) << 10;
-			epG[1] |= bit.read( 4) <<  0;
-			epG[0] |= bit.read( 1) << 15;
-			epG[0] |= bit.read( 1) << 14;
-			epG[0] |= bit.read( 1) << 13;
-			epG[0] |= bit.read( 1) << 12;
-			epG[0] |= bit.read( 1) << 11;
-			epG[0] |= bit.read( 1) << 10;
-			epB[1] |= bit.read( 4) <<  0;
-			epB[0] |= bit.read( 1) << 15;
-			epB[0] |= bit.read( 1) << 14;
-			epB[0] |= bit.read( 1) << 13;
-			epB[0] |= bit.read( 1) << 12;
-			epB[0] |= bit.read( 1) << 11;
-			epB[0] |= bit.read( 1) << 10;
-			break;
+			case 15:
+				epR[0] |= bit.read(10) <<  0;
+				epG[0] |= bit.read(10) <<  0;
+				epB[0] |= bit.read(10) <<  0;
+				epR[1] |= bit.read( 4) <<  0;
+				epR[0] |= bit.read( 1) << 15;
+				epR[0] |= bit.read( 1) << 14;
+				epR[0] |= bit.read( 1) << 13;
+				epR[0] |= bit.read( 1) << 12;
+				epR[0] |= bit.read( 1) << 11;
+				epR[0] |= bit.read( 1) << 10;
+				epG[1] |= bit.read( 4) <<  0;
+				epG[0] |= bit.read( 1) << 15;
+				epG[0] |= bit.read( 1) << 14;
+				epG[0] |= bit.read( 1) << 13;
+				epG[0] |= bit.read( 1) << 12;
+				epG[0] |= bit.read( 1) << 11;
+				epG[0] |= bit.read( 1) << 10;
+				epB[1] |= bit.read( 4) <<  0;
+				epB[0] |= bit.read( 1) << 15;
+				epB[0] |= bit.read( 1) << 14;
+				epB[0] |= bit.read( 1) << 13;
+				epB[0] |= bit.read( 1) << 12;
+				epB[0] |= bit.read( 1) << 11;
+				epB[0] |= bit.read( 1) << 10;
+				break;
 
-		case 18:
-			epR[0] |= bit.read( 8) <<  0;
-			epG[3] |= bit.read( 1) <<  4;
-			epB[2] |= bit.read( 1) <<  4;
-			epG[0] |= bit.read( 8) <<  0;
-			epB[3] |= bit.read( 1) <<  2;
-			epG[2] |= bit.read( 1) <<  4;
-			epB[0] |= bit.read( 8) <<  0;
-			epB[3] |= bit.read( 1) <<  3;
-			epB[3] |= bit.read( 1) <<  4;
-			epR[1] |= bit.read( 6) <<  0;
-			epG[2] |= bit.read( 4) <<  0;
-			epG[1] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  0;
-			epG[3] |= bit.read( 4) <<  0;
-			epB[1] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  1;
-			epB[2] |= bit.read( 4) <<  0;
-			epR[2] |= bit.read( 6) <<  0;
-			epR[3] |= bit.read( 6) <<  0;
-			break;
+			case 18:
+				epR[0] |= bit.read( 8) <<  0;
+				epG[3] |= bit.read( 1) <<  4;
+				epB[2] |= bit.read( 1) <<  4;
+				epG[0] |= bit.read( 8) <<  0;
+				epB[3] |= bit.read( 1) <<  2;
+				epG[2] |= bit.read( 1) <<  4;
+				epB[0] |= bit.read( 8) <<  0;
+				epB[3] |= bit.read( 1) <<  3;
+				epB[3] |= bit.read( 1) <<  4;
+				epR[1] |= bit.read( 6) <<  0;
+				epG[2] |= bit.read( 4) <<  0;
+				epG[1] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  0;
+				epG[3] |= bit.read( 4) <<  0;
+				epB[1] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  1;
+				epB[2] |= bit.read( 4) <<  0;
+				epR[2] |= bit.read( 6) <<  0;
+				epR[3] |= bit.read( 6) <<  0;
+				break;
 
-		case 22:
-			epR[0] |= bit.read( 8) <<  0;
-			epB[3] |= bit.read( 1) <<  0;
-			epB[2] |= bit.read( 1) <<  4;
-			epG[0] |= bit.read( 8) <<  0;
-			epG[2] |= bit.read( 1) <<  5;
-			epG[2] |= bit.read( 1) <<  4;
-			epB[0] |= bit.read( 8) <<  0;
-			epG[3] |= bit.read( 1) <<  5;
-			epB[3] |= bit.read( 1) <<  4;
-			epR[1] |= bit.read( 5) <<  0;
-			epG[3] |= bit.read( 1) <<  4;
-			epG[2] |= bit.read( 4) <<  0;
-			epG[1] |= bit.read( 6) <<  0;
-			epG[3] |= bit.read( 4) <<  0;
-			epB[1] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  1;
-			epB[2] |= bit.read( 4) <<  0;
-			epR[2] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  2;
-			epR[3] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  3;
-			break;
+			case 22:
+				epR[0] |= bit.read( 8) <<  0;
+				epB[3] |= bit.read( 1) <<  0;
+				epB[2] |= bit.read( 1) <<  4;
+				epG[0] |= bit.read( 8) <<  0;
+				epG[2] |= bit.read( 1) <<  5;
+				epG[2] |= bit.read( 1) <<  4;
+				epB[0] |= bit.read( 8) <<  0;
+				epG[3] |= bit.read( 1) <<  5;
+				epB[3] |= bit.read( 1) <<  4;
+				epR[1] |= bit.read( 5) <<  0;
+				epG[3] |= bit.read( 1) <<  4;
+				epG[2] |= bit.read( 4) <<  0;
+				epG[1] |= bit.read( 6) <<  0;
+				epG[3] |= bit.read( 4) <<  0;
+				epB[1] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  1;
+				epB[2] |= bit.read( 4) <<  0;
+				epR[2] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  2;
+				epR[3] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  3;
+				break;
 
-		case 26:
-			epR[0] |= bit.read( 8) <<  0;
-			epB[3] |= bit.read( 1) <<  1;
-			epB[2] |= bit.read( 1) <<  4;
-			epG[0] |= bit.read( 8) <<  0;
-			epB[2] |= bit.read( 1) <<  5;
-			epG[2] |= bit.read( 1) <<  4;
-			epB[0] |= bit.read( 8) <<  0;
-			epB[3] |= bit.read( 1) <<  5;
-			epB[3] |= bit.read( 1) <<  4;
-			epR[1] |= bit.read( 5) <<  0;
-			epG[3] |= bit.read( 1) <<  4;
-			epG[2] |= bit.read( 4) <<  0;
-			epG[1] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  0;
-			epG[3] |= bit.read( 4) <<  0;
-			epB[1] |= bit.read( 6) <<  0;
-			epB[2] |= bit.read( 4) <<  0;
-			epR[2] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  2;
-			epR[3] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  3;
-			break;
+			case 26:
+				epR[0] |= bit.read( 8) <<  0;
+				epB[3] |= bit.read( 1) <<  1;
+				epB[2] |= bit.read( 1) <<  4;
+				epG[0] |= bit.read( 8) <<  0;
+				epB[2] |= bit.read( 1) <<  5;
+				epG[2] |= bit.read( 1) <<  4;
+				epB[0] |= bit.read( 8) <<  0;
+				epB[3] |= bit.read( 1) <<  5;
+				epB[3] |= bit.read( 1) <<  4;
+				epR[1] |= bit.read( 5) <<  0;
+				epG[3] |= bit.read( 1) <<  4;
+				epG[2] |= bit.read( 4) <<  0;
+				epG[1] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  0;
+				epG[3] |= bit.read( 4) <<  0;
+				epB[1] |= bit.read( 6) <<  0;
+				epB[2] |= bit.read( 4) <<  0;
+				epR[2] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  2;
+				epR[3] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  3;
+				break;
 
-		case 30:
-			epR[0] |= bit.read( 6) <<  0;
-			epG[3] |= bit.read( 1) <<  4;
-			epB[3] |= bit.read( 1) <<  0;
-			epB[3] |= bit.read( 1) <<  1;
-			epB[2] |= bit.read( 1) <<  4;
-			epG[0] |= bit.read( 6) <<  0;
-			epG[2] |= bit.read( 1) <<  5;
-			epB[2] |= bit.read( 1) <<  5;
-			epB[3] |= bit.read( 1) <<  2;
-			epG[2] |= bit.read( 1) <<  4;
-			epB[0] |= bit.read( 6) <<  0;
-			epG[3] |= bit.read( 1) <<  5;
-			epB[3] |= bit.read( 1) <<  3;
-			epB[3] |= bit.read( 1) <<  5;
-			epB[3] |= bit.read( 1) <<  4;
-			epR[1] |= bit.read( 6) <<  0;
-			epG[2] |= bit.read( 4) <<  0;
-			epG[1] |= bit.read( 6) <<  0;
-			epG[3] |= bit.read( 4) <<  0;
-			epB[1] |= bit.read( 6) <<  0;
-			epB[2] |= bit.read( 4) <<  0;
-			epR[2] |= bit.read( 6) <<  0;
-			epR[3] |= bit.read( 6) <<  0;
-			break;
+			case 30:
+				epR[0] |= bit.read( 6) <<  0;
+				epG[3] |= bit.read( 1) <<  4;
+				epB[3] |= bit.read( 1) <<  0;
+				epB[3] |= bit.read( 1) <<  1;
+				epB[2] |= bit.read( 1) <<  4;
+				epG[0] |= bit.read( 6) <<  0;
+				epG[2] |= bit.read( 1) <<  5;
+				epB[2] |= bit.read( 1) <<  5;
+				epB[3] |= bit.read( 1) <<  2;
+				epG[2] |= bit.read( 1) <<  4;
+				epB[0] |= bit.read( 6) <<  0;
+				epG[3] |= bit.read( 1) <<  5;
+				epB[3] |= bit.read( 1) <<  3;
+				epB[3] |= bit.read( 1) <<  5;
+				epB[3] |= bit.read( 1) <<  4;
+				epR[1] |= bit.read( 6) <<  0;
+				epG[2] |= bit.read( 4) <<  0;
+				epG[1] |= bit.read( 6) <<  0;
+				epG[3] |= bit.read( 4) <<  0;
+				epB[1] |= bit.read( 6) <<  0;
+				epB[2] |= bit.read( 4) <<  0;
+				epR[2] |= bit.read( 6) <<  0;
+				epR[3] |= bit.read( 6) <<  0;
+				break;
 
-		default:
-			break;
+			default:
+				break;
+			}
 		}
+		else
+		{
+			switch (mode)
+			{
+			case 0:
+				epG[2] |= bit.read( 1) <<  4;
+				epB[2] |= bit.read( 1) <<  4;
+				epB[3] |= bit.read( 1) <<  4;
+				epR[0] |= bit.read(10) <<  0;
+				epG[0] |= bit.read(10) <<  0;
+				epB[0] |= bit.read(10) <<  0;
+				epR[1] |= bit.read( 5) <<  0;
+				epG[3] |= bit.read( 1) <<  4;
+				epG[2] |= bit.read( 4) <<  0;
+				epG[1] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  0;
+				epG[3] |= bit.read( 4) <<  0;
+				epB[1] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  1;
+				epB[2] |= bit.read( 4) <<  0;
+				epR[2] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  2;
+				epR[3] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  3;
+				break;
+
+			case 1:
+				epG[2] |= bit.read( 1) <<  5;
+				epG[3] |= bit.read( 1) <<  4;
+				epG[3] |= bit.read( 1) <<  5;
+				epR[0] |= bit.read( 7) <<  0;
+				epB[3] |= bit.read( 1) <<  0;
+				epB[3] |= bit.read( 1) <<  1;
+				epB[2] |= bit.read( 1) <<  4;
+				epG[0] |= bit.read( 7) <<  0;
+				epB[2] |= bit.read( 1) <<  5;
+				epB[3] |= bit.read( 1) <<  2;
+				epG[2] |= bit.read( 1) <<  4;
+				epB[0] |= bit.read( 7) <<  0;
+				epB[3] |= bit.read( 1) <<  3;
+				epB[3] |= bit.read( 1) <<  5;
+				epB[3] |= bit.read( 1) <<  4;
+				epR[1] |= bit.read( 6) <<  0;
+				epG[2] |= bit.read( 4) <<  0;
+				epG[1] |= bit.read( 6) <<  0;
+				epG[3] |= bit.read( 4) <<  0;
+				epB[1] |= bit.read( 6) <<  0;
+				epB[2] |= bit.read( 4) <<  0;
+				epR[2] |= bit.read( 6) <<  0;
+				epR[3] |= bit.read( 6) <<  0;
+				break;
+
+			default:
+				break;
+			}
+		}
+
+		const Bc6hModeInfo mi = s_bc6hModeInfo[mode];
 
 		if (_signed)
 		{
