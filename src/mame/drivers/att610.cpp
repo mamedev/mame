@@ -34,6 +34,7 @@ public:
 	att610_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_sio(*this, "sio")
 		, m_screen(*this, "screen")
 		, m_rom(*this, "rom")
 	{
@@ -54,6 +55,7 @@ private:
 	void io_map(address_map &map);
 
 	required_device<z80_device> m_maincpu;
+	required_device<z80sio_device> m_sio;
 	required_device<screen_device> m_screen;
 	required_memory_bank m_rom;
 };
@@ -62,6 +64,8 @@ void att610_state::machine_start()
 {
 	m_rom->configure_entry(0, memregion("firmware")->base());
 	m_rom->configure_entry(1, memregion("cartridge")->base());
+
+	m_sio->ctsb_w(0);
 }
 
 void att610_state::machine_reset()
@@ -116,10 +120,12 @@ void att610_state::att610(machine_config &config)
 	z80ctc_device &ctc(Z80CTC(config, "ctc", 27.72_MHz_XTAL / 7)); // Z8430APS
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	z80sio_device &sio(Z80SIO(config, "sio", 27.72_MHz_XTAL / 7)); // Z8441APS (SIO/1)
-	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	Z80SIO(config, m_sio, 27.72_MHz_XTAL / 7); // Z8441APS (SIO/1)
+	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	SCN2681(config, "duart", 3'686'400); // MC2681P (adjacent XTAL not legible)
+	scn2681_device &duart(SCN2681(config, "duart", 3'686'400)); // MC2681P (adjacent XTAL not legible)
+	duart.outport_cb().set("sio", FUNC(z80sio_device::rxcb_w)).bit(3);
+	duart.outport_cb().append("sio", FUNC(z80sio_device::txcb_w)).bit(3);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
 	m_screen->set_raw(21.6675_MHz_XTAL, 963, 0, 720, 375, 0, 351);
