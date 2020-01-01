@@ -291,8 +291,12 @@ ROM_END
 // BIOS versions specifically for NEC V20 CPUs, don't run on plain 8088
 ROM_START( pcv20 )
 	ROM_REGION(0x10000, "bios", 0)
-	// V20-BIOS Version 3.75 c't // (C) Peter Köhlmann 1987
-	ROM_LOAD( "peterv203.75.bin", 0xe000, 0x2000, CRC(b053a6a4) SHA1(f53218ad3d725f12d9149b22d8afcf6a8869a3bd))
+	// 0: V20-BIOS Version 3.75 c't // (C) Peter Köhlmann 1987
+	ROM_SYSTEM_BIOS(0, "v375", "c't v3.75")
+	ROMX_LOAD( "peterv203.75.bin", 0xe000, 0x2000, CRC(b053a6a4) SHA1(f53218ad3d725f12d9149b22d8afcf6a8869a3bd), ROM_BIOS(0))
+	// 1: V20-BIOS Version 3.72 c't // (C) Peter Köhlmann 1987 => last known version is 3.82
+	ROM_SYSTEM_BIOS(1, "v372", "c't v3.72")
+	ROMX_LOAD( "v20xtbios.bin", 0xe000, 0x2000, CRC(b2dca2e4) SHA1(18b0cb90084723eae08cf6b27bfb3fec8e9fb11b), ROM_BIOS(1))
 ROM_END
 
 #define rom_pcmda    rom_pc
