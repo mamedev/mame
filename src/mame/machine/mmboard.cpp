@@ -32,22 +32,23 @@ DEFINE_DEVICE_TYPE(MEPHISTO_DISPLAY_MODUL, mephisto_display_modul_device, "mdisp
 
 void mephisto_sensors_board_device::device_add_mconfig(machine_config &config)
 {
-	SENSORBOARD(config, m_board);
-	m_board->set_type(sensorboard_device::MAGNETS);
-	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	set_config(config, sensorboard_device::MAGNETS);
 }
-
-//-------------------------------------------------
-//  device_add_mconfig - add device-specific
-//  machine configuration
-//-------------------------------------------------
 
 void mephisto_buttons_board_device::device_add_mconfig(machine_config &config)
 {
-	SENSORBOARD(config, m_board);
-	m_board->set_type(sensorboard_device::BUTTONS);
-	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	set_config(config, sensorboard_device::BUTTONS);
 }
+
+void mephisto_board_device::set_config(machine_config &config, sensorboard_device::sb_type board_type)
+{
+	SENSORBOARD(config, m_board).set_type(board_type);
+	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+
+	PWM_DISPLAY(config, m_led_pwm).set_size(8, 8);
+	m_led_pwm->output_x().set(FUNC(mephisto_sensors_board_device::refresh_leds_w));
+}
+
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -60,8 +61,9 @@ void mephisto_buttons_board_device::device_add_mconfig(machine_config &config)
 mephisto_board_device::mephisto_board_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_board(*this, "board")
+	, m_led_pwm(*this, "led_pwm")
 	, m_sensordelay(attotime::from_msec(150))
-	, m_led(*this, "led%u", 0U)
+	, m_led_out(*this, "led%u", 0U)
 	, m_disable_leds(false)
 {
 }
@@ -74,6 +76,7 @@ mephisto_sensors_board_device::mephisto_sensors_board_device(const machine_confi
 	: mephisto_board_device(mconfig, MEPHISTO_SENSORS_BOARD, tag, owner, clock)
 {
 }
+
 //-------------------------------------------------
 //  mephisto_buttons_board_device - constructor
 //-------------------------------------------------
@@ -89,15 +92,10 @@ mephisto_buttons_board_device::mephisto_buttons_board_device(const machine_confi
 
 void mephisto_board_device::device_start()
 {
-	m_led.resolve();
-	m_leds_update_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mephisto_board_device::leds_update_callback), this));
-	m_leds_refresh_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mephisto_board_device::leds_refresh_callback), this));
-	m_leds_update_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
-	m_leds_refresh_timer->adjust(attotime::from_hz(5), 0, attotime::from_hz(5));
+	m_led_out.resolve();
 
 	save_item(NAME(m_mux));
-	save_item(NAME(m_leds));
-	save_item(NAME(m_leds_state));
+	save_item(NAME(m_led_data));
 
 	m_board->set_delay(m_sensordelay);
 }
@@ -109,38 +107,20 @@ void mephisto_board_device::device_start()
 void mephisto_board_device::device_reset()
 {
 	m_mux = 0x00;
-	m_leds = 0x00;
-	memset(m_leds_state, 0, sizeof(m_leds_state));
+	m_led_data = 0x00;
 }
 
-TIMER_CALLBACK_MEMBER(mephisto_board_device::leds_update_callback)
+WRITE8_MEMBER( mephisto_board_device::refresh_leds_w )
 {
-	for (int i=0; i<8; i++)
-		for (int j=0; j<8; j++)
-		{
-			if (!m_leds_state[i*8 + j] && !BIT(m_mux, i) && BIT(m_leds, j))
-				m_leds_state[i*8 + j] = 2;
-		}
-}
-
-TIMER_CALLBACK_MEMBER(mephisto_board_device::leds_refresh_callback)
-{
-	for (int i=0; i<8; i++)
-		for (int j=0; j<8; j++)
-		{
-			if (!m_disable_leds)
-				m_led[i*8 + j] = (m_leds_state[i*8 + j] > 1) ? 1 : 0;
-
-			if (m_leds_state[i*8 + j])
-				m_leds_state[i*8 + j]--;
-		}
+	if (!m_disable_leds)
+		m_led_out[offset >> 6 | (offset & 7) << 3] = data;
 }
 
 READ8_MEMBER( mephisto_board_device::input_r )
 {
 	uint8_t data = 0xff;
 
-	for (int i=0; i<8; i++)
+	for (int i = 0; i < 8; i++)
 		if (!BIT(m_mux, i))
 			data &= ~m_board->read_rank(i);
 
@@ -155,11 +135,13 @@ READ8_MEMBER( mephisto_board_device::mux_r )
 WRITE8_MEMBER( mephisto_board_device::mux_w )
 {
 	m_mux = data;
+	m_led_pwm->matrix(~m_mux, m_led_data);
 }
 
 WRITE8_MEMBER( mephisto_board_device::led_w )
 {
-	m_leds = data;
+	m_led_data = data;
+	m_led_pwm->matrix(~m_mux, m_led_data);
 }
 
 

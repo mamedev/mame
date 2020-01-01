@@ -1172,6 +1172,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"kurzweil",
 		"kyocera",
 		"leapfrog",
+		"lsi",
 		"luxor",
 		"magnavox",
 		"makerbot",
@@ -2604,6 +2605,14 @@ files {
 	MAME_DIR .. "src/mame/drivers/leapfrog_leappad.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "lsi")
+files {
+	MAME_DIR .. "src/mame/drivers/adm11.cpp",
+	MAME_DIR .. "src/mame/drivers/adm23.cpp",
+	MAME_DIR .. "src/mame/drivers/adm31.cpp",
+	MAME_DIR .. "src/mame/drivers/adm36.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "luxor")
 files {
 	MAME_DIR .. "src/mame/drivers/abc80.cpp",
@@ -4010,9 +4019,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/aaa.cpp",
 	MAME_DIR .. "src/mame/drivers/acd.cpp",
 	MAME_DIR .. "src/mame/drivers/aceex.cpp",
-	MAME_DIR .. "src/mame/drivers/adm23.cpp",
-	MAME_DIR .. "src/mame/drivers/adm31.cpp",
-	MAME_DIR .. "src/mame/drivers/adm36.cpp",
 	MAME_DIR .. "src/mame/drivers/akaiax80.cpp",
 	MAME_DIR .. "src/mame/drivers/alcat7100.cpp",
 	MAME_DIR .. "src/mame/drivers/alesis_qs.cpp",

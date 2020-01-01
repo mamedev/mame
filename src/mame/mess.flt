@@ -24,6 +24,7 @@ acrnsys1.cpp
 acrnsys.cpp
 acvirus.cpp
 adam.cpp
+adm11.cpp
 adm23.cpp
 adm31.cpp
 adm36.cpp
@@ -486,6 +487,7 @@ mekd2.cpp
 mekd3.cpp
 mekd4.cpp
 mekd5.cpp
+mephisto_berlin.cpp
 mephisto_brikett.cpp
 mephisto_glasgow.cpp
 mephisto_mm1.cpp

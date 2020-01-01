@@ -5,7 +5,8 @@
     Disassembler for AT&T's WE32100 processor.
 
     Operands are formatted similarly to AT&T's m32dis. Note that operand
-    encoding is little-endian even though memory accesses are big-endian.
+    encoding is little-endian even though memory accesses are big-endian
+    (and must also be aligned).
 
 ***************************************************************************/
 

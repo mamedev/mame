@@ -925,6 +925,9 @@ viruscl                         // (c) 2004 Access GmbH
 @source:adam.cpp
 adam                            // Coleco Adam
 
+@source:adm11.cpp
+adm12                           //
+
 @source:adm23.cpp
 adm23                           //
 
@@ -18541,6 +18544,7 @@ ddboya
 shuriboy
 fuusenpn
 tsukande
+mariorou
 
 @source:konmedal68k.cpp
 kzaurus
@@ -21864,6 +21868,7 @@ rebel5                          // Mephisto Rebell 5.0
 @source:mephisto_modena.cpp
 modena                          // 1992 Mephisto Modena
 
+@source:mephisto_modular.cpp
 alm16                           // 1988 Mephisto Almeria 16 Bit
 alm32                           // 1988 Mephisto Almeria 32 Bit
 port16                          // 1989 Mephisto Portorose 16 Bit
@@ -31377,6 +31382,7 @@ grdnstrmj                       // (c) 1998 (Japan)
 grdnstrmk                       // (c) 1998 (Korea)
 grdnstrmv                       // (c) 1998 Apples Industries license
 gunnail                         // (c) 1993 NMK / Tecmo
+gunnailp                        // (c) 1992 NMK
 gunnailb                        // bootleg
 hachamf                         // (c) 1991 NMK
 hachamfa                        // (c) 1991 NMK
@@ -34319,6 +34325,7 @@ stratvox                        // [1980 Sun Electronics] Taito
 stratvoxa                       // [1980 Sun Electronics] Taito
 stratvoxb                       // bootleg
 ttmahjng                        // 1981 Alpha Denshi Co. / Taito
+vscompmj                        // 1981 Nichibutsu
 
 @source:rowamet.cpp
 heavymtl                        //
