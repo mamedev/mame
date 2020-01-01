@@ -407,7 +407,6 @@ void route16_state::jongpute_cpu1_map(address_map &map)
 	map(0x5800, 0x5800).rw(FUNC(route16_state::jongpute_p1_matrix_r), FUNC(route16_state::jongpute_input_port_matrix_w));
 	map(0x6800, 0x6800).w("ay8910", FUNC(ay8910_device::data_w));
 	map(0x6900, 0x6900).w("ay8910", FUNC(ay8910_device::address_w));
-	map(0x7000, 0x7fff).rom();
 	map(0x8000, 0xbfff).ram().share("videoram1");
 }
 
