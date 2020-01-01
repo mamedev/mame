@@ -345,6 +345,8 @@ private:
 
 	DECLARE_WRITE16_MEMBER(flash_addr_low_w);
 	DECLARE_WRITE16_MEMBER(flash_addr_high_w);
+	
+	DECLARE_READ16_MEMBER(nand_ecc_low_byte_error_flag_1_r);
 
 	int m_testval;
 

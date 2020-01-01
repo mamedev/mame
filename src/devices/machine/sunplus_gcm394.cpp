@@ -734,6 +734,13 @@ READ16_MEMBER(generalplus_gpac800_device::unkarea_7850_r)
 	return machine().rand();
 }
 
+//[:maincpu] ':maincpu' (001490):sunplus_gcm394_base_device::unk_r @ 0x785f
+READ16_MEMBER(generalplus_gpac800_device::nand_ecc_low_byte_error_flag_1_r)
+{
+	return 0x0000;
+}
+
+
 
 
 // GPR27P512A   = C2 76  
@@ -747,96 +754,76 @@ READ16_MEMBER(generalplus_gpac800_device::unkarea_7854_r)
 	// certain games (eg jak_tsm) will only function correctly with specific ones, even if the code
 	// continues regardless.  Others will bail early if they don't get what they want.
 
-	if (m_romtype == 0)
+	// I think some unSP core maths bugs are causing severe issues after the initial load for jak_tsm
+	// at the moment, possibly the same ones that are causing rendering issues in the jak_gtg bitmap
+	// test and seemingly incorrect road data for jak_car2, either that or the hookup here is very
+	// non-standard outside of the ident codes
+
+	// real TSM code starts at 4c000
+
+
+	//logerror("%s:sunplus_gcm394_base_device::unkarea_7854_r\n", machine().describe_context());
+
+	if (m_nandcommand == 0x90) // read ident
 	{
-		//logerror("%s:sunplus_gcm394_base_device::unkarea_7854_r\n", machine().describe_context());
+		logerror("%s:sunplus_gcm394_base_device::unkarea_7854_r   READ IDENT byte %d\n", machine().describe_context(), m_curblockaddr);
 
-		// jak_tsm code looks for various 'magic values'
+		uint8_t data = 0x00;
 
-		if (m_nandcommand == 0x90) // read ident
+		if (m_romtype == 0)
 		{
-			uint8_t data = 0x00;
-
 			if (m_curblockaddr == 0)
 				data = 0xc2;
 			else
 				data = 0x76;
-
-			m_curblockaddr++;
-
-			return data;
 		}
-		else if (m_nandcommand == 0x00) // read data
+		else if (m_romtype == 1)
 		{
-			//uint8_t d
-			uint32_t nandaddress = (m_flash_addr_high << 16) | m_flash_addr_low;
-			uint8_t data = m_nand_read_cb((nandaddress * 2) + m_curblockaddr);
-
-			//logerror("reading nand byte %02x\n", data);
-
-			m_curblockaddr++;
-
-			return data;
-		}
-		else if (m_nandcommand == 0x70) // read status
-		{
-			return 0xffff;
-		}
-
-		return 0x0000;
-	}
-	else if (m_romtype == 1)
-	{
-		if (m_nandcommand == 0x90) // read ident
-		{
-			uint8_t data = 0x00;
-
 			if (m_curblockaddr == 0)
-				data = 0xAD;
-			else
+				data = 0xad;
+			else if (m_curblockaddr == 1)
 				data = 0x76;
-
-			m_curblockaddr++;
-
-			return data;
 		}
 		else
 		{
-			return 0x0000;
-		}
-
-		return 0x0000;
-	}
-	else if (m_romtype == 2)
-	{
-		if (m_nandcommand == 0x90) // read ident
-		{
-			uint8_t data = 0x00;
-
-			if (m_curblockaddr == 0)
-				data = 0xAD;
+			if (m_curblockaddr == 2)
+				data = 0xad;
 			else if (m_curblockaddr == 1)
-				data = 0xF1;
+				data = 0xf1;
 			else if (m_curblockaddr == 2)
 				data = 0x80;
 			else if (m_curblockaddr == 3)
-				data = 0x1D;
-			
-			m_curblockaddr++;
-			    
-			return data;
-		}
-		else
-		{
-			return 0x0000;
+				data = 0x1d;
 		}
 
-		return 0x0000;
+		m_curblockaddr++;
+
+		return data;
+	}
+	else if (m_nandcommand == 0x00)
+	{
+		//logerror("%s:sunplus_gcm394_base_device::unkarea_7854_r   READ DATA byte %d\n", machine().describe_context(), m_curblockaddr);
+
+		uint32_t nandaddress = (m_flash_addr_high << 16) | m_flash_addr_low;
+		uint8_t data = m_nand_read_cb((nandaddress * 2) + m_curblockaddr);
+
+		m_curblockaddr++;
+
+		return data;
+	}
+	else if (m_nandcommand == 0x70) // read status
+	{
+		logerror("%s:sunplus_gcm394_base_device::unkarea_7854_r   READ STATUS byte %d\n", machine().describe_context(), m_curblockaddr);
+
+		return 0xffff;
 	}
 	else
 	{
-		return 0x0000;
+		logerror("%s:sunplus_gcm394_base_device::unkarea_7854_r   READ UNKNOWN byte %d\n", machine().describe_context(), m_curblockaddr);
+		return 0xffff;
 	}
+
+	return 0x0000;
 }
 
 // 7998
@@ -861,7 +848,6 @@ WRITE16_MEMBER(generalplus_gpac800_device::flash_addr_high_w)
 
 	uint32_t address = (m_flash_addr_high << 16) | m_flash_addr_low;
 
-
 	logerror("%s: flash address is now %08x\n", machine().describe_context(), address);
 
 	m_curblockaddr = 0;
@@ -881,6 +867,8 @@ void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
 	map(0x007853, 0x007853).w(FUNC(generalplus_gpac800_device::flash_addr_high_w)); // NAND High Address Reg
 	map(0x007854, 0x007854).r(FUNC(generalplus_gpac800_device::unkarea_7854_r)); // NAND Data Reg
 //  map(0x007855, 0x007855).w(FUNC(generalplus_gpac800_device::nand_dma_ctrl_w)); // NAND DMA / INT Control
+
+	map(0x00785f, 0x00785f).r(FUNC(generalplus_gpac800_device::nand_ecc_low_byte_error_flag_1_r)); // ECC Low Byte Error Flag 1 (maybe)
 
 	// 128kwords internal ROM
 	//map(0x08000, 0x0ffff).rom().region("internal", 0); // lower 32kwords of internal ROM is visible / shadowed depending on boot pins and register
