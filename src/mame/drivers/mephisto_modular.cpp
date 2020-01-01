@@ -1,5 +1,5 @@
 // license:LGPL-2.1+
-// copyright-holders:Dirk Verwiebe, Cowering, Sandro Ronco
+// copyright-holders:Dirk Verwiebe, Cowering, Sandro Ronco, hap
 /******************************************************************************
 
 Hegener + Glaser Mephisto chesscomputers with plugin modules
@@ -25,7 +25,7 @@ No Mephisto modules were released anymore after Saitek took over H+G, engine is 
 to be same as Saitek's 1996 Mephisto London 68030 (limited release TM version).
 
 TODO:
-- add Bavaria sensor support, see patent DE4207534
+- add Bavaria sensor support
 - add the missing very rare 'TM' Tournament Machines
 - match I/S= diag speed test with real hardware (good test for proper waitstates)
 - remove gen32/gen32l ROM patch
@@ -47,14 +47,16 @@ XTAL = 7.37280MHz
 ROM = TC57256AD-12, sinus table
 
 Only usable with Weltmeister modules, Portorose until London (aka this MAME driver)
+Also, it was patented with DE4207534.
 
 Each piece has a Tank circuit, and in each square of the board there is a coil.
 By scanning all the squares at different frequencies, the resonance frequency
 of every piece is obtained in order to identify it.
 
 Coil resonance frequency:
-wJ,  bJ,  wK,  bK,  wQ,  bQ,  wP,  bP,  wB,  bB,  wN,  bN,  wR,  bR (J = Joker)
+wJ,  bJ,  wK,  bK,  wQ,  bQ,  wP,  bP,  wB,  bB,  wN,  bN,  wR,  bR  (J = Joker)
 460, 421, 381, 346, 316, 289, 259, 238, 217, 203, 180, 167, 154, 138 kHz
+14,  13,  12,  11,  10,  9,   8,   7,   6,   5,   4,   3,   2,   1   piece ID
 
 ******************************************************************************/
 
@@ -63,25 +65,35 @@ wJ,  bJ,  wK,  bK,  wQ,  bQ,  wP,  bP,  wB,  bB,  wN,  bN,  wR,  bR (J = Joker)
 #include "cpu/m68000/m68000.h"
 #include "machine/bankdev.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
+#include "machine/sensorboard.h"
 #include "machine/mmboard.h"
+#include "video/pwm.h"
 
 #include "screen.h"
 #include "speaker.h"
 
 // internal artwork
-#include "mephisto_alm16.lh"
-#include "mephisto_alm32.lh"
-#include "mephisto_gen32.lh"
+#include "mephisto_alm16.lh" // clickable
+#include "mephisto_alm32.lh" // clickable
+#include "mephisto_gen32.lh" // clickable
 
+
+namespace {
 
 class mmodular_state : public driver_device
 {
 public:
-	mmodular_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
+	mmodular_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_board(*this, "board"),
+		m_led_pwm(*this, "led_pwm"),
+		m_bav_busy(*this, "bav_busy"),
+		m_led_out(*this, "led%u", 0U)
 	{ }
 
+	// machine configs
 	void alm16(machine_config &config);
 	void alm32(machine_config &config);
 	void port16(machine_config &config);
@@ -92,11 +104,19 @@ public:
 
 	void init_gen32();
 
-private:
-	DECLARE_WRITE8_MEMBER(bavaria_w);
-	DECLARE_READ8_MEMBER(bavaria1_r);
-	DECLARE_READ8_MEMBER(bavaria2_r);
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
+private:
+	// devices/pointers
+	required_device<cpu_device> m_maincpu;
+	required_device<sensorboard_device> m_board;
+	required_device<pwm_display_device> m_led_pwm;
+	required_device<timer_device> m_bav_busy;
+	output_finder<64> m_led_out;
+
+	// address maps
 	void alm16_mem(address_map &map);
 	void alm32_mem(address_map &map);
 	void port16_mem(address_map &map);
@@ -106,8 +126,33 @@ private:
 	void gen32_mem(address_map &map);
 	void nvram_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	// I/O handlers
+	DECLARE_WRITE8_MEMBER(mux_w);
+	DECLARE_WRITE8_MEMBER(led_w);
+	DECLARE_READ8_MEMBER(input_r);
+	DECLARE_WRITE8_MEMBER(bavaria_w);
+	DECLARE_READ8_MEMBER(bavaria1_r);
+	DECLARE_READ8_MEMBER(bavaria2_r);
+
+	u8 m_mux = 0;
+	u8 m_led_data = 0;
+	u8 m_bav_data = 0;
 };
+
+void mmodular_state::machine_start()
+{
+	m_led_out.resolve();
+
+	// register for savestates
+	save_item(NAME(m_mux));
+	save_item(NAME(m_led_data));
+	save_item(NAME(m_bav_data));
+}
+
+void mmodular_state::machine_reset()
+{
+	m_bav_data = 0;
+}
 
 void mmodular_state::init_gen32()
 {
@@ -123,25 +168,57 @@ void mmodular_state::init_gen32()
     I/O
 ******************************************************************************/
 
+WRITE8_MEMBER(mmodular_state::mux_w)
+{
+	// d0-d7: input/led mux
+	m_mux = ~data;
+	m_led_pwm->matrix(m_mux, m_led_data);
+}
+
+WRITE8_MEMBER(mmodular_state::led_w)
+{
+	// d0-d7: led data
+	m_led_data = data;
+	m_led_pwm->matrix(m_mux, m_led_data);
+}
+
+READ8_MEMBER(mmodular_state::input_r)
+{
+	u8 data = 0;
+
+	// read magnet sensors
+	for (int i = 0; i < 8; i++)
+		if (BIT(m_mux, i))
+			data |= m_board->read_rank(i);
+
+	return ~data;
+}
+
 WRITE8_MEMBER(mmodular_state::bavaria_w)
 {
 	// d0-d5: select square?
-	// d6: ?
+	// d6: no function?
 	// d7: start search
+	if (m_bav_data & ~data & 0x80)
+		m_bav_busy->adjust(attotime::from_usec(3000));
+
+	m_bav_data = data;
 }
 
 READ8_MEMBER(mmodular_state::bavaria1_r)
 {
-	// d0-d3: piece id?
+	// d0-d3: piece id
 	// other: unused?
 	return 0;
 }
 
 READ8_MEMBER(mmodular_state::bavaria2_r)
 {
-	// d7: busy signal?
-	// other: ?
 	return 0;
+
+	// d7: busy signal
+	// other: unused?
+	return m_bav_busy->enabled() ? 0x80 : 0;
 }
 
 
@@ -161,9 +238,10 @@ void mmodular_state::alm16_mem(address_map &map)
 	map(0x000000, 0x01ffff).rom();
 	map(0x400000, 0x47ffff).ram();
 	map(0x800000, 0x803fff).m("nvram_map", FUNC(address_map_bank_device::amap8)).umask16(0xff00);
-	map(0xc00000, 0xc00000).r("board", FUNC(mephisto_board_device::input_r));
-	map(0xc80000, 0xc80000).w("board", FUNC(mephisto_board_device::mux_w));
-	map(0xd00000, 0xd00000).w("board", FUNC(mephisto_board_device::led_w));
+	map(0xc00000, 0xc00000).r(FUNC(mmodular_state::input_r));
+	map(0xc80000, 0xc80000).w(FUNC(mmodular_state::mux_w));
+	map(0xd00000, 0xd00000).w(FUNC(mmodular_state::led_w));
+	map(0xd00000, 0xd00001).nopr(); // clr.b
 	map(0xf00000, 0xf00003).portr("KEY1");
 	map(0xf00004, 0xf00007).portr("KEY2");
 	map(0xf00008, 0xf0000b).portr("KEY3");
@@ -195,9 +273,9 @@ void mmodular_state::alm32_mem(address_map &map)
 	map(0x800000ec, 0x800000ef).portr("KEY1");
 	map(0x800000f4, 0x800000f7).portr("KEY2");
 	map(0x800000f8, 0x800000fb).portr("KEY3");
-	map(0x800000fc, 0x800000fc).r("board", FUNC(mephisto_board_device::input_r));
-	map(0x88000000, 0x88000007).w("board", FUNC(mephisto_board_device::mux_w)).umask32(0xff000000);
-	map(0x90000000, 0x90000007).w("board", FUNC(mephisto_board_device::led_w)).umask32(0xff000000);
+	map(0x800000fc, 0x800000fc).r(FUNC(mmodular_state::input_r));
+	map(0x88000000, 0x88000007).w(FUNC(mmodular_state::mux_w)).umask32(0xff000000);
+	map(0x90000000, 0x90000007).w(FUNC(mmodular_state::led_w)).umask32(0xff000000);
 	map(0xa0000000, 0xa0000000).w("display", FUNC(mephisto_display_modul_device::latch_w));
 	map(0xa0000010, 0xa0000010).w("display", FUNC(mephisto_display_modul_device::io_w));
 	map(0xa8000000, 0xa8007fff).m("nvram_map", FUNC(address_map_bank_device::amap8)).umask32(0xff000000);
@@ -225,9 +303,9 @@ void mmodular_state::gen32_mem(address_map &map)
 	map(0x00000000, 0x0003ffff).rom();
 	map(0x40000000, 0x4007ffff).ram();
 	map(0x80000000, 0x8003ffff).ram();
-	map(0xc0000000, 0xc0000000).r("board", FUNC(mephisto_board_device::input_r));
-	map(0xc8000004, 0xc8000004).w("board", FUNC(mephisto_board_device::mux_w));
-	map(0xd0000004, 0xd0000004).w("board", FUNC(mephisto_board_device::led_w));
+	map(0xc0000000, 0xc0000000).r(FUNC(mmodular_state::input_r));
+	map(0xc8000004, 0xc8000004).w(FUNC(mmodular_state::mux_w));
+	map(0xd0000004, 0xd0000004).w(FUNC(mmodular_state::led_w));
 	map(0xd8000004, 0xd8000004).r(FUNC(mmodular_state::bavaria1_r));
 	map(0xd8000008, 0xd8000008).w(FUNC(mmodular_state::bavaria_w));
 	map(0xd800000c, 0xd800000c).r(FUNC(mmodular_state::bavaria2_r));
@@ -303,8 +381,16 @@ void mmodular_state::alm16(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	ADDRESS_MAP_BANK(config, "nvram_map").set_map(&mmodular_state::nvram_map).set_options(ENDIANNESS_BIG, 8, 13);
 
-	MEPHISTO_SENSORS_BOARD(config, "board");
+	TIMER(config, "bav_busy").configure_generic(nullptr);
+
+	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
+	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->set_delay(attotime::from_msec(150));
+
+	/* video hardware */
 	MEPHISTO_DISPLAY_MODUL(config, "display");
+	PWM_DISPLAY(config, m_led_pwm).set_size(8, 8);
+	m_led_pwm->output_x().set([this](offs_t offset, u8 data) { m_led_out[offset >> 6 | (offset & 7) << 3] = data; });
 	config.set_default_layout(layout_mephisto_alm16);
 }
 
@@ -464,6 +550,8 @@ ROM_START( lond32 )
 	ROM_REGION( 0x8000, "bavaria", 0 )
 	ROM_LOAD( "sinus_15_bavaria", 0x0000, 0x8000, CRC(84421306) SHA1(5aab13bf38d80a4233c11f6eb5657f2749c14547) )
 ROM_END
+
+} // anonymous namespace
 
 
 
