@@ -8471,7 +8471,7 @@ GAME( 1992, macross,    0,        macross,      macross,      nmk16_state, init_
 
 GAME( 1993, gunnail,    0,        gunnail,      gunnail,      nmk16_state, init_nmk,             ROT270, "NMK / Tecmo",                  "GunNail (28th May. 1992)", 0 ) // Tecmo is displayed only when set to Japan
 GAME( 1992, gunnailb,   gunnail,  gunnailb,     gunnail,      nmk16_state, init_gunnailb,        ROT270, "bootleg",                      "GunNail (bootleg)", MACHINE_NO_SOUND ) // different sound hardware not hooked up
-GAME( 1992, gunnailp,   gunnail,  gunnail,      gunnail,      nmk16_state, init_nmk,             ROT270, "NMK",                          "GunNail (location test)", MACHINE_NO_SOUND ) // still has the 28th May. 1992 string, so unlikely that was the release date for either version.
+GAME( 1992, gunnailp,   gunnail,  gunnail,      gunnail,      nmk16_state, init_nmk,             ROT270, "NMK",                          "GunNail (location test)", 0 ) // still has the 28th May. 1992 string, so unlikely that was the release date for either version.
 // a 1992 version of Gunnail exists, see https://www.youtube.com/watch?v=tf15Wz0zUiA  3:10; is this bootleg version 'gunnailb'?
 
 GAME( 1993, macross2,   0,        macross2,     macross2,     nmk16_state, init_banked_audiocpu, ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II", MACHINE_NO_COCKTAIL )
