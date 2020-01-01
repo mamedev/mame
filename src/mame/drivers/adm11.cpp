@@ -77,6 +77,14 @@ void adm11_state::machine_start()
 
 SCN2674_DRAW_CHARACTER_MEMBER(adm11_state::draw_character)
 {
+	u16 dots = m_chargen[charcode << 4 | linecount];
+	dots |= (dots & 0x80) << 1;
+
+	for (int i = 0; i < 9; i++)
+	{
+		bitmap.pix32(y, x++) = BIT(dots, 8) ? rgb_t::white() : rgb_t::black();
+		dots <<= 1;
+	}
 }
 
 WRITE_LINE_MEMBER(adm11_state::mbc_w)
@@ -156,4 +164,4 @@ ROM_START(adm12)
 	ROM_LOAD("u35.bin", 0x0000, 0x1000, CRC(66d7bc44) SHA1(cd839839f29657207098d85900cb570285be91a6)) // HN462732-P
 ROM_END
 
-COMP(1984, adm12, 0, 0, adm12, adm12, adm11_state, empty_init, "Lear Siegler", "ADM 12", MACHINE_IS_SKELETON)
+COMP(1984, adm12, 0, 0, adm12, adm12, adm11_state, empty_init, "Lear Siegler", "ADM 12 Video Display Terminal", MACHINE_IS_SKELETON)
