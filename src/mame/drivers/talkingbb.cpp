@@ -18,7 +18,7 @@ The speech driver is by Forrest S. Mozer's company.
 
 The cartridge slots are for extra teams. There are around 8 cartridges, each one
 included 3 or 4 baseball teams, with exception to the "Hall of Fame" cartridge.
-Players enter 3-digit code to select the team.
+Players enter a 3-digit code to select the team.
 
 TODO:
 - add cartridge slots

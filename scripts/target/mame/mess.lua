@@ -150,6 +150,7 @@ CPUS["FR"] = true
 CPUS["DSP56000"] = true
 CPUS["VT50"] = true
 CPUS["PACE"] = true
+CPUS["WE32000"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -1171,6 +1172,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"kurzweil",
 		"kyocera",
 		"leapfrog",
+		"lsi",
 		"luxor",
 		"magnavox",
 		"makerbot",
@@ -1752,6 +1754,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "att")
 files {
+	MAME_DIR .. "src/mame/drivers/att3b2.cpp",
 	MAME_DIR .. "src/mame/drivers/att4425.cpp",
 	MAME_DIR .. "src/mame/drivers/att610.cpp",
 	MAME_DIR .. "src/mame/drivers/att630.cpp",
@@ -2365,6 +2368,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "hegener")
 files {
+	MAME_DIR .. "src/mame/drivers/mephisto_berlin.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_brikett.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_glasgow.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_mm1.cpp",
@@ -2599,6 +2603,14 @@ createMESSProjects(_target, _subtarget, "leapfrog")
 files {
 	MAME_DIR .. "src/mame/drivers/leapster.cpp",
 	MAME_DIR .. "src/mame/drivers/leapfrog_leappad.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "lsi")
+files {
+	MAME_DIR .. "src/mame/drivers/adm11.cpp",
+	MAME_DIR .. "src/mame/drivers/adm23.cpp",
+	MAME_DIR .. "src/mame/drivers/adm31.cpp",
+	MAME_DIR .. "src/mame/drivers/adm36.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "luxor")
@@ -4007,9 +4019,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/aaa.cpp",
 	MAME_DIR .. "src/mame/drivers/acd.cpp",
 	MAME_DIR .. "src/mame/drivers/aceex.cpp",
-	MAME_DIR .. "src/mame/drivers/adm23.cpp",
-	MAME_DIR .. "src/mame/drivers/adm31.cpp",
-	MAME_DIR .. "src/mame/drivers/adm36.cpp",
 	MAME_DIR .. "src/mame/drivers/akaiax80.cpp",
 	MAME_DIR .. "src/mame/drivers/alcat7100.cpp",
 	MAME_DIR .. "src/mame/drivers/alesis_qs.cpp",

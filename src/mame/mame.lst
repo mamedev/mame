@@ -925,6 +925,9 @@ viruscl                         // (c) 2004 Access GmbH
 @source:adam.cpp
 adam                            // Coleco Adam
 
+@source:adm11.cpp
+adm12                           //
+
 @source:adm23.cpp
 adm23                           //
 
@@ -2970,6 +2973,12 @@ tajmah                          // Tajmahal
 atrwild
 atricmon
 atrbonpk
+
+@source:att3b2.cpp
+3b2_300                         //
+3b2_310                         //
+3b2_400                         //
+3b2_600                         //
 
 @source:att4425.cpp
 att4425                         //
@@ -9359,6 +9368,7 @@ disco                           // (c) 1982
 discof                          // (c) 1982
 lnc                             // (c) 1981
 mmonkey                         // (c) 1982 Technos Japan + Roller Tron
+mmonkeyj                        // (c) 1982 Technos Japan + Roller Tron
 protennb                        // bootleg
 sdtennis                        // (c) 1983
 tisland                         // (c) 1982
@@ -14951,6 +14961,7 @@ nfb96seb                        // bootleg
 nfb96sec                        // bootleg
 nfb96txt                        // (c) 2000 Amcoe
 nfm                             // bootleg
+nfma                            // bootleg
 ns8lines                        // unknown
 ns8linew                        // unknown
 ns8linewa                       // unknown
@@ -21815,6 +21826,12 @@ mekd5                           // 1980 Motorola Evaluation Kit
 crzyddz2                        // 2006 Sealy
 menghong                        // 2004? Sealy
 
+@source:mephisto_berlin.cpp
+berl16                          // 1992 Mephisto Berlin 68000
+berlinp                         // 1994 Mephisto Berlin Pro 68020
+berl16l                         // 1996 Mephisto Berlin 68000 London Upgrade
+berlinpl                        // 1996 Mephisto Berlin Pro London Upgrade
+
 @source:mephisto_brikett.cpp
 mephisto
 mephisto2
@@ -21863,10 +21880,6 @@ gen32                           // 1993 Mephisto Genius 68030
 gen32l                          // 1996 Mephisto Genius 68030 London Upgrade
 lond16                          // 1996 Mephisto London 16 Bit
 lond32                          // 1996 Mephisto London 32 Bit
-berl16                          // 1992 Mephisto Berlin 68000
-berlinp                         // 1994 Mephisto Berlin Pro 68020
-berl16l                         // 1996 Mephisto Berlin 68000 London Upgrade
-bpl32                           // 1996 Mephisto Berlin Pro London Upgrade
 
 @source:mephisto_mondial68k.cpp
 mondl68k                        // 1988 Mephisto Mondial 68000XL
@@ -31368,6 +31381,7 @@ grdnstrmj                       // (c) 1998 (Japan)
 grdnstrmk                       // (c) 1998 (Korea)
 grdnstrmv                       // (c) 1998 Apples Industries license
 gunnail                         // (c) 1993 NMK / Tecmo
+gunnailp                        // (c) 1992 NMK
 gunnailb                        // bootleg
 hachamf                         // (c) 1991 NMK
 hachamfa                        // (c) 1991 NMK
@@ -34310,6 +34324,7 @@ stratvox                        // [1980 Sun Electronics] Taito
 stratvoxa                       // [1980 Sun Electronics] Taito
 stratvoxb                       // bootleg
 ttmahjng                        // 1981 Alpha Denshi Co. / Taito
+vscompmj                        // 1981 Nichibutsu
 
 @source:rowamet.cpp
 heavymtl                        //
@@ -35205,9 +35220,10 @@ zektor                          // (c) 1982
 @source:segahang.cpp
 endurob2                        // (c) 1985 (Beta bootleg)
 endurobl                        // (c) 1985 (Herb bootleg)
-enduror                         // (c) 1985 (YM2151, FD1089B)
+enduror                         // (c) 1985 (Rev A, YM2151, FD1089B)
 enduror1                        // (c) 1985 (YM2203, FD1089B)
-endurora                        // (c) 1985 (YM2151, Mask ROM sprites, FD1089B)
+endurora                        // (c) 1985 (Rev A, YM2151, Mask ROM sprites, FD1089B)
+endurorb                        // (c) 1985 (YM2151, FD1089B)
 enduror1d                       // bootleg
 endurord                        // bootleg
 hangon                          // (c) 1985 (Rev A)
