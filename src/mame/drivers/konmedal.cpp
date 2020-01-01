@@ -679,20 +679,20 @@ ROM_START( buttobi )
 	ROM_LOAD32_BYTE( "440-a05-4h.bin", 0x000000, 0x020000, CRC(11d3ec99) SHA1(4bc267fa58ba1dd83e1d43b0e981b9e65d688042) )
 	ROM_LOAD32_BYTE( "440-a06-4j.bin", 0x000001, 0x020000, CRC(f915c517) SHA1(26128fcdf9947efd7959deddb52575088fa492d4) )
 
-	// temporarily borrowed from tsukande while the PROMs get dumped from this PCB
 	ROM_REGION( 0x400, "proms", 0 )
 	// R (440a07.13f)
-	ROM_LOAD( "441a07.20k",   0x000000, 0x000100, BAD_DUMP CRC(7d0c53c2) SHA1(f357e0cb3d53374208ad1670e70be03b399a4c02) )
+	ROM_LOAD( "440a07.13f",   0x000000, 0x000100, CRC(6ebce405) SHA1(778be32bf3cbc34014122d60c640979947d380ae) )
 	// G (440a08.14f)
-	ROM_LOAD( "441a08.21k",   0x000100, 0x000100, BAD_DUMP CRC(e2c3e853) SHA1(36a3008dde714ade53b9a01ac9d94c6cc655c293) )
+	ROM_LOAD( "440a08.14f",   0x000100, 0x000100, CRC(7b36a53c) SHA1(021ff79289848e094dc3b23b7f0b1cc0e9fe55a6) )
 	// B (440a09.15f)
-	ROM_LOAD( "441a09.23k",   0x000200, 0x000100, BAD_DUMP CRC(3daca33a) SHA1(38644f574beaa593f3348b49eabea9e03d722013) )
+	ROM_LOAD( "440a09.15f",   0x000200, 0x000100, CRC(2e4c9051) SHA1(ba5d3d96749ec8ae65595dba46dad6f2b1f8953e) )
 	// P(riority?) (440a10.14g)
-	ROM_LOAD( "441a10.21m",   0x000300, 0x000100, BAD_DUMP CRC(063722ff) SHA1(7ba43acfdccb02e7913dc000c4f9c57c54b1315f) )
+	ROM_LOAD( "440a10.14g",   0x000300, 0x000100, CRC(c2739e08) SHA1(c409ddc94f80a185e9e382762126d3ae551bf414) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "440-a01-8b.bin", 0x000000, 0x040000, CRC(955b1bd5) SHA1(1e8130a3634972d742ba4ad103e1738e44a4e28c) )
 ROM_END
+
 
 ROM_START( shuriboy )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
@@ -733,10 +733,32 @@ ROM_START( fuusenpn )
 	ROM_LOAD( "241a09.bin",   0x000200, 0x000100, CRC(79bd3e49) SHA1(ff94856d11acfba364f2d05ca955c10fbc02e265) )
 	ROM_LOAD( "241a10.bin",   0x000300, 0x000100, CRC(f7e3d8ee) SHA1(89c505873c884f9e1ec0cb113a3557d3f67943b9) )
 ROM_END
+
+ROM_START( mariorou )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
+	ROM_LOAD( "111_d01.3g.27c512", 0x000000, 0x010000, CRC(96e075c1) SHA1(ca8170e1756c7c4610680f5c5a95020ea34fd1f5) )
+
+	ROM_REGION( 0x40000, "k052109", 0 )   /* tilemaps */
+	ROM_LOAD32_BYTE( "111_c03.2h.27c256", 0x000000, 0x008000, CRC(b4e769ba) SHA1(5af1aa7768daa7cc844d64cfd13c8d81d801fc70) )
+	ROM_LOAD32_BYTE( "111_c04.4h.27c256", 0x000001, 0x008000, CRC(c6081712) SHA1(308df4824e884cb7d1febd34d85b1c1b9f494166) )
+	ROM_LOAD32_BYTE( "111_c05.5h.27c256", 0x000002, 0x008000, CRC(83eec257) SHA1(fcd0ff5050ef13f3a6d3a1d12c24f16ef6b4d25d) )
+	ROM_LOAD32_BYTE( "111_c06.7h.27c256", 0x000003, 0x008000, CRC(d71554e9) SHA1(e388e705f2fd84d98f84d7b843ded5c509f05796) )
+
+	ROM_REGION( 0x200000, "upd", 0 )
+	ROM_LOAD( "111_c02.13c.27c010", 0x000000, 0x020000, CRC(e42ba2d7) SHA1(4520353aa60c9ced87d94ef338903e08dff9f4cc) )
+
+	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 ) // am27s21apc
+	ROM_LOAD( "111_c07.2d.82s129", 0x000000, 0x000100, CRC(89bc3e83) SHA1(4089430cd48009ab1711a00ace81a5823cfafba6) )
+	ROM_LOAD( "111_c08.3d.82s129", 0x000100, 0x000100, CRC(f9f7dfa8) SHA1(e502c7c554e3add5d27645ea3bddbe2339c93f7a) )
+	ROM_LOAD( "111_c09.4d.82s129", 0x000200, 0x000100, CRC(879b796b) SHA1(f41d48013f0d55e7de4e40dc00dd30482946c14c) )
+	ROM_LOAD( "111_a10.3e.82s129", 0x000300, 0x000100, CRC(07ffc2ed) SHA1(37955d1788a86b90439233bb098c59b191056f68) )
+ROM_END
+
 GAME( 1994, buttobi,  0,     ddboy,    konmedal, konmedal_state, empty_init, ROT0, "Konami", "Buttobi Striker", MACHINE_NOT_WORKING)
 GAME( 1995, tsukande, 0,     tsukande, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)
 GAME( 1995, ddboy,    0,     ddboy,    konmedal, konmedal_state, empty_init, ROT0, "Konami", "Dam Dam Boy (on dedicated PCB)", MACHINE_NOT_WORKING)
 GAME( 1995, ddboya,   ddboy, ddboy,    konmedal, konmedal_state, empty_init, ROT0, "Konami", "Dam Dam Boy (on Tsukande Toru Chicchi PCB)", MACHINE_NOT_WORKING)
 GAME( 1993, shuriboy, 0,     shuriboy, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Shuriken Boy", MACHINE_NOT_WORKING)
 GAME( 1993, fuusenpn, 0,     fuusenpn, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Fuusen Pentai", MACHINE_NOT_WORKING)
+GAME( 1993, mariorou, 0,     fuusenpn, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Mario Roulette", MACHINE_NOT_WORKING)
 
