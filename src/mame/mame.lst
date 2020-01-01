@@ -925,6 +925,9 @@ viruscl                         // (c) 2004 Access GmbH
 @source:adam.cpp
 adam                            // Coleco Adam
 
+@source:adm11.cpp
+adm12                           //
+
 @source:adm23.cpp
 adm23                           //
 
