@@ -21867,6 +21867,7 @@ rebel5                          // Mephisto Rebell 5.0
 @source:mephisto_modena.cpp
 modena                          // 1992 Mephisto Modena
 
+@source:mephisto_modular.cpp
 alm16                           // 1988 Mephisto Almeria 16 Bit
 alm32                           // 1988 Mephisto Almeria 32 Bit
 port16                          // 1989 Mephisto Portorose 16 Bit
