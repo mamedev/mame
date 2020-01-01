@@ -1669,9 +1669,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<info name="serial" value="NUS-NCLE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-NCLE-0" />
-			<feature name="u2" value="[empty]" />
-			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="u1" value="U1 [NUS-NCLE-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="16777216">
@@ -1722,7 +1722,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<info name="serial" value="NUS-NCDE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NCDE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -1756,7 +1756,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 	</software>
 
 	<software name="cvaniau1" cloneof="cvania">
-		<description>Castlevania (USA, Rev. A)</description>
+		<description>Castlevania (USA, rev 1)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-ND3E-USA"/>
@@ -1774,7 +1774,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<info name="serial" value="NUS-ND3E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-ND3E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -1802,7 +1802,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<info name="serial" value="NUS-ND4E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-ND4E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -1868,7 +1868,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<info name="serial" value="NUS-NCTE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NCTE-0]" />
 			<feature name="u2" value="U2 [BU9850]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -1910,7 +1910,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<info name="serial" value="NUS-N2VE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-N2VE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
@@ -1939,9 +1939,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<info name="serial" value="NUS-NCBE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-NCBE-0" />
-			<feature name="u2" value="[empty]" />
-			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="u1" value="U1 [NUS-NCBE-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="4194304">
@@ -1969,9 +1969,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<info name="serial" value="NUS-NCHE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-NCHE-0" />
-			<feature name="u2" value="BK4D-NUS" />
-			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="u1" value="U1 [NUS-NCHE-0]" />
+			<feature name="u2" value="U2 [BK4D-NUS]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
 				<rom name="nus-nche-0.u1" size="8388608" crc="2c22147d" sha1="ce39f1afac5efc889cbe0ae03f0ccfa9a2e5b085" offset="000000" />
 			</dataarea>
@@ -2069,7 +2069,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<info name="serial" value="NUS-NC2E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NC2E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
@@ -2091,7 +2091,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 	</software>
 
 	<software name="clayfg63ub" cloneof="clayfg63">
-		<description>Clay Fighter 63⅓ (USA, Prototype)</description>
+		<description>Clay Fighter 63⅓ (USA, prototype)</description>
 		<year>1997</year>
 		<publisher>Interplay</publisher>
 		<part name="cart" interface="n64_cart">
@@ -2108,7 +2108,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<info name="serial" value="NUS-NCFE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NCFE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -2118,15 +2118,15 @@ Info on N64 chip labels (from The Cart Scan Repository)
 	</software>
 
 	<software name="cnc">
-		<description>Command &amp; Conquer (Europe)</description>
+		<description>Command &amp; Conquer (Australia, Europe)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NUS-NCCP-(AUS,EUR)"/>
+		<info name="serial" value="NUS-NCCP-AUS, NUS-NCCP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-01" />
-			<feature name="u1" value="NUS-NCCP-0" />
-			<feature name="u2" value="29L1100KC-15B0" />
-			<feature name="u3" value="CIC-NUS-7101" />
+			<feature name="u1" value="U1 [NUS-NCCP-0]" />
+			<feature name="u2" value="U2 [29L1100KC-15B0]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101]" />
 			<feature name="cart_model" value="NUS-006(EUR)" />
 			<feature name="cart_back_label" value="NUS-EUR-1" />
 			<dataarea name="rom" size="33554432">
@@ -2154,9 +2154,9 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<info name="serial" value="NUS-NCCE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-01" />
-			<feature name="u1" value="NUS-NCCE-0" />
-			<feature name="u2" value="29L1100KC-15B0" />
-			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="u1" value="U1 [NUS-NCCE-0]" />
+			<feature name="u2" value="U2 [29L1100KC-15B0]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="33554432">
@@ -2183,8 +2183,15 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NFUE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-02A-03" />
+			<feature name="u1" value="U1 [NUS-NFUE-0 02]" />
+			<feature name="u2" value="U2 [NUS-NFUE-0 12]" />
+			<feature name="u3" value="U3 [BU9850]" />
+			<feature name="u4" value="U4 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(USA)" />
 			<dataarea name="rom" size="67108864">
-				<rom name="conker's bad fur day (usa).bin" size="67108864" crc="6acdb3fc" sha1="27d3123dd4a3d84cb1a7ecf2ced3bc44389f4607" offset="000000" />
+				<rom name="nus-nfue-0 02.u1" size="33554432" crc="8a6fc9ef" sha1="eb287d733de04ed895bf02578be4c7cfc54b2c72" offset="000000" />
+				<rom name="nus-nfue-0 12.u2" size="33554432" crc="48f2e400" sha1="7abf8d669359b5f480982dc3e38d0635dc51cd45" offset="0x2000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2223,23 +2230,23 @@ patched out (+ a fix for internal checksum)
 -->
 
 	<software name="conkerph" cloneof="conker" supported="no">
-		<description>Conker's Bad Fur Day (Prototype Debug, Decrypted)</description>
+		<description>Conker's Bad Fur Day (prototype 20001025, decrypted)</description>
 		<year>2001?</year>
 		<publisher>Rare</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="67108864">
-				<rom name="bfd_ntsc_debug_dc.bin" size="67108864" crc="c9822f5c" sha1="6956bd77351a91cdd22af454a8d410a3b9c829f0" offset="0" />
+				<rom name="bfd_ntsc_debug_dc.bin" size="67108864" crc="c9822f5c" sha1="6956bd77351a91cdd22af454a8d410a3b9c829f0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="conkerdh" cloneof="conker" supported="no">
-		<description>Conker's Bad Fur Day (ECTS Demo, Decrypted)</description>
+		<description>Conker's Bad Fur Day (prototype 20000826, ECTS demo, decrypted)</description>
 		<year>2001?</year>
 		<publisher>Rare</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="67108864">
-				<rom name="conker_bfd_ects_dc.bin" size="67108864" crc="af9c5972" sha1="92575eed941324b9cd7d29df61e720b04d8b26cb" offset="0" />
+				<rom name="conker_bfd_ects_dc.bin" size="67108864" crc="af9c5972" sha1="92575eed941324b9cd7d29df61e720b04d8b26cb" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -2251,7 +2258,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NXOE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NXOE-0]" />
 			<feature name="u2" value="U2 [BU9850]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
@@ -2261,10 +2268,10 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="crusnusa">
-		<description>Cruis'n USA (Europe)</description>
+		<description>Cruis'n USA (Australia, Europe)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NUS-NCUP-EUR"/>
+		<info name="serial" value="NUS-NCUP-AUS, NUS-NCUP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="cruis'n usa (europe).bin" size="8388608" crc="6767eca4" sha1="6cc846aedcc31597842645bbb6030272cd9a82f0" offset="000000" />
@@ -2273,13 +2280,13 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="crusnusau" cloneof="crusnusa">
-		<description>Cruis'n USA (USA, Rev. 2)</description>
+		<description>Cruis'n USA (USA, rev 2)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NCUE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NCUE-2]" />
 			<feature name="u2" value="U2 [BU9850]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
@@ -2289,15 +2296,15 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="crusnusau1" cloneof="crusnusa">
-		<description>Cruis'n USA (USA, Rev. A)</description>
+		<description>Cruis'n USA (USA, rev 1)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NCUE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-01" />
-			<feature name="u1" value="NUS-NCUE-1" />
-			<feature name="u2" value="BU9850" />
-			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="u1" value="U1 [NUS-NCUE-1]" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN" />
 			<dataarea name="rom" size="8388608">
@@ -2349,9 +2356,9 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NCWE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-NCWE-0" />
-			<feature name="u2" value="BK16D 9851" />
-			<feature name="u3" value="CIC-NUS-6106" />
+			<feature name="u1" value="U1 [NUS-NCWE-0]" />
+			<feature name="u2" value="U2 [BK16D 9851]" />
+			<feature name="u3" value="U3 [CIC-NUS-6106]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="12582912">
@@ -2382,8 +2389,14 @@ patched out (+ a fix for internal checksum)
 		<info name="release" value="20001110"/>
 		<info name="alt_title" value="カスタムロボV2"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-03" />
+			<feature name="u1" value="U1 [NUS-NCZJ-0]" />
+			<feature name="u2" value="U2 [BK16D]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="16777216">
-				<rom name="custom robo v2 (japan).bin" size="16777216" crc="7bef9ecc" sha1="67ff98e6230470f0c3c209edb72869c715db2800" offset="000000" />
+				<rom name="nus-nczj-0.u1" size="16777216" crc="7bef9ecc" sha1="67ff98e6230470f0c3c209edb72869c715db2800" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2407,7 +2420,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NT4E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NT4E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
