@@ -236,8 +236,7 @@ public:
 	generalplus_gpac800_game_state(const machine_config& mconfig, device_type type, const char* tag) :
 		gcm394_game_state(mconfig, type, tag),
 		m_has_nand(false),
-		m_initial_copy_words(0x2000),
-		m_nandreadbase(0)
+		m_initial_copy_words(0x2000)
 	{
 	}
 
@@ -270,7 +269,6 @@ private:
 	int m_strippedsize;
 
 	int m_initial_copy_words;
-	int m_nandreadbase;
 	int m_vectorbase;
 };
 
@@ -370,7 +368,7 @@ READ8_MEMBER(generalplus_gpac800_game_state::read_nand)
 	if (!m_has_nand)
 		return 0x0000;
 
-	return m_strippedrom[(offset + m_nandreadbase) & (m_strippedsize - 1)];
+	return m_strippedrom[offset & (m_strippedsize - 1)];
 }
 
 READ16_MEMBER(gcm394_game_state::read_external_space)
@@ -1128,7 +1126,6 @@ void generalplus_gpac800_game_state::nand_tsm()
 	// the addresses written to the NAND device don't compensate for these data repeats, however dump seems ok as no other data is being repeated?
 	// reads after startup still need checking
 	nand_init210();
-	//m_nandreadbase = (0x2000 + 0x2000 + 0x8000 + 0x8000 + 0x8000) * 2;
 	m_maincpu->set_romtype(1);
 }
 
