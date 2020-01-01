@@ -148,7 +148,53 @@ void route16_state::init_route16c()
 	rom[0x756] = 0x07;
 }
 
+void route16_state::init_vscompmj() // only opcodes encrypted
+{
+	uint8_t *rom = memregion("cpu1")->base();
 
+	uint8_t unkn = 0x00;
+
+	static const uint8_t xor_table_00[0x08][0x08] =
+	{
+		{ 0x04, 0x01, 0x14, 0x14, 0x05, 0x10, 0x54, 0x05 }, // 0x0x and 0x2x
+		{ 0x15, 0x51, 0x01, 0x44, 0x50, 0x44, 0x11, 0x50 }, // 0x1x and 0x3x
+		{ 0x14, 0x50, 0x41, 0x15, 0x50, 0x15, 0x15, 0x41 }, // 0x4x and 0x6x
+		{ unkn, 0x04, 0x40, 0x11, 0x11, 0x45, 0x10, unkn }, // 0x5x and 0x7x
+		{ 0x40, unkn, 0x14, unkn, 0x01, 0x44, 0x14, 0x54 }, // 0x8x and 0xax
+		{ 0x11, 0x40, unkn, unkn, 0x14, 0x01, 0x54, 0x51 }, // 0x9x and 0xbx
+		{ 0x05, 0x45, 0x10, 0x55, unkn, 0x15, 0x55, 0x11 }, // 0xcx and 0xex
+		{ unkn, 0x41, 0x51, 0x10, 0x01, 0x44, 0x50, 0x50 }, // 0xdx and 0xfx
+	};
+
+	static const uint8_t xor_table_01[0x08][0x08] =
+	{
+		{ 0x40, 0x41, 0x45, 0x54, 0x44, 0x40, 0x55, 0x41 }, // 0x0x and 0x2x
+		{ 0x14, 0x14, 0x04, 0x45, 0x44, 0x01, 0x05, 0x05 }, // 0x1x and 0x3x
+		{ 0x40, 0x14, 0x01, 0x11, 0x45, 0x14, 0x04, 0x50 }, // 0x4x and 0x6x
+		{ 0x04, 0x40, 0x55, 0x55, 0x44, 0x40, 0x55, 0x55 }, // 0x5x and 0x7x
+		{ 0x15, 0x05, 0x14, 0x05, 0x01, unkn, 0x04, 0x04 }, // 0x8x and 0xax
+		{ 0x10, 0x04, 0x51, 0x01, 0x04, 0x04, 0x45, 0x51 }, // 0x9x and 0xbx
+		{ 0x11, 0x01, 0x44, 0x44, 0x05, 0x15, 0x10, 0x05 }, // 0xcx and 0xex
+		{ unkn, 0x14, 0x05, unkn, 0x01, 0x41, 0x04, unkn }, // 0xdx and 0xfx
+	};
+
+	for (int i = 0; i < 0x8000; i++)
+	{
+		uint8_t x = rom[i];
+
+		uint8_t row = (BIT(x, 4) +  (BIT(x, 6) << 1) + (BIT(x, 7) << 2));
+
+		uint8_t xor_v = x & 0x07;
+
+		switch(i & 0x01)
+		{
+			case 0x00: x ^= xor_table_00[row][xor_v]; break;
+			case 0x01: x ^= xor_table_01[row][xor_v]; break;
+		}
+
+		m_decrypted_opcodes[i] = x;
+	}
+}
 
 /*************************************
  *
@@ -361,7 +407,21 @@ void route16_state::jongpute_cpu1_map(address_map &map)
 	map(0x5800, 0x5800).rw(FUNC(route16_state::jongpute_p1_matrix_r), FUNC(route16_state::jongpute_input_port_matrix_w));
 	map(0x6800, 0x6800).w("ay8910", FUNC(ay8910_device::data_w));
 	map(0x6900, 0x6900).w("ay8910", FUNC(ay8910_device::address_w));
+	map(0x7000, 0x7fff).rom();
 	map(0x8000, 0xbfff).ram().share("videoram1");
+}
+
+void route16_state::vscompmj_cpu1_map(address_map &map)
+{
+	jongpute_cpu1_map(map);
+
+	map(0x6900, 0x6900).r("ay8910", FUNC(ay8910_device::data_r)); // TODO: check this, stuck notes
+	map(0x7000, 0x7fff).rom();
+}
+
+void route16_state::vscompmj_decrypted_opcodes(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
 }
 
 
@@ -783,7 +843,13 @@ void route16_state::jongpute(machine_config &config)
 	PALETTE(config.replace(), m_palette, palette_device::BGR_3BIT);
 }
 
+void route16_state::vscompmj(machine_config &config)
+{
+	jongpute(config);
 
+	m_cpu1->set_addrmap(AS_PROGRAM, &route16_state::vscompmj_cpu1_map);
+	m_cpu1->set_addrmap(AS_OPCODES, &route16_state::vscompmj_decrypted_opcodes);
+}
 
 /*************************************
  *
@@ -1130,6 +1196,25 @@ ROM_START( jongpute )
 	ROM_LOAD( "ju09",         0x0100, 0x0100, BAD_DUMP CRC(27d47624) SHA1(ee04ce8043216be8b91413b546479419fca2b917) )
 ROM_END
 
+ROM_START( vscompmj )
+	ROM_REGION( 0x8000, "cpu1", 0 ) // all 2732
+	ROM_LOAD( "j2_1.0r",           0x0000, 0x1000, CRC(e112ac58) SHA1(a274080dfd89c547335f93cb8f99e80ec7b972df) ) // 2732
+	ROM_LOAD( "j2_2.0n",           0x1000, 0x1000, CRC(c751c041) SHA1(69063549e616fdd9d175b47275331986f1d3e0bd) )
+	ROM_LOAD( "j2_3.0l",           0x2000, 0x1000, CRC(e85bf26b) SHA1(8bb6625433c9f86808a41bde7dd587bdc430b934) )
+	ROM_LOAD( "j2_4.0k",           0x3000, 0x1000, CRC(ead1b054) SHA1(fa0940391968541cdfd3d306c7bfd6781617b580) )
+	ROM_LOAD( "j2_5.0j",           0x7000, 0x1000, CRC(cbf49c08) SHA1(064054fd9e36c8a359926ade4fc10855d3058f01) )
+
+	ROM_REGION( 0x2000, "cpu2", 0 )
+	ROM_LOAD( "j2_6.0e",           0x0000, 0x1000, CRC(3a559328) SHA1(dd6333ddcc8aa6097d83b21cfde740b2cb7c908b) ) // 2732
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	// The upper 128 bytes are 0's, used by the hardware to blank the display
+	ROM_LOAD( "82s129.6k",         0x0000, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) )
+	ROM_LOAD( "82s129.6h",         0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) )
+
+	ROM_REGION( 0x0100, "proms2", 0 ) // currently unused by the emulation
+	ROM_LOAD( "82s129.9r",         0x0000, 0x0100, CRC(20ac25d8) SHA1(6f06472ac7fcb22c9060092a2d456be5d3ca6d5f) )
+ROM_END
 
 
 /*************************************
@@ -1155,3 +1240,4 @@ GAME( 1980, speakhlp, speakres, spacecho, spacecho, route16_state, empty_init,  
 
 GAME( 1981, jongpute, 0,        jongpute, jongpute, route16_state, empty_init,    ROT0,   "Alpha Denshi Co.",                 "Jongputer",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING )  // sampling voice is not emulated, bug with colors makes tile recognition difficult
 GAME( 1981, ttmahjng, jongpute, jongpute, jongpute, route16_state, empty_init,    ROT0,   "Alpha Denshi Co. (Taito license)", "T.T Mahjong", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, vscompmj, jongpute, vscompmj, jongpute, route16_state, init_vscompmj, ROT0,   "Nichibutsu",                       "VS Computer Mahjong", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // decryption might be incomplete (attract resets), inputs seem read differently
