@@ -17,6 +17,7 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
+#include "cpu/arm7/arm7core.h"
 
 #include "screen.h"
 
@@ -35,9 +36,20 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 private:
+
 	DECLARE_READ32_MEMBER(periphs_r);
 	DECLARE_WRITE32_MEMBER(periphs_w);
+
+	void set_timer_reload(int timer, uint32_t value);
+	void set_timer_ctrl(int timer, uint32_t value);
+	void check_timer(int timer);
+	void check_interrupts();
+
+	static constexpr device_timer_id TID_TIMER1 = 0;
+	static constexpr device_timer_id TID_TIMER2 = 1;
 
 	enum
 	{
@@ -115,19 +127,139 @@ private:
 		REG_LCDMUX    = 0x0e2c
 	};
 
+	enum
+	{
+		IRQ_EXTFIQ    = 0,	// FiqExternal
+		IRQ_BLINT     = 1,	// FiqBatLow
+		IRQ_WEINT     = 2,	// FiqWatchDog
+		IRQ_MCINT     = 3,	// FiqMediaChg
+		IRQ_CSINT     = 4,	// IrqCodec
+		IRQ_EINT1     = 5,	// IrqExt1
+		IRQ_EINT2     = 6,	// IrqExt2
+		IRQ_EINT3     = 7,	// IrqExt3
+		IRQ_TC1OI     = 8,	// IrqTimer1
+		IRQ_TC2OI     = 9,	// IrqTimer2
+		IRQ_RTCMI     = 10,	// IrqRtcMatch
+		IRQ_TINT      = 11,	// IrqTick
+		IRQ_UART1     = 12,	// IrqUart1
+		IRQ_UART2     = 13,	// IrqUart2
+		IRQ_LCDINT    = 14,	// IrqLcd
+		IRQ_SSEOTI    = 15,	// IrqSpi
+		IRQ_FIQ_MASK  = 0x000f,
+		IRQ_IRQ_MASK  = 0xfff0
+	};
+
 	void main_map(address_map &map);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<arm710t_cpu_device> m_maincpu;
+	emu_timer *m_timers[2];
+	uint32_t m_timer_reload[2];
+	uint32_t m_timer_ctrl[2];
+	uint32_t m_pending_ints;
+	uint32_t m_int_mask;
 };
 
 void psion5_state::machine_start()
 {
+	m_timers[0] = timer_alloc(TID_TIMER1);
+	m_timers[1] = timer_alloc(TID_TIMER2);
+	save_item(NAME(m_timer_reload[0]));
+	save_item(NAME(m_timer_reload[1]));
+	save_item(NAME(m_timer_ctrl[0]));
+	save_item(NAME(m_timer_ctrl[1]));
+	save_item(NAME(m_pending_ints));
+	save_item(NAME(m_int_mask));
 }
 
 void psion5_state::machine_reset()
 {
+	m_timers[0]->adjust(attotime::never);
+	m_timers[1]->adjust(attotime::never);
+	m_timer_reload[0] = m_timer_reload[1] = 0;
+	m_timer_ctrl[0] = m_timer_ctrl[1] = 0;
+	m_pending_ints = 0;
+	m_int_mask = 0;
+}
+
+void psion5_state::check_interrupts()
+{
+	m_maincpu->set_input_line(ARM7_FIRQ_LINE, m_pending_ints & m_int_mask & IRQ_FIQ_MASK);
+	m_maincpu->set_input_line(ARM7_IRQ_LINE, m_pending_ints & m_int_mask & IRQ_IRQ_MASK);
+}
+
+void psion5_state::check_timer(int timer)
+{
+	logerror("Checking Timer %d\n", timer + 1);
+	if (BIT(m_timer_ctrl[timer], 7))
+	{
+		logerror("Bit 7 is set, in %d * %08x\n", BIT(m_timer_ctrl[timer], 3) ? 1 : m_timer_reload[timer], BIT(m_timer_ctrl[timer], 3) ? 512000 : 36000000);
+		attotime interval = BIT(m_timer_ctrl[timer], 3) ? attotime::from_ticks(1, 512000) : attotime::from_ticks(m_timer_reload[timer], 36000000);
+		if (BIT(m_timer_ctrl[timer], 6))
+		{
+			logerror("Adjusting periodic\n");
+			m_timers[timer]->adjust(interval, 0, interval);
+		}
+		else
+		{
+			logerror("Adjusting non-periodic\n");
+			m_timers[timer]->adjust(interval, 0);
+		}
+	}
+	else
+	{
+		logerror("Cancelling\n");
+		m_timers[timer]->adjust(attotime::never);
+	}
+}
+
+void psion5_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id == TID_TIMER1)
+	{
+		logerror("Triggering 1\n");
+		m_pending_ints |= (1 << IRQ_TC1OI);
+	}
+	else if (id == TID_TIMER2)
+	{
+		logerror("Triggering 2\n");
+		m_pending_ints |= (1 << IRQ_TC2OI);
+	}
+	check_interrupts();
+}
+
+void psion5_state::set_timer_reload(int timer, uint32_t value)
+{
+	const uint32_t old = m_timer_reload[timer];
+	m_timer_reload[timer] = value;
+	logerror("%s: Timer %d reload = %08x\n", machine().describe_context(), timer + 1, value);
+	if (old != value)
+	{
+		m_timer_reload[timer] = value;
+		check_timer(timer);
+	}
+}
+
+void psion5_state::set_timer_ctrl(int timer, uint32_t value)
+{
+	const uint32_t old = m_timer_ctrl[timer];
+	const uint32_t changed = old ^ value;
+	m_timer_ctrl[timer] = value;
+	if (changed != 0)
+	{
+		attotime interval = BIT(m_timer_ctrl[timer], 3) ? attotime::from_ticks(1, 512000) : attotime::from_ticks(m_timer_reload[timer], 36000000);
+		if (BIT(changed, 6))
+		{
+			logerror("Timer %d, adjusting to an interval\n", timer + 1);
+			m_timers[timer]->adjust(m_timers[timer]->remaining(), 0, interval);
+		}
+		if (BIT(changed, 7))
+		{
+			logerror("Timer %d, just checking timer\n", timer + 1);
+			check_timer(timer);
+		}
+	}
 }
 
 READ32_MEMBER(psion5_state::periphs_r)
@@ -195,12 +327,15 @@ READ32_MEMBER(psion5_state::periphs_r)
 			break;
 
 		case REG_INTSR:
+			data = m_pending_ints;
 			logerror("%s: peripheral read, INTSR = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 		case REG_INTRSR:
+			data = m_pending_ints;
 			logerror("%s: peripheral read, INTRSR = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 		case REG_INTENS:
+			data = m_int_mask;
 			logerror("%s: peripheral read, INTENS = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 		case REG_INTENC:
@@ -247,24 +382,28 @@ READ32_MEMBER(psion5_state::periphs_r)
 			break;
 
 		case REG_TC1LOAD:
+			data = m_timer_reload[0];
 			logerror("%s: peripheral read, TC1LOAD = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 		case REG_TC1VAL:
 			logerror("%s: peripheral read, TC1VAL = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 		case REG_TC1CTRL:
+			data = m_timer_ctrl[0];
 			logerror("%s: peripheral read, TC1CTRL = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 		case REG_TC1EOI:
 			logerror("%s: peripheral read, TC1EOI = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 		case REG_TC2LOAD:
+			data = m_timer_reload[1];
 			logerror("%s: peripheral read, TC2LOAD = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 		case REG_TC2VAL:
 			logerror("%s: peripheral read, TC2VAL = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 		case REG_TC2CTRL:
+			data = m_timer_ctrl[1];
 			logerror("%s: peripheral read, TC2CTRL = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 		case REG_TC2EOI:
@@ -333,7 +472,7 @@ READ32_MEMBER(psion5_state::periphs_r)
 			logerror("%s: peripheral read, Unknown = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 	}
-	return 0;
+	return data;
 }
 
 WRITE32_MEMBER(psion5_state::periphs_w)
@@ -406,9 +545,11 @@ WRITE32_MEMBER(psion5_state::periphs_w)
 			logerror("%s: peripheral write, INTRSR = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 		case REG_INTENS:
+			m_int_mask |= data & mem_mask;
 			logerror("%s: peripheral write, INTENS = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 		case REG_INTENC:
+			m_int_mask &= ~(data & mem_mask);
 			logerror("%s: peripheral write, INTENC = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 		case REG_INTTEST1:
@@ -453,27 +594,35 @@ WRITE32_MEMBER(psion5_state::periphs_w)
 
 		case REG_TC1LOAD:
 			logerror("%s: peripheral write, TC1LOAD = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			set_timer_reload(0, data);
 			break;
 		case REG_TC1VAL:
 			logerror("%s: peripheral write, TC1VAL = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 		case REG_TC1CTRL:
 			logerror("%s: peripheral write, TC1CTRL = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			set_timer_ctrl(0, data);
 			break;
 		case REG_TC1EOI:
 			logerror("%s: peripheral write, TC1EOI = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			m_pending_ints &= ~(1 << IRQ_TC1OI);
+			check_interrupts();
 			break;
 		case REG_TC2LOAD:
 			logerror("%s: peripheral write, TC2LOAD = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			set_timer_reload(1, data);
 			break;
 		case REG_TC2VAL:
 			logerror("%s: peripheral write, TC2VAL = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 		case REG_TC2CTRL:
 			logerror("%s: peripheral write, TC2CTRL = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			set_timer_ctrl(1, data);
 			break;
 		case REG_TC2EOI:
 			logerror("%s: peripheral write, TC2EOI = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			m_pending_ints &= ~(1 << IRQ_TC2OI);
+			check_interrupts();
 			break;
 
 		case REG_BZCONT:
