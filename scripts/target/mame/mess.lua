@@ -3086,6 +3086,7 @@ createMESSProjects(_target, _subtarget, "psion")
 files {
 	MAME_DIR .. "src/mame/drivers/psion.cpp",
 	MAME_DIR .. "src/mame/includes/psion.h",
+	MAME_DIR .. "src/mame/drivers/psion5.cpp",
 	MAME_DIR .. "src/mame/machine/psion_pack.cpp",
 	MAME_DIR .. "src/mame/machine/psion_pack.h",
 }

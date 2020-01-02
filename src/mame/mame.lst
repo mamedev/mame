@@ -33824,6 +33824,9 @@ psionp350                       //
 psionp464                       //
 psionxp                         //
 
+@source:psion5.cpp
+psion5mx                        //
+
 @source:psx.cpp
 psa                             // 1995 Sony PlayStation (Asia-Pacific)
 pse                             // 1995 Sony PlayStation (Europe)

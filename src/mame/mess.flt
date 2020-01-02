@@ -688,6 +688,7 @@ proteus3.cpp
 ps2.cpp
 ps2sony.cpp
 psion.cpp
+psion5.cpp
 psx.cpp
 pt68k4.cpp
 ptcsol.cpp
