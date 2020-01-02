@@ -75,6 +75,9 @@ public:
 	DECLARE_WRITE32_MEMBER(sh4_des_keyh_w);		// 14000034
 	DECLARE_READ32_MEMBER(sh4_des_keyh_r);
 
+	DECLARE_WRITE32_MEMBER(memorymanager_w);
+	DECLARE_READ32_MEMBER(memorymanager_r);
+
 	DECLARE_READ64_MEMBER(i2cmem_dimm_r);
 	DECLARE_WRITE64_MEMBER(i2cmem_dimm_w);
 	DECLARE_READ8_MEMBER(pic_dimm_r);
@@ -112,6 +115,7 @@ private:
 	uint32_t dimm_status;
 	uint32_t sh4_unknown;
 	uint64_t dimm_des_key;
+	uint32_t memctl_regs[0x100 / 4];
 
 	// Note: voluntarily not saved into the state
 	uint8_t *dimm_data;
