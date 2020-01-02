@@ -111,7 +111,6 @@ arm710t_cpu_device::arm710t_cpu_device(const machine_config &mconfig, const char
 	: arm7_cpu_device(mconfig, ARM710T, tag, owner, clock, 4, ARCHFLAG_MODE26, ENDIANNESS_LITTLE)
 {
 	m_copro_id = ARM9_COPRO_ID_MFR_ARM
-			   | ARM9_COPRO_ID_ARCH_V4
 			   | ARM9_COPRO_ID_PART_ARM710
 			   | 0x00800000;
 }
