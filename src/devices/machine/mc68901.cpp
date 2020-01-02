@@ -61,105 +61,104 @@ DEFINE_DEVICE_TYPE(MC68901, mc68901_device, "mc68901", "Motorola MC68901 MFP")
 //**************************************************************************
 
 
-#define AER_GPIP_0              0x01
-#define AER_GPIP_1              0x02
-#define AER_GPIP_2              0x04
-#define AER_GPIP_3              0x08
-#define AER_GPIP_4              0x10
-#define AER_GPIP_5              0x20
-#define AER_GPIP_6              0x40
-#define AER_GPIP_7              0x80
+enum : u8 {
+	VR_S                  = 0x08
+};
 
+enum : u16 {
+	IR_GPIP_0             = 0x0001,
+	IR_GPIP_1             = 0x0002,
+	IR_GPIP_2             = 0x0004,
+	IR_GPIP_3             = 0x0008,
+	IR_TIMER_D            = 0x0010,
+	IR_TIMER_C            = 0x0020,
+	IR_GPIP_4             = 0x0040,
+	IR_GPIP_5             = 0x0080,
+	IR_TIMER_B            = 0x0100,
+	IR_XMIT_ERROR         = 0x0200,
+	IR_XMIT_BUFFER_EMPTY  = 0x0400,
+	IR_RCV_ERROR          = 0x0800,
+	IR_RCV_BUFFER_FULL    = 0x1000,
+	IR_TIMER_A            = 0x2000,
+	IR_GPIP_6             = 0x4000,
+	IR_GPIP_7             = 0x8000
+};
 
-#define VR_S                    0x08
+enum : u8 {
+	TCR_TIMER_STOPPED     = 0x00,
+	TCR_TIMER_DELAY_4     = 0x01,
+	TCR_TIMER_DELAY_10    = 0x02,
+	TCR_TIMER_DELAY_16    = 0x03,
+	TCR_TIMER_DELAY_50    = 0x04,
+	TCR_TIMER_DELAY_64    = 0x05,
+	TCR_TIMER_DELAY_100   = 0x06,
+	TCR_TIMER_DELAY_200   = 0x07,
+	TCR_TIMER_EVENT       = 0x08,
+	TCR_TIMER_PULSE_4     = 0x09,
+	TCR_TIMER_PULSE_10    = 0x0a,
+	TCR_TIMER_PULSE_16    = 0x0b,
+	TCR_TIMER_PULSE_50    = 0x0c,
+	TCR_TIMER_PULSE_64    = 0x0d,
+	TCR_TIMER_PULSE_100   = 0x0e,
+	TCR_TIMER_PULSE_200   = 0x0f,
+	TCR_TIMER_RESET       = 0x10
+};
 
+enum : u8 {
+	UCR_PARITY_ENABLED    = 0x04,
+	UCR_PARITY_EVEN       = 0x02,
+	UCR_PARITY_ODD        = 0x00,
+	UCR_WORD_LENGTH_8     = 0x00,
+	UCR_WORD_LENGTH_7     = 0x20,
+	UCR_WORD_LENGTH_6     = 0x40,
+	UCR_WORD_LENGTH_5     = 0x60,
+	UCR_WORD_LENGTH_MASK  = 0x60,
+	UCR_START_STOP_0_0    = 0x00,
+	UCR_START_STOP_1_1    = 0x08,
+	UCR_START_STOP_1_15   = 0x10,
+	UCR_START_STOP_1_2    = 0x18,
+	UCR_CLOCK_DIVIDE_16   = 0x80,
+	UCR_CLOCK_DIVIDE_1    = 0x00
+};
 
-#define IR_GPIP_0               0x0001
-#define IR_GPIP_1               0x0002
-#define IR_GPIP_2               0x0004
-#define IR_GPIP_3               0x0008
-#define IR_TIMER_D              0x0010
-#define IR_TIMER_C              0x0020
-#define IR_GPIP_4               0x0040
-#define IR_GPIP_5               0x0080
-#define IR_TIMER_B              0x0100
-#define IR_XMIT_ERROR           0x0200
-#define IR_XMIT_BUFFER_EMPTY    0x0400
-#define IR_RCV_ERROR            0x0800
-#define IR_RCV_BUFFER_FULL      0x1000
-#define IR_TIMER_A              0x2000
-#define IR_GPIP_6               0x4000
-#define IR_GPIP_7               0x8000
+enum : u8 {
+	RSR_RCV_ENABLE        = 0x01,
+	RSR_SYNC_STRIP_ENABLE = 0x02,
+	RSR_MATCH             = 0x04,
+	RSR_CHAR_IN_PROGRESS  = 0x04,
+	RSR_FOUND_SEARCH      = 0x08,
+	RSR_BREAK             = 0x08,
+	RSR_FRAME_ERROR       = 0x10,
+	RSR_PARITY_ERROR      = 0x20,
+	RSR_OVERRUN_ERROR     = 0x40,
+	RSR_BUFFER_FULL       = 0x80
+};
 
-
-#define TCR_TIMER_STOPPED       0x00
-#define TCR_TIMER_DELAY_4       0x01
-#define TCR_TIMER_DELAY_10      0x02
-#define TCR_TIMER_DELAY_16      0x03
-#define TCR_TIMER_DELAY_50      0x04
-#define TCR_TIMER_DELAY_64      0x05
-#define TCR_TIMER_DELAY_100     0x06
-#define TCR_TIMER_DELAY_200     0x07
-#define TCR_TIMER_EVENT         0x08
-#define TCR_TIMER_PULSE_4       0x09
-#define TCR_TIMER_PULSE_10      0x0a
-#define TCR_TIMER_PULSE_16      0x0b
-#define TCR_TIMER_PULSE_50      0x0c
-#define TCR_TIMER_PULSE_64      0x0d
-#define TCR_TIMER_PULSE_100     0x0e
-#define TCR_TIMER_PULSE_200     0x0f
-#define TCR_TIMER_RESET         0x10
-
-
-#define UCR_PARITY_ENABLED      0x04
-#define UCR_PARITY_EVEN         0x02
-#define UCR_PARITY_ODD          0x00
-#define UCR_WORD_LENGTH_8       0x00
-#define UCR_WORD_LENGTH_7       0x20
-#define UCR_WORD_LENGTH_6       0x40
-#define UCR_WORD_LENGTH_5       0x60
-#define UCR_START_STOP_0_0      0x00
-#define UCR_START_STOP_1_1      0x08
-#define UCR_START_STOP_1_15     0x10
-#define UCR_START_STOP_1_2      0x18
-#define UCR_CLOCK_DIVIDE_16     0x80
-#define UCR_CLOCK_DIVIDE_1      0x00
-
-
-#define RSR_RCV_ENABLE          0x01
-#define RSR_SYNC_STRIP_ENABLE   0x02
-#define RSR_MATCH               0x04
-#define RSR_CHAR_IN_PROGRESS    0x04
-#define RSR_FOUND_SEARCH        0x08
-#define RSR_BREAK               0x08
-#define RSR_FRAME_ERROR         0x10
-#define RSR_PARITY_ERROR        0x20
-#define RSR_OVERRUN_ERROR       0x40
-#define RSR_BUFFER_FULL         0x80
-
-#define TSR_XMIT_ENABLE         0x01
-#define TSR_OUTPUT_HI_Z         0x00
-#define TSR_OUTPUT_LOW          0x02
-#define TSR_OUTPUT_HIGH         0x04
-#define TSR_OUTPUT_LOOP         0x06
-#define TSR_OUTPUT_MASK         0x06
-#define TSR_BREAK               0x08
-#define TSR_END_OF_XMIT         0x10
-#define TSR_AUTO_TURNAROUND     0x20
-#define TSR_UNDERRUN_ERROR      0x40
-#define TSR_BUFFER_EMPTY        0x80
+enum : u8 {
+	TSR_XMIT_ENABLE       = 0x01,
+	TSR_OUTPUT_HI_Z       = 0x00,
+	TSR_OUTPUT_LOW        = 0x02,
+	TSR_OUTPUT_HIGH       = 0x04,
+	TSR_OUTPUT_LOOP       = 0x06,
+	TSR_OUTPUT_MASK       = 0x06,
+	TSR_BREAK             = 0x08,
+	TSR_END_OF_XMIT       = 0x10,
+	TSR_AUTO_TURNAROUND   = 0x20,
+	TSR_UNDERRUN_ERROR    = 0x40,
+	TSR_BUFFER_EMPTY      = 0x80
+};
 
 #define DIVISOR PRESCALER[data & 0x07]
 
 
-const int mc68901_device::INT_MASK_GPIO[] =
+const u16 mc68901_device::INT_MASK_GPIO[] =
 {
 	IR_GPIP_0, IR_GPIP_1, IR_GPIP_2, IR_GPIP_3,
 	IR_GPIP_4, IR_GPIP_5, IR_GPIP_6, IR_GPIP_7
 };
 
 
-const int mc68901_device::INT_MASK_TIMER[] =
+const u16 mc68901_device::INT_MASK_TIMER[] =
 {
 	IR_TIMER_A, IR_TIMER_B, IR_TIMER_C, IR_TIMER_D
 };
@@ -190,7 +189,7 @@ inline void mc68901_device::check_interrupts()
 	}
 }
 
-inline void mc68901_device::take_interrupt(uint16_t mask)
+inline void mc68901_device::take_interrupt(u16 mask)
 {
 	m_ipr |= mask;
 
@@ -312,7 +311,7 @@ inline void mc68901_device::gpio_input(int bit, int state)
 
 void mc68901_device::gpio_output()
 {
-	uint8_t new_gpio_output = m_gpip & m_ddr;
+	u8 new_gpio_output = m_gpip & m_ddr;
 
 	if (m_gpio_output != new_gpio_output)
 	{
@@ -329,7 +328,7 @@ void mc68901_device::gpio_output()
 //  mc68901_device - constructor
 //-------------------------------------------------
 
-mc68901_device::mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mc68901_device::mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MC68901, tag, owner, clock),
 		device_serial_interface(mconfig, *this),
 		m_timer_clock(0),
@@ -439,24 +438,24 @@ void mc68901_device::device_reset()
 	memset(m_ti, 0, sizeof(m_ti));
 	memset(m_to, 0, sizeof(m_to));
 
-	register_w(REGISTER_GPIP, 0);
-	register_w(REGISTER_AER, 0);
-	register_w(REGISTER_DDR, 0);
-	register_w(REGISTER_IERA, 0);
-	register_w(REGISTER_IERB, 0);
-	register_w(REGISTER_IPRA, 0);
-	register_w(REGISTER_IPRB, 0);
-	register_w(REGISTER_ISRA, 0);
-	register_w(REGISTER_ISRB, 0);
-	register_w(REGISTER_IMRA, 0);
-	register_w(REGISTER_IMRB, 0);
-	register_w(REGISTER_VR, 0);
-	register_w(REGISTER_TACR, 0);
-	register_w(REGISTER_TBCR, 0);
-	register_w(REGISTER_TCDCR, 0);
-	register_w(REGISTER_SCR, 0);
-	register_w(REGISTER_UCR, 0);
-	register_w(REGISTER_RSR, 0);
+	write(REGISTER_GPIP, 0);
+	write(REGISTER_AER, 0);
+	write(REGISTER_DDR, 0);
+	write(REGISTER_IERA, 0);
+	write(REGISTER_IERB, 0);
+	write(REGISTER_IPRA, 0);
+	write(REGISTER_IPRB, 0);
+	write(REGISTER_ISRA, 0);
+	write(REGISTER_ISRB, 0);
+	write(REGISTER_IMRA, 0);
+	write(REGISTER_IMRB, 0);
+	write(REGISTER_VR, 0);
+	write(REGISTER_TACR, 0);
+	write(REGISTER_TBCR, 0);
+	write(REGISTER_TCDCR, 0);
+	write(REGISTER_SCR, 0);
+	write(REGISTER_UCR, 0);
+	write(REGISTER_RSR, 0);
 
 	transmit_register_reset();
 	receive_register_reset();
@@ -555,7 +554,7 @@ void mc68901_device::rcv_complete()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( mc68901_device::read )
+u8 mc68901_device::read(offs_t offset)
 {
 	switch (offset)
 	{
@@ -586,7 +585,7 @@ READ8_MEMBER( mc68901_device::read )
 	case REGISTER_UCR:   return m_ucr;
 	case REGISTER_RSR:
 		{
-			uint8_t rsr = m_rsr;
+			u8 rsr = m_rsr;
 			if (!machine().side_effects_disabled())
 				m_rsr &= ~RSR_OVERRUN_ERROR;
 			return rsr;
@@ -595,7 +594,7 @@ READ8_MEMBER( mc68901_device::read )
 	case REGISTER_TSR:
 		{
 			/* clear UE bit (in reality, this won't be cleared until one full clock cycle of the transmitter has passed since the bit was set) */
-			uint8_t tsr = m_tsr;
+			u8 tsr = m_tsr;
 			if (!machine().side_effects_disabled())
 				m_tsr &= ~TSR_UNDERRUN_ERROR;
 			return tsr;
@@ -621,10 +620,10 @@ READ8_MEMBER( mc68901_device::read )
 
 
 //-------------------------------------------------
-//  register_w -
+//  write -
 //-------------------------------------------------
 
-void mc68901_device::register_w(offs_t offset, uint8_t data)
+void mc68901_device::write(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -1110,13 +1109,8 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE8_MEMBER( mc68901_device::write )
-{
-	register_w(offset, data);
-}
 
-
-uint8_t mc68901_device::get_vector()
+u8 mc68901_device::get_vector()
 {
 	for (int ch = 15; ch >= 0; ch--)
 	{
