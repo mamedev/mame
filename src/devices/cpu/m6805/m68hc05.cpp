@@ -36,7 +36,7 @@ determines both the COP watchdog timeout and the real-time interrupt rate
 #define LOG_UART    (1U <<  5)
 #define LOG_SPI     (1U <<  6)
 
-#define VERBOSE (LOG_GENERAL | LOG_INT | LOG_COP | LOG_UART)
+#define VERBOSE (LOG_GENERAL | LOG_INT | LOG_COP | LOG_UART | LOG_SPI)
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
 

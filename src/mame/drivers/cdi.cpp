@@ -361,6 +361,7 @@ INPUT_CHANGED_MEMBER(cdimono2_state::mouse_update)
 
 	if (BIT(state, 4))
 	{
+		logerror("Ctrl pressed\n");
 		m_mouse_buffer[1] |= 0x20;
 	}
 	if (BIT(state, 5))
@@ -917,11 +918,17 @@ WRITE8_MEMBER(cdimono2_state::servo_porta_w)
 WRITE8_MEMBER(cdimono2_state::servo_portb_w)
 {
 	logerror("%s: servo_portb_w: %02x & %02x\n", machine().describe_context(), data, mem_mask);
+	const uint8_t old = m_servo_portb_data;
 	m_servo_portb_data = data;
 	if (BIT(data, 7))
 		m_slave->ss_in(0);
 	else
 		m_slave->ss_in(1);
+
+	if (BIT(old, 5) != BIT(data, 5))
+	{
+		printf("New TMOUT: %d\n", BIT(data, 5));
+	}
 }
 
 WRITE8_MEMBER(cdimono2_state::servo_portc_w)
