@@ -213,6 +213,7 @@ public:
 	void gj5000(machine_config &config);
 	void gjrstar(machine_config &config);
 	void gjmovie(machine_config &config);
+        void pc1kjr(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -307,6 +308,13 @@ void geniusjr_state::gls(machine_config &config)
 	subdevice<software_list_device>("cart_list")->set_original("gls");
 }
 
+void geniusjr_state::pc1kjr(machine_config &config)
+{
+	gjrstar(config);
+
+	subdevice<software_list_device>("cart_list")->set_original("pc1000jr");
+}
+
 
 ROM_START( gj4000 )
 	ROM_REGION( 0x2000, "maincpu", 0 )
@@ -394,6 +402,51 @@ ROM_START( gls )
 	ROM_LOAD( "27-5635-00.u2", 0x000000, 0x40000, CRC(bc3c0587) SHA1(fe98f162bd80d96ce3264087b5869f4505955464))
 ROM_END
 
+/* 
+   VTech PC 1000 Jr.
+Two PCBs each one with one glob (LCD controller and main PCB with the CPU glob and the external ROM). No speech chip.
+Custom LCD screen with the following layout:
+   _________  ________________  _________
+   |        | |               | |        |
+   | CUSTOM | |     31x16     | | CUSTOM |
+   |SEGMENTS| |   DOT MATRIX  | |SEGMENTS|
+   |________| |_______________| |________|
+   ______________________________________
+   |_____________________________________|
+        16 5x8 alphanumeric characters
+
+Has a plastic punched cards reader (6 holes). Each game cartridge has its own punched cards deck,
+and the internal ROM supports the following deck (1=hole, punches on the bottom side of the card):
+
+Card Title           Code
+1A   WORD POWER      111110
+2A   PICTURE RACE    111100
+3A   SCIENCE🔍SEARCH 111011
+4A   DAY TO DAY      111000
+5A   SENTENCE JUMBLE 110110
+6A   ADDITION+       101110
+7A   MULTIPLICATIONX 101100
+8A   CRAZY MAZES     101010
+9A   PIANO🎹         100110
+1B   S·P·E·L·L·I·N·G 011111
+2B   WORD DECODER    001111
+3B   CLASSIC TRIVIA  010111
+4B   WORLD QUEST     000111
+5B   NUMBER? RIDDLES 011011
+6B   SUBTRACTION-    011101
+7B   DIVISION÷       001101
+8B   MASTERPIECE     010101
+9B   GUITAR🎸        011001
+
+*/
+ROM_START( pc1kjr )
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "hc05_internal.bin", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x20000, "extrom", 0 )
+	ROM_LOAD( "lh531g04.u1", 0x000000, 0x20000, CRC(17829e2f) SHA1(bfcc8aede5673ec6f9d22a31f9a480908e0187f2))
+ROM_END
+
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY   FULLNAME                             FLAGS
 COMP( 1996, gj4000,   0,       0,      gj4000,   geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Junior 4000 (Germany)",      MACHINE_IS_SKELETON )
@@ -406,3 +459,4 @@ COMP( 1998, gj5000,   0,       0,      gj5000,   geniusjr, geniusjr_state, empty
 COMP( 1993, gln,      0,       0,      gln,      geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Leader Notebook",            MACHINE_IS_SKELETON )
 COMP( 1993, pitagor,  gln,     0,      gln,      geniusjr, geniusjr_state, empty_init, "VTech",  "Pitagorin",                         MACHINE_IS_SKELETON )
 COMP( 1995, gls,      0,       0,      gls,      geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Leader Select",              MACHINE_IS_SKELETON )
+COMP( 199?, pc1kjr,   0,       0,      pc1kjr,   geniusjr, geniusjr_state, empty_init, "VTech",  "PreComputer 1000 Junior",           MACHINE_IS_SKELETON )

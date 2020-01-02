@@ -14492,6 +14492,7 @@ gln                             // Genius Leader Notebook
 pitagor                         // Pitagorin
 gls                             // Genius Leader Select
 pitagjr                         // Pitagorin Junior
+pc1kjr                          // PreComputer 1000 Junior
 
 @source:genpc.cpp
 pc                              // 1987 PC with CGA
