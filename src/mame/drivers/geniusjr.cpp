@@ -459,4 +459,4 @@ COMP( 1998, gj5000,   0,       0,      gj5000,   geniusjr, geniusjr_state, empty
 COMP( 1993, gln,      0,       0,      gln,      geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Leader Notebook",            MACHINE_IS_SKELETON )
 COMP( 1993, pitagor,  gln,     0,      gln,      geniusjr, geniusjr_state, empty_init, "VTech",  "Pitagorin",                         MACHINE_IS_SKELETON )
 COMP( 1995, gls,      0,       0,      gls,      geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Leader Select",              MACHINE_IS_SKELETON )
-COMP( 199?, pc1kjr,   0,       0,      pc1kjr,   geniusjr, geniusjr_state, empty_init, "VTech",  "PreComputer 1000 Junior",           MACHINE_IS_SKELETON )
+COMP( 1991, pc1kjr,   0,       0,      pc1kjr,   geniusjr, geniusjr_state, empty_init, "VTech",  "PreComputer 1000 Junior",           MACHINE_IS_SKELETON )
