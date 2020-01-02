@@ -2,8 +2,14 @@
 // copyright-holders:Sandro Ronco
 /**********************************************************************
 
-    Mephisto Sensors Board emulation
-    Mephisto Display Modul emulation
+Mephisto Sensors Board emulation
+- Modular
+- Muenchen
+- Exclusive
+
+Mephisto Display Modul emulation
+
+This device can also apply to non-modular boards if I/O is same
 
 *********************************************************************/
 
@@ -18,7 +24,7 @@
 
 DEFINE_DEVICE_TYPE(MEPHISTO_SENSORS_BOARD, mephisto_sensors_board_device, "msboard", "Mephisto Sensors Board")
 DEFINE_DEVICE_TYPE(MEPHISTO_BUTTONS_BOARD, mephisto_buttons_board_device, "mbboard", "Mephisto Buttons Board")
-DEFINE_DEVICE_TYPE(MEPHISTO_DISPLAY_MODUL, mephisto_display_modul_device, "mdisplay_modul",  "Mephisto Display Modul")
+DEFINE_DEVICE_TYPE(MEPHISTO_DISPLAY_MODUL, mephisto_display_modul_device, "mdisplay_modul", "Mephisto Display Modul")
 
 
 //***************************************************************************
@@ -46,7 +52,7 @@ void mephisto_board_device::set_config(machine_config &config, sensorboard_devic
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(8, 8);
-	m_led_pwm->output_x().set(FUNC(mephisto_sensors_board_device::refresh_leds_w));
+	m_led_pwm->output_x().set(FUNC(mephisto_board_device::refresh_leds_w));
 }
 
 
@@ -113,7 +119,7 @@ void mephisto_board_device::device_reset()
 WRITE8_MEMBER( mephisto_board_device::refresh_leds_w )
 {
 	if (!m_disable_leds)
-		m_led_out[offset >> 6 | (offset & 7) << 3] = data;
+		m_led_out[(offset >> 6 & 7) | (offset & 7) << 3] = data;
 }
 
 READ8_MEMBER( mephisto_board_device::input_r )

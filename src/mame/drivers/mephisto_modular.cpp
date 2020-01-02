@@ -25,14 +25,15 @@ No Mephisto modules were released anymore after Saitek took over H+G, engine is 
 to be same as Saitek's 1996 Mephisto London 68030 (limited release TM version).
 
 TODO:
-- add Bavaria sensor support
 - add the missing very rare 'TM' Tournament Machines
 - match I/S= diag speed test with real hardware (good test for proper waitstates)
-- remove gen32/gen32l ROM patch
+- remove gen32/gen32l ROM patch, also related to waitstates
 
 Undocumented buttons:
 - holding ENTER and LEFT cursor on boot runs diagnostics
 - holding UP and RIGHT cursor on boot will clear the battery backed RAM
+
+===============================================================================
 
 Bavaria piece recognition board:
 -------------------------------------------------
@@ -44,10 +45,10 @@ Bavaria piece recognition board:
 |                                               |
 -------------------------------------------------
 XTAL = 7.37280MHz
-ROM = TC57256AD-12, sinus table
+ROM = TC57256AD-12, sine table
 
 Only usable with Weltmeister modules, Portorose until London (aka this MAME driver)
-Also, it was patented with DE4207534.
+It does not work on Portorose 1.01. See German patent DE4207534 for detailed description.
 
 Each piece has a Tank circuit, and in each square of the board there is a coil.
 By scanning all the squares at different frequencies, the resonance frequency
@@ -57,6 +58,13 @@ Coil resonance frequency:
 wJ,  bJ,  wK,  bK,  wQ,  bQ,  wP,  bP,  wB,  bB,  wN,  bN,  wR,  bR  (J = Joker)
 460, 421, 381, 346, 316, 289, 259, 238, 217, 203, 180, 167, 154, 138 kHz
 14,  13,  12,  11,  10,  9,   8,   7,   6,   5,   4,   3,   2,   1   piece ID
+
+In MAME, to switch between the magnets chessboard and the Bavaria board, there's
+a configuration port. It's also doable by clicking on the sensorboard UI header
+(where it says "SB.MAGNETS" or "SB.BAVARIA"). The board gets detected at boot,
+so restart or reset(F3) afterwards.
+
+Reminder: unsupported on Almeria and Portorose 1.01, this is not a bug.
 
 ******************************************************************************/
 
@@ -68,7 +76,6 @@ wJ,  bJ,  wK,  bK,  wQ,  bQ,  wP,  bP,  wB,  bB,  wN,  bN,  wR,  bR  (J = Joker)
 #include "machine/timer.h"
 #include "machine/sensorboard.h"
 #include "machine/mmboard.h"
-#include "video/pwm.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -88,9 +95,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_board(*this, "board"),
-		m_led_pwm(*this, "led_pwm"),
-		m_bav_busy(*this, "bav_busy"),
-		m_led_out(*this, "led%u", 0U)
+		m_bav_busy(*this, "bav_busy")
 	{ }
 
 	// machine configs
@@ -104,6 +109,8 @@ public:
 
 	void init_gen32();
 
+	DECLARE_INPUT_CHANGED_MEMBER(switch_sensor_type) { set_sbtype(newval); }
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -111,10 +118,8 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<sensorboard_device> m_board;
-	required_device<pwm_display_device> m_led_pwm;
+	required_device<mephisto_board_device> m_board;
 	required_device<timer_device> m_bav_busy;
-	output_finder<64> m_led_out;
 
 	// address maps
 	void alm16_mem(address_map &map);
@@ -127,30 +132,25 @@ private:
 	void nvram_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(bavaria_w);
 	DECLARE_READ8_MEMBER(bavaria1_r);
 	DECLARE_READ8_MEMBER(bavaria2_r);
 
-	u8 m_mux = 0;
-	u8 m_led_data = 0;
+	u8 spawn_cb(offs_t offset);
+	void set_sbtype(ioport_value newval);
+
 	u8 m_bav_data = 0;
 };
 
 void mmodular_state::machine_start()
 {
-	m_led_out.resolve();
-
 	// register for savestates
-	save_item(NAME(m_mux));
-	save_item(NAME(m_led_data));
 	save_item(NAME(m_bav_data));
 }
 
 void mmodular_state::machine_reset()
 {
+	set_sbtype(ioport("FAKE")->read() & 1);
 	m_bav_data = 0;
 }
 
@@ -168,35 +168,12 @@ void mmodular_state::init_gen32()
     I/O
 ******************************************************************************/
 
-WRITE8_MEMBER(mmodular_state::mux_w)
-{
-	// d0-d7: input/led mux
-	m_mux = ~data;
-	m_led_pwm->matrix(m_mux, m_led_data);
-}
-
-WRITE8_MEMBER(mmodular_state::led_w)
-{
-	// d0-d7: led data
-	m_led_data = data;
-	m_led_pwm->matrix(m_mux, m_led_data);
-}
-
-READ8_MEMBER(mmodular_state::input_r)
-{
-	u8 data = 0;
-
-	// read magnet sensors
-	for (int i = 0; i < 8; i++)
-		if (BIT(m_mux, i))
-			data |= m_board->read_rank(i);
-
-	return ~data;
-}
-
 WRITE8_MEMBER(mmodular_state::bavaria_w)
 {
-	// d0-d5: select square?
+	if (!m_board->get()->is_inductive())
+		return;
+
+	// d0-d5: select square
 	// d6: no function?
 	// d7: start search
 	if (m_bav_data & ~data & 0x80)
@@ -207,18 +184,34 @@ WRITE8_MEMBER(mmodular_state::bavaria_w)
 
 READ8_MEMBER(mmodular_state::bavaria1_r)
 {
+	if (!m_board->get()->is_inductive())
+		return 0;
+
 	// d0-d3: piece id
 	// other: unused?
-	return 0;
+	static const u8 piece_id[0x10] =
+		{ 0, 8, 4, 6, 2, 10, 12, 7, 3, 5, 1, 9, 11, 14, 13, 0 };
+
+	int x = m_bav_data >> 3 & 7;
+	int y = m_bav_data & 7;
+
+	return piece_id[m_board->get()->read_sensor(x, y) & 0xf];
 }
 
 READ8_MEMBER(mmodular_state::bavaria2_r)
 {
-	return 0;
+	if (!m_board->get()->is_inductive())
+		return 0;
 
 	// d7: busy signal
 	// other: unused?
 	return m_bav_busy->enabled() ? 0x80 : 0;
+}
+
+u8 mmodular_state::spawn_cb(offs_t offset)
+{
+	// ignore jokers
+	return (!m_board->get()->is_inductive() && offset > 12) ? 0 : offset;
 }
 
 
@@ -238,9 +231,9 @@ void mmodular_state::alm16_mem(address_map &map)
 	map(0x000000, 0x01ffff).rom();
 	map(0x400000, 0x47ffff).ram();
 	map(0x800000, 0x803fff).m("nvram_map", FUNC(address_map_bank_device::amap8)).umask16(0xff00);
-	map(0xc00000, 0xc00000).r(FUNC(mmodular_state::input_r));
-	map(0xc80000, 0xc80000).w(FUNC(mmodular_state::mux_w));
-	map(0xd00000, 0xd00000).w(FUNC(mmodular_state::led_w));
+	map(0xc00000, 0xc00000).r("board", FUNC(mephisto_board_device::input_r)); // 0xff on Bavaria
+	map(0xc80000, 0xc80000).w("board", FUNC(mephisto_board_device::mux_w));
+	map(0xd00000, 0xd00000).w("board", FUNC(mephisto_board_device::led_w));
 	map(0xd00000, 0xd00001).nopr(); // clr.b
 	map(0xf00000, 0xf00003).portr("KEY1");
 	map(0xf00004, 0xf00007).portr("KEY2");
@@ -273,9 +266,9 @@ void mmodular_state::alm32_mem(address_map &map)
 	map(0x800000ec, 0x800000ef).portr("KEY1");
 	map(0x800000f4, 0x800000f7).portr("KEY2");
 	map(0x800000f8, 0x800000fb).portr("KEY3");
-	map(0x800000fc, 0x800000fc).r(FUNC(mmodular_state::input_r));
-	map(0x88000000, 0x88000007).w(FUNC(mmodular_state::mux_w)).umask32(0xff000000);
-	map(0x90000000, 0x90000007).w(FUNC(mmodular_state::led_w)).umask32(0xff000000);
+	map(0x800000fc, 0x800000fc).r("board", FUNC(mephisto_board_device::input_r));
+	map(0x88000000, 0x88000007).w("board", FUNC(mephisto_board_device::mux_w)).umask32(0xff000000);
+	map(0x90000000, 0x90000007).w("board", FUNC(mephisto_board_device::led_w)).umask32(0xff000000);
 	map(0xa0000000, 0xa0000000).w("display", FUNC(mephisto_display_modul_device::latch_w));
 	map(0xa0000010, 0xa0000010).w("display", FUNC(mephisto_display_modul_device::io_w));
 	map(0xa8000000, 0xa8007fff).m("nvram_map", FUNC(address_map_bank_device::amap8)).umask32(0xff000000);
@@ -303,9 +296,9 @@ void mmodular_state::gen32_mem(address_map &map)
 	map(0x00000000, 0x0003ffff).rom();
 	map(0x40000000, 0x4007ffff).ram();
 	map(0x80000000, 0x8003ffff).ram();
-	map(0xc0000000, 0xc0000000).r(FUNC(mmodular_state::input_r));
-	map(0xc8000004, 0xc8000004).w(FUNC(mmodular_state::mux_w));
-	map(0xd0000004, 0xd0000004).w(FUNC(mmodular_state::led_w));
+	map(0xc0000000, 0xc0000000).r("board", FUNC(mephisto_board_device::input_r));
+	map(0xc8000004, 0xc8000004).w("board", FUNC(mephisto_board_device::mux_w));
+	map(0xd0000004, 0xd0000004).w("board", FUNC(mephisto_board_device::led_w));
 	map(0xd8000004, 0xd8000004).r(FUNC(mmodular_state::bavaria1_r));
 	map(0xd8000008, 0xd8000008).w(FUNC(mmodular_state::bavaria_w));
 	map(0xd800000c, 0xd800000c).r(FUNC(mmodular_state::bavaria2_r));
@@ -323,7 +316,44 @@ void mmodular_state::gen32_mem(address_map &map)
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( alm16 )
+static INPUT_PORTS_START( bavaria )
+	PORT_START("FAKE")
+	PORT_CONFNAME( 0x01, 0x01, "Board Sensors" ) PORT_CHANGED_MEMBER(DEVICE_SELF, mmodular_state, switch_sensor_type, 0)
+	PORT_CONFSETTING(    0x01, "Magnets (Exclusive)" ) // or Muenchen/Modular
+	PORT_CONFSETTING(    0x00, "Induction (Bavaria)" )
+INPUT_PORTS_END
+
+void mmodular_state::set_sbtype(ioport_value newval)
+{
+	m_board->get()->set_type(newval ? sensorboard_device::MAGNETS : sensorboard_device::INDUCTIVE);
+
+	if (machine().phase() == machine_phase::RUNNING)
+	{
+		m_board->get()->cancel_hand();
+		m_board->get()->refresh();
+	}
+}
+
+
+static INPUT_PORTS_START( gen32 )
+	PORT_INCLUDE( bavaria )
+
+	PORT_START("KEY1")
+	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("ENT")    PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("LEFT")   PORT_CODE(KEYCODE_LEFT)
+
+	PORT_START("KEY2")
+	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("UP")     PORT_CODE(KEYCODE_UP)
+	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("DOWN")   PORT_CODE(KEYCODE_DOWN)
+
+	PORT_START("KEY3")
+	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("CL")     PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL)
+	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("RIGHT")  PORT_CODE(KEYCODE_RIGHT)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( port16 )
+	PORT_INCLUDE( bavaria )
+
 	PORT_START("KEY1")
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYPAD)      PORT_NAME("LEFT")   PORT_CODE(KEYCODE_LEFT)
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYPAD)      PORT_NAME("ENT")    PORT_CODE(KEYCODE_ENTER)
@@ -337,7 +367,9 @@ static INPUT_PORTS_START( alm16 )
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYPAD)      PORT_NAME("CL")     PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( alm32 )
+static INPUT_PORTS_START( port32 )
+	PORT_INCLUDE( bavaria )
+
 	PORT_START("KEY1")
 	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_KEYPAD)       PORT_NAME("RIGHT")  PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_KEYPAD)       PORT_NAME("CL")     PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL)
@@ -351,18 +383,18 @@ static INPUT_PORTS_START( alm32 )
 	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_KEYPAD)       PORT_NAME("ENT")    PORT_CODE(KEYCODE_ENTER)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( gen32 )
-	PORT_START("KEY1")
-	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("ENT")    PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("LEFT")   PORT_CODE(KEYCODE_LEFT)
+static INPUT_PORTS_START( alm16 )
+	PORT_INCLUDE( port16 )
 
-	PORT_START("KEY2")
-	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("UP")     PORT_CODE(KEYCODE_UP)
-	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("DOWN")   PORT_CODE(KEYCODE_DOWN)
+	PORT_MODIFY("FAKE")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+INPUT_PORTS_END
 
-	PORT_START("KEY3")
-	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("CL")     PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL)
-	PORT_BIT(0x02000000, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("RIGHT")  PORT_CODE(KEYCODE_RIGHT)
+static INPUT_PORTS_START( alm32 )
+	PORT_INCLUDE( port32 )
+
+	PORT_MODIFY("FAKE")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 
@@ -381,16 +413,14 @@ void mmodular_state::alm16(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	ADDRESS_MAP_BANK(config, "nvram_map").set_map(&mmodular_state::nvram_map).set_options(ENDIANNESS_BIG, 8, 13);
 
-	TIMER(config, "bav_busy").configure_generic(nullptr);
+	MEPHISTO_SENSORS_BOARD(config, m_board);
+	m_board->subdevice<sensorboard_device>("board")->set_spawnpoints(12+2); // 2 jokers
+	m_board->subdevice<sensorboard_device>("board")->spawn_cb().set(FUNC(mmodular_state::spawn_cb));
 
-	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
-	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
-	m_board->set_delay(attotime::from_msec(150));
+	TIMER(config, "bav_busy").configure_generic(nullptr);
 
 	/* video hardware */
 	MEPHISTO_DISPLAY_MODUL(config, "display");
-	PWM_DISPLAY(config, m_led_pwm).set_size(8, 8);
-	m_led_pwm->output_x().set([this](offs_t offset, u8 data) { m_led_out[offset >> 6 | (offset & 7) << 3] = data; });
 	config.set_default_layout(layout_mephisto_alm16);
 }
 
@@ -562,13 +592,13 @@ ROM_END
 /*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS           INIT        COMPANY             FULLNAME                     FLAGS */
 CONS( 1988, alm32,   0,       0,      alm32,   alm32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 32 Bit",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1988, alm16,   alm32,   0,      alm16,   alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 16 Bit",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, port32,  0,       0,      port32,  alm32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, port16,  port32,  0,      port16,  alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, lyon32,  0,       0,      port32,  alm32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 32 Bit",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, lyon16,  lyon32,  0,      port16,  alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 16 Bit",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, van32,   0,       0,      van32,   alm32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, van16,   van32,   0,      van16,   alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, port32,  0,       0,      port32,  port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, port16,  port32,  0,      port16,  port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, lyon32,  0,       0,      port32,  port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 32 Bit",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, lyon16,  lyon32,  0,      port16,  port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 16 Bit",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, van32,   0,       0,      van32,   port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, van16,   van32,   0,      van16,   port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1993, gen32,   0,       0,      gen32,   gen32,  mmodular_state, init_gen32, "Hegener + Glaser", "Mephisto Genius 68030",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1996, gen32l,  gen32,   0,      gen32,   gen32,  mmodular_state, init_gen32, "Richard Lang",     "Mephisto Genius 68030 (London upgrade)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1996, lond32,  0,       0,      van32,   alm32,  mmodular_state, empty_init, "Richard Lang",     "Mephisto London 32 Bit",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK ) // for alm32/port32/lyon32/van32
-CONS( 1996, lond16,  lond32,  0,      van16,   alm16,  mmodular_state, empty_init, "Richard Lang",     "Mephisto London 16 Bit",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK ) // for alm16/port16/lyon16/van16
+CONS( 1996, lond32,  0,       0,      van32,   port32, mmodular_state, empty_init, "Richard Lang",     "Mephisto London 32 Bit",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK ) // for alm32/port32/lyon32/van32
+CONS( 1996, lond16,  lond32,  0,      van16,   port16, mmodular_state, empty_init, "Richard Lang",     "Mephisto London 16 Bit",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK ) // for alm16/port16/lyon16/van16

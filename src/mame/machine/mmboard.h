@@ -38,6 +38,8 @@ public:
 	void set_disable_leds(int disable_leds) { m_disable_leds = disable_leds; }
 	void set_delay(attotime sensordelay)    { m_sensordelay = sensordelay; }
 
+	sensorboard_device *get() { return m_board; }
+
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_READ8_MEMBER(mux_r);
