@@ -3,17 +3,17 @@
 #include "emu.h"
 #include "vrender0.h"
 
-/***********************************
-        VRENDER ZERO
-        AUDIO EMULATION
-************************************/
-/************
-MISSING:
-envelopes
-reverb
-interrupts
-*************/
+/*************************************************************************************
+                                      VRENDER ZERO
+                                     AUDIO EMULATION
 
+	TODO
+	- Envelope, Interrupt functions aren't verified from real hardware behavior.
+	- Reverb, Pingpong/Reversed loop, Most of Channel/Overall control registers
+	  are Not implemented
+	- Sample Rate is unverified
+
+*************************************************************************************/
 static inline s32 sign_ext(s32 val, s32 bit)
 {
 	bit = 32 - bit;
@@ -128,6 +128,7 @@ vr0sound_device::vr0sound_device(const machine_config &mconfig, const char *tag,
 	, m_texture_config("texture", ENDIANNESS_LITTLE, 16, 23) // 64 MBit (8 MB) Texture Memory Support
 	, m_frame_config("frame", ENDIANNESS_LITTLE, 16, 23) // 64 MBit (8 MB) Framebuffer Memory Support
 	, m_stream(nullptr)
+	, m_irq_cb(*this)
 {
 }
 
@@ -138,6 +139,8 @@ vr0sound_device::vr0sound_device(const machine_config &mconfig, const char *tag,
 
 void vr0sound_device::device_start()
 {
+	m_irq_cb.resolve_safe();
+
 	// Find our direct access
 	m_texcache = space(AS_TEXTURE).cache<1, 0, ENDIANNESS_LITTLE>();
 	m_fbcache = space(AS_FRAME).cache<1, 0, ENDIANNESS_LITTLE>();
@@ -145,7 +148,7 @@ void vr0sound_device::device_start()
 	for (auto &elem : m_channel)
 		elem.Cache = m_fbcache;
 
-	m_stream = stream_alloc(0, 2, 44100); // TODO : Related to clock?
+	m_stream = stream_alloc(0, 2, clock() / 972); // TODO : Correct source / divider?
 
 	save_item(STRUCT_MEMBER(m_channel, CurSAddr));
 	save_item(STRUCT_MEMBER(m_channel, EnvVol));
@@ -169,6 +172,32 @@ void vr0sound_device::device_start()
 	save_item(NAME(m_MaxChn));
 	save_item(NAME(m_ChnClkNum));
 	save_item(NAME(m_Ctrl));
+}
+
+//-------------------------------------------------
+//  device_post_load - device-specific post-load
+//-------------------------------------------------
+
+void vr0sound_device::device_post_load()
+{
+	device_clock_changed();
+}
+
+
+//-------------------------------------------------
+//  device_clock_changed - called if the clock
+//  changes
+//-------------------------------------------------
+
+void vr0sound_device::device_clock_changed()
+{
+	int div;		
+	if (m_ChnClkNum)
+		div = ((30 << 16) | 0x8000) / (m_ChnClkNum + 1); // TODO : Verify algorithm
+	else
+		div = 1 << 16;
+
+	m_stream->set_sample_rate(((clock() * div) / 972) >> 16);
 }
 
 //-------------------------------------------------
@@ -306,6 +335,8 @@ u16 vr0sound_device::intpend_r(offs_t offset)
 void vr0sound_device::intpend_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_IntPend &= ~((data & mem_mask) << ((offset & 1) << 2));
+	if (!m_IntPend)
+		m_irq_cb(false);
 }
 
 u16 vr0sound_device::chnnum_r(offs_t offset)
@@ -316,7 +347,14 @@ u16 vr0sound_device::chnnum_r(offs_t offset)
 void vr0sound_device::chnnum_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
+	{
+		u8 old_chnclknum = m_ChnClkNum;
 		m_ChnClkNum = data & 0xff;
+		if (old_chnclknum != m_ChnClkNum)
+		{
+			device_clock_changed();
+		}
+	}
 	if (ACCESSING_BITS_8_15)
 		m_MaxChn = (data >> 8) & 0x1f;
 }
@@ -493,13 +531,6 @@ static inline u8 get_envstate(u8 stage)
 
 void vr0sound_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_sample_t *r)
 {
-	int div;
-
-	if (m_ChnClkNum)
-		div = ((30 << 16) | 0x8000) / (m_ChnClkNum + 1);
-	else
-		div = 1 << 16;
-
 	for (int s = 0; s < nsamples; s++)
 	{
 		s32 lsample = 0, rsample = 0;
@@ -509,8 +540,6 @@ void vr0sound_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_s
 			s32 sample = 0;
 			const u32 loopbegin_scaled = channel->LoopBegin << 10;
 			const u32 loopend_scaled = channel->LoopEnd << 10;
-
-			s32 DSADD = (channel->dSAddr * div) >> 16;
 
 			if (!(m_Status & (1 << i)) || !(m_Ctrl & CTRL_RS))
 				continue;
@@ -533,7 +562,7 @@ void vr0sound_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_s
 				}
 			}
 
-			channel->CurSAddr += DSADD;
+			channel->CurSAddr += channel->dSAddr;
 			if (channel->CurSAddr >= loopend_scaled)
 			{
 				if (channel->Modes & MODE_LOOP)  //Loop
@@ -541,12 +570,46 @@ void vr0sound_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_s
 				else
 				{
 					m_Status &= ~(1 << (i & 0x1f));
+					if (m_IntMask != 0xffffffff) // Interrupt, TODO : Partially implemented, Verify behavior from real hardware
+					{
+						const u32 old_pend = m_IntPend;
+						m_IntPend |= (~m_IntMask & (1 << (i & 0x1f))); // it's can be with loop?
+						if ((m_IntPend != 0) && (old_pend != m_IntPend))
+							m_irq_cb(true);
+					}
 					break;
 				}
 			}
 
-			s32 v = channel->EnvVol >> 16;
+			const s32 v = channel->EnvVol >> 16;
 			sample = (sample * v) >> 8;
+
+			if (channel->Modes & MODE_ENVELOPE) // Envelope, TODO : Partially implemented, Verify behavior from real hardware
+			{
+				for (int level = 0; level < 4; level++)
+				{
+					if (BIT(channel->EnvStage, level))
+					{
+						s32 RATE = channel->EnvRate[level];
+
+						channel->EnvVol += RATE;
+						if (RATE > 0)
+						{
+							if (((channel->EnvVol >> 16) & 0x7f) >= channel->EnvTarget[level])
+							{
+								channel->EnvStage <<= 1;
+							}
+						}
+						else if (RATE < 0)
+						{
+							if (((channel->EnvVol >> 16) & 0x7f) <= channel->EnvTarget[level])
+							{
+								channel->EnvStage <<= 1;
+							}
+						}
+					}
+				}
+			}
 			lsample += (sample * channel->LChnVol) >> 8;
 			rsample += (sample * channel->RChnVol) >> 8;
 		}

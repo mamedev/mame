@@ -29,6 +29,8 @@ public:
 
 	vr0sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	auto irq_callback() { return m_irq_cb.bind(); }
+
 	u16 channel_r(offs_t offset);
 	void channel_w(offs_t offset, u16 data, u16 mem_mask);
 
@@ -72,6 +74,8 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_post_load() override;
+	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -86,7 +90,7 @@ private:
 	{
 		MODE_LOOP = (1 << 0), // Loop Enable
 		MODE_SUSTAIN = (1 << 1), // Run Sustain when Note Off (Not Implemented)
-		MODE_ENVELOPE = (1 << 2), // Enable Envelope (Not Implemented)
+		MODE_ENVELOPE = (1 << 2), // Enable Envelope
 		MODE_PINGPONG = (1 << 3), // Pingpong Loop (Not Implemented)
 		MODE_ULAW = (1 << 4), // u-Law
 		MODE_8BIT = (1 << 5), // 8 Bit (1) / 16 Bit (0) samples
@@ -114,7 +118,7 @@ private:
 		memory_access_cache<1, 0, ENDIANNESS_LITTLE> *Cache;
 		u32 CurSAddr = 0; // Current Address Pointer, 22.10 Fixed Point
 		s32 EnvVol = 0; // Envelope Volume (Overall Volume), S.7.16 Fixed Point
-		u8 EnvStage = 1; // Envelope Stage (Not Implemented)
+		u8 EnvStage = 1; // Envelope Stage
 		u16 dSAddr = 0; // Frequency, 6.10 Fixed Point
 		u8 Modes = 0; // Modes
 		bool LD = true; // Loop Direction (Not Implemented)
@@ -122,8 +126,8 @@ private:
 		u32 LoopEnd = 0; // Loop End Pointer, High 22 Bits
 		u8 LChnVol = 0; // Left Volume, 7 bit unsigned
 		u8 RChnVol = 0; // Right Volume, 7 bit unsigned
-		s32 EnvRate[4]; // Envenloe Rate, S.16 Fixed Point (Not Implemented)
-		u8 EnvTarget[4]; // Envelope Target Volume, High 7 Bits (Not Implemented)
+		s32 EnvRate[4]; // Envenloe Rate per Each stages, S.16 Fixed Point
+		u8 EnvTarget[4]; // Envelope Target Volume per Each stages, High 7 Bits
 		u16 read(offs_t offset);
 		void write(offs_t offset, u16 data, u16 mem_mask);
 	};
@@ -134,6 +138,7 @@ private:
 
 	channel_t m_channel[32];
 	sound_stream *m_stream;
+	devcb_write_line m_irq_cb;
 
 	// Registers
 	u32 m_Status = 0; // Status (0 Idle, 1 Busy)
@@ -141,8 +146,8 @@ private:
 	u8 m_RevFactor = 0; // Reverb Factor (Not Implemented)
 	u32 m_BufferAddr = 0; // 21bit Reverb Buffer Start Address (Not Implemented)
 	u16 m_BufferSize[4] = {0, 0, 0, 0}; // Reverb Buffer Size (Not Implemented)
-	u32 m_IntMask = 0; // Interrupt Mask (Not Implemented)
-	u32 m_IntPend = 0; // Interrupt Pending (Not Implemented)
+	u32 m_IntMask = 0; // Interrupt Mask (0 Enable, 1 Disable)
+	u32 m_IntPend = 0; // Interrupt Pending
 	u8 m_MaxChn = 0x1f; // Max Channels - 1
 	u8 m_ChnClkNum = 0; // Clock Number per Channel
 	u16 m_Ctrl = 0; // 0x602 Control Functions

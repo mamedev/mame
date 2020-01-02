@@ -149,6 +149,8 @@ private:
 	DECLARE_READ32_MEMBER(intst_r);
 	DECLARE_WRITE32_MEMBER(intst_w);
 
+	DECLARE_WRITE_LINE_MEMBER(soundirq_cb);
+
 	// Timer
 	template<int Which> DECLARE_WRITE32_MEMBER(tmcon_w);
 	template<int Which> DECLARE_READ32_MEMBER(tmcon_r);

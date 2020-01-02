@@ -140,9 +140,10 @@ void vrender0soc_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, m_lspeaker).front_left();
 	SPEAKER(config, m_rspeaker).front_right();
 
-	SOUND_VRENDER0(config, m_vr0snd, 0);
+	SOUND_VRENDER0(config, m_vr0snd, DERIVED_CLOCK(1,1)); // Correct?
 	m_vr0snd->set_addrmap(vr0sound_device::AS_TEXTURE, &vrender0soc_device::texture_map);
 	m_vr0snd->set_addrmap(vr0sound_device::AS_FRAME, &vrender0soc_device::frame_map);
+	m_vr0snd->irq_callback().set(FUNC(vrender0soc_device::soundirq_cb));
 	m_vr0snd->add_route(0, m_lspeaker, 1.0);
 	m_vr0snd->add_route(1, m_rspeaker, 1.0);
 }
@@ -336,6 +337,14 @@ int vrender0soc_device::irq_callback()
 	return 0;       //This should never happen
 }
 
+
+WRITE_LINE_MEMBER(vrender0soc_device::soundirq_cb)
+{
+	if (state)
+	{
+		IntReq(2);
+	}
+}
 
 /*
  *
