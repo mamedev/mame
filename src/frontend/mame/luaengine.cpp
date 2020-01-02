@@ -1669,6 +1669,7 @@ void lua_engine::initialize()
  * space:write_log_*(addr, val)
  * space:read_direct_*(addr)
  * space:write_direct_*(addr, val)
+ * space:read_block(addr, count) - read block of raw bytes and return as a binary string
  *
  * space.name - address space name
  * space.shift - address bus shift, bitshift required for a bytewise address
@@ -1731,6 +1732,28 @@ void lua_engine::initialize()
 	addr_space_type.set("write_direct_u32", &addr_space::direct_mem_write<uint32_t>);
 	addr_space_type.set("write_direct_i64", &addr_space::direct_mem_write<int64_t>);
 	addr_space_type.set("write_direct_u64", &addr_space::direct_mem_write<uint64_t>);
+	addr_space_type.set("read_block", [](addr_space &sp, sol::this_state s, u64 offset, int count) {
+			lua_State *L = s;
+			luaL_Buffer buff;
+			u64 bytewise_size = (u64)sp.space.addrmask();
+			if (offset > bytewise_size)
+			{
+				luaL_error(L, "Offset exceeds space size");
+				return sol::make_reference(L, nullptr);
+			}
+			if (offset + count > bytewise_size)
+				count = bytewise_size - offset;
+			u8 *dest = (u8 *)luaL_buffinitsize(L, &buff, count);
+			u8 *src = (u8 *)sp.space.get_read_ptr(offset);
+			if(!src)
+				return sol::make_reference(L, nullptr);
+			for(int i = 0; i < count; i++)
+			{
+				*dest++ = src[i];
+			}
+			luaL_pushresultsize(&buff, count);
+			return sol::make_reference(L, sol::stack_reference(L, -1));
+		});
 	addr_space_type.set("name", sol::property([](addr_space &sp) { return sp.space.name(); }));
 	addr_space_type.set("shift", sol::property([](addr_space &sp) { return sp.space.addr_shift(); }));
 	addr_space_type.set("index", sol::property([](addr_space &sp) { return sp.space.spacenum(); }));
