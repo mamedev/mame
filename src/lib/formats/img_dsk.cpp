@@ -27,9 +27,9 @@ constexpr uint8_t  ID_AM        = 0x0e; // ID address mark
 constexpr uint8_t  DATA_AM      = 0x0b; // Data address mark
 constexpr uint8_t  AM_CLOCK     = 0x70; // Clock pattern of AM
 constexpr unsigned PREIDX_GAP	= 45;	// Size of pre-index gap
-constexpr unsigned GAP1_SIZE    = 28;   // Size of gap 1
-constexpr unsigned GAP2_SIZE    = 28;   // Size of gap 2
-constexpr int ID_DATA_OFFSET = 35 * 16; // Nominal distance (in cells) between ID & DATA AM
+//constexpr unsigned GAP1_SIZE    = 28;   // Size of gap 1
+//constexpr unsigned GAP2_SIZE    = 28;   // Size of gap 2
+//constexpr int ID_DATA_OFFSET = 35 * 16; // Nominal distance (in cells) between ID & DATA AM
 // Size of image file
 constexpr unsigned IMG_IMAGE_SIZE = IMG_TRACKS * IMG_HEADS * IMG_SECTORS * IMG_SECTOR_SIZE;
 constexpr uint16_t CRC_POLY		= 0x1021;	// CRC-CCITT
