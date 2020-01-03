@@ -21883,6 +21883,16 @@ gen32l                          // 1996 Mephisto Genius 68030 London Upgrade
 lond16                          // 1996 Mephisto London 16 Bit
 lond32                          // 1996 Mephisto London 32 Bit
 
+@source:mephisto_modular_tm.cpp
+port32t
+lyon32t
+lyon32t8
+van32t
+van32t8
+berl32t8p
+lond32t
+lond32t8
+
 @source:mephisto_mondial68k.cpp
 mondl68k                        // 1988 Mephisto Mondial 68000XL
 

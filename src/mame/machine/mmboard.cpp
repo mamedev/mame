@@ -114,6 +114,7 @@ void mephisto_board_device::device_reset()
 {
 	m_mux = 0x00;
 	m_led_data = 0x00;
+	update_led_pwm();
 }
 
 WRITE8_MEMBER( mephisto_board_device::refresh_leds_w )
@@ -141,13 +142,13 @@ READ8_MEMBER( mephisto_board_device::mux_r )
 WRITE8_MEMBER( mephisto_board_device::mux_w )
 {
 	m_mux = data;
-	m_led_pwm->matrix(~m_mux, m_led_data);
+	update_led_pwm();
 }
 
 WRITE8_MEMBER( mephisto_board_device::led_w )
 {
 	m_led_data = data;
-	m_led_pwm->matrix(~m_mux, m_led_data);
+	update_led_pwm();
 }
 
 

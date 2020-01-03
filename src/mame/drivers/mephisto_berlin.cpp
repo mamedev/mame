@@ -2,7 +2,8 @@
 // copyright-holders:Sandro Ronco
 /******************************************************************************
 
-Mephisto Berlin / Berlin Professional
+Mephisto Berlin 68000 / Berlin Professional 68020
+Berlin Professional has the same engine as Mephisto Genius.
 
 TODO:
 - does it have ROM waitstates like mephisto_modular?
@@ -148,7 +149,9 @@ void berlin_state::berlinp(machine_config &config)
 	/* basic machine hardware */
 	M68EC020(config.replace(), m_maincpu, 24.576_MHz_XTAL); // M68EC020RP25
 	m_maincpu->set_addrmap(AS_PROGRAM, &berlin_state::berlinp_mem);
-	m_maincpu->set_periodic_int(FUNC(berlin_state::irq2_line_hold), attotime::from_hz(750));
+
+	const attotime irq_period = attotime::from_hz(24.576_MHz_XTAL / 0x8000); // 750Hz
+	m_maincpu->set_periodic_int(FUNC(berlin_state::irq2_line_hold), irq_period);
 }
 
 
@@ -159,26 +162,26 @@ void berlin_state::berlinp(machine_config &config)
 
 ROM_START( berl16 )
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
-	ROM_SYSTEM_BIOS( 0, "v003", "V0.03" )
+	ROM_SYSTEM_BIOS( 0, "v003", "V0.03" ) // B003 8C60 CA47
 	ROMX_LOAD("berlin_68000_even.bin",     0x00000, 0x10000, CRC(31337f15) SHA1(0dcacb153a6f8376e6f1c2f3e57e60aad4370740), ROM_SKIP(1) | ROM_BIOS(0) )
 	ROMX_LOAD("berlin_68000_odd_b003.bin", 0x00001, 0x10000, CRC(cc146819) SHA1(e4b2c6e496eff4a657a0718be292f563fb4e5688), ROM_SKIP(1) | ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "v002", "V0.02" )
+	ROM_SYSTEM_BIOS( 1, "v002", "V0.02" ) // B002 8C59 CA47
 	ROMX_LOAD("berlin_68000_even.bin",     0x00000, 0x10000, CRC(31337f15) SHA1(0dcacb153a6f8376e6f1c2f3e57e60aad4370740), ROM_SKIP(1) | ROM_BIOS(1) )
 	ROMX_LOAD("berlin_68000_odd_b002.bin", 0x00001, 0x10000, CRC(513a95f2) SHA1(cbaef0078a119163577e76a78b2110939b17be6b), ROM_SKIP(1) | ROM_BIOS(1) )
 ROM_END
 
-ROM_START( berlinp )
+ROM_START( berlinp ) // B400 8AA1 E785
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_LOAD("berlin_020_v400.u2", 0x00000, 0x40000, CRC(82fbaf6e) SHA1(729b7cef3dfaecc4594a6178fc4ba6015afa6202) )
 ROM_END
 
-ROM_START( berl16l )
+ROM_START( berl16l ) // B500 ABD5 CA47
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("berlin_68000_london_even.bin", 0x00000, 0x10000, CRC(0ccddbc6) SHA1(90effdc9f2811a24d450b74ccfb24995ce896b86) )
 	ROM_LOAD16_BYTE("berlin_68000_london_odd.bin",  0x00001, 0x10000, CRC(5edac658) SHA1(18ebebc5ceffd9a01798d8a3709875120bd096f7) )
 ROM_END
 
-ROM_START( berlinpl )
+ROM_START( berlinpl ) // B500 53CA 3DCE
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_LOAD("berlin_020_london.u2", 0x00000, 0x40000, CRC(d75e170f) SHA1(ac0ebdaa114abd4fef87361a03df56928768b1ae) )
 ROM_END
