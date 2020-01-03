@@ -35791,4 +35791,94 @@
 		</part>
 	</software>
 
+	<software name="grglobge">
+		<description>Green Globs and Graphing Equations (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2020-01-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="green globs and graphing equations (4am crack).dsk" size="143360" crc="949b5a00" sha1="5c4453baf8d2eb89ee8a403c042861e36a219765"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inrecall">
+		<description>Instant Recall (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Howard W. Sams, Inc.</publisher>
+		<info name="release" value="2020-01-02"/>
+		<!--"Instant Recall" is a 1983 productivity program developed by Charles R. Landers and distributed by Howard W. Sams, Inc. This is version 1.1. It is preserved here for the first time.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Master"/>
+			<dataarea name="flop" size="143360">
+				<rom name="instant recall (4am crack) disk 1 - master.dsk" size="143360" crc="9eb1544d" sha1="54b6c873b097f5656c9610b8786d3ec2cb8cc6d2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Data"/>
+			<dataarea name="flop" size="143360">
+				<rom name="instant recall (4am crack) disk 2 - data.dsk" size="143360" crc="372ec6b6" sha1="4bf6c083cd70bfb30a2671f6781ff3f6f1d5d4a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barrnsat">
+		<description>Barron's Computer SAT Study Program (Version 1.0) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Barron's Educational Series, Inc.</publisher>
+		<info name="release" value="2020-01-02"/>
+		<!--"Barron's Computer SAT Study Program" is a 1983 educational program programmed by Richard Rothenberg, Ph.D. and James Marcos, and distributed by Barron's Educational Series, Inc. This is version 1.0. It is preserved here for the first time.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Math preparation 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="barron's computer sat study program (4am crack) disk 1 - math preparation 1.dsk" size="143360" crc="9f87f812" sha1="97a8a14110dc62443f733eba4c3c8fade8f613c3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Math preparation 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="barron's computer sat study program (4am crack) disk 2 - math preparation 2.dsk" size="143360" crc="2db92df8" sha1="7971d64ed79365ddb89f43caabc87da8359b8cec"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Verbal Preparation 1 "/>
+			<dataarea name="flop" size="143360">
+				<rom name="barron's computer sat study program (4am crack) disk 3 - verbal preparation 1.dsk" size="143360" crc="0554261c" sha1="e293c115297811e90c30150be53551fd21d75510"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - Verbal preparation 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="barron's computer sat study program (4am crack) disk 4 - verbal preparation 2.dsk" size="143360" crc="3431ad95" sha1="f83be0824ee3189e393119c8818e9fee9a657dec"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5 - Verbal preparation 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="barron's computer sat study program (4am crack) disk 5 - verbal preparation 3.dsk" size="143360" crc="397dab95" sha1="4981c4296b67cab353fb7fee74afbecd520ee6a1"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6 - Verbal preparation 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="barron's computer sat study program (4am crack) disk 6 - verbal preparation 4.dsk" size="143360" crc="df710598" sha1="a726b79315090a9d471083d92bd7a0b8a5f849cd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizip201">
+		<description>Wiziprint (Version 2.01) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Sir-Tech</publisher>
+		<info name="release" value="2020-01-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="wiziprint (4am crack).dsk" size="143360" crc="354fab0c" sha1="00ab6c5edc0fd0985ecbf425bb2a5c850d0c7b87"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
