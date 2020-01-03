@@ -2966,7 +2966,8 @@ ROM_START( op82c283 )
 	// Keyboard-BIOS: AMI KB-BIOS-VER-F (Intel P8942AHP) - CPU: AM386 SX/SXL-25 - OSC: 14.31818MHz, 50.000MHz - ISA8: 2, ISA16: 6
 	ROM_SYSTEM_BIOS( 1, "3805", "386sx 3805" )
 	ROMX_LOAD( "386sx-opti-908380.bin", 0x10000, 0x10000, CRC(38502567) SHA1(d65d272aa60642197c9b639a8679f8f41c4a697b), ROM_BIOS(1))
-	// 2: CPU: 386SX-20 - BIOS: AMI; 03/15/91 - no display
+	// 2: CPU: 386SX-20 - BIOS: AMI; 03/15/91 - no display - unknown ASI motherboard
+	// BIOS-String: 30-0100-DG1112-00101111-031591-OPSX
 	ROM_SYSTEM_BIOS( 2, "c28301", "OPTi 82C283 #1")
 	ROMX_LOAD( "3opm010.bin", 0x10000, 0x10000, CRC(7c2acf57) SHA1(d40605621da40204dc6370d2d00b783b3a7f8dce), ROM_BIOS(2))
 ROM_END
@@ -3255,7 +3256,7 @@ ROM_START( mb133340 )
 ROM_END
 
 
-// ***** motherboards using the UMC UM82C481AF, UM82C482A/B/F, 82C206F chipset
+// ***** 386 motherboards using the UMC UM82C481AF, UM82C482A/B/F, 82C206F chipset
 
 // QD-U386DX VER 1.0 - CPU/FPU: i386DX-33, IIT 3C87-33 - ISA8:2, ISA16: 5 - BIOS: AMI 386DX ISA BIOS (AA0119183)
 // BIOS-String: 30-0200-428003-10101111-070791-UMC480A-F
@@ -3542,12 +3543,16 @@ ROM_START( at486 )
 	// 29: screen remains blank
 	ROM_SYSTEM_BIOS(29, "optimus", "Optimus")
 	ROMX_LOAD("mb_bios_ami_930808.bin", 0x10000, 0x10000, CRC(89151d5b) SHA1(92a93cae054525adfdc6277a1236e699ea9fbc32), ROM_BIOS(29))
+	// 30: 30-0500-ZZ1130-00101111-070791-1219-0 - ASI board
+	ROM_SYSTEM_BIOS(30, "umc486a", "UMC-486A")
+	ROMX_LOAD("umc481i.ami", 0x10000, 0x10000, CRC(0e20eda3) SHA1(ae0b38856780386a70cefcfdc87822cd5d2bc329), ROM_BIOS(30))
 ROM_END
 
 
 //**************************************************************************
 //  80486 motherboard
 //************************************************************************//
+
 
 // AMI 80486 EISA Enterprise-II - Chipset: AMI/Intel 82357 - RAM: 8xSIMM30 (32MB max), 128K cache memory - CPU: i486DX 25/33, Weitek WTL4167 FPU socket provided
 // on board: Floppy, PS/2 mouse, memory card socket, i/o expansion module slot - EISA: 8
@@ -4104,9 +4109,21 @@ ROM_START( a486sp3 )
 	// 3: BIOS-String: 02/11/98-SiS-496-497B-PVI-4SP3C-00 / #401A0-0307 - boots to Award BootBlock BIOS V1.0
 	ROM_SYSTEM_BIOS(3, "v307", "ASUS PVI-486SP3 V3.07")
 	ROMX_LOAD( "si4i0307h.bin", 0x00000, 0x20000, CRC(99473cc0) SHA1(a01d253cf434a31e0ca6f6cd2b9026ca424eb463), ROM_BIOS(3))
-	// 4: 08/08/95-SiS-496-497B-PVI-4SP3C-00 / #401A0-0301 - boots to Award BootBlock BIOS
+	// 4: BIOS-String: 08/08/95-SiS-496-497B-PVI-4SP3C-00 / #401A0-0301 - boots to Award BootBlock BIOS
 	ROM_SYSTEM_BIOS(4, "v301", "ASUS PVI-486SP3 V3.01")
 	ROMX_LOAD( "4siw003.bin", 0x00000, 0x20000, CRC(47a1d815) SHA1(370bfb895646518884a2a82881721efc3aeb04d1), ROM_BIOS(4))
+	// 5: BIOS-String: 11/23/94-SiS-496-497-PVI-4SP3-00 / #401A0-0101
+	ROM_SYSTEM_BIOS(5, "v10101", "ASUS PVI-486SP3 V1.01 #1")
+	ROMX_LOAD( "0101.bin", 0x00000, 0x20000, CRC(7862ca56) SHA1(e609585893b23db10c4ae7d2abd17cc9dda964b6), ROM_BIOS(5))
+	// 6: BIOS-String: 11/23/94-SiS-496-497-PVI-4SP3-00 / #401A0-0101 - screen remains blank
+	ROM_SYSTEM_BIOS(6, "v10102", "ASUS PVI-486SP3 V1.01 #2")
+	ROMX_LOAD( "si4i0101.awd", 0x00000, 0x20000, CRC(18652037) SHA1(7460e90b0a9c825d2e47943a714049fe9e943760), ROM_BIOS(6))
+	// 7: BIOS-String: 07/15/95-SiS-496-497B-PVI-4SP3C-00 / #401A0-0205 - boots to Award BootBlock BIOS
+	ROM_SYSTEM_BIOS(7, "v205", "ASUS PVI-486SP3 V2.05")
+	ROMX_LOAD( "si4i0205.awd", 0x00000, 0x20000, CRC(d90d91b0) SHA1(043151d121780ff56ce32b9a48e9bbccd324625f), ROM_BIOS(7))
+	// 8: BIOS-String: 04/05/96-SiS-496-497B-PVI-4SP3C-00 / #401A0-0305 - boots to Award BootBlock BIOS
+	ROM_SYSTEM_BIOS(8, "v305", "ASUS PCI/I-486SP3 V3.05")
+	ROMX_LOAD( "si4i0305.awd", 0x00000, 0x20000, CRC(2f90e63e) SHA1(a4f16753b5a57d65fba7702ca28e44f10bd5bb6c), ROM_BIOS(8))
 ROM_END
 
 // Chaintech 486SPM - CPU: Socket 3 - Chipset: SiS 85C497, 85C496, UMC UM8663BF - RAM: 4xSIMM72, Cache: 8xIS61C1024-10N, W24512AK-10
@@ -4279,6 +4296,18 @@ ROM_START( abah4 )
 	ROM_LOAD( "ah4t_an4r2_02.bin", 0x10000, 0x10000, CRC(b45dc3b7) SHA1(94206ac9ed50fc37d954cc3cd1fb062fd75ea984))
 ROM_END
 
+// Aopen VI15G - Chipset: SiS 85C471, 85C407 - CPU: Socket 3 - RAM: 4xSocket72, Cache: 4x32pin, 4x28pin, TAG - BIOS: 28pin
+// Keyboard-BIOS: AMIKEY-2 - ISA16: 4, ISA16/VL: 3
+ROM_START( aovi15g )
+	ROM_REGION32_LE(0x20000, "bios", 0)
+	// 0:
+	ROM_SYSTEM_BIOS(0, "072594", "07/25/94")
+	ROMX_LOAD( "amiwinch.bin", 0x10000, 0x10000, CRC(9ee72bef) SHA1(25f08714a384d68777d1570cf28a4db8b390257e), ROM_BIOS(0))
+	// 1:
+	ROM_SYSTEM_BIOS(1, "r23", "R23")
+	ROMX_LOAD( "vi15gr23.rom", 0x10000, 0x10000, CRC(b704f571) SHA1(485795b8756069723dac865919dc3915a3162c12), ROM_BIOS(1))
+ROM_END
+
 // ASUS VL/I-486SV2G (GX4) (4xSIMM72, Cache: 128/256/512/1024KB, 7 ISA, 2 VLB)
 // SiS 85C471 + 85C407; AMIKEY-2
 ROM_START( a486sv2g )
@@ -4397,6 +4426,18 @@ ROM_START( md4duvc ) // "Memory test fail"
 	ROM_LOAD( "md-4duvc.dmg", 0x10000, 0x10000, CRC(40d208bb) SHA1(c879599d2635c093fce420d1e7081631d27c621a))
 ROM_END
 
+// BIOSTAR MB-1433UIV - Chipset: BIOTEQ 83C3498, 83C3496 - CPU: Socket 3 - RAM: 3xSIMM30, 4xSIMM72, Cache: 4x32pin, 4x28pin + TAG
+// ISA16: 4, ISA16/VL: 3 - BIOS: 28pin
+ROM_START( mb1433uiv )
+	ROM_REGION32_LE(0x20000, "bios", 0)
+	// 0:
+	ROM_SYSTEM_BIOS(0, "um8496fw", "UM8496FW")
+	ROMX_LOAD( "um8496fw.ami", 0x10000, 0x10000, CRC(4a6dcc36) SHA1(f159f67eb662272244cd1781814ebcb5204a2625), ROM_BIOS(0))
+	// 1:
+	ROM_SYSTEM_BIOS(1, "w4", "W4")
+	ROMX_LOAD( "um498-w4.amw", 0x10000, 0x10000, CRC(12fe6697) SHA1(2506dea874728916dc37f7dad8e8caf214a28525), ROM_BIOS(1))
+ROM_END
+
 // PC-Chips M912 - Chipset: UM8498F, UM8496F - CPU: 486 - BIOS: AMI - ISA16: 4, ISA16/VL: 3
 ROM_START( pccm912 ) // no display
 	ROM_REGION32_LE( 0x20000, "bios", 0)
@@ -4423,18 +4464,16 @@ ROM_START( so025r2 )
 	ROM_LOAD("25r2-b2.bin", 0x10000, 0x10000, CRC(3b73360c) SHA1(eaaf47236154a9cc81ffda4c11086960aed0dadf))
 ROM_END
 
+
 ROM_START( um8498f ) // no display
 	ROM_REGION32_LE(0x20000, "bios", 0)
-	// 0:
-	ROM_SYSTEM_BIOS(0, "deepgrn", "Deep Green")
-	ROMX_LOAD( "deepgrn.bin", 0x10000, 0x10000, CRC(4a6dcc36) SHA1(f159f67eb662272244cd1781814ebcb5204a2625), ROM_BIOS(0))
-	// 1: BIOS-String: 40-P101-001437-00101111-072594-GREEN-H - CPU: Socket 3 - RAM: 4xSIMM30, 2xSIMM72, Cache: 9xUM61256AK-15
+	// 0: BIOS-String: 40-P101-001437-00101111-072594-GREEN-H - CPU: Socket 3 - RAM: 4xSIMM30, 2xSIMM72, Cache: 9xUM61256AK-15
 	// BIOS: AMI AB9300757
-	ROM_SYSTEM_BIOS(1, "v14", "V1.4")
-	ROMX_LOAD( "4umm001.bin", 0x10000, 0x10000, CRC(a5b768b4) SHA1(904ce2814d6542b65acec0c84532946172f2296d), ROM_BIOS(1))
-	// 2:
-	ROM_SYSTEM_BIOS(2, "um849801", "UM8498 #1")
-	ROMX_LOAD( "um8498.ami", 0x10000, 0x10000, CRC(51f71bc7) SHA1(0986d60081d2c578a66789c0c53fe1d5919c553f),ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(0, "v14", "V1.4")
+	ROMX_LOAD( "4umm001.bin", 0x10000, 0x10000, CRC(a5b768b4) SHA1(904ce2814d6542b65acec0c84532946172f2296d), ROM_BIOS(0))
+	// 1:
+	ROM_SYSTEM_BIOS(1, "um849801", "UM8498 #1")
+	ROMX_LOAD( "um8498.ami", 0x10000, 0x10000, CRC(51f71bc7) SHA1(0986d60081d2c578a66789c0c53fe1d5919c553f),ROM_BIOS(1))
 ROM_END
 
 
@@ -4474,9 +4513,15 @@ ROM_START( mb8433uud ) // BootBlock BIOS
 	// 0: BIOS-String: 05/20/96-UMC-881E/886B-2A4X5B08C-00 / UUD960520S EVALUATION ROM - NOT FOR SALE
 	ROM_SYSTEM_BIOS(0, "520s", "520S")
 	ROMX_LOAD( "uud0520s.bin", 0x00000, 0x20000, CRC(0e347559) SHA1(060d3040b103dee051c5c2cfe8c53382acdfedad), ROM_BIOS(0))
-	// 1: 05/20/96-UMC-881E/886B-2A4X5B08C-00 / BIOSTAR MB-8433UUD v2014
+	// 1: BIOS-String: 05/20/96-UMC-881E/886B-2A4X5B08C-00 / BIOSTAR MB-8433UUD v2014
 	ROM_SYSTEM_BIOS(1, "2014", "2014")
 	ROMX_LOAD( "uud2014.bin", 0x00000, 0x20000, CRC(315f7519) SHA1(e0174e4982d1861c64d871a7806b793a914f2366), ROM_BIOS(1))
+	// 2: BIOS-String: 12/05/95-UMC-881E/886B-2A4X5B08C-00 / UUD951222S
+	ROM_SYSTEM_BIOS(2, "8881d", "8881D")
+	ROMX_LOAD( "um8881_d.awa", 0x00000, 0x20000, CRC(a47327b9) SHA1(6b57155cf34e2c597b7621e49ae8354c05cebfde), ROM_BIOS(2))
+	// 3: BIOS-String: 11/07/95-UMC-881E/886B-2A4X5B08C-0 / UUD951108A
+	ROM_SYSTEM_BIOS(3, "08a", "08A")
+	ROMX_LOAD( "8433uud.awd", 0x00000, 0x20000, CRC(17ca5c2a) SHA1(7cda78f87f35fe8574a1f2d70d548cc2bc2af05b), ROM_BIOS(3))
 ROM_END
 
 // Gigabyte GA-486AM/S - CPU: Socket 3 - Chipset: UMC UM8886AF, UM8881F, UM88663AF, UM8667 - RAM: 4xSIMM72, Cache: 9x32pin, occupied: 4xUM6152AK-15, 1xUM61M256K-15
@@ -4650,10 +4695,14 @@ ROM_END
 
 // Biostar MB-1433UCV - Chipset: BIOTEQ 82C3491, 82C3493 (check mb133340 for a 386 motherboard using the same chipset)
 // CPU: 486DX2-66 - RAM: 8xSIMM30, Cache: 8+1x28pin(AS57C256-20PC) - ISA8: 1, ISA16: 3, ISA16+VL: 3 - BIOS: AMI AB0975913 - Keyboard-BIOS: JETkey V5.0 - RTC: TH6887A 9410
-// BIOS-String: 40-0100-001223-00101111-040493-UMC491F-0 / MB-1333/40UCG-A, MB-1333/40UCQ-B / MB-1433-40UDV-A, MB-1433/50UCV-C, MB-6433/50UPC-A for EXT. RTC
 ROM_START( mb1433ucv )
 	ROM_REGION32_LE(0x20000, "bios", 0)
-	ROM_LOAD( "biostar_bios_mb-1433-50ucv-d_pcb_ver_2.bin", 0x10000, 0x10000, CRC(e5ff2d76) SHA1(d2abe00eb2051ec7cb9423cdb8b52e91f7e2d416))
+	// 0: BIOS-String: 40-0100-001223-00101111-040493-UMC491F-0 / MB-1333/40UCG-A, MB-1333/40UCQ-B / MB-1433-40UDV-A, MB-1433/50UCV-C, MB-6433/50UPC-A for EXT. RTC
+	ROM_SYSTEM_BIOS(0, "ucvd", "UCV-D")
+	ROMX_LOAD( "biostar_bios_mb-1433-50ucv-d_pcb_ver_2.bin", 0x10000, 0x10000, CRC(e5ff2d76) SHA1(d2abe00eb2051ec7cb9423cdb8b52e91f7e2d416), ROM_BIOS(0))
+	// 1: BIOS-String: 40-0100-001223-00101111-04093-UMC491f-0 / UCV-G
+	ROM_SYSTEM_BIOS(1, "ucvg", "UCV-G")
+	ROMX_LOAD( "bioteq.rom", 0x10000, 0x10000, CRC(93321e89) SHA1(450e35787607a4b6aecd3159d6c0599a03cd42b1), ROM_BIOS(1))
 ROM_END
 
 
@@ -5011,7 +5060,8 @@ COMP( 199?, amisvpci2, ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, amisvvlb,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "AMI",         "Super Voyager VLB", MACHINE_NOT_WORKING )
 COMP( 199?, amisvvlb2, ibm5170, 0,       at486,     0,     at_state,     init_at,        "AMI",         "Super Voyager VLB-II", MACHINE_NOT_WORKING )
 COMP( 199?, amisvvlb3, ibm5170, 0,       at486,     0,     at_state,     init_at,        "AMI",         "Super Voyager VLB-III", MACHINE_NOT_WORKING )
-COMP( 199?, aoap43,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Aopen", "AP43", MACHINE_NOT_WORKING )
+COMP( 199?, aoap43,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Aopen", "AP43",  MACHINE_NOT_WORKING )
+COMP( 199?, aovi15g,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Aopen", "VI15G", MACHINE_NOT_WORKING )
 COMP( 199?, mb4d33,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Aquarius System (ASI)", "MB-4D33/50NR", MACHINE_NOT_WORKING )
 COMP( 199?, md4duvc,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Aquarius System (ASI)", "MD-4DUVC", MACHINE_NOT_WORKING )
 COMP( 199?, as496,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Arstoria",    "AS496", MACHINE_NOT_WORKING )
@@ -5023,6 +5073,7 @@ COMP( 1995, aa486s,    ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 1994, a486sv1,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Asus",        "VL/EISA-486SV1", MACHINE_NOT_WORKING )
 COMP( 1994, a486sv2g,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "Asus",        "VL/I-486SV2G", MACHINE_NOT_WORKING )
 COMP( 199?, mb1433ucv, ibm5170, 0,       at486,     0,     at_state,     init_at,        "Biostar",     "MB-1433UCV", MACHINE_NOT_WORKING )
+COMP( 199?, mb1433uiv, ibm5170, 0,       at486,     0,     at_state,     init_at,        "Biostar",     "MB-1433UIV", MACHINE_NOT_WORKING )
 COMP( 199?, mb8433uud, ibm5170, 0,       at486,     0,     at_state,     init_at,        "Biostar",     "MB8433-UUD-A", MACHINE_NOT_WORKING ) // boots to Award BootBlock BIOS
 COMP( 199?, ch4slez1,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "Chaintech", "486SLE M106 4SLE-Z1", MACHINE_NOT_WORKING )
 COMP( 199?, ch486spm,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "Chaintech", "486SPM", MACHINE_NOT_WORKING )
