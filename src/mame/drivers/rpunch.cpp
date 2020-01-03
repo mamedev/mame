@@ -244,9 +244,9 @@ void rpunch_state::svolleybl_main_map(address_map &map)
 
 void rpunch_state::sound_map(address_map &map)
 {
-	map(0x0000, 0xdfff).rom();
-	map(0xe000, 0xe001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xe800, 0xe800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xf200, 0xf200).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xf400, 0xf400).w(FUNC(rpunch_state::upd_control_w));
 	map(0xf600, 0xf600).w(FUNC(rpunch_state::upd_data_w));
 	map(0xf800, 0xffff).ram();
