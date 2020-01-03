@@ -53,7 +53,7 @@ class mc68901_device :  public device_t,
 {
 public:
 	// construction/destruction
-	mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void set_timer_clock(int timer_clock) { m_timer_clock = timer_clock; }
 	void set_rx_clock(int rx_clock) { m_rx_clock = rx_clock; }
@@ -73,10 +73,10 @@ public:
 	//auto out_tr_cb() { return m_out_tr_cb.bind(); }
 	auto iack_chain_cb() { return m_iack_chain_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
-	uint8_t get_vector();
+	u8 get_vector();
 
 	DECLARE_WRITE_LINE_MEMBER( i0_w );
 	DECLARE_WRITE_LINE_MEMBER( i1_w );
@@ -104,14 +104,13 @@ protected:
 	virtual void rcv_complete() override;
 
 	void check_interrupts();
-	void take_interrupt(uint16_t mask);
+	void take_interrupt(u16 mask);
 	void rx_buffer_full();
 	void rx_error();
 	void timer_count(int index);
 	void timer_input(int index, int value);
 	void gpio_input(int bit, int state);
 	void gpio_output();
-	void register_w(offs_t offset, uint8_t data);
 
 private:
 	enum
@@ -199,8 +198,8 @@ private:
 		XMIT_STOPPING
 	};
 
-	static const int INT_MASK_GPIO[];
-	static const int INT_MASK_TIMER[];
+	static const u16 INT_MASK_GPIO[];
+	static const u16 INT_MASK_TIMER[];
 	static const int GPIO_TIMER[];
 	static const int PRESCALER[];
 
@@ -223,49 +222,44 @@ private:
 
 	devcb_read8             m_iack_chain_cb;
 
-	//int m_device_type;                      /* device type */
+	// registers
+	u8 m_gpip;                      // general purpose I/O register
+	u8 m_aer;                       // active edge register
+	u8 m_ddr;                       // data direction register
 
-	/* registers */
-	uint8_t m_gpip;                           /* general purpose I/O register */
-	uint8_t m_aer;                            /* active edge register */
-	uint8_t m_ddr;                            /* data direction register */
+	u16 m_ier;                      // interrupt enable register
+	u16 m_ipr;                      // interrupt pending register
+	u16 m_isr;                      // interrupt in-service register
+	u16 m_imr;                      // interrupt mask register
+	u8 m_vr;                        // vector register
 
-	uint16_t m_ier;                           /* interrupt enable register */
-	uint16_t m_ipr;                           /* interrupt pending register */
-	uint16_t m_isr;                           /* interrupt in-service register */
-	uint16_t m_imr;                           /* interrupt mask register */
-	uint8_t m_vr;                             /* vector register */
+	u8 m_tacr;                      // timer A control register
+	u8 m_tbcr;                      // timer B control register
+	u8 m_tcdcr;                     // timers C and D control register
+	u8 m_tdr[4];                    // timer data registers
 
-	uint8_t m_tacr;                           /* timer A control register */
-	uint8_t m_tbcr;                           /* timer B control register */
-	uint8_t m_tcdcr;                          /* timers C and D control register */
-	uint8_t m_tdr[4];     /* timer data registers */
-
-	uint8_t m_scr;                            /* synchronous character register */
-	uint8_t m_ucr;                            /* USART control register */
-	uint8_t m_tsr;                            /* transmitter status register */
-	uint8_t m_rsr;                            /* receiver status register */
-	uint8_t m_transmit_buffer;                /* USART data register */
+	u8 m_scr;                       // synchronous character register
+	u8 m_ucr;                       // USART control register
+	u8 m_tsr;                       // transmitter status register
+	u8 m_rsr;                       // receiver status register
+	u8 m_transmit_buffer;           // USART data register
 	bool m_transmit_pending;
-	uint8_t m_receive_buffer;
+	u8 m_receive_buffer;
 	bool m_overrun_pending;
-	uint8_t m_gpio_input;
-	uint8_t m_gpio_output;
+	u8 m_gpio_input;
+	u8 m_gpio_output;
 
-	/* counter timer state */
-	uint8_t m_tmc[4];     /* timer main counters */
-	int m_ti[4];            /* timer in latch */
-	int m_to[4];            /* timer out latch */
+	// counter timer state
+	u8 m_tmc[4];                    // timer main counters
+	int m_ti[4];                    // timer in latch
+	int m_to[4];                    // timer out latch
 
-	/* interrupt state */
-	//int m_irqlevel;                         /* interrupt level latch */
-
-	/* serial state */
-	uint8_t m_next_rsr;                       /* receiver status register latch */
-	int m_rsr_read;                         /* receiver status register read flag */
+	// serial state
+	u8 m_next_rsr;                  // receiver status register latch
+	int m_rsr_read;                 // receiver status register read flag
 
 	// timers
-	emu_timer *m_timer[4]; /* counter timers */
+	emu_timer *m_timer[4];          // counter timers
 };
 
 

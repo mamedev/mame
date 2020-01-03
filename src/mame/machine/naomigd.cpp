@@ -408,7 +408,14 @@ naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *
 	m_i2c0(*this, "i2c_0"),
 	m_i2c1(*this, "i2c_1"),
 	m_eeprom(*this, "eeprom"),
-	picdata(*this, finder_base::DUMMY_TAG)
+	picdata(*this, finder_base::DUMMY_TAG),
+	dimm_command(0xffff),
+	dimm_offsetl(0xffff),
+	dimm_parameterl(0xffff),
+	dimm_parameterh(0xffff),
+	dimm_status(0xffff),
+	sh4_unknown(0),
+	dimm_des_key(0)
 {
 	image_tag = nullptr;
 	picbus = 0;
@@ -416,17 +423,264 @@ naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *
 	picbus_io[0] = 0xf;
 	picbus_io[1] = 0xf;
 	picbus_used = false;
+	memset(memctl_regs, 0, sizeof(memctl_regs));
+}
+
+void naomi_gdrom_board::submap(address_map &map)
+{
+	naomi_board::submap(map);
+	map(0x3c / 2, 0x3c / 2 + 1).rw(FUNC(naomi_gdrom_board::dimm_command_r), FUNC(naomi_gdrom_board::dimm_command_w));
+	map(0x40 / 2, 0x40 / 2 + 1).rw(FUNC(naomi_gdrom_board::dimm_offsetl_r), FUNC(naomi_gdrom_board::dimm_offsetl_w));
+	map(0x44 / 2, 0x44 / 2 + 1).rw(FUNC(naomi_gdrom_board::dimm_parameterl_r), FUNC(naomi_gdrom_board::dimm_parameterl_w));
+	map(0x48 / 2, 0x48 / 2 + 1).rw(FUNC(naomi_gdrom_board::dimm_parameterh_r), FUNC(naomi_gdrom_board::dimm_parameterh_w));
+	map(0x4c / 2, 0x4c / 2 + 1).rw(FUNC(naomi_gdrom_board::dimm_status_r), FUNC(naomi_gdrom_board::dimm_status_w));
 }
 
 void naomi_gdrom_board::sh4_map(address_map &map)
 {
-	map(0x00000000, 0x001fffff).rom().region("bios", 0);
+	map(0x00000000, 0x001fffff).mirror(0xa0000000).rom().region("bios", 0);
+	map(0x04000000, 0x040000ff).rw(FUNC(naomi_gdrom_board::memorymanager_r), FUNC(naomi_gdrom_board::memorymanager_w));
+	map(0x0c000000, 0x0cffffff).ram();
+	map(0x10000000, 0x103fffff).ram();
+	map(0x14000000, 0x14000003).rw(FUNC(naomi_gdrom_board::sh4_unknown_r), FUNC(naomi_gdrom_board::sh4_unknown_w));
+	map(0x14000014, 0x14000017).rw(FUNC(naomi_gdrom_board::sh4_command_r), FUNC(naomi_gdrom_board::sh4_command_w));
+	map(0x14000018, 0x1400001b).rw(FUNC(naomi_gdrom_board::sh4_offsetl_r), FUNC(naomi_gdrom_board::sh4_offsetl_w));
+	map(0x1400001c, 0x1400001f).rw(FUNC(naomi_gdrom_board::sh4_parameterl_r), FUNC(naomi_gdrom_board::sh4_parameterl_w));
+	map(0x14000020, 0x14000023).rw(FUNC(naomi_gdrom_board::sh4_parameterh_r), FUNC(naomi_gdrom_board::sh4_parameterh_w));
+	map(0x14000024, 0x14000027).rw(FUNC(naomi_gdrom_board::sh4_status_r), FUNC(naomi_gdrom_board::sh4_status_w));
+	map(0x1400002c, 0x1400002f).lr32([]() { return 0x0c; }, "Constant 0x0c"); // 0x0a or 0x0e possible too
+	map(0x14000030, 0x14000033).rw(FUNC(naomi_gdrom_board::sh4_des_keyl_r), FUNC(naomi_gdrom_board::sh4_des_keyl_w));
+	map(0x14000034, 0x14000037).rw(FUNC(naomi_gdrom_board::sh4_des_keyh_r), FUNC(naomi_gdrom_board::sh4_des_keyh_w));
+	map(0x18001000, 0x18001007).lr32([]() { return 0x189d11db; }, "Constant 0x189d11db"); // 0x10001022 or 0x11720001 possible too
 	map.unmap_value_high();
 }
 
 void naomi_gdrom_board::sh4_io_map(address_map &map)
 {
 	map(0x00, 0x0f).rw(FUNC(naomi_gdrom_board::i2cmem_dimm_r), FUNC(naomi_gdrom_board::i2cmem_dimm_w));
+}
+
+WRITE32_MEMBER(naomi_gdrom_board::memorymanager_w)
+{
+	memctl_regs[offset] = data;
+	if (offset == 4)
+		logerror("SH4 write %04x to 0x04000010 at %04x\n", data, m_maincpu->pc());
+	if (offset == 6)
+		logerror("SH4 write %04x to 0x04000018 at %04x\n", data, m_maincpu->pc());
+	if (offset == 7)
+		logerror("SH4 write %04x to 0x0400001c at %04x\n", data, m_maincpu->pc());
+	if (offset == 14) // 0x04000038
+	{
+		if (memctl_regs[0x38 / 4] & 0x01000000)
+		{
+			uint32_t src, dst, len;
+			struct sh4_ddt_dma ddtdata;
+
+			memctl_regs[0x38 / 4] &= ~0x01000000;
+			src = memctl_regs[0x30 / 4];
+			dst = memctl_regs[0x34 / 4];
+			len = memctl_regs[0x38 / 4] & 0xffffff;
+			logerror("Dimm board dma (cpu <-> dimms) started: src %08x dst %08x len %08x\n", src, dst, len << 2);
+			/* Two examples:
+				1) bios uses a destination of 0x70900000 a source of 0x10000000 and then reads data at 0x0c900000
+			    2) bios puts data at 0x10004000 (from gdrom) and then uses a source of 0x78004000 and a destination of 0x10000000
+			*/
+			if (src >= 0x70000000) // cpu -> dimms
+			{
+				src = src - 0x70000000;
+				if (src & 0x08000000)
+					src = src + 0x08000000;
+				else
+					src = src + 0x0c000000;
+				dst = dst - 0x10000000;
+				ddtdata.buffer = dimm_data + dst; // TODO: access des encrypted data
+				ddtdata.source = src;
+				ddtdata.length = len;
+				ddtdata.size = 4;
+				ddtdata.channel = 1;
+				ddtdata.mode = -1;
+				ddtdata.direction = 0; // 0 sh4->device 1 device->sh4
+				m_maincpu->sh4_dma_ddt(&ddtdata);
+			}
+			else if (dst >= 0x70000000) // dimms -> cpu
+			{
+				dst = dst - 0x70000000;
+				if (dst & 0x8000000)
+					dst = dst + 0x8000000;
+				else
+					dst = dst + 0xc000000;
+				src = src - 0x10000000;
+				ddtdata.buffer = dimm_data + src; // TODO: access des encrypted data
+				ddtdata.destination = dst;
+				ddtdata.length = len;
+				ddtdata.size = 4;
+				ddtdata.channel = 1;
+				ddtdata.mode = -1;
+				ddtdata.direction = 1; // 0 sh4->device 1 device->sh4
+				m_maincpu->sh4_dma_ddt(&ddtdata);
+			}
+			// Log a message if requested transfer is not suppoted
+			src = memctl_regs[0x30 / 4] >> 24;
+			dst = memctl_regs[0x34 / 4] >> 24;
+			if ((src == 0x78) && ((dst & 0xf0) == 0x10))
+				logerror("  Supported\n");
+			else if (((src & 0xf0) == 0x10) && (dst == 0x70))
+				logerror("  Supported\n");
+			else
+				logerror("  Unsupported\n");
+		}
+	}
+}
+
+READ32_MEMBER(naomi_gdrom_board::memorymanager_r)
+{
+	return memctl_regs[offset];
+}
+
+WRITE16_MEMBER(naomi_gdrom_board::dimm_command_w)
+{
+	dimm_command = data;
+}
+
+READ16_MEMBER(naomi_gdrom_board::dimm_command_r)
+{
+	return dimm_command & 0xffff;
+}
+
+WRITE16_MEMBER(naomi_gdrom_board::dimm_offsetl_w)
+{
+	dimm_offsetl = data;
+}
+
+READ16_MEMBER(naomi_gdrom_board::dimm_offsetl_r)
+{
+	return dimm_offsetl & 0xffff;
+}
+
+WRITE16_MEMBER(naomi_gdrom_board::dimm_parameterl_w)
+{
+	dimm_parameterl = data;
+}
+
+READ16_MEMBER(naomi_gdrom_board::dimm_parameterl_r)
+{
+	return dimm_parameterl & 0xffff;
+}
+
+WRITE16_MEMBER(naomi_gdrom_board::dimm_parameterh_w)
+{
+	dimm_parameterh = data;
+}
+
+READ16_MEMBER(naomi_gdrom_board::dimm_parameterh_r)
+{
+	return dimm_parameterh & 0xffff;
+}
+
+WRITE16_MEMBER(naomi_gdrom_board::dimm_status_w)
+{
+	dimm_status = data;
+	if (dimm_status & 0x001)
+		m_maincpu->set_input_line(SH4_IRL3, CLEAR_LINE);
+	else
+		m_maincpu->set_input_line(SH4_IRL3, ASSERT_LINE);
+	if (dimm_status & 0x100)
+		set_ext_irq(CLEAR_LINE);
+	else
+		set_ext_irq(ASSERT_LINE);
+}
+
+READ16_MEMBER(naomi_gdrom_board::dimm_status_r)
+{
+	return dimm_status & 0xffff;
+}
+
+WRITE32_MEMBER(naomi_gdrom_board::sh4_unknown_w)
+{
+	sh4_unknown = data;
+}
+
+READ32_MEMBER(naomi_gdrom_board::sh4_unknown_r)
+{
+	return sh4_unknown;
+}
+
+WRITE32_MEMBER(naomi_gdrom_board::sh4_command_w)
+{
+	dimm_command = data;
+}
+
+READ32_MEMBER(naomi_gdrom_board::sh4_command_r)
+{
+	return dimm_command;
+}
+
+WRITE32_MEMBER(naomi_gdrom_board::sh4_offsetl_w)
+{
+	dimm_offsetl = data;
+}
+
+READ32_MEMBER(naomi_gdrom_board::sh4_offsetl_r)
+{
+	return dimm_offsetl;
+}
+
+WRITE32_MEMBER(naomi_gdrom_board::sh4_parameterl_w)
+{
+	dimm_parameterl = data;
+}
+
+READ32_MEMBER(naomi_gdrom_board::sh4_parameterl_r)
+{
+	return dimm_parameterl;
+}
+
+WRITE32_MEMBER(naomi_gdrom_board::sh4_parameterh_w)
+{
+	dimm_parameterh = data;
+}
+
+READ32_MEMBER(naomi_gdrom_board::sh4_parameterh_r)
+{
+	return dimm_parameterh;
+}
+
+WRITE32_MEMBER(naomi_gdrom_board::sh4_status_w)
+{
+	dimm_status = data;
+	if (dimm_status & 0x001)
+		m_maincpu->set_input_line(SH4_IRL3, CLEAR_LINE);
+	else
+		m_maincpu->set_input_line(SH4_IRL3, ASSERT_LINE);
+	if (dimm_status & 0x100)
+		set_ext_irq(CLEAR_LINE);
+	else
+		set_ext_irq(ASSERT_LINE);
+}
+
+READ32_MEMBER(naomi_gdrom_board::sh4_status_r)
+{
+	return dimm_status;
+}
+
+WRITE32_MEMBER(naomi_gdrom_board::sh4_des_keyl_w)
+{
+	dimm_des_key = (dimm_des_key & 0xffffffff00000000) | (uint64_t)data;
+}
+
+READ32_MEMBER(naomi_gdrom_board::sh4_des_keyl_r)
+{
+	return (uint32_t)dimm_des_key;
+}
+
+WRITE32_MEMBER(naomi_gdrom_board::sh4_des_keyh_w)
+{
+	dimm_des_key = (dimm_des_key & 0xffffffff) | ((uint64_t)data << 32);
+}
+
+READ32_MEMBER(naomi_gdrom_board::sh4_des_keyh_r)
+{
+	return (uint32_t)(dimm_des_key >> 32);
 }
 
 READ64_MEMBER(naomi_gdrom_board::i2cmem_dimm_r)
@@ -675,6 +929,14 @@ void naomi_gdrom_board::device_start()
 	save_item(NAME(picbus_pullup));
 	save_item(NAME(picbus_io));
 	save_item(NAME(picbus_used));
+	save_item(NAME(dimm_command));
+	save_item(NAME(dimm_offsetl));
+	save_item(NAME(dimm_parameterl));
+	save_item(NAME(dimm_parameterh));
+	save_item(NAME(dimm_status));
+	save_item(NAME(sh4_unknown));
+	save_item(NAME(dimm_des_key));
+	save_item(NAME(memctl_regs));
 }
 
 void naomi_gdrom_board::device_reset()

@@ -253,3 +253,24 @@ void rx01_device::write_sector(int ddam)
 	/* write data */
 	m_image[m_unit]->floppy_drive_write_sector_data(0, m_rxsa, (char *)m_buffer, 128, ddam);
 }
+
+ROM_START(rx01)
+	ROM_REGION(0x600, "firmware", 0)
+	ROM_LOAD_NIB_LOW( "23-111a2.e13", 0x000, 0x100, NO_DUMP)
+	ROM_LOAD_NIB_HIGH("23-421a2.e3",  0x000, 0x100, NO_DUMP)
+	ROM_LOAD_NIB_LOW( "23-257a2.e14", 0x100, 0x100, NO_DUMP)
+	ROM_LOAD_NIB_HIGH("23-258a2.e4",  0x100, 0x100, NO_DUMP)
+	ROM_LOAD_NIB_LOW( "23-115a2.e15", 0x200, 0x100, NO_DUMP)
+	ROM_LOAD_NIB_HIGH("23-116a2.e5",  0x200, 0x100, NO_DUMP)
+	ROM_LOAD_NIB_LOW( "23-117a2.e16", 0x300, 0x100, NO_DUMP)
+	ROM_LOAD_NIB_HIGH("23-118a2.e6",  0x300, 0x100, NO_DUMP)
+	ROM_LOAD_NIB_LOW( "23-259a2.e17", 0x400, 0x100, NO_DUMP)
+	ROM_LOAD_NIB_HIGH("23-260a2.e7",  0x400, 0x100, NO_DUMP)
+	ROM_LOAD_NIB_LOW( "23-121a2.e18", 0x500, 0x100, NO_DUMP)
+	ROM_LOAD_NIB_HIGH("23-122a2.e8",  0x500, 0x100, NO_DUMP)
+ROM_END
+
+const tiny_rom_entry *rx01_device::device_rom_region() const
+{
+	return ROM_NAME(rx01);
+}

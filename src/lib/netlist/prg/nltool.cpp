@@ -23,8 +23,6 @@
 #include <ios>
 #include <iostream> // scanf
 
-#define NLTOOL_VERSION  20190420
-
 class tool_app_t : public plib::app
 {
 public:
@@ -1008,12 +1006,12 @@ int tool_app_t::execute()
 	if (opt_version())
 	{
 		pout(
-			"nltool (netlist) " PSTRINGIFY(NLTOOL_VERSION) "\n"
+			"nltool (netlist) {1}\n"
 			"Copyright (C) 2019 Couriersud\n"
 			"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
 			"This is free software: you are free to change and redistribute it.\n"
 			"There is NO WARRANTY, to the extent permitted by law.\n\n"
-			"Written by Couriersud.\n");
+			"Written by Couriersud.\n", netlist::netlist_state_t::version());
 		if (opt_verb())
 		{
 			std::vector<std::pair<pstring, pstring>> defs;
@@ -1027,7 +1025,7 @@ int tool_app_t::execute()
 	}
 
 	m_defines = opt_defines();
-	m_defines.emplace_back("NLTOOL_VERSION=" PSTRINGIFY(NLTOOL_VERSION));
+	m_defines.emplace_back("NLTOOL_VERSION=" + netlist::netlist_state_t::version());
 	if (opt_prepro())
 		m_defines.emplace_back("__PREPROCESSOR_DEBUG__=1");
 

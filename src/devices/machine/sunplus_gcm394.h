@@ -39,9 +39,9 @@ public:
 		m_porta_out(*this),
 		m_nand_read_cb(*this),
 		m_csbase(0x20000),
+		m_romtype(0),
 		m_space_read_cb(*this),
 		m_space_write_cb(*this),
-		m_mapping_write_cb(*this),
 		m_boot_mode(0),
 		m_cs_callback(*this, DEVICE_SELF, FUNC(sunplus_gcm394_base_device::default_cs_callback))
 	{
@@ -56,7 +56,6 @@ public:
 
 	auto space_read_callback() { return m_space_read_cb.bind(); }
 	auto space_write_callback() { return m_space_write_cb.bind(); }
-	auto mapping_write_callback() { return m_mapping_write_cb.bind(); }
 
 	auto nand_read_callback() { return m_nand_read_cb.bind(); }
 
@@ -71,6 +70,10 @@ public:
 	void default_cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4 );
 
 	void set_cs_space(address_space* csspace) { m_cs_space = csspace; }
+	
+	void set_paldisplaybank_high_hack(int pal_displaybank_high) { m_spg_video->set_paldisplaybank_high(pal_displaybank_high); }
+	void set_alt_tile_addressing_hack(int alt_tile_addressing) { m_spg_video->set_alt_tile_addressing(alt_tile_addressing); }
+	void set_romtype(int romtype) { m_romtype = romtype; }
 
 protected:
 
@@ -154,6 +157,8 @@ protected:
 	uint16_t m_7960;
 	uint16_t m_7961;
 
+	uint16_t m_system_dma_memtype;
+
 	devcb_read16 m_nand_read_cb;
 	int m_csbase;
 
@@ -165,11 +170,11 @@ protected:
 	DECLARE_WRITE16_MEMBER(cs_space_w);
 	DECLARE_READ16_MEMBER(cs_bank_space_r);
 	DECLARE_WRITE16_MEMBER(cs_bank_space_w);
+	int m_romtype;
 
 private:
 	devcb_read16 m_space_read_cb;
 	devcb_write16 m_space_write_cb;
-	devcb_write16 m_mapping_write_cb;
 
 	DECLARE_READ16_MEMBER(unk_r);
 	DECLARE_WRITE16_MEMBER(unk_w);
@@ -184,6 +189,8 @@ private:
 	DECLARE_WRITE16_MEMBER(system_dma_params_channel1_w);
 	DECLARE_READ16_MEMBER(system_dma_status_r);
 	DECLARE_WRITE16_MEMBER(system_dma_trigger_w);
+	DECLARE_READ16_MEMBER(system_dma_memtype_r);
+	DECLARE_WRITE16_MEMBER(system_dma_memtype_w);
 
 	DECLARE_READ16_MEMBER(unkarea_780f_status_r);
 	DECLARE_READ16_MEMBER(unkarea_78fb_status_r);
@@ -292,7 +299,6 @@ private:
 	// config registers (external pins)
 	int m_boot_mode; // 2 pins determine boot mode, likely only read at power-on
 	sunplus_gcm394_cs_callback_device m_cs_callback;
-
 };
 
 
@@ -339,6 +345,8 @@ private:
 
 	DECLARE_WRITE16_MEMBER(flash_addr_low_w);
 	DECLARE_WRITE16_MEMBER(flash_addr_high_w);
+	
+	DECLARE_READ16_MEMBER(nand_ecc_low_byte_error_flag_1_r);
 
 	int m_testval;
 
@@ -348,7 +356,6 @@ private:
 	uint16_t m_flash_addr_high;
 
 	int m_curblockaddr;
-
 };
 
 

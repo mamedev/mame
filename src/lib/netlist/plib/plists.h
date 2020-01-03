@@ -461,8 +461,7 @@ namespace plib {
 				if (*i == elem)
 				{
 					m_end--;
-					for (;i < m_end; i++)
-						*i = std::move(*(i+1));
+					*i = *m_end;
 					std::make_heap(&m_list[0], m_end, compare());
 					return;
 				}

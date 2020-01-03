@@ -7,6 +7,7 @@
 #include "plib/palloc.h"
 #include "plib/pmempool.h"
 #include "plib/putil.h"
+#include "plib/pfmtlog.h"
 
 #include "devices/nlid_proxy.h"
 #include "devices/nlid_system.h"
@@ -202,6 +203,7 @@ namespace netlist
 	, m_callbacks(std::move(callbacks)) // Order is important here
 	, m_log(*m_callbacks)
 	, m_extended_validation(false)
+	, m_dummy_version(1)
 	{
 		pstring libpath = plib::util::environment("NL_BOOSTLIB", plib::util::buildpath({".", "nlboost.so"}));
 		m_lib = plib::make_unique<plib::dynlib>(libpath);
@@ -210,6 +212,11 @@ namespace netlist
 		// create the run interface
 		m_netlist = m_pool.make_unique<netlist_t>(*this);
 
+		// Make sure save states are invalidated when a new version is deployed
+
+		m_state.save_item(this, m_dummy_version, pstring("V") + version());
+
+		// Initialize factory
 		devices::initialize_factory(m_setup->factory());
 		NETLIST_NAME(base)(*m_setup);
 	}
@@ -241,19 +248,19 @@ namespace netlist
 		return std::numeric_limits<std::size_t>::max();
 	}
 
-
-
 	void netlist_state_t::rebuild_lists()
 	{
 		for (auto & net : m_nets)
 			net->rebuild_list();
 	}
 
-
 	void netlist_state_t::compile_defines(std::vector<std::pair<pstring, pstring>> &defs)
 	{
 	#define ENTRY(x) if (pstring(#x) != PSTRINGIFY(x)) defs.emplace_back(std::pair<pstring, pstring>(#x, PSTRINGIFY(x)));
-		ENTRY(PHAS_RDTSCP)
+		ENTRY(NL_VERSION_MAJOR)
+		ENTRY(NL_VERSION_MINOR)
+		ENTRY(NL_VERSION_PATCHLEVEL)
+
 		ENTRY(PUSE_ACCURATE_STATS)
 		ENTRY(PHAS_INT128)
 		ENTRY(PUSE_ALIGNED_OPTIMIZATIONS)
@@ -298,6 +305,16 @@ namespace netlist
 		ENTRY(__linux__)
 
 	#undef ENTRY
+	}
+
+	pstring netlist_state_t::version()
+	{
+		return plib::pfmt("{1}.{2}")(NL_VERSION_MAJOR, NL_VERSION_MINOR);
+	}
+
+	pstring netlist_state_t::version_patchlevel()
+	{
+		return plib::pfmt("{1}.{2}.{3}")(NL_VERSION_MAJOR, NL_VERSION_MINOR, NL_VERSION_PATCHLEVEL);
 	}
 
 	void netlist_t::reset()

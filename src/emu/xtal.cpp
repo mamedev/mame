@@ -228,6 +228,7 @@ const double XTAL::known_xtals[] = {
 	 15'700'000, /* 15.7_MHz_XTAL          Motogonki */
 	 15'897'600, /* 15.8976_MHz_XTAL       IAI Swyft */
 	 15'920'000, /* 15.92_MHz_XTAL         HP Integral PC */
+	 15'930'000, /* 15.93_MHz_XTAL         ADM 12 */
 	 15'974'400, /* 15.9744_MHz_XTAL       Osborne 1 (9600 * 52 * 32) */
 	 16'000'000, /* 16_MHz_XTAL            Extremely common, used on 100's of PCBs */
 	 16'097'280, /* 16.09728_MHz_XTAL      DEC VT240 (1024 * 262 * 60) */
@@ -285,6 +286,7 @@ const double XTAL::known_xtals[] = {
 	 21'281'370, /* 21.28137_MHz_XTAL      Radica Tetris (PAL) */
 	 21'300'000, /* 21.3_MHz_XTAL          - */
 	 21'477'272, /* 21.477272_MHz_XTAL     BMC bowling, some Data East 90's games, Vtech Socrates; (6x NTSC subcarrier) */
+	 21'667'500, /* 21.6675_MHz_XTAL       AT&T 610 (80-column display clock) */
 	 22'000'000, /* 22_MHz_XTAL            - */
 	 22'032'000, /* 22.032_MHz_XTAL        Intellec Series II I/O controller */
 	 22'096'000, /* 22.096_MHz_XTAL        ADDS Viewpoint 122 */
@@ -324,6 +326,7 @@ const double XTAL::known_xtals[] = {
 	 27'164'000, /* 27.164_MHz_XTAL        Typically used on 90's Taito PCBs to drive the custom chips */
 	 27'210'900, /* 27.2109_MHz_XTAL       LA Girl */
 	 27'562'000, /* 27.562_MHz_XTAL        Visual 220 */
+	 27'720'000, /* 27.72_MHz_XTAL         AT&T 610 (132-column display clock) */
 	 28'000'000, /* 28_MHz_XTAL            - */
 	 28'322'000, /* 28.322_MHz_XTAL        Saitek RISC 2500, Mephisto Montreux */
 	 28'375'160, /* 28.37516_MHz_XTAL      Amiga PAL systems */

@@ -20,6 +20,7 @@ Year + Game               Board(s)               CPU      Company            Not
 82  Royal Mahjong         ? + FRM-03             Z80      Falcon             bootleg
 83  Janyou Part II                               Z80      Cosmo Denshi
 84? Jan Oh                FRM-00?                Z80      Toaplan            Incomplete program roms
+84? Challenge Girl        FRM-03 + SK-1B         Z80      Paradise Denshi    The dumped set is a bootleg by Falcon
 86  Ippatsu Gyakuten                             Z80      Public/Paradais
 86  Don Den Mahjong       D039198L-0             Z80      Dyna Electronics
 86  Jong Shin             D8702158L1-0           Z80      Dyna Electronics
@@ -5263,6 +5264,23 @@ ROM_START( rkjanoh2 )
 	ROM_LOAD( "82s123",       0x000, 0x020, CRC(74a53e94) SHA1(ca9114bd9b2b07f5abe82616b41ae9fdb9537a4f) )
 ROM_END
 
+ROM_START( chalgirl )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // the first 6 ROMs are on the FRM-03 board, the following on the SK-1B sub board
+	ROM_LOAD( "cg_11.o1",  0x0000, 0x1000, CRC(1c064d3e) SHA1(cfe7e536efb377f009d7c9bee5b5a814ad1404ad) ) // 2732
+	ROM_LOAD( "cg_22.o2",  0x1000, 0x1000, CRC(3244fe61) SHA1(3163f14b8977fe4b05aa11d332347c5f3cc2fbfa) ) // 2732
+	ROM_LOAD( "cg_33.o3",  0x2000, 0x1000, CRC(692ef940) SHA1(c5a54161bedf26695aedad66016b5a789dbe13e5) ) // 2732
+	ROM_LOAD( "cg_4.o3",   0x3000, 0x1000, CRC(562aa45f) SHA1(fc052b8f3b2f105c9282468d385a9ad554ec00f5) ) // 2732
+	ROM_LOAD( "cg_5.o4",   0x4000, 0x1000, CRC(c0849a41) SHA1(1d901d59248cf0d8beff03207c46e3c50d0011cf) ) // 2732
+	ROM_LOAD( "cg_6.o4",   0x5000, 0x1000, CRC(92687327) SHA1(4fafba5881dca2a147616d94dd055eba6aa3c653) ) // 2732
+	ROM_LOAD( "7.f1",      0x6000, 0x1000, CRC(465db6e1) SHA1(e08fe431ab8676372fc13c51a2684a0320e01031) ) // 2732
+	ROM_LOAD( "8.e1",      0x7000, 0x2000, CRC(42fafb6f) SHA1(32d06ee4fe28033ae04058d806917bf5b5690246) ) // 2764
+	ROM_LOAD( "9.c1",      0x9000, 0x2000, CRC(8291e28a) SHA1(9a05cae191babdf3f78a7131985d8c6583f7c973) ) // 2764
+	ROM_LOAD( "10.b1",     0xb000, 0x2000, CRC(04e76413) SHA1(e85db89084a8ae448fde4e202e8516b2e14a8265) ) // 2764
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "f-rom.bpr",  0x0000, 0x0020, BAD_DUMP CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) ) // not dumped for this set, using the one from royalmah for now
+ROM_END
+
 void royalmah_state::init_tahjong()
 {
 	m_mainbank->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
@@ -5327,6 +5345,7 @@ void royalmah_state::init_janptr96()
 GAME( 1981,  royalmj,  0,        royalmah, royalmah, royalmah_state, empty_init,    ROT0,   "Nichibutsu",                 "Royal Mahjong (Japan, v1.13)",          0 )
 GAME( 1981?, openmj,   royalmj,  royalmah, royalmah, royalmah_state, empty_init,    ROT0,   "Sapporo Mechanic",           "Open Mahjong [BET] (Japan)",            0 )
 GAME( 1982,  royalmah, royalmj,  royalmah, royalmah, royalmah_state, empty_init,    ROT0,   "bootleg",                    "Royal Mahjong (Falcon bootleg, v1.01)", 0 )
+GAME( 1984?, chalgirl, 0,        royalmah, royalmah, royalmah_state, empty_init,    ROT0,   "bootleg",                    "Challenge Girl (Falcon bootleg)", MACHINE_NOT_WORKING ) // correct rom loading / banking, girls aren't shown
 GAME( 1983,  seljan,   0,        seljan,   seljan,   royalmah_state, empty_init,    ROT0,   "Jem / Dyna Corp",            "Sel-Jan [BET] (Japan)", 0 )
 GAME( 1983,  janyoup2, royalmj,  janyoup2, janyoup2, royalmah_state, empty_init,    ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
 GAME( 1985,  tahjong,  royalmj,  tahjong,  tahjong,  royalmah_state, init_tahjong,  ROT0,   "Bally Pond / Nasco",         "Tahjong Yakitori (ver. 2-1)",           0 ) // 1985 Jun. 17

@@ -124,6 +124,29 @@ remaps button 2 and 3 to button 1, so you can't enter the above sequence.
 
 ---
 
+'gunnailp' observed differences (from notes by trap15)
+
+   - Different introduction scene
+   - Many unique enemy types that ended up unused
+   - Tweaked enemy attack patterns
+   - Tweaked boss behavior and attack patterns
+   - Dramatically different stages (and only 7 of them):
+	  - Stage 1: Became Stage 5, very different layouts
+	  - Stage 2: Became Stage 7, with mostly slight enemy layout changes
+	  - Stage 3: Became Stage 6, almost the same as final
+	  - Stage 4: Stayed as Stage 4, with very minor enemy layout changes
+	  - Stage 5: Entirely unique stage, majorly reworked to become final Stage 2
+	  - Stage 6: Became Stage 3, many enemy layout changes
+	  - Stage 7: Entirely unique stage, majorly reworked to become final Stage 1
+   - No ending, instead loops forever
+	  - Loop has extremely fast bullets
+	  - The difficulty seems the same on all loops
+   - Player's blue shot has a wider maximum and minimum spread
+   - Player's main shot hitbox is symmetrical and wider than final
+	  - When the hitbox was shrunk for the final, it was only shrunk in one direction, making it extended to the right
+
+---
+
 Questions / Notes
 
 'manybloc' :
@@ -6639,6 +6662,34 @@ ROM_START( gunnail )
 	ROM_LOAD( "10_82s123.u96",  0x0200, 0x0020, CRC(c60103c8) SHA1(dfb05b704bb5e1f75f5aaa4fa36e8ddcc905f8b6) )  /* unknown */
 ROM_END
 
+ROM_START( gunnailp )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "3.u132",  0x00000, 0x80000, CRC(93570f03) SHA1(54fb203b5bfceb0ac86627bff3e67863f460fe73) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )     /* Code for NMK004 CPU */
+	ROM_LOAD( "92077_2.u101",      0x00000, 0x10000, CRC(cd4e55f8) SHA1(92182767ca0ec37ec4949bd1a88c2efdcdcb60ed) )
+
+	ROM_REGION( 0x020000, "fgtile", 0 )
+	ROM_LOAD( "1.u21",    0x000000, 0x020000, CRC(bdf427e4) SHA1(e9cd178d1d9e2ed72f0fb013385d935f334b8fe3) )    /* 8x8 tiles */
+
+	ROM_REGION( 0x100000, "bgtile", 0 )
+	ROM_LOAD( "92077-4.u19", 0x000000, 0x100000, CRC(a9ea2804) SHA1(14dbdb3c7986db5e44dc7c5be6fcf39f3d1e50b0) ) /* 16x16 tiles */
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "92077-7.u134", 0x000000, 0x200000, CRC(d49169b3) SHA1(565ff7725dd6ace79b55706114132d8d867e81a9) ) /* Sprites */
+
+	ROM_REGION( 0x080000, "oki1", 0 )   /* OKIM6295 samples */
+	ROM_LOAD( "92077-5.u56", 0x00000, 0x80000, CRC(feb83c73) SHA1(b44e9d20b4af02e218c4bc875d66a7d6b8551cae) ) /* 0x20000 - 0x80000 banked */
+
+	ROM_REGION( 0x080000, "oki2", 0 )   /* OKIM6295 samples */
+	ROM_LOAD( "92077-6.u57", 0x00000, 0x80000, CRC(6d133f0d) SHA1(8a5e6e27a297196f20e4de0d060f1188115809bb) ) /* 0x20000 - 0x80000 banked */
+
+	ROM_REGION( 0x0220, "proms", 0 )
+	ROM_LOAD( "8_82s129.u35",   0x0000, 0x0100, CRC(4299776e) SHA1(683d14d2ace14965f0fcfe0f0540c1b77d2cece5) )  /* unknown */
+	ROM_LOAD( "9_82s135.u72",   0x0100, 0x0100, CRC(633ab1c9) SHA1(acd99fcca41eaab7948ca84988352f1d7d519c61) )  /* unknown */
+	ROM_LOAD( "10_82s123.u96",  0x0200, 0x0020, CRC(c60103c8) SHA1(dfb05b704bb5e1f75f5aaa4fa36e8ddcc905f8b6) )  /* unknown */
+ROM_END
+
 // bootleg board labeled 'GT ELEKTRONIK 16.04.93' with only 1 OKI and no NMK custom chips. Only sprites and bgtile ROMs are identical to the original.
 ROM_START( gunnailb )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 code */
@@ -8420,6 +8471,7 @@ GAME( 1992, macross,    0,        macross,      macross,      nmk16_state, init_
 
 GAME( 1993, gunnail,    0,        gunnail,      gunnail,      nmk16_state, init_nmk,             ROT270, "NMK / Tecmo",                  "GunNail (28th May. 1992)", 0 ) // Tecmo is displayed only when set to Japan
 GAME( 1992, gunnailb,   gunnail,  gunnailb,     gunnail,      nmk16_state, init_gunnailb,        ROT270, "bootleg",                      "GunNail (bootleg)", MACHINE_NO_SOUND ) // different sound hardware not hooked up
+GAME( 1992, gunnailp,   gunnail,  gunnail,      gunnail,      nmk16_state, init_nmk,             ROT270, "NMK",                          "GunNail (location test)", 0 ) // still has the 28th May. 1992 string, so unlikely that was the release date for either version.
 // a 1992 version of Gunnail exists, see https://www.youtube.com/watch?v=tf15Wz0zUiA  3:10; is this bootleg version 'gunnailb'?
 
 GAME( 1993, macross2,   0,        macross2,     macross2,     nmk16_state, init_banked_audiocpu, ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II", MACHINE_NO_COCKTAIL )
