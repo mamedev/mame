@@ -14529,8 +14529,9 @@ suprpokra                       // (c) 1986 Grayhound Electronics
 suprpokrb                       // (c) 1986 Grayhound Electronics
 
 @source:generalplus_gpl32612.cpp
-jak_tmnthp
 jak_swbstrik
+jak_tmnthp
+jak_dchp
 
 @source:geneve.cpp
 geneve                          // 1987 Myarc Geneve 9640
