@@ -437,13 +437,14 @@ void psxgpu_device::updatevisiblearea()
 	else
 	{
 		/* ntsc */
-		refresh = 60;
 		switch( ( n_gpustatus >> 0x13 ) & 1 )
 		{
 		case 0:
+			refresh = 59.82;
 			n_screenheight = 240;
 			break;
 		case 1:
+			refresh = 59.94;
 			n_screenheight = 480;
 			break;
 		}
