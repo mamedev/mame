@@ -102,6 +102,11 @@ function hiscore.startplugin()
 	  if emu.softname() ~= "" then
 		local soft = emu.softname():match("([^:]*)$")
 		rm_match = '^' .. emu.romname() .. ',' .. soft .. ':';
+	  elseif manager:machine().images["cart"]:filename() ~= "" then
+		basename = string.gsub(manager:machine().images["cart"]:filename(), "(.*/)(.*)", "%2");
+		local quotepattern = '(['..("%^$().[]*+-?"):gsub("(.)", "%%%1")..'])';
+		basename = basename:gsub(quotepattern, "%%%1");
+		rm_match = '^' .. basename .. ':';
 	  else
 		rm_match = '^' .. emu.romname() .. ':';
 	  end
@@ -120,7 +125,7 @@ function hiscore.startplugin()
 			  end
 			elseif string.find(line, rm_match) then --- match this game
 			  current_is_match = true;
-			elseif string.find(line, '^[a-z0-9_]+:') then --- some game
+			elseif string.find(line, '^.+:') then --- some game
 			  if current_is_match and string.len(cluster) > 0 then
 				break; -- we're done
 			  end
@@ -157,6 +162,9 @@ function hiscore.startplugin()
 	  if emu.softname() ~= "" then
 		local soft = emu.softname():match("([^:]*)$")
 		r = hiscore_path .. '/' .. emu.romname() .. "_" .. soft .. ".hi";
+	  elseif manager:machine().images["cart"]:filename() ~= "" then
+		local basename = string.gsub(manager:machine().images["cart"]:filename(), "(.*/)(.*)", "%2");
+		r = hiscore_path .. '/' .. basename .. ".hi";
 	  else
 		r = hiscore_path .. '/' .. emu.romname() .. ".hi";
 	  end
