@@ -11,8 +11,8 @@ for it, but no software 'driver' either.
 
 Mephisto TM Almeria is not on this hardware.
 
-Mephisto Berlin 68030 is an unreleased dev version, an update to Vancouver,
-not used in any tournament. Internal string and version matches Vancouver 68030,
+Mephisto TM Berlin is an unreleased dev version, an update to TM Vancouver, but
+not used in any tournament. Internal string and version matches TM Vancouver,
 but ROM has many differences.
 
 Hardware notes:

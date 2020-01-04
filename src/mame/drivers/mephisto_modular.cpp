@@ -32,7 +32,7 @@ TODO:
 
 Undocumented buttons:
 - holding ENTER and LEFT cursor on boot runs diagnostics
-- holding UP and RIGHT cursor on boot will clear the battery backed RAM
+- holding CLEAR on boot will clear the battery backed RAM
 
 ===============================================================================
 
@@ -454,7 +454,7 @@ void mmodular_state::gen32(machine_config &config)
 	const attotime irq_period = attotime::from_hz(6.144_MHz_XTAL / 0x4000); // through 4060, 375Hz
 	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq2_line_hold), irq_period);
 
-	subdevice<hd44780_device>("display:hd44780")->set_busy_factor(0.25);
+	subdevice<hd44780_device>("display:hd44780")->set_busy_factor(0.25); // problem with waitstates
 	config.set_default_layout(layout_mephisto_gen32);
 }
 

@@ -21,9 +21,6 @@ Undocumented buttons:
 #include "machine/nvram.h"
 #include "machine/mmboard.h"
 
-#include "screen.h"
-#include "speaker.h"
-
 // internal artwork
 #include "mephisto_berlin.lh"
 
