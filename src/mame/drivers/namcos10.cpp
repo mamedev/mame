@@ -1283,4 +1283,4 @@ GAME( 2003, nflclsfb,  0,        ns10_nflclsfb, namcos10, namcos10_state, init_n
 GAME( 2003, konotako,  0,        ns10_konotako, namcos10, namcos10_state, init_konotako, ROT0, "Mitchell", "Kono Tako (10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME( 2004, sekaikh,   0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME( 2004, taiko6,    0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME( 200?, unks10md,  0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Namco", "unknown Namco System 10 medal game (MTL1 SPRB0)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 200?, unks10md,  0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Namco", "unknown Namco System 10 medal game (MTL1 SPR0B)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
