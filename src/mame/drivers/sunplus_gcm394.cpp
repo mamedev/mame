@@ -811,7 +811,7 @@ INPUT_PORTS_END
 
 ROM_START(smartfp)
 	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
-	//ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
 
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("smartfitpark.bin", 0x000000, 0x800000, CRC(ada84507) SHA1(a3a80bf71fae62ebcbf939166a51d29c24504428))
@@ -819,7 +819,7 @@ ROM_END
 
 ROM_START(wrlshunt)
 	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
-	//ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
 
 	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("wireless.bin", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796))		
@@ -928,7 +928,7 @@ https://web.archive.org/web/20180106005235/http://www.lcis.com.tw/paper_store/pa
 
 ROM_START( wlsair60 )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
 	ROM_REGION16_BE( 0x8400000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "wlsair60.nand", 0x0000, 0x8400000, CRC(eec23b97) SHA1(1bb88290cf54579a5bb51c08a02d793cd4d79f7a) )
@@ -936,7 +936,7 @@ ROM_END
 
 ROM_START( jak_gtg )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
 	ROM_REGION16_BE( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "goldentee.bin", 0x0000, 0x4200000, CRC(87d5e815) SHA1(5dc46cd753b791449cc41d5eff4928c0dcaf35c0) )
@@ -944,7 +944,7 @@ ROM_END
 
 ROM_START( jak_car2 )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
 	ROM_REGION16_BE( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "cars2.bin", 0x0000, 0x4200000, CRC(4d610e09) SHA1(bc59f5f7f676a8f2a78dfda7fb62c804bbf850b6) )
@@ -952,7 +952,7 @@ ROM_END
 
 ROM_START( jak_tsm )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
 	ROM_REGION16_BE( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "toystorymania.bin", 0x0000, 0x4200000, CRC(183b20a5) SHA1(eb4fa5ee9dfac58f5244d00d4e833b1e461cc52c) )
@@ -960,7 +960,7 @@ ROM_END
 
 ROM_START( vbaby )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
 	ROM_REGION16_BE( 0x8400000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "vbaby.bin", 0x0000, 0x8400000, CRC(d904441b) SHA1(3742bc4e1e403f061ce2813ecfafc6f30a44d287) )
@@ -968,7 +968,7 @@ ROM_END
 
 ROM_START( beambox )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
 	ROM_REGION16_BE( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "beambox.bin", 0x0000, 0x4200000, CRC(a486f04e) SHA1(73c7d99d8922eba58d94e955e254b9c3baa4443e) )

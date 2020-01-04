@@ -41,8 +41,8 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			//                                         , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 			m_core->m_icount -= 1; // TODO
 
-			uint16_t r0 = (ra & 0x8) ? m_secondary_r[ra & 0x7] : m_core->m_r[ra & 0x7];
-			uint16_t r1 = (rb & 0x8) ? m_secondary_r[rb & 0x7] : m_core->m_r[rb & 0x7];
+			uint16_t r0 = (ra & 0x8) ? m_core->m_r[(ra & 0x7)+8] : m_core->m_r[ra & 0x7];
+			uint16_t r1 = (rb & 0x8) ? m_core->m_r[(rb & 0x7)+8] : m_core->m_r[rb & 0x7];
 
 			uint32_t lres = r0 + r1;
 
@@ -50,7 +50,7 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 			if (ra & 0x8)
 			{
-				m_secondary_r[ra & 0x7] = (uint16_t)lres;
+				m_core->m_r[(ra & 0x7)+8] = (uint16_t)lres;
 			}
 			else
 			{
@@ -93,8 +93,8 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			//                                         , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 			m_core->m_icount -= 1; // TODO
 
-			uint16_t r0 = (ra & 0x8) ? m_secondary_r[ra & 0x7] : m_core->m_r[ra & 0x7];
-			uint16_t r1 = (rb & 0x8) ? m_secondary_r[rb & 0x7] : m_core->m_r[rb & 0x7];
+			uint16_t r0 = (ra & 0x8) ? m_core->m_r[(ra & 0x7)+8] : m_core->m_r[ra & 0x7];
+			uint16_t r1 = (rb & 0x8) ? m_core->m_r[(rb & 0x7)+8] : m_core->m_r[rb & 0x7];
 
 			uint32_t lres = r0 + (uint16_t)(~r1) + uint32_t(1);
 			update_nzsc(lres, r0 , ~r1);
@@ -127,11 +127,11 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			//                                       , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 			m_core->m_icount -= 1; // TODO
 
-			uint32_t lres = (rb & 0x8) ? m_secondary_r[rb & 0x7] : m_core->m_r[rb & 0x7];
+			uint32_t lres = (rb & 0x8) ? m_core->m_r[(rb & 0x7)+8] : m_core->m_r[rb & 0x7];
 			update_nz(lres);
 			if (ra & 0x8)
 			{
-				m_secondary_r[ra & 0x7] = (uint16_t)lres;
+				m_core->m_r[(ra & 0x7)+8] = (uint16_t)lres;
 			}
 			else
 			{
@@ -146,15 +146,15 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			// A |= B
 			//logerror("(Extended group 0) %s |= %s\n", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
 			//                                 	      , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
-			uint16_t a = (ra & 0x8) ? m_secondary_r[ra & 0x7] : m_core->m_r[ra & 0x7];
-			uint16_t b = (rb & 0x8) ? m_secondary_r[rb & 0x7] : m_core->m_r[rb & 0x7];
+			uint16_t a = (ra & 0x8) ? m_core->m_r[(ra & 0x7)] : m_core->m_r[ra & 0x7];
+			uint16_t b = (rb & 0x8) ? m_core->m_r[(rb & 0x7)+8] : m_core->m_r[rb & 0x7];
 
 			uint32_t lres = a | b;
 
 			update_nz(lres);
 			if (ra & 0x8)
 			{
-				m_secondary_r[ra & 0x7] = (uint16_t)lres;
+				m_core->m_r[(ra & 0x7)+8] = (uint16_t)lres;
 			}
 			else
 			{
@@ -226,9 +226,9 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 				while (size--)
 				{
 					if (rb & 0x8)
-						push(m_secondary_r[rx--], &m_secondary_r[rb & 0x7]);
+						push(m_core->m_r[(rx--)+8], &m_core->m_r[(rb & 0x7)+8]);
 					else
-						push(m_secondary_r[rx--], &m_core->m_r[rb & 0x7]);
+						push(m_core->m_r[(rx--)+8], &m_core->m_r[rb & 0x7]);
 				}
 			}
 			else
@@ -257,9 +257,9 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 				while (size--)
 				{
 					if (rb & 0x8)
-						m_secondary_r[realrx++] = pop(&m_secondary_r[rb & 0x07]);
+						m_core->m_r[(realrx++)+8] = pop(&m_core->m_r[(rb & 0x07)+8]);
 					else
-						m_secondary_r[realrx++] = pop(&m_core->m_r[rb & 0x07]);
+						m_core->m_r[(realrx++)+8] = pop(&m_core->m_r[rb & 0x07]);
 				}
 			}
 			else
@@ -359,7 +359,7 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			update_nz(lres);
 			if (ra & 0x8)
 			{
-				m_secondary_r[ra & 0x7] = (uint16_t)lres;
+				m_core->m_r[(ra & 0x7)+8] = (uint16_t)lres;
 			}
 			else
 			{
@@ -385,12 +385,12 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			//											  , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
 			//										  	  , imm16_2);
 
-			uint16_t b = (rb & 0x8) ? m_secondary_r[rb & 0x7] : m_core->m_r[rb & 0x7];
+			uint16_t b = (rb & 0x8) ? m_core->m_r[(rb & 0x7)+8] : m_core->m_r[rb & 0x7];
 			uint32_t lres = b & imm16_2;
 			update_nz(lres);
 			if (ra & 0x8)
 			{
-				m_secondary_r[ra & 0x7] = (uint16_t)lres;
+				m_core->m_r[(ra & 0x7)+8] = (uint16_t)lres;
 			}
 			else
 			{
@@ -513,7 +513,7 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			update_nz(lres);
 			if (ra & 0x8)
 			{
-				m_secondary_r[ra & 0x7] = (uint16_t)lres;
+				m_core->m_r[(ra & 0x7)+8] = (uint16_t)lres;
 			}
 			else
 			{
@@ -696,7 +696,7 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 			if (rb & 0x8)
 			{
-				write16(imm16_2, m_secondary_r[rb & 0x07]);
+				write16(imm16_2, m_core->m_r[(rb & 0x07)+8]);
 			}
 			else
 			{
@@ -1017,9 +1017,9 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			//logerror("(Extended group 6) %s -= %02x\n", extregs[rx], imm6);
 			m_core->m_icount -= 1; // TODO
 
-			uint32_t lres = m_secondary_r[rx] + (uint16_t)(~imm6) + uint32_t(1);
-			update_nzsc(lres, m_secondary_r[rx], ~imm6);
-			m_secondary_r[rx] = (uint16_t)lres;
+			uint32_t lres = m_core->m_r[rx+8] + (uint16_t)(~imm6) + uint32_t(1);
+			update_nzsc(lres, m_core->m_r[rx+8], ~imm6);
+			m_core->m_r[rx+8] = (uint16_t)lres;
 
 			return;
 			break;
@@ -1038,8 +1038,8 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 			m_core->m_icount -= 1; // TODO
 
-			uint32_t lres = m_secondary_r[rx] + (uint16_t)(~imm6) + uint32_t(1);
-			update_nzsc(lres, m_secondary_r[rx] , ~imm6);
+			uint32_t lres = m_core->m_r[rx+8] + (uint16_t)(~imm6) + uint32_t(1);
+			update_nzsc(lres, m_core->m_r[rx+8] , ~imm6);
 
 			//unimplemented_opcode(op, ximm);
 			return;
@@ -1068,7 +1068,7 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 			uint32_t lres = imm6;
 			update_nz(lres);
-			m_secondary_r[rx] = (uint16_t)lres;
+			m_core->m_r[rx+8] = (uint16_t)lres;
 
 			return;
 			break;
@@ -1126,14 +1126,14 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			m_core->m_icount -= 1; // TODO
 
 			uint16_t addr = (uint16_t)(m_core->m_r[REG_BP] + (imm6 & 0x3f));
-			uint16_t r0 = m_secondary_r[rx];
+			uint16_t r0 = m_core->m_r[rx+8];
 			uint16_t r1 = read16(addr);
 
 			uint32_t lres = r0 + r1;
 
 			update_nzsc(lres, r0, r1);
 
-			m_secondary_r[rx] = lres;
+			m_core->m_r[rx+8] = lres;
 
 			//unimplemented_opcode(op, ximm);
 			return;
@@ -1147,14 +1147,14 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 			uint32_t c = (m_core->m_r[REG_SR] & UNSP_C) ? 1 : 0;
 			uint16_t addr = (uint16_t)(m_core->m_r[REG_BP] + (imm6 & 0x3f));
-			uint16_t r0 = m_secondary_r[rx];
+			uint16_t r0 = m_core->m_r[rx+8];
 			uint16_t r1 = read16(addr);
 
 			uint32_t lres = r0 + r1 + c;
 
 			update_nzsc(lres, r0, r1);
 
-			m_secondary_r[rx] = lres;
+			m_core->m_r[rx+8] = lres;
 
 			//unimplemented_opcode(op, ximm);
 			return;
