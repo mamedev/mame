@@ -232,6 +232,7 @@ protected:
 
 	void update_nz(uint32_t value);
 	void update_nzsc(uint32_t value, uint16_t r0, uint16_t r1);
+	bool do_basic_alu_ops(const uint16_t& op0, uint32_t& lres, uint16_t& r0, uint16_t& r1, uint32_t& r2, bool update_flags);
 
 private:
 	// compilation boundaries -- how far back/forward does the analysis extend?
@@ -253,7 +254,6 @@ private:
 	};
 
 
-	inline bool do_basic_alu_ops(const uint16_t& op0, uint32_t& lres, uint16_t& r0, uint16_t& r1, uint32_t& r2, bool update_flags);
 	void execute_jumps(const uint16_t op);
 	void execute_remaining(const uint16_t op);
 	void execute_one(const uint16_t op);
