@@ -717,131 +717,21 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 		uint8_t rx = (ximm & 0x0e00) >> 9;
 		uint8_t imm6 = (ximm & 0x003f) >> 0;
 
-		switch (aluop)
+		uint32_t addr = (uint16_t)(m_core->m_r[REG_BP] + (imm6 & 0x3f));
+
+		uint16_t b = m_core->m_r[rx+8];
+		uint16_t c = read16(addr);
+
+		uint32_t storeaddr = addr; // dest address for STORE 
+		uint32_t lres;
+
+		bool write = do_basic_alu_ops(aluop, lres, b, c, storeaddr, true);
+
+		if (write)
 		{
-		case 0x00: // add
-		{
-			// A += B
-			// logerror( "(Extended group 7) %s += [BP+%02x]\n", extregs[rx], imm6 );
-			m_core->m_icount -= 1; // TODO
-
-			uint16_t addr = (uint16_t)(m_core->m_r[REG_BP] + (imm6 & 0x3f));
-			uint16_t r0 = m_core->m_r[rx+8];
-			uint16_t r1 = read16(addr);
-
-			uint32_t lres = r0 + r1;
-
-			update_nzsc(lres, r0, r1);
-
-			m_core->m_r[rx+8] = lres;
-
-			//unimplemented_opcode(op, ximm);
-			return;
-			break;
-		}
-		case 0x01: // adc
-		{
-			// A += B, Carry
-			//logerror( "(Extended group 7) %s += [BP+%02x], carry\n", extregs[rx], imm6 );
-			m_core->m_icount -= 1; // TODO
-
-			uint32_t c = (m_core->m_r[REG_SR] & UNSP_C) ? 1 : 0;
-			uint16_t addr = (uint16_t)(m_core->m_r[REG_BP] + (imm6 & 0x3f));
-			uint16_t r0 = m_core->m_r[rx+8];
-			uint16_t r1 = read16(addr);
-
-			uint32_t lres = r0 + r1 + c;
-
-			update_nzsc(lres, r0, r1);
-
-			m_core->m_r[rx+8] = lres;
-
-			//unimplemented_opcode(op, ximm);
-			return;
-			break;
+			m_core->m_r[rx+8] = (uint16_t)lres;
 		}
 
-		case 0x02: // sub
-			// A -= B
-			logerror( "(Extended group 7) %s -= [BP+%02x]\n", extregs[rx], imm6 );
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
-
-		case 0x03: // sbc
-			// A -= B, Carry
-			logerror( "(Extended group 7) %s -= [BP+%02x], carry\n", extregs[rx], imm6 );
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
-
-		case 0x04: // cmp
-			// CMP A,B
-			logerror( "(Extended group 7) cmp %s, [BP+%02x]\n", extregs[rx], imm6 );
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
-
-		case 0x06: // neg
-			// A = -B
-			logerror( "(Extended group 7) %s = -[BP+%02x]\n", extregs[rx], imm6 );
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
-
-		case 0x08: // xor
-			// A ^= B
-			logerror( "(Extended group 7) %s ^= [BP+%02x]\n", extregs[rx], imm6 );
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
-
-		case 0x09: // load
-			// A = B
-			logerror( "(Extended group 7) %s = [BP+%02x]\n", extregs[rx], imm6 );
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
-
-		case 0x0a: // or
-			// A |= B
-			logerror( "(Extended group 7) %s |= [BP+%02x]\n", extregs[rx], imm6 );
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
-
-		case 0x0b: // and
-			// A &= B
-			logerror( "(Extended group 7) %s &= [BP+%02x]\n", extregs[rx], imm6 );
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
-
-		case 0x0c: // test
-			// TEST A,B
-			logerror( "(Extended group 7) test %s, [BP+%02x]\n", extregs[rx], imm6 );
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
-
-		case 0x0d: // store
-			// B = A
-			logerror( "(Extended group 7) [BP+%02x] = %s\n", imm6, extregs[rx] );
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
-
-		case 0x05: // invalid
-		case 0x07: // invalid
-		case 0x0e: // invalid
-		case 0x0f: // invalid
-			logerror( "(Extended group 7) <INVALID Base+Disp6 Rx=Rx op [BP+IM6] form>\n");
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
-		}
-
-		unimplemented_opcode(op, ximm);
 		return;
 	}
 
