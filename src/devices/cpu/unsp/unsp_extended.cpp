@@ -41,21 +41,14 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			//                                         , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 			m_core->m_icount -= 1; // TODO
 
-			uint16_t r0 = (ra & 0x8) ? m_core->m_r[(ra & 0x7)+8] : m_core->m_r[ra & 0x7];
-			uint16_t r1 = (rb & 0x8) ? m_core->m_r[(rb & 0x7)+8] : m_core->m_r[rb & 0x7];
+			uint16_t r0 = m_core->m_r[ra];
+			uint16_t r1 = m_core->m_r[rb];
 
 			uint32_t lres = r0 + r1;
 
 			update_nzsc(lres, r0, r1);
 
-			if (ra & 0x8)
-			{
-				m_core->m_r[(ra & 0x7)+8] = (uint16_t)lres;
-			}
-			else
-			{
-				m_core->m_r[ra & 0x7] = (uint16_t)lres;
-			}
+			m_core->m_r[ra] = (uint16_t)lres;
 
 			//unimplemented_opcode(op, ximm);
 			return;
@@ -93,8 +86,8 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			//                                         , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 			m_core->m_icount -= 1; // TODO
 
-			uint16_t r0 = (ra & 0x8) ? m_core->m_r[(ra & 0x7)+8] : m_core->m_r[ra & 0x7];
-			uint16_t r1 = (rb & 0x8) ? m_core->m_r[(rb & 0x7)+8] : m_core->m_r[rb & 0x7];
+			uint16_t r0 = m_core->m_r[ra];
+			uint16_t r1 = m_core->m_r[rb];
 
 			uint32_t lres = r0 + (uint16_t)(~r1) + uint32_t(1);
 			update_nzsc(lres, r0 , ~r1);
@@ -127,16 +120,10 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			//                                       , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
 			m_core->m_icount -= 1; // TODO
 
-			uint32_t lres = (rb & 0x8) ? m_core->m_r[(rb & 0x7)+8] : m_core->m_r[rb & 0x7];
+			uint32_t lres = m_core->m_r[rb];
 			update_nz(lres);
-			if (ra & 0x8)
-			{
-				m_core->m_r[(ra & 0x7)+8] = (uint16_t)lres;
-			}
-			else
-			{
-				m_core->m_r[ra & 0x7] = (uint16_t)lres;
-			}
+
+			m_core->m_r[ra] = (uint16_t)lres;
 
 			return;
 			break;
@@ -146,20 +133,15 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			// A |= B
 			//logerror("(Extended group 0) %s |= %s\n", (ra & 0x8) ? extregs[ra & 0x7] : regs[ra & 0x7]
 			//                                 	      , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]);
-			uint16_t a = (ra & 0x8) ? m_core->m_r[(ra & 0x7)] : m_core->m_r[ra & 0x7];
-			uint16_t b = (rb & 0x8) ? m_core->m_r[(rb & 0x7)+8] : m_core->m_r[rb & 0x7];
+			uint16_t a = m_core->m_r[ra];
+			uint16_t b = m_core->m_r[rb];
 
 			uint32_t lres = a | b;
 
 			update_nz(lres);
-			if (ra & 0x8)
-			{
-				m_core->m_r[(ra & 0x7)+8] = (uint16_t)lres;
-			}
-			else
-			{
-				m_core->m_r[ra & 0x7] = (uint16_t)lres;
-			}
+
+			m_core->m_r[ra] = (uint16_t)lres;
+	
 
 			//unimplemented_opcode(op, ximm);
 			return;
@@ -225,10 +207,7 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 				while (size--)
 				{
-					if (rb & 0x8)
-						push(m_core->m_r[(rx--)+8], &m_core->m_r[(rb & 0x7)+8]);
-					else
-						push(m_core->m_r[(rx--)+8], &m_core->m_r[rb & 0x7]);
+					push(m_core->m_r[(rx--)+8], &m_core->m_r[rb]);
 				}
 			}
 			else
@@ -357,14 +336,8 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 			uint32_t lres = imm16_2;
 			update_nz(lres);
-			if (ra & 0x8)
-			{
-				m_core->m_r[(ra & 0x7)+8] = (uint16_t)lres;
-			}
-			else
-			{
-				m_core->m_r[ra & 0x7] = (uint16_t)lres;
-			}
+
+			m_core->m_r[ra] = (uint16_t)lres;
 
 			return;
 			break;
@@ -385,17 +358,11 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 			//											  , (rb & 0x8) ? extregs[rb & 0x7] : regs[rb & 0x7]
 			//										  	  , imm16_2);
 
-			uint16_t b = (rb & 0x8) ? m_core->m_r[(rb & 0x7)+8] : m_core->m_r[rb & 0x7];
+			uint16_t b = m_core->m_r[rb];
 			uint32_t lres = b & imm16_2;
 			update_nz(lres);
-			if (ra & 0x8)
-			{
-				m_core->m_r[(ra & 0x7)+8] = (uint16_t)lres;
-			}
-			else
-			{
-				m_core->m_r[ra & 0x7] = (uint16_t)lres;
-			}
+
+			m_core->m_r[ra] = (uint16_t)lres;
 
 			return;
 			break;
@@ -511,14 +478,9 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 			uint32_t lres = read16(imm16_2);
 			update_nz(lres);
-			if (ra & 0x8)
-			{
-				m_core->m_r[(ra & 0x7)+8] = (uint16_t)lres;
-			}
-			else
-			{
-				m_core->m_r[ra & 0x7] = (uint16_t)lres;
-			}
+
+			m_core->m_r[ra] = (uint16_t)lres;
+	
 
 			return;
 			break;
