@@ -3263,7 +3263,7 @@ GAME( 1996, tekken3a,  tekken3,  coh700,   namcos12,  namcos12_state,          i
 GAME( 1996, tekken3ud, tekken3,  coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Tekken 3 (US, TET3/VER.D)", 0 ) /* KC006 */
 GAME( 1996, tekken3ua, tekken3,  coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Tekken 3 (US, TET3/VER.A)", 0 ) /* KC006 */
 GAME( 1996, tekken3je1,tekken3,  coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.E1)", 0 ) /* KC006 */
-GAME( 1996, tekken3ja, tekken3,  coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.A)", 0 ) /* KC014 */
+GAME( 1996, tekken3ja, tekken3,  coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.A)", 0 ) /* KC006 */
 GAME( 1997, lbgrande,  0,        coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Libero Grande (World, LG2/VER.A)", 0 ) /* KC014 */
 GAME( 1997, lbgrandeja,lbgrande, coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Libero Grande (Japan, LG1/VER.A)", MACHINE_NOT_WORKING ) /* KC014 */
 GAME( 1997, toukon3,   0,        coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco / Tomy",    "Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (Japan, TR1/VER.A)", 0 ) /* KC019 */
