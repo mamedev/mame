@@ -50,6 +50,7 @@ Taiko no Tatsujin 5 (TK51 Ver.A)                   (C) Namco, 2003
 Taiko no Tatsujin 6 (TK61 Ver.A)                   (C) Namco, 2004
 Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)    (C) Namco/Metro, 2002
 Uchuu Daisakusen Chocovader Contactee (CVC1 Ver.A) (C) Namco, 2002
+Unknown medal (?) game (MTL1 SPR0B)                (C) ?,     200?
 
 * - denotes not dumped yet.
 
@@ -279,6 +280,7 @@ Taiko no Tatsujin 4                   TK41  Ver.A   KC024A   8E, 8D, 7E         
 Taiko no Tatsujin 5                   TK51  Ver.A   KC031A   8E, 8D, 7E           not dumped
 Taiko no Tatsujin 6                   TK61  Ver.A   KC036A   8E, 8D, 7E           TK-6
 Utyuu Daisakusen Chocovader Contactee CVC1  Ver.A   KC022A   8E, 8D, 7E, 7D, 6E   N/A
+unknown medal (?) game                MTL1  SPR0B   KC043A   8E, 8D               N/A           also has a Namco System10 EXFINAL PCB 8906962603 (8906962703)
 
       Notes:
       1. The ROM PCB has locations for 16x 128MBit FlashROMs (Total capacity = 2048MBits) but usually only a few are populated.
@@ -1253,6 +1255,16 @@ ROM_START( taiko6 )
 	DISK_IMAGE_READONLY( "tk-6", 0, SHA1(ca8b8dfccc2022094c428b5e0b6391a77ec351f4) )
 ROM_END
 
+ROM_START( unks10md )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION16_LE( 0x2100000, "user2", 0 ) /* main prg */
+	ROM_LOAD( "k9f2808u0c.8e",  0x0000000, 0x1080000, CRC(b8ce45c6) SHA1(cfc85e796e32f5f3cc16e12ce902f0ae088eea31) )
+	ROM_LOAD( "k9f2808u0c.8d",  0x1080000, 0x1080000, CRC(49a2a732) SHA1(1a473177827a6d0e58c289d9af064665b941519b) )
+ROM_END
+
+
 GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2, namcos10, namcos10_state, init_mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
 GAME( 2000, mrdrlr2a,  mrdrilr2, ns10_mrdrilr2, namcos10, namcos10_state, init_mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (World, DR22 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
 GAME( 2000, ptblank3,  0,        namcos10_memn, namcos10, namcos10_state, init_gunbalna, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
@@ -1271,3 +1283,4 @@ GAME( 2003, nflclsfb,  0,        ns10_nflclsfb, namcos10, namcos10_state, init_n
 GAME( 2003, konotako,  0,        ns10_konotako, namcos10, namcos10_state, init_konotako, ROT0, "Mitchell", "Kono Tako (10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME( 2004, sekaikh,   0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME( 2004, taiko6,    0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 200?, unks10md,  0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Namco", "unknown Namco System 10 medal game (MTL1 SPRB0)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

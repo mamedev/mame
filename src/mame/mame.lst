@@ -30094,6 +30094,7 @@ ptblank3                        // 2000.12 Point Blank 3 (GNN2 Ver.A)
 sekaikh                         // 2004.04 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)
 startrgn                        // 2002.07 Star Trigon (STT1 Ver.A)
 taiko6                          // 2004.?? Taiko no Tatsujin 6 (Japan, TK61 Ver.A)
+unks10md                        // 200?.?? unknown Namco System 10 medal game (MTL1 SPRB0)
 
 @source:namcos11.cpp
 danceyes                        // 1996.10 Dancing Eyes (US, DC3/VER.C)
@@ -38675,8 +38676,8 @@ spellb                          //
 spellb79                        //
 
 @source:tk2000.cpp
+mpf2                            // Multitech MPF-II
 tk2000                          // Microdigital TK2000
-mpf2				// Multitech MPF-II
 
 @source:tk635.cpp
 tk635                           // (c) 199? Termtek
