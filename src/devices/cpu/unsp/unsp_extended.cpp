@@ -9,6 +9,10 @@
 
 #include "unspdasm.h"
 
+// TODO: the call conventions and general use of 'do_basic_alu_ops' from unsp_other.cpp could be cleaned up
+// at the moment things like the 'Store' opcode make things more complex than they need to be, and require
+// the passing of a store address each time, they make the regular use of the code a little awkward too tho.
+
 void unsp_device::execute_extended_group(uint16_t op)
 {
 	// shouldn't get here anyway

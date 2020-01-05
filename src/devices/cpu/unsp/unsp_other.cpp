@@ -204,7 +204,7 @@ void unsp_device::execute_remaining(const uint16_t op)
 			r0 = m_core->m_r[opb];
 			r2 = read16(UNSP_LPC);
 			add_lpc(1);
-			// additional logic below
+			// additional special case 'if (op1 == 0x04 && opn == 0x03)' write logic below
 			break;
 
 		default: // Shifted ops
