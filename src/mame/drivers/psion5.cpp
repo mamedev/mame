@@ -760,9 +760,20 @@ void psion5mx_state::main_map(address_map &map)
 	map(0xc0000000, 0xc03fffff).ram().mirror(0x1fc00000).share("lcd_ram");
 }
 
+void psion5mx_state::palette_init(palette_device &palette)
+{
+	for (int i = 0; i < 16; i++)
+	{
+		const int r = (0x99 * i) / 15;
+		const int g = (0xaa * i) / 15;
+		const int b = (0x88 * i) / 15;
+		m_palette->set_pen_color(15 - i, rgb_t(r, g, b));
+	}
+}
+
 uint32_t psion5mx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *lcd_buf = (uint8_t*)&m_lcd_ram[(m_lcd_display_base_addr & 0x003fffff) >> 2];
+	const uint8_t *lcd_buf = (uint8_t*)&m_lcd_ram[(m_lcd_display_base_addr & 0x003fffff) >> 2];
 	static const int width = 640;
 	static const int height = 240;
 
@@ -779,6 +790,8 @@ uint32_t psion5mx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		LOGMASKED(LOG_DISPLAY, "palette[%d]: %04x\n", i, palette[i]);
 	}
 
+	const pen_t *pen = m_palette->pens();
+
 	// build our image out
 	const int line_width = (width * bpp) / 8;
 	for (int y = 0; y < height; y++)
@@ -791,10 +804,8 @@ uint32_t psion5mx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 			const int shift = (x & (ppb - 1)) * bpp;
 			const int mask = (1 << bpp) - 1;
 			const int pal_idx = (byte >> shift) & mask;
-			const uint8_t pal_value = palette[pal_idx] | (palette[pal_idx] << 4);
-			//printf("%d:%02x %04x %04x\n", pal_idx, pal_value, palette[0], palette[1]);
 
-			line[x] = 0xff000000 | (0x010101 * pal_value);
+			line[x] = pen[palette[pal_idx]];
 		}
 	}
 	return 0;
@@ -880,10 +891,10 @@ INPUT_PORTS_START( psion5mx )
 	PORT_START("COL5")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down Arrow") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Func") PORT_CODE(KEYCODE_DEL)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
@@ -924,6 +935,8 @@ void psion5mx_state::psion5mx(machine_config &config)
 	screen.set_screen_update(FUNC(psion5mx_state::screen_update));
 	screen.set_size(640, 240);
 	screen.set_visarea(0, 640-1, 0, 240-1);
+
+	PALETTE(config, m_palette, FUNC(psion5mx_state::palette_init), 16);
 }
 
 /* ROM definition */
@@ -936,4 +949,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME        PARENT   COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY  FULLNAME  FLAGS
-COMP( 1999, psion5mx,   0,       0,      psion5mx,  psion5mx, psion5mx_state, empty_init, "Psion", "5mx",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1999, psion5mx,   0,       0,      psion5mx,  psion5mx, psion5mx_state, empty_init, "Psion", "Series 5mx",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -19,6 +19,7 @@
 #include "machine/etna.h"
 
 #include "screen.h"
+#include "emupal.h"
 
 class psion5mx_state : public driver_device
 {
@@ -28,6 +29,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_etna(*this, "etna")
 		, m_lcd_ram(*this, "lcd_ram")
+		, m_palette(*this, "palette")
 		, m_touchx(*this, "TOUCHX")
 		, m_touchy(*this, "TOUCHY")
 		, m_touch(*this, "TOUCH")
@@ -46,6 +48,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
+	void palette_init(palette_device &palette);
 
 	DECLARE_READ32_MEMBER(periphs_r);
 	DECLARE_WRITE32_MEMBER(periphs_w);
@@ -175,6 +178,7 @@ private:
 	required_device<arm710t_cpu_device> m_maincpu;
 	required_device<etna_device> m_etna;
 	required_shared_ptr<uint32_t> m_lcd_ram;
+	required_device<palette_device> m_palette;
 	required_ioport m_touchx;
 	required_ioport m_touchy;
 	required_ioport m_touch;
