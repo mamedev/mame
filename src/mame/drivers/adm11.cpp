@@ -88,6 +88,9 @@ SCN2674_DRAW_CHARACTER_MEMBER(adm11_state::draw_character)
 	u16 dots = m_chargen[charcode << 4 | linecount];
 	dots |= (dots & 0x80) << 1;
 
+	if (BIT(attrcode, 2))
+		dots ^= 0x1ff;
+
 	for (int i = 0; i < 9; i++)
 	{
 		bitmap.pix32(y, x++) = BIT(dots, 8) ? rgb_t::white() : rgb_t::black();
