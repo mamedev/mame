@@ -729,14 +729,6 @@ READ16_MEMBER(sunplus_gcm394_base_device::internalrom_lower32_r)
 	}
 }
 
-//[:maincpu] ':maincpu' (001490):sunplus_gcm394_base_device::unk_r @ 0x785f
-READ16_MEMBER(generalplus_gpac800_device::nand_ecc_low_byte_error_flag_1_r)
-{
-	return 0x0000;
-}
-
-
-
 
 // GPR27P512A   = C2 76  
 // HY27UF081G2A = AD F1 80 1D
@@ -799,7 +791,7 @@ READ16_MEMBER(generalplus_gpac800_device::nand_7854_r)
 	{
 		//logerror("%s:sunplus_gcm394_base_device::nand_7854_r   READ DATA byte %d\n", machine().describe_context(), m_curblockaddr);
 
-		uint32_t nandaddress = (m_flash_addr_high << 16) | m_flash_addr_low;
+		uint32_t nandaddress = (m_nand_addr_high << 16) | m_nand_addr_low;
 		uint8_t data = m_nand_read_cb((nandaddress * 2) + m_curblockaddr);
 
 		m_curblockaddr++;
@@ -829,19 +821,19 @@ WRITE16_MEMBER(generalplus_gpac800_device::nand_command_w)
 	m_nandcommand = data;
 }
 
-WRITE16_MEMBER(generalplus_gpac800_device::flash_addr_low_w)
+WRITE16_MEMBER(generalplus_gpac800_device::nand_addr_low_w)
 {
-	//logerror("%s:sunplus_gcm394_base_device::flash_addr_low_w %04x\n", machine().describe_context(), data);
-	m_flash_addr_low = data;
+	//logerror("%s:sunplus_gcm394_base_device::nand_addr_low_w %04x\n", machine().describe_context(), data);
+	m_nand_addr_low = data;
 	m_curblockaddr = 0;
 }
 
-WRITE16_MEMBER(generalplus_gpac800_device::flash_addr_high_w)
+WRITE16_MEMBER(generalplus_gpac800_device::nand_addr_high_w)
 {
-	//logerror("%s:sunplus_gcm394_base_device::flash_addr_high_w %04x\n", machine().describe_context(), data);
-	m_flash_addr_high = data;
+	//logerror("%s:sunplus_gcm394_base_device::nand_addr_high_w %04x\n", machine().describe_context(), data);
+	m_nand_addr_high = data;
 
-	uint32_t address = (m_flash_addr_high << 16) | m_flash_addr_low;
+	uint32_t address = (m_nand_addr_high << 16) | m_nand_addr_low;
 
 	logerror("%s: flash address is now %08x\n", machine().describe_context(), address);
 
@@ -866,6 +858,121 @@ WRITE16_MEMBER(generalplus_gpac800_device::nand_7850_w)
 	m_nand_7850 = data;
 }
 
+WRITE16_MEMBER(generalplus_gpac800_device::nand_7856_w)
+{
+	logerror("%s:sunplus_gcm394_base_device::nand_7856_w %04x\n", machine().describe_context(), data);
+	m_nand_7856 = data;
+}
+
+WRITE16_MEMBER(generalplus_gpac800_device::nand_7857_w)
+{
+	logerror("%s:sunplus_gcm394_base_device::nand_7857_w %04x\n", machine().describe_context(), data);
+	m_nand_7857 = data;
+}
+
+WRITE16_MEMBER(generalplus_gpac800_device::nand_785b_w)
+{
+	logerror("%s:sunplus_gcm394_base_device::nand_785b_w %04x\n", machine().describe_context(), data);
+	m_nand_785b = data;
+}
+
+WRITE16_MEMBER(generalplus_gpac800_device::nand_785c_w)
+{
+	logerror("%s:sunplus_gcm394_base_device::nand_785c_w %04x\n", machine().describe_context(), data);
+	m_nand_785c = data;
+}
+
+WRITE16_MEMBER(generalplus_gpac800_device::nand_785d_w)
+{
+	logerror("%s:sunplus_gcm394_base_device::nand_785d_w %04x\n", machine().describe_context(), data);
+	m_nand_785d = data;
+}
+
+// [:maincpu] ':maincpu' (00146D)  jak_tsm
+READ16_MEMBER(generalplus_gpac800_device::nand_785e_r)
+{
+	return 0x0000;
+}
+
+//[:maincpu] ':maincpu' (001490)  jak_tsm
+READ16_MEMBER(generalplus_gpac800_device::nand_ecc_low_byte_error_flag_1_r)
+{
+	return 0x0000;
+}
+
+/*
+UNMAPPED reads  writes
+
+jak_tsm uses these (all iniitalized near start)
+unclear if these are specific to the GPAC800 type, or present in the older types
+
+[:maincpu] ':maincpu' (00043F):sunplus_gcm394_base_device::unk_w @ 0x780a (data 0x0000)
+[:maincpu] ':maincpu' (000442):sunplus_gcm394_base_device::unk_w @ 0x7808 (data 0x0000)
+[:maincpu] ':maincpu' (000445):sunplus_gcm394_base_device::unk_w @ 0x782f (data 0x0002)
+[:maincpu] ':maincpu' (000449):sunplus_gcm394_base_device::unk_w @ 0x783d (data 0x05d9)
+[:maincpu] ':maincpu' (00044D):sunplus_gcm394_base_device::unk_w @ 0x783c (data 0x0a57)
+[:maincpu] ':maincpu' (000451):sunplus_gcm394_base_device::unk_w @ 0x783b (data 0x2400)
+[:maincpu] ':maincpu' (000454):sunplus_gcm394_base_device::unk_w @ 0x783e (data 0x0002)
+[:maincpu] ':maincpu' (000458):sunplus_gcm394_base_device::unk_w @ 0x783a (data 0x3011)
+[:maincpu] ':maincpu' (00045B):sunplus_gcm394_base_device::unk_w @ 0x7874 (data 0x0000)
+[:maincpu] ':maincpu' (00045D):sunplus_gcm394_base_device::unk_w @ 0x787c (data 0x0000)
+[:maincpu] ':maincpu' (00045F):sunplus_gcm394_base_device::unk_w @ 0x7888 (data 0x0000)
+[:maincpu] ':maincpu' (000461):sunplus_gcm394_base_device::unk_w @ 0x787e (data 0x0000)
+
+jak_car2 uses these
+
+[:maincpu] ':maincpu' (004056):sunplus_gcm394_base_device::unk_w @ 0x782f (data 0x0002)
+[:maincpu] ':maincpu' (004059):sunplus_gcm394_base_device::unk_w @ 0x783d (data 0x05d9)
+[:maincpu] ':maincpu' (00405C):sunplus_gcm394_base_device::unk_w @ 0x783c (data 0x0a57)
+[:maincpu] ':maincpu' (00405F):sunplus_gcm394_base_device::unk_w @ 0x783b (data 0x2400)
+[:maincpu] ':maincpu' (004062):sunplus_gcm394_base_device::unk_w @ 0x783e (data 0x0002)
+[:maincpu] ':maincpu' (004065):sunplus_gcm394_base_device::unk_w @ 0x783a (data 0x3011)
+[:maincpu] ':maincpu' (004069):sunplus_gcm394_base_device::unk_r @ 0x7880
+[:maincpu] ':maincpu' (00406F):sunplus_gcm394_base_device::unk_w @ 0x7874 (data 0x1249)
+[:maincpu] ':maincpu' (004071):sunplus_gcm394_base_device::unk_w @ 0x787c (data 0x1249)
+[:maincpu] ':maincpu' (004073):sunplus_gcm394_base_device::unk_w @ 0x7888 (data 0x1249)
+[:maincpu] ':maincpu' (004075):sunplus_gcm394_base_device::unk_w @ 0x787e (data 0x1249)
+[:maincpu] ':maincpu' (004088):sunplus_gcm394_base_device::unk_w @ 0x7841 (data 0x000f)
+[:maincpu] ':maincpu' (00408F):sunplus_gcm394_base_device::unk_w @ 0x780a (data 0x0000)
+[:maincpu] ':maincpu' (004092):sunplus_gcm394_base_device::unk_w @ 0x7808 (data 0x0002)
+
+[:maincpu] ':maincpu' (03000A):sunplus_gcm394_base_device::unk_w @ 0x7874 (data 0x36db)
+[:maincpu] ':maincpu' (03000C):sunplus_gcm394_base_device::unk_w @ 0x787c (data 0x36db)
+[:maincpu] ':maincpu' (03000E):sunplus_gcm394_base_device::unk_w @ 0x7888 (data 0x36db)
+[:maincpu] ':maincpu' (030010):sunplus_gcm394_base_device::unk_w @ 0x787e (data 0x36db)
+[:maincpu] ':maincpu' (030013):sunplus_gcm394_base_device::unk_w @ 0x787f (data 0x0010)
+[:maincpu] ':maincpu' (03001D):sunplus_gcm394_base_device::unk_w @ 0x7804 (data 0x1c7f)
+[:maincpu] ':maincpu' (030023):sunplus_gcm394_base_device::unk_w @ 0x7805 (data 0xcdf0)
+[:maincpu] ':maincpu' (03E645):sunplus_gcm394_base_device::unk_w @ 0x7861 (data 0x1f66)
+[:maincpu] ':maincpu' (03E64C):sunplus_gcm394_base_device::unk_w @ 0x786b (data 0x0000)
+[:maincpu] ':maincpu' (03E64F):sunplus_gcm394_base_device::unk_w @ 0x7869 (data 0x0000)
+[:maincpu] ':maincpu' (03E652):sunplus_gcm394_base_device::unk_w @ 0x786a (data 0x0000)
+[:maincpu] ':maincpu' (03E65B):sunplus_gcm394_base_device::unk_w @ 0x7966 (data 0x0001)
+[:maincpu] ':maincpu' (03CBD0):sunplus_gcm394_base_device::unk_w @ 0x7871 (data 0x0000)
+
+-- this one seems like a common alt type of DMA, used in both hw types as it polls 707c status before doing it
+[:maincpu] ':maincpu' (03B4C7):sunplus_gcm394_base_device::unk_w @ 0x707c (data 0x0001)
+-- also video / alt dma?
+[:maincpu] ':maincpu' (068C15):sunplus_gcm394_base_device::unk_r @ 0x707e
+
+beambox sets things up with different values (ultimately stalls on some check, maybe seeprom?)
+
+[:maincpu] ':maincpu' (00043F):sunplus_gcm394_base_device::unk_w @ 0x780a (data 0x0000)
+[:maincpu] ':maincpu' (000442):sunplus_gcm394_base_device::unk_w @ 0x7808 (data 0x0000)
+[:maincpu] ':maincpu' (000445):sunplus_gcm394_base_device::unk_w @ 0x782f (data 0x0002)
+[:maincpu] ':maincpu' (000449):sunplus_gcm394_base_device::unk_w @ 0x783d (data 0x05d9)
+[:maincpu] ':maincpu' (00044D):sunplus_gcm394_base_device::unk_w @ 0x783c (data 0x0f58)
+[:maincpu] ':maincpu' (000451):sunplus_gcm394_base_device::unk_w @ 0x783b (data 0x2400)
+[:maincpu] ':maincpu' (000454):sunplus_gcm394_base_device::unk_w @ 0x783e (data 0x0002)
+[:maincpu] ':maincpu' (000458):sunplus_gcm394_base_device::unk_w @ 0x783a (data 0x4011)
+[:maincpu] ':maincpu' (00045C):sunplus_gcm394_base_device::unk_w @ 0x7874 (data 0x2492)   -- note pair of 4, but different values to above games
+[:maincpu] ':maincpu' (00045E):sunplus_gcm394_base_device::unk_w @ 0x787c (data 0x2492)
+[:maincpu] ':maincpu' (000460):sunplus_gcm394_base_device::unk_w @ 0x7888 (data 0x2492)
+[:maincpu] ':maincpu' (000462):sunplus_gcm394_base_device::unk_w @ 0x787e (data 0x2492)
+
+vbaby code is very differet, attempts to load NAND block manually, not with DMA
+
+*/
 
 
 // all tilemap registers etc. appear to be in the same place as the above system, including the 'extra' ones not on the earlier models
@@ -877,11 +984,18 @@ void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
 	// 785x = NAND device
 	map(0x007850, 0x007850).rw(FUNC(generalplus_gpac800_device::nand_7850_r), FUNC(generalplus_gpac800_device::nand_7850_w)); // NAND Control Reg
 	map(0x007851, 0x007851).w(FUNC(generalplus_gpac800_device::nand_command_w)); // NAND Command Reg
-	map(0x007852, 0x007852).w(FUNC(generalplus_gpac800_device::flash_addr_low_w)); // NAND Low Address Reg
-	map(0x007853, 0x007853).w(FUNC(generalplus_gpac800_device::flash_addr_high_w)); // NAND High Address Reg
+	map(0x007852, 0x007852).w(FUNC(generalplus_gpac800_device::nand_addr_low_w)); // NAND Low Address Reg
+	map(0x007853, 0x007853).w(FUNC(generalplus_gpac800_device::nand_addr_high_w)); // NAND High Address Reg
 	map(0x007854, 0x007854).r(FUNC(generalplus_gpac800_device::nand_7854_r)); // NAND Data Reg
 	map(0x007855, 0x007855).w(FUNC(generalplus_gpac800_device::nand_dma_ctrl_w)); // NAND DMA / INT Control
+	map(0x007856, 0x007856).w(FUNC(generalplus_gpac800_device::nand_7856_w)); // usually 0x0021?
+	map(0x007857, 0x007857).w(FUNC(generalplus_gpac800_device::nand_7857_w));
 
+	// most of these are likely ECC stuff for testing the ROM?
+	map(0x00785b, 0x00785b).w(FUNC(generalplus_gpac800_device::nand_785b_w));
+	map(0x00785c, 0x00785c).w(FUNC(generalplus_gpac800_device::nand_785c_w));
+	map(0x00785d, 0x00785d).w(FUNC(generalplus_gpac800_device::nand_785d_w));
+	map(0x00785e, 0x00785e).r(FUNC(generalplus_gpac800_device::nand_785e_r)); // also ECC status related?
 	map(0x00785f, 0x00785f).r(FUNC(generalplus_gpac800_device::nand_ecc_low_byte_error_flag_1_r)); // ECC Low Byte Error Flag 1 (maybe)
 
 	// 128kwords internal ROM
@@ -894,6 +1008,7 @@ void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
 	map(0x030000, 0x1fffff).rw(FUNC(generalplus_gpac800_device::cs_space_r), FUNC(generalplus_gpac800_device::cs_space_w));
 	map(0x200000, 0x3fffff).rw(FUNC(generalplus_gpac800_device::cs_bank_space_r), FUNC(generalplus_gpac800_device::cs_bank_space_w));
 }
+
 
 void sunplus_gcm394_base_device::device_start()
 {
@@ -1001,11 +1116,15 @@ void generalplus_gpac800_device::device_reset()
 {
 	sunplus_gcm394_base_device::device_reset();
 
-	m_flash_addr_low = 0x0000;
-	m_flash_addr_high = 0x0000;
-
+	m_nand_addr_low = 0x0000;
+	m_nand_addr_high = 0x0000;
 	m_nand_dma_ctrl = 0x0000;
 	m_nand_7850 = 0x0000;
+	m_nand_785d = 0x0000;
+	m_nand_785c = 0x0000;
+	m_nand_785b = 0x0000;
+	m_nand_7856 = 0x0000;
+	m_nand_7857 = 0x0000;
 }
 
 IRQ_CALLBACK_MEMBER(sunplus_gcm394_base_device::irq_vector_cb)
