@@ -116,8 +116,6 @@ protected:
 	void hexbus_value_changed(uint8_t data) override;
 
 private:
-	const uint8_t m_hexbval[6] = { 0x01, 0x02, 0x40, 0x80, 0x10, 0x04 };
-
 	required_device<hexbus::hexbus_device> m_hexbus;
 	required_device<cassette_image_device> m_cassette;
 	required_device<video992_device> m_videoctrl;
@@ -128,6 +126,9 @@ private:
 
 	// Keyboard row
 	int m_key_row;
+
+	// HSK* released flag. This is queried as CRU bit 6 (with the current HSK* level).
+	bool m_hsk_released;
 };
 
 

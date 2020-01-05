@@ -415,6 +415,15 @@ uint8_t hexbus_chained_device::to_line_state(uint8_t data, bool bav, bool hsk)
 	return lines;
 }
 
+/*
+    Convenience function to get a data bit.
+*/
+int hexbus_chained_device::data_bit(int n)
+{
+	const uint8_t testbit[4] = { 0x01, 0x02, 0x40, 0x80 };
+	return (m_current_bus_value & testbit[n&3])? 1:0;
+}
+
 // ------------------------------------------------------------------------
 
 }   }   // end namespace bus::hexbus
