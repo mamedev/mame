@@ -26,21 +26,24 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 	{
 	case 0x00: case 0x10:
 	{
-		// Ext Register Ra = Ra op Rb
+		// Ext Register
+		// Ra = Ra op Rb
+		// A  = B  op C
 		uint8_t aluop = (ximm & 0xf000) >> 12;
 		uint8_t rb = (ximm & 0x000f) >> 0;
 		uint8_t ra = (ximm & 0x0e00) >> 9;
 		ra |= (ximm & 0x0100) >> 5;
 
-		uint16_t r0 = m_core->m_r[ra];
-		uint16_t r1 = m_core->m_r[rb];
+		uint16_t b = m_core->m_r[ra];
+		uint16_t c = m_core->m_r[rb];
 		uint32_t lres;
-		uint32_t r2 = r1; // dest address for STORE
+		uint32_t storeaddr = b; // dest address for STORE
 
-		bool write = do_basic_alu_ops(aluop, lres, r0, r1, r2, (ra != 7));
+		bool write = do_basic_alu_ops(aluop, lres, b, c, storeaddr, (ra != 7));
 
 		if (write)
 		{
+			// a = Ra
 			m_core->m_r[ra] = (uint16_t)lres;
 		}
 
@@ -53,8 +56,6 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 		// Ext Push/Pop
 		if (ximm & 0x8000)
 		{
-			// just skip for now, as nothing really even uses the extended registers yet
-
 			uint8_t rb = (ximm & 0x000f) >> 0;
 			uint8_t size = (ximm & 0x7000) >> 12;
 			uint8_t rx = (ximm & 0x0e00) >> 9;
@@ -68,7 +69,7 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 				while (size--)
 				{
-					push(m_core->m_r[(rx--)+8], &m_core->m_r[rb]);
+					push(m_core->m_r[(rx--) + 8], &m_core->m_r[rb]);
 				}
 			}
 			else
@@ -97,9 +98,9 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 				while (size--)
 				{
 					if (rb & 0x8)
-						m_core->m_r[(realrx++)+8] = pop(&m_core->m_r[(rb & 0x07)+8]);
+						m_core->m_r[(realrx++) + 8] = pop(&m_core->m_r[(rb & 0x07) + 8]);
 					else
-						m_core->m_r[(realrx++)+8] = pop(&m_core->m_r[rb & 0x07]);
+						m_core->m_r[(realrx++) + 8] = pop(&m_core->m_r[rb & 0x07]);
 				}
 			}
 			else
@@ -118,7 +119,9 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 		uint16_t imm16_2 = read16(UNSP_LPC);
 		add_lpc(1);
 
-		// Ra=Rb op IMM16
+		// Ra = Rb op IMM16
+		// A  = B  op C
+
 		uint8_t aluop = (ximm & 0xf000) >> 12;
 		uint8_t rb = (ximm & 0x000f) >> 0;
 		uint8_t ra = (ximm & 0x0e00) >> 9;
@@ -139,6 +142,7 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 		if (write)
 		{
+			// a = Ra
 			m_core->m_r[ra] = (uint16_t)lres;
 		}
 
@@ -151,7 +155,9 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 		uint16_t imm16_2 = read16(UNSP_LPC);
 		add_lpc(1);
 
-		// Ra=Rb op [A16]
+		// Ra = Rb op [A16]
+		// A  = B  op C
+
 		uint8_t aluop = (ximm & 0xf000) >> 12;
 		uint8_t rb = (ximm & 0x000f) >> 0;
 		uint8_t ra = (ximm & 0x0e00) >> 9;
@@ -166,6 +172,7 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 		if (write)
 		{
+			// a = Ra
 			m_core->m_r[ra] = (uint16_t)lres;
 		}
 
@@ -181,6 +188,8 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 		add_lpc(1);
 
 		//[A16] = Ra op Rb
+		// A    = B  op C
+
 		uint8_t aluop = (ximm & 0xf000) >> 12;
 		uint8_t rb = (ximm & 0x000f) >> 0;
 		uint8_t ra = (ximm & 0x0e00) >> 9;
@@ -196,41 +205,53 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 		if (write)
 		{
+			// a = [A16]
 			write16(imm16_2, lres);
-		}	
+		}
 
 		return;
 	}
 
 	case 0x08: case 0x09:
 	{
-		// Ext Indirect Rx=Rx op [Ry@]
+		// Ext Indirect
+		// Rx = Rx op [Ry@]
+		// A  = B  op C
+
 		//uint8_t aluop = (ximm & 0xf000) >> 12;
 		//uint8_t ry = (ximm & 0x0007) >> 0;
 		//uint8_t form = (ximm & 0x0018) >> 3;
 		//uint8_t rx = (ximm & 0x0e00) >> 9;
 
-		logerror( "(Extended group 4) unimplemented ");
+		logerror("(Extended group 4 'Rx=Rx op [Ry@]' form) unimplemented ");
 		unimplemented_opcode(op, ximm);
 		return;
-		break;
 	}
 	case 0x0a: case 0x0b:
 	{
 		// Ext DS_Indirect Rx=Rx op ds:[Ry@]
-		logerror( "(Extended group 5) unimplemented ");
+
+		//uint8_t aluop = (ximm & 0xf000) >> 12;
+		//uint8_t ry = (ximm & 0x0007) >> 0;
+		//uint8_t form = (ximm & 0x0018) >> 3;
+		//uint8_t rx = (ximm & 0x0e00) >> 9;
+
+		logerror("(Extended group 5 'Rx=Rx op ds:[Ry@]' form) unimplemented ");
+
 		unimplemented_opcode(op, ximm);
 		return;
-		break;
 	}
 	case 0x18: case 0x19: case 0x1a: case 0x1b:
 	{
-		// Ext IM6 Rx=Rx op IM6
+		// Ext IM6
+		// Rx = Rx op IM6
+		// A  = B  op C
+
 		uint8_t aluop = (ximm & 0xf000) >> 12;
 		uint8_t rx = (ximm & 0x0e00) >> 9;
 		uint8_t imm6 = (ximm & 0x003f) >> 0;
 
-		uint16_t b = m_core->m_r[rx+8];
+		uint16_t b = m_core->m_r[rx + 8];
 		uint16_t c = imm6;
 
 		uint32_t storeaddr = 0; // dest address for STORE 
@@ -246,7 +267,8 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 		if (write)
 		{
-			m_core->m_r[rx+8] = (uint16_t)lres;
+			// A = Rx
+			m_core->m_r[rx + 8] = (uint16_t)lres;
 		}
 
 		return;
@@ -254,14 +276,17 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 	case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 	{
-		// Ext Base+Disp6 Rx=Rx op [BP+IM6]
+		// Ext Base+Disp6
+		// Rx = Rx op [BP+IM6]
+		// A  = B  op C
+
 		uint8_t aluop = (ximm & 0xf000) >> 12;
 		uint8_t rx = (ximm & 0x0e00) >> 9;
 		uint8_t imm6 = (ximm & 0x003f) >> 0;
 
 		uint32_t addr = (uint16_t)(m_core->m_r[REG_BP] + (imm6 & 0x3f));
 
-		uint16_t b = m_core->m_r[rx+8];
+		uint16_t b = m_core->m_r[rx + 8];
 		uint16_t c = read16(addr);
 
 		uint32_t storeaddr = addr; // dest address for STORE 
@@ -271,7 +296,8 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 		if (write)
 		{
-			m_core->m_r[rx+8] = (uint16_t)lres;
+			// A = Rx
+			m_core->m_r[rx + 8] = (uint16_t)lres;
 		}
 
 		return;
@@ -279,107 +305,15 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 	case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 	{
-		// Ext A6 Rx=Rx op [A6]
-		uint8_t aluop = (ximm & 0xf000) >> 12;
-		uint8_t rx = (ximm & 0x0e00) >> 9;
-		uint8_t a6 = (ximm & 0x003f) >> 0;
+		// Ext A6
+		// Rx = Rx op [A6]
+		// A  = B  op C
 
-		switch (aluop)
-		{
-		case 0x00: // add
-			// A += B
-			logerror( "(Extended group 8) %s += [%02x]\n", extregs[rx], a6 );
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
+		//uint8_t aluop = (ximm & 0xf000) >> 12;
+		//uint8_t rx = (ximm & 0x0e00) >> 9;
+		//uint8_t a6 = (ximm & 0x003f) >> 0;
 
-		case 0x01: // adc
-			// A += B, Carry
-			logerror( "(Extended group 8) %s += [%02x], carry\n", extregs[rx], a6 );
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
-
-		case 0x02: // sub
-			// A -= B
-			logerror( "(Extended group 8) %s -= [%02x]\n", extregs[rx], a6 );
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
-
-		case 0x03: // sbc
-			// A -= B, Carry
-			logerror( "(Extended group 8) %s -= [%02x], carry\n", extregs[rx], a6 );
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
-
-		case 0x04: // cmp
-			// CMP A,B
-			logerror( "(Extended group 8) cmp %s, [%02x]\n", extregs[rx], a6 );
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
-
-		case 0x06: // neg
-			// A = -B
-			logerror( "(Extended group 8) %s = -[%02x]\n", extregs[rx], a6 );
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
-
-		case 0x08: // xor
-			// A ^= B
-			logerror( "(Extended group 8) %s ^= [%02x]\n", extregs[rx], a6 );
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
-
-		case 0x09: // load
-			// A = B
-			logerror( "(Extended group 8) %s = [%02x]\n", extregs[rx], a6 );
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
-
-		case 0x0a: // or
-			// A |= B
-			logerror( "(Extended group 8) %s |= [%02x]\n", extregs[rx], a6 );
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
-
-		case 0x0b: // and
-			// A &= B
-			logerror( "(Extended group 8) %s &= [%02x]\n", extregs[rx], a6 );
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
-
-		case 0x0c: // test
-			// TEST A,B
-			logerror( "(Extended group 8) test %s, [%02x]\n", extregs[rx], a6 );
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
-
-		case 0x0d: // store
-			// B = A
-			logerror( "(Extended group 8) [%02x] = %s\n", a6, extregs[rx] );
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
-
-		case 0x05: // invalid
-		case 0x07: // invalid
-		case 0x0e: // invalid
-		case 0x0f: // invalid
-			logerror( "(Extended group 8) <INVALID A6 Rx=Rx op [A6] form>\n");
-			unimplemented_opcode(op, ximm);
-			return;
-			break;
-		}
-
+		logerror("(Extended group 8 'Rx=Rx op [A6]' form) unimplemented ");
 
 		unimplemented_opcode(op, ximm);
 		return;
