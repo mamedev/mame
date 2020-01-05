@@ -118,6 +118,11 @@ void psion5mx_state::check_interrupts()
 {
 	LOGMASKED(LOG_IRQ, "Pending FIQs is %08x & %08x & %08x\n", m_pending_ints, m_int_mask, IRQ_FIQ_MASK);
 	LOGMASKED(LOG_IRQ, "Pending IRQs is %08x & %08x & %08x\n", m_pending_ints, m_int_mask, IRQ_IRQ_MASK);
+	bool any_interrupts = (m_pending_ints & m_int_mask) != 0;
+	if (any_interrupts)
+	{
+		m_maincpu->resume(SUSPEND_REASON_HALT);
+	}
 	m_maincpu->set_input_line(ARM7_FIRQ_LINE, m_pending_ints & m_int_mask & IRQ_FIQ_MASK ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(ARM7_IRQ_LINE, m_pending_ints & m_int_mask & IRQ_IRQ_MASK ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -494,6 +499,7 @@ WRITE32_MEMBER(psion5mx_state::periphs_w)
 			LOGMASKED(LOG_POWER_WRITES, "%s: peripheral write, PWRCNT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 		case REG_HALT:
+			m_maincpu->suspend(SUSPEND_REASON_HALT, 1);
 			LOGMASKED(LOG_POWER_WRITES, "%s: peripheral write, HALT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 		case REG_STBY:
