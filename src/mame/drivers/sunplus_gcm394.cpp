@@ -400,10 +400,13 @@ WRITE16_MEMBER(gcm394_game_state::porta_w)
 	logerror("%s: Port A:WRITE %04x\n", machine().describe_context(), data);
 }
 
+// some sources indicate these later SoC types run at 96Mhz, others indicate 48Mhz.
+// unSP 2.0 CPUs have a lower average CPI too (2 instead of 6 on unSP 1.0 or 5 on unSP 1.1 / 1.2 / unSP 2.0) so using regular unSP timings might result in things being too slow
+// as with the older SunPlus chips this appears to be an fully internally generated frequency, external XTALs again are typically 6MHz or simply not present.
 
 void gcm394_game_state::base(machine_config &config)
 {
-	GCM394(config, m_maincpu, XTAL(27'000'000), m_screen);
+	GCM394(config, m_maincpu, 96000000/2, m_screen);
 	m_maincpu->porta_in().set(FUNC(gcm394_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(gcm394_game_state::portb_r));
 	m_maincpu->porta_out().set(FUNC(gcm394_game_state::porta_w));
@@ -459,10 +462,9 @@ WRITE16_MEMBER(wrlshunt_game_state::hunt_porta_w)
 }
 
 
-
 void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 {
-	GPAC800(config, m_maincpu, XTAL(27'000'000), m_screen);
+	GPAC800(config, m_maincpu, 96000000/2, m_screen); 
 	m_maincpu->porta_in().set(FUNC(generalplus_gpac800_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(generalplus_gpac800_game_state::portb_r));
 	m_maincpu->porta_out().set(FUNC(generalplus_gpac800_game_state::porta_w));
