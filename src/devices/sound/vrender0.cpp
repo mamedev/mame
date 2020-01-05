@@ -191,13 +191,7 @@ void vr0sound_device::device_post_load()
 
 void vr0sound_device::device_clock_changed()
 {
-	int div;		
-	if (m_ChnClkNum)
-		div = ((30 << 16) | 0x8000) / (m_ChnClkNum + 1); // TODO : Verify algorithm
-	else
-		div = 1 << 16;
-
-	m_stream->set_sample_rate(((clock() * div) / 972) >> 16);
+	m_stream->set_sample_rate(clock() / 972);
 }
 
 //-------------------------------------------------
@@ -347,14 +341,7 @@ u16 vr0sound_device::chnnum_r(offs_t offset)
 void vr0sound_device::chnnum_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
-	{
-		u8 old_chnclknum = m_ChnClkNum;
 		m_ChnClkNum = data & 0xff;
-		if (old_chnclknum != m_ChnClkNum)
-		{
-			device_clock_changed();
-		}
-	}
 	if (ACCESSING_BITS_8_15)
 		m_MaxChn = (data >> 8) & 0x1f;
 }
@@ -513,24 +500,14 @@ void vr0sound_device::channel_t::write(offs_t offset, u16 data, u16 mem_mask)
 	}
 }
 
-/*
-Bit 0 Attack (0)
-Bit 1 Decay (1)
-Bit 2 Sustain (2)
-Bit 3 Release (3)
-static inline u8 get_envstate(u8 stage)
-{
-	for (int bit = 3; bit >= 0; bit--)
-	{
-		if (BIT(stage, bit))
-			return bit;
-	}
-	return 0;
-}
-*/
-
 void vr0sound_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_sample_t *r)
 {
+	int div;
+	if (m_ChnClkNum)
+		div = ((30 << 16) | 0x8000) / (m_ChnClkNum + 1); // TODO : Verify algorithm
+	else
+		div = 1 << 16;
+
 	for (int s = 0; s < nsamples; s++)
 	{
 		s32 lsample = 0, rsample = 0;
@@ -562,7 +539,7 @@ void vr0sound_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_s
 				}
 			}
 
-			channel->CurSAddr += channel->dSAddr;
+			channel->CurSAddr += (channel->dSAddr * div) >> 16;
 			if (channel->CurSAddr >= loopend_scaled)
 			{
 				if (channel->Modes & MODE_LOOP)  //Loop
@@ -590,7 +567,7 @@ void vr0sound_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_s
 				{
 					if (BIT(channel->EnvStage, level))
 					{
-						s32 RATE = channel->EnvRate[level];
+						s32 RATE = (channel->EnvRate[level] * div) >> 16;
 
 						channel->EnvVol += RATE;
 						if (RATE > 0)
