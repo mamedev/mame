@@ -314,10 +314,10 @@ READ32_MEMBER(psion5mx_state::periphs_r)
 			switch (m_last_ssi_request)
 			{
 				case 0xd0d3: // Touch X
-					value = 50;
+					value = 50 + (uint16_t)(m_touchx->read() * 5.7);
 					break;
 				case 0x9093: // Touch Y
-					value = 3834;
+					value = 3834 - (uint16_t)(m_touchy->read() * 13.225);
 					break;
 				case 0xa4a4: // Main Battery
 				case 0xe4e4: // Backup Battery
@@ -760,9 +760,20 @@ void psion5mx_state::main_map(address_map &map)
 	map(0xc0000000, 0xc03fffff).ram().mirror(0x1fc00000).share("lcd_ram");
 }
 
+void psion5mx_state::palette_init(palette_device &palette)
+{
+	for (int i = 0; i < 16; i++)
+	{
+		const int r = (0x99 * i) / 15;
+		const int g = (0xaa * i) / 15;
+		const int b = (0x88 * i) / 15;
+		m_palette->set_pen_color(15 - i, rgb_t(r, g, b));
+	}
+}
+
 uint32_t psion5mx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *lcd_buf = (uint8_t*)&m_lcd_ram[(m_lcd_display_base_addr & 0x003fffff) >> 2];
+	const uint8_t *lcd_buf = (uint8_t*)&m_lcd_ram[(m_lcd_display_base_addr & 0x003fffff) >> 2];
 	static const int width = 640;
 	static const int height = 240;
 
@@ -779,6 +790,8 @@ uint32_t psion5mx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		LOGMASKED(LOG_DISPLAY, "palette[%d]: %04x\n", i, palette[i]);
 	}
 
+	const pen_t *pen = m_palette->pens();
+
 	// build our image out
 	const int line_width = (width * bpp) / 8;
 	for (int y = 0; y < height; y++)
@@ -791,10 +804,8 @@ uint32_t psion5mx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 			const int shift = (x & (ppb - 1)) * bpp;
 			const int mask = (1 << bpp) - 1;
 			const int pal_idx = (byte >> shift) & mask;
-			const uint8_t pal_value = palette[pal_idx] | (palette[pal_idx] << 4);
-			//printf("%d:%02x %04x %04x\n", pal_idx, pal_value, palette[0], palette[1]);
 
-			line[x] = 0xff000000 | (0x010101 * pal_value);
+			line[x] = pen[palette[pal_idx]];
 		}
 	}
 	return 0;
@@ -818,10 +829,10 @@ INPUT_CHANGED_MEMBER(psion5mx_state::touch_down)
 /* Input ports */
 INPUT_PORTS_START( psion5mx )
 	PORT_START("TOUCHX")
-	PORT_BIT( 0xff, 0x40, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
+	PORT_BIT(0x3ff, 362, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(42,681) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
 
 	PORT_START("TOUCHY")
-	PORT_BIT( 0xff, 0x40, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
+	PORT_BIT(0x0ff, 125, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(5,244) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
 
 	PORT_START("TOUCH")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Touch") PORT_CHANGED_MEMBER(DEVICE_SELF, psion5mx_state, touch_down, 0)
@@ -859,11 +870,11 @@ INPUT_PORTS_START( psion5mx )
 
 	PORT_START("COL3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_U) PORT_CHAR('l') PORT_CHAR('L')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_I) PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_P) PORT_CHAR('i') PORT_CHAR('I')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_L) PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Menu") PORT_CODE(KEYCODE_END)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
@@ -880,20 +891,20 @@ INPUT_PORTS_START( psion5mx )
 	PORT_START("COL5")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down Arrow") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Func") PORT_CODE(KEYCODE_DEL)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("COL6")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_H) PORT_CHAR('v') PORT_CHAR('V')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_J) PORT_CHAR('c') PORT_CHAR('C')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_K) PORT_CHAR('x') PORT_CHAR('X')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_M) PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
@@ -924,6 +935,8 @@ void psion5mx_state::psion5mx(machine_config &config)
 	screen.set_screen_update(FUNC(psion5mx_state::screen_update));
 	screen.set_size(640, 240);
 	screen.set_visarea(0, 640-1, 0, 240-1);
+
+	PALETTE(config, m_palette, FUNC(psion5mx_state::palette_init), 16);
 }
 
 /* ROM definition */
@@ -936,4 +949,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME        PARENT   COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY  FULLNAME  FLAGS
-COMP( 1999, psion5mx,   0,       0,      psion5mx,  psion5mx, psion5mx_state, empty_init, "Psion", "5mx",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1999, psion5mx,   0,       0,      psion5mx,  psion5mx, psion5mx_state, empty_init, "Psion", "Series 5mx",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
