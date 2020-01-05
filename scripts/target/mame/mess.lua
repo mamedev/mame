@@ -2385,6 +2385,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/mephisto_polgar.cpp",
 	MAME_DIR .. "src/mame/machine/mmboard.cpp",
 	MAME_DIR .. "src/mame/machine/mmboard.h",
+	MAME_DIR .. "src/mame/video/mmdisplay2.cpp",
+	MAME_DIR .. "src/mame/video/mmdisplay2.h",
 }
 
 createMESSProjects(_target, _subtarget, "hitachi")

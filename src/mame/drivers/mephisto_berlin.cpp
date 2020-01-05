@@ -20,6 +20,7 @@ Undocumented buttons:
 #include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "machine/mmboard.h"
+#include "video/mmdisplay2.h"
 
 // internal artwork
 #include "mephisto_berlin.lh"
@@ -83,8 +84,8 @@ void berlin_state::berlin_mem(address_map &map)
 	map(0x900000, 0x903fff).m("nvram_map", FUNC(address_map_bank_device::amap8)).umask16(0xff00);
 	map(0xa00000, 0xa00000).r(FUNC(berlin_state::input_r));
 	map(0xb00000, 0xb00000).w(m_board, FUNC(mephisto_board_device::mux_w));
-	map(0xc00000, 0xc00000).w("display", FUNC(mephisto_display_modul_device::latch_w));
-	map(0xd00008, 0xd00008).w("display", FUNC(mephisto_display_modul_device::io_w));
+	map(0xc00000, 0xc00000).w("display", FUNC(mephisto_display_module2_device::latch_w));
+	map(0xd00008, 0xd00008).w("display", FUNC(mephisto_display_module2_device::io_w));
 	map(0xe00000, 0xe00000).w(m_board, FUNC(mephisto_board_device::led_w));
 }
 
@@ -95,8 +96,8 @@ void berlin_state::berlinp_mem(address_map &map)
 	map(0x800000, 0x800000).r(FUNC(berlin_state::input_r));
 	map(0x900000, 0x900000).w(m_board, FUNC(mephisto_board_device::mux_w));
 	map(0xa00000, 0xa00000).w(m_board, FUNC(mephisto_board_device::led_w));
-	map(0xb00000, 0xb00000).w("display", FUNC(mephisto_display_modul_device::io_w));
-	map(0xc00000, 0xc00000).w("display", FUNC(mephisto_display_modul_device::latch_w));
+	map(0xb00000, 0xb00000).w("display", FUNC(mephisto_display_module2_device::io_w));
+	map(0xc00000, 0xc00000).w("display", FUNC(mephisto_display_module2_device::latch_w));
 	map(0xd00000, 0xd07fff).m("nvram_map", FUNC(address_map_bank_device::amap8)).umask32(0xff000000);
 }
 
@@ -135,7 +136,7 @@ void berlin_state::berlin(machine_config &config)
 	ADDRESS_MAP_BANK(config, "nvram_map").set_map(&berlin_state::nvram_map).set_options(ENDIANNESS_BIG, 8, 13);
 
 	MEPHISTO_BUTTONS_BOARD(config, m_board);
-	MEPHISTO_DISPLAY_MODUL(config, "display");
+	MEPHISTO_DISPLAY_MODULE2(config, "display");
 	config.set_default_layout(layout_mephisto_berlin);
 }
 

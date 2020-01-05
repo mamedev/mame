@@ -39,6 +39,7 @@ After boot, it copies ROM to RAM, probably to circumvent waitstates on slow ROM.
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "machine/mmboard.h"
+#include "video/mmdisplay2.h"
 
 // internal artwork
 #include "mephisto_modular_tm.lh" // clickable
@@ -138,8 +139,8 @@ void mmtm_state::mmtm_2m_map(address_map &map)
 	map(0xfc020004, 0xfc020007).portr("KEY1");
 	map(0xfc020008, 0xfc02000b).portr("KEY2");
 	map(0xfc020010, 0xfc020013).portr("KEY3");
-	map(0xfc040000, 0xfc040000).w("display", FUNC(mephisto_display_modul_device::latch_w));
-	map(0xfc060000, 0xfc060000).w("display", FUNC(mephisto_display_modul_device::io_w));
+	map(0xfc040000, 0xfc040000).w("display", FUNC(mephisto_display_module2_device::latch_w));
+	map(0xfc060000, 0xfc060000).w("display", FUNC(mephisto_display_module2_device::io_w));
 	map(0xfc080000, 0xfc080000).w("board", FUNC(mephisto_board_device::mux_w));
 	map(0xfc0a0000, 0xfc0a0000).w("board", FUNC(mephisto_board_device::led_w));
 	map(0xfc0c0000, 0xfc0c0000).r("board", FUNC(mephisto_board_device::input_r));
@@ -204,7 +205,7 @@ void mmtm_state::mmtm_v(machine_config &config)
 	ADDRESS_MAP_BANK(config, "nvram_map").set_map(&mmtm_state::nvram_map).set_options(ENDIANNESS_BIG, 8, 13);
 
 	MEPHISTO_SENSORS_BOARD(config, "board");
-	MEPHISTO_DISPLAY_MODUL(config, "display");
+	MEPHISTO_DISPLAY_MODULE2(config, "display");
 	config.set_default_layout(layout_mephisto_modular_tm);
 }
 

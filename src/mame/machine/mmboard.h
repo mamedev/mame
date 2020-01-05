@@ -2,7 +2,7 @@
 // copyright-holders:Sandro Ronco
 /**********************************************************************
 
-    Mephisto Modular
+    Mephisto Sensors Board
 
 *********************************************************************/
 
@@ -11,20 +11,9 @@
 
 #pragma once
 
-
 #include "machine/sensorboard.h"
-#include "video/hd44780.h"
-#include "sound/dac.h"
 #include "video/pwm.h"
 
-#include "emupal.h"
-#include "screen.h"
-#include "speaker.h"
-
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
 
 // ======================> mephisto_board_device
 
@@ -91,39 +80,9 @@ protected:
 };
 
 
-// ======================> mephisto_display_modul_device
-
-class mephisto_display_modul_device : public device_t
-{
-public:
-	// construction/destruction
-	mephisto_display_modul_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-
-	hd44780_device *get() { return m_lcdc; }
-
-	DECLARE_WRITE8_MEMBER(latch_w);
-	DECLARE_WRITE8_MEMBER(io_w);
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-
-	void lcd_palette(palette_device &palette) const;
-
-private:
-	optional_device<hd44780_device> m_lcdc;
-	required_device<dac_byte_interface> m_dac;
-	uint8_t m_latch;
-	uint8_t m_ctrl;
-};
-
-
 // device type definition
 DECLARE_DEVICE_TYPE(MEPHISTO_SENSORS_BOARD, mephisto_sensors_board_device)
 DECLARE_DEVICE_TYPE(MEPHISTO_BUTTONS_BOARD, mephisto_buttons_board_device)
-DECLARE_DEVICE_TYPE(MEPHISTO_DISPLAY_MODUL, mephisto_display_modul_device)
 
 
 #endif // MAME_MACHINE_MMBOARD_H
