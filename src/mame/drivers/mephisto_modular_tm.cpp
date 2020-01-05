@@ -15,6 +15,9 @@ Mephisto TM Berlin is an unreleased dev version, an update to TM Vancouver, but
 not used in any tournament. Internal string and version matches TM Vancouver,
 but ROM has many differences.
 
+BTANB:
+- lyon32t8 still says "2048Kbyte" even though it uses 8MB RAM
+
 Hardware notes:
 
 V(Verkauf?) home version:
