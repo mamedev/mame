@@ -1,5 +1,5 @@
-// license:LGPL-2.1+
-// copyright-holders:Dirk Verwiebe, Cowering, Sandro Ronco, hap
+// license:BSD-3-Clause
+// copyright-holders:Sandro Ronco, hap, Dirk Verwiebe, Cowering
 /******************************************************************************
 
 Hegener + Glaser Mephisto chesscomputers with plugin modules
