@@ -7,7 +7,6 @@
         Driver by Ryan Holtz, ported from work by Ash Wolf
 
         TODO:
-        - Touch inputs
         - Audio
         - UART support
         - Probably more
@@ -55,7 +54,7 @@
 #define LOG_ALL_IRQ			(LOG_IRQ | LOG_EOI_WRITES | LOG_INT_WRITES | LOG_EOI_READS | LOG_INT_READS)
 #define LOG_ALL				(LOG_UNKNOWNS | LOG_IRQ | LOG_DISPLAY | LOG_WRITES | LOG_READS)
 
-#define VERBOSE				(0)
+#define VERBOSE				(LOG_CODEC_READS | LOG_CODEC_WRITES | LOG_BUZZER_WRITES)
 #include "logmacro.h"
 
 void psion5mx_state::machine_start()
@@ -129,6 +128,10 @@ void psion5mx_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	{
 		case TID_TIMER1:
 			update_timer(0);
+			if (BIT(m_buzzer_ctrl, 1))
+			{
+				m_speaker->level_w(BIT(m_timer_value[0], 15));
+			}
 			break;
 		case TID_TIMER2:
 			update_timer(1);
@@ -372,6 +375,7 @@ READ32_MEMBER(psion5mx_state::periphs_r)
 			break;
 
 		case REG_BZCONT:
+			data = m_buzzer_ctrl;
 			LOGMASKED(LOG_BUZZER_READS, "%s: peripheral read, BZCONT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 
@@ -611,6 +615,11 @@ WRITE32_MEMBER(psion5mx_state::periphs_w)
 			break;
 
 		case REG_BZCONT:
+			m_buzzer_ctrl = data;
+			if (!BIT(m_buzzer_ctrl, 1))
+			{
+				m_speaker->level_w(BIT(m_buzzer_ctrl, 0));
+			}
 			LOGMASKED(LOG_BUZZER_WRITES, "%s: peripheral write, BZCONT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 
@@ -937,6 +946,10 @@ void psion5mx_state::psion5mx(machine_config &config)
 	screen.set_visarea(0, 640-1, 0, 240-1);
 
 	PALETTE(config, m_palette, FUNC(psion5mx_state::palette_init), 16);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 /* ROM definition */
@@ -949,4 +962,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME        PARENT   COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY  FULLNAME  FLAGS
-COMP( 1999, psion5mx,   0,       0,      psion5mx,  psion5mx, psion5mx_state, empty_init, "Psion", "Series 5mx",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1999, psion5mx,   0,       0,      psion5mx,  psion5mx, psion5mx_state, empty_init, "Psion", "Series 5mx",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

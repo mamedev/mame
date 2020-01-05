@@ -17,9 +17,11 @@
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/etna.h"
+#include "sound/spkrdev.h"
 
 #include "screen.h"
 #include "emupal.h"
+#include "speaker.h"
 
 class psion5mx_state : public driver_device
 {
@@ -30,6 +32,7 @@ public:
 		, m_etna(*this, "etna")
 		, m_lcd_ram(*this, "lcd_ram")
 		, m_palette(*this, "palette")
+		, m_speaker(*this, "speaker")
 		, m_touchx(*this, "TOUCHX")
 		, m_touchy(*this, "TOUCHY")
 		, m_touch(*this, "TOUCH")
@@ -179,6 +182,7 @@ private:
 	required_device<etna_device> m_etna;
 	required_shared_ptr<uint32_t> m_lcd_ram;
 	required_device<palette_device> m_palette;
+	required_device<speaker_sound_device> m_speaker;
 	required_ioport m_touchx;
 	required_ioport m_touchy;
 	required_ioport m_touch;
@@ -202,6 +206,7 @@ private:
 	uint32_t m_pwrsr;
 	uint32_t m_last_ssi_request;
 	uint32_t m_ssi_read_counter;
+	uint8_t m_buzzer_ctrl;
 
 	uint8_t m_kbd_scan;
 
