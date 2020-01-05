@@ -3,26 +3,20 @@
 #include "emu.h"
 #include "vrender0.h"
 
-/*************************************************************************************
-                                      VRENDER ZERO
-                                     AUDIO EMULATION
-
-	TODO
-	- Envelope, Interrupt functions aren't verified from real hardware behavior.
-	- Reverb, Pingpong/Reversed loop, Most of Channel/Overall control registers
-	  are Not implemented
-	- Sample Rate is unverified
-
-*************************************************************************************/
-static inline s32 sign_ext(s32 val, s32 bit)
-{
-	bit = 32 - bit;
-	return ((s32)(val << bit)) >> bit;
-}
+/***********************************
+        VRENDER ZERO
+        AUDIO EMULATION
+************************************/
+/************
+MISSING:
+envelopes
+reverb
+interrupts
+*************/
 
 //Correct table thanks to Evoga
 //they left a ulaw<->linear conversion tool inside the roms
-static const u16 ULawTo16[]=
+static const unsigned short ULawTo16[]=
 {
 	0x8000,0x8400,0x8800,0x8C00,0x9000,0x9400,0x9800,0x9C00,
 	0xA000,0xA400,0xA800,0xAC00,0xB000,0xB400,0xB800,0xBC00,
@@ -58,58 +52,26 @@ static const u16 ULawTo16[]=
 	0xFFC0,0xFFC8,0xFFD0,0xFFD8,0xFFE0,0xFFE8,0xFFF0,0xFFF8,
 };
 
-// 16 bit access only
-void vr0sound_device::sound_map(address_map &map)
-{
-	map(0x000, 0x3ff).rw(FUNC(vr0sound_device::channel_r), FUNC(vr0sound_device::channel_w));
 
-	/*
-	Sound Control Registers
+#define STATUS          m_SOUNDREGS[0x404/4]
+#define CURSADDR(chan)  (m_SOUNDREGS[(0x20/4)*chan+0x00])
+#define DSADDR(chan)    ((m_SOUNDREGS[(0x20/4)*chan+0x08/4]>>0)&0xffff)
+#define LOOPBEGIN(chan) (m_SOUNDREGS[(0x20/4)*chan+0x0c/4]&0x3fffff)
+#define LOOPEND(chan)   (m_SOUNDREGS[(0x20/4)*chan+0x10/4]&0x3fffff)
+#define ENVVOL(chan)    (m_SOUNDREGS[(0x20/4)*chan+0x04/4]&0xffffff)
 
-	       fedcba98 76543210
-	404(R) xxxxxxxx xxxxxxxx Status (Low); Channel 0-15
-	406(R) xxxxxxxx xxxxxxxx Status (High); Channel 16-31
-	404(W)
-	406(W) x------- -------- Status Assign (0 = Off, 1 = On)
-	       -------- ---xxxxx Status Channel
-	408(R) xxxxxxxx xxxxxxxx NoteOn (Low); Channel 0-15
-	40a(R) xxxxxxxx xxxxxxxx NoteOn (High); Channel 16-31
-	408(W)
-	40a(W) x------- -------- NoteOn Assign (0 = Off, 1 = On)
-	       -------- ---xxxxx NoteOn Channel
-	410    -------- xxxxxxxx RevFactor
-	412    -------- -xxxxxxx BufferSAddr (Top 7 bit of Reverb Buffer Start Address)
-	420    ----xxxx xxxxxxxx BufferSize0
-	422    ----xxxx xxxxxxxx BufferSize1
-	440    ----xxxx xxxxxxxx BufferSize2
-	442    ----xxxx xxxxxxxx BufferSize3
-	480    ----xxxx xxxxxxxx IntMask (Low); Channel 0-15
-	482    ----xxxx xxxxxxxx IntMask (High); Channel 16-31
-	500    ----xxxx xxxxxxxx IntPend (Low); Channel 0-15
-	502    ----xxxx xxxxxxxx IntPend (High); Channel 16-31
-	600    ---xxxxx -------- MaxChn
-	       -------- xxxxxxxx ChnClkNum (Clock Number per Channel)
-	602    x------- -------- RS (Run Sound)
-	       -------- --x----- TM (Texture Memory)
-		   -------- ---x---- RE (Reverb Enable)
-		   -------- -----x-- CW (32bit Adder Wait)
-		   -------- ------x- AW (16bit Adder Wait)
-		   -------- -------x MW (Multipler Wait)
-	*/
+/*
+#define GETSOUNDREG16(Chan,Offs) space.read_word(m_reg_base+0x20*Chan+Offs)
+#define GETSOUNDREG32(Chan,Offs) space.read_dword(m_reg_base+0x20*Chan+Offs)
 
-	map(0x404, 0x407).rw(FUNC(vr0sound_device::status_r), FUNC(vr0sound_device::status_w));
-	map(0x408, 0x40b).rw(FUNC(vr0sound_device::noteon_r), FUNC(vr0sound_device::noteon_w));
-	map(0x410, 0x411).rw(FUNC(vr0sound_device::revfactor_r), FUNC(vr0sound_device::revfactor_w));
-	map(0x412, 0x413).rw(FUNC(vr0sound_device::buffersaddr_r), FUNC(vr0sound_device::buffersaddr_w));
-	map(0x420, 0x421).rw(FUNC(vr0sound_device::buffersize0_r), FUNC(vr0sound_device::buffersize0_w));
-	map(0x422, 0x423).rw(FUNC(vr0sound_device::buffersize1_r), FUNC(vr0sound_device::buffersize1_w));
-	map(0x440, 0x441).rw(FUNC(vr0sound_device::buffersize2_r), FUNC(vr0sound_device::buffersize2_w));
-	map(0x442, 0x443).rw(FUNC(vr0sound_device::buffersize3_r), FUNC(vr0sound_device::buffersize3_w));
-	map(0x480, 0x483).rw(FUNC(vr0sound_device::intmask_r), FUNC(vr0sound_device::intmask_w));
-	map(0x500, 0x503).rw(FUNC(vr0sound_device::intpend_r), FUNC(vr0sound_device::intpend_w));
-	map(0x600, 0x601).rw(FUNC(vr0sound_device::chnnum_r), FUNC(vr0sound_device::chnnum_w));
-	map(0x602, 0x603).rw(FUNC(vr0sound_device::ctrl_r), FUNC(vr0sound_device::ctrl_w));
-}
+#define CURSADDR(chan)  GETSOUNDREG32(chan,0x00)
+#define DSADDR(chan)    GETSOUNDREG16(chan,0x08)
+#define LOOPBEGIN(chan) (GETSOUNDREG32(chan,0x0c)&0x3fffff)
+#define LOOPEND(chan)   (GETSOUNDREG32(chan,0x10)&0x3fffff)
+#define ENVVOL(chan)    (GETSOUNDREG32(chan,0x04)&0xffffff)
+*/
+
+
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -121,14 +83,12 @@ DEFINE_DEVICE_TYPE(SOUND_VRENDER0, vr0sound_device, "vr0sound", "MagicEyes VRend
 //  vr0sound_device - constructor
 //-------------------------------------------------
 
-vr0sound_device::vr0sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, SOUND_VRENDER0, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
-	, device_memory_interface(mconfig, *this)
-	, m_texture_config("texture", ENDIANNESS_LITTLE, 16, 23) // 64 MBit (8 MB) Texture Memory Support
-	, m_frame_config("frame", ENDIANNESS_LITTLE, 16, 23) // 64 MBit (8 MB) Framebuffer Memory Support
-	, m_stream(nullptr)
-	, m_irq_cb(*this)
+vr0sound_device::vr0sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SOUND_VRENDER0, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_TexBase(nullptr),
+	m_FBBase(nullptr),
+	m_stream(nullptr)
 {
 }
 
@@ -139,79 +99,13 @@ vr0sound_device::vr0sound_device(const machine_config &mconfig, const char *tag,
 
 void vr0sound_device::device_start()
 {
-	m_irq_cb.resolve_safe();
+	memset(m_SOUNDREGS,0,sizeof(m_SOUNDREGS));
 
-	// Find our direct access
-	m_texcache = space(AS_TEXTURE).cache<1, 0, ENDIANNESS_LITTLE>();
-	m_fbcache = space(AS_FRAME).cache<1, 0, ENDIANNESS_LITTLE>();
-	m_texcache_ctrl = m_fbcache;
-	for (auto &elem : m_channel)
-		elem.Cache = m_fbcache;
+	m_stream = stream_alloc(0, 2, 44100); // TODO : Related to clock?
 
-	m_stream = stream_alloc(0, 2, clock() / 972); // TODO : Correct source / divider?
-
-	save_item(STRUCT_MEMBER(m_channel, CurSAddr));
-	save_item(STRUCT_MEMBER(m_channel, EnvVol));
-	save_item(STRUCT_MEMBER(m_channel, EnvStage));
-	save_item(STRUCT_MEMBER(m_channel, dSAddr));
-	save_item(STRUCT_MEMBER(m_channel, Modes));
-	save_item(STRUCT_MEMBER(m_channel, LD));
-	save_item(STRUCT_MEMBER(m_channel, LoopBegin));
-	save_item(STRUCT_MEMBER(m_channel, LoopEnd));
-	save_item(STRUCT_MEMBER(m_channel, LChnVol));
-	save_item(STRUCT_MEMBER(m_channel, RChnVol));
-	save_item(STRUCT_MEMBER(m_channel, EnvRate));
-	save_item(STRUCT_MEMBER(m_channel, EnvTarget));
-	save_item(NAME(m_Status));
-	save_item(NAME(m_NoteOn));
-	save_item(NAME(m_RevFactor));
-	save_item(NAME(m_BufferAddr));
-	save_item(NAME(m_BufferSize));
-	save_item(NAME(m_IntMask));
-	save_item(NAME(m_IntPend));
-	save_item(NAME(m_MaxChn));
-	save_item(NAME(m_ChnClkNum));
-	save_item(NAME(m_Ctrl));
+	save_item(NAME(m_SOUNDREGS));
 }
 
-//-------------------------------------------------
-//  device_post_load - device-specific post-load
-//-------------------------------------------------
-
-void vr0sound_device::device_post_load()
-{
-	device_clock_changed();
-}
-
-
-//-------------------------------------------------
-//  device_clock_changed - called if the clock
-//  changes
-//-------------------------------------------------
-
-void vr0sound_device::device_clock_changed()
-{
-	int div;		
-	if (m_ChnClkNum)
-		div = ((30 << 16) | 0x8000) / (m_ChnClkNum + 1); // TODO : Verify algorithm
-	else
-		div = 1 << 16;
-
-	m_stream->set_sample_rate(((clock() * div) / 972) >> 16);
-}
-
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-device_memory_interface::space_config_vector vr0sound_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(AS_TEXTURE, &m_texture_config),
-		std::make_pair(AS_FRAME, &m_frame_config)
-	};
-}
 
 //-------------------------------------------------
 //  sound_stream_update - handle update requests
@@ -223,397 +117,133 @@ void vr0sound_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 	VR0_RenderAudio(samples, outputs[0], outputs[1]);
 }
 
-u16 vr0sound_device::channel_r(offs_t offset)
+
+
+READ32_MEMBER(vr0sound_device::vr0_snd_read)
 {
-	return m_channel[(offset >> 4) & 0x1f].read(offset & 0xf);
+	return m_SOUNDREGS[offset];
 }
 
-void vr0sound_device::channel_w(offs_t offset, u16 data, u16 mem_mask)
+
+WRITE32_MEMBER(vr0sound_device::vr0_snd_write)
 {
-	channel_t *channel = &m_channel[(offset >> 4) & 0x1f];
-	u16 old_mode = channel->Modes;
-	m_channel[(offset >> 4) & 0x1f].write(offset & 0xf, data, mem_mask);
-	if ((old_mode ^ channel->Modes) & MODE_TEXTURE)
+	if(offset==0x404/4)
 	{
-		channel->Cache = (channel->Modes & MODE_TEXTURE) ? m_texcache_ctrl : m_fbcache;
-	}
-}
-
-u16 vr0sound_device::status_r(offs_t offset)
-{
-	return m_Status >> ((offset & 1) << 2);
-}
-
-void vr0sound_device::status_w(offs_t offset, u16 data)
-{
-	const u32 c = data & 0x1f;
-	if (data & 0x8000)
-	{
-		m_Status |= 1 << c;
-	}
-	else
-	{
-		m_Status &= ~(1 << c);
-	}
-}
-
-u16 vr0sound_device::noteon_r(offs_t offset)
-{
-	return m_NoteOn >> ((offset & 1) << 2);
-}
-
-void vr0sound_device::noteon_w(offs_t offset, u16 data)
-{
-	const u32 c = data & 0x1f;
-	if (data & 0x8000)
-	{
-		m_NoteOn |= 1 << c;
-	}
-	else
-	{
-		m_NoteOn &= ~(1 << c);
-	}
-}
-
-u16 vr0sound_device::revfactor_r(offs_t offset)
-{
-	return m_RevFactor & 0xff;
-}
-
-void vr0sound_device::revfactor_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-		m_RevFactor = data & 0xff;
-}
-
-/*
-	Buffer Address
-		1                0
-		fedcba9876543210 fedcba9876543210
-		----------0xxxxx x--------------- BufferSAddr
-		---------------- -xxx------------ Buffer Select
-		---------------- ----xxxxxxxxxxxx Buffer Pointer
-*/
-
-u16 vr0sound_device::buffersaddr_r(offs_t offset)
-{
-	return (m_BufferAddr >> 14) & 0x7f;
-}
-
-void vr0sound_device::buffersaddr_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-		m_BufferAddr = (m_BufferAddr & ~(0x7f << 14)) | ((data & 0x7f) << 14);
-}
-
-u16 vr0sound_device::buffersize0_r(offs_t offset) { return m_BufferSize[0] & 0xfff; }
-u16 vr0sound_device::buffersize1_r(offs_t offset) { return m_BufferSize[1] & 0xfff; }
-u16 vr0sound_device::buffersize2_r(offs_t offset) { return m_BufferSize[2] & 0xfff; }
-u16 vr0sound_device::buffersize3_r(offs_t offset) { return m_BufferSize[3] & 0xfff; }
-
-void vr0sound_device::buffersize0_w(offs_t offset, u16 data, u16 mem_mask) { data &= 0xfff; COMBINE_DATA(&m_BufferSize[0]); }
-void vr0sound_device::buffersize1_w(offs_t offset, u16 data, u16 mem_mask) { data &= 0xfff; COMBINE_DATA(&m_BufferSize[1]); }
-void vr0sound_device::buffersize2_w(offs_t offset, u16 data, u16 mem_mask) { data &= 0xfff; COMBINE_DATA(&m_BufferSize[2]); }
-void vr0sound_device::buffersize3_w(offs_t offset, u16 data, u16 mem_mask) { data &= 0xfff; COMBINE_DATA(&m_BufferSize[3]); }
-
-u16 vr0sound_device::intmask_r(offs_t offset)
-{
-	return m_IntMask >> ((offset & 1) << 2);
-}
-
-void vr0sound_device::intmask_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	const int shift = ((offset & 1) << 2);
-	m_IntMask = (m_IntMask & ~(mem_mask << shift)) | ((data & mem_mask) << shift);
-}
-
-u16 vr0sound_device::intpend_r(offs_t offset)
-{
-	return m_IntPend >> ((offset & 1) << 2);
-}
-
-void vr0sound_device::intpend_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	m_IntPend &= ~((data & mem_mask) << ((offset & 1) << 2));
-	if (!m_IntPend)
-		m_irq_cb(false);
-}
-
-u16 vr0sound_device::chnnum_r(offs_t offset)
-{
-	return ((m_MaxChn & 0x1f) << 8) | (m_ChnClkNum & 0xff);
-}
-
-void vr0sound_device::chnnum_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		u8 old_chnclknum = m_ChnClkNum;
-		m_ChnClkNum = data & 0xff;
-		if (old_chnclknum != m_ChnClkNum)
+		data&=0xffff;
+		if(data&0x8000)
 		{
-			device_clock_changed();
+			uint32_t c=data&0x1f;
+			STATUS|=1<<c;
+			CURSADDR(c)=0;
 		}
+		else
+		{
+			STATUS&=~(1<<(data&0x1f));
+		}
+		return;
 	}
-	if (ACCESSING_BITS_8_15)
-		m_MaxChn = (data >> 8) & 0x1f;
-}
-
-u16 vr0sound_device::ctrl_r(offs_t offset)
-{
-	return m_Ctrl;
-}
-
-void vr0sound_device::ctrl_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	const u16 old_ctrl = m_Ctrl;
-	COMBINE_DATA(&m_Ctrl);
-	if ((old_ctrl ^ m_Ctrl) & CTRL_TM)
-		m_texcache_ctrl = (m_Ctrl & CTRL_TM) ? m_texcache : m_fbcache;
-}
-
-/*
-Channel Parameter Register (32 bytes for each channels)
-
-	fedcba98 76543210
-00	xxxxxxxx xxxxxxxx CurSAddr (15:0)
-02	xxxxxxxx xxxxxxxx CurSAddr (31:16)
-04	xxxxxxxx xxxxxxxx EnvVol (15:0)
-06	-11x---- -------- Loop Direction(LD)
-	-11-xxxx -------- EnvStage
-	-------- xxxxxxxx EnvVol (23:16)
-08	xxxxxxxx xxxxxxxx DSAddr (15:0)
-0a	-xxxxxxx -------- Modes
-0c	xxxxxxxx xxxxxxxx LoopBegin (15:0)
-0e	-xxxxxxx -------- LChnVol
-	-------- --xxxxxx LoopBegin (21:16)
-10	xxxxxxxx xxxxxxxx LoopEnd (15:0)
-12	-xxxxxxx -------- RChnVol
-	-------- --xxxxxx LoopEnd (21:16)
-14	xxxxxxxx xxxxxxxx EnvRate0 (15:0)
-16	xxxxxxxx xxxxxxxx EnvRate1 (15:0)
-18	xxxxxxxx xxxxxxxx EnvRate2 (15:0)
-1a	xxxxxxxx xxxxxxxx EnvRate3 (15:0)
-1c	x------- -------- EnvRate1 (16)
-	-xxxxxxx -------- EnvTarget1
-	-------- x------- EnvRate0 (16)
-	-------- -xxxxxxx EnvTarget0
-1e	x------- -------- EnvRate3 (16)
-	-xxxxxxx -------- EnvTarget3
-	-------- x------- EnvRate2 (16)
-	-------- -xxxxxxx EnvTarget2
-*/
-
-u16 vr0sound_device::channel_t::read(offs_t offset)
-{
-	u16 ret = 0;
-	
-	switch (offset)
+	else
 	{
-		case 0x00/2:
-			ret = CurSAddr & 0x0000ffff;
-			break;
-		case 0x02/2:
-			ret = (CurSAddr & 0xffff0000) >> 16;
-			break;
-		case 0x04/2:
-			ret = EnvVol & 0xffff;
-			break;
-		case 0x06/2:
-			ret = 0x6000 | (LD ? 0x1000 : 0) | ((EnvStage << 8) & 0x0f00) | ((EnvVol & 0xff0000) >> 16);
-			break;
-		case 0x08/2:
-			ret = dSAddr;
-			break;
-		case 0x0a/2:
-			ret = (Modes << 8) & 0x7f00;
-			break;
-		case 0x0c/2:
-			ret = LoopBegin & 0x00ffff;
-			break;
-		case 0x0e/2:
-			ret = ((LChnVol << 8) & 0x7f00) | ((LoopBegin & 0x3f0000) >> 16);
-			break;
-		case 0x10/2:
-			ret = LoopEnd & 0x00ffff;
-			break;
-		case 0x12/2:
-			ret = ((RChnVol << 8) & 0x7f00) | ((LoopEnd & 0x3f0000) >> 16);
-			break;
-		case 0x14/2:
-		case 0x16/2:
-		case 0x18/2:
-		case 0x1a/2:
-			ret = EnvRate[offset - (0x14/2)] & 0x0ffff;
-			break;
-		case 0x1c/2:
-		case 0x1e/2:
-			ret = (EnvTarget[((offset - (0x1c/2)) * 2) + 0] & 0x007f) | ((EnvTarget[((offset - (0x1c/2)) * 2) + 1] << 8) & 0x7f00);
-			ret |= ((EnvRate[((offset - (0x1c/2)) * 2) + 0] & 0x10000) >> 9) | ((EnvRate[((offset - (0x1c/2)) * 2) + 1] & 0x10000) >> 1);
-			break;
+		COMBINE_DATA(&m_SOUNDREGS[offset]);
 	}
-	return ret;
 }
 
-void vr0sound_device::channel_t::write(offs_t offset, u16 data, u16 mem_mask)
+
+void vr0sound_device::set_areas(uint16_t *texture, uint16_t *frame)
 {
-	u16 newdata = read(offset);
-	COMBINE_DATA(&newdata);
-
-	data = newdata;
-	switch (offset)
-	{
-		case 0x00/2:
-			CurSAddr = (CurSAddr & 0xffff0000) | (data & 0x0000ffff);
-			break;
-		case 0x02/2:
-			CurSAddr = (CurSAddr & 0x0000ffff) | ((data << 16) & 0xffff0000);
-			break;
-		case 0x04/2:
-			EnvVol = (EnvVol & ~0xffff) | (data & 0xffff);
-			break;
-		case 0x06/2:
-			LD = data & 0x1000;
-			EnvStage = (data & 0x0f00) >> 8;
-			EnvVol = sign_ext((EnvVol & 0x00ffff) | ((data << 16) & 0xff0000), 24);
-			break;
-		case 0x08/2:
-			dSAddr = data & 0xffff;
-			break;
-		case 0x0a/2:
-			Modes = (data & 0x7f00) >> 8;
-			break;
-		case 0x0c/2:
-			LoopBegin = (LoopBegin & 0x3f0000) | (data & 0x00ffff);
-			break;
-		case 0x0e/2:
-			LChnVol = (data & 0x7f00) >> 8;
-			LoopBegin = (LoopBegin & 0x00ffff) | ((data << 16) & 0x3f0000);
-			break;
-		case 0x10/2:
-			LoopEnd = (LoopEnd & 0x3f0000) | (data & 0x00ffff);
-			break;
-		case 0x12/2:
-			RChnVol = (data & 0x7f00) >> 8;
-			LoopEnd = (LoopEnd & 0x00ffff) | ((data << 16) & 0x3f0000);
-			break;
-		case 0x14/2:
-		case 0x16/2:
-		case 0x18/2:
-		case 0x1a/2:
-			EnvRate[offset - (0x14/2)] = (EnvRate[offset - (0x14/2)] & ~0xffff) | (data & 0xffff);
-			break;
-		case 0x1c/2:
-		case 0x1e/2:
-			EnvTarget[((offset - (0x1c/2)) * 2) + 0] = (data & 0x007f);
-			EnvTarget[((offset - (0x1c/2)) * 2) + 1] = ((data & 0x7f00) >> 8);
-			EnvRate[((offset - (0x1c/2)) * 2) + 0] = sign_ext((EnvRate[((offset - (0x1c/2)) * 2) + 0] & 0xffff) | ((data & 0x0080) << 9), 17);
-			EnvRate[((offset - (0x1c/2)) * 2) + 1] = sign_ext((EnvRate[((offset - (0x1c/2)) * 2) + 1] & 0xffff) | ((data & 0x8000) << 1), 17);
-			break;
-	}
+	m_TexBase=(int16_t *)texture;
+	m_FBBase=(int16_t *)frame;
 }
 
-/*
-Bit 0 Attack (0)
-Bit 1 Decay (1)
-Bit 2 Sustain (2)
-Bit 3 Release (3)
-static inline u8 get_envstate(u8 stage)
-{
-	for (int bit = 3; bit >= 0; bit--)
-	{
-		if (BIT(stage, bit))
-			return bit;
-	}
-	return 0;
-}
-*/
 
 void vr0sound_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_sample_t *r)
 {
-	for (int s = 0; s < nsamples; s++)
-	{
-		s32 lsample = 0, rsample = 0;
-		for (int i = 0; i <= m_MaxChn; i++)
-		{
-			channel_t *channel = &m_channel[i];
-			s32 sample = 0;
-			const u32 loopbegin_scaled = channel->LoopBegin << 10;
-			const u32 loopend_scaled = channel->LoopEnd << 10;
+	int16_t *SAMPLES;
+	uint32_t st=STATUS;
+	signed int lsample,rsample=0;
+	uint32_t CLK=(m_SOUNDREGS[0x600/4]>>0)&0xff;
+	uint32_t NCH=(m_SOUNDREGS[0x600/4]>>8)&0xff;
+	uint32_t CT1=(m_SOUNDREGS[0x600/4]>>16)&0xff;
+	uint32_t CT2=(m_SOUNDREGS[0x600/4]>>24)&0xff;
+	int div;
+	int s;
 
-			if (!(m_Status & (1 << i)) || !(m_Ctrl & CTRL_RS))
+
+	if(CT1&0x20)
+		SAMPLES = m_TexBase;
+	else
+		SAMPLES = m_FBBase;
+
+	if(CLK)
+		div=((30<<16)|0x8000)/(CLK+1);
+	else
+		div=1<<16;
+
+	for(s=0;s<nsamples;++s)
+	{
+		int i;
+		lsample=rsample=0;
+		for(i=0;i<=NCH;++i)
+		{
+			signed int sample;
+			uint32_t cur=CURSADDR(i);
+			uint32_t a=LOOPBEGIN(i)+(cur>>10);
+			uint8_t Mode=m_SOUNDREGS[(0x20/4)*i+0x8/4]>>24;
+			signed int LVOL=m_SOUNDREGS[(0x20/4)*i+0xc/4]>>24;
+			signed int RVOL=m_SOUNDREGS[(0x20/4)*i+0x10/4]>>24;
+
+			int32_t DSADD=(DSADDR(i)*div)>>16;
+
+			if(!(st&(1<<i)) || !(CT2&0x80))
 				continue;
 
-			if (channel->Modes & MODE_ULAW)       //u-law
+			if(Mode&0x10)       //u-law
 			{
-				sample = channel->Cache->read_byte(channel->CurSAddr >> 9);
-				sample = (s16)ULawTo16[sample & 0xff];
+				uint16_t s=SAMPLES[a];
+				if((cur&0x200))
+					s>>=8;
+				sample=(signed short)ULawTo16[s&0xff];
 			}
 			else
 			{
-				if (channel->Modes & MODE_8BIT)   //8bit
+				if(Mode&0x20)   //8bit
 				{
-					sample = channel->Cache->read_byte(channel->CurSAddr >> 9);
-					sample = (s16)(((s8)(sample & 0xff)) << 8);
+					uint16_t s=SAMPLES[a];
+					if((cur&0x200))
+						s>>=8;
+					sample=(signed short) (((signed char) (s&0xff))<<8);
 				}
 				else                //16bit
 				{
-					sample = (s16)(channel->Cache->read_word((channel->CurSAddr >> 9) & ~1));
+					sample=SAMPLES[a];
 				}
 			}
 
-			channel->CurSAddr += channel->dSAddr;
-			if (channel->CurSAddr >= loopend_scaled)
+			CURSADDR(i)+=DSADD;
+			if(a>=LOOPEND(i))
 			{
-				if (channel->Modes & MODE_LOOP)  //Loop
-					channel->CurSAddr = (channel->CurSAddr - loopend_scaled) + loopbegin_scaled;
+				if(Mode&1)  //Loop
+					CURSADDR(i)=0;//LOOPBEGIN(i)<<10;
 				else
 				{
-					m_Status &= ~(1 << (i & 0x1f));
-					if (m_IntMask != 0xffffffff) // Interrupt, TODO : Partially implemented, Verify behavior from real hardware
-					{
-						const u32 old_pend = m_IntPend;
-						m_IntPend |= (~m_IntMask & (1 << (i & 0x1f))); // it's can be with loop?
-						if ((m_IntPend != 0) && (old_pend != m_IntPend))
-							m_irq_cb(true);
-					}
+					STATUS&=~(1<<(i&0x1f));
 					break;
 				}
 			}
-
-			const s32 v = channel->EnvVol >> 16;
-			sample = (sample * v) >> 8;
-
-			if (channel->Modes & MODE_ENVELOPE) // Envelope, TODO : Partially implemented, Verify behavior from real hardware
-			{
-				for (int level = 0; level < 4; level++)
-				{
-					if (BIT(channel->EnvStage, level))
-					{
-						s32 RATE = channel->EnvRate[level];
-
-						channel->EnvVol += RATE;
-						if (RATE > 0)
-						{
-							if (((channel->EnvVol >> 16) & 0x7f) >= channel->EnvTarget[level])
-							{
-								channel->EnvStage <<= 1;
-							}
-						}
-						else if (RATE < 0)
-						{
-							if (((channel->EnvVol >> 16) & 0x7f) <= channel->EnvTarget[level])
-							{
-								channel->EnvStage <<= 1;
-							}
-						}
-					}
-				}
-			}
-			lsample += (sample * channel->LChnVol) >> 8;
-			rsample += (sample * channel->RChnVol) >> 8;
+//          uint32_t v=(ENVVOL(i))>>8;
+//          sample=(sample*v)>>16;
+			lsample+=(sample*LVOL)>>8;
+			rsample+=(sample*RVOL)>>8;
 		}
-		l[s] = std::max(-32768, std::min(32767, lsample));
-		r[s] = std::max(-32768, std::min(32767, rsample));
+		if(lsample>32767)
+			lsample=32767;
+		if(lsample<-32768)
+			lsample=-32768;
+		l[s]=lsample;
+		if(rsample>32767)
+			rsample=32767;
+		if(rsample<-32768)
+			rsample=-32768;
+		r[s]=rsample;
 	}
 }
