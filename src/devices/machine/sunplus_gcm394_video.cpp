@@ -705,10 +705,23 @@ void gcm394_base_video_device::draw_sprites(const rectangle &cliprect, uint32_t 
 
 uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	memset(&m_screenbuf[m_screen->width() * cliprect.min_y], 0, 4 *  m_screen->width() * ((cliprect.max_y - cliprect.min_y) + 1));
+	// For jak_car2 and jak_gtg the palette entry for 'magenta' in the test mode is intentionally set to a transparent black pen
+	// (it is stored in the palette table in ROM that way, and copied directly) so the only way for the magenta entries on the screen
+	// to be correctly displayed is if there is a magenta BG pen to fall through to (or for another palette write to change the palette
+	// that is copied, but this does not appear to be the case).  How the bg pen is set is unknown, it is not a regular palette entry.
+	// The 'bitmap test mode' in jak_car2 requires this to be black instead, 
+	//const uint16_t bgcol = 0x7c1f; // magenta
+	const uint16_t bgcol = 0x0000; // black
 
 	for (uint32_t scanline = (uint32_t)cliprect.min_y; scanline <= (uint32_t)cliprect.max_y; scanline++)
 	{
+		uint32_t* bufferline = &m_screenbuf[scanline * m_screen->width()];
+
+		for (int x = 0; x < m_screen->width(); x++)
+		{
+			bufferline[x] = m_rgb555_to_rgb888[bgcol];
+		}
+
 		for (int i = 0; i < 4; i++)
 		{
 			if (1)

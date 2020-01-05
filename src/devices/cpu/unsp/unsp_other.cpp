@@ -204,6 +204,7 @@ void unsp_device::execute_remaining(const uint16_t op)
 			r0 = m_core->m_r[opb];
 			r2 = read16(UNSP_LPC);
 			add_lpc(1);
+			// additional special case 'if (op1 == 0x04 && opn == 0x03)' write logic below
 			break;
 
 		default: // Shifted ops
@@ -266,12 +267,26 @@ void unsp_device::execute_remaining(const uint16_t op)
 		break;
 	}
 
+	bool write = do_basic_alu_ops(op0, lres, r0, r1, r2, (opa != 7) ? true : false);
+
+	if (write)
+	{
+		if (op1 == 0x04 && opn == 0x03) // store [imm16], r
+			write16(r2, lres);
+		else
+			m_core->m_r[opa] = (uint16_t)lres;
+	}
+}
+
+
+bool unsp_device::do_basic_alu_ops(const uint16_t &op0, uint32_t &lres, uint16_t &r0, uint16_t &r1, uint32_t &r2, bool update_flags)
+{
 	switch (op0)
 	{
 	case 0x00: // Add
 	{
 		lres = r0 + r1;
-		if (opa != 7)
+		if (update_flags)
 			update_nzsc(lres, r0, r1);
 		break;
 	}
@@ -279,69 +294,66 @@ void unsp_device::execute_remaining(const uint16_t op)
 	{
 		uint32_t c = (m_core->m_r[REG_SR] & UNSP_C) ? 1 : 0;
 		lres = r0 + r1 + c;
-		if (opa != 7)
+		if (update_flags)
 			update_nzsc(lres, r0, r1);
 		break;
 	}
 	case 0x02: // Subtract
 		lres = r0 + (uint16_t)(~r1) + uint32_t(1);
-		if (opa != 7)
+		if (update_flags)
 			update_nzsc(lres, r0, ~r1);
 		break;
 	case 0x03: // Subtract w/ carry
 	{
 		uint32_t c = (m_core->m_r[REG_SR] & UNSP_C) ? 1 : 0;
 		lres = r0 + (uint16_t)(~r1) + c;
-		if (opa != 7)
+		if (update_flags)
 			update_nzsc(lres, r0, ~r1);
 		break;
 	}
 	case 0x04: // Compare
 		lres = r0 + (uint16_t)(~r1) + uint32_t(1);
-		if (opa != 7)
+		if (update_flags)
 			update_nzsc(lres, r0, ~r1);
-		return;
+		return false;
 	case 0x06: // Negate
 		lres = -r1;
-		if (opa != 7)
+		if (update_flags)
 			update_nz(lres);
 		break;
 	case 0x08: // XOR
 		lres = r0 ^ r1;
-		if (opa != 7)
+		if (update_flags)
 			update_nz(lres);
 		break;
 	case 0x09: // Load
 		lres = r1;
-		if (opa != 7)
+		if (update_flags)
 			update_nz(lres);
 		break;
 	case 0x0a: // OR
 		lres = r0 | r1;
-		if (opa != 7)
+		if (update_flags)
 			update_nz(lres);
 		break;
 	case 0x0b: // AND
 		lres = r0 & r1;
-		if (opa != 7)
+		if (update_flags)
 			update_nz(lres);
 		break;
 	case 0x0c: // Test
 		lres = r0 & r1;
-		if (opa != 7)
+		if (update_flags)
 			update_nz(lres);
-		return;
+		return false;
 	case 0x0d: // Store
 		write16(r2, r0);
-		return;
+		return false;
 
 	default:
-		unimplemented_opcode(op);
-		return;
+		fatalerror("UNSP: illegal ALU optype %02x at %04x\n", op0, UNSP_LPC);
+		return false;
 	}
 
-	if (op1 == 0x04 && opn == 0x03) // store [imm16], r
-		write16(r2, lres);
-	else
-		m_core->m_r[opa] = (uint16_t)lres;
+	return true;
 }

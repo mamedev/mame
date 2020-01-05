@@ -325,7 +325,6 @@ public:
 		generalplus_gpac800_device(mconfig, tag, owner, clock)
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
-		m_testval = 0;
 		m_csbase = 0x30000;
 	}
 
@@ -338,22 +337,33 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_READ16_MEMBER(unkarea_7850_r);
-	DECLARE_READ16_MEMBER(unkarea_7854_r);
-
+	DECLARE_READ16_MEMBER(nand_7850_r);
+	DECLARE_READ16_MEMBER(nand_7854_r);
+	DECLARE_WRITE16_MEMBER(nand_dma_ctrl_w);
+	DECLARE_WRITE16_MEMBER(nand_7850_w);
 	DECLARE_WRITE16_MEMBER(nand_command_w);
-
-	DECLARE_WRITE16_MEMBER(flash_addr_low_w);
-	DECLARE_WRITE16_MEMBER(flash_addr_high_w);
-	
+	DECLARE_WRITE16_MEMBER(nand_addr_low_w);
+	DECLARE_WRITE16_MEMBER(nand_addr_high_w);
 	DECLARE_READ16_MEMBER(nand_ecc_low_byte_error_flag_1_r);
-
-	int m_testval;
+	DECLARE_WRITE16_MEMBER(nand_7856_w);
+	DECLARE_WRITE16_MEMBER(nand_7857_w);
+	DECLARE_WRITE16_MEMBER(nand_785b_w);
+	DECLARE_WRITE16_MEMBER(nand_785c_w);
+	DECLARE_WRITE16_MEMBER(nand_785d_w);
+	DECLARE_READ16_MEMBER(nand_785e_r);
 
 	uint16_t m_nandcommand;
 
-	uint16_t m_flash_addr_low;
-	uint16_t m_flash_addr_high;
+	uint16_t m_nand_addr_low;
+	uint16_t m_nand_addr_high;
+
+	uint16_t m_nand_dma_ctrl;
+	uint16_t m_nand_7850;
+	uint16_t m_nand_785d;
+	uint16_t m_nand_785c;
+	uint16_t m_nand_785b;
+	uint16_t m_nand_7856;
+	uint16_t m_nand_7857;
 
 	int m_curblockaddr;
 };
