@@ -64,7 +64,6 @@ private:
 
 	u8 p1_r();
 	void p1_w(u8 data);
-	void p3_w(u8 data);
 	void char_latched_attr_w(offs_t offset, u8 data);
 	void attr_latch_w(u8 data);
 
@@ -108,10 +107,6 @@ u8 adm11_state::p1_r()
 }
 
 void adm11_state::p1_w(u8 data)
-{
-}
-
-void adm11_state::p3_w(u8 data)
 {
 }
 
@@ -165,7 +160,7 @@ void adm11_state::adm12(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &adm11_state::ext_map);
 	m_maincpu->port_in_cb<1>().set(FUNC(adm11_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(adm11_state::p1_w));
-	m_maincpu->port_out_cb<3>().set(FUNC(adm11_state::p3_w));
+	// TODO: RXD/TXD are serial communications; INT0 is serial keyboard data
 
 	EEPROM_2804(config, "eeprom"); // X2804AP
 
@@ -180,7 +175,6 @@ void adm11_state::adm12(machine_config &config)
 	m_avdc->set_addrmap(0, &adm11_state::char_map);
 	m_avdc->set_addrmap(1, &adm11_state::attr_map);
 	m_avdc->set_display_callback(FUNC(adm11_state::draw_character));
-	m_avdc->breq_callback().set_inputline(m_maincpu, MCS51_INT0_LINE);
 	m_avdc->intr_callback().set_inputline(m_maincpu, MCS51_INT1_LINE);
 	m_avdc->mbc_callback().set(FUNC(adm11_state::mbc_w));
 }
@@ -189,6 +183,8 @@ void adm11_state::adm12(machine_config &config)
 ROM_START(adm12)
 	ROM_REGION(0x2000, "program", 0)
 	ROM_LOAD("u13.bin", 0x0000, 0x2000, CRC(3c928176) SHA1(dd741c620da2ced9979456296c2af0387461cdf1)) // MBM2764-30
+
+	// Keyboard MCU might be a COP420, as with the ADM 11
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD("u35.bin", 0x0000, 0x1000, CRC(66d7bc44) SHA1(cd839839f29657207098d85900cb570285be91a6)) // HN462732-P
