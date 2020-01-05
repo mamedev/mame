@@ -171,6 +171,10 @@ private:
 	required_shared_ptr<uint32_t> m_lcd_ram;
 
 	emu_timer *m_timers[2];
+
+	uint32_t m_memcfg[2];
+	uint16_t m_dramcfg;
+
 	uint16_t m_timer_reload[2];
 	uint16_t m_timer_ctrl[2];
 	uint16_t m_timer_value[2];

@@ -4,10 +4,13 @@
 
         Psion 5mx (EPOC R5) series
 
-        Skeleton driver by Ryan Holtz, ported from work by Ash Wolf
+        Driver by Ryan Holtz, ported from work by Ash Wolf
 
         TODO:
-        - everything
+        - Touch inputs
+        - Audio
+        - UART support
+        - Probably more
 
         More info:
             https://github.com/Treeki/WindEmu
@@ -57,8 +60,9 @@
 
 void psion5mx_state::machine_start()
 {
-	m_timers[0] = timer_alloc(TID_TIMER1);
-	m_timers[1] = timer_alloc(TID_TIMER2);
+	save_item(NAME(m_memcfg));
+	save_item(NAME(m_dramcfg));
+
 	save_item(NAME(m_timer_reload));
 	save_item(NAME(m_timer_value));
 	save_item(NAME(m_timer_ctrl));
@@ -75,13 +79,17 @@ void psion5mx_state::machine_start()
 
 	save_item(NAME(m_ports));
 
+	m_timers[0] = timer_alloc(TID_TIMER1);
+	m_timers[1] = timer_alloc(TID_TIMER2);
 	m_periodic = timer_alloc(TID_PERIODIC);
-
 	m_rtc_ticker = timer_alloc(TID_RTC_TICKER);
 }
 
 void psion5mx_state::machine_reset()
 {
+	memset(m_memcfg, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_memcfg));
+	m_dramcfg = 0;
+
 	m_timers[0]->adjust(attotime::never);
 	m_timers[1]->adjust(attotime::never);
 	m_timer_reload[0] = m_timer_reload[1] = 0;
@@ -92,7 +100,7 @@ void psion5mx_state::machine_reset()
 
 	m_lcd_display_base_addr = 0;
 
-	m_rtc = 0;
+	m_rtc = time(nullptr) - 946684800;
 	m_pwrsr = (1 << 10) | (1 << 13);
 	m_last_ssi_request = 0;
 	m_ssi_read_counter = 0;
@@ -163,7 +171,7 @@ void psion5mx_state::set_timer_ctrl(int timer, uint32_t value)
 	m_timer_ctrl[timer] = value;
 	if (changed != 0)
 	{
-		attotime interval = BIT(m_timer_ctrl[timer], 3) ? attotime::from_ticks(1, 512000) : attotime::from_ticks(m_timer_reload[timer], 36000000);
+		attotime interval = BIT(m_timer_ctrl[timer], 3) ? attotime::from_ticks(1, 512000) : attotime::from_ticks(1, 2000);
 		if (BIT(old, 7) && BIT(value, 7))
 		{
 			m_timers[timer]->adjust(m_timers[timer]->remaining(), 0, interval);
@@ -186,13 +194,16 @@ READ32_MEMBER(psion5mx_state::periphs_r)
 	switch (reg)
 	{
 		case REG_MEMCFG1:
+			data = m_memcfg[0];
 			LOGMASKED(LOG_DRAM_READS, "%s: peripheral read, MEMCFG1 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 		case REG_MEMCFG2:
+			data = m_memcfg[1];
 			LOGMASKED(LOG_DRAM_READS, "%s: peripheral read, MEMCFG2 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 
 		case REG_DRAMCFG:
+			data = m_dramcfg;
 			LOGMASKED(LOG_DRAM_READS, "%s: peripheral read, DRAMCFG = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 
@@ -322,6 +333,7 @@ READ32_MEMBER(psion5mx_state::periphs_r)
 			break;
 		}
 		case REG_SSSR:
+			data = 0;
 			LOGMASKED(LOG_SSP_READS, "%s: peripheral read, SSSR = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 
@@ -433,13 +445,16 @@ WRITE32_MEMBER(psion5mx_state::periphs_w)
 	switch (reg)
 	{
 		case REG_MEMCFG1:
+			m_memcfg[0] = data;
 			LOGMASKED(LOG_DRAM_WRITES, "%s: peripheral write, MEMCFG1 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 		case REG_MEMCFG2:
+			m_memcfg[1] = data;
 			LOGMASKED(LOG_DRAM_WRITES, "%s: peripheral write, MEMCFG2 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 
 		case REG_DRAMCFG:
+			m_dramcfg = data;
 			LOGMASKED(LOG_DRAM_WRITES, "%s: peripheral write, DRAMCFG = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 
@@ -559,6 +574,7 @@ WRITE32_MEMBER(psion5mx_state::periphs_w)
 		case REG_TC1LOAD:
 			LOGMASKED(LOG_TIMER_WRITES, "%s: peripheral write, TC1LOAD = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			m_timer_reload[0] = data;
+			m_timer_value[0] = data;
 			break;
 		case REG_TC1VAL:
 			LOGMASKED(LOG_TIMER_WRITES, "%s: peripheral write, TC1VAL = %08x & %08x\n", machine().describe_context(), data, mem_mask);
@@ -575,6 +591,7 @@ WRITE32_MEMBER(psion5mx_state::periphs_w)
 		case REG_TC2LOAD:
 			LOGMASKED(LOG_TIMER_WRITES, "%s: peripheral write, TC2LOAD = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			m_timer_reload[1] = data;
+			m_timer_value[1] = data;
 			break;
 		case REG_TC2VAL:
 			LOGMASKED(LOG_TIMER_WRITES, "%s: peripheral write, TC2VAL = %08x & %08x\n", machine().describe_context(), data, mem_mask);
@@ -734,7 +751,7 @@ uint32_t psion5mx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	// fetch palette
 	LOGMASKED(LOG_DISPLAY, "%02x %02x %02x %02x\n", lcd_buf[0], lcd_buf[1], lcd_buf[2], lcd_buf[3]);
 
-	const int bpp = 1 << (lcd_buf[0] >> 4);
+	const int bpp = 1 << (lcd_buf[1] >> 4);
 	const int ppb = 8 / bpp;
 	LOGMASKED(LOG_DISPLAY, "bpp: %d, ppb: %d\n", bpp, ppb);
 	uint16_t palette[16] = {};
@@ -773,7 +790,7 @@ INPUT_PORTS_END
 void psion5mx_state::psion5mx(machine_config &config)
 {
 	/* basic machine hardware */
-	ARM710T(config, m_maincpu, 18000000); // 18MHz, per wikipedia
+	ARM710T(config, m_maincpu, 36000000); // 36MHz, per wikipedia
 	m_maincpu->set_addrmap(AS_PROGRAM, &psion5mx_state::main_map);
 
 	ETNA(config, m_etna);
