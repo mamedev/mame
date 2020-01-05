@@ -486,6 +486,8 @@ MACHINES["HP_TACO"] = true
 MACHINES["1MA6"] = true
 MACHINES["1MB5"] = true
 MACHINES["I2CMEM"] = true
+MACHINES["I3001"] = true
+MACHINES["I3002"] = true
 MACHINES["I7220"] = true
 MACHINES["I80130"] = true
 MACHINES["I8087"] = true
@@ -825,6 +827,7 @@ BUSES["MIDI"] = true
 BUSES["MEGADRIVE"] = true
 BUSES["MSX_SLOT"] = true
 BUSES["MTX"] = true
+BUSES["MULTIBUS"] = true
 BUSES["NASBUS"] = true
 BUSES["NEOGEO"] = true
 BUSES["NEOGEO_CTRL"] = true
@@ -975,6 +978,7 @@ FORMATS["HECT_TAP"] = true
 FORMATS["HTI_TAP"] = true
 FORMATS["HPI_DSK"] = true
 FORMATS["HP_IPC_DSK"] = true
+FORMATS["IMG_DSK"] = true
 FORMATS["IQ151_DSK"] = true
 FORMATS["ITT3030_DSK"] = true
 FORMATS["JFD_DSK"] = true
@@ -2375,11 +2379,14 @@ files {
 	MAME_DIR .. "src/mame/drivers/mephisto_mm2.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_modena.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_modular.cpp",
+	MAME_DIR .. "src/mame/drivers/mephisto_modular_tm.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_mondial68k.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_montec.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_polgar.cpp",
 	MAME_DIR .. "src/mame/machine/mmboard.cpp",
 	MAME_DIR .. "src/mame/machine/mmboard.h",
+	MAME_DIR .. "src/mame/video/mmdisplay2.cpp",
+	MAME_DIR .. "src/mame/video/mmdisplay2.h",
 }
 
 createMESSProjects(_target, _subtarget, "hitachi")
@@ -2942,6 +2949,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/novag_presto.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_savant.cpp",
 	MAME_DIR .. "src/mame/drivers/novag_sexpert.cpp",
+	MAME_DIR .. "src/mame/drivers/novag_supremo.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "olivetti")
@@ -3086,6 +3094,10 @@ createMESSProjects(_target, _subtarget, "psion")
 files {
 	MAME_DIR .. "src/mame/drivers/psion.cpp",
 	MAME_DIR .. "src/mame/includes/psion.h",
+	MAME_DIR .. "src/mame/drivers/psion5.cpp",
+	MAME_DIR .. "src/mame/includes/psion5.h",
+	MAME_DIR .. "src/mame/machine/etna.cpp",
+	MAME_DIR .. "src/mame/machine/etna.h",
 	MAME_DIR .. "src/mame/machine/psion_pack.cpp",
 	MAME_DIR .. "src/mame/machine/psion_pack.h",
 }

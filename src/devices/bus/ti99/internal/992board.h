@@ -128,19 +128,6 @@ private:
 
 	// Keyboard row
 	int m_key_row;
-
-	// Hexbus outgoing signal latch. Should be set to D7 when idle.
-	// (see hexbus.cpp)
-	uint8_t m_latch_out;
-
-	// Hexbus incoming signal latch. Should be set to D7 when idle.
-	uint8_t m_latch_in;
-
-	// Hexbus inhibit. This prevents the incoming latches to store the data.
-	bool m_communication_disable;
-
-	// Bit 6. It is not documented, but likely to indicate the response phase.
-	bool m_response_phase;
 };
 
 

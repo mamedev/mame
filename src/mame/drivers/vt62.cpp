@@ -104,10 +104,10 @@ ROM_START(vt62)
 	ROM_LOAD("23-195a1_82s23.e13", 0x00, 0x20, CRC(cd8d8020) SHA1(cd10097d7fc62676b62387495615f1e06a689cd3))
 	ROM_LOAD("23-194a1_82s23.e12", 0x20, 0x20, CRC(b05df6b5) SHA1(e13b7b0f75dbbc0d262606280bd5cf8be3561849))
 
-	ROM_REGION(0x20, "alu", 0) // ALU function decode
-	ROM_LOAD("e41", 0x00, 0x20, NO_DUMP)
+	ROM_REGION(0x20, "alu", 0) // ALU function decode (same as VT61)
+	ROM_LOAD("23-114a1.e41", 0x00, 0x20, NO_DUMP)
 
-	ROM_REGION(0x400, "cgrom", 0) // character generators
+	ROM_REGION(0x400, "cgrom", 0) // character generators (same as VT61)
 	ROM_LOAD_NIB_HIGH("23-053a9_82s131.e24", 0x000, 0x100, CRC(9a242be8) SHA1(4c619b6c0cfdda4af097b5702e45fad78ed6d601))
 	ROM_CONTINUE(                            0x300, 0x100)
 	ROM_LOAD_NIB_LOW( "23-052a9_82s131.e23", 0x000, 0x100, CRC(6c09ac7b) SHA1(e50060489500b1ca1b89530209c59e610c605c3d))

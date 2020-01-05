@@ -729,6 +729,8 @@ void m68000_base_device::set_irq_line(int irqline, int state)
 
 	/* A transition from < 7 to 7 always interrupts (NMI) */
 	/* Note: Level 7 can also level trigger like a normal IRQ */
+	// FIXME: This may cause unintended level 7 interrupts if one or two IPL lines are asserted
+	// immediately before others are cleared. The actual 68000 imposes an input hold time.
 	if(old_level != 0x0700 && m_int_level == 0x0700)
 		m_nmi_pending = true;
 }

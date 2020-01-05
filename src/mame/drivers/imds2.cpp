@@ -87,6 +87,7 @@
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "bus/rs232/rs232.h"
+#include "bus/multibus/multibus.h"
 
 // CPU oscillator of IPC board: 8 MHz
 #define IPC_XTAL_Y2     8_MHz_XTAL
@@ -124,6 +125,7 @@ private:
 	required_device<ls259_device> m_ipcctrl;
 	required_device_array<rs232_port_device, 2> m_serial;
 	required_device<imds2ioc_device> m_ioc;
+	required_device<multibus_slot_device> m_slot;
 
 	std::vector<uint8_t> m_ipc_ram;
 
@@ -161,6 +163,7 @@ imds2_state::imds2_state(const machine_config &mconfig, device_type type, const 
 	m_ipcctrl(*this, "ipcctrl"),
 	m_serial(*this, "serial%u", 0U),
 	m_ioc(*this, "ioc"),
+	m_slot(*this, "slot"),
 	m_ipc_rom(*this, "ipcrom")
 {
 }
@@ -218,6 +221,9 @@ void imds2_state::driver_start()
 {
 	// Allocate 64k for IPC RAM
 	m_ipc_ram.resize(0x10000);
+
+	m_slot->install_io_rw(m_ipccpu->space(AS_IO));
+	m_slot->install_mem_rw(m_ipccpu->space(AS_PROGRAM));
 }
 
 bool imds2_state::in_ipc_rom(offs_t offset) const
@@ -300,6 +306,8 @@ void imds2_state::imds2(machine_config &config)
 	IMDS2IOC(config, m_ioc);
 	m_ioc->master_intr_cb().set(m_ipclocpic, FUNC(pic8259_device::ir6_w));
 	m_ioc->parallel_int_cb().set(m_ipclocpic, FUNC(pic8259_device::ir5_w));
+
+	MULTIBUS_SLOT(config , m_slot , 0);
 }
 
 ROM_START(imds2)

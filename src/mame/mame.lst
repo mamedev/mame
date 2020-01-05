@@ -2478,6 +2478,7 @@ comportiii                      // Compaq Portable III
 comslt286                       // Compaq SLT/286
 dsys200                         // Dell System 200
 pcd2                            // 1986 Siemens PCD-2
+pcd3nsl                         // Siemens-Nixdorf PCD-3Nsl
 pcd3nsx                         // Siemens-Nixdorf PCD-3Nsx
 pcd4x                           // Siemens-Nixdorf PCD-4H and other 486 desktops and towers
 pcd4nl                          // 1995 Siemens-Nixdorf PCD-4NL 486 subnotebook
@@ -2606,66 +2607,85 @@ ocpanii                         // Octek Panther II motherboard (386sx)
 ochipcom                        // Octek Hippo COM motherboard (486)
 chn333sc                        // Chaintech 333SC motherboard (386)
 elt386sx                        // Elitegroup ELT-386SX-160BE motherboard (386sx)
-ms4138                          // MSI MS-4138 motherboard (486)
 mbc18nb                         // Sanyo MBC-18NB notebook (386sx)
 tam25p2                         // AUVA TAM/25-P2 motherboard (386)
 zito4dps                        // ZIDA Tomato board 4DPS (486)
-alator2                         // Alaris Tornado 2 motherboard (486)
-ochipvlp                        // Octek Hippo VL+ motherboard (486)
-sto486wb                        // Auva-Cam-33-P2 = See-Thru Sto486Wb motherboard (486)
-ga486vf                         // Gigabyte GA-486VF motherboard (486)
-ga486vs                         // Gigabyte GA-486VS motherboard (486)
 amibaby                         // AMI Mark V Baby Screamer motherboard (386)
 ecsfx3000                       // Elitegroup FX-3000 motherboard (386)
 frx386c                         // Micro-Express Inc. Forex 386 Cache
+alim1489                        // 486 motherboards using the ALi 1487/1489 chipset
+op82c392                        // 486 motherboards using the OPTi OPTi 82C392, 82C493, 82C206 chipset
+sis85c471                       // 486 motherboards using the SiS 85C471/85C407 chipset
+sis85c496                       // 486 motherboards using the SiS 85C496/85C497 chipset
+um8498f                         // 486 motherboards using the UMC UM8498F, UM8496F chipset
+uni4800                         // 486 motherboards using the UNI4800 chipset
+atc1415                         // A-Trend ATC-1415 motherboard (486)
+atc1425a                        // A-Trend ATC-1425A
+abah4                           // Abit AH4(T) motherboard (486)
+abpi4                           // Abit PI4(T) motherboard (486)
+abae4                           // Abit 486 EISA-AE4 motherboard (486)
+abpb4                           // Abit AB-PB4 motherboard (486)
+abpm4                           // Abit AB-PM4 motherboard (486)
+abpv4                           // Abit AB-PM4 motherboard (486)
+abpw4                           // Abit AB-PW4 motherboard (486)
+alator2                         // Alaris Tornado 2 motherboard (486)
+sto486wb                        // Auva-Cam-33-P2 = See-Thru Sto486Wb motherboard (486)
+amient2                         // AMI EISA Enterprise II motherboard (486)
+amient3                         // AMI EISA Enterprise III motherboard (486)
+amient4                         // AMI EISA Enterprise IV motherboard (486)
+amisvpci2                       // AMI Super Voyager PCI-II motherboard (486)
+amisvvlb                        // AMI Super Voyager VLB motherboard (486)
+amisvvlb2                       // AMI Super Voyager VLB-II motherboard (486)
+amisvvlb3                       // AMI Super Voyager VLB-III motherboard (486)
+aoap43                          // Aopen AP43 motherboard (486)
+aovi15g                         // Aopen VI15G motherboard (486)
+a486sv2                         // Asus ISA-486SV2 motherboard (486)
+mb1433ucv                       // Biostar MB-1433UCV motherboard (486)
+mb1433uiv                       // Biostar MB-1433UIV motherboard (486)
+ch4slez1                        // Chaintech 486SLE M106 4SLE-Z1 motherboard (486)
+ch491e                          // Chicony CH-491E motherboard (486)
+pkm0038s                        // DTK PKM-0038S aka Gemlight GMB-486SG motherboard (486)
+ec4913                          // Elitegroup UC4913 REV:1.1 motherboard (486)
+ec4915aio                       // Elitegroup ECS UC4915 A AIO motherboard (486)
 um486                           // Elitegroup UM486/UM486sx Rev.1.4. motherboard (486)
 um486v                          // Elitegroup UM486V-AIO motherboard (486)
-sm48650usc                      // Vintage Sprite SM 486-50USC motherboard (486)
-ch4slez1                        // Chaintech 486SLE M106 4SLE-Z1 motherboard (486)
-ec4915aio                       // Elitegroup ECS UC4915 A AIO motherboard (486)
-via4386vio                      // Via 4386 VIO / Highscreen universal board (486)
-hot433                          // Shuttle HOT-433 motherboard (486)
-abpb4                           // Abit AB-PB4 motherboard (486)
-abpw4                           // Abit AB-PW4 motherboard (486)
+um8810paio                      // Elitegroup UM8810 PAIO motherboard (486)
+ga486vf                         // Gigabyte GA-486VF motherboard (486)
+ga486vs                         // Gigabyte GA-486VS motherboard (486)
+ms4125                          // MSI MS-4125 motherboard (486)
+ms4134                          // MSI MS-4134 motherboard (486)
+ms4138                          // MSI MS-4138 motherboard (486)
+ms4144                          // MSI MS-4144 motherboard (486)
+ms4145                          // MSI MS-4145 motherboard (486)
+ochipvlp                        // Octek Hippo VL+ motherboard (486)
 ochawk                          // Octek Hawk motherboard (486)
+ochipdca2                       // Octek Hippo DCA2 motherboard (486)
+pck486dx                        // Peacock PCK 486 DX motherboard
 pt430                           // Pine Technology PT-430 motherboard (486)
-ch491e                          // Chicony CH-491E motherboard (486)
-a486sv2                         // Asus ISA-486SV2 motherboard (486)
+pt432b                          // Pine PT-432b aka SR-M401-A motherboard (486)
+hot307h                         // Shuttle HOT-307H motherboard (486)
+hot419                          // Shuttle HOT-419 motherboard (486)
+hot433                          // Shuttle HOT-433 motherboard (486)
+so025r2                         // SOYO 025R2 motherboard (486)
+so30h                           // SOYO 30H motherboard (486)
+so4saw2                         // SOYO SY-4SAW2 motherboard (486)
+via4386vio                      // Via 4386 VIO / Highscreen universal board (486)
+sm48650usc                      // Vintage Sprite SM 486-50USC motherboard (486)
 mb4d33                          // Aquarius System (ASI) MB-4D33/50NR motherboard (486)
 uniwb4407                       // UNICHIP 486 WB 4407 REV 1.0 motherboard (486)
 px486p3                         // QDI PX486P3 motherboard (486)
 um8886                          // 486 motherboards using the UMC UM8886BF/UM8881F chipset
 gete486vl                       // GENOA TurboExpress 486 VL motherboard (486)
-pck486dx                        // Peacock PCK 486 DX motherboard
-sis85c471                       // 486 motherboards using the SiS 85C471/85C407 chipset
-sis85c496                       // 486 motherboards using the SiS 85C496/85C497 chipset
-um8498f                         // 486 motherboards using the UMC UM8498F, UM8496F chipset
 486ccv                          // Diamond Flower, Inc. (DFI) 486-CCV motherboard (486)
 alaleolx                        // RYC Alaris LEOPARD LX REV D (486)
-alim1489                        // 486 motherboards using the ALi 1487/1489 chipset
-ms4125                          // MSI MS-4125 motherboard (486)
-pkm0038s                        // DTK PKM-0038S aka Gemlight GMB-486SG motherboard (486)
 v4p895p3                        // QDI V4P895P3/SMT V5.0 motherboard (486)
-op82c392                        // 486 motherboards using the OPTi OPTi 82C392, 82C493, 82C206 chipset
 ls486e                          // LuckyStar LS-486E Rev:C motherboard (486)
 pm486pu                         // PROTECH PM486PU-S7 motherboard (486)
-ec4913                          // Elitegroup UC4913 REV:1.1 motherboard (486)
-ms4134                          // MSI MS-4134 motherboard (486)
-ms4144                          // MSI MS-4144 motherboard (486)
-pt432b                          // Pine PT-432b aka SR-M401-A motherboard (486)
-ochipdca2                       // Octek Hippo DCA2 motherboard (486)
 as496                           // Arstoria AS496 motherboard (486)
-hot307h                         // Shuttle HOT-307H motherboard (486)
-mb1433ucv                       // Biostar MB-1433UCV motherboard (486)
 gc10a                           // EAGLEN486 GC10A motherboard (486)
-hot419                          // Shuttle HOT-419 motherboard (486)
 ts34t25                         // Highscreen 486-25 aka Midwest Micro Elite TS34T-25 notebook
 wpc250                          // Wang PC-250/16 (286)
 suntac303                       // motherboards using the Suntac ST62C303 chipset
-abah4                           // Abit AH4(T) motherboard (486)
-abpi4                           // Abit PI4(T) motherboard (486)
-abae4                           // Abit 486 EISA-AE4 motherboard (486)
-so4saw2                         // SOYO SY-4SAW2 motherboard (486)
 nat48pv                         // NAT48PV-1.00 VL motherboard (486)
 olyport40                       // AEG Olympia Olyport 40-21
 micral45                        // Bull Micral 45 (286)
@@ -2675,7 +2695,6 @@ epsax3                          // Epson PC AX3
 md4duvc                         // Aquarius MD-4DUVC motherboard (486)
 kma300g                         // Arche Technologies Inc. KMA-300G-25
 asc486slc                       // Computechnik ASC486SLC slot CPU (386sx)
-um8810paio                      // Elitegroup UM8810 PAIO motherboard (486)
 pci48af                         // TMC Research Corporation PCI48AF motherboard (486)
 ft486f55                        // Freetech 486FT55 motherboard (486)
 ga486am                         // Gigabyte GA486AM/S motherboard (486)
@@ -2683,22 +2702,24 @@ jwj446a                         // Jetway J-446A motherboard (486)
 bluenote                        // Highscreen Colani Blue Note (486)
 4dmshl3g                        // EFA 4DMS HL3G-L4-VI motherboard (486)
 4dmuhl3s                        // EFA 4DMU HL3S motherboard (486)
+486apio                         // EFA 486 APIO motherboard
 suntac6                         // motherboards using the six chip SUNTAC chipset (286)
 bay1000c                        // Mintek BAY-1000C V1.01 motherboard (286()
 profpc33                        // Profex PC 33 (286)
 3siud                           // 3SIUD-1.1 motherboard (386sx)
-486apio                         // EFA 486 APIO motherboard
 exp4044                         // ExpertChip EXP4044 motherboard (486)
 ed486vl3h                       // Edom 486VL3H motherboard (486)
 zi4dvs                          // Zida 4DVS motherboard (486)
 td4ipaio                        // TD-4IP-UMC-AIO motherboard (486)
-atc1415                         // A-Trend ATC-1415 motherboard (486)
 dvbslan                         // Datavan Book-Size LAN station (386sx)
 486igb21                        // 486IG-B-2-1 motherboard (486)
 ch48633c                        // Chicony CH-486-33C motherboard (486)
 ataripc4                        // Atari PC4 (286)
 ataripc5                        // Atari PC5 (386)
 atariabc286                     // Atari ABC-286/30
+edmv035f                        // Edom MV035F motherboard (486)
+ch486spm                        // Chaintech 486SPM motherboard (486)
+
 
 @source:atari_s1.cpp
 aavenger                        //
@@ -14529,8 +14550,9 @@ suprpokra                       // (c) 1986 Grayhound Electronics
 suprpokrb                       // (c) 1986 Grayhound Electronics
 
 @source:generalplus_gpl32612.cpp
-jak_tmnthp
 jak_swbstrik
+jak_tmnthp
+jak_dchp
 
 @source:geneve.cpp
 geneve                          // 1987 Myarc Geneve 9640
@@ -21881,6 +21903,16 @@ gen32                           // 1993 Mephisto Genius 68030
 gen32l                          // 1996 Mephisto Genius 68030 London Upgrade
 lond16                          // 1996 Mephisto London 16 Bit
 lond32                          // 1996 Mephisto London 32 Bit
+
+@source:mephisto_modular_tm.cpp
+port32t
+lyon32t
+lyon32t8
+van32t
+van32t8
+berl32t8p
+lond32t
+lond32t8
 
 @source:mephisto_mondial68k.cpp
 mondl68k                        // 1988 Mephisto Mondial 68000XL
@@ -30083,6 +30115,7 @@ ptblank3                        // 2000.12 Point Blank 3 (GNN2 Ver.A)
 sekaikh                         // 2004.04 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)
 startrgn                        // 2002.07 Star Trigon (STT1 Ver.A)
 taiko6                          // 2004.?? Taiko no Tatsujin 6 (Japan, TK61 Ver.A)
+unks10md                        // 200?.?? unknown Namco System 10 medal game (MTL1 SPRB0)
 
 @source:namcos11.cpp
 danceyes                        // 1996.10 Dancing Eyes (US, DC3/VER.C)
@@ -31549,6 +31582,9 @@ sfortea1                        //
 sfortea2                        //
 sforteb                         //
 sfortec                         //
+
+@source:novag_supremo.cpp
+supremo
 
 @source:ns5652.cpp
 ns5652                          //
@@ -33824,6 +33860,9 @@ psionp350                       //
 psionp464                       //
 psionxp                         //
 
+@source:psion5.cpp
+psion5mx                        //
+
 @source:psx.cpp
 psa                             // 1995 Sony PlayStation (Asia-Pacific)
 pse                             // 1995 Sony PlayStation (Europe)
@@ -34335,6 +34374,7 @@ cafebrk                         // "528" Mahjong Cafe Break (C) 1999 Nakanihon /
 cafedoll                        // "76" (c) 1993 Dynax
 cafepara                        // "001" 1999 Techno-Top
 cafetime                        // "63" (c) 1992 Dynax
+chalgirl                        // bootleg
 daisyari                        // (c) 1989 Best System
 dondenmj                        // "03" (c) 1986 Dyna Electronics
 ippatsu                         // 01? (c) 1986 Dyna Electronics
@@ -35626,6 +35666,7 @@ loveber3                        //
 loveber3cn                      //
 lovebero                        //
 lovebery                        // 2004.10 Oshare Majo Love and Berry / Fashionable Witch Love and Berry
+mirworld                        // 2007.06 Mirage World (satellite)
 ochaken                         //
 segasp                          //
 tetgiano                        //
@@ -36357,6 +36398,9 @@ skeetsht                        // (c) 1991
 
 @source:skimaxx.cpp
 skimaxx                         // (c) 1996 Kyle Hodgetts/ICE
+
+@source:skopro.cpp
+drgdance                        // 2008
 
 @source:skullxbo.cpp
 skullxbo                        // 136072           (c) 1989
@@ -38657,6 +38701,7 @@ spellb                          //
 spellb79                        //
 
 @source:tk2000.cpp
+mpf2                            // Multitech MPF-II
 tk2000                          // Microdigital TK2000
 
 @source:tk635.cpp

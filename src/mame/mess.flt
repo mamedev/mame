@@ -494,6 +494,7 @@ mephisto_mm1.cpp
 mephisto_mm2.cpp
 mephisto_modena.cpp
 mephisto_modular.cpp
+mephisto_modular_tm.cpp
 mephisto_mondial68k.cpp
 mephisto_montec.cpp
 mephisto_polgar.cpp
@@ -592,6 +593,7 @@ novag_diablo.cpp
 novag_presto.cpp
 novag_savant.cpp
 novag_sexpert.cpp
+novag_supremo.cpp
 ns5652.cpp
 o2.cpp
 ob68k1a.cpp
@@ -688,6 +690,7 @@ proteus3.cpp
 ps2.cpp
 ps2sony.cpp
 psion.cpp
+psion5.cpp
 psx.cpp
 pt68k4.cpp
 ptcsol.cpp

@@ -9,6 +9,49 @@
     - calibration mode (command CX)
     - only tablet format and decimal format are supported for returning touch screen state
 
+Known MicroTouch boards use an 80C32 (compatible: Siemens, Winbond, Philips, MHS, etc.) with external ROM and a custom MicroTouch MCU.
+It seems there are different MicroTouch MCU versions, named "Kahuna", "Excalibur", and probably others, with unknown differences.
+
+
+ISA Board ((c) 1997 MicroTouch Systems Inc. FAB 5405800 REV 2.3)
+_________________________________________________________________
+|                                    ______   ______             |
+|                                   MM74HC04M HC125A   ____      |
+|                                                      34072   __|__
+|                  _______      ____       ____  ____  ____    |    |
+|                  R11APB18     78M05      34072 34072 93C46S  | DB |
+|                ___________  __________   ____________        | 25 |
+|                |SIEMENS   | |U1 BIOS  |  |MicroTouch|        |(P1)|
+|                |SAB 80C32 | |         |  |Excalibur |        |____|
+|                |__________| |_________|  |__________|          |
+|             ________  _______   __________                     O <- LED
+|             |_LS240_| DM74LS30M |TI       |                    |
+| JP2->:::::                      |TL16C450FN  ________          |
+|          JP1->::::::::::::::    |_________|  |_LS245_|         |
+|__       ___                                             _____  |
+   |_|_|_|   |_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|     |_|
+                         ISA EDGE CONNECTOR
+
+JP1 = ADDRESS / INTERRUPT (A1, A2, A3, A4, A5, A6, I2, I3, I4, I5, I10, I11, I12, I15)
+JP2 = TEST (T1, T2, T3, T4, T5, T6)
+Y1 = XTAL R11APB18
+U3 = MicroTouch Excalibur
+U4 = 80C32
+U11 = 93C46S Serial EEPROM
+P1 = RS-232
+
+    JP1 ADDRESS JUMPERS
+COM  ADDRESS A1 A2 A3 A4 A5 A6
+--------------------------------
+COM1 3F8-3FF ON  : ON  : ON  :
+COM2 2F8-2FF  : ON ON  : ON  :
+COM3 3E8-3EF ON  :  : ON ON  : <- DEFAULT
+COM4 2E8-2EF  : ON  : ON ON  :
+COM5 3E0-2E7  : ON  : ON  : ON
+COM6 2F0-2F7  : ON ON  :  : ON
+COM7 3E0-3E7 ON  :  : ON  : ON
+COM8 3F0-3F7 ON  : ON  :  : ON
+
 */
 
 #include "emu.h"
