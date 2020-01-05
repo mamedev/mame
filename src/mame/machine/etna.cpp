@@ -19,7 +19,7 @@
 #define LOG_PROM		(1 << 3)
 #define LOG_ALL			(LOG_READS | LOG_WRITES | LOG_UNKNOWNS | LOG_PROM)
 
-#define VERBOSE			(LOG_ALL)
+#define VERBOSE			(0)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(ETNA, etna_device, "etna", "Psion 5mx ETNA")
