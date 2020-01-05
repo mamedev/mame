@@ -729,11 +729,6 @@ READ16_MEMBER(sunplus_gcm394_base_device::internalrom_lower32_r)
 	}
 }
 
-READ16_MEMBER(generalplus_gpac800_device::unkarea_7850_r)
-{
-	return machine().rand();
-}
-
 //[:maincpu] ':maincpu' (001490):sunplus_gcm394_base_device::unk_r @ 0x785f
 READ16_MEMBER(generalplus_gpac800_device::nand_ecc_low_byte_error_flag_1_r)
 {
@@ -747,7 +742,7 @@ READ16_MEMBER(generalplus_gpac800_device::nand_ecc_low_byte_error_flag_1_r)
 // HY27UF081G2A = AD F1 80 1D
 // H27U518S2C   = AD 76
 
-READ16_MEMBER(generalplus_gpac800_device::unkarea_7854_r)
+READ16_MEMBER(generalplus_gpac800_device::nand_7854_r)
 {
 	// TODO: use actual NAND / Smart Media devices once this is better understood.
 	// The games have extensive checks on startup to determine the flash types, but then it appears that
@@ -762,11 +757,11 @@ READ16_MEMBER(generalplus_gpac800_device::unkarea_7854_r)
 	// real TSM code starts at 4c000
 
 
-	//logerror("%s:sunplus_gcm394_base_device::unkarea_7854_r\n", machine().describe_context());
+	//logerror("%s:sunplus_gcm394_base_device::nand_7854_r\n", machine().describe_context());
 
 	if (m_nandcommand == 0x90) // read ident
 	{
-		logerror("%s:sunplus_gcm394_base_device::unkarea_7854_r   READ IDENT byte %d\n", machine().describe_context(), m_curblockaddr);
+		logerror("%s:sunplus_gcm394_base_device::nand_7854_r   READ IDENT byte %d\n", machine().describe_context(), m_curblockaddr);
 
 		uint8_t data = 0x00;
 
@@ -802,7 +797,7 @@ READ16_MEMBER(generalplus_gpac800_device::unkarea_7854_r)
 	}
 	else if (m_nandcommand == 0x00)
 	{
-		//logerror("%s:sunplus_gcm394_base_device::unkarea_7854_r   READ DATA byte %d\n", machine().describe_context(), m_curblockaddr);
+		//logerror("%s:sunplus_gcm394_base_device::nand_7854_r   READ DATA byte %d\n", machine().describe_context(), m_curblockaddr);
 
 		uint32_t nandaddress = (m_flash_addr_high << 16) | m_flash_addr_low;
 		uint8_t data = m_nand_read_cb((nandaddress * 2) + m_curblockaddr);
@@ -813,13 +808,13 @@ READ16_MEMBER(generalplus_gpac800_device::unkarea_7854_r)
 	}
 	else if (m_nandcommand == 0x70) // read status
 	{
-		logerror("%s:sunplus_gcm394_base_device::unkarea_7854_r   READ STATUS byte %d\n", machine().describe_context(), m_curblockaddr);
+		logerror("%s:sunplus_gcm394_base_device::nand_7854_r   READ STATUS byte %d\n", machine().describe_context(), m_curblockaddr);
 
 		return 0xffff;
 	}
 	else
 	{
-		logerror("%s:sunplus_gcm394_base_device::unkarea_7854_r   READ UNKNOWN byte %d\n", machine().describe_context(), m_curblockaddr);
+		logerror("%s:sunplus_gcm394_base_device::nand_7854_r   READ UNKNOWN byte %d\n", machine().describe_context(), m_curblockaddr);
 		return 0xffff;
 	}
 
@@ -853,6 +848,25 @@ WRITE16_MEMBER(generalplus_gpac800_device::flash_addr_high_w)
 	m_curblockaddr = 0;
 }
 
+WRITE16_MEMBER(generalplus_gpac800_device::nand_dma_ctrl_w)
+{
+	logerror("%s:sunplus_gcm394_base_device::nand_dma_ctrl_w(?) %04x\n", machine().describe_context(), data);
+	m_nand_dma_ctrl = data;
+}
+
+READ16_MEMBER(generalplus_gpac800_device::nand_7850_r)
+{
+	// 0x8000 = ready
+	return m_nand_7850 | 0x8000;
+}
+
+WRITE16_MEMBER(generalplus_gpac800_device::nand_7850_w)
+{
+	logerror("%s:sunplus_gcm394_base_device::nand_7850_w %04x\n", machine().describe_context(), data);
+	m_nand_7850 = data;
+}
+
+
 
 // all tilemap registers etc. appear to be in the same place as the above system, including the 'extra' ones not on the earlier models
 // so it's likely this is built on top of that just with NAND support
@@ -861,12 +875,12 @@ void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
 	sunplus_gcm394_base_device::base_internal_map(map);
 
 	// 785x = NAND device
-	map(0x007850, 0x007850).r(FUNC(generalplus_gpac800_device::unkarea_7850_r)); // NAND Control Reg
+	map(0x007850, 0x007850).rw(FUNC(generalplus_gpac800_device::nand_7850_r), FUNC(generalplus_gpac800_device::nand_7850_w)); // NAND Control Reg
 	map(0x007851, 0x007851).w(FUNC(generalplus_gpac800_device::nand_command_w)); // NAND Command Reg
 	map(0x007852, 0x007852).w(FUNC(generalplus_gpac800_device::flash_addr_low_w)); // NAND Low Address Reg
 	map(0x007853, 0x007853).w(FUNC(generalplus_gpac800_device::flash_addr_high_w)); // NAND High Address Reg
-	map(0x007854, 0x007854).r(FUNC(generalplus_gpac800_device::unkarea_7854_r)); // NAND Data Reg
-//  map(0x007855, 0x007855).w(FUNC(generalplus_gpac800_device::nand_dma_ctrl_w)); // NAND DMA / INT Control
+	map(0x007854, 0x007854).r(FUNC(generalplus_gpac800_device::nand_7854_r)); // NAND Data Reg
+	map(0x007855, 0x007855).w(FUNC(generalplus_gpac800_device::nand_dma_ctrl_w)); // NAND DMA / INT Control
 
 	map(0x00785f, 0x00785f).r(FUNC(generalplus_gpac800_device::nand_ecc_low_byte_error_flag_1_r)); // ECC Low Byte Error Flag 1 (maybe)
 
@@ -989,6 +1003,9 @@ void generalplus_gpac800_device::device_reset()
 
 	m_flash_addr_low = 0x0000;
 	m_flash_addr_high = 0x0000;
+
+	m_nand_dma_ctrl = 0x0000;
+	m_nand_7850 = 0x0000;
 }
 
 IRQ_CALLBACK_MEMBER(sunplus_gcm394_base_device::irq_vector_cb)
