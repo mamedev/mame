@@ -108,7 +108,7 @@ enum {
 };
 
 // device type definition
-DEFINE_DEVICE_TYPE(ISBC202, isbc202_device, "iSBC202", "iSBC-202 floppy controller")
+DEFINE_DEVICE_TYPE(ISBC202, isbc202_device, "isbc202", "iSBC-202 floppy controller")
 
 // Microcode disassembler
 class isbc202_disassembler : public util::disasm_interface

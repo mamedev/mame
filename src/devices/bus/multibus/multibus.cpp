@@ -13,7 +13,7 @@
 #include "isbc202.h"
 
 // device type definition
-DEFINE_DEVICE_TYPE(MULTIBUS_SLOT, multibus_slot_device, "Multibus slot", "Intel Multibus slot")
+DEFINE_DEVICE_TYPE(MULTIBUS_SLOT, multibus_slot_device, "multibus_slot", "Intel Multibus slot")
 
 multibus_slot_device::multibus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig , MULTIBUS_SLOT , tag , owner , clock)
