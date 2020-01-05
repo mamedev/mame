@@ -97,8 +97,6 @@ public:
 
 	void regs_map(address_map &map);
 	void audiovideo_map(address_map &map);
-	void texture_map(address_map &map);
-	void frame_map(address_map &map);
 	template<class T> void set_host_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
 	void set_external_vclk(const uint32_t vclk) { m_ext_vclk = vclk; }
 	void set_external_vclk(const XTAL vclk) { m_ext_vclk = vclk.value(); }
@@ -148,8 +146,6 @@ private:
 	uint32_t m_intst = 0;
 	DECLARE_READ32_MEMBER(intst_r);
 	DECLARE_WRITE32_MEMBER(intst_w);
-
-	DECLARE_WRITE_LINE_MEMBER(soundirq_cb);
 
 	// Timer
 	template<int Which> DECLARE_WRITE32_MEMBER(tmcon_w);
