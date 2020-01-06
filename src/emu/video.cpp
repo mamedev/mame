@@ -556,6 +556,9 @@ void video_manager::begin_recording(const char *name, movie_format format)
 	screen_device_iterator::auto_iterator iter = iterator.begin();
 	const uint32_t count = (uint32_t)iterator.count();
 
+	if (count == 0)
+	    return;
+
 	switch (format)
 	{
 		case MF_AVI:
