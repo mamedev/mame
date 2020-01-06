@@ -12030,7 +12030,7 @@ hmcompmx                        // GX858 (c) 1999
 popn1                           // GX803 (c) 1998 (Asia)
 popn2                           // GX831 (c) 1998 (Japan)
 popn3                           // GX980 (c) 1999 (Japan)
-popnstage                       // GQ970 (c) 1999 (Japan)
+popnstex                        // GQ970 (c) 1999 (Japan)
 
 @source:dkmb.cpp
 dkmb

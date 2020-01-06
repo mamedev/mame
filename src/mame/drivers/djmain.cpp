@@ -1294,7 +1294,7 @@ static INPUT_PORTS_START( popnstage )
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW3:6" )
 INPUT_PORTS_END
 
-#ifdef UNUSED_DEFINITION
+
 static INPUT_PORTS_START( popnstex )
 	PORT_INCLUDE( popnstage )
 	PORT_MODIFY("DSW3")
@@ -1309,7 +1309,7 @@ static INPUT_PORTS_START( popnstex )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	/* "Enable Secret Mode" 3-1=On 3-3=On 3-5=On */
 INPUT_PORTS_END
-#endif
+
 
 /*************************************
  *
@@ -1851,22 +1851,22 @@ ROM_START( popn3 )
 	DISK_IMAGE( "980hdda01", 0, SHA1(57ece2b63c32d194d4e41b4e4a45aaab30150fd4) )
 ROM_END
 
-ROM_START( popnstage )
+ROM_START( popnstex )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* MC68EC020FG25 MPU */
-	ROM_LOAD16_BYTE( "970jba01.6a", 0x000000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "970jba02.8a", 0x000001, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "970jba01.6a", 0x000000, 0x80000, CRC(8fa0c957) SHA1(12d1d6f15e19955c663ebdfcb16d5f6d209c0f76) )
+	ROM_LOAD16_BYTE( "970jba02.8a", 0x000001, 0x80000, CRC(7adb00a0) SHA1(70a86897ab6cbc3f34be51f7f078644de697e331) )
 
 	ROM_REGION( 0x200000, "gfx1", 0)        /* SPRITE */
-	ROM_LOAD16_BYTE( "970jba03.19a", 0x000000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "970jba04.20a", 0x000001, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "970jba05.22a", 0x100000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "970jba06.24a", 0x100001, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "970jba03.19a", 0x000000, 0x80000, CRC(e5d15d3c) SHA1(bdbd3c59e3377e071b199eea6cfb2ad84d37e971) )
+	ROM_LOAD16_BYTE( "970jba04.20a", 0x000001, 0x80000, CRC(687f9beb) SHA1(6baac0aa2db3af9e34469b1719ccff3643fd85f7) )
+	ROM_LOAD16_BYTE( "970jba05.22a", 0x100000, 0x80000, CRC(3bedc09c) SHA1(d0806bb54a3e620a987d61c6a5f04a2e1fc613a8) )
+	ROM_LOAD16_BYTE( "970jba06.24a", 0x100001, 0x80000, CRC(1673a771) SHA1(2768434f1c94543f69d40165e68d325ae5d553cd) )
 
 	ROM_REGION( 0x200000, "k056832", 0 )       /* TILEMAP */
-	ROM_LOAD16_BYTE( "970jba07.22d", 0x000000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "970jba08.23d", 0x000001, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "970jba09.25d", 0x100000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "970jba10.27d", 0x100001, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "970jba07.22d", 0x000000, 0x80000, CRC(6fd06bdb) SHA1(1dc621923e0871d2d5171753f5ddb97786ab12bd) )
+	ROM_LOAD16_BYTE( "970jba08.23d", 0x000001, 0x80000, CRC(28256891) SHA1(2069f52d596acbf355f205bb8d69cefc4cce3542) )
+	ROM_LOAD16_BYTE( "970jba09.25d", 0x100000, 0x80000, CRC(5d2bda52) SHA1(d03c135ac04437b54e4d267ae168fe7ebb9e5b65) )
+	ROM_LOAD16_BYTE( "970jba10.27d", 0x100001, 0x80000, CRC(edc4a245) SHA1(30bbd7bf0299a064119c535abb9be69d725aa130) )
 
 	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "970jba11", 0, SHA1(72e92b73b22a8f35e9faca93211e5acf781e66bb) )  /* GQ970  pop'n stage 1.5 ver1.00  1999/10/15 (C) KONAMI */
@@ -1916,26 +1916,6 @@ ROM_START( popn1j )
 	DISK_IMAGE( "803jaa11", 0, MD5(54a8ac87857d81740621c622e27736d7) )  /* ver 1.00 JA */
 ROM_END
 
-ROM_START( popnstex )
-	ROM_REGION( 0x100000, "maincpu", 0 )        /* MC68EC020FG25 MPU */
-	ROM_LOAD16_BYTE( "970jba01.6a", 0x000000, 0x80000, CRC(8fa0c957) SHA1(12d1d6f15e19955c663ebdfcb16d5f6d209c0f76) )
-	ROM_LOAD16_BYTE( "970jba02.8a", 0x000001, 0x80000, CRC(7adb00a0) SHA1(70a86897ab6cbc3f34be51f7f078644de697e331) )
-
-	ROM_REGION( 0x200000, "gfx1", 0)        /* SPRITE */
-	ROM_LOAD16_BYTE( "970jba03.19a", 0x000000, 0x80000, CRC(e5d15d3c) SHA1(bdbd3c59e3377e071b199eea6cfb2ad84d37e971) )
-	ROM_LOAD16_BYTE( "970jba04.20a", 0x000001, 0x80000, CRC(687f9beb) SHA1(6baac0aa2db3af9e34469b1719ccff3643fd85f7) )
-	ROM_LOAD16_BYTE( "970jba05.22a", 0x100000, 0x80000, CRC(3bedc09c) SHA1(d0806bb54a3e620a987d61c6a5f04a2e1fc613a8) )
-	ROM_LOAD16_BYTE( "970jba06.24a", 0x100001, 0x80000, CRC(1673a771) SHA1(2768434f1c94543f69d40165e68d325ae5d553cd) )
-
-	ROM_REGION( 0x200000, "k056832", 0 )       /* TILEMAP */
-	ROM_LOAD16_BYTE( "970jba07.22d", 0x000000, 0x80000, CRC(6fd06bdb) SHA1(1dc621923e0871d2d5171753f5ddb97786ab12bd) )
-	ROM_LOAD16_BYTE( "970jba08.23d", 0x000001, 0x80000, CRC(28256891) SHA1(2069f52d596acbf355f205bb8d69cefc4cce3542) )
-	ROM_LOAD16_BYTE( "970jba09.25d", 0x100000, 0x80000, CRC(5d2bda52) SHA1(d03c135ac04437b54e4d267ae168fe7ebb9e5b65) )
-	ROM_LOAD16_BYTE( "970jba10.27d", 0x100001, 0x80000, CRC(edc4a245) SHA1(30bbd7bf0299a064119c535abb9be69d725aa130) )
-
-	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
-	DISK_IMAGE( "970jba11", 0, MD5(1616905838fdb2b521d53499c6c2a7a4) )  /* ver 1.00 JA */
-ROM_END
 #endif
 
 /*************************************
@@ -2175,11 +2155,12 @@ GAME( 2002, bmfinal,  0,        djmainj, bm6thmix,  djmain_state, init_bmfinal, 
 GAME( 1998, popn1,    0,        djmaina, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 1 (ver AA-A)", 0 )
 GAME( 1999, popn2,    0,        djmainj, popn2,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 2 (ver JA-A)", 0 )
 GAME( 1999, popn3,    0,        djmainj, popn2,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 3 (ver JA-A)", 0 )
-GAME( 1999, popnstage,0,        djmainj, popnstage, djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Stage (ver JB-A)", MACHINE_NOT_WORKING )
+// Pop'n Stage
+GAME( 1999, popnstex, 0,        djmainj, popnstex,  djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Stage EX (ver JB-A)", 0 )
 
 // for reference, these sets have not been verified
 //GAME( 1998, bm3rdmxb, bm3rdmix, djmainj, bm3rdmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 3rd MIX (ver JA-B)", 0 )
 
 //GAME( 1998, popn1j,   popn1,    djmainj, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 1 (ver JA-A)", 0 )
 
-//GAME( 1999, popnstex, 0,        djmainj, popnstex,  djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Stage EX (ver JB-A)", 0 )
+
