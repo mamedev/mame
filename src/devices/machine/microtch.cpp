@@ -9,11 +9,11 @@
     - calibration mode (command CX)
     - only tablet format and decimal format are supported for returning touch screen state
 
-    Known MicroTouch boards use an 80C32 (compatible: Siemens, Winbond, Philips, MHS, etc.) with external ROM and a custom MicroTouch MCU.
-    It seems there are different MicroTouch MCU versions, named "Kahuna", "Excalibur", and probably others, with unknown differences.
+Known MicroTouch boards use an 80C32 (compatible: Siemens, Winbond, Philips, MHS, etc.) with external ROM and a custom MicroTouch MCU.
+It seems there are different MicroTouch MCU versions, named "Kahuna", "Excalibur", and probably others, with unknown differences.
 
 
-ISA BOARD ((c) 1997 MicroTouch Systems Inc. FAB 5405800 REV 2.3)
+ISA board ((c) 1997 MicroTouch Systems Inc. FAB 5405800 REV 2.3)
 _________________________________________________________________
 |                                    ______   ______             |
 |                                   MM74HC04M HC125A   ____      |
