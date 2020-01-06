@@ -95,7 +95,7 @@ private:
 	enum { FILENAME_LENGTH=24 };
 
 	required_device<sh4_device> m_maincpu;
-	required_device<pic16c621a_device> m_securitycpu;
+	required_device<pic16c622_device> m_securitycpu;
 	required_device<i2cmem_device> m_i2c0;
 	required_device<i2cmem_device> m_i2c1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;

@@ -712,14 +712,14 @@ WRITE64_MEMBER(naomi_gdrom_board::i2cmem_dimm_w)
 		picbus_io[0] = (uint8_t)(~data >> (16 + 5 * 2 - 3)) & 0x8; // clock only for now
 		picbus = (data >> 2) & 0xf;
 		picbus_pullup = (picbus_io[0] & picbus_io[1]) & 0xf; // high if both are inputs
-		// TODO: abort timeslice of sh4
+		m_maincpu->abort_timeslice();
+		machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(1));
 	}
 	else
 	{
 		picbus_used = false;
-		// TODO: check if the states should be inverted
 		m_eeprom->di_write((data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
-		m_eeprom->cs_write((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 		m_eeprom->clk_write((data & 0x8) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
@@ -741,7 +741,7 @@ WRITE8_MEMBER(naomi_gdrom_board::pic_dimm_w)
 	if (offset == 1)
 	{
 		picbus = data;
-		// TODO: abort timeslice of pic
+		m_securitycpu->abort_timeslice();
 	}
 	if (offset == 3)
 	{
@@ -825,7 +825,8 @@ void naomi_gdrom_board::device_start()
 			netpic = picdata[0x6ee];
 
 			// set data for security pic rom
-			memcpy((uint8_t*)m_securitycpu->space(AS_PROGRAM).get_read_ptr(0), picdata, 0x400);
+			address_space &ps = m_securitycpu->space(AS_PROGRAM);
+			memcpy((uint8_t*)ps.get_read_ptr(0), picdata, 0x1000);
 		} else {
 			// use extracted pic data
 			// printf("This PIC key hasn't been converted to a proper PIC binary yet!\n");
@@ -965,6 +966,7 @@ void naomi_gdrom_board::board_advance(uint32_t size)
 }
 
 #define CPU_CLOCK 200000000 // need to set the correct value here
+#define PIC_CLOCK 20000000	// and here
 
 void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 {
@@ -981,10 +983,8 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 	m_maincpu->set_sh4_clock(CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &naomi_gdrom_board::sh4_map);
 	m_maincpu->set_addrmap(AS_IO, &naomi_gdrom_board::sh4_io_map);
-	m_maincpu->set_disable();
-	PIC16C621A(config, m_securitycpu, 2000000); // need to set the correct value for clock
+	PIC16C622(config, m_securitycpu, PIC_CLOCK);
 	m_securitycpu->set_addrmap(AS_IO, &naomi_gdrom_board::pic_map);
-	m_securitycpu->set_disable();
 	I2C_24C01(config, m_i2c0, 0);
 	m_i2c0->set_e0(0);
 	m_i2c0->set_wc(1);
@@ -992,6 +992,8 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 	m_i2c1->set_e0(1);
 	m_i2c1->set_wc(1);
 	EEPROM_93C46_8BIT(config, m_eeprom, 0);
+	m_maincpu->set_disable();
+	m_securitycpu->set_disable();
 }
 
 // DIMM firmwares:
@@ -1045,7 +1047,7 @@ ROM_START( dimm )
 	ROMX_LOAD( "401_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(edb52597108462bcea8eb2a47c19e51e5fb60638), ROM_BIOS(7))
 
 	// dynamically filled with data
-	ROM_REGION(0x400, "pic", ROMREGION_ERASE00)
+	ROM_REGION(0x1000, "pic", ROMREGION_ERASE00)
 	// filled with test data until actual dumps of serial memories are available
 	ROM_REGION(0x80, "i2c_0", ROMREGION_ERASE00)
 	ROM_FILL(0, 1, 0x40) ROM_FILL(1, 1, 0x00) ROM_FILL(2, 1, 0x01) ROM_FILL(3, 1, 0x02) ROM_FILL(4, 1, 0x03)
