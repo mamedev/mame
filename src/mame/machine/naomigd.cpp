@@ -493,7 +493,7 @@ WRITE32_MEMBER(naomi_gdrom_board::memorymanager_w)
 				else
 					src = src + 0x0c000000;
 				dst = dst - 0x10000000;
-				ddtdata.buffer = dimm_data + dst; // TODO: access des encrypted data
+				ddtdata.buffer = dimm_des_data + dst;
 				ddtdata.source = src;
 				ddtdata.length = len;
 				ddtdata.size = 4;
@@ -510,7 +510,7 @@ WRITE32_MEMBER(naomi_gdrom_board::memorymanager_w)
 				else
 					dst = dst + 0xc000000;
 				src = src - 0x10000000;
-				ddtdata.buffer = dimm_data + src; // TODO: access des encrypted data
+				ddtdata.buffer = dimm_des_data + src;
 				ddtdata.destination = dst;
 				ddtdata.length = len;
 				ddtdata.size = 4;
@@ -799,6 +799,7 @@ void naomi_gdrom_board::device_start()
 	naomi_board::device_start();
 
 	dimm_data = nullptr;
+	dimm_des_data = nullptr;
 	dimm_data_size = 0;
 
 	char name[128];
@@ -807,6 +808,15 @@ void naomi_gdrom_board::device_start()
 	uint64_t key;
 	uint8_t netpic = 0;
 
+
+	logerror("Work mode is %d\n", work_mode);
+	if (work_mode != 0)
+	{
+		dimm_command = 0;
+		dimm_offsetl = 0;
+		dimm_parameterl = 0;
+		dimm_parameterh = 0;
+	}
 
 	if(picdata) {
 		if(picdata.length() >= 0x4000) {
@@ -903,22 +913,26 @@ void naomi_gdrom_board::device_start()
 			uint32_t file_rounded_size = (file_size + 2047) & -2048;
 			for (dimm_data_size = 4096; dimm_data_size < file_rounded_size; dimm_data_size <<= 1);
 			dimm_data = auto_alloc_array(machine(), uint8_t, dimm_data_size);
+			if (work_mode == 0)
+				dimm_des_data = dimm_data;
+			else
+				dimm_des_data = auto_alloc_array(machine(), uint8_t, dimm_data_size);
 			if (dimm_data_size != file_rounded_size)
 				memset(dimm_data + file_rounded_size, 0, dimm_data_size - file_rounded_size);
 
-			// read encrypted data into dimm_data
+			// read encrypted data into dimm_des_data
 			uint32_t sectors = file_rounded_size / 2048;
 			for (uint32_t sec = 0; sec != sectors; sec++)
-				cdrom_read_data(gdromfile, file_start + sec, dimm_data + 2048 * sec, CD_TRACK_MODE1);
+				cdrom_read_data(gdromfile, file_start + sec, dimm_des_data + 2048 * sec, CD_TRACK_MODE1);
 
 			uint32_t des_subkeys[32];
 			des_generate_subkeys(rev64(key), des_subkeys);
 
+			// decrypt read data from dimm_des_data to dimm_data
 			for (int i = 0; i < file_rounded_size; i += 8)
-				write_from_qword(dimm_data + i, rev64(des_encrypt_decrypt(true, rev64(read_to_qword(dimm_data + i)), des_subkeys)));
+				write_from_qword(dimm_data + i, rev64(des_encrypt_decrypt(true, rev64(read_to_qword(dimm_des_data + i)), des_subkeys)));
 		}
 
-		// decrypt loaded data
 		cdrom_close(gdromfile);
 
 		if(!dimm_data)
@@ -992,8 +1006,11 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 	m_i2c1->set_e0(1);
 	m_i2c1->set_wc(1);
 	EEPROM_93C46_8BIT(config, m_eeprom, 0);
-	m_maincpu->set_disable();
-	m_securitycpu->set_disable();
+	if (work_mode == 0)
+	{
+		m_maincpu->set_disable();
+		m_securitycpu->set_disable();
+	}
 }
 
 // DIMM firmwares:

@@ -93,6 +93,7 @@ protected:
 
 private:
 	enum { FILENAME_LENGTH=24 };
+	const int work_mode = 0; // set to 1 and rebuild to enable the cpus
 
 	required_device<sh4_device> m_maincpu;
 	required_device<pic16c622_device> m_securitycpu;
@@ -118,6 +119,7 @@ private:
 	uint32_t memctl_regs[0x100 / 4];
 
 	// Note: voluntarily not saved into the state
+	uint8_t *dimm_des_data;
 	uint8_t *dimm_data;
 	uint32_t dimm_data_size;
 
