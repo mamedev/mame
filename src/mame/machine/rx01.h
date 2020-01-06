@@ -50,6 +50,8 @@ protected:
 	void write_sector(int ddam);
 
 private:
+	void firmware_map(address_map &map);
+
 	enum rx01_state {
 		RX01_FILL,
 		RX01_EMPTY,

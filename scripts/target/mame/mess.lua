@@ -151,6 +151,7 @@ CPUS["DSP56000"] = true
 CPUS["VT50"] = true
 CPUS["PACE"] = true
 CPUS["WE32000"] = true
+CPUS["RX01"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are

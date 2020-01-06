@@ -3048,3 +3048,20 @@ if (CPUS["WE32000"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/we32000/we32100d.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/we32000/we32100d.h")
 end
+
+--------------------------------------------------
+-- DEC RX01
+--@src/devices/cpu/rx01/rx01.h,CPUS["RX01"] = true
+--------------------------------------------------
+
+if (CPUS["RX01"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/rx01/rx01.cpp",
+		MAME_DIR .. "src/devices/cpu/rx01/rx01.h",
+	}
+end
+
+if (CPUS["RX01"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/rx01/rx01dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/rx01/rx01dasm.h")
+end
