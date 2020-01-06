@@ -487,7 +487,7 @@ void video_manager::begin_recording_avi(const char *name, uint32_t index, screen
 	// build up information about this new movie
 	avi_file::movie_info info;
 	info.video_format = 0;
-	info.video_timescale = 1000 * screen->frame_period().as_hz();
+	info.video_timescale = 1000 * (screen ? screen->frame_period().as_hz() : screen_device::DEFAULT_FRAME_RATE);
 	info.video_sampletime = 1000;
 	info.video_numsamples = 0;
 	info.video_width = m_snap_bitmap.width();
@@ -554,10 +554,14 @@ void video_manager::begin_recording(const char *name, movie_format format)
 	// create a snapshot bitmap so we know what the target size is
 	screen_device_iterator iterator = screen_device_iterator(machine().root_device());
 	screen_device_iterator::auto_iterator iter = iterator.begin();
-	const uint32_t count = (uint32_t)iterator.count();
+	uint32_t count = (uint32_t)iterator.count();
+	const bool no_screens(!count);
 
-	if (count == 0)
-	    return;
+	if (no_screens)
+	{
+		assert(!m_snap_native);
+		count = 1;
+	}
 
 	switch (format)
 	{
