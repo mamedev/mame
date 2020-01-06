@@ -12028,9 +12028,11 @@ bmfinal                         // GXC01 (c) 2002 (Japan)
 hmcompm2                        // GX988 (c) 2000
 hmcompmx                        // GX858 (c) 1999
 popn1                           // GX803 (c) 1998 (Asia)
+popn1k                          // GX803 (c) 1998 (Korea)
+popn1j                          // GX803 (c) 1998 (Japan)
 popn2                           // GX831 (c) 1998 (Japan)
 popn3                           // GX980 (c) 1999 (Japan)
-popnstage                       // GQ970 (c) 1999 (Japan)
+popnstex                        // GQ970 (c) 1999 (Japan)
 
 @source:dkmb.cpp
 dkmb
