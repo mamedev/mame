@@ -1869,7 +1869,7 @@ ROM_START( popn2 )
 	ROM_LOAD16_BYTE( "831jaa10.27d", 0x100001, 0x80000, CRC(85173cb6) SHA1(bc4d86bf4654a9a0a58e624f77090854950f3993) )
 
 	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
-	DISK_IMAGE( "831jhdda01", 0, SHA1(ef62d5fcc1a36235fc932e6ecef71dc845d1d72d) )
+	DISK_IMAGE( "831jhdda01", 0, SHA1(ef62d5fcc1a36235fc932e6ecef71dc845d1d72d) ) /* GQ831JA  pop'n music ver1.00  1999/2/28 (C) KONAMI */
 ROM_END
 
 ROM_START( popn3 )
@@ -1890,7 +1890,7 @@ ROM_START( popn3 )
 	ROM_LOAD16_BYTE( "980a10.27d",   0x100001, 0x080000, CRC(7776b87e) SHA1(662b7cd7cb4fb8f8bab240ef543bf9a593e23a03) )
 
 	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
-	DISK_IMAGE( "980hdda01", 0, SHA1(57ece2b63c32d194d4e41b4e4a45aaab30150fd4) )
+	DISK_IMAGE( "980hdda01", 0, SHA1(57ece2b63c32d194d4e41b4e4a45aaab30150fd4) ) /* GQ980JA  pop'n music 3 ver. 1.00  1999/09/02 (C) KONAMI */
 ROM_END
 
 ROM_START( popnstex )
