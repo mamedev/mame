@@ -93,6 +93,7 @@ offs_t rx01_disassembler::disassemble(std::ostream &stream, offs_t pc, const rx0
 		}
 		else
 		{
+			// Clock scratchpad address register
 			util::stream_format(stream, "OPEN R%d", (opcode & 074) >> 2);
 			return 1 | SUPPORTED;
 		}
@@ -100,18 +101,22 @@ offs_t rx01_disassembler::disassemble(std::ostream &stream, offs_t pc, const rx0
 	else switch (opcode & 074)
 	{
 	case 000: case 004: case 010: case 014: case 020: case 024: case 030:
+		// IOB flip-flops for drive or interface
 		util::stream_format(stream, "%s IOB%d", BIT(opcode, 1) ? "SET" : "CLR", (opcode & 074) >> 2);
 		return 1 | SUPPORTED;
 
 	case 034:
+		// Drive select
 		util::stream_format(stream, "UNIT %s", s_0_or_1[BIT(opcode, 1)]);
 		return 1 | SUPPORTED;
 
 	case 040:
+		// Head load/unload
 		util::stream_format(stream, "%sHD", BIT(opcode, 1) ? "LD" : "UN");
 		return 1 | SUPPORTED;
 
 	case 044:
+		// Clock buffer address register
 		if (BIT(opcode, 1))
 			stream << "INCR BAR";
 		else
@@ -119,10 +124,12 @@ offs_t rx01_disassembler::disassemble(std::ostream &stream, offs_t pc, const rx0
 		return 1 | SUPPORTED;
 
 	case 050:
+		// Sector data buffer write
 		util::stream_format(stream, "%s WRTBUF", BIT(opcode, 0) ? "START" : "FIN");
 		return 1 | SUPPORTED;
 
 	case 054:
+		// Shift/preset CRC
 		if (BIT(opcode, 0))
 			util::stream_format(stream, "%sCRC", BIT(opcode, 1) ? "PRE" : "DAT");
 		else
@@ -130,14 +137,17 @@ offs_t rx01_disassembler::disassemble(std::ostream &stream, offs_t pc, const rx0
 		return 1 | SUPPORTED;
 
 	case 060:
+		// Clock flag flip-flop (J/K)
 		util::stream_format(stream, "%s FLAG", s_flag_control[opcode & 3]);
 		return 1 | SUPPORTED;
 
 	case 064:
+		// Write to scratchpad
 		stream << "LSP";
 		return 1 | SUPPORTED;
 
 	case 070:
+		// Clock counter
 		if (BIT(opcode, 1))
 		{
 			stream << "ICT";
@@ -155,6 +165,7 @@ offs_t rx01_disassembler::disassemble(std::ostream &stream, offs_t pc, const rx0
 		}
 
 	case 074:
+		// Clock shift register
 		if (!BIT(opcode, 0))
 			util::stream_format(stream, "ROTATE %s", s_0_or_1[BIT(opcode, 1)]);
 		else if (BIT(opcode, 1))
