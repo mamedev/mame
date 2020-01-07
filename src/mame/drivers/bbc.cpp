@@ -2099,6 +2099,8 @@ ROM_START(bbcm)
 	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "mos350", "Enhanced MOS 3.50" )
 	ROMX_LOAD("mos350.ic24", 0x20000, 0x20000, CRC(141027b9) SHA1(85211b5bc7c7a269952d2b063b7ec0e1f0196803), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 2, "mos329", "FinMOS 3.29")
+	ROMX_LOAD("mos329.ic24", 0x20000, 0x20000, CRC(8dd7338b) SHA1(4604203c70c04a9fd003103deec438fc5bd44839), ROM_BIOS(2))
 	ROM_COPY("swr", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x20000, 0x4000, 0xff)
 	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
@@ -2126,6 +2128,7 @@ ROM_START(bbcm)
 	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
 	ROMX_LOAD("mos320.cmos", 0x00, 0x40, CRC(c7f9e85a) SHA1(f24cc9db0525910689219f7204bf8b864033ee94), ROM_BIOS(0))
 	ROMX_LOAD("mos350.cmos", 0x00, 0x40, CRC(e84c1854) SHA1(f3cb7f12b7432caba28d067f01af575779220aac), ROM_BIOS(1))
+	ROMX_LOAD("mos350.cmos", 0x00, 0x40, CRC(e84c1854) SHA1(f3cb7f12b7432caba28d067f01af575779220aac), ROM_BIOS(2))
 ROM_END
 
 
