@@ -2386,8 +2386,6 @@ if (BUSES["CENTRONICS"]~=null) then
 		MAME_DIR .. "src/devices/bus/centronics/comxpl80.h",
 		MAME_DIR .. "src/devices/bus/centronics/covox.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/covox.h",
-		MAME_DIR .. "src/devices/bus/centronics/dac_r2r.cpp",
-		MAME_DIR .. "src/devices/bus/centronics/dac_r2r.h",
 		MAME_DIR .. "src/devices/bus/centronics/dsjoy.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/dsjoy.h",
 		MAME_DIR .. "src/devices/bus/centronics/epson_ex800.cpp",

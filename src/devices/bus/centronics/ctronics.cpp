@@ -134,7 +134,6 @@ device_centronics_peripheral_interface::~device_centronics_peripheral_interface(
 #include "printer.h"
 #include "covox.h"
 #include "chessmec.h"
-#include "dac_r2r.h"
 
 void centronics_devices(device_slot_interface &device)
 {
@@ -148,5 +147,4 @@ void centronics_devices(device_slot_interface &device)
 	device.option_add("covox", CENTRONICS_COVOX);
 	device.option_add("covox_stereo", CENTRONICS_COVOX_STEREO);
 	device.option_add("chessmec", CENTRONICS_CHESSMEC);
-	device.option_add("dac_r2r", CENTRONICS_DAC_R2R);
 }
