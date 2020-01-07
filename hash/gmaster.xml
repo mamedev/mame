@@ -63,6 +63,17 @@ Undumped:
 		</part>
 	</software>
 
+	<software name="finitezn">
+		<description>Finite Zone</description>
+		<year>199?</year>
+		<publisher>Hartung</publisher>
+		<part name="cart" interface="gmaster_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="finite_zone.bin" size="16384" crc="35741cd9" sha1="148dc46f748f8b16d2e292400cd5fbe3f4891b91"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fussball" supported ="partial"> <!-- some gfx corruption -->
 		<description>3-on-3 Soccer (Fuss-ball)</description>
 		<year>1990</year>
@@ -136,6 +147,17 @@ Undumped:
 		<part name="cart" interface="gmaster_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="scastle.bin" size="16384" crc="11d734f1" sha1="6b213a19fc65e967b1b6beba4c4e9e1491b59268"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swarrior" supported="no">
+		<description>Space Warrior</description>
+		<year>199?</year>
+		<publisher>Hartung</publisher>
+		<part name="cart" interface="gmaster_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="space_warrior.bin" size="32768" crc="af61d552" sha1="7fb7731716013277c42712bfa6c5ab7cc2467349"/>
 			</dataarea>
 		</part>
 	</software>
