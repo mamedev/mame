@@ -45,6 +45,7 @@ private:
 
 	// internal helpers
 	u8 mux_out();
+	bool sep_data();
 	bool test_condition();
 	void shift_crc(bool data);
 

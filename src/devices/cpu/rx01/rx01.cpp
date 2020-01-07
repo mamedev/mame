@@ -109,7 +109,16 @@ void rx01_cpu_device::device_reset()
 
 u8 rx01_cpu_device::mux_out()
 {
-	return BIT(m_mb, 0) ? m_sp_cache->read_byte(m_spar) : m_inst_cache->read_byte(m_pc);
+	if (BIT(m_mb, 0))
+		return m_sp_cache->read_byte(m_spar);
+	else
+		return m_inst_cache->read_byte(m_pc);
+}
+
+bool rx01_cpu_device::sep_data()
+{
+	// TODO
+	return false;
 }
 
 bool rx01_cpu_device::test_condition()
@@ -124,6 +133,12 @@ bool rx01_cpu_device::test_condition()
 
 	case 030:
 		return BIT(m_crc, 0);
+
+	case 054:
+		return BIT(m_sr, 7) == sep_data();
+
+	case 060:
+		return m_bar == 07777;
 
 	case 074:
 		return m_flag;
@@ -202,7 +217,7 @@ void rx01_cpu_device::execute_run()
 				if ((m_mb & 3) == 3)
 					m_crc = 0177777;
 				else if (BIT(m_mb, 0))
-					shift_crc(0 /*sep_data()*/);
+					shift_crc(sep_data());
 				else
 					shift_crc(BIT(m_mb, 1));
 				break;
@@ -226,8 +241,10 @@ void rx01_cpu_device::execute_run()
 			case 074:
 				if ((m_mb & 3) == 1)
 					m_sr = m_cntr;
+				else if (BIT(m_mb, 0))
+					m_sr = (m_sr << 1) | sep_data();
 				else
-					m_sr = (m_sr << 1) | (BIT(m_mb, 0) ? 0 /*sep_data()*/ : BIT(m_mb, 1));
+					m_sr = (m_sr << 1) | BIT(m_mb, 1);
 				break;
 
 			default:
