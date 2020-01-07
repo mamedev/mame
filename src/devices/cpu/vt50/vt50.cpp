@@ -568,7 +568,10 @@ void vt5x_cpu_device::execute_tj(u8 dest)
 	if (m_load_pc)
 		m_pc = u16(m_rom_page) << 8 | dest;
 	else
+	{
+		// Hardware bug: the ROM page counter will not increment on the second byte of a jump not taken.
 		m_pc = (m_pc + 1) & 03777;
+	}
 }
 
 void vt5x_cpu_device::clock_video_counters()
