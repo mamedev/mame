@@ -1094,7 +1094,7 @@ void attache_state::driver_start()
 
 	m_nvram->set_base(m_cmos_ram,64);
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000,0x0fff,read8_delegate(FUNC(attache_state::rom_r),this),write8_delegate(FUNC(attache_state::rom_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000,0x0fff, read8_delegate(*this, FUNC(attache_state::rom_r)), write8_delegate(*this, FUNC(attache_state::rom_w)));
 
 	save_pointer(m_char_ram,"Character RAM",128*32);
 	save_pointer(m_attr_ram,"Attribute RAM",128*32);
@@ -1128,7 +1128,7 @@ void attache_state::attache(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &attache_state::attache_io);
 	m_maincpu->set_daisy_config(attache_daisy_chain);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
 	screen.set_raw(12.324_MHz_XTAL, 784, 0, 640, 262, 0, 240);
@@ -1205,12 +1205,12 @@ void attache816_state::attache816(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &attache816_state::attache_io);
 	m_maincpu->set_daisy_config(attache_daisy_chain);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	I8086(config, m_extcpu, 24_MHz_XTAL / 3);
 	m_extcpu->set_addrmap(AS_PROGRAM, &attache816_state::attache_x86_map);
 	m_extcpu->set_addrmap(AS_IO, &attache816_state::attache_x86_io);
-	config.m_perfect_cpu_quantum = subtag("extcpu");
+	config.set_perfect_quantum(m_extcpu);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
 	screen.set_raw(12.324_MHz_XTAL, 784, 0, 640, 262, 0, 240);
@@ -1338,7 +1338,7 @@ ROM_START( attache816 )
 	ROM_LOAD("u630.bin",  0x0000, 0x0100, CRC(f7a5c821) SHA1(fea07d9ac7e4e5f4f72aa7b2159deaedbd662ead) )
 
 	// chip locations based on schematics
-	ROM_REGION(0x2000, "x86bios", 0)
+	ROM_REGION16_LE(0x2000, "x86bios", 0)
 	ROM_LOAD16_BYTE("u4.bin",  0x0000, 0x1000, CRC(658c8f93) SHA1(ce4b388af5b73884194f548afa706964305462f7) )
 	ROM_LOAD16_BYTE("u9.bin",  0x0001, 0x1000, CRC(cc4cd938) SHA1(6a1d316628641f9b4de5c8c46f9430ef5bd6120f) )
 

@@ -447,7 +447,7 @@ void flipjack_state::flipjack(machine_config &config)
 	crtc.set_char_width(8);
 	crtc.out_vsync_callback().set_inputline("maincpu", INPUT_LINE_IRQ0, HOLD_LINE);
 	crtc.out_vsync_callback().append_inputline("audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
-	crtc.set_update_row_callback(FUNC(flipjack_state::update_row), this);
+	crtc.set_update_row_callback(FUNC(flipjack_state::update_row));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_flipjack);
 	PALETTE(config, m_palette, FUNC(flipjack_state::flipjack_palette), 128+8);

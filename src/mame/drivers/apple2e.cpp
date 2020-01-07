@@ -4212,9 +4212,9 @@ static void apple2_cards(device_slot_interface &device)
 
 static void apple2eaux_cards(device_slot_interface &device)
 {
-	device.option_add("std80", A2EAUX_STD80COL); /* Apple IIe Standard 80 Column Card */
-	device.option_add("ext80", A2EAUX_EXT80COL); /* Apple IIe Extended 80 Column Card */
-	device.option_add("rw3", A2EAUX_RAMWORKS3);  /* Applied Engineering RamWorks III */
+	device.option_add("std80", A2EAUX_STD80COL); // Apple IIe Standard 80 Column Card
+	device.option_add("ext80", A2EAUX_EXT80COL); // Apple IIe Extended 80 Column Card
+	device.option_add("rw3", A2EAUX_RAMWORKS3);  // Applied Engineering RamWorks III
 }
 
 void apple2e_state::apple2e(machine_config &config)
@@ -4226,7 +4226,7 @@ void apple2e_state::apple2e(machine_config &config)
 
 	TIMER(config, m_scantimer, 0);
 	m_scantimer->configure_scanline(FUNC(apple2e_state::apple2_interrupt), "screen", 0, 1);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	APPLE2_VIDEO(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
@@ -4300,7 +4300,7 @@ void apple2e_state::apple2e(machine_config &config)
 
 	/* repeat timer.  15 Hz from page 7-15 of "Understanding the Apple IIe" */
 	timer_device &timer(TIMER(config, "repttmr", 0));
-	timer.configure_periodic(timer_device::expired_delegate(FUNC(apple2e_state::ay3600_repeat), this), attotime::from_hz(15));
+	timer.configure_periodic(FUNC(apple2e_state::ay3600_repeat), attotime::from_hz(15));
 
 	/* slot devices */
 	A2BUS(config, m_a2bus, 0);
@@ -4321,7 +4321,7 @@ void apple2e_state::apple2e(machine_config &config)
 	m_a2eauxslot->set_space(m_maincpu, AS_PROGRAM);
 	m_a2eauxslot->out_irq_callback().set(FUNC(apple2e_state::a2bus_irq_w));
 	m_a2eauxslot->out_nmi_callback().set(FUNC(apple2e_state::a2bus_nmi_w));
-	A2EAUXSLOT_SLOT(config, "aux", m_a2eauxslot, apple2eaux_cards, "ext80");
+	A2EAUXSLOT_SLOT(config, "aux", m_a2eauxslot, apple2eaux_cards, "ext80");   // default to an extended 80-column card
 
 	APPLE2_GAMEIO(config, m_gameio, apple2_gameio_device::default_options, nullptr);
 

@@ -602,6 +602,40 @@ ROM_START( atetb3482 )
 	ROM_LOAD( "pal16l8.4f" , 0x618, 0x104, NO_DUMP )
 ROM_END
 
+/*
+
+ This ROM came from a prototype bartop field-test machine from an
+ex-Atari Employee.
+
+PCB is screened : A044809
+
+ The PCB does not draw its power from the JAMMA connector, instead a
+small AC voltage is taken onboard and regulated down as this pcb has
+only a small power requirement!
+
+ The label on the rom says :
+
+Tet_Rom_Rev1
+NO SLAPSTIC
+B4FF
+20-Apr-89
+
+The cabinet is completely custom made by Atari, and this pcb differs
+greatly from the production pcb that we know of. The machine was operated
+on location at a local bar but did not perform well so they decided it
+wasn't a viable game to make, its the only known example.
+
+*/
+
+ROM_START( atetrisbp )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "tet_rom_rev1.40f", 0x10000, 0x8000, CRC(b6224e6c) SHA1(6b549317499e91a2f19ec282d927fba08f217488) )
+	ROM_CONTINUE(                 0x08000, 0x8000 )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "8901-136066-1101.40p", 0x0000, 0x10000, CRC(84a1939f) SHA1(d8577985fc8ed4e74f74c68b7c00c4855b7c3270) BAD_DUMP ) // "© 1988 ATARI"; not dumped from this set
+ROM_END
+
 ROM_START( atetrisc )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "tetcktl1.rom", 0x10000, 0x8000, CRC(9afd1f4a) SHA1(323d1576d92c905e8e95108b39cabf6fa0c10db6) )
@@ -652,5 +686,6 @@ GAME( 1988, atetrisb,  atetris, atetris,   atetris,  atetris_state,     init_ate
 GAME( 1988, atetrisb2, atetris, atetrisb2, atetris,  atetris_state,     init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, atetrisb3, atetris, atetrisb3, atetris,  atetris_mcu_state, init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, atetb3482, atetris, atetris,   atetris,  atetris_state,     init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 4, with UM3482)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, atetrisbp, atetris, atetris,   atetris,  atetris_state,     init_atetris, ROT0,   "Atari Games", "Tetris (bartop, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1989, atetrisc,  atetris, atetris,   atetrisc, atetris_state,     init_atetris, ROT270, "Atari Games", "Tetris (cocktail set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, atetrisc2, atetris, atetris,   atetrisc, atetris_state,     init_atetris, ROT270, "Atari Games", "Tetris (cocktail set 2)", MACHINE_SUPPORTS_SAVE )

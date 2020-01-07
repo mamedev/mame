@@ -42,6 +42,8 @@ NETLIST_START(palestra)
 
 	TTL_INPUT(high, 1)
 	TTL_INPUT(low, 0)
+	NET_C(VCC, high.VCC, low.VCC)
+	NET_C(GND, high.GND, low.GND)
 
 /*
  * board A2 -- score display

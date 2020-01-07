@@ -219,7 +219,7 @@ void rd100_state::rd100(machine_config &config)
 
 	hd44780_device &hd44780(HD44780(config, "hd44780"));
 	hd44780.set_lcd_size(2, 16);
-	hd44780.set_pixel_update_cb(FUNC(rd100_state::pixel_update), this);
+	hd44780.set_pixel_update_cb(FUNC(rd100_state::pixel_update));
 
 	PALETTE(config, "palette").set_entries(2);
 

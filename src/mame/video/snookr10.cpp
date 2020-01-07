@@ -237,17 +237,17 @@ TILE_GET_INFO_MEMBER(snookr10_state::crystalc_get_bg_tile_info)
 
 void snookr10_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snookr10_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(snookr10_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
 }
 
 VIDEO_START_MEMBER(snookr10_state, apple10)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snookr10_state::apple10_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(snookr10_state::apple10_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
 }
 
 VIDEO_START_MEMBER(snookr10_state, crystalc)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snookr10_state::crystalc_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(snookr10_state::crystalc_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
 }
 
 uint32_t snookr10_state::screen_update_snookr10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

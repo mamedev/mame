@@ -341,7 +341,7 @@ void overdriv_state::overdriv(machine_config &config)
 																			  /* This might just mean that the video refresh rate is less than */
 																			  /* 60 fps, that's how I fixed it for now. */
 
-	config.m_minimum_quantum = attotime::from_hz(12000);
+	config.set_maximum_quantum(attotime::from_hz(12000));
 
 	EEPROM_ER5911_16BIT(config, "eeprom").default_data(overdriv_default_eeprom, 128);
 
@@ -356,7 +356,7 @@ void overdriv_state::overdriv(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
 	K053246(config, m_k053246, 0);
-	m_k053246->set_sprite_callback(FUNC(overdriv_state::sprite_callback), this);
+	m_k053246->set_sprite_callback(FUNC(overdriv_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, 77, 22);
 	m_k053246->set_palette("palette");
 
@@ -364,12 +364,12 @@ void overdriv_state::overdriv(machine_config &config)
 	m_k051316_1->set_palette("palette");
 	m_k051316_1->set_offsets(14, -1);
 	m_k051316_1->set_wrap(1);
-	m_k051316_1->set_zoom_callback(FUNC(overdriv_state::zoom_callback_1), this);
+	m_k051316_1->set_zoom_callback(FUNC(overdriv_state::zoom_callback_1));
 
 	K051316(config, m_k051316_2, 0);
 	m_k051316_2->set_palette("palette");
 	m_k051316_2->set_offsets(15, 1);
-	m_k051316_2->set_zoom_callback(FUNC(overdriv_state::zoom_callback_2), this);
+	m_k051316_2->set_zoom_callback(FUNC(overdriv_state::zoom_callback_2));
 
 	K053251(config, m_k053251, 0);
 

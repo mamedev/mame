@@ -832,7 +832,7 @@ void wicat_state::wicat(machine_config &config)
 
 	I8275(config, m_crtc, 19.6608_MHz_XTAL/10);
 	m_crtc->set_character_width(10);
-	m_crtc->set_display_callback(FUNC(wicat_state::wicat_display_pixels), this);
+	m_crtc->set_display_callback(FUNC(wicat_state::wicat_display_pixels));
 	m_crtc->drq_wr_callback().set(m_videodma, FUNC(am9517a_device::dreq0_w));
 	m_crtc->vrtc_wr_callback().set(FUNC(wicat_state::crtc_irq_w));
 	m_crtc->set_screen("screen");
@@ -850,7 +850,7 @@ void wicat_state::wicat(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:2", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
 
-	SOFTWARE_LIST(config, "flop_list").set_type("wicat", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop_list").set_original("wicat");
 }
 
 /* ROM definition */

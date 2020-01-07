@@ -213,9 +213,9 @@ TILE_GET_INFO_MEMBER(kingdrby_state::get_sc1_tile_info)
 
 void kingdrby_state::video_start()
 {
-	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kingdrby_state::get_sc0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,24);
-	m_sc1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kingdrby_state::get_sc1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,24);
-	m_sc0w_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kingdrby_state::get_sc0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kingdrby_state::get_sc0_tile_info)), TILEMAP_SCAN_ROWS, 8,8,32,24);
+	m_sc1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kingdrby_state::get_sc1_tile_info)), TILEMAP_SCAN_ROWS, 8,8,32,24);
+	m_sc0w_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kingdrby_state::get_sc0_tile_info)), TILEMAP_SCAN_ROWS, 8,8,32,32);
 
 	m_sc1_tilemap->set_transparent_pen(0);
 
@@ -982,7 +982,7 @@ void kingdrby_state::kingdrby(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &kingdrby_state::sound_io_map);
 	m_soundcpu->set_periodic_int(FUNC(kingdrby_state::irq0_line_hold), attotime::from_hz(1000)); /* guess, controls ay8910 tempo.*/
 
-	config.m_perfect_cpu_quantum = subtag("master");
+	config.set_perfect_quantum("master");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

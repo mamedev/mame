@@ -47,7 +47,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 
 	uint32_t screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void vta2000_palette(palette_device &palette) const;
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
@@ -181,13 +180,6 @@ static GFXDECODE_START( gfx_vta2000 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, vta2000_charlayout, 0, 1 )
 GFXDECODE_END
 
-void vta2000_state::vta2000_palette(palette_device &palette) const
-{
-	palette.set_pen_color(0, rgb_t::black());
-	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green
-	palette.set_pen_color(2, 0x00, 0xff, 0x00); // highlight
-}
-
 void vta2000_state::vta2000(machine_config &config)
 {
 	/* basic machine hardware */
@@ -214,7 +206,7 @@ void vta2000_state::vta2000(machine_config &config)
 	brgpit.out_handler<1>().set("usart", FUNC(i8251_device::write_txc)); // or vice versa?
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(80*8, 25*12);
@@ -222,7 +214,7 @@ void vta2000_state::vta2000(machine_config &config)
 	screen.set_screen_update(FUNC(vta2000_state::screen_update_vta2000));
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(vta2000_state::vta2000_palette), 3);
+	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_vta2000);
 
 	SPEAKER(config, "mono").front_center();

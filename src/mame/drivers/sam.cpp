@@ -32,7 +32,7 @@ void sam_state::sam(machine_config &config)
 }
 
 #define ROM_LOAD_BOOT_EPROM \
-	ROM_REGION( 0x100000, "boot", ROMREGION_ERASEFF ) \
+	ROM_REGION32_LE( 0x100000, "boot", ROMREGION_ERASEFF ) \
 	ROM_LOAD( "boot_eprom_01_02.bin", 0x0000, 0x100000, CRC(92c93cba) SHA1(aed7ba2f988df8c95e2ad08f70409152d5caa49a)) \
 	ROM_LOAD( "boot_eprom_01_06.bin", 0x0000, 0x0e8ac8, CRC(fe7bcece) SHA1(775590bbd52c24950db86cc231566ba3780030d8)) \
 	ROM_LOAD( "boot_eprom_02_10.bin", 0x0000, 0x0f0304, CRC(0f3fd4a4) SHA1(115d0b73c40fcdb2d202a0a9065472d216ca89e0)) \

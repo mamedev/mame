@@ -403,9 +403,17 @@ void naomi_gdrom_board::write_from_qword(uint8_t *region, uint64_t qword)
 
 naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: naomi_board(mconfig, NAOMI_GDROM_BOARD, tag, owner, clock),
+	m_maincpu(*this, "dimmcpu"),
+	m_securitycpu(*this, "pic"),
 	picdata(*this, finder_base::DUMMY_TAG)
 {
 	image_tag = nullptr;
+}
+
+void naomi_gdrom_board::sh4_map(address_map& map)
+{
+	map(0x00000000, 0x001fffff).rom().region("bios", 0);
+	map.unmap_value_high();
 }
 
 void naomi_gdrom_board::find_file(const char *name, const uint8_t *dir_sector, uint32_t &file_start, uint32_t &file_size)
@@ -481,6 +489,9 @@ void naomi_gdrom_board::device_start()
 			key |= picdata[0x7a0];
 
 			netpic = picdata[0x6ee];
+
+			// set data for security pic rom
+			memcpy((uint8_t*)m_securitycpu->space(AS_PROGRAM).get_read_ptr(0), picdata, 0x400);
 		} else {
 			// use extracted pic data
 	//      printf("This PIC key hasn't been converted to a proper PIC binary yet!\n");
@@ -607,6 +618,27 @@ void naomi_gdrom_board::board_advance(uint32_t size)
 		dimm_cur_address %= dimm_data_size;
 }
 
+#define CPU_CLOCK 200000000 // need to set the correct value here
+
+void naomi_gdrom_board::device_add_mconfig(machine_config& config)
+{
+	SH4LE(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_md(0, 1);
+	m_maincpu->set_md(1, 0);
+	m_maincpu->set_md(2, 1);
+	m_maincpu->set_md(3, 0);
+	m_maincpu->set_md(4, 0);
+	m_maincpu->set_md(5, 1);
+	m_maincpu->set_md(6, 0);
+	m_maincpu->set_md(7, 1);
+	m_maincpu->set_md(8, 0);
+	m_maincpu->set_sh4_clock(CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &naomi_gdrom_board::sh4_map);
+	m_maincpu->set_disable();
+	PIC16C621A(config, m_securitycpu, 1000000); // need to set the correct value for clock
+	m_securitycpu->set_disable();
+}
+
 // DIMM firmwares:
 //  FPR-23489C - 1.02 not VxWorks based, no network, can not be software updated to 2.xx+
 // Net-DIMM firmwares:
@@ -639,14 +671,26 @@ ROM_START( dimm )
 	ROM_LOAD("317-unknown.pic",  0x00, 0x4000, CRC(7dc07733) SHA1(b223dc44718fa71e7b420c3b44ce4ab961445461) )
 
 	// main firmwares
-	ROM_LOAD16_WORD_SWAP( "fpr-23489c.ic14", 0x000000, 0x200000, CRC(bc38bea1) SHA1(b36fcc6902f397d9749e9d02de1bbb7a5e29d468) )
-	ROM_LOAD16_WORD_SWAP( "203_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(6f55f1ae0606816a4eca6645ed36eb7f9c7ad9cf) )
-	ROM_LOAD16_WORD_SWAP( "fpr23718.ic36",   0x000000, 0x200000, CRC(a738ea1c) SHA1(b7b5a55a6a4cf0aa2df1b3dff62ff67f864c55e8) )
-	ROM_LOAD16_WORD_SWAP( "213_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(17131f318632610b87bc095156ffad4597fed4ca) )
-	ROM_LOAD16_WORD_SWAP( "217_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(e5a229ae7ed48b2955cad63529fd938c6db555e5) )
-	ROM_LOAD16_WORD_SWAP( "fpr23905.ic36",   0x000000, 0x200000, CRC(ffffffff) SHA1(acade4362807c7571b1c2a48ed6067e4bddd404b) )
-	ROM_LOAD16_WORD_SWAP( "317_312.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(31d698cd659446ee09a2eeedec6e4bc6a19d05e8) )
-	ROM_LOAD16_WORD_SWAP( "401_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(edb52597108462bcea8eb2a47c19e51e5fb60638) )
+	ROM_REGION(0x200000, "bios", ROMREGION_64BIT)
+	ROM_SYSTEM_BIOS(0, "fpr-23489c.ic14", "Bios 0")
+	ROMX_LOAD( "fpr-23489c.ic14", 0x000000, 0x200000, CRC(bc38bea1) SHA1(b36fcc6902f397d9749e9d02de1bbb7a5e29d468), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "203_203.bin", "Bios 1")
+	ROMX_LOAD( "203_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(6f55f1ae0606816a4eca6645ed36eb7f9c7ad9cf), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "fpr23718.ic36", "Bios 2")
+	ROMX_LOAD( "fpr23718.ic36",   0x000000, 0x200000, CRC(a738ea1c) SHA1(b7b5a55a6a4cf0aa2df1b3dff62ff67f864c55e8), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "213_203.bin", "Bios 3")
+	ROMX_LOAD( "213_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(17131f318632610b87bc095156ffad4597fed4ca), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(4, "217_203.bin", "Bios 4")
+	ROMX_LOAD( "217_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(e5a229ae7ed48b2955cad63529fd938c6db555e5), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(5, "fpr23905.ic36", "Bios 5")
+	ROMX_LOAD( "fpr23905.ic36",   0x000000, 0x200000, CRC(ffffffff) SHA1(acade4362807c7571b1c2a48ed6067e4bddd404b), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(6, "317_312.bin", "Bios 6")
+	ROMX_LOAD( "317_312.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(31d698cd659446ee09a2eeedec6e4bc6a19d05e8), ROM_BIOS(6))
+	ROM_SYSTEM_BIOS(7, "401_203.bin", "Bios 7")
+	ROMX_LOAD( "401_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(edb52597108462bcea8eb2a47c19e51e5fb60638), ROM_BIOS(7))
+
+	// dynamically filled with data
+	ROM_REGION(0x400, "pic", ROMREGION_ERASE00)
 ROM_END
 
 const tiny_rom_entry *naomi_gdrom_board::device_rom_region() const

@@ -928,11 +928,11 @@ void sfbonus_state::video_start()
 {
 	m_temp_reel_bitmap = std::make_unique<bitmap_ind16>(1024,512);
 
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 128, 64);
-	m_reel_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_reel_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 16);
-	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 16);
-	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 16);
-	m_reel4_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_reel4_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 16);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sfbonus_state::get_sfbonus_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_reel_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sfbonus_state::get_sfbonus_reel_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 16);
+	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sfbonus_state::get_sfbonus_reel2_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 16);
+	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sfbonus_state::get_sfbonus_reel3_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 16);
+	m_reel4_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sfbonus_state::get_sfbonus_reel4_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 16);
 
 	m_tilemap->set_transparent_pen(0);
 	m_reel_tilemap->set_transparent_pen(255);

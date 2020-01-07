@@ -580,7 +580,7 @@ void markham_state::markham(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &markham_state::markham_slave_map);
 	m_subcpu->set_vblank_int("screen", FUNC(markham_state::irq0_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(CPU_CLOCK/256);
+	config.set_maximum_quantum(attotime::from_hz(CPU_CLOCK/256));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

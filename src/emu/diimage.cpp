@@ -19,6 +19,7 @@
 #include "softlist_dev.h"
 #include "formats/ioprocs.h"
 
+#include <cstring>
 #include <regex>
 
 
@@ -218,7 +219,7 @@ void device_image_interface::set_image_filename(const std::string &filename)
 //  image creation by name
 //-------------------------------------------------
 
-const image_device_format *device_image_interface::device_get_named_creatable_format(const std::string &format_name)
+const image_device_format *device_image_interface::device_get_named_creatable_format(const std::string &format_name) noexcept
 {
 	for (auto &format : m_formatlist)
 		if (format->name() == format_name)
@@ -431,7 +432,7 @@ const std::string &device_image_interface::working_directory()
 //  software_info structure from the softlist
 //-------------------------------------------------
 
-const software_info *device_image_interface::software_entry() const
+const software_info *device_image_interface::software_entry() const noexcept
 {
 	return !m_software_part_ptr ? nullptr : &m_software_part_ptr->info();
 }
@@ -588,7 +589,7 @@ u32 device_image_interface::crc()
 //  end command line?
 //-------------------------------------------------
 
-bool device_image_interface::support_command_line_image_creation() const
+bool device_image_interface::support_command_line_image_creation() const noexcept
 {
 	bool result;
 	switch (image_type())
@@ -643,7 +644,7 @@ void device_image_interface::battery_load(void *buffer, int length, int fill)
 	memset(((char *)buffer) + bytes_read, fill, length - bytes_read);
 }
 
-void device_image_interface::battery_load(void *buffer, int length, void *def_buffer)
+void device_image_interface::battery_load(void *buffer, int length, const void *def_buffer)
 {
 	if (!buffer || (length <= 0))
 		throw emu_fatalerror("device_image_interface::battery_load: Must specify sensical buffer/length");
@@ -658,9 +659,9 @@ void device_image_interface::battery_load(void *buffer, int length, void *def_bu
 	if (filerr == osd_file::error::NONE)
 		bytes_read = file.read(buffer, length);
 
-	// if no file was present, copy the default battery
-	if (bytes_read == 0 && def_buffer)
-		memcpy((char *)buffer, (char *)def_buffer, length);
+	// if no file was present, copy the default contents
+	if (!bytes_read && def_buffer)
+		std::memcpy(buffer, def_buffer, length);
 }
 
 

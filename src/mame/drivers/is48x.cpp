@@ -69,6 +69,7 @@ void is48x_state::bcp_inst_map(address_map &map)
 void is48x_state::bcp_data_map(address_map &map)
 {
 	map(0x0000, 0x7fff).ram(); // W24257S-70LL
+	map(0xc000, 0xffff).ram();
 }
 
 static INPUT_PORTS_START(is482)
@@ -80,7 +81,8 @@ void is48x_state::is482(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &is48x_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &is48x_state::io_map);
 
-	DP8344(config, m_bcp, 18.867_MHz_XTAL); // DP8344BV
+	DP8344B(config, m_bcp, 18.867_MHz_XTAL); // DP8344BV
+	m_bcp->set_auto_start(false);
 	m_bcp->set_addrmap(AS_PROGRAM, &is48x_state::bcp_inst_map);
 	m_bcp->set_addrmap(AS_DATA, &is48x_state::bcp_data_map);
 
@@ -94,7 +96,7 @@ void is48x_state::is482(machine_config &config)
 	m_crtc->set_char_width(14); // guess
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
-	m_crtc->set_update_row_callback(FUNC(is48x_state::update_row), this);
+	m_crtc->set_update_row_callback(FUNC(is48x_state::update_row));
 }
 
 ROM_START(is482) // "IS-488-A" on case

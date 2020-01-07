@@ -211,7 +211,7 @@ WRITE8_MEMBER(asma2k_state::port_a_w)
 		if (data & 0x40)
 			space.install_readwrite_bank(0x0000, 0x7fff, "rambank");
 		else
-			space.install_readwrite_handler(0x0000, 0x7fff, read8_delegate(FUNC(asma2k_state::io_r), this), write8_delegate(FUNC(asma2k_state::io_w), this));
+			space.install_readwrite_handler(0x0000, 0x7fff, read8_delegate(*this, FUNC(asma2k_state::io_r)), write8_delegate(*this, FUNC(asma2k_state::io_w)));
 	}
 
 	m_rambank->set_entry(((data>>4) & 0x03));
@@ -416,7 +416,7 @@ void alphasmart_state::machine_reset()
 void alphasmart_state::alphasmart(machine_config &config)
 {
 	/* basic machine hardware */
-	MC68HC11D0(config, m_maincpu, XTAL(8'000'000)/2);  // XTAL is 8 Mhz, unknown divider
+	MC68HC11D0(config, m_maincpu, XTAL(8'000'000));  // XTAL is 8 Mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &alphasmart_state::alphasmart_mem);
 	m_maincpu->in_pa_callback().set(FUNC(alphasmart_state::port_a_r));
 	m_maincpu->out_pa_callback().set(FUNC(alphasmart_state::port_a_w));

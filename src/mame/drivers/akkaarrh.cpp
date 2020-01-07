@@ -90,10 +90,10 @@ static constexpr XTAL MASTER_CLOCK = 12.096_MHz_XTAL;
 
 void akkaarrh_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(akkaarrh_state::get_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 30);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(akkaarrh_state::get_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 30);
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(akkaarrh_state::get_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 30);
-	m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(akkaarrh_state::get_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 30);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(akkaarrh_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 30);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(akkaarrh_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 30);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(akkaarrh_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 30);
+	m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(akkaarrh_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 30);
 
 	m_tilemap[0]->set_flip(0);
 	m_tilemap[1]->set_flip(TILEMAP_FLIPX);

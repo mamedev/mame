@@ -159,7 +159,7 @@ files {
 	MAME_DIR .. "src/emu/inputdev.h",
 	MAME_DIR .. "src/emu/ioport.cpp",
 	MAME_DIR .. "src/emu/ioport.h",
-	MAME_DIR .. "src/emu/inpttype.h",
+	MAME_DIR .. "src/emu/inpttype.ipp",
 	MAME_DIR .. "src/emu/logmacro.h",
 	MAME_DIR .. "src/emu/machine.cpp",
 	MAME_DIR .. "src/emu/machine.h",

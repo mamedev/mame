@@ -1,14 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * plists.h
- *
- */
-
-#pragma once
 
 #ifndef PLISTS_H_
 #define PLISTS_H_
+
+///
+/// \file plists.h
+///
 
 #include "palloc.h"
 #include "pchrono.h"
@@ -24,19 +22,28 @@
 
 namespace plib {
 
-	/**! fixed size array allowing to override constructor and initialize members by placement new.
-	 *
-	 * Use with care. This template is provided to improve locality of storage
-	 * in high frequency applications. It should not be used for anything else.
-	 *
-	 */
+	/// \brief fixed size array allowing to override constructor and initialize members by placement new.
+	///
+	/// Use with care. This template is provided to improve locality of storage
+	/// in high frequency applications. It should not be used for anything else.
+	///
+	///
 	template <class C, std::size_t N>
 	class uninitialised_array_t
 	{
 	public:
 
-		using iterator = C *;
-		using const_iterator = const C *;
+		using value_type = C;
+		using pointer = value_type *;
+		using const_pointer = const value_type *;
+		using reference = value_type &;
+		using const_reference = const value_type &;
+		using iterator = value_type *;
+		using const_iterator = const value_type *;
+		using size_type = std::size_t;
+		using difference_type = std::ptrdiff_t;
+		using reverse_iterator = std::reverse_iterator<iterator>;
+		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 		//uninitialised_array_t() noexcept = default;
 		uninitialised_array_t() noexcept
@@ -48,24 +55,24 @@ namespace plib {
 		~uninitialised_array_t() noexcept
 		{
 			if (m_initialized>=N)
-				for (std::size_t i=0; i<N; i++)
+				for (size_type i=0; i<N; ++i)
 					(*this)[i].~C();
 		}
 
-		size_t size() const { return N; }
+		size_t size() const noexcept { return N; }
 
-		C& operator[](const std::size_t &index) noexcept
+		reference operator[](size_type index) noexcept
 		{
-			return *reinterpret_cast<C *>(&m_buf[index]);
+			return *reinterpret_cast<pointer>(&m_buf[index]);
 		}
 
-		const C& operator[](const std::size_t &index) const noexcept
+		const_reference operator[](size_type index) const noexcept
 		{
-			return *reinterpret_cast<const C *>(&m_buf[index]);
+			return *reinterpret_cast<const_pointer>(&m_buf[index]);
 		}
 
 		template<typename... Args>
-		void emplace(const std::size_t index, Args&&... args)
+		void emplace(size_type index, Args&&... args)
 		{
 			m_initialized++;
 			// allocate on buffer
@@ -85,16 +92,16 @@ namespace plib {
 
 	private:
 
-		/* ensure proper alignment */
+		// ensure proper alignment
 		PALIGNAS_VECTOROPT()
 		std::array<typename std::aligned_storage<sizeof(C), alignof(C)>::type, N> m_buf;
 		unsigned m_initialized;
 	};
 
-	/**! a simple linked list.
-	 *
-	 * the list allows insertions deletions whilst being processed.
-	 */
+	/// \brief a simple linked list.
+	///
+	/// The list allows insertions deletions whilst being processed.
+	///
 	template <class LC>
 	class linkedlist_t
 	{
@@ -125,7 +132,14 @@ namespace plib {
 			explicit constexpr iter_t(LC* x) noexcept : p(x) { }
 			constexpr iter_t(iter_t &rhs) noexcept : p(rhs.p) { }
 			iter_t(iter_t &&rhs) noexcept { std::swap(*this, rhs);  }
-			iter_t& operator=(const iter_t &rhs) noexcept { if (this != &rhs) p = rhs.p; return *this; }
+
+			iter_t& operator=(const iter_t &rhs) noexcept
+			{
+				if (this != &rhs)
+					p = rhs.p;
+				return *this;
+			}
+
 			iter_t& operator=(iter_t &&rhs) noexcept { std::swap(*this, rhs); return *this; }
 			~iter_t() = default;
 
@@ -180,7 +194,7 @@ namespace plib {
 				elem->m_next->m_prev = elem->m_prev;
 			else
 			{
-				/* update tail */
+				// update tail
 			}
 		}
 
@@ -236,19 +250,7 @@ namespace plib {
 	{
 		constexpr pqentry_t() noexcept : m_exec_time(), m_object(nullptr) { }
 		constexpr pqentry_t(const Time t, const Element o) noexcept : m_exec_time(t), m_object(o) { }
-#if 0
-		~pqentry_t() = default;
-		constexpr pqentry_t(const pqentry_t &e) noexcept = default;
-		constexpr pqentry_t(pqentry_t &&e) noexcept = default;
-		pqentry_t& operator=(pqentry_t && other) noexcept = default;
-		pqentry_t& operator=(const pqentry_t &other) noexcept = default;
 
-		void swap(pqentry_t &other) noexcept
-		{
-			std::swap(m_exec_time, other.m_exec_time);
-			std::swap(m_object, other.m_object);
-		}
-#endif
 		inline bool operator ==(const pqentry_t &rhs) const noexcept
 		{
 			return m_object == rhs.m_object;
@@ -271,11 +273,14 @@ namespace plib {
 
 		inline static constexpr pqentry_t never() noexcept { return pqentry_t(Time::never(), nullptr); }
 
+		Time exec_time() const noexcept { return m_exec_time; }
+		Element object() const noexcept { return m_object; }
+	private:
 		Time m_exec_time;
 		Element m_object;
 	};
 
-	/* Use TS = true for a threadsafe queue */
+	// Use TS = true for a threadsafe queue
 	template <class T, bool TS>
 	class timed_queue_linear : nocopyassignmove
 	{
@@ -294,7 +299,7 @@ namespace plib {
 		void push(T && e) noexcept
 		{
 #if 0
-			/* Lock */
+			// Lock
 			lock_guard_type lck(m_lock);
 			T * i(m_end-1);
 			for (; *i < e; --i)
@@ -306,7 +311,7 @@ namespace plib {
 			*(i+1) = std::move(e);
 			++m_end;
 #else
-			/* Lock */
+			// Lock
 			lock_guard_type lck(m_lock);
 			T * i(m_end++);
 			*i = std::move(e);
@@ -327,7 +332,7 @@ namespace plib {
 		template <bool KEEPSTAT, class R>
 		void remove(const R &elem) noexcept
 		{
-			/* Lock */
+			// Lock
 			lock_guard_type lck(m_lock);
 			if (KEEPSTAT)
 				m_prof_remove.inc();
@@ -345,7 +350,7 @@ namespace plib {
 		template <bool KEEPSTAT, class R>
 		void retime(R && elem) noexcept
 		{
-			/* Lock */
+			// Lock
 			lock_guard_type lck(m_lock);
 			if (KEEPSTAT)
 				m_prof_retime.inc();
@@ -374,10 +379,10 @@ namespace plib {
 		{
 			lock_guard_type lck(m_lock);
 			m_end = &m_list[0];
-			/* put an empty element with maximum time into the queue.
-			 * the insert algo above will run into this element and doesn't
-			 * need a comparison with queue start.
-			 */
+			// put an empty element with maximum time into the queue.
+			// the insert algo above will run into this element and doesn't
+			// need a comparison with queue start.
+			//
 			m_list[0] = T::never();
 			m_end++;
 		}
@@ -386,7 +391,7 @@ namespace plib {
 
 		const T *listptr() const noexcept { return &m_list[1]; }
 		std::size_t size() const noexcept { return static_cast<std::size_t>(m_end - &m_list[1]); }
-		const T & operator[](const std::size_t index) const noexcept { return m_list[ 1 + index]; }
+		const T & operator[](std::size_t index) const noexcept { return m_list[ 1 + index]; }
 	private:
 		using mutex_type = pspin_mutex<TS>;
 		using lock_guard_type = std::lock_guard<mutex_type>;
@@ -426,7 +431,7 @@ namespace plib {
 		template <bool KEEPSTAT>
 		void push(T &&e) noexcept
 		{
-			/* Lock */
+			// Lock
 			lock_guard_type lck(m_lock);
 			*m_end++ = e;
 			std::push_heap(&m_list[0], m_end, compare());
@@ -447,7 +452,7 @@ namespace plib {
 		template <bool KEEPSTAT, class R>
 		void remove(const R &elem) noexcept
 		{
-			/* Lock */
+			// Lock
 			lock_guard_type lck(m_lock);
 			if (KEEPSTAT)
 				m_prof_remove.inc();
@@ -467,7 +472,7 @@ namespace plib {
 		template <bool KEEPSTAT>
 		void retime(const T &elem) noexcept
 		{
-			/* Lock */
+			// Lock
 			lock_guard_type lck(m_lock);
 			if (KEEPSTAT)
 				m_prof_retime.inc();
@@ -512,4 +517,4 @@ namespace plib {
 
 } // namespace plib
 
-#endif /* PLISTS_H_ */
+#endif // PLISTS_H_

@@ -83,13 +83,13 @@ void picno_state::picno(machine_config &config)
 }
 
 ROM_START( picno )
-	ROM_REGION(0x88000, "roms", 0)
+	ROM_REGION16_BE(0x88000, "roms", 0)
 	ROM_LOAD( "hd6435328f10.u5", 0x00000, 0x08000, NO_DUMP ) // internal rom
 	ROM_LOAD( "rx001-z8-v3j.u2",    0x08000, 0x80000, CRC(e3c8929d) SHA1(1716f09b0a594b3782d257330282d77b6ca6fa0d) ) //HN62334BP
 ROM_END
 
 ROM_START( picno2 )
-	ROM_REGION(0x88000, "roms", 0)
+	ROM_REGION16_BE(0x88000, "roms", 0)
 	ROM_LOAD( "hd6435328f10.u5", 0x00000, 0x08000, NO_DUMP ) // internal rom
 	ROM_LOAD( "rx001-z8-v4j.u2",    0x08000, 0x80000, CRC(ae89a9a5) SHA1(51ed458ffd151e19019beb23517263efce4be272) ) //HN62334BP
 ROM_END

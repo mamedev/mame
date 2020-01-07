@@ -257,7 +257,7 @@ void babbage_state::babbage(machine_config &config)
 	m_pio_2->in_pa_callback().set(FUNC(babbage_state::pio2_a_r));
 	m_pio_2->out_pb_callback().set(FUNC(babbage_state::pio2_b_w));
 
-	TIMER(config, "keyboard_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(babbage_state::keyboard_callback), this), attotime::from_hz(30));
+	TIMER(config, "keyboard_timer", 0).configure_periodic(FUNC(babbage_state::keyboard_callback), attotime::from_hz(30));
 }
 
 

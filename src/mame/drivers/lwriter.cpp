@@ -210,7 +210,7 @@ void lwriter_state::maincpu_map(address_map &map)
 	map(0x000000, 0x1fffff).rw(FUNC(lwriter_state::bankedarea_r), FUNC(lwriter_state::bankedarea_w));
 	map(0x200000, 0x2fffff).rom().region("rom", 0); // 1MB ROM
 	//map(0x300000, 0x3fffff) // open bus?
-	map(0x400000, 0x5fffff).ram().region("dram", 0).mirror(0x200000); // 2MB DRAM
+	map(0x400000, 0x5fffff).ram().share("dram").mirror(0x200000); // 2MB DRAM
 	map(0x800000, 0x800000).w(FUNC(lwriter_state::led_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
 	map(0x800001, 0x800001).w(FUNC(lwriter_state::fifo_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
 	map(0xc00001, 0xc00001).w(m_scc, FUNC(scc8530_device::ca_w)).mirror(0x1ffff8);
@@ -237,7 +237,7 @@ INPUT_PORTS_END
 void lwriter_state::machine_start()
 {
 	m_rom_ptr = (uint16_t*)memregion("rom")->base();
-	m_dram_ptr = (uint16_t*)memregion("dram")->base();
+	m_dram_ptr = (uint16_t*)memshare("dram")->ptr();
 	m_sram_ptr = (uint16_t*)memregion("sram")->base();
 	// do stuff here later on like setting up printer mechanisms HLE timers etc
 }
@@ -439,8 +439,7 @@ ROM_START(lwriter)
 	ROM_LOAD16_BYTE("342-0550.h2", 0x080000, 0x20000, CRC (82adcf85) SHA1 (e2ab728afdae802c0c67fc25c9ba278b9cb04e31)) // Label: "342-0550-A JAPAN // TC531000CP-F705 // (C) 87 APPLE 8940EAI // (C) 83-87 ADOBE V47.0 // (C) 81 LINOTYPE" TC531000 @H2
 	ROM_LOAD16_BYTE("342-0551.l3", 0x0c0001, 0x20000, CRC (176b3346) SHA1 (eb8dfc7e44f2bc884097e51a47e2f10ee091c9e9)) // Label: "342-0551-A JAPAN // TC531000CP-F706 // (C) 87 APPLE 8940EAI // (C) 83-87 ADOBE V47.0 // (C) 81 LINOTYPE" TC531000 @L3
 	ROM_LOAD16_BYTE("342-0552.h3", 0x0c0000, 0x20000, CRC (69b175c6) SHA1 (a84c82be1ec7e373bb097ee74b941920a3b091aa)) // Label: "342-0552-A JAPAN // TC531000CP-F707 // (C) 87 APPLE 8940EAI // (C) 83-87 ADOBE V47.0 // (C) 81 LINOTYPE" TC531000 @H3
-	ROM_REGION( 0x200000, "dram", ROMREGION_ERASEFF )
-	ROM_REGION( 0x1000, "sram", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x1000, "sram", ROMREGION_ERASEFF )
 
 ROM_END
 

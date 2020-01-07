@@ -736,7 +736,7 @@
 
 	<!-- Notes: FM support -->
 	<software name="aliensynp" cloneof="aliensyn">
-		<description>Alien Syndrome (Prototype)</description>
+		<description>Alien Syndrome (prototype)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1075,7 +1075,7 @@
 
 	<!-- Notes: 3D glasses support -->
 	<software name="bladeag1" cloneof="bladeag">
-		<description>Blade Eagle (USA, Prototype)</description>
+		<description>Blade Eagle (USA, prototype)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1156,7 +1156,7 @@
 
 	<!-- Notes: FM support -->
 	<software name="borgmanp" cloneof="cyborgh">
-		<description>Chouon Senshi Borgman (Jpn, Prototype)</description>
+		<description>Chouon Senshi Borgman (Jpn, prototype)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1505,7 +1505,7 @@
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="chopliftj" cloneof="choplift">
-		<description>Choplifter (Jpn, Prototype)</description>
+		<description>Choplifter (Jpn, prototype)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1517,7 +1517,7 @@
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="chopliftp" cloneof="choplift">
-		<description>Choplifter (USA, Prototype)</description>
+		<description>Choplifter (USA, prototype)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1619,7 +1619,7 @@
 	</software>
 
 	<software name="columnsp" cloneof="columns">
-		<description>Columns (Prototype)</description>
+		<description>Columns (prototype)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1707,7 +1707,7 @@
 	</software>
 
 	<software name="cybersp" cloneof="cybers">
-		<description>The Cyber Shinobi (Prototype)</description>
+		<description>The Cyber Shinobi (prototype)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1868,7 +1868,7 @@
 	</software>
 
 	<software name="dinobash">
-		<description>Dinobasher Starring Bignose the Caveman (Euro, Prototype)</description>
+		<description>Dinobasher Starring Bignose the Caveman (Euro, prototype)</description>
 		<year>19??</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1910,7 +1910,7 @@
 
 	<!-- Notes: FM support -->
 	<software name="dokidokip" cloneof="pengland">
-		<description>Doki Doki Penguin Land - Uchuu Daibouken (Jpn, Prototype)</description>
+		<description>Doki Doki Penguin Land - Uchuu Daibouken (Jpn, prototype)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1936,7 +1936,7 @@
 	</software>
 
 	<software name="doublhwkp" cloneof="doublhwk">
-		<description>Double Hawk (Euro, Prototype)</description>
+		<description>Double Hawk (Euro, prototype)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2223,7 +2223,7 @@
 
 	<!-- Notes: Requires an extra-height video mode absent on the 315-5124 VDP -->
 	<software name="excdizzy" supported="no">
-		<description>The Excellent Dizzy Collection (Euro, USA, Prototype)</description>
+		<description>The Excellent Dizzy Collection (Euro, USA, prototype)</description>
 		<year>19??</year>
 		<publisher>Codemasters</publisher>
 		<info name="usage" value="Video mode is correct only on SMS 2 drivers, e.g. smspal" />
@@ -2405,7 +2405,7 @@
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="fantzone1" cloneof="fantzone">
-		<description>Fantasy Zone (World, v1, Prototype)</description>
+		<description>Fantasy Zone (World, v1, prototype)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2624,7 +2624,7 @@
 	</software>
 
 	<software name="ggroundp" cloneof="gground">
-		<description>Gain Ground (Euro, Prototype)</description>
+		<description>Gain Ground (Euro, prototype)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7045"/>
@@ -2904,7 +2904,7 @@
 
 	<!-- Notes: FM support -->
 	<software name="globaldp" cloneof="globald">
-		<description>Global Defense (Euro, USA, Prototype)</description>
+		<description>Global Defense (Euro, USA, prototype)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2949,7 +2949,7 @@
 
 	<!-- Notes: FM support -->
 	<software name="golfamanp" cloneof="golfaman">
-		<description>Golfamania (Prototype)</description>
+		<description>Golfamania (prototype)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3083,7 +3083,7 @@
 
 	<!-- Notes: FM support -->
 	<software name="greatglfp" cloneof="greatglf">
-		<description>Great Golf (Prototype)</description>
+		<description>Great Golf (prototype)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3263,7 +3263,7 @@
 	</software>
 
 	<software name="hangonshp" cloneof="hangonsh">
-		<description>Hang-On &amp; Safari Hunt (USA, Prototype)</description>
+		<description>Hang-On &amp; Safari Hunt (USA, prototype)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3365,7 +3365,7 @@
 	</software>
 
 	<software name="hook">
-		<description>Hook (Euro, Prototype)</description>
+		<description>Hook (Euro, prototype)</description>
 		<year>19??</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3419,7 +3419,7 @@
 	</software>
 
 	<software name="impmissp" cloneof="impmiss">
-		<description>Impossible Mission (Euro, Prototype)</description>
+		<description>Impossible Mission (Euro, prototype)</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3469,7 +3469,7 @@
 	</software>
 
 	<software name="indycrusp" cloneof="indycrus">
-		<description>Indiana Jones and the Last Crusade (Euro, Prototype)</description>
+		<description>Indiana Jones and the Last Crusade (Euro, prototype)</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3492,7 +3492,7 @@
 	</software>
 
 	<software name="jbdougkop" cloneof="heavyw">
-		<description>James 'Buster' Douglas Knockout Boxing (USA, Prototype)</description>
+		<description>James 'Buster' Douglas Knockout Boxing (USA, prototype)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3653,7 +3653,7 @@
 	</software>
 
 	<software name="kingqstp" cloneof="kingqst">
-		<description>King's Quest - Quest for the Crown (USA, Prototype)</description>
+		<description>King's Quest - Quest for the Crown (USA, prototype)</description>
 		<year>1989</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3801,7 +3801,7 @@
 	</software>
 
 	<software name="lemmingsp" cloneof="lemmings">
-		<description>Lemmings (Euro, Prototype)</description>
+		<description>Lemmings (Euro, prototype)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3812,7 +3812,7 @@
 	</software>
 
 	<software name="lemming2">
-		<description>Lemmings 2 - The Tribes (Euro, Prototype)</description>
+		<description>Lemmings 2 - The Tribes (Euro, prototype)</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3913,7 +3913,7 @@
 	</software>
 
 	<software name="luckydimp" cloneof="luckydim">
-		<description>The Lucky Dime Caper Starring Donald Duck (Euro, Prototype)</description>
+		<description>The Lucky Dime Caper Starring Donald Duck (Euro, prototype)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3941,7 +3941,7 @@
 	</software>
 
 	<software name="mjsengokp" cloneof="mjsengok">
-		<description>Mahjong Sengoku Jidai (Jpn, Prototype)</description>
+		<description>Mahjong Sengoku Jidai (Jpn, prototype)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3986,7 +3986,7 @@
 
 	<!-- Notes: FM support -->
 	<software name="maougolvp" cloneof="golvell">
-		<description>Maou Golvellius (Jpn, Prototype)</description>
+		<description>Maou Golvellius (Jpn, prototype)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4174,7 +4174,7 @@
 	</software>
 
 	<software name="sdmilhao">
-		<description>Show do Milhão (Bra, Prototype)</description>
+		<description>Show do Milhão (Bra, prototype)</description>
 		<year>2003</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4202,7 +4202,7 @@
 
 	<!-- Notes: FM support -->
 	<software name="miraclep" cloneof="miracle">
-		<description>Miracle Warriors - Seal of the Dark Lord (Prototype)</description>
+		<description>Miracle Warriors - Seal of the Dark Lord (prototype)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4313,7 +4313,7 @@
 	</software>
 
 	<software name="monopolyp" cloneof="monopoly">
-		<description>Monopoly (USA, Prototype)</description>
+		<description>Monopoly (USA, prototype)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4342,7 +4342,7 @@
 	</software>
 
 	<software name="montezump" cloneof="montezum">
-		<description>Montezuma's Revenge Featuring Panama Joe (USA, Prototype)</description>
+		<description>Montezuma's Revenge Featuring Panama Joe (USA, prototype)</description>
 		<year>1989</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4389,7 +4389,7 @@
 	</software>
 
 	<software name="mwalkp" cloneof="mwalk">
-		<description>Michael Jackson's Moonwalker (USA, Prototype)</description>
+		<description>Michael Jackson's Moonwalker (USA, prototype)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4425,7 +4425,7 @@
 	</software>
 
 	<software name="nbajam">
-		<description>NBA Jam (Euro, Prototype)</description>
+		<description>NBA Jam (Euro, prototype)</description>
 		<year>1994</year>
 		<publisher>Acclaim</publisher>
 		<info name="usage" value="Only runs with certain drivers, e.g. smsj - others show SOFTWARE ERROR" />
@@ -4438,7 +4438,7 @@
 
 	<!-- Notes: FM support -->
 	<software name="supgolf" cloneof="golfaman">
-		<description>Super Golf (Prototype)</description>
+		<description>Super Golf (prototype)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4545,7 +4545,7 @@
 	</software>
 
 	<software name="ngaidenp" cloneof="ngaiden">
-		<description>Ninja Gaiden (Euro, Prototype)</description>
+		<description>Ninja Gaiden (Euro, prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4725,7 +4725,7 @@
 	</software>
 
 	<software name="patriley">
-		<description>Pat Riley Basketball (USA, Prototype)</description>
+		<description>Pat Riley Basketball (USA, prototype)</description>
 		<year>19??</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5087,7 +5087,7 @@
 	</software>
 
 	<software name="puttputtp" cloneof="puttputt">
-		<description>Putt &amp; Putter (Euro, Prototype)</description>
+		<description>Putt &amp; Putter (Euro, prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5247,7 +5247,7 @@
 	</software>
 
 	<software name="rcgpp" cloneof="rcgp">
-		<description>R.C. Grand Prix (Prototype)</description>
+		<description>R.C. Grand Prix (prototype)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5396,7 +5396,7 @@
 
 	<!-- Notes: FM support -->
 	<software name="rtypep" cloneof="rtype">
-		<description>R-Type (Prototype)</description>
+		<description>R-Type (prototype)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5509,7 +5509,7 @@
 	</software>
 
 	<software name="smurfs2p" cloneof="smurfs2">
-		<description>The Smurfs 2 (Euro, Prototype)</description>
+		<description>The Smurfs 2 (Euro, prototype)</description>
 		<year>1996</year>
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5532,7 +5532,7 @@
 	</software>
 
 	<software name="scip" cloneof="sci">
-		<description>Special Criminal Investigation (Euro, Prototype)</description>
+		<description>Special Criminal Investigation (Euro, prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5597,7 +5597,7 @@
 	</software>
 
 	<software name="segagfx">
-		<description>Sega Graphic Board (Jpn, Prototype v2.0)</description>
+		<description>Sega Graphic Board (Jpn, prototype v2.0)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="ctrl1_default" value="graphic" />
@@ -5720,7 +5720,7 @@
 
 	<!-- Notes: FM support -->
 	<software name="shanghaip" cloneof="shanghai">
-		<description>Shanghai (Prototype)</description>
+		<description>Shanghai (prototype)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5892,7 +5892,7 @@
 	</software>
 
 	<software name="slapshotp" cloneof="slapshot">
-		<description>Slap Shoot (Prototype)</description>
+		<description>Slap Shoot (prototype)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5943,7 +5943,7 @@
 	</software>
 
 	<software name="smgpp1" cloneof="smgp">
-		<description>Super Monaco GP (Euro, Prototype)</description>
+		<description>Super Monaco GP (Euro, prototype)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5954,7 +5954,7 @@
 	</software>
 
 	<software name="smgpp2" cloneof="smgp">
-		<description>Super Monaco GP (Euro, Older Prototype)</description>
+		<description>Super Monaco GP (Euro, older prototype)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6076,8 +6076,38 @@
 		</part>
 	</software>
 
+	<!-- Notes: Sega of Japan labels, unfortunately crashes after title screen -->
+	<software name="sonicc630" cloneof="sonicc" supported="no">
+		<description>Sonic the Hedgehog Chaos (Euro, "Ver 0.20", prototype 19930630)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="ms sonic 3 0.bin" size="131072" crc="538ef990" sha1="0eee07db9d64813ab343c7d2ebd70bb2a1c6b589" offset="0x00000" />
+				<rom name="ms sonic 3 1.bin" size="131072" crc="4cec61fe" sha1="c6ff6f80e9f71965fca1927fe9c49c355d633f64" offset="0x20000" />
+				<rom name="ms sonic 3 2.bin" size="131072" crc="95f3c5b5" sha1="08a918b028a2e646b280637dd81217feae5d435c" offset="0x40000" />
+				<rom name="ms sonic 3 3.bin" size="131072" crc="803893e6" sha1="138c4fb7c0e80d1d06b1ebc949a139594d876693" offset="0x60000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: Sega UK labels, mistakenly marked GG; internal version has not changed since sonicc630 and therefore is not ideal for reference -->
+	<software name="sonicc713" cloneof="sonicc">
+		<description>Sonic the Hedgehog Chaos (Euro, prototype 19930713)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sonic chaos 0 gg 13-7 1m.bin" size="131072" crc="d8fae464" sha1="1873efcc4937c7e7c4b3c622f855615193229846" offset="0x00000" />
+				<rom name="sonic chaos 1 gg 13-7 1m.bin" size="131072" crc="b13ab99a" sha1="9e9575e50dba386917862c45f7af3acdf0e54e8e" offset="0x20000" />
+				<rom name="sonic chaos 2 gg 13-7 1m.bin" size="131072" crc="62625015" sha1="4cba6035f0b8e4ee2da372d9cdd0126af3807ddb" offset="0x40000" />
+				<rom name="sonic chaos 3 gg 13-7 1m.bin" size="131072" crc="fbd1c349" sha1="43c301b1439a83e57c6ab900a2838ea27fac7d25" offset="0x60000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sonicedu">
-		<description>Sonic's Edusoft (Prototype)</description>
+		<description>Sonic's Edusoft (prototype)</description>
 		<year>19??</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6466,7 +6496,7 @@
 
 	<!-- Notes: FM support -->
 	<software name="sumgamesp" cloneof="sumgames">
-		<description>Summer Games (Euro, Prototype)</description>
+		<description>Summer Games (Euro, prototype)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6668,7 +6698,7 @@
 	</software>
 
 	<software name="tazmaniap" cloneof="tazmania">
-		<description>Taz-Mania (Euro, Prototype)</description>
+		<description>Taz-Mania (Euro, prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6691,7 +6721,7 @@
 	</software>
 
 	<software name="tecmow92">
-		<description>Tecmo World Cup '92 (Euro, Prototype)</description>
+		<description>Tecmo World Cup '92 (Euro, prototype)</description>
 		<year>19??</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6736,7 +6766,7 @@
 	The cartridge contains three 16kB EPROM chips, the last chip seems to have
 	only 48 bytes of metadata used by the machine and the rest is all $ff. -->
 	<software name="teddyboyjp" cloneof="teddyboy">
-		<description>Teddy Boy Blues (Jpn, Ep-MyCard, Prototype)</description>
+		<description>Teddy Boy Blues (Jpn, Ep-MyCard, prototype)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6904,7 +6934,7 @@
 	</software>
 
 	<software name="tomjerry" cloneof="tomjermv">
-		<description>Tom &amp; Jerry (Prototype)</description>
+		<description>Tom &amp; Jerry (prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6944,7 +6974,7 @@
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="transbotp" cloneof="transbot">
-		<description>TransBot (USA, Prototype)</description>
+		<description>TransBot (USA, prototype)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -7030,7 +7060,7 @@
 
 	<!-- Notes: FM support -->
 	<software name="ultima4p" cloneof="ultima4">
-		<description>Ultima IV - Quest of the Avatar (Euro, Prototype)</description>
+		<description>Ultima IV - Quest of the Avatar (Euro, prototype)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -7056,7 +7086,7 @@
 	</software>
 
 	<software name="vampire" cloneof="mastdark">
-		<description>Vampire (Euro, Prototype)</description>
+		<description>Vampire (Euro, prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -7183,7 +7213,7 @@
 
 	<!-- Notes: FM support -->
 	<software name="wboymlndp" cloneof="wboymlnd">
-		<description>Wonder Boy in Monster Land (Prototype)</description>
+		<description>Wonder Boy in Monster Land (prototype)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -7238,7 +7268,7 @@
 	</software>
 
 	<software name="wboymwldp" cloneof="wboymwld">
-		<description>Wonder Boy in Monster World (Euro, Prototype)</description>
+		<description>Wonder Boy in Monster World (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -7390,7 +7420,7 @@
 	</software>
 
 	<software name="wldgamesp" cloneof="wldgames">
-		<description>World Games (Euro, Prototype)</description>
+		<description>World Games (Euro, prototype)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -7434,7 +7464,7 @@
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="worldgpp" cloneof="worldgp">
-		<description>World Grand Prix (USA, Prototype)</description>
+		<description>World Grand Prix (USA, prototype)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -7617,7 +7647,7 @@
 
 	<!-- Notes: 3D glasses support -->
 	<software name="zaxxon3dp" cloneof="zaxxon3d">
-		<description>Zaxxon 3-D (World, Prototype)</description>
+		<description>Zaxxon 3-D (World, prototype)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -7872,7 +7902,7 @@
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="ghosthcp" cloneof="ghosth">
-		<description>Ghost House (Sega Card, Prototype)</description>
+		<description>Ghost House (Sega Card, prototype)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_card">

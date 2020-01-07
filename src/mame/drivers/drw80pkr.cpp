@@ -338,7 +338,7 @@ TILE_GET_INFO_MEMBER(drw80pkr_state::get_bg_tile_info)
 
 void drw80pkr_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(drw80pkr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 24, 27);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(drw80pkr_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 24, 27);
 }
 
 uint32_t drw80pkr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

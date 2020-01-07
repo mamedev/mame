@@ -1,14 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_MACHINE_RAD_EU3A05GPIO_H
-#define MAME_MACHINE_RAD_EU3A05GPIO_H
+#ifndef MAME_MACHINE_ELAN_EU3A05GPIO_H
+#define MAME_MACHINE_ELAN_EU3A05GPIO_H
 
 
-class radica6502_gpio_device : public device_t
+class elan_eu3a05gpio_device : public device_t
 {
 public:
-	radica6502_gpio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	elan_eu3a05gpio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto read_0_callback() { return m_space_read0_cb.bind(); }
 	auto read_1_callback() { return m_space_read1_cb.bind(); }
@@ -38,6 +38,6 @@ private:
 	uint8_t m_unk[3];
 };
 
-DECLARE_DEVICE_TYPE(RADICA6502_GPIO, radica6502_gpio_device)
+DECLARE_DEVICE_TYPE(ELAN_EU3A05_GPIO, elan_eu3a05gpio_device)
 
 #endif // MAME_MACHINE_RAD_EU3A05GPIO_H

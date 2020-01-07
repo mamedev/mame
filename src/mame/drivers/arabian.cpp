@@ -375,7 +375,7 @@ void arabian_state::arabian(machine_config &config)
 	m_mcu->read_r<3>().set(FUNC(arabian_state::mcu_port_r3_r));
 	m_mcu->write_r<3>().set(FUNC(arabian_state::mcu_port_r3_w));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

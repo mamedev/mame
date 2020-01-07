@@ -60,17 +60,7 @@ public:
 	template <std::size_t Port> auto read_p() { return m_read_p[Port].bind(); }
 	template <std::size_t Port> auto write_p() { return m_write_p[Port].bind(); }
 
-	void set_pixel_update_cb(pixel_update_delegate callback) { m_pixel_update_cb = callback; }
-	template <class FunctionClass> void set_pixel_update_cb(const char *devname,
-		void (FunctionClass::*callback)(bitmap_ind16 &, const rectangle &, int, int, int, int), const char *name)
-	{
-		set_pixel_update_cb(pixel_update_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_pixel_update_cb(void (FunctionClass::*callback)(bitmap_ind16 &, const rectangle &, int, int, int, int),
-		const char *name)
-	{
-		set_pixel_update_cb(pixel_update_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_pixel_update_cb(T &&... args) { m_pixel_update_cb.set(std::forward<T>(args)...); }
 
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
@@ -83,7 +73,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual u32 execute_input_lines() const override { return 8; }
+	virtual u32 execute_input_lines() const noexcept override { return 8; }
 	virtual void execute_set_input(int line, int state) override;
 	virtual void execute_one() override;
 	virtual bool check_interrupt() override;

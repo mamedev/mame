@@ -324,7 +324,7 @@ void cloak_state::cloak(machine_config &config)
 	m_slave->set_addrmap(AS_PROGRAM, &cloak_state::slave_map);
 	m_slave->set_periodic_int(FUNC(cloak_state::irq0_line_hold), attotime::from_hz(2*60));
 
-	config.m_minimum_quantum = attotime::from_hz(1000);
+	config.set_maximum_quantum(attotime::from_hz(1000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

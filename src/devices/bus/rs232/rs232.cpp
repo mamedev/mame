@@ -51,7 +51,7 @@ rs232_port_device::rs232_port_device(const machine_config &mconfig, const char *
 
 rs232_port_device::rs232_port_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_rs232_port_interface>(mconfig, *this),
 	m_rxd(0),
 	m_dcd(0),
 	m_dsr(0),
@@ -78,7 +78,7 @@ rs232_port_device::~rs232_port_device()
 
 void rs232_port_device::device_config_complete()
 {
-	m_dev = dynamic_cast<device_rs232_port_interface *>(get_card_device());
+	m_dev = get_card_device();
 }
 
 void rs232_port_device::device_resolve_objects()
@@ -153,7 +153,7 @@ WRITE_LINE_MEMBER( rs232_port_device::write_spds )
 }
 
 device_rs232_port_interface::device_rs232_port_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_interface(device, "rs232")
 {
 	m_port = dynamic_cast<rs232_port_device *>(device.owner());
 }
@@ -168,6 +168,7 @@ device_rs232_port_interface::~device_rs232_port_interface()
 #include "printer.h"
 #include "pty.h"
 #include "sun_kbd.h"
+#include "swtpc8212.h"
 #include "terminal.h"
 #include "ie15.h"
 
@@ -182,4 +183,5 @@ void default_rs232_devices(device_slot_interface &device)
 	device.option_add("pty", PSEUDO_TERMINAL);
 	device.option_add("sunkbd", SUN_KBD_ADAPTOR);
 	device.option_add("ie15", SERIAL_TERMINAL_IE15);
+	device.option_add("swtpc8212", SERIAL_TERMINAL_SWTPC8212);
 }

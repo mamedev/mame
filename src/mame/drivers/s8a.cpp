@@ -85,7 +85,7 @@ private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_IRQ = 0;
 	virtual void machine_start() override { m_digits.resolve(); }
-	required_device<cpu_device> m_maincpu;
+	required_device<m6802_cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<pia6821_device> m_pias;
 	required_device<pia6821_device> m_pia21;
@@ -293,6 +293,7 @@ void s8a_state::s8a(machine_config &config)
 {
 	/* basic machine hardware */
 	M6802(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_ram_enable(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &s8a_state::s8a_main_map);
 	MCFG_MACHINE_RESET_OVERRIDE(s8a_state, s8a)
 

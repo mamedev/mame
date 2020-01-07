@@ -160,6 +160,7 @@ const i386_device::X86_OPCODE i386_device::s_x86_opcode_table[] =
 	{ 0x99,     OP_I386,                    &i386_device::i386_cwd,                    &i386_device::i386_cdq,                false},
 	{ 0x9A,     OP_I386,                    &i386_device::i386_call_abs16,             &i386_device::i386_call_abs32,         false},
 	{ 0x9B,     OP_I386,                    &i386_device::i386_wait,                   &i386_device::i386_wait,               false},
+	{ 0x9B,     OP_I486,                    &i386_device::i486_wait,                   &i386_device::i486_wait,               false},
 	{ 0x9C,     OP_I386,                    &i386_device::i386_pushf,                  &i386_device::i386_pushfd,             false},
 	{ 0x9D,     OP_I386,                    &i386_device::i386_popf,                   &i386_device::i386_popfd,              false},
 	{ 0x9E,     OP_I386,                    &i386_device::i386_sahf,                   &i386_device::i386_sahf,               false},

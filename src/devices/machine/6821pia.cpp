@@ -52,7 +52,7 @@ pia6821_device::pia6821_device(const machine_config &mconfig, const char *tag, d
 		m_cb2_handler(*this),
 		m_irqa_handler(*this),
 		m_irqb_handler(*this), m_in_a(0),
-		m_in_ca1(0), m_in_ca2(0), m_out_a(0), m_out_ca2(0), m_ddr_a(0),
+		m_in_ca1(0), m_in_ca2(0), m_out_a(0), m_a_input_overrides_output_mask(0), m_out_ca2(0), m_ddr_a(0),
 		m_ctl_a(0), m_irq_a1(0), m_irq_a2(0),
 		m_irq_a_state(0), m_in_b(0),
 		m_in_cb1(0), m_in_cb2(0), m_out_b(0), m_out_cb2(0), m_last_out_cb2_z(0), m_ddr_b(0),

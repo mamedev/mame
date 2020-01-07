@@ -395,7 +395,7 @@ void exterm_state::exterm(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch[0]).data_pending_callback().set_inputline(m_audiocpu, M6502_IRQ_LINE);
 	GENERIC_LATCH_8(config, m_soundlatch[1]).data_pending_callback().set_inputline(m_audioslave, M6502_IRQ_LINE);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

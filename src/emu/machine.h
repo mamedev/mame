@@ -206,7 +206,7 @@ public:
 
 	// additional helpers
 	emu_options &options() const { return m_config.options(); }
-	attotime time() const { return m_scheduler.time(); }
+	attotime time() const noexcept { return m_scheduler.time(); }
 	bool scheduled_event_pending() const { return m_exit_pending || m_hard_reset_pending; }
 	bool allow_logging() const { return !m_logerror_list.empty(); }
 

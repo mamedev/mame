@@ -729,7 +729,7 @@ void trs80m2_state::trs80m2(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(trs80m2_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(trs80m2_state::crtc_update_row));
 	m_crtc->out_de_callback().set(FUNC(trs80m2_state::de_w));
 	m_crtc->out_vsync_callback().set(FUNC(trs80m2_state::vsync_w));
 
@@ -821,7 +821,7 @@ void trs80m16_state::trs80m16(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(trs80m2_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(trs80m2_state::crtc_update_row));
 	m_crtc->out_de_callback().set(FUNC(trs80m2_state::de_w));
 	m_crtc->out_vsync_callback().set(FUNC(trs80m2_state::vsync_w));
 

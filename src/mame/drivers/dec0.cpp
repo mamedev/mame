@@ -56,6 +56,30 @@ ToDo:
 - background pen in Birdie Try is presumably wrong.
 - Pixel clock frequency isn't verified
 
+Bad Dudes MCU implements a command to calculate a program ROM checksum and
+compare the low byte of the result to a value supplied by the host CPU, but it
+doesn't work.  Here's the code in question:
+
+0AB0: 51 50    acall   $0A50
+0AB2: C3       clr     c
+0AB3: 48       orl     a,r0
+0AB4: 70 02    jnz     $0AB8
+0AB6: 80 89    sjmp    $0A41
+0AB8: 21 F0    ajmp    $09F0
+
+The function at $0A50 reads the expected value from the host, $0A41 is the
+normal command response, and $09F0 is the error response.  The orl instruction
+doesn't make sense here.  However, changing it from 48 to 60 makes it an xrl
+instruction which would work as expected.  The game doesn't issue this command.
+The checksum function can't be used to verify that the program is good because
+the expected value mod 256 has to be supplied by the host.
+
+Bad Dudes only seems to use commands $0B (sync), $01 (reset if parameter is not
+$3B), $07 (return table index if parameter matches table, otherwise reset), and
+$09 (set table index to zero).  Dragonninja only seems to use commands $03 (on
+startup), $07 (same function as Bad Dudes) and $09 (same function as Bad Dudes).
+Most of the MCU program isn't utilised.
+
 
 Guru-Readme for Data East 16 bit games (Updated 7-Feb-2017)
 
@@ -1860,7 +1884,7 @@ void dec0_automat_state::automat(machine_config &config)
 	m_tilegen[2]->set_gfxdecode_tag("gfxdecode");
 
 	DECO_MXC06(config, m_spritegen, 0);
-	m_spritegen->set_colpri_callback(FUNC(dec0_automat_state::robocop_colpri_cb), this);
+	m_spritegen->set_colpri_callback(FUNC(dec0_automat_state::robocop_colpri_cb));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_automat);
@@ -1986,7 +2010,7 @@ void dec0_state::hbarrel(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_hbarrel));
-	m_spritegen->set_colpri_callback(FUNC(dec0_state::hbarrel_colpri_cb), this);
+	m_spritegen->set_colpri_callback(FUNC(dec0_state::hbarrel_colpri_cb));
 }
 
 void dec0_state::bandit(machine_config &config)
@@ -2012,7 +2036,7 @@ void dec0_state::bandit(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_bandit));
-	m_spritegen->set_colpri_callback(FUNC(dec0_state::bandit_colpri_cb), this);
+	m_spritegen->set_colpri_callback(FUNC(dec0_state::bandit_colpri_cb));
 }
 
 void dec0_state::baddudes(machine_config &config)
@@ -2045,7 +2069,7 @@ void dec0_state::birdtry(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dec0_state::dec0_tb_map);
 
 	// needs a tight sync with the mcu
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	i8751_device &mcu(I8751(config, m_mcu, XTAL(8'000'000)));
 	mcu.port_in_cb<0>().set(FUNC(dec0_state::dec0_mcu_port0_r));
@@ -2076,11 +2100,11 @@ void dec0_state::robocop(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &dec0_state::robocop_sub_map);
 	m_subcpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-	config.m_minimum_quantum = attotime::from_hz(3000);  /* Interleave between HuC6280 & 68000 */
+	config.set_maximum_quantum(attotime::from_hz(3000));  /* Interleave between HuC6280 & 68000 */
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_robocop));
-	m_spritegen->set_colpri_callback(FUNC(dec0_state::robocop_colpri_cb), this);
+	m_spritegen->set_colpri_callback(FUNC(dec0_state::robocop_colpri_cb));
 }
 
 void dec0_state::robocopb(machine_config &config)
@@ -2089,7 +2113,7 @@ void dec0_state::robocopb(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_robocop));
-	m_spritegen->set_colpri_callback(FUNC(dec0_state::robocop_colpri_cb), this);
+	m_spritegen->set_colpri_callback(FUNC(dec0_state::robocop_colpri_cb));
 }
 
 void dec0_state::hippodrm(machine_config &config)
@@ -2102,7 +2126,7 @@ void dec0_state::hippodrm(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &dec0_state::hippodrm_sub_map);
 	m_subcpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-	config.m_minimum_quantum = attotime::from_hz(300);   /* Interleave between H6280 & 68000 */
+	config.set_maximum_quantum(attotime::from_hz(300));   /* Interleave between H6280 & 68000 */
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_hippodrm));
@@ -2118,7 +2142,7 @@ void dec0_state::ffantasybl(machine_config &config)
 //  m_subcpu->set_addrmap(AS_PROGRAM, &dec0_state::hippodrm_sub_map);
 //  m_subcpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-//  config.m_minimum_quantum = attotime::from_hz(300);   /* Interleave between H6280 & 68000 */
+//  config.set_maximum_quantum(attotime::from_hz(300));   /* Interleave between H6280 & 68000 */
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_hippodrm));
@@ -2171,7 +2195,7 @@ void dec0_state::midres(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_midres));
-	m_spritegen->set_colpri_callback(FUNC(dec0_state::midres_colpri_cb), this);
+	m_spritegen->set_colpri_callback(FUNC(dec0_state::midres_colpri_cb));
 
 	m_gfxdecode->set_info(gfx_midres);
 }
@@ -4018,10 +4042,10 @@ ROM_END
 
 void dec0_state::init_midresb()
 {
-//  m_maincpu->space(AS_PROGRAM).install_read_handler(0x00180000, 0x0018000f, read16_delegate(FUNC(dec0_state::dec0_controls_r),this));
-//  m_maincpu->space(AS_PROGRAM).install_read_handler(0x001a0000, 0x001a000f, read16_delegate(FUNC(dec0_state::dec0_rotary_r),this));
+//  m_maincpu->space(AS_PROGRAM).install_read_handler(0x00180000, 0x0018000f, read16_delegate(*this, FUNC(dec0_state::dec0_controls_r)));
+//  m_maincpu->space(AS_PROGRAM).install_read_handler(0x001a0000, 0x001a000f, read16_delegate(*this, FUNC(dec0_state::dec0_rotary_r)));
 
-//  m_maincpu->space(AS_PROGRAM).install_write_handler(0x00180014, 0x00180015, write16_delegate(FUNC(dec0_state::midres_sound_w),this));
+//  m_maincpu->space(AS_PROGRAM).install_write_handler(0x00180014, 0x00180015, write16_delegate(*this, FUNC(dec0_state::midres_sound_w)));
 }
 
 READ16_MEMBER(dec0_state::ffantasybl_242024_r)
@@ -4041,7 +4065,7 @@ void dec0_state::init_ffantasybl()
 {
 	m_maincpu->space(AS_PROGRAM).install_ram(0x24c880, 0x24cbff); // what is this? layer 3-related??
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00242024, 0x00242025, read16_delegate(FUNC(dec0_state::ffantasybl_242024_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00242024, 0x00242025, read16_delegate(*this, FUNC(dec0_state::ffantasybl_242024_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x00ff87ee, 0x00ff87ef, "VBLANK");
 }
 

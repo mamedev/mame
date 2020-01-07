@@ -203,10 +203,6 @@ void menu_select_software::handle()
 				m_filter_highlight = software_filter::LAST;
 			break;
 
-		case IPT_UI_CONFIGURE:
-			inkey_navigation();
-			break;
-
 		case IPT_UI_DATS:
 			inkey_dats();
 			break;

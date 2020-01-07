@@ -5,6 +5,7 @@
 
 from __future__ import with_statement
 
+import io
 import re
 import sys
 
@@ -63,7 +64,7 @@ def extract_version(input):
 build, outfmt, srcfile, dstfile = parse_args()
 
 try:
-    fp = open(srcfile, 'rU')
+    fp = io.open(srcfile, 'r')
 except IOError:
     sys.stderr.write("Unable to open source file '%s'\n" % srcfile)
     sys.exit(1)

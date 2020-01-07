@@ -154,9 +154,9 @@ private:
 	required_device<m6803_cpu_device> m_fddcpu;
 	required_device<rs232_port_device> m_fdd_serial;
 	std::deque<int> m_fdd_debug_rx_bits;
-	size_t m_fdd_debug_rx_bit_count;
-	size_t m_fdd_debug_rx_byte_count;
-	size_t m_fdd_debug_rx_recv_count;
+	uint32_t m_fdd_debug_rx_bit_count;
+	uint32_t m_fdd_debug_rx_byte_count;
+	uint32_t m_fdd_debug_rx_recv_count;
 	uint8_t m_fdd_ctrl;
 	uint8_t m_fdd_port1;
 	uint8_t m_fdd_track;
@@ -1116,8 +1116,8 @@ void dpb7000_state::dpb7000(machine_config &config)
 	m_crtc->set_char_width(8);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_screen("screen");
-	m_crtc->set_update_row_callback(FUNC(dpb7000_state::crtc_update_row), this);
-	m_crtc->set_on_update_addr_change_callback(FUNC(dpb7000_state::crtc_addr_changed), this);
+	m_crtc->set_update_row_callback(FUNC(dpb7000_state::crtc_update_row));
+	m_crtc->set_on_update_addr_change_callback(FUNC(dpb7000_state::crtc_addr_changed));
 
 	// Disc Sequencer Card
 	AM2910(config, m_diskseq, 0); // We drive the clock manually from the driver
@@ -1136,7 +1136,7 @@ void dpb7000_state::dpb7000(machine_config &config)
 	RS232_PORT(config, m_fdd_serial, default_rs232_devices, nullptr);
 	m_fdd_serial->rxd_handler().set(FUNC(dpb7000_state::fddcpu_debug_rx));
 
-	config.m_perfect_cpu_quantum = subtag("fddcpu");
+	config.set_perfect_quantum(m_fddcpu);
 
 	// Filter Card
 	TDC1008(config, m_filter_cd);

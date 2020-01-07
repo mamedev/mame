@@ -1,11 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * pstrutil.h
- */
 
 #ifndef PSTRUTIL_H_
 #define PSTRUTIL_H_
+
+///
+/// \file pstrutil.h
+///
 
 #include "pstring.h"
 #include "ptypes.h"
@@ -67,7 +68,7 @@ namespace plib
 	template<typename T>
 	typename T::size_type find_last_not_of(const T &str, const T &no)
 	{
-		/* FIXME: reverse iterator */
+		// FIXME: use reverse iterator
 		typename T::size_type last_found = T::npos;
 		typename T::size_type pos = 0;
 		for (auto it = str.begin(); it != str.end(); ++it, ++pos)
@@ -225,4 +226,4 @@ namespace plib
 
 } // namespace plib
 
-#endif /* PSTRUTIL_H_ */
+#endif // PSTRUTIL_H_

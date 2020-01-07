@@ -292,7 +292,7 @@ hle_1200baud_device::hle_1200baud_device(
 		char const *tag,
 		device_t *owner,
 		uint32_t clock)
-	: hle_device_base(mconfig, SUN_1200BAUD_HLE_MOUSE, tag, owner, clock, 8U) // FIXME: hack because z80scc isn't working properly
+	: hle_device_base(mconfig, SUN_1200BAUD_HLE_MOUSE, tag, owner, clock, 1U)
 {
 }
 

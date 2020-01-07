@@ -2817,7 +2817,7 @@ void snowbros_state::init_4in1boot()
 			buffer[i] = src[i^0x4000];
 		memcpy(src,&buffer[0],len);
 	}
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::_4in1_02_read),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(*this, FUNC(snowbros_state::_4in1_02_read)));
 }
 
 void snowbros_state::init_snowbro3()
@@ -2844,7 +2844,7 @@ READ16_MEMBER(snowbros_state::_3in1_read)
 
 void snowbros_state::init_3in1semi()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::_3in1_read),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(*this, FUNC(snowbros_state::_3in1_read)));
 }
 
 
@@ -2855,7 +2855,7 @@ READ16_MEMBER(snowbros_state::cookbib3_read)
 
 void snowbros_state::init_cookbib3()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::cookbib3_read),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(*this, FUNC(snowbros_state::cookbib3_read)));
 }
 
 void snowbros_state::init_pzlbreak()
@@ -2893,7 +2893,7 @@ void snowbros_state::init_toto()
 	}
 
 	// protection? (just return 0x07)
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x500006, 0x500007, read16_delegate(FUNC(snowbros_state::toto_read),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x500006, 0x500007, read16_delegate(*this, FUNC(snowbros_state::toto_read)));
 }
 
 void snowbros_state::init_hyperpac()

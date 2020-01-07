@@ -102,6 +102,9 @@ public:
 	void totmejan(machine_config &config);
 	void goodejan(machine_config &config);
 
+protected:
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -143,8 +146,8 @@ private:
 
 	void seibucrtc_sc0bank_w(uint16_t data);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
-	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void common_io_map(address_map &map);
 	void goodejan_io_map(address_map &map);
 	void goodejan_map(address_map &map);
@@ -366,10 +369,10 @@ void goodejan_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 void goodejan_state::video_start()
 {
-	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goodejan_state::seibucrtc_sc0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_sc2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goodejan_state::seibucrtc_sc2_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_sc1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goodejan_state::seibucrtc_sc1_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_sc3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goodejan_state::seibucrtc_sc3_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goodejan_state::seibucrtc_sc0_tile_info)), TILEMAP_SCAN_ROWS, 16,16,32,32);
+	m_sc2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goodejan_state::seibucrtc_sc2_tile_info)), TILEMAP_SCAN_ROWS, 16,16,32,32);
+	m_sc1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goodejan_state::seibucrtc_sc1_tile_info)), TILEMAP_SCAN_ROWS, 16,16,32,32);
+	m_sc3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goodejan_state::seibucrtc_sc3_tile_info)), TILEMAP_SCAN_ROWS, 8,8,32,32);
 
 	m_sc2_tilemap->set_transparent_pen(15);
 	m_sc1_tilemap->set_transparent_pen(15);
@@ -477,13 +480,13 @@ void goodejan_state::totmejan_io_map(address_map &map)
 void goodejan_state::goodejan_io_map(address_map &map)
 {
 	common_io_map(map);
-	map(0x8000, 0x807f).lrw16("crtc_rw",
-							  [this](address_space &space, offs_t offset, u16 mem_mask) {
+	map(0x8000, 0x807f).lrw16(
+							  NAME([this](address_space &space, offs_t offset, u16 mem_mask) {
 								  return m_crtc->read(space, offset ^ 0x20, mem_mask);
-							  },
-							  [this](address_space &space, offs_t offset, u16 data, u16 mem_mask) {
+							  }),
+							  NAME([this](address_space &space, offs_t offset, u16 data, u16 mem_mask) {
 								  m_crtc->write(space, offset ^ 0x20, data, mem_mask);
-							  });
+							  }));
 }
 
 static INPUT_PORTS_START( goodejan )

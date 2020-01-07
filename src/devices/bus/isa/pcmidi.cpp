@@ -100,8 +100,8 @@ void isa8_pcmidi_device::device_reset()
 {
 	offs_t ioaddr = BIT(m_config->read(), 0) ? 0x300 : 0x330;
 	m_isa->install_device(ioaddr, ioaddr + 1,
-		read8sm_delegate(FUNC(isa8_pcmidi_device::host_r), this),
-		write8sm_delegate(FUNC(isa8_pcmidi_device::host_w), this));
+			read8sm_delegate(*this, FUNC(isa8_pcmidi_device::host_r)),
+			write8sm_delegate(*this, FUNC(isa8_pcmidi_device::host_w)));
 
 	set_host_irq(false);
 }

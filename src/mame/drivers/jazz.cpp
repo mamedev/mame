@@ -85,8 +85,8 @@ void jazz_state::jazz_common_map(address_map &map)
 	map(0x1fc00000, 0x1fc3ffff).r(m_flash, FUNC(amd_28f020_device::read));
 
 	// NOTE: defaults to console on serial1 if no video rom found
-	map(0x60000000, 0x6000013f).lr8("video_rom",
-		[](offs_t offset)
+	map(0x60000000, 0x6000013f).lr8(
+		[] (offs_t offset)
 		{
 			/*
 			 * Board_Identifier, PROM_Stride, PROM_Width, PROM_Size
@@ -129,10 +129,10 @@ void jazz_state::jazz_common_map(address_map &map)
 			};
 
 			return bogus_g364[offset];
-		}).umask64(0xff);
+		}, "bogus_g364_r").umask64(0xff);
 
 	map(0x60080000, 0x60081fff).m(m_cvc, FUNC(g364_device::map));
-	map(0x60180000, 0x60180007).lw32("g364_reset", [this](u32 data) { m_cvc->reset(); });
+	map(0x60180000, 0x60180007).lw32([this] (u32 data) { m_cvc->reset(); }, "g364_reset");
 
 	map(0x80000000, 0x80000fff).m(m_mct_adr, FUNC(jazz_mct_adr_device::map));
 
@@ -142,23 +142,24 @@ void jazz_state::jazz_common_map(address_map &map)
 
 	// LE: only reads 4000
 	// BE: read 400d, write 400d, write 400c
-	map(0x80004000, 0x8000400f).lrw8("rtc",
-		[this](offs_t offset) { return m_rtc->read(1); },
-		[this](offs_t offset, u8 data) { m_rtc->write(1, data); }).umask64(0xff);
+	map(0x80004000, 0x8000400f).lrw8(
+			NAME([this] (offs_t offset) { return m_rtc->read(1); }),
+			NAME([this] (offs_t offset, u8 data) { m_rtc->write(1, data); })).umask64(0xff);
 	map(0x80005000, 0x80005007).rw(m_kbdc, FUNC(ps2_keyboard_controller_device::data_r), FUNC(ps2_keyboard_controller_device::data_w)).umask64(0x00ff);
 	map(0x80005000, 0x80005007).rw(m_kbdc, FUNC(ps2_keyboard_controller_device::status_r), FUNC(ps2_keyboard_controller_device::command_w)).umask64(0xff00);
 	map(0x80006000, 0x80006007).rw(m_ace[0], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x80007000, 0x80007007).rw(m_ace[1], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x80008000, 0x80008007).rw(m_lpt, FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write)).umask64(0xffffffff);
 	map(0x80009000, 0x8000afff).ram().share("nvram"); // 9000-9fff unprotected/a000-afff protected?
-	map(0x8000b000, 0x8000b007).lr8("mac",
-		[](offs_t offset)
-		{
-			// mac address and checksum
-			static u8 const mac[] = { 0x00, 0x00, 0x6b, 0x12, 0x34, 0x56, 0x00, 0xf7 };
+	map(0x8000b000, 0x8000b007).lr8(
+			[] (offs_t offset)
+			{
+				// mac address and checksum
+				static u8 const mac[] = { 0x00, 0x00, 0x6b, 0x12, 0x34, 0x56, 0x00, 0xf7 };
 
-			return mac[offset];
-		});
+				return mac[offset];
+			},
+			"mac");
 	// 3 4k pages of nvram: read/write, protected, read-only
 	// last page holds ethernet mac and checksum in bytes 0-7
 
@@ -167,13 +168,12 @@ void jazz_state::jazz_common_map(address_map &map)
 	map(0x8000d600, 0x8000d607).nopw();
 
 	map(0x8000f000, 0x8000f007).lrw8(
-		"led",
-		[this]() { return m_led; },
-		[this](u8 data)
-		{
-			logerror("led 0x%02x (%s)\n", data, machine().describe_context());
-			m_led = data;
-		}).umask64(0xff);
+			NAME([this] () { return m_led; }),
+			NAME([this] (u8 data)
+			{
+				logerror("led 0x%02x (%s)\n", data, machine().describe_context());
+				m_led = data;
+			})).umask64(0xff);
 
 	// lots of byte data written to 800
 	//map(0x800e0000, 0x800fffff).m() // dram config

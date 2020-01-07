@@ -17,6 +17,7 @@
 #include "emu.h"
 #include "includes/kc.h"
 
+#include "machine/input_merger.h"
 #include "softlist.h"
 #include "screen.h"
 #include "speaker.h"
@@ -96,6 +97,47 @@ void kc85_exp(device_slot_interface &device)
 }
 
 
+void kc_state::kc85_slots(machine_config &config)
+{
+	/* devices */
+	QUICKLOAD(config, "quickload", "kcc", attotime::from_seconds(2)).set_load_callback(FUNC(kc_state::quickload_cb));
+
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(kc_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("kc_cass");
+
+	INPUT_MERGER_ANY_HIGH(config, "irq").output_handler().set_inputline(m_maincpu, 0);
+	INPUT_MERGER_ANY_HIGH(config, "nmi").output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	INPUT_MERGER_ANY_HIGH(config, "halt").output_handler().set_inputline(m_maincpu, INPUT_LINE_HALT);
+
+	/* cartridge slot */
+	KCCART_SLOT(config, m_expansions[0], kc85_cart, "m011");
+	m_expansions[0]->set_next_slot(m_expansions[1]);
+	m_expansions[0]->irq().set("irq", FUNC(input_merger_device::in_w<0>));
+	m_expansions[0]->nmi().set("nmi", FUNC(input_merger_device::in_w<0>));
+	m_expansions[0]->halt().set("halt", FUNC(input_merger_device::in_w<0>));
+
+	KCCART_SLOT(config, m_expansions[1], kc85_cart, nullptr);
+	m_expansions[1]->set_next_slot(m_expansions[2]);
+	m_expansions[1]->irq().set("irq", FUNC(input_merger_device::in_w<1>));
+	m_expansions[1]->nmi().set("nmi", FUNC(input_merger_device::in_w<1>));
+	m_expansions[1]->halt().set("halt", FUNC(input_merger_device::in_w<1>));
+
+	/* expansion interface */
+	KCEXP_SLOT(config, m_expansions[2], kc85_exp, nullptr);
+	m_expansions[2]->irq().set("irq", FUNC(input_merger_device::in_w<2>));
+	m_expansions[2]->nmi().set("nmi", FUNC(input_merger_device::in_w<2>));
+	m_expansions[2]->halt().set("halt", FUNC(input_merger_device::in_w<2>));
+
+	/* Software lists */
+	SOFTWARE_LIST(config, "cart_list").set_original("kc_cart");
+	SOFTWARE_LIST(config, "flop_list").set_original("kc_flop");
+	SOFTWARE_LIST(config, "cass_list").set_original("kc_cass");
+}
+
+
 void kc_state::kc85_3(machine_config &config)
 {
 	/* basic machine hardware */
@@ -104,7 +146,7 @@ void kc_state::kc85_3(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &kc_state::kc85_3_io);
 	m_maincpu->set_daisy_config(kc85_daisy_chain);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	Z80PIO(config, m_z80pio, KC85_3_CLOCK);
 	m_z80pio->out_int_callback().set_inputline(m_maincpu, 0);
@@ -137,39 +179,7 @@ void kc_state::kc85_3(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	/* devices */
-	QUICKLOAD(config, "quickload", "kcc", attotime::from_seconds(2)).set_load_callback(FUNC(kc_state::quickload_cb), this);
-
-	CASSETTE(config, m_cassette);
-	m_cassette->set_formats(kc_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_PLAY);
-	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
-	m_cassette->set_interface("kc_cass");
-
-	/* cartridge slot */
-	KCCART_SLOT(config, m_expansions[0], kc85_cart, "m011");
-	m_expansions[0]->set_next_slot("mc");
-	m_expansions[0]->irq().set_inputline(m_maincpu, 0);
-	m_expansions[0]->nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_expansions[0]->halt().set_inputline(m_maincpu, INPUT_LINE_HALT);
-
-	KCCART_SLOT(config, m_expansions[1], kc85_cart, nullptr);
-	m_expansions[1]->set_next_slot("exp");
-	m_expansions[1]->irq().set_inputline(m_maincpu, 0);
-	m_expansions[1]->nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_expansions[1]->halt().set_inputline(m_maincpu, INPUT_LINE_HALT);
-
-	/* expansion interface */
-	KCEXP_SLOT(config, m_expansions[2], kc85_exp, nullptr);
-	m_expansions[2]->set_next_slot(nullptr);
-	m_expansions[2]->irq().set_inputline(m_maincpu, 0);
-	m_expansions[2]->nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_expansions[2]->halt().set_inputline(m_maincpu, INPUT_LINE_HALT);
-
-	/* Software lists */
-	SOFTWARE_LIST(config, "cart_list").set_original("kc_cart");
-	SOFTWARE_LIST(config, "flop_list").set_original("kc_flop");
-	SOFTWARE_LIST(config, "cass_list").set_original("kc_cass");
+	kc85_slots(config);
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("16K");
@@ -182,7 +192,7 @@ void kc85_4_state::kc85_4(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &kc85_4_state::kc85_4_mem);
 	m_maincpu->set_addrmap(AS_IO, &kc85_4_state::kc85_4_io);
 	m_maincpu->set_daisy_config(kc85_daisy_chain);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	Z80PIO(config, m_z80pio, KC85_4_CLOCK);
 	m_z80pio->out_int_callback().set_inputline(m_maincpu, 0);
@@ -215,39 +225,7 @@ void kc85_4_state::kc85_4(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	/* devices */
-	QUICKLOAD(config, "quickload", "kcc", attotime::from_seconds(2)).set_load_callback(FUNC(kc_state::quickload_cb), this);
-
-	CASSETTE(config, m_cassette);
-	m_cassette->set_formats(kc_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_PLAY);
-	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
-	m_cassette->set_interface("kc_cass");
-
-	/* cartridge slot */
-	KCCART_SLOT(config, m_expansions[0], kc85_cart, "m011");
-	m_expansions[0]->set_next_slot("mc");
-	m_expansions[0]->irq().set_inputline(m_maincpu, 0);
-	m_expansions[0]->nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_expansions[0]->halt().set_inputline(m_maincpu, INPUT_LINE_HALT);
-
-	KCCART_SLOT(config, m_expansions[1], kc85_cart, nullptr);
-	m_expansions[1]->set_next_slot("exp");
-	m_expansions[1]->irq().set_inputline(m_maincpu, 0);
-	m_expansions[1]->nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_expansions[1]->halt().set_inputline(m_maincpu, INPUT_LINE_HALT);
-
-	/* expansion interface */
-	KCEXP_SLOT(config, m_expansions[2], kc85_exp, nullptr);
-	m_expansions[2]->set_next_slot(nullptr);
-	m_expansions[2]->irq().set_inputline(m_maincpu, 0);
-	m_expansions[2]->nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_expansions[2]->halt().set_inputline(m_maincpu, INPUT_LINE_HALT);
-
-	/* Software lists */
-	SOFTWARE_LIST(config, "cart_list").set_original("kc_cart");
-	SOFTWARE_LIST(config, "flop_list").set_original("kc_flop");
-	SOFTWARE_LIST(config, "cass_list").set_original("kc_cass");
+	kc85_slots(config);
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("64K");

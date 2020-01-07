@@ -44,8 +44,13 @@ WRITE8_MEMBER(paradise_state::tgtball_flipscreen_w)
 void paradise_state::update_pix_palbank()
 {
 	for (int i = 0; i < 15; i++)
-		m_palette->set_pen_color(0x800 + i, m_paletteram[0x200 + m_pixbank + i + 0x800 * 0], m_paletteram[0x200 + m_pixbank + i + 0x800 * 1],
-								m_paletteram[0x200 + m_pixbank + i + 0x800 * 2]);
+	{
+		m_palette->set_pen_color(
+				0x800 + i,
+				m_paletteram[0x200 + m_pixbank + i + (0x800 * 0)],
+				m_paletteram[0x200 + m_pixbank + i + (0x800 * 1)],
+				m_paletteram[0x200 + m_pixbank + i + (0x800 * 2)]);
+	}
 }
 
 /* 800 bytes for red, followed by 800 bytes for green & 800 bytes for blue */
@@ -152,9 +157,9 @@ WRITE8_MEMBER(paradise_state::pixmap_w)
 
 void paradise_state::video_start()
 {
-	m_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(paradise_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 8, 8, 0x20, 0x20);
-	m_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(paradise_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 8, 8, 0x20, 0x20);
-	m_tilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(paradise_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS, 8, 8, 0x20, 0x20);
+	m_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(paradise_state::get_tile_info_0)), TILEMAP_SCAN_ROWS, 8, 8, 0x20, 0x20);
+	m_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(paradise_state::get_tile_info_1)), TILEMAP_SCAN_ROWS, 8, 8, 0x20, 0x20);
+	m_tilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(paradise_state::get_tile_info_2)), TILEMAP_SCAN_ROWS, 8, 8, 0x20, 0x20);
 
 	/* pixmap */
 	m_screen->register_screen_bitmap(m_tmpbitmap);

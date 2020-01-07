@@ -33,18 +33,21 @@ public:
 	void mikrosha(machine_config &config);
 
 private:
+	void mikrosha_8255_font_page_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(mikrosha_pit_out2);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	virtual void machine_reset() override;
 
 	void mikrosha_io(address_map &map);
 	void mikrosha_mem(address_map &map);
+
+	uint8_t m_mikrosha_font_page;
 };
 
 void mikrosha_state::machine_reset()
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x8000+m_cart->get_rom_size()-1, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x8000 + m_cart->get_rom_size() - 1, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 	radio86_state::machine_reset();
 }
 
@@ -161,6 +164,11 @@ static INPUT_PORTS_START( mikrosha )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 INPUT_PORTS_END
 
+void mikrosha_state::mikrosha_8255_font_page_w(uint8_t data)
+{
+	m_mikrosha_font_page = (data >> 7) & 1;
+}
+
 WRITE_LINE_MEMBER(mikrosha_state::mikrosha_pit_out2)
 {
 }
@@ -216,11 +224,12 @@ void mikrosha_state::mikrosha(machine_config &config)
 	m_ppi8255_1->out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
 
 	I8255(config, m_ppi8255_2);
-	m_ppi8255_2->out_pb_callback().set(FUNC(radio86_state::mikrosha_8255_font_page_w));
+	m_ppi8255_2->out_pb_callback().set(FUNC(mikrosha_state::mikrosha_8255_font_page_w));
+	m_ppi8255_2->tri_pb_callback().set_constant(0);
 
 	i8275_device &i8275(I8275(config, "i8275", XTAL(16'000'000) / 12));
 	i8275.set_character_width(6);
-	i8275.set_display_callback(FUNC(mikrosha_state::display_pixels), this);
+	i8275.set_display_callback(FUNC(mikrosha_state::display_pixels));
 	i8275.drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq2_w));
 
 	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));

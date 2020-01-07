@@ -92,6 +92,7 @@ DEFINE_DEVICE_TYPE(AMD_29LV200T,          amd_29lv200t_device,          "amd_29l
 DEFINE_DEVICE_TYPE(FUJITSU_29F160T,       fujitsu_29f160t_device,       "fujitsu_29f160t",       "Fujitsu 29F160T Flash")
 DEFINE_DEVICE_TYPE(FUJITSU_29F016A,       fujitsu_29f016a_device,       "fujitsu_29f016a",       "Fujitsu 29F016A Flash")
 DEFINE_DEVICE_TYPE(FUJITSU_29DL16X,       fujitsu_29dl16x_device,       "fujitsu_29dl16x",       "Fujitsu 29DL16X Flash")
+DEFINE_DEVICE_TYPE(FUJITSU_29LV002TC,     fujitsu_29lv002tc_device,     "fujitsu_29lv002tc",     "Fujitsu 29LV002TC Flash")
 DEFINE_DEVICE_TYPE(INTEL_E28F400B,        intel_e28f400b_device,        "intel_e28f400b",        "Intel E28F400B Flash")
 DEFINE_DEVICE_TYPE(MACRONIX_29L001MC,     macronix_29l001mc_device,     "macronix_29l001mc",     "Macronix 29L001MC Flash")
 DEFINE_DEVICE_TYPE(MACRONIX_29LV160TMC,   macronix_29lv160tmc_device,   "macronix_29lv160tmc",   "Macronix 29LV160TMC Flash")
@@ -286,6 +287,12 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_maker_id = MFG_FUJITSU;
 		m_device_id = 0x35;
 		break;
+	case FLASH_FUJITSU_29LV002TC:
+		m_bits = 8;
+		m_size = 0x40000;
+		m_maker_id = MFG_FUJITSU;
+		m_device_id = 0x40;
+		break;
 	case FLASH_INTEL_E28F008SA:
 		m_bits = 8;
 		m_size = 0x100000;
@@ -377,6 +384,9 @@ fujitsu_29f016a_device::fujitsu_29f016a_device(const machine_config &mconfig, co
 
 fujitsu_29dl16x_device::fujitsu_29dl16x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, FUJITSU_29DL16X, tag, owner, clock, FLASH_FUJITSU_29DL16X) { }
+
+fujitsu_29lv002tc_device::fujitsu_29lv002tc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh8_device(mconfig, FUJITSU_29LV002TC, tag, owner, clock, FLASH_FUJITSU_29LV002TC) { }
 
 sharp_lh28f016s_device::sharp_lh28f016s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, SHARP_LH28F016S, tag, owner, clock, FLASH_SHARP_LH28F016S) { }
@@ -702,11 +712,19 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			m_flash_mode = FM_WRITEPART1;
 			break;
 		case 0x50:  // clear status reg
-			m_status = 0x80;
-			m_flash_mode = FM_READSTATUS;
+			if ((m_type == FLASH_SST_49LF020) && (m_flash_mode == FM_NORMAL))
+				logerror("Invalid flash mode byte %x\n", data & 0xff);
+			else
+			{
+				m_status = 0x80;
+				m_flash_mode = FM_READSTATUS;
+			}
 			break;
 		case 0x20:  // block erase
-			m_flash_mode = FM_CLEARPART1;
+			if (m_type == FLASH_SST_49LF020)
+				logerror("Unknown flash mode byte %x\n", data & 0xff);
+			else
+				m_flash_mode = FM_CLEARPART1;
 			break;
 		case 0x60:  // set master lock
 			m_flash_mode = FM_SETMASTER;
@@ -875,7 +893,14 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			(( address & 0xfff ) == 0xaaa && ( data & 0xff ) == 0x10 ) )
 		{
 			// chip erase
-			memset(&m_data[0], 0xff, m_size);
+			if (m_maker_id == MFG_FUJITSU && m_device_id == 0x40)
+			{
+				// hardcoded for Dreamcast, TODO properly handle sector protection
+				memset(&m_data[0], 0xff, 0x3A000);
+				memset(&m_data[0x3C000], 0xff, 0x04000);
+			}
+			else
+				memset(&m_data[0], 0xff, m_size);
 
 			m_status = 1 << 3;
 			m_flash_mode = FM_ERASEAMD4;
@@ -931,6 +956,23 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 					m_timer->adjust( attotime::from_msec( 500 ) );
 				}
 			}
+			else if (m_maker_id == MFG_FUJITSU && m_device_id == 0x40)
+			{
+				constexpr u32 sectors[] = { 0x10000, 0x10000, 0x10000, 0x08000, 0x02000, 0x02000, 0x4000 };
+
+				u32 sec_num = 0;
+				u32 toffset = base;
+				while (toffset >= sectors[sec_num])
+					toffset -= sectors[sec_num++];
+				u32 sec_len = sectors[sec_num];
+
+				if (sec_num != 5) // hardcoded for Dreamcast, TODO properly handle sector protection
+				{
+					memset(&m_data[base & ~(sec_len - 1)], 0xff, sec_len);
+				}
+				m_erase_sector = address & ~(sec_len - 1);
+				m_timer->adjust(attotime::from_seconds(1));
+			}
 			else
 			{
 				memset(&m_data[base & ~0xffff], 0xff, 64 * 1024);
@@ -950,9 +992,13 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 		switch( m_bits )
 		{
 		case 8:
+			if (m_maker_id == MFG_FUJITSU && m_device_id == 0x40)
 			{
-				m_data[address] = data;
+				if (address < 0x3a000 || address >= 0x3c000) // hardcoded for Dreamcast, TODO properly handle sector protection
+					m_data[address] &= data;
 			}
+			else
+				m_data[address] = data;
 			break;
 		default:
 			logerror( "FM_BYTEPROGRAM not supported when m_bits == %d\n", m_bits );

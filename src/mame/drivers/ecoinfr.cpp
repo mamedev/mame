@@ -778,10 +778,9 @@ void ecoinfr_state::ecoinfr(machine_config &config)
 	Z80(config, m_maincpu, 4000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ecoinfr_state::memmap);
 	m_maincpu->set_addrmap(AS_IO, &ecoinfr_state::portmap);
-	TIMER(config , "ectimer" , 0).configure_periodic(timer_device::expired_delegate(FUNC(ecoinfr_state::ecoinfr_irq_timer) , this) , attotime::from_hz(250));
+	TIMER(config , "ectimer" , 0).configure_periodic(FUNC(ecoinfr_state::ecoinfr_irq_timer), attotime::from_hz(250));
 
 	config.set_default_layout(layout_ecoinfr);
-
 
 	I8251(config, UPD8251_TAG, 0);
 

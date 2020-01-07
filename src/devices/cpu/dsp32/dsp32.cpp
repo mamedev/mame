@@ -542,7 +542,7 @@ void dsp32c_device::update_pins(void)
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t dsp32c_device::execute_min_cycles() const
+uint32_t dsp32c_device::execute_min_cycles() const noexcept
 {
 	return 4;
 }
@@ -553,7 +553,7 @@ uint32_t dsp32c_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t dsp32c_device::execute_max_cycles() const
+uint32_t dsp32c_device::execute_max_cycles() const noexcept
 {
 	return 4;
 }
@@ -564,7 +564,7 @@ uint32_t dsp32c_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-uint32_t dsp32c_device::execute_input_lines() const
+uint32_t dsp32c_device::execute_input_lines() const noexcept
 {
 	return 2;
 }

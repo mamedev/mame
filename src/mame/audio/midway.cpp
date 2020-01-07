@@ -14,6 +14,7 @@
 #include "audio/williams.h"
 #include "sound/volt_reg.h"
 
+#include <algorithm>
 
 
 //**************************************************************************
@@ -34,22 +35,25 @@ DEFINE_DEVICE_TYPE(MIDWAY_TURBO_CHEAP_SQUEAK, midway_turbo_cheap_squeak_device, 
 //-------------------------------------------------
 
 midway_ssio_device::midway_ssio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MIDWAY_SSIO, tag, owner, clock),
-		device_mixer_interface(mconfig, *this, 2),
-		m_cpu(*this, "cpu"),
-		m_ay0(*this, "ay0"),
-		m_ay1(*this, "ay1"),
-		m_ports(*this, {"IP0", "IP1", "IP2", "IP3", "IP4"}),
-		m_status(0),
-		m_14024_count(0),
-		m_mute(0)
+	: device_t(mconfig, MIDWAY_SSIO, tag, owner, clock)
+	, device_mixer_interface(mconfig, *this, 2)
+	, m_cpu(*this, "cpu")
+	, m_ay0(*this, "ay0")
+	, m_ay1(*this, "ay1")
+	, m_ports(*this, "IP%u", 0U)
+	, m_status(0)
+	, m_14024_count(0)
+	, m_mute(0)
+	, m_custom_input_mask{ 0U, 0U, 0U, 0U, 0U }
+	, m_custom_input(*this)
+	, m_custom_output_mask{ 0U, 0U }
+	, m_custom_output(*this)
 {
-	memset(m_data, 0, sizeof(m_data));
-	memset(m_overall, 0, sizeof(m_overall));
-	memset(m_duty_cycle, 0, sizeof(m_duty_cycle));
-	memset(m_ayvolume_lookup, 0, sizeof(m_ayvolume_lookup));
-	memset(m_custom_input_mask, 0, sizeof(m_custom_input_mask));
-	memset(m_custom_output_mask, 0, sizeof(m_custom_output_mask));
+	std::fill(std::begin(m_data), std::end(m_data), 0);
+	std::fill(std::begin(m_overall), std::end(m_overall), 0);
+	for (auto &duty_cycle : m_duty_cycle)
+		std::fill(std::begin(duty_cycle), std::end(duty_cycle), 0);
+	std::fill(std::begin(m_ayvolume_lookup), std::end(m_ayvolume_lookup), 0);
 }
 
 
@@ -128,30 +132,6 @@ WRITE8_MEMBER(midway_ssio_device::ioport_write)
 	int which = offset >> 2;
 	if (!m_custom_output[which].isnull())
 		m_custom_output[which](space, offset & 4, data & m_custom_output_mask[which], 0xff);
-}
-
-
-//-------------------------------------------------
-//  set_custom_input - configure a custom port
-//  reader
-//-------------------------------------------------
-
-void midway_ssio_device::set_custom_input(int which, uint8_t mask, read8_delegate handler)
-{
-	m_custom_input[which] = handler;
-	m_custom_input_mask[which] = mask;
-}
-
-
-//-------------------------------------------------
-//  set_custom_output - configure a custom port
-//  writer
-//-------------------------------------------------
-
-void midway_ssio_device::set_custom_output(int which, uint8_t mask, write8_delegate handler)
-{
-	m_custom_output[which/4] = handler;
-	m_custom_output_mask[which/4] = mask;
 }
 
 

@@ -465,7 +465,7 @@ void alesis_state::sr16(machine_config &config)
 	config.set_default_layout(layout_sr16);
 
 	m_lcdc->set_lcd_size(2, 8);
-	m_lcdc->set_pixel_update_cb(FUNC(alesis_state::sr16_pixel_update), this);
+	m_lcdc->set_pixel_update_cb(FUNC(alesis_state::sr16_pixel_update));
 }
 
 void alesis_state::mmt8(machine_config &config)

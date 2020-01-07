@@ -596,7 +596,7 @@ void excali64_state::excali64(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(excali64_state::update_row), this);
+	m_crtc->set_update_row_callback(FUNC(excali64_state::update_row));
 	m_crtc->out_hsync_callback().set(FUNC(excali64_state::crtc_hs));
 	m_crtc->out_vsync_callback().set(FUNC(excali64_state::crtc_vs));
 

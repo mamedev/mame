@@ -39,8 +39,12 @@ public:
 	uint32_t applicable_passes();
 	bool transform() const { return m_transform; }
 	bool has_converter() const { return m_has_converter; }
+	bool has_adjuster() const { return m_has_adjuster; }
 
-	void prepend_converter(bgfx_effect *effect, chain_manager &chains);
+	// Setters
+	void set_has_converter(bool has_converter) { m_has_converter = has_converter; }
+	void set_has_adjuster(bool has_adjuster) { m_has_adjuster = has_adjuster; }
+	void insert_effect(uint32_t index, bgfx_effect *effect, std::string name, std::string source, chain_manager &chains);
 
 private:
 	std::string                         m_name;
@@ -56,6 +60,7 @@ private:
 	int64_t                             m_current_time;
 	uint32_t                            m_screen_index;
 	bool                                m_has_converter;
+	bool                                m_has_adjuster;
 };
 
 #endif // __DRAWBGFX_CHAIN__

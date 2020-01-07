@@ -524,7 +524,7 @@ void imolagp_state::imolagp(machine_config &config)
 	m_slavecpu->set_addrmap(AS_PROGRAM, &imolagp_state::imolagp_slave_map);
 	m_slavecpu->set_addrmap(AS_IO, &imolagp_state::imolagp_slave_io);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	i8255_device &ppi(I8255A(config, "ppi8255", 0));
 	// mode $91 - ports A & C-lower as input, ports B & C-upper as output

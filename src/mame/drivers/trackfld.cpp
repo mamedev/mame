@@ -1032,7 +1032,6 @@ void trackfld_state::yieartf(machine_config &config)
 
 void trackfld_state::hyprolyb_adpcm_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();
 	map(0x1000, 0x1000).r("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::data_r));
 	map(0x1001, 0x1001).r("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::ready_r));
 	map(0x1002, 0x1002).w("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::msm_data_w));
@@ -1658,7 +1657,7 @@ void trackfld_state::init_atlantol()
 
 	downcast<konami1_device &>(*m_maincpu).set_encryption_boundary(0x6000);
 
-	space.install_write_handler(0x0800, 0x0800, write8_delegate(FUNC(trackfld_state::atlantol_gfxbank_w),this));
+	space.install_write_handler(0x0800, 0x0800, write8_delegate(*this, FUNC(trackfld_state::atlantol_gfxbank_w)));
 	space.nop_write(0x1000, 0x1000);
 
 	/* unmapped areas read as ROM */

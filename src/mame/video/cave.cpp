@@ -1116,10 +1116,10 @@ inline void cave_state::tilemap_draw(int chip,
 	/* An additional 8 pixel offset for layers with 8x8 tiles. Plus
 	   Layer 0 is displaced by 1 pixel wrt Layer 1, so is Layer 2 wrt
 	   Layer 1 */
-	if      (TILEMAP == m_tilemap[0])    offs_x -= (TILEMAP->tiledim() ? 1 : (1 + 8));
-	else if (TILEMAP == m_tilemap[1])    offs_x -= (TILEMAP->tiledim() ? 2 : (2 + 8));
-	else if (TILEMAP == m_tilemap[2])    offs_x -= (TILEMAP->tiledim() ? 3 : (3 + 8));
-	else if (TILEMAP == m_tilemap[3])    offs_x -= (TILEMAP->tiledim() ? 4 : (4 + 8));
+	if      (TILEMAP == m_tilemap[0])    offs_x -= (TILEMAP->tile_is_16x16() ? 1 : (1 + 8));
+	else if (TILEMAP == m_tilemap[1])    offs_x -= (TILEMAP->tile_is_16x16() ? 2 : (2 + 8));
+	else if (TILEMAP == m_tilemap[2])    offs_x -= (TILEMAP->tile_is_16x16() ? 3 : (3 + 8));
+	else if (TILEMAP == m_tilemap[3])    offs_x -= (TILEMAP->tile_is_16x16() ? 4 : (4 + 8));
 
 	const int sx = TILEMAP->scrollx() - m_videoregs[chip][0] + (flipx ? (offs_x + 2) : -offs_x);
 	const int sy = TILEMAP->scrolly() - m_videoregs[chip][1] + (flipy ? (offs_y + 2) : -offs_y);

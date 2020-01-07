@@ -64,9 +64,6 @@ public:
 	// machine drivers
 	void savant(machine_config &config);
 
-	// user-controlled light switch (9 light bulbs behind LCD panel)
-	DECLARE_INPUT_CHANGED_MEMBER(light_switch) { output().set_value("backlight", newval); }
-
 protected:
 	virtual void machine_start() override;
 
@@ -343,8 +340,8 @@ static INPUT_PORTS_START( savant )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Promote")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("Set Up")
 
-	PORT_START("LIGHT")
-	PORT_CONFNAME( 0x01, 0x01, "LCD Light" ) PORT_CHANGED_MEMBER(DEVICE_SELF, savant_state, light_switch, 0)
+	PORT_START("LIGHT") // user-controlled light switch (9 light bulbs behind LCD panel)
+	PORT_CONFNAME( 0x01, 0x01, "LCD Light" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -373,7 +370,7 @@ void savant_state::savant(machine_config &config)
 	m_psu->write_a().set(FUNC(savant_state::lcd_w));
 	m_psu->read_b().set(FUNC(savant_state::input_r));
 
-	config.m_perfect_cpu_quantum = subtag("mcu");
+	config.set_perfect_quantum(m_mcu);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->set_ui_enable(false); // no chesspieces

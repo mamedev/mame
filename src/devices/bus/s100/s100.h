@@ -75,7 +75,7 @@ class s100_bus_device;
 
 // ======================> device_s100_card_interface
 
-class device_s100_card_interface : public device_slot_card_interface
+class device_s100_card_interface : public device_interface
 {
 	friend class s100_bus_device;
 	template <class ElementType> friend class simple_list;
@@ -121,6 +121,8 @@ public:
 protected:
 	// construction/destruction
 	device_s100_card_interface(const machine_config &mconfig, device_t &device);
+
+	virtual void interface_pre_start() override;
 
 	s100_bus_device  *m_bus;
 
@@ -213,7 +215,7 @@ private:
 
 // ======================> s100_slot_device
 
-class s100_slot_device : public device_t, public device_slot_interface
+class s100_slot_device : public device_t, public device_single_card_slot_interface<device_s100_card_interface>
 {
 public:
 	// construction/destruction
@@ -227,6 +229,8 @@ public:
 		set_fixed(false);
 	}
 	s100_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename T> void set_bus(T &&tag) { m_bus.set_tag(std::forward<T>(tag)); }
 
 protected:
 	// device-level overrides

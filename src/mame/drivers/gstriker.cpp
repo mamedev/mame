@@ -853,8 +853,8 @@ the zooming.To use it,you should use Player 2 Start button to show the test scre
 or to advance into the tests.
 ******************************************************************************************/
 #define PC(_num_)\
-m_work_ram[0x000/2] = (_num_ & 0xffff0000) >> 16;\
-m_work_ram[0x002/2] = (_num_ & 0x0000ffff) >> 0;
+		m_work_ram[0x000/2] = (_num_ & 0xffff0000) >> 16;\
+		m_work_ram[0x002/2] = (_num_ & 0x0000ffff) >> 0;
 
 
 WRITE8_MEMBER(gstriker_state::twcup94_prot_reg_w)
@@ -1103,8 +1103,8 @@ void gstriker_state::init_vgoalsoc()
 	m_gametype = VGOAL_SOCCER_MCU;
 	mcu_init();
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x200090, 0x200091, write16_delegate(FUNC(gstriker_state::vbl_toggle_w),this)); // vblank toggle
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200090, 0x200091, read16_delegate(FUNC(gstriker_state::vbl_toggle_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x200090, 0x200091, write16_delegate(*this, FUNC(gstriker_state::vbl_toggle_w))); // vblank toggle
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200090, 0x200091, read16_delegate(*this, FUNC(gstriker_state::vbl_toggle_r)));
 }
 
 /*** GAME DRIVERS ************************************************************/

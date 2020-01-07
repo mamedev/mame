@@ -38,8 +38,8 @@ TILE_GET_INFO_MEMBER(iqblock_state::get_fg_tile_info)
 
 void iqblock_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(iqblock_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,     8, 8,64,32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(iqblock_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,32,64, 8);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(iqblock_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(iqblock_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,32,64, 8);
 
 	m_bg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_scroll_cols(64);

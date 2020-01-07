@@ -103,7 +103,7 @@ TILE_GET_INFO_MEMBER(pandoras_state::get_tile_info0)
 
 void pandoras_state::video_start()
 {
-	m_layer0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pandoras_state::get_tile_info0),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_layer0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pandoras_state::get_tile_info0)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	save_item(NAME(m_flipscreen));
 }

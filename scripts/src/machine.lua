@@ -82,7 +82,6 @@ if (MACHINES["ACORN_VIDC"]~=null) then
 	}
 end
 
-
 ---------------------------------------------------
 --
 --@src/devices/machine/akiko.h,MACHINES["AKIKO"] = true
@@ -95,6 +94,17 @@ if (MACHINES["AKIKO"]~=null) then
 	}
 end
 
+--------------------------------------------------
+--
+--@src/devices/machine/arm_iomd.h,MACHINES["ARM_IOMD"] = true
+--------------------------------------------------
+
+if (MACHINES["ARM_IOMD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/arm_iomd.cpp",
+		MAME_DIR .. "src/devices/machine/arm_iomd.h",
+	}
+end
 
 ---------------------------------------------------
 --
@@ -2808,6 +2818,18 @@ if (MACHINES["STVCD"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/stvcd.cpp",
 		MAME_DIR .. "src/devices/machine/stvcd.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/swtpc8212.h,MACHINES["SWTPC8212"] = true
+---------------------------------------------------
+
+if (MACHINES["SWTPC8212"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/swtpc8212.cpp",
+		MAME_DIR .. "src/devices/machine/swtpc8212.h",
 	}
 end
 

@@ -507,10 +507,10 @@ READ8_MEMBER( popper_state::watchdog_clear_r )
 void popper_state::machine_start()
 {
 	// create tilemaps
-	m_layer0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(popper_state::layer0_tile_info), this), TILEMAP_SCAN_COLS, 8, 8, 48, 32);
+	m_layer0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(popper_state::layer0_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 48, 32);
 	m_layer0_tilemap->set_transparent_pen(1);
 
-	m_layer1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(popper_state::layer1_tile_info), this), TILEMAP_SCAN_COLS, 8, 8, 48, 32);
+	m_layer1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(popper_state::layer1_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 48, 32);
 	m_layer1_tilemap->set_transparent_pen(0);
 
 	// allocate and start scanline timer
@@ -543,7 +543,7 @@ void popper_state::popper(machine_config &config)
 	Z80(config, m_subcpu, XTAL(18'432'000)/3/2);
 	m_subcpu->set_addrmap(AS_PROGRAM, &popper_state::sub_map);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

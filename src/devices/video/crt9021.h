@@ -53,7 +53,7 @@ public:
 	// construction/destruction
 	crt9021_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename... T> void set_display_callback(T &&... args) { m_display_cb = draw_character_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_display_callback(T &&... args) { m_display_cb.set(std::forward<T>(args)...); }
 
 	void write(uint8_t data) { m_data = data; }
 	DECLARE_WRITE8_MEMBER( write ) { write(data); }

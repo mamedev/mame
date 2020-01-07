@@ -648,7 +648,7 @@ void microvision_state::microvision(machine_config &config)
 	m_tms1100->o().set(FUNC(microvision_state::tms1100_write_o));
 	m_tms1100->r().set(FUNC(microvision_state::tms1100_write_r));
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
@@ -670,7 +670,7 @@ void microvision_state::microvision(machine_config &config)
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "microvision_cart"));
 	cartslot.set_must_be_loaded(true);
-	cartslot.set_device_load(FUNC(microvision_state::cart_load), this);
+	cartslot.set_device_load(FUNC(microvision_state::cart_load));
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("microvision");

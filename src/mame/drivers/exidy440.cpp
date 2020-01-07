@@ -304,7 +304,7 @@ void exidy440_state::exidy440_bank_select(uint8_t bank)
 	if (m_showdown_bank_data[0] != nullptr)
 	{
 		if (bank == 0 && m_bank != 0)
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x7fff, read8_delegate(FUNC(exidy440_state::showdown_bank0_r),this));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x7fff, read8_delegate(*this, FUNC(exidy440_state::showdown_bank0_r)));
 		else if (bank != 0 && m_bank == 0)
 			m_maincpu->space(AS_PROGRAM).install_read_bank(0x4000, 0x7fff, "bank1");
 	}
@@ -365,7 +365,7 @@ TIMER_CALLBACK_MEMBER(exidy440_state::delayed_sound_command_w)
 
 WRITE8_MEMBER(exidy440_state::sound_command_w)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(exidy440_state::delayed_sound_command_w),this), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(exidy440_state::delayed_sound_command_w), this), data);
 }
 
 
@@ -2074,7 +2074,7 @@ void exidy440_state::init_exidy440()
 void exidy440_state::init_claypign()
 {
 	init_exidy440();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2ec0, 0x2ec3, read8_delegate(FUNC(exidy440_state::claypign_protection_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2ec0, 0x2ec3, read8_delegate(*this, FUNC(exidy440_state::claypign_protection_r)));
 }
 
 
@@ -2083,11 +2083,11 @@ void topsecex_state::init_topsecex()
 	init_exidy440();
 
 	/* extra input ports and scrolling */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2ec5, 0x2ec5, read8_delegate(FUNC(topsecex_state::topsecex_input_port_5_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2ec5, 0x2ec5, read8_delegate(*this, FUNC(topsecex_state::topsecex_input_port_5_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x2ec6, 0x2ec6, "AN0");
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x2ec7, 0x2ec7, "IN4");
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2ec1, 0x2ec1, write8_delegate(FUNC(topsecex_state::topsecex_yscroll_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2ec1, 0x2ec1, write8_delegate(*this, FUNC(topsecex_state::topsecex_yscroll_w)));
 }
 
 

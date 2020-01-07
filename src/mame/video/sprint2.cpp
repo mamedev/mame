@@ -45,7 +45,7 @@ void sprint2_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_helper);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sprint2_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sprint2_state::get_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 }
 
 

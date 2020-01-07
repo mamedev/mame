@@ -908,7 +908,7 @@ void exidy_state::venture(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::venture_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* audio hardware */
 	pia6821_device &pia(PIA6821(config, "pia", 0));
@@ -943,7 +943,7 @@ void exidy_state::mtrap(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::mtrap_map);
 
-	config.m_minimum_quantum = attotime::from_hz(1920);
+	config.set_maximum_quantum(attotime::from_hz(1920));
 
 	/* audio hardware */
 	pia6821_device &pia(PIA6821(config, "pia", 0));

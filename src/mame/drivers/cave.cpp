@@ -18,7 +18,7 @@ Other        :  93C46 EEPROM
 
 
 -----------------------------------------------------------------------------------------
-Year + Game           License       PCB         Tilemaps        Sprites         Other
+Year + Game               License       PCB         Tilemaps        Sprites         Other
 -----------------------------------------------------------------------------------------
 94 Mazinger Z             Banpresto     BP943A      038 9335EX706   013 9341E7009   Z80
 94 Power Instinct 2       Atlus         ATG02?      038 9429WX709   013 9341E7009   Z80 NMK 112
@@ -464,7 +464,7 @@ void cave_state::ddonpach_map(address_map &map)
 	map(0x400000, 0x40ffff).ram().share("spriteram.0");                                                           // Sprites
 	map(0x500000, 0x507fff).m(m_tilemap[0], FUNC(tilemap038_device::vram_map));                                   // Layer 0
 	map(0x600000, 0x607fff).m(m_tilemap[1], FUNC(tilemap038_device::vram_map));                                   // Layer 1
-	map(0x700000, 0x70ffff).m(m_tilemap[2], FUNC(tilemap038_device::vram_8x8_map));                               // Layer 2
+	map(0x700000, 0x703fff).mirror(0x00c000).m(m_tilemap[2], FUNC(tilemap038_device::vram_8x8_map));              // Layer 2
 	map(0x800000, 0x80007f).writeonly().share("videoregs.0");                                                     // Video Regs
 	map(0x800000, 0x800007).r(FUNC(cave_state::irq_cause_r));                                                     // IRQ Cause
 	map(0x900000, 0x900005).rw(m_tilemap[0], FUNC(tilemap038_device::vregs_r), FUNC(tilemap038_device::vregs_w)); // Layer 0 Control
@@ -500,7 +500,7 @@ void cave_state::donpachi_map(address_map &map)
 	map(0x100000, 0x10ffff).ram();                                                                                 // RAM
 	map(0x200000, 0x207fff).m(m_tilemap[1], FUNC(tilemap038_device::vram_map));                                    // Layer 1
 	map(0x300000, 0x307fff).m(m_tilemap[0], FUNC(tilemap038_device::vram_map));                                    // Layer 0
-	map(0x400000, 0x407fff).m(m_tilemap[2], FUNC(tilemap038_device::vram_8x8_map));                                // Layer 2
+	map(0x400000, 0x403fff).mirror(0x004000).m(m_tilemap[2], FUNC(tilemap038_device::vram_8x8_map));               // Layer 2
 	map(0x500000, 0x50ffff).ram().share("spriteram.0");                                                            // Sprites
 	map(0x600000, 0x600005).rw(m_tilemap[1], FUNC(tilemap038_device::vregs_r), FUNC(tilemap038_device::vregs_w));  // Layer 1 Control
 	map(0x700000, 0x700005).rw(m_tilemap[0], FUNC(tilemap038_device::vregs_r), FUNC(tilemap038_device::vregs_w));  // Layer 0 Control
@@ -740,8 +740,8 @@ void cave_state::mazinger_map(address_map &map)
 	map(0x300000, 0x300007).r(FUNC(cave_state::irq_cause_r));                                                     // IRQ Cause
 	map(0x300068, 0x300069).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                                // Watchdog
 	map(0x30006e, 0x30006f).rw(FUNC(cave_state::soundlatch_ack_r), FUNC(cave_state::sound_cmd_w));                // From Sound CPU
-	map(0x400000, 0x407fff).m(m_tilemap[1], FUNC(tilemap038_device::vram_8x8_map));                               // Layer 1
-	map(0x500000, 0x507fff).m(m_tilemap[0], FUNC(tilemap038_device::vram_8x8_map));                               // Layer 0
+	map(0x400000, 0x403fff).mirror(0x004000).m(m_tilemap[1], FUNC(tilemap038_device::vram_8x8_map));              // Layer 1
+	map(0x500000, 0x503fff).mirror(0x004000).m(m_tilemap[0], FUNC(tilemap038_device::vram_8x8_map));              // Layer 0
 	map(0x600000, 0x600005).rw(m_tilemap[1], FUNC(tilemap038_device::vregs_r), FUNC(tilemap038_device::vregs_w)); // Layer 1 Control
 	map(0x700000, 0x700005).rw(m_tilemap[0], FUNC(tilemap038_device::vregs_r), FUNC(tilemap038_device::vregs_w)); // Layer 0 Control
 	map(0x800000, 0x800001).portr("IN0");                                                                         // Inputs
@@ -937,7 +937,7 @@ void cave_state::pwrinst2_map(address_map &map)
 	map(0x800000, 0x807fff).m(m_tilemap[2], FUNC(tilemap038_device::vram_map));                                         // Layer 2
 	map(0x880000, 0x887fff).m(m_tilemap[0], FUNC(tilemap038_device::vram_map));                                         // Layer 0
 	map(0x900000, 0x907fff).m(m_tilemap[1], FUNC(tilemap038_device::vram_map));                                         // Layer 1
-	map(0x980000, 0x987fff).m(m_tilemap[3], FUNC(tilemap038_device::vram_8x8_map));                                     // Layer 3
+	map(0x980000, 0x983fff).mirror(0x004000).m(m_tilemap[3], FUNC(tilemap038_device::vram_8x8_map));                    // Layer 3
 	map(0xa00000, 0xa0ffff).ram().share("spriteram.0");                                                                 // Sprites
 	map(0xa10000, 0xa1ffff).ram();                                                                                      // Sprites?
 	map(0xa80000, 0xa8007f).ram().r(FUNC(cave_state::donpachi_videoregs_r)).share("videoregs.0");                       // Video Regs
@@ -1961,6 +1961,7 @@ void cave_state::add_base_config(machine_config &config, int layer)
 
 void cave_state::add_ymz(machine_config &config)
 {
+	// TODO: all PCB versions using mono, on a YMZ chip as well? Sounds very unlikely, verify on all flavours.
 	SPEAKER(config, "mono").front_center();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", 16.9344_MHz_XTAL));
@@ -2491,7 +2492,7 @@ void cave_state::sailormn(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cave_state::sailormn_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &cave_state::sailormn_sound_portmap);
 
-//  config.m_minimum_quantum = attotime::from_hz(600);
+//  config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,sailormn)
 	EEPROM_93C46_16BIT(config, m_eeprom);
@@ -2501,7 +2502,7 @@ void cave_state::sailormn(machine_config &config)
 	m_screen[0]->set_visarea(0+1, 320+1-1, 0, 240-1);
 
 	/* Layer 2 (8x8) needs to be handled differently */
-	m_tilemap[2]->set_tile_callback(tilemap038_device::tmap038_cb_delegate(FUNC(cave_state::sailormn_get_banked_code), this)); /* Layer 2 has 1 banked ROM */
+	m_tilemap[2]->set_tile_callback(FUNC(cave_state::sailormn_get_banked_code)); /* Layer 2 has 1 banked ROM */
 
 	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_sailormn); // 4 bit sprites, 6 bit tiles
 	m_palette[0]->set_entries(0x4000/2);

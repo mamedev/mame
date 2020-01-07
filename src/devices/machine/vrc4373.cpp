@@ -235,8 +235,8 @@ void vrc4373_device::map_cpu_space()
 		winStart = m_cpu_regs[NREG_PCIMW1]&0xff000000;
 		winEnd = winStart | (~(0x80000000 | (((m_cpu_regs[NREG_PCIMW1]>>13)&0x7f)<<24)));
 		winSize = winEnd - winStart + 1;
-		m_cpu_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(vrc4373_device::master1_r), this));
-		m_cpu_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(vrc4373_device::master1_w), this));
+		m_cpu_space->install_read_handler(winStart, winEnd, read32_delegate(*this, FUNC(vrc4373_device::master1_r)));
+		m_cpu_space->install_write_handler(winStart, winEnd, write32_delegate(*this, FUNC(vrc4373_device::master1_w)));
 		LOGNILE("map_cpu_space Master Window 1 start=%08X end=%08X size=%08X laddr=%08X\n", winStart, winEnd, winSize,  m_pci1_laddr);
 	}
 	// PCI Master Window 2
@@ -244,8 +244,8 @@ void vrc4373_device::map_cpu_space()
 		winStart = m_cpu_regs[NREG_PCIMW2]&0xff000000;
 		winEnd = winStart | (~(0x80000000 | (((m_cpu_regs[NREG_PCIMW2]>>13)&0x7f)<<24)));
 		winSize = winEnd - winStart + 1;
-		m_cpu_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(vrc4373_device::master2_r), this));
-		m_cpu_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(vrc4373_device::master2_w), this));
+		m_cpu_space->install_read_handler(winStart, winEnd, read32_delegate(*this, FUNC(vrc4373_device::master2_r)));
+		m_cpu_space->install_write_handler(winStart, winEnd, write32_delegate(*this, FUNC(vrc4373_device::master2_w)));
 		LOGNILE("map_cpu_space Master Window 2 start=%08X end=%08X size=%08X laddr=%08X\n", winStart, winEnd, winSize,  m_pci2_laddr);
 	}
 	// PCI IO Window
@@ -253,8 +253,8 @@ void vrc4373_device::map_cpu_space()
 		winStart = m_cpu_regs[NREG_PCIMIOW]&0xff000000;
 		winEnd = winStart | (~(0x80000000 | (((m_cpu_regs[NREG_PCIMIOW]>>13)&0x7f)<<24)));
 		winSize = winEnd - winStart + 1;
-		m_cpu_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(vrc4373_device::master_io_r), this));
-		m_cpu_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(vrc4373_device::master_io_w), this));
+		m_cpu_space->install_read_handler(winStart, winEnd, read32_delegate(*this, FUNC(vrc4373_device::master_io_r)));
+		m_cpu_space->install_write_handler(winStart, winEnd, write32_delegate(*this, FUNC(vrc4373_device::master_io_w)));
 		LOGNILE("map_cpu_space IO Window start=%08X end=%08X size=%08X laddr=%08X\n", tag(), winStart, winEnd, winSize,  m_pci_io_laddr);
 	}
 }
@@ -269,8 +269,8 @@ void vrc4373_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 		winStart = m_cpu_regs[NREG_PCITW1]&0xffe00000;
 		winEnd = winStart | (~(0xf0000000 | (((m_cpu_regs[NREG_PCITW1]>>13)&0x7f)<<21)));
 		winSize = winEnd - winStart + 1;
-		memory_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(vrc4373_device::target1_r), this));
-		memory_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(vrc4373_device::target1_w), this));
+		memory_space->install_read_handler(winStart, winEnd, read32_delegate(*this, FUNC(vrc4373_device::target1_r)));
+		memory_space->install_write_handler(winStart, winEnd, write32_delegate(*this, FUNC(vrc4373_device::target1_w)));
 		LOGNILE("map_extra Target Window 1 start=%08X end=%08X size=%08X laddr=%08X\n", winStart, winEnd, winSize,  m_target1_laddr);
 	}
 	// PCI Target Window 2
@@ -278,8 +278,8 @@ void vrc4373_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 		winStart = m_cpu_regs[NREG_PCITW2]&0xffe00000;
 		winEnd = winStart | (~(0xf0000000 | (((m_cpu_regs[NREG_PCITW2]>>13)&0x7f)<<21)));
 		winSize = winEnd - winStart + 1;
-		memory_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(vrc4373_device::target2_r), this));
-		memory_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(vrc4373_device::target2_w), this));
+		memory_space->install_read_handler(winStart, winEnd, read32_delegate(*this, FUNC(vrc4373_device::target2_r)));
+		memory_space->install_write_handler(winStart, winEnd, write32_delegate(*this, FUNC(vrc4373_device::target2_w)));
 		LOGNILE("map_extra Target Window 2 start=%08X end=%08X size=%08X laddr=%08X\n", winStart, winEnd, winSize,  m_target2_laddr);
 	}
 }

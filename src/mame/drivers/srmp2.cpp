@@ -1188,7 +1188,7 @@ void srmp2_state::srmp3(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 0);
 	m_seta001->set_gfxdecode_tag("gfxdecode");
-	m_seta001->set_gfxbank_callback(FUNC(srmp2_state::srmp3_gfxbank_callback), this);
+	m_seta001->set_gfxbank_callback(FUNC(srmp2_state::srmp3_gfxbank_callback));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1240,7 +1240,7 @@ void srmp2_state::mjyuugi(machine_config &config)
 
 	SETA001_SPRITE(config, m_seta001, 0);
 	m_seta001->set_gfxdecode_tag("gfxdecode");
-	m_seta001->set_gfxbank_callback(FUNC(srmp2_state::srmp3_gfxbank_callback), this);
+	m_seta001->set_gfxbank_callback(FUNC(srmp2_state::srmp3_gfxbank_callback));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

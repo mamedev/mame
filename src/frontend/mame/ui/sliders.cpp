@@ -156,13 +156,19 @@ void menu_sliders::populate(float &customtop, float &custombottom)
 		if (item.type == menu_item_type::SLIDER)
 		{
 			slider_state* slider = reinterpret_cast<slider_state *>(item.ref);
-			int32_t curval = slider->update(machine(), slider->arg, slider->id, &tempstring, SLIDER_NOCHANGE);
-			uint32_t flags = 0;
-			if (curval > slider->minval)
-				flags |= FLAG_LEFT_ARROW;
-			if (curval < slider->maxval)
-				flags |= FLAG_RIGHT_ARROW;
-			item_append(slider->description, tempstring, flags, (void *)slider, menu_item_type::SLIDER);
+			bool display(true);
+			if (slider->id >= SLIDER_ID_ADJUSTER && slider->id <= SLIDER_ID_ADJUSTER_LAST)
+				display = reinterpret_cast<ioport_field *>(slider->arg)->enabled();
+			if (display)
+			{
+				int32_t curval = slider->update(machine(), slider->arg, slider->id, &tempstring, SLIDER_NOCHANGE);
+				uint32_t flags = 0;
+				if (curval > slider->minval)
+					flags |= FLAG_LEFT_ARROW;
+				if (curval < slider->maxval)
+					flags |= FLAG_RIGHT_ARROW;
+				item_append(slider->description, tempstring, flags, (void *)slider, menu_item_type::SLIDER);
+			}
 		}
 		else
 		{
@@ -224,23 +230,24 @@ void menu_sliders::custom_render(void *selectedref, float top, float bottom, flo
 		tempstring.insert(0, " ").insert(0, curslider->description);
 
 		// move us to the bottom of the screen, and expand to full width
+		const float lr_border = ui().box_lr_border() * machine().render().ui_aspect(&container());
 		y2 = 1.0f - ui().box_tb_border();
 		y1 = y2 - bottom;
-		x1 = ui().box_lr_border();
-		x2 = 1.0f - ui().box_lr_border();
+		x1 = lr_border;
+		x2 = 1.0f - lr_border;
 
 		// draw extra menu area
 		ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
 		y1 += ui().box_tb_border();
 
 		// determine the text height
-		ui().draw_text_full(container(), tempstring.c_str(), 0, 0, x2 - x1 - 2.0f * ui().box_lr_border(),
+		ui().draw_text_full(container(), tempstring.c_str(), 0, 0, x2 - x1 - 2.0f * lr_border,
 					ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), nullptr, &text_height);
 
 		// draw the thermometer
-		bar_left = x1 + ui().box_lr_border();
+		bar_left = x1 + lr_border;
 		bar_area_top = y1;
-		bar_width = x2 - x1 - 2.0f * ui().box_lr_border();
+		bar_width = x2 - x1 - 2.0f * lr_border;
 		bar_area_height = line_height;
 
 		// compute positions
@@ -261,7 +268,7 @@ void menu_sliders::custom_render(void *selectedref, float top, float bottom, flo
 		container().add_line(default_x, bar_bottom, default_x, bar_area_top + bar_area_height, UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 		// draw the actual text
-		ui().draw_text_full(container(), tempstring.c_str(), x1 + ui().box_lr_border(), y1 + line_height, x2 - x1 - 2.0f * ui().box_lr_border(),
+		ui().draw_text_full(container(), tempstring.c_str(), x1 + lr_border, y1 + line_height, x2 - x1 - 2.0f * lr_border,
 					ui::text_layout::CENTER, ui::text_layout::WORD, mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(), nullptr, &text_height);
 	}
 }

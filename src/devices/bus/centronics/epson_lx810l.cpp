@@ -279,6 +279,7 @@ epson_lx810l_device::epson_lx810l_device(const machine_config &mconfig, device_t
 	m_eeprom(*this, "eeprom"),
 	m_e05a30(*this, "e05a30"),
 	m_screen(*this, "screen"),
+	m_online_led(*this, "online_led"),
 	m_93c06_clk(0),
 	m_93c06_cs(0),
 	m_printhead(0),
@@ -299,11 +300,10 @@ epson_ap2000_device::epson_ap2000_device(const machine_config &mconfig, const ch
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-
-
-
 void epson_lx810l_device::device_start()
 {
+	m_online_led.resolve();
+
 	m_cr_timer = timer_alloc(TIMER_CR);
 
 	m_screen->register_screen_bitmap(m_bitmap);
@@ -466,7 +466,7 @@ WRITE8_MEMBER( epson_lx810l_device::portc_w )
 	m_eeprom->clk_write(m_93c06_clk ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->cs_write (m_93c06_cs  ? ASSERT_LINE : CLEAR_LINE);
 
-	machine().output().set_value("online_led", !BIT(data, 2));
+	m_online_led = !BIT(data, 2);
 }
 
 

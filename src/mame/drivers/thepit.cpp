@@ -1353,7 +1353,7 @@ READ8_MEMBER(thepit_state::rtriv_question_r)
 void thepit_state::init_rtriv()
 {
 	// Set-up the weirdest questions read ever done
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x4fff, read8_delegate(FUNC(thepit_state::rtriv_question_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x4fff, read8_delegate(*this, FUNC(thepit_state::rtriv_question_r)));
 
 	save_item(NAME(m_question_address));
 	save_item(NAME(m_question_rom));

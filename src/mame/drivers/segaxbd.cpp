@@ -344,7 +344,7 @@ void segaxbd_state::device_reset()
 	m_segaic16vid->tilemap_reset(*m_screen);
 
 	// hook the RESET line, which resets CPU #1
-	m_maincpu->set_reset_callback(write_line_delegate(FUNC(segaxbd_state::m68k_reset_callback),this));
+	m_maincpu->set_reset_callback(*this, FUNC(segaxbd_state::m68k_reset_callback));
 
 	// start timers to track interrupts
 	m_scanline_timer->adjust(m_screen->time_until_pos(0), 0);
@@ -355,8 +355,8 @@ class segaxbd_new_state : public driver_device
 {
 public:
 	segaxbd_new_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_mainpcb(*this, "mainpcb")
+		: driver_device(mconfig, type, tag)
+		, m_mainpcb(*this, "mainpcb")
 	{
 	}
 
@@ -1680,7 +1680,7 @@ void segaxbd_state::xboard_base_mconfig(machine_config &config)
 
 	NVRAM(config, "backup1", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "backup2", nvram_device::DEFAULT_ALL_0);
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MB3773(config, "watchdog");
 
@@ -4665,7 +4665,7 @@ void segaxbd_state::install_loffire(void)
 	m_adc_reverse[1] = m_adc_reverse[3] = true;
 
 	// install sync hack on core shared memory
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x29c000, 0x29c011, write16_delegate(FUNC(segaxbd_state::loffire_sync0_w), this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x29c000, 0x29c011, write16_delegate(*this, FUNC(segaxbd_state::loffire_sync0_w)));
 	m_loffire_sync = m_subram0;
 }
 
@@ -4678,7 +4678,7 @@ void segaxbd_new_state::init_loffire()
 void segaxbd_state::install_smgp(void)
 {
 	// map /EXCS space
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2f0000, 0x2f3fff, read16_delegate(FUNC(segaxbd_state::smgp_excs_r), this), write16_delegate(FUNC(segaxbd_state::smgp_excs_w), this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2f0000, 0x2f3fff, read16_delegate(*this, FUNC(segaxbd_state::smgp_excs_r)), write16_delegate(*this, FUNC(segaxbd_state::smgp_excs_w)));
 }
 
 void segaxbd_new_state::init_smgp()
@@ -4713,8 +4713,8 @@ void segaxbd_new_state_double::init_gprider_double()
 	m_mainpcb->install_gprider();
 	m_subpcb->install_gprider();
 
-	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2F0000, 0x2F003f, read16_delegate(FUNC(segaxbd_new_state_double::shareram1_r), this), write16_delegate(FUNC(segaxbd_new_state_double::shareram1_w), this));
-	m_subpcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2F0000, 0x2F003f, read16_delegate(FUNC(segaxbd_new_state_double::shareram2_r), this), write16_delegate(FUNC(segaxbd_new_state_double::shareram2_w), this));
+	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2F0000, 0x2F003f, read16_delegate(*this, FUNC(segaxbd_new_state_double::shareram1_r)), write16_delegate(*this, FUNC(segaxbd_new_state_double::shareram1_w)));
+	m_subpcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2F0000, 0x2F003f, read16_delegate(*this, FUNC(segaxbd_new_state_double::shareram2_r)), write16_delegate(*this, FUNC(segaxbd_new_state_double::shareram2_w)));
 }
 
 

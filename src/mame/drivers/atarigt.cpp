@@ -1330,7 +1330,7 @@ void atarigt_state::init_tmek()
 	m_protection_w = &atarigt_state::tmek_protection_w;
 
 	/* temp hack */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd72000, 0xd75fff, write32_delegate(FUNC(atarigt_state::tmek_pf_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd72000, 0xd75fff, write32_delegate(*this, FUNC(atarigt_state::tmek_pf_w)));
 }
 
 

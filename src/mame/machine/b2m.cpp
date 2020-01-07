@@ -80,7 +80,7 @@ void b2m_state::b2m_set_bank(int bank)
 						space.unmap_write(0xe000, 0xffff);
 
 						membank("bank1")->set_base(ram);
-						space.install_read_handler(0x2800, 0x2fff, read8_delegate(FUNC(b2m_state::b2m_keyboard_r),this));
+						space.install_read_handler(0x2800, 0x2fff, read8_delegate(*this, FUNC(b2m_state::b2m_keyboard_r)));
 						membank("bank3")->set_base(ram + 0x10000);
 						membank("bank4")->set_base(ram + 0x7000);
 						membank("bank5")->set_base(rom + 0x10000);
@@ -90,7 +90,7 @@ void b2m_state::b2m_set_bank(int bank)
 						space.unmap_write(0xe000, 0xffff);
 
 						membank("bank1")->set_base(ram);
-						space.install_read_handler(0x2800, 0x2fff, read8_delegate(FUNC(b2m_state::b2m_keyboard_r),this));
+						space.install_read_handler(0x2800, 0x2fff, read8_delegate(*this, FUNC(b2m_state::b2m_keyboard_r)));
 						membank("bank3")->set_base(ram + 0x14000);
 						membank("bank4")->set_base(ram + 0x7000);
 						membank("bank5")->set_base(rom + 0x10000);
@@ -100,7 +100,7 @@ void b2m_state::b2m_set_bank(int bank)
 						space.unmap_write(0xe000, 0xffff);
 
 						membank("bank1")->set_base(ram);
-						space.install_read_handler(0x2800, 0x2fff, read8_delegate(FUNC(b2m_state::b2m_keyboard_r),this));
+						space.install_read_handler(0x2800, 0x2fff, read8_delegate(*this, FUNC(b2m_state::b2m_keyboard_r)));
 						membank("bank3")->set_base(ram + 0x18000);
 						membank("bank4")->set_base(ram + 0x7000);
 						membank("bank5")->set_base(rom + 0x10000);
@@ -111,7 +111,7 @@ void b2m_state::b2m_set_bank(int bank)
 						space.unmap_write(0xe000, 0xffff);
 
 						membank("bank1")->set_base(ram);
-						space.install_read_handler(0x2800, 0x2fff, read8_delegate(FUNC(b2m_state::b2m_keyboard_r),this));
+						space.install_read_handler(0x2800, 0x2fff, read8_delegate(*this, FUNC(b2m_state::b2m_keyboard_r)));
 						membank("bank3")->set_base(ram + 0x1c000);
 						membank("bank4")->set_base(ram + 0x7000);
 						membank("bank5")->set_base(rom + 0x10000);

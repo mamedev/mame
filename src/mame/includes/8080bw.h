@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "audio/8080bw.h"
 #include "includes/mw8080bw.h"
 
 #include "machine/eepromser.h"
@@ -89,7 +90,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(claybust_gun_trigger);
 	DECLARE_READ_LINE_MEMBER(claybust_gun_on_r);
 
-private:
+protected:
+	void clear_extra_columns( bitmap_rgb32 &bitmap, int color );
+	inline void set_8_pixels( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, int fore_color, int back_color );
+
 	/* devices/memory pointers */
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<timer_device> m_schaser_effect_555_timer;
@@ -101,9 +105,11 @@ private:
 	optional_device<palette_device> m_palette;
 	optional_shared_ptr<uint8_t> m_colorram;
 
+private:
 	/* misc game specific */
 	optional_ioport m_gunx;
 	optional_ioport m_guny;
+
 	uint8_t m_color_map;
 	uint8_t m_screen_red;
 	uint8_t m_fleet_step;
@@ -226,8 +232,6 @@ private:
 
 	void schaser_reinit_555_time_remain();
 	inline void set_pixel( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, int color );
-	inline void set_8_pixels( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, int fore_color, int back_color );
-	void clear_extra_columns( bitmap_rgb32 &bitmap, int color );
 
 	void invaders_samples_audio(machine_config &config);
 
@@ -280,5 +284,63 @@ DISCRETE_SOUND_EXTERN( ballbomb_discrete );
 DISCRETE_SOUND_EXTERN( indianbt_discrete );
 DISCRETE_SOUND_EXTERN( polaris_discrete );
 DISCRETE_SOUND_EXTERN( schaser_discrete );
+
+/*******************************************************/
+/*                                                     */
+/* Cane (Model Racing)                                 */
+/*                                                     */
+/*******************************************************/
+class cane_state : public _8080bw_state
+{
+public:
+	cane_state(machine_config const &mconfig, device_type type, char const *tag) :
+		_8080bw_state(mconfig, type, tag)
+	{
+	}
+
+	void cane(machine_config &config);
+	void cane_audio(machine_config &config);
+
+protected:
+	void cane_unknown_port0_w(u8 data);
+
+private:
+	void cane_io_map(address_map &map);
+	void cane_map(address_map &map);
+};
+
+DISCRETE_SOUND_EXTERN( cane_discrete );
+
+/*******************************************************/
+/*                                                     */
+/* Model Racing "Orbite"                               */
+/*                                                     */
+/*******************************************************/
+class orbite_state : public _8080bw_state
+{
+public:
+	orbite_state(machine_config const &mconfig, device_type type, char const *tag) :
+		_8080bw_state(mconfig, type, tag),
+		m_main_ram(*this, "main_ram")
+	{
+	}
+
+	void orbite(machine_config &config);
+
+protected:
+	required_shared_ptr<uint8_t> m_main_ram;
+	std::unique_ptr<uint8_t[]> m_scattered_colorram;
+
+	virtual void machine_start() override;
+
+	u8 orbite_scattered_colorram_r(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u8 mem_mask = 0xff);
+	void orbite_scattered_colorram_w(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u8 data, ATTR_UNUSED u8 mem_mask = 0xff);
+
+private:
+	void orbite_io_map(address_map &map);
+	void orbite_map(address_map &map);
+
+	u32 screen_update_orbite(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+};
 
 #endif // MAME_INCLUDES_8080BW_H

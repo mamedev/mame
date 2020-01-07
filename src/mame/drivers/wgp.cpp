@@ -871,7 +871,7 @@ void wgp_state::wgp(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &wgp_state::cpu2_map);
 	m_subcpu->set_vblank_int("screen", FUNC(wgp_state::cpub_interrupt));
 
-	config.m_minimum_quantum = attotime::from_hz(30000);
+	config.set_maximum_quantum(attotime::from_hz(30000));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -925,7 +925,7 @@ void wgp_state::wgp2(machine_config &config)
 {
 	wgp(config);
 
-	config.m_minimum_quantum = attotime::from_hz(12000);
+	config.set_maximum_quantum(attotime::from_hz(12000));
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(wgp_state, wgp2)

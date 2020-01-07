@@ -277,6 +277,7 @@ void targeth_state::targeth(machine_config &config)
 
 	gaelco_ds5002fp_device &ds5002fp(GAELCO_DS5002FP(config, "gaelco_ds5002fp", XTAL(24'000'000) / 2));
 	ds5002fp.set_addrmap(0, &targeth_state::mcu_hostmem_map);
+	config.set_perfect_quantum("gaelco_ds5002fp:mcu");
 
 	LS259(config, m_outlatch);
 	m_outlatch->q_out_cb<2>().set(FUNC(targeth_state::coin1_counter_w));

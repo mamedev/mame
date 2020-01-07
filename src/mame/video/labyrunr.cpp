@@ -103,8 +103,8 @@ TILE_GET_INFO_MEMBER(labyrunr_state::get_tile_info1)
 
 void labyrunr_state::video_start()
 {
-	m_layer0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(labyrunr_state::get_tile_info0),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_layer1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(labyrunr_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_layer0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(labyrunr_state::get_tile_info0)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_layer1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(labyrunr_state::get_tile_info1)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_layer0->set_transparent_pen(0);
 	m_layer1->set_transparent_pen(0);

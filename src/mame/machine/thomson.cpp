@@ -338,7 +338,7 @@ void thomson_state::to7_update_cart_bank()
 		bank = m_thom_cart_bank % m_thom_cart_nb_banks;
 		if ( bank != m_old_cart_bank && m_old_cart_bank < 0 )
 		{
-			space.install_read_handler(0x0000, 0x0003, read8_delegate(FUNC(thomson_state::to7_cartridge_r),this) );
+			space.install_read_handler(0x0000, 0x0003, read8_delegate(*this, FUNC(thomson_state::to7_cartridge_r)) );
 		}
 	}
 	if ( bank != m_old_cart_bank )
@@ -1484,8 +1484,8 @@ void thomson_state::mo5_update_cart_bank()
 				if ( m_old_cart_bank < 0 )
 				{
 					space.install_read_bank( 0xb000, 0xefff, m_cartbank);
-					space.install_write_handler( 0xb000, 0xefff, write8_delegate(FUNC(thomson_state::mo5_cartridge_w),this) );
-					space.install_read_handler( 0xbffc, 0xbfff, read8_delegate(FUNC(thomson_state::mo5_cartridge_r),this) );
+					space.install_write_handler( 0xb000, 0xefff, write8_delegate(*this, FUNC(thomson_state::mo5_cartridge_w)) );
+					space.install_read_handler( 0xbffc, 0xbfff, read8_delegate(*this, FUNC(thomson_state::mo5_cartridge_r)) );
 				}
 				LOG_BANK(( "mo5_update_cart_bank: CART is cartridge bank %i\n", bank ));
 			}
@@ -1496,7 +1496,7 @@ void thomson_state::mo5_update_cart_bank()
 			if ( m_old_cart_bank != 0 )
 						{
 				space.install_read_bank( 0xb000, 0xefff, m_cartbank);
-				space.install_write_handler( 0xb000, 0xefff, write8_delegate(FUNC(thomson_state::mo5_cartridge_w),this) );
+				space.install_write_handler( 0xb000, 0xefff, write8_delegate(*this, FUNC(thomson_state::mo5_cartridge_w)) );
 				LOG_BANK(( "mo5_update_cart_bank: CART is internal\n"));
 			}
 		}
@@ -1886,8 +1886,8 @@ void thomson_state::to9_update_cart_bank()
 				if ( m_old_cart_bank < 0 || m_old_cart_bank > 3 )
 				{
 					space.install_read_bank( 0x0000, 0x3fff, m_cartbank );
-					space.install_write_handler( 0x0000, 0x3fff, write8_delegate(FUNC(thomson_state::to9_cartridge_w),this) );
-					space.install_read_handler( 0x0000, 0x0003, read8_delegate(FUNC(thomson_state::to9_cartridge_r),this) );
+					space.install_write_handler( 0x0000, 0x3fff, write8_delegate(*this, FUNC(thomson_state::to9_cartridge_w)) );
+					space.install_read_handler( 0x0000, 0x0003, read8_delegate(*this, FUNC(thomson_state::to9_cartridge_r)) );
 				}
 				LOG_BANK(( "to9_update_cart_bank: CART is cartridge bank %i\n",  m_thom_cart_bank ));
 			}
@@ -2891,7 +2891,7 @@ void thomson_state::to8_kbd_init()
 
 void thomson_state::to8_update_floppy_bank()
 {
-	int bank = (m_to8_reg_sys1 & 0x80) ? to7_floppy_bank : (m_to8_bios_bank + TO7_NB_FLOP_BANK);
+	int bank = (m_to8_reg_sys1 & 0x80) ? m_to7_floppy_bank : (m_to8_bios_bank + TO7_NB_FLOP_BANK);
 
 	if ( bank != m_old_floppy_bank )
 	{
@@ -3005,7 +3005,7 @@ void thomson_state::to8_update_cart_bank()
 						}
 						else
 						{
-							space.install_write_handler( 0x0000, 0x3fff, write8_delegate(FUNC(thomson_state::to8_vcart_w),this));
+							space.install_write_handler( 0x0000, 0x3fff, write8_delegate(*this, FUNC(thomson_state::to8_vcart_w)));
 						}
 					}
 				}
@@ -3047,7 +3047,7 @@ void thomson_state::to8_update_cart_bank()
 				{
 					if (m_to8_cart_vpage < 4)
 					{
-						space.install_write_handler( 0x0000, 0x3fff, write8_delegate(FUNC(thomson_state::to8_vcart_w),this));
+						space.install_write_handler( 0x0000, 0x3fff, write8_delegate(*this, FUNC(thomson_state::to8_vcart_w)));
 					}
 					else
 					{
@@ -3072,7 +3072,7 @@ void thomson_state::to8_update_cart_bank()
 				if ( m_old_cart_bank < 4 || m_old_cart_bank > 7 )
 				{
 					space.install_read_bank( 0x0000, 0x3fff, m_cartbank );
-					space.install_write_handler( 0x0000, 0x3fff, write8_delegate(FUNC(thomson_state::to8_cartridge_w),this) );
+					space.install_write_handler( 0x0000, 0x3fff, write8_delegate(*this, FUNC(thomson_state::to8_cartridge_w)) );
 				}
 				LOG_BANK(( "to8_update_cart_bank: CART is internal bank %i\n", m_to8_soft_bank ));
 			}
@@ -3088,8 +3088,8 @@ void thomson_state::to8_update_cart_bank()
 					if ( m_old_cart_bank < 0 || m_old_cart_bank > 3 )
 					{
 						space.install_read_bank( 0x0000, 0x3fff, m_cartbank );
-						space.install_write_handler( 0x0000, 0x3fff, write8_delegate(FUNC(thomson_state::to8_cartridge_w),this) );
-						space.install_read_handler( 0x0000, 0x0003, read8_delegate(FUNC(thomson_state::to8_cartridge_r),this) );
+						space.install_write_handler( 0x0000, 0x3fff, write8_delegate(*this, FUNC(thomson_state::to8_cartridge_w)) );
+						space.install_read_handler( 0x0000, 0x0003, read8_delegate(*this, FUNC(thomson_state::to8_cartridge_r)) );
 					}
 					LOG_BANK(( "to8_update_cart_bank: CART is external cartridge bank %i\n", bank ));
 				}
@@ -3178,7 +3178,7 @@ READ8_MEMBER( thomson_state::to8_floppy_r )
 
 	if ( (m_to8_reg_sys1 & 0x80) && THOM_FLOPPY_EXT )
 		/* external controller */
-		return to7_floppy_r( space, offset );
+		return to7_floppy_r( offset );
 	else if ( ! (m_to8_reg_sys1 & 0x80) && THOM_FLOPPY_INT )
 		/* internal controller */
 		return m_thmfc->floppy_r( offset );
@@ -3193,7 +3193,7 @@ WRITE8_MEMBER( thomson_state::to8_floppy_w )
 {
 	if ( (m_to8_reg_sys1 & 0x80) && THOM_FLOPPY_EXT )
 		/* external controller */
-		to7_floppy_w( space, offset, data );
+		to7_floppy_w( offset, data );
 	else if ( ! (m_to8_reg_sys1 & 0x80) && THOM_FLOPPY_INT )
 		/* internal controller */
 		m_thmfc->floppy_w( offset, data );
@@ -3321,7 +3321,7 @@ READ8_MEMBER( thomson_state::to8_vreg_r )
 			return 0;
 
 		if ( THOM_FLOPPY_EXT )
-			return to7_floppy_r( space, 0xc );
+			return to7_floppy_r( 0xc );
 		else
 			return 0;
 	}
@@ -3386,7 +3386,7 @@ WRITE8_MEMBER( thomson_state::to8_vreg_w )
 		if ( ( offset == 3 ) && ( m_to8_reg_ram & 0x80 ) && ( m_to8_reg_sys1 & 0x80 ) )
 		{
 			if ( THOM_FLOPPY_EXT )
-				to7_floppy_w( space, 0xc, data );
+				to7_floppy_w( 0xc, data );
 		}
 		else
 		{
@@ -3813,8 +3813,8 @@ void thomson_state::mo6_update_cart_bank()
 						}
 						else
 						{
-							space.install_write_handler( 0xb000, 0xbfff, write8_delegate(FUNC(thomson_state::mo6_vcart_lo_w),this));
-							space.install_write_handler( 0xc000, 0xefff, write8_delegate(FUNC(thomson_state::mo6_vcart_hi_w),this));
+							space.install_write_handler( 0xb000, 0xbfff, write8_delegate(*this, FUNC(thomson_state::mo6_vcart_lo_w)));
+							space.install_write_handler( 0xc000, 0xefff, write8_delegate(*this, FUNC(thomson_state::mo6_vcart_hi_w)));
 						}
 					}
 				}
@@ -3849,8 +3849,8 @@ void thomson_state::mo6_update_cart_bank()
 				{
 					if (m_to8_cart_vpage < 4)
 					{
-						space.install_write_handler( 0xb000, 0xbfff, write8_delegate(FUNC(thomson_state::mo6_vcart_lo_w),this));
-						space.install_write_handler( 0xc000, 0xefff, write8_delegate(FUNC(thomson_state::mo6_vcart_hi_w),this));
+						space.install_write_handler( 0xb000, 0xbfff, write8_delegate(*this, FUNC(thomson_state::mo6_vcart_lo_w)));
+						space.install_write_handler( 0xc000, 0xefff, write8_delegate(*this, FUNC(thomson_state::mo6_vcart_hi_w)));
 					}
 					else
 					{
@@ -3945,7 +3945,7 @@ void thomson_state::mo6_update_cart_bank()
 				{
 					space.install_read_bank( 0xb000, 0xbfff, m_cartlobank );
 					space.install_read_bank( 0xc000, 0xefff, m_carthibank );
-					space.install_write_handler( 0xb000, 0xefff, write8_delegate(FUNC(thomson_state::mo6_cartridge_w),this) );
+					space.install_write_handler( 0xb000, 0xefff, write8_delegate(*this, FUNC(thomson_state::mo6_cartridge_w)) );
 				}
 				LOG_BANK(( "mo6_update_cart_bank: CART is internal ROM bank %i\n", b ));
 			}
@@ -3962,8 +3962,8 @@ void thomson_state::mo6_update_cart_bank()
 					{
 						space.install_read_bank( 0xb000, 0xbfff, m_cartlobank );
 						space.install_read_bank( 0xc000, 0xefff, m_carthibank );
-						space.install_write_handler( 0xb000, 0xefff, write8_delegate(FUNC(thomson_state::mo6_cartridge_w),this) );
-						space.install_read_handler( 0xbffc, 0xbfff, read8_delegate(FUNC(thomson_state::mo6_cartridge_r),this) );
+						space.install_write_handler( 0xb000, 0xefff, write8_delegate(*this, FUNC(thomson_state::mo6_cartridge_w)) );
+						space.install_read_handler( 0xbffc, 0xbfff, read8_delegate(*this, FUNC(thomson_state::mo6_cartridge_r)) );
 					}
 					LOG_BANK(( "mo6_update_cart_bank: CART is external cartridge bank %i\n", bank ));
 				}
@@ -4269,7 +4269,7 @@ READ8_MEMBER( thomson_state::mo6_vreg_r )
 	if ( ( offset == 3 ) && ( m_to8_reg_ram & 0x80 ) )
 		{
 		if ( !machine().side_effects_disabled() )
-			return to7_floppy_r( space, 0xc );
+			return to7_floppy_r( 0xc );
 		}
 
 	switch ( offset )
@@ -4305,7 +4305,7 @@ WRITE8_MEMBER( thomson_state::mo6_vreg_w )
 
 	case 2: /* display / external floppy register */
 		if ( ( m_to8_reg_sys1 & 0x80 ) && ( m_to8_reg_ram & 0x80 ) )
-			to7_floppy_w( space, 0xc, data );
+			to7_floppy_w( 0xc, data );
 		else
 			to9_set_video_mode( data, 2 );
 		break;
@@ -4313,7 +4313,7 @@ WRITE8_MEMBER( thomson_state::mo6_vreg_w )
 	case 3: /* system register 2 */
 		/* 0xa7dc from external floppy drive aliases the video gate-array */
 		if ( ( offset == 3 ) && ( m_to8_reg_ram & 0x80 ) )
-			to7_floppy_w( space, 0xc, data );
+			to7_floppy_w( 0xc, data );
 		else
 		{
 			m_to8_reg_sys2 = data;
@@ -4452,8 +4452,8 @@ READ8_MEMBER( thomson_state::mo5nr_net_r )
 	if ( machine().side_effects_disabled() )
 		return 0;
 
-	if ( to7_controller_type )
-		return to7_floppy_r ( space, offset );
+	if ( m_to7_controller_type )
+		return to7_floppy_r ( offset );
 
 	logerror( "$%04x %f mo5nr_net_r: read from reg %i\n", m_maincpu->pc(), machine().time().as_double(), offset );
 
@@ -4464,8 +4464,8 @@ READ8_MEMBER( thomson_state::mo5nr_net_r )
 
 WRITE8_MEMBER( thomson_state::mo5nr_net_w )
 {
-	if ( to7_controller_type )
-		to7_floppy_w ( space, offset, data );
+	if ( m_to7_controller_type )
+		to7_floppy_w ( offset, data );
 	else
 		logerror( "$%04x %f mo5nr_net_w: write $%02X to reg %i\n",
 				m_maincpu->pc(), machine().time().as_double(), data, offset );

@@ -107,6 +107,7 @@ a1200_kbd_device::a1200_kbd_device(machine_config const &mconfig, char const *ta
 	, device_amiga_keyboard_interface(mconfig, *this)
 	, m_rows(*this, "ROW%u", 0)
 	, m_mpu(*this, "mpu")
+	, m_led_kbd_caps(*this, "led_kbd_caps")
 	, m_row_drive(0xffff)
 	, m_host_kdat(true)
 	, m_mpu_kdat(true)
@@ -163,7 +164,7 @@ WRITE8_MEMBER(a1200_kbd_device::mpu_portb_w)
 WRITE8_MEMBER(a1200_kbd_device::mpu_portc_w)
 {
 	m_row_drive = (m_row_drive & 0x80ff) | (u16(u8(data | ~mem_mask) & 0x7f) << 8);
-	machine().output().set_value("led_kbd_caps", BIT(~data, 7));
+	m_led_kbd_caps = BIT(~data, 7);
 }
 
 WRITE_LINE_MEMBER(a1200_kbd_device::mpu_tcmp)
@@ -194,6 +195,8 @@ ioport_constructor a1200_kbd_device::device_input_ports() const
 
 void a1200_kbd_device::device_start()
 {
+	m_led_kbd_caps.resolve();
+
 	save_item(NAME(m_row_drive));
 	save_item(NAME(m_host_kdat));
 	save_item(NAME(m_mpu_kdat));

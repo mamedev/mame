@@ -217,7 +217,7 @@ void segas32_state::device_start()
 	{
 		struct cache_entry *entry = auto_alloc(machine(), struct cache_entry);
 
-		entry->tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas32_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,16);
+		entry->tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(segas32_state::get_tile_info)), TILEMAP_SCAN_ROWS,  16,16, 32,16);
 		entry->page = 0xff;
 		entry->bank = 0;
 		entry->next = m_cache_head;

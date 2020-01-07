@@ -598,7 +598,7 @@ void bigbord2_state::bigbord2(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(bigbord2_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(bigbord2_state::crtc_update_row));
 	crtc.out_vsync_callback().set(m_ctc1, FUNC(z80ctc_device::trg3));
 
 	ls259_device &proglatch(LS259(config, "proglatch")); // U41

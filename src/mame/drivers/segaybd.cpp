@@ -1289,7 +1289,7 @@ void segaybd_state::yboard(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &segaybd_state::sound_portmap);
 
 	NVRAM(config, "backupram", nvram_device::DEFAULT_ALL_0);
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MB3773(config, "watchdog"); // IC95
 

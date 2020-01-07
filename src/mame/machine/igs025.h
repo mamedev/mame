@@ -20,7 +20,7 @@ public:
 	uint32_t m_kb_game_id;
 	uint32_t m_kb_region;
 
-	template <typename... T> void set_external_cb(T &&... args) { m_execute_external = igs025_execute_external(std::forward<T>(args)...); }
+	template <typename... T> void set_external_cb(T &&... args) { m_execute_external.set(std::forward<T>(args)...); }
 
 	DECLARE_WRITE16_MEMBER( olds_w );
 	DECLARE_WRITE16_MEMBER( drgw2_d80000_protection_w );

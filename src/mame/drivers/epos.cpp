@@ -350,6 +350,61 @@ static INPUT_PORTS_START( catapult )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( eeekk )
+	PORT_START("DSW")
+
+// There are odd port mappings (old=new)
+// 02=10, 04=40, 08=02, 10=20, 20=04, 40=08
+
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x50, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:2,3")
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x40, "5" )
+	PORT_DIPSETTING(    0x50, "6" )
+	PORT_DIPNAME( 0x26, 0x06, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:4,5,6")
+	PORT_DIPSETTING(    0x00, "1 (Easy)" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x20, "3" )
+	PORT_DIPSETTING(    0x22, "4" )
+	PORT_DIPSETTING(    0x04, "5" )
+	PORT_DIPSETTING(    0x06, "6" )
+	PORT_DIPSETTING(    0x24, "7" )
+	PORT_DIPSETTING(    0x26, "8 (Hard)" )
+	PORT_DIPNAME( 0x08, 0x08, "Extra Life Range" ) PORT_DIPLOCATION("SW1:7") // exact points value varies by 10000 for every level of difficulty chosen via the dips above
+	PORT_DIPSETTING(    0x08, "100000 - 170000 points" )
+	PORT_DIPSETTING(    0x00, "20000 - 90000 points" )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START2 )
+	PORT_SERVICE_NO_TOGGLE(0x10, IP_ACTIVE_LOW)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* this has to be LO */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* this has to be LO */
+
+	PORT_START("INPUTS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("UNK")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( dealer )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:1")
@@ -641,6 +696,22 @@ ROM_START( igmo )
 ROM_END
 
 
+ROM_START( eeekk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u10_e12063.u10", 0x0000, 0x1000, CRC(edd05de2) SHA1(25dfa7ad2e29b1ca9ce9bb36bf1a573baabb4d5b) )
+	ROM_LOAD( "u9_e12063.u9",   0x1000, 0x1000, CRC(6f57114a) SHA1(417b910a4343da026426b4cfd0a83b9142c87353) )
+	ROM_LOAD( "u8_e12063.u8",   0x2000, 0x1000, CRC(bcb0ebbd) SHA1(a2a00dedee12d6006817021e98fb44b2339127a0) )
+	ROM_LOAD( "u7_e12063.u7",   0x3000, 0x1000, CRC(a0df8f77) SHA1(ee2afed25ab32bf09b14e8638d03b6e2f8e6b337) )
+	ROM_LOAD( "u6_e12063.u6",   0x4000, 0x1000, CRC(61953b0a) SHA1(67bcb4286e39cdda20684a4f580392468b08800e) )
+	ROM_LOAD( "u5_e12063.u5",   0x5000, 0x1000, CRC(4c22c6d9) SHA1(94a8fc951994746f8ccfb77d80f8b98fde8a6f33) )
+	ROM_LOAD( "u4_e12063.u4",   0x6000, 0x1000, CRC(3d341208) SHA1(bc4d2567df2779d97e718376c4bf682ba459c01e) )
+	ROM_LOAD( "u11_e12063.u11", 0x7000, 0x0800, CRC(417faff0) SHA1(7965155ee32694ea9a10245db73d8beef229408c) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "74s288.u66", 0x0000, 0x0020, CRC(f2078c38) SHA1(7bfd49932a6fd8840514b7af93a64cedb248122d) )
+ROM_END
+
+
 // Tristar 9000 boards:
 ROM_START( dealer )
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -788,6 +859,7 @@ GAME( 1983, theglob,  suprglob, epos,   suprglob, epos_state, empty_init, ROT270
 GAME( 1983, theglob2, suprglob, epos,   suprglob, epos_state, empty_init, ROT270, "Epos Corporation", "The Glob (earlier)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, theglob3, suprglob, epos,   suprglob, epos_state, empty_init, ROT270, "Epos Corporation", "The Glob (set 3)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1984, igmo,     0,        epos,   igmo,     epos_state, empty_init, ROT270, "Epos Corporation", "IGMO",               MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, eeekk,    0,        epos,   eeekk,    epos_state, empty_init, ROT270, "Epos Corporation", "Eeekk!",             MACHINE_SUPPORTS_SAVE )
 
 /* EPOS TRISTAR 9000 PCB based */
 GAME( 1984, dealer,   0,        dealer, dealer,   epos_state, init_dealer, ROT270, "Epos Corporation", "The Dealer",           MACHINE_SUPPORTS_SAVE )

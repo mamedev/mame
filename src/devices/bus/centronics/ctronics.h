@@ -18,8 +18,7 @@ DECLARE_DEVICE_TYPE(CENTRONICS, centronics_device)
 
 class device_centronics_peripheral_interface;
 
-class centronics_device : public device_t,
-	public device_slot_interface
+class centronics_device : public device_t, public device_slot_interface
 {
 	friend class device_centronics_peripheral_interface;
 
@@ -106,7 +105,7 @@ private:
 };
 
 
-class device_centronics_peripheral_interface : public device_slot_card_interface
+class device_centronics_peripheral_interface : public device_interface
 {
 	friend class centronics_device;
 

@@ -75,7 +75,7 @@ f300 ff00 040fpu1  l .          234f:0
 	}
 
 
-c100 f1f8 abcd     b .          071:6 234fc:4
+c100 f1f8 abcd     b .          01:6 7:10 234fc:4
 	u32* r_dst = &DX();
 	u32 src = DY();
 	u32 dst = *r_dst;
@@ -100,7 +100,7 @@ c100 f1f8 abcd     b .          071:6 234fc:4
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
 
 
-cf08 fff8 abcd     b .          071:18 234fc:16
+cf08 fff8 abcd     b .          01:18 7:31 234fc:16
 	u32 src = OPER_AY_PD_8();
 	u32 ea  = EA_A7_PD_8();
 	u32 dst = m68ki_read_8(ea);
@@ -125,7 +125,7 @@ cf08 fff8 abcd     b .          071:18 234fc:16
 	m68ki_write_8(ea, res);
 
 
-c10f f1ff abcd     b .          071:18 234fc:16
+c10f f1ff abcd     b .          01:18 7:31 234fc:16
 	u32 src = OPER_A7_PD_8();
 	u32 ea  = EA_AX_PD_8();
 	u32 dst = m68ki_read_8(ea);
@@ -150,7 +150,7 @@ c10f f1ff abcd     b .          071:18 234fc:16
 	m68ki_write_8(ea, res);
 
 
-cf0f ffff abcd     b .          071:18 234fc:16
+cf0f ffff abcd     b .          01:18 7:31 234fc:16
 	u32 src = OPER_A7_PD_8();
 	u32 ea  = EA_A7_PD_8();
 	u32 dst = m68ki_read_8(ea);
@@ -175,7 +175,7 @@ cf0f ffff abcd     b .          071:18 234fc:16
 	m68ki_write_8(ea, res);
 
 
-c108 f1f8 abcd     b .          071:18 234fc:16
+c108 f1f8 abcd     b .          01:18 7:31 234fc:16
 	u32 src = OPER_AY_PD_8();
 	u32 ea  = EA_AX_PD_8();
 	u32 dst = m68ki_read_8(ea);
@@ -200,7 +200,7 @@ c108 f1f8 abcd     b .          071:18 234fc:16
 	m68ki_write_8(ea, res);
 
 
-d000 f1f8 add      b .          071:4 234fc:2
+d000 f1f8 add      b .          01:4 7:7 234fc:2
 	u32* r_dst = &DX();
 	u32 src = MASK_OUT_ABOVE_8(DY());
 	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
@@ -214,7 +214,7 @@ d000 f1f8 add      b .          071:4 234fc:2
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | m_not_z_flag;
 
 
-d000 f1c0 add      b A+-DXWLdxI 071:4 234fc:2
+d000 f1c0 add      b A+-DXWLdxI 01:4 7:7 234fc:2
 	u32* r_dst = &DX();
 	u32 src = M68KMAKE_GET_OPER_AY_8;
 	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
@@ -228,7 +228,7 @@ d000 f1c0 add      b A+-DXWLdxI 071:4 234fc:2
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | m_not_z_flag;
 
 
-d040 f1f8 add      w .          071:4 234fc:2
+d040 f1f8 add      w .          01:4 7:7 234fc:2
 	u32* r_dst = &DX();
 	u32 src = MASK_OUT_ABOVE_16(DY());
 	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
@@ -242,7 +242,7 @@ d040 f1f8 add      w .          071:4 234fc:2
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | m_not_z_flag;
 
 
-d048 f1f8 add      w .          071:4 234fc:2
+d048 f1f8 add      w .          01:4 7:7 234fc:2
 	u32* r_dst = &DX();
 	u32 src = MASK_OUT_ABOVE_16(AY());
 	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
@@ -256,7 +256,7 @@ d048 f1f8 add      w .          071:4 234fc:2
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | m_not_z_flag;
 
 
-d040 f1c0 add      w A+-DXWLdxI 071:4 234fc:2
+d040 f1c0 add      w A+-DXWLdxI 01:4 7:7 234fc:2
 	u32* r_dst = &DX();
 	u32 src = M68KMAKE_GET_OPER_AY_16;
 	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
@@ -270,7 +270,7 @@ d040 f1c0 add      w A+-DXWLdxI 071:4 234fc:2
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | m_not_z_flag;
 
 
-d080 f1f8 add      l .          071:6 234fc:2
+d080 f1f8 add      l .          01:6 7:7 234fc:2
 	u32* r_dst = &DX();
 	u32 src = DY();
 	u32 dst = *r_dst;
@@ -284,7 +284,7 @@ d080 f1f8 add      l .          071:6 234fc:2
 	*r_dst = m_not_z_flag;
 
 
-d088 f1f8 add      l .          071:6 234fc:2
+d088 f1f8 add      l .          01:6 7:7 234fc:2
 	u32* r_dst = &DX();
 	u32 src = AY();
 	u32 dst = *r_dst;
@@ -298,7 +298,7 @@ d088 f1f8 add      l .          071:6 234fc:2
 	*r_dst = m_not_z_flag;
 
 
-d080 f1c0 add      l A+-DXWLdxI 071:6 234fc:2
+d080 f1c0 add      l A+-DXWLdxI 01:6 7:7 234fc:2
 	u32* r_dst = &DX();
 	u32 src = M68KMAKE_GET_OPER_AY_32;
 	u32 dst = *r_dst;
@@ -312,7 +312,7 @@ d080 f1c0 add      l A+-DXWLdxI 071:6 234fc:2
 	*r_dst = m_not_z_flag;
 
 
-d100 f1c0 add      b A+-DXWL    071:8 234fc:4
+d100 f1c0 add      b A+-DXWL    01:8 7:11 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 src = MASK_OUT_ABOVE_8(DX());
 	u32 dst = m68ki_read_8(ea);
@@ -326,7 +326,7 @@ d100 f1c0 add      b A+-DXWL    071:8 234fc:4
 	m68ki_write_8(ea, m_not_z_flag);
 
 
-d140 f1c0 add      w A+-DXWL    071:8 234fc:4
+d140 f1c0 add      w A+-DXWL    01:8 7:11 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 src = MASK_OUT_ABOVE_16(DX());
 	u32 dst = m68ki_read_16(ea);
@@ -340,7 +340,7 @@ d140 f1c0 add      w A+-DXWL    071:8 234fc:4
 	m68ki_write_16(ea, m_not_z_flag);
 
 
-d180 f1c0 add      l A+-DXWL    071:12 234fc:4
+d180 f1c0 add      l A+-DXWL    01:12 7:15 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_32;
 	u32 src = DX();
 	u32 dst = m68ki_read_32(ea);
@@ -354,45 +354,45 @@ d180 f1c0 add      l A+-DXWL    071:12 234fc:4
 	m68ki_write_32(ea, m_not_z_flag);
 
 
-d0c0 f1f8 adda     w .          071:8 234fc:2
+d0c0 f1f8 adda     w .          01:8 7:7 234fc:2
 	u32* r_dst = &AX();
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst + MAKE_INT_16(DY()));
 
 
-d0c8 f1f8 adda     w .          071:8 234fc:2
+d0c8 f1f8 adda     w .          01:8 7:7 234fc:2
 	u32* r_dst = &AX();
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst + MAKE_INT_16(AY()));
 
 
-d0c0 f1c0 adda     w A+-DXWLdxI 071:8 234fc:2
+d0c0 f1c0 adda     w A+-DXWLdxI 01:8 7:7 234fc:2
 	u32* r_dst = &AX();
 	u32 src = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst + src);
 
 
-d1c0 f1f8 adda     l .          071:6 234fc:2
+d1c0 f1f8 adda     l .          01:6 7:7 234fc:2
 	u32* r_dst = &AX();
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst + DY());
 
 
-d1c8 f1f8 adda     l .          071:6 234fc:2
+d1c8 f1f8 adda     l .          01:6 7:7 234fc:2
 	u32* r_dst = &AX();
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst + AY());
 
 
-d1c0 f1c0 adda     l A+-DXWLdxI 071:6 234fc:2
+d1c0 f1c0 adda     l A+-DXWLdxI 01:6 7:7 234fc:2
 	u32* r_dst = &AX();
 	u32 src = M68KMAKE_GET_OPER_AY_32;
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst + src);
 
 
-0600 fff8 addi     b .          071:8 234fc:2
+0600 fff8 addi     b .          01:8 7:14 234fc:2
 	u32* r_dst = &DY();
 	u32 src = OPER_I_8();
 	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
@@ -406,7 +406,7 @@ d1c0 f1c0 adda     l A+-DXWLdxI 071:6 234fc:2
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | m_not_z_flag;
 
 
-0600 ffc0 addi     b A+-DXWL    071:12 234fc:4
+0600 ffc0 addi     b A+-DXWL    01:12 7:18 234fc:4
 	u32 src = OPER_I_8();
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 dst = m68ki_read_8(ea);
@@ -420,7 +420,7 @@ d1c0 f1c0 adda     l A+-DXWLdxI 071:6 234fc:2
 	m68ki_write_8(ea, m_not_z_flag);
 
 
-0640 fff8 addi     w .          071:8 234fc:2
+0640 fff8 addi     w .          01:8 7:14 234fc:2
 	u32* r_dst = &DY();
 	u32 src = OPER_I_16();
 	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
@@ -434,7 +434,7 @@ d1c0 f1c0 adda     l A+-DXWLdxI 071:6 234fc:2
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | m_not_z_flag;
 
 
-0640 ffc0 addi     w A+-DXWL    071:12 234fc:4
+0640 ffc0 addi     w A+-DXWL    01:12 7:18 234fc:4
 	u32 src = OPER_I_16();
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 dst = m68ki_read_16(ea);
@@ -448,7 +448,7 @@ d1c0 f1c0 adda     l A+-DXWLdxI 071:6 234fc:2
 	m68ki_write_16(ea, m_not_z_flag);
 
 
-0680 fff8 addi     l .          07:16 1:14 234fc:2
+0680 fff8 addi     l .          0:16 7:18 1:14 234fc:2
 	u32* r_dst = &DY();
 	u32 src = OPER_I_32();
 	u32 dst = *r_dst;
@@ -462,7 +462,7 @@ d1c0 f1c0 adda     l A+-DXWLdxI 071:6 234fc:2
 	*r_dst = m_not_z_flag;
 
 
-0680 ffc0 addi     l A+-DXWL    071:20 234fc:4
+0680 ffc0 addi     l A+-DXWL    01:20 7:26 234fc:4
 	u32 src = OPER_I_32();
 	u32 ea = M68KMAKE_GET_EA_AY_32;
 	u32 dst = m68ki_read_32(ea);
@@ -476,7 +476,7 @@ d1c0 f1c0 adda     l A+-DXWLdxI 071:6 234fc:2
 	m68ki_write_32(ea, m_not_z_flag);
 
 
-5000 f1f8 addq     b .          071:4 234fc:2
+5000 f1f8 addq     b .          01:4 7:7 234fc:2
 	u32* r_dst = &DY();
 	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
@@ -490,7 +490,7 @@ d1c0 f1c0 adda     l A+-DXWLdxI 071:6 234fc:2
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | m_not_z_flag;
 
 
-5000 f1c0 addq     b A+-DXWL    071:8 234fc:4
+5000 f1c0 addq     b A+-DXWL    01:8 7:11 234fc:4
 	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 dst = m68ki_read_8(ea);
@@ -504,7 +504,7 @@ d1c0 f1c0 adda     l A+-DXWLdxI 071:6 234fc:2
 	m68ki_write_8(ea, m_not_z_flag);
 
 
-5040 f1f8 addq     w .          071:4 234fc:2
+5040 f1f8 addq     w .          01:4 7:7 234fc:2
 	u32* r_dst = &DY();
 	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
@@ -518,13 +518,13 @@ d1c0 f1c0 adda     l A+-DXWLdxI 071:6 234fc:2
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | m_not_z_flag;
 
 
-5048 f1f8 addq     w .          071:4 234fc:2
+5048 f1f8 addq     w .          01:4 7:7 234fc:2
 	u32* r_dst = &AY();
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst + (((m_ir >> 9) - 1) & 7) + 1);
 
 
-5040 f1c0 addq     w A+-DXWL    071:8 234fc:4
+5040 f1c0 addq     w A+-DXWL    01:8 7:11 234fc:4
 	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 dst = m68ki_read_16(ea);
@@ -538,7 +538,7 @@ d1c0 f1c0 adda     l A+-DXWLdxI 071:6 234fc:2
 	m68ki_write_16(ea, m_not_z_flag);
 
 
-5080 f1f8 addq     l .          071:8 234fc:2
+5080 f1f8 addq     l .          01:8 7:7 234fc:2
 	u32* r_dst = &DY();
 	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 dst = *r_dst;
@@ -552,13 +552,13 @@ d1c0 f1c0 adda     l A+-DXWLdxI 071:6 234fc:2
 	*r_dst = m_not_z_flag;
 
 
-5088 f1f8 addq     l .          071:8 234fc:2
+5088 f1f8 addq     l .          01:8 7:7 234fc:2
 	u32* r_dst = &AY();
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst + (((m_ir >> 9) - 1) & 7) + 1);
 
 
-5080 f1c0 addq     l A+-DXWL    071:12 234fc:4
+5080 f1c0 addq     l A+-DXWL    01:12 7:15 234fc:4
 	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 ea = M68KMAKE_GET_EA_AY_32;
 	u32 dst = m68ki_read_32(ea);
@@ -573,7 +573,7 @@ d1c0 f1c0 adda     l A+-DXWLdxI 071:6 234fc:2
 	m68ki_write_32(ea, m_not_z_flag);
 
 
-d100 f1f8 addx     b .          071:4 234fc:2
+d100 f1f8 addx     b .          01:4 7:7 234fc:2
 	u32* r_dst = &DX();
 	u32 src = MASK_OUT_ABOVE_8(DY());
 	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
@@ -589,7 +589,7 @@ d100 f1f8 addx     b .          071:4 234fc:2
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
 
 
-d140 f1f8 addx     w .          071:4 234fc:2
+d140 f1f8 addx     w .          01:4 7:7 234fc:2
 	u32* r_dst = &DX();
 	u32 src = MASK_OUT_ABOVE_16(DY());
 	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
@@ -605,7 +605,7 @@ d140 f1f8 addx     w .          071:4 234fc:2
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
 
 
-d180 f1f8 addx     l .          07:8 1:6 234fc:2
+d180 f1f8 addx     l .          0:8 7:7 1:6 234fc:2
 	u32* r_dst = &DX();
 	u32 src = DY();
 	u32 dst = *r_dst;
@@ -621,7 +621,7 @@ d180 f1f8 addx     l .          07:8 1:6 234fc:2
 	*r_dst = res;
 
 
-df08 fff8 addx     b .          071:18 234fc:12
+df08 fff8 addx     b .          01:18 7:28 234fc:12
 	u32 src = OPER_AY_PD_8();
 	u32 ea  = EA_A7_PD_8();
 	u32 dst = m68ki_read_8(ea);
@@ -637,7 +637,7 @@ df08 fff8 addx     b .          071:18 234fc:12
 	m68ki_write_8(ea, res);
 
 
-d10f f1ff addx     b .          071:18 234fc:12
+d10f f1ff addx     b .          01:18 7:28 234fc:12
 	u32 src = OPER_A7_PD_8();
 	u32 ea  = EA_AX_PD_8();
 	u32 dst = m68ki_read_8(ea);
@@ -653,7 +653,7 @@ d10f f1ff addx     b .          071:18 234fc:12
 	m68ki_write_8(ea, res);
 
 
-df0f ffff addx     b .          071:18 234fc:12
+df0f ffff addx     b .          01:18 7:28 234fc:12
 	u32 src = OPER_A7_PD_8();
 	u32 ea  = EA_A7_PD_8();
 	u32 dst = m68ki_read_8(ea);
@@ -669,7 +669,7 @@ df0f ffff addx     b .          071:18 234fc:12
 	m68ki_write_8(ea, res);
 
 
-d108 f1f8 addx     b .          071:18 234fc:12
+d108 f1f8 addx     b .          01:18 7:28 234fc:12
 	u32 src = OPER_AY_PD_8();
 	u32 ea  = EA_AX_PD_8();
 	u32 dst = m68ki_read_8(ea);
@@ -685,7 +685,7 @@ d108 f1f8 addx     b .          071:18 234fc:12
 	m68ki_write_8(ea, res);
 
 
-d148 f1f8 addx     w .          071:18 234fc:12
+d148 f1f8 addx     w .          01:18 7:28 234fc:12
 	u32 src = OPER_AY_PD_16();
 	u32 ea  = EA_AX_PD_16();
 	u32 dst = m68ki_read_16(ea);
@@ -701,7 +701,7 @@ d148 f1f8 addx     w .          071:18 234fc:12
 	m68ki_write_16(ea, res);
 
 
-d188 f1f8 addx     l .          071:30 234fc:12
+d188 f1f8 addx     l .          01:30 7:40 234fc:12
 	u32 src = OPER_AY_PD_32();
 	u32 ea  = EA_AX_PD_32();
 	u32 dst = m68ki_read_32(ea);
@@ -717,7 +717,7 @@ d188 f1f8 addx     l .          071:30 234fc:12
 	m68ki_write_32(ea, res);
 
 
-c000 f1f8 and      b .          071:4 234fc:2
+c000 f1f8 and      b .          01:4 7:7 234fc:2
 	m_not_z_flag = MASK_OUT_ABOVE_8(DX() &= (DY() | 0xffffff00));
 
 	m_n_flag = NFLAG_8(m_not_z_flag);
@@ -725,7 +725,7 @@ c000 f1f8 and      b .          071:4 234fc:2
 	m_v_flag = VFLAG_CLEAR;
 
 
-c000 f1c0 and      b A+-DXWLdxI 071:4 234fc:2
+c000 f1c0 and      b A+-DXWLdxI 01:4 7:7 234fc:2
 	m_not_z_flag = MASK_OUT_ABOVE_8(DX() &= (M68KMAKE_GET_OPER_AY_8 | 0xffffff00));
 
 	m_n_flag = NFLAG_8(m_not_z_flag);
@@ -733,7 +733,7 @@ c000 f1c0 and      b A+-DXWLdxI 071:4 234fc:2
 	m_v_flag = VFLAG_CLEAR;
 
 
-c040 f1f8 and      w .          071:4 234fc:2
+c040 f1f8 and      w .          01:4 7:7 234fc:2
 	m_not_z_flag = MASK_OUT_ABOVE_16(DX() &= (DY() | 0xffff0000));
 
 	m_n_flag = NFLAG_16(m_not_z_flag);
@@ -741,7 +741,7 @@ c040 f1f8 and      w .          071:4 234fc:2
 	m_v_flag = VFLAG_CLEAR;
 
 
-c040 f1c0 and      w A+-DXWLdxI 071:4 234fc:2
+c040 f1c0 and      w A+-DXWLdxI 01:4 7:7 234fc:2
 	m_not_z_flag = MASK_OUT_ABOVE_16(DX() &= (M68KMAKE_GET_OPER_AY_16 | 0xffff0000));
 
 	m_n_flag = NFLAG_16(m_not_z_flag);
@@ -749,7 +749,7 @@ c040 f1c0 and      w A+-DXWLdxI 071:4 234fc:2
 	m_v_flag = VFLAG_CLEAR;
 
 
-c080 f1f8 and      l .          071:6 234fc:2
+c080 f1f8 and      l .          01:6 7:7 234fc:2
 	m_not_z_flag = DX() &= DY();
 
 	m_n_flag = NFLAG_32(m_not_z_flag);
@@ -757,7 +757,7 @@ c080 f1f8 and      l .          071:6 234fc:2
 	m_v_flag = VFLAG_CLEAR;
 
 
-c080 f1c0 and      l A+-DXWLdxI 071:6 234fc:2
+c080 f1c0 and      l A+-DXWLdxI 01:6 7:7 234fc:2
 	m_not_z_flag = DX() &= M68KMAKE_GET_OPER_AY_32;
 
 	m_n_flag = NFLAG_32(m_not_z_flag);
@@ -765,7 +765,7 @@ c080 f1c0 and      l A+-DXWLdxI 071:6 234fc:2
 	m_v_flag = VFLAG_CLEAR;
 
 
-c100 f1c0 and      b A+-DXWL    071:8 234fc:4
+c100 f1c0 and      b A+-DXWL    01:8 7:11 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 res = DX() & m68ki_read_8(ea);
 
@@ -777,7 +777,7 @@ c100 f1c0 and      b A+-DXWL    071:8 234fc:4
 	m68ki_write_8(ea, m_not_z_flag);
 
 
-c140 f1c0 and      w A+-DXWL    071:8 234fc:4
+c140 f1c0 and      w A+-DXWL    01:8 7:11 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 res = DX() & m68ki_read_16(ea);
 
@@ -789,7 +789,7 @@ c140 f1c0 and      w A+-DXWL    071:8 234fc:4
 	m68ki_write_16(ea, m_not_z_flag);
 
 
-c180 f1c0 and      l A+-DXWL    071:12 234fc:4
+c180 f1c0 and      l A+-DXWL    01:12 7:15 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_32;
 	u32 res = DX() & m68ki_read_32(ea);
 
@@ -801,7 +801,7 @@ c180 f1c0 and      l A+-DXWL    071:12 234fc:4
 	m68ki_write_32(ea, res);
 
 
-0200 fff8 andi     b .          071:8 234fc:2
+0200 fff8 andi     b .          01:8 7:14 234fc:2
 	m_not_z_flag = MASK_OUT_ABOVE_8(DY() &= (OPER_I_8() | 0xffffff00));
 
 	m_n_flag = NFLAG_8(m_not_z_flag);
@@ -809,7 +809,7 @@ c180 f1c0 and      l A+-DXWL    071:12 234fc:4
 	m_v_flag = VFLAG_CLEAR;
 
 
-0200 ffc0 andi     b A+-DXWL    071:12 234fc:4
+0200 ffc0 andi     b A+-DXWL    01:12 7:18 234fc:4
 	u32 src = OPER_I_8();
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 res = src & m68ki_read_8(ea);
@@ -822,7 +822,7 @@ c180 f1c0 and      l A+-DXWL    071:12 234fc:4
 	m68ki_write_8(ea, res);
 
 
-0240 fff8 andi     w .          071:8 234fc:2
+0240 fff8 andi     w .          01:8 7:14 234fc:2
 	m_not_z_flag = MASK_OUT_ABOVE_16(DY() &= (OPER_I_16() | 0xffff0000));
 
 	m_n_flag = NFLAG_16(m_not_z_flag);
@@ -830,7 +830,7 @@ c180 f1c0 and      l A+-DXWL    071:12 234fc:4
 	m_v_flag = VFLAG_CLEAR;
 
 
-0240 ffc0 andi     w A+-DXWL    071:12 234fc:4
+0240 ffc0 andi     w A+-DXWL    01:12 7:18 234fc:4
 	u32 src = OPER_I_16();
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 res = src & m68ki_read_16(ea);
@@ -843,7 +843,7 @@ c180 f1c0 and      l A+-DXWL    071:12 234fc:4
 	m68ki_write_16(ea, res);
 
 
-0280 fff8 andi     l .          071:14 234fc:2
+0280 fff8 andi     l .          01:14 7:18 234fc:2
 	m_not_z_flag = DY() &= (OPER_I_32());
 
 	m_n_flag = NFLAG_32(m_not_z_flag);
@@ -851,7 +851,7 @@ c180 f1c0 and      l A+-DXWL    071:12 234fc:4
 	m_v_flag = VFLAG_CLEAR;
 
 
-0280 ffc0 andi     l A+-DXWL    071:20 234fc:4
+0280 ffc0 andi     l A+-DXWL    01:20 7:26 234fc:4
 	u32 src = OPER_I_32();
 	u32 ea = M68KMAKE_GET_EA_AY_32;
 	u32 res = src & m68ki_read_32(ea);
@@ -864,11 +864,11 @@ c180 f1c0 and      l A+-DXWL    071:12 234fc:4
 	m68ki_write_32(ea, res);
 
 
-023c ffff andi     w .          07:20 1:16 234fc:12
+023c ffff andi     w .          0:20 7:14 1:16 234fc:12
 	m68ki_set_ccr(m68ki_get_ccr() & OPER_I_8());
 
 
-027c ffff andi     w .          07:20p 1:16p 234fc:12p
+027c ffff andi     w .          0:20p 7:14p 1:16p 234fc:12p
 	if(m_s_flag) {
 		u32 src = OPER_I_16();
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
@@ -878,14 +878,14 @@ c180 f1c0 and      l A+-DXWL    071:12 234fc:4
 	}
 
 
-e000 f1f8 asr      b .          071234fc:6
+e000 f1f8 asr      b .          01234fc:6 7:13
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = MASK_OUT_ABOVE_8(*r_dst);
 	u32 res = src >> shift;
 
 	if(shift != 0)
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 	if(GET_MSB_8(src))
 		res |= m68ki_shift_8_table[shift];
@@ -898,14 +898,14 @@ e000 f1f8 asr      b .          071234fc:6
 	m_x_flag = m_c_flag = src << (9-shift);
 
 
-e040 f1f8 asr      w .          071234fc:6
+e040 f1f8 asr      w .          01234fc:6 7:13
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = MASK_OUT_ABOVE_16(*r_dst);
 	u32 res = src >> shift;
 
 	if(shift != 0)
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 	if(GET_MSB_16(src))
 		res |= m68ki_shift_16_table[shift];
@@ -918,14 +918,14 @@ e040 f1f8 asr      w .          071234fc:6
 	m_x_flag = m_c_flag = src << (9-shift);
 
 
-e080 f1f8 asr      l .          071:8 234fc:6
+e080 f1f8 asr      l .          01:8 7:13 234fc:6
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = *r_dst;
 	u32 res = src >> shift;
 
 	if(shift != 0)
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 	if(GET_MSB_32(src))
 		res |= m68ki_shift_32_table[shift];
@@ -938,14 +938,14 @@ e080 f1f8 asr      l .          071:8 234fc:6
 	m_x_flag = m_c_flag = src << (9-shift);
 
 
-e020 f1f8 asr      b .          071234fc:6
+e020 f1f8 asr      b .          01234fc:6 7:13
 	u32* r_dst = &DY();
 	u32 shift = DX() & 0x3f;
 	u32 src = MASK_OUT_ABOVE_8(*r_dst);
 	u32 res = src >> shift;
 
 	if(shift != 0) {
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 		if(shift < 8) {
 			if(GET_MSB_8(src))
@@ -982,14 +982,14 @@ e020 f1f8 asr      b .          071234fc:6
 	}
 
 
-e060 f1f8 asr      w .          071234fc:6
+e060 f1f8 asr      w .          01234fc:6 7:13
 	u32* r_dst = &DY();
 	u32 shift = DX() & 0x3f;
 	u32 src = MASK_OUT_ABOVE_16(*r_dst);
 	u32 res = src >> shift;
 
 	if(shift != 0) {
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 		if(shift < 16) {
 			if(GET_MSB_16(src))
@@ -1026,14 +1026,14 @@ e060 f1f8 asr      w .          071234fc:6
 	}
 
 
-e0a0 f1f8 asr      l .          071:8 234fc:6
+e0a0 f1f8 asr      l .          01:8 7:13 234fc:6
 	u32* r_dst = &DY();
 	u32 shift = DX() & 0x3f;
 	u32 src = *r_dst;
 	u32 res = src >> shift;
 
 	if(shift != 0) {
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 		if(shift < 32) {
 			if(GET_MSB_32(src))
@@ -1070,7 +1070,7 @@ e0a0 f1f8 asr      l .          071:8 234fc:6
 	}
 
 
-e0c0 ffc0 asr      w A+-DXWL    071:8 234fc:5
+e0c0 ffc0 asr      w A+-DXWL    01:8 7:14 234fc:5
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 src = m68ki_read_16(ea);
 	u32 res = src >> 1;
@@ -1086,14 +1086,14 @@ e0c0 ffc0 asr      w A+-DXWL    071:8 234fc:5
 	m_c_flag = m_x_flag = src << 8;
 
 
-e100 f1f8 asl      b .          071:6 234fc:8
+e100 f1f8 asl      b .          01:6 7:13 234fc:8
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = MASK_OUT_ABOVE_8(*r_dst);
 	u32 res = MASK_OUT_ABOVE_8(src << shift);
 
 	if(shift != 0)
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
 
@@ -1104,14 +1104,14 @@ e100 f1f8 asl      b .          071:6 234fc:8
 	m_v_flag = (!(src == 0 || (src == m68ki_shift_8_table[shift + 1] && shift < 8)))<<7;
 
 
-e140 f1f8 asl      w .          071:6 234fc:8
+e140 f1f8 asl      w .          01:6 7:13 234fc:8
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = MASK_OUT_ABOVE_16(*r_dst);
 	u32 res = MASK_OUT_ABOVE_16(src << shift);
 
 	if(shift != 0)
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
 
@@ -1122,14 +1122,14 @@ e140 f1f8 asl      w .          071:6 234fc:8
 	m_v_flag = (!(src == 0 || src == m68ki_shift_16_table[shift + 1]))<<7;
 
 
-e180 f1f8 asl      l .          071234fc:8
+e180 f1f8 asl      l .          01234fc:8 7:13
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = *r_dst;
 	u32 res = MASK_OUT_ABOVE_32(src << shift);
 
 	if(shift != 0)
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 	*r_dst = res;
 
@@ -1140,14 +1140,14 @@ e180 f1f8 asl      l .          071234fc:8
 	m_v_flag = (!(src == 0 || src == m68ki_shift_32_table[shift + 1]))<<7;
 
 
-e120 f1f8 asl      b .          071:6 234fc:8
+e120 f1f8 asl      b .          01:6 7:13 234fc:8
 	u32* r_dst = &DY();
 	u32 shift = DX() & 0x3f;
 	u32 src = MASK_OUT_ABOVE_8(*r_dst);
 	u32 res = MASK_OUT_ABOVE_8(src << shift);
 
 	if(shift != 0) {
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 		if(shift < 8) {
 			*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
@@ -1172,14 +1172,14 @@ e120 f1f8 asl      b .          071:6 234fc:8
 	}
 
 
-e160 f1f8 asl      w .          071:6 234fc:8
+e160 f1f8 asl      w .          01:6 7:13 234fc:8
 	u32* r_dst = &DY();
 	u32 shift = DX() & 0x3f;
 	u32 src = MASK_OUT_ABOVE_16(*r_dst);
 	u32 res = MASK_OUT_ABOVE_16(src << shift);
 
 	if(shift != 0) {
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 		if(shift < 16) {
 			*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
@@ -1203,14 +1203,14 @@ e160 f1f8 asl      w .          071:6 234fc:8
 	}
 
 
-e1a0 f1f8 asl      l .          071234fc:8
+e1a0 f1f8 asl      l .          01234fc:8 7:13
 	u32* r_dst = &DY();
 	u32 shift = DX() & 0x3f;
 	u32 src = *r_dst;
 	u32 res = MASK_OUT_ABOVE_32(src << shift);
 
 	if(shift != 0) {
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 		if(shift < 32) {
 			*r_dst = res;
@@ -1234,7 +1234,7 @@ e1a0 f1f8 asl      l .          071234fc:8
 	}
 
 
-e1c0 ffc0 asl      w A+-DXWL    071:8 234fc:6
+e1c0 ffc0 asl      w A+-DXWL    01:8 7:14 234fc:6
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 src = m68ki_read_16(ea);
 	u32 res = MASK_OUT_ABOVE_16(src << 1);
@@ -1248,7 +1248,7 @@ e1c0 ffc0 asl      w A+-DXWL    071:8 234fc:6
 	m_v_flag = (!(src == 0 || src == 0xc000))<<7;
 
 
-6000 f000 bcc      b .          071:10 234fc:6
+6000 f000 bcc      b .          01:10 7:13 234fc:6
 	if(M68KMAKE_CC) {
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 		m68ki_branch_8(MASK_OUT_ABOVE_8(m_ir));
@@ -1258,7 +1258,7 @@ e1c0 ffc0 asl      w A+-DXWL    071:8 234fc:6
 	}
 
 
-6000 f0ff bcc      w .          071:10 234fc:6
+6000 f0ff bcc      w .          01:10 7:14 234fc:6
 	if(M68KMAKE_CC) {
 		u32 offset = OPER_I_16();
 		m_pc -= 2;
@@ -1271,7 +1271,7 @@ e1c0 ffc0 asl      w A+-DXWL    071:8 234fc:6
 	}
 
 
-60ff f0ff bcc      l .          071:10
+60ff f0ff bcc      l .          01:10 7:13
 	if(M68KMAKE_CC) {
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 		m68ki_branch_8(MASK_OUT_ABOVE_8(m_ir));
@@ -1290,7 +1290,7 @@ e1c0 ffc0 asl      w A+-DXWL    071:8 234fc:6
 		m_pc += 4;
 
 
-0140 f1f8 bchg     l .          071:8 234fc:4
+0140 f1f8 bchg     l .          01:8 7:10 234fc:4
 	u32* r_dst = &DY();
 	u32 mask = 1 << (DX() & 0x1f);
 
@@ -1298,7 +1298,7 @@ e1c0 ffc0 asl      w A+-DXWL    071:8 234fc:6
 	*r_dst ^= mask;
 
 
-0140 f1c0 bchg     b A+-DXWL    071:8 234fc:4
+0140 f1c0 bchg     b A+-DXWL    01:8 7:14 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 src = m68ki_read_8(ea);
 	u32 mask = 1 << (DX() & 7);
@@ -1307,7 +1307,7 @@ e1c0 ffc0 asl      w A+-DXWL    071:8 234fc:6
 	m68ki_write_8(ea, src ^ mask);
 
 
-0840 fff8 bchg     l .          071:12 234fc:4
+0840 fff8 bchg     l .          01:12 7:17 234fc:4
 	u32* r_dst = &DY();
 	u32 mask = 1 << (OPER_I_8() & 0x1f);
 
@@ -1315,7 +1315,7 @@ e1c0 ffc0 asl      w A+-DXWL    071:8 234fc:6
 	*r_dst ^= mask;
 
 
-0840 ffc0 bchg     b A+-DXWL    071:12 234fc:4
+0840 ffc0 bchg     b A+-DXWL    01:12 7:21 234fc:4
 	u32 mask = 1 << (OPER_I_8() & 7);
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 src = m68ki_read_8(ea);
@@ -1332,7 +1332,7 @@ e1c0 ffc0 asl      w A+-DXWL    071:8 234fc:6
 	*r_dst &= ~mask;
 
 
-0180 f1c0 bclr     b A+-DXWL    07:8 1:10 234fc:4
+0180 f1c0 bclr     b A+-DXWL    0:8 7:14 1:10 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 src = m68ki_read_8(ea);
 	u32 mask = 1 << (DX() & 7);
@@ -1341,7 +1341,7 @@ e1c0 ffc0 asl      w A+-DXWL    071:8 234fc:6
 	m68ki_write_8(ea, src & ~mask);
 
 
-0880 fff8 bclr     l .          071:14 234fc:4
+0880 fff8 bclr     l .          01:14 7:17 234fc:4
 	u32* r_dst = &DY();
 	u32 mask = 1 << (OPER_I_8() & 0x1f);
 
@@ -1349,7 +1349,7 @@ e1c0 ffc0 asl      w A+-DXWL    071:8 234fc:6
 	*r_dst &= ~mask;
 
 
-0880 ffc0 bclr     b A+-DXWL    071:12 234fc:4
+0880 ffc0 bclr     b A+-DXWL    01:12 7:21 234fc:4
 	u32 mask = 1 << (OPER_I_8() & 7);
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 src = m68ki_read_8(ea);
@@ -1936,12 +1936,12 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	m68ki_exception_illegal();
 
 
-6000 ff00 bra      b .          071234fc:10
+6000 ff00 bra      b .          01234fc:10 7:13
 	m68ki_trace_t0();                  /* auto-disable (see m68kcpu.h) */
 	m68ki_branch_8(MASK_OUT_ABOVE_8(m_ir));
 
 
-6000 ffff bra      w .          071234fc:10
+6000 ffff bra      w .          01234fc:10 7:14
 	u32 offset = OPER_I_16();
 	m_pc -= 2;
 	m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
@@ -1955,7 +1955,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	m68ki_branch_32(offset);
 
 
-01c0 f1f8 bset     l .          071:8 234fc:4
+01c0 f1f8 bset     l .          01:8 7:10 234fc:4
 	u32* r_dst = &DY();
 	u32 mask = 1 << (DX() & 0x1f);
 
@@ -1963,7 +1963,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	*r_dst |= mask;
 
 
-01c0 f1c0 bset     b A+-DXWL    071:8 234fc:4
+01c0 f1c0 bset     b A+-DXWL    01:8 7:14 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 src = m68ki_read_8(ea);
 	u32 mask = 1 << (DX() & 7);
@@ -1972,7 +1972,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	m68ki_write_8(ea, src | mask);
 
 
-08c0 fff8 bset     l .          071:12 234fc:4
+08c0 fff8 bset     l .          01:12 7:17 234fc:4
 	u32* r_dst = &DY();
 	u32 mask = 1 << (OPER_I_8() & 0x1f);
 
@@ -1980,7 +1980,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	*r_dst |= mask;
 
 
-08c0 ffc0 bset     b A+-DXWL    071:12 234fc:4
+08c0 ffc0 bset     b A+-DXWL    01:12 7:21 234fc:4
 	u32 mask = 1 << (OPER_I_8() & 7);
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 src = m68ki_read_8(ea);
@@ -1989,13 +1989,13 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	m68ki_write_8(ea, src | mask);
 
 
-6100 ff00 bsr      b .          071:18 234fc:7
+6100 ff00 bsr      b .          01:18 7:17 234fc:7
 	m68ki_trace_t0();                  /* auto-disable (see m68kcpu.h) */
 	m68ki_push_32(m_pc);
 	m68ki_branch_8(MASK_OUT_ABOVE_8(m_ir));
 
 
-6100 ffff bsr      w .          071:18 234fc:7
+6100 ffff bsr      w .          01:18 7:22 234fc:7
 	u32 offset = OPER_I_16();
 	m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 	m68ki_push_32(m_pc);
@@ -2011,19 +2011,19 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	m68ki_branch_32(offset);
 
 
-0100 f1f8 btst     l .          071:6 234fc:4
+0100 f1f8 btst     l .          01:6 7:7 234fc:4
 	m_not_z_flag = DY() & (1 << (DX() & 0x1f));
 
 
-0100 f1c0 btst     b A+-DXWLdxI 071234fc:4
+0100 f1c0 btst     b A+-DXWLdxI 01234fc:4 7:7
 	m_not_z_flag = M68KMAKE_GET_OPER_AY_8 & (1 << (DX() & 7));
 
 
-0800 fff8 btst     l .          071:10 234fc:4
+0800 fff8 btst     l .          01:10 7:14 234fc:4
 	m_not_z_flag = DY() & (1 << (OPER_I_8() & 0x1f));
 
 
-0800 ffc0 btst     b A+-DXWLdx  071:8 234fc:4
+0800 ffc0 btst     b A+-DXWLdx  01:8 7:14 234fc:4
 	u32 bit = OPER_I_8() & 7;
 
 	m_not_z_flag = M68KMAKE_GET_OPER_AY_8 & (1 << bit);
@@ -2177,7 +2177,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	done: ;
 
 
-4180 f1f8 chk      w .          07:10 1234fc:8
+4180 f1f8 chk      w .          0:10 7:19 1234fc:8
 	s32 src = MAKE_INT_16(DX());
 	s32 bound = MAKE_INT_16(DY());
 
@@ -2192,7 +2192,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	}
 
 
-4180 f1c0 chk      w A+-DXWLdxI 07:10 1234fc:8
+4180 f1c0 chk      w A+-DXWLdxI 0:10 7:19 1234fc:8
 	s32 src = MAKE_INT_16(DX());
 	s32 bound = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
 
@@ -2453,7 +2453,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 		m68ki_exception_trap(EXCEPTION_CHK);
 
 
-4200 fff8 clr      b .          071:4 234fc:2
+4200 fff8 clr      b .          01:4 7:7 234fc:2
 	DY() &= 0xffffff00;
 
 	m_n_flag = NFLAG_CLEAR;
@@ -2474,7 +2474,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	m_not_z_flag = ZFLAG_SET;
 
 
-4200 ffc0 clr      b A+-DXWL    71234fc:4
+4200 ffc0 clr      b A+-DXWL    7:11 1234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 
 	m68ki_write_8(ea, 0);
@@ -2485,7 +2485,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	m_not_z_flag = ZFLAG_SET;
 
 
-4240 fff8 clr      w .          071:4 234fc:2
+4240 fff8 clr      w .          01:4 7:7 234fc:2
 	DY() &= 0xffff0000;
 
 	m_n_flag = NFLAG_CLEAR;
@@ -2507,7 +2507,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	m_not_z_flag = ZFLAG_SET;
 
 
-4240 ffc0 clr      w A+-DXWL    71234fc:4
+4240 ffc0 clr      w A+-DXWL    7:11 1234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 
 	m68ki_write_16(ea, 0);
@@ -2518,7 +2518,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	m_not_z_flag = ZFLAG_SET;
 
 
-4280 fff8 clr      l .          071:6 234fc:2
+4280 fff8 clr      l .          01:6 7:7 234fc:2
 	DY() = 0;
 
 	m_n_flag = NFLAG_CLEAR;
@@ -2539,7 +2539,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	m_not_z_flag = ZFLAG_SET;
 
 
-4280 ffc0 clr      l A+-DXWL    71:6 234fc:4
+4280 ffc0 clr      l A+-DXWL    7:15 1:6 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_32;
 
 	m68ki_write_32(ea, 0);
@@ -2550,7 +2550,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	m_not_z_flag = ZFLAG_SET;
 
 
-b000 f1f8 cmp      b .          071:4 234fc:2
+b000 f1f8 cmp      b .          01:4 7:7 234fc:2
 	u32 src = MASK_OUT_ABOVE_8(DY());
 	u32 dst = MASK_OUT_ABOVE_8(DX());
 	u32 res = dst - src;
@@ -2561,7 +2561,7 @@ b000 f1f8 cmp      b .          071:4 234fc:2
 	m_c_flag = CFLAG_8(res);
 
 
-b000 f1c0 cmp      b A+-DXWLdxI 071:4 234fc:2
+b000 f1c0 cmp      b A+-DXWLdxI 01:4 7:7 234fc:2
 	u32 src = M68KMAKE_GET_OPER_AY_8;
 	u32 dst = MASK_OUT_ABOVE_8(DX());
 	u32 res = dst - src;
@@ -2572,7 +2572,7 @@ b000 f1c0 cmp      b A+-DXWLdxI 071:4 234fc:2
 	m_c_flag = CFLAG_8(res);
 
 
-b040 f1f8 cmp      w .          071:4 234fc:2
+b040 f1f8 cmp      w .          01:4 7:7 234fc:2
 	u32 src = MASK_OUT_ABOVE_16(DY());
 	u32 dst = MASK_OUT_ABOVE_16(DX());
 	u32 res = dst - src;
@@ -2583,7 +2583,7 @@ b040 f1f8 cmp      w .          071:4 234fc:2
 	m_c_flag = CFLAG_16(res);
 
 
-b048 f1f8 cmp      w .          071:4 234fc:2
+b048 f1f8 cmp      w .          01:4 7:7 234fc:2
 	u32 src = MASK_OUT_ABOVE_16(AY());
 	u32 dst = MASK_OUT_ABOVE_16(DX());
 	u32 res = dst - src;
@@ -2594,7 +2594,7 @@ b048 f1f8 cmp      w .          071:4 234fc:2
 	m_c_flag = CFLAG_16(res);
 
 
-b040 f1c0 cmp      w A+-DXWLdxI 071:4 234fc:2
+b040 f1c0 cmp      w A+-DXWLdxI 01:4 7:7 234fc:2
 	u32 src = M68KMAKE_GET_OPER_AY_16;
 	u32 dst = MASK_OUT_ABOVE_16(DX());
 	u32 res = dst - src;
@@ -2605,7 +2605,7 @@ b040 f1c0 cmp      w A+-DXWLdxI 071:4 234fc:2
 	m_c_flag = CFLAG_16(res);
 
 
-b080 f1f8 cmp      l .          071:6 234fc:2
+b080 f1f8 cmp      l .          01:6 7:7 234fc:2
 	u32 src = DY();
 	u32 dst = DX();
 	u32 res = dst - src;
@@ -2616,7 +2616,7 @@ b080 f1f8 cmp      l .          071:6 234fc:2
 	m_c_flag = CFLAG_SUB_32(src, dst, res);
 
 
-b088 f1f8 cmp      l .          071:6 234fc:2
+b088 f1f8 cmp      l .          01:6 7:7 234fc:2
 	u32 src = AY();
 	u32 dst = DX();
 	u32 res = dst - src;
@@ -2627,7 +2627,7 @@ b088 f1f8 cmp      l .          071:6 234fc:2
 	m_c_flag = CFLAG_SUB_32(src, dst, res);
 
 
-b080 f1c0 cmp      l A+-DXWLdxI 071:6 234fc:2
+b080 f1c0 cmp      l A+-DXWLdxI 01:6 7:7 234fc:2
 	u32 src = M68KMAKE_GET_OPER_AY_32;
 	u32 dst = DX();
 	u32 res = dst - src;
@@ -2638,7 +2638,7 @@ b080 f1c0 cmp      l A+-DXWLdxI 071:6 234fc:2
 	m_c_flag = CFLAG_SUB_32(src, dst, res);
 
 
-b0c0 f1f8 cmpa     w .          071:6 234fc:4
+b0c0 f1f8 cmpa     w .          01:6 7:7 234fc:4
 	u32 src = MAKE_INT_16(DY());
 	u32 dst = AX();
 	u32 res = dst - src;
@@ -2649,7 +2649,7 @@ b0c0 f1f8 cmpa     w .          071:6 234fc:4
 	m_c_flag = CFLAG_SUB_32(src, dst, res);
 
 
-b0c8 f1f8 cmpa     w .          071:6 234fc:4
+b0c8 f1f8 cmpa     w .          01:6 7:7 234fc:4
 	u32 src = MAKE_INT_16(AY());
 	u32 dst = AX();
 	u32 res = dst - src;
@@ -2660,7 +2660,7 @@ b0c8 f1f8 cmpa     w .          071:6 234fc:4
 	m_c_flag = CFLAG_SUB_32(src, dst, res);
 
 
-b0c0 f1c0 cmpa     w A+-DXWLdxI 071:6 234fc:4
+b0c0 f1c0 cmpa     w A+-DXWLdxI 01:6 7:7 234fc:4
 	u32 src = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
 	u32 dst = AX();
 	u32 res = dst - src;
@@ -2671,7 +2671,7 @@ b0c0 f1c0 cmpa     w A+-DXWLdxI 071:6 234fc:4
 	m_c_flag = CFLAG_SUB_32(src, dst, res);
 
 
-b1c0 f1f8 cmpa     l .          071:6 234fc:4
+b1c0 f1f8 cmpa     l .          01:6 7:7 234fc:4
 	u32 src = DY();
 	u32 dst = AX();
 	u32 res = dst - src;
@@ -2682,7 +2682,7 @@ b1c0 f1f8 cmpa     l .          071:6 234fc:4
 	m_c_flag = CFLAG_SUB_32(src, dst, res);
 
 
-b1c8 f1f8 cmpa     l .          071:6 234fc:4
+b1c8 f1f8 cmpa     l .          01:6 7:7 234fc:4
 	u32 src = AY();
 	u32 dst = AX();
 	u32 res = dst - src;
@@ -2693,7 +2693,7 @@ b1c8 f1f8 cmpa     l .          071:6 234fc:4
 	m_c_flag = CFLAG_SUB_32(src, dst, res);
 
 
-b1c0 f1c0 cmpa     l A+-DXWLdxI 071:6 234fc:4
+b1c0 f1c0 cmpa     l A+-DXWLdxI 01:6 7:7 234fc:4
 	u32 src = M68KMAKE_GET_OPER_AY_32;
 	u32 dst = AX();
 	u32 res = dst - src;
@@ -2704,7 +2704,7 @@ b1c0 f1c0 cmpa     l A+-DXWLdxI 071:6 234fc:4
 	m_c_flag = CFLAG_SUB_32(src, dst, res);
 
 
-0c00 fff8 cmpi     b .          071:8 234fc:2
+0c00 fff8 cmpi     b .          01:8 7:14 234fc:2
 	u32 src = OPER_I_8();
 	u32 dst = MASK_OUT_ABOVE_8(DY());
 	u32 res = dst - src;
@@ -2715,7 +2715,7 @@ b1c0 f1c0 cmpa     l A+-DXWLdxI 071:6 234fc:4
 	m_c_flag = CFLAG_8(res);
 
 
-0c00 ffc0 cmpi     b A+-DXWL    071:8 234fc:2
+0c00 ffc0 cmpi     b A+-DXWL    01:8 7:14 234fc:2
 	u32 src = OPER_I_8();
 	u32 dst = M68KMAKE_GET_OPER_AY_8;
 	u32 res = dst - src;
@@ -2748,7 +2748,7 @@ b1c0 f1c0 cmpa     l A+-DXWLdxI 071:6 234fc:4
 	m_c_flag = CFLAG_8(res);
 
 
-0c40 fff8 cmpi     w .          071:8 234fc:2
+0c40 fff8 cmpi     w .          01:8 7:14 234fc:2
 	u32 src = OPER_I_16();
 	u32 dst = MASK_OUT_ABOVE_16(DY());
 	u32 res = dst - src;
@@ -2759,7 +2759,7 @@ b1c0 f1c0 cmpa     l A+-DXWLdxI 071:6 234fc:4
 	m_c_flag = CFLAG_16(res);
 
 
-0c40 ffc0 cmpi     w A+-DXWL    071:8 234fc:2
+0c40 ffc0 cmpi     w A+-DXWL    01:8 7:14 234fc:2
 	u32 src = OPER_I_16();
 	u32 dst = M68KMAKE_GET_OPER_AY_16;
 	u32 res = dst - src;
@@ -2792,7 +2792,7 @@ b1c0 f1c0 cmpa     l A+-DXWLdxI 071:6 234fc:4
 	m_c_flag = CFLAG_16(res);
 
 
-0c80 fff8 cmpi     l .          07:14 1:12 234fc:2
+0c80 fff8 cmpi     l .          0:14 7:18 1:12 234fc:2
 	u32 src = OPER_I_32();
 	u32 dst = DY();
 	u32 res = dst - src;
@@ -2806,7 +2806,7 @@ b1c0 f1c0 cmpa     l A+-DXWLdxI 071:6 234fc:4
 	m_c_flag = CFLAG_SUB_32(src, dst, res);
 
 
-0c80 ffc0 cmpi     l A+-DXWL    071:12 234fc:2
+0c80 ffc0 cmpi     l A+-DXWL    01:12 7:18 234fc:2
 	u32 src = OPER_I_32();
 	u32 dst = M68KMAKE_GET_OPER_AY_32;
 	u32 res = dst - src;
@@ -2839,7 +2839,7 @@ b1c0 f1c0 cmpa     l A+-DXWLdxI 071:6 234fc:4
 	m_c_flag = CFLAG_SUB_32(src, dst, res);
 
 
-bf08 fff8 cmpm     b .          071:12 234fc:9
+bf08 fff8 cmpm     b .          01:12 7:18 234fc:9
 	u32 src = OPER_AY_PI_8();
 	u32 dst = OPER_A7_PI_8();
 	u32 res = dst - src;
@@ -2850,7 +2850,7 @@ bf08 fff8 cmpm     b .          071:12 234fc:9
 	m_c_flag = CFLAG_8(res);
 
 
-b10f f1ff cmpm     b .          071:12 234fc:9
+b10f f1ff cmpm     b .          01:12 7:18 234fc:9
 	u32 src = OPER_A7_PI_8();
 	u32 dst = OPER_AX_PI_8();
 	u32 res = dst - src;
@@ -2861,7 +2861,7 @@ b10f f1ff cmpm     b .          071:12 234fc:9
 	m_c_flag = CFLAG_8(res);
 
 
-bf0f ffff cmpm     b .          071:12 234fc:9
+bf0f ffff cmpm     b .          01:12 7:18 234fc:9
 	u32 src = OPER_A7_PI_8();
 	u32 dst = OPER_A7_PI_8();
 	u32 res = dst - src;
@@ -2872,7 +2872,7 @@ bf0f ffff cmpm     b .          071:12 234fc:9
 	m_c_flag = CFLAG_8(res);
 
 
-b108 f1f8 cmpm     b .          071:12 234fc:9
+b108 f1f8 cmpm     b .          01:12 7:18 234fc:9
 	u32 src = OPER_AY_PI_8();
 	u32 dst = OPER_AX_PI_8();
 	u32 res = dst - src;
@@ -2883,7 +2883,7 @@ b108 f1f8 cmpm     b .          071:12 234fc:9
 	m_c_flag = CFLAG_8(res);
 
 
-b148 f1f8 cmpm     w .          071:12 234fc:9
+b148 f1f8 cmpm     w .          01:12 7:18 234fc:9
 	u32 src = OPER_AY_PI_16();
 	u32 dst = OPER_AX_PI_16();
 	u32 res = dst - src;
@@ -2894,7 +2894,7 @@ b148 f1f8 cmpm     w .          071:12 234fc:9
 	m_c_flag = CFLAG_16(res);
 
 
-b188 f1f8 cmpm     l .          071:20 234fc:9
+b188 f1f8 cmpm     l .          01:20 7:26 234fc:9
 	u32 src = OPER_AY_PI_32();
 	u32 dst = OPER_AX_PI_32();
 	u32 res = dst - src;
@@ -2943,11 +2943,11 @@ f278 fff8 ftrapcc  l .          23:4
 		m68ki_exception_1111();
 	}
 
-50c8 fff8 dbt      w .          071:12 234fc:6
+50c8 fff8 dbt      w .          01:12 7:14 234fc:6
 	m_pc += 2;
 
 
-51c8 fff8 dbf      w .          071:12 2:6 34fc:4
+51c8 fff8 dbf      w .          01:12 7:14 2:6 34fc:4
 	u32* r_dst = &DY();
 	u32 res = MASK_OUT_ABOVE_16(*r_dst - 1);
 
@@ -2964,7 +2964,7 @@ f278 fff8 ftrapcc  l .          23:4
 	}
 
 
-50c8 f0f8 dbcc     w .          071:12 234fc:6
+50c8 f0f8 dbcc     w .          01:12 7:14 234fc:6
 	if(M68KMAKE_NOT_CC) {
 		u32* r_dst = &DY();
 		u32 res = MASK_OUT_ABOVE_16(*r_dst - 1);
@@ -2985,7 +2985,7 @@ f278 fff8 ftrapcc  l .          23:4
 	}
 
 
-81c0 f1f8 divs     w .          07:158 1:122 234fc:56
+81c0 f1f8 divs     w .          0:158 7:169 1:122 234fc:56
 	u32* r_dst = &DX();
 	s32 src = MAKE_INT_16(DY());
 	s32 quotient;
@@ -3014,7 +3014,7 @@ f278 fff8 ftrapcc  l .          23:4
 		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
 	}
 
-81c0 f1c0 divs     w A+-DXWLdxI 07:158 1:122 234fc:56
+81c0 f1c0 divs     w A+-DXWLdxI 0:158 7:169 1:122 234fc:56
 	u32* r_dst = &DX();
 	s32 src = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
 	s32 quotient;
@@ -3044,7 +3044,7 @@ f278 fff8 ftrapcc  l .          23:4
 	}
 
 
-80c0 f1f8 divu     w .          07:140 1:108 234fc:44
+80c0 f1f8 divu     w .          0:140 7:130 1:108 234fc:44
 	u32* r_dst = &DX();
 	u32 src = MASK_OUT_ABOVE_16(DY());
 
@@ -3065,7 +3065,7 @@ f278 fff8 ftrapcc  l .          23:4
 	}
 
 
-80c0 f1c0 divu     w A+-DXWLdxI 07:140 1:108 234fc:44
+80c0 f1c0 divu     w A+-DXWLdxI 0:140 7:130 1:108 234fc:44
 	u32* r_dst = &DX();
 	u32 src = M68KMAKE_GET_OPER_AY_16;
 
@@ -3189,7 +3189,7 @@ f278 fff8 ftrapcc  l .          23:4
 	}
 
 
-b100 f1f8 eor      b .          071:4 234fc:2
+b100 f1f8 eor      b .          01:4 7:7 234fc:2
 	u32 res = MASK_OUT_ABOVE_8(DY() ^= MASK_OUT_ABOVE_8(DX()));
 
 	m_n_flag = NFLAG_8(res);
@@ -3198,7 +3198,7 @@ b100 f1f8 eor      b .          071:4 234fc:2
 	m_v_flag = VFLAG_CLEAR;
 
 
-b100 f1c0 eor      b A+-DXWL    071:8 234fc:4
+b100 f1c0 eor      b A+-DXWL    01:8 7:11 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 res = MASK_OUT_ABOVE_8(DX() ^ m68ki_read_8(ea));
 
@@ -3210,7 +3210,7 @@ b100 f1c0 eor      b A+-DXWL    071:8 234fc:4
 	m_v_flag = VFLAG_CLEAR;
 
 
-b140 f1f8 eor      w .          071:4 234fc:2
+b140 f1f8 eor      w .          01:4 7:7 234fc:2
 	u32 res = MASK_OUT_ABOVE_16(DY() ^= MASK_OUT_ABOVE_16(DX()));
 
 	m_n_flag = NFLAG_16(res);
@@ -3219,7 +3219,7 @@ b140 f1f8 eor      w .          071:4 234fc:2
 	m_v_flag = VFLAG_CLEAR;
 
 
-b140 f1c0 eor      w A+-DXWL    071:8 234fc:4
+b140 f1c0 eor      w A+-DXWL    01:8 7:11 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 res = MASK_OUT_ABOVE_16(DX() ^ m68ki_read_16(ea));
 
@@ -3231,7 +3231,7 @@ b140 f1c0 eor      w A+-DXWL    071:8 234fc:4
 	m_v_flag = VFLAG_CLEAR;
 
 
-b180 f1f8 eor      l .          07:8 1:6 234fc:2
+b180 f1f8 eor      l .          0:8 7:7 1:6 234fc:2
 	u32 res = DY() ^= DX();
 
 	m_n_flag = NFLAG_32(res);
@@ -3240,7 +3240,7 @@ b180 f1f8 eor      l .          07:8 1:6 234fc:2
 	m_v_flag = VFLAG_CLEAR;
 
 
-b180 f1c0 eor      l A+-DXWL    071:12 234fc:4
+b180 f1c0 eor      l A+-DXWL    01:12 7:15 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_32;
 	u32 res = DX() ^ m68ki_read_32(ea);
 
@@ -3252,7 +3252,7 @@ b180 f1c0 eor      l A+-DXWL    071:12 234fc:4
 	m_v_flag = VFLAG_CLEAR;
 
 
-0a00 fff8 eori     b .          071:8 234fc:2
+0a00 fff8 eori     b .          01:8 7:14 234fc:2
 	u32 res = MASK_OUT_ABOVE_8(DY() ^= OPER_I_8());
 
 	m_n_flag = NFLAG_8(res);
@@ -3261,7 +3261,7 @@ b180 f1c0 eor      l A+-DXWL    071:12 234fc:4
 	m_v_flag = VFLAG_CLEAR;
 
 
-0a00 ffc0 eori     b A+-DXWL    071:12 234fc:4
+0a00 ffc0 eori     b A+-DXWL    01:12 7:18 234fc:4
 	u32 src = OPER_I_8();
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 res = src ^ m68ki_read_8(ea);
@@ -3274,7 +3274,7 @@ b180 f1c0 eor      l A+-DXWL    071:12 234fc:4
 	m_v_flag = VFLAG_CLEAR;
 
 
-0a40 fff8 eori     w .          071:8 234fc:2
+0a40 fff8 eori     w .          01:8 7:14 234fc:2
 	u32 res = MASK_OUT_ABOVE_16(DY() ^= OPER_I_16());
 
 	m_n_flag = NFLAG_16(res);
@@ -3283,7 +3283,7 @@ b180 f1c0 eor      l A+-DXWL    071:12 234fc:4
 	m_v_flag = VFLAG_CLEAR;
 
 
-0a40 ffc0 eori     w A+-DXWL    071:12 234fc:4
+0a40 ffc0 eori     w A+-DXWL    01:12 7:18 234fc:4
 	u32 src = OPER_I_16();
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 res = src ^ m68ki_read_16(ea);
@@ -3296,7 +3296,7 @@ b180 f1c0 eor      l A+-DXWL    071:12 234fc:4
 	m_v_flag = VFLAG_CLEAR;
 
 
-0a80 fff8 eori     l .          07:16 1:14 234fc:2
+0a80 fff8 eori     l .          0:16 7:18 1:14 234fc:2
 	u32 res = DY() ^= OPER_I_32();
 
 	m_n_flag = NFLAG_32(res);
@@ -3305,7 +3305,7 @@ b180 f1c0 eor      l A+-DXWL    071:12 234fc:4
 	m_v_flag = VFLAG_CLEAR;
 
 
-0a80 ffc0 eori     l A+-DXWL    071:20 234fc:4
+0a80 ffc0 eori     l A+-DXWL    01:20 7:26 234fc:4
 	u32 src = OPER_I_32();
 	u32 ea = M68KMAKE_GET_EA_AY_32;
 	u32 res = src ^ m68ki_read_32(ea);
@@ -3318,11 +3318,11 @@ b180 f1c0 eor      l A+-DXWL    071:12 234fc:4
 	m_v_flag = VFLAG_CLEAR;
 
 
-0a3c ffff eori     w .          07:20 1:16 234fc:12
+0a3c ffff eori     w .          0:20 7:14 1:16 234fc:12
 	m68ki_set_ccr(m68ki_get_ccr() ^ OPER_I_8());
 
 
-0a7c ffff eori     w .          07:20p 1:16p 234fc:12p
+0a7c ffff eori     w .          0:20p 7:14p 1:16p 234fc:12p
 	if(m_s_flag) {
 		u32 src = OPER_I_16();
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
@@ -3332,7 +3332,7 @@ b180 f1c0 eor      l A+-DXWL    071:12 234fc:4
 	}
 
 
-c140 f1f8 exg      l .          071:6 234fc:2
+c140 f1f8 exg      l .          01:6 7:13 234fc:2
 	u32* reg_a = &DX();
 	u32* reg_b = &DY();
 	u32 tmp = *reg_a;
@@ -3340,7 +3340,7 @@ c140 f1f8 exg      l .          071:6 234fc:2
 	*reg_b = tmp;
 
 
-c148 f1f8 exg      l .          071:6 234fc:2
+c148 f1f8 exg      l .          01:6 7:13 234fc:2
 	u32* reg_a = &AX();
 	u32* reg_b = &AY();
 	u32 tmp = *reg_a;
@@ -3348,7 +3348,7 @@ c148 f1f8 exg      l .          071:6 234fc:2
 	*reg_b = tmp;
 
 
-c188 f1f8 exg      l .          071:6 234fc:2
+c188 f1f8 exg      l .          01:6 7:13 234fc:2
 	u32* reg_a = &DX();
 	u32* reg_b = &AY();
 	u32 tmp = *reg_a;
@@ -3356,7 +3356,7 @@ c188 f1f8 exg      l .          071:6 234fc:2
 	*reg_b = tmp;
 
 
-4880 fff8 ext      w .          071234fc:4
+4880 fff8 ext      w .          01234fc:4 7:7
 	u32* r_dst = &DY();
 
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | MASK_OUT_ABOVE_8(*r_dst) | (GET_MSB_8(*r_dst) ? 0xff00 : 0);
@@ -3367,7 +3367,7 @@ c188 f1f8 exg      l .          071:6 234fc:2
 	m_c_flag = CFLAG_CLEAR;
 
 
-48c0 fff8 ext      l .          071234fc:4
+48c0 fff8 ext      l .          01234fc:4 7:7
 	u32* r_dst = &DY();
 
 	*r_dst = MASK_OUT_ABOVE_16(*r_dst) | (GET_MSB_16(*r_dst) ? 0xffff0000 : 0);
@@ -3393,29 +3393,29 @@ c188 f1f8 exg      l .          071:6 234fc:2
 	m68ki_exception_illegal();
 
 
-4ec0 ffc0 jmp      l ADXWLdx    071:4 234fc:0
+4ec0 ffc0 jmp      l ADXWLdx    01:4 7:7 234fc:0
 	m68ki_jump(M68KMAKE_GET_EA_AY_32);
 	m68ki_trace_t0();                  /* auto-disable (see m68kcpu.h) */
 
 
-4e80 ffc0 jsr      l ADXWLdx    071:12 234fc:0
+4e80 ffc0 jsr      l ADXWLdx    01:12 7:18 234fc:0
 	u32 ea = M68KMAKE_GET_EA_AY_32;
 	m68ki_trace_t0();                  /* auto-disable (see m68kcpu.h) */
 	m68ki_push_32(m_pc);
 	m68ki_jump(ea);
 
 
-41c0 f1c0 lea      l ADXWLdx    071:0 234fc:2
+41c0 f1c0 lea      l ADXWLdx    01:0 7:7 234fc:2
 	AX() = M68KMAKE_GET_EA_AY_32;
 
 
-4e57 ffff link     w .          071:16 234fc:5
+4e57 ffff link     w .          01:16 7:25 234fc:5
 	REG_A()[7] -= 4;
 	m68ki_write_32(REG_A()[7], REG_A()[7]);
 	REG_A()[7] = MASK_OUT_ABOVE_32(REG_A()[7] + MAKE_INT_16(OPER_I_16()));
 
 
-4e50 fff8 link     w .          071:16 234fc:5
+4e50 fff8 link     w .          01:16 7:25 234fc:5
 	u32* r_dst = &AY();
 
 	m68ki_push_32(*r_dst);
@@ -3437,14 +3437,14 @@ c188 f1f8 exg      l .          071:6 234fc:2
 	REG_A()[7] = MASK_OUT_ABOVE_32(REG_A()[7] + OPER_I_32());
 
 
-e008 f1f8 lsr      b .          071:6 234fc:4
+e008 f1f8 lsr      b .          01:6 7:13 234fc:4
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = MASK_OUT_ABOVE_8(*r_dst);
 	u32 res = src >> shift;
 
 	if(shift != 0)
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
 
@@ -3454,14 +3454,14 @@ e008 f1f8 lsr      b .          071:6 234fc:4
 	m_v_flag = VFLAG_CLEAR;
 
 
-e048 f1f8 lsr      w .          071:6 234fc:4
+e048 f1f8 lsr      w .          01:6 7:13 234fc:4
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = MASK_OUT_ABOVE_16(*r_dst);
 	u32 res = src >> shift;
 
 	if(shift != 0)
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
 
@@ -3471,14 +3471,14 @@ e048 f1f8 lsr      w .          071:6 234fc:4
 	m_v_flag = VFLAG_CLEAR;
 
 
-e088 f1f8 lsr      l .          071:8 234fc:4
+e088 f1f8 lsr      l .          01:8 7:13 234fc:4
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = *r_dst;
 	u32 res = src >> shift;
 
 	if(shift != 0)
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 	*r_dst = res;
 
@@ -3488,14 +3488,14 @@ e088 f1f8 lsr      l .          071:8 234fc:4
 	m_v_flag = VFLAG_CLEAR;
 
 
-e028 f1f8 lsr      b .          071234fc:6
+e028 f1f8 lsr      b .          01234fc:6 7:13
 	u32* r_dst = &DY();
 	u32 shift = DX() & 0x3f;
 	u32 src = MASK_OUT_ABOVE_8(*r_dst);
 	u32 res = src >> shift;
 
 	if(shift != 0) {
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 		if(shift <= 8) {
 			*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
@@ -3520,14 +3520,14 @@ e028 f1f8 lsr      b .          071234fc:6
 	}
 
 
-e068 f1f8 lsr      w .          071234fc:6
+e068 f1f8 lsr      w .          01234fc:6 7:13
 	u32* r_dst = &DY();
 	u32 shift = DX() & 0x3f;
 	u32 src = MASK_OUT_ABOVE_16(*r_dst);
 	u32 res = src >> shift;
 
 	if(shift != 0) {
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 		if(shift <= 16) {
 			*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
@@ -3550,14 +3550,14 @@ e068 f1f8 lsr      w .          071234fc:6
 		m_v_flag = VFLAG_CLEAR;
 	}
 
-e0a8 f1f8 lsr      l .          071:8 234fc:6
+e0a8 f1f8 lsr      l .          01:8 7:13 234fc:6
 	u32* r_dst = &DY();
 	u32 shift = DX() & 0x3f;
 	u32 src = *r_dst;
 	u32 res = src >> shift;
 
 	if(shift != 0) {
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 		if(shift < 32) {
 			*r_dst = res;
@@ -3580,7 +3580,7 @@ e0a8 f1f8 lsr      l .          071:8 234fc:6
 	}
 
 
-e2c0 ffc0 lsr      w A+-DXWL    071:8 234fc:5
+e2c0 ffc0 lsr      w A+-DXWL    01:8 7:14 234fc:5
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 src = m68ki_read_16(ea);
 	u32 res = src >> 1;
@@ -3593,14 +3593,14 @@ e2c0 ffc0 lsr      w A+-DXWL    071:8 234fc:5
 	m_v_flag = VFLAG_CLEAR;
 
 
-e108 f1f8 lsl      b .          071:6 234fc:4
+e108 f1f8 lsl      b .          01:6 7:13 234fc:4
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = MASK_OUT_ABOVE_8(*r_dst);
 	u32 res = MASK_OUT_ABOVE_8(src << shift);
 
 	if(shift != 0)
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
 
@@ -3610,14 +3610,14 @@ e108 f1f8 lsl      b .          071:6 234fc:4
 	m_v_flag = VFLAG_CLEAR;
 
 
-e148 f1f8 lsl      w .          071:6 234fc:4
+e148 f1f8 lsl      w .          01:6 7:13 234fc:4
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = MASK_OUT_ABOVE_16(*r_dst);
 	u32 res = MASK_OUT_ABOVE_16(src << shift);
 
 	if(shift != 0)
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
 
@@ -3627,14 +3627,14 @@ e148 f1f8 lsl      w .          071:6 234fc:4
 	m_v_flag = VFLAG_CLEAR;
 
 
-e188 f1f8 lsl      l .          071:8 234fc:4
+e188 f1f8 lsl      l .          01:8 7:13 234fc:4
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = *r_dst;
 	u32 res = MASK_OUT_ABOVE_32(src << shift);
 
 	if(shift != 0)
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 	*r_dst = res;
 
@@ -3644,14 +3644,14 @@ e188 f1f8 lsl      l .          071:8 234fc:4
 	m_v_flag = VFLAG_CLEAR;
 
 
-e128 f1f8 lsl      b .          071234fc:6
+e128 f1f8 lsl      b .          01234fc:6 7:13
 	u32* r_dst = &DY();
 	u32 shift = DX() & 0x3f;
 	u32 src = MASK_OUT_ABOVE_8(*r_dst);
 	u32 res = MASK_OUT_ABOVE_8(src << shift);
 
 	if(shift != 0) {
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 		if(shift <= 8) {
 			*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
@@ -3675,14 +3675,14 @@ e128 f1f8 lsl      b .          071234fc:6
 	}
 
 
-e168 f1f8 lsl      w .          071234fc:6
+e168 f1f8 lsl      w .          01234fc:6 7:13
 	u32* r_dst = &DY();
 	u32 shift = DX() & 0x3f;
 	u32 src = MASK_OUT_ABOVE_16(*r_dst);
 	u32 res = MASK_OUT_ABOVE_16(src << shift);
 
 	if(shift != 0) {
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 		if(shift <= 16) {
 			*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
@@ -3706,14 +3706,14 @@ e168 f1f8 lsl      w .          071234fc:6
 	}
 
 
-e1a8 f1f8 lsl      l .          071:8 234fc:6
+e1a8 f1f8 lsl      l .          01:8 7:13 234fc:6
 	u32* r_dst = &DY();
 	u32 shift = DX() & 0x3f;
 	u32 src = *r_dst;
 	u32 res = MASK_OUT_ABOVE_32(src << shift);
 
 	if(shift != 0) {
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 		if(shift < 32) {
 			*r_dst = res;
@@ -3736,7 +3736,7 @@ e1a8 f1f8 lsl      l .          071:8 234fc:6
 	}
 
 
-e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
+e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 234fc:5
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 src = m68ki_read_16(ea);
 	u32 res = MASK_OUT_ABOVE_16(src << 1);
@@ -3749,7 +3749,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_v_flag = VFLAG_CLEAR;
 
 
-1000 f1f8 move     b .          071:4 234fc:2
+1000 f1f8 move     b .          01:4 7:7 234fc:2
 	u32 res = MASK_OUT_ABOVE_8(DY());
 	u32* r_dst = &DX();
 
@@ -3761,7 +3761,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-1000 f1c0 move     b A+-DXWLdxI 071:4 234fc:2
+1000 f1c0 move     b A+-DXWLdxI 01:4 7:7 234fc:2
 	u32 res = M68KMAKE_GET_OPER_AY_8;
 	u32* r_dst = &DX();
 
@@ -3773,7 +3773,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-1080 f1f8 move     b .          071:8 234fc:4
+1080 f1f8 move     b .          01:8 7:11 234fc:4
 	u32 res = MASK_OUT_ABOVE_8(DY());
 	u32 ea = EA_AX_AI_8();
 
@@ -3785,7 +3785,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-1080 f1c0 move     b A+-DXWLdxI 071:8 234fc:4
+1080 f1c0 move     b A+-DXWLdxI 01:8 7:11 234fc:4
 	u32 res = M68KMAKE_GET_OPER_AY_8;
 	u32 ea = EA_AX_AI_8();
 
@@ -3797,7 +3797,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-1ec0 fff8 move     b .          071:8 234fc:4
+1ec0 fff8 move     b .          01:8 7:11 234fc:4
 	u32 res = MASK_OUT_ABOVE_8(DY());
 	u32 ea = EA_A7_PI_8();
 
@@ -3809,7 +3809,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-10c0 f1f8 move     b .          071:8 234fc:4
+10c0 f1f8 move     b .          01:8 7:11 234fc:4
 	u32 res = MASK_OUT_ABOVE_8(DY());
 	u32 ea = EA_AX_PI_8();
 
@@ -3821,7 +3821,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-1ec0 ffc0 move     b A+-DXWLdxI 071:8 234fc:4
+1ec0 ffc0 move     b A+-DXWLdxI 01:8 7:11 234fc:4
 	u32 res = M68KMAKE_GET_OPER_AY_8;
 	u32 ea = EA_A7_PI_8();
 
@@ -3833,7 +3833,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-10c0 f1c0 move     b A+-DXWLdxI 071:8 234fc:4
+10c0 f1c0 move     b A+-DXWLdxI 01:8 7:11 234fc:4
 	u32 res = M68KMAKE_GET_OPER_AY_8;
 	u32 ea = EA_AX_PI_8();
 
@@ -3845,7 +3845,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-1f00 fff8 move     b .          071:8 234fc:5
+1f00 fff8 move     b .          01:8 7:14 234fc:5
 	u32 res = MASK_OUT_ABOVE_8(DY());
 	u32 ea = EA_A7_PD_8();
 
@@ -3857,7 +3857,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-1100 f1f8 move     b .          071:8 234fc:5
+1100 f1f8 move     b .          01:8 7:14 234fc:5
 	u32 res = MASK_OUT_ABOVE_8(DY());
 	u32 ea = EA_AX_PD_8();
 
@@ -3869,7 +3869,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-1f00 ffc0 move     b A+-DXWLdxI 071:8 234fc:5
+1f00 ffc0 move     b A+-DXWLdxI 01:8 7:14 234fc:5
 	u32 res = M68KMAKE_GET_OPER_AY_8;
 	u32 ea = EA_A7_PD_8();
 
@@ -3881,7 +3881,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-1100 f1c0 move     b A+-DXWLdxI 071:8 234fc:5
+1100 f1c0 move     b A+-DXWLdxI 01:8 7:14 234fc:5
 	u32 res = M68KMAKE_GET_OPER_AY_8;
 	u32 ea = EA_AX_PD_8();
 
@@ -3893,7 +3893,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-1140 f1f8 move     b .          071:12 234fc:5
+1140 f1f8 move     b .          01:12 7:18 234fc:5
 	u32 res = MASK_OUT_ABOVE_8(DY());
 	u32 ea = EA_AX_DI_8();
 
@@ -3905,7 +3905,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-1140 f1c0 move     b A+-DXWLdxI 071:12 234fc:5
+1140 f1c0 move     b A+-DXWLdxI 01:12 7:18 234fc:5
 	u32 res = M68KMAKE_GET_OPER_AY_8;
 	u32 ea = EA_AX_DI_8();
 
@@ -3917,7 +3917,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-1180 f1f8 move     b .          071:14 234fc:7
+1180 f1f8 move     b .          01:14 7:21 234fc:7
 	u32 res = MASK_OUT_ABOVE_8(DY());
 	u32 ea = EA_AX_IX_8();
 
@@ -3929,7 +3929,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-1180 f1c0 move     b A+-DXWLdxI 071:14 234fc:7
+1180 f1c0 move     b A+-DXWLdxI 01:14 7:21 234fc:7
 	u32 res = M68KMAKE_GET_OPER_AY_8;
 	u32 ea = EA_AX_IX_8();
 
@@ -3941,7 +3941,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-11c0 fff8 move     b .          071:12 234fc:4
+11c0 fff8 move     b .          01:12 7:15 234fc:4
 	u32 res = MASK_OUT_ABOVE_8(DY());
 	u32 ea = EA_AW_8();
 
@@ -3953,7 +3953,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-11c0 ffc0 move     b A+-DXWLdxI 071:12 234fc:4
+11c0 ffc0 move     b A+-DXWLdxI 01:12 7:15 234fc:4
 	u32 res = M68KMAKE_GET_OPER_AY_8;
 	u32 ea = EA_AW_8();
 
@@ -3965,7 +3965,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-13c0 fff8 move     b .          071:16 234fc:6
+13c0 fff8 move     b .          01:16 7:19 234fc:6
 	u32 res = MASK_OUT_ABOVE_8(DY());
 	u32 ea = EA_AL_8();
 
@@ -3977,7 +3977,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-13c0 ffc0 move     b A+-DXWLdxI 071:16 234fc:6
+13c0 ffc0 move     b A+-DXWLdxI 01:16 7:19 234fc:6
 	u32 res = M68KMAKE_GET_OPER_AY_8;
 	u32 ea = EA_AL_8();
 
@@ -3989,7 +3989,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-3000 f1f8 move     w .          071:4 234fc:2
+3000 f1f8 move     w .          01:4 7:7 234fc:2
 	u32 res = MASK_OUT_ABOVE_16(DY());
 	u32* r_dst = &DX();
 
@@ -4001,7 +4001,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-3008 f1f8 move     w .          071:4 234fc:2
+3008 f1f8 move     w .          01:4 7:7 234fc:2
 	u32 res = MASK_OUT_ABOVE_16(AY());
 	u32* r_dst = &DX();
 
@@ -4013,7 +4013,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-3000 f1c0 move     w A+-DXWLdxI 071:4 234fc:2
+3000 f1c0 move     w A+-DXWLdxI 01:4 7:7 234fc:2
 	u32 res = M68KMAKE_GET_OPER_AY_16;
 	u32* r_dst = &DX();
 
@@ -4025,7 +4025,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-3080 f1f8 move     w .          071:8 234fc:4
+3080 f1f8 move     w .          01:8 7:11 234fc:4
 	u32 res = MASK_OUT_ABOVE_16(DY());
 	u32 ea = EA_AX_AI_16();
 
@@ -4037,7 +4037,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-3088 f1f8 move     w .          071:8 234fc:4
+3088 f1f8 move     w .          01:8 7:11 234fc:4
 	u32 res = MASK_OUT_ABOVE_16(AY());
 	u32 ea = EA_AX_AI_16();
 
@@ -4049,7 +4049,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-3080 f1c0 move     w A+-DXWLdxI 071:8 234fc:4
+3080 f1c0 move     w A+-DXWLdxI 01:8 7:11 234fc:4
 	u32 res = M68KMAKE_GET_OPER_AY_16;
 	u32 ea = EA_AX_AI_16();
 
@@ -4061,7 +4061,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-30c0 f1f8 move     w .          071:8 234fc:4
+30c0 f1f8 move     w .          01:8 7:11 234fc:4
 	u32 res = MASK_OUT_ABOVE_16(DY());
 	u32 ea = EA_AX_PI_16();
 
@@ -4073,7 +4073,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-30c8 f1f8 move     w .          071:8 234fc:4
+30c8 f1f8 move     w .          01:8 7:11 234fc:4
 	u32 res = MASK_OUT_ABOVE_16(AY());
 	u32 ea = EA_AX_PI_16();
 
@@ -4085,7 +4085,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-30c0 f1c0 move     w A+-DXWLdxI 071:8 234fc:4
+30c0 f1c0 move     w A+-DXWLdxI 01:8 7:11 234fc:4
 	u32 res = M68KMAKE_GET_OPER_AY_16;
 	u32 ea = EA_AX_PI_16();
 
@@ -4097,7 +4097,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-3100 f1f8 move     w .          071:8 234fc:5
+3100 f1f8 move     w .          01:8 7:14 234fc:5
 	u32 res = MASK_OUT_ABOVE_16(DY());
 	u32 ea = EA_AX_PD_16();
 
@@ -4109,7 +4109,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-3108 f1f8 move     w .          071:8 234fc:5
+3108 f1f8 move     w .          01:8 7:14 234fc:5
 	u32 res = MASK_OUT_ABOVE_16(AY());
 	u32 ea = EA_AX_PD_16();
 
@@ -4121,7 +4121,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-3100 f1c0 move     w A+-DXWLdxI 071:8 234fc:5
+3100 f1c0 move     w A+-DXWLdxI 01:8 7:14 234fc:5
 	u32 res = M68KMAKE_GET_OPER_AY_16;
 	u32 ea = EA_AX_PD_16();
 
@@ -4133,7 +4133,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-3140 f1f8 move     w .          071:12 234fc:5
+3140 f1f8 move     w .          01:12 7:18 234fc:5
 	u32 res = MASK_OUT_ABOVE_16(DY());
 	u32 ea = EA_AX_DI_16();
 
@@ -4145,7 +4145,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-3148 f1f8 move     w .          071:12 234fc:5
+3148 f1f8 move     w .          01:12 7:18 234fc:5
 	u32 res = MASK_OUT_ABOVE_16(AY());
 	u32 ea = EA_AX_DI_16();
 
@@ -4157,7 +4157,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-3140 f1c0 move     w A+-DXWLdxI 071:12 234fc:5
+3140 f1c0 move     w A+-DXWLdxI 01:12 7:18 234fc:5
 	u32 res = M68KMAKE_GET_OPER_AY_16;
 	u32 ea = EA_AX_DI_16();
 
@@ -4169,7 +4169,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-3180 f1f8 move     w .          071:14 234fc:7
+3180 f1f8 move     w .          01:14 7:21 234fc:7
 	u32 res = MASK_OUT_ABOVE_16(DY());
 	u32 ea = EA_AX_IX_16();
 
@@ -4181,7 +4181,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-3188 f1f8 move     w .          071:14 234fc:7
+3188 f1f8 move     w .          01:14 7:21 234fc:7
 	u32 res = MASK_OUT_ABOVE_16(AY());
 	u32 ea = EA_AX_IX_16();
 
@@ -4193,7 +4193,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-3180 f1c0 move     w A+-DXWLdxI 071:14 234fc:7
+3180 f1c0 move     w A+-DXWLdxI 01:14 7:21 234fc:7
 	u32 res = M68KMAKE_GET_OPER_AY_16;
 	u32 ea = EA_AX_IX_16();
 
@@ -4205,7 +4205,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-31c0 fff8 move     w .          071:12 234fc:4
+31c0 fff8 move     w .          01:12 7:15 234fc:4
 	u32 res = MASK_OUT_ABOVE_16(DY());
 	u32 ea = EA_AW_16();
 
@@ -4217,7 +4217,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-31c8 fff8 move     w .          071:12 234fc:4
+31c8 fff8 move     w .          01:12 7:15 234fc:4
 	u32 res = MASK_OUT_ABOVE_16(AY());
 	u32 ea = EA_AW_16();
 
@@ -4229,7 +4229,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-31c0 ffc0 move     w A+-DXWLdxI 071:12 234fc:4
+31c0 ffc0 move     w A+-DXWLdxI 01:12 7:15 234fc:4
 	u32 res = M68KMAKE_GET_OPER_AY_16;
 	u32 ea = EA_AW_16();
 
@@ -4241,7 +4241,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-33c0 fff8 move     w .          071:16 234fc:6
+33c0 fff8 move     w .          01:16 7:19 234fc:6
 	u32 res = MASK_OUT_ABOVE_16(DY());
 	u32 ea = EA_AL_16();
 
@@ -4253,7 +4253,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-33c8 fff8 move     w .          071:16 234fc:6
+33c8 fff8 move     w .          01:16 7:19 234fc:6
 	u32 res = MASK_OUT_ABOVE_16(AY());
 	u32 ea = EA_AL_16();
 
@@ -4265,7 +4265,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-33c0 ffc0 move     w A+-DXWLdxI 071:16 234fc:6
+33c0 ffc0 move     w A+-DXWLdxI 01:16 7:19 234fc:6
 	u32 res = M68KMAKE_GET_OPER_AY_16;
 	u32 ea = EA_AL_16();
 
@@ -4277,7 +4277,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-2000 f1f8 move     l .          071:4 234fc:2
+2000 f1f8 move     l .          01:4 7:7 234fc:2
 	u32 res = DY();
 	u32* r_dst = &DX();
 
@@ -4289,7 +4289,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-2008 f1f8 move     l .          071:4 234fc:2
+2008 f1f8 move     l .          01:4 7:7 234fc:2
 	u32 res = AY();
 	u32* r_dst = &DX();
 
@@ -4301,7 +4301,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-2000 f1c0 move     l A+-DXWLdxI 071:4 234fc:2
+2000 f1c0 move     l A+-DXWLdxI 01:4 7:7 234fc:2
 	u32 res = M68KMAKE_GET_OPER_AY_32;
 	u32* r_dst = &DX();
 
@@ -4313,7 +4313,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-2080 f1f8 move     l .          071:12 234fc:4
+2080 f1f8 move     l .          01:12 7:15 234fc:4
 	u32 res = DY();
 	u32 ea = EA_AX_AI_32();
 
@@ -4325,7 +4325,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-2088 f1f8 move     l .          071:12 234fc:4
+2088 f1f8 move     l .          01:12 7:15 234fc:4
 	u32 res = AY();
 	u32 ea = EA_AX_AI_32();
 
@@ -4337,7 +4337,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-2080 f1c0 move     l A+-DXWLdxI 071:12 234fc:4
+2080 f1c0 move     l A+-DXWLdxI 01:12 7:15 234fc:4
 	u32 res = M68KMAKE_GET_OPER_AY_32;
 	u32 ea = EA_AX_AI_32();
 
@@ -4349,7 +4349,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-20c0 f1f8 move     l .          071:12 234fc:4
+20c0 f1f8 move     l .          01:12 7:15 234fc:4
 	u32 res = DY();
 	u32 ea = EA_AX_PI_32();
 
@@ -4361,7 +4361,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-20c8 f1f8 move     l .          071:12 234fc:4
+20c8 f1f8 move     l .          01:12 7:15 234fc:4
 	u32 res = AY();
 	u32 ea = EA_AX_PI_32();
 
@@ -4373,7 +4373,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-20c0 f1c0 move     l A+-DXWLdxI 071:12 234fc:4
+20c0 f1c0 move     l A+-DXWLdxI 01:12 7:15 234fc:4
 	u32 res = M68KMAKE_GET_OPER_AY_32;
 	u32 ea = EA_AX_PI_32();
 
@@ -4385,7 +4385,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-2100 f1f8 move     l .          07:12 1:14 234fc:5
+2100 f1f8 move     l .          0:12 7:18 1:14 234fc:5
 	u32 res = DY();
 	u32 ea = EA_AX_PD_32();
 
@@ -4398,7 +4398,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-2108 f1f8 move     l .          07:12 1:14 234fc:5
+2108 f1f8 move     l .          0:12 7:18 1:14 234fc:5
 	u32 res = AY();
 	u32 ea = EA_AX_PD_32();
 
@@ -4411,7 +4411,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-2100 f1c0 move     l A+-DXWLdxI 07:12 1:14 234fc:5
+2100 f1c0 move     l A+-DXWLdxI 0:12 7:18 1:14 234fc:5
 	u32 res = M68KMAKE_GET_OPER_AY_32;
 	u32 ea = EA_AX_PD_32();
 
@@ -4424,7 +4424,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-2140 f1f8 move     l .          071:16 234fc:5
+2140 f1f8 move     l .          01:16 7:22 234fc:5
 	u32 res = DY();
 	u32 ea = EA_AX_DI_32();
 
@@ -4436,7 +4436,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-2148 f1f8 move     l .          071:16 234fc:5
+2148 f1f8 move     l .          01:16 7:22 234fc:5
 	u32 res = AY();
 	u32 ea = EA_AX_DI_32();
 
@@ -4448,7 +4448,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-2140 f1c0 move     l A+-DXWLdxI 071:16 234fc:5
+2140 f1c0 move     l A+-DXWLdxI 01:16 7:22 234fc:5
 	u32 res = M68KMAKE_GET_OPER_AY_32;
 	u32 ea = EA_AX_DI_32();
 
@@ -4460,7 +4460,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-2180 f1f8 move     l .          071:18 234fc:7
+2180 f1f8 move     l .          01:18 7:25 234fc:7
 	u32 res = DY();
 	u32 ea = EA_AX_IX_32();
 
@@ -4472,7 +4472,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-2188 f1f8 move     l .          071:18 234fc:7
+2188 f1f8 move     l .          01:18 7:25 234fc:7
 	u32 res = AY();
 	u32 ea = EA_AX_IX_32();
 
@@ -4484,7 +4484,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-2180 f1c0 move     l A+-DXWLdxI 071:18 234fc:7
+2180 f1c0 move     l A+-DXWLdxI 01:18 7:25 234fc:7
 	u32 res = M68KMAKE_GET_OPER_AY_32;
 	u32 ea = EA_AX_IX_32();
 
@@ -4496,7 +4496,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-21c0 fff8 move     l .          071:16 234fc:4
+21c0 fff8 move     l .          01:16 7:19 234fc:4
 	u32 res = DY();
 	u32 ea = EA_AW_32();
 
@@ -4508,7 +4508,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-21c8 fff8 move     l .          071:16 234fc:4
+21c8 fff8 move     l .          01:16 7:19 234fc:4
 	u32 res = AY();
 	u32 ea = EA_AW_32();
 
@@ -4520,7 +4520,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-21c0 ffc0 move     l A+-DXWLdxI 071:16 234fc:4
+21c0 ffc0 move     l A+-DXWLdxI 01:16 7:19 234fc:4
 	u32 res = M68KMAKE_GET_OPER_AY_32;
 	u32 ea = EA_AW_32();
 
@@ -4532,7 +4532,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-23c0 fff8 move     l .          071:20 234fc:6
+23c0 fff8 move     l .          01:20 7:23 234fc:6
 	u32 res = DY();
 	u32 ea = EA_AL_32();
 
@@ -4544,7 +4544,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-23c8 fff8 move     l .          071:20 234fc:6
+23c8 fff8 move     l .          01:20 7:23 234fc:6
 	u32 res = AY();
 	u32 ea = EA_AL_32();
 
@@ -4556,7 +4556,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-23c0 ffc0 move     l A+-DXWLdxI 071:20 234fc:6
+23c0 ffc0 move     l A+-DXWLdxI 01:20 7:23 234fc:6
 	u32 res = M68KMAKE_GET_OPER_AY_32;
 	u32 ea = EA_AL_32();
 
@@ -4568,27 +4568,27 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-3040 f1f8 movea    w .          071:4 234fc:2
+3040 f1f8 movea    w .          01:4 7:7 234fc:2
 	AX() = MAKE_INT_16(DY());
 
 
-3048 f1f8 movea    w .          071:4 234fc:2
+3048 f1f8 movea    w .          01:4 7:7 234fc:2
 	AX() = MAKE_INT_16(AY());
 
 
-3040 f1c0 movea    w A+-DXWLdxI 071:4 234fc:2
+3040 f1c0 movea    w A+-DXWLdxI 01:4 7:7 234fc:2
 	AX() = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
 
 
-2040 f1f8 movea    l .          071:4 234fc:2
+2040 f1f8 movea    l .          01:4 7:7 234fc:2
 	AX() = DY();
 
 
-2048 f1f8 movea    l .          071:4 234fc:2
+2048 f1f8 movea    l .          01:4 7:7 234fc:2
 	AX() = AY();
 
 
-2040 f1c0 movea    l A+-DXWLdxI 071:4 234fc:2
+2040 f1c0 movea    l A+-DXWLdxI 01:4 7:7 234fc:2
 	AX() = M68KMAKE_GET_OPER_AY_32;
 
 
@@ -4600,15 +4600,15 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m68ki_write_16(M68KMAKE_GET_EA_AY_16, m68ki_get_ccr());
 
 
-44c0 fff8 move     w .          071:12 234fc:4
+44c0 fff8 move     w .          01:12 7:10 234fc:4
 	m68ki_set_ccr(DY());
 
 
-44c0 ffc0 move     w A+-DXWLdxI 071:12 234fc:4
+44c0 ffc0 move     w A+-DXWLdxI 01:12 7:10 234fc:4
 	m68ki_set_ccr(M68KMAKE_GET_OPER_AY_16);
 
 
-40c0 fff8 move     w .          07:6
+40c0 fff8 move     w .          0:6 7:7
 	DY() = MASK_OUT_BELOW_16(DY()) | m68ki_get_sr();
 
 
@@ -4620,7 +4620,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	}
 
 
-40c0 ffc0 move     w A+-DXWL    07:8
+40c0 ffc0 move     w A+-DXWL    0:8 7:11
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	m68ki_write_16(ea, m68ki_get_sr());
 
@@ -4634,7 +4634,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	}
 
 
-46c0 fff8 move     w .          071:12p 234fc:8p
+46c0 fff8 move     w .          01:12p 7:10p 234fc:8p
 	if(m_s_flag) {
 		m68ki_set_sr(DY());
 	} else {
@@ -4642,7 +4642,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	}
 
 
-46c0 ffc0 move     w A+-DXWLdxI 071:12p 234fc:8p
+46c0 ffc0 move     w A+-DXWLdxI 01:12p 7:10p 234fc:8p
 	if(m_s_flag) {
 		u32 new_sr = M68KMAKE_GET_OPER_AY_16;
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
@@ -4653,7 +4653,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	}
 
 
-4e68 fff8 move     l .          07:4p 1:6p 234fc:2p
+4e68 fff8 move     l .          0:4p 7:7p 1:6p 234fc:2p
 	if(m_s_flag) {
 		AY() = REG_USP();
 	} else {
@@ -4661,7 +4661,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	}
 
 
-4e60 fff8 move     l .          07:4p 1:6p 234fc:2p
+4e60 fff8 move     l .          0:4p 7:7p 1:6p 234fc:2p
 	if(m_s_flag) {
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 		REG_USP() = AY();
@@ -5183,7 +5183,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	}
 
 
-48a0 fff8 movem    w .          071:8 234fc:4
+48a0 fff8 movem    w .          01:8 7:23 234fc:4
 	u32 i = 0;
 	u32 register_list = OPER_I_16();
 	u32 ea = AY();
@@ -5197,10 +5197,10 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 		}
 	AY() = ea;
 
-	m_icount -= count<<m_cyc_movem_w;
+	m_icount -= count * m_cyc_movem_w;
 
 
-4880 ffc0 movem    w ADXWL      071:8 234fc:4
+4880 ffc0 movem    w ADXWL      01:8 7:23 234fc:4
 	u32 i = 0;
 	u32 register_list = OPER_I_16();
 	u32 ea = M68KMAKE_GET_EA_AY_16;
@@ -5213,10 +5213,10 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 			count++;
 		}
 
-	m_icount -= count<<m_cyc_movem_w;
+	m_icount -= count * m_cyc_movem_w;
 
 
-48e0 fff8 movem    l .          071:8 234fc:4
+48e0 fff8 movem    l .          01:8 7:23 234fc:4
 	u32 i = 0;
 	u32 register_list = OPER_I_16();
 	u32 ea = AY();
@@ -5231,10 +5231,10 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 		}
 	AY() = ea;
 
-	m_icount -= count<<m_cyc_movem_l;
+	m_icount -= count * m_cyc_movem_l;
 
 
-48c0 ffc0 movem    l ADXWL      071:8 234fc:4
+48c0 ffc0 movem    l ADXWL      01:8 7:23 234fc:4
 	u32 i = 0;
 	u32 register_list = OPER_I_16();
 	u32 ea = M68KMAKE_GET_EA_AY_32;
@@ -5247,10 +5247,10 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 			count++;
 		}
 
-	m_icount -= count<<m_cyc_movem_l;
+	m_icount -= count * m_cyc_movem_l;
 
 
-4c98 fff8 movem    w .          071:12 234fc:8
+4c98 fff8 movem    w .          01:12 7:26 234fc:8
 	u32 i = 0;
 	u32 register_list = OPER_I_16();
 	u32 ea = AY();
@@ -5264,10 +5264,10 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 		}
 	AY() = ea;
 
-	m_icount -= count<<m_cyc_movem_w;
+	m_icount -= count * m_cyc_movem_w;
 
 
-4cba ffff movem    w .          071:16 234fc:9
+4cba ffff movem    w .          01:16 7:30 234fc:9
 	u32 i = 0;
 	u32 register_list = OPER_I_16();
 	u32 ea = EA_PCDI_16();
@@ -5280,10 +5280,10 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 			count++;
 		}
 
-	m_icount -= count<<m_cyc_movem_w;
+	m_icount -= count * m_cyc_movem_w;
 
 
-4cbb ffff movem    w .          071:18 234fc:11
+4cbb ffff movem    w .          01:18 7:33 234fc:11
 	u32 i = 0;
 	u32 register_list = OPER_I_16();
 	u32 ea = EA_PCIX_16();
@@ -5296,10 +5296,10 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 			count++;
 		}
 
-	m_icount -= count<<m_cyc_movem_w;
+	m_icount -= count * m_cyc_movem_w;
 
 
-4c80 ffc0 movem    w ADXWL      071:12 234fc:8
+4c80 ffc0 movem    w ADXWL      01:12 7:26 234fc:8
 	u32 i = 0;
 	u32 register_list = OPER_I_16();
 	u32 ea = M68KMAKE_GET_EA_AY_16;
@@ -5312,10 +5312,10 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 			count++;
 		}
 
-	m_icount -= count<<m_cyc_movem_w;
+	m_icount -= count * m_cyc_movem_w;
 
 
-4cd8 fff8 movem    l .          071:12 234fc:8
+4cd8 fff8 movem    l .          01:12 7:26 234fc:8
 	u32 i = 0;
 	u32 register_list = OPER_I_16();
 	u32 ea = AY();
@@ -5329,10 +5329,10 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 		}
 	AY() = ea;
 
-	m_icount -= count<<m_cyc_movem_l;
+	m_icount -= count * m_cyc_movem_l;
 
 
-4cfa ffff movem    l .          071:16 234fc:9
+4cfa ffff movem    l .          01:16 7:30 234fc:9
 	u32 i = 0;
 	u32 register_list = OPER_I_16();
 	u32 ea = EA_PCDI_32();
@@ -5345,10 +5345,10 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 			count++;
 		}
 
-	m_icount -= count<<m_cyc_movem_l;
+	m_icount -= count * m_cyc_movem_l;
 
 
-4cfb ffff movem    l .          071:18 234fc:11
+4cfb ffff movem    l .          01:18 7:33 234fc:11
 	u32 i = 0;
 	u32 register_list = OPER_I_16();
 	u32 ea = EA_PCIX_32();
@@ -5361,10 +5361,10 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 			count++;
 		}
 
-	m_icount -= count<<m_cyc_movem_l;
+	m_icount -= count * m_cyc_movem_l;
 
 
-4cc0 ffc0 movem    l ADXWL      071:12 234fc:8
+4cc0 ffc0 movem    l ADXWL      01:12 7:26 234fc:8
 	u32 i = 0;
 	u32 register_list = OPER_I_16();
 	u32 ea = M68KMAKE_GET_EA_AY_32;
@@ -5377,10 +5377,10 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 			count++;
 		}
 
-	m_icount -= count<<m_cyc_movem_l;
+	m_icount -= count * m_cyc_movem_l;
 
 
-0188 f1f8 movep    w .          071:16 234fc:11
+0188 f1f8 movep    w .          01:16 7:25 234fc:11
 	u32 ea = EA_AY_DI_16();
 	u32 src = DX();
 
@@ -5388,7 +5388,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m68ki_write_8(ea += 2, MASK_OUT_ABOVE_8(src));
 
 
-01c8 f1f8 movep    l .          071:24 234fc:17
+01c8 f1f8 movep    l .          01:24 7:39 234fc:17
 	u32 ea = EA_AY_DI_32();
 	u32 src = DX();
 
@@ -5398,14 +5398,14 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	m68ki_write_8(ea += 2, MASK_OUT_ABOVE_8(src));
 
 
-0108 f1f8 movep    w .          071:16 234fc:12
+0108 f1f8 movep    w .          01:16 7:22 234fc:12
 	u32 ea = EA_AY_DI_16();
 	u32* r_dst = &DX();
 
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | ((m68ki_read_8(ea) << 8) + m68ki_read_8(ea + 2));
 
 
-0148 f1f8 movep    l .          071:24 234fc:18
+0148 f1f8 movep    l .          01:24 7:36 234fc:18
 	u32 ea = EA_AY_DI_32();
 
 	DX() = (m68ki_read_8(ea) << 24) + (m68ki_read_8(ea + 2) << 16)
@@ -5530,7 +5530,7 @@ e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
 	}
 
 
-7000 f100 moveq    l .          071:4 234fc:2
+7000 f100 moveq    l .          01:4 7:7 234fc:2
 	u32 res = DX() = MAKE_INT_8(MASK_OUT_ABOVE_8(m_ir));
 
 	m_n_flag = NFLAG_32(res);
@@ -5552,7 +5552,7 @@ f620 fff8 move16   l .          4f:4 c:4p
 	REG_A()[ay] += 16;
 
 
-c1c0 f1f8 muls     w .          07:54 1:32 234fc:27
+c1c0 f1f8 muls     w .          0:54 7:76 1:32 234fc:27
 	u32* r_dst = &DX();
 	u32 res = MASK_OUT_ABOVE_32(MAKE_INT_16(DY()) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
 
@@ -5564,7 +5564,7 @@ c1c0 f1f8 muls     w .          07:54 1:32 234fc:27
 	m_c_flag = CFLAG_CLEAR;
 
 
-c1c0 f1c0 muls     w A+-DXWLdxI 07:54 1:32 234fc:27
+c1c0 f1c0 muls     w A+-DXWLdxI 0:54 7:76 1:32 234fc:27
 	u32* r_dst = &DX();
 	u32 res = MASK_OUT_ABOVE_32(MAKE_INT_16(M68KMAKE_GET_OPER_AY_16) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
 
@@ -5576,7 +5576,7 @@ c1c0 f1c0 muls     w A+-DXWLdxI 07:54 1:32 234fc:27
 	m_c_flag = CFLAG_CLEAR;
 
 
-c0c0 f1f8 mulu     w .          07:54 1:30 234fc:27
+c0c0 f1f8 mulu     w .          0:54 7:76 1:30 234fc:27
 	u32* r_dst = &DX();
 	u32 res = MASK_OUT_ABOVE_16(DY()) * MASK_OUT_ABOVE_16(*r_dst);
 
@@ -5588,7 +5588,7 @@ c0c0 f1f8 mulu     w .          07:54 1:30 234fc:27
 	m_c_flag = CFLAG_CLEAR;
 
 
-c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
+c0c0 f1c0 mulu     w A+-DXWLdxI 0:54 7:76 1:30 234fc:27
 	u32* r_dst = &DX();
 	u32 res = M68KMAKE_GET_OPER_AY_16 * MASK_OUT_ABOVE_16(*r_dst);
 
@@ -5682,7 +5682,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	REG_D()[(word2 >> 12) & 7] = MASK_OUT_ABOVE_32(res);
 	done: ;
 
-4800 fff8 nbcd     b .          071234fc:6
+4800 fff8 nbcd     b .          01234fc:6 7:10
 	u32* r_dst = &DY();
 	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
 	u32 res = -dst - XFLAG_1();
@@ -5710,7 +5710,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m_n_flag = NFLAG_8(res);  /* Undefined N behavior */
 
 
-4800 ffc0 nbcd     b A+-DXWL    071:8 234fc:6
+4800 ffc0 nbcd     b A+-DXWL    01:8 7:14 234fc:6
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 dst = m68ki_read_8(ea);
 	u32 res = -dst - XFLAG_1();
@@ -5738,7 +5738,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m_n_flag = NFLAG_8(res);  /* Undefined N behavior */
 
 
-4400 fff8 neg      b .          071:4 234fc:2
+4400 fff8 neg      b .          01:4 7:7 234fc:2
 	u32* r_dst = &DY();
 	u32 res = 0 - MASK_OUT_ABOVE_8(*r_dst);
 
@@ -5750,7 +5750,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | m_not_z_flag;
 
 
-4400 ffc0 neg      b A+-DXWL    071:8 234fc:4
+4400 ffc0 neg      b A+-DXWL    01:8 7:11 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 src = m68ki_read_8(ea);
 	u32 res = 0 - src;
@@ -5763,7 +5763,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m68ki_write_8(ea, m_not_z_flag);
 
 
-4440 fff8 neg      w .          071:4 234fc:2
+4440 fff8 neg      w .          01:4 7:7 234fc:2
 	u32* r_dst = &DY();
 	u32 res = 0 - MASK_OUT_ABOVE_16(*r_dst);
 
@@ -5775,7 +5775,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | m_not_z_flag;
 
 
-4440 ffc0 neg      w A+-DXWL    071:8 234fc:4
+4440 ffc0 neg      w A+-DXWL    01:8 7:11 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 src = m68ki_read_16(ea);
 	u32 res = 0 - src;
@@ -5788,7 +5788,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m68ki_write_16(ea, m_not_z_flag);
 
 
-4480 fff8 neg      l .          071:6 234fc:2
+4480 fff8 neg      l .          01:6 7:7 234fc:2
 	u32* r_dst = &DY();
 	u32 res = 0 - *r_dst;
 
@@ -5800,7 +5800,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	*r_dst = m_not_z_flag;
 
 
-4480 ffc0 neg      l A+-DXWL    071:12 234fc:4
+4480 ffc0 neg      l A+-DXWL    01:12 7:15 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_32;
 	u32 src = m68ki_read_32(ea);
 	u32 res = 0 - src;
@@ -5813,7 +5813,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m68ki_write_32(ea, m_not_z_flag);
 
 
-4000 fff8 negx     b .          071:4 234fc:2
+4000 fff8 negx     b .          01:4 7:7 234fc:2
 	u32* r_dst = &DY();
 	u32 res = 0 - MASK_OUT_ABOVE_8(*r_dst) - XFLAG_1();
 
@@ -5827,7 +5827,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
 
 
-4000 ffc0 negx     b A+-DXWL    071:8 234fc:4
+4000 ffc0 negx     b A+-DXWL    01:8 7:11 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 src = m68ki_read_8(ea);
 	u32 res = 0 - src - XFLAG_1();
@@ -5842,7 +5842,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m68ki_write_8(ea, res);
 
 
-4040 fff8 negx     w .          071:4 234fc:2
+4040 fff8 negx     w .          01:4 7:7 234fc:2
 	u32* r_dst = &DY();
 	u32 res = 0 - MASK_OUT_ABOVE_16(*r_dst) - XFLAG_1();
 
@@ -5856,7 +5856,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
 
 
-4040 ffc0 negx     w A+-DXWL    071:8 234fc:4
+4040 ffc0 negx     w A+-DXWL    01:8 7:11 234fc:4
 	u32 ea  = M68KMAKE_GET_EA_AY_16;
 	u32 src = m68ki_read_16(ea);
 	u32 res = 0 - MASK_OUT_ABOVE_16(src) - XFLAG_1();
@@ -5871,7 +5871,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m68ki_write_16(ea, res);
 
 
-4080 fff8 negx     l .          071:6 234fc:2
+4080 fff8 negx     l .          01:6 7:7 234fc:2
 	u32* r_dst = &DY();
 	u32 res = 0 - MASK_OUT_ABOVE_32(*r_dst) - XFLAG_1();
 
@@ -5885,7 +5885,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	*r_dst = res;
 
 
-4080 ffc0 negx     l A+-DXWL    071:12 234fc:4
+4080 ffc0 negx     l A+-DXWL    01:12 7:15 234fc:4
 	u32 ea  = M68KMAKE_GET_EA_AY_32;
 	u32 src = m68ki_read_32(ea);
 	u32 res = 0 - MASK_OUT_ABOVE_32(src) - XFLAG_1();
@@ -5900,11 +5900,11 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m68ki_write_32(ea, res);
 
 
-4e71 ffff nop      . .          071:4 234fc:2
+4e71 ffff nop      . .          01:4 7:7 234fc:2
 	m68ki_trace_t0();                  /* auto-disable (see m68kcpu.h) */
 
 
-4600 fff8 not      b .          071:4 234fc:2
+4600 fff8 not      b .          01:4 7:7 234fc:2
 	u32* r_dst = &DY();
 	u32 res = MASK_OUT_ABOVE_8(~*r_dst);
 
@@ -5916,7 +5916,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m_v_flag = VFLAG_CLEAR;
 
 
-4600 ffc0 not      b A+-DXWL    071:8 234fc:4
+4600 ffc0 not      b A+-DXWL    01:8 7:11 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 res = MASK_OUT_ABOVE_8(~m68ki_read_8(ea));
 
@@ -5928,7 +5928,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m_v_flag = VFLAG_CLEAR;
 
 
-4640 fff8 not      w .          071:4 234fc:2
+4640 fff8 not      w .          01:4 7:7 234fc:2
 	u32* r_dst = &DY();
 	u32 res = MASK_OUT_ABOVE_16(~*r_dst);
 
@@ -5940,7 +5940,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m_v_flag = VFLAG_CLEAR;
 
 
-4640 ffc0 not      w A+-DXWL    071:8 234fc:4
+4640 ffc0 not      w A+-DXWL    01:8 7:11 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 res = MASK_OUT_ABOVE_16(~m68ki_read_16(ea));
 
@@ -5952,7 +5952,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m_v_flag = VFLAG_CLEAR;
 
 
-4680 fff8 not      l .          071:6 234fc:2
+4680 fff8 not      l .          01:6 7:7 234fc:2
 	u32* r_dst = &DY();
 	u32 res = *r_dst = MASK_OUT_ABOVE_32(~*r_dst);
 
@@ -5962,7 +5962,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m_v_flag = VFLAG_CLEAR;
 
 
-4680 ffc0 not      l A+-DXWL    071:12 234fc:4
+4680 ffc0 not      l A+-DXWL    01:12 7:15 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_32;
 	u32 res = MASK_OUT_ABOVE_32(~m68ki_read_32(ea));
 
@@ -5983,7 +5983,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m_v_flag = VFLAG_CLEAR;
 
 
-8000 f1c0 or       b A+-DXWLdxI 071:4 234fc:2
+8000 f1c0 or       b A+-DXWLdxI 01:4 7:7 234fc:2
 	u32 res = MASK_OUT_ABOVE_8((DX() |= M68KMAKE_GET_OPER_AY_8));
 
 	m_n_flag = NFLAG_8(res);
@@ -5992,7 +5992,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m_v_flag = VFLAG_CLEAR;
 
 
-8040 f1f8 or       w .          071:4 234fc:2
+8040 f1f8 or       w .          01:4 7:7 234fc:2
 	u32 res = MASK_OUT_ABOVE_16((DX() |= MASK_OUT_ABOVE_16(DY())));
 
 	m_n_flag = NFLAG_16(res);
@@ -6001,7 +6001,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m_v_flag = VFLAG_CLEAR;
 
 
-8040 f1c0 or       w A+-DXWLdxI 071:4 234fc:2
+8040 f1c0 or       w A+-DXWLdxI 01:4 7:7 234fc:2
 	u32 res = MASK_OUT_ABOVE_16((DX() |= M68KMAKE_GET_OPER_AY_16));
 
 	m_n_flag = NFLAG_16(res);
@@ -6010,7 +6010,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m_v_flag = VFLAG_CLEAR;
 
 
-8080 f1f8 or       l .          071:6 234fc:2
+8080 f1f8 or       l .          01:6 7:7 234fc:2
 	u32 res = DX() |= DY();
 
 	m_n_flag = NFLAG_32(res);
@@ -6019,7 +6019,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m_v_flag = VFLAG_CLEAR;
 
 
-8080 f1c0 or       l A+-DXWLdxI 071:6 234fc:2
+8080 f1c0 or       l A+-DXWLdxI 01:6 7:7 234fc:2
 	u32 res = DX() |= M68KMAKE_GET_OPER_AY_32;
 
 	m_n_flag = NFLAG_32(res);
@@ -6028,7 +6028,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m_v_flag = VFLAG_CLEAR;
 
 
-8100 f1c0 or       b A+-DXWL    071:8 234fc:4
+8100 f1c0 or       b A+-DXWL    01:8 7:11 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 res = MASK_OUT_ABOVE_8(DX() | m68ki_read_8(ea));
 
@@ -6040,7 +6040,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m_v_flag = VFLAG_CLEAR;
 
 
-8140 f1c0 or       w A+-DXWL    071:8 234fc:4
+8140 f1c0 or       w A+-DXWL    01:8 7:11 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 res = MASK_OUT_ABOVE_16(DX() | m68ki_read_16(ea));
 
@@ -6052,7 +6052,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m_v_flag = VFLAG_CLEAR;
 
 
-8180 f1c0 or       l A+-DXWL    071:12 234fc:4
+8180 f1c0 or       l A+-DXWL    01:12 7:15 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_32;
 	u32 res = DX() | m68ki_read_32(ea);
 
@@ -6064,7 +6064,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m_v_flag = VFLAG_CLEAR;
 
 
-0000 fff8 ori      b .          071:8 234fc:2
+0000 fff8 ori      b .          01:8 7:14 234fc:2
 	u32 res = MASK_OUT_ABOVE_8((DY() |= OPER_I_8()));
 
 	m_n_flag = NFLAG_8(res);
@@ -6073,7 +6073,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m_v_flag = VFLAG_CLEAR;
 
 
-0000 ffc0 ori      b A+-DXWL    071:12 234fc:4
+0000 ffc0 ori      b A+-DXWL    01:12 7:18 234fc:4
 	u32 src = OPER_I_8();
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 res = MASK_OUT_ABOVE_8(src | m68ki_read_8(ea));
@@ -6086,7 +6086,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m_v_flag = VFLAG_CLEAR;
 
 
-0040 fff8 ori      w .          071:8 234fc:2
+0040 fff8 ori      w .          01:8 7:14 234fc:2
 	u32 res = MASK_OUT_ABOVE_16(DY() |= OPER_I_16());
 
 	m_n_flag = NFLAG_16(res);
@@ -6095,7 +6095,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m_v_flag = VFLAG_CLEAR;
 
 
-0040 ffc0 ori      w A+-DXWL    071:12 234fc:4
+0040 ffc0 ori      w A+-DXWL    01:12 7:18 234fc:4
 	u32 src = OPER_I_16();
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 res = MASK_OUT_ABOVE_16(src | m68ki_read_16(ea));
@@ -6108,7 +6108,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m_v_flag = VFLAG_CLEAR;
 
 
-0080 fff8 ori      l .          07:16 1:14 234fc:2
+0080 fff8 ori      l .          0:16 7:18 1:14 234fc:2
 	u32 res = DY() |= OPER_I_32();
 
 	m_n_flag = NFLAG_32(res);
@@ -6117,7 +6117,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m_v_flag = VFLAG_CLEAR;
 
 
-0080 ffc0 ori      l A+-DXWL    071:20 234fc:4
+0080 ffc0 ori      l A+-DXWL    01:20 7:26 234fc:4
 	u32 src = OPER_I_32();
 	u32 ea = M68KMAKE_GET_EA_AY_32;
 	u32 res = src | m68ki_read_32(ea);
@@ -6130,11 +6130,11 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m_v_flag = VFLAG_CLEAR;
 
 
-003c ffff ori      w .          07:20 1:16 234fc:12
+003c ffff ori      w .          0:20 7:14 1:16 234fc:12
 	m68ki_set_ccr(m68ki_get_ccr() | OPER_I_8());
 
 
-007c ffff ori      w .          07:20p 1:16p 234fc:12p
+007c ffff ori      w .          0:20p 7:14p 1:16p 234fc:12p
 	if(m_s_flag) {
 		u32 src = OPER_I_16();
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
@@ -6190,7 +6190,7 @@ c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
 	m68ki_write_8(EA_AX_PD_8(), ((src >> 4) & 0x00f0) | (src & 0x000f));
 
 
-4840 ffc0 pea      l ADXWLdx    071:6 234fc:5
+4840 ffc0 pea      l ADXWLdx    01:6 7:18 234fc:5
 	u32 ea = M68KMAKE_GET_EA_AY_32;
 
 	m68ki_push_32(ea);
@@ -6244,7 +6244,7 @@ f548 ffd8 ptest    l .          4:8p
 		m68ki_exception_privilege_violation();
 	}
 
-e018 f1f8 ror      b .          071:6 234fc:8
+e018 f1f8 ror      b .          01:6 7:13 234fc:8
 	u32* r_dst = &DY();
 	u32 orig_shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 shift = orig_shift & 7;
@@ -6252,7 +6252,7 @@ e018 f1f8 ror      b .          071:6 234fc:8
 	u32 res = ROR_8(src, shift);
 
 	if(orig_shift != 0)
-		m_icount -= orig_shift<<m_cyc_shift;
+		m_icount -= orig_shift * m_cyc_shift;
 
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
 
@@ -6262,14 +6262,14 @@ e018 f1f8 ror      b .          071:6 234fc:8
 	m_v_flag = VFLAG_CLEAR;
 
 
-e058 f1f8 ror      w .          071:6 234fc:8
+e058 f1f8 ror      w .          01:6 7:13 234fc:8
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = MASK_OUT_ABOVE_16(*r_dst);
 	u32 res = ROR_16(src, shift);
 
 	if(shift != 0)
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
 
@@ -6279,14 +6279,14 @@ e058 f1f8 ror      w .          071:6 234fc:8
 	m_v_flag = VFLAG_CLEAR;
 
 
-e098 f1f8 ror      l .          071234fc:8
+e098 f1f8 ror      l .          01234fc:8 7:13
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u64 src = *r_dst;
 	u32 res = ROR_32(src, shift);
 
 	if(shift != 0)
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 	*r_dst = res;
 
@@ -6296,7 +6296,7 @@ e098 f1f8 ror      l .          071234fc:8
 	m_v_flag = VFLAG_CLEAR;
 
 
-e038 f1f8 ror      b .          071:6 234fc:8
+e038 f1f8 ror      b .          01:6 7:13 234fc:8
 	u32* r_dst = &DY();
 	u32 orig_shift = DX() & 0x3f;
 	u32 shift = orig_shift & 7;
@@ -6304,7 +6304,7 @@ e038 f1f8 ror      b .          071:6 234fc:8
 	u32 res = ROR_8(src, shift);
 
 	if(orig_shift != 0) {
-		m_icount -= orig_shift<<m_cyc_shift;
+		m_icount -= orig_shift * m_cyc_shift;
 
 		*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
 		m_c_flag = src << (8-((shift-1)&7));
@@ -6319,7 +6319,7 @@ e038 f1f8 ror      b .          071:6 234fc:8
 	}
 
 
-e078 f1f8 ror      w .          071:6 234fc:8
+e078 f1f8 ror      w .          01:6 7:13 234fc:8
 	u32* r_dst = &DY();
 	u32 orig_shift = DX() & 0x3f;
 	u32 shift = orig_shift & 15;
@@ -6327,7 +6327,7 @@ e078 f1f8 ror      w .          071:6 234fc:8
 	u32 res = ROR_16(src, shift);
 
 	if(orig_shift != 0) {
-		m_icount -= orig_shift<<m_cyc_shift;
+		m_icount -= orig_shift * m_cyc_shift;
 
 		*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
 		m_c_flag = (src >> ((shift - 1) & 15)) << 8;
@@ -6342,7 +6342,7 @@ e078 f1f8 ror      w .          071:6 234fc:8
 	}
 
 
-e0b8 f1f8 ror      l .          071234fc:8
+e0b8 f1f8 ror      l .          01234fc:8 7:13
 	u32* r_dst = &DY();
 	u32 orig_shift = DX() & 0x3f;
 	u32 shift = orig_shift & 31;
@@ -6350,7 +6350,7 @@ e0b8 f1f8 ror      l .          071234fc:8
 	u32 res = ROR_32(src, shift);
 
 	if(orig_shift != 0) {
-		m_icount -= orig_shift<<m_cyc_shift;
+		m_icount -= orig_shift * m_cyc_shift;
 
 		*r_dst = res;
 		m_c_flag = (src >> ((shift - 1) & 31)) << 8;
@@ -6365,7 +6365,7 @@ e0b8 f1f8 ror      l .          071234fc:8
 	}
 
 
-e6c0 ffc0 ror      w A+-DXWL    071:8 234fc:7
+e6c0 ffc0 ror      w A+-DXWL    01:8 7:14 234fc:7
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 src = m68ki_read_16(ea);
 	u32 res = ROR_16(src, 1);
@@ -6378,7 +6378,7 @@ e6c0 ffc0 ror      w A+-DXWL    071:8 234fc:7
 	m_v_flag = VFLAG_CLEAR;
 
 
-e118 f1f8 rol      b .          071:6 234fc:8
+e118 f1f8 rol      b .          01:6 7:13 234fc:8
 	u32* r_dst = &DY();
 	u32 orig_shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 shift = orig_shift & 7;
@@ -6386,7 +6386,7 @@ e118 f1f8 rol      b .          071:6 234fc:8
 	u32 res = ROL_8(src, shift);
 
 	if(orig_shift != 0)
-		m_icount -= orig_shift<<m_cyc_shift;
+		m_icount -= orig_shift * m_cyc_shift;
 
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
 
@@ -6396,14 +6396,14 @@ e118 f1f8 rol      b .          071:6 234fc:8
 	m_v_flag = VFLAG_CLEAR;
 
 
-e158 f1f8 rol      w .          071:6 234fc:8
+e158 f1f8 rol      w .          01:6 7:13 234fc:8
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = MASK_OUT_ABOVE_16(*r_dst);
 	u32 res = ROL_16(src, shift);
 
 	if(shift != 0)
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
 
@@ -6413,14 +6413,14 @@ e158 f1f8 rol      w .          071:6 234fc:8
 	m_v_flag = VFLAG_CLEAR;
 
 
-e198 f1f8 rol      l .          071234fc:8
+e198 f1f8 rol      l .          01234fc:8 7:13
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u64 src = *r_dst;
 	u32 res = ROL_32(src, shift);
 
 	if(shift != 0)
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 	*r_dst = res;
 
@@ -6430,7 +6430,7 @@ e198 f1f8 rol      l .          071234fc:8
 	m_v_flag = VFLAG_CLEAR;
 
 
-e138 f1f8 rol      b .          071:6 234fc:8
+e138 f1f8 rol      b .          01:6 7:13 234fc:8
 	u32* r_dst = &DY();
 	u32 orig_shift = DX() & 0x3f;
 	u32 shift = orig_shift & 7;
@@ -6438,7 +6438,7 @@ e138 f1f8 rol      b .          071:6 234fc:8
 	u32 res = ROL_8(src, shift);
 
 	if(orig_shift != 0) {
-		m_icount -= orig_shift<<m_cyc_shift;
+		m_icount -= orig_shift * m_cyc_shift;
 
 		if(shift != 0) {
 			*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
@@ -6460,7 +6460,7 @@ e138 f1f8 rol      b .          071:6 234fc:8
 	}
 
 
-e178 f1f8 rol      w .          071:6 234fc:8
+e178 f1f8 rol      w .          01:6 7:13 234fc:8
 	u32* r_dst = &DY();
 	u32 orig_shift = DX() & 0x3f;
 	u32 shift = orig_shift & 15;
@@ -6468,7 +6468,7 @@ e178 f1f8 rol      w .          071:6 234fc:8
 	u32 res = MASK_OUT_ABOVE_16(ROL_16(src, shift));
 
 	if(orig_shift != 0) {
-		m_icount -= orig_shift<<m_cyc_shift;
+		m_icount -= orig_shift * m_cyc_shift;
 
 		if(shift != 0) {
 			*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
@@ -6490,7 +6490,7 @@ e178 f1f8 rol      w .          071:6 234fc:8
 	}
 
 
-e1b8 f1f8 rol      l .          071234fc:8
+e1b8 f1f8 rol      l .          01234fc:8 7:13
 	u32* r_dst = &DY();
 	u32 orig_shift = DX() & 0x3f;
 	u32 shift = orig_shift & 31;
@@ -6498,7 +6498,7 @@ e1b8 f1f8 rol      l .          071234fc:8
 	u32 res = ROL_32(src, shift);
 
 	if(orig_shift != 0) {
-		m_icount -= orig_shift<<m_cyc_shift;
+		m_icount -= orig_shift * m_cyc_shift;
 
 		*r_dst = res;
 
@@ -6514,7 +6514,7 @@ e1b8 f1f8 rol      l .          071234fc:8
 	}
 
 
-e7c0 ffc0 rol      w A+-DXWL    071:8 234fc:7
+e7c0 ffc0 rol      w A+-DXWL    01:8 7:14 234fc:7
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 src = m68ki_read_16(ea);
 	u32 res = MASK_OUT_ABOVE_16(ROL_16(src, 1));
@@ -6527,14 +6527,14 @@ e7c0 ffc0 rol      w A+-DXWL    071:8 234fc:7
 	m_v_flag = VFLAG_CLEAR;
 
 
-e010 f1f8 roxr     b .          071:6 234fc:12
+e010 f1f8 roxr     b .          01:6 7:13 234fc:12
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = MASK_OUT_ABOVE_8(*r_dst);
 	u32 res = ROR_9(src | (XFLAG_1() << 8), shift);
 
 	if(shift != 0)
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 	m_c_flag = m_x_flag = res;
 	res = MASK_OUT_ABOVE_8(res);
@@ -6546,14 +6546,14 @@ e010 f1f8 roxr     b .          071:6 234fc:12
 	m_v_flag = VFLAG_CLEAR;
 
 
-e050 f1f8 roxr     w .          071:6 234fc:12
+e050 f1f8 roxr     w .          01:6 7:13 234fc:12
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = MASK_OUT_ABOVE_16(*r_dst);
 	u32 res = ROR_17(src | (XFLAG_1() << 16), shift);
 
 	if(shift != 0)
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 	m_c_flag = m_x_flag = res >> 8;
 	res = MASK_OUT_ABOVE_16(res);
@@ -6565,14 +6565,14 @@ e050 f1f8 roxr     w .          071:6 234fc:12
 	m_v_flag = VFLAG_CLEAR;
 
 
-e090 f1f8 roxr     l .          071:8 234fc:12
+e090 f1f8 roxr     l .          01:8 7:13 234fc:12
 	u32*  r_dst = &DY();
 	u32   shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u64 src   = *r_dst;
 	u64 res   = src | (((u64)XFLAG_1()) << 32);
 
 	if(shift != 0)
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 	res = ROR_33_64(res, shift);
 
@@ -6586,7 +6586,7 @@ e090 f1f8 roxr     l .          071:8 234fc:12
 	m_v_flag = VFLAG_CLEAR;
 
 
-e030 f1f8 roxr     b .          071:6 234fc:12
+e030 f1f8 roxr     b .          01:6 7:13 234fc:12
 	u32* r_dst = &DY();
 	u32 orig_shift = DX() & 0x3f;
 
@@ -6595,7 +6595,7 @@ e030 f1f8 roxr     b .          071:6 234fc:12
 		u32 src   = MASK_OUT_ABOVE_8(*r_dst);
 		u32 res   = ROR_9(src | (XFLAG_1() << 8), shift);
 
-		m_icount -= orig_shift<<m_cyc_shift;
+		m_icount -= orig_shift * m_cyc_shift;
 
 		m_c_flag = m_x_flag = res;
 		res = MASK_OUT_ABOVE_8(res);
@@ -6612,7 +6612,7 @@ e030 f1f8 roxr     b .          071:6 234fc:12
 	}
 
 
-e070 f1f8 roxr     w .          071:6 234fc:12
+e070 f1f8 roxr     w .          01:6 7:13 234fc:12
 	u32* r_dst = &DY();
 	u32 orig_shift = DX() & 0x3f;
 
@@ -6622,7 +6622,7 @@ e070 f1f8 roxr     w .          071:6 234fc:12
 		u32 src   = MASK_OUT_ABOVE_16(*r_dst);
 		u32 res   = ROR_17(src | (XFLAG_1() << 16), shift);
 
-		m_icount -= orig_shift<<m_cyc_shift;
+		m_icount -= orig_shift * m_cyc_shift;
 
 		m_c_flag = m_x_flag = res >> 8;
 		res = MASK_OUT_ABOVE_16(res);
@@ -6639,7 +6639,7 @@ e070 f1f8 roxr     w .          071:6 234fc:12
 	}
 
 
-e0b0 f1f8 roxr     l .          071:8 234fc:12
+e0b0 f1f8 roxr     l .          01:8 7:13 234fc:12
 	u32*  r_dst = &DY();
 	u32   orig_shift = DX() & 0x3f;
 
@@ -6650,7 +6650,7 @@ e0b0 f1f8 roxr     l .          071:8 234fc:12
 
 		res = ROR_33_64(res, shift);
 
-		m_icount -= orig_shift<<m_cyc_shift;
+		m_icount -= orig_shift * m_cyc_shift;
 
 		m_c_flag = m_x_flag = res >> 24;
 		res = MASK_OUT_ABOVE_32(res);
@@ -6667,7 +6667,7 @@ e0b0 f1f8 roxr     l .          071:8 234fc:12
 	}
 
 
-e4c0 ffc0 roxr     w A+-DXWL    071:8 234fc:5
+e4c0 ffc0 roxr     w A+-DXWL    01:8 7:14 234fc:5
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 src = m68ki_read_16(ea);
 	u32 res = ROR_17(src | (XFLAG_1() << 16), 1);
@@ -6682,14 +6682,14 @@ e4c0 ffc0 roxr     w A+-DXWL    071:8 234fc:5
 	m_v_flag = VFLAG_CLEAR;
 
 
-e110 f1f8 roxl     b .          071:6 234fc:12
+e110 f1f8 roxl     b .          01:6 7:13 234fc:12
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = MASK_OUT_ABOVE_8(*r_dst);
 	u32 res = ROL_9(src | (XFLAG_1() << 8), shift);
 
 	if(shift != 0)
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 	m_c_flag = m_x_flag = res;
 	res = MASK_OUT_ABOVE_8(res);
@@ -6701,14 +6701,14 @@ e110 f1f8 roxl     b .          071:6 234fc:12
 	m_v_flag = VFLAG_CLEAR;
 
 
-e150 f1f8 roxl     w .          071:6 234fc:12
+e150 f1f8 roxl     w .          01:6 7:13 234fc:12
 	u32* r_dst = &DY();
 	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 src = MASK_OUT_ABOVE_16(*r_dst);
 	u32 res = ROL_17(src | (XFLAG_1() << 16), shift);
 
 	if(shift != 0)
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 	m_c_flag = m_x_flag = res >> 8;
 	res = MASK_OUT_ABOVE_16(res);
@@ -6720,14 +6720,14 @@ e150 f1f8 roxl     w .          071:6 234fc:12
 	m_v_flag = VFLAG_CLEAR;
 
 
-e190 f1f8 roxl     l .          071:8 234fc:12
+e190 f1f8 roxl     l .          01:8 7:13 234fc:12
 	u32*  r_dst = &DY();
 	u32   shift = (((m_ir >> 9) - 1) & 7) + 1;
 	u64 src   = *r_dst;
 	u64 res   = src | (((u64)XFLAG_1()) << 32);
 
 	if(shift != 0)
-		m_icount -= shift<<m_cyc_shift;
+		m_icount -= shift * m_cyc_shift;
 
 	res = ROL_33_64(res, shift);
 
@@ -6741,7 +6741,7 @@ e190 f1f8 roxl     l .          071:8 234fc:12
 	m_v_flag = VFLAG_CLEAR;
 
 
-e130 f1f8 roxl     b .          071:6 234fc:12
+e130 f1f8 roxl     b .          01:6 7:13 234fc:12
 	u32* r_dst = &DY();
 	u32 orig_shift = DX() & 0x3f;
 
@@ -6751,7 +6751,7 @@ e130 f1f8 roxl     b .          071:6 234fc:12
 		u32 src   = MASK_OUT_ABOVE_8(*r_dst);
 		u32 res   = ROL_9(src | (XFLAG_1() << 8), shift);
 
-		m_icount -= orig_shift<<m_cyc_shift;
+		m_icount -= orig_shift * m_cyc_shift;
 
 		m_c_flag = m_x_flag = res;
 		res = MASK_OUT_ABOVE_8(res);
@@ -6768,7 +6768,7 @@ e130 f1f8 roxl     b .          071:6 234fc:12
 	}
 
 
-e170 f1f8 roxl     w .          071:6 234fc:12
+e170 f1f8 roxl     w .          01:6 7:13 234fc:12
 	u32* r_dst = &DY();
 	u32 orig_shift = DX() & 0x3f;
 
@@ -6777,7 +6777,7 @@ e170 f1f8 roxl     w .          071:6 234fc:12
 		u32 src   = MASK_OUT_ABOVE_16(*r_dst);
 		u32 res   = ROL_17(src | (XFLAG_1() << 16), shift);
 
-		m_icount -= orig_shift<<m_cyc_shift;
+		m_icount -= orig_shift * m_cyc_shift;
 
 		m_c_flag = m_x_flag = res >> 8;
 		res = MASK_OUT_ABOVE_16(res);
@@ -6794,7 +6794,7 @@ e170 f1f8 roxl     w .          071:6 234fc:12
 	}
 
 
-e1b0 f1f8 roxl     l .          071:8 234fc:12
+e1b0 f1f8 roxl     l .          01:8 7:13 234fc:12
 	u32*  r_dst = &DY();
 	u32   orig_shift = DX() & 0x3f;
 
@@ -6805,7 +6805,7 @@ e1b0 f1f8 roxl     l .          071:8 234fc:12
 
 		res = ROL_33_64(res, shift);
 
-		m_icount -= orig_shift<<m_cyc_shift;
+		m_icount -= orig_shift * m_cyc_shift;
 
 		m_c_flag = m_x_flag = res >> 24;
 		res = MASK_OUT_ABOVE_32(res);
@@ -6822,7 +6822,7 @@ e1b0 f1f8 roxl     l .          071:8 234fc:12
 	}
 
 
-e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
+e5c0 ffc0 roxl     w A+-DXWL    01:8 7:14 234fc:5
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 src = m68ki_read_16(ea);
 	u32 res = ROL_17(src | (XFLAG_1() << 16), 1);
@@ -6866,7 +6866,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	}
 
 
-4e73 ffff rte      l .          71:24p
+4e73 ffff rte      l .          7:39p 1:24p
 	if(m_s_flag) {
 		u32 new_sr;
 		u32 new_pc;
@@ -7033,18 +7033,18 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 					tag(), m_ppc, m_ir);
 
 
-4e77 ffff rtr      l .          071:20 234fc:14
+4e77 ffff rtr      l .          01:20 7:22 234fc:14
 	m68ki_trace_t0();                  /* auto-disable (see m68kcpu.h) */
 	m68ki_set_ccr(m68ki_pull_16());
 	m68ki_jump(m68ki_pull_32());
 
 
-4e75 ffff rts      l .          071:16 234fc:10
+4e75 ffff rts      l .          01:16 7:15 234fc:10
 	m68ki_trace_t0();                  /* auto-disable (see m68kcpu.h) */
 	m68ki_jump(m68ki_pull_32());
 
 
-8100 f1f8 sbcd     b .          071:6 234fc:4
+8100 f1f8 sbcd     b .          01:6 7:10 234fc:4
 	u32* r_dst = &DX();
 	u32 src = DY();
 	u32 dst = *r_dst;
@@ -7072,7 +7072,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
 
 
-8f08 fff8 sbcd     b .          071:18 234fc:16
+8f08 fff8 sbcd     b .          01:18 7:31 234fc:16
 	u32 src = OPER_AY_PD_8();
 	u32 ea  = EA_A7_PD_8();
 	u32 dst = m68ki_read_8(ea);
@@ -7100,7 +7100,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m68ki_write_8(ea, res);
 
 
-810f f1ff sbcd     b .          071:18 234fc:16
+810f f1ff sbcd     b .          01:18 7:31 234fc:16
 	u32 src = OPER_A7_PD_8();
 	u32 ea  = EA_AX_PD_8();
 	u32 dst = m68ki_read_8(ea);
@@ -7128,7 +7128,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m68ki_write_8(ea, res);
 
 
-8f0f ffff sbcd     b .          071:18 234fc:16
+8f0f ffff sbcd     b .          01:18 7:31 234fc:16
 	u32 src = OPER_A7_PD_8();
 	u32 ea  = EA_A7_PD_8();
 	u32 dst = m68ki_read_8(ea);
@@ -7156,7 +7156,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m68ki_write_8(ea, res);
 
 
-8108 f1f8 sbcd     b .          071:18 234fc:16
+8108 f1f8 sbcd     b .          01:18 7:31 234fc:16
 	u32 src = OPER_AY_PD_8();
 	u32 ea  = EA_AX_PD_8();
 	u32 dst = m68ki_read_8(ea);
@@ -7184,23 +7184,23 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m68ki_write_8(ea, res);
 
 
-50c0 fff8 st       b .          07:6 1234fc:4
+50c0 fff8 st       b .          0:6 7:13 1234fc:4
 	DY() |= 0xff;
 
 
-50c0 ffc0 st       b A+-DXWL    071:8 234fc:6
+50c0 ffc0 st       b A+-DXWL    01:8 7:14 234fc:6
 	m68ki_write_8(M68KMAKE_GET_EA_AY_8, 0xff);
 
 
-51c0 fff8 sf       b .          071234fc:4
+51c0 fff8 sf       b .          01234fc:4 7:13
 	DY() &= 0xffffff00;
 
 
-51c0 ffc0 sf       b A+-DXWL    071:8 234fc:6
+51c0 ffc0 sf       b A+-DXWL    01:8 7:14 234fc:6
 	m68ki_write_8(M68KMAKE_GET_EA_AY_8, 0);
 
 
-50c0 f0f8 scc      b .          071234fc:4
+50c0 f0f8 scc      b .          01234fc:4 7:13
 	if(M68KMAKE_CC) {
 		DY() |= 0xff;
 		m_icount -= m_cyc_scc_r_true;
@@ -7210,11 +7210,11 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	}
 
 
-50c0 f0c0 scc      b A+-DXWL    071:8 234fc:6
+50c0 f0c0 scc      b A+-DXWL    01:8 7:14 234fc:6
 	m68ki_write_8(M68KMAKE_GET_EA_AY_8, M68KMAKE_CC ? 0xff : 0);
 
 
-4e72 ffff stop     . .          071:4p 234fc:8p
+4e72 ffff stop     . .          01:4p 7:13p 234fc:8p
 	if(m_s_flag) {
 		u32 new_sr = OPER_I_16();
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
@@ -7226,7 +7226,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	}
 
 
-9000 f1f8 sub      b .          071:4 234fc:2
+9000 f1f8 sub      b .          01:4 7:7 234fc:2
 	u32* r_dst = &DX();
 	u32 src = MASK_OUT_ABOVE_8(DY());
 	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
@@ -7240,7 +7240,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | m_not_z_flag;
 
 
-9000 f1c0 sub      b A+-DXWLdxI 071:4 234fc:2
+9000 f1c0 sub      b A+-DXWLdxI 01:4 7:7 234fc:2
 	u32* r_dst = &DX();
 	u32 src = M68KMAKE_GET_OPER_AY_8;
 	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
@@ -7254,7 +7254,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | m_not_z_flag;
 
 
-9040 f1f8 sub      w .          071:4 234fc:2
+9040 f1f8 sub      w .          01:4 7:7 234fc:2
 	u32* r_dst = &DX();
 	u32 src = MASK_OUT_ABOVE_16(DY());
 	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
@@ -7268,7 +7268,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | m_not_z_flag;
 
 
-9048 f1f8 sub      w .          071:4 234fc:2
+9048 f1f8 sub      w .          01:4 7:7 234fc:2
 	u32* r_dst = &DX();
 	u32 src = MASK_OUT_ABOVE_16(AY());
 	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
@@ -7282,7 +7282,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | m_not_z_flag;
 
 
-9040 f1c0 sub      w A+-DXWLdxI 071:4 234fc:2
+9040 f1c0 sub      w A+-DXWLdxI 01:4 7:7 234fc:2
 	u32* r_dst = &DX();
 	u32 src = M68KMAKE_GET_OPER_AY_16;
 	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
@@ -7296,7 +7296,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | m_not_z_flag;
 
 
-9080 f1f8 sub      l .          071:6 234fc:2
+9080 f1f8 sub      l .          01:6 7:7 234fc:2
 	u32* r_dst = &DX();
 	u32 src = DY();
 	u32 dst = *r_dst;
@@ -7310,7 +7310,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	*r_dst = m_not_z_flag;
 
 
-9088 f1f8 sub      l .          071:6 234fc:2
+9088 f1f8 sub      l .          01:6 7:7 234fc:2
 	u32* r_dst = &DX();
 	u32 src = AY();
 	u32 dst = *r_dst;
@@ -7324,7 +7324,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	*r_dst = m_not_z_flag;
 
 
-9080 f1c0 sub      l A+-DXWLdxI 071:6 234fc:2
+9080 f1c0 sub      l A+-DXWLdxI 01:6 7:7 234fc:2
 	u32* r_dst = &DX();
 	u32 src = M68KMAKE_GET_OPER_AY_32;
 	u32 dst = *r_dst;
@@ -7338,7 +7338,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	*r_dst = m_not_z_flag;
 
 
-9100 f1c0 sub      b A+-DXWL    071:8 234fc:4
+9100 f1c0 sub      b A+-DXWL    01:8 7:11 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 src = MASK_OUT_ABOVE_8(DX());
 	u32 dst = m68ki_read_8(ea);
@@ -7352,7 +7352,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m68ki_write_8(ea, m_not_z_flag);
 
 
-9140 f1c0 sub      w A+-DXWL    071:8 234fc:4
+9140 f1c0 sub      w A+-DXWL    01:8 7:15 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 src = MASK_OUT_ABOVE_16(DX());
 	u32 dst = m68ki_read_16(ea);
@@ -7366,7 +7366,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m68ki_write_16(ea, m_not_z_flag);
 
 
-9180 f1c0 sub      l A+-DXWL    071:12 234fc:4
+9180 f1c0 sub      l A+-DXWL    01:12 7:15 234fc:4
 	u32 ea = M68KMAKE_GET_EA_AY_32;
 	u32 src = DX();
 	u32 dst = m68ki_read_32(ea);
@@ -7380,45 +7380,45 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m68ki_write_32(ea, m_not_z_flag);
 
 
-90c0 f1f8 suba     w .          071:8 234fc:2
+90c0 f1f8 suba     w .          01:8 7:7 234fc:2
 	u32* r_dst = &AX();
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst - MAKE_INT_16(DY()));
 
 
-90c8 f1f8 suba     w .          071:8 234fc:2
+90c8 f1f8 suba     w .          01:8 7:7 234fc:2
 	u32* r_dst = &AX();
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst - MAKE_INT_16(AY()));
 
 
-90c0 f1c0 suba     w A+-DXWLdxI 071:8 234fc:2
+90c0 f1c0 suba     w A+-DXWLdxI 01:8 7:7 234fc:2
 	u32* r_dst = &AX();
 	u32 src = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst - src);
 
 
-91c0 f1f8 suba     l .          071:6 234fc:2
+91c0 f1f8 suba     l .          01:6 7:7 234fc:2
 	u32* r_dst = &AX();
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst - DY());
 
 
-91c8 f1f8 suba     l .          071:6 234fc:2
+91c8 f1f8 suba     l .          01:6 7:7 234fc:2
 	u32* r_dst = &AX();
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst - AY());
 
 
-91c0 f1c0 suba     l A+-DXWLdxI 071:6 234fc:2
+91c0 f1c0 suba     l A+-DXWLdxI 01:6 7:7 234fc:2
 	u32* r_dst = &AX();
 	u32 src = M68KMAKE_GET_OPER_AY_32;
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst - src);
 
 
-0400 fff8 subi     b .          071:8 234fc:2
+0400 fff8 subi     b .          01:8 7:14 234fc:2
 	u32* r_dst = &DY();
 	u32 src = OPER_I_8();
 	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
@@ -7432,7 +7432,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | m_not_z_flag;
 
 
-0400 ffc0 subi     b A+-DXWL    071:12 234fc:4
+0400 ffc0 subi     b A+-DXWL    01:12 7:18 234fc:4
 	u32 src = OPER_I_8();
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 dst = m68ki_read_8(ea);
@@ -7446,7 +7446,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m68ki_write_8(ea, m_not_z_flag);
 
 
-0440 fff8 subi     w .          071:8 234fc:2
+0440 fff8 subi     w .          01:8 7:14 234fc:2
 	u32* r_dst = &DY();
 	u32 src = OPER_I_16();
 	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
@@ -7460,7 +7460,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | m_not_z_flag;
 
 
-0440 ffc0 subi     w A+-DXWL    071:12 234fc:4
+0440 ffc0 subi     w A+-DXWL    01:12 7:18 234fc:4
 	u32 src = OPER_I_16();
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 dst = m68ki_read_16(ea);
@@ -7474,7 +7474,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m68ki_write_16(ea, m_not_z_flag);
 
 
-0480 fff8 subi     l .          07:16 1:14 234fc:2
+0480 fff8 subi     l .          0:16 7:18 1:14 234fc:2
 	u32* r_dst = &DY();
 	u32 src = OPER_I_32();
 	u32 dst = *r_dst;
@@ -7488,7 +7488,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	*r_dst = m_not_z_flag;
 
 
-0480 ffc0 subi     l A+-DXWL    071:20 234fc:4
+0480 ffc0 subi     l A+-DXWL    01:20 7:26 234fc:4
 	u32 src = OPER_I_32();
 	u32 ea = M68KMAKE_GET_EA_AY_32;
 	u32 dst = m68ki_read_32(ea);
@@ -7502,7 +7502,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m68ki_write_32(ea, m_not_z_flag);
 
 
-5100 f1f8 subq     b .          071:4 234fc:2
+5100 f1f8 subq     b .          01:4 7:7 234fc:2
 	u32* r_dst = &DY();
 	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
@@ -7516,7 +7516,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | m_not_z_flag;
 
 
-5100 f1c0 subq     b A+-DXWL    071:8 234fc:4
+5100 f1c0 subq     b A+-DXWL    01:8 7:11 234fc:4
 	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 dst = m68ki_read_8(ea);
@@ -7530,7 +7530,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m68ki_write_8(ea, m_not_z_flag);
 
 
-5140 f1f8 subq     w .          071:4 234fc:2
+5140 f1f8 subq     w .          01:4 7:7 234fc:2
 	u32* r_dst = &DY();
 	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
@@ -7544,13 +7544,13 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | m_not_z_flag;
 
 
-5148 f1f8 subq     w .          07:8 1:4 234fc:2
+5148 f1f8 subq     w .          0:8 7:7 1:4 234fc:2
 	u32* r_dst = &AY();
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst - ((((m_ir >> 9) - 1) & 7) + 1));
 
 
-5140 f1c0 subq     w A+-DXWL    071:8 234fc:4
+5140 f1c0 subq     w A+-DXWL    01:8 7:11 234fc:4
 	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 ea = M68KMAKE_GET_EA_AY_16;
 	u32 dst = m68ki_read_16(ea);
@@ -7564,7 +7564,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m68ki_write_16(ea, m_not_z_flag);
 
 
-5180 f1f8 subq     l .          071:8 234fc:2
+5180 f1f8 subq     l .          01:8 7:7 234fc:2
 	u32* r_dst = &DY();
 	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 dst = *r_dst;
@@ -7578,13 +7578,13 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	*r_dst = m_not_z_flag;
 
 
-5188 f1f8 subq     l .          071:8 234fc:2
+5188 f1f8 subq     l .          01:8 7:7 234fc:2
 	u32* r_dst = &AY();
 
 	*r_dst = MASK_OUT_ABOVE_32(*r_dst - ((((m_ir >> 9) - 1) & 7) + 1));
 
 
-5180 f1c0 subq     l A+-DXWL    071:12 234fc:4
+5180 f1c0 subq     l A+-DXWL    01:12 7:15 234fc:4
 	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
 	u32 ea = M68KMAKE_GET_EA_AY_32;
 	u32 dst = m68ki_read_32(ea);
@@ -7598,7 +7598,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m68ki_write_32(ea, m_not_z_flag);
 
 
-9100 f1f8 subx     b .          071:4 234fc:2
+9100 f1f8 subx     b .          01:4 7:7 234fc:2
 	u32* r_dst = &DX();
 	u32 src = MASK_OUT_ABOVE_8(DY());
 	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
@@ -7614,7 +7614,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
 
 
-9140 f1f8 subx     w .          071:4 234fc:2
+9140 f1f8 subx     w .          01:4 7:7 234fc:2
 	u32* r_dst = &DX();
 	u32 src = MASK_OUT_ABOVE_16(DY());
 	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
@@ -7630,7 +7630,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
 
 
-9180 f1f8 subx     l .          07:8 1:6 234fc:2
+9180 f1f8 subx     l .          0:8 7:7 1:6 234fc:2
 	u32* r_dst = &DX();
 	u32 src = DY();
 	u32 dst = *r_dst;
@@ -7646,7 +7646,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	*r_dst = res;
 
 
-9f08 fff8 subx     b .          071:18 234fc:12
+9f08 fff8 subx     b .          01:18 7:28 234fc:12
 	u32 src = OPER_AY_PD_8();
 	u32 ea  = EA_A7_PD_8();
 	u32 dst = m68ki_read_8(ea);
@@ -7662,7 +7662,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m68ki_write_8(ea, res);
 
 
-910f f1ff subx     b .          071:18 234fc:12
+910f f1ff subx     b .          01:18 7:28 234fc:12
 	u32 src = OPER_A7_PD_8();
 	u32 ea  = EA_AX_PD_8();
 	u32 dst = m68ki_read_8(ea);
@@ -7678,7 +7678,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m68ki_write_8(ea, res);
 
 
-9f0f ffff subx     b .          071:18 234fc:12
+9f0f ffff subx     b .          01:18 7:28 234fc:12
 	u32 src = OPER_A7_PD_8();
 	u32 ea  = EA_A7_PD_8();
 	u32 dst = m68ki_read_8(ea);
@@ -7694,7 +7694,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m68ki_write_8(ea, res);
 
 
-9108 f1f8 subx     b .          071:18 234fc:12
+9108 f1f8 subx     b .          01:18 7:28 234fc:12
 	u32 src = OPER_AY_PD_8();
 	u32 ea  = EA_AX_PD_8();
 	u32 dst = m68ki_read_8(ea);
@@ -7710,7 +7710,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m68ki_write_8(ea, res);
 
 
-9148 f1f8 subx     w .          071:18 234fc:12
+9148 f1f8 subx     w .          01:18 7:28 234fc:12
 	u32 src = OPER_AY_PD_16();
 	u32 ea  = EA_AX_PD_16();
 	u32 dst = m68ki_read_16(ea);
@@ -7726,7 +7726,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m68ki_write_16(ea, res);
 
 
-9188 f1f8 subx     l .          071:30 234fc:12
+9188 f1f8 subx     l .          01:30 7:40 234fc:12
 	u32 src = OPER_AY_PD_32();
 	u32 ea  = EA_AX_PD_32();
 	u32 dst = m68ki_read_32(ea);
@@ -7742,7 +7742,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m68ki_write_32(ea, res);
 
 
-4840 fff8 swap     l .          071234fc:4
+4840 fff8 swap     l .          01234fc:4 7:7
 	u32* r_dst = &DY();
 
 	m_not_z_flag = MASK_OUT_ABOVE_32(*r_dst<<16);
@@ -7754,7 +7754,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m_v_flag = VFLAG_CLEAR;
 
 
-4ac0 fff8 tas      b .          071234fc:4
+4ac0 fff8 tas      b .          01234fc:4 7:10
 	u32* r_dst = &DY();
 
 	m_not_z_flag = MASK_OUT_ABOVE_8(*r_dst);
@@ -7764,7 +7764,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	*r_dst |= 0x80;
 
 
-4ac0 ffc0 tas      b A+-DXWL    071:14 234fc:12
+4ac0 ffc0 tas      b A+-DXWL    01:14 7:15 234fc:12
 	u32 ea = M68KMAKE_GET_EA_AY_8;
 	u32 dst = m68ki_read_8(ea);
 
@@ -7833,13 +7833,13 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	}
 
 
-4e76 ffff trapv    . .          071234fc:4
+4e76 ffff trapv    . .          01234fc:4 7:10
 	if(!COND_VC()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
 	}
 
 
-4a00 fff8 tst      b .          071:4 234fc:2
+4a00 fff8 tst      b .          01:4 7:7 234fc:2
 	u32 res = MASK_OUT_ABOVE_8(DY());
 
 	m_n_flag = NFLAG_8(res);
@@ -7848,7 +7848,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-4a00 ffc0 tst      b A+-DXWL    071:4 234fc:2
+4a00 ffc0 tst      b A+-DXWL    01:4 7:7 234fc:2
 	u32 res = M68KMAKE_GET_OPER_AY_8;
 
 	m_n_flag = NFLAG_8(res);
@@ -7884,7 +7884,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-4a40 fff8 tst      w .          071:4 234fc:2
+4a40 fff8 tst      w .          01:4 7:7 234fc:2
 	u32 res = MASK_OUT_ABOVE_16(DY());
 
 	m_n_flag = NFLAG_16(res);
@@ -7902,7 +7902,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-4a40 ffc0 tst      w A+-DXWL    071:4 234fc:2
+4a40 ffc0 tst      w A+-DXWL    01:4 7:7 234fc:2
 	u32 res = M68KMAKE_GET_OPER_AY_16;
 
 	m_n_flag = NFLAG_16(res);
@@ -7938,7 +7938,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-4a80 fff8 tst      l .          071:4 234fc:2
+4a80 fff8 tst      l .          01:4 7:7 234fc:2
 	u32 res = DY();
 
 	m_n_flag = NFLAG_32(res);
@@ -7956,7 +7956,7 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-4a80 ffc0 tst      l A+-DXWL    071:4 234fc:2
+4a80 ffc0 tst      l A+-DXWL    01:4 7:7 234fc:2
 	u32 res = M68KMAKE_GET_OPER_AY_32;
 
 	m_n_flag = NFLAG_32(res);
@@ -7992,11 +7992,11 @@ e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
 	m_c_flag = CFLAG_CLEAR;
 
 
-4e5f ffff unlk     l .          071:12 234fc:6
+4e5f ffff unlk     l .          01:12 7:15 234fc:6
 	REG_A()[7] = m68ki_read_32(REG_A()[7]);
 
 
-4e58 fff8 unlk     l .          071:12 234fc:6
+4e58 fff8 unlk     l .          01:12 7:15 234fc:6
 	u32* r_dst = &AY();
 
 	REG_A()[7] = *r_dst;

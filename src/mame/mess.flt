@@ -35,6 +35,7 @@ akaiax80.cpp
 alcat7100.cpp
 alesis.cpp
 alesis_qs.cpp
+alfaskop41xx.cpp
 alphasma.cpp
 alphatpx.cpp
 alphatro.cpp
@@ -96,6 +97,7 @@ banctec.cpp
 basic52.cpp
 bbc.cpp
 bbcbc.cpp
+bbl380.cpp
 bcs3.cpp
 bebox.cpp
 beehive.cpp
@@ -136,8 +138,10 @@ cbnt2039.cpp
 cc40.cpp
 ccs2810.cpp
 ccs300.cpp
+cd100.cpp
 cd2650.cpp
 cdc721.cpp
+cdsys5.cpp
 cfx9850.cpp
 cgc7900.cpp
 cgenie.cpp
@@ -175,6 +179,8 @@ crvision.cpp
 ct486.cpp
 cvicny.cpp
 cxg_ch2001.cpp
+cxg_dominator.cpp
+cxg_sphinx40.cpp
 cxhumax.cpp
 cybiko.cpp
 cz101.cpp
@@ -187,6 +193,7 @@ daruma.cpp
 datum.cpp
 dbox.cpp
 dccons.cpp
+dcebridge.cpp
 dct11em.cpp
 debut.cpp
 decstation.cpp
@@ -241,6 +248,7 @@ esqkt.cpp
 esqmr.cpp
 et3400.cpp
 eti660.cpp
+eurit.cpp
 eurocom2.cpp
 europc.cpp
 eva.cpp
@@ -296,11 +304,13 @@ gamemachine.cpp
 gamepock.cpp
 gb.cpp
 gba.cpp
+generalplus_gpl32612.cpp
 geneve.cpp
 geniusiq.cpp
 geniusjr.cpp
 genpc.cpp
 gimix.cpp
+gkidabc.cpp
 gizmondo.cpp
 glcx.cpp
 gmaster.cpp
@@ -366,6 +376,7 @@ ibmpcjr.cpp
 icatel.cpp
 icebox.cpp
 ie15.cpp
+lx_jg7425.cpp
 if800.cpp
 ikt5a.cpp
 imds2.cpp
@@ -393,6 +404,7 @@ isbc.cpp
 isbc8010.cpp
 isbc8030.cpp
 iskr103x.cpp
+itc4.cpp
 itt1700.cpp
 itt3030.cpp
 itt9216.cpp
@@ -424,12 +436,14 @@ ktm3.cpp
 kyocera.cpp
 laser3k.cpp
 lb186.cpp
+lbpc.cpp
 lc80.cpp
 lcmate2.cpp
 leapfrog_leappad.cpp
 leapster.cpp
 learnwin.cpp
 lee1214.cpp
+lexibook_jg7425.cpp
 lft.cpp
 lg-dvd.cpp
 lilith.cpp
@@ -530,6 +544,7 @@ msbc1.cpp
 mstation.cpp
 msx.cpp
 mt735.cpp
+mtd1256.cpp
 mtx.cpp
 multi16.cpp
 multi8.cpp
@@ -559,6 +574,7 @@ nds.cpp
 neogeocd.cpp
 nes.cpp
 nes_vt.cpp
+vt1682.cpp
 newbrain.cpp
 next.cpp
 nforcepc.cpp
@@ -696,8 +712,10 @@ rambo.cpp
 ravens.cpp
 rc702.cpp
 rc759.cpp
+rcm32p.cpp
 rd100.cpp
 rd110.cpp
+regence.cpp
 replicator.cpp
 rex6000.cpp
 riscpc.cpp
@@ -754,6 +772,7 @@ sk101bl.cpp
 slc1.cpp
 slc1a.cpp
 slicer.cpp
+slsstars.cpp
 sm1800.cpp
 sm7238.cpp
 smc777.cpp
@@ -884,6 +903,7 @@ tvgame.cpp
 tx0.cpp
 uchroma68.cpp
 uknc.cpp
+unkmandd.cpp
 unichamp.cpp
 unior.cpp
 unistar.cpp
@@ -896,10 +916,12 @@ v102.cpp
 v550.cpp
 v1050.cpp
 v6809.cpp
+vanguardmk1.cpp
 vax11.cpp
 vboy.cpp
 vc4000.cpp
 vcs80.cpp
+vd56sp.cpp
 vdm7932x.cpp
 vector06.cpp
 vector4.cpp
@@ -922,6 +944,7 @@ vp60.cpp
 vsmile.cpp
 vsmileb.cpp
 vsmilepro.cpp
+vt52.cpp
 vt100.cpp
 vt220.cpp
 vt240.cpp

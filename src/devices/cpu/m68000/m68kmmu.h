@@ -229,7 +229,8 @@ void pmmu_atc_flush_fc_ea(const u16 modes)
 		{
 			if ((e & M68K_MMU_ATC_VALID) &&
 				(((e >> 24) & fcmask) == fc) &&
-				(((e >> ps) << (ps - 8)) == ((ea >> ps) << (ps - 8))))
+//              (((e >> ps) << (ps - 8)) == ((ea >> ps) << (ps - 8))))
+				( (e << ps) == (ea >> 8 << ps) ))
 			{
 				MMULOG("flushing entry %08x\n", e);
 				e = 0;

@@ -98,37 +98,35 @@ extern int RLOOP;
 
 void retro_osd_interface::update(bool skip_redraw)
 {
-   osd_common_t::update(skip_redraw);
+	osd_common_t::update(skip_redraw);
 
    // if we're not skipping this redraw, update all windows
-   if (!skip_redraw)
-   {
-      retro_frame_draw_enable(true);
-      //      profiler_mark(PROFILER_BLIT);
-      for (auto window : osd_common_t::s_window_list)
-         window->update();
-      //      profiler_mark(PROFILER_END);
-   }
-   else retro_frame_draw_enable(false);
+	if (!skip_redraw)
+	{
+		retro_frame_draw_enable(true);
+		//      profiler_mark(PROFILER_BLIT);
+		for (auto window : osd_common_t::s_window_list)
+		window->update();
+		//      profiler_mark(PROFILER_END);
+	}
+	else retro_frame_draw_enable(false);
 
-   // poll the joystick values here
+	// if we're running, disable some parts of the debugger
+ 	if ((machine().debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
+		debugger_update();
+}
 
-   //FIXME RETRO
-   //	downcast<retro_osd_interface&>(machine().osd()).poll_inputs(machine());
+//============================================================
+//  input_update
+//============================================================
+void retro_osd_interface::input_update()
+{
+	// poll the joystick values here
+	process_events_buf();
+	poll_inputs(machine());
+	check_osd_inputs(machine());
 
-   check_osd_inputs(machine());
-   // if we're running, disable some parts of the debugger
-   if ((machine().debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
-      debugger_update();
-
-   //RETRO POLL INPUTS
-   input_poll_cb();
-
-   process_mouse_state(machine());
-   process_keyboard_state(machine());
-   process_joypad_state(machine());
-   process_lightgun_state(machine());
-   RLOOP=0;
+	RLOOP=0;
 }
 
 //============================================================

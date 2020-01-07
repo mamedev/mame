@@ -323,7 +323,7 @@ void samcoupe_state::machine_reset()
 	if (m_config->read() & 0x01)
 	{
 		/* install RTC */
-		spaceio.install_readwrite_handler(0xef, 0xef, 0, 0, 0xff00, read8_delegate(FUNC(samcoupe_state::samcoupe_rtc_r),this), write8_delegate(FUNC(samcoupe_state::samcoupe_rtc_w),this));
+		spaceio.install_readwrite_handler(0xef, 0xef, 0, 0, 0xff00, read8_delegate(*this, FUNC(samcoupe_state::samcoupe_rtc_r)), write8_delegate(*this, FUNC(samcoupe_state::samcoupe_rtc_w)));
 	}
 	else
 	{

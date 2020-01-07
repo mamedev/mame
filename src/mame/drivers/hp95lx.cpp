@@ -760,7 +760,7 @@ void hp95lx_state::hp95lx(machine_config &config)
 
 
 ROM_START( hp95lx )
-	ROM_REGION16_LE(0x100000, "romdos", 0)
+	ROM_REGION(0x100000, "romdos", 0)
 	// Version A ... ROM BIOS Ver 2.14 ... 04/02/91
 	ROM_LOAD("18-5301.abd.bin", 0, 0x100000, CRC(18121c48) SHA1(c3bfb45cbbf4f57ae67fb5659da40f371d8e5c54))
 

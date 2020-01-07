@@ -64,7 +64,7 @@ void apple3_state::apple3(machine_config &config)
 	m_maincpu->sync_cb().set(FUNC(apple3_state::apple3_sync_w));
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple3_state::apple3_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	input_merger_device &mainirq(INPUT_MERGER_ANY_HIGH(config, "mainirq"));
 	mainirq.output_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);

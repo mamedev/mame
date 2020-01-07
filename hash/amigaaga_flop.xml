@@ -2,14 +2,13 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!-- General purpose software list for Amiga software with a MINIMUM requirement of the AGA chipset (A1200 / A4000)
-     some AGA software exists instead in other lists if it is backwards compatible with older hardware
+    some AGA software exists instead in other lists if it is backwards compatible with older hardware.
 
-    the software listed here is not designed for use on systems without the AGA chipset and
+    The software listed here is not designed for use on systems without the AGA chipset and
     will not function.
 -->
 
-
-<softwarelist name="amigaaga_flop" description="Amiga AGA disk images">
+<softwarelist name="amigaaga_flop" description="Commodore Amiga AGA disk images">
 
 	<software name="1869_a" supported="no">
 		<!-- SPS (CAPS) release 1653 -->

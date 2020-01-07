@@ -243,7 +243,7 @@ void sc6_state::sc6(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "fidel_sc6", "bin");
-	m_cart->set_device_load(FUNC(sc6_state::cart_load), this);
+	m_cart->set_device_load(FUNC(sc6_state::cart_load));
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_sc6");

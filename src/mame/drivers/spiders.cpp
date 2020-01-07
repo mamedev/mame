@@ -399,7 +399,6 @@ void spiders_state::spiders_main_map(address_map &map)
 
 void spiders_state::spiders_audio_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();
 	map(0x0080, 0x0083).rw("pia4", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xf800, 0xffff).rom();
 }
@@ -527,7 +526,7 @@ void spiders_state::spiders(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(spiders_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(spiders_state::crtc_update_row));
 	crtc.out_de_callback().set("ic60", FUNC(ttl74123_device::a_w));
 
 	PIA6821(config, m_pia[0], 0);

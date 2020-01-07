@@ -435,7 +435,7 @@ void mm1_state::mm1(machine_config &config)
 	m_maincpu->in_sid_func().set(FUNC(mm1_state::dsra_r));
 	m_maincpu->out_sod_func().set(KB_TAG, FUNC(mm1_keyboard_device::bell_w));
 
-	config.m_perfect_cpu_quantum = subtag(I8085A_TAG);
+	config.set_perfect_quantum(m_maincpu);
 
 	// peripheral hardware
 	ADDRESS_MAP_BANK(config, m_io);

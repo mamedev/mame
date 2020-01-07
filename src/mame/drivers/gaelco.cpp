@@ -117,7 +117,7 @@ void gaelco_state::bigkarnk_map(address_map &map)
 	map(0x700004, 0x700005).portr("P1");
 	map(0x700006, 0x700007).portr("P2");
 	map(0x700008, 0x700009).portr("SERVICE");
-	map(0x70000b, 0x70000b).select(0x000070).lw8("outlatch_w", [this](offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); });
+	map(0x70000b, 0x70000b).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
 	map(0x70000f, 0x70000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));               /* Triggers a FIRQ on the sound CPU */
 	map(0xff8000, 0xffffff).ram();                                                         /* Work RAM */
 }
@@ -163,7 +163,7 @@ void gaelco_state::squash_map(address_map &map)
 	map(0x700002, 0x700003).portr("DSW1");
 	map(0x700004, 0x700005).portr("P1");
 	map(0x700006, 0x700007).portr("P2");
-	map(0x70000b, 0x70000b).select(0x000070).lw8("outlatch_w", [this](offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); });
+	map(0x70000b, 0x70000b).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
 	map(0x70000d, 0x70000d).w(FUNC(gaelco_state::oki_bankswitch_w));
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));                      /* OKI6295 status register */
 	map(0xff0000, 0xffffff).ram();                                                         /* Work RAM */
@@ -182,7 +182,7 @@ void gaelco_state::thoop_map(address_map &map)
 	map(0x700002, 0x700003).portr("DSW1");
 	map(0x700004, 0x700005).portr("P1");
 	map(0x700006, 0x700007).portr("P2");
-	map(0x70000b, 0x70000b).select(0x000070).lw8("outlatch_w", [this](offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); });
+	map(0x70000b, 0x70000b).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
 	map(0x70000d, 0x70000d).w(FUNC(gaelco_state::oki_bankswitch_w));
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));                      /* OKI6295 status register */
 	map(0xff0000, 0xffffff).ram();                                                         /* Work RAM */
@@ -646,7 +646,7 @@ void gaelco_state::bigkarnk(machine_config &config)
 	MC6809E(config, m_audiocpu, XTAL(8'000'000)/4);  /* 68B09EP, 2 MHz? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gaelco_state::bigkarnk_snd_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	LS259(config, m_outlatch);
 	m_outlatch->q_out_cb<0>().set(FUNC(gaelco_state::coin1_lockout_w)).invert();
@@ -715,7 +715,7 @@ void gaelco_state::squash(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco_state::squash_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	LS259(config, m_outlatch); // B8
 	m_outlatch->q_out_cb<0>().set(FUNC(gaelco_state::coin1_lockout_w)).invert();
@@ -753,7 +753,7 @@ void gaelco_state::thoop(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco_state::thoop_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	LS259(config, m_outlatch); // B8
 	m_outlatch->q_out_cb<0>().set(FUNC(gaelco_state::coin1_lockout_w)); // not inverted

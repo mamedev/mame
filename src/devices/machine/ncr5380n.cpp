@@ -187,7 +187,7 @@ void ncr5380n_device::step(bool timeout)
 		if(win != scsi_id) {
 			scsi_bus->data_w(scsi_refid, 0);
 			scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
-			fatalerror("need to wait for bus free\n");
+			logerror("need to wait for bus free\n");
 		}
 
 		state &= STATE_MASK;

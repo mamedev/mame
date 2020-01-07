@@ -268,13 +268,13 @@ WRITE16_MEMBER(ngen_state::cpu_peripheral_cb)
 		addr = (m_peripheral & 0xffc0) << 4;
 		if(m_middle & 0x0040)
 		{
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(addr, addr + 0x3ff, read16_delegate(FUNC(ngen_state::peripheral_r), this), write16_delegate(FUNC(ngen_state::peripheral_w), this));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(addr, addr + 0x3ff, read16_delegate(*this, FUNC(ngen_state::peripheral_r)), write16_delegate(*this, FUNC(ngen_state::peripheral_w)));
 			logerror("Mapped peripherals to memory 0x%08x\n",addr);
 		}
 		else
 		{
 			addr &= 0xffff;
-			m_maincpu->space(AS_IO).install_readwrite_handler(addr, addr + 0x3ff, read16_delegate(FUNC(ngen_state::peripheral_r), this), write16_delegate(FUNC(ngen_state::peripheral_w), this));
+			m_maincpu->space(AS_IO).install_readwrite_handler(addr, addr + 0x3ff, read16_delegate(*this, FUNC(ngen_state::peripheral_r)), write16_delegate(*this, FUNC(ngen_state::peripheral_w)));
 			logerror("Mapped peripherals to I/O 0x%04x\n",addr);
 		}
 		break;
@@ -450,7 +450,7 @@ WRITE16_MEMBER(ngen_state::xbus_w)
 	switch(m_xbus_current)
 	{
 		case 0x00:  // Floppy/Hard disk module
-			io.install_readwrite_handler(addr,addr+0xff,read16_delegate(FUNC(ngen_state::hfd_r),this),write16_delegate(FUNC(ngen_state::hfd_w),this),0xffffffff);
+			io.install_readwrite_handler(addr,addr+0xff, read16_delegate(*this, FUNC(ngen_state::hfd_r)), write16_delegate(*this, FUNC(ngen_state::hfd_w)), 0xffffffff);
 			break;
 		default:
 			cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);  // reached end of the modules
@@ -999,7 +999,7 @@ void ngen_state::ngen(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(9);
-	m_crtc->set_update_row_callback(FUNC(ngen_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(ngen_state::crtc_update_row));
 
 	// keyboard UART (patent says i8251 is used for keyboard communications, it is located on the video board)
 	I8251(config, m_viduart, 0);  // main clock unknown, Rx/Tx clocks are 19.53kHz
@@ -1112,7 +1112,7 @@ void ngen386_state::ngen386(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(9);
-	m_crtc->set_update_row_callback(FUNC(ngen386_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(ngen386_state::crtc_update_row));
 
 	// keyboard UART (patent says i8251 is used for keyboard communications, it is located on the video board)
 	I8251(config, m_viduart, 0);  // main clock unknown, Rx/Tx clocks are 19.53kHz
@@ -1162,7 +1162,7 @@ void ngen386_state::_386i(machine_config &config)
 }
 
 ROM_START( ngen )
-	ROM_REGION( 0x2000, "bios", 0)
+	ROM_REGION16_LE( 0x2000, "bios", 0)
 	ROM_LOAD16_BYTE( "72-00414_80186_cpu.bin",  0x000000, 0x001000, CRC(e1387a03) SHA1(ddca4eba67fbf8b731a8009c14f6b40edcbc3279) )  // bootstrap ROM v8.4
 	ROM_LOAD16_BYTE( "72-00415_80186_cpu.bin",  0x000001, 0x001000, CRC(a6dde7d9) SHA1(b4d15c1bce31460ab5b92ff43a68c15ac5485816) )
 
@@ -1178,7 +1178,7 @@ ROM_END
 
 // not sure just how similar these systems are to the 80186 model, but are here at the moment to document the dumps
 ROM_START( ngenb38 )
-	ROM_REGION( 0x2000, "bios", 0)
+	ROM_REGION32_LE( 0x2000, "bios", 0)
 	ROM_LOAD16_BYTE( "72-168_fpc_386_cpu.bin",  0x000000, 0x001000, CRC(250a3b68) SHA1(49c070514bac264fa4892f284f7d2c852ae6605d) )
 	ROM_LOAD16_BYTE( "72-167_fpc_386_cpu.bin",  0x000001, 0x001000, CRC(4010cc4e) SHA1(74a3024d605569056484d08b63f19fbf8eaf31c6) )
 
@@ -1187,7 +1187,7 @@ ROM_START( ngenb38 )
 ROM_END
 
 ROM_START( 386i )
-	ROM_REGION( 0x4000, "bios", 0)
+	ROM_REGION32_LE( 0x4000, "bios", 0)
 	ROM_LOAD16_BYTE( "72-1561o_386i_cpu.bin",  0x000000, 0x002000, CRC(b5efd768) SHA1(8b250d47d9c6eb82e1afaeb2244d8c4134ecbc47) )
 	ROM_LOAD16_BYTE( "72-1562e_386i_cpu.bin",  0x000001, 0x002000, CRC(002d0d3a) SHA1(31de8592999377db9251acbeff348390a2d2602a) )
 

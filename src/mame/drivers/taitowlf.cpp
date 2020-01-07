@@ -379,10 +379,8 @@ void taitowlf_state::taitowlf(machine_config &config)
 
 
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device_read (0, FUNC(taitowlf_state::intel82439tx_pci_r), this);
-	pcibus.set_device_write(0, FUNC(taitowlf_state::intel82439tx_pci_w), this);
-	pcibus.set_device_read (7, FUNC(taitowlf_state::intel82371ab_pci_r), this);
-	pcibus.set_device_write(7, FUNC(taitowlf_state::intel82371ab_pci_w), this);
+	pcibus.set_device(0, FUNC(taitowlf_state::intel82439tx_pci_r), FUNC(taitowlf_state::intel82439tx_pci_w));
+	pcibus.set_device(7, FUNC(taitowlf_state::intel82371ab_pci_r), FUNC(taitowlf_state::intel82371ab_pci_w));
 
 	pcat_common(config);
 

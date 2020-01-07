@@ -48,7 +48,7 @@ void mb60553_zooming_tilemap_device::device_start()
 	save_item(NAME(m_bank));
 	save_item(NAME(m_regs));
 
-	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mb60553_zooming_tilemap_device::get_tile_info),this),tilemap_mapper_delegate(FUNC(mb60553_zooming_tilemap_device::twc94_scan),this), 16,16,128,64);
+	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mb60553_zooming_tilemap_device::get_tile_info)), tilemap_mapper_delegate(*this, FUNC(mb60553_zooming_tilemap_device::twc94_scan)), 16,16,128,64);
 	m_tmap->set_transparent_pen(0);
 }
 

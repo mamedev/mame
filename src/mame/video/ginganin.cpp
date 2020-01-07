@@ -132,9 +132,9 @@ void ginganin_state::txtram_w(offs_t offset, u16 data, u16 mem_mask)
 
 void ginganin_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ginganin_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, BG_NX, BG_NY);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ginganin_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, FG_NX, FG_NY);
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ginganin_state::get_txt_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, TXT_NX, TXT_NY);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ginganin_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, BG_NX, BG_NY);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ginganin_state::get_fg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, FG_NX, FG_NY);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ginganin_state::get_txt_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, TXT_NX, TXT_NY);
 
 	m_fg_tilemap->set_transparent_pen(15);
 	m_tx_tilemap->set_transparent_pen(15);

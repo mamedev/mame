@@ -1296,10 +1296,10 @@ isa16_gus_device::isa16_gus_device(const machine_config &mconfig, const char *ta
 void isa16_gus_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0200, 0x0201, read8_delegate(FUNC(isa16_gus_device::joy_r),this), write8_delegate(FUNC(isa16_gus_device::joy_w),this) );
-	m_isa->install_device(0x0220, 0x022f, read8_delegate(FUNC(isa16_gus_device::board_r),this), write8_delegate(FUNC(isa16_gus_device::board_w),this) );
-	m_isa->install_device(0x0320, 0x0327, read8_delegate(FUNC(isa16_gus_device::synth_r),this), write8_delegate(FUNC(isa16_gus_device::synth_w),this) );
-	m_isa->install_device(0x0388, 0x0389, read8_delegate(FUNC(isa16_gus_device::adlib_r),this), write8_delegate(FUNC(isa16_gus_device::adlib_w),this) );
+	m_isa->install_device(0x0200, 0x0201, read8_delegate(*this, FUNC(isa16_gus_device::joy_r)), write8_delegate(*this, FUNC(isa16_gus_device::joy_w)));
+	m_isa->install_device(0x0220, 0x022f, read8_delegate(*this, FUNC(isa16_gus_device::board_r)), write8_delegate(*this, FUNC(isa16_gus_device::board_w)));
+	m_isa->install_device(0x0320, 0x0327, read8_delegate(*this, FUNC(isa16_gus_device::synth_r)), write8_delegate(*this, FUNC(isa16_gus_device::synth_w)));
+	m_isa->install_device(0x0388, 0x0389, read8_delegate(*this, FUNC(isa16_gus_device::adlib_r)), write8_delegate(*this, FUNC(isa16_gus_device::adlib_w)));
 }
 
 void isa16_gus_device::device_reset()

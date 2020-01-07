@@ -103,8 +103,8 @@ VIDEO_START_MEMBER(psikyo_state,psikyo)
 
 	for (int size = 0; size < 4; size++)
 	{
-		m_tilemap[0][size] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20 << size, 0x80 >> size);
-		m_tilemap[1][size] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20 << size, 0x80 >> size);
+		m_tilemap[0][size] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(psikyo_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 0x20 << size, 0x80 >> size);
+		m_tilemap[1][size] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(psikyo_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 0x20 << size, 0x80 >> size);
 
 		for (int layer = 0; layer < 2; layer++)
 		{

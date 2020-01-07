@@ -1331,11 +1331,13 @@ void nv2a_renderer::write_pixel(int x, int y, uint32_t color, int depth)
 	uint32_t deptsten;
 	int32_t c[4], fb[4], s[4], d[4], cc[4];
 	uint32_t dep, sten, stenc, stenv;
+	uint32_t udepth;
 	bool stencil_passed;
 	bool depth_passed;
 
 	if ((depth > 0xffffff) || (depth < 0) || (x < 0))
 		return;
+	udepth = (uint32_t)depth;
 	fb[3] = fb[2] = fb[1] = fb[0] = 0;
 	addr = nullptr;
 	if (color_mask != 0)
@@ -1508,27 +1510,27 @@ void nv2a_renderer::write_pixel(int x, int y, uint32_t color, int depth)
 				depth_passed = false;
 				break;
 			case NV2A_COMPARISON_OP::LESS:
-				if (depth >= dep)
+				if (udepth >= dep)
 					depth_passed = false;
 				break;
 			case NV2A_COMPARISON_OP::EQUAL:
-				if (depth != dep)
+				if (udepth != dep)
 					depth_passed = false;
 				break;
 			case NV2A_COMPARISON_OP::LEQUAL:
-				if (depth > dep)
+				if (udepth > dep)
 					depth_passed = false;
 				break;
 			case NV2A_COMPARISON_OP::GREATER:
-				if (depth <= dep)
+				if (udepth <= dep)
 					depth_passed = false;
 				break;
 			case NV2A_COMPARISON_OP::NOTEQUAL:
-				if (depth == dep)
+				if (udepth == dep)
 					depth_passed = false;
 				break;
 			case NV2A_COMPARISON_OP::GEQUAL:
-				if (depth < dep)
+				if (udepth < dep)
 					depth_passed = false;
 				break;
 			case NV2A_COMPARISON_OP::ALWAYS:
@@ -1925,7 +1927,7 @@ void nv2a_renderer::write_pixel(int x, int y, uint32_t color, int depth)
 		}
 	}
 	if (depth_write_enabled)
-		dep = depth;
+		dep = udepth;
 	if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT::Z24S8) {
 		deptsten = (dep << 8) | sten;
 		*daddr32 = deptsten;
@@ -4491,11 +4493,11 @@ WRITE_LINE_MEMBER(nv2a_renderer::vblank_callback)
 #ifdef LOG_NV2A
 	printf("vblank_callback\n\r");
 #endif
-	if ((state == true) && (puller_waiting == 1)) {
+	if ((state != 0) && (puller_waiting == 1)) {
 		puller_waiting = 0;
 		puller_timer_work(nullptr, 0);
 	}
-	if (state == true) {
+	if (state != 0) {
 		pcrtc[0x100 / 4] |= 1;
 		pcrtc[0x808 / 4] |= 0x10000;
 	}

@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(stadhero_state::get_pf1_tile_info)
 
 void stadhero_state::video_start()
 {
-	m_pf1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stadhero_state::get_pf1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	m_pf1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(stadhero_state::get_pf1_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 	m_pf1_tilemap->set_transparent_pen(0);
 }
 

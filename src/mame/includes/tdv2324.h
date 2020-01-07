@@ -65,7 +65,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
-	required_device<cpu_device> m_fdccpu;
+	required_device<m6802_cpu_device> m_fdccpu;
 	required_device<z80dart_device> m_sio;
 	required_device<pic8259_device> m_pic;
 	required_device<pit8253_device> m_pit0;

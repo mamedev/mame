@@ -49,6 +49,8 @@ public:
 		, m_soundbank(*this, "soundbank")
 		, m_gun_recoil(*this, "P%u_Gun_Recoil", 1U)
 		, m_romboard(ROM_BOARD_INVALID)
+		, m_custom_io_r(*this)
+		, m_custom_io_w(*this)
 		, m_grayscale_enable(false)
 		, m_vdp_enable(false)
 		, m_vdp_mixing(0)

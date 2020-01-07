@@ -12,6 +12,8 @@
 #include "emupal.h"
 #include "tilemap.h"
 
+#include <array>
+
 class tnx1_state : public driver_device
 {
 public:
@@ -25,7 +27,19 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_color_prom(*this, "proms"),
-		m_color_prom_spr(*this, "sprpal")
+		m_color_prom_spr(*this, "sprpal"),
+		m_io_mconf(*this, "MCONF"),
+		m_io_dsw1(*this, "DSW1"),
+		m_background_scroll{0,0,0},
+		m_fg_tilemap(nullptr),
+		m_palette_bank(0),
+		m_palette_bank_cache(0),
+		m_prot0(0),
+		m_prot1(0),
+		m_prot_shift(0),
+		m_dswbit(0),
+		m_nmi_enabled(false),
+		m_field(0)
 	{ }
 
 	DECLARE_READ_LINE_MEMBER(dsw1_read);
@@ -43,6 +57,8 @@ protected:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_region_ptr<uint8_t> m_color_prom;
 	required_region_ptr<uint8_t> m_color_prom_spr;
+	required_ioport m_io_mconf;
+	required_ioport m_io_dsw1;
 
 	static const res_net_decode_info mb7051_decode_info;
 	static const res_net_decode_info mb7052_decode_info;
@@ -58,12 +74,13 @@ protected:
 	tilemap_t *m_fg_tilemap;
 	uint8_t m_palette_bank;
 	uint8_t m_palette_bank_cache;
-	int   m_field;
 	uint8_t m_prot0;
 	uint8_t m_prot1;
 	uint8_t m_prot_shift;
 	uint8_t m_dswbit;
 	bool m_nmi_enabled;
+	int   m_field;
+	std::array<bitmap_ind16, 2>  m_bitmap;    // bitmaps for fields
 
 	virtual DECLARE_WRITE8_MEMBER(refresh_w);
 	DECLARE_READ8_MEMBER(protection_r);

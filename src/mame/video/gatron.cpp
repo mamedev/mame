@@ -47,7 +47,7 @@ void gatron_state::video_start()
 {
 	m_lamps.resolve();
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gatron_state::get_bg_tile_info), this), TILEMAP_SCAN_COLS, 8, 16, 48, 16);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gatron_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 8, 16, 48, 16);
 }
 
 uint32_t gatron_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

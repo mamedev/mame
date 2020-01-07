@@ -1934,7 +1934,7 @@ void cischeat_state::bigrun(machine_config &config)
 	// timing set by the YM irqhandler
 //  m_soundcpu->set_periodic_int(FUNC(cischeat_state::irq4_line_hold), attotime::from_hz(16*30));
 
-	config.m_minimum_quantum = attotime::from_hz(1200);
+	config.set_maximum_quantum(attotime::from_hz(1200));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2051,7 +2051,7 @@ void cischeat_state::f1gpstr2(machine_config &config)
 	M68000(config, m_cpu5, 10000000);
 	m_cpu5->set_addrmap(AS_PROGRAM, &cischeat_state::f1gpstr2_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(12000);
+	config.set_maximum_quantum(attotime::from_hz(12000));
 }
 
 
@@ -2205,8 +2205,8 @@ void captflag_state::captflag(machine_config &config)
 	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 0x4e00/2);
 
 	// Motors
-	TIMER(config, m_motor_left).configure_generic(timer_device::expired_delegate());
-	TIMER(config, m_motor_right).configure_generic(timer_device::expired_delegate());
+	TIMER(config, m_motor_left).configure_generic(nullptr);
+	TIMER(config, m_motor_right).configure_generic(nullptr);
 
 	// Layout
 	config.set_default_layout(layout_captflag);

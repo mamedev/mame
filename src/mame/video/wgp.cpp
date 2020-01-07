@@ -23,9 +23,9 @@ TILE_GET_INFO_MEMBER(wgp_state::get_piv_tile_info)
 
 void wgp_state::core_vh_start(int piv_xoffs, int piv_yoffs)
 {
-	m_piv_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wgp_state::get_piv_tile_info<0x0000>),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_piv_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wgp_state::get_piv_tile_info<0x1000>),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_piv_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wgp_state::get_piv_tile_info<0x2000>),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_piv_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wgp_state::get_piv_tile_info<0x0000>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_piv_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wgp_state::get_piv_tile_info<0x1000>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_piv_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wgp_state::get_piv_tile_info<0x2000>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
 	m_piv_xoffs = piv_xoffs;
 	m_piv_yoffs = piv_yoffs;

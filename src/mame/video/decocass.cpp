@@ -695,9 +695,9 @@ void decocass_state::draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 void decocass_state::video_start()
 {
-	m_bg_tilemap_l = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(decocass_state::get_bg_l_tile_info),this), tilemap_mapper_delegate(FUNC(decocass_state::bgvideoram_scan_cols),this), 16, 16, 32, 32);
-	m_bg_tilemap_r = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(decocass_state::get_bg_r_tile_info),this), tilemap_mapper_delegate(FUNC(decocass_state::bgvideoram_scan_cols),this), 16, 16, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(decocass_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(decocass_state::fgvideoram_scan_cols),this), 8, 8, 32, 32);
+	m_bg_tilemap_l = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(decocass_state::get_bg_l_tile_info)), tilemap_mapper_delegate(*this, FUNC(decocass_state::bgvideoram_scan_cols)), 16, 16, 32, 32);
+	m_bg_tilemap_r = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(decocass_state::get_bg_r_tile_info)), tilemap_mapper_delegate(*this, FUNC(decocass_state::bgvideoram_scan_cols)), 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(decocass_state::get_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(decocass_state::fgvideoram_scan_cols)), 8, 8, 32, 32);
 
 	m_bg_tilemap_l->set_transparent_pen(0);
 	m_bg_tilemap_r->set_transparent_pen(0);

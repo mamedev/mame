@@ -243,7 +243,7 @@ void star_state::tstar432(machine_config &config)
 
 	/* extension rom */
 	GENERIC_CARTSLOT(config, m_extrom, generic_plain_slot, "saitek_kso", "bin");
-	m_extrom->set_device_load(FUNC(star_state::extrom_load), this);
+	m_extrom->set_device_load(FUNC(star_state::extrom_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("saitek_kso");
 }

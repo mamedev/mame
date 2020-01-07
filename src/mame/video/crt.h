@@ -55,7 +55,7 @@ private:
 		int next = 0;       /* index of next pixel in list */
 	};
 
-	crt_point *m_list; /* array of (crt_window_width*crt_window_height) point */
+	std::unique_ptr<crt_point[]> m_list; /* array of (crt_window_width*crt_window_height) point */
 	std::unique_ptr<int[]> m_list_head;  /* head of the list of lit pixels (index in the array) */
 						/* keep a separate list for each display line (makes the video code slightly faster) */
 

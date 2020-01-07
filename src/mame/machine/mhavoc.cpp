@@ -319,6 +319,6 @@ WRITE8_MEMBER(mhavoc_state::mhavocrv_speech_strobe_w)
 void mhavoc_state::init_mhavocrv()
 {
 	// For Return to Vax, add support for the normally-unused speech module.
-	m_gamma->space(AS_PROGRAM).install_write_handler(0x5800, 0x5800, write8_delegate(FUNC(mhavoc_state::mhavocrv_speech_data_w),this));
-	m_gamma->space(AS_PROGRAM).install_write_handler(0x5900, 0x5900, write8_delegate(FUNC(mhavoc_state::mhavocrv_speech_strobe_w),this));
+	m_gamma->space(AS_PROGRAM).install_write_handler(0x5800, 0x5800, write8_delegate(*this, FUNC(mhavoc_state::mhavocrv_speech_data_w)));
+	m_gamma->space(AS_PROGRAM).install_write_handler(0x5900, 0x5900, write8_delegate(*this, FUNC(mhavoc_state::mhavocrv_speech_strobe_w)));
 }

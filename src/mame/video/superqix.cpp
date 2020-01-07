@@ -51,17 +51,17 @@ TILE_GET_INFO_MEMBER(superqix_state_base::sqix_get_bg_tile_info)
 
 void hotsmash_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hotsmash_state::pb_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hotsmash_state::pb_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8,32,32);
 }
 
 void superqix_state::video_start()
 {
 	m_fg_bitmap[0] = std::make_unique<bitmap_ind16>(256, 256);
 	m_fg_bitmap[1] = std::make_unique<bitmap_ind16>(256, 256);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(superqix_state_base::sqix_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(superqix_state_base::sqix_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_bg_tilemap->set_transmask(0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
-	m_bg_tilemap->set_transmask(1,0x0001,0xfffe); /* split type 1 has pen 0 transparent in front half */
+	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); // split type 0 is totally transparent in front half
+	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe); // split type 1 has pen 0 transparent in front half
 
 	save_item(NAME(*m_fg_bitmap[0]));
 	save_item(NAME(*m_fg_bitmap[1]));

@@ -1009,7 +1009,7 @@ void fanucspmg_state::fanucspmg(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(fanucspmg_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(fanucspmg_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(FUNC(fanucspmg_state::vsync_w));
 }
 
@@ -1017,7 +1017,7 @@ void fanucspmg_state::fanucspmgm(machine_config &config)
 {
 	fanucspmg(config);
 
-	m_crtc->set_update_row_callback(FUNC(fanucspmg_state::crtc_update_row_mono), this);
+	m_crtc->set_update_row_callback(FUNC(fanucspmg_state::crtc_update_row_mono));
 }
 
 /* ROM definition */

@@ -477,7 +477,7 @@ void shanghai_state::kothello(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &shanghai_state::kothello_sound_map);
 	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	config.m_minimum_quantum = attotime::from_hz(12000);
+	config.set_maximum_quantum(attotime::from_hz(12000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

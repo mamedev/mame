@@ -46,6 +46,8 @@ public:
 		, m_cxdio(*this, "cxdio")
 		, m_workram(*this, "nvram")
 		, m_sound_decrypted_opcodes(*this, "sound_decrypted_opcodes")
+		, m_custom_io_r(*this)
+		, m_custom_io_w(*this)
 		, m_video_control(0)
 		, m_mcu_control(0)
 		, m_n7751_command(0)
@@ -194,9 +196,9 @@ class afighter_16a_analog_state : public segas16a_state
 public:
 	// construction/destruction
 	afighter_16a_analog_state(const machine_config &mconfig, device_type type, const char *tag)
-		: segas16a_state(mconfig, type, tag),
-			m_accel(*this, "ACCEL"),
-			m_steer(*this, "STEER")
+		: segas16a_state(mconfig, type, tag)
+		, m_accel(*this, "ACCEL")
+		, m_steer(*this, "STEER")
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(afighter_accel_r);

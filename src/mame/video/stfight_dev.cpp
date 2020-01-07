@@ -12,8 +12,8 @@
 DEFINE_DEVICE_TYPE(STFIGHT_VIDEO, stfight_video_device, "stfight_vid", "Seibu Street Fight Video")
 
 
-stfight_video_device::stfight_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, STFIGHT_VIDEO, tag, owner, clock),
+stfight_video_device::stfight_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, STFIGHT_VIDEO, tag, owner, clock),
 	m_gfxdecode(*this, "gfxdecode"),
 	m_palette(*this,"^palette"),
 	m_screen(*this, "screen"),
@@ -311,9 +311,9 @@ void stfight_video_device::device_start()
 
 	save_item(NAME(m_sprite_base));
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stfight_video_device::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(stfight_video_device::bg_scan),this),16,16,128,256);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stfight_video_device::get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(stfight_video_device::fg_scan),this),16,16,128,256);
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stfight_video_device::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8,8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(stfight_video_device::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(stfight_video_device::bg_scan)), 16,16, 128,256);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(stfight_video_device::get_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(stfight_video_device::fg_scan)), 16,16, 128,256);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(stfight_video_device::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 
 	// we do manual mixing using a temp bitmap
 	m_screen->register_screen_bitmap(m_temp_sprite_bitmap);

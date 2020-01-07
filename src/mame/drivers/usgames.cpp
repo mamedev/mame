@@ -242,7 +242,7 @@ void usgames_state::usg32(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(usgames_state::update_row), this);
+	crtc.set_update_row_callback(FUNC(usgames_state::update_row));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -12,19 +12,23 @@ class microtouch_device :
 		public device_serial_interface
 {
 public:
+	typedef device_delegate<int (int *, int *)> touch_cb;
+
 	microtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	auto stx() { return m_out_stx_func.bind(); }
 
-	virtual ioport_constructor device_input_ports() const override;
 	DECLARE_WRITE_LINE_MEMBER(rx) { device_serial_interface::rx_w(state); }
 	DECLARE_INPUT_CHANGED_MEMBER(touch);
 
-	typedef device_delegate<int (int *, int *)> touch_cb;
-	template <typename... T> void set_touch_callback(T &&... args) { m_out_touch_cb = touch_cb(std::forward<T>(args)...); }
+	template <typename... T> void set_touch_callback(T &&... args) { m_out_touch_cb.set(std::forward<T>(args)...); }
 
 protected:
+	// device_t implementation
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	// device_serial_interface implementation
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
 	virtual void rcv_complete() override;

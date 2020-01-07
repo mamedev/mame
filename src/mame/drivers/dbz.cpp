@@ -125,7 +125,7 @@ void dbz_state::dbz_map(address_map &map)
 	map(0x4d4000, 0x4d401f).w(m_k053936_2, FUNC(k053936_device::ctrl_w));
 	map(0x4e0000, 0x4e0001).portr("P1_P2");
 	map(0x4e0002, 0x4e0003).portr("SYSTEM_DSW1");
-	map(0x4e4000, 0x4e4001).lr8("4e4000", [this]() { return uint8_t(m_dsw2->read()); });
+	map(0x4e4000, 0x4e4001).lr8(NAME([this]() { return uint8_t(m_dsw2->read()); }));
 	map(0x4e8000, 0x4e8001).nopw();
 	map(0x4ec000, 0x4ec001).w(FUNC(dbz_state::dbzcontrol_w));
 	map(0x4f0000, 0x4f0001).w(FUNC(dbz_state::dbz_sound_command_w));
@@ -349,12 +349,12 @@ void dbz_state::dbz(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x4000/2).enable_shadows();
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(dbz_state::tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(dbz_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4, 1, 1);
 	m_k056832->set_palette("palette");
 
 	K053246(config, m_k053246, 0);
-	m_k053246->set_sprite_callback(FUNC(dbz_state::sprite_callback), this);
+	m_k053246->set_sprite_callback(FUNC(dbz_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, -87, 32); // or -52, 16?
 	m_k053246->set_palette("palette");
 

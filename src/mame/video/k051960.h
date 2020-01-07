@@ -13,7 +13,6 @@ enum
 };
 
 
-typedef device_delegate<void (int *code, int *color, int *priority, int *shadow)> k051960_cb_delegate;
 #define K051960_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority, int *shadow)
 
 
@@ -27,6 +26,8 @@ class k051960_device : public device_t, public device_gfx_interface, public devi
 	DECLARE_GFXDECODE_MEMBER(gfxinfo_gradius3);
 
 public:
+	using sprite_delegate = device_delegate<void (int *code, int *color, int *priority, int *shadow)>;
+
 	k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto irq_handler() { return m_irq_handler.bind(); }
@@ -37,7 +38,7 @@ public:
 
 
 	// static configuration
-	template <typename... T> void set_sprite_callback(T &&... args) { m_k051960_cb = k051960_cb_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_sprite_callback(T &&... args) { m_k051960_cb.set(std::forward<T>(args)...); }
 	void set_plane_order(int order);
 
 	/*
@@ -77,7 +78,7 @@ private:
 
 	emu_timer *m_scanline_timer;
 
-	k051960_cb_delegate m_k051960_cb;
+	sprite_delegate m_k051960_cb;
 
 	devcb_write_line m_irq_handler;
 	// TODO: is this even used by anything?

@@ -23,7 +23,13 @@ DEFINE_DEVICE_TYPE(WSWAN_VIDEO, wswan_video_device, "wswan_video", "Bandai Wonde
 wswan_video_device::wswan_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, WSWAN_VIDEO, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
+	, m_set_irq_cb(*this)
+	, m_snd_dma_cb(*this)
 	, m_vdp_type(VDP_TYPE_WSWAN)
+{
+}
+
+wswan_video_device::~wswan_video_device()
 {
 }
 
@@ -88,8 +94,8 @@ void wswan_video_device::device_start()
 	m_timer->adjust(attotime::from_ticks(256, 3072000), 0, attotime::from_ticks(256, 3072000));
 
 	// bind callbacks
-	m_set_irq_cb.bind_relative_to(*owner());
-	m_snd_dma_cb.bind_relative_to(*owner());
+	m_set_irq_cb.resolve();
+	m_snd_dma_cb.resolve();
 
 	if (m_vdp_type == VDP_TYPE_WSC)
 	{

@@ -183,7 +183,7 @@ std::unique_ptr<util::disasm_interface> diablo1300_cpu_device::create_disassembl
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t diablo1300_cpu_device::execute_min_cycles() const
+uint32_t diablo1300_cpu_device::execute_min_cycles() const noexcept
 {
 	return 1;
 }
@@ -194,7 +194,7 @@ uint32_t diablo1300_cpu_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t diablo1300_cpu_device::execute_max_cycles() const
+uint32_t diablo1300_cpu_device::execute_max_cycles() const noexcept
 {
 	return 1;
 }

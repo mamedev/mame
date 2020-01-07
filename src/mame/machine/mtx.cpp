@@ -130,7 +130,7 @@ void mtx_state::bankswitch(uint8_t data)
 	{
 		/* rom based memory map */
 		program.install_rom(0x0000, 0x1fff, memregion("user1")->base());
-		program.install_write_handler(0x0000, 0x1fff, write8_delegate(FUNC(mtx_state::mtx_subpage_w), this));
+		program.install_write_handler(0x0000, 0x1fff, write8_delegate(*this, FUNC(mtx_state::mtx_subpage_w)));
 		program.install_read_bank(0x2000, 0x3fff, "rommap_bank1");
 		program.unmap_write(0x2000, 0x3fff);
 		program.install_readwrite_bank(0x4000, 0x7fff, "rommap_bank2");

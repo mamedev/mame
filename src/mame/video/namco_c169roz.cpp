@@ -51,16 +51,16 @@ void namco_c169roz_device::device_start()
 	std::fill(std::begin(m_videoram), std::end(m_videoram), 0x0000);
 
 	m_tilemap[0] = &machine().tilemap().create(*this,
-		tilemap_get_info_delegate(FUNC(namco_c169roz_device::get_info<0>), this),
-		tilemap_mapper_delegate(FUNC(namco_c169roz_device::mapper), this),
-		16, 16,
-		256, 256);
+			tilemap_get_info_delegate(*this, FUNC(namco_c169roz_device::get_info<0>)),
+			tilemap_mapper_delegate(*this, FUNC(namco_c169roz_device::mapper)),
+			16, 16,
+			256, 256);
 
 	m_tilemap[1] = &machine().tilemap().create(*this,
-		tilemap_get_info_delegate(FUNC(namco_c169roz_device::get_info<1>), this),
-		tilemap_mapper_delegate(FUNC(namco_c169roz_device::mapper), this),
-		16, 16,
-		256, 256);
+			tilemap_get_info_delegate(*this, FUNC(namco_c169roz_device::get_info<1>)),
+			tilemap_mapper_delegate(*this, FUNC(namco_c169roz_device::mapper)),
+			16, 16,
+			256, 256);
 
 	save_item(NAME(m_control));
 	save_item(NAME(m_videoram));

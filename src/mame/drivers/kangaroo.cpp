@@ -185,7 +185,7 @@ void kangaroo_state::machine_start()
 MACHINE_START_MEMBER(kangaroo_state,kangaroo_mcu)
 {
 	kangaroo_state::machine_start();
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xef00, 0xefff, read8_delegate(FUNC(kangaroo_state::mcu_sim_r),this), write8_delegate(FUNC(kangaroo_state::mcu_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xef00, 0xefff, read8_delegate(*this, FUNC(kangaroo_state::mcu_sim_r)), write8_delegate(*this, FUNC(kangaroo_state::mcu_sim_w)));
 	save_item(NAME(m_mcu_clock));
 }
 

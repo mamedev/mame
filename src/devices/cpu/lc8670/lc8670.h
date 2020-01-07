@@ -80,18 +80,7 @@ public:
 
 	auto bank_cb() { return m_bankswitch_func.bind(); }
 
-	template <typename Object> void set_lcd_update_cb(Object &&cb) { m_lcd_update_func = std::forward<Object>(cb); }
-	void set_lcd_update_cb(lcd_update_delegate callback) { m_lcd_update_func = callback; }
-	template <class FunctionClass> void set_lcd_update_cb(const char *devname,
-		uint32_t (FunctionClass::*callback)(bitmap_ind16 &, const rectangle &, uint8_t*, bool, uint8_t), const char *name)
-	{
-		set_lcd_update_cb(lcd_update_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_lcd_update_cb(
-		uint32_t (FunctionClass::*callback)(bitmap_ind16 &, const rectangle &, uint8_t*, bool, uint8_t), const char *name)
-	{
-		set_lcd_update_cb(lcd_update_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_lcd_update_cb(T &&... args) { m_lcd_update_func.set(std::forward<T>(args)...); }
 
 	void lc8670_internal_map(address_map &map);
 protected:
@@ -107,9 +96,9 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 7; }
-	virtual uint32_t execute_input_lines() const override { return 4; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 7; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 4; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 

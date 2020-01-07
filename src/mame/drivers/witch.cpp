@@ -263,7 +263,7 @@ TILE_GET_INFO_MEMBER(keirinou_state::get_keirinou_gfx1_tile_info)
 
 void witch_state::video_common_init()
 {
-	m_gfx0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(witch_state::get_gfx0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_gfx0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(witch_state::get_gfx0_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 
 	m_gfx0_tilemap->set_transparent_pen(0);
 
@@ -276,7 +276,7 @@ void witch_state::video_common_init()
 void witch_state::video_start()
 {
 	video_common_init();
-	m_gfx1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(witch_state::get_gfx1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_gfx1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(witch_state::get_gfx1_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 
 	m_gfx0_tilemap->set_palette_offset(0x100);
 	m_gfx1_tilemap->set_palette_offset(0x200);
@@ -288,7 +288,7 @@ void keirinou_state::video_start()
 {
 	//witch_state::video_start();
 	video_common_init();
-	m_gfx1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(keirinou_state::get_keirinou_gfx1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_gfx1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(keirinou_state::get_keirinou_gfx1_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 
 	m_gfx0_tilemap->set_palette_offset(0x000);
 	m_gfx1_tilemap->set_palette_offset(0x100);
@@ -939,7 +939,7 @@ void witch_state::witch(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &witch_state::witch_sub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(witch_state::irq0_line_assert));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1136,7 +1136,7 @@ void witch_state::init_witch()
 	m_mainbank->configure_entries(0, 4, memregion("maincpu")->base() + UNBANKED_SIZE, 0x8000);
 	m_mainbank->set_entry(0);
 
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x700f, read8_delegate(FUNC(witch_state::prot_read_700x), this));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x700f, read8_delegate(*this, FUNC(witch_state::prot_read_700x)));
 }
 
 GAME( 1987, keirinou, 0,     keirinou, keirinou, keirinou_state, empty_init, ROT0, "Excellent System", "Keirin Ou", MACHINE_SUPPORTS_SAVE )

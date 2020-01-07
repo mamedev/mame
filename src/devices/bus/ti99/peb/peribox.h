@@ -170,7 +170,7 @@ protected:
     The parent class for all expansion cards.
 ******************************************************************************/
 
-class device_ti99_peribox_card_interface : public device_slot_card_interface
+class device_ti99_peribox_card_interface : public device_interface
 {
 	friend class peribox_slot_device;
 
@@ -186,7 +186,6 @@ public:
 	void    set_senilb(int state) { m_senilb = state; }
 
 protected:
-	using device_slot_card_interface::device_slot_card_interface;
 	device_ti99_peribox_card_interface(const machine_config &mconfig, device_t &device);
 	virtual void interface_config_complete() override;
 
@@ -212,7 +211,7 @@ protected:
     A single slot in the box.
 ******************************************************************************/
 
-class peribox_slot_device : public device_t, public device_slot_interface
+class peribox_slot_device : public device_t, public device_single_card_slot_interface<device_ti99_peribox_card_interface>
 {
 	friend class peribox_device;
 public:

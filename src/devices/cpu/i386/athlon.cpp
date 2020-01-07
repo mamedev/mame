@@ -31,7 +31,7 @@ void athlonxp_device::device_start()
 	m_data = &space(AS_DATA);
 	m_opcodes = &space(AS_OPCODES);
 	mmacache32 = m_data->cache<2, 0, ENDIANNESS_LITTLE>();
-	m_opcodes->install_read_handler(0, 0xffffffff, read32_delegate(FUNC(athlonxp_device::debug_read_memory), this));
+	m_opcodes->install_read_handler(0, 0xffffffff, read32_delegate(*this, FUNC(athlonxp_device::debug_read_memory)));
 
 	build_x87_opcode_table();
 	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_PPRO | OP_MMX | OP_SSE);
@@ -477,7 +477,7 @@ uint64_t athlonxp_device::READ64PL(uint32_t ea, uint8_t privilege)
 	case 0:
 	default:
 		value = READ32PL(ea, privilege);
-		value |= uint64_t(READ32PL(ea + 2, privilege)) << 32;
+		value |= uint64_t(READ32PL(ea + 4, privilege)) << 32;
 		break;
 
 	case 1:
@@ -610,7 +610,7 @@ void athlonxp_device::WRITE64PL(uint32_t ea, uint8_t privilege, uint64_t value)
 	{
 	case 0:
 		WRITE32PL(ea, privilege, value & 0xffffffff);
-		WRITE32PL(ea + 2, privilege, (value >> 32) & 0xffffffff);
+		WRITE32PL(ea + 4, privilege, (value >> 32) & 0xffffffff);
 		break;
 
 	case 1:

@@ -60,7 +60,7 @@ void stadhero_state::main_map(address_map &map)
 	map(0x240010, 0x240017).w(m_tilegen, FUNC(deco_bac06_device::pf_control_1_w));
 	map(0x260000, 0x261fff).rw(m_tilegen, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
 	map(0x30c000, 0x30c001).portr("INPUTS");
-	map(0x30c002, 0x30c002).lr8("30c002", [this]() { return uint8_t(m_coin->read()); });
+	map(0x30c002, 0x30c002).lr8(NAME([this] () { return uint8_t(m_coin->read()); }));
 	map(0x30c003, 0x30c003).r(FUNC(stadhero_state::mystery_r));
 	map(0x30c004, 0x30c005).portr("DSW").w(FUNC(stadhero_state::int_ack_w));
 	map(0x30c007, 0x30c007).w(m_soundlatch, FUNC(generic_latch_8_device::write));

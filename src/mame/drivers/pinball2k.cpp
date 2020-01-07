@@ -613,8 +613,7 @@ void pinball2k_state::mediagx(machine_config &config)
 	pcat_common(config);
 
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device_read (18, FUNC(pinball2k_state::cx5510_pci_r), this);
-	pcibus.set_device_write(18, FUNC(pinball2k_state::cx5510_pci_w), this);
+	pcibus.set_device(18, FUNC(pinball2k_state::cx5510_pci_r), FUNC(pinball2k_state::cx5510_pci_w));
 
 	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));

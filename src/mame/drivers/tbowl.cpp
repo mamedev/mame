@@ -445,7 +445,7 @@ void tbowl_state::tbowl(machine_config &config)
 	Z80(config, m_audiocpu, 4000000); /* Actual Z80 */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tbowl_state::_6206A_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tbowl);

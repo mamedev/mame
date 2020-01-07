@@ -107,7 +107,7 @@ static const u8 drgw2_source_data[0x08][0xec] =
 
 void pgm_012_025_state::drgw2_common_init()
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd80000, 0xd80003, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::drgw2_d80000_protection_w), (igs025_device*)m_igs025));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd80000, 0xd80003, read16_delegate(*m_igs025, FUNC(igs025_device::killbld_igs025_prot_r)), write16_delegate(*m_igs025, FUNC(igs025_device::drgw2_d80000_protection_w)));
 
 	m_igs025->m_kb_source_data = drgw2_source_data;
 

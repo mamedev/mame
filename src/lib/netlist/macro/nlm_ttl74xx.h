@@ -1,7 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-#ifndef NLD_TTL74XX_H_
-#define NLD_TTL74XX_H_
+
+#ifndef NLM_TTL74XX_H_
+#define NLM_TTL74XX_H_
+
+///
+/// \file nlm_ttl74xx.h
+///
 
 #include "netlist/nl_setup.h"
 
@@ -300,7 +305,7 @@
 #define DM9312_DIP(name)                                                       \
 		NET_REGISTER_DEV(DM9312_DIP, name)
 
-#endif
+#endif // NL_AUTO_DEVICES
 
 /* ----------------------------------------------------------------------------
  *  External declarations
@@ -308,6 +313,7 @@
 
 NETLIST_EXTERNAL(TTL74XX_lib)
 
-#endif
+#endif // __PLIB_PREPROCESSOR__
 
-#endif
+
+#endif // NLM_TTL74XX

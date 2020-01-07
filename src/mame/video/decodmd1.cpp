@@ -202,7 +202,7 @@ void decodmd_type1_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_addrmap(AS_PROGRAM, &decodmd_type1_device::decodmd1_map);
 	m_cpu->set_addrmap(AS_IO, &decodmd_type1_device::decodmd1_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(50);
+	config.set_maximum_quantum(attotime::from_hz(50));
 
 	TIMER(config, "nmi_timer").configure_periodic(FUNC(decodmd_type1_device::dmd_nmi), attotime::from_hz(2000));  // seems a lot
 

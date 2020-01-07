@@ -2354,8 +2354,8 @@ void pc8801_state::pc8801(machine_config &config)
 	m_fdccpu->set_addrmap(AS_PROGRAM, &pc8801_state::pc8801fdc_mem);
 	m_fdccpu->set_addrmap(AS_IO, &pc8801_state::pc8801fdc_io);
 
-	//config.m_minimum_quantum = attotime::from_hz(300000);
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	//config.set_maximum_quantum(attotime::from_hz(300000));
+	config.set_perfect_quantum(m_maincpu);
 
 	i8255_device &d8255_master(I8255(config, "d8255_master"));
 	d8255_master.in_pa_callback().set("d8255_slave", FUNC(i8255_device::pb_r));

@@ -228,7 +228,9 @@ void compc_state::compc(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &compc_state::compc_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	PCNOPPI_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
+	PCNOPPI_MOTHERBOARD(config, m_mb, 0).set_cputag(m_maincpu);
+	m_mb->int_callback().set_inputline(m_maincpu, 0);
+	m_mb->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	config.device_remove("mb:pit8253");
 	fe2010_pit_device &pit(FE2010_PIT(config, "mb:pit8253", 0));
 	pit.set_clk<0>(XTAL(14'318'181)/12.0); /* heartbeat IRQ */

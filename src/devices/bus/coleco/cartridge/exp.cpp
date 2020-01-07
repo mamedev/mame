@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(COLECOVISION_CARTRIDGE_SLOT, colecovision_cartridge_slot_devi
 //-------------------------------------------------
 
 device_colecovision_cartridge_interface::device_colecovision_cartridge_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device),
+	device_interface(device, "colecocart"),
 	m_rom(nullptr),
 	m_rom_size(0)
 {
@@ -55,7 +55,7 @@ void device_colecovision_cartridge_interface::rom_alloc(size_t size)
 
 colecovision_cartridge_slot_device::colecovision_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, COLECOVISION_CARTRIDGE_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_colecovision_cartridge_interface>(mconfig, *this),
 	device_image_interface(mconfig, *this),
 	m_card(nullptr)
 {
@@ -68,7 +68,7 @@ colecovision_cartridge_slot_device::colecovision_cartridge_slot_device(const mac
 
 void colecovision_cartridge_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_colecovision_cartridge_interface *>(get_card_device());
+	m_card = get_card_device();
 }
 
 

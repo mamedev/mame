@@ -452,7 +452,7 @@ void bking_state::bking3(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(bking_state,bking3)
 	MCFG_MACHINE_RESET_OVERRIDE(bking_state,bking3)
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 }
 
 

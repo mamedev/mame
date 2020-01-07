@@ -2173,7 +2173,7 @@ void system1_state::sys1ppi(machine_config &config)
 
 	TIMER(config, "soundirq", 0).configure_scanline(FUNC(system1_state::soundirq_gen), "screen", 32, 64);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	I8255A(config, m_ppi8255);
 	m_ppi8255->out_pa_callback().set(FUNC(system1_state::soundport_w));
@@ -2459,7 +2459,7 @@ void system1_state::sys1ppisx_315_5041(machine_config &config)
 void system1_state::mcu(machine_config &config)
 {
 	/* basic machine hardware */
-	m_maincpu->set_vblank_int(device_interrupt_delegate(), nullptr);
+	m_maincpu->remove_vblank_int();
 
 	I8751(config, m_mcu, SOUND_CLOCK);
 	m_mcu->set_addrmap(AS_IO, &system1_state::mcu_io_map);
@@ -2469,7 +2469,7 @@ void system1_state::mcu(machine_config &config)
 	// This interrupt is driven by pin 15 of a PAL16R4 (315-5138 on Choplifter), based on the vertical count.
 	// The actual duty cycle likely differs from VBLANK, which is another output from the same PAL.
 
-	TIMER(config, "mcu_t0", 0).configure_periodic(timer_device::expired_delegate(FUNC(system1_state::mcu_t0_callback), this), attotime::from_usec(2500));
+	TIMER(config, "mcu_t0", 0).configure_periodic(FUNC(system1_state::mcu_t0_callback), attotime::from_usec(2500));
 }
 
 /* alternate program map with RAM/collision swapped */
@@ -5456,11 +5456,11 @@ void system1_state::init_nob()
 	/* hack to fix incorrect JMP at start, which should obviously be to $0080 */
 	/* patching the ROM causes errors in the self-test */
 	/* in real-life, it could be some behavior dependent upon M1 */
-	space.install_read_handler(0x0001, 0x0001, read8_delegate(FUNC(system1_state::nob_start_r),this));
+	space.install_read_handler(0x0001, 0x0001, read8_delegate(*this, FUNC(system1_state::nob_start_r)));
 
 	/* install MCU communications */
-	iospace.install_readwrite_handler(0x18, 0x18, read8_delegate(FUNC(system1_state::nob_maincpu_latch_r),this), write8_delegate(FUNC(system1_state::nob_maincpu_latch_w),this));
-	iospace.install_read_handler(0x1c, 0x1c, read8_delegate(FUNC(system1_state::nob_mcu_status_r),this));
+	iospace.install_readwrite_handler(0x18, 0x18, read8_delegate(*this, FUNC(system1_state::nob_maincpu_latch_r)), write8_delegate(*this, FUNC(system1_state::nob_maincpu_latch_w)));
+	iospace.install_read_handler(0x1c, 0x1c, read8_delegate(*this, FUNC(system1_state::nob_mcu_status_r)));
 }
 
 void system1_state::init_nobb()
@@ -5487,10 +5487,10 @@ void system1_state::init_nobb()
 
 	init_bank44();
 
-	iospace.install_read_handler(0x1c, 0x1c, read8_delegate(FUNC(system1_state::nobb_inport1c_r),this));
-	iospace.install_read_handler(0x02, 0x02, read8_delegate(FUNC(system1_state::nobb_inport22_r),this));
-	iospace.install_read_handler(0x03, 0x03, read8_delegate(FUNC(system1_state::nobb_inport23_r),this));
-	iospace.install_write_handler(0x04, 0x04, write8_delegate(FUNC(system1_state::nobb_outport24_w),this));
+	iospace.install_read_handler(0x1c, 0x1c, read8_delegate(*this, FUNC(system1_state::nobb_inport1c_r)));
+	iospace.install_read_handler(0x02, 0x02, read8_delegate(*this, FUNC(system1_state::nobb_inport22_r)));
+	iospace.install_read_handler(0x03, 0x03, read8_delegate(*this, FUNC(system1_state::nobb_inport23_r)));
+	iospace.install_write_handler(0x04, 0x04, write8_delegate(*this, FUNC(system1_state::nobb_outport24_w)));
 }
 
 
@@ -5520,7 +5520,7 @@ void system1_state::init_shtngmst()
 	address_space &iospace = m_maincpu->space(AS_IO);
 	iospace.install_read_port(0x12, 0x12, "TRIGGER");
 	iospace.install_read_port(0x18, 0x18, 0x03, "18");
-	iospace.install_read_handler(0x1c, 0x1c, 0, 0x02, 0, read8_delegate(FUNC(system1_state::shtngmst_gunx_r),this));
+	iospace.install_read_handler(0x1c, 0x1c, 0, 0x02, 0, read8_delegate(*this, FUNC(system1_state::shtngmst_gunx_r)));
 	iospace.install_read_port(0x1d, 0x1d, 0x02, "GUNY");
 	init_bank0c();
 }

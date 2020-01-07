@@ -476,7 +476,7 @@ void stfight_state::stfight_base(machine_config &config)
 	m_mcu->portb_w().set(FUNC(stfight_state::stfight_68705_port_b_w));
 	m_mcu->portc_w().set(FUNC(stfight_state::stfight_68705_port_c_w));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	PALETTE(config, "palette").set_format(palette_device::xBRG_444, 256);
 

@@ -1584,7 +1584,7 @@ void zaxxon_state::init_razmataz()
 	pgmspace.install_read_port(0xc00c, 0xc00c, 0x18f3, "SW0C");
 
 	/* unknown behavior expected here */
-	pgmspace.install_read_handler(0xc80a, 0xc80a, read8_delegate(FUNC(zaxxon_state::razmataz_counter_r),this));
+	pgmspace.install_read_handler(0xc80a, 0xc80a, read8_delegate(*this, FUNC(zaxxon_state::razmataz_counter_r)));
 
 	/* additional state saving */
 	save_item(NAME(m_razmataz_dial_pos));

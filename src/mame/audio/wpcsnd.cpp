@@ -73,7 +73,7 @@ void wpcsnd_device::device_add_mconfig(machine_config &config)
 {
 	MC6809E(config, m_cpu, XTAL(8'000'000) / 4); // MC68B09E
 	m_cpu->set_addrmap(AS_PROGRAM, &wpcsnd_device::wpcsnd_map);
-	config.m_minimum_quantum = attotime::from_hz(50);
+	config.set_maximum_quantum(attotime::from_hz(50));
 
 	YM2151(config, m_ym2151, 3580000);
 	m_ym2151->irq_handler().set(FUNC(wpcsnd_device::ym2151_irq_w));

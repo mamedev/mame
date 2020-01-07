@@ -1488,7 +1488,7 @@ void mcr68_state::init_xenophob()
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
 	/* install control port handler */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::xenophobe_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(*this, FUNC(mcr68_state::xenophobe_control_w)));
 }
 
 
@@ -1500,9 +1500,9 @@ void mcr68_state::init_spyhunt2()
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
 	/* analog port handling is a bit tricky */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::spyhunt2_control_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0d0000, 0x0dffff, read16_delegate(FUNC(mcr68_state::spyhunt2_port_0_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(FUNC(mcr68_state::spyhunt2_port_1_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(*this, FUNC(mcr68_state::spyhunt2_control_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0d0000, 0x0dffff, read16_delegate(*this, FUNC(mcr68_state::spyhunt2_port_0_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(*this, FUNC(mcr68_state::spyhunt2_port_1_r)));
 }
 
 
@@ -1516,7 +1516,7 @@ void mcr68_state::init_blasted()
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::blasted_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(*this, FUNC(mcr68_state::blasted_control_w)));
 }
 
 void mcr68_state::init_intlaser()
@@ -1527,7 +1527,7 @@ void mcr68_state::init_intlaser()
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::blasted_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(*this, FUNC(mcr68_state::blasted_control_w)));
 
 }
 
@@ -1541,10 +1541,10 @@ void mcr68_state::init_archrivl()
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::archrivl_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(*this, FUNC(mcr68_state::archrivl_control_w)));
 
 	/* 49-way joystick handling is a bit tricky */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(FUNC(mcr68_state::archrivl_port_1_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(*this, FUNC(mcr68_state::archrivl_port_1_r)));
 }
 
 READ16_MEMBER(mcr68_state::archrivlb_port_1_r)
@@ -1560,10 +1560,10 @@ void mcr68_state::init_archrivlb()
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::archrivl_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(*this, FUNC(mcr68_state::archrivl_control_w)));
 
 	/* 49-way joystick replaced by standard 8way stick */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(FUNC(mcr68_state::archrivlb_port_1_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(*this, FUNC(mcr68_state::archrivlb_port_1_r)));
 }
 
 

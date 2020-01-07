@@ -1667,23 +1667,23 @@ void midzeus_state::init_mk4()
 
 void midzeus_state::init_invasn()
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9c0000, 0x9c0000, read32_delegate(FUNC(midzeus_state::invasn_gun_r),this), write32_delegate(FUNC(midzeus_state::invasn_gun_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9c0000, 0x9c0000, read32_delegate(*this, FUNC(midzeus_state::invasn_gun_r)), write32_delegate(*this, FUNC(midzeus_state::invasn_gun_w)));
 }
 
 
 void midzeus2_state::init_crusnexo()
 {
 	membank("bank1")->configure_entries(0, 3, memregion("user2")->base(), 0x400000*4);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9b0004, 0x9b0007, read32_delegate(FUNC(midzeus2_state::crusnexo_leds_r),this), write32_delegate(FUNC(midzeus2_state::crusnexo_leds_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler    (0x8d0009, 0x8d000a, write32_delegate(FUNC(midzeus_state::keypad_select_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9b0004, 0x9b0007, read32_delegate(*this, FUNC(midzeus2_state::crusnexo_leds_r)), write32_delegate(*this, FUNC(midzeus2_state::crusnexo_leds_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler    (0x8d0009, 0x8d000a, write32_delegate(*this, FUNC(midzeus_state::keypad_select_w)));
 }
 
 
 void midzeus2_state::init_thegrid()
 {
 	membank("bank1")->configure_entries(0, 3, memregion("user2")->base(), 0x400000*4);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x8c0000, 0x8c0001, read32_delegate(FUNC(midzeus_state::trackball_r), this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9b0000, 0x9b0004, read32_delegate(FUNC(midzeus_state::grid_keypad_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x8c0000, 0x8c0001, read32_delegate(*this, FUNC(midzeus_state::trackball_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9b0000, 0x9b0004, read32_delegate(*this, FUNC(midzeus_state::grid_keypad_r)));
 }
 
 

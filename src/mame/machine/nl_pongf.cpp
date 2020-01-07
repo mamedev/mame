@@ -16,10 +16,13 @@
 
 NETLIST_START(pongf)
 
-	SOLVER(Solver, 48000)
+	SOLVER(Solver, 5000)
 	PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers
-	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
-	PARAM(Solver.DYNAMIC_LTE,     1e-4) // Default is not enough for paddle control if using LTE
+	PARAM(Solver.VNTOL, 1e-4) // works and is sufficient
+	PARAM(Solver.DYNAMIC_LTE, 1e-1) // Aggressive timestepping
+	PARAM(Solver.METHOD, "MAT_CR")
+	PARAM(Solver.DYNAMIC_TS, 1)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-5)
 	PARAM(NETLIST.USE_DEACTIVATE, 1)
 
 	ANALOG_INPUT(V5, 5)
@@ -572,37 +575,11 @@ NETLIST_START(pongf)
 
 	ALIAS(videomix, RV3.2)
 
-#if 1
-	HINT(clk, NO_DEACTIVATE)
-	HINT(ic_e1d, NO_DEACTIVATE)
-	HINT(ic_e1c, NO_DEACTIVATE)
-	HINT(ic_f1, NO_DEACTIVATE)
-	HINT(ic_g1d, NO_DEACTIVATE)
-	HINT(ic_h1a, NO_DEACTIVATE)
-	HINT(ic_h1d, NO_DEACTIVATE)
-	HINT(ic_h3b, NO_DEACTIVATE)
-	HINT(ic_g6b, NO_DEACTIVATE)
-	HINT(ic_c2a, NO_DEACTIVATE)
-	HINT(hit_sound, NO_DEACTIVATE)
-	HINT(topbothitsound, NO_DEACTIVATE)
-	HINT(ic_c9b, NO_DEACTIVATE)
-	HINT(ic_b8, NO_DEACTIVATE)
-	HINT(ic_b7a, NO_DEACTIVATE)
-	HINT(ic_a7b, NO_DEACTIVATE)
-	HINT(ic_c9a, NO_DEACTIVATE)
-	HINT(ic_a8, NO_DEACTIVATE)
-	HINT(ic_b7d, NO_DEACTIVATE)
-	HINT(ic_a7a, NO_DEACTIVATE)
-	HINT(ic_g1a, NO_DEACTIVATE)
+	// ----------------------------------------------------------------------------------------
+	// power terminals
+	// ----------------------------------------------------------------------------------------
 
-	HINT(ic_c8a, NO_DEACTIVATE)
-	HINT(ic_c8b, NO_DEACTIVATE)
-	HINT(ic_d8b, NO_DEACTIVATE)
-
-	HINT(ic_d6b, NO_DEACTIVATE)
-	HINT(ic_c6a, NO_DEACTIVATE)
-	HINT(ic_c6b, NO_DEACTIVATE)
-#endif
-
+	NET_C(VCC, high.VCC, low.VCC, antenna.VCC)
+	NET_C(GND, high.GND, low.GND, antenna.GND)
 
 NETLIST_END()

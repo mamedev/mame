@@ -2,30 +2,35 @@
 // copyright-holders:Ryan Holtz
 /***************************************************************************
 
-  sun4c_mmu.h - Sun 4c MMU emulation
+  sun4c_mmu.h - Sun 4/4c MMU emulation
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_SUN4C_MMU_H
-#define MAME_MACHINE_SUN4C_MMU_H
-
 #pragma once
+
+#ifndef DEVICE_MACHINE_SUN4C_MMU_H
+#define DEVICE_MACHINE_SUN4C_MMU_H
 
 #include "cpu/sparc/sparc_intf.h"
 #include "machine/ram.h"
 #include "machine/z80scc.h"
 
-class sun4c_mmu_device : public device_t, public sparc_mmu_interface
+class sun4_mmu_base_device : public device_t, public sparc_mmu_interface
 {
 public:
-	sun4c_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint8_t ctx_mask, uint8_t pmeg_mask)
-		: sun4c_mmu_device(mconfig, tag, owner, clock)
+	sun4_mmu_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock
+		, uint8_t ctx_mask, uint8_t pmeg_mask, uint32_t page_mask, uint32_t seg_entry_shift, uint32_t seg_entry_mask
+		, uint32_t page_entry_mask, uint32_t cache_mask)
+		: sun4_mmu_base_device(mconfig, type, tag, owner, clock)
 	{
 		set_ctx_mask(ctx_mask);
 		set_pmeg_mask(pmeg_mask);
+		set_page_mask(page_mask);
+		set_seg_entry_shift(seg_entry_shift);
+		set_seg_entry_mask(seg_entry_mask);
+		set_page_entry_mask(page_entry_mask);
+		set_cache_mask(cache_mask);
 	}
-
-	sun4c_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <typename T> void set_cpu(T &&cpu_tag) { m_cpu.set_tag(std::forward<T>(cpu_tag)); }
 	template <typename T> void set_ram(T &&ram_tag) { m_ram.set_tag(std::forward<T>(ram_tag)); }
@@ -37,6 +42,11 @@ public:
 
 	void set_ctx_mask(uint8_t ctx_mask) { m_ctx_mask = ctx_mask; }
 	void set_pmeg_mask(uint8_t pmeg_mask) { m_pmeg_mask = pmeg_mask; }
+	void set_page_mask(uint32_t page_mask) { m_page_mask = page_mask; }
+	void set_seg_entry_shift(uint32_t seg_entry_shift) { m_seg_entry_shift = seg_entry_shift; }
+	void set_seg_entry_mask(uint32_t seg_entry_mask) { m_seg_entry_mask = seg_entry_mask; }
+	void set_page_entry_mask(uint32_t page_entry_mask) { m_page_entry_mask = page_entry_mask; }
+	void set_cache_mask(uint32_t cache_mask) { m_cache_mask = cache_mask; }
 
 	enum insn_data_mode
 	{
@@ -49,6 +59,11 @@ public:
 	template <insn_data_mode MODE> uint32_t insn_data_r(const uint32_t offset, const uint32_t mem_mask);
 	template <insn_data_mode MODE> void insn_data_w(const uint32_t offset, const uint32_t data, const uint32_t mem_mask);
 
+	uint32_t type1_timeout_r(uint32_t offset);
+	void type1_timeout_w(uint32_t offset, uint32_t data);
+	uint32_t parity_r(uint32_t offset, uint32_t mem_mask);
+	void parity_w(uint32_t offset, uint32_t data, uint32_t mem_mask);
+
 	// sparc_mmu_device overrides
 	uint32_t fetch_insn(const bool supervisor, const uint32_t offset) override;
 	uint32_t read_asi(uint8_t asi, uint32_t offset, uint32_t mem_mask) override;
@@ -56,14 +71,34 @@ public:
 	void set_host(sparc_mmu_host_interface *host) override { m_host = host; }
 
 protected:
+	sun4_mmu_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	struct page_entry
+	{
+		uint32_t valid;
+		uint32_t writable;
+		uint32_t supervisor;
+		uint32_t uncached;
+		uint32_t accessed;
+		uint32_t modified;
+		uint32_t page;
+		uint8_t type;
+		uint8_t pad[3];
+	};
+
 	static const device_timer_id TIMER_RESET = 0;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	uint32_t cache_flush_r();
-	void cache_flush_w();
+	uint32_t page_entry_to_uint(uint32_t index);
+	void merge_page_entry(uint32_t index, uint32_t data, uint32_t mem_mask);
+
+	bool cache_fetch(page_entry &entry, uint32_t vaddr, uint32_t paddr, uint32_t &cached_data);
+	void segment_flush_w(const uint32_t vaddr);
+	void context_flush_w(const uint32_t vaddr);
+	void page_flush_w(const uint32_t vaddr);
 	uint32_t system_r(const uint32_t offset, const uint32_t mem_mask);
 	void system_w(const uint32_t offset, const uint32_t data, const uint32_t mem_mask);
 	uint32_t segment_map_r(const uint32_t offset, const uint32_t mem_mask);
@@ -72,6 +107,7 @@ protected:
 	void page_map_w(const uint32_t offset, const uint32_t data, const uint32_t mem_mask);
 	void type0_timeout_r(const uint32_t offset);
 	void type0_timeout_w(const uint32_t offset);
+	void l2p_command(int ref, const std::vector<std::string> &params);
 
 	enum
 	{
@@ -92,22 +128,6 @@ protected:
 		PM_MODIFIED     = 0x01000000     // modified flag
 	};
 
-	struct page_entry_t
-	{
-		uint32_t valid;
-		uint32_t writable;
-		uint32_t supervisor;
-		uint32_t uncached;
-		uint32_t accessed;
-		uint32_t modified;
-		uint32_t page;
-		uint8_t type;
-		uint8_t pad[3];
-
-		uint32_t to_uint();
-		void merge_uint(uint32_t data, uint32_t mem_mask);
-	};
-
 	required_device<cpu_device> m_cpu;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
@@ -120,10 +140,10 @@ protected:
 	devcb_write32 m_type1_w;
 
 	// Actual SRAM
-	uint8_t m_segmap[16][4096];
-	page_entry_t m_pagemap[16384];
-	uint32_t m_cachetags[16384];
-	uint32_t m_cachedata[16384];
+	std::unique_ptr<std::unique_ptr<uint8_t[]>[]> m_segmap;
+	std::unique_ptr<page_entry[]> m_pagemap;
+	std::unique_ptr<uint32_t[]> m_cachetags;
+	std::unique_ptr<uint32_t[]> m_cachedata;
 
 	uint32_t *m_rom_ptr;
 	uint32_t *m_ram_ptr;
@@ -134,24 +154,47 @@ protected:
 	uint32_t m_cache_context;
 	uint8_t m_system_enable;
 	bool m_fetch_bootrom;
-	uint32_t m_buserr[4];
+	uint32_t m_buserr[16];
+	uint32_t m_type1_offset;
+	uint32_t m_parity_err_reg;
+	uint32_t m_memory_err_reg;
+	uint32_t m_parity_err;
 
 	// Pre-computed data for optimization purposes
-	uint32_t m_segmap_masked[16][4096];
+	std::unique_ptr<std::unique_ptr<uint32_t[]>[]> m_segmap_masked;
 	uint8_t *m_curr_segmap;
 	uint32_t *m_curr_segmap_masked;
-	bool m_page_valid[16384];
+	std::unique_ptr<bool[]> m_page_valid;
 
 	// Internal MAME device state
 	uint8_t m_ctx_mask;         // SS2 is sun4c but has 16 contexts; most have 8
 	uint8_t m_pmeg_mask;        // SS2 is sun4c but has 16384 PTEs; most have 8192
+	uint32_t m_page_mask;
+	uint32_t m_seg_entry_shift;
+	uint32_t m_seg_entry_mask;
+	uint32_t m_page_entry_mask;
+	uint32_t m_cache_mask;
+	uint32_t m_cache_tag_mask;
 	uint32_t m_ram_set_mask[4]; // Used for mirroring within 4 megabyte sets
 	uint32_t m_ram_set_base[4];
 	uint32_t m_populated_ram_words;
 	emu_timer *m_reset_timer;
+	bool m_log_mem;
 };
 
+class sun4_mmu_device : public sun4_mmu_base_device
+{
+public:
+	sun4_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
 
+class sun4c_mmu_device : public sun4_mmu_base_device
+{
+public:
+	sun4c_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+DECLARE_DEVICE_TYPE(SUN4_MMU, sun4_mmu_device)
 DECLARE_DEVICE_TYPE(SUN4C_MMU, sun4c_mmu_device)
 
-#endif // MAME_MACHINE_SUN4C_MMU_H
+#endif // DEVICE_MACHINE_SUN4C_MMU_H

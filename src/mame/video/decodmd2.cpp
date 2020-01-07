@@ -134,15 +134,15 @@ void decodmd_type2_device::device_add_mconfig(machine_config &config)
 	MC6809E(config, m_cpu, XTAL(8'000'000) / 4);
 	m_cpu->set_addrmap(AS_PROGRAM, &decodmd_type2_device::decodmd2_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
-	TIMER(config, "firq_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(decodmd_type2_device::dmd_firq), this), attotime::from_hz(80));
+	TIMER(config, "firq_timer", 0).configure_periodic(FUNC(decodmd_type2_device::dmd_firq), attotime::from_hz(80));
 
 	MC6845(config, m_mc6845, XTAL(8'000'000) / 8);  // TODO: confirm clock speed
 	m_mc6845->set_screen(nullptr);
 	m_mc6845->set_show_border_area(false);
 	m_mc6845->set_char_width(8);
-	m_mc6845->set_update_row_callback(FUNC(decodmd_type2_device::crtc_update_row), this);
+	m_mc6845->set_update_row_callback(FUNC(decodmd_type2_device::crtc_update_row));
 
 	screen_device &screen(SCREEN(config, "dmd", SCREEN_TYPE_RASTER));
 	screen.set_native_aspect();

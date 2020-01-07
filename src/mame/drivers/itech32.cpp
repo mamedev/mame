@@ -82,8 +82,8 @@
 
         Some time in 2004 I.T. introduced a new bowling game called Silver Strike Bowling on a full
         blown PC system known as "Nighthawk System Box" (AKA The Nighthawk Chassis) to replace it's
-        aging World Class Bowling game.  Other known games on this platform include Golden Tee Live!
-        and Target Toss Pro: Bags
+        aging World Class Bowling game.  Other known games on this platform include Golden Tee Live!,
+        Power Putt Golf (Mini-Golf) and Target Toss Pro: Lawn Darts / Bags
 
     Trivia: For the Golden Tee series, the second generation was called GT2.  The third gen was known
             as GT3 but also included Golden Tee '97 through 2K and Classic.  The fourth gen on the
@@ -1737,14 +1737,14 @@ void drivedge_state::drivedge(machine_config &config)
 	m_via->writepb_handler().set(FUNC(drivedge_state::portb_out));
 	m_via->cb2_handler().set(FUNC(drivedge_state::turbo_light));
 
-//  M6803(config, "comm", 8000000/4); -- network CPU
+//  M6803(config, "comm", 8000000/4); -- network CPU MC68803P
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	m_screen->screen_vblank().set_nop(); // interrupt not used?
 
-	SPEAKER(config, "left_back").front_left();
-	SPEAKER(config, "right_back").front_right();
+	SPEAKER(config, "left_back").front_left();   /* Sound PCB has hook-ups & AMPs for 5 channels */
+	SPEAKER(config, "right_back").front_right(); /* As per Sound Tests Menu: Left Front, Right Front, Left Rear, Right Rear, Under Seat */
 
 	m_ensoniq->set_channels(2);
 	m_ensoniq->add_route(2, "right_back", 0.1);  /* swapped stereo */
@@ -2834,44 +2834,44 @@ ROM_END
 
 
 ROM_START( drivedge )
-	ROM_REGION32_BE( 0x8000, "user1", 0 )
-	ROM_LOAD( "de_v1.6-u130.bin", 0x00000, 0x8000, CRC(873579b0) SHA1(ce7fcbea780aee376c2f4c659a75fcf6b7abbdb4) )
+	ROM_REGION32_BE( 0x8000, "user1", 0 ) /* Main board P/N 1053 REV3 */
+	ROM_LOAD( "itde_er_u130_v1.0.u130", 0x00000, 0x8000, CRC(873579b0) SHA1(ce7fcbea780aee376c2f4c659a75fcf6b7abbdb4) ) /* Labeled as "ITDE ER (U130) V1.0" */
 
-	ROM_REGION( 0x28000, "soundcpu", 0 )
-	ROM_LOAD( "desndu17.bin", 0x10000, 0x18000, CRC(6e8ca8bc) SHA1(98ad36877b40123b0396943754234df8de183687) )
-	ROM_CONTINUE(             0x08000, 0x08000 )
+	ROM_REGION( 0x28000, "soundcpu", 0 ) /* Sound board P/N 1054 REV2 */
+	ROM_LOAD( "itde_sndu17_v1.2.u17", 0x10000, 0x18000, CRC(6e8ca8bc) SHA1(98ad36877b40123b0396943754234df8de183687) ) /* Labeled as "ITDE SND(U17) V1.2" */
+	ROM_CONTINUE(                     0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "cpu4", 0 )
-	ROM_LOAD( "de-u7net.bin", 0x08000, 0x08000, CRC(dea8b9de) SHA1(46ba3a549522d7e6a32792814a04fd34839c7e55) )
+	ROM_REGION( 0x10000, "cpu4", 0 ) /* Network daughterboard P/N 1055 REV3 */
+	ROM_LOAD( "vidnet_v1.0_u7.u7", 0x08000, 0x08000, CRC(dea8b9de) SHA1(46ba3a549522d7e6a32792814a04fd34839c7e55) ) /* Labeled as "VIDNET V1.0 (U7)" */
 
-	ROM_REGION( 0xa00000, "gfx1", 0 )
-	ROM_LOAD32_BYTE( "de-grom0.bin", 0x000000, 0x80000, CRC(7fe5b01b) SHA1(b31e48971253d77e2277434b1b1590cbbea2209f) )
-	ROM_LOAD32_BYTE( "de-grom5.bin", 0x000001, 0x80000, CRC(5ea6dbc2) SHA1(c2de55ec6a527d0555504070a7ecb43b8aa797ea) )
-	ROM_LOAD32_BYTE( "de-grm10.bin", 0x000002, 0x80000, CRC(76be06cd) SHA1(b533a07853b531e318c5a85139a74ca3edb9089f) )
-	ROM_LOAD32_BYTE( "de-grm15.bin", 0x000003, 0x80000, CRC(119bf46b) SHA1(67f5434581d5f0042c7acd36d2c64ffe69efaa76) )
-	ROM_LOAD32_BYTE( "de-grom1.bin", 0x200000, 0x80000, CRC(5b88e8b7) SHA1(04f05d9e811697c28a5671df6a9530594978decc) )
-	ROM_LOAD32_BYTE( "de-grom6.bin", 0x200001, 0x80000, CRC(2cb76b9a) SHA1(0db32cb572121c8a751dcce55b94adc48f9be738) )
-	ROM_LOAD32_BYTE( "de-grm11.bin", 0x200002, 0x80000, CRC(5d29018c) SHA1(11f346afedfac4f7b0d5d4995dd38ec2d7fc7777) )
-	ROM_LOAD32_BYTE( "de-grm16.bin", 0x200003, 0x80000, CRC(476940fb) SHA1(00dab9aeb0d5cc23e4f78f15cb976ddcafa63b42) )
-	ROM_LOAD32_BYTE( "de-grom2.bin", 0x400000, 0x80000, CRC(5ccc4c62) SHA1(fc49bba2208a1157fe0948fcadac79c597f382c4) )
-	ROM_LOAD32_BYTE( "de-grom7.bin", 0x400001, 0x80000, CRC(45367070) SHA1(c7cf074f95cf287c4caf70d2286608c50ad01044) )
-	ROM_LOAD32_BYTE( "de-grm12.bin", 0x400002, 0x80000, CRC(b978ef5a) SHA1(d1fce9c7966b8324ce1a4a99d92cd69ec32f5c47) )
-	ROM_LOAD32_BYTE( "de-grm17.bin", 0x400003, 0x80000, CRC(eff8abac) SHA1(83da116368fae05a0c3c12ea72656681912a1175) )
-	ROM_LOAD32_BYTE( "de-grom3.bin", 0x600000, 0x20000, CRC(9cd252c9) SHA1(7db6bdeeb2967154cd104ac2e20761cb99046d70) )
-	ROM_LOAD32_BYTE( "de-grom8.bin", 0x600001, 0x20000, CRC(43f10ca4) SHA1(9eb0e2fd1adc25b334f86582be8e5960de0caba7) )
-	ROM_LOAD32_BYTE( "de-grm13.bin", 0x600002, 0x20000, CRC(431d131e) SHA1(efe5a4aa65fde1f094adc6e701db8be94a4b625c) )
-	ROM_LOAD32_BYTE( "de-grm18.bin", 0x600003, 0x20000, CRC(b09e0d9c) SHA1(b14ff39b028c0070ccca601c21542896168bd0b7) )
-	ROM_LOAD32_BYTE( "de-grom4.bin", 0x800000, 0x20000, CRC(c499cdfa) SHA1(acec47fb606f999f9d88fdce1b5860d5afcd5106) )
-	ROM_LOAD32_BYTE( "de-grom9.bin", 0x800001, 0x20000, CRC(e5f21566) SHA1(ce41c7e808799eea217e14e9aabe6ce617f87287) )
-	ROM_LOAD32_BYTE( "de-grm14.bin", 0x800002, 0x20000, CRC(09dbe382) SHA1(a85ecba433eb9bb75b4060d1b6391f66f4c8146c) )
-	ROM_LOAD32_BYTE( "de-grm19.bin", 0x800003, 0x20000, CRC(4ced78e1) SHA1(7995c8684ca28cbdf620d10297850463fa473fe8) )
+	ROM_REGION( 0xa00000, "gfx1", 0 ) /* ROM board P/N 1049 REV1 */
+	ROM_LOAD32_BYTE( "grom0_itde_gv1.2.grom0",   0x000000, 0x80000, CRC(7fe5b01b) SHA1(b31e48971253d77e2277434b1b1590cbbea2209f) ) /* These 8 labeled as GV1.2 */
+	ROM_LOAD32_BYTE( "grom5_itde_gv1.2.grom5",   0x000001, 0x80000, CRC(5ea6dbc2) SHA1(c2de55ec6a527d0555504070a7ecb43b8aa797ea) )
+	ROM_LOAD32_BYTE( "grom10_itde_gv1.2.grom10", 0x000002, 0x80000, CRC(76be06cd) SHA1(b533a07853b531e318c5a85139a74ca3edb9089f) )
+	ROM_LOAD32_BYTE( "grom15_itde_gv1.2.grom15", 0x000003, 0x80000, CRC(119bf46b) SHA1(67f5434581d5f0042c7acd36d2c64ffe69efaa76) )
+	ROM_LOAD32_BYTE( "grom1_itde_gv1.2.grom1",   0x200000, 0x80000, CRC(5b88e8b7) SHA1(04f05d9e811697c28a5671df6a9530594978decc) )
+	ROM_LOAD32_BYTE( "grom6_itde_gv1.2.grom6",   0x200001, 0x80000, CRC(2cb76b9a) SHA1(0db32cb572121c8a751dcce55b94adc48f9be738) )
+	ROM_LOAD32_BYTE( "grom11_itde_gv1.2.grom11", 0x200002, 0x80000, CRC(5d29018c) SHA1(11f346afedfac4f7b0d5d4995dd38ec2d7fc7777) )
+	ROM_LOAD32_BYTE( "grom16_itde_gv1.2.grom16", 0x200003, 0x80000, CRC(476940fb) SHA1(00dab9aeb0d5cc23e4f78f15cb976ddcafa63b42) )
+	ROM_LOAD32_BYTE( "grom2_itde_dv1.2.grom2",   0x400000, 0x80000, CRC(5ccc4c62) SHA1(fc49bba2208a1157fe0948fcadac79c597f382c4) ) /* These 4 labeled as DV1.2 */
+	ROM_LOAD32_BYTE( "grom7_itde_dv1.2.grom7",   0x400001, 0x80000, CRC(45367070) SHA1(c7cf074f95cf287c4caf70d2286608c50ad01044) )
+	ROM_LOAD32_BYTE( "grom12_itde_dv1.2.grom12", 0x400002, 0x80000, CRC(b978ef5a) SHA1(d1fce9c7966b8324ce1a4a99d92cd69ec32f5c47) )
+	ROM_LOAD32_BYTE( "grom17_itde_dv1.2.grom17", 0x400003, 0x80000, CRC(eff8abac) SHA1(83da116368fae05a0c3c12ea72656681912a1175) )
+	ROM_LOAD32_BYTE( "grom3_itde_mv1.2.grom3",   0x600000, 0x20000, CRC(9cd252c9) SHA1(7db6bdeeb2967154cd104ac2e20761cb99046d70) ) /* These 4 labeled as MV1.2 */
+	ROM_LOAD32_BYTE( "grom8_itde_mv1.2.grom8",   0x600001, 0x20000, CRC(43f10ca4) SHA1(9eb0e2fd1adc25b334f86582be8e5960de0caba7) )
+	ROM_LOAD32_BYTE( "grom13_itde_mv1.2.grom13", 0x600002, 0x20000, CRC(431d131e) SHA1(efe5a4aa65fde1f094adc6e701db8be94a4b625c) )
+	ROM_LOAD32_BYTE( "grom18_itde_mv1.2.grom18", 0x600003, 0x20000, CRC(b09e0d9c) SHA1(b14ff39b028c0070ccca601c21542896168bd0b7) )
+	ROM_LOAD32_BYTE( "grom4_itde_pv1.6.grom4",   0x800000, 0x20000, CRC(c499cdfa) SHA1(acec47fb606f999f9d88fdce1b5860d5afcd5106) ) /* These 4 labeled as PV1.6 */
+	ROM_LOAD32_BYTE( "grom9_itde_pv1.6.grom9",   0x800001, 0x20000, CRC(e5f21566) SHA1(ce41c7e808799eea217e14e9aabe6ce617f87287) )
+	ROM_LOAD32_BYTE( "grom14_itde_pv1.6.grom14", 0x800002, 0x20000, CRC(09dbe382) SHA1(a85ecba433eb9bb75b4060d1b6391f66f4c8146c) )
+	ROM_LOAD32_BYTE( "grom19_itde_pv1.6.grom19", 0x800003, 0x20000, CRC(4ced78e1) SHA1(7995c8684ca28cbdf620d10297850463fa473fe8) )
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 ) /* Sound board P/N 1054 REV2 */
 	ROM_LOAD16_BYTE( "ensoniq.2m", 0x000000, 0x200000, CRC(9fdc4825) SHA1(71e5255c66d9010be7e6f27916b605441fc53839) ) /* Ensoniq 2m 1350901601 */
 
-	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "de-srom0.bin", 0x000000, 0x80000, CRC(649c685f) SHA1(95d8f257cac621c8bd4abaa88ea5f7b3b8adea4c) )
-	ROM_LOAD16_BYTE( "de-srom1.bin", 0x100000, 0x80000, CRC(df4fff97) SHA1(3c43623bfc176639417e86a037b92026e84a5dce) )
+	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 ) /* Sound board P/N 1054 REV2 */
+	ROM_LOAD16_BYTE( "srom0_itde_v1.0.srom0", 0x000000, 0x80000, CRC(649c685f) SHA1(95d8f257cac621c8bd4abaa88ea5f7b3b8adea4c) )
+	ROM_LOAD16_BYTE( "srom1_itde_v1.0.srom1", 0x100000, 0x80000, CRC(df4fff97) SHA1(3c43623bfc176639417e86a037b92026e84a5dce) )
 ROM_END
 
 
@@ -2982,6 +2982,7 @@ ROM_START( sftm110 )   /* Version 1.10, P/N 1064 REV 1 Mainboard, P/N 1073 REV 0
 	ROM_LOAD16_BYTE( "sfm_srom3.srom3", 0x000000, 0x080000, CRC(4f181534) SHA1(e858a33b22558665427146ec79dfba48edc20c2c) )
 ROM_END
 
+/* There is known to exist a PCB with hand written labels shown as V1.23 */
 
 ROM_START( sftmj114 )   /* Version 1.14N (Japan), P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 ROM board, P/N 1066 REV 2 Sound board  */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
@@ -4447,8 +4448,8 @@ void drivedge_state::driver_init()
 	m_vram_height = 1024;
 	m_planes = 1;
 
-	m_dsp[0]->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32_delegate(FUNC(drivedge_state::tms1_speedup_r),this));
-	m_dsp[1]->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32_delegate(FUNC(drivedge_state::tms2_speedup_r),this));
+	m_dsp[0]->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32_delegate(*this, FUNC(drivedge_state::tms1_speedup_r)));
+	m_dsp[1]->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32_delegate(*this, FUNC(drivedge_state::tms2_speedup_r)));
 }
 
 
@@ -4464,10 +4465,10 @@ void itech32_state::init_wcbowl()
 	m_vram_height = 1024;
 	m_planes = 1;
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680001, read8smo_delegate(FUNC(itech32_state::trackball_r),this), 0x00ff);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680001, read8smo_delegate(*this, FUNC(itech32_state::trackball_r)), 0x00ff);
 
 	m_maincpu->space(AS_PROGRAM).nop_read(0x578000, 0x57ffff);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680080, 0x680081, read16smo_delegate(FUNC(itech32_state::wcbowl_prot_result_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680080, 0x680081, read16smo_delegate(*this, FUNC(itech32_state::wcbowl_prot_result_r)));
 	m_maincpu->space(AS_PROGRAM).nop_write(0x680080, 0x680081);
 }
 
@@ -4484,11 +4485,11 @@ void itech32_state::init_wcbowlj()
 	m_vram_height = 1024;
 	m_planes = 1;
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680001, read8smo_delegate(FUNC(itech32_state::trackball_r),this), 0x00ff);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680040, 0x680041, read8smo_delegate(FUNC(itech32_state::trackball_p2_r),this), 0x00ff);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680001, read8smo_delegate(*this, FUNC(itech32_state::trackball_r)), 0x00ff);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680040, 0x680041, read8smo_delegate(*this, FUNC(itech32_state::trackball_p2_r)), 0x00ff);
 
 	m_maincpu->space(AS_PROGRAM).nop_read(0x578000, 0x57ffff);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680080, 0x680081, read16smo_delegate(FUNC(itech32_state::wcbowl_prot_result_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680080, 0x680081, read16smo_delegate(*this, FUNC(itech32_state::wcbowl_prot_result_r)));
 	m_maincpu->space(AS_PROGRAM).nop_write(0x680080, 0x680081);
 }
 
@@ -4501,8 +4502,8 @@ void itech32_state::init_sftm_common(int prot_addr)
 
 	m_itech020_prot_address = prot_addr;
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x300000, 0x300003, write8smo_delegate(FUNC(itech32_state::color_w<0>),this), 0x000000ff);
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x380000, 0x380003, write8smo_delegate(FUNC(itech32_state::color_w<1>),this), 0x000000ff);
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x300000, 0x300003, write8smo_delegate(*this, FUNC(itech32_state::color_w<0>)), 0x000000ff);
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x380000, 0x380003, write8smo_delegate(*this, FUNC(itech32_state::color_w<1>)), 0x000000ff);
 }
 
 
@@ -4531,10 +4532,10 @@ void itech32_state::init_shuffle_bowl_common(int prot_addr)
 
 	m_itech020_prot_address = prot_addr;
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x300000, 0x300003, write8smo_delegate(FUNC(itech32_state::color_w<0>),this), 0x000000ff);
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x380000, 0x380003, write8smo_delegate(FUNC(itech32_state::color_w<1>),this), 0x000000ff);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x180800, 0x180803, read32smo_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x181000, 0x181003, read32smo_delegate(FUNC(itech32_state::trackball32_4bit_p2_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x300000, 0x300003, write8smo_delegate(*this, FUNC(itech32_state::color_w<0>)), 0x000000ff);
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x380000, 0x380003, write8smo_delegate(*this, FUNC(itech32_state::color_w<1>)), 0x000000ff);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x180800, 0x180803, read32smo_delegate(*this, FUNC(itech32_state::trackball32_4bit_p1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x181000, 0x181003, read32smo_delegate(*this, FUNC(itech32_state::trackball32_4bit_p2_r)));
 }
 
 
@@ -4552,7 +4553,7 @@ void itech32_state::init_wcbowln()
 
 void itech32_state::install_timekeeper()
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x681000, 0x6817ff, read8sm_delegate(FUNC(timekeeper_device::read), &(*m_timekeeper)), write8sm_delegate(FUNC(timekeeper_device::write), &(*m_timekeeper)), 0xffffffff);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x681000, 0x6817ff, read8sm_delegate(*m_timekeeper, FUNC(timekeeper_device::read)), write8sm_delegate(*m_timekeeper, FUNC(timekeeper_device::write)), 0xffffffff);
 }
 
 void itech32_state::init_wcbowlt()
@@ -4582,7 +4583,7 @@ void itech32_state::init_gt3d()
 	    Hacked versions of this PCB have been found with GT97
 	    through GTClassic. This is _NOT_ a factory modification
 	*/
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200003, read16smo_delegate(FUNC(itech32_state::trackball_8bit_r),this), 0x0000ffff);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200003, read16smo_delegate(*this, FUNC(itech32_state::trackball_8bit_r)), 0x0000ffff);
 	init_gt_common();
 }
 
@@ -4595,8 +4596,8 @@ void itech32_state::init_aama()
 	    board share the same sound CPU code and sample ROMs.
 	    This board has all versions of GT for it, GT3D through GTClassic
 	*/
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x180800, 0x180803, read32smo_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x181000, 0x181003, read32smo_delegate(FUNC(itech32_state::trackball32_4bit_p2_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x180800, 0x180803, read32smo_delegate(*this, FUNC(itech32_state::trackball32_4bit_p1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x181000, 0x181003, read32smo_delegate(*this, FUNC(itech32_state::trackball32_4bit_p2_r)));
 	init_gt_common();
 }
 
@@ -4620,7 +4621,7 @@ void itech32_state::init_s_ver()
 	    board: GT97 v1.21S, GT98, GT99, GT2K & GT Classic Versions 1.00S
 	    Trackball info is read through 200202 (actually 200203).
 	*/
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200200, 0x200203, read32smo_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200200, 0x200203, read32smo_delegate(*this, FUNC(itech32_state::trackball32_4bit_p1_r)));
 	init_gt_common();
 }
 
@@ -4634,7 +4635,7 @@ void itech32_state::init_gt3dl()
 	    Player 1 trackball read through 200003
 	    Player 2 trackball read through 200002
 	*/
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200003, read32smo_delegate(FUNC(itech32_state::trackball32_4bit_combined_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200003, read32smo_delegate(*this, FUNC(itech32_state::trackball32_4bit_combined_r)));
 	init_gt_common();
 }
 
@@ -4642,7 +4643,7 @@ void itech32_state::init_gt3dl()
 void itech32_state::init_gt2kp()
 {
 	/* a little extra protection */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680003, read32smo_delegate(FUNC(itech32_state::gt2kp_prot_result_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680003, read32smo_delegate(*this, FUNC(itech32_state::gt2kp_prot_result_r)));
 	init_aama();
 
 	/* The protection code is:
@@ -4663,7 +4664,7 @@ Label1  bne.s       Label1          ; Infinite loop if result isn't 0x01
 void itech32_state::init_gtclasscp()
 {
 	/* a little extra protection */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680003, read32smo_delegate(FUNC(itech32_state::gtclass_prot_result_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680003, read32smo_delegate(*this, FUNC(itech32_state::gtclass_prot_result_r)));
 	init_aama();
 
 	/* The protection code is:

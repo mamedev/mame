@@ -225,7 +225,8 @@ enum : unsigned {
 };
 
 hp9885_device::hp9885_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hp98032_gpio_card_device(mconfig , HP9885 , tag , owner , clock)
+	: device_t(mconfig , HP9885 , tag , owner , clock)
+	, device_hp98032_gpio_interface(mconfig, *this)
 	, m_drive_connector{*this , "floppy"}
 {
 }

@@ -476,7 +476,7 @@ void radio86_state::radio86(machine_config &config)
 
 	i8275_device &crtc(I8275(config, "i8275", XTAL(16'000'000) / 12));
 	crtc.set_character_width(6);
-	crtc.set_display_callback(FUNC(radio86_state::display_pixels), this);
+	crtc.set_display_callback(FUNC(radio86_state::display_pixels));
 	crtc.drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq2_w));
 
 	/* video hardware */

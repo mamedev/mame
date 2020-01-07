@@ -84,6 +84,10 @@ public:
 
 	void sengokmj(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -122,9 +126,6 @@ private:
 	TILE_GET_INFO_MEMBER(seibucrtc_sc3_tile_info);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-
-	virtual void machine_start() override;
-	virtual void video_start() override;
 
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -307,10 +308,10 @@ void sengokmj_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 void sengokmj_state::video_start()
 {
-	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sengokmj_state::seibucrtc_sc0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_sc2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sengokmj_state::seibucrtc_sc2_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_sc1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sengokmj_state::seibucrtc_sc1_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_sc3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sengokmj_state::seibucrtc_sc3_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sengokmj_state::seibucrtc_sc0_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_sc2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sengokmj_state::seibucrtc_sc2_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_sc1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sengokmj_state::seibucrtc_sc1_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_sc3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sengokmj_state::seibucrtc_sc3_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_sc2_tilemap->set_transparent_pen(15);
 	m_sc1_tilemap->set_transparent_pen(15);

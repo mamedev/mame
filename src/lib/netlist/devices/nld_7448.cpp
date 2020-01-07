@@ -36,7 +36,19 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	public:
-		void update_outputs(unsigned v) NL_NOEXCEPT;
+		void update_outputs(unsigned v) noexcept
+		{
+			nl_assert(v<16);
+			if (v != m_state)
+			{
+				// max transfer time is 100 NS */
+
+				uint8_t t = tab7448[v];
+				for (std::size_t i = 0; i < 7; i++)
+					m_Q[i].push((t >> (6-i)) & 1, NLTIME_FROM_NS(100));
+				m_state = v;
+			}
+		}
 
 		logic_input_t m_A;
 		logic_input_t m_B;
@@ -50,7 +62,8 @@ namespace netlist
 
 		object_array_t<logic_output_t, 7> m_Q;  /* a .. g */
 		nld_power_pins m_power_pins;
-
+	private:
+		static const std::array<uint8_t, 16> tab7448;
 	};
 
 	NETLIB_OBJECT_DERIVED(7448_dip, 7448)
@@ -83,7 +96,7 @@ namespace netlist
 
 #define BITS7(b6,b5,b4,b3,b2,b1,b0) ((b6)<<6) | ((b5)<<5) | ((b4)<<4) | ((b3)<<3) | ((b2)<<2) | ((b1)<<1) | ((b0)<<0)
 
-	static constexpr const std::array<uint8_t, 16> tab7448 =
+	const std::array<uint8_t, 16> NETLIB_NAME(7448)::tab7448 =
 	{
 			BITS7(   1, 1, 1, 1, 1, 1, 0 ),  /* 00 - not blanked ! */
 			BITS7(   0, 1, 1, 0, 0, 0, 0 ),  /* 01 */
@@ -136,27 +149,6 @@ namespace netlist
 	NETLIB_RESET(7448)
 	{
 		m_state = 0;
-#if 0
-		m_A.set_state(logic_t::STATE_INP_PASSIVE);
-		m_B.set_state(logic_t::STATE_INP_PASSIVE);
-		m_C.set_state(logic_t::STATE_INP_PASSIVE);
-		m_D.set_state(logic_t::STATE_INP_PASSIVE);
-		m_RBIQ.set_state(logic_t::STATE_INP_PASSIVE);
-#endif
-	}
-
-	NETLIB_FUNC_VOID(7448, update_outputs, (unsigned v))
-	{
-		nl_assert(v<16);
-		if (v != m_state)
-		{
-			// max transfer time is 100 NS */
-
-			uint8_t t = tab7448[v];
-			for (std::size_t i = 0; i < 7; i++)
-				m_Q[i].push((t >> (6-i)) & 1, NLTIME_FROM_NS(100));
-			m_state = v;
-		}
 	}
 
 	NETLIB_DEVICE_IMPL(7448, "TTL_7448", "+A,+B,+C,+D,+LTQ,+BIQ,+RBIQ,@VCC,@GND")

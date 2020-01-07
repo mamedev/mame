@@ -200,8 +200,7 @@ const char *expression_error::code_string() const
 //-------------------------------------------------
 
 symbol_entry::symbol_entry(symbol_table &table, symbol_type type, const char *name, const std::string &format)
-	: m_next(nullptr),
-		m_table(table),
+	: m_table(table),
 		m_type(type),
 		m_name(name),
 		m_format(format)
@@ -560,7 +559,7 @@ void parsed_expression::parse(const char *expression)
 	// copy the string and reset our parsing state
 	m_original_string.assign(expression);
 	m_tokenlist.reset();
-	m_stringlist.reset();
+	m_stringlist.clear();
 
 	// first parse the tokens into the token array in order
 	parse_string_into_tokens();
@@ -1072,7 +1071,7 @@ void parsed_expression::parse_quoted_string(parse_token &token, const char *&str
 	string++;
 
 	// make the token
-	token.configure_string(m_stringlist.append(*global_alloc(expression_string(buffer.c_str()))));
+	token.configure_string(m_stringlist.emplace(m_stringlist.end(), buffer.c_str())->c_str());
 }
 
 
@@ -1089,7 +1088,7 @@ void parsed_expression::parse_memory_operator(parse_token &token, const char *st
 	const char *dot = strrchr(string, '.');
 	if (dot != nullptr)
 	{
-		namestring = m_stringlist.append(*global_alloc(expression_string(string, dot - string)));
+		namestring = m_stringlist.emplace(m_stringlist.end(), string, dot)->c_str();
 		string = dot + 1;
 	}
 

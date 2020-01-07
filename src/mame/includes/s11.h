@@ -9,6 +9,7 @@
 #ifndef MAME_INCLUDES_S11_H
 #define MAME_INCLUDES_S11_H
 
+#include "cpu/m6800/m6800.h"
 #include "audio/s11c_bg.h"
 #include "machine/6821pia.h"
 #include "machine/genpin.h"
@@ -96,7 +97,7 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
+	optional_device<m6802_cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_bgcpu;
 	optional_device<hc55516_device> m_hc55516;
 	optional_device<pia6821_device> m_pias;

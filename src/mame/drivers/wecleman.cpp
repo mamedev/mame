@@ -1063,7 +1063,7 @@ void wecleman_state::wecleman(machine_config &config)
 	Z80(config, m_audiocpu, 3579545);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &wecleman_state::wecleman_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MCFG_MACHINE_START_OVERRIDE(wecleman_state, wecleman)
 	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state, wecleman)
@@ -1142,7 +1142,7 @@ void wecleman_state::hotchase(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &wecleman_state::hotchase_sound_map);
 	m_audiocpu->set_periodic_int(FUNC(wecleman_state::hotchase_sound_timer), attotime::from_hz(496));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state, hotchase)
 	MCFG_MACHINE_START_OVERRIDE(wecleman_state, hotchase)
@@ -1168,12 +1168,12 @@ void wecleman_state::hotchase(machine_config &config)
 	m_k051316[0]->set_palette(m_palette);
 	m_k051316[0]->set_offsets(-0xb0 / 2, -16);
 	m_k051316[0]->set_wrap(1);
-	m_k051316[0]->set_zoom_callback(FUNC(wecleman_state::hotchase_zoom_callback_1), this);
+	m_k051316[0]->set_zoom_callback(FUNC(wecleman_state::hotchase_zoom_callback_1));
 
 	K051316(config, m_k051316[1], 0);
 	m_k051316[1]->set_palette(m_palette);
 	m_k051316[1]->set_offsets(-0xb0 / 2, -16);
-	m_k051316[1]->set_zoom_callback(FUNC(wecleman_state::hotchase_zoom_callback_2), this);
+	m_k051316[1]->set_zoom_callback(FUNC(wecleman_state::hotchase_zoom_callback_2));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

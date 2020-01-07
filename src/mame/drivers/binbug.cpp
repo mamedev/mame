@@ -266,7 +266,7 @@ void binbug_state::binbug(machine_config &config)
 	RS232_PORT(config, m_rs232, default_rs232_devices, "keyboard").set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(binbug_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(binbug_state::quickload_cb));
 
 	S100_BUS(config, m_s100, 0);
 	S100_SLOT(config, "s100:1", binbug_s100_devices, "dg640");

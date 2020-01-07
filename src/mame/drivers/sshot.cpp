@@ -212,7 +212,7 @@ TILE_GET_INFO_MEMBER(supershot_state::get_supershot_text_tile_info)
 
 void supershot_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supershot_state::get_supershot_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supershot_state::get_supershot_text_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 uint32_t supershot_state::screen_update_supershot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

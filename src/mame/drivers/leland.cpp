@@ -2954,11 +2954,11 @@ ROM_END
 void leland_state::init_master_ports(u8 mvram_base, u8 io_base)
 {
 	/* set up the master CPU VRAM I/O */
-	m_master->space(AS_IO).install_readwrite_handler(mvram_base, mvram_base + 0x1f, read8sm_delegate(FUNC(leland_state::leland_mvram_port_r),this), write8sm_delegate(FUNC(leland_state::leland_mvram_port_w),this));
+	m_master->space(AS_IO).install_readwrite_handler(mvram_base, mvram_base + 0x1f, read8sm_delegate(*this, FUNC(leland_state::leland_mvram_port_r)), write8sm_delegate(*this, FUNC(leland_state::leland_mvram_port_w)));
 
 	/* set up the master CPU I/O ports */
-	m_master->space(AS_IO).install_read_handler(io_base, io_base + 0x1f, read8sm_delegate(FUNC(leland_state::leland_master_input_r),this));
-	m_master->space(AS_IO).install_write_handler(io_base, io_base + 0x0f, write8sm_delegate(FUNC(leland_state::leland_master_output_w),this));
+	m_master->space(AS_IO).install_read_handler(io_base, io_base + 0x1f, read8sm_delegate(*this, FUNC(leland_state::leland_master_input_r)));
+	m_master->space(AS_IO).install_write_handler(io_base, io_base + 0x0f, write8sm_delegate(*this, FUNC(leland_state::leland_master_output_w)));
 }
 
 
@@ -2974,8 +2974,8 @@ void leland_state::init_cerberus()
 	init_master_ports(0x40, 0x80);
 
 	/* set up additional input ports */
-	m_master->space(AS_IO).install_read_handler(0x80, 0x80, read8smo_delegate(FUNC(leland_state::cerberus_dial_1_r),this));
-	m_master->space(AS_IO).install_read_handler(0x90, 0x90, read8smo_delegate(FUNC(leland_state::cerberus_dial_2_r),this));
+	m_master->space(AS_IO).install_read_handler(0x80, 0x80, read8smo_delegate(*this, FUNC(leland_state::cerberus_dial_1_r)));
+	m_master->space(AS_IO).install_read_handler(0x90, 0x90, read8smo_delegate(*this, FUNC(leland_state::cerberus_dial_2_r)));
 }
 
 
@@ -3020,7 +3020,7 @@ void leland_state::init_alleymas()
 	/* kludge warning: the game uses location E0CA to determine if the joysticks are available */
 	/* it gets cleared by the code, but there is no obvious way for the value to be set to a */
 	/* non-zero value. If the value is zero, the joystick is never read. */
-	m_master->space(AS_PROGRAM).install_write_handler(0xe0ca, 0xe0ca, write8smo_delegate(FUNC(leland_state::alleymas_joystick_kludge),this));
+	m_master->space(AS_PROGRAM).install_write_handler(0xe0ca, 0xe0ca, write8smo_delegate(*this, FUNC(leland_state::alleymas_joystick_kludge)));
 	m_alleymas_kludge_mem = m_mainram + (0xe0ca - 0xe000);
 }
 
@@ -3044,9 +3044,9 @@ void leland_state::init_dangerz()
 	init_master_ports(0x40, 0x80);
 
 	/* set up additional input ports */
-	m_master->space(AS_IO).install_read_handler(0xf4, 0xf4, read8smo_delegate(FUNC(leland_state::dangerz_input_upper_r),this));
-	m_master->space(AS_IO).install_read_handler(0xf8, 0xf8, read8smo_delegate(FUNC(leland_state::dangerz_input_y_r),this));
-	m_master->space(AS_IO).install_read_handler(0xfc, 0xfc, read8smo_delegate(FUNC(leland_state::dangerz_input_x_r),this));
+	m_master->space(AS_IO).install_read_handler(0xf4, 0xf4, read8smo_delegate(*this, FUNC(leland_state::dangerz_input_upper_r)));
+	m_master->space(AS_IO).install_read_handler(0xf8, 0xf8, read8smo_delegate(*this, FUNC(leland_state::dangerz_input_y_r)));
+	m_master->space(AS_IO).install_read_handler(0xfc, 0xfc, read8smo_delegate(*this, FUNC(leland_state::dangerz_input_x_r)));
 
 	save_item(NAME(m_dangerz_x));
 	save_item(NAME(m_dangerz_y));
@@ -3094,10 +3094,10 @@ void redline_state::init_redlin2p()
 	init_master_ports(0x00, 0xc0);
 
 	/* set up additional input ports */
-	m_master->space(AS_IO).install_read_handler(0xc0, 0xc0, read8smo_delegate(FUNC(redline_state::redline_pedal_1_r),this));
-	m_master->space(AS_IO).install_read_handler(0xd0, 0xd0, read8smo_delegate(FUNC(redline_state::redline_pedal_2_r),this));
-	m_master->space(AS_IO).install_read_handler(0xf8, 0xf8, read8smo_delegate(FUNC(redline_state::redline_wheel_2_r),this));
-	m_master->space(AS_IO).install_read_handler(0xfb, 0xfb, read8smo_delegate(FUNC(redline_state::redline_wheel_1_r),this));
+	m_master->space(AS_IO).install_read_handler(0xc0, 0xc0, read8smo_delegate(*this, FUNC(redline_state::redline_pedal_1_r)));
+	m_master->space(AS_IO).install_read_handler(0xd0, 0xd0, read8smo_delegate(*this, FUNC(redline_state::redline_pedal_2_r)));
+	m_master->space(AS_IO).install_read_handler(0xf8, 0xf8, read8smo_delegate(*this, FUNC(redline_state::redline_wheel_2_r)));
+	m_master->space(AS_IO).install_read_handler(0xfb, 0xfb, read8smo_delegate(*this, FUNC(redline_state::redline_wheel_1_r)));
 }
 
 
@@ -3126,9 +3126,9 @@ void redline_state::init_viper()
 	init_master_ports(0x00, 0xc0);
 
 	/* set up additional input ports */
-	m_master->space(AS_IO).install_read_handler(0xa4, 0xa4, read8smo_delegate(FUNC(redline_state::dangerz_input_upper_r),this));
-	m_master->space(AS_IO).install_read_handler(0xb8, 0xb8, read8smo_delegate(FUNC(redline_state::dangerz_input_y_r),this));
-	m_master->space(AS_IO).install_read_handler(0xbc, 0xbc, read8smo_delegate(FUNC(redline_state::dangerz_input_x_r),this));
+	m_master->space(AS_IO).install_read_handler(0xa4, 0xa4, read8smo_delegate(*this, FUNC(redline_state::dangerz_input_upper_r)));
+	m_master->space(AS_IO).install_read_handler(0xb8, 0xb8, read8smo_delegate(*this, FUNC(redline_state::dangerz_input_y_r)));
+	m_master->space(AS_IO).install_read_handler(0xbc, 0xbc, read8smo_delegate(*this, FUNC(redline_state::dangerz_input_x_r)));
 
 	save_item(NAME(m_dangerz_x));
 	save_item(NAME(m_dangerz_y));
@@ -3221,9 +3221,9 @@ void redline_state::init_offroad()
 	init_master_ports(0x40, 0x80);   /* yes, this is intentional */
 
 	/* set up additional input ports */
-	m_master->space(AS_IO).install_read_handler(0xf8, 0xf8, read8smo_delegate(FUNC(redline_state::offroad_wheel_3_r),this));
-	m_master->space(AS_IO).install_read_handler(0xf9, 0xf9, read8smo_delegate(FUNC(redline_state::offroad_wheel_1_r),this));
-	m_master->space(AS_IO).install_read_handler(0xfb, 0xfb, read8smo_delegate(FUNC(redline_state::offroad_wheel_2_r),this));
+	m_master->space(AS_IO).install_read_handler(0xf8, 0xf8, read8smo_delegate(*this, FUNC(redline_state::offroad_wheel_3_r)));
+	m_master->space(AS_IO).install_read_handler(0xf9, 0xf9, read8smo_delegate(*this, FUNC(redline_state::offroad_wheel_1_r)));
+	m_master->space(AS_IO).install_read_handler(0xfb, 0xfb, read8smo_delegate(*this, FUNC(redline_state::offroad_wheel_2_r)));
 }
 
 
@@ -3240,9 +3240,9 @@ void redline_state::init_offroadt()
 	init_master_ports(0x80, 0x40);
 
 	/* set up additional input ports */
-	m_master->space(AS_IO).install_read_handler(0xf8, 0xf8, read8smo_delegate(FUNC(redline_state::offroad_wheel_3_r),this));
-	m_master->space(AS_IO).install_read_handler(0xf9, 0xf9, read8smo_delegate(FUNC(redline_state::offroad_wheel_1_r),this));
-	m_master->space(AS_IO).install_read_handler(0xfb, 0xfb, read8smo_delegate(FUNC(redline_state::offroad_wheel_2_r),this));
+	m_master->space(AS_IO).install_read_handler(0xf8, 0xf8, read8smo_delegate(*this, FUNC(redline_state::offroad_wheel_3_r)));
+	m_master->space(AS_IO).install_read_handler(0xf9, 0xf9, read8smo_delegate(*this, FUNC(redline_state::offroad_wheel_1_r)));
+	m_master->space(AS_IO).install_read_handler(0xfb, 0xfb, read8smo_delegate(*this, FUNC(redline_state::offroad_wheel_2_r)));
 }
 
 
@@ -3269,7 +3269,7 @@ void ataxx_state::init_ataxx()
 	rotate_memory("slave");
 
 	/* set up additional input ports */
-	m_master->space(AS_IO).install_read_handler(0x00, 0x03, read8sm_delegate(FUNC(ataxx_state::ataxx_trackball_r),this));
+	m_master->space(AS_IO).install_read_handler(0x00, 0x03, read8sm_delegate(*this, FUNC(ataxx_state::ataxx_trackball_r)));
 }
 
 
@@ -3279,7 +3279,7 @@ void ataxx_state::init_ataxxj()
 	rotate_memory("slave");
 
 	/* set up additional input ports */
-	m_master->space(AS_IO).install_read_handler(0x00, 0x03, read8sm_delegate(FUNC(ataxx_state::ataxx_trackball_r),this));
+	m_master->space(AS_IO).install_read_handler(0x00, 0x03, read8sm_delegate(*this, FUNC(ataxx_state::ataxx_trackball_r)));
 }
 
 
@@ -3301,14 +3301,14 @@ void ataxx_state::init_indyheat()
 	rotate_memory("slave");
 
 	/* set up additional input ports */
-	m_master->space(AS_IO).install_read_handler(0x00, 0x02, read8sm_delegate(FUNC(ataxx_state::ataxx_trackball_r),this));
-	m_master->space(AS_IO).install_read_handler(0x08, 0x0b, read8sm_delegate(FUNC(ataxx_state::indyheat_analog_r),this));
+	m_master->space(AS_IO).install_read_handler(0x00, 0x02, read8sm_delegate(*this, FUNC(ataxx_state::ataxx_trackball_r)));
+	m_master->space(AS_IO).install_read_handler(0x08, 0x0b, read8sm_delegate(*this, FUNC(ataxx_state::indyheat_analog_r)));
 	m_master->space(AS_IO).install_read_port(0x0d, 0x0d, "P1");
 	m_master->space(AS_IO).install_read_port(0x0e, 0x0e, "P2");
 	m_master->space(AS_IO).install_read_port(0x0f, 0x0f, "P3");
 
 	/* set up additional output ports */
-	m_master->space(AS_IO).install_write_handler(0x08, 0x0b, write8sm_delegate(FUNC(ataxx_state::indyheat_analog_w),this));
+	m_master->space(AS_IO).install_write_handler(0x08, 0x0b, write8sm_delegate(*this, FUNC(ataxx_state::indyheat_analog_w)));
 }
 
 

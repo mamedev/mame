@@ -41,9 +41,9 @@ void gcpinbal_state::video_start()
 	int xoffs = 0;
 	int yoffs = 0;
 
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gcpinbal_state::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gcpinbal_state::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gcpinbal_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gcpinbal_state::get_bg0_tile_info)),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gcpinbal_state::get_bg1_tile_info)),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gcpinbal_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
 
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(0);

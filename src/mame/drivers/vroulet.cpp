@@ -139,7 +139,7 @@ void vroulet_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(
 			*m_gfxdecode,
-			tilemap_get_info_delegate(FUNC(vroulet_state::get_bg_tile_info),this),
+			tilemap_get_info_delegate(*this, FUNC(vroulet_state::get_bg_tile_info)),
 			TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
 }

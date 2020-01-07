@@ -20,7 +20,7 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_dsp(*this,"dsp"),
 		m_tc0640fio(*this, "tc0640fio"),
-		m_gfx2(*this, "gfx2"),
+		m_dspgfx(*this, "dspgfx"),
 		m_vram(*this, "vram"),
 		m_objlist(*this, "objlist"),
 		m_main_ram(*this, "main_ram"),
@@ -50,7 +50,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
 	required_device<tc0640fio_device> m_tc0640fio;
-	required_memory_region m_gfx2;
+	required_region_ptr<uint16_t> m_dspgfx;
 
 	required_shared_ptr<uint32_t> m_vram;
 	required_shared_ptr<uint32_t> m_objlist;
