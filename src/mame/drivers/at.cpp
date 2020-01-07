@@ -3569,9 +3569,11 @@ ROM_START( at486 )
 	// 29: screen remains blank
 	ROM_SYSTEM_BIOS(29, "optimus", "Optimus")
 	ROMX_LOAD("mb_bios_ami_930808.bin", 0x10000, 0x10000, CRC(89151d5b) SHA1(92a93cae054525adfdc6277a1236e699ea9fbc32), ROM_BIOS(29))
-	// 30: 30-0500-ZZ1130-00101111-070791-1219-0 - ASI board
+	// 30: 40-0100-DG1112-00101111-070791-UMC480A / Rev. 251191 UMC-486A - ASI board
+	// The BIOS comes from http://www.elhvb.com/supportbios.info/Archives/BIOS/0-A/ASI/UMC-486A/index.html and contains 28 extra plain textattr
+	// bytes at the end of the file. These have been lopped off, but the emulated machine complains about a ROM error, thus marked BAD_DUMP
 	ROM_SYSTEM_BIOS(30, "umc486a", "UMC-486A")
-	ROMX_LOAD("umc481i.ami", 0x10000, 0x10000, CRC(0e20eda3) SHA1(ae0b38856780386a70cefcfdc87822cd5d2bc329), ROM_BIOS(30))
+	ROMX_LOAD("umc481icorr.ami", 0x10000, 0x10000, BAD_DUMP CRC(d27b2fd4) SHA1(e639dbc7d65b29ffca26701af766fa75bfe33787), ROM_BIOS(30))
 	// 31: 40-0201-D41107-00101111-031591-OPBC-0
 	ROM_SYSTEM_BIOS(31, "a9c11f1f", "a9c11f1f")
 	ROMX_LOAD("ami_486_zz686886.bin", 0x10000, 0x10000, CRC(a9c11f1f) SHA1(2a27ecae9547ddd3d230c30a94deb83a4d6b4436), ROM_BIOS(31))
