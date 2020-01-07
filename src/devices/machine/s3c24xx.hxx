@@ -2606,20 +2606,20 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_adc_r )
 #if defined(DEVICE_S3C2400)
 	case S3C24XX_ADCDAT:
 		data = (data & ~0x3FF) | (iface_adc_data_r(0) & 0x3FF);
-		LOGMASKED(LOG_ADC, "%s: ADC read: ADCDAT = %08x & %08x\n", machine().describe_context, data, mem_mask);
+		LOGMASKED(LOG_ADC, "%s: ADC read: ADCDAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 #else
 	case S3C24XX_ADCDAT0:
 		data = (data & ~0x3FF) | (iface_adc_data_r(0) & 0x3FF);
-		LOGMASKED(LOG_ADC, "%s: ADC read: ADCDAT0 = %08x & %08x\n", machine().describe_context, data, mem_mask);
+		LOGMASKED(LOG_ADC, "%s: ADC read: ADCDAT0 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	case S3C24XX_ADCDAT1:
 		data = (data & ~0x3FF) | (iface_adc_data_r(1) & 0x3FF);
-		LOGMASKED(LOG_ADC, "%s: ADC read: ADCDAT1 = %08x & %08x\n", machine().describe_context, data, mem_mask);
+		LOGMASKED(LOG_ADC, "%s: ADC read: ADCDAT1 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 #endif
 	default:
-		LOGMASKED(LOG_ADC, "%s: ADC read: %08x = %08x & %08x\n", machine().describe_context, data, mem_mask);
+		LOGMASKED(LOG_ADC, "%s: ADC read: %08x = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	}
 	return data;
@@ -2914,7 +2914,7 @@ void S3C24_CLASS_NAME::s3c24xx_nand_update_ecc(uint8_t data)
 		temp[0] = m_nand.secc[0];
 		temp[1] = m_nand.secc[1];
 		nand_update_secc(m_nand.secc, m_nand.ecc_pos++, data);
-		LOGMASKED(LOG_FLASH, "%s: NAND - SECC %02X - %02X %02X -> %02X %02X\n", machine().describe_context, m_nand.ecc_pos - 1, temp[0], temp[1], m_nand.secc[0], m_nand.secc[1]);
+		LOGMASKED(LOG_FLASH, "%s: NAND - SECC %02X - %02X %02X -> %02X %02X\n", machine().describe_context(), m_nand.ecc_pos - 1, temp[0], temp[1], m_nand.secc[0], m_nand.secc[1]);
 		if (m_nand.ecc_pos == 16)
 			m_nand.ecc_pos = 0;
 	}
