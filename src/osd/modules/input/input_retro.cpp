@@ -1138,10 +1138,10 @@ void retro_osd_interface::process_events_buf()
 
 void retro_osd_interface::poll_inputs(running_machine &machine)
 {
-	m_keyboard_input->poll_if_necessary(machine);
-	m_mouse_input->poll_if_necessary(machine);
-	m_lightgun_input->poll_if_necessary(machine);
-	m_joystick_input->poll_if_necessary(machine);
+	process_mouse_state(machine);
+	process_keyboard_state(machine);
+	process_joypad_state(machine);
+	process_lightgun_state(machine);
 }
 
 MODULE_DEFINITION(KEYBOARDINPUT_RETRO, keyboard_input_retro)
