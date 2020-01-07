@@ -11,7 +11,8 @@
  ***************************************************************************/
 
 class vr0video_device : public device_t,
-						public device_video_interface
+						public device_video_interface,
+						public device_palette_interface
 {
 public:
 	vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -29,6 +30,9 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// device_palette_interface overrides
+	virtual uint32_t palette_entries() const override { return 32*64*32; }
 
 private:
 	int vrender0_ProcessPacket(u32 PacketPtr);

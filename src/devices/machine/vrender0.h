@@ -121,7 +121,6 @@ protected:
 private:
 	required_device <se3208_device> m_host_cpu;
 	required_device <screen_device> m_screen;
-	required_device <palette_device> m_palette;
 	required_device <vr0video_device> m_vr0vid;
 	required_device <vr0sound_device> m_vr0snd;
 	required_device <speaker_device> m_lspeaker;

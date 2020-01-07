@@ -35,6 +35,7 @@ DEFINE_DEVICE_TYPE(VIDEO_VRENDER0, vr0video_device, "vr0video", "MagicEyes VRend
 vr0video_device::vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, VIDEO_VRENDER0, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
+	, device_palette_interface(mconfig, *this)
 	, m_idleskip_cb(*this)
 
 {
@@ -127,6 +128,14 @@ WRITE16_MEMBER(vr0video_device::flip_count_w)
 
 void vr0video_device::device_start()
 {
+	for (int color = 0; color < 32*64*32; color++)
+	{
+		u8 r = pal5bit((color >> 11) & 0x1f);
+		u8 g = pal6bit((color >> 5) & 0x3f);
+		u8 b = pal5bit((color >> 0) & 0x1f);
+		set_pen_color(color, r, g, b);
+	}
+
 	for (int color = 0; color < 0x100; color++)
 	{
 		m_multiply_lookup[color] = std::make_unique<u8[]>(0x100 + 1);

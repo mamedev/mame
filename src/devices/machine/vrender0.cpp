@@ -39,7 +39,6 @@ vrender0soc_device::vrender0soc_device(const machine_config &mconfig, const char
 	: device_t(mconfig, VRENDER0_SOC, tag, owner, clock),
 	m_host_cpu(*this, finder_base::DUMMY_TAG),
 	m_screen(*this, "screen"),
-	m_palette(*this, "palette"),
 	m_vr0vid(*this, "vr0vid"),
 	m_vr0snd(*this, "vr0snd"),
 	m_lspeaker(*this, "lspeaker"),
@@ -128,14 +127,12 @@ void vrender0soc_device::device_add_mconfig(machine_config &config)
 	m_screen->set_raw((XTAL(14'318'181)*2)/4, 455, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(vrender0soc_device::screen_update));
 	m_screen->screen_vblank().set(FUNC(vrender0soc_device::screen_vblank));
-	m_screen->set_palette(m_palette);
+	m_screen->set_palette(m_vr0vid);
 
 	VIDEO_VRENDER0(config, m_vr0vid, 14318180);
 	#ifdef IDLE_LOOP_SPEEDUP
 	m_vr0vid->idleskip_cb().set(FUNC(vrender0soc_device::idle_skip_speedup_w));
 	#endif
-
-	PALETTE(config, m_palette, palette_device::RGB_565);
 
 	SPEAKER(config, m_lspeaker).front_left();
 	SPEAKER(config, m_rspeaker).front_right();
