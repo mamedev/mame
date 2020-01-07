@@ -451,7 +451,7 @@ void video_manager::begin_recording_mng(const char *name, uint32_t index, screen
 	if (filerr == osd_file::error::NONE)
 	{
 		// start the capture
-		int rate = int(screen->frame_period().as_hz());
+		int rate = int(screen ? screen->frame_period().as_hz() : screen_device::DEFAULT_FRAME_RATE);
 		png_error pngerr = mng_capture_start(*info.m_mng_file, m_snap_bitmap, rate);
 		if (pngerr != PNGERR_NONE)
 		{
