@@ -134,6 +134,15 @@ bool rx01_cpu_device::test_condition()
 	}
 }
 
+void rx01_cpu_device::shift_crc(bool data)
+{
+	// TODO: double-check algorithm
+	if (data == BIT(m_crc, 0))
+		m_crc = (m_crc >> 1) ^ 0002010;
+	else
+		m_crc = (m_crc >> 1) | 0100000;
+}
+
 void rx01_cpu_device::execute_run()
 {
 	while (m_icount > 0)
@@ -187,6 +196,15 @@ void rx01_cpu_device::execute_run()
 					m_bar = (m_bar + 1) & 07777;
 				else
 					m_bar = BIT(m_mb, 0) ? 0 : 06000;
+				break;
+
+			case 054:
+				if ((m_mb & 3) == 3)
+					m_crc = 0177777;
+				else if (BIT(m_mb, 0))
+					shift_crc(0 /*sep_data()*/);
+				else
+					shift_crc(BIT(m_mb, 1));
 				break;
 
 			case 060:

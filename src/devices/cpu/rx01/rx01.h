@@ -46,6 +46,7 @@ private:
 	// internal helpers
 	u8 mux_out();
 	bool test_condition();
+	void shift_crc(bool data);
 
 	// address spaces
 	address_space_config m_inst_config;
