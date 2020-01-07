@@ -96,7 +96,6 @@ bool img_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 
 bool img_format::save(io_generic *io, floppy_image *image)
 {
-	LOG("save..\n");
 	for (int cyl = 0; cyl < IMG_TRACKS; cyl++) {
 		uint8_t bitstream[ 21000 ];
 		int bitstream_size;
@@ -105,7 +104,6 @@ bool img_format::save(io_generic *io, floppy_image *image)
 		unsigned track_no , sector_no;
 		uint8_t sector_data[ IMG_SECTOR_SIZE ];
 		while (get_next_sector(bitstream , bitstream_size , pos , track_no , sector_no , sector_data)) {
-			LOG("Got T %u S %u\n" , track_no , sector_no);
 			if (track_no == cyl && sector_no >= 1 && sector_no <= IMG_SECTORS) {
 				unsigned offset_in_image = (cyl * IMG_SECTORS + sector_no - 1) * IMG_SECTOR_SIZE;
 				io_generic_write(io, sector_data, offset_in_image, IMG_SECTOR_SIZE);
@@ -312,8 +310,6 @@ std::vector<uint8_t> img_format::get_next_id_n_block(const uint8_t *bitstream , 
 		}
 	} while (clock_sr != AM_CLOCK);
 
-	LOG("@%u data=%02x\n" , start_pos , data_sr);
-
 	// ID blocks: Track no. + 0 + sector no. + 0 + CRC
 	// Data blocks: Sector data + CRC
 	res.push_back(data_sr);
@@ -339,7 +335,6 @@ std::vector<uint8_t> img_format::get_next_id_n_block(const uint8_t *bitstream , 
 			res.push_back(data_sr);
 		}
 	}
-	LOG("block %02x:%02x:%02x:%02x:%02x (%lu)\n" , res[ 0 ] , res[ 1 ] , res[ 2 ] , res[ 3 ] , res[ 4 ] , res.size());
 	return res;
 }
 
