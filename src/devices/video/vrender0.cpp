@@ -394,10 +394,8 @@ void vr0video_device::DrawQuadTexture(QuadInfo *Quad)
 				Color = Quad->Pal[Texel];
 				break;
 			case 16:
-				Color = Quad->u.Imagew[Offset];
-				break;
 			default:
-				Color = ~0;
+				Color = Quad->u.Imagew[Offset];
 				break;
 			}
 			if (Color != TransColor)
