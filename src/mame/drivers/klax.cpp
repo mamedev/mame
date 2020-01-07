@@ -83,7 +83,7 @@ void klax_state::klax_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x0e0000, 0x0e0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
-	map(0x260000, 0x260001).portr("P1").w(FUNC(klax_state::klax_latch_w));
+	map(0x260000, 0x260001).portr("P1").w(FUNC(klax_state::latch_w));
 	map(0x260002, 0x260003).portr("P2");
 	map(0x270001, 0x270001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x2e0000, 0x2e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
@@ -96,12 +96,12 @@ void klax_state::klax_map(address_map &map)
 	map(0x3f2800, 0x3f3fff).ram();
 }
 
-void klax_state::klax2bl_map(address_map &map)
+void klax_state::klax5bl_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x0e0000, 0x0e0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
-	map(0x260000, 0x260001).portr("P1").w(FUNC(klax_state::klax_latch_w));
+	map(0x260000, 0x260001).portr("P1").w(FUNC(klax_state::latch_w));
 	map(0x260002, 0x260003).portr("P2");
 	map(0x260006, 0x260007).w(FUNC(klax_state::interrupt_ack_w));
 //  map(0x270001, 0x270001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // no OKI here
@@ -179,7 +179,7 @@ static const gfx_layout bootleg_layout =
 	8*8*4
 };
 
-static GFXDECODE_START( gfx_klax2bl )
+static GFXDECODE_START( gfx_klax5bl )
 	GFXDECODE_ENTRY( "gfx1", 0, bootleg_layout, 256, 16 ) /* playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,       0, 16 ) /* sprites */
 GFXDECODE_END
@@ -231,18 +231,18 @@ void klax_state::bootleg_sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 }
 
-void klax_state::klax2bl(machine_config &config)
+void klax_state::klax5bl(machine_config &config)
 {
 	klax(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &klax_state::klax2bl_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &klax_state::klax5bl_map);
 
 	config.device_remove("oki"); // no 6295 here
 
 	z80_device &audiocpu(Z80(config, "audiocpu", 6000000)); /* ? */
 	audiocpu.set_addrmap(AS_PROGRAM, &klax_state::bootleg_sound_map);
 
-	m_gfxdecode->set_info(gfx_klax2bl);
+	m_gfxdecode->set_info(gfx_klax5bl);
 
 	// guess, probably something like this
 	// 2 x msm at least on bootleg set 2 (ic18 and ic19)
@@ -339,7 +339,7 @@ ROM_START( klax5bl ) // derived from 'klax5' set
 	ROM_LOAD16_BYTE( "8.bin", 0x00001, 0x10000, CRC(36764bbc) SHA1(5762996a327b5f7f93f42dad7eccb6297b3e4c0b) )
 ROM_END
 
-ROM_START( klax5bl2 ) // derived from 'klax5' set, closer than klax2bl
+ROM_START( klax5bl2 ) // derived from 'klax5' set, closer than klax5bl
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 4*64k for 68000 code */
 	ROM_LOAD16_BYTE( "3.ic31", 0x00000, 0x10000, CRC(e43699f3) SHA1(2a78959ad065e1c0f69cc2ba4146a50102ccfd7e) )
 	ROM_LOAD16_BYTE( "1.ic13", 0x00001, 0x10000, CRC(dc67f13a) SHA1(6021f48b53f9000983bcd786b8366ba8638174de) )
@@ -359,6 +359,37 @@ ROM_START( klax5bl2 ) // derived from 'klax5' set, closer than klax2bl
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "10.ic101", 0x00000, 0x10000, CRC(5c551e92) SHA1(cbff8fc4f4d370b6db2b4953ecbedd249916b891) )
 	ROM_LOAD16_BYTE( "9.ic102",  0x00001, 0x10000, CRC(29708e34) SHA1(6bea1527ad941fbb1abfad59ef3d78900dcd7f27) )
+
+	ROM_REGION( 0x800, "plds", 0) // protected
+	ROM_LOAD( "palce16v8.ic67", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8.ic91", 0x200, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8.ic24",   0x400, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8.ic29",   0x600, 0x117, NO_DUMP )
+ROM_END
+
+ROM_START( klax5bl3 ) // almost identical to klax5bl2, only the first audiocpu ROM differs
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 4*64k for 68000 code */
+	ROM_LOAD16_BYTE( "3.ic31", 0x00000, 0x10000, CRC(e43699f3) SHA1(2a78959ad065e1c0f69cc2ba4146a50102ccfd7e) )
+	ROM_LOAD16_BYTE( "1.ic13", 0x00001, 0x10000, CRC(dc67f13a) SHA1(6021f48b53f9000983bcd786b8366ba8638174de) )
+	ROM_LOAD16_BYTE( "4.ic30", 0x20000, 0x10000, CRC(f1b8e588) SHA1(080511f90aecb7526ab2107c196e73cb881a2bb5) )
+	ROM_LOAD16_BYTE( "2.ic12", 0x20001, 0x10000, CRC(adbe33a8) SHA1(c6c4f9ea5224169dbf4dda1062954563ebab18d4) )
+
+	ROM_REGION( 0x40000, "audiocpu", 0 )
+	ROM_LOAD( "6.ic22", 0x00000, 0x10000, CRC(d2c40941) SHA1(34d35d9333c315e116198aebc7db00fce6ccceb0) )
+	ROM_LOAD( "5.ic23", 0x10000, 0x10000, CRC(a245e005) SHA1(8843edfa9deec405f491647d40007d0a38c25262) )
+
+	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_LOAD32_BYTE( "8.ic116",  0x00000, 0x10000, CRC(ebe4bd96) SHA1(31f941e39aeaed6a64b35827df4d234cd641b47d) )
+	ROM_LOAD32_BYTE( "7.ic117",  0x00001, 0x10000, CRC(3b79c0d3) SHA1(f6910f2526e1d92eae260b5eb73b1672db891f4b) )
+	ROM_LOAD32_BYTE( "12.ic134", 0x00002, 0x10000, CRC(ef7712fd) SHA1(9308b37a8b024837b32d10e358a5205fdc582214) )
+	ROM_LOAD32_BYTE( "11.ic135", 0x00003, 0x10000, CRC(c2d8ce0c) SHA1(6b2f3c3f5f238dc00501646230dc8787dd862ed4) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "10.ic101", 0x00000, 0x10000, CRC(5c551e92) SHA1(cbff8fc4f4d370b6db2b4953ecbedd249916b891) )
+	ROM_LOAD16_BYTE( "9.ic102",  0x00001, 0x10000, CRC(36764bbc) SHA1(5762996a327b5f7f93f42dad7eccb6297b3e4c0b) )
+
+	ROM_REGION( 0x800, "eeprom", 0 ) // dumped from PCB after factory reset
+	ROM_LOAD( "28c16a.ic11", 0x000, 0x800, CRC(a853f611) SHA1(303d9032239a6b868bb010cee2e6292531686487) )
 
 	ROM_REGION( 0x800, "plds", 0) // protected
 	ROM_LOAD( "palce16v8.ic67", 0x000, 0x117, NO_DUMP )
@@ -491,12 +522,13 @@ ROM_END
  *
  *************************************/
 
-GAME( 1989, klax,     0,    klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (version 6)", 0 )
-GAME( 1989, klax5,    klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (version 5)", 0 )
-GAME( 1989, klax4,    klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (version 4)", 0 )
-GAME( 1989, klaxj4,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (Japan, version 4)", 0 )
-GAME( 1989, klaxj3,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (Japan, version 3)", 0 )
-GAME( 1989, klaxd2,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (Germany, version 2)", 0 )
+GAME( 1989, klax,     0,    klax,    klax, klax_state, empty_init, ROT0, "Atari Games",        "Klax (version 6)", 0 )
+GAME( 1989, klax5,    klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games",        "Klax (version 5)", 0 )
+GAME( 1989, klax4,    klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games",        "Klax (version 4)", 0 )
+GAME( 1989, klaxj4,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games",        "Klax (Japan, version 4)", 0 )
+GAME( 1989, klaxj3,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games",        "Klax (Japan, version 3)", 0 )
+GAME( 1989, klaxd2,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games",        "Klax (Germany, version 2)", 0 )
 
-GAME( 1989, klax5bl,  klax, klax2bl, klax, klax_state, empty_init, ROT0, "bootleg",     "Klax (version 5, bootleg set 1)", MACHINE_NOT_WORKING )
-GAME( 1989, klax5bl2, klax, klax2bl, klax, klax_state, empty_init, ROT0, "bootleg",     "Klax (version 5, bootleg set 2)", MACHINE_NOT_WORKING )
+GAME( 1989, klax5bl,  klax, klax5bl, klax, klax_state, empty_init, ROT0, "bootleg",            "Klax (version 5, bootleg set 1)", MACHINE_NOT_WORKING )
+GAME( 1989, klax5bl2, klax, klax5bl, klax, klax_state, empty_init, ROT0, "bootleg",            "Klax (version 5, bootleg set 2)", MACHINE_NOT_WORKING )
+GAME( 1989, klax5bl3, klax, klax5bl, klax, klax_state, empty_init, ROT0, "bootleg (Playmark)", "Klax (version 5, bootleg set 3)", MACHINE_NOT_WORKING )
