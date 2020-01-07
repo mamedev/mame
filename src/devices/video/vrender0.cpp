@@ -130,9 +130,9 @@ void vr0video_device::device_start()
 {
 	for (int color = 0; color < 32*64*32; color++)
 	{
-		u8 r = pal5bit((color >> 11) & 0x1f);
-		u8 g = pal6bit((color >> 5) & 0x3f);
-		u8 b = pal5bit((color >> 0) & 0x1f);
+		const u8 r = pal5bit((color >> 11) & 0x1f);
+		const u8 g = pal6bit((color >> 5) & 0x3f);
+		const u8 b = pal5bit((color >> 0) & 0x1f);
 		set_pen_color(color, r, g, b);
 	}
 

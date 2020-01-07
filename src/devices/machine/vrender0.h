@@ -15,7 +15,6 @@
 #include "screen.h"
 #include "video/vrender0.h"
 #include "sound/vrender0.h"
-#include "emupal.h"
 #include "speaker.h"
 #include "diserial.h"
 
