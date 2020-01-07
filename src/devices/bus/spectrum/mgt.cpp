@@ -103,8 +103,17 @@
     v3 rom: use system disk/system tape ver 3a, 3b or 3d
 
     +D G+DOS versions:
-    a v1 (-non a) exists but has yet to be found/dumped,
-    from "pick-poke-it" user manual:
+    The rom/system disk versions must match,
+    v1  rom: system disk/system tape ver 1
+    v1a rom: system disk/system tape ver 2a
+
+    +D only curiosities:
+    The earliest v1.0 unit has a very crude pcb (no solder resist or silkscreen markings),
+    has various rework modifications (cut tracks, flying wires, piggy-backed chips etc.),
+    the PAL is a 16L6 rather than a 20L8 used in later version (only known dump is bruteforced and converted to gal20v8 target.)
+    details here: https://web.archive.org/web/20171118171054/http://trastero.speccy.org/cosas/JL/PlusD/PlusD-v1-0.html
+
+    from "pick-poke-it" user manual (reguarding v1.0 unit):
      "A few PLUS D users are still using Version 1 of the ROM which was used in PLUS D's sold in December 1987-January 1988.
       ... check the serial number on the bottom of your PLUS D. If it's a 4-figure number commencing with 1,
       then you have a PLUS D with the Version 1 ROM."
@@ -232,8 +241,12 @@ ROM_START(plusd)
 	ROM_SYSTEM_BIOS(1, "unidos", "UNI-DOS v2")
 	ROMX_LOAD("plusd_uni.rom", 0x0000, 0x2000, CRC(60920496) SHA1(399c8c7c8335bc59849a2182c32347603fd0288a), ROM_BIOS(1))
 
-	ROM_REGION( 0x200, "plds", 0 )
+	ROM_SYSTEM_BIOS(2, "gdos1", "G+DOS v1")
+	ROMX_LOAD("plusd_g1.rom", 0x0000, 0x2000, CRC(e29c0d41) SHA1(fd7e4557d0080a3532200ce72211eb1b185d7d0a), ROM_BIOS(2))
+
+	ROM_REGION( 0x400, "plds", 0 )
 	ROM_LOAD( "alice_pal20l8.ic4", 0x000, 0x144, CRC(60135856) SHA1(41273f13a3680b29ba84ae1e85829482c783c55e) )
+	ROM_LOAD( "v1_pal16l6.icx",    0x200, 0x157, CRC(77076102) SHA1(5142068ae01ff29979b08e6b322512750fbc6a04) )  // v1.0 pcb, ic ref unknown (no silkscreen on pcb!), gal20v8 target
 ROM_END
 
 //-------------------------------------------------

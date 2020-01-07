@@ -45,7 +45,6 @@ known issues:
     - no artwork
 
     Metal Hawk
-    - tilemap issues (ex : Result and stage select screen)
     - ROZ wraparound isn't implemented
 
 The Namco System II board is a 5 ( only 4 are emulated ) CPU system. The
@@ -706,21 +705,31 @@ void namcos2_state::common_default_am(address_map &map)
 	map(0xd00000, 0xd0000f).rw(FUNC(namcos2_state::namcos2_68k_key_r), FUNC(namcos2_state::namcos2_68k_key_w));
 }
 
-void namcos2_state::master_default_am(address_map &map)
+void namcos2_state::master_common_am(address_map &map)
 {
-	common_default_am(map);
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x10ffff).ram();
 	map(0x180000, 0x183fff).rw(FUNC(namcos2_state::eeprom_r), FUNC(namcos2_state::eeprom_w)).umask16(0x00ff);
 	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
 }
 
-void namcos2_state::slave_default_am(address_map &map)
+void namcos2_state::slave_common_am(address_map &map)
 {
-	common_default_am(map);
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x13ffff).ram();
 	map(0x1c0000, 0x1fffff).m(m_slave_intc, FUNC(namco_c148_device::map));
+}
+
+void namcos2_state::master_default_am(address_map &map)
+{
+	common_default_am(map);
+	master_common_am(map);
+}
+
+void namcos2_state::slave_default_am(address_map &map)
+{
+	common_default_am(map);
+	slave_common_am(map);
 }
 
 
@@ -739,18 +748,13 @@ void namcos2_state::common_finallap_am(address_map &map)
 void namcos2_state::master_finallap_am(address_map &map)
 {
 	common_finallap_am(map);
-	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x10ffff).ram();
-	map(0x180000, 0x183fff).rw(FUNC(namcos2_state::eeprom_r), FUNC(namcos2_state::eeprom_w)).umask16(0x00ff);
-	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
+	master_common_am(map);
 }
 
 void namcos2_state::slave_finallap_am(address_map &map)
 {
 	common_finallap_am(map);
-	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x13ffff).ram();
-	map(0x1c0000, 0x1fffff).m(m_slave_intc, FUNC(namco_c148_device::map));
+	slave_common_am(map);
 }
 
 /*************************************************************/
@@ -766,18 +770,13 @@ void namcos2_state::common_sgunner_am(address_map &map)
 void namcos2_state::master_sgunner_am(address_map &map)
 {
 	common_sgunner_am(map);
-	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x10ffff).ram();
-	map(0x180000, 0x183fff).rw(FUNC(namcos2_state::eeprom_r), FUNC(namcos2_state::eeprom_w)).umask16(0x00ff);
-	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
+	master_common_am(map);
 }
 
 void namcos2_state::slave_sgunner_am(address_map &map)
 {
 	common_sgunner_am(map);
-	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x13ffff).ram();
-	map(0x1c0000, 0x1fffff).m(m_slave_intc, FUNC(namco_c148_device::map));
+	slave_common_am(map);
 }
 
 /*************************************************************/
@@ -794,18 +793,13 @@ void namcos2_state::common_metlhawk_am(address_map &map)
 void namcos2_state::master_metlhawk_am(address_map &map)
 {
 	common_metlhawk_am(map);
-	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x10ffff).ram();
-	map(0x180000, 0x183fff).rw(FUNC(namcos2_state::eeprom_r), FUNC(namcos2_state::eeprom_w)).umask16(0x00ff);
-	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
+	master_common_am(map);
 }
 
 void namcos2_state::slave_metlhawk_am(address_map &map)
 {
 	common_metlhawk_am(map);
-	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x13ffff).ram();
-	map(0x1c0000, 0x1fffff).m(m_slave_intc, FUNC(namco_c148_device::map));
+	slave_common_am(map);
 }
 
 /*************************************************************/
@@ -822,47 +816,44 @@ void namcos2_state::common_suzuka8h_am(address_map &map)
 	map(0xf00000, 0xf00007).rw(FUNC(namcos2_state::namcos2_68k_key_r), FUNC(namcos2_state::namcos2_68k_key_w));
 }
 
+void namcos2_state::common_suzuka8h_roz_am(address_map &map)
+{
+	map(0xc00000, 0xc0ffff).noprw(); // no ROZ hardware implemented in PCB
+	map(0xd00000, 0xd0001f).noprw(); // ^^
+}
 
 void namcos2_state::master_suzuka8h_am(address_map &map)
 {
 	common_suzuka8h_am(map);
-	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x10ffff).ram();
-	map(0x180000, 0x183fff).rw(FUNC(namcos2_state::eeprom_r), FUNC(namcos2_state::eeprom_w)).umask16(0x00ff);
-	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
-	map(0xc00000, 0xc0ffff).ram(); // is roz hardware populated?
-	map(0xd00000, 0xd0001f).ram(); // is roz hardware populated?
+	master_common_am(map);
+	common_suzuka8h_roz_am(map);
 }
 
 void namcos2_state::slave_suzuka8h_am(address_map &map)
 {
 	common_suzuka8h_am(map);
-	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x13ffff).ram();
-	map(0x1c0000, 0x1fffff).m(m_slave_intc, FUNC(namco_c148_device::map));
-	map(0xc00000, 0xc0ffff).ram(); // is roz hardware populated?
-	map(0xd00000, 0xd0001f).ram(); // is roz hardware populated?
+	slave_common_am(map);
+	common_suzuka8h_roz_am(map);
+}
+
+void namcos2_state::common_luckywld_roz_am(address_map &map)
+{
+	map(0xc00000, 0xc0ffff).rw(m_c169roz, FUNC(namco_c169roz_device::videoram_r), FUNC(namco_c169roz_device::videoram_w));
+	map(0xd00000, 0xd0001f).rw(m_c169roz, FUNC(namco_c169roz_device::control_r), FUNC(namco_c169roz_device::control_w));
 }
 
 void namcos2_state::master_luckywld_am(address_map &map)
 {
 	common_suzuka8h_am(map);
-	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x10ffff).ram();
-	map(0x180000, 0x183fff).rw(FUNC(namcos2_state::eeprom_r), FUNC(namcos2_state::eeprom_w)).umask16(0x00ff);
-	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
-	map(0xc00000, 0xc0ffff).rw(m_c169roz, FUNC(namco_c169roz_device::videoram_r), FUNC(namco_c169roz_device::videoram_w));
-	map(0xd00000, 0xd0001f).rw(m_c169roz, FUNC(namco_c169roz_device::control_r), FUNC(namco_c169roz_device::control_w));
+	master_common_am(map);
+	common_luckywld_roz_am(map);
 }
 
 void namcos2_state::slave_luckywld_am(address_map &map)
 {
 	common_suzuka8h_am(map);
-	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x13ffff).ram();
-	map(0x1c0000, 0x1fffff).m(m_slave_intc, FUNC(namco_c148_device::map));
-	map(0xc00000, 0xc0ffff).rw(m_c169roz, FUNC(namco_c169roz_device::videoram_r), FUNC(namco_c169roz_device::videoram_w));
-	map(0xd00000, 0xd0001f).rw(m_c169roz, FUNC(namco_c169roz_device::control_r), FUNC(namco_c169roz_device::control_w));
+	slave_common_am(map);
+	common_luckywld_roz_am(map);
 }
 
 /*************************************************************/
@@ -1705,6 +1696,32 @@ void namcos2_state::configure_c68_standard(machine_config &config)
 	m_c68->dp_out_callback().set(FUNC(namcos2_state::dpram_byte_w));
 }
 
+void namcos2_state::configure_common_standard(machine_config &config)
+{
+	M68000(config, m_maincpu, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
+	TIMER(config, "scantimer").configure_scanline(FUNC(namcos2_state::screen_scanline), "screen", 0, 1);
+
+	M68000(config, m_slave, M68K_CPU_CLOCK); /*  12.288MHz (49.152MHz OSC/4) */
+
+	MC6809E(config, m_audiocpu, M68B09_CPU_CLOCK); /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
+	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+
+	NAMCO_C139(config, m_sci, 0);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8);
+	m_screen->set_palette(m_c116);
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
+	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
+	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
+}
+
 // TODO: temp
 TIMER_DEVICE_CALLBACK_MEMBER(namcos2_state::screen_scanline)
 {
@@ -1744,52 +1761,69 @@ void namcos2_state::configure_c123tmap_standard(machine_config &config)
 	m_c123tmap->set_color_base(16*256);
 }
 
-void namcos2_state::base_noio(machine_config &config)
+void namcos2_state::configure_c169roz_standard(machine_config &config)
 {
-	M68000(config, m_maincpu, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcos2_state::master_default_am);
-	TIMER(config, "scantimer").configure_scanline(FUNC(namcos2_state::screen_scanline), "screen", 0, 1);
+	NAMCO_C169ROZ(config, m_c169roz, 0);
+	m_c169roz->set_palette(m_c116);
+	m_c169roz->set_is_namcofl(false);
+	m_c169roz->set_ram_words(0x10000/2);
+	m_c169roz->set_color_base(0*256);
+}
 
-	M68000(config, m_slave, M68K_CPU_CLOCK); /*  12.288MHz (49.152MHz OSC/4) */
-	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_default_am);
+void namcos2_state::configure_c355spr_standard(machine_config &config)
+{
+	NAMCO_C355SPR(config, m_c355spr, 0);
+	m_c355spr->set_screen(m_screen);
+	m_c355spr->set_palette(m_c116);
+	m_c355spr->set_scroll_offsets(0x26, 0x19);
+	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
+	m_c355spr->set_palxor(0x0);
+	m_c355spr->set_color_base(0);
+}
 
-	MC6809E(config, m_audiocpu, M68B09_CPU_CLOCK); /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
-	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
+void namcos2_state::configure_c45road_standard(machine_config &config)
+{
+	NAMCO_C45_ROAD(config, m_c45_road, 0);
+	m_c45_road->set_palette(m_c116);
+}
 
-	config.set_maximum_quantum(attotime::from_hz(12000)); /* CPU slices per frame */
-
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
-	configure_c148_standard(config);
-	NAMCO_C139(config, m_sci, 0);
-
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8);
-	m_screen->set_screen_update(FUNC(namcos2_state::screen_update));
-	m_screen->set_palette(m_c116);
-
-	configure_c123tmap_standard(config);
-
+void namcos2_state::configure_namcos2_sprite_standard(machine_config &config)
+{
 	NAMCOS2_SPRITE(config, m_ns2sprite, 0);
 	m_ns2sprite->set_gfxdecode_tag("gfxdecode");
 	m_ns2sprite->set_spriteram_tag("spriteram");
+}
 
+void namcos2_state::configure_namcos2_roz_standard(machine_config &config)
+{
 	NAMCOS2_ROZ(config, m_ns2roz, 0);
 	m_ns2roz->set_palette(m_c116);
 	m_ns2roz->set_rozram_tag("rozram");
 	m_ns2roz->set_rozctrl_tag("rozctrl");
+}
 
+void namcos2_state::base_noio(machine_config &config)
+{
+	configure_common_standard(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos2_state::master_default_am);
+
+	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_default_am);
+
+	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
+
+	config.set_maximum_quantum(attotime::from_hz(12000)); /* CPU slices per frame */
+
+	configure_c148_standard(config);
 	configure_c116_standard(config);
+
+	m_screen->set_screen_update(FUNC(namcos2_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_c116, gfx_namcos2);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	configure_namcos2_sprite_standard(config);
+	configure_c123tmap_standard(config);
+	configure_namcos2_roz_standard(config);
 
-	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
-	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
-	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	m_c140->add_route(0, "lspeaker", 0.75);
 	m_c140->add_route(1, "rspeaker", 0.75);
 
@@ -1838,52 +1872,28 @@ void namcos2_state::base3(machine_config &config)
 
 void namcos2_state::gollygho(machine_config &config)
 {
-	M68000(config, m_maincpu, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
+	configure_common_standard(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos2_state::master_default_am);
-	TIMER(config, "scantimer").configure_scanline(FUNC(namcos2_state::screen_scanline), "screen", 0, 1);
 
-	M68000(config, m_slave, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
 	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_default_am);
 
-	MC6809E(config, m_audiocpu, M68B09_CPU_CLOCK); /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
-	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
 
 	configure_c65_standard(config);
 
 	config.set_maximum_quantum(attotime::from_hz(6000)); /* CPU slices per frame */
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
 	configure_c148_standard(config);
-	NAMCO_C139(config, m_sci, 0);
+	configure_c116_standard(config);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8);
 	m_screen->set_screen_update(FUNC(namcos2_state::screen_update));
-	m_screen->set_palette(m_c116);
 
 	GFXDECODE(config, m_gfxdecode, m_c116, gfx_namcos2);
 
+	configure_namcos2_sprite_standard(config);
 	configure_c123tmap_standard(config);
+	configure_namcos2_roz_standard(config);
 
-	NAMCOS2_SPRITE(config, m_ns2sprite, 0);
-	m_ns2sprite->set_gfxdecode_tag("gfxdecode");
-	m_ns2sprite->set_spriteram_tag("spriteram");
-
-	NAMCOS2_ROZ(config, m_ns2roz, 0);
-	m_ns2roz->set_palette(m_c116);
-	m_ns2roz->set_rozram_tag("rozram");
-	m_ns2roz->set_rozctrl_tag("rozctrl");
-
-	configure_c116_standard(config);
-
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
-	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
-	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	m_c140->add_route(0, "lspeaker", 0.75);
 	m_c140->add_route(1, "rspeaker", 0.75);
 
@@ -1893,48 +1903,26 @@ void namcos2_state::gollygho(machine_config &config)
 
 void namcos2_state::finallap_noio(machine_config &config)
 {
-	M68000(config, m_maincpu, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
+	configure_common_standard(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos2_state::master_finallap_am);
-	TIMER(config, "scantimer").configure_scanline(FUNC(namcos2_state::screen_scanline), "screen", 0, 1);
 
-	M68000(config, m_slave, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
 	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_finallap_am);
 
-	MC6809E(config, m_audiocpu, M68B09_CPU_CLOCK); /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
-	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
 
 	config.set_maximum_quantum(attotime::from_hz(6000)); /* CPU slices per frame */
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
 	configure_c148_standard(config);
-	NAMCO_C139(config, m_sci, 0);
+	configure_c116_standard(config);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8);
 	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_finallap));
-	m_screen->set_palette(m_c116);
 
 	GFXDECODE(config, m_gfxdecode, m_c116, gfx_namcos2);
 
+	configure_namcos2_sprite_standard(config);
 	configure_c123tmap_standard(config);
+	configure_c45road_standard(config);
 
-	NAMCOS2_SPRITE(config, m_ns2sprite, 0);
-	m_ns2sprite->set_gfxdecode_tag("gfxdecode");
-	m_ns2sprite->set_spriteram_tag("spriteram");
-
-	configure_c116_standard(config);
-
-	NAMCO_C45_ROAD(config, m_c45_road, 0);
-	m_c45_road->set_palette(m_c116);
-
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
-	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
-	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	m_c140->add_route(0, "lspeaker", 0.75);
 	m_c140->add_route(1, "rspeaker", 0.75);
 
@@ -1972,51 +1960,27 @@ void namcos2_state::finalap3(machine_config &config)
 
 void namcos2_state::sgunner(machine_config &config)
 {
-	M68000(config, m_maincpu, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
+	configure_common_standard(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos2_state::master_sgunner_am);
-	TIMER(config, "scantimer").configure_scanline(FUNC(namcos2_state::screen_scanline), "screen", 0, 1);
 
-	M68000(config, m_slave, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
 	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_sgunner_am);
 
-	MC6809E(config, m_audiocpu, M68B09_CPU_CLOCK); /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
-	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
 
 	configure_c65_standard(config);
 
 	config.set_maximum_quantum(attotime::from_hz(6000)); /* CPU slices per frame */
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
 	configure_c148_standard(config);
-	NAMCO_C139(config, m_sci, 0);
-
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8);
-	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_sgunner));
-	m_screen->set_palette(m_c116);
-
-	NAMCO_C355SPR(config, m_c355spr, 0);
-	m_c355spr->set_screen(m_screen);
-	m_c355spr->set_palette(m_c116);
-	m_c355spr->set_scroll_offsets(0x26, 0x19);
-	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
-	m_c355spr->set_palxor(0x0);
-	m_c355spr->set_color_base(0);
-
-	configure_c123tmap_standard(config);
-
 	configure_c116_standard(config);
+
+	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_sgunner));
+
+	configure_c355spr_standard(config);
+	configure_c123tmap_standard(config);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
-	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
-	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	m_c140->add_route(0, "lspeaker", 0.75);
 	m_c140->add_route(1, "rspeaker", 0.75);
 
@@ -2025,51 +1989,27 @@ void namcos2_state::sgunner(machine_config &config)
 
 void namcos2_state::sgunner2(machine_config &config)
 {
-	M68000(config, m_maincpu, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
+	configure_common_standard(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos2_state::master_sgunner_am);
-	TIMER(config, "scantimer").configure_scanline(FUNC(namcos2_state::screen_scanline), "screen", 0, 1);
 
-	M68000(config, m_slave, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
 	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_sgunner_am);
 
-	MC6809E(config, m_audiocpu, M68B09_CPU_CLOCK); /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
-	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
 
 	configure_c68_standard(config);
 
 	config.set_maximum_quantum(attotime::from_hz(6000)); /* CPU slices per frame */
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
 	configure_c148_standard(config);
-	NAMCO_C139(config, m_sci, 0);
-
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8);
-	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_sgunner));
-	m_screen->set_palette(m_c116);
-
-	NAMCO_C355SPR(config, m_c355spr, 0);
-	m_c355spr->set_screen(m_screen);
-	m_c355spr->set_palette(m_c116);
-	m_c355spr->set_scroll_offsets(0x26, 0x19);
-	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
-	m_c355spr->set_palxor(0x0);
-	m_c355spr->set_color_base(0);
-
-	configure_c123tmap_standard(config);
-
 	configure_c116_standard(config);
+
+	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_sgunner));
+
+	configure_c355spr_standard(config);
+	configure_c123tmap_standard(config);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
-	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
-	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	m_c140->add_route(0, "lspeaker", 0.75);
 	m_c140->add_route(1, "rspeaker", 0.75);
 
@@ -2078,54 +2018,28 @@ void namcos2_state::sgunner2(machine_config &config)
 
 void namcos2_state::suzuka8h(machine_config &config)
 {
-	M68000(config, m_maincpu, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
+	configure_common_standard(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos2_state::master_suzuka8h_am);
-	TIMER(config, "scantimer").configure_scanline(FUNC(namcos2_state::screen_scanline), "screen", 0, 1);
 
-	M68000(config, m_slave, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
 	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_suzuka8h_am);
 
-	MC6809E(config, m_audiocpu, M68B09_CPU_CLOCK); /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
-	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
 
 	configure_c68_standard(config);
 
 	config.set_maximum_quantum(attotime::from_hz(6000)); /* CPU slices per frame */
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
 	configure_c148_standard(config);
-	NAMCO_C139(config, m_sci, 0);
-
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8);
-	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_luckywld));
-	m_screen->set_palette(m_c116);
-
-	NAMCO_C355SPR(config, m_c355spr, 0);
-	m_c355spr->set_screen(m_screen);
-	m_c355spr->set_palette(m_c116);
-	m_c355spr->set_scroll_offsets(0x26, 0x19);
-	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
-	m_c355spr->set_palxor(0x0);
-	m_c355spr->set_color_base(0);
-
-	configure_c123tmap_standard(config);
-
 	configure_c116_standard(config);
+
+	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_luckywld));
+
+	configure_c355spr_standard(config);
+	configure_c123tmap_standard(config);
+	configure_c45road_standard(config);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, luckywld)
 
-	NAMCO_C45_ROAD(config, m_c45_road, 0);
-	m_c45_road->set_palette(m_c116);
-
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
-	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
-	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	m_c140->add_route(0, "lspeaker", 0.75);
 	m_c140->add_route(1, "rspeaker", 0.75);
 
@@ -2140,66 +2054,37 @@ void namcos2_state::luckywld(machine_config &config)
 
 	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_luckywld_am);
 
-	NAMCO_C169ROZ(config, m_c169roz, 0);
-	m_c169roz->set_palette(m_c116);
-	m_c169roz->set_is_namcofl(false);
-	m_c169roz->set_ram_words(0x10000/2);
+	configure_c169roz_standard(config);
 	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namcos2_state::RozCB_luckywld, this));
-	m_c169roz->set_color_base(0*256);
 }
 
 void namcos2_state::metlhawk(machine_config &config)
 {
-	M68000(config, m_maincpu, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
+	configure_common_standard(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos2_state::master_metlhawk_am);
-	TIMER(config, "scantimer").configure_scanline(FUNC(namcos2_state::screen_scanline), "screen", 0, 1);
 
-	M68000(config, m_slave, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
 	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_metlhawk_am);
 
-	MC6809E(config, m_audiocpu, M68B09_CPU_CLOCK); /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
-	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
 
 	configure_c65_standard(config);
 
 	config.set_maximum_quantum(attotime::from_hz(6000)); /* CPU slices per frame */
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
 	configure_c148_standard(config);
-	NAMCO_C139(config, m_sci, 0);
+	configure_c116_standard(config);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8);
 	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_metlhawk));
-	m_screen->set_palette(m_c116);
 
 	GFXDECODE(config, m_gfxdecode, m_c116, gfx_metlhawk);
 
-	NAMCO_C169ROZ(config, m_c169roz, 0);
-	m_c169roz->set_palette(m_c116);
-	m_c169roz->set_is_namcofl(false);
-	m_c169roz->set_ram_words(0x10000/2);
-	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namcos2_state::RozCB_metlhawk, this));
-	m_c169roz->set_color_base(0*256);
-
+	configure_namcos2_sprite_standard(config);
 	configure_c123tmap_standard(config);
-
-	NAMCOS2_SPRITE(config, m_ns2sprite, 0);
-	m_ns2sprite->set_gfxdecode_tag("gfxdecode");
-	m_ns2sprite->set_spriteram_tag("spriteram");
-
-	configure_c116_standard(config);
+	configure_c169roz_standard(config);
+	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namcos2_state::RozCB_metlhawk, this));
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, metlhawk)
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
-	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM2);
-	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	m_c140->add_route(0, "lspeaker", 1.0);
 	m_c140->add_route(1, "rspeaker", 1.0);
 

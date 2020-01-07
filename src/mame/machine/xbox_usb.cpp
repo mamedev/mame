@@ -124,9 +124,12 @@ WRITE32_MEMBER(ohci_usb_controller::write)
 		ohcist.state = hcfs;
 	}
 	if (offset == HcCommandStatus) {
-		if (data & 1) // HostControllerReset
-			ohcist.hc_regs[HcControl] |= 3 << 6;
 		ohcist.hc_regs[HcCommandStatus] |= data;
+		if (data & 1) // HostControllerReset
+		{
+			ohcist.hc_regs[HcControl] |= 3 << 6;
+			ohcist.hc_regs[HcCommandStatus] &= ~1;
+		}
 		return;
 	}
 	if (offset == HcInterruptStatus) {
@@ -231,7 +234,8 @@ void ohci_usb_controller::timer(emu_timer &timer, device_timer_id id, int param,
 	if (ohcist.state == UsbOperational) {
 		// increment frame number
 		ohcist.framenumber = (ohcist.framenumber + 1) & 0xffff;
-		ohcist.space->write_dword(hcca + 0x80, ohcist.framenumber);
+		if (hcca)
+			ohcist.space->write_dword(hcca + 0x80, ohcist.framenumber);
 		ohcist.hc_regs[HcFmNumber] = ohcist.framenumber;
 	}
 	// port reset delay
@@ -682,6 +686,8 @@ void ohci_usb_controller::timer(emu_timer &timer, device_timer_id id, int param,
 					else
 						list = 0; // if no control or bulk lists, go to periodic list
 				}
+				else
+					list = 0;
 			}
 		}
 		if (ohcist.framenumber == 0)
@@ -695,7 +701,8 @@ void ohci_usb_controller::timer(emu_timer &timer, device_timer_id id, int param,
 			if ((ohcist.hc_regs[HcInterruptStatus] & ohcist.hc_regs[HcInterruptEnable]) != WritebackDoneHead)
 				b = 1;
 			ohcist.hc_regs[HcInterruptStatus] |= WritebackDoneHead;
-			ohcist.space->write_dword(hcca + 0x84, ohcist.hc_regs[HcDoneHead] | b);
+			if (hcca)
+				ohcist.space->write_dword(hcca + 0x84, ohcist.hc_regs[HcDoneHead] | b);
 			ohcist.hc_regs[HcDoneHead] = 0;
 			ohcist.writebackdonehadcounter = 7;
 		}

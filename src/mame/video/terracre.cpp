@@ -186,6 +186,9 @@ uint32_t terracre_state::screen_update_amazon(screen_device &screen, bitmap_ind1
 		m_background->draw(screen, bitmap, cliprect, 0, 0 );
 
 	draw_sprites(bitmap,cliprect );
-	m_foreground->draw(screen, bitmap, cliprect, 0, 0 );
+
+	if ((m_xscroll & 0x1000) == 0)
+		m_foreground->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }

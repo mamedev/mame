@@ -23,7 +23,6 @@ Note: To start a game, certain switches need to be activated.  You must first pr
 #include "emu.h"
 #include "includes/s11a.h"
 
-#include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
@@ -237,6 +236,7 @@ void s11a_state::s11a(machine_config &config)
 
 	/* Add the soundcard */
 	M6802(config, m_audiocpu, XTAL(4'000'000));
+	m_audiocpu->set_ram_enable(false);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &s11a_state::s11a_audio_map);
 
 	SPEAKER(config, "speaker").front_center();

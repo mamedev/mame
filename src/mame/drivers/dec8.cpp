@@ -2628,43 +2628,87 @@ ROM_END
 
 ROM_START( gondo )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "dt-00.256", 0x08000, 0x08000, CRC(a8cf9118) SHA1(865744c9866957d686a31608d356e279fe58934e) )
-	ROM_LOAD( "dt-01.512", 0x10000, 0x10000, CRC(c39bb877) SHA1(9beb59ba19f38417c5d4d36e8f3c41f2b017d2d6) )
-	ROM_LOAD( "dt-02.512", 0x20000, 0x10000, CRC(bb5e674b) SHA1(8057dc7464a8b6987536f248d607957923b223cf) )
-	ROM_LOAD( "dt-03.512", 0x30000, 0x10000, CRC(99c32b13) SHA1(3d79f48e7d198cb2e519d592a89eda505044bce5) )
+	ROM_LOAD( "dt00-e.f3", 0x08000, 0x08000, CRC(912a7eee) SHA1(15af89babf166dadaa77640e1973d7ebb4c078db) ) // Verified only DT00-E & DT03-E have the "-E" extention
+	ROM_LOAD( "dt01.f5",   0x10000, 0x10000, CRC(c39bb877) SHA1(9beb59ba19f38417c5d4d36e8f3c41f2b017d2d6) )
+	ROM_LOAD( "dt02.f6",   0x20000, 0x10000, CRC(bb5e674b) SHA1(8057dc7464a8b6987536f248d607957923b223cf) )
+	ROM_LOAD( "dt03-e.f7", 0x30000, 0x10000, CRC(ee7475eb) SHA1(8c68198ea1c3e89c9c2c4ba0e5d3f47afb8eecd4) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "dt-05.256", 0x8000, 0x8000, CRC(ec08aa29) SHA1(ce83974ae095d9518d1ebf9f7e712f0cbc2c1b42) )
+	ROM_LOAD( "dt05-e.h5", 0x8000, 0x8000, CRC(ec08aa29) SHA1(ce83974ae095d9518d1ebf9f7e712f0cbc2c1b42) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
+	ROM_LOAD( "dt-e.b1", 0x0000, 0x1000, NO_DUMP ) // No decapped dump or hand crafted code for this set
+
+	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
+	ROM_LOAD( "dt14.b18", 0x00000, 0x08000, CRC(4bef16e1) SHA1(b8157a7a1b8f36cea1fd353267a4e03d920cb4aa) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites */
+	ROM_LOAD( "dt19.f13",   0x00000, 0x10000, CRC(da2abe4b) SHA1(d53e4769671f3fd437edcff7e7ea05156bbcb45d) ) // All sprite data matches the Japanese set
+	ROM_LOAD( "dt20-e.f15", 0x10000, 0x08000, CRC(0eef7f56) SHA1(05c23aa6a598478cd4822634cff96055c585e9d2) ) // Verified only DT17-E, DT18-E, DT20-E & DT22-E have the "-E" extention
+	ROM_LOAD( "dt16.f9",    0x20000, 0x10000, CRC(e9955d8f) SHA1(aeef5e18f9d36c1bab3000e95205ce1b18cfbf0b) ) // DT15, DT16, DT19 & DT21 do NOT have the "-E" extention
+	ROM_LOAD( "dt18-e.f12", 0x30000, 0x08000, CRC(2b2d1468) SHA1(a144ac1b367e1fec876156230e9ab1c99416962e) )
+	ROM_LOAD( "dt15.f8",    0x40000, 0x10000, CRC(a54b2eb6) SHA1(25cb61f67135672154f1ad8e0c49ec04655e91de) )
+	ROM_LOAD( "dt17-e.f11", 0x50000, 0x08000, CRC(75ae349a) SHA1(15755a28925d5ed37fab4bd988716fcc5d20c290) )
+	ROM_LOAD( "dt21.f16",   0x60000, 0x10000, CRC(1c5f682d) SHA1(4b7022cce930a9e9a0087c91e8344269fe7ed889) )
+	ROM_LOAD( "dt22-e.f18", 0x70000, 0x08000, CRC(c8ffb148) SHA1(ae1a8b3cd1f5e423dc1a3c7d05f9fe7c689432e3) )
+
+	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles */
+	ROM_LOAD( "dt08.h10", 0x00000, 0x08000, CRC(aec483f5) SHA1(1d6de823ab0eeb9c89e9c227428ff278663627f3) ) // Tiles data is the same for all 3 regions
+	ROM_CONTINUE(         0x10000, 0x08000 )
+	ROM_LOAD( "dt09.h12", 0x08000, 0x08000, CRC(446f0ce0) SHA1(072b88d6de5aa0ed6b1d60c266bcf170dea927d5) )
+	ROM_LOAD( "dt06.h7",  0x20000, 0x08000, CRC(3fe1527f) SHA1(b8df4bef2b1a879b65214025fc3b5998ef5c8886) )
+	ROM_CONTINUE(         0x30000, 0x08000 )
+	ROM_LOAD( "dt07.h9",  0x28000, 0x08000, CRC(61f9bce5) SHA1(ef8a5f5e4c66a143304bcab50ca87579f1507864) )
+	ROM_LOAD( "dt12.h16", 0x40000, 0x08000, CRC(1a72ca8d) SHA1(f412758452cb3417e85c355ccb8794fde7edf1cc) )
+	ROM_CONTINUE(         0x50000, 0x08000 )
+	ROM_LOAD( "dt13.h18", 0x48000, 0x08000, CRC(ccb81aec) SHA1(56e524ed4373b7bd1074a0d22ff75ede379f1696) )
+	ROM_LOAD( "dt10.h13", 0x60000, 0x08000, CRC(cfcfc9ed) SHA1(57f43d638cf864d68420f0203740be7bda9da5ca) )
+	ROM_CONTINUE(         0x70000, 0x08000 )
+	ROM_LOAD( "dt11.h15", 0x68000, 0x08000, CRC(53e9cf17) SHA1(8cbb45154a60f42f1b1e7299b12d2e92fc194df8) )
+
+	ROM_REGION( 1024, "proms", 0 )
+	ROM_LOAD( "ds-23.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) /* BPROM type MB7122E for Priority (Not yet used) */
+ROM_END
+
+ROM_START( gondou )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "dt00.f3", 0x08000, 0x08000, CRC(a8cf9118) SHA1(865744c9866957d686a31608d356e279fe58934e) )
+	ROM_LOAD( "dt01.f5", 0x10000, 0x10000, CRC(c39bb877) SHA1(9beb59ba19f38417c5d4d36e8f3c41f2b017d2d6) )
+	ROM_LOAD( "dt02.f6", 0x20000, 0x10000, CRC(bb5e674b) SHA1(8057dc7464a8b6987536f248d607957923b223cf) )
+	ROM_LOAD( "dt03.f7", 0x30000, 0x10000, CRC(99c32b13) SHA1(3d79f48e7d198cb2e519d592a89eda505044bce5) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "dt05.h5", 0x8000, 0x8000, CRC(ec08aa29) SHA1(ce83974ae095d9518d1ebf9f7e712f0cbc2c1b42) ) // == dt05-e.h5
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
 	ROM_LOAD( "dt-a.b1", 0x0000, 0x1000, CRC(03abceeb) SHA1(a16b779d7cea1c1437f85fa6b6e08894a46a5674) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
-	ROM_LOAD( "dt-14.256", 0x00000, 0x08000, CRC(4bef16e1) SHA1(b8157a7a1b8f36cea1fd353267a4e03d920cb4aa) )
+	ROM_LOAD( "dt14.b18", 0x00000, 0x08000, CRC(4bef16e1) SHA1(b8157a7a1b8f36cea1fd353267a4e03d920cb4aa) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites */
-	ROM_LOAD( "dt-19.512", 0x00000, 0x10000, CRC(da2abe4b) SHA1(d53e4769671f3fd437edcff7e7ea05156bbcb45d) )
-	ROM_LOAD( "dt-20.256", 0x10000, 0x08000, CRC(42d01002) SHA1(5a289ffdc83c05f21908a5d0b6247da5b51c1ddd) )
-	ROM_LOAD( "dt-16.512", 0x20000, 0x10000, CRC(e9955d8f) SHA1(aeef5e18f9d36c1bab3000e95205ce1b18cfbf0b) )
-	ROM_LOAD( "dt-18.256", 0x30000, 0x08000, CRC(c0c5df1c) SHA1(5b0f71f590434cdd0545ce098666798927727469) )
-	ROM_LOAD( "dt-15.512", 0x40000, 0x10000, CRC(a54b2eb6) SHA1(25cb61f67135672154f1ad8e0c49ec04655e91de) )
-	ROM_LOAD( "dt-17.256", 0x50000, 0x08000, CRC(3bbcff0d) SHA1(a8f7aa56ff49ed6b29240c3504d6c9945944953b) )
-	ROM_LOAD( "dt-21.512", 0x60000, 0x10000, CRC(1c5f682d) SHA1(4b7022cce930a9e9a0087c91e8344269fe7ed889) )
-	ROM_LOAD( "dt-22.256", 0x70000, 0x08000, CRC(c1876a5f) SHA1(66122ce765723765e20036bd4d461a210c8b94d3) )
+	ROM_LOAD( "dt19.f13", 0x00000, 0x10000, CRC(da2abe4b) SHA1(d53e4769671f3fd437edcff7e7ea05156bbcb45d) )
+	ROM_LOAD( "dt20.f15", 0x10000, 0x08000, CRC(42d01002) SHA1(5a289ffdc83c05f21908a5d0b6247da5b51c1ddd) ) // Unique data to the US set
+	ROM_LOAD( "dt16.f9",  0x20000, 0x10000, CRC(e9955d8f) SHA1(aeef5e18f9d36c1bab3000e95205ce1b18cfbf0b) )
+	ROM_LOAD( "dt18.f12", 0x30000, 0x08000, CRC(c0c5df1c) SHA1(5b0f71f590434cdd0545ce098666798927727469) ) // Unique data to the US set
+	ROM_LOAD( "dt15.f8",  0x40000, 0x10000, CRC(a54b2eb6) SHA1(25cb61f67135672154f1ad8e0c49ec04655e91de) )
+	ROM_LOAD( "dt17.f11", 0x50000, 0x08000, CRC(3bbcff0d) SHA1(a8f7aa56ff49ed6b29240c3504d6c9945944953b) ) // Unique data to the US set
+	ROM_LOAD( "dt21.f16", 0x60000, 0x10000, CRC(1c5f682d) SHA1(4b7022cce930a9e9a0087c91e8344269fe7ed889) )
+	ROM_LOAD( "dt22.f18", 0x70000, 0x08000, CRC(c1876a5f) SHA1(66122ce765723765e20036bd4d461a210c8b94d3) ) // Unique data to the US set
 
 	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles */
-	ROM_LOAD( "dt-08.512", 0x00000, 0x08000, CRC(aec483f5) SHA1(1d6de823ab0eeb9c89e9c227428ff278663627f3) )
-	ROM_CONTINUE(          0x10000, 0x08000 )
-	ROM_LOAD( "dt-09.256", 0x08000, 0x08000, CRC(446f0ce0) SHA1(072b88d6de5aa0ed6b1d60c266bcf170dea927d5) )
-	ROM_LOAD( "dt-06.512", 0x20000, 0x08000, CRC(3fe1527f) SHA1(b8df4bef2b1a879b65214025fc3b5998ef5c8886) )
-	ROM_CONTINUE(          0x30000, 0x08000 )
-	ROM_LOAD( "dt-07.256", 0x28000, 0x08000, CRC(61f9bce5) SHA1(ef8a5f5e4c66a143304bcab50ca87579f1507864) )
-	ROM_LOAD( "dt-12.512", 0x40000, 0x08000, CRC(1a72ca8d) SHA1(f412758452cb3417e85c355ccb8794fde7edf1cc) )
-	ROM_CONTINUE(          0x50000, 0x08000 )
-	ROM_LOAD( "dt-13.256", 0x48000, 0x08000, CRC(ccb81aec) SHA1(56e524ed4373b7bd1074a0d22ff75ede379f1696) )
-	ROM_LOAD( "dt-10.512", 0x60000, 0x08000, CRC(cfcfc9ed) SHA1(57f43d638cf864d68420f0203740be7bda9da5ca) )
-	ROM_CONTINUE(          0x70000, 0x08000 )
-	ROM_LOAD( "dt-11.256", 0x68000, 0x08000, CRC(53e9cf17) SHA1(8cbb45154a60f42f1b1e7299b12d2e92fc194df8) )
+	ROM_LOAD( "dt08.h10", 0x00000, 0x08000, CRC(aec483f5) SHA1(1d6de823ab0eeb9c89e9c227428ff278663627f3) ) // Tiles data is the same for all 3 regions
+	ROM_CONTINUE(         0x10000, 0x08000 )
+	ROM_LOAD( "dt09.h12", 0x08000, 0x08000, CRC(446f0ce0) SHA1(072b88d6de5aa0ed6b1d60c266bcf170dea927d5) )
+	ROM_LOAD( "dt06.h7",  0x20000, 0x08000, CRC(3fe1527f) SHA1(b8df4bef2b1a879b65214025fc3b5998ef5c8886) )
+	ROM_CONTINUE(         0x30000, 0x08000 )
+	ROM_LOAD( "dt07.h9",  0x28000, 0x08000, CRC(61f9bce5) SHA1(ef8a5f5e4c66a143304bcab50ca87579f1507864) )
+	ROM_LOAD( "dt12.h16", 0x40000, 0x08000, CRC(1a72ca8d) SHA1(f412758452cb3417e85c355ccb8794fde7edf1cc) )
+	ROM_CONTINUE(         0x50000, 0x08000 )
+	ROM_LOAD( "dt13.h18", 0x48000, 0x08000, CRC(ccb81aec) SHA1(56e524ed4373b7bd1074a0d22ff75ede379f1696) )
+	ROM_LOAD( "dt10.h13", 0x60000, 0x08000, CRC(cfcfc9ed) SHA1(57f43d638cf864d68420f0203740be7bda9da5ca) )
+	ROM_CONTINUE(         0x70000, 0x08000 )
+	ROM_LOAD( "dt11.h15", 0x68000, 0x08000, CRC(53e9cf17) SHA1(8cbb45154a60f42f1b1e7299b12d2e92fc194df8) )
 
 	ROM_REGION( 1024, "proms", 0 )
 	ROM_LOAD( "ds-23.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) /* BPROM type MB7122E for Priority (Not yet used) */
@@ -2672,43 +2716,43 @@ ROM_END
 
 ROM_START( makyosen )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "ds00.f3",  0x08000, 0x08000, CRC(33bb16fe) SHA1(5d3873b66e0d08b35d56a8b508c774b27368a100) )
-	ROM_LOAD( "dt-01.512",0x10000, 0x10000, CRC(c39bb877) SHA1(9beb59ba19f38417c5d4d36e8f3c41f2b017d2d6) ) // ds01.f5
-	ROM_LOAD( "ds02.f6",  0x20000, 0x10000, CRC(925307a4) SHA1(1e8b8eb21df1a11b14c981b343b34c6cc3676517) )
-	ROM_LOAD( "ds03.f7",  0x30000, 0x10000, CRC(9c0fcbf6) SHA1(bfe42b5277fea111840a9f59b2cb8dfe44444029) )
+	ROM_LOAD( "ds00.f3", 0x08000, 0x08000, CRC(33bb16fe) SHA1(5d3873b66e0d08b35d56a8b508c774b27368a100) )
+	ROM_LOAD( "ds01.f5", 0x10000, 0x10000, CRC(c39bb877) SHA1(9beb59ba19f38417c5d4d36e8f3c41f2b017d2d6) )
+	ROM_LOAD( "ds02.f6", 0x20000, 0x10000, CRC(925307a4) SHA1(1e8b8eb21df1a11b14c981b343b34c6cc3676517) )
+	ROM_LOAD( "ds03.f7", 0x30000, 0x10000, CRC(9c0fcbf6) SHA1(bfe42b5277fea111840a9f59b2cb8dfe44444029) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "ds05.h5",  0x8000, 0x8000, CRC(e6e28ca9) SHA1(3b1f8219331db1910bfb428f8964f8fc1063df6f) )
+	ROM_LOAD( "ds05.h5",  0x8000, 0x8000, CRC(e6e28ca9) SHA1(3b1f8219331db1910bfb428f8964f8fc1063df6f) ) // == dt05-e.h5
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
-	ROM_LOAD( "ds-a.b1",  0x0000, 0x1000, CRC(08f36e35) SHA1(e8913da71704a89fad41d5bfba45682119166681))
+	ROM_LOAD( "ds.b1",  0x0000, 0x1000, CRC(08f36e35) SHA1(e8913da71704a89fad41d5bfba45682119166681) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "ds14.b18", 0x00000, 0x08000, CRC(00cbe9c8) SHA1(de7b640de8fd54ee79194945c96d5768d09f483b) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites */
-	ROM_LOAD( "dt-19.512",0x00000, 0x10000, CRC(da2abe4b) SHA1(d53e4769671f3fd437edcff7e7ea05156bbcb45d) ) // ds19.f13
-	ROM_LOAD( "ds20.f15", 0x10000, 0x08000, CRC(0eef7f56) SHA1(05c23aa6a598478cd4822634cff96055c585e9d2) )
-	ROM_LOAD( "dt-16.512",0x20000, 0x10000, CRC(e9955d8f) SHA1(aeef5e18f9d36c1bab3000e95205ce1b18cfbf0b) ) // ds16.f9
-	ROM_LOAD( "ds18.f12", 0x30000, 0x08000, CRC(2b2d1468) SHA1(a144ac1b367e1fec876156230e9ab1c99416962e) )
-	ROM_LOAD( "dt-15.512",0x40000, 0x10000, CRC(a54b2eb6) SHA1(25cb61f67135672154f1ad8e0c49ec04655e91de) ) // ds15.f8
-	ROM_LOAD( "ds17.f11", 0x50000, 0x08000, CRC(75ae349a) SHA1(15755a28925d5ed37fab4bd988716fcc5d20c290) )
-	ROM_LOAD( "dt-21.512",0x60000, 0x10000, CRC(1c5f682d) SHA1(4b7022cce930a9e9a0087c91e8344269fe7ed889) ) // ds21.f16
-	ROM_LOAD( "ds22.f18", 0x70000, 0x08000, CRC(c8ffb148) SHA1(ae1a8b3cd1f5e423dc1a3c7d05f9fe7c689432e3) )
+	ROM_LOAD( "ds19.f13", 0x00000, 0x10000, CRC(da2abe4b) SHA1(d53e4769671f3fd437edcff7e7ea05156bbcb45d) ) // == dt19.f13
+	ROM_LOAD( "ds20.f15", 0x10000, 0x08000, CRC(0eef7f56) SHA1(05c23aa6a598478cd4822634cff96055c585e9d2) ) // == dt20-e.f15
+	ROM_LOAD( "ds16.f9",  0x20000, 0x10000, CRC(e9955d8f) SHA1(aeef5e18f9d36c1bab3000e95205ce1b18cfbf0b) ) // == dt16.f9
+	ROM_LOAD( "ds18.f12", 0x30000, 0x08000, CRC(2b2d1468) SHA1(a144ac1b367e1fec876156230e9ab1c99416962e) ) // == dt18-e.f12
+	ROM_LOAD( "ds15.f8",  0x40000, 0x10000, CRC(a54b2eb6) SHA1(25cb61f67135672154f1ad8e0c49ec04655e91de) ) // == dt15.f8
+	ROM_LOAD( "ds17.f11", 0x50000, 0x08000, CRC(75ae349a) SHA1(15755a28925d5ed37fab4bd988716fcc5d20c290) ) // == dt17-e.f11
+	ROM_LOAD( "ds21.f16", 0x60000, 0x10000, CRC(1c5f682d) SHA1(4b7022cce930a9e9a0087c91e8344269fe7ed889) ) // == dt21.f16
+	ROM_LOAD( "ds22.f18", 0x70000, 0x08000, CRC(c8ffb148) SHA1(ae1a8b3cd1f5e423dc1a3c7d05f9fe7c689432e3) ) // == dt22-e.f18
 
 	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles */
-	ROM_LOAD( "dt-08.512",0x00000, 0x08000, CRC(aec483f5) SHA1(1d6de823ab0eeb9c89e9c227428ff278663627f3) ) // ds08.h10
+	ROM_LOAD( "ds08.h10", 0x00000, 0x08000, CRC(aec483f5) SHA1(1d6de823ab0eeb9c89e9c227428ff278663627f3) ) // Tiles data is the same for all 3 regions
 	ROM_CONTINUE(         0x10000, 0x08000 )
-	ROM_LOAD( "dt-09.256",0x08000, 0x08000, CRC(446f0ce0) SHA1(072b88d6de5aa0ed6b1d60c266bcf170dea927d5) ) // ds09.h12
-	ROM_LOAD( "dt-06.512",0x20000, 0x08000, CRC(3fe1527f) SHA1(b8df4bef2b1a879b65214025fc3b5998ef5c8886) ) // ds06.h7
+	ROM_LOAD( "ds09.h12", 0x08000, 0x08000, CRC(446f0ce0) SHA1(072b88d6de5aa0ed6b1d60c266bcf170dea927d5) )
+	ROM_LOAD( "ds06.h7",  0x20000, 0x08000, CRC(3fe1527f) SHA1(b8df4bef2b1a879b65214025fc3b5998ef5c8886) )
 	ROM_CONTINUE(         0x30000, 0x08000 )
-	ROM_LOAD( "dt-07.256",0x28000, 0x08000, CRC(61f9bce5) SHA1(ef8a5f5e4c66a143304bcab50ca87579f1507864) ) // ds07.h9
-	ROM_LOAD( "dt-12.512",0x40000, 0x08000, CRC(1a72ca8d) SHA1(f412758452cb3417e85c355ccb8794fde7edf1cc) ) // ds12.h16
+	ROM_LOAD( "ds07.h9",  0x28000, 0x08000, CRC(61f9bce5) SHA1(ef8a5f5e4c66a143304bcab50ca87579f1507864) )
+	ROM_LOAD( "ds12.h16", 0x40000, 0x08000, CRC(1a72ca8d) SHA1(f412758452cb3417e85c355ccb8794fde7edf1cc) )
 	ROM_CONTINUE(         0x50000, 0x08000 )
-	ROM_LOAD( "dt-13.256",0x48000, 0x08000, CRC(ccb81aec) SHA1(56e524ed4373b7bd1074a0d22ff75ede379f1696) ) // ds13.h18
-	ROM_LOAD( "dt-10.512",0x60000, 0x08000, CRC(cfcfc9ed) SHA1(57f43d638cf864d68420f0203740be7bda9da5ca) ) // ds10.h13
+	ROM_LOAD( "ds13.h18", 0x48000, 0x08000, CRC(ccb81aec) SHA1(56e524ed4373b7bd1074a0d22ff75ede379f1696) )
+	ROM_LOAD( "ds10.h13", 0x60000, 0x08000, CRC(cfcfc9ed) SHA1(57f43d638cf864d68420f0203740be7bda9da5ca) )
 	ROM_CONTINUE(         0x70000, 0x08000 )
-	ROM_LOAD( "dt-11.256",0x68000, 0x08000, CRC(53e9cf17) SHA1(8cbb45154a60f42f1b1e7299b12d2e92fc194df8) ) // ds11.h15
+	ROM_LOAD( "ds11.h15", 0x68000, 0x08000, CRC(53e9cf17) SHA1(8cbb45154a60f42f1b1e7299b12d2e92fc194df8) )
 
 	ROM_REGION( 1024, "proms", 0 )
 	ROM_LOAD( "ds-23.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) /* BPROM type MB7122E for Priority (Not yet used) */
@@ -2882,6 +2926,8 @@ ROM_START( ghostb3 )
 	ROM_LOAD( "dz20a.11d", 0x0400, 0x0400, CRC(d8fe2d99) SHA1(56f8fcf2f871c7d52d4299a5b9988401ada4319d) )
 ROM_END
 
+// DZ-1 is the verified correct MCU code for the ghostb3a set below - program ROMs work on a real PCB, but stall here in the demo mode
+// Both DZ01-2 & DZ04- ROMs have been verified correct from multiple sources
 ROM_START( ghostb3a )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "dz01-2.1d", 0x08000, 0x08000, CRC(1b16890e) SHA1(eebd253d616b6286937b72cfb64612877f383932) )
@@ -3610,7 +3656,8 @@ GAME( 1986, lastmisnu5, lastmisn, lastmisn, lastmisn,  dec8_state, init_dec8,   
 GAME( 1986, lastmisnj,  lastmisn, lastmisn, lastmisnj, dec8_state, init_dec8,    ROT270, "Data East Corporation", "Last Mission (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, shackled,   0,        shackled, shackled,  dec8_state, init_dec8,    ROT0,   "Data East USA",         "Shackled (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, breywood,   shackled, shackled, breywood,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Breywood (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gondo,      0,        gondo,    gondo,     dec8_state, init_dec8,    ROT270, "Data East USA",         "Gondomania (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gondo,      0,        gondo,    gondo,     dec8_state, init_dec8,    ROT270, "Data East Corporation", "Gondomania (World)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // i8751 protection MCU not dumped
+GAME( 1987, gondou,     gondo,    gondo,    gondo,     dec8_state, init_dec8,    ROT270, "Data East USA",         "Gondomania (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, makyosen,   gondo,    gondo,    gondo,     dec8_state, init_dec8,    ROT270, "Data East Corporation", "Makyou Senshi (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, garyoret,   0,        garyoret, garyoret,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Garyo Retsuden (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ghostb,     0,        ghostb,   ghostb,    dec8_state, init_dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players, revision 2)", MACHINE_SUPPORTS_SAVE )

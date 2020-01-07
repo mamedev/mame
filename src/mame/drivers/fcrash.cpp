@@ -17,11 +17,9 @@
     *1 these seem to be only CPS1.5/Q sound games?
     *2 this is original configuration, but non-Capcom (usually single-board) hardware.
 
-
     As per the above, this file now only contains games in second and last catergories.
     Eventually only Final Crash, other Final Fight bootlegs and Carrier Air Wing bootlegs will remain here.
 */
-
 
 /*
 
@@ -78,41 +76,13 @@ likely won't write any sprite clearing values otherwise.
 None of this is hooked up currently due to issues with row scroll on the scroll2 layer.
 
 
-
 Status of each game:
 --------------------
-cawingb2, cawingbl: ok
-
-dinopic: no sound   (moved to cps1bl_pic.cpp)
-
-dinopic2: no sound, one bad graphics ROM. Copying 8.bin from dinopic fixes it.   (moved to cps1bl_pic.cpp)
-
-fcrash, kodb: old sprites show on next screen. Patch used.
-
-punipic, punipic2: no sound. Problems in Central Park. Patches used.   (moved to cps1bl_pic.cpp)
-
-punipic3: same as punipic, and doors are missing.   (moved to cps1bl_pic.cpp)
-
-sf2m1: crowd is missing. Plane's tail comes off a bit. Patch used.
-
-sf2mdt, sf2mdtb: ok   (moved to cps1bl_5205.cpp)
-
-sf2mdta, sf2ceb: scroll 2X has strange 0x200 writes that cause missing fighters' portraits at the vs. screen    (moved to cps1bl_5205.cpp)
-                 and glitched backgrounds during fights. Masking them out seems a hack.
-
-sgyxz, wofabl: garbage left behind. A priority problem can be seen in 3rd demo where
-               the fighters walk through the crowd instead of behind.
-
-slampic: no sound. Some minor gfx issues (sprites on character select screen)   (moved to cps1bl_pic.cpp)
-
-slampic2: no sound. All gfx issues confirmed present on real board.   (moved to cps1bl_pic.cpp)
-
-captcommb2: ok    (moved to cps1bl_5205.cpp)
-
-knightsb3: ok    (moved to cps1bl_5205.cpp)
-
-dinopic3: no sound. Some minor gfx priority issues, confirmed present on real board.   (moved to cps1bl_pic.cpp)
-
+cawingb2, cawingbl: OK.
+fcrash, kodb:       Old sprites show on next screen. Patch used.
+sf2m1:              Crowd is missing. Plane's tail comes off a bit. Patch used.
+sgyxz, wofabl:      Garbage left behind. A priority problem can be seen in 3rd demo where
+                    the fighters walk through the crowd instead of behind.
 */
 
 #include "emu.h"
@@ -1352,8 +1322,6 @@ void fcrash_state::fcrash_render_layer( screen_device &screen, bitmap_ind16 &bit
 
 void fcrash_state::fcrash_render_high_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer )
 {
-	bitmap_ind16 dummy_bitmap;
-
 	switch (layer)
 	{
 		case 0:
@@ -1362,7 +1330,7 @@ void fcrash_state::fcrash_render_high_layer( screen_device &screen, bitmap_ind16
 		case 1:
 		case 2:
 		case 3:
-			m_bg_tilemap[layer - 1]->draw(screen, dummy_bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
+			m_bg_tilemap[layer - 1]->draw(screen, m_dummy_bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
 			break;
 	}
 }
@@ -1901,9 +1869,9 @@ ROM_END
 GAME( 1990, cawingbl,   cawing,  cawingbl,  cawingbl,  fcrash_state,  init_cawingbl,  ROT0,    "bootleg",  "Carrier Air Wing (bootleg with 2xYM2203 + 2xMSM5205, set 1)",  MACHINE_SUPPORTS_SAVE ) // 901012 ETC
 GAME( 1990, cawingb2,   cawing,  cawingbl,  cawingbl,  fcrash_state,  init_cawingbl,  ROT0,    "bootleg",  "Carrier Air Wing (bootleg with 2xYM2203 + 2xMSM5205, set 2)",  MACHINE_SUPPORTS_SAVE ) // 901012 ETC
 
-GAME( 1990, fcrash,     ffight,  fcrash,    fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg (Playmark)",  "Final Crash (bootleg of Final Fight)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ffightbl,   ffight,  fcrash,    fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg",  "Final Fight (bootleg)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ffightbla,  ffight,  fcrash,    fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg",  "Final Fight (bootleg on Final Crash PCB)",  MACHINE_SUPPORTS_SAVE ) // same as Final Crash without the modified graphics
+GAME( 1990, fcrash,     ffight,  fcrash,    fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg (Playmark)",  "Final Crash (bootleg of Final Fight)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ffightbl,   ffight,  fcrash,    fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg",  "Final Fight (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ffightbla,  ffight,  fcrash,    fcrash,    fcrash_state,  init_cps1,      ROT0,    "bootleg",  "Final Fight (bootleg on Final Crash PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // same as Final Crash without the modified graphics
 
 GAME( 1991, kodb,       kod,     kodb,      kodb,      fcrash_state,  init_kodb,      ROT0,    "bootleg (Playmark)",  "The King of Dragons (bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 910731  "ETC"
 

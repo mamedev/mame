@@ -2,9 +2,9 @@
 // copyright-holders:David Haywood, Nicola Salmoria
 
 /*
-    Gals Panic (Modular System bootleg)
+    New Quiz (Gals Panic bootleg on Modular System)
 
-    PCB stack was marked as 'New Quiz' (aka New Qix?)
+    PCB stack was marked as 'New Quiz'
 
     this is a clone of the expro02.cpp version of Gals Panic
 
@@ -368,4 +368,4 @@ ROM_START( galpanicms )
 ROM_END
 
 
-GAME( 1990, galpanicms,  galsnew,  newquiz,  newquiz,  galspanic_ms_state, empty_init, ROT90, "bootleg", "Gals Panic (Modular System bootleg)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1991, galpanicms,  galsnew,  newquiz,  newquiz,  galspanic_ms_state, empty_init, ROT90, "bootleg (Kaenko)", "New Quiz (Modular System bootleg)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

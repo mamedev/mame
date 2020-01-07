@@ -1098,7 +1098,7 @@ void subsino2_state::new2001_base_map(address_map &map)
 
 	map(0xc00000, 0xc00001).portr("DSW");
 	map(0xc00002, 0xc00003).portr("IN C");
-	map(0xc00004, 0xc00005).portr("IN A & B");
+	map(0xc00004, 0xc00005).portr("IN AB");
 	map(0xc00006, 0xc00007).r(FUNC(subsino2_state::bishjan_serial_r));
 }
 
@@ -1728,7 +1728,7 @@ static INPUT_PORTS_START( new2001 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	// high byte not read
 
-	PORT_START("IN A & B") // c00004
+	PORT_START("IN AB") // c00004
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE       ) PORT_IMPULSE(1) // service mode (press twice for inputs)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_POKER_HOLD3   ) PORT_NAME("Hold 3 / Black")
@@ -1776,7 +1776,7 @@ static INPUT_PORTS_START( humlan )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	// high byte not read
 
-	PORT_START("IN A & B") // c00004
+	PORT_START("IN AB") // c00004
 	// 1st-type panel
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       )

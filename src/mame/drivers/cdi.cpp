@@ -74,8 +74,11 @@ void cdi_state::cdimono1_mem(address_map &map)
 	map(0x00400000, 0x0047ffff).rom().region("maincpu", 0);
 	map(0x004fffe0, 0x004fffff).rw(m_mcd212, FUNC(mcd212_device::regs_r), FUNC(mcd212_device::regs_w));
 	map(0x00500000, 0x0057ffff).ram();
-	map(0x00580000, 0x00ffffff).noprw();
-	map(0x00e00000, 0x00efffff).ram(); // DVC
+	map(0x00580000, 0x00cfffff).noprw();
+	map(0x00d00000, 0x00dfffff).ram(); // DVC RAM block 1
+	map(0x00e00000, 0x00e7ffff).rw(FUNC(cdi_state::dvc_r), FUNC(cdi_state::dvc_w));
+	map(0x00e80000, 0x00efffff).ram(); // DVC RAM block 2
+	map(0x00f00000, 0x00ffffff).noprw();
 }
 
 void cdi_state::cdimono2_mem(address_map &map)
@@ -94,7 +97,7 @@ void cdi_state::cdimono2_mem(address_map &map)
 	map(0x004fffe0, 0x004fffff).rw(m_mcd212, FUNC(mcd212_device::regs_r), FUNC(mcd212_device::regs_w));
 	//map(0x00500000, 0x0057ffff).ram();
 	map(0x00500000, 0x00ffffff).noprw();
-	//map(0x00e00000, 0x00efffff).ram(); // DVC
+	//map(0x00e00000, 0x00efffff).ram();
 }
 
 void cdi_state::cdi910_mem(address_map &map)
@@ -122,7 +125,7 @@ void cdi_state::cdi910_mem(address_map &map)
 *      Input ports       *
 *************************/
 
-INPUT_CHANGED_MEMBER(cdi_state::mcu_input)
+INPUT_CHANGED_MEMBER(quizard_state::mcu_input)
 {
 	bool send = false;
 
@@ -161,10 +164,10 @@ INPUT_CHANGED_MEMBER(cdi_state::mcu_input)
 			break;
 	}
 
-	if(send)
+	if (send)
 	{
 		uint8_t data = uint8_t(param & 0x000000ff);
-		quizard_rx(data);
+		mcu_tx(data);
 	}
 }
 
@@ -233,19 +236,19 @@ static INPUT_PORTS_START( quizard )
 	PORT_INCLUDE( cdi )
 
 	PORT_START("INPUT1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("Coin 1") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, 0x39)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Start 1") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, 0x37)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Player 1 A") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, 0x31)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Player 1 B") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, 0x32)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Player 1 C") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, 0x33)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("Coin 1") PORT_CHANGED_MEMBER(DEVICE_SELF, quizard_state, mcu_input, 0x39)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Start 1") PORT_CHANGED_MEMBER(DEVICE_SELF, quizard_state, mcu_input, 0x37)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Player 1 A") PORT_CHANGED_MEMBER(DEVICE_SELF, quizard_state, mcu_input, 0x31)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Player 1 B") PORT_CHANGED_MEMBER(DEVICE_SELF, quizard_state, mcu_input, 0x32)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Player 1 C") PORT_CHANGED_MEMBER(DEVICE_SELF, quizard_state, mcu_input, 0x33)
 	PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("INPUT2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SERVICE1) PORT_NAME("Service") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, 0x30)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START2) PORT_NAME("Start 2") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, 0x38)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Player 2 A") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, 0x34)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("Player 2 B") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, 0x35)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_NAME("Player 2 C") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, 0x36)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SERVICE1) PORT_NAME("Service") PORT_CHANGED_MEMBER(DEVICE_SELF, quizard_state, mcu_input, 0x30)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START2) PORT_NAME("Start 2") PORT_CHANGED_MEMBER(DEVICE_SELF, quizard_state, mcu_input, 0x38)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Player 2 A") PORT_CHANGED_MEMBER(DEVICE_SELF, quizard_state, mcu_input, 0x34)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("Player 2 B") PORT_CHANGED_MEMBER(DEVICE_SELF, quizard_state, mcu_input, 0x35)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_NAME("Player 2 C") PORT_CHANGED_MEMBER(DEVICE_SELF, quizard_state, mcu_input, 0x36)
 	PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -254,62 +257,27 @@ INPUT_PORTS_END
 *  Machine Initialization  *
 ***************************/
 
-MACHINE_RESET_MEMBER( cdi_state, cdimono1 )
+void cdi_state::machine_reset()
 {
 	uint16_t *src   = (uint16_t*)memregion("maincpu")->base();
 	uint16_t *dst   = m_planea;
 	memcpy(dst, src, 0x8);
+}
 
-	// Quizard Protection HLE data
+void quizard_state::machine_start()
+{
+	save_item(NAME(m_seeds));
+	save_item(NAME(m_state));
+	save_item(NAME(m_mcu_value));
+	save_item(NAME(m_mcu_ack));
+}
+
+void quizard_state::machine_reset()
+{
+	cdi_state::machine_reset();
+
 	memset(m_seeds, 0, 10 * sizeof(uint16_t));
 	memset(m_state, 0, 8 * sizeof(uint8_t));
-	m_mcu_value = 0;
-	m_mcu_ack = 0;
-}
-
-MACHINE_RESET_MEMBER( cdi_state, cdimono2 )
-{
-	uint16_t *src   = (uint16_t*)memregion("maincpu")->base();
-	uint16_t *dst   = m_planea;
-	memcpy(dst, src, 0x8);
-
-	m_maincpu->reset();
-}
-
-MACHINE_RESET_MEMBER( cdi_state, quizard1 )
-{
-	MACHINE_RESET_CALL_MEMBER( cdimono1 );
-
-	set_quizard_mcu_value(0x021f);
-	set_quizard_mcu_ack(0x5a);
-}
-
-MACHINE_RESET_MEMBER( cdi_state, quizard2 )
-{
-	MACHINE_RESET_CALL_MEMBER( cdimono1 );
-
-	// 0x2b1: Italian
-	// 0x001: French
-	// 0x188: German
-
-	set_quizard_mcu_value(0x188);
-	set_quizard_mcu_ack(0x59);
-}
-
-MACHINE_RESET_MEMBER( cdi_state, quizard3 )
-{
-	MACHINE_RESET_CALL_MEMBER( cdimono1 );
-
-	set_quizard_mcu_value(0x00ae);
-	set_quizard_mcu_ack(0x58);
-}
-
-MACHINE_RESET_MEMBER( cdi_state, quizard4 )
-{
-	MACHINE_RESET_CALL_MEMBER( cdimono1 );
-
-	set_quizard_mcu_value(0x011f);
-	set_quizard_mcu_ack(0x57);
 }
 
 
@@ -317,23 +285,23 @@ MACHINE_RESET_MEMBER( cdi_state, quizard4 )
 *  Quizard Protection HLE  *
 ***************************/
 
-void cdi_state::set_quizard_mcu_ack(uint8_t ack)
+void quizard_state::set_mcu_ack(uint8_t ack)
 {
 	m_mcu_ack = ack;
 }
 
-void cdi_state::set_quizard_mcu_value(uint16_t value)
+void quizard_state::set_mcu_value(uint16_t value)
 {
 	m_mcu_value = value;
 }
 
-void cdi_state::quizard_rx(uint8_t data)
+void quizard_state::mcu_tx(uint8_t data)
 {
 	m_maincpu->uart_rx(0x5a);
 	m_maincpu->uart_rx(data);
 }
 
-void cdi_state::quizard_set_seeds(uint8_t *rx)
+void quizard_state::mcu_set_seeds(uint8_t *rx)
 {
 	m_seeds[0] = (rx[1] << 8) | rx[0];
 	m_seeds[1] = (rx[3] << 8) | rx[2];
@@ -347,7 +315,7 @@ void cdi_state::quizard_set_seeds(uint8_t *rx)
 	m_seeds[9] = (rx[19] << 8) | rx[18];
 }
 
-void cdi_state::quizard_calculate_state()
+void quizard_state::mcu_calculate_state()
 {
 	//const uint16_t desired_bitfield = mcu_value;
 	const uint16_t field0 = 0x00ff;
@@ -385,7 +353,7 @@ void cdi_state::quizard_calculate_state()
 	m_state[5] = lo1 - m_state[4];
 }
 
-void cdi_state::quizard_handle_byte_tx(uint8_t data)
+void quizard_state::mcu_rx(uint8_t data)
 {
 	static int state = 0;
 	static uint8_t rx[0x100];
@@ -427,8 +395,8 @@ void cdi_state::quizard_handle_byte_tx(uint8_t data)
 			if (rx_ptr == 20)
 			{
 				//printf("Calculating seeds\n");
-				quizard_set_seeds(rx);
-				quizard_calculate_state();
+				mcu_set_seeds(rx);
+				mcu_calculate_state();
 				state = 2;
 			}
 			break;
@@ -480,6 +448,27 @@ void cdi_state::quizard_handle_byte_tx(uint8_t data)
 	}
 }
 
+READ8_MEMBER(quizard_state::mcu_p1_r)
+{
+	LOG("%s: MCU Port 1 Read\n", machine().describe_context());
+	return 0;
+}
+
+
+/*************************
+*     DVC cartridge      *
+*************************/
+
+READ16_MEMBER( cdi_state::dvc_r )
+{
+	logerror("%s: dvc_r: %08x = 0000 & %04x\n", machine().describe_context(), 0xe80000 + (offset << 1), mem_mask);
+	return 0;
+}
+
+WRITE16_MEMBER( cdi_state::dvc_w )
+{
+	logerror("%s: dvc_w: %08x = %04x & %04x\n", machine().describe_context(), 0xe80000 + (offset << 1), data, mem_mask);
+}
 
 /*************************
 *       LCD screen       *
@@ -637,8 +626,6 @@ void cdi_state::cdimono2(machine_config &config)
 
 	config.set_default_layout(layout_cdi);
 
-	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
-
 	M68HC05C8(config, m_servo, 4_MHz_XTAL);
 	M68HC05C8(config, m_slave, 4_MHz_XTAL);
 
@@ -690,8 +677,6 @@ void cdi_state::cdi910(machine_config &config)
 
 	config.set_default_layout(layout_cdi);
 
-	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
-
 	M68HC05C8(config, m_servo, 4_MHz_XTAL);
 	M68HC05C8(config, m_slave, 4_MHz_XTAL);
 
@@ -719,56 +704,19 @@ void cdi_state::cdi910(machine_config &config)
 void cdi_state::cdimono1(machine_config &config)
 {
 	cdimono1_base(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, cdimono1)
 
 	CDROM(config, "cdrom").set_interface("cdi_cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
 }
 
-void cdi_state::quizard(machine_config &config)
+void quizard_state::quizard(machine_config &config)
 {
 	cdimono1_base(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdimono1_mem);
-	m_maincpu->uart_tx_callback().set(FUNC(cdi_state::quizard_handle_byte_tx));
-}
-
-
-READ8_MEMBER( cdi_state::quizard_mcu_p1_r )
-{
-	LOG("%s: MCU Port 1 Read\n", machine().describe_context());
-	return 0;
-}
-
-void cdi_state::quizard1(machine_config &config)
-{
-	quizard(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard1)
+	m_maincpu->set_addrmap(AS_PROGRAM, &quizard_state::cdimono1_mem);
+	m_maincpu->uart_tx_callback().set(FUNC(quizard_state::mcu_rx));
 
 	i8751_device &mcu(I8751(config, "mcu", 8000000));
-	mcu.port_in_cb<1>().set(FUNC(cdi_state::quizard_mcu_p1_r));
-//  mcu.set_vblank_int("screen", FUNC(cdi_state::irq0_line_pulse));
-}
-
-void cdi_state::quizard2(machine_config &config)
-{
-	quizard(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard2)
-}
-
-void cdi_state::quizard3(machine_config &config)
-{
-	quizard(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard3)
-}
-
-void cdi_state::quizard4(machine_config &config)
-{
-	quizard(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard4)
-
-	i8751_device &mcu(I8751(config, "mcu", 8000000));
-	mcu.port_in_cb<1>().set(FUNC(cdi_state::quizard_mcu_p1_r));
-//  mcu.set_vblank_int("screen", FUNC(cdi_state::irq0_line_pulse));
+	mcu.port_in_cb<1>().set(FUNC(quizard_state::mcu_p1_r));
 }
 
 /*************************
@@ -1068,30 +1016,30 @@ ROM_END
 *      Game driver(s)    *
 *************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS      INIT        COMPANY         FULLNAME */
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS      INIT        COMPANY       FULLNAME */
 // BIOS / System
-CONS( 1991, cdimono1, 0,      0,      cdimono1, cdi,      cdi_state, empty_init, "Philips",      "CD-i (Mono-I) (PAL)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE  )
-CONS( 1991, cdimono2, 0,      0,      cdimono2, cdimono2, cdi_state, empty_init, "Philips",      "CD-i (Mono-II) (NTSC)",   MACHINE_NOT_WORKING )
-CONS( 1991, cdi910,   0,      0,      cdi910,   cdimono2, cdi_state, empty_init, "Philips",      "CD-i 910-17P Mini-MMC (PAL)",   MACHINE_NOT_WORKING  )
-CONS( 1991, cdi490a,  0,      0,      cdimono1, cdi,      cdi_state, empty_init, "Philips",      "CD-i 490",   MACHINE_NOT_WORKING  )
+CONS( 1991, cdimono1, 0,      0,      cdimono1, cdi,      cdi_state, empty_init, "Philips",    "CD-i (Mono-I) (PAL)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1991, cdimono2, 0,      0,      cdimono2, cdimono2, cdi_state, empty_init, "Philips",    "CD-i (Mono-II) (NTSC)",   MACHINE_NOT_WORKING )
+CONS( 1991, cdi910,   0,      0,      cdi910,   cdimono2, cdi_state, empty_init, "Philips",    "CD-i 910-17P Mini-MMC (PAL)",   MACHINE_NOT_WORKING )
+CONS( 1991, cdi490a,  0,      0,      cdimono1, cdi,      cdi_state, empty_init, "Philips",    "CD-i 490",   MACHINE_NOT_WORKING )
 
 // The Quizard games are RETAIL CD-i units, with additional JAMMA adapters & dongles for protection, hence being 'clones' of the system.
-/*    YEAR  NAME         PARENT    MACHINE        INPUT     DEVICE     INIT         MONITOR     COMPANY         FULLNAME */
-GAME( 1995, cdibios,     0,        cdimono1_base, quizard,  cdi_state, empty_init,  ROT0,       "Philips",      "CD-i (Mono-I) (PAL) BIOS", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IS_BIOS_ROOT )
+/*    YEAR  NAME         PARENT    MACHINE        INPUT     DEVICE          INIT         MONITOR     COMPANY         FULLNAME */
+GAME( 1995, cdibios,     0,        cdimono1_base, quizard,  quizard_state,  empty_init,  ROT0,      "Philips",      "CD-i (Mono-I) (PAL) BIOS", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IS_BIOS_ROOT )
 
-GAME( 1995, quizard,     cdibios,  quizard1,      quizard,  cdi_state, empty_init,  ROT0,       "TAB Austria",  "Quizard (v1.8)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1995, quizard_17,  quizard,  quizard1,      quizard,  cdi_state, empty_init,  ROT0,       "TAB Austria",  "Quizard (v1.7)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1995, quizard_12,  quizard,  quizard1,      quizard,  cdi_state, empty_init,  ROT0,       "TAB Austria",  "Quizard (v1.2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1995, quizard_10,  quizard,  quizard1,      quizard,  cdi_state, empty_init,  ROT0,       "TAB Austria",  "Quizard (v1.0)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard,     cdibios,  quizard,       quizard,  quizard1_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.8)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard_17,  quizard,  quizard,       quizard,  quizard1_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.7)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard_12,  quizard,  quizard,       quizard,  quizard1_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard_10,  quizard,  quizard,       quizard,  quizard1_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.0)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 
-GAME( 1995, quizard2,    cdibios,  quizard2,      quizard,  cdi_state, empty_init,  ROT0,       "TAB Austria",  "Quizard 2 (v2.3)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1995, quizard2_22, quizard2, quizard2,      quizard,  cdi_state, empty_init,  ROT0,       "TAB Austria",  "Quizard 2 (v2.2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard2,    cdibios,  quizard,       quizard,  quizard2_state, empty_init,  ROT0, "TAB Austria",  "Quizard 2 (v2.3)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard2_22, quizard2, quizard,       quizard,  quizard2_state, empty_init,  ROT0, "TAB Austria",  "Quizard 2 (v2.2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 
 // Quizard 3 and 4 will hang after inserting a coin (incomplete protection sims?)
 
-GAME( 1995, quizard3,    cdibios,  quizard3,      quizard,  cdi_state, empty_init,  ROT0,       "TAB Austria",  "Quizard 3 (v3.4)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996, quizard3_32, quizard3, quizard3,      quizard,  cdi_state, empty_init,  ROT0,       "TAB Austria",  "Quizard 3 (v3.2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard3,    cdibios,  quizard,       quizard,  quizard3_state, empty_init,  ROT0, "TAB Austria",  "Quizard 3 (v3.4)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1996, quizard3_32, quizard3, quizard,       quizard,  quizard3_state, empty_init,  ROT0, "TAB Austria",  "Quizard 3 (v3.2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 
-GAME( 1998, quizard4,    cdibios,  quizard4,      quizard,  cdi_state, empty_init,  ROT0,       "TAB Austria",  "Quizard 4 Rainbow (v4.2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1998, quizard4_41, quizard4, quizard4,      quizard,  cdi_state, empty_init,  ROT0,       "TAB Austria",  "Quizard 4 Rainbow (v4.1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1997, quizard4_40, quizard4, quizard4,      quizard,  cdi_state, empty_init,  ROT0,       "TAB Austria",  "Quizard 4 Rainbow (v4.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1998, quizard4,    cdibios,  quizard,       quizard,  quizard4_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1998, quizard4_41, quizard4, quizard,       quizard,  quizard4_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1997, quizard4_40, quizard4, quizard,       quizard,  quizard4_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )

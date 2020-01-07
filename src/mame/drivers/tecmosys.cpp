@@ -246,7 +246,7 @@ WRITE16_MEMBER(tecmosys_state::unk880000_w)
 
 READ16_MEMBER(tecmosys_state::unk880000_r)
 {
-	//uint16_t ret = m_880000regs[offset];
+	//u16 ret = m_880000regs[offset];
 
 	logerror( "unk880000_r( %06x ) @ %06x = %04x\n", (offset * 2 ) +0x880000, m_maincpu->pc(), m_880000regs[offset] );
 
@@ -411,11 +411,23 @@ static INPUT_PORTS_START( tecmosys )
 INPUT_PORTS_END
 
 
+const gfx_layout gfx_sprite =
+{
+	16,1,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP4(0,1), STEP4(16,1) },
+	{ STEP4(0*16*2,4), STEP4(1*16*2,4), STEP4(2*16*2,4), STEP4(3*16*2,4) },
+	{ 0 },
+	8*16*1
+};
+
 static GFXDECODE_START( gfx_tecmosys )
-	GFXDECODE_ENTRY( "layer0", 0, gfx_8x8x4_packed_msb,               0x4400, 0x40 )
-	GFXDECODE_ENTRY( "layer1", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x4000, 0x40 )
-	GFXDECODE_ENTRY( "layer2", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x4000, 0x40 )
-	GFXDECODE_ENTRY( "layer3", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0x4000, 0x40 )
+	GFXDECODE_ENTRY( "layer0",  0, gfx_8x8x4_packed_msb,               0x4400, 0x40 )
+	GFXDECODE_ENTRY( "layer1",  0, gfx_8x8x4_row_2x2_group_packed_msb, 0x4000, 0x40 )
+	GFXDECODE_ENTRY( "layer2",  0, gfx_8x8x4_row_2x2_group_packed_msb, 0x4000, 0x40 )
+	GFXDECODE_ENTRY( "layer3",  0, gfx_8x8x4_row_2x2_group_packed_msb, 0x4000, 0x40 )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_sprite,                         0x0000, 0x40 )
 GFXDECODE_END
 
 
@@ -498,12 +510,12 @@ ROM_START( deroon )
 	ROM_REGION( 0x2000000, "sprites", ROMREGION_ERASE00 ) // Sprites (non-tile based)
 	/* all these roms need verifying, they could be half size */
 
-	ROM_LOAD16_BYTE( "t101.uah1", 0x0000000, 0x200000, CRC(74baf845) SHA1(935d2954ba227a894542be492654a2750198e1bc) )
-	ROM_LOAD16_BYTE( "t102.ual1", 0x0000001, 0x200000, CRC(1a02c4a3) SHA1(5155eeaef009fc9a9f258e3e54ca2a7f78242df5) )
-	/*                            0x8000000, 0x400000 - no rom loaded here, these gfx are 4bpp */
-	ROM_LOAD16_BYTE( "t103.ubl1", 0x0800001, 0x400000, CRC(84e7da88) SHA1(b5c3234f33bb945cc9762b91db087153a0589cfb) )
-	/*                            0x1000000, 0x400000 - no rom loaded here, these gfx are 4bpp */
-	ROM_LOAD16_BYTE( "t104.ucl1", 0x1000001, 0x200000, CRC(66eb611a) SHA1(64435d35677fea3c06fdb03c670f3f63ee481c02) )
+	ROM_LOAD32_WORD_SWAP( "t101.uah1", 0x0000000, 0x200000, CRC(74baf845) SHA1(935d2954ba227a894542be492654a2750198e1bc) )
+	ROM_LOAD32_WORD_SWAP( "t102.ual1", 0x0000002, 0x200000, CRC(1a02c4a3) SHA1(5155eeaef009fc9a9f258e3e54ca2a7f78242df5) )
+	/*                                 0x8000000, 0x400000 - no rom loaded here, these gfx are 4bpp */
+	ROM_LOAD32_WORD_SWAP( "t103.ubl1", 0x0800002, 0x400000, CRC(84e7da88) SHA1(b5c3234f33bb945cc9762b91db087153a0589cfb) )
+	/*                                 0x1000000, 0x400000 - no rom loaded here, these gfx are 4bpp */
+	ROM_LOAD32_WORD_SWAP( "t104.ucl1", 0x1000002, 0x200000, CRC(66eb611a) SHA1(64435d35677fea3c06fdb03c670f3f63ee481c02) )
 
 	ROM_REGION( 0x100000, "layer0", 0 ) // 8x8 4bpp tiles
 	ROM_LOAD( "t301.ubd1", 0x000000, 0x100000, CRC(8b026177) SHA1(3887856bdaec4d9d3669fe3bc958ef186fbe9adb) )
@@ -530,7 +542,7 @@ About the Deroon DeroDero listed below:
  This set contains less Japanese text and English translations for some game aspects such as game menus.
  Coining up displays "TECMO STACKERS" but this set doesn't seem to include a "How to Play" demo like the parent set
 
- PCB contained genuine Tecmo dvelopment labels, it's unknown which specific region this set was intended for.
+ PCB contained genuine Tecmo development labels, it's unknown which specific region this set was intended for.
  Still missing the full English version titled Temco Stackers if it exists.
 
 */
@@ -547,12 +559,12 @@ ROM_START( deroon2 )
 	ROM_LOAD( "deroon_68hc11a8.eeprom", 0x2000, 0x0200, NO_DUMP )
 
 	ROM_REGION( 0x2000000, "sprites", ROMREGION_ERASE00 ) // Sprites (non-tile based)
-	ROM_LOAD16_BYTE( "t101.uah1", 0x0000000, 0x200000, CRC(74baf845) SHA1(935d2954ba227a894542be492654a2750198e1bc) )
-	ROM_LOAD16_BYTE( "t102.ual1", 0x0000001, 0x200000, CRC(1a02c4a3) SHA1(5155eeaef009fc9a9f258e3e54ca2a7f78242df5) )
-	/*                            0x8000000, 0x400000 - no rom loaded here, these gfx are 4bpp */
-	ROM_LOAD16_BYTE( "t103.ubl1", 0x0800001, 0x400000, CRC(84e7da88) SHA1(b5c3234f33bb945cc9762b91db087153a0589cfb) )
-	/*                            0x1000000, 0x400000 - no rom loaded here, these gfx are 4bpp */
-	ROM_LOAD16_BYTE( "t104.ucl1", 0x1000001, 0x200000, CRC(66eb611a) SHA1(64435d35677fea3c06fdb03c670f3f63ee481c02) )
+	ROM_LOAD32_WORD_SWAP( "t101.uah1", 0x0000000, 0x200000, CRC(74baf845) SHA1(935d2954ba227a894542be492654a2750198e1bc) )
+	ROM_LOAD32_WORD_SWAP( "t102.ual1", 0x0000002, 0x200000, CRC(1a02c4a3) SHA1(5155eeaef009fc9a9f258e3e54ca2a7f78242df5) )
+	/*                                 0x8000000, 0x400000 - no rom loaded here, these gfx are 4bpp */
+	ROM_LOAD32_WORD_SWAP( "t103.ubl1", 0x0800002, 0x400000, CRC(84e7da88) SHA1(b5c3234f33bb945cc9762b91db087153a0589cfb) )
+	/*                                 0x1000000, 0x400000 - no rom loaded here, these gfx are 4bpp */
+	ROM_LOAD32_WORD_SWAP( "t104.ucl1", 0x1000002, 0x200000, CRC(66eb611a) SHA1(64435d35677fea3c06fdb03c670f3f63ee481c02) )
 
 	ROM_REGION( 0x100000, "layer0", 0 ) // 8x8 4bpp tiles
 	ROM_LOAD( "t301.ubd1", 0x000000, 0x100000, CRC(8b026177) SHA1(3887856bdaec4d9d3669fe3bc958ef186fbe9adb) )
@@ -574,7 +586,7 @@ ROM_START( deroon2 )
 ROM_END
 
 ROM_START( tkdensho )
-	ROM_REGION( 0x600000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "aeprge-2.pal", 0x00000, 0x80000, CRC(25e453d6) SHA1(9c84e2af42eff5cc9b14c1759d5bab42fa7bb663) )
 	ROM_LOAD16_BYTE( "aeprgo-2.pau", 0x00001, 0x80000, CRC(22d59510) SHA1(5ade482d6ab9a22df2ee8337458c22cfa9045c73) )
 
@@ -586,16 +598,16 @@ ROM_START( tkdensho )
 	ROM_LOAD( "tkdensho_68hc11a8.rom",    0x0000, 0x2000, NO_DUMP )
 	ROM_LOAD( "tkdensho_68hc11a8.eeprom", 0x2000, 0x0200, NO_DUMP )
 
-	ROM_REGION( 0x4000000, "sprites", ROMREGION_ERASE00 ) // Graphics - mostly (maybe all?) not tile based
-	ROM_LOAD16_BYTE( "ae100h.ah1",    0x0000000, 0x0400000, CRC(06be252b) SHA1(08d1bb569fd2e66e2c2f47da7780b31945232e62) )
-	ROM_LOAD16_BYTE( "ae100.al1",     0x0000001, 0x0400000, CRC(009cdff4) SHA1(fd88f07313d14fd4429b09a1e8d6b595df3b98e5) )
-	ROM_LOAD16_BYTE( "ae101h.bh1",    0x0800000, 0x0400000, CRC(f2469eff) SHA1(ba49d15cc7949437ba9f56d9b425a5f0e62137df) )
-	ROM_LOAD16_BYTE( "ae101.bl1",     0x0800001, 0x0400000, CRC(db7791bb) SHA1(1fe40b747b7cee7a9200683192b1d60a735a0446) )
-	ROM_LOAD16_BYTE( "ae102h.ch1",    0x1000000, 0x0200000, CRC(f9d2a343) SHA1(d141ac0b20be587e77a576ef78f15d269d9c84e5) )
-	ROM_LOAD16_BYTE( "ae102.cl1",     0x1000001, 0x0200000, CRC(681be889) SHA1(8044ca7cbb325e6dcadb409f91e0c01b88a1bca7) )
-	ROM_LOAD16_BYTE( "ae104.el1",     0x2000001, 0x0400000, CRC(e431b798) SHA1(c2c24d4f395bba8c78a45ecf44009a830551e856) )
-	ROM_LOAD16_BYTE( "ae105.fl1",     0x2800001, 0x0400000, CRC(b7f9ebc1) SHA1(987f664072b43a578b39fa6132aaaccc5fe5bfc2) )
-	ROM_LOAD16_BYTE( "ae106.gl1",     0x3000001, 0x0200000, CRC(7c50374b) SHA1(40865913125230122072bb13f46fb5fb60c088ea) )
+	ROM_REGION( 0x4000000, "sprites", ROMREGION_ERASE00 ) // Graphics - not tile based
+	ROM_LOAD32_WORD_SWAP( "ae100h.ah1",    0x0000000, 0x0400000, CRC(06be252b) SHA1(08d1bb569fd2e66e2c2f47da7780b31945232e62) )
+	ROM_LOAD32_WORD_SWAP( "ae100.al1",     0x0000002, 0x0400000, CRC(009cdff4) SHA1(fd88f07313d14fd4429b09a1e8d6b595df3b98e5) )
+	ROM_LOAD32_WORD_SWAP( "ae101h.bh1",    0x0800000, 0x0400000, CRC(f2469eff) SHA1(ba49d15cc7949437ba9f56d9b425a5f0e62137df) )
+	ROM_LOAD32_WORD_SWAP( "ae101.bl1",     0x0800002, 0x0400000, CRC(db7791bb) SHA1(1fe40b747b7cee7a9200683192b1d60a735a0446) )
+	ROM_LOAD32_WORD_SWAP( "ae102h.ch1",    0x1000000, 0x0200000, CRC(f9d2a343) SHA1(d141ac0b20be587e77a576ef78f15d269d9c84e5) )
+	ROM_LOAD32_WORD_SWAP( "ae102.cl1",     0x1000002, 0x0200000, CRC(681be889) SHA1(8044ca7cbb325e6dcadb409f91e0c01b88a1bca7) )
+	ROM_LOAD32_WORD_SWAP( "ae104.el1",     0x2000002, 0x0400000, CRC(e431b798) SHA1(c2c24d4f395bba8c78a45ecf44009a830551e856) )
+	ROM_LOAD32_WORD_SWAP( "ae105.fl1",     0x2800002, 0x0400000, CRC(b7f9ebc1) SHA1(987f664072b43a578b39fa6132aaaccc5fe5bfc2) )
+	ROM_LOAD32_WORD_SWAP( "ae106.gl1",     0x3000002, 0x0200000, CRC(7c50374b) SHA1(40865913125230122072bb13f46fb5fb60c088ea) )
 
 	ROM_REGION( 0x080000, "layer0", 0 ) // 8x8 4bpp tiles
 	ROM_LOAD( "ae300w36.bd1",  0x000000, 0x0080000, CRC(e829f29e) SHA1(e56bfe2669ed1d1ae394c644def426db129d97e3) )
@@ -618,7 +630,7 @@ ROM_START( tkdensho )
 ROM_END
 
 ROM_START( tkdenshoa )
-	ROM_REGION( 0x600000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "aeprge.pal", 0x00000, 0x80000, CRC(17a209ff) SHA1(b5dbea9868cbb89d4e27bf19fdb616ac256985b4) )
 	ROM_LOAD16_BYTE( "aeprgo.pau", 0x00001, 0x80000, CRC(d265e6a1) SHA1(f39d8ce115f197a660f5210b2483108854eb12a9) )
 
@@ -630,16 +642,16 @@ ROM_START( tkdenshoa )
 	ROM_LOAD( "tkdensho_68hc11a8.rom",    0x0000, 0x2000, NO_DUMP )
 	ROM_LOAD( "tkdensho_68hc11a8.eeprom", 0x2000, 0x0200, NO_DUMP )
 
-	ROM_REGION( 0x4000000, "sprites", ROMREGION_ERASE00 ) // Graphics - mostly (maybe all?) not tile based
-	ROM_LOAD16_BYTE( "ae100h.ah1",    0x0000000, 0x0400000, CRC(06be252b) SHA1(08d1bb569fd2e66e2c2f47da7780b31945232e62) )
-	ROM_LOAD16_BYTE( "ae100.al1",     0x0000001, 0x0400000, CRC(009cdff4) SHA1(fd88f07313d14fd4429b09a1e8d6b595df3b98e5) )
-	ROM_LOAD16_BYTE( "ae101h.bh1",    0x0800000, 0x0400000, CRC(f2469eff) SHA1(ba49d15cc7949437ba9f56d9b425a5f0e62137df) )
-	ROM_LOAD16_BYTE( "ae101.bl1",     0x0800001, 0x0400000, CRC(db7791bb) SHA1(1fe40b747b7cee7a9200683192b1d60a735a0446) )
-	ROM_LOAD16_BYTE( "ae102h.ch1",    0x1000000, 0x0200000, CRC(f9d2a343) SHA1(d141ac0b20be587e77a576ef78f15d269d9c84e5) )
-	ROM_LOAD16_BYTE( "ae102.cl1",     0x1000001, 0x0200000, CRC(681be889) SHA1(8044ca7cbb325e6dcadb409f91e0c01b88a1bca7) )
-	ROM_LOAD16_BYTE( "ae104.el1",     0x2000001, 0x0400000, CRC(e431b798) SHA1(c2c24d4f395bba8c78a45ecf44009a830551e856) )
-	ROM_LOAD16_BYTE( "ae105.fl1",     0x2800001, 0x0400000, CRC(b7f9ebc1) SHA1(987f664072b43a578b39fa6132aaaccc5fe5bfc2) )
-	ROM_LOAD16_BYTE( "ae106.gl1",     0x3000001, 0x0200000, CRC(7c50374b) SHA1(40865913125230122072bb13f46fb5fb60c088ea) )
+	ROM_REGION( 0x4000000, "sprites", ROMREGION_ERASE00 ) // Graphics - not tile based
+	ROM_LOAD32_WORD_SWAP( "ae100h.ah1",    0x0000000, 0x0400000, CRC(06be252b) SHA1(08d1bb569fd2e66e2c2f47da7780b31945232e62) )
+	ROM_LOAD32_WORD_SWAP( "ae100.al1",     0x0000002, 0x0400000, CRC(009cdff4) SHA1(fd88f07313d14fd4429b09a1e8d6b595df3b98e5) )
+	ROM_LOAD32_WORD_SWAP( "ae101h.bh1",    0x0800000, 0x0400000, CRC(f2469eff) SHA1(ba49d15cc7949437ba9f56d9b425a5f0e62137df) )
+	ROM_LOAD32_WORD_SWAP( "ae101.bl1",     0x0800002, 0x0400000, CRC(db7791bb) SHA1(1fe40b747b7cee7a9200683192b1d60a735a0446) )
+	ROM_LOAD32_WORD_SWAP( "ae102h.ch1",    0x1000000, 0x0200000, CRC(f9d2a343) SHA1(d141ac0b20be587e77a576ef78f15d269d9c84e5) )
+	ROM_LOAD32_WORD_SWAP( "ae102.cl1",     0x1000002, 0x0200000, CRC(681be889) SHA1(8044ca7cbb325e6dcadb409f91e0c01b88a1bca7) )
+	ROM_LOAD32_WORD_SWAP( "ae104.el1",     0x2000002, 0x0400000, CRC(e431b798) SHA1(c2c24d4f395bba8c78a45ecf44009a830551e856) )
+	ROM_LOAD32_WORD_SWAP( "ae105.fl1",     0x2800002, 0x0400000, CRC(b7f9ebc1) SHA1(987f664072b43a578b39fa6132aaaccc5fe5bfc2) )
+	ROM_LOAD32_WORD_SWAP( "ae106.gl1",     0x3000002, 0x0200000, CRC(7c50374b) SHA1(40865913125230122072bb13f46fb5fb60c088ea) )
 
 	ROM_REGION( 0x080000, "layer0", 0 ) // 8x8 4bpp tiles
 	ROM_LOAD( "ae300w36.bd1",  0x000000, 0x0080000, CRC(e829f29e) SHA1(e56bfe2669ed1d1ae394c644def426db129d97e3) )
@@ -663,22 +675,29 @@ ROM_END
 
 void tecmosys_state::descramble()
 {
-	int i;
-
-	for (i=0; i < m_sprite_region.length(); i+=4)
+	m_sprite_gfx_mask = 1;
+	while (m_sprite_gfx_mask < m_sprite_region.length())
 	{
-		uint8_t tmp[4];
-
-		tmp[2] = ((m_sprite_region[i+0]&0xf0)>>0) | ((m_sprite_region[i+1]&0xf0)>>4); //  0, 1, 2, 3   8, 9,10,11
-		tmp[3] = ((m_sprite_region[i+0]&0x0f)<<4) | ((m_sprite_region[i+1]&0x0f)<<0); //  4, 5, 6, 7, 12,13,14,15
-		tmp[0] = ((m_sprite_region[i+2]&0xf0)>>0) | ((m_sprite_region[i+3]&0xf0)>>4); // 16,17,18,19, 24,25,26,27
-		tmp[1] = ((m_sprite_region[i+2]&0x0f)<<4) | ((m_sprite_region[i+3]&0x0f)>>0); // 20,21,22,23, 28,29,30,31
-
-		m_sprite_region[i+0] = tmp[0];
-		m_sprite_region[i+1] = tmp[1];
-		m_sprite_region[i+2] = tmp[2];
-		m_sprite_region[i+3] = tmp[3];
+		m_sprite_gfx_mask <<= 1;
 	}
+	m_sprite_gfx = make_unique_clear<u8[]>(m_sprite_gfx_mask);
+
+	gfx_element *gfx = m_gfxdecode->gfx(4);
+	u8 *dst = m_sprite_gfx.get();
+	for (int e = 0; e < gfx->elements(); e++)
+	{
+		const u8 *data = gfx->get_data(e);
+		for (int y = 0; y < gfx->height(); y++)
+		{
+			const u8 *datatmp = data;
+			for (int x = 0; x < gfx->width(); x++)
+			{
+				*dst++ = *datatmp++;
+			}
+			data += gfx->rowbytes();
+		}
+	}
+	m_sprite_gfx_mask--;
 }
 
 void tecmosys_state::init_deroon()

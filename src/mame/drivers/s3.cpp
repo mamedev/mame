@@ -130,7 +130,6 @@ void s3_state::s3_main_map(address_map &map)
 void s3_state::s3_audio_map(address_map &map)
 {
 	map.global_mask(0xfff);
-	map(0x0000, 0x007f).ram();
 	map(0x0400, 0x0403).rw(m_pias, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sounds
 	map(0x0800, 0x0fff).rom().region("audioroms", 0);
 }

@@ -82,6 +82,7 @@ using util::BIT;
 #include "cpu/m6502/m65ce02d.h"
 #include "cpu/m6502/m740d.h"
 #include "cpu/m6502/r65c02d.h"
+#include "cpu/m6502/r65c19d.h"
 #include "cpu/m6502/xavixd.h"
 #include "cpu/m6502/xavix2000d.h"
 #include "cpu/m6800/6800dasm.h"
@@ -157,6 +158,7 @@ using util::BIT;
 #include "cpu/upd7810/upd7810_dasm.h"
 #include "cpu/v60/v60d.h"
 #include "cpu/v810/v810dasm.h"
+#include "cpu/vt50/vt50dasm.h"
 #include "cpu/z180/z180dasm.h"
 #include "cpu/z8/z8dasm.h"
 #include "cpu/z80/z80dasm.h"
@@ -453,6 +455,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "pps4",            le,  0, []() -> util::disasm_interface * { return new pps4_disassembler; } },
 	{ "psxcpu",          le,  0, []() -> util::disasm_interface * { return new psxcpu_disassembler; } },
 	{ "r65c02",          le,  0, []() -> util::disasm_interface * { return new r65c02_disassembler; } },
+	{ "r65c19",          le,  0, []() -> util::disasm_interface * { return new r65c19_disassembler; } },
 	{ "rsp",             le,  0, []() -> util::disasm_interface * { return new rsp_disassembler; } },
 	{ "s2650",           le,  0, []() -> util::disasm_interface * { return new s2650_disassembler(&s2650_unidasm); } },
 	{ "saturn",          le,  0, []() -> util::disasm_interface * { return new saturn_disassembler(&saturn_unidasm); } },
@@ -521,6 +524,8 @@ static const dasm_table_entry dasm_table[] =
 	{ "upi41",           le,  0, []() -> util::disasm_interface * { return new mcs48_disassembler(true, false); } },
 	{ "v60",             le,  0, []() -> util::disasm_interface * { return new v60_disassembler; } },
 	{ "v810",            le,  0, []() -> util::disasm_interface * { return new v810_disassembler; } },
+	{ "vt50",            le,  0, []() -> util::disasm_interface * { return new vt50_disassembler; } },
+	{ "vt52",            le,  0, []() -> util::disasm_interface * { return new vt52_disassembler; } },
 	{ "x86_16",          le,  0, []() -> util::disasm_interface * { i386_unidasm.mode = 16; return new i386_disassembler(&i386_unidasm); } },
 	{ "x86_32",          le,  0, []() -> util::disasm_interface * { i386_unidasm.mode = 32; return new i386_disassembler(&i386_unidasm); } },
 	{ "x86_64",          le,  0, []() -> util::disasm_interface * { i386_unidasm.mode = 64; return new i386_disassembler(&i386_unidasm); } },

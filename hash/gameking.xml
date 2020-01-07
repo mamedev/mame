@@ -43,6 +43,25 @@ S2: to VCC (most likely WE)
 S3: to GND (most likely OE)
 S1: is on some carts directly connected to VCC
 
+    there are multiple cartridge types with different dates stamped on the PCB
+
+    128KB capacity
+
+    2007 / APR 02 04 / REV:1.0
+    2007 / APR 28 04 / REV:2.0
+
+    512KB capacity
+
+    2007B / OCT 28 04 / REV:1.0
+    2007D / APR 23 05 / REV:1.0
+
+    1024KB capacity
+    2007E / JUN 16 05 / REV:1.0
+
+    the dates are not the release dates for the individual games.
+
+    all GameKing 3 cartridges seen have been the 2007D type
+
 -->
 
 <softwarelist name="gameking" description="TimeTop GameKing cartridges">
@@ -109,6 +128,7 @@ S1: is on some carts directly connected to VCC
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
+			<feature name="pcb" value="2007 / APR 28 04 / REV:2.0"/>
 			<dataarea name="rom" size="0x020000">
 				<rom name="f1-2004 racing.bin" size="0x020000" crc="dae3a18d" sha1="939931d1eed8a353fb0cd065612479b52ee36242"/>
 			</dataarea>
@@ -120,6 +140,7 @@ S1: is on some carts directly connected to VCC
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
+			<feature name="pcb" value="2007 / APR 28 04 / REV:2.0"/>
 			<dataarea name="rom" size="0x020000">
 				<rom name="feichuan vii.bin" size="0x020000" crc="f94715f1" sha1="98b1cd7d3d1fe1b1341bef0b2f7d4ae0052fdb01"/>
 			</dataarea>
@@ -197,6 +218,7 @@ S1: is on some carts directly connected to VCC
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
+			<feature name="pcb" value="2007 / APR 02 04 / REV:1.0"/>
 			<dataarea name="rom" size="0x020000">
 				<rom name="soldier.bin" size="0x020000" crc="0a1ac0ed" sha1="590e2ed2b72ad2e3a8c1d6b115c7c9acabf9aa63"/>
 			</dataarea>
@@ -208,6 +230,7 @@ S1: is on some carts directly connected to VCC
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
+			<feature name="pcb" value="2007 / APR 28 04 / REV:2.0"/>
 			<dataarea name="rom" size="0x020000">
 				<rom name="street hero.bin" size="0x020000" crc="9e0fe489" sha1="2c442126999e4b112a48e42a82dfa9ad9d6efa22"/>
 			</dataarea>
@@ -219,6 +242,7 @@ S1: is on some carts directly connected to VCC
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
+			<feature name="pcb" value="2007 / APR 02 04 / REV:1.0"/>
 			<dataarea name="rom" size="0x020000">
 				<rom name="supermotor.bin" size="0x020000" crc="6290b94b" sha1="0c3011da35170241637907bb23d79355db38f343"/>
 			</dataarea>
@@ -250,12 +274,23 @@ S1: is on some carts directly connected to VCC
 	</software>
 
 	<software name="mc_4v02" supported="partial">
-		<description>4 in 1 - Chaser + Blaster + StarWars + Nagual</description>
+		<description>4 in 1 - Chaser + Blaster + StarWars + Nagual (set 1)</description>
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="gk_4in1_chaser_blaster_starwars_nagual.bin" size="0x080000" crc="8a49e7ca" sha1="5c40c158564932184b14a5f481f7053aa00811e0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4v02a" cloneof="mc_4v02" supported="partial">
+		<description>4 in 1 - Chaser + Blaster + StarWars + Nagual (set 2)</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="4in1 - chaser blaster starwars nagual.gk" size="0x080000" crc="f6fbb988" sha1="8378a01b4443d054ecde447314dbc45c4ea7d0ed"/>
 			</dataarea>
 		</part>
 	</software>
@@ -320,6 +355,7 @@ S1: is on some carts directly connected to VCC
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
+			<feature name="pcb" value="2007D / APR 23 05 / REV:1.0"/>
 			<dataarea name="rom" size="0x080000">
 				<rom name="gk_4in1_v8.bin" size="0x080000" crc="ad1a74b3" sha1="8789e0badbf6da1030561b86ba18f34749ee0796"/>
 			</dataarea>
@@ -342,6 +378,7 @@ S1: is on some carts directly connected to VCC
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
+			<feature name="pcb" value="2007B / OCT 28 04 / REV:1.0"/>
 			<dataarea name="rom" size="0x080000">
 				<rom name="4in1no10.bin" size="0x080000" crc="b25b1080" sha1="24bc65a9e49ba6f0ffc19b3b858d6c576a3196f7"/>
 			</dataarea>
@@ -438,23 +475,24 @@ S1: is on some carts directly connected to VCC
 	</software>
 
 	<software name="mc_4v19" supported="partial">
-		<description>4 in 1 - Warrior + Cleverhawk + Valiant + MetalDeform ('APR 23 05', 512KB cartridge)</description>
+		<description>4 in 1 - Warrior + Cleverhawk + Valiant + MetalDeform (512KB cartridge)</description>
 		<year>2005</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
+			<feature name="pcb" value="2007D / APR 23 05 / REV:1.0"/>
 			<dataarea name="rom" size="0x080000">
-				<rom name="4in1 - warrior, cleverhawk, valiant, metaldeform (apr 23 05).bin" size="0x080000" crc="1a673940" sha1="564941836fe82baa4e1534dd373b169a47a62a06"/>
+				<rom name="4in1 - warrior, cleverhawk, valiant, metaldeform (512kb cart type).bin" size="0x080000" crc="1a673940" sha1="564941836fe82baa4e1534dd373b169a47a62a06"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="mc_4v19a" cloneof="mc_4v19" supported="no">
-		<description>4 in 1 - Warrior + Cleverhawk + Valiant + MetalDeform ('JUN 16 05', 1MB cartridge)</description>
+		<description>4 in 1 - Warrior + Cleverhawk + Valiant + MetalDeform (1MB cartridge)</description>
 		<year>2005</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
 			<dataarea name="rom" size="0x080000">
-				<rom name="4in1 - warrior, cleverhawk, valiant, metaldeform (jun 16 05).bin" status="baddump" size="0x080000" crc="18fe216b" sha1="f9c0215b031120d1868d7e825e3774898e452ba9"/> <!-- half size -->
+				<rom name="4in1 - warrior, cleverhawk, valiant, metaldeform (1mb cart type).bin" status="baddump" size="0x080000" crc="18fe216b" sha1="f9c0215b031120d1868d7e825e3774898e452ba9"/> <!-- half size -->
 			</dataarea>
 		</part>
 	</software>
@@ -464,6 +502,7 @@ S1: is on some carts directly connected to VCC
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
+			<feature name="pcb" value="2007E / JUN 16 05 / REV:1.0"/>
 			<dataarea name="rom" size="0x100000">
 				<rom name="4in1 - szlh, colo, f12004, popper.bin" size="0x100000" crc="0316eb98" sha1="71a3a4f2fc49c4e19c016d036aba63d8437489a0"/>
 			</dataarea>

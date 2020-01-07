@@ -140,7 +140,6 @@ void taito_state::taito_map(address_map &map)
 void taito_state::taito_sub_map(address_map &map)
 {
 	map.global_mask(0x1fff);
-	map(0x0000, 0x007f).ram(); // internal to the cpu
 	map(0x0400, 0x0403).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0800, 0x1fff).rom().region("cpu2", 0x0800);
 }
@@ -148,7 +147,6 @@ void taito_state::taito_sub_map(address_map &map)
 void taito_state::taito_sub_map2(address_map &map)
 {
 	map.global_mask(0x3fff);
-	map(0x0000, 0x007f).ram(); // internal to the cpu
 	map(0x0400, 0x0403).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x2000, 0x3fff).rom().region("cpu2", 0x2000);
 }
@@ -156,7 +154,6 @@ void taito_state::taito_sub_map2(address_map &map)
 void taito_state::taito_sub_map5(address_map &map)
 {
 	map.global_mask(0x7fff);
-	map(0x0000, 0x007f).ram(); // internal to the cpu
 	map(0x0400, 0x0403).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1000, 0x1000).w("aysnd_0", FUNC(ay8910_device::address_w));
 	map(0x1003, 0x1003).w("aysnd_0", FUNC(ay8910_device::address_w));
@@ -194,7 +191,6 @@ void taito_state::shock_map(address_map &map)
 void taito_state::shock_sub_map(address_map &map)
 {
 	map.global_mask(0x0fff);
-	map(0x0000, 0x007f).ram(); // internal to the cpu
 	map(0x0400, 0x0403).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0800, 0x0fff).rom().region("cpu2", 0);
 }

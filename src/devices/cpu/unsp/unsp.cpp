@@ -120,6 +120,7 @@ char const* const unsp_device::bitops[] =
 	"tstb", "setb", "clrb", "invb"
 };
 
+// log/barrel shift
 char const* const unsp_device::lsft[] =
 {
 	"asr", "asror", "lsl", "lslor", "lsr", "lsror", "rol", "ror"
@@ -264,6 +265,28 @@ void unsp_device::device_start()
 	set_icountptr(m_core->m_icount);
 }
 
+void unsp_20_device::device_start()
+{
+	unsp_12_device::device_start();
+
+#if UNSP_LOG_OPCODES || UNSP_LOG_REGS
+	int baseindex = UNSP_LOG_OPS + 1;
+#else
+	int baseindex = UNSP_SB + 1;
+#endif
+
+	state_add(baseindex + UNSP20_R8,     "R8", m_secondary_r[UNSP20_R8]).formatstr("%04X");
+	state_add(baseindex + UNSP20_R9,     "R9", m_secondary_r[UNSP20_R9]).formatstr("%04X");
+	state_add(baseindex + UNSP20_R10,    "R10", m_secondary_r[UNSP20_R10]).formatstr("%04X");
+	state_add(baseindex + UNSP20_R11,    "R11", m_secondary_r[UNSP20_R11]).formatstr("%04X");
+	state_add(baseindex + UNSP20_R12,    "R12", m_secondary_r[UNSP20_R12]).formatstr("%04X");
+	state_add(baseindex + UNSP20_R13,    "R13", m_secondary_r[UNSP20_R13]).formatstr("%04X");
+	state_add(baseindex + UNSP20_R14,    "R14", m_secondary_r[UNSP20_R14]).formatstr("%04X");
+	state_add(baseindex + UNSP20_R15,    "R15", m_secondary_r[UNSP20_R15]).formatstr("%04X");
+
+	save_item(NAME(m_secondary_r));
+}
+
 void unsp_device::device_reset()
 {
 	memset(m_core->m_r, 0, sizeof(uint32_t) * 8);
@@ -273,6 +296,16 @@ void unsp_device::device_reset()
 	m_core->m_enable_fiq = 0;
 	m_core->m_irq = 0;
 	m_core->m_fiq = 0;
+}
+
+void unsp_20_device::device_reset()
+{
+	unsp_12_device::device_reset();
+
+	for (int i = 0; i < 8; i++)
+	{
+		m_secondary_r[i] = 0;
+	}
 }
 
 void unsp_device::device_stop()
@@ -398,6 +431,7 @@ inline void unsp_device::trigger_fiq()
 	push(m_core->m_r[REG_SR], &m_core->m_r[REG_SP]);
 	m_core->m_r[REG_PC] = read16(0xfff6);
 	m_core->m_r[REG_SR] = 0;
+	standard_irq_callback(UNSP_FIQ_LINE);
 }
 
 inline void unsp_device::trigger_irq(int line)
@@ -414,6 +448,7 @@ inline void unsp_device::trigger_irq(int line)
 	push(m_core->m_r[REG_SR], &m_core->m_r[REG_SP]);
 	m_core->m_r[REG_PC] = read16(0xfff8 + line);
 	m_core->m_r[REG_SR] = 0;
+	standard_irq_callback(UNSP_IRQ0_LINE+line);
 }
 
 void unsp_device::check_irqs()

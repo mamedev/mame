@@ -120,7 +120,8 @@ private:
 
 	struct debug_command
 	{
-		debug_command * next;
+		debug_command(const char *_command, u32 _flags, int _ref, int _minparams, int _maxparams, std::function<void(int, const std::vector<std::string> &)> _handler);
+
 		char            command[32];
 		const char *    params;
 		const char *    help;
@@ -136,7 +137,7 @@ private:
 	text_buffer     *m_console_textbuf;
 	text_buffer     *m_errorlog_textbuf;
 
-	debug_command   *m_commandlist;
+	std::forward_list<debug_command> m_commandlist;
 
 	std::unique_ptr<std::istream> m_source_file;        // script source file
 };

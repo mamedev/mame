@@ -7,6 +7,7 @@
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
+#include "video/ms32_sprite.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -20,6 +21,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_sprite(*this, "sprite"),
 		m_soundlatch(*this, "soundlatch"),
 		m_screen(*this, "screen"),
 		m_mainram(*this, "mainram"),
@@ -74,39 +76,40 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<ms32_sprite_device> m_sprite;
 	optional_device<generic_latch_8_device> m_soundlatch;
 
 private:
-
 	optional_device<screen_device> m_screen;
-	optional_shared_ptr<uint32_t> m_mainram;
-	optional_shared_ptr<uint32_t> m_roz_ctrl;
-	optional_shared_ptr<uint32_t> m_tx_scroll;
-	optional_shared_ptr<uint32_t> m_bg_scroll;
-	optional_shared_ptr<uint32_t> m_mahjong_input_select;
-	optional_shared_ptr<uint8_t> m_priram;
-	optional_shared_ptr<uint16_t> m_palram;
-	optional_shared_ptr<uint16_t> m_rozram;
-	optional_shared_ptr<uint16_t> m_lineram;
-	optional_shared_ptr<uint16_t> m_sprram;
-	optional_shared_ptr<uint16_t> m_txram;
-	optional_shared_ptr<uint16_t> m_bgram;
-	optional_shared_ptr<uint16_t> m_f1superb_extraram;
+	optional_shared_ptr<u32> m_mainram;
+	optional_shared_ptr<u32> m_roz_ctrl;
+	optional_shared_ptr<u32> m_tx_scroll;
+	optional_shared_ptr<u32> m_bg_scroll;
+	optional_shared_ptr<u32> m_mahjong_input_select;
+	optional_shared_ptr<u8> m_priram;
+	optional_shared_ptr<u16> m_palram;
+	optional_shared_ptr<u16> m_rozram;
+	optional_shared_ptr<u16> m_lineram;
+	optional_shared_ptr<u16> m_sprram;
+	optional_shared_ptr<u16> m_txram;
+	optional_shared_ptr<u16> m_bgram;
+	optional_shared_ptr<u16> m_f1superb_extraram;
 
 	optional_memory_bank_array<2> m_z80bank;
-	std::unique_ptr<uint8_t[]> m_nvram_8;
-	uint32_t m_to_main;
-	uint16_t m_irqreq;
+	std::unique_ptr<u8[]> m_nvram_8;
+	std::unique_ptr<u16[]> m_sprram_buffer;
+	u32 m_to_main;
+	u16 m_irqreq;
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_roz_tilemap;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_bg_tilemap_alt;
-	uint32_t m_tilemaplayoutcontrol;
+	u32 m_tilemaplayoutcontrol;
 	tilemap_t* m_extra_tilemap;
 	bitmap_ind16 m_temp_bitmap_tilemaps;
 	bitmap_ind16 m_temp_bitmap_sprites;
 	bitmap_ind8 m_temp_bitmap_sprites_pri;
-	uint32_t m_brt[4];
+	u32 m_brt[4];
 	int m_brt_r;
 	int m_brt_g;
 	int m_brt_b;
@@ -144,11 +147,12 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_VIDEO_START(f1superb);
-	uint32_t screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_ms32);
 	void irq_init();
 	void irq_raise(int level);
 	void update_color(int color);
-	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, uint16_t *sprram_top, size_t sprram_size, int gfxnum, int reverseorder);
+	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u16 *sprram_top, size_t sprram_size, int reverseorder);
 	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int priority);
 	void f1superb_map(address_map &map);
 	void ms32_map(address_map &map);

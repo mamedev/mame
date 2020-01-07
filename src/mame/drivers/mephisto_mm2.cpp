@@ -71,6 +71,7 @@ http://chesseval.com/ChessEvalJournal/PrototypeMMV.htm
 TODO:
 - need to emulate TurboKit properly, also for mm5p (it's not as simple as a CPU
   overclock plus ROM patch)
+- LCD module is 8.8.:8.8 like mephisto_brikett/mm1 (so, add ":" in the middle)
 
 ******************************************************************************/
 
@@ -467,8 +468,8 @@ void mephisto_state::mm2(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START(rebel5)
-	ROM_REGION(0x10000,"maincpu",0)
+ROM_START( rebel5 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS("v2")
 	ROM_SYSTEM_BIOS( 0, "v1", "V1" )
 	ROMX_LOAD("rebel5_v1.rom", 0x8000, 0x8000, CRC(8d02e1ef) SHA1(9972c75936613bd68cfd3fe62bd222e90e8b1083), ROM_BIOS(0))
@@ -476,8 +477,8 @@ ROM_START(rebel5)
 	ROMX_LOAD("rebel5_v2.rom", 0x8000, 0x8000, CRC(17232752) SHA1(3cd6893c0071f3dc02785bf99f1950eed81eba39), ROM_BIOS(1))
 ROM_END
 
-ROM_START(mm2)
-	ROM_REGION(0x10000,"maincpu",0)
+ROM_START( mm2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS("v42") // no official versioning, chronological order is assumed here from hex compare
 	ROM_SYSTEM_BIOS( 0, "v1", "V1 (2 EPROMs)" )
 	ROMX_LOAD("mm2_v1_1.bin", 0x8000, 0x4000, CRC(b91dab77) SHA1(67762304afe51fb8f1eb91259567b2451bf9bbfd), ROM_BIOS(0))
@@ -494,8 +495,8 @@ ROM_START(mm2)
 	ROMX_LOAD("mm2_v4_2.bin", 0xc000, 0x4000, CRC(d40cbfc2) SHA1(4e9b19b1a0ad97868b31d7a55143a1778110cc96), ROM_BIOS(4))
 ROM_END
 
-ROM_START(bup)
-	ROM_REGION(0x10000,"maincpu",0)
+ROM_START( bup )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS("v2")
 	ROM_SYSTEM_BIOS( 0, "v1", "V1" )
 	ROMX_LOAD("bup_v1_1.bin", 0x8000, 0x4000, CRC(e1e9625a) SHA1(8a757e28b7afca2a092f8ff419087e06b07b743e), ROM_BIOS(0))
@@ -505,29 +506,35 @@ ROM_START(bup)
 	ROMX_LOAD("bup_v2_2.bin", 0xc000, 0x4000, CRC(6db30b80) SHA1(df4b379c4e916dff6b4110ec9c3591a9620c3424), ROM_BIOS(1))
 ROM_END
 
-ROM_START(mm4)
-	ROM_REGION(0x10000,"maincpu",0)
-	ROM_LOAD("mephisto4.rom", 0x8000, 0x8000, CRC(f68a4124) SHA1(d1d03a9aacc291d5cb720d2ee2a209eeba13a36c))
+ROM_START( mm4 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_DEFAULT_BIOS("v3")
+	ROM_SYSTEM_BIOS( 0, "v1", "V1" )
+	ROMX_LOAD("600", 0x8000, 0x8000, CRC(837d49b9) SHA1(9fb2dfaaeca2559ce582211137635c069180e95f), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS( 1, "v2", "V2" )
+	ROMX_LOAD("700", 0x8000, 0x8000, CRC(c97da840) SHA1(10bd2a391338ed2e417b35dcb6396ab4a4e360f0), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 2, "v3", "V3" )
+	ROMX_LOAD("710", 0x8000, 0x8000, CRC(f68a4124) SHA1(d1d03a9aacc291d5cb720d2ee2a209eeba13a36c), ROM_BIOS(2))
 ROM_END
 
-ROM_START(mm4tk)
-	ROM_REGION(0x10000,"maincpu",0)
-	ROM_LOAD("mm4tk.rom", 0x8000, 0x8000, CRC(51cb36a4) SHA1(9e184b4e85bb721e794b88d8657ae8d2ff5a24af))
+ROM_START( mm4tk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("mm4tk.rom", 0x8000, 0x8000, CRC(51cb36a4) SHA1(9e184b4e85bb721e794b88d8657ae8d2ff5a24af) )
 ROM_END
 
-ROM_START(mm5)
-	ROM_REGION(0x10000,"maincpu",0)
-	ROM_DEFAULT_BIOS("v51")
-	ROM_SYSTEM_BIOS( 0, "v50", "V5.0" )
+ROM_START( mm5 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_DEFAULT_BIOS("v2")
+	ROM_SYSTEM_BIOS( 0, "v1", "V1" )
 	ROMX_LOAD("mm50.rom", 0x8000, 0x8000, CRC(fcfa7e6e) SHA1(afeac3a8c957ba58cefaa27b11df974f6f2066da), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS( 1, "v51", "V5.1" )
+	ROM_SYSTEM_BIOS( 1, "v2", "V2" )
 	ROMX_LOAD("mephisto5.rom", 0x8000, 0x8000, CRC(89c3d9d2) SHA1(77cd6f8eeb03c713249db140d2541e3264328048), ROM_BIOS(1))
 ROM_END
 
-ROM_START(mm5p)
+ROM_START( mm5p )
 	ROM_REGION(0x10000,"maincpu",0)
-	ROM_LOAD("buch.bin", 0x0000, 0x8000, CRC(534607c7) SHA1(d0347a5f8dc4cf6001f649aa13e7a7fe75bec5b9)) // 1st half empty
-	ROM_LOAD("programm.bin", 0x8000, 0x8000, CRC(ee22b974) SHA1(37267507be30ee84051bc94c3a63fb1298a00261))
+	ROM_LOAD("buch.bin", 0x0000, 0x8000, CRC(534607c7) SHA1(d0347a5f8dc4cf6001f649aa13e7a7fe75bec5b9) ) // 1st half empty
+	ROM_LOAD("programm.bin", 0x8000, 0x8000, CRC(ee22b974) SHA1(37267507be30ee84051bc94c3a63fb1298a00261) )
 ROM_END
 
 

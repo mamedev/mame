@@ -410,9 +410,14 @@ void device_execute_interface::interface_post_start()
 	device().save_item(NAME(m_totalcycles));
 	device().save_item(NAME(m_localtime));
 
+	// it's more efficient and causes less clutter to save these this way
+	device().save_item(STRUCT_MEMBER(m_input, m_stored_vector));
+	device().save_item(STRUCT_MEMBER(m_input, m_curvector));
+	device().save_item(STRUCT_MEMBER(m_input, m_curstate));
+
 	// fill in the input states and IRQ callback information
 	for (int line = 0; line < ARRAY_LENGTH(m_input); line++)
-		m_input[line].start(this, line);
+		m_input[line].start(*this, line);
 }
 
 
@@ -668,17 +673,12 @@ device_execute_interface::device_input::device_input()
 //  can set ourselves up
 //-------------------------------------------------
 
-void device_execute_interface::device_input::start(device_execute_interface *execute, int linenum)
+void device_execute_interface::device_input::start(device_execute_interface &execute, int linenum)
 {
-	m_execute = execute;
+	m_execute = &execute;
 	m_linenum = linenum;
 
 	reset();
-
-	device_t &device = m_execute->device();
-	device.save_item(NAME(m_stored_vector), m_linenum);
-	device.save_item(NAME(m_curvector), m_linenum);
-	device.save_item(NAME(m_curstate), m_linenum);
 }
 
 

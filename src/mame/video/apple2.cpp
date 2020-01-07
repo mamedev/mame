@@ -843,7 +843,6 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 				|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
 				|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
 
-
 			// verified on h/w: setting dhires w/o 80col emulates a rev. 0 Apple ][ with no orange/blue
 			if (m_dhires)
 			{
@@ -873,17 +872,29 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 				case 1:
 					w >>= 7;
+					if (vram_row[col] & 0x80)
+					{
+						p--;
+					}
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
 						w >>= 1;
 						*(p++) = v ? WHITE : BLACK;
 						*(p++) = v ? WHITE : BLACK;
+					}
+					if (vram_row[col] & 0x80)
+					{
+						p++;
 					}
 					break;
 
 				case 2:
 					w >>= 7;
+					if (vram_row[col] & 0x80)
+					{
+						p--;
+					}
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
@@ -891,16 +902,28 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 						*(p++) = v ? GREEN : BLACK;
 						*(p++) = v ? GREEN : BLACK;
 					}
+					if (vram_row[col] & 0x80)
+					{
+						p++;
+					}
 					break;
 
 				case 3:
 					w >>= 7;
+					if (vram_row[col] & 0x80)
+					{
+						p--;
+					}
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
 						w >>= 1;
 						*(p++) = v ? ORANGE : BLACK;
 						*(p++) = v ? ORANGE : BLACK;
+					}
+					if (vram_row[col] & 0x80)
+					{
+						p++;
 					}
 					break;
 			}
@@ -962,19 +985,31 @@ void a2_video_device::hgr_update_tk2000(screen_device &screen, bitmap_ind16 &bit
 					}
 					break;
 
-				case 1:
+			   case 1:
 					w >>= 7;
+					if (vram_row[col] & 0x80)
+					{
+						p--;
+					}
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
 						w >>= 1;
 						*(p++) = v ? WHITE : BLACK;
 						*(p++) = v ? WHITE : BLACK;
+					}
+					if (vram_row[col] & 0x80)
+					{
+						p++;
 					}
 					break;
 
 				case 2:
 					w >>= 7;
+					if (vram_row[col] & 0x80)
+					{
+						p--;
+					}
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
@@ -982,16 +1017,28 @@ void a2_video_device::hgr_update_tk2000(screen_device &screen, bitmap_ind16 &bit
 						*(p++) = v ? GREEN : BLACK;
 						*(p++) = v ? GREEN : BLACK;
 					}
+					if (vram_row[col] & 0x80)
+					{
+						p++;
+					}
 					break;
 
 				case 3:
 					w >>= 7;
+					if (vram_row[col] & 0x80)
+					{
+						p--;
+					}
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
 						w >>= 1;
 						*(p++) = v ? ORANGE : BLACK;
 						*(p++) = v ? ORANGE : BLACK;
+					}
+					if (vram_row[col] & 0x80)
+					{
+						p++;
 					}
 					break;
 			}
@@ -1094,28 +1141,28 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 }
 
-/* according to Steve Nickolas (author of Dapple), our original palette would
- * have been more appropriate for an Apple IIgs.  So we've substituted in the
- * Robert Munafo palette instead, which is more accurate on 8-bit Apples
- */
+/*
+    Latest Apple II NTSC palette from "Apple II Video Display Theory"
+    https://docs.google.com/spreadsheets/d/1rKR6A_bVniSCtIP_rrv8QLWJdj4h6jEU1jJj0AebWwg/
+*/
 static const rgb_t apple2_palette[] =
 {
 	rgb_t::black(),
-	rgb_t(0xE3, 0x1E, 0x60), /* Dark Red */
-	rgb_t(0x60, 0x4E, 0xBD), /* Dark Blue */
-	rgb_t(0xFF, 0x44, 0xFD), /* Purple */
-	rgb_t(0x00, 0xA3, 0x60), /* Dark Green */
-	rgb_t(0x9C, 0x9C, 0x9C), /* Dark Gray */
-	rgb_t(0x14, 0xCF, 0xFD), /* Medium Blue */
-	rgb_t(0xD0, 0xC3, 0xFF), /* Light Blue */
-	rgb_t(0x60, 0x72, 0x03), /* Brown */
-	rgb_t(0xFF, 0x6A, 0x3C), /* Orange */
-	rgb_t(0x9C, 0x9C, 0x9C), /* Light Grey */
-	rgb_t(0xFF, 0xA0, 0xD0), /* Pink */
-	rgb_t(0x14, 0xF5, 0x3C), /* Light Green */
-	rgb_t(0xD0, 0xDD, 0x8D), /* Yellow */
-	rgb_t(0x72, 0xFF, 0xD0), /* Aquamarine */
-	rgb_t(0xFF, 0xFF, 0xFF)  /* White */
+	rgb_t(0xa7, 0x0b, 0x40), /* Dark Red */
+	rgb_t(0x40, 0x1c, 0xf7), /* Dark Blue */
+	rgb_t(0xe6, 0x28, 0xff), /* Purple */
+	rgb_t(0x00, 0x74, 0x40), /* Dark Green */
+	rgb_t(0x80, 0x80, 0x80), /* Dark Gray */
+	rgb_t(0x19, 0x90, 0xff), /* Medium Blue */
+	rgb_t(0xbf, 0x9c, 0xff), /* Light Blue */
+	rgb_t(0x40, 0x63, 0x00), /* Brown */
+	rgb_t(0xe6, 0x6f, 0x00), /* Orange */
+	rgb_t(0x80, 0x80, 0x80), /* Light Grey */
+	rgb_t(0xff, 0x8b, 0xbf), /* Pink */
+	rgb_t(0x19, 0xd7, 0x00), /* Light Green */
+	rgb_t(0xbf, 0xe3, 0x08), /* Yellow */
+	rgb_t(0x58, 0xf4, 0xbf), /* Aquamarine */
+	rgb_t(0xff, 0xff, 0xff)  /* White */
 };
 
 void a2_video_device::init_palette()

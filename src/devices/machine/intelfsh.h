@@ -20,6 +20,7 @@ public:
 		FLASH_FUJITSU_29F160T,
 		FLASH_FUJITSU_29F016A,
 		FLASH_FUJITSU_29DL16X,
+		FLASH_FUJITSU_29LV002TC,
 		FLASH_ATMEL_29C010,
 		FLASH_AMD_29F010,
 		FLASH_AMD_29F040,
@@ -159,6 +160,12 @@ class fujitsu_29dl16x_device : public intelfsh8_device
 {
 public:
 	fujitsu_29dl16x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+class fujitsu_29lv002tc_device : public intelfsh8_device
+{
+public:
+	fujitsu_29lv002tc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class atmel_29c010_device : public intelfsh8_device
@@ -352,6 +359,7 @@ DECLARE_DEVICE_TYPE(AMD_29LV200T,          amd_29lv200t_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29F160T,       fujitsu_29f160t_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29F016A,       fujitsu_29f016a_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29DL16X,       fujitsu_29dl16x_device)
+DECLARE_DEVICE_TYPE(FUJITSU_29LV002TC,     fujitsu_29lv002tc_device)
 DECLARE_DEVICE_TYPE(INTEL_E28F400B,        intel_e28f400b_device)
 DECLARE_DEVICE_TYPE(MACRONIX_29L001MC,     macronix_29l001mc_device)
 DECLARE_DEVICE_TYPE(MACRONIX_29LV160TMC,   macronix_29lv160tmc_device)

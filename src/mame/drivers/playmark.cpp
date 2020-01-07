@@ -43,17 +43,47 @@ to correct the music playback sequencing and also allow sound effect samples to
 play on any of the three available sample channels. The fourth channel is reserved
 for music playback.
 
-HotMind and presumably Lucky Boom have a Jamma expansion board that plugs onto the
-main boards Jamma connector and provides extra I/O using the generic Player-2 pins.
+There is another World Beach Volley with a (undumped) S87C751 for sound instead of a
+PIC (also with an OKI M6295) which fully matches "World Beach Volley (set 1)" for the
+other ROMS. It's an original PCB from Playmark Italy.
+
+HotMind, World Beach Volley and presumably Lucky Boom have a JAMMA expansion board
+that plugs onto the main boards Jamma connector and provides extra I/O using the
+generic Player-2 pins.
 The expansion boards provides I/O for the Token and Ticket dispensers, drive circuit
 for Coin-In Counter and Credit-Out Counter. In the case of HotMind, a 93C46 EEPROM
 for storing game config/stats. The Expansion board then has a male Jamma connector
 that you plug into your Jamma harness.
 
+The World Beach Volley JAMMA expansion board for the 87C751 version follows this layout:
+
+  PLAYMARK ITALY 1995
+  LINK2
+  ____________________________
+  |___    ___________        |
+     |   | TDA1510AQ|        |
+  ___|   |__________|        |
+  |__                        |
+J |__                        |
+A  __|                       |
+M |__                        |
+M |__      ___________       |
+A |__     |_MCT1413P_|       |
+  |__                        |
+  |__                       _|___
+  |__     ____________      |DB9|
+  |__    |SN74LS245N_|      |   | To main PCB
+  |__     ____________      |___|
+  |__    |S87C751-4N24       |
+  |__       ______           |
+  ___|      |XTAL|<-12.000   |
+  |         |____|           |
+  |__________________________|
+
 
 TODO:
-- World Beach Volley and Hard Times sound is controlled by a PIC16C57 whose internal
-  ROM is currently missing.
+- Hard Times sound is controlled by a PIC16C57 whose internal ROM is currently missing.
+- Dump the World Beach Volley sound S87C751 internal ROM.
 - Lucky Boom has some minor colour issue with the background - see the title screen. The
   game selects the wrong colour for some tiles. The tiles should be colour 0x01 not 0x02.
   Affects the backgrounds in game however it's barely noticeable.

@@ -247,8 +247,6 @@ namespace solver
 			mat.gaussian_back_substitution(this->m_new_V, this->m_RHS);
 		}
 
-		this->m_stat_calculations++;
-
 		bool err(false);
 		if (newton_raphson)
 			err = this->check_err();

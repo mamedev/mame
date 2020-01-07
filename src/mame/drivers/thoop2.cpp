@@ -269,6 +269,7 @@ void thoop2_state::thoop2(machine_config &config)
 
 	gaelco_ds5002fp_device &ds5002fp(GAELCO_DS5002FP(config, "gaelco_ds5002fp", XTAL(24'000'000) / 2)); // 12MHz verified
 	ds5002fp.set_addrmap(0, &thoop2_state::mcu_hostmem_map);
+	config.set_perfect_quantum("gaelco_ds5002fp:mcu");
 
 	LS259(config, m_outlatch);
 	m_outlatch->q_out_cb<0>().set(FUNC(thoop2_state::coin1_lockout_w));

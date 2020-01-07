@@ -728,7 +728,7 @@ Sound section:
 
 ***************************************************************************/
 
-ROM_START( magicbub )
+ROM_START( magicbub ) /* YS1302 PCB */
 
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "magbuble.u33", 0x000000, 0x040000, CRC(18fdd582) SHA1(89f4c52ec0e213285a04743da88f6e39408b573d) )
@@ -754,7 +754,7 @@ ROM_START( magicbub )
 
 ROM_END
 
-ROM_START( magicbuba )
+ROM_START( magicbuba ) /* YS1302 PCB */
 
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "u33.bin", 0x000000, 0x040000, CRC(a8164a02) SHA1(7275209d5d73881839f7fa3ac7d362194ef2cfd9) )
@@ -784,7 +784,37 @@ ROM_START( magicbuba )
 
 ROM_END
 
-ROM_START( magicbubb ) /* Found on a YS-0211 PCB like below */
+ROM_START( magicbubb ) /* YS1302 PCB */
+
+	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "p2.u33", 0x000000, 0x040000, CRC(24e7e2b4) SHA1(9cceef7ee7eb909ab2f4f5438695d62e2448f142) )
+	ROM_LOAD16_BYTE( "p1.u32", 0x000001, 0x040000, CRC(0fa8b089) SHA1(acac9879a5c2ba34fa71af00907676b1f4a81b16) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Z80 Code */
+	ROM_LOAD( "u143.bin", 0x00000, 0x10000, CRC(04192753) SHA1(9c56ba70e1d074906ea1dc593c2a8516c6ba2074) )
+
+	ROM_REGION( 0x200000*8, "gfx1", ROMREGION_ERASEFF ) /* 16x16x8 */
+	ROMX_LOAD( "u67.bin", 0x000000, 0x080000, CRC(89523dcd) SHA1(edea2bbec615aa253d940bbc3bbdb33f6873a8ee) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "u68.bin", 0x000002, 0x080000, CRC(30e01a70) SHA1(3a98c2ef61307b44bf4e155663117199587ff4a4) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "u69.bin", 0x000004, 0x080000, CRC(fe357f52) SHA1(5aff9a0bf70fc8a78820c4d13838ad238852c594) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "u70.bin", 0x000006, 0x080000, CRC(1398a473) SHA1(f58bda6cbf5f553a9632d910b2ffef5d5bfedf18) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "u71.bin", 0x200000, 0x080000, CRC(0844e017) SHA1(2ae5c9da521fea7aa5811627d7b3eca82cdc0821) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "u72.bin", 0x200002, 0x080000, CRC(591db1cb) SHA1(636fbfe9e048d6418d43f947004b281f61081fd8) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "u73.bin", 0x200004, 0x080000, CRC(cb4f3c3c) SHA1(fbd804bb70f09c2471557675af4c5b4abedea3b2) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "u74.bin", 0x200006, 0x080000, CRC(81ff4910) SHA1(69241fe2d20b53984aa67f17d8da32e1b74ce696) , ROM_GROUPWORD | ROM_SKIP(6))
+
+	ROM_REGION( 0x080000, "gfx2", 0 )   /* 16x16x4 */
+	ROM_LOAD( "1.u20", 0x000000, 0x020000, CRC(d3bba963) SHA1(39f04c8cb7f3c43a4df15a4a326c360a3c1e617c) )
+	ROM_LOAD( "3.u21", 0x020000, 0x020000, CRC(0017f6d3) SHA1(305aea32936babc86f60aac08f0e6a6af8b132ee) )
+	ROM_LOAD( "2.u22", 0x040000, 0x020000, CRC(7d71f838) SHA1(61b6e3af9a1b89b90297fe9c164e4ba62730caf0) )
+	ROM_LOAD( "4.u23", 0x060000, 0x020000, CRC(ecee1f63) SHA1(7a94ca5b749dc3fc302b28dbeab7e756167b0793) )
+
+	ROM_REGION( 0x080000, "oki", 0 )    /* Samples */
+	ROM_LOAD( "u131", 0x000000, 0x040000, CRC(9bdb08e4) SHA1(4d8bdeb9b503b0959a6ae3f3fb3574350b01b1a1) )
+
+ROM_END
+
+ROM_START( magicbubc ) /* Found on a YS-0211 PCB like below */
 
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "u33", 0x000000, 0x040000, CRC(db651555) SHA1(41dbf35147e1c646db585437b378529559d3decb) )
@@ -1022,12 +1052,13 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 199?, magicbub,   0,        magicbub, magicbub, magicbub_state, empty_init, ROT0,   "Yun Sung", "Magic Bubble",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, magicbuba,  magicbub, magicbub, magicbua, magicbub_state, empty_init, ROT0,   "Yun Sung", "Magic Bubble (Adult version, YS-1302 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, magicbubb,  magicbub, shocking, magicbua, shocking_state, empty_init, ROT0,   "Yun Sung", "Magic Bubble (Adult version, YS-0211 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, paprazzi,   0,        shocking, paprazzi, shocking_state, empty_init, ROT270, "Yun Sung", "Paparazzi",                                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, shocking,   0,        shocking, shocking, shocking_state, empty_init, ROT0,   "Yun Sung", "Shocking",                                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, shockingk,  shocking, shocking, shocking, shocking_state, empty_init, ROT0,   "Yun Sung", "Shocking (Korea, set 1)",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, shockingko, shocking, shocking, shocking, shocking_state, empty_init, ROT0,   "Yun Sung", "Shocking (Korea, set 2)",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bombkick,   0,        shocking, bombkick, shocking_state, empty_init, ROT0,   "Yun Sung", "Bomb Kick (set 1)",                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bombkicka,  bombkick, shocking, bombkick, shocking_state, empty_init, ROT0,   "Yun Sung", "Bomb Kick (set 2)",                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, magicbub,   0,        magicbub, magicbub, magicbub_state, empty_init, ROT0,   "Yun Sung", "Magic Bubble",                                     MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, magicbuba,  magicbub, magicbub, magicbua, magicbub_state, empty_init, ROT0,   "Yun Sung", "Magic Bubble (Adult version, YS1302 PCB, set 1)",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, magicbubb,  magicbub, magicbub, magicbua, magicbub_state, empty_init, ROT0,   "Yun Sung", "Magic Bubble (Adult version, YS1302 PCB, set 2)",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, magicbubc,  magicbub, shocking, magicbua, shocking_state, empty_init, ROT0,   "Yun Sung", "Magic Bubble (Adult version, YS-0211 PCB)",        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, paprazzi,   0,        shocking, paprazzi, shocking_state, empty_init, ROT270, "Yun Sung", "Paparazzi",                                        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, shocking,   0,        shocking, shocking, shocking_state, empty_init, ROT0,   "Yun Sung", "Shocking",                                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, shockingk,  shocking, shocking, shocking, shocking_state, empty_init, ROT0,   "Yun Sung", "Shocking (Korea, set 1)",                          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, shockingko, shocking, shocking, shocking, shocking_state, empty_init, ROT0,   "Yun Sung", "Shocking (Korea, set 2)",                          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bombkick,   0,        shocking, bombkick, shocking_state, empty_init, ROT0,   "Yun Sung", "Bomb Kick (set 1)",                                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bombkicka,  bombkick, shocking, bombkick, shocking_state, empty_init, ROT0,   "Yun Sung", "Bomb Kick (set 2)",                                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

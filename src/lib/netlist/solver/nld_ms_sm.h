@@ -289,7 +289,6 @@ namespace solver
 		this->clear_square_mat(this->m_A);
 		this->fill_matrix_and_rhs();
 
-		this->m_stat_calculations++;
 		return this->solve_non_dynamic(newton_raphson);
 	}
 

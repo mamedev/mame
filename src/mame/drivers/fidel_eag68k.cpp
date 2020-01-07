@@ -678,7 +678,7 @@ void eag_state::eagv9(machine_config &config)
 	eagv7(config);
 
 	/* basic machine hardware */
-	M68030(config.replace(), m_maincpu, 32_MHz_XTAL/2); // also seen with 40MHz XTAL
+	M68030(config.replace(), m_maincpu, 32_MHz_XTAL); // also seen with 40MHz XTAL
 	m_maincpu->disable_interrupt_mixer();
 	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eagv7_map);
 }

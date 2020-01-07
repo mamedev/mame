@@ -907,7 +907,6 @@ void apollo_state::machine_reset()
 #ifdef APOLLO_XXL
 	// set configuration
 	omti8621_device::set_verbose(apollo_config(APOLLO_CONF_DISK_TRACE));
-	threecom3c505_device::set_verbose(apollo_config(APOLLO_CONF_NET_TRACE));
 #endif
 
 	if (apollo_config(APOLLO_CONF_NODE_ID))

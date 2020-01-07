@@ -80,9 +80,9 @@ bool image_software_list_loader::load_software(device_image_interface &image, so
 //  software_list_device - constructor
 //-------------------------------------------------
 
-software_list_device::software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, SOFTWARE_LIST, tag, owner, clock),
-	m_list_type(SOFTWARE_LIST_ORIGINAL_SYSTEM),
+software_list_device::software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, SOFTWARE_LIST, tag, owner, clock),
+	m_list_type(softlist_type::ORIGINAL_SYSTEM),
 	m_filter(nullptr),
 	m_parsed(false),
 	m_file(mconfig.options().hash_path(), OPEN_FLAG_READ),
@@ -220,7 +220,7 @@ void software_list_device::display_matches(const machine_config &config, const c
 		if (matches[0] != nullptr)
 		{
 			// different output depending on original system or compatible
-			if (swlistdev.list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM)
+			if (swlistdev.is_original())
 				osd_printf_error("* Software list \"%s\" (%s) matches: \n", swlistdev.list_name(), swlistdev.description());
 			else
 				osd_printf_error("* Compatible software list \"%s\" (%s) matches: \n", swlistdev.list_name(), swlistdev.description());

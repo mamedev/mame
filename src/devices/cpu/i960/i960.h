@@ -106,10 +106,10 @@ private:
 	void burst_stall_save(uint32_t t1, uint32_t t2, int index, int size, bool iswriteop);
 
 	struct {
-		uint32_t t1,t2;
-		int index,size;
-		bool burst_mode;
-		bool iswriteop;
+		uint32_t t1 = 0, t2 = 0;
+		int index = 0, size = 0;
+		bool burst_mode = false;
+		bool iswriteop = false;
 	}m_stall_state;
 	bool m_stalled;
 

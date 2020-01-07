@@ -21,14 +21,23 @@
 class sunplus_gcm394_base_device : public unsp_20_device, public device_mixer_interface
 {
 public:
-	sunplus_gcm394_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: unsp_20_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(sunplus_gcm394_base_device::internal_map), this))
-	, device_mixer_interface(mconfig, *this, 2)
-	, m_screen(*this, finder_base::DUMMY_TAG)
-	, m_spg_video(*this, "spgvideo")
-	, m_spg_audio(*this, "spgaudio")
-	, m_porta_in(*this)
-	, m_portb_in(*this)
+	sunplus_gcm394_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+		sunplus_gcm394_base_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(sunplus_gcm394_base_device::gcm394_internal_map), this))
+	{
+	}
+
+	sunplus_gcm394_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock, address_map_constructor internal) :
+		unsp_20_device(mconfig, type, tag, owner, clock, internal),
+		device_mixer_interface(mconfig, *this, 2),
+		m_screen(*this, finder_base::DUMMY_TAG),
+		m_spg_video(*this, "spgvideo"),
+		m_spg_audio(*this, "spgaudio"),
+		m_porta_in(*this),
+		m_portb_in(*this),
+		m_porta_out(*this),
+		m_space_read_cb(*this),
+		m_space_write_cb(*this),
+		m_mapping_write_cb(*this)
 	{
 	}
 
@@ -37,16 +46,25 @@ public:
 	auto porta_in() { return m_porta_in.bind(); }
 	auto portb_in() { return m_portb_in.bind(); }
 
+	auto porta_out() { return m_porta_out.bind(); }
+
+	auto space_read_callback() { return m_space_read_cb.bind(); }
+	auto space_write_callback() { return m_space_write_cb.bind(); }
+	auto mapping_write_callback() { return m_mapping_write_cb.bind(); }
+
+
 	DECLARE_WRITE_LINE_MEMBER(vblank) { m_spg_video->vblank(state); }
 
 	virtual void device_add_mconfig(machine_config& config) override;
+
+	IRQ_CALLBACK_MEMBER(irq_vector_cb);
 
 protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	void internal_map(address_map &map);
+	void gcm394_internal_map(address_map &map);
 
 	required_device<screen_device> m_screen;
 	required_device<gcm394_video_device> m_spg_video;
@@ -54,6 +72,8 @@ protected:
 
 	devcb_read16 m_porta_in;
 	devcb_read16 m_portb_in;
+
+	devcb_write16 m_porta_out;
 
 	uint16_t m_dma_params[7];
 
@@ -124,6 +144,10 @@ protected:
 	uint16_t m_7961;
 
 private:
+	devcb_read16 m_space_read_cb;
+	devcb_write16 m_space_write_cb;
+	devcb_write16 m_mapping_write_cb;
+
 	DECLARE_READ16_MEMBER(unk_r);
 	DECLARE_WRITE16_MEMBER(unk_w);
 
@@ -162,8 +186,8 @@ private:
 	DECLARE_READ16_MEMBER(unkarea_782d_r);
 	DECLARE_WRITE16_MEMBER(unkarea_782d_w);
 
-	DECLARE_READ16_MEMBER(ioport_a_r);
-	DECLARE_WRITE16_MEMBER(ioport_a_w);
+	DECLARE_READ16_MEMBER(ioarea_7860_porta_r);
+	DECLARE_WRITE16_MEMBER(ioarea_7860_porta_w);
 
 	DECLARE_READ16_MEMBER(unkarea_7861_r);
 
@@ -172,8 +196,8 @@ private:
 	DECLARE_READ16_MEMBER(unkarea_7863_r);
 	DECLARE_WRITE16_MEMBER(unkarea_7863_w);
 
-	DECLARE_READ16_MEMBER(unkarea_7870_r);
-	DECLARE_WRITE16_MEMBER(unkarea_7870_w);
+	DECLARE_READ16_MEMBER(ioarea_7870_portb_r);
+	DECLARE_WRITE16_MEMBER(ioarea_7870_portb_w);
 
 	DECLARE_READ16_MEMBER(unkarea_7871_r);
 
@@ -189,6 +213,9 @@ private:
 
 	DECLARE_WRITE16_MEMBER(unkarea_78a0_w);
 
+	DECLARE_READ16_MEMBER(unkarea_78a0_r);
+	DECLARE_READ16_MEMBER(unkarea_78a1_r);
+
 	DECLARE_WRITE16_MEMBER(unkarea_78a4_w);
 	DECLARE_WRITE16_MEMBER(unkarea_78a5_w);
 	DECLARE_WRITE16_MEMBER(unkarea_78a6_w);
@@ -197,6 +224,8 @@ private:
 
 	DECLARE_WRITE16_MEMBER(unkarea_78b0_w);
 	DECLARE_WRITE16_MEMBER(unkarea_78b1_w);
+
+	DECLARE_READ16_MEMBER(unkarea_78b2_r);
 	DECLARE_WRITE16_MEMBER(unkarea_78b2_w);
 
 	DECLARE_WRITE16_MEMBER(unkarea_78b8_w);
@@ -237,8 +266,8 @@ class sunplus_gcm394_device : public sunplus_gcm394_base_device
 {
 public:
 	template <typename T>
-	sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag)
-		: sunplus_gcm394_device(mconfig, tag, owner, clock)
+	sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag) :
+		sunplus_gcm394_device(mconfig, tag, owner, clock)
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
 	}
@@ -247,6 +276,42 @@ public:
 };
 
 
+class generalplus_gpac800_device : public sunplus_gcm394_base_device
+{
+public:
+	template <typename T>
+	generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag) :
+		generalplus_gpac800_device(mconfig, tag, owner, clock)
+	{
+		m_screen.set_tag(std::forward<T>(screen_tag));
+		m_testval = 0;
+	}
+
+	generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	void gpac800_internal_map(address_map &map);
+
+	//virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	DECLARE_READ16_MEMBER(unkarea_7850_r);
+	DECLARE_READ16_MEMBER(unkarea_7854_r);
+
+	DECLARE_WRITE16_MEMBER(flash_addr_low_w);
+	DECLARE_WRITE16_MEMBER(flash_addr_high_w);
+
+	int m_testval;
+
+	uint16_t m_flash_addr_low;
+	uint16_t m_flash_addr_high;
+
+};
+
+
+
 DECLARE_DEVICE_TYPE(GCM394, sunplus_gcm394_device)
+DECLARE_DEVICE_TYPE(GPAC800, generalplus_gpac800_device)
 
 #endif // MAME_MACHINE_SUNPLUS_GCM394_H

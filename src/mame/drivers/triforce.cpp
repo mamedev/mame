@@ -1149,18 +1149,48 @@ ROM_START( tcfboxa )
 	ROM_LOAD("317-0567-com.pic", 0x00, 0x4000, CRC(cd1d2b2d) SHA1(78203ee0339f76eb76da08d7de43e7e44e4b7d32) )
 ROM_END
 
-// This dump is tested good on h/w: was flashed to a dead cart and it then ran fine
+
+// the following triforce games use a flash board instead of a gdrom
+// the flash board contains a 29lv400t chip used as a block index, whose format works as follows:
+// * 0x00000-0x77fff is an index of 16-bit little endian offsets, in "sectors" (see below)
+//   into the flash area, each corresponding to where to look for the data for sector n, where n is the
+//   sector of data being looked for by the host system. Unused sectors past the end of the data have their
+//   index set to FF FF.
+// * 0x78000-0x78007 contains what seems to be two 32-bit checksums, this isn't clear.
+// * 0x78020-0x7802f contains what seems to be a list of 16 error counts (possibly corresponding to d0 thru d15)
+//   and written during the 'formatting/copying' portion of creating the flash board for a given game.
+//   For instance, the dump of mkartagp skips two blocks in its lookup list, and the 16 'lanes' in the
+//   0x78020-0x7802f area are 00 except for two values, which are 1. The corresponding two skipped blocks
+//   in the flash area are all zero/unused.
+//   Likewise, with mkartagp2, there are three 1 value and one 2 values in the table,
+//   and mkartagp2 skips 5 blocks in its mapping table.
+// * 0x79ffc-0x79fff contains what may be a checksum of the 0x78000-0x79ffb area? unclear.
+
+// the flash board has up to 8 k9f1208u0b or k9k1g08uoa flash roms, which contain both sector data broken into 512 byte sectors,
+// and 16 bytes of metadata appearing immediately after each sector.
+// In the implementation on this board, the data for each sector is 512 words long
+// (technically 512 bytes long, but in this implementation it is interleaved between two flash roms)
+// followed by a 16-word metadata area which contains what seems to be the sector checksums.
+// This checksum data may be specific to its local rom, meaning it is only the checksum
+// for the high half or the low half of each word, depending on which rom the metadata appears in. The
+// checksum algorithm is unknown, and it is unclear if the checksum is for the des-encrypted or decrypted data.
+// Each rom is (512+16)*131072 or (512+16)*262144 bytes long respectively, and the rom can be used in
+// either an 8 bit wide or 16 bit wide mode. It is unclear whether the pcb uses it in the 8 or 16 bit wide mode,
+// however the data is interleaved bytewise (not wordwise), regardless of which mode is used.
+
+// The original dumper wrote: "This dump is tested good on h/w: was flashed to a dead cart and it then ran fine"
+// further research has indicated that the dump below has a lot of missing data, and one rom entirely blank/bad.
 ROM_START( mkartagp )
 	TRIFORCE_BIOS
 
 	ROM_REGION(0x19000000, "rom_board", 0)
-	ROM_LOAD( "ic9_29lv400t",    0x00000000, 0x0080000, CRC(f1ba67b2) SHA1(212fe4b28b6f9590bff200a6680bf7ee381780c7) )
-	ROM_LOAD( "ic1_k9f1208u0b",  0x01000000, 0x4200000, CRC(7edb6ff2) SHA1(c544c09fc0441f940623c7368919e46153d49c20) )
-	ROM_LOAD( "ic2_k9f1208u0b",  0x04200000, 0x4200000, CRC(beb58594) SHA1(826ddc3db46f7644b08488618453917430bb16a1) )
-	ROM_LOAD( "ic5_k9f1208u0b",  0x08400000, 0x4200000, CRC(fd7b9a28) SHA1(bc56c0a786e70de7365bd1b46fe82b3c43388f0c) )
-	ROM_LOAD( "ic6_k9f1208u0b",  0x0c600000, 0x4200000, CRC(26bcfe14) SHA1(893e6b38cccca62037fc01012410d535634f8bc1) )
-	ROM_LOAD( "ic35_k9f1208u0b", 0x10800000, 0x4200000, CRC(9a67892f) SHA1(f2beb56d07a42a01a8cfffbf683d8ec58c8407cc) )
-	ROM_LOAD( "ic45_k9f1208u0b", 0x14c00000, 0x4200000, CRC(274e7b81) SHA1(d97951c19d4ea430e09bc56777d99651a1f888d1) )
+	ROM_LOAD16_BYTE( "ic1_k9f1208u0b",  0x00000000, 0x4200000, BAD_DUMP CRC(7edb6ff2) SHA1(c544c09fc0441f940623c7368919e46153d49c20) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and should not be
+	ROM_LOAD16_BYTE( "ic2_k9f1208u0b",  0x00000001, 0x4200000, BAD_DUMP CRC(beb58594) SHA1(826ddc3db46f7644b08488618453917430bb16a1) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and should not be
+	ROM_LOAD16_BYTE( "ic35_k9f1208u0b", 0x08400000, 0x4200000, BAD_DUMP CRC(9a67892f) SHA1(f2beb56d07a42a01a8cfffbf683d8ec58c8407cc) ) // This dump is completely blank (0xFF)
+	ROM_LOAD16_BYTE( "ic45_k9f1208u0b", 0x08400001, 0x4200000, BAD_DUMP CRC(274e7b81) SHA1(d97951c19d4ea430e09bc56777d99651a1f888d1) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and should not be
+	ROM_LOAD16_BYTE( "ic5_k9f1208u0b",  0x10800000, 0x4200000, BAD_DUMP CRC(fd7b9a28) SHA1(bc56c0a786e70de7365bd1b46fe82b3c43388f0c) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and MAYBE should not be, since it is after the end of the data in the rom, so it may be correct
+	ROM_LOAD16_BYTE( "ic6_k9f1208u0b",  0x10800001, 0x4200000, BAD_DUMP CRC(26bcfe14) SHA1(893e6b38cccca62037fc01012410d535634f8bc1) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and MAYBE should not be, since it is after the end of the data in the rom, so it may be correct
+	ROM_LOAD( "ic9_29lv400t",     0x18c00000, 0x0080000, CRC(f1ba67b2) SHA1(212fe4b28b6f9590bff200a6680bf7ee381780c7) ) // block mapping flash rom
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	ROM_LOAD("317-5109-com.pic", 0x00, 0x4000, CRC(b7159fe3) SHA1(886c026ae62651bb5f700dfd6f9ebb2c415c1ae8) )
@@ -1180,16 +1210,16 @@ ROM_START( mkartag2 )
 
 	ROM_REGION(0x21200000, "rom_board", 0)
 	// DES encrypted
-	ROM_LOAD16_BYTE( "ic1_k9f1208u0b.bin",    0x00000000, 0x4200000, CRC(e52f17ef) SHA1(1e007d3136cacb89c396b8261e3978956cc21bdd) )
-	ROM_LOAD16_BYTE( "ic2_k9f1208u0b.bin",    0x00000001, 0x4200000, CRC(8a6a2649) SHA1(fd4318e7fb5020c499e06fdb1996b8d40161b674) )
-	ROM_LOAD16_BYTE( "ic3_k9f1208u0b.bin",    0x08400000, 0x4200000, CRC(8fd44a29) SHA1(9392bc4da6541960a83e9c7b3ab4f36bc5564fb7) )
-	ROM_LOAD16_BYTE( "ic4_k9f1208u0b.bin",    0x08400001, 0x4200000, CRC(ae3fb198) SHA1(c9c0beb9f6875dbf7ce015454a59481524ef3ef6) )
-	ROM_LOAD16_BYTE( "ic5_k9f1208u0b.bin",    0x10800000, 0x4200000, CRC(e9208514) SHA1(ad0ed3e681cd78a61d7ad3af83db20e364bb47fd) )
-	ROM_LOAD16_BYTE( "ic6_k9f1208u0b.bin",    0x10800001, 0x4200000, CRC(7363697c) SHA1(997c96d0b41774a24a2e0427a703bc295e784187) )
-	ROM_LOAD16_BYTE( "ic7_k9f1208u0b.bin",    0x18c00000, 0x4200000, CRC(407da1d2) SHA1(c185ebd2f3d8654d8fd394c56ac9bfff7e49f125) )
-	ROM_LOAD16_BYTE( "ic8_k9f1208u0b.bin",    0x18c00001, 0x4200000, CRC(9ab76062) SHA1(36a6317c646da5cf682d46ca438ce05e600bc354) )
+	ROM_LOAD16_BYTE( "ic1_k9f1208u0b.bin",    0x00000000, 0x4200000, BAD_DUMP CRC(e52f17ef) SHA1(1e007d3136cacb89c396b8261e3978956cc21bdd) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and should not be
+	ROM_LOAD16_BYTE( "ic2_k9f1208u0b.bin",    0x00000001, 0x4200000, BAD_DUMP CRC(8a6a2649) SHA1(fd4318e7fb5020c499e06fdb1996b8d40161b674) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and should not be
+	ROM_LOAD16_BYTE( "ic3_k9f1208u0b.bin",    0x08400000, 0x4200000, BAD_DUMP CRC(8fd44a29) SHA1(9392bc4da6541960a83e9c7b3ab4f36bc5564fb7) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and should not be
+	ROM_LOAD16_BYTE( "ic4_k9f1208u0b.bin",    0x08400001, 0x4200000, BAD_DUMP CRC(ae3fb198) SHA1(c9c0beb9f6875dbf7ce015454a59481524ef3ef6) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and should not be
+	ROM_LOAD16_BYTE( "ic5_k9f1208u0b.bin",    0x10800000, 0x4200000, BAD_DUMP CRC(e9208514) SHA1(ad0ed3e681cd78a61d7ad3af83db20e364bb47fd) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and should not be
+	ROM_LOAD16_BYTE( "ic6_k9f1208u0b.bin",    0x10800001, 0x4200000, BAD_DUMP CRC(7363697c) SHA1(997c96d0b41774a24a2e0427a703bc295e784187) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and should not be
+	ROM_LOAD16_BYTE( "ic7_k9f1208u0b.bin",    0x18c00000, 0x4200000, BAD_DUMP CRC(407da1d2) SHA1(c185ebd2f3d8654d8fd394c56ac9bfff7e49f125) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and MAYBE should not be, since it is after the end of the data in the rom, so it may be correct
+	ROM_LOAD16_BYTE( "ic8_k9f1208u0b.bin",    0x18c00001, 0x4200000, BAD_DUMP CRC(9ab76062) SHA1(36a6317c646da5cf682d46ca438ce05e600bc354) )  // all data from 0x3de0000 - 0x41fffff is 0xFF and MAYBE should not be, since it is after the end of the data in the rom, so it may be correct
 	// below contain rom board NAND block list/map (16bit words), the "block" is 2 * 32 NAND pages (512 data bytes +16 ECC?)
-	ROM_LOAD( "ic9_mx29lv400cttc.bin",        0x21000000, 0x0080000, CRC(2bb9f1fe) SHA1(935511d93a0ab06436b0674bef90c790c100e0b1) )
+	ROM_LOAD( "ic9_mx29lv400cttc.bin",        0x21000000, 0x0080000, CRC(2bb9f1fe) SHA1(935511d93a0ab06436b0674bef90c790c100e0b1) ) // block mapping flash rom
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	ROM_LOAD("317-5128-com.pic", 0x00, 0x4000, CRC(0231b10c) SHA1(e060d74753a39081364e3175ac12e724ad585c33) )
@@ -1200,16 +1230,16 @@ ROM_START( mkartag2a )
 
 	ROM_REGION(0x21200000, "rom_board", 0)
 	// DES encrypted
-	ROM_LOAD16_BYTE( "ic1_k9f1208u0b.bin",    0x00000000, 0x4200000, CRC(c5624816) SHA1(d6f2a2ff9e9e14d857a0ec810521c378ba1fabd5) ) // sldh
-	ROM_LOAD16_BYTE( "ic2_k9f1208u0b.bin",    0x00000001, 0x4200000, CRC(44e59a1f) SHA1(68a8c1178a33e23446980ec84486bc614f830dad) ) // sldh
-	ROM_LOAD16_BYTE( "ic3_k9f1208u0b.bin",    0x08400000, 0x4200000, CRC(6688e7f9) SHA1(7d1e60806c02fd765dd0981e790a698a29050aae) ) // sldh
-	ROM_LOAD16_BYTE( "ic4_k9f1208u0b.bin",    0x08400001, 0x4200000, CRC(e043eac2) SHA1(0108d940a852ff03e919170957f2bca2c1a88a03) ) // sldh
-	ROM_LOAD16_BYTE( "ic5_k9f1208u0b.bin",    0x10800000, 0x4200000, CRC(20882926) SHA1(c802de32ca24bf4e9fbabf47fed23a91b3d614ac) ) // sldh
-	ROM_LOAD16_BYTE( "ic6_k9f1208u0b.bin",    0x10800001, 0x4200000, CRC(14171ba4) SHA1(3ddace539cd8a4b53a1ef03238e8404db7dcd85e) ) // sldh
-	ROM_LOAD16_BYTE( "ic7_k9f1208u0b.bin",    0x18c00000, 0x4200000, CRC(bd0199df) SHA1(aafb171e9f5a4c8dc2ef55ba344a0eb310c63467) ) // sldh
-	ROM_LOAD16_BYTE( "ic8_k9f1208u0b.bin",    0x18c00001, 0x4200000, CRC(8ad6c7ae) SHA1(749b99a944f62aefb895a622c029656c69b3c736) ) // sldh
+	ROM_LOAD16_BYTE( "ic1_k9f1208u0b.bin",    0x00000000, 0x4200000, BAD_DUMP CRC(c5624816) SHA1(d6f2a2ff9e9e14d857a0ec810521c378ba1fabd5) ) // sldh; all data from 0x3de0000 - 0x41fffff is 0xFF and should not be
+	ROM_LOAD16_BYTE( "ic2_k9f1208u0b.bin",    0x00000001, 0x4200000, BAD_DUMP CRC(44e59a1f) SHA1(68a8c1178a33e23446980ec84486bc614f830dad) ) // sldh; all data from 0x3de0000 - 0x41fffff is 0xFF and should not be
+	ROM_LOAD16_BYTE( "ic3_k9f1208u0b.bin",    0x08400000, 0x4200000, BAD_DUMP CRC(6688e7f9) SHA1(7d1e60806c02fd765dd0981e790a698a29050aae) ) // sldh; all data from 0x3de0000 - 0x41fffff is 0xFF and should not be
+	ROM_LOAD16_BYTE( "ic4_k9f1208u0b.bin",    0x08400001, 0x4200000, BAD_DUMP CRC(e043eac2) SHA1(0108d940a852ff03e919170957f2bca2c1a88a03) ) // sldh; all data from 0x3de0000 - 0x41fffff is 0xFF and should not be
+	ROM_LOAD16_BYTE( "ic5_k9f1208u0b.bin",    0x10800000, 0x4200000, BAD_DUMP CRC(20882926) SHA1(c802de32ca24bf4e9fbabf47fed23a91b3d614ac) ) // sldh; all data from 0x3de0000 - 0x41fffff is 0xFF and should not be
+	ROM_LOAD16_BYTE( "ic6_k9f1208u0b.bin",    0x10800001, 0x4200000, BAD_DUMP CRC(14171ba4) SHA1(3ddace539cd8a4b53a1ef03238e8404db7dcd85e) ) // sldh; all data from 0x3de0000 - 0x41fffff is 0xFF and should not be
+	ROM_LOAD16_BYTE( "ic7_k9f1208u0b.bin",    0x18c00000, 0x4200000, BAD_DUMP CRC(bd0199df) SHA1(aafb171e9f5a4c8dc2ef55ba344a0eb310c63467) ) // sldh; all data from 0x3de0000 - 0x41fffff is 0xFF and MAYBE should not be, since it is after the end of the data in the rom, so it may be correct
+	ROM_LOAD16_BYTE( "ic8_k9f1208u0b.bin",    0x18c00001, 0x4200000, BAD_DUMP CRC(8ad6c7ae) SHA1(749b99a944f62aefb895a622c029656c69b3c736) ) // sldh; all data from 0x3de0000 - 0x41fffff is 0xFF and MAYBE should not be, since it is after the end of the data in the rom, so it may be correct
 	// below contain rom board NAND block list/map (16bit words), the "block" is 2 * 32 NAND pages (512 data bytes +16 ECC?)
-	ROM_LOAD16_BYTE( "ic9_mx29lv400cttc.bin", 0x21000000, 0x0080000, CRC(ff854fd0) SHA1(0e42aff9a60aacd200b7a29d4d180abdab6a732e) ) // sldh
+	ROM_LOAD16_BYTE( "ic9_mx29lv400cttc.bin", 0x21000000, 0x0080000, CRC(ff854fd0) SHA1(0e42aff9a60aacd200b7a29d4d180abdab6a732e) ) // sldh; block mapping flash rom
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	ROM_LOAD("317-5128-com.pic", 0x00, 0x4000, CRC(0231b10c) SHA1(e060d74753a39081364e3175ac12e724ad585c33) )

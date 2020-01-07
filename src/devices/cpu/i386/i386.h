@@ -324,8 +324,10 @@ protected:
 	uint16_t m_x87_cw;
 	uint16_t m_x87_sw;
 	uint16_t m_x87_tw;
-	uint64_t m_x87_data_ptr;
-	uint64_t m_x87_inst_ptr;
+	uint16_t m_x87_ds;
+	uint32_t m_x87_data_ptr;
+	uint16_t m_x87_cs;
+	uint32_t m_x87_inst_ptr;
 	uint16_t m_x87_opcode;
 
 	i386_modrm_func m_opcode_table_x87_d8[256];
@@ -466,6 +468,7 @@ protected:
 	void modrm_to_EA(uint8_t mod_rm, uint32_t* out_ea, uint8_t* out_segment);
 	uint32_t GetNonTranslatedEA(uint8_t modrm,uint8_t *seg);
 	uint32_t GetEA(uint8_t modrm, int rwn);
+	uint32_t Getx87EA(uint8_t modrm, int rwn);
 	void i386_check_sreg_validity(int reg);
 	int i386_limit_check(int seg, uint32_t offset);
 	void i386_sreg_load(uint16_t selector, uint8_t reg, bool *fault);
@@ -638,6 +641,7 @@ protected:
 	void i386_aam();
 	void i386_clts();
 	void i386_wait();
+	void i486_wait();
 	void i386_lock();
 	void i386_mov_r32_tr();
 	void i386_mov_tr_r32();
@@ -1354,6 +1358,7 @@ protected:
 	int x87_inc_stack();
 	int x87_dec_stack();
 	int x87_check_exceptions();
+	int x87_mf_fault();
 	inline void x87_write_cw(uint16_t cw);
 	void x87_reset();
 	floatx80 x87_add(floatx80 a, floatx80 b);
@@ -1479,8 +1484,6 @@ protected:
 	void x87_fincstp(uint8_t modrm);
 	void x87_fclex(uint8_t modrm);
 	void x87_ffree(uint8_t modrm);
-	void x87_fdisi(uint8_t modrm);
-	void x87_feni(uint8_t modrm);
 	void x87_finit(uint8_t modrm);
 	void x87_fldcw(uint8_t modrm);
 	void x87_fstcw(uint8_t modrm);

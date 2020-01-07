@@ -1686,6 +1686,21 @@ static INPUT_PORTS_START( model2 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( model2crx )
+	PORT_INCLUDE(model2)
+
+	PORT_START("SW")
+	// SW1 and SW2 are push buttons
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW3:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW3:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW3:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW3:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW3:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW3:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW3:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW3:8")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( ioboard_dipswitches )
 	PORT_START("ioboard:dsw1")
 	PORT_DIPUNUSED_DIPLOC(0x01, 0x01, "DSW1:1")
@@ -1826,7 +1841,7 @@ static INPUT_PORTS_START( vcop )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( vf2 )
-	PORT_INCLUDE(model2)
+	PORT_INCLUDE(model2crx)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1) PORT_NAME("P1 Punch")
@@ -1842,7 +1857,7 @@ INPUT_PORTS_START( vf2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( manxtt )
-	PORT_INCLUDE(model2)
+	PORT_INCLUDE(model2crx)
 
 	PORT_MODIFY("IN0")
 	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -1868,7 +1883,7 @@ static INPUT_PORTS_START( manxtt )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( srallyc )
-	PORT_INCLUDE(model2)
+	PORT_INCLUDE(model2crx)
 	PORT_INCLUDE(gears)
 
 	PORT_MODIFY("IN0")
@@ -1895,26 +1910,31 @@ static INPUT_PORTS_START( srallyc )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vcop2 )
-	PORT_INCLUDE(vcop)
+	PORT_INCLUDE(model2crx)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1) PORT_NAME("P1 Trigger")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2) PORT_NAME("P2 Trigger")
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_MODIFY("IN2")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_MODIFY("P1_X")
+	PORT_START("P1_X")
 	PORT_BIT(0x3ff, 0x17f, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(137, 630) PORT_SENSITIVITY(50) PORT_KEYDELTA(13) PORT_PLAYER(1)
 
-	PORT_MODIFY("P1_Y")
+	PORT_START("P1_Y")
 	PORT_BIT(0x3ff, 0x0e6, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX( 36, 425) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_MODIFY("P2_X")
+	PORT_START("P2_X")
 	PORT_BIT(0x3ff, 0x17c, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(134, 627) PORT_SENSITIVITY(50) PORT_KEYDELTA(13) PORT_PLAYER(2)
 
-	PORT_MODIFY("P2_Y")
+	PORT_START("P2_Y")
 	PORT_BIT(0x3ff, 0x0e6, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX( 36, 425) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( skytargt )
-	PORT_INCLUDE(model2)
+	PORT_INCLUDE(model2crx)
 
 	PORT_MODIFY("IN0")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
@@ -1938,7 +1958,7 @@ static INPUT_PORTS_START( skytargt )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( doa )
-	PORT_INCLUDE(model2)
+	PORT_INCLUDE(model2crx)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1) PORT_NAME("P1 Hold")
@@ -1954,7 +1974,7 @@ INPUT_PORTS_START( doa )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( zerogun )
-	PORT_INCLUDE(model2)
+	PORT_INCLUDE(model2crx)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x0c, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -1962,18 +1982,11 @@ static INPUT_PORTS_START( zerogun )
 	PORT_MODIFY("IN2")
 	PORT_BIT(0x0c, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("DSW")
+	PORT_MODIFY("SW")
 	// in service mode, enables scroll check, polygon check, bg check, stage select
-	PORT_DIPNAME(0x01, 0x01, "Enable Debug Menu") PORT_DIPLOCATION("SW:1")
+	PORT_DIPNAME(0x01, 0x01, "Enable Debug Menu") PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(   0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x00, DEF_STR( On ))
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW:8")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( motoraid )
@@ -1985,7 +1998,7 @@ static INPUT_PORTS_START( motoraid )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dynamcop )
-	PORT_INCLUDE(model2)
+	PORT_INCLUDE(model2crx)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1) PORT_NAME("P1 Punch")
@@ -2001,7 +2014,7 @@ static INPUT_PORTS_START( dynamcop )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pltkids )
-	PORT_INCLUDE(model2)
+	PORT_INCLUDE(model2crx)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x0c, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -2011,7 +2024,7 @@ static INPUT_PORTS_START( pltkids )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rchase2 )
-	PORT_INCLUDE(model2)
+	PORT_INCLUDE(model2crx)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
@@ -2035,7 +2048,7 @@ static INPUT_PORTS_START( rchase2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vstriker )
-	PORT_INCLUDE(model2)
+	PORT_INCLUDE(model2crx)
 
 	// oddly enough service mode returns standard 1-2-3 layout but actual ingame is 2-3-1
 	// also bit 3 repeats bit 2 functionality.
@@ -2063,7 +2076,7 @@ static INPUT_PORTS_START( gunblade )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( indy500 )
-	PORT_INCLUDE(model2)
+	PORT_INCLUDE(model2crx)
 
 	PORT_MODIFY("IN0")
 	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -2093,7 +2106,7 @@ static INPUT_PORTS_START( indy500 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( von )
-	PORT_INCLUDE(model2)
+	PORT_INCLUDE(model2crx)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("P1 Left Shot")
@@ -2115,7 +2128,7 @@ static INPUT_PORTS_START( von )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( schamp )
-	PORT_INCLUDE(model2)
+	PORT_INCLUDE(model2crx)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1) PORT_NAME("P1 Punch")
@@ -2139,7 +2152,7 @@ static INPUT_PORTS_START( sgt24h )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dynabb )
-	PORT_INCLUDE(model2)
+	PORT_INCLUDE(model2crx)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x0c, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -2164,7 +2177,7 @@ static INPUT_PORTS_START( overrev )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( skisuprg )
-	PORT_INCLUDE(model2)
+	PORT_INCLUDE(model2crx)
 
 	PORT_MODIFY("IN0")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Select 3")
@@ -2189,7 +2202,7 @@ static INPUT_PORTS_START( skisuprg )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( waverunr )
-	PORT_INCLUDE(model2)
+	PORT_INCLUDE(model2crx)
 
 	PORT_MODIFY("IN0")
 	PORT_BIT(0x32, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -2249,7 +2262,7 @@ static INPUT_PORTS_START( hotd )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( segawski )
-	PORT_INCLUDE(model2)
+	PORT_INCLUDE(model2crx)
 
 	PORT_MODIFY("IN0")
 	PORT_BIT(0x32, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -2271,7 +2284,7 @@ INPUT_PORTS_END
 
 // TODO: has testable service / test on board buttons
 static INPUT_PORTS_START( topskatr )
-	PORT_INCLUDE(model2)
+	PORT_INCLUDE(model2crx)
 
 	PORT_MODIFY("IN0")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Select Right")
@@ -2295,7 +2308,7 @@ static INPUT_PORTS_START( topskatr )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( powsled )
-	PORT_INCLUDE(model2)
+	PORT_INCLUDE(model2crx)
 
 	PORT_MODIFY("IN0")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE2)
@@ -2695,6 +2708,7 @@ void model2a_state::model2a(machine_config &config)
 	io.in_pb_callback().set(FUNC(model2a_state::in0_r));
 	io.in_pc_callback().set_ioport("IN1");
 	io.in_pd_callback().set_ioport("IN2");
+	io.in_pg_callback().set_ioport("SW");
 	io.out_pe_callback().set([this] (uint8_t data) { m_billboard->write(data); });
 
 	model2_timers(config);
@@ -2788,9 +2802,6 @@ void model2a_state::model2a_0229(machine_config &config)
 void model2a_state::zeroguna(machine_config &config)
 {
 	model2a_5881(config);
-
-	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
-	io.in_pg_callback().set_ioport("DSW");
 }
 
 /* 2B-CRX */
@@ -2822,6 +2833,7 @@ void model2b_state::model2b(machine_config &config)
 	io.in_pb_callback().set(FUNC(model2b_state::in0_r));
 	io.in_pc_callback().set_ioport("IN1");
 	io.in_pd_callback().set_ioport("IN2");
+	io.in_pg_callback().set_ioport("SW");
 	io.out_pe_callback().set([this] (uint8_t data) { m_billboard->write(data); });
 
 	model2_timers(config);
@@ -2945,9 +2957,6 @@ void model2b_state::dynabb(machine_config &config)
 void model2b_state::zerogun(machine_config &config)
 {
 	model2b_5881(config);
-
-	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
-	io.in_pg_callback().set_ioport("DSW");
 }
 
 /* 2C-CRX */
@@ -2974,6 +2983,7 @@ void model2c_state::model2c(machine_config &config)
 	io.in_pb_callback().set(FUNC(model2c_state::in0_r));
 	io.in_pc_callback().set_ioport("IN1");
 	io.in_pd_callback().set_ioport("IN2");
+	io.in_pg_callback().set_ioport("SW");
 
 	model2_timers(config);
 	model2_screen(config);
@@ -6230,7 +6240,11 @@ ROM_START( daytona ) /* Daytona USA (Japan, Revision A), Original Model 2 w/Mode
 	MODEL2_CPU_BOARD /* Model 2 CPU board extra roms */
 
 	ROM_REGION( 0x10000, "drivecpu", 0 ) // 838-10646 drive board
-	ROM_LOAD("epr-16488a.ic12", 0x000000, 0x010000, CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da) )
+	ROM_DEFAULT_BIOS("16488a")
+	ROM_SYSTEM_BIOS(0, "16488a", "drive board ROM 16488a")
+	ROMX_LOAD("epr-16488a.ic12", 0x000000, 0x010000, CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(1, "16488", "drive board ROM 16488")
+	ROMX_LOAD("epr-16488.ic12",  0x000000, 0x010000, CRC(4f0b8114) SHA1(1fcebd0632da8f224a04fe6b39147a05eb358e83), ROM_BIOS(1) )
 ROM_END
 
 ROM_START( daytonase ) /* Daytona USA (Japan, Revision A), Original Model 2 w/Model 1 sound board */
@@ -6291,7 +6305,11 @@ ROM_START( daytonase ) /* Daytona USA (Japan, Revision A), Original Model 2 w/Mo
 	MODEL2_CPU_BOARD /* Model 2 CPU board extra roms */
 
 	ROM_REGION( 0x10000, "drivecpu", 0 ) // 838-10646 drive board
-	ROM_LOAD("epr-16488a.ic12", 0x000000, 0x010000, CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da) )
+	ROM_DEFAULT_BIOS("16488a")
+	ROM_SYSTEM_BIOS(0, "16488a", "drive board ROM 16488a")
+	ROMX_LOAD("epr-16488a.ic12", 0x000000, 0x010000, CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(1, "16488", "drive board ROM 16488")
+	ROMX_LOAD("epr-16488.ic12",  0x000000, 0x010000, CRC(4f0b8114) SHA1(1fcebd0632da8f224a04fe6b39147a05eb358e83), ROM_BIOS(1) )
 ROM_END
 
 ROM_START( daytona93 ) /* Daytona USA, Deluxe cabinet, '93 version, ROM board ID# 834-10536-01 - There is said to be a Deluxe '94 edition */
@@ -6351,7 +6369,11 @@ ROM_START( daytona93 ) /* Daytona USA, Deluxe cabinet, '93 version, ROM board ID
 	MODEL2_CPU_BOARD /* Model 2 CPU board extra roms */
 
 	ROM_REGION( 0x10000, "drivecpu", 0 ) // 838-10646 drive board
-	ROM_LOAD("epr-16488a.ic12", 0x000000, 0x010000, BAD_DUMP CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da) ) // unconfirmed
+	ROM_DEFAULT_BIOS("16488a")
+	ROM_SYSTEM_BIOS(0, "16488a", "drive board ROM 16488a")
+	ROMX_LOAD("epr-16488a.ic12", 0x000000, 0x010000, BAD_DUMP CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da), ROM_BIOS(0) ) // unconfirmed
+	ROM_SYSTEM_BIOS(1, "16488", "drive board ROM 16488")
+	ROMX_LOAD("epr-16488.ic12",  0x000000, 0x010000, BAD_DUMP CRC(4f0b8114) SHA1(1fcebd0632da8f224a04fe6b39147a05eb358e83), ROM_BIOS(1) ) // unconfirmed
 ROM_END
 
 ROM_START( daytonas ) /* Daytona USA (With Saturn Adverts) */
@@ -6412,7 +6434,11 @@ ROM_START( daytonas ) /* Daytona USA (With Saturn Adverts) */
 	MODEL2_CPU_BOARD /* Model 2 CPU board extra roms */
 
 	ROM_REGION( 0x10000, "drivecpu", 0 ) // 838-10646 drive board
-	ROM_LOAD("epr-16488a.ic12", 0x000000, 0x010000, BAD_DUMP CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da) ) // unconfirmed
+	ROM_DEFAULT_BIOS("16488a")
+	ROM_SYSTEM_BIOS(0, "16488a", "drive board ROM 16488a")
+	ROMX_LOAD("epr-16488a.ic12", 0x000000, 0x010000, BAD_DUMP CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da), ROM_BIOS(0) ) // unconfirmed
+	ROM_SYSTEM_BIOS(1, "16488", "drive board ROM 16488")
+	ROMX_LOAD("epr-16488.ic12",  0x000000, 0x010000, BAD_DUMP CRC(4f0b8114) SHA1(1fcebd0632da8f224a04fe6b39147a05eb358e83), ROM_BIOS(1) ) // unconfirmed
 ROM_END
 
 ROM_START( daytonat )/* Daytona USA (Japan, Turbo hack) */
@@ -6475,7 +6501,11 @@ ROM_START( daytonat )/* Daytona USA (Japan, Turbo hack) */
 	MODEL2_CPU_BOARD /* Model 2 CPU board extra roms */
 
 	ROM_REGION( 0x10000, "drivecpu", 0 ) // 838-10646 drive board
-	ROM_LOAD("epr-16488a.ic12", 0x000000, 0x010000, CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da) )
+	ROM_DEFAULT_BIOS("16488a")
+	ROM_SYSTEM_BIOS(0, "16488a", "drive board ROM 16488a")
+	ROMX_LOAD("epr-16488a.ic12", 0x000000, 0x010000, CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(1, "16488", "drive board ROM 16488")
+	ROMX_LOAD("epr-16488.ic12",  0x000000, 0x010000, CRC(4f0b8114) SHA1(1fcebd0632da8f224a04fe6b39147a05eb358e83), ROM_BIOS(1) )
 ROM_END
 
 ROM_START( daytonata )/* Daytona USA (Japan, Turbo hack) */
@@ -6536,7 +6566,11 @@ ROM_START( daytonata )/* Daytona USA (Japan, Turbo hack) */
 	MODEL2_CPU_BOARD /* Model 2 CPU board extra roms */
 
 	ROM_REGION( 0x10000, "drivecpu", 0 ) // 838-10646 drive board
-	ROM_LOAD("epr-16488a.ic12", 0x000000, 0x010000, CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da) )
+	ROM_DEFAULT_BIOS("16488a")
+	ROM_SYSTEM_BIOS(0, "16488a", "drive board ROM 16488a")
+	ROMX_LOAD("epr-16488a.ic12", 0x000000, 0x010000, CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(1, "16488", "drive board ROM 16488")
+	ROMX_LOAD("epr-16488.ic12",  0x000000, 0x010000, CRC(4f0b8114) SHA1(1fcebd0632da8f224a04fe6b39147a05eb358e83), ROM_BIOS(1) )
 ROM_END
 
 /*
@@ -6608,7 +6642,11 @@ ROM_START( daytonam ) /* Daytona USA (Japan, To The MAXX) */
 	MODEL2_CPU_BOARD /* Model 2 CPU board extra roms */
 
 	ROM_REGION( 0x10000, "drivecpu", 0 ) // 838-10646 drive board
-	ROM_LOAD("epr-16488a.ic12", 0x000000, 0x010000, CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da) )
+	ROM_DEFAULT_BIOS("16488a")
+	ROM_SYSTEM_BIOS(0, "16488a", "drive board ROM 16488a")
+	ROMX_LOAD("epr-16488a.ic12", 0x000000, 0x010000, CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(1, "16488", "drive board ROM 16488")
+	ROMX_LOAD("epr-16488.ic12",  0x000000, 0x010000, CRC(4f0b8114) SHA1(1fcebd0632da8f224a04fe6b39147a05eb358e83), ROM_BIOS(1) )
 
 	ROM_REGION( 0x10000, "pic", 0)
 	ROM_LOAD("pic.bin", 0x00000, 0x10000, NO_DUMP )
@@ -6676,7 +6714,11 @@ ROM_START( daytonagtx )
 	MODEL2_CPU_BOARD /* Model 2 CPU board extra roms */
 
 	ROM_REGION( 0x10000, "drivecpu", 0 ) // 838-10646 drive board
-	ROM_LOAD("epr-16488a.ic12", 0x000000, 0x010000, CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da) )
+	ROM_DEFAULT_BIOS("16488a")
+	ROM_SYSTEM_BIOS(0, "16488a", "drive board ROM 16488a")
+	ROMX_LOAD("epr-16488a.ic12", 0x000000, 0x010000, CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(1, "16488", "drive board ROM 16488")
+	ROMX_LOAD("epr-16488.ic12",  0x000000, 0x010000, CRC(4f0b8114) SHA1(1fcebd0632da8f224a04fe6b39147a05eb358e83), ROM_BIOS(1) )
 ROM_END
 
 ROM_START( vcop ) /* Virtua Cop Revision B, Model 2 */
@@ -7045,7 +7087,7 @@ GAME( 1997, bel,       0,        bel,          bel,      model2c_state, empty_in
 GAME( 1997, hotd,      0,        hotd,         hotd,     model2c_state, empty_init, ROT0, "Sega",   "The House of the Dead", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, hotdp,     hotd,     hotd,         hotd,     model2c_state, empty_init, ROT0, "Sega",   "The House of the Dead (prototype)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, overrev,   0,        overrev2c,    overrev,  model2c_state, empty_init, ROT0, "Jaleco", "Over Rev (Model 2C, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, rascot2,   0,        model2c,      model2,   model2c_state, empty_init, ROT0, "Sega",   "Royal Ascot II", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, rascot2,   0,        model2c,      model2crx,model2c_state, empty_init, ROT0, "Sega",   "Royal Ascot II", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, segawski,  0,        segawski,     segawski, model2c_state, empty_init, ROT0, "Sega",   "Sega Water Ski (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, topskatr,  0,        topskatr,     topskatr, model2c_state, empty_init, ROT0, "Sega",   "Top Skater (Export, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, topskatru, topskatr, model2c,      topskatr, model2c_state, empty_init, ROT0, "Sega",   "Top Skater (USA, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

@@ -151,7 +151,7 @@ void lisa_state::lisa(machine_config &config)
 	sonydriv_floppy_image_device::legacy_2_drives_add(config, &lisa_floppy_interface);
 
 	/* software lists */
-	SOFTWARE_LIST(config, "disk_list").set_type("lisa", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "disk_list").set_original("lisa");
 
 	/* via */
 	VIA6522(config, m_via0, 20.37504_MHz_XTAL / 40); // CPU E clock (nominally 500 kHz)

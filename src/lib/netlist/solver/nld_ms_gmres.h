@@ -115,7 +115,6 @@ namespace solver
 		auto gsl = m_gmres.solve(m_ops, this->m_new_V, this->m_RHS, iter, accuracy);
 
 		this->m_iterative_total += gsl;
-		this->m_stat_calculations++;
 
 		if (gsl > iter)
 		{

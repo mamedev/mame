@@ -270,13 +270,13 @@ void tnx1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	{
 		struct attribute_memory
 		{
-			int row;
-			int sx;
-			uint8_t color;
-			uint16_t code;
-			int flipx;
-			int flipy;
-		} attributes[64] = { 0 };
+			int row = 0;
+			int sx = 0;
+			uint8_t color = 0;
+			uint16_t code = 0;
+			int flipx = 0;
+			int flipy = 0;
+		} attributes[64];
 
 		for (int offs = 4; offs < m_dmasource.bytes(); offs += 4)
 		{

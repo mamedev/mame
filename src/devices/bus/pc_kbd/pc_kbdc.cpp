@@ -16,10 +16,10 @@ The following basic program can be useful for identifying scancodes:
 #include "emu.h"
 #include "pc_kbdc.h"
 
-#define LOG_SIGNALS         (1U<<1)
-#define VERBOSE ( LOG_GENERAL )
-
+#define LOG_SIGNALS (1U << 1)
+//#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES

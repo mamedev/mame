@@ -842,7 +842,7 @@ void interpro_state::interpro(machine_config &config)
 	config.set_default_layout(layout_interpro);
 
 	// software lists
-	SOFTWARE_LIST(config, m_softlist).set_type("interpro", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, m_softlist).set_original("interpro");
 }
 
 void emerald_state::emerald(machine_config &config)

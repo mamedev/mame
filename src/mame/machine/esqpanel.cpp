@@ -415,6 +415,7 @@ esqpanel_device::esqpanel_device(const machine_config &mconfig, device_type type
 	m_write_tx(*this),
 	m_write_analog(*this)
 {
+	std::fill(std::begin(m_xmitring), std::end(m_xmitring), 0);
 }
 
 

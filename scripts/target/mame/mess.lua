@@ -148,6 +148,7 @@ CPUS["F2MC16"] = true
 CPUS["CR16B"] = true
 CPUS["FR"] = true
 CPUS["DSP56000"] = true
+CPUS["VT50"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -330,6 +331,7 @@ VIDEOS["NT7534"] = true
 VIDEOS["HD44102"] = true
 VIDEOS["HD44352"] = true
 VIDEOS["HD44780"] = true
+VIDEOS["HD61603"] = true
 VIDEOS["HD61830"] = true
 --VIDEOS["HD63484"] = true
 VIDEOS["HD66421"] = true
@@ -346,6 +348,7 @@ VIDEOS["I8244"] = true
 VIDEOS["I82730"] = true
 VIDEOS["I8275"] = true
 VIDEOS["IMS_CVC"] = true
+VIDEOS["LC7582"] = true
 --VIDEOS["M50458"] = true
 --VIDEOS["MB90082"] = true
 --VIDEOS["MB_VCU"] = true
@@ -435,6 +438,7 @@ MACHINES["AM9513"] = true
 MACHINES["AM9517A"] = true
 MACHINES["AM9519"] = true
 MACHINES["AMIGAFDC"] = true
+MACHINES["ARM_IOMD"] = true
 MACHINES["AT_KEYBC"] = true
 MACHINES["AT28C16"] = true
 MACHINES["AT29X"] = true
@@ -1132,6 +1136,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"fairlight",
 		"fidelity",
 		"force",
+		"francedr",
 		"fujitsu",
 		"funtech",
 		"galaxy",
@@ -1207,6 +1212,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"osborne",
 		"osi",
 		"palm",
+		"parker",
 		"pc",
 		"pdp1",
 		"pel",
@@ -1996,6 +2002,8 @@ files {
 createMESSProjects(_target, _subtarget, "cxg")
 files {
 	MAME_DIR .. "src/mame/drivers/cxg_ch2001.cpp",
+	MAME_DIR .. "src/mame/drivers/cxg_dominator.cpp",
+	MAME_DIR .. "src/mame/drivers/cxg_sphinx40.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "cybiko")
@@ -2062,6 +2070,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/vax11.cpp",
 	MAME_DIR .. "src/mame/drivers/rainbow.cpp",
 	MAME_DIR .. "src/mame/drivers/vk100.cpp",
+	MAME_DIR .. "src/mame/drivers/vt52.cpp",
 	MAME_DIR .. "src/mame/drivers/vt100.cpp",
 	MAME_DIR .. "src/mame/drivers/vt220.cpp",
 	MAME_DIR .. "src/mame/drivers/vt240.cpp",
@@ -2271,6 +2280,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/fccpu20.cpp",
 	MAME_DIR .. "src/mame/drivers/fccpu30.cpp",
 	MAME_DIR .. "src/mame/drivers/force68k.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "francedr")
+files {
+	MAME_DIR .. "src/mame/drivers/regence.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "fujitsu")
@@ -2976,6 +2990,12 @@ files {
 	MAME_DIR .. "src/mame/drivers/palm.cpp",
 	MAME_DIR .. "src/mame/drivers/palm_dbg.hxx",
 	MAME_DIR .. "src/mame/drivers/palmz22.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "parker")
+files {
+	MAME_DIR .. "src/mame/drivers/talkingbb.cpp",
+	MAME_DIR .. "src/mame/drivers/talkingfb.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "pitronic")
@@ -3733,6 +3753,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/spg110.cpp",
 	MAME_DIR .. "src/mame/drivers/vii.cpp",
 	MAME_DIR .. "src/mame/drivers/sunplus_gcm394.cpp",
+	MAME_DIR .. "src/mame/drivers/generalplus_gpl32612.cpp",
 	MAME_DIR .. "src/mame/drivers/xavix.cpp",
 	MAME_DIR .. "src/mame/video/xavix.cpp",
 	MAME_DIR .. "src/mame/machine/xavix.cpp",
@@ -3754,6 +3775,9 @@ files {
 	MAME_DIR .. "src/mame/machine/xavix2002_io.h",
 	MAME_DIR .. "src/mame/drivers/xavix2.cpp",
 	MAME_DIR .. "src/mame/drivers/titan_soc.cpp",
+	MAME_DIR .. "src/mame/drivers/lexibook_jg7425.cpp",
+	MAME_DIR .. "src/mame/drivers/unkmandd.cpp",
+	MAME_DIR .. "src/mame/drivers/bbl380.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "ultimachine")
@@ -4014,6 +4038,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/cbnt2039.cpp",
 	MAME_DIR .. "src/mame/drivers/cdsys5.cpp",
 	MAME_DIR .. "src/mame/drivers/chaos.cpp",
+	MAME_DIR .. "src/mame/drivers/cd100.cpp",
 	MAME_DIR .. "src/mame/drivers/cd2650.cpp",
 	MAME_DIR .. "src/mame/drivers/cdc721.cpp",
 	MAME_DIR .. "src/mame/drivers/clxvme186.cpp",
@@ -4084,6 +4109,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/imsai.cpp",
 	MAME_DIR .. "src/mame/drivers/indiana.cpp",
 	MAME_DIR .. "src/mame/drivers/is48x.cpp",
+	MAME_DIR .. "src/mame/drivers/itc4.cpp",
 	MAME_DIR .. "src/mame/drivers/itt1700.cpp",
 	MAME_DIR .. "src/mame/machine/itt1700_kbd.cpp",
 	MAME_DIR .. "src/mame/machine/itt1700_kbd.h",
@@ -4184,8 +4210,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/sys9002.cpp",
 	MAME_DIR .. "src/mame/drivers/systec.cpp",
 	MAME_DIR .. "src/mame/drivers/systel1.cpp",
-	MAME_DIR .. "src/mame/drivers/talkingbb.cpp",
-	MAME_DIR .. "src/mame/drivers/talkingfb.cpp",
 	MAME_DIR .. "src/mame/drivers/tavernie.cpp",
 	MAME_DIR .. "src/mame/drivers/tecnbras.cpp",
 	MAME_DIR .. "src/mame/drivers/teleray10.cpp",
@@ -4205,6 +4229,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/tti.cpp",
 	MAME_DIR .. "src/mame/drivers/unistar.cpp",
 	MAME_DIR .. "src/mame/drivers/v6809.cpp",
+	MAME_DIR .. "src/mame/drivers/vanguardmk1.cpp",
+	MAME_DIR .. "src/mame/drivers/vd56sp.cpp",
 	MAME_DIR .. "src/mame/drivers/vector4.cpp",
 	MAME_DIR .. "src/mame/drivers/vectrix.cpp",
 	MAME_DIR .. "src/mame/drivers/vp60.cpp",

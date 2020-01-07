@@ -16,6 +16,10 @@ inline void unsp_device::execute_fxxx_000_group(uint16_t op)
 	// DS Reg   1 1 1 1   - - - 0   0 0 1 0   w r r r
 	// FR Reg   1 1 1 1   - - - 0   0 0 1 1   w r r r
 
+	// FR = 'inner flag register' on ISA1.2+
+	// does this mean 1.2+ do not store the registers in the upper bits of SR, or is this something else?
+	// smartfp IRQ4 reads this and puts in on the stack
+
 	if (((op & 0xffc0) == 0xfe00) && m_iso >= 12)
 	{
 		// ds = imm6
@@ -41,20 +45,20 @@ inline void unsp_device::execute_fxxx_000_group(uint16_t op)
 	{
 		int r = op & 0x7;
 		logerror("%s = fr\n", regs[r]);
-		unimplemented_opcode(op);
+	//  unimplemented_opcode(op);
 		return;
 	}
 	else if (((op & 0xf1f8) == 0xf038) && m_iso >= 12)
 	{
 		int r = op & 0x7;
 		logerror("fr = %s\n", regs[r]);
-		unimplemented_opcode(op);
+	//  unimplemented_opcode(op);
 		return;
 	}
 
 	// everything else falls through to the multiply
 
-	// signed * unsigned
+	// MUL us ( signed * unsigned )
 	// MUL      1 1 1 1*  r r r 0*  0 0 0 0   1 r r r     (** = sign bits, fixed here)
 	const uint16_t opa = (op >> 9) & 7;
 	const uint16_t opb = op & 7;
@@ -142,8 +146,15 @@ inline void unsp_device::execute_fxxx_011_group(uint16_t op)
 	// JMPR    1 1 1 1   1 1 1 0   1 1 - -   - - - -
 	if (((op & 0xffc0) == 0xfec0) && m_iso >= 12)
 	{
-		logerror("goto mr\n");
-		unimplemented_opcode(op);
+		uint32_t mr = m_core->m_r[REG_R3] | ((m_core->m_r[REG_R4]) << 16);
+
+		m_core->m_icount -= 5;
+		m_core->m_r[REG_PC] = mr & 0xffff;
+		m_core->m_r[REG_SR] &= 0xffc0;
+		m_core->m_r[REG_SR] |=( mr>>16) & 0x3f;
+
+		logerror("goto mr %08x\n", mr);
+		//unimplemented_opcode(op);
 		return;
 	}
 
@@ -235,13 +246,15 @@ void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 		return;
 
 	case 0xf144: case 0xf344: case 0xf544: case 0xf744: case 0xf944: case 0xfb44: case 0xfd44: case 0xff44:
-		logerror("fir_mov on\n");
-		unimplemented_opcode(op);
+		logerror("unimplemented: fir_mov on\n");
+		m_core->m_icount -= 1;
+		//unimplemented_opcode(op); // generalplus_gpac800 games do this on startup
 		return;
 
 	case 0xf145: case 0xf345: case 0xf545: case 0xf745: case 0xf945: case 0xfb45: case 0xfd45: case 0xff45:
-		logerror("fir_mov off\n");
-		unimplemented_opcode(op);
+		logerror("unimplemented: fir_mov off\n");
+		m_core->m_icount -= 1;
+		//unimplemented_opcode(op); // generalplus_gpac800 games do this on startup
 		return;
 
 	case 0xf161: case 0xf361: case 0xf561: case 0xf761: case 0xf961: case 0xfb61: case 0xfd61: case 0xff61:
@@ -280,24 +293,17 @@ void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 	case 0xf174: case 0xf374: case 0xf574: case 0xf774: case 0xf974: case 0xfb74: case 0xfd74: case 0xff74:
 	case 0xf17c: case 0xf37c: case 0xf57c: case 0xf77c: case 0xf97c: case 0xfb7c: case 0xfd7c: case 0xff7c:
 	{
-		//unimplemented_opcode(op);
-		// what is this, sign extend / sign expand / zero expand? it doesn't seem to be exponent
-		// palette uploads in smartfp depend on this, however this logic only works for the first few, so isn't correct
-		uint16_t result = m_core->m_r[REG_R4];// rand();
-		uint16_t temp = m_core->m_r[REG_R4];
+		uint16_t r4 = m_core->m_r[REG_R4];
 
-		for (int i = 0; i < 16; i++)
+		if (r4 & 0x8000)
 		{
-			int bit = (temp << i) & 0x8000;
-
-			if (bit)
-				break;
-
-			result |= 1 << (15 - i);
+			// r2 undefined (code will check for this and avoid calculations
+		}
+		else
+		{
+			m_core->m_r[REG_R2] = count_leading_zeros(r4) - 17; // -17 because count_leading_zeros works with 32-bit values
 		}
 
-		logerror("pc:%06x: r2 = exp r4 (with r2 = %04x r4 = %04x) (returning %04x)\n", UNSP_LPC, m_core->m_r[REG_R2], m_core->m_r[REG_R4], result);
-		m_core->m_r[REG_R2] = result;
 		return;
 	}
 

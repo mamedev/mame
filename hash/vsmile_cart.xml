@@ -3809,7 +3809,6 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-1" />
 			<feature name="cart_type" value="lilac" />
-			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92074.u1" size="8388608" crc="70bde4da" sha1="788a8b471ef97106fbcaeb053cd6aa19c6ac299a" />

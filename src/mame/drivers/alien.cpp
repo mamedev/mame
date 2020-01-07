@@ -16,7 +16,7 @@
   * - 2 x Fujitsu MB86292 'Orchid' Graphics Controller
   * - 8 x Fujitsu MB81E161622-10FH 512K x 16-bit x 2-banks (16Mbit) FCRAM
   * - 2 x ADV7120 Video DAC
-  * - Yamaha YMZ770B-F 'AMMSL' SPU
+  * - Yamaha YMZ770B-F 'AMMSL' SPU at 16.934MHz
    components marked * might be not populated
 
    Capcom AMT-02008 "YUI"
@@ -44,6 +44,7 @@
      - Alien Danger (c) 2007
      - Chibi Maruko-chan Aim Fuji Nippon Ichi! (c) 2008
  *   - Donkey Kong Banana Kingdom (c) 2006
+ *   - Super Mario Fushigi no Korokoro Party (c) 2004
  !   - Super Mario Fushigi no Korokoro Party 2 (c) 2005
 
     Single player medal machines:
@@ -245,8 +246,36 @@ ROM_START( dokodemo )
 	DISK_IMAGE( "dokodemo", 0, SHA1(0c786b6857a29b26971578abe1c8439fe43d94b5) )
 ROM_END
 
-// CF card only dumped, boot ROMs is missing
+// 'Center' unit, GPUs and YMZ770B not populated.
 ROM_START( masmario )
+	ROM_REGION( 0x400000, "maincpu", 0 ) // BIOS code
+	ROM_LOAD32_WORD( "mpf_m04f.ic30", 0x000000, 0x200000, CRC(f83ffb1a) SHA1(fa0ec83c21d81288b69e23ee46db359a3902648e) )
+	ROM_LOAD32_WORD( "mpf_m05f.ic33", 0x000002, 0x200000, CRC(fe19dfb7) SHA1(2fdc2feb86840448eb9e47f7bd4dcc9adfc36bdf) )
+
+	ROM_REGION( 0x800000, "ymz770b", ROMREGION_ERASEFF ) // not populated
+
+	ROM_REGION( 0x8000, "nvram", ROMREGION_ERASEFF) //timekeeper device
+	ROM_LOAD( "m48t35y.ic26", 0x000000, 0x008000, CRC(47b9480a) SHA1(9f8a6c7212ee410485e403db57e25d478fb4ae07) )
+ROM_END
+
+// Satellite unit
+ROM_START( masmarios )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) // BIOS and game code/data
+	ROM_LOAD32_WORD( "mpf_s04j.ic30", 0x000000, 0x400000, CRC(73d8b6bd) SHA1(8353df96107303427fc146da29b6a6a5d303c4ee) )
+	ROM_LOAD32_WORD( "mpf_s05j.ic33", 0x000002, 0x400000, CRC(1b1e5429) SHA1(4b25fc83172c7422bfe3f2aed9d2ee6c8a2c537f) )
+	ROM_LOAD32_WORD( "mpf_s06j.ic39", 0x800000, 0x400000, CRC(dc20e3cc) SHA1(5b9bd0fc4a6abdda16781727b01014b0a68ef8df) )
+	ROM_LOAD32_WORD( "mpf_s07j.ic42", 0x800002, 0x400000, CRC(cb08dc74) SHA1(31e658f8bd03fea3dffa5f32dc7ac2e73930b383) )
+
+	ROM_REGION( 0x800000, "ymz770b", 0 )
+	ROM_LOAD16_WORD_SWAP( "mpf_s01.ic31", 0x000000, 0x400000, CRC(99688b6d) SHA1(2052471e2a742c05c2bbd6bcb24deca681df41c3) )
+	ROM_LOAD16_WORD_SWAP( "mpf_s02.ic38", 0x400000, 0x400000, CRC(251f7111) SHA1(4d6e4111d76e7f56e9aeff19686dd84717ccb78a) )
+
+	ROM_REGION(0x8000, "nvram", 0 ) //timekeeper device
+	ROM_LOAD("m48t35y.ic26", 0x000000, 0x008000, CRC(1e62bd96) SHA1(85dc20ea9af8aa17fee39a0647600e5075bb70e0) )
+ROM_END
+
+// CF card only dumped, boot ROMs is missing
+ROM_START( masmario2 )
 	ROM_REGION( 0x800000, "maincpu", 0 ) // BIOS code
 	ROM_LOAD32_WORD( "ic30", 0x000000, 0x400000, BAD_DUMP CRC(6b2d2ef1) SHA1(0db6490b40c5716c1271b7f99608e8c7ad916516) ) //
 	ROM_LOAD32_WORD( "ic33", 0x000002, 0x400000, BAD_DUMP CRC(64049fc3) SHA1(b373b2c8cb4d66b9c700e0542bd26444484fae40) ) // modified boot roms from dkbanans
@@ -254,7 +283,7 @@ ROM_START( masmario )
 	ROM_REGION( 0x1000000, "ymz770b", ROMREGION_ERASEFF )
 
 	DISK_REGION( "card" ) //compact flash
-	DISK_IMAGE( "massmario", 0, SHA1(9632c91bf2e4983ee29f417e3122e9380baee25b) )
+	DISK_IMAGE( "massmario2", 0, SHA1(9632c91bf2e4983ee29f417e3122e9380baee25b) )
 ROM_END
 
 // CF card only dumped, boot ROMs is missing
@@ -270,10 +299,12 @@ ROM_START( wontame )
 ROM_END
 
 
-GAME( 2005, alien,    0,        alien, alien, alien_state, empty_init,    ROT0, "Capcom",               "Alien: The Arcade Medal Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2006, pingu,    0,        alien, alien, alien_state, empty_init,    ROT0, "Pygos Group / Capcom", "Pingu's Ice Block", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2007, dkbanana, 0,        alien, alien, alien_state, empty_init,    ROT0, "Capcom",               "Donkey Kong Banana Kingdom (host)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2007, dkbanans, dkbanana, alien, alien, alien_state, init_dkbanans, ROT0, "Capcom",               "Donkey Kong Banana Kingdom (satellite)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2006, dokodemo, 0,        alien, alien, alien_state, empty_init,    ROT0, "Sony / Capcom",        "Doko Demo Issho: Toro's Fishing", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2005, masmario, 0,        alien, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party 2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2008, wontame,  0,        alien, alien, alien_state, empty_init,    ROT0, "Capcom / Tomy",        "Won! Tertainment Happy Channel (Ver E)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, alien,     0,        alien, alien, alien_state, empty_init,    ROT0, "Capcom",               "Alien: The Arcade Medal Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, pingu,     0,        alien, alien, alien_state, empty_init,    ROT0, "Pygos Group / Capcom", "Pingu's Ice Block", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, dkbanana,  0,        alien, alien, alien_state, empty_init,    ROT0, "Capcom",               "Donkey Kong Banana Kingdom (host)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, dkbanans,  dkbanana, alien, alien, alien_state, init_dkbanans, ROT0, "Capcom",               "Donkey Kong Banana Kingdom (satellite)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, dokodemo,  0,        alien, alien, alien_state, empty_init,    ROT0, "Sony / Capcom",        "Doko Demo Issho: Toro's Fishing", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004, masmario,  0,        alien, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party (center)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004, masmarios, 0,        alien, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party (satellite)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, masmario2, 0,        alien, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party 2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2008, wontame,   0,        alien, alien, alien_state, empty_init,    ROT0, "Capcom / Tomy",        "Won! Tertainment Happy Channel (Ver E)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

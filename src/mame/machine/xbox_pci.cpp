@@ -106,9 +106,11 @@ void mcpx_isalpc_device::internal_io_map(address_map &map)
 {
 	map(0x0020, 0x0023).rw("pic8259_1", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x0043).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
+	map(0x0061, 0x0061).rw(FUNC(mcpx_isalpc_device::portb_r), FUNC(mcpx_isalpc_device::portb_w));
 	map(0x0070, 0x0073).rw("rtc", FUNC(ds12885ext_device::read_extended), FUNC(ds12885ext_device::write_extended));
 	map(0x0080, 0x0080).w(FUNC(mcpx_isalpc_device::boot_state_w));
 	map(0x00a0, 0x00a3).rw("pic8259_2", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x00e0, 0x00e3).nopw();
 }
 
 void mcpx_isalpc_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -141,7 +143,12 @@ mcpx_isalpc_device::mcpx_isalpc_device(const machine_config &mconfig, const char
 	m_gpe0_status(0),
 	m_gpe0_enable(0),
 	m_global_smi_control(0),
-	m_smi_command_port(0)
+	m_smi_command_port(0),
+	m_speaker(0),
+	m_refresh(false),
+	m_pit_out2(0),
+	m_spkrdata(0),
+	m_channel_check(0)
 {
 }
 
@@ -186,6 +193,10 @@ void mcpx_isalpc_device::device_start()
 void mcpx_isalpc_device::device_reset()
 {
 	pci_device::device_reset();
+	memset(m_gpio_mode, 0, sizeof(m_gpio_mode));
+	m_refresh = false;
+	m_pit_out2 = 1;
+	m_spkrdata = 0;
 }
 
 void mcpx_isalpc_device::device_add_mconfig(machine_config &config)
@@ -202,7 +213,8 @@ void mcpx_isalpc_device::device_add_mconfig(machine_config &config)
 	pit8254_device &pit8254(PIT8254(config, "pit8254", 0));
 	pit8254.set_clk<0>(1125000); /* heartbeat IRQ */
 	pit8254.out_handler<0>().set(FUNC(mcpx_isalpc_device::pit8254_out0_changed));
-	pit8254.set_clk<1>(1125000); /* (unused) dram refresh */
+	pit8254.set_clk<1>(1125000); /* originally dram refresh, now only legacy support */
+	pit8254.out_handler<1>().set(FUNC(mcpx_isalpc_device::pit8254_out1_changed));
 	pit8254.set_clk<2>(1125000); /* (unused) pio port c pin 4, and speaker polling enough */
 	pit8254.out_handler<2>().set(FUNC(mcpx_isalpc_device::pit8254_out2_changed));
 
@@ -273,6 +285,19 @@ WRITE32_MEMBER(mcpx_isalpc_device::acpi_w)
 		update_smi_line();
 		logerror("Generate software SMI with value %02X\n", m_smi_command_port);
 	}
+	else if (((offset >= 0x30) && (offset < 0x36)) || ((offset == 0x36) && ACCESSING_BITS_0_15))
+	{
+		int m = offset != 0x36 ? 4 : 2;
+		int p = (offset - 0x30) * 4;
+
+		for (int a = 0; a < m; a++)
+		{
+			m_gpio_mode[p] = (m_gpio_mode[p] & (~mem_mask & 0xff)) | (data & 0xff);
+			p++;
+			data = data >> 8;
+			mem_mask = mem_mask >> 8;
+		}
+	}
 	else
 		logerror("Acpi write not recognized\n");
 }
@@ -300,9 +325,16 @@ WRITE_LINE_MEMBER(mcpx_isalpc_device::pit8254_out0_changed)
 	pic8259_1->ir0_w(state);
 }
 
+WRITE_LINE_MEMBER(mcpx_isalpc_device::pit8254_out1_changed)
+{
+	if (state)
+		m_refresh = !m_refresh;
+}
+
 WRITE_LINE_MEMBER(mcpx_isalpc_device::pit8254_out2_changed)
 {
-	//xbox_speaker_set_input( state ? 1 : 0 );
+	m_pit_out2 = state ? 1 : 0;
+	//xbox_speaker_set_input(m_at_spkrdata & m_pit_out2);
 }
 
 WRITE_LINE_MEMBER(mcpx_isalpc_device::irq1)
@@ -335,9 +367,39 @@ WRITE_LINE_MEMBER(mcpx_isalpc_device::irq15)
 	pic8259_2->ir7_w(state);
 }
 
+READ8_MEMBER(mcpx_isalpc_device::portb_r)
+{
+	uint8_t data = m_speaker;
+
+	data &= ~0xd0; /* AT BIOS don't likes this being set */
+	/* 0x10 is the dram refresh line bit on the 5170, just a timer here, 15.085us. */
+	data |= m_refresh ? 0x10 : 0;
+	if (m_pit_out2)
+		data |= 0x20;
+	else
+		data &= ~0x20; /* ps2m30 wants this */
+
+	return data;
+}
+
+WRITE8_MEMBER(mcpx_isalpc_device::portb_w)
+{
+	m_speaker = data;
+	pit8254->write_gate2(BIT(data, 0));
+	speaker_set_spkrdata(BIT(data, 1));
+	m_channel_check = BIT(data, 3);
+	//if (m_channel_check) m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
 uint32_t mcpx_isalpc_device::acknowledge()
 {
 	return pic8259_1->acknowledge();
+}
+
+void mcpx_isalpc_device::speaker_set_spkrdata(uint8_t data)
+{
+	m_spkrdata = data ? 1 : 0;
+	//xbox_speaker_set_input(m_at_spkrdata & m_pit_out2);
 }
 
 void mcpx_isalpc_device::debug_generate_irq(int irq, int state)
@@ -399,7 +461,28 @@ void mcpx_isalpc_device::set_virtual_line(int line, int state)
 		}
 		return;
 	}
-	//line = line - 16;
+/* Will be updated to support dma
+    line = line - 16;
+    if (line < 4)
+    {
+        switch (line)
+        {
+        case 0:
+            break;
+        case 1:
+            break;
+        case 2:
+            break;
+        case 3:
+            break;
+        }
+    }
+*/
+}
+
+void mcpx_isalpc_device::remap()
+{
+	remap_cb();
 }
 
 /*
@@ -442,6 +525,7 @@ void mcpx_smbus_device::device_start()
 	add_map(0x00000020, M_IO, FUNC(mcpx_smbus_device::smbus_io2));
 	bank_infos[2].adr = 0xc200;
 	status = 0x00b0;
+	intr_pin = 1;
 	memset(&smbusst, 0, sizeof(smbusst));
 	for (int b = 0; b < 2; b++)
 		for (int a = 0; a < 128; a++)
@@ -599,9 +683,10 @@ void mcpx_ohci_device::device_start()
 	add_map(0x00001000, M_MEM, FUNC(mcpx_ohci_device::ohci_mmio));
 	bank_infos[0].adr = 0xfed00000;
 	status = 0x00b0;
+	intr_pin = 1;
 	ohci_usb = new ohci_usb_controller();
 	ohci_usb->set_cpu(maincpu.target());
-	ohci_usb->set_irq_callbaclk(
+	ohci_usb->set_irq_callback(
 		[&](int state)
 		{
 			m_interrupt_handler(state);
@@ -742,6 +827,7 @@ void mcpx_apu_device::device_start()
 	add_map(0x00080000, M_MEM, FUNC(mcpx_apu_device::apu_mmio));
 	bank_infos[0].adr = 0xfe800000;
 	status = 0x00b0;
+	intr_pin = 1;
 	memset(apust.memory, 0, sizeof(apust.memory));
 	memset(apust.voices_heap_blockaddr, 0, sizeof(apust.voices_heap_blockaddr));
 	memset(apust.voices_active, 0, sizeof(apust.voices_active));
@@ -945,6 +1031,7 @@ void mcpx_ac97_audio_device::device_start()
 	add_map(0x00001000, M_MEM, FUNC(mcpx_ac97_audio_device::ac97_mmio));
 	bank_infos[2].adr = 0xfec00000;
 	status = 0x00b0;
+	intr_pin = 1;
 	memset(&ac97st, 0, sizeof(ac97st));
 }
 
@@ -1113,15 +1200,22 @@ void mcpx_ide_device::device_add_mconfig(machine_config &config)
 void mcpx_ide_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
+	// in compatibility mode the addresses are fixed, but the io enable bit in the command register is still used
 	if (~pclass & 1) // compatibility mode
 	{
-		io_space->install_device(0x1f0, 0x1f7, *this, &mcpx_ide_device::ide_pri_command);
-		io_space->install_device(0x3f4, 0x3f7, *this, &mcpx_ide_device::ide_pri_control);
+		if (command & 1)
+		{
+			io_space->install_device(0x1f0, 0x1f7, *this, &mcpx_ide_device::ide_pri_command);
+			io_space->install_device(0x3f4, 0x3f7, *this, &mcpx_ide_device::ide_pri_control);
+		}
 	}
 	if (~pclass & 4)
 	{
-		io_space->install_device(0x170, 0x177, *this, &mcpx_ide_device::ide_sec_command);
-		io_space->install_device(0x374, 0x377, *this, &mcpx_ide_device::ide_sec_control);
+		if (command & 1)
+		{
+			io_space->install_device(0x170, 0x177, *this, &mcpx_ide_device::ide_sec_command);
+			io_space->install_device(0x374, 0x377, *this, &mcpx_ide_device::ide_sec_control);
+		}
 	}
 }
 
@@ -1145,7 +1239,7 @@ WRITE32_MEMBER(mcpx_ide_device::class_rev_w)
 				bank_infos[0].flags &= ~M_DISABLED;
 				bank_infos[1].flags &= ~M_DISABLED;
 			}
-			if (~pclass & 1) // compatibility mode
+			if (~pclass & 4) // compatibility mode
 			{
 				bank_infos[2].flags |= M_DISABLED;
 				bank_infos[3].flags |= M_DISABLED;
@@ -1162,29 +1256,21 @@ WRITE32_MEMBER(mcpx_ide_device::class_rev_w)
 
 READ8_MEMBER(mcpx_ide_device::pri_read_cs1_r)
 {
-	if (!(command & 1))
-		return 0xff;
 	return m_pri->read_cs1(1, 0xff0000) >> 16;
 }
 
 WRITE8_MEMBER(mcpx_ide_device::pri_write_cs1_w)
 {
-	if (!(command & 1))
-		return;
 	m_pri->write_cs1(1, data << 16, 0xff0000);
 }
 
 READ8_MEMBER(mcpx_ide_device::sec_read_cs1_r)
 {
-	if (!(command & 1))
-		return 0xff;
 	return m_sec->read_cs1(1, 0xff0000) >> 16;
 }
 
 WRITE8_MEMBER(mcpx_ide_device::sec_write_cs1_w)
 {
-	if (!(command & 1))
-		return;
 	m_sec->write_cs1(1, data << 16, 0xff0000);
 }
 
@@ -1232,7 +1318,7 @@ READ32_MEMBER(nv2a_agp_device::unknown_r)
 	// 45 8
 	// 46 8
 	// 47 8
-	printf("R %08X %08X\n",0x40+offset*4,mem_mask);
+	//printf("R %08X %08X\n",0x40+offset*4,mem_mask);
 	if (offset == 3)
 		return 1;
 	return 0;
@@ -1240,7 +1326,7 @@ READ32_MEMBER(nv2a_agp_device::unknown_r)
 
 WRITE32_MEMBER(nv2a_agp_device::unknown_w)
 {
-	printf("W %08X %08X %08X\n", 0x40+offset*4, mem_mask, data);
+	//printf("W %08X %08X %08X\n", 0x40+offset*4, mem_mask, data);
 }
 
 /*

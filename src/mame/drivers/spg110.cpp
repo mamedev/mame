@@ -525,6 +525,14 @@ ROM_START( conyteni )
 	// MCU (I/O?) read protected TODO: add NO_DUMP
 ROM_END
 
+ROM_START( conyping )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "tvvirtualpingpong.bin", 0x000000, 0x200000, CRC(6f5bf22e) SHA1(005e1580c4ab66db38682e797faebe8776eb58f7) )
+
+	// MCU (I/O?) read protected TODO: add NO_DUMP
+ROM_END
+
+
 
 // JAKKS Pacific Inc TV games
 CONS( 2004, jak_capb,  0,        0, spg110_base, jak_capb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Classic Arcade Pinball (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
@@ -534,3 +542,7 @@ CONS( 2004, jak_spdmo, jak_spdm, 0, spg110_base, jak_spdmo, spg110_game_state, e
 
 // this was sold by SDW Games for the US market, ROM not yet verified to be the same, also appears in some mutligames?
 CONS( 2003, conyteni,  0,        0, spg110_base, conyteni,  spg110_game_state, empty_init, "Conny",      "TV Virtual Tennis", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs motion inputs, and video fixes, setting to PAL
+
+// from a US SDW Games unit, has SDW Games banners in background so ROM might differ to other regsions
+CONS( 2003, conyping,  0,        0, spg110_base, conyteni,  spg110_game_state, empty_init, "Conny / SDW Games",      "Virtual Ping Pong (Conny / SDW Games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+

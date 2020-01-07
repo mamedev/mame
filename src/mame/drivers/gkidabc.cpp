@@ -4,10 +4,10 @@
 
     Genius KID ABC Fan
     Mis Primeras Lecciones
+    Genius Junior Profi
 
     Other known undumped international versions:
-    - Genius Junior Profi (German version of Mis Primeras Lecciones)
-    - Smart Start Elite (English version of Genius Junior Profi)
+    - Smart Start Elite (English version of Genius Junior Profi / Mis Primeras Lecciones)
 
     TODO: identify CPU type (16-bit processor internally, but with 8-bit external bus?)
     It might be that the dumped ROMs contain no actual code, only graphics data and
@@ -45,8 +45,16 @@ ROM_END
 ROM_START(miprimlec)
 	ROM_REGION(0x20000, "maincpu", 0)
 	ROM_LOAD("27-5482-01.u1", 0x00000, 0x20000, CRC(83aa655b) SHA1(5d7b03f0ff2836e228da77676df03854f87edd26))
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD( "csm10150an.u3", 0x0000, 0x2000, NO_DUMP ) // TSP50C10 (8K bytes of ROM) labeled "67ACLKT VIDEO TECH CSM10150AN"
 ROM_END
 
+ROM_START(gjrprofi)
+	ROM_REGION(0x20000, "maincpu", 0)
+	ROM_LOAD("27-5476-00.u1", 0x00000, 0x20000, CRC(ad1ec838) SHA1(0cf90c02762ace656191a38ae423a4fa0e7484f7))
+ROM_END
 
 COMP(1996, gkidabc,   0, 0, gkidabc, gkidabc, gkidabc_state, empty_init, "VTech", "Genius KID ABC Fan (Germany)",   MACHINE_IS_SKELETON)
 COMP(1995, miprimlec, 0, 0, gkidabc, gkidabc, gkidabc_state, empty_init, "VTech", "Mis Primeras Lecciones (Spain)", MACHINE_IS_SKELETON)
+COMP(1995, gjrprofi,  0, 0, gkidabc, gkidabc, gkidabc_state, empty_init, "VTech", "Genius Junior Profi (Germany)",  MACHINE_IS_SKELETON)

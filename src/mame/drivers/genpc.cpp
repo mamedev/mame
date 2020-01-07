@@ -140,7 +140,7 @@ ROM_START(pc)
 	// List of bioses to go to separate drivers
 	ROM_SYSTEM_BIOS(10, "ami", "XT AMI")
 	ROMX_LOAD( "ami.bin", 0xe000, 0x2000, CRC(b381eb22) SHA1(9735193de119270c946a17ed58c3ab9554e0852e),ROM_BIOS(10))
-	ROM_SYSTEM_BIOS(11, "award", "XT Award 2.05")
+	ROM_SYSTEM_BIOS(11, "award", "XT Award 2.05 #1")
 	ROMX_LOAD( "award2.05.bin", 0xe000, 0x2000, CRC(5b3953e5) SHA1(4a36171aa8d993008187f39f732b9296401b7b6c),ROM_BIOS(11))
 	ROM_SYSTEM_BIOS(12, "dtk226", "XT DTK Erso bios 2.26")
 	ROMX_LOAD( "dtk-ers0.rom", 0xe000, 0x2000, CRC(85fd5e10) SHA1(2ae152f042e7e43e27621f071af763e3f9dc68d2),ROM_BIOS(12))
@@ -218,6 +218,10 @@ ROM_START(pc)
 	ROMX_LOAD( "diagrom.bin", 0xe000, 0x2000, CRC(747b1853) SHA1(204a484bc83b3607d5e1404a2dbe629f5f3044b1), ROM_BIOS(48))
 	ROM_SYSTEM_BIOS(49, "081682", "08/16/1982")
 	ROMX_LOAD( "xt_rom_1_081682_clone.bin", 0xe000, 0x2000, CRC(cfce9b2c) SHA1(14145acb0aca2baf8a6f3c7613f4521fdf0cbe92), ROM_BIOS(49))
+	// 50: V20 NEC D70108C-8 - OSC: 14.31818, 24.000 MHz
+	ROM_SYSTEM_BIOS(50, "awxt205", "XT Award 2.05 #2")
+	ROMX_LOAD( "rom7.u35", 0xe000, 0x2000, CRC(aa3def6b) SHA1(9fb88b6b522d939f7080a567f4a24279ca6c0928), ROM_BIOS(50))
+	// ROM_LOAD("82s129.u95b", 0x000, 0x100, CRC(91e7bead) SHA1(a1eddefc5017591b12db4364c98dfe036b1cb2c7)) // motherboard PROM
 ROM_END
 
 #define rom_pcmda    rom_pc
