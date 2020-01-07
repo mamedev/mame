@@ -9,7 +9,7 @@
     This format is just a raw image of every sector on SSDD 8" floppy
     disks as used in Intel MDS-II systems.
     Files with this format have no header/trailer and are exactly
-	512512 bytes in size (52 sectors, 1 head, 77 tracks,
+    512512 bytes in size (52 sectors, 1 head, 77 tracks,
     128 bytes per sector).
 
 *********************************************************************/
@@ -22,17 +22,17 @@
 #define LOG(...)  do { if (VERBOSE) printf(__VA_ARGS__); } while (false)
 
 constexpr unsigned CELL_SIZE    = 1200; // Bit cell size (1 µs)
-constexpr uint8_t  INDEX_AM		= 0x0c;	// Index address mark
+constexpr uint8_t  INDEX_AM     = 0x0c; // Index address mark
 constexpr uint8_t  ID_AM        = 0x0e; // ID address mark
 constexpr uint8_t  DATA_AM      = 0x0b; // Data address mark
 constexpr uint8_t  AM_CLOCK     = 0x70; // Clock pattern of AM
-constexpr unsigned PREIDX_GAP	= 45;	// Size of pre-index gap
-//constexpr unsigned GAP1_SIZE    = 28;   // Size of gap 1
-//constexpr unsigned GAP2_SIZE    = 28;   // Size of gap 2
-//constexpr int ID_DATA_OFFSET = 35 * 16; // Nominal distance (in cells) between ID & DATA AM
+constexpr unsigned PREIDX_GAP   = 45;   // Size of pre-index gap
+constexpr unsigned SYNC_00_LEN  = 18;   // 00's in sync (gaps 1, 2, 3)
+constexpr unsigned SYNC_FF_LEN  = 10;   // FF's in sync (gaps 1, 2, 3)
+constexpr int ID_DATA_OFFSET    = 35 * 16;  // Nominal distance (in cells) between ID & DATA AM
 // Size of image file
 constexpr unsigned IMG_IMAGE_SIZE = IMG_TRACKS * IMG_HEADS * IMG_SECTORS * IMG_SECTOR_SIZE;
-constexpr uint16_t CRC_POLY		= 0x1021;	// CRC-CCITT
+constexpr uint16_t CRC_POLY     = 0x1021;   // CRC-CCITT
 
 img_format::img_format()
 {
@@ -67,10 +67,26 @@ bool img_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 
 		write_gap(track_data, 0 , PREIDX_GAP);
 		write_mmfm_byte(track_data , INDEX_AM , AM_CLOCK);
-		
+
+		// Compute interleave factor and skew for current track
+		unsigned il_factor;
+		unsigned skew;
+		if (cyl == 0) {
+			il_factor = 1;
+			skew = 51;
+		} else if (cyl == 1) {
+			il_factor = 4;
+			skew = 48;
+		} else {
+			il_factor = 5;
+			skew = (47 + 45 * (cyl - 2)) % 52;
+		}
+		std::vector<uint8_t> sector_list = interleaved_sectors(il_factor);
+
 		for (unsigned sector = 0; sector < IMG_SECTORS; sector++) {
-			unsigned offset_in_image = (sector + cyl * IMG_SECTORS) * IMG_SECTOR_SIZE;
-			write_sector(track_data , cyl , sector + 1 , &image_data[ offset_in_image ]);
+			unsigned real_sector = sector_list[ (sector + skew) % IMG_SECTORS ];
+			unsigned offset_in_image = (real_sector - 1 + cyl * IMG_SECTORS) * IMG_SECTOR_SIZE;
+			write_sector(track_data , cyl , real_sector , &image_data[ offset_in_image ]);
 		}
 		fill_with_gap4(track_data);
 		generate_track_from_levels(cyl , 0 , track_data , 0 , image);
@@ -80,8 +96,23 @@ bool img_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 
 bool img_format::save(io_generic *io, floppy_image *image)
 {
-	// TODO:
-	return false;
+	LOG("save..\n");
+	for (int cyl = 0; cyl < IMG_TRACKS; cyl++) {
+		uint8_t bitstream[ 21000 ];
+		int bitstream_size;
+		generate_bitstream_from_track(cyl , 0 , CELL_SIZE , bitstream , bitstream_size , image , 0);
+		int pos = 0;
+		unsigned track_no , sector_no;
+		uint8_t sector_data[ IMG_SECTOR_SIZE ];
+		while (get_next_sector(bitstream , bitstream_size , pos , track_no , sector_no , sector_data)) {
+			LOG("Got T %u S %u\n" , track_no , sector_no);
+			if (track_no == cyl && sector_no >= 1 && sector_no <= IMG_SECTORS) {
+				unsigned offset_in_image = (cyl * IMG_SECTORS + sector_no - 1) * IMG_SECTOR_SIZE;
+				io_generic_write(io, sector_data, offset_in_image, IMG_SECTOR_SIZE);
+			}
+		}
+	}
+	return true;
 }
 
 const char *img_format::name() const
@@ -101,8 +132,26 @@ const char *img_format::extensions() const
 
 bool img_format::supports_save() const
 {
-	// TODO: 
-	return false;
+	return true;
+}
+
+std::vector<uint8_t> img_format::interleaved_sectors(unsigned il_factor)
+{
+	std::vector<uint8_t> out(IMG_SECTORS);
+	unsigned idx = 0;
+	for (unsigned s = 0; s < IMG_SECTORS; s++) {
+		while (out[ idx ] != 0) {
+			if (++idx >= IMG_SECTORS) {
+				idx = 0;
+			}
+		}
+		out[ idx ] = s + 1;
+		idx += il_factor;
+		if (idx >= IMG_SECTORS) {
+			idx -= IMG_SECTORS;
+		}
+	}
+	return out;
 }
 
 void img_format::write_mmfm_bit(std::vector<uint32_t> &buffer , bool data_bit , bool clock_bit)
@@ -128,7 +177,7 @@ void img_format::write_mmfm_byte(std::vector<uint32_t> &buffer , uint8_t data , 
 
 void img_format::write_sync(std::vector<uint32_t> &buffer)
 {
-	write_gap(buffer , 18 , 10);
+	write_gap(buffer , SYNC_00_LEN , SYNC_FF_LEN);
 }
 
 void img_format::write_crc(std::vector<uint32_t> &buffer , uint16_t crc)
@@ -209,6 +258,126 @@ void img_format::fill_with_gap4(std::vector<uint32_t> &buffer)
 	if (buffer.size() * CELL_SIZE < 200000000) {
 		bit_w(buffer , false , 200000000 - buffer.size() * CELL_SIZE);
 	}
+}
+
+std::vector<uint8_t> img_format::get_next_id_n_block(const uint8_t *bitstream , int bitstream_size , int& pos , int& start_pos)
+{
+	std::vector<uint8_t> res;
+	uint8_t data_sr;
+	uint8_t clock_sr;
+
+	// Look for either sync + ID AM or sync + DATA AM
+	do {
+		unsigned cnt_trans = 0;
+		while (pos < bitstream_size && cnt_trans < 34) {
+			bool bit = BIT(bitstream[ pos >> 3 ] , ~pos & 7);
+			pos++;
+			if (cnt_trans < 32) {
+				if (!(BIT(cnt_trans , 0) ^ bit)) {
+					cnt_trans++;
+				} else {
+					cnt_trans = 0;
+				}
+			} else if (cnt_trans == 32) {
+				if (!bit) {
+					start_pos = pos;
+					cnt_trans++;
+				} else {
+					cnt_trans = 0;
+				}
+			} else if (!bit) {
+				cnt_trans++;
+			} else {
+				cnt_trans = 32;
+			}
+		}
+
+		if (pos == bitstream_size) {
+			// End of track reached
+			return res;
+		}
+
+		// Get AM
+		data_sr = clock_sr = 0;
+		for (unsigned i = 0; i < 7; ++i) {
+			bool bit = BIT(bitstream[ pos >> 3 ] , ~pos & 7);
+			pos++;
+			clock_sr = (clock_sr << 1) | bit;
+			bit = BIT(bitstream[ pos >> 3 ] , ~pos & 7);
+			pos++;
+			data_sr = (data_sr << 1) | bit;
+		}
+		if (pos >= bitstream_size) {
+			return res;
+		}
+	} while (clock_sr != AM_CLOCK);
+
+	LOG("@%u data=%02x\n" , start_pos , data_sr);
+
+	// ID blocks: Track no. + 0 + sector no. + 0 + CRC
+	// Data blocks: Sector data + CRC
+	res.push_back(data_sr);
+	unsigned to_dump;
+	if (data_sr == ID_AM) {
+		to_dump = 4;
+	} else if (data_sr == DATA_AM) {
+		to_dump = IMG_SECTOR_SIZE;
+	} else {
+		to_dump = 0;
+	}
+
+	pos++;
+	for (unsigned i = 0; i < to_dump && pos < bitstream_size; i++) {
+		data_sr = 0;
+		unsigned j;
+		for (j = 0; j < 8 && pos < bitstream_size; j++) {
+			bool bit = BIT(bitstream[ pos >> 3 ] , ~pos & 7);
+			pos += 2;
+			data_sr = (data_sr << 1) | bit;
+		}
+		if (j == 8) {
+			res.push_back(data_sr);
+		}
+	}
+	LOG("block %02x:%02x:%02x:%02x:%02x (%lu)\n" , res[ 0 ] , res[ 1 ] , res[ 2 ] , res[ 3 ] , res[ 4 ] , res.size());
+	return res;
+}
+
+bool img_format::get_next_sector(const uint8_t *bitstream , int bitstream_size , int& pos , unsigned& track , unsigned& sector , uint8_t *sector_data)
+{
+	std::vector<uint8_t> block;
+	while (true) {
+		// Scan for ID block first
+		int id_pos = 0;
+		while (true) {
+			if (block.size() == 0) {
+				block = get_next_id_n_block(bitstream , bitstream_size , pos , id_pos);
+				if (block.size() == 0) {
+					return false;
+				}
+			}
+			if (block[ 0 ] == ID_AM && block.size() >= 5) {
+				track = block[ 1 ];
+				sector = block[ 3 ];
+				break;
+			} else {
+				block.clear();
+			}
+		}
+		// Then for DATA block
+		int data_pos = 0;
+		block = get_next_id_n_block(bitstream , bitstream_size , pos , data_pos);
+		if (block.size() == 0) {
+			return false;
+		}
+		if (block[ 0 ] == DATA_AM && block.size() >= (IMG_SECTOR_SIZE + 1) && abs((data_pos - id_pos) - ID_DATA_OFFSET) <= 64) {
+			break;
+		}
+	}
+
+	memcpy(sector_data , block.data() + 1 , IMG_SECTOR_SIZE);
+
+	return true;
 }
 
 const floppy_format_type FLOPPY_IMG_FORMAT = &floppy_image_format_creator<img_format>;
