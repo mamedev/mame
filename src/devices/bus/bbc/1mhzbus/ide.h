@@ -60,6 +60,7 @@ protected:
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config& config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	virtual uint8_t fred_r(offs_t offset) override;
 	virtual void fred_w(offs_t offset, uint8_t data) override;
@@ -67,8 +68,11 @@ protected:
 	virtual void jim_w(offs_t offset, uint8_t data) override;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER(irq_w);
+
 	required_device<ata_interface_device> m_ide;
 	required_device<bbc_1mhzbus_slot_device> m_1mhzbus;
+	required_ioport m_links;
 
 	uint16_t m_ide_data;
 };

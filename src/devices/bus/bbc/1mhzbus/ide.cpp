@@ -5,6 +5,7 @@
     RetroClinic BBC 8-bit IDE Interface
 
     http://www.retroclinic.com/acorn/bbcide/bbcide.htm
+    http://www.retroclinic.com/acorn/kitide1mhz/kitide1mhz.htm
 
     Sprow BeebIDE 16-bit IDE Interface for the BBC series
 
@@ -26,19 +27,42 @@ DEFINE_DEVICE_TYPE(BBC_BEEBIDE, bbc_beebide_device, "bbc_beebide", "Sprow BeebID
 
 
 //-------------------------------------------------
+//  INPUT_PORTS( beebide )
+//-------------------------------------------------
+
+INPUT_PORTS_START(beebide)
+	PORT_START("LINKS")
+	PORT_CONFNAME(0x01, 0x00, "Interrupt Enable")
+	PORT_CONFSETTING(0x00, DEF_STR(No))
+	PORT_CONFSETTING(0x01, DEF_STR(Yes))
+	PORT_CONFNAME(0x10, 0x00, "Address Selection")
+	PORT_CONFSETTING(0x00, "&FC40-&FC4F")
+	PORT_CONFSETTING(0x10, "&FC50-&FC5F")
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor bbc_beebide_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(beebide);
+}
+
+//-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 void bbc_ide8_device::device_add_mconfig(machine_config& config)
 {
 	ATA_INTERFACE(config, m_ide).options(ata_devices, "hdd", nullptr, false);
-	m_ide->irq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::irq_w));
 }
 
 void bbc_beebide_device::device_add_mconfig(machine_config& config)
 {
 	ATA_INTERFACE(config, m_ide).options(ata_devices, "hdd", nullptr, false);
-	m_ide->irq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::irq_w));
+	m_ide->irq_handler().set(FUNC(bbc_beebide_device::irq_w));
 
 	BBC_1MHZBUS_SLOT(config, m_1mhzbus, DERIVED_CLOCK(1, 1), bbc_1mhzbus_devices, nullptr);
 	m_1mhzbus->irq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::irq_w));
@@ -66,6 +90,7 @@ bbc_beebide_device::bbc_beebide_device(const machine_config& mconfig, const char
 	, device_bbc_1mhzbus_interface(mconfig, *this)
 	, m_ide(*this, "ide")
 	, m_1mhzbus(*this, "1mhzbus")
+	, m_links(*this, "LINKS")
 	, m_ide_data(0)
 {
 }
@@ -94,9 +119,6 @@ uint8_t bbc_ide8_device::fred_r(offs_t offset)
 	case 0x40:
 		data = m_ide->read_cs0(offset & 0x07, 0xff);
 		break;
-	case 0x48:
-		data = m_ide->read_cs1(offset & 0x07, 0xff);
-		break;
 	}
 
 	return data;
@@ -109,9 +131,6 @@ void bbc_ide8_device::fred_w(offs_t offset, uint8_t data)
 	case 0x40:
 		m_ide->write_cs0(offset & 0x07, data, 0xff);
 		break;
-	case 0x48:
-		m_ide->write_cs1(offset & 0x07, data, 0xff);
-		break;
 	}
 }
 
@@ -120,29 +139,32 @@ uint8_t bbc_beebide_device::fred_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	switch (offset & 0xf8)
+	if ((offset & 0x50) == ((m_links->read() & 0x10) | 0x40))
 	{
-	case 0x40:
-		if (offset == 0x40)
+		switch (offset & 0xe8)
 		{
-			m_ide_data = m_ide->read_cs0(offset & 0x07);
-			data = m_ide_data & 0x00ff;
+		case 0x40:
+			if (offset & 0x07)
+			{
+				data = m_ide->read_cs0(offset & 0x07, 0xff);
+			}
+			else
+			{
+				m_ide_data = m_ide->read_cs0(offset & 0x07);
+				data = m_ide_data & 0xff;
+			}
+			break;
+		case 0x48:
+			if (offset & 0x04)
+			{
+				data = m_ide->read_cs1(offset & 0x07, 0xff);
+			}
+			else
+			{
+				data = m_ide_data >> 8;
+			}
+			break;
 		}
-		else
-		{
-			data = m_ide->read_cs0(offset & 0x07);
-		}
-		break;
-	case 0x48:
-		if (offset & 0x04)
-		{
-			data = m_ide->read_cs1(offset & 0x07);
-		}
-		else
-		{
-			data = m_ide_data >> 8;
-		}
-		break;
 	}
 
 	data &= m_1mhzbus->fred_r(offset);
@@ -152,29 +174,32 @@ uint8_t bbc_beebide_device::fred_r(offs_t offset)
 
 void bbc_beebide_device::fred_w(offs_t offset, uint8_t data)
 {
-	switch (offset & 0xf8)
+	if ((offset & 0x50) == ((m_links->read() & 0x10) | 0x40))
 	{
-	case 0x40:
-		if (offset == 0x40)
+		switch (offset & 0xe8)
 		{
-			m_ide_data = (m_ide_data & 0xff00) | data;
-			m_ide->write_cs0(offset & 0x07, m_ide_data);
+		case 0x40:
+			if (offset & 0x07)
+			{
+				m_ide->write_cs0(offset & 0x07, data, 0xff);
+			}
+			else
+			{
+				m_ide_data = (m_ide_data & 0xff00) | data;
+				m_ide->write_cs0(offset & 0x07, m_ide_data);
+			}
+			break;
+		case 0x48:
+			if (offset & 0x04)
+			{
+				m_ide->write_cs1(offset & 0x07, data, 0xff);
+			}
+			else
+			{
+				m_ide_data = data << 8;
+			}
+			break;
 		}
-		else
-		{
-			m_ide->write_cs0(offset & 0x07, data);
-		}
-		break;
-	case 0x48:
-		if (offset & 0x04)
-		{
-			m_ide->write_cs1(offset & 0x07, data);
-		}
-		else
-		{
-			m_ide_data = data << 8;
-		}
-		break;
 	}
 
 	m_1mhzbus->fred_w(offset, data);
@@ -188,4 +213,12 @@ uint8_t bbc_beebide_device::jim_r(offs_t offset)
 void bbc_beebide_device::jim_w(offs_t offset, uint8_t data)
 {
 	m_1mhzbus->jim_w(offset, data);
+}
+
+WRITE_LINE_MEMBER(bbc_beebide_device::irq_w)
+{
+	if (BIT(m_links->read(), 0))
+	{
+		m_slot->irq_w(state);
+	}
 }
