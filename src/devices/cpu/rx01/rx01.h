@@ -27,6 +27,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 4); }
 	virtual void execute_run() override;
 
 	// device_disasm_interface overrides
@@ -41,19 +43,29 @@ protected:
 private:
 	void scratchpad_map(address_map &map);
 
+	// internal helpers
+	u8 mux_out();
+	bool test_condition();
+
 	// address spaces
-	address_space_config m_rom_config;
+	address_space_config m_inst_config;
 	address_space_config m_sp_config;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_rom_cache;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_inst_cache;
 	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_sp_cache;
 
 	// internal state
 	u16 m_pc;
+	u16 m_ppc;
+	u8 m_mb;
+	bool m_br_condition;
+	bool m_inst_disable;
+	bool m_inst_repeat;
 	u8 m_cntr;
 	u8 m_sr;
 	u8 m_spar;
 	u16 m_bar;
 	u16 m_crc;
+	bool m_flag;
 	s32 m_icount;
 };
 
