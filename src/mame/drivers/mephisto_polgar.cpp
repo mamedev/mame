@@ -14,13 +14,15 @@ TODO:
 
 
 #include "emu.h"
+
 #include "cpu/m6502/m65c02.h"
 #include "cpu/m6502/m65sc02.h"
 #include "machine/74259.h"
 #include "machine/nvram.h"
 #include "machine/mmboard.h"
 #include "machine/chessmachine.h"
-#include "video/hd44780.h"
+#include "video/mmdisplay2.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -91,7 +93,7 @@ protected:
 
 private:
 	required_device<mephisto_board_device> m_board;
-	required_device<mephisto_display_modul_device> m_display;
+	required_device<mephisto_display_module2_device> m_display;
 	output_finder<16> m_leds;
 	uint8_t m_led_latch;
 };
@@ -130,8 +132,8 @@ READ8_MEMBER(mephisto_polgar_state::polgar_keys_r)
 void mephisto_polgar_state::polgar_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram");
-	map(0x2000, 0x2000).w("display", FUNC(mephisto_display_modul_device::latch_w));
-	map(0x2004, 0x2004).w("display", FUNC(mephisto_display_modul_device::io_w));
+	map(0x2000, 0x2000).w("display", FUNC(mephisto_display_module2_device::latch_w));
+	map(0x2004, 0x2004).w("display", FUNC(mephisto_display_module2_device::io_w));
 	map(0x2400, 0x2400).w("board", FUNC(mephisto_board_device::led_w));
 	map(0x2800, 0x2800).w("board", FUNC(mephisto_board_device::mux_w));
 	map(0x2c00, 0x2c07).r(FUNC(mephisto_polgar_state::polgar_keys_r));
@@ -157,8 +159,8 @@ void mephisto_risc_state::mrisc_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).ram().share("nvram");
-	map(0x2000, 0x2000).w("display", FUNC(mephisto_display_modul_device::latch_w));
-	map(0x2004, 0x2004).w("display", FUNC(mephisto_display_modul_device::io_w));
+	map(0x2000, 0x2000).w("display", FUNC(mephisto_display_module2_device::latch_w));
+	map(0x2004, 0x2004).w("display", FUNC(mephisto_display_module2_device::io_w));
 	map(0x2c00, 0x2c07).r(FUNC(mephisto_risc_state::polgar_keys_r));
 	map(0x2400, 0x2400).w("board", FUNC(mephisto_board_device::led_w));
 	map(0x2800, 0x2800).w("board", FUNC(mephisto_board_device::mux_w));
@@ -203,7 +205,7 @@ void mephisto_milano_state::milano_mem(address_map &map)
 {
 	map(0x0000, 0x1fbf).ram().share("nvram");
 
-	map(0x1fc0, 0x1fc0).w(m_display, FUNC(mephisto_display_modul_device::latch_w));
+	map(0x1fc0, 0x1fc0).w(m_display, FUNC(mephisto_display_module2_device::latch_w));
 	map(0x1fd0, 0x1fd0).w(FUNC(mephisto_milano_state::milano_led_w));
 	map(0x1fe0, 0x1fe0).r(FUNC(mephisto_milano_state::milano_input_r));
 	map(0x1fe8, 0x1fef).w("outlatch", FUNC(hc259_device::write_d7));
@@ -314,7 +316,7 @@ void mephisto_polgar_state::polgar(machine_config &config)
 	outlatch.q_out_cb<5>().set_output("led105");
 
 	MEPHISTO_SENSORS_BOARD(config, "board");
-	MEPHISTO_DISPLAY_MODUL(config, "display");
+	MEPHISTO_DISPLAY_MODULE2(config, "display");
 	config.set_default_layout(layout_mephisto_polgar);
 }
 
@@ -345,7 +347,7 @@ void mephisto_risc_state::mrisc(machine_config &config)
 	outlatch.parallel_out_cb().set_membank("rombank").rshift(6).mask(0x03).exor(0x01);
 
 	MEPHISTO_SENSORS_BOARD(config, "board");
-	MEPHISTO_DISPLAY_MODUL(config, "display");
+	MEPHISTO_DISPLAY_MODULE2(config, "display");
 	config.set_default_layout(layout_mephisto_polgar);
 }
 

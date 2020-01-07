@@ -47,7 +47,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
-	required_device<upd7759_device> m_upd7759;
+	optional_device<upd7759_device> m_upd7759;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -87,6 +87,8 @@ private:
 	void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
+	void svolleybl_main_map(address_map &map);
+	void svolleybl_sound_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_RPUNCH_H

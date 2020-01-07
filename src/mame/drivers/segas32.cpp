@@ -2985,7 +2985,7 @@ void segas32_new_state::sega_multi32_6p(machine_config &config)
     ROM PCB No: 834-8526-01 (US)
                 834-8526-02 (Export)
                 834-8526-03 (Japan)
-                834-8526-05 (Export)
+                834-8526-05 (Export, had the DSP 837-8341 board attached)
    Link PCB No: 837-8223-01
      A/D BD No: 837-7536 (one for each mainboard)
      DSP BD No: 837-8341

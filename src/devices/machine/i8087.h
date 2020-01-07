@@ -76,7 +76,7 @@ private:
 	void set_stack_overflow();
 	int inc_stack();
 	int dec_stack();
-	int check_exceptions();
+	int check_exceptions(bool store = false);
 	void write_cw(u16 cw);
 	floatx80 add(floatx80 a, floatx80 b);
 	floatx80 sub(floatx80 a, floatx80 b);

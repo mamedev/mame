@@ -24,6 +24,7 @@ acrnsys1.cpp
 acrnsys.cpp
 acvirus.cpp
 adam.cpp
+adm11.cpp
 adm23.cpp
 adm31.cpp
 adm36.cpp
@@ -83,7 +84,9 @@ atarist.cpp
 atm.cpp
 atom.cpp
 atpci.cpp
+att3b2.cpp
 att4425.cpp
+att610.cpp
 att630.cpp
 attache.cpp
 aussiebyte.cpp
@@ -484,12 +487,14 @@ mekd2.cpp
 mekd3.cpp
 mekd4.cpp
 mekd5.cpp
+mephisto_berlin.cpp
 mephisto_brikett.cpp
 mephisto_glasgow.cpp
 mephisto_mm1.cpp
 mephisto_mm2.cpp
 mephisto_modena.cpp
 mephisto_modular.cpp
+mephisto_modular_tm.cpp
 mephisto_mondial68k.cpp
 mephisto_montec.cpp
 mephisto_polgar.cpp
@@ -588,6 +593,7 @@ novag_diablo.cpp
 novag_presto.cpp
 novag_savant.cpp
 novag_sexpert.cpp
+novag_supremo.cpp
 ns5652.cpp
 o2.cpp
 ob68k1a.cpp
@@ -684,6 +690,7 @@ proteus3.cpp
 ps2.cpp
 ps2sony.cpp
 psion.cpp
+psion5.cpp
 psx.cpp
 pt68k4.cpp
 ptcsol.cpp
@@ -894,6 +901,7 @@ tti.cpp
 tutor.cpp
 tv910.cpp
 tv912.cpp
+tv924.cpp
 tv950.cpp
 tv955.cpp
 tv965.cpp

@@ -1112,6 +1112,7 @@ TIMER_CALLBACK_MEMBER(scn2674_device::scanline_timer)
 
 	const bool mbc = (charrow == 0) && (m_buffer_mode_select == 3);
 	const bool blink_on = (screen().frame_number() & (m_character_blink_rate_divisor >> 1)) != 0;
+	const uint16_t last_address = (m_display_buffer_last_address << 10) | 0x3ff;
 	for (int i = 0; i < m_character_per_row; i++)
 	{
 		u8 charcode, attrcode = 0;
@@ -1154,10 +1155,11 @@ TIMER_CALLBACK_MEMBER(scn2674_device::scanline_timer)
 							blink_on);
 
 		}
-		address = (address + 1) & 0xffff;
 
-		if (address > ((m_display_buffer_last_address << 10) | 0x3ff))
-			address = m_display_buffer_first_address;
+		if ((address & 0x3fff) == last_address)
+			address = (address & 0xc000) | m_display_buffer_first_address;
+		else
+			address = (address + 1) & 0xffff;
 	}
 
 	if (!m_display_enabled)

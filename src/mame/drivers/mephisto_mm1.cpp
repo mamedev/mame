@@ -349,7 +349,7 @@ static INPUT_PORTS_START( mirage )
 
 	PORT_START("FAKE") // module came with buttons sensorboard by default
 	PORT_CONFNAME( 0x01, 0x00, "Board Sensors" ) PORT_CHANGED_MEMBER(DEVICE_SELF, mm1_state, mirage_switch_sensor_type, 0)
-	PORT_CONFSETTING(    0x00, "Buttons (Mirage)" )
+	PORT_CONFSETTING(    0x00, "Buttons (Mobil)" )
 	PORT_CONFSETTING(    0x01, "Magnets (Modular)" )
 INPUT_PORTS_END
 

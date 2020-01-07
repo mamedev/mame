@@ -748,6 +748,16 @@ WRITE_LINE_MEMBER(dc_state::sh4_aica_irq)
 	dc_update_interrupt_status();
 }
 
+WRITE_LINE_MEMBER(dc_state::external_irq)
+{
+	if (state)
+		dc_sysctrl_regs[SB_ISTEXT] |= IST_EXT_EXTERNAL;
+	else
+		dc_sysctrl_regs[SB_ISTEXT] &= ~IST_EXT_EXTERNAL;
+
+	dc_update_interrupt_status();
+}
+
 MACHINE_RESET_MEMBER(dc_state,dc_console)
 {
 	dc_state::machine_reset();

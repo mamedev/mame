@@ -33,6 +33,7 @@ public:
 	naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void submap(address_map& map) override;
 	void sh4_map(address_map &map);
 	void sh4_io_map(address_map &map);
 	void pic_map(address_map &map);
@@ -45,6 +46,37 @@ public:
 	uint8_t *memory(uint32_t &size) { size = dimm_data_size; return dimm_data; }
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	DECLARE_WRITE16_MEMBER(dimm_command_w);		// 5f703c
+	DECLARE_READ16_MEMBER(dimm_command_r);
+	DECLARE_WRITE16_MEMBER(dimm_offsetl_w);		// 5f7040
+	DECLARE_READ16_MEMBER(dimm_offsetl_r);
+	DECLARE_WRITE16_MEMBER(dimm_parameterl_w);	// 5f7044
+	DECLARE_READ16_MEMBER(dimm_parameterl_r);
+	DECLARE_WRITE16_MEMBER(dimm_parameterh_w);	// 5f7048
+	DECLARE_READ16_MEMBER(dimm_parameterh_r);
+	DECLARE_WRITE16_MEMBER(dimm_status_w);		// 5f704c
+	DECLARE_READ16_MEMBER(dimm_status_r);
+
+	DECLARE_WRITE32_MEMBER(sh4_unknown_w);		// 14000000
+	DECLARE_READ32_MEMBER(sh4_unknown_r);
+	DECLARE_WRITE32_MEMBER(sh4_command_w);		// 14000014
+	DECLARE_READ32_MEMBER(sh4_command_r);
+	DECLARE_WRITE32_MEMBER(sh4_offsetl_w);		// 14000018
+	DECLARE_READ32_MEMBER(sh4_offsetl_r);
+	DECLARE_WRITE32_MEMBER(sh4_parameterl_w);	// 1400001c
+	DECLARE_READ32_MEMBER(sh4_parameterl_r);
+	DECLARE_WRITE32_MEMBER(sh4_parameterh_w);	// 14000020
+	DECLARE_READ32_MEMBER(sh4_parameterh_r);
+	DECLARE_WRITE32_MEMBER(sh4_status_w);		// 14000024
+	DECLARE_READ32_MEMBER(sh4_status_r);
+	DECLARE_WRITE32_MEMBER(sh4_des_keyl_w);		// 14000030
+	DECLARE_READ32_MEMBER(sh4_des_keyl_r);
+	DECLARE_WRITE32_MEMBER(sh4_des_keyh_w);		// 14000034
+	DECLARE_READ32_MEMBER(sh4_des_keyh_r);
+
+	DECLARE_WRITE32_MEMBER(memorymanager_w);
+	DECLARE_READ32_MEMBER(memorymanager_r);
 
 	DECLARE_READ64_MEMBER(i2cmem_dimm_r);
 	DECLARE_WRITE64_MEMBER(i2cmem_dimm_w);
@@ -61,9 +93,10 @@ protected:
 
 private:
 	enum { FILENAME_LENGTH=24 };
+	const int work_mode = 0; // set to 1 and rebuild to enable the cpus
 
 	required_device<sh4_device> m_maincpu;
-	required_device<pic16c621a_device> m_securitycpu;
+	required_device<pic16c622_device> m_securitycpu;
 	required_device<i2cmem_device> m_i2c0;
 	required_device<i2cmem_device> m_i2c1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -76,8 +109,17 @@ private:
 	uint8_t picbus_pullup;
 	uint8_t picbus_io[2]; // 0 for sh4, 1 for pic
 	bool picbus_used;
+	uint32_t dimm_command;
+	uint32_t dimm_offsetl;
+	uint32_t dimm_parameterl;
+	uint32_t dimm_parameterh;
+	uint32_t dimm_status;
+	uint32_t sh4_unknown;
+	uint64_t dimm_des_key;
+	uint32_t memctl_regs[0x100 / 4];
 
 	// Note: voluntarily not saved into the state
+	uint8_t *dimm_des_data;
 	uint8_t *dimm_data;
 	uint32_t dimm_data_size;
 

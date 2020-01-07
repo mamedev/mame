@@ -166,6 +166,9 @@ offs_t t11_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 						default:   util::stream_format(stream, "Scc   #%02o", lo & 15); break;
 					}
 					break;
+				default:
+					util::stream_format(stream, ".WORD %06o", op);
+					break;
 			}
 			break;
 		case 0000300:
@@ -521,6 +524,8 @@ offs_t t11_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 			ea2 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "SUB   %s,%s", ea1, ea2);
 			break;
+
+		// 17xxxx: floating point (not implemented on T-11)
 
 		default:
 			util::stream_format(stream, ".WORD %06o", op);

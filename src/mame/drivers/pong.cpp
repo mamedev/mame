@@ -109,7 +109,7 @@ static const int NS_PER_CLOCK_PONG  = static_cast<int>((double) NETLIST_INTERNAL
 static const int MASTER_CLOCK_PONG  = static_cast<int>((double) NETLIST_INTERNAL_RES / (double) NS_PER_CLOCK_PONG + 0.5);
 
 #define V_TOTAL_PONG    (0x105+1)       // 262
-#define H_TOTAL_PONG    (0x1C6+1)       // 454
+#define H_TOTAL_PONG    (0x1C5+1)       // 454
 
 /*
  * Breakout's H1 signal:
@@ -490,14 +490,15 @@ void pong_state::pong(machine_config &config)
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 	//SCREEN(config, "screen", SCREEN_TYPE_VECTOR);
-	FIXFREQ(config, m_video).set_screen("screen");
-	m_video->set_monitor_clock(MASTER_CLOCK_PONG);
-	m_video->set_horz_params(H_TOTAL_PONG-67,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG);
-	m_video->set_vert_params(V_TOTAL_PONG-22,V_TOTAL_PONG-19,V_TOTAL_PONG-12,V_TOTAL_PONG);
-	m_video->set_fieldcount(1);
-	m_video->set_threshold(0.11);
-	m_video->set_horz_scale(4);
-
+	FIXFREQ(config, m_video)
+		.set_monitor_clock(MASTER_CLOCK_PONG)
+		.set_horz_params(H_TOTAL_PONG-66,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG)
+		.set_vert_params(V_TOTAL_PONG-22,V_TOTAL_PONG-10,V_TOTAL_PONG-8,V_TOTAL_PONG)
+		.set_fieldcount(1)
+		.set_threshold(0.11)
+		.set_gain(2.37)
+		.set_horz_scale(4)
+		.set_screen("screen");
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
@@ -540,19 +541,20 @@ void breakout_state::breakout(machine_config &config)
 	NETLIST_ANALOG_OUTPUT(config, "maincpu:coin_counter", 0).set_params("CON_T", FUNC(breakout_state::coin_counter_cb));
 
 	/* video hardware */
-	FIXFREQ(config, m_video).set_screen("screen");
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
-	//SCREEN(config, "screen", SCREEN_TYPE_VECTOR);
 	/* The Pixel width is a 2,1,2,1,2,1,1,1 repeating pattern
 	 * Thus we must use double resolution horizontally
 	 */
-	m_video->set_monitor_clock(MASTER_CLOCK_BREAKOUT);
-	m_video->set_horz_params((H_TOTAL_BREAKOUT-208),(H_TOTAL_BREAKOUT-144),(H_TOTAL_BREAKOUT-16),  (H_TOTAL_BREAKOUT));
-	m_video->set_vert_params(V_TOTAL_BREAKOUT-22,V_TOTAL_BREAKOUT-23,V_TOTAL_BREAKOUT-4, V_TOTAL_BREAKOUT);
-	m_video->set_fieldcount(1);
-	m_video->set_threshold(1.0);
-	m_video->set_gain(1.5);
-	m_video->set_horz_scale(2);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	//SCREEN(config, "screen", SCREEN_TYPE_VECTOR);
+	FIXFREQ(config, m_video)
+		.set_monitor_clock(MASTER_CLOCK_BREAKOUT)
+		.set_horz_params((H_TOTAL_BREAKOUT-176),(H_TOTAL_BREAKOUT-144),(H_TOTAL_BREAKOUT-80),  (H_TOTAL_BREAKOUT))
+		.set_vert_params(V_TOTAL_BREAKOUT-24,V_TOTAL_BREAKOUT-24,V_TOTAL_BREAKOUT-20, V_TOTAL_BREAKOUT)
+		.set_fieldcount(1)
+		.set_threshold(1.0)
+		.set_gain(2.66)
+		.set_horz_scale(2)
+		.set_screen("screen");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -594,12 +596,15 @@ void pong_state::pongd(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
-	FIXFREQ(config, m_video).set_screen("screen");
-	m_video->set_monitor_clock(MASTER_CLOCK_PONG);
-	m_video->set_horz_params(H_TOTAL_PONG-67,H_TOTAL_PONG-52,H_TOTAL_PONG-8,H_TOTAL_PONG);
-	m_video->set_vert_params(V_TOTAL_PONG-22,V_TOTAL_PONG-19,V_TOTAL_PONG-12,V_TOTAL_PONG);
-	m_video->set_fieldcount(1);
-	m_video->set_threshold(0.11);
+	FIXFREQ(config, m_video)
+		.set_monitor_clock(MASTER_CLOCK_PONG)
+		.set_horz_params(H_TOTAL_PONG-76,H_TOTAL_PONG-56,H_TOTAL_PONG-8,H_TOTAL_PONG)
+		.set_vert_params(V_TOTAL_PONG-22,V_TOTAL_PONG-10,V_TOTAL_PONG-8,V_TOTAL_PONG)
+		.set_fieldcount(1)
+		.set_threshold(0.11)
+		.set_gain(2.7)
+		.set_horz_scale(2)
+		.set_screen("screen");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -633,15 +638,15 @@ void rebound_state::rebound(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
-	FIXFREQ(config, m_video).set_screen("screen");
-	m_video->set_monitor_clock(MASTER_CLOCK_PONG);
-	//m_video->set_horz_params(H_TOTAL_PONG-67,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG);
-	m_video->set_horz_params(H_TOTAL_PONG-51,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG);
-	m_video->set_vert_params(V_TOTAL_PONG-22,V_TOTAL_PONG-19,V_TOTAL_PONG-12,V_TOTAL_PONG);
-	m_video->set_fieldcount(1);
-	m_video->set_threshold(1.0);
-	m_video->set_gain(0.6);
-	m_video->set_horz_scale(2);
+	FIXFREQ(config, m_video)
+		.set_monitor_clock(MASTER_CLOCK_PONG)
+		.set_horz_params(H_TOTAL_PONG-66,H_TOTAL_PONG-56,H_TOTAL_PONG-8,H_TOTAL_PONG)
+		.set_vert_params(V_TOTAL_PONG-22,V_TOTAL_PONG-12,V_TOTAL_PONG-8,V_TOTAL_PONG)
+		.set_fieldcount(1)
+		.set_threshold(1.0)
+		.set_gain(1.8)
+		.set_horz_scale(2)
+		.set_screen("screen");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -721,7 +726,7 @@ ROM_END
 */
 
 GAME(  1972, pong,      0, pong,     pong,      pong_state,     empty_init, ROT0,  "Atari", "Pong (Rev E) external [TTL]", MACHINE_SUPPORTS_SAVE)
-GAME(  1972, pongf,     0, pongf,    pong,      pong_state,     empty_init, ROT0,  "Atari", "Pong (Rev E) [TTL]", MACHINE_SUPPORTS_SAVE)
+GAME(  1972, pongf,    pong, pongf,    pong,      pong_state,     empty_init, ROT0,  "Atari", "Pong (Rev E) [TTL]", MACHINE_SUPPORTS_SAVE)
 GAME(  1973, pongd,     0, pongd,    pongd,     pong_state,     empty_init, ROT0,  "Atari", "Pong Doubles [TTL]", MACHINE_SUPPORTS_SAVE)
 GAMEL( 1974, rebound,   0, rebound,  rebound,   rebound_state,  empty_init, ROT0,  "Atari", "Rebound (Rev B) [TTL]", MACHINE_SUPPORTS_SAVE, layout_rebound)
 GAMEL( 1976, breakout,  0, breakout, breakout,  breakout_state, empty_init, ROT90, "Atari", "Breakout [TTL]", MACHINE_SUPPORTS_SAVE, layout_breakout)

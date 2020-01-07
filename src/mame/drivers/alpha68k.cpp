@@ -33,6 +33,11 @@ TODO:
 - Sky Adventure, probably others: sprite drawing is off-sync, cfr. notes in video file;
 - Gold Medalist: attract mode has missing finger on button 1, may be btanb;
 - Gold Medalist: incorrect blank effect on shooting pistol for dash events (cfr. alpha68k_palette_device);
+- Gold Medalist: dash events timers relies on MCU irq timings. 
+  Previous emulation of 180 Hz was making it way too hard, and the timer was updating at 0.03 secs (-> 30 Hz refresh rate).
+  Using a timer of 100 Hz seems a better approximation compared to a stopwatch, of course fine tuning 
+  this approximation needs HW probing and/or a MCU decap.
+- Gold Medalist: MCU irq routine has an event driven path that is never taken into account, what is it for?
 - Super Champion Baseball: enables opacity bit on fix layer, those are transparent on SNK Arcade Classics 0
   but actually opaque on a reference shot, sounds like a btanb;
 - Fix layer tilemap should be a common device between this, snk68.cpp and other Alpha/SNK-based games;
@@ -327,7 +332,11 @@ u16 alpha68k_II_state::alpha_II_trigger_r(offs_t offset)
 			else
 			{
 				if (m_microcontroller_id == 0x8803)     /* Gold Medalist */
-					m_microcontroller_data = 0x21;              // timer
+				{
+					// TODO: dash events increments timer at 0x16c0 in irq routine (event driven?)
+					// There's also another unemulated event path if this is 0x5b, unknown purpose
+					m_microcontroller_data = 0x21;
+				}
 				else
 					m_microcontroller_data = 0x00;
 				m_shared_ram[0x29] = (source & 0xff00) | m_microcontroller_data;
@@ -1310,6 +1319,7 @@ void alpha68k_II_state::btlfieldb(machine_config &config)
 {
 	alpha68k_II(config);
 	m_maincpu->set_vblank_int("screen", FUNC(alpha68k_II_state::irq1_line_hold));
+	// TODO: timing
 	m_maincpu->set_periodic_int(FUNC(alpha68k_II_state::irq2_line_hold), attotime::from_hz(60*4)); // MCU irq
 }
 
@@ -1317,7 +1327,8 @@ void goldmedal_II_state::goldmedal(machine_config &config)
 {
 	alpha68k_II(config);
 	m_maincpu->set_vblank_int("screen", FUNC(goldmedal_II_state::irq1_line_hold));
-	m_maincpu->set_periodic_int(FUNC(goldmedal_II_state::irq2_line_hold), attotime::from_hz(60*3)); // MCU irq
+	// TODO: dash events relies on MCU irq timings
+	m_maincpu->set_periodic_int(FUNC(goldmedal_II_state::irq2_line_hold), attotime::from_hz(100)); // MCU irq
 }
 
 void alpha68k_III_state::alpha68k_III(machine_config &config)
@@ -1344,7 +1355,8 @@ void alpha68k_III_state::alpha68k_III(machine_config &config)
 void goldmedal_III_state::goldmedal(machine_config &config)
 {
 	alpha68k_III_state::alpha68k_III(config);
-	m_maincpu->set_periodic_int(FUNC(goldmedal_III_state::irq2_line_hold), attotime::from_hz(60*3)); // MCU irq
+	// TODO: dash events relies on MCU irq timings
+	m_maincpu->set_periodic_int(FUNC(goldmedal_III_state::irq2_line_hold), attotime::from_hz(100)); // MCU irq
 }
 
 void alpha68k_V_state::alpha68k_V(machine_config &config)
@@ -2136,11 +2148,11 @@ GAME( 1988, skysoldr,  0,        alpha68k_II,    skysoldr,  alpha68k_II_state, i
 GAME( 1988, skysoldrbl,skysoldr, alpha68k_II,    skysoldr,  alpha68k_II_state, init_skysoldr,  ROT90, "bootleg",                                           "Sky Soldiers (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 
-GAME( 1988, goldmedl,  0,        goldmedal,   goldmedl,  goldmedal_II_state, init_goldmedl,  ROT0,  "SNK",                                               "Gold Medalist (set 1, Alpha68k II PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, goldmedl,  0,        goldmedal,   goldmedl,  goldmedal_II_state, init_goldmedl,  ROT0,  "SNK",                                               "Gold Medalist (set 1, Alpha68k II PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
 
 // Alpha III HW
-GAME( 1988, goldmedla, goldmedl, goldmedal,   goldmedl,  goldmedal_III_state, init_goldmedla, ROT0,  "SNK",                                               "Gold Medalist (set 2, Alpha68k III PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, goldmedlb, goldmedl, goldmedal,   goldmedl,  goldmedal_III_state, init_goldmedla, ROT0,  "bootleg",                                               "Gold Medalist (bootleg, Alpha68k III PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, goldmedla, goldmedl, goldmedal,   goldmedl,  goldmedal_III_state, init_goldmedla, ROT0,  "SNK",                                               "Gold Medalist (set 2, Alpha68k III PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1988, goldmedlb, goldmedl, goldmedal,   goldmedl,  goldmedal_III_state, init_goldmedla, ROT0,  "bootleg",                                               "Gold Medalist (bootleg, Alpha68k III PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
 
 // Alpha V HW
 GAME( 1989, skyadvnt,  0,        skyadventure,     skyadvnt,  skyadventure_state, init_skyadvnt,  ROT90, "Alpha Denshi Co.",                                  "Sky Adventure (World)", MACHINE_SUPPORTS_SAVE )

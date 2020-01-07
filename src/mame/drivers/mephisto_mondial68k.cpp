@@ -208,7 +208,7 @@ void mondial68k_state::mondial68k(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(0xf, 0x7f);
-	m_display->output_digit().set([this] (offs_t offset, u8 data, u8 mem_mask) { m_digits[offset] = bitswap<8>(data, 7,4,5,0,1,2,3,6); });
+	m_display->output_digit().set([this](offs_t offset, u8 data) { m_digits[offset] = bitswap<8>(data, 7,4,5,0,1,2,3,6); });
 	config.set_default_layout(layout_mephisto_mondial68k);
 
 	/* sound hardware */

@@ -33,6 +33,9 @@ protected:
 	virtual void tra_complete() override;
 	virtual void rcv_complete() override;
 
+	// ROM region (unused, as the device is HLE'd)
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
 private:
 	int check_command( const char* commandtocheck, int command_len, uint8_t* command_data );
 	void send_format_table_packet(uint8_t flag, int x, int y);

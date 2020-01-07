@@ -14,6 +14,7 @@
 
 #include "emu.h"
 #include "machine/rx01.h"
+#include "cpu/rx01/rx01.h"
 #include "formats/basicdsk.h"
 
 static LEGACY_FLOPPY_OPTIONS_START( rx01 )
@@ -38,7 +39,7 @@ static const floppy_interface rx01_floppy_interface =
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(RX01, rx01_device, "rx01", "RX01")
+DEFINE_DEVICE_TYPE(RX01, rx01_device, "rx01", "RX01 Floppy Disk Controller")
 
 //-------------------------------------------------
 //  rx01_device - constructor
@@ -50,12 +51,20 @@ rx01_device::rx01_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
+void rx01_device::firmware_map(address_map &map)
+{
+	map(00000, 02777).rom().region("firmware", 0);
+}
+
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 void rx01_device::device_add_mconfig(machine_config &config)
 {
+	rx01_cpu_device &cpu(RX01_CPU(config, "rx01cpu", 20_MHz_XTAL));
+	cpu.set_addrmap(AS_PROGRAM, &rx01_device::firmware_map);
+
 	for (auto &floppy : m_image)
 		LEGACY_FLOPPY(config, floppy, 0, &rx01_floppy_interface);
 }
@@ -252,4 +261,25 @@ void rx01_device::write_sector(int ddam)
 {
 	/* write data */
 	m_image[m_unit]->floppy_drive_write_sector_data(0, m_rxsa, (char *)m_buffer, 128, ddam);
+}
+
+ROM_START(rx01)
+	ROM_REGION(0x600, "firmware", 0) // Harris M1-7610-5 (82S126 equivalent) PROMs
+	ROM_LOAD_NIB_LOW( "23-111a2.e13", 0x000, 0x100, CRC(67ada159) SHA1(7cdc31e4aa64491c6212cb3ec1e00e6ae41eff1e))
+	ROM_LOAD_NIB_HIGH("23-421a2.e3",  0x000, 0x100, CRC(d95473f1) SHA1(0fe73ffc3fb9ace480b7100e8f6921cb925f9702))
+	ROM_LOAD_NIB_LOW( "23-257a2.e14", 0x100, 0x100, CRC(226f5f48) SHA1(b458bcd6d48158448967bd9fe30ea4a7df3b44d0))
+	ROM_LOAD_NIB_HIGH("23-258a2.e4",  0x100, 0x100, CRC(4c0efd41) SHA1(c3cc76fffdd626c1c07e3a38f5c0e5f1481aabfe))
+	ROM_LOAD_NIB_LOW( "23-115a2.e15", 0x200, 0x100, CRC(99fc60a3) SHA1(172c9ecfc705a6df404aeec1de210aa992995c40))
+	ROM_LOAD_NIB_HIGH("23-116a2.e5",  0x200, 0x100, CRC(35677163) SHA1(0298130686e87416eddff2346e858f38804222fd))
+	ROM_LOAD_NIB_LOW( "23-117a2.e16", 0x300, 0x100, CRC(3cec12ee) SHA1(eb2289144bace85b4df04e06b2df3ea4b40c1c63))
+	ROM_LOAD_NIB_HIGH("23-118a2.e6",  0x300, 0x100, CRC(d64aaffe) SHA1(06c4729e6d04a24ae0be0022e62389169706715a))
+	ROM_LOAD_NIB_LOW( "23-259a2.e17", 0x400, 0x100, CRC(0a382bb3) SHA1(960d9a995ec67b85080765377b1a546bcfe80883))
+	ROM_LOAD_NIB_HIGH("23-260a2.e7",  0x400, 0x100, CRC(3643c2e4) SHA1(3e11ae926ca746fcfb849adbea7a78329dbc73a7))
+	ROM_LOAD_NIB_LOW( "23-121a2.e18", 0x500, 0x100, CRC(ebc0ced0) SHA1(ef09ba7df66af5afd355ef9d4fef0efb97b3d2f9))
+	ROM_LOAD_NIB_HIGH("23-122a2.e8",  0x500, 0x100, CRC(04ab3bbe) SHA1(abf87d731213e51413c6ef3172f14353da36e791))
+ROM_END
+
+const tiny_rom_entry *rx01_device::device_rom_region() const
+{
+	return ROM_NAME(rx01);
 }
