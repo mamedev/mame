@@ -966,7 +966,7 @@ void bbc_state::bbcb(machine_config &config)
 	m_via6522_1->readpb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_r));
 	m_via6522_1->writepb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_w));
 	m_via6522_1->writepb_handler().append(m_internal, FUNC(bbc_internal_slot_device::latch_fe60_w));
-	m_via6522_1->ca2_handler().set("centronics", FUNC(centronics_device::write_strobe));
+	m_via6522_1->ca2_handler().set("printer", FUNC(centronics_device::write_strobe));
 	m_via6522_1->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 
 	/* adc */
@@ -975,7 +975,7 @@ void bbc_state::bbcb(machine_config &config)
 	m_upd7002->set_eoc_callback(FUNC(bbc_state::upd7002_eoc));
 
 	/* printer */
-	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
+	centronics_device &centronics(CENTRONICS(config, "printer", centronics_devices, "printer"));
 	centronics.ack_handler().set(m_via6522_1, FUNC(via6522_device::write_ca1)).invert(); // ack seems to be inverted?
 	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
 	centronics.set_output_latch(latch);
@@ -1406,7 +1406,7 @@ void bbcm_state::bbcm(machine_config &config)
 	m_rtc->irq().set(m_irqs, FUNC(input_merger_device::in_w<7>));
 
 	/* printer */
-	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
+	centronics_device &centronics(CENTRONICS(config, "printer", centronics_devices, "printer"));
 	centronics.ack_handler().set(m_via6522_1, FUNC(via6522_device::write_ca1)).invert(); // ack seems to be inverted?
 	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
 	centronics.set_output_latch(latch);
@@ -1449,7 +1449,7 @@ void bbcm_state::bbcm(machine_config &config)
 	m_via6522_1->writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
 	m_via6522_1->readpb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_r));
 	m_via6522_1->writepb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_w));
-	m_via6522_1->ca2_handler().set("centronics", FUNC(centronics_device::write_strobe));
+	m_via6522_1->ca2_handler().set("printer", FUNC(centronics_device::write_strobe));
 	m_via6522_1->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 
 	/* fdc */
@@ -1552,7 +1552,7 @@ void bbcm_state::bbcmet(machine_config &config)
 	m_bankdev->set_map(&bbcm_state::bbcmet_bankdev).set_options(ENDIANNESS_LITTLE, 8, 16, 0x0400);
 
 	/* printer */
-	config.device_remove("centronics");
+	config.device_remove("printer");
 	config.device_remove("cent_data_out");
 
 	/* cassette */
@@ -1572,7 +1572,7 @@ void bbcm_state::bbcmet(machine_config &config)
 
 	/* acia */
 	config.device_remove("acia6850");
-	config.device_remove("rs232");
+	config.device_remove("rs423");
 	config.device_remove("acia_clock");
 
 	/* devices */
