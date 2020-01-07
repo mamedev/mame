@@ -13,7 +13,7 @@ Known MicroTouch boards use an 80C32 (compatible: Siemens, Winbond, Philips, MHS
 It seems there are different MicroTouch MCU versions, named "Kahuna", "Excalibur", and probably others, with unknown differences.
 
 
-ISA Board ((c) 1997 MicroTouch Systems Inc. FAB 5405800 REV 2.3)
+ISA board ((c) 1997 MicroTouch Systems Inc. FAB 5405800 REV 2.3)
 _________________________________________________________________
 |                                    ______   ______             |
 |                                   MM74HC04M HC125A   ____      |
@@ -355,6 +355,15 @@ INPUT_CHANGED_MEMBER( microtouch_device::touch )
 	}
 }
 
+// BIOS not hooked up
+ROM_START(microtouch)
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_SYSTEM_BIOS(0, "microtouch_5_6", "MicroTouch Rev.5.6") // "Excalibur", ISA card
+	ROMX_LOAD("microtouch_560410_rev_5.6.u1",  0x0000, 0x10000, CRC(d19ee080) SHA1(c695405ec8c2ac4408a63bacfc68a5a4b878928c), ROM_BIOS(0)) // 27c512
+	ROM_SYSTEM_BIOS(1, "microtouch_5_5", "MicroTouch Rev.5.5") // "Kahuna", daughterboard integrated on monitor
+	ROMX_LOAD("microtouch_5603920_rev_5.5.u1", 0x0000, 0x08000, CRC(5cc164e7) SHA1(753277ce54e8be1b759c37ae760fe4a6846d1fae), ROM_BIOS(1))
+ROM_END
+
 static INPUT_PORTS_START(microtouch)
 	PORT_START("TOUCH")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME( "Touch screen" ) PORT_CHANGED_MEMBER( DEVICE_SELF,microtouch_device, touch, 0 )
@@ -382,3 +391,9 @@ void microtouch_device::tra_complete()
 		m_output_valid = false;
 	}
 }
+
+const tiny_rom_entry *microtouch_device::device_rom_region() const
+{
+    return ROM_NAME(microtouch);
+}
+
