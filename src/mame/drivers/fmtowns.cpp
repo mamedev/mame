@@ -9,7 +9,7 @@
 
     CPU:  various AMD x86 CPUs, originally 80386DX (80387 available as an add-on).
           later models use 80386SX, 80486 and Pentium CPUs
-    Sound:  Yamaha YM3438
+    Sound:  Yamaha YM3438 (some later models are use YMF276; Low voltage variation of YM3438, needs External DAC)
             Ricoh RF5c68
             CD-DA
     Video:  Custom
