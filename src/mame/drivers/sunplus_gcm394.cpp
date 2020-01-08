@@ -7,7 +7,7 @@
 
 	note, these SoC types always have a 128Kwords internal ROM, which the JAKKS games appear to use for basic bootstrap purposes.
 
-    GPL600
+    GPL600 (GCM394)
         Smart Fit Park
         SpongeBob SquarePants Bikini Bottom 500
         Spiderman - The Masked Menace 'Spider Sense' (pad type with Spiderman model)
@@ -179,9 +179,9 @@ protected:
 	optional_region_ptr<uint16_t> m_romregion;
 	required_device<full_memory_device> m_memory;
 
-	DECLARE_READ16_MEMBER(porta_r);
-	DECLARE_READ16_MEMBER(portb_r);
-	DECLARE_WRITE16_MEMBER(porta_w);
+	virtual DECLARE_READ16_MEMBER(porta_r);
+	virtual DECLARE_READ16_MEMBER(portb_r);
+	virtual DECLARE_WRITE16_MEMBER(porta_w);
 
 	virtual DECLARE_READ16_MEMBER(read_external_space);
 	virtual DECLARE_WRITE16_MEMBER(write_external_space);
@@ -250,6 +250,7 @@ public:
 	void nand_beambox();
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER(read_nand);
@@ -287,15 +288,16 @@ public:
 	void init_wrlshunt();
 
 protected:
-	//virtual void machine_start() override;
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	std::vector<uint16_t> m_sdram;
 
+	virtual DECLARE_READ16_MEMBER(porta_r) override;
+	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
+
 private:
 
-	DECLARE_READ16_MEMBER(hunt_porta_r);
-	DECLARE_WRITE16_MEMBER(hunt_porta_w);
 
 	//required_shared_ptr<u16> m_mainram;
 
@@ -304,6 +306,25 @@ private:
 	virtual DECLARE_READ16_MEMBER(cs1_r) override;
 	virtual DECLARE_WRITE16_MEMBER(cs1_w) override;
 };
+
+class jak_s500_game_state : public wrlshunt_game_state
+{
+public:
+	jak_s500_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		wrlshunt_game_state(mconfig, type, tag)
+	{
+	}
+
+protected:
+	//virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	virtual DECLARE_READ16_MEMBER(porta_r) override;
+
+private:
+};
+
+
 
 
 READ16_MEMBER(wrlshunt_game_state::cs0_r)
@@ -328,6 +349,11 @@ WRITE16_MEMBER(wrlshunt_game_state::cs1_w)
 }
 
 
+void wrlshunt_game_state::machine_start()
+{
+	save_item(NAME(m_sdram));
+}
+
 void wrlshunt_game_state::machine_reset()
 {
 	cs_callback(0x00, 0x00, 0x00, 0x00, 0x00);
@@ -337,6 +363,23 @@ void wrlshunt_game_state::machine_reset()
 	m_maincpu->set_paldisplaybank_high_hack(1);
 	m_maincpu->set_alt_tile_addressing_hack(1);
 }
+
+READ16_MEMBER(jak_s500_game_state::porta_r)
+{
+	uint16_t data = machine().rand();
+	return data;
+}
+
+void jak_s500_game_state::machine_reset()
+{
+	cs_callback(0x00, 0x00, 0x00, 0x00, 0x00);
+	m_maincpu->set_cs_space(m_memory->get_program());
+	m_maincpu->reset(); // reset CPU so vector gets read etc.
+
+	m_maincpu->set_paldisplaybank_high_hack(1);
+	m_maincpu->set_alt_tile_addressing_hack(1);
+}
+
 
 void wrlshunt_game_state::init_wrlshunt()
 {
@@ -435,8 +478,6 @@ void wrlshunt_game_state::wrlshunt(machine_config &config)
 {
 	gcm394_game_state::base(config);
 
-	m_maincpu->porta_in().set(FUNC(wrlshunt_game_state::hunt_porta_r));
-	m_maincpu->porta_out().set(FUNC(wrlshunt_game_state::hunt_porta_w));
 	m_maincpu->set_bootmode(1); // boot from external ROM / CS mirror
 
 	m_screen->set_size(320*2, 262*2);
@@ -444,14 +485,14 @@ void wrlshunt_game_state::wrlshunt(machine_config &config)
 }
 
 
-READ16_MEMBER(wrlshunt_game_state::hunt_porta_r)
+READ16_MEMBER(wrlshunt_game_state::porta_r)
 {
 	uint16_t data = m_io_p1->read();
 	logerror("%s: Port A Read: %04x\n",  machine().describe_context(), data);
 	return data;
 }
 
-WRITE16_MEMBER(wrlshunt_game_state::hunt_porta_w)
+WRITE16_MEMBER(wrlshunt_game_state::porta_w)
 {
 	logerror("%s: Port A:WRITE %04x\n", machine().describe_context(), data);
 
@@ -819,6 +860,15 @@ ROM_START(smartfp)
 	ROM_LOAD16_WORD_SWAP("smartfitpark.bin", 0x000000, 0x800000, CRC(ada84507) SHA1(a3a80bf71fae62ebcbf939166a51d29c24504428))
 ROM_END
 
+ROM_START(jak_s500)
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("spbwheel.bin", 0x000000, 0x800000, CRC(6ba1d335) SHA1(1bb3e4d02c7b35dd4d336971c6a9f82071cc6ce1) )
+ROM_END
+
+
 ROM_START(wrlshunt)
 	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
@@ -979,10 +1029,15 @@ ROM_END
 // the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
 CONS(2009, smartfp, 0, 0, base, gcm394, gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // Fun 2 Learn 3-in-1 SMART SPORTS  ?
+CONS(2009, jak_s500, 0, 0, wrlshunt, wrlshunt, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "SpongeBob SquarePants Bikini Bottom 500 (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 
 CONS(2011, wrlshunt, 0, 0, wrlshunt, wrlshunt, wrlshunt_game_state, init_wrlshunt, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
+void generalplus_gpac800_game_state::machine_start()
+{
+	save_item(NAME(m_sdram));
+}
 
 void generalplus_gpac800_game_state::machine_reset()
 {

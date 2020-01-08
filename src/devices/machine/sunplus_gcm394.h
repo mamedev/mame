@@ -80,6 +80,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	virtual void device_post_load() override;
+
 	void gcm394_internal_map(address_map &map);
 	void base_internal_map(address_map &map);
 

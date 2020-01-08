@@ -269,6 +269,10 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::chipselect_csx_memory_device_control_
 
 }
 
+void sunplus_gcm394_base_device::device_post_load()
+{
+	m_cs_callback(m_782x[0], m_782x[1], m_782x[2], m_782x[3], m_782x[4]);
+}
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7835_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7835_w %04x\n", machine().describe_context(), data); m_7835 = data; }
 
@@ -1030,6 +1034,46 @@ void sunplus_gcm394_base_device::device_start()
 
 	m_unk_timer = timer_alloc(0);
 	m_unk_timer->adjust(attotime::never);
+
+	save_item(NAME(m_dma_params));
+	save_item(NAME(m_7803));
+	save_item(NAME(m_7807));
+	save_item(NAME(m_membankswitch_7810));
+	save_item(NAME(m_7816));
+	save_item(NAME(m_7817));
+	save_item(NAME(m_7819));
+	save_item(NAME(m_782x));
+	save_item(NAME(m_782d));
+	save_item(NAME(m_7835));
+	save_item(NAME(m_7860));
+	save_item(NAME(m_7861));
+	save_item(NAME(m_7862));
+	save_item(NAME(m_7863));
+	save_item(NAME(m_7870));
+	save_item(NAME(m_7871));
+	save_item(NAME(m_7872));
+	save_item(NAME(m_7873));
+	save_item(NAME(m_7882));
+	save_item(NAME(m_7883));
+	save_item(NAME(m_78a0));
+	save_item(NAME(m_78a4));
+	save_item(NAME(m_78a5));
+	save_item(NAME(m_78a6));
+	save_item(NAME(m_78a8));
+	save_item(NAME(m_78b0));
+	save_item(NAME(m_78b1));
+	save_item(NAME(m_78b2));
+	save_item(NAME(m_78b8));
+	save_item(NAME(m_78f0));
+	save_item(NAME(m_78fb));
+	save_item(NAME(m_7934));
+	save_item(NAME(m_7935));
+	save_item(NAME(m_7936));
+	save_item(NAME(m_7960));
+	save_item(NAME(m_7961));
+	save_item(NAME(m_system_dma_memtype));
+	save_item(NAME(m_csbase));
+	save_item(NAME(m_romtype));
 }
 
 void sunplus_gcm394_base_device::device_reset()
