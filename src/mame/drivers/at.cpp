@@ -2484,6 +2484,9 @@ ROM_START( at386 )
 	ROM_SYSTEM_BIOS( 23, "3vim002", "3VIM002")
 	ROMX_LOAD( "3vim002l.bin", 0x10000, 0x8000, CRC(368b66df) SHA1(1bef1e8e1818513061f0c7cf3c731da360c8400b), ROM_SKIP(1) | ROM_BIOS(23))
 	ROMX_LOAD( "3vim002h.bin", 0x10001, 0x8000, CRC(02dbb9fe) SHA1(cfce750a4a019c71e59011fb7a7d891b40f61c61), ROM_SKIP(1) | ROM_BIOS(23))
+	// 24: BIOS-String: 30-0201-ZZ1343-00101111-050591-OPWB-0
+	ROM_SYSTEM_BIOS( 24, "zz1343", "zz1343")
+	ROMX_LOAD( "ami_zz1343.bin", 0x10000, 0x10000, CRC(f5464c1f) SHA1(cb069c3d1d322aa769d46749716a35259f78264a), ROM_BIOS(24))
 ROM_END
 
 
@@ -2818,9 +2821,14 @@ ROM_END
 // 8x SIMM, 5x 16-bit ISA, 2x 8-bit ISA, 1x 32-bit proprietary memory expansion slot
 ROM_START( ecs38632 )
 	ROM_REGION32_LE(0x20000, "bios", 0)
-	// BIOS-String: EC&T-1131-030389-K0
-	ROMX_LOAD( "ami_ecs-386_32_lo.bin", 0x10000, 0x8000, CRC(e119d6a4) SHA1(bcc6164173b44832b8ebfa1883e22efc167e2cd4), ROM_SKIP(1) )
-	ROMX_LOAD( "ami_ecs-386_32_hi.bin", 0x10001, 0x8000, CRC(e3072bf8) SHA1(74eec72e190f682cfd5ae5425ebdc854e0ba7bc9), ROM_SKIP(1) )
+	// 0: BIOS-String: EC&T-1131-030389-K0
+	ROM_SYSTEM_BIOS( 0, "030389", "030389")
+	ROMX_LOAD( "ami_ecs-386_32_lo.bin", 0x10000, 0x8000, CRC(e119d6a4) SHA1(bcc6164173b44832b8ebfa1883e22efc167e2cd4), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD( "ami_ecs-386_32_hi.bin", 0x10001, 0x8000, CRC(e3072bf8) SHA1(74eec72e190f682cfd5ae5425ebdc854e0ba7bc9), ROM_SKIP(1) | ROM_BIOS(0) )
+	// 1: BIOS-String: EC&T-1131-092588-K0
+	ROM_SYSTEM_BIOS( 1, "092588", "092588")
+	ROMX_LOAD( "ami_1131_bios_l.bin", 0x10000, 0x8000, CRC(145c3905) SHA1(9ee2615982e28082971bae8ef8a1f936313ac8c8), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "ami_1131_bios_h.bin", 0x10001, 0x8000, CRC(73d57778) SHA1(176c90134540d5054c99c077126c7c5a65199175), ROM_SKIP(1) | ROM_BIOS(1) )
 ROM_END
 
 // SY-012 16/25 386MB VER: 5.2 - Chipset: Chips P82C301C; P82A306; P82A303; P82C206; P82A304; P82C302; P82B305
@@ -2919,7 +2927,7 @@ ROM_START( ht18c )
 ROM_END
 
 
-// ***** 386 Motherboards using the Macronix MX83C305(A)(FC), MX83C05(A)(FC) chipset
+// ***** 386 Motherboards using the Macronix MX83C305(A)(FC), MX83C06(A)(FC) chipset
 
 // TAM/33/40-MA0 (CM318R00,M31-R00) - Chipset: MX83C305, MX83C306 - CPU: AMD Am386DX-40 - ISA16:8
 // OSC: 80.000MHz - 14.31818 - BIOS: AMI 386 BIOS PLUS S/N OA2050592 - BIOS-String: 31-0100-001105-00101111-121291-MXIC-0 - 386DX/Cx486DLX TAM/33,30-MA0/MA01, 09/10/1992
@@ -3063,8 +3071,14 @@ ROM_END
 ROM_START( op386wb )
 	ROM_REGION32_LE(0x20000, "bios", 0)
 	// OPTi 386WB VER.1.0 - OSC: 66.6670MHz, 50.000MHz, 14,31818 - ISA8: 1, ISA16: 7
-	// BIOS: 1006229 - BIOS-String: 30-0201-D41107-00101111-050591-OPWB-0 - Keyboard-BIOS: Intel P8942AHP
-	ROM_LOAD( "386-opti-386wb-10.bin", 0x10000, 0x10000, CRC(1a5dd6b2) SHA1(9e6b556bfdf21d6f3cba6a05a3092887a71a24a8))
+	// BIOS: 1006229 - Keyboard-BIOS: Intel P8942AHP
+	// 0: BIOS-String: 30-0201-D41107-00101111-050591-OPWB-0
+	ROM_SYSTEM_BIOS( 0, "1006229", "1006220")
+	ROMX_LOAD( "386-opti-386wb-10.bin", 0x10000, 0x10000, CRC(1a5dd6b2) SHA1(9e6b556bfdf21d6f3cba6a05a3092887a71a24a8), ROM_BIOS(0))
+	// 1: BIOS-String: 30-0201-D41107-00101111-050591-OPWB-0
+	ROM_SYSTEM_BIOS( 1, "d41107", "D41107")
+	ROMX_LOAD( "ami_d41107.bin", 0x10000, 0x10000, CRC(2b6cc50d) SHA1(69f69e0295abf5e331fdf01dc8e6b1c0c6591992), ROM_BIOS(1))
+
 ROM_END
 
 // Shuttle HOT-307H - BIOS-String: 30-0100-DK1343-00101111-070791-OPWB3/B-0 - CPU: 386DX - Chipset: OPTi 82C391 B2, 82C392 B - BIOS: AMI; 07/07/91; AA 0571504
@@ -3168,6 +3182,15 @@ ROM_START( chn333sc )
 	ROM_LOAD( "bios.bin", 0x10000, 0x10000, CRC(f8b2b0bc) SHA1(2799cce621b93bf38b04deeb419d25a73f7416f4))
 ROM_END
 
+// Octek Jaguar II - Chipset: SiS 85C330, 85C320, 85C206, 85C310 - CPU: i386-33, FPU: i387-33 - RAM: 8xSIMM30, Cache: 8xIS61C64-25N
+// BIOS: AMI - Keyboard-BIOS: AMI KB-BIOS-VER-F - ISA8: 2, ISA16: 5, ISA16/Memory: 1 - OSC: 66.000MHz, 14.31818
+// BIOS-String: 30-0100-006069-00101111-020291-SISC / 0033P-002
+ROM_START( ocjagii )
+	ROM_REGION32_LE(0x20000, "bios", 0)
+	ROM_LOAD( "ami_386_zz457511.bin", 0x10000, 0x10000, CRC(b5bc6a9a) SHA1(b74f592dd3bcd2978ed7d895d483f83413e0f8d5))
+ROM_END
+
+
 ROM_START( sisrabb )
 	ROM_REGION32_LE(0x20000, "bios", 0)
 	// BIOS-String: 30-0000-D01128-00101111-070791-SISD-0
@@ -3183,11 +3206,14 @@ ROM_START( 386sc ) // CPU: unreadable, FPU: Cyrix 387DX-25 - OSC: 40.000MHz, 14.
 	ROM_LOAD( "386_sc_symphony.bin", 0x10000, 0x10000, CRC(fabe369c) SHA1(211ff63dd874c273135d1427db3562d752c2bade))
 ROM_END
 
-// BIOS-String: 20-0200-DF1121-00101111-102591-SYM_386B-0 / 386DX/SX (S1A.P)
-	// ROM_SYSTEM_BIOS(4, "386sc2c", "386-SC-2C") // Chipset: SYMPHONY SL82C362, SL82C461, SL82C465
 ROM_START( 386sc2c )
 	ROM_REGION32_LE(0x20000, "bios", 0)
-	ROM_LOAD( "386-sc-2c_ami_za492668.bin", 0x10000, 0x10000, CRC(b408eeb7) SHA1(cf1974492119e1aae623fa366d5760343e827e52))
+	// 0: BIOS-String: 20-0200-DF1121-00101111-102591-SYM_386B-0 / 386DX/SX (S1A.P)
+	ROM_SYSTEM_BIOS(0, "s1a", "S1A.P") // Chipset: SYMPHONY SL82C362, SL82C461, SL82C465
+	ROMX_LOAD( "386-sc-2c_ami_za492668.bin", 0x10000, 0x10000, CRC(b408eeb7) SHA1(cf1974492119e1aae623fa366d5760343e827e52), ROM_BIOS(0))
+	// 1: BIOS-String: 20-0200-DF1121-00001111-102591-SYM_386B-0 / 386SX/DX (S1B)
+	ROM_SYSTEM_BIOS(1, "s1b", "S1B")
+	ROMX_LOAD( "ami_386_za590821.bin", 0x10000, 0x10000, CRC(51a4c231) SHA1(4ad65408f2a401ff262934f886937a2615c08e21), ROM_BIOS(1))
 ROM_END
 
 
@@ -3543,9 +3569,17 @@ ROM_START( at486 )
 	// 29: screen remains blank
 	ROM_SYSTEM_BIOS(29, "optimus", "Optimus")
 	ROMX_LOAD("mb_bios_ami_930808.bin", 0x10000, 0x10000, CRC(89151d5b) SHA1(92a93cae054525adfdc6277a1236e699ea9fbc32), ROM_BIOS(29))
-	// 30: 30-0500-ZZ1130-00101111-070791-1219-0 - ASI board
+	// 30: 40-0100-DG1112-00101111-070791-UMC480A / Rev. 251191 UMC-486A - ASI board
+	// The BIOS comes from http://www.elhvb.com/supportbios.info/Archives/BIOS/0-A/ASI/UMC-486A/index.html and contains 28 extra plain textattr
+	// bytes at the end of the file. These have been lopped off, but the emulated machine complains about a ROM error, thus marked BAD_DUMP
 	ROM_SYSTEM_BIOS(30, "umc486a", "UMC-486A")
-	ROMX_LOAD("umc481i.ami", 0x10000, 0x10000, CRC(0e20eda3) SHA1(ae0b38856780386a70cefcfdc87822cd5d2bc329), ROM_BIOS(30))
+	ROMX_LOAD("umc481icorr.ami", 0x10000, 0x10000, BAD_DUMP CRC(d27b2fd4) SHA1(e639dbc7d65b29ffca26701af766fa75bfe33787), ROM_BIOS(30))
+	// 31: 40-0201-D41107-00101111-031591-OPBC-0
+	ROM_SYSTEM_BIOS(31, "a9c11f1f", "a9c11f1f")
+	ROMX_LOAD("ami_486_zz686886.bin", 0x10000, 0x10000, CRC(a9c11f1f) SHA1(2a27ecae9547ddd3d230c30a94deb83a4d6b4436), ROM_BIOS(31))
+	//32: Award Modular BIOS v4.20 / Version 1.09K
+	ROM_SYSTEM_BIOS(32, "109k", "1.09K")
+	ROMX_LOAD("award_486dx_0097042.bin", 0x10000, 0x10000, CRC(b620534b) SHA1(d3777a82cb35639d386a1840dd5cf52527ec6f8b), ROM_BIOS(32))
 ROM_END
 
 
@@ -4837,6 +4871,7 @@ ROM_START( bluenote )
 	ROM_LOAD( "7500d_rev26_121593.bin", 0x00000, 0x20000, CRC(d564f855) SHA1(181e4097c3b4ca2e8e79f1732d4aef9edd5b4586))
 ROM_END
 
+
 /***************************************************************************
 
   Game driver(s)
@@ -5020,6 +5055,7 @@ COMP( 1992, ecsum386,  ibm5170, 0,       at386,     0,     at_state,     init_at
 COMP( 199?, ecsfx3000, ibm5170, 0,       at386,     0,     at_state,     init_at,        "Elitegroup Computer Systems", "FX-3000 REV1.0", MACHINE_NOT_WORKING )
 COMP( 19??, smih0107,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "Forex Computer Company", "unknown 386 AT clone with Forex chipset", MACHINE_NOT_WORKING )
 COMP( 199?, frx386c,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Micro-Express Inc.", "Forex 386 Cache", MACHINE_NOT_WORKING )
+COMP( 1992, ocjagii,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Octek",       "Jaguar II", MACHINE_NOT_WORKING )
 COMP( 1992, ocjagv,    ibm5170, 0,       at386,     0,     at_state,     init_at,        "Octek",       "Jaguar V v1.4", MACHINE_NOT_WORKING )
 COMP( 199?, op386wb,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "OPTi", "OPTi 386WB VER.1.0", MACHINE_NOT_WORKING )
 COMP( 199?, pccm321,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "PC-Chips", "M321", MACHINE_NOT_WORKING )

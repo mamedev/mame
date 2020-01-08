@@ -285,7 +285,10 @@ ROM_START(pc)
 	// American Research Corp., Copyright 1985, ARC TURBO BIOS VERSION 1.23 6/27/85
 	ROM_SYSTEM_BIOS(50, "arc123", "ARC Turbo BIOS 1.23")
 	ROMX_LOAD( "arcturbobios.bin", 0xe000, 0x2000, CRC(07692e7b) SHA1(27aa350dbc0d846cee8f9149bde0ef72d3862254), ROM_BIOS(50))
-
+	// 51: XT-Faraday PAC - Chipset: Faraday FE2010A-ES, Faraday FE2100, MM58167AN, Z0765A08PSC, NS8250N - CPU: SONY CXQ70108P-8 (V20)
+	// OSC: 28.6363, 18.4328.000 - ISA8: 6 - BIOS: PCBIOS 05017 / FARADAY'84'87 / 07017007 - on board: Floppy, ... (ser/par?)
+	ROM_SYSTEM_BIOS(51, "pac", "XT-Faraday PAC")
+	ROMX_LOAD( "xt-faraday_pac_32k.bin", 0x8000, 0x8000, CRC(d1edf110) SHA1(09570ef36dada08a6d3b97d17ad64814fe32d345), ROM_BIOS(51))
 ROM_END
 
 // BIOS versions specifically for NEC V20 CPUs, don't run on plain 8088
