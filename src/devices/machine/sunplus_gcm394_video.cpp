@@ -384,7 +384,7 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 
 		if (nbits < nc_bpp)
 		{
-			uint16_t b = m_space_read_cb((m++ & 0x3fffff));
+			uint16_t b = m_space_read_cb((m++)&0xfffffff);
 			b = (b << 8) | (b >> 8);
 			bits |= b << (nc_bpp - nbits);
 			nbits += 16;
