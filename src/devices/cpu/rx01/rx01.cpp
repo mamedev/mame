@@ -4,6 +4,24 @@
 
     DEC RX01 skeleton CPU device
 
+    This TTL disk control processor executes its custom instruction set at
+    the rather brisk rate of 200 ns per machine cycle. However, it has no
+    ALU or general-purpose data bus, so most of its operations amount to
+    simple manipulations of an assortment of synchronous counters, shift
+    registers and flip-flops.
+
+    The instruction memory is organized as a series of 256-byte "fields"
+    which limit the extent of conditional branches. The architecture allows
+    for up to 16 fields, although the original hardware only implements F0
+    through F5. DEC's documentation treats the program counter as being
+    only 8 bits, calling the upper 4 bits the field counter. This emulation
+    treats PC and FC as a single 12-bit register since the overflow carry
+    from the lower counters is in fact linked to the upper counter, even
+    though the actual microcode does not rely on this.
+
+    The CRC LFSR is implemented using three 74174 registers using negative
+    logic, since these TTL ICs can be cleared but not preset.
+
 ***************************************************************************/
 
 #include "emu.h"
