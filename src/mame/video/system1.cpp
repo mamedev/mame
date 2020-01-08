@@ -90,7 +90,84 @@
 
 #include "emu.h"
 #include "includes/system1.h"
+#include "video/resnet.h"
 
+void system1_state::system1_palette(palette_device &palette) const
+{
+	/*
+	  There are two kind of color handling: in the System 1 games, values in the
+	  palette RAM are directly mapped to colors with the usual BBGGGRRR format;
+	  in the System 2 ones (Choplifter, WBML, etc.), the value in the palette RAM
+	  is a lookup offset for three palette PROMs in RRRRGGGGBBBB format.
+
+	  It's hard to tell for sure because they use resistor packs, but here's
+	  what I think the values are from measurment with a volt meter:
+
+	  Blue: .250K ohms
+	  Blue: .495K ohms
+	  Green:.250K ohms
+	  Green:.495K ohms
+	  Green:.995K ohms
+	  Red:  .495K ohms
+	  Red:  .250K ohms
+	  Red:  .995K ohms
+
+	  accurate to +/- .003K ohms.
+	*/
+
+	if (m_color_prom != nullptr)
+	{
+		for (int pal = 0; pal < 256; pal++)
+		{
+			u8 val;
+			val = m_color_prom[pal + 0 * 256];
+			uint8_t r = 0x0e * BIT(val, 0) + 0x1f * BIT(val, 1) + 0x43 * BIT(val, 2) + 0x8f * BIT(val, 3);
+
+			val = m_color_prom[pal + 1 * 256];
+			uint8_t g = 0x0e * BIT(val, 0) + 0x1f * BIT(val, 1) + 0x43 * BIT(val, 2) + 0x8f * BIT(val, 3);
+
+			val = m_color_prom[pal + 2 * 256];
+			uint8_t b = 0x0e * BIT(val, 0) + 0x1f * BIT(val, 1) + 0x43 * BIT(val, 2) + 0x8f * BIT(val, 3);
+
+			palette.set_indirect_color(pal, rgb_t(r, g, b));
+		}
+	}
+	else
+	{
+		static constexpr int resistances_rg[3] = { 995, 495, 250 };
+		static constexpr int resistances_b [2] = { 495, 250 };
+
+		double weights_r[3], weights_g[3], weights_b[2];
+		compute_resistor_weights(0, 255,    -1.0,
+				3,  resistances_rg, weights_r,  0,    0,
+				3,  resistances_rg, weights_g,  0,    0,
+				2,  resistances_b,  weights_b,  0,    0);
+
+		for (int i = 0; i < 256; i++)
+		{
+			int bit0, bit1, bit2;
+
+			// red component
+			bit0 = BIT(i, 0);
+			bit1 = BIT(i, 1);
+			bit2 = BIT(i, 2);
+			int const r = combine_weights(weights_r, bit0, bit1, bit2);
+
+			// green component
+			bit0 = BIT(i, 3);
+			bit1 = BIT(i, 4);
+			bit2 = BIT(i, 5);
+			int const g = combine_weights(weights_g, bit0, bit1, bit2);
+
+			// blue component
+			bit0 = BIT(i, 6);
+			bit1 = BIT(i, 7);
+			int const b = combine_weights(weights_b, bit0, bit1);
+
+			palette.set_indirect_color(i, rgb_t(r, g, b));
+		}
+	}
+}
 
 /*************************************
  *
@@ -301,47 +378,7 @@ WRITE8_MEMBER(system1_state::system1_videoram_bank_w)
 
 WRITE8_MEMBER(system1_state::system1_paletteram_w)
 {
-	/*
-	  There are two kind of color handling: in the System 1 games, values in the
-	  palette RAM are directly mapped to colors with the usual BBGGGRRR format;
-	  in the System 2 ones (Choplifter, WBML, etc.), the value in the palette RAM
-	  is a lookup offset for three palette PROMs in RRRRGGGGBBBB format.
-
-	  It's hard to tell for sure because they use resistor packs, but here's
-	  what I think the values are from measurment with a volt meter:
-
-	  Blue: .250K ohms
-	  Blue: .495K ohms
-	  Green:.250K ohms
-	  Green:.495K ohms
-	  Green:.995K ohms
-	  Red:  .495K ohms
-	  Red:  .250K ohms
-	  Red:  .995K ohms
-
-	  accurate to +/- .003K ohms.
-	*/
-
-	if (m_color_prom != nullptr)
-	{
-		m_paletteram[offset] = data;
-		uint8_t val;
-
-		val = m_color_prom[data + 0 * 256];
-		uint8_t r = 0x0e * BIT(val, 0) + 0x1f * BIT(val, 1) + 0x43 * BIT(val, 2) + 0x8f * BIT(val, 3);
-
-		val = m_color_prom[data + 1 * 256];
-		uint8_t g = 0x0e * BIT(val, 0) + 0x1f * BIT(val, 1) + 0x43 * BIT(val, 2) + 0x8f * BIT(val, 3);
-
-		val = m_color_prom[data + 2 * 256];
-		uint8_t b = 0x0e * BIT(val, 0) + 0x1f * BIT(val, 1) + 0x43 * BIT(val, 2) + 0x8f * BIT(val, 3);
-
-		m_palette->set_pen_color(offset, rgb_t(r, g, b));
-	}
-	else
-	{
-		m_palette->write8(offset, data);
-	}
+	m_palette->set_pen_indirect(offset, data);
 }
 
 
@@ -354,8 +391,7 @@ WRITE8_MEMBER(system1_state::system1_paletteram_w)
 
 void system1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset)
 {
-	uint32_t gfxbanks = memregion("sprites")->bytes() / 0x8000;
-	const uint8_t *gfxbase = memregion("sprites")->base();
+	uint32_t gfxbanks = m_spriterom.bytes() / 0x8000;
 	uint8_t *spriteram = m_spriteram;
 	int flipscreen = flip_screen();
 	int spritenum;
@@ -382,7 +418,7 @@ void system1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 		/* clamp the bank to the size of the sprite ROMs */
 		bank %= gfxbanks;
-		gfxbankbase = gfxbase + bank * 0x8000;
+		gfxbankbase = &m_spriterom[bank * 0x8000];
 
 		/* flip sprites vertically */
 		if (flipscreen)
@@ -483,7 +519,6 @@ void system1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 void system1_state::video_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind16 &fgpixmap, bitmap_ind16 **bgpixmaps, const int *bgrowscroll, int bgyscroll, int spritexoffs)
 {
-	const uint8_t *lookup = memregion("proms")->base();
 	int x, y;
 
 	/* first clear the sprite bitmap and draw sprites within this area */
@@ -520,7 +555,7 @@ void system1_state::video_update_common(screen_device &screen, bitmap_ind16 &bit
 							(((fgpix >> 9) & 3) << 2) |
 							(((bgpix & 7) == 0) << 4) |
 							(((bgpix >> 9) & 3) << 5);
-			lookup_value = lookup[lookup_index];
+			lookup_value = m_lookup_prom[lookup_index];
 
 			/* compute collisions based on two of the PROM bits */
 			if (!(lookup_value & 4))

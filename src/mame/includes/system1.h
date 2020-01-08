@@ -26,6 +26,8 @@ public:
 		m_ram(*this, "ram"),
 		m_spriteram(*this, "spriteram"),
 		m_paletteram(*this, "palette"),
+		m_spriterom(*this, "sprites"),
+		m_lookup_prom(*this, "proms"),
 		m_videomode_custom(nullptr),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
@@ -115,6 +117,8 @@ private:
 	required_shared_ptr<uint8_t> m_ram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_paletteram;
+	required_region_ptr<uint8_t> m_spriterom;
+	required_region_ptr<uint8_t> m_lookup_prom;
 
 	std::unique_ptr<uint8_t[]> m_videoram;
 	void (system1_state::*m_videomode_custom)(uint8_t data, uint8_t prevdata);
@@ -175,6 +179,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	void system1_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(system2);
 	DECLARE_VIDEO_START(system2);
 	DECLARE_MACHINE_START(myherok);
