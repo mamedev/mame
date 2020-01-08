@@ -51,6 +51,8 @@ protected:
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
 
+	optional_memory_region m_region;
+
 	inline u8 rtc_read(u8 offset);
 	inline void rtc_write(u8 offset, u8 data);
 	void check_overflow();

@@ -375,7 +375,7 @@
 		</bezel>
 
 		<bezel name="lamp5" element="text_gameover">
-			<bounds x="97" y="86" width="45" height="5" />
+			<bounds x="99" y="86" width="41" height="5" />
 		</bezel>
 
 

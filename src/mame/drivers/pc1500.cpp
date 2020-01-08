@@ -274,7 +274,7 @@ void pc1500_state::pc1500_palette(palette_device &palette) const
 
 void pc1500_state::pc1500(machine_config &config)
 {
-	LH5801(config, m_maincpu, 1300000); // 1.3 MHz
+	LH5801(config, m_maincpu, 2.6_MHz_XTAL); // 1.3 MHz internally
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc1500_state::pc1500_mem);
 	m_maincpu->set_addrmap(AS_IO, &pc1500_state::pc1500_mem_io);
 	m_maincpu->in_func().set(FUNC(pc1500_state::pc1500_kb_r));
@@ -297,7 +297,7 @@ void pc1500_state::pc1500(machine_config &config)
 	ioports.portc_w().set(FUNC(pc1500_state::port_c_w));
 	ioports.out_int().set_inputline("maincpu", LH5801_LINE_MI);
 
-	UPD1990A(config, m_rtc);
+	UPD1990A(config, m_rtc, 32.768_kHz_XTAL);
 }
 
 

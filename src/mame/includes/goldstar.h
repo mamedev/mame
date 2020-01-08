@@ -65,6 +65,7 @@ public:
 	DECLARE_VIDEO_START(cherrym);
 	void cmast91_palette(palette_device &palette) const;
 	void lucky8_palette(palette_device &palette) const;
+	void nfm_palette(palette_device &palette) const;
 	uint32_t screen_update_goldstar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cmast91(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

@@ -58,8 +58,10 @@ To Do:
   relevant registers aren't changed throughout the game (?)
 
 [gtmr2]
-- Finish the Inputs (different wheels and pedals)
-- Find infos about the communication stuff (even if it won't be supported)
+- Finish the Inputs (different wheels and pedals);
+- Implement LAN comms;
+- Selecting Italian in the service mode settings causes no voice samples being played 
+  (with lots of OKI invalid samples in logerror), sound bank bug or btanb?
 
 [brapboys / shogwarr]
 

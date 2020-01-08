@@ -21,18 +21,22 @@
 
 DEFINE_DEVICE_TYPE(GCM394, sunplus_gcm394_device, "gcm394", "SunPlus GCM394 System-on-a-Chip")
 
-sunplus_gcm394_device::sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sunplus_gcm394_base_device(mconfig, GCM394, tag, owner, clock)
+sunplus_gcm394_device::sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	sunplus_gcm394_base_device(mconfig, GCM394, tag, owner, clock)
 {
 }
 
 DEFINE_DEVICE_TYPE(GPAC800, generalplus_gpac800_device, "gpac800", "GeneralPlus GPAC800 System-on-a-Chip")
 
-generalplus_gpac800_device::generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sunplus_gcm394_base_device(mconfig, GPAC800, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpac800_device::gpac800_internal_map), this))
+generalplus_gpac800_device::generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	sunplus_gcm394_base_device(mconfig, GPAC800, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpac800_device::gpac800_internal_map), this))
 {
 }
 
+void sunplus_gcm394_base_device::default_cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4)
+{
+	logerror("callback not hooked\n");
+}
 
 
 // **************************************** SYSTEM DMA device *************************************************
@@ -91,7 +95,7 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 	uint32_t dest = m_dma_params[2][channel] | (m_dma_params[5][channel] << 16) ;
 	uint32_t length = m_dma_params[3][channel] | (m_dma_params[6][channel] << 16);
 
-	LOGMASKED(LOG_GCM394_SYSDMA, "%s:possible DMA operation (7abf) (trigger %04x) with params mode:%04x source:%08x (word offset) dest:%08x (word offset) length:%08x (words)\n", machine().describe_context(), data, mode, source, dest, length );
+	LOGMASKED(LOG_GCM394_SYSDMA, "%s:possible DMA operation (7abf) (trigger %04x) with params mode:%04x source:%08x (word offset) dest:%08x (word offset) length:%08x (words) while csbank is %02x\n", machine().describe_context().c_str(), data, mode, source, dest, length, m_membankswitch_7810 );
 
 	if ((source&0x0fffffff) >= 0x20000)
 		LOGMASKED(LOG_GCM394_SYSDMA, " likely transfer from ROM %08x - %08x\n", (source - 0x20000) * 2, (source - 0x20000) * 2 + (length * 2)- 1);
@@ -109,14 +113,14 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 
 		for (int i = 0; i < length/2; i++)
 		{
-			uint16_t val1 = mem.read_word(source);
-			uint16_t val2 = mem.read_word(source);
+			uint16_t val1 = read_space(source);
+			uint16_t val2 = read_space(source);
 
-			//printf("val1 %04x val2 %04x\n", val1, val2);
+			//logerror("val1 %04x val2 %04x\n", val1, val2);
 
 			uint16_t val = (val2 << 8) | val1;
 
-			m_space_write_cb(space, dest, val);
+			write_space(dest, val);
 			dest += 1;
 		}
 
@@ -126,45 +130,26 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 		if (mem.read_word(0x3f368) == 0x4840)
 			mem.write_word(0x3f368, 0x4841);    // cars 2 IRQ? wait hack
 
-		if (mem.read_word(0x4368c) == 0x4846)
-			mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
+		//if (mem.read_word(0x4368c) == 0x4846)
+		//	mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
 
 		if (mem.read_word(0x4d8d4) == 0x4840)
 			mem.write_word(0x4d8d4, 0x4841);    // golden tee IRQ? wait hack
 
-		if (mem.read_word(0x34410) == 0x4846)
-			mem.write_word(0x34410, 0x4840);    // golden tee force service mode
-
+		//if (mem.read_word(0x34410) == 0x4846)
+		//	mem.write_word(0x34410, 0x4840);    // golden tee force service mode
+		
 	}
 	else if ((mode == 0x0089) || (mode == 0x0009) || (mode == 0x4009))
 	{
 		for (int i = 0; i < length; i++)
 		{
-			uint16_t val = 0x0000;
 
-			address_space& mem = this->space(AS_PROGRAM);
+			uint16_t val = read_space(source);
 
-			if (source < 0x20000)
-			{
-				val = mem.read_word(source);
-			}
-			else
-			{
-				// maybe the -0x20000 here should be handled in external space handlers instead
-				val = m_space_read_cb(space, source - 0x20000);
-			}
-
-			if (dest < 0x20000)
-			{
-				mem.write_word(dest, val);
-			}
-			else
-			{
-				// maybe the -0x20000 here should be handled in external space handlers instead
-				m_space_write_cb(space, dest - 0x20000, val);
-			}
-
+			write_space(dest , val);
 			dest += 1;
+			
 			if ((mode&0x3fff) == 0x0009)
 				source += 1;
 		}
@@ -184,6 +169,17 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
 	if (data & 0x02) trigger_systemm_dma(space, 1, data);
 }
 
+READ16_MEMBER(sunplus_gcm394_base_device::system_dma_memtype_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::system_dma_memtype_r\n", machine().describe_context());
+	return m_system_dma_memtype; 
+}
+
+WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_memtype_w)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::system_dma_memtype_w %04x\n", machine().describe_context(), data);
+	m_system_dma_memtype = data;
+}
 
 
 // **************************************** 78xx region with some handling *************************************************
@@ -237,7 +233,8 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::membankswitch_7810_w)
 //	if (m_membankswitch_7810 != data)
 //	LOGMASKED(LOG_GCM394,"%s:sunplus_gcm394_base_device::membankswitch_7810_w %04x\n", machine().describe_context(), data);
 
-	popmessage("bankswitch %04x -> %04x", m_membankswitch_7810, data);
+//	if (m_membankswitch_7810 != data)
+//		popmessage("bankswitch %04x -> %04x", m_membankswitch_7810, data);
 
 	m_membankswitch_7810 = data;
 }
@@ -250,9 +247,6 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::chipselect_csx_memory_device_control_
 {
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::chipselect_csx_memory_device_control_w %04x (782x registers offset %d)\n", machine().describe_context(), data, offset);
 	m_782x[offset] = data;
-
-	if (offset == 0)
-		m_mapping_write_cb(data);
 
 
 	static const char* const md[] =
@@ -269,6 +263,9 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::chipselect_csx_memory_device_control_
 	int cs_size  = (data & 0xff00)>>8;
 
 	logerror("CS%d set to size: %02x (%08x words) md: %01x %s   warat: %01x wait: %01x\n", offset, cs_size, (cs_size+1)*0x10000, cs_md, md[cs_md], cs_warat, cs_wait);
+
+
+	m_cs_callback(m_782x[0], m_782x[1], m_782x[2], m_782x[3], m_782x[4]);
 
 }
 
@@ -435,7 +432,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unk_w)
 	}
 }
 
-void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
+void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 {
 	map(0x000000, 0x006fff).ram();
 	map(0x007000, 0x007fff).rw(FUNC(sunplus_gcm394_base_device::unk_r), FUNC(sunplus_gcm394_base_device::unk_w)); // catch unhandled
@@ -446,8 +443,8 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 
 	// note, tilemaps are at the same address offsets in video device as spg2xx (but unknown devices are extra)
 
-	map(0x007000, 0x007007).w(m_spg_video, FUNC(gcm394_base_video_device::unk_vid1_regs_w)); // written with other unknown_video_device1 LSB/MSB regs below (roz layer or line layer?)
-	map(0x007008, 0x00700f).w(m_spg_video, FUNC(gcm394_base_video_device::unk_vid2_regs_w)); // written with other unknown_video_device2 LSB/MSB regs below (roz layer or line layer?)
+	map(0x007000, 0x007007).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap2_regs_r), FUNC(gcm394_base_video_device::tmap2_regs_w)); // written with other unknown_video_device1 LSB/MSB regs below (roz layer or line layer?)
+	map(0x007008, 0x00700f).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap3_regs_r), FUNC(gcm394_base_video_device::tmap3_regs_w)); // written with other unknown_video_device2 LSB/MSB regs below (roz layer or line layer?)
 
 	map(0x007010, 0x007015).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap0_regs_r), FUNC(gcm394_base_video_device::tmap0_regs_w));
 	map(0x007016, 0x00701b).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap1_regs_r), FUNC(gcm394_base_video_device::tmap1_regs_w));
@@ -456,8 +453,8 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 	map(0x007020, 0x007020).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap0_tilebase_lsb_r), FUNC(gcm394_base_video_device::tmap0_tilebase_lsb_w));      // tilebase, written with other tmap0 regs
 	map(0x007021, 0x007021).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap1_tilebase_lsb_r), FUNC(gcm394_base_video_device::tmap1_tilebase_lsb_w));      // tilebase, written with other tmap1 regs
 	map(0x007022, 0x007022).rw(m_spg_video, FUNC(gcm394_base_video_device::sprite_7022_gfxbase_lsb_r), FUNC(gcm394_base_video_device::sprite_7022_gfxbase_lsb_w)); // sprite tilebase written as 7022, 702d and 7042 group
-	map(0x007023, 0x007023).w(m_spg_video, FUNC(gcm394_base_video_device::unk_vid1_gfxbase_lsb_w));    // written with other unknown_video_device1 regs (roz layer or line layer?)
-	map(0x007024, 0x007024).w(m_spg_video, FUNC(gcm394_base_video_device::unk_vid2_gfxbase_lsb_w));    // written with other unknown_video_device2 regs (roz layer or line layer?)
+	map(0x007023, 0x007023).rw(m_spg_video, FUNC(gcm394_base_video_device::unk_vid1_gfxbase_lsb_r), FUNC(gcm394_base_video_device::unk_vid1_gfxbase_lsb_w));    // written with other unknown_video_device1 regs (roz layer or line layer?)
+	map(0x007024, 0x007024).rw(m_spg_video, FUNC(gcm394_base_video_device::unk_vid2_gfxbase_lsb_r), FUNC(gcm394_base_video_device::unk_vid2_gfxbase_lsb_w));    // written with other unknown_video_device2 regs (roz layer or line layer?)
 
 	map(0x00702a, 0x00702a).w(m_spg_video, FUNC(gcm394_base_video_device::video_702a_w)); // blend level control
 
@@ -465,8 +462,8 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 	map(0x00702b, 0x00702b).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap0_tilebase_msb_r), FUNC(gcm394_base_video_device::tmap0_tilebase_msb_w));      // written with other tmap0 regs
 	map(0x00702c, 0x00702c).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap1_tilebase_msb_r), FUNC(gcm394_base_video_device::tmap1_tilebase_msb_w));      // written with other tmap1 regs
 	map(0x00702d, 0x00702d).rw(m_spg_video, FUNC(gcm394_base_video_device::sprite_702d_gfxbase_msb_r), FUNC(gcm394_base_video_device::sprite_702d_gfxbase_msb_w)); // sprites, written as 7022, 702d and 7042 group
-	map(0x00702e, 0x00702e).w(m_spg_video, FUNC(gcm394_base_video_device::unk_vid1_gfxbase_msb_w));    // written with other unknown_video_device1 regs (roz layer or line layer?)
-	map(0x00702f, 0x00702f).w(m_spg_video, FUNC(gcm394_base_video_device::unk_vid2_gfxbase_msb_w));    // written with other unknown_video_device2 regs (roz layer or line layer?)
+	map(0x00702e, 0x00702e).rw(m_spg_video, FUNC(gcm394_base_video_device::unk_vid1_gfxbase_msb_r), FUNC(gcm394_base_video_device::unk_vid1_gfxbase_msb_w));    // written with other unknown_video_device1 regs (roz layer or line layer?)
+	map(0x00702f, 0x00702f).rw(m_spg_video, FUNC(gcm394_base_video_device::unk_vid2_gfxbase_msb_r), FUNC(gcm394_base_video_device::unk_vid2_gfxbase_msb_w));    // written with other unknown_video_device2 regs (roz layer or line layer?)
 
 	map(0x007030, 0x007030).rw(m_spg_video, FUNC(gcm394_base_video_device::video_7030_brightness_r), FUNC(gcm394_base_video_device::video_7030_brightness_w));
 	map(0x007038, 0x007038).r(m_spg_video, FUNC(gcm394_base_video_device::video_curline_r));
@@ -477,7 +474,7 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 
 	map(0x007051, 0x007051).r(m_spg_video, FUNC(gcm394_base_video_device::video_7051_r)); // wrlshunt checks this (doesn't exist on older SPG?)
 
-	map(0x007062, 0x007062).rw(m_spg_video, FUNC(gcm394_base_video_device::video_7062_r), FUNC(gcm394_base_video_device::video_7062_w));
+	map(0x007062, 0x007062).rw(m_spg_video, FUNC(gcm394_base_video_device::videoirq_source_enable_r), FUNC(gcm394_base_video_device::videoirq_source_enable_w));
 	map(0x007063, 0x007063).rw(m_spg_video, FUNC(gcm394_base_video_device::video_7063_videoirq_source_r), FUNC(gcm394_base_video_device::video_7063_videoirq_source_ack_w));
 
 	// note, 70 / 71 / 72 are the same offsets used for DMA as in spg2xx video device
@@ -506,8 +503,8 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 	// 73xx-77xx = video ram
 	// ######################################################################################################################################################################################
 
-	map(0x007100, 0x0071ef).ram().share("unkram1"); // maybe a line table? (assuming DMA isn't writing to wrong place)
-	map(0x007200, 0x0072ef).ram().share("unkram2"); // ^^
+	map(0x007100, 0x0071ff).ram().share("unkram1"); // maybe a line table? (assuming DMA isn't writing to wrong place)
+	map(0x007200, 0x0072ff).ram().share("unkram2"); // ^^
 
 	map(0x007300, 0x0073ff).rw(m_spg_video, FUNC(gcm394_base_video_device::palette_r), FUNC(gcm394_base_video_device::palette_w));
 
@@ -647,12 +644,9 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 	// ######################################################################################################################################################################################
 
 	map(0x007a3a, 0x007a3a).r(FUNC(sunplus_gcm394_base_device::system_7a3a_r));
-
 	map(0x007a80, 0x007a86).rw(FUNC(sunplus_gcm394_base_device::system_dma_params_channel0_r), FUNC(sunplus_gcm394_base_device::system_dma_params_channel0_w));
-
 	map(0x007a88, 0x007a8e).rw(FUNC(sunplus_gcm394_base_device::system_dma_params_channel1_r), FUNC(sunplus_gcm394_base_device::system_dma_params_channel1_w)); // jak_tsm writes here
-
-	// 7abe - written with DMA stuff (source type for each channel so that device handles timings properly?)
+	map(0x007abe, 0x007abe).rw(FUNC(sunplus_gcm394_base_device::system_dma_memtype_r), FUNC(sunplus_gcm394_base_device::system_dma_memtype_w)); // 7abe - written with DMA stuff (source type for each channel so that device handles timings properly?)
 	map(0x007abf, 0x007abf).rw(FUNC(sunplus_gcm394_base_device::system_dma_status_r), FUNC(sunplus_gcm394_base_device::system_dma_trigger_w));
 
 	// ######################################################################################################################################################################################
@@ -662,36 +656,143 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 	map(0x007b80, 0x007bbf).rw(m_spg_audio, FUNC(sunplus_gcm394_audio_device::control_r), FUNC(sunplus_gcm394_audio_device::control_w));
 	map(0x007c00, 0x007dff).rw(m_spg_audio, FUNC(sunplus_gcm394_audio_device::audio_r), FUNC(sunplus_gcm394_audio_device::audio_w));
 	map(0x007e00, 0x007fff).rw(m_spg_audio, FUNC(sunplus_gcm394_audio_device::audio_phase_r), FUNC(sunplus_gcm394_audio_device::audio_phase_w));
+
 }
 
-READ16_MEMBER(generalplus_gpac800_device::unkarea_7850_r)
+void sunplus_gcm394_base_device::gcm394_internal_map(address_map& map)
 {
-	return machine().rand();
+	sunplus_gcm394_base_device::base_internal_map(map);
+
+	// no internal ROM on this model?
+
+	map(0x08000, 0x0ffff).r(FUNC(sunplus_gcm394_base_device::internalrom_lower32_r)).nopw();
+
+	map(0x020000, 0x1fffff).rw(FUNC(sunplus_gcm394_base_device::cs_space_r), FUNC(sunplus_gcm394_base_device::cs_space_w));
+	map(0x200000, 0x3fffff).rw(FUNC(sunplus_gcm394_base_device::cs_bank_space_r), FUNC(sunplus_gcm394_base_device::cs_bank_space_w));
 }
 
-READ16_MEMBER(generalplus_gpac800_device::unkarea_7854_r)
+READ16_MEMBER(sunplus_gcm394_base_device::cs_space_r)
 {
+	return m_cs_space->read_word(offset);
+}
 
-	//logerror("%s:sunplus_gcm394_base_device::unkarea_7854_r\n", machine().describe_context());
+WRITE16_MEMBER(sunplus_gcm394_base_device::cs_space_w)
+{
+	m_cs_space->write_word(offset, data);
+}
+READ16_MEMBER(sunplus_gcm394_base_device::cs_bank_space_r)
+{
+	int bank = m_membankswitch_7810 & 0x3f;
+	int realoffset = offset + (bank * 0x200000) - m_csbase;
 
-	// jak_tsm code looks for various 'magic values'
+	if (realoffset < 0)
+	{
+		logerror("read real offset < 0\n");
+		return 0;
+	}
+
+	//return m_cs_space->read_word(offset + (0x200000 - m_csbase));
+	return m_cs_space->read_word(realoffset);
+
+}
+
+WRITE16_MEMBER(sunplus_gcm394_base_device::cs_bank_space_w)
+{
+	int bank = m_membankswitch_7810 & 0x3f;
+	int realoffset = offset + (bank * 0x200000) - m_csbase;
+
+	if (realoffset < 0)
+	{
+		logerror("write real offset < 0\n");
+		return;
+	}
+
+	m_cs_space->write_word(realoffset, data);
+}
+
+
+
+READ16_MEMBER(sunplus_gcm394_base_device::internalrom_lower32_r)
+{
+	if (m_boot_mode == 0)
+	{
+		uint16_t* introm = (uint16_t*)m_internalrom->base();
+		return introm[offset];
+	}
+	else
+	{
+		if (!m_cs_space)
+			return 0x0000;
+
+		uint16_t val = m_cs_space->read_word(offset+0x8000);
+		return val;
+	}
+}
+
+
+// GPR27P512A   = C2 76  
+// HY27UF081G2A = AD F1 80 1D
+// H27U518S2C   = AD 76
+
+READ16_MEMBER(generalplus_gpac800_device::nand_7854_r)
+{
+	// TODO: use actual NAND / Smart Media devices once this is better understood.
+	// The games have extensive checks on startup to determine the flash types, but then it appears that
+	// certain games (eg jak_tsm) will only function correctly with specific ones, even if the code
+	// continues regardless.  Others will bail early if they don't get what they want.
+
+	// I think some unSP core maths bugs are causing severe issues after the initial load for jak_tsm
+	// at the moment, possibly the same ones that are causing rendering issues in the jak_gtg bitmap
+	// test and seemingly incorrect road data for jak_car2, either that or the hookup here is very
+	// non-standard outside of the ident codes
+
+	// real TSM code starts at 4c000
+
+
+	//logerror("%s:sunplus_gcm394_base_device::nand_7854_r\n", machine().describe_context());
 
 	if (m_nandcommand == 0x90) // read ident
 	{
-		m_testval ^= 1;
+		logerror("%s:sunplus_gcm394_base_device::nand_7854_r   READ IDENT byte %d\n", machine().describe_context(), m_curblockaddr);
 
-		if (m_testval == 0)
-			return 0x73;
+		uint8_t data = 0x00;
+
+		if (m_romtype == 0)
+		{
+			if (m_curblockaddr == 0)
+				data = 0xc2;
+			else
+				data = 0x76;
+		}
+		else if (m_romtype == 1)
+		{
+			if (m_curblockaddr == 0)
+				data = 0xad;
+			else if (m_curblockaddr == 1)
+				data = 0x76;
+		}
 		else
-			return 0x98;
-	}
-	else if (m_nandcommand == 0x00) // read data
-	{
-		//uint8_t d
-		uint32_t nandaddress = (m_flash_addr_high << 16) | m_flash_addr_low;
-		uint8_t data = m_nand_read_cb((nandaddress * 2) + m_curblockaddr);
+		{
+			if (m_curblockaddr == 2)
+				data = 0xad;
+			else if (m_curblockaddr == 1)
+				data = 0xf1;
+			else if (m_curblockaddr == 2)
+				data = 0x80;
+			else if (m_curblockaddr == 3)
+				data = 0x1d;
+		}
 
-		//printf("reading nand byte %02x\n", data);
+		m_curblockaddr++;
+
+		return data;
+	}
+	else if (m_nandcommand == 0x00)
+	{
+		//logerror("%s:sunplus_gcm394_base_device::nand_7854_r   READ DATA byte %d\n", machine().describe_context(), m_curblockaddr);
+
+		uint32_t nandaddress = (m_nand_addr_high << 16) | m_nand_addr_low;
+		uint8_t data = m_nand_read_cb((nandaddress * 2) + m_curblockaddr);
 
 		m_curblockaddr++;
 
@@ -699,10 +800,17 @@ READ16_MEMBER(generalplus_gpac800_device::unkarea_7854_r)
 	}
 	else if (m_nandcommand == 0x70) // read status
 	{
+		logerror("%s:sunplus_gcm394_base_device::nand_7854_r   READ STATUS byte %d\n", machine().describe_context(), m_curblockaddr);
+
+		return 0xffff;
+	}
+	else
+	{
+		logerror("%s:sunplus_gcm394_base_device::nand_7854_r   READ UNKNOWN byte %d\n", machine().describe_context(), m_curblockaddr);
 		return 0xffff;
 	}
 
-	return 0x00;
+	return 0x0000;
 }
 
 // 7998
@@ -713,49 +821,200 @@ WRITE16_MEMBER(generalplus_gpac800_device::nand_command_w)
 	m_nandcommand = data;
 }
 
-WRITE16_MEMBER(generalplus_gpac800_device::flash_addr_low_w)
+WRITE16_MEMBER(generalplus_gpac800_device::nand_addr_low_w)
 {
-	//logerror("%s:sunplus_gcm394_base_device::flash_addr_low_w %04x\n", machine().describe_context(), data);
-	m_flash_addr_low = data;
+	//logerror("%s:sunplus_gcm394_base_device::nand_addr_low_w %04x\n", machine().describe_context(), data);
+	m_nand_addr_low = data;
 	m_curblockaddr = 0;
 }
 
-WRITE16_MEMBER(generalplus_gpac800_device::flash_addr_high_w)
+WRITE16_MEMBER(generalplus_gpac800_device::nand_addr_high_w)
 {
-	//logerror("%s:sunplus_gcm394_base_device::flash_addr_high_w %04x\n", machine().describe_context(), data);
-	m_flash_addr_high = data;
+	//logerror("%s:sunplus_gcm394_base_device::nand_addr_high_w %04x\n", machine().describe_context(), data);
+	m_nand_addr_high = data;
 
-	uint32_t address = (m_flash_addr_high << 16) | m_flash_addr_low;
-
+	uint32_t address = (m_nand_addr_high << 16) | m_nand_addr_low;
 
 	logerror("%s: flash address is now %08x\n", machine().describe_context(), address);
 
 	m_curblockaddr = 0;
 }
 
+WRITE16_MEMBER(generalplus_gpac800_device::nand_dma_ctrl_w)
+{
+	logerror("%s:sunplus_gcm394_base_device::nand_dma_ctrl_w(?) %04x\n", machine().describe_context(), data);
+	m_nand_dma_ctrl = data;
+}
+
+READ16_MEMBER(generalplus_gpac800_device::nand_7850_r)
+{
+	// 0x8000 = ready
+	return m_nand_7850 | 0x8000;
+}
+
+WRITE16_MEMBER(generalplus_gpac800_device::nand_7850_w)
+{
+	logerror("%s:sunplus_gcm394_base_device::nand_7850_w %04x\n", machine().describe_context(), data);
+	m_nand_7850 = data;
+}
+
+WRITE16_MEMBER(generalplus_gpac800_device::nand_7856_w)
+{
+	logerror("%s:sunplus_gcm394_base_device::nand_7856_w %04x\n", machine().describe_context(), data);
+	m_nand_7856 = data;
+}
+
+WRITE16_MEMBER(generalplus_gpac800_device::nand_7857_w)
+{
+	logerror("%s:sunplus_gcm394_base_device::nand_7857_w %04x\n", machine().describe_context(), data);
+	m_nand_7857 = data;
+}
+
+WRITE16_MEMBER(generalplus_gpac800_device::nand_785b_w)
+{
+	logerror("%s:sunplus_gcm394_base_device::nand_785b_w %04x\n", machine().describe_context(), data);
+	m_nand_785b = data;
+}
+
+WRITE16_MEMBER(generalplus_gpac800_device::nand_785c_w)
+{
+	logerror("%s:sunplus_gcm394_base_device::nand_785c_w %04x\n", machine().describe_context(), data);
+	m_nand_785c = data;
+}
+
+WRITE16_MEMBER(generalplus_gpac800_device::nand_785d_w)
+{
+	logerror("%s:sunplus_gcm394_base_device::nand_785d_w %04x\n", machine().describe_context(), data);
+	m_nand_785d = data;
+}
+
+// [:maincpu] ':maincpu' (00146D)  jak_tsm
+READ16_MEMBER(generalplus_gpac800_device::nand_785e_r)
+{
+	return 0x0000;
+}
+
+//[:maincpu] ':maincpu' (001490)  jak_tsm
+READ16_MEMBER(generalplus_gpac800_device::nand_ecc_low_byte_error_flag_1_r)
+{
+	return 0x0000;
+}
+
+/*
+UNMAPPED reads  writes
+
+jak_tsm uses these (all iniitalized near start)
+unclear if these are specific to the GPAC800 type, or present in the older types
+
+[:maincpu] ':maincpu' (00043F):sunplus_gcm394_base_device::unk_w @ 0x780a (data 0x0000)
+[:maincpu] ':maincpu' (000442):sunplus_gcm394_base_device::unk_w @ 0x7808 (data 0x0000)
+[:maincpu] ':maincpu' (000445):sunplus_gcm394_base_device::unk_w @ 0x782f (data 0x0002)
+[:maincpu] ':maincpu' (000449):sunplus_gcm394_base_device::unk_w @ 0x783d (data 0x05d9)
+[:maincpu] ':maincpu' (00044D):sunplus_gcm394_base_device::unk_w @ 0x783c (data 0x0a57)
+[:maincpu] ':maincpu' (000451):sunplus_gcm394_base_device::unk_w @ 0x783b (data 0x2400)
+[:maincpu] ':maincpu' (000454):sunplus_gcm394_base_device::unk_w @ 0x783e (data 0x0002)
+[:maincpu] ':maincpu' (000458):sunplus_gcm394_base_device::unk_w @ 0x783a (data 0x3011)
+[:maincpu] ':maincpu' (00045B):sunplus_gcm394_base_device::unk_w @ 0x7874 (data 0x0000)
+[:maincpu] ':maincpu' (00045D):sunplus_gcm394_base_device::unk_w @ 0x787c (data 0x0000)
+[:maincpu] ':maincpu' (00045F):sunplus_gcm394_base_device::unk_w @ 0x7888 (data 0x0000)
+[:maincpu] ':maincpu' (000461):sunplus_gcm394_base_device::unk_w @ 0x787e (data 0x0000)
+
+jak_car2 uses these
+
+[:maincpu] ':maincpu' (004056):sunplus_gcm394_base_device::unk_w @ 0x782f (data 0x0002)
+[:maincpu] ':maincpu' (004059):sunplus_gcm394_base_device::unk_w @ 0x783d (data 0x05d9)
+[:maincpu] ':maincpu' (00405C):sunplus_gcm394_base_device::unk_w @ 0x783c (data 0x0a57)
+[:maincpu] ':maincpu' (00405F):sunplus_gcm394_base_device::unk_w @ 0x783b (data 0x2400)
+[:maincpu] ':maincpu' (004062):sunplus_gcm394_base_device::unk_w @ 0x783e (data 0x0002)
+[:maincpu] ':maincpu' (004065):sunplus_gcm394_base_device::unk_w @ 0x783a (data 0x3011)
+[:maincpu] ':maincpu' (004069):sunplus_gcm394_base_device::unk_r @ 0x7880
+[:maincpu] ':maincpu' (00406F):sunplus_gcm394_base_device::unk_w @ 0x7874 (data 0x1249)
+[:maincpu] ':maincpu' (004071):sunplus_gcm394_base_device::unk_w @ 0x787c (data 0x1249)
+[:maincpu] ':maincpu' (004073):sunplus_gcm394_base_device::unk_w @ 0x7888 (data 0x1249)
+[:maincpu] ':maincpu' (004075):sunplus_gcm394_base_device::unk_w @ 0x787e (data 0x1249)
+[:maincpu] ':maincpu' (004088):sunplus_gcm394_base_device::unk_w @ 0x7841 (data 0x000f)
+[:maincpu] ':maincpu' (00408F):sunplus_gcm394_base_device::unk_w @ 0x780a (data 0x0000)
+[:maincpu] ':maincpu' (004092):sunplus_gcm394_base_device::unk_w @ 0x7808 (data 0x0002)
+
+[:maincpu] ':maincpu' (03000A):sunplus_gcm394_base_device::unk_w @ 0x7874 (data 0x36db)
+[:maincpu] ':maincpu' (03000C):sunplus_gcm394_base_device::unk_w @ 0x787c (data 0x36db)
+[:maincpu] ':maincpu' (03000E):sunplus_gcm394_base_device::unk_w @ 0x7888 (data 0x36db)
+[:maincpu] ':maincpu' (030010):sunplus_gcm394_base_device::unk_w @ 0x787e (data 0x36db)
+[:maincpu] ':maincpu' (030013):sunplus_gcm394_base_device::unk_w @ 0x787f (data 0x0010)
+[:maincpu] ':maincpu' (03001D):sunplus_gcm394_base_device::unk_w @ 0x7804 (data 0x1c7f)
+[:maincpu] ':maincpu' (030023):sunplus_gcm394_base_device::unk_w @ 0x7805 (data 0xcdf0)
+[:maincpu] ':maincpu' (03E645):sunplus_gcm394_base_device::unk_w @ 0x7861 (data 0x1f66)
+[:maincpu] ':maincpu' (03E64C):sunplus_gcm394_base_device::unk_w @ 0x786b (data 0x0000)
+[:maincpu] ':maincpu' (03E64F):sunplus_gcm394_base_device::unk_w @ 0x7869 (data 0x0000)
+[:maincpu] ':maincpu' (03E652):sunplus_gcm394_base_device::unk_w @ 0x786a (data 0x0000)
+[:maincpu] ':maincpu' (03E65B):sunplus_gcm394_base_device::unk_w @ 0x7966 (data 0x0001)
+[:maincpu] ':maincpu' (03CBD0):sunplus_gcm394_base_device::unk_w @ 0x7871 (data 0x0000)
+
+-- this one seems like a common alt type of DMA, used in both hw types as it polls 707c status before doing it
+[:maincpu] ':maincpu' (03B4C7):sunplus_gcm394_base_device::unk_w @ 0x707c (data 0x0001)
+-- also video / alt dma?
+[:maincpu] ':maincpu' (068C15):sunplus_gcm394_base_device::unk_r @ 0x707e
+
+beambox sets things up with different values (ultimately stalls on some check, maybe seeprom?)
+
+[:maincpu] ':maincpu' (00043F):sunplus_gcm394_base_device::unk_w @ 0x780a (data 0x0000)
+[:maincpu] ':maincpu' (000442):sunplus_gcm394_base_device::unk_w @ 0x7808 (data 0x0000)
+[:maincpu] ':maincpu' (000445):sunplus_gcm394_base_device::unk_w @ 0x782f (data 0x0002)
+[:maincpu] ':maincpu' (000449):sunplus_gcm394_base_device::unk_w @ 0x783d (data 0x05d9)
+[:maincpu] ':maincpu' (00044D):sunplus_gcm394_base_device::unk_w @ 0x783c (data 0x0f58)
+[:maincpu] ':maincpu' (000451):sunplus_gcm394_base_device::unk_w @ 0x783b (data 0x2400)
+[:maincpu] ':maincpu' (000454):sunplus_gcm394_base_device::unk_w @ 0x783e (data 0x0002)
+[:maincpu] ':maincpu' (000458):sunplus_gcm394_base_device::unk_w @ 0x783a (data 0x4011)
+[:maincpu] ':maincpu' (00045C):sunplus_gcm394_base_device::unk_w @ 0x7874 (data 0x2492)   -- note pair of 4, but different values to above games
+[:maincpu] ':maincpu' (00045E):sunplus_gcm394_base_device::unk_w @ 0x787c (data 0x2492)
+[:maincpu] ':maincpu' (000460):sunplus_gcm394_base_device::unk_w @ 0x7888 (data 0x2492)
+[:maincpu] ':maincpu' (000462):sunplus_gcm394_base_device::unk_w @ 0x787e (data 0x2492)
+
+vbaby code is very differet, attempts to load NAND block manually, not with DMA
+
+*/
+
 
 // all tilemap registers etc. appear to be in the same place as the above system, including the 'extra' ones not on the earlier models
 // so it's likely this is built on top of that just with NAND support
 void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
 {
-	sunplus_gcm394_base_device::gcm394_internal_map(map);
+	sunplus_gcm394_base_device::base_internal_map(map);
 
-	// there is an extra command-based device at 785x, what it returns is important to code flow
-	// code is littered with NOPs so clearly the device can't accept commands too quickly and doesn't return data immediately
-	//
-	// this should be the NAND device, as the games attempt to do a DMA operation with '7854' as the source, and the target
-	// as the RAM location where code needs to end up before jumping to it
-	map(0x007850, 0x007850).r(FUNC(generalplus_gpac800_device::unkarea_7850_r)); // NAND Control Reg
+	// 785x = NAND device
+	map(0x007850, 0x007850).rw(FUNC(generalplus_gpac800_device::nand_7850_r), FUNC(generalplus_gpac800_device::nand_7850_w)); // NAND Control Reg
 	map(0x007851, 0x007851).w(FUNC(generalplus_gpac800_device::nand_command_w)); // NAND Command Reg
-	map(0x007852, 0x007852).w(FUNC(generalplus_gpac800_device::flash_addr_low_w)); // NAND Low Address Reg
-	map(0x007853, 0x007853).w(FUNC(generalplus_gpac800_device::flash_addr_high_w)); // NAND High Address Reg
-	map(0x007854, 0x007854).r(FUNC(generalplus_gpac800_device::unkarea_7854_r)); // NAND Data Reg
-//  map(0x007855, 0x007855).w(FUNC(generalplus_gpac800_device::nand_dma_ctrl_w)); // NAND DMA / INT Control
+	map(0x007852, 0x007852).w(FUNC(generalplus_gpac800_device::nand_addr_low_w)); // NAND Low Address Reg
+	map(0x007853, 0x007853).w(FUNC(generalplus_gpac800_device::nand_addr_high_w)); // NAND High Address Reg
+	map(0x007854, 0x007854).r(FUNC(generalplus_gpac800_device::nand_7854_r)); // NAND Data Reg
+	map(0x007855, 0x007855).w(FUNC(generalplus_gpac800_device::nand_dma_ctrl_w)); // NAND DMA / INT Control
+	map(0x007856, 0x007856).w(FUNC(generalplus_gpac800_device::nand_7856_w)); // usually 0x0021?
+	map(0x007857, 0x007857).w(FUNC(generalplus_gpac800_device::nand_7857_w));
+
+	// most of these are likely ECC stuff for testing the ROM?
+	map(0x00785b, 0x00785b).w(FUNC(generalplus_gpac800_device::nand_785b_w));
+	map(0x00785c, 0x00785c).w(FUNC(generalplus_gpac800_device::nand_785c_w));
+	map(0x00785d, 0x00785d).w(FUNC(generalplus_gpac800_device::nand_785d_w));
+	map(0x00785e, 0x00785e).r(FUNC(generalplus_gpac800_device::nand_785e_r)); // also ECC status related?
+	map(0x00785f, 0x00785f).r(FUNC(generalplus_gpac800_device::nand_ecc_low_byte_error_flag_1_r)); // ECC Low Byte Error Flag 1 (maybe)
+
+	// 128kwords internal ROM
+	//map(0x08000, 0x0ffff).rom().region("internal", 0); // lower 32kwords of internal ROM is visible / shadowed depending on boot pins and register
+	map(0x08000, 0x0ffff).r(FUNC(generalplus_gpac800_device::internalrom_lower32_r)).nopw();
+	map(0x10000, 0x27fff).rom().region("internal", 0x10000); // upper 96kwords of internal ROM is always visible
+	map(0x28000, 0x2ffff).noprw(); // reserved
+	// 0x30000+ is CS access
+	
+	map(0x030000, 0x1fffff).rw(FUNC(generalplus_gpac800_device::cs_space_r), FUNC(generalplus_gpac800_device::cs_space_w));
+	map(0x200000, 0x3fffff).rw(FUNC(generalplus_gpac800_device::cs_bank_space_r), FUNC(generalplus_gpac800_device::cs_bank_space_w));
 }
+
 
 void sunplus_gcm394_base_device::device_start()
 {
 	unsp_20_device::device_start();
+
+	m_cs_callback.resolve();
 
 	m_porta_in.resolve_safe(0);
 	m_portb_in.resolve_safe(0);
@@ -763,9 +1022,9 @@ void sunplus_gcm394_base_device::device_start()
 	m_porta_out.resolve();
 
 
+
 	m_space_read_cb.resolve_safe(0);
 	m_space_write_cb.resolve();
-	m_mapping_write_cb.resolve();
 
 	m_nand_read_cb.resolve_safe(0);
 
@@ -792,7 +1051,7 @@ void sunplus_gcm394_base_device::device_reset()
 
 	m_7807 = 0x0000;
 
-	m_membankswitch_7810 = 0x0000;
+	m_membankswitch_7810 = 0x0001;
 
 	m_7816 = 0x0000;
 	m_7817 = 0x0000;
@@ -848,20 +1107,24 @@ void sunplus_gcm394_base_device::device_reset()
 	m_7960 = 0x0000;
 	m_7961 = 0x0000;
 
+	m_system_dma_memtype = 0x0000;
 
 	m_unk_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
-
-	m_gfxregion = memregion(":maincpu")->base();
-	m_gfxregionsize = memregion(":maincpu")->bytes();
-
 }
 
 void generalplus_gpac800_device::device_reset()
 {
 	sunplus_gcm394_base_device::device_reset();
 
-	m_flash_addr_low = 0x0000;
-	m_flash_addr_high = 0x0000;
+	m_nand_addr_low = 0x0000;
+	m_nand_addr_high = 0x0000;
+	m_nand_dma_ctrl = 0x0000;
+	m_nand_7850 = 0x0000;
+	m_nand_785d = 0x0000;
+	m_nand_785c = 0x0000;
+	m_nand_785b = 0x0000;
+	m_nand_7856 = 0x0000;
+	m_nand_7857 = 0x0000;
 }
 
 IRQ_CALLBACK_MEMBER(sunplus_gcm394_base_device::irq_vector_cb)
@@ -942,12 +1205,33 @@ WRITE_LINE_MEMBER(sunplus_gcm394_base_device::videoirq_w)
 
 uint16_t sunplus_gcm394_base_device::read_space(uint32_t offset)
 {
-//  uint16_t b = m_gfxregion[(offset * 2) & (m_gfxregionsize - 1)] | (m_gfxregion[(offset * 2 + 1) & (m_gfxregionsize - 1)] << 8);
-//  return b;
-	address_space& mem = this->space(AS_PROGRAM);
-	uint16_t retdata = mem.read_word(offset);
-	return retdata;
+	address_space& space = this->space(AS_PROGRAM);
+	uint16_t val;
+	if (offset < m_csbase)
+	{
+		val = space.read_word(offset);
+	}
+	else
+	{
+		val = m_cs_space->read_word(offset-m_csbase);
+	}
+
+	return val;
 }
+
+void sunplus_gcm394_base_device::write_space(uint32_t offset, uint16_t data)
+{
+	address_space& space = this->space(AS_PROGRAM);
+	if (offset < m_csbase)
+	{
+		space.write_word(offset, data);
+	}
+	else
+	{
+		m_cs_space->write_word(offset-m_csbase, data);
+	}
+}
+
 
 
 void sunplus_gcm394_base_device::device_add_mconfig(machine_config &config)

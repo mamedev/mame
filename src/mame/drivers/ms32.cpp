@@ -71,13 +71,16 @@ others are unknown
 Notes
 -----
 
-Some of the roms for each game are encrypted.
+Some of the roms for each game are encrypted:
+  16x16x8 'Scroll' Tiles (Non-Roz BG Layer)
+  8x8x8 'Ascii' Tiles (FG Layer)
 
-The only difference between the two Gratia sets is in the encrypted ROMs (they use
-different custom chips). The program is the same.
-
-16x16x8 'Scroll' Tiles (Non-Roz BG Layer)
-8x8x8 'Ascii' Tiles (FG Layer)
+The only difference between the two Gratia sets are the encrypted ROMs in each set (they use
+different custom chips). The program ROMs are the same, as is all non encrypted graphics data.
+94019_30ver1.0.30 matches 94019_2.030 when both are decrypted with their respective encryption
+routines.  Due to the badly dumped mr94019-07.10, it hasn't been verified that it's data is
+identical to 94019_2.07 when both are decrypted. Waiting for a proper redump of mr94019-07.10
+for verification.
 
 
 ToDo / Notes
@@ -775,10 +778,10 @@ confirm them by looking at the code. The ROM string is in quotes.
 FFE00DE8  ; irq_0  probably "1msec interrupt"
 FFE00DF4  ; irq_1  "sound cpu interrupt"
 FFE00878  ; irq_2  probably "fpu 1-1 interrupt"
-FFE00884  ; irq_3  unused and labelled "fpu 0-1 interrupt"
-FFE00898  ; irq_4  unused and labelled "fpu 1-0 interrupt"
+FFE00884  ; irq_3  unused and labeled "fpu 0-1 interrupt"
+FFE00898  ; irq_4  unused and labeled "fpu 1-0 interrupt"
 FFE008AC  ; irq_5  probably "fpu 0-0 interrupt", x coords (and y) populated from here
-FFE008D0  ; irq_6  unused and labelled "option 2 interrupt"
+FFE008D0  ; irq_6  unused and labeled "option 2 interrupt"
 FFE008E4  ; irq_7  same as 5 - probably "option 1 interrupt"
 FFE01034  ; irq_9  VBL at 60Hz this would be "16msec interrupt"
 FFE01094  ; irq_10 loads of processing in the 0xfc000000 area : must be "32msec interrupt"
@@ -2028,7 +2031,8 @@ ROM_START( gratiaa )
 	ROM_LOAD( "mr94019-09.11", 0x200000, 0x200000, CRC(711ab08b) SHA1(185b80b965ac3aba4857b4f83637008c2c1cc6ff) )
 
 	ROM_REGION( 0x200000, "gfx3", 0 ) /* bg tiles */
-	ROM_LOAD( "mr94019-07.10", 0x000000, 0x200000, BAD_DUMP CRC(acb75824) SHA1(3b43e00a2d240761565042c8feead25a83ef0eb1)  )  // FIXED BITS (xxxxxxxx11111111)
+//	ROM_LOAD( "mr94019-07.10", 0x000000, 0x200000, BAD_DUMP CRC(acb75824) SHA1(3b43e00a2d240761565042c8feead25a83ef0eb1) )  // FIXED BITS (xxxxxxxx11111111)
+	ROM_LOAD( "mr94019-07.10", 0x000000, 0x200000, BAD_DUMP CRC(561a786b) SHA1(23df08d50801bd6e4a2f12dd3bb50632ff77f0f2) ) /* HAND CRAFTED: decrypted & re-encrypted 94019_2.07 - marked BAD_DUMP until proper ROM redump */
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
 	ROM_LOAD( "94019_30ver1.0.30",0x000000, 0x080000, CRC(026b5379) SHA1(b9237477f1bf8ae83174e8231492fe667e6d6a13) ) /* Labeled 94019  (21)Ver1,0  with the Kanji verson of the game name before "(30)" */
@@ -2334,12 +2338,13 @@ ROM_START( akiss )
 	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
+// Version 1.1 known to exist, labeled as: P-47 ACES 3/31 ROM 26 Ver1.1 - uses the same MB-94166 EB91022-20101 rom board.
 ROM_START( p47aces )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
-	ROM_LOAD32_BYTE( "p47-26.26", 0x000003, 0x80000, CRC(e017b819) SHA1(942fb48e8bb3a263534a0351a1a9979d786bc475) ) /* Need to verify - might be: P-47 ACES 3/31 ROM 26 Ver1.1 - uses MB-94166 EB91022-20101 rom board */
-	ROM_LOAD32_BYTE( "p47-27.27", 0x000002, 0x80000, CRC(bd1b81e0) SHA1(b15f157fe3a30295f999a4c285da2d6f22d7fba6) ) /* Need to verify - might be: P-47 ACES 3/31 ROM 27 Ver1.1 */
-	ROM_LOAD32_BYTE( "p47-28.28", 0x000001, 0x80000, CRC(4742a5f7) SHA1(cd297aa150082c545647c9a755cf2cdbdc98c988) ) /* Need to verify - might be: P-47 ACES 3/31 ROM 28 Ver1.1 */
-	ROM_LOAD32_BYTE( "p47-29.29", 0x000000, 0x80000, CRC(86e17d8b) SHA1(73004f243c6dfb86ce4cc61475dc7caaf452750e) ) /* Need to verify - might be: P-47 ACES 3/31 ROM 29 Ver1.1 */
+	ROM_LOAD32_BYTE( "p47_ver1.0-26.26", 0x000003, 0x80000, CRC(e017b819) SHA1(942fb48e8bb3a263534a0351a1a9979d786bc475) ) /* Labeled "P-47 Ver1.0 -26" */
+	ROM_LOAD32_BYTE( "p47_ver1.0-27.27", 0x000002, 0x80000, CRC(bd1b81e0) SHA1(b15f157fe3a30295f999a4c285da2d6f22d7fba6) ) /* Labeled "P-47 Ver1.0 -27" */
+	ROM_LOAD32_BYTE( "p47_ver1.0-28.28", 0x000001, 0x80000, CRC(4742a5f7) SHA1(cd297aa150082c545647c9a755cf2cdbdc98c988) ) /* Labeled "P-47 Ver1.0 -28" */
+	ROM_LOAD32_BYTE( "p47_ver1.0-29.29", 0x000000, 0x80000, CRC(86e17d8b) SHA1(73004f243c6dfb86ce4cc61475dc7caaf452750e) ) /* Labeled "P-47 Ver1.0 -29" */
 
 	ROM_REGION( 0xe00000, "sprite", 0 ) /* sprites */
 	ROM_LOAD32_WORD( "mr94020-02.1",  0x000002, 0x200000, CRC(28732d3c) SHA1(15b2687bcad31793fc7d6a9dc3eccb7ad9b5f659) )
@@ -2360,10 +2365,10 @@ ROM_START( p47aces )
 	ROM_LOAD( "mr94020-09.9",  0x200000, 0x200000, CRC(226014a6) SHA1(090bdc1f6d2b9d33b431dbb49a457a4bb36cd3ad) )
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
-	ROM_LOAD( "p-47_ver1.0-30.30", 0x000000, 0x080000, CRC(7ba90fad) SHA1(c0a3d4458816f00b8f5eb4b6d4531d1abeaccbe5) )
+	ROM_LOAD( "p-47_ver1.0-30.30", 0x000000, 0x080000, CRC(7ba90fad) SHA1(c0a3d4458816f00b8f5eb4b6d4531d1abeaccbe5) ) /* Labeled "P-47 Ver1.0 -30" */
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
-	ROM_LOAD( "p-47_ver1.0-21.21", 0x000000, 0x040000, CRC(f2d43927) SHA1(69ac20f339a515d58cafbcd6f7d7982ca5cda681) )
+	ROM_LOAD( "p-47_ver1.0-21.21", 0x000000, 0x040000, CRC(f2d43927) SHA1(69ac20f339a515d58cafbcd6f7d7982ca5cda681) ) /* Labeled "P-47 Ver1.0 -21" */
 
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples - 8-bit signed PCM */
 	ROM_LOAD( "mr92042-01.22", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
@@ -2629,7 +2634,7 @@ GAME( 1994, suchie2o,  suchie2,  ms32, suchie2,  ms32_state, init_suchie2,    RO
 GAME( 1995, desertwr,  0,        ms32, desertwr, ms32_state, init_ss91022_10, ROT270, "Jaleco",        "Desert War / Wangan Sensou (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, gametngk,  0,        ms32, gametngk, ms32_state, init_ss91022_10, ROT270, "Jaleco",        "The Game Paradise - Master of Shooting! / Game Tengoku - The Game Paradise (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, tetrisp,   0,        ms32, tetrisp,  ms32_state, init_ss92046_01, ROT0,   "Jaleco / BPS",  "Tetris Plus (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, p47aces,   0,        ms32, p47aces,  ms32_state, init_ss92048_01, ROT0,   "Jaleco",         "P-47 Aces", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, p47aces,   0,        ms32, p47aces,  ms32_state, init_ss92048_01, ROT0,   "Jaleco",         "P-47 Aces (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, akiss,     0,        ms32, suchie2,  ms32_state, init_kirarast,   ROT0,   "Jaleco",         "Mahjong Angel Kiss (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, gratia,    0,        ms32, gratia,   ms32_state, init_ss92047_01, ROT0,   "Jaleco",         "Gratia - Second Earth (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, gratiaa,   gratia,   ms32, gratia,   ms32_state, init_ss91022_10, ROT0,   "Jaleco",         "Gratia - Second Earth (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

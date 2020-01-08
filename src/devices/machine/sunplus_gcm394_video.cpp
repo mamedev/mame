@@ -11,7 +11,9 @@
 
 DEFINE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device, "gcm394_video", "SunPlus GCM394 System-on-a-Chip (Video)")
 
-#define LOG_GCM394_VIDEO_DMA      (1U << 3)
+#define LOG_GCM394_VIDEO_PALETTE  (1U << 5)
+#define LOG_GCM394_VIDEO_DMA      (1U << 4)
+#define LOG_GCM394_TMAP_EXTRA     (1U << 3)
 #define LOG_GCM394_TMAP           (1U << 2)
 #define LOG_GCM394_VIDEO          (1U << 1)
 
@@ -20,18 +22,20 @@ DEFINE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device, "gcm394_video", "SunPlus G
 #include "logmacro.h"
 
 
-gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	//, device_gfx_interface(mconfig, *this, nullptr)
-	, device_video_interface(mconfig, *this)
-	, m_cpu(*this, finder_base::DUMMY_TAG)
-	, m_screen(*this, finder_base::DUMMY_TAG)
-//  , m_scrollram(*this, "scrollram")
-	, m_video_irq_cb(*this)
-	, m_palette(*this, "palette")
-	, m_gfxdecode(*this, "gfxdecode")
-	, m_space_read_cb(*this)
-	, m_global_y_mask(0x1ff)
+gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	//device_gfx_interface(mconfig, *this, nullptr),
+	device_video_interface(mconfig, *this),
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_screen(*this, finder_base::DUMMY_TAG),
+//  m_scrollram(*this, "scrollram"),
+	m_video_irq_cb(*this),
+	m_palette(*this, "palette"),
+	m_gfxdecode(*this, "gfxdecode"),
+	m_space_read_cb(*this),
+	m_global_y_mask(0x1ff),
+	m_pal_displaybank_high(0),
+	m_alt_tile_addressing(0)
 {
 }
 
@@ -207,7 +211,9 @@ void gcm394_base_video_device::device_start()
 
 	m_maxgfxelement = 0;
 
-	decodegfx(":maincpu");
+	// debug helper only
+	if (memregion(":maincpu"))
+		decodegfx(":maincpu");
 
 	save_item(NAME(m_spriteextra));
 	save_item(NAME(m_spriteram));
@@ -217,10 +223,20 @@ void gcm394_base_video_device::device_start()
 
 void gcm394_base_video_device::device_reset()
 {
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		m_tmap0_regs[i] = 0x0000;
 		m_tmap1_regs[i] = 0x0000;
+		m_tmap2_regs[i] = 0x0000;
+		m_tmap3_regs[i] = 0x0000;
+		m_tmap2_scroll[i] = 0x0000;
+		m_tmap3_scroll[i] = 0x0000;
+	}
+
+	for (int i = 0; i < 2; i++)
+	{
+		m_tmap0_scroll[i] = 0x0000;
+		m_tmap1_scroll[i] = 0x0000;
 	}
 
 	for (int i = 0; i < 0x400; i++)
@@ -335,8 +351,8 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 		{
 			// 2bpp
 			// 4bpp
-
-			current_palette_offset |= 0x0800;
+			if (m_pal_displaybank_high) // how is this set?
+				current_palette_offset |= 0x0800;
 
 		}
 		else if (nc_bpp < 8)
@@ -386,14 +402,14 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 	}
 }
 
-void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t *regs)
+void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t *regs, uint16_t *scroll)
 {
-	uint32_t xscroll = regs[0];
-	uint32_t yscroll = regs[1];
-	uint32_t attr_reg = regs[2];
-	uint32_t ctrl_reg = regs[3];
-	uint32_t tilemap = regs[4];
-	uint32_t palette_map = regs[5];
+	uint32_t xscroll = scroll[0];
+	uint32_t yscroll = scroll[1];
+	uint32_t attr_reg = regs[0];
+	uint32_t ctrl_reg = regs[1];
+	uint32_t tilemap = regs[2];
+	uint32_t palette_map = regs[3];
 	address_space &space = m_cpu->space(AS_PROGRAM);
 
 	if (!(ctrl_reg & PAGE_ENABLE_MASK))
@@ -406,118 +422,186 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 		return;
 	}
 
-	uint32_t tile_h = 8 << ((attr_reg & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-	uint32_t tile_w = 8 << ((attr_reg & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
-
-	int total_width = 512;
-
-	if ((attr_reg >> 14) & 0x2)
-		total_width = 1024;
-
-	uint32_t tile_count_x = total_width / tile_w;
-
-	uint32_t bitmap_y = (scanline + yscroll);// &0xff;
-	uint32_t y0 = bitmap_y / tile_h;
-	uint32_t tile_scanline = bitmap_y % tile_h;
-	uint32_t tile_address = tile_count_x * y0;
-
-	for (uint32_t x0 = 0; x0 < tile_count_x; x0++, tile_address++)
+	if (ctrl_reg & 0x01) // bitmap mode jak_car2 uses this ingame
 	{
-		uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & m_global_y_mask) - 0x10;
-		uint32_t xx = (tile_w * x0 - xscroll);// &0x1ff;
-		uint32_t tile = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(tilemap) : space.read_word(tilemap + tile_address);
+		popmessage("bitmap mode %08x\n", bitmap_addr);
 
-		uint16_t palette = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
-		if (x0 & 1)
+		uint32_t linebase = space.read_word(tilemap + scanline); // every other word is unused, but there are only enough entries for 240 lines then, sometimes to do with interlace mode?
+		uint16_t palette = space.read_word(palette_map + (scanline / 2));
+
+		if (scanline & 1)
 			palette >>= 8;
 
+		//if (linebase != 0)
+		//	printf("scanline %d linebase %04x palette %04x\n", scanline, linebase, palette);
 
-		if (!tile)
-			continue;
+		linebase |= ((palette >> 8) << 16);
+
+		int gfxbase = bitmap_addr + linebase;
+
+		for (int i = 0; i < 160; i++) // will have to be 320 for jak_car2 ingame
+		{
+			uint16_t pix = m_space_read_cb((gfxbase++)&0xffffff);
+			int xx;
+			int y_index = scanline * m_screen->width();
+			uint16_t pal;
+
+			if ((scanline >= 0) && (scanline < 480))
+			{
+				xx = (i * 2);
+				pal = (pix & 0xff) | 0x100;
+
+				if (xx >= 0 && xx <= cliprect.max_x)
+				{
+					int pix_index = xx + y_index;
+
+					uint16_t rgb = m_paletteram[pal];
+
+					if (!(rgb & 0x8000))
+					{
+						m_screenbuf[pix_index] = m_rgb555_to_rgb888[rgb];
+					}
+				}
+
+				xx = (i * 2)+1;
+				pal = (pix >> 8) + 0x100;
+
+				if (xx >= 0 && xx <= cliprect.max_x)
+				{
+					int pix_index = xx + y_index;
+
+					uint16_t rgb = m_paletteram[pal];
+
+					if (!(rgb & 0x8000))
+					{
+						m_screenbuf[pix_index] = m_rgb555_to_rgb888[rgb];
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		uint32_t tile_h = 8 << ((attr_reg & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
+		uint32_t tile_w = 8 << ((attr_reg & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+
+		int total_width;
+		int use_alt_drawmode = m_alt_tile_addressing;
+
+		// just a guess based on this being set on the higher resolution tilemaps we've seen, could be 100% incorrect register
+		if ((attr_reg >> 14) & 0x2)
+		{
+			total_width = 1024;
+		//	use_alt_drawmode = 1; // probably doesn't control this
+		}
+		else
+		{
+			total_width = 512;
+		//	use_alt_drawmode = 0; // probably doesn't control this
+		}
+
+		uint32_t tile_count_x = total_width / tile_w;
+
+		uint32_t bitmap_y = (scanline + yscroll);// &0xff;
+		uint32_t y0 = bitmap_y / tile_h;
+		uint32_t tile_scanline = bitmap_y % tile_h;
+		uint32_t tile_address = tile_count_x * y0;
+
+		for (uint32_t x0 = 0; x0 < tile_count_x; x0++, tile_address++)
+		{
+			uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & m_global_y_mask) - 0x10;
+			uint32_t xx = (tile_w * x0 - xscroll);// &0x1ff;
+			uint32_t tile = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(tilemap) : space.read_word(tilemap + tile_address);
+
+			uint16_t palette = (ctrl_reg & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
+			if (x0 & 1)
+				palette >>= 8;
 
 
-		uint32_t tileattr = attr_reg;
-		uint32_t tilectrl = ctrl_reg;
+			if (!tile)
+				continue;
+
+
+			uint32_t tileattr = attr_reg;
+			uint32_t tilectrl = ctrl_reg;
 
 #if 0
-		if ((ctrl_reg & 2) == 0)
-		{   // -(1) bld(1) flip(2) pal(4)
-			tileattr &= ~0x000c;
-			tileattr |= (palette >> 2) & 0x000c;    // flip
+			if ((ctrl_reg & 2) == 0)
+			{   // -(1) bld(1) flip(2) pal(4)
+				tileattr &= ~0x000c;
+				tileattr |= (palette >> 2) & 0x000c;    // flip
 
-			tileattr &= ~0x0f00;
-			tileattr |= (palette << 8) & 0x0f00;    // palette
+				tileattr &= ~0x0f00;
+				tileattr |= (palette << 8) & 0x0f00;    // palette
 
-			tilectrl &= ~0x0100;
-			tilectrl |= (palette << 2) & 0x0100;    // blend
-		}
+				tilectrl &= ~0x0100;
+				tilectrl |= (palette << 2) & 0x0100;    // blend
+			}
 #endif
-		bool blend;
-		bool row_scroll;
-		bool flip_x;
-		uint32_t yflipmask;
-		uint32_t palette_offset;
+			bool blend;
+			bool row_scroll;
+			bool flip_x;
+			uint32_t yflipmask;
+			uint32_t palette_offset;
 
-		blend = (tileattr & 0x4000 || tilectrl & 0x0100);
-		row_scroll = (tilectrl & 0x0010);
-
-		int use_alt_drawmode;
-
-		if ((ctrl_reg & 2) == 0)
-		{
-			flip_x = 0;
-			yflipmask = 0;
-			palette_offset = (palette & 0x0f) << 4;
-			use_alt_drawmode = 1;
-		}
-		else
-		{
-			flip_x = (tileattr & TILE_X_FLIP);
-			yflipmask = tileattr & TILE_Y_FLIP ? tile_h - 1 : 0;
-			palette_offset = (tileattr & 0x0f00) >> 4;
-			tile |= (palette & 0x0007) << 16;
-			use_alt_drawmode = 0;
-		}
+			blend = (tileattr & 0x4000 || tilectrl & 0x0100);
+			row_scroll = (tilectrl & 0x0010);
 
 
-		//palette_offset |= 0x0900;
-		palette_offset |= 0x0100;
-
-		const uint8_t bpp = tileattr & 0x0003;
-
-
-		if (blend)
-		{
-			if (row_scroll)
+			if ((ctrl_reg & 2) == 0)
 			{
-				if (flip_x)
-					draw<BlendOn, RowScrollOn, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
+				flip_x = 0;
+				yflipmask = 0;
+				palette_offset = (palette & 0x0f) << 4;
+			}
+			else // jak_car2 uses this mode for sky ingame
+			{
+				flip_x = (tileattr & TILE_X_FLIP);
+				yflipmask = tileattr & TILE_Y_FLIP ? tile_h - 1 : 0;
+				palette_offset = (tileattr & 0x0f00) >> 4;
+				tile |= (palette & 0x0007) << 16;
+			}
+
+
+			//palette_offset |= 0x0900;
+			palette_offset |= 0x0100;
+
+			const uint8_t bpp = tileattr & 0x0003;
+
+
+			if (blend)
+			{
+				if (row_scroll)
+				{
+					if (flip_x)
+						draw<BlendOn, RowScrollOn, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
+					else
+						draw<BlendOn, RowScrollOn, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
+				}
 				else
-					draw<BlendOn, RowScrollOn, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
+				{
+					if (flip_x)
+						draw<BlendOn, RowScrollOff, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
+					else
+						draw<BlendOn, RowScrollOff, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
+				}
 			}
 			else
 			{
-				if (flip_x)
-					draw<BlendOn, RowScrollOff, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
+				if (row_scroll)
+				{
+					if (flip_x)
+						draw<BlendOff, RowScrollOn, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
+					else
+						draw<BlendOff, RowScrollOn, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
+				}
 				else
-					draw<BlendOn, RowScrollOff, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
-			}
-		}
-		else
-		{
-			if (row_scroll)
-			{
-				if (flip_x)
-					draw<BlendOff, RowScrollOn, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
-				else
-					draw<BlendOff, RowScrollOn, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
-			}
-			else
-			{
-				if (flip_x)
-					draw<BlendOff, RowScrollOff, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
-				else
-					draw<BlendOff, RowScrollOff, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
+				{
+					if (flip_x)
+						draw<BlendOff, RowScrollOff, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
+					else
+						draw<BlendOff, RowScrollOff, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, use_alt_drawmode);
+				}
 			}
 		}
 	}
@@ -621,21 +705,32 @@ void gcm394_base_video_device::draw_sprites(const rectangle &cliprect, uint32_t 
 
 uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	memset(&m_screenbuf[m_screen->width() * cliprect.min_y], 0, 4 *  m_screen->width() * ((cliprect.max_y - cliprect.min_y) + 1));
-
-	const uint32_t page0_addr = (m_page0_addr_lsb | (m_page0_addr_msb<<16));
-	const uint32_t page1_addr = (m_page1_addr_lsb | (m_page1_addr_msb<<16));
-	uint16_t* page0_regs = m_tmap0_regs;
-	uint16_t* page1_regs = m_tmap1_regs;
+	// For jak_car2 and jak_gtg the palette entry for 'magenta' in the test mode is intentionally set to a transparent black pen
+	// (it is stored in the palette table in ROM that way, and copied directly) so the only way for the magenta entries on the screen
+	// to be correctly displayed is if there is a magenta BG pen to fall through to (or for another palette write to change the palette
+	// that is copied, but this does not appear to be the case).  How the bg pen is set is unknown, it is not a regular palette entry.
+	// The 'bitmap test mode' in jak_car2 requires this to be black instead, 
+	//const uint16_t bgcol = 0x7c1f; // magenta
+	const uint16_t bgcol = 0x0000; // black
 
 	for (uint32_t scanline = (uint32_t)cliprect.min_y; scanline <= (uint32_t)cliprect.max_y; scanline++)
 	{
+		uint32_t* bufferline = &m_screenbuf[scanline * m_screen->width()];
+
+		for (int x = 0; x < m_screen->width(); x++)
+		{
+			bufferline[x] = m_rgb555_to_rgb888[bgcol];
+		}
+
 		for (int i = 0; i < 4; i++)
 		{
 			if (1)
 			{
-				draw_page(cliprect, scanline, i, page0_addr, page0_regs);
-				draw_page(cliprect, scanline, i, page1_addr, page1_regs);
+				draw_page(cliprect, scanline, i, (m_page0_addr_lsb | (m_page0_addr_msb<<16)), m_tmap0_regs, m_tmap0_scroll);
+				draw_page(cliprect, scanline, i, (m_page1_addr_lsb | (m_page1_addr_msb<<16)), m_tmap1_regs, m_tmap1_scroll);
+				draw_page(cliprect, scanline, i, (m_unk_vid1_gfxbase_lsb | (m_unk_vid1_gfxbase_msb<<16)), m_tmap2_regs, m_tmap2_scroll);
+				draw_page(cliprect, scanline, i, (m_unk_vid2_gfxbase_lsb | (m_unk_vid2_gfxbase_msb<<16)), m_tmap3_regs, m_tmap3_scroll);
+
 			}
 			draw_sprites(cliprect, scanline, i);
 		}
@@ -652,52 +747,106 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 }
 
 
-void gcm394_base_video_device::write_tmap_regs(int tmap, uint16_t* regs, int offset, uint16_t data)
+void gcm394_base_video_device::write_tmap_scroll(int tmap, uint16_t* regs, int offset, uint16_t data)
 {
 	switch (offset)
 	{
 	case 0x0: // Page X scroll
-		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d X Scroll = %04x\n", machine().describe_context(), tmap, data & 0x01ff);
-		regs[offset] = data & 0x01ff;
+		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d X Scroll = %04x\n", machine().describe_context(), tmap, data);
+		regs[offset] = data;
 		break;
 
 	case 0x1: // Page Y scroll
-		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Y Scroll = %04x\n",  machine().describe_context(), tmap, data & 0x00ff);
-		regs[offset] = data & 0x00ff;
+		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Y Scroll = %04x\n", machine().describe_context(), tmap, data);
+		regs[offset] = data;
 		break;
+	}
+}
 
-	case 0x2: // Page Attributes
+void gcm394_base_video_device::write_tmap_regs(int tmap, uint16_t* regs, int offset, uint16_t data)
+{
+	switch (offset)
+	{
+	case 0x0: // Page Attributes
 		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Attributes = %04x (unk %01x: Depth:%d, Palette:%d, VSize:%d, HSize:%d, FlipY:%d, FlipX:%d, BPP:%d)\n",  machine().describe_context(), tmap, data,
 			(data & 0xc000) >> 14, (data >> 12) & 3, (data >> 8) & 15, 8 << ((data >> 6) & 3), 8 << ((data >> 4) & 3), BIT(data, 3), BIT(data, 2), 2 * ((data & 3) + 1));
 		regs[offset] = data;
 		break;
 
-	case 0x3: // Page Control
+	case 0x1: // Page Control
 		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Control = %04x (unk:%02x Blend:%d, HiColor:%d, unk:%d, unk%d, RowScroll:%d, Enable:%d, Wallpaper:%d, RegSet:%d, Bitmap:%d)\n",  machine().describe_context(), tmap, data,
 			(data & 0xfe00) >> 9, BIT(data, 8), BIT(data, 7), BIT(data, 6), BIT(data, 5), BIT(data, 4), BIT(data, 3), BIT(data, 2), BIT(data, 1), BIT(data, 0));
 		regs[offset] = data;
 		break;
 
-	case 0x4: // Page Tile Address
+	case 0x2: // Page Tile Address
 		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Tile Address = %04x\n",  machine().describe_context(), tmap, data);
 		regs[offset] = data;
 		break;
 
-	case 0x5: // Page Attribute write_tmap_regs
+	case 0x3: // Page Attribute Address
 		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Attribute Address = %04x\n",  machine().describe_context(), tmap, data);
 		regs[offset] = data;
 		break;
 	}
 }
 
+
+// offsets 0,1,4,5,6,7 used in main IRQ code
+// offsets 2,3 only cleared on startup
+
+// Based on code analysis this seems to be the same as the regular tilemap regs, except for the addition of regs 2,3 which shift the remaining ones along.
+// As the hardware appears to support ROZ these are probably 2 extra tile layers, with the 2 additional words being the ROZ parameters?
+
+
+void gcm394_base_video_device::write_tmap_extrascroll(int tmap, uint16_t* regs, int offset, uint16_t data)
+{
+	switch (offset)
+	{
+	case 0x0: // Page X scroll
+	case 0x1: // Page Y scroll
+		write_tmap_scroll(tmap, regs, offset, data);
+		break;
+
+	case 0x2: //
+		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d X Unk Rotation Zoom Attribute1 = %04x\n", machine().describe_context(), tmap, data);
+		regs[offset] = data;
+		break;
+
+	case 0x3:
+		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d X Unk Rotation Zoom Attribute = %04x\n", machine().describe_context(), tmap, data);
+		regs[offset] = data;
+		break;
+
+	}
+}
+
+
 // **************************************** TILEMAP 0 *************************************************
 
-READ16_MEMBER(gcm394_base_video_device::tmap0_regs_r) { return m_tmap0_regs[offset]; }
+READ16_MEMBER(gcm394_base_video_device::tmap0_regs_r)
+{
+	if (offset < 2)
+	{
+		return m_tmap0_scroll[offset];
+	}
+	else
+	{
+		return m_tmap0_regs[offset-2];
+	}
+}
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap0_regs_w)
 {
-	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap0_regs_w %01x %04x\n", machine().describe_context(), offset, data);
-	write_tmap_regs(0, m_tmap0_regs, offset, data);
+	LOGMASKED(LOG_GCM394_TMAP_EXTRA, "%s:gcm394_base_video_device::tmap0_regs_w %01x %04x\n", machine().describe_context(), offset, data);
+	if (offset < 2)
+	{
+		write_tmap_scroll(0, m_tmap0_scroll, offset, data);
+	}
+	else
+	{
+		write_tmap_regs(0, m_tmap0_regs, offset-2, data);
+	}
 }
 
 READ16_MEMBER(gcm394_base_video_device::tmap0_tilebase_lsb_r)
@@ -726,19 +875,36 @@ WRITE16_MEMBER(gcm394_base_video_device::tmap0_tilebase_msb_w)
 
 // **************************************** TILEMAP 1 *************************************************
 
-READ16_MEMBER(gcm394_base_video_device::tmap1_regs_r) { return m_tmap1_regs[offset]; }
+
+READ16_MEMBER(gcm394_base_video_device::tmap1_regs_r)
+{
+	if (offset < 2)
+	{
+		return m_tmap1_scroll[offset];
+	}
+	else
+	{
+		return m_tmap1_regs[offset-2];
+	}
+}
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap1_regs_w)
 {
-	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap1_regs_w %01x %04x\n", machine().describe_context(), offset, data);
-	write_tmap_regs(1, m_tmap1_regs, offset, data);
+	LOGMASKED(LOG_GCM394_TMAP_EXTRA, "%s:gcm394_base_video_device::tmap1_regs_w %01x %04x\n", machine().describe_context(), offset, data);
+	if (offset < 2)
+	{
+		write_tmap_scroll(1, m_tmap1_scroll, offset, data);
+	}
+	else
+	{
+		write_tmap_regs(1, m_tmap1_regs, offset-2, data);
+	}
 }
 
 READ16_MEMBER(gcm394_base_video_device::tmap1_tilebase_lsb_r)
 {
 	return m_page1_addr_lsb;
 }
-
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap1_tilebase_lsb_w)
 {
@@ -759,51 +925,49 @@ WRITE16_MEMBER(gcm394_base_video_device::tmap1_tilebase_msb_w)
 	LOGMASKED(LOG_GCM394_TMAP, "\t(tmap1 tilegfxbase is now %04x%04x)\n", m_page1_addr_msb, m_page1_addr_lsb);
 }
 
-// **************************************** unknown video device handler for below  *************************************************
+// **************************************** unknown video device 1 (another tilemap? roz? line? zooming sprite layer?) *************************************************
 
-// offsets 0,1,4,5,6,7 used in main IRQ code
-// offsets 2,3 only cleared on startup
-
-// Based on code analysis this seems to be the same as the regular tilemap regs, except for the addition of regs 2,3 which shift the remaining ones along.
-// As the hardware appears to support ROZ these are probably 2 extra tile layers, with the 2 additional words being the ROZ parameters?
-void gcm394_base_video_device::unk_vid_regs_w(int which, int offset, uint16_t data)
+READ16_MEMBER(gcm394_base_video_device::tmap2_regs_r)
 {
-	switch (offset)
+	if (offset < 4)
 	{
-	case 0x0:
-		LOGMASKED(LOG_GCM394_VIDEO, "%s: unk_vid_regs_w (unk chip %d) (offset %01x) (data %04x) (X scroll?)\n", machine().describe_context(), which, offset, data); // masked with 0x3ff in code like x-scroll for tilemaps
-		break;
-	case 0x1:
-		LOGMASKED(LOG_GCM394_VIDEO, "%s: unk_vid_regs_w (unk chip %d) (offset %01x) (data %04x) (y scroll?)\n", machine().describe_context(), which, offset, data); // masked with 0x3ff in code like x-scroll for tilemaps
-		break;
-
-	case 0x05: // seems to be similar / the same as Page Control for tilemaps (written with same basic code, but for these layers)
-		LOGMASKED(LOG_GCM394_VIDEO, "%s: unk_vid_regs_w (unk chip %d) (offset %01x) (data %04x) (Page Control?)\n", machine().describe_context(), which, offset, data);
-		break;
-
-	case 0x02: // startup?
-	case 0x03: // startup?
-	case 0x04:
-	case 0x06:
-	case 0x07:
-		LOGMASKED(LOG_GCM394_VIDEO, "%s: unk_vid_regs_w (unk chip %d) (offset %01x) (data %04x)\n", machine().describe_context(), which, offset, data);
-		break;
-
+		return m_tmap2_scroll[offset];
+	}
+	else
+	{
+		return m_tmap2_regs[offset-4];
 	}
 }
 
-// **************************************** unknown video device 1 (another tilemap? roz? line? zooming sprite layer?) *************************************************
-
-WRITE16_MEMBER(gcm394_base_video_device::unk_vid1_regs_w)
+WRITE16_MEMBER(gcm394_base_video_device::tmap2_regs_w)
 {
-	unk_vid_regs_w(0, offset, data);
+	LOGMASKED(LOG_GCM394_TMAP_EXTRA, "%s:gcm394_base_video_device::tmap2_regs_w %01x %04x\n", machine().describe_context(), offset, data);
+	if (offset < 4)
+	{
+		write_tmap_extrascroll(2, m_tmap2_scroll, offset, data);
+	}
+	else
+	{
+		write_tmap_regs(2, m_tmap2_regs, offset-4, data);
+	}
 }
+
+READ16_MEMBER(gcm394_base_video_device::unk_vid1_gfxbase_lsb_r)
+{
+	return m_unk_vid1_gfxbase_lsb;
+}
+
 
 WRITE16_MEMBER(gcm394_base_video_device::unk_vid1_gfxbase_lsb_w)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid1_gfxbase_lsb_w %04x\n", machine().describe_context(), data);
 	m_unk_vid1_gfxbase_lsb = data;
 	LOGMASKED(LOG_GCM394_TMAP, "\t(unk_vid1 tilegfxbase is now %04x%04x)\n", m_unk_vid1_gfxbase_msb, m_unk_vid1_gfxbase_lsb);
+}
+
+READ16_MEMBER(gcm394_base_video_device::unk_vid1_gfxbase_msb_r)
+{
+	return m_unk_vid1_gfxbase_msb;
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::unk_vid1_gfxbase_msb_w)
@@ -815,10 +979,36 @@ WRITE16_MEMBER(gcm394_base_video_device::unk_vid1_gfxbase_msb_w)
 
 // **************************************** unknown video device 2 (another tilemap? roz? lines? zooming sprite layer?) *************************************************
 
-WRITE16_MEMBER(gcm394_base_video_device::unk_vid2_regs_w)
+READ16_MEMBER(gcm394_base_video_device::tmap3_regs_r)
 {
-	unk_vid_regs_w(1, offset, data);
+	if (offset < 4)
+	{
+		return m_tmap3_scroll[offset];
+	}
+	else
+	{
+		return m_tmap3_regs[offset-4];
+	}
 }
+
+WRITE16_MEMBER(gcm394_base_video_device::tmap3_regs_w)
+{
+	LOGMASKED(LOG_GCM394_TMAP_EXTRA, "%s:gcm394_base_video_device::tmap3_regs_w %01x %04x\n", machine().describe_context(), offset, data);
+	if (offset < 4)
+	{
+		write_tmap_extrascroll(3, m_tmap3_scroll, offset, data);
+	}
+	else
+	{
+		write_tmap_regs(3, m_tmap3_regs, offset-4, data);
+	}
+}
+
+READ16_MEMBER(gcm394_base_video_device::unk_vid2_gfxbase_lsb_r)
+{
+	return m_unk_vid2_gfxbase_lsb;
+}
+
 
 WRITE16_MEMBER(gcm394_base_video_device::unk_vid2_gfxbase_lsb_w)
 {
@@ -826,6 +1016,12 @@ WRITE16_MEMBER(gcm394_base_video_device::unk_vid2_gfxbase_lsb_w)
 	m_unk_vid2_gfxbase_lsb = data;
 	LOGMASKED(LOG_GCM394_TMAP, "\t(unk_vid2 tilegfxbase is now %04x%04x)\n", m_unk_vid2_gfxbase_msb, m_unk_vid2_gfxbase_lsb);
 }
+
+READ16_MEMBER(gcm394_base_video_device::unk_vid2_gfxbase_msb_r)
+{
+	return m_unk_vid2_gfxbase_msb;
+}
+
 
 WRITE16_MEMBER(gcm394_base_video_device::unk_vid2_gfxbase_msb_w)
 {
@@ -997,8 +1193,17 @@ WRITE16_MEMBER(gcm394_base_video_device::video_703a_palettebank_w)
 	m_703a_palettebank = data;
 }
 
-READ16_MEMBER(gcm394_base_video_device::video_7062_r) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7062_r\n", machine().describe_context()); return m_7062; }
-WRITE16_MEMBER(gcm394_base_video_device::video_7062_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7062_w %04x\n", machine().describe_context(), data); m_7062 = data; }
+READ16_MEMBER(gcm394_base_video_device::videoirq_source_enable_r)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::videoirq_source_enable_r\n", machine().describe_context());
+	return m_7062;
+}
+
+WRITE16_MEMBER(gcm394_base_video_device::videoirq_source_enable_w)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::videoirq_source_enable_w %04x\n", machine().describe_context(), data);
+	m_7062 = data;
+}
 
 READ16_MEMBER(gcm394_base_video_device::video_7063_videoirq_source_r)
 {
@@ -1110,7 +1315,7 @@ READ16_MEMBER(gcm394_base_video_device::spriteram_r)
 
 WRITE16_MEMBER(gcm394_base_video_device::palette_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::palette_w %04x : %04x (value of 0x703a is %04x)\n", machine().describe_context(), offset, data, m_703a_palettebank);
+	LOGMASKED(LOG_GCM394_VIDEO_PALETTE, "%s:gcm394_base_video_device::palette_w %04x : %04x (value of 0x703a is %04x)\n", machine().describe_context(), offset, data, m_703a_palettebank);
 
 	if (m_703a_palettebank & 0xfff0)
 	{

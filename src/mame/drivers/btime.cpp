@@ -1745,6 +1745,29 @@ ROM_START( mmonkey )
 	ROM_LOAD( "sb-4c",        0x0020, 0x0020, CRC(a29b4204) SHA1(7f15cae5c4aaa29638fb45029782dafd2b3d1484) )    /* RAS/CAS logic - not used */
 ROM_END
 
+ROM_START( mmonkeyj )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // all 2732
+	ROM_LOAD( "b00.e4",   0xc000, 0x1000, CRC(8d31bf6a) SHA1(77b44d8e2b4db148727e7bfc5162c7e9e9cfc662) )
+	ROM_LOAD( "b10.d4",   0xd000, 0x1000, CRC(e54f584a) SHA1(a03fef09f6a0bb6802b33b28c45548efb85cda5c) )
+	ROM_LOAD( "b20.b4",   0xe000, 0x1000, CRC(9f606767) SHA1(afd248e5bc05e3ee4b31545efe5d66a032cea275) )
+	ROM_LOAD( "b30.a4",   0xf000, 0x1000, CRC(a4e85439) SHA1(0455a520d6dbd5efa0598f80e48b88574135922a) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "b40.h1",   0xe000, 0x1000, CRC(5bcb2e81) SHA1(60fb8fd83c83b278e3aaf96f0b6dbefbc1eef0f7) ) // 2732
+
+	ROM_REGION( 0x6000, "gfx1", 0 ) // all 2732
+	ROM_LOAD( "b50.l11",  0x0000, 0x1000, CRC(b6aa8566) SHA1(bc90d4cfa9a221477d1989fea532621ce3e76439) )
+	ROM_LOAD( "b60.m11",  0x1000, 0x1000, CRC(6cc4d0c4) SHA1(f43450e97dd0c6d0a269c06e4c4253d0814590e9) )
+	ROM_LOAD( "b70.l13",  0x2000, 0x1000, CRC(2a343b7e) SHA1(1dba32a83db933096b9a9fbcfd8e0290aba76483) )
+	ROM_LOAD( "b80.m13",  0x3000, 0x1000, CRC(0230b50d) SHA1(d62b5d1be35c8bf29483fb616cd7e3949a422e76) )
+	ROM_LOAD( "b90.l14",  0x4000, 0x1000, CRC(922bb3e1) SHA1(72d2017e80bea7700a3a61a06882839ecffcabe8) )
+	ROM_LOAD( "ba0.m14",  0x5000, 0x1000, CRC(f943e28c) SHA1(6ff536a21f34cbb958f6d0f84791102938966ff3) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "bc0.m5",       0x0000, 0x0020, CRC(55e28b32) SHA1(b73f85224738252dc8dbb38a54250dcfe1fc3ae3) )    /* 82S123, palette */
+	ROM_LOAD( "m3-7603-5.c4", 0x0020, 0x0020, BAD_DUMP CRC(a29b4204) SHA1(7f15cae5c4aaa29638fb45029782dafd2b3d1484) )    /* not dumped for this set - RAS/CAS logic - not used */
+ROM_END
+
 ROM_START( brubber )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* a000-bfff space for the service ROM */
@@ -2055,22 +2078,23 @@ void btime_state::init_sdtennis()
 }
 
 
-GAME( 1982, btime,    0,       btime,    btime,    btime_state, init_btime,    ROT270, "Data East Corporation", "Burger Time (Data East set 1)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, btime2,   btime,   btime,    btime,    btime_state, init_btime,    ROT270, "Data East Corporation", "Burger Time (Data East set 2)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, btime3,   btime,   btime,    btime,    btime_state, init_btime,    ROT270, "Data East USA Inc.",    "Burger Time (Data East USA)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1982, btimem,   btime,   btime,    btime,    btime_state, init_btime,    ROT270, "Data East (Bally Midway license)", "Burger Time (Midway)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, cookrace, btime,   cookrace, cookrace, btime_state, init_cookrace, ROT270, "bootleg",               "Cook Race",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1981, tisland,  0,       tisland,  btime,    btime_state, init_tisland,  ROT270, "Data East Corporation", "Treasure Island",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, lnc,      0,       lnc,      lnc,      btime_state, init_lnc,      ROT270, "Data East Corporation", "Lock'n'Chase",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1982, protennb, 0,       disco,    disco,    btime_state, init_protennb, ROT270, "bootleg",               "Tennis (bootleg of Pro Tennis)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, wtennis,  0,       wtennis,  wtennis,  btime_state, init_wtennis,  ROT270, "bootleg",               "World Tennis",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mmonkey,  0,       mmonkey,  mmonkey,  btime_state, init_lnc,      ROT270, "Technos Japan / Roller Tron", "Minky Monkey", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, brubber,  0,       bnj,      bnj,      btime_state, init_bnj,      ROT270, "Data East",             "Burnin' Rubber",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bnj,      brubber, bnj,      bnj,      btime_state, init_bnj,      ROT270, "Data East USA",         "Bump 'n' Jump",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bnjm,     brubber, bnj,      bnj,      btime_state, init_bnj,      ROT270, "Data East USA (Bally Midway license)", "Bump 'n' Jump (Midway)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, caractn,  brubber, bnj,      bnj,      btime_state, init_bnj,      ROT270, "bootleg",               "Car Action (set 1)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1982, caractn2, brubber, bnj,      caractn2, btime_state, init_bnj,      ROT270, "bootleg",               "Car Action (set 2)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zoar,     0,       zoar,     zoar,     btime_state, init_zoar,     ROT270, "Data East USA",         "Zoar",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, disco,    0,       disco,    disco,    btime_state, init_disco,    ROT270, "Data East",             "Disco No.1",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1982, discof,   disco,   disco,    disco,    btime_state, init_disco,    ROT270, "Data East",             "Disco No.1 (Rev.F)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1983, sdtennis, 0,       sdtennis, sdtennis, btime_state, init_sdtennis, ROT270, "Data East Corporation", "Super Doubles Tennis",           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, btime,    0,       btime,    btime,    btime_state, init_btime,    ROT270, "Data East Corporation",                "Burger Time (Data East set 1)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, btime2,   btime,   btime,    btime,    btime_state, init_btime,    ROT270, "Data East Corporation",                "Burger Time (Data East set 2)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, btime3,   btime,   btime,    btime,    btime_state, init_btime,    ROT270, "Data East USA Inc.",                   "Burger Time (Data East USA)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, btimem,   btime,   btime,    btime,    btime_state, init_btime,    ROT270, "Data East (Bally Midway license)",     "Burger Time (Midway)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, cookrace, btime,   cookrace, cookrace, btime_state, init_cookrace, ROT270, "bootleg",                              "Cook Race",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1981, tisland,  0,       tisland,  btime,    btime_state, init_tisland,  ROT270, "Data East Corporation",                "Treasure Island",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, lnc,      0,       lnc,      lnc,      btime_state, init_lnc,      ROT270, "Data East Corporation",                "Lock'n'Chase",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1982, protennb, 0,       disco,    disco,    btime_state, init_protennb, ROT270, "bootleg",                              "Tennis (bootleg of Pro Tennis)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, wtennis,  0,       wtennis,  wtennis,  btime_state, init_wtennis,  ROT270, "bootleg",                              "World Tennis",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mmonkey,  0,       mmonkey,  mmonkey,  btime_state, init_lnc,      ROT270, "Technos Japan / Roller Tron",          "Minky Monkey",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mmonkeyj, mmonkey, mmonkey,  mmonkey,  btime_state, init_lnc,      ROT270, "Technos Japan / Roller Tron",          "Minky Monkey (Japan)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, brubber,  0,       bnj,      bnj,      btime_state, init_bnj,      ROT270, "Data East",                            "Burnin' Rubber",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bnj,      brubber, bnj,      bnj,      btime_state, init_bnj,      ROT270, "Data East USA",                        "Bump 'n' Jump",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bnjm,     brubber, bnj,      bnj,      btime_state, init_bnj,      ROT270, "Data East USA (Bally Midway license)", "Bump 'n' Jump (Midway)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, caractn,  brubber, bnj,      bnj,      btime_state, init_bnj,      ROT270, "bootleg",                              "Car Action (set 1)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1982, caractn2, brubber, bnj,      caractn2, btime_state, init_bnj,      ROT270, "bootleg",                              "Car Action (set 2)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zoar,     0,       zoar,     zoar,     btime_state, init_zoar,     ROT270, "Data East USA",                        "Zoar",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, disco,    0,       disco,    disco,    btime_state, init_disco,    ROT270, "Data East",                            "Disco No.1",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1982, discof,   disco,   disco,    disco,    btime_state, init_disco,    ROT270, "Data East",                            "Disco No.1 (Rev.F)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1983, sdtennis, 0,       sdtennis, sdtennis, btime_state, init_sdtennis, ROT270, "Data East Corporation",                "Super Doubles Tennis",           MACHINE_SUPPORTS_SAVE )

@@ -956,12 +956,17 @@
 	</software>
 
 	<software name="bmxracersa3" cloneof="bmxracers">
-		<description>BMX Racers (set 4, Visiload T1 loader)</description>
+		<description>BMX Racers (set 4, Visiload loaders)</description>
 		<year>1984</year>
 		<publisher>Mastertronic</publisher>
 		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="485799">
+				<rom name="bmx racers side a.tap" size="485799" crc="109ceaef" sha1="7bbaa334f90f202aefc065588755b5eb69c4aed1"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="478027">
-				<rom name="bmx racers.tap" size="478027" crc="44efcf46" sha1="b813aae24a6abfe77afb1d4c151d1a5f36dac06f"/>
+				<rom name="bmx racers side b.tap" size="478027" crc="44efcf46" sha1="b813aae24a6abfe77afb1d4c151d1a5f36dac06f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5942,7 +5947,7 @@
 			</dataarea>
 		</part>
 		<part name="cass2" interface="cbm_cass">
-			<dataarea name="cass" size="">
+			<dataarea name="cass" size="562360">
 				<rom name="space hunter side b.tap" size="562360" crc="3f93d15b" sha1="27c9d41cb322cae98a40e462ffbd596ee289268a"/>
 			</dataarea>
 		</part>
@@ -6671,6 +6676,22 @@
 		</part>
 	</software>
 
+	<software name="sweep">
+		<description>Sweep</description>
+		<year>19??</year>
+		<publisher>Mastertronic</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="400020">
+				<rom name="sweep (c64) (side a).tap" size="400020" crc="5c9225bf" sha1="d1c27f0d9833b91b5fc506087c83d49578f93257"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="388837">
+				<rom name="sweep (c64) (side b).tap" size="388837" crc="ab92b874" sha1="0a24b3db81b5ffd378dbb50e82f13daf4a645072"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tbird">
 		<description>T-Bird</description>
 		<year>1988</year>
@@ -7387,7 +7408,7 @@
 			</dataarea>
 		</part>
 		<part name="cass2" interface="cbm_cass">
-			<dataarea name="cass" size="">
+			<dataarea name="cass" size="665130">
 				<rom name="yogi's great escape side b.tap" size="665130" crc="268e5891" sha1="bca798fa1f984ace680442205c63fc7ee06e67ec"/>
 			</dataarea>
 		</part>

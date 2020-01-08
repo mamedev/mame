@@ -35,6 +35,7 @@ protected:
 	virtual void device_reset() override;
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	void command_write(uint16_t data);
 	uint16_t status_read();
@@ -49,6 +50,8 @@ protected:
 	void write_sector(int ddam);
 
 private:
+	void firmware_map(address_map &map);
+
 	enum rx01_state {
 		RX01_FILL,
 		RX01_EMPTY,

@@ -966,7 +966,7 @@ void bbc_state::bbcb(machine_config &config)
 	m_via6522_1->readpb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_r));
 	m_via6522_1->writepb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_w));
 	m_via6522_1->writepb_handler().append(m_internal, FUNC(bbc_internal_slot_device::latch_fe60_w));
-	m_via6522_1->ca2_handler().set("centronics", FUNC(centronics_device::write_strobe));
+	m_via6522_1->ca2_handler().set("printer", FUNC(centronics_device::write_strobe));
 	m_via6522_1->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 
 	/* adc */
@@ -975,7 +975,7 @@ void bbc_state::bbcb(machine_config &config)
 	m_upd7002->set_eoc_callback(FUNC(bbc_state::upd7002_eoc));
 
 	/* printer */
-	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
+	centronics_device &centronics(CENTRONICS(config, "printer", centronics_devices, "printer"));
 	centronics.ack_handler().set(m_via6522_1, FUNC(via6522_device::write_ca1)).invert(); // ack seems to be inverted?
 	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
 	centronics.set_output_latch(latch);
@@ -1406,7 +1406,7 @@ void bbcm_state::bbcm(machine_config &config)
 	m_rtc->irq().set(m_irqs, FUNC(input_merger_device::in_w<7>));
 
 	/* printer */
-	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
+	centronics_device &centronics(CENTRONICS(config, "printer", centronics_devices, "printer"));
 	centronics.ack_handler().set(m_via6522_1, FUNC(via6522_device::write_ca1)).invert(); // ack seems to be inverted?
 	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
 	centronics.set_output_latch(latch);
@@ -1449,7 +1449,7 @@ void bbcm_state::bbcm(machine_config &config)
 	m_via6522_1->writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
 	m_via6522_1->readpb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_r));
 	m_via6522_1->writepb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_w));
-	m_via6522_1->ca2_handler().set("centronics", FUNC(centronics_device::write_strobe));
+	m_via6522_1->ca2_handler().set("printer", FUNC(centronics_device::write_strobe));
 	m_via6522_1->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 
 	/* fdc */
@@ -1552,7 +1552,7 @@ void bbcm_state::bbcmet(machine_config &config)
 	m_bankdev->set_map(&bbcm_state::bbcmet_bankdev).set_options(ENDIANNESS_LITTLE, 8, 16, 0x0400);
 
 	/* printer */
-	config.device_remove("centronics");
+	config.device_remove("printer");
 	config.device_remove("cent_data_out");
 
 	/* cassette */
@@ -1572,7 +1572,7 @@ void bbcm_state::bbcmet(machine_config &config)
 
 	/* acia */
 	config.device_remove("acia6850");
-	config.device_remove("rs232");
+	config.device_remove("rs423");
 	config.device_remove("acia_clock");
 
 	/* devices */
@@ -2099,6 +2099,8 @@ ROM_START(bbcm)
 	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "mos350", "Enhanced MOS 3.50" )
 	ROMX_LOAD("mos350.ic24", 0x20000, 0x20000, CRC(141027b9) SHA1(85211b5bc7c7a269952d2b063b7ec0e1f0196803), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 2, "mos329", "FinMOS 3.29")
+	ROMX_LOAD("mos329.ic24", 0x20000, 0x20000, CRC(8dd7338b) SHA1(4604203c70c04a9fd003103deec438fc5bd44839), ROM_BIOS(2))
 	ROM_COPY("swr", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x20000, 0x4000, 0xff)
 	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
@@ -2126,6 +2128,7 @@ ROM_START(bbcm)
 	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
 	ROMX_LOAD("mos320.cmos", 0x00, 0x40, CRC(c7f9e85a) SHA1(f24cc9db0525910689219f7204bf8b864033ee94), ROM_BIOS(0))
 	ROMX_LOAD("mos350.cmos", 0x00, 0x40, CRC(e84c1854) SHA1(f3cb7f12b7432caba28d067f01af575779220aac), ROM_BIOS(1))
+	ROMX_LOAD("mos350.cmos", 0x00, 0x40, CRC(e84c1854) SHA1(f3cb7f12b7432caba28d067f01af575779220aac), ROM_BIOS(2))
 ROM_END
 
 

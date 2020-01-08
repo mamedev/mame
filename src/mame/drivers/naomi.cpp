@@ -3011,6 +3011,7 @@ void naomi_state::naomi(machine_config &config)
 	naomi_base(config);
 	naomi_rom_board &rom_board(NAOMI_ROM_BOARD(config, "rom_board", 0, "naomibd_eeprom"));
 	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
+	rom_board.ext_irq_callback().set(FUNC(dc_state::external_irq));
 }
 
 /*
@@ -3022,6 +3023,7 @@ void naomi_state::naomigd(machine_config &config)
 	naomi_base(config);
 	naomi_gdrom_board &rom_board(NAOMI_GDROM_BOARD(config, "rom_board", 0, "naomibd_eeprom", ":gdrom", "pic"));
 	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
+	rom_board.ext_irq_callback().set(FUNC(dc_state::external_irq));
 }
 
 /*

@@ -535,12 +535,12 @@
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-13" right="88" top="-1.5" bottom="104.5" />
+		<bounds left="-14" right="88" top="-1.5" bottom="104.5" />
 
 		<bezel element="cblack"><bounds x="-1" y="-1.5" width="89" height="89" /></bezel>
 		<bezel element="cwhite"><bounds x="3" y="2.5" width="81" height="81" /></bezel>
 		<group ref="sb_board"><bounds x="3.5" y="3" width="80" height="80" /></group>
-		<group ref="sb_ui"><bounds x="-12" y="3" width="10" height="80" /></group>
+		<group ref="sb_ui"><bounds x="-12.5" y="3" width="10" height="80" /></group>
 
 		<bezel element="lcd_bg"><bounds x="23.5" y="92" width="20" height="8" /></bezel>
 		<group ref="display"><bounds x="24" y="92.8" width="19" height="6.4" /></group>

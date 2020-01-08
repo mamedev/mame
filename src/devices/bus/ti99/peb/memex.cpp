@@ -15,8 +15,12 @@
 #include "emu.h"
 #include "memex.h"
 
-#define LOG_WARN        (1U<<1)   // Warnings
-#define LOG_CONFIG      (1U<<2)   // Configuration
+#define LOG_WARN        (1U<<1)
+#define LOG_CONFIG      (1U<<2)
+#define LOG_READ        (1U<<3)
+#define LOG_WRITE       (1U<<4)
+#define LOG_BLOCK       (1U<<5)
+
 #define VERBOSE ( LOG_CONFIG | LOG_WARN )
 
 #include "logmacro.h"
@@ -56,12 +60,19 @@ bool geneve_memex_device::access_enabled(offs_t offset)
 	// we may have to lock out those areas
 	int page = (offset >> 13)&0xff;
 
+	// All mirrors of page ba via AMD/AME are blocked.
+	// These are 3a, 7a, ba, and fa.
+	if ((page & 0x3f)==0x3a)
+	{
+		LOGMASKED(LOG_BLOCK, "memex blocks page %02x\n", page);
+		return false;
+	}
+
 	// SW2: 10xxx010   locked when SW2=off
 	//      10111010   locked when SW2=on
-	if (page == 0xba) return false;
 	if ((page & 0xc7)==0x82 && ((m_switches & MDIP2)==0))
 	{
-		LOGMASKED(LOG_CONFIG, "memex blocks page %02x; dip2=%d\n", page,  (m_switches & MDIP2)!=0);
+		LOGMASKED(LOG_BLOCK, "memex blocks page %02x; dip2=%d\n", page,  (m_switches & MDIP2)!=0);
 		return false;
 	}
 
@@ -91,11 +102,14 @@ bool geneve_memex_device::access_enabled(offs_t offset)
 READ8Z_MEMBER( geneve_memex_device::readz )
 {
 	/* If not Genmod, add the upper two address bits 10 */
-	if (!m_genmod) offset |= 0x100000;
+//  if (!m_genmod) offset |= 0x100000;
 
 	// The card is accessed for all addresses in the address space
 	if (access_enabled(offset))
+	{
 		*value = m_ram->pointer()[offset];
+		LOGMASKED(LOG_READ, "%06x -> %02x\n", offset, *value);
+	}
 }
 
 /*
@@ -104,11 +118,14 @@ READ8Z_MEMBER( geneve_memex_device::readz )
 void geneve_memex_device::write(offs_t offset, uint8_t data)
 {
 	/* If not Genmod, add the upper two address bits 10 */
-	if (!m_genmod) offset |= 0x100000;
+//  if (!m_genmod) offset |= 0x100000;
 
 	// The card is accessed for all addresses in the address space
 	if (access_enabled(offset))
+	{
+		LOGMASKED(LOG_WRITE, "%06x <- %02x\n", offset, data);
 		m_ram->pointer()[offset] = data;
+	}
 }
 
 /**************************************************************************/

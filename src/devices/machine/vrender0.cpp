@@ -98,9 +98,19 @@ void vrender0soc_device::regs_map(address_map &map)
 void vrender0soc_device::audiovideo_map(address_map &map)
 {
 	map(0x00000000, 0x0000ffff).m(m_vr0vid, FUNC(vr0video_device::regs_map));
-	map(0x00800000, 0x00ffffff).rw(FUNC(vrender0soc_device::textureram_r), FUNC(vrender0soc_device::textureram_w));
-	map(0x01000000, 0x017fffff).rw(FUNC(vrender0soc_device::frameram_r), FUNC(vrender0soc_device::frameram_w));
-	map(0x01800000, 0x01800fff).rw(m_vr0snd, FUNC(vr0sound_device::vr0_snd_read), FUNC(vr0sound_device::vr0_snd_write));
+	map(0x00800000, 0x00ffffff).m(FUNC(vrender0soc_device::texture_map));
+	map(0x01000000, 0x017fffff).m(FUNC(vrender0soc_device::frame_map));
+	map(0x01800000, 0x01800fff).m(m_vr0snd, FUNC(vr0sound_device::sound_map));
+}
+
+void vrender0soc_device::texture_map(address_map &map)
+{
+	map(0x000000, 0x7fffff).rw(FUNC(vrender0soc_device::textureram_r), FUNC(vrender0soc_device::textureram_w));
+}
+
+void vrender0soc_device::frame_map(address_map &map)
+{
+	map(0x000000, 0x7fffff).rw(FUNC(vrender0soc_device::frameram_r), FUNC(vrender0soc_device::frameram_w));
 }
 
 //-------------------------------------------------
@@ -130,7 +140,10 @@ void vrender0soc_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, m_lspeaker).front_left();
 	SPEAKER(config, m_rspeaker).front_right();
 
-	SOUND_VRENDER0(config, m_vr0snd, 0);
+	SOUND_VRENDER0(config, m_vr0snd, DERIVED_CLOCK(1,1)); // Correct?
+	m_vr0snd->set_addrmap(vr0sound_device::AS_TEXTURE, &vrender0soc_device::texture_map);
+	m_vr0snd->set_addrmap(vr0sound_device::AS_FRAME, &vrender0soc_device::frame_map);
+	m_vr0snd->irq_callback().set(FUNC(vrender0soc_device::soundirq_cb));
 	m_vr0snd->add_route(0, m_lspeaker, 1.0);
 	m_vr0snd->add_route(1, m_rspeaker, 1.0);
 }
@@ -147,7 +160,6 @@ void vrender0soc_device::device_start()
 	m_frameram = auto_alloc_array_clear(machine(), uint16_t, 0x00800000/2);
 
 	m_vr0vid->set_areas(m_textureram, m_frameram);
-	m_vr0snd->set_areas(m_textureram, m_frameram);
 	m_host_space = &m_host_cpu->space(AS_PROGRAM);
 
 	if (this->clock() == 0)
@@ -325,6 +337,14 @@ int vrender0soc_device::irq_callback()
 	return 0;       //This should never happen
 }
 
+
+WRITE_LINE_MEMBER(vrender0soc_device::soundirq_cb)
+{
+	if (state)
+	{
+		IntReq(2);
+	}
+}
 
 /*
  *

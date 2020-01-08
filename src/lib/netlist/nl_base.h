@@ -1304,11 +1304,9 @@ namespace netlist
 		using timed_queue = plib::timed_queue_linear<T, TS>;
 
 		// Use timed_queue_heap to use stdc++ heap functions instead of linear processing.
-		/// This slows down processing by about 25% on a Kaby Lake.
-
-
-		//template <class T, bool TS>
-		//using timed_queue = timed_queue_heap<T, TS>;
+		// This slows down processing by about 25% on a Kaby Lake.
+		// template <class T, bool TS>
+		// using timed_queue = plib::timed_queue_heap<T, TS>;
 
 		// -----------------------------------------------------------------------------
 		// queue_t
@@ -1521,6 +1519,8 @@ namespace netlist
 		void rebuild_lists(); // must be called after post_load !
 
 		static void compile_defines(std::vector<std::pair<pstring, pstring>> &defs);
+		static pstring version();
+		static pstring version_patchlevel();
 
 		nets_collection_type & nets() noexcept { return m_nets; }
 		const nets_collection_type & nets() const noexcept { return m_nets; }
@@ -1575,6 +1575,9 @@ namespace netlist
 		// sole use is to manage lifetime of net objects
 		devices_collection_type             m_devices;
 		bool m_extended_validation;
+
+		// dummy version
+		int									m_dummy_version;
 	};
 
 	namespace devices
@@ -1705,7 +1708,6 @@ namespace netlist
 		PALIGNAS_CACHELINE()
 		detail::queue_t                     m_queue;
 		bool                                m_use_stats;
-
 		// performance
 		plib::pperftime_t<true>             m_stat_mainloop;
 		plib::pperfcount_t<true>            m_perf_out_processed;

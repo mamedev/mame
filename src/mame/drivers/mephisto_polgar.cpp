@@ -7,20 +7,22 @@ Mephisto Polgar and RISC
 The chess engine in Mephisto Risc is also compatible with Tasc's The ChessMachine.
 
 TODO:
-- Mephisto Risc maincpu is more likely 5MHz, but LCD doesn't like it
+- Mephisto Risc maincpu is maybe 5MHz? but LCD doesn't like it
 - split driver into several files? mrisc for example is completely different hw
 
 **************************************************************************************************/
 
 
 #include "emu.h"
+
 #include "cpu/m6502/m65c02.h"
 #include "cpu/m6502/m65sc02.h"
 #include "machine/74259.h"
 #include "machine/nvram.h"
 #include "machine/mmboard.h"
 #include "machine/chessmachine.h"
-#include "video/hd44780.h"
+#include "video/mmdisplay2.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -91,7 +93,7 @@ protected:
 
 private:
 	required_device<mephisto_board_device> m_board;
-	required_device<mephisto_display_modul_device> m_display;
+	required_device<mephisto_display_module2_device> m_display;
 	output_finder<16> m_leds;
 	uint8_t m_led_latch;
 };
@@ -130,8 +132,8 @@ READ8_MEMBER(mephisto_polgar_state::polgar_keys_r)
 void mephisto_polgar_state::polgar_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram");
-	map(0x2000, 0x2000).w("display", FUNC(mephisto_display_modul_device::latch_w));
-	map(0x2004, 0x2004).w("display", FUNC(mephisto_display_modul_device::io_w));
+	map(0x2000, 0x2000).w("display", FUNC(mephisto_display_module2_device::latch_w));
+	map(0x2004, 0x2004).w("display", FUNC(mephisto_display_module2_device::io_w));
 	map(0x2400, 0x2400).w("board", FUNC(mephisto_board_device::led_w));
 	map(0x2800, 0x2800).w("board", FUNC(mephisto_board_device::mux_w));
 	map(0x2c00, 0x2c07).r(FUNC(mephisto_polgar_state::polgar_keys_r));
@@ -157,8 +159,8 @@ void mephisto_risc_state::mrisc_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).ram().share("nvram");
-	map(0x2000, 0x2000).w("display", FUNC(mephisto_display_modul_device::latch_w));
-	map(0x2004, 0x2004).w("display", FUNC(mephisto_display_modul_device::io_w));
+	map(0x2000, 0x2000).w("display", FUNC(mephisto_display_module2_device::latch_w));
+	map(0x2004, 0x2004).w("display", FUNC(mephisto_display_module2_device::io_w));
 	map(0x2c00, 0x2c07).r(FUNC(mephisto_risc_state::polgar_keys_r));
 	map(0x2400, 0x2400).w("board", FUNC(mephisto_board_device::led_w));
 	map(0x2800, 0x2800).w("board", FUNC(mephisto_board_device::mux_w));
@@ -203,7 +205,7 @@ void mephisto_milano_state::milano_mem(address_map &map)
 {
 	map(0x0000, 0x1fbf).ram().share("nvram");
 
-	map(0x1fc0, 0x1fc0).w(m_display, FUNC(mephisto_display_modul_device::latch_w));
+	map(0x1fc0, 0x1fc0).w(m_display, FUNC(mephisto_display_module2_device::latch_w));
 	map(0x1fd0, 0x1fd0).w(FUNC(mephisto_milano_state::milano_led_w));
 	map(0x1fe0, 0x1fe0).r(FUNC(mephisto_milano_state::milano_input_r));
 	map(0x1fe8, 0x1fef).w("outlatch", FUNC(hc259_device::write_d7));
@@ -299,7 +301,7 @@ void mephisto_academy_state::machine_reset()
 
 void mephisto_polgar_state::polgar(machine_config &config)
 {
-	m65c02_device &maincpu(M65C02(config, "maincpu", XTAL(4'915'200)));
+	m65c02_device &maincpu(M65C02(config, "maincpu", XTAL(4'915'200))); // RP65C02G
 	maincpu.set_addrmap(AS_PROGRAM, &mephisto_polgar_state::polgar_mem);
 	maincpu.set_periodic_int(FUNC(mephisto_polgar_state::nmi_line_pulse), attotime::from_hz(XTAL(4'915'200) / (1 << 13)));
 
@@ -314,14 +316,14 @@ void mephisto_polgar_state::polgar(machine_config &config)
 	outlatch.q_out_cb<5>().set_output("led105");
 
 	MEPHISTO_SENSORS_BOARD(config, "board");
-	MEPHISTO_DISPLAY_MODUL(config, "display");
+	MEPHISTO_DISPLAY_MODULE2(config, "display");
 	config.set_default_layout(layout_mephisto_polgar);
 }
 
 void mephisto_polgar_state::polgar10(machine_config &config)
 {
 	polgar(config);
-	subdevice<m65c02_device>("maincpu")->set_clock(XTAL(10'000'000));
+	subdevice<m65c02_device>("maincpu")->set_clock(9.8304_MHz_XTAL); // W65C02P-8
 }
 
 void mephisto_risc_state::mrisc(machine_config &config)
@@ -345,13 +347,13 @@ void mephisto_risc_state::mrisc(machine_config &config)
 	outlatch.parallel_out_cb().set_membank("rombank").rshift(6).mask(0x03).exor(0x01);
 
 	MEPHISTO_SENSORS_BOARD(config, "board");
-	MEPHISTO_DISPLAY_MODUL(config, "display");
+	MEPHISTO_DISPLAY_MODULE2(config, "display");
 	config.set_default_layout(layout_mephisto_polgar);
 }
 
 void mephisto_milano_state::milano(machine_config &config)
 {
-	polgar(config);
+	polgar(config); // CPU: W65C02P-8, 4.9152Mhz
 	subdevice<m65c02_device>("maincpu")->set_addrmap(AS_PROGRAM, &mephisto_milano_state::milano_mem);
 
 	MEPHISTO_BUTTONS_BOARD(config.replace(), m_board);
@@ -361,7 +363,7 @@ void mephisto_milano_state::milano(machine_config &config)
 
 void mephisto_academy_state::academy(machine_config &config)
 {
-	polgar(config);
+	polgar(config); // CPU: VL65NC02-04PC, 4.9152Mhz
 	subdevice<m65c02_device>("maincpu")->set_addrmap(AS_PROGRAM, &mephisto_academy_state::academy_mem);
 
 	hc259_device &outlatch(HC259(config.replace(), "outlatch"));
@@ -405,11 +407,11 @@ ROM_START(academy)
 	ROMX_LOAD("acad4000.bin", 0x4000, 0x4000, CRC(ee1222b5) SHA1(98541d87755a7186b69b9723cc4adbd07f20f0e2), ROM_BIOS(0))
 	ROMX_LOAD("acad8000.bin", 0x8000, 0x8000, CRC(a967922b) SHA1(1327903ff89bf96d72c930c400f367ae19e3ec68), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "de", "German" )
-	ROMX_LOAD("academy_2_4000.bin", 0x4000, 0x4000, CRC(900a0001) SHA1(174a6bc3bde55994c603e232fcb45fccd62f11f6), ROM_BIOS(1))
-	ROMX_LOAD("academy_1_8000.bin", 0x8000, 0x8000, CRC(e313d084) SHA1(ced5712d34fcc81bedcd741b7ac9e2ba17bf5235), ROM_BIOS(1))
+	ROMX_LOAD("academy_16k_6.3.89", 0x4000, 0x4000, CRC(900a0001) SHA1(174a6bc3bde55994c603e232fcb45fccd62f11f6), ROM_BIOS(1))
+	ROMX_LOAD("academy_32k_6.3.89", 0x8000, 0x8000, CRC(e313d084) SHA1(ced5712d34fcc81bedcd741b7ac9e2ba17bf5235), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "de_old", "German Old" )
-	ROMX_LOAD("acad4000_de.bin", 0x4000, 0x4000, CRC(fb4d83c4) SHA1(f5132042c3b5a17c173f81eaa57e313ff0bb848e), ROM_BIOS(2))
-	ROMX_LOAD("acad8000_de.bin", 0x8000, 0x8000, CRC(478155db) SHA1(d363ab6d5bc0f47a6cdfa5132b77535ef8da8256), ROM_BIOS(2))
+	ROMX_LOAD("academy_16k_04.10.88", 0x4000, 0x4000, CRC(fb4d83c4) SHA1(f5132042c3b5a17c173f81eaa57e313ff0bb848e), ROM_BIOS(2))
+	ROMX_LOAD("academy_32k_04.10.88", 0x8000, 0x8000, CRC(478155db) SHA1(d363ab6d5bc0f47a6cdfa5132b77535ef8da8256), ROM_BIOS(2))
 ROM_END
 
 ROM_START(milano)

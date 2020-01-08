@@ -74,7 +74,7 @@ public:
 		, m_acia(*this, "acia6850")
 		, m_acia_clock(*this, "acia_clock")
 		, m_latch(*this, "latch")
-		, m_rs232(*this, "rs232")
+		, m_rs232(*this, "rs423")
 		, m_via6522_0(*this, "via6522_0")
 		, m_via6522_1(*this, "via6522_1")
 		, m_upd7002(*this, "upd7002")

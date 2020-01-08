@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Dirk Verwiebe, Cowering
 /******************************************************************************
  Mephisto 4 + 5 Chess Computer

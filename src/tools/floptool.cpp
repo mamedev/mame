@@ -50,6 +50,7 @@
 #include "formats/applix_dsk.h"
 
 #include "formats/hpi_dsk.h"
+#include "formats/img_dsk.h"
 
 #include "formats/dvk_mx_dsk.h"
 #include "formats/aim_dsk.h"
@@ -98,6 +99,7 @@ static floppy_format_type floppy_formats[] = {
 	FLOPPY_APPLIX_FORMAT,
 
 	FLOPPY_HPI_FORMAT,
+        FLOPPY_IMG_FORMAT,
 
 	FLOPPY_DVK_MX_FORMAT,
 	FLOPPY_AIM_FORMAT,

@@ -14,7 +14,7 @@
     - holding CL+INFO+BOOK on boot load the test mode
 
     TODO:
-    - split driver into several files?
+    - split driver into several files? need to make PCF2112T device
     - why are megaiv/smondial2 beeps noisy?
 
 **************************************************************************************************/
@@ -591,7 +591,7 @@ void mephisto_montec_state::smondial2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_montec_state::smondial2_mem);
 
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "smondial2_cart");
-	SOFTWARE_LIST(config, "cart_list").set_original("smondial2");
+	SOFTWARE_LIST(config, "cart_list").set_original("mephisto_smondial2");
 
 	config.set_default_layout(layout_mephisto_smondial2);
 }
@@ -652,6 +652,6 @@ CONS( 1986, smondial,  0,        0,      smondial,  megaiv,    mephisto_montec_s
 CONS( 1986, smondialb, smondial, 0,      megaiv,    megaiv,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (Ver B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, montec,    0,        0,      montec,    montec,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo",       MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, mondial2,  0,        0,      mondial2,  mondial2,  mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Mondial II",        MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, smondial2, 0,        0,      smondial2, smondial2, mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial II",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, megaiv,    0,        0,      megaiv,    megaiv,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Mega IV",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, smondial2, 0,        0,      smondial2, smondial2, mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial II",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, megaiv,    0,        0,      megaiv,    megaiv,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Mega IV",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1990, monteciv,  montec,   0,      monteciv,  montec,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo IV LE", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

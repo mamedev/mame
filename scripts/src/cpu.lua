@@ -3014,3 +3014,54 @@ if (CPUS["VT50"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/vt50/vt50dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/vt50/vt50dasm.h")
 end
+
+--------------------------------------------------
+-- National Semiconductor PACE/INS8900
+--@src/devices/cpu/pace/pace.h,CPUS["PACE"] = true
+--------------------------------------------------
+
+if (CPUS["PACE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/pace/pace.cpp",
+		MAME_DIR .. "src/devices/cpu/pace/pace.h",
+	}
+end
+
+if (CPUS["PACE"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pace/pacedasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pace/pacedasm.h")
+end
+
+--------------------------------------------------
+-- AT&T WE32000/WE32100/WE32200
+--@src/devices/cpu/we32000/we32100.h,CPUS["WE32000"] = true
+--------------------------------------------------
+
+if (CPUS["WE32000"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/we32000/we32100.cpp",
+		MAME_DIR .. "src/devices/cpu/we32000/we32100.h",
+	}
+end
+
+if (CPUS["WE32000"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/we32000/we32100d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/we32000/we32100d.h")
+end
+
+--------------------------------------------------
+-- DEC RX01
+--@src/devices/cpu/rx01/rx01.h,CPUS["RX01"] = true
+--------------------------------------------------
+
+if (CPUS["RX01"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/rx01/rx01.cpp",
+		MAME_DIR .. "src/devices/cpu/rx01/rx01.h",
+	}
+end
+
+if (CPUS["RX01"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/rx01/rx01dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/rx01/rx01dasm.h")
+end

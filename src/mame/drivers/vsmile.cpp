@@ -282,21 +282,18 @@ void vsmilem_state::vsmilem(machine_config &config)
  *
  ************************************/
 
-// TODO: decide on a dump endian, these likely differ in endianess due to different dumping technqiues
-ROM_START( vsmile )
+// NOTE: many games contain additional spare copies of the BIOS in their own cartridge ROM, reason unknown
+
+ROM_START( vsmile ) 	
 	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
-	ROM_LOAD( "vsmilebios.bin", 0x000000, 0x200000, CRC(11f1b416) SHA1(11f77c4973d29c962567390e41879c86a759c93b) )
+	ROM_SYSTEM_BIOS( 0, "v103", "v103" )
+	ROMX_LOAD( "vsmile_v103.bin", 0x000000, 0x200000, CRC(387fbc24) SHA1(5f2fd211b6ff3a6f5121b14adc6bbf4f49e89f33),  ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(0) ) // this is the earliest version used on the V.Smile Pocket, but it isn't system specific
+	ROM_SYSTEM_BIOS( 1, "v102", "v102" )
+	ROMX_LOAD( "vsmile_v102.bin", 0x000000, 0x200000, CRC(0cd0bdf5) SHA1(5c8d1eada1b6b545555b8d2b09325d7127681af8),  ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1) ) // found in all 'fat' model systems
+	ROM_SYSTEM_BIOS( 2, "v100", "v100" )
+	ROMX_LOAD( "vsmile_v100.bin", 0x000000, 0x200000, CRC(205c5296) SHA1(7fbcf761b5885c8b1524607aabaf364b4559c8cc),  ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2) )
 ROM_END
 
-ROM_START( vsmileg )
-	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "sysrom german.bin", 0x000000, 0x200000, CRC(205c5296) SHA1(7fbcf761b5885c8b1524607aabaf364b4559c8cc) )
-ROM_END
-
-ROM_START( vsmilef )
-	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "sysrom_france", 0x000000, 0x200000, CRC(0cd0bdf5) SHA1(5c8d1eada1b6b545555b8d2b09325d7127681af8) )
-ROM_END
 
 ROM_START( vsmilem )
 	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
@@ -304,7 +301,5 @@ ROM_START( vsmilem )
 ROM_END
 
 //    year, name,    parent, compat, machine, input,   class,         init,       company, fullname,              flags
-CONS( 2005, vsmile,  0,      0,      vsmile,  vsmile,  vsmile_state,  empty_init, "VTech", "V.Smile (US)",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2005, vsmileg, vsmile, 0,      vsmilep, vsmile,  vsmile_state,  empty_init, "VTech", "V.Smile (Germany)",   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2005, vsmilef, vsmile, 0,      vsmilep, vsmile,  vsmile_state,  empty_init, "VTech", "V.Smile (France)",    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, vsmile,  0,      0,      vsmile,  vsmile,  vsmile_state,  empty_init, "VTech", "V.Smile",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2008, vsmilem, vsmile, 0,      vsmilem, vsmile,  vsmilem_state, empty_init, "VTech", "V.Smile Motion (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

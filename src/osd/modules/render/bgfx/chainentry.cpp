@@ -77,7 +77,7 @@ void bgfx_chain_entry::submit(int view, chain_manager::screen_prim &prim, textur
 		const uint8_t r = (uint8_t)std::round(prim.m_prim->color.r * 255);
 		const uint8_t g = (uint8_t)std::round(prim.m_prim->color.g * 255);
 		const uint8_t b = (uint8_t)std::round(prim.m_prim->color.b * 255);
-		tint = (a << 24) | (r << 16) | (g << 8) | b;
+		tint = (a << 24) | (b << 16) | (g << 8) | r;
 	}
 
 	bgfx::TransientVertexBuffer buffer;

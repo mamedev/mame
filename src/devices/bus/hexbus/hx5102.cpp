@@ -432,7 +432,7 @@ WRITE8_MEMBER(hx5102_device::ibc_write)
 
 WRITE8_MEMBER(hx5102_device::hexbus_out)
 {
-	LOGMASKED(LOG_HEXBUS, "hexbus out: %02x\n", data);
+	LOGMASKED(LOG_HEXBUS, "Write to hexbus: BAV*=%d, HSK*=%d, data=%x\n", bav_line(data)==ASSERT_LINE? 0:1, hsk_line(data)==ASSERT_LINE? 0:1, data_lines(data));
 
 	// Get the other levels and set our own states
 	uint8_t newlevel = hexbus_get_levels() & data;

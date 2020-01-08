@@ -13,10 +13,11 @@
  *   http://www.sensi.org/~alec/mips/mips-history.html
  *
  * TODO
- *   - make it boot Windows NT
  *   - big-endian support for RISC/os
  *   - EISA bus and slots
  *   - slotify and improve graphics board
+ *   - other models/variants
+ *   - sound and other loose ends
  *
  * Unconfirmed parts lists from ARCSystem reference design (which appears to
  * be very similar or identical to the Jazz system) taken from:
@@ -292,7 +293,7 @@ void jazz_state::jazz(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(78643200, 1280, 0, 1280, 1024, 0, 1024);
-	m_screen->set_screen_update("g364", FUNC(g364_device::screen_update));
+	m_screen->set_screen_update(m_cvc, FUNC(g364_device::screen_update));
 	m_screen->screen_vblank().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<3>)); // maybe?
 
 	G364(config, m_cvc, 5_MHz_XTAL); // FIXME: guessed clock
@@ -340,7 +341,7 @@ void jazz_state::jazz(machine_config &config)
 
 	DP83932C(config, m_net, 20_MHz_XTAL);
 	m_net->out_int_cb().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<4>));
-	m_net->set_ram(RAM_TAG);
+	m_net->set_ram(m_ram);
 
 	I82357(config, m_isp, 14.318181_MHz_XTAL);
 	m_isp->out_rtc_cb().set(m_rtc, FUNC(mc146818_device::write));
@@ -378,5 +379,5 @@ ROM_START(mmr4000le)
 ROM_END
 
 /*    YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS       INIT         COMPANY  FULLNAME                 FLAGS */
-COMP( 1992,  mmr4000be, 0,      0,      mmr4000be, 0,     jazz_state, init_common, "MIPS",  "Magnum R4000 (big)",    MACHINE_IS_SKELETON)
-COMP( 1992,  mmr4000le, 0,      0,      mmr4000le, 0,     jazz_state, init_common, "MIPS",  "Magnum R4000 (little)", MACHINE_IS_SKELETON)
+COMP( 1992,  mmr4000be, 0,      0,      mmr4000be, 0,     jazz_state, init_common, "MIPS",  "Magnum R4000 (big)",    MACHINE_NOT_WORKING)
+COMP( 1992,  mmr4000le, 0,      0,      mmr4000le, 0,     jazz_state, init_common, "MIPS",  "Magnum R4000 (little)", MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN)

@@ -76,7 +76,12 @@ function xml.conv_cheat(data)
 		local function convert_memref(cpu, phys, space, width, addr, rw)
 			-- debug expressions address spaces by index not by name
 			local function get_space_name(index)
-				return cpu_spaces[":" .. cpu][index]
+				local prefix = cpu:sub(1,1)
+				if prefix == ":" then
+					return cpu_spaces[cpu][index]
+				else
+					return cpu_spaces[":" .. cpu][index]
+				end
 			end
 
 			local mod = ""
@@ -105,6 +110,12 @@ function xml.conv_cheat(data)
 			elseif width == "q" then
 				width = "u64"
 			end
+			
+			local prefix = cpu:sub(1,1)
+			if prefix == ":" then
+				cpu = cpu:sub(2,cpu:len())
+			end
+			
 			local cpuname = cpu:gsub(":", "_")
 			if space == "m" then
 				regions[cpuname .. space] = ":" .. cpu

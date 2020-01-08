@@ -352,7 +352,7 @@ void cgang_state::refresh_motor_output()
 		m_en_count[i] = int((m_en_pos[i] / float(CG_MOTOR_LIMIT)) * 100.0 + 0.5);
 	}
 
-	m_door_count = int((m_door_motor_pos / float(DOOR_MOTOR_LIMIT)) * 100.0 + 0.5);
+	m_door_count = (m_conf->read() & 1) ? int((m_door_motor_pos / float(DOOR_MOTOR_LIMIT)) * 100.0 + 0.5) : 0;
 }
 
 
