@@ -6,6 +6,9 @@ Mephisto Turniermaschinen (dedicated in-house chesscomputers used at tournaments
 and their limited-release home versions. These are mephisto_modular hardware
 generation, see that driver for more information.
 
+V versions were sold in limited quantities by Hobby Computer Centrale.
+T versions were the ones used in actual tournaments, some of them sold to fans.
+
 The Bavaria board does not work on these. Not only does it not have the connector
 for it, but no software 'driver' either.
 
@@ -17,6 +20,8 @@ but ROM has many differences.
 
 BTANB:
 - lyon32t8 still says "2048Kbyte" even though it uses 8MB RAM
+
+===============================================================================
 
 Hardware notes:
 

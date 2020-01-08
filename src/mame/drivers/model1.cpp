@@ -1705,8 +1705,6 @@ void model1_state::model1(machine_config &config)
 	m_tgp_copro->set_addrmap(AS_IO, &model1_state::copro_io_map);
 	m_tgp_copro->set_addrmap(mb86233_device::AS_RF, &model1_state::copro_rf_map);
 
-	MB8421(config, m_dpram, 0);
-
 	S24TILE(config, m_tiles, 0, 0x3fff).set_palette(m_palette);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1717,11 +1715,14 @@ void model1_state::model1(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 8192);
 
+	// create SEGA_MODEL1IO device *after* SCREEN device
 	model1io_device &ioboard(SEGA_MODEL1IO(config, "ioboard", 0));
 	ioboard.read_callback().set(m_dpram, FUNC(mb8421_device::left_r));
 	ioboard.write_callback().set(m_dpram, FUNC(mb8421_device::left_w));
 	ioboard.in_callback<0>().set_ioport("IN.0");
 	ioboard.in_callback<1>().set_ioport("IN.1");
+
+	MB8421(config, m_dpram, 0);
 
 	SEGAM1AUDIO(config, m_m1audio, 0);
 	m_m1audio->rxd_handler().set(m_m1uart, FUNC(i8251_device::write_rxd));

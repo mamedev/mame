@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
+<softwarelist name="mephisto_mm2" description="Mephisto MM II Modules">
+
 <!-- HG 240 module is exclusively used with MM II -->
 
-<softwarelist name="mephisto_mm2" description="Mephisto MM II Modules">
 	<software name="hg240">
 		<description>Mephisto HG 240 Opening Library</description>
 		<year>1984</year>
@@ -14,4 +15,5 @@
 			</dataarea>
 		</part>
 	</software>
+
 </softwarelist>

@@ -2548,6 +2548,7 @@ void model2o_state::model2o(machine_config &config)
 	model2_timers(config);
 	model2_screen(config);
 
+	// create SEGA_MODEL1IO device *after* SCREEN device
 	model1io_device &ioboard(SEGA_MODEL1IO(config, "ioboard", 0));
 	ioboard.set_default_bios_tag("epr14869c");
 	ioboard.read_callback().set("dpram", FUNC(mb8421_device::left_r));
@@ -2560,7 +2561,7 @@ void model2o_state::model2o(machine_config &config)
 	SEGAM1AUDIO(config, m_m1audio, 0);
 	m_m1audio->rxd_handler().set(m_uart, FUNC(i8251_device::write_rxd));
 
-	I8251(config, m_uart, 8000000);  // uPD71051C, clock unknown
+	I8251(config, m_uart, 8000000); // uPD71051C, clock unknown
 	m_uart->txd_handler().set(m_m1audio, FUNC(segam1audio_device::write_txd));
 
 	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
