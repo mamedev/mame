@@ -5672,8 +5672,14 @@ This cart features a RTC, currently unemulated
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NKIE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-02A-01" />
+			<feature name="u1" value="U1 [NUS-NKIE-0 02]" />
+			<feature name="u2" value="U2 [NUS-NKIE-0 12]" />
+			<feature name="u3" value="U3 [BU9850]" />
+			<feature name="u4" value="U4 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="killer instinct gold (usa).bin" size="12582912" crc="b279e4b2" sha1="75e148b5f290b08f7e0a661ee485fb5a79f4a54a" offset="000000" />
+				<rom name="nus-nkie-0 02.u1" size="8388608" crc="3c6869da" sha1="c7b749502dd5db65d09febcc64a6efe96a348356" offset="000000" />
+				<rom name="nus-nkie-0 12.u2" size="4194304" crc="993640cb" sha1="58dd8ea2b34ddd6af8a8a5590cab291dedb7b8a1" offset="0x800000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7254,16 +7260,16 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 	</software>
 
 	<software name="mktrilgyu1" cloneof="mktrilgy">
-		<description>Mortal Kombat Trilogy (USA, Rev. A)</description>
+		<description>Mortal Kombat Trilogy (USA, rev 1)</description>
 		<year>1996</year>
 		<publisher>Midway</publisher>
 		<info name="serial" value="NUS-NMKE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-02A-01" />
-			<feature name="u1" value="NUS-NMKE-1 02" />
-			<feature name="u2" value="NUS-NMKE-1 12" />
-			<feature name="u3" value="[empty]" />
-			<feature name="u4" value="CIC-NUS-6102" />
+			<feature name="u1" value="U1 [NUS-NMKE-1 02]" />
+			<feature name="u2" value="U2 [NUS-NMKE-1 12]" />
+			<feature name="u3" value="U3 [empty]" />
+			<feature name="u4" value="U4 [CIC-NUS-6102]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN" />
 			<dataarea name="rom" size="12582912">
@@ -7279,8 +7285,14 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<publisher>Midway</publisher>
 		<info name="serial" value="NUS-NMKE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-02A-01" />
+			<feature name="u1" value="U1 [NUS-NMKE-0 02]" />
+			<feature name="u2" value="U2 [NUS-NMKE-0 12]" />
+			<feature name="u3" value="U3 [empty]" />
+			<feature name="u4" value="U4 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="mortal kombat trilogy (usa).bin" size="12582912" crc="58e57c08" sha1="fc82a5bbb306c3f855974de18cf1b1bffac268ff" offset="000000" />
+				<rom name="nus-nmke-0 02.u1" size="8388608" crc="64f61706" sha1="2771d42bc093b0d30aef9b92d06ab09cfdebdea2" offset="000000" />
+				<rom name="nus-nmke-0 12.u2" size="4194304" crc="822f4ccd" sha1="ca842ce91ea9bbc8f4ee6a31bea2a99a7e633543" offset="0x800000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7511,17 +7523,35 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 	</software>
 
 	<software name="nbahangu" cloneof="nbahang">
-		<description>NBA Hangtime (USA)</description>
+		<description>NBA Hangtime (USA, set 1)</description>
 		<year>1997</year>
 		<publisher>Midway</publisher>
 		<info name="serial" value="NUS-NXGE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-01" /> <!-- Also with NUS-01A-02 -->
-			<feature name="u1" value="NUS-NXGE-0" />
-			<feature name="u2" value="[empty]" />
-			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="u1" value="U1 [NUS-NXGE-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
 				<rom name="nus-nxge-0.u1" size="12582912" crc="72e2aca9" sha1="2a1ef108f5345e6ca80d7f73f4ca4557e7843594" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nbahangu2" cloneof="nbahang">
+		<description>NBA Hangtime (USA, set 2)</description>
+		<year>1997</year>
+		<publisher>Midway</publisher>
+		<info name="serial" value="NUS-NXGE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-02A-01" />
+			<feature name="u1" value="U1 [NUS-NXGE-0 02]" />
+			<feature name="u2" value="U2 [NUS-NXGE-0 12]" />
+			<feature name="u3" value="U3 [empty]" />
+			<feature name="u4" value="U4 [CIC-NUS-6102]" />
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-nxge-0 02.u1" size="8388608" crc="61a09164" sha1="771911da1aa2aabbf87b2a15ed14fa7909b0c593" offset="000000" />
+				<rom name="nus-nxge-0 12.u2" size="4194304" crc="6be5f4f3" sha1="9b909c40b72c519442f4c52f632f1b9fe0c8fe60" offset="0x800000" />
 			</dataarea>
 		</part>
 	</software>
