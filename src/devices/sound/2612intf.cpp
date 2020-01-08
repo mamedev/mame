@@ -2,9 +2,9 @@
 // copyright-holders:Ernesto Corvi
 /***************************************************************************
 
-  2612intf.cpp
+  2612intf.c
 
-  The YM2612 emulator supports up to 3 chips.
+  The YM2612 emulator supports up to 2 chips.
   Each chip has the following connections:
   - Status Read / Control Write A
   - Port Read / Data Write A
@@ -59,23 +59,9 @@ void ym2612_device::timer_handler(int c,int count,int clock)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-// YM2612, YM3438 has internal 9-bit DAC
 void ym2612_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	ym2612_update_one(m_chip, outputs, samples);
-	// Clamp into 9-bit, TODO : Mega Drive/Genesis 'Ladder' effect?
-	for (int s = 0; s < samples; s++)
-	{
-		outputs[0][s] &= 0xff80;
-		outputs[1][s] &= 0xff80;
-	}
-}
-
-// YMF276 needs external DAC
-void ymf276_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	ym2612_update_one(m_chip, outputs, samples);
-	// 16 bit output?
 }
 
 
@@ -165,9 +151,9 @@ ym2612_device::ym2612_device(const machine_config &mconfig, const char *tag, dev
 ym2612_device::ym2612_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, m_chip(nullptr)
 	, m_stream(nullptr)
 	, m_timer{ nullptr, nullptr }
+	, m_chip(nullptr)
 	, m_irq_handler(*this)
 {
 }
@@ -177,13 +163,5 @@ DEFINE_DEVICE_TYPE(YM3438, ym3438_device, "ym3438", "YM3438 OPN2C")
 
 ym3438_device::ym3438_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ym2612_device(mconfig, YM3438, tag, owner, clock)
-{
-}
-
-
-DEFINE_DEVICE_TYPE(YMF276, ymf276_device, "ymf276", "YMF276 OPN2L")
-
-ymf276_device::ymf276_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ym2612_device(mconfig, YMF276, tag, owner, clock)
 {
 }
