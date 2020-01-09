@@ -212,7 +212,8 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7819_w) { LOGMASKED(LOG_GCM39
 
 // ****************************************  78xx region stubs *************************************************
 
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7868_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7868_r\n", machine().describe_context()); return 0x0000; }
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7868_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7868_r\n", machine().describe_context()); return machine().rand(); }
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7869_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7869_r\n", machine().describe_context()); return machine().rand(); }
 
 READ16_MEMBER(sunplus_gcm394_base_device::unkarea_782d_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_782d_r\n", machine().describe_context()); return m_782d; }
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_782d_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_782d_w %04x\n", machine().describe_context(), data); m_782d = data; }
@@ -414,6 +415,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7935_w)
 	//checkirq6();
 }
 
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7944_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7944_r\n", machine().describe_context()); return machine().rand(); }
 READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7945_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7945_r\n", machine().describe_context()); return machine().rand(); }
 
 
@@ -584,7 +586,7 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	map(0x007863, 0x007863).rw(FUNC(sunplus_gcm394_base_device::unkarea_7863_r), FUNC(sunplus_gcm394_base_device::unkarea_7863_w)); // 	7863  I/O PortA Attribute Register
 
 	map(0x007868, 0x007868).r(FUNC(sunplus_gcm394_base_device::unkarea_7868_r)); // on startup   // 7868  I/O PortB Data Register
-	// 7869  I/O PortB Buffer Register
+	map(0x007869, 0x007869).r(FUNC(sunplus_gcm394_base_device::unkarea_7869_r)); //  7869  I/O PortB Buffer Register   // jak_s500
 	// 786a  I/O PortB Direction Register
 	// 786b  I/O PortB Attribute Register
 	// 786a  I/O PortB Direction Register
@@ -657,6 +659,7 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	map(0x007935, 0x007935).rw(FUNC(sunplus_gcm394_base_device::unkarea_7935_r), FUNC(sunplus_gcm394_base_device::unkarea_7935_w));
 	map(0x007936, 0x007936).rw(FUNC(sunplus_gcm394_base_device::unkarea_7936_r), FUNC(sunplus_gcm394_base_device::unkarea_7936_w));
 
+	map(0x007944, 0x007944).r(FUNC(sunplus_gcm394_base_device::unkarea_7945_r)); // jak_s500
 	map(0x007945, 0x007945).r(FUNC(sunplus_gcm394_base_device::unkarea_7945_r)); // jak_s500
 
 	// possible adc?
