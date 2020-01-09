@@ -384,7 +384,7 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 
 		if (nbits < nc_bpp)
 		{
-			uint16_t b = m_space_read_cb((m++)&0xfffffff);
+			uint16_t b = m_space_read_cb((m++)&0x7ffffff); // smartfp suggests either 0x7ffffff mask, or some bits are being set incorrectly, jak_s500 needs over 0x3ffffff at least
 			b = (b << 8) | (b >> 8);
 			bits |= b << (nc_bpp - nbits);
 			nbits += 16;

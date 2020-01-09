@@ -2317,8 +2317,8 @@ static INPUT_PORTS_START( sentx6p )
 
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( telestory )
-	PORT_START("P1")
+static INPUT_PORTS_START( telestory ) // there is a hidden test mode, if you return rand() on this port you get it, TODO: figure out button combination
+	PORT_START("P1") // I/O test also lists 'Headphone 1' but it isn't mapped to any of these ports?
 	PORT_DIPNAME( 0x0001, 0x0001, "Port 1" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -2334,27 +2334,24 @@ static INPUT_PORTS_START( telestory )
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Pause / Menu")
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Pause / Menu")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Read To Me")
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Red / Triangle")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Blue / Square")
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Yellow / Star")
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Green / Circle")
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Next Page")
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Red / Triangle")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Blue / Square")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Yellow / Star")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Green / Circle")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Right Arrow / Next Page") // Test mode calls this Right Arrow / LED (so probalby LED output too)
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) ) // port changes on these bits advance the word in manual mode (scroll wheel)
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )  // port changes on these bits advance the word in manual mode (scroll wheel)
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Left Arrow / Previous Page")
+
 
 	PORT_START("P2")
 	PORT_DIPNAME( 0x0001, 0x0001, "Port 2" )
@@ -2907,33 +2904,43 @@ void icanpian_state::icanpian(machine_config &config)
 READ16_MEMBER(telestory_state::porta_r)
 {
 	uint16_t data = m_io_p1->read();
-	//logerror("Port B Read: %04x\n", data);
+	//logerror("%s: porta_r: %04x\n", machine().describe_context(), data);
 	return data;
-}
-
-READ16_MEMBER(telestory_state::portb_r)
-{
-	uint16_t data = m_io_p2->read();
-	//logerror("Port B Read: %04x\n", data);
-	return data;
-}
-
-READ16_MEMBER(telestory_state::portc_r)
-{
-	//logerror("%s: portc_r\n", machine().describe_context());
-	return machine().rand() & 0x0c00;
 }
 
 WRITE16_MEMBER(telestory_state::porta_w)
 {
-	//logerror("%s: porta_w (%04x)\n", machine().describe_context(), data);
+	/*
+	not used as an output very often
+
+	':maincpu' (0145D5): porta_w (0000)
+	':maincpu' (0145DC): porta_w (0000)
+	':maincpu' (0145F4): porta_w (0000)
+	':maincpu' (0145F4): porta_w (6000)
+	*/
+	logerror("%s: porta_w (%04x)\n", machine().describe_context(), data);
+}
+
+READ16_MEMBER(telestory_state::portb_r)
+{
+	// not used?
+	uint16_t data = m_io_p2->read();
+	logerror("%s: portb_r %04x\n", machine().describe_context(), data);
+	return data;
 }
 
 WRITE16_MEMBER(telestory_state::portb_w)
 {
-	//logerror("%s: portb_w (%04x)\n", machine().describe_context(), data);
+	// not used?
+	logerror("%s: portb_w (%04x)\n", machine().describe_context(), data);
 }
 
+// What is here? accessed using serial protocol with clocked bits
+READ16_MEMBER(telestory_state::portc_r)
+{
+	//logerror("%s: portc_r\n", machine().describe_context());
+	return machine().rand() & 0x0c00; // bits need to change state or it doesn't boot
+}
 
 WRITE16_MEMBER(telestory_state::portc_w)
 {
@@ -4214,6 +4221,15 @@ CONS( 2006, icanpian,  0,        0, icanpian, icanpian,   icanpian_state, empty_
 CONS( 2005, tvgogo,  0,        0, tvgogo, tvgogo,   tvgogo_state, empty_init, "Toyquest", "GoGo TV Video Vision",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // or TV Go Go - the game addons call it the 'Video Vision console'
 
 // JAKKS Pacific / Toymax
+
+/* Sound data for the narrator is written to the SIO data port 
+   013127: D319 3D54 [3d54] = r1   (Cinderella)  - 4-bit data?
+   The hidden test mode calls the speech test 'CELP' (possibly "Code-excited linear prediction" based?)
+   https://en.wikipedia.org/wiki/Code-excited_linear_prediction
+   
+   TODO: check if it's a common implementation eg.  Speex
+   SIO port is not currently implemented in spg2xx_io.cpp however
+*/
 CONS( 2006, telestry,  0,        0, telestory, telestory,   telestory_state, empty_init, "JAKKS Pacific Inc / Toymax", "Telestory",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 
