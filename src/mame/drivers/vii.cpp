@@ -2334,7 +2334,7 @@ static INPUT_PORTS_START( telestory )
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Pause / Menu")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Pause / Menu")
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -2346,15 +2346,14 @@ static INPUT_PORTS_START( telestory )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Yellow / Star")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Green / Circle")
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Next Page")
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) ) // port changes on these bits advance the word in manual mode (scroll wheel)
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )  // port changes on these bits advance the word in manual mode (scroll wheel)
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Previous Page")
+
 
 	PORT_START("P2")
 	PORT_DIPNAME( 0x0001, 0x0001, "Port 2" )
@@ -2907,33 +2906,43 @@ void icanpian_state::icanpian(machine_config &config)
 READ16_MEMBER(telestory_state::porta_r)
 {
 	uint16_t data = m_io_p1->read();
-	//logerror("Port B Read: %04x\n", data);
+	//logerror("%s: porta_r: %04x\n", machine().describe_context(), data);
 	return data;
+}
+
+WRITE16_MEMBER(telestory_state::porta_w)
+{
+	/*
+	not used as an output very often
+
+	':maincpu' (0145D5): porta_w (0000)
+	':maincpu' (0145DC): porta_w (0000)
+	':maincpu' (0145F4): porta_w (0000)
+	':maincpu' (0145F4): porta_w (6000)
+	*/
+	logerror("%s: porta_w (%04x)\n", machine().describe_context(), data);
 }
 
 READ16_MEMBER(telestory_state::portb_r)
 {
+	// not used?
 	uint16_t data = m_io_p2->read();
-	//logerror("Port B Read: %04x\n", data);
+	logerror("%s: portb_r %04x\n", machine().describe_context(), data);
 	return data;
 }
 
+WRITE16_MEMBER(telestory_state::portb_w)
+{
+	// not used?
+	logerror("%s: portb_w (%04x)\n", machine().describe_context(), data);
+}
+
+/* is port C some kind of Audio DAC for the narrator? */
 READ16_MEMBER(telestory_state::portc_r)
 {
 	//logerror("%s: portc_r\n", machine().describe_context());
 	return machine().rand() & 0x0c00;
 }
-
-WRITE16_MEMBER(telestory_state::porta_w)
-{
-	//logerror("%s: porta_w (%04x)\n", machine().describe_context(), data);
-}
-
-WRITE16_MEMBER(telestory_state::portb_w)
-{
-	//logerror("%s: portb_w (%04x)\n", machine().describe_context(), data);
-}
-
 
 WRITE16_MEMBER(telestory_state::portc_w)
 {
