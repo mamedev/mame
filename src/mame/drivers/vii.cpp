@@ -2317,8 +2317,8 @@ static INPUT_PORTS_START( sentx6p )
 
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( telestory )
-	PORT_START("P1")
+static INPUT_PORTS_START( telestory ) // there is a hidden test mode, if you return rand() on this port you get it, TODO: figure out button combination
+	PORT_START("P1") // I/O test also lists 'Headphone 1' but it isn't mapped to any of these ports?
 	PORT_DIPNAME( 0x0001, 0x0001, "Port 1" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -2334,25 +2334,23 @@ static INPUT_PORTS_START( telestory )
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Pause / Menu")
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Pause / Menu")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Read To Me")
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Red / Triangle")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Blue / Square")
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Yellow / Star")
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Green / Circle")
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Next Page")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Red / Triangle")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Blue / Square")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Yellow / Star")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Green / Circle")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Right Arrow / Next Page") // Test mode calls this Right Arrow / LED (so probalby LED output too)
 	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) ) // port changes on these bits advance the word in manual mode (scroll wheel)
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )  // port changes on these bits advance the word in manual mode (scroll wheel)
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Previous Page")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Left Arrow / Previous Page")
 
 
 	PORT_START("P2")
@@ -2942,6 +2940,8 @@ WRITE16_MEMBER(telestory_state::portb_w)
    - unlikely, looks more like the sound data for the narrator is written to the SIO data port 
 	  013127: D319 3D54 [3d54] = r1   (Cinderella)
 	 4-bit data?
+
+	 the hidden test mode calls the speech test 'CELP' (possibly Code-excited linear prediction based?)
 
  */
 READ16_MEMBER(telestory_state::portc_r)
