@@ -34,7 +34,7 @@ generalplus_gpac800_device::generalplus_gpac800_device(const machine_config &mco
 }
 
 
-DEFINE_DEVICE_TYPE(GP_SPISPI, generalplus_gpspispi_device, "gpac800", "GeneralPlus unSP20 SPI-based SoC")
+DEFINE_DEVICE_TYPE(GP_SPISPI, generalplus_gpspispi_device, "gpac800spi", "GeneralPlus unSP20 SPI-based SoC")
 
 generalplus_gpspispi_device::generalplus_gpspispi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	sunplus_gcm394_base_device(mconfig, GP_SPISPI, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpspispi_device::gpspispi_internal_map), this))
