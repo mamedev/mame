@@ -520,9 +520,9 @@ INPUT_PORTS_END
 
 void mephisto_montec_state::montec(machine_config &config)
 {
-	M65C02(config, m_maincpu, XTAL(4'000'000));
+	M65C02(config, m_maincpu, XTAL(8'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_montec_state::montec_mem);
-	m_maincpu->set_periodic_int(FUNC(mephisto_montec_state::nmi_line_assert), attotime::from_hz(XTAL(4'000'000) / (1 << 13)));
+	m_maincpu->set_periodic_int(FUNC(mephisto_montec_state::nmi_line_assert), attotime::from_hz(XTAL(8'000'000) / (1 << 14)));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
