@@ -2935,19 +2935,11 @@ WRITE16_MEMBER(telestory_state::portb_w)
 	logerror("%s: portb_w (%04x)\n", machine().describe_context(), data);
 }
 
-/* is port C some kind of Audio DAC for the narrator?
- 
-   - unlikely, looks more like the sound data for the narrator is written to the SIO data port 
-	  013127: D319 3D54 [3d54] = r1   (Cinderella)
-	 4-bit data?
-
-	 the hidden test mode calls the speech test 'CELP' (possibly Code-excited linear prediction based?)
-
- */
+// What is here? accessed using serial protocol with clocked bits
 READ16_MEMBER(telestory_state::portc_r)
 {
 	//logerror("%s: portc_r\n", machine().describe_context());
-	return machine().rand() & 0x0c00;
+	return machine().rand() & 0x0c00; // bits need to change state or it doesn't boot
 }
 
 WRITE16_MEMBER(telestory_state::portc_w)
@@ -4229,6 +4221,15 @@ CONS( 2006, icanpian,  0,        0, icanpian, icanpian,   icanpian_state, empty_
 CONS( 2005, tvgogo,  0,        0, tvgogo, tvgogo,   tvgogo_state, empty_init, "Toyquest", "GoGo TV Video Vision",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // or TV Go Go - the game addons call it the 'Video Vision console'
 
 // JAKKS Pacific / Toymax
+
+/* Sound data for the narrator is written to the SIO data port 
+   013127: D319 3D54 [3d54] = r1   (Cinderella)  - 4-bit data?
+   The hidden test mode calls the speech test 'CELP' (possibly "Code-excited linear prediction" based?)
+   https://en.wikipedia.org/wiki/Code-excited_linear_prediction
+   
+   TODO: check if it's a common implementation eg.  Speex
+   SIO port is not currently implemented in spg2xx_io.cpp however
+*/
 CONS( 2006, telestry,  0,        0, telestory, telestory,   telestory_state, empty_init, "JAKKS Pacific Inc / Toymax", "Telestory",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 
