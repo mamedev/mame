@@ -1015,7 +1015,7 @@ void md_base_state::md2_pal(machine_config &config)
 	md_pal(config);
 
 	// Internalized YM3438 in VDP ASIC
-	YM3438(config.replace(), m_ymsnd, MASTER_CLOCK_NTSC/7); /* 7.67 MHz */
+	YM3438(config.replace(), m_ymsnd, MASTER_CLOCK_PAL / 7); /* 7.67 MHz */
 	m_ymsnd->add_route(0, "lspeaker", 0.50);
 	m_ymsnd->add_route(1, "rspeaker", 0.50);
 }
