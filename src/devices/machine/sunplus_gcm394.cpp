@@ -1035,11 +1035,19 @@ void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
 	map(0x200000, 0x3fffff).rw(FUNC(generalplus_gpac800_device::cs_bank_space_r), FUNC(generalplus_gpac800_device::cs_bank_space_w));
 }
 
+
+READ16_MEMBER(generalplus_gpspispi_device::spi_unk_7943_r)
+{
+	return 0x0007;
+}
+
 void generalplus_gpspispi_device::gpspispi_internal_map(address_map& map)
 {
 	sunplus_gcm394_base_device::base_internal_map(map);
 
-	map(0x08000, 0x0ffff).rom().region("internal", 0); 
+	map(0x007943, 0x007943).r(FUNC(generalplus_gpspispi_device::spi_unk_7943_r));
+
+	map(0x008000, 0x00ffff).rom().region("internal", 0); 
 }
 
 

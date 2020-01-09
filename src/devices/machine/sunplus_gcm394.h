@@ -395,7 +395,7 @@ protected:
 	//virtual void device_reset() override;
 
 private:
-
+	DECLARE_READ16_MEMBER(spi_unk_7943_r);
 };
 
 

@@ -7,13 +7,13 @@
 
 	note, these SoC types always have a 128Kwords internal ROM, which the JAKKS games appear to use for basic bootstrap purposes.
 
-    GPL600 (GCM394)
+    GPAC800 / GCM394 (SpongeBob Bikini Bottom 500 Test Mode also calls this GPAC800, even if the mappings appear different to the NAND version below - different CS base, maybe just depends on boot mode?)
         Smart Fit Park
         SpongeBob SquarePants Bikini Bottom 500
         Spiderman - The Masked Menace 'Spider Sense' (pad type with Spiderman model)
         (Wireless Hunting? - maybe, register map looks the same even if it sets stack to 2fff not 6fff)
 
-    GPL800 (== GPL600 with NAND support + maybe more)
+    GPAC800 (with NAND support)
         Wireless Air 60
         Golden Tee Golf
         Cars 2
@@ -21,14 +21,14 @@
         V.Baby
         Playskool Heroes Transformers Rescue Bots Beam Box
 
-    GPL500 (unknown, might be GPL600 but without the higher resolution support?)
+    GPAC500 (based on test modes, unknown hardware, might be GPAC800 but without the higher resolution support?)
         The Price is Right
-        Bejeweled? (might be GPL600)
+        Bejeweled? (might be GPAC800)
 
     Notes
         smartfp: hold button Circle, Star and Home on startup for Test Menu
 
-    these are both unsp 2.0 type, as they use the extended ocpodes
+    these are all unsp 2.0 type, as they use the extended ocpodes
 
 
 	NAND types:
@@ -45,6 +45,8 @@
 #include "emu.h"
 
 #include "machine/sunplus_gcm394.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -293,6 +295,25 @@ protected:
 private:
 };
 
+
+
+class generalplus_gpspispi_bkrankp_game_state : public generalplus_gpspispi_game_state
+{
+public:
+	generalplus_gpspispi_bkrankp_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		generalplus_gpspispi_game_state(mconfig, type, tag),
+		m_cart(*this, "cartslot")
+	{
+	}
+
+	void generalplus_gpspispi_bkrankp(machine_config &config);
+
+protected:
+	required_device<generic_slot_device> m_cart;
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+
+private:
+};
 
 
 
@@ -657,8 +678,33 @@ void generalplus_gpspispi_game_state::generalplus_gpspispi(machine_config &confi
 	SPEAKER(config, "rspeaker").front_right();
 }
 
+DEVICE_IMAGE_LOAD_MEMBER(generalplus_gpspispi_bkrankp_game_state::cart_load)
+{
+	uint32_t size = m_cart->common_get_size("rom");
+
+	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
+void generalplus_gpspispi_bkrankp_game_state::generalplus_gpspispi_bkrankp(machine_config &config)
+{
+	generalplus_gpspispi_game_state::generalplus_gpspispi(config);	
+
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "bkrankp_cart");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_device_load(FUNC(generalplus_gpspispi_bkrankp_game_state::cart_load));
+
+	SOFTWARE_LIST(config, "cart_list").set_original("bkrankp_cart");
+}
 
 static INPUT_PORTS_START( gcm394 )
+	PORT_START("P1")
+	PORT_START("P2")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( smartfp )
 	PORT_START("P1")
 	// entirely non-standard mat based controller (0-11 are where your feet are placed normally, row of selection places to step above those)
 	// no sensible default mapping unless forced
@@ -1194,7 +1240,7 @@ ROM_START( beambox )
 ROM_END
 
 // the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
-CONS(2009, smartfp, 0, 0, base, gcm394, gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, smartfp, 0, 0, base, smartfp, gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // Fun 2 Learn 3-in-1 SMART SPORTS  ?
 CONS(2009, jak_s500, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "SpongeBob SquarePants Bikini Bottom 500 (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
@@ -1426,4 +1472,4 @@ void generalplus_gpspispi_game_state::init_spi()
 }
 
 
-CONS(200?, bkrankp, 0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(200?, bkrankp, 0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state	, init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

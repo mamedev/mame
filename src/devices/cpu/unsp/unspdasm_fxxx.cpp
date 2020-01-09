@@ -83,9 +83,9 @@ offs_t unsp_disassembler::disassemble_fxxx_001_group(std::ostream& stream, offs_
 		uint8_t d =      (op & 0x0400) >> 10;
 
 		if (d)
-			util::stream_format(stream, "%s ds:[$04x],%d", bitops[bitop], offset);
+			util::stream_format(stream, "%s ds:[%04x],%d", bitops[bitop], ximm, offset);
 		else
-			util::stream_format(stream, "%s [$04x],%d", bitops[bitop], offset);
+			util::stream_format(stream, "%s [%04x],%d", bitops[bitop], ximm, offset);
 
 		return UNSP_DASM_OK;
 	}
