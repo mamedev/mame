@@ -15,7 +15,20 @@ public:
 		RX01_R0, RX01_R1, RX01_R2, RX01_R3, RX01_R4, RX01_R5, RX01_R6, RX01_R7,
 		RX01_R8, RX01_R9, RX01_R10, RX01_R11, RX01_R12, RX01_R13, RX01_R14, RX01_R15,
 		RX01_BAR,
-		RX01_CRC
+		RX01_CRC,
+		RX01_UNIT, RX01_LDHD
+	};
+
+	enum : u16 {
+		FF_IOB0 = 1 << 0,
+		FF_IOB1 = 1 << 1,
+		FF_IOB2 = 1 << 2,
+		FF_IOB3 = 1 << 3,
+		FF_IOB4 = 1 << 4,
+		FF_IOB5 = 1 << 5,
+		FF_IOB6 = 1 << 6,
+		FF_WRTBUF = 1 << 7,
+		FF_FLAG = 1 << 8
 	};
 
 	// device type constructor
@@ -48,6 +61,7 @@ private:
 	bool sep_data();
 	bool test_condition();
 	void shift_crc(bool data);
+	void set_flag(bool j, bool k);
 
 	// address spaces
 	address_space_config m_inst_config;
@@ -67,7 +81,9 @@ private:
 	u8 m_spar;
 	u16 m_bar;
 	u16 m_crc;
-	bool m_flag;
+	u16 m_flags;
+	bool m_unit;
+	bool m_load_head;
 	s32 m_icount;
 };
 

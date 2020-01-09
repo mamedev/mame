@@ -51,7 +51,9 @@ rx01_cpu_device::rx01_cpu_device(const machine_config &mconfig, const char *tag,
 	, m_spar(0)
 	, m_bar(0)
 	, m_crc(0)
-	, m_flag(false)
+	, m_flags(0)
+	, m_unit(false)
+	, m_load_head(false)
 	, m_icount(0)
 {
 	m_inst_config.m_is_octal = true;
@@ -87,6 +89,7 @@ void rx01_cpu_device::device_start()
 	state_add(RX01_PC, "PC", m_pc).mask(07777).formatstr("%04O");
 	state_add(STATE_GENPC, "GENPC", m_pc).mask(07777).formatstr("%04O").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).mask(07777).formatstr("%04O").noshow();
+	state_add(STATE_GENFLAGS, "FLAGS", m_flags).formatstr("%12s").noshow();
 	state_add(RX01_CNTR, "CNTR", m_cntr).formatstr("%03O");
 	state_add(RX01_SR, "SR", m_sr).formatstr("%03O");
 	state_add(RX01_SPAR, "SPAR", m_spar).mask(15).formatstr("%3s");
@@ -95,6 +98,8 @@ void rx01_cpu_device::device_start()
 		state_add(RX01_R0 + r, string_format("R%d", r).c_str(), sp[r]).formatstr("%03O");
 	state_add(RX01_BAR, "BAR", m_bar).mask(07777).formatstr("%04O");
 	state_add(RX01_CRC, "CRC", m_crc).formatstr("%06O");
+	state_add(RX01_UNIT, "UNIT", m_unit);
+	state_add(RX01_LDHD, "LDHD", m_load_head);
 
 	// Save state registration
 	save_item(NAME(m_pc));
@@ -108,7 +113,9 @@ void rx01_cpu_device::device_start()
 	save_item(NAME(m_spar));
 	save_item(NAME(m_bar));
 	save_item(NAME(m_crc));
-	save_item(NAME(m_flag));
+	save_item(NAME(m_flags));
+	save_item(NAME(m_unit));
+	save_item(NAME(m_load_head));
 }
 
 void rx01_cpu_device::device_reset()
@@ -122,7 +129,9 @@ void rx01_cpu_device::device_reset()
 	m_cntr = 0;
 	m_sr = 0;
 	m_spar = 0;
-	m_flag = false;
+	m_flags = 0;
+	m_unit = false;
+	m_load_head = false;
 }
 
 u8 rx01_cpu_device::mux_out()
@@ -143,23 +152,37 @@ bool rx01_cpu_device::test_condition()
 {
 	switch (m_mb & 074)
 	{
+	case 000:
+		// Interface transfer request or command pending (TODO)
+		return false;
+
+	case 004:
+		// Output buffer bit 3
+		return (m_flags & FF_IOB3) != 0;
+
 	case 020:
+		// MSB of shift register
 		return BIT(m_sr, 7);
 
 	case 024:
+		// Counter overflow
 		return m_cntr == 0377;
 
 	case 030:
+		// 16th stage of CRC generator
 		return BIT(m_crc, 0);
 
 	case 054:
+		// Separated data equals MSB of shift register
 		return BIT(m_sr, 7) == sep_data();
 
 	case 060:
+		// Sector buffer address overflow
 		return m_bar == 07777;
 
 	case 074:
-		return m_flag;
+		// Flag state equals one
+		return (m_flags & FF_FLAG) != 0;
 
 	default:
 		LOG("%04o: Unhandled branch condition %d\n", m_ppc, (m_mb & 074) >> 2);
@@ -174,6 +197,14 @@ void rx01_cpu_device::shift_crc(bool data)
 		m_crc = (m_crc >> 1) ^ 0002010;
 	else
 		m_crc = (m_crc >> 1) | 0100000;
+}
+
+void rx01_cpu_device::set_flag(bool j, bool k)
+{
+	if (j && !(m_flags & FF_FLAG))
+		m_flags |= FF_FLAG;
+	else if (k && (m_flags & FF_FLAG))
+		m_flags &= ~FF_FLAG;
 }
 
 void rx01_cpu_device::execute_run()
@@ -224,11 +255,75 @@ void rx01_cpu_device::execute_run()
 			}
 			else switch (m_mb & 074)
 			{
+			case 000:
+				if (BIT(m_mb, 1))
+					m_flags |= FF_IOB0;
+				else
+					m_flags &= ~FF_IOB0;
+				break;
+
+			case 004:
+				if (BIT(m_mb, 1))
+					m_flags |= FF_IOB1;
+				else
+					m_flags &= ~FF_IOB1;
+				break;
+
+			case 010:
+				if (BIT(m_mb, 1))
+					m_flags |= FF_IOB2;
+				else
+					m_flags &= ~FF_IOB2;
+				break;
+
+			case 014:
+				if (BIT(m_mb, 1))
+					m_flags |= FF_IOB3;
+				else
+					m_flags &= ~FF_IOB3;
+				break;
+
+			case 020:
+				if (BIT(m_mb, 1))
+					m_flags |= FF_IOB4;
+				else
+					m_flags &= ~FF_IOB4;
+				break;
+
+			case 024:
+				if (BIT(m_mb, 1))
+					m_flags |= FF_IOB5;
+				else
+					m_flags &= ~FF_IOB5;
+				break;
+
+			case 030:
+				if (BIT(m_mb, 1))
+					m_flags |= FF_IOB6;
+				else
+					m_flags &= ~FF_IOB6;
+				break;
+
+			case 034:
+				m_unit = BIT(m_mb, 1);
+				break;
+
+			case 040:
+				m_load_head = BIT(m_mb, 1);
+				break;
+
 			case 044:
 				if (BIT(m_mb, 1))
 					m_bar = (m_bar + 1) & 07777;
 				else
 					m_bar = BIT(m_mb, 0) ? 0 : 06000;
+				break;
+
+			case 050:
+				if (BIT(m_mb, 0))
+					m_flags |= FF_WRTBUF;
+				else
+					m_flags &= ~FF_WRTBUF;
 				break;
 
 			case 054:
@@ -241,7 +336,7 @@ void rx01_cpu_device::execute_run()
 				break;
 
 			case 060:
-				m_flag = (!BIT(m_mb, 0) && m_flag) || (BIT(m_mb, 1) && !m_flag);
+				set_flag(BIT(m_mb, 1), BIT(m_mb, 0));
 				break;
 
 			case 064:
@@ -264,10 +359,6 @@ void rx01_cpu_device::execute_run()
 				else
 					m_sr = (m_sr << 1) | BIT(m_mb, 1);
 				break;
-
-			default:
-				LOG("%04o: Unimplemented instruction %03o\n", m_ppc, m_mb);
-				break;
 			}
 		}
 
@@ -279,6 +370,28 @@ void rx01_cpu_device::state_string_export(const device_state_entry &entry, std::
 {
 	switch (entry.index())
 	{
+	case STATE_GENFLAGS:
+		if (m_flags & FF_IOB0)
+			str = string_format("D%c%c%c%c%c%c %4s",
+								(m_flags & FF_WRTBUF) ? 'B' : ':',
+								(m_flags & FF_IOB1) ? 'W' : '.',
+								(m_flags & FF_IOB2) ? 'S' : '.',
+								(m_flags & FF_IOB3) ? 'H' : '.',
+								(m_flags & FF_IOB4) ? 'E' : '.',
+								(m_flags & FF_IOB5) ? 'T' : '.',
+								(m_flags & FF_FLAG) ? ((m_flags & FF_IOB1) ? "DATA" : "FLAG") : "");
+		else
+			str = string_format("I%c%c%c%c%c%c %s %c",
+								(m_flags & FF_WRTBUF) ? 'B' : ':',
+								(m_flags & FF_IOB1) ? 'E' : '.',
+								(m_flags & FF_IOB2) ? 'R' : '.',
+								(m_flags & FF_IOB3) ? 'O' : '.',
+								(m_flags & FF_IOB4) ? 'D' : '.',
+								(m_flags & FF_IOB5) ? 'S' : '.',
+								(m_flags & FF_IOB6) ? "SB" : "SR",
+								(m_flags & FF_FLAG) ? 'F' : ' ');
+		break;
+
 	case RX01_SPAR:
 		str = string_format("R%-2d", m_spar);
 		break;

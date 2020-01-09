@@ -21,7 +21,7 @@ const char *const rx01_disassembler::s_0_or_1[2] = {
 
 const char *const rx01_disassembler::s_conditions[16] = {
 	"RUN",
-	"IOB3DT",
+	"IOB3OT",
 	"DATAIN",
 	"INDX",
 	"SR7",
