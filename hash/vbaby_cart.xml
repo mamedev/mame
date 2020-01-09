@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="vbaby_cart" description="VTech V.Baby cartridges">
+	<!-- note these are NAND parts.
+	     the dump doesn't contain GPNANDNAND strings so probably not booted from? -->
+
+	<software name="eljardin" supported="no"> 
+		<description>El Jardin</description>
+		<year>200?</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="vbaby_cart"> <!-- dumped as hy27us08121a, ident returned C2 5A -->
+			<dataarea name="rom" size="0x4200000">
+				<rom name="vbaby_eljardin_as_hy27us08121a.bin" size="0x4200000" crc="b7c946c5" sha1="16d80c914bcc279d131336b8194adb61558b05fa" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
+
+

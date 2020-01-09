@@ -275,6 +275,24 @@ private:
 	int m_vectorbase;
 };
 
+class generalplus_gpac800_vbaby_game_state : public generalplus_gpac800_game_state
+{
+public:
+	generalplus_gpac800_vbaby_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		generalplus_gpac800_game_state(mconfig, type, tag),
+		m_cart(*this, "cartslot")
+	{
+	}
+
+	void generalplus_gpac800_vbaby(machine_config &config);
+
+protected:
+	required_device<generic_slot_device> m_cart;
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+
+private:
+};
+
 
 class generalplus_gpspispi_game_state : public gcm394_game_state
 {
@@ -591,6 +609,26 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 }
 
+DEVICE_IMAGE_LOAD_MEMBER(generalplus_gpac800_vbaby_game_state::cart_load)
+{
+	uint32_t size = m_cart->common_get_size("rom");
+
+	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
+void generalplus_gpac800_vbaby_game_state::generalplus_gpac800_vbaby(machine_config &config)
+{
+	generalplus_gpac800_game_state::generalplus_gpac800(config);
+
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vbaby_cart");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_device_load(FUNC(generalplus_gpac800_vbaby_game_state::cart_load));
+
+	SOFTWARE_LIST(config, "cart_list").set_original("vbaby_cart");
+}
 
 
 void gcm394_game_state::machine_start()
@@ -1411,8 +1449,10 @@ CONS(2010, wlsair60, 0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_ga
 CONS(200?, jak_gtg,  0, 0, generalplus_gpac800, jak_gtg,  generalplus_gpac800_game_state, nand_init210,  "JAKKS Pacific Inc", "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, jak_car2, 0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_init210,  "JAKKS Pacific Inc", "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, jak_tsm , 0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_tsm,      "JAKKS Pacific Inc", "Toy Story Mania (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, vbaby,    0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_vbaby,    "VTech", "V.Baby",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, beambox,  0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_beambox,  "Hasbro", "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+CONS(200?, vbaby,    0, 0, generalplus_gpac800_vbaby, jak_car2, generalplus_gpac800_vbaby_game_state, nand_vbaby,    "VTech", "V.Baby",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
 
 ROM_START( bkrankp )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
