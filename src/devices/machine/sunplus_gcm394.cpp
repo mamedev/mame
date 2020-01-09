@@ -33,6 +33,15 @@ generalplus_gpac800_device::generalplus_gpac800_device(const machine_config &mco
 {
 }
 
+
+DEFINE_DEVICE_TYPE(GP_SPISPI, generalplus_gpspispi_device, "gpac800", "GeneralPlus unSP20 SPI-based SoC")
+
+generalplus_gpspispi_device::generalplus_gpspispi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	sunplus_gcm394_base_device(mconfig, GP_SPISPI, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpspispi_device::gpspispi_internal_map), this))
+{
+}
+
+
 void sunplus_gcm394_base_device::default_cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4)
 {
 	logerror("callback not hooked\n");
@@ -1024,6 +1033,13 @@ void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
 	
 	map(0x030000, 0x1fffff).rw(FUNC(generalplus_gpac800_device::cs_space_r), FUNC(generalplus_gpac800_device::cs_space_w));
 	map(0x200000, 0x3fffff).rw(FUNC(generalplus_gpac800_device::cs_bank_space_r), FUNC(generalplus_gpac800_device::cs_bank_space_w));
+}
+
+void generalplus_gpspispi_device::gpspispi_internal_map(address_map& map)
+{
+	sunplus_gcm394_base_device::base_internal_map(map);
+
+	map(0x08000, 0x0ffff).rom().region("internal", 0); 
 }
 
 
