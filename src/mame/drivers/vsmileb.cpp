@@ -170,5 +170,5 @@ ROM_END
 //    year, name,    parent, compat, machine, input,   class,         init,       company, fullname,            flags
 CONS( 2005, vsmileb,   0,       0,      vsmileb, vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2005, vsmilebsw ,vsmileb, 0,      vsmilebp,vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (Sweden)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-// has the Winnie the Pooh game built in?
+// has the Winnie the Pooh game in the BIOS ROM.  This was supplied as a 'Romless cart' with the device, so probably triggers a switch, currently always banked in.
 CONS( 2005, vsmilebs,  vsmileb, 0,      vsmileb, vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (Spain, with Aventuras en el Bosque de los Cien Acres)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
