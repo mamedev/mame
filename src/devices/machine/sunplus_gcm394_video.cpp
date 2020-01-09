@@ -215,10 +215,59 @@ void gcm394_base_video_device::device_start()
 	if (memregion(":maincpu"))
 		decodegfx(":maincpu");
 
-	save_item(NAME(m_spriteextra));
-	save_item(NAME(m_spriteram));
-
 	m_space_read_cb.resolve_safe(0);
+
+
+	save_item(NAME(m_screenbuf));
+	save_item(NAME(m_rgb5_to_rgb8));
+	save_item(NAME(m_rgb555_to_rgb888));
+	save_item(NAME(m_page0_addr_lsb));
+	save_item(NAME(m_page0_addr_msb));
+	save_item(NAME(m_page1_addr_lsb));
+	save_item(NAME(m_page1_addr_msb));
+	save_item(NAME(m_707e_videodma_bank));
+	save_item(NAME(m_videodma_size));
+	save_item(NAME(m_videodma_dest));
+	save_item(NAME(m_videodma_source));
+	save_item(NAME(m_tmap0_regs));
+	save_item(NAME(m_tmap1_regs));
+	save_item(NAME(m_tmap2_regs));
+	save_item(NAME(m_tmap3_regs));
+	save_item(NAME(m_tmap0_scroll));
+	save_item(NAME(m_tmap1_scroll));
+	save_item(NAME(m_tmap2_scroll));
+	save_item(NAME(m_tmap3_scroll));
+	save_item(NAME(m_707f));
+	save_item(NAME(m_703a_palettebank));
+	save_item(NAME(m_7062));
+	save_item(NAME(m_7063));
+	save_item(NAME(m_702a));
+	save_item(NAME(m_7030_brightness));
+	save_item(NAME(m_703c));
+	save_item(NAME(m_7042_sprite));
+	save_item(NAME(m_7080));
+	save_item(NAME(m_7081));
+	save_item(NAME(m_7082));
+	save_item(NAME(m_7083));
+	save_item(NAME(m_7084));
+	save_item(NAME(m_7085));
+	save_item(NAME(m_7086));
+	save_item(NAME(m_7087));
+	save_item(NAME(m_7088));
+	save_item(NAME(m_sprite_7022_gfxbase_lsb));
+	save_item(NAME(m_sprite_702d_gfxbase_msb));
+	save_item(NAME(m_unk_vid1_gfxbase_lsb));
+	save_item(NAME(m_unk_vid1_gfxbase_msb));
+	save_item(NAME(m_unk_vid2_gfxbase_lsb));
+	save_item(NAME(m_unk_vid2_gfxbase_msb));
+	save_item(NAME(m_video_irq_status));
+	save_item(NAME(m_spriteram));
+	save_item(NAME(m_spriteextra));
+	save_item(NAME(m_paletteram));
+	save_item(NAME(m_maxgfxelement));
+	save_item(NAME(m_global_y_mask));
+	save_item(NAME(m_pal_displaybank_high));
+	save_item(NAME(m_alt_tile_addressing));
 }
 
 void gcm394_base_video_device::device_reset()
@@ -335,7 +384,7 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 
 		if (nbits < nc_bpp)
 		{
-			uint16_t b = m_space_read_cb((m++ & 0x3fffff));
+			uint16_t b = m_space_read_cb((m++)&0xfffffff);
 			b = (b << 8) | (b >> 8);
 			bits |= b << (nc_bpp - nbits);
 			nbits += 16;

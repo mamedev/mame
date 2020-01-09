@@ -31268,6 +31268,7 @@ vgpocket
 vgpmini
 sy889
 sy888b
+rfcp168
 dgun2573
 bittboy
 mc_89in1
@@ -37430,6 +37431,7 @@ srangerw                        // (c) 1988 SunA (WDK License)
 starfigh                        // (c) 1990 SunA
 
 @source:sunplus_gcm394.cpp
+jak_s500
 smartfp                         // Smart Fit Park
 wlsair60                        // Wireless Air 60
 wrlshunt                        // Wireless: Hunting Video Game System
@@ -37438,7 +37440,7 @@ jak_gtg
 jak_tsm
 vbaby
 beambox
-
+bkrankp
 
 @source:supbtime.cpp
 chinatwn                        // MAK (c) 1991 Data East Corporation (Japan)
@@ -39818,6 +39820,7 @@ pvmil                           //
 taikeegr                        //
 shredmjr                        //
 sentx6p                         //
+telestry                        //
 
 @source:vsmile.cpp
 vsmile                          //
@@ -39825,6 +39828,7 @@ vsmilem                         //
 
 @source:vsmileb.cpp
 vsmileb                         //
+vsmilebs                        //
 vsmilebsw                       //
 
 @source:vsmilepro.cpp
@@ -40986,6 +40990,7 @@ rad_madf                        //
 rad_fb                          //
 rad_socr                        //
 epo_epp                         //
+epo_eppk                        //
 epo_epp3                        //
 epo_efdx                        //
 epo_ebox                        //
@@ -41005,6 +41010,7 @@ ekara                           //
 ekaraa                          //
 ekaraj                          //
 ekarag                          //
+ekaras                          //
 ekaraphs                        //
 epitch                          //
 ekaramix                        //

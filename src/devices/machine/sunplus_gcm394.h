@@ -80,6 +80,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	virtual void device_post_load() override;
+
 	void gcm394_internal_map(address_map &map);
 	void base_internal_map(address_map &map);
 
@@ -264,6 +266,8 @@ private:
 
 	DECLARE_WRITE16_MEMBER(unkarea_78b8_w);
 
+	DECLARE_READ16_MEMBER(unkarea_78d0_r);
+
 	DECLARE_WRITE16_MEMBER(unkarea_78f0_w);
 
 	DECLARE_READ16_MEMBER(unkarea_7934_r);
@@ -274,6 +278,8 @@ private:
 
 	DECLARE_READ16_MEMBER(unkarea_7936_r);
 	DECLARE_WRITE16_MEMBER(unkarea_7936_w);
+
+	DECLARE_READ16_MEMBER(unkarea_7945_r);
 
 	DECLARE_WRITE16_MEMBER(unkarea_7960_w);
 	DECLARE_READ16_MEMBER(unkarea_7961_r);
@@ -369,8 +375,33 @@ private:
 };
 
 
+class generalplus_gpspispi_device : public sunplus_gcm394_base_device
+{
+public:
+	template <typename T>
+	generalplus_gpspispi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag) :
+		generalplus_gpspispi_device(mconfig, tag, owner, clock)
+	{
+		m_screen.set_tag(std::forward<T>(screen_tag));
+		m_csbase = 0x30000;
+	}
+
+	generalplus_gpspispi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	void gpspispi_internal_map(address_map &map);
+
+	//virtual void device_start() override;
+	//virtual void device_reset() override;
+
+private:
+	DECLARE_READ16_MEMBER(spi_unk_7943_r);
+};
+
+
 
 DECLARE_DEVICE_TYPE(GCM394, sunplus_gcm394_device)
 DECLARE_DEVICE_TYPE(GPAC800, generalplus_gpac800_device)
+DECLARE_DEVICE_TYPE(GP_SPISPI, generalplus_gpspispi_device)
 
 #endif // MAME_MACHINE_SUNPLUS_GCM394_H

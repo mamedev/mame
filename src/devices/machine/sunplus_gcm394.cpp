@@ -33,6 +33,15 @@ generalplus_gpac800_device::generalplus_gpac800_device(const machine_config &mco
 {
 }
 
+
+DEFINE_DEVICE_TYPE(GP_SPISPI, generalplus_gpspispi_device, "gpac800spi", "GeneralPlus unSP20 SPI-based SoC")
+
+generalplus_gpspispi_device::generalplus_gpspispi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	sunplus_gcm394_base_device(mconfig, GP_SPISPI, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpspispi_device::gpspispi_internal_map), this))
+{
+}
+
+
 void sunplus_gcm394_base_device::default_cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4)
 {
 	logerror("callback not hooked\n");
@@ -269,6 +278,10 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::chipselect_csx_memory_device_control_
 
 }
 
+void sunplus_gcm394_base_device::device_post_load()
+{
+	m_cs_callback(m_782x[0], m_782x[1], m_782x[2], m_782x[3], m_782x[4]);
+}
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7835_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7835_w %04x\n", machine().describe_context(), data); m_7835 = data; }
 
@@ -384,6 +397,9 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_78b2_w) { LOGMASKED(LOG_GCM39
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_78b8_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78b8_w %04x\n", machine().describe_context(), data); m_78b8 = data; }
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_78f0_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78f0_w %04x\n", machine().describe_context(), data); m_78f0 = data; }
 
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_78d0_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78d0_r\n", machine().describe_context()); return machine().rand(); }
+
+
 // **************************************** 79xx region stubs *************************************************
 
 READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7934_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7934_r\n", machine().describe_context()); return 0x0000; }
@@ -397,6 +413,9 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7935_w)
 	m_7935 &= ~data;
 	//checkirq6();
 }
+
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7945_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7945_r\n", machine().describe_context()); return machine().rand(); }
+
 
 READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7936_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7936_r\n", machine().describe_context()); return 0x0000; }
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7936_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7936_w %04x\n", machine().describe_context(), data); m_7936 = data; }
@@ -618,6 +637,9 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 
 	map(0x0078b8, 0x0078b8).w(FUNC(sunplus_gcm394_base_device::unkarea_78b8_w));  // 78b8 TimeBase Counter Reset Register  (P_TimeBase_Reset)
 
+	map(0x0078d0, 0x0078d0).r(FUNC(sunplus_gcm394_base_device::unkarea_78d0_r)); // jak_s500
+
+
 	// ######################################################################################################################################################################################
 	// 78fx - unknown
 	// ######################################################################################################################################################################################
@@ -634,6 +656,8 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	map(0x007934, 0x007934).rw(FUNC(sunplus_gcm394_base_device::unkarea_7934_r), FUNC(sunplus_gcm394_base_device::unkarea_7934_w));
 	map(0x007935, 0x007935).rw(FUNC(sunplus_gcm394_base_device::unkarea_7935_r), FUNC(sunplus_gcm394_base_device::unkarea_7935_w));
 	map(0x007936, 0x007936).rw(FUNC(sunplus_gcm394_base_device::unkarea_7936_r), FUNC(sunplus_gcm394_base_device::unkarea_7936_w));
+
+	map(0x007945, 0x007945).r(FUNC(sunplus_gcm394_base_device::unkarea_7945_r)); // jak_s500
 
 	// possible adc?
 	map(0x007960, 0x007960).w(FUNC(sunplus_gcm394_base_device::unkarea_7960_w));
@@ -666,6 +690,8 @@ void sunplus_gcm394_base_device::gcm394_internal_map(address_map& map)
 	// no internal ROM on this model?
 
 	map(0x08000, 0x0ffff).r(FUNC(sunplus_gcm394_base_device::internalrom_lower32_r)).nopw();
+	
+	map(0x10000, 0x01ffff).nopr();
 
 	map(0x020000, 0x1fffff).rw(FUNC(sunplus_gcm394_base_device::cs_space_r), FUNC(sunplus_gcm394_base_device::cs_space_w));
 	map(0x200000, 0x3fffff).rw(FUNC(sunplus_gcm394_base_device::cs_bank_space_r), FUNC(sunplus_gcm394_base_device::cs_bank_space_w));
@@ -1010,6 +1036,21 @@ void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
 }
 
 
+READ16_MEMBER(generalplus_gpspispi_device::spi_unk_7943_r)
+{
+	return 0x0007;
+}
+
+void generalplus_gpspispi_device::gpspispi_internal_map(address_map& map)
+{
+	sunplus_gcm394_base_device::base_internal_map(map);
+
+	map(0x007943, 0x007943).r(FUNC(generalplus_gpspispi_device::spi_unk_7943_r));
+
+	map(0x008000, 0x00ffff).rom().region("internal", 0); 
+}
+
+
 void sunplus_gcm394_base_device::device_start()
 {
 	unsp_20_device::device_start();
@@ -1030,6 +1071,46 @@ void sunplus_gcm394_base_device::device_start()
 
 	m_unk_timer = timer_alloc(0);
 	m_unk_timer->adjust(attotime::never);
+
+	save_item(NAME(m_dma_params));
+	save_item(NAME(m_7803));
+	save_item(NAME(m_7807));
+	save_item(NAME(m_membankswitch_7810));
+	save_item(NAME(m_7816));
+	save_item(NAME(m_7817));
+	save_item(NAME(m_7819));
+	save_item(NAME(m_782x));
+	save_item(NAME(m_782d));
+	save_item(NAME(m_7835));
+	save_item(NAME(m_7860));
+	save_item(NAME(m_7861));
+	save_item(NAME(m_7862));
+	save_item(NAME(m_7863));
+	save_item(NAME(m_7870));
+	save_item(NAME(m_7871));
+	save_item(NAME(m_7872));
+	save_item(NAME(m_7873));
+	save_item(NAME(m_7882));
+	save_item(NAME(m_7883));
+	save_item(NAME(m_78a0));
+	save_item(NAME(m_78a4));
+	save_item(NAME(m_78a5));
+	save_item(NAME(m_78a6));
+	save_item(NAME(m_78a8));
+	save_item(NAME(m_78b0));
+	save_item(NAME(m_78b1));
+	save_item(NAME(m_78b2));
+	save_item(NAME(m_78b8));
+	save_item(NAME(m_78f0));
+	save_item(NAME(m_78fb));
+	save_item(NAME(m_7934));
+	save_item(NAME(m_7935));
+	save_item(NAME(m_7936));
+	save_item(NAME(m_7960));
+	save_item(NAME(m_7961));
+	save_item(NAME(m_system_dma_memtype));
+	save_item(NAME(m_csbase));
+	save_item(NAME(m_romtype));
 }
 
 void sunplus_gcm394_base_device::device_reset()

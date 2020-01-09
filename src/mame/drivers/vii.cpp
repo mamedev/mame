@@ -169,15 +169,15 @@
 class spg2xx_game_state : public driver_device
 {
 public:
-	spg2xx_game_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_screen(*this, "screen")
-		, m_bank(*this, "cartbank")
-		, m_io_p1(*this, "P1")
-		, m_io_p2(*this, "P2")
-		, m_io_p3(*this, "P3")
-		, m_i2cmem(*this, "i2cmem")
+	spg2xx_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
+		m_bank(*this, "cartbank"),
+		m_io_p1(*this, "P1"),
+		m_io_p2(*this, "P2"),
+		m_io_p3(*this, "P3"),
+		m_i2cmem(*this, "i2cmem")
 	{ }
 
 	void spg2xx_base(machine_config &config);
@@ -431,11 +431,11 @@ private:
 class jakks_gkr_state : public spg2xx_game_state
 {
 public:
-	jakks_gkr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: spg2xx_game_state(mconfig, type, tag)
-		, m_porta_key_mode(false)
-		, m_cart(*this, "cartslot")
-		, m_cart_region(nullptr)
+	jakks_gkr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_porta_key_mode(false),
+		m_cart(*this, "cartslot"),
+		m_cart_region(nullptr)
 	{ }
 
 	void jakks_gkr(machine_config &config);
@@ -474,14 +474,14 @@ private:
 class vii_state : public spg2xx_game_state
 {
 public:
-	vii_state(const machine_config &mconfig, device_type type, const char *tag)
-		: spg2xx_game_state(mconfig, type, tag)
-		, m_cart(*this, "cartslot")
-		, m_io_motionx(*this, "MOTIONX")
-		, m_io_motiony(*this, "MOTIONY")
-		, m_io_motionz(*this, "MOTIONZ")
-		, m_cart_region(nullptr)
-		, m_ctrl_poll_timer(nullptr)
+	vii_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_cart(*this, "cartslot"),
+		m_io_motionx(*this, "MOTIONX"),
+		m_io_motiony(*this, "MOTIONY"),
+		m_io_motionz(*this, "MOTIONZ"),
+		m_cart_region(nullptr),
+		m_ctrl_poll_timer(nullptr)
 	{ }
 
 	void vii(machine_config &config);
@@ -509,15 +509,49 @@ private:
 	uint8_t m_controller_input[8];
 };
 
+class telestory_state : public spg2xx_game_state
+{
+public:
+	telestory_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_cart(*this, "cartslot"),
+		m_cart_region(nullptr)
+	{ }
+
+	void telestory(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void mem_map_4m_tsram(address_map& map);
+
+	DECLARE_READ16_MEMBER(porta_r);
+	DECLARE_WRITE16_MEMBER(porta_w);
+
+	DECLARE_READ16_MEMBER(portb_r);
+	DECLARE_WRITE16_MEMBER(portb_w);
+
+	DECLARE_READ16_MEMBER(portc_r);
+	DECLARE_WRITE16_MEMBER(portc_w);
+
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_telestory);
+
+	required_device<generic_slot_device> m_cart;
+	memory_region *m_cart_region;
+};
+
+
 class icanguit_state : public spg2xx_game_state
 {
 public:
-	icanguit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: spg2xx_game_state(mconfig, type, tag)
-		, m_cart(*this, "cartslot")
-		, m_cart_region(nullptr)
-		, m_porta_in(*this, "P1_%u", 0U)
-		, m_portc_in(*this, "P3_%u", 0U)
+	icanguit_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_cart(*this, "cartslot"),
+		m_cart_region(nullptr),
+		m_porta_in(*this, "P1_%u", 0U),
+		m_portc_in(*this, "P3_%u", 0U)
 	{ }
 
 	void icanguit(machine_config &config);
@@ -550,9 +584,9 @@ protected:
 class icanpian_state : public icanguit_state
 {
 public:
-	icanpian_state(const machine_config &mconfig, device_type type, const char *tag)
-		: icanguit_state(mconfig, type, tag)
-	//  , m_eeprom(*this, "eeprom")
+	icanpian_state(const machine_config &mconfig, device_type type, const char *tag) :
+		icanguit_state(mconfig, type, tag)
+	//  m_eeprom(*this, "eeprom")
 	{ }
 
 	void icanpian(machine_config &config);
@@ -569,10 +603,10 @@ protected:
 class tvgogo_state : public spg2xx_game_state
 {
 public:
-	tvgogo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: spg2xx_game_state(mconfig, type, tag)
-		, m_cart(*this, "cartslot")
-		, m_cart_region(nullptr)
+	tvgogo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_cart(*this, "cartslot"),
+		m_cart_region(nullptr)
 	{ }
 
 	void tvgogo(machine_config &config);
@@ -596,9 +630,9 @@ private:
 class dreamlif_state : public spg2xx_game_state
 {
 public:
-	dreamlif_state(const machine_config &mconfig, device_type type, const char *tag)
-		: spg2xx_game_state(mconfig, type, tag)
-		, m_eeprom(*this, "eeprom")
+	dreamlif_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_eeprom(*this, "eeprom")
 	{ }
 
 	void dreamlif(machine_config &config);
@@ -975,6 +1009,13 @@ void sentx6p_state::mem_map_2m_texas(address_map &map)
 	map(0x000000, 0x1fffff).bankr("cartbank");
 	map(0x3f0000, 0x3f7fff).ram();
 }
+
+void telestory_state::mem_map_4m_tsram(address_map &map)
+{
+	map(0x000000, 0x3fffff).bankr("cartbank");
+	map(0x3e0000, 0x3fffff).ram(); // is this in the cart or in the system?
+}
+
 
 READ16_MEMBER(zone40_state::z40_rom_r)
 {
@@ -2276,6 +2317,146 @@ static INPUT_PORTS_START( sentx6p )
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( telestory )
+	PORT_START("P1")
+	PORT_DIPNAME( 0x0001, 0x0001, "Port 1" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Pause / Menu")
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Red / Triangle")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Blue / Square")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Yellow / Star")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Green / Circle")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Next Page")
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("P2")
+	PORT_DIPNAME( 0x0001, 0x0001, "Port 2" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("P3")
+	PORT_DIPNAME( 0x0001, 0x0001, "Port 3" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 READ16_MEMBER(dreamlif_state::portb_r)
 {
@@ -2721,6 +2902,104 @@ void icanpian_state::icanpian(machine_config &config)
 
 	SOFTWARE_LIST(config, "icanpian_cart").set_original("icanpian");
 }
+
+
+READ16_MEMBER(telestory_state::porta_r)
+{
+	uint16_t data = m_io_p1->read();
+	//logerror("Port B Read: %04x\n", data);
+	return data;
+}
+
+READ16_MEMBER(telestory_state::portb_r)
+{
+	uint16_t data = m_io_p2->read();
+	//logerror("Port B Read: %04x\n", data);
+	return data;
+}
+
+READ16_MEMBER(telestory_state::portc_r)
+{
+	//logerror("%s: portc_r\n", machine().describe_context());
+	return machine().rand() & 0x0c00;
+}
+
+WRITE16_MEMBER(telestory_state::porta_w)
+{
+	//logerror("%s: porta_w (%04x)\n", machine().describe_context(), data);
+}
+
+WRITE16_MEMBER(telestory_state::portb_w)
+{
+	//logerror("%s: portb_w (%04x)\n", machine().describe_context(), data);
+}
+
+
+WRITE16_MEMBER(telestory_state::portc_w)
+{
+	//logerror("%s: portc_w (%04x)\n", machine().describe_context(), data);
+}
+
+
+
+void telestory_state::machine_start()
+{
+	spg2xx_game_state::machine_start();
+
+	// if there's a cart, override the standard banking
+	if (m_cart && m_cart->exists())
+	{
+		std::string region_tag;
+		m_cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+		m_bank->configure_entries(0, (m_cart_region->bytes() + 0x7fffff) / 0x800000, m_cart_region->base(), 0x800000);
+		m_bank->set_entry(0);
+	}
+}
+
+void telestory_state::machine_reset()
+{
+	spg2xx_game_state::machine_reset();
+}
+
+DEVICE_IMAGE_LOAD_MEMBER(telestory_state::cart_load_telestory)
+{
+	uint32_t size = m_cart->common_get_size("rom");
+
+	if (size > 0x800000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		return image_init_result::FAIL;
+	}
+
+	m_cart->rom_alloc(0x800000, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
+void telestory_state::telestory(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &telestory_state::mem_map_4m_tsram);
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(telestory_state::porta_r));
+	m_maincpu->porta_out().set(FUNC(telestory_state::porta_w));
+	m_maincpu->portb_in().set(FUNC(telestory_state::portb_r));
+	m_maincpu->portb_out().set(FUNC(telestory_state::portb_w));
+	m_maincpu->portc_in().set(FUNC(telestory_state::portc_r));
+	m_maincpu->portc_out().set(FUNC(telestory_state::portc_w));
+
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "telestory_cart");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_device_load(FUNC(telestory_state::cart_load_telestory));
+	m_cart->set_must_be_loaded(true);
+
+	SOFTWARE_LIST(config, "telestory_cart").set_original("telestory_cart");
+}
+
+
 
 WRITE8_MEMBER(tvgogo_state::tvg_i2c_w)
 {
@@ -3718,6 +3997,10 @@ ROM_START( icanpian )
 	// no internal ROM, requires a cartridge
 ROM_END
 
+ROM_START( telestry )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	// no internal ROM?
+ROM_END
 
 ROM_START( tvgogo )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -3929,6 +4212,10 @@ CONS( 2006, icanpian,  0,        0, icanpian, icanpian,   icanpian_state, empty_
 
 // Toyquest games
 CONS( 2005, tvgogo,  0,        0, tvgogo, tvgogo,   tvgogo_state, empty_init, "Toyquest", "GoGo TV Video Vision",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // or TV Go Go - the game addons call it the 'Video Vision console'
+
+// JAKKS Pacific / Toymax
+CONS( 2006, telestry,  0,        0, telestory, telestory,   telestory_state, empty_init, "JAKKS Pacific Inc / Toymax", "Telestory",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
 
 // Similar, SPG260?, scrambled
 CONS( 200?, lexizeus,    0,     0,        lexizeus,     lexizeus, spg2xx_game_state, init_zeus, "Lexibook", "Zeus IG900 20-in-1 (US?)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad sound and some corrupt bg tilemap entries in Tiger Rescue, verify ROM data (same game runs in Zone 60 without issue)
