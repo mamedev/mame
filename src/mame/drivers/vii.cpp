@@ -2937,7 +2937,13 @@ WRITE16_MEMBER(telestory_state::portb_w)
 	logerror("%s: portb_w (%04x)\n", machine().describe_context(), data);
 }
 
-/* is port C some kind of Audio DAC for the narrator? */
+/* is port C some kind of Audio DAC for the narrator?
+ 
+   - unlikely, looks more like the sound data for the narrator is written to the SIO data port 
+	  013127: D319 3D54 [3d54] = r1   (Cinderella)
+	 4-bit data?
+
+ */
 READ16_MEMBER(telestory_state::portc_r)
 {
 	//logerror("%s: portc_r\n", machine().describe_context());
