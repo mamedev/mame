@@ -1205,7 +1205,7 @@ ROM_START( rdaction )
 ROM_END
 
 // Found on an official UPL board with an original encrypted sound CPU block and official UPL serial number sticker
-// Other "JT-104" sets have been found with mismatched ROMs and the decrypted sound CPU + ROM hack
+// Other "JT 104" sets have been found with mismatched ROMs and the decrypted sound CPU + ROM hack
 ROM_START( jt104 )
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "1.3u", 0x00000, 0x8000, CRC(5c475611) SHA1(2da88a95b5d68b259c8ae48af1438a82a1d601c1) ) // sldh - == 1.3u from rdaction
@@ -1690,7 +1690,7 @@ GAME( 1987, ninjakd2a, ninjakd2, ninjakd2b, ninjakd2, ninjakd2_state, init_bootl
 GAME( 1987, ninjakd2b, ninjakd2, ninjakd2b, rdaction, ninjakd2_state, init_bootleg,  ROT0,   "UPL",                             "Ninja-Kid II / NinjaKun Ashura no Shou (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ninjakd2c, ninjakd2, ninjakd2,  rdaction, ninjakd2_state, init_ninjakd2, ROT0,   "UPL",                             "Ninja-Kid II / NinjaKun Ashura no Shou (set 4)", MACHINE_SUPPORTS_SAVE ) // close to set 3
 GAME( 1987, rdaction,  ninjakd2, ninjakd2,  rdaction, ninjakd2_state, init_ninjakd2, ROT0,   "UPL (World Games license)",       "Rad Action / NinjaKun Ashura no Shou", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, jt104,     ninjakd2, ninjakd2,  rdaction, ninjakd2_state, init_ninjakd2, ROT0,   "UPL (United Amusements license)", "JT-104", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, jt104,     ninjakd2, ninjakd2,  rdaction, ninjakd2_state, init_ninjakd2, ROT0,   "UPL (United Amusements license)", "JT 104 / NinjaKun Ashura no Shou", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, mnight,    0,        mnight,    mnight,   mnight_state,   init_mnight,   ROT0,   "UPL", "Mutant Night", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, mnightj,   mnight,   mnight,    mnight,   mnight_state,   init_mnight,   ROT0,   "UPL (Kawakus license)", "Mutant Night (Japan)", MACHINE_SUPPORTS_SAVE )
