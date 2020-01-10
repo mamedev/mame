@@ -408,6 +408,7 @@ naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *
 	m_i2c0(*this, "i2c_0"),
 	m_i2c1(*this, "i2c_1"),
 	m_eeprom(*this, "eeprom"),
+	m_315_6154(*this, "northbridge"),
 	picdata(*this, finder_base::DUMMY_TAG),
 	dimm_command(0xffff),
 	dimm_offsetl(0xffff),
@@ -439,25 +440,38 @@ void naomi_gdrom_board::submap(address_map &map)
 void naomi_gdrom_board::sh4_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).mirror(0xa0000000).rom().region("bios", 0);
-	map(0x04000000, 0x040000ff).rw(FUNC(naomi_gdrom_board::memorymanager_r), FUNC(naomi_gdrom_board::memorymanager_w));
-	map(0x0c000000, 0x0cffffff).ram();
-	map(0x10000000, 0x103fffff).ram();
-	map(0x14000000, 0x14000003).rw(FUNC(naomi_gdrom_board::sh4_unknown_r), FUNC(naomi_gdrom_board::sh4_unknown_w));
-	map(0x14000014, 0x14000017).rw(FUNC(naomi_gdrom_board::sh4_command_r), FUNC(naomi_gdrom_board::sh4_command_w));
-	map(0x14000018, 0x1400001b).rw(FUNC(naomi_gdrom_board::sh4_offsetl_r), FUNC(naomi_gdrom_board::sh4_offsetl_w));
-	map(0x1400001c, 0x1400001f).rw(FUNC(naomi_gdrom_board::sh4_parameterl_r), FUNC(naomi_gdrom_board::sh4_parameterl_w));
-	map(0x14000020, 0x14000023).rw(FUNC(naomi_gdrom_board::sh4_parameterh_r), FUNC(naomi_gdrom_board::sh4_parameterh_w));
-	map(0x14000024, 0x14000027).rw(FUNC(naomi_gdrom_board::sh4_status_r), FUNC(naomi_gdrom_board::sh4_status_w));
-	map(0x1400002c, 0x1400002f).lr32([]() { return 0x0c; }, "Constant 0x0c"); // 0x0a or 0x0e possible too
-	map(0x14000030, 0x14000033).rw(FUNC(naomi_gdrom_board::sh4_des_keyl_r), FUNC(naomi_gdrom_board::sh4_des_keyl_w));
-	map(0x14000034, 0x14000037).rw(FUNC(naomi_gdrom_board::sh4_des_keyh_r), FUNC(naomi_gdrom_board::sh4_des_keyh_w));
-	map(0x18001000, 0x18001007).lr32([]() { return 0x189d11db; }, "Constant 0x189d11db"); // 0x10001022 or 0x11720001 possible too
+	map(0x04000000, 0x040000ff).rw(m_315_6154, FUNC(sega_315_6154_device::registers_r), FUNC(sega_315_6154_device::registers_w));
+	map(0x0c000000, 0x0cffffff).ram().share("sh4sdram");
+	map(0x10000000, 0x103fffff).ram().share("6154sdram");
+	map(0x14000000, 0x17ffffff).rw(m_315_6154, FUNC(sega_315_6154_device::aperture_r<0>), FUNC(sega_315_6154_device::aperture_w<0>));
+	map(0x18000000, 0x1bffffff).rw(m_315_6154, FUNC(sega_315_6154_device::aperture_r<1>), FUNC(sega_315_6154_device::aperture_w<1>));
 	map.unmap_value_high();
 }
 
 void naomi_gdrom_board::sh4_io_map(address_map &map)
 {
 	map(0x00, 0x0f).rw(FUNC(naomi_gdrom_board::i2cmem_dimm_r), FUNC(naomi_gdrom_board::i2cmem_dimm_w));
+}
+
+void naomi_gdrom_board::pci_map(address_map& map)
+{
+	map(0x00000000, 0x00000003).rw(FUNC(naomi_gdrom_board::sh4_unknown_r), FUNC(naomi_gdrom_board::sh4_unknown_w));
+	map(0x00000014, 0x00000017).rw(FUNC(naomi_gdrom_board::sh4_command_r), FUNC(naomi_gdrom_board::sh4_command_w));
+	map(0x00000018, 0x0000001b).rw(FUNC(naomi_gdrom_board::sh4_offsetl_r), FUNC(naomi_gdrom_board::sh4_offsetl_w));
+	map(0x0000001c, 0x0000001f).rw(FUNC(naomi_gdrom_board::sh4_parameterl_r), FUNC(naomi_gdrom_board::sh4_parameterl_w));
+	map(0x00000020, 0x00000023).rw(FUNC(naomi_gdrom_board::sh4_parameterh_r), FUNC(naomi_gdrom_board::sh4_parameterh_w));
+	map(0x00000024, 0x00000027).rw(FUNC(naomi_gdrom_board::sh4_status_r), FUNC(naomi_gdrom_board::sh4_status_w));
+	map(0x0000002c, 0x0000002f).lr32([]() { return 0x0c; }, "Constant 0x0c"); // 0x0a or 0x0e possible too
+	map(0x00000030, 0x00000033).rw(FUNC(naomi_gdrom_board::sh4_des_keyl_r), FUNC(naomi_gdrom_board::sh4_des_keyl_w));
+	map(0x00000034, 0x00000037).rw(FUNC(naomi_gdrom_board::sh4_des_keyh_r), FUNC(naomi_gdrom_board::sh4_des_keyh_w));
+	map(0x10000000, 0x10000003).ram(); // temporary for testing
+	map(0x70000000, 0x70ffffff).ram().share("sh4sdram");
+	map(0x78000000, 0x783fffff).ram().share("6154sdram");
+}
+
+void naomi_gdrom_board::pci_config_map(address_map& map)
+{
+	map(0x1000, 0x1003).lr32([]() { return 0x189d11db; }, "Constant 0x189d11db"); // 0x10001022 or 0x11720001 possible too
 }
 
 WRITE32_MEMBER(naomi_gdrom_board::memorymanager_w)
@@ -997,6 +1011,9 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 	m_maincpu->set_sh4_clock(CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &naomi_gdrom_board::sh4_map);
 	m_maincpu->set_addrmap(AS_IO, &naomi_gdrom_board::sh4_io_map);
+	SEGA315_6154(config, m_315_6154, 0);
+	m_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_MEMORY, &naomi_gdrom_board::pci_map);
+	m_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_CONFIGURATION, &naomi_gdrom_board::pci_config_map);
 	PIC16C622(config, m_securitycpu, PIC_CLOCK);
 	m_securitycpu->set_addrmap(AS_IO, &naomi_gdrom_board::pic_map);
 	I2C_24C01(config, m_i2c0, 0);

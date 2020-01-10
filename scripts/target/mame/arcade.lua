@@ -3407,6 +3407,8 @@ files {
 	MAME_DIR .. "src/mame/machine/m3comm.h",
 	MAME_DIR .. "src/mame/machine/315-5881_crypt.cpp",
 	MAME_DIR .. "src/mame/machine/315-5881_crypt.h",
+	MAME_DIR .. "src/mame/machine/315-6154.cpp",
+	MAME_DIR .. "src/mame/machine/315-6154.h",
 	MAME_DIR .. "src/mame/machine/awboard.cpp",
 	MAME_DIR .. "src/mame/machine/awboard.h",
 	MAME_DIR .. "src/mame/machine/mie.cpp",

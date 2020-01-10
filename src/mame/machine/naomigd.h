@@ -9,6 +9,7 @@
 #include "cpu/pic16c62x/pic16c62x.h"
 #include "machine/i2cmem.h"
 #include "machine/eepromser.h"
+#include "machine/315-6154.h"
 
 class naomi_gdrom_board : public naomi_board
 {
@@ -37,6 +38,8 @@ public:
 	void sh4_map(address_map &map);
 	void sh4_io_map(address_map &map);
 	void pic_map(address_map &map);
+	void pci_map(address_map &map);
+	void pci_config_map(address_map &map);
 
 	void set_image_tag(const char *_image_tag)
 	{
@@ -100,6 +103,7 @@ private:
 	required_device<i2cmem_device> m_i2c0;
 	required_device<i2cmem_device> m_i2c1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<sega_315_6154_device> m_315_6154;
 
 	const char *image_tag;
 	optional_region_ptr<uint8_t> picdata;
