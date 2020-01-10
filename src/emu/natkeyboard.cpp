@@ -17,7 +17,7 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define LOG_NATURAL_KEYBOARD    1
+#define LOG_NATURAL_KEYBOARD    0
 
 
 
