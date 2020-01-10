@@ -212,8 +212,17 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7819_w) { LOGMASKED(LOG_GCM39
 
 // ****************************************  78xx region stubs *************************************************
 
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7868_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7868_r\n", machine().describe_context()); return machine().rand(); }
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7869_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7869_r\n", machine().describe_context()); return machine().rand(); }
+READ16_MEMBER(sunplus_gcm394_base_device::ioarea_7868_portb_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::ioarea_7868_portb_r\n", machine().describe_context());
+	return m_portb_in();
+}
+
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7869_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7869_r\n", machine().describe_context());
+	return machine().rand();
+}
 
 READ16_MEMBER(sunplus_gcm394_base_device::unkarea_782d_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_782d_r\n", machine().describe_context()); return m_782d; }
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_782d_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_782d_w %04x\n", machine().describe_context(), data); m_782d = data; }
@@ -332,15 +341,15 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7863_w)
 
 // similar read/write pattern to above, 2nd group?
 
-READ16_MEMBER(sunplus_gcm394_base_device::ioarea_7870_portb_r)
+READ16_MEMBER(sunplus_gcm394_base_device::ioarea_7870_portc_r)
 {
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::ioarea_7870_portb_r\n", machine().describe_context());
-	return m_portb_in();
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::ioarea_7870_portc_r\n", machine().describe_context());
+	return m_portc_in();
 }
 
-WRITE16_MEMBER(sunplus_gcm394_base_device::ioarea_7870_portb_w)
+WRITE16_MEMBER(sunplus_gcm394_base_device::ioarea_7870_portc_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::ioarea_7870_portb_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::ioarea_7870_portc_w %04x\n", machine().describe_context(), data);
 	m_7870 = data;
 }
 
@@ -368,7 +377,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_78a0_w) { LOGMASKED(LOG_GCM39
 READ16_MEMBER(sunplus_gcm394_base_device::unkarea_78a0_r)
 {
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78a0_r\n", machine().describe_context());
-	return machine().rand();
+	return 0x0000;// machine().rand();
 }
 
 READ16_MEMBER(sunplus_gcm394_base_device::unkarea_78a1_r)
@@ -398,7 +407,11 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_78b2_w) { LOGMASKED(LOG_GCM39
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_78b8_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78b8_w %04x\n", machine().describe_context(), data); m_78b8 = data; }
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_78f0_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78f0_w %04x\n", machine().describe_context(), data); m_78f0 = data; }
 
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_78d0_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78d0_r\n", machine().describe_context()); return machine().rand(); }
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_78d0_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78d0_r\n", machine().describe_context());
+	return machine().rand();
+}
 
 
 // **************************************** 79xx region stubs *************************************************
@@ -415,8 +428,18 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7935_w)
 	//checkirq6();
 }
 
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7944_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7944_r\n", machine().describe_context()); return machine().rand(); }
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7945_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7945_r\n", machine().describe_context()); return machine().rand(); }
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7944_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7944_r\n", machine().describe_context());
+	return 0x0000;// machine().rand();
+}
+
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7945_r)
+{
+	// this is related to the accelerometer values on jak_g500 (8-bit signed) 
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7945_r\n", machine().describe_context());
+	return machine().rand();// &0x0007;
+}
 
 
 READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7936_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7936_r\n", machine().describe_context()); return 0x0000; }
@@ -504,7 +527,7 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	map(0x007072, 0x007072).rw(m_spg_video, FUNC(gcm394_base_video_device::video_dma_size_busy_r), FUNC(gcm394_base_video_device::video_dma_size_trigger_w));     //
 
 	// these don't exist on older SPG
-	map(0x00707c, 0x00707c).r(m_spg_video, FUNC(gcm394_base_video_device::video_707c_r)); // wrlshunt polls this waiting for 0x8000, is this some kind of manual port based data upload?
+	map(0x00707c, 0x00707c).r(m_spg_video, FUNC(gcm394_base_video_device::video_707c_r)); // wrlshunt polls this waiting for 0x8000, is this some kind of manual port bport based data upload?
 
 	map(0x00707e, 0x00707e).w(m_spg_video, FUNC(gcm394_base_video_device::video_dma_unk_w));                                                         // written around same time as DMA, seems to select alt sprite bank
 	map(0x00707f, 0x00707f).rw(m_spg_video, FUNC(gcm394_base_video_device::video_707f_r), FUNC(gcm394_base_video_device::video_707f_w));
@@ -585,17 +608,18 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	map(0x007862, 0x007862).rw(FUNC(sunplus_gcm394_base_device::unkarea_7862_r), FUNC(sunplus_gcm394_base_device::unkarea_7862_w));  // 7862  I/O PortA Direction Register
 	map(0x007863, 0x007863).rw(FUNC(sunplus_gcm394_base_device::unkarea_7863_r), FUNC(sunplus_gcm394_base_device::unkarea_7863_w)); // 	7863  I/O PortA Attribute Register
 
-	map(0x007868, 0x007868).r(FUNC(sunplus_gcm394_base_device::unkarea_7868_r)); // on startup   // 7868  I/O PortB Data Register
+	map(0x007868, 0x007868).r(FUNC(sunplus_gcm394_base_device::ioarea_7868_portb_r)); // on startup   // 7868  I/O PortB Data Register
 	map(0x007869, 0x007869).r(FUNC(sunplus_gcm394_base_device::unkarea_7869_r)); //  7869  I/O PortB Buffer Register   // jak_s500
 	// 786a  I/O PortB Direction Register
 	// 786b  I/O PortB Attribute Register
 	// 786a  I/O PortB Direction Register
 	// 786c  I/O PortB Latch / Wakeup
 
-	map(0x007870, 0x007870).rw(FUNC(sunplus_gcm394_base_device::ioarea_7870_portb_r) ,FUNC(sunplus_gcm394_base_device::ioarea_7870_portb_w)); // 7870  I/O PortC Data Register
+	map(0x007870, 0x007870).rw(FUNC(sunplus_gcm394_base_device::ioarea_7870_portc_r) ,FUNC(sunplus_gcm394_base_device::ioarea_7870_portc_w)); // 7870  I/O PortC Data Register
 	map(0x007871, 0x007871).r(FUNC(sunplus_gcm394_base_device::unkarea_7871_r)); // 7871  I/O PortC Buffer Register
 	map(0x007872, 0x007872).rw(FUNC(sunplus_gcm394_base_device::unkarea_7872_r), FUNC(sunplus_gcm394_base_device::unkarea_7872_w)); // 7872  I/O PortC Direction Register
 	map(0x007873, 0x007873).rw(FUNC(sunplus_gcm394_base_device::unkarea_7873_r), FUNC(sunplus_gcm394_base_device::unkarea_7873_w)); // 7873  I/O PortC Attribute Register
+
 	// 7874 (data 0x1249)
 	// 787c (data 0x1249)
 	// 787e (data 0x1249)
@@ -1062,6 +1086,7 @@ void sunplus_gcm394_base_device::device_start()
 
 	m_porta_in.resolve_safe(0);
 	m_portb_in.resolve_safe(0);
+	m_portc_in.resolve_safe(0);
 
 	m_porta_out.resolve();
 

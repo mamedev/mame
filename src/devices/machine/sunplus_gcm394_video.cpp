@@ -409,6 +409,7 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 		else if (nc_bpp < 8)
 		{
 			// 6bpp
+		//	current_palette_offset |= 0x0800;
 
 		}
 		else

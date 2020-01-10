@@ -36,6 +36,7 @@ public:
 		m_internalrom(*this, "internal"),
 		m_porta_in(*this),
 		m_portb_in(*this),
+		m_portc_in(*this),
 		m_porta_out(*this),
 		m_nand_read_cb(*this),
 		m_csbase(0x20000),
@@ -51,6 +52,7 @@ public:
 
 	auto porta_in() { return m_porta_in.bind(); }
 	auto portb_in() { return m_portb_in.bind(); }
+	auto portc_in() { return m_portc_in.bind(); }
 
 	auto porta_out() { return m_porta_out.bind(); }
 
@@ -92,6 +94,7 @@ protected:
 
 	devcb_read16 m_porta_in;
 	devcb_read16 m_portb_in;
+	devcb_read16 m_portc_in;
 
 	devcb_write16 m_porta_out;
 
@@ -217,7 +220,7 @@ private:
 
 	DECLARE_WRITE16_MEMBER(unkarea_7835_w);
 
-	DECLARE_READ16_MEMBER(unkarea_7868_r);
+	DECLARE_READ16_MEMBER(ioarea_7868_portb_r);
 	DECLARE_READ16_MEMBER(unkarea_7869_r);
 
 	DECLARE_READ16_MEMBER(unkarea_782d_r);
@@ -233,8 +236,8 @@ private:
 	DECLARE_READ16_MEMBER(unkarea_7863_r);
 	DECLARE_WRITE16_MEMBER(unkarea_7863_w);
 
-	DECLARE_READ16_MEMBER(ioarea_7870_portb_r);
-	DECLARE_WRITE16_MEMBER(ioarea_7870_portb_w);
+	DECLARE_READ16_MEMBER(ioarea_7870_portc_r);
+	DECLARE_WRITE16_MEMBER(ioarea_7870_portc_w);
 
 	DECLARE_READ16_MEMBER(unkarea_7871_r);
 
