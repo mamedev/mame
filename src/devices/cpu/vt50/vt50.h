@@ -6,7 +6,7 @@
 
 #pragma once
 
-class vt5x_cpu_device : public cpu_device
+class vt5x_cpu_device : public cpu_device, public device_video_interface
 {
 public:
 	enum {
@@ -31,12 +31,17 @@ public:
 	auto cen_callback() { return m_cen_callback.bind(); }
 	auto ccf_callback() { return m_ccf_callback.bind(); }
 	auto csf_callback() { return m_csf_callback.bind(); }
+	auto char_data_callback() { return m_char_data_callback.bind(); }
+
+	// screen update method
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// construction/destruction
 	vt5x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int bbits, int ybits);
 
 	// device-level overrides
+	virtual void device_config_complete() override;
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -49,6 +54,9 @@ protected:
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
+	// video helpers
+	void draw_char_line();
 
 	// address translation
 	offs_t translate_xy() const;
@@ -83,6 +91,7 @@ protected:
 	devcb_write_line m_cen_callback;
 	devcb_read_line m_csf_callback;
 	devcb_read_line m_ccf_callback;
+	devcb_read8 m_char_data_callback;
 
 	// register dimensions
 	const u8 m_bbits;
@@ -116,6 +125,11 @@ protected:
 	u8 m_horiz_count;
 	u16 m_vert_count;
 	bool m_top_of_screen;
+	u16 m_current_line;
+	u16 m_first_line;
+
+	// display bitmap
+	bitmap_rgb32 m_bitmap;
 };
 
 class vt50_cpu_device : public vt5x_cpu_device

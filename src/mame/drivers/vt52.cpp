@@ -14,8 +14,8 @@
     character generator (on a board of its own). VT50 and VT52 each had
     minor variants differing in keyboard function and printer availability.
 
-    The VT55 was a graphical terminal ostensibly in the same family as the
-    VT50 and VT52. Its hardware commonalities and differences are unknown.
+    The VT55 DECgraphic Scope was a graphical terminal based on the same
+    main boards as the VT50 and VT52.
 
 ****************************************************************************/
 
@@ -37,6 +37,7 @@ public:
 		, m_keys(*this, "KEY%d", 0U)
 		, m_baud_sw(*this, "BAUD")
 		, m_data_sw(*this, "DATABITS")
+		, m_chargen(*this, "chargen")
 	{
 	}
 
@@ -56,6 +57,7 @@ private:
 	void uart_xd_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(serial_out_w);
 	DECLARE_READ_LINE_MEMBER(xrdy_eoc_r);
+	u8 chargen_r(offs_t offset);
 
 	void rom_1k(address_map &map);
 	void ram_2k(address_map &map);
@@ -65,6 +67,7 @@ private:
 	required_ioport_array<8> m_keys;
 	required_ioport m_baud_sw;
 	required_ioport m_data_sw;
+	required_region_ptr<u8> m_chargen;
 };
 
 void vt52_state::machine_reset()
@@ -148,6 +151,12 @@ WRITE_LINE_MEMBER(vt52_state::break_w)
 READ_LINE_MEMBER(vt52_state::xrdy_eoc_r)
 {
 	return m_uart->tbmt_r() || m_uart->eoc_r();
+}
+
+u8 vt52_state::chargen_r(offs_t offset)
+{
+	// ROM is on its own board, shared only with 7404 inverters
+	return ~m_chargen[offset];
 }
 
 void vt52_state::rom_1k(address_map &map)
@@ -306,6 +315,7 @@ void vt52_state::vt52(machine_config &mconfig)
 	VT52_CPU(mconfig, m_maincpu, 13.824_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt52_state::rom_1k);
 	m_maincpu->set_addrmap(AS_DATA, &vt52_state::ram_2k);
+	m_maincpu->set_screen("screen");
 	m_maincpu->baud_9600_callback().set(FUNC(vt52_state::baud_9600_w));
 	m_maincpu->vert_count_callback().set(FUNC(vt52_state::vert_count_w));
 	m_maincpu->uart_rd_callback().set(m_uart, FUNC(ay51013_device::receive));
@@ -317,14 +327,12 @@ void vt52_state::vt52(machine_config &mconfig)
 	m_maincpu->kclk_callback().set_ioport("KEYCLICK");
 	m_maincpu->frq_callback().set_ioport("60HJ");
 	m_maincpu->bell_callback().set("bell", FUNC(speaker_sound_device::level_w));
+	m_maincpu->char_data_callback().set(FUNC(vt52_state::chargen_r));
 
 	AY51013(mconfig, m_uart); // TR1402 or equivalent
 	m_uart->write_so_callback().set(FUNC(vt52_state::serial_out_w));
 
-	screen_device &screen(SCREEN(mconfig, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(13.824_MHz_XTAL, 900, 0, 720, 256, 0, 240);
-	//screen.set_raw(13.824_MHz_XTAL, 900, 0, 720, 307.2, 0, 264); // not a whole number of scans
-	screen.set_screen_update(FUNC(vt52_state::screen_update));
+	SCREEN(mconfig, "screen", SCREEN_TYPE_RASTER);
 
 	SPEAKER(mconfig, "mono").front_center();
 	SPEAKER_SOUND(mconfig, "bell").add_route(ALL_OUTPUTS, "mono", 1.0); // FIXME: uses a flyback diode circuit
@@ -337,8 +345,8 @@ ROM_START(vt52)
 	ROM_LOAD_NIB_LOW( "23-126a9.e37", 0x200, 0x200, CRC(4883a600) SHA1(c5d9b0c21493065c75b4a7d52d5bd47f9851dfe7))
 	ROM_LOAD_NIB_HIGH("23-127a9.e21", 0x200, 0x200, CRC(56c1c0d6) SHA1(ab0eb6e7bbafcc3d28481b62de3d3490f01c0174))
 
-	ROM_REGION(0x400, "chargen", 0) // 2608 character generator
+	ROM_REGION(0x400, "chargen", 0) // 2608 (non-JEDEC) character generator
 	ROM_LOAD("23-002b4.e1", 0x000, 0x400, CRC(b486500c) SHA1(029f07424d6c23ee083db42d9f9c252ac728ccd0))
 ROM_END
 
-COMP(1975, vt52, 0, 0, vt52, vt52, vt52_state, empty_init, "Digital Equipment Corporation", "VT52 Video Display Terminal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP(1975, vt52, 0, 0, vt52, vt52, vt52_state, empty_init, "Digital Equipment Corporation", "VT52 Video Display Terminal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER)

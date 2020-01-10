@@ -18,7 +18,6 @@ protected:
 	// tables
 	static const char *const s_opcodes_e[8];
 	static const char *const s_opcodes_f[8];
-	static const char *const s_jumps_h[2][8];
 	static const char *const s_opcodes_w[8];
 
 private:
@@ -38,6 +37,7 @@ public:
 private:
 	// tables
 	static const char *const s_opcodes_g[8];
+	static const char *const s_jumps_h[2][8];
 };
 
 class vt52_disassembler : public vt5x_disassembler
@@ -49,6 +49,7 @@ public:
 private:
 	// tables
 	static const char *const s_opcodes_g[8];
+	static const char *const s_jumps_h[2][8];
 };
 
 #endif // MAME_CPU_VT50_VT50DASM_H
