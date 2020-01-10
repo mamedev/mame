@@ -9,9 +9,52 @@
         <publisher>Nintendo</publisher>
 		<info name="serial" value="21041"/>
         <info name="alt_title" value="动物森林" />
+		<info name="release" value="20060601"/>
         <part name="cart" interface="ique_cart">
             <dataarea name="rom" size="16138240">
                 <rom name="dongwu senlin.bin" size="16138240" crc="38f90948" sha1="4245e0dc921cecfd388c2df8d124e0fac2b0a3ca" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="fzerox" supported="no">
+        <description>F-Zero X Wèilái Sàichē</description>
+        <year>2004</year>
+        <publisher>Nintendo</publisher>
+		<info name="serial" value="52021"/>
+        <info name="alt_title" value="F-Zero X 未来赛车" />
+		<info name="release" value="20040225"/>
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="16334848">
+                <rom name="f-zero x - weilai saiche.bin" size="16334848" crc="b67dde4f" sha1="8def0f201b04c32dcf6d42901cc9b0bd5bb620d2" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="fzeroxm2" cloneof="fzeroxm4" supported="no">
+        <description>F-Zero X Wèilái Sàichē (manual, version 2)</description>
+        <year>2004</year>
+        <publisher>Nintendo</publisher>
+		<info name="serial" value="52021"/>
+        <info name="alt_title" value="F-Zero X 未来赛车" />
+		<info name="release" value="20040225"/>
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="180224">
+                <rom name="f-zero x - weilai saiche manual v2.bin" size="180224" crc="141403cf" sha1="35676d1ba314b96d75951834e526bd04d9ca42a4" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="fzeroxm4" supported="no">
+        <description>F-Zero X Wèilái Sàichē (manual, version 4)</description>
+        <year>2004</year>
+        <publisher>Nintendo</publisher>
+		<info name="serial" value="52021"/>
+        <info name="alt_title" value="F-Zero X 未来赛车" />
+		<info name="release" value="20040225"/>
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="180224">
+                <rom name="f-zero x - weilai saiche manual v4.bin" size="294912" crc="e1d27770" sha1="d3eb35ef2450daa05a9265f8ed3f688415908d02" />
             </dataarea>
         </part>
     </software>
