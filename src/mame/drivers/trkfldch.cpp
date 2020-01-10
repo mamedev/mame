@@ -292,14 +292,26 @@ void trkfldch_state::draw_sprites(screen_device& screen, bitmap_ind16& bitmap, c
 	{
 		int priority = (m_spriteram[i + 4] & 0x20)>>5;
 
-		// list is NOT drawn but instead z sorted, see shadows in trkfldch
+		// list is NOT drawn in order, but instead z sorted, see shadows in trkfldch
 		if (priority != pri)
 			continue;
 
 		// logerror("entry %02x %02x %02x %02x %02x\n", m_spriteram[i + 0], m_spriteram[i + 1], m_spriteram[i + 2], m_spriteram[i + 3], m_spriteram[i + 4]);
 		int tilegfxbase = (m_modebank[0x05] * 0x800);
 
-		// --pp tt-y    yyyy yyyy    tttt tttt    yyyy yyyy    --zf -t-x
+		/* m_spriteram[i + 0]  --pp tt-y    
+		   m_spriteram[i + 1]  yyyy yyyy    
+		   m_spriteram[i + 2]  tttt tttt    
+		   m_spriteram[i + 3]  xxxx xxxx    
+		   m_spriteram[i + 4]  --zfF-t-x
+
+		   p = palette bits
+		   t = tile bites
+		   y = y pos bits
+		   x = x pos bits
+		   z = priority
+		   fF = x/y flip
+		*/
 
 		int y = m_spriteram[i + 1];
 		int x = m_spriteram[i + 3];
@@ -312,6 +324,7 @@ void trkfldch_state::draw_sprites(screen_device& screen, bitmap_ind16& bitmap, c
 		int pal = 0;
 
 		int flipx = m_spriteram[i + 4] & 0x10;
+		int flipy = m_spriteram[i + 4] & 0x08;
 
 		if (tilehigh)
 			tile += 0x100;
@@ -349,7 +362,7 @@ void trkfldch_state::draw_sprites(screen_device& screen, bitmap_ind16& bitmap, c
 		}
 
 
-		gfx->transpen(bitmap, cliprect, tile + tilegfxbase, pal, flipx, 0, x, y, 0);
+		gfx->transpen(bitmap, cliprect, tile + tilegfxbase, pal, flipx, flipy, x, y, 0);
 	}
 }
 
