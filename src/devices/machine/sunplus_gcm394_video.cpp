@@ -33,6 +33,8 @@ gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig
 	m_palette(*this, "palette"),
 	m_gfxdecode(*this, "gfxdecode"),
 	m_space_read_cb(*this),
+	m_rowscroll(*this, "^rowscroll"),
+	m_rowzoom(*this, "^rowzoom"),
 	m_global_y_mask(0x1ff),
 	m_pal_displaybank_high(0),
 	m_alt_tile_addressing(0)
@@ -471,33 +473,44 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 		return;
 	}
 
-	if (ctrl_reg & 0x01) // bitmap mode jak_car2 uses this ingame
+	if (ctrl_reg & 0x01) // bitmap mode jak_car2 and jak_s500 use for the ingame race sections, also have a bitmap test in test mode
 	{
-		popmessage("bitmap mode %08x\n", bitmap_addr);
+		if (ctrl_reg & 0x10)
+			popmessage("bitmap mode %08x with rowscroll\n", bitmap_addr);
+		else
+			popmessage("bitmap mode %08x\n", bitmap_addr);
+
+		// note, in interlace modes it appears every other line is unused? (480 entry table, but with blank values)
+		// and furthermore the rowscroll and rowzoom tables only have 240 entries, not enough for every line
+		// the end of the rowscroll table (entries 240-255) contain something else, maybe garbage data as it's offscreen, maybe not
 
 		uint32_t linebase = space.read_word(tilemap + scanline); // every other word is unused, but there are only enough entries for 240 lines then, sometimes to do with interlace mode?
 		uint16_t palette = space.read_word(palette_map + (scanline / 2));
 
 		if (scanline & 1)
 			palette >>= 8;
+		else
+			palette &= 0xff;
 
-		//if (linebase != 0)
-		//	printf("scanline %d linebase %04x palette %04x\n", scanline, linebase, palette);
+		if (!linebase)
+			return;
 
-		linebase |= ((palette >> 8) << 16);
+		linebase = linebase | (palette << 16);
 
-		int gfxbase = bitmap_addr + linebase;
+		// this logic works for jak_s500 and the test modes to get the correct base, doesn't seem to work for jak_car2 ingame, maybe data is copied to wrong place?
+		int gfxbase = (bitmap_addr&0x7ffffff) + (linebase&0x7ffffff);
 
-		for (int i = 0; i < 160; i++) // will have to be 320 for jak_car2 ingame
+		for (int i = 0; i < 160; i++) // will have to be 320 for jak_car2 ingame, jak_s500 lines are wider than screen, and zoomed
 		{
-			uint16_t pix = m_space_read_cb((gfxbase++)&0xffffff);
+			uint16_t pix = m_space_read_cb((gfxbase++)&0x7ffffff);
 			int xx;
 			int y_index = scanline * m_screen->width();
 			uint16_t pal;
 
 			if ((scanline >= 0) && (scanline < 480))
 			{
-				xx = (i * 2);
+				xx = i * 2;
+				
 				pal = (pix & 0xff) | 0x100;
 
 				if (xx >= 0 && xx <= cliprect.max_x)

@@ -246,6 +246,9 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	devcb_read16 m_space_read_cb;
+	
+	required_shared_ptr<uint16_t> m_rowscroll;
+	required_shared_ptr<uint16_t> m_rowzoom;
 
 	int m_maxgfxelement;
 	void decodegfx(const char* tag);
