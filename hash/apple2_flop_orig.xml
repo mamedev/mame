@@ -9796,4 +9796,86 @@
 		</part>
 	</software>
 
+	<software name="tmpapsr1">
+		<description>Dunjonquest: The Temple of Apshai (Revision 1)</description>
+		<year>1979</year>
+		<publisher>Automated Simulations</publisher>
+		<info name="release" value="2020-01-06"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--It requires a 13-sector drive and a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234834">
+				<rom name="dunjonquest - the temple of apshai rev. 1.woz" size="234834" crc="558d8c4d" sha1="210ae265fc085655888c4dbad7f763a7c2e9c68d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmpapsr2">
+		<description>Dunjonquest: The Temple of Apshai (Revision 2)</description>
+		<year>1979</year>
+		<publisher>Automated Simulations</publisher>
+		<info name="release" value="2020-01-06"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- This is revision 2, which fixes unspecified bugs and adds a 
+		graphical title screen. It requires a 13-sector drive and a 
+		48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234734">
+				<rom name="dunjonquest - the temple of apshai rev. 2.woz" size="234734" crc="cde02b29" sha1="cb5e566436d64026dccd2f622d24aff1b529c71b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmpapsr3">
+		<description>Dunjonquest: The Temple of Apshai (Revision 3)</description>
+		<year>1979</year>
+		<publisher>Automated Simulations</publisher>
+		<info name="release" value="2020-01-07"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- This is revision 3, with updated copy protection and a hi-res 
+		character generator for on-screen text. It requires a 16-sector drive 
+		and a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234807">
+				<rom name="dunjonquest - the temple of apshai rev. 3.woz" size="234807" crc="6d43c84e" sha1="4fdadd64a576d5fce2a0af5aaced36429fd35b19"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmpapsr4">
+		<description>Dunjonquest: The Temple of Apshai (Revision 4)</description>
+		<year>1979</year>
+		<publisher>Automated Simulations</publisher>
+		<info name="release" value="2020-01-07"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- This is revision 4, with updated copy protection and a hi-res
+		character generator with two choices of font. It requires a 16-sector
+		drive and a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="248222">
+				<rom name="dunjonquest - the temple of apshai rev. 4.woz" size="248222" crc="03743196" sha1="be872c142dfff107fed23e23fecb2ab1fb035ce0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="streksos">
+		<description>Star Trek: Strategic Operations Simulator</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<info name="release" value="2020-01-07"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="88341">
+				<rom name="star trek - strategic operations simulator.woz" size="88341" crc="4c47c392" sha1="8ac0afa85358e8d9ab4a58daeb3b92a8b0330a55"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
