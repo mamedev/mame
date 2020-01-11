@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 /****************************************************************************
 
-    Skeleton driver for DEC VT50 terminal family.
+    DEC VT50 terminal family
 
     The VT50 "DECscope" was DEC's first video terminal to contain a CPU of
     sorts, with TTL logic spanning two boards executing custom microcode.
@@ -20,7 +20,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-//#include "bus/rs232/rs232.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/vt50/vt50.h"
 #include "machine/ay31015.h"
 #include "sound/spkrdev.h"
@@ -34,28 +34,37 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_uart(*this, "uart")
+		, m_eia(*this, "eia")
 		, m_keys(*this, "KEY%d", 0U)
+		, m_break_key(*this, "BREAK")
 		, m_baud_sw(*this, "BAUD")
 		, m_data_sw(*this, "DATABITS")
 		, m_chargen(*this, "chargen")
+		, m_serial_out(true)
+		, m_rec_data(true)
+		, m_110_baud_counter(0)
 	{
 	}
 
-	void vt52(machine_config &mconfig);
+	void vt52(machine_config &config);
 
 	DECLARE_WRITE_LINE_MEMBER(break_w);
+	DECLARE_INPUT_CHANGED_MEMBER(data_sw_changed);
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void update_serial_settings();
 
 	u8 key_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(baud_9600_w);
 	void vert_count_w(u8 data);
 	void uart_xd_w(u8 data);
+	void gated_serial_output(bool state);
 	DECLARE_WRITE_LINE_MEMBER(serial_out_w);
+	DECLARE_WRITE_LINE_MEMBER(rec_data_w);
 	DECLARE_READ_LINE_MEMBER(xrdy_eoc_r);
 	u8 chargen_r(offs_t offset);
 
@@ -64,27 +73,54 @@ private:
 
 	required_device<vt5x_cpu_device> m_maincpu;
 	required_device<ay31015_device> m_uart;
+	required_device<rs232_port_device> m_eia;
 	required_ioport_array<8> m_keys;
+	required_ioport m_break_key;
 	required_ioport m_baud_sw;
 	required_ioport m_data_sw;
 	required_region_ptr<u8> m_chargen;
+
+	bool m_serial_out;
+	bool m_rec_data;
+	u8 m_110_baud_counter;
 };
+
+void vt52_state::machine_start()
+{
+	save_item(NAME(m_serial_out));
+	save_item(NAME(m_rec_data));
+	save_item(NAME(m_110_baud_counter));
+}
 
 void vt52_state::machine_reset()
 {
-	bool db = m_data_sw->read();
+	m_110_baud_counter = 0;
+
+	update_serial_settings();
+	m_uart->write_swe(0);
+
+	m_eia->write_dtr(0);
+	m_eia->write_rts(0);
+}
+
+void vt52_state::update_serial_settings()
+{
+	u8 db = m_data_sw->read();
 	m_uart->write_nb1(BIT(db, 0));
 	m_uart->write_np(BIT(db, 0));
 	m_uart->write_eps(BIT(db, 1));
 	m_uart->write_nb2(1);
-	m_uart->write_tsb(!BIT(m_baud_sw->read(), 11));
+	m_uart->write_tsb(!BIT(m_baud_sw->read(), 10));
 	m_uart->write_cs(1);
-	m_uart->write_swe(0);
+
+	gated_serial_output(m_serial_out && m_break_key->read());
+	if (!BIT(m_baud_sw->read(), 9))
+		m_uart->write_si(1);
 }
 
-u32 vt52_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+INPUT_CHANGED_MEMBER(vt52_state::data_sw_changed)
 {
-	return 0;
+	update_serial_settings();
 }
 
 u8 vt52_state::key_r(offs_t offset)
@@ -108,7 +144,30 @@ void vt52_state::vert_count_w(u8 data)
 {
 	u16 baud = m_baud_sw->read();
 
-	// TODO: subcounter for 110 baud
+	// 110 baud clock is 1200 baud clock divided by 11 by yet another 74161
+	if ((data & 7) == 4)
+	{
+		if (m_110_baud_counter == 15)
+		{
+			if (!BIT(baud, 10))
+			{
+				m_uart->write_rcp(0);
+				if ((baud & 0x0380) != 0x0380)
+					m_uart->write_tcp(0);
+			}
+			m_110_baud_counter = 5;
+		}
+		else
+		{
+			m_110_baud_counter++;
+			if (m_110_baud_counter == 8 && !BIT(baud, 10))
+			{
+				m_uart->write_rcp(1);
+				if ((baud & 0x0380) != 0x0380)
+					m_uart->write_tcp(1);
+			}
+		}
+	}
 
 	if ((baud & 0x2400) == 0x2400)
 	{
@@ -136,21 +195,43 @@ void vt52_state::uart_xd_w(u8 data)
 		m_uart->set_transmit_data(data & 0x7f);
 }
 
+void vt52_state::gated_serial_output(bool state)
+{
+	ioport_value baud = m_baud_sw->read();
+	if (BIT(baud, 9))
+		m_eia->write_txd(state);
+	if (!BIT(baud, 9) || (m_rec_data && (~baud & 0x0880) != 0))
+		m_uart->write_si(state);
+}
+
 WRITE_LINE_MEMBER(vt52_state::serial_out_w)
 {
-	// TODO: break, on-line modes
-	if (!BIT(m_baud_sw->read(), 9))
-		m_uart->write_si(state);
+	if (m_serial_out != state)
+	{
+		m_serial_out = state;
+		if (m_break_key->read())
+			gated_serial_output(state);
+	}
 }
 
 WRITE_LINE_MEMBER(vt52_state::break_w)
 {
-	// TODO
+	if (m_serial_out)
+		gated_serial_output(state);
+}
+
+WRITE_LINE_MEMBER(vt52_state::rec_data_w)
+{
+	m_rec_data = state;
+
+	ioport_value baud = m_baud_sw->read();
+	if (BIT(baud, 9) && ((~baud & 0x0880) == 0 || (m_serial_out && m_break_key->read())))
+		m_uart->write_si(state);
 }
 
 READ_LINE_MEMBER(vt52_state::xrdy_eoc_r)
 {
-	return m_uart->tbmt_r() || m_uart->eoc_r();
+	return m_uart->tbmt_r() && m_uart->eoc_r();
 }
 
 u8 vt52_state::chargen_r(offs_t offset)
@@ -269,8 +350,8 @@ static INPUT_PORTS_START(vt52)
 	PORT_START("BREAK") // on keyboard but divorced from matrix (position taken over by Caps Lock) and not readable by CPU
 	PORT_BIT(1, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_PAUSE) PORT_WRITE_LINE_MEMBER(vt52_state, break_w) // S16
 
-	PORT_START("BAUD") // 7-position rotary switches under keyboard, set in combination
-	PORT_DIPNAME(0x03f1, 0x01f1, "Transmitting Speed") PORT_DIPLOCATION("S1:7,4,5,6,2,3,1")
+	PORT_START("BAUD") // 7-position rotary switches under keyboard, set in combination (positions on SW2 are actually labeled A through G)
+	PORT_DIPNAME(0x03f1, 0x01f1, "Transmitting Speed") PORT_DIPLOCATION("S1:7,4,5,6,2,3,1") PORT_CHANGED_MEMBER(DEVICE_SELF, vt52_state, data_sw_changed, 0)
 	PORT_DIPSETTING(0x01f1, "Off-Line (XCLK = RCLK)") // S1:1
 	PORT_DIPSETTING(0x02f1, "Full Duplex (XCLK = RCLK)") // S1:3
 	PORT_DIPSETTING(0x0371, "Full Duplex, Local Copy (XCLK = RCLK)") // S1:2
@@ -278,10 +359,10 @@ static INPUT_PORTS_START(vt52)
 	PORT_DIPSETTING(0x03d1, "150 Baud") // S1:5
 	PORT_DIPSETTING(0x03e1, "300 Baud") // S1:4
 	PORT_DIPSETTING(0x03f0, "4800 Baud") // S1:7
-	PORT_DIPNAME(0x3c0e, 0x1c0e, "Receiving Speed") PORT_DIPLOCATION("S2:6,5,4,2,1,3,7") // positions labeled A through G
+	PORT_DIPNAME(0x3c0e, 0x1c0e, "Receiving Speed") PORT_DIPLOCATION("S2:6,5,4,2,1,3,7") PORT_CHANGED_MEMBER(DEVICE_SELF, vt52_state, data_sw_changed, 0)
 	PORT_DIPSETTING(0x2c0e, "Match (Bell 103) (RCLK = XCLK)") // S2:C
 	PORT_DIPSETTING(0x340e, "Match (Bell 103), Local Copy (RCLK = XCLK)") // S2:A
-	PORT_DIPSETTING(0x380e, "110 Baud with 2 Stop Bits") // S2:B (TODO: not supported yet)
+	PORT_DIPSETTING(0x380e, "110 Baud with 2 Stop Bits") // S2:B
 	PORT_DIPSETTING(0x3c06, "600 Baud") // S2:D
 	PORT_DIPSETTING(0x3c0a, "1200 Baud") // S2:E
 	PORT_DIPSETTING(0x3c0c, "2400 Baud") // S2:F
@@ -289,15 +370,15 @@ static INPUT_PORTS_START(vt52)
 	// Any combination of XCLK = RCLK with RCLK = XCLK is illegal (both lines are pulled up, halting the UART)
 
 	PORT_START("DATABITS")
-	PORT_DIPNAME(0x1, 0x1, "Data Bits") PORT_DIPLOCATION("S3:1")
+	PORT_DIPNAME(0x1, 0x1, "Data Bits") PORT_DIPLOCATION("S3:1") PORT_CHANGED_MEMBER(DEVICE_SELF, vt52_state, data_sw_changed, 0)
 	PORT_DIPSETTING(0x0, "7 (with parity)")
 	PORT_DIPSETTING(0x1, "8 (no parity)")
-	PORT_DIPNAME(0x2, 0x2, "Parity") PORT_DIPLOCATION("W6:1")
+	PORT_DIPNAME(0x2, 0x2, "Parity") PORT_DIPLOCATION("W6:1") PORT_CHANGED_MEMBER(DEVICE_SELF, vt52_state, data_sw_changed, 0)
 	PORT_DIPSETTING(0x2, "Even")
 	PORT_DIPSETTING(0x0, "Odd")
-	PORT_DIPNAME(0x4, 0x0, "Data Bit 7") PORT_DIPLOCATION("W5:1")
+	PORT_DIPNAME(0x4, 0x0, "Data Bit 7") PORT_DIPLOCATION("W5:1") PORT_CHANGED_MEMBER(DEVICE_SELF, vt52_state, data_sw_changed, 0)
 	PORT_DIPSETTING(0x0, "Spacing")
-	PORT_DIPSETTING(0x4, "Marking")
+	PORT_DIPSETTING(0x4, "Marking") // actually the hardware default, but not as good for modern use
 
 	PORT_START("KEYCLICK")
 	PORT_DIPNAME(1, 1, DEF_STR(Unused)) PORT_DIPLOCATION("S4:1") // not tested by VT52, and possibly not even populated
@@ -310,9 +391,9 @@ static INPUT_PORTS_START(vt52)
 	PORT_DIPSETTING(1, "60 Hz")
 INPUT_PORTS_END
 
-void vt52_state::vt52(machine_config &mconfig)
+void vt52_state::vt52(machine_config &config)
 {
-	VT52_CPU(mconfig, m_maincpu, 13.824_MHz_XTAL);
+	VT52_CPU(config, m_maincpu, 13.824_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt52_state::rom_1k);
 	m_maincpu->set_addrmap(AS_DATA, &vt52_state::ram_2k);
 	m_maincpu->set_screen("screen");
@@ -329,13 +410,16 @@ void vt52_state::vt52(machine_config &mconfig)
 	m_maincpu->bell_callback().set("bell", FUNC(speaker_sound_device::level_w));
 	m_maincpu->char_data_callback().set(FUNC(vt52_state::chargen_r));
 
-	AY51013(mconfig, m_uart); // TR1402 or equivalent
+	AY51013(config, m_uart); // TR1402 or equivalent
 	m_uart->write_so_callback().set(FUNC(vt52_state::serial_out_w));
 
-	SCREEN(mconfig, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	SPEAKER(mconfig, "mono").front_center();
-	SPEAKER_SOUND(mconfig, "bell").add_route(ALL_OUTPUTS, "mono", 1.0); // FIXME: uses a flyback diode circuit
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "bell").add_route(ALL_OUTPUTS, "mono", 1.0); // FIXME: uses a flyback diode circuit
+
+	RS232_PORT(config, m_eia, default_rs232_devices, nullptr);
+	m_eia->rxd_handler().set(FUNC(vt52_state::rec_data_w));
 }
 
 ROM_START(vt52)
@@ -344,9 +428,11 @@ ROM_START(vt52)
 	ROM_LOAD_NIB_HIGH("23-125a9.e26", 0x000, 0x200, CRC(b2a670c9) SHA1(fa8dd031dcafe4facff41e79603bdb388a6df928))
 	ROM_LOAD_NIB_LOW( "23-126a9.e37", 0x200, 0x200, CRC(4883a600) SHA1(c5d9b0c21493065c75b4a7d52d5bd47f9851dfe7))
 	ROM_LOAD_NIB_HIGH("23-127a9.e21", 0x200, 0x200, CRC(56c1c0d6) SHA1(ab0eb6e7bbafcc3d28481b62de3d3490f01c0174))
+	// K1 or L1 version uses PROMs 23-119A9 through 23-122A9
 
 	ROM_REGION(0x400, "chargen", 0) // 2608 (non-JEDEC) character generator
 	ROM_LOAD("23-002b4.e1", 0x000, 0x400, CRC(b486500c) SHA1(029f07424d6c23ee083db42d9f9c252ac728ccd0))
+	// K1 or L1 version may use either 23-001B4 or 23-002B4
 ROM_END
 
-COMP(1975, vt52, 0, 0, vt52, vt52, vt52_state, empty_init, "Digital Equipment Corporation", "VT52 Video Display Terminal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER)
+COMP(1975, vt52, 0, 0, vt52, vt52, vt52_state, empty_init, "Digital Equipment Corporation", "VT52 Video Display Terminal (M4)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER)
