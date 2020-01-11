@@ -121,12 +121,12 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>007 - GoldenEye (USA)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NUS-NGEE-USA"/>
+		<info name="serial" value="NUS-NGEE-USA, NUS-NGEE-USA-1"/>
 		<part name="cart" interface="n64_cart">
-			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="pcb" value="NUS-01A-02" /> <!-- Also with NUS-01A-03 -->
 			<feature name="u1" value="U1 [NUS-NGEE-0]" />
 			<feature name="u2" value="U2 [BU9850]" />
-			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" /> <!-- Also with [CIC-NUS-6102A] -->
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN" /> <!-- also found with NUS-USA/CAN-1 -->
 			<dataarea name="rom" size="12582912">
@@ -845,8 +845,14 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<info name="release" value="19990903"/>
 		<info name="alt_title" value="爆裂無敵 バンガイオー"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NBNJ-0]" />
+			<feature name="u2" value="U2 [BK4D-NUS]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="12582912">
-				<rom name="bakuretsu muteki bangaioh (japan).bin" size="12582912" crc="2a8ce2e1" sha1="38c6653a0c4e45f25f33c97ccd2a7f5af0b57784" />
+				<rom name="nus-nbnj-0.u1" size="12582912" crc="2a8ce2e1" sha1="38c6653a0c4e45f25f33c97ccd2a7f5af0b57784" />
 			</dataarea>
 		</part>
 	</software>
@@ -3698,9 +3704,9 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-N8IP-UKV"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-N8IP-0" />
-			<feature name="u2" value="[empty]" />
-			<feature name="u3" value="CIC-NUS-7101" />
+			<feature name="u1" value="U1 [NUS-N8IP-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101]" />
 			<feature name="cart_model" value="NUS-006(EUR)" />
 			<dataarea name="rom" size="12582912">
 				<rom name="nus-n8ip-0.u1" size="12582912" crc="2d49f99a" sha1="12a12c3b5aba1307d947ea7f72246497755b5482" />
@@ -3723,16 +3729,16 @@ This cart features a RTC, currently unemulated
 	</software>
 
 	<software name="fifa98u" cloneof="fifa98">
-		<description>FIFA - Road to World Cup 98 (USA, Brazil)</description>
+		<description>FIFA - Road to World Cup 98 (Brazil, USA)</description>
 		<year>1997</year>
-		<publisher>Electronic Arts</publisher>
+		<publisher>Electronic Arts / Gradiente</publisher>
 		<info name="alt_title" value="FIFA - A Caminho Da Copa 98 (Brazil)" />
 		<info name="serial" value="NUS-N8IE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-N8IE-0" />
-			<feature name="u2" value="[empty]" />
-			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="u1" value="U1 [NUS-N8IE-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<feature name="cart_model" value="n/a (NUS-006 clone)" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="12582912">
@@ -3745,7 +3751,7 @@ This cart features a RTC, currently unemulated
 		<description>FIFA 99 (Europe)</description>
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="NUS-N9FP-(NOE,FRA,ESP,SCN)"/>
+		<info name="serial" value="NUS-N9FP-ESP, NUS-N9FP-FRA, NUS-N9FP-NOE, NUS-N9FP-SCN"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="fifa 99 (europe) (en,fr,de,es,it,nl,pt,sv).bin" size="16777216" crc="ce258860" sha1="eab12cc33bd12923c022d2336c3b8a1001132137" />
@@ -3760,7 +3766,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-N9FE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-N9FE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
@@ -3788,7 +3794,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-N7IE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-01" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-N7IE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
@@ -3801,7 +3807,7 @@ This cart features a RTC, currently unemulated
 		<description>Fighters Destiny (Europe)</description>
 		<year>1998</year>
 		<publisher>Ocean</publisher>
-		<info name="serial" value="NUS-NKAP-EUR"/>
+		<info name="serial" value="NUS-NKAP-EUR, NUS-NKAP-SCN"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="fighters destiny (europe).bin" size="12582912" crc="83f9299e" sha1="ad18a0144137ed61012363f7e810548e7ceaa934" />
@@ -3840,7 +3846,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NKAE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NKAE-0]" />
 			<feature name="u2" value="U2 [BU9850]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -3856,9 +3862,9 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NFGE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-NFGE-0" />
-			<feature name="u2" value="BU9850" />
-			<feature name="u3" value="CIC-NUS-6102A" />
+			<feature name="u1" value="U1 [NUS-NFGE-0]" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="16777216">
@@ -3900,7 +3906,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NFFE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NFFE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
@@ -3928,7 +3934,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NFDE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NFDE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -3941,7 +3947,7 @@ This cart features a RTC, currently unemulated
 		<description>Forsaken 64 (Europe)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="NUS-NFOP-EUR"/>
+		<info name="serial" value="NUS-NFOP-EUR, NUS-NFOP-UKV"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="forsaken 64 (europe) (en,fr,es,it).bin" size="8388608" crc="6c65ef7a" sha1="5b6a661f75f9e3560238acf6dfcd4287e75586c0" />
@@ -3968,7 +3974,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NFOE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NFOE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
@@ -3984,7 +3990,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NF9E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NF9E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -4155,7 +4161,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NGXE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NGXE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -4209,7 +4215,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NX3E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NX3E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="33554432">
@@ -4237,7 +4243,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NX2E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NX2E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
@@ -4250,10 +4256,16 @@ This cart features a RTC, currently unemulated
 		<description>Glover (Europe)</description>
 		<year>1998</year>
 		<publisher>Hasbro Interactive</publisher>
-		<info name="serial" value="NUS-NGVP-EUR"/>
+		<info name="serial" value="NUS-NGVP-EUR, NUS-NGVP-EUR-1"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NGVP-0]" />
+			<feature name="u2" value="U2 [BK4D-NUS]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101]" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<feature name="cart_back_label" value="NUS-EUR-1" />
 			<dataarea name="rom" size="8388608">
-				<rom name="glover (europe) (en,fr,de).bin" size="8388608" crc="93dae2a0" sha1="d61d03147a0f88136dd3fef4e934fa8c8bd96bc1" />
+				<rom name="nus-ngvp-0.u1" size="8388608" crc="93dae2a0" sha1="d61d03147a0f88136dd3fef4e934fa8c8bd96bc1" />
 			</dataarea>
 		</part>
 	</software>
@@ -4265,7 +4277,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NGVE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NGVE-0]" />
 			<feature name="u2" value="U2 [BK4D-NUS]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
@@ -4282,7 +4294,7 @@ This cart features a RTC, currently unemulated
 		<publisher>Hasbro Interactive</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="67108864">
-				<rom name="glover (prototype).bin" size="67108864" crc="4c708e6d" sha1="72484ed65cc8cefe23e6536735d053b822bb7fbf" status="baddump" />
+				<rom name="glover (prototype).bin" size="67108864" crc="4c708e6d" sha1="72484ed65cc8cefe23e6536735d053b822bb7fbf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4330,7 +4342,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NGME-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NGME-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -4346,11 +4358,13 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NGNE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NGNE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="8388608">
-				<rom name="nus-ngne-0.u1" size="8388608" crc="9670a4b7" sha1="543310e808dec437a0e499410a9c39694430a7c7" />
+				<rom name="nus-ngne-0.u1" size="8388608" crc="05a0db83" sha1="fe9d5a5ebd075b9030f23c0525cedda6fe790002" />
 			</dataarea>
 		</part>
 	</software>
@@ -4374,7 +4388,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NGCE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NGCE-0]" />
 			<feature name="u2" value="U2 [BK16D]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -4446,7 +4460,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NYWE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-03A-01" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NYWE-0]" />
 			<feature name="u2" value="U2 [LH52V246A]" />
 			<feature name="u3" value="U3 [74LV2416]" />
 			<feature name="u4" value="U4 [CIC-NUS-6102A]" />
@@ -4490,7 +4504,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NHCE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NHCE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -4556,7 +4570,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NHXE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-01" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NHXE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
@@ -4580,7 +4594,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NPGE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NPGE-0]" />
 			<feature name="u2" value="U2 [BK4D-NUS]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -4598,9 +4612,9 @@ This cart features a RTC, currently unemulated
 		<info name="alt_title" value="飛龍の拳ツイン"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-NHKJ-0" />
-			<feature name="u2" value="[empty]" />
-			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="u1" value="U1 [NUS-NHKJ-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
 				<rom name="nus-nhkj-0.u1" size="12582912" crc="4a07511c" sha1="bf68b9514a78040edd62863dfe15b75aed397cdb" />
 			</dataarea>
@@ -4613,8 +4627,13 @@ This cart features a RTC, currently unemulated
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NETP-EUR"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NETP-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101]" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
 			<dataarea name="rom" size="16777216">
-				<rom name="holy magic century (europe).bin" size="16777216" crc="2f886030" sha1="4a5fad6564ffb69b874b1054b702e64aed197387" />
+				<rom name="nus-netp-0.u1" size="16777216" crc="2f886030" sha1="4a5fad6564ffb69b874b1054b702e64aed197387" />
 			</dataarea>
 		</part>
 	</software>
@@ -4644,7 +4663,7 @@ This cart features a RTC, currently unemulated
 	</software>
 
 	<software name="kirby64j" cloneof="kirby64">
-		<description>Hoshi no Kirby 64 (Japan, Rev. C)</description>
+		<description>Hoshi no Kirby 64 (Japan, rev 3)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NK4J-JPN"/>
@@ -4658,7 +4677,7 @@ This cart features a RTC, currently unemulated
 	</software>
 
 	<software name="kirby64j1" cloneof="kirby64">
-		<description>Hoshi no Kirby 64 (Japan, Rev. B)</description>
+		<description>Hoshi no Kirby 64 (Japan, rev 2)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NK4J-JPN"/>
@@ -4672,7 +4691,7 @@ This cart features a RTC, currently unemulated
 	</software>
 
 	<software name="kirby64j2" cloneof="kirby64">
-		<description>Hoshi no Kirby 64 (Japan, Rev. A)</description>
+		<description>Hoshi no Kirby 64 (Japan, rev 1)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NK4J-JPN"/>
@@ -4718,7 +4737,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NHWE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NHWE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -4786,7 +4805,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NHVE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NHVE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -4826,7 +4845,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NHTE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NHTE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="33554432">
@@ -5997,7 +6016,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NZSE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-01" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NZSE-0]" />
 			<feature name="u2" value="U2 [29L1100KC-15B0]" />
 			<feature name="u3" value="U3 [CIC-NUS-6105A]" />
 			<dataarea name="rom" size="33554432">
@@ -7253,6 +7272,15 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="release" value="19980403"/>
 		<info name="alt_title" value="森田将棋64"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="A33-0024A" />
+			<feature name="u1" value="U1 MASKROM-NUS [NUS-NMSJ-0]" />
+			<feature name="u2" value="U2 EEPROM-NUS [BU9850]" />
+			<feature name="u3" value="U3 CIC-NUS [CIC6102]" />
+			<feature name="u4" value="U4 ST031" />
+			<feature name="u5" value="U5 ST034" />
+			<feature name="u6" value="U6 78L08T" />
+			<feature name="U7" value="U7 UPC358 [LM358]" />
+			<feature name="U8" value="U8 UPC3403 [MC3403D]" />
 			<dataarea name="rom" size="8388608">
 				<rom name="morita shougi 64 (japan).bin" size="8388608" crc="377b7580" sha1="41b66663b6428c040579cebeda70db2fcd063b3e" />
 			</dataarea>
