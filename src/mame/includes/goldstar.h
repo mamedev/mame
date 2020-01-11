@@ -170,6 +170,7 @@ public:
 	void init_skill98();
 	void init_po33();
 	void init_match133();
+	void init_nfb96_b();
 	void init_nfb96_dk();
 	void init_nfb96_c2();
 	void init_nfb96_d();

@@ -14362,6 +14362,43 @@ ROM_START( nc96f )
 	// none?
 ROM_END
 
+ROM_START( nc96g )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "new cherry 96 b-type 3.1.bin", 0x00000, 0x1000, CRC(7c06c960) SHA1(017428d3cf5471533ef8702d62cb572bb7fbb652) ) // v3.1, B Sub-PCB
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x8000)
+
+	ROM_REGION( 0x20000, "graphics", 0 )
+	ROM_LOAD( "high.bin", 0x00000, 0x10000, CRC(1ab0441a) SHA1(88bd43fb27aa38b566c13b3a0c63cd2f7529f886) )
+	ROM_LOAD( "low.bin",  0x10000, 0x10000, CRC(6c173154) SHA1(af7d597dd9d7704b9fc9c154349e067c990c541d) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x04000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x0c000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x14000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
+	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // palette, not dumped for this set
+	ROM_LOAD( "82s129a.u84", 0x0000, 0x0100, BAD_DUMP CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
+	ROM_LOAD( "82s129a.u79", 0x0100, 0x0100, BAD_DUMP CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
+ROM_END
+
 ROM_START( nc96txt )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "tc132axt.bin", 0x00000, 0x1000, CRC(a77dc042) SHA1(1076a6687da1871b666bd214a755b68f5e1aeb8c) ) // Special Texas v1.32, C2 Sub-PCB
@@ -17479,6 +17516,24 @@ void cmaster_state::init_skill98()
 	/* Oki 6295 at 0x20 */
 }
 
+void cmaster_state::init_nfb96_b()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+	for (int i = 0; i < 0x10000; i++)
+	{
+		uint8_t x = rom[i];
+
+		switch (i & 0x18)
+		{
+			case 0x00: x = bitswap<8>(x ^ 0x27, 3, 2, 1, 0, 7, 6, 5, 4); break;
+			case 0x08: x = bitswap<8>(x ^ 0xa1, 0, 7, 6, 5, 4, 3, 2, 1); break;
+			case 0x10: x = bitswap<8>(x ^ 0x34, 5, 4, 3, 2, 1, 0, 7, 6); break;
+			case 0x18: x = bitswap<8>(x ^ 0x5c, 4, 3, 2, 1, 0, 7, 6, 5); break;
+		}
+		rom[i] = x;
+	}
+}
+
 void cmaster_state::init_nfb96_c1()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -18170,6 +18225,7 @@ GAMEL( 1996, nc96c,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb9
 GAMEL( 1996, nc96d,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb96_d,  ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.53, D PCB)",                0,                 layout_nfb96 ) /* D  Sub-PCB */
 GAMEL( 1996, nc96e,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb96_d,  ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.40, D PCB)",                0,                 layout_nfb96 ) /* D  Sub-PCB */
 GAMEL( 1996, nc96f,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb96_dk, ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.62, DK PCB)",               0,                 layout_nfb96 ) /* DK Sub-PCB */
+GAMEL( 1996, nc96g,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb96_b,  ROT0, "Amcoe",   "New Cherry '96 (v3.1, B PCB)",                                 0,                 layout_nfb96 ) /* B  Sub-PCB */
 GAMEL( 2000, nc96txt,   nc96,     amcoe2,   nfb96tx,   cmaster_state,  init_nfb96_c2, ROT0, "Amcoe",   "New Cherry '96 Special Edition (v1.32 Texas XT, C2 PCB)",      0,                 layout_nfb96tx ) /* ver. tc1.32axt C2 Sub-PCB */
 
 GAME(  2009, fb2010,    0,        amcoe2,   fb2010,    cmaster_state,  init_fb2010,   ROT0, "Amcoe",   "Fruit Bonus 2010",                                             0 )
