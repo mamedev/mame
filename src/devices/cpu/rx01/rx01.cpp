@@ -7,7 +7,7 @@
     This TTL disk control processor executes its custom instruction set at
     the rather brisk rate of 200 ns per machine cycle. However, it has no
     ALU or general-purpose data bus, so most of its operations amount to
-    simple manipulations of an assortment of synchronous counters, shift
+    simple manipulations of an assortment of synchronous up counters, shift
     registers and flip-flops.
 
     The instruction memory is organized as a series of 256-byte "fields"
@@ -148,6 +148,18 @@ bool rx01_cpu_device::sep_data()
 	return false;
 }
 
+bool rx01_cpu_device::missing_clk()
+{
+	// TODO
+	return false;
+}
+
+bool rx01_cpu_device::drv_sel_trk0()
+{
+	// TODO
+	return false;
+}
+
 bool rx01_cpu_device::test_condition()
 {
 	switch (m_mb & 074)
@@ -172,13 +184,21 @@ bool rx01_cpu_device::test_condition()
 		// 16th stage of CRC generator
 		return BIT(m_crc, 0);
 
+	case 034:
+		// Track zero of selected drive on head
+		return (m_flags & FF_IOB0) && (m_flags && FF_IOB3) && drv_sel_trk0();
+
 	case 054:
-		// Separated data equals MSB of shift register
+		// Separated data equals shift register MSB
 		return BIT(m_sr, 7) == sep_data();
 
 	case 060:
 		// Sector buffer address overflow
 		return m_bar == 07777;
+
+	case 064:
+		// Missing clock equals shift register MSB
+		return BIT(m_sr, 7) == missing_clk();
 
 	case 074:
 		// Flag state equals one

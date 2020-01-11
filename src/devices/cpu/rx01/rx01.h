@@ -59,6 +59,8 @@ private:
 	// internal helpers
 	u8 mux_out();
 	bool sep_data();
+	bool missing_clk();
+	bool drv_sel_trk0();
 	bool test_condition();
 	void shift_crc(bool data);
 	void set_flag(bool j, bool k);
