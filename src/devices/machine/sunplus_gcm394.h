@@ -98,7 +98,7 @@ protected:
 
 	devcb_write16 m_porta_out;
 
-	uint16_t m_dma_params[7][2];
+	uint16_t m_dma_params[7][3];
 
 	// unk 78xx
 	uint16_t m_7803;
@@ -192,6 +192,8 @@ private:
 	DECLARE_WRITE16_MEMBER(system_dma_params_channel0_w);
 	DECLARE_READ16_MEMBER(system_dma_params_channel1_r);
 	DECLARE_WRITE16_MEMBER(system_dma_params_channel1_w);
+	DECLARE_READ16_MEMBER(system_dma_params_channel2_r);
+	DECLARE_WRITE16_MEMBER(system_dma_params_channel2_w);
 	DECLARE_READ16_MEMBER(system_dma_status_r);
 	DECLARE_WRITE16_MEMBER(system_dma_trigger_w);
 	DECLARE_READ16_MEMBER(system_dma_memtype_r);

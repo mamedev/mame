@@ -85,6 +85,17 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_params_channel1_w)
 	write_dma_params(1, offset, data);
 }
 
+READ16_MEMBER(sunplus_gcm394_base_device::system_dma_params_channel2_r)
+{
+	return read_dma_params(2, offset);
+}
+
+WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_params_channel2_w)
+{
+	write_dma_params(2, offset, data);
+}
+
+
 
 
 READ16_MEMBER(sunplus_gcm394_base_device::system_dma_status_r)
@@ -174,8 +185,15 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
 {
-	if (data & 0x01) trigger_systemm_dma(space, 0, data);
-	if (data & 0x02) trigger_systemm_dma(space, 1, data);
+	// trigger is value based, not bit based, how many channels are there?
+
+	if (data == 1) trigger_systemm_dma(space, 0, data);
+	else if (data == 2) trigger_systemm_dma(space, 1, data);
+	else if (data == 3) trigger_systemm_dma(space, 2, data);
+	else
+	{
+		fatalerror("unknown DMA trigger type\n");
+	}
 }
 
 READ16_MEMBER(sunplus_gcm394_base_device::system_dma_memtype_r)
@@ -697,6 +715,8 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	map(0x007a3a, 0x007a3a).r(FUNC(sunplus_gcm394_base_device::system_7a3a_r));
 	map(0x007a80, 0x007a86).rw(FUNC(sunplus_gcm394_base_device::system_dma_params_channel0_r), FUNC(sunplus_gcm394_base_device::system_dma_params_channel0_w));
 	map(0x007a88, 0x007a8e).rw(FUNC(sunplus_gcm394_base_device::system_dma_params_channel1_r), FUNC(sunplus_gcm394_base_device::system_dma_params_channel1_w)); // jak_tsm writes here
+	map(0x007a90, 0x007a96).rw(FUNC(sunplus_gcm394_base_device::system_dma_params_channel2_r), FUNC(sunplus_gcm394_base_device::system_dma_params_channel2_w)); // bkrankp writes here (is this on all types or just SPI?)
+
 	map(0x007abe, 0x007abe).rw(FUNC(sunplus_gcm394_base_device::system_dma_memtype_r), FUNC(sunplus_gcm394_base_device::system_dma_memtype_w)); // 7abe - written with DMA stuff (source type for each channel so that device handles timings properly?)
 	map(0x007abf, 0x007abf).rw(FUNC(sunplus_gcm394_base_device::system_dma_status_r), FUNC(sunplus_gcm394_base_device::system_dma_trigger_w));
 
@@ -1145,7 +1165,7 @@ void sunplus_gcm394_base_device::device_reset()
 {
 	unsp_20_device::device_reset();
 
-	for (int j = 0; j < 2; j++)
+	for (int j = 0; j < 3; j++)
 	{
 		for (int i = 0; i < 7; i++)
 		{
