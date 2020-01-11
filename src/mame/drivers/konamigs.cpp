@@ -27,8 +27,8 @@
 	* denotes these games are archived
 
 	TODO:
-	 - currently implemented very basic set of Q2SD GPU features, required/used by Spray Hitter, should be improved if more games will be found.
-	 - hook IRQs from GPU and SPU (not used by Spray Hitter)
+	 - currently implemented very basic set of Q2SD GPU features, required/used by dumped games, should be improved if more games will be found.
+	 - hook IRQs from GPU and SPU (not used by dumped games)
 
 	Notes:
 	 - hold Test + Service while booting to initialise RTC NVRAM
@@ -387,11 +387,11 @@ WRITE_LINE_MEMBER(gsan_state::vblank)
 			{
 				m_gpuregs[0x000 / 2] &= ~(1 << 9);
 				m_gpuregs[0x002 / 2] ^= 1 << 8; // DBF (display buffer)
-				if (m_vbkem)
-				{
-					m_vbkem = false;
-					do_render(true);
-				}
+			}
+			if (m_vbkem)
+			{
+				m_vbkem = false;
+				do_render(true);
 			}
 			break;
 		}
