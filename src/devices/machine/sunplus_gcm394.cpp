@@ -477,16 +477,15 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7935_w)
 }
 
 // these are related to the accelerometer values on jak_g500 (8-bit signed) and also the SPI reads for bkrankp
-
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7944_r)
+READ16_MEMBER(sunplus_gcm394_base_device::spi_7944_rxdata)
 {
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7944_r\n", machine().describe_context());
-	return  machine().rand();
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::spi_7944_rxdata\n", machine().describe_context());
+	return machine().rand();
 }
 
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7945_r)
+READ16_MEMBER(sunplus_gcm394_base_device::spi_7945_misc_control_reg)
 {
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7945_r\n", machine().describe_context());
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::spi_7945_misc_control_reg\n", machine().describe_context());
 	return machine().rand();// &0x0007;
 }
 
@@ -732,8 +731,12 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	map(0x007935, 0x007935).rw(FUNC(sunplus_gcm394_base_device::unkarea_7935_r), FUNC(sunplus_gcm394_base_device::unkarea_7935_w));
 	map(0x007936, 0x007936).rw(FUNC(sunplus_gcm394_base_device::unkarea_7936_r), FUNC(sunplus_gcm394_base_device::unkarea_7936_w));
 
-	map(0x007944, 0x007944).r(FUNC(sunplus_gcm394_base_device::unkarea_7944_r)); // jak_s500   (also the SPI input port for bkrankp?)
-	map(0x007945, 0x007945).r(FUNC(sunplus_gcm394_base_device::unkarea_7945_r)); // jak_s500
+	//7940 P_SPI_Ctrl     - SPI Control Register
+	//7941 P_SPI_TXStatus - SPI Transmit Status Register
+	//7942 P_SPI_TXData   - SPI Transmit FIFO Register
+	//7943 P_SPI_RXStatus - SPI Receive Status Register
+	map(0x007944, 0x007944).r(FUNC(sunplus_gcm394_base_device::spi_7944_rxdata));           // 7944 P_SPI_RXData - SPI Receive FIFO Register    (jak_s500 accelerometer)   (also the SPI ROM DMA input port for bkrankp?)
+	map(0x007945, 0x007945).r(FUNC(sunplus_gcm394_base_device::spi_7945_misc_control_reg)); // 7945 P_SPI_Misc   - SPI Misc Control Register    (jak_s500 accelerometer)
 
 	// possible adc?
 	map(0x007960, 0x007960).w(FUNC(sunplus_gcm394_base_device::unkarea_7960_w));
