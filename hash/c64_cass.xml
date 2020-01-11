@@ -4491,13 +4491,13 @@
 		<year>1985</year>
 		<publisher>Ricochet</publisher>
 		<part name="cass1" interface="cbm_cass">
-			<dataarea name="cass" size="16387950">
-				<rom name="outlaws side a.wav" size="16387950" crc="b048919a" sha1="65660170e42b2239ddba44b021dd58c0e299b4c8"/>
+			<dataarea name="cass" size="663257">
+				<rom name="outlaws side a.tap" size="663257" crc="332f4483" sha1="f5752d3fad3971662c5b13f9570e5625821854a2"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="cbm_cass">
-			<dataarea name="cass" size="16378130">
-				<rom name="outlaws side b.wav" size="16378130" crc="e71d5da2" sha1="55b0036ff24c5c98f58c21a72085e7fb4382ae54"/>
+			<dataarea name="cass" size="658990">
+				<rom name="outlaws side b.tap" size="658990" crc="429754e6" sha1="5fae6c04243e532008efe477eb7ffeab6178ca7c"/>
 			</dataarea>
 		</part>
 	</software>
