@@ -258,10 +258,10 @@ void gcm394_base_video_device::device_start()
 	save_item(NAME(m_7088));
 	save_item(NAME(m_sprite_7022_gfxbase_lsb));
 	save_item(NAME(m_sprite_702d_gfxbase_msb));
-	save_item(NAME(m_unk_vid1_gfxbase_lsb));
-	save_item(NAME(m_unk_vid1_gfxbase_msb));
-	save_item(NAME(m_unk_vid2_gfxbase_lsb));
-	save_item(NAME(m_unk_vid2_gfxbase_msb));
+	save_item(NAME(m_page2_addr_lsb));
+	save_item(NAME(m_page2_addr_msb));
+	save_item(NAME(m_page3_addr_lsb));
+	save_item(NAME(m_page3_addr_msb));
 	save_item(NAME(m_video_irq_status));
 	save_item(NAME(m_spriteram));
 	save_item(NAME(m_spriteextra));
@@ -330,10 +330,10 @@ void gcm394_base_video_device::device_reset()
 
 	m_sprite_7022_gfxbase_lsb = 0;
 	m_sprite_702d_gfxbase_msb = 0;
-	m_unk_vid1_gfxbase_lsb = 0;
-	m_unk_vid1_gfxbase_msb = 0;
-	m_unk_vid2_gfxbase_lsb = 0;
-	m_unk_vid2_gfxbase_msb = 0;
+	m_page2_addr_lsb = 0;
+	m_page2_addr_msb = 0;
+	m_page3_addr_lsb = 0;
+	m_page3_addr_msb = 0;
 
 }
 
@@ -791,8 +791,8 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 			{
 				draw_page(cliprect, scanline, i, (m_page0_addr_lsb | (m_page0_addr_msb<<16)), m_tmap0_regs, m_tmap0_scroll);
 				draw_page(cliprect, scanline, i, (m_page1_addr_lsb | (m_page1_addr_msb<<16)), m_tmap1_regs, m_tmap1_scroll);
-				draw_page(cliprect, scanline, i, (m_unk_vid1_gfxbase_lsb | (m_unk_vid1_gfxbase_msb<<16)), m_tmap2_regs, m_tmap2_scroll);
-				draw_page(cliprect, scanline, i, (m_unk_vid2_gfxbase_lsb | (m_unk_vid2_gfxbase_msb<<16)), m_tmap3_regs, m_tmap3_scroll);
+				draw_page(cliprect, scanline, i, (m_page2_addr_lsb | (m_page2_addr_msb<<16)), m_tmap2_regs, m_tmap2_scroll);
+				draw_page(cliprect, scanline, i, (m_page3_addr_lsb | (m_page3_addr_msb<<16)), m_tmap3_regs, m_tmap3_scroll);
 
 			}
 			draw_sprites(cliprect, scanline, i);
@@ -1015,29 +1015,29 @@ WRITE16_MEMBER(gcm394_base_video_device::tmap2_regs_w)
 	}
 }
 
-READ16_MEMBER(gcm394_base_video_device::unk_vid1_gfxbase_lsb_r)
+READ16_MEMBER(gcm394_base_video_device::tmap2_tilebase_lsb_r)
 {
-	return m_unk_vid1_gfxbase_lsb;
+	return m_page2_addr_lsb;
 }
 
 
-WRITE16_MEMBER(gcm394_base_video_device::unk_vid1_gfxbase_lsb_w)
+WRITE16_MEMBER(gcm394_base_video_device::tmap2_tilebase_lsb_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid1_gfxbase_lsb_w %04x\n", machine().describe_context(), data);
-	m_unk_vid1_gfxbase_lsb = data;
-	LOGMASKED(LOG_GCM394_TMAP, "\t(unk_vid1 tilegfxbase is now %04x%04x)\n", m_unk_vid1_gfxbase_msb, m_unk_vid1_gfxbase_lsb);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::tmap2_tilebase_lsb_w %04x\n", machine().describe_context(), data);
+	m_page2_addr_lsb = data;
+	LOGMASKED(LOG_GCM394_TMAP, "\t(unk_vid1 tilegfxbase is now %04x%04x)\n", m_page2_addr_msb, m_page2_addr_lsb);
 }
 
-READ16_MEMBER(gcm394_base_video_device::unk_vid1_gfxbase_msb_r)
+READ16_MEMBER(gcm394_base_video_device::tmap2_tilebase_msb_r)
 {
-	return m_unk_vid1_gfxbase_msb;
+	return m_page2_addr_msb;
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::unk_vid1_gfxbase_msb_w)
+WRITE16_MEMBER(gcm394_base_video_device::tmap2_tilebase_msb_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid1_gfxbase_msb_w %04x\n", machine().describe_context(), data);
-	m_unk_vid1_gfxbase_msb = data;
-	LOGMASKED(LOG_GCM394_TMAP, "\t(unk_vid1 tilegfxbase is now %04x%04x)\n", m_unk_vid1_gfxbase_msb, m_unk_vid1_gfxbase_lsb);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::tmap2_tilebase_msb_w %04x\n", machine().describe_context(), data);
+	m_page2_addr_msb = data;
+	LOGMASKED(LOG_GCM394_TMAP, "\t(unk_vid1 tilegfxbase is now %04x%04x)\n", m_page2_addr_msb, m_page2_addr_lsb);
 }
 
 // **************************************** unknown video device 2 (another tilemap? roz? lines? zooming sprite layer?) *************************************************
@@ -1067,30 +1067,30 @@ WRITE16_MEMBER(gcm394_base_video_device::tmap3_regs_w)
 	}
 }
 
-READ16_MEMBER(gcm394_base_video_device::unk_vid2_gfxbase_lsb_r)
+READ16_MEMBER(gcm394_base_video_device::tmap3_tilebase_lsb_r)
 {
-	return m_unk_vid2_gfxbase_lsb;
+	return m_page3_addr_lsb;
 }
 
 
-WRITE16_MEMBER(gcm394_base_video_device::unk_vid2_gfxbase_lsb_w)
+WRITE16_MEMBER(gcm394_base_video_device::tmap3_tilebase_lsb_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid2_gfxbase_lsb_w %04x\n", machine().describe_context(), data);
-	m_unk_vid2_gfxbase_lsb = data;
-	LOGMASKED(LOG_GCM394_TMAP, "\t(unk_vid2 tilegfxbase is now %04x%04x)\n", m_unk_vid2_gfxbase_msb, m_unk_vid2_gfxbase_lsb);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::tmap3_tilebase_lsb_w %04x\n", machine().describe_context(), data);
+	m_page3_addr_lsb = data;
+	LOGMASKED(LOG_GCM394_TMAP, "\t(unk_vid2 tilegfxbase is now %04x%04x)\n", m_page3_addr_msb, m_page3_addr_lsb);
 }
 
-READ16_MEMBER(gcm394_base_video_device::unk_vid2_gfxbase_msb_r)
+READ16_MEMBER(gcm394_base_video_device::tmap3_tilebase_msb_r)
 {
-	return m_unk_vid2_gfxbase_msb;
+	return m_page3_addr_msb;
 }
 
 
-WRITE16_MEMBER(gcm394_base_video_device::unk_vid2_gfxbase_msb_w)
+WRITE16_MEMBER(gcm394_base_video_device::tmap3_tilebase_msb_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid2_gfxbase_msb_w %04x\n", machine().describe_context(), data);
-	m_unk_vid2_gfxbase_msb = data;
-	LOGMASKED(LOG_GCM394_TMAP, "\t(unk_vid2 tilegfxbase is now %04x%04x)\n", m_unk_vid2_gfxbase_msb, m_unk_vid2_gfxbase_lsb);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::tmap3_tilebase_msb_w %04x\n", machine().describe_context(), data);
+	m_page3_addr_msb = data;
+	LOGMASKED(LOG_GCM394_TMAP, "\t(unk_vid2 tilegfxbase is now %04x%04x)\n", m_page3_addr_msb, m_page3_addr_lsb);
 }
 
 // **************************************** sprite control registers *************************************************
@@ -1410,6 +1410,11 @@ READ16_MEMBER(gcm394_base_video_device::palette_r)
 		offset |= (m_703a_palettebank & 0x000f) << 8;
 		return m_paletteram[offset];
 	}
+}
+
+WRITE16_MEMBER(gcm394_base_video_device::video_701c_w)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_701c_w %04x\n", machine().describe_context(), data);
 }
 
 
