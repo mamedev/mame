@@ -4366,8 +4366,8 @@
 		<year>1984</year>
 		<publisher>Firebird Silver</publisher>
 		<part name="cass1" interface="cbm_cass">
-			<dataarea name="cass" size="517364">
-				<rom name="on court tennis.tap" size="517364" crc="b2351874" sha1="b055f200043ac0fee774976f8de495134f731de7"/>
+			<dataarea name="cass" size="517655">
+				<rom name="on court tennis.tap" size="517655" crc="c7dbf50b" sha1="df6dc7bec0c870a387cc6478c0a81e9a00ddbdaa"/>
 			</dataarea>
 		</part>
 	</software>
