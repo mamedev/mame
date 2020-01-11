@@ -20,8 +20,10 @@ public:
 	template<int Aperture>
 	void aperture_w(address_space &space, offs_t offset, u32 data, u32 mem_mask = 0xffffffff);
 
-	static const int AS_PCI_MEMORY = 0;
-	static const int AS_PCI_CONFIGURATION = 1;
+	enum {
+		AS_PCI_MEMORY = 0,
+		AS_PCI_CONFIGURATION = 1
+	};
 
 protected:
 	virtual void device_start() override;
