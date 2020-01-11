@@ -421,10 +421,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::ioarea_786b_portb_attribute_w)
 	m_786b_portb_attribute = data;
 }
 
-
-
-
-// similar read/write pattern to above, 2nd group?
+// Port C
 
 READ16_MEMBER(sunplus_gcm394_base_device::ioarea_7870_portc_r)
 {
@@ -438,15 +435,35 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::ioarea_7870_portc_w)
 	m_7870 = data;
 }
 
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7871_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7871_r\n", machine().describe_context()); return 0xffff;// m_7871;
+READ16_MEMBER(sunplus_gcm394_base_device::ioarea_7871_portc_buffer_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::ioarea_7871_portc_buffer_r\n", machine().describe_context());
+	return 0xffff;// m_7871;
 }
 
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7872_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7872_r\n", machine().describe_context()); return 0xffff;// m_7872;
+READ16_MEMBER(sunplus_gcm394_base_device::ioarea_7872_portc_direction_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::ioarea_7872_portc_direction_r\n", machine().describe_context());
+	return m_7872_portc_direction;
 }
-WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7872_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7872_w %04x\n", machine().describe_context(), data); m_7872 = data; }
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7873_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7873_r\n", machine().describe_context()); return 0xffff;// m_7873;
+
+WRITE16_MEMBER(sunplus_gcm394_base_device::ioarea_7872_portc_direction_w)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::ioarea_7872_portc_direction_w %04x\n", machine().describe_context(), data);
+	m_7872_portc_direction = data;
 }
-WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7873_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7873_w %04x\n", machine().describe_context(), data); m_7873 = data; }
+
+READ16_MEMBER(sunplus_gcm394_base_device::ioarea_7873_portc_attribute_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::ioarea_7873_portc_attribute_r\n", machine().describe_context());
+	return m_7873_portc_attribute;
+}
+
+WRITE16_MEMBER(sunplus_gcm394_base_device::ioarea_7873_portc_attribute_w)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::ioarea_7873_portc_attribute_w %04x\n", machine().describe_context(), data);
+	m_7873_portc_attribute = data;
+}
 
 
 
@@ -702,9 +719,9 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	// 786c  I/O PortB Latch / Wakeup
 
 	map(0x007870, 0x007870).rw(FUNC(sunplus_gcm394_base_device::ioarea_7870_portc_r) ,FUNC(sunplus_gcm394_base_device::ioarea_7870_portc_w)); // 7870  I/O PortC Data Register
-	map(0x007871, 0x007871).r(FUNC(sunplus_gcm394_base_device::unkarea_7871_r)); // 7871  I/O PortC Buffer Register
-	map(0x007872, 0x007872).rw(FUNC(sunplus_gcm394_base_device::unkarea_7872_r), FUNC(sunplus_gcm394_base_device::unkarea_7872_w)); // 7872  I/O PortC Direction Register
-	map(0x007873, 0x007873).rw(FUNC(sunplus_gcm394_base_device::unkarea_7873_r), FUNC(sunplus_gcm394_base_device::unkarea_7873_w)); // 7873  I/O PortC Attribute Register
+	map(0x007871, 0x007871).r(FUNC(sunplus_gcm394_base_device::ioarea_7871_portc_buffer_r)); // 7871  I/O PortC Buffer Register
+	map(0x007872, 0x007872).rw(FUNC(sunplus_gcm394_base_device::ioarea_7872_portc_direction_r), FUNC(sunplus_gcm394_base_device::ioarea_7872_portc_direction_w)); // 7872  I/O PortC Direction Register
+	map(0x007873, 0x007873).rw(FUNC(sunplus_gcm394_base_device::ioarea_7873_portc_attribute_r), FUNC(sunplus_gcm394_base_device::ioarea_7873_portc_attribute_w)); // 7873  I/O PortC Attribute Register
 
 	// 7874 (data 0x1249) (bkrankp data 0x36db)
 	// 787c (data 0x1249) (bkrankp data 0x36db)
@@ -1209,9 +1226,9 @@ void sunplus_gcm394_base_device::device_start()
 	save_item(NAME(m_786b_portb_attribute));
 
 	save_item(NAME(m_7870));
-	save_item(NAME(m_7871));
-	save_item(NAME(m_7872));
-	save_item(NAME(m_7873));
+	//save_item(NAME(m_7871));
+	save_item(NAME(m_7872_portc_direction));
+	save_item(NAME(m_7873_portc_attribute));
 	save_item(NAME(m_7882));
 	save_item(NAME(m_7883));
 	save_item(NAME(m_78a0));
@@ -1281,10 +1298,10 @@ void sunplus_gcm394_base_device::device_reset()
 
 	m_7870 = 0x0000;
 
-	m_7871 = 0x0000;
+	//m_7871 = 0x0000;
 
-	m_7872 = 0x0000;
-	m_7873 = 0x0000;
+	m_7872_portc_direction = 0x0000;
+	m_7873_portc_attribute = 0x0000;
 
 	m_7882 = 0x0000;
 	m_7883 = 0x0000;

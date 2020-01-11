@@ -131,10 +131,10 @@ protected:
 
 	uint16_t m_7870;
 
-	uint16_t m_7871;
+	//uint16_t m_7871;
 
-	uint16_t m_7872;
-	uint16_t m_7873;
+	uint16_t m_7872_portc_direction;
+	uint16_t m_7873_portc_attribute;
 
 	uint16_t m_7882;
 	uint16_t m_7883;
@@ -251,12 +251,12 @@ private:
 	DECLARE_READ16_MEMBER(ioarea_7870_portc_r);
 	DECLARE_WRITE16_MEMBER(ioarea_7870_portc_w);
 
-	DECLARE_READ16_MEMBER(unkarea_7871_r);
+	DECLARE_READ16_MEMBER(ioarea_7871_portc_buffer_r);
 
-	DECLARE_READ16_MEMBER(unkarea_7872_r);
-	DECLARE_WRITE16_MEMBER(unkarea_7872_w);
-	DECLARE_READ16_MEMBER(unkarea_7873_r);
-	DECLARE_WRITE16_MEMBER(unkarea_7873_w);
+	DECLARE_READ16_MEMBER(ioarea_7872_portc_direction_r);
+	DECLARE_WRITE16_MEMBER(ioarea_7872_portc_direction_w);
+	DECLARE_READ16_MEMBER(ioarea_7873_portc_attribute_r);
+	DECLARE_WRITE16_MEMBER(ioarea_7873_portc_attribute_w);
 
 	DECLARE_READ16_MEMBER(unkarea_7882_r);
 	DECLARE_WRITE16_MEMBER(unkarea_7882_w);
