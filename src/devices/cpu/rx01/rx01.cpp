@@ -186,7 +186,7 @@ bool rx01_cpu_device::test_condition()
 
 	case 034:
 		// Track zero of selected drive on head
-		return (m_flags & FF_IOB0) && (m_flags && FF_IOB3) && drv_sel_trk0();
+		return (m_flags & FF_IOB0) && (m_flags & FF_IOB3) && drv_sel_trk0();
 
 	case 054:
 		// Separated data equals shift register MSB
