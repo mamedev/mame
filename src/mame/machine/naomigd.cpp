@@ -409,6 +409,7 @@ naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *
 	m_i2c1(*this, "i2c_1"),
 	m_eeprom(*this, "eeprom"),
 	m_315_6154(*this, "northbridge"),
+	m_ide(*this, "ide"),
 	picdata(*this, finder_base::DUMMY_TAG),
 	dimm_command(0xffff),
 	dimm_offsetl(0xffff),
@@ -424,7 +425,6 @@ naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *
 	picbus_io[0] = 0xf;
 	picbus_io[1] = 0xf;
 	picbus_used = false;
-	memset(memctl_regs, 0, sizeof(memctl_regs));
 }
 
 void naomi_gdrom_board::submap(address_map &map)
@@ -467,88 +467,14 @@ void naomi_gdrom_board::pci_map(address_map& map)
 	map(0x10000000, 0x10000003).ram(); // temporary for testing
 	map(0x70000000, 0x70ffffff).ram().share("sh4sdram");
 	map(0x78000000, 0x783fffff).ram().share("6154sdram");
+	map(0xc00001c0, 0xc00001df).rw(FUNC(naomi_gdrom_board::ide_cs0_r), FUNC(naomi_gdrom_board::ide_cs0_w));
+	map(0xc00003b0, 0xc00003cf).rw(FUNC(naomi_gdrom_board::ide_cs1_r), FUNC(naomi_gdrom_board::ide_cs1_w));
+	map(0xc000cc00, 0xc000cc0f).rw(m_ide, FUNC(bus_master_ide_controller_device::bmdma_r), FUNC(bus_master_ide_controller_device::bmdma_w));
 }
 
 void naomi_gdrom_board::pci_config_map(address_map& map)
 {
 	map(0x1000, 0x1003).lr32([]() { return 0x189d11db; }, "Constant 0x189d11db"); // 0x10001022 or 0x11720001 possible too
-}
-
-WRITE32_MEMBER(naomi_gdrom_board::memorymanager_w)
-{
-	memctl_regs[offset] = data;
-	if (offset == 4)
-		logerror("SH4 write %04x to 0x04000010 at %04x\n", data, m_maincpu->pc());
-	if (offset == 6)
-		logerror("SH4 write %04x to 0x04000018 at %04x\n", data, m_maincpu->pc());
-	if (offset == 7)
-		logerror("SH4 write %04x to 0x0400001c at %04x\n", data, m_maincpu->pc());
-	if (offset == 14) // 0x04000038
-	{
-		if (memctl_regs[0x38 / 4] & 0x01000000)
-		{
-			uint32_t src, dst, len;
-			struct sh4_ddt_dma ddtdata;
-
-			memctl_regs[0x38 / 4] &= ~0x01000000;
-			src = memctl_regs[0x30 / 4];
-			dst = memctl_regs[0x34 / 4];
-			len = memctl_regs[0x38 / 4] & 0xffffff;
-			logerror("Dimm board dma (cpu <-> dimms) started: src %08x dst %08x len %08x\n", src, dst, len << 2);
-			/* Two examples:
-				1) bios uses a destination of 0x70900000 a source of 0x10000000 and then reads data at 0x0c900000
-			    2) bios puts data at 0x10004000 (from gdrom) and then uses a source of 0x78004000 and a destination of 0x10000000
-			*/
-			if (src >= 0x70000000) // cpu -> dimms
-			{
-				src = src - 0x70000000;
-				if (src & 0x08000000)
-					src = src + 0x08000000;
-				else
-					src = src + 0x0c000000;
-				dst = dst - 0x10000000;
-				ddtdata.buffer = dimm_des_data + dst;
-				ddtdata.source = src;
-				ddtdata.length = len;
-				ddtdata.size = 4;
-				ddtdata.channel = 1;
-				ddtdata.mode = -1;
-				ddtdata.direction = 0; // 0 sh4->device 1 device->sh4
-				m_maincpu->sh4_dma_ddt(&ddtdata);
-			}
-			else if (dst >= 0x70000000) // dimms -> cpu
-			{
-				dst = dst - 0x70000000;
-				if (dst & 0x8000000)
-					dst = dst + 0x8000000;
-				else
-					dst = dst + 0xc000000;
-				src = src - 0x10000000;
-				ddtdata.buffer = dimm_des_data + src;
-				ddtdata.destination = dst;
-				ddtdata.length = len;
-				ddtdata.size = 4;
-				ddtdata.channel = 1;
-				ddtdata.mode = -1;
-				ddtdata.direction = 1; // 0 sh4->device 1 device->sh4
-				m_maincpu->sh4_dma_ddt(&ddtdata);
-			}
-			// Log a message if requested transfer is not suppoted
-			src = memctl_regs[0x30 / 4] >> 24;
-			dst = memctl_regs[0x34 / 4] >> 24;
-			if ((src == 0x78) && ((dst & 0xf0) == 0x10))
-				logerror("  Supported\n");
-			else if (((src & 0xf0) == 0x10) && (dst == 0x70))
-				logerror("  Supported\n");
-			else
-				logerror("  Unsupported\n");
-		}
-	}
-}
-
-READ32_MEMBER(naomi_gdrom_board::memorymanager_r)
-{
-	return memctl_regs[offset];
 }
 
 WRITE16_MEMBER(naomi_gdrom_board::dimm_command_w)
@@ -736,6 +662,38 @@ WRITE64_MEMBER(naomi_gdrom_board::i2cmem_dimm_w)
 		m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 		m_eeprom->clk_write((data & 0x8) ? ASSERT_LINE : CLEAR_LINE);
 	}
+}
+
+READ32_MEMBER(naomi_gdrom_board::ide_cs0_r)
+{
+	const int o = offset >> 2;
+	const int r = (offset & 3) << 3;
+
+	return m_ide->cs0_r(space, o, mem_mask << r) >> r;
+}
+
+READ32_MEMBER(naomi_gdrom_board::ide_cs1_r)
+{
+	const int o = offset >> 2;
+	const int r = (offset & 3) << 3;
+
+	return m_ide->cs1_r(space, o, mem_mask << r) >> r;
+}
+
+WRITE32_MEMBER(naomi_gdrom_board::ide_cs0_w)
+{
+	const int o = offset >> 2;
+	const int r = (offset & 3) << 3;
+
+	m_ide->cs0_w(space, o, data << r, mem_mask << r);
+}
+
+WRITE32_MEMBER(naomi_gdrom_board::ide_cs1_w)
+{
+	const int o = offset >> 2;
+	const int r = (offset & 3) << 3;
+
+	m_ide->cs1_w(space, o, data << r, mem_mask << r);
 }
 
 void naomi_gdrom_board::pic_map(address_map &map)
@@ -965,7 +923,6 @@ void naomi_gdrom_board::device_start()
 	save_item(NAME(dimm_status));
 	save_item(NAME(sh4_unknown));
 	save_item(NAME(dimm_des_key));
-	save_item(NAME(memctl_regs));
 }
 
 void naomi_gdrom_board::device_reset()
@@ -993,6 +950,11 @@ void naomi_gdrom_board::board_advance(uint32_t size)
 		dimm_cur_address %= dimm_data_size;
 }
 
+static void gdrom_devices(device_slot_interface& device)
+{
+	device.option_add(":gdrom", GDROM);
+}
+
 #define CPU_CLOCK 200000000 // need to set the correct value here
 #define PIC_CLOCK 20000000	// and here
 
@@ -1014,6 +976,9 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 	SEGA315_6154(config, m_315_6154, 0);
 	m_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_MEMORY, &naomi_gdrom_board::pci_map);
 	m_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_CONFIGURATION, &naomi_gdrom_board::pci_config_map);
+	BUS_MASTER_IDE_CONTROLLER(config, m_ide).options(gdrom_devices, ":gdrom", nullptr, true);
+	m_ide->irq_handler().set_inputline(m_maincpu, SH4_IRL2);
+	m_ide->set_bus_master_space(m_315_6154, sega_315_6154_device::AS_PCI_MEMORY);
 	PIC16C622(config, m_securitycpu, PIC_CLOCK);
 	m_securitycpu->set_addrmap(AS_IO, &naomi_gdrom_board::pic_map);
 	I2C_24C01(config, m_i2c0, 0);
