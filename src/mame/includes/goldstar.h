@@ -245,6 +245,7 @@ public:
 	void lucky8(machine_config &config);
 	void lucky8f(machine_config &config);
 	void lucky8k(machine_config &config);
+	void luckylad(machine_config &config);
 	void super972(machine_config &config);
 	void wcat3(machine_config &config);
 	void magodds(machine_config &config);
