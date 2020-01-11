@@ -77,7 +77,6 @@ namespace solver
 
 		// special
 		, m_use_gabs(parent, "USE_GABS", true)
-		, m_use_linear_prediction(parent, "USE_LINEAR_PREDICTION", false) // // savings are eaten up by effort
 
 		{
 			m_min_timestep = m_dynamic_min_ts();
@@ -112,7 +111,6 @@ namespace solver
 		param_enum_t<matrix_sort_type_e> m_sort_type;
 
 		param_logic_t m_use_gabs;
-		param_logic_t m_use_linear_prediction;
 
 		nl_fptype m_min_timestep;
 		nl_fptype m_max_timestep;
@@ -206,6 +204,8 @@ namespace solver
 		std::size_t ops() { return m_ops; }
 
 	protected:
+		template <typename T>
+		using aligned_alloc = plib::aligned_allocator<T, PALIGN_VECTOROPT>;
 
 		matrix_solver_t(netlist_state_t &anetlist, const pstring &name,
 			const analog_net_t::list_t &nets,
@@ -213,9 +213,6 @@ namespace solver
 
 		virtual unsigned vsolve_non_dynamic(const bool newton_raphson) = 0;
 		virtual netlist_time compute_next_timestep(const nl_fptype cur_ts) = 0;
-
-		template <typename T>
-		using aligned_alloc = plib::aligned_allocator<T, PALIGN_VECTOROPT>;
 
 		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_gonn;
 		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_gtn;
@@ -451,12 +448,13 @@ namespace solver
 			{
 				for (std::size_t k = 0; k < size(); k++)
 				{
-					auto &t = m_terms[k];
-					//const nl_fptype DD_n = (n->Q_Analog() - t->m_last_V);
+					const auto &t = m_terms[k];
+					const auto v(t.template getV<nl_fptype>());
 					// avoid floating point exceptions
-
 					const nl_fptype DD_n = std::max(-fp_constants<nl_fptype>::TIMESTEP_MAXDIFF(),
-						std::min(+fp_constants<nl_fptype>::TIMESTEP_MAXDIFF(),(t.template getV<nl_fptype>() - m_last_V[k])));
+						std::min(+fp_constants<nl_fptype>::TIMESTEP_MAXDIFF(),(v - m_last_V[k])));
+
+					m_last_V[k] = v;
 					const nl_fptype hn = cur_ts;
 
 					//printf("%g %g %g %g\n", DD_n, hn, t.m_DD_n_m_1, t.m_h_n_m_1);
@@ -470,24 +468,14 @@ namespace solver
 					else
 						new_net_timestep = m_params.m_max_timestep;
 
-					if (new_net_timestep < new_solver_timestep)
-						new_solver_timestep = new_net_timestep;
-
-					m_last_V[k] = t.template getV<nl_fptype>();
+					new_solver_timestep = std::min(new_net_timestep, new_solver_timestep);
 				}
-				if (new_solver_timestep < m_params.m_min_timestep)
-				{
-					new_solver_timestep = m_params.m_min_timestep;
-				}
+				new_solver_timestep = std::max(new_solver_timestep, m_params.m_min_timestep);
 			}
-			//if (new_solver_timestep > 10.0 * hn)
-			//    new_solver_timestep = 10.0 * hn;
-			//
-			// FIXME: Factor 2 below is important. Without, we get timing issues. This must be a bug elsewhere.
 
+			// FIXME: Factor 2 below is important. Without, we get timing issues. This must be a bug elsewhere.
 			return std::max(netlist_time::from_fp(new_solver_timestep), netlist_time::quantum() * 2);
 		}
-
 
 		template <typename M>
 		void build_mat_ptr(M &mat)

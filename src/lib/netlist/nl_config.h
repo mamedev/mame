@@ -17,11 +17,11 @@
 ///
 /// \brief Version - Minor.
 ///
-#define NL_VERSION_MINOR  		   4
+#define NL_VERSION_MINOR  		   5
 ///
 /// \brief Version - Patch level.
 ///
-#define NL_VERSION_PATCHLEVEL      2
+#define NL_VERSION_PATCHLEVEL      0
 
 ///
 /// \addtogroup compiledefine
@@ -125,6 +125,10 @@
 //#define NL_DEBUG                    (true)
 #endif
 
+///
+/// \}
+///
+
 //============================================================
 // Time resolution
 //============================================================
@@ -138,7 +142,7 @@ static constexpr const auto NETLIST_INTERNAL_RES = 1000000000;
 // FIXME: Belongs into MAME netlist.h
 static constexpr const auto NETLIST_CLOCK = NETLIST_INTERNAL_RES;
 
-///  \}
+
 
 /// \brief  Floating point types used
 ///

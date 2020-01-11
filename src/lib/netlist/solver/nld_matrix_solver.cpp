@@ -438,9 +438,7 @@ namespace solver
 			this->vsolve_non_dynamic(false);
 		}
 
-		const netlist_time next_time_step = compute_next_timestep(delta.as_fp<nl_fptype>());
-
-		return next_time_step;
+		return compute_next_timestep(delta.as_fp<nl_fptype>());
 	}
 
 	int matrix_solver_t::get_net_idx(const analog_net_t *net) const noexcept
