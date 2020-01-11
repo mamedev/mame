@@ -2184,6 +2184,7 @@ void a400_state::atari_common(machine_config &config)
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_list").set_original("a800_flop");
 	SOFTWARE_LIST(config, "cart_list").set_original("a800");
+	SOFTWARE_LIST(config, "cass_list").set_original("a800_cass");
 	SOFTWARE_LIST(config, "xegs_list").set_original("xegs");
 }
 
