@@ -252,21 +252,30 @@ uint32_t stfight_video_device::screen_update_stfight(screen_device &screen, bitm
 	m_temp_sprite_bitmap.fill(-1, cliprect);
 	draw_sprites(screen, m_temp_sprite_bitmap, cliprect);
 
-	m_temp_bitmap.fill(-1, cliprect);
-	m_bg_tilemap->draw(screen, m_temp_bitmap, cliprect, 0, 0);
-	mix_txlayer(screen, bitmap, m_temp_bitmap, cliprect, m_bg_clut, 0x00, 0x00, 0x00, false);
+	if (m_bg_tilemap->enabled())
+	{
+		m_temp_bitmap.fill(-1, cliprect);
+		m_bg_tilemap->draw(screen, m_temp_bitmap, cliprect, 0, 0);
+		mix_txlayer(screen, bitmap, m_temp_bitmap, cliprect, m_bg_clut, 0x00, 0x00, 0x00, false);
+	}
 
 	if (m_vregs[0x07] & 0x40) mix_txlayer(screen, bitmap, m_temp_sprite_bitmap, cliprect, m_spr_clut, 0x80, 0x100, 0x100, false); // low priority sprites
 
-	m_temp_bitmap.fill(-1, cliprect);
-	m_fg_tilemap->draw(screen, m_temp_bitmap, cliprect, 0, 0);
-	mix_txlayer(screen, bitmap, m_temp_bitmap, cliprect, m_fg_clut, 0x40, 0x00, 0x00, false);
+	if (m_fg_tilemap->enabled())
+	{
+		m_temp_bitmap.fill(-1, cliprect);
+		m_fg_tilemap->draw(screen, m_temp_bitmap, cliprect, 0, 0);
+		mix_txlayer(screen, bitmap, m_temp_bitmap, cliprect, m_fg_clut, 0x40, 0x00, 0x00, false);
+	}
 
 	if (m_vregs[0x07] & 0x40) mix_txlayer(screen, bitmap, m_temp_sprite_bitmap, cliprect, m_spr_clut, 0x80, 0x100, 0x000, false); // high priority sprites
 
-	m_temp_bitmap.fill(-1, cliprect);
-	m_tx_tilemap->draw(screen, m_temp_bitmap, cliprect, 0, 0);
-	mix_txlayer(screen, bitmap, m_temp_bitmap, cliprect, m_tx_clut, 0xc0, 0x00, 0x00, true);
+	if (m_tx_tilemap->enabled())
+	{
+		m_temp_bitmap.fill(-1, cliprect);
+		m_tx_tilemap->draw(screen, m_temp_bitmap, cliprect, 0, 0);
+		mix_txlayer(screen, bitmap, m_temp_bitmap, cliprect, m_tx_clut, 0xc0, 0x00, 0x00, true);
+	}
 	//
 	return 0;
 }
