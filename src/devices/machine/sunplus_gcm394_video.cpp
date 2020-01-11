@@ -245,7 +245,7 @@ void gcm394_base_video_device::device_start()
 	save_item(NAME(m_7063));
 	save_item(NAME(m_702a));
 	save_item(NAME(m_7030_brightness));
-	save_item(NAME(m_703c));
+	save_item(NAME(m_703c_tvcontrol1));
 	save_item(NAME(m_7042_sprite));
 	save_item(NAME(m_7080));
 	save_item(NAME(m_7081));
@@ -307,7 +307,7 @@ void gcm394_base_video_device::device_reset()
 
 	m_702a = 0x0000;
 	m_7030_brightness = 0x0000;
-	m_703c = 0x0000;
+	m_703c_tvcontrol1 = 0x0000;
 
 	m_7042_sprite = 0x0000;
 
@@ -772,9 +772,22 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 	// (it is stored in the palette table in ROM that way, and copied directly) so the only way for the magenta entries on the screen
 	// to be correctly displayed is if there is a magenta BG pen to fall through to (or for another palette write to change the palette
 	// that is copied, but this does not appear to be the case).  How the bg pen is set is unknown, it is not a regular palette entry.
-	// The 'bitmap test mode' in jak_car2 requires this to be black instead, 
+	// The 'bitmap test mode' in jak_car2 requires this to be black instead.
+
+	// jak_s500 briely sets pen 0 of the layer to magenta, but then ends up erasing it
+
 	//const uint16_t bgcol = 0x7c1f; // magenta
 	const uint16_t bgcol = 0x0000; // black
+
+
+	if (m_707f & 0x0010)
+	{
+		m_screen->set_visible_area(0, 640-1, 0, 480-1);
+	}
+	else
+	{
+		m_screen->set_visible_area(0, 320-1, 0, 240-1);
+	}
 
 	for (uint32_t scanline = (uint32_t)cliprect.min_y; scanline <= (uint32_t)cliprect.max_y; scanline++)
 	{
@@ -1173,7 +1186,7 @@ WRITE16_MEMBER(gcm394_base_video_device::video_dma_size_trigger_w)
 
 WRITE16_MEMBER(gcm394_base_video_device::video_dma_unk_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s:gcm394_base_video_device::video_dma_unk_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_dma_unk_w %04x\n", machine().describe_context(), data);
 	m_707e_videodma_bank = data;
 }
 
@@ -1288,7 +1301,11 @@ WRITE16_MEMBER(gcm394_base_video_device::video_7063_videoirq_source_ack_w)
 	}
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::video_702a_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_702a_w %04x\n", machine().describe_context(), data); m_702a = data; }
+WRITE16_MEMBER(gcm394_base_video_device::video_702a_w)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_702a_w %04x\n", machine().describe_context(), data);
+	m_702a = data;
+}
 
 READ16_MEMBER(gcm394_base_video_device::video_curline_r)
 {
@@ -1314,7 +1331,17 @@ WRITE16_MEMBER(gcm394_base_video_device::video_7030_brightness_w)
 	m_7030_brightness = data;
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::video_703c_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703c_w %04x\n", machine().describe_context(), data); m_703c = data; }
+READ16_MEMBER(gcm394_base_video_device::video_703c_tvcontrol1_r)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703c_tvcontrol1_r\n", machine().describe_context());
+	return m_703c_tvcontrol1;
+}
+
+WRITE16_MEMBER(gcm394_base_video_device::video_703c_tvcontrol1_w)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703c_tvcontrol1_w %04x\n", machine().describe_context(), data);
+	m_703c_tvcontrol1 = data;
+}
 
 READ16_MEMBER(gcm394_base_video_device::video_7051_r)
 {

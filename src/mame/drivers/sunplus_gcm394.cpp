@@ -430,6 +430,11 @@ READ16_MEMBER(jak_s500_game_state::porta_r)
 {
 	uint16_t data = m_io[0]->read();
 	logerror("%s: Port A Read: %04x\n", machine().describe_context(), data);
+
+	address_space& mem = m_maincpu->space(AS_PROGRAM);
+	if (mem.read_word(0x22b408) == 0x4846)
+		mem.write_word(0x22b408, 0x4840);    // jak_s500 force service mode
+
 	return data;
 }
 
@@ -558,8 +563,8 @@ void gcm394_game_state::base(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_size(320, 262);
-	m_screen->set_visarea(0, 320-1, 0, 240-1);
+	m_screen->set_size(320*2, 262*2);
+	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
 	m_screen->set_screen_update("maincpu", FUNC(sunplus_gcm394_device::screen_update));
 	m_screen->screen_vblank().set(m_maincpu, FUNC(sunplus_gcm394_device::vblank));
 
@@ -570,11 +575,6 @@ void gcm394_game_state::base(machine_config &config)
 void wrlshunt_game_state::wrlshunt(machine_config &config)
 {
 	gcm394_game_state::base(config);
-
-	m_maincpu->set_bootmode(1); // boot from external ROM / CS mirror
-
-	m_screen->set_size(320*2, 262*2);
-	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
 }
 
 
