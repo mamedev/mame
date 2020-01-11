@@ -61,7 +61,7 @@ Love & Berry 3 CHN                          ???-?????       MDA-C0071 CF   EXP  
 Marine & Marine                             ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Medalink                                    837-14699                 no
 Medalink                                    837-14700                 no
-Mirage World                                ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx, Medal
+Mirage World (SP MRW SATL)                  834-14713                 ROM  ANY    ???-????-????   AAFG-01A3xxxxxxx, Medal
 Monopoly: The Medal                         ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx, Medal
 Monopoly: The Medal 2nd Edition             ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx, Medal
 Mushiking 2K6 2ND                           ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
@@ -341,6 +341,7 @@ void segasp_state::init_segasp()
 
 // net_firm_119.ic72  - Network/Media Board firmware VER 1.19(VxWorks), 1st half contain original 1.10 version
 // fpr-24208a.ic72    - version 1.23, 1st half - 1.10
+// fpr-24329.ic72     - version 1.21, 1st half - 1.20
 // fpr-24407_123.ic72 - version 1.23, 1st half - 1.20
 // fpr-24407.ic72     - version 1.25, 1st half - 1.20
 #define SEGASP_NETFIRM \
@@ -348,6 +349,7 @@ void segasp_state::init_segasp()
 	ROM_LOAD( "net_eeprom.ic74s",  0x00000000,    0x200, CRC(77cc5a6c) SHA1(cbfba546256b70bce6c6fd0030d7e2e410a25526) ) \
 	ROM_LOAD( "net_firm_119.ic72", 0x00000000, 0x200000, CRC(a738ea1c) SHA1(d25187a973a7e166e70334f964363adf2be87257) ) \
 	ROM_LOAD( "fpr-24208a.ic72",   0x00000000, 0x200000, CRC(a738ea1c) SHA1(3c32ddfb3c40be66b9fb2ba35fbfd5b534bb3da0) ) \
+	ROM_LOAD( "fpr-24329.ic72",    0x00000000, 0x200000, CRC(a738ea1c) SHA1(d0d062a4089a2d3404df45eb015faaf7eee9b8c2) ) \
 	ROM_LOAD( "fpr-24407.ic72",    0x00000000, 0x200000, CRC(a738ea1c) SHA1(fbcc3d119b47a6da4d194e3fe4a98126c7049edf) ) \
 	ROM_LOAD( "fpr-24407_123.ic72",0x00000000, 0x200000, CRC(a738ea1c) SHA1(3f5a2fb03bbb1bd9af9fe32ad76a224c97aa9b7a) )
 
@@ -500,6 +502,25 @@ ROM_START( lovebero )
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0446-com.ic15", 0, 0x800, BAD_DUMP CRC(60f56bf2) SHA1(35e697aca7213e3fb1ebe75bb8991b1b992af6d9) )
+ROM_END
+
+// Mirage World
+// "coin pusher" type medal game machine, consists of "Main", "Center" and several "Satellite" units connected via Ethernet.
+// Only Satellite unit was dumped, Main and Center units is missing.
+// 834-14713 SP MRW SATL
+ROM_START( mirworld )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
+	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(beda1ded) SHA1(a493a298d8fbe1fa2c66423da2dee378e691a7f4) )
+	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(ec7e58cb) SHA1(8c6a45da31cd87a71b8e2f7454dc31bc2891210b) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
+	
+	ROM_REGION( 0x800, "pic_readout", ROMREGION_ERASEFF ) // not populated
 ROM_END
 
 ROM_START( ochaken )
@@ -673,6 +694,7 @@ GAME( 2009, brickppl,segasp,     segasp,    segasp, segasp_state, init_segasp, R
 GAME( 2005, dinoking,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King (USA)", GAME_FLAGS )
 GAME( 2006, lovebery,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 2.000)", GAME_FLAGS )
 GAME( 2006, lovebero,lovebery,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 1.003)", GAME_FLAGS )
+GAME( 2007, mirworld,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Mirage World (satellite)", GAME_FLAGS )
 GAME( 2007, ochaken, segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Ocha-Ken Hot Medal", GAME_FLAGS )
 GAME( 2009, tetgiant,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (Ver.2.000)", GAME_FLAGS )
 // These use a CF card

@@ -408,6 +408,7 @@ naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *
 	m_i2c0(*this, "i2c_0"),
 	m_i2c1(*this, "i2c_1"),
 	m_eeprom(*this, "eeprom"),
+	m_315_6154(*this, "northbridge"),
 	picdata(*this, finder_base::DUMMY_TAG),
 	dimm_command(0xffff),
 	dimm_offsetl(0xffff),
@@ -439,25 +440,38 @@ void naomi_gdrom_board::submap(address_map &map)
 void naomi_gdrom_board::sh4_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).mirror(0xa0000000).rom().region("bios", 0);
-	map(0x04000000, 0x040000ff).rw(FUNC(naomi_gdrom_board::memorymanager_r), FUNC(naomi_gdrom_board::memorymanager_w));
-	map(0x0c000000, 0x0cffffff).ram();
-	map(0x10000000, 0x103fffff).ram();
-	map(0x14000000, 0x14000003).rw(FUNC(naomi_gdrom_board::sh4_unknown_r), FUNC(naomi_gdrom_board::sh4_unknown_w));
-	map(0x14000014, 0x14000017).rw(FUNC(naomi_gdrom_board::sh4_command_r), FUNC(naomi_gdrom_board::sh4_command_w));
-	map(0x14000018, 0x1400001b).rw(FUNC(naomi_gdrom_board::sh4_offsetl_r), FUNC(naomi_gdrom_board::sh4_offsetl_w));
-	map(0x1400001c, 0x1400001f).rw(FUNC(naomi_gdrom_board::sh4_parameterl_r), FUNC(naomi_gdrom_board::sh4_parameterl_w));
-	map(0x14000020, 0x14000023).rw(FUNC(naomi_gdrom_board::sh4_parameterh_r), FUNC(naomi_gdrom_board::sh4_parameterh_w));
-	map(0x14000024, 0x14000027).rw(FUNC(naomi_gdrom_board::sh4_status_r), FUNC(naomi_gdrom_board::sh4_status_w));
-	map(0x1400002c, 0x1400002f).lr32([]() { return 0x0c; }, "Constant 0x0c"); // 0x0a or 0x0e possible too
-	map(0x14000030, 0x14000033).rw(FUNC(naomi_gdrom_board::sh4_des_keyl_r), FUNC(naomi_gdrom_board::sh4_des_keyl_w));
-	map(0x14000034, 0x14000037).rw(FUNC(naomi_gdrom_board::sh4_des_keyh_r), FUNC(naomi_gdrom_board::sh4_des_keyh_w));
-	map(0x18001000, 0x18001007).lr32([]() { return 0x189d11db; }, "Constant 0x189d11db"); // 0x10001022 or 0x11720001 possible too
+	map(0x04000000, 0x040000ff).rw(m_315_6154, FUNC(sega_315_6154_device::registers_r), FUNC(sega_315_6154_device::registers_w));
+	map(0x0c000000, 0x0cffffff).ram().share("sh4sdram");
+	map(0x10000000, 0x103fffff).ram().share("6154sdram");
+	map(0x14000000, 0x17ffffff).rw(m_315_6154, FUNC(sega_315_6154_device::aperture_r<0>), FUNC(sega_315_6154_device::aperture_w<0>));
+	map(0x18000000, 0x1bffffff).rw(m_315_6154, FUNC(sega_315_6154_device::aperture_r<1>), FUNC(sega_315_6154_device::aperture_w<1>));
 	map.unmap_value_high();
 }
 
 void naomi_gdrom_board::sh4_io_map(address_map &map)
 {
 	map(0x00, 0x0f).rw(FUNC(naomi_gdrom_board::i2cmem_dimm_r), FUNC(naomi_gdrom_board::i2cmem_dimm_w));
+}
+
+void naomi_gdrom_board::pci_map(address_map& map)
+{
+	map(0x00000000, 0x00000003).rw(FUNC(naomi_gdrom_board::sh4_unknown_r), FUNC(naomi_gdrom_board::sh4_unknown_w));
+	map(0x00000014, 0x00000017).rw(FUNC(naomi_gdrom_board::sh4_command_r), FUNC(naomi_gdrom_board::sh4_command_w));
+	map(0x00000018, 0x0000001b).rw(FUNC(naomi_gdrom_board::sh4_offsetl_r), FUNC(naomi_gdrom_board::sh4_offsetl_w));
+	map(0x0000001c, 0x0000001f).rw(FUNC(naomi_gdrom_board::sh4_parameterl_r), FUNC(naomi_gdrom_board::sh4_parameterl_w));
+	map(0x00000020, 0x00000023).rw(FUNC(naomi_gdrom_board::sh4_parameterh_r), FUNC(naomi_gdrom_board::sh4_parameterh_w));
+	map(0x00000024, 0x00000027).rw(FUNC(naomi_gdrom_board::sh4_status_r), FUNC(naomi_gdrom_board::sh4_status_w));
+	map(0x0000002c, 0x0000002f).lr32([]() { return 0x0c; }, "Constant 0x0c"); // 0x0a or 0x0e possible too
+	map(0x00000030, 0x00000033).rw(FUNC(naomi_gdrom_board::sh4_des_keyl_r), FUNC(naomi_gdrom_board::sh4_des_keyl_w));
+	map(0x00000034, 0x00000037).rw(FUNC(naomi_gdrom_board::sh4_des_keyh_r), FUNC(naomi_gdrom_board::sh4_des_keyh_w));
+	map(0x10000000, 0x10000003).ram(); // temporary for testing
+	map(0x70000000, 0x70ffffff).ram().share("sh4sdram");
+	map(0x78000000, 0x783fffff).ram().share("6154sdram");
+}
+
+void naomi_gdrom_board::pci_config_map(address_map& map)
+{
+	map(0x1000, 0x1003).lr32([]() { return 0x189d11db; }, "Constant 0x189d11db"); // 0x10001022 or 0x11720001 possible too
 }
 
 WRITE32_MEMBER(naomi_gdrom_board::memorymanager_w)
@@ -493,7 +507,7 @@ WRITE32_MEMBER(naomi_gdrom_board::memorymanager_w)
 				else
 					src = src + 0x0c000000;
 				dst = dst - 0x10000000;
-				ddtdata.buffer = dimm_data + dst; // TODO: access des encrypted data
+				ddtdata.buffer = dimm_des_data + dst;
 				ddtdata.source = src;
 				ddtdata.length = len;
 				ddtdata.size = 4;
@@ -510,7 +524,7 @@ WRITE32_MEMBER(naomi_gdrom_board::memorymanager_w)
 				else
 					dst = dst + 0xc000000;
 				src = src - 0x10000000;
-				ddtdata.buffer = dimm_data + src; // TODO: access des encrypted data
+				ddtdata.buffer = dimm_des_data + src;
 				ddtdata.destination = dst;
 				ddtdata.length = len;
 				ddtdata.size = 4;
@@ -712,14 +726,14 @@ WRITE64_MEMBER(naomi_gdrom_board::i2cmem_dimm_w)
 		picbus_io[0] = (uint8_t)(~data >> (16 + 5 * 2 - 3)) & 0x8; // clock only for now
 		picbus = (data >> 2) & 0xf;
 		picbus_pullup = (picbus_io[0] & picbus_io[1]) & 0xf; // high if both are inputs
-		// TODO: abort timeslice of sh4
+		m_maincpu->abort_timeslice();
+		machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(1));
 	}
 	else
 	{
 		picbus_used = false;
-		// TODO: check if the states should be inverted
 		m_eeprom->di_write((data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
-		m_eeprom->cs_write((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 		m_eeprom->clk_write((data & 0x8) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
@@ -741,7 +755,7 @@ WRITE8_MEMBER(naomi_gdrom_board::pic_dimm_w)
 	if (offset == 1)
 	{
 		picbus = data;
-		// TODO: abort timeslice of pic
+		m_securitycpu->abort_timeslice();
 	}
 	if (offset == 3)
 	{
@@ -799,6 +813,7 @@ void naomi_gdrom_board::device_start()
 	naomi_board::device_start();
 
 	dimm_data = nullptr;
+	dimm_des_data = nullptr;
 	dimm_data_size = 0;
 
 	char name[128];
@@ -807,6 +822,15 @@ void naomi_gdrom_board::device_start()
 	uint64_t key;
 	uint8_t netpic = 0;
 
+
+	logerror("Work mode is %d\n", work_mode);
+	if (work_mode != 0)
+	{
+		dimm_command = 0;
+		dimm_offsetl = 0;
+		dimm_parameterl = 0;
+		dimm_parameterh = 0;
+	}
 
 	if(picdata) {
 		if(picdata.length() >= 0x4000) {
@@ -825,7 +849,8 @@ void naomi_gdrom_board::device_start()
 			netpic = picdata[0x6ee];
 
 			// set data for security pic rom
-			memcpy((uint8_t*)m_securitycpu->space(AS_PROGRAM).get_read_ptr(0), picdata, 0x400);
+			address_space &ps = m_securitycpu->space(AS_PROGRAM);
+			memcpy((uint8_t*)ps.get_read_ptr(0), picdata, 0x1000);
 		} else {
 			// use extracted pic data
 			// printf("This PIC key hasn't been converted to a proper PIC binary yet!\n");
@@ -902,22 +927,26 @@ void naomi_gdrom_board::device_start()
 			uint32_t file_rounded_size = (file_size + 2047) & -2048;
 			for (dimm_data_size = 4096; dimm_data_size < file_rounded_size; dimm_data_size <<= 1);
 			dimm_data = auto_alloc_array(machine(), uint8_t, dimm_data_size);
+			if (work_mode == 0)
+				dimm_des_data = dimm_data;
+			else
+				dimm_des_data = auto_alloc_array(machine(), uint8_t, dimm_data_size);
 			if (dimm_data_size != file_rounded_size)
 				memset(dimm_data + file_rounded_size, 0, dimm_data_size - file_rounded_size);
 
-			// read encrypted data into dimm_data
+			// read encrypted data into dimm_des_data
 			uint32_t sectors = file_rounded_size / 2048;
 			for (uint32_t sec = 0; sec != sectors; sec++)
-				cdrom_read_data(gdromfile, file_start + sec, dimm_data + 2048 * sec, CD_TRACK_MODE1);
+				cdrom_read_data(gdromfile, file_start + sec, dimm_des_data + 2048 * sec, CD_TRACK_MODE1);
 
 			uint32_t des_subkeys[32];
 			des_generate_subkeys(rev64(key), des_subkeys);
 
+			// decrypt read data from dimm_des_data to dimm_data
 			for (int i = 0; i < file_rounded_size; i += 8)
-				write_from_qword(dimm_data + i, rev64(des_encrypt_decrypt(true, rev64(read_to_qword(dimm_data + i)), des_subkeys)));
+				write_from_qword(dimm_data + i, rev64(des_encrypt_decrypt(true, rev64(read_to_qword(dimm_des_data + i)), des_subkeys)));
 		}
 
-		// decrypt loaded data
 		cdrom_close(gdromfile);
 
 		if(!dimm_data)
@@ -965,6 +994,7 @@ void naomi_gdrom_board::board_advance(uint32_t size)
 }
 
 #define CPU_CLOCK 200000000 // need to set the correct value here
+#define PIC_CLOCK 20000000	// and here
 
 void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 {
@@ -981,10 +1011,11 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 	m_maincpu->set_sh4_clock(CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &naomi_gdrom_board::sh4_map);
 	m_maincpu->set_addrmap(AS_IO, &naomi_gdrom_board::sh4_io_map);
-	m_maincpu->set_disable();
-	PIC16C621A(config, m_securitycpu, 2000000); // need to set the correct value for clock
+	SEGA315_6154(config, m_315_6154, 0);
+	m_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_MEMORY, &naomi_gdrom_board::pci_map);
+	m_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_CONFIGURATION, &naomi_gdrom_board::pci_config_map);
+	PIC16C622(config, m_securitycpu, PIC_CLOCK);
 	m_securitycpu->set_addrmap(AS_IO, &naomi_gdrom_board::pic_map);
-	m_securitycpu->set_disable();
 	I2C_24C01(config, m_i2c0, 0);
 	m_i2c0->set_e0(0);
 	m_i2c0->set_wc(1);
@@ -992,6 +1023,11 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 	m_i2c1->set_e0(1);
 	m_i2c1->set_wc(1);
 	EEPROM_93C46_8BIT(config, m_eeprom, 0);
+	if (work_mode == 0)
+	{
+		m_maincpu->set_disable();
+		m_securitycpu->set_disable();
+	}
 }
 
 // DIMM firmwares:
@@ -1045,7 +1081,7 @@ ROM_START( dimm )
 	ROMX_LOAD( "401_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(edb52597108462bcea8eb2a47c19e51e5fb60638), ROM_BIOS(7))
 
 	// dynamically filled with data
-	ROM_REGION(0x400, "pic", ROMREGION_ERASE00)
+	ROM_REGION(0x1000, "pic", ROMREGION_ERASE00)
 	// filled with test data until actual dumps of serial memories are available
 	ROM_REGION(0x80, "i2c_0", ROMREGION_ERASE00)
 	ROM_FILL(0, 1, 0x40) ROM_FILL(1, 1, 0x00) ROM_FILL(2, 1, 0x01) ROM_FILL(3, 1, 0x02) ROM_FILL(4, 1, 0x03)

@@ -336,7 +336,9 @@ void ay31015_device::rx_process()
 
 			if (m_rx_pulses == 8)                    // sample input stream
 			{
-				m_rx_parity ^= get_si();             // calculate cumulative parity
+				m_internal_sample = get_si();
+				m_rx_parity ^= m_internal_sample;     // calculate cumulative parity
+				LOG("Receive parity bit: %d\n", m_internal_sample);
 			}
 			else
 			if (!m_rx_pulses)                    // end of a byte
@@ -350,7 +352,10 @@ void ay31015_device::rx_process()
 				if ((m_control_reg & CONTROL_EPS) && (!m_rx_parity))
 					m_rx_parity = 0;         // even parity, ok
 				else
+				{
 					m_rx_parity = 1;         // parity error
+					LOG("Parity error\n");
+				}
 			}
 			return;
 
@@ -478,7 +483,7 @@ void ay31015_device::tx_process()
 				}
 				else
 					set_so(0);
-				LOG("Transmit data bit #%d: %d\n", 9 - (m_tx_pulses >> 4), m_tx_data & 1);
+				LOG("Transmit data bit #%d: %d\n", 1 + ((m_total_pulses - m_tx_pulses) >> 4), m_tx_data & 1);
 
 				m_tx_data >>= 1;             // adjust the shift register
 			}
@@ -524,14 +529,36 @@ void ay31015_device::tx_process()
 			m_tx_pulses--;
 			if (!m_tx_pulses)
 			{
-				m_status_reg |= STATUS_EOC;          // character is completely sent
 				if (m_second_stop_bit)
 				{
 					m_tx_state = SECOND_STOP_BIT;
 					m_tx_pulses = m_second_stop_bit;
-					LOG("Transmit second stop bit\n");
 				}
 				else
+				{
+					m_status_reg |= STATUS_EOC;          // character is completely sent
+					if (m_status_reg & STATUS_TBMT)
+					{
+						m_tx_state = IDLE;           // if nothing to send, go idle
+						LOG("Transmitter idle\n");
+					}
+					else
+					{
+						m_tx_pulses = 16;
+						m_tx_state = START_BIT;      // otherwise immediately start next byte
+					}
+					update_status_pins();
+				}
+			}
+			return;
+
+		case SECOND_STOP_BIT:
+			if (m_tx_pulses == 16)
+				LOG("Transmit second stop bit\n");
+			m_tx_pulses--;
+			if (!m_tx_pulses)
+			{
+				m_status_reg |= STATUS_EOC;          // character is completely sent
 				if (m_status_reg & STATUS_TBMT)
 				{
 					m_tx_state = IDLE;           // if nothing to send, go idle
@@ -543,25 +570,6 @@ void ay31015_device::tx_process()
 					m_tx_state = START_BIT;      // otherwise immediately start next byte
 				}
 				update_status_pins();
-			}
-			return;
-
-		case SECOND_STOP_BIT:
-			if (m_tx_pulses == 16)
-				LOG("Transmit second stop bit\n");
-			m_tx_pulses--;
-			if (!m_tx_pulses)
-			{
-				if (m_status_reg & STATUS_TBMT)
-				{
-					m_tx_state = IDLE;           // if nothing to send, go idle
-					LOG("Transmitter idle\n");
-				}
-				else
-				{
-					m_tx_pulses = 16;
-					m_tx_state = START_BIT;      // otherwise immediately start next byte
-				}
 			}
 			return;
 

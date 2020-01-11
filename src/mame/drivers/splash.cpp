@@ -807,7 +807,7 @@ Note
 001-937
 */
 
-ROM_START( rebus )
+ROM_START( rebus ) // there's also a year hack dumped: it has 4 different bytes total, 2 to change 1995 to 1997 in two places and 2 corresponding changes to fix the checksum
 	ROM_REGION( 0x408000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "2.u16", 0x000000, 0x080000, CRC(7c8a717f) SHA1(00b1e7986046a7705fc65a5c7d4701a002b2ea6f) )
 	ROM_LOAD16_BYTE( "6.u12", 0x000001, 0x080000, CRC(8f73d548) SHA1(210d95dc0db41da3252a09e598719d98bca41983) )

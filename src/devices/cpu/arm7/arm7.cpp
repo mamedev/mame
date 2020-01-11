@@ -35,6 +35,15 @@ TODO:
 #include "arm7core.h"   //include arm7 core
 #include "arm7help.h"
 
+#define LOG_MMU				(1 << 0)
+#define LOG_DSP				(1 << 1)
+#define LOG_COPRO_READS		(1 << 2)
+#define LOG_COPRO_WRITES	(1 << 3)
+#define LOG_COPRO_UNKNOWN	(1 << 4)
+#define LOG_COPRO_RESERVED	(1 << 5)
+
+#define VERBOSE				(0)
+#include "logmacro.h"
 
 /* prototypes of coprocessor functions */
 void arm7_dt_r_callback(arm_state *arm, uint32_t insn, uint32_t *prn, uint32_t (*read32)(arm_state *arm, uint32_t addr));
@@ -330,7 +339,7 @@ uint32_t arm7_cpu_device::arm7_tlb_get_second_level_descriptor( uint32_t granula
 			break;
 		default:
 			// We shouldn't be here
-			LOG( ( "ARM7: Attempting to get second-level TLB descriptor of invalid granularity (%d)\n", granularity ) );
+			LOGMASKED(LOG_MMU, "ARM7: Attempting to get second-level TLB descriptor of invalid granularity (%d)\n", granularity);
 			break;
 	}
 
@@ -426,7 +435,7 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags, bool no_except
 #if ARM7_MMU_ENABLE_HACK
 	if ((m_r[eR15] == (m_mmu_enable_addr + 4)) || (m_r[eR15] == (m_mmu_enable_addr + 8)))
 	{
-		LOG( ( "ARM7: fetch flat, PC = %08x, vaddr = %08x\n", m_r[eR15], addr ) );
+		LOGMASKED(LOG_MMU, "ARM7: fetch flat, PC = %08x, vaddr = %08x\n", m_r[eR15], addr);
 		return true;
 	}
 	else
@@ -452,18 +461,18 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags, bool no_except
 			if (flags & ARM7_TLB_ABORT_D)
 			{
 				uint8_t domain = (desc_lvl1 >> 5) & 0xF;
-				LOG( ( "ARM7: Section Table, Section %s fault on virtual address, vaddr = %08x, PC = %08x\n", (fault == FAULT_DOMAIN) ? "domain" : "permission", addr, m_r[eR15] ) );
+				LOGMASKED(LOG_MMU, "ARM7: Section Table, Section %s fault on virtual address, vaddr = %08x, PC = %08x\n", (fault == FAULT_DOMAIN) ? "domain" : "permission", addr, m_r[eR15]);
 				m_faultStatus[0] = ((fault == FAULT_DOMAIN) ? (9 << 0) : (13 << 0)) | (domain << 4); // 9 = section domain fault, 13 = section permission fault
 				m_faultAddress = addr;
 				m_pendingAbtD = true;
 				update_irq_state();
-				LOG( ( "vaddr %08X desc_lvl1 %08X domain %d permission %d ap %d s %d r %d mode %d read %d write %d\n",
+				LOGMASKED(LOG_MMU, "vaddr %08X desc_lvl1 %08X domain %d permission %d ap %d s %d r %d mode %d read %d write %d\n",
 					addr, desc_lvl1, domain, (m_domainAccessControl >> ((desc_lvl1 >> 4) & 0x1e)) & 3, (desc_lvl1 >> 10) & 3, (m_control & COPRO_CTRL_SYSTEM) ? 1 : 0, (m_control & COPRO_CTRL_ROM) ? 1 : 0,
-					m_r[eCPSR] & MODE_FLAG, flags & ARM7_TLB_READ ? 1 : 0,  flags & ARM7_TLB_WRITE ? 1 : 0) );
+					m_r[eCPSR] & MODE_FLAG, flags & ARM7_TLB_READ ? 1 : 0,  flags & ARM7_TLB_WRITE ? 1 : 0);
 			}
 			else if (flags & ARM7_TLB_ABORT_P)
 			{
-				LOG( ( "ARM7: Section Table, Section %s fault on virtual address, vaddr = %08x, PC = %08x\n", (fault == FAULT_DOMAIN) ? "domain" : "permission", addr, m_r[eR15] ) );
+				LOGMASKED(LOG_MMU, "ARM7: Section Table, Section %s fault on virtual address, vaddr = %08x, PC = %08x\n", (fault == FAULT_DOMAIN) ? "domain" : "permission", addr, m_r[eR15]);
 				m_pendingAbtP = true;
 				update_irq_state();
 			}
@@ -478,7 +487,7 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags, bool no_except
 		// Unmapped, generate a translation fault
 		if (flags & ARM7_TLB_ABORT_D)
 		{
-			LOG( ( "ARM7: Translation fault on unmapped virtual address, PC = %08x, vaddr = %08x\n", m_r[eR15], addr ) );
+			LOGMASKED(LOG_MMU, "ARM7: Translation fault on unmapped virtual address, PC = %08x, vaddr = %08x\n", m_r[eR15], addr);
 			m_faultStatus[0] = (5 << 0); // 5 = section translation fault
 			m_faultAddress = addr;
 			m_pendingAbtD = true;
@@ -486,7 +495,7 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags, bool no_except
 		}
 		else if (flags & ARM7_TLB_ABORT_P)
 		{
-			LOG( ( "ARM7: Translation fault on unmapped virtual address, PC = %08x, vaddr = %08x\n", m_r[eR15], addr ) );
+			LOGMASKED(LOG_MMU, "ARM7: Translation fault on unmapped virtual address, PC = %08x, vaddr = %08x\n", m_r[eR15], addr);
 			m_pendingAbtP = true;
 			update_irq_state();
 		}
@@ -513,7 +522,7 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags, bool no_except
 				if (flags & ARM7_TLB_ABORT_D)
 				{
 					uint8_t domain = (desc_lvl1 >> 5) & 0xF;
-					LOG( ( "ARM7: Translation fault on unmapped virtual address, vaddr = %08x, PC %08X\n", addr, m_r[eR15] ) );
+					LOGMASKED(LOG_MMU, "ARM7: Translation fault on unmapped virtual address, vaddr = %08x, PC %08X\n", addr, m_r[eR15]);
 					m_faultStatus[0] = (7 << 0) | (domain << 4); // 7 = page translation fault
 					m_faultAddress = addr;
 					m_pendingAbtD = true;
@@ -521,7 +530,7 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags, bool no_except
 				}
 				else if (flags & ARM7_TLB_ABORT_P)
 				{
-					LOG( ( "ARM7: Translation fault on unmapped virtual address, vaddr = %08x, PC %08X\n", addr, m_r[eR15] ) );
+					LOGMASKED(LOG_MMU, "ARM7: Translation fault on unmapped virtual address, vaddr = %08x, PC %08X\n", addr, m_r[eR15]);
 					m_pendingAbtP = true;
 					update_irq_state();
 				}
@@ -549,18 +558,18 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags, bool no_except
 						{
 							uint8_t domain = (desc_lvl1 >> 5) & 0xF;
 							// hapyfish expects a data abort when something tries to write to a read-only memory location from user mode
-							LOG( ( "ARM7: Page Table, Section %s fault on virtual address, vaddr = %08x, PC = %08x\n", (fault == FAULT_DOMAIN) ? "domain" : "permission", addr, m_r[eR15] ) );
+							LOGMASKED(LOG_MMU, "ARM7: Page Table, Section %s fault on virtual address, vaddr = %08x, PC = %08x\n", (fault == FAULT_DOMAIN) ? "domain" : "permission", addr, m_r[eR15]);
 							m_faultStatus[0] = ((fault == FAULT_DOMAIN) ? (11 << 0) : (15 << 0)) | (domain << 4); // 11 = page domain fault, 15 = page permission fault
 							m_faultAddress = addr;
 							m_pendingAbtD = true;
 							update_irq_state();
-							LOG( ( "vaddr %08X desc_lvl2 %08X domain %d permission %d ap %d s %d r %d mode %d read %d write %d\n",
+							LOGMASKED(LOG_MMU, "vaddr %08X desc_lvl2 %08X domain %d permission %d ap %d s %d r %d mode %d read %d write %d\n",
 								addr, desc_lvl2, domain, permission, ap, (m_control & COPRO_CTRL_SYSTEM) ? 1 : 0, (m_control & COPRO_CTRL_ROM) ? 1 : 0,
-								m_r[eCPSR] & MODE_FLAG, flags & ARM7_TLB_READ ? 1 : 0,  flags & ARM7_TLB_WRITE ? 1 : 0) );
+								m_r[eCPSR] & MODE_FLAG, flags & ARM7_TLB_READ ? 1 : 0,  flags & ARM7_TLB_WRITE ? 1 : 0);
 						}
 						else if (flags & ARM7_TLB_ABORT_P)
 						{
-							LOG( ( "ARM7: Page Table, Section %s fault on virtual address, vaddr = %08x, PC = %08x\n", (fault == FAULT_DOMAIN) ? "domain" : "permission", addr, m_r[eR15] ) );
+							LOGMASKED(LOG_MMU, "ARM7: Page Table, Section %s fault on virtual address, vaddr = %08x, PC = %08x\n", (fault == FAULT_DOMAIN) ? "domain" : "permission", addr, m_r[eR15]);
 							m_pendingAbtP = true;
 							update_irq_state();
 						}
@@ -572,7 +581,7 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags, bool no_except
 				// Tiny page descriptor
 				if( ( desc_lvl1 & 3 ) == 1 )
 				{
-					LOG( ( "ARM7: It would appear that we're looking up a tiny page from a coarse TLB lookup.  This is bad. vaddr = %08x\n", addr ) );
+					LOGMASKED(LOG_MMU, "ARM7: It would appear that we're looking up a tiny page from a coarse TLB lookup.  This is bad. vaddr = %08x\n", addr);
 				}
 				addr = ( desc_lvl2 & COPRO_TLB_TINY_PAGE_MASK ) | ( addr & ~COPRO_TLB_TINY_PAGE_MASK );
 				break;
@@ -1082,7 +1091,7 @@ READ32_MEMBER( arm7_cpu_device::arm7_rt_r_callback )
 		}
 		else
 		{
-			LOG( ("ARM7: Unhandled coprocessor %d (archFlags %x)\n", cpnum, m_archFlags) );
+			LOGMASKED(LOG_COPRO_UNKNOWN, "ARM7: Unhandled coprocessor %d (archFlags %x)\n", cpnum, m_archFlags);
 			m_pendingUnd = true;
 			update_irq_state();
 			return 0;
@@ -1099,7 +1108,7 @@ READ32_MEMBER( arm7_cpu_device::arm7_rt_r_callback )
 		case 11:
 		case 12:
 			// RESERVED
-			LOG( ( "arm7_rt_r_callback CR%d, RESERVED\n", cReg ) );
+			LOGMASKED(LOG_COPRO_RESERVED, "arm7_rt_r_callback CR%d, RESERVED\n", cReg);
 			break;
 		case 0:             // ID
 			switch(op2)
@@ -1121,7 +1130,7 @@ READ32_MEMBER( arm7_cpu_device::arm7_rt_r_callback )
 				data = 0;
 				break;
 			}
-			LOG( ( "arm7_rt_r_callback, ID %02x (%02x) -> %08x (PC=%08x)\n",op2,m_archRev,data,GET_PC ) );
+			LOGMASKED(LOG_COPRO_READS, "arm7_rt_r_callback, ID %02x (%02x) -> %08x (PC=%08x)\n",op2,m_archRev,data,GET_PC);
 			break;
 		case 1:             // Control
 			data = COPRO_CTRL | 0x70;   // bits 4-6 always read back as "1" (bit 3 too in XScale)
@@ -1130,11 +1139,11 @@ READ32_MEMBER( arm7_cpu_device::arm7_rt_r_callback )
 			data = COPRO_TLB_BASE;
 			break;
 		case 3:             // Domain Access Control
-			LOG( ( "arm7_rt_r_callback, Domain Access Control\n" ) );
+			LOGMASKED(LOG_COPRO_READS, "arm7_rt_r_callback, Domain Access Control\n");
 			data = COPRO_DOMAIN_ACCESS_CONTROL;
 			break;
 		case 5:             // Fault Status
-			LOG( ( "arm7_rt_r_callback, Fault Status\n" ) );
+			LOGMASKED(LOG_COPRO_READS, "arm7_rt_r_callback, Fault Status\n");
 			switch (op3)
 			{
 				case 0: data = COPRO_FAULT_STATUS_D; break;
@@ -1142,18 +1151,18 @@ READ32_MEMBER( arm7_cpu_device::arm7_rt_r_callback )
 			}
 			break;
 		case 6:             // Fault Address
-			LOG( ( "arm7_rt_r_callback, Fault Address\n" ) );
+			LOGMASKED(LOG_COPRO_READS, "arm7_rt_r_callback, Fault Address\n");
 			data = COPRO_FAULT_ADDRESS;
 			break;
 		case 13:            // Read Process ID (PID)
-			LOG( ( "arm7_rt_r_callback, Read PID\n" ) );
+			LOGMASKED(LOG_COPRO_READS, "arm7_rt_r_callback, Read PID\n");
 			data = COPRO_FCSE_PID;
 			break;
 		case 14:            // Read Breakpoint
-			LOG( ( "arm7_rt_r_callback, Read Breakpoint\n" ) );
+			LOGMASKED(LOG_COPRO_READS, "arm7_rt_r_callback, Read Breakpoint\n");
 			break;
 		case 15:            // Test, Clock, Idle
-			LOG( ( "arm7_rt_r_callback, Test / Clock / Idle \n" ) );
+			LOGMASKED(LOG_COPRO_READS, "arm7_rt_r_callback, Test / Clock / Idle \n");
 			break;
 	}
 
@@ -1173,19 +1182,19 @@ WRITE32_MEMBER( arm7_cpu_device::arm7_rt_w_callback )
 	{
 		if (cpnum == 14)
 		{
-			LOG( ("arm7_rt_w_callback: write %x to XScale CP14 reg %d\n", data, cReg) );
+			LOGMASKED(LOG_COPRO_UNKNOWN, "arm7_rt_w_callback: write %x to XScale CP14 reg %d\n", data, cReg);
 			return;
 		}
 		else
 		{
-			LOG( ("ARM7: Unhandled coprocessor %d\n", cpnum) );
+			LOGMASKED(LOG_COPRO_UNKNOWN, "ARM7: Unhandled coprocessor %d\n", cpnum);
 			m_pendingUnd = true;
 			update_irq_state();
 			return;
 		}
 	}
 
-	switch( cReg )
+	switch (cReg)
 	{
 		case 0:
 		case 4:
@@ -1193,20 +1202,20 @@ WRITE32_MEMBER( arm7_cpu_device::arm7_rt_w_callback )
 		case 11:
 		case 12:
 			// RESERVED
-			LOG( ( "arm7_rt_w_callback CR%d, RESERVED = %08x\n", cReg, data) );
+			LOGMASKED(LOG_COPRO_RESERVED, "arm7_rt_w_callback CR%d, RESERVED = %08x\n", cReg, data);
 			break;
 		case 1:             // Control
-			LOG( ( "arm7_rt_w_callback Control = %08x (%d) (%d)\n", data, op2, op3 ) );
-			LOG( ( "    MMU:%d, Address Fault:%d, Data Cache:%d, Write Buffer:%d\n",
+			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Control = %08x (%d) (%d)\n", data, op2, op3);
+			LOGMASKED(LOG_COPRO_WRITES, "    MMU:%d, Address Fault:%d, Data Cache:%d, Write Buffer:%d\n",
 					data & COPRO_CTRL_MMU_EN, ( data & COPRO_CTRL_ADDRFAULT_EN ) >> COPRO_CTRL_ADDRFAULT_EN_SHIFT,
 					( data & COPRO_CTRL_DCACHE_EN ) >> COPRO_CTRL_DCACHE_EN_SHIFT,
-					( data & COPRO_CTRL_WRITEBUF_EN ) >> COPRO_CTRL_WRITEBUF_EN_SHIFT ) );
-			LOG( ( "    Endianness:%d, System:%d, ROM:%d, Instruction Cache:%d\n",
+					( data & COPRO_CTRL_WRITEBUF_EN ) >> COPRO_CTRL_WRITEBUF_EN_SHIFT);
+			LOGMASKED(LOG_COPRO_WRITES, "    Endianness:%d, System:%d, ROM:%d, Instruction Cache:%d\n",
 					( data & COPRO_CTRL_ENDIAN ) >> COPRO_CTRL_ENDIAN_SHIFT,
 					( data & COPRO_CTRL_SYSTEM ) >> COPRO_CTRL_SYSTEM_SHIFT,
 					( data & COPRO_CTRL_ROM ) >> COPRO_CTRL_ROM_SHIFT,
-					( data & COPRO_CTRL_ICACHE_EN ) >> COPRO_CTRL_ICACHE_EN_SHIFT ) );
-			LOG( ( "    Int Vector Adjust:%d\n", ( data & COPRO_CTRL_INTVEC_ADJUST ) >> COPRO_CTRL_INTVEC_ADJUST_SHIFT ) );
+					( data & COPRO_CTRL_ICACHE_EN ) >> COPRO_CTRL_ICACHE_EN_SHIFT);
+			LOGMASKED(LOG_COPRO_WRITES, "    Int Vector Adjust:%d\n", ( data & COPRO_CTRL_INTVEC_ADJUST ) >> COPRO_CTRL_INTVEC_ADJUST_SHIFT);
 #if ARM7_MMU_ENABLE_HACK
 			if (((data & COPRO_CTRL_MMU_EN) != 0) && ((COPRO_CTRL & COPRO_CTRL_MMU_EN) == 0))
 			{
@@ -1223,12 +1232,12 @@ WRITE32_MEMBER( arm7_cpu_device::arm7_rt_w_callback )
 			COPRO_CTRL = data & COPRO_CTRL_MASK;
 			break;
 		case 2:             // Translation Table Base
-			LOG( ( "arm7_rt_w_callback TLB Base = %08x (%d) (%d)\n", data, op2, op3 ) );
+			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback TLB Base = %08x (%d) (%d)\n", data, op2, op3);
 			COPRO_TLB_BASE = data;
 			m_tlb_base_mask = data & COPRO_TLB_BASE_MASK;
 			break;
 		case 3:             // Domain Access Control
-			LOG( ( "arm7_rt_w_callback Domain Access Control = %08x (%d) (%d)\n", data, op2, op3 ) );
+			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Domain Access Control = %08x (%d) (%d)\n", data, op2, op3);
 			COPRO_DOMAIN_ACCESS_CONTROL = data;
 			for (int i = 0; i < 32; i += 2)
 			{
@@ -1236,7 +1245,7 @@ WRITE32_MEMBER( arm7_cpu_device::arm7_rt_w_callback )
 			}
 			break;
 		case 5:             // Fault Status
-			LOG( ( "arm7_rt_w_callback Fault Status = %08x (%d) (%d)\n", data, op2, op3 ) );
+			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Fault Status = %08x (%d) (%d)\n", data, op2, op3);
 			switch (op3)
 			{
 				case 0: COPRO_FAULT_STATUS_D = data; break;
@@ -1244,28 +1253,28 @@ WRITE32_MEMBER( arm7_cpu_device::arm7_rt_w_callback )
 			}
 			break;
 		case 6:             // Fault Address
-			LOG( ( "arm7_rt_w_callback Fault Address = %08x (%d) (%d)\n", data, op2, op3 ) );
+			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Fault Address = %08x (%d) (%d)\n", data, op2, op3);
 			COPRO_FAULT_ADDRESS = data;
 			break;
 		case 7:             // Cache Operations
-//            LOG( ( "arm7_rt_w_callback Cache Ops = %08x (%d) (%d)\n", data, op2, op3 ) );
+//            LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Cache Ops = %08x (%d) (%d)\n", data, op2, op3);
 			break;
 		case 8:             // TLB Operations
-			LOG( ( "arm7_rt_w_callback TLB Ops = %08x (%d) (%d)\n", data, op2, op3 ) );
+			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback TLB Ops = %08x (%d) (%d)\n", data, op2, op3);
 			break;
 		case 9:             // Read Buffer Operations
-			LOG( ( "arm7_rt_w_callback Read Buffer Ops = %08x (%d) (%d)\n", data, op2, op3 ) );
+			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Read Buffer Ops = %08x (%d) (%d)\n", data, op2, op3);
 			break;
 		case 13:            // Write Process ID (PID)
-			LOG( ( "arm7_rt_w_callback Write PID = %08x (%d) (%d)\n", data, op2, op3 ) );
+			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Write PID = %08x (%d) (%d)\n", data, op2, op3);
 			COPRO_FCSE_PID = data;
 			m_pid_offset = (((COPRO_FCSE_PID >> 25) & 0x7F)) * 0x2000000;
 			break;
 		case 14:            // Write Breakpoint
-			LOG( ( "arm7_rt_w_callback Write Breakpoint = %08x (%d) (%d)\n", data, op2, op3 ) );
+			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Write Breakpoint = %08x (%d) (%d)\n", data, op2, op3);
 			break;
 		case 15:            // Test, Clock, Idle
-			LOG( ( "arm7_rt_w_callback Test / Clock / Idle = %08x (%d) (%d)\n", data, op2, op3 ) );
+			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Test / Clock / Idle = %08x (%d) (%d)\n", data, op2, op3);
 			break;
 	}
 }
@@ -1551,7 +1560,7 @@ void arm7_cpu_device::arm7_dt_r_callback(uint32_t insn, uint32_t *prn)
 	uint8_t cpn = (insn >> 8) & 0xF;
 	if ((m_archFlags & ARCHFLAG_XSCALE) && (cpn == 0))
 	{
-		LOG( ( "arm7_dt_r_callback: DSP Coprocessor 0 (CP0) not yet emulated (PC %08x)\n", GET_PC ) );
+		LOGMASKED(LOG_DSP, "arm7_dt_r_callback: DSP Coprocessor 0 (CP0) not yet emulated (PC %08x)\n", GET_PC);
 	}
 	else
 	{
@@ -1566,7 +1575,7 @@ void arm7_cpu_device::arm7_dt_w_callback(uint32_t insn, uint32_t *prn)
 	uint8_t cpn = (insn >> 8) & 0xF;
 	if ((m_archFlags & ARCHFLAG_XSCALE) && (cpn == 0))
 	{
-		LOG( ( "arm7_dt_w_callback: DSP Coprocessor 0 (CP0) not yet emulated (PC %08x)\n", GET_PC ) );
+		LOGMASKED(LOG_DSP, "arm7_dt_w_callback: DSP Coprocessor 0 (CP0) not yet emulated (PC %08x)\n", GET_PC);
 	}
 	else
 	{

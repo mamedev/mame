@@ -21,7 +21,7 @@
 ///
 /// \brief Version - Patch level.
 ///
-#define NL_VERSION_PATCHLEVEL      1
+#define NL_VERSION_PATCHLEVEL      2
 
 ///
 /// \addtogroup compiledefine

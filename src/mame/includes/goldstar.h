@@ -170,6 +170,7 @@ public:
 	void init_skill98();
 	void init_po33();
 	void init_match133();
+	void init_nfb96_b();
 	void init_nfb96_dk();
 	void init_nfb96_c2();
 	void init_nfb96_d();
@@ -245,6 +246,7 @@ public:
 	void lucky8(machine_config &config);
 	void lucky8f(machine_config &config);
 	void lucky8k(machine_config &config);
+	void luckylad(machine_config &config);
 	void super972(machine_config &config);
 	void wcat3(machine_config &config);
 	void magodds(machine_config &config);

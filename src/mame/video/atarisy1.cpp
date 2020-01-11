@@ -396,6 +396,10 @@ READ16_MEMBER( atarisy1_state::atarisy1_int3state_r )
 
 void atarisy1_state::update_timers(int scanline)
 {
+}
+
+void atarisy1r_state::update_timers(int scanline)
+{
 	int offset = m_mob->bank() * 64 * 4;
 	int link = 0, best = scanline, found = 0;
 	uint8_t spritevisit[64];

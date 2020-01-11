@@ -305,6 +305,7 @@
 		<description>Dunjunz</description>
 		<year>1987</year>
 		<publisher>Bug Byte</publisher>
+		<info name="usage" value="BBC B version requires Acorn DFS 0.90" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A: Master Version"/>
 			<dataarea name="flop" size="102400">
@@ -362,6 +363,17 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
 				<rom name="elite_executive.ssd" size="204800" crc="f10aea60" sha1="cbd40dd9cad231f2f093e64665a69b64ddab5608" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="enigma">
+		<description>Enigma</description>
+		<year>1990</year>
+		<publisher>Cervin Games</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55040">
+				<rom name="Enigma.ssd" size="55040" crc="8373a65c" sha1="ef317adfb56efed21713bbf3d2ed038a982a1606"/>
 			</dataarea>
 		</part>
 	</software>
@@ -577,6 +589,18 @@
 		</part>
 	</software>
 
+	<software name="krystalc">
+		<description>The Krystal Connection</description>
+		<year>2009</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Stephen Smith" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="38400">
+				<rom name="The Krystal Connection (2009)(Retro Software).ssd" size="38400" crc="0949d4ea" sha1="237a4a4fce3bddca16822c3281ed5328ad793480" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ldaydoom">
 		<description>Last Days of Doom</description>
 		<year>1990</year>
@@ -610,6 +634,17 @@
 		</part>
 	</software>
 
+	<software name="mntpanic">
+		<description>Mountain Panic</description>
+		<year>2013</year>
+		<publisher>Retro Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="MountainPanic-v1.2(2013)(Retro Software).ssd" size="102400" crc="1c893b3a" sha1="f1ef8cec1c3b86e9578b94c66137687c070e13c7" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nevryon">
 		<description>Nevryon</description>
 		<year>1990</year>
@@ -618,6 +653,17 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="101632">
 				<rom name="nevryon.ssd" size="101632" crc="a6c83ad4" sha1="e5f8336ffd3b27be04d70974a45d3972b796afdc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="paranoid">
+		<description>Paranoid</description>
+		<year>1990</year>
+		<publisher>Cervin Games</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="73984">
+				<rom name="Paranoid.ssd" size="73984" crc="4f9fc969" sha1="07f1be5511f5391a2759304986b16d321241f0d5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -997,6 +1043,18 @@
 		</part>
 	</software>
 
+	<software name="whitelt">
+		<description>White Light</description>
+		<year>2017</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Sarah Walker" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="WhiteLight-v10_BBCMicro-DFS.ssd" size="204800" crc="813285df" sha1="dd1bf2af17dadec1c33f4caac8e4ff8394640007" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="whimagic">
 		<description>White Magic</description>
 		<year>1989</year>
@@ -1017,6 +1075,18 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
 				<rom name="white magic 2.ssd" size="102400" crc="8d3ed4da" sha1="fe11e69648bae6e1c6fdfc54cdde91b816ca7e85" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zap">
+		<description>Zap!</description>
+		<year>2009</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Jamie Woodhouse" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="44032">
+				<rom name="Zap! (2009)(Retro Software).ssd" size="44032" crc="12dbbc47" sha1="535e24688f3a9c00aee9b9cba678c25961c4564c" />
 			</dataarea>
 		</part>
 	</software>
@@ -1641,7 +1711,7 @@
 
 	<software name="wrldword">
 		<description>World Without Words</description>
-		<year>198?</year>
+		<year>1988</year>
 		<publisher>4mation</publisher>
 		<info name="notes" value="Deprotected" />
 		<part name="flop1" interface="floppy_5_25">
@@ -1813,6 +1883,17 @@
 		</part>
 	</software>
 
+	<software name="chauffr">
+		<description>Chauffeur</description>
+		<year>1987</year>
+		<publisher>Nidd Valley</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Chauffeur-NiddValley.ssd" size="102400" crc="c34012cf" sha1="7877d8b9fc0ae7ff87556fe9ed43d6d87692015c" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cumaform">
 		<description>Cumana - BBC disk formatter issue B</description>
 		<year>198?</year>
@@ -1835,6 +1916,17 @@
 		</part>
 	</software>
 
+	<software name="ev1">
+		<description>EV1 Camera Interface</description>
+		<year>1984</year>
+		<publisher>Micro-Robotics</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="EV1CameraInterface.ssd" size="204800" crc="fc182d92" sha1="0990e8fd0f3ac552fb36d5cf41cca76f7d76cf26" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="l1fsutil">
 		<description>Econet Level 1 Fileserver Software</description>
 		<year>1985</year>
@@ -1847,6 +1939,17 @@
 		</part>
 	</software>
 
+	<software name="hadfs">
+		<description>Harston ADFS System Disk 6.10</description>
+		<year>2018</year>
+		<publisher>J.G.Harston</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="HADFS_System_6.10.dsd" size="409600" crc="fa5301c0" sha1="28d3afaa870ae6300861dbf34a511934882187c6" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="integraw" supported="no">
 		<description>Integra Windows 1.00</description>
 		<year>1989</year>
@@ -1854,6 +1957,17 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
 				<rom name="Integra Windows 1.00 (Computech).ssd" size="102400" crc="c28d1caa" sha1="d1fe037f04b9b8b7c60d71fa671b64a8d4452103" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mr4200">
+		<description>MR4200 32K RAM Board</description>
+		<year>1986</year>
+		<publisher>Peartree Computers</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="MR4200 32K RAM Board (Peartree).ssd" size="204800" crc="04a03cec" sha1="ae642ebecdf968db098e60c06d4ed5383e905c7c" />
 			</dataarea>
 		</part>
 	</software>
@@ -1952,6 +2066,39 @@
 		</part>
 	</software>
 
+	<software name="utilram">
+		<description>UTILRAM: The Utility RAM</description>
+		<year>1987</year>
+		<publisher>Tubelink</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Utility RAM (Tubelink).ssd" size="102400" crc="9f4c7b3d" sha1="02a82744c7de260e5a52eddb98443cd03420fae6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vci">
+		<description>Video Camera Interface</description>
+		<year>1984</year>
+		<publisher>Data Harvest</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="98304">
+				<rom name="VideoCameraInterface-DataHarvest.ssd" size="98304" crc="25b1f1be" sha1="f3cd82be317b22cccd6df042b82fc2f0338b5f74" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vnula">
+		<description>VideoNuLA Support Disc</description>
+		<year>2017</year>
+		<publisher>Rob Coleman</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="36864">
+				<rom name="VideoNuLA Support Disc.ssd" size="36864" crc="a2dfc1fa" sha1="9cc6c6f45695a5dc3be9ea9d6d9f2237b8203ecb" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wwtyping">
 		<description>Typing Tutor for Wordwise Plus</description>
 		<year>1983</year>
@@ -1970,6 +2117,17 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
 				<rom name="we_romram_utilities.ssd" size="102400" crc="7ec0ed6d" sha1="575e385bb61b310619647d0b0645c714bebe3543" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="z88link">
+		<description>BBC-Z88 Transfer Link</description>
+		<year>1988</year>
+		<publisher>Watford Electronics</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="20992">
+				<rom name="BBC-Z88_Transfer_Link.ssd" size="20992" crc="0b3eecf1" sha1="0d6a7371a04b233acd2d58655ac333535aa12c4e" />
 			</dataarea>
 		</part>
 	</software>
@@ -2040,7 +2198,7 @@
 	</software>
 
 	<software name="amxpagem">
-		<description>AMX Pagemaker</description>
+		<description>AMX Pagemaker Plus</description>
 		<year>1985</year>
 		<publisher>Advanced Memory Systems</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2064,6 +2222,30 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="91648">
 				<rom name="amx_paintpot.ssd" size="91648" crc="4c32a0ea" sha1="8281403eeb5f3a3b471bbccd78bf6256e064ecfa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amxstpress">
+		<description>AMX Stop Press</description>
+		<year>1987</year>
+		<publisher>Advanced Memory Systems</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc"/>
+			<dataarea name="flop" size="102400">
+				<rom name="AMX_Stop_Press_System_Disc.ssd" size="102400" crc="f93eaff2" sha1="007951af6d62ba96fbbdd7f03ba438529dae8c92" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Font Disc"/>
+			<dataarea name="flop" size="102400">
+				<rom name="AMX_Stop_Press_Font_Disc.ssd" size="102400" crc="0d9b3297" sha1="40e0c924924eba3b6d9e901304d0fe199e1b8f31" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Master Downloader"/>
+			<dataarea name="flop" size="102400">
+				<rom name="AMX_Stop_Press_Master_Downloader.ssd" size="102400" crc="e5ac6f26" sha1="e3b458078a651b0312e75af96a603442a5d6246e" />
 			</dataarea>
 		</part>
 	</software>
@@ -2123,6 +2305,18 @@
 		</part>
 	</software>
 
+	<software name="iconartm">
+		<description>Icon Art Master</description>
+		<year>1985</year>
+		<publisher>Micro-Draw</publisher>
+		<sharedfeat name="userport_default" value="tracker"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Icon Art Master.ssd" size="102400" crc="84737b02" sha1="d3367f85d3aad2a04335c0fc2a09f6d2d1e632f2" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="qpfonts">
 		<description>Quest Page Fonts</description>
 		<year>1987</year>
@@ -2156,6 +2350,41 @@
 		</part>
 	</software>
 
+	<software name="tracker">
+		<description>MEDL Tracker Ball Utilities</description>
+		<year>1985</year>
+		<publisher>MEDL</publisher>
+		<sharedfeat name="userport_default" value="tracker"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Trackerball Utilities.ssd" size="204800" crc="a21d155e" sha1="bd2a2b29098e81bbe17c76a55e70e80f67a3f225" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wedit121" cloneof="wedit">
+		<description>The Wapping Editor Utilities 1.21</description>
+		<year>1988</year>
+		<publisher>Watford Electronics</publisher>
+		<info name="usage" value="Requires Wapping Editor ROM" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="WappingEditorUtilities_1.21.ssd" size="102400" crc="4ce8e621" sha1="4828e13b038055fe2a325e55da3912bee9bf74b7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wedit">
+		<description>The Wapping Editor Utilities 1.30</description>
+		<year>1988</year>
+		<publisher>Watford Electronics</publisher>
+		<info name="usage" value="Requires Wapping Editor ROM" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="WappingEditorUtilities_1.30.ssd" size="102400" crc="029759c7" sha1="a1de2fc1a642888bb5de9a5c859bb758ae74d869" />
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- Magazines -->
 
@@ -2322,6 +2551,17 @@
 		</part>
 	</software>
 
+	<software name="ccracker">
+		<description>Christmas Crackers</description>
+		<year>1986</year>
+		<publisher>Database Publications</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="96512">
+				<rom name="Christmas Crackers (Database).ssd" size="96512" crc="5c2012df" sha1="ce865dd8115fe052bede403972076bd91174df71" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="du01">
 		<description>Disk User 01 June/July 1987</description>
 		<year>1987</year>
@@ -2476,6 +2716,17 @@
 		</part>
 	</software>
 
+	<software name="magscan">
+		<description>MagScan - The Beebug Bibliography Disc v1.31</description>
+		<year>1991</year>
+		<publisher>Beebugsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="Magscan-1.31.dsd" size="409600" crc="e84790ac" sha1="f596f06d0aa083efc416a240a1dfd28a333d93f1" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="swdmastr">
 		<description>Sword Master</description>
 		<year>1985</year>
@@ -2503,7 +2754,7 @@
 	<software name="beebtrk">
 		<description>Beeb Tracker Volume 1: Battle of the Bits</description>
 		<year>2016</year>
-		<publisher>Bitshifters</publisher>
+		<publisher>Bitshifters Collective</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="187648">
 				<rom name="bs-beebtrk.ssd" size="187648" crc="d7fb81cc" sha1="668769f8c09daba7068bbf2eca84e6164c922c75"/>
@@ -2514,7 +2765,7 @@
 	<software name="beebtrk2">
 		<description>Beeb Tracker Volume 2: Ninja Gaiden</description>
 		<year>2016</year>
-		<publisher>Bitshifters</publisher>
+		<publisher>Bitshifters Collective</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="142592">
 				<rom name="bs-beebtrk2.ssd" size="142592" crc="0174737c" sha1="75d298ab55cedd5e8492096956b7971fd1db158b"/>
@@ -2525,7 +2776,7 @@
 	<software name="beebtrk3">
 		<description>Beeb Tracker Volume 3: Sonic the Hedgehog</description>
 		<year>2016</year>
-		<publisher>Bitshifters</publisher>
+		<publisher>Bitshifters Collective</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="110592">
 				<rom name="bs-beebtrk3.ssd" size="110592" crc="4d349403" sha1="c82e305827cbebebf6f2d2f3fbd362ba6b5ac6f6"/>
@@ -2536,7 +2787,7 @@
 	<software name="badapple">
 		<description>Teletext Bad Apple</description>
 		<year>2017</year>
-		<publisher>Bitshifters</publisher>
+		<publisher>Bitshifters Collective</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
 				<rom name="bs-badappl.dsd" size="409600" crc="6c06dafd" sha1="92c4cd382c7073b47fa359d3352892d2d20c9b65"/>
@@ -2776,6 +3027,189 @@
 		</part>
 	</software>
 
+	<!-- BeebOPL -->
+
+	<software name="oplbonus">
+		<description>Beeb OPL: AdLib Jukebox Bonus Disc</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="Robert Lazarus" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143104">
+				<rom name="beebopl_adlib_bonus.ssd" size="143104" crc="8323968a" sha1="93b29ae5f7ce6dd1c53c4671d522de5fbca3a7eb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oplbrix">
+		<description>Beeb OPL: Brix</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="Sarah Walker" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="109568">
+				<rom name="beebopl_brix.ssd" size="109568" crc="e2d450f4" sha1="7c0a9ece1f2c2eef312d06c5f269c79ea419d6f5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oplclassic">
+		<description>Beeb OPL: AdLib Classical Favourites #1</description>
+		<year>2017</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="Robert Lazarus" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="404992">
+				<rom name="beebopl_adlib_classic1.dsd" size="404992" crc="33c32278" sha1="4f47172bb5f661fb989e3999af5bcebb65ec8c40"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="opldroplay">
+		<description>Beeb OPL: Droplay</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="Robert Lazarus" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="158976">
+				<rom name="beebopl_droplay.ssd" size="158976" crc="cfbd0cf7" sha1="0eaef5111aa59f3b4079371860e4d02fd2155200"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="opldynab">
+		<description>Beeb OPL: DynaBlaster</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="Sarah Walker" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="49664">
+				<rom name="beebopl_dynablaster.ssd" size="49664" crc="ce15f065" sha1="fa3661c558e2d27478b69dff8f7379045104fcf3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="opljill">
+		<description>Beeb OPL: Jill of the Jungle</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="Sarah Walker" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="106752">
+				<rom name="beebopl_jillofthejungle.ssd" size="106752" crc="3b8a2e89" sha1="4cccecc5681d0897d1cd654f8e2b58bb2b758182"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="opljukebox">
+		<description>Beeb OPL: AdLib Jukebox</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="Robert Lazarus" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="171776">
+				<rom name="beebopl_adlib_jukebox.ssd" size="171776" crc="b9a8d090" sha1="391eda20b944af844bee995db1c67776c88445c4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oplkilob">
+		<description>Beeb OPL: KiloBlaster</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="Sarah Walker" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="394240">
+				<rom name="beebopl_kiloblaster.dsd" size="394240" crc="f6cece26" sha1="28f61f4049597ba983a6a4e3f89d2961de9a8d03"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oplpop">
+		<description>Beeb OPL: AdLib Pop/Rock Grooves</description>
+		<year>2017</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="Robert Lazarus" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="314880">
+				<rom name="beebopl_adlib_pop.dsd" size="314880" crc="927c5f13" sha1="984c5eb9926b816300e1deaca57c998861f5fd78"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oplsolar">
+		<description>Beeb OPL: Solar Winds</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="Sarah Walker" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="159232">
+				<rom name="beebopl_solarwinds.ssd" size="159232" crc="48405a04" sha1="bf9bedf8be63acb1e2b7a74b1f18308d3ff746d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oplwacky">
+		<description>Beeb OPL: Wacky Wheels</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="Sarah Walker" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="384000">
+				<rom name="beebopl_wackywheels.dsd" size="384000" crc="97d35b09" sha1="cb3fdec1fd8c735d00c8fdfa73f448bb082fc259"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oplxargon">
+		<description>Beeb OPL: Xargon</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="Sarah Walker" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="140288">
+				<rom name="beebopl_xargon.ssd" size="140288" crc="36f5a3ca" sha1="bba409d3c775ec9dc66d352ef238ad518f425756"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oplxmas">
+		<description>Beeb OPL: AdLib Christmas Carols</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="Robert Lazarus" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="beebopl_adlib_xmas.ssd" size="179200" crc="b484f806" sha1="5715479054c7183deaa54fa0454e25080c2c66c0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oplzone66">
+		<description>Beeb OPL: Zone 66</description>
+		<year>2017</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="Sarah Walker" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Standard"/>
+			<dataarea name="flop" size="86016">
+				<rom name="beebopl_zone66.ssd" size="86016" crc="8ee0e0ca" sha1="e2806acef0851cd750aa508b6b3666fb160fb3fb"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Master 128"/>
+			<dataarea name="flop" size="655360">
+				<rom name="beebopl_zone66_m128.adl" size="655360" crc="ecd94eb7" sha1="ecd4c5b9efec49dbbe71fb5f6377a4e6ff04fb60"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Master 128 + DAC"/>
+			<dataarea name="flop" size="655360">
+				<rom name="beebopl_zone66_m128_dac.adl" size="655360" crc="43e8e9fb" sha1="ccf4e2854bd3e68e5e99efd7caa1bd16b64fc22e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- BeebSID -->
 
 	<software name="beebsid1">
@@ -2990,6 +3424,18 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="107520">
 				<rom name="beebsid18.ssd" size="107520" crc="f332ef9f" sha1="6a9946ad960b07758490d7b23b7a6453b27d8baa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebsid19">
+		<description>BeebSID 19 - Classical</description>
+		<year>2018</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="PitfallJones" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="56320">
+				<rom name="beebsid19.ssd" size="56320" crc="81ac0684" sha1="990062cb1a5ec73608f2aeee775e9dd3bfff10de"/>
 			</dataarea>
 		</part>
 	</software>

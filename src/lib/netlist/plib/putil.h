@@ -19,11 +19,30 @@
 #define PSTRINGIFY_HELP(y) # y
 #define PSTRINGIFY(x) PSTRINGIFY_HELP(x)
 
-#define PNARGS_(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, N, ...) N
-#define PNARGS(...) PNARGS_(__VA_ARGS__, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+// Discussion and background of this MSVC bug: https://github.com/mamedev/mame/issues/6106
+///
+/// \brief Macro to work around a bug in MSVC treatment of __VA_ARGS__
+///
+#define PMSVC_VARARG_BUG(MACRO, ARGS) MACRO ARGS
+
+/// \brief Determine number of arguments in __VA_ARGS__
+///
+/// This macro works up to 16 arguments in __VA_ARGS__
+///
+/// \returns Number of arguments
+///
+#define PNARGS(...) PNARGS_1(__VA_ARGS__, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+
+#define PNARGS_2(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, N, ...) N
+#define PNARGS_1(...) PMSVC_VARARG_BUG(PNARGS_2, (__VA_ARGS__))
+
+/// \brief Concatenate two arguments after expansion
+///
+/// \returns Concatenated expanded arguments
+///
+#define PCONCAT(a, b) PCONCAT_(a, b)
 
 #define PCONCAT_(a, b) a ## b
-#define PCONCAT(a, b) PCONCAT_(a, b)
 
 #define PSTRINGIFY_1(x)                     #x
 #define PSTRINGIFY_2(x, x2)                 #x, #x2
@@ -42,7 +61,13 @@
 #define PSTRINGIFY_15(x, ...)               #x, PSTRINGIFY_14(__VA_ARGS__)
 #define PSTRINGIFY_16(x, ...)               #x, PSTRINGIFY_15(__VA_ARGS__)
 
-#define PSTRINGIFY_VA(...) PCONCAT(PSTRINGIFY_, PNARGS(__VA_ARGS__))(__VA_ARGS__)
+/// \brief Individually stringify up to 16 arguments
+///
+/// PSTRINGIFY_VA(a, b, c) will be expanded to "a", "b", "c"
+///
+/// \returns List of stringified individual arguments
+///
+#define PSTRINGIFY_VA(...) PMSVC_VARARG_BUG(PCONCAT, (PSTRINGIFY_, PNARGS(__VA_ARGS__)))(__VA_ARGS__)
 
 // FIXME:: __FUNCTION__ may be not be supported by all compilers.
 

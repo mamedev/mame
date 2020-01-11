@@ -205,22 +205,6 @@ static const uint32_t MAP_SUBINT_TO_INT[11] =
 #define S3C24XX_CORE_PIN_OM0  S3C2410_CORE_PIN_OM0
 #define S3C24XX_CORE_PIN_OM1  S3C2410_CORE_PIN_OM1
 
-
-#define VERBOSE_LEVEL ( 0 )
-
-static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
-{
-	if (VERBOSE_LEVEL >= n_level)
-	{
-		va_list v;
-		char buf[32768];
-		va_start(v, s_fmt);
-		vsprintf(buf, s_fmt, v);
-		va_end(v);
-		device.logerror("%s: %s", device.machine().describe_context( ), buf);
-	}
-}
-
 #define DEVICE_S3C2410
 #define S3C24_CLASS_NAME s3c2410_device
 #include "machine/s3c24xx.hxx"

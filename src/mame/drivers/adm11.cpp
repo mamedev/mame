@@ -40,8 +40,11 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_avdc(*this, "avdc")
+		, m_charram(*this, "charram")
+		, m_attrram(*this, "attrram")
 		, m_chargen(*this, "chargen")
 		, m_mbc(false)
+		, m_latched_attr(0)
 	{
 	}
 
@@ -53,20 +56,25 @@ protected:
 private:
 	void prog_map(address_map &map);
 	void ext_map(address_map &map);
-	void display_map(address_map &map);
+	void char_map(address_map &map);
+	void attr_map(address_map &map);
 
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 	DECLARE_WRITE_LINE_MEMBER(mbc_w);
 
 	u8 p1_r();
 	void p1_w(u8 data);
-	void p3_w(u8 data);
+	void char_latched_attr_w(offs_t offset, u8 data);
+	void attr_latch_w(u8 data);
 
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<scn2674_device> m_avdc;
+	required_shared_ptr<u8> m_charram;
+	required_shared_ptr<u8> m_attrram;
 	required_region_ptr<u8> m_chargen;
 
 	bool m_mbc;
+	u8 m_latched_attr;
 };
 
 
@@ -79,6 +87,9 @@ SCN2674_DRAW_CHARACTER_MEMBER(adm11_state::draw_character)
 {
 	u16 dots = m_chargen[charcode << 4 | linecount];
 	dots |= (dots & 0x80) << 1;
+
+	if (BIT(attrcode, 2))
+		dots ^= 0x1ff;
 
 	for (int i = 0; i < 9; i++)
 	{
@@ -102,8 +113,15 @@ void adm11_state::p1_w(u8 data)
 {
 }
 
-void adm11_state::p3_w(u8 data)
+void adm11_state::char_latched_attr_w(offs_t offset, u8 data)
 {
+	m_charram[offset] = data;
+	m_attrram[offset] = m_latched_attr;
+}
+
+void adm11_state::attr_latch_w(u8 data)
+{
+	m_latched_attr = data;
 }
 
 void adm11_state::prog_map(address_map &map)
@@ -115,14 +133,23 @@ void adm11_state::ext_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0x2000, 0x21ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
-	map(0x6000, 0x7fff).ram().share("display");
+	map(0x4000, 0x4fff).mirror(0x1000).ram().share("charram");
+	map(0x6000, 0x6fff).mirror(0x1000).w(FUNC(adm11_state::char_latched_attr_w));
+	map(0x8000, 0x8fff).mirror(0x1000).ram().share("attrram");
+	map(0xa000, 0xa000).mirror(0x1fff).w(FUNC(adm11_state::attr_latch_w));
 	map(0xe000, 0xe007).rw(m_avdc, FUNC(scn2674_device::read), FUNC(scn2674_device::write));
 }
 
-void adm11_state::display_map(address_map &map)
+void adm11_state::char_map(address_map &map)
 {
-	map.global_mask(0x1fff);
-	map(0x0000, 0x1fff).ram().share("display");
+	map.global_mask(0x0fff);
+	map(0x0000, 0x0fff).ram().share("charram");
+}
+
+void adm11_state::attr_map(address_map &map)
+{
+	map.global_mask(0x0fff);
+	map(0x0000, 0x0fff).ram().share("attrram");
 }
 
 
@@ -136,7 +163,7 @@ void adm11_state::adm12(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &adm11_state::ext_map);
 	m_maincpu->port_in_cb<1>().set(FUNC(adm11_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(adm11_state::p1_w));
-	m_maincpu->port_out_cb<3>().set(FUNC(adm11_state::p3_w));
+	// TODO: RXD/TXD are serial communications; INT0 is serial keyboard data
 
 	EEPROM_2804(config, "eeprom"); // X2804AP
 
@@ -148,9 +175,9 @@ void adm11_state::adm12(machine_config &config)
 	SCN2674(config, m_avdc, 15.93_MHz_XTAL / 9); // SCN2674B
 	m_avdc->set_screen("screen");
 	m_avdc->set_character_width(9); // 6 in 158-column mode?
-	m_avdc->set_addrmap(0, &adm11_state::display_map);
+	m_avdc->set_addrmap(0, &adm11_state::char_map);
+	m_avdc->set_addrmap(1, &adm11_state::attr_map);
 	m_avdc->set_display_callback(FUNC(adm11_state::draw_character));
-	m_avdc->breq_callback().set_inputline(m_maincpu, MCS51_INT0_LINE);
 	m_avdc->intr_callback().set_inputline(m_maincpu, MCS51_INT1_LINE);
 	m_avdc->mbc_callback().set(FUNC(adm11_state::mbc_w));
 }
@@ -159,6 +186,8 @@ void adm11_state::adm12(machine_config &config)
 ROM_START(adm12)
 	ROM_REGION(0x2000, "program", 0)
 	ROM_LOAD("u13.bin", 0x0000, 0x2000, CRC(3c928176) SHA1(dd741c620da2ced9979456296c2af0387461cdf1)) // MBM2764-30
+
+	// Keyboard MCU might be a COP420, as with the ADM 11
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD("u35.bin", 0x0000, 0x1000, CRC(66d7bc44) SHA1(cd839839f29657207098d85900cb570285be91a6)) // HN462732-P

@@ -215,10 +215,59 @@ void gcm394_base_video_device::device_start()
 	if (memregion(":maincpu"))
 		decodegfx(":maincpu");
 
-	save_item(NAME(m_spriteextra));
-	save_item(NAME(m_spriteram));
-
 	m_space_read_cb.resolve_safe(0);
+
+
+	save_item(NAME(m_screenbuf));
+	save_item(NAME(m_rgb5_to_rgb8));
+	save_item(NAME(m_rgb555_to_rgb888));
+	save_item(NAME(m_page0_addr_lsb));
+	save_item(NAME(m_page0_addr_msb));
+	save_item(NAME(m_page1_addr_lsb));
+	save_item(NAME(m_page1_addr_msb));
+	save_item(NAME(m_707e_videodma_bank));
+	save_item(NAME(m_videodma_size));
+	save_item(NAME(m_videodma_dest));
+	save_item(NAME(m_videodma_source));
+	save_item(NAME(m_tmap0_regs));
+	save_item(NAME(m_tmap1_regs));
+	save_item(NAME(m_tmap2_regs));
+	save_item(NAME(m_tmap3_regs));
+	save_item(NAME(m_tmap0_scroll));
+	save_item(NAME(m_tmap1_scroll));
+	save_item(NAME(m_tmap2_scroll));
+	save_item(NAME(m_tmap3_scroll));
+	save_item(NAME(m_707f));
+	save_item(NAME(m_703a_palettebank));
+	save_item(NAME(m_7062));
+	save_item(NAME(m_7063));
+	save_item(NAME(m_702a));
+	save_item(NAME(m_7030_brightness));
+	save_item(NAME(m_703c));
+	save_item(NAME(m_7042_sprite));
+	save_item(NAME(m_7080));
+	save_item(NAME(m_7081));
+	save_item(NAME(m_7082));
+	save_item(NAME(m_7083));
+	save_item(NAME(m_7084));
+	save_item(NAME(m_7085));
+	save_item(NAME(m_7086));
+	save_item(NAME(m_7087));
+	save_item(NAME(m_7088));
+	save_item(NAME(m_sprite_7022_gfxbase_lsb));
+	save_item(NAME(m_sprite_702d_gfxbase_msb));
+	save_item(NAME(m_unk_vid1_gfxbase_lsb));
+	save_item(NAME(m_unk_vid1_gfxbase_msb));
+	save_item(NAME(m_unk_vid2_gfxbase_lsb));
+	save_item(NAME(m_unk_vid2_gfxbase_msb));
+	save_item(NAME(m_video_irq_status));
+	save_item(NAME(m_spriteram));
+	save_item(NAME(m_spriteextra));
+	save_item(NAME(m_paletteram));
+	save_item(NAME(m_maxgfxelement));
+	save_item(NAME(m_global_y_mask));
+	save_item(NAME(m_pal_displaybank_high));
+	save_item(NAME(m_alt_tile_addressing));
 }
 
 void gcm394_base_video_device::device_reset()
@@ -335,7 +384,7 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 
 		if (nbits < nc_bpp)
 		{
-			uint16_t b = m_space_read_cb((m++ & 0x3fffff));
+			uint16_t b = m_space_read_cb((m++)&0x7ffffff); // smartfp suggests either 0x7ffffff mask, or some bits are being set incorrectly, jak_s500 needs over 0x3ffffff at least
 			b = (b << 8) | (b >> 8);
 			bits |= b << (nc_bpp - nbits);
 			nbits += 16;
@@ -705,10 +754,23 @@ void gcm394_base_video_device::draw_sprites(const rectangle &cliprect, uint32_t 
 
 uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	memset(&m_screenbuf[m_screen->width() * cliprect.min_y], 0, 4 *  m_screen->width() * ((cliprect.max_y - cliprect.min_y) + 1));
+	// For jak_car2 and jak_gtg the palette entry for 'magenta' in the test mode is intentionally set to a transparent black pen
+	// (it is stored in the palette table in ROM that way, and copied directly) so the only way for the magenta entries on the screen
+	// to be correctly displayed is if there is a magenta BG pen to fall through to (or for another palette write to change the palette
+	// that is copied, but this does not appear to be the case).  How the bg pen is set is unknown, it is not a regular palette entry.
+	// The 'bitmap test mode' in jak_car2 requires this to be black instead, 
+	//const uint16_t bgcol = 0x7c1f; // magenta
+	const uint16_t bgcol = 0x0000; // black
 
 	for (uint32_t scanline = (uint32_t)cliprect.min_y; scanline <= (uint32_t)cliprect.max_y; scanline++)
 	{
+		uint32_t* bufferline = &m_screenbuf[scanline * m_screen->width()];
+
+		for (int x = 0; x < m_screen->width(); x++)
+		{
+			bufferline[x] = m_rgb555_to_rgb888[bgcol];
+		}
+
 		for (int i = 0; i < 4; i++)
 		{
 			if (1)

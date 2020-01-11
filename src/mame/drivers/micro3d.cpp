@@ -346,11 +346,9 @@ void micro3d_state::micro3d(machine_config &config)
 
 	mc68901_device &mfp(MC68901(config, "mfp", 4000000));
 	mfp.set_timer_clock(4000000);
-	mfp.set_rx_clock(0);
-	mfp.set_tx_clock(0);
 	mfp.out_irq_cb().set_inputline("maincpu", M68K_IRQ_4);
-	//mfp.out_tao_cb().set("mfp", FUNC(mc68901_device::rc_w));
-	//mfp.out_tao_cb().append("mfp", FUNC(mc68901_device::tc_w));
+	mfp.out_tao_cb().set("mfp", FUNC(mc68901_device::rc_w));
+	mfp.out_tao_cb().append("mfp", FUNC(mc68901_device::tc_w));
 	mfp.out_tco_cb().set("mfp", FUNC(mc68901_device::tbi_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);

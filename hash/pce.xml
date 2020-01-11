@@ -3242,7 +3242,7 @@
 	</software>
 
   <!-- later revision, password parser bugfix for passwords with 8 lives -->
-  <software name="rtypep21" cloneof="rtypep2">
+	<software name="rtypep21" cloneof="rtypep2">
 		<description>R-Type Part-2 (alt)</description>
 		<year>1988</year>
 		<publisher>Hudson</publisher>

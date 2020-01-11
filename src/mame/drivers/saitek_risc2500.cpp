@@ -18,6 +18,7 @@ TODO:
   Is cpu cycle timing wrong? I suspect conditional branch timing due to cache miss
   (pipeline has to refill). The delay loop between writing to the speaker is simply:
   SUBS R2, R2, #$1, BNE $2000cd8
+- does it have an LCDC? if so, what chip?
 
 ******************************************************************************/
 
@@ -102,7 +103,7 @@ void risc2500_state::remove_boot_rom()
 void risc2500_state::lcd_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(131, 136, 139)); // lcd pixel off
-	palette.set_pen_color(1, rgb_t(92, 83, 88)); // lcd pixel on
+	palette.set_pen_color(1, rgb_t(51, 42, 43)); // lcd pixel on
 	palette.set_pen_color(2, rgb_t(138, 146, 148)); // background
 }
 
@@ -118,7 +119,7 @@ uint32_t risc2500_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			uint8_t gfx = bitswap<8>(m_vram[c*5 + x], 6,5,0,1,2,3,4,7);
 
 			for(int y=0; y<7; y++)
-				bitmap.pix16(y, 71 - (c*6 + x)) = (gfx >> (y + 1)) & 1;
+				bitmap.pix16(y + 1, 71 - (c*6 + x)) = (gfx >> (y + 1)) & 1;
 		}
 
 		// LCD digits and symbols
@@ -287,8 +288,8 @@ void risc2500_state::risc2500(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(12*6+1, 7);
-	screen.set_visarea(0, 12*6, 0, 7-1);
+	screen.set_size(12*6+1, 7+2);
+	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(risc2500_state::screen_update));
 	screen.set_palette("palette");
 

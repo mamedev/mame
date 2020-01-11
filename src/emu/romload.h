@@ -451,8 +451,8 @@ private:
 
 	int                 m_romsloaded;         // current ROMs loaded count
 	int                 m_romstotal;          // total number of ROMs to read
-	u32                 m_romsloadedsize;     // total size of ROMs loaded so far
-	u32                 m_romstotalsize;      // total size of ROMs to read
+	u64                 m_romsloadedsize;     // total size of ROMs loaded so far
+	u64                 m_romstotalsize;      // total size of ROMs to read
 
 	std::unique_ptr<emu_file>  m_file;               /* current file */
 	std::vector<std::unique_ptr<open_chd>> m_chd_list;     /* disks */

@@ -226,8 +226,8 @@
 
 <!-- sb ui -->
 
-	<element name="wmask1" defstate="0">
-		<rect state="1"><color red="0.84" green="0.75" blue="0.50" /></rect>
+	<element name="wmask1" defstate="1">
+		<rect state="0"><color red="0.84" green="0.75" blue="0.50" /></rect>
 	</element>
 	<element name="wmask2">
 		<rect><color red="1" green="1" blue="1" /></rect>
@@ -238,8 +238,8 @@
 	</element>
 
 	<element name="text_uit1" defstate="0">
-		<text string="SB.BAVARIA" state="0"><color red="0.81" green="0.8" blue="0.79" /></text>
-		<text string="SB.MAGNETS" state="1"><color red="0.81" green="0.8" blue="0.79" /></text>
+		<text string="SB.MAGNETS" state="0"><color red="0.81" green="0.8" blue="0.79" /></text>
+		<text string="SB.BAVARIA" state="1"><color red="0.81" green="0.8" blue="0.79" /></text>
 	</element>
 	<element name="text_uit2"><text string="INTERFACE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uib1"><text string="BOARD:"><color red="0.81" green="0.8" blue="0.79" /></text></element>

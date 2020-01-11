@@ -49,6 +49,7 @@ public:
 protected:
 	virtual void machine_start() override;
 
+private:
 	// devices/pointers
 	required_device<hd6303y_cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;

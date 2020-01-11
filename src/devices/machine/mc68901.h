@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, AJR
 /**********************************************************************
 
     Motorola MC68901 Multi Function Peripheral emulation
@@ -38,8 +38,6 @@
 
 #pragma once
 
-#include "diserial.h"
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -48,19 +46,14 @@
 
 // ======================> mc68901_device
 
-class mc68901_device :  public device_t,
-						public device_serial_interface
+class mc68901_device :  public device_t
 {
 public:
 	// construction/destruction
 	mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void set_timer_clock(int timer_clock) { m_timer_clock = timer_clock; }
-	void set_rx_clock(int rx_clock) { m_rx_clock = rx_clock; }
-	void set_tx_clock(int tx_clock) { m_tx_clock = tx_clock; }
 	void set_timer_clock(const XTAL &xtal) { set_timer_clock(xtal.value()); }
-	void set_rx_clock(const XTAL &xtal) { set_rx_clock(xtal.value()); }
-	void set_tx_clock(const XTAL &xtal) { set_tx_clock(xtal.value()); }
 
 	auto out_irq_cb() { return m_out_irq_cb.bind(); }
 	auto out_gpio_cb() { return m_out_gpio_cb.bind(); }
@@ -90,7 +83,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( tai_w );
 	DECLARE_WRITE_LINE_MEMBER( tbi_w );
 
-	DECLARE_WRITE_LINE_MEMBER( write_rx );
+	DECLARE_WRITE_LINE_MEMBER( si_w );
+	DECLARE_WRITE_LINE_MEMBER( rc_w );
+	DECLARE_WRITE_LINE_MEMBER( tc_w );
 
 protected:
 	// device-level overrides
@@ -98,19 +93,25 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	// device_serial_interface overrides
-	virtual void tra_callback() override;
-	virtual void tra_complete() override;
-	virtual void rcv_complete() override;
-
 	void check_interrupts();
 	void take_interrupt(u16 mask);
+	void tx_buffer_empty();
+	void tx_error();
 	void rx_buffer_full();
 	void rx_error();
 	void timer_count(int index);
 	void timer_input(int index, int value);
 	void gpio_input(int bit, int state);
 	void gpio_output();
+
+	void set_so(bool state);
+	void rx_frame_start();
+	void rx_sync_found();
+	void rx_async_frame_complete();
+	void rx_sync_frame_complete();
+	void rx_clock(bool si);
+	void tx_frame_load(u8 data);
+	void tx_clock();
 
 private:
 	enum
@@ -204,8 +205,6 @@ private:
 	static const int PRESCALER[];
 
 	int m_timer_clock;      /* timer clock */
-	int m_rx_clock;         /* serial receive clock */
-	int m_tx_clock;         /* serial transmit clock */
 
 	devcb_write_line        m_out_irq_cb;
 
@@ -239,13 +238,12 @@ private:
 	u8 m_tdr[4];                    // timer data registers
 
 	u8 m_scr;                       // synchronous character register
+	bool m_scr_parity;              // parity of sync character
 	u8 m_ucr;                       // USART control register
 	u8 m_tsr;                       // transmitter status register
 	u8 m_rsr;                       // receiver status register
 	u8 m_transmit_buffer;           // USART data register
-	bool m_transmit_pending;
 	u8 m_receive_buffer;
-	bool m_overrun_pending;
 	u8 m_gpio_input;
 	u8 m_gpio_output;
 
@@ -254,9 +252,25 @@ private:
 	int m_ti[4];                    // timer in latch
 	int m_to[4];                    // timer out latch
 
-	// serial state
+	// serial receiver state
+	u16 m_rframe;                   // receiver frame shift register
+	u8 m_rclk;                      // receiver clock counter
+	u8 m_rbits;                     // receiver bit counter
+	u8 m_si_scan;                   // receiver bitstream scan
 	u8 m_next_rsr;                  // receiver status register latch
-	int m_rsr_read;                 // receiver status register read flag
+	bool m_rc;                      // receiver clock input
+	bool m_si;                      // serial data input
+	bool m_last_si;                 // synchronized serial data input
+	bool m_rparity;                 // receiver data parity
+
+	// serial transmitter state
+	u16 m_osr;                      // output shift register
+	u8 m_tclk;                      // transmit clock counter
+	u8 m_tbits;                     // transmit bit counter
+	bool m_tc;                      // transmit clock input
+	bool m_so;                      // serial data output
+	bool m_tparity;                 // transmit data transmit
+	bool m_underrun;                // underrun preset time
 
 	// timers
 	emu_timer *m_timer[4];          // counter timers

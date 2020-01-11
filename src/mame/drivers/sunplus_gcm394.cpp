@@ -7,13 +7,13 @@
 
 	note, these SoC types always have a 128Kwords internal ROM, which the JAKKS games appear to use for basic bootstrap purposes.
 
-    GPL600
+    GPAC800 / GCM394 (SpongeBob Bikini Bottom 500 Test Mode also calls this GPAC800, even if the mappings appear different to the NAND version below - different CS base, maybe just depends on boot mode?)
         Smart Fit Park
         SpongeBob SquarePants Bikini Bottom 500
         Spiderman - The Masked Menace 'Spider Sense' (pad type with Spiderman model)
         (Wireless Hunting? - maybe, register map looks the same even if it sets stack to 2fff not 6fff)
 
-    GPL800 (== GPL600 with NAND support + maybe more)
+    GPAC800 (with NAND support)
         Wireless Air 60
         Golden Tee Golf
         Cars 2
@@ -21,14 +21,14 @@
         V.Baby
         Playskool Heroes Transformers Rescue Bots Beam Box
 
-    GPL500 (unknown, might be GPL600 but without the higher resolution support?)
+    GPAC500 (based on test modes, unknown hardware, might be GPAC800 but without the higher resolution support?)
         The Price is Right
-        Bejeweled? (might be GPL600)
+        Bejeweled? (might be GPAC800)
 
     Notes
         smartfp: hold button Circle, Star and Home on startup for Test Menu
 
-    these are both unsp 2.0 type, as they use the extended ocpodes
+    these are all unsp 2.0 type, as they use the extended ocpodes
 
 
 	NAND types:
@@ -45,6 +45,8 @@
 #include "emu.h"
 
 #include "machine/sunplus_gcm394.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -179,9 +181,9 @@ protected:
 	optional_region_ptr<uint16_t> m_romregion;
 	required_device<full_memory_device> m_memory;
 
-	DECLARE_READ16_MEMBER(porta_r);
-	DECLARE_READ16_MEMBER(portb_r);
-	DECLARE_WRITE16_MEMBER(porta_w);
+	virtual DECLARE_READ16_MEMBER(porta_r);
+	virtual DECLARE_READ16_MEMBER(portb_r);
+	virtual DECLARE_WRITE16_MEMBER(porta_w);
 
 	virtual DECLARE_READ16_MEMBER(read_external_space);
 	virtual DECLARE_WRITE16_MEMBER(write_external_space);
@@ -250,6 +252,7 @@ public:
 	void nand_beambox();
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER(read_nand);
@@ -272,6 +275,66 @@ private:
 	int m_vectorbase;
 };
 
+class generalplus_gpac800_vbaby_game_state : public generalplus_gpac800_game_state
+{
+public:
+	generalplus_gpac800_vbaby_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		generalplus_gpac800_game_state(mconfig, type, tag),
+		m_cart(*this, "cartslot")
+	{
+	}
+
+	void generalplus_gpac800_vbaby(machine_config &config);
+
+protected:
+	required_device<generic_slot_device> m_cart;
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+
+private:
+};
+
+
+class generalplus_gpspispi_game_state : public gcm394_game_state
+{
+public:
+	generalplus_gpspispi_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		gcm394_game_state(mconfig, type, tag)
+	{
+	}
+
+	void generalplus_gpspispi(machine_config &config);
+
+	void init_spi();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+};
+
+
+
+class generalplus_gpspispi_bkrankp_game_state : public generalplus_gpspispi_game_state
+{
+public:
+	generalplus_gpspispi_bkrankp_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		generalplus_gpspispi_game_state(mconfig, type, tag),
+		m_cart(*this, "cartslot")
+	{
+	}
+
+	void generalplus_gpspispi_bkrankp(machine_config &config);
+
+protected:
+	required_device<generic_slot_device> m_cart;
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+
+private:
+};
+
+
+
 
 
 class wrlshunt_game_state : public gcm394_game_state
@@ -287,15 +350,16 @@ public:
 	void init_wrlshunt();
 
 protected:
-	//virtual void machine_start() override;
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	std::vector<uint16_t> m_sdram;
 
+	virtual DECLARE_READ16_MEMBER(porta_r) override;
+	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
+
 private:
 
-	DECLARE_READ16_MEMBER(hunt_porta_r);
-	DECLARE_WRITE16_MEMBER(hunt_porta_w);
 
 	//required_shared_ptr<u16> m_mainram;
 
@@ -304,6 +368,25 @@ private:
 	virtual DECLARE_READ16_MEMBER(cs1_r) override;
 	virtual DECLARE_WRITE16_MEMBER(cs1_w) override;
 };
+
+class jak_s500_game_state : public wrlshunt_game_state
+{
+public:
+	jak_s500_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		wrlshunt_game_state(mconfig, type, tag)
+	{
+	}
+
+protected:
+	//virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	virtual DECLARE_READ16_MEMBER(porta_r) override;
+
+private:
+};
+
+
 
 
 READ16_MEMBER(wrlshunt_game_state::cs0_r)
@@ -328,6 +411,11 @@ WRITE16_MEMBER(wrlshunt_game_state::cs1_w)
 }
 
 
+void wrlshunt_game_state::machine_start()
+{
+	save_item(NAME(m_sdram));
+}
+
 void wrlshunt_game_state::machine_reset()
 {
 	cs_callback(0x00, 0x00, 0x00, 0x00, 0x00);
@@ -337,6 +425,38 @@ void wrlshunt_game_state::machine_reset()
 	m_maincpu->set_paldisplaybank_high_hack(1);
 	m_maincpu->set_alt_tile_addressing_hack(1);
 }
+
+READ16_MEMBER(jak_s500_game_state::porta_r)
+{
+	uint16_t data = m_io_p1->read();
+	logerror("Port A Read: %04x\n", data);
+	return data;
+}
+
+void jak_s500_game_state::machine_reset()
+{
+	cs_callback(0x00, 0x00, 0x00, 0x00, 0x00);
+	m_maincpu->set_cs_space(m_memory->get_program());
+	m_maincpu->reset(); // reset CPU so vector gets read etc.
+
+	m_maincpu->set_paldisplaybank_high_hack(0);
+	m_maincpu->set_alt_tile_addressing_hack(1);
+}
+
+
+void generalplus_gpspispi_game_state::machine_start()
+{
+}
+
+void generalplus_gpspispi_game_state::machine_reset()
+{
+	m_maincpu->reset(); // reset CPU so vector gets read etc.
+
+	m_maincpu->set_paldisplaybank_high_hack(0);
+	m_maincpu->set_alt_tile_addressing_hack(1);
+}
+
+
 
 void wrlshunt_game_state::init_wrlshunt()
 {
@@ -400,10 +520,13 @@ WRITE16_MEMBER(gcm394_game_state::porta_w)
 	logerror("%s: Port A:WRITE %04x\n", machine().describe_context(), data);
 }
 
+// some sources indicate these later SoC types run at 96Mhz, others indicate 48Mhz.
+// unSP 2.0 CPUs have a lower average CPI too (2 instead of 6 on unSP 1.0 or 5 on unSP 1.1 / 1.2 / unSP 2.0) so using regular unSP timings might result in things being too slow
+// as with the older SunPlus chips this appears to be an fully internally generated frequency, external XTALs again are typically 6MHz or simply not present.
 
 void gcm394_game_state::base(machine_config &config)
 {
-	GCM394(config, m_maincpu, XTAL(27'000'000), m_screen);
+	GCM394(config, m_maincpu, 96000000/2, m_screen);
 	m_maincpu->porta_in().set(FUNC(gcm394_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(gcm394_game_state::portb_r));
 	m_maincpu->porta_out().set(FUNC(gcm394_game_state::porta_w));
@@ -432,8 +555,6 @@ void wrlshunt_game_state::wrlshunt(machine_config &config)
 {
 	gcm394_game_state::base(config);
 
-	m_maincpu->porta_in().set(FUNC(wrlshunt_game_state::hunt_porta_r));
-	m_maincpu->porta_out().set(FUNC(wrlshunt_game_state::hunt_porta_w));
 	m_maincpu->set_bootmode(1); // boot from external ROM / CS mirror
 
 	m_screen->set_size(320*2, 262*2);
@@ -441,14 +562,14 @@ void wrlshunt_game_state::wrlshunt(machine_config &config)
 }
 
 
-READ16_MEMBER(wrlshunt_game_state::hunt_porta_r)
+READ16_MEMBER(wrlshunt_game_state::porta_r)
 {
 	uint16_t data = m_io_p1->read();
 	logerror("%s: Port A Read: %04x\n",  machine().describe_context(), data);
 	return data;
 }
 
-WRITE16_MEMBER(wrlshunt_game_state::hunt_porta_w)
+WRITE16_MEMBER(wrlshunt_game_state::porta_w)
 {
 	logerror("%s: Port A:WRITE %04x\n", machine().describe_context(), data);
 
@@ -459,10 +580,9 @@ WRITE16_MEMBER(wrlshunt_game_state::hunt_porta_w)
 }
 
 
-
 void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 {
-	GPAC800(config, m_maincpu, XTAL(27'000'000), m_screen);
+	GPAC800(config, m_maincpu, 96000000/2, m_screen); 
 	m_maincpu->porta_in().set(FUNC(generalplus_gpac800_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(generalplus_gpac800_game_state::portb_r));
 	m_maincpu->porta_out().set(FUNC(generalplus_gpac800_game_state::porta_w));
@@ -489,6 +609,26 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 }
 
+DEVICE_IMAGE_LOAD_MEMBER(generalplus_gpac800_vbaby_game_state::cart_load)
+{
+	uint32_t size = m_cart->common_get_size("rom");
+
+	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
+void generalplus_gpac800_vbaby_game_state::generalplus_gpac800_vbaby(machine_config &config)
+{
+	generalplus_gpac800_game_state::generalplus_gpac800(config);
+
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vbaby_cart");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_device_load(FUNC(generalplus_gpac800_vbaby_game_state::cart_load));
+
+	SOFTWARE_LIST(config, "cart_list").set_original("vbaby_cart");
+}
 
 
 void gcm394_game_state::machine_start()
@@ -549,8 +689,60 @@ void gcm394_game_state::cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, ui
 }
 
 
+void generalplus_gpspispi_game_state::generalplus_gpspispi(machine_config &config)
+{
+	GP_SPISPI(config, m_maincpu, 96000000/2, m_screen); 
+	m_maincpu->porta_in().set(FUNC(generalplus_gpspispi_game_state::porta_r));
+	m_maincpu->portb_in().set(FUNC(generalplus_gpspispi_game_state::portb_r));
+	m_maincpu->porta_out().set(FUNC(generalplus_gpspispi_game_state::porta_w));
+	m_maincpu->space_read_callback().set(FUNC(generalplus_gpspispi_game_state::read_external_space));
+	m_maincpu->space_write_callback().set(FUNC(generalplus_gpspispi_game_state::write_external_space));
+	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(sunplus_gcm394_base_device::irq_vector_cb));
+	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_maincpu->set_bootmode(0); // boot from internal ROM (SPI bootstrap)
+	m_maincpu->set_cs_config_callback(FUNC(gcm394_game_state::cs_callback));
+
+	FULL_MEMORY(config, m_memory).set_map(&generalplus_gpspispi_game_state::cs_map_base);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(320*2, 262*2);
+	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
+	m_screen->set_screen_update("maincpu", FUNC(sunplus_gcm394_device::screen_update));
+	m_screen->screen_vblank().set(m_maincpu, FUNC(sunplus_gcm394_device::vblank));
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+}
+
+DEVICE_IMAGE_LOAD_MEMBER(generalplus_gpspispi_bkrankp_game_state::cart_load)
+{
+	uint32_t size = m_cart->common_get_size("rom");
+
+	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
+void generalplus_gpspispi_bkrankp_game_state::generalplus_gpspispi_bkrankp(machine_config &config)
+{
+	generalplus_gpspispi_game_state::generalplus_gpspispi(config);	
+
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "bkrankp_cart");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_device_load(FUNC(generalplus_gpspispi_bkrankp_game_state::cart_load));
+
+	SOFTWARE_LIST(config, "cart_list").set_original("bkrankp_cart");
+}
 
 static INPUT_PORTS_START( gcm394 )
+	PORT_START("P1")
+	PORT_START("P2")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( smartfp )
 	PORT_START("P1")
 	// entirely non-standard mat based controller (0-11 are where your feet are placed normally, row of selection places to step above those)
 	// no sensible default mapping unless forced
@@ -809,17 +1001,118 @@ static INPUT_PORTS_START( jak_gtg )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( jak_s500 )
+	PORT_START("P1")
+	PORT_DIPNAME( 0x0001, 0x0001, "P1" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 )
+
+	PORT_START("P2")
+	PORT_DIPNAME( 0x0001, 0x0001, "P2" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
 ROM_START(smartfp)
 	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
-	//ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
 
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("smartfitpark.bin", 0x000000, 0x800000, CRC(ada84507) SHA1(a3a80bf71fae62ebcbf939166a51d29c24504428))
 ROM_END
 
+ROM_START(jak_s500)
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("spbwheel.bin", 0x000000, 0x800000, CRC(6ba1d335) SHA1(1bb3e4d02c7b35dd4d336971c6a9f82071cc6ce1) )
+ROM_END
+
+
 ROM_START(wrlshunt)
 	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
-	//ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
 
 	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("wireless.bin", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796))		
@@ -928,7 +1221,7 @@ https://web.archive.org/web/20180106005235/http://www.lcis.com.tw/paper_store/pa
 
 ROM_START( wlsair60 )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
 	ROM_REGION16_BE( 0x8400000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "wlsair60.nand", 0x0000, 0x8400000, CRC(eec23b97) SHA1(1bb88290cf54579a5bb51c08a02d793cd4d79f7a) )
@@ -936,7 +1229,7 @@ ROM_END
 
 ROM_START( jak_gtg )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
 	ROM_REGION16_BE( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "goldentee.bin", 0x0000, 0x4200000, CRC(87d5e815) SHA1(5dc46cd753b791449cc41d5eff4928c0dcaf35c0) )
@@ -944,7 +1237,7 @@ ROM_END
 
 ROM_START( jak_car2 )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
 	ROM_REGION16_BE( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "cars2.bin", 0x0000, 0x4200000, CRC(4d610e09) SHA1(bc59f5f7f676a8f2a78dfda7fb62c804bbf850b6) )
@@ -952,7 +1245,7 @@ ROM_END
 
 ROM_START( jak_tsm )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
 	ROM_REGION16_BE( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "toystorymania.bin", 0x0000, 0x4200000, CRC(183b20a5) SHA1(eb4fa5ee9dfac58f5244d00d4e833b1e461cc52c) )
@@ -960,7 +1253,7 @@ ROM_END
 
 ROM_START( vbaby )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
 	ROM_REGION16_BE( 0x8400000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "vbaby.bin", 0x0000, 0x8400000, CRC(d904441b) SHA1(3742bc4e1e403f061ce2813ecfafc6f30a44d287) )
@@ -968,19 +1261,24 @@ ROM_END
 
 ROM_START( beambox )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "intenral.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
 	ROM_REGION16_BE( 0x4200000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "beambox.bin", 0x0000, 0x4200000, CRC(a486f04e) SHA1(73c7d99d8922eba58d94e955e254b9c3baa4443e) )
 ROM_END
 
 // the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
-CONS(2009, smartfp, 0, 0, base, gcm394, gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, smartfp, 0, 0, base, smartfp, gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // Fun 2 Learn 3-in-1 SMART SPORTS  ?
+CONS(2009, jak_s500, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "SpongeBob SquarePants Bikini Bottom 500 (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 
 CONS(2011, wrlshunt, 0, 0, wrlshunt, wrlshunt, wrlshunt_game_state, init_wrlshunt, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
+void generalplus_gpac800_game_state::machine_start()
+{
+	save_item(NAME(m_sdram));
+}
 
 void generalplus_gpac800_game_state::machine_reset()
 {
@@ -1040,8 +1338,6 @@ void generalplus_gpac800_game_state::machine_reset()
 		internal[0x7ffd] = m_vectorbase + 0x1a;
 		internal[0x7ffe] = m_vectorbase + 0x1c;
 		internal[0x7fff] = m_vectorbase + 0x1e;
-
-		internal[0x8000] = 0xb00b;
 	}
 
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
@@ -1143,5 +1439,67 @@ CONS(2010, wlsair60, 0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_ga
 CONS(200?, jak_gtg,  0, 0, generalplus_gpac800, jak_gtg,  generalplus_gpac800_game_state, nand_init210,  "JAKKS Pacific Inc", "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, jak_car2, 0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_init210,  "JAKKS Pacific Inc", "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, jak_tsm , 0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_tsm,      "JAKKS Pacific Inc", "Toy Story Mania (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, vbaby,    0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_vbaby,    "VTech", "V.Baby",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, beambox,  0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_beambox,  "Hasbro", "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+CONS(200?, vbaby,    0, 0, generalplus_gpac800_vbaby, jak_car2, generalplus_gpac800_vbaby_game_state, nand_vbaby,    "VTech", "V.Baby",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+
+ROM_START( bkrankp )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+
+	ROM_REGION(0x400000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "unit_mx25l3206e_c22016.bin", 0x0000, 0x400000, CRC(7efad116) SHA1(427d707e97586ae6ab5fe08f29ca450ddc7ad36e) )
+ROM_END
+
+
+void generalplus_gpspispi_game_state::init_spi()
+{
+	int vectorbase = 0x2fe0;
+	uint8_t* spirom = memregion("maincpu")->base();
+
+	address_space& mem = m_maincpu->space(AS_PROGRAM);
+
+	/*  Offset(h) 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
+
+		00000000  50 47 70 73 73 69 69 70 70 73 44 00 44 3F 44 00  PGpssiipps
+		00000010  -- -- -- -- -- bb -- -- -- -- -- -- -- -- -- -- 
+		                         ^^ copy dest, just like with nand type
+
+		bb = where to copy first block
+
+		The header is GPspispi (byteswapped) then some params
+		one of the params appears to be for the initial code copy operation done
+		by the bootstrap
+	*/
+	
+	// probably more bytes are used
+	int dest = spirom[0x15] << 8;
+
+	// copy a block of code from the NAND to RAM
+	for (int i = 0; i < 0x2000; i++)
+	{
+		uint16_t word = spirom[(i * 2) + 0] | (spirom[(i * 2) + 1] << 8);
+
+		mem.write_word(dest + i, word);
+	}
+
+	// these vectors must either directly point to RAM, or at least redirect there after some code
+	uint16_t* internal = (uint16_t*)memregion("maincpu:internal")->base();
+	internal[0x0000] = 0xb00b;
+
+	internal[0x7ff5] = vectorbase + 0x0a;
+	internal[0x7ff6] = vectorbase + 0x0c;
+	internal[0x7ff7] = dest + 0x20; // point boot vector at code in RAM (probably in reality points to internal code that copies the first block)
+	internal[0x7ff8] = vectorbase + 0x10;
+	internal[0x7ff9] = vectorbase + 0x12;
+	internal[0x7ffa] = vectorbase + 0x14;
+	internal[0x7ffb] = vectorbase + 0x16;
+	internal[0x7ffc] = vectorbase + 0x18;
+	internal[0x7ffd] = vectorbase + 0x1a;
+	internal[0x7ffe] = vectorbase + 0x1c;
+	internal[0x7fff] = vectorbase + 0x1e;
+}
+
+
+CONS(200?, bkrankp, 0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state	, init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

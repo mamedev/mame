@@ -1003,6 +1003,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/img_dsk.h,FORMATS["IMG_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["IMG_DSK"]~=null or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/img_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/img_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/iq151_dsk.h,FORMATS["IQ151_DSK"] = true
 --------------------------------------------------
 

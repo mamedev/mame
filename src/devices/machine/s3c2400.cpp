@@ -149,22 +149,6 @@
 #define S3C24XX_GPIO_PORT_F S3C2400_GPIO_PORT_F
 #define S3C24XX_GPIO_PORT_G S3C2400_GPIO_PORT_G
 
-
-#define VERBOSE_LEVEL ( 0 )
-
-static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
-{
-	if (VERBOSE_LEVEL >= n_level)
-	{
-		va_list v;
-		char buf[32768];
-		va_start(v, s_fmt);
-		vsprintf( buf, s_fmt, v);
-		va_end(v);
-		device.logerror("%s: %s", device.machine().describe_context( ), buf);
-	}
-}
-
 #define DEVICE_S3C2400
 #define S3C24_CLASS_NAME s3c2400_device
 #include "machine/s3c24xx.hxx"

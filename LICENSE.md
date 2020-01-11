@@ -4,7 +4,7 @@ MAME is a registered trademark of Gregory Ember.
 
 The text of version 2 of the GNU General Public License follows.
 
-    Copyright (C) 1997-2019  MAMEDev and contributors
+    Copyright (C) 1997-2020  MAMEDev and contributors
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+Cart info:
+
+Glob up, edge connector towards you.
+Pins 1-10 on top, left to right.  Pins 11-20 on bottom, pin 11 under pin 10, pin 20 under pin 1.
+
+1  VCC (3.3V)    20 cart grounds this to indicate inserted
+2  R/B           19 N/C
+3  GND           18 /RE
+4  /WE           17 ALE
+5  GND           16 IO7
+6  IO6           15 IO5
+7  IO4           14 IO3
+8  IO2           13 /CE
+9  IO0           12 IO1
+10 CLE           11 GND
+
+Cart 52-107122-022(SP) "Aventuras en el Zoo" is a ROMless cart that unlocks the console internal bundled game.
+
+-->
+
+<softwarelist name="vbaby_cart" description="VTech V.Baby cartridges">
+	<!-- note these are NAND parts.
+	     the dump doesn't contain GPNANDNAND strings so probably not booted from? -->
+
+	<software name="eljardin" supported="no"> 
+		<description>El Jardín de los Sueños... (Spain)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="52-220507(SP)" />
+		<part name="cart" interface="vbaby_cart"> <!-- dumped as hy27us08121a, ident returned C2 5A -->
+			<dataarea name="rom" size="0x4200000">
+				<rom name="vbaby_eljardin_as_hy27us08121a.bin" size="0x4200000" crc="b7c946c5" sha1="16d80c914bcc279d131336b8194adb61558b05fa" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
+
+

@@ -285,14 +285,21 @@ ROM_START(pc)
 	// American Research Corp., Copyright 1985, ARC TURBO BIOS VERSION 1.23 6/27/85
 	ROM_SYSTEM_BIOS(50, "arc123", "ARC Turbo BIOS 1.23")
 	ROMX_LOAD( "arcturbobios.bin", 0xe000, 0x2000, CRC(07692e7b) SHA1(27aa350dbc0d846cee8f9149bde0ef72d3862254), ROM_BIOS(50))
-
+	// 51: XT-Faraday PAC - Chipset: Faraday FE2010A-ES, Faraday FE2100, MM58167AN, Z0765A08PSC, NS8250N - CPU: SONY CXQ70108P-8 (V20)
+	// OSC: 28.6363, 18.4328.000 - ISA8: 6 - BIOS: PCBIOS 05017 / FARADAY'84'87 / 07017007 - on board: Floppy, ... (ser/par?)
+	ROM_SYSTEM_BIOS(51, "pac", "XT-Faraday PAC")
+	ROMX_LOAD( "xt-faraday_pac_32k.bin", 0x8000, 0x8000, CRC(d1edf110) SHA1(09570ef36dada08a6d3b97d17ad64814fe32d345), ROM_BIOS(51))
 ROM_END
 
 // BIOS versions specifically for NEC V20 CPUs, don't run on plain 8088
 ROM_START( pcv20 )
 	ROM_REGION(0x10000, "bios", 0)
-	// V20-BIOS Version 3.75 c't // (C) Peter Köhlmann 1987
-	ROM_LOAD( "peterv203.75.bin", 0xe000, 0x2000, CRC(b053a6a4) SHA1(f53218ad3d725f12d9149b22d8afcf6a8869a3bd))
+	// 0: V20-BIOS Version 3.75 c't // (C) Peter Köhlmann 1987
+	ROM_SYSTEM_BIOS(0, "v375", "c't v3.75")
+	ROMX_LOAD( "peterv203.75.bin", 0xe000, 0x2000, CRC(b053a6a4) SHA1(f53218ad3d725f12d9149b22d8afcf6a8869a3bd), ROM_BIOS(0))
+	// 1: V20-BIOS Version 3.72 c't // (C) Peter Köhlmann 1987 => last known version is 3.82
+	ROM_SYSTEM_BIOS(1, "v372", "c't v3.72")
+	ROMX_LOAD( "v20xtbios.bin", 0xe000, 0x2000, CRC(b2dca2e4) SHA1(18b0cb90084723eae08cf6b27bfb3fec8e9fb11b), ROM_BIOS(1))
 ROM_END
 
 #define rom_pcmda    rom_pc

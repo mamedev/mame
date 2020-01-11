@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="telestory_cart" description="JAKKS Pacific Telestory cartridges">
+
+	<software name="cinders" supported="no">
+		<description>La cenicienta - Bellezas en Flor / Cinderella - Beauties in Bloom (Spain)</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Toymax</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="telestorycinderellasp.bin" size="0x400000" crc="e1b2fd69" sha1="0f3109f30672dacbf52668d485eeed51829993a9"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="poohs" supported="no">
+		<description>Winnie the Pooh - Salta, Tigger, Salta / Winnie the Pooh - Bounce, Tigger, Bounce (Spain)</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Toymax</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="telestorypoohsp.bin" size="0x400000" crc="f0ef00e8" sha1="bc407c127a64f6b5cfcf3239f1af3d7896d5a6c2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkings" supported="no">
+		<description>El Rey León - El orgullo de Simba / The Lion King - Simba's Pride (Spain)</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Toymax</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="telestorylionkingsp.bin" size="0x800000" crc="459ed493" sha1="8528d4fd5d4a7ff457935d618527621b8ec2a100"/>
+			</dataarea>
+		</part>
+	</software>
+	
+</softwarelist>
