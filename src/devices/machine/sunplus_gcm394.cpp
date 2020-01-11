@@ -204,10 +204,40 @@ READ16_MEMBER(sunplus_gcm394_base_device::system_dma_memtype_r)
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_memtype_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::system_dma_memtype_w %04x\n", machine().describe_context(), data);
+	static char const* const types[16] =
+	{
+		"Unused / USB",
+		"DAC CHA",
+		"UART TX",
+		"UART RX",
+		"SD/MMC",
+		"NAND Flash",
+		"Serial Interface",
+		"DAC CHB",
+		"ADC Audo Sample Full",
+		"SPI TX",
+		"SPI RX",
+		"RESERVED (c)",
+		"RESERVED (d)",
+		"RESERVED (e)",
+		"RESERVED (f)"
+	};
+
 	m_system_dma_memtype = data;
+
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::system_dma_memtype_w %04x (CH3: %s | CH2: %s | CH1: %s | CH0: %s )\n", machine().describe_context(), data,
+		types[((m_system_dma_memtype>>12)&0xf)],
+		types[((m_system_dma_memtype>>8)&0xf)],
+		types[((m_system_dma_memtype>>4)&0xf)],
+		types[((m_system_dma_memtype)&0xf)]);
+
 }
 
+READ16_MEMBER(sunplus_gcm394_base_device::system_7a3a_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::system_7a3a_r\n", machine().describe_context());
+	return machine().rand();
+}
 
 // **************************************** 78xx region with some handling *************************************************
 
@@ -712,10 +742,12 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	// 7axx region = system (including dma)
 	// ######################################################################################################################################################################################
 
-	map(0x007a3a, 0x007a3a).r(FUNC(sunplus_gcm394_base_device::system_7a3a_r));
+	map(0x007a3a, 0x007a3a).r(FUNC(sunplus_gcm394_base_device::system_7a3a_r)); // ?
+
 	map(0x007a80, 0x007a86).rw(FUNC(sunplus_gcm394_base_device::system_dma_params_channel0_r), FUNC(sunplus_gcm394_base_device::system_dma_params_channel0_w));
 	map(0x007a88, 0x007a8e).rw(FUNC(sunplus_gcm394_base_device::system_dma_params_channel1_r), FUNC(sunplus_gcm394_base_device::system_dma_params_channel1_w)); // jak_tsm writes here
 	map(0x007a90, 0x007a96).rw(FUNC(sunplus_gcm394_base_device::system_dma_params_channel2_r), FUNC(sunplus_gcm394_base_device::system_dma_params_channel2_w)); // bkrankp writes here (is this on all types or just SPI?)
+	//map(0x007a98, 0x007a9e).rw(FUNC(sunplus_gcm394_base_device::system_dma_params_channel3_r), FUNC(sunplus_gcm394_base_device::system_dma_params_channel3_w)); // not seen, but probably
 
 	map(0x007abe, 0x007abe).rw(FUNC(sunplus_gcm394_base_device::system_dma_memtype_r), FUNC(sunplus_gcm394_base_device::system_dma_memtype_w)); // 7abe - written with DMA stuff (source type for each channel so that device handles timings properly?)
 	map(0x007abf, 0x007abf).rw(FUNC(sunplus_gcm394_base_device::system_dma_status_r), FUNC(sunplus_gcm394_base_device::system_dma_trigger_w));
