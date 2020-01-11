@@ -668,25 +668,21 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	map(0x007872, 0x007872).rw(FUNC(sunplus_gcm394_base_device::unkarea_7872_r), FUNC(sunplus_gcm394_base_device::unkarea_7872_w)); // 7872  I/O PortC Direction Register
 	map(0x007873, 0x007873).rw(FUNC(sunplus_gcm394_base_device::unkarea_7873_r), FUNC(sunplus_gcm394_base_device::unkarea_7873_w)); // 7873  I/O PortC Attribute Register
 
-	// 7874 (data 0x1249)
-	// 787c (data 0x1249)
-	// 787e (data 0x1249)
+	// 7874 (data 0x1249) (bkrankp data 0x36db)
+	// 787c (data 0x1249) (bkrankp data 0x36db)
+	// 787e (data 0x1249) (bkrankp data 0x36db)
 
 	// 7878  I/O PortD Data Register
 	// 7879  I/O PortD Buffer Register
 	// 787a  I/O PortD Direction Register
 	// 787b  I/O PortD Attribute Register
 
-	// ######################################################################################################################################################################################
-	// 788x - more IO?
-	// ######################################################################################################################################################################################
-	
 	// 7880
 
 	map(0x007882, 0x007882).rw(FUNC(sunplus_gcm394_base_device::unkarea_7882_r), FUNC(sunplus_gcm394_base_device::unkarea_7882_w));
 	map(0x007883, 0x007883).rw(FUNC(sunplus_gcm394_base_device::unkarea_7883_r), FUNC(sunplus_gcm394_base_device::unkarea_7883_w));
 
-	// 0x7888 (data 0x1249)
+	// 0x7888 (data 0x1249) (bkrankp data 0x36db), written with 7874 / 787c / 787e above
 
 	// ######################################################################################################################################################################################
 	// 78ax - interrupt controller?
