@@ -38,7 +38,7 @@
     2007        Tokyo Friend park? perfect! mezase! grand slam!/EPOCH/Japan                                     -           -               -           -               -                   -                       -
     2006    1   Let's TV Play series "Kamen Rider Kabuto" /EPOCH/Japan                                          -           -               -           -               -                   -                       -
             2   Let's TV Play series "Bo-kenger" /EPOCH/Japan                                                   -           -               -           -               -                   -                       -
-            3   Challenge Ai-chan! Exciting Ping-pong /TAKARATOMY/Japan                                         -           -               -           -               -                   -                       -
+            3   Challenge Ai-chan! Exciting Ping-pong /TAKARATOMY/Japan                                         -           -               -           -               -                   -                       dumped
             4   Sasuke & Sportsman Tournament /BANDAI/Japan                                                     -           -               -           -               -                   -                       -
             5   Hyper resque, I am a resque team /BANDAI/Japan                                                  -           -               -           -               -                   -                       -
             6   Let's TV Play series "Ultraman" /BANDAI/Japan                                                   -           -               -           -               -                   -                       -
@@ -69,7 +69,7 @@
             17  Toinohgi Onmyo-daisenki /BANDAI/Japan                                                           -           -               -           -               -                   -                       -
     2004    1   Accessory cartridge for Super TV computer "Double mouse party"/EPOCH/Japan                      -           -               -           -               -                   -                       -
             2   Printer for TV computer /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
-            3   Virtual punching battle of "One Piece" /BANDAI/Japan                                            -           -               -           -               -                   -                       -
+            3   Virtual punching battle of "One Piece" /BANDAI/Japan                                            -           -               -           -               -                   -                       dumped
             4   Accessory cartridge for Super TV computer "Doraemon"/EPOCH/Japan                                -           -               -           -               -                   -                       -
             5   Accessory cartridge for Super TV computer "Hamutaro"/EPOCH/Japan                                -           -               -           -               -                   -                       -
             6   Super TV computer /EPOCH/Japan                                                                  -           -               -           -               -                   -                       -
@@ -88,7 +88,7 @@
             19  Play TV Madden Football /RADICA/USA                                                             74021       x8              48          4M              none                SSD 98 PL7351-181       dumped
             20  Play TV SSX Snowboarder (and Snowboarder white?) /RADICA/USA                                    74023                       none                                                                    dumped
             21  Disney Princess "Kira-Kira magical lesson" /TOMY/Japan                                          -           -               -           -               -                   -                       -
-            22  Mermaid Melody "pichi-pichi Pitch" e-pitch microcomputer pure starter set /TAKARA/Japan         -           -               -           -               -                   -                       -
+            22  Mermaid Melody "pichi-pichi Pitch" e-pitch microcomputer pure starter set /TAKARA/Japan         -           -               -           -               -                   -                       dumped (same as e-kara Japan)
             23  Hello Kitty TV computer /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
             24  Gan-Gan Revoultion /TAKARA/Japan                                                                -           -               -           -               -                   -                       -
     2003    1   Tokyo Friend Park II /EPOCH/Japan                                                               -           -               -           -               -                   -                       -
@@ -100,7 +100,7 @@
             7   Croquette! Win a medal! /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
             8   Taiko Popira /TAKARA/Japan                                                                      -           -               -           -               -                   -                       dumped
             9   Together Minimoni, Dancing' Stage! plus /EPOCH/Japan                                            -           -               -           -               -                   -                       -
-            10  Evio /TOMY/Japan                                                                                -           -               -           -               -                   -                       -
+            10  Evio /TOMY/Japan                                                                                -           -               -           -               -                   -                       dumped (some carts not dumped tho)
             11  Together Minimoni,Jumping Party! /EPOCH/Japan                                                   -           -               -           -               -                   -                       -
             12  Hamutaro TV computer /EPOCH/Japan                                                               -           -               -           -               -                   -                       -
             13  Jara-Ja Land /TAKARA/Japan                                                                      -           -               -           -               -                   -                       -       (is this the home release of Jala Jaland /atlus/Japan above?)
@@ -111,9 +111,9 @@
             18  Cartridge for Slot machine TV "King of wild animal" /TAKARA/Japan                               -           -               -           -               -                   -                       -
             19  ChyoroQ "Burning up Racer /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
             20  Super shot! Exciting golf /EPOCH/Japan                                                          -           -               -           -               -                   -                       -
-            21  PichiPichi Pitchi /TAKARA/Japan                                                                 -           -               -           -               -                   -                       -
+            21  PichiPichi Pitchi /TAKARA/Japan                                                                 -           -               -           -               -                   -                       dumped (same as e-kara Japan)
             22  Dual Station /TAKARA/Japan                                                                      -           -               -           -               -                   -                       -
-            23  Gei-Geki GoGo! Shooting /TAKARA/Japan                                                           -           -               -           -               -                   -                       -
+            23  Gei-Geki GoGo! Shooting /TAKARA/Japan                                                           -           -               -           -               -                   -                       dumped
             24  Let's fish a big one. Exciting fishing! /EPOCH/Japan                                            -           -               -           -               -                   -                       -
             25  Champion Pinball /TOMY/Japan                                                                    -           -               -           -               -                   -                       -
             26  Excite Fishing DX                                                                               EF2J        x8              48          4M              24C08               SSD 98 PL7351-181       dumped
@@ -121,18 +121,18 @@
             2   Wildest computer robot "Daigander" (Korean version) /TAKARA/Korea                               -           -               -           -               -                   -                       -
             3   Hamutaro's circus /EPOCH/Japan                                                                  -           -               -           -               -                   -                       -
             4   Doraemon Wakuwaku Kuukihou /EPOCH/Japan                                                         -           x8              -           -               -                   -                       dumped
-            5   Strike! Exciting bowling /EPOCH/Japan                                                           -           -               -           -               -                   -                       -
-            6   e-kara /Hasbro/Spain                                                                            -           -               -           -               -                   -                       -
+            5   Strike! Exciting bowling /EPOCH/Japan                                                           -           -               -           -               -                   -                       dumped
+            6   e-kara /Hasbro/Spain                                                                            -           -               -           -               -                   -                       dumped (has 3 Spanish songs)
             7   Starter set for e-kara H.S," Morning sisters" /TAKARA/Japan                                     -           -               -           -               -                   -                       -
             8   e-kara H.S.(headphones set) /TAKARA/Japan                                                       -           -               -           -               -                   -                       -
-            9   Accessory cartridge for Slot machine TV," Aladdin TV" /TAKARA/Japan                             -           -               -           -               -                   -                       -
-            10  Accessory cartridge for Slot machine TV "Businessman Kintaro/TAKARA/Japan                       -           -               -           -               -                   -                       -
+            9   Accessory cartridge for Slot machine TV," Aladdin TV" /TAKARA/Japan                             -           -               -           -               -                   -                       dumped (cart)
+            10  Accessory cartridge for Slot machine TV "Businessman Kintaro/TAKARA/Japan                       -           -               -           -               -                   -                       dumped (cart)
             11  Poko-poko Hammers /TAKARA/Japan                                                                 -           -               -           -               -                   -                       -
             12  e-kara N Angel blue special set /TAKARA/Japan                                                   -           -               -           -               -                   -                       -
             13  Together Minimoni,Dancing Stage! /EPOCH/Japan                                                   -           -               -           -               -                   -                       -
             14  King of shooting /TOMY/Japan                                                                    -           -               -           -               -                   -                       -
-            15  Knock them out! Exciting boxing /EPOCH/Japan                                                    -           -               -           -               -                   -                       -
-            16  Popira2 /TAKARA/Japan                                                                           -           -               -           -               -                   -                       -
+            15  Knock them out! Exciting boxing /EPOCH/Japan                                                    -           -               -           -               -                   -                       dumped
+            16  Popira2 /TAKARA/Japan                                                                           -           -               -           -               -                   -                       dumped
             17  Zuba-Zuba Blade /TAKARA/Japan                                                                   -           -               -           -               -                   -                       -
             18  Starter set for e-kara N "Morning sisters" /TAKARA/Japan                                        -           -               -           -               -                   -                       -
             19  e-kara /Hasbro/England                                                                          -           -               -           -               -                   -                       dumped? (if same as one of the 'US' sets?)
@@ -142,12 +142,12 @@
             23  PLAY TV Boxing /RADICA/Japan                                                                    72039       x8              48          2M              none                SSD 98 PA7351-107       dumped
             24  PLAY TV Baseball 2 /RADICA/USA                                                                  72042       x8              48          2M              none                SSD 98 PL7351-181       dumped
             25  Barbie Dance Party /RADICA/USA,EU                                                               -           x8              none        -               -                   -                       dumped
-            26  Compete! Exciting stadium DX /EPOCH/Japan                                                       -           -               -           -               -                   -                       -
+            26  Compete! Exciting stadium DX /EPOCH/Japan                                                       -           -               -           -               -                   -                       dumped
             27  e-kara N /EPOCH/Japan                                                                           -           -               -           -               -                   -                       -
             28  Who's the ace? Excite Tennis /EPOCH/Japan                                                       -           -               -           -               -                   -                       -
             29  Wildest computer robot, "Daigander" /TAKARA/Japan                                               -           -               -           -               -                   -                       -
-            30  Cartridge for Slot machine TV "King of wild animal Jr." /TAKARA/Japan                           -           -               -           -               -                   -                       -
-            31  Gachinko Contest! Slot machine TV /DCT/Japan                                                    -           -               -           -               -                   -                       -
+            30  Cartridge for Slot machine TV "King of wild animal Jr." /TAKARA/Japan                           -           -               -           -               -                   -                       dumped? (cart)
+            31  Gachinko Contest! Slot machine TV /DCT/Japan                                                    -           -               -           -               -                   -                       dumped
             32  Beyblade Ultimate shooter /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
     2001    1   Ping-pong(Chinese version) /Tenpon/China                                                        -           -               -           -               -                   -                       -
             2   TV hockey /TOMY/Japan                                                                           -           -               -           -               -                   -                       -
@@ -169,7 +169,7 @@
             18  Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
             19  Let's fish black bass! Exciting Fishing /EPOCH/Japan                                            -           -               -           -               -                   -                       -
             20  Baseball Korean version /SONOKONG/Korea                                                         -           -               -           -               -                   -                       -
-            21  Ping-pong Korean version /SONOKONG/Korea                                                        -           -               -           -               -                   -                       -
+            21  Ping-pong Korean version /SONOKONG/Korea                                                        -           -               -           -               -                   -                       dumped ('Reeal Ping Pong')
             22  e-kara Hello Kitty /TAKARA/Japan                                                                -           -               -           -               -                   -                       -
             23  Special box "Morning sisters" /TAKARA/Japan                                                     -           -               -           -               -                   -                       -
             24  Gan-Gan Adventure /TAKARA/Japan                                                                 -           -               -           -               -                   -                       -
@@ -545,6 +545,22 @@ static INPUT_PORTS_START( xavix_i2c )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( epo_bowl )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( ttv_lotr )
 	PORT_INCLUDE(xavix)
@@ -1788,6 +1804,16 @@ ROM_START( epo_efdx )
 	ROM_LOAD("excitefishing.bin", 0x000000, 0x400000, CRC(9c85b261) SHA1(6a363faed2ec89c5176e46554a98ca1e20132579) )
 ROM_END
 
+ROM_START( epo_bowl )
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("bowling.bin", 0x000000, 0x200000, CRC(d34f8d9e) SHA1(ebe3792172dc43904b9226beb27f1da89d2388cc) )
+ROM_END
+
+ROM_START( epo_esdx )
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("baseballdx.bin", 0x000000, 0x400000, CRC(fe2e832e) SHA1(e6343f5e5f52316538d918d0d67c15764aa40f65) )
+ROM_END
+
 ROM_START( epo_epp )
 	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("excitepingpong.bin", 0x000000, 0x100000, CRC(1fdb9cbd) SHA1(8ed0c1f6d2708ab6e79f0b9553e587c6446e8338) )
@@ -2010,6 +2036,8 @@ CONS( 2002, rad_bdp,   0,          0,  xavix,            rad_bdp,  xavix_state, 
 
 CONS( 2002, rad_socr,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Radica / Epoch / SSD Company LTD",             "Play TV Soccer", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
+CONS( 2002, epo_esdx,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Excite Stadium DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
 CONS( 2000, epo_epp,   0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Excite Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2000, epo_eppk,  epo_epp,    0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD / Sonokong",           "Real Ping Pong (Korea)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
@@ -2113,6 +2141,9 @@ ROM_START( ban_onep )
 ROM_END
 
 CONS( 2002, epo_ebox, 0, 0, xavix2000_nv,        epo_epp,     xavix_state,             init_xavix, "Epoch / SSD Company LTD",       "Excite Boxing (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // doesn't use XaviX2000 extra opcodes, but had that type of CPU
+ // die not confirmed, but uses extra opcodes.  (hangs on title screen due to combination of freq_timer_done nested interrupts tripping, and waiting on bits in input ports to change
+CONS( 2002, epo_bowl, 0, 0, xavix2000_i2c_24c02, epo_bowl,    xavix_i2c_state,         init_xavix, "Epoch / SSD Company LTD",       "Excite Bowling (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
 CONS( 2004, epo_sdb,  0, 0, xavix2000_nv_sdb,    epo_sdb,     xavix_2000_nv_sdb_state, init_xavix, "Epoch / SSD Company LTD",       "Super Dash Ball (Japan)",  MACHINE_IMPERFECT_SOUND )
 
 CONS( 2005, ttv_sw,   0, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Tiger / SSD Company LTD",       "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
