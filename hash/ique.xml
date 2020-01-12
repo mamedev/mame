@@ -59,4 +59,15 @@
         </part>
     </software>
 
+    <software name="iqueclub" supported="no">
+        <description>iQue Club (version 3)</description>
+        <year>200?</year>
+        <publisher>Nintendo</publisher>
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="573440">
+                <rom name="ique club v3.bin" size="573440" crc="74d3b450" sha1="aae97a70d4bc67c3dd857d1c884bc3ce1a296040" />
+            </dataarea>
+        </part>
+    </software>
+
 </softwarelist>
