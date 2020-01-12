@@ -473,9 +473,8 @@ void gdrom_device::SetDevice(void *device)
 
 	// try to find if the mounted chd is from an actual gd-rom disc
 	if (m_cdrom)
-		if (cdrom_get_last_track(m_cdrom) == 3)
-			if ((cdrom_get_track_type(m_cdrom, 0) == CD_TRACK_MODE1_RAW) && (cdrom_get_track_type(m_cdrom, 1) == CD_TRACK_AUDIO) && (cdrom_get_track_type(m_cdrom, 2) == CD_TRACK_MODE1_RAW))
-				is_real_gdrom_disc = true;
+		if (cdrom_get_toc(m_cdrom)->flags & CD_FLAG_GDROM)
+			is_real_gdrom_disc = true;
 }
 
 // device type definition
