@@ -75,6 +75,8 @@ public:
 	DECLARE_READ32_MEMBER(sh4_parameterh_r);
 	DECLARE_WRITE32_MEMBER(sh4_status_w);		// 14000024
 	DECLARE_READ32_MEMBER(sh4_status_r);
+	DECLARE_WRITE32_MEMBER(sh4_control_w);		// 14000028
+	DECLARE_READ32_MEMBER(sh4_control_r);
 	DECLARE_WRITE32_MEMBER(sh4_des_keyl_w);		// 14000030
 	DECLARE_READ32_MEMBER(sh4_des_keyl_r);
 	DECLARE_WRITE32_MEMBER(sh4_des_keyh_w);		// 14000034
@@ -123,6 +125,7 @@ private:
 	uint32_t dimm_parameterl;
 	uint32_t dimm_parameterh;
 	uint32_t dimm_status;
+	uint32_t dimm_control;
 	uint32_t sh4_unknown;
 	uint64_t dimm_des_key;
 

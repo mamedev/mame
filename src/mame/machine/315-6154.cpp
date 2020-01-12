@@ -76,7 +76,21 @@ WRITE32_MEMBER(sega_315_6154_device::registers_w)
 	else if (offset == 0x38 / 4)
 	{
 		if (m_registers[0x38 / 4] & 0x01000000)
-			logerror("got dma transfer request from 0x%08x to 0x%08x size 0x%08x bytes\n", m_registers[0x30 / 4], m_registers[0x34 / 4], (m_registers[0x38 / 4] & 0xffffff) << 2);
+		{
+			uint32_t s, d, l;
+
+			s = m_registers[0x30 / 4];
+			d = m_registers[0x34 / 4];
+			l = m_registers[0x38 / 4] & 0xffffff;
+			logerror("got dma transfer request from 0x%08x to 0x%08x size 0x%08x bytes\n", s, d, l << 2);
+			while (l != 0)
+			{
+				m_memory->write_dword(d, m_memory->read_dword(s));
+				s += 4;
+				d += 4;
+				l--;
+			}
+		}
 		m_registers[0x38 / 4] &= ~0x01000000;
 	}
 }

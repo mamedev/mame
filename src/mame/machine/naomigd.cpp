@@ -416,6 +416,7 @@ naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *
 	dimm_parameterl(0xffff),
 	dimm_parameterh(0xffff),
 	dimm_status(0xffff),
+	dimm_control(0),
 	sh4_unknown(0),
 	dimm_des_key(0)
 {
@@ -461,10 +462,10 @@ void naomi_gdrom_board::pci_map(address_map& map)
 	map(0x0000001c, 0x0000001f).rw(FUNC(naomi_gdrom_board::sh4_parameterl_r), FUNC(naomi_gdrom_board::sh4_parameterl_w));
 	map(0x00000020, 0x00000023).rw(FUNC(naomi_gdrom_board::sh4_parameterh_r), FUNC(naomi_gdrom_board::sh4_parameterh_w));
 	map(0x00000024, 0x00000027).rw(FUNC(naomi_gdrom_board::sh4_status_r), FUNC(naomi_gdrom_board::sh4_status_w));
+	map(0x00000028, 0x0000002b).rw(FUNC(naomi_gdrom_board::sh4_control_r), FUNC(naomi_gdrom_board::sh4_control_w));
 	map(0x0000002c, 0x0000002f).lr32([]() { return 0x0c; }, "Constant 0x0c"); // 0x0a or 0x0e possible too
 	map(0x00000030, 0x00000033).rw(FUNC(naomi_gdrom_board::sh4_des_keyl_r), FUNC(naomi_gdrom_board::sh4_des_keyl_w));
 	map(0x00000034, 0x00000037).rw(FUNC(naomi_gdrom_board::sh4_des_keyh_r), FUNC(naomi_gdrom_board::sh4_des_keyh_w));
-	map(0x10000000, 0x10000003).ram(); // temporary for testing
 	map(0x70000000, 0x70ffffff).ram().share("sh4sdram");
 	map(0x78000000, 0x783fffff).ram().share("6154sdram");
 	map(0xc00001c0, 0xc00001df).rw(FUNC(naomi_gdrom_board::ide_cs0_r), FUNC(naomi_gdrom_board::ide_cs0_w));
@@ -601,6 +602,20 @@ WRITE32_MEMBER(naomi_gdrom_board::sh4_status_w)
 READ32_MEMBER(naomi_gdrom_board::sh4_status_r)
 {
 	return dimm_status;
+}
+
+WRITE32_MEMBER(naomi_gdrom_board::sh4_control_w)
+{
+	dimm_control = data;
+	if (dimm_control & 2)
+		m_315_6154->memory()->unmap_readwrite(0x10000000, 0x10000000 + dimm_data_size - 1);
+	else
+		m_315_6154->memory()->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data);
+}
+
+READ32_MEMBER(naomi_gdrom_board::sh4_control_r)
+{
+	return dimm_control;
 }
 
 WRITE32_MEMBER(naomi_gdrom_board::sh4_des_keyl_w)
@@ -921,6 +936,7 @@ void naomi_gdrom_board::device_start()
 	save_item(NAME(dimm_parameterl));
 	save_item(NAME(dimm_parameterh));
 	save_item(NAME(dimm_status));
+	save_item(NAME(dimm_control));
 	save_item(NAME(sh4_unknown));
 	save_item(NAME(dimm_des_key));
 }
@@ -930,6 +946,8 @@ void naomi_gdrom_board::device_reset()
 	naomi_board::device_reset();
 
 	dimm_cur_address = 0;
+	if (work_mode != 0)
+		m_315_6154->memory()->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data);
 }
 
 void naomi_gdrom_board::board_setup_address(uint32_t address, bool is_dma)
