@@ -5651,6 +5651,11 @@ ROM_START( ii32in1 )
 	ROM_LOAD( "ii32in1.bin", 0x00000, 0x2000000, CRC(ddee4eac) SHA1(828c0c18a66bb4872299f9a43d5e3647482c5925) )
 ROM_END
 
+ROM_START( zone7in1 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "zone.bin", 0x000000, 0x1000000, CRC(50726ae8) SHA1(bcedcd61728dce7b430784585be14109af542cc2) )
+ROM_END
+
 ROM_START( miwi2_16 )
 	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "miwi 2 16 arcade games and drum master vt168.bin", 0x00000, 0x1000000, CRC(00c115c5) SHA1(fa5fdb448dd9b963351d71fe94e2072f5c872a18) )
@@ -5678,6 +5683,9 @@ ROM_END
 CONS( 200?, ii8in1,    0,  0,  intech_interact,    intec, intec_interact_state, regular_init,  "Intec", "InterAct 8-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, ii32in1,   0,  0,  intech_interact,    intec, intec_interact_state, regular_init,  "Intec", "InterAct 32-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // a 40-in-1 also exists which combines the above
+
+CONS( 200?, zone7in1,  0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "<unknown>", "Zone 7-in-1 Sports (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // UK version has different games
+
 
 CONS( 200?, miwi2_16,  0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "<unknown>", "MiWi2 16-in-1 + Drum Master", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // clearly older code, Highway has uncensored title screen, selection screen has 'Arcase' instead of 'Arcade'
 CONS( 200?, miwi2_7,   0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "<unknown>", "MiWi2 7-in-1 Sports", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
