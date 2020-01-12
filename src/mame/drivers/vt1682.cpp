@@ -5684,8 +5684,8 @@ CONS( 200?, ii8in1,    0,  0,  intech_interact,    intec, intec_interact_state, 
 CONS( 200?, ii32in1,   0,  0,  intech_interact,    intec, intec_interact_state, regular_init,  "Intec", "InterAct 32-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // a 40-in-1 also exists which combines the above
 
-CONS( 200?, zone7in1,  0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "<unknown>", "Zone 7-in-1 Sports (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // UK version has different games
-
+CONS( 200?, zone7in1,  0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "<unknown>", "Zone 7-in-1 Sports (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) 
+// UK version of Zone 7-in-1 has different games (Boxing / Tennis / Golf / Fishing / Table Tennis / Bowling / Football) with Fishing replacing Baseball
 
 CONS( 200?, miwi2_16,  0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "<unknown>", "MiWi2 16-in-1 + Drum Master", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // clearly older code, Highway has uncensored title screen, selection screen has 'Arcase' instead of 'Arcade'
 CONS( 200?, miwi2_7,   0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "<unknown>", "MiWi2 7-in-1 Sports", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
