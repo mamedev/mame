@@ -42,8 +42,8 @@ namespace plib
 		using internal_type = TYPE;
 		using mult_type = TYPE;
 
-		template <typename altTYPE, altTYPE>
-		friend class ptime;
+		template <typename altTYPE, altTYPE altRES>
+		friend struct ptime;
 
 		constexpr ptime() noexcept : m_time(0) {}
 
@@ -64,7 +64,7 @@ namespace plib
 		// FIXME: check for overflow
 		template <typename O>
 		constexpr explicit ptime(const ptime<O, RES> &rhs) noexcept
-		: m_time(rhs.as_raw()) { }
+		: m_time(rhs.m_time) { }
 
 		template <typename O>
 		C14CONSTEXPR ptime &operator+=(const ptime<O, RES> &rhs) noexcept
@@ -86,14 +86,14 @@ namespace plib
 		friend constexpr const ptime operator-(const ptime &lhs, const ptime<O, RES> &rhs) noexcept
 		{
 			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
-			return ptime(lhs.m_time - rhs.as_raw());
+			return ptime(lhs.m_time - rhs.m_time);
 		}
 
 		template <typename O>
 		friend constexpr const ptime operator+(const ptime &lhs, const ptime<O, RES> &rhs) noexcept
 		{
 			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
-			return ptime(lhs.m_time + rhs.as_raw());
+			return ptime(lhs.m_time + rhs.m_time);
 		}
 
 		friend constexpr const ptime operator*(ptime lhs, const mult_type factor) noexcept
@@ -105,7 +105,7 @@ namespace plib
 		friend constexpr mult_type operator/(const ptime lhs, const ptime<O, RES> rhs) noexcept
 		{
 			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
-			return static_cast<mult_type>(lhs.m_time / rhs.as_raw());
+			return static_cast<mult_type>(lhs.m_time / rhs.m_time);
 		}
 
 		friend constexpr bool operator<(const ptime lhs, const ptime rhs) noexcept
