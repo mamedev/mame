@@ -68,10 +68,10 @@ namespace devices
 		if (m_params.m_dynamic_ts)
 			return;
 
-		netlist_time now(exec().time());
+		netlist_time_ext now(exec().time());
 		// force solving during start up if there are no time-step devices
 		// FIXME: Needs a more elegant solution
-		bool force_solve = (now < netlist_time::from_fp<decltype(m_params.m_max_timestep)>(2 * m_params.m_max_timestep));
+		bool force_solve = (now < netlist_time_ext::from_fp<decltype(m_params.m_max_timestep)>(2 * m_params.m_max_timestep));
 
 		std::size_t nthreads = std::min(static_cast<std::size_t>(m_params.m_parallel()), plib::omp::get_max_threads());
 

@@ -45,7 +45,7 @@ namespace solver
 		, m_stat_calculations(*this, "m_stat_calculations", 0)
 		, m_stat_newton_raphson(*this, "m_stat_newton_raphson", 0)
 		, m_stat_vsolver_calls(*this, "m_stat_vsolver_calls", 0)
-		, m_last_step(*this, "m_last_step", netlist_time::zero())
+		, m_last_step(*this, "m_last_step", netlist_time_ext::zero())
 		, m_fb_sync(*this, "FB_sync")
 		, m_Q_sync(*this, "Q_sync")
 		, m_ops(0)
@@ -358,7 +358,7 @@ namespace solver
 
 	void matrix_solver_t::reset()
 	{
-		m_last_step = netlist_time::zero();
+		m_last_step = netlist_time_ext::zero();
 	}
 
 	void matrix_solver_t::update() noexcept
@@ -397,18 +397,18 @@ namespace solver
 			d->timestep(dd);
 	}
 
-	const netlist_time matrix_solver_t::solve(netlist_time now)
+	const netlist_time matrix_solver_t::solve(netlist_time_ext now)
 	{
-		const netlist_time delta = now - m_last_step;
+		const netlist_time_ext delta = now - m_last_step();
 
 		// We are already up to date. Avoid oscillations.
 		// FIXME: Make this a parameter!
-		if (delta < netlist_time::quantum())
+		if (delta < netlist_time_ext::quantum())
 			return netlist_time::zero();
 
 		// update all terminals for new time step
 		m_last_step = now;
-		step(delta);
+		step(static_cast<netlist_time>(delta));
 
 		++m_stat_vsolver_calls;
 		if (has_dynamic_devices())

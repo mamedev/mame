@@ -350,6 +350,10 @@ namespace netlist
 		C14CONSTEXPR operator T & () noexcept { return m_value; }
 		//! Return const value of state variable.
 		constexpr operator const T & () const noexcept { return m_value; }
+		//! Return non-const value of state variable.
+		C14CONSTEXPR T & operator ()() noexcept { return m_value; }
+		//! Return const value of state variable.
+		constexpr const T & operator ()() const noexcept { return m_value; }
 		//! Return pointer to state variable.
 		C14CONSTEXPR T * ptr() noexcept { return &m_value; }
 		//! Return const pointer to state variable.
@@ -674,8 +678,8 @@ namespace netlist
 			template <bool KEEP_STATS>
 			void update_devs() noexcept;
 
-			netlist_time next_scheduled_time() const noexcept { return m_next_scheduled_time; }
-			void set_next_scheduled_time(netlist_time ntime) noexcept { m_next_scheduled_time = ntime; }
+			netlist_time_ext next_scheduled_time() const noexcept { return m_next_scheduled_time; }
+			void set_next_scheduled_time(netlist_time_ext ntime) noexcept { m_next_scheduled_time = ntime; }
 
 			bool isRailNet() const noexcept { return !(m_railterminal == nullptr); }
 			core_terminal_t & railterminal() const noexcept { return *m_railterminal; }
@@ -733,7 +737,7 @@ namespace netlist
 			}
 
 			// only used for logic nets
-			void set_Q_time(netlist_sig_t newQ, netlist_time at) noexcept
+			void set_Q_time(netlist_sig_t newQ, netlist_time_ext at) noexcept
 			{
 				if (newQ != m_new_Q)
 				{
@@ -756,10 +760,10 @@ namespace netlist
 			netlist_sig_t *Q_state_ptr() noexcept { return m_cur_Q.ptr(); }
 
 		private:
-			state_var<netlist_sig_t> m_new_Q;
-			state_var<netlist_sig_t> m_cur_Q;
-			state_var<queue_status>  m_in_queue;    // 0: not in queue, 1: in queue, 2: last was taken
-			state_var<netlist_time>  m_next_scheduled_time;
+			state_var<netlist_sig_t>     m_new_Q;
+			state_var<netlist_sig_t>     m_cur_Q;
+			state_var<queue_status>      m_in_queue;    // 0: not in queue, 1: in queue, 2: last was taken
+			state_var<netlist_time_ext>  m_next_scheduled_time;
 
 			core_terminal_t * m_railterminal;
 			plib::linkedlist_t<core_terminal_t> m_list_active;
@@ -956,7 +960,7 @@ namespace netlist
 			m_my_net.set_Q_and_push(newQ, delay); // take the shortcut
 		}
 
-		void set_Q_time(netlist_sig_t newQ, netlist_time at) noexcept
+		void set_Q_time(netlist_sig_t newQ, netlist_time_ext at) noexcept
 		{
 			m_my_net.set_Q_time(newQ, at); // take the shortcut
 		}
@@ -1317,13 +1321,13 @@ namespace netlist
 
 		class queue_t :
 				//public timed_queue<pqentry_t<net_t *, netlist_time>, false, NL_KEEP_STATISTICS>,
-				public timed_queue<plib::pqentry_t<net_t *, netlist_time>, false>,
+				public timed_queue<plib::pqentry_t<net_t *, netlist_time_ext>, false>,
 				public netlist_ref,
 				public plib::state_manager_t::callback_t
 		{
 		public:
-			using base_queue = timed_queue<plib::pqentry_t<net_t *, netlist_time>, false>;
-			using entry_t = plib::pqentry_t<net_t *, netlist_time>;
+			using entry_t = plib::pqentry_t<net_t *, netlist_time_ext>;
+			using base_queue = timed_queue<entry_t, false>;
 			explicit queue_t(netlist_t &nl);
 			~queue_t() noexcept override = default;
 
@@ -1340,7 +1344,7 @@ namespace netlist
 
 		private:
 			std::size_t m_qsize;
-			std::vector<netlist_time::internal_type> m_times;
+			std::vector<netlist_time_ext::internal_type> m_times;
 			std::vector<std::size_t> m_net_ids;
 		};
 
@@ -1597,7 +1601,7 @@ namespace netlist
 
 			NETLIB_RESETI()
 			{
-				m_Q.net().set_next_scheduled_time(netlist_time::zero());
+				m_Q.net().set_next_scheduled_time(netlist_time_ext::zero());
 			}
 
 			NETLIB_UPDATE_PARAMI()
@@ -1618,6 +1622,7 @@ namespace netlist
 			param_fp_t m_freq;
 		};
 	} // namespace devices
+
 	// -----------------------------------------------------------------------------
 	// netlist_t
 	// -----------------------------------------------------------------------------
@@ -1634,9 +1639,9 @@ namespace netlist
 
 		// run functions
 
-		netlist_time time() const noexcept { return m_time; }
+		netlist_time_ext time() const noexcept { return m_time; }
 
-		void process_queue(netlist_time delta) noexcept;
+		void process_queue(netlist_time_ext delta) noexcept;
 		void abort_current_queue_slice() noexcept
 		{
 			if (!NL_USE_QUEUE_STATS || !m_use_stats)
@@ -1695,14 +1700,14 @@ namespace netlist
 	private:
 
 		template <bool KEEP_STATS>
-		void process_queue_stats(netlist_time delta) noexcept;
+		void process_queue_stats(netlist_time_ext delta) noexcept;
 
 		netlist_state_t &                   m_state;
 		devices::NETLIB_NAME(solver) *      m_solver;
 
 		// mostly rw
 		PALIGNAS_CACHELINE()
-		netlist_time                        m_time;
+		netlist_time_ext                    m_time;
 		devices::NETLIB_NAME(mainclock) *   m_mainclock;
 
 		PALIGNAS_CACHELINE()
@@ -2064,57 +2069,63 @@ namespace netlist
 	}
 
 	template <bool KEEP_STATS>
-	inline void netlist_t::process_queue_stats(const netlist_time delta) noexcept
+	inline void netlist_t::process_queue_stats(const netlist_time_ext delta) noexcept
 	{
-		netlist_time stop(m_time + delta);
+		netlist_time_ext stop(m_time + delta);
 
 		qpush(detail::queue_t::entry_t(stop, nullptr));
 
 		if (m_mainclock == nullptr)
 		{
-			detail::queue_t::entry_t e(m_queue.pop());
-			m_time = e.exec_time();
-			while (e.object() != nullptr)
+			m_time = m_queue.top().exec_time();
+			detail::net_t *obj(m_queue.top().object());
+			m_queue.pop();
+
+			while (obj != nullptr)
 			{
-				e.object()->template update_devs<KEEP_STATS>();
+				obj->template update_devs<KEEP_STATS>();
 				if (KEEP_STATS)
 					m_perf_out_processed.inc();
-				e = m_queue.pop();
-				m_time = e.exec_time();
+				const detail::queue_t::entry_t *top = &m_queue.top();
+				m_time = top->exec_time();
+				obj = top->object();
+				m_queue.pop();
 			}
 		}
 		else
 		{
 			logic_net_t &mc_net(m_mainclock->m_Q.net());
 			const netlist_time inc(m_mainclock->m_inc);
-			netlist_time mc_time(mc_net.next_scheduled_time());
+			netlist_time_ext mc_time(mc_net.next_scheduled_time());
 
 			do
 			{
-				while (m_queue.top().exec_time() > mc_time)
+				const detail::queue_t::entry_t *top = &m_queue.top();
+				while (top->exec_time() > mc_time)
 				{
 					m_time = mc_time;
 					mc_net.toggle_new_Q();
 					mc_net.update_devs<KEEP_STATS>();
+					top = &m_queue.top();
 					mc_time += inc;
 				}
 
-				detail::queue_t::entry_t e(m_queue.pop());
-				m_time = e.exec_time();
-				if (e.object() != nullptr)
-				{
-					e.object()->template update_devs<KEEP_STATS>();
-					if (KEEP_STATS)
-						m_perf_out_processed.inc();
-				}
+				m_time = top->exec_time();
+				const auto obj(top->object());
+				m_queue.pop();
+				if (obj != nullptr)
+					obj->template update_devs<KEEP_STATS>();
 				else
 					break;
-			} while (true); //while (e.m_object != nullptr);
+				if (KEEP_STATS)
+					m_perf_out_processed.inc();
+			} while (true);
+
 			mc_net.set_next_scheduled_time(mc_time);
 		}
 	}
 
-	inline void netlist_t::process_queue(netlist_time delta) noexcept
+	inline void netlist_t::process_queue(netlist_time_ext delta) noexcept
 	{
 		if (!m_use_stats)
 			process_queue_stats<false>(delta);

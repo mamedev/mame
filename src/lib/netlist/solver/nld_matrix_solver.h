@@ -177,7 +177,7 @@ namespace solver
 		// after every call to solve, update inputs must be called.
 		// this can be done as well as a batch to ease parallel processing.
 
-		const netlist_time solve(netlist_time now);
+		const netlist_time solve(netlist_time_ext now);
 		void update_inputs();
 
 		bool has_dynamic_devices() const noexcept { return m_dynamic_devices.size() > 0; }
@@ -235,7 +235,7 @@ namespace solver
 		state_var<std::size_t> m_stat_newton_raphson;
 		state_var<std::size_t> m_stat_vsolver_calls;
 
-		state_var<netlist_time> m_last_step;
+		state_var<netlist_time_ext> m_last_step;
 		std::vector<core_device_t *> m_step_devices;
 		std::vector<core_device_t *> m_dynamic_devices;
 

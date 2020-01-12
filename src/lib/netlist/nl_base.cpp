@@ -102,7 +102,7 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	detail::queue_t::queue_t(netlist_t &nl)
-		: timed_queue<plib::pqentry_t<net_t *, netlist_time>, false>(512)
+		: timed_queue<plib::pqentry_t<net_t *, netlist_time_ext>, false>(512)
 		, netlist_ref(nl)
 		, m_qsize(0)
 		, m_times(512)
@@ -129,7 +129,6 @@ namespace netlist
 		}
 	}
 
-
 	void detail::queue_t::on_post_load(plib::state_manager_t &manager)
 	{
 		plib::unused_var(manager);
@@ -137,7 +136,7 @@ namespace netlist
 		for (std::size_t i = 0; i < m_qsize; i++ )
 		{
 			detail::net_t *n = state().nets()[m_net_ids[i]].get();
-			this->push<false>(queue_t::entry_t(netlist_time::from_raw(m_times[i]),n));
+			this->push<false>(queue_t::entry_t(netlist_time_ext::from_raw(m_times[i]),n));
 		}
 	}
 
@@ -183,7 +182,7 @@ namespace netlist
 	netlist_t::netlist_t(netlist_state_t &state)
 		: m_state(state)
 		, m_solver(nullptr)
-		, m_time(netlist_time::zero())
+		, m_time(netlist_time_ext::zero())
 		, m_mainclock(nullptr)
 		, m_queue(*this)
 		, m_use_stats(false)
@@ -325,10 +324,10 @@ namespace netlist
 		log().debug("Searching for solver\n");
 		m_solver = m_state.get_single_device<devices::NETLIB_NAME(solver)>("solver");
 
-		m_time = netlist_time::zero();
+		m_time = netlist_time_ext::zero();
 		m_queue.clear();
 		if (m_mainclock != nullptr)
-			m_mainclock->m_Q.net().set_next_scheduled_time(netlist_time::zero());
+			m_mainclock->m_Q.net().set_next_scheduled_time(netlist_time_ext::zero());
 		//if (m_solver != nullptr)
 		//  m_solver->reset();
 
@@ -654,7 +653,7 @@ namespace netlist
 		, m_new_Q(*this, "m_new_Q", 0)
 		, m_cur_Q (*this, "m_cur_Q", 0)
 		, m_in_queue(*this, "m_in_queue", queue_status::DELIVERED)
-		, m_next_scheduled_time(*this, "m_time", netlist_time::zero())
+		, m_next_scheduled_time(*this, "m_time", netlist_time_ext::zero())
 		, m_railterminal(railterminal)
 	{
 	}
@@ -675,7 +674,7 @@ namespace netlist
 
 	void detail::net_t::reset() noexcept
 	{
-		m_next_scheduled_time = netlist_time::zero();
+		m_next_scheduled_time = netlist_time_ext::zero();
 		m_in_queue = queue_status::DELIVERED;
 
 		m_new_Q = 0;

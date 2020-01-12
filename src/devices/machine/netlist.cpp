@@ -422,7 +422,7 @@ public:
 		, m_in(*this, "IN")
 		, m_cur(0.0)
 		, m_last_pos(0)
-		, m_last_buffer_time(*this, "m_last_buffer", netlist::netlist_time::zero())
+		, m_last_buffer_time(*this, "m_last_buffer", netlist::netlist_time_ext::zero())
 	{
 	}
 
@@ -432,12 +432,12 @@ public:
 	{
 		m_cur = 0.0;
 		m_last_pos = 0;
-		m_last_buffer_time = netlist::netlist_time::zero();
+		m_last_buffer_time = netlist::netlist_time_ext::zero();
 	}
 
-	ATTR_HOT void sound_update(const netlist::netlist_time &upto)
+	ATTR_HOT void sound_update(const netlist::netlist_time_ext &upto)
 	{
-		int pos = (upto - m_last_buffer_time) / m_sample_time;
+		int pos = (upto - m_last_buffer_time()) / m_sample_time;
 		if (pos > m_bufsize)
 			throw emu_fatalerror("sound %s: pos %d exceeded bufsize %d\n", name().c_str(), pos, m_bufsize);
 		while (m_last_pos < pos )
@@ -471,7 +471,7 @@ public:
 	}
 
 public:
-	ATTR_HOT void buffer_reset(const netlist::netlist_time &upto)
+	ATTR_HOT void buffer_reset(const netlist::netlist_time_ext &upto)
 	{
 		m_last_pos = 0;
 		m_last_buffer_time = upto;
@@ -489,7 +489,7 @@ private:
 	netlist::analog_input_t m_in;
 	double m_cur;
 	int m_last_pos;
-	netlist::state_var<netlist::netlist_time> m_last_buffer_time;
+	netlist::state_var<netlist::netlist_time_ext> m_last_buffer_time;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -1022,7 +1022,7 @@ netlist_mame_device::netlist_mame_device(const machine_config &mconfig, const ch
 netlist_mame_device::netlist_mame_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_icount(0)
-	, m_old(netlist::netlist_time::zero())
+	, m_old(netlist::netlist_time_ext::zero())
 	, m_setup_func(nullptr)
 {
 }
@@ -1155,7 +1155,7 @@ void netlist_mame_device::device_start()
 
 	save_state();
 
-	m_old = netlist::netlist_time::zero();
+	m_old = netlist::netlist_time_ext::zero();
 	m_rem = netlist::netlist_time::zero();
 
 	LOGDEVCALLS("device_start exit\n");
@@ -1171,7 +1171,7 @@ void netlist_mame_device::device_clock_changed()
 void netlist_mame_device::device_reset()
 {
 	LOGDEVCALLS("device_reset\n");
-	m_old = netlist::netlist_time::zero();
+	m_old = netlist::netlist_time_ext::zero();
 	m_rem = netlist::netlist_time::zero();
 	netlist().exec().reset();
 }
@@ -1197,13 +1197,12 @@ ATTR_COLD void netlist_mame_device::device_pre_save()
 	netlist().run_state_manager().pre_save();
 }
 
-void netlist_mame_device::update_icount(netlist::netlist_time time) noexcept
+void netlist_mame_device::update_icount(netlist::netlist_time_ext time) noexcept
 {
-	const netlist::netlist_time newt(time);
-	const netlist::netlist_time delta(newt - m_old + m_rem);
-	const uint64_t d = delta / m_div;
-	m_old = newt;
-	m_rem = delta - (m_div * d);
+	const netlist::netlist_time_ext delta(time - m_old + m_rem);
+	const auto d(delta / m_div);
+	m_old = time;
+	m_rem = static_cast<netlist::netlist_time>(delta - (m_div * d));
 	m_icount -= d;
 }
 
@@ -1321,13 +1320,13 @@ ATTR_HOT void netlist_mame_cpu_device::execute_run()
 			m_genPC++;
 			m_genPC &= 255;
 			debugger_instruction_hook(m_genPC);
-			netlist().exec().process_queue(m_div);
+			netlist().exec().process_queue(static_cast<netlist::netlist_time_ext>(nl_clock_period()));
 			update_icount(netlist().exec().time());
 		}
 	}
 	else
 	{
-		netlist().exec().process_queue(m_div * m_icount);
+		netlist().exec().process_queue(static_cast<netlist::netlist_time_ext>(nl_clock_period()) * m_icount);
 		update_icount(netlist().exec().time());
 	}
 }
@@ -1475,11 +1474,11 @@ void netlist_mame_sound_device::sound_stream_update(sound_stream &stream, stream
 		}
 	}
 
-	netlist::netlist_time cur(netlist().exec().time());
+	auto cur(netlist().exec().time());
+    const auto delta(static_cast<netlist::netlist_time_ext>(nl_clock_period()) * samples);
+	netlist().exec().process_queue(delta);
 
-	netlist().exec().process_queue(m_div * samples);
-
-	cur += (m_div * samples);
+	cur += delta;
 
 	for (auto &e : m_out)
 	{

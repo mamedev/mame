@@ -137,11 +137,16 @@
 ///
 ///  Uses nano-second resolution - Sufficient for now
 
-static constexpr const auto NETLIST_INTERNAL_RES = 1000000000;
-
-// FIXME: Belongs into MAME netlist.h
+#if 1
+static constexpr const auto NETLIST_INTERNAL_RES = 1'000'000'000;
 static constexpr const auto NETLIST_CLOCK = NETLIST_INTERNAL_RES;
-
+#else
+//static constexpr const auto NETLIST_INTERNAL_RES = (1<<30); // 1,073,741,824
+//static constexpr const std::int64_t NETLIST_INTERNAL_RES = (static_cast<std::int64_t>(1)<<33); // 8,589,934,592
+static constexpr const std::int64_t NETLIST_INTERNAL_RES = (static_cast<std::int64_t>(1)<<37); // 137,438,953,472
+// FIXME: Belongs into MAME netlist.h
+static constexpr const std::int32_t NETLIST_CLOCK = (static_cast<std::int64_t>(1)<<30); // 1,073,741,824
+#endif
 
 
 /// \brief  Floating point types used
