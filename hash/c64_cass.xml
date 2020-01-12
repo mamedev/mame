@@ -3041,6 +3041,24 @@
 		</part>
 	</software>
 
+	<software name="holinone">
+		<description>Hole In One</description>
+		<year>1987</year>
+		<publisher>Mastertronic Added Dimension</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="692452">
+				<rom name="hole in one side a.tap" size="692452" crc="99fe83f3" sha1="6124084b5c7bdc0d68ab5625b1bba2d6e167abc6"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="710167">
+				<rom name="hole in one side b.tap" size="710167" crc="a9707464" sha1="d8ff00e94e4ff907657e6be074b43d26fabd9132"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hpoker">
 		<description>Hollywood Poker</description>
 		<year>1988</year>
