@@ -46,9 +46,10 @@ function hiscore.startplugin()
 		emu.print_verbose( "hiscore: config found" );
 		local _conf = {}
 		for line in io.lines(config_path) do
-		  token, value = string.match(line, '([^ ]+) ([^ ]+)');
-		  _conf[token] = value;
-		end
+		  token, spaces, value = string.match(line, '([^ ]+)([ ]+)([^ ]+)');
+		  if token ~= nil and token ~= '' then
+			_conf[token] = value;
+		  end
 		hiscore_path = lfs.env_replace(_conf["hi_path"] or hiscore_path);
 		timed_save = _conf["only_save_at_exit"] ~= "1"
 		-- hiscoredata_path = _conf["dat_path"]; -- don't know if I should do it, but wathever
