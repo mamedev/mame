@@ -80,7 +80,7 @@ public:
 		m_out_x(*this, "%u.%u.%u", 0U, 0U, 0U)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void mark5(machine_config &config);
 	void mark6(machine_config &config);
 
@@ -403,7 +403,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void mark5_state::mark5(machine_config &config)

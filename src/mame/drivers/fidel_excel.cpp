@@ -166,7 +166,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void fexcel(machine_config &config);
 	void fexcelb(machine_config &config);
 	void fexcel4(machine_config &config);
@@ -390,7 +390,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void excel_state::fexcel(machine_config &config)

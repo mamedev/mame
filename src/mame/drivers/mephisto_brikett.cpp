@@ -91,7 +91,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { if (newval) machine_reset(); }
 	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
 
-	// machine drivers
+	// machine configs
 	void mephisto(machine_config &config);
 	void mephisto2(machine_config &config);
 	void mephisto2e(machine_config &config);
@@ -406,7 +406,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void brikett_state::mephisto(machine_config &config)

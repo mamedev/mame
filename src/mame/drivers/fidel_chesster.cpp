@@ -54,7 +54,7 @@ public:
 		m_inputs(*this, "IN.0")
 	{ }
 
-	// machine drivers
+	// machine configs
 	void chesster(machine_config &config);
 	void kishon(machine_config &config);
 
@@ -186,7 +186,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void chesster_state::chesster(machine_config &config)

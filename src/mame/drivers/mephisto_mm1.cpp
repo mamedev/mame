@@ -67,7 +67,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(mirage_switch_sensor_type);
 
-	// machine drivers
+	// machine configs
 	void mirage(machine_config &config);
 	void mm1(machine_config &config);
 
@@ -361,7 +361,7 @@ INPUT_CHANGED_MEMBER(mm1_state::mirage_switch_sensor_type)
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void mm1_state::mirage(machine_config &config)

@@ -190,7 +190,7 @@ public:
 		m_rotate(true)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void eagv2(machine_config &config);
 	void eagv3(machine_config &config);
 	void eagv5(machine_config &config);
@@ -235,18 +235,13 @@ protected:
 	DECLARE_WRITE8_MEMBER(digit_w);
 
 	bool m_rotate;
-	u8 m_select;
-	u8 m_7seg_data;
-	u8 m_led_data;
+	u8 m_select = 0;
+	u8 m_7seg_data = 0;
+	u8 m_led_data = 0;
 };
 
 void eag_state::machine_start()
 {
-	// zerofill
-	m_select = 0;
-	m_7seg_data = 0;
-	m_led_data = 0;
-
 	// register for savestates
 	save_item(NAME(m_select));
 	save_item(NAME(m_7seg_data));
@@ -265,7 +260,7 @@ public:
 		m_sublatch(*this, "sublatch")
 	{ }
 
-	// machine drivers
+	// machine configs
 	void eagv5(machine_config &config);
 
 private:
@@ -295,7 +290,7 @@ public:
 		m_rotate = false;
 	}
 
-	// machine drivers
+	// machine configs
 	void fex68k(machine_config &config);
 	void fex68km2(machine_config &config);
 	void fex68km3(machine_config &config);
@@ -545,7 +540,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void excel68k_state::fex68k(machine_config &config)

@@ -67,7 +67,7 @@ public:
 		m_fake(*this, "FAKE")
 	{ }
 
-	// machine drivers
+	// machine configs
 	void mmtm_v(machine_config &config);
 	void mmtm_t(machine_config &config);
 
@@ -195,7 +195,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void mmtm_state::mmtm_v(machine_config &config)

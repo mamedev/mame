@@ -381,7 +381,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void phantom_state::fphantom(machine_config &config)

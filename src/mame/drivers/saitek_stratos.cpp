@@ -84,7 +84,7 @@ public:
 
 	int lcd_ready_r() { return m_lcd_ready ? 1 : 0; }
 
-	// machine drivers
+	// machine configs
 	void stratos(machine_config &config);
 	void tking(machine_config &config);
 	void tking2(machine_config &config);
@@ -485,7 +485,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void stratos_state::stratos(machine_config &config)
