@@ -76,6 +76,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 4); }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int irqline, int state) override;
 
