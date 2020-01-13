@@ -5832,4 +5832,17 @@ CONS( 200?, intg5410,  0,  0,  intech_interact_bank, miwi2, intec_interact_state
 
 // European versions not verified as the same yet
 CONS( 200?, exsprt48,   0,  0,  vt1682_exsport,    exsprt48, vt1682_exsport_state, regular_init,  "Excite", "Excite Sports Wireless Interactive TV Game - 48-in-1 (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "32 Arcade, 8 Sports, 8 Stadium"
+/*
+There is at least one alt US version of this also on VT1682
+
+Still advertised as 48-in-1, 8 Interactive Sports Games, 8 Olympic games, 32 Arcade Games
+see https://www.youtube.com/watch?v=tHMX71daHAk
+Changes:
+Dancing as extra under Music
+Doesn't have Poker under Brain
+Ball Shoot instead of 'Noshery' under Arcade
+
+This might be a regional / store thing if some places didn't want to sell a unit with a Poker game in it?
+*/
+
 
