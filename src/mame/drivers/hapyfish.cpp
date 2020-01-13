@@ -34,37 +34,18 @@
 
 	The system will begin its startup sequence, displaying a red fish logo.
 
-	It will then hang, possibly due to a bad flash ROM checksum, or more
-	likely due to faults in the Samsung S3C2440 SoC emulation.
+	After some time checking the filesystem, it will then boot into the main
+	menu. Currently, inputs are not hooked up.
 
-	At the point at which it hangs, the interrupt mask register contains
-	0x6B763DBF, which corresponds to the following interrupts being
-	enabled, from MSB to LSB (a 0 bit means 'enabled'):
+	It will then watchdog at around 52 seconds remaining on the timer, for
+	reasons not yet known, though the following kernel messages might provide
+	a clue:
 
-	- ADC
-	- UART 0
-	- USB Host Controller
-	- UART 1
-	- DMA Channel 2
-	- LCD Controller
-	- PWM Timer 4
-	- Watchdog / AC97 Codec
-	- Camera Interface
-
-	Known Info as of 7 January 2020:
-	- PWM Timer 4 will be the only regular interrupt being triggered and
-	  subsequently serviced.
-	- The ADC is not initialized, and so is unlikely to be the source of
-	  issue.
-	- DMA Channel 2 is partially initialized with a destination address
-	  of the I2S FIFO register, but the I2S system is not enabled, nor
-	  does it subsequently activate the DMA channel.
-	- The LCD controller is initialized enough to display the boot logo,
-	  but the LCD interrupt mask register is never cleared, so it also
-	  cannot yet be a source of interrupts to move the boot process along.
-	- Likewise, the AC97 Codec and Watchdog Timer are not enabled.
-	- The Camera interface is also not initialized.
-	- It is not yet known what will move the boot process forward.
+	<3>dma2: IRQ with no loaded buffer?
+	<3>dma2: IRQ with no loaded buffer?
+	<0>Restarting system.
+	.
+	arch_reset: attempting watchdog reset
 
 *******************************************************************************/
 
@@ -82,8 +63,9 @@
 #define LOG_GPIO	(1 << 0)
 #define LOG_ADC		(1 << 1)
 #define LOG_I2C		(1 << 2)
+#define LOG_INPUTS	(1 << 3)
 
-#define VERBOSE		(0)
+#define VERBOSE		(LOG_GPIO | LOG_ADC | LOG_I2C | LOG_INPUTS)
 #include "logmacro.h"
 
 class hapyfish_state : public driver_device
@@ -96,7 +78,8 @@ public:
 		m_nand(*this, "nand"),
 		m_nand2(*this, "nand2"),
 		m_ldac(*this, "ldac"),
-		m_rdac(*this, "rdac")
+		m_rdac(*this, "rdac"),
+		m_inputs(*this, "INPUT%u", 0U)
 	{ }
 
 	void hapyfish(machine_config &config);
@@ -109,6 +92,7 @@ private:
 	required_device<nand_device> m_nand, m_nand2;
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
+	required_ioport_array<6> m_inputs;
 
 	void i2c_scl_write(bool clk);
 	void i2c_sda_write(int data);
@@ -136,6 +120,10 @@ private:
 	uint8_t m_i2c_addr_bits;
 	uint8_t m_i2c_data;
 	uint8_t m_i2c_data_bits;
+
+	bool m_nand_select;
+
+	uint8_t m_input_select;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -306,6 +294,11 @@ READ32_MEMBER(hapyfish_state::s3c2440_gpio_port_r)
 			break;
 
 		case S3C2440_GPIO_PORT_F:
+			data = 0xff;
+			if (m_input_select < 6)
+			{
+				data = m_inputs[m_input_select]->read();
+			}
 			LOGMASKED(LOG_GPIO, "%s: Read GPIO F: %08x\n", machine().describe_context(), data);
 			break;
 
@@ -366,6 +359,12 @@ WRITE32_MEMBER(hapyfish_state::s3c2440_gpio_port_w)
 			{
 				i2c_sda_write(BIT(data, 15));
 			}
+			if (mem_mask & 0x7e0)
+			{
+				uint8_t input_row_mask = ~(((data & mem_mask) >> 5) & 0x7f);
+				for (m_input_select = 0; m_input_select < 8 && !BIT(input_row_mask, m_input_select); m_input_select++);
+				LOGMASKED(LOG_INPUTS, "%s: Input select: Port %d\n", machine().describe_context(), m_input_select);
+			}
 			break;
 
 		case S3C2440_GPIO_PORT_F:
@@ -381,7 +380,11 @@ WRITE32_MEMBER(hapyfish_state::s3c2440_gpio_port_w)
 			break;
 
 		case S3C2440_GPIO_PORT_J:
-			//LOGMASKED(LOG_GPIO, "%s: Write GPIO J: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			LOGMASKED(LOG_GPIO, "%s: Write GPIO J: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			if (BIT(mem_mask, 11))
+			{
+				m_nand_select = BIT(data, 11);
+			}
 			break;
 	}
 }
@@ -414,47 +417,34 @@ READ32_MEMBER(hapyfish_state::s3c2440_core_pin_r)
 
 WRITE8_MEMBER(hapyfish_state::s3c2440_nand_command_w )
 {
-	if ((m_port[8] & 0x1800) != 0)
-	{
+	if (m_nand_select)
 		m_nand->command_w(data);
-	}
 	else
-	{
 		m_nand2->command_w(data);
-	}
 }
 
 WRITE8_MEMBER(hapyfish_state::s3c2440_nand_address_w )
 {
-	if ((m_port[8] & 0x1800) != 0)
-	{
+	if (m_nand_select)
 		m_nand->address_w(data);
-	}
 	else
-	{
 		m_nand2->address_w(data);
-	}
 }
 
 READ8_MEMBER(hapyfish_state::s3c2440_nand_data_r )
 {
-	if ((m_port[8] & 0x1800) != 0)
-	{
+	if (m_nand_select)
 		return m_nand->data_r();
-	}
-
-	return m_nand2->data_r();
+	else
+		return m_nand2->data_r();
 }
 
 WRITE8_MEMBER(hapyfish_state::s3c2440_nand_data_w )
 {
-	if ((m_port[8] & 0x1800) != 0)
-	{
+	if (m_nand_select)
 		m_nand->data_w(data);
-		return;
-	}
-
-	m_nand2->data_w(data);
+	else
+		m_nand2->data_w(data);
 }
 
 // I2S
@@ -482,14 +472,15 @@ void hapyfish_state::machine_start()
 {
 	m_nand->set_data_ptr(memregion("nand")->base());
 	m_nand2->set_data_ptr(memregion("nand2")->base());
-	m_port[8] = 0x1800; // select NAND #1 (S3C2440 bootloader will happen before machine_reset())
+	m_nand_select = true; // select NAND #1 (S3C2440 bootloader will happen before machine_reset())
+	m_input_select = 7;
 }
 
 void hapyfish_state::machine_reset()
 {
 	m_maincpu->reset();
 	std::fill(std::begin(m_port), std::end(m_port), 0);
-	m_port[8] = 0x1800; // select NAND #1
+	m_nand_select = true; // select NAND #1
 	m_i2c_sda_in = 1;
 	m_i2c_sda_out = 1;
 	m_i2c_scl = true;
@@ -500,6 +491,7 @@ void hapyfish_state::machine_reset()
 	m_i2c_addr_bits = 0;
 	m_i2c_data = 0x00;
 	m_i2c_data_bits = 0;
+	m_input_select = 7;
 }
 
 /***************************************************************************
@@ -565,6 +557,50 @@ void hapyfish_state::hapyfish(machine_config &config)
 }
 
 static INPUT_PORTS_START( hapyfish )
+	PORT_START("INPUT0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)		PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)	PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)	PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)	PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)			PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) 			PORT_PLAYER(1)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3) 			PORT_PLAYER(1)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON4) 			PORT_PLAYER(1)
+
+	PORT_START("INPUT1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)		PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)	PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)	PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)	PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) 			PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) 			PORT_PLAYER(2)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3) 			PORT_PLAYER(2)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON4) 			PORT_PLAYER(2)
+
+	PORT_START("INPUT2")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("INPUT3")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("INPUT4")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("INPUT5")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Language ) ) PORT_DIPLOCATION("S2:1")
+	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Chinese ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("S2:2")
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Coinage ) ) PORT_DIPLOCATION("S2:3,4")
+	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 /***************************************************************************
