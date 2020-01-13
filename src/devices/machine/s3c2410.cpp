@@ -271,7 +271,7 @@ void s3c2410_device::device_start()
 {
 	s3c24xx_device_start();
 
-	address_space &space = m_cpu->memory().space( AS_PROGRAM);
+	address_space &space = m_cpu->space(AS_PROGRAM);
 	space.install_readwrite_handler( 0x48000000, 0x4800003b, read32_delegate(*this, FUNC(s3c2410_device::s3c24xx_memcon_r)), write32_delegate(*this, FUNC(s3c2410_device::s3c24xx_memcon_w)));
 	space.install_readwrite_handler( 0x49000000, 0x4900005b, read32_delegate(*this, FUNC(s3c2410_device::s3c24xx_usb_host_r)), write32_delegate(*this, FUNC(s3c2410_device::s3c24xx_usb_host_w)));
 	space.install_readwrite_handler( 0x4a000000, 0x4a00001f, read32_delegate(*this, FUNC(s3c2410_device::s3c24xx_irq_r)), write32_delegate(*this, FUNC(s3c2410_device::s3c24xx_irq_w)));

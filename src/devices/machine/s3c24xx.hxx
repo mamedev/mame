@@ -115,7 +115,7 @@
 							| LOG_DMA_REGS | LOG_AC97 | LOG_DMA_TIMERS | LOG_GPIO | LOG_MEMCON | LOG_USBHOST | LOG_UART | LOG_USB \
 							| LOG_WDT | LOG_I2C | LOG_I2S | LOG_RTC | LOG_SDI)
 
-#define VERBOSE				(0)
+#define VERBOSE				(LOG_ALL & ~(LOG_FLASH | LOG_UART))
 #include "logmacro.h"
 
 /***************************************************************************
@@ -272,6 +272,11 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_dma_reload()
 	LOGMASKED(LOG_LCD_DMA, "LCD - vramaddr %08X %08X offsize %08X pagewidth %08X\n", m_lcd.vramaddr_cur, m_lcd.vramaddr_max, m_lcd.offsize, m_lcd.pagewidth_max);
 	m_lcd.dma_data = 0;
 	m_lcd.dma_bits = 0;
+
+	if (machine().input().code_pressed_once(KEYCODE_K))
+	{
+		s3c24xx_uart_fifo_w(0, 0x55);
+	}
 }
 
 void S3C24_CLASS_NAME::s3c24xx_lcd_dma_init()
@@ -289,7 +294,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_dma_init()
 #if 0
 uint32_t S3C24_CLASS_NAME::s3c24xx_lcd_dma_read()
 {
-	address_space& space = m_cpu->memory().space( AS_PROGRAM);
+	address_space& space = m_cpu->space( AS_PROGRAM);
 	uint8_t *vram, data[4];
 	vram = (uint8_t *)space.get_read_ptr( m_lcd.vramaddr_cur);
 	for (int i = 0; i < 2; i++)
@@ -332,7 +337,7 @@ uint32_t S3C24_CLASS_NAME::s3c24xx_lcd_dma_read()
 
 uint32_t S3C24_CLASS_NAME::s3c24xx_lcd_dma_read()
 {
-	address_space& space = m_cpu->memory().space( AS_PROGRAM);
+	address_space& space = m_cpu->space( AS_PROGRAM);
 	uint8_t *vram, data[4];
 	vram = (uint8_t *)space.get_read_ptr( m_lcd.vramaddr_cur);
 	for (int i = 0; i < 2; i++)
@@ -1080,6 +1085,7 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_clkpow_r )
 
 WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_clkpow_w )
 {
+	const uint32_t old = ((uint32_t*)&m_clkpow.regs)[offset];
 	COMBINE_DATA(&((uint32_t*)&m_clkpow.regs)[offset]);
 	switch (offset)
 	{
@@ -1087,9 +1093,16 @@ WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_clkpow_w )
 		LOGMASKED(LOG_CLKPOW, "%s: clock/power write: MPLLCON = %08x & %08x - fclk %d hclk %d pclk %d\n", machine().describe_context(), data, mem_mask, s3c24xx_get_fclk(), s3c24xx_get_hclk(), s3c24xx_get_pclk());
 		m_cpu->set_unscaled_clock(s3c24xx_get_fclk() * CLOCK_MULTIPLIER);
 		break;
-	case S3C24XX_CLKSLOW :
+	case S3C24XX_CLKSLOW:
 		LOGMASKED(LOG_CLKPOW, "%s: clock/power write: CLKSLOW = %08x & %08x - fclk %d hclk %d pclk %d\n", machine().describe_context(), data, mem_mask, s3c24xx_get_fclk(), s3c24xx_get_hclk(), s3c24xx_get_pclk());
 		m_cpu->set_unscaled_clock(s3c24xx_get_fclk() * CLOCK_MULTIPLIER);
+		break;
+	case S3C24XX_CLKCON:
+		LOGMASKED(LOG_CLKPOW, "%s: clock/power write: CLKCON = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		if (BIT(data, 2) && !BIT(old, 2))
+		{
+			m_cpu->suspend(SUSPEND_REASON_HALT, 1);
+		}
 		break;
 	default:
 		LOGMASKED(LOG_CLKPOW, "%s: clock/power write: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_CLKPOW + (offset << 2), data, mem_mask);
@@ -1134,7 +1147,8 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_irq()
 			if (m_irq.line_irq != ASSERT_LINE)
 			{
 				LOGMASKED(LOG_IRQS, "triggering IRQ line\n");
-				m_cpu->execute().set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+				m_cpu->resume(SUSPEND_REASON_HALT);
+				m_cpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
 				m_irq.line_irq = ASSERT_LINE;
 			}
 		}
@@ -1144,7 +1158,7 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_irq()
 			{
 				LOGMASKED(LOG_IRQS, "IRQ: srcpnd %08X intmsk %08X intmod %08X\n", m_irq.regs.srcpnd, m_irq.regs.intmsk, m_irq.regs.intmod);
 				LOGMASKED(LOG_IRQS, "clearing IRQ line\n");
-				m_cpu->execute().set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+				m_cpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
 				m_irq.line_irq = CLEAR_LINE;
 			}
 		}
@@ -1163,7 +1177,8 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_irq()
 		if (m_irq.line_fiq != ASSERT_LINE)
 		{
 			LOGMASKED(LOG_IRQS, "asserting FIQ line\n");
-			m_cpu->execute().set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE);
+			m_cpu->resume(SUSPEND_REASON_HALT);
+			m_cpu->set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE);
 			m_irq.line_fiq = ASSERT_LINE;
 		}
 	}
@@ -1172,7 +1187,7 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_irq()
 		if (m_irq.line_fiq != CLEAR_LINE)
 		{
 			LOGMASKED(LOG_IRQS, "clearing FIQ line\n");
-			m_cpu->execute().set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE);
+			m_cpu->set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE);
 			m_irq.line_fiq = CLEAR_LINE;
 		}
 	}
@@ -1523,7 +1538,7 @@ void S3C24_CLASS_NAME::s3c24xx_dma_trigger(int ch)
 {
 	dma_regs_t *regs = &m_dma[ch].regs;
 	uint32_t curr_tc, curr_src, curr_dst;
-	address_space &space = m_cpu->memory().space(AS_PROGRAM);
+	address_space &space = m_cpu->space(AS_PROGRAM);
 	int dsz, inc_src, inc_dst, servmode, tsz;
 	static constexpr uint32_t ch_int[] = { S3C24XX_INT_DMA0, S3C24XX_INT_DMA1, S3C24XX_INT_DMA2, S3C24XX_INT_DMA3 };
 	LOGMASKED(LOG_DMA, "DMA %d trigger\n", ch);
@@ -2061,8 +2076,29 @@ WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_uart_2_w )
 
 void S3C24_CLASS_NAME::s3c24xx_uart_fifo_w(int uart, uint8_t data)
 {
+#if defined(DEVICE_S3C2400)
+	static const uint32_t s_int_bits[2] = { S3C24XX_INT_URXD0, S3C24XX_INT_URXD1 };
+#else
+	static const uint32_t s_int_bits[3] = { S3C24XX_SUBINT_RXD0, S3C24XX_SUBINT_RXD1, S3C24XX_SUBINT_RXD2 };
+#endif
+
 	m_uart[uart].regs.urxh = data;
 	m_uart[uart].regs.utrstat |= 1; // [bit 0] Receive buffer data ready
+
+	bool request_irq = true;
+	if (BIT(m_uart[uart].regs.ufcon, 0))
+	{
+		request_irq = false;
+	}
+
+	if (request_irq)
+	{
+#if defined(DEVICE_S3C2400)
+		s3c24xx_request_irq(s_int_bits[uart]);
+#else
+		s3c24xx_request_subirq(s_int_bits[uart]);
+#endif
+	}
 }
 
 /* USB Device */
@@ -3264,7 +3300,7 @@ void S3C24_CLASS_NAME::s3c24xx_device_start()
 	int om1 = iface_core_pin_r(S3C24XX_CORE_PIN_OM1);
 	if ((om0 == 0) && (om1 == 0))
 	{
-		address_space &space = m_cpu->memory().space(AS_PROGRAM);
+		address_space &space = m_cpu->space(AS_PROGRAM);
 		space.install_ram(0x00000000, 0x00000fff, m_steppingstone);
 		space.install_ram(0x40000000, 0x40000fff, m_steppingstone);
 	}
