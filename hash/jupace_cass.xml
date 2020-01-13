@@ -694,6 +694,18 @@
 		</part>
 	</software>
 
+	<software name="schess2"><!-- looks the same as "chess" above, but the .ace versions have different checksums, so presumably there's something different. -->
+		<description>Superchess II</description>
+		<year>1983</year>
+		<publisher>C.P. Software</publisher>
+		<info name="usage" value="load chess run" />
+		<part name="cass1" interface="jupace_cass">
+			<dataarea name="cass" size="7379620">
+				<rom name="superchess ii (1983)(cp software)[19k].wav" size="7379620" crc="d8e11db8" sha1="af47d5fdf816f47c5727ffa05252958ba678d0b4"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cygnus" supported="no">
 		<description>Cygnus</description>
 		<year>1984</year>
@@ -868,13 +880,14 @@
 		</part>
 	</software>
 
-	<software name="frogger" supported="no"><!-- invalid image -->
+	<software name="frogger">
 		<description>Frogger (Boldfield Computing)</description>
 		<year>1984</year>
 		<publisher>Boldfield Computing</publisher>
+		<info name="usage" value="load frogger go" />
 		<part name="cass1" interface="jupace_cass">
-			<dataarea name="cass" size="8284">
-				<rom name="frogger (1984)(boldfield computing)(gb)(pd)[16k].tap" size="8284" crc="ff0f890c" sha1="d921609941c978d364f5cd0055c7618a9fa7d897"/>
+			<dataarea name="cass" size="1056924">
+				<rom name="frogger (1984)(boldfield computing)[16k].wav" size="1056924" crc="6a42d361" sha1="e6860dd3be37b0b8af633c3daaea68a835be4a1a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -946,14 +959,14 @@
 		</part>
 	</software>
 
-	<software name="gobbgook" supported="no"><!-- error 10, bad load -->
+	<software name="gobbgook">
 		<description>Gobbledegook</description>
 		<year>1983</year>
 		<publisher>Jupiter Cantab</publisher>
-		<info name="usage" value="load gobblegook" />
+		<info name="usage" value="load gobblegook gobblegook" />
 		<part name="cass1" interface="jupace_cass">
-			<dataarea name="cass" size="9369">
-				<rom name="gobbledegook (1983)(jupiter cantab)(gb)[19k].tap" size="9369" crc="6f2300c1" sha1="176b5fc9e7e82a7350cd62ad5a118ed76e019ec6"/>
+			<dataarea name="cass" size="1204556">
+				<rom name="gobbledegook (1983)(jupiter cantab)[19k].wav" size="1204556" crc="058a888d" sha1="70fb714a710cfd4cabe9a6ff3d5901114f71c6ac"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1576,6 +1589,18 @@
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="3887">
 				<rom name="sudoku (2007)(lopes, ricardo fernandes)(pd)[19k].tap" size="3887" crc="a994a6fd" sha1="e1915263651eae3d5a953aa9f8f8cb39b9d31f0c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="surround">
+		<description>Forth Surround</description>
+		<year>1983</year>
+		<publisher>Your Computer</publisher>
+		<info name="usage" value="load surround go" />
+		<part name="cass1" interface="jupace_cass">
+			<dataarea name="cass" size="450618">
+				<rom name="forth surround (1983-06)(your computer)[3k]" size="450618" crc="11cfef0d" sha1="aece6398f52f8ba159111846a4c6885dd92f4629"/>
 			</dataarea>
 		</part>
 	</software>
