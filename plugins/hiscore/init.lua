@@ -1,5 +1,5 @@
--- hiscore.lua
--- by borgar@borgar.net, WTFPL license
+s-- hiscore.lua
+-- by borgar@borgar.net & eadmaster, WTFPL license
 --
 -- This uses MAME's built-in Lua scripting to implment
 -- high-score saving with hiscore.dat infom just as older
@@ -50,6 +50,7 @@ function hiscore.startplugin()
 		  if token ~= nil and token ~= '' then
 			_conf[token] = value;
 		  end
+		end
 		hiscore_path = lfs.env_replace(_conf["hi_path"] or hiscore_path);
 		timed_save = _conf["only_save_at_exit"] ~= "1"
 		-- hiscoredata_path = _conf["dat_path"]; -- don't know if I should do it, but wathever
