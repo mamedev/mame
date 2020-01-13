@@ -131,6 +131,7 @@ pic16c62x_device::pic16c62x_device(const machine_config &mconfig, device_type ty
 					  ( ( picmodel == 0x16C622 ) ? address_map_constructor(FUNC(pic16c62x_device::pic16c622_ram), this) :
 												   address_map_constructor(FUNC(pic16c62x_device::pic16c62xa_ram), this) ) ) )
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 5, 0)
+	, m_CONFIG(0x3fff)
 	, m_reset_vector(0x0)
 	, m_picmodel(picmodel)
 	, m_picRAMmask(0xff)
@@ -891,8 +892,6 @@ void pic16c62x_device::device_start()
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 
-	m_CONFIG = 0x3fff;
-
 	/* ensure the internal ram pointers are set before get_info is called */
 	update_internalram_ptr();
 
@@ -1051,7 +1050,7 @@ void pic16c62x_device::pic16c62x_soft_reset()
 	pic16c62x_reset_regs();
 }
 
-void pic16c62x_device::pic16c62x_set_config(int data)
+void pic16c62x_device::set_config(int data)
 {
 	logerror("Writing %04x to the PIC16C62x configuration bits\n",data);
 	m_CONFIG = (data & 0x3fff);
