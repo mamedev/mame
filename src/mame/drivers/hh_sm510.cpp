@@ -29,8 +29,8 @@ TODO:
   electronically. For the ones that weren't decapped, they were read by
   playing back all melody data and reconstructing it to ROM. Visual(decap)
   verification is wanted for: gnw_bfightn, gnw_bjack, gnw_bsweep, gnw_climbern,
-  gnw_dkcirc, gnw_dkjrp, gnw_gcliff, gnw_mariotj, gnw_mbaway, gnw_mmousep,
-  gnw_sbuster, gnw_zelda
+  gnw_dkcirc, gnw_dkjrp, gnw_gcliff, gnw_mariocmt, gnw_mariotj, gnw_mbaway,
+  gnw_mmousep, gnw_sbuster, gnw_zelda
 
 ****************************************************************************
 
@@ -82,7 +82,7 @@ JB-63     ms   SM511   Safe Buster
 MV-64     ms   SM512   Gold Cliff
 ZL-65     ms   SM512   Zelda
 CJ-71*    tt   SM511?  Donkey Kong Jr.
-CM-72*    tt   SM511?  Mario's Cement Factory
+CM-72     tt   SM511   Mario's Cement Factory
 SM-73*    tt   SM511?  Snoopy
 PG-74*    tt   SM511?  Popeye
 SM-91*    p    SM511?  Snoopy (assume same ROM & LCD as tabletop version)
@@ -2772,6 +2772,81 @@ ROM_START( gnw_zelda )
 
 	ROM_REGION( 424886, "screen_bottom", 0)
 	ROM_LOAD( "gnw_zelda_bottom.svg", 0, 424886, CRC(09f00d09) SHA1(33045028bd7e0df4e976e79dc180028c6886359a) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Mario's Cement Factory (model CM-72)
+  * PCB labels: CM-72 M (main board)
+                CM-72 C (joystick controller board)
+                CM-72 S (buttons controller board)
+  * Sharp SM511 label CM-72 534A (no decap)
+  * inverted lcd screen with custom segments, 1-bit sound
+
+  This is the tabletop version. There's also a new wide screen version which is
+  a different game.
+
+***************************************************************************/
+
+class gnw_mariocmt_state : public hh_sm510_state
+{
+public:
+	gnw_mariocmt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_mariocmt(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_mariocmt )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Open
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void gnw_mariocmt_state::gnw_mariocmt(machine_config &config)
+{
+	sm511_common(config, 1920, 1046);
+}
+
+// roms
+
+ROM_START( gnw_mariocmt )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "cm-72.program", 0x0000, 0x1000, CRC(b2ae4596) SHA1(f64bf11e18c9fbd4de4134f685bb2d7bda3d7487) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "cm-72.melody", 0x000, 0x100, BAD_DUMP CRC(db4f0fc1) SHA1(e386df3e3e88fa36a73bcd0649feb904180493c8) ) // decap needed for verification
+
+	ROM_REGION( 293317, "screen", 0)
+	ROM_LOAD( "gnw_mariocmt.svg", 0, 293317, CRC(4f969dc7) SHA1(fec72c4a8600c0753f81bfb296b53cca6aee14cc) )
 ROM_END
 
 
@@ -8828,6 +8903,7 @@ CONS( 1988, gnw_bfightn, gnw_bfight, 0, gnw_bfightn, gnw_bfight,  gnw_bfight_sta
 CONS( 1991, gnw_mariotj, 0,          0, gnw_mariotj, gnw_mariotj, gnw_mariotj_state, empty_init, "Nintendo", "Game & Watch: Mario The Juggler", MACHINE_SUPPORTS_SAVE )
 
 // Nintendo G&W: table top / panorama screen
+CONS( 1983, gnw_mariocmt,0,          0, gnw_mariocmt,gnw_mariocmt,gnw_mariocmt_state,empty_init, "Nintendo", "Game & Watch: Mario's Cement Factory (tabletop screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_dkjrp,   0,          0, gnw_dkjrp,   gnw_dkjrp,   gnw_dkjrp_state,   empty_init, "Nintendo", "Game & Watch: Donkey Kong Jr. (panorama screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_mbaway,  0,          0, gnw_mbaway,  gnw_mbaway,  gnw_mbaway_state,  empty_init, "Nintendo", "Game & Watch: Mario's Bombs Away", MACHINE_SUPPORTS_SAVE )
 CONS( 1984, gnw_mmousep, 0,          0, gnw_mmousep, gnw_mmousep, gnw_mmousep_state, empty_init, "Nintendo", "Game & Watch: Mickey Mouse (panorama screen)", MACHINE_SUPPORTS_SAVE )
