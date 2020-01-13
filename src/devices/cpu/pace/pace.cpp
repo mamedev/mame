@@ -367,11 +367,11 @@ void pace_device::sign_extend(u16 &r)
 
 void pace_device::add(u16 &dr, u16 sr, bool c)
 {
-	bool carry_out = sign_bit((u32(dr) + u32(sr) + (c && BIT(m_fr, 7) ? 1 : 0)) >> (BIT(m_fr, 10) ? 1 : 9));
+	u32 carry_test = (BIT(m_fr, 10) ? u32(dr & 0x00ff) + u32(sr & 0x00ff) : u32(dr) + u32(sr)) + (c && BIT(m_fr, 7) ? 1 : 0);
 	s32 overflow_test = BIT(m_fr, 10) ? s32(s8(dr & 0x00ff)) + s32(s8(sr & 0x00ff)) : s32(s16(dr)) + s32(s16(sr));
 	dr += sr + (c && BIT(m_fr, 7) ? 1 : 0);
 
-	if (carry_out)
+	if (BIT(m_fr, 10) ? BIT(carry_test, 8) : BIT(carry_test, 16))
 		set_control_flag(7);
 	else
 		reset_control_flag(7);
