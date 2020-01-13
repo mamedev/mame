@@ -133,7 +133,6 @@ void leapfrog_leappad_state::leapfrog_mfleappad(machine_config &config)
 	m_cart->set_device_load(FUNC(leapfrog_leappad_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("leapfrog_mfleappad_cart");
-	SOFTWARE_LIST(config, "cart_list2").set_original("leapfrog_ltleappad_cart");
 }
 
 void leapfrog_leappad_state::leapfrog_ltleappad(machine_config &config)
@@ -148,7 +147,7 @@ void leapfrog_leappad_state::leapfrog_ltleappad(machine_config &config)
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
 	m_cart->set_device_load(FUNC(leapfrog_leappad_state::cart_load));
 
-	// no Software List yet
+	SOFTWARE_LIST(config, "cart_list").set_original("leapfrog_ltleappad_cart");
 }
 
 
