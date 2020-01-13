@@ -606,11 +606,15 @@ READ32_MEMBER(naomi_gdrom_board::sh4_status_r)
 
 WRITE32_MEMBER(naomi_gdrom_board::sh4_control_w)
 {
+	uint32_t old = dimm_control;
+
 	dimm_control = data;
 	if (dimm_control & 2)
 		m_315_6154->memory()->unmap_readwrite(0x10000000, 0x10000000 + dimm_data_size - 1);
 	else
 		m_315_6154->memory()->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data);
+	if (((old & 1) == 0) && ((dimm_control & 1) == 1))
+		set_reset_out();
 }
 
 READ32_MEMBER(naomi_gdrom_board::sh4_control_r)
@@ -999,6 +1003,7 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 	m_ide->set_bus_master_space(m_315_6154, sega_315_6154_device::AS_PCI_MEMORY);
 	PIC16C622(config, m_securitycpu, PIC_CLOCK);
 	m_securitycpu->set_addrmap(AS_IO, &naomi_gdrom_board::pic_map);
+	m_securitycpu->set_config(0x3fff - 0x04);
 	I2C_24C01(config, m_i2c0, 0);
 	m_i2c0->set_e0(0);
 	m_i2c0->set_wc(1);
