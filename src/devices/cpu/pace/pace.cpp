@@ -390,13 +390,13 @@ void pace_device::add(u16 &dr, u16 sr, bool c)
 
 void pace_device::decimal_add(u16 &dr, u16 sr, unsigned stage)
 {
-	bool carry_out = ((sr >> stage) & 15) + ((dr >> stage) & 15) >= BIT(m_fr, 7) ? 9 : 10;
+	bool carry_out = ((sr >> stage) & 15) + ((dr >> stage) & 15) >= (BIT(m_fr, 7) ? 9 : 10);
 	s32 overflow_test = s32(s16(sr << (12 - stage))) + s32(s16(dr << (12 - stage)));
 	dr += (sr & (0x000f << stage)) + ((BIT(m_fr, 7) + (carry_out ? 6 : 0)) << stage);
 
 	if (stage == 0)
 		reset_control_flag(7);
-	else if (stage == BIT(m_fr, 10) ? 4 : 12)
+	else if (stage == (BIT(m_fr, 10) ? 4 : 12))
 	{
 		if (carry_out)
 			set_control_flag(7);
@@ -955,6 +955,7 @@ pace_device::cycle pace_device::execute_one()
 		logerror("%04X: Unknown %02XXX opcode encountered\n", m_ppc, m_cir >> 2);
 		return cycle::IFETCH_M1;
 	}
+	return cycle::IFETCH_M1;
 }
 
 
