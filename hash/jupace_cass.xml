@@ -1803,7 +1803,7 @@
 		<description>Valkyr + Life (Prototype)</description>
 		<year>1985</year>
 		<publisher>Colinsoft</publisher>
-		<info name="usage" value="load valkyr go" />
+		<info name="usage" value="load valkyr go" /><!-- computer reboots when starting the game, bad dump? -->
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (Valkyr)"/>
 			<dataarea name="cass" size="12855">
