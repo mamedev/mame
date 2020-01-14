@@ -952,10 +952,10 @@ pace_device::cycle pace_device::execute_one()
 		return cycle::IFETCH_M1;
 
 	case cycle::UNKNOWN:
+	default:
 		logerror("%04X: Unknown %02XXX opcode encountered\n", m_ppc, m_cir >> 2);
 		return cycle::IFETCH_M1;
 	}
-	return cycle::IFETCH_M1;
 }
 
 
