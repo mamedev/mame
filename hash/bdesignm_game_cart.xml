@@ -4,28 +4,34 @@
 	Game cartridges for Bandai Design Master
 	
 	Game carts, these plug into the system
+	
+	G.01 - Dragon Ball Z Taisen-gata Search Battle 	
+	G.02 - Dungeon Diver
+	G.03 - Bishoujo Senshi Sailor Moon SS Illustration Club
+	G.04 - Rockman X3 Buster Battle
+	
 -->
 
-<softwarelist name="bdesignm_game_cart" description="Bandai Design Master cartridges">
+<softwarelist name="bdesignm_game_cart" description="Bandai Design Master 'Game' cartridges">
 
 	<software name="dbzg" supported="no">
-		<description>Dragon Ball Z (game)</description>
-		<year>200?</year>
+		<description>Dragon Ball Z Taisen-gata Search Battle (game)</description>
+		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="bdesignm_cart">
 			<dataarea name="rom" size="0x20000">
-				<rom name="g01_dragonballz.bin" size="0x20000" crc="94107404" sha1="c86d48e9f0262da36ac9bbcffd9cea8e9bb672b7" />
+				<rom loadflag="load16_word_swap" name="g01_dragonballz.bin" size="0x20000" crc="94107404" sha1="c86d48e9f0262da36ac9bbcffd9cea8e9bb672b7" />
 			</dataarea>
 		</part>
 	</software>
 	
 	<software name="sailormng" supported="no">
-		<description>Sailor Moon (game)</description>
-		<year>200?</year>
+		<description>Bishoujo Senshi Sailor Moon SS Illustration Club (game)</description>
+		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="bdesignm_cart">
 			<dataarea name="rom" size="0x20000">
-				<rom name="g03_sailormoon.bin" size="0x20000" crc="641f20e6" sha1="b9f3a37385eeaf2e66b28ad5bac24a8a9cd46bdd" />
+				<rom loadflag="load16_word_swap" name="g03_sailormoon.bin" size="0x20000" crc="641f20e6" sha1="b9f3a37385eeaf2e66b28ad5bac24a8a9cd46bdd" />
 			</dataarea>
 		</part>
 	</software>	
