@@ -131,7 +131,7 @@ void bdsm_state::bdesignm(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 
 	GENERIC_CARTSLOT(config, m_cartslot, generic_linear_slot, "bdesignm_cart"); // TODO: this should be a custom bus type with capability to plug the 'design' carts into it
-	m_cartslot->set_must_be_loaded(true);
+	//m_cartslot->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "cart_list_game").set_original("bdesignm_game_cart");
 	SOFTWARE_LIST(config, "cart_list_design").set_original("bdesignm_design_cart"); // TODO: this should be contained within the custom bus device mentioned above
