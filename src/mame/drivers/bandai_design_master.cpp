@@ -119,7 +119,7 @@ uint32_t bdsm_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 void bdsm_state::bdesignm(machine_config &config)
 {
 	/* basic machine hardware */
-	H83337(config, m_maincpu, XTAL(20'000'000)); /* H8/328 (24kbytes internal ROM, 1kbyte internal ROM) ?Mhz */
+	H83334(config, m_maincpu, XTAL(20'000'000)); /* H8/328 (24kbytes internal ROM, 1kbyte internal ROM) ?Mhz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &bdsm_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &bdsm_state::io_map);
 
