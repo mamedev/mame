@@ -11260,12 +11260,15 @@ cubeqsta                        // (c) 1983 Simutrek Inc.
 @source:cubo.cpp
 cndypuzl                        // (c) 1995
 cubo                            // Base unit
+eldoralg                        //
 haremchl                        // (c) 1995
 lasstixx                        // (c) 1995
 lsrquiz                         // (c) 1995
-lsrquiz2                        // (c) 1995
+lsrquizg                        // (c) 1995
+lsrquiz2i                       // (c) 1995
 mgnumber                        // (c) 1995
 mgprem11                        // (c) 1995
+odeontw                         //
 odeontw2                        // (c) 1999
 
 @source:cultures.cpp
