@@ -69,12 +69,18 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 ***************************************************************************/
 
+// Notes by Jose Tejada (jotego)
+// CPU speed is 3MHz as per PCB measurement
+// Vertical speed is 59.63 Hz
+// There is no watchdog
+// There is a DMA circuit, same as GnG, Commando and other CAPCOM games of the era
+// The DMA copies sprites to a video and halts the CPU for ~131us
+
 #include "emu.h"
 #include "includes/gunsmoke.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "screen.h"
 #include "speaker.h"
@@ -117,7 +123,7 @@ void gunsmoke_state::gunsmoke_map(address_map &map)
 	map(0xc4c9, 0xc4cb).r(FUNC(gunsmoke_state::gunsmoke_protection_r));
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc804, 0xc804).w(FUNC(gunsmoke_state::gunsmoke_c804_w));  // ROM bank switch, screen flip
-	map(0xc806, 0xc806).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	// 0xc806 DMA trigger (not emulated)
 	map(0xd000, 0xd3ff).ram().w(FUNC(gunsmoke_state::gunsmoke_videoram_w)).share("videoram");
 	map(0xd400, 0xd7ff).ram().w(FUNC(gunsmoke_state::gunsmoke_colorram_w)).share("colorram");
 	map(0xd800, 0xd801).ram().share("scrollx");
@@ -304,19 +310,17 @@ void gunsmoke_state::machine_reset()
 void gunsmoke_state::gunsmoke(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);   // 4 MHz
+	Z80(config, m_maincpu, 3000000);   // 3 MHz Verified on PCB by jotego
 	m_maincpu->set_addrmap(AS_PROGRAM, &gunsmoke_state::gunsmoke_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gunsmoke_state::irq0_line_hold));
 
 	z80_device &audiocpu(Z80(config, "audiocpu", 3000000));  // 3 MHz
 	audiocpu.set_addrmap(AS_PROGRAM, &gunsmoke_state::sound_map);
-	audiocpu.set_periodic_int(FUNC(gunsmoke_state::irq0_line_hold), attotime::from_hz(4*60));
-
-	WATCHDOG_TIMER(config, "watchdog");
+	audiocpu.set_periodic_int(FUNC(gunsmoke_state::irq0_line_hold), attotime::from_hz(4*59.63));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(59.63);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
@@ -364,6 +368,7 @@ ROM_START( gunsmoke )
 	ROM_LOAD( "gs12.05c", 0x08000, 0x8000, CRC(d997b78c) SHA1(3b4a9b6f9e57ecfb4ab9734379bd0ee765fd6daa) )
 	ROM_LOAD( "gs11.04c", 0x10000, 0x8000, CRC(125ba58e) SHA1(cf6931653cebd051564bed8121ab8713a55095c5) )
 	ROM_LOAD( "gs10.02c", 0x18000, 0x8000, CRC(f469c13c) SHA1(54eda52d6fce58771c0adfe2c88292a41d5a9b99) )
+	
 	ROM_LOAD( "gs09.06a", 0x20000, 0x8000, CRC(539f182d) SHA1(4190c0adbecc57b92f4d002e121acb77e8c5d8d8) ) /* 32x32 tiles planes 0-1 */
 	ROM_LOAD( "gs08.05a", 0x28000, 0x8000, CRC(e87e526d) SHA1(d10068addf30322424a85bbc6382cb762ae3fbe2) )
 	ROM_LOAD( "gs07.04a", 0x30000, 0x8000, CRC(4382c0d2) SHA1(8615e62bc57b40d082f6ca211d64f22185bed1fd) )
