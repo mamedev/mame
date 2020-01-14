@@ -149,6 +149,7 @@ CPUS["CR16B"] = true
 CPUS["FR"] = true
 CPUS["DSP56000"] = true
 CPUS["VT50"] = true
+CPUS["VT61"] = true
 CPUS["PACE"] = true
 CPUS["WE32000"] = true
 CPUS["RX01"] = true
