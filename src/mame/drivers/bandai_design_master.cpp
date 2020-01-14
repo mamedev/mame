@@ -31,7 +31,7 @@
  TODO: cartridge pinouts / information
 
 
- NOTE: cartridge dumps contain a boot vector, is internal ROM even used? (maybe when no cartridge is inserted?)
+ NOTE: cartridge dumps contain boot vectors so Internal ROM likely only used when no cartridge is present
 
 
 ******************************************************************************************************************************/
