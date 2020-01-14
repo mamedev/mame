@@ -93,7 +93,6 @@ private:
 	K052109_CB_MEMBER(fuusenpn_tile_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	DECLARE_WRITE8_MEMBER(shuri_bank_w);
-	DECLARE_WRITE8_MEMBER(shuri_control_w);
 	DECLARE_READ8_MEMBER(shuri_irq_r);
 	DECLARE_WRITE8_MEMBER(shuri_irq_w);
 
@@ -301,7 +300,6 @@ void konmedal_state::shuriboy_main(address_map &map)
 	map(0xa000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xffff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
 	map(0xdd00, 0xdd00).rw(FUNC(konmedal_state::shuri_irq_r), FUNC(konmedal_state::shuri_irq_w));
-	map(0xdd80, 0xdd80).w(FUNC(konmedal_state::shuri_control_w));
 }
 
 static INPUT_PORTS_START( konmedal )
@@ -499,6 +497,7 @@ K052109_CB_MEMBER(konmedal_state::fuusenpn_tile_callback)
 
 WRITE8_MEMBER(konmedal_state::shuri_bank_w)
 {
+	m_k052109->set_rmrd_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	membank("bank1")->set_entry(data&0x3);
 }
 
@@ -535,13 +534,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(konmedal_state::scanline)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
-}
-
-WRITE8_MEMBER(konmedal_state::shuri_control_w)
-{
-	m_control = data;
-	m_k052109->set_rmrd_line((m_control & 0x10) ? ASSERT_LINE : CLEAR_LINE);
-	m_k052109->write(offset+0x1d80, data);
 }
 
 void konmedal_state::shuriboy(machine_config &config)
