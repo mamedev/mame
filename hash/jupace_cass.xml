@@ -435,11 +435,11 @@
 		</part>
 	</software>
 
-	<software name="acestar" supported="no">
+	<software name="acestar"><!-- only levels 1 and 2 are playable -->
 		<description>Ace Star</description>
 		<year>2010</year>
 		<publisher>Jupiter Ace Archive Team</publisher>
-		<info name="usage" value="0 0 bload astar" />
+		<info name="usage" value="0 0 bload astar 16384 call" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="10365">
 				<rom name="ace star (2010)(jupiter ace archive team)(gb)(pd)[19k].tap" size="10365" crc="01217f3f" sha1="d3c69c182323c3ad45e01601611f36b40970e22d"/>
@@ -471,11 +471,11 @@
 		</part>
 	</software>
 
-	<software name="adventa" supported="no">
+	<software name="adventa">
 		<description>Adventure A - Planet of Death</description>
 		<year>1981</year>
 		<publisher>Artic Computing</publisher>
-		<info name="usage" value="0 0 bload adva" />
+		<info name="usage" value="0 0 bload adva 16384 call" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="14811">
 				<rom name="adventure a - planet of death (1981)(artic computing)(pd)[19k].tap" size="14811" crc="be67ed38" sha1="e70ed38c14e2ba34ce8faa42e0c828081d53e4b5"/>
@@ -615,11 +615,11 @@
 		</part>
 	</software>
 
-	<software name="callisto" supported="no">
+	<software name="callisto">
 		<description>Callisto</description>
 		<year>1983</year>
 		<publisher>ACS Software</publisher>
-		<info name="usage" value="0 0 bload callisto" />
+		<info name="usage" value="8930 0 bload callisto" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="8832">
 				<rom name="callisto (1983)(acs software)[16k].tap" size="8832" crc="aa6ba879" sha1="4e70e44db33c4197a6d68da3ff17ca82c23cff93"/>
@@ -710,7 +710,7 @@
 		<description>Cygnus</description>
 		<year>1984</year>
 		<publisher>Boldfield Computing</publisher>
-		<info name="usage" value="load cygnus go" />
+		<info name="usage" value="load cygnus g" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="16549">
 				<rom name="cygnus (1984)(boldfield computing)(gb)[19k].tap" size="16549" crc="d0a31a28" sha1="5b0260200cafde332c514bdf319e7f29e3d312c2"/>
@@ -787,7 +787,7 @@
 		<description>Duckshoot</description>
 		<year>1983</year>
 		<publisher>Micro Marketing</publisher>
-		<info name="usage" value="11272 0 bload dchars load duckshoot d" />
+		<info name="usage" value="11272 0 bload dchars load duckshoot d. Fire = Enter" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="802">
 				<rom name="duckshoot (1983)(micro marketing)(gb)[3k].tap" size="802" crc="105055d8" sha1="1286c483d0365acbf258336c89e940d981a1ed13"/>
@@ -1064,7 +1064,7 @@
 		<description>Jumpman</description>
 		<year>1984</year>
 		<publisher>Callisto Software</publisher>
-		<info name="usage" value="load jumpman run. Movement keys are Z,X,N,M" />
+		<info name="usage" value="load jumpman start. Start = S, movement keys are Z,X,N,M" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="8735">
 				<rom name="jumpman (1984)(callisto software)[32k].tap" size="8735" crc="de04b476" sha1="94aea64e9f67bd936028b559a5824f3d6d9322a0"/>
@@ -1367,11 +1367,11 @@
 		</part>
 	</software>
 
-	<software name="owler" supported="no">
+	<software name="owler">
 		<description>Owler</description>
 		<year>1984</year>
 		<publisher>Callisto Software</publisher>
-		<info name="usage" value="load owler go" />
+		<info name="usage" value="load owler loading" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="14885">
 				<rom name="owler (1984)(callisto software)[32k].tap" size="14885" crc="7e93c42f" sha1="893dc5a34ab3a4c260304ade09191a24fc08d33b"/>
@@ -1409,11 +1409,11 @@
 		</part>
 	</software>
 
-	<software name="quickdrp" supported="no">
+	<software name="quickdrp">
 		<description>Quick-Draw Practice (Prototype)</description>
 		<year>1983</year>
 		<publisher>Brian Bates</publisher>
-		<info name="usage" value="load Qdraw go" />
+		<info name="usage" value="load Qdraw run" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="15106">
 				<rom name="quick-draw practice (1983-11)(bates, brian)[unreleased][19k].tap" size="15106" crc="32b350e4" sha1="5c5e2bc35bf96f226076ef8a5cb9ce735921bb86"/>
@@ -1803,6 +1803,7 @@
 		<description>Valkyr + Life (Prototype)</description>
 		<year>1985</year>
 		<publisher>Colinsoft</publisher>
+		<info name="usage" value="load valkyr go" />
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (Valkyr)"/>
 			<dataarea name="cass" size="12855">
