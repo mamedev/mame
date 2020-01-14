@@ -57,7 +57,7 @@ public:
 	// RE button is tied to Z80 RESET pin
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
 
-	// machine Configs
+	// machine configs
 	void acr(machine_config &config);
 	void ccx(machine_config &config);
 

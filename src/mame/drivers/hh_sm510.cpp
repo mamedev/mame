@@ -112,6 +112,9 @@ YM-901-S* x    SM511   Super Mario Bros.  "
 RGW-001 (2010 Ball remake) is on different hardware, ATmega169PV MCU.
 The "Mini Classics" keychains are by Nelsonic, not Nintendo.
 
+Bassmate Computer (BM-501) is on identical hardware as G&W Multi Screen,
+but it's not part of the game series.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -2788,7 +2791,7 @@ ROM_END
   * inverted lcd screen with custom segments, 1-bit sound
 
   This is the tabletop version. There's also a new wide screen version which is
-  a different game.
+  a different game. Unlike the other tabletop games, there is no panorama version.
 
 ***************************************************************************/
 
