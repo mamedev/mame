@@ -148,7 +148,7 @@ void homedata_state::reikaids_handleblit( int rom_base )
 	dest_addr = (dest_param & 0x3fff);
 	flipx   = (dest_param & 0x8000);
 
-//  logerror( "[blit %02x %04x %04x]\n",blitter_bank,source_addr,dest_param);
+	//logerror( "[blit %02x %04x %04x]\n",m_blitter_bank,source_addr,dest_param);
 
 	if (m_visible_page == 0)
 		base_addr += 0x2000 << 2;
@@ -452,7 +452,7 @@ inline void homedata_state::reikaids_info( tile_data &tileinfo, int tile_index, 
 }
 
 	/* reikaids_gfx_bank[0]:
-	 *      -xxx.x---   layer#1
+	 *      xxxx.x---   layer#1
 	 *      ----.-xxx   layer#3
 	 *
 	 * reikaids_gfx_bank[1]:
@@ -471,12 +471,12 @@ TILE_GET_INFO_MEMBER(homedata_state::reikaids_get_info1_0)
 
 TILE_GET_INFO_MEMBER(homedata_state::reikaids_get_info0_1)
 {
-	reikaids_info(tileinfo, tile_index, 0, 1, ((m_gfx_bank[0] & 0x78) >> 3));
+	reikaids_info(tileinfo, tile_index, 0, 1, ((m_gfx_bank[0]) >> 3));
 }
 
 TILE_GET_INFO_MEMBER(homedata_state::reikaids_get_info1_1)
 {
-	reikaids_info(tileinfo, tile_index, 1, 1, ((m_gfx_bank[0] & 0x78) >> 3));
+	reikaids_info(tileinfo, tile_index, 1, 1, ((m_gfx_bank[0]) >> 3));
 }
 
 TILE_GET_INFO_MEMBER(homedata_state::reikaids_get_info0_2)
