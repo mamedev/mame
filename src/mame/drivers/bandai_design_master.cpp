@@ -66,6 +66,9 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
+	DECLARE_READ16_MEMBER(io_p7_r);
+	DECLARE_WRITE16_MEMBER(io_p7_w);
+
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_bdesignm);
@@ -83,7 +86,7 @@ void bdsm_state::machine_start()
 	{
 		std::string region_tag;
 		m_cartslot_region = memregion(region_tag.assign(m_cartslot->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-		m_bank->configure_entries(0, (m_cartslot_region->bytes() / 0x10000), m_cartslot_region->base(), 0x10000);
+		m_bank->configure_entries(0, (m_cartslot_region->bytes() / 0x8000), m_cartslot_region->base(), 0x8000);
 		m_bank->set_entry(0);
 	}
 }
@@ -100,11 +103,24 @@ DEVICE_IMAGE_LOAD_MEMBER(bdsm_state::cart_load_bdesignm)
 
 void bdsm_state::mem_map(address_map &map)
 {
-	map(0x00000, 0x0efff).bankr("cartbank");
+	map(0x0000, 0x7fff).bankr("cartbank");
+	map(0x8000, 0x895f).ram().share("unkram");
 }
+
+READ16_MEMBER(bdsm_state::io_p7_r)
+{
+	return machine().rand();
+}
+
+WRITE16_MEMBER(bdsm_state::io_p7_w)
+{
+	logerror("%s: io_p7_w %04x %04x\n", machine().describe_context(), data, mem_mask);
+}
+
 
 void bdsm_state::io_map(address_map &map)
 {
+	map(h8_device::PORT_7, h8_device::PORT_7).rw(FUNC(bdsm_state::io_p7_r), FUNC(bdsm_state::io_p7_w));
 }
 
 static INPUT_PORTS_START( bdesignm )
