@@ -616,7 +616,7 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	map(0x007030, 0x007030).rw(m_spg_video, FUNC(gcm394_base_video_device::video_7030_brightness_r), FUNC(gcm394_base_video_device::video_7030_brightness_w));
 	map(0x007038, 0x007038).r(m_spg_video, FUNC(gcm394_base_video_device::video_curline_r));
 	map(0x00703a, 0x00703a).rw(m_spg_video, FUNC(gcm394_base_video_device::video_703a_palettebank_r), FUNC(gcm394_base_video_device::video_703a_palettebank_w));
-	map(0x00703c, 0x00703c).w(m_spg_video, FUNC(gcm394_base_video_device::video_703c_w)); // TV Control 1
+	map(0x00703c, 0x00703c).rw(m_spg_video, FUNC(gcm394_base_video_device::video_703c_tvcontrol1_r), FUNC(gcm394_base_video_device::video_703c_tvcontrol1_w)); // TV Control 1
 
 	map(0x007042, 0x007042).rw(m_spg_video, FUNC(gcm394_base_video_device::sprite_7042_extra_r), FUNC(gcm394_base_video_device::sprite_7042_extra_w)); // maybe sprites,  written as 7022, 702d and 7042 group
 

@@ -88,7 +88,9 @@ public:
 	DECLARE_READ16_MEMBER(video_7030_brightness_r);
 	DECLARE_WRITE16_MEMBER(video_7030_brightness_w);
 	DECLARE_READ16_MEMBER(video_curline_r);
-	DECLARE_WRITE16_MEMBER(video_703c_w);
+
+	DECLARE_READ16_MEMBER(video_703c_tvcontrol1_r);
+	DECLARE_WRITE16_MEMBER(video_703c_tvcontrol1_w);
 
 	DECLARE_READ16_MEMBER(video_707c_r);
 
@@ -215,7 +217,7 @@ protected:
 
 	uint16_t m_702a;
 	uint16_t m_7030_brightness;
-	uint16_t m_703c;
+	uint16_t m_703c_tvcontrol1;
 
 	uint16_t m_7042_sprite;
 

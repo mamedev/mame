@@ -18868,6 +18868,7 @@ leappad                         // (c) 2001 LeapFrog / Knowledge Kids Enterprise
 leappadca                       // (c) 2004 LeapFrog
 mfleappad                       // (c) 2002 LeapFrog
 mfleappadus                     // (c) 2004 LeapFrog
+ltleappad
 
 @source:leapster.cpp
 leapster                        //
@@ -31292,10 +31293,12 @@ ts_handy11
 @source:vt1682.cpp
 ii8in1
 ii32in1
+zone7in1
 miwi2_16
 miwi2_7
 intact89
 intg5410
+exsprt48
 
 @source:newbrain.cpp
 newbrain                        //
