@@ -18,7 +18,8 @@ public:
 		VT61_R0, VT61_R1, VT61_R2, VT61_R3,
 		VT61_R4, VT61_R5, VT61_R6, VT61_R7,
 		VT61_R8, VT61_R9, VT61_R10, VT61_R11,
-		VT61_R12, VT61_R13, VT61_R14, VT61_R15
+		VT61_R12, VT61_R13, VT61_R14, VT61_R15,
+		VT61_MISC, VT61_MOD, VT61_INTRC
 	};
 
 	enum {
@@ -54,7 +55,7 @@ private:
 	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_memory_cache;
 	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_idr_cache;
 
-	// internal state
+	// processor state
 	u16 m_pc;
 	u8 m_ac;
 	u16 m_mar;
@@ -62,6 +63,11 @@ private:
 	u8 m_ir;
 	u8 m_sp[16]; // scratchpad memory
 	s32 m_icount;
+
+	// I/O registers
+	u8 m_misc_flags;
+	u8 m_modem_flags;
+	u8 m_intrpt_control;
 };
 
 DECLARE_DEVICE_TYPE(VT61_CPU, vt61_cpu_device)

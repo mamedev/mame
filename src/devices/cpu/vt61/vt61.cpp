@@ -30,6 +30,9 @@ vt61_cpu_device::vt61_cpu_device(const machine_config &mconfig, const char *tag,
 	, m_ir(0)
 	, m_sp{0}
 	, m_icount(0)
+	, m_misc_flags(0)
+	, m_modem_flags(0)
+	, m_intrpt_control(0)
 {
 	m_program_config.m_is_octal = true;
 	m_memory_config.m_is_octal = true;
@@ -75,6 +78,9 @@ void vt61_cpu_device::device_start()
 	state_add(VT61_IR, "IR", m_ir).mask(6);
 	for (int i = 0; i < 16; i++)
 		state_add(VT61_R0 + i, string_format("R%d", i).c_str(), m_sp[i]).formatstr("%03O");
+	state_add(VT61_MISC, "MISC", m_misc_flags).formatstr("%03O");
+	state_add(VT61_MOD, "MOD", m_modem_flags).formatstr("%02O").mask(017);
+	state_add(VT61_INTRC, "INTRC", m_intrpt_control).formatstr("%02O").mask(017);
 
 	save_item(NAME(m_pc));
 	save_item(NAME(m_ac));
@@ -82,11 +88,18 @@ void vt61_cpu_device::device_start()
 	save_item(NAME(m_mdr));
 	save_item(NAME(m_ir));
 	save_item(NAME(m_sp));
+	save_item(NAME(m_misc_flags));
+	save_item(NAME(m_modem_flags));
+	save_item(NAME(m_intrpt_control));
 }
 
 void vt61_cpu_device::device_reset()
 {
 	m_pc = 0;
+
+	m_misc_flags = 0;
+	m_modem_flags = 0;
+	m_intrpt_control = 0;
 }
 
 void vt61_cpu_device::execute_run()
