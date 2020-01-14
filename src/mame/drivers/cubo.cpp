@@ -8,23 +8,26 @@
    for JAMMA use.
 
    Known Games:
-   Title                | rev. | year
-   ----------------------------------------------
-   Candy Puzzle         |  1.0 | 1995
-   Double Strixx        |      | 1995
-   Greyhound Race       |      | 199x
-   Harem Challenge      |      | 1995
-   Laser Quiz           |      | 1995
-   Laser Quiz France    |  1.0 | 1995
-   Laser Quiz Greece?   |      | 1995 *may exist
-   Laser Quiz 2 "Italy" |  1.0 | 1995
-   Laser Strixx         |      | 1995
-   Laser Strixx 2       |      | 1995
-   Lucky Five           |      | 1995
-   Magic Number         |      | 1995
-   Magic Premium        |  1.1 | 1996
-   Odeon Twister        |      | 199x
-   Odeon Twister 2      |202.19| 1999
+   Dumped | Title                | Rev.  | Year | Notes
+   ----------------------------------------------------
+     YES  | Candy Puzzle         |  1.0  | 1995 |
+          | Double Strixx        |       | 1995 |
+     YES  | El Dorado            |  4.2  | 199x | Laser Gate 2
+          | Greyhound Race       |       | 199x |
+     YES  | Harem Challenge      |       | 1995 |
+          | Laser Quiz           |       | 1995 |
+          | Laser Quiz France    |  1.0  | 1995 |
+          | Laser Quiz Greece    |       | 1995 | May exist
+     YES  | Laser Quiz Italy     |       | 1995 |
+     YES  | Laser Quiz 2 Greece  |       | 1995 |
+     YES  | Laser Quiz 2 Italy   |  1.0  | 1995 |
+          | Laser Strixx         |       | 1995 |
+     YES  | Laser Strixx 2       |       | 1995 |
+          | Lucky Five           |       | 1995 |
+     YES  | Magic Number         |       | 1995 |
+     YES  | Magic Premium        |    1.1| 1996 |
+     YES  | Odeon Twister        |    1.4| 199x |
+     YES  | Odeon Twister 2      | 202.19| 1999 |
 
    ToDo:
    - remove the hack needed to make inputs working
@@ -1139,11 +1142,18 @@ ROM_START( lsrquiz )
 	DISK_IMAGE_READONLY( "lsrquiz", 0, BAD_DUMP SHA1(41fb6cd0c9d36bd77e9c3db69d36801edc791e96) )
 ROM_END
 
-ROM_START( lsrquiz2 )
+ROM_START( lsrquiz2i )
 	CD32_BIOS
 
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "lsrquiz2", 0, BAD_DUMP SHA1(78e261df1c548fa492e6cf37a9469640bb8816bf) )
+ROM_END
+
+ROM_START( lsrquizg )
+	CD32_BIOS
+
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "laserquizgreek2pro", 0, BAD_DUMP SHA1(8538915b4a0078f19197a5562e37ed3e6d0429a4) )
 ROM_END
 
 ROM_START( mgprem11 )
@@ -1167,6 +1177,13 @@ ROM_START( mgnumber )
 	DISK_IMAGE_READONLY( "magicnumber", 0, BAD_DUMP SHA1(60e1fadc42694742d19cc0ac2b6e99e9e33faa3d) )
 ROM_END
 
+ROM_START( odeontw )
+	CD32_BIOS
+
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "twister32_17_3", 0, BAD_DUMP SHA1(a40ec484708e22059f7186415283084ebf01323e) ) // has its audio cut a little, worth to mark as redump needed
+ROM_END
+
 ROM_START( odeontw2 )
 	CD32_BIOS
 
@@ -1174,6 +1191,12 @@ ROM_START( odeontw2 )
 	DISK_IMAGE_READONLY( "odeontw2", 0, BAD_DUMP SHA1(f39e09f35b65a6ae9f1eba4a22f970626b7d3b71) )
 ROM_END
 
+ROM_START( eldoralg )
+	CD32_BIOS
+
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "eldorado", 0, BAD_DUMP SHA1(bc1617c2e3438b729421c1d8b1bf88840b12f030) )
+ROM_END
 
 
 /*************************************
@@ -1369,12 +1392,17 @@ INPUT_PORTS_END
 
 
 
-GAME( 1993, cubo,     0,    cubo, cubo,     cubo_state, init_cubo,     ROT0, "Commodore",  "Cubo BIOS",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IS_BIOS_ROOT )
-GAME( 1995, cndypuzl, cubo, cubo, cndypuzl, cubo_state, init_cndypuzl, ROT0, "CD Express", "Candy Puzzle (v1.0)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, haremchl, cubo, cubo, haremchl, cubo_state, init_haremchl, ROT0, "CD Express", "Harem Challenge",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, lsrquiz,  cubo, cubo, lsrquiz,  cubo_state, init_lsrquiz,  ROT0, "CD Express", "Laser Quiz Italy",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )  /* no player 2 inputs (ingame), wrong pitch for most gfxs */
-GAME( 1995, lsrquiz2, cubo, cubo, lsrquiz2, cubo_state, init_lsrquiz2, ROT0, "CD Express", "Laser Quiz 2 Italy (v1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* wrong pitch for some gfxs, crashes during gameplay */
-GAME( 1995, lasstixx, cubo, cubo, lasstixx, cubo_state, init_lasstixx, ROT0, "CD Express", "Laser Strixx 2",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, mgnumber, cubo, cubo, mgnumber, cubo_state, init_mgnumber, ROT0, "CD Express", "Magic Number",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, mgprem11, cubo, cubo, mgprem11, cubo_state, init_mgprem11, ROT0, "CD Express", "Magic Premium (v1.1)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1999, odeontw2, cubo, cubo, odeontw2, cubo_state, init_cubo,     ROT0, "CD Express", "Odeon Twister 2 (v202.19)", MACHINE_NOT_WORKING )
+GAME( 1993, cubo,      0,    cubo, cubo,     cubo_state, init_cubo,     ROT0, "Commodore",  "Cubo BIOS",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IS_BIOS_ROOT )
+GAME( 1995, cndypuzl,  cubo, cubo, cndypuzl, cubo_state, init_cndypuzl, ROT0, "CD Express", "Candy Puzzle (v1.0)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, haremchl,  cubo, cubo, haremchl, cubo_state, init_haremchl, ROT0, "CD Express", "Harem Challenge",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, lsrquiz,   cubo, cubo, lsrquiz,  cubo_state, init_lsrquiz,  ROT0, "CD Express", "Laser Quiz Italy",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* no player 2 inputs (ingame), wrong pitch for most gfxs */
+GAME( 1995, lsrquizg,  cubo, cubo, lsrquiz,  cubo_state, init_lsrquiz,  ROT0, "CD Express", "Laser Quiz Greece",         MACHINE_NOT_WORKING )
+GAME( 1995, lsrquiz2i, cubo, cubo, lsrquiz2, cubo_state, init_lsrquiz2, ROT0, "CD Express", "Laser Quiz 2 Italy (v1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* wrong pitch for some gfxs, crashes during gameplay */
+GAME( 1995, lasstixx,  cubo, cubo, lasstixx, cubo_state, init_lasstixx, ROT0, "CD Express", "Laser Strixx 2",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, mgnumber,  cubo, cubo, mgnumber, cubo_state, init_mgnumber, ROT0, "CD Express", "Magic Number",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, mgprem11,  cubo, cubo, mgprem11, cubo_state, init_mgprem11, ROT0, "CD Express", "Magic Premium (v1.1)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 19??, odeontw,   cubo, cubo, odeontw2, cubo_state, init_cubo,     ROT0, "CD Express", "Odeon Twister (v1.4)",      MACHINE_NOT_WORKING )
+GAME( 1999, odeontw2,  cubo, cubo, odeontw2, cubo_state, init_cubo,     ROT0, "CD Express", "Odeon Twister 2 (v202.19)", MACHINE_NOT_WORKING )
+
+// Laser Gate 2
+GAME( 19??, eldoralg,  cubo, cubo, cubo,     cubo_state, init_cubo,     ROT0, "CD Express", "Eldorado (4.2)",            MACHINE_NOT_WORKING )
