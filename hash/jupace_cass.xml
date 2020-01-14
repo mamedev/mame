@@ -783,11 +783,11 @@
 		</part>
 	</software>
 
-	<software name="ducksht" supported="no">
+	<software name="ducksht">
 		<description>Duckshoot</description>
 		<year>1983</year>
 		<publisher>Micro Marketing</publisher>
-		<info name="usage" value="0 0 bload dchars load duckshoot d" />
+		<info name="usage" value="11272 0 bload dchars load duckshoot d" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="802">
 				<rom name="duckshoot (1983)(micro marketing)(gb)[3k].tap" size="802" crc="105055d8" sha1="1286c483d0365acbf258336c89e940d981a1ed13"/>
@@ -1221,11 +1221,11 @@
 		</part>
 	</software>
 
-	<software name="minefld" supported="no">
+	<software name="minefld">
 		<description>Minefield</description>
 		<year>1983</year>
 		<publisher>Micro Marketing</publisher>
-		<info name="usage" value="0 0 bload mchars load minefield m" />
+		<info name="usage" value="11272 0 bload mchars load minefield m" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="839">
 				<rom name="minefield (1983)(micro marketing)(gb)[3k].tap" size="839" crc="dc70bee6" sha1="6245ed5e8c97ef22189c874dfc1c703c36d21922"/>
@@ -1337,11 +1337,11 @@
 		</part>
 	</software>
 
-	<software name="othello" supported="no">
+	<software name="othello">
 		<description>Othello</description>
 		<year>1983</year>
 		<publisher>Jupiter Cantab</publisher>
-		<info name="usage" value="load othello 0 0 bload pieces go" />
+		<info name="usage" value="load othello 11272 0 bload pieces go" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="2686">
 				<rom name="othello (1983)(jupiter cantab)(gb)[19k].tap" size="2686" crc="52c4d4a8" sha1="2bf56bb00593c812122e6cdcce30e20ddec620a3"/>
@@ -1699,7 +1699,7 @@
 		<description>Turbo (Prototype)</description>
 		<year>1984</year>
 		<publisher>Plasma Software</publisher>
-		<info name="usage" value="load turbo 0 0 bload track turbo" />
+		<info name="usage" value="load turbo 0 0 bload track turbo. Left = 5, Right = 6" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="16958">
 				<rom name="turbo (1984)(plasma software)(gb)[unreleased][19k].tap" size="16958" crc="b1d5aad0" sha1="6f23ddf66bcd4cb6a7bfc0f2b88b6282e7136a2e"/>
@@ -1841,11 +1841,11 @@
 		</part>
 	</software>
 
-	<software name="zapem" supported="no">
+	<software name="zapem">
 		<description>Zapem</description>
 		<year>1983</year>
 		<publisher>Micro Marketing</publisher>
-		<info name="usage" value="0 0 bload zchars load zapem z" />
+		<info name="usage" value="11272 0 bload zchars load zapem z. Left = 6, Right = 7, 9 = Thrust, 0 = Fire" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="943">
 				<rom name="zapem (1983)(micro marketing)(gb)[3k].tap" size="943" crc="f14dcfec" sha1="8f60e73a34ec2f967caffd37e9cc6d2c44b919c8"/>
