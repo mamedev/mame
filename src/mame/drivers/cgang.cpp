@@ -38,7 +38,8 @@ Audio CPU side:
 - M5L8255AP-5 PPI
 - Namco CUS121 sound interface, same chip used in Namco System 1
 - Yamaha YM2151 @ 3.57MHz, 2*NEC D7759C @ 640kHz
-- 2*128KB ADPCM ROM (27C010, one for each D7759C)
+- 2*128KB ADPCM ROM (27C010, one for each D7759C; labels usually peeled off
+  or handwritten, perhaps due to field upgrade)
 
 Cabinet:
 - 5 lanes with movable aliens, lightsensor under mouth
