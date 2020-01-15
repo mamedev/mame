@@ -87,7 +87,7 @@ void bdsm_state::machine_start()
 		std::string region_tag;
 		m_cartslot_region = memregion(region_tag.assign(m_cartslot->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 		m_bank->configure_entries(0, (m_cartslot_region->bytes() / 0x8000), m_cartslot_region->base(), 0x8000);
-		m_bank->set_entry(0);
+		m_bank->set_entry(0); // only the first bank seems to contain a valid reset vector '0x50' which points at the first code in the ROM.  The other banks contain 0x5a00 as the reset vector.  IRQ vector seems valid in all banks.
 	}
 }
 
@@ -149,8 +149,8 @@ void bdsm_state::bdesignm(machine_config &config)
 	GENERIC_CARTSLOT(config, m_cartslot, generic_linear_slot, "bdesignm_cart"); // TODO: this should be a custom bus type with capability to plug the 'design' carts into it
 	//m_cartslot->set_must_be_loaded(true);
 
-	SOFTWARE_LIST(config, "cart_list_game").set_original("bdesignm_game_cart");
-	SOFTWARE_LIST(config, "cart_list_design").set_original("bdesignm_design_cart"); // TODO: this should be contained within the custom bus device mentioned above
+	SOFTWARE_LIST(config, "cart_list_game").set_original("bdesignm_game_cart"); // Game carts, these appear to disable the Internal ROM
+	SOFTWARE_LIST(config, "cart_list_design").set_original("bdesignm_design_cart"); // You can also plug a design cart directly into the unit for use by the Internal ROM program (they contain no program)
 }
 
 ROM_START( bdesignm )
