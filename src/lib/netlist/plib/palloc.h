@@ -11,6 +11,7 @@
 #include "pconfig.h"
 #include "pstring.h"
 #include "ptypes.h"
+#include "pmath.h"
 
 #include <cstddef>      // for std::max_align_t (usually long long)
 #include <memory>
