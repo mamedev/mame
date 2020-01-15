@@ -3814,6 +3814,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/lexibook_jg7425.cpp",
 	MAME_DIR .. "src/mame/drivers/unkmandd.cpp",
 	MAME_DIR .. "src/mame/drivers/bbl380.cpp",
+	MAME_DIR .. "src/mame/drivers/actions_atj2279b.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "ultimachine")
