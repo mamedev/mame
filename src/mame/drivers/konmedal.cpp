@@ -225,10 +225,10 @@ uint32_t konmedal_state::screen_update_mariorou(screen_device &screen, bitmap_in
 	screen.priority().fill(0, cliprect);
 
 	m_k052109->tilemap_update();
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 1);
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 4);
 
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 4);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 1);
 	return 0;
 }
 
@@ -238,7 +238,6 @@ void konmedal_state::konmedal_palette(palette_device &palette) const
 
 	for (int i = 0; i < 256; i++)
 	{
-		// this is extremely wrong, see the color test screen
 		palette.set_pen_color(i,
 				(PROM[i]) << 4,
 				(PROM[0x100 + i]) << 4,
@@ -501,10 +500,12 @@ K052109_CB_MEMBER(konmedal_state::shuriboy_tile_callback)
 	{
 		if (*color == 1) *color = 0;
 		if (*color == 2) *color = 1;
+		if (*color == 3) *color = 1;
 		if (*color == 6) *color = 5;
 		if (*color == 8) *color = 4;
 		if (*color == 9) *color = 4;
 		if (*color == 0xa) *color = 5;
+		if (*color == 0xb) *color = 5;
 		if (*color == 0xd) *color = 6;
 		if (*color == 0xe) *color = 3;
 	}
