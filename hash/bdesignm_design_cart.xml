@@ -32,7 +32,7 @@
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="bdesignm_cart">
 			<dataarea name="rom" size="0x20000">
-				<rom loadflag="load16_word_swap"name="m03_streetfighterii.bin" size="0x20000" crc="f4a59015" sha1="a607628a4fbae143e34294a4363c286feb21d770" />
+				<rom loadflag="load16_word_swap" name="m03_streetfighterii.bin" size="0x20000" crc="f4a59015" sha1="a607628a4fbae143e34294a4363c286feb21d770" />
 			</dataarea>
 		</part>
 	</software>	
