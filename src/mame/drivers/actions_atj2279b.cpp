@@ -15,7 +15,7 @@
 
 	reviews for this device were less than favourable with many comments
 	about how the SNES and Arcade games often did not run at full speed
-	and how the overall the qualiy of emulation was unremarkable
+	and how the overall quality of emulation was unremarkable
 
 *******************************************************************************/
 
