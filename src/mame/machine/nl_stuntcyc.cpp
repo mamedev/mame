@@ -12,8 +12,8 @@
 NETLIST_START(stuntcyc)
 
 	SOLVER(Solver, 48000)
+
 	PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers
-	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
 	PARAM(NETLIST.USE_DEACTIVATE, 1)
 
 	ANALOG_INPUT(V5, 5)
@@ -22,8 +22,8 @@ NETLIST_START(stuntcyc)
 	TTL_INPUT(high, 1)
 	TTL_INPUT(low, 0)
 
-	MAINCLOCK(main_clk, 14258400)
-	//MAINCLOCK(main_clk, 14318181)
+	//MAINCLOCK(main_clk, 14258400)
+	MAINCLOCK(main_clk, 14318000)
 	ALIAS(Y1, main_clk)
 
 #if 1
@@ -325,6 +325,10 @@ NETLIST_START(stuntcyc)
 	RES(R15, RES_K(1))
 	NET_C(R15.1, E4_2.Q)
 	//RES(R107, RES_K(1))
+
+	// FIXME: Having the diode in the video output has a negative impact
+	//        on performance. A "fast-but-not-perfect" approach could
+	//        use a switched resistor.
 
 	DIODE(D17, "1N914")
 	NET_C(D17.K, COMP_SYNC_Q)
