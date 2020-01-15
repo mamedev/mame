@@ -1796,6 +1796,7 @@ files {
 	MAME_DIR .. "src/mame/machine/wswan.cpp",
 	MAME_DIR .. "src/mame/video/wswan.cpp",
 	MAME_DIR .. "src/mame/video/wswan.h",
+	MAME_DIR .. "src/mame/drivers/bandai_design_master.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "be")

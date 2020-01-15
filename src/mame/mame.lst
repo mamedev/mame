@@ -3143,6 +3143,9 @@ triviaes5                       // (c) 19?? (Maibesa hardware)
 @source:banctec.cpp
 banctec                         // BancTec ESeries panel
 
+@source:bandai_design_master.cpp
+bdesignm
+
 @source:bankp.cpp
 bankp                           // (c) 1984 Sega,  made by Sanritsu
 combh                           // (c) 1987 Sega,  made by Sanritsu
@@ -41020,6 +41023,7 @@ rad_bdp                         //
 has_wamg                        //
 ltv_tam                         //
 tak_geig                        //
+jarajal                         //
 ban_onep                        //
 ekara                           //
 ekaraa                          //
