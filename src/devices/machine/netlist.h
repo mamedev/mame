@@ -82,7 +82,16 @@ public:
 
 	int m_icount;
 
+	static constexpr const unsigned MDIV_SHIFT = 16;
+
+	netlist::netlist_time nltime_from_clocks(unsigned c) const noexcept
+	{
+		//return (m_div * c + netlist::netlist_time::from_raw((1 << MDIV_SHIFT) - 1)).shr(MDIV_SHIFT);
+		return (m_div * c).shr(MDIV_SHIFT);
+	}
+
 protected:
+
 	netlist_mame_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// Custom to netlist ...
@@ -98,8 +107,6 @@ protected:
 	virtual void device_pre_save() override;
 	virtual void device_clock_changed() override;
 
-	netlist::netlist_time nl_clock_period() const noexcept { return m_div; }
-
 	plib::unique_ptr<netlist::netlist_state_t> base_validity_check(validity_checker &valid) const;
 
 private:
@@ -107,8 +114,8 @@ private:
 
 	void common_dev_start(netlist::netlist_state_t *lnetlist) const;
 
-	netlist::netlist_time 		 m_div;
-	netlist::netlist_time        m_rem;
+	netlist::netlist_time_ext	 m_div;
+	netlist::netlist_time_ext    m_rem;
 	netlist::netlist_time_ext    m_old;
 
 	std::unique_ptr<netlist_mame_t> m_netlist;

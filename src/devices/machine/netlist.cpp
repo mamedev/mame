@@ -36,8 +36,6 @@
 #define MOVE_UNIQUE_PTR(x) (x)
 #endif
 
-
-
 DEFINE_DEVICE_TYPE(NETLIST_CORE,  netlist_mame_device,       "netlist_core",  "Netlist Core Device")
 DEFINE_DEVICE_TYPE(NETLIST_CPU,   netlist_mame_cpu_device,   "netlist_cpu",   "Netlist CPU Device")
 DEFINE_DEVICE_TYPE(NETLIST_SOUND, netlist_mame_sound_device, "netlist_sound", "Netlist Sound Device")
@@ -508,6 +506,7 @@ public:
 	, m_feedback(*this, "FB") // clock part
 	, m_Q(*this, "Q")
 	, m_pos(0)
+	, m_samples(0)
 	, m_num_channels(0)
 	{
 		connect(m_feedback, m_Q);
@@ -527,9 +526,11 @@ public:
 			elem.m_buffer = nullptr;
 	}
 
-	ATTR_COLD void resolve()
+	ATTR_COLD void resolve(std::uint32_t clock)
 	{
 		m_pos = 0;
+		m_inc = netlist::netlist_time::from_hz(clock);
+
 		for (int i = 0; i < MAX_INPUT_CHANNELS; i++)
 		{
 			if ((*m_channels[i].m_param_name)() != pstring(""))
@@ -544,21 +545,38 @@ public:
 
 	NETLIB_UPDATEI()
 	{
-		for (int i=0; i<m_num_channels; i++)
+		if (m_pos < m_samples)
 		{
-			if (m_channels[i].m_buffer == nullptr)
-				break; // stop, called outside of stream_update
-			const nl_fptype v = m_channels[i].m_buffer[m_pos];
-			m_channels[i].m_param->setTo(v * (*m_channels[i].m_param_mult)() + (*m_channels[i].m_param_offset)());
+			for (int i=0; i<m_num_channels; i++)
+			{
+				if (m_channels[i].m_buffer == nullptr)
+					break; // stop, called outside of stream_update
+				const nl_fptype v = m_channels[i].m_buffer[m_pos];
+				m_channels[i].m_param->setTo(v * (*m_channels[i].m_param_mult)() + (*m_channels[i].m_param_offset)());
+			}
+		}
+		else
+		{
+			// FIXME: The logic has a rounding issue because time resolution divided
+			//        by 48,000 is not a natural number. The fractional part
+			//        adds up to one samples every 13 seconds for 100 ps resolution.
+			// 		  Fixing this is possible but complicated and expensive.
 		}
 		m_pos++;
+
 		m_Q.net().toggle_and_push_to_queue(m_inc);
 	}
 
 public:
-	ATTR_HOT void buffer_reset()
+	template <typename S>
+	ATTR_HOT void buffer_reset(int num_samples, S **inputs)
 	{
+		m_samples = num_samples;
 		m_pos = 0;
+		for (int i=0; i < m_num_channels; i++)
+		{
+			m_channels[i].m_buffer = inputs[i];
+		}
 	}
 
 	struct channel
@@ -569,16 +587,18 @@ public:
 		netlist::unique_pool_ptr<netlist::param_fp_t> m_param_mult;
 		netlist::unique_pool_ptr<netlist::param_fp_t> m_param_offset;
 	};
-	channel m_channels[MAX_INPUT_CHANNELS];
-	netlist::netlist_time m_inc;
 
 	int num_channels() { return m_num_channels; }
 
 private:
+	channel m_channels[MAX_INPUT_CHANNELS];
+	netlist::netlist_time m_inc;
+
 	netlist::logic_input_t m_feedback;
 	netlist::logic_output_t m_Q;
 
 	int m_pos;
+	int m_samples;
 	int m_num_channels;
 };
 
@@ -1163,7 +1183,9 @@ void netlist_mame_device::device_start()
 
 void netlist_mame_device::device_clock_changed()
 {
-	m_div = netlist::netlist_time::from_hz(clock());
+	m_div = static_cast<netlist::netlist_time>(
+		(netlist::netlist_time::resolution() << MDIV_SHIFT) / clock());
+	printf("m_div %d\n", (int) m_div.as_raw());
 	netlist().log().debug("Setting clock {1} and divisor {2}\n", clock(), m_div.as_double());
 }
 
@@ -1199,10 +1221,11 @@ ATTR_COLD void netlist_mame_device::device_pre_save()
 
 void netlist_mame_device::update_icount(netlist::netlist_time_ext time) noexcept
 {
-	const netlist::netlist_time_ext delta(time - m_old + m_rem);
-	const auto d(delta / m_div);
+	const netlist::netlist_time_ext delta = (time - m_old).shl(MDIV_SHIFT) + m_rem;
+	const uint64_t d = delta / m_div;
 	m_old = time;
-	m_rem = static_cast<netlist::netlist_time>(delta - (m_div * d));
+	m_rem = (delta - (m_div * d));
+	//printf("d %d m_rem %d\n", (int) d, (int) m_rem.as_raw());
 	m_icount -= d;
 }
 
@@ -1320,13 +1343,13 @@ ATTR_HOT void netlist_mame_cpu_device::execute_run()
 			m_genPC++;
 			m_genPC &= 255;
 			debugger_instruction_hook(m_genPC);
-			netlist().exec().process_queue(static_cast<netlist::netlist_time_ext>(nl_clock_period()));
+			netlist().exec().process_queue(nltime_from_clocks(1));
 			update_icount(netlist().exec().time());
 		}
 	}
 	else
 	{
-		netlist().exec().process_queue(static_cast<netlist::netlist_time_ext>(nl_clock_period()) * m_icount);
+		netlist().exec().process_queue(nltime_from_clocks(m_icount));
 		update_icount(netlist().exec().time());
 	}
 }
@@ -1440,8 +1463,7 @@ void netlist_mame_sound_device::device_start()
 	if (indevs.size() == 1)
 	{
 		m_in = indevs[0];
-		m_in->resolve();
-		m_in->m_inc = netlist::netlist_time::from_hz(clock());
+		m_in->resolve(clock());
 	}
 
 	/* initialize the stream(s) */
@@ -1467,15 +1489,11 @@ void netlist_mame_sound_device::sound_stream_update(sound_stream &stream, stream
 
 	if (m_in)
 	{
-		m_in->buffer_reset();
-		for (int i=0; i < m_in->num_channels(); i++)
-		{
-			m_in->m_channels[i].m_buffer = inputs[i];
-		}
+		m_in->buffer_reset(samples, inputs);
 	}
 
 	auto cur(netlist().exec().time());
-    const auto delta(static_cast<netlist::netlist_time_ext>(nl_clock_period()) * samples);
+    const auto delta(nltime_from_clocks(samples));
 	netlist().exec().process_queue(delta);
 
 	cur += delta;

@@ -159,6 +159,10 @@ namespace plib
 		constexpr double as_float() const noexcept { return as_fp<float>(); }
 		constexpr double as_long_double() const noexcept { return as_fp<long double>(); }
 
+
+		constexpr ptime shl(unsigned shift) const noexcept { return ptime(m_time << shift); }
+		constexpr ptime shr(unsigned shift) const noexcept { return ptime(m_time >> shift); }
+
 		// for save states ....
 		C14CONSTEXPR internal_type *get_internaltype_ptr() noexcept { return &m_time; }
 

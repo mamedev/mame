@@ -17,7 +17,7 @@
 ///
 /// \brief Version - Minor.
 ///
-#define NL_VERSION_MINOR  		   5
+#define NL_VERSION_MINOR  		   6
 ///
 /// \brief Version - Patch level.
 ///
@@ -135,19 +135,30 @@
 
 /// \brief Resolution as clocks per second for timing
 ///
-///  Uses nano-second resolution - Sufficient for now
+/// Uses 100 pico second resolution. This is aligned to MAME's
+/// attotime resolution.
+///
+/// The table below shows the maximum run times depending on
+/// time type size and resolution.
+///
+///  | Bits |               Res |       Seconds |   Days | Years |
+///  | ====-|               ===-|       =======-|   ====-| =====-|
+///  |  63	|     1,000,000,000	| 9,223,372,037	| 106,752| 292.3 |
+///  |  63	|    10,000,000,000	|   922,337,204	|  10,675|  29.2 |
+///  |  63	|   100,000,000,000	|    92,233,720	|   1,068|   2.9 |
+///  |  63	| 1,000,000,000,000	|     9,223,372	|     107|   0.3 |
+///
 
-#if 1
-static constexpr const auto NETLIST_INTERNAL_RES = 1'000'000'000;
-static constexpr const auto NETLIST_CLOCK = NETLIST_INTERNAL_RES;
-#else
-//static constexpr const auto NETLIST_INTERNAL_RES = (1<<30); // 1,073,741,824
-//static constexpr const std::int64_t NETLIST_INTERNAL_RES = (static_cast<std::int64_t>(1)<<33); // 8,589,934,592
-static constexpr const std::int64_t NETLIST_INTERNAL_RES = (static_cast<std::int64_t>(1)<<37); // 137,438,953,472
-// FIXME: Belongs into MAME netlist.h
-static constexpr const std::int32_t NETLIST_CLOCK = (static_cast<std::int64_t>(1)<<30); // 1,073,741,824
-#endif
+static constexpr const auto NETLIST_INTERNAL_RES = 10'000'000'000ll;
 
+/// \brief Recommended clock to be used
+///
+/// This is the recommended clock to be used in fixed clock applications limited
+/// to 32 bit clock resolution. The MAME code (netlist.cpp) contains code
+/// illustrating how to deal with remainders if \ref NETLIST_INTERNAL_RES is
+/// bigger than NETLIST_CLOCK.
+
+static constexpr const int NETLIST_CLOCK = 1'000'000'000;
 
 /// \brief  Floating point types used
 ///
