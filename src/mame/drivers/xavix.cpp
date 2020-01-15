@@ -1608,7 +1608,7 @@ void xavix_cart_state::xavix_cart_evio(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list_evio").set_original("evio");
 }
 
-void xavix_cart_gcslottv::xavix_cart_gcslottv(machine_config &config)
+void xavix_cart_gcslottv_state::xavix_cart_gcslottv(machine_config &config)
 {
 	xavix_cart(config);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);

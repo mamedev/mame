@@ -753,7 +753,7 @@ class xavix_cart_state : public xavix_state
 {
 public:
 	xavix_cart_state(const machine_config &mconfig, device_type type, const char *tag) :
-		xavix_state(mconfig, type, tag)
+		xavix_state(mconfig, type, tag),
 		m_cartslot(*this, "cartslot")
 	{ 
 		m_cartlimit = 0x400000;
