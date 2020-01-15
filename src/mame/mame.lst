@@ -10007,9 +10007,11 @@ quizard2                        // (c) TAB Austria 1995
 quizard2_22                     // (c) TAB Austria 199?
 quizard3                        // (c) TAB Austria 1996
 quizard3_32                     // (c) TAB Austria 1996
+quizard3a                       // (c) TAB Austria 1996
 quizard4                        // (c) TAB Austria 1998
 quizard4_40                     // (c) TAB Austria 1997
 quizard4_41                     // (c) TAB Austria 1998
+quizard4cz                      // (c) TAB Austria 1998
 
 @source:cdsys5.cpp
 minijook                        //
