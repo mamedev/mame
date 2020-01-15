@@ -773,7 +773,7 @@ protected:
 	{
 		if (offset & 0x8000)
 		{
-			if ((offset & 0xffffff) >= m_cartlimit)
+			if (offset & m_cartlimit)
 			{
 				return m_rgn[(offset) & (m_rgnlen - 1)];
 			}
@@ -797,7 +797,7 @@ protected:
 
 	virtual uint8_t opcodes_800000_r(offs_t offset) override
 	{
-		if ((offset & 0xffffff) >= m_cartlimit)
+		if (offset & m_cartlimit)
 		{
 			return m_rgn[(offset) & (m_rgnlen - 1)];
 		}
@@ -840,7 +840,7 @@ protected:
 		}
 		else
 		{
-			if ((offset & 0xffffff) >= m_cartlimit)
+			if (offset & m_cartlimit)
 			{
 				return m_rgn[(offset) & (m_rgnlen - 1)];
 			}
@@ -883,7 +883,7 @@ protected:
 
 		if (databank >= 0x80)
 		{
-			if ((offset & 0xffffff) >= m_cartlimit)
+			if (offset & m_cartlimit)
 			{
 				return m_rgn[(offset) & (m_rgnlen - 1)];
 			}
@@ -903,7 +903,7 @@ protected:
 		{
 			if ((offset & 0xffff) >= 0x8000)
 			{
-				if ((offset & 0xffffff) >= m_cartlimit)
+				if (offset & m_cartlimit)
 				{
 					return m_rgn[(offset) & (m_rgnlen - 1)];
 				}
