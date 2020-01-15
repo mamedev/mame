@@ -1756,18 +1756,28 @@ INPUT_PORTS_END
  *
  *************************************/
 
+void jaguar_state::video_config(machine_config &config, const XTAL clock)
+{
+	JAGUARGPU(config, m_gpu, clock);
+	m_gpu->irq().set(FUNC(jaguar_state::gpu_cpu_int));
+
+	JAGUARDSP(config, m_dsp, clock);
+	m_dsp->irq().set(FUNC(jaguar_state::dsp_cpu_int));
+	
+	// TODO: Tom 
+	// TODO: Object Processor
+	
+	JAG_BLITTER(config, m_blitter, clock);
+}
+
 void jaguar_state::cojagr3k(machine_config &config)
 {
 	/* basic machine hardware */
 	R3041(config, m_maincpu, R3000_CLOCK).set_endianness(ENDIANNESS_BIG);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::r3000_map);
 
-	JAGUARGPU(config, m_gpu, COJAG_CLOCK/2);
-	m_gpu->irq().set(FUNC(jaguar_state::gpu_cpu_int));
+	video_config(config, COJAG_CLOCK/2);
 	m_gpu->set_addrmap(AS_PROGRAM, &jaguar_state::gpu_map);
-
-	JAGUARDSP(config, m_dsp, COJAG_CLOCK/2);
-	m_dsp->irq().set(FUNC(jaguar_state::dsp_cpu_int));
 	m_dsp->set_addrmap(AS_PROGRAM, &jaguar_state::dsp_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
@@ -1795,6 +1805,8 @@ void jaguar_state::cojagr3k(machine_config &config)
 	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
+	
+	// TODO: subwoofer speaker
 }
 
 void jaguar_state::cojagr3k_rom(machine_config &config)
@@ -1824,12 +1836,8 @@ void jaguar_state::jaguar(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::jaguar_map);
 	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &jaguar_state::cpu_space_map);
 
-	JAGUARGPU(config, m_gpu, JAGUAR_CLOCK);
-	m_gpu->irq().set(FUNC(jaguar_state::gpu_cpu_int));
+	video_config(config, JAGUAR_CLOCK);
 	m_gpu->set_addrmap(AS_PROGRAM, &jaguar_state::jag_gpu_dsp_map);
-
-	JAGUARDSP(config, m_dsp, JAGUAR_CLOCK);
-	m_dsp->irq().set(FUNC(jaguar_state::dsp_cpu_int));
 	m_dsp->set_addrmap(AS_PROGRAM, &jaguar_state::jag_gpu_dsp_map);
 
 //  MCFG_NVRAM_HANDLER(jaguar)
