@@ -67,7 +67,7 @@ void teamjocs_state::teamjocs(machine_config &config)
 
 }
 
-ROM_START(teamjocs)
+ROM_START(diaelite)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "elite_3_4_6_pic17c44.ic7", 0x0000, 0x8000, NO_DUMP )
 
@@ -79,4 +79,4 @@ ROM_START(teamjocs)
 ROM_END
 
 
-GAME(199?, teamjocs,         0, teamjocs, teamjocs, teamjocs_state, empty_init, ROT0, "Recreativos Presas", "Team Jocs", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(199?, diaelite, 0, teamjocs, teamjocs, teamjocs_state, empty_init, ROT0, "Recreativos Presas", "Diana Elite", MACHINE_IS_SKELETON_MECHANICAL)
