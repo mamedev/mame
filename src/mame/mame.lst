@@ -39795,6 +39795,7 @@ jak_capb                        //
 jak_spdmo                       //
 conyteni                        //
 conyping                        //
+conyfght
 
 @source:vii.cpp
 jak_batm                        // The Batman, 2004
@@ -39840,6 +39841,7 @@ taikeegr                        //
 shredmjr                        //
 sentx6p                         //
 telestry                        //
+wiwi18                          //
 
 @source:vsmile.cpp
 vsmile                          //
