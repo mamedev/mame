@@ -9878,4 +9878,154 @@
 		</part>
 	</software>
 
+	<software name="wzdryr21">
+		<description>Wizardry: Proving Grounds of the Mad Overlord (Version 2.1)</description>
+		<year>1981</year>
+		<publisher>Sir-Tech</publisher>
+		<info name="release" value="2020-01-11"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--  Note: some emulators may have difficulty loading this disk
+		because of its especially timing-sensitive copy protection.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Boot disk"/>
+			<dataarea name="flop" size="234829">
+				<rom name="wizardry - proving grounds of the mad overlord v2.1 - boot disk.woz" size="234829" crc="29dfa2a6" sha1="6c0416fb7cb91bde8da05df77ecfc5f7b7c645f1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Scenario master disk"/>
+			<dataarea name="flop" size="234829">
+				<rom name="wizardry - proving grounds of the mad overlord v2.1 - scenario master disk.woz" size="234829" crc="7951ca26" sha1="604a416c50ca6fccb39c11142f8be00d51ce627c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wzrdry2">
+		<description>Wizardry II: The Knight of Diamonds (Version PV3S2V1/10-MAR-82)</description>
+		<year>1982</year>
+		<publisher>Sir-Tech</publisher>
+		<info name="release" value="2020-01-11"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!-- This is version PV3S2V1 of 10-MAR-82. 
+		Note: some emulators may have difficulty loading this disk because of 
+		its especially timing-sensitive copy protection.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Boot disk"/>
+			<dataarea name="flop" size="234854">
+				<rom name="wizardry ii - knight of diamonds - boot disk.woz" size="234854" crc="16a794a8" sha1="db098051302810edb8aa5c56c8a3dd7cc9ab0772"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Master scenario disk"/>
+			<dataarea name="flop" size="234865">
+				<rom name="wizardry ii - knight of diamonds - master scenario disk.woz" size="234865" crc="ac3a27d9" sha1="59f7c602c6347c732ddd8222d667622bf8749a29"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizipr21">
+		<description>Wiziprint (Version 2.1)</description>
+		<year>1982</year>
+		<publisher>Sir-Tech</publisher>
+		<info name="release" value="2020-01-13"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234840">
+				<rom name="wiziprint v2.01.woz" size="234840" crc="593dc847" sha1="d8628dbce3441820cbbd2ef4ac5a94421e514226"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tramazon">
+		<description>Amazon</description>
+		<year>1984</year>
+		<publisher>Trillium</publisher>
+		<info name="release" value="2020-01-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="234765">
+				<rom name="amazon side 1.woz" size="234765" crc="3b40f777" sha1="423b5ac50f78b437147fd8dbe9eda9e4d47759b7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="234765">
+				<rom name="amazon side 2.woz" size="234765" crc="99779f7b" sha1="3fb413d6e6600257d4a28fcf0f3af7c72b3548ad"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3 (Boot)"/>
+			<dataarea name="flop" size="234765">
+				<rom name="amazon side 3 (boot).woz" size="234765" crc="0e5a0504" sha1="2728aa48758297ad385fa49f30353a49e62bd888"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side 4"/>
+			<dataarea name="flop" size="234765">
+				<rom name="amazon side 4.woz" size="234765" crc="41ed7aa5" sha1="0b3d7c70f1ed66366ea57d20c0846fb92be4fc0d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lrdskrma">
+		<description>Lords of Karma</description>
+		<year>1981</year>
+		<publisher>Avalon Hill</publisher>
+		<info name="release" value="2020-01-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234768">
+				<rom name="lords of karma.woz" size="234768" crc="36d0b276" sha1="cda44968d7b4902af648fbb04597ea50b1b7947a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xyphus">
+		<description>Xyphus</description>
+		<year>1984</year>
+		<publisher>Penguin Software</publisher>
+		<info name="release" value="2020-01-14"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="121619">
+				<rom name="xyphus - program disk.woz" size="121619" crc="9126e743" sha1="04d5ad0a6a547cc672769f0512d374072ad0d950"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Scenario disk"/>
+			<dataarea name="flop" size="221460">
+				<rom name="xyphus - scenario disk.woz" size="221460" crc="081fa985" sha1="116c2cdd0240393c2920c665fc0a251e6d5b8bf5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ochess70">
+		<description>Chess (Odesta) (Version 7.0)</description>
+		<year>1982</year>
+		<publisher>Odesta Software</publisher>
+		<info name="release" value="2020-01-14"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Chess" is a 1982 board game by Larry Atkin and distributed by Odesta Software. This is version 7.0. It runs on any Apple ][ with 48K.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234821">
+				<rom name="chess v7.0 (odesta).woz" size="234821" crc="dea3482d" sha1="40d127ba91d83be331a266e4f7d9727baeb78711"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
