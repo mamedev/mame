@@ -131,7 +131,7 @@ namespace netlist
 
 		NETLIB_HANDLERI(updB)
 		{
-			auto cnt = (++m_bcd &= 0x07);
+			const auto cnt(++m_bcd &= 0x07);
 			m_QD.push((cnt >> 2) & 1, out_delay3);
 			m_QC.push((cnt >> 1) & 1, out_delay2);
 			m_QB.push(cnt & 1, out_delay);
