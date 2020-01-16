@@ -84,10 +84,14 @@ public:
 
 	static constexpr const unsigned MDIV_SHIFT = 16;
 
+	netlist::netlist_time_ext nltime_ext_from_clocks(unsigned c) const noexcept
+	{
+		return (m_div * c).shr(MDIV_SHIFT);
+	}
+
 	netlist::netlist_time nltime_from_clocks(unsigned c) const noexcept
 	{
-		//return (m_div * c + netlist::netlist_time::from_raw((1 << MDIV_SHIFT) - 1)).shr(MDIV_SHIFT);
-		return (m_div * c).shr(MDIV_SHIFT);
+		return static_cast<netlist::netlist_time>((m_div * c).shr(MDIV_SHIFT));
 	}
 
 protected:
