@@ -17,11 +17,11 @@
  |   |   |      | IC1   |   |   |       |
  |   |IC4|      |       |   |   |       |
  |   |___|      |_______|   |___|       |
- |
- | SW2
- |______________________________________
+ |                                      |
+ | SW2                                  |
+ |______________________________________|
  
- IC1 = Hitachi H8/328 (24K-byte internal ROM + 1k-byte RAM)
+ IC1 = Hitachi H8/328 (24K-byte internal ROM + 1K-byte RAM)
  IC2 = Hitachi HG62G010R21FBN Gate Array (low gatecount and low I/O-count packages)
  IC3 = Hitachi HM62256LFP-10T 256kbit CMOS SRAM
  IC4 = BA10324AF Ground Sense Operational Amplifier
@@ -30,9 +30,7 @@
 
  TODO: cartridge pinouts / information
 
-
  NOTE: cartridge dumps contain boot vectors so Internal ROM likely only used when no cartridge is present
-
 
 ******************************************************************************************************************************/
 
