@@ -38341,6 +38341,9 @@ tceptor2                        // (c) 1986
 @source:tdv2324.cpp
 tdv2324                         //
 
+@source:teamjocs.cpp
+teamjocs                        //
+
 @source:tec1.cpp
 tec1                            // Talking Electronics Computer
 tecjmon                         // Talking Electronics Computer
