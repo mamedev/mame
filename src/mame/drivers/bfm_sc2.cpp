@@ -7721,7 +7721,7 @@ GAMEL( 1996, sltblgpo,    0,        scorpion2_vid,  sltblgpo, bfm_sc2_vid_state,
 GAMEL( 1996, sltblgp1,    sltblgpo, scorpion2_vid,  sltblgpo, bfm_sc2_vid_state,  init_sltsbelg,    0, "BFM/ELAM", "Slots (Belgian Cash, Game Card 95-752-008)",   MACHINE_SUPPORTS_SAVE,layout_sltblgpo )
 
 GAMEL( 1997, gldncrwn,    0,        scorpion2_vid,  gldncrwn, bfm_sc2_vid_state,  init_gldncrwn,    0, "BFM/ELAM", "Golden Crown (Dutch, Game Card 95-752-011)",   MACHINE_SUPPORTS_SAVE,layout_gldncrwn )
-GAMEL( 1997, gldncrwnhop, gldncrwn, scorpion2_vid,  gldncrwn, bfm_sc2_vid_state,  init_gldncrwn,    0, "BFM/ELAM", "Golden Crown Hopper (Dutch, Game Card)",       MACHINE_SUPPORTS_SAVE,layout_gldncrwn )
+GAMEL( 1997, gldncrwnhop, gldncrwn, scorpion2_vid,  gldncrwn, bfm_sc2_vid_state,  init_gldncrwn,    0, "BFM/ELAM", "Golden Crown Hopper (Dutch, Game Card)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE,layout_gldncrwn ) // SUMCHECK 3 and SUMCHECK 4 errors
 
 /* Non-Video */
 
