@@ -9,7 +9,57 @@
 	G.02 - Dungeon Diver
 	G.03 - Bishoujo Senshi Sailor Moon SS Illustration Club
 	G.04 - Rockman X3 Buster Battle
-	
+
+	Cart info:
+
+	G-Cartridge (GAME):
+
+	        FRONT                        BACK
+	+--------------------+      +--------------------+
+	|  2x18 EDGE-SOCKET  |      |  2x18 EDGE-SOCKET  |
+	+--------------------+      +--------------------+
+	 |                  |        |                  |
+	 |                  |        |                  |
+	 |                  |        |                  |
+	 | +--------+  HC74 |        |                  |
+	 | |1MbitROM|  +--+ |        |                  |
+	 | +--------+  +--+ |        |                  |
+	 |                  |        |                  |
+	 |__________________|        |__________________|
+	 ||||||||||||||||||||        ||||||||||||||||||||
+	1+------------------+18    19+------------------+36
+
+	PINOUT:
+
+	 1|CE_G-Cart  19|NC
+	 2|GND        20|HC74_3&11 -> Clock Signal (CLK)
+	 3|GND        21|A2
+	 4|VCC        22|A3
+	 5|CE_M-Cart  23|A4
+	 6|NC         24|A5
+	 7|OE         25|A6
+	 8|D0         26|A7
+	 9|D1         27|A8
+	10|D2         28|A9
+	11|D3         29|A10
+	12|D4         30|A11
+	13|D5         31|A12
+	14|D6         32|A13
+	15|D7         33|A14
+	16|A0         34|CLK_M-Cart
+	17|A1         35|VCC
+	18|HC74_1&13  36|GND
+
+	HC74:
+	     +--------+
+	 C18-|        |-VCC
+	  D0-|        |-C18
+	 CLK-|        |-D1
+	 VCC-|        |-CLK
+	 A15-|        |-VCC
+	  NC-|        |-A16
+	 GND-|        |-NC
+	     +--------+
 -->
 
 <softwarelist name="bdesignm_game_cart" description="Bandai Design Master 'Game' cartridges">
