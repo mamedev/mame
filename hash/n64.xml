@@ -6270,7 +6270,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NMEE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NMEE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -6298,7 +6298,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-N8ME-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-N8ME-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -6314,7 +6314,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NMDE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NMDE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="12582912">
@@ -6330,7 +6330,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NFLE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NFLE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="12582912">
@@ -6346,7 +6346,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-N2ME-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-N2ME-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="12582912">
@@ -6374,9 +6374,9 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-N9ME-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-N9ME-0" />
-			<feature name="u2" value="[empty]" />
-			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="u1" value="U1 [NUS-N9ME-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="12582912">
@@ -6434,7 +6434,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NMTE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NMTE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
@@ -6518,7 +6518,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NKGE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-03A-01" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NKGE-0]" />
 			<feature name="u2" value="U2 [LH52V246AD]" />
 			<feature name="u3" value="U3 [74LV2416]" />
 			<feature name="u4" value="U4 [CIC-NUS-6103]" />
@@ -6548,7 +6548,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NMFE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-03A-01" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NMFE-0]" />
 			<feature name="u2" value="U2 [LH52V246A]" />
 			<feature name="u3" value="U3 [BU9811]" />
 			<feature name="u4" value="U4 [CIC-NUS-6102]" />
@@ -6560,7 +6560,7 @@ This cart features a RTC, currently unemulated
 	</software>
 
 	<software name="marioglfj" cloneof="marioglf">
-		<description>Mario Golf 64 (Japan, Rev. A)</description>
+		<description>Mario Golf 64 (Japan, rev 1)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NMFJ-JPN"/>
@@ -6588,13 +6588,17 @@ This cart features a RTC, currently unemulated
 	</software>
 
 	<software name="mariokrt">
-		<description>Mario Kart 64 (Europe, Rev. A)</description>
+		<description>Mario Kart 64 (Europe, rev 1)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NKTP-EUR"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NKTP-1]" />
+			<feature name="u2" value="U2 [BK4D-NUS]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="mario kart 64 (europe) (rev a).bin" size="12582912" crc="032625b0" sha1="f18317bfd7fbcaea6cfbfcb9c4ae3c7c7d1d66c7" />
+				<rom name="nus-nktp-1.u1" size="12582912" crc="032625b0" sha1="f18317bfd7fbcaea6cfbfcb9c4ae3c7c7d1d66c7" />
 			</dataarea>
 		</part>
 	</software>
@@ -6612,7 +6616,7 @@ This cart features a RTC, currently unemulated
 	</software>
 
 	<software name="mariokrtj" cloneof="mariokrt">
-		<description>Mario Kart 64 (Japan, Rev. A)</description>
+		<description>Mario Kart 64 (Japan, rev 1)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NKTJ-JPN"/>
@@ -6633,8 +6637,14 @@ This cart features a RTC, currently unemulated
 		<info name="release" value="19961214"/>
 		<info name="alt_title" value="マリオカート64"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-02A-01" />
+			<feature name="u1" value="U1 [NUS-NKTJ-0 02]" />
+			<feature name="u2" value="U2 [NUS-NKTJ-0 12]" />
+			<feature name="u3" value="U3 [BU9850]" />
+			<feature name="u4" value="U4 [CIC-NUS-7102]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="mario kart 64 (japan).bin" size="12582912" crc="4711a9dc" sha1="991d4f714730cdef771ab1e32da5a324388619b7" />
+				<rom name="nus-nktj-0 02.u1" size="8388608" crc="6575dcf7" sha1="9e5e99461236c56c640b3ef2bf11fb8636abc04c" />
+				<rom name="nus-nktj-0 12.u2" size="4194304" crc="9aed2500" sha1="879716e48c99699910702e0fa89c45895a798777" />
 			</dataarea>
 		</part>
 	</software>
@@ -6666,7 +6676,7 @@ This cart features a RTC, currently unemulated
 		<info name="serial" value="NUS-NKTE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NKTE-0]" />
 			<feature name="u2" value="U2 [BU9850]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="12582912">
@@ -6711,9 +6721,9 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 		<info name="serial" value="NUS-CLBE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" /> <!-- Also with NUS-01A-01 -->
-			<feature name="u1" value="NUS-CLBE-0" />
-			<feature name="u2" value="BU9850" /> <!-- Also with [BK4D-NUS] -->
-			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="u1" value="U1 [NUS-CLBE-0]" />
+			<feature name="u2" value="U2 [BU9850]" /> <!-- Also with [BK4D-NUS] -->
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="33554432">
@@ -6769,7 +6779,7 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 		<info name="serial" value="NUS-NMWE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NMWE-0]" />
 			<feature name="u2" value="U2 [BU9850]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="33554432">
@@ -6811,7 +6821,7 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 		<info name="serial" value="NUS-NMVE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NMVE-0]" />
 			<feature name="u2" value="U2 [BK16D]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="33554432">
@@ -8565,8 +8575,14 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NMQP-EUR"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-08A-01" />
+			<feature name="u1" value="U1 [NUS-NMQP-0 02]" />
+			<feature name="u2" value="U2 [NUS-NMQP-0 12]" />
+			<feature name="u3" value="U3 [29L1100KC-15B0]" />
+			<feature name="u4" value="U4 [CIC-NUS-7103A]" />
 			<dataarea name="rom" size="67108864">
-				<rom name="paper mario (europe) (en,fr,de,es).bin" size="67108864" crc="7cab0055" sha1="7f29b70c9cb686ae678beb40b59ee5583b095ff7" />
+				<rom name="NUS-NMQP-0 02.u1" size="33554432" crc="" sha1="" />
+				<rom name="NUS-NMQP-0 02.u1" size="16777216" crc="" sha1="" />
 			</dataarea>
 		</part>
 	</software>
@@ -11424,8 +11440,16 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NALP-EUR"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-03A-01" />
+			<feature name="u1" value="U1 [NUS-NALP-0]" />
+			<feature name="u2" value="U2 [LH52V246A]" />
+			<feature name="u3" value="U3 [74LV2416]" />
+			<feature name="u4" value="U4 [CIC-NUS-7103]" />
+			<feature name="bt1" value="BT1 [CR2032]" />
+			<feature name="cart_model" value="NUS-006(-01)(EUR)" />
+			<feature name="cart_back_label" value="NUS-EUR-1" />
 			<dataarea name="rom" size="33554432">
-				<rom name="super smash bros. (europe) (en,fr,de).bin" size="33554432" crc="7976248c" sha1="a582522c0a09816bf904109e014a970625c06d3c" />
+				<rom name="nus-nalp-0.u1" size="33554432" crc="7976248c" sha1="a582522c0a09816bf904109e014a970625c06d3c" />
 			</dataarea>
 		</part>
 	</software>
@@ -12568,8 +12592,14 @@ clips onto the player's ear.
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NUS-NT2D-NOE" />
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NT2D-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101]" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<feature name="cart_back_label" value="NUS-EUR-1" />
 			<dataarea name="rom" size="33554432">
-				<rom name="turok 2 - seeds of evil (germany).bin" size="33554432" crc="fbe927cc" sha1="1a46b9ca32625bd20c7c8e02ad62ae3273b8790a" />
+				<rom name="nus-nt2d-0.u1" size="33554432" crc="fbe927cc" sha1="1a46b9ca32625bd20c7c8e02ad62ae3273b8790a" />
 			</dataarea>
 		</part>
 	</software>
@@ -12762,7 +12792,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NVLE-USA" />
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NVLE-0]" />
 			<feature name="u2" value="U2 [BU9850]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="8388608">
@@ -13283,15 +13313,15 @@ clips onto the player's ear.
 	</software>
 
 	<software name="wcwvsnwou" cloneof="wcwvsnwo">
-		<description>WCW vs. nWo - World Tour (USA, Rev. A)</description>
+		<description>WCW vs. nWo - World Tour (USA, rev 1)</description>
 		<year>1997</year>
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="NUS-NWNE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-NWNE-1" />
-			<feature name="u2" value="[empty]" />
-			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="u1" value="U1 [NUS-NWNE-1]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="12582912">
@@ -13307,9 +13337,9 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NWNE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-NWNE-0" />
-			<feature name="u2" value="[empty]" />
-			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="u1" value="U1 [NUS-NWNE-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="12582912">
