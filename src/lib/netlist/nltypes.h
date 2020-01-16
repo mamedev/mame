@@ -106,8 +106,8 @@ namespace netlist
 #else
 	using netlist_time = plib::ptime<std::int64_t, NETLIST_INTERNAL_RES>;
 	using netlist_time_ext = netlist_time;
-	static_assert(noexcept(netlist_time::from_nsec(1)) == true, "Not evaluated as constexpr");
 #endif
+	static_assert(noexcept(netlist_time::from_nsec(1)) == true, "Not evaluated as constexpr");
 
 	//============================================================
 	//  MACROS
