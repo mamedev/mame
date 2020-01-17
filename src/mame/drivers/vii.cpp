@@ -4456,4 +4456,4 @@ CONS( 200?, wiwi18,  0,        0, rad_skat, wiwi18,  spg2xx_game_state, init_wiw
 // PDC 200
 
 // This was dumped from an Anncia branded unit, although there's no ingame branding, so ROM is probably the same for all PDC100 units
-CONS( 2008, pdc100,  0,        0, pdc100, pdc100,  spg2xx_pdc100_game_state, empty_init, "Conny",      "PDC100 - Portable Dream Console", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, pdc100,  0,        0, pdc100, pdc100,  spg2xx_pdc100_game_state, empty_init, "Conny",      "PDC100 - Pocket Dream Console", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
