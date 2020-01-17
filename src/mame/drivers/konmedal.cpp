@@ -84,10 +84,6 @@ private:
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(control2_w);
-	READ8_MEMBER(inputs_r)
-	{
-		return 0xff;
-	}
 
 	uint32_t screen_update_konmedal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_shuriboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -126,7 +122,6 @@ private:
 	required_ioport m_outport;
 
 	u8 m_control, m_control2, m_shuri_irq;
-	u32 m_vrom_base;
 	int m_ccu_int_time, m_ccu_int_time_count;
 };
 
@@ -436,7 +431,6 @@ MACHINE_START_MEMBER(konmedal_state, shuriboy)
 
 void konmedal_state::machine_reset()
 {
-	m_vrom_base = 0;
 	m_control = m_control2 = m_shuri_irq = 0;
 	m_ccu_int_time_count = 0;
 	m_ccu_int_time = 31;
