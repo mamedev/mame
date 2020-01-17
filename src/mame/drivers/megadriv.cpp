@@ -1006,6 +1006,8 @@ ROM_START( megacdj )
 	// EEPROM had no SEGA's label, might be 14088(no rev) or 14088A
 	ROM_SYSTEM_BIOS(5, "v100c", "v1.00C")   // CRC: c3b60c13 when byteswapped
 	ROMX_LOAD( "100c.bin",       0x000000,  0x020000, CRC(41af44c4) SHA1(f30d109d1c2f7c9feaf38600c65834261db73d1f), ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS(6, "v111", "v1.11")   // CRC: e0a6179b when byteswapped
+	ROMX_LOAD( "mpr-14837.bin",  0x000000,  0x020000, CRC(4be18ff6) SHA1(204758d5a64c24e96e1a9fe6bd82e1878fef7ade), ROM_BIOS(6) )
 ROM_END
 
 /* Asia bios, when run in USA region will show :
