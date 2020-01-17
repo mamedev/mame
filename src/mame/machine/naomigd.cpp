@@ -1070,13 +1070,12 @@ ROM_START( dimm )
 
 	// dynamically filled with data
 	ROM_REGION(0x1000, "pic", ROMREGION_ERASE00)
-	// filled with test data until actual dumps of serial memories are available
-	ROM_REGION(0x80, "i2c_0", ROMREGION_ERASE00)
-	ROM_FILL(0, 1, 0x40) ROM_FILL(1, 1, 0x00) ROM_FILL(2, 1, 0x01) ROM_FILL(3, 1, 0x02) ROM_FILL(4, 1, 0x03)
-	ROM_REGION(0x80, "i2c_1", ROMREGION_ERASE00)
-	ROM_FILL(0, 1, 0x40) ROM_FILL(1, 1, 0x80) ROM_FILL(2, 1, 0x81) ROM_FILL(3, 1, 0x82) ROM_FILL(4, 1, 0x83)
+	ROM_REGION(0x100, "i2c_0", ROMREGION_ERASE00)
+	ROM_LOAD("dimmspd.bin", 0x00, 0x100, CRC(ad3bf001) SHA1(462290324b02ae87416381e24491319f35033ae3))
+	ROM_REGION(0x100, "i2c_1", ROMREGION_ERASE00)
+	ROM_LOAD("dimmspd.bin", 0x00, 0x100, CRC(ad3bf001) SHA1(462290324b02ae87416381e24491319f35033ae3))
 	ROM_REGION(0x80, "eeprom", ROMREGION_ERASE00)
-	ROM_FILL(0, 1, 'M') ROM_FILL(1, 1, 'A') ROM_FILL(2, 1, 'M') ROM_FILL(3, 1, 'E') ROM_FILL(4, 12, 0x20)
+	ROM_LOAD("93c46.bin", 0x00, 0x80, CRC(daafbccd) SHA1(1e39983779a62ebc6801ec6f2a5138717a7a5259))
 ROM_END
 
 const tiny_rom_entry *naomi_gdrom_board::device_rom_region() const
