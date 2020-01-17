@@ -35,7 +35,6 @@ Canceled games (possibly never got to the proto stage)
 	Mario Kart 64 (demo)                       DIS-NUS-NKTE-USA
 	Mario Party 2 (demo)                       DIS-NUS-NMWE-USA
 	Mario Party 3 (demo)                       DIS-NUS-NMVE-USA
-	Mario Tennis (demo)                        DIS-NUS-NMBE-USA
 	Nintendo 64 Test Cartridge                 http://www.nesworld.com/n64demo-game.php?gamegeneral=n64test&gameid=31
 	Perfect Dark (demo)                        DIS-NUS-NPDE-USA
 	Pokemon Stadium (demo)                     DIS-NUS-NP0E-USA
@@ -6403,11 +6402,22 @@ This cart features a RTC, currently unemulated
 		</part>
 	</software>
 
+	<software name="madden99p" cloneof="madden99">
+		<description>Madden NFL 99 (USA, prototype 19980805, "Beta 10 NTSC")</description>
+		<year>1998</year>
+		<publisher>Electronic Arts</publisher>
+´		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="16777216">
+				<rom name="madden-99-n64-proto.bin" size="16777216" crc="e7f33cc8" sha1="4f38e57f5f6d0a0406b074d9b5473c3fe99a0f32" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mtetrisc">
 		<description>Magical Tetris Challenge (Europe)</description>
 		<year>1999</year>
 		<publisher>Capcom</publisher>
-		<info name="serial" value="NUS-NMTP-EUR"/>
+		<info name="serial" value="NUS-NMTP-EUR, NUS-NMTP-UKV"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="magical tetris challenge (europe).bin" size="16777216" crc="bf53bf3d" sha1="4885e3951584032fb0254cbbdba9961c45c3d10f" />
@@ -6604,10 +6614,10 @@ This cart features a RTC, currently unemulated
 	</software>
 
 	<software name="mariokrt1" cloneof="mariokrt">
-		<description>Mario Kart 64 (Europe)</description>
+		<description>Mario Kart 64 (Australia, Europe)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NUS-NKTP-EUR"/>
+		<info name="serial" value="NUS-NKTP-AUS, NUS-NKTP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="mario kart 64 (europe).bin" size="12582912" crc="6787e212" sha1="f1324f0a316ed895a92097b949e3aa74aefedda5" />
@@ -6623,8 +6633,14 @@ This cart features a RTC, currently unemulated
 		<info name="release" value="19961214"/>
 		<info name="alt_title" value="マリオカート64"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NKTJ-1]" />
+			<feature name="u2" value="U2 [BK4D-NUS]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="12582912">
-				<rom name="mario kart 64 (japan) (rev a).bin" size="12582912" crc="26450aab" sha1="42769bc9467df9a517a88e28f9ce2b6956a7a15f" />
+				<rom name="nus-nktj-1.u1" size="12582912" crc="26450aab" sha1="42769bc9467df9a517a88e28f9ce2b6956a7a15f" />
 			</dataarea>
 		</part>
 	</software>
@@ -6641,7 +6657,7 @@ This cart features a RTC, currently unemulated
 			<feature name="u1" value="U1 [NUS-NKTJ-0 02]" />
 			<feature name="u2" value="U2 [NUS-NKTJ-0 12]" />
 			<feature name="u3" value="U3 [BU9850]" />
-			<feature name="u4" value="U4 [CIC-NUS-7102]" />
+			<feature name="u4" value="U4 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
 				<rom name="nus-nktj-0 02.u1" size="8388608" crc="6575dcf7" sha1="9e5e99461236c56c640b3ef2bf11fb8636abc04c" />
 				<rom name="nus-nktj-0 12.u2" size="4194304" crc="9aed2500" sha1="879716e48c99699910702e0fa89c45895a798777" />
@@ -6860,10 +6876,10 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 		<description>Mario Tennis (USA)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NUS-NM8E-USA"/>
+		<info name="serial" value="NUS-NM8E-USA, DIS-NUS-NM8E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NM8E-0]" />
 			<feature name="u2" value="U2 [BK16D]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
@@ -6921,7 +6937,7 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 		<info name="serial" value="NUS-NHME-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NHME-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
@@ -6975,7 +6991,7 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 		<info name="serial" value="NUS-NMLE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NMLE-0]" />
 			<feature name="u2" value="U2 [BU9850]" />
 			<feature name="u3" value="U3 [CIC-NUS-6105A]" />
 			<dataarea name="rom" size="33554432">
@@ -7003,7 +7019,7 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 		<info name="serial" value="NUS-NV3E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NV3E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -7019,7 +7035,7 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 		<info name="serial" value="NUS-NAIE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NAIE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="4194304">
@@ -7035,7 +7051,7 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 		<info name="serial" value="NUS-NMBE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NMBE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -7063,7 +7079,7 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 		<info name="serial" value="NUS-NBRE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NBRE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="4194304">
@@ -7096,7 +7112,7 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 	</software>
 
 	<software name="mischiefu" cloneof="mischief">
-		<description>Mischief Makers (USA, Rev. A)</description>
+		<description>Mischief Makers (USA, rev 1)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NTME-USA"/>
@@ -7114,7 +7130,7 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 		<info name="serial" value="NUS-NTME-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NTME-0]" />
 			<feature name="u2" value="U2 [BU9850]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
@@ -7124,7 +7140,7 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 	</software>
 
 	<software name="missimp">
-		<description>Mission Impossible (Europe)</description>
+		<description>Mission: Impossible (Europe)</description>
 		<year>1998</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="NUS-NMIP-UKV"/>
@@ -7136,7 +7152,7 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 	</software>
 
 	<software name="missimpf" cloneof="missimp">
-		<description>Mission Impossible (France)</description>
+		<description>Mission: Impossible (France)</description>
 		<year>1998</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="NUS-NMIF-FRA"/>
@@ -7148,7 +7164,7 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 	</software>
 
 	<software name="missimpg" cloneof="missimp">
-		<description>Mission Impossible (Germany)</description>
+		<description>Mission: Impossible (Germany)</description>
 		<year>1998</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="NUS-NMID-NOE"/>
@@ -7160,7 +7176,7 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 	</software>
 
 	<software name="missimpi" cloneof="missimp">
-		<description>Mission Impossible (Italy)</description>
+		<description>Mission: Impossible (Italy)</description>
 		<year>1998</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="NUS-NMII-ITA"/>
@@ -7172,7 +7188,7 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 	</software>
 
 	<software name="missimps" cloneof="missimp">
-		<description>Mission Impossible (Spain)</description>
+		<description>Mission: Impossible (Spain)</description>
 		<year>1998</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="NUS-NMIS-ESP"/>
@@ -7190,7 +7206,7 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 		<info name="serial" value="NUS-NMIS-ESP"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NMIS-1]" />
 			<feature name="u2" value="U2 [BU9850]" />
 			<feature name="u3" value="U3 [CIC-NUS-7101]" />
 			<feature name="cart_model" value="NUS-006(EUR)" />
@@ -7202,15 +7218,15 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 	</software>
 
 	<software name="missimpu" cloneof="missimp">
-		<description>Mission Impossible (USA)</description>
+		<description>Mission: Impossible (USA)</description>
 		<year>1998</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="NUS-NMIE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-NMIE-0" />
-			<feature name="u2" value="BU9850" />
-			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="u1" value="U1 [NUS-NMIE-0]" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="12582912">
@@ -7226,7 +7242,7 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 		<info name="serial" value="NUS-NMGE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NMGE-0]" />
 			<feature name="u2" value="U2 [BK4D-NUS]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -7239,7 +7255,7 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 		<description>Monaco Grand Prix - Racing Simulation 2 (Europe)</description>
 		<year>1999</year>
 		<publisher>Ubi Soft</publisher>
-		<info name="serial" value="NUS-NMGP-(UKV,FAH)"/>
+		<info name="serial" value="NUS-NMGP-FAH, NUS-NMGP-UKV"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="monaco grand prix - racing simulation 2 (europe) (en,fr,es,it).bin" size="16777216" crc="0a54fdf0" sha1="bd25283c98fc1915c07f4ee9ce58820c1d4a44b2" />
@@ -7254,7 +7270,7 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 		<info name="serial" value="NUS-NMOE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NMOE-0]" />
 			<feature name="u2" value="U2 [BU9850]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="8388608">
@@ -7270,9 +7286,9 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 		<info name="serial" value="NUS-NM3P-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-NM3P-0" />
-			<feature name="u2" value="[empty]" />
-			<feature name="u3" value="CIC-NUS-7101" />
+			<feature name="u1" value="U1 [NUS-NM3P-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101]" />
 			<feature name="cart_model" value="NUS-006(EUR)" />
 			<dataarea name="rom" size="8388608">
 				<rom name="nus-nm3p-0.u1" size="8388608" crc="ce6779fb" sha1="42f1702360e5381b0c94912ae3b5bb092c04297c" />
@@ -7286,8 +7302,14 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 		<publisher>Rockstar Games</publisher>
 		<info name="serial" value="NUS-NM3E-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NM3E-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN" />
 			<dataarea name="rom" size="8388608">
-				<rom name="monster truck madness 64 (usa).bin" size="8388608" crc="b8d03ffb" sha1="f7e66b1eb2905df6c6dfadf1593064fc6d592c17" />
+				<rom name="nus-nm3e-0.u1" size="8388608" crc="b8d03ffb" sha1="f7e66b1eb2905df6c6dfadf1593064fc6d592c17" />
 			</dataarea>
 		</part>
 	</software>
@@ -7337,9 +7359,9 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NM4E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-NM4E-0" />
-			<feature name="u2" value="" /><!-- blank slot -->
-			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="u1" value="U1 [NUS-NM4E-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="16777216">
@@ -7367,7 +7389,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NMYE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NMYE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
@@ -7389,7 +7411,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 	</software>
 
 	<software name="mktrilgyu" cloneof="mktrilgy">
-		<description>Mortal Kombat Trilogy (USA, Rev. B)</description>
+		<description>Mortal Kombat Trilogy (USA, rev 2)</description>
 		<year>1996</year>
 		<publisher>Midway</publisher>
 		<info name="serial" value="NUS-NMKE-USA"/>
@@ -7453,7 +7475,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<description>MRC - Multi Racing Championship (Europe)</description>
 		<year>1997</year>
 		<publisher>Ocean</publisher>
-		<info name="serial" value="NUS-NMRP-EUR"/>
+		<info name="serial" value="NUS-NMRP-EUR, NUS-NMRP-SCN"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="mrc - multi racing championship (europe) (en,fr,de).bin" size="12582912" crc="9c7d29ec" sha1="6c00683512f99da0db25e22833b8369270a3a044" />
@@ -7482,7 +7504,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NMRE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NMRE-0]" />
 			<feature name="u2" value="U2 [BU9850]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -7498,7 +7520,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NP9E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NP9E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -7523,7 +7545,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<description>Mystical Ninja Starring Goemon (Europe)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
-		<info name="serial" value="NUS-NG5P-(EUR,EUU)"/>
+		<info name="serial" value="NUS-NG5P-EUR, NUS-NG5P-EUU"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="mystical ninja starring goemon (europe).bin" size="16777216" crc="7dfe2e7a" sha1="3eb67f551791aa84ec2524c7a00b53dfd24b11ee" />
@@ -7538,7 +7560,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NG5E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NG5E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
@@ -8581,8 +8603,8 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 			<feature name="u3" value="U3 [29L1100KC-15B0]" />
 			<feature name="u4" value="U4 [CIC-NUS-7103A]" />
 			<dataarea name="rom" size="67108864">
-				<rom name="NUS-NMQP-0 02.u1" size="33554432" crc="" sha1="" />
-				<rom name="NUS-NMQP-0 02.u1" size="16777216" crc="" sha1="" />
+				<rom name="nus-nmqp-0 02.u1" size="33554432" crc="68f7101c" sha1="c82851bd21e31a59fd63ca3af19801816eebfde9" />
+				<rom name="nus-nmqp-0 02.u1" size="16777216" crc="d5f2e57d" sha1="586217209dcd4de1448594eef6e3f51f785cfc14" />
 			</dataarea>
 		</part>
 	</software>
