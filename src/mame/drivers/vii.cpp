@@ -236,6 +236,23 @@ protected:
 	optional_device<i2cmem_device> m_i2cmem;
 };
 
+
+class spg2xx_pdc100_game_state : public spg2xx_game_state
+{
+public:
+	spg2xx_pdc100_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag)
+	{ }
+
+	void pdc100(machine_config& config);
+
+protected:
+	//virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	DECLARE_WRITE16_MEMBER(porta_w);
+};
+
 class wireless60_state : public spg2xx_game_state
 {
 public:
@@ -2563,6 +2580,28 @@ static INPUT_PORTS_START( telestory ) // there is a hidden test mode, if you ret
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( pdc100 )
+	PORT_START("P1")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Left Trigger")
+	PORT_BIT( 0x0e00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Right Trigger")
+	PORT_BIT( 0xe000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Pause")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
 
 READ16_MEMBER(dreamlif_state::portb_r)
 {
@@ -2835,6 +2874,18 @@ void spg2xx_game_state::machine_reset()
 	m_maincpu->reset();
 }
 
+void spg2xx_pdc100_game_state::machine_reset()
+{
+	m_current_bank = -1;
+	switch_bank(7); // must boot from upper bank
+	m_maincpu->reset();
+}
+
+WRITE16_MEMBER(spg2xx_pdc100_game_state::porta_w)
+{
+	//logerror("%s: porta_w %04x\n", machine().describe_context(), data);
+	switch_bank(data & 0x0007);
+}
 
 
 void wireless60_state::machine_start()
@@ -3462,6 +3513,16 @@ void spg2xx_game_state::taikeegr(machine_config &config)
 	m_maincpu->porta_in().set_ioport("P1");
 //  m_maincpu->portb_in().set_ioport("P2");
 //  m_maincpu->portc_in().set_ioport("P3");
+}
+
+
+void spg2xx_pdc100_game_state::pdc100(machine_config &config)
+{
+	non_spg_base(config);
+	m_maincpu->porta_out().set(FUNC(spg2xx_pdc100_game_state::porta_w));
+	m_maincpu->porta_in().set_ioport("P1");
+	m_maincpu->portb_in().set_ioport("P2");
+	m_maincpu->portc_in().set_ioport("P3"); // not used?
 }
 
 // Shredmaster Jr uses the same input order as the regular Taikee Guitar, but reads all inputs through a single multplexed bit
@@ -4143,6 +4204,11 @@ ROM_START( wiwi18 )
 	ROM_LOAD16_WORD_SWAP( "26gl128.bin", 0x000000, 0x1000000, CRC(0b103ac9) SHA1(14434908f429942096fb8db5b5630603fd54fb2c) )
 ROM_END
 
+ROM_START( pdc100 )
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "pdc100.bin", 0x000000, 0x4000000, CRC(0a1d99d4) SHA1(984d05122f77cd2ac9b9f6988a67ab718efb01a4) )
+ROM_END
+
 
 ROM_START( sentx6p )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
@@ -4377,3 +4443,17 @@ CONS( 2004, sentx6p,    0,     0,        sentx6p,     sentx6p, sentx6p_state, em
 // actually a cartridge, but all hardware is in the cart, overriding any internal hardware entirely.  see nes_vt.cp 'mc_sp69' for the '69 arcade game' part
 CONS( 200?, wiwi18,  0,        0, rad_skat, wiwi18,  spg2xx_game_state, init_wiwi18, "Hamy System",      "WiWi 18-in-1 Sports Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
+// Conny devices
+
+// there were older models eg. PDC30 with fewer games, and some differences (eg "Jo Ma" instead of "Jo Ma 2")
+// "Jo Ma 2" shows "Licensed by Mitchell Corporation" (Mitchell made the original Puzzloop on which this style of game is based)  Videos of the original Jo Ma show it lacking this text.
+
+// Other known units
+// PDC Teenage Mutant Ninja Turtles
+// PDC Dora the Explorer
+// PDC 30
+// PDC 40
+// PDC 200
+
+// This was dumped from an Anncia branded unit, although there's no ingame branding, so ROM is probably the same for all PDC100 units
+CONS( 2008, pdc100,  0,        0, pdc100, pdc100,  spg2xx_pdc100_game_state, empty_init, "Conny",      "PDC100 - Portable Dream Console", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
