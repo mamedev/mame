@@ -22,7 +22,7 @@ private:
 
 	// internal helpers
 	void format_signed(std::ostream &stream, s32 x);
-	void dasm_am(std::ostream &stream, offs_t &pc, const data_buffer &opcodes, u8 n, bool dst);
+	void dasm_am(std::ostream &stream, offs_t &pc, const data_buffer &opcodes, u8 n, bool dst, bool spectype);
 	void dasm_src(std::ostream &stream, offs_t &pc, const data_buffer &opcodes);
 	void dasm_srcw(std::ostream &stream, offs_t &pc, const data_buffer &opcodes);
 	void dasm_dst(std::ostream &stream, offs_t &pc, const data_buffer &opcodes);
