@@ -35,9 +35,10 @@ K051649 (sound)
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/eepromser.h"
-#include "machine/gen_latch.h"
+#include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "machine/timer.h"
+#include "machine/k053252.h"
 #include "sound/ymz280b.h"
 #include "sound/okim6295.h"
 #include "sound/k051649.h"
@@ -56,11 +57,14 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_k056832(*this, "k056832"),
+		m_k053252(*this, "k053252"),
 		m_k052109(*this, "k052109"),
 		m_palette(*this, "palette"),
 		m_ymz(*this, "ymz"),
 		m_oki(*this, "oki"),
-		m_upd7759(*this, "upd7759")
+		m_upd7759(*this, "upd7759"),
+		m_nvram(*this, "nvram"),
+		m_outport(*this, "OUT")
 	{ }
 
 	void shuriboy(machine_config &config);
@@ -71,11 +75,13 @@ public:
 
 private:
 	void konmedal_palette(palette_device &palette) const;
+	void shuriboy_nvram_init(nvram_device &nvram, void *base, size_t size);
+	void fuusenpn_nvram_init(nvram_device &nvram, void *base, size_t size);
+	void mario_nvram_init(nvram_device &nvram, void *base, size_t size);
 	DECLARE_MACHINE_START(shuriboy);
 
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(magic_r);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(control2_w);
 	READ8_MEMBER(inputs_r)
@@ -88,11 +94,14 @@ private:
 	uint32_t screen_update_fuusenpn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mariorou(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(konmedal_interrupt);
 	K056832_CB_MEMBER(tile_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(konmedal_scanline);
+	WRITE_LINE_MEMBER(vbl_ack_w) { m_maincpu->set_input_line(0, CLEAR_LINE); }
+	WRITE_LINE_MEMBER(nmi_ack_w) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
+	WRITE8_MEMBER(ccu_int_time_w) { m_ccu_int_time = data; }
 
 	K052109_CB_MEMBER(shuriboy_tile_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(shuri_scanline);
 	DECLARE_WRITE8_MEMBER(shuri_bank_w);
 	DECLARE_READ8_MEMBER(shuri_irq_r);
 	DECLARE_WRITE8_MEMBER(shuri_irq_w);
@@ -107,20 +116,25 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<k056832_device> m_k056832;
+	optional_device<k053252_device> m_k053252;
 	optional_device<k052109_device> m_k052109;
 	required_device<palette_device> m_palette;
 	optional_device<ymz280b_device> m_ymz;
 	optional_device<okim6295_device> m_oki;
 	optional_device<upd7759_device> m_upd7759;
+	required_device<nvram_device> m_nvram;
+	required_ioport m_outport;
 
 	u8 m_control, m_control2, m_shuri_irq;
 	u32 m_vrom_base;
+	int m_ccu_int_time, m_ccu_int_time_count;
 };
 
 WRITE8_MEMBER(konmedal_state::control2_w)
 {
 	//printf("%02x to control2\n", data);
 	m_control2 = data;
+	m_outport->write(data);
 }
 
 READ8_MEMBER(konmedal_state::vram_r)
@@ -156,11 +170,6 @@ WRITE8_MEMBER(konmedal_state::vram_w)
 	}
 
 	m_k056832->ram_code_lo_w(offset>>1, data);
-}
-
-READ8_MEMBER(konmedal_state::magic_r)
-{
-	return 0xc1;    // checked at 60f in tsukande before reading a page of the VROM
 }
 
 K056832_CB_MEMBER(konmedal_state::tile_callback)
@@ -245,10 +254,26 @@ void konmedal_state::konmedal_palette(palette_device &palette) const
 	}
 }
 
-INTERRUPT_GEN_MEMBER(konmedal_state::konmedal_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(konmedal_state::konmedal_scanline)
 {
-	m_maincpu->set_input_line(0, HOLD_LINE);
-	m_k056832->mark_plane_dirty(3);
+	int scanline = param;
+
+	// z80 /IRQ is connected to the IRQ1(vblank) pin of k053252 CCU
+	if (scanline == 255)
+	{
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+		//m_k056832->mark_plane_dirty(3);
+	}
+
+	// z80 /NMI is connected to the IRQ2 pin of k053252 CCU
+	// the following code is emulating INT_TIME of the k053252, this code will go away
+	// when the new konami branch is merged.
+	m_ccu_int_time_count--;
+	if (m_ccu_int_time_count <= 0)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_ccu_int_time_count = m_ccu_int_time;
+	}
 }
 
 WRITE8_MEMBER(konmedal_state::bankswitch_w)
@@ -262,18 +287,17 @@ void konmedal_state::medal_main(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0x8000, 0x9fff).bankr("bank1");
-	map(0xa000, 0xafff).ram(); // work RAM?
-	map(0xb800, 0xbfff).ram(); // stack goes here
+	map(0xa000, 0xbfff).ram().share("nvram"); // work RAM
 	map(0xc000, 0xc03f).w(m_k056832, FUNC(k056832_device::write));
 	map(0xc100, 0xc100).w(FUNC(konmedal_state::control2_w));
 	map(0xc400, 0xc400).w(FUNC(konmedal_state::bankswitch_w));
 	map(0xc500, 0xc500).noprw(); // read to reset watchdog
+	map(0xc600, 0xc60f).w(m_k056832, FUNC(k056832_device::b_w));
 	map(0xc700, 0xc700).portr("DSW2");
 	map(0xc701, 0xc701).portr("DSW1");
 	map(0xc702, 0xc702).portr("IN1");
 	map(0xc703, 0xc703).portr("IN2");
-	map(0xc800, 0xc80f).w(m_k056832, FUNC(k056832_device::b_w));
-	map(0xc80f, 0xc80f).r(FUNC(konmedal_state::magic_r));
+	map(0xc800, 0xc80f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write));
 	map(0xd000, 0xd001).rw(m_ymz, FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
 	map(0xe000, 0xffff).rw(FUNC(konmedal_state::vram_r), FUNC(konmedal_state::vram_w));
 }
@@ -282,15 +306,17 @@ void konmedal_state::ddboy_main(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0x8000, 0x9fff).bankr("bank1");
-	map(0xa000, 0xbfff).ram(); // work RAM
+	map(0xa000, 0xbfff).ram().share("nvram"); // work RAM
 	map(0xc000, 0xc03f).w(m_k056832, FUNC(k056832_device::write));
 	map(0xc100, 0xc100).w(FUNC(konmedal_state::control2_w));
 	map(0xc400, 0xc400).w(FUNC(konmedal_state::bankswitch_w));
 	map(0xc500, 0xc500).noprw(); // read to reset watchdog
+	map(0xc600, 0xc60f).w(m_k056832, FUNC(k056832_device::b_w));
+	map(0xc700, 0xc700).portr("DSW1");
+	map(0xc701, 0xc701).portr("DSW2");
 	map(0xc702, 0xc702).portr("IN1");
 	map(0xc703, 0xc703).portr("IN2");
-	map(0xc800, 0xc80f).w(m_k056832, FUNC(k056832_device::b_w));
-	map(0xc80f, 0xc80f).r(FUNC(konmedal_state::magic_r));
+	map(0xc800, 0xc80f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write));
 	map(0xcc00, 0xcc00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xd000, 0xd000).nopw();    // ???  writes 00 and 3f every frame
 	map(0xd800, 0xd8ff).m("k051649", FUNC(k051649_device::scc_map));
@@ -300,12 +326,12 @@ void konmedal_state::ddboy_main(address_map &map)
 void konmedal_state::shuriboy_main(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
-	map(0x8000, 0x87ff).ram();
+	map(0x8000, 0x87ff).ram().share("nvram"); // actual RAM chip is 8Kbyte, might be banked somewhow
 	map(0x8800, 0x8800).portr("IN2");
 	map(0x8801, 0x8801).portr("IN1");
 	map(0x8802, 0x8802).portr("DSW1");
 	map(0x8803, 0x8803).portr("DSW2");
-	map(0x8900, 0x8900).nopw();
+	map(0x8900, 0x8900).w(FUNC(konmedal_state::control2_w));
 	map(0x8b00, 0x8b00).nopw();    // watchdog?
 	map(0x8c00, 0x8c00).w(FUNC(konmedal_state::shuri_bank_w));
 	map(0x8d00, 0x8d00).w(m_upd7759, FUNC(upd7759_device::port_w));
@@ -318,7 +344,7 @@ void konmedal_state::shuriboy_main(address_map &map)
 
 static INPUT_PORTS_START( konmedal )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x00, "Coin Slot 1" )   PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, "Coin Slot 1" )   PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x00, "5 Coins/2 Credits" )
 	PORT_DIPSETTING(    0x01, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_3C ) )
@@ -344,9 +370,9 @@ static INPUT_PORTS_START( konmedal )
 	PORT_DIPSETTING(    0x68, "3 Medals" )
 	PORT_DIPSETTING(    0x70, "2 Medals" )
 	// PORT_DIPSETTING(    0x78, "2 Medals" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW1:8") // more like debug mode
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0f, 0x00, "Standard of Payout" ) PORT_DIPLOCATION("SW2:1,2,3,4")
@@ -389,8 +415,11 @@ static INPUT_PORTS_START( konmedal )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test") PORT_CODE(KEYCODE_F2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // medal ack
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused
+
+	PORT_START("OUT")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w)
 INPUT_PORTS_END
 
 void konmedal_state::machine_start()
@@ -409,6 +438,8 @@ void konmedal_state::machine_reset()
 {
 	m_vrom_base = 0;
 	m_control = m_control2 = m_shuri_irq = 0;
+	m_ccu_int_time_count = 0;
+	m_ccu_int_time = 31;
 }
 
 void konmedal_state::tsukande(machine_config &config)
@@ -416,7 +447,15 @@ void konmedal_state::tsukande(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(14'318'181)/2); // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal_state::medal_main);
-	m_maincpu->set_vblank_int("screen", FUNC(konmedal_state::konmedal_interrupt));
+	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal_state::konmedal_scanline), "screen", 0, 1);
+
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
+	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+
+	K053252(config, m_k053252, XTAL(14'318'181) / 2); // not verified
+	m_k053252->int1_ack().set(FUNC(konmedal_state::vbl_ack_w));
+	m_k053252->int2_ack().set(FUNC(konmedal_state::nmi_ack_w));
+	m_k053252->int_time().set(FUNC(konmedal_state::ccu_int_time_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -449,7 +488,15 @@ void konmedal_state::ddboy(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(14'318'181)/2); // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal_state::ddboy_main);
-	m_maincpu->set_vblank_int("screen", FUNC(konmedal_state::konmedal_interrupt));
+	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal_state::konmedal_scanline), "screen", 0, 1);
+
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
+	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+
+	K053252(config, m_k053252, XTAL(14'318'181) / 2); // not verified
+	m_k053252->int1_ack().set(FUNC(konmedal_state::vbl_ack_w));
+	m_k053252->int2_ack().set(FUNC(konmedal_state::nmi_ack_w));
+	m_k053252->int_time().set(FUNC(konmedal_state::ccu_int_time_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -551,7 +598,7 @@ WRITE8_MEMBER(konmedal_state::shuri_irq_w)
 	m_shuri_irq = data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(konmedal_state::scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(konmedal_state::shuri_scanline)
 {
 	int scanline = param;
 
@@ -572,7 +619,11 @@ void konmedal_state::shuriboy(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(24'000'000) / 3); // divisor unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal_state::shuriboy_main);
-	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal_state::scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal_state::shuri_scanline), "screen", 0, 1);
+
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
+	m_nvram->set_custom_handler(FUNC(konmedal_state::shuriboy_nvram_init));;
+	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // everything not verified, just a placeholder
@@ -606,6 +657,8 @@ void konmedal_state::fuusenpn(machine_config &config)
 {
 	shuriboy(config);
 
+	m_nvram->set_custom_handler(FUNC(konmedal_state::fuusenpn_nvram_init));
+
 	screen_device &screen(SCREEN(config.replace(), "screen", SCREEN_TYPE_RASTER)); // everything not verified, just a placeholder
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(30));
@@ -621,6 +674,8 @@ void konmedal_state::mariorou(machine_config &config)
 {
 	shuriboy(config);
 
+	m_nvram->set_custom_handler(FUNC(konmedal_state::mario_nvram_init));
+
 	screen_device &screen(SCREEN(config.replace(), "screen", SCREEN_TYPE_RASTER)); // everything not verified, just a placeholder
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(30));
@@ -630,6 +685,40 @@ void konmedal_state::mariorou(machine_config &config)
 	screen.set_palette(m_palette);
 
 	m_k052109->set_tile_callback(FUNC(konmedal_state::shuriboy_tile_callback));
+}
+
+// required at 1st boot with "Backup Keep" DIPSW setting
+void konmedal_state::shuriboy_nvram_init(nvram_device &nvram, void *base, size_t size)
+{
+	memset(base, 0x00, size);
+	u8 *ram = (u8*)base;
+	ram[0x08] = 0x01;
+	ram[0x09] = 0x02;
+	ram[0x0e] = 0x04;
+	ram[0x17] = 0x08;
+	ram[0x18] = 0x10;
+	ram[0x21] = 0x20;
+	ram[0x50] = 0x40;
+	ram[0x52] = 0x80;
+	ram[0x53] = 0x55;
+	ram[0x54] = 0xaa;
+}
+
+void konmedal_state::fuusenpn_nvram_init(nvram_device &nvram, void *base, size_t size)
+{
+	memset(base, 0x00, size);
+	u8 *ram = (u8*)base;
+	ram[0x203] = 0xff;
+	ram[0x209] = 0xaa;
+}
+
+void konmedal_state::mario_nvram_init(nvram_device &nvram, void *base, size_t size)
+{
+	memset(base, 0x00, size);
+	u8 *ram = (u8*)base;
+	ram[0x502] = 0xff;
+	ram[0x506] = 0xaa;
+	ram[0x508] = 0x55;
 }
 
 ROM_START( tsukande )
