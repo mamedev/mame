@@ -810,7 +810,7 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				clip.max_x = cliprect.max_x;
 		}
 	}
-	bitmap.fill(0, clip);
+	bitmap.fill(paldata[0], clip);
 
 	draw_tilemap(screen, bitmap, clip, 1);
 	draw_tilemap(screen, bitmap, clip, 0);

@@ -914,6 +914,9 @@ actfancrj                       // (c) 1989 Data East Corporation (Japan)
 triothep                        // (c) 1989 Data East Corporation (World)
 triothepj                       // (c) 1989 Data East Corporation (Japan)
 
+@source:actions_atj2279b.cpp
+rbitgen
+
 @source:acvirus.cpp
 virusa                          // (c) 1997 Access GmbH
 virusb                          // (c) 1999 Access GmbH
@@ -39798,6 +39801,7 @@ jak_capb                        //
 jak_spdmo                       //
 conyteni                        //
 conyping                        //
+conyfght
 
 @source:vii.cpp
 jak_batm                        // The Batman, 2004
@@ -39843,6 +39847,7 @@ taikeegr                        //
 shredmjr                        //
 sentx6p                         //
 telestry                        //
+wiwi18                          //
 
 @source:vsmile.cpp
 vsmile                          //
@@ -41030,6 +41035,7 @@ has_wamg                        //
 ltv_tam                         //
 tak_geig                        //
 jarajal                         //
+tcarnavi                        //
 ban_onep                        //
 ekara                           //
 ekaraa                          //
