@@ -60,6 +60,7 @@
 
 #include "emu.h"
 #include "machine/m6502_vt1682.h"
+#include "machine/m6502_vh2009.h"
 #include "machine/vt1682_io.h"
 #include "machine/vt1682_uio.h"
 #include "machine/vt1682_alu.h"
@@ -474,6 +475,10 @@ private:
 	DECLARE_READ8_MEMBER(vt1682_212c_prng_r);
 	DECLARE_WRITE8_MEMBER(vt1682_212c_prng_seed_w);
 
+	virtual void clock_joy2();
+
+	READ8_MEMBER(inteact_212a_send_joy_clock2_r);
+
 	/* Hacky */
 
 	DECLARE_READ8_MEMBER(soundcpu_irq_vector_hack_r);
@@ -660,23 +665,36 @@ public:
 
 	void vt1682_exsport(machine_config& config);
 
-	DECLARE_READ8_MEMBER(uiob_r);
+	virtual DECLARE_READ8_MEMBER(uiob_r);
 	DECLARE_WRITE8_MEMBER(uiob_w);
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	int m_old_portb;
 	int m_portb_shiftpos = 0;
 	int m_p1_latch;
 	int m_p2_latch;
+	virtual void clock_joy2() override;
 
 	required_ioport m_io_p1;
 	required_ioport m_io_p2;
 };
 
+class vt1682_wow_state : public vt1682_exsport_state
+{
+public:
+	vt1682_wow_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt1682_exsport_state(mconfig, type, tag)
+	{ }
+
+	void vt1682_wow(machine_config& config);
+
+protected:
+
+private:
+};
 
 
 void vt_vt1682_state::video_start()
@@ -3624,6 +3642,17 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
     0x01 - UIOA DIRECTION
 */
 
+void vt_vt1682_state::clock_joy2()
+{
+}
+
+READ8_MEMBER(vt_vt1682_state::inteact_212a_send_joy_clock2_r)
+{
+	uint8_t ret = m_uio->inteact_212a_uio_a_direction_r(space,offset);
+	clock_joy2();
+	return ret;
+}
+
 /*
     Address 0x212b r/w (MAIN CPU)
 
@@ -4850,7 +4879,11 @@ void vt_vt1682_state::draw_layer(int which, int opaque, const rectangle& cliprec
 
 			if (high_color)
 			{
-
+				popmessage("high colour line mode\n");
+			}
+			else
+			{
+				popmessage("line mode\n");
 			}
 		}
 	}
@@ -5162,7 +5195,8 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x2127, 0x2127).rw(FUNC(vt_vt1682_state::vt1682_2127_dma_status_r), FUNC(vt_vt1682_state::vt1682_2127_dma_size_trigger_w));
 	map(0x2128, 0x2128).rw(FUNC(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_r), FUNC(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w));
 	map(0x2129, 0x2129).rw(m_uio, FUNC(vrt_vt1682_uio_device::inteact_2129_uio_a_data_r), FUNC(vrt_vt1682_uio_device::inteact_2129_uio_a_data_w));
-	map(0x212a, 0x212a).rw(m_uio, FUNC(vrt_vt1682_uio_device::inteact_212a_uio_a_direction_r), FUNC(vrt_vt1682_uio_device::inteact_212a_uio_a_direction_w));
+	map(0x212a, 0x212a).w(m_uio, FUNC(vrt_vt1682_uio_device::inteact_212a_uio_a_direction_w));
+	map(0x212a, 0x212a).r(FUNC(vt_vt1682_state::inteact_212a_send_joy_clock2_r));
 	map(0x212b, 0x212b).rw(m_uio, FUNC(vrt_vt1682_uio_device::inteact_212b_uio_a_attribute_r), FUNC(vrt_vt1682_uio_device::inteact_212b_uio_a_attribute_w));
 	map(0x212c, 0x212c).rw(FUNC(vt_vt1682_state::vt1682_212c_prng_r), FUNC(vt_vt1682_state::vt1682_212c_prng_seed_w));
 	// 212d PLL
@@ -5661,12 +5695,15 @@ WRITE8_MEMBER(intec_interact_state::portb_w)
 	m_previous_port_b = data;
 };
 
+void vt1682_exsport_state::clock_joy2()
+{
+	m_portb_shiftpos++;
+}
+
 READ8_MEMBER(vt1682_exsport_state::uiob_r)
 {
 	int p1bit = (m_p1_latch >> m_portb_shiftpos) & 1;
 	int p2bit = (m_p2_latch >> m_portb_shiftpos) & 1;
-
-	m_portb_shiftpos++;
 
 	return (p1bit << 1) | (p2bit << 3);
 };
@@ -5678,6 +5715,9 @@ WRITE8_MEMBER(vt1682_exsport_state::uiob_w)
 		if (!(data & 0x01))
 		{
 			m_portb_shiftpos = 0;
+
+			//logerror("%s: reset shift\n", machine().describe_context());
+
 			m_p1_latch = m_io_p1->read();
 			m_p2_latch = m_io_p2->read();
 		}
@@ -5728,6 +5768,14 @@ void vt1682_exsport_state::vt1682_exsport(machine_config& config)
 	m_uio->portb_out().set(FUNC(vt1682_exsport_state::uiob_w));
 }
 
+
+void vt1682_wow_state::vt1682_wow(machine_config& config)
+{
+	vt1682_exsport_state::vt1682_exsport(config);
+
+	M6502_VH2009(config.replace(), m_maincpu, MAIN_CPU_CLOCK_NTSC); // doesn't use the same bitswap as the other VT1682 games...
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt1682_wow_state::vt_vt1682_map);
+}
 
 
 void vt_vt1682_state::regular_init()
@@ -5792,6 +5840,13 @@ ROM_START( exsprt48 )
 	ROM_LOAD( "excitesportgames_48.bin", 0x00000, 0x2000000, CRC(1bf239a0) SHA1(d69c16bac5fb15c62abb5a0c0920405647205539) ) // original dump had upper 2 address lines swapped, unmarked chip, so lines were guessed when dumping
 ROM_END
 
+ROM_START( wowwg )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "msp55lv128.bin", 0x00000, 0x1000000, CRC(f607c40c) SHA1(66d3960c3b8fbab06a88cf039419c79a6c8633f0) )
+	ROM_RELOAD(0x1000000,0x1000000)
+ROM_END
+
+
 
 // TODO: this is a cartridge based system (actually, verify this, it seems some versions simply had built in games) move these to SL if verified as from cartridge config
 //  actually it appears that for the cart based systems these are 'fake systems' anyway, where the base unit is just a Famiclone but as soon as you plug in a cart none of
@@ -5845,4 +5900,5 @@ Ball Shoot instead of 'Noshery' under Arcade
 This might be a regional / store thing if some places didn't want to sell a unit with a Poker game in it?
 */
 
-
+CONS( 200?, wowwg,  0,  0,  vt1682_wow, exsprt48, vt1682_wow_state, regular_init, "Wow", "Wow Wireless Gaming", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND) // needs high colour line mode for main menu
+// NJ Pocket 60-in-1 (NJ-250) is meant to have similar games, so might fit here
