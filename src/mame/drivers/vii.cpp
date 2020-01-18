@@ -236,6 +236,39 @@ protected:
 	optional_device<i2cmem_device> m_i2cmem;
 };
 
+
+class spg2xx_lexiseal_game_state : public spg2xx_game_state
+{
+public:
+	spg2xx_lexiseal_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag)
+	{ }
+
+	void lexiseal(machine_config& config);
+
+protected:
+	//virtual void machine_start() override;
+	//virtual void machine_reset() override;
+
+	DECLARE_WRITE16_MEMBER(portb_w);
+};
+
+class spg2xx_pdc100_game_state : public spg2xx_game_state
+{
+public:
+	spg2xx_pdc100_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag)
+	{ }
+
+	void pdc100(machine_config& config);
+
+protected:
+	//virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	DECLARE_WRITE16_MEMBER(porta_w);
+};
+
 class wireless60_state : public spg2xx_game_state
 {
 public:
@@ -247,6 +280,7 @@ public:
 	void wireless60(machine_config& config);
 
 	void init_lx_jg7415();
+	void init_zone100();
 
 protected:
 	virtual void machine_start() override;
@@ -265,6 +299,39 @@ protected:
 private:
 };
 
+class zon32bit_state : public spg2xx_game_state
+{
+public:
+	zon32bit_state(const machine_config& mconfig, device_type type, const char* tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_romregion(*this, "maincpu")
+	{ }
+
+	void zon32bit(machine_config& config);
+	
+	void mem_map_zon32bit(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	
+	DECLARE_READ16_MEMBER(z32_rom_r);
+
+	required_region_ptr<uint16_t> m_romregion;
+
+	DECLARE_READ16_MEMBER(porta_r);
+	DECLARE_READ16_MEMBER(portb_r);
+
+	DECLARE_WRITE16_MEMBER(porta_w);
+	DECLARE_WRITE16_MEMBER(portb_w);
+	DECLARE_WRITE16_MEMBER(portc_w);
+
+private:
+	int m_porta_dat;
+	int m_portb_dat;
+
+	int m_hackbank;
+};
 
 class zone40_state : public wireless60_state
 {
@@ -697,6 +764,8 @@ READ8_MEMBER(spg2xx_game_state::i2c_r)
 
 WRITE16_MEMBER(wireless60_state::wireless60_porta_w)
 {
+	//logerror("%s: wireless60_porta_w %04x\n", machine().describe_context(), data);
+
 	m_w60_porta_data = (data & 0x300) | m_w60_p1_ctrl_mask | m_w60_p2_ctrl_mask;
 	switch (m_w60_porta_data & 0x300)
 	{
@@ -718,6 +787,18 @@ WRITE16_MEMBER(wireless60_state::wireless60_porta_w)
 	}
 }
 
+READ16_MEMBER(wireless60_state::wireless60_porta_r)
+{
+	//logerror("%s: wireless60_porta_r\n", machine().describe_context());
+	return m_w60_porta_data;
+}
+
+WRITE16_MEMBER(wireless60_state::wireless60_portb_w)
+{
+	logerror("%s: wireless60_portb_w (bankswitch) %04x\n", machine().describe_context(), data);
+	switch_bank(data & m_bankmask);
+}
+
 WRITE16_MEMBER(zone40_state::zone40_porta_w)
 {
 	wireless60_porta_w(space, offset, data);
@@ -729,10 +810,48 @@ WRITE16_MEMBER(zone40_state::zone40_porta_w)
 	}
 }
 
-READ16_MEMBER(wireless60_state::wireless60_porta_r)
-{
-	return m_w60_porta_data;
+
+READ16_MEMBER(zon32bit_state::porta_r)
+{	
+	return m_porta_dat;
 }
+
+
+WRITE16_MEMBER(zon32bit_state::porta_w)
+{	
+	if (data != 0x0101)
+		logerror("%s: porta_w (%04x)\n", machine().describe_context(), data);
+
+	m_porta_dat = data;
+
+	// where is the banking?! this gets written from the RAM-based code when the lower bank needs to change, but the upper bank needs to change in places too
+	// (and all these bits get unset again after this write, so this probably isn't the bank)
+	if (data == 0x0e01)
+	{
+		m_hackbank = 1;
+	}	
+}
+
+READ16_MEMBER(zon32bit_state::portb_r)
+{	
+	return m_portb_dat;
+}
+
+WRITE16_MEMBER(zon32bit_state::portb_w)
+{
+	if (data != 0x0001)
+		logerror("%s: portb_w (%04x)\n", machine().describe_context(), data);
+
+	m_portb_dat = data;
+}
+
+WRITE16_MEMBER(zon32bit_state::portc_w)
+{
+	// very noisy
+	//logerror("%s: portc_w (%04x)\n", machine().describe_context(), data);
+}
+
+
 
 READ16_MEMBER(zone40_state::zone40_porta_r)
 {
@@ -741,11 +860,6 @@ READ16_MEMBER(zone40_state::zone40_porta_r)
 	return ret;
 }
 
-WRITE16_MEMBER(wireless60_state::wireless60_portb_w)
-{
-	logerror("%s: wireless60_portb_w (bankswitch) %04x\n", machine().describe_context(), data);
-	switch_bank(data & m_bankmask);
-}
 
 void vii_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -1016,6 +1130,49 @@ void telestory_state::mem_map_4m_tsram(address_map &map)
 	map(0x000000, 0x3fffff).bankr("cartbank");
 	map(0x3e0000, 0x3fffff).ram(); // is this in the cart or in the system?
 }
+
+
+void zon32bit_state::mem_map_zon32bit(address_map &map)
+{
+	map(0x000000, 0x3fffff).r(FUNC(zon32bit_state::z32_rom_r));
+}
+
+READ16_MEMBER(zon32bit_state::z32_rom_r)
+{
+	/*
+		This has upper and lower bank, which can be changed independently.
+		I don't know where the bank registers are.	
+	*/
+
+	if (offset < 0x200000)
+	{
+		if (m_hackbank == 0) // if lower bank is 0
+			return m_romregion[offset+ 0x000000];
+		else // if lower bank is 1
+			return m_romregion[offset+ 0x400000];
+	}
+	else
+	{
+		offset &= 0x1fffff;
+
+		if (m_hackbank == 0) // if lower bank is 0
+		{
+			return m_romregion[0x200000 + offset + 0x000000]; // this upper bank is needed to boot to the menu
+
+			// other banks are presumably needed for the games that don't change the lower bank but still don't run with the above.
+		}
+		else // if lower bank is 1
+		{
+			// these banks are used for different 'mini' games (and boxing) with the 2nd lower bank enabled
+			return m_romregion[0x200000 + offset + 0x400000 + 0x000000]; // 31-44
+			//return m_romregion[0x200000 + offset+ 0x400000 + 0x600000]; // 45-49
+			//return m_romregion[0x200000 + offset+ 0x400000 + 0x800000]; // 50-59
+		}	
+	}
+
+	return 0x0000;// m_romregion[offset];
+}
+
 
 
 READ16_MEMBER(zone40_state::z40_rom_r)
@@ -1378,6 +1535,141 @@ static INPUT_PORTS_START( wirels60 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(2) PORT_NAME("B Button")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(2) PORT_NAME("Menu")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_PLAYER(2) PORT_NAME("Start")
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( zon32bit )
+	PORT_START("P1")
+	PORT_DIPNAME( 0x0001, 0x0001, "P1" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("P2")
+	PORT_DIPNAME( 0x0001, 0x0001, "P2" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	
+	PORT_START("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON5 )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )		
 INPUT_PORTS_END
 
 
@@ -2041,6 +2333,28 @@ static INPUT_PORTS_START( lexizeus ) // how many buttons does this have?  I acci
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( lexiseal )
+	PORT_START("P1")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED ) // doesn't respond as 'select'
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) // pause / start
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0xfffc, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( tvgogo )
 	PORT_START("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Back")
@@ -2563,6 +2877,28 @@ static INPUT_PORTS_START( telestory ) // there is a hidden test mode, if you ret
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( pdc100 )
+	PORT_START("P1")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Left Trigger")
+	PORT_BIT( 0x0e00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Right Trigger")
+	PORT_BIT( 0xe000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Pause")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
 
 READ16_MEMBER(dreamlif_state::portb_r)
 {
@@ -2835,6 +3171,30 @@ void spg2xx_game_state::machine_reset()
 	m_maincpu->reset();
 }
 
+void spg2xx_pdc100_game_state::machine_reset()
+{
+	m_current_bank = -1;
+	switch_bank(7); // must boot from upper bank
+	m_maincpu->reset();
+}
+
+WRITE16_MEMBER(spg2xx_pdc100_game_state::porta_w)
+{
+	//logerror("%s: porta_w %04x\n", machine().describe_context(), data);
+	switch_bank(data & 0x0007);
+}
+
+WRITE16_MEMBER(spg2xx_lexiseal_game_state::portb_w)
+{
+	//logerror("%s: portb_w %04x\n", machine().describe_context(), data);
+	
+	// only 2 banks
+	if (data == 0x5f)
+		switch_bank(0);
+	else if (data == 0xdf)
+		switch_bank(1);
+}
+
 
 
 void wireless60_state::machine_start()
@@ -2846,6 +3206,11 @@ void wireless60_state::machine_start()
 
 	m_w60_p1_ctrl_mask = 0x0400;
 	m_w60_p2_ctrl_mask = 0x0800;
+}
+
+void zon32bit_state::machine_start()
+{
+	spg2xx_game_state::machine_start();
 }
 
 void zone40_state::machine_start()
@@ -2864,6 +3229,16 @@ void wireless60_state::machine_reset()
 	spg2xx_game_state::machine_reset();
 	m_w60_controller_input = -1;
 	m_w60_porta_data = 0;
+}
+
+void zon32bit_state::machine_reset()
+{
+	spg2xx_game_state::machine_reset();
+
+	m_porta_dat = 0x0000;
+	m_portb_dat = 0x0000;
+
+	m_hackbank = 0;
 }
 
 void zone40_state::machine_reset()
@@ -3167,6 +3542,25 @@ void wireless60_state::wireless60(machine_config &config)
 	m_maincpu->porta_in().set(FUNC(wireless60_state::wireless60_porta_r));
 }
 
+void zon32bit_state::zon32bit(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zon32bit_state::mem_map_zon32bit);
+	m_maincpu->set_force_no_drc(true); // uses JVS opcode, not implemented in recompiler
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(zon32bit_state::porta_r));
+	m_maincpu->portb_in().set(FUNC(zon32bit_state::portb_r));
+	m_maincpu->portc_in().set_ioport("P3");
+
+	m_maincpu->porta_out().set(FUNC(zon32bit_state::porta_w));
+	m_maincpu->portb_out().set(FUNC(zon32bit_state::portb_w));
+	m_maincpu->portc_out().set(FUNC(zon32bit_state::portc_w));
+
+
+}
+
 void zone40_state::zone40(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
@@ -3463,6 +3857,26 @@ void spg2xx_game_state::taikeegr(machine_config &config)
 //  m_maincpu->portb_in().set_ioport("P2");
 //  m_maincpu->portc_in().set_ioport("P3");
 }
+
+
+void spg2xx_pdc100_game_state::pdc100(machine_config &config)
+{
+	non_spg_base(config);
+	m_maincpu->porta_out().set(FUNC(spg2xx_pdc100_game_state::porta_w));
+	m_maincpu->porta_in().set_ioport("P1");
+	m_maincpu->portb_in().set_ioport("P2");
+	m_maincpu->portc_in().set_ioport("P3"); // not used?
+}
+
+void spg2xx_lexiseal_game_state::lexiseal(machine_config &config)
+{
+	non_spg_base(config);
+	m_maincpu->portb_out().set(FUNC(spg2xx_lexiseal_game_state::portb_w));
+	m_maincpu->porta_in().set_ioport("P1");
+	m_maincpu->portb_in().set_ioport("P2");
+	m_maincpu->portc_in().set_ioport("P3");
+}
+
 
 // Shredmaster Jr uses the same input order as the regular Taikee Guitar, but reads all inputs through a single multplexed bit
 WRITE16_MEMBER(shredmjr_game_state::porta_w)
@@ -4032,6 +4446,11 @@ ROM_START( lexizeus )
 	ROM_LOAD16_WORD_SWAP( "lexibook1g900us.bin", 0x0000, 0x800000, CRC(c2370806) SHA1(cbb599c29c09b62b6a9951c724cd9fc496309cf9))
 ROM_END
 
+ROM_START( lexiseal )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "lexibook_seal.bin", 0x0000, 0x1000000, CRC(3529f154) SHA1(f5f142600c6b2d037b97e007364ea2fa228e0163) )
+ROM_END
+
 ROM_START( zone40 )
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "zone40.bin", 0x0000, 0x4000000, CRC(4ba1444f) SHA1(de83046ab93421486668a247972ad6d3cda19440) )
@@ -4047,6 +4466,13 @@ ROM_START( wirels60 )
 	ROM_LOAD16_WORD_SWAP( "wirels60.bin", 0x0000, 0x4000000, CRC(b4df8b28) SHA1(00e3da542e4bc14baf4724ad436f66d4c0f65c84))
 ROM_END
 
+ROM_START( mywicodx )
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
+	// the first bank contains the Mi Guitar game, the 2nd half of the ROM is where the Menu starts
+	ROM_LOAD16_WORD_SWAP( "mywicodx.u2", 0x2000000, 0x2000000, CRC(ec7c5d2f) SHA1(330fb839c485713f7bec5bf9d2d42841612c5b45))
+	ROM_CONTINUE(0x0000000, 0x2000000)
+ROM_END
+
 // PCB marked 'Zone 100 110728 V2.1'
 ROM_START( lx_jg7415 )
 	ROM_REGION( 0x10000000, "maincpu", ROMREGION_ERASE00 )
@@ -4055,8 +4481,15 @@ ROM_START( lx_jg7415 )
 	ROM_LOAD16_WORD_SWAP( "rom.bin", 0x0000, 0x10000000, CRC(59442e00) SHA1(7e91cf6b19c37f9b4fa4dc21e241c6634d6a6f95) )
 ROM_END
 
+ROM_START( zone100 )
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "zone100.bin", 0x0000, 0x8000000, CRC(b966a54e) SHA1(e38156ebc4e2f2935b1acbeca33d1866d45c4f65) )
+ROM_END
 
-
+ROM_START( zon32bit )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "41sports.bin", 0x0000, 0x2000000, CRC(86eee6e0) SHA1(3f6cab6649aebf596de5a8af21658bb1a27edb10) )
+ROM_END                                             
 
 ROM_START( rad_skat )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -4141,6 +4574,13 @@ ROM_END
 ROM_START( wiwi18 )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "26gl128.bin", 0x000000, 0x1000000, CRC(0b103ac9) SHA1(14434908f429942096fb8db5b5630603fd54fb2c) )
+ROM_END
+
+ROM_START( pdc100 )
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
+	// only 1st half of this is used "Jumper resistor (0 ohm) that short A25 to ground"
+	// 2nd half just contains what seems to be random garbage
+	ROM_LOAD16_WORD_SWAP( "pdc100.bin", 0x000000, 0x8000000, CRC(57285b49) SHA1(cfb4be7877ec263d24063a004c56985db5c0f4e2) )
 ROM_END
 
 
@@ -4271,6 +4711,11 @@ void wireless60_state::init_lx_jg7415()
 	m_bankmask = 0xf;
 }
 
+void wireless60_state::init_zone100()
+{
+	m_bankmask = 0xf;
+}
+
 void spg2xx_game_state::init_wiwi18()
 {
 	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
@@ -4288,8 +4733,15 @@ CONS( 2007, vii,      0, 0, vii,        vii,      vii_state,         empty_init,
 // these don't have real motion controls
 CONS( 2009, zone40,   0, 0, zone40,     wirels60, zone40_state,      init_zone40,     "Jungle Soft / Ultimate Products (HK) Ltd",    "Zone 40",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2010, zone60,   0, 0, wireless60, wirels60, wireless60_state,  empty_init,      "Jungle's Soft / Ultimate Products (HK) Ltd",  "Zone 60",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, zone100,  0, 0, wireless60, wirels60, wireless60_state,  init_zone100,    "Jungle's Soft / Ultimate Products (HK) Ltd",  "Zone 100",    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit was black, menus still show white controllers, unlike wireless 60
 CONS( 2010, wirels60, 0, 0, wireless60, wirels60, wireless60_state,  empty_init,      "Jungle Soft / Kids Station Toys Inc",         "Wireless 60", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2011, lx_jg7415,0, 0, wireless60, wirels60, wireless60_state,  init_lx_jg7415,  "Lexibook",  "Lexibook JG7415 120-in-1",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+
+// Box advertises this as '40 Games Included' but the cartridge, which was glued directly to the PCB, not removable, is a 41-in-1.  Maybe some versions exist with a 40 game selection.
+CONS( 200?, zon32bit,  0, 0, zon32bit, zon32bit, zon32bit_state,  empty_init,      "Jungle Soft / Ultimate Products (HK) Ltd",    "Zone 32-bit Gaming Console System (Family Sport 41-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mywicodx,  0, 0, zon32bit, zon32bit, zon32bit_state,  empty_init,      "<unknown>",                                   "My Wico Deluxe", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
 
 // JAKKS Pacific Inc TV games
 CONS( 2004, jak_batm, 0, 0, jakks, batman, spg2xx_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "The Batman (JAKKS Pacific TV Game)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
@@ -4359,6 +4811,8 @@ CONS( 2006, telestry,  0,        0, telestory, telestory,   telestory_state, emp
 // Similar, SPG260?, scrambled
 CONS( 200?, lexizeus,    0,     0,        lexizeus,     lexizeus, spg2xx_game_state, init_zeus, "Lexibook", "Zeus IG900 20-in-1 (US?)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad sound and some corrupt bg tilemap entries in Tiger Rescue, verify ROM data (same game runs in Zone 60 without issue)
 
+CONS( 200?, lexiseal,    0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Lexibook / Sit Up Limited", "Seal 50-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // also has bad sound in Tiger Rescue, but no corrupt tilemap
+
 // there are other regions of this, including a Finnish version "Haluatko miljonääriksi?" (see https://millionaire.fandom.com/wiki/Haluatko_miljon%C3%A4%C3%A4riksi%3F_(Play_Vision_game) )
 CONS( 2006, pvmil,       0,     0,        pvmil,        pvmil,    pvmil_state, empty_init, "Play Vision", "Who Wants to Be a Millionaire? (Play Vision, Plug and Play, UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
@@ -4377,3 +4831,17 @@ CONS( 2004, sentx6p,    0,     0,        sentx6p,     sentx6p, sentx6p_state, em
 // actually a cartridge, but all hardware is in the cart, overriding any internal hardware entirely.  see nes_vt.cp 'mc_sp69' for the '69 arcade game' part
 CONS( 200?, wiwi18,  0,        0, rad_skat, wiwi18,  spg2xx_game_state, init_wiwi18, "Hamy System",      "WiWi 18-in-1 Sports Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
+// Conny devices
+
+// there were older models eg. PDC30 with fewer games, and some differences (eg "Jo Ma" instead of "Jo Ma 2")
+// "Jo Ma 2" shows "Licensed by Mitchell Corporation" (Mitchell made the original Puzzloop on which this style of game is based)  Videos of the original Jo Ma show it lacking this text.
+
+// Other known units
+// PDC Teenage Mutant Ninja Turtles
+// PDC Dora the Explorer
+// PDC 30
+// PDC 40
+// PDC 200
+
+// This was dumped from an Anncia branded unit, although there's no ingame branding, so ROM is probably the same for all PDC100 units
+CONS( 2008, pdc100,  0,        0, pdc100, pdc100,  spg2xx_pdc100_game_state, empty_init, "Conny",      "PDC100 - Pocket Dream Console", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

@@ -31315,6 +31315,7 @@ miwi2_7
 intact89
 intg5410
 exsprt48
+wowwg
 
 @source:newbrain.cpp
 newbrain                        //
@@ -37458,6 +37459,7 @@ jak_s500
 smartfp                         // Smart Fit Park
 wlsair60                        // Wireless Air 60
 wrlshunt                        // Wireless: Hunting Video Game System
+tkmag220                        //
 jak_car2
 jak_gtg
 jak_tsm
@@ -39829,10 +39831,14 @@ jak_care                        //
 jak_nick                        //
 jak_sbfc                        //
 lexizeus                        // Lexibook
+lexiseal                        //
 vii                             // KenSingTon / Jungle Soft / Siatronics Vii
 wirels60                        // Wireless 60
 zone40                          // Zone 40
 zone60                          // Zone 60
+zone100                         //
+mywicodx                        //
+zon32bit                        // Zone 32-bit
 lx_jg7415                       //
 rad_skat                        //
 rad_skatp                       //
@@ -39850,6 +39856,7 @@ shredmjr                        //
 sentx6p                         //
 telestry                        //
 wiwi18                          //
+pdc100
 
 @source:vsmile.cpp
 vsmile                          //
