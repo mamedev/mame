@@ -313,6 +313,8 @@ protected:
 private:
 	int m_porta_dat;
 	int m_portb_dat;
+
+	int m_hackbank;
 };
 
 class zone40_state : public wireless60_state
@@ -802,9 +804,16 @@ READ16_MEMBER(zon32bit_state::porta_r)
 WRITE16_MEMBER(zon32bit_state::porta_w)
 {	
 	if (data != 0x0101)
-		printf("%s: porta_w (%04x)\n", machine().describe_context().c_str(), data);
+		logerror("%s: porta_w (%04x)\n", machine().describe_context(), data);
 
 	m_porta_dat = data;
+
+	// where is the banking?! this gets written from the RAM-based code when the lower bank needs to change, but the upper bank needs to change in places too
+	// (and all these bits get unset again after this write, so this probably isn't the bank)
+	if (data == 0x0e01)
+	{
+		m_hackbank = 1;
+	}	
 }
 
 READ16_MEMBER(zon32bit_state::portb_r)
@@ -815,7 +824,7 @@ READ16_MEMBER(zon32bit_state::portb_r)
 WRITE16_MEMBER(zon32bit_state::portb_w)
 {
 	if (data != 0x0001)
-		printf("%s: portb_w (%04x)\n", machine().describe_context().c_str(), data);
+		logerror("%s: portb_w (%04x)\n", machine().describe_context(), data);
 
 	m_portb_dat = data;
 }
@@ -1114,22 +1123,35 @@ void zon32bit_state::mem_map_zon32bit(address_map &map)
 
 READ16_MEMBER(zon32bit_state::z32_rom_r)
 {
+	/*
+		This has upper and lower bank, which can be changed independently.
+		I don't know where the bank registers are.	
+	*/
+
 	if (offset < 0x200000)
 	{
-		return m_romregion[offset+ 0x400000];
+		if (m_hackbank == 0) // if lower bank is 0
+			return m_romregion[offset+ 0x000000];
+		else // if lower bank is 1
+			return m_romregion[offset+ 0x400000];
 	}
 	else
 	{
-		return m_romregion[offset+ 0x400000 - 0x200000]; 
+		offset &= 0x1fffff;
 
-	//	return m_romregion[offset+ 0x400000 + 0x000000]; // 31-44
-	//	return m_romregion[offset+ 0x400000 + 0x600000]; // 45-49
-	//	return m_romregion[offset+ 0x400000 + 0x800000]; // 50-59
+		if (m_hackbank == 0) // if lower bank is 0
+		{
+			return m_romregion[0x200000 + offset + 0x000000]; // this upper bank is needed to boot to the menu
 
-
-		//return m_romregion[offset+ 0x400000 + 0x400000]; // nothing?
-		//return m_romregion[offset+ 0x400000 + 0x200000]; // nothing?
-	
+			// other banks are presumably needed for the games that don't change the lower bank but still don't run with the above.
+		}
+		else // if lower bank is 1
+		{
+			// these banks are used for different 'mini' games (and boxing) with the 2nd lower bank enabled
+			return m_romregion[0x200000 + offset + 0x400000 + 0x000000]; // 31-44
+			//return m_romregion[0x200000 + offset+ 0x400000 + 0x600000]; // 45-49
+			//return m_romregion[0x200000 + offset+ 0x400000 + 0x800000]; // 50-59
+		}	
 	}
 
 	return 0x0000;// m_romregion[offset];
@@ -3165,6 +3187,8 @@ void zon32bit_state::machine_reset()
 
 	m_porta_dat = 0x0000;
 	m_portb_dat = 0x0000;
+
+	m_hackbank = 0;
 }
 
 void zone40_state::machine_reset()
@@ -4384,6 +4408,7 @@ ROM_END
 
 ROM_START( mywicodx )
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
+	// the first bank contains the Mi Guitar game, the 2nd half of the ROM is where the Menu starts
 	ROM_LOAD16_WORD_SWAP( "mywicodx.u2", 0x2000000, 0x2000000, CRC(ec7c5d2f) SHA1(330fb839c485713f7bec5bf9d2d42841612c5b45))
 	ROM_CONTINUE(0x0000000, 0x2000000)
 ROM_END
@@ -4652,10 +4677,10 @@ CONS( 200?, zone100,  0, 0, wireless60, wirels60, wireless60_state,  init_zone10
 CONS( 2010, wirels60, 0, 0, wireless60, wirels60, wireless60_state,  empty_init,      "Jungle Soft / Kids Station Toys Inc",         "Wireless 60", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2011, lx_jg7415,0, 0, wireless60, wirels60, wireless60_state,  init_lx_jg7415,  "Lexibook",  "Lexibook JG7415 120-in-1",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 200?, mywicodx, 0, 0, wireless60, wirels60, wireless60_state,  empty_init,      "Jungle Soft / Kids Station Toys Inc",         "My Wico Deluxe", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Box advertises this as '40 Games Included' but the cartridge, which was glued directly to the PCB, not removable, is a 41-in-1.  Maybe some versions exist with a 40 game selection.
 CONS( 200?, zon32bit,  0, 0, zon32bit, zon32bit, zon32bit_state,  empty_init,      "Jungle Soft / Ultimate Products (HK) Ltd",    "Zone 32-bit Gaming Console System (Family Sport 41-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mywicodx,  0, 0, zon32bit, zon32bit, zon32bit_state,  empty_init,      "<unknown>",                                   "My Wico Deluxe", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 
 // JAKKS Pacific Inc TV games
