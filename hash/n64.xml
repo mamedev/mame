@@ -6659,8 +6659,8 @@ This cart features a RTC, currently unemulated
 			<feature name="u3" value="U3 [BU9850]" />
 			<feature name="u4" value="U4 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="nus-nktj-0 02.u1" size="8388608" crc="6575dcf7" sha1="9e5e99461236c56c640b3ef2bf11fb8636abc04c" />
-				<rom name="nus-nktj-0 12.u2" size="4194304" crc="9aed2500" sha1="879716e48c99699910702e0fa89c45895a798777" />
+				<rom name="nus-nktj-0 02.u1" size="8388608" crc="6575dcf7" sha1="9e5e99461236c56c640b3ef2bf11fb8636abc04c" offset="0x000000" />
+				<rom name="nus-nktj-0 12.u2" size="4194304" crc="9aed2500" sha1="879716e48c99699910702e0fa89c45895a798777" offset="0x800000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6854,8 +6854,16 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 		<info name="release" value="20000811"/>
 		<info name="alt_title" value="マリオストーリー"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-08A-01" />
+			<feature name="u1" value="U1 [NUS-NMQJ-0 02]" />
+			<feature name="u2" value="U2 [NUS-NMQJ-0 12]" />
+			<feature name="u3" value="U3 [29L1100KC-15B0]" />
+			<feature name="u4" value="U4 [CIC-NUS-6103A]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="41943040">
-				<rom name="mario story (japan).bin" size="41943040" crc="1fb7e59a" sha1="01c32f527383b4ec69ecc7805c485b7fb9a76ce0" />
+				<rom name="nus-nmqj-0 02.u1" size="33554432" crc="7eb4a9ad" sha1="7601a5ae522c855c7c4570adc5d43741c6b51d74" offset="0x0000000" />
+				<rom name="nus-nmqj-0 12.u2" size="8388608" crc="80b0f0d6" sha1="e94f4a80de1953877de0fbe3e83bbd0332d3e108" offset="0x2000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6896,8 +6904,14 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 		<info name="release" value="20000721"/>
 		<info name="alt_title" value="マリオテニス64"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-03" />
+			<feature name="u1" value="U1 [NUS-NM8J-0]" />
+			<feature name="u2" value="U2 [BK16D 9851]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="16777216">
-				<rom name="mario tennis 64 (japan).bin" size="16777216" crc="17c5515b" sha1="fb7f917aa3f40dbde33107f1c949301af8470c2e" />
+				<rom name="nus-nm8j-0.u1" size="16777216" crc="17c5515b" sha1="fb7f917aa3f40dbde33107f1c949301af8470c2e" />
 			</dataarea>
 		</part>
 	</software>
@@ -7181,8 +7195,14 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="NUS-NMII-ITA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NMII-0]" />
+			<feature name="u2" value="U2 [BK4D-NUS]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101]" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<feature name="cart_back_label" value="NUS-EUR-1" />
 			<dataarea name="rom" size="12582912">
-				<rom name="mission impossible (italy).bin" size="12582912" crc="ac5c1408" sha1="25b1ff3432465450b4b17bb26ce9f9289ebfe65c" />
+				<rom name="nus-nmii-0.u1" size="12582912" crc="ac5c1408" sha1="25b1ff3432465450b4b17bb26ce9f9289ebfe65c" />
 			</dataarea>
 		</part>
 	</software>
@@ -7193,8 +7213,14 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="NUS-NMIS-ESP"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NMIS-0]" />
+			<feature name="u2" value="U2 [BK4D-NUS]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101]" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<feature name="cart_back_label" value="NUS-EUR-1" />
 			<dataarea name="rom" size="12582912">
-				<rom name="mission impossible (spain).bin" size="12582912" crc="e33b52f0" sha1="244711046f77e8059e677731c2d26d0c45996dda" />
+				<rom name="nus-nmis-0.u1" size="12582912" crc="e33b52f0" sha1="244711046f77e8059e677731c2d26d0c45996dda" />
 			</dataarea>
 		</part>
 	</software>
@@ -8603,8 +8629,8 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 			<feature name="u3" value="U3 [29L1100KC-15B0]" />
 			<feature name="u4" value="U4 [CIC-NUS-7103A]" />
 			<dataarea name="rom" size="67108864">
-				<rom name="nus-nmqp-0 02.u1" size="33554432" crc="68f7101c" sha1="c82851bd21e31a59fd63ca3af19801816eebfde9" />
-				<rom name="nus-nmqp-0 02.u1" size="16777216" crc="d5f2e57d" sha1="586217209dcd4de1448594eef6e3f51f785cfc14" />
+				<rom name="nus-nmqp-0 02.u1" size="33554432" crc="68f7101c" sha1="c82851bd21e31a59fd63ca3af19801816eebfde9" offset="0x0000000" />
+				<rom name="nus-nmqp-0 12.u1" size="16777216" crc="d5f2e57d" sha1="586217209dcd4de1448594eef6e3f51f785cfc14" offset="0x2000000" />
 			</dataarea>
 		</part>
 	</software>
