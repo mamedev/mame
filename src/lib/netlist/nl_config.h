@@ -17,11 +17,11 @@
 ///
 /// \brief Version - Minor.
 ///
-#define NL_VERSION_MINOR  		   6
+#define NL_VERSION_MINOR  		   7
 ///
 /// \brief Version - Patch level.
 ///
-#define NL_VERSION_PATCHLEVEL      0
+#define NL_VERSION_PATCHLEVEL      1
 
 ///
 /// \addtogroup compiledefine
@@ -61,7 +61,7 @@
 /// This approach is stricter and should identify bugs in
 /// the netlist core faster.
 /// By default it is disabled since it is not as fast as
-/// the default approach. It is up to 10% slower.
+/// the default approach. It is up to 20% slower.
 ///
 
 #ifndef NL_USE_COPY_INSTEAD_OF_REFERENCE

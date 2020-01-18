@@ -569,17 +569,24 @@ namespace netlist
 								public plib::linkedlist_t<core_terminal_t>::element_t
 		{
 		public:
+			/// \brief Number of signal bits
+			///
+			/// Going forward setting this to 8 will allow 8-bit signal
+			/// busses to be used in netlist, e.g. for more complex memory
+			/// arrangements.
+			static constexpr const unsigned int INP_BITS = 1;
 
+			static constexpr const unsigned int INP_MASK = (1 << INP_BITS) - 1;
 			static constexpr const unsigned int INP_HL_SHIFT = 0;
-			static constexpr const unsigned int INP_LH_SHIFT = 1;
+			static constexpr const unsigned int INP_LH_SHIFT = INP_BITS;
 
 			enum state_e {
 				STATE_INP_PASSIVE = 0,
-				STATE_INP_HL      = (1 << INP_HL_SHIFT),
-				STATE_INP_LH      = (1 << INP_LH_SHIFT),
+				STATE_INP_HL      = (INP_MASK << INP_HL_SHIFT),
+				STATE_INP_LH      = (INP_MASK << INP_LH_SHIFT),
 				STATE_INP_ACTIVE  = STATE_INP_HL | STATE_INP_LH,
-				STATE_OUT = 128,
-				STATE_BIDIR = 256
+				STATE_OUT         = (1 << (2*INP_BITS)),
+				STATE_BIDIR       = (1 << (2*INP_BITS + 1))
 			};
 
 			core_terminal_t(core_device_t &dev, const pstring &aname,
@@ -590,12 +597,11 @@ namespace netlist
 
 			/// \brief The object type.
 			/// \returns type of the object
-
 			terminal_type type() const noexcept(false);
+
 			/// \brief Checks if object is of specified type.
 			/// \param atype type to check object against.
 			/// \returns true if object is of specified type else false.
-
 			bool is_type(const terminal_type atype) const noexcept(false) { return (type() == atype); }
 
 			void set_net(net_t *anet) noexcept { m_net = anet; }
@@ -632,7 +638,7 @@ namespace netlist
 			void set_delegate(const nldelegate &delegate) noexcept { m_delegate = delegate; }
 			nldelegate &delegate() noexcept { return m_delegate; }
 			const nldelegate &delegate() const noexcept { return m_delegate; }
-			void run_delegate() noexcept { m_delegate(); }
+			inline void run_delegate() noexcept { m_delegate(); }
 		private:
 			nldelegate m_delegate;
 			net_t * m_net;
@@ -762,7 +768,7 @@ namespace netlist
 		private:
 			state_var<netlist_sig_t>     m_new_Q;
 			state_var<netlist_sig_t>     m_cur_Q;
-			state_var<queue_status>      m_in_queue;    // 0: not in queue, 1: in queue, 2: last was taken
+			state_var<queue_status>      m_in_queue;
 			state_var<netlist_time_ext>  m_next_scheduled_time;
 
 			core_terminal_t * m_railterminal;
@@ -1858,7 +1864,7 @@ namespace netlist
 		{
 			m_next_scheduled_time = exec().time() + delay;
 
-			if (is_queued())
+			if (!!is_queued())
 				exec().qremove(this);
 
 			if (!m_list_active.empty())
@@ -2028,7 +2034,7 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 
 	template <bool KEEP_STATS, typename T>
-	inline void detail::net_t::process(const T mask, netlist_sig_t sig) noexcept
+	inline void detail::net_t::process(T mask, netlist_sig_t sig) noexcept
 	{
 		m_cur_Q = sig;
 
