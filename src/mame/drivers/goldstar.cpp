@@ -13468,6 +13468,28 @@ ROM_START( wcat3 )
 	ROM_LOAD( "wcat3.d12",  0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
+ROM_START( wcat3a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "main program sub 27c512.bin",  0x0000, 0x10000, CRC(50b61d88) SHA1(7cea2a03d9b48a1f324171f69ae9df62cf65dc6f) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "rom7.bin",   0x10000, 0x8000, CRC(3e2ade27) SHA1(9a463219c5028ed32086c378a17079f69d1c0439) )
+	ROM_LOAD( "rom6.bin",   0x08000, 0x8000, CRC(71ae4c3c) SHA1(7b3b0a7453e5844194f3d3ed449549e4c091b127) )
+	ROM_LOAD( "rom5.bin",   0x00000, 0x8000, CRC(8fac3f23) SHA1(e2c67620aa2ea01c2d469d963b5a34ca710742ec) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "rom4.bin",   0x6000, 0x2000, CRC(0509d556) SHA1(c2f46d279f45b544c67b0c966659cc6d5d53c22f) )
+	ROM_LOAD( "rom3.bin",   0x4000, 0x2000, CRC(d50f3d62) SHA1(8500c7f3a2f51ea0ed7e142ecdc4e669ba3e7065) )
+	ROM_LOAD( "rom2.bin",   0x2000, 0x2000, CRC(373d9949) SHA1(ff483505fb9e86411acad7059bf5434dde290946) )
+	ROM_LOAD( "rom1.bin",   0x0000, 0x2000, CRC(50febe3b) SHA1(0479bcee53b174aa0413951e283e446b09a6f156) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF ) // no girls bitmap
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "n82s129 u84.bin", 0x0000, 0x0100, CRC(d12b865b) SHA1(cb1fee592c9eb51e38c33a27f8d706c4c57b9823) )
+	ROM_LOAD( "n82s129 u79.bin", 0x0100, 0x0100, CRC(89af30d9) SHA1(049252654a25399ad5ca95d1b063eb45356efcad) )
+ROM_END
+
 
 /* these 'Amcoe' games look like bootlegs of cherry master
   the z80 roms are encrypted */
@@ -17267,6 +17289,47 @@ void goldstar_state::init_chryangl()
 	}
 }
 
+void cmaster_state::init_wcat3a() // seems ok, but needs checking
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x10000; i++)
+	{
+		uint8_t x = rom[i];
+
+		switch (i & 0x83)
+		{
+			case 0x00: x = bitswap<8>(x ^ 0x2a, 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 0x01: x = bitswap<8>(x ^ 0x0a, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x02: x = bitswap<8>(x ^ 0xa8, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x03: x = bitswap<8>(x ^ 0x0a, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x80: x = bitswap<8>(x ^ 0x28, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x81: x = bitswap<8>(x ^ 0xa8, 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 0x82: x = bitswap<8>(x ^ 0xa2, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x83: x = bitswap<8>(x ^ 0x2a, 5, 6, 3, 4, 1, 2, 7, 0); break;
+		}
+
+		m_decrypted_opcodes[i] = x;
+	}
+
+	for (int i = 0; i < 0x10000; i++)
+	{
+		uint8_t x = rom[i];
+		switch (i & 0x83)
+		{
+			case 0x00: x = bitswap<8>(x ^ 0x88, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x01: x = bitswap<8>(x ^ 0x80, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x02: x = bitswap<8>(x ^ 0x28, 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 0x03: x = bitswap<8>(x ^ 0x80, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x80: x = bitswap<8>(x ^ 0x02, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x81: x = bitswap<8>(x ^ 0x22, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x82: x = bitswap<8>(x ^ 0x88, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x83: x = bitswap<8>(x ^ 0x22, 1, 6, 7, 4, 5, 2, 3, 0); break;
+		}
+		rom[i] = x;
+	}
+}
+
 void cb3_state::init_chrygld()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -18151,6 +18214,7 @@ GAMEL( 1991, cmasterf,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,
 GAMEL( 1991, cmasterg,  cmaster,  cm,       cmasterg, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 8, V4-B-)",    0,                 layout_cmasterb )
 GAMEL( 1991, cmasterh,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.10)",                  0,                 layout_cmasterb )
 GAMEL( 199?, super7,    cmaster,  cm,       cmaster,  cmaster_state,  init_super7,    ROT0, "bootleg",           "Super Seven",                                 MACHINE_NOT_WORKING, layout_cmasterb )
+GAME ( 199?, wcat3a,    wcat3,    chryangl, cmaster,  cmaster_state,  init_wcat3a,    ROT0, "E.A.I.",            "Wild Cat 3 (CMV4 hardware)",                  MACHINE_NOT_WORKING ) // does not boot. Wrong decryption, wrong machine or wrong what?
 
 GAMEL( 1991, tonypok,   0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )
 GAME(  1999, jkrmast,   0,        pkrmast,  pkrmast,  goldstar_state, init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master (V515)",                         MACHINE_NOT_WORKING ) // encryption broken, needs GFX and controls

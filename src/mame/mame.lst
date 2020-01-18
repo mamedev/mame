@@ -15026,6 +15026,7 @@ unkch2                          // bootleg
 unkch3                          // bootleg
 unkch4                          // bootleg
 wcat3                           //
+wcat3a                          //
 wcherry                         // bootleg
 
 @source:gomoku.cpp
