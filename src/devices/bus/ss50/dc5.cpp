@@ -47,6 +47,7 @@ public:
 		, m_interrupt_select(*this, "INTERRUPT_SELECT")
 		, m_address_mode(*this, "ADDRESS_MODE")
 		, m_two_control_regs(*this, "TWO_CONTROL_REGS")
+		, m_force_ready(*this, "FORCE_READY")
 		, m_ctrl_reg_bit7_side_select(*this, "CTRL_REG_BIT7_SIDE_SELECT")
 		, m_expected_clock(*this, "EXPECTED_CLOCK")
 		, m_expected_density(*this, "EXPECTED_DENSITY")
@@ -55,6 +56,7 @@ public:
 	{
 	}
 
+	DECLARE_INPUT_CHANGED_MEMBER(force_ready_change);
 	DECLARE_INPUT_CHANGED_MEMBER(ctrl_reg_bit7_side_select_change);
 	DECLARE_INPUT_CHANGED_MEMBER(expected_clock_change);
 
@@ -99,6 +101,7 @@ private:
 	required_ioport m_interrupt_select;
 	required_ioport m_address_mode;
 	required_ioport m_two_control_regs;
+	required_ioport m_force_ready;
 	required_ioport m_ctrl_reg_bit7_side_select;
 	required_ioport m_expected_clock;
 	required_ioport m_expected_density;
@@ -109,20 +112,31 @@ private:
 
 static INPUT_PORTS_START( dc5 )
 	PORT_START("INTERRUPT_SELECT")
-	PORT_DIPNAME(0xf, 0, "Interrupt select")
+	PORT_DIPNAME(0x3, 0, "Interrupt select")
 	PORT_DIPSETTING(0, "N/C")
 	PORT_DIPSETTING(1, "IRQ")
 	PORT_DIPSETTING(2, "NMI/FIRQ")
 
 	PORT_START("ADDRESS_MODE")
-	PORT_DIPNAME(0xf, 1, "Address mode")
+	PORT_DIPNAME(0x1, 1, "Address mode")
 	PORT_DIPSETTING(0, "4 address")
 	PORT_DIPSETTING(1, "16 address")
 
 	PORT_START("TWO_CONTROL_REGS")
-	PORT_DIPNAME(0xf, 0, "Two control registers")
+	PORT_DIPNAME(0x1, 0, "Two control registers")
 	PORT_DIPSETTING(0, "No, DC4 compatible")
 	PORT_DIPSETTING(1, "Yes, DC5 extension")
+
+	// The DC5 has two modes for controlling the FDC 'ready' input. One
+	// mode forces the 'ready' line for a period triggered by the chip
+	// select, along with the motors. The other mode detects index pulses
+	// from the disk to control the 'ready' line. Flex2 for the 6800
+	// generally needs the 'ready' line forced and Flex9 can use the index
+	// pulse detection to determine if disks are present.
+	PORT_START("FORCE_READY")
+	PORT_CONFNAME(0x1, 0, "Force ready") PORT_CHANGED_MEMBER(DEVICE_SELF, ss50_dc5_device, force_ready_change, 0)
+	PORT_CONFSETTING(0, DEF_STR(No))
+	PORT_CONFSETTING(1, DEF_STR(Yes))
 
 	// This config setting allows checking of the FDC clock rate and
 	// overriding it to assist driver development. The DC5 supports
@@ -149,7 +163,7 @@ static INPUT_PORTS_START( dc5 )
 	// drive selection. These drivers need to be corrected, but this
 	// option helps identify this issue and work around it.
 	PORT_START("CTRL_REG_BIT7_SIDE_SELECT")
-	PORT_CONFNAME(0x01, 0, "Control register bit 7") PORT_CHANGED_MEMBER(DEVICE_SELF, ss50_dc5_device, ctrl_reg_bit7_side_select_change, 0)
+	PORT_CONFNAME(0x1, 0, "Control register bit 7") PORT_CHANGED_MEMBER(DEVICE_SELF, ss50_dc5_device, ctrl_reg_bit7_side_select_change, 0)
 	PORT_CONFSETTING(0, "Inhibits drive selection")
 	PORT_CONFSETTING(1, "Erroneous side select")
 
@@ -159,7 +173,7 @@ static INPUT_PORTS_START( dc5 )
 	// support for that. This setting is an aid to report unexpected
 	// usage, and it attempts to correct that.
 	PORT_START("EXPECTED_DENSITY")
-	PORT_CONFNAME(0xff, 0, "Expected density")
+	PORT_CONFNAME(0x3, 0, "Expected density")
 	PORT_CONFSETTING(0, "-")
 	PORT_CONFSETTING(1, "single density") // Purely single density.
 	PORT_CONFSETTING(2, "double density, with single density track zero") // The default FLEX double density format.
@@ -270,6 +284,7 @@ void ss50_dc5_device::device_start()
 	m_fdc_side = 0;
 	m_floppy_motor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ss50_dc5_device::floppy_motor_callback),this));
 	m_motor_timer_out = 0;
+	m_fdc->set_force_ready(0);
 	m_fdc_prog_clock_div = 12;
 
 	save_item(NAME(m_fdc_status));
@@ -280,6 +295,11 @@ void ss50_dc5_device::device_start()
 	save_item(NAME(m_fdc_prog_clock_div));
 }
 
+
+INPUT_CHANGED_MEMBER(ss50_dc5_device::force_ready_change)
+{
+	control_register_update();
+}
 
 INPUT_CHANGED_MEMBER(ss50_dc5_device::ctrl_reg_bit7_side_select_change)
 {
@@ -588,6 +608,10 @@ void ss50_dc5_device::control_register_update()
 		floppy->ss_w(side);
 		m_fdc_side = side;
 	}
+
+	// Force the FDC 'ready' line on if the motor line is asserted, but
+	// only when this forced mode is enabled.
+	m_fdc->set_force_ready(m_motor_timer_out && m_force_ready->read());
 }
 
 
