@@ -230,9 +230,9 @@ uint32_t konmedal_state::screen_update_mariorou(screen_device &screen, bitmap_in
 
 	m_k052109->tilemap_update();
 
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 1);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 4);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 1);
 	return 0;
 }
 
@@ -542,7 +542,8 @@ K052109_CB_MEMBER(konmedal_state::shuriboy_tile_callback)
 		if (*color == 1) *color = 0;
 		if (*color == 2) *color = 1;
 		if (*color == 3) *color = 1;
-		if (*color == 6) *color = 5;
+		if (*color == 4) *color = 2;
+		if (*color == 6) *color = 3;
 		if (*color == 8) *color = 4;
 		if (*color == 9) *color = 4;
 		if (*color == 0xa) *color = 5;
@@ -552,18 +553,22 @@ K052109_CB_MEMBER(konmedal_state::shuriboy_tile_callback)
 	}
 	if (layer == 1)
 	{
+		if (*color == 8) *color = 2;
 		if (*color == 0) *color = 8;
 		if (*color == 0xa) *color = 0xe;
 		if (*color == 4) *color = 0xa;
+		if (*color == 6) *color = 3;
 	}
 	if (layer == 2)
 	{
-		if (*color == 6) *color = 3;
+		if (*color == 2) *color = 9;
+		if (*color == 6) *color = 2;
 		if (*color == 8) *color = 0xc;
 		if (*color == 0) *color = 8;
 		if (*color == 0xa) *color = 0xd;
 		if (*color == 4) *color = 0xa;
 		if (*color == 5) *color = 0xa;
+		if (*color == 0xf) *color = 0xb;
 	}
 }
 
