@@ -282,6 +282,23 @@ protected:
 private:
 };
 
+class zon32bit_state : public spg2xx_game_state
+{
+public:
+	zon32bit_state(const machine_config& mconfig, device_type type, const char* tag) :
+		spg2xx_game_state(mconfig, type, tag)
+	{ }
+
+	void zon32bit(machine_config& config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	DECLARE_READ16_MEMBER(zon32bit_portc_r);
+
+private:
+};
 
 class zone40_state : public wireless60_state
 {
@@ -759,6 +776,14 @@ WRITE16_MEMBER(zone40_state::zone40_porta_w)
 		m_maincpu->invalidate_cache();
 	}
 }
+
+
+READ16_MEMBER(zon32bit_state::zon32bit_portc_r)
+{
+	logerror("%s: zon32bit_portc_r\n", machine().describe_context());
+	return machine().rand();// m_w60_porta_data;
+}
+
 
 READ16_MEMBER(zone40_state::zone40_porta_r)
 {
@@ -2903,6 +2928,11 @@ void wireless60_state::machine_start()
 	m_w60_p2_ctrl_mask = 0x0800;
 }
 
+void zon32bit_state::machine_start()
+{
+	spg2xx_game_state::machine_start();
+}
+
 void zone40_state::machine_start()
 {
 	wireless60_state::machine_start();
@@ -2919,6 +2949,11 @@ void wireless60_state::machine_reset()
 	spg2xx_game_state::machine_reset();
 	m_w60_controller_input = -1;
 	m_w60_porta_data = 0;
+}
+
+void zon32bit_state::machine_reset()
+{
+	spg2xx_game_state::machine_reset();
 }
 
 void zone40_state::machine_reset()
@@ -3220,6 +3255,17 @@ void wireless60_state::wireless60(machine_config &config)
 	m_maincpu->porta_out().set(FUNC(wireless60_state::wireless60_porta_w));
 	m_maincpu->portb_out().set(FUNC(wireless60_state::wireless60_portb_w));
 	m_maincpu->porta_in().set(FUNC(wireless60_state::wireless60_porta_r));
+}
+
+void zon32bit_state::zon32bit(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zon32bit_state::mem_map_4m);
+	m_maincpu->set_force_no_drc(true); // uses JVS opcode, not implemented in recompiler
+
+	spg2xx_base(config);
+
+	m_maincpu->portc_in().set(FUNC(zon32bit_state::zon32bit_portc_r));
 }
 
 void zone40_state::zone40(machine_config &config)
@@ -4216,8 +4262,10 @@ ROM_START( wiwi18 )
 ROM_END
 
 ROM_START( pdc100 )
-	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "pdc100.bin", 0x000000, 0x4000000, CRC(0a1d99d4) SHA1(984d05122f77cd2ac9b9f6988a67ab718efb01a4) )
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
+	// only 1st half of this is used "Jumper resistor (0 ohm) that short A25 to ground"
+	// 2nd half just contains what seems to be random garbage
+	ROM_LOAD16_WORD_SWAP( "pdc100.bin", 0x000000, 0x8000000, CRC(57285b49) SHA1(cfb4be7877ec263d24063a004c56985db5c0f4e2) )
 ROM_END
 
 
@@ -4370,7 +4418,7 @@ CONS( 2010, wirels60, 0, 0, wireless60, wirels60, wireless60_state,  empty_init,
 CONS( 2011, lx_jg7415,0, 0, wireless60, wirels60, wireless60_state,  init_lx_jg7415,  "Lexibook",  "Lexibook JG7415 120-in-1",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Box advertises this as '40 Games Included' but the cartridge, which was glued directly to the PCB, not removable, is a 41-in-1.  Maybe some versions exist with a 40 game selection.
-CONS( 200?, zon32bit,  0, 0, wireless60, wirels60, wireless60_state,  empty_init,      "Jungle Soft / Ultimate Products (HK) Ltd",    "Zone 32-bit Gaming Console System (Family Sport 41-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, zon32bit,  0, 0, zon32bit, wirels60, zon32bit_state,  empty_init,      "Jungle Soft / Ultimate Products (HK) Ltd",    "Zone 32-bit Gaming Console System (Family Sport 41-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 
 // JAKKS Pacific Inc TV games
