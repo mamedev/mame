@@ -714,6 +714,8 @@ READ8_MEMBER(spg2xx_game_state::i2c_r)
 
 WRITE16_MEMBER(wireless60_state::wireless60_porta_w)
 {
+	//logerror("%s: wireless60_porta_w %04x\n", machine().describe_context(), data);
+
 	m_w60_porta_data = (data & 0x300) | m_w60_p1_ctrl_mask | m_w60_p2_ctrl_mask;
 	switch (m_w60_porta_data & 0x300)
 	{
@@ -735,6 +737,18 @@ WRITE16_MEMBER(wireless60_state::wireless60_porta_w)
 	}
 }
 
+READ16_MEMBER(wireless60_state::wireless60_porta_r)
+{
+	//logerror("%s: wireless60_porta_r\n", machine().describe_context());
+	return m_w60_porta_data;
+}
+
+WRITE16_MEMBER(wireless60_state::wireless60_portb_w)
+{
+	logerror("%s: wireless60_portb_w (bankswitch) %04x\n", machine().describe_context(), data);
+	switch_bank(data & m_bankmask);
+}
+
 WRITE16_MEMBER(zone40_state::zone40_porta_w)
 {
 	wireless60_porta_w(space, offset, data);
@@ -746,11 +760,6 @@ WRITE16_MEMBER(zone40_state::zone40_porta_w)
 	}
 }
 
-READ16_MEMBER(wireless60_state::wireless60_porta_r)
-{
-	return m_w60_porta_data;
-}
-
 READ16_MEMBER(zone40_state::zone40_porta_r)
 {
 	uint16_t ret = wireless60_porta_r(space, offset) & (0x0300 | m_w60_p1_ctrl_mask | m_w60_p2_ctrl_mask);
@@ -758,11 +767,6 @@ READ16_MEMBER(zone40_state::zone40_porta_r)
 	return ret;
 }
 
-WRITE16_MEMBER(wireless60_state::wireless60_portb_w)
-{
-	logerror("%s: wireless60_portb_w (bankswitch) %04x\n", machine().describe_context(), data);
-	switch_bank(data & m_bankmask);
-}
 
 void vii_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -4116,8 +4120,15 @@ ROM_START( lx_jg7415 )
 	ROM_LOAD16_WORD_SWAP( "rom.bin", 0x0000, 0x10000000, CRC(59442e00) SHA1(7e91cf6b19c37f9b4fa4dc21e241c6634d6a6f95) )
 ROM_END
 
+ROM_START( zone100 )
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "zone100.bin", 0x0000, 0x8000000, CRC(b966a54e) SHA1(e38156ebc4e2f2935b1acbeca33d1866d45c4f65) )
+ROM_END
 
-
+ROM_START( zon32bit )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "41sports.bin", 0x0000, 0x2000000, CRC(86eee6e0) SHA1(3f6cab6649aebf596de5a8af21658bb1a27edb10) )
+ROM_END
 
 ROM_START( rad_skat )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -4354,8 +4365,13 @@ CONS( 2007, vii,      0, 0, vii,        vii,      vii_state,         empty_init,
 // these don't have real motion controls
 CONS( 2009, zone40,   0, 0, zone40,     wirels60, zone40_state,      init_zone40,     "Jungle Soft / Ultimate Products (HK) Ltd",    "Zone 40",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2010, zone60,   0, 0, wireless60, wirels60, wireless60_state,  empty_init,      "Jungle's Soft / Ultimate Products (HK) Ltd",  "Zone 60",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, zone100,  0, 0, wireless60, wirels60, wireless60_state,  empty_init,      "Jungle's Soft / Ultimate Products (HK) Ltd",  "Zone 100",    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit was black, menus still show white controllers, unlike wireless 60
 CONS( 2010, wirels60, 0, 0, wireless60, wirels60, wireless60_state,  empty_init,      "Jungle Soft / Kids Station Toys Inc",         "Wireless 60", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2011, lx_jg7415,0, 0, wireless60, wirels60, wireless60_state,  init_lx_jg7415,  "Lexibook",  "Lexibook JG7415 120-in-1",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// Box advertises this as '40 Games Included' but the cartridge, which was glued directly to the PCB, not removable, is a 41-in-1.  Maybe some versions exist with a 40 game selection.
+CONS( 200?, zon32bit,  0, 0, wireless60, wirels60, wireless60_state,  empty_init,      "Jungle Soft / Ultimate Products (HK) Ltd",    "Zone 32-bit Gaming Console System (Family Sport 41-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
 
 // JAKKS Pacific Inc TV games
 CONS( 2004, jak_batm, 0, 0, jakks, batman, spg2xx_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "The Batman (JAKKS Pacific TV Game)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
