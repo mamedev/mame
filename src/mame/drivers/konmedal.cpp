@@ -95,6 +95,8 @@ private:
 	WRITE_LINE_MEMBER(vbl_ack_w) { m_maincpu->set_input_line(0, CLEAR_LINE); }
 	WRITE_LINE_MEMBER(nmi_ack_w) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
 	WRITE8_MEMBER(ccu_int_time_w) { m_ccu_int_time = data; }
+	WRITE8_MEMBER(k056832_w) { m_k056832->write(offset ^ 1, data); }
+	WRITE8_MEMBER(k056832_b_w) { m_k056832->b_w(offset ^ 1, data); }
 
 	K052109_CB_MEMBER(shuriboy_tile_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(shuri_scanline);
@@ -191,9 +193,10 @@ uint32_t konmedal_state::screen_update_konmedal(screen_device &screen, bitmap_in
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
 
-	// game only draws on this layer, apparently
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 3, 0, 1);
-
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, 0, 4);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 8);
 	return 0;
 }
 
@@ -283,11 +286,11 @@ void konmedal_state::medal_main(address_map &map)
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0x8000, 0x9fff).bankr("bank1");
 	map(0xa000, 0xbfff).ram().share("nvram"); // work RAM
-	map(0xc000, 0xc03f).w(m_k056832, FUNC(k056832_device::write));
+	map(0xc000, 0xc03f).w(FUNC(konmedal_state::k056832_w));
 	map(0xc100, 0xc100).w(FUNC(konmedal_state::control2_w));
 	map(0xc400, 0xc400).w(FUNC(konmedal_state::bankswitch_w));
 	map(0xc500, 0xc500).noprw(); // read to reset watchdog
-	map(0xc600, 0xc60f).w(m_k056832, FUNC(k056832_device::b_w));
+	map(0xc600, 0xc60f).w(FUNC(konmedal_state::k056832_b_w));
 	map(0xc700, 0xc700).portr("DSW2");
 	map(0xc701, 0xc701).portr("DSW1");
 	map(0xc702, 0xc702).portr("IN1");
@@ -302,11 +305,11 @@ void konmedal_state::ddboy_main(address_map &map)
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0x8000, 0x9fff).bankr("bank1");
 	map(0xa000, 0xbfff).ram().share("nvram"); // work RAM
-	map(0xc000, 0xc03f).w(m_k056832, FUNC(k056832_device::write));
+	map(0xc000, 0xc03f).w(FUNC(konmedal_state::k056832_w));
 	map(0xc100, 0xc100).w(FUNC(konmedal_state::control2_w));
 	map(0xc400, 0xc400).w(FUNC(konmedal_state::bankswitch_w));
 	map(0xc500, 0xc500).noprw(); // read to reset watchdog
-	map(0xc600, 0xc60f).w(m_k056832, FUNC(k056832_device::b_w));
+	map(0xc600, 0xc60f).w(FUNC(konmedal_state::k056832_b_w));
 	map(0xc700, 0xc700).portr("DSW1");
 	map(0xc701, 0xc701).portr("DSW2");
 	map(0xc702, 0xc702).portr("IN1");
