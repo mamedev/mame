@@ -36,6 +36,7 @@ Canceled games (possibly never got to the proto stage)
 	Mario Party 2 (demo)                       DIS-NUS-NMWE-USA
 	Mario Party 3 (demo)                       DIS-NUS-NMVE-USA
 	Nintendo 64 Test Cartridge                 http://www.nesworld.com/n64demo-game.php?gamegeneral=n64test&gameid=31
+	Ogre Battle 64 - Person of Lordly Caliber  Japan, rev 0
 	Perfect Dark (demo)                        DIS-NUS-NPDE-USA
 	Pokemon Stadium (demo)                     DIS-NUS-NP0E-USA
 	Pokemon Stadium 2 (demo)                   DIS-NUS-NP3E-USA
@@ -7614,7 +7615,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NH5E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NH5E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -7630,7 +7631,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NNME-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NNME-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="4194304">
@@ -7646,7 +7647,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NN2E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NN2E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -7674,7 +7675,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-N9CE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-N9CE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -7690,7 +7691,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NCKE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-01" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NCKE-0]" />
 			<feature name="u2" value="U2 [29L1100KC-15B0]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -7766,7 +7767,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NBAE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NBAE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -7782,7 +7783,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NB2E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NB2E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -7824,7 +7825,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NWZE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NWZE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -7852,7 +7853,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NJAE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NJAE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -7880,7 +7881,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NB9E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NB9E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -7907,8 +7908,13 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="NUS-NNLE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NNLE-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
+			<feature name="cart_model" value="NUS-006(USA)" />
 			<dataarea name="rom" size="16777216">
-				<rom name="nba live 2000 (usa) (en,fr,de,es).bin" size="16777216" crc="94fc12d3" sha1="61e5052589bfe9b7736b9e758125a8af11a11cb3" />
+				<rom name="nus-nnle-0.u1" size="16777216" crc="94fc12d3" sha1="61e5052589bfe9b7736b9e758125a8af11a11cb3" />
 			</dataarea>
 		</part>
 	</software>
@@ -7917,7 +7923,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<description>NBA Live 99 (Europe)</description>
 		<year>1998</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="NUS-N9BP-EUR"/>
+		<info name="serial" value="NUS-N9BP-EUR, NUS-N9BP-SCN"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="nba live 99 (europe) (en,fr,de,es,it).bin" size="16777216" crc="086e322e" sha1="eea6e4ff34beb7d0eb5692d79f4c5a1ff757853e" />
@@ -7932,9 +7938,9 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-N9BE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-N9BE-0" />
-			<feature name="u2" value="[empty]" />
-			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="u1" value="U1 [NUS-N9BE-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="16777216">
@@ -7974,7 +7980,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NSOE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NSOE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -8016,13 +8022,13 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NRIE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-03A-01" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NRIE-0]" />
 			<feature name="u2" value="U2 [LH52V246A]" />
 			<feature name="u3" value="U3 [BU9811]" />
 			<feature name="u4" value="U4 [CIC-NUS-6102A]" />
 			<feature name="bt1" value="BT1 [CR2032]" />
 			<dataarea name="rom" size="12582912">
-				<rom name="new tetris, the (usa).bin" size="12582912" crc="82a76dc9" sha1="cc88bfed8b77885cda6123c08e5d3b11451c6074" />
+				<rom name="nus-nrie-0.u1" size="12582912" crc="82a76dc9" sha1="cc88bfed8b77885cda6123c08e5d3b11451c6074" />
 			</dataarea>
 		</part>
 	</software>
@@ -8034,7 +8040,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NBZE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NBZE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
@@ -8050,7 +8056,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NSZE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NSZE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -8066,7 +8072,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NBIE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NBIE-1]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -8081,8 +8087,14 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<publisher>Midway</publisher>
 		<info name="serial" value="NUS-NBIE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NBIE-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="16777216">
-				<rom name="nfl blitz 2000 (usa).bin" size="16777216" crc="e4b42e6a" sha1="0dc7a0b174c53d95cb8046538a1a4c4475d7209d" />
+				<rom name="nus-nbie-0.u1" size="16777216" crc="e4b42e6a" sha1="0dc7a0b174c53d95cb8046538a1a4c4475d7209d" />
 			</dataarea>
 		</part>
 	</software>
@@ -8118,7 +8130,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NQBE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NQBE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="12582912">
@@ -8134,7 +8146,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NQCE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NQCE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="12582912">
@@ -8162,7 +8174,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NQ8E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NQ8E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
@@ -8190,7 +8202,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NQ9E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NQ9E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -8218,7 +8230,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-N9HE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-N9HE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -8234,7 +8246,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NHOE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NHOE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -8262,7 +8274,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NHLE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NHLE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -8290,7 +8302,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NH9E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NH9E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -8318,7 +8330,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NNCE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NNCE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
@@ -8351,10 +8363,12 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-03A-01" />
 			<feature name="u1" value="U1 [NUS-NALJ-0]" />
-			<feature name="u2" value="U2 [LH52V246AD]" />
-			<feature name="u3" value="U3 [BU9811]" />
+			<feature name="u2" value="U2 [LH52V246AD]" /> <!-- Also with [LH52V246A] -->
+			<feature name="u3" value="U3 [BU9811]" /> <!-- Also with [74LV2416] -->
 			<feature name="u4" value="U4 [CIC-NUS-6103]" />
 			<feature name="bt1" value="BT1 [CR2032]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="16777216">
 				<rom name="nus-nalj-0.u1" size="16777216" crc="a2d1d0d1" sha1="42e5bab5d8c3b3ca3582e142094b50ecc7fea5e6" />
 			</dataarea>
@@ -8392,7 +8406,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NCEE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NCEE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="33554432">
@@ -8402,7 +8416,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 	</software>
 
 	<software name="nustsu64">
-		<description>Nushi Tsuri 64 (Japan, Rev. A)</description>
+		<description>Nushi Tsuri 64 (Japan, rev 1)</description>
 		<year>1998</year>
 		<publisher>Pack In Soft</publisher>
 		<info name="serial" value="NUS-NUTJ-JPN"/>
@@ -8484,7 +8498,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NOFE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NOFE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
@@ -8494,7 +8508,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 	</software>
 
 	<software name="ogrebatlj" cloneof="ogrebatl">
-		<description>Ogre Battle 64 - Person of Lordly Caliber (Japan, Rev. A)</description>
+		<description>Ogre Battle 64 - Person of Lordly Caliber (Japan, rev 1)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NOBJ-JPN"/>
@@ -8508,7 +8522,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 	</software>
 
 	<software name="ogrebatl">
-		<description>Ogre Battle 64 - Person of Lordly Caliber (USA, Rev. A)</description>
+		<description>Ogre Battle 64 - Person of Lordly Caliber (USA, rev 1)</description>
 		<year>2000</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="NUS-NOBE-USA"/>
@@ -8543,7 +8557,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<description>Olympic Hockey Nagano '98 (Europe)</description>
 		<year>1998</year>
 		<publisher>Midway</publisher>
-		<info name="serial" value="NUS-NHNP-(UKV,NOE)"/>
+		<info name="serial" value="NUS-NHNP-NOE, NUS-NHNP-UKV"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="olympic hockey nagano '98 (europe) (en,fr,de,es).bin" size="8388608" crc="1c7b9ed5" sha1="d72f932b0d12f19b9423a112664d0ccfc1526767" />
@@ -8673,7 +8687,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NYPE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NYPE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="12582912">
@@ -8729,7 +8743,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 		<info name="serial" value="NUS-NCRE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NCRE-0]" />
 			<feature name="u2" value="U2 [BK4D-NUS]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
@@ -8765,15 +8779,15 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 	</software>
 
 	<software name="pdarku" cloneof="pdark">
-		<description>Perfect Dark (USA, Rev. A)</description>
+		<description>Perfect Dark (USA, rev 1)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NPDE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-NPDE-1" />
-			<feature name="u2" value="BK16D 9851 " />
-			<feature name="u3" value="CIC-NUS-6105A" />
+			<feature name="u1" value="U1 [NUS-NPDE-1]" />
+			<feature name="u2" value="U2 [BK16D 9851]" />
+			<feature name="u3" value="U3 [CIC-NUS-6105A]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="33554432">
@@ -8825,12 +8839,12 @@ patched out (+ a fix for internal checksum)
 -->
 <!-- Why is this a different size than encrypted? -->
 	<software name="pdarkuph" cloneof="pdark">
-		<description>Perfect Dark (USA, Prototype Debug, Decrypted)</description>
+		<description>Perfect Dark (USA, prototype 20000522, version 6.4, decrypted)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
-				<rom name="pd_ntsc_debug_dc.bin" size="33554432" crc="0ea2645f" sha1="40c60733840ee68ac60f0c951055c942a2573bfc" />
+				<rom name="pd_ntsc_debug_dc.bin" size="33554432" crc="0ea2645f" sha1="40c60733840ee68ac60f0c951055c942a2573bfc" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -8842,7 +8856,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NEAE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NEAE-0]" />
 			<feature name="u2" value="U2 [BU9850]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -8918,7 +8932,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NPWE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NPWE-0]" />
 			<feature name="u2" value="U2 [BU9850]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
@@ -9134,9 +9148,9 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NPFE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-01" />
-			<feature name="u1" value="NUS-NPFE-0" />
-			<feature name="u2" value="29L1100KC-15B0" />
-			<feature name="u3" value="CIC-NUS-6103" />
+			<feature name="u1" value="U1 [NUS-NPFE-0]" />
+			<feature name="u2" value="U2 [29L1100KC-15B0]" />
+			<feature name="u3" value="U3 [CIC-NUS-6103]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="16777216">
@@ -9157,7 +9171,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokestad">
-		<description>Pokémon Stadium (Europe, Rev. A)</description>
+		<description>Pokémon Stadium (Europe, rev 1)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NPOP-EUR"/>
@@ -9234,7 +9248,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokestadu" cloneof="pokestad">
-		<description>Pokémon Stadium (USA, Rev. B)</description>
+		<description>Pokémon Stadium (USA, rev 2)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NPOE-USA"/>
@@ -9252,7 +9266,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NPOE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-01" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NPOE-1]" />
 			<feature name="u2" value="U2 [29LL1100KC-15B0]" />
 			<feature name="u3" value="U3 [CIC-NUS-6103A]" />
 			<dataarea name="rom" size="33554432">
@@ -9268,9 +9282,9 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NPOE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-01" />
-			<feature name="u1" value="NUS-NPOE-0" />
-			<feature name="u2" value="29L1100KC-15B0" />
-			<feature name="u3" value="CIC-NUS-6103A" />
+			<feature name="u1" value="U1 [NUS-NPOE-0]" />
+			<feature name="u2" value="U2 [29L1100KC-15B0]" />
+			<feature name="u3" value="U3 [CIC-NUS-6103A]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="33554432">
@@ -9372,7 +9386,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NPXE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NPXE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -9414,7 +9428,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NPUE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NPUE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -9430,7 +9444,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NPQE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NPQE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="8388608">
@@ -9452,7 +9466,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="mjkiwame">
-		<description>Pro Mahjong Kiwame 64 (Japan, Rev. A)</description>
+		<description>Pro Mahjong Kiwame 64 (Japan, rev 1)</description>
 		<year>1997</year>
 		<publisher>Athena</publisher>
 		<info name="serial" value="NUS-NKMJ-JPN"/>
@@ -9539,7 +9553,7 @@ patched out (+ a fix for internal checksum)
 		<description>Quake 64 (Europe)</description>
 		<year>1998</year>
 		<publisher>GT Interactive</publisher>
-		<info name="serial" value="NUS-NKQP-EUR"/>
+		<info name="serial" value="NUS-NQKP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="quake 64 (europe).bin" size="12582912" crc="6f79b0eb" sha1="8b9ff00fff48ef847794164111ec9415e5dccb31" />
@@ -9554,7 +9568,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NQKE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NQKE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -9582,7 +9596,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NQ2E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NQ2E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -9598,9 +9612,9 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NETE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-NETE-0" />
-			<feature name="u2" value="[empty]" />
-			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="u1" value="U1 [NUS-NETE-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="16777216">
@@ -11232,8 +11246,14 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NSQP-AUS"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-06A-01" />
+			<feature name="u1" value="U1 [NUS-NSQP-0]" />
+			<feature name="u2" value="U2 [29L1100KC-15B0]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101A]" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<feature name="cart_back_label" value="NUS-EUR-1" />
 			<dataarea name="rom" size="33554432">
-				<rom name="starcraft 64 (australia).bin" size="33554432" crc="d42fcfe1" sha1="0e4ae4d13bc78cea021a1f7d1534e9b82bdb0cdd" />
+				<rom name="nus-nsqp-0.u1" size="33554432" crc="d42fcfe1" sha1="0e4ae4d13bc78cea021a1f7d1534e9b82bdb0cdd" />
 			</dataarea>
 		</part>
 	</software>
@@ -11256,9 +11276,9 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NSQE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-01" />
-			<feature name="u1" value="NUS-NSQE-0" />
-			<feature name="u2" value="29L1100KC-15B0" />
-			<feature name="u3" value="CIC-NUS-6102A" />
+			<feature name="u1" value="U1 [NUS-NSQE-0]" />
+			<feature name="u2" value="U2 [29L1100KC-15B0]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="33554432">
