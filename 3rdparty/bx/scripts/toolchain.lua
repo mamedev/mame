@@ -253,14 +253,15 @@ function toolchain(_buildDir, _libDir)
 
 		elseif "asmjs" == _OPTIONS["gcc"] then
 
-			if not os.getenv("EMSDK") then
-				print("Set EMSDK environment variable.")
+			if not os.getenv("EMSCRIPTEN") then
+				print("Set EMSCRIPTEN environment variable.")
 			end
 
-			premake.gcc.cc   = "\"$(EMSDK)/fastcomp/bin/emcc\""
-			premake.gcc.cxx  = "\"$(EMSDK)/fastcomp/bin/em++\""
-			premake.gcc.ar   = "\"$(EMSDK)/fastcomp/bin/emar\""
+			premake.gcc.cc   = "\"$(EMSCRIPTEN)/emcc\""
+			premake.gcc.cxx  = "\"$(EMSCRIPTEN)/em++\""
+			premake.gcc.ar   = "\"$(EMSCRIPTEN)/emar\""
 			premake.gcc.llvm = true
+			premake.gcc.namestyle = "Emscripten"
 			location (path.join(_buildDir, "projects", _ACTION .. "-asmjs"))
 
 		elseif "freebsd" == _OPTIONS["gcc"] then
@@ -969,9 +970,15 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "asmjs/obj"))
 		libdirs { path.join(_libDir, "lib/asmjs") }
 		buildoptions {
-			"-isystem \"$(EMSDK)/fastcomp/emscripten\"",
 			"-Wunused-value",
 			"-Wundef",
+		}
+
+		linkoptions {
+--			"-s ASSERTIONS=2",
+--			"-s EMTERPRETIFY=1",
+--			"-s EMTERPRETIFY_ASYNC=1",
+			"-s PRECISE_F32=1",
 		}
 
 	configuration { "freebsd" }
@@ -1273,24 +1280,6 @@ function strip()
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
 			"$(SILENT) $(MINGW)/bin/strip -s \"$(TARGET)\""
-		}
-
-	configuration { "asmjs" }
-		postbuildcommands {
-			"$(SILENT) echo Running asmjs finalize.",
-			"$(SILENT) \"$(EMSDK)/fastcomp/bin/emcc\" -O2 "
-
---				.. "-s ALLOW_MEMORY_GROWTH=1 "
---				.. "-s ASSERTIONS=2 "
---				.. "-s EMTERPRETIFY=1 "
---				.. "-s EMTERPRETIFY_ASYNC=1 "
-				.. "-s PRECISE_F32=1 "
-				.. "-s TOTAL_MEMORY=268435456 "
---				.. "-s USE_WEBGL2=1 "
-
-				.. "--memory-init-file 1 "
-				.. "\"$(TARGET)\" -o \"$(TARGET)\".html "
---				.. "--preload-file ../../../examples/runtime@/ "
 		}
 
 	configuration { "riscv" }
