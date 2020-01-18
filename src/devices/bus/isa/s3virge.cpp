@@ -958,7 +958,7 @@ void s3virge_vga_device::command_finish()
 		command_start();
 	else
 		s3virge.s3d.busy = false;
-	
+	//machine().debug_break();
 	LOGMMIO("Command finished [%u] (%u slots free)\n",s3virge.s3d.cmd_fifo_current_ptr,s3virge.s3d.cmd_fifo_slots_free);
 }
 
@@ -1025,8 +1025,6 @@ bool s3virge_vga_device::advance_pixel()
 		s3virge.s3d.bitblt_x_current--;
 		s3virge.s3d.bitblt_x_src_current--;
 		s3virge.s3d.bitblt_pat_x--;
-//		logerror("SRC: %i,%i  DST: %i,%i PAT: %i,%i\n",
-//					s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,s3virge.s3d.bitblt_pat_x,s3virge.s3d.bitblt_pat_y);
 //		machine().debug_break();
 	}
 	if(ypos)
@@ -1060,6 +1058,9 @@ bool s3virge_vga_device::advance_pixel()
 		s3virge.s3d.bitblt_pat_x = s3virge.s3d.bitblt_x_current % 8;
 		if(s3virge.s3d.bitblt_pat_y >= 8 || s3virge.s3d.bitblt_pat_y < 0)
 			s3virge.s3d.bitblt_pat_y = s3virge.s3d.bitblt_y_current % 8;
+	logerror("SRC: %i,%i  DST: %i,%i PAT: %i,%i Bounds: %i,%i,%i,%i\n",
+				s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,s3virge.s3d.bitblt_pat_x,s3virge.s3d.bitblt_pat_y,
+				left,right,top,bottom);
 		if((s3virge.s3d.bitblt_y_current >= bottom) || (s3virge.s3d.bitblt_y_current <= top))
 			return true;
 	}
@@ -1108,6 +1109,11 @@ void s3virge_vga_device::bitblt_colour_step()
 				dst = read_pixel8(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current);
 				write_pixel8(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, src, dst, pat) & 0xff);
 				done = advance_pixel();
+				if(done)
+				{
+					command_finish();
+					break;
+				}
 				if((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x80) && s3virge.s3d.bitblt_x_current == s3virge.s3d.bitblt_x_dst)
 				{
 					if(align == 2) // doubleword aligned, end here
@@ -1121,8 +1127,6 @@ void s3virge_vga_device::bitblt_colour_step()
 					}
 				}
 			}
-			if(done)
-				command_finish();
 			break;
 		case 1:  // 16bpp
 			if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x80)
@@ -1139,12 +1143,13 @@ void s3virge_vga_device::bitblt_colour_step()
 				pat = s3virge.s3d.pattern[(s3virge.s3d.bitblt_pat_y*16) + (s3virge.s3d.bitblt_pat_x*2)] | (s3virge.s3d.pattern[(s3virge.s3d.bitblt_pat_y*16) + (s3virge.s3d.bitblt_pat_x*2) + 1]) << 8;
 			write_pixel16(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, src, dst, pat) & 0xffff);
 			done = advance_pixel();
-			if((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x80) && s3virge.s3d.bitblt_x_current == s3virge.s3d.bitblt_x_dst && align == 2)  
+			if(done)
 			{
-				if(done)
-					command_finish();
-				break;  // if a new line of an image transfer, and is dword aligned, stop here
+				command_finish();
+				break;
 			}
+			if((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x80) && s3virge.s3d.bitblt_x_current == s3virge.s3d.bitblt_x_dst && align == 2)  
+				break;  // if a new line of an image transfer, and is dword aligned, stop here
 			if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x80)
 				src = s3virge.s3d.image_xfer >> 16;
 			else
