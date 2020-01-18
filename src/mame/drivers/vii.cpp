@@ -237,6 +237,22 @@ protected:
 };
 
 
+class spg2xx_lexiseal_game_state : public spg2xx_game_state
+{
+public:
+	spg2xx_lexiseal_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag)
+	{ }
+
+	void lexiseal(machine_config& config);
+
+protected:
+	//virtual void machine_start() override;
+	//virtual void machine_reset() override;
+
+	DECLARE_WRITE16_MEMBER(portb_w);
+};
+
 class spg2xx_pdc100_game_state : public spg2xx_game_state
 {
 public:
@@ -2317,6 +2333,28 @@ static INPUT_PORTS_START( lexizeus ) // how many buttons does this have?  I acci
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( lexiseal )
+	PORT_START("P1")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED ) // doesn't respond as 'select'
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) // pause / start
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0xfffc, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( tvgogo )
 	PORT_START("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Back")
@@ -3146,6 +3184,18 @@ WRITE16_MEMBER(spg2xx_pdc100_game_state::porta_w)
 	switch_bank(data & 0x0007);
 }
 
+WRITE16_MEMBER(spg2xx_lexiseal_game_state::portb_w)
+{
+	//logerror("%s: portb_w %04x\n", machine().describe_context(), data);
+	
+	// only 2 banks
+	if (data == 0x5f)
+		switch_bank(0);
+	else if (data == 0xdf)
+		switch_bank(1);
+}
+
+
 
 void wireless60_state::machine_start()
 {
@@ -3817,6 +3867,16 @@ void spg2xx_pdc100_game_state::pdc100(machine_config &config)
 	m_maincpu->portb_in().set_ioport("P2");
 	m_maincpu->portc_in().set_ioport("P3"); // not used?
 }
+
+void spg2xx_lexiseal_game_state::lexiseal(machine_config &config)
+{
+	non_spg_base(config);
+	m_maincpu->portb_out().set(FUNC(spg2xx_lexiseal_game_state::portb_w));
+	m_maincpu->porta_in().set_ioport("P1");
+	m_maincpu->portb_in().set_ioport("P2");
+	m_maincpu->portc_in().set_ioport("P3");
+}
+
 
 // Shredmaster Jr uses the same input order as the regular Taikee Guitar, but reads all inputs through a single multplexed bit
 WRITE16_MEMBER(shredmjr_game_state::porta_w)
@@ -4751,7 +4811,7 @@ CONS( 2006, telestry,  0,        0, telestory, telestory,   telestory_state, emp
 // Similar, SPG260?, scrambled
 CONS( 200?, lexizeus,    0,     0,        lexizeus,     lexizeus, spg2xx_game_state, init_zeus, "Lexibook", "Zeus IG900 20-in-1 (US?)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad sound and some corrupt bg tilemap entries in Tiger Rescue, verify ROM data (same game runs in Zone 60 without issue)
 
-CONS( 200?, lexiseal,    0,     0,        lexizeus,     lexizeus, spg2xx_game_state, init_zeus, "Lexibook / Sit Up Limited", "Seal 50-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, lexiseal,    0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Lexibook / Sit Up Limited", "Seal 50-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // there are other regions of this, including a Finnish version "Haluatko miljonääriksi?" (see https://millionaire.fandom.com/wiki/Haluatko_miljon%C3%A4%C3%A4riksi%3F_(Play_Vision_game) )
 CONS( 2006, pvmil,       0,     0,        pvmil,        pvmil,    pvmil_state, empty_init, "Play Vision", "Who Wants to Be a Millionaire? (Play Vision, Plug and Play, UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
