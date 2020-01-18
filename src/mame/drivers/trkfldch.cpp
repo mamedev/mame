@@ -20,6 +20,16 @@ The G65816 code on these is VERY ugly and difficult to follow, many redundant st
 
 One of the vectors points to 0x6000, there is nothing mapped there, could it be a small internal ROM or some debug trap for development?
 
+
+---
+
+4 Player System notes:
+
+Mountain Bike Rally uses scrolling / split (helps confirm the same row skip logic seen in other games when using split)
+Turn and Whack (cards) game runs far too quickly (might show us where timer config is)
+The Power Game game also appears to run far too quickly
+Territory Pursuit uses y-flipped sprites
+
 */
 
 #include "emu.h"
@@ -43,7 +53,8 @@ public:
 		m_mainram(*this, "mainram"),
 		m_spriteram(*this, "spriteram"),
 		m_palram(*this, "palram"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_in(*this, "IN%u", 0U)
 	{ }
 
 	void trkfldch(machine_config &config);
@@ -63,6 +74,7 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_palram;
 	required_device<palette_device> m_palette;
+	required_ioport_array<4> m_in;
 
 	void draw_sprites(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int pri);
 	void render_text_tile_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, uint16_t base);
@@ -280,14 +292,26 @@ void trkfldch_state::draw_sprites(screen_device& screen, bitmap_ind16& bitmap, c
 	{
 		int priority = (m_spriteram[i + 4] & 0x20)>>5;
 
-		// list is NOT drawn but instead z sorted, see shadows in trkfldch
+		// list is NOT drawn in order, but instead z sorted, see shadows in trkfldch
 		if (priority != pri)
 			continue;
 
 		// logerror("entry %02x %02x %02x %02x %02x\n", m_spriteram[i + 0], m_spriteram[i + 1], m_spriteram[i + 2], m_spriteram[i + 3], m_spriteram[i + 4]);
 		int tilegfxbase = (m_modebank[0x05] * 0x800);
 
-		// --pp tt-y    yyyy yyyy    tttt tttt    yyyy yyyy    --zf -t-x
+		/* m_spriteram[i + 0]  --pp tt-y    
+		   m_spriteram[i + 1]  yyyy yyyy    
+		   m_spriteram[i + 2]  tttt tttt    
+		   m_spriteram[i + 3]  xxxx xxxx    
+		   m_spriteram[i + 4]  --zfF-t-x
+
+		   p = palette bits
+		   t = tile bites
+		   y = y pos bits
+		   x = x pos bits
+		   z = priority
+		   fF = x/y flip
+		*/
 
 		int y = m_spriteram[i + 1];
 		int x = m_spriteram[i + 3];
@@ -300,6 +324,7 @@ void trkfldch_state::draw_sprites(screen_device& screen, bitmap_ind16& bitmap, c
 		int pal = 0;
 
 		int flipx = m_spriteram[i + 4] & 0x10;
+		int flipy = m_spriteram[i + 4] & 0x08;
 
 		if (tilehigh)
 			tile += 0x100;
@@ -337,7 +362,7 @@ void trkfldch_state::draw_sprites(screen_device& screen, bitmap_ind16& bitmap, c
 		}
 
 
-		gfx->transpen(bitmap, cliprect, tile + tilegfxbase, pal, flipx, 0, x, y, 0);
+		gfx->transpen(bitmap, cliprect, tile + tilegfxbase, pal, flipx, flipy, x, y, 0);
 	}
 }
 
@@ -511,6 +536,18 @@ WRITE8_MEMBER(trkfldch_state::tmap1_scroll_window_w)
 READ8_MEMBER(trkfldch_state::dmaregs_r)
 {
 	uint8_t ret = m_dmaregs[offset];
+
+	switch (offset)
+	{
+	case 0x05: // abl4play polls this expecting it to be 0 to continue (probably becomes after DMA is complete, or can show the status in realtime?)
+		ret = 0x00;
+		break;
+
+	case 0x06: // abl4play polls this expecting it to be 0 to continue (probably becomes after DMA is complete, or can show the status in realtime?)
+		ret = 0x00;
+		break;
+	}
+
 	logerror("%s: dmaregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 	return ret;
 }
@@ -728,7 +765,7 @@ void trkfldch_state::trkfldch_map(address_map &map)
 
 	map(0x007870, 0x0078ff).rw(FUNC(trkfldch_state::unkregs_r), FUNC(trkfldch_state::unkregs_w));
 
-	map(0x008000, 0x3fffff).rom().region("maincpu", 0x000000); // good for code mapped at 008000 and 050000 at least
+	map(0x008000, 0x7fffff).rom().region("maincpu", 0x000000); // good for code mapped at 008000 and 050000 at least
 }
 
 void trkfldch_state::vectors_map(address_map &map)
@@ -863,6 +900,9 @@ static INPUT_PORTS_START( trkfldch )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_START("IN3")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( my1stddr )
@@ -905,6 +945,51 @@ static INPUT_PORTS_START( my1stddr )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_START("IN3")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( abl4play )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Select")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+		
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(4)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(4)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(4)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1092,17 +1177,19 @@ READ8_MEMBER(trkfldch_state::unkregs_r)
 	{
 
 	case 0x00: // read in irq (inputs?)
-		ret = ioport("IN0")->read();
-		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		ret = m_in[0]->read();
+		logerror("%s: unkregs_r %04x (returning %02x) (Player 1 inputs)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x01:
-		ret = ioport("IN1")->read();
 		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
 		break;
 
+	// 0x02
+
 	case 0x03:
-		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		ret = m_in[1]->read();
+		logerror("%s: unkregs_r %04x (returning %02x) (Player 2 inputs)\n", machine().describe_context(), offset, ret);
 		break;
 
 	case 0x04:
@@ -1118,8 +1205,19 @@ READ8_MEMBER(trkfldch_state::unkregs_r)
 		break;
 
 	case 0x07:
-		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
+		ret = m_in[2]->read();
+		logerror("%s: unkregs_r %04x (returning %02x) (Player 3 inputs)\n", machine().describe_context(), offset, ret);
 		break;
+
+	// 0x08
+	// 0x09
+	// 0x0a
+
+	case 0x0b:
+		ret = m_in[3]->read();
+		logerror("%s: unkregs_r %04x (returning %02x) (Player 4 inputs)\n", machine().describe_context(), offset, ret);
+		break;
+
 
 	case 0x0f:
 		logerror("%s: unkregs_r %04x (returning %02x)\n", machine().describe_context(), offset, ret);
@@ -1328,16 +1426,22 @@ void trkfldch_state::trkfldch(machine_config &config)
 }
 
 ROM_START( trkfldch )
-	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "trackandfield.bin", 0x000000, 0x400000,  CRC(f4f1959d) SHA1(344dbfe8df1897adf77da6e5ca0435c4d47d6842) )
 ROM_END
 
 ROM_START( my1stddr )
-	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "myfirstddr.bin", 0x000000, 0x400000, CRC(2ef57bfc) SHA1(9feea5adb9de8fe17e915f3a037e8ddd70e58ae7) )
+ROM_END
+
+ROM_START( abl4play )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "abl4play.bin", 0x000000, 0x800000, CRC(5d57fb70) SHA1(34cdf80dc8cb08e5cd98c724268e4c5f483780d7) )
 ROM_END
 
 
 CONS( 2007, trkfldch,  0,          0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Konami",             "Track & Field Challenge", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 CONS( 2006, my1stddr,  0,          0,  trkfldch, my1stddr,trkfldch_state,      empty_init,    "Konami",             "My First Dance Dance Revolution (US)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Japan version has different songs
+CONS( 200?, abl4play,  0,          0,  trkfldch, abl4play,trkfldch_state,      empty_init,    "Advance Bright Ltd", "4 Player System - 10 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 

@@ -69,7 +69,7 @@ public:
 		m_inputs(*this, "IN.0")
 	{ }
 
-	// machine drivers
+	// machine configs
 	void sc9b(machine_config &config);
 	void sc9c(machine_config &config);
 	void sc9d(machine_config &config);
@@ -271,7 +271,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void sc9_state::sc9d(machine_config &config)

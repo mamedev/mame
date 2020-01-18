@@ -51,7 +51,7 @@ public:
 		m_inputs(*this, "IN.0")
 	{ }
 
-	// machine drivers
+	// machine configs
 	void as12(machine_config &config);
 
 protected:
@@ -205,7 +205,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void as12_state::as12(machine_config &config)

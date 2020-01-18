@@ -22,6 +22,7 @@ aci_ggm.cpp
 aci_prodigy.cpp
 acrnsys1.cpp
 acrnsys.cpp
+actions_atj2279b.cpp
 acvirus.cpp
 adam.cpp
 adm11.cpp
@@ -97,6 +98,7 @@ b16.cpp
 b2m.cpp
 babbage.cpp
 banctec.cpp
+bandai_design_master.cpp
 basic52.cpp
 bbc.cpp
 bbcbc.cpp

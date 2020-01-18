@@ -81,7 +81,7 @@ public:
 		m_inputs(*this, "IN.0")
 	{ }
 
-	// machine drivers
+	// machine configs
 	void sc12(machine_config &config);
 	void sc12b(machine_config &config);
 
@@ -224,7 +224,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void sc12_state::sc12(machine_config &config)

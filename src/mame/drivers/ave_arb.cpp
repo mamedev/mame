@@ -77,7 +77,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { update_reset(); }
 	DECLARE_INPUT_CHANGED_MEMBER(halt_button) { m_maincpu->set_input_line(M6502_NMI_LINE, newval ? ASSERT_LINE : CLEAR_LINE); update_reset(); }
 
-	// machine drivers
+	// machine configs
 	void arb(machine_config &config);
 	void v2(machine_config &config);
 
@@ -256,7 +256,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void arb_state::v2(machine_config &config)

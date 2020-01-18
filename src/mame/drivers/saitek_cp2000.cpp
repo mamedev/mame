@@ -45,7 +45,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void cp2000(machine_config &config);
 
 protected:
@@ -207,7 +207,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void cp2000_state::cp2000(machine_config &config)

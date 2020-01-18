@@ -17,11 +17,11 @@
 ///
 /// \brief Version - Minor.
 ///
-#define NL_VERSION_MINOR  		   4
+#define NL_VERSION_MINOR  		   7
 ///
 /// \brief Version - Patch level.
 ///
-#define NL_VERSION_PATCHLEVEL      2
+#define NL_VERSION_PATCHLEVEL      1
 
 ///
 /// \addtogroup compiledefine
@@ -61,7 +61,7 @@
 /// This approach is stricter and should identify bugs in
 /// the netlist core faster.
 /// By default it is disabled since it is not as fast as
-/// the default approach. It is up to 10% slower.
+/// the default approach. It is up to 20% slower.
 ///
 
 #ifndef NL_USE_COPY_INSTEAD_OF_REFERENCE
@@ -125,20 +125,40 @@
 //#define NL_DEBUG                    (true)
 #endif
 
+///
+/// \}
+///
+
 //============================================================
 // Time resolution
 //============================================================
 
 /// \brief Resolution as clocks per second for timing
 ///
-///  Uses nano-second resolution - Sufficient for now
+/// Uses 100 pico second resolution. This is aligned to MAME's
+/// attotime resolution.
+///
+/// The table below shows the maximum run times depending on
+/// time type size and resolution.
+///
+///  | Bits |               Res |       Seconds |   Days | Years |
+///  | ====-|               ===-|       =======-|   ====-| =====-|
+///  |  63	|     1,000,000,000	| 9,223,372,037	| 106,752| 292.3 |
+///  |  63	|    10,000,000,000	|   922,337,204	|  10,675|  29.2 |
+///  |  63	|   100,000,000,000	|    92,233,720	|   1,068|   2.9 |
+///  |  63	| 1,000,000,000,000	|     9,223,372	|     107|   0.3 |
+///
 
-static constexpr const auto NETLIST_INTERNAL_RES = 1000000000;
+static constexpr const auto NETLIST_INTERNAL_RES = 10'000'000'000ll;
 
-// FIXME: Belongs into MAME netlist.h
-static constexpr const auto NETLIST_CLOCK = NETLIST_INTERNAL_RES;
+/// \brief Recommended clock to be used
+///
+/// This is the recommended clock to be used in fixed clock applications limited
+/// to 32 bit clock resolution. The MAME code (netlist.cpp) contains code
+/// illustrating how to deal with remainders if \ref NETLIST_INTERNAL_RES is
+/// bigger than NETLIST_CLOCK.
 
-///  \}
+static constexpr const int NETLIST_CLOCK = 1'000'000'000;
 
 /// \brief  Floating point types used
 ///

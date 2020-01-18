@@ -70,19 +70,32 @@ public:
 
 	virtual ~netlist_mame_device();
 
-	void set_setup_func(func_type &&func) { m_setup_func = std::move(func); }
+	void set_setup_func(func_type &&func) noexcept { m_setup_func = std::move(func); }
 
 	netlist::setup_t &setup();
 	netlist_mame_t &netlist() noexcept { return *m_netlist; }
 
-	void update_icount(netlist::netlist_time time) noexcept;
+	void update_icount(netlist::netlist_time_ext time) noexcept;
 	void check_mame_abort_slice() noexcept;
 
 	static void register_memregion_source(netlist::nlparse_t &setup, device_t &dev, const char *name);
 
 	int m_icount;
 
+	static constexpr const unsigned MDIV_SHIFT = 16;
+
+	netlist::netlist_time_ext nltime_ext_from_clocks(unsigned c) const noexcept
+	{
+		return (m_div * c).shr(MDIV_SHIFT);
+	}
+
+	netlist::netlist_time nltime_from_clocks(unsigned c) const noexcept
+	{
+		return static_cast<netlist::netlist_time>((m_div * c).shr(MDIV_SHIFT));
+	}
+
 protected:
+
 	netlist_mame_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// Custom to netlist ...
@@ -98,8 +111,6 @@ protected:
 	virtual void device_pre_save() override;
 	virtual void device_clock_changed() override;
 
-	netlist::netlist_time m_div;
-
 	plib::unique_ptr<netlist::netlist_state_t> base_validity_check(validity_checker &valid) const;
 
 private:
@@ -107,9 +118,9 @@ private:
 
 	void common_dev_start(netlist::netlist_state_t *lnetlist) const;
 
-	/* timing support here - so sound can hijack it ... */
-	netlist::netlist_time        m_rem;
-	netlist::netlist_time        m_old;
+	netlist::netlist_time_ext	 m_div;
+	netlist::netlist_time_ext    m_rem;
+	netlist::netlist_time_ext    m_old;
 
 	std::unique_ptr<netlist_mame_t> m_netlist;
 

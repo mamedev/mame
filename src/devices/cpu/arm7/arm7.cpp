@@ -45,6 +45,8 @@ TODO:
 #define VERBOSE				(0)
 #include "logmacro.h"
 
+#define PRINT_HAPYFSH2		(0)
+
 /* prototypes of coprocessor functions */
 void arm7_dt_r_callback(arm_state *arm, uint32_t insn, uint32_t *prn, uint32_t (*read32)(arm_state *arm, uint32_t addr));
 void arm7_dt_w_callback(arm_state *arm, uint32_t insn, uint32_t *prn, void (*write32)(arm_state *arm, uint32_t addr, uint32_t data));
@@ -865,6 +867,198 @@ void arm7_cpu_device::execute_run()
 	{
 		uint32_t pc = GET_PC;
 
+#if PRINT_HAPYFSH2
+		if (pc == 0xC0047374)
+		{
+			char substr_buf[4096];
+			uint16_t substr_idx = 0;
+			bool zero_prepend = false;
+			uint8_t digit_count = 0;
+			uint32_t string_addr = (m_r[eR0] & 0x0fffffff) | 0x30000000;
+			uint8_t charval = 0;
+			uint32_t reg_idx = eR1;
+			do
+			{
+				charval = m_program->read_byte(string_addr);
+				string_addr++;
+				if (charval >= 0x20 && charval < 0x7f)
+				{
+					if (charval == '%')
+					{
+						bool still_processing = true;
+						uint8_t nextval = m_program->read_byte(string_addr);
+						string_addr++;
+						switch (nextval)
+						{
+						case 0:
+							printf("%%");
+							charval = 0;
+							still_processing = false;
+							break;
+						case '%':
+							printf("%%");
+							still_processing = false;
+							break;
+						case '0':
+							zero_prepend = true;
+							break;
+						case '1':
+						case '2':
+						case '3':
+						case '4':
+						case '5':
+						case '6':
+						case '7':
+						case '8':
+						case '9':
+							digit_count = nextval - '0';
+							break;
+						case 'd':
+							printf("%d", (reg_idx >= eR4) ? m_program->read_dword(((m_r[eR13_SVC] & 0x0fffffff) | 0x30000000) + (reg_idx - eR4)) : m_r[reg_idx]);
+							still_processing = false;
+							reg_idx++;
+							break;
+						case 'l':
+						case 'u':
+							printf("%u", (reg_idx >= eR4) ? m_program->read_dword(((m_r[eR13_SVC] & 0x0fffffff) | 0x30000000) + (reg_idx - eR4)) : m_r[reg_idx]);
+							still_processing = false;
+							reg_idx++;
+							break;
+						case 'x':
+						case 'p':
+							printf("%x", (reg_idx >= eR4) ? m_program->read_dword(((m_r[eR13_SVC] & 0x0fffffff) | 0x30000000) + (reg_idx - eR4)) : m_r[reg_idx]);
+							still_processing = false;
+							reg_idx++;
+							break;
+						case 'o':
+							printf("%o", (reg_idx >= eR4) ? m_program->read_dword(((m_r[eR13_SVC] & 0x0fffffff) | 0x30000000) + (reg_idx - eR4)) : m_r[reg_idx]);
+							still_processing = false;
+							reg_idx++;
+							break;
+						case 's':
+						{
+							uint32_t val = (reg_idx >= eR4) ? m_program->read_dword(((m_r[eR13_SVC] & 0x0fffffff) | 0x30000000) + (reg_idx - eR4)) : m_r[reg_idx];
+							uint32_t substring_addr = (val & 0x0fffffff) | 0x30000000;
+							reg_idx++;
+							bool end_found = false;
+							while (!end_found)
+							{
+								substr_buf[substr_idx] = m_program->read_byte(substring_addr);
+								if (substr_buf[substr_idx] == 0)
+								{
+									end_found = true;
+								}
+								substring_addr++;
+								substr_idx++;
+							}
+							substr_idx = 0;
+							printf("%s", substr_buf);
+							still_processing = false;
+							break;
+						}
+						}
+						while (still_processing)
+						{
+							uint8_t nextval2 = m_program->read_byte(string_addr);
+							string_addr++;
+							if (nextval2 == 0)
+							{
+								printf("%c%c", (char)charval, (char)nextval);
+								charval = 0;
+								break;
+							}
+							else if (nextval2 >= '1' && nextval2 <= '9')
+							{
+								digit_count = nextval2 - '0';
+							}
+							else if (nextval2 == 'd')
+							{
+								uint32_t val = (reg_idx >= eR4) ? m_program->read_dword(((m_r[eR13_SVC] & 0x0fffffff) | 0x30000000) + (reg_idx - eR4)) : m_r[reg_idx];
+								switch (digit_count)
+								{
+								case 1: if (zero_prepend) { printf("%01d", val); } else { printf("%1d", val); } break;
+								case 2: if (zero_prepend) { printf("%02d", val); } else { printf("%2d", val); } break;
+								case 3: if (zero_prepend) { printf("%03d", val); } else { printf("%3d", val); } break;
+								case 4: if (zero_prepend) { printf("%04d", val); } else { printf("%4d", val); } break;
+								case 5: if (zero_prepend) { printf("%05d", val); } else { printf("%5d", val); } break;
+								case 6: if (zero_prepend) { printf("%06d", val); } else { printf("%6d", val); } break;
+								case 7: if (zero_prepend) { printf("%07d", val); } else { printf("%7d", val); } break;
+								case 8: if (zero_prepend) { printf("%08d", val); } else { printf("%8d", val); } break;
+								case 9: if (zero_prepend) { printf("%09d", val); } else { printf("%9d", val); } break;
+								}
+								reg_idx++;
+								still_processing = false;
+							}
+							else if (nextval2 == 'u' || nextval2 == 'l')
+							{
+								uint32_t val = (reg_idx >= eR4) ? m_program->read_dword(((m_r[eR13_SVC] & 0x0fffffff) | 0x30000000) + (reg_idx - eR4)) : m_r[reg_idx];
+								switch (digit_count)
+								{
+								case 1: if (zero_prepend) { printf("%01u", val); } else { printf("%1u", val); } break;
+								case 2: if (zero_prepend) { printf("%02u", val); } else { printf("%2u", val); } break;
+								case 3: if (zero_prepend) { printf("%03u", val); } else { printf("%3u", val); } break;
+								case 4: if (zero_prepend) { printf("%04u", val); } else { printf("%4u", val); } break;
+								case 5: if (zero_prepend) { printf("%05u", val); } else { printf("%5u", val); } break;
+								case 6: if (zero_prepend) { printf("%06u", val); } else { printf("%6u", val); } break;
+								case 7: if (zero_prepend) { printf("%07u", val); } else { printf("%7u", val); } break;
+								case 8: if (zero_prepend) { printf("%08u", val); } else { printf("%8u", val); } break;
+								case 9: if (zero_prepend) { printf("%09u", val); } else { printf("%9u", val); } break;
+								}
+								reg_idx++;
+								still_processing = false;
+							}
+							else if (nextval2 == 'x')
+							{
+								uint32_t val = (reg_idx >= eR4) ? m_program->read_dword(((m_r[eR13_SVC] & 0x0fffffff) | 0x30000000) + (reg_idx - eR4)) : m_r[reg_idx];
+								switch (digit_count)
+								{
+								case 1: if (zero_prepend) { printf("%01x", val); } else { printf("%1x", val); } break;
+								case 2: if (zero_prepend) { printf("%02x", val); } else { printf("%2x", val); } break;
+								case 3: if (zero_prepend) { printf("%03x", val); } else { printf("%3x", val); } break;
+								case 4: if (zero_prepend) { printf("%04x", val); } else { printf("%4x", val); } break;
+								case 5: if (zero_prepend) { printf("%05x", val); } else { printf("%5x", val); } break;
+								case 6: if (zero_prepend) { printf("%06x", val); } else { printf("%6x", val); } break;
+								case 7: if (zero_prepend) { printf("%07x", val); } else { printf("%7x", val); } break;
+								case 8: if (zero_prepend) { printf("%08x", val); } else { printf("%8x", val); } break;
+								case 9: if (zero_prepend) { printf("%09x", val); } else { printf("%9x", val); } break;
+								}
+								reg_idx++;
+								still_processing = false;
+							}
+							else if (nextval2 == 'o')
+							{
+								uint32_t val = (reg_idx >= eR4) ? m_program->read_dword(((m_r[eR13_SVC] & 0x0fffffff) | 0x30000000) + (reg_idx - eR4)) : m_r[reg_idx];
+								switch (digit_count)
+								{
+								case 1: if (zero_prepend) { printf("%01o", val); } else { printf("%1o", val); } break;
+								case 2: if (zero_prepend) { printf("%02o", val); } else { printf("%2o", val); } break;
+								case 3: if (zero_prepend) { printf("%03o", val); } else { printf("%3o", val); } break;
+								case 4: if (zero_prepend) { printf("%04o", val); } else { printf("%4o", val); } break;
+								case 5: if (zero_prepend) { printf("%05o", val); } else { printf("%5o", val); } break;
+								case 6: if (zero_prepend) { printf("%06o", val); } else { printf("%6o", val); } break;
+								case 7: if (zero_prepend) { printf("%07o", val); } else { printf("%7o", val); } break;
+								case 8: if (zero_prepend) { printf("%08o", val); } else { printf("%8o", val); } break;
+								case 9: if (zero_prepend) { printf("%09o", val); } else { printf("%9o", val); } break;
+								}
+								reg_idx++;
+								still_processing = false;
+							}
+							else
+							{
+								printf("%c%c", (char)charval, (char)nextval);
+								still_processing = false;
+							}
+						}
+					}
+					else
+					{
+						printf("%c", (char)charval);
+					}
+				}
+			} while (charval != 0);
+			printf("\n");
+		}
+#endif
 		update_insn_prefetch(pc);
 
 		debugger_instruction_hook(pc);

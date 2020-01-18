@@ -3041,6 +3041,24 @@
 		</part>
 	</software>
 
+	<software name="holinone">
+		<description>Hole In One</description>
+		<year>1987</year>
+		<publisher>Mastertronic Added Dimension</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="692452">
+				<rom name="hole in one side a.tap" size="692452" crc="99fe83f3" sha1="6124084b5c7bdc0d68ab5625b1bba2d6e167abc6"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="710167">
+				<rom name="hole in one side b.tap" size="710167" crc="a9707464" sha1="d8ff00e94e4ff907657e6be074b43d26fabd9132"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hpoker">
 		<description>Hollywood Poker</description>
 		<year>1988</year>
@@ -4366,8 +4384,8 @@
 		<year>1984</year>
 		<publisher>Firebird Silver</publisher>
 		<part name="cass1" interface="cbm_cass">
-			<dataarea name="cass" size="517364">
-				<rom name="on court tennis.tap" size="517364" crc="b2351874" sha1="b055f200043ac0fee774976f8de495134f731de7"/>
+			<dataarea name="cass" size="517655">
+				<rom name="on court tennis.tap" size="517655" crc="c7dbf50b" sha1="df6dc7bec0c870a387cc6478c0a81e9a00ddbdaa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4491,13 +4509,13 @@
 		<year>1985</year>
 		<publisher>Ricochet</publisher>
 		<part name="cass1" interface="cbm_cass">
-			<dataarea name="cass" size="16387950">
-				<rom name="outlaws side a.wav" size="16387950" crc="b048919a" sha1="65660170e42b2239ddba44b021dd58c0e299b4c8"/>
+			<dataarea name="cass" size="663257">
+				<rom name="outlaws side a.tap" size="663257" crc="332f4483" sha1="f5752d3fad3971662c5b13f9570e5625821854a2"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="cbm_cass">
-			<dataarea name="cass" size="16378130">
-				<rom name="outlaws side b.wav" size="16378130" crc="e71d5da2" sha1="55b0036ff24c5c98f58c21a72085e7fb4382ae54"/>
+			<dataarea name="cass" size="658990">
+				<rom name="outlaws side b.tap" size="658990" crc="429754e6" sha1="5fae6c04243e532008efe477eb7ffeab6178ca7c"/>
 			</dataarea>
 		</part>
 	</software>

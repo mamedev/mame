@@ -182,6 +182,8 @@ public:
 	void s3c2440_touch_screen( int state);
 	void s3c2440_request_eint( uint32_t number);
 
+	void s3c2440_uart_fifo_w(int uart, uint8_t data);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -363,7 +365,6 @@ protected:
 	void s3c24xx_device_reset();
 	void s3c24xx_device_start();
 
-	void s3c2440_uart_fifo_w( int uart, uint8_t data);
 	void s3c2440_request_irq( uint32_t int_type);
 
 private:
@@ -603,7 +604,7 @@ private:
 	};
 
 	// internal state
-	required_device<device_t> m_cpu;
+	required_device<arm7_cpu_device> m_cpu;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 

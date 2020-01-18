@@ -323,7 +323,7 @@ struct input_t
 		if (e != 3)
 			plib::pthrow<netlist::nl_exception>(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
 		m_value = static_cast<nl_fptype>(val);
-		m_time = netlist::netlist_time::from_fp(t);
+		m_time = netlist::netlist_time_ext::from_fp(t);
 		m_param = setup.find_param(pstring(buf.data()), true);
 	}
 
@@ -346,7 +346,7 @@ struct input_t
 		}
 	}
 
-	netlist::netlist_time m_time;
+	netlist::netlist_time_ext m_time;
 	netlist::param_t *m_param;
 	nl_fptype m_value;
 };
@@ -377,7 +377,7 @@ void tool_app_t::run()
 {
 	plib::chrono::timer<plib::chrono::system_ticks> t;
 	std::vector<input_t> inps;
-	netlist::netlist_time ttr;
+	netlist::netlist_time_ext ttr;
 	netlist_tool_t nt(*this, "netlist");
 
 	{
@@ -398,7 +398,7 @@ void tool_app_t::run()
 		nt.exec().reset();
 
 		inps = read_input(nt.setup(), opt_inp());
-		ttr = netlist::netlist_time::from_fp(opt_ttr());
+		ttr = netlist::netlist_time_ext::from_fp(opt_ttr());
 	}
 
 
@@ -406,7 +406,7 @@ void tool_app_t::run()
 
 	t.reset();
 
-	netlist::netlist_time nlt = nt.exec().time();
+	netlist::netlist_time_ext nlt = nt.exec().time();
 	{
 		auto t_guard(t.guard());
 

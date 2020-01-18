@@ -234,6 +234,8 @@ void spg2xx_video_device::draw_bitmap(const rectangle& cliprect, uint32_t scanli
 	palette = space.read_word(palette_map + realline / 2);
 	if (scanline & 1)
 		palette >>= 8;
+	else
+		palette &= 0x00ff;
 
 	//const int linewidth = 320 / 2;
 	int sourcebase = tile | (palette << 16); // this is correct for Texas Hold'em - TODO: get from a register?
@@ -318,6 +320,8 @@ void spg2xx_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 		palette = (ctrl & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
 		if (x0 & 1)
 			palette >>= 8;
+		else
+			palette &= 0x00ff;
 
 		uint32_t tileattr = attr;
 		uint32_t tilectrl = ctrl;

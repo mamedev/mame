@@ -55,7 +55,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void diablo68k(machine_config &config);
 	void scorpio68k(machine_config &config);
 
@@ -279,7 +279,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void diablo_state::diablo68k(machine_config &config)

@@ -51,7 +51,7 @@ public:
 		m_inputs(*this, "IN.0")
 	{ }
 
-	// machine drivers
+	// machine configs
 	void sc6(machine_config &config);
 
 protected:
@@ -213,7 +213,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void sc6_state::sc6(machine_config &config)

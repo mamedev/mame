@@ -74,7 +74,7 @@ public:
 		m_out_lcd(*this, "lcd%u", 0U)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void sphinx40(machine_config &config);
 
 protected:
@@ -269,7 +269,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void sphinx40_state::sphinx40(machine_config &config)

@@ -38,7 +38,7 @@ public:
 	// New Game button is directly tied to F3850 EXT RES pin
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
 
-	// machine drivers
+	// machine configs
 	void delta1(machine_config &config);
 
 protected:
@@ -200,7 +200,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void delta1_state::delta1(machine_config &config)

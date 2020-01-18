@@ -2922,6 +2922,17 @@ MACHINE_RESET_MEMBER(naomi_state,naomi)
 	naomi_state::machine_reset();
 }
 
+WRITE_LINE_MEMBER(naomi_state::external_reset)
+{
+	// routine called by the dimm board to reboot the naomi mainboard
+	logerror("Received reset fromm dimm board !\n");
+	naomi_state::machine_reset();
+	m_maincpu->reset();
+	// it will probably need to be adjusted
+	m_aica->reset();
+	m_soundcpu->reset();
+}
+
 /*
  * Common for Naomi 1, Naomi GD-Rom, Naomi 2, Atomiswave ...
  */
@@ -3012,6 +3023,7 @@ void naomi_state::naomi(machine_config &config)
 	naomi_rom_board &rom_board(NAOMI_ROM_BOARD(config, "rom_board", 0, "naomibd_eeprom"));
 	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
 	rom_board.ext_irq_callback().set(FUNC(dc_state::external_irq));
+	rom_board.reset_out_callback().set(FUNC(naomi_state::external_reset));
 }
 
 /*
@@ -3024,6 +3036,7 @@ void naomi_state::naomigd(machine_config &config)
 	naomi_gdrom_board &rom_board(NAOMI_GDROM_BOARD(config, "rom_board", 0, "naomibd_eeprom", ":gdrom", "pic"));
 	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
 	rom_board.ext_irq_callback().set(FUNC(dc_state::external_irq));
+	rom_board.reset_out_callback().set(FUNC(naomi_state::external_reset));
 }
 
 /*

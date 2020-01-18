@@ -142,7 +142,7 @@ namespace devices
 		template<bool doOUT>
 		void process() noexcept
 		{
-			netlist_time mt(netlist_time::zero());
+			netlist_time_ext mt(netlist_time_ext::zero());
 			type_t nstate(0);
 			type_t ign(m_ign);
 

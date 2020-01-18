@@ -914,6 +914,9 @@ actfancrj                       // (c) 1989 Data East Corporation (Japan)
 triothep                        // (c) 1989 Data East Corporation (World)
 triothepj                       // (c) 1989 Data East Corporation (Japan)
 
+@source:actions_atj2279b.cpp
+rbitgen
+
 @source:acvirus.cpp
 virusa                          // (c) 1997 Access GmbH
 virusb                          // (c) 1999 Access GmbH
@@ -3092,6 +3095,7 @@ botanic2                        // (c) 1983
 botanicf                        // (c) 1984
 pickin                          // (c) 1983
 sbagman                         // (c) 1984
+sbagman2                        // (c) 1984
 sbagmani                        // (c) 1984 + Itisa license
 sbagmans                        // (c) 1984 + Stern license
 squaitsa                        // (c) 1985
@@ -3142,6 +3146,9 @@ triviaes5                       // (c) 19?? (Maibesa hardware)
 
 @source:banctec.cpp
 banctec                         // BancTec ESeries panel
+
+@source:bandai_design_master.cpp
+bdesignm
 
 @source:bankp.cpp
 bankp                           // (c) 1984 Sega,  made by Sanritsu
@@ -10007,9 +10014,11 @@ quizard2                        // (c) TAB Austria 1995
 quizard2_22                     // (c) TAB Austria 199?
 quizard3                        // (c) TAB Austria 1996
 quizard3_32                     // (c) TAB Austria 1996
+quizard3a                       // (c) TAB Austria 1996
 quizard4                        // (c) TAB Austria 1998
 quizard4_40                     // (c) TAB Austria 1997
 quizard4_41                     // (c) TAB Austria 1998
+quizard4cz                      // (c) TAB Austria 1998
 
 @source:cdsys5.cpp
 minijook                        //
@@ -11260,12 +11269,15 @@ cubeqsta                        // (c) 1983 Simutrek Inc.
 @source:cubo.cpp
 cndypuzl                        // (c) 1995
 cubo                            // Base unit
+eldoralg                        //
 haremchl                        // (c) 1995
 lasstixx                        // (c) 1995
 lsrquiz                         // (c) 1995
-lsrquiz2                        // (c) 1995
+lsrquizg                        // (c) 1995
+lsrquiz2i                       // (c) 1995
 mgnumber                        // (c) 1995
 mgprem11                        // (c) 1995
+odeontw                         //
 odeontw2                        // (c) 1999
 
 @source:cultures.cpp
@@ -14118,6 +14130,7 @@ dkongjrmc                       // bootleg (Centromatic)
 drivfrcb                        // bootleg
 drivfrcg                        // [1984] Shinkai (Magic Electronics USA license)
 drivfrcsg                       // [1984] Seatongrove
+drivfrcsga                      // [1984] Seatongrove
 drivfrct                        // bootleg
 froggerv                        // bootleg
 guttangt                        //
@@ -15014,6 +15027,7 @@ unkch2                          // bootleg
 unkch3                          // bootleg
 unkch4                          // bootleg
 wcat3                           //
+wcat3a                          //
 wcherry                         // bootleg
 
 @source:gomoku.cpp
@@ -15667,6 +15681,7 @@ gnw_manhole                     // Nintendo
 gnw_manholeg                    // Nintendo
 gnw_mario                       // Nintendo
 gnw_mariocm                     // Nintendo
+gnw_mariocmt                    // Nintendo
 gnw_mariotj                     // Nintendo
 gnw_mbaway                      // Nintendo
 gnw_mmouse                      // Nintendo
@@ -15964,6 +15979,7 @@ battlcryc                       // (c) 1989 Home Data
 battlcryp                       // (c) 1989 Home Data
 hourouki                        // (c) 1987 Home Data
 jogakuen                        // (c) 1992 Windom corporation
+lastapos                        // (c) 1988 Home Data
 lemnangl                        // (c) 1990 Home Data
 mhgaiden                        // (c) 1987 Home Data
 mirderby                        // (c) 1988 Home Data?
@@ -15975,7 +15991,7 @@ mjkinjas                        // (c) 1991 Home Data
 mjkojink                        // (c) 1989 Home Data
 mjprivat                        // (c) 1991 Matoba
 mjyougo                         // (c) 1989 Home Data
-mjjoship            // (c) 1988 Home Data
+mjjoship                        // (c) 1988 Home Data
 mrokumei                        // (c) 1988 Home Data
 reikaids                        // (c) 1988 Home Data
 vitaminc                        // (c) 1989 Home Data
@@ -18866,6 +18882,7 @@ leappad                         // (c) 2001 LeapFrog / Knowledge Kids Enterprise
 leappadca                       // (c) 2004 LeapFrog
 mfleappad                       // (c) 2002 LeapFrog
 mfleappadus                     // (c) 2004 LeapFrog
+ltleappad
 
 @source:leapster.cpp
 leapster                        //
@@ -21690,6 +21707,8 @@ wmega                           // 1992 Sega Wondermega (Japan)
 wmegam2                         // 1993 Victor Wondermega M2 (Japan)
 xeye                            // 1993 JVC X'eye (USA)
 dcat16                          //
+gen_nomd                        // 1995 Sega Genesis Nomad (USA)
+megajet                         // 1993 Sega Mega Jet (Japan)
 
 @source:megadriv_acbl.cpp
 aladmdb                         // MegaDrive-based hack
@@ -31290,10 +31309,12 @@ ts_handy11
 @source:vt1682.cpp
 ii8in1
 ii32in1
+zone7in1
 miwi2_16
 miwi2_7
 intact89
 intg5410
+exsprt48
 
 @source:newbrain.cpp
 newbrain                        //
@@ -38325,6 +38346,9 @@ tceptor2                        // (c) 1986
 @source:tdv2324.cpp
 tdv2324                         //
 
+@source:teamjocs.cpp
+diaelite                        //
+
 @source:tec1.cpp
 tec1                            // Talking Electronics Computer
 tecjmon                         // Talking Electronics Computer
@@ -39135,6 +39159,7 @@ trivrus                         // 2009 AGT. Trivia R Us
 @source:trkfldch.cpp
 trkfldch                        // (c) 2007 Konami
 my1stddr                        // (c) 2006 Konami
+abl4play
 
 @source:trs80.cpp
 ht108064                        // Hradstechnika Szvetkezet HT-1080Z/64
@@ -39778,6 +39803,7 @@ jak_capb                        //
 jak_spdmo                       //
 conyteni                        //
 conyping                        //
+conyfght
 
 @source:vii.cpp
 jak_batm                        // The Batman, 2004
@@ -39823,6 +39849,7 @@ taikeegr                        //
 shredmjr                        //
 sentx6p                         //
 telestry                        //
+wiwi18                          //
 
 @source:vsmile.cpp
 vsmile                          //
@@ -40991,6 +41018,8 @@ rad_snowp                       //
 rad_madf                        //
 rad_fb                          //
 rad_socr                        //
+epo_bowl                        //
+epo_esdx                        //
 epo_epp                         //
 epo_eppk                        //
 epo_epp3                        //
@@ -41007,6 +41036,8 @@ rad_bdp                         //
 has_wamg                        //
 ltv_tam                         //
 tak_geig                        //
+jarajal                         //
+tcarnavi                        //
 ban_onep                        //
 ekara                           //
 ekaraa                          //

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Sandro Ronco, hap, Dirk Verwiebe, Cowering
+// copyright-holders:Dirk Verwiebe, Cowering, Sandro Ronco, hap
 /******************************************************************************
 
 Hegener + Glaser Mephisto chesscomputers with plugin modules
@@ -48,8 +48,8 @@ Bavaria piece recognition board:
 XTAL = 7.37280MHz
 ROM = TC57256AD-12, sine table
 
-Only usable with Weltmeister modules, Portorose until London (aka this MAME driver)
-It does not work on Portorose 1.01. See German patent DE4207534 for detailed description.
+Only usable with Weltmeister modules, Portorose until London (aka this MAME driver), but
+it does not work on Portorose 1.01. See German patent DE4207534 for detailed description.
 
 Each piece has a Tank circuit, and in each square of the board there is a coil.
 By scanning all the squares at different frequencies, the resonance frequency

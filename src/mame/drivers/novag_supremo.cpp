@@ -43,7 +43,7 @@ public:
 		m_dac(*this, "dac")
 	{ }
 
-	// machine drivers
+	// machine configs
 	void supremo(machine_config &config);
 
 protected:
@@ -96,7 +96,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void supremo_state::supremo(machine_config &config)

@@ -26,6 +26,8 @@ public:
 
 protected:
 	virtual void process_buffer() override;
+	virtual void signature() override;
+	virtual void SetDevice(void *device) override;
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -36,6 +38,7 @@ private:
 	uint32_t read_type;   // for command 0x30 only
 	uint32_t data_select; // for command 0x30 only
 	uint32_t transferOffset;
+	bool is_real_gdrom_disc;
 };
 
 DECLARE_DEVICE_TYPE(GDROM, gdrom_device)

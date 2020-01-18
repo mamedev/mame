@@ -141,8 +141,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_io_p1(*this, "P1"),
-		m_io_p2(*this, "P2"),
+		m_io(*this, "IN%u", 0U),
 		m_romregion(*this, "maincpu"),
 		m_memory(*this, "memory")
 	{
@@ -174,8 +173,7 @@ protected:
 	required_device<screen_device> m_screen;
 
 
-	required_ioport m_io_p1;
-	required_ioport m_io_p2;
+	required_ioport_array<3> m_io;
 
 
 	optional_region_ptr<uint16_t> m_romregion;
@@ -183,6 +181,7 @@ protected:
 
 	virtual DECLARE_READ16_MEMBER(porta_r);
 	virtual DECLARE_READ16_MEMBER(portb_r);
+	virtual DECLARE_READ16_MEMBER(portc_r);
 	virtual DECLARE_WRITE16_MEMBER(porta_w);
 
 	virtual DECLARE_READ16_MEMBER(read_external_space);
@@ -382,6 +381,7 @@ protected:
 	virtual void machine_reset() override;
 
 	virtual DECLARE_READ16_MEMBER(porta_r) override;
+	virtual DECLARE_READ16_MEMBER(portb_r) override;
 
 private:
 };
@@ -428,10 +428,23 @@ void wrlshunt_game_state::machine_reset()
 
 READ16_MEMBER(jak_s500_game_state::porta_r)
 {
-	uint16_t data = m_io_p1->read();
-	logerror("Port A Read: %04x\n", data);
+	uint16_t data = m_io[0]->read();
+	logerror("%s: Port A Read: %04x\n", machine().describe_context(), data);
+
+	//address_space& mem = m_maincpu->space(AS_PROGRAM);
+	//if (mem.read_word(0x22b408) == 0x4846)
+	//	mem.write_word(0x22b408, 0x4840);    // jak_s500 force service mode
+
 	return data;
 }
+
+READ16_MEMBER(jak_s500_game_state::portb_r)
+{
+	uint16_t data = m_io[1]->read();
+	logerror("%s: Port B Read: %04x\n", machine().describe_context(), data);
+	return data;
+}
+
 
 void jak_s500_game_state::machine_reset()
 {
@@ -503,15 +516,22 @@ WRITE16_MEMBER(gcm394_game_state::write_external_space)
 
 READ16_MEMBER(gcm394_game_state::porta_r)
 {
-	uint16_t data = m_io_p1->read();
+	uint16_t data = m_io[0]->read();
 	logerror("Port A Read: %04x\n", data);
 	return data;
 }
 
 READ16_MEMBER(gcm394_game_state::portb_r)
 {
-	uint16_t data = m_io_p2->read();
+	uint16_t data = m_io[1]->read();
 	logerror("Port B Read: %04x\n", data);
+	return data;
+}
+
+READ16_MEMBER(gcm394_game_state::portc_r)
+{
+	uint16_t data = m_io[2]->read();
+	logerror("Port C Read: %04x\n", data);
 	return data;
 }
 
@@ -529,6 +549,7 @@ void gcm394_game_state::base(machine_config &config)
 	GCM394(config, m_maincpu, 96000000/2, m_screen);
 	m_maincpu->porta_in().set(FUNC(gcm394_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(gcm394_game_state::portb_r));
+	m_maincpu->portc_in().set(FUNC(gcm394_game_state::portc_r));
 	m_maincpu->porta_out().set(FUNC(gcm394_game_state::porta_w));
 	m_maincpu->space_read_callback().set(FUNC(gcm394_game_state::read_external_space));
 	m_maincpu->space_write_callback().set(FUNC(gcm394_game_state::write_external_space));
@@ -542,8 +563,8 @@ void gcm394_game_state::base(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_size(320, 262);
-	m_screen->set_visarea(0, 320-1, 0, 240-1);
+	m_screen->set_size(320*2, 262*2);
+	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
 	m_screen->set_screen_update("maincpu", FUNC(sunplus_gcm394_device::screen_update));
 	m_screen->screen_vblank().set(m_maincpu, FUNC(sunplus_gcm394_device::vblank));
 
@@ -554,17 +575,12 @@ void gcm394_game_state::base(machine_config &config)
 void wrlshunt_game_state::wrlshunt(machine_config &config)
 {
 	gcm394_game_state::base(config);
-
-	m_maincpu->set_bootmode(1); // boot from external ROM / CS mirror
-
-	m_screen->set_size(320*2, 262*2);
-	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
 }
 
 
 READ16_MEMBER(wrlshunt_game_state::porta_r)
 {
-	uint16_t data = m_io_p1->read();
+	uint16_t data = m_io[0]->read();
 	logerror("%s: Port A Read: %04x\n",  machine().describe_context(), data);
 	return data;
 }
@@ -585,6 +601,7 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 	GPAC800(config, m_maincpu, 96000000/2, m_screen); 
 	m_maincpu->porta_in().set(FUNC(generalplus_gpac800_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(generalplus_gpac800_game_state::portb_r));
+	m_maincpu->portc_in().set(FUNC(generalplus_gpac800_game_state::portc_r));
 	m_maincpu->porta_out().set(FUNC(generalplus_gpac800_game_state::porta_w));
 	m_maincpu->space_read_callback().set(FUNC(generalplus_gpac800_game_state::read_external_space));
 	m_maincpu->space_write_callback().set(FUNC(generalplus_gpac800_game_state::write_external_space));
@@ -694,6 +711,7 @@ void generalplus_gpspispi_game_state::generalplus_gpspispi(machine_config &confi
 	GP_SPISPI(config, m_maincpu, 96000000/2, m_screen); 
 	m_maincpu->porta_in().set(FUNC(generalplus_gpspispi_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(generalplus_gpspispi_game_state::portb_r));
+	m_maincpu->portc_in().set(FUNC(generalplus_gpspispi_game_state::portc_r));
 	m_maincpu->porta_out().set(FUNC(generalplus_gpspispi_game_state::porta_w));
 	m_maincpu->space_read_callback().set(FUNC(generalplus_gpspispi_game_state::read_external_space));
 	m_maincpu->space_write_callback().set(FUNC(generalplus_gpspispi_game_state::write_external_space));
@@ -738,12 +756,13 @@ void generalplus_gpspispi_bkrankp_game_state::generalplus_gpspispi_bkrankp(machi
 }
 
 static INPUT_PORTS_START( gcm394 )
-	PORT_START("P1")
-	PORT_START("P2")
+	PORT_START("IN0")
+	PORT_START("IN1")
+	PORT_START("IN2")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( smartfp )
-	PORT_START("P1")
+	PORT_START("IN0")
 	// entirely non-standard mat based controller (0-11 are where your feet are placed normally, row of selection places to step above those)
 	// no sensible default mapping unless forced
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_Q) PORT_NAME("0")
@@ -764,8 +783,11 @@ static INPUT_PORTS_START( smartfp )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_D) PORT_NAME("Triangle / Yellow")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_F) PORT_NAME("Star / Blue")
 
-	PORT_START("P2")
-	PORT_DIPNAME( 0x0001, 0x0001, "P2" )
+	PORT_START("IN1")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN2" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
@@ -814,13 +836,14 @@ static INPUT_PORTS_START( smartfp )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wrlshunt )
-	PORT_START("P1")
-	PORT_START("P2")
+	PORT_START("IN0")
+	PORT_START("IN1")
+	PORT_START("IN2")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jak_car2 )
-	PORT_START("P1")
-	PORT_DIPNAME( 0x0001, 0x0001, "P1" )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN0" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
@@ -855,8 +878,11 @@ static INPUT_PORTS_START( jak_car2 )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START("P2")
-	PORT_DIPNAME( 0x0001, 0x0001, "P2" )
+	PORT_START("IN1")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN2" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
@@ -907,8 +933,8 @@ static INPUT_PORTS_START( jak_car2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jak_gtg )
-	PORT_START("P1")
-	PORT_DIPNAME( 0x0001, 0x0001, "P1" )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN0" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
@@ -949,8 +975,11 @@ static INPUT_PORTS_START( jak_gtg )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START("P2")
-	PORT_DIPNAME( 0x0001, 0x0001, "P2" )
+	PORT_START("IN1")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN2" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
@@ -1002,8 +1031,8 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( jak_s500 )
-	PORT_START("P1")
-	PORT_DIPNAME( 0x0001, 0x0001, "P1" )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN0" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
@@ -1042,8 +1071,11 @@ static INPUT_PORTS_START( jak_s500 )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 )
 
-	PORT_START("P2")
-	PORT_DIPNAME( 0x0001, 0x0001, "P2" )
+	PORT_START("IN1")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN2" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )

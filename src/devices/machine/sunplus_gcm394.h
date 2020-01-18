@@ -36,6 +36,7 @@ public:
 		m_internalrom(*this, "internal"),
 		m_porta_in(*this),
 		m_portb_in(*this),
+		m_portc_in(*this),
 		m_porta_out(*this),
 		m_nand_read_cb(*this),
 		m_csbase(0x20000),
@@ -51,6 +52,7 @@ public:
 
 	auto porta_in() { return m_porta_in.bind(); }
 	auto portb_in() { return m_portb_in.bind(); }
+	auto portc_in() { return m_portc_in.bind(); }
 
 	auto porta_out() { return m_porta_out.bind(); }
 
@@ -92,10 +94,11 @@ protected:
 
 	devcb_read16 m_porta_in;
 	devcb_read16 m_portb_in;
+	devcb_read16 m_portc_in;
 
 	devcb_write16 m_porta_out;
 
-	uint16_t m_dma_params[7][2];
+	uint16_t m_dma_params[7][3];
 
 	// unk 78xx
 	uint16_t m_7803;
@@ -120,15 +123,18 @@ protected:
 
 	uint16_t m_7861;
 
-	uint16_t m_7862;
-	uint16_t m_7863;
+	uint16_t m_7862_porta_direction;
+	uint16_t m_7863_porta_attribute;
+
+	uint16_t m_786a_portb_direction;
+	uint16_t m_786b_portb_attribute;
 
 	uint16_t m_7870;
 
-	uint16_t m_7871;
+	//uint16_t m_7871;
 
-	uint16_t m_7872;
-	uint16_t m_7873;
+	uint16_t m_7872_portc_direction;
+	uint16_t m_7873_portc_attribute;
 
 	uint16_t m_7882;
 	uint16_t m_7883;
@@ -189,6 +195,8 @@ private:
 	DECLARE_WRITE16_MEMBER(system_dma_params_channel0_w);
 	DECLARE_READ16_MEMBER(system_dma_params_channel1_r);
 	DECLARE_WRITE16_MEMBER(system_dma_params_channel1_w);
+	DECLARE_READ16_MEMBER(system_dma_params_channel2_r);
+	DECLARE_WRITE16_MEMBER(system_dma_params_channel2_w);
 	DECLARE_READ16_MEMBER(system_dma_status_r);
 	DECLARE_WRITE16_MEMBER(system_dma_trigger_w);
 	DECLARE_READ16_MEMBER(system_dma_memtype_r);
@@ -217,31 +225,38 @@ private:
 
 	DECLARE_WRITE16_MEMBER(unkarea_7835_w);
 
-	DECLARE_READ16_MEMBER(unkarea_7868_r);
-	DECLARE_READ16_MEMBER(unkarea_7869_r);
+	// Port A
+	DECLARE_READ16_MEMBER(ioarea_7860_porta_r);
+	DECLARE_WRITE16_MEMBER(ioarea_7860_porta_w);
+	DECLARE_READ16_MEMBER(ioarea_7861_porta_buffer_r);
+	DECLARE_READ16_MEMBER(ioarea_7862_porta_direction_r);
+	DECLARE_WRITE16_MEMBER(ioarea_7862_porta_direction_w);
+	DECLARE_READ16_MEMBER(ioarea_7863_porta_attribute_r);
+	DECLARE_WRITE16_MEMBER(ioarea_7863_porta_attribute_w);
+
+	// Port B
+	DECLARE_READ16_MEMBER(ioarea_7868_portb_r);
+	DECLARE_WRITE16_MEMBER(ioarea_7868_portb_w);
+	DECLARE_READ16_MEMBER(ioarea_7869_portb_buffer_r);
+	DECLARE_READ16_MEMBER(ioarea_786a_portb_direction_r);
+	DECLARE_WRITE16_MEMBER(ioarea_786a_portb_direction_w);
+	DECLARE_READ16_MEMBER(ioarea_786b_portb_attribute_r);
+	DECLARE_WRITE16_MEMBER(ioarea_786b_portb_attribute_w);
 
 	DECLARE_READ16_MEMBER(unkarea_782d_r);
 	DECLARE_WRITE16_MEMBER(unkarea_782d_w);
 
-	DECLARE_READ16_MEMBER(ioarea_7860_porta_r);
-	DECLARE_WRITE16_MEMBER(ioarea_7860_porta_w);
 
-	DECLARE_READ16_MEMBER(unkarea_7861_r);
 
-	DECLARE_READ16_MEMBER(unkarea_7862_r);
-	DECLARE_WRITE16_MEMBER(unkarea_7862_w);
-	DECLARE_READ16_MEMBER(unkarea_7863_r);
-	DECLARE_WRITE16_MEMBER(unkarea_7863_w);
+	DECLARE_READ16_MEMBER(ioarea_7870_portc_r);
+	DECLARE_WRITE16_MEMBER(ioarea_7870_portc_w);
 
-	DECLARE_READ16_MEMBER(ioarea_7870_portb_r);
-	DECLARE_WRITE16_MEMBER(ioarea_7870_portb_w);
+	DECLARE_READ16_MEMBER(ioarea_7871_portc_buffer_r);
 
-	DECLARE_READ16_MEMBER(unkarea_7871_r);
-
-	DECLARE_READ16_MEMBER(unkarea_7872_r);
-	DECLARE_WRITE16_MEMBER(unkarea_7872_w);
-	DECLARE_READ16_MEMBER(unkarea_7873_r);
-	DECLARE_WRITE16_MEMBER(unkarea_7873_w);
+	DECLARE_READ16_MEMBER(ioarea_7872_portc_direction_r);
+	DECLARE_WRITE16_MEMBER(ioarea_7872_portc_direction_w);
+	DECLARE_READ16_MEMBER(ioarea_7873_portc_attribute_r);
+	DECLARE_WRITE16_MEMBER(ioarea_7873_portc_attribute_w);
 
 	DECLARE_READ16_MEMBER(unkarea_7882_r);
 	DECLARE_WRITE16_MEMBER(unkarea_7882_w);
@@ -280,8 +295,8 @@ private:
 	DECLARE_READ16_MEMBER(unkarea_7936_r);
 	DECLARE_WRITE16_MEMBER(unkarea_7936_w);
 
-	DECLARE_READ16_MEMBER(unkarea_7944_r);
-	DECLARE_READ16_MEMBER(unkarea_7945_r);
+	DECLARE_READ16_MEMBER(spi_7944_rxdata_r);
+	DECLARE_READ16_MEMBER(spi_7945_misc_control_reg_r);
 
 	DECLARE_WRITE16_MEMBER(unkarea_7960_w);
 	DECLARE_READ16_MEMBER(unkarea_7961_r);
@@ -291,10 +306,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(videoirq_w);
 	DECLARE_WRITE_LINE_MEMBER(audioirq_w);
 
-	DECLARE_READ16_MEMBER(system_7a3a_r)
-	{
-		return machine().rand();
-	}
+	DECLARE_READ16_MEMBER(system_7a3a_r);
 
 	void checkirq6();
 

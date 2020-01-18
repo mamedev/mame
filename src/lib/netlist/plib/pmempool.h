@@ -59,7 +59,7 @@ namespace plib {
 					plib::perrlogger("Found {} info blocks\n", sinfo().size());
 					plib::perrlogger("Found block with {} dangling allocations\n", b->m_num_alloc);
 				}
-				plib::pdelete(b);
+				aligned_arena::free(b);
 				//::operator delete(b->m_data);
 			}
 		}
@@ -126,7 +126,7 @@ namespace plib {
 						plib::terminate("mempool::free - block not found");
 
 					mp.m_blocks.erase(itb);
-					plib::pdelete(b);
+					aligned_arena::free(b);
 				}
 				sinfo().erase(it);
 			}
@@ -222,14 +222,12 @@ namespace plib {
 			size_type m_pos;
 		};
 
-
 		block * new_block(size_type min_bytes)
 		{
-			auto *b = plib::pnew<block>(*this, min_bytes);
+			auto *b = aligned_arena::alloc<block>(*this, min_bytes);
 			m_blocks.push_back(b);
 			return b;
 		}
-
 
 		static std::unordered_map<void *, info> &sinfo()
 		{

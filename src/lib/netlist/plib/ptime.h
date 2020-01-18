@@ -8,6 +8,8 @@
 /// \file ptime.h
 ///
 
+#include <type_traits>
+
 #include "pconfig.h"
 #include "pmath.h" // std::floor
 #include "ptypes.h"
@@ -19,6 +21,19 @@
 namespace plib
 {
 
+	template <typename T, typename U>
+	struct ptime_le
+	{
+		const static bool value = sizeof(T) <= sizeof(U);
+	};
+
+#if 0
+	template<typename T, typename U>
+	struct ptime_res {
+	    using type = typename std::conditional<sizeof(T) >= sizeof(U), T, U>::type;
+	};
+#endif
+
 	template <typename TYPE, TYPE RES>
 	struct ptime final
 	{
@@ -26,6 +41,9 @@ namespace plib
 
 		using internal_type = TYPE;
 		using mult_type = TYPE;
+
+		template <typename altTYPE, altTYPE altRES>
+		friend struct ptime;
 
 		constexpr ptime() noexcept : m_time(0) {}
 
@@ -43,28 +61,60 @@ namespace plib
 		constexpr explicit ptime(const internal_type nom, const internal_type den) noexcept
 		: m_time(nom * (RES / den)) { }
 
-		C14CONSTEXPR ptime &operator+=(const ptime &rhs) noexcept { m_time += rhs.m_time; return *this; }
-		C14CONSTEXPR ptime &operator-=(const ptime &rhs) noexcept { m_time -= rhs.m_time; return *this; }
-		C14CONSTEXPR ptime &operator*=(const mult_type factor) noexcept { m_time *= static_cast<internal_type>(factor); return *this; }
+		// FIXME: check for overflow
+		template <typename O>
+		constexpr explicit ptime(const ptime<O, RES> &rhs) noexcept
+		: m_time(rhs.m_time) { }
 
-		friend constexpr const ptime operator-(ptime lhs, const ptime rhs) noexcept
+		template <typename O>
+		C14CONSTEXPR ptime &operator+=(const ptime<O, RES> &rhs) noexcept
 		{
-			return ptime(lhs.m_time - rhs.m_time);
+			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
+			m_time += rhs.m_time;
+			return *this;
+		}
+		template <typename O>
+		C14CONSTEXPR ptime &operator-=(const ptime<O, RES> &rhs) noexcept
+		{
+			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
+			m_time -= rhs.m_time;
+			return *this;
 		}
 
-		friend constexpr const ptime operator+(ptime lhs, const ptime rhs) noexcept
+		template <typename M>
+		C14CONSTEXPR ptime &operator*=(const M factor) noexcept
 		{
-			return ptime(lhs.m_time + rhs.m_time);
+			static_assert(plib::is_integral<M>::value, "Factor must be an integral type");
+			m_time *= factor;
+			return *this;
 		}
 
-		friend constexpr const ptime operator*(ptime lhs, const mult_type factor) noexcept
+		template <typename O>
+		constexpr const ptime operator-(const ptime<O, RES> &rhs) const noexcept
 		{
-			return ptime(lhs.m_time * factor);
+			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
+			return ptime(m_time - rhs.m_time);
 		}
 
-		friend constexpr mult_type operator/(const ptime lhs, const ptime rhs) noexcept
+		template <typename O>
+		constexpr const ptime operator+(const ptime<O, RES> &rhs) const noexcept
 		{
-			return static_cast<mult_type>(lhs.m_time / rhs.m_time);
+			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
+			return ptime(m_time + rhs.m_time);
+		}
+
+		template <typename M>
+		constexpr const ptime operator*(const M &factor) const noexcept
+		{
+			static_assert(plib::is_integral<M>::value, "Factor must be an integral type");
+			return ptime(m_time * static_cast<mult_type>(factor));
+		}
+
+		template <typename O>
+		constexpr const mult_type operator/(const ptime<O, RES> &rhs) const noexcept
+		{
+			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
+			return static_cast<mult_type>(m_time / rhs.m_time);
 		}
 
 		friend constexpr bool operator<(const ptime lhs, const ptime rhs) noexcept
@@ -118,6 +168,10 @@ namespace plib
 		constexpr double as_float() const noexcept { return as_fp<float>(); }
 		constexpr double as_long_double() const noexcept { return as_fp<long double>(); }
 
+
+		constexpr ptime shl(unsigned shift) const noexcept { return ptime(m_time << shift); }
+		constexpr ptime shr(unsigned shift) const noexcept { return ptime(m_time >> shift); }
+
 		// for save states ....
 		C14CONSTEXPR internal_type *get_internaltype_ptr() noexcept { return &m_time; }
 
@@ -160,7 +214,6 @@ namespace plib
 		static constexpr FT inv_res() noexcept { return static_cast<FT>(1.0) / static_cast<FT>(RES); }
 		internal_type m_time;
 	};
-
 
 } // namespace plib
 

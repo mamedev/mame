@@ -149,6 +149,7 @@ CPUS["CR16B"] = true
 CPUS["FR"] = true
 CPUS["DSP56000"] = true
 CPUS["VT50"] = true
+CPUS["VT61"] = true
 CPUS["PACE"] = true
 CPUS["WE32000"] = true
 CPUS["RX01"] = true
@@ -1795,6 +1796,7 @@ files {
 	MAME_DIR .. "src/mame/machine/wswan.cpp",
 	MAME_DIR .. "src/mame/video/wswan.cpp",
 	MAME_DIR .. "src/mame/video/wswan.h",
+	MAME_DIR .. "src/mame/drivers/bandai_design_master.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "be")
@@ -3812,6 +3814,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/lexibook_jg7425.cpp",
 	MAME_DIR .. "src/mame/drivers/unkmandd.cpp",
 	MAME_DIR .. "src/mame/drivers/bbl380.cpp",
+	MAME_DIR .. "src/mame/drivers/actions_atj2279b.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "ultimachine")

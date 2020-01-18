@@ -326,7 +326,7 @@ namespace plib {
 				m_prof_call.inc();
 		}
 
-		T pop() noexcept       { return *(--m_end); }
+		void pop() noexcept       { --m_end; }
 		const T &top() const noexcept { return *(m_end-1); }
 
 		template <bool KEEPSTAT, class R>

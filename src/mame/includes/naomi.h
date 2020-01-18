@@ -79,6 +79,7 @@ protected:
 	optional_ioport_array<5> m_mp;
 
 	DECLARE_MACHINE_RESET(naomi);
+	DECLARE_WRITE_LINE_MEMBER(external_reset);
 
 	DECLARE_READ16_MEMBER( naomi_g2bus_r );
 	DECLARE_READ64_MEMBER( eeprom_93c46a_r );

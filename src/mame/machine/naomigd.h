@@ -10,6 +10,8 @@
 #include "machine/i2cmem.h"
 #include "machine/eepromser.h"
 #include "machine/315-6154.h"
+#include "machine/idectrl.h"
+#include "machine/gdrom.h"
 
 class naomi_gdrom_board : public naomi_board
 {
@@ -73,18 +75,22 @@ public:
 	DECLARE_READ32_MEMBER(sh4_parameterh_r);
 	DECLARE_WRITE32_MEMBER(sh4_status_w);		// 14000024
 	DECLARE_READ32_MEMBER(sh4_status_r);
+	DECLARE_WRITE32_MEMBER(sh4_control_w);		// 14000028
+	DECLARE_READ32_MEMBER(sh4_control_r);
 	DECLARE_WRITE32_MEMBER(sh4_des_keyl_w);		// 14000030
 	DECLARE_READ32_MEMBER(sh4_des_keyl_r);
 	DECLARE_WRITE32_MEMBER(sh4_des_keyh_w);		// 14000034
 	DECLARE_READ32_MEMBER(sh4_des_keyh_r);
 
-	DECLARE_WRITE32_MEMBER(memorymanager_w);
-	DECLARE_READ32_MEMBER(memorymanager_r);
-
 	DECLARE_READ64_MEMBER(i2cmem_dimm_r);
 	DECLARE_WRITE64_MEMBER(i2cmem_dimm_w);
 	DECLARE_READ8_MEMBER(pic_dimm_r);
 	DECLARE_WRITE8_MEMBER(pic_dimm_w);
+
+	DECLARE_READ32_MEMBER(ide_cs0_r);
+	DECLARE_READ32_MEMBER(ide_cs1_r);
+	DECLARE_WRITE32_MEMBER(ide_cs0_w);
+	DECLARE_WRITE32_MEMBER(ide_cs1_w);
 
 protected:
 	virtual void device_start() override;
@@ -104,6 +110,7 @@ private:
 	required_device<i2cmem_device> m_i2c1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<sega_315_6154_device> m_315_6154;
+	required_device<bus_master_ide_controller_device> m_ide;
 
 	const char *image_tag;
 	optional_region_ptr<uint8_t> picdata;
@@ -118,9 +125,9 @@ private:
 	uint32_t dimm_parameterl;
 	uint32_t dimm_parameterh;
 	uint32_t dimm_status;
+	uint32_t dimm_control;
 	uint32_t sh4_unknown;
 	uint64_t dimm_des_key;
-	uint32_t memctl_regs[0x100 / 4];
 
 	// Note: voluntarily not saved into the state
 	uint8_t *dimm_des_data;

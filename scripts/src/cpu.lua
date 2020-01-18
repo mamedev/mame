@@ -3016,6 +3016,23 @@ if (CPUS["VT50"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- DEC VT61
+--@src/devices/cpu/vt61/vt61.h,CPUS["VT61"] = true
+--------------------------------------------------
+
+if (CPUS["VT61"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/vt61/vt61.cpp",
+		MAME_DIR .. "src/devices/cpu/vt61/vt61.h",
+	}
+end
+
+if (CPUS["VT61"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/vt61/vt61dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/vt61/vt61dasm.h")
+end
+
+--------------------------------------------------
 -- National Semiconductor PACE/INS8900
 --@src/devices/cpu/pace/pace.h,CPUS["PACE"] = true
 --------------------------------------------------
