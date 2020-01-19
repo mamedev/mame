@@ -4,57 +4,95 @@
 <softwarelist name="n64" description="Nintendo iQue depot downloads">
 
     <software name="dongwu" supported="no">
-        <description>Dòngwù Sēnlín</description>
+        <description>Dòngwù Sēnlín (version 8)</description>
         <year>2006</year>
         <publisher>Nintendo</publisher>
-        <info name="serial" value="21041"/>
+        <info name="serial" value="21041" />
         <info name="alt_title" value="动物森林" />
-        <info name="release" value="20060601"/>
+        <info name="release" value="20060601" />
         <part name="cart" interface="ique_cart">
             <dataarea name="rom" size="16138240">
-                <rom name="dongwu senlin.bin" size="16138240" crc="38f90948" sha1="4245e0dc921cecfd388c2df8d124e0fac2b0a3ca" />
+                <rom name="2104108.bin" size="16138240" crc="0f86effe" sha1="8d009e1266fdbabcab307dfca39c8eb2ce2fe047" />
             </dataarea>
         </part>
     </software>
 
     <software name="fzerox" supported="no">
-        <description>F-Zero X Wèilái Sàichē</description>
+        <description>F-Zero X Wèilái Sàichē (version 3)</description>
         <year>2004</year>
         <publisher>Nintendo</publisher>
-        <info name="serial" value="52021"/>
+        <info name="serial" value="52021" />
         <info name="alt_title" value="F-Zero X 未来赛车" />
-        <info name="release" value="20040225"/>
+        <info name="release" value="20040225" />
         <part name="cart" interface="ique_cart">
             <dataarea name="rom" size="16334848">
-                <rom name="f-zero x - weilai saiche.bin" size="16334848" crc="b67dde4f" sha1="8def0f201b04c32dcf6d42901cc9b0bd5bb620d2" />
+                <rom name="5202103.bin" size="16334848" crc="909367b3" sha1="2920132524aa877792f03fab3e2957385aae41e7" />
             </dataarea>
         </part>
     </software>
 
-    <software name="fzeroxm2" cloneof="fzeroxm4" supported="no">
+    <software name="fzeroxm2" cloneof="fzerox" supported="no">
         <description>F-Zero X Wèilái Sàichē (manual, version 2)</description>
         <year>2004</year>
         <publisher>Nintendo</publisher>
-        <info name="serial" value="52021"/>
+        <info name="serial" value="52029" />
         <info name="alt_title" value="F-Zero X 未来赛车" />
-        <info name="release" value="20040225"/>
+        <info name="release" value="20040225" />
         <part name="cart" interface="ique_cart">
             <dataarea name="rom" size="180224">
-                <rom name="f-zero x - weilai saiche manual v2.bin" size="180224" crc="141403cf" sha1="35676d1ba314b96d75951834e526bd04d9ca42a4" />
+                <rom name="5202902.bin" size="180224" crc="ceb2944c" sha1="871953819ce2a2d0cd7dfab57f95e966827744eb" />
             </dataarea>
         </part>
     </software>
 
-    <software name="fzeroxm4" supported="no">
+    <software name="fzeroxm4" cloneof="fzerox" supported="no">
         <description>F-Zero X Wèilái Sàichē (manual, version 4)</description>
         <year>2004</year>
         <publisher>Nintendo</publisher>
-        <info name="serial" value="52021"/>
+        <info name="serial" value="52029" />
         <info name="alt_title" value="F-Zero X 未来赛车" />
-        <info name="release" value="20040225"/>
+        <info name="release" value="20040225" />
         <part name="cart" interface="ique_cart">
-            <dataarea name="rom" size="180224">
-                <rom name="f-zero x - weilai saiche manual v4.bin" size="294912" crc="e1d27770" sha1="d3eb35ef2450daa05a9265f8ed3f688415908d02" />
+            <dataarea name="rom" size="294912">
+                <rom name="5202904.bin" size="294912" crc="6737c794" sha1="a01cd9da8beeac44f44f08fa98cec603232d7ea4" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="fzeroxt" cloneof="fzerox" supported="no">
+        <description>F-Zero X Wèilái Sàichē (trailer)</description>
+        <year>2004</year>
+        <publisher>Nintendo</publisher>
+        <info name="serial" value="260000" />
+        <info name="alt_title" value="F-Zero X 未来赛车" />
+        <info name="release" value="20040225" />
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="12891544">
+                <rom name="26000001.bin" size="12891544" crc="02d1cc96" sha1="e5e8b362ae873e5c3cd5d7c553ee1a601009411c" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="iqueclub1" cloneof="iqueclub" supported="no">
+        <description>iQue Club (version 1)</description>
+        <year>200?</year>
+        <publisher>Nintendo</publisher>
+        <info name="serial" value="100000" />
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="557056">
+                <rom name="10000001.bin" size="557056" crc="15da7cec" sha1="11e8bed976037bc4ccf77998cbd24f9b2d4db9c7" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="iqueclub2" cloneof="iqueclub" supported="no">
+        <description>iQue Club (version 2)</description>
+        <year>200?</year>
+        <publisher>Nintendo</publisher>
+        <info name="serial" value="100000" />
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="557056">
+                <rom name="10000002.bin" size="557056" crc="3399854a" sha1="fe5e9a312d902e921730f96625207fdf99dc2cc8" />
             </dataarea>
         </part>
     </software>
@@ -63,135 +101,164 @@
         <description>iQue Club (version 3)</description>
         <year>200?</year>
         <publisher>Nintendo</publisher>
+        <info name="serial" value="100000" />
         <part name="cart" interface="ique_cart">
             <dataarea name="rom" size="573440">
-                <rom name="ique club v3.bin" size="573440" crc="74d3b450" sha1="aae97a70d4bc67c3dd857d1c884bc3ce1a296040" />
+                <rom name="10000003.bin" size="573440" crc="638fd248" sha1="0eed6b76f3ee7015b309a0e2db51642599b7df3f" />
             </dataarea>
         </part>
     </software>
 
     <software name="mariokrt" supported="no">
-        <description>Mario Kǎdīngchē (version 5)</description>
+        <description>Mǎlìōu Kǎdīngchē (version 5)</description>
         <year>2003</year>
         <publisher>Nintendo</publisher>
-        <info name="serial" value="52011"/>
+        <info name="serial" value="52011" />
         <info name="alt_title" value="马力欧卡丁车" />
-        <info name="release" value="20031225"/>
+        <info name="release" value="20031225" />
         <part name="cart" interface="ique_cart">
             <dataarea name="rom" size="12533760">
-                <rom name="mario kadingche v5.bin" size="12533760" crc="269003ae" sha1="d37214b05af90ef0980d4bda0f2c1c7b46573201" />
+                <rom name="5201105.bin" size="12533760" crc="7c2e7213" sha1="a6e1dc67ab968f4bbcf15b761bc72387a3d2fe3a" />
             </dataarea>
         </part>
     </software>
 
     <software name="mariokrt4" cloneof="mariokrt" supported="no">
-        <description>Mario Kǎdīngchē (version 4)</description>
+        <description>Mǎlìōu Kǎdīngchē (version 4)</description>
         <year>2003</year>
         <publisher>Nintendo</publisher>
-        <info name="serial" value="52011"/>
+        <info name="serial" value="52011" />
         <info name="alt_title" value="马力欧卡丁车" />
-        <info name="release" value="20031225"/>
+        <info name="release" value="20031225" />
         <part name="cart" interface="ique_cart">
             <dataarea name="rom" size="12533760">
-                <rom name="mario kadingche v4.bin" size="12533760" crc="2d403da0" sha1="59adcfea76dfc3301a35a3b2cddbb2d40840f0b1" />
+                <rom name="5201104.bin" size="12533760" crc="884b13bd" sha1="c9d341daa59b196031a457fbb768f9d9457b539c" />
             </dataarea>
         </part>
     </software>
 
-    <software name="mariokrtm2" cloneof="mariokrtm6" supported="no">
-        <description>Mario Kǎdīngchē (manual, version 2)</description>
+    <software name="mariokrtm2" cloneof="mariokrt" supported="no">
+        <description>Mǎlìōu Kǎdīngchē (manual, version 2)</description>
         <year>2003</year>
         <publisher>Nintendo</publisher>
-        <info name="serial" value="52011"/>
+        <info name="serial" value="52019" />
         <info name="alt_title" value="马力欧卡丁车" />
-        <info name="release" value="20031225"/>
+        <info name="release" value="20031225" />
         <part name="cart" interface="ique_cart">
             <dataarea name="rom" size="245760">
-                <rom name="mario kadingche manual v2.bin" size="245760" crc="d74a2074" sha1="ad7b9343294e54fca1ca0767c82996a7b25685ff" />
+                <rom name="5201902.bin" size="245760" crc="9eb74f64" sha1="018f08ef7aa62fa343774090856adc7eee3556ec" />
             </dataarea>
         </part>
     </software>
 
-    <software name="mariokrtm6" supported="no">
-        <description>Mario Kǎdīngchē (manual, version 6)</description>
+    <software name="mariokrtm6" cloneof="mariokrt" supported="no">
+        <description>Mǎlìōu Kǎdīngchē (manual, version 6)</description>
         <year>2003</year>
         <publisher>Nintendo</publisher>
-        <info name="serial" value="52011"/>
+        <info name="serial" value="52019" />
         <info name="alt_title" value="马力欧卡丁车" />
-        <info name="release" value="20031225"/>
+        <info name="release" value="20031225" />
         <part name="cart" interface="ique_cart">
             <dataarea name="rom" size="425984">
-                <rom name="mario kadingche manual v6.bin" size="425984" crc="124f1408" sha1="3012851910609c503461fb02ec854ab295a43d48" />
+                <rom name="5201906.bin" size="425984" crc="b6696482" sha1="65f930785b9ff5be19ca37eed0c042dee60fd951" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="mariokrtt" cloneof="mariokrt" supported="no">
+        <description>Mǎlìōu Kǎdīngchē (trailer)</description>
+        <year>2003</year>
+        <publisher>Nintendo</publisher>
+        <info name="serial" value="250000" />
+        <info name="alt_title" value="马力欧卡丁车" />
+        <info name="release" value="20031225" />
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="14887542">
+                <rom name="25000001.bin" size="14887542" crc="a4982815" sha1="55b1def947aaef82268903548e77d827503657c2" />
             </dataarea>
         </part>
     </software>
 
     <software name="drmario" supported="no">
-        <description>Mario Yīshēng</description>
+        <description>Mǎlìōu Yīshēng (version 4)</description>
         <year>2003</year>
         <publisher>Nintendo</publisher>
-        <info name="serial" value="61011"/>
+        <info name="serial" value="61011" />
         <info name="alt_title" value="马力欧医生" />
-        <info name="release" value="20031117"/>
+        <info name="release" value="20031117" />
         <part name="cart" interface="ique_cart">
             <dataarea name="rom" size="3358720">
-                <rom name="mario yisheng.bin" size="3358720" crc="d1aba3b9" sha1="218bcb123b2531bf0b9d2c4eac6907ee4b28a67f" />
+                <rom name="6101104.bin" size="3358720" crc="e5a3741e" sha1="964fe2891d3351499e5f2d9ee117d87330ae7412" />
             </dataarea>
         </part>
     </software>
 
-    <software name="drmariom2" cloneof="drmariom4" supported="no">
-        <description>Mario Yīshēng (manual, version 2)</description>
+    <software name="drmariom2" cloneof="drmario" supported="no">
+        <description>Mǎlìōu Yīshēng (manual, version 2)</description>
         <year>2003</year>
         <publisher>Nintendo</publisher>
-        <info name="serial" value="61011"/>
+        <info name="serial" value="61019" />
         <info name="alt_title" value="马力欧医生" />
-        <info name="release" value="20031117"/>
+        <info name="release" value="20031117" />
         <part name="cart" interface="ique_cart">
             <dataarea name="rom" size="294912">
-                <rom name="mario yisheng manual v2.bin" size="294912" crc="f0d1aac1" sha1="e0629ca365530f5d5b5e6dbf23cc14e973512c68" />
+                <rom name="6101902.bin" size="294912" crc="7ce72e9b" sha1="36fb571c18d73472a89e02f26cdaea6cde937afb" />
             </dataarea>
         </part>
     </software>
 
-    <software name="drmariom4" supported="no">
-        <description>Mario Yīshēng (manual, version 4)</description>
+    <software name="drmariom4" cloneof="drmario" supported="no">
+        <description>Mǎlìōu Yīshēng (manual, version 4)</description>
         <year>2003</year>
         <publisher>Nintendo</publisher>
-        <info name="serial" value="61011"/>
+        <info name="serial" value="61019" />
         <info name="alt_title" value="马力欧医生" />
-        <info name="release" value="20031117"/>
+        <info name="release" value="20031117" />
         <part name="cart" interface="ique_cart">
             <dataarea name="rom" size="393216">
-                <rom name="mario yisheng manual v4.bin" size="393216" crc="d87f6e39" sha1="77f614173c4465771d52f0180aaa3e91b0d9bd61" />
+                <rom name="6101904.bin" size="393216" crc="107ba311" sha1="828ea9a8b7666f2d8eae950359812fd5c3e4f276" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="drmariot" cloneof="drmario" supported="no">
+        <description>Mǎlìōu Yīshēng (trailer)</description>
+        <year>2003</year>
+        <publisher>Nintendo</publisher>
+        <info name="serial" value="220000" />
+        <info name="alt_title" value="马力欧医生" />
+        <info name="release" value="20031117" />
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="13374918">
+                <rom name="22000001.bin" size="13374918" crc="a5f929f2" sha1="ff0024156a32f628c569e4d614c4102c49bdda19" />
             </dataarea>
         </part>
     </software>
 
     <software name="smashbro" supported="no">
-        <description>Rèntiāntáng Míngxīng Dà Luàn Dǒu</description>
+        <description>Rèntiāntáng Míngxīng Dà Luàn Dǒu (version 5)</description>
         <year>2005</year>
         <publisher>Nintendo</publisher>
-        <info name="serial" value="12021"/>
+        <info name="serial" value="12011" />
         <info name="alt_title" value="任天堂明星大乱斗" />
-        <info name="release" value="20051115"/>
+        <info name="release" value="20051115" />
         <part name="cart" interface="ique_cart">
             <dataarea name="rom" size="16793600">
-                <rom name="rentiantang mingxing - daluan dou.bin" size="16793600" crc="7f465ac3" sha1="6f7394951530380892b10e3fee87f8e6e987fc90" />
+                <rom name="1201105.bin" size="16793600" crc="ad6ca836" sha1="7fcb59d677c25859c4a00b82cae846590f2d0ee7" />
             </dataarea>
         </part>
     </software>
 
     <software name="smashbrom" supported="no">
-        <description>Rèntiāntáng Míngxīng Dà Luàn Dǒu (manual)</description>
+        <description>Rèntiāntáng Míngxīng Dà Luàn Dǒu (manual, version 1)</description>
         <year>2005</year>
         <publisher>Nintendo</publisher>
-        <info name="serial" value="12021"/>
+        <info name="serial" value="12019" />
         <info name="alt_title" value="任天堂明星大乱斗" />
-        <info name="release" value="20051115"/>
+        <info name="release" value="20051115" />
         <part name="cart" interface="ique_cart">
             <dataarea name="rom" size="294912">
-                <rom name="rentiantang mingxing - daluan dou manual.bin" size="294912" crc="456f399c" sha1="abb0c93cd7962623f7e1f0974429eaabe002eb2e" />
+                <rom name="1201901.bin" size="294912" crc="2bd85517" sha1="aca3ddc7f1b939337cc73f9eefee6c5268c41d4d" />
             </dataarea>
         </part>
     </software>
