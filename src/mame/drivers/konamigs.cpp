@@ -120,6 +120,7 @@ protected:
 	void draw_quad_bin(u16 cmd, u16 *data);
 	void fill_quad(u16 cmd, u16 *data);
 	void draw_line(u16 cmd, u16 *data);
+	void draw_rline(u16 cmd, u16 *data);
 
 	int m_dbmode;
 	bool m_fg16bit;
@@ -128,6 +129,8 @@ protected:
 	bool m_width1024;
 	bool m_rsae;
 	bool m_vbkem;
+	s16 m_xc;
+	s16 m_yc;
 	s16 m_xo;
 	s16 m_yo;
 	s16 m_uxmin;
@@ -405,12 +408,23 @@ void gsan_state::draw_quad_tex(u16 cmd, u16 *data)
 	//	logerror("Q2SD draw %04X src %d:%d sz %d:%d dst %d:%d %d:%d %d:%d %d:%d\n", cmd, data[0], data[1], data[2], data[3], (s16)data[4], (s16)data[5], (s16)data[6], (s16)data[7], (s16)data[8], (s16)data[9], (s16)data[10], (s16)data[11]);
 	if (cmd & 0x57f)
 		logerror("Q2SD unhandled draw tex mode %04X\n", cmd);
-	u32 ssx = data[0] & 0x3ff;
-	u32 ssy = data[1] & 0x3ff;
-	s16 sdx = data[4];
-	s16 sdy = data[5];
-	s16 edx = data[8];
-	s16 edy = data[9];
+	// LNi = 0
+	u32 ssx = data[0] & 0x3ff; // TXS
+	u32 ssy = data[1] & 0x3ff; // TYS
+	// LNi = 1, REL = 0
+	// ((data[0] & 0x3ff) << 13) | (data[1] & 0x1fff) Absolute Source Address
+	// LNi = 1, REL = 1
+	// (((data[0] & 0x1ff) - (data[0] & 0x200)) << 13) | (data[1] & 0x1fff) Relative Source Address
+	// data[2] TDX
+	// data[3] TDY
+	s16 sdx = data[4]; // DX1
+	s16 sdy = data[5]; // DY1
+	// data[6] DX2
+	// data[7] DY2	
+	s16 edx = data[8]; // DX3
+	s16 edy = data[9]; // DY3
+	// data[0xa] DX4
+	// data[0xb] DY4
 
 	sdx += m_xo;
 	edx += m_xo;
@@ -457,12 +471,20 @@ void gsan_state::draw_quad_bin(u16 cmd, u16 *data)
 	if (cmd & 0x57f)
 		logerror("Q2SD unhandled draw bin mode %04X\n", cmd);
 
-	u32 src_offs = ((data[0] & 0x03ff) << 13) | (data[1] & 0x1fff);
-	u32 tdx = data[2];
-	s16 sdx = data[4];
-	s16 sdy = data[5];
-	s16 edx = data[8];
-	s16 edy = data[9];
+	// REL = 0
+	u32 src_offs = ((data[0] & 0x03ff) << 13) | (data[1] & 0x1fff); // Absolute Source Address
+	// REL = 1
+	// (((data[0] & 0x1ff) - (data[0] & 0x200)) << 13) | (data[1] & 0x1fff) Relative Source Address
+	u32 tdx = data[2]; // TDX
+	// data[3] TDY
+	s16 sdx = data[4]; // DX1
+	s16 sdy = data[5]; // DY1
+	// data[6] DX2
+	// data[7] DY2
+	s16 edx = data[8]; // DX3
+	s16 edy = data[9]; // DY3
+	// data[0xa] DX4
+	// data[0xb] DY4
 	u16 color0 = data[0xc];
 	u16 color1 = data[0xd];
 
@@ -514,10 +536,14 @@ void gsan_state::fill_quad(u16 cmd, u16 *data)
 	//	logerror("Q2SD fill dst %d:%d %d:%d %d:%d %d:%d col %04X\n", (s16)data[0], (s16)data[1], (s16)data[2], (s16)data[3], (s16)data[4], (s16)data[5], (s16)data[6], (s16)data[7], data[8]);
 	if (cmd & 0x77f)
 		logerror("Q2SD unhandled draw mode %04X\n", cmd);
-	s16 sdx = data[0];
-	s16 sdy = data[1];
-	s16 edx = data[4];
-	s16 edy = data[5];
+	s16 sdx = data[0]; // DX1
+	s16 sdy = data[1]; // DY1
+	// data[2] DX2
+	// data[3] DY2
+	s16 edx = data[4]; // DX3
+	s16 edy = data[5]; // DY3
+	// data[6] DX4
+	// data[7] DY4
 	u16 color = data[8];
 
 	sdx += m_xo;
@@ -617,6 +643,75 @@ void gsan_state::draw_line(u16 cmd, u16 *data)
 	}
 }
 
+void gsan_state::draw_rline(u16 cmd, u16 *data)
+{
+	if (cmd & 0x77f)
+		logerror("Q2SD unhandled line mode %04X\n", cmd);
+
+	s16 sclipx, sclipy, eclipx, eclipy;
+	if (BIT(cmd, 7))
+	{
+		sclipx = m_uxmin;
+		sclipy = m_uymin;
+		eclipx = std::min(m_uxmax, m_sxmax);
+		eclipy = std::min(m_uymax, m_symax);
+	}
+	else
+	{
+		sclipx = 0; sclipy = 0;
+		eclipx = m_sxmax; eclipy = m_symax;
+	}
+	u32 fg_offs = get_rend_offset();
+
+	u16 color = *data++;
+	if (!m_rend16bit)
+		color &= 0xff;
+
+	u16 count = *data++;
+	while (count > 1)
+	{
+		s16 rel_x = s8(*data >> 8);
+		s16 rel_y = s8(*data);
+		s16 x0 = m_xc + m_xo;
+		s16 y0 = m_yc + m_yo;
+		s16 x1 = m_xc + rel_x + m_xo;
+		s16 y1 = m_yc + rel_y + m_yo;
+		--count;
+
+		int dx = abs(x1 - x0);
+		int dy = -abs(y1 - y0);
+		int sx = x0 < x1 ? 1 : -1;
+		int sy = y0 < y1 ? 1 : -1;
+		int err = dx + dy;
+
+		while (true)
+		{
+			if (x0 >= sclipx && x0 <= eclipx && y0 >= sclipy && y0 <= eclipy)
+				put_pixel(fg_offs, x0, y0, color, m_rend16bit);
+
+			if (x0 == x1 && y0 == y1)
+				break;
+
+			int e2 = 2 * err;
+			if (e2 >= dy)
+			{
+				err += dy;
+				x0 += sx;
+			}
+			if (e2 <= dx)
+			{
+				err += dx;
+				y0 += sy;
+			}
+		}
+		m_xc += rel_x;
+		m_yc += rel_y;
+		data++;
+	}
+	m_gpuregs[0x80 / 2] = m_xc;
+	m_gpuregs[0x82 / 2] = m_yc;
+}
+
 void gsan_state::do_render(bool vbkem)
 {
 	u32 listoffs = (vbkem ? ((m_gpuregs[0x03e / 2] << 16) | m_gpuregs[0x040 / 2]) : ((m_gpuregs[0x018 / 2] << 16) | m_gpuregs[0x01a / 2])) / 2;
@@ -638,14 +733,41 @@ void gsan_state::do_render(bool vbkem)
 			fill_quad(cmd, &m_vram[listoffs]);
 			listoffs += 9;
 			break;
+		// 0x08 FTRAP
+		// 0x09 RFTRAP
+		// 0x0a LINEW
+		// 0x0b RLINEW
 		case 0x0c: // LINE
 			draw_line(cmd, &m_vram[listoffs]);
 			listoffs += m_vram[listoffs + 1] * 2 + 2;
+			break;
+		case 0x0d: // RLINE
+			draw_line(cmd, &m_vram[listoffs]);
+			listoffs += m_vram[listoffs + 1] + 2;
+			break;
+		// 0x0e PLINE
+		// 0x0f RPLINE
+		case 0x10: // MOVE
+			m_xc = m_gpuregs[0x80 / 2] = m_vram[listoffs++];
+			m_yc = m_gpuregs[0x82 / 2] = m_vram[listoffs++];
+			break;
+		case 0x11: // RMOVE
+			m_xc += s8(m_vram[listoffs] >> 8);
+			m_yc += s8(m_vram[listoffs++]);
+			m_gpuregs[0x80 / 2] = m_xc;
+			m_gpuregs[0x82 / 2] = m_yc;
 			break;
 		case 0x12: // LCOFS
 			m_xo = m_gpuregs[0x84 / 2] = m_vram[listoffs++];
 			m_yo = m_gpuregs[0x86 / 2] = m_vram[listoffs++];
 			break;
+		case 0x13: // RLCOFS
+			m_xo += s8(m_vram[listoffs] >> 8);
+			m_yo += s8(m_vram[listoffs++]);
+			m_gpuregs[0x84 / 2] = m_xo;
+			m_gpuregs[0x86 / 2] = m_yo;
+			break;
+		// 0x14 CLRW
 		case 0x15: // UCLIP
 			m_uxmin = m_gpuregs[0x88 / 2] = m_vram[listoffs++];
 			m_uymin = m_gpuregs[0x8a / 2] = m_vram[listoffs++];
@@ -660,6 +782,8 @@ void gsan_state::do_render(bool vbkem)
 			m_sxmax = m_gpuregs[0x90 / 2] = m_vram[listoffs++];
 			m_symax = m_gpuregs[0x92 / 2] = m_vram[listoffs++];
 			break;
+		// 0x18 JUMP
+		// 0x19 GOSUB
 		case 0x1a: // VBKEM
 			listoffs += 2;
 			// remember current address and wait until vblank
@@ -668,6 +792,7 @@ void gsan_state::do_render(bool vbkem)
 			m_vbkem = true;
 			end_of_list = true;
 			break;
+		// 0x1b RET
 		case 0x1e: // NOP3
 			listoffs += 2;
 			break;
@@ -955,6 +1080,8 @@ void gsan_state::machine_start()
 	save_item(NAME(m_width1024));
 	save_item(NAME(m_rsae));
 	save_item(NAME(m_vbkem));
+	save_item(NAME(m_xc));
+	save_item(NAME(m_yc));
 	save_item(NAME(m_xo));
 	save_item(NAME(m_yo));
 	save_item(NAME(m_uxmin));
@@ -975,7 +1102,7 @@ void gsan_state::machine_reset()
 
 	m_dbmode = 0;
 	m_fg16bit = m_bg16bit = m_rend16bit = m_width1024 = m_rsae = m_vbkem = false;
-	m_xo = m_yo = m_uxmin = m_uxmax = m_uymin = m_uymax = m_sxmax = m_symax = 0;
+	m_xc = m_yc = m_xo = m_yo = m_uxmin = m_uxmax = m_uymin = m_uymax = m_sxmax = m_symax = 0;
 }
 
 static void gsan_devices(device_slot_interface &device)
