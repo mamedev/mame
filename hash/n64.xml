@@ -8821,7 +8821,7 @@ This cart features a built-in RJ-42 Modem Connection port to play online, curren
 	</software>
 
 	<software name="pdarkup" cloneof="pdark" supported="no">
-		<description>Perfect Dark (USA, prototype 20000522, version 6.4)</description>
+		<description>Perfect Dark (USA, prototype 20000322, version 6.4)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8839,7 +8839,7 @@ patched out (+ a fix for internal checksum)
 -->
 <!-- Why is this a different size than encrypted? -->
 	<software name="pdarkuph" cloneof="pdark">
-		<description>Perfect Dark (USA, prototype 20000522, version 6.4, decrypted)</description>
+		<description>Perfect Dark (USA, prototype 20000322, version 6.4, decrypted)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8893,6 +8893,12 @@ patched out (+ a fix for internal checksum)
 		<info name="release" value="19981212"/>
 		<info name="alt_title" value="ピカチュウげんきでちゅう"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="u1" value="U1 [NUS-NPGJ-0]" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pikachuu genki de chuu (japan).bin" size="16777216" crc="2ae884cd" sha1="533ba7078e631bdcbf97776a151dbcab206fa991" />
 			</dataarea>
@@ -8919,8 +8925,14 @@ patched out (+ a fix for internal checksum)
 		<info name="release" value="19960623"/>
 		<info name="alt_title" value="パイロットウイングス64"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="u1" value="U1 [NUS-NPWJ-0]" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN" />
 			<dataarea name="rom" size="8388608">
-				<rom name="pilotwings 64 (japan).bin" size="8388608" crc="001ee45b" sha1="e6e8a48e433dc7a4949756e70ab18d0165a1bc6f" />
+				<rom name="nus-npwj-0.u1" size="8388608" crc="001ee45b" sha1="e6e8a48e433dc7a4949756e70ab18d0165a1bc6f" />
 			</dataarea>
 		</part>
 	</software>
@@ -9035,8 +9047,12 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NPND-NOE"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-06A-01" />
+			<feature name="u1" value="U1 [NUS-NPND-0]" />
+			<feature name="u2" value="U2 [29LL1100KC-15B0]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101A]" />
 			<dataarea name="rom" size="33554432">
-				<rom name="pokemon puzzle league (germany).bin" size="33554432" crc="7d4c9859" sha1="656c86a50e4954e11c202ada31d2e2fd516b8f07" />
+				<rom name="nus-npnd-0.u1" size="33554432" crc="7d4c9859" sha1="656c86a50e4954e11c202ada31d2e2fd516b8f07" />
 			</dataarea>
 		</part>
 	</software>
@@ -9123,8 +9139,14 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NPFI-ITA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-06A-01" />
+			<feature name="u1" value="U1 [NUS-NPFI-0]" />
+			<feature name="u2" value="U2 [29LL1100KC-15B0]" />
+			<feature name="u3" value="U3 [CIC-NUS-7103A]" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<feature name="cart_back_label" value="NUS-EUR-1" />
 			<dataarea name="rom" size="16777216">
-				<rom name="pokemon snap (italy).bin" size="16777216" crc="d3ae1d04" sha1="ab649b902b48271f628b614b43453c651592af4f" />
+				<rom name="nus-npfi-0.u1" size="16777216" crc="d3ae1d04" sha1="ab649b902b48271f628b614b43453c651592af4f" />
 			</dataarea>
 		</part>
 	</software>
@@ -9135,8 +9157,14 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NPFS-ESP"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-06A-01" />
+			<feature name="u1" value="U1 [NUS-NPFS-0]" />
+			<feature name="u2" value="U2 [29LL1100KC-15B0]" />
+			<feature name="u3" value="U3 [CIC-NUS-7103A]" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<feature name="cart_back_label" value="NUS-EUR-1" />
 			<dataarea name="rom" size="16777216">
-				<rom name="pokemon snap (spain).bin" size="16777216" crc="426a1919" sha1="e2276abf1cc2fe7bb5a8d05241214481b02580e1" />
+				<rom name="nus-npfs-0.u1" size="16777216" crc="426a1919" sha1="e2276abf1cc2fe7bb5a8d05241214481b02580e1" />
 			</dataarea>
 		</part>
 	</software>
@@ -9217,8 +9245,14 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NPOD-NOE"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-06A-01" />
+			<feature name="u1" value="U1 [NUS-NPOD-0]" />
+			<feature name="u2" value="U2 [29L1100KC-15B0]" />
+			<feature name="u3" value="U3 [CIC-NUS-7103A]" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<feature name="cart_back_label" value="NUS-EUR-1" />
 			<dataarea name="rom" size="33554432">
-				<rom name="pokemon stadium (germany).bin" size="33554432" crc="3243a2a7" sha1="20943b1e25af11ae2305d9680049dfa777b96ef0" />
+				<rom name="nus-npod-0.u1" size="33554432" crc="3243a2a7" sha1="20943b1e25af11ae2305d9680049dfa777b96ef0" />
 			</dataarea>
 		</part>
 	</software>
@@ -9241,8 +9275,14 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NPOS-ESP"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-06A-01" />
+			<feature name="u1" value="U1 [NUS-NPOS-0]" />
+			<feature name="u2" value="U2 [29L1100KC-15B0]" />
+			<feature name="u3" value="U3 [CIC-NUS-7103A]" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<feature name="cart_back_label" value="NUS-EUR-1" />
 			<dataarea name="rom" size="33554432">
-				<rom name="pokemon stadium (spain).bin" size="33554432" crc="7adfb7e0" sha1="d8bce5fdd89654c37c74e64a39589466c6ed8c3d" />
+				<rom name="nus-npos-0.u1" size="33554432" crc="7adfb7e0" sha1="d8bce5fdd89654c37c74e64a39589466c6ed8c3d" />
 			</dataarea>
 		</part>
 	</software>
@@ -9331,8 +9371,16 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NP3D-NOE"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-08A-01" />
+			<feature name="u1" value="U1 [NUS-NP3D-0 12]" />
+			<feature name="u2" value="U2 [NUS-NP3D-0 02]" />
+			<feature name="u3" value="U3 [NUS MN63F81MPN]" />
+			<feature name="u4" value="U4 [CIC-NUS-7103A]" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<feature name="cart_back_label" value="NUS-EUR-1" />
 			<dataarea name="rom" size="67108864">
-				<rom name="pokemon stadium 2 (germany).bin" size="67108864" crc="b0a291fc" sha1="bdb0db2ab6e2661bd32ff3cd1ded3bd5ad6073ef" />
+				<rom name="nus-np3d-0 12.u1" size="33554432" crc="e12f9ac1" sha1="06d6b0c79991b6b546603ca9068ed94dce4867a9" offset="0x0000000" />
+				<rom name="nus-np3d-0 02.u2" size="33554432" crc="c2e53eea" sha1="f3a36667a91c8efb77efb375ca9e04c5f0dab377" offset="0x2000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9355,8 +9403,16 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NP3S-ESP"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-08A-01" />
+			<feature name="u1" value="U1 [NUS-NP3S-0 02]" />
+			<feature name="u2" value="U2 [NUS-NP3S-0 12]" />
+			<feature name="u3" value="U3 [29L1100KC-15B0]" />
+			<feature name="u4" value="U4 [CIC-NUS-7103A]" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<feature name="cart_back_label" value="NUS-EUR-1" />
 			<dataarea name="rom" size="67108864">
-				<rom name="pokemon stadium 2 (spain).bin" size="67108864" crc="391119b5" sha1="ef07a49536ddb18b98897b78eb66a44c13467351" />
+				<rom name="nus-np3s-0 02.u1" size="33554432" crc="8b4238b2" sha1="3e764dad17a6dd801931928852cfffb429a4b6d9" offset="0x0000000" />
+				<rom name="nus-np3s-0 12.u2" size="33554432" crc="a1a77dba" sha1="aff7f2eab9fb7093332c270af2c3ccf4114514f7" offset="0x2000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9415,8 +9471,14 @@ patched out (+ a fix for internal checksum)
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="NUS-NPUP-EUR"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-03" />
+			<feature name="u1" value="U1 [NUS-NPUP-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101A]" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<feature name="cart_back_label" value="NUS-EUR-1" />
 			<dataarea name="rom" size="12582912">
-				<rom name="power rangers - lightspeed rescue (europe).bin" size="12582912" crc="88250ab1" sha1="c49ac782bc970a7ce1f76d7b60f7e741e915fbe2" />
+				<rom name="nus-npup-0.u1" size="12582912" crc="88250ab1" sha1="c49ac782bc970a7ce1f76d7b60f7e741e915fbe2" />
 			</dataarea>
 		</part>
 	</software>
@@ -9529,8 +9591,14 @@ patched out (+ a fix for internal checksum)
 		<info name="release" value="19971031"/>
 		<info name="alt_title" value="ぷよぷよSUN64"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NPYJ-0]" />
+			<feature name="u2" value="U2 [PU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="8388608">
-				<rom name="puyo puyo sun 64 (japan).bin" size="8388608" crc="c256544c" sha1="6ba3441890502ed5cdc27f29752f231490e49bf5" />
+				<rom name="nus-npyj-0.u1" size="8388608" crc="c256544c" sha1="6ba3441890502ed5cdc27f29752f231490e49bf5" />
 			</dataarea>
 		</part>
 	</software>
@@ -9553,7 +9621,7 @@ patched out (+ a fix for internal checksum)
 		<description>Quake 64 (Europe)</description>
 		<year>1998</year>
 		<publisher>GT Interactive</publisher>
-		<info name="serial" value="NUS-NQKP-EUR"/>
+		<info name="serial" value="NUS-NQKP-EUR, NUS-NQKP-FRA, NUS-NQKP-SCN"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="quake 64 (europe).bin" size="12582912" crc="6f79b0eb" sha1="8b9ff00fff48ef847794164111ec9415e5dccb31" />
@@ -9682,9 +9750,9 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NWQE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-02" />
-			<feature name="u1" value="NUS-NWQE-0" />
-			<feature name="u2" value="BU9850" />
-			<feature name="u3" value="CIC-NUS-6102A" />
+			<feature name="u1" value="U1 [NUS-NWQE-0]" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="12582912">
@@ -9712,7 +9780,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NRPE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NRPE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -9740,7 +9808,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-N2PE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-N2PE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -9768,7 +9836,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NRTE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NRTE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="8388608">
@@ -9796,7 +9864,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NY2E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NY2E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="33554432">
@@ -9824,7 +9892,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NFQE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NFQE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="8388608">
@@ -9852,7 +9920,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NRVE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NRVE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="12582912">
@@ -9865,7 +9933,7 @@ patched out (+ a fix for internal checksum)
 		<description>Ready 2 Rumble Boxing (Europe)</description>
 		<year>1999</year>
 		<publisher>Midway</publisher>
-		<info name="serial" value="NUS-NRDP-(EUR,EUU)"/>
+		<info name="serial" value="NUS-NRDP-EUR, NUS-NRDP-EUU"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="ready 2 rumble boxing (europe) (en,fr,de).bin" size="33554432" crc="f2fe85ad" sha1="8a2bd9ceb91bc753cbeebd4cb0d47819361e4bea" />
@@ -9880,7 +9948,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NRDE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NRDE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="33554432">
@@ -9896,7 +9964,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-N22E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-N22E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="33554432">
@@ -9929,7 +9997,7 @@ patched out (+ a fix for internal checksum)
 			<feature name="u3" value="U3 [LH52V246AN]" />
 			<feature name="u4" value="U4 BU9803 [LV2416]" />
 			<feature name="u5" value="U5 CIC-NUS [CIC6102A]" />
-			<feature name="bt1" value="CR2032" />
+			<feature name="bt1" value="BT1 [CR2032]" />
 			<feature name="cart_model" value="NUS-006(-01)(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="67108864">
@@ -9951,7 +10019,7 @@ patched out (+ a fix for internal checksum)
 			<feature name="u3" value="U3 [LH52V246AN]" />
 			<feature name="u4" value="U4 BU9803 [LV2416]" />
 			<feature name="u5" value="U5 CIC-NUS [CIC6102A]" />
-			<feature name="bt1" value="CR2032" />
+			<feature name="bt1" value="BT1 [CR2032]" />
 			<feature name="cart_model" value="NUS-006(-01)(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="67108864">
@@ -9980,7 +10048,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NROE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NROE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="33554432">
@@ -10008,7 +10076,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NRRE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NRRE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="12582912">
@@ -10031,13 +10099,25 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
+	<software name="robotech1" cloneof="robotech">
+		<description>Robotech: Crystal Dreams (USA, prototype, earlier)</description>
+		<year>1998</year>
+		<publisher>GameTek</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="16777216">
+				<rom name="robotech - crystal dreams (prototype).n64" size="16777216" crc="4d6016ab" sha1="b86a1567becb47c30be79370c85706c103b063a9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Prototype should be 16777216 bytes. -->
 	<software name="robotech">
 		<description>Robotech: Crystal Dreams (USA, prototype 19990820)</description>
 		<year>1998</year>
 		<publisher>GameTek</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
-				<rom name="robotech - crystal dreams (usa) (proto).bin" size="12582912" crc="3a711f12" sha1="5ea71103d323530c73e1668cc47a1c287d07e99b" />
+				<rom name="robotech - crystal dreams (usa) (proto).bin" size="12582912" crc="3a711f12" sha1="5ea71103d323530c73e1668cc47a1c287d07e99b" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -10085,7 +10165,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NSUE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NSUE-0]" />
 			<feature name="u2" value="U2 [BU9850]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="12582912">
@@ -10125,10 +10205,10 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="rr64">
-		<description>RR64 - Ridge Racer 64 (Europe)</description>
+		<description>RR64 - Ridge Racer 64 (Australia, Europe)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NUS-NRZP-EUR"/>
+		<info name="serial" value="NUS-NRZP-AUS, NUS-NRZP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="rr64 - ridge racer 64 (europe).bin" size="33554432" crc="170f63b2" sha1="7543e17585ef4af0b3b1de8004b6cd4d92ec214d" />
@@ -10143,7 +10223,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NRZE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NRZE-0]" />
 			<feature name="u2" value="U2 [BK16DA]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="33554432">
@@ -10171,7 +10251,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NRGE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NRGE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
@@ -10199,9 +10279,9 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NRGD-NOE"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-NRGD-0" />
-			<feature name="u2" value="[empty]" />
-			<feature name="u3" value="CIC-NUS-7101" />
+			<feature name="u1" value="U1 [NUS-NRGD-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101]" />
 			<feature name="cart_model" value="NUS-006(EUR)" />
 			<dataarea name="rom" size="16777216">
 				<rom name="nus-nrgd-0.u1" size="16777216" crc="e1d7919f" sha1="7840bdfe801fa2d8e34e120f66af59a140d3c1c3" />
@@ -10228,7 +10308,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NRKE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NRKE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">

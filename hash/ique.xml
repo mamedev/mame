@@ -168,4 +168,32 @@
         </part>
     </software>
 
+    <software name="smashbro" supported="no">
+        <description>Rèntiāntáng Míngxīng Dà Luàn Dǒu</description>
+        <year>2005</year>
+        <publisher>Nintendo</publisher>
+        <info name="serial" value="12021"/>
+        <info name="alt_title" value="任天堂明星大乱斗" />
+        <info name="release" value="20051115"/>
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="16793600">
+                <rom name="rentiantang mingxing - daluan dou.bin" size="16793600" crc="7f465ac3" sha1="6f7394951530380892b10e3fee87f8e6e987fc90" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="smashbrom" supported="no">
+        <description>Rèntiāntáng Míngxīng Dà Luàn Dǒu (manual)</description>
+        <year>2005</year>
+        <publisher>Nintendo</publisher>
+        <info name="serial" value="12021"/>
+        <info name="alt_title" value="任天堂明星大乱斗" />
+        <info name="release" value="20051115"/>
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="294912">
+                <rom name="rentiantang mingxing - daluan dou manual.bin" size="294912" crc="456f399c" sha1="abb0c93cd7962623f7e1f0974429eaabe002eb2e" />
+            </dataarea>
+        </part>
+    </software>
+
 </softwarelist>
