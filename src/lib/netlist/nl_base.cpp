@@ -5,9 +5,9 @@
 #include "solver/nld_solver.h"
 
 #include "plib/palloc.h"
+#include "plib/pfmtlog.h"
 #include "plib/pmempool.h"
 #include "plib/putil.h"
-#include "plib/pfmtlog.h"
 
 #include "devices/nlid_proxy.h"
 #include "devices/nlid_system.h"

@@ -156,7 +156,7 @@ namespace plib {
 			C14CONSTEXPR LC* operator->() const noexcept { return p; }
 		};
 
-		constexpr linkedlist_t() : m_head(nullptr) {}
+		constexpr linkedlist_t() noexcept : m_head(nullptr) {}
 
 		constexpr iter_t begin() const noexcept { return iter_t(m_head); }
 		constexpr iter_t end() const noexcept { return iter_t(nullptr); }

@@ -675,16 +675,12 @@ void tool_app_t::header_entry(const netlist::factory::element_t *e)
 
 	for (const auto &s : v)
 	{
-		pstring r(plib::replace_all(plib::replace_all(plib::replace_all(s, "+", ""), ".", "_"), "@",""));
-		if (plib::startsWith(s, "+"))
-			vs += ", p" + r;
-		else if (plib::startsWith(s, "@"))
+		if (!plib::startsWith(s, "@"))
 		{
-			// automatically connected
-			//mac_out("\tNET_CONNECT(name, " + r + ", " + r + ")");
-		}
-		else
+			// @ gets automatically connected
+			const pstring r(plib::replace_all(plib::replace_all(plib::replace_all(s, "+", ""), ".", "_"), "@",""));
 			vs += ", p" + r;
+		}
 	}
 
 	mac_out("\tNET_REGISTER_DEVEXT(" + e->name() +", name" + vs + ")", false);

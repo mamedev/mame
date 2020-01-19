@@ -149,7 +149,7 @@
 ///  |  63	| 1,000,000,000,000	|     9,223,372	|     107|   0.3 |
 ///
 
-static constexpr const auto NETLIST_INTERNAL_RES = 10'000'000'000ll;
+static constexpr const auto NETLIST_INTERNAL_RES = 10'000'000'000LL;
 
 /// \brief Recommended clock to be used
 ///
