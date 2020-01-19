@@ -20,6 +20,224 @@
 1942p                           // prototype
 1942h                           // hack (Two Bit Score?)
 
+/* FIXME: games commented out complain about being a clone of a game not in the driver */
+
+@source:galaxian.cpp
+600                             // GX353 (c) 1981 Konami
+amidar                          // GX337 (c) 1982 Konami
+amidar1                         // GX337 (c) 1981 Konami
+amidarb                         // bootleg
+amidaro                         // GX337 (c) 1982 Konami + Olympia license
+amidars                         // GX337 (c) 1982 Konami
+amidaru                         // GX337 (c) 1982 Konami + Stern license
+amigo                           // bootleg
+amigo2                          // bootleg
+anteater                        // (c) 1982 Tago
+anteaterg                       // (c) 1983 TV-Tuning (F.E.G. license)
+anteatergg                      // bootleg
+anteateruk                      // (c) 1983 Free Enterprise Games
+aracnis                         // bootleg
+armorcar                        // (c) 1981 Stern
+armorcar2                       // (c) 1981 Stern
+asideral                        // bootleg
+astrians                        //
+atlantis                        // (c) 1981 Comsoft
+atlantis2                       // (c) 1981 Comsoft
+atlantisb                       // bootleg
+azurian                         // (c) 1982 Rait Electronics Ltd
+//batman2                         // bootleg
+blkhole                         // TDS (Tokyo Denshi Sekkei) & MINTS
+bomber                          //
+calipso                         // (c) 1982 Tago
+catacomb                        // 1982 MTM Games
+checkman                        // (c) 1982 Zilec-Zenitone
+checkmanj                       // (c) 1982 Jaleco (Zenitone/Zilec in ROM CM4, and the programmer names)
+chewing                         // ?? unknown
+//devilfsg                        // (c) 1984 Vision / Artic (bootleg?)
+dingo                           // (c) 1983 Ashby Computers and Graphics LTD. + Jaleco license
+dingoe                          // (c) 1983 Ashby Computers and Graphics LTD. + Jaleco license
+eagle                           // [1980] Centuri
+eagle2                          // [1980] Centuri
+eagle3                          // [1980] Centuri
+exodus                          // Subelectro - bootleg?
+explorer                        // bootleg
+fantastc                        // (c) Taito (Brazil) - rewrite of Galaga
+fantazia                        // bootleg
+frogf                           // bootleg
+frogg                           // bootleg
+frogger                         // GX392 (c) 1981 Konami
+froggeram                       // bootleg
+froggermc                       // 800-3110 (c) 1981 Sega
+froggers                        // bootleg
+froggers1                       // (c) 1981 Sega
+froggers2                       // 834-0068 (c) 1981 Sega
+froggers3                       //
+froggrs                         //
+froggervd                       // Video Dens
+fourplay                        // multigame
+galap1                          // hack
+galap4                          // hack
+galapx                          // hack
+galaxbsf                        // hack
+galaxbsf2                       // bootleg
+galaxian                        // (c) Namco
+galaxiana                       // (c) Namco
+galaxianbl                      // bootleg
+galaxianbl2                     // bootleg
+galaxiani                       // (c) Irem
+galaxianm                       // (c) Midway
+galaxianmo                      // (c) Midway
+galaxiant                       // (c) Taito
+galaxrcgg                       // bootleg (Recreativos Covadonga)
+galaxrf                         // bootleg (Recreativos Franco)
+galaxrfgg                       // bootleg (Recreativos Franco)
+galemp                          // (c) Taito do Brasil
+galturbo                        // hack
+//ghostmun                        //
+gmgalax                         // bootleg
+gteikoku                        // (c) Irem
+gteikokub                       // bootleg
+gteikokub2                      // bootleg
+gteikokub3                      // bootleg (Honly Enterprises)
+jumpbug                         // (c) 1981 Rock-ola
+jumpbugb                        // (c) 1981 Sega
+//jungsub                         // bootleg
+kamakazi3                       // Video Games (UK) Ltd., hack or bootleg?
+kamikazp                        // bootleg (Potomac Games)
+kingball                        // (c) 1980 Namco
+kingballj                       // (c) 1980 Namco
+kong                            // (c) Taito (Brazil) - rewrite of Donkey Kong
+//ladybugg                        // bootleg
+levers                          // (c) 1983 Rock-ola
+losttomb                        // (c) 1982 Stern
+losttombh                       // (c) 1982 Stern
+luctoday                        // 1980 Sigma
+mandinga                        // bootleg (Artemi)
+mandingaeg                      // bootleg (Electrogame)
+mandingarf                      // bootleg (Recreativos Franco S.A.)
+mandingac                       // bootleg (Centromatic)
+mltiwars                        // bootleg (Gayton Games)
+monsterz                        // (c) 1982 Nihon (Arcade TV Game List - P.102, Left, 20 from top)
+moonal2                         // [1980] Nichibutsu
+moonal2b                        // [1980] Nichibutsu
+moonaln                         // [Nichibutsu] (Karateco license) or hack
+mooncmw                         // bootleg
+mooncptc                        // bootleg (Petaco S.A.)
+mooncreg                        // bootleg
+mooncrgx                        // bootleg
+mooncrs2                        // bootleg
+mooncrs3                        // bootleg
+mooncrs4                        // bootleg
+mooncrs5                        // bootleg
+mooncrsb                        // bootleg
+mooncrsl                        // bootleg (Laguna S.A.)
+mooncrst                        // (c) 1980 Nichibutsu
+mooncrstg                       // (c) 1980 Gremlin
+mooncrstso                      // (c) 1980 SegaSA / Sonic
+mooncrsto                       // (c) 1980 Nichibutsu
+mooncrstu                       // (c) 1980 Nichibutsu USA
+mooncrstuk                      // (c) 1980 Nichibutsu UK
+mooncrstuku                     // (c) 1980 Nichibutsu UK
+moonqsr                         // (c) 1980 Nichibutsu
+moonwar                         // (c) 1981 Stern
+moonwara                        // (c) 1981 Stern
+mshuttle                        // (c) 1981 Nichibutsu
+mshuttle2                       // (c) 1981 Nichibutsu
+mshuttlea                       // (c) 1981 Nichibutsu
+mshuttlej                       // (c) 1981 Nichibutsu
+mshuttlej2                      // (c) 1981 Nichibutsu
+ncentury                        // bootleg (Petaco S.A.)
+offensiv                        // bootleg (Video Dens)
+omegab                          // bootleg
+omni                            // bootleg
+orbitron                        // (c) 1982 Signatron USA (Arcade Tv Game List - P.160, Left, 22 from top)
+//pacmanbl                        // bootleg
+//pacmanbla                       // bootleg
+//pacmanblb                       // bootleg
+//pacmanblv                       // bootleg (Video Dens)
+pajaroes                        // bootleg
+//phoenxp2                        // bootleg
+pisces                          // Subelectro
+piscesb                         // bootleg
+quaak                           // bootleg
+redufo                          // (c) Artic
+redufob                         // bootleg
+redufob2                        // bootleg
+scobra                          // GX316 (c) 1981 Konami
+scobrab                         // GX316 (c) 1981 Karateco (bootleg?)
+scobrae                         // GX316 (c) 1981 Stern
+scobrae2                        //
+scobrag                         // AVG by Zaccaria (bootleg?)
+scobraggi                       // bootleg (Cocamatic)
+scobras                         // GX316 (c) 1981 Stern
+scobrase                        // GX316 (c) 1981 Sega
+scorpion                        // (c) 1982 Zaccaria
+scorpiona                       // (c) 1982 Zaccaria
+scorpionb                       // (c) 1982 Zaccaria
+scorpionmc                      // bootleg
+scramble                        // GX387 (c) 1981 Konami
+scramblebb                      // bootleg?
+kamikazesp                      // bootleg (Euromatic S.A.)
+scramblebf                      // bootleg
+scrambles                       // GX387 (c) 1981 Stern
+scrambles2                      // GX387 (c) 1981 Stern
+scrambp                         // bootleg (Billport S.A.)
+scramce                         // bootleg (Centromatic S.A.)
+scrammr                         // bootleg (Model Racing)
+scrampt                         // bootleg (Petaco S.A.)
+scramrf                         // bootleg (Recreativos Franco)
+sfx                             // (c) 1983 Nichibutsu
+skelagon                        // (c) 1983 Nichibutsu USA
+skybase                         // (c) 1982 Omori Electric Co., Ltd.
+skyraidr                        // bootleg
+smooncrs                        // Gremlin
+spacbat2                        // bootleg
+spacbatt                        // bootleg
+spacempr                        // bootleg
+spactrai                        //
+spcdrag                         // bootleg
+spcdraga                        // bootleg
+spctbird                        // (c) Fortrek
+spdcoin                         // (c) 1984 Stern
+sstarcrs                        // Taito (Brazil)
+starfght                        // hack
+starfgmc                        // bootleg
+stera                           // bootleg
+streakng                        // [1980] Shoei
+streaknga                       // [1980] Shoei
+strfbomb                        // bootleg
+superbon                        // bootleg
+superg                          // hack
+supergs                         // Silver Systems hack
+supergx                         // [1980] Nichibutsu
+suprheli                        // bootleg
+swarm                           // hack
+tazmania                        // (c) 1982 Stern
+tdpgal                          // 1983 Design Labs / Thomas Automatics
+tenspot                         // (c) 1982 Thomas Automatics
+theend                          // (c) 1980 Konami
+takeoff                         // (c) 1980 Sidam (bootleg)
+theends                         // (c) 1980 Stern
+//thepitm                         // bootleg
+timefgtr                        // (c) Taito (Brazil) - rewrite of Time Pilot
+tst_galx                        // Galaxian Test ROM
+turpin                          // (c) 1981 Sega
+turpins                         // (c) 1981 bootleg
+turtles                         // (c) 1981 Stern
+uniwars                         // (c) Irem
+uniwarsa                        // (c) Karateco
+victoryc                        // (c) Comsoft
+victorycb                       // (c) Comsoft (bootleg)
+videight                        // multigame
+warofbug                        // (c) 1981 Armenia
+warofbugg                       // German Version
+warofbugu                       // (c) 1981 Armenia
+zerotime                        // hack (Petaco S.A.)
+zerotimed                       // hack (Datamat)
+zerotimemc                      // hack (Marti Colls)
+zigzagb                         // (c) 1982 LAX (bootleg)
+zigzagb2                        // (c) 1982 LAX (bootleg)
+
 @source:gamemachine.cpp
 2001tgm                         //
 
