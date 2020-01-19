@@ -31242,6 +31242,9 @@ m82p                            // Nintendo M82 Display Unit PAL
 nes                             // Nintendo Entertainment System
 nespal                          // Nintendo Entertainment System PAL
 
+@source:nes_boot.cpp
+pjoypj001
+
 @source:nes_vt.cpp
 vdogdeme
 vdogdemo
