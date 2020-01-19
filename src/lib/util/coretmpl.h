@@ -295,40 +295,6 @@ private:
 };
 
 
-// ======================> simple_list_wrapper
-
-// a simple_list_wrapper wraps an existing object with a next pointer so it
-// can live in a simple_list without requiring the object to have a next
-// pointer
-template<class ObjectType>
-class simple_list_wrapper
-{
-public:
-	template<class U> friend class simple_list;
-
-	// construction/destruction
-	simple_list_wrapper(ObjectType *object)
-		: m_next(nullptr)
-		, m_object(object)
-	{ }
-
-	// operators
-	operator ObjectType *() { return m_object; }
-	operator ObjectType *() const { return m_object; }
-	ObjectType *operator *() { return m_object; }
-	ObjectType *operator *() const { return m_object; }
-
-	// getters
-	simple_list_wrapper *next() const { return m_next; }
-	ObjectType *object() const { return m_object; }
-
-private:
-	// internal state
-	simple_list_wrapper *   m_next;
-	ObjectType *            m_object;
-};
-
-
 // ======================> fixed_allocator
 
 // a fixed_allocator is a simple class that maintains a free pool of objects
