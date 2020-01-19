@@ -826,15 +826,10 @@ WRITE8_MEMBER(galaxian_state::konami_sound_filter_w)
 		/* the offset is used as data, 6 channels * 2 bits each */
 		/* AV0 .. AV5  ==> AY8910 #2 - 3C */
 		/* AV6 .. AV11 ==> AY8910 #1 - 3D */
-		static int last = 0;
-		if (offset != last)
-			printf("filter %04x\n", offset);
 		for (int which = 0; which < 2; which++)
 		{
 			if (m_ay8910[which] != nullptr)
 			{
-				if (offset != last)
-					printf("filter%d %04x\n", which, (offset >> (6*(1-which))) & 0x3f);
 				for (int flt = 0; flt < 6; flt++)
 				{
 					const int fltnum = (flt + 6 * which);
@@ -846,7 +841,6 @@ WRITE8_MEMBER(galaxian_state::konami_sound_filter_w)
 				}
 			}
 		}
-		last = offset;
 	}
 }
 
