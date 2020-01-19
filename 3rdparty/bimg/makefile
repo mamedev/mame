@@ -48,7 +48,6 @@ projgen: ## Generate project files for all configurations.
 	$(GENIE)              --gcc=freebsd       gmake
 	$(GENIE)                                --gcc=android-arm     gmake
 	$(GENIE)                                --gcc=android-arm64   gmake
-	$(GENIE)                                --gcc=android-mips    gmake
 	$(GENIE)                                --gcc=android-x86     gmake
 	$(GENIE)                                --gcc=asmjs           gmake
 	$(GENIE)                                --gcc=ios-arm         gmake
@@ -72,14 +71,6 @@ android-arm64-debug: .build/projects/gmake-android-arm64 ## Build - Android ARM6
 android-arm64-release: .build/projects/gmake-android-arm64 ## Build - Android ARM64 Release
 	$(MAKE) -R -C .build/projects/gmake-android-arm64 config=release
 android-arm64: android-arm64-debug android-arm64-release ## Build - Android ARM64 Debug and Release
-
-.build/projects/gmake-android-mips:
-	$(GENIE) --gcc=android-mips gmake
-android-mips-debug: .build/projects/gmake-android-mips ## Build - Android MIPS Debug
-	$(MAKE) -R -C .build/projects/gmake-android-mips config=debug
-android-mips-release: .build/projects/gmake-android-mips ## Build - Android MIPS Release
-	$(MAKE) -R -C .build/projects/gmake-android-mips config=release
-android-mips: android-mips-debug android-mips-release ## Build - Android MIPS Debug and Release
 
 .build/projects/gmake-android-x86:
 	$(GENIE) --gcc=android-x86 gmake
