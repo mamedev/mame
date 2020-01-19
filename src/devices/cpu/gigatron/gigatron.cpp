@@ -70,22 +70,9 @@ void gigatron_cpu_device::device_start()
 #if 0
 void gigatron_cpu_device::execute_set_input(int irqline, int state)
 {
-	switch(irqline)
+	if (CLEAR_LINE != state)
 	{
-		case gigatron_INT_INTRM: // level-sensitive
-			m_intrm_pending = ((ASSERT_LINE == state) || (HOLD_LINE == state));
-			m_intrm_state = (ASSERT_LINE == state);
-			break;
-		case gigatron_RESET: // edge-sensitive
-			if (CLEAR_LINE != state)
-				m_reset_pending = 1;
-			m_reset_state = (ASSERT_LINE == state);
-			break;
-		case gigatron_INT_INTR: // edge-sensitive
-			if (CLEAR_LINE != state)
-				m_intr_pending = 1;
-			m_intr_state = (ASSERT_LINE == state);
-			break;
+		
 	}
 }
 #endif
