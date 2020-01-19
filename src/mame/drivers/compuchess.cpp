@@ -101,7 +101,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_switch) { update_reset(newval); }
 
-	// machine drivers
+	// machine configs
 	void cmpchess(machine_config &config);
 	void mk1(machine_config &config);
 	void cnc(machine_config &config);

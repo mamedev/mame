@@ -7,12 +7,12 @@
     Timer devices.
 
 ***************************************************************************/
-
-#pragma once
-
 #ifndef MAME_MACHINE_TIMER_H
 #define MAME_MACHINE_TIMER_H
 
+#pragma once
+
+#include "screen.h"
 
 
 //**************************************************************************
@@ -38,63 +38,43 @@ public:
 	timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// inline configuration helpers
-	template <typename Object> void configure_generic(Object &&cb)
+	template <typename... T> void configure_generic(T &&... args)
 	{
 		m_type = TIMER_TYPE_GENERIC;
-		m_callback = std::forward<Object>(cb);
-	}
-	template <class FunctionClass> void configure_generic(void (FunctionClass::*callback)(timer_device &, void *, s32), const char *name)
-	{
-		configure_generic(expired_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+		m_callback.set(std::forward<T>(args)...);
 	}
 
-	template <class FunctionClass> void configure_generic(const char *devname, void (FunctionClass::*callback)(timer_device &, void *, s32), const char *name)
-	{
-		configure_generic(expired_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-
-	template <typename Object> void configure_periodic(Object &&cb, const attotime &period)
+	template <typename F> void configure_periodic(F &&callback, const char *name, const attotime &period)
 	{
 		m_type = TIMER_TYPE_PERIODIC;
-		m_callback = std::forward<Object>(cb);
+		m_callback.set(std::forward<F>(callback), name);
 		m_period = period;
 	}
-	template <class FunctionClass> void configure_periodic(void (FunctionClass::*callback)(timer_device &, void *, s32), const char *name,
-		const attotime &period)
+	template <typename T, typename F> void configure_periodic(T &&target, F &&callback, const char *name, const attotime &period)
 	{
-		configure_periodic(expired_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)), period);
+		m_type = TIMER_TYPE_PERIODIC;
+		m_callback.set(std::forward<T>(target), std::forward<F>(callback), name);
+		m_period = period;
 	}
 
-	template <class FunctionClass> void configure_periodic(const char *devname, void (FunctionClass::*callback)(timer_device &, void *, s32),
-		const char *name, const attotime &period)
-	{
-		configure_periodic(expired_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)), period);
-	}
-
-	template <typename Object> void configure_scanline(Object &&cb, const char *screen, int first_vpos, int increment)
+	template <typename F, typename U> void configure_scanline(F &&callback, const char *name, U &&screen, int first_vpos, int increment)
 	{
 		m_type = TIMER_TYPE_SCANLINE;
-		m_callback = std::forward<Object>(cb);
-		m_screen_tag = screen;
+		m_callback.set(std::forward<F>(callback), name);
+		m_screen.set_tag(std::forward<U>(screen));
 		m_first_vpos = first_vpos;
 		m_increment = increment;
 	}
-	template <class FunctionClass> void configure_scanline(void (FunctionClass::*callback)(timer_device &, void *, s32),
-		const char *name, const char *screen, int first_vpos, int increment)
+	template <typename T, typename F, typename U> void configure_scanline(T &&target, F &&callback, const char *name, U &&screen, int first_vpos, int increment)
 	{
-		configure_scanline(expired_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)), screen, first_vpos, increment);
-	}
-	template <class FunctionClass> void configure_scanline(const char *devname, void (FunctionClass::*callback)(timer_device &, void *, s32),
-		const char *name, const char *screen, int first_vpos, int increment)
-	{
-		configure_scanline(expired_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)), screen, first_vpos, increment);
+		m_type = TIMER_TYPE_SCANLINE;
+		m_callback.set(std::forward<T>(target), std::forward<F>(callback), name);
+		m_screen.set_tag(std::forward<U>(screen));
+		m_first_vpos = first_vpos;
+		m_increment = increment;
 	}
 
-	template <typename Object> void set_callback(Object &&cb) { m_callback = std::forward<Object>(cb); }
-	template <class FunctionClass> void set_callback(void (FunctionClass::*callback)(timer_device &, void *, s32), const char *name)
-	{
-		set_callback(expired_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_callback(T &&... args) { m_callback.set(std::forward<T>(args)...); }
 
 	void set_start_delay(const attotime &delay) { m_start_delay = delay; }
 	void config_param(int param) { m_param = param; }
@@ -150,8 +130,7 @@ private:
 	s32                     m_param;            // the integer parameter passed to the timer callback
 
 	// scanline timers only
-	const char *            m_screen_tag;       // the tag of the screen this timer tracks
-	screen_device *         m_screen;           // pointer to the screen device
+	optional_device<screen_device> m_screen;    // pointer to the screen device
 	u32                     m_first_vpos;       // the first vertical scanline position the timer fires on
 	u32                     m_increment;        // the number of scanlines between firings
 

@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_bjt.h
- *
- */
 
 #ifndef NLD_BJT_H_
 #define NLD_BJT_H_
+
+///
+/// \file nld_bjt.h
+///
 
 #include "netlist/nl_setup.h"
 
@@ -22,4 +22,4 @@
 		NET_REGISTER_DEV(QBJT_EB, name)                                       \
 		NETDEV_PARAMI(name,  MODEL, model)
 
-#endif /* NLD_BJT_H_ */
+#endif // NLD_BJT_H_

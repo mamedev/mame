@@ -81,17 +81,11 @@
 
 #define SPEEDUP_HACKS   1
 
-struct speedup_entry
-{
-	uint32_t          offset;
-	uint32_t          pc;
-};
-
 class mediagx_state : public pcat_base_state
 {
 public:
-	mediagx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag),
+	mediagx_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pcat_base_state(mconfig, type, tag),
 		m_ide(*this, "ide"),
 		m_ramdac(*this, "ramdac"),
 		m_dmadac(*this, "dac%u", 0U),
@@ -114,6 +108,12 @@ protected:
 	virtual void video_start() override;
 
 private:
+	struct speedup_entry
+	{
+		uint32_t          offset;
+		uint32_t          pc;
+	};
+
 	DECLARE_READ32_MEMBER(disp_ctrl_r);
 	DECLARE_WRITE32_MEMBER(disp_ctrl_w);
 	DECLARE_READ32_MEMBER(memory_ctrl_r);
@@ -127,18 +127,7 @@ private:
 	DECLARE_READ8_MEMBER(io20_r);
 	DECLARE_WRITE8_MEMBER(io20_w);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_READ32_MEMBER(speedup0_r);
-	DECLARE_READ32_MEMBER(speedup1_r);
-	DECLARE_READ32_MEMBER(speedup2_r);
-	DECLARE_READ32_MEMBER(speedup3_r);
-	DECLARE_READ32_MEMBER(speedup4_r);
-	DECLARE_READ32_MEMBER(speedup5_r);
-	DECLARE_READ32_MEMBER(speedup6_r);
-	DECLARE_READ32_MEMBER(speedup7_r);
-	DECLARE_READ32_MEMBER(speedup8_r);
-	DECLARE_READ32_MEMBER(speedup9_r);
-	DECLARE_READ32_MEMBER(speedup10_r);
-	DECLARE_READ32_MEMBER(speedup11_r);
+	template <offs_t N> uint32_t speedup_r(address_space &space) { return generic_speedup(space, N); }
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer_callback);
 	void draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y);
 	void draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -220,7 +209,9 @@ private:
 	int m_speedup_count;
 #endif
 
-	static const read32_delegate s_speedup_handlers[];
+	using speedup_handler = std::pair<uint32_t (mediagx_state::*)(address_space &), const char *>;
+	static const speedup_handler s_speedup_handlers[];
+	static const speedup_entry a51site4_speedups[];
 };
 
 // Display controller registers
@@ -891,8 +882,7 @@ void mediagx_state::mediagx(machine_config &config)
 	pcat_common(config);
 
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device_read (18, FUNC(mediagx_state::cx5510_pci_r), this);
-	pcibus.set_device_write(18, FUNC(mediagx_state::cx5510_pci_w), this);
+	pcibus.set_device(18, FUNC(mediagx_state::cx5510_pci_r), FUNC(mediagx_state::cx5510_pci_w));
 
 	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set(m_pic8259_2, FUNC(pic8259_device::ir6_w));
@@ -940,24 +930,11 @@ uint32_t mediagx_state::generic_speedup(address_space &space, int idx)
 	return m_main_ram[m_speedup_table[idx].offset/4];
 }
 
-READ32_MEMBER(mediagx_state::speedup0_r) { return generic_speedup(space, 0); }
-READ32_MEMBER(mediagx_state::speedup1_r) { return generic_speedup(space, 1); }
-READ32_MEMBER(mediagx_state::speedup2_r) { return generic_speedup(space, 2); }
-READ32_MEMBER(mediagx_state::speedup3_r) { return generic_speedup(space, 3); }
-READ32_MEMBER(mediagx_state::speedup4_r) { return generic_speedup(space, 4); }
-READ32_MEMBER(mediagx_state::speedup5_r) { return generic_speedup(space, 5); }
-READ32_MEMBER(mediagx_state::speedup6_r) { return generic_speedup(space, 6); }
-READ32_MEMBER(mediagx_state::speedup7_r) { return generic_speedup(space, 7); }
-READ32_MEMBER(mediagx_state::speedup8_r) { return generic_speedup(space, 8); }
-READ32_MEMBER(mediagx_state::speedup9_r) { return generic_speedup(space, 9); }
-READ32_MEMBER(mediagx_state::speedup10_r) { return generic_speedup(space, 10); }
-READ32_MEMBER(mediagx_state::speedup11_r) { return generic_speedup(space, 11); }
-
-const read32_delegate mediagx_state::s_speedup_handlers[]
+const mediagx_state::speedup_handler mediagx_state::s_speedup_handlers[]
 {
-	{ FUNC(mediagx_state::speedup0_r), (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup1_r), (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup2_r),  (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup3_r),  (mediagx_state*)nullptr },
-	{ FUNC(mediagx_state::speedup4_r), (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup5_r), (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup6_r),  (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup7_r),  (mediagx_state*)nullptr },
-	{ FUNC(mediagx_state::speedup8_r), (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup9_r), (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup10_r), (mediagx_state*)nullptr }, { FUNC(mediagx_state::speedup11_r), (mediagx_state*)nullptr }
+	{ FUNC(mediagx_state::speedup_r<0>) }, { FUNC(mediagx_state::speedup_r<1>) }, { FUNC(mediagx_state::speedup_r<2>)  }, { FUNC(mediagx_state::speedup_r<3>)  },
+	{ FUNC(mediagx_state::speedup_r<4>) }, { FUNC(mediagx_state::speedup_r<5>) }, { FUNC(mediagx_state::speedup_r<6>)  }, { FUNC(mediagx_state::speedup_r<7>)  },
+	{ FUNC(mediagx_state::speedup_r<8>) }, { FUNC(mediagx_state::speedup_r<9>) }, { FUNC(mediagx_state::speedup_r<10>) }, { FUNC(mediagx_state::speedup_r<11>) }
 };
 
 #ifdef MAME_DEBUG
@@ -975,18 +952,15 @@ void mediagx_state::install_speedups(const speedup_entry *entries, int count)
 	m_speedup_table = entries;
 	m_speedup_count = count;
 
-	for (int i = 0; i < count; i++) {
-		read32_delegate func = s_speedup_handlers[i];
-		func.late_bind(*this);
-		m_maincpu->space(AS_PROGRAM).install_read_handler(entries[i].offset, entries[i].offset + 3, func);
-	}
+	for (int i = 0; i < count; i++)
+		m_maincpu->space(AS_PROGRAM).install_read_handler(entries[i].offset, entries[i].offset + 3, read32mo_delegate(*this, s_speedup_handlers[i].first, s_speedup_handlers[i].second));
 
 #ifdef MAME_DEBUG
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&mediagx_state::report_speedups, this));
 #endif
 }
 
-static const speedup_entry a51site4_speedups[] =
+const mediagx_state::speedup_entry mediagx_state::a51site4_speedups[] =
 {
 	{ 0x5504c, 0x0363e },
 	{ 0x5f11c, 0x0363e },

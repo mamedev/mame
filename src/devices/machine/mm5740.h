@@ -24,7 +24,7 @@
                 Repeat  16 |             | 25  Y3
        Key Bounce Mask  17 |             | 24  Y2
                    Vgg  18 |             | 23  Y1
-               Control  19 |             | 22  Y0
+               Control  19 |             | 22  Y10
         Shift Lock I/O  20 |_____________| 21  Shift
 
 Name                 Pin No.     Function
@@ -94,7 +94,7 @@ public:
 	// public interface
 	uint16_t b_r();
 
-	template <unsigned N> auto x_cb() { return m_read_x[N].bind(); }
+	template <unsigned N> auto x_cb() { return m_read_x[N - 1].bind(); }
 	auto shift_cb() { return m_read_shift.bind(); }
 	auto control_cb() { return m_read_control.bind(); }
 	auto data_ready_cb() { return m_write_data_ready.bind(); }

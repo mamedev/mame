@@ -1290,24 +1290,21 @@ void ay8910_device::build_mixer_table()
 
 void ay8910_device::ay8910_statesave()
 {
-	for (int chan = 0; chan < NUM_CHANNELS; chan++)
-	{
-		save_item(NAME(m_tone[chan].period), chan);
-		save_item(NAME(m_tone[chan].volume), chan);
-		save_item(NAME(m_tone[chan].duty), chan);
-		save_item(NAME(m_tone[chan].count), chan);
-		save_item(NAME(m_tone[chan].duty_cycle), chan);
-		save_item(NAME(m_tone[chan].output), chan);
+	save_item(STRUCT_MEMBER(m_tone, period));
+	save_item(STRUCT_MEMBER(m_tone, volume));
+	save_item(STRUCT_MEMBER(m_tone, duty));
+	save_item(STRUCT_MEMBER(m_tone, count));
+	save_item(STRUCT_MEMBER(m_tone, duty_cycle));
+	save_item(STRUCT_MEMBER(m_tone, output));
 
-		save_item(NAME(m_envelope[chan].period), chan);
-		save_item(NAME(m_envelope[chan].count), chan);
-		save_item(NAME(m_envelope[chan].step), chan);
-		save_item(NAME(m_envelope[chan].volume), chan);
-		save_item(NAME(m_envelope[chan].hold), chan);
-		save_item(NAME(m_envelope[chan].alternate), chan);
-		save_item(NAME(m_envelope[chan].attack), chan);
-		save_item(NAME(m_envelope[chan].holding), chan);
-	}
+	save_item(STRUCT_MEMBER(m_envelope, period));
+	save_item(STRUCT_MEMBER(m_envelope, count));
+	save_item(STRUCT_MEMBER(m_envelope, step));
+	save_item(STRUCT_MEMBER(m_envelope, volume));
+	save_item(STRUCT_MEMBER(m_envelope, hold));
+	save_item(STRUCT_MEMBER(m_envelope, alternate));
+	save_item(STRUCT_MEMBER(m_envelope, attack));
+	save_item(STRUCT_MEMBER(m_envelope, holding));
 
 	save_item(NAME(m_active));
 	save_item(NAME(m_register_latch));

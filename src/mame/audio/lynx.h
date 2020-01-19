@@ -16,7 +16,7 @@ public:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 	void count_down(int nr);
-	template <typename... T> void set_timer_delegate(T &&... args) { m_timer_delegate = timer_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_timer_delegate(T &&... args) { m_timer_delegate.set(std::forward<T>(args)...); }
 
 protected:
 	struct LYNX_AUDIO {

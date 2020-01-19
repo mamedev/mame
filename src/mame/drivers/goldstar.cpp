@@ -189,7 +189,7 @@
 
   This game has similar memory map than Golden Star. The program writes to init
   the reels RAM/palette (bp C11A), then transfer the control to PC 253h where
-  starts to write to some NVRAM chunks. Unfortunatelly at PC 2DBh there is a call
+  starts to write to some NVRAM chunks. Unfortunately at PC 2DBh there is a call
   to 0C33h, where there are only ASCII strings instead of subroutines.
   Also there are some other calls to the same range, that also lack of code.
 
@@ -206,7 +206,7 @@
   * Bingo (Wing)
 
   It has a different machine driver to support the different pos of gfx
-  layers. I strogly suspect there is a register to adjust the layer position.
+  layers. I strongly suspect there is a register to adjust the layer position.
 
 
 ***************************************************************************/
@@ -217,6 +217,7 @@
 
 #include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
+#include "machine/segacrpt_device.h"
 #include "machine/segacrp2_device.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
@@ -733,13 +734,13 @@ void goldstar_state::wcherry_map(address_map &map)
 	map(0xf660, 0xf660).nopw();    //.w(FUNC(goldstar_state::output_w));  // unknown register: 0x3e
 	map(0xf670, 0xf670).w("snsnd", FUNC(sn76489_device::write));    /* guess... device is initialized, but doesn't seems to be used.*/
 
-	map(0xf800, 0xffff).ram();
+	map(0xfc00, 0xffff).rom();
 }
 
 void goldstar_state::wcherry_readwriteport(address_map &map)
 {
 	map.global_mask(0xff);
-	}
+}
 
 /* wcherry findings...
 
@@ -846,6 +847,19 @@ void cmaster_state::cm_portmap(address_map &map)
 	map(0x12, 0x12).w(FUNC(cmaster_state::p1_lamps_w));
 	map(0x13, 0x13).w(FUNC(cmaster_state::background_col_w));
 	map(0x14, 0x14).w(FUNC(cmaster_state::girl_scroll_w));
+}
+
+void cmaster_state::cm97_portmap(address_map &map) // TODO: other reads/writes
+{
+	map.global_mask(0xff);
+	map(0x09, 0x09).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x0a, 0x0b).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x0c, 0x0c).portr("DSW1");
+	map(0x0d, 0x0d).portr("DSW2");
+	map(0x0e, 0x0e).portr("DSW3");
+	map(0x10, 0x10).portr("IN0");
+	map(0x11, 0x11).portr("IN1");
+	map(0x12, 0x12).portr("IN2").w(FUNC(cmaster_state::outport0_w));
 }
 
 void cmaster_state::chryangl_decrypted_opcodes_map(address_map &map)
@@ -966,6 +980,11 @@ void goldstar_state::lucky8_map(address_map &map)
 void goldstar_state::common_decrypted_opcodes_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+}
+
+void goldstar_state::super972_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom().share("decrypted_opcodes");
 }
 
 void goldstar_state::flaming7_map(address_map &map)
@@ -3793,14 +3812,14 @@ static INPUT_PORTS_START( luckylad ) // CHECK & FIX ME
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Play (Bet)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Odds table")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Keep 3")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Keep 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Keep 1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3808,22 +3827,22 @@ static INPUT_PORTS_START( luckylad ) // CHECK & FIX ME
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Keep 5")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Keep 4")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME("Coin A")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME("Coin B")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME("Coin C")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2) PORT_NAME("Coin D")
 
 	PORT_START("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Key Out / Attendant")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Hopper")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -3869,9 +3888,9 @@ static INPUT_PORTS_START( luckylad ) // CHECK & FIX ME
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -8290,7 +8309,7 @@ GFXDECODE_END
 static GFXDECODE_START( gfx_cmast91 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128+64, 4 ) // or is there a register for the +64?
-	GFXDECODE_ENTRY( "user1", 0, tiles256x128x4_layout, 128, 4 ) // wrong... FIXME.
+	GFXDECODE_ENTRY( "user1", 0, tiles256x128x4_layout, 128, 4 )
 GFXDECODE_END
 
 #if 0 // decodes an extra plane for cmv4 / cmasterb, not sure if we need to
@@ -8359,7 +8378,8 @@ static const gfx_layout tiles8x8_3bpp_layout =
 
 static GFXDECODE_START( gfx_nfm )
 	GFXDECODE_ENTRY( "tilegfx", 0, tiles8x8_3bpp_layout, 0, 16 )
-	GFXDECODE_ENTRY( "reelgfx", 0, tiles8x32_4bpp_layout, 0, 16 )
+	GFXDECODE_ENTRY( "reelgfx", 0, tiles8x32_4bpp_layout, 128+64, 4 )
+	GFXDECODE_ENTRY( "user1", 0, tiles128x128x4_layout, 128, 4 ) // wrong, needs correct decoding
 GFXDECODE_END
 
 
@@ -8695,6 +8715,19 @@ void goldstar_state::lucky8_palette(palette_device &palette) const
 	}
 }
 
+void goldstar_state::nfm_palette(palette_device &palette) const
+{
+	// BBGGGRRR
+	uint8_t const *const colours = memregion("colours")->base();
+	for (int i = 0; i < 0x100; i++)
+	{
+		uint8_t const data = bitswap<8>(colours[0x000 + i], 3, 2, 1, 0, 7, 6, 5, 4);
+		palette.set_pen_color(i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
+	}
+
+	// TODO: what's 0x100-0x1ff for? For the currently undecoded user1 ROM?
+}
+
 
 void cb3_state::ncb3(machine_config &config)
 {
@@ -8776,12 +8809,11 @@ void cb3_state::cherrys(machine_config &config)
 	m_gfxdecode->set_info(gfx_cherrys);
 }
 
-void cb3_state::cm97(machine_config &config)
+void cb3_state::eldoradd(machine_config &config)
 {
 	ncb3(config);
 	m_gfxdecode->set_info(gfx_cm97);
 }
-
 
 void goldstar_state::wcherry(machine_config &config)
 {
@@ -8873,6 +8905,18 @@ void cmaster_state::cmasterc(machine_config &config)
 {
 	cm(config);
 	m_gfxdecode->set_info(gfx_cmasterc);
+}
+
+void cmaster_state::cm97(machine_config &config)
+{
+	cm(config);
+
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::cm97_portmap);
+
+	m_gfxdecode->set_info(gfx_cm97);
+
+	config.device_remove("ppi8255_0");
+	config.device_remove("ppi8255_1");
 }
 
 void cmaster_state::chryangl(machine_config &config)
@@ -8996,6 +9040,23 @@ void wingco_state::lucky8k(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &wingco_state::lucky8_map);
 	maincpu.set_addrmap(AS_OPCODES, &wingco_state::common_decrypted_opcodes_map);
 	maincpu.set_decrypted_tag(m_decrypted_opcodes);
+}
+
+void wingco_state::luckylad(machine_config &config)
+{
+	lucky8(config);
+
+	sega_315_spat_device &maincpu(SEGA_315_SPAT(config.replace(), m_maincpu, CPU_CLOCK)); // actually Falcon 03155096 encrypted Z80
+	maincpu.set_addrmap(AS_PROGRAM, &wingco_state::lucky8_map);
+	maincpu.set_addrmap(AS_OPCODES, &wingco_state::common_decrypted_opcodes_map);
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
+}
+
+void wingco_state::super972(machine_config &config)
+{
+	lucky8(config);
+
+	m_maincpu->set_addrmap(AS_OPCODES, &wingco_state::super972_decrypted_opcodes_map);
 }
 
 void wingco_state::bingowng(machine_config &config)
@@ -9263,6 +9324,7 @@ void wingco_state::wcat3(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::wcat3_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &wingco_state::super972_decrypted_opcodes_map);
 	//m_maincpu->set_addrmap(AS_IO, &wingco_state::goldstar_readport);
 
 	I8255A(config, m_ppi[0]);
@@ -9413,6 +9475,8 @@ void cmaster_state::nfm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::nfm_map);
 
 	m_gfxdecode->set_info(gfx_nfm);
+
+	m_palette->set_init(FUNC(cmaster_state::nfm_palette));
 }
 
 
@@ -10341,6 +10405,42 @@ ROM_START( super7 )
 	ROM_LOAD( "gal20v8.bin",   0x000, 0x114, NO_DUMP )
 	ROM_LOAD( "gal20v8.bin",   0x000, 0x114, NO_DUMP )
 	ROM_LOAD( "gal20v8.bin",   0x000, 0x114, NO_DUMP )
+ROM_END
+
+ROM_START( chthree )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.u40",   0x0000, 0x8000, CRC(3d677758) SHA1(d2d13e54d3b55460a05b0ca42e12d8a6d72954ba) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(0x8000)
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7.u46",  0x00000, 0x8000, CRC(65e2e9e9) SHA1(3085aec35ac6d232fcf9be847ab4fcde586dd4f5) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(0x8000)
+	ROM_LOAD( "8.u47",  0x08000, 0x8000, CRC(0ec483a9) SHA1(55913f830ee310c2326f50af4527aeb63649e68d) ) // 0xxxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(       0x08000, 0x8000)
+	ROM_LOAD( "9.u48",  0x10000, 0x8000, CRC(39f528f7) SHA1(29d31783afdb256cd9454c87170591d3f9c53665) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(0x8000)
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "3.u49",   0x0000, 0x2000, CRC(b541cbc0) SHA1(ab8666c06a71fa8364c71d14715ddf9e222064cd) )
+	ROM_LOAD( "4.u50",   0x2000, 0x2000, CRC(95ecd2aa) SHA1(73452c77dd83f96038d197bad5e37f0b3d9de561) )
+	ROM_LOAD( "5.u51",   0x4000, 0x2000, CRC(a99c87ba) SHA1(4d74ded22da25e093b09d0a4abfbd3e1eabd816c) )
+	ROM_LOAD( "6.u52",   0x6000, 0x2000, CRC(5b19025d) SHA1(8e861ed8249811fdf50de8ca9c44fe1176a7e340) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "2.u53",  0x0000, 0x10000, CRC(4124228a) SHA1(d1a6c98cac20ae49daaaa165ac9ccfaca14323b1) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u23", 0x0000, 0x0100, CRC(fdb15bef) SHA1(68c6539f5c9136e5f822dce86fcf3335e8c3874d) )
+	ROM_LOAD( "82s129.u35", 0x0100, 0x0100, CRC(fd90f7e6) SHA1(6bfa15ab2db8667e28277c9a5cd80ad3d5a0ea4d) )
+
+	ROM_REGION( 0x200, "proms2", 0 )
+	ROM_LOAD( "82s129.u24", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+
+	ROM_REGION( 0x800, "plds", 0 ) // PALs dumps from a 27c020 adapter are available, need checking / conversion
+	ROM_LOAD( "16l8_u18.bin", 0x0000, 0x117, NO_DUMP )
+	ROM_LOAD( "16l8_u31.bin", 0x0200, 0x117, NO_DUMP )
+	ROM_LOAD( "16l8_u32.bin", 0x0400, 0x117, NO_DUMP )
+	ROM_LOAD( "16l8_u30.bin", 0x0600, 0x117, NO_DUMP )
 ROM_END
 
 /*
@@ -11345,8 +11445,8 @@ ROM_START( cmast91 )
 	ROM_LOAD( "1.bin",  0x10000, 0x8000, CRC(71bdab69) SHA1(d2c594ed88d6368df15b623c48eecc1c219b839e) )
 	ROM_LOAD( "2.bin",  0x18000, 0x8000, CRC(fccd48d7) SHA1(af564f5ef9ff5b6363897ce6bdf0b21123911fd4) )
 
-	ROM_REGION( 0x40000, "user1", 0 ) /* unknown, bitmaps, or sound? */
-	ROM_LOAD( "9.bin",  0x00000, 0x40000, CRC(92342276) SHA1(f9436752f2ec67cf873fd01c729c7c113dc18be0) ) // ?
+	ROM_REGION( 0x40000, "user1", 0 ) // girls GFX
+	ROM_LOAD( "9.bin",  0x00000, 0x40000, CRC(92342276) SHA1(f9436752f2ec67cf873fd01c729c7c113dc18be0) )
 
 	ROM_REGION( 0x300, "proms", 0 )
 	ROM_LOAD( "p1.bin", 0x0000, 0x0100, CRC(ac529f04) SHA1(5bc92e50c85bb23e609172cc15c430ddea7fdcb5) )
@@ -12405,11 +12505,7 @@ ROM_END
 /*
   Super 97-2
 
-  Code jumps above $C000, so offset range C000-F7FF was defined
-  as ROM space. However, the game isn't working due to the high
-  memory code looks strange. Maybe the program needs some sort
-  of address/data descramble...
-
+  Offset range 0xc000 - 0xdfff is encrypted (see init_super972()).
 */
 ROM_START( super972 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -12710,10 +12806,7 @@ ROM_END
 
   About encryption...
 
-  Seems that programmers left a hole at offset 3890-3a90, enough to see some
-  values and progressions as hints. Some of these strings (IE: 00 20 00 20),
-  are valid to XOR some text offsets, as 3ac7-3acf, 3ae5-3aea, 3c00-3c0f, and
-  other text strings. See also offsets 5240 and 5800 onward...
+  The scheme is the same used in some early Sega games (see machine/segacrpt_device.cpp)
 
 
 ******************************************************************************/
@@ -13366,13 +13459,35 @@ ROM_START( wcat3 )
 	ROM_LOAD( "wcat3.g14",  0x0100, 0x0100, CRC(dcd53d2c) SHA1(bbcb4266117c3cd1c8ef0e5046d3558c8293313a) )
 
 	ROM_REGION( 0x40, "proms2", 0 )
-	ROM_LOAD( "wcat3.d12",  0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+	ROM_LOAD( "wcat3.d13",  0x0000, 0x0020, CRC(eab832ed) SHA1(0fbc8914ba1805cfc6698fe7f137a934e63a4f89) )
 
 	ROM_REGION( 0x100, "unkprom", 0 )
 	ROM_LOAD( "wcat3.f3",   0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
 
 	ROM_REGION( 0x40, "unkprom2", 0 )
-	ROM_LOAD( "wcat3.d13",  0x0000, 0x0020, CRC(eab832ed) SHA1(0fbc8914ba1805cfc6698fe7f137a934e63a4f89) )
+	ROM_LOAD( "wcat3.d12",  0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+ROM_START( wcat3a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "main program sub 27c512.bin",  0x0000, 0x10000, CRC(50b61d88) SHA1(7cea2a03d9b48a1f324171f69ae9df62cf65dc6f) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "rom7.bin",   0x10000, 0x8000, CRC(3e2ade27) SHA1(9a463219c5028ed32086c378a17079f69d1c0439) )
+	ROM_LOAD( "rom6.bin",   0x08000, 0x8000, CRC(71ae4c3c) SHA1(7b3b0a7453e5844194f3d3ed449549e4c091b127) )
+	ROM_LOAD( "rom5.bin",   0x00000, 0x8000, CRC(8fac3f23) SHA1(e2c67620aa2ea01c2d469d963b5a34ca710742ec) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "rom4.bin",   0x6000, 0x2000, CRC(0509d556) SHA1(c2f46d279f45b544c67b0c966659cc6d5d53c22f) )
+	ROM_LOAD( "rom3.bin",   0x4000, 0x2000, CRC(d50f3d62) SHA1(8500c7f3a2f51ea0ed7e142ecdc4e669ba3e7065) )
+	ROM_LOAD( "rom2.bin",   0x2000, 0x2000, CRC(373d9949) SHA1(ff483505fb9e86411acad7059bf5434dde290946) )
+	ROM_LOAD( "rom1.bin",   0x0000, 0x2000, CRC(50febe3b) SHA1(0479bcee53b174aa0413951e283e446b09a6f156) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF ) // no girls bitmap
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "n82s129 u84.bin", 0x0000, 0x0100, CRC(d12b865b) SHA1(cb1fee592c9eb51e38c33a27f8d706c4c57b9823) )
+	ROM_LOAD( "n82s129 u79.bin", 0x0100, 0x0100, CRC(89af30d9) SHA1(049252654a25399ad5ca95d1b063eb45356efcad) )
 ROM_END
 
 
@@ -14269,6 +14384,43 @@ ROM_START( nc96f )
 	// none?
 ROM_END
 
+ROM_START( nc96g )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "new cherry 96 b-type 3.1.bin", 0x00000, 0x1000, CRC(7c06c960) SHA1(017428d3cf5471533ef8702d62cb572bb7fbb652) ) // v3.1, B Sub-PCB
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x8000)
+
+	ROM_REGION( 0x20000, "graphics", 0 )
+	ROM_LOAD( "high.bin", 0x00000, 0x10000, CRC(1ab0441a) SHA1(88bd43fb27aa38b566c13b3a0c63cd2f7529f886) )
+	ROM_LOAD( "low.bin",  0x10000, 0x10000, CRC(6c173154) SHA1(af7d597dd9d7704b9fc9c154349e067c990c541d) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x04000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x0c000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x14000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
+	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // palette, not dumped for this set
+	ROM_LOAD( "82s129a.u84", 0x0000, 0x0100, BAD_DUMP CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
+	ROM_LOAD( "82s129a.u79", 0x0100, 0x0100, BAD_DUMP CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
+ROM_END
+
 ROM_START( nc96txt )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "tc132axt.bin", 0x00000, 0x1000, CRC(a77dc042) SHA1(1076a6687da1871b666bd214a755b68f5e1aeb8c) ) // Special Texas v1.32, C2 Sub-PCB
@@ -14427,7 +14579,7 @@ void cmaster_state::init_fb2010()
 	ROM[0x10dc] = 0x00;
 	ROM[0x10dd] = 0x00;
 
-	m_maincpu->space(AS_IO).install_read_handler(0x1e, 0x1e, read8_delegate(FUNC(cmaster_state::fixedval7d_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x1e, 0x1e, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x7d>)));
 }
 
 
@@ -14743,22 +14895,61 @@ ROM_START( nfm )
 	ROM_CONTINUE(0xf000,0x1000)
 
 	ROM_REGION( 0x10000, "reelgfx", 0 )
-	ROM_LOAD( "fruit1", 0x00000, 0x04000, CRC(dd096dae) SHA1(ab34942cfa4fe7d46892819372c42f566c249f8c) )
-	ROM_CONTINUE(0x0000, 0x4000)
-	ROM_LOAD( "fruit2", 0x04000, 0x04000, CRC(6a37a16f) SHA1(7adb08d3e4de9768a8e41760a044bf52509da211) )
-	ROM_CONTINUE(0x0000, 0x4000)
-	ROM_LOAD( "fruit3", 0x08000, 0x04000, CRC(f3361ba7) SHA1(1a7b9c4f685656447bd6ce5f361e6e4af63012e3) )
+	ROM_LOAD( "fruit4", 0x00000, 0x04000, CRC(99ac5ddf) SHA1(65b6abb98f3156f4c0c55478d09c612eed5ae555) )
+	ROM_LOAD( "fruit3", 0x04000, 0x04000, CRC(f3361ba7) SHA1(1a7b9c4f685656447bd6ce5f361e6e4af63012e3) )
+	ROM_CONTINUE(0x4000, 0x4000)
+	ROM_LOAD( "fruit2", 0x08000, 0x04000, CRC(6a37a16f) SHA1(7adb08d3e4de9768a8e41760a044bf52509da211) )
 	ROM_CONTINUE(0x8000, 0x4000)
-	ROM_LOAD( "fruit4", 0x0c000, 0x04000, CRC(99ac5ddf) SHA1(65b6abb98f3156f4c0c55478d09c612eed5ae555) )
+	ROM_LOAD( "fruit1", 0x0c000, 0x04000, CRC(dd096dae) SHA1(ab34942cfa4fe7d46892819372c42f566c249f8c) )
+	ROM_CONTINUE(0xc000, 0x4000)
 
-	// do these graphics really belong with this set? a lot of the tiles seem wrong for it
 	ROM_REGION( 0x18000, "tilegfx", 0 )
-	ROM_LOAD( "fruit5", 0x00000, 0x08000, CRC(a7a8f08d) SHA1(76c93194133ba85c0dde1f364260e16d5b647134) )
+	ROM_LOAD( "fruit7", 0x00000, 0x08000, CRC(3ade6709) SHA1(9cdf2814e50c5433c582fc40265c5df2a16e99e7) )
 	ROM_LOAD( "fruit6", 0x08000, 0x08000, CRC(39d5b89a) SHA1(4cf52fa557ffc792d3e13f7dbb5d45fd617bac85) )
-	ROM_LOAD( "fruit7", 0x10000, 0x08000, CRC(3ade6709) SHA1(9cdf2814e50c5433c582fc40265c5df2a16e99e7) )
+	ROM_LOAD( "fruit5", 0x10000, 0x08000, CRC(a7a8f08d) SHA1(76c93194133ba85c0dde1f364260e16d5b647134) )
 
-	ROM_REGION( 0x18000, "proms", 0 ) // colours?
-	ROM_LOAD( "fruiprg2", 0x00000, 0x08000, CRC(13925ff5) SHA1(236415a244ef6092834f8080cf0d2e04bbfa2650) )
+	ROM_REGION( 0x40000, "user1", 0 )
+	ROM_LOAD( "8_f29c51002t.u53",  0x00000, 0x40000, CRC(ff9d5b6d) SHA1(a84fe241ff9958740dcdbd4650bd16a0aa6e01ca) )
+
+	ROM_REGION( 0x8000, "colours", 0 ) // colours, only 0x200 used
+	ROM_LOAD( "fruiprg2", 0x0000, 0x08000, CRC(13925ff5) SHA1(236415a244ef6092834f8080cf0d2e04bbfa2650) )
+ROM_END
+
+ROM_START( nfma )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "9_27c512.u53", 0x00000, 0x01000, CRC(127b2a17) SHA1(973815f99d744e055f8bdff7753c3e70a892250c) )
+	ROM_CONTINUE(0x5000,0x1000)
+	ROM_CONTINUE(0x7000,0x1000)
+	ROM_CONTINUE(0xa000,0x1000)
+	ROM_CONTINUE(0x2000,0x1000) //?
+	ROM_CONTINUE(0xb000,0x1000) //?
+	ROM_CONTINUE(0x9000,0x1000)
+	ROM_CONTINUE(0xc000,0x1000)
+	ROM_CONTINUE(0x1000,0x1000)
+	ROM_CONTINUE(0x3000,0x1000)
+	ROM_CONTINUE(0x6000,0x1000)
+	ROM_CONTINUE(0x4000,0x1000)
+	ROM_CONTINUE(0x8000,0x1000)
+	ROM_CONTINUE(0xd000,0x1000) // ?
+	ROM_CONTINUE(0xe000,0x1000)
+	ROM_CONTINUE(0xf000,0x1000)
+
+	ROM_REGION( 0x10000, "reelgfx", 0 )
+	ROM_LOAD( "4_27c128.u15", 0x00000, 0x04000, CRC(99ac5ddf) SHA1(65b6abb98f3156f4c0c55478d09c612eed5ae555) ) // matches nfm
+	ROM_LOAD( "3_27c128.u10", 0x04000, 0x04000, CRC(e8fbe05e) SHA1(a9439a91953d5caa211587eb837f6bfe52be0a00) ) // matches nfm, once taken into account this is correct size ROM
+	ROM_LOAD( "2_27c128.u14", 0x08000, 0x04000, CRC(6540a218) SHA1(78f5b78b9c7198c5cf6b2d1a7e02e9ac7b422b10) ) // matches nfm, once taken into account this is correct size ROM
+	ROM_LOAD( "1_27c128.u9",  0x0c000, 0x04000, CRC(af41b0c0) SHA1(ce463035b7f5509a92ae727020c3ecc511ed1d30) ) // matches nfm, once taken into account this is correct size ROM
+
+	ROM_REGION( 0x18000, "tilegfx", 0 )
+	ROM_LOAD( "7_27c256.u16", 0x00000, 0x08000, CRC(3ade6709) SHA1(9cdf2814e50c5433c582fc40265c5df2a16e99e7) ) // matches nfm
+	ROM_LOAD( "6_27c256.u11", 0x08000, 0x08000, CRC(39d5b89a) SHA1(4cf52fa557ffc792d3e13f7dbb5d45fd617bac85) ) // matches nfm
+	ROM_LOAD( "5_27c256.u4",  0x10000, 0x08000, CRC(a7a8f08d) SHA1(76c93194133ba85c0dde1f364260e16d5b647134) ) // matches nfm
+
+	ROM_REGION( 0x40000, "user1", 0 )
+	ROM_LOAD( "8_f29c51002t.u53",  0x00000, 0x40000, CRC(ff9d5b6d) SHA1(a84fe241ff9958740dcdbd4650bd16a0aa6e01ca) )
+
+	ROM_REGION( 0x8000, "colours", 0 ) // colours, only 0x200 used
+	ROM_LOAD( "10bp_27c257.u62", 0x0000, 0x8000, CRC(13925ff5) SHA1(236415a244ef6092834f8080cf0d2e04bbfa2650) ) // matches nfm
 ROM_END
 
 
@@ -14936,7 +15127,7 @@ ROM_START( eldoradd )
 	ROM_REGION( 0x300, "proms", 0 )
 	ROM_LOAD( "mb7114.e8",  0x000, 0x100, CRC(fa274678) SHA1(6712cb1f7ead1a7aa703ec799e7199c33ace857c) )
 	ROM_LOAD( "mb7114.e10", 0x100, 0x100, CRC(e58877ea) SHA1(30fa873fc05d91610ef68eef54b78f2c7301a62a) )
-	ROM_LOAD( "mb7114.e12", 0x100, 0x100, CRC(781b2842) SHA1(566667d4f81e93b29bb01dbc51bf144c02dff75d) )
+	ROM_LOAD( "mb7114.e12", 0x200, 0x100, CRC(781b2842) SHA1(566667d4f81e93b29bb01dbc51bf144c02dff75d) )
 
 	ROM_REGION( 0x400, "plds", 0 ) // available as brute-forced dumps, need to be verified and converted
 	ROM_LOAD( "pal16l8.d13", 0x000, 0x104, NO_DUMP )
@@ -16895,6 +17086,66 @@ void goldstar_state::init_ladylinre()
 	}
 }
 
+void wingco_state::init_wcat3()
+{
+	// there must be some more conditions and/or some errors as the game needs to be soft resets 4-5 times before working apparently fine
+	// see from 0xb0 - 0xcf range for an example (comparable to range 0x96 - 0xb5 in lucky8)
+	uint8_t *rom = memregion("maincpu")->base();
+
+	static const uint8_t op_convtable[8][8] =
+	{
+		//                    opcodes                           address
+		//  0     1     2     3     4     5     6     7
+		{ 0x10, 0x00, 0x80, 0x90, 0x30, 0x20, 0xa0, 0xb0 },   // 0x000
+		{ 0x10, 0x00, 0x80, 0x90, 0x30, 0x20, 0xa0, 0xb0 },   // 0x001
+		{ 0x20, 0xa0, 0x00, 0x80, 0x10, 0x90, 0x30, 0xb0 },   // 0x004
+		{ 0x00, 0x20, 0x10, 0x30, 0x80, 0xa0, 0x90, 0xb0 },   // 0x005
+		{ 0x20, 0x80, 0x00, 0xa0, 0x30, 0x90, 0x10, 0xb0 },   // 0x400
+		{ 0x00, 0x80, 0x10, 0x90, 0x20, 0xa0, 0x30, 0xb0 },   // 0x401
+		{ 0x20, 0x80, 0x00, 0xa0, 0x30, 0x90, 0x10, 0xb0 },   // 0x404
+		{ 0x80, 0xa0, 0x10, 0x30, 0x00, 0x20, 0x90, 0xb0 },   // 0x405
+	};
+
+	static const uint8_t convtable[8][8] =
+	{
+		//                      data                            address
+		//  0     1     2     3     4     5     6     7
+		{ 0x00, 0x10, 0x20, 0x30, 0x80, 0x90, 0xa0, 0xb0 },   // 0x000
+		{ 0x10, 0x00, 0x90, 0x80, 0x20, 0x30, 0xa0, 0xb0 },   // 0x001
+		{ 0x20, 0xa0, 0x00, 0x80, 0x10, 0x90, 0x30, 0xb0 },   // 0x004 // verify 0x00, 0x90, 0xa0
+		{ 0x80, 0x20, 0x90, 0x30, 0x00, 0xa0, 0x10, 0xb0 },   // 0x005
+		{ 0x00, 0x10, 0x20, 0x30, 0x80, 0x90, 0xa0, 0xb0 },   // 0x400
+		{ 0x10, 0x00, 0x90, 0x80, 0x20, 0x30, 0xa0, 0xb0 },   // 0x401
+		{ 0x00, 0x80, 0x20, 0xa0, 0x10, 0x90, 0x30, 0xb0 },   // 0x404
+		{ 0x00, 0x80, 0x20, 0xa0, 0x10, 0x90, 0x30, 0xb0 },   // 0x405
+	};
+
+	for (int i = 0x0000; i < 0x10000; i++)
+	{
+		uint8_t x = rom[i];
+
+		// translation table from address
+		uint8_t  row = (BIT(i, 0) + (BIT(i, 2) << 1) + (BIT(i, 10) << 2));
+
+		// offset in the table from source data
+		uint8_t  col = (BIT(x, 4) + (BIT(x, 5) << 1) + (BIT(x, 7) << 2));
+
+		m_decrypted_opcodes[i] = (x & ~0xb0) | op_convtable[row][col];
+	}
+
+	for (int i = 0x0000; i < 0x10000; i++)
+	{
+		uint8_t x = rom[i];
+
+		// translation table from address
+		uint8_t  row = (BIT(i,  0) + (BIT(i, 2) << 1) + (BIT(i, 10) << 2));
+
+		// offset in the table from source data
+		uint8_t  col = (BIT(x, 4) + (BIT(x, 5) << 1) + (BIT(x, 7) << 2));
+
+		rom[i] = (x & ~0xb0) | convtable[row][col];
+	}
+}
 
 //  this block swapping is the same for chry10, chrygld and cb3
 //  the underlying bitswaps / xors are different however
@@ -17034,6 +17285,47 @@ void goldstar_state::init_chryangl()
 			case 0x83: x = bitswap<8>(x ^ 0x88, 1, 6, 7, 4, 5, 2, 3, 0); break;
 		}
 
+		rom[i] = x;
+	}
+}
+
+void cmaster_state::init_wcat3a() // seems ok, but needs checking
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x10000; i++)
+	{
+		uint8_t x = rom[i];
+
+		switch (i & 0x83)
+		{
+			case 0x00: x = bitswap<8>(x ^ 0x2a, 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 0x01: x = bitswap<8>(x ^ 0x0a, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x02: x = bitswap<8>(x ^ 0xa8, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x03: x = bitswap<8>(x ^ 0x0a, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x80: x = bitswap<8>(x ^ 0x28, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x81: x = bitswap<8>(x ^ 0xa8, 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 0x82: x = bitswap<8>(x ^ 0xa2, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x83: x = bitswap<8>(x ^ 0x2a, 5, 6, 3, 4, 1, 2, 7, 0); break;
+		}
+
+		m_decrypted_opcodes[i] = x;
+	}
+
+	for (int i = 0; i < 0x10000; i++)
+	{
+		uint8_t x = rom[i];
+		switch (i & 0x83)
+		{
+			case 0x00: x = bitswap<8>(x ^ 0x88, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x01: x = bitswap<8>(x ^ 0x80, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x02: x = bitswap<8>(x ^ 0x28, 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 0x03: x = bitswap<8>(x ^ 0x80, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x80: x = bitswap<8>(x ^ 0x02, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x81: x = bitswap<8>(x ^ 0x22, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x82: x = bitswap<8>(x ^ 0x88, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x83: x = bitswap<8>(x ^ 0x22, 1, 6, 7, 4, 5, 2, 3, 0); break;
+		}
 		rom[i] = x;
 	}
 }
@@ -17217,6 +17509,20 @@ void wingco_state::init_lucky8f() // TODO: simplify
 	}
 }
 
+void wingco_state::init_super972()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0x0000; i < 0xf000; i++)
+		m_decrypted_opcodes[i] = rom [i];
+
+	for (int i = 0xc000; i < 0xe000; i++)
+		m_decrypted_opcodes[i] = bitswap<8>(m_decrypted_opcodes[i], 7, 4, 5, 6, 3, 0, 1, 2);;
+
+	for (int i = 0xc000; i < 0xe000; i++)
+		rom[i] = bitswap<8>(rom[i], 7, 2, 5, 0, 3, 6, 1, 4);
+}
+
 void cmaster_state::init_nfb96sea()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -17256,8 +17562,8 @@ void cmaster_state::init_schery97()
 
 		rom[i] = x;
 	}
-	m_maincpu->space(AS_IO).install_read_handler(0x1d, 0x1d, read8_delegate(FUNC(cmaster_state::fixedvala8_r), this));
-	m_maincpu->space(AS_IO).install_read_handler(0x2a, 0x2a, read8_delegate(FUNC(cmaster_state::fixedvalb4_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x1d, 0x1d, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xa8>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x2a, 0x2a, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xb4>)));
 	/* Oki 6295 at 0x20 */
 }
 
@@ -17279,7 +17585,7 @@ void cmaster_state::init_schery97a()
 	}
 
 
-	m_maincpu->space(AS_IO).install_read_handler(0x16, 0x16, read8_delegate(FUNC(cmaster_state::fixedval38_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x16, 0x16, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x38>)));
 	/* Oki 6295 at 0x20 */
 }
 
@@ -17299,8 +17605,26 @@ void cmaster_state::init_skill98()
 
 		rom[i] = x;
 	}
-	m_maincpu->space(AS_IO).install_read_handler(0x1e, 0x1e, read8_delegate(FUNC(cmaster_state::fixedvalea_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x1e, 0x1e, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xea>)));
 	/* Oki 6295 at 0x20 */
+}
+
+void cmaster_state::init_nfb96_b()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+	for (int i = 0; i < 0x10000; i++)
+	{
+		uint8_t x = rom[i];
+
+		switch (i & 0x18)
+		{
+			case 0x00: x = bitswap<8>(x ^ 0x27, 3, 2, 1, 0, 7, 6, 5, 4); break;
+			case 0x08: x = bitswap<8>(x ^ 0xa1, 0, 7, 6, 5, 4, 3, 2, 1); break;
+			case 0x10: x = bitswap<8>(x ^ 0x34, 5, 4, 3, 2, 1, 0, 7, 6); break;
+			case 0x18: x = bitswap<8>(x ^ 0x5c, 4, 3, 2, 1, 0, 7, 6, 5); break;
+		}
+		rom[i] = x;
+	}
 }
 
 void cmaster_state::init_nfb96_c1()
@@ -17319,7 +17643,7 @@ void cmaster_state::init_nfb96_c1()
 		}
 		rom[i] = x;
 	}
-	m_maincpu->space(AS_IO).install_read_handler(0x31, 0x31, read8_delegate(FUNC(cmaster_state::fixedval68_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x31, 0x31, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x68>)));
 
 }
 
@@ -17340,7 +17664,7 @@ void cmaster_state::init_nfb96_c2()
 
 		rom[i] = x;
 	}
-	m_maincpu->space(AS_IO).install_read_handler(0x21, 0x21, read8_delegate(FUNC(cmaster_state::fixedval58_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x21, 0x21, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x58>)));
 }
 
 void cmaster_state::init_nfb96_d()
@@ -17360,11 +17684,11 @@ void cmaster_state::init_nfb96_d()
 		rom[i] = x;
 	}
 	// nfb96b needs both of these
-	m_maincpu->space(AS_IO).install_read_handler(0x23, 0x23, read8_delegate(FUNC(cmaster_state::fixedval80_r), this));
-	m_maincpu->space(AS_IO).install_read_handler(0x5a, 0x5a, read8_delegate(FUNC(cmaster_state::fixedvalaa_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x23, 0x23, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x80>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x5a, 0x5a, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xaa>)));
 
 	// csel96b
-	m_maincpu->space(AS_IO).install_read_handler(0x6e, 0x6e, read8_delegate(FUNC(cmaster_state::fixedval96_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x6e, 0x6e, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x96>)));
 
 }
 
@@ -17385,7 +17709,7 @@ void cmaster_state::init_nfb96_dk()
 		}
 		rom[i] = x;
 	}
-	m_maincpu->space(AS_IO).install_read_handler(0x2e, 0x2e, read8_delegate(FUNC(cmaster_state::fixedvalbe_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x2e, 0x2e, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xbe>)));
 
 }
 
@@ -17406,8 +17730,8 @@ void cmaster_state::init_rp35()
 		rom[i] = x;
 	}
 
-	m_maincpu->space(AS_IO).install_read_handler(0x5e, 0x5e, read8_delegate(FUNC(cmaster_state::fixedval84_r), this));
-	m_maincpu->space(AS_IO).install_read_handler(0x36, 0x36, read8_delegate(FUNC(cmaster_state::fixedval90_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x5e, 0x5e, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x84>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x36, 0x36, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x90>)));
 }
 
 void cmaster_state::init_rp36()
@@ -17428,7 +17752,7 @@ void cmaster_state::init_rp36()
 		rom[i] = x;
 	}
 
-	m_maincpu->space(AS_IO).install_read_handler(0x34, 0x34, read8_delegate(FUNC(cmaster_state::fixedvalb2_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x34, 0x34, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xb2>)));
 }
 
 void cmaster_state::init_rp36c3()
@@ -17449,7 +17773,7 @@ void cmaster_state::init_rp36c3()
 		rom[i] = x;
 	}
 
-	m_maincpu->space(AS_IO).install_read_handler(0x17, 0x17, read8_delegate(FUNC(cmaster_state::fixedval48_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x17, 0x17, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x48>)));
 }
 
 void cmaster_state::init_rp96sub()  // 95 33 95 33 70 6C 70 6C... XORs and bitswaps seem ok. Stuck at Program Check screen. Unlike the other sets, there aren't unmapped reads where to put the handler.
@@ -17470,7 +17794,7 @@ void cmaster_state::init_rp96sub()  // 95 33 95 33 70 6C 70 6C... XORs and bitsw
 		rom[i] = x;
 	}
 
-//  m_maincpu->space(AS_IO).install_read_handler(0x34, 0x34, read8_delegate(FUNC(cmaster_state::fixedvalb2_r),this));
+//  m_maincpu->space(AS_IO).install_read_handler(0x34, 0x34, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xb2>)));
 }
 
 
@@ -17491,8 +17815,8 @@ void cmaster_state::init_po33()
 
 		rom[i] = x;
 	}
-	m_maincpu->space(AS_IO).install_read_handler(0x32, 0x32, read8_delegate(FUNC(cmaster_state::fixedval74_r), this));
-	m_maincpu->space(AS_IO).install_read_handler(0x12, 0x12, read8_delegate(FUNC(cmaster_state::fixedval09_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x32, 0x32, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x74>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x12, 0x12, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x09>)));
 	/* oki6295 at 0x20 */
 }
 
@@ -17515,8 +17839,8 @@ void cmaster_state::init_match133()
 		rom[i] = x;
 	}
 
-	m_maincpu->space(AS_IO).install_read_handler(0x16, 0x16, read8_delegate(FUNC(cmaster_state::fixedvalc7_r), this));
-	m_maincpu->space(AS_IO).install_read_handler(0x1a, 0x1a, read8_delegate(FUNC(cmaster_state::fixedvale4_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x16, 0x16, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xc7>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x1a, 0x1a, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xe4>)));
 }
 
 
@@ -17638,6 +17962,92 @@ void goldstar_state::init_wcherry()
 	}
 }
 
+void cmaster_state::init_chthree()
+{
+	// Address swapping in 0x10 bytes blocks.
+	// 01234567-89abcdef <> c9ba8dfe - 41320576
+
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0x0000; i < 0x8000; i++)
+	{
+		uint8_t row = i & 0x07;
+		uint16_t addr;
+
+		switch (row)
+		{
+			case 0x00: addr = 0x0c; break;
+			case 0x01: addr = 0x09; break;
+			case 0x02: addr = 0x0b; break;
+			case 0x03: addr = 0x0a; break;
+			case 0x04: addr = 0x08; break;
+			case 0x05: addr = 0x0d; break;
+			case 0x06: addr = 0x0f; break;
+			case 0x07: addr = 0x0e; break;
+		}
+
+		addr = (i & 0x7ff0) | addr;
+
+		if (!BIT(i, 3))
+			std::swap(rom[i], rom[addr]);
+	}
+
+	// Temporary hacks - PPI settings and checksum correction
+	rom[0x1ff] = 0xbd;
+	rom[0x209] = 0x9b;
+	rom[0x20d] = 0x9b;
+
+	// TODO: can the following be done with GFXDECODE?
+
+	uint8_t *gfx1 = memregion("gfx1")->base();
+
+	for (int i = 0x00000; i < 0x18000; i++)
+	{
+		uint8_t row = i & 0x0f;
+		uint32_t addr;
+
+		switch (row)
+		{
+			case 0x01: addr = 0x04; break;
+			case 0x02: addr = 0x01; break;
+			case 0x03: addr = 0x06; break;
+			case 0x05: addr = 0x06; break;
+			case 0x09: addr = 0x0c; break;
+			case 0x0a: addr = 0x09; break;
+			case 0x0b: addr = 0x0e; break;
+			case 0x0d: addr = 0x0e; break;
+			default: addr = row; break;
+		}
+
+		addr = (i & 0x1fff0) | addr;
+
+		std::swap(gfx1[i], gfx1[addr]);
+	}
+
+	uint8_t *gfx2 = memregion("gfx2")->base();
+
+	for (int i = 0x00000; i < 0x8000; i++)
+	{
+		uint8_t row = i & 0x0f;
+		uint16_t addr;
+
+		switch (row)
+		{
+			case 0x01: addr = 0x02; break;
+			case 0x04: addr = 0x08; break;
+			case 0x05: addr = 0x0a; break;
+			case 0x06: addr = 0x09; break;
+			case 0x07: addr = 0x0b; break;
+			case 0x0d: addr = 0x0e; break;
+			default: addr = row; break;
+		}
+
+		addr = (i & 0x7ff0) | addr;
+
+		std::swap(gfx2[i], gfx2[addr]);
+	}
+}
+
 /*
   Flaming 7's
   Cyberdyne Systems.
@@ -17745,36 +18155,6 @@ void cmaster_state::init_super7()
 	}
 }
 
-void wingco_state::init_luckylad()
-{
-	uint8_t *rom = memregion("maincpu")->base();
-
-	for (int i = 0x0000; i < 0x8000; i++)
-	{
-		uint8_t x = rom[i];
-		switch (i & 0x1111) // preliminary, text in 0x3ab0-0x3c70, 0x4c00-0x5160 ranges seems mostly ok, seems similar to the one used in luckygrl (jangou.cpp).
-		{
-			case 0x0000: x = bitswap<8>(x ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x0001: x = bitswap<8>(x ^ 0xa0, 3, 6, 5, 4, 7, 2, 1, 0); break;
-			case 0x0010: x = bitswap<8>(x ^ 0x88, 5, 6, 7, 4, 3, 2, 1, 0); break;
-			case 0x0011: x = bitswap<8>(x ^ 0x28, 3, 6, 7, 4, 5, 2, 1, 0); break;
-			case 0x0100: x = bitswap<8>(x ^ 0x28, 3, 6, 7, 4, 5, 2, 1, 0); break;
-			case 0x0101: x = bitswap<8>(x ^ 0x20, 5, 6, 7, 4, 3, 2, 1, 0); break;
-			case 0x0110: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break;
-			case 0x0111: x = bitswap<8>(x ^ 0x88, 5, 6, 7, 4, 3, 2, 1, 0); break;
-			case 0x1000: x = bitswap<8>(x ^ 0x20, 5, 6, 7, 4, 3, 2, 1, 0); break;
-			case 0x1001: x = bitswap<8>(x ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x1010: x = bitswap<8>(x ^ 0xa0, 3, 6, 5, 4, 7, 2, 1, 0); break;
-			case 0x1011: x = bitswap<8>(x ^ 0x80, 7, 6, 3, 4, 5, 2, 1, 0); break;
-			case 0x1100: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break;
-			case 0x1101: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break;
-			case 0x1110: x = bitswap<8>(x ^ 0x80, 7, 6, 3, 4, 5, 2, 1, 0); break;
-			case 0x1111: x = bitswap<8>(x ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-		}
-
-		rom[i] = x;
-	}
-}
 
 /*********************************************
 *                Game Drivers                *
@@ -17805,8 +18185,7 @@ GAMEL( 199?, cb3e,      ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,
 GAMEL( 199?, chryglda,  ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Gold I (set 2, encrypted bootleg)",    0,                 layout_chrygld )  // Runs in CB3e hardware.
 GAME(  1994, chryangla, ncb3,     chryangla,ncb3,     cb3_state,      init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (encrypted, W-4 hardware)",      MACHINE_NOT_WORKING ) // DYNA CB3  V1.40 string, decrypted but only test screens work
 
-GAME(  1996, cmast97,   ncb3,     cm97,     chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Master '97",                           MACHINE_NOT_WORKING) // fix prom decode
-GAME(  1991, eldoradd,  0,        cm97,     chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado",                                   MACHINE_NOT_WORKING) // everything
+GAME(  1991, eldoradd,  0,        eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado",                                   MACHINE_NOT_WORKING) // everything
 
 // looks like a hack of Cherry Bonus 3
 GAME(  1994, chryangl,  ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel",                                MACHINE_NOT_WORKING ) // SKY SUPERCB 1.0 string, decrypted but hangs when betting
@@ -17835,6 +18214,7 @@ GAMEL( 1991, cmasterf,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,
 GAMEL( 1991, cmasterg,  cmaster,  cm,       cmasterg, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 8, V4-B-)",    0,                 layout_cmasterb )
 GAMEL( 1991, cmasterh,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.10)",                  0,                 layout_cmasterb )
 GAMEL( 199?, super7,    cmaster,  cm,       cmaster,  cmaster_state,  init_super7,    ROT0, "bootleg",           "Super Seven",                                 MACHINE_NOT_WORKING, layout_cmasterb )
+GAME ( 199?, wcat3a,    wcat3,    chryangl, cmaster,  cmaster_state,  init_wcat3a,    ROT0, "E.A.I.",            "Wild Cat 3 (CMV4 hardware)",                  MACHINE_NOT_WORKING ) // does not boot. Wrong decryption, wrong machine or wrong what?
 
 GAMEL( 1991, tonypok,   0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )
 GAME(  1999, jkrmast,   0,        pkrmast,  pkrmast,  goldstar_state, init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master (V515)",                         MACHINE_NOT_WORKING ) // encryption broken, needs GFX and controls
@@ -17842,9 +18222,11 @@ GAME(  1999, jkrmasta,  jkrmast,  pkrmast,  pkrmast,  goldstar_state, init_jkrma
 GAME(  199?, pkrmast,   jkrmast,  pkrmast,  pkrmast,  goldstar_state, init_pkrmast,   ROT0, "Fun USA",           "Poker Master (ED-1993 set 1)",                MACHINE_NOT_WORKING ) // needs inputs / dips fixed, puts FUN USA 95H N/G  V2.20 in NVRAM
 GAME(  1993, pkrmasta,  jkrmast,  pkrmast,  pkrmast,  goldstar_state, init_pkrmast,   ROT0, "Fun USA",           "Poker Master (ED-1993 set 2)",                MACHINE_NOT_WORKING ) // needs inputs / dips fixed, puts PM93 JAN 29/1996 V1.52 in NVRAM
 
+GAME(  199?, chthree,   cmaster,  cm,       cmaster,  cmaster_state,  init_chthree,   ROT0, "Promat",            "Channel Three",                               0 ) // hack of cmaster, still shows DYNA CM-1 V1.01 in book-keeping
 
 GAME(  1991, cmast91,   0,        cmast91,  cmast91,  goldstar_state, init_cmast91,   ROT0, "Dyna",              "Cherry Master '91 (ver.1.30)",                0 )
 GAME(  1992, cmast92,   0,        cmast91,  cmast91,  goldstar_state, init_cmast91,   ROT0, "Dyna",              "Cherry Master '92",                           MACHINE_NOT_WORKING ) // no gfx roms are dumped
+GAME(  1996, cmast97,   0,        cm97,     cmv801,   cmaster_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97",                           MACHINE_NOT_WORKING) // fix prom decode, reels
 GAME(  1999, cmast99,   0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master '99 (V9B.00)",                  MACHINE_NOT_WORKING )
 GAME(  1999, cmast99b,  cmast99,  cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cherry Master '99 (V9B.00 bootleg / hack)",   MACHINE_NOT_WORKING )
 GAME(  1993, aplan,     0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "WeaShing H.K.",     "A-Plan",                                      MACHINE_NOT_WORKING )
@@ -17868,7 +18250,7 @@ GAMEL( 198?, ns8lines,  0,        lucky8,   lucky8b,  wingco_state,   empty_init
 GAMEL( 1985, ns8linesa, ns8lines, lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "Yamate (bootleg)",  "New Lucky 8 Lines / New Super 8 Lines (W-4, Lucky97 HW)",  0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 198?, ns8linew,  ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 198?, ns8linewa, ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus)", 0,                     layout_lucky8p1 )  // only 1 control set...
-GAMEL( 198?, super972,  ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "Super 97-2 (Witch Bonus)",                                 MACHINE_NOT_WORKING,   layout_lucky8 )    // ???
+GAMEL( 198?, super972,  ns8lines, super972, ns8linwa, wingco_state,   init_super972,  ROT0, "<unknown>",         "Super 97-2 (Witch Bonus)",                                 MACHINE_NOT_WORKING,   layout_lucky8p1 )  // decrypted, needs correct inputs
 GAME(  198?, luckybar,  0,        lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "Lucky Bar (W-4 with mc68705 MCU)",                         MACHINE_NOT_WORKING )  // MC68705 MCU
 GAMEL( 198?, kkotnoli,  0,        kkotnoli, kkotnoli, goldstar_state, empty_init,     ROT0, "hack",              "Kkot No Li (Kill the Bees)",                               MACHINE_IMPERFECT_COLORS, layout_lucky8 )
 GAME(  198?, ladylinr,  0,        ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner (set 1)",                                       0 )
@@ -17877,9 +18259,9 @@ GAME(  198?, ladylinrb, ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladyl
 GAME(  198?, ladylinrc, ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinrc, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 2)",                            0 )
 GAME(  198?, ladylinrd, ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinrd, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 3)",                            0 )
 GAME(  198?, ladylinre, ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinre, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 4)",                            0 )
-GAME(  198?, wcat3,     0,        wcat3,    lucky8,   wingco_state,   empty_init,     ROT0, "E.A.I.",            "Wild Cat 3",                                               MACHINE_NOT_WORKING )
+GAME(  1995, wcat3,     0,        wcat3,    lucky8,   wingco_state,   init_wcat3,     ROT0, "E.A.I.",            "Wild Cat 3",                                               MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // decryption partially wrong, needs soft resets before running. Bad PROM decode
 
-GAME(  1985, luckylad,  0,        lucky8,   luckylad, wingco_state,   init_luckylad,  ROT0, "Wing Co., Ltd.",    "Lucky Lady (Wing, encrypted)",                             MACHINE_NOT_WORKING )  // encrypted (see notes in rom_load)...
+GAME(  1985, luckylad,  0,        luckylad, luckylad, wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Lucky Lady (Wing, encrypted)",                             MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS )  // controls / dips, colors not correctly decoded
 GAME(  1991, megaline,  0,        megaline, megaline, unkch_state,    empty_init,     ROT0, "Fun World",         "Mega Lines",                                               MACHINE_NOT_WORKING )
 
 GAMEL( 1993, bingowng,  0,        bingowng, bingowng, wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Bingo (set 1)",                                            0,                     layout_bingowng )
@@ -17937,6 +18319,7 @@ GAMEL( 1996, nc96c,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb9
 GAMEL( 1996, nc96d,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb96_d,  ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.53, D PCB)",                0,                 layout_nfb96 ) /* D  Sub-PCB */
 GAMEL( 1996, nc96e,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb96_d,  ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.40, D PCB)",                0,                 layout_nfb96 ) /* D  Sub-PCB */
 GAMEL( 1996, nc96f,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb96_dk, ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.62, DK PCB)",               0,                 layout_nfb96 ) /* DK Sub-PCB */
+GAMEL( 1996, nc96g,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb96_b,  ROT0, "Amcoe",   "New Cherry '96 (v3.1, B PCB)",                                 0,                 layout_nfb96 ) /* B  Sub-PCB */
 GAMEL( 2000, nc96txt,   nc96,     amcoe2,   nfb96tx,   cmaster_state,  init_nfb96_c2, ROT0, "Amcoe",   "New Cherry '96 Special Edition (v1.32 Texas XT, C2 PCB)",      0,                 layout_nfb96tx ) /* ver. tc1.32axt C2 Sub-PCB */
 
 GAME(  2009, fb2010,    0,        amcoe2,   fb2010,    cmaster_state,  init_fb2010,   ROT0, "Amcoe",   "Fruit Bonus 2010",                                             0 )
@@ -17958,7 +18341,8 @@ GAME( 1996, nfb96sec,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init
 GAME( 2002, carb2002,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg", "Carriage Bonus 2002 (bootleg)",                                            MACHINE_WRONG_COLORS )
 GAME( 2003, carb2003,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg", "Carriage Bonus 2003 (bootleg)",                                            MACHINE_WRONG_COLORS )
 
-GAME( 2003, nfm,       0,        nfm,      nfm,       cmaster_state,  empty_init,     ROT0, "Ming-Yang Electronic", "New Fruit Machine (Ming-Yang Electronic)",                    MACHINE_NOT_WORKING ) // vFB02-07A "Copyright By Ms. Liu Orchis 2003/03/06"
+GAME( 2003, nfm,       0,        nfm,      nfm,       cmaster_state,  empty_init,     ROT0, "Ming-Yang Electronic", "New Fruit Machine (Ming-Yang Electronic, vFB02-07A)",         MACHINE_NOT_WORKING ) // vFB02-07A "Copyright By Ms. Liu Orchis 2003/03/06", needs correct PROM and USER1 regions decode
+GAME( 2003, nfma,      nfm,      nfm,      nfm,       cmaster_state,  empty_init,     ROT0, "Ming-Yang Electronic", "New Fruit Machine (Ming-Yang Electronic, vFB02-01A)",         MACHINE_NOT_WORKING ) // vFB02-01A "Copyright By Ms. Liu Orchis 2003/03/06", needs correct PROM and USER1 regions decode
 
 
 // super cherry master sets...

@@ -76,7 +76,7 @@ DEFINE_DEVICE_TYPE(COCOCART_SLOT, cococart_slot_device, "cococart_slot", "CoCo C
 //-------------------------------------------------
 cococart_slot_device::cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, COCOCART_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_cococart_interface>(mconfig, *this),
 	device_image_interface(mconfig, *this),
 	m_cart_callback(*this),
 	m_nmi_callback(*this),
@@ -123,7 +123,7 @@ void cococart_slot_device::device_start()
 	m_halt_callback.resolve();
 	m_halt_line.callback = &m_halt_callback;
 
-	m_cart = dynamic_cast<device_cococart_interface *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 
@@ -273,8 +273,8 @@ void cococart_slot_device::set_line_timer(coco_cartridge_line &line, cococart_sl
 {
 	// calculate delay; delay dependant on cycles per second
 	attotime delay = (line.delay != 0)
-		? clocks_to_attotime(line.delay)
-		: attotime::zero;
+			? clocks_to_attotime(line.delay)
+			: attotime::zero;
 
 	line.timer[line.timer_index]->adjust(delay, (int) value);
 	line.timer_index = (line.timer_index + 1) % TIMER_POOL;
@@ -483,7 +483,7 @@ template class device_finder<device_cococart_interface, true>;
 //-------------------------------------------------
 
 device_cococart_interface::device_cococart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "cococart")
 	, m_owning_slot(nullptr)
 	, m_host(nullptr)
 {
@@ -507,8 +507,8 @@ void device_cococart_interface::interface_config_complete()
 {
 	m_owning_slot = dynamic_cast<cococart_slot_device *>(device().owner());
 	m_host = m_owning_slot
-		? dynamic_cast<device_cococart_host_interface *>(m_owning_slot->owner())
-		: nullptr;
+			? dynamic_cast<device_cococart_host_interface *>(m_owning_slot->owner())
+			: nullptr;
 }
 
 

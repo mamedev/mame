@@ -904,10 +904,9 @@ void mpu3_state::init_m3hprvpr()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	m_disp_func=METER_PORT;
+	m_disp_func = METER_PORT;
 	m_current_chr_table = hprvpr_data;
-	space.install_readwrite_handler(0xc000, 0xc000 , read8_delegate(FUNC(mpu3_state::characteriser_r), this),write8_delegate(FUNC(mpu3_state::characteriser_w), this));
-
+	space.install_readwrite_handler(0xc000, 0xc000, read8_delegate(*this, FUNC(mpu3_state::characteriser_r)), write8_delegate(*this, FUNC(mpu3_state::characteriser_w)));
 }
 
 ROM_START( m3tst )

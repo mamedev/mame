@@ -206,11 +206,6 @@ void radio86_state::radio86_romdisk_portc_w(uint8_t data)
 	m_romdisk_msb = data;
 }
 
-void radio86_state::mikrosha_8255_font_page_w(uint8_t data)
-{
-	m_mikrosha_font_page = (data  > 7) & 1;
-}
-
 I8275_DRAW_CHARACTER_MEMBER(radio86_state::display_pixels)
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();

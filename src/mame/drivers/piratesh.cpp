@@ -626,7 +626,7 @@ void piratesh_state::piratesh(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::BGRx_888, 2048).enable_shadows().enable_hilights();
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(piratesh_state::piratesh_tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(piratesh_state::piratesh_tile_callback));
 	m_k056832->set_config(K056832_BPP_4PIRATESH, 1, 0);
 	m_k056832->set_palette("palette");
 
@@ -635,13 +635,13 @@ void piratesh_state::piratesh(machine_config &config)
 	K053250PS(config, m_k053250, 12000000, "palette", "screen", -16, 0);
 
 	K055673(config, m_k055673, 0);
-	m_k055673->set_sprite_callback(FUNC(piratesh_state::piratesh_sprite_callback), this);
+	m_k055673->set_sprite_callback(FUNC(piratesh_state::piratesh_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_PS, -60, 24);
 	m_k055673->set_palette("palette");
 
 	// ????
 	//K053246(config, m_k053246, 0);
-	//m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback), this);
+	//m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback));
 	//m_k053246->set_config("k053246", NORMAL_PLANE_ORDER, -48+1, 23);
 	//m_k053246->set_palette(m_palette);
 

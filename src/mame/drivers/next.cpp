@@ -915,7 +915,7 @@ void next_state::next_mem(address_map &map)
 	map(0x02014020, 0x02014023).mirror(0x300000).rw(FUNC(next_state::scsictrl_r), FUNC(next_state::scsictrl_w));
 	map(0x02016000, 0x02016003).mirror(0x300000).rw(FUNC(next_state::timer_data_r), FUNC(next_state::timer_data_w));
 	map(0x02016004, 0x02016007).mirror(0x300000).rw(FUNC(next_state::timer_ctrl_r), FUNC(next_state::timer_ctrl_w));
-	map(0x02018000, 0x02018003).mirror(0x300000).rw(scc, FUNC(scc8530_t::reg_r), FUNC(scc8530_t::reg_w));
+	map(0x02018000, 0x02018003).mirror(0x300000).rw(scc, FUNC(scc8530_legacy_device::reg_r), FUNC(scc8530_legacy_device::reg_w));
 //  map(0x02018004, 0x02018007).mirror(0x300000); SCC CLK
 //  map(0x02018190, 0x02018197).mirror(0x300000); warp 9c DRAM timing
 //  map(0x02018198, 0x0201819f).mirror(0x300000); warp 9c VRAM timing

@@ -41,7 +41,7 @@ class device_psi_keyboard_interface;
 
 // ======================> psi_keyboard_bus_device
 
-class psi_keyboard_bus_device : public device_t, public device_slot_interface
+class psi_keyboard_bus_device : public device_t, public device_single_card_slot_interface<device_psi_keyboard_interface>
 {
 public:
 	// construction/destruction
@@ -85,13 +85,13 @@ private:
 
 // ======================> device_psi_keyboard_interface
 
-class device_psi_keyboard_interface : public device_slot_card_interface
+class device_psi_keyboard_interface : public device_interface
 {
 public:
 	// construction/destruction
 	virtual ~device_psi_keyboard_interface();
 
-	virtual void tx_w(int state) {};
+	virtual void tx_w(int state) { }
 
 protected:
 	device_psi_keyboard_interface(const machine_config &mconfig, device_t &device);

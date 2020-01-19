@@ -606,5 +606,5 @@ void pc1512_state::pc1512_video(machine_config &config)
 	m_vdu->set_screen(m_screen);
 	m_vdu->set_show_border_area(true);
 	m_vdu->set_char_width(8);
-	m_vdu->set_update_row_callback(FUNC(pc1512_state::crtc_update_row), this);
+	m_vdu->set_update_row_callback(FUNC(pc1512_state::crtc_update_row));
 }

@@ -57,7 +57,7 @@ void pc8401a_state::scan_keyboard()
 	if (!m_key_strobe && strobe)
 	{
 		/* trigger interrupt */
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0x28); // Z80
+		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xef); // Z80 - RST 28h
 		logerror("INTERRUPT\n");
 	}
 
@@ -573,7 +573,7 @@ WRITE8_MEMBER( pc8401a_state::ppi_pc_w )
 void pc8401a_state::pc8401a(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000); // NEC uPD70008C
+	Z80(config, m_maincpu, 7.987_MHz_XTAL / 2); // NEC uPD70008C
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc8401a_state::pc8401a_mem);
 	m_maincpu->set_addrmap(AS_IO, &pc8401a_state::pc8401a_io);
 

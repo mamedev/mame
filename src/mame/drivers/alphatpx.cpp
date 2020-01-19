@@ -36,7 +36,7 @@
 
     P2U
     ===
-    For paging via port 0x78A, a 16K RAM card with RAM at 0x0000 and 0x3fff and the banking logic (see above) is added to the the standard 48K memory card.
+    For paging via port 0x78A, a 16K RAM card with RAM at 0x0000 and 0x3fff and the banking logic (see above) is added to the standard 48K memory card.
     P2S, P2U: 2x 320K, double sided, 40 tracks, 16 sectors/track, 256 bytes/sector floppy disk drives
 
     P3, P4
@@ -1210,7 +1210,7 @@ void alphatp_12_state::alphatp2(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &alphatp_12_state::alphatp2_mem);
 	maincpu.set_addrmap(AS_IO, &alphatp_12_state::alphatp2_io);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum("maincpu");
 
 	I8041A(config, m_kbdmcu, 12.8544_MHz_XTAL / 2);
 	m_kbdmcu->t0_in_cb().set(FUNC(alphatp_12_state::kbd_matrix_r));
@@ -1288,9 +1288,9 @@ void alphatp_34_state::alphatp3(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &alphatp_34_state::alphatp3_mem);
 	maincpu.set_addrmap(AS_IO, &alphatp_34_state::alphatp3_io);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum("maincpu");
 
-	I8041A(config, m_kbdmcu, 12.8544_MHz_XTAL /2);
+	I8041A(config, m_kbdmcu, 12.8544_MHz_XTAL / 2);
 	m_kbdmcu->t0_in_cb().set(FUNC(alphatp_34_state::kbd_matrix_r));
 	m_kbdmcu->p1_out_cb().set(FUNC(alphatp_34_state::kbd_matrix_w));
 	m_kbdmcu->p2_in_cb().set(FUNC(alphatp_34_state::kbd_port2_r));

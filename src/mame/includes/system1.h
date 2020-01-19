@@ -21,11 +21,7 @@ class system1_state : public driver_device
 public:
 	system1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_ppi8255(*this, "ppi8255"),
-		m_pio(*this, "pio"),
-		m_ram(*this, "ram"),
-		m_spriteram(*this, "spriteram"),
-		m_paletteram(*this, "palette"),
+		m_videoram(nullptr),
 		m_videomode_custom(nullptr),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
@@ -34,9 +30,16 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
+		m_ppi8255(*this, "ppi8255"),
+		m_pio(*this, "pio"),
+		m_ram(*this, "ram"),
+		m_spriteram(*this, "spriteram"),
+		m_paletteram(*this, "paletteram"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_maincpu_region(*this, "maincpu"),
-		m_color_prom(*this, "palette"),
+		m_spriterom(*this, "sprites"),
+		m_lookup_prom(*this, "lookup_proms"),
+		m_color_prom(*this, "color_proms"),
 		m_bank1(*this, "bank1"),
 		m_bank0d(*this, "bank0d"),
 		m_bank1d(*this, "bank1d"),
@@ -109,36 +112,55 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(dakkochn_mux_data_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(dakkochn_mux_status_r);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
-	optional_device<i8255_device>  m_ppi8255;
-	optional_device<z80pio_device>  m_pio;
-	required_shared_ptr<uint8_t> m_ram;
-	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_paletteram;
-
-	std::unique_ptr<uint8_t[]> m_videoram;
-	void (system1_state::*m_videomode_custom)(uint8_t data, uint8_t prevdata);
-	uint8_t m_mute_xor;
-	uint8_t m_dakkochn_mux_data;
-	uint8_t m_videomode_prev;
-	uint8_t m_mcu_control;
-	uint8_t m_nob_maincpu_latch;
-	uint8_t m_nob_mcu_latch;
-	uint8_t m_nob_mcu_status;
-	int m_nobb_inport23_step;
-	std::unique_ptr<uint8_t[]> m_mix_collide;
-	uint8_t m_mix_collide_summary;
-	std::unique_ptr<uint8_t[]> m_sprite_collide;
-	uint8_t m_sprite_collide_summary;
+	// video related
+	std::unique_ptr<u8[]> m_videoram;
+	void (system1_state::*m_videomode_custom)(u8 data, u8 prevdata);
+	u8 m_videomode_prev;
+	std::unique_ptr<u8[]> m_mix_collide;
+	u8 m_mix_collide_summary;
+	std::unique_ptr<u8[]> m_sprite_collide;
+	u8 m_sprite_collide_summary;
 	bitmap_ind16 m_sprite_bitmap;
-	uint8_t m_video_mode;
-	uint8_t m_videoram_bank;
+	u8 m_video_mode;
+	u8 m_videoram_bank;
 	tilemap_t *m_tilemap_page[8];
-	uint8_t m_tilemap_pages;
+	u8 m_tilemap_pages;
 
+	// protection, miscs
+	u8 m_mute_xor;
+	u8 m_dakkochn_mux_data;
+	u8 m_mcu_control;
+	u8 m_nob_maincpu_latch;
+	u8 m_nob_mcu_latch;
+	u8 m_nob_mcu_status;
+	int m_nobb_inport23_step;
+
+	// video handlers
+	DECLARE_WRITE8_MEMBER(common_videomode_w);
 	DECLARE_WRITE8_MEMBER(videomode_w);
+	DECLARE_WRITE8_MEMBER(videoram_bank_w);
+	DECLARE_READ8_MEMBER(mixer_collision_r);
+	DECLARE_WRITE8_MEMBER(mixer_collision_w);
+	DECLARE_WRITE8_MEMBER(mixer_collision_reset_w);
+	DECLARE_READ8_MEMBER(sprite_collision_r);
+	DECLARE_WRITE8_MEMBER(sprite_collision_w);
+	DECLARE_WRITE8_MEMBER(sprite_collision_reset_w);
+	DECLARE_READ8_MEMBER(videoram_r);
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_WRITE8_MEMBER(paletteram_w);
+
+	// sound handlers
 	DECLARE_READ8_MEMBER(sound_data_r);
 	DECLARE_WRITE8_MEMBER(soundport_w);
+	DECLARE_WRITE8_MEMBER(sound_control_w);
+
+	// misc handlers
 	DECLARE_WRITE8_MEMBER(mcu_control_w);
 	DECLARE_READ8_MEMBER(mcu_io_r);
 	DECLARE_WRITE8_MEMBER(mcu_io_w);
@@ -155,42 +177,29 @@ private:
 	DECLARE_WRITE8_MEMBER(nobb_outport24_w);
 	DECLARE_READ8_MEMBER(nob_start_r);
 	DECLARE_READ8_MEMBER(shtngmst_gunx_r);
-	DECLARE_WRITE8_MEMBER(system1_videomode_w);
-	DECLARE_READ8_MEMBER(system1_mixer_collision_r);
-	DECLARE_WRITE8_MEMBER(system1_mixer_collision_w);
-	DECLARE_WRITE8_MEMBER(system1_mixer_collision_reset_w);
-	DECLARE_READ8_MEMBER(system1_sprite_collision_r);
-	DECLARE_WRITE8_MEMBER(system1_sprite_collision_w);
-	DECLARE_WRITE8_MEMBER(system1_sprite_collision_reset_w);
-	DECLARE_READ8_MEMBER(system1_videoram_r);
-	DECLARE_WRITE8_MEMBER(system1_videoram_w);
-	DECLARE_WRITE8_MEMBER(system1_paletteram_w);
-	DECLARE_WRITE8_MEMBER(sound_control_w);
 
-	void encrypted_sys1ppi_maps(machine_config &config);
-	void encrypted_sys1pio_maps(machine_config &config);
-	void encrypted_sys2_mc8123_maps(machine_config &config);
-
+	// video functions
 	TILE_GET_INFO_MEMBER(tile_get_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	void system1_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(system2);
 	DECLARE_VIDEO_START(system2);
 	DECLARE_MACHINE_START(myherok);
-	uint32_t screen_update_system1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_system2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_system2_rowscroll(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(soundirq_gen);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_t0_callback);
-	DECLARE_WRITE8_MEMBER(system1_videoram_bank_w);
+	u32 screen_update_system1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_system2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_system2_rowscroll(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void video_start_common(int pagecount);
 	inline void videoram_wait_states(cpu_device *cpu);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset);
 	void video_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind16 &fgpixmap, bitmap_ind16 **bgpixmaps, const int *bgrowscroll, int bgyscroll, int spritexoffs);
-	void bank44_custom_w(uint8_t data, uint8_t prevdata);
-	void bank0c_custom_w(uint8_t data, uint8_t prevdata);
-	void dakkochn_custom_w(uint8_t data, uint8_t prevdata);
+
+	// misc functions
+	TIMER_DEVICE_CALLBACK_MEMBER(soundirq_gen);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_t0_callback);
+	void bank44_custom_w(u8 data, u8 prevdata);
+	void bank0c_custom_w(u8 data, u8 prevdata);
+	void dakkochn_custom_w(u8 data, u8 prevdata);
+
+	// devices
 	required_device<z80_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<i8751_device> m_mcu;
@@ -198,17 +207,33 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+	optional_device<i8255_device> m_ppi8255;
+	optional_device<z80pio_device> m_pio;
+
+	// shared pointers
+	required_shared_ptr<u8> m_ram;
+	required_shared_ptr<u8> m_spriteram;
+	required_shared_ptr<u8> m_paletteram;
+	optional_shared_ptr<u8> m_decrypted_opcodes;
+
+	// memory regions
 	required_memory_region m_maincpu_region;
-	optional_region_ptr<uint8_t> m_color_prom;
+	required_region_ptr<u8> m_spriterom;
+	required_region_ptr<u8> m_lookup_prom;
+	optional_region_ptr<u8> m_color_prom;
+
+	// banks
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank0d;
 	optional_memory_bank m_bank1d;
+	std::unique_ptr<u8[]> m_banked_decrypted_opcodes;
 
-	std::unique_ptr<uint8_t[]> m_banked_decrypted_opcodes;
-
+	// address maps
 	void banked_decrypted_opcodes_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
+	void encrypted_sys1ppi_maps(machine_config &config);
+	void encrypted_sys1pio_maps(machine_config &config);
+	void encrypted_sys2_mc8123_maps(machine_config &config);
 	void mcu_io_map(address_map &map);
 	void nobo_map(address_map &map);
 	void sound_map(address_map &map);

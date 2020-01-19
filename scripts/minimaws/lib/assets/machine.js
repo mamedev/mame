@@ -4,6 +4,7 @@
 var slot_info = Object.create(null);
 var bios_sets = Object.create(null);
 var machine_flags = Object.create(null);
+var softwarelist_info = Object.create(null);
 
 
 function make_slot_popup_id(name) { return ('select-slot-choice-' + name).replace(/:/g, '-'); }
@@ -197,6 +198,47 @@ var fetch_machine_flags = (function ()
 		})();
 
 
+var fetch_softwarelist_info = (function ()
+		{
+			var pending = Object.create(null);
+			return function (device)
+			{
+				if (!Object.prototype.hasOwnProperty.call(softwarelist_info, device) && !Object.prototype.hasOwnProperty.call(pending, device))
+				{
+					pending[device] = true;
+					var req = new XMLHttpRequest();
+					req.open('GET', appurl + 'rpc/softwarelists/' + encodeURIComponent(device), true);
+					req.responseType = 'json';
+					req.onload =
+							function ()
+							{
+								delete pending[device];
+								if (req.status == 200)
+								{
+									softwarelist_info[device] = req.response;
+									var slotslist = document.getElementById('list-slot-options');
+									if (slotslist)
+									{
+										for (var item = slotslist.firstChild; item; item = item.nextSibling)
+										{
+											if ((item.nodeName == 'DT') && (item.getAttribute('data-slotcard') == device))
+											{
+												var slotname = item.getAttribute('data-slotname');
+												add_softwarelist_rows(
+														device,
+														slotname,
+														document.getElementById('select-slot-choice-' + slotname.replace(/:/g, '-')).value);
+											}
+										}
+									}
+								}
+							};
+					req.send();
+				}
+			};
+		})();
+
+
 function add_flag_rows(table, device)
 {
 	var sorted_features = Object.keys(machine_flags[device].features).sort();
@@ -225,6 +267,51 @@ function add_flag_rows(table, device)
 
 	add_one(unemulated, 'Unemulated features:');
 	add_one(imperfect, 'Imperfect features:');
+}
+
+
+function add_softwarelist_rows(device, slot, card)
+{
+	var sorted_softwarelists = Object.keys(softwarelist_info[device]).sort();
+	var cardtag = slot + ':' + card;
+	if (sorted_softwarelists.length)
+	{
+		var table = document.getElementById('tbl-softwarelists').tBodies[0];
+		sorted_softwarelists.forEach(
+				function (tag)
+				{
+					var cell, link;
+					var info = softwarelist_info[device][tag];
+					var href = appurl + 'softwarelist/' + encodeURIComponent(info.shortname);
+					var row = table.appendChild(document.createElement('tr'));
+					row.setAttribute('id', 'row-softwarelists-' + (cardtag + tag).replace(/:/g, '-'))
+					row.appendChild(document.createElement('td')).textContent = cardtag;
+					link = row.appendChild(document.createElement('td')).appendChild(document.createElement('a'));
+					link.setAttribute('href', href);
+					link.textContent = info.shortname;
+					link = row.appendChild(document.createElement('td')).appendChild(document.createElement('a'));
+					link.setAttribute('href', href);
+					link.textContent = info.description;
+					row.appendChild(document.createElement('td')).textContent = info.status;
+					total = info.total;
+					cell = row.appendChild(document.createElement('td'));
+					cell.textContent = total.toString(10);
+					cell.style.textAlign = 'right';
+					if (!total)
+						total = 1;
+					cell = row.appendChild(document.createElement('td'));
+					cell.textContent = (info.supported * 100.0 / total).toFixed(1) + '%';
+					cell.style.textAlign = 'right';
+					cell = row.appendChild(document.createElement('td'));
+					cell.textContent = (info.partiallysupported * 100.0 / total).toFixed(1) + '%';
+					cell.style.textAlign = 'right';
+					cell = row.appendChild(document.createElement('td'));
+					cell.textContent = (info.unsupported * 100.0 / total).toFixed(1) + '%';
+					cell.style.textAlign = 'right';
+				});
+		document.getElementById('heading-softwarelists').style.removeProperty('display');
+		document.getElementById('tbl-softwarelists').style.removeProperty('display');
+	}
 }
 
 
@@ -394,6 +481,16 @@ function make_slot_change_handler(name, slot, defaults, dfltbtn)
 			slotslist.removeChild(next);
 		}
 
+		// clear out any software lists from previous selection
+		var softwarelist_rowid_prefix = 'row-softwarelists-' + prefix.replace(/:/g, '-');
+		for (var candidate = document.getElementById('tbl-softwarelists').tBodies[0].rows[0]; candidate; )
+		{
+			var next = candidate.nextSibling;
+			if ((candidate.nodeName == 'TR') && candidate.getAttribute('id').startsWith(softwarelist_rowid_prefix))
+				candidate.parentNode.removeChild(candidate);
+			candidate = next;
+		}
+
 		if (selection === null)
 		{
 			// no selection, remove the slot card details table
@@ -426,6 +523,12 @@ function make_slot_change_handler(name, slot, defaults, dfltbtn)
 				fetch_bios_sets(selection.device);
 			else
 				add_bios_row(slotname, tbl, selection.device);
+
+			// if we have software list info, populate now, otherweise fetch asynchronously
+			if (!Object.prototype.hasOwnProperty.call(softwarelist_info, selection.device))
+				fetch_softwarelist_info(selection.device);
+			else
+				add_softwarelist_rows(selection.device, slotname, choice);
 
 			// drop the details table into the list
 			if (def.firstChild)

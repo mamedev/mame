@@ -422,7 +422,7 @@ void duet16_state::duet16(machine_config &config)
 
 	hd6845s_device &crtc(HD6845S(config, "crtc", 2000000)); // "46505S" on schematics
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(duet16_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(duet16_state::crtc_update_row));
 
 	PALETTE(config, m_pal).set_entries(8);
 	PALETTE(config, m_chrpal, palette_device::BRG_3BIT);
@@ -446,7 +446,7 @@ void duet16_state::duet16(machine_config &config)
 }
 
 ROM_START(duet16)
-	ROM_REGION(0x2000, "rom", 0)
+	ROM_REGION16_LE(0x2000, "rom", 0)
 	ROM_LOAD16_BYTE("duet16_h516a_3.bin", 0x0001, 0x1000, CRC(936706aa) SHA1(412ff9c7bf4443d2ed29a8d792fc3c849c9393cc))
 	ROM_LOAD16_BYTE("duet16_h517a_z.bin", 0x0000, 0x1000, CRC(1633cce8) SHA1(5145d04a48921cacfed17a94873e8988772fc8d4))
 

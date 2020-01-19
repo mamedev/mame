@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "bus/rs232/rs232.h"
 #include "cpu/ie15/ie15.h"
 #include "machine/ie15_kbd.h"
 #include "sound/beep.h"
@@ -39,13 +38,22 @@ class ie15_device : public device_t, public device_serial_interface
 public:
 	ie15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(write) { term_write(data); }
+	// Interface to a RS232 connection.
+	auto rs232_conn_txd_handler() { return m_rs232_conn_txd_handler.bind(); }
+	auto rs232_conn_dtr_handler() { return m_rs232_conn_dtr_handler.bind(); }
+	auto rs232_conn_rts_handler() { return m_rs232_conn_rts_handler.bind(); }
+	DECLARE_WRITE_LINE_MEMBER(rs232_conn_dcd_w);
+	DECLARE_WRITE_LINE_MEMBER(rs232_conn_dsr_w);
+	DECLARE_WRITE_LINE_MEMBER(rs232_conn_ri_w);
+	DECLARE_WRITE_LINE_MEMBER(rs232_conn_cts_w);
+	DECLARE_WRITE_LINE_MEMBER(rs232_conn_rxd_w);
 
-	DECLARE_WRITE_LINE_MEMBER(serial_rx_callback);
+	DECLARE_WRITE_LINE_MEMBER(update_serial);
 
 protected:
 	ie15_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -57,8 +65,6 @@ protected:
 	virtual void rcv_complete() override;
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
-
-	void term_write(uint8_t data) { m_serial_rx_char = data; m_serial_rx_ready = IE_FALSE; }
 
 private:
 	static const device_timer_id TIMER_HBLANK = 0;
@@ -129,10 +135,29 @@ private:
 	required_region_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<beep_device> m_beeper;
-	required_device<rs232_port_device> m_rs232;
 	required_device<screen_device> m_screen;
 	required_device<ie15_keyboard_device> m_keyboard;
 	required_ioport m_io_keyboard;
+
+	output_finder<> m_lat_led;
+	output_finder<> m_nr_led;
+	output_finder<> m_pch_led;
+	output_finder<> m_dup_led;
+	output_finder<> m_lin_led;
+	output_finder<> m_red_led;
+	output_finder<> m_sdv_led;
+	output_finder<> m_prd_led;
+
+	devcb_write_line m_rs232_conn_txd_handler;
+	devcb_write_line m_rs232_conn_dtr_handler;
+	devcb_write_line m_rs232_conn_rts_handler;
+
+	// Until the UART is implemented
+	required_ioport m_rs232_txbaud;
+	required_ioport m_rs232_rxbaud;
+	required_ioport m_rs232_databits;
+	required_ioport m_rs232_parity;
+	required_ioport m_rs232_stopbits;
 };
 
 DECLARE_DEVICE_TYPE(IE15, ie15_device)

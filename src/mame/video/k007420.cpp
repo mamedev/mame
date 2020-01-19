@@ -27,6 +27,7 @@ k007420_device::k007420_device(const machine_config &mconfig, const char *tag, d
 	, m_flipscreen(0)
 	, m_palette(*this, finder_base::DUMMY_TAG)
 	, m_banklimit(0)
+	, m_callback(*this)
 	//, m_regs[8]
 {
 }
@@ -38,7 +39,7 @@ k007420_device::k007420_device(const machine_config &mconfig, const char *tag, d
 void k007420_device::device_start()
 {
 	// bind the init function
-	m_callback.bind_relative_to(*owner());
+	m_callback.resolve();
 
 	m_ram = make_unique_clear<uint8_t[]>(0x200);
 

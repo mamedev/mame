@@ -78,7 +78,7 @@ void thedeep_state::thedeep_palette(palette_device &palette) const
 
 void thedeep_state::video_start()
 {
-	m_text_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(thedeep_state::get_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 0x20, 0x20);
+	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(thedeep_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 0x20, 0x20);
 
 	m_text_tilemap->set_transparent_pen(0);
 }

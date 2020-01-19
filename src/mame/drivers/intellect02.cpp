@@ -255,7 +255,7 @@ void intel02_state::intel02(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "intellect02", "bin");
-	m_cart->set_device_load(FUNC(intel02_state::cart_load), this);
+	m_cart->set_device_load(FUNC(intel02_state::cart_load));
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("intellect02");

@@ -35,12 +35,7 @@ public:
 
 	sega_m2_read_delegate m_read;
 
-	template <typename Object> void set_read_cb(Object &&readcb) { m_read = std::forward<Object>(readcb); }
-	void set_read_cb(sega_m2_read_delegate callback) { m_read = callback; }
-	template <class FunctionClass> void set_read_cb(uint16_t (FunctionClass::*callback)(uint32_t), const char *name)
-	{
-		set_read_cb(sega_m2_read_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_read_cb(T &&... args) { m_read.set(std::forward<T>(args)...); }
 
 protected:
 	virtual void device_start() override;

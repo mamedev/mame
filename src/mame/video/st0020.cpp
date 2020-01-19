@@ -21,10 +21,10 @@
 DEFINE_DEVICE_TYPE(ST0020_SPRITES, st0020_device, "st0020", "Seta ST0020 Sprites")
 
 
-#define ST0020_ST0032_BYTESWAP_DATA \
-	if (m_is_st0032) data = ((data & 0x00ff)<<8) | ((data & 0xff00)>>8);
-#define ST0020_ST0032_BYTESWAP_MEM_MASK \
-	if (m_is_st0032) mem_mask = ((mem_mask & 0x00ff)<<8) | ((mem_mask & 0xff00)>>8);
+#define ST0020_ST0032_BYTESWAP_DATA() \
+		do { if (m_is_st0032) data = ((data & 0x00ff)<<8) | ((data & 0xff00)>>8); } while (false)
+#define ST0020_ST0032_BYTESWAP_MEM_MASK() \
+		do { if (m_is_st0032) mem_mask = ((mem_mask & 0x00ff)<<8) | ((mem_mask & 0xff00)>>8); } while (false)
 
 
 st0020_device::st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -68,13 +68,13 @@ void st0020_device::device_start()
 
 	// Tilemaps
 	m_tmap[0] = &machine().tilemap().create(
-				*this, tilemap_get_info_delegate(FUNC(st0020_device::get_tile_info<0>), this), tilemap_mapper_delegate(FUNC(st0020_device::scan_16x16),this),16,8, 0x40,0x40*2);
+				*this, tilemap_get_info_delegate(*this, FUNC(st0020_device::get_tile_info<0>)), tilemap_mapper_delegate(*this, FUNC(st0020_device::scan_16x16)), 16,8, 0x40,0x40*2);
 	m_tmap[1] = &machine().tilemap().create(
-				*this, tilemap_get_info_delegate(FUNC(st0020_device::get_tile_info<1>), this), tilemap_mapper_delegate(FUNC(st0020_device::scan_16x16),this),16,8, 0x40,0x40*2);
+				*this, tilemap_get_info_delegate(*this, FUNC(st0020_device::get_tile_info<1>)), tilemap_mapper_delegate(*this, FUNC(st0020_device::scan_16x16)), 16,8, 0x40,0x40*2);
 	m_tmap[2] = &machine().tilemap().create(
-				*this, tilemap_get_info_delegate(FUNC(st0020_device::get_tile_info<2>), this), tilemap_mapper_delegate(FUNC(st0020_device::scan_16x16),this),16,8, 0x40,0x40*2);
+				*this, tilemap_get_info_delegate(*this, FUNC(st0020_device::get_tile_info<2>)), tilemap_mapper_delegate(*this, FUNC(st0020_device::scan_16x16)), 16,8, 0x40,0x40*2);
 	m_tmap[3] = &machine().tilemap().create(
-				*this, tilemap_get_info_delegate(FUNC(st0020_device::get_tile_info<3>), this), tilemap_mapper_delegate(FUNC(st0020_device::scan_16x16),this),16,8, 0x40,0x40*2);
+				*this, tilemap_get_info_delegate(*this, FUNC(st0020_device::get_tile_info<3>)), tilemap_mapper_delegate(*this, FUNC(st0020_device::scan_16x16)), 16,8, 0x40,0x40*2);
 	for (int i = 0; i < 4; ++i)
 	{
 		m_tmap[i]->set_transparent_pen(0);
@@ -92,18 +92,18 @@ void st0020_device::device_start()
 // Gfx ram
 READ16_MEMBER(st0020_device::gfxram_r)
 {
-	ST0020_ST0032_BYTESWAP_MEM_MASK
+	ST0020_ST0032_BYTESWAP_MEM_MASK();
 
 	uint16_t data = m_gfxram[offset + m_gfxram_bank * 0x100000/2];
 
-	ST0020_ST0032_BYTESWAP_DATA
+	ST0020_ST0032_BYTESWAP_DATA();
 	return data;
 }
 
 WRITE16_MEMBER(st0020_device::gfxram_w)
 {
-	ST0020_ST0032_BYTESWAP_MEM_MASK
-	ST0020_ST0032_BYTESWAP_DATA
+	ST0020_ST0032_BYTESWAP_MEM_MASK();
+	ST0020_ST0032_BYTESWAP_DATA();
 
 	offset += m_gfxram_bank * 0x100000/2;
 	COMBINE_DATA(&m_gfxram[offset]);

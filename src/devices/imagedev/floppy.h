@@ -54,8 +54,7 @@ class floppy_sound_device;
 ***************************************************************************/
 
 class floppy_image_device : public device_t,
-							public device_image_interface,
-							public device_slot_card_interface
+							public device_image_interface
 {
 public:
 	typedef delegate<image_init_result (floppy_image_device *)> load_cb;
@@ -80,16 +79,15 @@ public:
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
-	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
-	virtual const char *image_interface() const override = 0;
-	virtual iodevice_t image_type() const override { return IO_FLOPPY; }
+	virtual const char *image_interface() const noexcept override = 0;
+	virtual iodevice_t image_type() const noexcept override { return IO_FLOPPY; }
 
-	virtual bool is_readable()  const override { return true; }
-	virtual bool is_writeable() const override { return true; }
-	virtual bool is_creatable() const override { return true; }
-	virtual bool must_be_loaded() const override { return false; }
-	virtual bool is_reset_on_load() const override { return false; }
-	virtual const char *file_extensions() const override { return extension_list; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override { return extension_list; }
 	void setup_write(floppy_image_format_t *output_format);
 
 	void setup_load_cb(load_cb cb);
@@ -146,6 +144,9 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
+
+	// device_image_interface implementation
+	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
 	virtual void setup_characteristics() = 0;
 
@@ -234,7 +235,7 @@ protected:
 		Name(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock); \
 		virtual ~Name(); \
 		virtual void handled_variants(uint32_t *variants, int &var_count) const override; \
-		virtual const char *image_interface() const override { return Interface; } \
+		virtual const char *image_interface() const noexcept override { return Interface; } \
 	protected: \
 		virtual void setup_characteristics() override; \
 	}; \

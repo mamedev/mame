@@ -279,7 +279,7 @@ void seta2_state::mj4simai_map(address_map &map)
 	map(0x200000, 0x20ffff).ram();                             // RAM
 	map(0x600000, 0x600001).r(FUNC(seta2_state::mj4simai_p1_r));             // P1
 	map(0x600002, 0x600003).r(FUNC(seta2_state::mj4simai_p2_r));             // P2
-	map(0x600005, 0x600005).lw8("keyboard_row_w", [this](u8 data){ m_keyboard_row = data; } );      // select keyboard row to read
+	map(0x600005, 0x600005).lw8(NAME([this] (u8 data){ m_keyboard_row = data; }));      // select keyboard row to read
 	map(0x600006, 0x600007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 	map(0x600100, 0x600101).portr("SYSTEM");             //
 	map(0x600200, 0x600201).nopw();                        // Leds? Coins?

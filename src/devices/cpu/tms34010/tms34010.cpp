@@ -88,8 +88,12 @@ tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type
 	, m_pixperclock(0)
 	, m_scantimer(nullptr)
 	, m_icount(0)
+	, m_scanline_ind16_cb(*this)
+	, m_scanline_rgb32_cb(*this)
 	, m_output_int_cb(*this)
 	, m_ioreg_pre_write_cb(*this)
+	, m_to_shiftreg_cb(*this)
+	, m_from_shiftreg_cb(*this)
 {
 }
 
@@ -629,12 +633,12 @@ void tms340x0_device::check_interrupt()
 
 void tms340x0_device::device_start()
 {
-	m_scanline_ind16_cb.bind_relative_to(*owner());
-	m_scanline_rgb32_cb.bind_relative_to(*owner());
+	m_scanline_ind16_cb.resolve();
+	m_scanline_rgb32_cb.resolve();
 	m_output_int_cb.resolve();
 	m_ioreg_pre_write_cb.resolve();
-	m_to_shiftreg_cb.bind_relative_to(*owner());
-	m_from_shiftreg_cb.bind_relative_to(*owner());
+	m_to_shiftreg_cb.resolve();
+	m_from_shiftreg_cb.resolve();
 
 	m_external_host_access = false;
 

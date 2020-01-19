@@ -52,8 +52,8 @@ void tsamurai_state::video_start()
 
 VIDEO_START_MEMBER(tsamurai_state, tsamurai)
 {
-	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tsamurai_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
-	m_foreground = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tsamurai_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsamurai_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+	m_foreground = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsamurai_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 
 	m_background->set_transparent_pen(0);
 	m_foreground->set_transparent_pen(0);
@@ -251,7 +251,7 @@ TILE_GET_INFO_MEMBER(tsamurai_state::get_vsgongf_tile_info)
 
 VIDEO_START_MEMBER(tsamurai_state,vsgongf)
 {
-	m_foreground = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tsamurai_state::get_vsgongf_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_foreground = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsamurai_state::get_vsgongf_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 
 	save_item(NAME(m_vsgongf_color));
 	video_start();

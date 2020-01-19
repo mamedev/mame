@@ -209,6 +209,10 @@ dmv_keyboard_device::dmv_keyboard_device(const machine_config &mconfig, const ch
 
 void dmv_keyboard_device::device_start()
 {
+	// register for state saving
+	save_item(NAME(m_col));
+	save_item(NAME(m_sd_data_state));
+	save_item(NAME(m_sd_poll_state));
 }
 
 

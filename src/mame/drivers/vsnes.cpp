@@ -1837,7 +1837,7 @@ void vsnes_state::vsdual(machine_config &config)
 void vsnes_state::vsdual_pi(machine_config &config)
 {
 	vsdual(config);
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 	// need high level of interleave to keep screens in sync in Balloon Fight.
 	// however vsmahjng doesn't like perfect interleave? you end up needing to reset it to boot? maybe something in a bad default state? watchdog?
 	// as the board would always be running in 'perfect interleave' the fact the Mahjong game doesn't work like this needs investigating.

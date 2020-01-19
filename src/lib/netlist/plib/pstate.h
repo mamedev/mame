@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * pstate.h
- *
- */
 
 #ifndef PSTATE_H_
 #define PSTATE_H_
+
+///
+/// \file pstate.h
+///
 
 #include "palloc.h"
 #include "pstring.h"
@@ -28,16 +28,22 @@ public:
 	struct datatype_t
 	{
 		datatype_t(std::size_t bsize, bool bintegral, bool bfloat)
-		: size(bsize), is_integral(bintegral), is_float(bfloat), is_custom(false)
+		: m_size(bsize), m_is_integral(bintegral), m_is_float(bfloat), m_is_custom(false)
 		{}
 		explicit datatype_t(bool bcustom)
-		: size(0), is_integral(false), is_float(false), is_custom(bcustom)
+		: m_size(0), m_is_integral(false), m_is_float(false), m_is_custom(bcustom)
 		{}
 
-		const std::size_t size;
-		const bool is_integral;
-		const bool is_float;
-		const bool is_custom;
+		std::size_t size() const noexcept { return m_size; }
+		bool is_integral() const noexcept { return m_is_integral; }
+		bool is_float()    const noexcept { return m_is_float; }
+		bool is_custom()   const noexcept { return m_is_custom; }
+
+	private:
+		std::size_t m_size;
+		bool m_is_integral;
+		bool m_is_float;
+		bool m_is_custom;
 	};
 
 	template<typename T>
@@ -58,13 +64,13 @@ public:
 		virtual void on_post_load(state_manager_t &manager) = 0;
 	protected:
 		callback_t() = default;
-		~callback_t() = default;
+		virtual ~callback_t() = default;
 		COPYASSIGNMOVE(callback_t, default)
 	};
 
 	struct entry_t
 	{
-		using list_t = std::vector<plib::unique_ptr<entry_t>>;
+		using list_t = std::vector<entry_t>;
 
 		entry_t(const pstring &stname, const datatype_t &dt, const void *owner,
 				const std::size_t count, void *ptr)
@@ -73,17 +79,25 @@ public:
 		entry_t(const pstring &stname, const void *owner, callback_t *callback)
 		: m_name(stname), m_dt(datatype_t(true)), m_owner(owner), m_callback(callback), m_count(0), m_ptr(nullptr) { }
 
+		pstring name() const noexcept { return m_name; }
+		datatype_t dt() const noexcept { return m_dt; }
+		const void * owner() const noexcept { return m_owner; }
+		callback_t * callback() const noexcept { return m_callback; }
+		std::size_t count() const noexcept { return m_count; }
+		void * ptr() const noexcept { return m_ptr; }
+
+	private:
 		pstring             m_name;
-		const datatype_t    m_dt;
+		datatype_t          m_dt;
 		const void *        m_owner;
 		callback_t *        m_callback;
-		const std::size_t   m_count;
+		std::size_t         m_count;
 		void *              m_ptr;
 	};
 
 	state_manager_t() = default;
 
-	template<typename C>
+	template<typename C> //, typename std::enable_if<std::is_integral<C>::value || std::is_floating_point<C>::value>::type>
 	void save_item(const void *owner, C &state, const pstring &stname)
 	{
 		save_state_ptr( owner, stname, dtype<C>(), 1, &state);
@@ -101,8 +115,8 @@ public:
 		save_state_ptr(owner, stname, dtype<C>(), count, state);
 	}
 
-	template<typename C>
-	void save_item(const void *owner, std::vector<C> &v, const pstring &stname)
+	template<typename C, typename A>
+	void save_item(const void *owner, std::vector<C, A> &v, const pstring &stname)
 	{
 		save_state_ptr(owner, stname, dtype<C>(), v.size(), v.data());
 	}
@@ -115,19 +129,19 @@ public:
 
 	void save_state_ptr(const void *owner, const pstring &stname, const datatype_t &dt, const std::size_t count, void *ptr)
 	{
-		m_save.push_back(plib::make_unique<entry_t>(stname, dt, owner, count, ptr));
+		m_save.emplace_back(stname, dt, owner, count, ptr);
 	}
 
 	void pre_save()
 	{
 		for (auto & s : m_custom)
-			s->m_callback->on_pre_save(*this);
+			s.callback()->on_pre_save(*this);
 	}
 
 	void post_load()
 	{
 		for (auto & s : m_custom)
-			s->m_callback->on_post_load(*this);
+			s.callback()->on_post_load(*this);
 	}
 
 	void remove_save_items(const void *owner)
@@ -136,14 +150,14 @@ public:
 		while (i != m_save.begin())
 		{
 			i--;
-			if (i->get()->m_owner == owner)
+			if (i->owner() == owner)
 				i = m_save.erase(i);
 		}
 		i = m_custom.end();
 		while (i > m_custom.begin())
 		{
 			i--;
-			if (i->get()->m_owner == owner)
+			if (i->owner() == owner)
 				i = m_custom.erase(i);
 		}
 	}
@@ -152,7 +166,7 @@ public:
 	{
 		std::vector<const entry_t *> ret;
 		for (auto &i : m_save)
-			ret.push_back(i.get());
+			ret.push_back(&i);
 		return ret;
 	}
 
@@ -166,11 +180,11 @@ private:
 
 template<> inline void state_manager_t::save_item(const void *owner, callback_t &state, const pstring &stname)
 {
-	m_custom.push_back(plib::make_unique<entry_t>(stname, owner, &state));
+	m_custom.emplace_back(stname, owner, &state);
 	state.register_state(*this, stname);
 }
 
 
 } // namespace plib
 
-#endif /* PSTATE_H_ */
+#endif // PSTATE_H_

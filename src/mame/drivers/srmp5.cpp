@@ -579,7 +579,7 @@ void srmp5_state::srmp5(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &srmp5_state::st0016_io);
 	m_soundcpu->set_vblank_int("screen", FUNC(srmp5_state::irq0_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

@@ -98,7 +98,7 @@
 #include "bus/lpci/cirrus.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/mc146818.h"
-#include "machine/ataintf.h"
+#include "bus/ata/ataintf.h"
 #include "bus/lpci/pci.h"
 
 #define LOG_CPUIMASK    1

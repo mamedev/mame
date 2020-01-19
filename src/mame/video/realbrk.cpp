@@ -121,11 +121,11 @@ void realbrk_state::vram_2_w(offs_t offset, u16 data, u16 mem_mask)
 void realbrk_state::video_start()
 {
 	/* Backgrounds */
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(realbrk_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x20);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(realbrk_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x20);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(realbrk_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x20);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(realbrk_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x20);
 
 	/* Text */
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(realbrk_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS,   8,  8, 0x40, 0x20);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(realbrk_state::get_tile_info_2)), TILEMAP_SCAN_ROWS,   8,  8, 0x40, 0x20);
 
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(0);

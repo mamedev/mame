@@ -1,9 +1,5 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * poptions.cpp
- *
- */
 
 #include "poptions.h"
 #include "pexception.h"
@@ -11,9 +7,6 @@
 #include "ptypes.h"
 
 namespace plib {
-/***************************************************************************
-    Options
-***************************************************************************/
 
 	option_base::option_base(options &parent, const pstring &help)
 	: m_help(help)
@@ -82,7 +75,7 @@ namespace plib {
 					{
 						if (m_other_args != nullptr)
 						{
-							throw pexception("other args can only be specified once!");
+							pthrow<pexception>("other args can only be specified once!");
 						}
 						else
 						{
@@ -90,7 +83,7 @@ namespace plib {
 						}
 					}
 					else
-						throw pexception("found option with neither short or long tag!" );
+						pthrow<pexception>("found option with neither short or long tag!" );
 				}
 			}
 		}

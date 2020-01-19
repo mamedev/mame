@@ -107,16 +107,16 @@ UPD65031_MEMORY_UPDATE(z88_state::bankswitch_update)
 			switch (bank)
 			{
 				case 0:
-					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x3fff, read8_delegate(FUNC(z88_state::bank0_cart_r), this), write8_delegate(FUNC(z88_state::bank0_cart_w), this));
+					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x3fff, read8_delegate(*this, FUNC(z88_state::bank0_cart_r)), write8_delegate(*this, FUNC(z88_state::bank0_cart_w)));
 					break;
 				case 1:
-					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x7fff, read8_delegate(FUNC(z88_state::bank1_cart_r), this), write8_delegate(FUNC(z88_state::bank1_cart_w), this));
+					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x7fff, read8_delegate(*this, FUNC(z88_state::bank1_cart_r)), write8_delegate(*this, FUNC(z88_state::bank1_cart_w)));
 					break;
 				case 2:
-					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xbfff, read8_delegate(FUNC(z88_state::bank2_cart_r), this), write8_delegate(FUNC(z88_state::bank2_cart_w), this));
+					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xbfff, read8_delegate(*this, FUNC(z88_state::bank2_cart_r)), write8_delegate(*this, FUNC(z88_state::bank2_cart_w)));
 					break;
 				case 3:
-					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc000, 0xffff, read8_delegate(FUNC(z88_state::bank3_cart_r), this), write8_delegate(FUNC(z88_state::bank3_cart_w), this));
+					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc000, 0xffff, read8_delegate(*this, FUNC(z88_state::bank3_cart_r)), write8_delegate(*this, FUNC(z88_state::bank3_cart_w)));
 					break;
 			}
 
@@ -619,8 +619,8 @@ void z88_state::z88(machine_config &config)
 	m_blink->int_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_blink->nmi_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_blink->spkr_wr_callback().set("speaker", FUNC(speaker_sound_device::level_w));
-	m_blink->set_screen_update_callback(FUNC(z88_state::lcd_update), this);
-	m_blink->set_memory_update_callback(FUNC(z88_state::bankswitch_update), this);
+	m_blink->set_screen_update_callback(FUNC(z88_state::lcd_update));
+	m_blink->set_memory_update_callback(FUNC(z88_state::bankswitch_update));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

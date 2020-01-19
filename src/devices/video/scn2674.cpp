@@ -86,6 +86,7 @@ scn2674_device::scn2674_device(const machine_config &mconfig, device_type type, 
 	, m_dbl1(0)
 	, m_char_buffer(0), m_attr_buffer(0)
 	, m_linecounter(0), m_address(0), m_start1change(0)
+	, m_display_cb(*this)
 	, m_scanline_timer(nullptr)
 	, m_breq_timer(nullptr)
 	, m_vblank_timer(nullptr)
@@ -97,18 +98,15 @@ scn2674_device::scn2674_device(const machine_config &mconfig, device_type type, 
 
 device_memory_interface::space_config_vector scn2674_device::memory_space_config() const
 {
-	return has_configured_map(1) ? space_config_vector {
-		std::make_pair(0, &m_char_space_config),
-		std::make_pair(1, &m_attr_space_config)
-	} : space_config_vector {
-		std::make_pair(0, &m_char_space_config)
-	};
+	return has_configured_map(1)
+			? space_config_vector{ std::make_pair(0, &m_char_space_config), std::make_pair(1, &m_attr_space_config) }
+			: space_config_vector{ std::make_pair(0, &m_char_space_config) };
 }
 
 void scn2674_device::device_start()
 {
 	// resolve callbacks
-	m_display_cb.bind_relative_to(*owner());
+	m_display_cb.resolve();
 	m_intr_cb.resolve_safe();
 	m_breq_cb.resolve_safe();
 	m_mbc_cb.resolve_safe();
@@ -1114,6 +1112,7 @@ TIMER_CALLBACK_MEMBER(scn2674_device::scanline_timer)
 
 	const bool mbc = (charrow == 0) && (m_buffer_mode_select == 3);
 	const bool blink_on = (screen().frame_number() & (m_character_blink_rate_divisor >> 1)) != 0;
+	const uint16_t last_address = (m_display_buffer_last_address << 10) | 0x3ff;
 	for (int i = 0; i < m_character_per_row; i++)
 	{
 		u8 charcode, attrcode = 0;
@@ -1156,10 +1155,11 @@ TIMER_CALLBACK_MEMBER(scn2674_device::scanline_timer)
 							blink_on);
 
 		}
-		address = (address + 1) & 0xffff;
 
-		if (address > ((m_display_buffer_last_address << 10) | 0x3ff))
-			address = m_display_buffer_first_address;
+		if ((address & 0x3fff) == last_address)
+			address = (address & 0xc000) | m_display_buffer_first_address;
+		else
+			address = (address + 1) & 0xffff;
 	}
 
 	if (!m_display_enabled)

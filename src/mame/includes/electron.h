@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Wilbert Pol, Nigel Barnes
 /*****************************************************************************
  *
  * includes/electron.h
@@ -15,11 +15,16 @@
 #pragma once
 
 #include "machine/ram.h"
+#include "machine/6522via.h"
+#include "machine/input_merger.h"
 #include "imagedev/cassette.h"
 #include "sound/beep.h"
 #include "emupal.h"
 
 #include "bus/electron/exp.h"
+#include "bus/bbc/userport/userport.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 /* Interrupts */
 #define INT_HIGH_TONE       0x40
@@ -36,6 +41,7 @@ public:
 	electron_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_irqs(*this, "irqs")
 		, m_screen(*this, "screen")
 		, m_cassette(*this, "cassette")
 		, m_beeper(*this, "beeper")
@@ -54,7 +60,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 
-private:
+protected:
 	enum
 	{
 		TIMER_TAPE_HANDLER,
@@ -69,12 +75,12 @@ private:
 	DECLARE_READ8_MEMBER(electron64_fetch_r);
 	DECLARE_READ8_MEMBER(electron_mem_r);
 	DECLARE_WRITE8_MEMBER(electron_mem_w);
-	DECLARE_READ8_MEMBER(electron_paged_r);
-	DECLARE_WRITE8_MEMBER(electron_paged_w);
+	virtual DECLARE_READ8_MEMBER(electron_paged_r);
+	virtual DECLARE_WRITE8_MEMBER(electron_paged_w);
 	DECLARE_READ8_MEMBER(electron_mos_r);
 	DECLARE_WRITE8_MEMBER(electron_mos_w);
-	DECLARE_READ8_MEMBER(electron_fred_r);
-	DECLARE_WRITE8_MEMBER(electron_fred_w);
+	virtual DECLARE_READ8_MEMBER(electron_fred_r);
+	virtual DECLARE_WRITE8_MEMBER(electron_fred_w);
 	DECLARE_READ8_MEMBER(electron_jim_r);
 	DECLARE_WRITE8_MEMBER(electron_jim_w);
 	DECLARE_READ8_MEMBER(electron_sheila_r);
@@ -101,6 +107,7 @@ private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<input_merger_device> m_irqs;
 	required_device<screen_device> m_screen;
 	required_device<cassette_image_device> m_cassette;
 	required_device<beep_device> m_beeper;
@@ -146,5 +153,44 @@ private:
 	bool m_mrb_mapped;
 	bool m_vdu_drivers;
 };
+
+
+class electronsp_state : public electron_state
+{
+public:
+	electronsp_state(const machine_config &mconfig, device_type type, const char *tag)
+		: electron_state(mconfig, type, tag)
+		, m_region_sp64(*this, "sp64")
+		, m_via(*this, "via6522")
+		, m_userport(*this, "userport")
+		, m_romi(*this, "romi%u", 1)
+		, m_rompages(*this, "ROMPAGES")
+	{ }
+
+	void electronsp(machine_config &config);
+
+protected:
+	virtual DECLARE_READ8_MEMBER(electron_paged_r) override;
+	virtual DECLARE_WRITE8_MEMBER(electron_paged_w) override;
+	virtual DECLARE_READ8_MEMBER(electron_fred_r) override;
+	virtual DECLARE_WRITE8_MEMBER(electron_fred_w) override;
+
+	virtual void machine_start() override;
+
+private:
+	required_memory_region m_region_sp64;
+	required_device<via6522_device> m_via;
+	required_device<bbc_userport_slot_device> m_userport;
+	required_device_array<generic_slot_device, 2> m_romi;
+	required_ioport m_rompages;
+
+	uint8_t m_sp64_bank;
+	std::unique_ptr<uint8_t[]> m_sp64_ram;
+
+	image_init_result load_rom(device_image_interface &image, generic_slot_device *slot);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom1_load) { return load_rom(image, m_romi[0]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom2_load) { return load_rom(image, m_romi[1]); }
+};
+
 
 #endif // MAME_INCLUDES_ELECTRON_H

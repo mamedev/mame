@@ -636,7 +636,7 @@ void ldv1000_state::ldv1000(machine_config &config)
 {
 	ldplayer_ntsc(config);
 	pioneer_ldv1000_device &laserdisc(PIONEER_LDV1000(config, "laserdisc"));
-	laserdisc.set_get_disc(FUNC(ldv1000_state::get_disc), this);
+	laserdisc.set_get_disc(FUNC(ldv1000_state::get_disc));
 	laserdisc.add_ntsc_screen(config, "screen");
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -650,7 +650,7 @@ void pr8210_state::pr8210(machine_config &config)
 {
 	ldplayer_ntsc(config);
 	pioneer_pr8210_device &laserdisc(PIONEER_PR8210(config, "laserdisc"));
-	laserdisc.set_get_disc(FUNC(pr8210_state::get_disc), this);
+	laserdisc.set_get_disc(FUNC(pr8210_state::get_disc));
 	laserdisc.add_ntsc_screen(config, "screen");
 
 	SPEAKER(config, "lspeaker").front_left();

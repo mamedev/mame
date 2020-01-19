@@ -1,8 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, AJR
 /**********************************************************************
 
     Motorola MC68901 Multi Function Peripheral emulation
+
+    This chip was originally designed by Mostek (MK68901) as a 68000-
+    oriented evolution of the Z80 STI.
 
 **********************************************************************/
 
@@ -34,12 +37,7 @@
         the GLUE is essentially invisible w.r.t IPL.  The CPU and the
         MFP manage to add the delays all by themselves.
 
-    - divide serial clock by 16
-    - synchronous mode
-    - 1.5/2 stop bits
-    - interrupt on receiver break end
-    - interrupt on character boundaries during break transmission
-    - loopback mode
+    - RR & TR outputs
 
 */
 
@@ -47,7 +45,11 @@
 #include "mc68901.h"
 #include "cpu/m68000/m68000.h"
 
-//#define VERBOSE 1
+#define LOG_GENERAL (1 << 0U)
+#define LOG_RCV     (1 << 1U)
+#define LOG_XMIT    (1 << 2U)
+
+//#define VERBOSE (LOG_GENERAL | LOG_RCV | LOG_XMIT)
 #include "logmacro.h"
 
 
@@ -61,105 +63,104 @@ DEFINE_DEVICE_TYPE(MC68901, mc68901_device, "mc68901", "Motorola MC68901 MFP")
 //**************************************************************************
 
 
-#define AER_GPIP_0              0x01
-#define AER_GPIP_1              0x02
-#define AER_GPIP_2              0x04
-#define AER_GPIP_3              0x08
-#define AER_GPIP_4              0x10
-#define AER_GPIP_5              0x20
-#define AER_GPIP_6              0x40
-#define AER_GPIP_7              0x80
+enum : u8 {
+	VR_S                  = 0x08
+};
 
+enum : u16 {
+	IR_GPIP_0             = 0x0001,
+	IR_GPIP_1             = 0x0002,
+	IR_GPIP_2             = 0x0004,
+	IR_GPIP_3             = 0x0008,
+	IR_TIMER_D            = 0x0010,
+	IR_TIMER_C            = 0x0020,
+	IR_GPIP_4             = 0x0040,
+	IR_GPIP_5             = 0x0080,
+	IR_TIMER_B            = 0x0100,
+	IR_XMIT_ERROR         = 0x0200,
+	IR_XMIT_BUFFER_EMPTY  = 0x0400,
+	IR_RCV_ERROR          = 0x0800,
+	IR_RCV_BUFFER_FULL    = 0x1000,
+	IR_TIMER_A            = 0x2000,
+	IR_GPIP_6             = 0x4000,
+	IR_GPIP_7             = 0x8000
+};
 
-#define VR_S                    0x08
+enum : u8 {
+	TCR_TIMER_STOPPED     = 0x00,
+	TCR_TIMER_DELAY_4     = 0x01,
+	TCR_TIMER_DELAY_10    = 0x02,
+	TCR_TIMER_DELAY_16    = 0x03,
+	TCR_TIMER_DELAY_50    = 0x04,
+	TCR_TIMER_DELAY_64    = 0x05,
+	TCR_TIMER_DELAY_100   = 0x06,
+	TCR_TIMER_DELAY_200   = 0x07,
+	TCR_TIMER_EVENT       = 0x08,
+	TCR_TIMER_PULSE_4     = 0x09,
+	TCR_TIMER_PULSE_10    = 0x0a,
+	TCR_TIMER_PULSE_16    = 0x0b,
+	TCR_TIMER_PULSE_50    = 0x0c,
+	TCR_TIMER_PULSE_64    = 0x0d,
+	TCR_TIMER_PULSE_100   = 0x0e,
+	TCR_TIMER_PULSE_200   = 0x0f,
+	TCR_TIMER_RESET       = 0x10
+};
 
+enum : u8 {
+	UCR_PARITY_ENABLED    = 0x04,
+	UCR_PARITY_EVEN       = 0x02,
+	UCR_PARITY_ODD        = 0x00,
+	UCR_WORD_LENGTH_8     = 0x00,
+	UCR_WORD_LENGTH_7     = 0x20,
+	UCR_WORD_LENGTH_6     = 0x40,
+	UCR_WORD_LENGTH_5     = 0x60,
+	UCR_WORD_LENGTH_MASK  = 0x60,
+	UCR_START_STOP_0_0    = 0x00,
+	UCR_START_STOP_1_1    = 0x08,
+	UCR_START_STOP_1_15   = 0x10,
+	UCR_START_STOP_1_2    = 0x18,
+	UCR_CLOCK_DIVIDE_16   = 0x80,
+	UCR_CLOCK_DIVIDE_1    = 0x00
+};
 
-#define IR_GPIP_0               0x0001
-#define IR_GPIP_1               0x0002
-#define IR_GPIP_2               0x0004
-#define IR_GPIP_3               0x0008
-#define IR_TIMER_D              0x0010
-#define IR_TIMER_C              0x0020
-#define IR_GPIP_4               0x0040
-#define IR_GPIP_5               0x0080
-#define IR_TIMER_B              0x0100
-#define IR_XMIT_ERROR           0x0200
-#define IR_XMIT_BUFFER_EMPTY    0x0400
-#define IR_RCV_ERROR            0x0800
-#define IR_RCV_BUFFER_FULL      0x1000
-#define IR_TIMER_A              0x2000
-#define IR_GPIP_6               0x4000
-#define IR_GPIP_7               0x8000
+enum : u8 {
+	RSR_RCV_ENABLE        = 0x01,
+	RSR_SYNC_STRIP_ENABLE = 0x02,
+	RSR_MATCH             = 0x04,
+	RSR_CHAR_IN_PROGRESS  = 0x04,
+	RSR_FOUND_SEARCH      = 0x08,
+	RSR_BREAK             = 0x08,
+	RSR_FRAME_ERROR       = 0x10,
+	RSR_PARITY_ERROR      = 0x20,
+	RSR_OVERRUN_ERROR     = 0x40,
+	RSR_BUFFER_FULL       = 0x80
+};
 
-
-#define TCR_TIMER_STOPPED       0x00
-#define TCR_TIMER_DELAY_4       0x01
-#define TCR_TIMER_DELAY_10      0x02
-#define TCR_TIMER_DELAY_16      0x03
-#define TCR_TIMER_DELAY_50      0x04
-#define TCR_TIMER_DELAY_64      0x05
-#define TCR_TIMER_DELAY_100     0x06
-#define TCR_TIMER_DELAY_200     0x07
-#define TCR_TIMER_EVENT         0x08
-#define TCR_TIMER_PULSE_4       0x09
-#define TCR_TIMER_PULSE_10      0x0a
-#define TCR_TIMER_PULSE_16      0x0b
-#define TCR_TIMER_PULSE_50      0x0c
-#define TCR_TIMER_PULSE_64      0x0d
-#define TCR_TIMER_PULSE_100     0x0e
-#define TCR_TIMER_PULSE_200     0x0f
-#define TCR_TIMER_RESET         0x10
-
-
-#define UCR_PARITY_ENABLED      0x04
-#define UCR_PARITY_EVEN         0x02
-#define UCR_PARITY_ODD          0x00
-#define UCR_WORD_LENGTH_8       0x00
-#define UCR_WORD_LENGTH_7       0x20
-#define UCR_WORD_LENGTH_6       0x40
-#define UCR_WORD_LENGTH_5       0x60
-#define UCR_START_STOP_0_0      0x00
-#define UCR_START_STOP_1_1      0x08
-#define UCR_START_STOP_1_15     0x10
-#define UCR_START_STOP_1_2      0x18
-#define UCR_CLOCK_DIVIDE_16     0x80
-#define UCR_CLOCK_DIVIDE_1      0x00
-
-
-#define RSR_RCV_ENABLE          0x01
-#define RSR_SYNC_STRIP_ENABLE   0x02
-#define RSR_MATCH               0x04
-#define RSR_CHAR_IN_PROGRESS    0x04
-#define RSR_FOUND_SEARCH        0x08
-#define RSR_BREAK               0x08
-#define RSR_FRAME_ERROR         0x10
-#define RSR_PARITY_ERROR        0x20
-#define RSR_OVERRUN_ERROR       0x40
-#define RSR_BUFFER_FULL         0x80
-
-#define TSR_XMIT_ENABLE         0x01
-#define TSR_OUTPUT_HI_Z         0x00
-#define TSR_OUTPUT_LOW          0x02
-#define TSR_OUTPUT_HIGH         0x04
-#define TSR_OUTPUT_LOOP         0x06
-#define TSR_OUTPUT_MASK         0x06
-#define TSR_BREAK               0x08
-#define TSR_END_OF_XMIT         0x10
-#define TSR_AUTO_TURNAROUND     0x20
-#define TSR_UNDERRUN_ERROR      0x40
-#define TSR_BUFFER_EMPTY        0x80
+enum : u8 {
+	TSR_XMIT_ENABLE       = 0x01,
+	TSR_OUTPUT_HI_Z       = 0x00,
+	TSR_OUTPUT_LOW        = 0x02,
+	TSR_OUTPUT_HIGH       = 0x04,
+	TSR_OUTPUT_LOOP       = 0x06,
+	TSR_OUTPUT_MASK       = 0x06,
+	TSR_BREAK             = 0x08,
+	TSR_END_OF_XMIT       = 0x10,
+	TSR_AUTO_TURNAROUND   = 0x20,
+	TSR_UNDERRUN_ERROR    = 0x40,
+	TSR_BUFFER_EMPTY      = 0x80
+};
 
 #define DIVISOR PRESCALER[data & 0x07]
 
 
-const int mc68901_device::INT_MASK_GPIO[] =
+const u16 mc68901_device::INT_MASK_GPIO[] =
 {
 	IR_GPIP_0, IR_GPIP_1, IR_GPIP_2, IR_GPIP_3,
 	IR_GPIP_4, IR_GPIP_5, IR_GPIP_6, IR_GPIP_7
 };
 
 
-const int mc68901_device::INT_MASK_TIMER[] =
+const u16 mc68901_device::INT_MASK_TIMER[] =
 {
 	IR_TIMER_A, IR_TIMER_B, IR_TIMER_C, IR_TIMER_D
 };
@@ -190,11 +191,27 @@ inline void mc68901_device::check_interrupts()
 	}
 }
 
-inline void mc68901_device::take_interrupt(uint16_t mask)
+inline void mc68901_device::take_interrupt(u16 mask)
 {
 	m_ipr |= mask;
 
 	check_interrupts();
+}
+
+inline void mc68901_device::tx_buffer_empty()
+{
+	if (m_ier & IR_XMIT_BUFFER_EMPTY)
+	{
+		take_interrupt(IR_XMIT_BUFFER_EMPTY);
+	}
+}
+
+inline void mc68901_device::tx_error()
+{
+	if (m_ier & IR_XMIT_ERROR)
+	{
+		take_interrupt(IR_XMIT_ERROR);
+	}
 }
 
 inline void mc68901_device::rx_buffer_full()
@@ -312,7 +329,7 @@ inline void mc68901_device::gpio_input(int bit, int state)
 
 void mc68901_device::gpio_output()
 {
-	uint8_t new_gpio_output = m_gpip & m_ddr;
+	u8 new_gpio_output = m_gpip & m_ddr;
 
 	if (m_gpio_output != new_gpio_output)
 	{
@@ -329,12 +346,9 @@ void mc68901_device::gpio_output()
 //  mc68901_device - constructor
 //-------------------------------------------------
 
-mc68901_device::mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mc68901_device::mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MC68901, tag, owner, clock),
-		device_serial_interface(mconfig, *this),
 		m_timer_clock(0),
-		m_rx_clock(0),
-		m_tx_clock(0),
 		m_out_irq_cb(*this),
 		m_out_gpio_cb(*this),
 		m_out_tao_cb(*this),
@@ -347,8 +361,28 @@ mc68901_device::mc68901_device(const machine_config &mconfig, const char *tag, d
 		m_iack_chain_cb(*this),
 		m_aer(0),
 		m_ier(0),
+		m_scr(0),
+		m_scr_parity(false),
+		m_transmit_buffer(0),
+		m_receive_buffer(0),
 		m_gpio_input(0),
-		m_gpio_output(0xff)
+		m_gpio_output(0xff),
+		m_rframe(0),
+		m_rclk(0),
+		m_rbits(0),
+		m_si_scan(0xff),
+		m_next_rsr(0),
+		m_rc(true),
+		m_si(true),
+		m_last_si(true),
+		m_rparity(false),
+		m_osr(0),
+		m_tclk(0),
+		m_tbits(0),
+		m_tc(true),
+		m_so(false),
+		m_tparity(false),
+		m_underrun(false)
 {
 }
 
@@ -359,8 +393,6 @@ mc68901_device::mc68901_device(const machine_config &mconfig, const char *tag, d
 
 void mc68901_device::device_start()
 {
-	m_start_bit_hack_for_external_clocks = true;
-
 	/* resolve callbacks */
 	m_out_irq_cb.resolve_safe();
 	m_out_gpio_cb.resolve_safe();
@@ -379,16 +411,6 @@ void mc68901_device::device_start()
 	m_timer[TIMER_C] = timer_alloc(TIMER_C);
 	m_timer[TIMER_D] = timer_alloc(TIMER_D);
 
-	if (m_rx_clock > 0)
-	{
-		set_rcv_rate(m_rx_clock);
-	}
-
-	if (m_tx_clock > 0)
-	{
-		set_tra_rate(m_tx_clock);
-	}
-
 	/* register for state saving */
 	save_item(NAME(m_gpip));
 	save_item(NAME(m_aer));
@@ -406,17 +428,30 @@ void mc68901_device::device_start()
 	save_item(NAME(m_to));
 	save_item(NAME(m_ti));
 	save_item(NAME(m_scr));
+	save_item(NAME(m_scr_parity));
 	save_item(NAME(m_ucr));
 	save_item(NAME(m_rsr));
 	save_item(NAME(m_tsr));
 	save_item(NAME(m_transmit_buffer));
-	save_item(NAME(m_transmit_pending));
 	save_item(NAME(m_receive_buffer));
-	save_item(NAME(m_overrun_pending));
 	save_item(NAME(m_gpio_input));
 	save_item(NAME(m_gpio_output));
-	save_item(NAME(m_rsr_read));
+	save_item(NAME(m_rframe));
+	save_item(NAME(m_rclk));
+	save_item(NAME(m_rbits));
+	save_item(NAME(m_si_scan));
 	save_item(NAME(m_next_rsr));
+	save_item(NAME(m_rc));
+	save_item(NAME(m_si));
+	save_item(NAME(m_last_si));
+	save_item(NAME(m_rparity));
+	save_item(NAME(m_osr));
+	save_item(NAME(m_tclk));
+	save_item(NAME(m_tbits));
+	save_item(NAME(m_tc));
+	save_item(NAME(m_so));
+	save_item(NAME(m_tparity));
+	save_item(NAME(m_underrun));
 }
 
 
@@ -426,40 +461,41 @@ void mc68901_device::device_start()
 
 void mc68901_device::device_reset()
 {
-	m_tsr = 0;
-	m_transmit_pending = false;
-	m_overrun_pending = false;
+	m_rsr = 0;
+	m_tsr = TSR_BUFFER_EMPTY;
+	m_underrun = false;
+	m_rclk = 0;
+	m_tclk = 0;
 
 	// Avoid read-before-write
 	m_ipr = m_imr = 0;
 
+	m_rframe = 0x100;
 	m_next_rsr = 0;
 
 	memset(m_tmc, 0, sizeof(m_tmc));
 	memset(m_ti, 0, sizeof(m_ti));
 	memset(m_to, 0, sizeof(m_to));
 
-	register_w(REGISTER_GPIP, 0);
-	register_w(REGISTER_AER, 0);
-	register_w(REGISTER_DDR, 0);
-	register_w(REGISTER_IERA, 0);
-	register_w(REGISTER_IERB, 0);
-	register_w(REGISTER_IPRA, 0);
-	register_w(REGISTER_IPRB, 0);
-	register_w(REGISTER_ISRA, 0);
-	register_w(REGISTER_ISRB, 0);
-	register_w(REGISTER_IMRA, 0);
-	register_w(REGISTER_IMRB, 0);
-	register_w(REGISTER_VR, 0);
-	register_w(REGISTER_TACR, 0);
-	register_w(REGISTER_TBCR, 0);
-	register_w(REGISTER_TCDCR, 0);
-	register_w(REGISTER_SCR, 0);
-	register_w(REGISTER_UCR, 0);
-	register_w(REGISTER_RSR, 0);
+	write(REGISTER_GPIP, 0);
+	write(REGISTER_AER, 0);
+	write(REGISTER_DDR, 0);
+	write(REGISTER_IERA, 0);
+	write(REGISTER_IERB, 0);
+	write(REGISTER_IPRA, 0);
+	write(REGISTER_IPRB, 0);
+	write(REGISTER_ISRA, 0);
+	write(REGISTER_ISRB, 0);
+	write(REGISTER_IMRA, 0);
+	write(REGISTER_IMRB, 0);
+	write(REGISTER_VR, 0);
+	write(REGISTER_TACR, 0);
+	write(REGISTER_TBCR, 0);
+	write(REGISTER_TCDCR, 0);
+	write(REGISTER_SCR, 0);
+	write(REGISTER_UCR, 0);
 
-	transmit_register_reset();
-	receive_register_reset();
+	set_so(true);
 }
 
 
@@ -475,87 +511,10 @@ void mc68901_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 
 //-------------------------------------------------
-//  tra_callback -
+//  read - read from one MFP register
 //-------------------------------------------------
 
-void mc68901_device::tra_callback()
-{
-	m_out_so_cb(transmit_register_get_data_bit());
-}
-
-
-//-------------------------------------------------
-//  tra_complete -
-//-------------------------------------------------
-
-void mc68901_device::tra_complete()
-{
-	if (m_tsr & TSR_XMIT_ENABLE)
-	{
-		if (m_transmit_pending)
-		{
-			transmit_register_setup(m_transmit_buffer);
-			m_transmit_pending = false;
-			m_tsr |= TSR_BUFFER_EMPTY;
-
-			if (m_ier & IR_XMIT_BUFFER_EMPTY)
-			{
-				take_interrupt(IR_XMIT_BUFFER_EMPTY);
-			}
-		}
-		else
-		{
-			m_tsr |= TSR_UNDERRUN_ERROR;
-			// TODO: transmit error?
-		}
-	}
-	else
-	{
-		m_tsr |= TSR_END_OF_XMIT;
-	}
-}
-
-
-//-------------------------------------------------
-//  rcv_complete -
-//-------------------------------------------------
-
-void mc68901_device::rcv_complete()
-{
-	receive_register_extract();
-	if (m_rsr & RSR_BUFFER_FULL)
-	{
-		m_overrun_pending = true;
-	}
-	else
-	{
-		m_receive_buffer = get_received_char();
-		m_rsr |= RSR_BUFFER_FULL;
-		LOG("Received Character: %02x\n", m_receive_buffer);
-
-		if (is_receive_framing_error())
-			m_rsr |= RSR_FRAME_ERROR;
-		else
-			m_rsr &= ~RSR_FRAME_ERROR;
-
-		if (is_receive_parity_error())
-			m_rsr |= RSR_PARITY_ERROR;
-		else
-			m_rsr &= ~RSR_PARITY_ERROR;
-
-		if ((m_rsr & (RSR_FRAME_ERROR | RSR_PARITY_ERROR)) && (m_ier & IR_RCV_ERROR))
-			rx_error();
-		else
-			rx_buffer_full();
-	}
-}
-
-
-//-------------------------------------------------
-//  read -
-//-------------------------------------------------
-
-READ8_MEMBER( mc68901_device::read )
+u8 mc68901_device::read(offs_t offset)
 {
 	switch (offset)
 	{
@@ -586,7 +545,7 @@ READ8_MEMBER( mc68901_device::read )
 	case REGISTER_UCR:   return m_ucr;
 	case REGISTER_RSR:
 		{
-			uint8_t rsr = m_rsr;
+			u8 rsr = m_rsr;
 			if (!machine().side_effects_disabled())
 				m_rsr &= ~RSR_OVERRUN_ERROR;
 			return rsr;
@@ -595,8 +554,8 @@ READ8_MEMBER( mc68901_device::read )
 	case REGISTER_TSR:
 		{
 			/* clear UE bit (in reality, this won't be cleared until one full clock cycle of the transmitter has passed since the bit was set) */
-			uint8_t tsr = m_tsr;
-			if (!machine().side_effects_disabled())
+			u8 tsr = m_tsr;
+			if (!machine().side_effects_disabled() && !m_underrun)
 				m_tsr &= ~TSR_UNDERRUN_ERROR;
 			return tsr;
 		}
@@ -605,10 +564,15 @@ READ8_MEMBER( mc68901_device::read )
 		if (!machine().side_effects_disabled())
 		{
 			m_rsr &= ~RSR_BUFFER_FULL;
-			if (m_overrun_pending)
+			if (m_next_rsr != 0)
 			{
-				m_overrun_pending = false;
-				m_rsr |= RSR_OVERRUN_ERROR;
+				m_rsr |= m_next_rsr;
+				m_next_rsr = 0;
+				rx_error();
+			}
+			if ((m_rsr & RSR_BREAK) && BIT(m_rframe, 9))
+			{
+				m_rsr &= ~RSR_BREAK;
 				rx_error();
 			}
 		}
@@ -621,10 +585,10 @@ READ8_MEMBER( mc68901_device::read )
 
 
 //-------------------------------------------------
-//  register_w -
+//  write - write to one MFP register
 //-------------------------------------------------
 
-void mc68901_device::register_w(offs_t offset, uint8_t data)
+void mc68901_device::write(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -918,6 +882,7 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 		LOG("MC68901 Sync Character : %x\n", data);
 
 		m_scr = data;
+		m_scr_parity = BIT(population_count_32(data), 0);
 		break;
 
 	case REGISTER_UCR:
@@ -932,60 +897,41 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 		case UCR_WORD_LENGTH_5: data_bit_count = 5; break;
 		}
 
-		parity_t parity;
-
 		if (data & UCR_PARITY_ENABLED)
 		{
 			if (data & UCR_PARITY_EVEN)
 			{
 				LOG("MC68901 Parity : Even\n");
-
-				parity = PARITY_EVEN;
 			}
 			else
 			{
 				LOG("MC68901 Parity : Odd\n");
-
-				parity = PARITY_ODD;
 			}
 		}
 		else
 		{
 			LOG("MC68901 Parity : Disabled\n");
-
-			parity = PARITY_NONE;
 		}
 
 		LOG("MC68901 Word Length : %u bits\n", data_bit_count);
 
 
-		int start_bits;
-		stop_bits_t stop_bits;
-
 		switch (data & 0x18)
 		{
 		case UCR_START_STOP_0_0:
 		default:
-			start_bits = 0;
-			stop_bits = STOP_BITS_0;
 			LOG("MC68901 Start Bits : 0, Stop Bits : 0, Format : synchronous\n");
 			break;
 
 		case UCR_START_STOP_1_1:
-			start_bits = 1;
-			stop_bits = STOP_BITS_1;
 			LOG("MC68901 Start Bits : 1, Stop Bits : 1, Format : asynchronous\n");
 			break;
 
 		case UCR_START_STOP_1_15:
-			start_bits = 1;
-			stop_bits = STOP_BITS_1_5;
 			LOG("MC68901 Start Bits : 1, Stop Bits : 1.5, Format : asynchronous\n");
 			break;
 
 		case UCR_START_STOP_1_2:
-			start_bits = 1;
-			stop_bits = STOP_BITS_2;
 			LOG("MC68901 Start Bits : 1, Stop Bits : 2, Format : asynchronous\n");
 			break;
 		}
@@ -998,9 +944,6 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 		{
 			LOG("MC68901 Rx/Tx Clock Divisor : 1\n");
 		}
-
-		set_data_frame(start_bits, data_bit_count, parity, stop_bits);
-		receive_register_reset();
 
 		m_ucr = data;
 		}
@@ -1015,20 +958,32 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 		else
 		{
 			LOG("MC68901 Receiver Enabled\n");
+			m_rsr |= RSR_RCV_ENABLE;
 
 			if (data & RSR_SYNC_STRIP_ENABLE)
 			{
 				LOG("MC68901 Sync Strip Enabled\n");
+				m_rsr |= RSR_SYNC_STRIP_ENABLE;
 			}
 			else
 			{
 				LOG("MC68901 Sync Strip Disabled\n");
+				m_rsr &= ~RSR_SYNC_STRIP_ENABLE;
 			}
 
-			if (data & RSR_FOUND_SEARCH)
-				LOG("MC68901 Receiver Search Mode Enabled\n");
-
-			m_rsr = data & 0x0b;
+			if ((m_ucr & UCR_START_STOP_1_2) == UCR_START_STOP_0_0)
+			{
+				if (data & RSR_FOUND_SEARCH)
+				{
+					LOG("MC68901 Receiver Search Mode Disabled\n");
+					m_rsr |= RSR_FOUND_SEARCH;
+				}
+				else
+				{
+					LOG("MC68901 Receiver Search Mode Disabled\n");
+					m_rsr &= ~RSR_FOUND_SEARCH;
+				}
+			}
 		}
 		break;
 
@@ -1037,12 +992,11 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 
 		if ((data & TSR_XMIT_ENABLE) == 0)
 		{
-			LOG("MC68901 Transmitter Disabled\n");
-
 			m_tsr &= ~TSR_UNDERRUN_ERROR;
+			m_underrun = false;
 
-			if (is_transmit_register_empty())
-				m_tsr |= TSR_END_OF_XMIT;
+			if (m_tbits == 0)
+				set_so((m_tsr & TSR_OUTPUT_MASK) != TSR_OUTPUT_LOW);
 		}
 		else
 		{
@@ -1083,40 +1037,19 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 			}
 
 			m_tsr &= ~TSR_END_OF_XMIT;
-
-			if (m_transmit_pending && is_transmit_register_empty())
-			{
-				transmit_register_setup(m_transmit_buffer);
-				m_transmit_pending = false;
-			}
-			if (!m_transmit_pending)
-				m_tsr |= TSR_BUFFER_EMPTY;
 		}
 		break;
 
 	case REGISTER_UDR:
 		LOG("MC68901 UDR %x\n", data);
 		m_transmit_buffer = data;
-		m_transmit_pending = true;
 		m_tsr &= ~TSR_BUFFER_EMPTY;
-
-		if ((m_tsr & TSR_XMIT_ENABLE) && is_transmit_register_empty())
-		{
-			transmit_register_setup(m_transmit_buffer);
-			m_transmit_pending = false;
-			m_tsr |= TSR_BUFFER_EMPTY;
-		}
 		break;
 	}
 }
 
-WRITE8_MEMBER( mc68901_device::write )
-{
-	register_w(offset, data);
-}
 
-
-uint8_t mc68901_device::get_vector()
+u8 mc68901_device::get_vector()
 {
 	for (int ch = 15; ch >= 0; ch--)
 	{
@@ -1167,7 +1100,413 @@ WRITE_LINE_MEMBER( mc68901_device::tbi_w )
 	timer_input(TIMER_B, state);
 }
 
-WRITE_LINE_MEMBER(mc68901_device::write_rx)
+//**************************************************************************
+//  USART
+//**************************************************************************
+
+//-------------------------------------------------
+//  si_w - serial data input for receiver
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(mc68901_device::si_w)
 {
-	device_serial_interface::rx_w(state);
+	m_si = state;
+}
+
+//-------------------------------------------------
+//  rc_w - receiver clock input
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(mc68901_device::rc_w)
+{
+	if (state != m_rc)
+	{
+		// receiver active on rising edge
+		m_rc = state;
+		if (state && (m_rsr & RSR_RCV_ENABLE) && (m_tsr & TSR_OUTPUT_MASK) != TSR_OUTPUT_LOOP)
+			rx_clock(m_si);
+	}
+}
+
+//-------------------------------------------------
+//  tc_w - transmitter clock input
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(mc68901_device::tc_w)
+{
+	if (state != m_tc)
+	{
+		// transmitter active on falling edge
+		m_tc = state;
+		if (!state && ((m_tsr & TSR_XMIT_ENABLE) || !(m_tsr & TSR_END_OF_XMIT)))
+			tx_clock();
+		else if (state && (m_rsr & RSR_RCV_ENABLE) && (m_tsr & TSR_OUTPUT_MASK) == TSR_OUTPUT_LOOP)
+			rx_clock(m_so);
+	}
+}
+
+//-------------------------------------------------
+//  set_so - set serial output
+//-------------------------------------------------
+
+void mc68901_device::set_so(bool state)
+{
+	if (m_so != state)
+	{
+		m_so = state;
+		m_out_so_cb(state);
+	}
+}
+
+//-------------------------------------------------
+//  rx_frame_start - begin a new frame of received
+//  data (following start bit for async mode)
+//-------------------------------------------------
+
+void mc68901_device::rx_frame_start()
+{
+	m_rframe = 0;
+	m_rbits = (m_ucr & UCR_WORD_LENGTH_MASK) >> 5;
+	m_rparity = (m_ucr & UCR_PARITY_EVEN) == UCR_PARITY_ODD;
+}
+
+//-------------------------------------------------
+//  rx_sync_found - notify that a sync character
+//  was found
+//-------------------------------------------------
+
+void mc68901_device::rx_sync_found()
+{
+	m_rsr |= RSR_FOUND_SEARCH;
+	LOGMASKED(LOG_RCV, "USART sync character found (%02X)\n", m_scr);
+
+	// causes error interrupt, but does not fill receiver buffer
+	rx_error();
+}
+
+//-------------------------------------------------
+//  rx_async_frame_complete - finish receiving one
+//  character in asynchronous mode
+//-------------------------------------------------
+
+void mc68901_device::rx_async_frame_complete()
+{
+	if (m_rsr & RSR_BUFFER_FULL)
+	{
+		LOGMASKED(LOG_RCV, "USART discarding received character %02X (%s)\n", m_rframe & 0xff, (m_rframe == 0 && !m_last_si) ? "break" : "overrun");
+		m_next_rsr |= (m_rframe == 0 && !m_last_si) ? RSR_BREAK : RSR_OVERRUN_ERROR;
+	}
+	else if (m_rsr & RSR_OVERRUN_ERROR)
+	{
+		if (m_rframe == 0 && !m_last_si)
+			m_rsr |= RSR_BREAK;
+	}
+	else
+	{
+		// load the receiver buffer
+		m_receive_buffer = m_rframe & 0xff;
+		m_rsr |= RSR_BUFFER_FULL;
+
+		// set error flags
+		m_rsr &= ~(RSR_PARITY_ERROR | RSR_FRAME_ERROR | RSR_BREAK);
+		if (m_rparity)
+			m_rsr |= RSR_PARITY_ERROR;
+		if (!m_last_si)
+			m_rsr |= m_rframe == 0 ? RSR_BREAK : RSR_FRAME_ERROR;
+		LOGMASKED(LOG_RCV, "USART received character: %02X (PE = %d, FE = %d, B = %d)\n", m_receive_buffer,
+			m_rparity,
+			!m_last_si && m_rframe != 0,
+			 !m_last_si && m_rframe == 0);
+
+		// set normal or error interrupt (if the latter is disabled, always use the former)
+		if ((m_rparity || !m_last_si) && (m_ier & IR_RCV_ERROR))
+			rx_error();
+		else
+			rx_buffer_full();
+	}
+}
+
+//-------------------------------------------------
+//  rx_sync_frame_complete - finish receiving one
+//  character in synchronous mode (error flags are
+//  different from asynchronous mode)
+//-------------------------------------------------
+
+void mc68901_device::rx_sync_frame_complete()
+{
+	// check if sync character matches
+	bool match = (m_rframe & 0xff) == (m_scr & (0xff >> ((m_ucr & UCR_WORD_LENGTH_MASK) >> 5))) && !m_rparity;
+
+	// suppress sync characters if strip option set
+	if (!match || !(m_rsr & RSR_SYNC_STRIP_ENABLE))
+	{
+		if (m_rsr & RSR_BUFFER_FULL)
+			m_next_rsr |= RSR_OVERRUN_ERROR;
+		else if (!(m_rsr & RSR_OVERRUN_ERROR))
+		{
+			// load the receiver buffer
+			m_receive_buffer = m_rframe & 0xff;
+			m_rsr |= RSR_BUFFER_FULL;
+
+			// set error flags
+			m_rsr &= ~(RSR_FRAME_ERROR | RSR_PARITY_ERROR | RSR_MATCH);
+			if (m_rparity)
+				m_rsr |= RSR_PARITY_ERROR;
+			if (match)
+				m_rsr |= RSR_MATCH;
+			LOGMASKED(LOG_RCV, "USART received character: %02X (PE = %d, sync %smatched)\n", m_receive_buffer,
+				m_rparity,
+				match ? "not " : "");
+
+			// set normal or error interrupt (if the latter is disabled, always use the former)
+			if ((m_rparity || match) && (m_ier & IR_RCV_ERROR))
+				rx_error();
+			else
+				rx_buffer_full();
+		}
+	}
+	else
+		LOGMASKED(LOG_RCV, "USART sync character stripped (%02X)\n", m_rframe & 0xff);
+}
+
+//-------------------------------------------------
+//  rx_clock - process one active transition on
+//  the receiver clock
+//-------------------------------------------------
+
+void mc68901_device::rx_clock(bool si)
+{
+	m_rclk++;
+	if (m_rclk >= 244)
+		m_rclk &= 15;
+	m_si_scan = (m_si_scan >> 1) | (si ? 0x80 : 0);
+	bool rclk_sync = (m_ucr & UCR_CLOCK_DIVIDE_16) == UCR_CLOCK_DIVIDE_1 || (m_rclk >= 4 && (m_si_scan & 0xe0) == (m_last_si ? 0 : 0xe0));
+	bool sync_mode = (m_ucr & UCR_START_STOP_1_2) == UCR_START_STOP_0_0;
+	if (rclk_sync)
+	{
+		LOGMASKED(LOG_RCV, "SI = %d (synchronized); RSR = %02X; rframe = %X; %d rbits, %d rclks\n", si, m_rsr, m_rframe, m_rbits, m_rclk);
+		m_last_si = si;
+		if (si && !sync_mode && !(m_rsr & RSR_CHAR_IN_PROGRESS))
+		{
+			m_rframe = 0x100;
+			if (!(m_rsr & RSR_BUFFER_FULL) && (m_rsr & RSR_BREAK))
+			{
+				// valid 0 to 1 transition ends break condition
+				m_rsr &= ~RSR_BREAK;
+				rx_error();
+			}
+		}
+		m_rclk = 0;
+	}
+
+	if ((m_ucr & UCR_CLOCK_DIVIDE_16) == UCR_CLOCK_DIVIDE_1 || (m_rclk & 15) == 8)
+	{
+		if (sync_mode && !(m_rsr & RSR_FOUND_SEARCH))
+		{
+			// search mode: continuous comparison
+			m_rframe = (m_rframe >> 1) | (m_last_si ? 0x100 : 0);
+			if ((m_ucr & UCR_PARITY_ENABLED) && (m_ucr & UCR_WORD_LENGTH_MASK) == UCR_WORD_LENGTH_8)
+			{
+				// check calculated parity of 8-bit sync character
+				if ((m_rframe & 0xff) == m_scr && m_last_si == ((m_ucr & UCR_PARITY_EVEN) ? m_scr_parity : !m_scr_parity))
+				{
+					rx_sync_found();
+					rx_frame_start();
+				}
+			}
+			else
+			{
+				// parity, if any, must be included in SCR when words are less than 8 bits
+				int frame_bits = ((m_ucr & UCR_PARITY_ENABLED) ? 9 : 8) - ((m_ucr & UCR_WORD_LENGTH_MASK) >> 5);
+				if ((m_rframe >> (9 - frame_bits)) == (m_scr & ((1 << frame_bits) - 1)))
+				{
+					rx_sync_found();
+					rx_frame_start();
+				}
+			}
+		}
+		else if (sync_mode || (m_rsr & RSR_CHAR_IN_PROGRESS))
+		{
+			if (m_rbits > 8)
+			{
+				rx_async_frame_complete();
+				m_rframe = m_last_si ? 0x100 : 0;
+				m_rsr &= ~RSR_CHAR_IN_PROGRESS;
+			}
+			else
+			{
+				LOGMASKED(LOG_RCV, "USART shifting in %d %s bit\n", m_last_si, m_rbits < 8 ? "data" : "parity");
+				m_rframe = (m_rframe >> 1) | (m_last_si ? 0x100 : 0);
+				if (m_last_si)
+					m_rparity = !m_rparity;
+				m_rbits++;
+
+				if (m_rbits == 8)
+				{
+					// adjust for fewer than 8 data bits
+					m_rframe >>= (m_ucr & UCR_WORD_LENGTH_MASK) >> 5;
+
+					// adjust for no parity
+					if (!(m_ucr & UCR_PARITY_ENABLED))
+					{
+						m_rframe >>= 1;
+						m_rparity = false;
+						m_rbits++;
+					}
+				}
+
+				if (m_rbits > 8 && sync_mode)
+				{
+					rx_sync_frame_complete();
+
+					// one character follows another in sync mode
+					rx_frame_start();
+				}
+			}
+		}
+		else if (!m_last_si && BIT(m_rframe, 8))
+		{
+			// start bit valid
+			LOGMASKED(LOG_RCV, "USART received start bit\n");
+			m_rsr |= RSR_CHAR_IN_PROGRESS;
+			rx_frame_start();
+		}
+	}
+}
+
+//-------------------------------------------------
+//  tx_frame_load - load one character into the
+//  shift register for transmission
+//-------------------------------------------------
+
+void mc68901_device::tx_frame_load(u8 data)
+{
+	// set up output shift register
+	m_osr = data;
+	m_tbits = 9 - ((m_ucr & UCR_WORD_LENGTH_MASK) >> 5);
+	m_tparity = (m_ucr & UCR_PARITY_EVEN) == UCR_PARITY_ODD;
+
+	// add start and stop bits for asynchronous mode
+	if ((m_ucr & UCR_START_STOP_1_2) != UCR_START_STOP_0_0)
+	{
+		m_osr = (m_osr << 1) | (1 << m_tbits);
+		m_tbits += 2;
+	}
+}
+
+//-------------------------------------------------
+//  tx_clock - process one active edge on the
+//  transmitter clock
+//-------------------------------------------------
+
+void mc68901_device::tx_clock()
+{
+	if (m_tclk != 0)
+	{
+		m_tclk--;
+		return;
+	}
+
+	m_underrun = false;
+
+	bool sync_mode = (m_ucr & UCR_START_STOP_1_2) == UCR_START_STOP_0_0;
+	if (m_tbits == (sync_mode ? 2 : 3))
+	{
+		// inject the calculated parity or skip that bit
+		if (m_ucr & UCR_PARITY_ENABLED)
+			m_osr = (m_osr << 1) | m_tparity;
+		else
+			m_tbits--;
+	}
+
+	bool send_break = !sync_mode && (m_tsr & TSR_BREAK);
+	bool tbusy = false;
+	if (m_tbits != 0)
+	{
+		m_tbits--;
+		if (m_tbits != 0)
+			tbusy = true;
+		else if (!(m_tsr & TSR_XMIT_ENABLE))
+		{
+			LOGMASKED(LOG_XMIT, "USART transmitter disabled\n");
+
+			// transmitter is now effectively disabled
+			m_tsr |= TSR_END_OF_XMIT;
+			tx_error();
+
+			// automatic turnaround enables the receiver
+			if (m_tsr & TSR_AUTO_TURNAROUND)
+				m_rsr |= RSR_RCV_ENABLE;
+		}
+		else if ((m_tsr & TSR_BUFFER_EMPTY) && !(m_tsr & TSR_UNDERRUN_ERROR) && !send_break)
+		{
+			LOGMASKED(LOG_XMIT, "USART transmitter underrun\n");
+
+			// underrun error condition
+			m_tsr |= TSR_UNDERRUN_ERROR;
+			m_underrun = true;
+			tx_error();
+		}
+	}
+
+	if (!tbusy && (m_tsr & TSR_XMIT_ENABLE))
+	{
+		// break inhibits reload
+		if (!(m_tsr & TSR_BUFFER_EMPTY) && !send_break)
+		{
+			LOGMASKED(LOG_XMIT, "USART loading character (%02X)\n", m_transmit_buffer);
+
+			// empty buffer into shift register
+			m_tsr |= TSR_BUFFER_EMPTY;
+			tx_buffer_empty();
+			tx_frame_load(m_transmit_buffer);
+			tbusy = true;
+		}
+		else if (sync_mode)
+		{
+			LOGMASKED(LOG_XMIT, "USART loading sync character (%02X)\n", m_scr);
+
+			// transmit sync characters if nothing else is loaded
+			tx_frame_load(m_scr);
+			tbusy = true;
+		}
+	}
+
+	if (tbusy)
+	{
+		LOGMASKED(LOG_XMIT, "USART shifting out %d %s bit\n", BIT(m_osr, 0),
+			m_tbits == 1 && !sync_mode ? "stop" : m_tbits == (sync_mode ? 1 : 2) ? "parity" : "data or start");
+
+		// shift out one bit
+		set_so(BIT(m_osr, 0));
+		if (BIT(m_osr, 0))
+			m_tparity = !m_tparity;
+		m_osr >>= 1;
+
+		if (m_tbits == 1 && (m_ucr & UCR_START_STOP_1_2) >= UCR_START_STOP_1_15)
+		{
+			// 1½ or 2 stop bits selected
+			if (m_ucr & UCR_CLOCK_DIVIDE_16)
+				m_tclk = (m_ucr & UCR_START_STOP_1_2) == UCR_START_STOP_1_2 ? 31 : 23;
+			else
+				m_tclk = (m_ucr & UCR_START_STOP_1_2) == UCR_START_STOP_1_2 ? 1 : 0;
+		}
+		else if (m_ucr & UCR_CLOCK_DIVIDE_16)
+			m_tclk = 15;
+	}
+	else if (!(m_tsr & TSR_XMIT_ENABLE))
+	{
+		// high/low output on SO (Hi-Z not supported)
+		set_so((m_tsr & TSR_OUTPUT_MASK) != TSR_OUTPUT_LOW);
+	}
+	else if (send_break)
+	{
+		set_so(false);
+		m_tbits = 1;
+	}
+	else
+	{
+		// asynchronous marking condition
+		set_so(true);
+	}
 }

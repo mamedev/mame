@@ -313,7 +313,7 @@ void bladestl_state::bladestl(machine_config &config)
 	MC6809E(config, m_audiocpu, XTAL(24'000'000) / 16);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bladestl_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -331,12 +331,12 @@ void bladestl_state::bladestl(machine_config &config)
 
 	K007342(config, m_k007342, 0);
 	m_k007342->set_gfxnum(0);
-	m_k007342->set_tile_callback(FUNC(bladestl_state::bladestl_tile_callback), this);
+	m_k007342->set_tile_callback(FUNC(bladestl_state::bladestl_tile_callback));
 	m_k007342->set_gfxdecode_tag(m_gfxdecode);
 
 	K007420(config, m_k007420, 0);
 	m_k007420->set_bank_limit(0x3ff);
-	m_k007420->set_sprite_callback(FUNC(bladestl_state::bladestl_sprite_callback), this);
+	m_k007420->set_sprite_callback(FUNC(bladestl_state::bladestl_sprite_callback));
 	m_k007420->set_palette_tag("palette");
 
 	K051733(config, "k051733", 0);

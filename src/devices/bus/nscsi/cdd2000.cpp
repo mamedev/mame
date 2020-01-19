@@ -34,7 +34,7 @@ void cdd2000_device::mem_map(address_map &map)
 
 void cdd2000_device::device_add_mconfig(machine_config &config)
 {
-	MC68HC11A1(config, m_cdcpu, 8'000'000); // type and clock are total guesses
+	MC68HC11F1(config, m_cdcpu, 8'000'000); // type and clock guessed
 	m_cdcpu->set_addrmap(AS_PROGRAM, &cdd2000_device::mem_map);
 
 	NCR53CF94(config, "scsic", 25'000'000); // type and clock guessed

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "video/starfield_05xx.h"
 #include "machine/74259.h"
 #include "sound/discrete.h"
 #include "sound/namco.h"
@@ -12,6 +13,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
+
 
 class galaga_state : public driver_device
 {
@@ -31,6 +33,11 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_leds(*this, "led%u", 0U)
+		, m_starfield(*this, "starfield")
+		, m_galaga_gfxbank(0)
+		, m_main_irq_mask(0)
+		, m_sub_irq_mask(0)
+		, m_sub2_nmi_mask(0)
 	{ }
 
 	DECLARE_READ8_MEMBER(bosco_dsw_r);
@@ -55,6 +62,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	TIMER_CALLBACK_MEMBER(cpu3_interrupt_callback);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	uint16_t get_next_lfsr_state(uint16_t lfsr);
 	void draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void galaga(machine_config &config);
 	void gatsbee(machine_config &config);
@@ -63,8 +71,6 @@ public:
 	void galaga_map(address_map &map);
 	void galaga_mem4(address_map &map);
 	void gatsbee_main_map(address_map &map);
-
-	void starfield_init();
 
 protected:
 	virtual void machine_start() override;
@@ -84,11 +90,8 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	output_finder<2> m_leds;
+	optional_device<starfield_05xx_device> m_starfield; // not present on battles, digdug, xevious
 	emu_timer *m_cpu3_interrupt_timer;
-
-	/* machine state */
-	uint32_t m_stars_scrollx;
-	uint32_t m_stars_scrolly;
 
 	uint32_t m_galaga_gfxbank; // used by catsbee
 
@@ -103,15 +106,6 @@ protected:
 	uint8_t m_main_irq_mask;
 	uint8_t m_sub_irq_mask;
 	uint8_t m_sub2_nmi_mask;
-
-	struct star
-	{
-		uint16_t x,y;
-		uint8_t col,set;
-	};
-
-	static star const s_star_seed_tab[];
-
 };
 
 DISCRETE_SOUND_EXTERN( galaga_discrete );

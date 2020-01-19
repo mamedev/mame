@@ -602,7 +602,7 @@ void rt1715_state::rt1715(machine_config &config)
 
 	I8275(config, m_crtc, 13.824_MHz_XTAL / 8);
 	m_crtc->set_character_width(8);
-	m_crtc->set_display_callback(FUNC(rt1715_state::crtc_display_pixels), this);
+	m_crtc->set_display_callback(FUNC(rt1715_state::crtc_display_pixels));
 	m_crtc->set_screen(m_screen);
 
 	/* keyboard */

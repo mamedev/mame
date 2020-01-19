@@ -3,7 +3,7 @@
 /******************************************************************************
 *
 *  V-tech Socrates-series devices
-*  Copyright (C) 2009-2019 Jonathan Gevaryahu AKA Lord Nightmare
+*  Copyright (C) 2009-2020 Jonathan Gevaryahu AKA Lord Nightmare
 *  with dumping help from Kevin 'kevtris' Horton
 *
 *  The devices in this driver all use a similar ASIC, presumably produced by
@@ -117,8 +117,9 @@ public:
 		m_kbdrow(*this, "IN%u", 0)
 	{ }
 
-	void socrates_pal(machine_config &config);
 	void socrates(machine_config &config);
+	void socrates_pal(machine_config &config);
+	void vpainter_pal(machine_config &config);
 
 	void init_socrates();
 	void init_iqunlimz();
@@ -135,7 +136,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<socrates_snd_device> m_sound;
 	required_device<screen_device> m_screen;
-	required_device<generic_slot_device> m_cart;
+	optional_device<generic_slot_device> m_cart;
 	memory_region *m_cart_reg;
 	required_memory_region m_bios_reg;
 	required_memory_region m_vram_reg;
@@ -371,7 +372,7 @@ void socrates_state::machine_start()
 
 void socrates_state::machine_reset()
 {
-	m_cart_reg = memregion(util::string_format("%s%s", m_cart->tag(), GENERIC_ROM_REGION_TAG).c_str());
+	m_cart_reg = m_cart ? memregion(util::string_format("%s%s", m_cart->tag(), GENERIC_ROM_REGION_TAG).c_str()) : nullptr;
 	kbmcu_sim_reset();
 	m_kb_spi_request = true;
 	m_oldkeyvalue = 0;
@@ -470,8 +471,9 @@ READ8_MEMBER(socrates_state::socrates_cart_r)
 	offset = ((offset&0x3FFFF)|((offset&0xF80000)>>1));
 	if (m_cart_reg)
 	{
-		offset &= (m_cart->get_rom_size()-1);
-		return (*(m_cart_reg->base()+offset));
+		assert(m_cart);
+		offset &= m_cart->get_rom_size()-1;
+		return *(m_cart_reg->base()+offset);
 	}
 	else
 		return 0xF3;
@@ -1489,7 +1491,7 @@ void socrates_state::socrates(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &socrates_state::socrates_mem);
 	m_maincpu->set_addrmap(AS_IO, &socrates_state::socrates_io);
 	m_maincpu->set_vblank_int("screen", FUNC(socrates_state::assert_irq));
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	ADDRESS_MAP_BANK(config, "rombank1").set_map(&socrates_state::socrates_rombank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 	ADDRESS_MAP_BANK(config, "rambank1").set_map(&socrates_state::socrates_rambank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
@@ -1522,7 +1524,7 @@ void socrates_state::socrates_pal(machine_config &config)
 
 	m_maincpu->set_clock(XTAL(26'601'712)/8); // XTAL verified, divider NOT verified; this is a later ASIC so the divider may be different
 
-	config.m_minimum_quantum = attotime::from_hz(50);
+	config.set_maximum_quantum(attotime::from_hz(50));
 
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
@@ -1531,6 +1533,14 @@ void socrates_state::socrates_pal(machine_config &config)
 	m_screen->set_screen_update(FUNC(socrates_state::screen_update_socrates));
 
 	m_sound->set_clock(XTAL(26'601'712)/(512+256)); // this is correct, as strange as it sounds.
+}
+
+void socrates_state::vpainter_pal(machine_config &config)
+{
+	socrates_pal(config);
+
+	config.device_remove("cartslot");
+	config.device_remove("cart_list");
 }
 
 void iqunlimz_state::iqunlimz(machine_config &config)
@@ -1700,5 +1710,5 @@ COMP( 1988, profweis, socrates, 0,      socrates_pal, socrates, socrates_state, 
 
 COMP( 1991, iqunlimz, 0,        0,      iqunlimz,     iqunlimz, iqunlimz_state, init_iqunlimz, "Video Technology",        "IQ Unlimited (Z80)",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-COMP( 1991, vpainter, 0,        0,      socrates_pal, socrates, socrates_state, init_vpainter, "Video Technology",        "Video Painter (PAL)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1991, vpainter, 0,        0,      vpainter_pal, socrates, socrates_state, init_vpainter, "Video Technology",        "Video Painter (PAL)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // Master Video Painter goes here

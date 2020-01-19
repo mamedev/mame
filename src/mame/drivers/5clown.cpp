@@ -1049,7 +1049,7 @@ void _5clown_state::fclown(machine_config &config)
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	crtc.set_update_row_callback(FUNC(_5clown_state::update_row), this);
+	crtc.set_update_row_callback(FUNC(_5clown_state::update_row));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

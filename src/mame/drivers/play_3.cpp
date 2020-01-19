@@ -14,7 +14,6 @@ Status:
 -- Spain82: not working (no manual available; uses same sound board as Cerberus)
 -- Nautilus: sound is broken (runs into the weeds)
 -- Skill Flight, Phantom Ship: not working
--- Eight Ball Champ, Cobra: not working (different hardware)
 -- Miss Disco: not working (no manual available)
 -- Meg Aaton: Ball number doesn't show
 
@@ -754,41 +753,6 @@ ROM_START(msdisco)
 	ROM_REGION(0x4000, "audiocpu", ROMREGION_ERASEFF)
 ROM_END
 
-// Eight Ball Champ (Maibesa) on EFO "Z-Pinball" hardware - very different from the Bally original
-// actual year uncertain; schematic in manual says hardware was designed in 1986, so probably not 1985 as claimed
-ROM_START(eballchps)
-	ROM_REGION(0x8000, "maincpu", 0) // Z80-based
-	ROM_LOAD("u18-jeb 5a0 - cpu.bin", 0x0000, 0x8000, CRC(87615a7d) SHA1(b27ca2d863040a2641f88f9bd3143467a83f181b))
-
-	ROM_REGION(0x28000, "zsu:soundcpu", 0) // Z80-based
-	ROM_LOAD("u3-ebe a02 - sonido.bin", 0x00000, 0x8000, CRC(34be32ee) SHA1(ce0271540164639f28d617753760ecc479b6b0d0))
-	ROM_LOAD("u4-ebe b01 - sonido.bin", 0x08000, 0x8000, CRC(d696c4e8) SHA1(501e18c258e6d42819d25d72e1907984a6cfeecb))
-	ROM_LOAD("u5-ebe c01 - sonido.bin", 0x10000, 0x8000, CRC(fe78d7ef) SHA1(ed91c51dd230854a007f88446011f786759687ca))
-	ROM_LOAD("u6-ebe d02 - sonido.bin", 0x18000, 0x8000, CRC(a507081b) SHA1(72d025852a12f455981c61a405f97eaaac9c6fac))
-ROM_END
-
-// Cobra (Playbar)
-ROM_START(cobrapb)
-	ROM_REGION(0x8000, "maincpu", 0) // Z80-based
-	ROM_LOAD("u18 - jcb 4 a0 - cpu.bin", 0x0000, 0x8000, CRC(c663910e) SHA1(c38692343f114388259c4e7b7943e5be934189ca))
-
-	ROM_REGION(0x28000, "zsu:soundcpu", 0) // Z80-based
-	ROM_LOAD("u3 - scb 1 a0 - sonido.bin", 0x00000, 0x8000, CRC(d3675770) SHA1(882ce748308f2d78cccd28fc8cd64fe69bd223e3))
-	ROM_LOAD("u4 - scb 1 b0 - sonido.bin", 0x08000, 0x8000, CRC(e8e1bdbb) SHA1(215bdfab751cb0ea47aa529df0ac30976de4f772))
-	ROM_LOAD("u5 - scb 1 c0 - sonido.bin", 0x10000, 0x8000, CRC(c36340ab) SHA1(cd662457959de3a929ba02779e2046ed18b797e2))
-ROM_END
-
-// Come Back (Nondum)
-ROM_START(comeback)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("jeb_5a0.u18", 0x0000, 0x8000, CRC(87615a7d) SHA1(b27ca2d863040a2641f88f9bd3143467a83f181b))
-
-	ROM_REGION(0x28000, "zsu:soundcpu", 0)
-	ROM_LOAD("cbs_3a0.u3", 0x00000, 0x8000, CRC(d0f55dc9) SHA1(91186e2cbe248323380418911240a9a5887063fb))
-	ROM_LOAD("cbs_3b0.u4", 0x08000, 0x8000, CRC(1da16d36) SHA1(9f7a27ae23064c1183a346ff042e6cba148257c7))
-	ROM_LOAD("cbs_1c0.u5", 0x10000, 0x8000, CRC(794ae588) SHA1(adaa5e69232523369a6a2da865ac05102cc04ec8))
-ROM_END
-
 
 // Terrific Lake (Sport Matic)
 ROM_START(terrlake)
@@ -818,10 +782,6 @@ GAME(1987,  sklflite,  0,        sklflite, play_3,   play_3_state, empty_init, R
 // not by Playmatic, but same hardware
 GAME(1986,  ridersrf,  0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "JocMatic",  "Rider's Surf",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 GAME(1987,  ironball,  0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Stargame",  "Iron Balls",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-// "Z-Pinball" hardware, Z80 main and sound CPUs - to be split (?)
-GAME(1986,  eballchps, eballchp, sklflite, play_3,   play_3_state, empty_init, ROT0, "Bally (Maibesa license)", "Eight Ball Champ (Spain, Z-Pinball hardware)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987,  cobrapb,   0,        sklflite, play_3,   play_3_state, empty_init, ROT0, "Playbar",   "Cobra (Playbar)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(198?,  comeback,  0,        sklflite, play_3,   play_3_state, empty_init, ROT0, "Nondum / CIFA", "Come Back",                MACHINE_IS_SKELETON_MECHANICAL)
 GAME(198?,  terrlake,  0,        sklflite, play_3,   play_3_state, empty_init, ROT0, "Sport Matic", "Terrific Lake",              MACHINE_IS_SKELETON_MECHANICAL)
 // bingo hardware, to be split (?)
 GAME(1983,  msdisco,   0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Miss Disco (Bingo)",           MACHINE_IS_SKELETON_MECHANICAL)

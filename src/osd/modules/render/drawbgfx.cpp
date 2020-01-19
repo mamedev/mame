@@ -278,11 +278,10 @@ int renderer_bgfx::create()
 		{
 			init.type = bgfx::RendererType::Direct3D11;
 		}
-// Throws exception on exit
-//		else if (backend == "dx12" || backend == "d3d12")
-//		{
-//			init.type = bgfx::RendererType::Direct3D12;
-//		}
+		else if (backend == "dx12" || backend == "d3d12")
+		{
+			init.type = bgfx::RendererType::Direct3D12;
+		}
 		else if (backend == "gles")
 		{
 			init.type = bgfx::RendererType::OpenGLES;
@@ -467,6 +466,15 @@ void renderer_bgfx::put_packed_quad(render_primitive *prim, uint32_t hash, Scree
 	float u[4] = { u0, u1, u0, u1 };
 	float v[4] = { v0, v0, v1, v1 };
 
+	if (bgfx::getRendererType() == bgfx::RendererType::Direct3D9)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			u[i] += 0.5f / size;
+			v[i] += 0.5f / size;
+		}
+	}
+
 	if (PRIMFLAG_GET_TEXORIENT(prim->flags) & ORIENTATION_SWAP_XY)
 	{
 		std::swap(u[1], u[2]);
@@ -589,19 +597,35 @@ void renderer_bgfx::render_textured_quad(render_primitive* prim, bgfx::Transient
 		texture_flags |= BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT;
 	}
 
+	const bool is_screen = PRIMFLAG_GET_SCREENTEX(prim->flags);
 	uint16_t tex_width(prim->texture.width);
 	uint16_t tex_height(prim->texture.height);
 
-	bgfx::TextureHandle texture = m_textures->create_or_update_mame_texture(prim->flags & PRIMFLAG_TEXFORMAT_MASK
-		, tex_width, tex_height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base, prim->texture.seqid
-		, texture_flags, prim->texture.unique_id, prim->texture.old_id);
+	bgfx::TextureHandle texture = BGFX_INVALID_HANDLE;
+	if (is_screen)
+	{
+		const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_argb32(prim->flags & PRIMFLAG_TEXFORMAT_MASK
+			, tex_width, tex_height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base);
+		texture = bgfx::createTexture2D(tex_width, tex_height, false, 1, bgfx::TextureFormat::RGBA8, texture_flags, mem);
+	}
+	else
+	{
+		texture = m_textures->create_or_update_mame_texture(prim->flags & PRIMFLAG_TEXFORMAT_MASK
+			, tex_width, tex_height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base, prim->texture.seqid
+			, texture_flags, prim->texture.unique_id, prim->texture.old_id);
+	}
 
-	bgfx_effect** effects = PRIMFLAG_GET_SCREENTEX(prim->flags) ? m_screen_effect : m_gui_effect;
+	bgfx_effect** effects = is_screen ? m_screen_effect : m_gui_effect;
 
 	uint32_t blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
 	bgfx::setVertexBuffer(0,buffer);
 	bgfx::setTexture(0, effects[blend]->uniform("s_tex")->handle(), texture);
 	effects[blend]->submit(m_ortho_view->get_index());
+
+	if (is_screen)
+	{
+		bgfx::destroy(texture);
+	}
 }
 
 #define MAX_TEMP_COORDS 100
@@ -834,8 +858,13 @@ int renderer_bgfx::draw(int update)
 	}
 
 	win->m_primlist->acquire_lock();
-	s_current_view += m_chains->handle_screen_chains(s_current_view, win->m_primlist->first(), *win.get());
+	uint32_t num_screens = m_chains->update_screen_textures(s_current_view, win->m_primlist->first(), *win.get());
 	win->m_primlist->release_lock();
+
+	if (num_screens)
+	{
+		s_current_view += m_chains->process_screen_chains(s_current_view, *win.get());
+	}
 
 	bool skip_frame = update_dimensions();
 	if (skip_frame)
@@ -1171,7 +1200,8 @@ uint32_t renderer_bgfx::get_texture_hash(render_primitive *prim)
 	}
 	return hash;
 #else
-	return (reinterpret_cast<size_t>(prim->texture.base)) & 0xffffffff;
+	//return (reinterpret_cast<size_t>(prim->texture.base)) & 0xffffffff;
+	return (reinterpret_cast<size_t>(prim->texture.base) ^ reinterpret_cast<size_t>(prim->texture.palette)) & 0xffffffff;
 #endif
 }
 

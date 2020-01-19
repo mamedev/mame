@@ -1697,21 +1697,16 @@ static inline void CSMKeyControll(fm2612_FM_OPN *OPN, fm2612_FM_CH *CH)
 /* FM channel save , internal state only */
 static void FMsave_state_channel(device_t *device,fm2612_FM_CH *CH,int num_ch)
 {
-	int slot , ch;
+	/* channel */
+	device->save_pointer(STRUCT_MEMBER(CH, op1_out), num_ch);
+	device->save_pointer(STRUCT_MEMBER(CH, fc), num_ch);
 
-	for(ch=0;ch<num_ch;ch++,CH++)
+	/* slots */
+	for(int ch=0;ch<num_ch;ch++,CH++)
 	{
-		/* channel */
-		device->save_item(NAME(CH->op1_out), ch);
-		device->save_item(NAME(CH->fc), ch);
-		/* slots */
-		for(slot=0;slot<4;slot++)
-		{
-			fm2612_FM_SLOT *SLOT = &CH->SLOT[slot];
-			device->save_item(NAME(SLOT->phase), ch * 4 + slot);
-			device->save_item(NAME(SLOT->state), ch * 4 + slot);
-			device->save_item(NAME(SLOT->volume), ch * 4 + slot);
-		}
+		device->save_item(STRUCT_MEMBER(CH->SLOT, phase), ch);
+		device->save_item(STRUCT_MEMBER(CH->SLOT, state), ch);
+		device->save_item(STRUCT_MEMBER(CH->SLOT, volume), ch);
 	}
 }
 
@@ -2179,8 +2174,11 @@ static void init_tables(void)
 /*******************************************************************************/
 
 /* Generate samples for one of the YM2612s */
-void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length)
+void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length, u8 output_bits)
 {
+	// TODO : 'ladder' effects for Mega Drive/Genesis
+	const u8 output_shift = (output_bits > 14) ? 0 : (14 - output_bits);
+	const s32 output_nandmask = (1 << output_shift) - 1;
 	ym2612_state *F2612 = (ym2612_state *)chip;
 	fm2612_FM_OPN *OPN   = &F2612->OPN;
 	int32_t *out_fm = OPN->out_fm;
@@ -2213,7 +2211,10 @@ void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length)
 			refresh_fc_eg_slot(OPN, &cch[2]->SLOT[SLOT3] , OPN->SL3.fc[0] , OPN->SL3.kcode[0] );
 			refresh_fc_eg_slot(OPN, &cch[2]->SLOT[SLOT4] , cch[2]->fc , cch[2]->kcode );
 		}
-	}else refresh_fc_eg_chan( OPN, cch[2] );
+	}
+	else
+		refresh_fc_eg_chan( OPN, cch[2] );
+
 	refresh_fc_eg_chan( OPN, cch[3] );
 	refresh_fc_eg_chan( OPN, cch[4] );
 	refresh_fc_eg_chan( OPN, cch[5] );
@@ -2244,7 +2245,7 @@ void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length)
 		chan_calc(F2612, OPN, cch[3]);
 		chan_calc(F2612, OPN, cch[4]);
 		if( F2612->dacen )
-			*cch[5]->connect4 += F2612->dacout;
+			*cch[5]->connect4 += F2612->dacout << 5;
 		else
 			chan_calc(F2612, OPN, cch[5]);
 
@@ -2280,18 +2281,18 @@ void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length)
 		else if (out_fm[5] < -8192) out_fm[5] = -8192;
 
 		/* 6-channels mixing  */
-		lt  = ((out_fm[0]>>0) & OPN->pan[0]);
-		rt  = ((out_fm[0]>>0) & OPN->pan[1]);
-		lt += ((out_fm[1]>>0) & OPN->pan[2]);
-		rt += ((out_fm[1]>>0) & OPN->pan[3]);
-		lt += ((out_fm[2]>>0) & OPN->pan[4]);
-		rt += ((out_fm[2]>>0) & OPN->pan[5]);
-		lt += ((out_fm[3]>>0) & OPN->pan[6]);
-		rt += ((out_fm[3]>>0) & OPN->pan[7]);
-		lt += ((out_fm[4]>>0) & OPN->pan[8]);
-		rt += ((out_fm[4]>>0) & OPN->pan[9]);
-		lt += ((out_fm[5]>>0) & OPN->pan[10]);
-		rt += ((out_fm[5]>>0) & OPN->pan[11]);
+		lt  = (((out_fm[0]) & OPN->pan[0]) & ~output_nandmask);
+		rt  = (((out_fm[0]) & OPN->pan[1]) & ~output_nandmask);
+		lt += (((out_fm[1]) & OPN->pan[2]) & ~output_nandmask);
+		rt += (((out_fm[1]) & OPN->pan[3]) & ~output_nandmask);
+		lt += (((out_fm[2]) & OPN->pan[4]) & ~output_nandmask);
+		rt += (((out_fm[2]) & OPN->pan[5]) & ~output_nandmask);
+		lt += (((out_fm[3]) & OPN->pan[6]) & ~output_nandmask);
+		rt += (((out_fm[3]) & OPN->pan[7]) & ~output_nandmask);
+		lt += (((out_fm[4]) & OPN->pan[8]) & ~output_nandmask);
+		rt += (((out_fm[4]) & OPN->pan[9]) & ~output_nandmask);
+		lt += (((out_fm[5]) & OPN->pan[10]) & ~output_nandmask);
+		rt += (((out_fm[5]) & OPN->pan[11]) & ~output_nandmask);
 
 //      Limit( lt, MAXOUT, MINOUT );
 //      Limit( rt, MAXOUT, MINOUT );
@@ -2333,7 +2334,7 @@ void ym2612_postload(void *chip)
 		int r;
 
 		/* DAC data & port */
-		F2612->dacout = ((int)F2612->REGS[0x2a] - 0x80) << 6;   /* level unknown */
+		F2612->dacout = (((int)F2612->REGS[0x2a] - 0x80) << 1) | (BIT(F2612->REGS[0x2c], 3));
 		F2612->dacen  = F2612->REGS[0x2b] & 0x80;
 		/* OPN registers */
 		/* DT / MULTI , TL , KS / AR , AMON / DR , SR , SL / RR , SSG-EG */
@@ -2493,11 +2494,15 @@ int ym2612_write(void *chip, int a, uint8_t v)
 			{
 			case 0x2a:  /* DAC data (YM2612) */
 				ym2612_device::update_request(F2612->OPN.ST.device);
-				F2612->dacout = ((int)v - 0x80) << 6;   /* level unknown */
+				F2612->dacout = (F2612->dacout & 0x001) | (((int)v - 0x80) << 1);
 				break;
 			case 0x2b:  /* DAC Sel  (YM2612) */
 				/* b7 = dac enable */
 				F2612->dacen = v & 0x80;
+				break;
+			case 0x2c:  /* Test  (YM2612) */
+				/* b3 = dac lowest bit */
+				F2612->dacout = (F2612->dacout & ~0x001) | BIT(v, 3);
 				break;
 			default:    /* OPN section */
 				ym2612_device::update_request(F2612->OPN.ST.device);

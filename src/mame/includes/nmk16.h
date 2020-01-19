@@ -82,6 +82,7 @@ public:
 	void init_gunnailb();
 	void init_bjtwin();
 
+protected:
 	DECLARE_VIDEO_START(gunnail);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_scanline);
 	u32 screen_update_macross(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -92,7 +93,6 @@ public:
 
 	void macross2_sound_bank_w(u8 data);
 
-protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device_array<okim6295_device, 2> m_oki;
@@ -247,6 +247,7 @@ public:
 	void redhawkb(machine_config &config);
 	void stagger1(machine_config &config);
 	void spec2k(machine_config &config);
+
 	void init_bubl2000();
 	void init_grdnstrm();
 	void init_grdnstrmau();
@@ -288,6 +289,7 @@ public:
 	{}
 
 	void tomagic(machine_config &config);
+
 	void init_tomagic();
 
 private:

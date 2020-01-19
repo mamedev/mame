@@ -272,16 +272,16 @@ private:
 	};
 
 	struct {
-		int htotal;             /**< HTL: horizontal total number of dots x 2 */
-		int vtotal;             /**< VTL: vertical total number of lines x 1 */
-		int display_hstart;     /**< HDS: horizontal display starting position x 2*/
-		int display_vstart;     /**< VDS: vertical display starting position x 1 */
-		int display_width;      /**< HDW: horizontal display size x 16 */
-		int display_height;     /**< VDW: vertical display size x 8 */
-		int display_hsync;      /**< HSW: horizontal sync signal x 16 */
-		int display_vsync;      /**< VSW: vertical sync signal x 1 */
-		int border_width;       /**< HBW: horizontal border size x 16 */
-		int border_height;      /**< VBW: vertical border size x 8 */
+		int htotal = 0;             /**< HTL: horizontal total number of dots x 2 */
+		int vtotal = 0;             /**< VTL: vertical total number of lines x 1 */
+		int display_hstart = 0;     /**< HDS: horizontal display starting position x 2*/
+		int display_vstart = 0;     /**< VDS: vertical display starting position x 1 */
+		int display_width = 0;      /**< HDW: horizontal display size x 16 */
+		int display_height = 0;     /**< VDW: vertical display size x 8 */
+		int display_hsync = 0;      /**< HSW: horizontal sync signal x 16 */
+		int display_vsync = 0;      /**< VSW: vertical sync signal x 1 */
+		int border_width = 0;       /**< HBW: horizontal border size x 16 */
+		int border_height = 0;      /**< VBW: vertical border size x 8 */
 	}m_crtc;
 
 	// rotation, zoom shortcuts

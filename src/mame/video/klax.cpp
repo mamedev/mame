@@ -74,7 +74,7 @@ const atari_motion_objects_config klax_state::s_mob_config =
  *
  *************************************/
 
-void klax_state::klax_latch_w(u16 data)
+void klax_state::latch_w(u16 data)
 {
 }
 

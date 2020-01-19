@@ -67,17 +67,13 @@ Notes:
 //**************************************************************************
 
 #define R6502_TAG       "u1"
-#define R6532_TAG       "u3"
-#define R6522_TAG       "u4"
-#define MC6850_TAG      "u5"
-#define RS232_TAG       "rs232"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(INTERPOD, interpod_t, "interpod", "Interpod")
+DEFINE_DEVICE_TYPE(CBM_INTERPOD, cbm_interpod_device, "cbm_interpod", "Oxford Computer Systems Interpod")
 
 
 
@@ -103,7 +99,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *interpod_t::device_rom_region() const
+const tiny_rom_entry *cbm_interpod_device::device_rom_region() const
 {
 	return ROM_NAME( interpod );
 }
@@ -113,13 +109,13 @@ const tiny_rom_entry *interpod_t::device_rom_region() const
 //  ADDRESS_MAP( interpod_mem )
 //-------------------------------------------------
 
-void interpod_t::interpod_mem(address_map &map)
+void cbm_interpod_device::interpod_mem(address_map &map)
 {
-	map(0x0000, 0x007f).mirror(0x3b80).m(R6532_TAG, FUNC(mos6532_new_device::ram_map));
-	map(0x0400, 0x041f).mirror(0x3be0).m(R6532_TAG, FUNC(mos6532_new_device::io_map));
-	map(0x2000, 0x2001).mirror(0x9ffe).rw(MC6850_TAG, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x0000, 0x007f).mirror(0x3b80).m(m_riot, FUNC(mos6532_new_device::ram_map));
+	map(0x0400, 0x041f).mirror(0x3be0).m(m_riot, FUNC(mos6532_new_device::io_map));
+	map(0x2000, 0x2001).mirror(0x9ffe).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x4000, 0x47ff).mirror(0xb800).rom().region(R6502_TAG, 0);
-	map(0x8000, 0x800f).mirror(0x5ff0).m(R6522_TAG, FUNC(via6522_device::map));
+	map(0x8000, 0x800f).mirror(0x5ff0).m(m_via, FUNC(via6522_device::map));
 }
 
 
@@ -127,10 +123,10 @@ void interpod_t::interpod_mem(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void interpod_t::device_add_mconfig(machine_config &config)
+void cbm_interpod_device::device_add_mconfig(machine_config &config)
 {
 	M6502(config, m_maincpu, 1000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &interpod_t::interpod_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cbm_interpod_device::interpod_mem);
 
 	VIA6522(config, m_via, 1000000);
 
@@ -150,18 +146,18 @@ void interpod_t::device_add_mconfig(machine_config &config)
 //**************************************************************************
 
 //-------------------------------------------------
-//  interpod_t - constructor
+//  cbm_interpod_device - constructor
 //-------------------------------------------------
 
-interpod_t::interpod_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, INTERPOD, tag, owner, clock),
+cbm_interpod_device::cbm_interpod_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, CBM_INTERPOD, tag, owner, clock),
 	device_cbm_iec_interface(mconfig, *this),
 	m_maincpu(*this, R6502_TAG),
-	m_via(*this, R6522_TAG),
-	m_riot(*this, R6532_TAG),
-	m_acia(*this, MC6850_TAG),
+	m_via(*this, "u4"),
+	m_riot(*this, "u3"),
+	m_acia(*this, "u5"),
 	m_ieee(*this, IEEE488_TAG),
-	m_rs232(*this, RS232_TAG)
+	m_rs232(*this, "rs232")
 {
 }
 
@@ -170,7 +166,7 @@ interpod_t::interpod_t(const machine_config &mconfig, const char *tag, device_t 
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void interpod_t::device_start()
+void cbm_interpod_device::device_start()
 {
 }
 
@@ -179,6 +175,6 @@ void interpod_t::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void interpod_t::device_reset()
+void cbm_interpod_device::device_reset()
 {
 }

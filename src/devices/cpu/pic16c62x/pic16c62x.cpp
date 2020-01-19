@@ -123,10 +123,15 @@ void pic16c62x_device::pic16c62xa_ram(address_map &map)
 pic16c62x_device::pic16c62x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int picmodel)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, program_width, -1
-					   , ( ( program_width == 9 ) ? address_map_constructor(FUNC(pic16c62x_device::pic16c62x_rom_9), this) : ( ( program_width == 10 ) ? address_map_constructor(FUNC(pic16c62x_device::pic16c62x_rom_10), this) : address_map_constructor(FUNC(pic16c62x_device::pic16c62x_rom_11), this) )))
+					   , ( ( program_width == 9 ) ?  address_map_constructor(FUNC(pic16c62x_device::pic16c62x_rom_9), this) :
+						 ( ( program_width == 10 ) ? address_map_constructor(FUNC(pic16c62x_device::pic16c62x_rom_10), this) :
+													 address_map_constructor(FUNC(pic16c62x_device::pic16c62x_rom_11), this) )))
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 8, 0
-					, ( ( picmodel == 0x16C620 || picmodel == 0x16C621 ) ? address_map_constructor(FUNC(pic16c62x_device::pic16c620_ram), this) : ( ( picmodel == 0x16C622 ) ? address_map_constructor(FUNC(pic16c62x_device::pic16c622_ram), this) : address_map_constructor(FUNC(pic16c62x_device::pic16c62xa_ram), this) ) ) )
+					, ( ( picmodel == 0x16C620 || picmodel == 0x16C621 ) ? address_map_constructor(FUNC(pic16c62x_device::pic16c620_ram), this) :
+					  ( ( picmodel == 0x16C622 ) ? address_map_constructor(FUNC(pic16c62x_device::pic16c622_ram), this) :
+												   address_map_constructor(FUNC(pic16c62x_device::pic16c62xa_ram), this) ) ) )
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 5, 0)
+	, m_CONFIG(0x3fff)
 	, m_reset_vector(0x0)
 	, m_picmodel(picmodel)
 	, m_picRAMmask(0xff)
@@ -145,25 +150,34 @@ pic16c620a_device::pic16c620a_device(const machine_config &mconfig, const char *
 }
 
 pic16c621_device::pic16c621_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pic16c62x_device(mconfig, PIC16C621, tag, owner, clock, 9, 0x16C621)
+	: pic16c62x_device(mconfig, PIC16C621, tag, owner, clock, 10, 0x16C621)
 {
 }
 
 pic16c621a_device::pic16c621a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pic16c62x_device(mconfig, PIC16C621A, tag, owner, clock, 9, 0x16C621A)
+	: pic16c62x_device(mconfig, PIC16C621A, tag, owner, clock, 10, 0x16C621A)
 {
 }
 
 pic16c622_device::pic16c622_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pic16c62x_device(mconfig, PIC16C622, tag, owner, clock, 9, 0x16C622)
+	: pic16c62x_device(mconfig, PIC16C622, tag, owner, clock, 11, 0x16C622)
 {
 }
 
 pic16c622a_device::pic16c622a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pic16c62x_device(mconfig, PIC16C622A, tag, owner, clock, 9, 0x16C622A)
+	: pic16c62x_device(mconfig, PIC16C622A, tag, owner, clock, 11, 0x16C622A)
 {
 }
 
+
+device_memory_interface::space_config_vector pic16c62x_device::memory_space_config() const
+{
+	return space_config_vector{
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
 
 std::unique_ptr<util::disasm_interface> pic16c62x_device::create_disassembler()
 {
@@ -331,6 +345,7 @@ uint16_t pic16c62x_device::POP_STACK()
 	m_STACK[1] = m_STACK[0];
 	return (data & ADDR_MASK);
 }
+
 void pic16c62x_device::PUSH_STACK(uint16_t data)
 {
 	m_STACK[0] = m_STACK[1];
@@ -877,8 +892,6 @@ void pic16c62x_device::device_start()
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 
-	m_CONFIG = 0x3fff;
-
 	/* ensure the internal ram pointers are set before get_info is called */
 	update_internalram_ptr();
 
@@ -1037,7 +1050,7 @@ void pic16c62x_device::pic16c62x_soft_reset()
 	pic16c62x_reset_regs();
 }
 
-void pic16c62x_device::pic16c62x_set_config(int data)
+void pic16c62x_device::set_config(int data)
 {
 	logerror("Writing %04x to the PIC16C62x configuration bits\n",data);
 	m_CONFIG = (data & 0x3fff);

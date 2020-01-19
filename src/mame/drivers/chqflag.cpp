@@ -327,7 +327,7 @@ void chqflag_state::chqflag(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, m_bank1000).set_map(&chqflag_state::bank1000_map).set_options(ENDIANNESS_BIG, 8, 13, 0x1000);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -345,7 +345,7 @@ void chqflag_state::chqflag(machine_config &config)
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
-	m_k051960->set_sprite_callback(FUNC(chqflag_state::sprite_callback), this);
+	m_k051960->set_sprite_callback(FUNC(chqflag_state::sprite_callback));
 	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 	m_k051960->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_k051960->vreg_contrast_handler().set(FUNC(chqflag_state::background_brt_w));
@@ -353,14 +353,14 @@ void chqflag_state::chqflag(machine_config &config)
 	K051316(config, m_k051316[0], 0);
 	m_k051316[0]->set_palette(m_palette);
 	m_k051316[0]->set_offsets(7, 0);
-	m_k051316[0]->set_zoom_callback(FUNC(chqflag_state::zoom_callback_1), this);
+	m_k051316[0]->set_zoom_callback(FUNC(chqflag_state::zoom_callback_1));
 
 	K051316(config, m_k051316[1], 0);
 	m_k051316[1]->set_palette(m_palette);
 	m_k051316[1]->set_bpp(8);
 	m_k051316[1]->set_layermask(0xc0);
 	m_k051316[1]->set_wrap(1);
-	m_k051316[1]->set_zoom_callback(FUNC(chqflag_state::zoom_callback_2), this);
+	m_k051316[1]->set_zoom_callback(FUNC(chqflag_state::zoom_callback_2));
 
 	K051733(config, "k051733", 0);
 

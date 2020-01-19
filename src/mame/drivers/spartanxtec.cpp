@@ -113,7 +113,7 @@ TILE_GET_INFO_MEMBER(spartanxtec_state::get_kungfum_bg_tile_info)
 
 void spartanxtec_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spartanxtec_state::get_kungfum_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spartanxtec_state::get_kungfum_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_bg_tilemap->set_scroll_rows(32);
 }
 
@@ -441,11 +441,11 @@ ROM_START( spartanxtec )
 	ROM_REGION( 0x18000, "unkprom", 0 ) // just linear increasing value
 	ROM_LOAD( "1_tbp24s10_82s129.bin", 0x0000, 0x0100, CRC(b6135ee0) SHA1(248a978987cff86c2bbad10ef332f63a6abd5bee) )
 	ROM_LOAD( "2_tbp24s10_82s129.bin", 0x0000, 0x0100, CRC(b6135ee0) SHA1(248a978987cff86c2bbad10ef332f63a6abd5bee) )
-	
+
 	ROM_REGION( 0x00228, "plds", 0 )
 	ROM_LOAD( "pal16r8acn.ic12", 0x0000, 0x0114, NO_DUMP )
- 	ROM_LOAD( "pal16r6acn.ic33", 0x0114, 0x0114, NO_DUMP )
-	
+	ROM_LOAD( "pal16r6acn.ic33", 0x0114, 0x0114, NO_DUMP )
+
 ROM_END
 
 

@@ -1,13 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles, Vas Crabb
-/**
- * \file devfind.h
- * Object auto-discovery helpers
- * \defgroup devfind
- * \{
- * Object auto-discovery helpers
- */
-
+/// \file
+/// \brief Object auto-discovery helpers
+/// \defgroup devfind Object auto-discovery helpers
+/// \{
 #ifndef __EMU_H__
 #error Dont include this file directly; include emu.h instead.
 #endif
@@ -237,8 +233,8 @@ public:
 	/// \brief Attempt discovery
 	///
 	/// Concrete derived classes must implement this member function.
-	/// Should return false if the the object is required but not found,
-	/// or true otherwise (the report_missing member function can assist
+	/// Should return false if the object is required but not found, or
+	/// true otherwise (the report_missing member function can assist
 	/// in implementing this behaviour).
 	/// \param [in] isvalidation Pass true if this is a dry run (i.e. no
 	///   intention to actually start the device), or false otherwise.
@@ -1212,4 +1208,4 @@ extern template class shared_ptr_finder<s64, false>;
 extern template class shared_ptr_finder<s64, true>;
 
 #endif // MAME_EMU_DEVFIND_H
-/** \} */
+/// \}

@@ -225,7 +225,7 @@ WRITE8_MEMBER(a2bus_timemasterho_device::pia_out_b)
 	// if it's a read, poke it into the PIA
 	if ((data>>5) & 1)
 	{
-		m_pia->write_porta(m_msm5832->data_r(space, 0));
+		m_pia->write_porta(m_msm5832->data_r());
 	}
 }
 

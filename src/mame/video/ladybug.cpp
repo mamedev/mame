@@ -101,7 +101,7 @@ void ladybug_video_device::device_start()
 	std::fill_n(m_spr_ram.get(), 0x0400, 0);
 	std::fill_n(m_bg_ram.get(), 0x0800, 0);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ladybug_video_device::get_bg_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ladybug_video_device::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_rows(32);
 	m_bg_tilemap->set_transparent_pen(0);
 
@@ -432,7 +432,7 @@ void sraider_state::video_start()
 {
 	ladybug_base_state::video_start();
 
-	m_grid_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sraider_state::get_grid_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_grid_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sraider_state::get_grid_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_grid_tilemap->set_scroll_rows(32);
 	m_grid_tilemap->set_transparent_pen(0);
 }

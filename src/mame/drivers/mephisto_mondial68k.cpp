@@ -208,7 +208,7 @@ void mondial68k_state::mondial68k(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(0xf, 0x7f);
-	m_display->output_digit().set([this] (offs_t offset, u8 data, u8 mem_mask) { m_digits[offset] = bitswap<8>(data, 7,4,5,0,1,2,3,6); });
+	m_display->output_digit().set([this](offs_t offset, u8 data) { m_digits[offset] = bitswap<8>(data, 7,4,5,0,1,2,3,6); });
 	config.set_default_layout(layout_mephisto_mondial68k);
 
 	/* sound hardware */
@@ -226,8 +226,8 @@ void mondial68k_state::mondial68k(machine_config &config)
 
 ROM_START( mondl68k )
 	ROM_REGION16_BE( 0x1000000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("68000xl-06-11-87-u.bin", 0x0000, 0x8000, CRC(aebe482a) SHA1(900c91ec836cd65e4cd38e50555976ab8064be41))
-	ROM_LOAD16_BYTE("68000xl-06-11-87-l.bin", 0x0001, 0x8000, CRC(564e32c5) SHA1(8c9df46bc5ced114e72fb663f1055d775b8e2e0b))
+	ROM_LOAD16_BYTE("68000xl_u_06.11.87", 0x0000, 0x8000, CRC(aebe482a) SHA1(900c91ec836cd65e4cd38e50555976ab8064be41) )
+	ROM_LOAD16_BYTE("68000xl_l_06.11.87", 0x0001, 0x8000, CRC(564e32c5) SHA1(8c9df46bc5ced114e72fb663f1055d775b8e2e0b) )
 ROM_END
 
 

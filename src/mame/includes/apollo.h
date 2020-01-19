@@ -367,25 +367,25 @@ public:
 	apollo_ni(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~apollo_ni();
 
-	virtual iodevice_t image_type() const override { return IO_ROM; }
-
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 1; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual bool support_command_line_image_creation() const override { return 1; }
-	virtual const char *file_extensions() const override { return "ani,bin"; }
-
-	DECLARE_WRITE16_MEMBER(write);
-	DECLARE_READ16_MEMBER(read);
-
 	// image-level overrides
+	virtual iodevice_t image_type() const noexcept override { return IO_ROM; }
+
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual bool support_command_line_image_creation() const noexcept override { return true; }
+	virtual const char *file_extensions() const noexcept override { return "ani,bin"; }
+
 	virtual image_init_result call_load() override;
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
-	virtual const char *custom_instance_name() const override { return "node_id"; }
-	virtual const char *custom_brief_instance_name() const override { return "ni"; }
+	virtual const char *custom_instance_name() const noexcept override { return "node_id"; }
+	virtual const char *custom_brief_instance_name() const noexcept override { return "ni"; }
+
+	DECLARE_WRITE16_MEMBER(write);
+	DECLARE_READ16_MEMBER(read);
 
 	void set_node_id_from_disk();
 

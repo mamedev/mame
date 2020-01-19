@@ -357,6 +357,9 @@ cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, d
 	device_memory_interface(mconfig, *this),
 	m_read_pal_ntsc(*this),
 	m_write_prd(*this),
+	m_in_pcb_func(*this),
+	m_in_char_ram_func(*this),
+	m_out_char_ram_func(*this),
 	m_color_clock(0),
 	m_stream(nullptr),
 	m_palette(*this, "palette"),
@@ -384,9 +387,9 @@ void cdp1869_device::device_start()
 	// resolve callbacks
 	m_read_pal_ntsc.resolve_safe(0);
 	m_write_prd.resolve_safe();
-	m_in_pcb_func.bind_relative_to(*owner());
-	m_in_char_ram_func.bind_relative_to(*owner());
-	m_out_char_ram_func.bind_relative_to(*owner());
+	m_in_pcb_func.resolve();
+	m_in_char_ram_func.resolve();
+	m_out_char_ram_func.resolve();
 
 	// allocate timers
 	m_prd_timer = timer_alloc();

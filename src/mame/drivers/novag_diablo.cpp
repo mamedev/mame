@@ -55,7 +55,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void diablo68k(machine_config &config);
 	void scorpio68k(machine_config &config);
 
@@ -279,7 +279,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void diablo_state::diablo68k(machine_config &config)
@@ -323,7 +323,7 @@ void diablo_state::diablo68k(machine_config &config)
 
 	HD44780(config, m_lcd, 0);
 	m_lcd->set_lcd_size(2, 8);
-	m_lcd->set_pixel_update_cb(FUNC(diablo_state::lcd_pixel_update), this);
+	m_lcd->set_pixel_update_cb(FUNC(diablo_state::lcd_pixel_update));
 
 	PWM_DISPLAY(config, m_display).set_size(8, 8+2);
 	config.set_default_layout(layout_novag_diablo68k);

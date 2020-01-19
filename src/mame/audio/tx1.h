@@ -89,40 +89,40 @@ protected:
 	required_ioport m_brake;
 	optional_ioport m_ppi_portd;
 
-	sound_stream *m_stream;
-	uint32_t m_freq_to_step;
-	uint32_t m_step0;
-	uint32_t m_step1;
-	uint32_t m_step2;
+	sound_stream *m_stream = nullptr;
+	uint32_t m_freq_to_step = 0;
+	uint32_t m_step0 = 0;
+	uint32_t m_step1 = 0;
+	uint32_t m_step2 = 0;
 
 	pit8253_state m_pit8253;
 
-	uint8_t m_ay_outputa;
-	uint8_t m_ay_outputb;
+	uint8_t m_ay_outputa = 0;
+	uint8_t m_ay_outputb = 0;
 
-	uint8_t m_ppi_latch_a;
-	uint8_t m_ppi_latch_b;
-	uint32_t m_ts;
+	uint8_t m_ppi_latch_a = 0;
+	uint8_t m_ppi_latch_b = 0;
+	uint32_t m_ts = 0;
 
-	stream_sample_t m_pit0;
-	stream_sample_t m_pit1;
-	stream_sample_t m_pit2;
+	stream_sample_t m_pit0 = 0;
+	stream_sample_t m_pit1 = 0;
+	stream_sample_t m_pit2 = 0;
 
-	double m_weights0[4];
-	double m_weights1[3];
-	double m_weights2[3];
-	int m_eng0[4];
-	int m_eng1[4];
-	int m_eng2[4];
+	double m_weights0[4] = { 0, 0, 0, 0 };
+	double m_weights1[3] = { 0, 0, 0 };
+	double m_weights2[3] = { 0, 0, 0 };
+	int m_eng0[4] = { 0, 0, 0, 0 };;
+	int m_eng1[4] = { 0, 0, 0, 0 };
+	int m_eng2[4] = { 0, 0, 0, 0 };
 
-	int m_noise_lfsra;
-	int m_noise_lfsrb;
-	int m_noise_lfsrc;
-	int m_noise_lfsrd;
-	int m_noise_counter;
-	uint8_t m_ym1_outputa;
-	uint8_t m_ym2_outputa;
-	uint8_t m_ym2_outputb;
+	int m_noise_lfsra = 0;
+	int m_noise_lfsrb = 0;
+	int m_noise_lfsrc = 0;
+	int m_noise_lfsrd = 0;
+	int m_noise_counter = 0;
+	uint8_t m_ym1_outputa = 0;
+	uint8_t m_ym2_outputa = 0;
+	uint8_t m_ym2_outputb = 0;
 	uint16_t m_eng_voltages[16];
 };
 

@@ -13,6 +13,12 @@
 
 #include "express.h"
 
+#include <algorithm>
+#include <iterator>
+#include <memory>
+#include <string>
+#include <vector>
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -107,23 +113,19 @@ class debug_view_source
 {
 	DISABLE_COPYING(debug_view_source);
 
-	friend class simple_list<debug_view_source>;
-
 public:
 	// construction/destruction
-	debug_view_source(const char *name, device_t *device = nullptr);
+	debug_view_source(std::string &&name, device_t *device = nullptr);
 	virtual ~debug_view_source();
 
 	// getters
 	const char *name() const { return m_name.c_str(); }
-	debug_view_source *next() const { return m_next; }
 	device_t *device() const { return m_device; }
 
 private:
 	// internal state
-	debug_view_source *     m_next;                 // link to next item
-	std::string             m_name;                 // name of the source item
-	device_t *              m_device;               // associated device (if applicable)
+	std::string const       m_name;                 // name of the source item
+	device_t *const         m_device;               // associated device (if applicable)
 };
 
 
@@ -149,9 +151,16 @@ public:
 	debug_view_xy cursor_position() { flush_updates(); return m_cursor; }
 	bool cursor_supported() { flush_updates(); return m_supports_cursor; }
 	bool cursor_visible() { flush_updates(); return m_cursor_visible; }
+	size_t source_count() const { return m_source_list.size(); }
 	const debug_view_source *source() const { return m_source; }
-	const debug_view_source *first_source() const { return m_source_list.first(); }
-	const simple_list<debug_view_source> &source_list() const { return m_source_list; }
+	const debug_view_source *source(unsigned i) const { return (m_source_list.size() > i) ? m_source_list[i].get() : nullptr; }
+	const debug_view_source *first_source() const { return m_source_list.empty() ? nullptr : m_source_list[0].get(); }
+	auto source_index(const debug_view_source &source) const
+	{
+		const auto it(std::find_if(m_source_list.begin(), m_source_list.end(), [&source] (const auto &x) { return x.get() == &source; }));
+		return (m_source_list.end() != it) ? std::distance(m_source_list.begin(), it) : -1;
+	}
+	const std::vector<std::unique_ptr<const debug_view_source> > &source_list() const { return m_source_list; }
 
 	// setters
 	void set_visible_size(debug_view_xy size);
@@ -188,7 +197,7 @@ protected:
 	debug_view *            m_next;             // link to the next view
 	debug_view_type         m_type;             // type of view
 	const debug_view_source *m_source;          // currently selected data source
-	simple_list<debug_view_source> m_source_list; // list of available data sources
+	std::vector<std::unique_ptr<const debug_view_source> > m_source_list; // list of available data sources
 
 	// OSD data
 	debug_view_osd_update_func m_osdupdate;     // callback for the update

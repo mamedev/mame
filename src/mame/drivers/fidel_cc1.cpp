@@ -68,7 +68,7 @@ public:
 	// RE button is tied to 8224 RESIN pin
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
 
-	// machine drivers
+	// machine configs
 	void cc1(machine_config &config);
 	void cc3(machine_config &config);
 
@@ -216,7 +216,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void cc1_state::cc1(machine_config &config)
@@ -233,7 +233,7 @@ void cc1_state::cc1(machine_config &config)
 	m_ppi8255->out_pc_callback().set(FUNC(cc1_state::ppi_portc_w));
 	m_ppi8255->tri_pc_callback().set_constant(0);
 
-	TIMER(config, "delay").configure_generic(timer_device::expired_delegate());
+	TIMER(config, "delay").configure_generic(nullptr);
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(6, 7);

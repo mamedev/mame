@@ -6,8 +6,7 @@
     Neo-Geo CD hardware
 
     Thanks to:
-        * The FBA team (Barry Harris) for much of the CDC / CDD code and system details.
-          ( http://www.barryharris.me.uk/ )
+        * Jan Klaassen (of the former FBA team) for much of the CDC / CDD code and system details.
         * Mirko Buffoni for a commented disassembly of the NeoCD bios rom.
 
     Current status:
@@ -542,7 +541,7 @@ int32_t ngcd_state::SekIdle(int32_t nCycles)
  *  DMA
 
     FF0061  Write 0x40 means start DMA transfer
-    FF0064  Source address (in copy mode), Target address (in filll mode)
+    FF0064  Source address (in copy mode), Target address (in fill mode)
     FF0068  Target address (in copy mode)
     FF006C  Fill word
     FF0070  Words count
@@ -586,7 +585,7 @@ void ngcd_state::do_dma(address_space& curr_space)
 {
 	// The LC8953 chip has a programmable DMA controller, which is not properly emulated.
 	// Since the software only uses it in a limited way, we can apply a simple heuristic
-	// to determnine the requested operation.
+	// to determine the requested operation.
 
 	// Additionally, we don't know how many cycles DMA operations take.
 	// Here, only bus access is used to get a rough approximation --
@@ -1056,9 +1055,9 @@ void ngcd_state::neocd(machine_config &config)
 	LC89510_TEMP(config, m_tempcdc, 0); // cd controller
 	m_tempcdc->set_cdrom_tag("cdrom");
 	m_tempcdc->set_is_neoCD(true);
-	m_tempcdc->set_type1_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type1), this);
-	m_tempcdc->set_type2_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type2), this);
-	m_tempcdc->set_type3_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type3), this);
+	m_tempcdc->set_type1_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type1));
+	m_tempcdc->set_type2_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type2));
+	m_tempcdc->set_type3_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type3));
 
 	NVRAM(config, "saveram", nvram_device::DEFAULT_ALL_0);
 
@@ -1066,7 +1065,7 @@ void ngcd_state::neocd(machine_config &config)
 	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_controls, "joy", false);
 
 	CDROM(config, "cdrom").set_interface("neocd_cdrom");
-	SOFTWARE_LIST(config, "cd_list").set_type("neocd", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cd_list").set_original("neocd");
 
 	m_ym->set_addrmap(0, &ngcd_state::neocd_ym_map);
 }

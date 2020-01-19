@@ -603,7 +603,7 @@ void fp_state::fp(machine_config &config)
 	m_crtc->set_screen(SCREEN_CRT_TAG);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(fp_state::update_row), this);
+	m_crtc->set_update_row_callback(FUNC(fp_state::update_row));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

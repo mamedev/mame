@@ -64,6 +64,7 @@ MB89372 - Uses 3 serial data transfer protocols: ASYNC, COP & BOP. Has a built
 #include "machine/mb8421.h"
 #include "machine/msm6253.h"
 #include "machine/nvram.h"
+#include "machine/segaic16.h"
 #include "machine/315_5296.h"
 #include "sound/segapcm.h"
 #include "sound/ym2151.h"
@@ -1288,7 +1289,7 @@ void segaybd_state::yboard(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &segaybd_state::sound_portmap);
 
 	NVRAM(config, "backupram", nvram_device::DEFAULT_ALL_0);
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MB3773(config, "watchdog"); // IC95
 

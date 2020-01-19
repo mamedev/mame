@@ -523,7 +523,7 @@ void m6801_cpu_device::serial_transmit()
 			break;
 		}
 
-		if (old_m_tx != m_tx) // call callback only if line has changed 
+		if (old_m_tx != m_tx) // call callback only if line has changed
 		{
 			m_out_sertx_func((m_tx == 1) ? ASSERT_LINE : CLEAR_LINE);
 		}

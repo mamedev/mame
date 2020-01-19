@@ -374,8 +374,8 @@ void karnov_state::karnov_map(address_map &map)
 	map(0x0a0000, 0x0a07ff).ram().w(FUNC(karnov_state::videoram_w)).share("videoram");
 	map(0x0a0800, 0x0a0fff).w(FUNC(karnov_state::videoram_w)); /* Wndrplnt Mirror */
 	map(0x0a1000, 0x0a17ff).w(FUNC(karnov_state::playfield_w)).share("pf_data");
-	map(0x0a1800, 0x0a1fff).lw16("pf_col_w", [this](offs_t offset, u16 data, u16 mem_mask)
-							{ playfield_w(((offset & 0x1f) << 5) | ((offset & 0x3e0) >> 5), data, mem_mask); });
+	map(0x0a1800, 0x0a1fff).lw16([this](offs_t offset, u16 data, u16 mem_mask)
+							{ playfield_w(((offset & 0x1f) << 5) | ((offset & 0x3e0) >> 5), data, mem_mask); }, "pf_col_w");
 	map(0x0c0000, 0x0c0001).portr("P1_P2").w(FUNC(karnov_state::mcusim_ack_w));
 	map(0x0c0002, 0x0c0003).portr("SYSTEM");
 	map(0x0c0003, 0x0c0003).w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -907,7 +907,7 @@ void karnov_state::wndrplnt(machine_config &config)
 ROM_START( karnov )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "dn08-6.j15", 0x00000, 0x10000, CRC(4c60837f) SHA1(6886e6ee1d1563c3011b8fea79e7435f983a3ee0) )
-	ROM_LOAD16_BYTE( "dn11-6.j12", 0x00001, 0x10000, CRC(cd4abb99) SHA1(b4482175f5d90941ad3aec6c2269a50f57a465ed) )
+	ROM_LOAD16_BYTE( "dn11-6.j20", 0x00001, 0x10000, CRC(cd4abb99) SHA1(b4482175f5d90941ad3aec6c2269a50f57a465ed) )
 	ROM_LOAD16_BYTE( "dn07-.j14",  0x20000, 0x10000, CRC(fc14291b) SHA1(c92207cf70d4c887cd0f53208e8090c7f614c1d3) )
 	ROM_LOAD16_BYTE( "dn10-.j18",  0x20001, 0x10000, CRC(a4a34e37) SHA1(f40b680cc7312c844f81d01997f9a47c48d36e88) )
 	ROM_LOAD16_BYTE( "dn06-5.j13", 0x40000, 0x10000, CRC(29d64e42) SHA1(c07ff5f29b7ccd5fc97b5086bcae57ab6eb29330) )
@@ -917,7 +917,7 @@ ROM_START( karnov )
 	ROM_LOAD( "dn05-5.f3", 0x8000, 0x8000, CRC(fa1a31a8) SHA1(5007a625be03c546d2a78444d72c28761b10cdb0) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "karnov_i8751.k13", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "dn-e.k14", 0x0000, 0x1000, NO_DUMP ) /* DN-E or DN-6? */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "dn00-.c5", 0x00000, 0x08000, CRC(0ed77c6d) SHA1(4ec86ac56c01c158a580dc13dea3e5cbdf90d0e9) )  /* Characters */
@@ -945,8 +945,8 @@ ROM_END
 
 ROM_START( karnova )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
-	ROM_LOAD16_BYTE( "dn08-5.j15", 0x00000, 0x10000, CRC(db92c264) SHA1(bd4bcd984a3455eedd2b78dc2090c9d625025671) )
-	ROM_LOAD16_BYTE( "dn11-5.j20", 0x00001, 0x10000, CRC(05669b4b) SHA1(c78d0da5afc66750dd9841a7d4f8f244d878c081) )
+	ROM_LOAD16_BYTE( "dn08-5.j15", 0x00000, 0x10000, CRC(db92c264) SHA1(bd4bcd984a3455eedd2b78dc2090c9d625025671) ) /* also known to be labeled DN08-5E */
+	ROM_LOAD16_BYTE( "dn11-5.j20", 0x00001, 0x10000, CRC(05669b4b) SHA1(c78d0da5afc66750dd9841a7d4f8f244d878c081) ) /* also known to be labeled DN11-5E */
 	ROM_LOAD16_BYTE( "dn07-.j14",  0x20000, 0x10000, CRC(fc14291b) SHA1(c92207cf70d4c887cd0f53208e8090c7f614c1d3) )
 	ROM_LOAD16_BYTE( "dn10-.j18",  0x20001, 0x10000, CRC(a4a34e37) SHA1(f40b680cc7312c844f81d01997f9a47c48d36e88) )
 	ROM_LOAD16_BYTE( "dn06-5.j13", 0x40000, 0x10000, CRC(29d64e42) SHA1(c07ff5f29b7ccd5fc97b5086bcae57ab6eb29330) )
@@ -956,7 +956,7 @@ ROM_START( karnova )
 	ROM_LOAD( "dn05-5.f3", 0x8000, 0x8000, CRC(fa1a31a8) SHA1(5007a625be03c546d2a78444d72c28761b10cdb0) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "karnov_i8751.k13", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "dn-5.k14", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "dn00-.c5", 0x00000, 0x08000, CRC(0ed77c6d) SHA1(4ec86ac56c01c158a580dc13dea3e5cbdf90d0e9) )  /* Characters */
@@ -995,7 +995,7 @@ ROM_START( karnovj )
 	ROM_LOAD( "kar5.f3", 0x8000, 0x8000, CRC(7c9158f1) SHA1(dfba7b3abd6b8d6991f0207cd252ee652a6050c2) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "karnovj_i8751.k13", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "karnovj_i8751.k14", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "dn00-.c5",        0x00000, 0x08000, CRC(0ed77c6d) SHA1(4ec86ac56c01c158a580dc13dea3e5cbdf90d0e9) )  /* Characters */
@@ -1079,7 +1079,7 @@ ROM_START( wndrplnt )
 	ROM_LOAD( "ea05.f3",     0x8000, 0x8000, CRC(8dbb6231) SHA1(342faa020448ce916e820b3df18d44191983f7a6) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "wndrplnt_i8751.k13", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "wndrplnt_i8751.k14", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "ea00.c5",    0x00000, 0x08000, CRC(9f3cac4c) SHA1(af8a275ff531029dbada3c820c9f660fef383100) )   /* Characters */
@@ -1118,7 +1118,7 @@ ROM_START( chelnov )
 	ROM_LOAD( "ee05-.f3",     0x8000, 0x8000, CRC(6a8936b4) SHA1(2b72cb749e6bddb67c2bd3d27b3a92511f9ef016) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "ee-e.14k", 0x0000, 0x1000, CRC(b7045395) SHA1(a873de0978cbd169b481ee4c4512e47e7745df77) )
+	ROM_LOAD( "ee-e.k14", 0x0000, 0x1000, CRC(b7045395) SHA1(a873de0978cbd169b481ee4c4512e47e7745df77) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "ee00-e.c5",    0x00000, 0x08000, CRC(e06e5c6b) SHA1(70166257da5be428cb8404d8e1063c59c7722365) )  /* Characters */
@@ -1153,7 +1153,7 @@ ROM_START( chelnovu )
 	ROM_LOAD( "ee05-.f3",     0x8000, 0x8000, CRC(6a8936b4) SHA1(2b72cb749e6bddb67c2bd3d27b3a92511f9ef016) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "ee-a.14k", 0x0000, 0x1000, CRC(95ea1e7b) SHA1(6d9e3107a2b90734c826c6915c1a3443a7eddfdb) )
+	ROM_LOAD( "ee-a.k14", 0x0000, 0x1000, CRC(95ea1e7b) SHA1(6d9e3107a2b90734c826c6915c1a3443a7eddfdb) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "ee00-e.c5",    0x00000, 0x08000, CRC(e06e5c6b) SHA1(70166257da5be428cb8404d8e1063c59c7722365) )  /* Characters */
@@ -1177,8 +1177,8 @@ ROM_END
 
 ROM_START( chelnovj ) /* at least 1 PCB found with all labels as 'EPR-EExx' like Sega labels */
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
-	ROM_LOAD16_BYTE( "ee08.j15",    0x00000, 0x10000, CRC(1978cb52) SHA1(833b8e80445ec2384e0479afb7430b32d6a14441) ) /* PCBs known to have revision 1 ROM here - need to verify */
-	ROM_LOAD16_BYTE( "ee11.j20",    0x00001, 0x10000, CRC(e0ed3d99) SHA1(f47aaec5c72ecc308c32cdcf117ef4965ac5ea61) ) /* PCBs known to have revision 1 ROM here - need to verify */
+	ROM_LOAD16_BYTE( "ee08-1.j15",  0x00000, 0x10000, CRC(1978cb52) SHA1(833b8e80445ec2384e0479afb7430b32d6a14441) )
+	ROM_LOAD16_BYTE( "ee11-1.j20",  0x00001, 0x10000, CRC(e0ed3d99) SHA1(f47aaec5c72ecc308c32cdcf117ef4965ac5ea61) )
 	ROM_LOAD16_BYTE( "ee07.j14",    0x20000, 0x10000, CRC(51465486) SHA1(e165e754eb756db3abc1f8477171ab817d03a890) )
 	ROM_LOAD16_BYTE( "ee10.j18",    0x20001, 0x10000, CRC(d09dda33) SHA1(1764215606eec61e4fe30c0fc82ea2faf17821dc) )
 	ROM_LOAD16_BYTE( "ee06.j13",    0x40000, 0x10000, CRC(cd991507) SHA1(9da858ea41bfbce78496c086e3b462ea9f3722e8) )
@@ -1188,7 +1188,7 @@ ROM_START( chelnovj ) /* at least 1 PCB found with all labels as 'EPR-EExx' like
 	ROM_LOAD( "ee05.f3",     0x8000, 0x8000, CRC(6a8936b4) SHA1(2b72cb749e6bddb67c2bd3d27b3a92511f9ef016) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "ee.14k", 0x0000, 0x1000, CRC(b3dc380c) SHA1(81cc4ded918da9f232481f4e67cf71de814efc48) )
+	ROM_LOAD( "ee.k14", 0x0000, 0x1000, CRC(b3dc380c) SHA1(81cc4ded918da9f232481f4e67cf71de814efc48) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "ee00.c5",     0x00000, 0x08000, CRC(1abf2c6d) SHA1(86d625ae94cd9ea69e4e613895410640efb175b3) )  /* Characters */

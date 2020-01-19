@@ -57,7 +57,7 @@ public:
 		m_floppy1(*this, FD1797_TAG":1"),
 		m_cassette(*this, CASSETTE_TAG),
 		m_centronics(*this, CENTRONICS_TAG),
-		m_exp(*this, TIKI100_BUS_TAG),
+		m_exp(*this, "tiki100bus"),
 		m_rom(*this, Z80_TAG),
 		m_prom(*this, "u4"),
 		m_video_ram(*this, "video_ram"),

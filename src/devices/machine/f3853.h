@@ -71,7 +71,7 @@ public:
 
 	auto int_req_callback() { return m_int_req_callback.bind(); }
 	auto pri_out_callback() { return m_pri_out_callback.bind(); }
-	template<typename Object> void set_int_daisy_chain_callback(Object &&cb) { m_int_daisy_chain_callback = std::forward<Object>(cb); }
+	template <typename... T> void set_int_daisy_chain_callback(T &&... args) { m_int_daisy_chain_callback.set(std::forward<T>(args)...); }
 
 	virtual DECLARE_READ8_MEMBER(read);
 	virtual DECLARE_WRITE8_MEMBER(write);

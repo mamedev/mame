@@ -68,7 +68,7 @@ TILE_GET_INFO_MEMBER(dogfgt_state::get_tile_info)
 
 void dogfgt_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dogfgt_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dogfgt_state::get_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_bitmapram = std::make_unique<uint8_t[]>(BITMAPRAM_SIZE);
 	save_pointer(NAME(m_bitmapram), BITMAPRAM_SIZE);

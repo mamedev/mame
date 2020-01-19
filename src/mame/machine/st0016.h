@@ -19,7 +19,7 @@ public:
 
 	st0016_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
 
-	template <typename... T> void set_dma_offs_callback(T &&... args) { m_dma_offs_cb = dma_offs_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_dma_offs_callback(T &&... args) { m_dma_offs_cb.set(std::forward<T>(args)...); }
 
 	DECLARE_WRITE8_MEMBER(st0016_sprite_bank_w);
 	DECLARE_WRITE8_MEMBER(st0016_palette_bank_w);

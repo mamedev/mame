@@ -495,7 +495,7 @@ void argo_state::argo(machine_config &config)
 
 	i8275_device &crtc(I8275(config, "crtc", XTAL(20'000'000) / 12));  // unknown frequency
 	crtc.set_character_width(6);
-	crtc.set_display_callback(FUNC(argo_state::display_pixels), this);
+	crtc.set_display_callback(FUNC(argo_state::display_pixels));
 	crtc.drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 	crtc.set_screen("screen");
 }

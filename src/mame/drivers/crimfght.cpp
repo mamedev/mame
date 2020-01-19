@@ -328,12 +328,12 @@ void crimfght_state::crimfght(machine_config &config)
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen(nullptr);
-	m_k052109->set_tile_callback(FUNC(crimfght_state::tile_callback), this);
+	m_k052109->set_tile_callback(FUNC(crimfght_state::tile_callback));
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
-	m_k051960->set_sprite_callback(FUNC(crimfght_state::sprite_callback), this);
+	m_k051960->set_sprite_callback(FUNC(crimfght_state::sprite_callback));
 	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
 	/* sound hardware */

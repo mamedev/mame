@@ -18,8 +18,8 @@ msx_cart_arc_device::msx_cart_arc_device(const machine_config &mconfig, const ch
 void msx_cart_arc_device::device_start()
 {
 	// Install IO read/write handlers
-	io_space().install_write_handler(0x7f, 0x7f, write8smo_delegate(FUNC(msx_cart_arc_device::io_7f_w), this));
-	io_space().install_read_handler(0x7f, 0x7f, read8smo_delegate(FUNC(msx_cart_arc_device::io_7f_r), this));
+	io_space().install_write_handler(0x7f, 0x7f, write8smo_delegate(*this, FUNC(msx_cart_arc_device::io_7f_w)));
+	io_space().install_read_handler(0x7f, 0x7f, read8smo_delegate(*this, FUNC(msx_cart_arc_device::io_7f_r)));
 }
 
 

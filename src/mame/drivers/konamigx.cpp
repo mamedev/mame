@@ -1620,7 +1620,7 @@ void konamigx_state::konamigx(machine_config &config)
 	m_k053252->int2_ack().set(FUNC(konamigx_state::hblank_irq_ack_w));
 	m_k053252->set_screen("screen");
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MCFG_MACHINE_START_OVERRIDE(konamigx_state,konamigx)
 	MCFG_MACHINE_RESET_OVERRIDE(konamigx_state,konamigx)
@@ -1645,7 +1645,7 @@ void konamigx_state::konamigx(machine_config &config)
 	m_palette->enable_hilights();
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(konamigx_state::type2_tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(konamigx_state::type2_tile_callback));
 	m_k056832->set_config(K056832_BPP_5, 0, 0);
 	m_k056832->set_palette(m_palette);
 
@@ -1656,7 +1656,7 @@ void konamigx_state::konamigx(machine_config &config)
 	m_k054338->set_alpha_invert(1);
 
 	K055673(config, m_k055673, 0);
-	m_k055673->set_sprite_callback(FUNC(konamigx_state::type2_sprite_callback), this);
+	m_k055673->set_sprite_callback(FUNC(konamigx_state::type2_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_GX, -26, -23);
 	m_k055673->set_screen(m_screen);
 	m_k055673->set_palette(m_palette);
@@ -1708,7 +1708,7 @@ void konamigx_state::sexyparo(machine_config &config)
 {
 	konamigx(config);
 
-	m_k056832->set_tile_callback(FUNC(konamigx_state::alpha_tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(konamigx_state::alpha_tile_callback));
 
 	m_k055673->set_config(K055673_LAYOUT_GX, -42, -23);
 }
@@ -1729,7 +1729,7 @@ void konamigx_state::dragoonj(machine_config &config)
 
 	m_k056832->set_config(K056832_BPP_5, 1, 0);
 
-	m_k055673->set_sprite_callback(FUNC(konamigx_state::dragoonj_sprite_callback), this);
+	m_k055673->set_sprite_callback(FUNC(konamigx_state::dragoonj_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_RNG, -53, -23);
 }
 
@@ -1742,7 +1742,7 @@ void konamigx_state::le2(machine_config &config)
 
 	m_k056832->set_config(K056832_BPP_8, 1, 0);
 
-	m_k055673->set_sprite_callback(FUNC(konamigx_state::le2_sprite_callback), this);
+	m_k055673->set_sprite_callback(FUNC(konamigx_state::le2_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_LE2, -46, -23);
 }
 
@@ -1761,7 +1761,7 @@ void konamigx_state::salmndr2(machine_config &config)
 	konamigx(config);
 	m_k056832->set_config(K056832_BPP_6, 1, 0);
 
-	m_k055673->set_sprite_callback(FUNC(konamigx_state::salmndr2_sprite_callback), this);
+	m_k055673->set_sprite_callback(FUNC(konamigx_state::salmndr2_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_GX6, -48, -23);
 }
 
@@ -1914,7 +1914,7 @@ void konamigx_state::winspike(machine_config &config)
 
 	m_k053252->set_offsets(24+15, 16);
 
-	m_k056832->set_tile_callback(FUNC(konamigx_state::alpha_tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(konamigx_state::alpha_tile_callback));
 	m_k056832->set_config(K056832_BPP_8, 0, 2);
 
 	m_k055673->set_config(K055673_LAYOUT_LE2, -53, -23);
@@ -3852,8 +3852,8 @@ void konamigx_state::init_konamigx()
 			switch (gameDefs[i].special)
 			{
 				case 1: // LE2 guns
-					m_maincpu->space(AS_PROGRAM).install_read_handler(0xd44000, 0xd44003, read32_delegate(FUNC(konamigx_state::le2_gun_H_r),this));
-					m_maincpu->space(AS_PROGRAM).install_read_handler(0xd44004, 0xd44007, read32_delegate(FUNC(konamigx_state::le2_gun_V_r),this));
+					m_maincpu->space(AS_PROGRAM).install_read_handler(0xd44000, 0xd44003, read32_delegate(*this, FUNC(konamigx_state::le2_gun_H_r)));
+					m_maincpu->space(AS_PROGRAM).install_read_handler(0xd44004, 0xd44007, read32_delegate(*this, FUNC(konamigx_state::le2_gun_V_r)));
 					break;
 				case 2: // tkmmpzdm hack
 				{
@@ -3888,7 +3888,7 @@ void konamigx_state::init_konamigx()
 					break;
 
 				case 7: // install type 4 Xilinx protection for non-type 3/4 games
-					m_maincpu->space(AS_PROGRAM).install_write_handler(0xcc0000, 0xcc0007, write32_delegate(FUNC(konamigx_state::type4_prot_w),this));
+					m_maincpu->space(AS_PROGRAM).install_write_handler(0xcc0000, 0xcc0007, write32_delegate(*this, FUNC(konamigx_state::type4_prot_w)));
 					break;
 
 				case 8: // tbyahhoo
@@ -3905,7 +3905,7 @@ void konamigx_state::init_konamigx()
 	}
 
 	if (readback == BPP66)
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xd00000, 0xd01fff, read32_delegate(FUNC(konamigx_state::k_6bpp_rom_long_r), this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xd00000, 0xd01fff, read32_delegate(*this, FUNC(konamigx_state::k_6bpp_rom_long_r)));
 
 
 #undef BPP5

@@ -47,24 +47,24 @@ void namco_c123tmap_device::device_start()
 	m_tilemapinfo.videoram = std::make_unique<uint16_t[]>(size);
 
 	/* four scrolling tilemaps */
-	m_tilemapinfo.tmap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namco_c123tmap_device::get_tile_info<0x0000>), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemapinfo.tmap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namco_c123tmap_device::get_tile_info<0x1000>), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemapinfo.tmap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namco_c123tmap_device::get_tile_info<0x2000>), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemapinfo.tmap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x0000>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemapinfo.tmap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x1000>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemapinfo.tmap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x2000>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	if (m_tmap3_half_height)
 	{
-		m_tilemapinfo.tmap[3] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namco_c123tmap_device::get_tile_info<0x3000>), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+		m_tilemapinfo.tmap[3] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x3000>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 		/* two non-scrolling tilemaps */
-		m_tilemapinfo.tmap[4] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namco_c123tmap_device::get_tile_info<0x3808>), this), TILEMAP_SCAN_ROWS, 8, 8, 36, 28);
-		m_tilemapinfo.tmap[5] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namco_c123tmap_device::get_tile_info<0x3c08>), this), TILEMAP_SCAN_ROWS, 8, 8, 36, 28);
+		m_tilemapinfo.tmap[4] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x3808>)), TILEMAP_SCAN_ROWS, 8, 8, 36, 28);
+		m_tilemapinfo.tmap[5] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x3c08>)), TILEMAP_SCAN_ROWS, 8, 8, 36, 28);
 	}
 	else
 	{
-		m_tilemapinfo.tmap[3] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namco_c123tmap_device::get_tile_info<0x3000>), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+		m_tilemapinfo.tmap[3] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x3000>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 		/* two non-scrolling tilemaps */
-		m_tilemapinfo.tmap[4] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namco_c123tmap_device::get_tile_info<0x4008>), this), TILEMAP_SCAN_ROWS, 8, 8, 36, 28);
-		m_tilemapinfo.tmap[5] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namco_c123tmap_device::get_tile_info<0x4408>), this), TILEMAP_SCAN_ROWS, 8, 8, 36, 28);
+		m_tilemapinfo.tmap[4] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x4008>)), TILEMAP_SCAN_ROWS, 8, 8, 36, 28);
+		m_tilemapinfo.tmap[5] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x4408>)), TILEMAP_SCAN_ROWS, 8, 8, 36, 28);
 	}
 
 	/* define offsets for scrolling */

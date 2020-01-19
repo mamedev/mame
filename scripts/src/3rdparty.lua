@@ -51,6 +51,7 @@ end
 			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
 			"/wd4127", -- warning C4127: conditional expression is constant
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
+			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
@@ -60,10 +61,6 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
 		}
 end
-	configuration { "vs201*" }
-		buildoptions {
-			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
-		}
 	configuration { }
 
 	files {
@@ -154,13 +151,15 @@ project "softfloat"
 		"ForceCPP",
 	}
 
-	buildoptions_cpp {
-		"-x c++",
-	}
-
 	includedirs {
 		MAME_DIR .. "src/osd",
 	}
+
+	configuration { "gmake or ninja" }
+		buildoptions_cpp {
+			"-x c++",
+		}
+
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
@@ -192,16 +191,17 @@ options {
 	"ForceCPP",
 }
 
-buildoptions_cpp {
-	"-x c++",
-}
-
 includedirs {
 	MAME_DIR .. "src/osd",
 	MAME_DIR .. "3rdparty/softfloat3/build/MAME",
 	MAME_DIR .. "3rdparty/softfloat3/source",
 	MAME_DIR .. "3rdparty/softfloat3/source/include",
 	MAME_DIR .. "3rdparty/softfloat3/source/8086",
+}
+
+configuration { "gmake or ninja" }
+buildoptions_cpp {
+	"-x c++",
 }
 
 configuration { "vs*" }
@@ -619,6 +619,7 @@ project "flac"
 			"/wd4127", -- warning C4127: conditional expression is constant
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
 			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
+			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 			"/wd4702", -- warning C4702: unreachable code
 		}
 if _OPTIONS["vs"]=="intel-15" then
@@ -634,11 +635,6 @@ end
 	configuration { "mingw-clang" }
 		buildoptions {
 			"-include stdint.h"
-		}
-
-	configuration { "vs201*" }
-		buildoptions {
-			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 		}
 
 	configuration { "vsllvm" }
@@ -724,17 +720,14 @@ project "7z"
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
+			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
+			"/wd4457", -- warning C4457: declaration of 'xxx' hides function parameter
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
 			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
 		}
 end
-	configuration { "vs201*" }
-		buildoptions {
-			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
-			"/wd4457", -- warning C4457: declaration of 'xxx' hides function parameter
-		}
 	configuration { "winstore*" }
 		forcedincludes {
 			MAME_DIR .. "src/osd/uwp/uwpcompat.h"
@@ -1021,6 +1014,7 @@ project "portmidi"
 			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
 			"/wd4127", -- warning C4127: conditional expression is constant
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
+			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 			"/wd4706", -- warning C4706: assignment within conditional expression
 		}
 if _OPTIONS["vs"]=="intel-15" then
@@ -1031,11 +1025,6 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd2557",             -- remark #2557: comparison between signed and unsigned operands
 		}
 end
-
-	configuration { "vs201*" }
-		buildoptions {
-			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
-		}
 
 	configuration { "linux*" }
 		defines {
@@ -1206,8 +1195,8 @@ project "bimg"
 
 	configuration { }
 
-	if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="windows" then
-		if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
+	if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="asmjs" then
+		if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs")) then
 			buildoptions_cpp {
 				"-Wno-unused-const-variable",
 			}
@@ -1380,12 +1369,23 @@ end
 		"__STDC_CONSTANT_MACROS",
 		"BGFX_CONFIG_MAX_FRAME_BUFFERS=128",
 	}
+
+	if _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
+		if _OPTIONS["NO_X11"]=="1" then
+			defines {
+				"BGFX_CONFIG_RENDERER_OPENGLES=1",
+				"BGFX_CONFIG_RENDERER_OPENGL=0",
+			}
+		end
+	end
+
 	files {
 		MAME_DIR .. "3rdparty/bgfx/src/bgfx.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/debug_renderdoc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/dxgi.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_egl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_glx.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/glcontext_html5.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_wgl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/nvapi.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d11.cpp",
@@ -1437,6 +1437,8 @@ project "portaudio"
 			"/wd4389", -- warning C4389: 'operator' : signed/unsigned mismatch
 			"/wd4189", -- warning C4189: 'xxx' : local variable is initialized but not referenced
 			"/wd4127", -- warning C4127: conditional expression is constant
+			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
+			"/wd4312", -- warning C4312: 'type cast': conversion from 'UINT' to 'HWAVEIN' of greater size
 		}
 	if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
@@ -1446,10 +1448,6 @@ project "portaudio"
 			"/Qwd1879",             -- warning #1879: unimplemented pragma ignored
 		}
 	end
-	configuration { "vs2015*" }
-		buildoptions {
-			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
-		}
 
 	configuration { "vsllvm" }
 		buildoptions {

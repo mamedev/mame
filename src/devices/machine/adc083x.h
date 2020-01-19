@@ -40,15 +40,7 @@ public:
 	typedef device_delegate<double (uint8_t input)> input_delegate;
 
 	// configuration helpers
-	void set_input_callback(input_delegate callback) { m_input_callback = callback; }
-	template <class FunctionClass> void set_input_callback(const char *devname, double (FunctionClass::*callback)(uint8_t), const char *name)
-	{
-		set_input_callback(input_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_input_callback(double (FunctionClass::*callback)(uint8_t), const char *name)
-	{
-		set_input_callback(input_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_input_callback(T &&... args) { m_input_callback.set(std::forward<T>(args)...); }
 
 	DECLARE_WRITE_LINE_MEMBER( cs_write );
 	DECLARE_WRITE_LINE_MEMBER( clk_write );

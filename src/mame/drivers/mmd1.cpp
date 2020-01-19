@@ -91,11 +91,16 @@ public:
 		, m_cass(*this, "cassette")
 		, m_uart(*this, "uart")
 		, m_digits(*this, "digit%u", 0U)
-		{ }
+		, m_p(*this, "p%u_%u", 0U, 0U)
+	{ }
 
 	void mmd1(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	DECLARE_WRITE8_MEMBER(port00_w);
@@ -107,54 +112,56 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(so);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	DECLARE_WRITE_LINE_MEMBER(kansas_w);
-	u8 m_cass_data[4];
-	bool m_cassinbit, m_cassoutbit, m_cassold;
+
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-	virtual void machine_reset() override;
+
+	u8 m_cass_data[4];
+	bool m_cassinbit, m_cassoutbit, m_cassold;
 	uint8_t m_return_code;
-	virtual void machine_start() override { m_digits.resolve(); }
+
 	required_device<i8080_cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<ay31015_device> m_uart;
 	output_finder<9> m_digits;
+	output_finder<3, 8> m_p;
 };
 
 
 WRITE8_MEMBER( mmd1_state::port00_w )
 {
-	output().set_value("p0_7", BIT(data,7) ? 0 : 1);
-	output().set_value("p0_6", BIT(data,6) ? 0 : 1);
-	output().set_value("p0_5", BIT(data,5) ? 0 : 1);
-	output().set_value("p0_4", BIT(data,4) ? 0 : 1);
-	output().set_value("p0_3", BIT(data,3) ? 0 : 1);
-	output().set_value("p0_2", BIT(data,2) ? 0 : 1);
-	output().set_value("p0_1", BIT(data,1) ? 0 : 1);
-	output().set_value("p0_0", BIT(data,0) ? 0 : 1);
+	m_p[0][7] = BIT(data,7) ? 0 : 1;
+	m_p[0][6] = BIT(data,6) ? 0 : 1;
+	m_p[0][5] = BIT(data,5) ? 0 : 1;
+	m_p[0][4] = BIT(data,4) ? 0 : 1;
+	m_p[0][3] = BIT(data,3) ? 0 : 1;
+	m_p[0][2] = BIT(data,2) ? 0 : 1;
+	m_p[0][1] = BIT(data,1) ? 0 : 1;
+	m_p[0][0] = BIT(data,0) ? 0 : 1;
 }
 
 WRITE8_MEMBER( mmd1_state::port01_w )
 {
-	output().set_value("p1_7", BIT(data,7) ? 0 : 1);
-	output().set_value("p1_6", BIT(data,6) ? 0 : 1);
-	output().set_value("p1_5", BIT(data,5) ? 0 : 1);
-	output().set_value("p1_4", BIT(data,4) ? 0 : 1);
-	output().set_value("p1_3", BIT(data,3) ? 0 : 1);
-	output().set_value("p1_2", BIT(data,2) ? 0 : 1);
-	output().set_value("p1_1", BIT(data,1) ? 0 : 1);
-	output().set_value("p1_0", BIT(data,0) ? 0 : 1);
+	m_p[1][7] = BIT(data,7) ? 0 : 1;
+	m_p[1][6] = BIT(data,6) ? 0 : 1;
+	m_p[1][5] = BIT(data,5) ? 0 : 1;
+	m_p[1][4] = BIT(data,4) ? 0 : 1;
+	m_p[1][3] = BIT(data,3) ? 0 : 1;
+	m_p[1][2] = BIT(data,2) ? 0 : 1;
+	m_p[1][1] = BIT(data,1) ? 0 : 1;
+	m_p[1][0] = BIT(data,0) ? 0 : 1;
 }
 
 WRITE8_MEMBER( mmd1_state::port02_w )
 {
-	output().set_value("p2_7", BIT(data,7) ? 0 : 1);
-	output().set_value("p2_6", BIT(data,6) ? 0 : 1);
-	output().set_value("p2_5", BIT(data,5) ? 0 : 1);
-	output().set_value("p2_4", BIT(data,4) ? 0 : 1);
-	output().set_value("p2_3", BIT(data,3) ? 0 : 1);
-	output().set_value("p2_2", BIT(data,2) ? 0 : 1);
-	output().set_value("p2_1", BIT(data,1) ? 0 : 1);
-	output().set_value("p2_0", BIT(data,0) ? 0 : 1);
+	m_p[2][7] = BIT(data,7) ? 0 : 1;
+	m_p[2][6] = BIT(data,6) ? 0 : 1;
+	m_p[2][5] = BIT(data,5) ? 0 : 1;
+	m_p[2][4] = BIT(data,4) ? 0 : 1;
+	m_p[2][3] = BIT(data,3) ? 0 : 1;
+	m_p[2][2] = BIT(data,2) ? 0 : 1;
+	m_p[2][1] = BIT(data,1) ? 0 : 1;
+	m_p[2][0] = BIT(data,0) ? 0 : 1;
 }
 
 // keyboard has a keydown and a keyup code. Keyup = last keydown + bit 7 set
@@ -304,6 +311,12 @@ INPUT_PORTS_END
 INPUT_CHANGED_MEMBER(mmd1_state::reset_button)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void mmd1_state::machine_start()
+{
+	m_digits.resolve();
+	m_p.resolve();
 }
 
 void mmd1_state::machine_reset()

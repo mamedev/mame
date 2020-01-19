@@ -4057,7 +4057,7 @@ void segas1x_bootleg_state::init_altbeastbl()
 {
 	init_common();
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x418000, 0x418029, write16_delegate(FUNC(segas1x_bootleg_state::altbeastbl_gfx_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x418000, 0x418029, write16_delegate(*this, FUNC(segas1x_bootleg_state::altbeastbl_gfx_w)));
 }
 
 /* Tetris-based */
@@ -4128,7 +4128,7 @@ void segas1x_bootleg_state::init_astormb2()
 	init_sys18bl_oki();
 
 	m_maincpu->space(AS_PROGRAM).unmap_write(0xa00006, 0xa00007);
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00006, 0xa00007, write8smo_delegate(FUNC(generic_latch_8_device::write), (generic_latch_8_device*)m_soundlatch), 0x00ff);
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00006, 0xa00007, write8smo_delegate(*m_soundlatch, FUNC(generic_latch_8_device::write)), 0x00ff);
 }
 
 /*************************************

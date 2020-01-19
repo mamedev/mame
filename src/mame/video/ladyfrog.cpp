@@ -127,7 +127,7 @@ void ladyfrog_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 VIDEO_START_MEMBER(ladyfrog_state,ladyfrog_common)
 {
 	m_spriteram = std::make_unique<uint8_t[]>(160);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ladyfrog_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ladyfrog_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_paletteram.resize(0x200);
 	m_paletteram_ext.resize(0x200);

@@ -941,7 +941,7 @@ void hx20_state::hx20(machine_config &config)
 
 	// optional rom
 	GENERIC_SOCKET(config, m_optrom, generic_plain_slot, "opt_rom", "bin,rom");
-	m_optrom->set_device_load(FUNC(hx20_state::optrom_load), this);
+	m_optrom->set_device_load(FUNC(hx20_state::optrom_load));
 
 	// software lists
 	SOFTWARE_LIST(config, "hx20_opt_list").set_original("hx20_rom");

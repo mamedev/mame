@@ -463,8 +463,8 @@ void sg1000_state::machine_start()
 {
 	if (m_cart->get_type() == SEGA8_DAHJEE_TYPEA || m_cart->get_type() == SEGA8_DAHJEE_TYPEB)
 	{
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8_delegate(FUNC(sega8_cart_slot_device::read_ram),(sega8_cart_slot_device*)m_cart));
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0xc000, 0xffff, write8_delegate(FUNC(sega8_cart_slot_device::write_ram),(sega8_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8_delegate(*m_cart, FUNC(sega8_cart_slot_device::read_ram)));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0xc000, 0xffff, write8_delegate(*m_cart, FUNC(sega8_cart_slot_device::write_ram)));
 	}
 
 	if (m_cart)
@@ -484,8 +484,8 @@ void sc3000_state::machine_start()
 								|| m_cart->get_type() == SEGA8_DAHJEE_TYPEA || m_cart->get_type() == SEGA8_DAHJEE_TYPEB
 								|| m_cart->get_type() == SEGA8_MULTICART || m_cart->get_type() == SEGA8_MEGACART))
 	{
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8_delegate(FUNC(sega8_cart_slot_device::read_ram),(sega8_cart_slot_device*)m_cart));
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0xc000, 0xffff, write8_delegate(FUNC(sega8_cart_slot_device::write_ram),(sega8_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8_delegate(*m_cart, FUNC(sega8_cart_slot_device::read_ram)));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0xc000, 0xffff, write8_delegate(*m_cart, FUNC(sega8_cart_slot_device::write_ram)));
 	}
 
 	if (m_cart)

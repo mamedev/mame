@@ -670,7 +670,7 @@ void esripsys_state::esripsys(machine_config &config)
 	m_gamecpu->set_addrmap(AS_PROGRAM, &esripsys_state::game_cpu_map);
 	m_gamecpu->set_vblank_int("screen", FUNC(esripsys_state::esripsys_vblank_irq));
 
-	config.m_perfect_cpu_quantum = subtag("game_cpu");
+	config.set_perfect_quantum(m_gamecpu);
 
 	MC6809E(config, m_framecpu, XTAL(8'000'000) / 4);
 	m_framecpu->set_addrmap(AS_PROGRAM, &esripsys_state::frame_cpu_map);

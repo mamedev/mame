@@ -180,7 +180,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void vsc(machine_config &config);
 
 protected:
@@ -416,7 +416,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void vsc_state::vsc(machine_config &config)

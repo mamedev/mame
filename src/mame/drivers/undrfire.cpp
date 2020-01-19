@@ -569,7 +569,7 @@ void undrfire_state::cbombers(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &undrfire_state::cbombers_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(undrfire_state::irq4_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(480);   /* CPU slices - Need to interleave Cpu's 1 & 3 */
+	config.set_maximum_quantum(attotime::from_hz(480));   /* CPU slices - Need to interleave Cpu's 1 & 3 */
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 

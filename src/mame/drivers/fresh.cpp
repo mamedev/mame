@@ -159,8 +159,8 @@ WRITE16_MEMBER(fresh_state::fresh_attr_2_videoram_w)
 
 void fresh_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fresh_state::get_fresh_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8,  64, 512);
-	m_bg_2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fresh_state::get_fresh_bg_2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8,  64, 512);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fresh_state::get_fresh_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8,  64, 512);
+	m_bg_2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fresh_state::get_fresh_bg_2_tile_info)), TILEMAP_SCAN_ROWS, 8, 8,  64, 512);
 
 	m_bg_tilemap->set_transparent_pen(255);
 }

@@ -23,6 +23,7 @@
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "machine/intelfsh.h"
+#include "video/pc_vga.h"
 
 #include "bus/lpci/pci.h"
 
@@ -46,6 +47,7 @@ public:
 		, m_smc37c78(*this, "smc37c78")
 		, m_flash(*this, "flash")
 		, m_pcibus(*this, "pcibus")
+		, m_vga(*this, "vga")
 	{
 	}
 
@@ -58,6 +60,7 @@ public:
 	required_device<smc37c78_device> m_smc37c78;
 	required_device<fujitsu_29f016a_device> m_flash;
 	required_device<pci_bus_device> m_pcibus;
+	required_device<vga_device> m_vga;
 	uint32_t m_cpu_imask[2];
 	uint32_t m_interrupts;
 	uint32_t m_crossproc_interrupts;
@@ -118,7 +121,8 @@ public:
 	void bebox_set_irq_bit(unsigned int interrupt_bit, int val);
 	void bebox_update_interrupts();
 
-	static void mpc105_config(device_t *device);
+	void mpc105_config(device_t *device);
+	void cirrus_config(device_t *device);
 
 	pci_connector_device & add_pci_slot(machine_config &config, const char *tag, size_t index, const char *default_tag);
 	void bebox_peripherals(machine_config &config);

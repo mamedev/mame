@@ -896,8 +896,8 @@ void bzone_state::init_bradley()
 	space.install_ram(0x400, 0x7ff);
 	space.install_read_port(0x1808, 0x1808, "1808");
 	space.install_read_port(0x1809, 0x1809, "1809");
-	space.install_read_handler(0x180a, 0x180a, read8smo_delegate(FUNC(bzone_state::analog_data_r),this));
-	space.install_write_handler(0x1848, 0x1850, write8sm_delegate(FUNC(bzone_state::analog_select_w),this));
+	space.install_read_handler(0x180a, 0x180a, read8smo_delegate(*this, FUNC(bzone_state::analog_data_r)));
+	space.install_write_handler(0x1848, 0x1850, write8sm_delegate(*this, FUNC(bzone_state::analog_select_w)));
 }
 
 

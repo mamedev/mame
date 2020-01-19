@@ -11,6 +11,12 @@
     The AT&T PC6300, the Xerox 6060 and the Logabax Persona 1600 were
     badge-engineered Olivetti M24s.
 
+    The Olivetti M21 was a portable version of the M24 that sported a 9"
+    monochrome monitor.
+
+    http://www.computinghistory.org.uk/det/43175/Olivetti-M21/
+    https://www.nightfallcrew.com/23/02/2014/repairing-a-defective-olivetti-m21/
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -613,6 +619,15 @@ void m24_state::olivetti(machine_config &config)
 	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
 }
 
+ROM_START( m21 )
+	ROM_REGION16_LE(0x8000,"bios", 0)
+	ROMX_LOAD( "bios_m24_144_even.bin", 0x4000, 0x2000, CRC(5f3d7084) SHA1(d55c0d8472b45e4c4ca9cb0066cd5c122056ba8e), ROM_SKIP(1))
+	ROMX_LOAD( "bios_m24_144_odd.bin", 0x4001, 0x2000, CRC(18fd8db8) SHA1(f2c9d189f7ded88946a99432abd7106d509a7411), ROM_SKIP(1))
+
+	ROM_REGION(0x800, "kbc", 0)
+	ROM_LOAD("pdbd.tms2516.kbdmcu_replacement_board.10u", 0x000, 0x800, CRC(b8c4c18a) SHA1(25b4c24e19ff91924c53557c66513ab242d926c6))
+ROM_END
+
 ROM_START( m24 )
 	ROM_REGION16_LE(0x8000,"bios", 0)
 	ROM_SYSTEM_BIOS(0,"v1.1","v1.1")
@@ -645,5 +660,6 @@ ROM_START( m240 )
 	ROM_LOAD("pdbd.tms2516.kbdmcu_replacement_board.10u", 0x000, 0x800, BAD_DUMP CRC(b8c4c18a) SHA1(25b4c24e19ff91924c53557c66513ab242d926c6))
 ROM_END
 
+COMP( 1984, m21,  ibm5150, 0, olivetti, m24, m24_state, empty_init, "Olivetti", "M21",  MACHINE_NOT_WORKING )
 COMP( 1983, m24,  ibm5150, 0, olivetti, m24, m24_state, empty_init, "Olivetti", "M24",  MACHINE_NOT_WORKING )
 COMP( 1987, m240, ibm5150, 0, olivetti, m24, m24_state, empty_init, "Olivetti", "M240", MACHINE_NOT_WORKING )

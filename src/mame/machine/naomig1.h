@@ -17,10 +17,12 @@ public:
 	typedef delegate<void (uint32_t main_adr, void *dma_ptr, uint32_t length, uint32_t size, bool to_mainram)> dma_cb;
 
 	auto irq_callback() { return irq_cb.bind(); }
+	auto ext_irq_callback() { return ext_irq_cb.bind(); }
+	auto reset_out_callback() { return reset_out_cb.bind(); }
 	void set_dma_cb(dma_cb cb) { _dma_cb = cb; }
 
-	void amap(address_map &map);
-	virtual void submap(address_map &map) = 0;
+	void amap(address_map &map);               // for range 0x005f7400-0x005f74ff
+	virtual void submap(address_map &map) = 0; // for range 0x005f7000-0x005f70ff
 
 	DECLARE_READ32_MEMBER(sb_gdstar_r);   // 5f7404
 	DECLARE_WRITE32_MEMBER(sb_gdstar_w);  // 5f7404
@@ -60,11 +62,16 @@ protected:
 	virtual void dma_get_position(uint8_t *&base, uint32_t &limit, bool to_maincpu) = 0;
 	virtual void dma_advance(uint32_t size) = 0;
 
+	void set_ext_irq(int state) { ext_irq_cb(state); }
+	void set_reset_out() { reset_out_cb(ASSERT_LINE); }
+
 private:
 	uint32_t gdstar, gdlen, gddir, gden, gdst;
 
 	emu_timer *timer;
 	devcb_write8 irq_cb;
+	devcb_write_line ext_irq_cb;
+	devcb_write_line reset_out_cb;
 	dma_cb _dma_cb;
 
 	void dma(void *dma_ptr, uint32_t main_adr, uint32_t size, bool to_mainram);

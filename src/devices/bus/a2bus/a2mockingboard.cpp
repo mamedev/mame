@@ -338,7 +338,7 @@ WRITE8_MEMBER( a2bus_ayboard_device::via2_out_b )
 				break;
 
 			case 3: // BDIR=1, BC1=1 (latch)
-				m_ay2->data_w(m_porta2);
+				m_ay2->address_w(m_porta2);
 				break;
 		}
 	}

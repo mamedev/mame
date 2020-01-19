@@ -585,9 +585,9 @@ void raiden2_state::raiden2_mem(address_map &map)
 
 	map(0x0068e, 0x0068f).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 
-	map(0x00700, 0x0071f).lrw8("seibu_sound_rw",
-							   [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
-							   [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+	map(0x00700, 0x0071f).lrw8(
+							   NAME([this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+							   NAME([this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
 
 	map(0x00740, 0x00741).portr("DSW");
 	map(0x00744, 0x00745).portr("P1_P2");
@@ -630,9 +630,9 @@ void raiden2_state::zeroteam_mem(address_map &map)
 
 	map(0x0068e, 0x0068f).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 
-	map(0x00700, 0x0071f).lrw8("seibu_sound_rw",
-							   [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
-							   [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+	map(0x00700, 0x0071f).lrw8(
+							   NAME([this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+							   NAME([this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
 
 	map(0x00740, 0x00741).portr("DSW");
 	map(0x00744, 0x00745).portr("P1_P2");
@@ -664,9 +664,9 @@ void raiden2_state::xsedae_mem(address_map &map)
 
 	map(0x0068e, 0x0068f).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 
-	map(0x00700, 0x0071f).lrw8("seibu_sound_rw",
-							   [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
-							   [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+	map(0x00700, 0x0071f).lrw8(
+							   NAME([this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+							   NAME([this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
 
 	map(0x00740, 0x00741).portr("DSW");
 	map(0x00744, 0x00745).portr("P1_P2");

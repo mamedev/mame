@@ -70,16 +70,16 @@ void lordgun_state::video_start()
 	int h = m_screen->height();
 
 	// 0x800 x 200
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS,8,8, 0x100, 0x40 );
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lordgun_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS,  8, 8, 0x100, 0x40);
 
 	// 0x800 x 200
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS,16,16, 0x80,0x20 );
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lordgun_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16,16,  0x80, 0x20);
 
 	// 0x800 x 200
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info<2>),this), TILEMAP_SCAN_ROWS,32,32, 0x40,0x10 );
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lordgun_state::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 32,32,  0x40, 0x10);
 
 	// 0x200 x 100
-	m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info<3>),this), TILEMAP_SCAN_ROWS,8,8, 0x40,0x20 );
+	m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lordgun_state::get_tile_info<3>)), TILEMAP_SCAN_ROWS,  8, 8,  0x40, 0x20);
 
 	m_tilemap[0]->set_scroll_rows(1);
 	m_tilemap[0]->set_scroll_cols(1);

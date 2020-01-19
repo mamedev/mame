@@ -253,7 +253,7 @@ generic_keyboard_device::generic_keyboard_device(
 	, m_config(*this, "GENKBD_CFG")
 	, m_modifiers(*this, "GENKBD_MOD")
 	, m_last_modifiers(0U)
-	, m_keyboard_cb()
+	, m_keyboard_cb(*this)
 {
 }
 
@@ -272,7 +272,7 @@ ioport_constructor generic_keyboard_device::device_input_ports() const
 
 void generic_keyboard_device::device_start()
 {
-	m_keyboard_cb.bind_relative_to(*owner());
+	m_keyboard_cb.resolve();
 
 	save_item(NAME(m_last_modifiers));
 }

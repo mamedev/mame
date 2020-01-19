@@ -494,11 +494,11 @@ void prof80_state::prof80(machine_config &config)
 
 	// ECB bus
 	ECBBUS(config, m_ecb);
-	ECBBUS_SLOT(config, "ecb_1", 1, ecbbus_cards, "grip21");
-	ECBBUS_SLOT(config, "ecb_2", 2, ecbbus_cards, nullptr);
-	ECBBUS_SLOT(config, "ecb_3", 3, ecbbus_cards, nullptr);
-	ECBBUS_SLOT(config, "ecb_4", 4, ecbbus_cards, nullptr);
-	ECBBUS_SLOT(config, "ecb_5", 5, ecbbus_cards, nullptr);
+	ECBBUS_SLOT(config, "ecb_1", m_ecb, 1, ecbbus_cards, "grip21");
+	ECBBUS_SLOT(config, "ecb_2", m_ecb, 2, ecbbus_cards, nullptr);
+	ECBBUS_SLOT(config, "ecb_3", m_ecb, 3, ecbbus_cards, nullptr);
+	ECBBUS_SLOT(config, "ecb_4", m_ecb, 4, ecbbus_cards, nullptr);
+	ECBBUS_SLOT(config, "ecb_5", m_ecb, 5, ecbbus_cards, nullptr);
 
 	// V24
 	RS232_PORT(config, m_rs232a, default_rs232_devices, nullptr);

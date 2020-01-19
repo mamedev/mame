@@ -12,7 +12,7 @@
 
 // ======================> astrocade_blueram_4k_device
 
-class astrocade_blueram_4k_device : public device_t, public device_astrocade_card_interface
+class astrocade_blueram_4k_device : public device_t, public device_astrocade_exp_interface
 {
 public:
 	// construction/destruction
@@ -69,7 +69,7 @@ public:
 
 // ======================> astrocade_viper_sys1_device
 
-class astrocade_viper_sys1_device : public device_t, public device_astrocade_card_interface
+class astrocade_viper_sys1_device : public device_t, public device_astrocade_exp_interface
 {
 public:
 	// construction/destruction
@@ -93,7 +93,7 @@ private:
 
 // ======================> astrocade_whiteram_device
 
-class astrocade_whiteram_device : public device_t, public device_astrocade_card_interface
+class astrocade_whiteram_device : public device_t, public device_astrocade_exp_interface
 {
 public:
 	// construction/destruction
@@ -117,7 +117,7 @@ private:
 
 // ======================> astrocade_rl64ram_device
 
-class astrocade_rl64ram_device : public device_t, public device_astrocade_card_interface
+class astrocade_rl64ram_device : public device_t, public device_astrocade_exp_interface
 {
 public:
 	// construction/destruction

@@ -221,7 +221,7 @@ void t11_device::t11_check_irqs()
 		PUSH(PC);
 		PCD = new_pc;
 		PSW = new_psw;
-		t11_check_irqs();
+		//t11_check_irqs();
 
 		/* count cycles and clear the WAIT flag */
 		m_icount -= 114;
@@ -279,15 +279,15 @@ void t11_device::device_start()
 	save_item(NAME(m_irq_state));
 
 	// Register debugger state
-	state_add( T11_PC,  "PC",  m_reg[7].w.l).formatstr("%04X");
-	state_add( T11_SP,  "SP",  m_reg[6].w.l).formatstr("%04X");
-	state_add( T11_PSW, "PSW", m_psw.b.l).formatstr("%02X");
-	state_add( T11_R0,  "R0",  m_reg[0].w.l).formatstr("%04X");
-	state_add( T11_R1,  "R1",  m_reg[1].w.l).formatstr("%04X");
-	state_add( T11_R2,  "R2",  m_reg[2].w.l).formatstr("%04X");
-	state_add( T11_R3,  "R3",  m_reg[3].w.l).formatstr("%04X");
-	state_add( T11_R4,  "R4",  m_reg[4].w.l).formatstr("%04X");
-	state_add( T11_R5,  "R5",  m_reg[5].w.l).formatstr("%04X");
+	state_add( T11_PC,  "PC",  m_reg[7].w.l).formatstr("%06O");
+	state_add( T11_SP,  "SP",  m_reg[6].w.l).formatstr("%06O");
+	state_add( T11_PSW, "PSW", m_psw.b.l).formatstr("%03O");
+	state_add( T11_R0,  "R0",  m_reg[0].w.l).formatstr("%06O");
+	state_add( T11_R1,  "R1",  m_reg[1].w.l).formatstr("%06O");
+	state_add( T11_R2,  "R2",  m_reg[2].w.l).formatstr("%06O");
+	state_add( T11_R3,  "R3",  m_reg[3].w.l).formatstr("%06O");
+	state_add( T11_R4,  "R4",  m_reg[4].w.l).formatstr("%06O");
+	state_add( T11_R5,  "R5",  m_reg[5].w.l).formatstr("%06O");
 
 	state_add(STATE_GENPC, "GENPC", m_reg[7].w.l).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_ppc.w.l).noshow();
@@ -409,7 +409,7 @@ void t11_device::execute_run()
 		return;
 	}
 
-	do
+	while (m_icount > 0)
 	{
 		uint16_t op;
 
@@ -419,8 +419,7 @@ void t11_device::execute_run()
 
 		op = ROPCODE();
 		(this->*s_opcode_table[op >> 3])(op);
-
-	} while (m_icount > 0);
+	}
 }
 
 std::unique_ptr<util::disasm_interface> t11_device::create_disassembler()

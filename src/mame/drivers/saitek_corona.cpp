@@ -42,7 +42,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void corona(machine_config &config);
 
 protected:
@@ -264,7 +264,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void corona_state::corona(machine_config &config)
@@ -293,7 +293,7 @@ void corona_state::corona(machine_config &config)
 
 	/* extension rom */
 	GENERIC_CARTSLOT(config, m_extrom, generic_plain_slot, "saitek_egr", "bin");
-	m_extrom->set_device_load(FUNC(corona_state::extrom_load), this);
+	m_extrom->set_device_load(FUNC(corona_state::extrom_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("saitek_egr");
 }

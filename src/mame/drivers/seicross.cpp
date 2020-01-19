@@ -135,7 +135,6 @@ void seicross_state::main_portmap(address_map &map)
 
 void seicross_state::mcu_nvram_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();
 	map(0x1000, 0x10ff).ram().share("nvram");
 	map(0x2000, 0x2000).w(FUNC(seicross_state::dac_w));
 	map(0x8000, 0xf7ff).rom().region("maincpu", 0);
@@ -144,7 +143,6 @@ void seicross_state::mcu_nvram_map(address_map &map)
 
 void seicross_state::mcu_no_nvram_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();
 	map(0x1003, 0x1003).portr("DSW1");       /* DSW1 */
 	map(0x1005, 0x1005).portr("DSW2");       /* DSW2 */
 	map(0x1006, 0x1006).portr("DSW3");       /* DSW3 */
@@ -406,7 +404,7 @@ void seicross_state::no_nvram(machine_config &config)
 	NSC8105(config, m_mcu, XTAL(18'432'000) / 6);   /* ??? */
 	m_mcu->set_addrmap(AS_PROGRAM, &seicross_state::mcu_no_nvram_map);
 
-	config.m_minimum_quantum = attotime::from_hz(1200);  /* 20 CPU slices per frame - a high value to ensure proper */
+	config.set_maximum_quantum(attotime::from_hz(1200));  /* 20 CPU slices per frame - a high value to ensure proper */
 						/* synchronization of the CPUs */
 
 	WATCHDOG_TIMER(config, "watchdog");

@@ -245,6 +245,7 @@ static NETLIST_START(TTL_7414_GATE)
 	ALIAS(A, X.A)
 	ALIAS(Q, X.Q)
 	ALIAS(GND, X.GND)
+	ALIAS(VCC, X.VCC)
 NETLIST_END()
 
 static NETLIST_START(TTL_74LS14_GATE)
@@ -252,6 +253,7 @@ static NETLIST_START(TTL_74LS14_GATE)
 	ALIAS(A, X.A)
 	ALIAS(Q, X.Q)
 	ALIAS(GND, X.GND)
+	ALIAS(VCC, X.VCC)
 NETLIST_END()
 
 static NETLIST_START(TTL_7414_DIP)
@@ -263,7 +265,7 @@ static NETLIST_START(TTL_7414_DIP)
 	SCHMITT_TRIGGER(F, "DM7414")
 
 	NET_C(A.GND, B.GND, C.GND, D.GND, E.GND, F.GND)
-	DUMMY_INPUT(VCC)
+	NET_C(A.VCC, B.VCC, C.VCC, D.VCC, E.VCC, F.VCC)
 
 	DIPPINS(   /*       +--------------+      */
 		A.A,   /*    A1 |1     ++    14| VCC  */ VCC.I,
@@ -286,7 +288,7 @@ static NETLIST_START(TTL_74LS14_DIP)
 	SCHMITT_TRIGGER(F, "DM74LS14")
 
 	NET_C(A.GND, B.GND, C.GND, D.GND, E.GND, F.GND)
-	DUMMY_INPUT(VCC)
+	NET_C(A.VCC, B.VCC, C.VCC, D.VCC, E.VCC, F.VCC)
 
 	DIPPINS(   /*       +--------------+      */
 		A.A,   /*    A1 |1     ++    14| VCC  */ VCC.I,
@@ -353,7 +355,7 @@ static NETLIST_START(TTL_7420_DIP)
 
 	NET_C(A.VCC, B.VCC)
 	NET_C(A.GND, B.GND)
-	DUMMY_INPUT(NC)
+	NC_PIN(NC)
 
 	DIPPINS(  /*       +--------------+      */
 		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
@@ -395,13 +397,14 @@ static NETLIST_START(TTL_7425_DIP)
 
 	NET_C(A.VCC, B.VCC)
 	NET_C(A.GND, B.GND)
-	DUMMY_INPUT(X)
+	NC_PIN(XA) // FIXME: Functionality needs to be implemented
+	NC_PIN(XB) // FIXME: Functionality needs to be implemented
 
 	DIPPINS(  /*       +--------------+      */
 		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
 		A.B,  /*    B1 |2           13| D2   */ B.D,
-		X.I,  /*    X1 |3           12| C2   */ B.C,
-		A.C,  /*    C1 |4    7425   11| X2   */ X.I,
+		XA.I, /*    X1 |3           12| C2   */ B.C,
+		A.C,  /*    C1 |4    7425   11| X2   */ XB.I,
 		A.D,  /*    D1 |5           10| B2   */ B.B,
 		A.Q,  /*    Y1 |6            9| A2   */ B.A,
 		A.GND,/*   GND |7            8| Y2   */ B.Q
@@ -471,15 +474,17 @@ NETLIST_END()
 static NETLIST_START(TTL_7430_DIP)
 	TTL_7430_GATE(A)
 
-	DUMMY_INPUT(NC)
+	NC_PIN(NC9)
+	NC_PIN(NC10)
+	NC_PIN(NC13)
 
 	DIPPINS(  /*       +--------------+      */
 		A.A,  /*     A |1     ++    14| VCC  */ A.VCC,
-		A.B,  /*     B |2           13| NC   */ NC.I,
+		A.B,  /*     B |2           13| NC   */ NC13.I,
 		A.C,  /*     C |3           12| H    */ A.H,
 		A.D,  /*     D |4    7430   11| G    */ A.G,
-		A.E,  /*     E |5           10| NC   */ NC.I,
-		A.F,  /*     F |6            9| NC   */ NC.I,
+		A.E,  /*     E |5           10| NC   */ NC10.I,
+		A.F,  /*     F |6            9| NC   */ NC9.I,
 		A.GND,/*   GND |7            8| Y    */ A.Q
 			  /*       +--------------+      */
 	)
@@ -604,7 +609,7 @@ static NETLIST_START(TTL_7486_DIP)
 	)
 NETLIST_END()
 
-#if (USE_TRUTHTABLE_74107)
+#if (NL_USE_TRUTHTABLE_74107)
 #ifndef __PLIB_PREPROCESSOR__
 #define TTL_74107_TT(name)                                                         \
 		NET_REGISTER_DEV(TTL_74107, name)
@@ -846,7 +851,7 @@ static NETLIST_START(DM9312_DIP)
 	)
 NETLIST_END()
 
-#if (USE_TRUTHTABLE_7448)
+#if (NL_USE_TRUTHTABLE_7448)
 
 /*
  *  DM7448: BCD to 7-Segment decoders/drivers
@@ -1115,7 +1120,7 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-#if (USE_TRUTHTABLE_7448)
+#if (NL_USE_TRUTHTABLE_7448)
 	TRUTHTABLE_START(TTL_7448, 7, 7, "+A,+B,+C,+D,+LTQ,+BIQ,+RBIQ,@VCC,@GND")
 		TT_HEAD(" LTQ,BIQ,RBIQ, A , B , C , D | a, b, c, d, e, f, g")
 
@@ -1207,7 +1212,7 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
-#if (USE_TRUTHTABLE_74107)
+#if (NL_USE_TRUTHTABLE_74107)
 	/*
 	 *          +-----+-----+-----+---++---+-----+
 	 *          | CLRQ| CLK |  J  | K || Q | QQ  |
@@ -1379,11 +1384,11 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_7430_DIP)
 	LOCAL_LIB_ENTRY(TTL_7432_DIP)
 	LOCAL_LIB_ENTRY(TTL_7437_DIP)
-#if (USE_TRUTHTABLE_7448)
+#if (NL_USE_TRUTHTABLE_7448)
 	LOCAL_LIB_ENTRY(TTL_7448_DIP)
 #endif
 	LOCAL_LIB_ENTRY(TTL_7486_DIP)
-#if (USE_TRUTHTABLE_74107)
+#if (NL_USE_TRUTHTABLE_74107)
 	LOCAL_LIB_ENTRY(TTL_74107_DIP)
 #endif
 	LOCAL_LIB_ENTRY(TTL_74155_DIP)

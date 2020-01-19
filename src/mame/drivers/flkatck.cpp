@@ -225,7 +225,7 @@ void flkatck_state::flkatck(machine_config &config)
 	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);   /* NEC D780C-1, 3.579545MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &flkatck_state::flkatck_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 

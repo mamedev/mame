@@ -166,7 +166,7 @@ MemoryWindow::~MemoryWindow()
 
 void MemoryWindow::memoryRegionChanged(int index)
 {
-	m_memTable->view()->set_source(*m_memTable->view()->source_list().find(index));
+	m_memTable->view()->set_source(*m_memTable->view()->source(index));
 	m_memTable->viewport()->update();
 
 	// Update the data format radio buttons to the memory region's default
@@ -283,9 +283,9 @@ void MemoryWindow::populateComboBox()
 		return;
 
 	m_memoryComboBox->clear();
-	for (const debug_view_source &source : m_memTable->view()->source_list())
+	for (auto &source : m_memTable->view()->source_list())
 	{
-		m_memoryComboBox->addItem(source.name());
+		m_memoryComboBox->addItem(source->name());
 	}
 }
 
@@ -293,9 +293,15 @@ void MemoryWindow::populateComboBox()
 void MemoryWindow::setToCurrentCpu()
 {
 	device_t* curCpu = m_machine->debugger().cpu().get_visible_cpu();
-	const debug_view_source *source = m_memTable->view()->source_for_device(curCpu);
-	const int listIndex = m_memTable->view()->source_list().indexof(*source);
-	m_memoryComboBox->setCurrentIndex(listIndex);
+	if (curCpu)
+	{
+		const debug_view_source *source = m_memTable->view()->source_for_device(curCpu);
+		if (source)
+		{
+			const int listIndex = m_memTable->view()->source_index(*source);
+			m_memoryComboBox->setCurrentIndex(listIndex);
+		}
+	}
 }
 
 

@@ -303,10 +303,8 @@ WRITE8_MEMBER(redalert_state::demoneye_ay8910_data_w)
 
 void redalert_state::demoneye_audio_map(address_map &map)
 {
-	map.global_mask(0x3fff);
-	map(0x0000, 0x007f).ram();
-	map(0x0500, 0x0503).rw("sndpia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x2000, 0x3fff).rom();
+	map(0x0500, 0x0503).mirror(0xc000).rw("sndpia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x2000, 0x3fff).mirror(0xc000).rom();
 }
 
 

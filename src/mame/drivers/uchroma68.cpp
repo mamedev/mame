@@ -148,7 +148,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_video_ram(*this, "videoram")
 		, m_cass(*this, "cassette")
-		, m_semi_graphics_six_mod(*this, "semi_graphics_six_mod")
+		, m_semi_graphics_six_mod(*this, "SEMI_GRAPHICS_SIX_MOD")
 	{ }
 
 	void uchroma68(machine_config &config);
@@ -161,7 +161,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6846_device> m_mc6846;
-	required_device<mc6847_base_device> m_mc6847;
+	required_device<mc6847_ntsc_device> m_mc6847;
 	required_device<pia6821_device> m_pia;
 	required_device<acia6850_device> m_acia;
 	required_device<clock_device> m_acia_tx_clock;
@@ -237,7 +237,7 @@ static INPUT_PORTS_START(uchroma68)
 
 	// The documentation notes a hardware modification to allow the use of
 	// the Semi-graphics 6 mode of the MC6847.
-	PORT_START("semi_graphics_six_mod")
+	PORT_START("SEMI_GRAPHICS_SIX_MOD")
 	PORT_CONFNAME(0x01, 0x00, "Semi-graphics 6 mode modification")
 	PORT_CONFSETTING(0x00, "No")
 	PORT_CONFSETTING(0x01, "Yes")
@@ -453,11 +453,11 @@ void uchroma68_state::uchroma68(machine_config &config)
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 
-	mc6847_ntsc_device &vdg(MC6847_NTSC(config, "mc6847", XTAL_UCHROMA68));
-	vdg.set_screen("screen");
-	vdg.input_callback().set(FUNC(uchroma68_state::mc6847_videoram_r));
+	MC6847_NTSC(config, m_mc6847, XTAL_UCHROMA68);
+	m_mc6847->set_screen(m_screen);
+	m_mc6847->input_callback().set(FUNC(uchroma68_state::mc6847_videoram_r));
 
 	PIA6821(config, m_pia, 0);
 	m_pia->readpa_handler().set(FUNC(uchroma68_state::pia_pa_r));

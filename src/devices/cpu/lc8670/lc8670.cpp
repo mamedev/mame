@@ -180,6 +180,7 @@ lc8670_cpu_device::lc8670_cpu_device(const machine_config &mconfig, const char *
 	, m_pc(0)
 	, m_ppc(0)
 	, m_bankswitch_func(*this)
+	, m_lcd_update_func(*this)
 {
 	memset(m_sfr, 0x00, sizeof(m_sfr));
 	memset(m_timer0, 0x00, sizeof(m_timer0));
@@ -202,8 +203,8 @@ void lc8670_cpu_device::device_start()
 	set_icountptr(m_icount);
 
 	// resolve callbacks
-	m_lcd_update_func.bind_relative_to(*owner());
 	m_bankswitch_func.resolve();
+	m_lcd_update_func.resolve();
 
 	// setup timers
 	m_basetimer = timer_alloc(BASE_TIMER);

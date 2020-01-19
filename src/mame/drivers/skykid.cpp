@@ -434,7 +434,7 @@ void skykid_state::skykid(machine_config &config)
 	m_mcu->in_p2_cb().set_constant(0xff);                           /* leds won't work otherwise */
 	m_mcu->out_p2_cb().set(FUNC(skykid_state::skykid_led_w));       /* lamps */
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* we need heavy synch */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* we need heavy synch */
 
 	WATCHDOG_TIMER(config, "watchdog");
 

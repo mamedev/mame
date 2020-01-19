@@ -9,7 +9,7 @@
 
     CPU:  various AMD x86 CPUs, originally 80386DX (80387 available as an add-on).
           later models use 80386SX, 80486 and Pentium CPUs
-    Sound:  Yamaha YM3438
+    Sound:  Yamaha YM3438 (some later models are use YMF276; Low voltage variation of YM3438, needs External DAC)
             Ricoh RF5c68
             CD-DA
     Video:  Custom
@@ -27,6 +27,59 @@
 
 
     Issues: Video emulation is far from complete.
+
+*/
+
+/*
+
+Regular models:
+
+             Model              | Form factor |     CPU    |        Standard RAM          | Max RAM |      Standard FDDs     |         Standard HDD
+FM Towns 1/2                    | Tower       | 386DX-16   | 1 MB (1) or 2 MB (2)         | 6 MB    | 1 or 2                 | No SCSI controller
+FM Towns 1F/2F/1H/2H            | Tower       | 386DX-16   | 1 MB (1F/1H) or 2 MB (2F/2H) | 8 MB    | 1 (1F) or 2 (others)   | 20 or 40 MB (H models only)
+FM Towns 10F/20F/40H/80H        | Tower       | 386DX-16   | 2 MB                         | 26 MB   | 1 (10F) or 2 (others)  | 40 or 85 MB (H models only)
+FM Towns II CX10/20/40/100      | Tower       | 386DX-16   | 2 MB                         | 26 MB   | 1 (CX10) or 2 (others) | No (CX10/20), 40 or 100 MB
+FM Towns II UX10/20/40          | All-in-one  | 386SX-16   | 2 MB                         | 10 MB   | 1 (UX10) or 2 (others) | No (UX10/20) or 40 MB
+FM Towns II HG20/40/100         | Desktop     | 386DX-20   | 2 MB                         | 26 MB   | 2                      | No (HG20), 40 or 80 MB
+FM Towns II HR20/100/200        | Desktop     | 486SX-20   | 4 MB                         | 28 MB   | 2                      | No (HR20) 100 or 200 MB
+FM Towns II UG10/20/40/80       | All-in-one  | 386SX-20   | 2 MB                         | 10 MB   | 1 (UG10) or 2 (others) | No (UG10/20), 40 or 80 MB
+FM Towns II UR20/40/80          | All-in-one  | 486SX-20   | 2 MB                         | 10 MB   | 2                      | No (UG20), 40 or 80 MB
+FM Towns II ME20/170            | Desktop     | 486SX-25   | 2 MB                         | 66 MB   | 2                      | No (ME20) or 170 MB
+FM Towns II MA170/340           | Desktop     | 486SX-33   | 4 MB                         | 100 MB  | 2                      | 170 or 340 MB
+FM Towns II MX20/170/340        | Desktop     | 486DX2-66  | 4 MB                         | 100 MB  | 2                      | No (MX20), 170 or 340 MB
+FM Towns II Fresh/MF20/MF170W   | Desktop     | 486SX-33   | 4 MB (MF20) or 6 MB (others) | 68 MB   | 2                      | No (MF20), or 170 (others)
+FM Towns II MA170W/MA340W       | Desktop     | 486SX-33   | 8 MB                         | 100 MB  | 2                      | 170 or 340 MB
+FM Towns II MX170W/MA340W       | Desktop     | 486DX2-66  | 8 MB                         | 100 MB  | 2                      | 170 or 340 MB
+FM Towns II Fresh-TV            | Desktop     | 486SX-33   | 6 MB                         | 68 MB   | 2                      | 170 MB
+FM Towns II Fresh-E             | Desktop     | 486DX2-66  | 8 MB                         | 72 MB   | 2                      | 260 MB
+FM Towns II Fresh-T             | Desktop     | 486SX-33   | 8 MB                         | 72 MB   | 2                      | 260 MB
+FM Towns II EA2                 | Desktop     | 486SX-33   | 4 MB                         | 68 MB   | 2                      | No
+FM Towns II HA2/HA53            | Desktop     | 486DX2-66  | 4 MB (HA2) or 8 MB (HA53)    | 100 MB  | 2                      | No (HA2) or 530 MB
+FM Towns II HB2/HB53/HB53M      | Desktop     | Pentium-60 | 8 MB                         | 136 MB  | 2                      | No (HB2) or 530 MB
+FM Towns II Fresh-ES/Fresh-ET   | Desktop     | 486DX2-66  | 8 MB                         | 72 MB   | 1                      | 360 MB
+FM Towns II HC53/HC53M          | Desktop     | Pentium-90 | 8 MB                         | 136 MB  | 1                      | 540 MB
+FM Towns II Fresh-FS/Fresh-FT   | Desktop     | 486DX4-100 | 8 MB                         | 72 MB   | 1                      | 540 MB
+FM Towns Marty/Marty 2/TC Marty | Console     | 386SX-16   | 2 MB                         | 4 MB    | 1                      | No SCSI controller
+Car Marty                       | Car-mounted | 386SX-16   | 2 MB                         | ?       | No                     | No SCSI controller
+
+Education models:
+
+         Model          | Form factor |     CPU    |        Standard RAM          | Max RAM |      Standard FDDs     |         Standard HDD
+FM Towns S1/S2          | Tower       | 386DX-16   | 1 MB (S1) or 2 MB (S2)       | 6 MB    | 1 or 2                 | No SCSI controller
+FM Towns SF/SH          | Tower       | 386DX-16   | 1 MB (1F/1H) or 2 MB (2F/2H) | 8 MB    | 2                      | No (SF) or 40 MB
+FM Towns SF2/SH2        | Tower       | 386DX-16   | 2 MB                         | 26 MB   | 2                      | No (SF2) or 40 MB
+FM Towns II SG20/40     | Desktop     | 386DX-20   | 2 MB                         | 26 MB   | 2                      | No (SG20) or 40 MB
+FM Towns II SR20/100    | Desktop     | 486SX-20   | 4 MB                         | 28 MB   | 2                      | No (SR20) or 100 MB
+FM Towns II SE          | Desktop     | 486SX-25   | 2 MB                         | 66 MB   | 2                      | No
+FM Towns II SA          | Desktop     | 486SX-33   | 4 MB                         | 100 MB  | 2                      | No
+FM Towns II SF20/SF170W | Desktop     | 486SX-33   | 4 MB (SF20) or 6 MB (SF170W) | 100 MB  | 2                      | No (SF20) or 170 MB
+FM Towns II SA170W      | Desktop     | 486SX-33   | 8 MB                         | 100 MB  | 2                      | 170 MB
+FM Towns II SI2/SI26    | Desktop     | 486SX-33   | 4 MB (SI2) or 8 MB (SI26)    | 68 MB   | 2                      | No (SI2) or 260 MB
+FM Towns II SJ2/SJ26    | Desktop     | 486DX2-66  | 4 MB (SJ2) or 8 MB (SJ26)    | 68 MB   | 2                      | No (SJ2) or 260 MB
+FM Towns II SK53        | Desktop     | Pentium-60 | 8 MB                         | 136 MB  | 2                      | 530 MB
+FM Towns II SN          | Laptop      | 486DX2-66  | 4 MB                         | 36 MB   | 1                      | 340 MB
+FM Towns II SJ2A/SJ53   | Desktop     | 486DX2-66  | 4 MB (SJ2A) or 8 MB (SJ53)   | 68 MB   | 2                      | No (SJ2A) or 530 MB
+FM Towns II SL53        | Desktop     | Pentium-90 | 8 MB                         | 136 MB  | 2                      | 530 MB
 
 */
 
@@ -2784,10 +2837,19 @@ void towns_state::towns_base(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
+
 	ym3438_device &fm(YM3438(config, "fm", 16000000 / 2)); // actual clock speed unknown
 	fm.irq_handler().set(FUNC(towns_state::towns_fm_irq));
 	fm.add_route(0, "lspeaker", 1.00);
 	fm.add_route(1, "rspeaker", 1.00);
+
+/*
+	// Later model uses YMF276 for FM
+	ymf276_device &fm(YMF276(config, "fm", 16000000 / 2)); // actual clock speed unknown
+	fm.irq_handler().set(FUNC(towns_state::towns_fm_irq));
+	fm.add_route(0, "lspeaker", 1.00);
+	fm.add_route(1, "rspeaker", 1.00);
+*/
 
 	rf5c68_device &pcm(RF5C68(config, "pcm", 16000000 / 2));  // actual clock speed unknown
 	pcm.set_end_callback(FUNC(towns_state::towns_pcm_irq));
@@ -2865,10 +2927,8 @@ void towns_state::towns_base(machine_config &config)
 
 	FMT_ICMEM(config, m_icmemcard, 0);
 
-	/*
-		First-generation models: 1 MB onboard, 3 SIMM slots with 1 or 2 MB each, except slot 1 (limited to 1 MB).
-		Model 2 comes with a 1 MB SIMM preinstalled on slot 1, Model 1 doesn't.
-	*/
+	/* First-generation models: 1 MB onboard, 3 SIMM slots with 1 or 2 MB each, except slot 1 (limited to 1 MB).
+	   Model 2 comes with a 1 MB SIMM preinstalled on slot 1, Model 1 doesn't. */
 	RAM(config, m_ram).set_default_size("2M").set_extra_options("1M,3M,4M,5M,6M");
 
 	MSM58321(config, m_rtc, 32768_Hz_XTAL);
@@ -2929,7 +2989,7 @@ void towns_state::townssj(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &towns_state::towns2_io);
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-	
+
 	scsi_port_device &scsi(SCSI_PORT(config, "scsi", 0));
 	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 	scsi.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
@@ -2994,7 +3054,7 @@ void marty_state::marty(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &marty_state::towns16_io);
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-	
+
 	FLOPPY_CONNECTOR(config.replace(), m_flop[1], towns_floppies, nullptr, towns_state::floppy_formats);
 
 	// 2 MB onboard, expandable to 4 MB with a Marty-only expansion card
@@ -3004,30 +3064,33 @@ void marty_state::marty(machine_config &config)
 }
 
 /* ROM definitions */
-/* It is unknown exactly what model these ROM were dumped from, but it is certainly a newer model, as it won't
- * boot without the freerun timer, which was added in the FM-Towns II HG, HR, UG and later. */
+
+/* These ROMs were dumped from an FM Towns Model 2. Model 1 is assumed to use the same ROMs, since they were
+   released at the same time, and the only differences are the amount of RAM and floppy drives.
+
+   The ROM is physically contained in three 4 Mbit chips: two MB834200-20 (DIP40) and one MB834200-25 (QFP44) */
 ROM_START( fmtowns )
 	ROM_REGION32_LE( 0x280000, "user", 0)
 	ROM_LOAD("fmt_dos.rom",  0x000000, 0x080000, CRC(112872ee) SHA1(57fd146478226f7f215caf63154c763a6d52165e) )
-	ROM_LOAD("fmt_f20.rom",  0x080000, 0x080000, CRC(9f55a20c) SHA1(1920711cb66340bb741a760de187de2f76040b8c) )
-	ROM_LOAD("fmt_dic.rom",  0x100000, 0x080000, CRC(82d1daa2) SHA1(7564020dba71deee27184824b84dbbbb7c72aa4e) )
-	ROM_LOAD("fmt_fnt.rom",  0x180000, 0x040000, CRC(dd6fd544) SHA1(a216482ea3162f348fcf77fea78e0b2e4288091a) )
-	ROM_LOAD("fmt_sys.rom",  0x200000, 0x040000, CRC(afe4ebcf) SHA1(4cd51de4fca9bd7a3d91d09ad636fa6b47a41df5) )
+	ROM_LOAD("fmt_dic.rom",  0x100000, 0x080000, CRC(b314c659) SHA1(3959c4c6be540252cabea06847bcd408f1911cfb) )
+	ROM_LOAD("fmt_fnt.rom",  0x180000, 0x040000, CRC(955c6b75) SHA1(fa5f7a18060afa35678dcbdc3589a1455aba26dc) )
+	ROM_LOAD("fmt_sys.rom",  0x200000, 0x040000, CRC(53319e23) SHA1(15d9cc705f3534fe97a2386e4d4848a1602cc534) )
 ROM_END
 
-/* likely an older set, as it runs without needing the freerun timer.  Font ROM appears to be corrupt, though. */
-ROM_START( fmtownsa )
+/* System ROM has a date of 91/07/09 and matches the UX set, but the dictionary ROM is completely different. It could be from an FM Towns II CX.
+   Font ROM appears to be corrupt, though. */
+ROM_START( fmtownsv03 )
 	ROM_REGION32_LE( 0x280000, "user", 0)
 	ROM_LOAD("fmt_dos_a.rom",  0x000000, 0x080000, CRC(22270e9f) SHA1(a7e97b25ff72b14121146137db8b45d6c66af2ae) )
 	ROM_LOAD("fmt_f20_a.rom",  0x080000, 0x080000, CRC(75660aac) SHA1(6a521e1d2a632c26e53b83d2cc4b0edecfc1e68c) )
 	ROM_LOAD("fmt_dic_a.rom",  0x100000, 0x080000, CRC(74b1d152) SHA1(f63602a1bd67c2ad63122bfb4ffdaf483510f6a8) )
-	ROM_LOAD("fmt_fnt_a.rom",  0x180000, 0x040000, CRC(0108a090) SHA1(1b5dd9d342a96b8e64070a22c3a158ca419894e1) )
+	ROM_LOAD("fmt_fnt_a.rom",  0x180000, 0x040000, CRC(0108a090) SHA1(1b5dd9d342a96b8e64070a22c3a158ca419894e1) BAD_DUMP )
 	ROM_LOAD("fmt_sys_a.rom",  0x200000, 0x040000, CRC(92f3fa67) SHA1(be21404098b23465d24c4201a81c96ac01aff7ab) )
 ROM_END
 
 /* 16MHz 80386SX, 2MB RAM expandable up to 10MB (due to the limited 24-bit address space of the CPU), dumped from a UX10 */
 ROM_START( fmtownsux )
-	ROM_REGION32_LE( 0x480000, "user", 0)
+	ROM_REGION16_LE( 0x480000, "user", 0)
 	ROM_LOAD("fmt_dos_a.rom",  0x000000, 0x080000, CRC(22270e9f) SHA1(a7e97b25ff72b14121146137db8b45d6c66af2ae) )
 	// no F20 ROM
 	ROM_LOAD("fmt_dic.rom",  0x100000, 0x080000, CRC(82d1daa2) SHA1(7564020dba71deee27184824b84dbbbb7c72aa4e) )
@@ -3088,7 +3151,7 @@ ROM_START( fmtownsftv )
 ROM_END
 
 ROM_START( fmtmarty )
-	ROM_REGION32_LE( 0x480000, "user", 0)
+	ROM_REGION16_LE( 0x480000, "user", 0)
 	ROM_LOAD("mrom.m36",  0x000000, 0x080000, CRC(9c0c060c) SHA1(5721c5f9657c570638352fa9acac57fa8d0b94bd) )
 	ROM_CONTINUE(0x280000,0x180000)
 	ROM_LOAD("mrom.m37",  0x400000, 0x080000, CRC(fb66bb56) SHA1(e273b5fa618373bdf7536495cd53c8aac1cce9a5) )
@@ -3098,7 +3161,7 @@ ROM_START( fmtmarty )
 ROM_END
 
 ROM_START( fmtmarty2 )
-	ROM_REGION32_LE( 0x480000, "user", 0)
+	ROM_REGION16_LE( 0x480000, "user", 0)
 	ROM_LOAD("fmt_dos.rom",  0x000000, 0x080000, CRC(2bc2af96) SHA1(99cd51c5677288ad8ef711b4ac25d981fd586884) )
 	ROM_LOAD("fmt_dic.rom",  0x100000, 0x080000, CRC(82d1daa2) SHA1(7564020dba71deee27184824b84dbbbb7c72aa4e) )
 	ROM_LOAD("fmt_fnt.rom",  0x180000, 0x040000, CRC(dd6fd544) SHA1(a216482ea3162f348fcf77fea78e0b2e4288091a) )
@@ -3112,7 +3175,7 @@ ROM_START( fmtmarty2 )
 ROM_END
 
 ROM_START( carmarty )
-	ROM_REGION32_LE( 0x480000, "user", 0)
+	ROM_REGION16_LE( 0x480000, "user", 0)
 	ROM_LOAD("fmt_dos.rom",  0x000000, 0x080000, CRC(2bc2af96) SHA1(99cd51c5677288ad8ef711b4ac25d981fd586884) )
 	ROM_LOAD("fmt_dic.rom",  0x100000, 0x080000, CRC(82d1daa2) SHA1(7564020dba71deee27184824b84dbbbb7c72aa4e) )
 	ROM_LOAD("fmt_fnt.rom",  0x180000, 0x040000, CRC(dd6fd544) SHA1(a216482ea3162f348fcf77fea78e0b2e4288091a) )
@@ -3127,14 +3190,14 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME        PARENT    COMPAT  MACHINE   INPUT  CLASS          INIT        COMPANY    FULLNAME                FLAGS */
-COMP( 1989, fmtowns,    0,        0,      towns,    towns, towns_state,   empty_init, "Fujitsu", "FM-Towns",             MACHINE_NOT_WORKING)
-COMP( 1989, fmtownsa,   fmtowns,  0,      towns,    towns, towns_state,   empty_init, "Fujitsu", "FM-Towns (alternate)", MACHINE_NOT_WORKING)
-COMP( 1991, fmtownsux,  fmtowns,  0,      townsux,  towns, towns16_state, empty_init, "Fujitsu", "FM-Towns II UX",       MACHINE_NOT_WORKING)
-COMP( 1992, fmtownshr,  fmtowns,  0,      townshr,  towns, towns_state,   empty_init, "Fujitsu", "FM-Towns II HR",       MACHINE_NOT_WORKING)
-COMP( 1993, fmtownsmx,  fmtowns,  0,      townsmx,  towns, towns_state,   empty_init, "Fujitsu", "FM-Towns II MX",       MACHINE_NOT_WORKING)
-COMP( 1994, fmtownsftv, fmtowns,  0,      townsftv, towns, towns_state,   empty_init, "Fujitsu", "FM-Towns II FreshTV",  MACHINE_NOT_WORKING)
-COMP( 19??, fmtownssj,  fmtowns,  0,      townssj,  towns, towns_state,   empty_init, "Fujitsu", "FM-Towns II SJ",       MACHINE_NOT_WORKING)
-CONS( 1993, fmtmarty,   0,        0,      marty,    marty, marty_state,   empty_init, "Fujitsu", "FM-Towns Marty",       MACHINE_NOT_WORKING)
-CONS( 1993, fmtmarty2,  fmtmarty, 0,      marty,    marty, marty_state,   empty_init, "Fujitsu", "FM-Towns Marty 2",     MACHINE_NOT_WORKING)
-CONS( 1994, carmarty,   fmtmarty, 0,      marty,    marty, marty_state,   empty_init, "Fujitsu", "FM-Towns Car Marty",   MACHINE_NOT_WORKING)
+/*    YEAR  NAME        PARENT    COMPAT  MACHINE   INPUT  CLASS          INIT        COMPANY    FULLNAME                                   FLAGS */
+COMP( 1989, fmtowns,    0,        0,      towns,    towns, towns_state,   empty_init, "Fujitsu", "FM-Towns (Model 1 / 2)",                  MACHINE_NOT_WORKING)
+COMP( 1991, fmtownsv03, fmtowns,  0,      towns,    towns, towns_state,   empty_init, "Fujitsu", "FM-Towns (unknown, V03 L01 00 91/07/09)", MACHINE_NOT_WORKING)
+COMP( 1991, fmtownsux,  fmtowns,  0,      townsux,  towns, towns16_state, empty_init, "Fujitsu", "FM-Towns II UX",                          MACHINE_NOT_WORKING)
+COMP( 1992, fmtownshr,  fmtowns,  0,      townshr,  towns, towns_state,   empty_init, "Fujitsu", "FM-Towns II HR",                          MACHINE_NOT_WORKING)
+COMP( 1993, fmtownsmx,  fmtowns,  0,      townsmx,  towns, towns_state,   empty_init, "Fujitsu", "FM-Towns II MX",                          MACHINE_NOT_WORKING)
+COMP( 1994, fmtownsftv, fmtowns,  0,      townsftv, towns, towns_state,   empty_init, "Fujitsu", "FM-Towns II FreshTV",                     MACHINE_NOT_WORKING)
+COMP( 19??, fmtownssj,  fmtowns,  0,      townssj,  towns, towns_state,   empty_init, "Fujitsu", "FM-Towns II SJ",                          MACHINE_NOT_WORKING)
+CONS( 1993, fmtmarty,   0,        0,      marty,    marty, marty_state,   empty_init, "Fujitsu", "FM-Towns Marty",                          MACHINE_NOT_WORKING)
+CONS( 1993, fmtmarty2,  fmtmarty, 0,      marty,    marty, marty_state,   empty_init, "Fujitsu", "FM-Towns Marty 2",                        MACHINE_NOT_WORKING)
+CONS( 1994, carmarty,   fmtmarty, 0,      marty,    marty, marty_state,   empty_init, "Fujitsu", "FM-Towns Car Marty",                      MACHINE_NOT_WORKING)

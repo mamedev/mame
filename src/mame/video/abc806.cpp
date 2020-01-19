@@ -10,7 +10,9 @@
 #include "includes/abc80x.h"
 #include "screen.h"
 
-#define LOG 0
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 #define HORIZONTAL_PORCH_HACK   109
 #define VERTICAL_PORCH_HACK     27
@@ -38,7 +40,7 @@ WRITE8_MEMBER( abc806_state::hrs_w )
 
 	*/
 
-	if (LOG) logerror("%s HRS %02x\n", machine().describe_context(), data);
+	LOG("%s HRS %02x\n", machine().describe_context(), data);
 
 	m_hrs = data;
 }
@@ -124,7 +126,7 @@ READ8_MEMBER( abc806_state::cli_r )
 	uint16_t hru2_addr = (m_hru2_a8 << 8) | (offset >> 8);
 	uint8_t data = m_hru2_prom->base()[hru2_addr] & 0x0f;
 
-	if (LOG) logerror("HRU II %03x : %01x\n", hru2_addr, data);
+	LOG("HRU II %03x : %01x\n", hru2_addr, data);
 
 	data |= m_rtc->dio_r() << 7;
 
@@ -169,7 +171,7 @@ WRITE8_MEMBER( abc806_state::sto_w )
 	{
 	case 0:
 		// external memory enable
-		if (LOG) logerror("%s EME %u\n", machine().describe_context(), level);
+		LOG("%s EME %u\n", machine().describe_context(), level);
 		m_eme = level;
 		break;
 	case 1:
@@ -483,7 +485,7 @@ void abc806_state::abc806_video(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(ABC800_CHAR_WIDTH);
-	m_crtc->set_update_row_callback(FUNC(abc806_state::abc806_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(abc806_state::abc806_update_row));
 	m_crtc->out_hsync_callback().set(FUNC(abc806_state::hs_w));
 	m_crtc->out_vsync_callback().set(FUNC(abc806_state::vs_w));
 

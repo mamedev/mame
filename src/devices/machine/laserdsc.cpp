@@ -62,9 +62,12 @@ laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type ty
 	: device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
+		m_getdisc_callback(*this),
+		m_audio_callback(*this),
 		m_overwidth(0),
 		m_overheight(0),
 		m_overclip(0, -1, 0, -1),
+		m_overupdate_rgb32(*this),
 		m_disc(nullptr),
 		m_width(0),
 		m_height(0),
@@ -629,6 +632,8 @@ int32_t laserdisc_device::generic_update(const vbi_metadata &vbi, int fieldnum, 
 
 void laserdisc_device::init_disc()
 {
+	m_getdisc_callback.resolve();
+
 	// get a handle to the disc to play
 	if (!m_getdisc_callback.isnull())
 		m_disc = m_getdisc_callback();
@@ -730,7 +735,7 @@ void laserdisc_device::init_video()
 	if (m_overenable)
 	{
 		// bind our handlers
-		m_overupdate_rgb32.bind_relative_to(*owner());
+		m_overupdate_rgb32.resolve();
 
 		// allocate overlay bitmaps
 		for (auto & elem : m_overbitmap)
@@ -754,6 +759,8 @@ void laserdisc_device::init_video()
 
 void laserdisc_device::init_audio()
 {
+	m_audio_callback.resolve();
+
 	// allocate a stream
 	m_stream = stream_alloc(0, 2, 48000);
 

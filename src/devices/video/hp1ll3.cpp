@@ -539,10 +539,10 @@ bool hp1ll3_device::bitblt(uint16_t src_base_addr, unsigned src_width, unsigned 
 				 dst_rect.origin.x, dst_rect.origin.y, dst_rect.size.x, dst_rect.size.y,
 				 rop));
 	int src_x = src_p.x;
-	int dst_x = dst_rect.origin.x;
+	int dst_x = static_cast<int16_t>(dst_rect.origin.x);
 	int dst_width = dst_rect.size.x;
 	int src_y = src_p.y;
-	int dst_y = dst_rect.origin.y;
+	int dst_y = static_cast<int16_t>(dst_rect.origin.y);
 	int dst_height = dst_rect.size.y;
 	// Clip x-coordinates
 	clip_coord(src_width, src_x, clip_rect.origin.x, clip_rect.size.x, dst_x, dst_width);

@@ -68,7 +68,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void bcc(machine_config &config);
 	void bkc(machine_config &config);
 
@@ -90,16 +90,12 @@ private:
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(control_w);
 
-	u8 m_inp_mux;
-	u8 m_7seg_data;
+	u8 m_inp_mux = 0;
+	u8 m_7seg_data = 0;
 };
 
 void bcc_state::machine_start()
 {
-	// zerofill
-	m_inp_mux = 0;
-	m_7seg_data = 0;
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_7seg_data));
@@ -222,7 +218,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void bcc_state::bkc(machine_config &config)

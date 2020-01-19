@@ -1981,7 +1981,7 @@
 	<software name="f29ret" supported="no">
 		<description>F-29 Retaliator</description>
 		<year>1995</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">

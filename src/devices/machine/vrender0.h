@@ -67,9 +67,9 @@ private:
 	DECLARE_READ32_MEMBER( receive_buffer_r );
 	TIMER_CALLBACK_MEMBER( break_timer_cb );
 
-	uint32_t m_ucon; // control
-	uint32_t m_ubdr; // baud rate
-	uint32_t m_ustat; // status
+	uint32_t m_ucon = 0; // control
+	uint32_t m_ubdr = 0; // baud rate
+	uint32_t m_ustat = 0; // status
 	util::fifo<uint8_t, 16> m_urxb_fifo; // receive FIFO
 
 	void update_serial_config();
@@ -97,6 +97,8 @@ public:
 
 	void regs_map(address_map &map);
 	void audiovideo_map(address_map &map);
+	void texture_map(address_map &map);
+	void frame_map(address_map &map);
 	template<class T> void set_host_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
 	void set_external_vclk(const uint32_t vclk) { m_ext_vclk = vclk; }
 	void set_external_vclk(const XTAL vclk) { m_ext_vclk = vclk.value(); }
@@ -126,26 +128,28 @@ private:
 	required_device <speaker_device> m_rspeaker;
 	required_device_array <vr0uart_device, 2> m_uart;
 	required_shared_ptr <uint32_t> m_crtcregs;
-	uint16_t *m_textureram;
-	uint16_t *m_frameram;
+	uint16_t *m_textureram = nullptr;
+	uint16_t *m_frameram = nullptr;
 
-	address_space *m_host_space;
-	uint32_t m_ext_vclk;
+	address_space *m_host_space = nullptr;
+	uint32_t m_ext_vclk = 0;
 
 	devcb_write_line write_tx[2];
 
 	// INTC
-	uint32_t m_inten;
+	uint32_t m_inten = 0;
 	DECLARE_READ32_MEMBER(inten_r);
 	DECLARE_WRITE32_MEMBER(inten_w);
 
 	DECLARE_READ32_MEMBER(intvec_r);
 	DECLARE_WRITE32_MEMBER(intvec_w);
 
-	uint8_t m_IntHigh;
-	uint32_t m_intst;
+	uint8_t m_IntHigh = 0;
+	uint32_t m_intst = 0;
 	DECLARE_READ32_MEMBER(intst_r);
 	DECLARE_WRITE32_MEMBER(intst_w);
+
+	DECLARE_WRITE_LINE_MEMBER(soundirq_cb);
 
 	// Timer
 	template<int Which> DECLARE_WRITE32_MEMBER(tmcon_w);
@@ -154,9 +158,9 @@ private:
 	template<int Which> DECLARE_READ16_MEMBER(tmcnt_r);
 	TIMER_CALLBACK_MEMBER(Timercb);
 
-	uint32_t m_timer_control[4];
-	uint16_t m_timer_count[4];
-	emu_timer  *m_Timer[4];
+	uint32_t m_timer_control[4] = { 0, 0, 0, 0 };
+	uint16_t m_timer_count[4] = { 0, 0, 0, 0 };
+	emu_timer  *m_Timer[4] = { nullptr, nullptr, nullptr, nullptr };
 	void TimerStart(int which);
 
 	// DMAC
@@ -170,10 +174,10 @@ private:
 	template<int Which> DECLARE_WRITE32_MEMBER(dmada_w);
 	inline int dma_setup_hold(uint8_t setting, uint8_t bitmask);
 	struct {
-		uint32_t src;
-		uint32_t dst;
-		uint32_t size;
-		uint32_t ctrl;
+		uint32_t src = 0;
+		uint32_t dst = 0;
+		uint32_t size = 0;
+		uint32_t ctrl = 0;
 	}m_dma[2];
 
 	// CRTC
@@ -196,7 +200,7 @@ private:
 
 	// Hacks
 #ifdef IDLE_LOOP_SPEEDUP
-	uint8_t     m_FlipCntRead;
+	uint8_t     m_FlipCntRead = 0;
 	DECLARE_WRITE_LINE_MEMBER(idle_skip_resume_w);
 	DECLARE_WRITE_LINE_MEMBER(idle_skip_speedup_w);
 #endif

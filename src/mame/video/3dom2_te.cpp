@@ -720,10 +720,10 @@ void m2_te_device::device_start()
 	m_winclip_int_handler.resolve_safe();
 
 	// Allocate texture RAM
-	m_tram = auto_alloc_array(machine(), uint32_t, TEXTURE_RAM_WORDS);
+	m_tram = std::make_unique<uint32_t[]>(TEXTURE_RAM_WORDS);
 
 	// Allocate PIP RAM
-	m_pipram = auto_alloc_array(machine(), uint32_t, PIP_RAM_WORDS);
+	m_pipram = std::make_unique<uint32_t[]>(PIP_RAM_WORDS);
 
 	// TODO
 	memset(&m_gc, 0, sizeof(m_gc));

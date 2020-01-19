@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic
+// copyright-holders:Vas Crabb
 /***************************************************************************
 
     language.h
@@ -11,10 +11,6 @@
 #define MAME_FRONTEND_MAME_LANGUAGE_H
 
 #pragma once
-
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
 
 //**************************************************************************
 //  LOCALIZATION SUPPORT

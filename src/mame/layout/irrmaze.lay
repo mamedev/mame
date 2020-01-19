@@ -13,8 +13,8 @@ copyright-holders:Vas Crabb
 	sit15           ???                 *0x10fe29 != 0
 	-->
 
-	<element name="blank">
-		<rect><color red="0" green="0" blue="0" /></rect>
+	<element name="white">
+		<rect><color red="1" green="1" blue="1" /></rect>
 	</element>
 
 	<element name="marquee">
@@ -98,28 +98,28 @@ copyright-holders:Vas Crabb
 		<cpanel element="bluebtn" inputtag="edge:irrmaze:BUTTONS" inputmask="0x80"><bounds x="17" y="22.5" width="1" height="1" /></cpanel>
 	</view>
 
-	<view name="Screen 0 Standard (4:3)">
+	<view name="Screen 0 Standard (320x224)">
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 	</view>
 
 	<view name="Screen 0 Cropped (304x224)">
-		<bezel name="blank" element="blank">
-			<bounds left="0" top="0" right="0.1" bottom="3" />
-		</bezel>
-		<bezel name="blank" element="blank">
-			<bounds left="3.9" top="0" right="4" bottom="3" />
-		</bezel>
-		<screen index="0">
-			<bounds left="0" top="0" right="4" bottom="3" />
+		<element ref="white">
+			<bounds x="8" y="0" width="304" height="240" />
+		</element>
+		<screen index="0" blend="multiply">
+			<bounds x="0" y="0" width="320" height="240" />
 		</screen>
 	</view>
 
 	<view name="Screen 0 Stretched (304x224)">
-		<bounds left="0" top="0" right="4" bottom="3" />
-		<screen index="0">
-			<bounds left="-0.105263" top="0" right="4.105263" bottom="3" />
+		<bounds left="8" top="0" right="312" bottom="228" />
+		<element ref="white">
+			<bounds x="8" y="0" width="304" height="228" />
+		</element>
+		<screen index="0" blend="multiply">
+			<bounds x="0" y="0" width="320" height="228" />
 		</screen>
 	</view>
 </mamelayout>

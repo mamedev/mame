@@ -2,26 +2,26 @@
 // copyright-holders:Angelo Salese
 /******************************************************************************
 
-	Alpha Denshi "NeoGeo" palette devices
+    Alpha Denshi "NeoGeo" palette devices
 
-	Notes:
-	- URL reference: https://wiki.neogeodev.org/index.php?title=Palettes
+    Notes:
+    - URL reference: https://wiki.neogeodev.org/index.php?title=Palettes
 
-	TODO:
-	- Make mods to support NeoGeo HW (palette bank, shadows);
-	- Are alpha68k.cpp/snk68.cpp with or without shadows?
-	- Reference color, research exact consequences about this wiki claim: 
-	  "It always has to be pure black ($8000)(*) otherwise monitors won't 
-	   be happy and other colors won't be displayed correctly."
-	  (*) tested nam1975/skyadvnt, they actually setup $0000.
-	  Update: Gold Medalist actually setup $0fff when starter pistol is shot 
-	  on dash events, according to a reference video it causes generally darker
-	  colors on playfield and a color overflow in the border area.
-	  We currently just dim the palette to simulate the effect, it's totally 
-	  possible that the side effects are different depending on type of monitor 
-	  used, and maybe the dimming is caused by the capture card uncapable of 
-	  catching up the actual signal and intended behaviour is actually a bright 
-	  flash (without palette clamp?).
+    TODO:
+    - Make mods to support NeoGeo HW (palette bank, shadows);
+    - Are alpha68k.cpp/snk68.cpp with or without shadows?
+    - Reference color, research exact consequences about this wiki claim:
+      "It always has to be pure black ($8000)(*) otherwise monitors won't
+       be happy and other colors won't be displayed correctly."
+      (*) tested nam1975/skyadvnt, they actually setup $0000.
+      Update: Gold Medalist actually setup $0fff when starter pistol is shot
+      on dash events, according to a reference video it causes generally darker
+      colors on playfield and a color overflow in the border area.
+      We currently just dim the palette to simulate the effect, it's totally
+      possible that the side effects are different depending on type of monitor
+      used, and maybe the dimming is caused by the capture card uncapable of
+      catching up the actual signal and intended behaviour is actually a bright
+      flash (without palette clamp?).
 
 ******************************************************************************/
 
@@ -139,7 +139,7 @@ inline void alpha68k_palette_device::set_color_entry(u16 offset, u16 pal_data, i
 	int r = ((pal_data >> 14) & 0x1) | ((pal_data >> 7) & 0x1e);
 	int g = ((pal_data >> 13) & 0x1) | ((pal_data >> 3) & 0x1e);
 	int b = ((pal_data >> 12) & 0x1) | ((pal_data << 1) & 0x1e);
-	
+
 	r >>= shift;
 	g >>= shift;
 	b >>= shift;
@@ -159,7 +159,7 @@ WRITE16_MEMBER( alpha68k_palette_device::write )
 		// TODO: actual behaviour, needs HW tests.
 		bool is_sync_color = (pal_data & 0x7fff) == 0;
 		int sync_color_shift = is_sync_color ? 0 : 2;
-		
+
 		for (int i=0; i<m_entries; i++)
 			set_color_entry(i, m_paletteram[i], sync_color_shift);
 	}

@@ -93,9 +93,9 @@ void gio64_device::device_start()
 	std::fill(std::begin(m_device_list), std::end(m_device_list), nullptr);
 
 	m_space = &space(0);
-	m_space->install_readwrite_handler(0x00000000, 0x003fffff, read64_delegate(FUNC(gio64_device::no_gfx_r), this), write64_delegate(FUNC(gio64_device::no_gfx_w), this));
-	m_space->install_readwrite_handler(0x00400000, 0x005fffff, read64_delegate(FUNC(gio64_device::no_exp0_r), this), write64_delegate(FUNC(gio64_device::no_exp0_w), this));
-	m_space->install_readwrite_handler(0x00600000, 0x009fffff, read64_delegate(FUNC(gio64_device::no_exp1_r), this), write64_delegate(FUNC(gio64_device::no_exp1_w), this));
+	m_space->install_readwrite_handler(0x00000000, 0x003fffff, read64_delegate(*this, FUNC(gio64_device::no_gfx_r)), write64_delegate(*this, FUNC(gio64_device::no_gfx_w)));
+	m_space->install_readwrite_handler(0x00400000, 0x005fffff, read64_delegate(*this, FUNC(gio64_device::no_exp0_r)), write64_delegate(*this, FUNC(gio64_device::no_exp0_w)));
+	m_space->install_readwrite_handler(0x00600000, 0x009fffff, read64_delegate(*this, FUNC(gio64_device::no_exp1_r)), write64_delegate(*this, FUNC(gio64_device::no_exp1_w)));
 }
 
 READ64_MEMBER(gio64_device::no_gfx_r)  { return ~0ULL; }
@@ -140,7 +140,7 @@ void gio64_device::add_gio64_card(gio64_slot_device::slot_type_t slot_type, devi
 
 
 device_gio64_card_interface::device_gio64_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "sgigio64")
 	, m_gio64(nullptr)
 	, m_gio64_slottag(nullptr)
 	, m_slot_type(gio64_slot_device::GIO64_SLOT_COUNT)
@@ -157,8 +157,6 @@ void device_gio64_card_interface::interface_validity_check(validity_checker &val
 
 void device_gio64_card_interface::interface_pre_start()
 {
-	device_slot_card_interface::interface_pre_start();
-
 	if (!m_gio64)
 	{
 		fatalerror("Can't find SGI GIO64 device\n");

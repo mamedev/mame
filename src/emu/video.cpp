@@ -91,6 +91,7 @@ video_manager::video_manager(running_machine &machine)
 	, m_seconds_to_run(machine.options().seconds_to_run())
 	, m_auto_frameskip(machine.options().auto_frameskip())
 	, m_speed(original_speed_setting())
+	, m_low_latency(machine.options().low_latency())
 	, m_empty_skip_count(0)
 	, m_frameskip_level(machine.options().frameskip())
 	, m_frameskip_counter(0)
@@ -166,7 +167,7 @@ video_manager::video_manager(running_machine &machine)
 	// extract snap resolution if present
 	if (sscanf(machine.options().snap_size(), "%dx%d", &m_snap_width, &m_snap_height) != 2)
 		m_snap_width = m_snap_height = 0;
-	
+
 	// if no screens, create a periodic timer to drive updates
 	if (no_screens)
 	{
@@ -229,13 +230,20 @@ void video_manager::frame_update(bool from_debugger)
 
 	// if we're throttling, synchronize before rendering
 	attotime current_time = machine().time();
-	if (!from_debugger && !skipped_it && effective_throttle())
+	if (!from_debugger && !skipped_it && !m_low_latency && effective_throttle())
 		update_throttle(current_time);
 
 	// ask the OSD to update
 	g_profiler.start(PROFILER_BLIT);
 	machine().osd().update(!from_debugger && skipped_it);
 	g_profiler.stop();
+
+	// we synchronize after rendering instead of before, if low latency mode is enabled
+	if (!from_debugger && !skipped_it && m_low_latency && effective_throttle())
+		update_throttle(current_time);
+
+	// get most recent input now
+	machine().osd().input_update();
 
 	emulator_info::periodic_check();
 
@@ -443,7 +451,7 @@ void video_manager::begin_recording_mng(const char *name, uint32_t index, screen
 	if (filerr == osd_file::error::NONE)
 	{
 		// start the capture
-		int rate = int(screen->frame_period().as_hz());
+		int rate = int(screen ? screen->frame_period().as_hz() : screen_device::DEFAULT_FRAME_RATE);
 		png_error pngerr = mng_capture_start(*info.m_mng_file, m_snap_bitmap, rate);
 		if (pngerr != PNGERR_NONE)
 		{
@@ -479,7 +487,7 @@ void video_manager::begin_recording_avi(const char *name, uint32_t index, screen
 	// build up information about this new movie
 	avi_file::movie_info info;
 	info.video_format = 0;
-	info.video_timescale = 1000 * screen->frame_period().as_hz();
+	info.video_timescale = 1000 * (screen ? screen->frame_period().as_hz() : screen_device::DEFAULT_FRAME_RATE);
 	info.video_sampletime = 1000;
 	info.video_numsamples = 0;
 	info.video_width = m_snap_bitmap.width();
@@ -546,7 +554,14 @@ void video_manager::begin_recording(const char *name, movie_format format)
 	// create a snapshot bitmap so we know what the target size is
 	screen_device_iterator iterator = screen_device_iterator(machine().root_device());
 	screen_device_iterator::auto_iterator iter = iterator.begin();
-	const uint32_t count = (uint32_t)iterator.count();
+	uint32_t count = (uint32_t)iterator.count();
+	const bool no_screens(!count);
+
+	if (no_screens)
+	{
+		assert(!m_snap_native);
+		count = 1;
+	}
 
 	switch (format)
 	{

@@ -93,7 +93,7 @@ private:
 	DECLARE_WRITE16_MEMBER(wecleman_protection_w);
 	DECLARE_WRITE16_MEMBER(irqctrl_w);
 	DECLARE_WRITE16_MEMBER(selected_ip_w);
-	DECLARE_READ16_MEMBER(selected_ip_r);
+	uint8_t selected_ip_r();
 	DECLARE_WRITE16_MEMBER(blitter_w);
 	DECLARE_READ8_MEMBER(multiply_r);
 	DECLARE_WRITE8_MEMBER(multiply_w);

@@ -157,9 +157,9 @@ void tti_state::tti(machine_config &config)
 	m_maincpu->set_addrmap(m68008_device::AS_CPU_SPACE, &tti_state::fc7_map);
 
 	MC68901(config, m_mfp, 20_MHz_XTAL / 2); // guess
-	m_mfp->set_timer_clock(20_MHz_XTAL / 2); // guess
-	m_mfp->set_rx_clock(9600); // for testing (FIXME: actually 16x)
-	m_mfp->set_tx_clock(9600); // for testing (FIXME: actually 16x)
+	m_mfp->set_timer_clock(2'457'600); // guess
+	m_mfp->out_tco_cb().set(m_mfp, FUNC(mc68901_device::rc_w));
+	m_mfp->out_tdo_cb().set(m_mfp, FUNC(mc68901_device::tc_w));
 	m_mfp->out_so_cb().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_mfp->out_irq_cb().set_inputline("maincpu", M68K_IRQ_2); // probably
 
@@ -174,7 +174,7 @@ void tti_state::tti(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:7", tti_scsi_devices, "asc", true).set_option_machine_config("asc", [this] (device_t *device) { asc_config(device); });
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
-	rs232.rxd_handler().set(m_mfp, FUNC(mc68901_device::write_rx));
+	rs232.rxd_handler().set(m_mfp, FUNC(mc68901_device::si_w));
 
 	EEPROM_X24C44_16BIT(config, "novram").do_callback().set("mfp", FUNC(mc68901_device::i0_w));
 

@@ -40,9 +40,9 @@ TILE_GET_INFO_MEMBER(suprridr_state::get_tile_info2)
 
 void suprridr_state::video_start()
 {
-	m_fg_tilemap          = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(suprridr_state::get_tile_info2),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
-	m_bg_tilemap          = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(suprridr_state::get_tile_info),this),  TILEMAP_SCAN_ROWS,       8,8, 32,32);
-	m_bg_tilemap_noscroll = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(suprridr_state::get_tile_info),this),  TILEMAP_SCAN_ROWS,       8,8, 32,32);
+	m_fg_tilemap          = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(suprridr_state::get_tile_info2)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+	m_bg_tilemap          = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(suprridr_state::get_tile_info)),  TILEMAP_SCAN_ROWS, 8,8, 32,32);
+	m_bg_tilemap_noscroll = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(suprridr_state::get_tile_info)),  TILEMAP_SCAN_ROWS, 8,8, 32,32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 

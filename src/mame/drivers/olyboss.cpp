@@ -468,7 +468,7 @@ void olyboss_state::olybossd(machine_config &config)
 
 	UPD3301(config, m_crtc, XTAL(14'318'181));
 	m_crtc->set_character_width(8);
-	m_crtc->set_display_callback(FUNC(olyboss_state::olyboss_display_pixels), this);
+	m_crtc->set_display_callback(FUNC(olyboss_state::olyboss_display_pixels));
 	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 	m_crtc->int_wr_callback().set(m_uic, FUNC(am9519_device::ireq0_w)).invert();
 	m_crtc->set_screen(SCREEN_TAG);

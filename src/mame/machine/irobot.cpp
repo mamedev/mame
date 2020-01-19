@@ -319,7 +319,7 @@ void irobot_state::load_oproms()
 	int i;
 
 	/* allocate RAM */
-	m_mbops = auto_alloc_array(machine(), irmb_ops, 1024);
+	m_mbops = std::make_unique<irmb_ops[]>(1024);
 
 	for (i = 0; i < 1024; i++)
 	{

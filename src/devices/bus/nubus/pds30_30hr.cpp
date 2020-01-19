@@ -96,8 +96,8 @@ void nubus_xceed30hr_device::device_start()
 	m_vram.resize(VRAM_SIZE);
 	m_vram32 = (uint32_t *)&m_vram[0];
 
-	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_xceed30hr_device::vram_r), this), write32_delegate(FUNC(nubus_xceed30hr_device::vram_w), this));
-	nubus().install_device(slotspace+0x800000, slotspace+0xefffff, read32_delegate(FUNC(nubus_xceed30hr_device::xceed30hr_r), this), write32_delegate(FUNC(nubus_xceed30hr_device::xceed30hr_w), this));
+	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(*this, FUNC(nubus_xceed30hr_device::vram_r)), write32_delegate(*this, FUNC(nubus_xceed30hr_device::vram_w)));
+	nubus().install_device(slotspace+0x800000, slotspace+0xefffff, read32_delegate(*this, FUNC(nubus_xceed30hr_device::xceed30hr_r)), write32_delegate(*this, FUNC(nubus_xceed30hr_device::xceed30hr_w)));
 
 	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(screen().time_until_pos(479, 0), 0);

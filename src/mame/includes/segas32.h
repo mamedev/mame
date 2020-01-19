@@ -74,8 +74,8 @@ protected:
 
 	struct layer_info
 	{
-		bitmap_ind16 *bitmap;
-		uint8_t* transparent;
+		bitmap_ind16 *bitmap = nullptr;
+		uint8_t* transparent = nullptr;
 	};
 
 	struct extents_list
@@ -87,10 +87,10 @@ protected:
 
 	struct cache_entry
 	{
-		struct cache_entry *    next;
-		tilemap_t *             tmap;
-		uint8_t                   page;
-		uint8_t                   bank;
+		struct cache_entry *    next = nullptr;
+		tilemap_t *             tmap = nullptr;
+		uint8_t                   page = 0;
+		uint8_t                   bank = 0;
 	};
 
 	DECLARE_WRITE16_MEMBER(sonic_level_load_protection);

@@ -9,8 +9,6 @@
  *
  *   http://bitsavers.org/components/inmos/graphics/72-TRN-204-01_Graphics_Databook_Second_Edition_1990.pdf
  *
- * TODO
- *   - cursor
  */
 
 #include "emu.h"
@@ -28,7 +26,7 @@ DEFINE_DEVICE_TYPE(G300, g300_device, "g300", "INMOS G300 Colour Video Controlle
 DEFINE_DEVICE_TYPE(G332, g332_device, "g332", "INMOS G332 Colour Video Controller")
 DEFINE_DEVICE_TYPE(G364, g364_device, "g364", "INMOS G364 Colour Video Controller")
 
-ims_cvc_device::ims_cvc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+ims_cvc_device::ims_cvc_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
 	, m_screen(*this, finder_base::DUMMY_TAG)
@@ -36,23 +34,23 @@ ims_cvc_device::ims_cvc_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-g300_device::g300_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+g300_device::g300_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: ims_cvc_device(mconfig, G300, tag, owner, clock)
 {
 }
 
-g332_device::g332_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+g332_device::g332_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock)
 	: ims_cvc_device(mconfig, type, tag, owner, clock)
 	, m_microport(*this, "microport")
 {
 }
 
-g332_device::g332_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+g332_device::g332_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: g332_device(mconfig, G332, tag, owner, clock)
 {
 }
 
-g364_device::g364_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+g364_device::g364_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: g332_device(mconfig, G364, tag, owner, clock)
 {
 }
@@ -65,7 +63,7 @@ void g332_device::device_add_mconfig(machine_config &config)
 void g300_device::map(address_map &map)
 {
 	// datasheet gives unshifted addresses
-	const int shift = 2;
+	unsigned const shift = 2;
 
 	// colour palette
 	map(0x000 << shift, (0x0ff << shift) | 0x3).rw(FUNC(g300_device::colour_palette_r), FUNC(g300_device::colour_palette_w));
@@ -99,7 +97,7 @@ void g332_device::microport_map(address_map &map)
 {
 	// datasheet uses unshifted addresses: configure the device map for 64 bit
 	// address mode, bank device does handles additional shift for 32 bit mode
-	const int shift = 3;
+	unsigned const shift = 3;
 
 	map(0x000 << shift, (0x000 << shift) | 0x7).w(FUNC(g332_device::boot_w));
 
@@ -129,11 +127,14 @@ void g332_device::microport_map(address_map &map)
 
 	// checksum registers (0c0-0c2)
 
+	// cursor start (0c7)
+	map(0x0c7 << shift, (0x0c7 << shift) | 0x7).rw(FUNC(g332_device::cursor_start_r), FUNC(g332_device::cursor_start_w));
+
 	// colour palette
 	map(0x100 << shift, (0x1ff << shift) | 0x7).rw(FUNC(g332_device::colour_palette_r), FUNC(g332_device::colour_palette_w));
 
 	// cursor store (200-3ff)
-	// cursor position (0c7)
+	map(0x200 << shift, (0x3ff << shift) | 0x7).rw(FUNC(g332_device::cursor_store_r), FUNC(g332_device::cursor_store_w));
 }
 
 void ims_cvc_device::device_start()
@@ -170,11 +171,16 @@ void g332_device::device_start()
 {
 	ims_cvc_device::device_start();
 
+	m_cursor_store = std::make_unique<u16[]>(512);
+
 	save_item(NAME(m_vpreequalise));
 	save_item(NAME(m_vpostequalise));
 	save_item(NAME(m_linestart));
 	save_item(NAME(m_control_a));
 	save_item(NAME(m_control_b));
+	save_item(NAME(m_cursor_start));
+
+	save_pointer(NAME(m_cursor_store), 512);
 }
 
 void g332_device::device_reset()
@@ -182,7 +188,7 @@ void g332_device::device_reset()
 	m_control_a = 0;
 }
 
-u32 g300_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 g300_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
 {
 	offs_t address = m_tos;
 
@@ -193,7 +199,7 @@ u32 g300_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	return 0;
 }
 
-u32 g332_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 g332_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
 {
 	offs_t address = m_tos;
 
@@ -247,30 +253,48 @@ u32 g332_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		break;
 	}
 
+	if (!(m_control_a & CURSOR_DISABLE))
+	{
+		// get cursor origin
+		int const cursor_x = screen.visible_area().min_x + (s32(m_cursor_start << 8) >> 20);
+		int const cursor_y = screen.visible_area().min_y + (s32(m_cursor_start << 20) >> 20);
+
+		// intersect cursor with screen
+		rectangle cursor(cursor_x, cursor_x + 63, cursor_y, cursor_y + 63);
+		cursor &= bitmap.cliprect();
+
+		// check if any portion is visible
+		if (!cursor.empty())
+		{
+			for (int y = 0; y < 64; y++)
+			{
+				// get screen y pixel coordinate
+				int const ypos = cursor_y + y;
+
+				for (int x = 0; x < 8; x++)
+				{
+					// retrieve 8 pixels from cursor bitmap
+					u16 data = m_cursor_store[y * 8 + x];
+
+					// draw non-transparent pixels
+					for (int i = 0; data && i < 8; data >>= 2, i++)
+					{
+						// get screen x pixel coordinate
+						int const xpos = cursor_x + x * 8 + i;
+
+						// draw pixel if visible
+						if ((data & 3) && cursor.contains(xpos, ypos))
+							bitmap.pix(ypos, xpos) = pen_color(256 + (data & 3) - 1);
+					}
+				}
+			}
+		}
+	}
+
 	return 0;
 }
 
-u32 ims_cvc_device::colour_palette_r(offs_t offset)
-{
-	return 0;
-}
-
-void ims_cvc_device::colour_palette_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	set_pen_color(offset >> 1, data >> 16, data >> 8, data >> 0);
-}
-
-u32 g332_device::cursor_palette_r(offs_t offset)
-{
-	return 0;
-}
-
-void g332_device::cursor_palette_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	set_pen_color(256 + (offset >> 1), data >> 16, data >> 8, data >> 0);
-}
-
-void g332_device::boot_w(offs_t offset, u32 data, u32 mem_mask)
+void g332_device::boot_w(u32 data)
 {
 	LOG("boot_w %s clock, multiplier %d, %d bit alignment (%s)\n",
 		(data & PLL_SELECT) ? "PLL" : "external", (data & PLL_MULTIPLIER),
@@ -278,68 +302,69 @@ void g332_device::boot_w(offs_t offset, u32 data, u32 mem_mask)
 
 	m_microport->set_shift((data & ALIGN_64) ? 0 : 1);
 
-	mem_mask &= 0x00ffffffU;
-	COMBINE_DATA(&m_boot);
+	m_boot = data & MASK24;
 }
 
-void g332_device::control_a_w(offs_t offset, u32 data, u32 mem_mask)
+void g332_device::control_a_w(u32 data)
 {
 	LOG("control_a_w 0x%08x (%s)\n", data, machine().describe_context());
 
-	mem_mask &= 0x00ffffffU;
-	COMBINE_DATA(&m_control_a);
-
-	if (data & VTG_ENABLE)
+	if ((data ^ m_control_a) & MASK24)
 	{
-		LOGMASKED(LOG_CONFIG, "VTG %s, %s, %s mode\n",
-			(data & VTG_ENABLE) ? "enabled" : "disabled",
-			(data & INTL_ENABLE) ? ((data & INTL_FORMAT) ? "interlaced (CCIR)" : "interlaced (EIA)") : "non-interlaced",
-			(data & SLAVE_MODE) ? "slave" : "master");
+		m_control_a = data & MASK24;
 
-		LOGMASKED(LOG_CONFIG, "%s sync, %s digital sync, analogue %s\n",
-			(data & SYNC_PATTERN) ? "plain" : "tesselated",
-			(data & SYNC_FORMAT) ? "separate" : "composite",
-			(data & VIDEO_FORMAT) ? "video only" : "composite video + sync");
+		if (data & VTG_ENABLE)
+		{
+			LOGMASKED(LOG_CONFIG, "VTG %s, %s, %s mode\n",
+				(data & VTG_ENABLE) ? "enabled" : "disabled",
+				(data & INTL_ENABLE) ? ((data & INTL_FORMAT) ? "interlaced (CCIR)" : "interlaced (EIA)") : "non-interlaced",
+				(data & SLAVE_MODE) ? "slave" : "master");
 
-		LOGMASKED(LOG_CONFIG, "%s, CBlank is %s, %s, %s\n",
-			(data & BLANK_LEVEL) ? "blanking pedestal" : "no blank pedestal",
-			(data & BLANK_IO) ? "ouput" : "input",
-			(data & BLANK_FUNC) ? "undelayed ClkDisable" : "delayed CBlank",
-			(data & BLANK_FORCE) ? "screen blanked" : (data & BLANK_DISABLE) ? "blanking disabled" : "blanking enabled");
+			LOGMASKED(LOG_CONFIG, "%s sync, %s digital sync, analogue %s\n",
+				(data & SYNC_PATTERN) ? "plain" : "tesselated",
+				(data & SYNC_FORMAT) ? "separate" : "composite",
+				(data & VIDEO_FORMAT) ? "video only" : "composite video + sync");
 
-		LOGMASKED(LOG_CONFIG, "address increment %d, DMA %s, sync delay %d cycles\n",
-			(data & ADDR_INC) == INC_1 ? 1 :
-			(data & ADDR_INC) == INC_256 ? (data & INTL_ENABLE) ? 2 : 256 :
-			(data & ADDR_INC) == INC_512 ? 512 : 1024,
-			(data & DMA_DISABLE) ? "disabled" : "enabled",
-			(data & SYNC_DELAY) >> 15);
+			LOGMASKED(LOG_CONFIG, "%s, CBlank is %s, %s, %s\n",
+				(data & BLANK_LEVEL) ? "blanking pedestal" : "no blank pedestal",
+				(data & BLANK_IO) ? "ouput" : "input",
+				(data & BLANK_FUNC) ? "undelayed ClkDisable" : "delayed CBlank",
+				(data & BLANK_FORCE) ? "screen blanked" : (data & BLANK_DISABLE) ? "blanking disabled" : "blanking enabled");
 
-		LOGMASKED(LOG_CONFIG, "interleave %s, pixel sampling %s, %s bits per pixel, cursor %s\n",
-			(data & INTERLEAVE) ? "enabled" : "disabled",
-			(data & SAMPLE_DELAY) ? "delayed" : "standard",
-			(data & PIXEL_BITS) == BPP_1 ? "1" :
-			(data & PIXEL_BITS) == BPP_2 ? "2" :
-			(data & PIXEL_BITS) == BPP_4 ? "4" :
-			(data & PIXEL_BITS) == BPP_8 ? "8" :
-			(data & PIXEL_BITS) == BPP_15 ? "15" :
-			(data & PIXEL_BITS) == BPP_16 ? "16" : "unknown",
-			(data & CURSOR_DISABLE) ? "disabled" : "enabled");
+			LOGMASKED(LOG_CONFIG, "address increment %d, DMA %s, sync delay %d cycles\n",
+				(data & ADDR_INC) == INC_1 ? 1 :
+				(data & ADDR_INC) == INC_256 ? (data & INTL_ENABLE) ? 2 : 256 :
+				(data & ADDR_INC) == INC_512 ? 512 : 1024,
+				(data & DMA_DISABLE) ? "disabled" : "enabled",
+				(data & SYNC_DELAY) >> 15);
 
-		LOG("display %d vdisplay %d\n", m_display, m_vdisplay);
-		LOG("linetime %d halfsync %d backporch %d broadpulse %d\n", m_linetime, m_halfsync, m_backporch, m_broadpulse);
-		LOG("vsync %d vpreequalise %d vpostequalise %d vblank %d\n", m_vsync, m_vpreequalise, m_vpostequalise, m_vblank);
+			LOGMASKED(LOG_CONFIG, "interleave %s, pixel sampling %s, %s bits per pixel, cursor %s\n",
+				(data & INTERLEAVE) ? "enabled" : "disabled",
+				(data & SAMPLE_DELAY) ? "delayed" : "standard",
+				(data & PIXEL_BITS) == BPP_1 ? "1" :
+				(data & PIXEL_BITS) == BPP_2 ? "2" :
+				(data & PIXEL_BITS) == BPP_4 ? "4" :
+				(data & PIXEL_BITS) == BPP_8 ? "8" :
+				(data & PIXEL_BITS) == BPP_15 ? "15" :
+				(data & PIXEL_BITS) == BPP_16 ? "16" : "unknown",
+				(data & CURSOR_DISABLE) ? "disabled" : "enabled");
 
-		int const hbend = (m_halfsync + m_halfsync + m_backporch) << 2;
-		int const vbend = (m_vpreequalise + m_vpostequalise + m_vsync + m_vblank) >> 1;
-		int const width = m_linetime << 2;
-		int const height = vbend + (m_vdisplay >> 1);
+			LOG("display %d vdisplay %d\n", m_display, m_vdisplay);
+			LOG("linetime %d halfsync %d backporch %d broadpulse %d\n", m_linetime, m_halfsync, m_backporch, m_broadpulse);
+			LOG("vsync %d vpreequalise %d vpostequalise %d vblank %d\n", m_vsync, m_vpreequalise, m_vpostequalise, m_vblank);
 
-		rectangle const visarea(hbend, hbend + (m_display << 2) - 1, vbend, height - 1);
+			int const hbend = (m_halfsync + m_halfsync + m_backporch) << 2;
+			int const vbend = (m_vpreequalise + m_vpostequalise + m_vsync + m_vblank) >> 1;
+			int const width = m_linetime << 2;
+			int const height = vbend + (m_vdisplay >> 1);
 
-		u32 const dotclock = (m_boot & PLL_SELECT) ? clock() * (m_boot & PLL_MULTIPLIER) : clock();
-		attotime const refresh = attotime::from_hz(dotclock / (width * height));
+			rectangle const visarea(hbend, hbend + (m_display << 2) - 1, vbend, height - 1);
 
-		m_screen->configure(width, height, visarea, refresh.as_attoseconds());
-		m_screen->reset_origin();
+			u32 const dotclock = (m_boot & PLL_SELECT) ? clock() * (m_boot & PLL_MULTIPLIER) : clock();
+			attotime const refresh = attotime::from_hz(dotclock / (width * height));
+
+			m_screen->configure(width, height, visarea, refresh.as_attoseconds());
+			m_screen->reset_origin();
+		}
 	}
 }

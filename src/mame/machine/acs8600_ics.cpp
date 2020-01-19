@@ -87,11 +87,11 @@ void acs8600_ics_device::ics_io(address_map &map)
 
 static const z80_daisy_config ics_daisy_chain[] =
 {
-	"sio1",
-	"sio2",
-	"sio3",
-	"sio4",
-	nullptr
+	{ "sio1" },
+	{ "sio2" },
+	{ "sio3" },
+	{ "sio4" },
+	{ nullptr }
 };
 
 void acs8600_ics_device::device_add_mconfig(machine_config &config)

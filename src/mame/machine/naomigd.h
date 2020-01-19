@@ -6,7 +6,12 @@
 #pragma once
 
 #include "machine/naomibd.h"
-
+#include "cpu/pic16c62x/pic16c62x.h"
+#include "machine/i2cmem.h"
+#include "machine/eepromser.h"
+#include "machine/315-6154.h"
+#include "machine/idectrl.h"
+#include "machine/gdrom.h"
 
 class naomi_gdrom_board : public naomi_board
 {
@@ -30,6 +35,14 @@ public:
 
 	naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void submap(address_map& map) override;
+	void sh4_map(address_map &map);
+	void sh4_io_map(address_map &map);
+	void pic_map(address_map &map);
+	void pci_map(address_map &map);
+	void pci_config_map(address_map &map);
+
 	void set_image_tag(const char *_image_tag)
 	{
 		image_tag = _image_tag;
@@ -38,6 +51,46 @@ public:
 	uint8_t *memory(uint32_t &size) { size = dimm_data_size; return dimm_data; }
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	DECLARE_WRITE16_MEMBER(dimm_command_w);		// 5f703c
+	DECLARE_READ16_MEMBER(dimm_command_r);
+	DECLARE_WRITE16_MEMBER(dimm_offsetl_w);		// 5f7040
+	DECLARE_READ16_MEMBER(dimm_offsetl_r);
+	DECLARE_WRITE16_MEMBER(dimm_parameterl_w);	// 5f7044
+	DECLARE_READ16_MEMBER(dimm_parameterl_r);
+	DECLARE_WRITE16_MEMBER(dimm_parameterh_w);	// 5f7048
+	DECLARE_READ16_MEMBER(dimm_parameterh_r);
+	DECLARE_WRITE16_MEMBER(dimm_status_w);		// 5f704c
+	DECLARE_READ16_MEMBER(dimm_status_r);
+
+	DECLARE_WRITE32_MEMBER(sh4_unknown_w);		// 14000000
+	DECLARE_READ32_MEMBER(sh4_unknown_r);
+	DECLARE_WRITE32_MEMBER(sh4_command_w);		// 14000014
+	DECLARE_READ32_MEMBER(sh4_command_r);
+	DECLARE_WRITE32_MEMBER(sh4_offsetl_w);		// 14000018
+	DECLARE_READ32_MEMBER(sh4_offsetl_r);
+	DECLARE_WRITE32_MEMBER(sh4_parameterl_w);	// 1400001c
+	DECLARE_READ32_MEMBER(sh4_parameterl_r);
+	DECLARE_WRITE32_MEMBER(sh4_parameterh_w);	// 14000020
+	DECLARE_READ32_MEMBER(sh4_parameterh_r);
+	DECLARE_WRITE32_MEMBER(sh4_status_w);		// 14000024
+	DECLARE_READ32_MEMBER(sh4_status_r);
+	DECLARE_WRITE32_MEMBER(sh4_control_w);		// 14000028
+	DECLARE_READ32_MEMBER(sh4_control_r);
+	DECLARE_WRITE32_MEMBER(sh4_des_keyl_w);		// 14000030
+	DECLARE_READ32_MEMBER(sh4_des_keyl_r);
+	DECLARE_WRITE32_MEMBER(sh4_des_keyh_w);		// 14000034
+	DECLARE_READ32_MEMBER(sh4_des_keyh_r);
+
+	DECLARE_READ64_MEMBER(i2cmem_dimm_r);
+	DECLARE_WRITE64_MEMBER(i2cmem_dimm_w);
+	DECLARE_READ8_MEMBER(pic_dimm_r);
+	DECLARE_WRITE8_MEMBER(pic_dimm_w);
+
+	DECLARE_READ32_MEMBER(ide_cs0_r);
+	DECLARE_READ32_MEMBER(ide_cs1_r);
+	DECLARE_WRITE32_MEMBER(ide_cs0_w);
+	DECLARE_WRITE32_MEMBER(ide_cs1_w);
 
 protected:
 	virtual void device_start() override;
@@ -49,13 +102,35 @@ protected:
 
 private:
 	enum { FILENAME_LENGTH=24 };
+	const int work_mode = 0; // set to 1 and rebuild to enable the cpus
+
+	required_device<sh4_device> m_maincpu;
+	required_device<pic16c622_device> m_securitycpu;
+	required_device<i2cmem_device> m_i2c0;
+	required_device<i2cmem_device> m_i2c1;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<sega_315_6154_device> m_315_6154;
+	required_device<bus_master_ide_controller_device> m_ide;
 
 	const char *image_tag;
 	optional_region_ptr<uint8_t> picdata;
 
 	uint32_t dimm_cur_address;
+	uint8_t picbus;
+	uint8_t picbus_pullup;
+	uint8_t picbus_io[2]; // 0 for sh4, 1 for pic
+	bool picbus_used;
+	uint32_t dimm_command;
+	uint32_t dimm_offsetl;
+	uint32_t dimm_parameterl;
+	uint32_t dimm_parameterh;
+	uint32_t dimm_status;
+	uint32_t dimm_control;
+	uint32_t sh4_unknown;
+	uint64_t dimm_des_key;
 
 	// Note: voluntarily not saved into the state
+	uint8_t *dimm_des_data;
 	uint8_t *dimm_data;
 	uint32_t dimm_data_size;
 

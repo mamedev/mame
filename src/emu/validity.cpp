@@ -238,7 +238,7 @@ bool validity_checker::check_all_matching(const char *string)
 
 	// if we failed to match anything, it
 	if (string && !validated_any)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", string);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", string);
 
 	return !(m_errors > 0 || m_warnings > 0);
 }
@@ -318,7 +318,7 @@ void validity_checker::validate_one(const game_driver &driver)
 	}
 	catch (emu_fatalerror &err)
 	{
-		osd_printf_error("Fatal error %s", err.string());
+		osd_printf_error("Fatal error %s", err.what());
 	}
 
 	// if we had warnings or errors, output

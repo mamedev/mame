@@ -148,7 +148,7 @@ std::string hp_dc100_tape_device::call_display()
 	return buffer;
 }
 
-const char *hp_dc100_tape_device::file_extensions() const
+const char *hp_dc100_tape_device::file_extensions() const noexcept
 {
 	return "hti";
 }

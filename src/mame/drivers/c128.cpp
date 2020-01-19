@@ -34,42 +34,36 @@
 #include "video/mc6845.h"
 #include "video/mos6566.h"
 
-#define Z80A_TAG        "u10"
 #define M8502_TAG       "u6"
 #define MOS8563_TAG     "u22"
 #define MOS8564_TAG     "u21"
 #define MOS8566_TAG     "u21"
-#define MOS6581_TAG     "u5"
-#define MOS6526_1_TAG   "u1"
-#define MOS6526_2_TAG   "u4"
 #define MOS8721_TAG     "u11"
-#define MOS8722_TAG     "u7"
 #define SCREEN_VIC_TAG  "screen"
 #define SCREEN_VDC_TAG  "screen80"
 #define CONTROL1_TAG    "joy1"
 #define CONTROL2_TAG    "joy2"
-#define PET_USER_PORT_TAG     "user"
 
 class c128_state : public driver_device
 {
 public:
 	c128_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, Z80A_TAG),
+		m_maincpu(*this, "u10"),
 		m_subcpu(*this, M8502_TAG),
 		m_nmi(*this, "nmi"),
-		m_mmu(*this, MOS8722_TAG),
+		m_mmu(*this, "u7"),
 		m_pla(*this, MOS8721_TAG),
 		m_vdc(*this, MOS8563_TAG),
 		m_vic(*this, MOS8564_TAG),
-		m_sid(*this, MOS6581_TAG),
-		m_cia1(*this, MOS6526_1_TAG),
-		m_cia2(*this, MOS6526_2_TAG),
+		m_sid(*this, "u5"),
+		m_cia1(*this, "u1"),
+		m_cia2(*this, "u4"),
 		m_iec(*this, CBM_IEC_TAG),
 		m_joy1(*this, CONTROL1_TAG),
 		m_joy2(*this, CONTROL2_TAG),
 		m_exp(*this, "exp"),
-		m_user(*this, PET_USER_PORT_TAG),
+		m_user(*this, "user"),
 		m_ram(*this, RAM_TAG),
 		m_cassette(*this, PET_DATASSETTE_PORT_TAG),
 		m_from(*this, "from"),
@@ -1638,15 +1632,13 @@ void c128_state::ntsc(machine_config &config)
 	Z80(config, m_maincpu, XTAL(14'318'181)*2/3.5/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c128_state::z80_mem);
 	m_maincpu->set_addrmap(AS_IO, &c128_state::z80_io);
-	config.m_perfect_cpu_quantum = subtag(Z80A_TAG);
 
 	M8502(config, m_subcpu, XTAL(14'318'181)*2/3.5/8);
-	m_subcpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_subcpu->read_callback().set(FUNC(c128_state::cpu_r));
 	m_subcpu->write_callback().set(FUNC(c128_state::cpu_w));
 	m_subcpu->set_pulls(0x07, 0x20);
 	m_subcpu->set_addrmap(AS_PROGRAM, &c128_state::m8502_mem);
-	config.m_perfect_cpu_quantum = subtag(M8502_TAG);
+	config.set_perfect_quantum(m_subcpu);
 
 	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
 	irq.output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -1755,7 +1747,7 @@ void c128_state::ntsc(machine_config &config)
 	m_user->pl_handler().set(FUNC(c128_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c128_state::write_user_pa2));
 
-	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c128_state::quickload_c128), this);
+	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c128_state::quickload_c128));
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter("NTSC");
@@ -1811,7 +1803,7 @@ void c128_state::c128d81(machine_config &config)
 	m_iec->srq_callback().set(FUNC(c128_state::iec_srq_w));
 	m_iec->data_callback().set(FUNC(c128_state::iec_data_w));
 
-	CBM_IEC_SLOT(config.replace(), "iec8", c128d81_iec_devices, "c1563");
+	CBM_IEC_SLOT(config.replace(), "iec8", 8, c128d81_iec_devices, "c1563");
 }
 
 
@@ -1825,15 +1817,13 @@ void c128_state::pal(machine_config &config)
 	Z80(config, m_maincpu, XTAL(17'734'472)*2/4.5/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c128_state::z80_mem);
 	m_maincpu->set_addrmap(AS_IO, &c128_state::z80_io);
-	config.m_perfect_cpu_quantum = subtag(Z80A_TAG);
 
 	M8502(config, m_subcpu, XTAL(17'734'472)*2/4.5/8);
-	m_subcpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_subcpu->read_callback().set(FUNC(c128_state::cpu_r));
 	m_subcpu->write_callback().set(FUNC(c128_state::cpu_w));
 	m_subcpu->set_pulls(0x07, 0x20);
 	m_subcpu->set_addrmap(AS_PROGRAM, &c128_state::m8502_mem);
-	config.m_perfect_cpu_quantum = subtag(M8502_TAG);
+	config.set_perfect_quantum(m_subcpu);
 
 	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
 	irq.output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -1942,7 +1932,7 @@ void c128_state::pal(machine_config &config)
 	m_user->pl_handler().set(FUNC(c128_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c128_state::write_user_pa2));
 
-	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c128_state::quickload_c128), this);
+	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c128_state::quickload_c128));
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");

@@ -688,7 +688,7 @@ void nova2001_state::ninjakun(machine_config &config)
 	subcpu.set_addrmap(AS_PROGRAM, &nova2001_state::ninjakun_cpu2_map);
 	subcpu.set_periodic_int(FUNC(nova2001_state::irq0_line_hold), attotime::from_hz(4*60)); /* ? */
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* 100 CPU slices per frame */
 
 	MCFG_MACHINE_START_OVERRIDE(nova2001_state,ninjakun)
 
@@ -766,7 +766,7 @@ void nova2001_state::raiders5(machine_config &config)
 	subcpu.set_addrmap(AS_PROGRAM, &nova2001_state::raiders5_cpu2_map);
 	subcpu.set_periodic_int(FUNC(nova2001_state::irq0_line_hold), attotime::from_hz(4*60));  /* ? */
 
-	config.m_minimum_quantum = attotime::from_hz(24000);
+	config.set_maximum_quantum(attotime::from_hz(24000));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

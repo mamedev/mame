@@ -335,7 +335,7 @@ void uapce_state::uapce(machine_config &config)
 	z80_device &sub(Z80(config, "sub", 1400000));
 	sub.set_addrmap(AS_PROGRAM, &uapce_state::z80_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

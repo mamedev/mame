@@ -153,7 +153,7 @@ cheat_parameter::cheat_parameter(cheat_manager &manager, symbol_table &symbols, 
 		if (!itemnode->get_value() || !itemnode->get_value()[0])
 			throw emu_fatalerror("%s.xml(%d): item is missing text\n", filename, itemnode->line);
 
-		// check for non-existant value
+		// check for non-existent value
 		if (!itemnode->has_attribute("value"))
 			throw emu_fatalerror("%s.xml(%d): item is value\n", filename, itemnode->line);
 
@@ -309,6 +309,9 @@ bool cheat_parameter::set_next_state()
 //**************************************************************************
 //  CHEAT SCRIPT
 //**************************************************************************
+
+constexpr int cheat_script::script_entry::MAX_ARGUMENTS;
+
 
 //-------------------------------------------------
 //  cheat_script - constructor
@@ -1227,7 +1230,7 @@ bool cheat_manager::save_all(const char *filename)
 	catch (emu_fatalerror const &err)
 	{
 		// catch errors and cleanup
-		osd_printf_error("%s\n", err.string());
+		osd_printf_error("%s\n", err.what());
 		cheatfile.remove_on_close();
 	}
 	return false;
@@ -1447,7 +1450,7 @@ void cheat_manager::load_cheats(const char *filename)
 				catch (emu_fatalerror const &err)
 				{
 					// just move on to the next cheat
-					osd_printf_error("%s\n", err.string());
+					osd_printf_error("%s\n", err.what());
 				}
 			}
 		}
@@ -1455,7 +1458,7 @@ void cheat_manager::load_cheats(const char *filename)
 	catch (emu_fatalerror const &err)
 	{
 		// handle errors cleanly
-		osd_printf_error("%s\n", err.string());
+		osd_printf_error("%s\n", err.what());
 		m_cheatlist.clear();
 	}
 }

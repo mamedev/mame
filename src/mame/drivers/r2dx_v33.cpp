@@ -483,9 +483,9 @@ void r2dx_v33_state::nzeroteam_base_map(address_map &map)
 
 //  map(0x00762, 0x00763).r(FUNC(r2dx_v33_state::nzerotea_unknown_r));
 
-	map(0x00780, 0x0079f).lrw8("seibu_sound_rw",
-							   [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
-							   [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+	map(0x00780, 0x0079f).lrw8(
+							   NAME([this] (offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+							   NAME([this] (offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
 
 	map(0x00800, 0x00fff).ram();
 	map(0x01000, 0x0bfff).ram();

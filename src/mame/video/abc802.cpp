@@ -184,7 +184,7 @@ void abc802_state::abc802_video(machine_config &config)
 	mc6845.set_screen(SCREEN_TAG);
 	mc6845.set_show_border_area(true);
 	mc6845.set_char_width(ABC800_CHAR_WIDTH);
-	mc6845.set_update_row_callback(FUNC(abc802_state::abc802_update_row), this);
+	mc6845.set_update_row_callback(FUNC(abc802_state::abc802_update_row));
 	mc6845.out_vsync_callback().set(FUNC(abc802_state::vs_w));
 	mc6845.out_vsync_callback().append(m_dart, FUNC(z80dart_device::rib_w)).invert();
 

@@ -386,7 +386,7 @@ void falcots_state::ts1(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(falcots_state::update_row), this);
+	m_crtc->set_update_row_callback(FUNC(falcots_state::update_row));
 }
 
 static const z80_daisy_config daisy_chain[] =
@@ -425,7 +425,7 @@ void falcots_state::ts2624(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(16);
-	m_crtc->set_update_row_callback(FUNC(falcots_state::update_row), this);
+	m_crtc->set_update_row_callback(FUNC(falcots_state::update_row));
 }
 
 ROM_START(ts1)

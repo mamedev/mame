@@ -118,9 +118,9 @@ VIDEO_START_MEMBER(kickgoal_state,kickgoal)
 	m_bg2_base = 0x2000 / 4;
 	m_bg2_mask = (0x2000/4) - 1;
 
-	m_fgtm = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kickgoal_state::get_kickgoal_fg_tile_info),this), tilemap_mapper_delegate(FUNC(kickgoal_state::tilemap_scan_8x8),this), 8, 8, 64, 64);
-	m_bgtm = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kickgoal_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(kickgoal_state::tilemap_scan_16x16),this), 16, 16, 64, 64);
-	m_bg2tm = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kickgoal_state::get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(kickgoal_state::tilemap_scan_32x32),this), 32, 32, 64, 64);
+	m_fgtm = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kickgoal_state::get_kickgoal_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(kickgoal_state::tilemap_scan_8x8)), 8, 8, 64, 64);
+	m_bgtm = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kickgoal_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(kickgoal_state::tilemap_scan_16x16)), 16, 16, 64, 64);
+	m_bg2tm = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kickgoal_state::get_bg2_tile_info)), tilemap_mapper_delegate(*this, FUNC(kickgoal_state::tilemap_scan_32x32)), 32, 32, 64, 64);
 
 	m_fgtm->set_transparent_pen(15);
 	m_bgtm->set_transparent_pen(15);
@@ -138,9 +138,9 @@ VIDEO_START_MEMBER(kickgoal_state,actionhw)
 	m_bg2_base = 0x2000;
 	m_bg2_mask = 0x2000 - 1;
 
-	m_fgtm = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kickgoal_state::get_actionhw_fg_tile_info),this), tilemap_mapper_delegate(FUNC(kickgoal_state::tilemap_scan_8x8),this), 8, 8, 64, 64);
-	m_bgtm = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kickgoal_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(kickgoal_state::tilemap_scan_16x16),this), 16, 16, 64, 64);
-	m_bg2tm = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kickgoal_state::get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(kickgoal_state::tilemap_scan_16x16),this), 16, 16, 64, 64);
+	m_fgtm = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kickgoal_state::get_actionhw_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(kickgoal_state::tilemap_scan_8x8)), 8, 8, 64, 64);
+	m_bgtm = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kickgoal_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(kickgoal_state::tilemap_scan_16x16)), 16, 16, 64, 64);
+	m_bg2tm = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kickgoal_state::get_bg2_tile_info)), tilemap_mapper_delegate(*this, FUNC(kickgoal_state::tilemap_scan_16x16)), 16, 16, 64, 64);
 
 	m_fgtm->set_transparent_pen(15);
 	m_bgtm->set_transparent_pen(15);

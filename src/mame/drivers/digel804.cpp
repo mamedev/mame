@@ -637,7 +637,7 @@ void digel804_state::digel804(machine_config &config)
 	Z80(config, m_maincpu, 3.6864_MHz_XTAL/2); /* Z80A, X1(aka E0 on schematics): 3.6864Mhz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &digel804_state::z80_mem_804_1_4);
 	m_maincpu->set_addrmap(AS_IO, &digel804_state::z80_io_1_4);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	ROC10937(config, m_vfd); // RIGHT_TO_LEFT
 
@@ -695,10 +695,10 @@ void ep804_state::ep804(machine_config &config)
 
 /*
 "Hardware Revisions"
-For pcb 1.0, there are at least 6 hardware revisions (i.e. small changes/component changes/greenwire fixes)
-which revison the hardware is is shown on the sticker on the bottom.
+For pcb 1.0, there are at least 6 hardware revisions (i.e. small changes/component changes/greenwire fixes).
+The hardware revision is shown on the sticker on the bottom.
 
-known features:
+Known features:
 
 1.0 - ?
 1.1 - does not support driving pin 1 of the socket, i.e. max size is 27256; pin 1 is pulled high; several components unpopulated

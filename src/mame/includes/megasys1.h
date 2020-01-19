@@ -14,6 +14,7 @@
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
+#include "sound/msm5205.h"
 #include "sound/okim6295.h"
 #include "video/ms1_tmap.h"
 #include "emupal.h"
@@ -31,6 +32,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki%u", 1U),
+		m_p47b_adpcm(*this, "msm%u", 1U),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
@@ -94,6 +96,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device_array<okim6295_device, 2> m_oki;
+	optional_device_array<msm5205_device, 2> m_p47b_adpcm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
@@ -168,6 +171,7 @@ private:
 	void megasys1_set_vreg_flag(int which, int data);
 	template<int Chip> DECLARE_READ8_MEMBER(oki_status_r);
 	DECLARE_WRITE16_MEMBER(ram_w);
+	void p47b_adpcm_w(offs_t offset, u8 data);
 
 	DECLARE_MACHINE_RESET(megasys1);
 	DECLARE_VIDEO_START(megasys1);

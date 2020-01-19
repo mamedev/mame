@@ -12,7 +12,11 @@ Sound:  YM2203C x 2
 Other:  2 HM6116LP-3 (one on each board)
         1 KM6264L-15 (on bottom board)
 
-To Do:  The background rendering is entirely guesswork
+TODO:
+- The background rendering is entirely guesswork;
+- DMA trigger happens at vpos 24 with legacy video parameters,
+  needs H/VSync PCB calculations, also notice that 62.65 Hz comes from the
+  bootleg and may be different for original;
 
 2008-07
 Verified Dip locations and recommended settings with manual
@@ -33,8 +37,9 @@ Verified Dip locations and recommended settings with manual
 
 ***************************************************************************/
 
-WRITE8_MEMBER(skyfox_state::skyfox_vregs_w)
+WRITE8_MEMBER(skyfox_state::output_w)
 {
+	// TODO: untangle
 	switch (offset)
 	{
 	case 0:
@@ -44,9 +49,6 @@ WRITE8_MEMBER(skyfox_state::skyfox_vregs_w)
 	case 1:
 		m_soundlatch->write(data);
 		break;
-
-	default:
-		break;
 	}
 }
 
@@ -55,11 +57,15 @@ void skyfox_state::skyfox_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xd3ff).ram().share("spriteram");
-	map(0xd400, 0xdfff).ram(); // ?
+	map(0xd400, 0xd4ff).ram().share("bgram"); // For background stars
+	// TODO: verify if A11 is unconnected
+	map(0xd500, 0xdfff).ram();
 	map(0xe000, 0xe000).portr("INPUTS");
 	map(0xe001, 0xe001).portr("DSW0");
 	map(0xe002, 0xe002).portr("DSW1");
-	map(0xe008, 0xe00f).w(FUNC(skyfox_state::skyfox_vregs_w));
+	map(0xe008, 0xe009).w(FUNC(skyfox_state::output_w));
+//  map(0xe00a, 0xe00e) // POST only?
+	map(0xe00f, 0xe00f).nopw(); // DMA trigger
 	map(0xf001, 0xf001).portr("DSW2");
 }
 
@@ -202,23 +208,13 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-/* Scroll the background on every vblank (guess). */
-
-INTERRUPT_GEN_MEMBER(skyfox_state::skyfox_interrupt)
-{
-	/* Scroll the bg */
-	m_bg_pos += (m_bg_ctrl >> 1) & 0x7; // maybe..
-}
-
 void skyfox_state::machine_start()
 {
-	save_item(NAME(m_bg_pos));
 	save_item(NAME(m_bg_ctrl));
 }
 
 void skyfox_state::machine_reset()
 {
-	m_bg_pos = 0;
 	m_bg_ctrl = 0;
 }
 
@@ -227,13 +223,14 @@ void skyfox_state::skyfox(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(8'000'000)/2); /* Verified at 4MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &skyfox_state::skyfox_map);
-	m_maincpu->set_vblank_int("screen", FUNC(skyfox_state::skyfox_interrupt));
+	// IM0, never enables ei opcode
 
 	Z80(config, m_audiocpu, XTAL(14'318'181)/8); /* Verified at 1.789772MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &skyfox_state::skyfox_sound_map);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// TODO: legacy screen configuration with no vblank irq
 	m_screen->set_refresh_hz(62.65);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(512, 256);
@@ -242,7 +239,7 @@ void skyfox_state::skyfox(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_skyfox);
-	PALETTE(config, m_palette, FUNC(skyfox_state::skyfox_palette), 256+256); // 256 static colors (+256 for the background??)
+	PALETTE(config, m_palette, FUNC(skyfox_state::skyfox_palette), 256); // 256 static colors
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

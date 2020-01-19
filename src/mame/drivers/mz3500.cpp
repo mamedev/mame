@@ -820,7 +820,7 @@ void mz3500_state::mz3500(machine_config &config)
 	m_slave->set_addrmap(AS_PROGRAM, &mz3500_state::mz3500_slave_map);
 	m_slave->set_addrmap(AS_IO, &mz3500_state::mz3500_slave_io);
 
-	config.m_perfect_cpu_quantum = subtag("master");
+	config.set_perfect_quantum(m_master);
 
 	i8255_device &ppi(I8255A(config, "i8255"));
 	ppi.out_pa_callback().set(FUNC(mz3500_state::mz3500_pa_w));

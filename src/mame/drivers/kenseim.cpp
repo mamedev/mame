@@ -504,7 +504,7 @@ void kenseim_state::kenseim(machine_config &config)
 	ppi_x2.in_pe().set_ioport("MOLEB");
 	ppi_x2.out_pf().set(FUNC(kenseim_state::mb8936_portf_w));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 }
 
 static INPUT_PORTS_START( kenseim )
@@ -695,7 +695,7 @@ ROM_END
 
 void kenseim_state::init_kenseim()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800030, 0x800037, write16_delegate(FUNC(kenseim_state::cps1_kensei_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800030, 0x800037, write16_delegate(*this, FUNC(kenseim_state::cps1_kensei_w)));
 
 	init_cps1();
 

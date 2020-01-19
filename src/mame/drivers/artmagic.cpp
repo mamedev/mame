@@ -820,7 +820,7 @@ void artmagic_state::artmagic(machine_config &config)
 	m_tms->set_shiftreg_in_callback(FUNC(artmagic_state::to_shiftreg));
 	m_tms->set_shiftreg_out_callback(FUNC(artmagic_state::from_shiftreg));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	EEPROM_2816(config, "eeprom").write_time(attotime::from_usec(1)); // FIXME: false-readback polling should make this unnecessary
 
@@ -1157,7 +1157,7 @@ void artmagic_state::init_ultennis()
 	m_protection_handler = &artmagic_state::ultennis_protection;
 
 	/* additional (protection?) hack */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16_delegate(FUNC(artmagic_state::ultennis_hack_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16_delegate(*this, FUNC(artmagic_state::ultennis_hack_r)));
 }
 
 

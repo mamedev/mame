@@ -84,7 +84,7 @@ WRITE32_MEMBER ( stv_state::common_prot_w )
 
 void stv_state::install_common_protection()
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4fffff0, 0x4ffffff, read32_delegate(FUNC(stv_state::common_prot_r), this), write32_delegate(FUNC(stv_state::common_prot_w), this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4fffff0, 0x4ffffff, read32_delegate(*this, FUNC(stv_state::common_prot_r)), write32_delegate(*this, FUNC(stv_state::common_prot_w)));
 }
 
 void stv_state::stv_register_protection_savestates()

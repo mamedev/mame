@@ -508,7 +508,7 @@ void macs_state::macs(machine_config &config)
 	ST0016_CPU(config, m_maincpu, 8000000); // 8 MHz ?
 	m_maincpu->set_memory_map(&macs_state::macs_mem);
 	m_maincpu->set_io_map(&macs_state::macs_io);
-	m_maincpu->set_dma_offs_callback(FUNC(macs_state::dma_offset), this);
+	m_maincpu->set_dma_offs_callback(FUNC(macs_state::dma_offset));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

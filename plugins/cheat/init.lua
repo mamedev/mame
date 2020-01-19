@@ -536,9 +536,26 @@ function cheat.startplugin()
 				manager:machine():video():frame_update(true)
 				input:seq_poll_start("switch")
 				local time = os.clock()
-				while (not input:seq_poll()) and (os.clock() < time + 1) do end
-				cheat.hotkeys = {pressed = false, keys = input:seq_poll_final()}
-				manager:machine():popmessage()
+				local clearmsg = true
+				while (not input:seq_poll()) and (input.seq_poll_modified() or (os.clock() < time + 1)) do
+					if input:seq_poll_modified() then
+						if not input:seq_poll_valid() then
+							manager:machine():popmessage(_("Invalid sequence entered"))
+							clearmsg = false
+							break
+						end
+						manager:machine():popmessage(input:seq_name(input:seq_poll_sequence()))
+						manager:machine():video():frame_update(true)
+					end
+				end
+				if input:seq_poll_valid() then
+					cheat.hotkeys = {pressed = false, keys = input:seq_poll_final()}
+				else
+					cheat.hotkeys = nil
+				end
+				if clearmsg then
+					manager:machine():popmessage()
+				end
 				manager:machine():video():frame_update(true)
 			end
 

@@ -35,7 +35,7 @@ public:
 	DECLARE_READ32_MEMBER(read);
 	DECLARE_WRITE32_MEMBER(write);
 
-	uint32_t *tram_ptr() const { return m_tram; }
+	uint32_t *tram_ptr() const { return &m_tram[0]; }
 
 	enum te_reg_wmode
 	{
@@ -190,7 +190,6 @@ private:
 	void load_texture();
 
 	m2_bda_device       *m_bda;
-	const address_space_config  m_space_config; // TODO: Why is this still here?
 
 	devcb_write_line    m_general_int_handler;
 	devcb_write_line    m_dfinstr_int_handler;
@@ -409,8 +408,8 @@ private:
 
 	te_state    m_state;
 
-	uint32_t        *m_pipram;
-	uint32_t        *m_tram;
+	std::unique_ptr<uint32_t[]> m_pipram;
+	std::unique_ptr<uint32_t[]> m_tram;
 };
 
 DECLARE_DEVICE_TYPE(M2_TE, m2_te_device)

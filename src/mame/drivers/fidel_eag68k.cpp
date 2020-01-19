@@ -190,7 +190,7 @@ public:
 		m_rotate(true)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void eagv2(machine_config &config);
 	void eagv3(machine_config &config);
 	void eagv5(machine_config &config);
@@ -235,18 +235,13 @@ protected:
 	DECLARE_WRITE8_MEMBER(digit_w);
 
 	bool m_rotate;
-	u8 m_select;
-	u8 m_7seg_data;
-	u8 m_led_data;
+	u8 m_select = 0;
+	u8 m_7seg_data = 0;
+	u8 m_led_data = 0;
 };
 
 void eag_state::machine_start()
 {
-	// zerofill
-	m_select = 0;
-	m_7seg_data = 0;
-	m_led_data = 0;
-
 	// register for savestates
 	save_item(NAME(m_select));
 	save_item(NAME(m_7seg_data));
@@ -265,7 +260,7 @@ public:
 		m_sublatch(*this, "sublatch")
 	{ }
 
-	// machine drivers
+	// machine configs
 	void eagv5(machine_config &config);
 
 private:
@@ -295,7 +290,7 @@ public:
 		m_rotate = false;
 	}
 
-	// machine drivers
+	// machine configs
 	void fex68k(machine_config &config);
 	void fex68km2(machine_config &config);
 	void fex68km3(machine_config &config);
@@ -545,7 +540,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void excel68k_state::fex68k(machine_config &config)
@@ -621,7 +616,7 @@ void eag_state::eag_base(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "fidel_scc", "bin,dat");
-	m_cart->set_device_load(FUNC(eag_state::cart_load), this);
+	m_cart->set_device_load(FUNC(eag_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 }
@@ -660,7 +655,7 @@ void eagv5_state::eagv5(machine_config &config)
 
 	// gen_latch syncs on write, but this is still needed with tight cpu comms
 	// (not that it locks up or anything, but it will calculate moves much slower if timing is off)
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 }
 
 void eag_state::eagv7(machine_config &config)
@@ -678,7 +673,7 @@ void eag_state::eagv9(machine_config &config)
 	eagv7(config);
 
 	/* basic machine hardware */
-	M68030(config.replace(), m_maincpu, 32_MHz_XTAL/2); // also seen with 40MHz XTAL
+	M68030(config.replace(), m_maincpu, 32_MHz_XTAL); // also seen with 40MHz XTAL
 	m_maincpu->disable_interrupt_mixer();
 	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eagv7_map);
 }
@@ -762,11 +757,11 @@ ROM_START( feagv3 )
 ROM_END
 
 ROM_START( feagv5 )
-	ROM_REGION( 0x20000, "maincpu", 0 ) // PCB label 510.1136A01
+	ROM_REGION16_BE( 0x20000, "maincpu", 0 ) // PCB label 510.1136A01
 	ROM_LOAD16_BYTE("master_e", 0x00000, 0x10000, CRC(e424bddc) SHA1(ff03656addfe5c47f06df2efb4602f43a9e19d96) )
 	ROM_LOAD16_BYTE("master_o", 0x00001, 0x10000, CRC(33a00894) SHA1(849460332b1ac10d452ca3631eb99f5597511b73) )
 
-	ROM_REGION( 0x10000, "subcpu", 0 ) // PCB label 510.1138B01
+	ROM_REGION16_BE( 0x10000, "subcpu", 0 ) // PCB label 510.1138B01
 	ROM_LOAD16_BYTE("slave_e", 0x00000, 0x08000, CRC(eea4de52) SHA1(a64ca8a44b431e2fa7f00e44cab7e6aa2d4a9403) )
 	ROM_LOAD16_BYTE("slave_o", 0x00001, 0x08000, CRC(35fe2fdf) SHA1(731da12ee290bad9bc03cffe281c8cc48e555dfb) )
 ROM_END

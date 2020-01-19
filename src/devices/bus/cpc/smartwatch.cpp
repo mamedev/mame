@@ -63,8 +63,8 @@ void cpc_smartwatch_device::device_start()
 void cpc_smartwatch_device::device_reset()
 {
 	address_space &space = m_slot->cpu().space(AS_PROGRAM);
-	space.install_read_handler(0xc000,0xc001,read8_delegate(FUNC(cpc_smartwatch_device::rtc_w),this));
-	space.install_read_handler(0xc004,0xc004,read8_delegate(FUNC(cpc_smartwatch_device::rtc_r),this));
+	space.install_read_handler(0xc000,0xc001, read8_delegate(*this, FUNC(cpc_smartwatch_device::rtc_w)));
+	space.install_read_handler(0xc004,0xc004, read8_delegate(*this, FUNC(cpc_smartwatch_device::rtc_r)));
 	m_bank = membank(":bank7");
 }
 

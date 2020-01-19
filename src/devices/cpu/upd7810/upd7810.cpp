@@ -1889,6 +1889,7 @@ void upd7801_device::device_reset()
 	upd7810_device::device_reset();
 	MA = 0;     /* Port A is output port on the uPD7801 */
 	m_ovc0 = 0;
+	m_int2 = 0;
 }
 
 void upd78c05_device::device_reset()

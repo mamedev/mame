@@ -544,7 +544,7 @@ void europc_fdc_device::device_add_mconfig(machine_config &config)
 	fdc.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
 	// single built-in 3.5" 720K drive, connector for optional external 3.5" or 5.25" drive
 	FLOPPY_CONNECTOR(config, "fdc:0", pc_dd_floppies, "35dd", isa8_fdc_device::floppy_formats).set_fixed(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", pc_dd_floppies, "", isa8_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_dd_floppies, nullptr, isa8_fdc_device::floppy_formats);
 }
 
 static void europc_fdc(device_slot_interface &device)
@@ -560,7 +560,9 @@ void europc_pc_state::europc(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &europc_pc_state::europc_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	PCNOPPI_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
+	PCNOPPI_MOTHERBOARD(config, m_mb, 0).set_cputag(m_maincpu);
+	m_mb->int_callback().set_inputline(m_maincpu, 0);
+	m_mb->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	M6805U2(config, "kbdctrl", 16_MHz_XTAL / 4);
 

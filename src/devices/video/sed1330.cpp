@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "sed1330.h"
+#include "screen.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -383,6 +384,12 @@ WRITE8_MEMBER( sed1330_device::data_w )
 		case 5:
 			m_lf = data + 1;
 			LOG("SED1330 Frame Height: %u\n", m_lf);
+			if (clock() != 0)
+			{
+				attotime fr = clocks_to_attotime(m_tcr * m_lf * 9);
+				screen().configure(m_tcr * m_fx, m_lf, screen().visible_area(), fr.as_attoseconds());
+				LOG("SED1330 Frame Rate: %.1f Hz\n", fr.as_hz());
+			}
 			break;
 
 		case 6:

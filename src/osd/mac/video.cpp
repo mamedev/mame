@@ -108,13 +108,21 @@ void mac_osd_interface::update(bool skip_redraw)
 //      profiler_mark(PROFILER_END);
 	}
 
-	// poll the joystick values here
-	downcast<mac_osd_interface&>(machine().osd()).poll_inputs(machine());
-
-	check_osd_inputs(machine());
 	// if we're running, disable some parts of the debugger
 	if ((machine().debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
 		debugger_update();
+}
+
+//============================================================
+//  input_update
+//============================================================
+
+void mac_osd_interface::input_update()
+{
+	// poll the joystick values here
+	process_events_buf();
+	poll_inputs(machine());
+	check_osd_inputs(machine());
 }
 
 //============================================================
@@ -224,7 +232,7 @@ void mac_osd_interface::extract_video_config()
 		video_config.syncrefresh = 0;
 	}
 
-	if (video_config.prescale < 1 || video_config.prescale > 3)
+	if (video_config.prescale < 1 || video_config.prescale > 8)
 	{
 		osd_printf_warning("Invalid prescale option, reverting to '1'\n");
 		video_config.prescale = 1;

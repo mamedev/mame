@@ -935,6 +935,8 @@ void ym2151_device::device_start()
 	eg_timer_add  = 1 << EG_SH;
 	eg_timer_overflow = 3 * eg_timer_add;
 
+	irqlinestate = 0;
+
 	/* save all 32 operators */
 	for (int j=0; j<32; j++)
 	{

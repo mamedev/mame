@@ -12,7 +12,7 @@
 /* Missing:
    - linescroll in special modes (qgh title, mahmajn2/qrouka attract mode)
    - screen flipping (mix register 13 & 2)
-   - FRC timer IRQ is currently in a slight off-beat (timer should be resetted every time
+   - FRC timer IRQ is currently in a slight off-beat (timer should be reset every time
      that the mode changes, but current MAME framework doesn't seem to like it)
 */
 
@@ -143,7 +143,7 @@ Notes:
         the floppy disk format is custom. The floppy disk can be read with "Anadisk"
         depending on the PC being used and it's floppy controller. Most clone PC's can't read the
         System 24 floppies even with "Anadisk"[1]. But many brand-name PC's can. It's likely due to the
-        propietry nature of the components used in brand-name PC's. Generally the older and crappier
+        proprietary nature of the components used in brand-name PC's. Generally the older and crappier
         the PC is, the better chance you have of being able to read the floppy ;-)
 
         [1] Actually, most can _except_ for the Hotrod disks.  Those 8K sectors are deadly.
@@ -357,7 +357,7 @@ Notes:
 #define VIDEO_CLOCK         XTAL(32'000'000)
 #define TIMER_CLOCK         (VIDEO_CLOCK/4)
 #define HSYNC_CLOCK         (VIDEO_CLOCK/2/656.0)
-/* TODO: understand why divisors doesn't match at all with the reference */
+/* TODO: understand why divisors don't match at all with the reference */
 #define FRC_CLOCK_MODE0     (MASTER_CLOCK/2)/24 // /16 according to Charles
 #define FRC_CLOCK_MODE1     (MASTER_CLOCK/2)/1536 // /1024 according to Charles, but /1536 sounds better
 
@@ -1586,7 +1586,7 @@ static INPUT_PORTS_START( sgmast )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Club")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Angle Right")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Stance")
-	/* For select the power shot rotate the stick from up-left (max power) to up (minimum power) and relese */
+	/* For select the power shot rotate the stick from up-left (max power) to up (minimum power) and release */
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_CUSTOM )
 
 	PORT_MODIFY("P2")
@@ -1921,7 +1921,7 @@ void segas24_state::system24(machine_config &config)
 	M68000(config, m_subcpu, MASTER_CLOCK/2);
 	m_subcpu->set_addrmap(AS_PROGRAM, &segas24_state::cpu2_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	sega_315_5296_device &io(SEGA_315_5296(config, "io", VIDEO_CLOCK/2));
 	io.in_pa_callback().set_ioport("P1");
@@ -1937,7 +1937,7 @@ void segas24_state::system24(machine_config &config)
 
 	TIMER(config, "irq_timer").configure_generic(FUNC(segas24_state::irq_timer_cb));
 	TIMER(config, "irq_timer_clear").configure_generic(FUNC(segas24_state::irq_timer_clear_cb));
-	TIMER(config, "frc_timer").configure_generic(timer_device::expired_delegate());
+	TIMER(config, "frc_timer").configure_generic(nullptr);
 	TIMER(config, "irq_frc").configure_periodic(FUNC(segas24_state::irq_frc_cb), attotime::from_hz(FRC_CLOCK_MODE1));
 
 	S24TILE(config, m_vtile, 0, 0xfff).set_palette("palette");

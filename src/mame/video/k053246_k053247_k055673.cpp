@@ -902,6 +902,9 @@ void k055673_device::device_start()
 	if (!palette().device().started())
 		throw device_missing_dependencies();
 
+	// resolve callbacks
+	m_k053247_cb.resolve();
+
 	int gfx_index = 0;
 	u32 total;
 
@@ -1046,11 +1049,12 @@ k053247_device::k053247_device(const machine_config &mconfig, const char *tag, d
 }
 
 k053247_device::k053247_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, type, tag, owner, clock),
-		device_video_interface(mconfig, *this),
-		device_gfx_interface(mconfig, *this, nullptr),
-		m_gfxrom(*this, DEVICE_SELF),
-		m_gfx_num(0)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
+	, device_gfx_interface(mconfig, *this, nullptr)
+	, m_k053247_cb(*this)
+	, m_gfxrom(*this, DEVICE_SELF)
+	, m_gfx_num(0)
 {
 	clear_all();
 }
@@ -1063,6 +1067,9 @@ void k053247_device::device_start()
 {
 	if (!palette().device().started())
 		throw device_missing_dependencies();
+
+	// resolve callbacks
+	m_k053247_cb.resolve();
 
 	u32 total;
 	static const gfx_layout spritelayout =

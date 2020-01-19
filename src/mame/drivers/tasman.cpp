@@ -224,13 +224,12 @@ void kongambl_state::kongambl_map(address_map &map)
 	map(0x300000, 0x307fff).ram(); // backup RAM 24H
 
 	// override konami chips with custom areas until that code is removed
-	map(0x400000, 0x401fff).rom().region("k056832", 0);
 	map(0x420000, 0x43ffff).ram().share("vram");
 	//map(0x480000, 0x48003f).ram(); // vregs
 
 	//0x400000 0x400001 "13M" even addresses
 	//0x400002,0x400003 "13J" odd addresses
-//  map(0x400000, 0x401fff).r(m_k056832, FUNC(k056832_device::rom_word_r));
+	map(0x400000, 0x401fff).r(m_k056832, FUNC(k056832_device::rom_word_r));
 //  map(0x420000, 0x43ffff).rw(m_k056832, FUNC(k056832_device::unpaged_ram_word_r), FUNC(k056832_device::unpaged_ram_word_w));
 	map(0x480000, 0x48003f).w(m_k056832, FUNC(k056832_device::word_w));
 
@@ -675,7 +674,7 @@ void kongambl_state::kongambl(machine_config &config)
 	K055555(config, m_k055555, 0);
 
 	K055673(config, m_k055673, 0);
-	m_k055673->set_sprite_callback(FUNC(kongambl_state::sprite_callback), this);
+	m_k055673->set_sprite_callback(FUNC(kongambl_state::sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_LE2, -48+1, -23);
 	m_k055673->set_palette(m_palette);
 
@@ -684,7 +683,7 @@ void kongambl_state::kongambl(machine_config &config)
 #endif
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(kongambl_state::tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(kongambl_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_8TASMAN, 0, 0);
 	m_k056832->set_palette(m_palette);
 

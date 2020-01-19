@@ -82,7 +82,7 @@ public:
 	void register_write(u8 data);
 
 	/* update the screen */
-	uint32_t screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	bitmap_rgb32 &get_bitmap() { return m_tmpbmp; }
 
 	/* RESET pin */

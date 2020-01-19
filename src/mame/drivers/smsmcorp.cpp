@@ -559,7 +559,7 @@ void smsmfg_state::sms(machine_config &config)
 	z80_device &soundcpu(Z80(config, "soundcpu", XTAL(16'000'000)/8));
 	soundcpu.set_addrmap(AS_PROGRAM, &smsmfg_state::sub_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
 	ppi0.out_pa_callback().set(FUNC(smsmfg_state::ppi0_a_w));

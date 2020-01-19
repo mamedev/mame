@@ -22,7 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(UNIDISK, unidisk_t, "unidisk", "MyAB UNI DISK")
+DEFINE_DEVICE_TYPE(ABC_UNIDISK, abc_unidisk_device, "abc_unidisk", "MyAB UNI DISK")
 
 
 //-------------------------------------------------
@@ -44,7 +44,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *unidisk_t::device_rom_region() const
+const tiny_rom_entry *abc_unidisk_device::device_rom_region() const
 {
 	return ROM_NAME( unidisk );
 }
@@ -54,7 +54,7 @@ const tiny_rom_entry *unidisk_t::device_rom_region() const
 //  ADDRESS_MAP( unidisk_mem )
 //-------------------------------------------------
 
-void unidisk_t::unidisk_mem(address_map &map)
+void abc_unidisk_device::unidisk_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).rom().region(TMS9995_TAG, 0);
 }
@@ -64,7 +64,7 @@ void unidisk_t::unidisk_mem(address_map &map)
 //  ADDRESS_MAP( unidisk_io )
 //-------------------------------------------------
 
-void unidisk_t::unidisk_io(address_map &map)
+void abc_unidisk_device::unidisk_io(address_map &map)
 {
 }
 
@@ -73,11 +73,11 @@ void unidisk_t::unidisk_io(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void unidisk_t::device_add_mconfig(machine_config &config)
+void abc_unidisk_device::device_add_mconfig(machine_config &config)
 {
 	TMS9995(config, m_maincpu, 12000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &unidisk_t::unidisk_mem);
-	m_maincpu->set_addrmap(AS_IO, &unidisk_t::unidisk_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &abc_unidisk_device::unidisk_mem);
+	m_maincpu->set_addrmap(AS_IO, &abc_unidisk_device::unidisk_io);
 }
 
 
@@ -93,7 +93,7 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-ioport_constructor unidisk_t::device_input_ports() const
+ioport_constructor abc_unidisk_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( unidisk );
 }
@@ -105,11 +105,11 @@ ioport_constructor unidisk_t::device_input_ports() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  unidisk_t - constructor
+//  abc_unidisk_device - constructor
 //-------------------------------------------------
 
-unidisk_t::unidisk_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, UNIDISK, tag, owner, clock),
+abc_unidisk_device::abc_unidisk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ABC_UNIDISK, tag, owner, clock),
 	device_abcbus_card_interface(mconfig, *this),
 	m_maincpu(*this, TMS9995_TAG)
 {
@@ -120,7 +120,7 @@ unidisk_t::unidisk_t(const machine_config &mconfig, const char *tag, device_t *o
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void unidisk_t::device_start()
+void abc_unidisk_device::device_start()
 {
 }
 
@@ -129,7 +129,7 @@ void unidisk_t::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void unidisk_t::device_reset()
+void abc_unidisk_device::device_reset()
 {
 	m_cs = false;
 }
@@ -144,7 +144,7 @@ void unidisk_t::device_reset()
 //  abcbus_cs -
 //-------------------------------------------------
 
-void unidisk_t::abcbus_cs(uint8_t data)
+void abc_unidisk_device::abcbus_cs(uint8_t data)
 {
 }
 
@@ -153,7 +153,7 @@ void unidisk_t::abcbus_cs(uint8_t data)
 //  abcbus_stat -
 //-------------------------------------------------
 
-uint8_t unidisk_t::abcbus_stat()
+uint8_t abc_unidisk_device::abcbus_stat()
 {
 	uint8_t data = 0xff;
 
@@ -169,7 +169,7 @@ uint8_t unidisk_t::abcbus_stat()
 //  abcbus_inp -
 //-------------------------------------------------
 
-uint8_t unidisk_t::abcbus_inp()
+uint8_t abc_unidisk_device::abcbus_inp()
 {
 	uint8_t data = 0xff;
 
@@ -185,7 +185,7 @@ uint8_t unidisk_t::abcbus_inp()
 //  abcbus_out -
 //-------------------------------------------------
 
-void unidisk_t::abcbus_out(uint8_t data)
+void abc_unidisk_device::abcbus_out(uint8_t data)
 {
 	if (!m_cs) return;
 }
@@ -195,7 +195,7 @@ void unidisk_t::abcbus_out(uint8_t data)
 //  abcbus_c1 -
 //-------------------------------------------------
 
-void unidisk_t::abcbus_c1(uint8_t data)
+void abc_unidisk_device::abcbus_c1(uint8_t data)
 {
 	if (m_cs)
 	{
@@ -207,7 +207,7 @@ void unidisk_t::abcbus_c1(uint8_t data)
 //  abcbus_c3 -
 //-------------------------------------------------
 
-void unidisk_t::abcbus_c3(uint8_t data)
+void abc_unidisk_device::abcbus_c3(uint8_t data)
 {
 	if (m_cs)
 	{

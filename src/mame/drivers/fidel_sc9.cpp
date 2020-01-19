@@ -69,7 +69,7 @@ public:
 		m_inputs(*this, "IN.0")
 	{ }
 
-	// machine drivers
+	// machine configs
 	void sc9b(machine_config &config);
 	void sc9c(machine_config &config);
 	void sc9d(machine_config &config);
@@ -271,7 +271,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void sc9_state::sc9d(machine_config &config)
@@ -300,7 +300,7 @@ void sc9_state::sc9d(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "fidel_scc", "bin,dat");
-	m_cart->set_device_load(FUNC(sc9_state::cart_load), this);
+	m_cart->set_device_load(FUNC(sc9_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 }

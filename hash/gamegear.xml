@@ -79,7 +79,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="advbatmrp8" cloneof="advbatmr">
-		<description>The Adventures of Batman &amp; Robin (Prototype, 19950427)</description>
+		<description>The Adventures of Batman &amp; Robin (prototype, 19950427)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -90,7 +90,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="advbatmrp7" cloneof="advbatmr">
-		<description>The Adventures of Batman &amp; Robin (Prototype, 19950429-A)</description>
+		<description>The Adventures of Batman &amp; Robin (prototype, 19950429-A)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -101,7 +101,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="advbatmrp6" cloneof="advbatmr">
-		<description>The Adventures of Batman &amp; Robin (Prototype, 19950430)</description>
+		<description>The Adventures of Batman &amp; Robin (prototype, 19950430)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -112,7 +112,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="advbatmrp5" cloneof="advbatmr">
-		<description>The Adventures of Batman &amp; Robin (Prototype, 19950502)</description>
+		<description>The Adventures of Batman &amp; Robin (prototype, 19950502)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -123,7 +123,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="advbatmrp4" cloneof="advbatmr">
-		<description>The Adventures of Batman &amp; Robin (Prototype, 19950504)</description>
+		<description>The Adventures of Batman &amp; Robin (prototype, 19950504)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -134,7 +134,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="advbatmrp3" cloneof="advbatmr">
-		<description>The Adventures of Batman &amp; Robin (Prototype, 19950506-B)</description>
+		<description>The Adventures of Batman &amp; Robin (prototype, 19950506-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -145,7 +145,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="advbatmrp2" cloneof="advbatmr">
-		<description>The Adventures of Batman &amp; Robin (Prototype, 19950506)</description>
+		<description>The Adventures of Batman &amp; Robin (prototype, 19950506)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -156,7 +156,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="advbatmrp1" cloneof="advbatmr">
-		<description>The Adventures of Batman &amp; Robin (Prototype, 19950507)</description>
+		<description>The Adventures of Batman &amp; Robin (prototype, 19950507)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -230,7 +230,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="aladdinp3" cloneof="aladdin">
-		<description>Disney's Aladdin (Prototype, 19931229)</description>
+		<description>Disney's Aladdin (prototype, 19931229)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -241,7 +241,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="aladdinp2" cloneof="aladdin">
-		<description>Disney's Aladdin (Prototype, 19940111)</description>
+		<description>Disney's Aladdin (prototype, 19940111)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -252,7 +252,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="aladdinp1" cloneof="aladdin">
-		<description>Disney's Aladdin (Prototype, 19940113)</description>
+		<description>Disney's Aladdin (prototype, 19940113)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -264,7 +264,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- same as jan 13 proto. was a mistake by drx? -->
 	<!--software name="aladdinp1a" cloneof="aladdin">
-	    <description>Disney's Aladdin (Prototype WITH, 19940123)</description>
+	    <description>Disney's Aladdin (prototype WITH, 19940123)</description>
 	    <year>1994</year>
 	    <publisher>Sega</publisher>
 	    <part name="cart" interface="gamegear_cart">
@@ -276,7 +276,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!--  Alt. Title: Alex Kido (on the boxart) -->
 	<software name="alexkidd">
-		<description>Alex Kidd in Miracle World (Tw, SMS Mode)</description>
+		<description>Alex Kidd in Miracle World (Tw, SMS mode)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="HG 101-10"/>
@@ -456,7 +456,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="astergrep5" cloneof="astergre">
-		<description>Astérix and the Great Rescue (Prototype, 19940216)</description>
+		<description>Astérix and the Great Rescue (prototype, 19940216)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -467,7 +467,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="astergrep4" cloneof="astergre">
-		<description>Astérix and the Great Rescue (Prototype, 19940222)</description>
+		<description>Astérix and the Great Rescue (prototype, 19940222)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -478,7 +478,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="astergrep3" cloneof="astergre">
-		<description>Astérix and the Great Rescue (Prototype, 19940125)</description>
+		<description>Astérix and the Great Rescue (prototype, 19940125)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -489,7 +489,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="astergrep2" cloneof="astergre">
-		<description>Astérix and the Great Rescue (Prototype, 19940313)</description>
+		<description>Astérix and the Great Rescue (prototype, 19940313)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -500,7 +500,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="astergrep1" cloneof="astergre">
-		<description>Astérix and the Great Rescue (Prototype, 19940315)</description>
+		<description>Astérix and the Great Rescue (prototype, 19940315)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -535,7 +535,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="axbattlrp" cloneof="axbattlr">
-		<description>Ax Battler - A Legend of Golden Axe (Euro, USA, Prototype v2.0)</description>
+		<description>Ax Battler - A Legend of Golden Axe (Euro, USA, prototype v2.0)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -594,7 +594,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="smgp2p" cloneof="smgp2">
-		<description>Ayrton Senna's Super Monaco GP II (Euro, USA, Prototype)</description>
+		<description>Ayrton Senna's Super Monaco GP II (Euro, USA, prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -649,7 +649,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="barbiesm">
-		<description>Barbie Super Model (Prototype)</description>
+		<description>Barbie Super Model (prototype)</description>
 		<year>1993</year>
 		<publisher>Hi Tech Expressions</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -772,7 +772,7 @@ on the pause screen, some messages are not displayed ("Sorry boys, no tickets, n
 to explain why it is not possible to progress beyond a certain point in the game without
 a certain item) -->
 	<software name="beavisp" cloneof="beavis">
-		<description>Beavis and Butt-head (Prototype?)</description>
+		<description>Beavis and Butt-head (prototype?)</description>
 		<year>1994</year>
 		<publisher>Viacom New Media</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -795,7 +795,7 @@ a certain item) -->
 	</software>
 
 	<software name="berensp12" cloneof="berens">
-		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940801)</description>
+		<description>The Berenstain Bears' Camping Adventure (prototype, 19940801)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -806,7 +806,7 @@ a certain item) -->
 	</software>
 
 	<software name="berensp11" cloneof="berens">
-		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940811-A)</description>
+		<description>The Berenstain Bears' Camping Adventure (prototype, 19940811-A)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -817,7 +817,7 @@ a certain item) -->
 	</software>
 
 	<software name="berensp10" cloneof="berens">
-		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940811)</description>
+		<description>The Berenstain Bears' Camping Adventure (prototype, 19940811)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -828,7 +828,7 @@ a certain item) -->
 	</software>
 
 	<software name="berensp09" cloneof="berens">
-		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940812)</description>
+		<description>The Berenstain Bears' Camping Adventure (prototype, 19940812)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -839,7 +839,7 @@ a certain item) -->
 	</software>
 
 	<software name="berensp08" cloneof="berens">
-		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940813)</description>
+		<description>The Berenstain Bears' Camping Adventure (prototype, 19940813)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -850,7 +850,7 @@ a certain item) -->
 	</software>
 
 	<software name="berensp07" cloneof="berens">
-		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940814)</description>
+		<description>The Berenstain Bears' Camping Adventure (prototype, 19940814)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -861,7 +861,7 @@ a certain item) -->
 	</software>
 
 	<software name="berensp06" cloneof="berens">
-		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940819)</description>
+		<description>The Berenstain Bears' Camping Adventure (prototype, 19940819)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -872,7 +872,7 @@ a certain item) -->
 	</software>
 
 	<software name="berensp05" cloneof="berens">
-		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940820)</description>
+		<description>The Berenstain Bears' Camping Adventure (prototype, 19940820)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -883,7 +883,7 @@ a certain item) -->
 	</software>
 
 	<software name="berensp04" cloneof="berens">
-		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940824)</description>
+		<description>The Berenstain Bears' Camping Adventure (prototype, 19940824)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -894,7 +894,7 @@ a certain item) -->
 	</software>
 
 	<software name="berensp03" cloneof="berens">
-		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940825-B)</description>
+		<description>The Berenstain Bears' Camping Adventure (prototype, 19940825-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -905,7 +905,7 @@ a certain item) -->
 	</software>
 
 	<software name="berensp02" cloneof="berens">
-		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940826-B)</description>
+		<description>The Berenstain Bears' Camping Adventure (prototype, 19940826-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -916,7 +916,7 @@ a certain item) -->
 	</software>
 
 	<software name="berensp01" cloneof="berens">
-		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940826)</description>
+		<description>The Berenstain Bears' Camping Adventure (prototype, 19940826)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -927,7 +927,7 @@ a certain item) -->
 	</software>
 
 	<software name="berensp16" cloneof="berens">
-		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940715-B)</description>
+		<description>The Berenstain Bears' Camping Adventure (prototype, 19940715-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -938,7 +938,7 @@ a certain item) -->
 	</software>
 
 	<software name="berensp15" cloneof="berens">
-		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940721)</description>
+		<description>The Berenstain Bears' Camping Adventure (prototype, 19940721)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -949,7 +949,7 @@ a certain item) -->
 	</software>
 
 	<software name="berensp14" cloneof="berens">
-		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940722)</description>
+		<description>The Berenstain Bears' Camping Adventure (prototype, 19940722)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -960,7 +960,7 @@ a certain item) -->
 	</software>
 
 	<software name="berensp13" cloneof="berens">
-		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940727)</description>
+		<description>The Berenstain Bears' Camping Adventure (prototype, 19940727)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -971,7 +971,7 @@ a certain item) -->
 	</software>
 
 	<software name="berensp17" cloneof="berens">
-		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940628)</description>
+		<description>The Berenstain Bears' Camping Adventure (prototype, 19940628)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1026,7 +1026,7 @@ a certain item) -->
 	</software>
 
 	<software name="bonkersp07" cloneof="bonkers">
-		<description>Disneys Bonkers Wax Up! (Prototype, 19941203)</description>
+		<description>Disneys Bonkers Wax Up! (prototype, 19941203)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1037,7 +1037,7 @@ a certain item) -->
 	</software>
 
 	<software name="bonkersp06" cloneof="bonkers">
-		<description>Disneys Bonkers Wax Up! (Prototype, 19941205)</description>
+		<description>Disneys Bonkers Wax Up! (prototype, 19941205)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1048,7 +1048,7 @@ a certain item) -->
 	</software>
 
 	<software name="bonkersp05" cloneof="bonkers">
-		<description>Disney's Bonkers Wax Up! (Prototype, 19941207-C)</description>
+		<description>Disney's Bonkers Wax Up! (prototype, 19941207-C)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1059,7 +1059,7 @@ a certain item) -->
 	</software>
 
 	<software name="bonkersp04" cloneof="bonkers">
-		<description>Disney's Bonkers Wax Up! (Prototype, 19941208-B)</description>
+		<description>Disney's Bonkers Wax Up! (prototype, 19941208-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1070,7 +1070,7 @@ a certain item) -->
 	</software>
 
 	<software name="bonkersp03" cloneof="bonkers">
-		<description>Disney's Bonkers Wax Up! (Prototype, 19941208-C)</description>
+		<description>Disney's Bonkers Wax Up! (prototype, 19941208-C)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1081,7 +1081,7 @@ a certain item) -->
 	</software>
 
 	<software name="bonkersp02" cloneof="bonkers">
-		<description>Disney's Bonkers Wax Up! (Prototype, 19941211)</description>
+		<description>Disney's Bonkers Wax Up! (prototype, 19941211)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1093,7 +1093,7 @@ a certain item) -->
 
 	<!-- same as dec 11 proto. was a mistake by drx? -->
 	<!-- software name="bonkersp02a" cloneof="bonkers">
-	    <description>Disney's Bonkers Wax Up! (Prototype, 19941212-B)</description>
+	    <description>Disney's Bonkers Wax Up! (prototype, 19941212-B)</description>
 	    <year>1994</year>
 	    <publisher>Sega</publisher>
 	    <part name="cart" interface="gamegear_cart">
@@ -1104,7 +1104,7 @@ a certain item) -->
 	</software-->
 
 	<software name="bonkersp01" cloneof="bonkers">
-		<description>Disney's Bonkers Wax Up! (Prototype, 19941212-D)</description>
+		<description>Disney's Bonkers Wax Up! (prototype, 19941212-D)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1115,7 +1115,7 @@ a certain item) -->
 	</software>
 
 	<software name="bonkersp12" cloneof="bonkers">
-		<description>Bonkers Wax Up! (Prototype, 19941115)</description>
+		<description>Bonkers Wax Up! (prototype, 19941115)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1126,7 +1126,7 @@ a certain item) -->
 	</software>
 
 	<software name="bonkersp11" cloneof="bonkers">
-		<description>Bonkers Wax Up! (Prototype, 19941121)</description>
+		<description>Bonkers Wax Up! (prototype, 19941121)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1137,7 +1137,7 @@ a certain item) -->
 	</software>
 
 	<software name="bonkersp10" cloneof="bonkers">
-		<description>Bonkers Wax Up! (Prototype, 19941123)</description>
+		<description>Bonkers Wax Up! (prototype, 19941123)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1148,7 +1148,7 @@ a certain item) -->
 	</software>
 
 	<software name="bonkersp09" cloneof="bonkers">
-		<description>Bonkers Wax Up! (Prototype, 19941126)</description>
+		<description>Bonkers Wax Up! (prototype, 19941126)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1159,7 +1159,7 @@ a certain item) -->
 	</software>
 
 	<software name="bonkersp08" cloneof="bonkers">
-		<description>Bonkers Wax Up! (Prototype, 19941129)</description>
+		<description>Bonkers Wax Up! (prototype, 19941129)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1170,7 +1170,7 @@ a certain item) -->
 	</software>
 
 	<software name="bonkersp13" cloneof="bonkers">
-		<description>Bonkers Wax Up! (Prototype, 19941031)</description>
+		<description>Bonkers Wax Up! (prototype, 19941031)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1318,7 +1318,7 @@ a certain item) -->
 	</software>
 
 	<software name="castlill">
-		<description>Castle of Illusion Starring Mickey Mouse (Euro, USA, SMS Mode)</description>
+		<description>Castle of Illusion Starring Mickey Mouse (Euro, USA, SMS mode)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2401"/>
@@ -1397,7 +1397,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicagop09" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype, 19950703)</description>
+		<description>Chicago Syndicate (prototype, 19950703)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1408,7 +1408,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicagop08" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype, 19950705)</description>
+		<description>Chicago Syndicate (prototype, 19950705)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1419,7 +1419,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicagop07" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype, 19950707)</description>
+		<description>Chicago Syndicate (prototype, 19950707)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1430,7 +1430,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicagop06" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype, 19950710)</description>
+		<description>Chicago Syndicate (prototype, 19950710)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1441,7 +1441,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicagop05" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype, 19950711)</description>
+		<description>Chicago Syndicate (prototype, 19950711)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1452,7 +1452,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicagop04" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype, 19950719)</description>
+		<description>Chicago Syndicate (prototype, 19950719)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1463,7 +1463,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicagop03" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype, 19950720)</description>
+		<description>Chicago Syndicate (prototype, 19950720)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1474,7 +1474,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicagop02" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype, 19950721-B)</description>
+		<description>Chicago Syndicate (prototype, 19950721-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1485,7 +1485,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicagop01" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype, 19950721)</description>
+		<description>Chicago Syndicate (prototype, 19950721)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1496,7 +1496,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicagop23" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype, 19950601)</description>
+		<description>Chicago Syndicate (prototype, 19950601)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1507,7 +1507,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicagop22" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype, 19950605)</description>
+		<description>Chicago Syndicate (prototype, 19950605)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1518,7 +1518,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicagop21" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype, 19950607)</description>
+		<description>Chicago Syndicate (prototype, 19950607)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1529,7 +1529,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicagop20" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype, 19950608)</description>
+		<description>Chicago Syndicate (prototype, 19950608)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1540,7 +1540,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicagop19" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype, 19950612)</description>
+		<description>Chicago Syndicate (prototype, 19950612)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1551,7 +1551,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicagop18" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype, 19950614)</description>
+		<description>Chicago Syndicate (prototype, 19950614)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1562,7 +1562,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicagop17" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype, 19950619)</description>
+		<description>Chicago Syndicate (prototype, 19950619)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1573,7 +1573,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicagop16" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype, 19950620)</description>
+		<description>Chicago Syndicate (prototype, 19950620)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1584,7 +1584,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicagop15" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype, 19950622)</description>
+		<description>Chicago Syndicate (prototype, 19950622)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1595,7 +1595,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicagop14" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype, 19950626)</description>
+		<description>Chicago Syndicate (prototype, 19950626)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1606,7 +1606,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicagop13" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype, 19950628)</description>
+		<description>Chicago Syndicate (prototype, 19950628)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1617,7 +1617,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicagop12" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype, 19950629-B)</description>
+		<description>Chicago Syndicate (prototype, 19950629-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1628,7 +1628,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicagop11" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype, 19950629)</description>
+		<description>Chicago Syndicate (prototype, 19950629)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1639,7 +1639,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicagop10" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype, 19950630-B)</description>
+		<description>Chicago Syndicate (prototype, 19950630-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1650,7 +1650,7 @@ a certain item) -->
 	</software>
 
 	<software name="chicagop24" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype, 19950505)</description>
+		<description>Chicago Syndicate (prototype, 19950505)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1690,7 +1690,7 @@ a certain item) -->
 	</software>
 
 	<software name="chuckrckp" cloneof="chuckrck">
-		<description>Chuck Rock (World, Prototype)</description>
+		<description>Chuck Rock (World, prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1776,7 +1776,7 @@ a certain item) -->
 
 	<!-- Developers: Sega -->
 	<software name="columnsj1" cloneof="columns">
-		<description>Columns (Jpn, Older)</description>
+		<description>Columns (Jpn, older)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3101, G-3104 (Meisaku Collection)"/>
@@ -1874,7 +1874,7 @@ a certain item) -->
 	</software>
 
 	<software name="crazyfac">
-		<description>Crazy Faces (Euro, Prototype)</description>
+		<description>Crazy Faces (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>Domark</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1917,7 +1917,7 @@ a certain item) -->
 	</software>
 
 	<software name="cutthrp" cloneof="cutthr">
-		<description>Cutthroat Island (Prototype 19950916)</description>
+		<description>Cutthroat Island (prototype 19950916)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1989,7 +1989,7 @@ a certain item) -->
 	</software>
 
 	<software name="defoasisp" cloneof="defoasis">
-		<description>Defenders of Oasis (Euro, USA, Prototype)</description>
+		<description>Defenders of Oasis (Euro, USA, prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2154,7 +2154,7 @@ a certain item) -->
 	</software>
 
 	<software name="ddragonp" cloneof="ddragon">
-		<description>Double Dragon (Euro, USA, Prototype)</description>
+		<description>Double Dragon (Euro, USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2192,7 +2192,7 @@ a certain item) -->
 	</software>
 
 	<software name="drfrankn">
-		<description>Dr. Franken (Prototype Demo)</description>
+		<description>Dr. Franken (prototype demo)</description>
 		<year>1993</year>
 		<publisher>Elite</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2319,7 +2319,7 @@ a certain item) -->
 	</software>
 
 	<software name="dheadp2" cloneof="dhead">
-		<description>Dynamite Headdy (Prototype, 19940701)</description>
+		<description>Dynamite Headdy (prototype, 19940701)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2330,7 +2330,7 @@ a certain item) -->
 	</software>
 
 	<software name="dheadp1" cloneof="dhead">
-		<description>Dynamite Headdy (Prototype, 19940705)</description>
+		<description>Dynamite Headdy (prototype, 19940705)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2341,7 +2341,7 @@ a certain item) -->
 	</software>
 
 	<software name="dheadp3" cloneof="dhead">
-		<description>Dynamite Headdy (Prototype, 19940615)</description>
+		<description>Dynamite Headdy (prototype, 19940615)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2478,7 +2478,7 @@ a certain item) -->
 	</software>
 
 	<software name="excdizzy">
-		<description>The Excellent Dizzy Collection (Euro, SMS Mode)</description>
+		<description>The Excellent Dizzy Collection (Euro, SMS mode)</description>
 		<year>1995</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2491,7 +2491,7 @@ a certain item) -->
 	</software>
 
 	<software name="excdizzyp" cloneof="excdizzy">
-		<description>The Excellent Dizzy Collection (Prototype, SMS Mode)</description>
+		<description>The Excellent Dizzy Collection (prototype, SMS mode)</description>
 		<year>1995</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2568,7 +2568,7 @@ a certain item) -->
 	</software>
 
 	<software name="fantdizz">
-		<description>Fantastic Dizzy (Euro, SMS Mode)</description>
+		<description>Fantastic Dizzy (Euro, SMS mode)</description>
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2738,7 +2738,7 @@ a certain item) -->
 	</software>
 
 	<software name="frogger">
-		<description>Frogger (USA, Prototype)</description>
+		<description>Frogger (USA, prototype)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3071,7 +3071,7 @@ a certain item) -->
 	</software>
 
 	<software name="gpriderp" cloneof="gprider">
-		<description>GP Rider (Prototype, 19940104)</description>
+		<description>GP Rider (prototype, 19940104)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3481,7 +3481,7 @@ a certain item) -->
 	</software>
 
 	<software name="jangpun2">
-		<description>Jang Pung II (Kor, SMS Mode)</description>
+		<description>Jang Pung II (Kor, SMS mode)</description>
 		<year>1993</year>
 		<publisher>Sieco</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3494,7 +3494,7 @@ a certain item) -->
 	</software>
 
 	<software name="strtbatl" cloneof="jangpun2">
-		<description>Street Battle (US, SMS Mode, prototype)</description>
+		<description>Street Battle (US, SMS mode, prototype)</description>
 		<year>1993</year>
 		<publisher>Innovation Tech</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3862,7 +3862,7 @@ a certain item) -->
 	</software>
 
 	<software name="legndillp3" cloneof="legndill">
-		<description>Legend of Illusion Starring Mickey Mouse (Prototype, 19941011)</description>
+		<description>Legend of Illusion Starring Mickey Mouse (prototype, 19941011)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3873,7 +3873,7 @@ a certain item) -->
 	</software>
 
 	<software name="legndillp2" cloneof="legndill">
-		<description>Legend of Illusion Starring Mickey Mouse (Prototype, 19941014)</description>
+		<description>Legend of Illusion Starring Mickey Mouse (prototype, 19941014)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3884,7 +3884,7 @@ a certain item) -->
 	</software>
 
 	<software name="legndillp1" cloneof="legndill">
-		<description>Legend of Illusion Starring Mickey Mouse (Prototype, 19941017)</description>
+		<description>Legend of Illusion Starring Mickey Mouse (prototype, 19941017)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3895,7 +3895,7 @@ a certain item) -->
 	</software>
 
 	<software name="legndillp6" cloneof="legndill">
-		<description>Legend of Illusion Starring Mickey Mouse (Prototype, 19940922)</description>
+		<description>Legend of Illusion Starring Mickey Mouse (prototype, 19940922)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3906,7 +3906,7 @@ a certain item) -->
 	</software>
 
 	<software name="legndillp5" cloneof="legndill">
-		<description>Legend of Illusion Starring Mickey Mouse (Prototype, 19940930-SEL)</description>
+		<description>Legend of Illusion Starring Mickey Mouse (prototype, 19940930-SEL)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3917,7 +3917,7 @@ a certain item) -->
 	</software>
 
 	<software name="legndillp4" cloneof="legndill">
-		<description>Legend of Illusion Starring Mickey Mouse (Prototype, 19940930)</description>
+		<description>Legend of Illusion Starring Mickey Mouse (prototype, 19940930)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3928,7 +3928,7 @@ a certain item) -->
 	</software>
 
 	<software name="lemmingsp" cloneof="lemmings">
-		<description>Lemmings (World, Prototype)</description>
+		<description>Lemmings (World, prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3953,7 +3953,7 @@ a certain item) -->
 	</software>
 
 	<software name="lemming2">
-		<description>Lemmings 2 - The Tribes (Euro, Prototype)</description>
+		<description>Lemmings 2 - The Tribes (Euro, prototype)</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4009,7 +4009,7 @@ a certain item) -->
 	</software>
 
 	<software name="lionkingp9" cloneof="lionking">
-		<description>Disney's The Lion King (Prototype, 19940803)</description>
+		<description>Disney's The Lion King (prototype, 19940803)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4020,7 +4020,7 @@ a certain item) -->
 	</software>
 
 	<software name="lionkingp8" cloneof="lionking">
-		<description>Disney's The Lion King (Prototype, 19940811)</description>
+		<description>Disney's The Lion King (prototype, 19940811)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4031,7 +4031,7 @@ a certain item) -->
 	</software>
 
 	<software name="lionkingp7" cloneof="lionking">
-		<description>Disney's The Lion King (Prototype, 19940812)</description>
+		<description>Disney's The Lion King (prototype, 19940812)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4042,7 +4042,7 @@ a certain item) -->
 	</software>
 
 	<software name="lionkingp6" cloneof="lionking">
-		<description>Disney's The Lion King (Prototype, 19940813)</description>
+		<description>Disney's The Lion King (prototype, 19940813)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4053,7 +4053,7 @@ a certain item) -->
 	</software>
 
 	<software name="lionkingp5" cloneof="lionking">
-		<description>Disney's The Lion King (Prototype, 19940814)</description>
+		<description>Disney's The Lion King (prototype, 19940814)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4065,7 +4065,7 @@ a certain item) -->
 
 	<!-- same as aug 14 proto. was a mistake by drx? -->
 	<!--software name="lionkingp5b" cloneof="lionking">
-	    <description>Disney's The Lion King (Prototype, 19940815)</description>
+	    <description>Disney's The Lion King (prototype, 19940815)</description>
 	    <year>1994</year>
 	    <publisher>Virgin Interactive</publisher>
 	    <part name="cart" interface="gamegear_cart">
@@ -4076,7 +4076,7 @@ a certain item) -->
 	</software-->
 
 	<software name="lionkingp4" cloneof="lionking">
-		<description>Disney's The Lion King (Prototype, 19940816)</description>
+		<description>Disney's The Lion King (prototype, 19940816)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4087,7 +4087,7 @@ a certain item) -->
 	</software>
 
 	<software name="lionkingp3" cloneof="lionking">
-		<description>The Lion King (Prototype, 19940817-2)</description>
+		<description>The Lion King (prototype, 19940817-2)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4098,7 +4098,7 @@ a certain item) -->
 	</software>
 
 	<software name="lionkingp2" cloneof="lionking">
-		<description>The Lion King (Prototype, 19940817)</description>
+		<description>The Lion King (prototype, 19940817)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4109,7 +4109,7 @@ a certain item) -->
 	</software>
 
 	<software name="lionkingp1" cloneof="lionking">
-		<description>The Lion King (Prototype, 19940820)</description>
+		<description>The Lion King (prototype, 19940820)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4494,7 +4494,7 @@ a certain item) -->
 	</software>
 
 	<software name="castlillj" cloneof="castlill">
-		<description>Mickey Mouse no Castle Illusion (Jpn, SMS Mode)</description>
+		<description>Mickey Mouse no Castle Illusion (Jpn, SMS mode)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3301"/>
@@ -4559,7 +4559,7 @@ a certain item) -->
 	</software>
 
 	<software name="mmprp" cloneof="mmpr">
-		<description>Mighty Morphin Power Rangers (Prototype, 19940716)</description>
+		<description>Mighty Morphin Power Rangers (prototype, 19940716)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4582,7 +4582,7 @@ a certain item) -->
 	</software>
 
 	<software name="mmprtmp" cloneof="mmprtm">
-		<description>Mighty Morphin Power Rangers - The Movie (Prototype, 19950530)</description>
+		<description>Mighty Morphin Power Rangers - The Movie (prototype, 19950530)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4769,7 +4769,7 @@ a certain item) -->
 	</software>
 
 	<software name="nazpyoarp" cloneof="nazpyoar">
-		<description>Nazo Puyo Arle no Roux (Jpn, Prototype)</description>
+		<description>Nazo Puyo Arle no Roux (Jpn, prototype)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4897,7 +4897,7 @@ a certain item) -->
 	</software>
 
 	<software name="nbaactp23" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Prototype, 19940202)</description>
+		<description>NBA Action Starring David Robinson (prototype, 19940202)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4908,7 +4908,7 @@ a certain item) -->
 	</software>
 
 	<software name="nbaactp22" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Prototype, 19940203)</description>
+		<description>NBA Action Starring David Robinson (prototype, 19940203)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4919,7 +4919,7 @@ a certain item) -->
 	</software>
 
 	<software name="nbaactp21" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Prototype, 19940206)</description>
+		<description>NBA Action Starring David Robinson (prototype, 19940206)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4930,7 +4930,7 @@ a certain item) -->
 	</software>
 
 	<software name="nbaactp20" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Prototype, 19940208)</description>
+		<description>NBA Action Starring David Robinson (prototype, 19940208)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4941,7 +4941,7 @@ a certain item) -->
 	</software>
 
 	<software name="nbaactp19" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Prototype, 19940212)</description>
+		<description>NBA Action Starring David Robinson (prototype, 19940212)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4952,7 +4952,7 @@ a certain item) -->
 	</software>
 
 	<software name="nbaactp18" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Prototype, 19941215)</description>
+		<description>NBA Action Starring David Robinson (prototype, 19941215)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4963,7 +4963,7 @@ a certain item) -->
 	</software>
 
 	<software name="nbaactp17" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Prototype, 19940217)</description>
+		<description>NBA Action Starring David Robinson (prototype, 19940217)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4974,7 +4974,7 @@ a certain item) -->
 	</software>
 
 	<software name="nbaactp16" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Prototype, 19940220)</description>
+		<description>NBA Action Starring David Robinson (prototype, 19940220)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4985,7 +4985,7 @@ a certain item) -->
 	</software>
 
 	<software name="nbaactp15" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Prototype, 19940221)</description>
+		<description>NBA Action Starring David Robinson (prototype, 19940221)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4996,7 +4996,7 @@ a certain item) -->
 	</software>
 
 	<software name="nbaactp14" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Prototype, 19940224)</description>
+		<description>NBA Action Starring David Robinson (prototype, 19940224)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5007,7 +5007,7 @@ a certain item) -->
 	</software>
 
 	<software name="nbaactp13" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Prototype, 19940225-B)</description>
+		<description>NBA Action Starring David Robinson (prototype, 19940225-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5018,7 +5018,7 @@ a certain item) -->
 	</software>
 
 	<software name="nbaactp12" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Prototype, 19940225)</description>
+		<description>NBA Action Starring David Robinson (prototype, 19940225)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5029,7 +5029,7 @@ a certain item) -->
 	</software>
 
 	<software name="nbaactp11" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Prototype, 19940226)</description>
+		<description>NBA Action Starring David Robinson (prototype, 19940226)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5040,7 +5040,7 @@ a certain item) -->
 	</software>
 
 	<software name="nbaactp10" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Prototype, 19940227)</description>
+		<description>NBA Action Starring David Robinson (prototype, 19940227)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5051,7 +5051,7 @@ a certain item) -->
 	</software>
 
 	<software name="nbaactp09" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Prototype, 19940228)</description>
+		<description>NBA Action Starring David Robinson (prototype, 19940228)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5062,7 +5062,7 @@ a certain item) -->
 	</software>
 
 	<software name="nbaactp28" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Prototype, 19940104)</description>
+		<description>NBA Action Starring David Robinson (prototype, 19940104)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5073,7 +5073,7 @@ a certain item) -->
 	</software>
 
 	<software name="nbaactp27" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Prototype, 19940106)</description>
+		<description>NBA Action Starring David Robinson (prototype, 19940106)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5084,7 +5084,7 @@ a certain item) -->
 	</software>
 
 	<software name="nbaactp26" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Prototype, 19940110)</description>
+		<description>NBA Action Starring David Robinson (prototype, 19940110)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5095,7 +5095,7 @@ a certain item) -->
 	</software>
 
 	<software name="nbaactp25" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Prototype, 19940124)</description>
+		<description>NBA Action Starring David Robinson (prototype, 19940124)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5106,7 +5106,7 @@ a certain item) -->
 	</software>
 
 	<software name="nbaactp24" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Prototype, 19940129)</description>
+		<description>NBA Action Starring David Robinson (prototype, 19940129)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5117,7 +5117,7 @@ a certain item) -->
 	</software>
 
 	<software name="nbaactp29" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Prototype, 19931201)</description>
+		<description>NBA Action Starring David Robinson (prototype, 19931201)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5128,7 +5128,7 @@ a certain item) -->
 	</software>
 
 	<software name="nbaactp30" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Prototype, 19931128)</description>
+		<description>NBA Action Starring David Robinson (prototype, 19931128)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5225,7 +5225,7 @@ a certain item) -->
 	</software>
 
 	<software name="nfl95p13" cloneof="nfl95">
-		<description>NFL '95 (Prototype, 19940808)</description>
+		<description>NFL '95 (prototype, 19940808)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5236,7 +5236,7 @@ a certain item) -->
 	</software>
 
 	<software name="nfl95p12" cloneof="nfl95">
-		<description>NFL '95 (Prototype, 19940825-A)</description>
+		<description>NFL '95 (prototype, 19940825-A)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5248,7 +5248,7 @@ a certain item) -->
 
 	<!-- same as aug 25 proto. was a mistake by drx? -->
 	<!--software name="nfl95p11a" cloneof="nfl95">
-	    <description>NFL '95 (Prototype, 19940825-B)</description>
+	    <description>NFL '95 (prototype, 19940825-B)</description>
 	    <year>1994</year>
 	    <publisher>Sega</publisher>
 	    <part name="cart" interface="gamegear_cart">
@@ -5259,7 +5259,7 @@ a certain item) -->
 	</software-->
 
 	<software name="nfl95p11" cloneof="nfl95">
-		<description>NFL '95 (Prototype, 19940825)</description>
+		<description>NFL '95 (prototype, 19940825)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5270,7 +5270,7 @@ a certain item) -->
 	</software>
 
 	<software name="nfl95p10" cloneof="nfl95">
-		<description>NFL '95 (Prototype, 19940826)</description>
+		<description>NFL '95 (prototype, 19940826)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5281,7 +5281,7 @@ a certain item) -->
 	</software>
 
 	<software name="nfl95p09" cloneof="nfl95">
-		<description>NFL '95 (Prototype, 19940831)</description>
+		<description>NFL '95 (prototype, 19940831)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5292,7 +5292,7 @@ a certain item) -->
 	</software>
 
 	<software name="nfl95p08" cloneof="nfl95">
-		<description>NFL '95 (Prototype, 19940902)</description>
+		<description>NFL '95 (prototype, 19940902)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5303,7 +5303,7 @@ a certain item) -->
 	</software>
 
 	<software name="nfl95p07" cloneof="nfl95">
-		<description>NFL '95 (Prototype, 19940908)</description>
+		<description>NFL '95 (prototype, 19940908)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5314,7 +5314,7 @@ a certain item) -->
 	</software>
 
 	<software name="nfl95p06" cloneof="nfl95">
-		<description>NFL '95 (Prototype, 19940910)</description>
+		<description>NFL '95 (prototype, 19940910)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5325,7 +5325,7 @@ a certain item) -->
 	</software>
 
 	<software name="nfl95p05" cloneof="nfl95">
-		<description>NFL '95 (Prototype, 19940911-B)</description>
+		<description>NFL '95 (prototype, 19940911-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5336,7 +5336,7 @@ a certain item) -->
 	</software>
 
 	<software name="nfl95p04" cloneof="nfl95">
-		<description>NFL '95 (Prototype, 19940911-C)</description>
+		<description>NFL '95 (prototype, 19940911-C)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5347,7 +5347,7 @@ a certain item) -->
 	</software>
 
 	<software name="nfl95p03" cloneof="nfl95">
-		<description>NFL '95 (Prototype, 19940912)</description>
+		<description>NFL '95 (prototype, 19940912)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5358,7 +5358,7 @@ a certain item) -->
 	</software>
 
 	<software name="nfl95p02" cloneof="nfl95">
-		<description>NFL '95 (Prototype, 19940914-F)</description>
+		<description>NFL '95 (prototype, 19940914-F)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5369,7 +5369,7 @@ a certain item) -->
 	</software>
 
 	<software name="nfl95p01" cloneof="nfl95">
-		<description>NFL '95 (Prototype, 19940914)</description>
+		<description>NFL '95 (prototype, 19940914)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5417,7 +5417,7 @@ a certain item) -->
 	</software>
 
 	<software name="nhlasp17" cloneof="nhlas">
-		<description>NHL All-Star Hockey (Prototype, 19941215)</description>
+		<description>NHL All-Star Hockey (prototype, 19941215)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5428,7 +5428,7 @@ a certain item) -->
 	</software>
 
 	<software name="nhlasp16" cloneof="nhlas">
-		<description>NHL All-Star Hockey (Prototype, 19941222)</description>
+		<description>NHL All-Star Hockey (prototype, 19941222)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5439,7 +5439,7 @@ a certain item) -->
 	</software>
 
 	<software name="nhlasp15" cloneof="nhlas">
-		<description>NHL All-Star Hockey (Prototype, 19941229)</description>
+		<description>NHL All-Star Hockey (prototype, 19941229)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5450,7 +5450,7 @@ a certain item) -->
 	</software>
 
 	<software name="nhlasp14" cloneof="nhlas">
-		<description>NHL All-Star Hockey (Prototype, 19941231)</description>
+		<description>NHL All-Star Hockey (prototype, 19941231)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5461,7 +5461,7 @@ a certain item) -->
 	</software>
 
 	<software name="nhlasp13" cloneof="nhlas">
-		<description>NHL All-Star Hockey (Prototype, 19950102)</description>
+		<description>NHL All-Star Hockey (prototype, 19950102)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5472,7 +5472,7 @@ a certain item) -->
 	</software>
 
 	<software name="nhlasp12" cloneof="nhlas">
-		<description>NHL All-Star Hockey (Prototype, 19950103)</description>
+		<description>NHL All-Star Hockey (prototype, 19950103)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5483,7 +5483,7 @@ a certain item) -->
 	</software>
 
 	<software name="nhlasp11" cloneof="nhlas">
-		<description>NHL All-Star Hockey (Prototype, 19950107)</description>
+		<description>NHL All-Star Hockey (prototype, 19950107)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5494,7 +5494,7 @@ a certain item) -->
 	</software>
 
 	<software name="nhlasp10" cloneof="nhlas">
-		<description>NHL All-Star Hockey (Prototype, 19950111)</description>
+		<description>NHL All-Star Hockey (prototype, 19950111)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5505,7 +5505,7 @@ a certain item) -->
 	</software>
 
 	<software name="nhlasp09" cloneof="nhlas">
-		<description>NHL All-Star Hockey (Prototype, 19950113)</description>
+		<description>NHL All-Star Hockey (prototype, 19950113)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5516,7 +5516,7 @@ a certain item) -->
 	</software>
 
 	<software name="nhlasp08" cloneof="nhlas">
-		<description>NHL All-Star Hockey (Prototype, 19950116)</description>
+		<description>NHL All-Star Hockey (prototype, 19950116)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5527,7 +5527,7 @@ a certain item) -->
 	</software>
 
 	<software name="nhlasp07" cloneof="nhlas">
-		<description>NHL All-Star Hockey (Prototype, 19950120)</description>
+		<description>NHL All-Star Hockey (prototype, 19950120)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5538,7 +5538,7 @@ a certain item) -->
 	</software>
 
 	<software name="nhlasp06" cloneof="nhlas">
-		<description>NHL All-Star Hockey (Prototype, 19950121)</description>
+		<description>NHL All-Star Hockey (prototype, 19950121)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5549,7 +5549,7 @@ a certain item) -->
 	</software>
 
 	<software name="nhlasp05" cloneof="nhlas">
-		<description>NHL All-Star Hockey (Prototype, 19950124-A)</description>
+		<description>NHL All-Star Hockey (prototype, 19950124-A)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5560,7 +5560,7 @@ a certain item) -->
 	</software>
 
 	<software name="nhlasp04" cloneof="nhlas">
-		<description>NHL All-Star Hockey (Prototype, 19950124-B)</description>
+		<description>NHL All-Star Hockey (prototype, 19950124-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5571,7 +5571,7 @@ a certain item) -->
 	</software>
 
 	<software name="nhlasp03" cloneof="nhlas">
-		<description>NHL All-Star Hockey (Prototype, 19950124-C)</description>
+		<description>NHL All-Star Hockey (prototype, 19950124-C)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5582,7 +5582,7 @@ a certain item) -->
 	</software>
 
 	<software name="nhlasp02" cloneof="nhlas">
-		<description>NHL All-Star Hockey (Prototype, 19950124)</description>
+		<description>NHL All-Star Hockey (prototype, 19950124)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5593,7 +5593,7 @@ a certain item) -->
 	</software>
 
 	<software name="nhlasp01" cloneof="nhlas">
-		<description>NHL All-Star Hockey (Prototype, 19950125)</description>
+		<description>NHL All-Star Hockey (prototype, 19950125)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5728,7 +5728,7 @@ a certain item) -->
 	</software>
 
 	<software name="olympgld">
-		<description>Olympic Gold (Euro, v1, SMS Mode)</description>
+		<description>Olympic Gold (Euro, v1, SMS mode)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="79018-50, 79018-05, 79018-18"/>
@@ -5744,7 +5744,7 @@ a certain item) -->
 	</software>
 
 	<software name="olympglda" cloneof="olympgld">
-		<description>Olympic Gold (Jpn, USA, v0, SMS Mode)</description>
+		<description>Olympic Gold (Jpn, USA, v0, SMS mode)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="G-3316 (JPN), T-79018"/>
@@ -5797,7 +5797,7 @@ a certain item) -->
 	</software>
 
 	<software name="outrneur">
-		<description>Out Run Europa (Euro, Bra, SMS Mode)</description>
+		<description>Out Run Europa (Euro, Bra, SMS mode)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="T-79038-50, 016.870"/>
@@ -5810,7 +5810,7 @@ a certain item) -->
 	</software>
 
 	<software name="outrneuru" cloneof="outrneur">
-		<description>Out Run Europa (USA, SMS Mode)</description>
+		<description>Out Run Europa (USA, SMS mode)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="T-79038"/>
@@ -5834,7 +5834,7 @@ a certain item) -->
 	</software>
 
 	<software name="pacintim">
-		<description>Pac-In-Time (Prototype)</description>
+		<description>Pac-In-Time (prototype)</description>
 		<year>1994</year>
 		<publisher>Namco</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5911,7 +5911,7 @@ a certain item) -->
 	</software>
 
 	<software name="paperbo2p" cloneof="paperbo2">
-		<description>Paperboy II (Prototype)</description>
+		<description>Paperboy II (prototype)</description>
 		<year>1992</year>
 		<publisher>Tengen</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6203,7 +6203,7 @@ a certain item) -->
 	</software>
 
 	<software name="predatr2">
-		<description>Predator 2 (Euro, USA, SMS Mode)</description>
+		<description>Predator 2 (Euro, USA, SMS mode)</description>
 		<year>1992</year>
 		<publisher>Arena</publisher>
 		<info name="serial" value="T-81068, T-81068-50"/>
@@ -6231,7 +6231,7 @@ a certain item) -->
 	</software>
 
 	<software name="ppersia">
-		<description>Prince of Persia (Euro, SMS Mode)</description>
+		<description>Prince of Persia (Euro, SMS mode)</description>
 		<year>1992</year>
 		<publisher>Domark</publisher>
 		<info name="serial" value="T-88018-50"/>
@@ -6244,7 +6244,7 @@ a certain item) -->
 	</software>
 
 	<software name="ppersiau" cloneof="ppersia">
-		<description>Prince of Persia (USA, SMS Mode)</description>
+		<description>Prince of Persia (USA, SMS mode)</description>
 		<year>1992</year>
 		<publisher>Domark</publisher>
 		<info name="serial" value="T-48098 301053-0161"/>
@@ -6466,7 +6466,7 @@ a certain item) -->
 	</software>
 
 	<software name="rcgp">
-		<description>R.C. Grand Prix (USA, SMS Mode)</description>
+		<description>R.C. Grand Prix (USA, SMS mode)</description>
 		<year>1992</year>
 		<publisher>Absolute Entertainment</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6478,7 +6478,7 @@ a certain item) -->
 	</software>
 
 	<software name="rastan">
-		<description>Rastan Saga (Jpn, SMS Mode)</description>
+		<description>Rastan Saga (Jpn, SMS mode)</description>
 		<year>1991</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="T-11037"/>
@@ -6559,7 +6559,7 @@ a certain item) -->
 	</software>
 
 	<software name="ristarp2" cloneof="ristar">
-		<description>Ristar - The Shooting Star (Prototype, 19941101)</description>
+		<description>Ristar - The Shooting Star (prototype, 19941101)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6570,7 +6570,7 @@ a certain item) -->
 	</software>
 
 	<software name="ristarp1" cloneof="ristar">
-		<description>Ristar - The Shooting Star (Prototype, 19941102)</description>
+		<description>Ristar - The Shooting Star (prototype, 19941102)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6581,7 +6581,7 @@ a certain item) -->
 	</software>
 
 	<software name="ristarp4" cloneof="ristar">
-		<description>Ristar - The Shooting Star (Prototype, 19941019)</description>
+		<description>Ristar - The Shooting Star (prototype, 19941019)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6592,7 +6592,7 @@ a certain item) -->
 	</software>
 
 	<software name="ristarp3" cloneof="ristar">
-		<description>Ristar - The Shooting Star (Prototype, 19941026)</description>
+		<description>Ristar - The Shooting Star (prototype, 19941026)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6603,7 +6603,7 @@ a certain item) -->
 	</software>
 
 	<software name="ristarp5" cloneof="ristar">
-		<description>Ristar - The Shooting Star (Prototype, 19940909)</description>
+		<description>Ristar - The Shooting Star (prototype, 19940909)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6804,7 +6804,7 @@ a certain item) -->
 	</software>
 
 	<software name="sega4in1p" cloneof="sega4in1">
-		<description>Sega Game Pack 4 in 1 (Euro, Prototype)</description>
+		<description>Sega Game Pack 4 in 1 (Euro, prototype)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6976,7 +6976,7 @@ a certain item) -->
 	</software>
 
 	<software name="shinfrc2p4" cloneof="shinfrc2">
-		<description>Shining Force II - The Sword of Hajya (Prototype, 19940427)</description>
+		<description>Shining Force II - The Sword of Hajya (prototype, 19940427)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6991,7 +6991,7 @@ a certain item) -->
 	</software>
 
 	<software name="shinfrc2p1" cloneof="shinfrc2">
-		<description>Shining Force II - The Sword of Hajya (Prototype, 19940708)</description>
+		<description>Shining Force II - The Sword of Hajya (prototype, 19940708)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7006,7 +7006,7 @@ a certain item) -->
 	</software>
 
 	<software name="shinfrc2p2" cloneof="shinfrc2">
-		<description>Shining Force II - The Sword of Hajya (Prototype, 19940627)</description>
+		<description>Shining Force II - The Sword of Hajya (prototype, 19940627)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7021,7 +7021,7 @@ a certain item) -->
 	</software>
 
 	<software name="shinfrc2p3" cloneof="shinfrc2">
-		<description>Shining Force II - The Sword of Hajya (Prototype, 19940530)</description>
+		<description>Shining Force II - The Sword of Hajya (prototype, 19940530)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7232,7 +7232,7 @@ a certain item) -->
 	</software>
 
 	<software name="sonicblsp6" cloneof="sonicbls">
-		<description>Sonic Blast (Prototype 611, 19960531, 13.49)</description>
+		<description>Sonic Blast (prototype 611, 19960531, 13.49)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7243,7 +7243,7 @@ a certain item) -->
 	</software>
 
 	<software name="sonicblsp5" cloneof="sonicbls">
-		<description>Sonic Blast (Prototype 74, 19960717, 09.11)</description>
+		<description>Sonic Blast (prototype 74, 19960717, 09.11)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7254,7 +7254,7 @@ a certain item) -->
 	</software>
 
 	<software name="sonicblsp4" cloneof="sonicbls">
-		<description>Sonic Blast (Prototype 806, 19960806, 18.37)</description>
+		<description>Sonic Blast (prototype 806, 19960806, 18.37)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7265,7 +7265,7 @@ a certain item) -->
 	</software>
 
 	<software name="sonicblsp3" cloneof="sonicbls">
-		<description>Sonic Blast (Prototype 821, 19960822, 09.38)</description>
+		<description>Sonic Blast (prototype 821, 19960822, 09.38)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7276,7 +7276,7 @@ a certain item) -->
 	</software>
 
 	<software name="sonicblsp2" cloneof="sonicbls">
-		<description>Sonic Blast (Prototype 827, 19960828, 11.13)</description>
+		<description>Sonic Blast (prototype 827, 19960828, 11.13)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7287,7 +7287,7 @@ a certain item) -->
 	</software>
 
 	<software name="sonicblsp1" cloneof="sonicbls">
-		<description>Sonic Blast (Prototype 94, 19960902, 17.47)</description>
+		<description>Sonic Blast (prototype 94, 19960902, 17.47)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7298,7 +7298,7 @@ a certain item) -->
 	</software>
 
 	<software name="sonicc">
-		<description>Sonic Chaos (Euro, USA, Bra)</description>
+		<description>Sonic the Hedgehog Chaos (Euro, USA, Bra)</description>
 		<year>199?</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2515, 1204, 077080"/>
@@ -7308,6 +7308,21 @@ a certain item) -->
 			<feature name="ic1" value="MPR-15973-F" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-15973-f.ic1" size="524288" crc="663f2abb" sha1="5b5b7d9cd8adf0f8e1ee15fd4557828f91dfdca1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: Sega Europe labels; internal version not ideal for reference -->
+	<software name="sonicc517" cloneof="sonicc">
+		<description>Sonic the Hedgehog Chaos (Euro, prototype 19930517)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="gg sonic chaos 0 17-5.bin" size="131072" crc="19ac09ff" sha1="ce2b641a8907868fd314795e2e1d41b62cfa6ae7" offset="0x00000" />
+				<rom name="gg sonic chaos 1 17-5.bin" size="131072" crc="9e3ba273" sha1="02635627f0ebdb7a8cc5f5f835d051de497244c9" offset="0x20000" />
+				<rom name="gg sonic chaos 2 17-5.bin" size="131072" crc="8cfeb3c0" sha1="0b6eadcd60511bba0b22abdbef54e05ed1410cba" offset="0x40000" />
+				<rom name="gg sonic chaos 3 17-5.bin" size="131072" crc="d82f30e4" sha1="1f3a7c30363ddd6972dec7c114f11f4f62b96d50" offset="0x60000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7389,7 +7404,7 @@ a certain item) -->
 	</software>
 
 	<software name="sspinp20" cloneof="sspin">
-		<description>Sonic Spinball (Prototype 0307, 19940307, 05.24)</description>
+		<description>Sonic Spinball (prototype 0307, 19940307, 05.24)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7400,7 +7415,7 @@ a certain item) -->
 	</software>
 
 	<software name="sspinp19" cloneof="sspin">
-		<description>Sonic Spinball (Prototype 031094, 19940310, 17.41)</description>
+		<description>Sonic Spinball (prototype 031094, 19940310, 17.41)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7411,7 +7426,7 @@ a certain item) -->
 	</software>
 
 	<software name="sspinp18" cloneof="sspin">
-		<description>Sonic Spinball (Prototype 031194, 19940311, 12.09)</description>
+		<description>Sonic Spinball (prototype 031194, 19940311, 12.09)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7422,7 +7437,7 @@ a certain item) -->
 	</software>
 
 	<software name="sspinp17" cloneof="sspin">
-		<description>Sonic Spinball (Prototype 032194, 19940321, 07.12)</description>
+		<description>Sonic Spinball (prototype 032194, 19940321, 07.12)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7433,7 +7448,7 @@ a certain item) -->
 	</software>
 
 	<software name="sspinp16" cloneof="sspin">
-		<description>Sonic Spinball (Prototype 0328, 19940328, 06.54)</description>
+		<description>Sonic Spinball (prototype 0328, 19940328, 06.54)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7444,7 +7459,7 @@ a certain item) -->
 	</software>
 
 	<software name="sspinp15" cloneof="sspin">
-		<description>Sonic Spinball (Prototype 0329, 19940329, 07.35)</description>
+		<description>Sonic Spinball (prototype 0329, 19940329, 07.35)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7455,7 +7470,7 @@ a certain item) -->
 	</software>
 
 	<software name="sspinp14" cloneof="sspin">
-		<description>Sonic Spinball (Prototype 0330, 19940330, 06.54)</description>
+		<description>Sonic Spinball (prototype 0330, 19940330, 06.54)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7466,7 +7481,7 @@ a certain item) -->
 	</software>
 
 	<software name="sspinp13" cloneof="sspin">
-		<description>Sonic Spinball (Prototype 0405, 19940405, 18.07)</description>
+		<description>Sonic Spinball (prototype 0405, 19940405, 18.07)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7477,7 +7492,7 @@ a certain item) -->
 	</software>
 
 	<software name="sspinp12" cloneof="sspin">
-		<description>Sonic Spinball (Prototype 0412, 19940412, 07.26)</description>
+		<description>Sonic Spinball (prototype 0412, 19940412, 07.26)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7488,7 +7503,7 @@ a certain item) -->
 	</software>
 
 	<software name="sspinp11" cloneof="sspin">
-		<description>Sonic Spinball (Prototype 0413, 19940413, 02.54)</description>
+		<description>Sonic Spinball (prototype 0413, 19940413, 02.54)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7499,7 +7514,7 @@ a certain item) -->
 	</software>
 
 	<software name="sspinp10" cloneof="sspin">
-		<description>Sonic Spinball (Prototype 0415, 19940415, 17.33)</description>
+		<description>Sonic Spinball (prototype 0415, 19940415, 17.33)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7510,7 +7525,7 @@ a certain item) -->
 	</software>
 
 	<software name="sspinp09" cloneof="sspin">
-		<description>Sonic Spinball (Prototype 0421, 19940421, 05.30)</description>
+		<description>Sonic Spinball (prototype 0421, 19940421, 05.30)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7521,7 +7536,7 @@ a certain item) -->
 	</software>
 
 	<software name="sspinp08" cloneof="sspin">
-		<description>Sonic Spinball (Prototype 0427, 19940427, 04.51)</description>
+		<description>Sonic Spinball (prototype 0427, 19940427, 04.51)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7532,7 +7547,7 @@ a certain item) -->
 	</software>
 
 	<software name="sspinp07" cloneof="sspin">
-		<description>Sonic Spinball (Prototype 0429, 19940429, 06.01)</description>
+		<description>Sonic Spinball (prototype 0429, 19940429, 06.01)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7543,7 +7558,7 @@ a certain item) -->
 	</software>
 
 	<software name="sspinp06" cloneof="sspin">
-		<description>Sonic Spinball (Prototype 0430, 19940429, 21.48)</description>
+		<description>Sonic Spinball (prototype 0430, 19940429, 21.48)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7554,7 +7569,7 @@ a certain item) -->
 	</software>
 
 	<software name="sspinp05" cloneof="sspin">
-		<description>Sonic Spinball (Prototype 503B, 19940503, 19.27)</description>
+		<description>Sonic Spinball (prototype 503B, 19940503, 19.27)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7565,7 +7580,7 @@ a certain item) -->
 	</software>
 
 	<software name="sspinp04" cloneof="sspin">
-		<description>Sonic Spinball (Prototype 0505, 19940505, 04.47)</description>
+		<description>Sonic Spinball (prototype 0505, 19940505, 04.47)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7576,7 +7591,7 @@ a certain item) -->
 	</software>
 
 	<software name="sspinp03" cloneof="sspin">
-		<description>Sonic Spinball (Prototype 0506, 19940506, 13.04)</description>
+		<description>Sonic Spinball (prototype 0506, 19940506, 13.04)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7587,7 +7602,7 @@ a certain item) -->
 	</software>
 
 	<software name="sspinp02" cloneof="sspin">
-		<description>Sonic Spinball (Prototype 0525, 19940525, 13.24)</description>
+		<description>Sonic Spinball (prototype 0525, 19940525, 13.24)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7598,7 +7613,7 @@ a certain item) -->
 	</software>
 
 	<software name="sspinp01" cloneof="sspin">
-		<description>Sonic Spinball (Prototype 0530, 19940530, 23.25)</description>
+		<description>Sonic Spinball (prototype 0530, 19940530, 23.25)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7640,7 +7655,7 @@ a certain item) -->
 	</software>
 
 	<software name="sonicp" cloneof="sonic">
-		<description>Sonic The Hedgehog (World, Prototype)</description>
+		<description>Sonic The Hedgehog (World, prototype)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7705,7 +7720,7 @@ a certain item) -->
 	</software>
 
 	<software name="sonictrip" cloneof="sonictri">
-		<description>Sonic The Hedgehog - Triple Trouble (Prototype 0808, 19940808, 18.05)</description>
+		<description>Sonic The Hedgehog - Triple Trouble (prototype 0808, 19940808, 18.05)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7796,7 +7811,7 @@ a certain item) -->
 	</software>
 
 	<software name="spirou">
-		<description>Spirou (Euro, Prototype)</description>
+		<description>Spirou (Euro, prototype)</description>
 		<year>1996</year>
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7832,7 +7847,7 @@ a certain item) -->
 <!-- Apparently, the development of both Sports Trivia and Sports Trivia CE went on in parallel... hard to say which
      version the QTEST/ALOGTEST/etc. protos were for (more info are needed on these, or some code analysis/comparison) -->
 	<software name="sporttrvp12" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950308)</description>
+		<description>Sports Trivia (prototype, 19950308)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7843,7 +7858,7 @@ a certain item) -->
 	</software>
 
 	<software name="sporttrvp11" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950309)</description>
+		<description>Sports Trivia (prototype, 19950309)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7854,7 +7869,7 @@ a certain item) -->
 	</software>
 
 	<software name="sporttrvp10" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950313)</description>
+		<description>Sports Trivia (prototype, 19950313)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7865,7 +7880,7 @@ a certain item) -->
 	</software>
 
 	<software name="sporttrvp09" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950316-1MEG)</description>
+		<description>Sports Trivia (prototype, 19950316-1MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7876,7 +7891,7 @@ a certain item) -->
 	</software>
 
 	<software name="sporttrvp08" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950316-2MEG)</description>
+		<description>Sports Trivia (prototype, 19950316-2MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7887,7 +7902,7 @@ a certain item) -->
 	</software>
 
 	<software name="sporttrvp07" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950317-2MEG)</description>
+		<description>Sports Trivia (prototype, 19950317-2MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7898,7 +7913,7 @@ a certain item) -->
 	</software>
 
 	<software name="sporttrvp06" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950320-2MEG)</description>
+		<description>Sports Trivia (prototype, 19950320-2MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7909,7 +7924,7 @@ a certain item) -->
 	</software>
 
 	<software name="sporttrvp05" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950320-QTEST)</description>
+		<description>Sports Trivia (prototype, 19950320-QTEST)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7920,7 +7935,7 @@ a certain item) -->
 	</software>
 
 	<software name="sporttrvp04" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950425-1MEG)</description>
+		<description>Sports Trivia (prototype, 19950425-1MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7931,7 +7946,7 @@ a certain item) -->
 	</software>
 
 	<software name="sporttrvp03" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950425-QTEST)</description>
+		<description>Sports Trivia (prototype, 19950425-QTEST)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7942,7 +7957,7 @@ a certain item) -->
 	</software>
 
 	<software name="sporttrvp02" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950427-1MEG)</description>
+		<description>Sports Trivia (prototype, 19950427-1MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7953,7 +7968,7 @@ a certain item) -->
 	</software>
 
 	<software name="sporttrvp01" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950504-1MEG)</description>
+		<description>Sports Trivia (prototype, 19950504-1MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7975,7 +7990,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvcep01" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950502-2MEG)</description>
+		<description>Sports Trivia (prototype, 19950502-2MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7986,7 +8001,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvcep13" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950403-2MEG)</description>
+		<description>Sports Trivia (prototype, 19950403-2MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7997,7 +8012,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvcep12" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950403-QTEST)</description>
+		<description>Sports Trivia (prototype, 19950403-QTEST)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8008,7 +8023,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvcep11" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950404-2MEG)</description>
+		<description>Sports Trivia (prototype, 19950404-2MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8019,7 +8034,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvcep10" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950405-2MEG-B)</description>
+		<description>Sports Trivia (prototype, 19950405-2MEG-B)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8030,7 +8045,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvcep09" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950405-2MEG-C)</description>
+		<description>Sports Trivia (prototype, 19950405-2MEG-C)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8041,7 +8056,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvcep08" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950405-QTEST)</description>
+		<description>Sports Trivia (prototype, 19950405-QTEST)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8052,7 +8067,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvcep07" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950406-2MEG)</description>
+		<description>Sports Trivia (prototype, 19950406-2MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8063,7 +8078,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvcep06" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950407-2MEG)</description>
+		<description>Sports Trivia (prototype, 19950407-2MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8074,7 +8089,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvcep05" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950407-QTEST)</description>
+		<description>Sports Trivia (prototype, 19950407-QTEST)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8085,7 +8100,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvcep04" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950411-2MEG)</description>
+		<description>Sports Trivia (prototype, 19950411-2MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8096,7 +8111,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvcep03" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950412-2MEG)</description>
+		<description>Sports Trivia (prototype, 19950412-2MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8107,7 +8122,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvcep02" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950428-2MEG)</description>
+		<description>Sports Trivia (prototype, 19950428-2MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8118,7 +8133,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvcep24" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950321-2MEG)</description>
+		<description>Sports Trivia (prototype, 19950321-2MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8129,7 +8144,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvcep23" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950323-2MEG)</description>
+		<description>Sports Trivia (prototype, 19950323-2MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8140,7 +8155,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvcep22" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950323-ALGOTEST)</description>
+		<description>Sports Trivia (prototype, 19950323-ALGOTEST)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8151,7 +8166,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvcep21" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950323-QTEST)</description>
+		<description>Sports Trivia (prototype, 19950323-QTEST)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8162,7 +8177,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvcep20" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950327-2MEG)</description>
+		<description>Sports Trivia (prototype, 19950327-2MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8173,7 +8188,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvcep19" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950327-ALGOTEST)</description>
+		<description>Sports Trivia (prototype, 19950327-ALGOTEST)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8184,7 +8199,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvcep18" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950329-2MEG)</description>
+		<description>Sports Trivia (prototype, 19950329-2MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8195,7 +8210,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvcep17" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950329-ALGOTEST)</description>
+		<description>Sports Trivia (prototype, 19950329-ALGOTEST)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8206,7 +8221,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvcep16" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950329-QTEST)</description>
+		<description>Sports Trivia (prototype, 19950329-QTEST)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8217,7 +8232,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvcep15" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950330-2MEG-D)</description>
+		<description>Sports Trivia (prototype, 19950330-2MEG-D)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8228,7 +8243,7 @@ a certain item) -->
 	</software>
 
 	<software name="sprtrvcep14" cloneof="sprtrvce">
-		<description>Sports Trivia (Prototype, 19950330-QTEST)</description>
+		<description>Sports Trivia (prototype, 19950330-QTEST)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8301,7 +8316,7 @@ a certain item) -->
 	</software>
 
 	<software name="shero">
-		<description>Street Hero (USA, Prototype, SMS Mode)</description>
+		<description>Street Hero (USA, prototype, SMS mode)</description>
 		<year>1993</year>
 		<publisher>Innovation Tech</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8314,7 +8329,7 @@ a certain item) -->
 	</software>
 
 	<software name="sheroa" cloneof="shero">
-		<description>Street Hero (USA, Prototype Alt, SMS Mode)</description>
+		<description>Street Hero (USA, prototype Alt, SMS mode)</description>
 		<year>1993</year>
 		<publisher>Innovation Tech</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8412,7 +8427,7 @@ a certain item) -->
 	</software>
 
 	<software name="supercolp6" cloneof="supercol">
-		<description>Super Columns (Prototype, 19941201)</description>
+		<description>Super Columns (prototype, 19941201)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8423,7 +8438,7 @@ a certain item) -->
 	</software>
 
 	<software name="supercolp5" cloneof="supercol">
-		<description>Super Columns (Prototype, 19941215)</description>
+		<description>Super Columns (prototype, 19941215)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8434,7 +8449,7 @@ a certain item) -->
 	</software>
 
 	<software name="supercolp4" cloneof="supercol">
-		<description>Super Columns (Prototype, 19941221)</description>
+		<description>Super Columns (prototype, 19941221)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8445,7 +8460,7 @@ a certain item) -->
 	</software>
 
 	<software name="supercolp3" cloneof="supercol">
-		<description>Super Columns (Prototype, 19941226)</description>
+		<description>Super Columns (prototype, 19941226)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8456,7 +8471,7 @@ a certain item) -->
 	</software>
 
 	<software name="supercolp2" cloneof="supercol">
-		<description>Super Columns (Prototype, 19941228)</description>
+		<description>Super Columns (prototype, 19941228)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8467,7 +8482,7 @@ a certain item) -->
 	</software>
 
 	<software name="supercolp1" cloneof="supercol">
-		<description>Super Columns (Prototype, 19950106)</description>
+		<description>Super Columns (prototype, 19950106)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8478,7 +8493,7 @@ a certain item) -->
 	</software>
 
 	<software name="supercolp7" cloneof="supercol">
-		<description>Super Columns (Prototype, 19941111)</description>
+		<description>Super Columns (prototype, 19941111)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8514,7 +8529,7 @@ a certain item) -->
 	</software>
 
 	<software name="skickoff">
-		<description>Super Kick Off (Euro, SMS Mode)</description>
+		<description>Super Kick Off (Euro, SMS mode)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2415"/>
@@ -8637,7 +8652,7 @@ a certain item) -->
 	</software>
 
 	<software name="stetris">
-		<description>Super Tetris (Kor, SMS Mode?)</description>
+		<description>Super Tetris (Kor, SMS mode?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8664,7 +8679,7 @@ a certain item) -->
 	</software>
 
 	<software name="supermanp" cloneof="superman">
-		<description>Superman - The Man of Steel (Euro, Prototype)</description>
+		<description>Superman - The Man of Steel (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8811,7 +8826,7 @@ a certain item) -->
 	</software>
 
 	<software name="chasehqj" cloneof="chasehq">
-		<description>Taito Chase H.Q. (Jpn, SMS Mode)</description>
+		<description>Taito Chase H.Q. (Jpn, SMS mode)</description>
 		<year>1991</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="T-11017"/>
@@ -8826,7 +8841,7 @@ a certain item) -->
 	</software>
 
 	<software name="chasehq">
-		<description>Taito Chase H.Q. (USA, SMS Mode)</description>
+		<description>Taito Chase H.Q. (USA, SMS mode)</description>
 		<year>1991</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="T-11018"/>
@@ -8917,7 +8932,7 @@ a certain item) -->
 	</software>
 
 	<software name="tazmarsp13" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940810)</description>
+		<description>Taz in Escape from Mars (prototype, 19940810)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8928,7 +8943,7 @@ a certain item) -->
 	</software>
 
 	<software name="tazmarsp12" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940812)</description>
+		<description>Taz in Escape from Mars (prototype, 19940812)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8939,7 +8954,7 @@ a certain item) -->
 	</software>
 
 	<software name="tazmarsp11" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940814)</description>
+		<description>Taz in Escape from Mars (prototype, 19940814)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8951,7 +8966,7 @@ a certain item) -->
 
 	<!-- same as aug 14 proto. was a mistake by drx? -->
 	<!--software name="tazmarsp11a" cloneof="tazmars">
-	    <description>Taz in Escape from Mars (Prototype, 19940815)</description>
+	    <description>Taz in Escape from Mars (prototype, 19940815)</description>
 	    <year>1994</year>
 	    <publisher>Sega</publisher>
 	    <part name="cart" interface="gamegear_cart">
@@ -8962,7 +8977,7 @@ a certain item) -->
 	</software-->
 
 	<software name="tazmarsp10" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940819)</description>
+		<description>Taz in Escape from Mars (prototype, 19940819)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8973,7 +8988,7 @@ a certain item) -->
 	</software>
 
 	<software name="tazmarsp09" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940823)</description>
+		<description>Taz in Escape from Mars (prototype, 19940823)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8984,7 +8999,7 @@ a certain item) -->
 	</software>
 
 	<software name="tazmarsp08" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940829-B)</description>
+		<description>Taz in Escape from Mars (prototype, 19940829-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8995,7 +9010,7 @@ a certain item) -->
 	</software>
 
 	<software name="tazmarsp07" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940830)</description>
+		<description>Taz in Escape from Mars (prototype, 19940830)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9006,7 +9021,7 @@ a certain item) -->
 	</software>
 
 	<software name="tazmarsp14" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940511)</description>
+		<description>Taz in Escape from Mars (prototype, 19940511)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9017,7 +9032,7 @@ a certain item) -->
 	</software>
 
 	<software name="tazmarsp06" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940902)</description>
+		<description>Taz in Escape from Mars (prototype, 19940902)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9028,7 +9043,7 @@ a certain item) -->
 	</software>
 
 	<software name="tazmarsp05" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940905-B)</description>
+		<description>Taz in Escape from Mars (prototype, 19940905-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9039,7 +9054,7 @@ a certain item) -->
 	</software>
 
 	<software name="tazmarsp04" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940905-C)</description>
+		<description>Taz in Escape from Mars (prototype, 19940905-C)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9050,7 +9065,7 @@ a certain item) -->
 	</software>
 
 	<software name="tazmarsp03" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940906-D)</description>
+		<description>Taz in Escape from Mars (prototype, 19940906-D)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9061,7 +9076,7 @@ a certain item) -->
 	</software>
 
 	<software name="tazmarsp02" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940909-B)</description>
+		<description>Taz in Escape from Mars (prototype, 19940909-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9072,7 +9087,7 @@ a certain item) -->
 	</software>
 
 	<software name="tazmarsp01" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940910)</description>
+		<description>Taz in Escape from Mars (prototype, 19940910)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9115,7 +9130,7 @@ a certain item) -->
 	</software>
 
 	<software name="tempojrp8" cloneof="tempojr">
-		<description>Tempo Jr. (Prototype, 19941205)</description>
+		<description>Tempo Jr. (prototype, 19941205)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9126,7 +9141,7 @@ a certain item) -->
 	</software>
 
 	<software name="tempojrp7" cloneof="tempojr">
-		<description>Tempo Jr. (Prototype, 19941212)</description>
+		<description>Tempo Jr. (prototype, 19941212)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9137,7 +9152,7 @@ a certain item) -->
 	</software>
 
 	<software name="tempojrp6" cloneof="tempojr">
-		<description>Tempo Jr. (Prototype, 19941226)</description>
+		<description>Tempo Jr. (prototype, 19941226)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9148,7 +9163,7 @@ a certain item) -->
 	</software>
 
 	<software name="tempojrp2" cloneof="tempojr">
-		<description>Tempo Jr. (Prototype, 19950206)</description>
+		<description>Tempo Jr. (prototype, 19950206)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9159,7 +9174,7 @@ a certain item) -->
 	</software>
 
 	<software name="tempojrp1" cloneof="tempojr">
-		<description>Tempo Jr. (Prototype, 19950215)</description>
+		<description>Tempo Jr. (prototype, 19950215)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9170,7 +9185,7 @@ a certain item) -->
 	</software>
 
 	<software name="tempojrp5" cloneof="tempojr">
-		<description>Tempo Jr. (Prototype, 19950117)</description>
+		<description>Tempo Jr. (prototype, 19950117)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9181,7 +9196,7 @@ a certain item) -->
 	</software>
 
 	<software name="tempojrp4" cloneof="tempojr">
-		<description>Tempo Jr. (Prototype, 19950120)</description>
+		<description>Tempo Jr. (prototype, 19950120)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9192,7 +9207,7 @@ a certain item) -->
 	</software>
 
 	<software name="tempojrp3" cloneof="tempojr">
-		<description>Tempo Jr. (Prototype, 19950131)</description>
+		<description>Tempo Jr. (prototype, 19950131)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9203,7 +9218,7 @@ a certain item) -->
 	</software>
 
 	<software name="tempojrp9" cloneof="tempojr">
-		<description>Tempo Jr. (Prototype, 19941128)</description>
+		<description>Tempo Jr. (prototype, 19941128)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9463,7 +9478,7 @@ a certain item) -->
 	</software>
 
 	<software name="wildsnak">
-		<description>WildSnake (Prototype)</description>
+		<description>WildSnake (prototype)</description>
 		<year>1994</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9591,7 +9606,7 @@ a certain item) -->
 	</software>
 
 	<software name="wboydtrpp" cloneof="wboydtrp">
-		<description>Wonder Boy III - The Dragon's Trap (Euro, Prototype)</description>
+		<description>Wonder Boy III - The Dragon's Trap (Euro, prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9680,7 +9695,7 @@ a certain item) -->
 	</software>
 
 	<software name="wsb95p5" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19940709)</description>
+		<description>World Series Baseball '95 (prototype, 19940709)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9691,7 +9706,7 @@ a certain item) -->
 	</software>
 
 	<software name="wsb95p4" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19940719)</description>
+		<description>World Series Baseball '95 (prototype, 19940719)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9702,7 +9717,7 @@ a certain item) -->
 	</software>
 
 	<software name="wsb95p3" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19940722)</description>
+		<description>World Series Baseball '95 (prototype, 19940722)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9713,7 +9728,7 @@ a certain item) -->
 	</software>
 
 	<software name="wsb95p2" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19940728)</description>
+		<description>World Series Baseball '95 (prototype, 19940728)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9724,7 +9739,7 @@ a certain item) -->
 	</software>
 
 	<software name="wsb95p1" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19940729)</description>
+		<description>World Series Baseball '95 (prototype, 19940729)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9735,7 +9750,7 @@ a certain item) -->
 	</software>
 
 	<software name="wsb95p6" cloneof="wsb95">
-		<description>World Series Baseball '95 (Prototype, 19940629)</description>
+		<description>World Series Baseball '95 (prototype, 19940629)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9782,7 +9797,7 @@ a certain item) -->
 	</software>
 
 	<software name="wwfsteel">
-		<description>WWF Wrestlemania Steel Cage Challenge (Euro, SMS Mode)</description>
+		<description>WWF Wrestlemania Steel Cage Challenge (Euro, SMS mode)</description>
 		<year>1993</year>
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9818,7 +9833,7 @@ a certain item) -->
 	</software>
 
 	<software name="xmenglp3" cloneof="xmengl">
-		<description>X-Men - Gamemaster's Legacy (Prototype, 19940810)</description>
+		<description>X-Men - Gamemaster's Legacy (prototype, 19940810)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9830,7 +9845,7 @@ a certain item) -->
 
 	<!-- same as aug 10 proto. was a mistake by drx? -->
 	<!--software name="xmenglp3a" cloneof="xmengl">
-	    <description>X-Men - Gamemaster's Legacy (Prototype, 19940815)</description>
+	    <description>X-Men - Gamemaster's Legacy (prototype, 19940815)</description>
 	    <year>1994</year>
 	    <publisher>Sega</publisher>
 	    <part name="cart" interface="gamegear_cart">
@@ -9841,7 +9856,7 @@ a certain item) -->
 	</software-->
 
 	<software name="xmenglp2" cloneof="xmengl">
-		<description>X-Men - Gamemaster's Legacy (Prototype 36, 19940831)</description>
+		<description>X-Men - Gamemaster's Legacy (prototype 36, 19940831)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9852,7 +9867,7 @@ a certain item) -->
 	</software>
 
 	<software name="xmenglp1" cloneof="xmengl">
-		<description>X-Men - Gamemaster's Legacy (Prototype 51, 19940906)</description>
+		<description>X-Men - Gamemaster's Legacy (prototype 51, 19940906)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9874,7 +9889,7 @@ a certain item) -->
 	</software>
 
 	<software name="xmenmojop7" cloneof="xmenmojo">
-		<description>X-Men - Mojo World (Prototype, 19960605)</description>
+		<description>X-Men - Mojo World (prototype, 19960605)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9885,7 +9900,7 @@ a certain item) -->
 	</software>
 
 	<software name="xmenmojop6" cloneof="xmenmojo">
-		<description>X-Men - Mojo World (Prototype, 19960613)</description>
+		<description>X-Men - Mojo World (prototype, 19960613)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9896,7 +9911,7 @@ a certain item) -->
 	</software>
 
 	<software name="xmenmojop5" cloneof="xmenmojo">
-		<description>X-Men - Mojo World (Prototype, 19960624)</description>
+		<description>X-Men - Mojo World (prototype, 19960624)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9907,7 +9922,7 @@ a certain item) -->
 	</software>
 
 	<software name="xmenmojop4" cloneof="xmenmojo">
-		<description>X-Men - Mojo World (Prototype, 19960625)</description>
+		<description>X-Men - Mojo World (prototype, 19960625)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9918,7 +9933,7 @@ a certain item) -->
 	</software>
 
 	<software name="xmenmojop3" cloneof="xmenmojo">
-		<description>X-Men - Mojo World (Prototype, 19960627)</description>
+		<description>X-Men - Mojo World (prototype, 19960627)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9929,7 +9944,7 @@ a certain item) -->
 	</software>
 
 	<software name="xmenmojop2" cloneof="xmenmojo">
-		<description>X-Men - Mojo World (Prototype, 19960628)</description>
+		<description>X-Men - Mojo World (prototype, 19960628)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9940,7 +9955,7 @@ a certain item) -->
 	</software>
 
 	<software name="xmenmojop1" cloneof="xmenmojo">
-		<description>X-Men - Mojo World (Prototype, 19960629)</description>
+		<description>X-Men - Mojo World (prototype, 19960629)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9951,7 +9966,7 @@ a certain item) -->
 	</software>
 
 	<software name="yogibear">
-		<description>Yogi Bear in Yogi Bear's Goldrush (Prototype)</description>
+		<description>Yogi Bear in Yogi Bear's Goldrush (prototype)</description>
 		<year>1994</year>
 		<publisher>GameTek</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -10046,7 +10061,7 @@ a certain item) -->
 	</software>
 
 	<software name="zoopp" cloneof="zoop">
-		<description>Zoop (USA, Prototype)</description>
+		<description>Zoop (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Viacom New Media</publisher>
 		<part name="cart" interface="gamegear_cart">

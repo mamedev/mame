@@ -33,6 +33,7 @@ rf5c68_device::rf5c68_device(const machine_config & mconfig, device_type type, c
 	, m_cbank(0)
 	, m_wbank(0)
 	, m_enable(0)
+	, m_sample_end_cb(*this)
 {
 }
 
@@ -61,7 +62,7 @@ void rf5c68_device::device_start()
 	m_data = &space(0);
 	// Find our direct access
 	m_cache = space().cache<0, 0, ENDIANNESS_LITTLE>();
-	m_sample_end_cb.bind_relative_to(*owner());
+	m_sample_end_cb.resolve();
 
 	/* allocate the stream */
 	m_stream = stream_alloc(0, 2, clock() / 384);

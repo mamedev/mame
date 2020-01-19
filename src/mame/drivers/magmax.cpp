@@ -336,7 +336,7 @@ void magmax_state::magmax(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &magmax_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &magmax_state::sound_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 
 	/* video hardware */

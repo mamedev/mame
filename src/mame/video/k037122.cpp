@@ -9,15 +9,16 @@ Konami 037122
 #include "konami_helper.h"
 #include "screen.h"
 
-#define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 #define K037122_NUM_TILES       16384
 
 DEFINE_DEVICE_TYPE(K037122, k037122_device, "k037122", "K037122 2D Tilemap")
 
-k037122_device::k037122_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K037122, tag, owner, clock),
+k037122_device::k037122_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, K037122, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	device_gfx_interface(mconfig, *this, nullptr),
 	m_tile_ram(nullptr),
@@ -51,8 +52,8 @@ void k037122_device::device_start()
 	m_tile_ram = make_unique_clear<uint32_t[]>(0x20000 / 4);
 	m_reg = make_unique_clear<uint32_t[]>(0x400 / 4);
 
-	m_layer[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k037122_device::tile_info_layer0),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
-	m_layer[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k037122_device::tile_info_layer1),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_layer[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k037122_device::tile_info_layer0)), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
+	m_layer[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k037122_device::tile_info_layer1)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 
 	m_layer[0]->set_transparent_pen(0);
 	m_layer[1]->set_transparent_pen(0);

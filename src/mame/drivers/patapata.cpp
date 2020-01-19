@@ -118,12 +118,12 @@ TILEMAP_MAPPER_MEMBER(patapata_state::pagescan)
 
 void patapata_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(patapata_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(patapata_state::pagescan),this), 16, 16, 1024,16*2);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(patapata_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(patapata_state::pagescan),this), 16, 16, 1024,16*2);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(patapata_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(patapata_state::pagescan)), 16, 16, 1024, 16*2);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(patapata_state::get_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(patapata_state::pagescan)), 16, 16, 1024, 16*2);
 
 // 2nd half of the ram seems unused, maybe it's actually a mirror meaning this would be the correct tilemap sizes
-// m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(patapata_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(patapata_state::pagescan),this), 16, 16, 1024/2,16*2);
-// m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(patapata_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(patapata_state::pagescan),this), 16, 16, 1024/2,16*2);
+// m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(patapata_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(patapata_state::pagescan)), 16, 16, 1024/2, 16*2);
+// m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(patapata_state::get_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(patapata_state::pagescan)), 16, 16, 1024/2, 16*2);
 
 	m_fg_tilemap->set_transparent_pen(0xf);
 

@@ -35,6 +35,7 @@
 
 #include "emu.h"
 #include "multipcm.h"
+#include "wavwrite.h"
 
 ALLOW_SAVE_TYPE(multipcm_device::state_t); // allow save_item on a non-fundamental type
 
@@ -368,6 +369,10 @@ void multipcm_device::write_slot(slot_t &slot, int32_t reg, uint8_t data)
 				envelope_generator_calc(slot);
 				slot.m_envelope_gen.m_state = state_t::ATTACK;
 				slot.m_envelope_gen.m_volume = 0;
+
+#if MULTIPCM_LOG_SAMPLES
+				dump_sample(slot);
+#endif
 			}
 			else
 			{
@@ -570,23 +575,23 @@ void multipcm_device::device_start()
 	save_item(NAME(m_address));
 
 	// Slots
-	m_slots = make_unique_clear<slot_t[]>(28);
+	m_slots = make_unique_clear<slot_t []>(28);
+
+	save_pointer(STRUCT_MEMBER(m_slots, m_regs), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_playing), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_base), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_offset), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_step), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_pan), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_total_level), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_dest_total_level), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_total_level_step), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_prev_sample), 28);
+
 	for (int32_t slot = 0; slot < 28; ++slot)
 	{
-		m_slots[slot].m_slot_index = slot;
 		m_slots[slot].m_playing = false;
 
-		save_item(NAME(m_slots[slot].m_slot_index), slot);
-		save_item(NAME(m_slots[slot].m_regs), slot);
-		save_item(NAME(m_slots[slot].m_playing), slot);
-		save_item(NAME(m_slots[slot].m_base), slot);
-		save_item(NAME(m_slots[slot].m_offset), slot);
-		save_item(NAME(m_slots[slot].m_step), slot);
-		save_item(NAME(m_slots[slot].m_pan), slot);
-		save_item(NAME(m_slots[slot].m_total_level), slot);
-		save_item(NAME(m_slots[slot].m_dest_total_level), slot);
-		save_item(NAME(m_slots[slot].m_total_level_step), slot);
-		save_item(NAME(m_slots[slot].m_prev_sample), slot);
 		save_item(NAME(m_slots[slot].m_envelope_gen.m_volume), slot);
 		save_item(NAME(m_slots[slot].m_envelope_gen.m_state), slot);
 		save_item(NAME(m_slots[slot].m_envelope_gen.step), slot);
@@ -638,6 +643,38 @@ int16_t multipcm_device::clamp_to_int16(int32_t value)
 	}
 	return (int16_t)value;
 }
+
+#if MULTIPCM_LOG_SAMPLES
+void multipcm_device::dump_sample(slot_t &slot)
+{
+	if (m_logged_map[slot.m_base])
+		return;
+
+	m_logged_map[slot.m_base] = true;
+
+	char filebuf[256];
+	snprintf(filebuf, 256, "multipcm%08x.wav", slot.m_base);
+	wav_file *file = wav_open(filebuf, m_stream->sample_rate(), 1);
+	if (file == nullptr)
+		return;
+
+	uint32_t offset = slot.m_offset;
+	bool done = false;
+	while (!done)
+	{
+		int16_t sample = (int16_t) (read_byte(slot.m_base + (offset >> TL_SHIFT)) << 8);
+		wav_add_data_16(file, &sample, 1);
+
+		offset += 1 << TL_SHIFT;
+		if (offset >= (slot.m_sample.m_end << TL_SHIFT))
+		{
+			done = true;
+		}
+	}
+
+	wav_close(file);
+}
+#endif
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update

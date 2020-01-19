@@ -36,7 +36,7 @@ bool xbox_base_state::find_bios_hash(int bios, uint32_t &crc32)
 	{
 		if (ROMENTRY_ISFILE(re))
 		{
-			if (ROM_GETBIOSFLAGS(re) == (bios + 1))
+			if (ROM_GETBIOSFLAGS(re) == (uint32_t)(bios + 1))
 			{
 				const std::string &h = re.hashdata();
 				util::hash_collection hc(h.c_str());
@@ -856,7 +856,7 @@ void xbox_base_state::xbox_base(machine_config &config)
 	PENTIUM3(config, m_maincpu, 733333333); /* Wrong! family 6 model 8 stepping 10 */
 	m_maincpu->set_irq_acknowledge_callback(FUNC(xbox_base_state::irq_callback));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	PCI_ROOT(config,        ":pci", 0);
 	NV2A_HOST(config,       ":pci:00.0", 0, m_maincpu);

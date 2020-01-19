@@ -157,6 +157,8 @@ private:
 	required_device<floppy_connector> m_floppy0;
 	floppy_image_device *m_floppy;
 
+	std::unique_ptr<uint16_t[]> m_mainram;
+
 //declarations
 	// screen
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -180,6 +182,8 @@ private:
 	// mem map stuff
 	DECLARE_READ16_MEMBER(iop_r);
 	DECLARE_WRITE16_MEMBER(iop_w);
+	uint16_t ep_mainram_r(offs_t offset, uint16_t mem_mask);
+	void ep_mainram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	//variables
 	//  IPConReg
 	uint8_t m_BootSeqDone;
@@ -287,8 +291,8 @@ uint32_t notetaker_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 #ifdef DEBUG_VIDEO
 	logerror("Video Base = 0x%05x\n", video_base);
 #endif
-	const uint16_t *video_ram_field1 = (uint16_t *)(memregion("mainram")->base()+video_base);
-	const uint16_t *video_ram_field2 = (uint16_t *)(memregion("mainram")->base()+video_base+0x4B00);
+	const uint16_t *video_ram_field1 = &m_mainram[video_base/2];
+	const uint16_t *video_ram_field2 = &m_mainram[(video_base+0x4B00)/2];
 
 	for (y = 0; y < 480; y++)
 	{
@@ -492,7 +496,7 @@ READ16_MEMBER(notetaker_state::iop_r)
 {
 	uint16_t *rom = (uint16_t *)(memregion("iop")->base());
 	rom += 0x7f800;
-	uint16_t *ram = (uint16_t *)(memregion("mainram")->base());
+	uint16_t *ram = m_mainram.get();
 	if ( (m_BootSeqDone == 0) || ((m_DisableROM == 0) && ((offset&0x7F800) == 0)) )
 	{
 		rom += (offset&0x7FF);
@@ -510,7 +514,7 @@ READ16_MEMBER(notetaker_state::iop_r)
 WRITE16_MEMBER(notetaker_state::iop_w)
 {
 	//uint16_t tempword;
-	uint16_t *ram = (uint16_t *)(memregion("mainram")->base());
+	uint16_t *ram = m_mainram.get();
 	if ( (m_BootSeqDone == 0) || ((m_DisableROM == 0) && ((offset&0x7F800) == 0)) )
 	{
 		logerror("attempt to write %04X to ROM-mapped area at %06X ignored\n", data, offset<<1);
@@ -549,7 +553,7 @@ void notetaker_state::iop_mem(address_map &map)
 {
 	/*
 	map(0x00000, 0x00fff).rom().region("iop", 0xff000); // rom is here if either BootSeqDone OR DisableROM are zero. the 1.5 source code and the schematics implies writes here are ignored while rom is enabled; if disablerom is 1 this goes to mainram
-	map(0x01000, 0x3ffff).ram().region("mainram", 0); // 256k of ram (less 8k), shared between both processors. rom goes here if bootseqdone is 0
+	map(0x01000, 0x3ffff).ram().share("mainram"); // 256k of ram (less 8k), shared between both processors. rom goes here if bootseqdone is 0
 	// note 4000-d5ff is the framebuffer for the screen, in two sets of fields for odd/even interlace?
 	map(0xff000, 0xfffe7).rom().region("iop", 0xff000); // rom is only banked in here if bootseqdone is 0, so the reset vector is in the proper place. otherwise the memory control regs live at fffe8-fffef
 	//map(0xfffea, 0xfffeb).w(FUNC(notetaker_state::cpuCtl_w));
@@ -706,10 +710,20 @@ x   x   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   0   
 x   x   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   1   x    x                       R   FFFEE (Parity Error Address: row bits 15-8, column bits 7-0; reading this also acknowledges a parity interrupt)
 */
 
+uint16_t notetaker_state::ep_mainram_r(offs_t offset, u16 mem_mask)
+{
+	return m_mainram[offset + 0x2000/2];
+}
+
+void notetaker_state::ep_mainram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_mainram[offset + 0x2000/2]);
+}
+
 void notetaker_state::ep_mem(address_map &map)
 {
 	map(0x00000, 0x01fff).mirror(0xc0000).ram(); // actually a banked block of ram, 8kb (4kw)
-	map(0x02000, 0x3ffff).mirror(0xc0000).ram().region("mainram", 0x2000); // 256k of ram (less 8k), shared between both processors, mirrored 4 times
+	map(0x02000, 0x3ffff).mirror(0xc0000).rw(FUNC(notetaker_state::ep_mainram_r), FUNC(notetaker_state::ep_mainram_w)); // 256k of ram (less 8k), shared between both processors, mirrored 4 times
 	//map(0xfffc0, 0xfffdf).mirror(0xc0000).rw(FUNC(notetaker_state::proc_illinst_r), FUNC(notetaker_state::proc_illinst_w));
 	//map(0xfffe0, 0xfffef).mirror(0xc0000).rw(FUNC(notetaker_state::proc_control_r), FUNC(notetaker_state::proc_control_w));
 }
@@ -747,6 +761,8 @@ static void notetaker_floppies(device_slot_interface &device)
 /* Machine Start; allocate timers and savestate stuff */
 void notetaker_state::machine_start()
 {
+	// allocate RAM
+	m_mainram = make_unique_clear<uint16_t[]>(0x100000/2);
 	// allocate the DAC timer, and set it to fire NEVER. We'll set it up properly in IPReset.
 	m_FIFO_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(notetaker_state::timer_fifoclk),this));
 	m_FIFO_timer->adjust(attotime::never);
@@ -915,7 +931,7 @@ ROM_START( notetakr )
 	ROMX_LOAD( "z-iop_1.50_hi.h1", 0x0000, 0x0800, CRC(122ffb5b) SHA1(b957fe24620e1aa98b3158dbcf459937dbd54bac), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD( "z-iop_1.50_lo.g1", 0x0001, 0x0800, CRC(2cb79a67) SHA1(692aafd2aeea27533f6288dbb1cb8678ea08fade), ROM_SKIP(1) | ROM_BIOS(1))
 	ROM_REGION( 0x100000, "iop", ROMREGION_ERASEFF ) // area for descrambled roms
-	ROM_REGION( 0x100000, "mainram", ROMREGION_ERASEFF ) // main ram, on 2 cards with parity/ecc/syndrome/timing/bus arbitration on another 2 cards
+	// main ram, on 2 cards with parity/ecc/syndrome/timing/bus arbitration on another 2 cards
 	ROM_REGION( 0x400, "kbmcu", ROMREGION_ERASEFF )
 	ROM_LOAD( "keyboard.i8748.a10a", 0x000, 0x400, NO_DUMP ) // keyboard mcu which handles key scanning as well as reading the mouse quadratures, and issues state responses if requested by the iop
 	ROM_REGION( 0x500, "proms", ROMREGION_ERASEFF )

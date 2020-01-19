@@ -661,7 +661,7 @@ void twin16_state::twin16(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(3'579'545));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &twin16_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -703,7 +703,7 @@ void twin16_state::twin16(machine_config &config)
 void twin16_state::devilw(machine_config &config)
 {
 	twin16(config);
-	config.m_minimum_quantum = attotime::from_hz(60000); // watchdog reset otherwise
+	config.set_maximum_quantum(attotime::from_hz(60000)); // watchdog reset otherwise
 }
 
 void fround_state::fround(machine_config &config)
@@ -715,7 +715,7 @@ void fround_state::fround(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(3'579'545));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fround_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -1255,7 +1255,7 @@ void cuebrickj_state::init_cuebrickj()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	space.install_readwrite_bank(0x0b0000, 0x0b03ff, "nvrambank");
-	space.install_write_handler( 0x0b0400, 0x0b0401, WRITE8_DELEGATE(cuebrickj_state, nvram_bank_w), 0xff00);
+	space.install_write_handler( 0x0b0400, 0x0b0401, write8_delegate(*this, FUNC(cuebrickj_state::nvram_bank_w)), 0xff00);
 
 	membank("nvrambank")->configure_entries(0, 0x20, m_nvram, 0x400);
 

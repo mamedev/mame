@@ -13,6 +13,7 @@ ______|___________|______
       |Skateboard |Skateboard-shaped motion controller
       |Basketball |Ball-shaped motion controller
       |Dodgeball  |Motion controller
+      |Baseball   |Baseball Bat shaped motion controller
 -->
 
 <softwarelist name="tvgogo" description="Toyquest TV Go Go cartridges">

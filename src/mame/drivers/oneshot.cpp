@@ -114,6 +114,14 @@ For One Shot One Kill:
  chip appears to be unpopulated for One Shot One Kill.
  The ROM board for One Shot One Kill has 8 additional logic chips along the front edge of the PCB
 
+For Mad Donna:
+ At least one PCB (in an eBay auction) has shown original ROM labels as:
+  MADDONNA
+  TMAD_B15  (B15 being the PCB location of ROM)
+  160595    (Date, IE: May 16th, 1995)
+
+ It has NOT be verified as to which set this corresponds to or if this set had been dumped.
+
 Clock measurements:
  SCN68000C8N64: 12MHz
      Z8400A PS: 3.375MHz (27MHz/8)

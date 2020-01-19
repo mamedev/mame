@@ -90,6 +90,7 @@
 
 #include "emu.h"
 #include "cpu/t11/t11.h"
+#include "cpu/i86/i186.h"
 #include "machine/terminal.h"
 #include "machine/rx01.h"
 
@@ -106,6 +107,7 @@ public:
 	void pdp11ub2(machine_config &config);
 	void pdp11(machine_config &config);
 	void pdp11qb(machine_config &config);
+	void sms1000(machine_config &config);
 
 private:
 	required_device<t11_device> m_maincpu;
@@ -121,6 +123,7 @@ private:
 	void load9312prom(uint8_t *desc, uint8_t *src, int size);
 	void pdp11_mem(address_map &map);
 	void pdp11qb_mem(address_map &map);
+	void sms1000_mem_188(address_map &map);
 };
 
 READ16_MEMBER(pdp11_state::teletype_ctrl_r)
@@ -177,6 +180,16 @@ void pdp11_state::pdp11qb_mem(address_map &map)
 	map(0x0000, 0xe9ff).ram();  // RAM
 	map(0xea00, 0xefff).rom();
 	map(0xf000, 0xffff).ram();
+}
+
+void pdp11_state::sms1000_mem_188(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x027ff).ram();
+	map(0x03000, 0x037ff).rom().region("prom", 0);
+	map(0x40000, 0x47fff).rom().region("subcpu", 0);
+	map(0x50000, 0x5ffff).nopr();
+	map(0xf8000, 0xfffff).rom().region("subcpu", 0);
 }
 
 #define M9312_PORT_CONFSETTING \
@@ -382,6 +395,14 @@ void pdp11_state::pdp11qb(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pdp11_state::pdp11qb_mem);
 }
 
+void pdp11_state::sms1000(machine_config &config)
+{
+	pdp11qb(config);
+
+	i80188_cpu_device &subcpu(I80188(config, "subcpu", 12.288_MHz_XTAL));
+	subcpu.set_addrmap(AS_PROGRAM, &pdp11_state::sms1000_mem_188);
+}
+
 /* ROM definition */
 ROM_START( pdp11ub )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -442,12 +463,17 @@ ROM_END
 
 ROM_START( sms1000 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_REGION( 0x20000, "user1", ROMREGION_ERASEFF )
-	ROM_LOAD( "21251000u",    0x00000, 0x008000, CRC(68db0afc) SHA1(577124bc64f6ddc9771e11b483120a175bfcf8c5) )
 	ROM_LOAD( "21251001u",    0x00000, 0x010000, CRC(eec3ccbb) SHA1(69eedb2c3bffe0a2988b1c066df1fea195618087) )
+
+	ROM_REGION( 0x8000, "subcpu", 0 )
+	ROM_LOAD( "21251000u",    0x00000, 0x008000, CRC(68db0afc) SHA1(577124bc64f6ddc9771e11b483120a175bfcf8c5) )
+
+	ROM_REGION( 0x800, "prom", 0 )
 	ROM_LOAD( "21251002u",    0x00000, 0x000800, CRC(66ca0eaf) SHA1(8141f64f81d9954169bcff6c79fd9f85e91f98e0) )
+
+	ROM_REGION( 0x20000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "2123001",      0x00000, 0x000800, CRC(7eb10e9b) SHA1(521ce8b8a79075c30ad92d810141c725d26fc50e) )
-	ROM_LOAD( "2115001.jed",  0x00000, 0x000b19, CRC(02170f78) SHA1(afe50d165b39bff1cadae4290344341376729fda) )
+	ROM_LOAD( "2115001.jed",  0x01000, 0x000b19, CRC(02170f78) SHA1(afe50d165b39bff1cadae4290344341376729fda) )
 	// no idea how large these undumped proms are
 	ROM_LOAD( "2096001",      0x1f000, 0x000100, NO_DUMP )
 	ROM_LOAD( "2097002",      0x1f000, 0x000100, NO_DUMP )
@@ -477,4 +503,4 @@ ROM_END
 COMP( ????, pdp11ub,  0,       0,      pdp11,    pdp11, pdp11_state, empty_init, "Digital Equipment Corporation", "PDP-11 [Unibus](M9301-YA)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP( ????, pdp11ub2, pdp11ub, 0,      pdp11ub2, pdp11, pdp11_state, empty_init, "Digital Equipment Corporation", "PDP-11 [Unibus](M9312)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP( ????, pdp11qb,  pdp11ub, 0,      pdp11qb,  pdp11, pdp11_state, empty_init, "Digital Equipment Corporation", "PDP-11 [Q-BUS] (M7195 - MXV11)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1987, sms1000,  pdp11ub, 0,      pdp11qb,  pdp11, pdp11_state, empty_init, "Scientific Micro Systems",      "SMS-1000",                       MACHINE_IS_SKELETON )
+COMP( 1987, sms1000,  0,       0,      sms1000,  pdp11, pdp11_state, empty_init, "Scientific Micro Systems",      "SMS-1000",                       MACHINE_IS_SKELETON )

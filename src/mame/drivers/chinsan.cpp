@@ -468,7 +468,7 @@ WRITE8_MEMBER( chinsan_state::ctrl_w )
 
 void chinsan_state::machine_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chinsan_state::tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chinsan_state::tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_bank1->configure_entries(0, 4, memregion("maincpu")->base() + 0x8000, 0x4000);
 

@@ -180,7 +180,7 @@ void pgm_arm_type2_state::init_kov2()
 	kov2_latch_init();
 
 	// we only have a HK internal ROM dumped for now, allow us to override that for debugging purposes.
-	m_prot->space(AS_PROGRAM).install_write_handler(0x48000138, 0x4800013b, write32s_delegate(FUNC(pgm_arm_type2_state::kov2_arm_region_w),this));
+	m_prot->space(AS_PROGRAM).install_write_handler(0x48000138, 0x4800013b, write32s_delegate(*this, FUNC(pgm_arm_type2_state::kov2_arm_region_w)));
 }
 
 
@@ -194,7 +194,7 @@ void pgm_arm_type2_state::init_kov2p()
 	kov2_latch_init();
 
 	// we only have a China internal ROM dumped for now, allow us to override that for debugging purposes.
-	m_prot->space(AS_PROGRAM).install_write_handler(0x48000138, 0x4800013b, write32s_delegate(FUNC(pgm_arm_type2_state::kov2p_arm_region_w),this));
+	m_prot->space(AS_PROGRAM).install_write_handler(0x48000138, 0x4800013b, write32s_delegate(*this, FUNC(pgm_arm_type2_state::kov2p_arm_region_w)));
 }
 
 void pgm_arm_type2_state::martmast_arm_region_w(offs_t offset, u32 data, u32 mem_mask)
@@ -213,7 +213,7 @@ void pgm_arm_type2_state::init_martmast()
 	kov2_latch_init();
 
 	// we only have a USA / CHINA internal ROMs dumped for now, allow us to override that for debugging purposes.
-	m_prot->space(AS_PROGRAM).install_write_handler(0x48000138, 0x4800013b, write32s_delegate(FUNC(pgm_arm_type2_state::martmast_arm_region_w),this));
+	m_prot->space(AS_PROGRAM).install_write_handler(0x48000138, 0x4800013b, write32s_delegate(*this, FUNC(pgm_arm_type2_state::martmast_arm_region_w)));
 }
 
 
@@ -256,8 +256,8 @@ void pgm_arm_type2_state::init_ddp2()
 	pgm_ddp2_decrypt(machine());
 	kov2_latch_init();
 
-	m_prot->space(AS_PROGRAM).install_read_handler(0x1800300c, 0x1800300f, read32_delegate(FUNC(pgm_arm_type2_state::ddp2_speedup_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80ee54, 0x80ee55, read16_delegate(FUNC(pgm_arm_type2_state::ddp2_main_speedup_r),this));
+	m_prot->space(AS_PROGRAM).install_read_handler(0x1800300c, 0x1800300f, read32_delegate(*this, FUNC(pgm_arm_type2_state::ddp2_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80ee54, 0x80ee55, read16_delegate(*this, FUNC(pgm_arm_type2_state::ddp2_main_speedup_r)));
 }
 
 

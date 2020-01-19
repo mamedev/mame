@@ -807,9 +807,9 @@ WRITE_LINE_MEMBER( abc1600_state::nmi_w )
 void abc1600_state::cpu_space_map(address_map &map)
 {
 	map(0xffff0, 0xfffff).m(m_maincpu, FUNC(m68008_device::autovectors_map));
-	map(0xffff5, 0xffff5).lr8("cio int", [this]() -> u8 { return m_cio->intack_r(); });
-	map(0xffffb, 0xffffb).lr8("dart int", [this]() -> u8 { return m_dart->m1_r(); });
-	map(0xfffff, 0xfffff).lr8("nmi int", [this]() -> u8 { m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE); return m68008_device::autovector(7); });
+	map(0xffff5, 0xffff5).lr8(NAME([this]() -> u8 { return m_cio->intack_r(); }));
+	map(0xffffb, 0xffffb).lr8(NAME([this]() -> u8 { return m_dart->m1_r(); }));
+	map(0xfffff, 0xfffff).lr8(NAME([this]() -> u8 { m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE); return m68008_device::autovector(7); }));
 }
 
 void abc1600_state::machine_start()

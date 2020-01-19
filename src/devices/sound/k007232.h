@@ -38,9 +38,11 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-	void KDAC_A_make_fncode();
+	void make_fncodes();
 
 private:
+	uint32_t get_start_address(int channel);
+
 	static constexpr unsigned KDAC_A_PCM_MAX = 2;      /* Channels per chip */
 
 	// internal state
@@ -51,15 +53,15 @@ private:
 	uint32_t          m_start[KDAC_A_PCM_MAX];
 	uint32_t          m_step[KDAC_A_PCM_MAX];
 	uint32_t          m_bank[KDAC_A_PCM_MAX];
-	int             m_play[KDAC_A_PCM_MAX];
+	int               m_play[KDAC_A_PCM_MAX];
 
 	uint8_t           m_wreg[0x10]; /* write data */
 
 	uint32_t          m_pcmlimit;
 
-	sound_stream *  m_stream;
+	sound_stream *    m_stream;
 	uint32_t          m_fncode[0x200];
-	devcb_write8 m_port_write_handler;
+	devcb_write8      m_port_write_handler;
 };
 
 DECLARE_DEVICE_TYPE(K007232, k007232_device)

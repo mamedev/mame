@@ -153,7 +153,7 @@ void unistar_state::unistar(machine_config &config)
 
 	i8275_device &crtc(I8275(config, "crtc", 20_MHz_XTAL / 9));
 	crtc.set_character_width(9);
-	crtc.set_display_callback(FUNC(unistar_state::draw_character), this);
+	crtc.set_display_callback(FUNC(unistar_state::draw_character));
 	crtc.set_screen("screen");
 	crtc.drq_wr_callback().set("dmac", FUNC(am9517a_device::dreq2_w));
 	crtc.irq_wr_callback().set("rst75", FUNC(input_merger_device::in_w<0>));

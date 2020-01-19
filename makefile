@@ -24,6 +24,7 @@
 # BENCHMARKS = 1
 # OSD = sdl
 
+# NO_OPENGL = 0
 # USE_DISPATCH_GL = 0
 # MODERN_WIN_API = 0
 # DIRECTINPUT = 7
@@ -292,6 +293,21 @@ else
 UNAME    := $(shell uname -mps)
 TARGETOS := $(OS)
 
+#-------------------------------------------------
+# determine the whether -m32, -m64 or nothing
+# should be passed to gcc when building genie
+#-------------------------------------------------
+
+ifeq ($(ARCHITECTURE),_x86)
+MPARAM := -m32
+else
+ifeq ($(ARCHITECTURE),_x64)
+MPARAM := -m64
+else
+MPARAM :=
+endif
+endif
+
 ARCHITECTURE := _x86
 
 ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
@@ -403,21 +419,6 @@ endif
 CC := $(SILENT)gcc
 LD := $(SILENT)g++
 CXX:= $(SILENT)g++
-
-#-------------------------------------------------
-# determine the whether -m32, -m64 or nothing
-# should be passed to gcc when building genie
-#-------------------------------------------------
-
-ifeq ($(ARCHITECTURE),_x86)
-MPARAM := -m32
-else
-ifeq ($(ARCHITECTURE),_x64)
-MPARAM := -m64
-else
-MPARAM :=
-endif
-endif
 
 #-------------------------------------------------
 # specify OSD layer: windows, sdl, etc.
@@ -711,6 +712,10 @@ endif
 
 ifdef DONT_USE_NETWORK
 PARAMS += --DONT_USE_NETWORK='$(DONT_USE_NETWORK)'
+endif
+
+ifdef NO_OPENGL
+PARAMS += --NO_OPENGL='$(NO_OPENGL)'
 endif
 
 ifdef USE_DISPATCH_GL
@@ -1699,14 +1704,14 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.214"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.217"' > $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char build_version[];' >> $@
 	@echo 'const char bare_build_version[] = BARE_BUILD_VERSION;' >> $@
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " ($(NEW_GIT_VERSION))";' >> $@
 else
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo #define BARE_BUILD_VERSION "0.214" > $@
+	@echo #define BARE_BUILD_VERSION "0.217" > $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char build_version[]; >> $@
 	@echo const char bare_build_version[] = BARE_BUILD_VERSION; >> $@

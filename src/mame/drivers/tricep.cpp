@@ -67,7 +67,7 @@ void tricep_state::tricep_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x0007ffff).ram().share("p_ram");
-	map(0x00fd0000, 0x00fd1fff).rom().region("user1", 0);
+	map(0x00fd0000, 0x00fd1fff).rom().region("bios", 0);
 	map(0x00ff0028, 0x00ff002b).rw(FUNC(tricep_state::usart_r), FUNC(tricep_state::usart_w));
 	map(0x00ff002e, 0x00ff002f).nopr();
 	map(0x00ff002f, 0x00ff002f).w(FUNC(tricep_state::usart_select_w));
@@ -80,9 +80,9 @@ INPUT_PORTS_END
 
 void tricep_state::machine_reset()
 {
-	uint8_t* user1 = memregion("user1")->base();
+	uint8_t* bios = memregion("bios")->base();
 
-	memcpy((uint8_t*)m_p_ram.target(),user1,0x2000);
+	memcpy((uint8_t*)m_p_ram.target(),bios,0x2000);
 
 	m_maincpu->reset();
 
@@ -125,9 +125,9 @@ void tricep_state::tricep(machine_config &config)
 
 /* ROM definition */
 ROM_START( tricep )
-	ROM_REGION( 0x2000, "user1", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "tri2.4_odd.u37",  0x0000, 0x1000, CRC(31eb2dcf) SHA1(2d9df9262ee1096d0398505e10d209201ac49a5d))
-	ROM_LOAD16_BYTE( "tri2.4_even.u36", 0x0001, 0x1000, CRC(4414dcdc) SHA1(00a3d293617dc691748ae85b6ccdd6723daefc0a))
+	ROM_REGION16_BE( 0x2000, "bios", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "tri2.4_odd.u37",  0x0001, 0x1000, CRC(31eb2dcf) SHA1(2d9df9262ee1096d0398505e10d209201ac49a5d))
+	ROM_LOAD16_BYTE( "tri2.4_even.u36", 0x0000, 0x1000, CRC(4414dcdc) SHA1(00a3d293617dc691748ae85b6ccdd6723daefc0a))
 ROM_END
 
 /* Driver */

@@ -427,7 +427,7 @@ void progolf_state::progolf(machine_config &config)
 	M6502(config, m_audiocpu, 500000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &progolf_state::sound_cpu);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
 	soundlatch.data_pending_callback().set_inputline(m_audiocpu, 0);

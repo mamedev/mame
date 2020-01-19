@@ -197,14 +197,14 @@ void model3_state::video_start()
 
 	m_vid_reg0 = 0;
 
-	m_layer4[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(model3_state::tile_info_layer0_4bit), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_layer8[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(model3_state::tile_info_layer0_8bit), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_layer4[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(model3_state::tile_info_layer1_4bit), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_layer8[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(model3_state::tile_info_layer1_8bit), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_layer4[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(model3_state::tile_info_layer2_4bit), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_layer8[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(model3_state::tile_info_layer2_8bit), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_layer4[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(model3_state::tile_info_layer3_4bit), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_layer8[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(model3_state::tile_info_layer3_8bit), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_layer4[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(model3_state::tile_info_layer0_4bit)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_layer8[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(model3_state::tile_info_layer0_8bit)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_layer4[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(model3_state::tile_info_layer1_4bit)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_layer8[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(model3_state::tile_info_layer1_8bit)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_layer4[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(model3_state::tile_info_layer2_4bit)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_layer8[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(model3_state::tile_info_layer2_8bit)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_layer4[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(model3_state::tile_info_layer3_4bit)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_layer8[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(model3_state::tile_info_layer3_8bit)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	// 4-bit tiles
 	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, char4_layout, (uint8_t*)m_m3_char_ram.get(), 0, m_palette->entries() / 16, 0));

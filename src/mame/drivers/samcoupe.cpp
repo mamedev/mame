@@ -236,6 +236,10 @@ READ8_MEMBER(samcoupe_state::samcoupe_keyboard_r)
 	/* bit 7, external memory */
 	data |= 1 << 7;
 
+	/* joysticks */
+	if (!BIT(offset, 12)) data &= m_joy1->read() | (0xff ^ 0x1f);
+	if (!BIT(offset, 11)) data &= m_joy2->read() | (0xff ^ 0x1f);
+
 	return data;
 }
 
@@ -458,6 +462,24 @@ static INPUT_PORTS_START( samcoupe )
 	PORT_CONFNAME(0x01, 0x00, "Real Time Clock")
 	PORT_CONFSETTING(   0x00, DEF_STR(None))
 	PORT_CONFSETTING(   0x01, "SAMBUS")
+
+	/* Sam Coupe has single 9-pin ATARI-compatible connector but supports 2 joysticks via a splitter,
+	   this works by using a different ground for each stick (pin 8: stick 1 gnd, pin 9: stick 2 gnd.)
+	   Joysticks overlay number keys 6-0 for the stick 1 and 1-5 for stick 2 (same scheme as ZX Spectrum) */
+
+	PORT_START("joy_1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_8WAY PORT_PLAYER(1)
+
+	PORT_START("joy_2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(2)
 INPUT_PORTS_END
 
 

@@ -25,6 +25,7 @@ adc1038_device::adc1038_device(const machine_config &mconfig, const char *tag, d
 	, m_adc_data(0)
 	, m_sars(0)
 	, m_gticlub_hack(false)
+	, m_input_cb(*this)
 {
 }
 
@@ -34,7 +35,7 @@ adc1038_device::adc1038_device(const machine_config &mconfig, const char *tag, d
 
 void adc1038_device::device_start()
 {
-	m_input_cb.bind_relative_to(*owner());
+	m_input_cb.resolve();
 
 	save_item(NAME(m_cycle));
 	save_item(NAME(m_clk));

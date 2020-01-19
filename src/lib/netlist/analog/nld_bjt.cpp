@@ -1,105 +1,100 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_bjt.c
- *
- */
 
 #include "netlist/solver/nld_solver.h"
 #include "netlist/nl_setup.h"
 #include "nlid_twoterm.h"
 
-
-#include <cmath>
-
 namespace netlist
 {
 namespace analog
 {
-	using constants = plib::constants<nl_double>;
-
 	class diode
 	{
 	public:
-		diode() : m_Is(1e-15), m_VT(0.0258), m_VT_inv(1.0 / m_VT) {}
-		diode(const nl_double Is, const nl_double n)
+		diode()
+		: m_Is(nlconst::magic(1e-15))
+		, m_VT(nlconst::magic(0.0258))
+		, m_VT_inv(plib::reciprocal(m_VT))
+		{}
+
+		diode(nl_fptype Is, nl_fptype n)
 		{
 			m_Is = Is;
-			m_VT = 0.0258 * n;
-			m_VT_inv = 1.0 / m_VT;
+			m_VT = nlconst::magic(0.0258) * n;
+			m_VT_inv = plib::reciprocal(m_VT);
 		}
-		void set(const nl_double Is, const nl_double n)
+		void set(nl_fptype Is, nl_fptype n) noexcept
 		{
 			m_Is = Is;
-			m_VT = 0.0258 * n;
-			m_VT_inv = 1.0 / m_VT;
+			m_VT = nlconst::magic(0.0258) * n;
+			m_VT_inv = plib::reciprocal(m_VT);
 		}
-		nl_double I(const nl_double V) const { return m_Is * std::exp(V * m_VT_inv) - m_Is; }
-		nl_double g(const nl_double V) const { return m_Is * m_VT_inv * std::exp(V * m_VT_inv); }
-		nl_double V(const nl_double I) const { return std::log1p(I / m_Is) * m_VT; } // log1p(x)=log(1.0 + x)
-		nl_double gI(const nl_double I) const { return m_VT_inv * (I + m_Is); }
+		nl_fptype I(nl_fptype V) const noexcept { return m_Is * plib::exp(V * m_VT_inv) - m_Is; }
+		nl_fptype g(nl_fptype V) const noexcept { return m_Is * m_VT_inv * plib::exp(V * m_VT_inv); }
+		nl_fptype V(nl_fptype I) const noexcept { return plib::log1p(I / m_Is) * m_VT; } // log1p(x)=log(1.0 + x)
+		nl_fptype gI(nl_fptype I) const noexcept { return m_VT_inv * (I + m_Is); }
 
 	private:
-		nl_double m_Is;
-		nl_double m_VT;
-		nl_double m_VT_inv;
+		nl_fptype m_Is;
+		nl_fptype m_VT;
+		nl_fptype m_VT_inv;
 	};
 
 	// -----------------------------------------------------------------------------
 	// nld_Q - Base classes
 	// -----------------------------------------------------------------------------
 
-	/*! Class representing the bjt model parameters.
-	 *
-	 *  This is the model representation of the bjt model. Typically, SPICE uses
-	 *  the following parameters. A "Y" in the first column indicates that the
-	 *  parameter is actually used in netlist.
-	 *
-	 * | NL? | name | parameter                                                             | units |  default |         example | area |
-	 * |:---:|------|-----------------------------------------------------------------------|-------|---------:|----------------:|:----:|
-	 * |  Y  | IS   | transport saturation current                                          | A     |   1E-016 |          1E-015 |   *  |
-	 * |  Y  | BF   | ideal maximum forward beta                                            | -     |      100 |             100 |      |
-	 * |  Y  | NF   | forward current emission coefficient                                  | -     |        1 |               1 |      |
-	 * |     | VAF  | forward Early voltage                                                 | V     | infinite |             200 |      |
-	 * |     | IKF  | corner for forward beta high current roll-off                         | A     | infinite |            0.01 |   *  |
-	 * |     | ISE  | B-E leakage saturation current                                        | A     |        0 | 0.0000000000001 |   *  |
-	 * |     | NE   | B-E leakage emission coefficient                                      | -     |      1.5 |               2 |      |
-	 * |  Y  | BR   | ideal maximum reverse beta                                            | -     |        1 |             0.1 |      |
-	 * |  Y  | NR   | reverse current emission coefficient                                  | -     |        1 |               1 |      |
-	 * |     | VAR  | reverse Early voltage                                                 | V     | infinite |             200 |      |
-	 * |     | IKR  | corner for reverse beta high current roll-off                         | A     | infinite |            0.01 |   *  |
-	 * |     | ISC  | leakage saturation current                                            | A     |        0 |               8 |      |
-	 * |     | NC   | leakage emission coefficient                                          | -     |        2 |             1.5 |      |
-	 * |     | RB   | zero bias base resistance                                             |       |        0 |             100 |   *  |
-	 * |     | IRB  | current where base resistance falls halfway to its min value          | A     | infinite |             0.1 |   *  |
-	 * |     | RBM  | minimum base resistance at high currents                              |       |       RB |              10 |   *  |
-	 * |     | RE   | emitter resistance                                                    |       |        0 |               1 |   *  |
-	 * |     | RC   | collector resistance                                                  |       |        0 |              10 |   *  |
-	 * |  Y  | CJE  | B-E zero-bias depletion capacitance                                   | F     |        0 |             2pF |   *  |
-	 * |     | VJE  | B-E built-in potential                                                | V     |     0.75 |             0.6 |      |
-	 * |     | MJE  | B-E junction exponential factor                                       | -     |     0.33 |            0.33 |      |
-	 * |     | TF   | ideal forward transit time                                            | sec   |        0 |           0.1ns |      |
-	 * |     | XTF  | coefficient for bias dependence of TF                                 | -     |        0 |                 |      |
-	 * |     | VTF  | voltage describing VBC  dependence of TF                              | V     | infinite |                 |      |
-	 * |     | ITF  | high-current parameter  for effect on TF                              | A     |        0 |                 |   *  |
-	 * |     | PTF  | excess phase at freq=1.0/(TF*2PI) Hz                                  | deg   |        0 |                 |      |
-	 * |  Y  | CJC  | B-C zero-bias depletion capacitance                                   | F     |        0 |             2pF |   *  |
-	 * |     | VJC  | B-C built-in potential                                                | V     |     0.75 |             0.5 |      |
-	 * |     | MJC  | B-C junction exponential factor                                       | -     |     0.33 |             0.5 |      |
-	 * |     | XCJC | fraction of B-C depletion capacitance connected to internal base node | -     |        1 |                 |      |
-	 * |     | TR   | ideal reverse transit time                                            | sec   |        0 |            10ns |      |
-	 * |     | CJS  | zero-bias collector-substrate capacitance                             | F     |        0 |             2pF |   *  |
-	 * |     | VJS  | substrate junction built-in potential                                 | V     |     0.75 |                 |      |
-	 * |     | MJS  | substrate junction exponential factor                                 | -     |        0 |             0.5 |      |
-	 * |     | XTB  | forward and reverse beta temperature exponent                         | -     |        0 |                 |      |
-	 * |     | EG   | energy gap for temperature effect on IS                               | eV    |     1.11 |                 |      |
-	 * |     | XTI  | temperature exponent for effect on IS                                 | -     |        3 |                 |      |
-	 * |     | KF   | flicker-noise coefficient                                             | -     |        0 |                 |      |
-	 * |     | AF   | flicker-noise exponent                                                | -     |        1 |                 |      |
-	 * |     | FC   | coefficient for forward-bias depletion capacitance formula            | -     |      0.5 |                 |      |
-	 * |     | TNOM | Parameter measurement temperature                                     | C     |       27 |              50 |      |
-	 * */
-
+	/// \brief Class representing the bjt model parameters.
+	///
+	///  This is the model representation of the bjt model. Typically, SPICE uses
+	///  the following parameters. A "Y" in the first column indicates that the
+	///  parameter is actually used in netlist.
+	///
+	/// | NL? | name | parameter                                                             | units |  default |         example | area |
+	/// |:---:|------|-----------------------------------------------------------------------|-------|---------:|----------------:|:----:|
+	/// |  Y  | IS   | transport saturation current                                          | A     |   1E-016 |          1E-015 |   *  |
+	/// |  Y  | BF   | ideal maximum forward beta                                            | -     |      100 |             100 |      |
+	/// |  Y  | NF   | forward current emission coefficient                                  | -     |        1 |               1 |      |
+	/// |     | VAF  | forward Early voltage                                                 | V     | infinite |             200 |      |
+	/// |     | IKF  | corner for forward beta high current roll-off                         | A     | infinite |            0.01 |   *  |
+	/// |     | ISE  | B-E leakage saturation current                                        | A     |        0 | 0.0000000000001 |   *  |
+	/// |     | NE   | B-E leakage emission coefficient                                      | -     |      1.5 |               2 |      |
+	/// |  Y  | BR   | ideal maximum reverse beta                                            | -     |        1 |             0.1 |      |
+	/// |  Y  | NR   | reverse current emission coefficient                                  | -     |        1 |               1 |      |
+	/// |     | VAR  | reverse Early voltage                                                 | V     | infinite |             200 |      |
+	/// |     | IKR  | corner for reverse beta high current roll-off                         | A     | infinite |            0.01 |   *  |
+	/// |     | ISC  | leakage saturation current                                            | A     |        0 |               8 |      |
+	/// |     | NC   | leakage emission coefficient                                          | -     |        2 |             1.5 |      |
+	/// |     | RB   | zero bias base resistance                                             |       |        0 |             100 |   *  |
+	/// |     | IRB  | current where base resistance falls halfway to its min value          | A     | infinite |             0.1 |   *  |
+	/// |     | RBM  | minimum base resistance at high currents                              |       |       RB |              10 |   *  |
+	/// |     | RE   | emitter resistance                                                    |       |        0 |               1 |   *  |
+	/// |     | RC   | collector resistance                                                  |       |        0 |              10 |   *  |
+	/// |  Y  | CJE  | B-E zero-bias depletion capacitance                                   | F     |        0 |             2pF |   *  |
+	/// |     | VJE  | B-E built-in potential                                                | V     |     0.75 |             0.6 |      |
+	/// |     | MJE  | B-E junction exponential factor                                       | -     |     0.33 |            0.33 |      |
+	/// |     | TF   | ideal forward transit time                                            | sec   |        0 |           0.1ns |      |
+	/// |     | XTF  | coefficient for bias dependence of TF                                 | -     |        0 |                 |      |
+	/// |     | VTF  | voltage describing VBC  dependence of TF                              | V     | infinite |                 |      |
+	/// |     | ITF  | high-current parameter  for effect on TF                              | A     |        0 |                 |   *  |
+	/// |     | PTF  | excess phase at freq=1.0/(TF*2PI) Hz                                  | deg   |        0 |                 |      |
+	/// |  Y  | CJC  | B-C zero-bias depletion capacitance                                   | F     |        0 |             2pF |   *  |
+	/// |     | VJC  | B-C built-in potential                                                | V     |     0.75 |             0.5 |      |
+	/// |     | MJC  | B-C junction exponential factor                                       | -     |     0.33 |             0.5 |      |
+	/// |     | XCJC | fraction of B-C depletion capacitance connected to internal base node | -     |        1 |                 |      |
+	/// |     | TR   | ideal reverse transit time                                            | sec   |        0 |            10ns |      |
+	/// |     | CJS  | zero-bias collector-substrate capacitance                             | F     |        0 |             2pF |   *  |
+	/// |     | VJS  | substrate junction built-in potential                                 | V     |     0.75 |                 |      |
+	/// |     | MJS  | substrate junction exponential factor                                 | -     |        0 |             0.5 |      |
+	/// |     | XTB  | forward and reverse beta temperature exponent                         | -     |        0 |                 |      |
+	/// |     | EG   | energy gap for temperature effect on IS                               | eV    |     1.11 |                 |      |
+	/// |     | XTI  | temperature exponent for effect on IS                                 | -     |        3 |                 |      |
+	/// |     | KF   | flicker-noise coefficient                                             | -     |        0 |                 |      |
+	/// |     | AF   | flicker-noise exponent                                                | -     |        1 |                 |      |
+	/// |     | FC   | coefficient for forward-bias depletion capacitance formula            | -     |      0.5 |                 |      |
+	/// |     | TNOM | Parameter measurement temperature                                     | C     |       27 |              50 |      |
+	///
 	class bjt_model_t : public param_model_t
 	{
 	public:
@@ -145,9 +140,9 @@ namespace analog
 		//NETLIB_RESETI();
 		NETLIB_UPDATEI();
 
-		q_type qtype() const { return m_qtype; }
-		bool is_qtype(q_type atype) const { return m_qtype == atype; }
-		void set_qtype(q_type atype) { m_qtype = atype; }
+		q_type qtype() const noexcept { return m_qtype; }
+		bool is_qtype(q_type atype) const noexcept { return m_qtype == atype; }
+		void set_qtype(q_type atype) noexcept { m_qtype = atype; }
 	protected:
 
 		bjt_model_t m_model;
@@ -160,18 +155,18 @@ namespace analog
 	// -----------------------------------------------------------------------------
 
 
-	/*
-	 *         + -              C
-	 *   B ----VVV----+         |
-	 *                |         |
-	 *                Rb        Rc
-	 *                Rb        Rc
-	 *                Rb        Rc
-	 *                |         |
-	 *                +----+----+
-	 *                     |
-	 *                     E
-	 */
+	//
+	//         + -              C
+	//   B ----VVV----+         |
+	//                |         |
+	//                Rb        Rc
+	//                Rb        Rc
+	//                Rb        Rc
+	//                |         |
+	//                +----+----+
+	//                     |
+	//                     E
+	//
 
 	NETLIB_OBJECT_DERIVED(QBJT_switch, QBJT)
 	{
@@ -179,9 +174,9 @@ namespace analog
 			, m_RB(*this, "m_RB", true)
 			, m_RC(*this, "m_RC", true)
 			, m_BC(*this, "m_BC", true)
-			, m_gB(1e-9)
-			, m_gC(1e-9)
-			, m_V(0.0)
+			, m_gB(nlconst::magic(1e-9))
+			, m_gC(nlconst::magic(1e-9))
+			, m_V(nlconst::zero())
 			, m_state_on(*this, "m_state_on", 0)
 		{
 			register_subalias("B", m_RB.m_P);
@@ -203,9 +198,9 @@ namespace analog
 		nld_twoterm m_RC;
 		nld_twoterm m_BC;
 
-		nl_double m_gB; // base conductance / switch on
-		nl_double m_gC; // collector conductance / switch on
-		nl_double m_V; // internal voltage source
+		nl_fptype m_gB; // base conductance / switch on
+		nl_fptype m_gC; // collector conductance / switch on
+		nl_fptype m_V; // internal voltage source
 		state_var<unsigned> m_state_on;
 
 	private:
@@ -237,13 +232,13 @@ namespace analog
 			connect(m_D_EB.m_N, m_D_CB.m_N);
 			connect(m_D_CB.m_P, m_D_EC.m_N);
 
-			if (m_model.m_CJE > 0.0)
+			if (m_model.m_CJE > nlconst::zero())
 			{
 				create_and_register_subdevice("m_CJE", m_CJE);
 				connect("B", "m_CJE.1");
 				connect("E", "m_CJE.2");
 			}
-			if (m_model.m_CJC > 0.0)
+			if (m_model.m_CJC > nlconst::zero())
 			{
 				create_and_register_subdevice("m_CJC", m_CJC);
 				connect("B", "m_CJC.1");
@@ -267,11 +262,11 @@ namespace analog
 		nld_twoterm m_D_EB;  // gee, gec - gee, gce - gee, gee - gec | Ie
 		nld_twoterm m_D_EC;  // 0, -gec, -gcc, 0 | 0
 
-		nl_double m_alpha_f;
-		nl_double m_alpha_r;
+		nl_fptype m_alpha_f;
+		nl_fptype m_alpha_r;
 
-		NETLIB_SUBXX(analog, C) m_CJE;
-		NETLIB_SUBXX(analog, C) m_CJC;
+		NETLIB_SUB_UPTR(analog, C) m_CJE;
+		NETLIB_SUB_UPTR(analog, C) m_CJC;
 	};
 
 
@@ -292,18 +287,20 @@ namespace analog
 	NETLIB_RESET(QBJT_switch)
 	{
 		NETLIB_NAME(QBJT)::reset();
+		const auto zero(nlconst::zero());
 
 		m_state_on = 0;
 
-		m_RB.set_G_V_I(exec().gmin(), 0.0, 0.0);
-		m_RC.set_G_V_I(exec().gmin(), 0.0, 0.0);
+		m_RB.set_G_V_I(exec().gmin(), zero, zero);
+		m_RC.set_G_V_I(exec().gmin(), zero, zero);
 
-		m_BC.set_G_V_I(exec().gmin() / 10.0, 0.0, 0.0);
+		m_BC.set_G_V_I(exec().gmin() / nlconst::magic(10.0), zero, zero);
 
 	}
 
 	NETLIB_UPDATE(QBJT_switch)
 	{
+		// FIXME: this should never be called
 		if (!m_RB.m_P.net().isRailNet())
 			m_RB.m_P.solve_now();   // Basis
 		else if (!m_RB.m_N.net().isRailNet())
@@ -315,46 +312,48 @@ namespace analog
 
 	NETLIB_UPDATE_PARAM(QBJT_switch)
 	{
-		nl_double IS = m_model.m_IS;
-		nl_double BF = m_model.m_BF;
-		nl_double NF = m_model.m_NF;
-		//nl_double VJE = m_model.dValue("VJE", 0.75);
+		nl_fptype IS = m_model.m_IS;
+		nl_fptype BF = m_model.m_BF;
+		nl_fptype NF = m_model.m_NF;
+		//nl_fptype VJE = m_model.dValue("VJE", 0.75);
 
 		set_qtype((m_model.type() == "NPN") ? BJT_NPN : BJT_PNP);
 
-		nl_double alpha = BF / (1.0 + BF);
+		nl_fptype alpha = BF / (nlconst::one() + BF);
 
 		diode d(IS, NF);
 
 		// Assume 5mA Collector current for switch operation
 
-		m_V = d.V(0.005 / alpha);
+		const auto cc(nlconst::magic(0.005));
+		m_V = d.V(cc / alpha);
 
-		/* Base current is 0.005 / beta
-		 * as a rough estimate, we just scale the conductance down */
+		// Base current is 0.005 / beta
+		// as a rough estimate, we just scale the conductance down
 
-		m_gB = 1.0 / (m_V/(0.005 / BF));
+		m_gB = plib::reciprocal((m_V/(cc / BF)));
 
 		//m_gB = d.gI(0.005 / alpha);
 
 		if (m_gB < exec().gmin())
 			m_gB = exec().gmin();
-		m_gC =  d.gI(0.005); // very rough estimate
+		m_gC =  d.gI(cc); // very rough estimate
 	}
 
 	NETLIB_UPDATE_TERMINALS(QBJT_switch)
 	{
-		const nl_double m = (is_qtype( BJT_NPN) ? 1 : -1);
+		const nl_fptype m = (is_qtype( BJT_NPN) ? 1 : -1);
 
 		const unsigned new_state = (m_RB.deltaV() * m > m_V ) ? 1 : 0;
 		if (m_state_on ^ new_state)
 		{
-			const nl_double gb = new_state ? m_gB : exec().gmin();
-			const nl_double gc = new_state ? m_gC : exec().gmin();
-			const nl_double v  = new_state ? m_V * m : 0;
+			const auto zero(nlconst::zero());
+			const nl_fptype gb = new_state ? m_gB : exec().gmin();
+			const nl_fptype gc = new_state ? m_gC : exec().gmin();
+			const nl_fptype v  = new_state ? m_V * m : zero;
 
-			m_RB.set_G_V_I(gb, v,   0.0);
-			m_RC.set_G_V_I(gc, 0.0, 0.0);
+			m_RB.set_G_V_I(gb,   v,   zero);
+			m_RC.set_G_V_I(gc, zero, zero);
 			m_state_on = new_state;
 		}
 	}
@@ -367,6 +366,7 @@ namespace analog
 
 	NETLIB_UPDATE(QBJT_EB)
 	{
+		// FIXME: this should never be called
 		if (!m_D_EB.m_P.net().isRailNet())
 			m_D_EB.m_P.solve_now();   // Basis
 		else if (!m_D_EB.m_N.net().isRailNet())
@@ -393,19 +393,19 @@ namespace analog
 
 	NETLIB_UPDATE_TERMINALS(QBJT_EB)
 	{
-		const nl_double polarity = (qtype() == BJT_NPN ? 1.0 : -1.0);
+		const nl_fptype polarity = nlconst::magic(qtype() == BJT_NPN ? 1.0 : -1.0);
 
 		m_gD_BE.update_diode(-m_D_EB.deltaV() * polarity);
 		m_gD_BC.update_diode(-m_D_CB.deltaV() * polarity);
 
-		const nl_double gee = m_gD_BE.G();
-		const nl_double gcc = m_gD_BC.G();
-		const nl_double gec =  m_alpha_r * gcc;
-		const nl_double gce =  m_alpha_f * gee;
-		const nl_double sIe = -m_gD_BE.I() + m_alpha_r * m_gD_BC.I();
-		const nl_double sIc = m_alpha_f * m_gD_BE.I() - m_gD_BC.I();
-		const nl_double Ie = (sIe + gee * m_gD_BE.Vd() - gec * m_gD_BC.Vd()) * polarity;
-		const nl_double Ic = (sIc - gce * m_gD_BE.Vd() + gcc * m_gD_BC.Vd()) * polarity;
+		const nl_fptype gee = m_gD_BE.G();
+		const nl_fptype gcc = m_gD_BC.G();
+		const nl_fptype gec =  m_alpha_r * gcc;
+		const nl_fptype gce =  m_alpha_f * gee;
+		const nl_fptype sIe = -m_gD_BE.I() + m_alpha_r * m_gD_BC.I();
+		const nl_fptype sIc = m_alpha_f * m_gD_BE.I() - m_gD_BC.I();
+		const nl_fptype Ie = (sIe + gee * m_gD_BE.Vd() - gec * m_gD_BC.Vd()) * polarity;
+		const nl_fptype Ic = (sIc - gce * m_gD_BE.Vd() + gcc * m_gD_BC.Vd()) * polarity;
 
 		// "Circuit Design", page 174
 
@@ -420,20 +420,20 @@ namespace analog
 
 	NETLIB_UPDATE_PARAM(QBJT_EB)
 	{
-		nl_double IS = m_model.m_IS;
-		nl_double BF = m_model.m_BF;
-		nl_double NF = m_model.m_NF;
-		nl_double BR = m_model.m_BR;
-		nl_double NR = m_model.m_NR;
-		//nl_double VJE = m_model.dValue("VJE", 0.75);
+		nl_fptype IS = m_model.m_IS;
+		nl_fptype BF = m_model.m_BF;
+		nl_fptype NF = m_model.m_NF;
+		nl_fptype BR = m_model.m_BR;
+		nl_fptype NR = m_model.m_NR;
+		//nl_fptype VJE = m_model.dValue("VJE", 0.75);
 
 		set_qtype((m_model.type() == "NPN") ? BJT_NPN : BJT_PNP);
 
-		m_alpha_f = BF / (1.0 + BF);
-		m_alpha_r = BR / (1.0 + BR);
+		m_alpha_f = BF / (nlconst::one() + BF);
+		m_alpha_r = BR / (nlconst::one() + BR);
 
-		m_gD_BE.set_param(IS / m_alpha_f, NF, exec().gmin(), constants::T0());
-		m_gD_BC.set_param(IS / m_alpha_r, NR, exec().gmin(), constants::T0());
+		m_gD_BE.set_param(IS / m_alpha_f, NF, exec().gmin(), nlconst::T0());
+		m_gD_BC.set_param(IS / m_alpha_r, NR, exec().gmin(), nlconst::T0());
 	}
 
 } // namespace analog

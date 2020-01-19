@@ -8,9 +8,14 @@
 
     TODO:
     - needs built-in language card, it's advertised to work w/o one.
-    - C074 speed control
     - Doesn't work with Swyft but advertised to; how does h/w get
       around the Fxxx ROM not checksumming right?
+
+    To control this from software:
+    - There's no way I can tell to detect it besides maybe measuring
+      how many cycles between vblanks or something.
+    - Write to $C074: 0 = fast speed, 1 = 1 MHz,
+      3 = disables the TransWarp's CPU and restarts the Apple's 65(C)02.
 
 *********************************************************************/
 
@@ -156,6 +161,8 @@ void a2bus_transwarp_device::device_start()
 	m_timer = timer_alloc(0);
 
 	save_item(NAME(m_bEnabled));
+	save_item(NAME(m_bReadA2ROM));
+	save_item(NAME(m_bIn1MHzMode));
 }
 
 void a2bus_transwarp_device::device_reset()
@@ -166,9 +173,13 @@ void a2bus_transwarp_device::device_reset()
 	if (!(m_dsw2->read() & 0x80))
 	{
 		if (m_dsw1->read() & 0x80)
+		{
 			m_ourcpu->set_unscaled_clock(A2BUS_7M_CLOCK / 4);
+		}
 		else
+		{
 			m_ourcpu->set_unscaled_clock(A2BUS_7M_CLOCK / 2);
+		}
 	}
 	else
 	{
@@ -178,12 +189,23 @@ void a2bus_transwarp_device::device_reset()
 
 void a2bus_transwarp_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if (!(m_dsw2->read() & 0x80))
+	if (m_bIn1MHzMode)
 	{
-		if (m_dsw1->read() & 0x80)
-			m_ourcpu->set_unscaled_clock(A2BUS_7M_CLOCK / 4);
-		else
-			m_ourcpu->set_unscaled_clock(A2BUS_7M_CLOCK / 2);
+		m_ourcpu->set_unscaled_clock(1021800);
+	}
+	else
+	{
+		if (!(m_dsw2->read() & 0x80))
+		{
+			if (m_dsw1->read() & 0x80)
+			{
+				m_ourcpu->set_unscaled_clock(A2BUS_7M_CLOCK / 4);
+			}
+			else
+			{
+				m_ourcpu->set_unscaled_clock(A2BUS_7M_CLOCK / 2);
+			}
+		}
 	}
 	m_timer->adjust(attotime::never);
 }
@@ -221,13 +243,39 @@ WRITE8_MEMBER( a2bus_transwarp_device::dma_w )
 	{
 		hit_slot_joy();
 	}
-
-	if (offset == 0xc072)
+	else if (offset == 0xc072)
 	{
 		m_bReadA2ROM = true;
 	}
-
-	if ((offset >= 0xc090) && (offset <= 0xc0ff))
+	else if (offset == 0xc074)
+	{
+		if (data == 0)
+		{
+			if (m_dsw1->read() & 0x80)
+			{
+				m_ourcpu->set_unscaled_clock(A2BUS_7M_CLOCK / 4);
+			}
+			else
+			{
+				m_ourcpu->set_unscaled_clock(A2BUS_7M_CLOCK / 2);
+			}
+			m_bIn1MHzMode = false;
+		}
+		else if (data == 1)
+		{
+			m_ourcpu->set_unscaled_clock(1021800);
+			m_bIn1MHzMode = true;
+		}
+		else if (data == 3)
+		{
+			// disable our CPU
+			m_ourcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+			// re-enable the Apple's
+			lower_slot_dma();
+		}
+		return;
+	}
+	else if ((offset >= 0xc090) && (offset <= 0xc0ff))
 	{
 		hit_slot(((offset >> 4) & 0xf) - 8);
 	}

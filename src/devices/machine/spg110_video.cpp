@@ -35,6 +35,14 @@ void spg110_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_
 
 	uint32_t nc = (bpp + 1) << 1;
 
+	switch (bpp)
+	{
+	case 0x03: pal = 0; break; // 8 bpp
+	case 0x02: pal &=0x03; break; // 6 bpp
+	case 0x01: break; // 4 bpp
+	case 0x00: break; // 2 bpp
+	}
+
 	uint32_t palette_offset = pal;
 
 	palette_offset <<= nc;
@@ -136,20 +144,27 @@ void spg110_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 		uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & 0xff) - 0x10;
 		uint32_t xx = (tile_w * x0 - xscroll) & 0x1ff;
 		uint16_t tile = (ctrl & PAGE_WALLPAPER_MASK) ? space2.read_word(tilemap*2) : space2.read_word((tilemap + tile_address)*2);
-		uint16_t extra_attribute = 0;
 
 		if (!tile)
 			continue;
 
-		extra_attribute = space2.read_word((palette_map*2) + tile_address);
-		if (x0 & 1)
-			extra_attribute = (extra_attribute & 0x00ff);
-		else
-			extra_attribute = (extra_attribute & 0xff00) >> 8;
+		uint8_t pal = 0x000;
+		uint8_t pri = 0x00;
+		bool flip_x = false;
 
-		uint8_t pal = extra_attribute & 0x0f;
-		uint8_t pri = (extra_attribute & 0x30) >> 4;
-		bool flip_x = extra_attribute & 0x40;
+		if (!(ctrl & 0x0002)) // 'regset'
+		{
+			uint16_t extra_attribute = space2.read_word((palette_map * 2) + tile_address);
+
+			if (x0 & 1)
+				extra_attribute = (extra_attribute & 0x00ff);
+			else
+				extra_attribute = (extra_attribute & 0xff00) >> 8;
+
+			pal = extra_attribute & 0x0f;
+			pri = (extra_attribute & 0x30) >> 4;
+			flip_x = extra_attribute & 0x40;
+		}
 
 		if (pri == priority)
 		{
@@ -393,12 +408,14 @@ WRITE16_MEMBER(spg110_video_device::dma_len_trigger_w)
 	int length = data & 0x1fff;
 
 	// this is presumably a counter that underflows to 0x1fff, because that's what the wait loop waits for?
-	logerror("%s: (trigger len) %04x with values (unk) %04x (dststep) %04x (unk) %04x (src step) %04x | (dst) %04x (src) %04x\n", machine().describe_context(), data, m_dma_unk_2061, m_dma_dst_step, m_dma_src_high, m_dma_src_step, m_dma_dst, m_dma_src);
+	logerror("%s: (trigger len) %04x with values (unk) %04x (dststep) %04x (srchigh) %04x (src step) %04x | (dst) %04x (src) %04x\n", machine().describe_context(), data, m_dma_unk_2061, m_dma_dst_step, m_dma_src_high, m_dma_src_step, m_dma_dst, m_dma_src);
 
-	if (m_dma_src_high != 0x0000)
+	/*
+	if (m_dma_unk_2061 != 0x0000)
 	{
-		logerror("unknown DMA params are not zero!\n");
+	    logerror("unknown DMA params are not zero!\n");
 	}
+	*/
 
 	int source = m_dma_src | m_dma_src_high << 16;
 	int dest = m_dma_dst;
@@ -416,9 +433,9 @@ WRITE16_MEMBER(spg110_video_device::dma_len_trigger_w)
 
 	// not sure, spiderman would suggest that some of these need to reset (unless a missing IRQ clears them)
 	m_dma_unk_2061 = 0;
-	m_dma_dst_step = 0;
+	//m_dma_dst_step = 0; // conyteni says no
 	m_dma_src_high = 0;
-	m_dma_src_step = 0;
+	//m_dma_src_step = 0; // conyteni says no
 	m_dma_dst = 0;
 	m_dma_src = 0;
 

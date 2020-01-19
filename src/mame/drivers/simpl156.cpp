@@ -412,15 +412,15 @@ void simpl156_state::chainrec(machine_config &config)
 	m_deco_tilegen->set_pf2_col_bank(0x10);
 	m_deco_tilegen->set_pf1_col_mask(0x0f);
 	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_bank1_callback(FUNC(simpl156_state::bank_callback), this);
-	m_deco_tilegen->set_bank2_callback(FUNC(simpl156_state::bank_callback), this);
+	m_deco_tilegen->set_bank1_callback(FUNC(simpl156_state::bank_callback));
+	m_deco_tilegen->set_bank2_callback(FUNC(simpl156_state::bank_callback));
 	m_deco_tilegen->set_pf12_8x8_bank(0);
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(2);
-	m_sprgen->set_pri_callback(FUNC(simpl156_state::pri_callback), this);
+	m_sprgen->set_pri_callback(FUNC(simpl156_state::pri_callback));
 	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -1058,7 +1058,7 @@ READ32_MEMBER(simpl156_state::joemacr_speedup_r)
 
 void simpl156_state::init_joemacr()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201018, 0x020101b, read32_delegate(FUNC(simpl156_state::joemacr_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201018, 0x020101b, read32_delegate(*this, FUNC(simpl156_state::joemacr_speedup_r)));
 	init_simpl156();
 }
 
@@ -1071,7 +1071,7 @@ READ32_MEMBER(simpl156_state::chainrec_speedup_r)
 
 void simpl156_state::init_chainrec()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201018, 0x020101b, read32_delegate(FUNC(simpl156_state::chainrec_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201018, 0x020101b, read32_delegate(*this, FUNC(simpl156_state::chainrec_speedup_r)));
 	init_simpl156();
 }
 
@@ -1084,7 +1084,7 @@ READ32_MEMBER(simpl156_state::prtytime_speedup_r)
 
 void simpl156_state::init_prtytime()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201ae0, 0x0201ae3, read32_delegate(FUNC(simpl156_state::prtytime_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201ae0, 0x0201ae3, read32_delegate(*this, FUNC(simpl156_state::prtytime_speedup_r)));
 	init_simpl156();
 }
 
@@ -1098,7 +1098,7 @@ READ32_MEMBER(simpl156_state::charlien_speedup_r)
 
 void simpl156_state::init_charlien()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, read32_delegate(FUNC(simpl156_state::charlien_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, read32_delegate(*this, FUNC(simpl156_state::charlien_speedup_r)));
 	init_simpl156();
 }
 
@@ -1111,7 +1111,7 @@ READ32_MEMBER(simpl156_state::osman_speedup_r)
 
 void simpl156_state::init_osman()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, read32_delegate(FUNC(simpl156_state::osman_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, read32_delegate(*this, FUNC(simpl156_state::osman_speedup_r)));
 	init_simpl156();
 
 }

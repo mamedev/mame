@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+
+Cart pinout:
+
+Glob up, edge connector towards you. Odd pins 1-47 on top, right to left.
+Even pins 2-48 on bottom, pin 2 under pin 1, pin 48 under pin 47.
+
+1  GND           2  GND
+3  A1            4  A0
+5  A3            6  A2
+7  A5            8  A4
+9  A7            10 A6
+11 A18           12 A17
+13 A20           14 A21
+15 A8            16 A19
+17 A10           18 A9
+19 A12           20 A11
+21 A14           22 A13
+23 A16           24 A15
+25 /OE           26 GND
+27 VCC (3.3v)    28 GND
+29 N/C           30 N/C
+31 D7            32 D15
+33 D6            34 D14
+35 D5            36 D13
+37 D4            38 D12
+39 D3            40 D11
+41 D2            42 D10
+43 D1            44 D9
+45 D0            46 D8
+47 to pin 48     48 to pin 47
+
+
+Undumped carts:
+
+-Power Ranger Mystic Force - Whispering Voices / Code Busters (USA)
+-Thomas & Friends - Thomas Visits the Toy Shop / Thomas' Milkshake Mix (USA)
+-Cinderella - Cinderella / Beauties in Bloom (USA)
+-Dora the Explorer - At the Carnival / Dora Goes To School (USA)
+-Winnie the Pooh - Bounce, Tigger, Bounce / Pooh's Honey Tree (USA)
+-Spongebob SquarePants - Ice-Cream Dreams / Stop the Presses! (USA)
+-The Lion King - The Lion King / The Lion King II - Simba's Pride (USA)
+-Cenerentola - Cenerentola / Cenerentola Bellezze in Fiore (Italy)
+-Il Re Reone - Il Re Leone / Il Re Leone 2: Il Regno di Simba (Italy)
+-Winnie the Pooh - Salta Tigro, salta! / Winnie the Pooh l'orsetto goloso (Italy)
+
+-->
+
+<softwarelist name="telestory_cart" description="JAKKS Pacific Telestory cartridges">
+
+	<software name="cinders" supported="no">
+		<description>La Cenicienta - Bellezas en Flor / Cinderella - Beauties in Bloom (Spain)</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Toymax</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="telestorycinderellasp.bin" size="0x400000" crc="e1b2fd69" sha1="0f3109f30672dacbf52668d485eeed51829993a9"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="poohs" supported="no">
+		<description>Winnie the Pooh - Salta, Tigger, Salta / Winnie the Pooh - Bounce, Tigger, Bounce (Spain)</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Toymax</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="telestorypoohsp.bin" size="0x400000" crc="f0ef00e8" sha1="bc407c127a64f6b5cfcf3239f1af3d7896d5a6c2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkings" supported="no">
+		<description>El Rey León II - El orgullo de Simba / The Lion King II - Simba's Pride (Spain)</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Toymax</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="telestorylionkingsp.bin" size="0x800000" crc="459ed493" sha1="8528d4fd5d4a7ff457935d618527621b8ec2a100"/>
+			</dataarea>
+		</part>
+	</software>
+	
+</softwarelist>

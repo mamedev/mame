@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(QL_ROM_CARTRIDGE_SLOT, ql_rom_cartridge_slot_device, "ql_rom_
 //-------------------------------------------------
 
 device_ql_rom_cartridge_card_interface::device_ql_rom_cartridge_card_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device),
+	device_interface(device, "qlrom"),
 	m_rom(*this, "rom"),
 	m_slot(dynamic_cast<ql_rom_cartridge_slot_device *>(device.owner())),
 	m_romoeh(0)
@@ -47,8 +47,6 @@ device_ql_rom_cartridge_card_interface::~device_ql_rom_cartridge_card_interface(
 
 void device_ql_rom_cartridge_card_interface::interface_post_start()
 {
-	device_slot_card_interface::interface_post_start();
-
 	device().save_item(NAME(m_romoeh));
 }
 
@@ -64,7 +62,7 @@ void device_ql_rom_cartridge_card_interface::interface_post_start()
 
 ql_rom_cartridge_slot_device::ql_rom_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, QL_ROM_CARTRIDGE_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_ql_rom_cartridge_card_interface>(mconfig, *this),
 	device_image_interface(mconfig, *this), m_card(nullptr)
 {
 }
@@ -73,24 +71,13 @@ ql_rom_cartridge_slot_device::ql_rom_cartridge_slot_device(const machine_config 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-
-void ql_rom_cartridge_slot_device::device_validity_check(validity_checker &valid) const
-{
-	device_t *const card(get_card_device());
-	if (card && !dynamic_cast<device_ql_rom_cartridge_card_interface *>(card))
-		osd_printf_error("Card device %s (%s) does not implement device_ql_rom_cartridge_card_interface\n", card->tag(), card->name());
-}
-
 void ql_rom_cartridge_slot_device::device_resolve_objects()
 {
-	m_card = dynamic_cast<device_ql_rom_cartridge_card_interface *>(get_card_device());
+	m_card = get_card_device();
 }
 
 void ql_rom_cartridge_slot_device::device_start()
 {
-	device_t *const card(get_card_device());
-	if (card && !m_card)
-		throw emu_fatalerror("ql_rom_cartridge_slot_device: card device %s (%s) does not implement device_ql_rom_cartridge_card_interface\n", card->tag(), card->name());
 }
 
 

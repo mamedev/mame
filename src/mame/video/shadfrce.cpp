@@ -60,13 +60,13 @@ WRITE16_MEMBER(shadfrce_state::bg1videoram_w)
 
 void shadfrce_state::video_start()
 {
-	m_fgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(shadfrce_state::get_fgtile_info),this),TILEMAP_SCAN_ROWS,    8,  8,64,32);
+	m_fgtilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(shadfrce_state::get_fgtile_info)),  TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
 	m_fgtilemap->set_transparent_pen(0);
 
-	m_bg0tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(shadfrce_state::get_bg0tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,32,32);
+	m_bg0tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(shadfrce_state::get_bg0tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_bg0tilemap->set_transparent_pen(0);
 
-	m_bg1tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(shadfrce_state::get_bg1tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,32,32);
+	m_bg1tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(shadfrce_state::get_bg1tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_spvideoram_old = std::make_unique<uint16_t[]>(m_spvideoram.bytes()/2);
 

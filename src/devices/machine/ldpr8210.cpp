@@ -175,6 +175,16 @@ pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, cons
 
 pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: laserdisc_device(mconfig, type, tag, owner, clock),
+		m_audio1(*this, "pr8210_audio1"),
+		m_audio2(*this, "pr8210_audio2"),
+		m_clv(*this, "pr8210_clv"),
+		m_cav(*this, "pr8210_cav"),
+		m_srev(*this, "pr8210_srev"),
+		m_sfwd(*this, "pr8210_sfwd"),
+		m_play(*this, "pr8210_play"),
+		m_step(*this, "pr8210_step"),
+		m_pause(*this, "pr8210_pause"),
+		m_standby(*this, "pr8210_standby"),
 		m_control(0),
 		m_lastcommand(0),
 		m_accumulator(0),
@@ -266,6 +276,18 @@ void pioneer_pr8210_device::control_w(uint8_t data)
 
 void pioneer_pr8210_device::device_start()
 {
+	// resolve outputs
+	m_audio1.resolve();
+	m_audio2.resolve();
+	m_clv.resolve();
+	m_cav.resolve();
+	m_srev.resolve();
+	m_sfwd.resolve();
+	m_play.resolve();
+	m_step.resolve();
+	m_pause.resolve();
+	m_standby.resolve();
+
 	// pass through to the parent
 	laserdisc_device::device_start();
 }
@@ -546,18 +568,18 @@ WRITE8_MEMBER( pioneer_pr8210_device::i8049_pia_w )
 		case 0x60:
 
 			// these 4 are direct-connect
-			machine().output().set_value("pr8210_audio1", (data & 0x01) != 0);
-			machine().output().set_value("pr8210_audio2", (data & 0x02) != 0);
-			machine().output().set_value("pr8210_clv", (data & 0x04) != 0);
-			machine().output().set_value("pr8210_cav", (data & 0x08) != 0);
+			m_audio1 = BIT(data, 0);
+			m_audio2 = BIT(data, 1);
+			m_clv = BIT(data, 2);
+			m_cav = BIT(data, 3);
 
 			// remaining 3 bits select one of 5 LEDs via a mux
 			value = ((data & 0x40) >> 6) | ((data & 0x20) >> 4) | ((data & 0x10) >> 2);
-			machine().output().set_value("pr8210_srev", (value == 0));
-			machine().output().set_value("pr8210_sfwd", (value == 1));
-			machine().output().set_value("pr8210_play", (value == 2));
-			machine().output().set_value("pr8210_step", (value == 3));
-			machine().output().set_value("pr8210_pause", (value == 4));
+			m_srev = (value == 0);
+			m_sfwd = (value == 1);
+			m_play = (value == 2);
+			m_step = (value == 3);
+			m_pause = (value == 4);
 
 			m_pia.portb = data;
 			update_audio_squelch();
@@ -700,14 +722,14 @@ WRITE8_MEMBER( pioneer_pr8210_device::i8049_port2_w )
 	m_i8049_port2 = data;
 
 	// on the falling edge of bit 5, start the slow timer
-	if (!(data & 0x20) && (prev & 0x20))
+	if (!BIT(data, 5) && BIT(prev, 5))
 		m_slowtrg = machine().time();
 
 	// bit 6 when low triggers an IRQ on the MCU
-	m_i8049_cpu->set_input_line(MCS48_INPUT_IRQ, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	m_i8049_cpu->set_input_line(MCS48_INPUT_IRQ, BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE);
 
-	// standby LED is set accordingl to bit 4
-	machine().output().set_value("pr8210_standby", (data & 0x10) != 0);
+	// standby LED is set accordingly to bit 4
+	m_standby = BIT(data, 4);
 }
 
 

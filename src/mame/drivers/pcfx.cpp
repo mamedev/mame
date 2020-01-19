@@ -462,22 +462,22 @@ void pcfx_state::pcfx(machine_config &config)
 
 
 ROM_START( pcfx )
-	ROM_REGION( 0x100000, "ipl", 0 )
+	ROM_REGION32_LE( 0x100000, "ipl", 0 )
 	ROM_SYSTEM_BIOS( 0, "v100", "BIOS v1.00 - 2 Sep 1994" )
 	ROMX_LOAD( "pcfxbios.bin", 0x000000, 0x100000, CRC(76ffb97a) SHA1(1a77fd83e337f906aecab27a1604db064cf10074), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v101", "BIOS v1.01 - 5 Dec 1994" )
 	ROMX_LOAD( "pcfxv101.bin", 0x000000, 0x100000, CRC(236102c9) SHA1(8b662f7548078be52a871565e19511ccca28c5c8), ROM_BIOS(1) )
 
-	ROM_REGION( 0x80000, "scsi_rom", 0 )
+	ROM_REGION32_LE( 0x80000, "scsi_rom", 0 )
 	ROM_LOAD( "fx-scsi.rom", 0x00000, 0x80000, CRC(f3e60e5e) SHA1(65482a23ac5c10a6095aee1db5824cca54ead6e5) )
 ROM_END
 
 
 ROM_START( pcfxga )
-	ROM_REGION( 0x100000, "ipl", 0 )
+	ROM_REGION32_LE( 0x100000, "ipl", 0 )
 	ROM_LOAD( "pcfxga.rom", 0x000000, 0x100000, CRC(41c3776b) SHA1(a9372202a5db302064c994fcda9b24d29bb1b41c) )
 
-	ROM_REGION( 0x80000, "scsi_rom", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x80000, "scsi_rom", ROMREGION_ERASEFF )
 ROM_END
 
 

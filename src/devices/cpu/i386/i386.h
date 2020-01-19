@@ -51,10 +51,10 @@ protected:
 	virtual void device_debug_setup() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 40; }
-	virtual uint32_t execute_input_lines() const override { return 32; }
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 40; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 32; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -324,8 +324,10 @@ protected:
 	uint16_t m_x87_cw;
 	uint16_t m_x87_sw;
 	uint16_t m_x87_tw;
-	uint64_t m_x87_data_ptr;
-	uint64_t m_x87_inst_ptr;
+	uint16_t m_x87_ds;
+	uint32_t m_x87_data_ptr;
+	uint16_t m_x87_cs;
+	uint32_t m_x87_inst_ptr;
 	uint16_t m_x87_opcode;
 
 	i386_modrm_func m_opcode_table_x87_d8[256];
@@ -466,6 +468,7 @@ protected:
 	void modrm_to_EA(uint8_t mod_rm, uint32_t* out_ea, uint8_t* out_segment);
 	uint32_t GetNonTranslatedEA(uint8_t modrm,uint8_t *seg);
 	uint32_t GetEA(uint8_t modrm, int rwn);
+	uint32_t Getx87EA(uint8_t modrm, int rwn);
 	void i386_check_sreg_validity(int reg);
 	int i386_limit_check(int seg, uint32_t offset);
 	void i386_sreg_load(uint16_t selector, uint8_t reg, bool *fault);
@@ -638,6 +641,7 @@ protected:
 	void i386_aam();
 	void i386_clts();
 	void i386_wait();
+	void i486_wait();
 	void i386_lock();
 	void i386_mov_r32_tr();
 	void i386_mov_tr_r32();
@@ -1353,7 +1357,8 @@ protected:
 	inline void x87_set_stack_overflow();
 	int x87_inc_stack();
 	int x87_dec_stack();
-	int x87_check_exceptions();
+	int x87_check_exceptions(bool store = false);
+	int x87_mf_fault();
 	inline void x87_write_cw(uint16_t cw);
 	void x87_reset();
 	floatx80 x87_add(floatx80 a, floatx80 b);
@@ -1479,8 +1484,6 @@ protected:
 	void x87_fincstp(uint8_t modrm);
 	void x87_fclex(uint8_t modrm);
 	void x87_ffree(uint8_t modrm);
-	void x87_fdisi(uint8_t modrm);
-	void x87_feni(uint8_t modrm);
 	void x87_finit(uint8_t modrm);
 	void x87_fldcw(uint8_t modrm);
 	void x87_fstcw(uint8_t modrm);
@@ -1575,7 +1578,7 @@ public:
 protected:
 	pentium_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI || inputnum == INPUT_LINE_SMI; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI || inputnum == INPUT_LINE_SMI; }
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
 	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;

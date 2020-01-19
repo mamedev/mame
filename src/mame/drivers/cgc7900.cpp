@@ -235,7 +235,7 @@ WRITE16_MEMBER( cgc7900_state::interrupt_mask_w )
 
 void cgc7900_state::cpu_space_map(address_map &map)
 {
-	map(0xfffff2, 0xffffff).lr16("interrupt", [] (offs_t offset) -> u16 { return int_vectors[offset+1]; });
+	map(0xfffff2, 0xffffff).lr16(NAME([] (offs_t offset) -> u16 { return int_vectors[offset + 1]; }));
 }
 
 void cgc7900_state::irq_encoder(int pin, int state)

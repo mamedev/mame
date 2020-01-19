@@ -397,7 +397,7 @@ void softbox_state::softbox(machine_config &config)
 	HARDDISK(config, "harddisk3", "corvus_hdd");
 	HARDDISK(config, "harddisk4", "corvus_hdd");
 
-	imi7000_bus_device::add_config(config, "imi5000h", nullptr, nullptr, nullptr);
+	IMI7000_BUS(config, "imi7000").set_slot_default_options("imi5000h", nullptr, nullptr, nullptr);
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("softbox");

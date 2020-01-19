@@ -27,12 +27,24 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	public:
-		void shift();
+		void shift() noexcept
+		{
+			uint32_t out = m_buffer[0] & 1;
+			uint32_t in = (m_RC() ? out : m_IN());
+			for (std::size_t i=0; i < 5; i++)
+			{
+				uint32_t shift_in = (i == 4) ? in : m_buffer[i + 1];
+				m_buffer[i] >>= 1;
+				m_buffer[i] |= shift_in << 15;
+			}
+
+			m_OUT.push(out, NLTIME_FROM_NS(200));
+		}
 
 		logic_input_t m_RC;
 		logic_input_t m_IN;
 
-		state_array<uint16_t, 5> m_buffer;
+		state_container<std::array<uint16_t, 5>> m_buffer;
 
 		logic_output_t m_OUT;
 		nld_power_pins m_power_pins;
@@ -129,20 +141,6 @@ namespace netlist
 	NETLIB_UPDATE(Am2847_shifter)
 	{
 		/* do nothing */
-	}
-
-	NETLIB_FUNC_VOID(Am2847_shifter, shift, ())
-	{
-		uint32_t out = m_buffer[0] & 1;
-		uint32_t in = (m_RC() ? out : m_IN());
-		for (std::size_t i=0; i < 5; i++)
-		{
-			uint32_t shift_in = (i == 4) ? in : m_buffer[i + 1];
-			m_buffer[i] >>= 1;
-			m_buffer[i] |= shift_in << 15;
-		}
-
-		m_OUT.push(out, NLTIME_FROM_NS(200));
 	}
 
 	NETLIB_DEVICE_IMPL(AM2847,     "TTL_AM2847",     "+CP,+INA,+INB,+INC,+IND,+RCA,+RCB,+RCC,+RCD,@VSS,@VDD")

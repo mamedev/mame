@@ -36,7 +36,6 @@
 #define X87_CW_OM               0x0008
 #define X87_CW_UM               0x0010
 #define X87_CW_PM               0x0020
-#define X87_CW_IEM              0x0080
 #define X87_CW_PC_SHIFT         8
 #define X87_CW_PC_MASK          3
 #define X87_CW_PC_SINGLE        0

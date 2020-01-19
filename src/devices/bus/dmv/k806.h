@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+// thanks-to:rfka01
 #ifndef MAME_BUS_DMV_K806_H
 #define MAME_BUS_DMV_K806_H
 
@@ -50,7 +51,6 @@ private:
 	required_ioport m_mouse_buttons;
 	required_ioport m_mouse_x;
 	required_ioport m_mouse_y;
-	dmvcart_slot_device * m_bus;
 
 	struct
 	{
