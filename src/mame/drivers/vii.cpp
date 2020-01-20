@@ -321,6 +321,7 @@ protected:
 
 	DECLARE_READ16_MEMBER(porta_r);
 	DECLARE_READ16_MEMBER(portb_r);
+	DECLARE_READ16_MEMBER(portc_r);
 
 	DECLARE_WRITE16_MEMBER(porta_w);
 	DECLARE_WRITE16_MEMBER(portb_w);
@@ -329,6 +330,9 @@ protected:
 private:
 	int m_porta_dat;
 	int m_portb_dat;
+	int m_portc_dat;
+
+	int m_upperbank;
 
 	int m_hackbank;
 };
@@ -819,8 +823,8 @@ READ16_MEMBER(zon32bit_state::porta_r)
 
 WRITE16_MEMBER(zon32bit_state::porta_w)
 {	
-	if (data != 0x0101)
-		logerror("%s: porta_w (%04x)\n", machine().describe_context(), data);
+	//if (data != 0x0101)
+	//	printf("%s: porta_w (%04x)\n", machine().describe_context().c_str(), data);
 
 	m_porta_dat = data;
 
@@ -829,8 +833,25 @@ WRITE16_MEMBER(zon32bit_state::porta_w)
 	if (data == 0x0e01)
 	{
 		m_hackbank = 1;
-	}	
+	}
+
+	if (data == 0x0335)
+	{
+	//	printf("%s: port a write 0x0355, port c is %04x %04X\n", machine().describe_context().c_str(), data, data & 0x1800);
+
+		m_upperbank = (m_portc_dat & 0x1800);
+	}
 }
+
+READ16_MEMBER(zon32bit_state::portc_r)
+{	
+	uint16_t dat = m_io_p3->read() & ~0xf800;
+
+	dat |= (m_portc_dat & 0xf800);
+
+	return dat;
+}
+
 
 READ16_MEMBER(zon32bit_state::portb_r)
 {	
@@ -849,6 +870,38 @@ WRITE16_MEMBER(zon32bit_state::portc_w)
 {
 	// very noisy
 	//logerror("%s: portc_w (%04x)\n", machine().describe_context(), data);
+
+	//int pc = m_maincpu->pc();
+	//if ((pc >= 0x77261) && (pc <= 0x77268))
+	//	printf("%s: port c %04x %04X-- BANK STUFF\n", machine().describe_context().c_str(), data, data & 0x1800);
+
+	//printf("%s: port c %04x %04x\n", machine().describe_context().c_str(), data, data & 0x1800);
+
+/*
+
+this logic seems to apply for some of the mini-games, but cases where the lower bank doesn't change, this sequence doesn't happen either...
+
+we can only trigger bank on 0335 writes, because it gets lost shortly after (unless that's an issue with the io code in spg2xx_io.cpp)
+
+':maincpu' (077250): port c 0000 0000
+':maincpu' (077263): port c fe00 1800-- BANK STUFF
+':maincpu' (077263): port c fe00 1800
+':maincpu' (0677DC): porta_w (0311)
+':maincpu' (0677E9): porta_w (0301)
+':maincpu' (0677F6): porta_w (0335)  // bank take effect?
+':maincpu' (067803): port c fc00 1800
+':maincpu' (067810): port c fe00 1800
+':maincpu' (06781B): port c f800 1800
+*/
+
+	m_portc_dat = data;
+
+//077261: r4 = r2
+//077262: [r4] = r3         // writes to  3d0b   (port c?)
+//077263: sp += 04
+
+
+// ':maincpu' (05FF41): port c 1800 1800
 }
 
 
@@ -1144,12 +1197,22 @@ READ16_MEMBER(zon32bit_state::z32_rom_r)
 		I don't know where the bank registers are.	
 	*/
 
+		//return m_romregion[offset+ (0x400000*1)]; // invalid
+		//return m_romregion[offset+ (0x400000*4)]; // invalid  (menu with all things)
+		//return m_romregion[offset+ (0x400000*8)];
+
+
+
+#if 1
 	if (offset < 0x200000)
 	{
 		if (m_hackbank == 0) // if lower bank is 0
 			return m_romregion[offset+ 0x000000];
-		else // if lower bank is 1
-			return m_romregion[offset+ 0x400000];
+		else
+		{	// if lower bank is 1
+			return m_romregion[offset + 0x400000];
+		}
+
 	}
 	else
 	{
@@ -1157,18 +1220,22 @@ READ16_MEMBER(zon32bit_state::z32_rom_r)
 
 		if (m_hackbank == 0) // if lower bank is 0
 		{
-			return m_romregion[0x200000 + offset + 0x000000]; // this upper bank is needed to boot to the menu
+			return m_romregion[0x200000 + offset + 0x000000];
 
+			//if ((m_upperbank & 0x1800) == 0x1000)  return m_romregion[0x200000 + offset + 0x000000]; // this upper bank is needed to boot to the menu
+			//else if ((m_upperbank & 0x1800) == 0x0000)  return m_romregion[0x200000 + offset + 0x200000];
 			// other banks are presumably needed for the games that don't change the lower bank but still don't run with the above.
 		}
 		else // if lower bank is 1
 		{
 			// these banks are used for different 'mini' games (and boxing) with the 2nd lower bank enabled
-			return m_romregion[0x200000 + offset + 0x400000 + 0x000000]; // 31-44
-			//return m_romregion[0x200000 + offset+ 0x400000 + 0x600000]; // 45-49
-			//return m_romregion[0x200000 + offset+ 0x400000 + 0x800000]; // 50-59
+			if ((m_upperbank & 0x1800) == 0x1000) return m_romregion[0x200000 + offset + 0x400000 + 0x000000]; // 31-44    1000 bubble destroyer
+			else if ((m_upperbank & 0x1800) == 0x0800) return m_romregion[0x200000 + offset+ 0x400000 + 0x600000]; // 45-49   46 writes 0800
+			else if ((m_upperbank & 0x1800) == 0x1800) return m_romregion[0x200000 + offset+ 0x400000 + 0x800000]; // 50-59   changing 1800
+			else if ((m_upperbank & 0x1800) == 0x0000) return m_romregion[0x200000 + offset + 0x000000]; // ?
 		}	
 	}
+#endif
 
 	return 0x0000;// m_romregion[offset];
 }
@@ -3552,7 +3619,7 @@ void zon32bit_state::zon32bit(machine_config &config)
 
 	m_maincpu->porta_in().set(FUNC(zon32bit_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(zon32bit_state::portb_r));
-	m_maincpu->portc_in().set_ioport("P3");
+	m_maincpu->portc_in().set(FUNC(zon32bit_state::portc_r));
 
 	m_maincpu->porta_out().set(FUNC(zon32bit_state::porta_w));
 	m_maincpu->portb_out().set(FUNC(zon32bit_state::portb_w));
