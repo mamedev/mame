@@ -73,6 +73,9 @@ public:
 	void fuusenpn(machine_config &config);
 	void mariorou(machine_config &config);
 
+	void medal_init();
+	void tsuka_init();
+	void shuri_init();
 private:
 	void konmedal_palette(palette_device &palette) const;
 	void shuriboy_nvram_init(nvram_device &nvram, void *base, size_t size);
@@ -126,6 +129,7 @@ private:
 	u8 m_control, m_control2, m_shuri_irq;
 	int m_ccu_int_time, m_ccu_int_time_count;
 	int m_avac;
+	int m_layer_colorbase[4];
 };
 
 WRITE8_MEMBER(konmedal_state::control2_w)
@@ -170,21 +174,37 @@ WRITE8_MEMBER(konmedal_state::vram_w)
 	m_k056832->ram_code_lo_w(offset>>1, data);
 }
 
+void konmedal_state::medal_init()
+{
+	m_layer_colorbase[0] = 0;
+	m_layer_colorbase[1] = 8;
+	m_layer_colorbase[2] = 0;
+	m_layer_colorbase[3] = 8;
+}
+
+void konmedal_state::tsuka_init()
+{
+	m_layer_colorbase[0] = 0;
+	m_layer_colorbase[1] = 8;
+	m_layer_colorbase[2] = 0;
+	m_layer_colorbase[3] = 0;
+}
+
 K056832_CB_MEMBER(konmedal_state::tile_callback)
 {
 	u32 codebits = *code;
-	*color = (codebits >> 12) & 0xf;
 
 	int mode, avac;
 	m_k056832->read_avac(&mode, &avac);
 	if (mode)
 		*code = (((avac >> ((codebits >> 8) & 0xc)) & 0xf) << 10) | (codebits & 0x3ff);
 	else 
-		*code = codebits & 0xfff; // hmmm
+		*code = codebits & 0xfff;
 
-	*code = bitswap<14>(*code, 8, 9, 13, 12, 11, 10, 7, 6, 5, 4, 3, 2, 1, 0); // seems OK
+	*code = bitswap<14>(*code, 8, 9, 13, 12, 11, 10, 7, 6, 5, 4, 3, 2, 1, 0);
+	*color = m_layer_colorbase[layer] + ((codebits >> 13) & 7);
 
-	*color ^= 8; // FIXME colors is wrong, probably somehow permutated and/or xor-ed with some of codebits
+	// *priority = BIT(codebits, 12); // TODO per-tile priorities
 }
 
 void konmedal_state::video_start()
@@ -301,7 +321,7 @@ void konmedal_state::medal_main(address_map &map)
 	map(0xc000, 0xc03f).w(FUNC(konmedal_state::k056832_w));
 	map(0xc100, 0xc100).w(FUNC(konmedal_state::control2_w));
 	map(0xc400, 0xc400).w(FUNC(konmedal_state::bankswitch_w));
-	map(0xc500, 0xc500).noprw(); // read to reset watchdog
+	map(0xc500, 0xc500).nopr(); // read to reset watchdog
 	map(0xc600, 0xc60f).w(FUNC(konmedal_state::k056832_b_w));
 	map(0xc700, 0xc700).portr("DSW2");
 	map(0xc701, 0xc701).portr("DSW1");
@@ -320,7 +340,7 @@ void konmedal_state::ddboy_main(address_map &map)
 	map(0xc000, 0xc03f).w(FUNC(konmedal_state::k056832_w));
 	map(0xc100, 0xc100).w(FUNC(konmedal_state::control2_w));
 	map(0xc400, 0xc400).w(FUNC(konmedal_state::bankswitch_w));
-	map(0xc500, 0xc500).noprw(); // read to reset watchdog
+	map(0xc500, 0xc500).nopr(); // read to reset watchdog
 	map(0xc600, 0xc60f).w(FUNC(konmedal_state::k056832_b_w));
 	map(0xc700, 0xc700).portr("DSW1");
 	map(0xc701, 0xc701).portr("DSW2");
@@ -465,6 +485,7 @@ void konmedal_state::tsukande(machine_config &config)
 	m_k053252->int1_ack().set(FUNC(konmedal_state::vbl_ack_w));
 	m_k053252->int2_ack().set(FUNC(konmedal_state::nmi_ack_w));
 	m_k053252->int_time().set(FUNC(konmedal_state::ccu_int_time_w));
+	m_k053252->set_offsets(32, 16);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -506,6 +527,7 @@ void konmedal_state::ddboy(machine_config &config)
 	m_k053252->int1_ack().set(FUNC(konmedal_state::vbl_ack_w));
 	m_k053252->int2_ack().set(FUNC(konmedal_state::nmi_ack_w));
 	m_k053252->int_time().set(FUNC(konmedal_state::ccu_int_time_w));
+	m_k053252->set_offsets(32, 16);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -545,46 +567,20 @@ Other custom chip: 051550
 Dips: 2 x 8 dips bank
 */
 
+void konmedal_state::shuri_init()
+{
+	m_layer_colorbase[0] = 0;
+	m_layer_colorbase[1] = 8;
+	m_layer_colorbase[2] = 8;
+}
+
 K052109_CB_MEMBER(konmedal_state::shuriboy_tile_callback)
 {
 	*code |= ((*color & 0xc) << 6) | (bank << 10);
 	if (*color & 0x2) *code |= 0x1000;
 	*flags = (*color & 0x1) ? TILE_FLIPX : 0;
-	u8 col = *color;
-	*color = (col >> 4);
-	if (layer == 0)
-	{
-		if (*color == 1) *color = 0;
-		if (*color == 2) *color = 1;
-		if (*color == 3) *color = 1;
-		if (*color == 4) *color = 2;
-		if (*color == 6) *color = 3;
-		if (*color == 8) *color = 4;
-		if (*color == 9) *color = 4;
-		if (*color == 0xa) *color = 5;
-		if (*color == 0xb) *color = 5;
-		if (*color == 0xd) *color = 6;
-		if (*color == 0xe) *color = 3;
-	}
-	if (layer == 1)
-	{
-		if (*color == 8) *color = 2;
-		if (*color == 0) *color = 8;
-		if (*color == 0xa) *color = 0xe;
-		if (*color == 4) *color = 0xa;
-		if (*color == 6) *color = 3;
-	}
-	if (layer == 2)
-	{
-		if (*color == 2) *color = 9;
-		if (*color == 6) *color = 2;
-		if (*color == 8) *color = 0xc;
-		if (*color == 0) *color = 8;
-		if (*color == 0xa) *color = 0xd;
-		if (*color == 4) *color = 0xa;
-		if (*color == 5) *color = 0xa;
-		if (*color == 0xf) *color = 0xb;
-	}
+	//*priority = BIT(*color, 4); // TODO
+	*color = m_layer_colorbase[layer] + ((*color >> 5) & 7);
 }
 
 WRITE8_MEMBER(konmedal_state::shuri_bank_w)
@@ -896,12 +892,12 @@ ROM_START( mariorou )
 ROM_END
 
 // K052109 (TMNT tilemaps) board
-GAME( 1991, mariorou, 0,     mariorou, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Mario Roulette", MACHINE_NOT_WORKING)
-GAME( 1993, shuriboy, 0,     shuriboy, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Shuriken Boy", MACHINE_NOT_WORKING)
-GAME( 1993, fuusenpn, 0,     fuusenpn, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Fuusen Pentai", MACHINE_NOT_WORKING)
+GAME( 1991, mariorou, 0,     mariorou, konmedal, konmedal_state, shuri_init, ROT0, "Konami", "Mario Roulette", MACHINE_NOT_WORKING)
+GAME( 1993, shuriboy, 0,     shuriboy, konmedal, konmedal_state, shuri_init, ROT0, "Konami", "Shuriken Boy", MACHINE_NOT_WORKING)
+GAME( 1993, fuusenpn, 0,     fuusenpn, konmedal, konmedal_state, shuri_init, ROT0, "Konami", "Fuusen Pentai", MACHINE_NOT_WORKING)
 
 // K054156/K054157 (GX tilemaps) board
-GAME( 1994, buttobi,  0,     ddboy,    konmedal, konmedal_state, empty_init, ROT0, "Konami", "Buttobi Striker", MACHINE_NOT_WORKING)
-GAME( 1995, tsukande, 0,     tsukande, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)
-GAME( 1994, ddboy,    0,     ddboy,    konmedal, konmedal_state, empty_init, ROT0, "Konami", "Dam Dam Boy (on dedicated PCB)", MACHINE_NOT_WORKING)
-GAME( 1994, ddboya,   ddboy, tsukande, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Dam Dam Boy (on Tsukande Toru Chicchi PCB)", MACHINE_NOT_WORKING)
+GAME( 1994, buttobi,  0,     ddboy,    konmedal, konmedal_state, medal_init, ROT0, "Konami", "Buttobi Striker", MACHINE_NOT_WORKING)
+GAME( 1995, tsukande, 0,     tsukande, konmedal, konmedal_state, tsuka_init, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)
+GAME( 1994, ddboy,    0,     ddboy,    konmedal, konmedal_state, medal_init, ROT0, "Konami", "Dam Dam Boy (on dedicated PCB)", MACHINE_NOT_WORKING)
+GAME( 1994, ddboya,   ddboy, tsukande, konmedal, konmedal_state, medal_init, ROT0, "Konami", "Dam Dam Boy (on Tsukande Toru Chicchi PCB)", MACHINE_NOT_WORKING)
