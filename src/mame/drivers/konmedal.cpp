@@ -125,6 +125,7 @@ private:
 
 	u8 m_control, m_control2, m_shuri_irq;
 	int m_ccu_int_time, m_ccu_int_time_count;
+	int m_avac;
 };
 
 WRITE8_MEMBER(konmedal_state::control2_w)
@@ -171,17 +172,19 @@ WRITE8_MEMBER(konmedal_state::vram_w)
 
 K056832_CB_MEMBER(konmedal_state::tile_callback)
 {
-	int codebits = *code;
-	//int bs;
-	//int bankshifts[4] = { 0, 4, 8, 12 };
-	int mode, data; //, bank;
-
-	m_k056832->read_avac(&mode, &data);
-
+	u32 codebits = *code;
 	*color = (codebits >> 12) & 0xf;
-	//bs = (codebits & 0xc00) >> 10;
-	//bank = (data >> bankshifts[bs]) & 0xf;
-	*code = (codebits & 0x3ff); // | (bank << 10);
+
+	int mode, avac;
+	m_k056832->read_avac(&mode, &avac);
+	if (mode)
+		*code = (((avac >> ((codebits >> 8) & 0xc)) & 0xf) << 10) | (codebits & 0x3ff);
+	else 
+		*code = codebits & 0xfff; // hmmm
+
+	*code = bitswap<14>(*code, 8, 9, 13, 12, 11, 10, 7, 6, 5, 4, 3, 2, 1, 0); // seems OK
+
+	*color ^= 8; // FIXME colors is wrong, probably somehow permutated and/or xor-ed with some of codebits
 }
 
 void konmedal_state::video_start()
@@ -193,6 +196,16 @@ uint32_t konmedal_state::screen_update_konmedal(screen_device &screen, bitmap_in
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
 
+	int mode, data;
+	m_k056832->read_avac(&mode, &data);
+	data |= mode << 3;
+	if (m_avac != data)
+	{
+		m_avac = data;
+		m_k056832->mark_all_tilemaps_dirty();
+	}
+
+	// FIXME priorities all wrong
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 3, 0, 1);
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, 0, 4);
@@ -260,7 +273,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(konmedal_state::konmedal_scanline)
 	if (scanline == 255)
 	{
 		m_maincpu->set_input_line(0, ASSERT_LINE);
-		//m_k056832->mark_plane_dirty(3);
 	}
 
 	// z80 /NMI is connected to the IRQ2 pin of k053252 CCU
@@ -783,7 +795,7 @@ ROM_START( ddboya )
 	ROM_LOAD32_BYTE( "342_a05.27c010.4h", 0x000000, 0x020000, CRC(e7e50901) SHA1(5e01377a3ad8ccb2a2b56610e8225b9b6bf15122) )
 	ROM_LOAD32_BYTE( "342_a06.27c010.4j", 0x000001, 0x020000, CRC(49f35d66) SHA1(3d5cf3b6eb6a3497609117acd002169a31130418) )
 
-	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_REGION( 0x100000, "ymz", 0 )
 	ROM_LOAD( "342-a11-10d-=s1=.bin", 0x000000, 0x080000, CRC(b523bced) SHA1(87a814035af4dcf24454667d4346d301303d697e) )
 	ROM_LOAD( "342-a12-10e-=s2=.bin", 0x080000, 0x080000, CRC(6febafe7) SHA1(69e550dd067f326b4d20a859345f193b43a5af99) )
 
@@ -891,5 +903,5 @@ GAME( 1993, fuusenpn, 0,     fuusenpn, konmedal, konmedal_state, empty_init, ROT
 // K054156/K054157 (GX tilemaps) board
 GAME( 1994, buttobi,  0,     ddboy,    konmedal, konmedal_state, empty_init, ROT0, "Konami", "Buttobi Striker", MACHINE_NOT_WORKING)
 GAME( 1995, tsukande, 0,     tsukande, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)
-GAME( 1995, ddboy,    0,     ddboy,    konmedal, konmedal_state, empty_init, ROT0, "Konami", "Dam Dam Boy (on dedicated PCB)", MACHINE_NOT_WORKING)
-GAME( 1995, ddboya,   ddboy, ddboy,    konmedal, konmedal_state, empty_init, ROT0, "Konami", "Dam Dam Boy (on Tsukande Toru Chicchi PCB)", MACHINE_NOT_WORKING)
+GAME( 1994, ddboy,    0,     ddboy,    konmedal, konmedal_state, empty_init, ROT0, "Konami", "Dam Dam Boy (on dedicated PCB)", MACHINE_NOT_WORKING)
+GAME( 1994, ddboya,   ddboy, tsukande, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Dam Dam Boy (on Tsukande Toru Chicchi PCB)", MACHINE_NOT_WORKING)
