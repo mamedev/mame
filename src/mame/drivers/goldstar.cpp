@@ -11239,6 +11239,29 @@ ROM_START( aplan ) // Has "DYNA QL-1  V1.01" string.
 	ROM_LOAD( "82s129.u46",   0x100, 0x100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
 ROM_END
 
+ROM_START( war3cb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512 9 sub-board.bin", 0x00000, 0x10000, CRC(7fc6009d) SHA1(cb664890cffaddb741e8fe94d73ca23634c21e95) ) // addresses scrambled (i.e. 0x2000 goes to 0x0000)
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "27c256 5.bin",   0x00000, 0x8000, CRC(5ba97822) SHA1(f089a09509c13d01a375e273eadcd4007c2054c8) )
+	ROM_LOAD( "27c256 6.bin",   0x08000, 0x8000, CRC(56f7359a) SHA1(b33b6853d05607b1a35b6f5e1a52a4b84a86759a) )
+	ROM_LOAD( "27c256 7.bin",   0x10000, 0x8000, CRC(b2ba5c16) SHA1(4ba64eed71b3e470dbb5250fcb98ab24abc151df) )
+
+	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_LOAD( "27c64 1.bin",   0x0000, 0x2000, CRC(b35c5114) SHA1(1f3e105ebc1ee59201defcea78a8abf0607608f8) )
+	ROM_LOAD( "27c64 2.bin",   0x2000, 0x2000, CRC(d65f8608) SHA1(bd68c6004a97617fbc23acbd76ac1e093a565f89) )
+	ROM_LOAD( "27c64 3.bin",   0x4000, 0x2000, CRC(7f2d9f4c) SHA1(f7f62cd09091bd8e713237c6ac4ee3b4c28350b2) )
+	ROM_LOAD( "27c64 4.bin",   0x6000, 0x2000, CRC(1d7f7f2a) SHA1(787f9d2cea1f0690445c65c0a4827b07d85571b7) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+	ROM_FILL( 0x0000, 0x10000, 0xff ) // (girl bitmaps, not present)
+
+	ROM_REGION( 0x200, "proms", 0 ) // not yet dumped
+	ROM_LOAD( "prom1",   0x000, 0x100, BAD_DUMP CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "prom2",   0x100, 0x100, BAD_DUMP CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+ROM_END
+
 ROM_START( chryangl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "8.u6",  0x0000, 0x10000, CRC(331961e4) SHA1(50c7e0e983aed1f199f238442bb8fafce1849f84) )
@@ -18398,6 +18421,8 @@ GAME(  1996, cmast97,   0,        cm97,     cmv801,   cmaster_state,  empty_init
 GAME(  1999, cmast99,   0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master '99 (V9B.00)",                  MACHINE_NOT_WORKING )
 GAME(  1999, cmast99b,  cmast99,  cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cherry Master '99 (V9B.00 bootleg / hack)",   MACHINE_NOT_WORKING )
 GAME(  1993, aplan,     0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "WeaShing H.K.",     "A-Plan",                                      MACHINE_NOT_WORKING )
+
+GAME(  1996, war3cb,    0,        cm,       cmast99,  cmaster_state,  empty_init,     ROT0, "S.B.E.",            "War III Cherry Best",                         MACHINE_NOT_WORKING ) // first of all needs correct address de-scrambling. Doesn't seem encrypted.
 
 GAME(  1995, tcl,       0,        cm,       cmaster,  cmaster_state,  init_tcl,       ROT0, "Uniwang",           "Taiwan Chess Legend",                         MACHINE_NOT_WORKING ) // incomplete decryption
 
