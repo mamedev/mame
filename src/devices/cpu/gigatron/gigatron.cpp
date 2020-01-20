@@ -11,7 +11,16 @@
 #include "debugger.h"
 
 
-DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron", "Gigatron")
+DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron", "GTRON")
+
+
+/* FLAGS */
+#if 0
+#define S  0x80
+#define Z  0x40
+#define OV 0x20
+#define C  0x10
+#endif
 
 
 #define gigatron_readop(A) m_program->read_dword(A)
@@ -32,6 +41,7 @@ void gigatron_cpu_device::gigatron_illegal()
 void gigatron_cpu_device::execute_run()
 {
 	uint16_t opcode;
+
 	do
 	{
 		debugger_instruction_hook(this, m_pc);
@@ -39,14 +49,14 @@ void gigatron_cpu_device::execute_run()
 		opcode = gigatron_readop(m_pc);
 		m_pc++;
 
-		switch (opcode)
+		switch( opcode )
 		{
 			default:
 				gigatron_illegal();
 				break;
 		}
 
-	} while (m_icount > 0);
+	} while( m_icount > 0 );
 }
 
 
@@ -59,7 +69,7 @@ void gigatron_cpu_device::device_start()
 	save_item(NAME(m_flags));
 
 	// Register state for debugger
-	state_add( GTRON_AC, "PC", m_pc ).formatstr("%02X");
+	state_add( GTRON_R0, "PC", m_pc ).formatstr("%02X");
 	state_add( STATE_GENPC, "GENPC", m_r[7] ).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_r[7] ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_flags ).noshow();
@@ -70,9 +80,22 @@ void gigatron_cpu_device::device_start()
 #if 0
 void gigatron_cpu_device::execute_set_input(int irqline, int state)
 {
-	if (CLEAR_LINE != state)
+	switch(irqline)
 	{
-		
+		case GTRON_INT_INTRM: // level-sensitive
+			m_intrm_pending = ((ASSERT_LINE == state) || (HOLD_LINE == state));
+			m_intrm_state = (ASSERT_LINE == state);
+			break;
+		case GTRON_RESET: // edge-sensitive
+			if (CLEAR_LINE != state)
+				m_reset_pending = 1;
+			m_reset_state = (ASSERT_LINE == state);
+			break;
+		case GTRON_INT_INTR: // edge-sensitive
+			if (CLEAR_LINE != state)
+				m_intr_pending = 1;
+			m_intr_state = (ASSERT_LINE == state);
+			break;
 	}
 }
 #endif
@@ -82,4 +105,25 @@ gigatron_cpu_device::gigatron_cpu_device(const machine_config &mconfig, const ch
 	, m_program_config("program", ENDIANNESS_BIG, 8, 32, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 8, 32, 0)
 {
+}
+
+
+void gigatron_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			str = util::string_format("%c%c%c%c",
+					m_flags & 0x80 ? 'S':'.',
+					m_flags & 0x40 ? 'Z':'.',
+					m_flags & 0x20 ? 'V':'.',
+					m_flags & 0x10 ? 'C':'.');
+			break;
+	}
+}
+
+
+offs_t gigatron_cpu_device::disassemble(char *buffer, offs_t pc, const uint32_t *oprom, const uint32_t *opram, uint32_t options)
+{
+	return CPU_DISASSEMBLE_NAME(gigatron)(this, buffer, pc, opcodes, params, options);
 }
