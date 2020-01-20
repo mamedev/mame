@@ -311,6 +311,9 @@ public:
 	
 	void mem_map_zon32bit(address_map &map);
 
+	void init_zon32bit() { m_game = 0; };
+	void init_mywicodx() { m_game = 1; };
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -335,6 +338,7 @@ private:
 	int m_upperbank;
 
 	int m_hackbank;
+	int m_game;
 };
 
 class zone40_state : public wireless60_state
@@ -880,7 +884,6 @@ WRITE16_MEMBER(zon32bit_state::portc_w)
 
 	//logerror("%s: portc_w (%04x)\n", machine().describe_context(), data);
 
-	int pc = m_maincpu->pc();
 	//if ((pc >= 0x77261) && (pc <= 0x77268))
 	//	printf("%s: port c %04x %04X-- BANK STUFF\n", machine().describe_context().c_str(), data, data & 0x1800);
 
@@ -902,17 +905,46 @@ we can only trigger bank on 0335 writes, because it gets lost shortly after (unl
 ':maincpu' (06781B): port c f800 1800
 */
 
-	if (((pc == 0x077263) || (pc == 0x077262)) && m_hackbank == 1) // when using upper code bank
+// logic doesn't work for all cases, causes bad bank changes after boot in some games
+#if 0
+	if ((data & 0x0600) == (0x0600))
 	{
-		//printf("change upper bank from upper code bank %04x\n", data & 0x1800);
-		m_upperbank = data & 0x1800;
+		if ((m_portc_dat & 0x0600) != 0x0600)
+			m_upperbank = data & 0x1800;
 	}
+#endif
 
-	if (((pc == 0x05ff63) || (pc == 0x05FF62)) && m_hackbank == 0) // when using lower code bank
+#if 1
+	int pc = m_maincpu->pc();
+	if (m_game == 0)
 	{
-		//printf("change upper bank from lower code bank %04x\n", data & 0x1800);
-		m_upperbank = data & 0x1800;
+		if ((pc == 0x077263) && m_hackbank == 1) // when using upper code bank
+		{
+			//printf("zon32bit change upper bank from upper code bank %04x\n", data & 0x1800);
+			m_upperbank = data & 0x1800;
+		}
+
+		if ((pc == 0x05ff63) && m_hackbank == 0) // when using lower code bank
+		{
+			//printf("zon32bit change upper bank from lower code bank %04x\n", data & 0x1800);
+			m_upperbank = data & 0x1800;
+		}
 	}
+	else if (m_game == 1)
+	{
+		if ((pc == 0x09369c) && m_hackbank == 0) // when using lower code bank
+		{
+			printf("mywicodx change upper bank from main menu code bank %04x\n", data & 0x1800);
+			m_upperbank = data & 0x1800;
+		}
+
+		if (pc == 0x530)
+		{
+			printf("mywicodx change upper bank from other menu code bank %04x\n", data & 0x1800);
+			m_upperbank = data & 0x1800;
+		}
+	}
+#endif
 
 	m_portc_dat = data;
 
@@ -1215,37 +1247,69 @@ READ16_MEMBER(zon32bit_state::z32_rom_r)
 		to ports then erased at the moment, maybe they latch somehow?
 	*/
 
-#if 1
-	if (offset < 0x200000)
+	if (m_game == 0) // zon32bit
 	{
-		if (m_hackbank == 0) // if lower bank is 0
-			return m_romregion[offset+ 0x000000];
+		if (offset < 0x200000)
+		{
+			if (m_hackbank == 0) // if lower bank is 0
+				return m_romregion[offset + 0x000000];
+			else
+			{	// if lower bank is 1
+				return m_romregion[offset + 0x400000];
+			}
+		}
 		else
-		{	// if lower bank is 1
-			return m_romregion[offset + 0x400000];
-		}
-	}
-	else
-	{
-		offset &= 0x1fffff;
+		{
+			offset &= 0x1fffff;
 
-		if (m_hackbank == 0) // if lower bank is 0
-		{
-			if ((m_upperbank & 0x1800) == 0x1000)  return m_romregion[offset + (0x0400000/2)]; // this upper bank is needed to boot to the menu
-			else if ((m_upperbank & 0x1800) == 0x0800)  return m_romregion[offset + (0x1000000/2)]; // golf, tennis, several mini games
-			else if ((m_upperbank & 0x1800) == 0x1800)  return m_romregion[offset + (0x1400000/2)]; // baseball, more minigames
-			else if ((m_upperbank & 0x1800) == 0x0000)  return m_romregion[offset + (0x0400000/2)]; // ? (not used?)
+			if (m_hackbank == 0) // if lower bank is 0
+			{
+				if ((m_upperbank & 0x1800) == 0x1000)  return m_romregion[offset + (0x0400000 / 2)]; // this upper bank is needed to boot to the menu
+				else if ((m_upperbank & 0x1800) == 0x0800)  return m_romregion[offset + (0x1000000 / 2)]; // golf, tennis, several mini games
+				else if ((m_upperbank & 0x1800) == 0x1800)  return m_romregion[offset + (0x1400000 / 2)]; // baseball, more minigames
+				else if ((m_upperbank & 0x1800) == 0x0000)  return m_romregion[offset + (0x0400000 / 2)]; // ? (not used?)
+			}
+			else // if lower bank is 1
+			{
+				// these banks are used for different 'mini' games (and boxing) with the 2nd lower bank enabled
+				if ((m_upperbank & 0x1800) == 0x1000)      return m_romregion[offset + (0x0c00000 / 2)]; // 31-44   some mini games
+				else if ((m_upperbank & 0x1800) == 0x0800) return m_romregion[offset + (0x1800000 / 2)]; // 45-49   some mini games + boxing
+				else if ((m_upperbank & 0x1800) == 0x1800) return m_romregion[offset + (0x1c00000 / 2)]; // 50-59   some mini games
+				else if ((m_upperbank & 0x1800) == 0x0000) return m_romregion[offset + (0x0400000 / 2)]; // ? (not used?)
+			}
 		}
-		else // if lower bank is 1
-		{
-			// these banks are used for different 'mini' games (and boxing) with the 2nd lower bank enabled
-			if ((m_upperbank & 0x1800) == 0x1000)      return m_romregion[offset + (0x0c00000/2)]; // 31-44   some mini games
-			else if ((m_upperbank & 0x1800) == 0x0800) return m_romregion[offset + (0x1800000/2)]; // 45-49   some mini games + boxing
-			else if ((m_upperbank & 0x1800) == 0x1800) return m_romregion[offset + (0x1c00000/2)]; // 50-59   some mini games
-			else if ((m_upperbank & 0x1800) == 0x0000) return m_romregion[offset + (0x0400000/2)]; // ? (not used?)
-		}	
 	}
-#endif
+	else if (m_game == 1) // mywicodx
+	{
+		if (offset < 0x200000)
+		{
+			if (m_hackbank == 0) // if lower bank is 0
+				return m_romregion[offset + (0x2000000/2)];
+			else
+			{	// if lower bank is 1
+				return m_romregion[offset + (0x3000000/2)];
+			}
+		}
+		else
+		{
+			offset &= 0x1fffff;
+
+			if (m_hackbank == 0) // if lower bank is 0
+			{
+				if ((m_upperbank & 0x1800) == 0x1000)  return m_romregion[offset + (0x2400000 / 2)]; // this upper bank is needed to boot to the menu, boxing
+				else if ((m_upperbank & 0x1800) == 0x0800)  return m_romregion[offset + (0x2800000 / 2)]; // ? tennis, golf
+				else if ((m_upperbank & 0x1800) == 0x1800)  return m_romregion[offset + (0x2c00000 / 2)]; // ? table tennis, bowling, basketball, baseball
+				else if ((m_upperbank & 0x1800) == 0x0000)  return m_romregion[offset + (0x2400000 / 2)]; // ? (not used?)
+			}
+			else // if lower bank is 1
+			{
+				if ((m_upperbank & 0x1800) == 0x1000)  return m_romregion[offset + (0x3400000 / 2)]; // base code for other bank
+				else if ((m_upperbank & 0x1800) == 0x0800)  return m_romregion[offset + (0x3800000 / 2)]; //
+				else if ((m_upperbank & 0x1800) == 0x1800)  return m_romregion[offset + (0x3c00000 / 2)]; // 
+				else if ((m_upperbank & 0x1800) == 0x0000)  return m_romregion[offset + (0x3400000 / 2)]; //
+			}
+		}
+	}
 
 	return 0x0000;// m_romregion[offset];
 }
@@ -4546,8 +4610,7 @@ ROM_END
 ROM_START( mywicodx )
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
 	// the first bank contains the Mi Guitar game, the 2nd half of the ROM is where the Menu starts
-	ROM_LOAD16_WORD_SWAP( "mywicodx.u2", 0x2000000, 0x2000000, CRC(ec7c5d2f) SHA1(330fb839c485713f7bec5bf9d2d42841612c5b45))
-	ROM_CONTINUE(0x0000000, 0x2000000)
+	ROM_LOAD16_WORD_SWAP( "mywicodx.u2", 0x0000000, 0x4000000, CRC(ec7c5d2f) SHA1(330fb839c485713f7bec5bf9d2d42841612c5b45))
 ROM_END
 
 // PCB marked 'Zone 100 110728 V2.1'
@@ -4816,8 +4879,8 @@ CONS( 2011, lx_jg7415,0, 0, wireless60, wirels60, wireless60_state,  init_lx_jg7
 
 
 // Box advertises this as '40 Games Included' but the cartridge, which was glued directly to the PCB, not removable, is a 41-in-1.  Maybe some versions exist with a 40 game selection.
-CONS( 200?, zon32bit,  0, 0, zon32bit, zon32bit, zon32bit_state,  empty_init,      "Jungle Soft / Ultimate Products (HK) Ltd",    "Zone 32-bit Gaming Console System (Family Sport 41-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, mywicodx,  0, 0, zon32bit, zon32bit, zon32bit_state,  empty_init,      "<unknown>",                                   "My Wico Deluxe", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, zon32bit,  0, 0, zon32bit, zon32bit, zon32bit_state,  init_zon32bit,      "Jungle Soft / Ultimate Products (HK) Ltd",    "Zone 32-bit Gaming Console System (Family Sport 41-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mywicodx,  0, 0, zon32bit, zon32bit, zon32bit_state,  init_mywicodx,      "<unknown>",                                   "My Wico Deluxe", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 
 // JAKKS Pacific Inc TV games
