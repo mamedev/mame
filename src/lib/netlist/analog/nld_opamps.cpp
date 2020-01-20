@@ -112,7 +112,7 @@ namespace netlist
 			if (m_type < 1 || m_type > 3)
 			{
 				log().fatal(MF_OPAMP_UNKNOWN_TYPE(m_type));
-				plib::pthrow<nl_exception>(MF_OPAMP_UNKNOWN_TYPE(m_type));
+				throw nl_exception(MF_OPAMP_UNKNOWN_TYPE(m_type));
 			}
 
 			if (m_type == 1)

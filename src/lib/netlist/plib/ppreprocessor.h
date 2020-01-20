@@ -77,7 +77,7 @@ namespace plib {
 			return *this;
 		}
 
-		[[noreturn]] void error(const pstring &err);
+		[[noreturn]] void error(const pstring &err) noexcept(false);
 
 	protected:
 

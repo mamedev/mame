@@ -76,21 +76,21 @@ namespace plib {
 		///          to be prefixed with rpn, e.g. "rpn:A B + 1.3 /"
 		/// \param inputs Vector of input variables, e.g. {"A","B"}
 		///
-		void compile(const pstring &expr, const std::vector<pstring> &inputs);
+		void compile(const pstring &expr, const std::vector<pstring> &inputs) noexcept(false);
 
 		/// \brief Compile a rpn expression
 		///
 		/// \param expr Reverse polish notation expression, e.g. "A B + 1.3 /"
 		/// \param inputs Vector of input variables, e.g. {"A","B"}
 		///
-		void compile_postfix(const pstring &expr, const std::vector<pstring> &inputs);
+		void compile_postfix(const pstring &expr, const std::vector<pstring> &inputs) noexcept(false);
 
 		/// \brief Compile an infix expression
 		///
 		/// \param expr Infix expression, e.g. "(A+B)/1.3"
 		/// \param inputs Vector of input variables, e.g. {"A","B"}
 		///
-		void compile_infix(const pstring &expr, const std::vector<pstring> &inputs);
+		void compile_infix(const pstring &expr, const std::vector<pstring> &inputs) noexcept(false);
 
 		/// \brief Evaluate the expression
 		///

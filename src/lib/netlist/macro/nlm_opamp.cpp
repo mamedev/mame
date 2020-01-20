@@ -78,7 +78,7 @@ static NETLIST_START(opamp_layout_1_7_4)
 		A.MINUS,         /*   |2            7|   */ A.VCC,
 		A.PLUS,          /*   |3            6|   */ A.OUT,
 		A.GND,           /*   |4            5|   */ NC /* OFFSET */
-					     /*   +--------------+   */
+						 /*   +--------------+   */
 	)
 NETLIST_END()
 

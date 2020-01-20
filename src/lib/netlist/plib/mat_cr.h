@@ -110,11 +110,11 @@ namespace plib
 
 		template <typename M>
 		void build_from_fill_mat(const M &f, std::size_t max_fill = FILL_INFINITY - 1,
-			std::size_t band_width = FILL_INFINITY)
+			std::size_t band_width = FILL_INFINITY) noexcept(false)
 		{
 			C nz = 0;
 			if (nz_num != 0)
-				pthrow<pexception>("build_from_mat only allowed on empty CR matrix");
+				throw pexception("build_from_mat only allowed on empty CR matrix");
 			for (std::size_t k=0; k < size(); k++)
 			{
 				row_idx[k] = nz;
@@ -177,7 +177,7 @@ namespace plib
 
 		// throws error if P(source)>P(destination)
 		template <typename LUMAT>
-		void slim_copy_from(LUMAT & src)
+		void slim_copy_from(LUMAT & src) noexcept(false)
 		{
 			for (std::size_t r=0; r<src.size(); r++)
 			{
@@ -188,7 +188,7 @@ namespace plib
 					while (col_idx[dp] < src.col_idx[sp])
 						A[dp++] = 0;
 					if (row_idx[r+1] <= dp || col_idx[dp] != src.col_idx[sp])
-						pthrow<pexception>("slim_copy_from error");
+						throw pexception("slim_copy_from error");
 					A[dp++] = src.A[sp];
 				}
 				// fill remaining elements in row

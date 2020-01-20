@@ -534,7 +534,7 @@ int nlwav_app::execute()
 	{
 		auto outstrm(std::ofstream(plib::filesystem::u8path(opt_out())));
 		if (outstrm.fail())
-			plib::pthrow<plib::file_open_e>(opt_out());
+			throw plib::file_open_e(opt_out());
 		outstrm.imbue(std::locale::classic());
 		convert(outstrm);
 	}

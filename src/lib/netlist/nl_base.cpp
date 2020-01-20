@@ -170,7 +170,7 @@ namespace netlist
 		else
 		{
 			state().log().fatal(MF_UNKNOWN_TYPE_FOR_OBJECT(name()));
-			plib::pthrow<nl_exception>(MF_UNKNOWN_TYPE_FOR_OBJECT(name()));
+			throw nl_exception(MF_UNKNOWN_TYPE_FOR_OBJECT(name()));
 			//return terminal_type::TERMINAL; // please compiler
 		}
 	}
@@ -518,7 +518,7 @@ namespace netlist
 				if (ret != nullptr)
 				{
 					m_log.fatal(MF_MORE_THAN_ONE_1_DEVICE_FOUND(classname));
-					plib::pthrow<nl_exception>(MF_MORE_THAN_ONE_1_DEVICE_FOUND(classname));
+					throw nl_exception(MF_MORE_THAN_ONE_1_DEVICE_FOUND(classname));
 				}
 				else
 					ret = d.second.get();
@@ -619,7 +619,7 @@ namespace netlist
 		if (!state().setup().connect(t1, t2))
 		{
 			log().fatal(MF_ERROR_CONNECTING_1_TO_2(t1.name(), t2.name()));
-			plib::pthrow<nl_exception>(MF_ERROR_CONNECTING_1_TO_2(t1.name(), t2.name()));
+			throw nl_exception(MF_ERROR_CONNECTING_1_TO_2(t1.name(), t2.name()));
 		}
 	}
 
@@ -703,7 +703,7 @@ namespace netlist
 			if (t == &terminal)
 			{
 				state().log().fatal(MF_NET_1_DUPLICATE_TERMINAL_2(name(), t->name()));
-				plib::pthrow<nl_exception>(MF_NET_1_DUPLICATE_TERMINAL_2(name(), t->name()));
+				throw nl_exception(MF_NET_1_DUPLICATE_TERMINAL_2(name(), t->name()));
 			}
 
 		terminal.set_net(this);
@@ -721,7 +721,7 @@ namespace netlist
 		else
 		{
 			state().log().fatal(MF_REMOVE_TERMINAL_1_FROM_NET_2(terminal.name(), this->name()));
-			plib::pthrow<nl_exception>(MF_REMOVE_TERMINAL_1_FROM_NET_2(terminal.name(), this->name()));
+			throw nl_exception(MF_REMOVE_TERMINAL_1_FROM_NET_2(terminal.name(), this->name()));
 		}
 	}
 
@@ -791,9 +791,8 @@ namespace netlist
 	, m_Idr1(nullptr)
 	, m_go1(nullptr)
 	, m_gt1(nullptr)
-	, m_connected_terminal(otherterm)
 	{
-		state().setup().register_term(*this);
+		state().setup().register_term(*this, *otherterm);
 	}
 
 	void terminal_t::solve_now()
@@ -908,7 +907,7 @@ namespace netlist
 		else
 		{
 			state().log().fatal(MF_UNKNOWN_PARAM_TYPE(name()));
-			plib::pthrow<nl_exception>(MF_UNKNOWN_PARAM_TYPE(name()));
+			throw nl_exception(MF_UNKNOWN_PARAM_TYPE(name()));
 		}
 	}
 

@@ -275,7 +275,7 @@ public:
 			size += s->dt().size() * s->count();
 
 		if (buf.size() != size)
-			plib::pthrow<netlist::nl_exception>("Size different during load state.");
+			throw netlist::nl_exception("Size different during load state.");
 
 		char *p = buf.data();
 
@@ -321,7 +321,7 @@ struct input_t
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 		int e = std::sscanf(line.c_str(), "%lf,%[^,],%lf", &t, buf.data(), &val);
 		if (e != 3)
-			plib::pthrow<netlist::nl_exception>(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
+			throw netlist::nl_exception(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
 		m_value = static_cast<nl_fptype>(val);
 		m_time = netlist::netlist_time_ext::from_fp(t);
 		m_param = setup.find_param(pstring(buf.data()), true);
@@ -333,7 +333,7 @@ struct input_t
 		{
 			case netlist::param_t::STRING:
 			case netlist::param_t::POINTER:
-				plib::pthrow<netlist::nl_exception>(plib::pfmt("param {1} is not numeric\n")(m_param->name()));
+				throw netlist::nl_exception(plib::pfmt("param {1} is not numeric\n")(m_param->name()));
 			case netlist::param_t::DOUBLE:
 				static_cast<netlist::param_fp_t*>(m_param)->setTo(m_value);
 				break;
@@ -358,7 +358,7 @@ static std::vector<input_t> read_input(const netlist::setup_t &setup, const pstr
 	{
 		plib::putf8_reader r = plib::putf8_reader(std::ifstream(plib::filesystem::u8path(fname)));
 		if (r.stream().fail())
-			plib::pthrow<netlist::nl_exception>(netlist::MF_FILE_OPEN_ERROR(fname));
+			throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(fname));
 		r.stream().imbue(std::locale::classic());
 		pstring l;
 		while (r.readline(l))
@@ -415,7 +415,7 @@ void tool_app_t::run()
 		{
 			std::ifstream strm(plib::filesystem::u8path(opt_loadstate()));
 			if (strm.fail())
-				plib::pthrow<netlist::nl_exception>(netlist::MF_FILE_OPEN_ERROR(opt_loadstate()));
+				throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(opt_loadstate()));
 			strm.imbue(std::locale::classic());
 			plib::pbinary_reader reader(strm);
 			std::vector<char> loadstate;
@@ -453,7 +453,7 @@ void tool_app_t::run()
 			auto savestate = nt.save_state();
 			std::ofstream strm(plib::filesystem::u8path(opt_savestate()), std::ios_base::binary);
 			if (strm.fail())
-				plib::pthrow<plib::file_open_e>(opt_savestate());
+				throw plib::file_open_e(opt_savestate());
 			strm.imbue(std::locale::classic());
 
 			plib::pbinary_writer writer(strm);
@@ -501,14 +501,14 @@ void tool_app_t::validate()
 	//pout("Validation errors: {}\n",   m_errors);
 
 	if (m_warnings + m_errors > 0)
-		plib::pthrow<netlist::nl_exception>("validation: {1} errors {2} warnings", m_errors, m_warnings);
+		throw netlist::nl_exception("validation: {1} errors {2} warnings", m_errors, m_warnings);
 
 }
 
 void tool_app_t::static_compile()
 {
 	if (!opt_dir.was_specified())
-		plib::pthrow<netlist::nl_exception>("--dir option needs to be specified");
+		throw netlist::nl_exception("--dir option needs to be specified");
 
 	netlist_tool_t nt(*this, "netlist");
 
@@ -568,7 +568,7 @@ static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 	//printf("file %s\n", fname.c_str());
 	plib::putf8_reader r = plib::putf8_reader(std::ifstream(plib::filesystem::u8path(fname)));
 	if (r.stream().fail())
-		plib::pthrow<netlist::nl_exception>(netlist::MF_FILE_OPEN_ERROR(fname));
+		throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(fname));
 	r.stream().imbue(std::locale::classic());
 	doc_ext ret;
 
@@ -585,7 +585,7 @@ static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 			{
 				auto a(plib::psplit(l, ":", true));
 				if ((a.size() < 1) || (a.size() > 2))
-					plib::pthrow<netlist::nl_exception>(l+" size mismatch");
+					throw netlist::nl_exception(l+" size mismatch");
 				pstring n(plib::trim(a[0]));
 				pstring v(a.size() < 2 ? "" : plib::trim(a[1]));
 				if (n == "Identifier")
@@ -622,10 +622,10 @@ static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 					{
 						ret.example = plib::psplit(plib::trim(v),",",true);
 						if (ret.example.size() != 2 && ret.example.size() != 0)
-							plib::pthrow<netlist::nl_exception>("Example requires 2 parameters, but found {1}", ret.example.size());
+							throw netlist::nl_exception("Example requires 2 parameters, but found {1}", ret.example.size());
 					}
 					else
-						plib::pthrow<netlist::nl_exception>(n);
+						throw netlist::nl_exception(n);
 				}
 			}
 		}
@@ -939,7 +939,7 @@ void tool_app_t::convert()
 	{
 		std::ifstream strm(plib::filesystem::u8path(opt_file()));
 		if (strm.fail())
-			plib::pthrow<netlist::nl_exception>(netlist::MF_FILE_OPEN_ERROR(opt_file()));
+			throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(opt_file()));
 		strm.imbue(std::locale::classic());
 		plib::copystream(ostrm, strm);
 	}

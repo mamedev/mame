@@ -64,7 +64,7 @@ namespace analog
 	{
 		plib::unused_var(d1);
 		if (b)
-			plib::pthrow<nl_exception>("bselect with netlist and b==true");
+			throw nl_exception("bselect with netlist and b==true");
 		return d2;
 	}
 
