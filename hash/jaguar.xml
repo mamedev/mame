@@ -272,7 +272,7 @@ Unreleased (possibly no prototypes exist):
 	</software>
 
 	<!-- boot OK -->
-	<software name="bubsy" supported="yes">
+	<software name="bubsy">
 		<description>Bubsy in Fractured Furry Tales</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
@@ -285,7 +285,7 @@ Unreleased (possibly no prototypes exist):
 	</software>
 
 	<!-- boot OK -->
-	<software name="cfodder" supported="yes">
+	<software name="cfodder">
 		<description>Cannon Fodder</description>
 		<year>1995</year>
 		<publisher>Virgin Interactive</publisher>
@@ -760,7 +760,7 @@ Unreleased (possibly no prototypes exist):
 	</software>
 
 	<!-- boot OK -->
-	<software name="soccerkd" supported="yes">
+	<software name="soccerkd">
 		<description>Soccer Kid</description>
 		<year>1996</year>
 		<publisher>ReadySoft</publisher>
@@ -790,7 +790,7 @@ Unreleased (possibly no prototypes exist):
 	</software>
 
 	<!-- boot OK -->
-	<software name="soccerkd1h" cloneof="soccerkd" supported="yes">
+	<software name="soccerkd1h" cloneof="soccerkd">
 		<!-- uses universal header, only way to boot this at moment -->
 		<description>Soccer Kid (Re-release, Hacked)</description>
 		<year>2000</year>
@@ -1068,7 +1068,7 @@ Unreleased (possibly no prototypes exist):
 	</software>
 
 	<!-- boot OK, sound metrics menu has glitchy bars (pause menu then press 'B') -->
-	<software name="zool2" supported="yes">
+	<software name="zool2">
 		<description>Zool 2</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
