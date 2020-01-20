@@ -832,19 +832,26 @@ WRITE16_MEMBER(zon32bit_state::porta_w)
 	// (and all these bits get unset again after this write, so this probably isn't the bank)
 	if (data == 0x0e01)
 	{
-		m_hackbank = 1;
+		m_hackbank ^= 1;
 	}
 
+/*
 	if (data == 0x0335)
 	{
-	//	printf("%s: port a write 0x0355, port c is %04x %04X\n", machine().describe_context().c_str(), data, data & 0x1800);
+		printf("%s: port a write 0x0355, port c is %04x %04X\n", machine().describe_context().c_str(), data, data & 0x1800);
 
 		m_upperbank = (m_portc_dat & 0x1800);
 	}
+*/
 }
 
 READ16_MEMBER(zon32bit_state::portc_r)
 {	
+	// 0x03ff seem to be inputs for buttons (and some kind of output?)
+	// 0xfc00 gets masked for other reasons (including banking?)
+
+	// returning same value written for 0x0400 means controls don't respond (some kind of direction flag?)
+
 	uint16_t dat = m_io_p3->read() & ~0xf800;
 
 	dat |= (m_portc_dat & 0xf800);
@@ -869,9 +876,11 @@ WRITE16_MEMBER(zon32bit_state::portb_w)
 WRITE16_MEMBER(zon32bit_state::portc_w)
 {
 	// very noisy
+	// is the code actually sending the sound to the remotes?
+
 	//logerror("%s: portc_w (%04x)\n", machine().describe_context(), data);
 
-	//int pc = m_maincpu->pc();
+	int pc = m_maincpu->pc();
 	//if ((pc >= 0x77261) && (pc <= 0x77268))
 	//	printf("%s: port c %04x %04X-- BANK STUFF\n", machine().describe_context().c_str(), data, data & 0x1800);
 
@@ -885,7 +894,6 @@ we can only trigger bank on 0335 writes, because it gets lost shortly after (unl
 
 ':maincpu' (077250): port c 0000 0000
 ':maincpu' (077263): port c fe00 1800-- BANK STUFF
-':maincpu' (077263): port c fe00 1800
 ':maincpu' (0677DC): porta_w (0311)
 ':maincpu' (0677E9): porta_w (0301)
 ':maincpu' (0677F6): porta_w (0335)  // bank take effect?
@@ -894,14 +902,23 @@ we can only trigger bank on 0335 writes, because it gets lost shortly after (unl
 ':maincpu' (06781B): port c f800 1800
 */
 
+	if (((pc == 0x077263) || (pc == 0x077262)) && m_hackbank == 1) // when using upper code bank
+	{
+		//printf("change upper bank from upper code bank %04x\n", data & 0x1800);
+		m_upperbank = data & 0x1800;
+	}
+
+	if (((pc == 0x05ff63) || (pc == 0x05FF62)) && m_hackbank == 0) // when using lower code bank
+	{
+		//printf("change upper bank from lower code bank %04x\n", data & 0x1800);
+		m_upperbank = data & 0x1800;
+	}
+
 	m_portc_dat = data;
 
 //077261: r4 = r2
 //077262: [r4] = r3         // writes to  3d0b   (port c?)
 //077263: sp += 04
-
-
-// ':maincpu' (05FF41): port c 1800 1800
 }
 
 
@@ -1194,14 +1211,9 @@ READ16_MEMBER(zon32bit_state::z32_rom_r)
 {
 	/*
 		This has upper and lower bank, which can be changed independently.
-		I don't know where the bank registers are.	
+		Banking hookup is currently very hacky as bank values are written
+		to ports then erased at the moment, maybe they latch somehow?
 	*/
-
-		//return m_romregion[offset+ (0x400000*1)]; // invalid
-		//return m_romregion[offset+ (0x400000*4)]; // invalid  (menu with all things)
-		//return m_romregion[offset+ (0x400000*8)];
-
-
 
 #if 1
 	if (offset < 0x200000)
@@ -1212,7 +1224,6 @@ READ16_MEMBER(zon32bit_state::z32_rom_r)
 		{	// if lower bank is 1
 			return m_romregion[offset + 0x400000];
 		}
-
 	}
 	else
 	{
@@ -1220,19 +1231,18 @@ READ16_MEMBER(zon32bit_state::z32_rom_r)
 
 		if (m_hackbank == 0) // if lower bank is 0
 		{
-			return m_romregion[0x200000 + offset + 0x000000];
-
-			//if ((m_upperbank & 0x1800) == 0x1000)  return m_romregion[0x200000 + offset + 0x000000]; // this upper bank is needed to boot to the menu
-			//else if ((m_upperbank & 0x1800) == 0x0000)  return m_romregion[0x200000 + offset + 0x200000];
-			// other banks are presumably needed for the games that don't change the lower bank but still don't run with the above.
+			if ((m_upperbank & 0x1800) == 0x1000)  return m_romregion[offset + (0x0400000/2)]; // this upper bank is needed to boot to the menu
+			else if ((m_upperbank & 0x1800) == 0x0800)  return m_romregion[offset + (0x1000000/2)]; // golf, tennis, several mini games
+			else if ((m_upperbank & 0x1800) == 0x1800)  return m_romregion[offset + (0x1400000/2)]; // baseball, more minigames
+			else if ((m_upperbank & 0x1800) == 0x0000)  return m_romregion[offset + (0x0400000/2)]; // ? (not used?)
 		}
 		else // if lower bank is 1
 		{
 			// these banks are used for different 'mini' games (and boxing) with the 2nd lower bank enabled
-			if ((m_upperbank & 0x1800) == 0x1000) return m_romregion[0x200000 + offset + 0x400000 + 0x000000]; // 31-44    1000 bubble destroyer
-			else if ((m_upperbank & 0x1800) == 0x0800) return m_romregion[0x200000 + offset+ 0x400000 + 0x600000]; // 45-49   46 writes 0800
-			else if ((m_upperbank & 0x1800) == 0x1800) return m_romregion[0x200000 + offset+ 0x400000 + 0x800000]; // 50-59   changing 1800
-			else if ((m_upperbank & 0x1800) == 0x0000) return m_romregion[0x200000 + offset + 0x000000]; // ?
+			if ((m_upperbank & 0x1800) == 0x1000)      return m_romregion[offset + (0x0c00000/2)]; // 31-44   some mini games
+			else if ((m_upperbank & 0x1800) == 0x0800) return m_romregion[offset + (0x1800000/2)]; // 45-49   some mini games + boxing
+			else if ((m_upperbank & 0x1800) == 0x1800) return m_romregion[offset + (0x1c00000/2)]; // 50-59   some mini games
+			else if ((m_upperbank & 0x1800) == 0x0000) return m_romregion[offset + (0x0400000/2)]; // ? (not used?)
 		}	
 	}
 #endif
