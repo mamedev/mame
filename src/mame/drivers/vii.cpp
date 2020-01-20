@@ -827,8 +827,8 @@ READ16_MEMBER(zon32bit_state::porta_r)
 
 WRITE16_MEMBER(zon32bit_state::porta_w)
 {	
-	//if (data != 0x0101)
-	//	printf("%s: porta_w (%04x)\n", machine().describe_context().c_str(), data);
+//	if (data != 0x0101)
+//		printf("%s: porta_w (%04x)\n", machine().describe_context().c_str(), data);
 
 	m_porta_dat = data;
 
@@ -837,6 +837,11 @@ WRITE16_MEMBER(zon32bit_state::porta_w)
 	if (data == 0x0e01)
 	{
 		m_hackbank ^= 1;
+	}
+
+	if (data == 0x0301)
+	{
+		m_hackbank = 2;
 	}
 
 /*
@@ -938,11 +943,18 @@ we can only trigger bank on 0335 writes, because it gets lost shortly after (unl
 			m_upperbank = data & 0x1800;
 		}
 
-		if (pc == 0x530)
+		if ((pc == 0x530) && m_hackbank == 1)
 		{
 			printf("mywicodx change upper bank from other menu code bank %04x\n", data & 0x1800);
 			m_upperbank = data & 0x1800;
 		}
+
+		if ((pc == 0x159E2) && m_hackbank == 2)
+		{
+			printf("mywicodx change guitar music bank %04x\n", data & 0x1800);
+			m_upperbank = data & 0x1800;
+		}
+
 	}
 #endif
 
@@ -1283,35 +1295,49 @@ READ16_MEMBER(zon32bit_state::z32_rom_r)
 	{
 		if (offset < 0x200000)
 		{
-			if (m_hackbank == 0) // if lower bank is 0
-				return m_romregion[offset + (0x2000000/2)];
-			else
-			{	// if lower bank is 1
-				return m_romregion[offset + (0x3000000/2)];
+			if (m_hackbank == 0) // if lower bank is 0 (main menu)
+			{
+				return m_romregion[offset + (0x2000000 / 2)];
+			}
+			else if (m_hackbank == 1) // if lower bank is 0 (debug menu code / extra cames)
+			{
+				return m_romregion[offset + (0x3000000 / 2)];
+			}
+			else 	// Mi Guitar
+			{
+				return m_romregion[offset + (0x0000000 / 2)];
 			}
 		}
 		else
 		{
 			offset &= 0x1fffff;
 
-			if (m_hackbank == 0) // if lower bank is 0
+			if (m_hackbank == 0)
 			{
 				if ((m_upperbank & 0x1800) == 0x1000)  return m_romregion[offset + (0x2400000 / 2)]; // this upper bank is needed to boot to the menu, boxing
 				else if ((m_upperbank & 0x1800) == 0x0800)  return m_romregion[offset + (0x2800000 / 2)]; // ? tennis, golf
 				else if ((m_upperbank & 0x1800) == 0x1800)  return m_romregion[offset + (0x2c00000 / 2)]; // ? table tennis, bowling, basketball, baseball
 				else if ((m_upperbank & 0x1800) == 0x0000)  return m_romregion[offset + (0x2400000 / 2)]; // ? (not used?)
 			}
-			else // if lower bank is 1
+			else if (m_hackbank == 1)
 			{
 				if ((m_upperbank & 0x1800) == 0x1000)  return m_romregion[offset + (0x3400000 / 2)]; // base code for other bank
 				else if ((m_upperbank & 0x1800) == 0x0800)  return m_romregion[offset + (0x3800000 / 2)]; //
 				else if ((m_upperbank & 0x1800) == 0x1800)  return m_romregion[offset + (0x3c00000 / 2)]; // 
 				else if ((m_upperbank & 0x1800) == 0x0000)  return m_romregion[offset + (0x3400000 / 2)]; //
 			}
+			else
+			{
+				if ((m_upperbank & 0x1800) == 0x1000)  return m_romregion[offset + (0x0400000 / 2)]; // song data 1
+				else if ((m_upperbank & 0x1800) == 0x0800)  return m_romregion[offset + (0x0800000 / 2)]; // song data 2
+				else if ((m_upperbank & 0x1800) == 0x1800)  return m_romregion[offset + (0x0c00000 / 2)]; // song data 3
+				else if ((m_upperbank & 0x1800) == 0x0000)  return m_romregion[offset + (0x0400000 / 2)]; //
+			}
 		}
 	}
 
 	return 0x0000;// m_romregion[offset];
+
 }
 
 
@@ -1786,9 +1812,9 @@ static INPUT_PORTS_START( zon32bit )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("Left (vertical) Down (horizontal)")
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Right (vertical) Up (horizontal)")
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON4 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("B")
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Pause / Menu")
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
@@ -4880,7 +4906,7 @@ CONS( 2011, lx_jg7415,0, 0, wireless60, wirels60, wireless60_state,  init_lx_jg7
 
 // Box advertises this as '40 Games Included' but the cartridge, which was glued directly to the PCB, not removable, is a 41-in-1.  Maybe some versions exist with a 40 game selection.
 CONS( 200?, zon32bit,  0, 0, zon32bit, zon32bit, zon32bit_state,  init_zon32bit,      "Jungle Soft / Ultimate Products (HK) Ltd",    "Zone 32-bit Gaming Console System (Family Sport 41-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, mywicodx,  0, 0, zon32bit, zon32bit, zon32bit_state,  init_mywicodx,      "<unknown>",                                   "My Wico Deluxe", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mywicodx,  0, 0, zon32bit, zon32bit, zon32bit_state,  init_mywicodx,      "<unknown>",                                   "My Wico Deluxe (Family Sport 81-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // also available under the MiWi brand, as a cart
 
 
 // JAKKS Pacific Inc TV games
