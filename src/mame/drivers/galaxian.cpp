@@ -5984,6 +5984,7 @@ void galaxian_state::konami_base(machine_config &config)
 	m_ppi8255[1]->out_pb_callback().set(FUNC(galaxian_state::konami_sound_control_w));
 	m_ppi8255[1]->in_pc_callback().set_ioport("IN3");
 	m_ppi8255[1]->out_pc_callback().set(FUNC(galaxian_state::konami_portc_1_w));
+
 }
 
 
@@ -6105,9 +6106,7 @@ void galaxian_state::galaxian(machine_config &config)
 {
 	galaxian_base(config);
 
-	GALAXIAN(config, "cust", 0).add_route(ALL_OUTPUTS, "speaker", 0.4);
-
-	DISCRETE(config, GAL_AUDIO, galaxian_discrete).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	GALAXIAN_SOUND(config, "cust", 0);
 }
 
 void galaxian_state::victoryc(machine_config &config)
@@ -6189,9 +6188,7 @@ void galaxian_state::mooncrst(machine_config &config)
 	// alternate memory map
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::mooncrst_map);
 
-	GALAXIAN(config, "cust", 0).add_route(ALL_OUTPUTS, "speaker", 0.4);
-
-	DISCRETE(config, GAL_AUDIO, mooncrst_discrete).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	MOONCRST_SOUND(config, "cust", 0);
 }
 
 void galaxian_state::eagle(machine_config &config)
@@ -6240,7 +6237,6 @@ void galaxian_state::fantastc(machine_config &config)
 
 	// sound hardware
 	AY8910(config, m_ay8910[0], GALAXIAN_PIXEL_CLOCK/3/2).add_route(ALL_OUTPUTS, "speaker", 0.25); // 3.072MHz
-
 	AY8910(config, m_ay8910[1], GALAXIAN_PIXEL_CLOCK/3/2).add_route(ALL_OUTPUTS, "speaker", 0.25); // 3.072MHz
 }
 
@@ -6364,6 +6360,7 @@ void galaxian_state::frogger(machine_config &config)
 void galaxian_state::froggermc(machine_config &config)
 {
 	galaxian_base(config);
+
 	konami_sound_1x_ay8910(config);
 
 	// alternate memory map

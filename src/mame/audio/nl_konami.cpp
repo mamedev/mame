@@ -6,6 +6,25 @@
 #error Somehow nl_base.h made it into the include chain.
 #endif
 
+/*
+ * M51516L pins:
+ *
+ * pin
+ * 9 - power,
+ * 8 - output 1,
+ * 7 - output 2,
+ * 6 - ground (large signal),
+ * 5 - feedback 2,
+ * 4 - feedback 1,
+ * 3 - muting,
+ * 2 - ground (small signal),
+ * 1 - input
+ *
+ * on the block diagram, box to the right of pin 3 says "Muting"
+ * and then to the right of that "ASO protection, surge protection, heat barrier"
+ *
+ */
+
 static NETLIST_START(filter)
 	CD4066_GATE(G1)
 	PARAM(G1.BASER, 270.0)
