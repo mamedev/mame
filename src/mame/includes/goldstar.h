@@ -173,6 +173,7 @@ public:
 	void init_nfb96_a();
 	void init_nfb96_b();
 	void init_nfb96_c1();
+	void init_nfb96_c1_2();
 	void init_nfb96_c2();
 	void init_nfb96_d();
 	void init_nfb96_dk();
