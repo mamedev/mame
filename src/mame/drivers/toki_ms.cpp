@@ -6,12 +6,16 @@
 
     as with most of the 'Modular System' setups, the hardware is heavily modified from the original
     and consists of a multi-board stack in a cage, hence different driver.
+	Update: it doesn't seem all that different than tokib, the differences are on paletteram, 
+	scrollram and (probably) spriteram;
 
-    TODO: PCB list
-
+    TODO: 
+	- PCB list;
+	- Merge with toki.cpp driver;
+	- "bajo licencia" -> "under license" ... from whoever developed Modular System or TAD itself?
 
     NOTES:
-    PCB lacks raster effect on title screen
+    PCB lacks raster effect on title screen (like toki bootlegs)
 
 */
 
@@ -21,56 +25,274 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class toki_ms_state : public driver_device
 {
 public:
 	toki_ms_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette"),
-		m_screen(*this, "screen"),
-		m_paletteram(*this, "palette"),
-		m_gfxdecode(*this, "gfxdecode")
+		driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_palette(*this, "palette")
+		, m_screen(*this, "screen")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_bk1vram(*this, "bk1vram")
+		, m_bk2vram(*this, "bk2vram")
+		, m_vram(*this, "vram")
+		, m_scrollram(*this, "scrollram")
 	{ }
 
-	void tokim(machine_config &config);
+	void tokims(machine_config &config);
+	void init_tokims();
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
-	required_shared_ptr<uint16_t> m_paletteram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_shared_ptr<u16> m_bk1vram;
+	required_shared_ptr<u16> m_bk2vram;
+	required_shared_ptr<u16> m_vram;
+	required_shared_ptr<u16> m_scrollram;
 
 	virtual void machine_start() override;
+	virtual void video_start() override;
+
+	TILE_GET_INFO_MEMBER(get_bk1_info);
+	TILE_GET_INFO_MEMBER(get_bk2_info);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	DECLARE_WRITE16_MEMBER(bk1vram_w);
+	DECLARE_WRITE16_MEMBER(bk2vram_w);
+	DECLARE_WRITE16_MEMBER(vram_w);
+	tilemap_t *m_bk1_tilemap;
+	tilemap_t *m_bk2_tilemap;
+	tilemap_t *m_tx_tilemap;
+
+	DECLARE_READ8_MEMBER(palette_r);
+	DECLARE_WRITE8_MEMBER(palette_w);
+	std::unique_ptr<u8 []> m_paletteram;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void tokim_map(address_map &map);
+	void tokims_map(address_map &map);
+	
+	DECLARE_READ16_MEMBER(sound_status_r);
 };
 
-
-void toki_ms_state::tokim_map(address_map &map)
+TILE_GET_INFO_MEMBER(toki_ms_state::get_tile_info)
 {
-	map(0x000000, 0x05ffff).rom();
-	map(0x060000, 0x06d7ff).ram();
-	map(0x06e000, 0x06e7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	u16 code = (m_vram[tile_index] & 0xfff) | 0x1000;
+	u8 color = (m_vram[tile_index] >> 12);
+
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-void toki_ms_state::machine_start()
+TILE_GET_INFO_MEMBER(toki_ms_state::get_bk1_info)
 {
+	int tile = m_bk1vram[tile_index];
+	int color = (tile >> 12) & 0xf;
+
+	tile &= 0xfff;
+
+	SET_TILE_INFO_MEMBER(2,
+			tile,
+			color,
+			0);
 }
 
+TILE_GET_INFO_MEMBER(toki_ms_state::get_bk2_info)
+{
+	int tile = m_bk2vram[tile_index];
+	int color = (tile >> 12) & 0xf;
+
+	tile &= 0xfff;
+
+	SET_TILE_INFO_MEMBER(3,
+			tile,
+			color,
+			0);
+}
+
+void toki_ms_state::video_start()
+{
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(toki_ms_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bk1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(toki_ms_state::get_bk1_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bk2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(toki_ms_state::get_bk2_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+
+	m_bk1_tilemap->set_transparent_pen(15);
+	m_bk2_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_transparent_pen(15);
+
+	m_paletteram = std::make_unique<u8 []>(0x800);
+	std::fill_n(m_paletteram.get(), 0x800, 0);
+	save_pointer(NAME(m_paletteram), 0x800);
+}
 
 uint32_t toki_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(m_palette->black_pen());
+	m_bk1_tilemap->set_scrollx(0, (0x33-m_scrollram[0]) & 0x1ff );
+	m_bk1_tilemap->set_scrolly(0, (m_scrollram[1]+1) & 0x1ff );
+	m_bk2_tilemap->set_scrollx(0, (0x31-m_scrollram[2]) & 0x1ff );
+	m_bk2_tilemap->set_scrolly(0, (m_scrollram[3]+1) & 0x1ff );
+
+	if (m_scrollram[4] & 1)
+	{
+		m_bk2_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_bk1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	}
+	else
+	{
+		m_bk1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_bk2_tilemap->draw(screen, bitmap, cliprect, 0, 0);		
+	}
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }
 
-static INPUT_PORTS_START( tokim )
+WRITE16_MEMBER(toki_ms_state::bk1vram_w)
+{
+	COMBINE_DATA(&m_bk1vram[offset]);
+	m_bk1_tilemap->mark_tile_dirty(offset);
+}
+
+WRITE16_MEMBER(toki_ms_state::bk2vram_w)
+{
+	COMBINE_DATA(&m_bk2vram[offset]);
+	m_bk2_tilemap->mark_tile_dirty(offset);
+}
+
+WRITE16_MEMBER(toki_ms_state::vram_w)
+{
+	COMBINE_DATA(&m_vram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
+}
+
+READ8_MEMBER(toki_ms_state::palette_r)
+{
+	return m_paletteram[offset];
+}
+
+WRITE8_MEMBER(toki_ms_state::palette_w)
+{
+	m_paletteram[offset] = data;
+	// xBGR444 over an 8-bit bus
+	int r,g,b;
+	u16 pal_entry = offset & 0x3ff;
+	b = (m_paletteram[pal_entry|0x400] & 0xf);
+	g = (m_paletteram[pal_entry] & 0xf0) >> 4;
+	r = m_paletteram[pal_entry] & 0xf;
+
+	m_palette->set_pen_color(pal_entry, pal4bit(r),pal4bit(g),pal4bit(b));
+}
+
+READ16_MEMBER(toki_ms_state::sound_status_r)
+{
+	return 0xffff;
+}
+
+void toki_ms_state::tokims_map(address_map &map)
+{
+	map(0x000000, 0x05ffff).rom();
+	map(0x060000, 0x06dfff).ram();
+	map(0x06e800, 0x06efff).ram().w(FUNC(toki_ms_state::bk1vram_w)).share("bk1vram");
+	map(0x06f000, 0x06f7ff).ram().w(FUNC(toki_ms_state::bk2vram_w)).share("bk2vram");
+	map(0x06f800, 0x06ffff).ram().w(FUNC(toki_ms_state::vram_w)).share("vram");
+	map(0x070000, 0x0707ff).rw(FUNC(toki_ms_state::palette_r), FUNC(toki_ms_state::palette_w)).umask16(0xffff);
+	map(0x071000, 0x0713ff).ram(); // sprites
+	map(0x072000, 0x072001).nopr(); // irq ack?
+	map(0x073000, 0x07300f).ram().share("scrollram"); 
+	map(0x0c0000, 0x0c0001).portr("DSW");
+	map(0x0c0002, 0x0c0003).portr("INPUTS");
+	map(0x0c0004, 0x0c0005).portr("SYSTEM");
+	map(0x0c000e, 0x0c000f).r(FUNC(toki_ms_state::sound_status_r));
+}
+
+static INPUT_PORTS_START( tokims )
+	// same as tokib
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x001f, 0x001f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3,4,5")
+	PORT_DIPSETTING(      0x0015, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(      0x0017, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0x0019, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x001b, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0003, DEF_STR( 8C_3C ) )
+	PORT_DIPSETTING(      0x001d, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0005, DEF_STR( 5C_3C ) )
+	PORT_DIPSETTING(      0x0007, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(      0x001f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0009, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x0013, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0011, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x000f, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x000d, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x000b, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(      0x001e, "A 1/1 B 1/2" )
+	PORT_DIPSETTING(      0x0014, "A 2/1 B 1/3" )
+	PORT_DIPSETTING(      0x000a, "A 3/1 B 1/5" )
+	PORT_DIPSETTING(      0x0000, "A 5/1 B 1/6" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0020, 0x0000, "Joysticks" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(      0x0020, "1" )
+	PORT_DIPSETTING(      0x0000, "2" )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Upright ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )  PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(      0x0200, "2" )
+	PORT_DIPSETTING(      0x0300, "3" )
+	PORT_DIPSETTING(      0x0100, "5" )
+	PORT_DIPSETTING(      0x0000, "Infinite (Cheat)")
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(      0x0800, "50000 150000" )
+	PORT_DIPSETTING(      0x0000, "70000 140000 210000" )
+	PORT_DIPSETTING(      0x0c00, "70000" )
+	PORT_DIPSETTING(      0x0400, "100000 200000" )
+	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(      0x2000, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x3000, DEF_STR( Medium ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
+	
+	PORT_START("INPUTS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_BUTTON1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_BUTTON2 )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static const gfx_layout tiles16x16x4_layout =
@@ -78,37 +300,55 @@ static const gfx_layout tiles16x16x4_layout =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0,8,16,24 },
+	{ 24,16,8,0 },
 	{ 0,1,2,3,4,5,6,7, 512,513,514,515,516,517,518,519 },
 	{ STEP16(0,32) },
 	16 * 16 * 4
 };
 
+static const gfx_layout tokib_tilelayout =
+{
+	16,16,  /* 16 by 16 */
+	4096,   /* 4096 characters */
+	4,  /* 4 bits per pixel */
+	{ 4096*16*16*3,4096*16*16*2,4096*16*16*1,4096*16*16*0 },    /* planes */
+	{ 0, 1, 2, 3, 4, 5, 6, 7,
+		0x8000*8+0, 0x8000*8+1, 0x8000*8+2, 0x8000*8+3, 0x8000*8+4,
+		0x8000*8+5, 0x8000*8+6, 0x8000*8+7 },           /* x bit */
+	{
+		0,8,16,24,32,40,48,56,
+		0x10000*8+ 0, 0x10000*8+ 8, 0x10000*8+16, 0x10000*8+24, 0x10000*8+32,
+		0x10000*8+40, 0x10000*8+48, 0x10000*8+56 },         /* y bit */
+	8*8
+};
+
 static GFXDECODE_START( gfx_toki_ms )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x4_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x4_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tiles16x16x4_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, tiles16x16x4_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_planar,    0x100, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x4_layout, 0x000, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, tokib_tilelayout,    0x200, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, tokib_tilelayout,    0x300, 16 )
 GFXDECODE_END
 
-void toki_ms_state::tokim(machine_config &config)
+void toki_ms_state::machine_start()
+{
+}
+
+
+void toki_ms_state::tokims(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &toki_ms_state::tokim_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &toki_ms_state::tokims_map);
 	m_maincpu->set_vblank_int("screen", FUNC(toki_ms_state::irq1_line_hold));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0, 256-1, 0, 256-32-1);
+	m_screen->set_raw(12_MHz_XTAL / 2, 384, 0, 256, 272, 16, 240); // generic, not measured
 	m_screen->set_screen_update(FUNC(toki_ms_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x400);
-
+	PALETTE(config, m_palette).set_entries(0x400);
+	
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_toki_ms);
 
 	/* sound hardware */
@@ -128,7 +368,13 @@ ROM_START( tokims )
 	ROM_REGION( 0x010000, "audiocpu", 0 )    /* Z80 code */
 	ROM_LOAD( "1_tk_101.c19", 0x000000, 0x10000, CRC(a447a394) SHA1(ccaa6aca5c2afc7c05035cb551b8368b18188dd6) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF ) // sprites (same rom subboard type as galpanic_ms.cpp)
+	ROM_REGION( 0x040000, "gfx1", 0 )
+	ROM_LOAD( "8_tk_825.ic9",      0x000000, 0x10000, CRC(6d04def0) SHA1(36f23b0893dfae6cf4c6f4414ff54bb13cfdad41) )
+	ROM_LOAD( "8_tk_826.ic16",     0x010000, 0x10000, CRC(d3a2a038) SHA1(a2a020397a427f5fd401aad09048c7d4a21cd728) )
+	ROM_LOAD( "8_tk_827.ic24",     0x020000, 0x10000, CRC(d254ae6c) SHA1(cdbdd7d7c6cd4de8b8a0f54e1543caba5f3d11cb) )
+	ROM_LOAD( "8_tk_828.ic31",     0x030000, 0x10000, CRC(a6fae34b) SHA1(d9a276d30bdcc25d9cd299c2502cf910273890f6) )
+
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASEFF ) // sprites (same rom subboard type as galpanic_ms.cpp)
 	ROM_LOAD32_BYTE( "5_tk_501.ic3",         0x000003, 0x010000, CRC(c3cd26b6) SHA1(20d5a68eada4150642365dd61c699b7771de5372) )
 	ROM_LOAD32_BYTE( "5_tk_505.ic12",        0x000002, 0x010000, CRC(ec096351) SHA1(10417266c2280b2d9c301423d8c41ed73d9654c9) )
 	ROM_LOAD32_BYTE( "5_tk_509.ic18",        0x000001, 0x010000, CRC(a1a4ef7b) SHA1(92aad84f14f8257477920012bd1fe033ec96301b) )
@@ -148,12 +394,6 @@ ROM_START( tokims )
 	ROM_LOAD32_BYTE( "5_tk_508.ic15",        0x0c0002, 0x010000, CRC(1873ae38) SHA1(a1633ab5c417e9851e285a6b322c06e7d2d0bccd) )
 	ROM_LOAD32_BYTE( "5_tk_512.ic21",        0x0c0001, 0x010000, CRC(0228110f) SHA1(33a29f9f458ca9d0af3c8da8a5b67bab79cecdec) )
 	ROM_LOAD32_BYTE( "5_tk_516.ic27",        0x0c0000, 0x010000, CRC(f4e29429) SHA1(706050b51e0afbddf6ec5c8f14d3649bb05c8550) )
-
-	ROM_REGION( 0x040000, "gfx2", 0 )
-	ROM_LOAD( "8_tk_825.ic9",      0x000000, 0x10000, CRC(6d04def0) SHA1(36f23b0893dfae6cf4c6f4414ff54bb13cfdad41) )
-	ROM_LOAD( "8_tk_826.ic16",     0x010000, 0x10000, CRC(d3a2a038) SHA1(a2a020397a427f5fd401aad09048c7d4a21cd728) )
-	ROM_LOAD( "8_tk_827.ic24",     0x020000, 0x10000, CRC(d254ae6c) SHA1(cdbdd7d7c6cd4de8b8a0f54e1543caba5f3d11cb) )
-	ROM_LOAD( "8_tk_828.ic31",     0x030000, 0x10000, CRC(a6fae34b) SHA1(d9a276d30bdcc25d9cd299c2502cf910273890f6) )
 
 	ROM_REGION( 0x080000, "gfx3", 0 ) // same ROMs as some of the other Toki bootlegs
 	ROM_LOAD( "8_tk_809.ic13",     0x000000, 0x10000, CRC(feb13d35) SHA1(1b78ce1e48d16e58ad0721b30ab87765ded7d24e) )
@@ -195,4 +435,40 @@ ROM_START( tokims )
 	ROM_LOAD( "21_202_82s129.ic12",   0x0000, 0x100, CRC(e434128a) SHA1(ef0f6d8daef8b25211095577a182cdf120a272c1) )
 ROM_END
 
-GAME( 1991, tokims,  toki,  tokim,  tokim,  toki_ms_state, empty_init, ROT0, "bootleg", "Toki (Modular System)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+void toki_ms_state::init_tokims()
+{
+	// copied verbatim from toki.cpp
+	uint8_t temp[0x20000];
+
+	int len = memregion("gfx3")->bytes();
+	uint8_t *rom = memregion("gfx3")->base();
+	for (int offs = 0; offs < len; offs += 0x20000)
+	{
+		uint8_t *base = &rom[offs];
+		memcpy (&temp[0], base, 65536 * 2);
+		for (int i = 0; i < 16; i++)
+		{
+			memcpy(&base[0x00000 + i * 0x800], &temp[0x0000 + i * 0x2000], 0x800);
+			memcpy(&base[0x10000 + i * 0x800], &temp[0x0800 + i * 0x2000], 0x800);
+			memcpy(&base[0x08000 + i * 0x800], &temp[0x1000 + i * 0x2000], 0x800);
+			memcpy(&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
+		}
+	}
+
+	len = memregion("gfx4")->bytes();
+	rom = memregion("gfx4")->base();
+	for (int offs = 0; offs < len; offs += 0x20000)
+	{
+		uint8_t *base = &rom[offs];
+		memcpy (&temp[0], base, 65536 * 2);
+		for (int i = 0; i < 16; i++)
+		{
+			memcpy(&base[0x00000 + i * 0x800], &temp[0x0000 + i * 0x2000], 0x800);
+			memcpy(&base[0x10000 + i * 0x800], &temp[0x0800 + i * 0x2000], 0x800);
+			memcpy(&base[0x08000 + i * 0x800], &temp[0x1000 + i * 0x2000], 0x800);
+			memcpy(&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
+		}
+	}
+}
+
+GAME( 1991, tokims,  toki,  tokims,  tokims,  toki_ms_state, init_tokims, ROT0, "bootleg", "Toki (Modular System)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
