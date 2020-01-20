@@ -994,6 +994,9 @@ age_cand                        // AGE Candy Crane
 agat7                           // Agat-7
 agat9                           // Agat-9
 
+@source:aid80f.cpp
+aid80f                          //
+
 @source:aim65.cpp
 aim65                           // Rockwell AIM65
 
