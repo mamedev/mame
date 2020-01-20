@@ -742,7 +742,7 @@ void gsan_state::do_render(bool vbkem)
 			listoffs += m_vram[listoffs + 1] * 2 + 2;
 			break;
 		case 0x0d: // RLINE
-			draw_line(cmd, &m_vram[listoffs]);
+			draw_rline(cmd, &m_vram[listoffs]);
 			listoffs += m_vram[listoffs + 1] + 2;
 			break;
 		// 0x0e PLINE
