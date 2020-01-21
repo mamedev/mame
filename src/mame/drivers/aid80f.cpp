@@ -98,7 +98,9 @@ void aid80f_state::mem_map(address_map &map)
 void aid80f_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
+	map(0xd8, 0xdb).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0xdc, 0xdf).rw("pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0xe4, 0xe7).rw("fdc", FUNC(fd1771_device::read), FUNC(fd1771_device::write));
 }
 
 static INPUT_PORTS_START(aid80f)
