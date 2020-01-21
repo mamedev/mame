@@ -827,8 +827,8 @@ READ16_MEMBER(zon32bit_state::porta_r)
 
 WRITE16_MEMBER(zon32bit_state::porta_w)
 {	
-//	if (data != 0x0101)
-//		printf("%s: porta_w (%04x)\n", machine().describe_context().c_str(), data);
+	//if (data != 0x0101)
+	//	logerror("%s: porta_w (%04x)\n", machine().describe_context(), data);
 
 	m_porta_dat = data;
 
@@ -844,14 +844,14 @@ WRITE16_MEMBER(zon32bit_state::porta_w)
 		m_hackbank = 2;
 	}
 
-/*
+	/*
 	if (data == 0x0335)
 	{
-		printf("%s: port a write 0x0355, port c is %04x %04X\n", machine().describe_context().c_str(), data, data & 0x1800);
+		logerror("%s: port a write 0x0355, port c is %04x %04X\n", machine().describe_context(), data, data & 0x1800);
 
 		m_upperbank = (m_portc_dat & 0x1800);
 	}
-*/
+	*/
 }
 
 READ16_MEMBER(zon32bit_state::portc_r)
@@ -890,36 +890,35 @@ WRITE16_MEMBER(zon32bit_state::portc_w)
 	//logerror("%s: portc_w (%04x)\n", machine().describe_context(), data);
 
 	//if ((pc >= 0x77261) && (pc <= 0x77268))
-	//	printf("%s: port c %04x %04X-- BANK STUFF\n", machine().describe_context().c_str(), data, data & 0x1800);
+	//	logerror("%s: port c %04x %04X-- BANK STUFF\n", machine().describe_context(), data, data & 0x1800);
 
-	//printf("%s: port c %04x %04x\n", machine().describe_context().c_str(), data, data & 0x1800);
+	//logerror("%s: port c %04x %04x\n", machine().describe_context(), data, data & 0x1800);
 
-/*
+	/*
 
-this logic seems to apply for some of the mini-games, but cases where the lower bank doesn't change, this sequence doesn't happen either...
+	this logic seems to apply for some of the mini-games, but cases where the lower bank doesn't change, this sequence doesn't happen either...
 
-we can only trigger bank on 0335 writes, because it gets lost shortly after (unless that's an issue with the io code in spg2xx_io.cpp)
+	we can only trigger bank on 0335 writes, because it gets lost shortly after (unless that's an issue with the io code in spg2xx_io.cpp)
 
-':maincpu' (077250): port c 0000 0000
-':maincpu' (077263): port c fe00 1800-- BANK STUFF
-':maincpu' (0677DC): porta_w (0311)
-':maincpu' (0677E9): porta_w (0301)
-':maincpu' (0677F6): porta_w (0335)  // bank take effect?
-':maincpu' (067803): port c fc00 1800
-':maincpu' (067810): port c fe00 1800
-':maincpu' (06781B): port c f800 1800
-*/
+	':maincpu' (077250): port c 0000 0000
+	':maincpu' (077263): port c fe00 1800-- BANK STUFF
+	':maincpu' (0677DC): porta_w (0311)
+	':maincpu' (0677E9): porta_w (0301)
+	':maincpu' (0677F6): porta_w (0335)  // bank take effect?
+	':maincpu' (067803): port c fc00 1800
+	':maincpu' (067810): port c fe00 1800
+	':maincpu' (06781B): port c f800 1800
+	*/
 
-// logic doesn't work for all cases, causes bad bank changes after boot in some games
+// bits 0x0600 are explicitly set when changing bank, but this logic doesn't work for all cases, causes bad bank changes after boot in some games
 #if 0
 	if ((data & 0x0600) == (0x0600))
 	{
 		if ((m_portc_dat & 0x0600) != 0x0600)
 			m_upperbank = data & 0x1800;
 	}
-#endif
 
-#if 1
+#else // ugly PC based hacked to ensure we always have the correct bank
 	int pc = m_maincpu->pc();
 	if (m_game == 0)
 	{
@@ -3348,7 +3347,10 @@ void spg2xx_pdc100_game_state::machine_reset()
 WRITE16_MEMBER(spg2xx_pdc100_game_state::porta_w)
 {
 	//logerror("%s: porta_w %04x\n", machine().describe_context(), data);
-	switch_bank(data & 0x0007);
+	
+	// simply writes 0000 at times during bootup while initializing stuff, which causes an invalid bankswitch mid-code execution
+	if (data & 0xff00)
+		switch_bank(data & 0x0007);
 }
 
 WRITE16_MEMBER(spg2xx_lexiseal_game_state::portb_w)
