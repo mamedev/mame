@@ -1941,6 +1941,55 @@ ROM_START( godzilla )
 	ROM_LOAD( "copx-d2.313",  0x000000, 0x080000, CRC(7c52581b) SHA1(7e668476f886806b0c06fa0bcf4bbc955878c87c) )
 ROM_END
 
+/* 
+
+Denjin Makai newer set
+PCB labeled BP942KS
+All "denjin" ROM labels from this set are actually written in kanji chars.
+
+*/
+
+ROM_START( denjinmk ) 
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD32_BYTE( "denjin_1.u025", 0x000000, 0x040000, CRC(b23a6e6f) SHA1(73ab330dfc0d2799984874f02da51deb8323b9e2) )
+	ROM_LOAD32_BYTE( "denjin_2.u024", 0x000001, 0x040000, CRC(4fde59e7) SHA1(1618db14a18acc2acabdd93b8e2563d7221e643d) )
+	ROM_LOAD32_BYTE( "denjin_3.u026", 0x000002, 0x040000, CRC(4f10292b) SHA1(c61c88cacc433bb9af6a4225ce5959dd0fefd084) )
+	ROM_LOAD32_BYTE( "denjin_4.u023", 0x000003, 0x040000, CRC(209f1f6b) SHA1(3f6709dc79fae47ef4181d405d3aa94c2df5963a) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
+	ROM_LOAD( "denjin_7.u1016",  0x000000, 0x08000, CRC(970f36dd) SHA1(010a9edeaedb9e258cd02b3e9294264d00ec7c45) )
+	ROM_CONTINUE(         0x010000, 0x08000 )   /* banked stuff */
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x020000, "char", 0 )
+	ROM_LOAD16_BYTE( "denjin_6.u0620", 0x000000, 0x010000, CRC(e1f759b1) SHA1(ddc60e78e7791a59c59403dd4089b3f6e1ecf8cb) )
+	ROM_LOAD16_BYTE( "denjin_5.u0615", 0x000001, 0x010000, CRC(cc36af0d) SHA1(69c2ae38f03be79be4d138fcc73a6a86407eb285) )
+
+	ROM_REGION( 0x500000, "sprite", 0 )
+	ROM_LOAD16_WORD_SWAP( "obj-0-3.748", 0x000000, 0x200000, CRC(67c26a67) SHA1(20543ca9dcf3fed0884968b5249b34b59a14b791) ) /* banks 0,1,2,3 */
+	ROM_LOAD16_WORD_SWAP( "obj-4-5.756", 0x200000, 0x100000, CRC(01f8d4e6) SHA1(25b69da693be8c3404f750b419c330a7a56e88ec) ) /* 4,5 */
+	ROM_LOAD16_WORD_SWAP( "obj-6-7.743", 0x300000, 0x100000, CRC(e5805757) SHA1(9d392c27eef7c1fcda560dac17ba9d7ae2287ac8) ) /* 6,7 */
+	ROM_LOAD16_WORD_SWAP( "obj-8-9.757", 0x400000, 0x100000, CRC(c8f7e1c9) SHA1(a746d187b50a0ecdd5a7f687a2601e5dc8bfe272) ) /* 8,9 */
+
+	ROM_REGION( 0x100000, "back", 0 )   /* MBK tiles */
+	ROM_LOAD16_WORD_SWAP( "bg-1-ab.618", 0x000000, 0x100000, CRC(eaad151a) SHA1(bdd1d83ee8497efe20f21baf873e786446372bcb) )
+
+	ROM_REGION( 0x100000, "mid", 0 )    /* BK2 used (or LBK; just identification string differs?) */
+	ROM_LOAD16_WORD_SWAP( "bg-2-ab.617", 0x000000, 0x100000, CRC(40938f74) SHA1(d68b0f8245a8b390ad5d4e6ebc7514a939b8ac51) )
+
+	ROM_REGION( 0x100000, "fore", 0 )   /* BK3 tiles */
+	ROM_LOAD16_WORD_SWAP( "bg-3-ab.619", 0x000000, 0x100000, CRC(de7366ee) SHA1(0c3969d15f3cd963e579d4164b6e0a6b4012c9c6) )
+
+	ROM_REGION( 0x080000, "oki", 0 )    /* ADPCM samples */
+	ROM_LOAD( "denjin_8.u0922",     0x000000, 0x040000, CRC(a11adb8f) SHA1(50e1158767b506d962bff861c2a6609246d764c4) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "s68e08.844",  0x000000, 0x000200, CRC(96f7646e) SHA1(400a831b83d6ac4d2a46ef95b97b1ee237099e44) ) /* Priority */
+
+	ROM_REGION( 0x080000, "user1", 0 )
+	ROM_LOAD( "copx-d2.313", 0x000000, 0x080000, CRC(7c52581b) SHA1(7e668476f886806b0c06fa0bcf4bbc955878c87c) )
+ROM_END
+
 /*
 
 Denjin Makai
@@ -2013,49 +2062,7 @@ Notes:
 
       S68E08 : PROM type 82S147, labelled 'S68E08'
 
-
 */
-
-ROM_START( denjinmk ) /* PCB labled BP942KS */
-	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD32_BYTE( "denjin_1.u025", 0x000000, 0x040000, CRC(b23a6e6f) SHA1(73ab330dfc0d2799984874f02da51deb8323b9e2) ) /* "Denjin" written in Kanji on label */
-	ROM_LOAD32_BYTE( "denjin_2.u024", 0x000001, 0x040000, CRC(4fde59e7) SHA1(1618db14a18acc2acabdd93b8e2563d7221e643d) ) /* "Denjin" written in Kanji on label */
-	ROM_LOAD32_BYTE( "denjin_3.u026", 0x000002, 0x040000, CRC(4f10292b) SHA1(c61c88cacc433bb9af6a4225ce5959dd0fefd084) ) /* "Denjin" written in Kanji on label */
-	ROM_LOAD32_BYTE( "denjin_4.u023", 0x000003, 0x040000, CRC(209f1f6b) SHA1(3f6709dc79fae47ef4181d405d3aa94c2df5963a) ) /* "Denjin" written in Kanji on label */
-
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
-	ROM_LOAD( "denjin_7.u1016",  0x000000, 0x08000, CRC(970f36dd) SHA1(010a9edeaedb9e258cd02b3e9294264d00ec7c45) ) /* "Denjin" written in Kanji on label */
-	ROM_CONTINUE(         0x010000, 0x08000 )   /* banked stuff */
-	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
-
-	ROM_REGION( 0x020000, "char", 0 )
-	ROM_LOAD16_BYTE( "denjin_6.u0620", 0x000000, 0x010000, CRC(e1f759b1) SHA1(ddc60e78e7791a59c59403dd4089b3f6e1ecf8cb) ) /* "Denjin" written in Kanji on label */
-	ROM_LOAD16_BYTE( "denjin_5.u0615", 0x000001, 0x010000, CRC(cc36af0d) SHA1(69c2ae38f03be79be4d138fcc73a6a86407eb285) ) /* "Denjin" written in Kanji on label */
-
-	ROM_REGION( 0x500000, "sprite", 0 )
-	ROM_LOAD16_WORD_SWAP( "obj-0-3.748", 0x000000, 0x200000, CRC(67c26a67) SHA1(20543ca9dcf3fed0884968b5249b34b59a14b791) ) /* banks 0,1,2,3 */
-	ROM_LOAD16_WORD_SWAP( "obj-4-5.756", 0x200000, 0x100000, CRC(01f8d4e6) SHA1(25b69da693be8c3404f750b419c330a7a56e88ec) ) /* 4,5 */
-	ROM_LOAD16_WORD_SWAP( "obj-6-7.743", 0x300000, 0x100000, CRC(e5805757) SHA1(9d392c27eef7c1fcda560dac17ba9d7ae2287ac8) ) /* 6,7 */
-	ROM_LOAD16_WORD_SWAP( "obj-8-9.757", 0x400000, 0x100000, CRC(c8f7e1c9) SHA1(a746d187b50a0ecdd5a7f687a2601e5dc8bfe272) ) /* 8,9 */
-
-	ROM_REGION( 0x100000, "back", 0 )   /* MBK tiles */
-	ROM_LOAD16_WORD_SWAP( "bg-1-ab.618", 0x000000, 0x100000, CRC(eaad151a) SHA1(bdd1d83ee8497efe20f21baf873e786446372bcb) )
-
-	ROM_REGION( 0x100000, "mid", 0 )    /* BK2 used (or LBK; just identification string differs?) */
-	ROM_LOAD16_WORD_SWAP( "bg-2-ab.617", 0x000000, 0x100000, CRC(40938f74) SHA1(d68b0f8245a8b390ad5d4e6ebc7514a939b8ac51) )
-
-	ROM_REGION( 0x100000, "fore", 0 )   /* BK3 tiles */
-	ROM_LOAD16_WORD_SWAP( "bg-3-ab.619", 0x000000, 0x100000, CRC(de7366ee) SHA1(0c3969d15f3cd963e579d4164b6e0a6b4012c9c6) )
-
-	ROM_REGION( 0x080000, "oki", 0 )    /* ADPCM samples */
-	ROM_LOAD( "denjin_8.u0922",     0x000000, 0x040000, CRC(a11adb8f) SHA1(50e1158767b506d962bff861c2a6609246d764c4) ) /* "Denjin" written in Kanji on label */
-
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "s68e08.844",  0x000000, 0x000200, CRC(96f7646e) SHA1(400a831b83d6ac4d2a46ef95b97b1ee237099e44) ) /* Priority */
-
-	ROM_REGION( 0x080000, "user1", 0 )
-	ROM_LOAD( "copx-d2.313", 0x000000, 0x080000, CRC(7c52581b) SHA1(7e668476f886806b0c06fa0bcf4bbc955878c87c) )
-ROM_END
 
 ROM_START( denjinmka )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
