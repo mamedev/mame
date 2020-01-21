@@ -592,7 +592,7 @@ ROM_START( atetb3482 )
 	ROM_LOAD( "k1-d3.bin", 0x0000, 0x8000, CRC(ce51c82b) SHA1(f90ed16f817e6b2a22b69db20348386b9c1ecb67) ) // Same 8K repeated four times
 
 	// See http://www.seanriddle.com/um348x/ for notes about the UM3482
-	ROM_REGION( 0x01e0, "um3482", 0 ) // Not hooked up
+	ROM_REGION( 0x01f0, "um3482", 0 ) // Not hooked up
 
 	/* Notes (3584 bits, which matches the datasheet's 512 7-bit notes).
 	   Raw dump from visual decap, needs further analysis. */
@@ -602,15 +602,15 @@ ROM_START( atetb3482 )
 	   Song starting locations?  Chip has 16 songs max, 512 total notes.
 	   All 16 entries have data, but only 12 songs on chip.
 	   Values: 000, 01D, 034, 04D, 067, 080, 0A0, 0C2, 0D7, 0F1, 10C, 125, 138, 154, 170, 198
-	   Raw dump from visual decap, needs further analysis. */
-	ROM_LOAD( "offsets.bin",    0x0000, 0x0012, BAD_DUMP CRC(aa1c0472) SHA1(554c9e1c189f46f8ea50422403551a186446f88e) )
+	   Dump from visual decap with values padded to 16 bits, needs further analysis. */
+	ROM_LOAD( "offsets.bin",    0x0000, 0x0020, BAD_DUMP CRC(f39aff3c) SHA1(255dcea154ed04c6d1968b09e188ca5fc8821721) )
 
 	/* 16 entry by 7-bit ROM.
 	   Tempo for each song?
 	   All 16 entries have data, but only 12 songs on chip.
 	   Values: 0D,  2C,  29,  50,  0E,  24,  36,  5B,  7E,  6F,  58,  62,  39,  02,  0A,  48
-	   Raw dump from visual decap, needs further analysis. */
-	ROM_LOAD( "tempos.bin",     0x0000, 0x000e, BAD_DUMP CRC(aaedb1a8) SHA1(0cfb5c8e7e06e4300eced0fe496cae9fe21fd54c) )
+   	   Dump from visual decap with values padded to 8 bits, needs further analysis. */
+	ROM_LOAD( "tempos.bin",     0x0000, 0x0010, BAD_DUMP CRC(c3a37f74) SHA1(67eac8c6530c202760d492f3e52c44f9cd183b46) )
 	
 	/* Not dumped, unused */
 	ROM_REGION( 0x71c, "plds", 0 )
