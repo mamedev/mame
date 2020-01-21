@@ -994,6 +994,9 @@ age_cand                        // AGE Candy Crane
 agat7                           // Agat-7
 agat9                           // Agat-9
 
+@source:aid80f.cpp
+aid80f                          //
+
 @source:aim65.cpp
 aim65                           // Rockwell AIM65
 
@@ -14988,12 +14991,15 @@ nc96d                           // (c) 1996 Amcoe
 nc96e                           // (c) 1996 Amcoe
 nc96f                           // (c) 1996 Amcoe
 nc96g                           // (c) 1996 Amcoe
+nc96h                           // (c) 1996 Amcoe
+nc96i                           // (c) 1996 Amcoe
 nc96txt                         // (c) 2000 Amcoe
 ncb3                            // (c) 199? Dyna Electronics
 nfb96                           // (c) 1996 Amcoe
 nfb96a                          // (c) 1996 Amcoe
 nfb96b                          // (c) 1996 Amcoe
 nfb96c                          // (c) 1996 Amcoe
+nfb96d                          // (c) 1996 Amcoe
 nfb96se                         // bootleg
 nfb96sea                        // bootleg
 nfb96seb                        // bootleg
@@ -15026,6 +15032,7 @@ unkch1                          // bootleg
 unkch2                          // bootleg
 unkch3                          // bootleg
 unkch4                          // bootleg
+war3cb                          //
 wcat3                           //
 wcat3a                          //
 wcherry                         // bootleg
@@ -18904,7 +18911,8 @@ cupsoca                         // (c) 1992 Seibu
 cupsocb                         // (c) 1992 Seibu
 cupsocs                         // (c) 1992 Seibu
 cupsocs2                        // (c) 1992 Seibu
-denjinmk                        // (c) 199? Banpresto
+denjinmk                        // (c) 1994 Banpresto
+denjinmka                       // (c) 1994 Banpresto
 godzilla                        // (c) 1993 Banpresto
 grainbow                        // (c) 1993 Banpresto
 grainbowk                       // (c) 1993 Banpresto

@@ -385,6 +385,16 @@ namespace netlist
 		pstring get_initial_param_val(const pstring &name, const pstring &def) const;
 
 		void register_term(detail::core_terminal_t &term);
+		void register_term(terminal_t &term, terminal_t &other_term);
+
+		terminal_t *get_connected_terminal(const terminal_t &term) const noexcept
+		{
+			auto ret(m_connected_terminals.find(&term));
+			if (ret != m_connected_terminals.end())
+				return ret->second;
+			else
+				return nullptr;
+		}
 
 		void remove_connections(const pstring &pin);
 
@@ -443,6 +453,7 @@ namespace netlist
 		detail::core_terminal_t &resolve_proxy(detail::core_terminal_t &term);
 
 		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
+		std::unordered_map<const terminal_t *, terminal_t *> m_connected_terminals;
 
 		netlist_state_t                             &m_nlstate;
 		devices::nld_netlistparams                  *m_netlist_params;

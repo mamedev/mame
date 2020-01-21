@@ -30,7 +30,7 @@ namespace plib
 #if 0
 	template<typename T, typename U>
 	struct ptime_res {
-	    using type = typename std::conditional<sizeof(T) >= sizeof(U), T, U>::type;
+		using type = typename std::conditional<sizeof(T) >= sizeof(U), T, U>::type;
 	};
 #endif
 

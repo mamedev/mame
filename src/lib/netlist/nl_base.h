@@ -819,7 +819,7 @@ namespace netlist
 
 		void set_go_gt_I(nl_fptype GO, nl_fptype GT, nl_fptype I) const noexcept
 		{
-			// FIXME: is this check still needed?
+			// Check for rail nets ...
 			if (m_go1 != nullptr)
 			{
 				*m_Idr1 = I;
@@ -832,15 +832,11 @@ namespace netlist
 		void schedule_solve_after(netlist_time after) noexcept;
 
 		void set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(false);
-
-		terminal_t *connected_terminal() const noexcept { return m_connected_terminal; }
 	private:
 
 		nl_fptype *m_Idr1; // drive current
 		nl_fptype *m_go1;  // conductance for Voltage from other term
 		nl_fptype *m_gt1;  // conductance for total conductance
-
-		terminal_t *m_connected_terminal; // FIXME: only used during setup
 
 	};
 
@@ -1091,7 +1087,7 @@ namespace netlist
 
 		void connect(const pstring &t1, const pstring &t2);
 		void connect(const detail::core_terminal_t &t1, const detail::core_terminal_t &t2);
-		void connect_post_start(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
+		void connect_post_start(detail::core_terminal_t &t1, detail::core_terminal_t &t2) noexcept(false);
 	protected:
 
 		NETLIB_UPDATEI() { }
@@ -1152,7 +1148,7 @@ namespace netlist
 	class param_num_t final: public param_t
 	{
 	public:
-		param_num_t(device_t &device, const pstring &name, const T val);
+		param_num_t(device_t &device, const pstring &name, const T val) noexcept(false);
 
 		T operator()() const noexcept { return m_param; }
 		operator T() const noexcept { return m_param; }
@@ -1166,7 +1162,7 @@ namespace netlist
 	class param_enum_t final: public param_t
 	{
 	public:
-		param_enum_t(device_t &device, const pstring &name, const T val);
+		param_enum_t(device_t &device, const pstring &name, const T val) noexcept(false);
 
 		T operator()() const noexcept { return T(m_param); }
 		operator T() const noexcept { return T(m_param); }
@@ -1255,7 +1251,7 @@ namespace netlist
 	protected:
 		void changed() noexcept override;
 	private:
-};
+	};
 
 	// -----------------------------------------------------------------------------
 	// data parameter
@@ -1388,7 +1384,7 @@ namespace netlist
 			return dynamic_cast<C *>(p) != nullptr;
 		}
 
-		core_device_t *get_single_device(const pstring &classname, bool (*cc)(core_device_t *)) const;
+		core_device_t *get_single_device(const pstring &classname, bool (*cc)(core_device_t *)) const noexcept(false);
 
 		/// \brief Get single device filtered by class and name
 		///
@@ -1485,7 +1481,7 @@ namespace netlist
 				{
 					dev.release();
 					log().fatal(MF_DUPLICATE_NAME_DEVICE_LIST(name));
-					plib::pthrow<nl_exception>(MF_DUPLICATE_NAME_DEVICE_LIST(name));
+					throw nl_exception(MF_DUPLICATE_NAME_DEVICE_LIST(name));
 				}
 			//m_devices.push_back(std::move(dev));
 			m_devices.insert(m_devices.end(), { name, std::move(dev) });
@@ -1587,7 +1583,7 @@ namespace netlist
 		bool m_extended_validation;
 
 		// dummy version
-		int									m_dummy_version;
+		int                                 m_dummy_version;
 	};
 
 	namespace devices
@@ -1778,7 +1774,7 @@ namespace netlist
 			auto valx = func.evaluate();
 			if (std::is_integral<T>::value)
 				if (plib::abs(valx - plib::trunc(valx)) > nlconst::magic(1e-6))
-					plib::pthrow<nl_exception>(MF_INVALID_NUMBER_CONVERSION_1_2(device.name() + "." + name, p));
+					throw nl_exception(MF_INVALID_NUMBER_CONVERSION_1_2(device.name() + "." + name, p));
 			m_param = static_cast<T>(valx);
 		}
 		else
@@ -1800,7 +1796,7 @@ namespace netlist
 			if (!ok)
 			{
 				device.state().log().fatal(MF_INVALID_ENUM_CONVERSION_1_2(name, p));
-				plib::pthrow<nl_exception>(MF_INVALID_ENUM_CONVERSION_1_2(name, p));
+				throw nl_exception(MF_INVALID_ENUM_CONVERSION_1_2(name, p));
 			}
 			m_param = temp;
 		}
@@ -1934,7 +1930,7 @@ namespace netlist
 		if (!(gt && go && Idr) && (gt || go || Idr))
 		{
 			state().log().fatal("Inconsistent nullptrs for terminal {}", name());
-			plib::pthrow<nl_exception>("Inconsistent nullptrs for terminal {}", name());
+			throw nl_exception("Inconsistent nullptrs for terminal {}", name());
 		}
 		else
 		{

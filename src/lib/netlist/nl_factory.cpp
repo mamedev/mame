@@ -55,7 +55,7 @@ namespace factory {
 			if (e->name() == factory->name())
 			{
 				m_log.fatal(MF_FACTORY_ALREADY_CONTAINS_1(factory->name()));
-				plib::pthrow<nl_exception>(MF_FACTORY_ALREADY_CONTAINS_1(factory->name()));
+				throw nl_exception(MF_FACTORY_ALREADY_CONTAINS_1(factory->name()));
 			}
 		push_back(std::move(factory));
 	}
@@ -69,7 +69,7 @@ namespace factory {
 		}
 
 		m_log.fatal(MF_CLASS_1_NOT_FOUND(devname));
-		plib::pthrow<nl_exception>(MF_CLASS_1_NOT_FOUND(devname));
+		throw nl_exception(MF_CLASS_1_NOT_FOUND(devname));
 	}
 
 	// -----------------------------------------------------------------------------

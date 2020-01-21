@@ -667,6 +667,8 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+#include "audio/nl_konami.h"
+
 /*************************************
  *
  *  Interrupts
@@ -817,25 +819,25 @@ READ8_MEMBER(galaxian_state::konami_sound_timer_r)
 			0x0e;                   /* assume remaining bits are high, except B0 which is grounded */
 }
 
-
 WRITE8_MEMBER(galaxian_state::konami_sound_filter_w)
 {
-	if (m_discrete != nullptr)
+	if (m_netlist != nullptr)
 	{
 		/* the offset is used as data, 6 channels * 2 bits each */
-		/* AV0 .. AV5 ==> AY8910 #2 */
-		/* AV6 .. AV11 ==> AY8910 #1 */
+		/* AV0 .. AV5  ==> AY8910 #2 - 3C */
+		/* AV6 .. AV11 ==> AY8910 #1 - 3D */
 		for (int which = 0; which < 2; which++)
 		{
 			if (m_ay8910[which] != nullptr)
 			{
-				for (int chan = 0; chan < 3; chan++)
+				for (int flt = 0; flt < 6; flt++)
 				{
-					uint8_t bits = (offset >> (2 * chan + 6 * (1 - which))) & 3;
+					const int fltnum = (flt + 6 * which);
+					const uint8_t bit = (offset >> (flt + 6 * (1 - which))) & 1;
 
 					/* low bit goes to 0.22uF capacitor = 220000pF  */
 					/* high bit goes to 0.047uF capacitor = 47000pF */
-					m_discrete->write(NODE(3 * which + chan + 11), bits);
+					m_filter_ctl[fltnum]->write(bit);
 				}
 			}
 		}
@@ -5924,62 +5926,6 @@ static GFXDECODE_START(gfx_videight)
 GFXDECODE_END
 
 
-/*************************************
- *
- *  Sound configuration
- *
- *************************************/
-
-static const discrete_mixer_desc konami_sound_mixer_desc =
-	{DISC_MIXER_IS_OP_AMP,
-		{RES_K(5.1), RES_K(5.1), RES_K(5.1), RES_K(5.1), RES_K(5.1), RES_K(5.1)},
-		{0,0,0,0,0,0},  /* no variable resistors   */
-		{0,0,0,0,0,0},  /* no node capacitors      */
-		0, RES_K(2.2),
-		0,
-		0, /* modelled separately */
-		0, 1};
-
-static DISCRETE_SOUND_START( konami_sound_discrete )
-
-	DISCRETE_INPUTX_STREAM(NODE_01, 0, 1.0, 0)
-	DISCRETE_INPUTX_STREAM(NODE_02, 1, 1.0, 0)
-	DISCRETE_INPUTX_STREAM(NODE_03, 2, 1.0, 0)
-
-	DISCRETE_INPUTX_STREAM(NODE_04, 3, 1.0, 0)
-	DISCRETE_INPUTX_STREAM(NODE_05, 4, 1.0, 0)
-	DISCRETE_INPUTX_STREAM(NODE_06, 5, 1.0, 0)
-
-	DISCRETE_INPUT_DATA(NODE_11)
-	DISCRETE_INPUT_DATA(NODE_12)
-	DISCRETE_INPUT_DATA(NODE_13)
-
-	DISCRETE_INPUT_DATA(NODE_14)
-	DISCRETE_INPUT_DATA(NODE_15)
-	DISCRETE_INPUT_DATA(NODE_16)
-
-	DISCRETE_RCFILTER_SW(NODE_21, 1, NODE_01, NODE_11, AY8910_INTERNAL_RESISTANCE+1000, CAP_U(0.22), CAP_U(0.047), 0, 0)
-	DISCRETE_RCFILTER_SW(NODE_22, 1, NODE_02, NODE_12, AY8910_INTERNAL_RESISTANCE+1000, CAP_U(0.22), CAP_U(0.047), 0, 0)
-	DISCRETE_RCFILTER_SW(NODE_23, 1, NODE_03, NODE_13, AY8910_INTERNAL_RESISTANCE+1000, CAP_U(0.22), CAP_U(0.047), 0, 0)
-
-	DISCRETE_RCFILTER_SW(NODE_24, 1, NODE_04, NODE_14, AY8910_INTERNAL_RESISTANCE+1000, CAP_U(0.22), CAP_U(0.047), 0, 0)
-	DISCRETE_RCFILTER_SW(NODE_25, 1, NODE_05, NODE_15, AY8910_INTERNAL_RESISTANCE+1000, CAP_U(0.22), CAP_U(0.047), 0, 0)
-	DISCRETE_RCFILTER_SW(NODE_26, 1, NODE_06, NODE_16, AY8910_INTERNAL_RESISTANCE+1000, CAP_U(0.22), CAP_U(0.047), 0, 0)
-
-	DISCRETE_MIXER6(NODE_30, 1, NODE_21, NODE_22, NODE_23, NODE_24, NODE_25, NODE_26, &konami_sound_mixer_desc)
-
-	/* FIXME the amplifier M51516L has a decay circuit */
-	/* This is handled with sound_global_enable but    */
-	/* belongs here.                                   */
-
-	/* Input impedance of a M51516L is typically 30k (datasheet) */
-	DISCRETE_CRFILTER(NODE_40,NODE_30,RES_K(30),CAP_U(0.15))
-
-	DISCRETE_OUTPUT(NODE_40, 10.0 )
-
-DISCRETE_SOUND_END
-
-
 
 /*************************************
  *
@@ -6038,6 +5984,7 @@ void galaxian_state::konami_base(machine_config &config)
 	m_ppi8255[1]->out_pb_callback().set(FUNC(galaxian_state::konami_sound_control_w));
 	m_ppi8255[1]->in_pc_callback().set_ioport("IN3");
 	m_ppi8255[1]->out_pc_callback().set(FUNC(galaxian_state::konami_portc_1_w));
+
 }
 
 
@@ -6052,15 +5999,32 @@ void galaxian_state::konami_sound_1x_ay8910(machine_config &config)
 
 	/* sound hardware */
 	AY8910(config, m_ay8910[0], KONAMI_SOUND_CLOCK/8);
-	m_ay8910[0]->set_flags(AY8910_DISCRETE_OUTPUT);
-	m_ay8910[0]->set_resistors_load(RES_K(5.1), RES_K(5.1), RES_K(5.1));
+	m_ay8910[0]->set_flags(AY8910_RESISTOR_OUTPUT);
+	m_ay8910[0]->set_resistors_load(1000.0, 1000.0, 1000.0);
 	m_ay8910[0]->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	m_ay8910[0]->port_b_read_callback().set(FUNC(galaxian_state::frogger_sound_timer_r));
 	m_ay8910[0]->add_route(0, "konami", 1.0, 0);
 	m_ay8910[0]->add_route(1, "konami", 1.0, 1);
 	m_ay8910[0]->add_route(2, "konami", 1.0, 2);
 
-	DISCRETE(config, m_discrete, konami_sound_discrete).add_route(ALL_OUTPUTS, "speaker", 0.75);
+	NETLIST_SOUND(config, "konami", 48000)
+		.set_source(netlist_konami1x)
+		.add_route(ALL_OUTPUTS, "speaker", 1.0);
+
+	// Filter
+	NETLIST_LOGIC_INPUT(config, "konami:ctl0", "CTL0.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl1", "CTL1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl2", "CTL2.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl3", "CTL3.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl4", "CTL4.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl5", "CTL5.IN", 0);
+
+	// CHA1 - 3D
+	NETLIST_STREAM_INPUT(config, "konami:cin0", 0, "R_AY3D_A.R");
+	NETLIST_STREAM_INPUT(config, "konami:cin1", 1, "R_AY3D_B.R");
+	NETLIST_STREAM_INPUT(config, "konami:cin2", 2, "R_AY3D_C.R");
+
+	NETLIST_STREAM_OUTPUT(config, "konami:cout0", 0, "OUT").set_mult_offset(30000.0 / 0.05, 0.0);
 }
 
 
@@ -6075,8 +6039,8 @@ void galaxian_state::konami_sound_2x_ay8910(machine_config &config)
 
 	/* sound hardware */
 	AY8910(config, m_ay8910[0], KONAMI_SOUND_CLOCK/8);
-	m_ay8910[0]->set_flags(AY8910_DISCRETE_OUTPUT);
-	m_ay8910[0]->set_resistors_load(RES_K(5.1), RES_K(5.1), RES_K(5.1));
+	m_ay8910[0]->set_flags(AY8910_RESISTOR_OUTPUT);
+	m_ay8910[0]->set_resistors_load(1000.0, 1000.0, 1000.0);
 	m_ay8910[0]->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	m_ay8910[0]->port_b_read_callback().set(FUNC(galaxian_state::konami_sound_timer_r));
 	m_ay8910[0]->add_route(0, "konami", 1.0, 0);
@@ -6084,13 +6048,40 @@ void galaxian_state::konami_sound_2x_ay8910(machine_config &config)
 	m_ay8910[0]->add_route(2, "konami", 1.0, 2);
 
 	AY8910(config, m_ay8910[1], KONAMI_SOUND_CLOCK/8);
-	m_ay8910[1]->set_flags(AY8910_DISCRETE_OUTPUT);
-	m_ay8910[1]->set_resistors_load(RES_K(5.1), RES_K(5.1), RES_K(5.1));
+	m_ay8910[1]->set_flags(AY8910_RESISTOR_OUTPUT);
+	m_ay8910[1]->set_resistors_load(1000.0, 1000.0, 1000.0);
 	m_ay8910[1]->add_route(0, "konami", 1.0, 3);
 	m_ay8910[1]->add_route(1, "konami", 1.0, 4);
 	m_ay8910[1]->add_route(2, "konami", 1.0, 5);
 
-	DISCRETE(config, m_discrete, konami_sound_discrete).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	NETLIST_SOUND(config, "konami", 48000)
+		.set_source(netlist_konami2x)
+		.add_route(ALL_OUTPUTS, "speaker", 1.0);
+
+	// Filter
+	NETLIST_LOGIC_INPUT(config, "konami:ctl0", "CTL0.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl1", "CTL1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl2", "CTL2.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl3", "CTL3.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl4", "CTL4.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl5", "CTL5.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl6", "CTL6.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl7", "CTL7.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl8", "CTL8.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl9", "CTL9.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl10", "CTL10.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl11", "CTL11.IN", 0);
+
+	// CHA1 - 3D
+	NETLIST_STREAM_INPUT(config, "konami:cin0", 0, "R_AY3D_A.R");
+	NETLIST_STREAM_INPUT(config, "konami:cin1", 1, "R_AY3D_B.R");
+	NETLIST_STREAM_INPUT(config, "konami:cin2", 2, "R_AY3D_C.R");
+
+	// CHA2 - 3C
+	NETLIST_STREAM_INPUT(config, "konami:cin3", 3, "R_AY3C_A.R");
+	NETLIST_STREAM_INPUT(config, "konami:cin4", 4, "R_AY3C_B.R");
+	NETLIST_STREAM_INPUT(config, "konami:cin5", 5, "R_AY3C_C.R");
+	NETLIST_STREAM_OUTPUT(config, "konami:cout0", 0, "OUT").set_mult_offset(30000.0 / 0.05, 0.0);
 }
 
 
@@ -6115,9 +6106,7 @@ void galaxian_state::galaxian(machine_config &config)
 {
 	galaxian_base(config);
 
-	GALAXIAN(config, "cust", 0).add_route(ALL_OUTPUTS, "speaker", 0.4);
-
-	DISCRETE(config, GAL_AUDIO, galaxian_discrete).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	GALAXIAN_SOUND(config, "cust", 0);
 }
 
 void galaxian_state::victoryc(machine_config &config)
@@ -6199,9 +6188,7 @@ void galaxian_state::mooncrst(machine_config &config)
 	// alternate memory map
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::mooncrst_map);
 
-	GALAXIAN(config, "cust", 0).add_route(ALL_OUTPUTS, "speaker", 0.4);
-
-	DISCRETE(config, GAL_AUDIO, mooncrst_discrete).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	MOONCRST_SOUND(config, "cust", 0);
 }
 
 void galaxian_state::eagle(machine_config &config)
@@ -6250,7 +6237,6 @@ void galaxian_state::fantastc(machine_config &config)
 
 	// sound hardware
 	AY8910(config, m_ay8910[0], GALAXIAN_PIXEL_CLOCK/3/2).add_route(ALL_OUTPUTS, "speaker", 0.25); // 3.072MHz
-
 	AY8910(config, m_ay8910[1], GALAXIAN_PIXEL_CLOCK/3/2).add_route(ALL_OUTPUTS, "speaker", 0.25); // 3.072MHz
 }
 
@@ -6374,6 +6360,7 @@ void galaxian_state::frogger(machine_config &config)
 void galaxian_state::froggermc(machine_config &config)
 {
 	galaxian_base(config);
+
 	konami_sound_1x_ay8910(config);
 
 	// alternate memory map
@@ -6701,10 +6688,6 @@ void galaxian_state::turpins(machine_config &config) // the ROMs came from a bli
 void galaxian_state::anteater(machine_config &config)
 {
 	scobra(config);
-
-	/* quiet down the sounds */
-	m_discrete->reset_routes();
-	m_discrete->add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 

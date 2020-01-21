@@ -51,6 +51,7 @@ SOUNDS["TMS5220"] = true
 SOUNDS["BEEP"] = true
 SOUNDS["VOLT_REG"] = true
 SOUNDS["SPEAKER"] = true
+SOUNDS["DIGITALKER"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -183,6 +184,17 @@ files{
 	MAME_DIR .. "src/mame/drivers/cheekyms.cpp",
 	MAME_DIR .. "src/mame/includes/cheekyms.h",
 	MAME_DIR .. "src/mame/video/cheekyms.cpp",
+
+  MAME_DIR .. "src/mame/drivers/galaxian.cpp",
+  MAME_DIR .. "src/mame/includes/galaxian.h",
+  MAME_DIR .. "src/mame/audio/galaxian.cpp",
+  MAME_DIR .. "src/mame/audio/galaxian.h",
+  MAME_DIR .. "src/mame/video/galaxian.cpp",
+  MAME_DIR .. "src/mame/audio/nl_konami.h",
+  MAME_DIR .. "src/mame/audio/nl_konami.cpp",
+
+  MAME_DIR .. "src/mame/audio/cclimber.cpp",
+  MAME_DIR .. "src/mame/audio/cclimber.h",
 
 	MAME_DIR .. "src/mame/audio/nl_zac1b11142.cpp",
 	MAME_DIR .. "src/mame/audio/nl_zacc1b11142.h",

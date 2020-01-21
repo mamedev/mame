@@ -2821,6 +2821,8 @@ files {
 	MAME_DIR .. "src/mame/audio/galaxian.cpp",
 	MAME_DIR .. "src/mame/audio/galaxian.h",
 	MAME_DIR .. "src/mame/video/galaxian.cpp",
+  MAME_DIR .. "src/mame/audio/nl_konami.h",
+  MAME_DIR .. "src/mame/audio/nl_konami.cpp",
 	MAME_DIR .. "src/mame/drivers/galaxold.cpp",
 	MAME_DIR .. "src/mame/includes/galaxold.h",
 	MAME_DIR .. "src/mame/machine/galaxold.cpp",

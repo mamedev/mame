@@ -69,21 +69,17 @@ NETLIST_END()
 
 /*
  *   Generic layout with 1 opamp, VCC+ on pin 7, VCC- on pin 4 and compensation
+ *   // FIXME: Offset inputs are not supported!
  */
 
 static NETLIST_START(opamp_layout_1_7_4)
-	DIPPINS(        /*   +--------------+   */
-		OFFSET.N1,  /*   |1     ++     8|   */ NC,
-		MINUS,      /*   |2            7|   */ VCC.PLUS,
-		PLUS,       /*   |3            6|   */ OUT,
-		VCC.MINUS,  /*   |4            5|   */ OFFSET.N2
-					/*   +--------------+   */
+	DIPPINS(             /*   +--------------+   */
+		NC /* OFFSET */, /*   |1     ++     8|   */ NC,
+		A.MINUS,         /*   |2            7|   */ A.VCC,
+		A.PLUS,          /*   |3            6|   */ A.OUT,
+		A.GND,           /*   |4            5|   */ NC /* OFFSET */
+						 /*   +--------------+   */
 	)
-	NET_C(A.GND, VCC.MINUS)
-	NET_C(A.VCC, VCC.PLUS)
-	NET_C(A.MINUS, MINUS)
-	NET_C(A.PLUS, PLUS)
-	NET_C(A.OUT, OUT)
 NETLIST_END()
 
 /*
@@ -353,7 +349,7 @@ NETLIST_START(OPAMP_lib)
 	NET_MODEL("UA741       OPAMP(TYPE=3 VLH=1.0 VLL=1.0 FPF=5 UGF=1000k SLEW=0.5M RI=2000k RO=75 DAB=0.0017)")
 	NET_MODEL("LM747       OPAMP(TYPE=3 VLH=1.0 VLL=1.0 FPF=5 UGF=1000k SLEW=0.5M RI=2000k RO=50 DAB=0.0017)")
 	NET_MODEL("LM747A      OPAMP(TYPE=3 VLH=2.0 VLL=2.0 FPF=5 UGF=1000k SLEW=0.7M RI=6000k RO=50 DAB=0.0015)")
-	// TI and Motorola Datasheets differ - below are Motorola values values SLEW is average of LH and HL
+	// TI and Motorola Datasheets differ - below are Motorola values, SLEW is average of LH and HL
 	NET_MODEL("LM3900      OPAMP(TYPE=3 VLH=1.0 VLL=0.03 FPF=2k UGF=4M SLEW=10M RI=10M RO=2k DAB=0.0015)")
 
 #if USE_LM3900_MODEL == 1
