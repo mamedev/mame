@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "gigatron.h"
-#include "debugger.h"
+#include "gigatrondasm.h"
 
 
 DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron", "GTRON")
@@ -44,7 +44,7 @@ void gigatron_cpu_device::execute_run()
 
 	do
 	{
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		opcode = gigatron_readop(m_pc);
 		m_pc++;
@@ -74,7 +74,7 @@ void gigatron_cpu_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_r[7] ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_flags ).noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 #if 0
@@ -123,7 +123,16 @@ void gigatron_cpu_device::state_string_export(const device_state_entry &entry, s
 }
 
 
-offs_t gigatron_cpu_device::disassemble(char *buffer, offs_t pc, const uint32_t *oprom, const uint32_t *opram, uint32_t options)
+std::unique_ptr<util::disasm_interface> gigatron_cpu_device::create_disassembler()
 {
-	return CPU_DISASSEMBLE_NAME(gigatron)(this, buffer, pc, opcodes, params, options);
+	return std::make_unique<gigatron_disassembler>();
+}
+
+
+device_memory_interface::space_config_vector gigatron_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA, &m_data_config)
+	};
 }

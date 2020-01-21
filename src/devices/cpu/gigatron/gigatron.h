@@ -39,9 +39,15 @@ protected:
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
+	// device_disasm_interface overrides
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	// device_memory_interface overrides
+	virtual space_config_vector memory_space_config() const override;
 
 private:
 	address_space_config m_program_config;
+	address_space_config m_data_config;
 
 	uint8_t   m_pc;   /* registers */
 	uint8_t   m_flags;  /* flags */
@@ -49,8 +55,9 @@ private:
 	address_space *m_data;
 	int m_icount;
 
-	void gigatron_illegal();
+	uint32_t  m_r[8];
 
+	void gigatron_illegal();
 };
 
 

@@ -153,6 +153,7 @@ CPUS["VT61"] = true
 CPUS["PACE"] = true
 CPUS["WE32000"] = true
 CPUS["RX01"] = true
+CPUS["GTRON"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -4127,6 +4128,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/fs3216.cpp",
 	MAME_DIR .. "src/mame/drivers/ft68m.cpp",
 	MAME_DIR .. "src/mame/drivers/gameking.cpp",
+	MAME_DIR .. "src/mame/drivers/gigatron.cpp",
 	MAME_DIR .. "src/mame/drivers/gimix.cpp",
 	MAME_DIR .. "src/mame/drivers/goupil.cpp",
 	MAME_DIR .. "src/mame/drivers/grfd2301.cpp",
