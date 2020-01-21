@@ -601,14 +601,12 @@ ROM_START( atetb3482 )
         /* 16 entry by 9-bit ROM
 	   Song starting locations?  Chip has 16 songs max, 512 total notes.
 	   All 16 entries have data, but only 12 songs on chip.
-	   Values: 000, 01D, 034, 04D, 067, 080, 0A0, 0C2, 0D7, 0F1, 10C, 125, 138, 154, 170, 198
 	   Dump from visual decap with values padded to 16 bits, needs further analysis. */
 	ROM_LOAD( "offsets.bin",    0x0000, 0x0020, BAD_DUMP CRC(f39aff3c) SHA1(255dcea154ed04c6d1968b09e188ca5fc8821721) )
 
 	/* 16 entry by 7-bit ROM.
 	   Tempo for each song?
 	   All 16 entries have data, but only 12 songs on chip.
-	   Values: 0D,  2C,  29,  50,  0E,  24,  36,  5B,  7E,  6F,  58,  62,  39,  02,  0A,  48
    	   Dump from visual decap with values padded to 8 bits, needs further analysis. */
 	ROM_LOAD( "tempos.bin",     0x0000, 0x0010, BAD_DUMP CRC(c3a37f74) SHA1(67eac8c6530c202760d492f3e52c44f9cd183b46) )
 	
