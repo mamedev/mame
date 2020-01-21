@@ -77,9 +77,13 @@ void gigatron_cpu_device::device_start()
 	set_icountptr(m_icount);
 }
 
-#if 0
+void gigatron_cpu_device::device_reset()
+{
+}
+
 void gigatron_cpu_device::execute_set_input(int irqline, int state)
 {
+#if 0
 	switch(irqline)
 	{
 		case GTRON_INT_INTRM: // level-sensitive
@@ -97,13 +101,13 @@ void gigatron_cpu_device::execute_set_input(int irqline, int state)
 			m_intr_state = (ASSERT_LINE == state);
 			break;
 	}
-}
 #endif
+}
 
 gigatron_cpu_device::gigatron_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, GTRON, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_BIG, 8, 32, -1)
-	, m_data_config("data", ENDIANNESS_BIG, 8, 32, 0)
+	, m_program_config("program", ENDIANNESS_BIG, 16, 14, -1)
+	, m_data_config("data", ENDIANNESS_BIG, 8, 15, 0)
 {
 }
 

@@ -8,8 +8,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
-//#include "cpu/gigatron/gigatron.h"
+#include "cpu/gigatron/gigatron.h"
 #include "machine/nvram.h"
 #include "speaker.h"
 
@@ -27,23 +26,36 @@ public:
 	void gigatron(machine_config &config);
 
 private:
+	void prog_map(address_map &map);
+	void data_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 };
+
+void gigatron_state::prog_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().region("maincpu", 0);
+}
+
+void gigatron_state::data_map(address_map &map)
+{
+}
 
 static INPUT_PORTS_START(gigatron)
 INPUT_PORTS_END
 
 void gigatron_state::gigatron(machine_config &config)
 {
-	M6502(config, m_maincpu, MAIN_CLOCK); // actually its own custom cpu but i cant get it to work
-	//GTRON(config, m_maincpu, MAIN_CLOCK);
+	GTRON(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gigatron_state::prog_map);
+	m_maincpu->set_addrmap(AS_DATA, &gigatron_state::data_map);
+
 	SPEAKER(config, "mono").front_center();
 
 }
 
 ROM_START( gigatron )
-	ROM_REGION( 0x00000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "gigatron.rom",  0x0000, 0x20000, CRC(78995109) SHA1(2395fc48e64099836111f5aeca39ddbf4650ea4e) )
 ROM_END
 

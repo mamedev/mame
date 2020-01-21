@@ -52,6 +52,7 @@ using util::BIT;
 #include "cpu/f8/f8dasm.h"
 #include "cpu/fr/frdasm.h"
 #include "cpu/g65816/g65816ds.h"
+#include "cpu/gigatron/gigatrondasm.h"
 #include "cpu/h6280/6280dasm.h"
 #include "cpu/h8/h8d.h"
 #include "cpu/h8/h8hd.h"
@@ -370,6 +371,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "f8",              be,  0, []() -> util::disasm_interface * { return new f8_disassembler; } },
 	{ "fr",              be,  0, []() -> util::disasm_interface * { return new fr_disassembler; } },
 	{ "g65816",          le,  0, []() -> util::disasm_interface * { return new g65816_disassembler(&g65816_unidasm); } },
+	{ "gigatron",        be, -1, []() -> util::disasm_interface * { return new gigatron_disassembler; } },
 	{ "h6280",           le,  0, []() -> util::disasm_interface * { return new h6280_disassembler; } },
 	{ "h8",              be,  0, []() -> util::disasm_interface * { return new h8_disassembler; } },
 	{ "h8h",             be,  0, []() -> util::disasm_interface * { return new h8h_disassembler; } },
