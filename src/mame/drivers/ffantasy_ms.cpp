@@ -76,7 +76,7 @@ uint32_t ffantasy_ms_state::screen_update(screen_device &screen, bitmap_ind16 &b
 static INPUT_PORTS_START( ffantasym )
 INPUT_PORTS_END
 
-static GFXDECODE_START( gfx_bloodbro_ms )
+static GFXDECODE_START( gfx_ffantasy_ms )
 GFXDECODE_END
 
 void ffantasy_ms_state::ffantasym(machine_config &config)
@@ -98,7 +98,7 @@ void ffantasy_ms_state::ffantasym(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xBRG_444, 1024);
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_bloodbro_ms);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_ffantasy_ms);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
