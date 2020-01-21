@@ -693,7 +693,7 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 	else
 	{
 		std::string copyright(emulator_info::get_copyright());
-		size_t found = copyright.find("\n");
+		size_t found = copyright.find('\n');
 
 		tempbuf[0].clear();
 		tempbuf[1] = string_format(_("%1$s %2$s"), emulator_info::get_appname(), build_version);

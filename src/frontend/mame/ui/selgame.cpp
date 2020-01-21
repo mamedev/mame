@@ -251,7 +251,7 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 		ui_globals::rpanel = std::min<int>(std::max<int>(moptions.last_right_panel(), RP_FIRST), RP_LAST);
 
 		std::string tmp(moptions.last_used_filter());
-		std::size_t const found = tmp.find_first_of(",");
+		std::size_t const found = tmp.find_first_of(',');
 		std::string fake_ini;
 		if (found == std::string::npos)
 		{
