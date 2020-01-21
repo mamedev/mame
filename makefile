@@ -94,7 +94,6 @@
 # LTO = 1
 # SSE2 = 1
 # OPENMP = 1
-# FASTDEBUG = 1
 
 # SEPARATE_BIN = 1
 # PYTHON_EXECUTABLE = python3
@@ -808,10 +807,6 @@ endif
 
 ifdef OPENMP
 PARAMS += --OPENMP='$(OPENMP)'
-endif
-
-ifdef FASTDEBUG
-PARAMS += --FASTDEBUG='$(FASTDEBUG)'
 endif
 
 ifdef SEPARATE_BIN
