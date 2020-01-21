@@ -1106,7 +1106,7 @@ void debug_imgui::draw_mount_dialog(const char* label)
 {
 	// render dialog
 	//ImGui::SetNextWindowContentWidth(200.0f);
-	if(ImGui::BeginPopupModal(label,NULL,ImGuiWindowFlags_AlwaysAutoResize))
+	if(ImGui::BeginPopupModal(label,nullptr,ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		if(m_filelist_refresh)
 			refresh_filelist();
@@ -1157,7 +1157,7 @@ void debug_imgui::draw_create_dialog(const char* label)
 {
 	// render dialog
 	//ImGui::SetNextWindowContentWidth(200.0f);
-	if(ImGui::BeginPopupModal(label,NULL,ImGuiWindowFlags_AlwaysAutoResize))
+	if(ImGui::BeginPopupModal(label,nullptr,ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		ImGui::LabelText("##static1","Filename:");
 		ImGui::SameLine();
