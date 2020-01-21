@@ -36003,4 +36003,17 @@
 		</part>
 	</software>
 
+	<software name="whtlgcr1">
+		<description>What's My Logic? (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Midwest Publications</publisher>
+		<info name="release" value="2020-01-21"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="what's my logic? (4am crack).dsk" size="143360" crc="433922c6" sha1="2902ea9aa9ef0f75d51d555d36b82feef4b51f12"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
