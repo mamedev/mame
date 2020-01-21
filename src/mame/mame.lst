@@ -13352,6 +13352,9 @@ wofabl                          // bootleg
 @source:feversoc.cpp
 feversoc                        // (c) 2004
 
+@source:ffantasy_ms.cpp
+ffantasym                       //
+
 @source:fgoal.cpp
 fgoal                           // TF  (c) 1979 Taito Corporation
 fgoala                          // MF  (c) 1979 Taito Corporation

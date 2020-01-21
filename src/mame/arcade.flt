@@ -396,6 +396,7 @@ fastlane.cpp
 fcombat.cpp
 fcrash.cpp
 feversoc.cpp
+ffantasy_ms.cpp
 fgoal.cpp
 finalizr.cpp
 fireball.cpp
