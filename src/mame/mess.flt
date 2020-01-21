@@ -315,6 +315,7 @@ geneve.cpp
 geniusiq.cpp
 geniusjr.cpp
 genpc.cpp
+gigatron.cpp
 gimix.cpp
 gkidabc.cpp
 gizmondo.cpp
