@@ -10,7 +10,7 @@ Known functional issues:
 - Virtua Fighter
   * Gameplay mecahnics - specifically, collision detection - are significantly broken due to
     imperfect TGP RAM port emulation or hookup. This is observable in both attract mode and
-    in-game.
+    in-game. It seems to break when both characters attack at the same time.
 
 Sega Model 1 Hardware Overview
 ------------------------------

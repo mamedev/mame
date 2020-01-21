@@ -23,7 +23,8 @@ TODO:
 - confirm gnw_bfight rom (assumed to be the same as gnw_bfightn)
 - confirm gnw_climber rom (assumed to be the same as gnw_climbern)
 - confirm gnw_smb rom (assumed to be the same as gnw_smbn)
-- dump/add purple version of gnw_judge
+- dump/add purple version of gnw_judge, different MCU label?
+- dump/add 2nd version of gnw_mariocmt, different MCU label?
 - dump/add CN-07 version of gnw_helmet
 - Currently there is no accurate way to dump the SM511/SM512 melody ROM
   electronically. For the ones that weren't decapped, they were read by
@@ -2792,6 +2793,8 @@ ROM_END
 
   This is the tabletop version. There's also a new wide screen version which is
   a different game. Unlike the other tabletop games, there is no panorama version.
+  There are two known versions, distinguished by the startup jingle. The first
+  version sounds like Queen's "Another One Bites the Dust".
 
 ***************************************************************************/
 
