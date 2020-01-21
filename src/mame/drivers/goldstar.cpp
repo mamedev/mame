@@ -11239,9 +11239,17 @@ ROM_START( aplan ) // Has "DYNA QL-1  V1.01" string.
 	ROM_LOAD( "82s129.u46",   0x100, 0x100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
 ROM_END
 
-ROM_START( war3cb )
+ROM_START( war3cb ) // WANG QL-0B V1.00 in NVRAM, SANGHO in GFX ROMs
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "27c512 9 sub-board.bin", 0x00000, 0x10000, CRC(7fc6009d) SHA1(cb664890cffaddb741e8fe94d73ca23634c21e95) ) // addresses scrambled (i.e. 0x2000 goes to 0x0000)
+	ROM_LOAD( "27c512 9 sub-board.bin", 0x2000, 0x2000, CRC(7fc6009d) SHA1(cb664890cffaddb741e8fe94d73ca23634c21e95) )
+	ROM_CONTINUE(                       0x0000, 0x2000 )
+	ROM_CONTINUE(                       0x6000, 0x2000 )
+	ROM_CONTINUE(                       0x4000, 0x2000 )
+	ROM_CONTINUE(                       0xa000, 0x2000 )
+	ROM_CONTINUE(                       0x8000, 0x2000 )
+	ROM_CONTINUE(                       0xe000, 0x2000 )
+	ROM_CONTINUE(                       0xc000, 0x2000 )
+	ROM_COPY( "maincpu" ,       0x6000, 0x7000, 0x1000 ) // verified with Z80 ICE memory dump
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "27c256 5.bin",   0x00000, 0x8000, CRC(5ba97822) SHA1(f089a09509c13d01a375e273eadcd4007c2054c8) )
@@ -18422,7 +18430,7 @@ GAME(  1999, cmast99,   0,        cm,       cmast99,  cmaster_state,  init_cmv4,
 GAME(  1999, cmast99b,  cmast99,  cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cherry Master '99 (V9B.00 bootleg / hack)",   MACHINE_NOT_WORKING )
 GAME(  1993, aplan,     0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "WeaShing H.K.",     "A-Plan",                                      MACHINE_NOT_WORKING )
 
-GAME(  1996, war3cb,    0,        cm,       cmast99,  cmaster_state,  empty_init,     ROT0, "S.B.E.",            "War III Cherry Best",                         MACHINE_NOT_WORKING ) // first of all needs correct address de-scrambling. Doesn't seem encrypted.
+GAME(  1996, war3cb,    0,        cm,       cmast99,  cmaster_state,  empty_init,     ROT0, "S.B.E.",            "War III Cherry Best",                         MACHINE_NOT_WORKING ) // different portmap?
 
 GAME(  1995, tcl,       0,        cm,       cmaster,  cmaster_state,  init_tcl,       ROT0, "Uniwang",           "Taiwan Chess Legend",                         MACHINE_NOT_WORKING ) // incomplete decryption
 
