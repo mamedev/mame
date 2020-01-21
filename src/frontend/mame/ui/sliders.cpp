@@ -151,7 +151,7 @@ void menu_sliders::populate(float &customtop, float &custombottom)
 
 	// add UI sliders
 	std::vector<menu_item> ui_sliders = ui().get_slider_list();
-	for (menu_item item : ui_sliders)
+	for (const menu_item &item : ui_sliders)
 	{
 		if (item.type == menu_item_type::SLIDER)
 		{
@@ -180,7 +180,7 @@ void menu_sliders::populate(float &customtop, float &custombottom)
 
 	// add OSD options
 	std::vector<menu_item> osd_sliders = machine().osd().get_slider_list();
-	for (menu_item item : osd_sliders)
+	for (const menu_item &item : osd_sliders)
 	{
 		if (item.type == menu_item_type::SLIDER)
 		{

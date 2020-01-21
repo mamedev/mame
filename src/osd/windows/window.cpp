@@ -204,7 +204,7 @@ bool windows_osd_interface::window_init()
 
 void windows_osd_interface::update_slider_list()
 {
-	for (auto window : osd_common_t::s_window_list)
+	for (const auto &window : osd_common_t::s_window_list)
 	{
 		// check if any window has dirty sliders
 		if (window->has_renderer() && window->renderer().sliders_dirty())
@@ -224,7 +224,7 @@ void windows_osd_interface::build_slider_list()
 {
 	m_sliders.clear();
 
-	for (auto window : osd_common_t::s_window_list)
+	for (const auto &window : osd_common_t::s_window_list)
 	{
 		if (window->has_renderer())
 		{
@@ -418,7 +418,7 @@ void winwindow_process_events_periodic(running_machine &machine)
 
 static bool is_mame_window(HWND hwnd)
 {
-	for (auto window : osd_common_t::s_window_list)
+	for (const auto &window : osd_common_t::s_window_list)
 		if (std::static_pointer_cast<win_window_info>(window)->platform_window() == hwnd)
 			return true;
 
@@ -582,7 +582,7 @@ void winwindow_take_snap(void)
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// iterate over windows and request a snap
-	for (auto window : osd_common_t::s_window_list)
+	for (const auto &window : osd_common_t::s_window_list)
 	{
 		window->renderer().save();
 	}
@@ -600,7 +600,7 @@ void winwindow_toggle_fsfx(void)
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// iterate over windows and request a snap
-	for (auto window : osd_common_t::s_window_list)
+	for (const auto &window : osd_common_t::s_window_list)
 	{
 		window->renderer().toggle_fsfx();
 	}
@@ -618,7 +618,7 @@ void winwindow_take_video(void)
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// iterate over windows and request a snap
-	for (auto window : osd_common_t::s_window_list)
+	for (const auto &window : osd_common_t::s_window_list)
 	{
 		window->renderer().record();
 	}
@@ -636,7 +636,7 @@ void winwindow_toggle_full_screen(void)
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// if we are in debug mode, never go full screen
-	for (auto window : osd_common_t::s_window_list)
+	for (const auto &window : osd_common_t::s_window_list)
 		if (window->machine().debug_flags & DEBUG_FLAG_OSD_ENABLED)
 			return;
 
@@ -644,7 +644,7 @@ void winwindow_toggle_full_screen(void)
 	video_config.windowed = !video_config.windowed;
 
 	// iterate over windows and toggle their fullscreen state
-	for (auto window : osd_common_t::s_window_list)
+	for (const auto &window : osd_common_t::s_window_list)
 		SendMessage(std::static_pointer_cast<win_window_info>(window)->platform_window(), WM_USER_SET_FULLSCREEN, !video_config.windowed, 0);
 
 	// Set the first window as foreground
@@ -661,7 +661,7 @@ void winwindow_toggle_full_screen(void)
 bool winwindow_has_focus(void)
 {
 	// see if one of the video windows has focus
-	for (auto window : osd_common_t::s_window_list)
+	for (const auto &window : osd_common_t::s_window_list)
 	{
 		switch (std::static_pointer_cast<win_window_info>(window)->focus())
 		{
@@ -752,7 +752,7 @@ void win_window_info::create(running_machine &machine, int index, std::shared_pt
 	// set main window
 	if (window->m_index > 0)
 	{
-		for (auto w : osd_common_t::s_window_list)
+		for (const auto &w : osd_common_t::s_window_list)
 		{
 			if (w->m_index == 0)
 			{
@@ -769,7 +769,7 @@ void win_window_info::create(running_machine &machine, int index, std::shared_pt
 
 	// see if we are safe for fullscreen
 	window->m_fullscreen_safe = TRUE;
-	for (auto win : osd_common_t::s_window_list)
+	for (const auto &win : osd_common_t::s_window_list)
 		if (win->monitor() == monitor.get())
 			window->m_fullscreen_safe = FALSE;
 
