@@ -150,8 +150,8 @@ bool jvc_format::parse_header(io_generic *io, int &header_size, int &tracks, int
 
 	switch (header_size)
 	{
-	case 5: emu_fatalerror("jvc_format: sector attribute flag unsupported\n");
-		break;
+	case 5:
+		throw emu_fatalerror("jvc_format: sector attribute flag unsupported\n");
 	case 4: base_sector_id = header[3];
 		// no break
 	case 3: sector_size = 128 << header[2];
@@ -184,7 +184,7 @@ bool jvc_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 
 	// safety check
 	if (sector_count * sector_size > 10000)
-		emu_fatalerror("jvc_format: incorrect track layout\n");
+		throw emu_fatalerror("jvc_format: incorrect track layout\n");
 
 	int file_offset = header_size;
 
@@ -253,7 +253,7 @@ bool jvc_format::save(io_generic *io, floppy_image *image)
 			for (int i = 0; i < 18; i++)
 			{
 				if (sectors[1 + i].size != 256)
-					emu_fatalerror("jvc_format: invalid sector size: %d\n", sectors[1 + i].size);
+					throw emu_fatalerror("jvc_format: invalid sector size: %d\n", sectors[1 + i].size);
 
 				io_generic_write(io, sectors[1 + i].data, file_offset, sectors[1 + i].size);
 				file_offset += sectors[1 + i].size;
