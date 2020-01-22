@@ -167,4 +167,4 @@ ROM_START( ffantasym )
 	ROM_LOAD( "ff_5-1_5235_gal16v8.ic8",       0x000, 0x117, NO_DUMP )
 ROM_END
 
-GAME( 199?, ffantasym,  ffantasy,  ffantasym,  ffantasym,  ffantasy_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Fighting Fantasy (Modular System)", MACHINE_IS_SKELETON )
+GAME( 199?, ffantasym,  hippodrm,  ffantasym,  ffantasym,  ffantasy_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Fighting Fantasy (Modular System)", MACHINE_IS_SKELETON )
