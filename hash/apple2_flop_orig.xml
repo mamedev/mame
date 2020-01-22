@@ -10020,7 +10020,7 @@
 		<info name="release" value="2020-01-14"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It runs on any Apple II with 48K. -->
-		<!--"Chess" is a 1982 board game by Larry Atkin and distributed by Odesta Software. This is version 7.0. It runs on any Apple ][ with 48K.-->
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234821">
 				<rom name="chess v7.0 (odesta).woz" size="234821" crc="dea3482d" sha1="40d127ba91d83be331a266e4f7d9727baeb78711"/>
@@ -10329,6 +10329,73 @@
 			<feature name="part_id" value="Side B (Boot)"/>
 			<dataarea name="flop" size="234828">
 				<rom name="questprobe featuring the hulk side b (boot).woz" size="234828" crc="54ddc830" sha1="c8884b9fb356cfb5dc496920e0653ee6b2572c2f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="horizv">
+		<description>Horizon V</description>
+		<year>1982</year>
+		<publisher>Gebelli Software</publisher>
+		<info name="release" value="2020-01-22"/>
+		<sharedfeat name="compatibility" value="A2,A2P"/>
+		<!-- It requires an Apple ][ or Apple ][+. Due to restrictive copy protection, it will not boot on later models. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="354579">
+				<rom name="horizon v.woz" size="354579" crc="4ba97a3e" sha1="57c0c36f919df498693e235614bd0c1c83183181"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crwnarth">
+		<description>Crown of Arthain</description>
+		<year>1980</year>
+		<publisher>Micro Lab</publisher>
+		<info name="release" value="2020-01-22"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234789">
+				<rom name="crown of arthain.woz" size="234789" crc="454ac2fa" sha1="068c976a64a2b0563e5f98983a8d7b46976307c2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diamine">
+		<description>Diamond Mine</description>
+		<year>1983</year>
+		<publisher>Roklan Corporation</publisher>
+		<info name="release" value="2020-01-22"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="201487">
+				<rom name="diamond mine.woz" size="201487" crc="d7e143f3" sha1="66d84fd826d0bed64c585c00deedbfbc570854ce"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abyszone">
+		<description>The Abyssal Zone</description>
+		<year>1984</year>
+		<publisher>Salty Software</publisher>
+		<info name="release" value="2020-01-22"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="234815">
+				<rom name="the abyssal zone side 1.woz" size="234815" crc="36ed024c" sha1="1cb3db556bbbc417e16f0021579d636b461107d2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2 - Boot"/>
+			<dataarea name="flop" size="234813">
+				<rom name="the abyssal zone side 2 (boot).woz" size="234813" crc="4113c4f4" sha1="6cee828e9f6ed6adbe799b2579f35b05f9821f01"/>
 			</dataarea>
 		</part>
 	</software>
