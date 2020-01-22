@@ -98,6 +98,8 @@ void gigatron_cpu_device::init()
 	state_add(GTRON_A,         "AC",         ac);
 	state_add(GTRON_X,         "X",         x);
 	state_add(GTRON_Y,         "Y",         y);
+	
+	set_icountptr(m_icount);
 }
 
 void gigatron_cpu_device::branchOp(int op, int mode, int bus, int d)
