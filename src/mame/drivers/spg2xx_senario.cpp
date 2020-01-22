@@ -125,7 +125,7 @@ WRITE16_MEMBER(spg2xx_senario_mil_state::portc_w)
 	// -4-3 -2-1
 	// change when a button for that player is pressed, none of these seem to be for the LEDs on the controllers (or are they 'always on')
 
-	printf("%s: spg2xx_senario_mil_state::portc_w %04x ---- %04x %04x \n", machine().describe_context().c_str(), data, data & 0x55, data & 0xaa);
+	logerror("%s: spg2xx_senario_mil_state::portc_w %04x ---- %04x %04x \n", machine().describe_context(), data, data & 0x55, data & 0xaa);
 	m_portc_data = data;
 }
 	
