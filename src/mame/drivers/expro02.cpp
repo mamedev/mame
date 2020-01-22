@@ -390,7 +390,8 @@ uint32_t expro02_state::screen_update_backgrounds(screen_device &screen, bitmap_
 uint32_t expro02_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_update_backgrounds(screen, bitmap, cliprect);
-	m_kaneko_spr->render_sprites(bitmap,cliprect, screen.priority(), m_spriteram, m_spriteram.bytes());
+	m_kaneko_spr->render_sprites(cliprect, m_spriteram, m_spriteram.bytes());
+	m_kaneko_spr->copybitmap(bitmap, cliprect, screen.priority());
 	return 0;
 }
 
