@@ -1201,9 +1201,9 @@ void bbcbp_state::abc110(machine_config &config)
 	m_tube->set_default_option("z80");
 	m_tube->set_fixed(true);
 
-	/* Adaptec ACB-4000 Winchester Disc Controller */
-
-	/* 10MB ST-412 Winchester */
+	/* Acorn Winchester Disc 10MB */
+	m_1mhzbus->set_default_option("awhd");
+	m_1mhzbus->set_fixed(true);
 
 	/* software lists */
 	config.device_remove("cass_ls_a");
@@ -1223,13 +1223,9 @@ void bbcbp_state::acw443(machine_config &config)
 	//m_tube->set_default_option("32016");
 	//m_tube->set_fixed(true);
 
-	/* Adaptec ACB-4000 Winchester Disc Controller */
-	//m_1mhzbus->set_default_option("awdd");
-	//m_1mhzbus->set_fixed(true);
-
-	/* 10MB ST-412 Winchester ABC210 */
-
-	/* 20MB ST-412 Winchester Cambridge */
+	/* Acorn Winchester Disc 20MB */
+	m_1mhzbus->set_default_option("awhd");
+	m_1mhzbus->set_fixed(true);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_ls_32016").set_original("bbc_flop_32016");
@@ -1250,9 +1246,9 @@ void bbcbp_state::abc310(machine_config &config)
 	m_tube->set_default_option("80286");
 	m_tube->set_fixed(true);
 
-	/* Adaptec ACB-4000 Winchester Disc Controller */
-
-	/* 10MB ST-412 Winchester */
+	/* Acorn Winchester Disc 10MB */
+	m_1mhzbus->set_default_option("awhd");
+	m_1mhzbus->set_fixed(true);
 
 	/* software lists */
 	config.device_remove("cass_ls_a");
@@ -1615,6 +1611,9 @@ void bbcm_state::bbcmarm(machine_config &config)
 	/* Acorn ARM co-processor */
 	m_extube->set_default_option("arm");
 	m_extube->set_fixed(true);
+
+	/* Acorn Winchester Disc */
+	m_1mhzbus->set_default_option("awhd");
 }
 
 
