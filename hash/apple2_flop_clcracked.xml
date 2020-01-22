@@ -35996,9 +35996,80 @@
 		<!-- This is version 4.0, originally distributed on a 3.5-inch (800K) 
 		disk for Apple IIgs, //c+, or //e users with a UniDisk 3.5-inch drive.
 		-->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="the quarter mile v4.0 800k (4am crack).2mg" size="819264" crc="0ecf0ca5" sha1="09f1df0b1819296037ed00020cfca537bc510793"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="whtlgcr1">
+		<description>What's My Logic? (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Midwest Publications</publisher>
+		<info name="release" value="2020-01-21"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="what's my logic? (4am crack).dsk" size="143360" crc="433922c6" sha1="2902ea9aa9ef0f75d51d555d36b82feef4b51f12"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diaread1">
+		<description>Diascriptive Reading I (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Educational Activities</publisher>
+		<info name="release" value="2020-01-21"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Details"/>
+			<dataarea name="flop" size="143360">
+				<rom name="diascriptive reading i (4am crack) disk 1 - details.dsk" size="143360" crc="84cf8618" sha1="aa682b4da097993877d086b86717625b946944db"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Inference"/>
+			<dataarea name="flop" size="143360">
+				<rom name="diascriptive reading i (4am crack) disk 2 - inference.dsk" size="143360" crc="8585d61e" sha1="a0910aed62bddf4d56c59ae9b6057a8338f56b68"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Main idea"/>
+			<dataarea name="flop" size="143360">
+				<rom name="diascriptive reading i (4am crack) disk 3 - main idea.dsk" size="143360" crc="e36d1a25" sha1="bd0a63fd197d51c6271747e764eabfc2888c8a19"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - Sequence"/>
+			<dataarea name="flop" size="143360">
+				<rom name="diascriptive reading i (4am crack) disk 4 - sequence.dsk" size="143360" crc="bc8f308a" sha1="d63a62cef26488b2d76d6ceb26f791e5531b3127"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5 - Vocabulary"/>
+			<dataarea name="flop" size="143360">
+				<rom name="diascriptive reading i (4am crack) disk 5 - vocabulary.dsk" size="143360" crc="947000e5" sha1="e44284a73af9e9d15d6b1eacff9400096e10cf31"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6 - Diagnostic tests"/>
+			<dataarea name="flop" size="143360">
+				<rom name="diascriptive reading i (4am crack) disk 6 - diagnostic tests.dsk" size="143360" crc="d487f31c" sha1="ffba07158f024a3668b286e308734a637533b222"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airnavtr">
+		<description>Air Navigation Trainer (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Space-Time Associates</publisher>
+		<info name="release" value="2020-01-21"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="air navigation trainer (4am crack).dsk" size="143360" crc="dbd68189" sha1="03e9791a1bf6b4c0560935e8bd7e9b6b8566abcf"/>
 			</dataarea>
 		</part>
 	</software>
