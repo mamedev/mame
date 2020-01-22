@@ -43,11 +43,12 @@ u32 gigatron_disassembler::opcode_alignment() const
 offs_t gigatron_disassembler::disassemble(std::ostream &stream, offs_t pc, const gigatron_disassembler::data_buffer &opcodes, const gigatron_disassembler::data_buffer &params)
 {
 	u16 inst = opcodes.r16(pc);
+	u32 flags = 0;
 
 	if (inst >= 0xe000)
 	{
 		// Jump instructions use special format
-		util::stream_format(stream, "%-6s", s_jumps[(inst & 0x1c00) >> 10]);
+		util::stream_format(stream, "%-5s", s_jumps[(inst & 0x1c00) >> 10]);
 		if ((inst & 0x1c00) == 0)
 			stream << "y,";
 
@@ -57,7 +58,7 @@ offs_t gigatron_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			if ((inst & 0x1c00) == 0)
 				util::stream_format(stream, "$%02x", inst & 0x00ff);
 			else
-				util::stream_format(stream, "$%04x", (pc & 0x3f00) | (inst & 0x00ff));
+				util::stream_format(stream, "$%04x", ((pc + 1) & 0x3f00) | (inst & 0x00ff));
 			break;
 
 		case 0x0100:
@@ -72,65 +73,78 @@ offs_t gigatron_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			stream << "in";
 			break;
 		}
+
+		flags = STEP_OVER | step_over_extra(1);
 	}
-	else if ((inst & 0xe300) == 0xc100)
-	{
-		// This was originally an undefined store mode
-		util::stream_format(stream, "%-6s$%02x", "ctrl", inst & 0x00ff);
-	}
+	else if ((inst & 0xf300) == 0x0200)
+		stream << "nop";
 	else
 	{
-		util::stream_format(stream, "%-6s", s_ops[(inst & 0xe000) >> 13]);
-
-		// Bus data
-		switch (inst & 0x0300)
+		if ((inst & 0xe300) == 0xc100)
 		{
-		case 0x0000:
-			util::stream_format(stream, "$%02x", inst & 0x00ff);
-			if (inst >= 0xc000)
-				stream << ",";
-			break;
+			// This was originally an undefined store mode
+			util::stream_format(stream, "%-5s", "ctrl");
+		}
+		else
+		{
+			util::stream_format(stream, "%-5s", s_ops[(inst & 0xe000) >> 13]);
 
-		case 0x0100:
-			break;
+			// Bus data
+			switch (inst & 0x0300)
+			{
+			case 0x0000:
+				util::stream_format(stream, "$%02x", inst & 0x00ff);
+				if (inst >= 0xc000)
+					stream << ",";
+				break;
 
-		case 0x0200:
-			if (inst < 0xc000)
-				stream << "ac"; // implicit for store instruction
-			break;
+			case 0x0100:
+				break;
 
-		case 0x0300:
-			stream << "in";
-			if (inst >= 0xc000)
-				stream << ",";
-			break;
+			case 0x0200:
+				if (inst < 0xc000)
+					stream << "ac"; // implicit for store instruction
+				break;
+
+			case 0x0300:
+				stream << "in";
+				if (inst >= 0xc000)
+					stream << ",";
+				break;
+			}
 		}
 
 		// RAM source or store destination
 		if (inst >= 0xc000 || (inst & 0x0300) == 0x0100)
 		{
+			if ((inst & 0xe300) != 0xc100)
+				stream << "[";
+
 			switch (inst & 0x1c00)
 			{
 			case 0x0000: case 0x1000: case 0x1400: case 0x1800:
-				util::stream_format(stream, "[$%02x]", inst & 0x00ff);
+				util::stream_format(stream, "$%02x", inst & 0x00ff);
 				break;
 
 			case 0x0400:
-				stream << "[x]";
+				stream << "x";
 				break;
 
 			case 0x0800:
-				util::stream_format(stream, "[y,$%02x]", inst & 0x00ff);
+				util::stream_format(stream, "y,$%02x", inst & 0x00ff);
 				break;
 
 			case 0x0c00:
-				stream << "[y,x]";
+				stream << "y,x";
 				break;
 
 			case 0x1c00:
-				stream << "[y,x++]";
+				stream << "y,x++";
 				break;
 			}
+
+			if ((inst & 0xe300) != 0xc100)
+				stream << "]";
 		}
 
 		// Non-accumulator destinations
@@ -143,5 +157,5 @@ offs_t gigatron_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		}
 	}
 
-	return 1;
+	return 1 | flags | SUPPORTED;
 }
