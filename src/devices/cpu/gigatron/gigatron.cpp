@@ -5,6 +5,8 @@
  * Skeleton device for Gigatron CPU Core
  *
  *****************************************************************************/
+ 
+ //https://github.com/PhilThomas/gigatron/blob/master/src/gigatron.js
 
 #include "emu.h"
 #include "gigatron.h"
@@ -65,16 +67,14 @@ void gigatron_cpu_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
 
-	save_item(NAME(m_pc));
-	save_item(NAME(m_flags));
+	init();
+}
 
-	// Register state for debugger
-	state_add( GTRON_R0, "PC", m_pc ).formatstr("%02X");
-	state_add( STATE_GENPC, "GENPC", m_r[7] ).noshow();
-	state_add( STATE_GENPCBASE, "CURPC", m_r[7] ).noshow();
-	state_add( STATE_GENFLAGS, "GENFLAGS", m_flags ).noshow();
-
-	set_icountptr(m_icount);
+void gigatron_cpu_device::init()
+{
+	state_add(GTRON_A,         "AC",         ac);
+	state_add(GTRON_X,         "X",         x);
+	state_add(GTRON_Y,         "Y",         y);
 }
 
 void gigatron_cpu_device::branchOp(int op, int mode, int bus, int d)
