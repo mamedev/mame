@@ -83,6 +83,17 @@ void gigatron_cpu_device::branchOp(int op, int mode, int bus, int d)
 
 void gigatron_cpu_device::aluOp(int op, int mode, int bus, int d)
 {
+	int b;
+	switch(bus) {
+		case 0:
+			b = d;
+			break;
+		case 1:
+		case 2:
+			b = ac;
+			break;
+		case 3:
+	}
 }
 
 void gigatron_cpu_device::storeOp(int op, int mode, int bus, int d)
