@@ -78,10 +78,12 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "machine/pcshare.h"
+#include "video/clgd542x.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "emupal.h"
 #include "screen.h"
-
+#include "machine/nvram.h"
 
 #define MAIN_CLOCK        XTAL(40'000'000)          // Pletronics 40.000 MHz. Crystal. Used for CPU clock.
 #define VIDEO_CLOCK       XTAL(14'318'181)    // Pletronics MP49 14.31818 MHz. Crystal. Used in common VGA ISA cards.
@@ -117,6 +119,7 @@ private:
 
 uint32_t wms_state::screen_update_wms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	printf("!! screen_update_wms !!\n");
 	return 0;
 }
 
@@ -126,27 +129,32 @@ uint32_t wms_state::screen_update_wms(screen_device &screen, bitmap_ind16 &bitma
 
 void wms_state::wms_map(address_map &map)
 {
+	printf("!! wms_map !!\n");
 	map(0x00000, 0x0ffff).ram();
 	map(0x60000, 0xfffff).rom().region("maincpu", 0x60000); // TODO: fix me
 }
 
 READ8_MEMBER(wms_state::test_r)
 {
+	printf("!! test_r !!\n");
 	return 1;
 }
 
 void wms_state::wms_io(address_map &map)
 {
+	printf("!! wms_io !!\n");
 	map(0x1207, 0x1207).r(FUNC(wms_state::test_r));
 }
 
 
 void wms_state::adsp_program_map(address_map &map)
 {
+	printf("!! adsp_program_map !!\n");
 }
 
 void wms_state::adsp_data_map(address_map &map)
 {
+	printf("!! adsp_data_map !!\n");
 }
 
 
@@ -180,6 +188,7 @@ GFXDECODE_END
 
 void wms_state::wms(machine_config &config)
 {
+	printf("!! wms !!\n");
 	/* basic machine hardware */
 	I80188(config, m_maincpu, MAIN_CLOCK);    // AMD N80C188-20, ( 40 MHz. internally divided by 2)
 	m_maincpu->set_addrmap(AS_PROGRAM, &wms_state::wms_map);

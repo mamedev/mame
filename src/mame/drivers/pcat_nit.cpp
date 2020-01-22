@@ -126,6 +126,7 @@ private:
 
 WRITE8_MEMBER(pcat_nit_state::pcat_nit_rombank_w)
 {
+	printf("!! pcat_nit_rombank_w !!\n");
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	//logerror( "rom bank #%02x at PC=%08X\n", data, m_maincpu->pc() );
 	if ( data & 0x40 )
@@ -157,6 +158,7 @@ WRITE8_MEMBER(pcat_nit_state::pcat_nit_rombank_w)
 
 void pcat_nit_state::pcat_map(address_map &map)
 {
+	printf("!! pcat_map !!\n");
 	map(0x00000000, 0x0009ffff).ram();
 	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
 	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0).nopw();
@@ -169,6 +171,7 @@ void pcat_nit_state::pcat_map(address_map &map)
 
 void pcat_nit_state::bonanza_map(address_map &map)
 {
+	printf("!! bonanza_map !!\n");
 	map(0x00000000, 0x0009ffff).ram();
 	map(0x000a0000, 0x000bffff).rw("vga", FUNC(cirrus_gd5428_device::mem_r), FUNC(cirrus_gd5428_device::mem_w));
 	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0).nopw();
@@ -181,6 +184,7 @@ void pcat_nit_state::bonanza_map(address_map &map)
 
 READ8_MEMBER(pcat_nit_state::pcat_nit_io_r)
 {
+	// printf("!! pcat_nit_io_r !!\n");
 	switch(offset)
 	{
 		case 0: /* 278 */
@@ -196,6 +200,7 @@ READ8_MEMBER(pcat_nit_state::pcat_nit_io_r)
 
 void pcat_nit_state::pcat_nit_io(address_map &map)
 {
+	printf("!! pcat_nit_io !!\n");
 	pcat32_io_common(map);
 	map(0x0278, 0x027f).r(FUNC(pcat_nit_state::pcat_nit_io_r)).nopw();
 	map(0x0280, 0x0283).nopr();
@@ -207,6 +212,7 @@ void pcat_nit_state::pcat_nit_io(address_map &map)
 
 void pcat_nit_state::bonanza_io_map(address_map &map)
 {
+	printf("!! bonanza_io_map !!\n");
 	pcat32_io_common(map);
 	map(0x0278, 0x027f).r(FUNC(pcat_nit_state::pcat_nit_io_r)).nopw();
 	map(0x0280, 0x0283).nopr();
@@ -227,12 +233,14 @@ INPUT_PORTS_END
 
 void pcat_nit_state::machine_start()
 {
+	printf("!! machine_start !!\n");
 	membank("rombank")->configure_entries(0, 0x80, memregion("game_prg")->base(), 0x8000 );
 	membank("rombank")->set_entry(0);
 }
 
 void pcat_nit_state::pcat_nit(machine_config &config)
 {
+	printf("!! pcat_nit !!\n");
 	/* basic machine hardware */
 	I386(config, m_maincpu, 14318180*2);   /* I386 ?? Mhz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcat_nit_state::pcat_map);
@@ -255,6 +263,7 @@ void pcat_nit_state::pcat_nit(machine_config &config)
 
 void pcat_nit_state::bonanza(machine_config &config)
 {
+	printf("!! bonanza !!\n");
 	/* basic machine hardware */
 	I386(config, m_maincpu, 14318180*2);   /* I386 ?? Mhz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcat_nit_state::bonanza_map);
