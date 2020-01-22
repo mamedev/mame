@@ -199,7 +199,7 @@ LRESULT editwin_info::edit_proc(UINT message, WPARAM wparam, LPARAM lparam)
 						// process
 						{
 							auto utf8_buffer = osd::text::from_tstring(buffer);
-							process_string(utf8_buffer.c_str());
+							process_string(utf8_buffer);
 						}
 					}
 					break;

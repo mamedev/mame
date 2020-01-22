@@ -1422,7 +1422,7 @@ void address_space::prepare_map()
 		{
 			// if we can't find it, add it to our map
 			std::string fulltag = entry.m_devbase.subtag(entry.m_share);
-			if (m_manager.m_sharelist.find(fulltag.c_str()) == m_manager.m_sharelist.end())
+			if (m_manager.m_sharelist.find(fulltag) == m_manager.m_sharelist.end())
 			{
 				VPRINTF(("Creating share '%s' of length 0x%X\n", fulltag.c_str(), entry.m_addrend + 1 - entry.m_addrstart));
 				m_manager.m_sharelist.emplace(fulltag.c_str(), std::make_unique<memory_share>(m_config.data_width(), address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), endianness()));
@@ -1447,7 +1447,7 @@ void address_space::prepare_map()
 			std::string fulltag = entry.m_devbase.subtag(entry.m_region);
 
 			// find the region
-			memory_region *region = m_manager.machine().root_device().memregion(fulltag.c_str());
+			memory_region *region = m_manager.machine().root_device().memregion(fulltag);
 			if (region == nullptr)
 				fatalerror("device '%s' %s space memory map entry %X-%X references nonexistent region \"%s\"\n", m_device.tag(), m_name, entry.m_addrstart, entry.m_addrend, entry.m_region);
 
@@ -1463,7 +1463,7 @@ void address_space::prepare_map()
 			std::string fulltag = entry.m_devbase.subtag(entry.m_region);
 
 			// set the memory address
-			entry.m_memory = m_manager.machine().root_device().memregion(fulltag.c_str())->base() + entry.m_rgnoffs;
+			entry.m_memory = m_manager.machine().root_device().memregion(fulltag)->base() + entry.m_rgnoffs;
 		}
 	}
 }
@@ -1774,7 +1774,7 @@ address_map_entry *address_space::block_assign_intersecting(offs_t addrstart, of
 		if (entry.m_memory == nullptr && entry.m_share != nullptr)
 		{
 			std::string fulltag = entry.m_devbase.subtag(entry.m_share);
-			auto share = m_manager.shares().find(fulltag.c_str());
+			auto share = m_manager.shares().find(fulltag);
 			if (share != m_manager.shares().end() && share->second->ptr() != nullptr)
 			{
 				entry.m_memory = share->second->ptr();
@@ -1797,7 +1797,7 @@ address_map_entry *address_space::block_assign_intersecting(offs_t addrstart, of
 		if (entry.m_memory != nullptr && entry.m_share != nullptr)
 		{
 			std::string fulltag = entry.m_devbase.subtag(entry.m_share);
-			auto share = m_manager.shares().find(fulltag.c_str());
+			auto share = m_manager.shares().find(fulltag);
 			if (share != m_manager.shares().end() && share->second->ptr() == nullptr)
 			{
 				share->second->set_ptr(entry.m_memory);
@@ -2299,7 +2299,7 @@ bool address_space::needs_backing_store(const address_map_entry &entry)
 	if (entry.m_share != nullptr)
 	{
 		std::string fulltag = entry.m_devbase.subtag(entry.m_share);
-		auto share = m_manager.shares().find(fulltag.c_str());
+		auto share = m_manager.shares().find(fulltag);
 		if (share != m_manager.shares().end() && share->second->ptr() == nullptr)
 			return true;
 	}

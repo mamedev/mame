@@ -3414,7 +3414,7 @@ void layout_view::item::resolve_tags()
 
 	if (!m_input_tag.empty())
 	{
-		m_input_port = m_element->machine().root_device().ioport(m_input_tag.c_str());
+		m_input_port = m_element->machine().root_device().ioport(m_input_tag);
 		if (m_input_port)
 		{
 			for (ioport_field &field : m_input_port->fields())

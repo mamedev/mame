@@ -2754,7 +2754,7 @@ void ioport_manager::timecode_init()
 	filename.append(record_filename).append(".timecode");
 	osd_printf_info("Record input timecode file: %s\n", record_filename);
 
-	osd_file::error filerr = m_timecode_file.open(filename.c_str());
+	osd_file::error filerr = m_timecode_file.open(filename);
 	if (filerr != osd_file::error::NONE)
 		throw emu_fatalerror("ioport_manager::timecode_init: Failed to open file for input timecode recording");
 
@@ -3028,7 +3028,7 @@ ioport_configurer& ioport_configurer::port_modify(const char *tag)
 	std::string fulltag = m_owner.subtag(tag);
 
 	// find the existing port
-	m_curport = m_portlist.find(fulltag.c_str())->second.get();
+	m_curport = m_portlist.find(fulltag)->second.get();
 	if (m_curport == nullptr)
 		throw emu_fatalerror("Requested to modify nonexistent port '%s'", fulltag.c_str());
 

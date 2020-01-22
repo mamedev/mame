@@ -483,8 +483,8 @@ void menu_select_software::inkey_select(const event *menu_event)
 		driver_enumerator drivlist(machine().options(), *ui_swinfo->driver);
 		media_auditor auditor(drivlist);
 		drivlist.next();
-		software_list_device *swlist = software_list_device::find_by_name(*drivlist.config(), ui_swinfo->listname.c_str());
-		const software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());
+		software_list_device *swlist = software_list_device::find_by_name(*drivlist.config(), ui_swinfo->listname);
+		const software_info *swinfo = swlist->find(ui_swinfo->shortname);
 
 		media_auditor::summary const summary = auditor.audit_software(swlist->list_name(), swinfo, AUDIT_VALIDATE_FAST);
 

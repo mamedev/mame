@@ -949,7 +949,7 @@ void debug_imgui::mount_image()
 			case file_entry_type::DIRECTORY:
 				{
 					util::zippath_directory::ptr dir;
-					err = util::zippath_directory::open(m_selected_file->fullpath.c_str(), dir);
+					err = util::zippath_directory::open(m_selected_file->fullpath, dir);
 				}
 				if(err == osd_file::error::NONE)
 				{
@@ -958,7 +958,7 @@ void debug_imgui::mount_image()
 				}
 				break;
 			case file_entry_type::FILE:
-				m_dialog_image->load(m_selected_file->fullpath.c_str());
+				m_dialog_image->load(m_selected_file->fullpath);
 				ImGui::CloseCurrentPopup();
 				break;
 		}
