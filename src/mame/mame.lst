@@ -39824,7 +39824,17 @@ conyteni                        //
 conyping                        //
 conyfght
 
-@source:vii.cpp
+@source:spg2xx.cpp
+rad_skat                        //
+rad_skatp                       //
+rad_sktv                        //
+rad_crik                        //
+rad_fb2                         //
+mattelcs                        //
+abltenni                        //
+wiwi18                          //
+
+@source:spg2xx_jakks.cpp
 jak_batm                        // The Batman, 2004
 jak_wall                        //
 jak_wwe                         //
@@ -39847,33 +39857,54 @@ jak_pooh                        //
 jak_care                        //
 jak_nick                        //
 jak_sbfc                        //
-lexizeus                        // Lexibook
-lexiseal                        //
-vii                             // KenSingTon / Jungle Soft / Siatronics Vii
+
+@source:spg2xx_zone.cpp
 wirels60                        // Wireless 60
 zone40                          // Zone 40
 zone60                          // Zone 60
 zone100                         //
+lx_jg7415                       //
+
+@source:spg2xx_zone_32bit.cpp
 mywicodx                        //
 zon32bit                        // Zone 32-bit
-lx_jg7415                       //
-rad_skat                        //
-rad_skatp                       //
-rad_sktv                        //
-rad_crik                        //
-rad_fb2                         //
-mattelcs                        //
-dreamlif                        //
+
+@source:spg2xx_senario.cpp
+senmil
+senbbs
+
+@source:spg2xx_senario_poker.cpp
+sentx6p                         //
+
+@source:spg2xx_vii.cpp
+vii                             // KenSingTon / Jungle Soft / Siatronics Vii
+
+@source:spg2xx_ican.cpp
 icanguit                        //
 icanpian                        //
-tvgogo                          //
+
+@source:spg2xx_playvision.cpp
 pvmil                           //
+
+@source:spg2xx_shredmjr.cpp
 taikeegr                        //
 shredmjr                        //
-sentx6p                         //
+
+@source:spg2xx_telestory.cpp
 telestry                        //
-wiwi18                          //
+
+@source:spg2xx_tvgogo.cpp
+tvgogo                          //
+
+@source:spg2xx_pdc.cpp
 pdc100
+
+@source:spg2xx_dreamlife.cpp
+dreamlif                        //
+
+@source:spg2xx_lexibook.cpp
+lexizeus                        // Lexibook
+lexiseal                        //
 
 @source:vsmile.cpp
 vsmile                          //
