@@ -60,7 +60,7 @@ private:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_gamekey);
 
-	required_device<jakks_gamekey_slot_device> m_cart;
+	optional_device<jakks_gamekey_slot_device> m_cart;
 	memory_region *m_cart_region;
 };
 
