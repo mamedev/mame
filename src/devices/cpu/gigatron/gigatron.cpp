@@ -50,9 +50,28 @@ void gigatron_cpu_device::execute_run()
 
 		opcode = gigatron_readop(m_pc);
 		m_pc++;
+		
+		uint8_t op = (opcode >> 13) & 0x0007;
+		uint8_t mode = (opcode >> 10) & 0x0007;
+		uint8_t bus = (opcode >> 8) & 0x0003;
+		uint8_t d = (opcode >> 0) & 0x00ff;
 
-		switch( opcode )
+		switch( op)
 		{
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+			case 5:
+				aluOp(op, mode, bus, d);
+				break;
+			case 6:
+				storeOp(op, mode, bus, d);
+				break;
+			case 7:
+				branchOp(op, mode, bus, d);
+				break;
 			default:
 				gigatron_illegal();
 				break;
