@@ -80,6 +80,7 @@ void gigatron_state::gigatron(machine_config &config)
 	screen.set_visarea(0, 640-1, 0, 480-1);
 	screen.set_screen_update(FUNC(gigatron_state::screen_update));
 
+	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 }

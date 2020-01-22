@@ -91,6 +91,10 @@ void gigatron_cpu_device::device_start()
 
 void gigatron_cpu_device::init()
 {
+	ac = 0;
+	x = 0;
+	y = 0;
+	m_pc = 0;
 	state_add(GTRON_A,         "AC",         ac);
 	state_add(GTRON_X,         "X",         x);
 	state_add(GTRON_Y,         "Y",         y);
