@@ -15,10 +15,10 @@
 #include <locale>
 #include <string>
 
-#include <assert.h>
-#include <ctype.h>
-#include <stdarg.h>
-#include <stdlib.h>
+#include <cassert>
+#include <cctype>
+#include <cstdarg>
+#include <cstdlib>
 
 
 const int core_options::MAX_UNADORNED_OPTIONS;

@@ -20,8 +20,8 @@
 #include "winutil.h"
 
 // standard C headers
-#include <stdio.h>
-#include <ctype.h>
+#include <cstdio>
+#include <cctype>
 #include <cassert>
 #include <cstring>
 

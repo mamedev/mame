@@ -13,12 +13,12 @@
 #pragma once
 
 // standard C includes
-#include <assert.h>
-#include <math.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdarg.h>
+#include <cassert>
+#include <cmath>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+#include <cstdarg>
 
 // some cleanups for Solaris for things defined in stdlib.h
 #if defined(__sun__) && defined(__svr4__)

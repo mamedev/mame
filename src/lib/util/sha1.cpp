@@ -27,9 +27,9 @@
 
 #include "sha1.h"
 
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
 
 static unsigned int READ_UINT32(const uint8_t* data)
 {

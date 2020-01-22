@@ -48,7 +48,7 @@
 
 #include "screen.h"
 
-#include <math.h>
+#include <cmath>
 #include <array>
 #include <map>
 #include <memory>

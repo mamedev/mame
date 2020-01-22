@@ -11,7 +11,7 @@
 #include <windows.h>
 #include <mmsystem.h>
 
-#include <stdlib.h>
+#include <cstdlib>
 #ifndef _MSC_VER
 #include <unistd.h>
 #endif

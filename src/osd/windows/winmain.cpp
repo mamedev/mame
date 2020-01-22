@@ -21,9 +21,9 @@
 #include "modules/monitor/monitor_common.h"
 
 // standard C headers
-#include <ctype.h>
-#include <stdarg.h>
-#include <stdio.h>
+#include <cctype>
+#include <cstdarg>
+#include <cstdio>
 
 // standard windows headers
 #include <windows.h>

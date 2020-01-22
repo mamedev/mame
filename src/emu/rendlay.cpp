@@ -18,7 +18,7 @@
 #include "vecstream.h"
 #include "xmlfile.h"
 
-#include <ctype.h>
+#include <cctype>
 #include <algorithm>
 #include <cmath>
 #include <cstddef>

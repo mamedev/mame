@@ -13,7 +13,7 @@
 #include "speaker.h"
 #include "debug/debugcpu.h"
 
-#include <string.h>
+#include <cstring>
 
 
 //**************************************************************************

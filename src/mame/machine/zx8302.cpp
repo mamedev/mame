@@ -23,7 +23,7 @@
 
 #include "imagedev/microdrv.h"
 
-#include <time.h>
+#include <ctime>
 
 
 

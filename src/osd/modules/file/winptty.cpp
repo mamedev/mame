@@ -10,7 +10,7 @@
 #include <cassert>
 
 #include <windows.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 
 namespace {

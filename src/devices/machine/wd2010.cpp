@@ -41,7 +41,7 @@ UNIMPLEMENTED FEATURES :
 #define VERBOSE 1
 #include "logmacro.h"
 
-#include <math.h>
+#include <cmath>
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************

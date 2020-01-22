@@ -41,7 +41,7 @@
 #include "emu.h"
 #include "tms9902.h"
 
-#include <math.h>
+#include <cmath>
 
 #define LOG_GENERAL (1U << 0)
 #define LOG_LINES   (1U << 1)

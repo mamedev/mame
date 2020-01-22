@@ -27,7 +27,7 @@ TODO:
 
 */
 
-#include <assert.h>
+#include <cassert>
 
 #include "tzx_cas.h"
 #include "formats/imageutl.h"

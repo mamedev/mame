@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "ds1205.h"
 
-#include <stdio.h>
+#include <cstdio>
 
 
 #define VERBOSE_LEVEL ( 0 )

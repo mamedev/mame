@@ -40,9 +40,9 @@
 
 ********************************************************************/
 
-#include <string.h>
-#include <time.h>
-#include <assert.h>
+#include <cstring>
+#include <ctime>
+#include <cassert>
 #include <iomanip>
 
 #include "emu.h" // osd_printf_* (in osdcore.h)

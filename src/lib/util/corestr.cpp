@@ -14,8 +14,8 @@
 #include <algorithm>
 #include <memory>
 
-#include <ctype.h>
-#include <stdlib.h>
+#include <cctype>
+#include <cstdlib>
 
 
 /*-------------------------------------------------

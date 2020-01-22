@@ -31,7 +31,7 @@
 
 #include "emu.h"
 #include "express.h"
-#include <ctype.h>
+#include <cctype>
 
 
 

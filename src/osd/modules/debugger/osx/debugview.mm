@@ -16,7 +16,7 @@
 
 #include "util/xmlfile.h"
 
-#include <string.h>
+#include <cstring>
 
 
 static NSColor *DefaultForeground;

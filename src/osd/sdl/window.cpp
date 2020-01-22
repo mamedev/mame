@@ -16,7 +16,7 @@
 #include <SDL2/SDL.h>
 
 // standard C headers
-#include <math.h>
+#include <cmath>
 #ifndef _MSC_VER
 #include <unistd.h>
 #endif

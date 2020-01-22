@@ -15,7 +15,7 @@
 #include "debugger.h"
 
 #include <algorithm>
-#include <ctype.h>
+#include <cctype>
 #include <tuple>
 
 

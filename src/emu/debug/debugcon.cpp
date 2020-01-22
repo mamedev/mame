@@ -14,7 +14,7 @@
 #include "debugvw.h"
 #include "textbuf.h"
 #include "debugger.h"
-#include <ctype.h>
+#include <cctype>
 #include <fstream>
 
 /***************************************************************************

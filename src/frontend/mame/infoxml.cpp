@@ -25,7 +25,7 @@
 
 #include "xmlfile.h"
 
-#include <ctype.h>
+#include <cctype>
 #include <cstring>
 #include <unordered_set>
 #include <queue>

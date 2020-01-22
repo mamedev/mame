@@ -19,7 +19,7 @@
 
 *********************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "formats/camplynx_dsk.h"
 

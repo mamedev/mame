@@ -30,7 +30,7 @@
 #include "emu.h"
 #include "mea8000.h"
 
-#include <math.h>
+#include <cmath>
 
 //#define VERBOSE 1
 #include "logmacro.h"

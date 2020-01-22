@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Sven Gothel
-#include <stdio.h>   /* snprintf */
-#include <stdlib.h>  /* malloc */
+#include <cstdio>   /* snprintf */
+#include <cstdlib>  /* malloc */
 
 #include "osdcomm.h"
 #include "osd_opengl.h"

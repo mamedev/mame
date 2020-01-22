@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#include <assert.h>
+#include <cassert>
 #include "harddisk.h"
 #include "osdcore.h"
-#include <stdlib.h>
+#include <cstdlib>
 
 /***************************************************************************
     TYPE DEFINITIONS

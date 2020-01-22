@@ -15,7 +15,7 @@
 #include "softlist_dev.h"
 #include "validity.h"
 
-#include <ctype.h>
+#include <cctype>
 
 
 //**************************************************************************
