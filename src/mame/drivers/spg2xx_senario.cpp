@@ -5,17 +5,19 @@
 	General Senario games on SunPlus hardware
 	
 	these check for flash ROM and actually save user data at 0x700000 in the flash ROM
+
+	TODO:
+	Are the LEDs on the controllers meant to go out as players select answers like with pvmil, or are they just to show that the controller is connected?
 */
 
 #include "includes/spg2xx.h"
 #include "machine/intelfsh.h"
-#include "senmil.lh"
 
 class spg2xx_senario_state : public spg2xx_game_state
 {
 public:
 	spg2xx_senario_state(const machine_config& mconfig, device_type type, const char* tag) :
-		spg2xx_game_state(mconfig, type, tag),
+		spg2xx_game_state(mconfig, type, tag)
 	{ }
 
 	void senbbs(machine_config& config);
@@ -26,10 +28,6 @@ protected:
 	//virtual void machine_start() override;
 	//virtual void machine_reset() override;
 
-	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
-	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
-	virtual DECLARE_WRITE16_MEMBER(portc_w) override;
-
 private:
 };
 
@@ -38,26 +36,24 @@ class spg2xx_senario_mil_state : public spg2xx_senario_state
 public:
 	spg2xx_senario_mil_state(const machine_config& mconfig, device_type type, const char* tag) :
 		spg2xx_senario_state(mconfig, type, tag),
-		m_leds(*this, "led%u", 0U)
+		m_portc_data(0)
 	{ }
 
 	void senmil(machine_config& config);
 	
 protected:
-	virtual void machine_start() override;
+	//virtual void machine_start() override;
 	//virtual void machine_reset() override;
 
+	DECLARE_READ16_MEMBER(portc_r);
+
+	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
+	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
+	virtual DECLARE_WRITE16_MEMBER(portc_w) override;
+
 private:
-	output_finder<4> m_leds;
+	uint16_t m_portc_data;
 };
-
-void spg2xx_senario_mil_state::machine_start()
-{
-	spg2xx_senario_state::machine_start();
-
-	m_leds.resolve();
-}
-
 
 static INPUT_PORTS_START( senmil ) // reset with Console Start and Console Select held down for test mode
 	PORT_START("P1")
@@ -90,9 +86,9 @@ static INPUT_PORTS_START( senmil ) // reset with Console Start and Console Selec
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P3")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Pad Connection Status (exact bit assignment unclear)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Pad Connection Status (see spg2xx_senario_mil_state::portc_r)
 	PORT_BIT( 0x0300, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Low Batttery sensor
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Low Battery sensor
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START ) PORT_CODE(KEYCODE_1) PORT_NAME("Console Start")
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SELECT ) PORT_CODE(KEYCODE_5) PORT_NAME("Console Select")
 	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -110,7 +106,7 @@ static INPUT_PORTS_START( senbbs ) // reset with Select and Spin held down for t
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Cash Out")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Bet Max")
 	PORT_BIT( 0x7f80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Low Batttery sensor
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Low Battery sensor
 
 	PORT_START("P2")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -124,21 +120,22 @@ void spg2xx_senario_state::mem_map_flash(address_map &map)
 	map(0x000000, 0x3fffff).rw("flash", FUNC(spansion_s29gl064s_device::read), FUNC(spansion_s29gl064s_device::write));
 }
 
-WRITE16_MEMBER(spg2xx_senario_state::porta_w)
+WRITE16_MEMBER(spg2xx_senario_mil_state::portc_w)
 {
-	logerror("%s: porta_w %04x\n", machine().describe_context(), data);
-}
+	// -4-3 -2-1
+	// change when a button for that player is pressed, none of these seem to be for the LEDs on the controllers (or are they 'always on')
 
-WRITE16_MEMBER(spg2xx_senario_state::portb_w)
-{
-	logerror("%s: portb_w %04x\n", machine().describe_context(), data);
-}
-
-WRITE16_MEMBER(spg2xx_senario_state::portc_w)
-{
-	printf("%s: portc_w %04x\n", machine().describe_context().c_str(), data);
+	printf("%s: spg2xx_senario_mil_state::portc_w %04x ---- %04x %04x \n", machine().describe_context().c_str(), data, data & 0x55, data & 0xaa);
+	m_portc_data = data;
 }
 	
+READ16_MEMBER(spg2xx_senario_mil_state::portc_r)
+{
+	uint16_t ret = m_io_p3->read() & 0xffaa; // 0xaa must be set to register all controllers as turned on
+	ret |= m_portc_data & 0x0055;
+	return ret;
+}
+
 void spg2xx_senario_state::senbbs(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
@@ -150,10 +147,6 @@ void spg2xx_senario_state::senbbs(machine_config &config)
 	m_maincpu->portb_in().set_ioport("P2");
 	m_maincpu->portc_in().set_ioport("P3");
 
-	m_maincpu->porta_out().set(FUNC(spg2xx_senario_state::porta_w));
-	m_maincpu->portb_out().set(FUNC(spg2xx_senario_state::portb_w));
-	m_maincpu->portc_out().set(FUNC(spg2xx_senario_state::portc_w));
-
 	SPANSION_S29GL064S(config, "flash");
 }
 
@@ -161,7 +154,8 @@ void spg2xx_senario_mil_state::senmil(machine_config& config)
 {
 	spg2xx_senario_state::senbbs(config);
 
-	config.set_default_layout(layout_senmil);
+	m_maincpu->portc_in().set(FUNC(spg2xx_senario_mil_state::portc_r));
+	m_maincpu->portc_out().set(FUNC(spg2xx_senario_mil_state::portc_w));
 }
 
 // note not using ROM_LOAD16_WORD_SWAP because this is a Flash ROM region, and we end up with wrong endian if we do
