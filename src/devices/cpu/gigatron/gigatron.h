@@ -46,9 +46,9 @@ protected:
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 	
-	void gigatron_cpu_device::branchOp(int op, int mode, int bus, int d);
-	void gigatron_cpu_device::aluOp(int op, int mode, int bus, int d);
-	void gigatron_cpu_device::storeOp(int op, int mode, int bus, int d);
+	void branchOp(int op, int mode, int bus, int d);
+	void aluOp(int op, int mode, int bus, int d);
+	void storeOp(int op, int mode, int bus, int d);
 	
 	uint8_t ac;
 	uint8_t x;
