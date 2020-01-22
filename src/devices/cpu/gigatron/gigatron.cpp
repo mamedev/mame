@@ -77,6 +77,18 @@ void gigatron_cpu_device::device_start()
 	set_icountptr(m_icount);
 }
 
+void gigatron_cpu_device::branchOp(int op, int mode, int bus, int d)
+{
+}
+
+void gigatron_cpu_device::aluOp(int op, int mode, int bus, int d)
+{
+}
+
+void gigatron_cpu_device::storeOp(int op, int mode, int bus, int d)
+{
+}
+
 void gigatron_cpu_device::device_reset()
 {
 }

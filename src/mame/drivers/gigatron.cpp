@@ -12,7 +12,6 @@
 
 #include "emu.h"
 #include "cpu/gigatron/gigatron.h"
-#include "machine/nvram.h"
 #include "screen.h"
 #include "speaker.h"
 
