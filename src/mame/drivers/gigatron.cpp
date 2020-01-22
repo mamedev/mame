@@ -27,10 +27,11 @@ public:
 	}
 
 	void gigatron(machine_config &config);
-	
-	void init_gigatron();
+
 
 private:
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -40,6 +41,11 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 };
+
+uint32_t gigatron_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
 
 void gigatron_state::prog_map(address_map &map)
 {
@@ -72,6 +78,7 @@ void gigatron_state::gigatron(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640, 0, 480);
+	screen.set_screen_update(FUNC(gigatron_state::screen_update));
 
 	SPEAKER(config, "mono").front_center();
 
