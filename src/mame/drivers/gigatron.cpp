@@ -82,4 +82,4 @@ ROM_START( gigatron )
 	ROM_LOAD( "gigatron.rom",  0x0000, 0x20000, CRC(78995109) SHA1(2395fc48e64099836111f5aeca39ddbf4650ea4e) )
 ROM_END
 
-COMP(2018, gigatron,         0, gigatron, gigatron, gigatron_state, empty_init, ROT0, "Marcel van Kervinck", "Gigatron TTL Microcomputer", MACHINE_IS_SKELETON)
+COMP(2018, gigatron, 0, 0, gigatron, gigatron, gigatron_state, empty_init, "Marcel van Kervinck", "Gigatron TTL Microcomputer", MACHINE_IS_SKELETON)
