@@ -768,6 +768,7 @@ BUSES["BBC_CART"] = true
 BUSES["BBC_EXP"] = true
 BUSES["BBC_INTERNAL"] = true
 BUSES["BBC_JOYPORT"] = true
+BUSES["BBC_MODEM"] = true
 BUSES["BBC_1MHZBUS"] = true
 BUSES["BBC_TUBE"] = true
 BUSES["BBC_USERPORT"] = true
