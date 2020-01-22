@@ -235,7 +235,7 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_size = 0x800000;
 		m_maker_id = MFG_SPANSION;
 		m_device_id = 0x227e;
-		m_sector_is_4k = true;
+		m_sector_is_4k = false;
 		break;
 	case FLASH_INTEL_28F320J5: // funkball
 		m_bits = 16;
