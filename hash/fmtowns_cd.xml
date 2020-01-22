@@ -27,6 +27,7 @@ Ablemax Suugaku                                               Able Serve        
 AD&D Heroes of the Lance                                      Pony Canyon                       1990/6     CD
 Aesop World Dai-1-shuu (Denshi Ehon)                          Fujitsu                           1993/12    CD
 Aesop World Dai-2-shuu (Denshi Ehon)                          Fujitsu                           1993/12    CD
+After Burner (v1.02)                                          CRI                               1989/11    CD
 Airwave Adventure                                             Toshiba EMI                       1989/12    CD
 Aishuu to Netsujou no Chouwa                                  Fujitsu                           1995/4     CD
 Akiko Gold                                                    Fairytale (Red Zone)              1995/1     SET(CD+FD)
@@ -203,7 +204,6 @@ FreeColle Marty 1                                             Fujitsu           
 * Fujitsu Air Warrior V1.1                                    Fujitsu                           1992/3     SET(CD+FD)
 Fujitsu Air Warrior V2.1                                      Fujitsu                           1995/4     SET(CD+FD)
 Fujitsu Habitat V1.1                                          Fujitsu                           1990/1     SET(CD+FD)
-* Fujitsu Habitat V2.1 L10                                    Fujitsu                           1994/5     SET(CD+FD)
 Fujitsu Habitat V2.1 L11                                      Fujitsu                           1994/?     SET(CD+FD)
 Fukui Toshio no Otenki Map                                    Inter Limited Logic               1991/2     CD
 Functioning in Business Part 1                                DynEd Japan                       1992/7     SET(CD+FD)
@@ -600,7 +600,6 @@ Shiki wo Irodoru Nihon no Shouka: Fuyu-hen                    Toshiba EMI       
 Shiki wo Irodoru Nihon no Shouka: Haru-hen                    Toshiba EMI                       1991/4     CD
 Shiki wo Irodoru Nihon no Shouka: Natsu-hen                   Toshiba EMI                       1991/4     CD
 Shin Eiwa / Waei Chuujiten                                    Fujitsu                           1993/11    CD
-Shooting Towns                                                Amorphous                         1990/3     CD
 Shoubunsha Area Guide: 74 Zenkoku Pension Guide               Com Staff                         1989/12    CD
 Shougakkou 4-nen Kyouzai Set                                  Uchida Youkou                     1993/5     CD
 Shougakkou 5-nen Kyouzai Set                                  Uchida Youkou                     1993/5     CD
@@ -1604,29 +1603,45 @@ User/save disks that can be created from the game itself are not included.
 	<!-- Runs too fast -->
 	<software name="aburner" supported="partial">
 		<!--
-		Origin: Neo Kobe Collection
-		<rom name="After Burner.ccd" size="2145" crc="c88c38a9" sha1="88f2a8ff8f7c8f27b43e7b2ac2e92e856e97def2"/>
-		<rom name="After Burner.cue" size="386" crc="a1a8850b" sha1="986ad6875e82ba8c8c20684606cd86d6aeebf5f5"/>
-		<rom name="After Burner.img" size="230907600" crc="37fa03b7" sha1="1cfa47e4767f4048160149a7c7f3c0bc7ccc60cd"/>
-		<rom name="After Burner.sub" size="9424800" crc="7a728a6d" sha1="c12601658d2c4863b7c40e2a5c56abe4b2c1e671"/>
+		Origin: redump.org
+		<rom name="After Burner (Japan) (Track 1).bin" size="7126560" crc="789fc2c6" sha1="0604f645a7777df34006b93baa1c2f68d3379dad"/>
+		<rom name="After Burner (Japan) (Track 2).bin" size="15709008" crc="e82058e2" sha1="53b1455a8e0db651d5404e3f49aaa6fb6fd00303"/>
+		<rom name="After Burner (Japan) (Track 3).bin" size="36136128" crc="32986b6c" sha1="78d6b64dc121363bef3ac57fbf1e96b0e3a3d510"/>
+		<rom name="After Burner (Japan) (Track 4).bin" size="58696512" crc="8bcb4924" sha1="2f399b78429d8b5d91b48379cc3bf54e208fc1c1"/>
+		<rom name="After Burner (Japan) (Track 5).bin" size="20107248" crc="ef8c6543" sha1="a83c5f182f7bfc41adb8bb94b1965bf7be10298b"/>
+		<rom name="After Burner (Japan) (Track 6).bin" size="52546032" crc="cb19df25" sha1="3890a42757ce4c220177b748465902e7fd53cced"/>
+		<rom name="After Burner (Japan) (Track 7).bin" size="35207088" crc="a7e97277" sha1="a932119e322e21c61d71f42ead2c61e41375cfba"/>
+		<rom name="After Burner (Japan) (Track 8).bin" size="5379024" crc="a9397468" sha1="c7bba81a93d0a5ab5575ad976b5de22a7825e6a7"/>
+		<rom name="After Burner (Japan).cue" size="917" crc="cac464a9" sha1="31cb5ced76d61f0a76ef1c8f455b6483a2ddcfa7"/>
 		-->
-		<description>After Burner</description>
+		<description>After Burner (v1.01)</description>
 		<year>1989</year>
 		<publisher>CRI</publisher>
 		<info name="alt_title" value="アフターバーナー" />
-		<info name="release" value="198911xx" />
+		<info name="release" value="198903xx" />
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="after burner" sha1="e1c6cc2df19b89ca1dab88358337d97ece90dd58" />
+				<disk name="after burner (japan)" sha1="a7889124b3e67f6ef8b129b2ecb5914da14e9ed7" />
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="aburner3">
 		<!--
-		Origin: Neo Kobe Collection
-		<rom name="After Burner III.bin" size="414645840" crc="d58140b8" sha1="2a7b13067e1e810f173021e8cdd7e8bdaedfe08c"/>
-		<rom name="After Burner III.cue" size="554" crc="c686ae32" sha1="fd6f1618b9ea5c15300044a8e1626802fa4bbab9"/>
+		Origin: redump.org
+		<rom name="After Burner III (Japan) (Track 01).bin" size="10231200" crc="0d6bc39a" sha1="9a3eecc6b1dbf4a30e0cc62e4ddb54a1298038d2"/>
+		<rom name="After Burner III (Japan) (Track 02).bin" size="12496176" crc="97def07f" sha1="4e9f21e85d2bb4c2d4108ad1510d8d920a157cd8"/>
+		<rom name="After Burner III (Japan) (Track 03).bin" size="58393104" crc="243ee025" sha1="b1bd4b5aab7a926d02f3ca5818621690b122d708"/>
+		<rom name="After Burner III (Japan) (Track 04).bin" size="61500096" crc="7b3225f8" sha1="ec12fa3b41ea7ee94fa800aa7f6e44ec3c263358"/>
+		<rom name="After Burner III (Japan) (Track 05).bin" size="53030544" crc="6e9be897" sha1="9ddc5c079c066b9cf5e02bef684c39b42584f63d"/>
+		<rom name="After Burner III (Japan) (Track 06).bin" size="54714576" crc="d7e48924" sha1="34853c8d662b5898926adba7b60dca92fdd8a874"/>
+		<rom name="After Burner III (Japan) (Track 07).bin" size="56734944" crc="ea9507e7" sha1="7d8edd52637cc65af0853fd678798fa95e8bb4fd"/>
+		<rom name="After Burner III (Japan) (Track 08).bin" size="60300576" crc="bc0325ae" sha1="6826f501a1d7c5d54441ca60ddf6443398bac077"/>
+		<rom name="After Burner III (Japan) (Track 09).bin" size="12947760" crc="f5b3562b" sha1="e82dc93b13aa4fa1b4f1706f68597ddf3cc49809"/>
+		<rom name="After Burner III (Japan) (Track 10).bin" size="13328784" crc="10bc34e6" sha1="2f72bc2635cd10760e2795d479e72eb1de25d6bd"/>
+		<rom name="After Burner III (Japan) (Track 11).bin" size="6157536" crc="5a8629c2" sha1="9eb2f74518d840fbc73410c34f6647cddee919cf"/>
+		<rom name="After Burner III (Japan) (Track 12).bin" size="15163344" crc="2b7add3d" sha1="9490084e6b4a95494869784e23a634075b6c343b"/>
+		<rom name="After Burner III (Japan).cue" size="1410" crc="a13d9e08" sha1="a2f29ae1c5edb4b11ddf39cc196aea9192c54461"/>
 		-->
 		<description>After Burner III</description>
 		<year>1992</year>
@@ -1635,7 +1650,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199206xx" />
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="after burner iii" sha1="70b10643e32f4d4a254a0c8f29e3224c2f810c1d" />
+				<disk name="after burner iii (japan)" sha1="fe11d382c3efef8ed4a698f6a9832fb6bcd09167" />
 			</diskarea>
 		</part>
 	</software>
@@ -3937,7 +3952,6 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-
 	<software name="emit2">
 		<!--
 		Origin: redump.org
@@ -3965,6 +3979,36 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="emit vol. 2 - inochigake no tabi (japan) (en,ja)" sha1="ae0de13b275b8f7ce5082008002aa4c275d011db" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="emit3">
+		<!--
+		Origin: redump.org
+		<rom name="Emit Vol. 3 - Watashi ni Sayonara o (Japan) (En,Ja) (Track 1).bin" size="20815200" crc="d77c413f" sha1="5ddc8bcbd38929a6e74845df23de3a730d79adf1"/>
+		<rom name="Emit Vol. 3 - Watashi ni Sayonara o (Japan) (En,Ja) (Track 2).bin" size="42547680" crc="c4e86795" sha1="f22e3636eaff62524d189c4bcc771dd63cd226d5"/>
+		<rom name="Emit Vol. 3 - Watashi ni Sayonara o (Japan) (En,Ja) (Track 3).bin" size="158341344" crc="8f6b1bb1" sha1="268de6a023126d32931b04a3291ed4854f956375"/>
+		<rom name="Emit Vol. 3 - Watashi ni Sayonara o (Japan) (En,Ja) (Track 4).bin" size="183209040" crc="cf38ec52" sha1="525c83befa09f26c8a5b1ce1a53b3bfb22e21bac"/>
+		<rom name="Emit Vol. 3 - Watashi ni Sayonara o (Japan) (En,Ja) (Track 5).bin" size="46428480" crc="de12b148" sha1="9d413ac2e691b07a918bcf9699b303dd217309e3"/>
+		<rom name="Emit Vol. 3 - Watashi ni Sayonara o (Japan) (En,Ja) (Track 6).bin" size="123785760" crc="4796d502" sha1="bdeb2600fa79e451db3468d7bc6880d1473391a6"/>
+		<rom name="Emit Vol. 3 - Watashi ni Sayonara o (Japan) (En,Ja) (Track 7).bin" size="68991216" crc="19056db5" sha1="bd59802aacf935d0e0807b36c34270061b27cf26"/>
+		<rom name="Emit Vol. 3 - Watashi ni Sayonara o (Japan) (En,Ja) (Track 8).bin" size="3356304" crc="a77f098e" sha1="59f1048a47f199b1b5311e09e6cdcaa777ccc314"/>
+		<rom name="Emit Vol. 3 - Watashi ni Sayonara o (Japan) (En,Ja).cue" size="1142" crc="1c6b0466" sha1="dcaef9c9d047f96aa269271c29a62f200a5a8acb"/>
+		-->
+		<description>Emit Vol. 3 - Watashi ni Sayonara o</description>
+		<year>1994</year>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="release" value="199409xx" />
+		<info name="alt_title" value="エミット Vol. 3 私にさよならを" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="emit3.hdm" size="1261568" crc="4e00e431" sha1="8feb87e951bb4030c085a3a37add7091533c7272" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="emit vol. 3 - watashi ni sayonara o (japan) (en,ja)" sha1="b19d7321c656c3c8722ece8a17622e441422ec20" />
 			</diskarea>
 		</part>
 	</software>
@@ -4676,10 +4720,13 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Missing a floppy disk -->
+	<!--
+	Habitat is an early MMORPG, so it's marked as "not supported" since it requires a modem, and obviously the original online service.
+	There is an open source server replacement called NeoHabitat, but for now it only works with the Commodore 64 version.
+	-->
 	<software name="habitat" supported="no">
 		<!--
-		Origin: redump.org
+		Origin: redump.org + private floppy dump (StuBlad)
 		<rom name="Fujitsu Habitat V2.1L10 (Japan) (Track 1).bin" size="101959200" crc="29a91a0f" sha1="ecff62e56a93cc5d357e012fe21f1ae6c9a2cf70"/>
 		<rom name="Fujitsu Habitat V2.1L10 (Japan) (Track 2).bin" size="47150544" crc="f61961ed" sha1="c89982352db456c812c486b59088656363cde992"/>
 		<rom name="Fujitsu Habitat V2.1L10 (Japan) (Track 3).bin" size="20551776" crc="7e452f3c" sha1="4a8fc3891643ffeff4ea74e4dbd50ad38cd29823"/>
@@ -4692,6 +4739,11 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>富士通 (Fujitsu)</publisher>
 		<info name="alt_title" value="富士通 Habitat V2.1L10" />
 		<info name="release" value="199405xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="habitatv2.1l10.hdm" size="1261568" crc="4dc2691b" sha1="a99ada487e1970240a284eb67f7420b13c45f265" />
+			</dataarea>
+		</part>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="fujitsu habitat v2.1l10 (japan)" sha1="5704f482ca0bb17e0a01f82bfc4ea272a7534bda" />
@@ -6561,11 +6613,16 @@ User/save disks that can be created from the game itself are not included.
 	<!-- Runs too fast? -->
 	<software name="lastsurv" supported="partial">
 		<!--
-		Origin: Neo Kobe Collection
-		<rom name="Last Survivor.ccd" size="2083" crc="dd87d31e" sha1="8453a35a485de1b0343da937e5a2236e799032fe"/>
-		<rom name="Last Survivor.cue" size="350" crc="b39f0cbd" sha1="63a66fd501fdea977ffc97ba88b24d48db4778a3"/>
-		<rom name="Last Survivor.img" size="291942000" crc="e221b966" sha1="8d9318700dfddf70bd932ce08b12cbc53b584e94"/>
-		<rom name="Last Survivor.sub" size="11916000" crc="3c61313c" sha1="c839a29dfc45bf1bb074cc76c334561fd9949df1"/>
+		Origin: redump.org
+		<rom name="Last Survivor (Japan) (Track 1).bin" size="13759200" crc="8655d470" sha1="e57e9280e729ae54ffda5bbe0b87879b45907d81"/>
+		<rom name="Last Survivor (Japan) (Track 2).bin" size="1587600" crc="9bec6429" sha1="e47f903e9c644bb77e4459c7d854c946660f3945"/>
+		<rom name="Last Survivor (Japan) (Track 3).bin" size="14112000" crc="bda965b3" sha1="40681625e19826dd490d9b7f049e07ad16c94911"/>
+		<rom name="Last Survivor (Japan) (Track 4).bin" size="66502800" crc="f3447abd" sha1="ec4711adfda4718c17f53445117a5e36aa492ae3"/>
+		<rom name="Last Survivor (Japan) (Track 5).bin" size="67914000" crc="1c0ad2eb" sha1="b349258bd0502166b3ae0c6d529e0d26bd9c48b3"/>
+		<rom name="Last Survivor (Japan) (Track 6).bin" size="67032000" crc="c178c066" sha1="6446297de98387d8f7cb07005ef36a3a75bb6a6d"/>
+		<rom name="Last Survivor (Japan) (Track 7).bin" size="57153600" crc="f4a16773" sha1="e2771df7800bee85ac6b40bafb32a3d46c63c43b"/>
+		<rom name="Last Survivor (Japan) (Track 8).bin" size="3880800" crc="f3e8c4c3" sha1="78e4b91400e7fc2b41f9e687ebd1277f0059ca3b"/>
+		<rom name="Last Survivor (Japan).cue" size="925" crc="210d69e8" sha1="59987b4b5018e93426d81a1a5dcfc22f10599926"/>
 		-->
 		<description>Last Survivor</description>
 		<year>1990</year>
@@ -6574,7 +6631,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199011xx" />
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="last survivor" sha1="d853e7cc1be3d5b10d67f81c9c92ec0b2b360ddd" />
+				<disk name="last survivor (japan)" sha1="2daa0d86cda7f88037065f1a70924261fecc3afd" />
 			</diskarea>
 		</part>
 	</software>
@@ -6670,7 +6727,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Lemmings 2 - The Tribes.img" size="335865600" crc="b92ab9cc" sha1="1b45b55ccb0cd2df1cce6475221204deb2d17984"/>
 		<rom name="Lemmings 2 - The Tribes.sub" size="13708800" crc="fe714f95" sha1="1be99f829fdc8926a8a8a879706e66cc0c258b05"/>
 		-->
-		<description>Lemmings 2 - The Tribes (Japanese)</description>
+		<description>Lemmings 2 - The Tribes</description>
 		<year>1994</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<info name="alt_title" value="レミングス2 ザ・トライブス" />
@@ -9881,6 +9938,29 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="shooting">
+		<!--
+		Origin: Private dump (rockleevk)
+		<rom name="SHOOTING (Track 1).bin" size="20462400" crc="f61249cf" sha1="3b758e2510d94d05ec21c36724b82b60bb77768d"/>
+		<rom name="SHOOTING (Track 2).bin" size="32673984" crc="b43eb157" sha1="cf28bb9f37763e0d085b1c8fa9871a4fbb546f08"/>
+		<rom name="SHOOTING (Track 3).bin" size="35750400" crc="1b12759b" sha1="c2d102aeb67c5e3a48a43d01b1e9ff4893bedc34"/>
+		<rom name="SHOOTING (Track 4).bin" size="40061616" crc="55697b43" sha1="45a7dcf45f5698748e1394bb65b1dc42b94eacb3"/>
+		<rom name="SHOOTING (Track 5).bin" size="36437184" crc="27377dcb" sha1="050a78132620b8ce2c4b24a969c784088626fb02"/>
+		<rom name="SHOOTING (Track 6).bin" size="26742240" crc="61d65f10" sha1="ddd14ce28067deaba895e38f9aa7dee3109cf3ec"/>
+		<rom name="SHOOTING.cue" size="617" crc="199debf6" sha1="ddce20c7149404b97a5557a258f102d08014eb46"/>
+		-->
+		<description>Shooting Towns</description>
+		<year>1990</year>
+		<publisher>アモルファス (Amorphous)</publisher>
+		<info name="alt_title" value="シューティングTOWNS" />
+		<info name="release" value="199003xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="shooting" sha1="e2671ef122e5c7d4c5c1893208c621251ae462c1" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="shounenm">
 		<!--
 		Origin: Neo Kobe Collection
@@ -10981,7 +11061,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="The New Zealand Story.img" size="3528000" crc="1aa9de77" sha1="41ad193cfa00c6a66b16a11a466025bb6b00f4a2"/>
 		<rom name="The New Zealand Story.sub" size="144000" crc="ca7fa012" sha1="c9b7ab8bef81071416697e7a7b764f8beac732dc"/>
 		-->
-		<description>The New Zealand Story</description>
+		<description>The New Zealand Story (HMA-213A)</description>
 		<year>1989</year>
 		<publisher>ビング (Ving)</publisher>
 		<info name="alt_title" value="ニュージーランドストーリー" />
@@ -10989,6 +11069,24 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="the new zealand story" sha1="d523a6bc0fbee6aa874de47de192c639ae97a3cf" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tnzso" cloneof="tnzs">
+		<!--
+		Origin: redump.org
+		<rom name="NewZealand Story, The (Japan).bin" size="3528000" crc="f1245680" sha1="e8c9ea40ce35475707f0dc561917dc9b9ec9dfd0"/>
+		<rom name="NewZealand Story, The (Japan).cue" size="118" crc="3fd154f7" sha1="a79b9610ec8a2bad92e21982d887b878e87c4910"/>
+		-->
+		<description>The New Zealand Story (HMA-213)</description>
+		<year>1989</year>
+		<publisher>ビング (Ving)</publisher>
+		<info name="alt_title" value="ニュージーランドストーリー" />
+		<info name="release" value="198908xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="newzealand story, the (japan)" sha1="fffd76294e587755c3753bfbbd71ce3555186701" />
 			</diskarea>
 		</part>
 	</software>
