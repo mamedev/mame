@@ -135,7 +135,7 @@ void jazz_state::jazz_common_map(address_map &map)
 	map(0x60080000, 0x60081fff).m(m_cvc, FUNC(g364_device::map));
 	map(0x60180000, 0x60180007).lw32([this] (u32 data) { m_cvc->reset(); }, "g364_reset");
 
-	map(0x80000000, 0x80000fff).m(m_mct_adr, FUNC(jazz_mct_adr_device::map));
+	map(0x80000000, 0x80000fff).m(m_mct_adr, FUNC(mct_adr_device::map));
 
 	map(0x80001000, 0x800010ff).m(m_net, FUNC(dp83932c_device::map)).umask32(0x0000ffff);
 	map(0x80002000, 0x8000200f).m(m_scsi, FUNC(ncr53c94_device::map));
@@ -185,8 +185,8 @@ void jazz_state::jazz_common_map(address_map &map)
 	//map(0x92000000, 0x92ffffff).m(); // EISA I/O ports?
 	//map(0x93000000, 0x93ffffff).m(); // EISA memory
 
-	map(0xf0000000, 0xf0000007).r(m_mct_adr, FUNC(jazz_mct_adr_device::isr_r)).umask64(0xffff);
-	map(0xf0000000, 0xf0000007).rw(m_mct_adr, FUNC(jazz_mct_adr_device::imr_r), FUNC(jazz_mct_adr_device::imr_w)).umask64(0xffff0000);
+	map(0xf0000000, 0xf0000007).r(m_mct_adr, FUNC(mct_adr_device::isr_r)).umask64(0xffff);
+	map(0xf0000000, 0xf0000007).rw(m_mct_adr, FUNC(mct_adr_device::imr_r), FUNC(mct_adr_device::imr_w)).umask64(0xffff0000);
 
 	map(0xfff00000, 0xfff3ffff).r(m_flash, FUNC(amd_28f020_device::read)); // mirror?
 }
@@ -217,7 +217,7 @@ void jazz_state::jazz(machine_config &config)
 	m_vram->set_default_value(0);
 
 	// local bus dma, timer and interrupt controller
-	JAZZ_MCT_ADR(config, m_mct_adr, 0);
+	MCT_ADR(config, m_mct_adr, 0);
 	m_mct_adr->set_bus(m_cpu, 0);
 	m_mct_adr->out_int_dma_cb().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 	m_mct_adr->out_int_device_cb().set_inputline(m_cpu, INPUT_LINE_IRQ1);
@@ -240,17 +240,17 @@ void jazz_state::jazz(machine_config &config)
 		{
 			ncr53c94_device &adapter = downcast<ncr53c94_device &>(*device);
 
-			adapter.irq_handler_cb().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<5>));;
-			adapter.drq_handler_cb().set(m_mct_adr, FUNC(jazz_mct_adr_device::drq<0>));
+			adapter.irq_handler_cb().set(m_mct_adr, FUNC(mct_adr_device::irq<5>));;
+			adapter.drq_handler_cb().set(m_mct_adr, FUNC(mct_adr_device::drq<0>));
 
-			subdevice<jazz_mct_adr_device>(":mct_adr")->dma_r_cb<0>().set(adapter, FUNC(ncr53c94_device::dma_r));
-			subdevice<jazz_mct_adr_device>(":mct_adr")->dma_w_cb<0>().set(adapter, FUNC(ncr53c94_device::dma_w));
+			subdevice<mct_adr_device>(":mct_adr")->dma_r_cb<0>().set(adapter, FUNC(ncr53c94_device::dma_r));
+			subdevice<mct_adr_device>(":mct_adr")->dma_w_cb<0>().set(adapter, FUNC(ncr53c94_device::dma_w));
 		});
 
 	// floppy controller and drive
 	N82077AA(config, m_fdc, 24_MHz_XTAL);
-	m_fdc->intrq_wr_callback().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<1>));
-	m_fdc->drq_wr_callback().set(m_mct_adr, FUNC(jazz_mct_adr_device::drq<1>));
+	m_fdc->intrq_wr_callback().set(m_mct_adr, FUNC(mct_adr_device::irq<1>));
+	m_fdc->drq_wr_callback().set(m_mct_adr, FUNC(mct_adr_device::drq<1>));
 	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, jazz_state::floppy_formats).enable_sound(false);
 	m_mct_adr->dma_r_cb<1>().set(m_fdc, FUNC(n82077aa_device::dma_r));
 	m_mct_adr->dma_w_cb<1>().set(m_fdc, FUNC(n82077aa_device::dma_w));
@@ -283,18 +283,18 @@ void jazz_state::jazz(machine_config &config)
 	// keyboard controller
 	PS2_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);
 	// FIXME: reset is probably routed through the MCT-ADR
-	m_kbdc->hot_res().set([this](int state) { logerror("reset %d\n", state); });
+	m_kbdc->hot_res().set([this](int state) { machine().schedule_soft_reset(); });
 	m_kbdc->kbd_clk().set(kbd_con, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_kbdc->kbd_data().set(kbd_con, FUNC(pc_kbdc_device::data_write_from_mb));
-	m_kbdc->kbd_irq().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<6>));
+	m_kbdc->kbd_irq().set(m_mct_adr, FUNC(mct_adr_device::irq<6>));
 	m_kbdc->aux_clk().set(aux_con, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_kbdc->aux_data().set(aux_con, FUNC(pc_kbdc_device::data_write_from_mb));
-	m_kbdc->aux_irq().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<7>));
+	m_kbdc->aux_irq().set(m_mct_adr, FUNC(mct_adr_device::irq<7>));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(78643200, 1280, 0, 1280, 1024, 0, 1024);
 	m_screen->set_screen_update(m_cvc, FUNC(g364_device::screen_update));
-	m_screen->screen_vblank().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<3>)); // maybe?
+	m_screen->screen_vblank().set(m_mct_adr, FUNC(mct_adr_device::irq<3>)); // maybe?
 
 	G364(config, m_cvc, 5_MHz_XTAL); // FIXME: guessed clock
 	m_cvc->set_screen(m_screen);
@@ -307,7 +307,7 @@ void jazz_state::jazz(machine_config &config)
 	m_ace[0]->out_dtr_callback().set(serial0, FUNC(rs232_port_device::write_dtr));
 	m_ace[0]->out_rts_callback().set(serial0, FUNC(rs232_port_device::write_rts));
 	m_ace[0]->out_tx_callback().set(serial0, FUNC(rs232_port_device::write_txd));
-	m_ace[0]->out_int_callback().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<8>));
+	m_ace[0]->out_int_callback().set(m_mct_adr, FUNC(mct_adr_device::irq<8>));
 
 	serial0.cts_handler().set(m_ace[0], FUNC(ns16550_device::cts_w));
 	serial0.dcd_handler().set(m_ace[0], FUNC(ns16550_device::dcd_w));
@@ -321,7 +321,7 @@ void jazz_state::jazz(machine_config &config)
 	m_ace[1]->out_dtr_callback().set(serial1, FUNC(rs232_port_device::write_dtr));
 	m_ace[1]->out_rts_callback().set(serial1, FUNC(rs232_port_device::write_rts));
 	m_ace[1]->out_tx_callback().set(serial1, FUNC(rs232_port_device::write_txd));
-	m_ace[1]->out_int_callback().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<9>));
+	m_ace[1]->out_int_callback().set(m_mct_adr, FUNC(mct_adr_device::irq<9>));
 
 	serial1.cts_handler().set(m_ace[1], FUNC(ns16550_device::cts_w));
 	serial1.dcd_handler().set(m_ace[1], FUNC(ns16550_device::dcd_w));
@@ -330,7 +330,7 @@ void jazz_state::jazz(machine_config &config)
 	serial1.rxd_handler().set(m_ace[1], FUNC(ns16550_device::rx_w));
 
 	PC_LPT(config, m_lpt, 0);
-	m_lpt->irq_handler().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<0>));
+	m_lpt->irq_handler().set(m_mct_adr, FUNC(mct_adr_device::irq<0>));
 
 	// TODO: sound, interrupt 2, drq 2(l) & 3(r)
 
@@ -340,8 +340,8 @@ void jazz_state::jazz(machine_config &config)
 	m_buzzer->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	DP83932C(config, m_net, 20_MHz_XTAL);
-	m_net->out_int_cb().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<4>));
-	m_net->set_ram(m_ram);
+	m_net->out_int_cb().set(m_mct_adr, FUNC(mct_adr_device::irq<4>));
+	m_net->set_bus(m_mct_adr, 0);
 
 	I82357(config, m_isp, 14.318181_MHz_XTAL);
 	m_isp->out_rtc_cb().set(m_rtc, FUNC(mc146818_device::write));
@@ -378,6 +378,6 @@ ROM_START(mmr4000le)
 	ROMX_LOAD("ntprom.bin", 0x00000, 0x40000, CRC(d91018d7) SHA1(316de17820192c89b8ee6d9936ab8364a739ca53), ROM_BIOS(0))
 ROM_END
 
-/*    YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS       INIT         COMPANY  FULLNAME                 FLAGS */
-COMP( 1992,  mmr4000be, 0,      0,      mmr4000be, 0,     jazz_state, init_common, "MIPS",  "Magnum R4000 (big)",    MACHINE_NOT_WORKING)
-COMP( 1992,  mmr4000le, 0,      0,      mmr4000le, 0,     jazz_state, init_common, "MIPS",  "Magnum R4000 (little)", MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN)
+/*   YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS       INIT         COMPANY  FULLNAME             FLAGS */
+COMP(1992,  mmr4000be, 0,      0,      mmr4000be, 0,     jazz_state, init_common, "MIPS",  "Magnum R4000 (be)", MACHINE_NOT_WORKING)
+COMP(1992,  mmr4000le, 0,      0,      mmr4000le, 0,     jazz_state, init_common, "MIPS",  "Magnum R4000 (le)", MACHINE_NO_SOUND)
