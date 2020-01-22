@@ -78,7 +78,7 @@ void gigatron_state::gigatron(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_size(640, 480);
-	screen.set_visarea(0, 640, 0, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
 	screen.set_screen_update(FUNC(gigatron_state::screen_update));
 
 	SPEAKER(config, "mono").front_center();
