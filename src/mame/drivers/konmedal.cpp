@@ -62,7 +62,7 @@ public:
 		m_palette(*this, "palette"),
 		m_ymz(*this, "ymz"),
 		m_oki(*this, "oki"),
-		m_upd7759(*this, "upd7759"),
+		m_upd7759(*this, "upd"),
 		m_nvram(*this, "nvram"),
 		m_outport(*this, "OUT")
 	{ }
@@ -136,6 +136,10 @@ WRITE8_MEMBER(konmedal_state::control2_w)
 {
 	//printf("%02x to control2\n", data);
 	m_control2 = data;
+
+	// note: this is needed because games clear reset line and assert start line at the same time, but MAME's outport can't handle right order
+	if (m_upd7759)
+		m_upd7759->reset_w((data & 2) ? 1 : 0);
 	m_outport->write(data);
 }
 
@@ -452,6 +456,17 @@ static INPUT_PORTS_START( konmedal )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( shuriboy )
+	PORT_INCLUDE( konmedal )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("upd", upd7759_device, busy_r)
+
+	PORT_MODIFY("OUT")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("upd", upd7759_device, reset_w) // this should be called 1st, but it's not
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("upd", upd7759_device, start_w)
+INPUT_PORTS_END
+
 void konmedal_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 0x10, memregion("maincpu")->base(), 0x2000);
@@ -660,7 +675,7 @@ void konmedal_state::shuriboy(machine_config &config)
 
 	K051649(config, "k051649", XTAL(24'000'000) / 12).add_route(ALL_OUTPUTS, "mono", 0.45); // divisor unknown
 
-	UPD7759(config, m_upd7759);
+	UPD7759(config, m_upd7759, XTAL(640'000)).add_route(ALL_OUTPUTS, "mono", 0.60);
 }
 
 void konmedal_state::fuusenpn(machine_config &config)
@@ -892,9 +907,9 @@ ROM_START( mariorou )
 ROM_END
 
 // K052109 (TMNT tilemaps) board
-GAME( 1991, mariorou, 0,     mariorou, konmedal, konmedal_state, shuri_init, ROT0, "Konami", "Mario Roulette", MACHINE_NOT_WORKING)
-GAME( 1993, shuriboy, 0,     shuriboy, konmedal, konmedal_state, shuri_init, ROT0, "Konami", "Shuriken Boy", MACHINE_NOT_WORKING)
-GAME( 1993, fuusenpn, 0,     fuusenpn, konmedal, konmedal_state, shuri_init, ROT0, "Konami", "Fuusen Pentai", MACHINE_NOT_WORKING)
+GAME( 1991, mariorou, 0,     mariorou, shuriboy, konmedal_state, shuri_init, ROT0, "Konami", "Mario Roulette", MACHINE_NOT_WORKING)
+GAME( 1993, shuriboy, 0,     shuriboy, shuriboy, konmedal_state, shuri_init, ROT0, "Konami", "Shuriken Boy", MACHINE_NOT_WORKING)
+GAME( 1993, fuusenpn, 0,     fuusenpn, shuriboy, konmedal_state, shuri_init, ROT0, "Konami", "Fuusen Pentai", MACHINE_NOT_WORKING)
 
 // K054156/K054157 (GX tilemaps) board
 GAME( 1994, buttobi,  0,     ddboy,    konmedal, konmedal_state, medal_init, ROT0, "Konami", "Buttobi Striker", MACHINE_NOT_WORKING)
