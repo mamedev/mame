@@ -2576,8 +2576,8 @@ createMESSProjects(_target, _subtarget, "jazz")
 files {
 	MAME_DIR .. "src/mame/drivers/jazz.cpp",
 	MAME_DIR .. "src/mame/includes/jazz.h",
-	MAME_DIR .. "src/mame/machine/jazz_mct_adr.cpp",
-	MAME_DIR .. "src/mame/machine/jazz_mct_adr.h",
+	MAME_DIR .. "src/mame/machine/mct_adr.cpp",
+	MAME_DIR .. "src/mame/machine/mct_adr.h",
 }
 
 createMESSProjects(_target, _subtarget, "kaypro")

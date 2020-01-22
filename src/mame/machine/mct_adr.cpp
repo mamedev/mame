@@ -30,7 +30,7 @@
  */
 
 #include "emu.h"
-#include "jazz_mct_adr.h"
+#include "mct_adr.h"
 
 #define VERBOSE 0
 #include "logmacro.h"

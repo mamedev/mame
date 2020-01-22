@@ -14,7 +14,7 @@
 #include "machine/28fxxx.h"
 
 // various hardware
-#include "machine/jazz_mct_adr.h"
+#include "machine/mct_adr.h"
 #include "machine/dp83932c.h"
 #include "machine/mc146818.h"
 #include "machine/ins8250.h"
