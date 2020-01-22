@@ -46,15 +46,15 @@ public:
 	// (legacy) used in the bitmap clear functions
 	virtual int get_sprite_type(void) =0;
 
-	void render_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u16* spriteram16, int spriteram16_bytes);
-	void render_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u16* spriteram16, int spriteram16_bytes);
+	void render_sprites(const rectangle &cliprect, u16* spriteram16, int spriteram16_bytes);
 
+	void copybitmap(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
+	void copybitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
 
 	template<class _BitmapClass>
-	void render_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u16* spriteram16, int spriteram16_bytes);
+	void copybitmap_common(_BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
 
 	void bootleg_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, u16* spriteram16, int spriteram16_bytes);
-
 
 	u16 regs_r(offs_t offset);
 	void regs_w(offs_t offset, u16 data, u16 mem_mask);
@@ -97,21 +97,17 @@ private:
 	std::unique_ptr<struct tempsprite_t[]> m_first_sprite;
 	int m_keep_sprites;
 	bitmap_ind16 m_sprites_bitmap;
+	bitmap_ind8 m_sprites_maskmap;
 
 
-	template<class _BitmapClass>
-	void draw_sprites(_BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u16* spriteram16, int spriteram16_bytes);
+	void draw_sprites(const rectangle &cliprect, u16* spriteram16, int spriteram16_bytes);
 
 
-	template<class _BitmapClass>
-	void draw_sprites_custom(_BitmapClass &dest_bmp,const rectangle &clip,gfx_element *gfx,
+	void draw_sprites_custom(const rectangle &clip,gfx_element *gfx,
 			u32 code,u32 color,bool flipx,bool flipy,int sx,int sy,
-			bitmap_ind8 &priority_bitmap, int priority);
+			int priority);
 
 	int parse_sprite_type012(int i, struct tempsprite_t *s, u16* spriteram16, int spriteram16_bytes);
-
-	void copybitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void copybitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 //extern const device_type KANEKO16_SPRITE;
