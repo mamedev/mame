@@ -23,14 +23,12 @@ protected:
 	void mem_map_4m_tsram(address_map& map);
 
 	DECLARE_READ16_MEMBER(porta_r);
-	DECLARE_WRITE16_MEMBER(porta_w);
-
 	DECLARE_READ16_MEMBER(portb_r);
-	DECLARE_WRITE16_MEMBER(portb_w);
-
 	DECLARE_READ16_MEMBER(portc_r);
-	DECLARE_WRITE16_MEMBER(portc_w);
 
+	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
+	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
+	virtual	DECLARE_WRITE16_MEMBER(portc_w) override;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_telestory);
 

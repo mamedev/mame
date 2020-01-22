@@ -16,7 +16,7 @@ public:
 
 private:
 	DECLARE_READ16_MEMBER(portb_r);
-	DECLARE_WRITE16_MEMBER(portb_w);
+	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };

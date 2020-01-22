@@ -27,13 +27,12 @@ protected:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_icanguit);
 
 	DECLARE_READ16_MEMBER(porta_r);
-	virtual DECLARE_WRITE16_MEMBER(porta_w);
-
 	virtual DECLARE_READ16_MEMBER(portb_r);
-	virtual DECLARE_WRITE16_MEMBER(portb_w);
-
 	DECLARE_READ16_MEMBER(portc_r);
-	DECLARE_WRITE16_MEMBER(portc_w);
+
+	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
+	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
+	virtual DECLARE_WRITE16_MEMBER(portc_w) override;
 
 	required_device<generic_slot_device> m_cart;
 	memory_region *m_cart_region;
@@ -56,9 +55,9 @@ public:
 	void icanpian(machine_config &config);
 
 protected:
-	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
-
 	virtual DECLARE_READ16_MEMBER(portb_r) override;
+
+	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
 	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
 
 	//optional_device<eeprom_serial_93cxx_device> m_eeprom;

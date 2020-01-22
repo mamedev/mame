@@ -8,14 +8,14 @@
 class pvmil_state : public spg2xx_game_state
 {
 public:
-	pvmil_state(const machine_config &mconfig, device_type type, const char *tag)
-		: spg2xx_game_state(mconfig, type, tag)
-		, m_portcdata(0x0000)
-		, m_latchcount(0)
-		, m_latchbit(0)
-		, m_outdat(0)
-		, m_p4inputs(*this, "EXTRA")
-		, m_leds(*this, "led%u", 0U)
+	pvmil_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_portcdata(0x0000),
+		m_latchcount(0),
+		m_latchbit(0),
+		m_outdat(0),
+		m_p4inputs(*this, "EXTRA"),
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 	void pvmil(machine_config &config);
@@ -25,9 +25,9 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	DECLARE_WRITE16_MEMBER(pvmil_porta_w);
-	DECLARE_WRITE16_MEMBER(pvmil_portb_w);
-	DECLARE_WRITE16_MEMBER(pvmil_portc_w);
+	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
+	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
+	virtual DECLARE_WRITE16_MEMBER(portc_w) override;
 
 private:
 	uint16_t m_portcdata;
@@ -51,12 +51,12 @@ void pvmil_state::machine_start()
 }
 
 
-WRITE16_MEMBER(pvmil_state::pvmil_porta_w)
+WRITE16_MEMBER(pvmil_state::porta_w)
 {
 	logerror("%s: pvmil_porta_w %04x\n", machine().describe_context(), data);
 }
 
-WRITE16_MEMBER(pvmil_state::pvmil_portb_w)
+WRITE16_MEMBER(pvmil_state::portb_w)
 {
 	logerror("%s: pvmil_portb_w %04x\n", machine().describe_context(), data);
 }
@@ -68,7 +68,7 @@ READ_LINE_MEMBER(pvmil_state::pvmil_p4buttons_r)
 }
 
 
-WRITE16_MEMBER(pvmil_state::pvmil_portc_w)
+WRITE16_MEMBER(pvmil_state::portc_w)
 {
 	// ---- -432 1--- r-?c
 	// 4,3,2,1 = player controller LEDs
@@ -214,9 +214,9 @@ void pvmil_state::pvmil(machine_config &config)
 	m_maincpu->porta_in().set_ioport("P1");
 	m_maincpu->portb_in().set_ioport("P2");
 	m_maincpu->portc_in().set_ioport("P3");
-//	m_maincpu->porta_out().set(FUNC(pvmil_state::pvmil_porta_w));
-//	m_maincpu->portb_out().set(FUNC(pvmil_state::pvmil_portb_w));
-//	m_maincpu->portc_out().set(FUNC(pvmil_state::pvmil_portc_w));
+	m_maincpu->porta_out().set(FUNC(pvmil_state::porta_w));
+	m_maincpu->portb_out().set(FUNC(pvmil_state::portb_w));
+	m_maincpu->portc_out().set(FUNC(pvmil_state::portc_w));
 
 	config.set_default_layout(layout_pvmil);
 }

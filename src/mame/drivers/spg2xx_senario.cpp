@@ -9,15 +9,16 @@
 
 #include "includes/spg2xx.h"
 #include "machine/intelfsh.h"
+#include "senmil.lh"
 
 class spg2xx_senario_state : public spg2xx_game_state
 {
 public:
 	spg2xx_senario_state(const machine_config& mconfig, device_type type, const char* tag) :
-		spg2xx_game_state(mconfig, type, tag)
+		spg2xx_game_state(mconfig, type, tag),
 	{ }
 
-	void senmil(machine_config& config);
+	void senbbs(machine_config& config);
 	
 	void mem_map_flash(address_map &map);
 
@@ -25,8 +26,38 @@ protected:
 	//virtual void machine_start() override;
 	//virtual void machine_reset() override;
 
+	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
+	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
+	virtual DECLARE_WRITE16_MEMBER(portc_w) override;
+
 private:
 };
+
+class spg2xx_senario_mil_state : public spg2xx_senario_state
+{
+public:
+	spg2xx_senario_mil_state(const machine_config& mconfig, device_type type, const char* tag) :
+		spg2xx_senario_state(mconfig, type, tag),
+		m_leds(*this, "led%u", 0U)
+	{ }
+
+	void senmil(machine_config& config);
+	
+protected:
+	virtual void machine_start() override;
+	//virtual void machine_reset() override;
+
+private:
+	output_finder<4> m_leds;
+};
+
+void spg2xx_senario_mil_state::machine_start()
+{
+	spg2xx_senario_state::machine_start();
+
+	m_leds.resolve();
+}
+
 
 static INPUT_PORTS_START( senmil ) // reset with Console Start and Console Select held down for test mode
 	PORT_START("P1")
@@ -59,7 +90,8 @@ static INPUT_PORTS_START( senmil ) // reset with Console Start and Console Selec
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P3")
-	PORT_BIT( 0x03ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Pad Connection Status (exact bit assignment unclear)
+	PORT_BIT( 0x0300, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Low Batttery sensor
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START ) PORT_CODE(KEYCODE_1) PORT_NAME("Console Start")
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SELECT ) PORT_CODE(KEYCODE_5) PORT_NAME("Console Select")
@@ -91,8 +123,23 @@ void spg2xx_senario_state::mem_map_flash(address_map &map)
 {
 	map(0x000000, 0x3fffff).rw("flash", FUNC(spansion_s29gl064s_device::read), FUNC(spansion_s29gl064s_device::write));
 }
+
+WRITE16_MEMBER(spg2xx_senario_state::porta_w)
+{
+	logerror("%s: porta_w %04x\n", machine().describe_context(), data);
+}
+
+WRITE16_MEMBER(spg2xx_senario_state::portb_w)
+{
+	logerror("%s: portb_w %04x\n", machine().describe_context(), data);
+}
+
+WRITE16_MEMBER(spg2xx_senario_state::portc_w)
+{
+	printf("%s: portc_w %04x\n", machine().describe_context().c_str(), data);
+}
 	
-void spg2xx_senario_state::senmil(machine_config &config)
+void spg2xx_senario_state::senbbs(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_senario_state::mem_map_flash);
@@ -103,7 +150,18 @@ void spg2xx_senario_state::senmil(machine_config &config)
 	m_maincpu->portb_in().set_ioport("P2");
 	m_maincpu->portc_in().set_ioport("P3");
 
+	m_maincpu->porta_out().set(FUNC(spg2xx_senario_state::porta_w));
+	m_maincpu->portb_out().set(FUNC(spg2xx_senario_state::portb_w));
+	m_maincpu->portc_out().set(FUNC(spg2xx_senario_state::portc_w));
+
 	SPANSION_S29GL064S(config, "flash");
+}
+
+void spg2xx_senario_mil_state::senmil(machine_config& config)
+{
+	spg2xx_senario_state::senbbs(config);
+
+	config.set_default_layout(layout_senmil);
 }
 
 // note not using ROM_LOAD16_WORD_SWAP because this is a Flash ROM region, and we end up with wrong endian if we do
@@ -118,6 +176,5 @@ ROM_START( senbbs )
 	ROM_LOAD( "bigbonusslots.bin", 0x000000, 0x800000, CRC(071effc3) SHA1(892c05a8b64a388b331ad0d361bf4c523c6c14c9) )
 ROM_END
 
-
-CONS( 2006, senmil,      0,     0,        senmil,       senmil,    spg2xx_senario_state, empty_init, "Senario", "Who Wants to Be a Millionaire? (Senario, Plug and Play, US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2006, senbbs,      0,     0,        senmil,       senbbs,    spg2xx_senario_state, empty_init, "Senario", "Big Bonus Slots (Senario, Plug and Play)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, senbbs,      0,     0,        senbbs,       senbbs,    spg2xx_senario_state,     empty_init, "Senario", "Big Bonus Slots (Senario, Plug and Play)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, senmil,      0,     0,        senmil,       senmil,    spg2xx_senario_mil_state, empty_init, "Senario", "Who Wants to Be a Millionaire? (Senario, Plug and Play, US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

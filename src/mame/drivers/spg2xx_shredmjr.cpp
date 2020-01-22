@@ -19,7 +19,7 @@ public:
 
 protected:
 	DECLARE_READ16_MEMBER(porta_r);
-	DECLARE_WRITE16_MEMBER(porta_w);
+	virtual  DECLARE_WRITE16_MEMBER(porta_w) override;
 
 private:
 	uint16_t m_porta_data;

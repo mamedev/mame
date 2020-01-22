@@ -16,7 +16,7 @@ protected:
 	//virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE16_MEMBER(porta_w);
+	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
 };
 
 

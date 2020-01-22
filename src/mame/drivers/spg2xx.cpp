@@ -167,6 +167,21 @@ void spg2xx_game_state::switch_bank(uint32_t bank)
 	}
 }
 
+WRITE16_MEMBER(spg2xx_game_state::porta_w)
+{
+	logerror("%s: porta_w %04x\n", machine().describe_context(), data);
+}
+
+WRITE16_MEMBER(spg2xx_game_state::portb_w)
+{
+	logerror("%s: portb_w %04x\n", machine().describe_context(), data);
+}
+
+WRITE16_MEMBER(spg2xx_game_state::portc_w)
+{
+	logerror("%s: portc_w %04x\n", machine().describe_context(), data);
+}
+
 WRITE8_MEMBER(spg2xx_game_state::i2c_w)
 {
 	logerror("%s: i2c_w %05x %04x\n", machine().describe_context(), offset, data);
@@ -177,9 +192,6 @@ READ8_MEMBER(spg2xx_game_state::i2c_r)
 	logerror("%s: i2c_r %04x\n", machine().describe_context(), offset);
 	return 0x0000;
 }
-
-
-
 
 READ16_MEMBER(spg2xx_game_state::rad_porta_r)
 {
@@ -212,20 +224,10 @@ void spg2xx_game_state::mem_map_2m(address_map &map)
 	map(0x000000, 0x1fffff).mirror(0x200000).bankr("cartbank");
 }
 
-
-
-
-
-
-
-
-
 void spg2xx_game_state::mem_map_1m(address_map &map)
 {
 	map(0x000000, 0x0fffff).mirror(0x300000).bankr("cartbank");
 }
-
-
 
 static INPUT_PORTS_START( rad_skat )
 	PORT_START("P1")
@@ -407,7 +409,6 @@ static INPUT_PORTS_START( wiwi18 )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-
 	PORT_START("P2")
 	PORT_DIPNAME( 0x0001, 0x0001, "IN1" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
@@ -458,11 +459,9 @@ static INPUT_PORTS_START( wiwi18 )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-
 	PORT_START("P3")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_CUSTOM ) // NTSC (1) / PAL (0) flag
 INPUT_PORTS_END
-
 
 static INPUT_PORTS_START( mattelcs ) // there is a 'secret test mode' that previously got activated before inputs were mapped, might need unused inputs to active?
 	PORT_START("P1")
@@ -511,9 +510,6 @@ static INPUT_PORTS_START( rad_crik )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-
-
-
 static INPUT_PORTS_START( rad_fb2 ) // controls must be multiplexed somehow, as there's no room for P2 controls otherwise (unless P2 controls were never finished and it was only sold in a single mat version, Radica left useless P2 menu options in the mini Genesis consoles)
 	PORT_START("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) // 'left'
@@ -530,9 +526,6 @@ static INPUT_PORTS_START( rad_fb2 ) // controls must be multiplexed somehow, as 
 	PORT_START("P3")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_CUSTOM ) // NTSC (1) / PAL (0) flag
 INPUT_PORTS_END
-
-
-
 
 static INPUT_PORTS_START( abltenni )
 	PORT_START("P1") // Down and both buttons on startup for Diagnostics Menu
@@ -664,9 +657,12 @@ void spg2xx_game_state::machine_reset()
 	m_maincpu->reset();
 }
 
-
 void spg2xx_game_state::spg2xx_base(machine_config &config)
 {
+	m_maincpu->porta_out().set(FUNC(spg2xx_game_state::porta_w));
+	m_maincpu->portb_out().set(FUNC(spg2xx_game_state::portb_w));
+	m_maincpu->portc_out().set(FUNC(spg2xx_game_state::portc_w));
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
@@ -687,10 +683,6 @@ void spg2xx_game_state::non_spg_base(machine_config &config)
 
 	spg2xx_base(config);
 }
-
-
-
-
 
 void spg2xx_game_state::rad_skat(machine_config &config)
 {
@@ -719,8 +711,6 @@ void spg2xx_game_state::abltenni(machine_config &config)
 
 	m_maincpu->set_rowscroll_offset(8);
 }
-
-
 
 void spg2xx_game_state::rad_skatp(machine_config &config)
 {
@@ -758,12 +748,6 @@ void spg2xx_game_state::rad_crik(machine_config &config)
 	m_maincpu->i2c_r().set(FUNC(spg2xx_game_state::i2c_r));
 }
 
-
-
-
-
-
-
 ROM_START( rad_skat )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "skateboarder.bin", 0x000000, 0x400000, CRC(08b9ab91) SHA1(6665edc4740804956136c68065890925a144626b) )
@@ -795,26 +779,20 @@ ROM_START( rad_crik ) // only released in EU?
 	ROM_LOAD16_WORD_SWAP( "cricket.bin", 0x000000, 0x200000, CRC(6fa0aaa9) SHA1(210d2d4f542181f59127ce2f516d0408dc6de7a8) )
 ROM_END
 
-
 ROM_START( mattelcs )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "mattelclassicsports.bin", 0x000000, 0x100000, CRC(e633e7ad) SHA1(bf3e325a930cf645a7e32195939f3c79c6d35dac) )
 ROM_END
-
 
 ROM_START( abltenni )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "ablpnpwirelesstennis.bin", 0x000000, 0x400000, CRC(66bd8ef1) SHA1(a83640d5d9e84e10d29a065a61e0d7bbec16c6e4) )
 ROM_END
 
-
-
 ROM_START( wiwi18 )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "26gl128.bin", 0x000000, 0x1000000, CRC(0b103ac9) SHA1(14434908f429942096fb8db5b5630603fd54fb2c) )
 ROM_END
-
-
 
 void spg2xx_game_state::init_crc()
 {
@@ -832,21 +810,13 @@ void spg2xx_game_state::init_crc()
 	logerror("Calculated Byte Sum of bytes from 0x10 to 0x%08x is %08x)\n", length - 1, checksum);
 }
 
-
-
-
 void spg2xx_game_state::init_wiwi18()
 {
 	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 	rom[0x1ca259] = 0xf165;
 }
 
-
- 
-
-
 // year, name, parent, compat, machine, input, class, init, company, fullname, flags
-
 
 // Radica TV games
 CONS( 2006, rad_skat,  0,        0, rad_skat, rad_skat,   spg2xx_game_state, init_crc, "Radica", "Play TV Skateboarder (NTSC)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
@@ -865,6 +835,3 @@ CONS( 2005, mattelcs,  0,        0, rad_skat, mattelcs,   spg2xx_game_state, emp
 // Unit marked 'Hamy System' 'WiWi'
 // actually a cartridge, but all hardware is in the cart, overriding any internal hardware entirely.  see nes_vt.cp 'mc_sp69' for the '69 arcade game' part
 CONS( 200?, wiwi18,  0,        0, rad_skat, wiwi18,  spg2xx_game_state, init_wiwi18, "Hamy System",      "WiWi 18-in-1 Sports Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-
-// Conny devices
-
