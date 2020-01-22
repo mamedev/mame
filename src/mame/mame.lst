@@ -3231,8 +3231,7 @@ pro128s                         // 1987 Olivetti Prodest PC 128S
 autoc15                         // 1988 Autocue 1500
 reutapm                         // 1985 Reuters APM Board
 torchf                          // 1982 Torch CF240
-torchh10                        // 1982 Torch CH240/10
-torchh21                        // 1982 Torch CH240/21
+torchh                          // 1982 Torch CH240
 
 @source:bbcbc.cpp
 bbcbc                           // 1985 BBC Bridge Companion

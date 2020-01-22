@@ -399,8 +399,7 @@ public:
 	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
 
 	void torchf(machine_config &config);
-	void torchh21(machine_config &config);
-	void torchh10(machine_config &config);
+	void torchh(machine_config &config);
 };
 
 

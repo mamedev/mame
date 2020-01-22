@@ -1095,29 +1095,21 @@ void torch_state::torchf(machine_config &config)
 	FLOPPY_CONNECTOR(config, "i8271:0", bbc_floppies, "525qd", bbc_state::floppy_formats, true).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "i8271:1", bbc_floppies, "525qd", bbc_state::floppy_formats).enable_sound(true);
 
-	/* Add Torch Z80 Communicator co-processor */
+	/* Torch Z80 Communicator co-processor */
 	m_tube->set_default_option("zep100");
 	m_tube->set_fixed(true);
 }
 
 
-void torch_state::torchh10(machine_config &config)
+void torch_state::torchh(machine_config &config)
 {
 	torchf(config);
 	/* fdc */
 	m_i8271->subdevice<floppy_connector>("1")->set_default_option(nullptr);
 
-	/* 10MB HDD */
-}
-
-
-void torch_state::torchh21(machine_config &config)
-{
-	torchf(config);
-	/* fdc */
-	m_i8271->subdevice<floppy_connector>("1")->set_default_option(nullptr);
-
-	/* 21MB HDD */
+	/* 10MB or 21MB HDD */
+	//m_1mhzbus->set_default_option("sasi");
+	//m_1mhzbus->set_fixed(true);
 }
 
 
@@ -1925,8 +1917,7 @@ ROM_START(torchf)
 ROM_END
 
 
-#define rom_torchh10 rom_torchf
-#define rom_torchh21 rom_torchf
+#define rom_torchh rom_torchf
 
 
 ROM_START(bbcbp)
@@ -2514,8 +2505,7 @@ ROM_END
 COMP ( 1981, bbcb,     0,      bbca,  bbcb,     bbcb,   bbc_state,   init_bbc,  "Acorn Computers", "BBC Micro Model B",                  MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1981, bbca,     bbcb,   0,     bbca,     bbca,   bbc_state,   init_bbc,  "Acorn Computers", "BBC Micro Model A",                  MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1982, torchf,   bbcb,   0,     torchf,   torch,  torch_state, init_bbc,  "Torch Computers", "Torch CF240",                        MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1982, torchh10, bbcb,   0,     torchh10, torch,  torch_state, init_bbc,  "Torch Computers", "Torch CH240/10",                     MACHINE_NOT_WORKING)
-COMP ( 1982, torchh21, bbcb,   0,     torchh21, torch,  torch_state, init_bbc,  "Torch Computers", "Torch CH240/21",                     MACHINE_NOT_WORKING)
+COMP ( 1982, torchh,   bbcb,   0,     torchh,   torch,  torch_state, init_bbc,  "Torch Computers", "Torch CH240",                        MACHINE_NOT_WORKING)
 COMP ( 1982, bbcb_de,  bbcb,   0,     bbcb_de,  bbcb,   bbc_state,   init_bbc,  "Acorn Computers", "BBC Micro Model B (German)",         MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1983, bbcb_us,  bbcb,   0,     bbcb_us,  bbcb,   bbc_state,   init_bbc,  "Acorn Computers", "BBC Micro Model B (US)",             MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1985, bbcbp,    0,      bbcb,  bbcbp,    bbcbp,  bbcbp_state, init_bbc,  "Acorn Computers", "BBC Micro Model B+ 64K",             MACHINE_IMPERFECT_GRAPHICS)
