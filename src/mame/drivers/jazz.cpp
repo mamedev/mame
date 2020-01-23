@@ -86,51 +86,7 @@ void jazz_state::jazz_common_map(address_map &map)
 	map(0x1fc00000, 0x1fc3ffff).r(m_flash, FUNC(amd_28f020_device::read));
 
 	// NOTE: defaults to console on serial1 if no video rom found
-	map(0x60000000, 0x6000013f).lr8(
-		[] (offs_t offset)
-		{
-			/*
-			 * Board_Identifier, PROM_Stride, PROM_Width, PROM_Size
-			 *   0=JazzVideoG300, 1=JazzVideoG364, 2=JazzVideoVxl, 0x10=MipsVideoG364, 0x11=MaximumJazzVideo (jazzvideog364 osc period == 123077, MipsVideoG364 = 200000)
-			 * Test_Byte_0 - Test_Byte_3
-			 * VideoMemorySize, VideoControlSize
-			 * CodeOffset, CodeSize
-			 * ID string
-			 */
-			/*
-			static u8 const jazz_g364[] =
-			{
-			    0x01, 0x08, 0x01, 0x20,  'J',  'a',  'z',  'z',
-			    0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x20, 0x00,
-			    0x00, 0x02, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00,
-			     'J',  'a',  'z',  'z',  ' ',  'G',  '3',  '6',
-			     '4', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			};
-
-			static u8 const mips_g364[] =
-			{
-			    0x10, 0x08, 0x01, 0x20,  'J',  'a',  'z',  'z',
-			    0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x20, 0x00,
-			    0x00, 0x02, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00,
-			     'M',  'i',  'p',  's',  ' ',  'G',  '3',  '6',
-			     '4', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			};
-			*/
-
-			// FIXME: this is the MIPS G364 with the PROM fields zeroed to
-			// avoid a startup error, and should be replaced with the real
-			// signature above when an actual PROM dump is located.
-			static u8 const bogus_g364[] =
-			{
-				0x10, 0x00, 0x00, 0x00,  'J',  'a',  'z',  'z',
-				0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x20, 0x00,
-				0x00, 0x02, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00,
-				 'M',  'i',  'p',  's',  ' ',  'G',  '3',  '6',
-				 '4', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			};
-
-			return bogus_g364[offset];
-		}, "bogus_g364_r").umask64(0xff);
+	map(0x60000000, 0x600001ff).rom().region("graphics", 0);
 
 	map(0x60080000, 0x60081fff).m(m_cvc, FUNC(g364_device::map));
 	map(0x60180000, 0x60180007).lw32([this] (u32 data) { m_cvc->reset(); }, "g364_reset");
@@ -180,6 +136,12 @@ void jazz_state::jazz_common_map(address_map &map)
 	//map(0x800e0000, 0x800fffff).m() // dram config
 
 	map(0x90000000, 0x90ffffff).m(m_isp, FUNC(i82357_device::map));
+
+	// HACK: empty eisa slots
+	map(0x90001c80, 0x90001c87).ram();
+	map(0x90002c80, 0x90002c87).ram();
+	map(0x90003c80, 0x90003c87).ram();
+	map(0x90004c80, 0x90004c87).ram();
 
 	//map(0x91000000, 0x91ffffff).m();
 	//map(0x92000000, 0x92ffffff).m(); // EISA I/O ports?
@@ -370,12 +332,27 @@ ROM_START(mmr4000be)
 	ROM_REGION64_BE(0x40000, "flash", 0)
 	ROM_SYSTEM_BIOS(0, "riscos", "R4000 RISC/os PROM")
 	ROMX_LOAD("riscos.bin", 0x00000, 0x40000, CRC(cea6bc8f) SHA1(3e47b4ad5d1a0c7aac649e6aef3df1bf86fc938b), ROM_BIOS(0))
+
+	ROM_REGION64_BE(0x200, "graphics", 0)
+	ROM_LOAD64_BYTE("mips_g364.bin", 0x00, 0x40, CRC(9265ccb6) SHA1(ef5c3a6bc5249274dd9c9a18d88a668cdd457370) BAD_DUMP)
 ROM_END
 
 ROM_START(mmr4000le)
 	ROM_REGION64_LE(0x40000, "flash", 0)
 	ROM_SYSTEM_BIOS(0, "ntprom", "R4000 Windows NT PROM")
 	ROMX_LOAD("ntprom.bin", 0x00000, 0x40000, CRC(d91018d7) SHA1(316de17820192c89b8ee6d9936ab8364a739ca53), ROM_BIOS(0))
+
+	ROM_REGION64_LE(0x200, "graphics", 0)
+	// Jazz G300 (8.125MHz video clock)
+	//ROM_LOAD64_BYTE("jazz_g300.bin", 0x00, 0x40, CRC(258eb00a) SHA1(6e3fd0272957524de82e7042d6e36aca492c4d26) BAD_DUMP)
+	// Jazz G364 (8.125MHz video clock)
+	//ROM_LOAD64_BYTE("jazz_g364.bin", 0x00, 0x40, CRC(6d1ee59f) SHA1(8ec928af5b72c52eae6a3e81942db7cfaf9b9c1d) BAD_DUMP)
+	// Jazz VXL
+	//ROM_LOAD64_BYTE("jazz_vxl.bin", 0x00, 0x40, CRC(df86e670) SHA1(2a9e8b1a42e4a29242131fa26c493f53eb866484) BAD_DUMP)
+	// MIPS Video G364 (5MHz video clock)
+	ROM_LOAD64_BYTE("mips_g364.bin", 0x00, 0x40, CRC(9265ccb6) SHA1(ef5c3a6bc5249274dd9c9a18d88a668cdd457370) BAD_DUMP)
+	// Maximum Jazz Video
+	//ROM_LOAD64_BYTE("jazz_max.bin", 0x00, 0x40, CRC(34ad0fd1) SHA1(5fef74f06d71b3e3a347aa43511d36dfb54dcdc1) BAD_DUMP)
 ROM_END
 
 /*   YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS       INIT         COMPANY  FULLNAME             FLAGS */
