@@ -212,6 +212,11 @@ public:
 		m_channel[Channel].m_count = (m_channel[Channel].m_count & 0x0000ffffU) | (u32(data) << 16);
 	}
 
+	void set_ext_mode(u8 data)
+	{
+		m_ext_mode[data & 3] = data;
+	}
+
 	template <unsigned Channel> u32 get_stop() { return m_stop[Channel]; }
 	template <unsigned Channel> void set_stop(offs_t offset, u32 data, u32 mem_mask)
 	{
@@ -224,6 +229,7 @@ protected:
 
 private:
 	u32 m_stop[4];
+	u8 m_ext_mode[4];
 };
 
 // device type definition
