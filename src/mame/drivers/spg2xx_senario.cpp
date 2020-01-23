@@ -4,11 +4,14 @@
 /*
 	General Senario games on SunPlus hardware
 	
-	these check for flash ROM and actually save user data at 0x700000 in the flash ROM
+	these check for flash ROM and actually save user data at 0x700000 (senmil/senbbs/senapren) in the flash ROM
 
 	TODO:
 	senmil - Are the LEDs on the controllers meant to go out as players select answers like with pvmil, or are they just to show that the controller is connected?
-	sencosmo - fix Flash hookup
+	sencosmo - fix Flash hookup (crashes if you use a Flash chip right now)
+	senapren - should it actually save data? chip really seems to be 2MB, data written at 7MB can't be saved at mirrored 1MB address or it would erase game code / data
+	senpmate - again seems to actually be a 2MB chip
+
 */
 
 #include "includes/spg2xx.h"
@@ -194,6 +197,26 @@ static INPUT_PORTS_START( sencosmo ) // hold Pause during power on for Test Menu
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( senpmate ) // hold Pause during power on for Test Menu
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Player A")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Player B")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Player C")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Player D")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_CODE(KEYCODE_F2) PORT_NAME("Console Reset")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Player Select")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Player Start")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN ) // responds for 'any button' presses, doesn't appear to be a real button
+	PORT_BIT( 0x7f00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Low Battery sensor
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 
 void spg2xx_senario_bbs_state::mem_map_flash(address_map &map)
 {
@@ -256,14 +279,22 @@ void spg2xx_senario_mil_state::senmil(machine_config& config)
 
 ROM_START( senapren )
 	ROM_REGION16_BE( 0x800000, "flash", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "apprentice.bin", 0x000000, 0x200000, BAD_DUMP CRC(1c919e72) SHA1(20efcb992bd3ff8ab78470bd484f4f0b226e6c15) ) // needs further verification
+	ROM_LOAD16_WORD_SWAP( "apprentice.bin", 0x000000, 0x200000, CRC(1c919e72) SHA1(20efcb992bd3ff8ab78470bd484f4f0b226e6c15) )
 	// That one has a SOP44 COB instead of a TSOP48 chip.  Pin 1 is N/C, 32 is grounded, and 33 is tied high.  That means a max of A0-A20 = 21 16-bit address lines, for 4MB
 	// Data repeated dumped as 4MB, so 2MB? (but game attempts to write to 0x700000 for flash user data which would erase game data in a 2MB ROM)
+	// ROM also had a sticker that says D44B 16M 050818.  16Mbit is 2MB, and the 16-bit sum of the 2MB file is D44B.
+	// Maybe the Flash ROM save just isn't meant to work here?
+ROM_END
+
+ROM_START( senpmate )
+	ROM_REGION16_BE( 0x800000, "flash", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "perfectmate.bin", 0x000000, 0x200000, CRC(fa7f8ca0) SHA1(fcc78f8efb183e9c65545eb502da475225253a94) )
+	// Perfect Mate's COB also had a sticker: 7DC1 16M 050822.  The 2MB file I dumped sums to 7DC1
 ROM_END
 
 ROM_START( sencosmo )
 	ROM_REGION16_BE( 0x400000, "flash", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "cosmo.bin", 0x000000, 0x400000, BAD_DUMP CRC(1ec50795) SHA1(621c4e03b5713f3678d2935f8938f15c5d4a5fdf) ) // needs further verification
+	ROM_LOAD16_WORD_SWAP( "cosmo.bin", 0x000000, 0x400000, CRC(1ec50795) SHA1(621c4e03b5713f3678d2935f8938f15c5d4a5fdf) )
 	// attempts to write to 0x380000 for flash user data? different Flash type?
 ROM_END
 
@@ -279,7 +310,8 @@ ROM_END
 
 
 
-CONS( 2005, senbbs,      0,     0,        senbbs,       senbbs,    spg2xx_senario_bbs_state, empty_init, "Senario", "Big Bonus Slots (Senario, Plug and Play)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2005, senapren,    0,     0,        senbbs,       senappren, spg2xx_senario_bbs_state, empty_init, "Senario", "The Apprentice (Senario, Plug and Play)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, senbbs,      0,     0,        senbbs,       senbbs,    spg2xx_senario_bbs_state,   empty_init, "Senario", "Big Bonus Slots (Senario, Plug and Play)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, senapren,    0,     0,        senbbs,       senappren, spg2xx_senario_bbs_state,   empty_init, "Senario", "The Apprentice (Senario, Plug and Play)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, senpmate,    0,     0,        senbbs,       senpmate,  spg2xx_senario_bbs_state,   empty_init, "Senario", "The Perfect Mate (Senario, Plug and Play)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2005, sencosmo,    0,     0,        sencosmo,     sencosmo,  spg2xx_senario_cosmo_state, empty_init, "Senario", "Cosmo Girl (Senario, Plug and Play)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2006, senmil,      0,     0,        senmil,       senmil,    spg2xx_senario_mil_state, empty_init, "Senario", "Who Wants to Be a Millionaire? (Senario, Plug and Play, US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005?,senmil,      0,     0,        senmil,       senmil,    spg2xx_senario_mil_state,   empty_init, "Senario", "Who Wants to Be a Millionaire? (Senario, Plug and Play, US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
