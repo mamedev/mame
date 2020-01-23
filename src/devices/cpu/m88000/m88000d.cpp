@@ -296,8 +296,8 @@ const std::map<u32, const mc88110_disassembler::instruction> mc88110_disassemble
 	{ 0x7c000000, { 0xfc000000, "cmp",         mc88110_disassembler::addressing::SIMM16 }},
 	{ 0x80004000, { 0xfc1ff81f, "ldcr",        mc88110_disassembler::addressing::CR }},
 	{ 0x80004800, { 0xfc1ff81f, "fldcr",       mc88110_disassembler::addressing::CR }},
-	{ 0x80008000, { 0xffe0ffe0, "stcr",        mc88110_disassembler::addressing::CR }},
-	{ 0x80008800, { 0xffe0ffe0, "fstcr",       mc88110_disassembler::addressing::CR }},
+	{ 0x80008000, { 0xffe0f800, "stcr",        mc88110_disassembler::addressing::CR }},
+	{ 0x80008800, { 0xffe0f800, "fstcr",       mc88110_disassembler::addressing::CR }},
 	{ 0x8000c000, { 0xfc00f800, "xcr",         mc88110_disassembler::addressing::CR }},
 	{ 0x8000c800, { 0xfc00f800, "fxcr",        mc88110_disassembler::addressing::CR }},
 	{ 0x84000000, { 0xfc007fe0, "fmul.sss",    mc88110_disassembler::addressing::FP }},
@@ -1040,8 +1040,8 @@ offs_t m88000_disassembler::dasm_bitfield(std::ostream &stream, const char *mnem
 	util::stream_format(stream, "%-12sr%d,r%d,", mnemonic,
 						(inst & 0x03e00000) >> 21,
 						(inst & 0x001f0000) >> 16);
-	if ((inst & 0xfc00fc00) != 0xf000a800)
-		util::stream_format(stream, "%d", (inst & 0x000003e0) == 0 ? 32 : (inst & 0x000003e0) >> 5);
+	if ((inst & 0xfc00fc00) != 0xf000a800 && (inst & 0x000003e0) != 0)
+		util::stream_format(stream, "%d", (inst & 0x000003e0) >> 5);
 	util::stream_format(stream, "<%d>", inst & 0x0000001f);
 	return 4 | SUPPORTED;
 }
@@ -1109,7 +1109,7 @@ offs_t m88000_disassembler::dasm_cr(std::ostream &stream, const char *mnemonic, 
 offs_t m88000_disassembler::dasm_si16(std::ostream &stream, const char *mnemonic, u32 inst, bool xrf)
 {
 	// Register indirect with extended immediate index
-	util::stream_format(stream, "%-16%cr%d,r%d,", mnemonic,
+	util::stream_format(stream, "%-12s%c%d,r%d,", mnemonic,
 						xrf ? 'x' : 'r',
 						(inst & 0x03e00000) >> 21,
 						(inst & 0x001f0000) >> 16);
