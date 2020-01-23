@@ -1,5 +1,5 @@
-// license:BSD-3-Clause
-// copyright-holders:Sterophonick
+// license:BSD-2-Clause
+// copyright-holders:Sterophonick, Phil Thomas
 /*****************************************************************************
  *
  * Skeleton device for Gigatron CPU Core
