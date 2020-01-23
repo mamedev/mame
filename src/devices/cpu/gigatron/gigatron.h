@@ -2,7 +2,7 @@
 // copyright-holders:Sterophonick, Phil Thomas
 /*****************************************************************************
  *
- * Skeleton Device for Gigatron CPU Core
+ * Skeleton device for Gigatron CPU Core
  *
  *****************************************************************************/
 
