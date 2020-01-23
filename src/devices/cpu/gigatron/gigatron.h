@@ -5,6 +5,8 @@
  * Skeleton Device for Gigatron CPU Core
  *
  *****************************************************************************/
+ 
+ //https://github.com/PhilThomas/gigatron/blob/master/src/gigatron.js
 
 #ifndef MAME_CPU_GTRON_H
 #define MAME_CPU_GTRON_H
@@ -13,8 +15,7 @@
 
 enum
 {
-	GTRON_R0=1, GTRON_R1, GTRON_R2, GTRON_R3,
-	GTRON_R4, GTRON_R5, GTRON_R6, GTRON_R7
+	GTRON_AC=1, GTRON_X, GTRON_Y
 };
 
 
@@ -44,6 +45,16 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
+	
+	void branchOp(int op, int mode, int bus, int d);
+	void aluOp(int op, int mode, int bus, int d);
+	void storeOp(int op, int mode, int bus, int d);
+	
+	uint8_t ac;
+	uint8_t x;
+	uint8_t y;
+	
+	virtual void init();
 
 private:
 	address_space_config m_program_config;

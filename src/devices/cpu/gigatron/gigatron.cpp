@@ -5,13 +5,15 @@
  * Skeleton device for Gigatron CPU Core
  *
  *****************************************************************************/
+ 
+ //https://github.com/PhilThomas/gigatron/blob/master/src/gigatron.js
 
 #include "emu.h"
 #include "gigatron.h"
 #include "gigatrondasm.h"
 
 
-DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron", "Gigatron CPU Device")
+DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron_cpu", "Gigatron CPU Device")
 
 
 /* FLAGS */
@@ -48,9 +50,28 @@ void gigatron_cpu_device::execute_run()
 
 		opcode = gigatron_readop(m_pc);
 		m_pc++;
+		
+		uint8_t op = (opcode >> 13) & 0x0007;
+		uint8_t mode = (opcode >> 10) & 0x0007;
+		uint8_t bus = (opcode >> 8) & 0x0003;
+		uint8_t d = (opcode >> 0) & 0x00ff;
 
-		switch( opcode )
+		switch( op)
 		{
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+			case 5:
+				aluOp(op, mode, bus, d);
+				break;
+			case 6:
+				storeOp(op, mode, bus, d);
+				break;
+			case 7:
+				branchOp(op, mode, bus, d);
+				break;
 			default:
 				gigatron_illegal();
 				break;
@@ -65,16 +86,43 @@ void gigatron_cpu_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
 
-	save_item(NAME(m_pc));
-	save_item(NAME(m_flags));
+	init();
+}
 
-	// Register state for debugger
-	state_add( GTRON_R0, "PC", m_pc ).formatstr("%02X");
-	state_add( STATE_GENPC, "GENPC", m_r[7] ).noshow();
-	state_add( STATE_GENPCBASE, "CURPC", m_r[7] ).noshow();
-	state_add( STATE_GENFLAGS, "GENFLAGS", m_flags ).noshow();
-
+void gigatron_cpu_device::init()
+{
+	ac = 0;
+	x = 0;
+	y = 0;
+	m_pc = 0;
+	state_add(GTRON_A,         "AC",         ac);
+	state_add(GTRON_X,         "X",         x);
+	state_add(GTRON_Y,         "Y",         y);
+	
 	set_icountptr(m_icount);
+}
+
+void gigatron_cpu_device::branchOp(int op, int mode, int bus, int d)
+{
+}
+
+void gigatron_cpu_device::aluOp(int op, int mode, int bus, int d)
+{
+	int b;
+	switch(bus) {
+		case 0:
+			b = d;
+			break;
+		case 1:
+		case 2:
+			b = ac;
+			break;
+		case 3:
+	}
+}
+
+void gigatron_cpu_device::storeOp(int op, int mode, int bus, int d)
+{
 }
 
 void gigatron_cpu_device::device_reset()
