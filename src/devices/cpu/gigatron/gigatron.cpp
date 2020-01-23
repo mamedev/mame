@@ -13,7 +13,7 @@
 #include "gigatrondasm.h"
 
 
-DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron_cpu", "Gigatron CPU")
+DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron_cpu", "Gigatron")
 
 
 /* FLAGS */
@@ -244,7 +244,7 @@ void gigatron_cpu_device::storeOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t
 			break;
 		case 1:
 			b = 0;
-			logerror("UNDEFINED BEHAVIOR!");
+			logerror("UNDEFINED BEHAVIOR! %b", m_pc);
 			break;
 		case 2:
 			b = m_ac;
