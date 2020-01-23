@@ -5,7 +5,7 @@
  * Skeleton device for Gigatron CPU Core
  *
  *****************************************************************************/
- 
+
  //https://github.com/PhilThomas/gigatron/blob/master/src/gigatron.js
 
 #include "emu.h"
@@ -50,7 +50,7 @@ void gigatron_cpu_device::execute_run()
 
 		opcode = gigatron_readop(m_pc);
 		m_pc++;
-		
+
 		uint8_t op = (opcode >> 13) & 0x0007;
 		uint8_t mode = (opcode >> 10) & 0x0007;
 		uint8_t bus = (opcode >> 8) & 0x0003;
@@ -91,14 +91,14 @@ void gigatron_cpu_device::device_start()
 
 void gigatron_cpu_device::init()
 {
-	ac = 0;
-	x = 0;
-	y = 0;
+	m_ac = 0;
+	m_x = 0;
+	m_y = 0;
 	m_pc = 0;
-	state_add(GTRON_A,         "AC",         ac);
-	state_add(GTRON_X,         "X",         x);
-	state_add(GTRON_Y,         "Y",         y);
-	
+	state_add(GTRON_AC,        "AC",        m_ac);
+	state_add(GTRON_X,         "X",         m_x);
+	state_add(GTRON_Y,         "Y",         m_y);
+
 	set_icountptr(m_icount);
 }
 
@@ -109,15 +109,17 @@ void gigatron_cpu_device::branchOp(int op, int mode, int bus, int d)
 void gigatron_cpu_device::aluOp(int op, int mode, int bus, int d)
 {
 	int b;
+	(void)b;
 	switch(bus) {
 		case 0:
 			b = d;
 			break;
 		case 1:
 		case 2:
-			b = ac;
+			b = m_ac;
 			break;
 		case 3:
+			break;
 	}
 }
 

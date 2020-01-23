@@ -2983,7 +2983,7 @@ end
 
 --------------------------------------------------
 -- Gigatron
---@src/devices/cpu/gigatron.h,CPUS["GTRON"] = true
+--@src/devices/cpu/gigatron/gigatron.h,CPUS["GTRON"] = true
 --------------------------------------------------
 
 if (CPUS["GTRON"]~=null) then
@@ -2998,6 +2998,7 @@ if (CPUS["GTRON"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/gigatron/gigatrondasm.h")
 end
 
+--------------------------------------------------
 -- Motorola DSP56000
 --@src/devices/cpu/dsp56000/dsp56000.h,CPUS["DSP56000"] = true
 --------------------------------------------------

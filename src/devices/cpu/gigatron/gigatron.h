@@ -5,7 +5,7 @@
  * Skeleton Device for Gigatron CPU Core
  *
  *****************************************************************************/
- 
+
  //https://github.com/PhilThomas/gigatron/blob/master/src/gigatron.js
 
 #ifndef MAME_CPU_GTRON_H
@@ -45,15 +45,15 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-	
+
 	void branchOp(int op, int mode, int bus, int d);
 	void aluOp(int op, int mode, int bus, int d);
 	void storeOp(int op, int mode, int bus, int d);
-	
-	uint8_t ac;
-	uint8_t x;
-	uint8_t y;
-	
+
+	uint8_t m_ac;
+	uint8_t m_x;
+	uint8_t m_y;
+
 	virtual void init();
 
 private:

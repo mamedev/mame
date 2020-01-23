@@ -8,7 +8,7 @@ Known functional issues:
     and while in-game.
   * There are indeterminate issues with the analog controls in-game.
 - Virtua Fighter
-  * Gameplay mecahnics - specifically, collision detection - are significantly broken due to
+  * Gameplay mechanics - specifically, collision detection - are significantly broken due to
     imperfect TGP RAM port emulation or hookup. This is observable in both attract mode and
     in-game. It seems to break when both characters attack at the same time.
 
