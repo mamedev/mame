@@ -155,21 +155,25 @@ void gigatron_cpu_device::aluOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d
 			b = d;
 			break;
 		case 1:
+			uint16_t addr2 = addr(mode, d) & m_ramMask;
+			b = gigatron_readmem8(addr2);
+			break;
 		case 2:
 			b = m_ac;
 			break;
 		case 3:
+			b = m_inReg;
 			break;
 	}
 	switch(op) {
 		case 1:
-			b = m_ac & b;
+			b = (m_ac & b);
 			break;
 		case 2:
-			b = m_ac | b;
+			b = (m_ac | b);
 			break;
 		case 3:
-			b = m_ac ^ b;
+			b = (m_ac ^ b);
 			break;
 		case 4:
 			b = (m_ac + b);
