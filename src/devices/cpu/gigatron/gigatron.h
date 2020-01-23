@@ -66,8 +66,6 @@ private:
 	address_space *m_data;
 	int m_icount;
 
-	uint32_t  m_r[8];
-
 	void gigatron_illegal();
 };
 

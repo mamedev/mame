@@ -4,7 +4,7 @@
 
  Arcade games (hacks of console games) running on SNES hardware.
 
- Driver (based on nss.cpp) by Tomasz Slanina  analog[at]op.pl
+ Driver (based on nss.cpp) by Tomasz Slanina 
 
     Supported games:
     - Killer Instinct
@@ -29,8 +29,8 @@ TODO:
  - sblast2b : dipswitches
  - sblast2b : pressing start during gameplay changes the character used. Intentional?
  - denseib,2: fix gfx glitches, missing texts
- - legendsb : dipswitches
- - rushbets : everything
+ - legendsb : unknown dipswitches
+ - rushbets : dipswitches (stored at memory locations $785006 and $785008)
  - venom    : gfx glitches on second level
 
 ***************************************************************************
@@ -185,6 +185,8 @@ private:
 	DECLARE_READ8_MEMBER(endless_580xxx_r);
 	DECLARE_READ8_MEMBER(endless_624b7f_r);
 	DECLARE_READ8_MEMBER(endless_800b_r);
+	DECLARE_READ8_MEMBER(rushbets_75axxx_r);
+	DECLARE_READ8_MEMBER(rushbets_5b8e3c_r);
 	DECLARE_READ8_MEMBER(sharedram2_r);
 	DECLARE_WRITE8_MEMBER(sharedram2_w);
 	DECLARE_READ8_MEMBER(snesb_dsw1_r);
@@ -230,7 +232,7 @@ READ8_MEMBER(snesb_state::sb2b_6a6xxx_r)
 		case 0xfb7: return 0x47;
 	}
 
-	logerror("Unknown protection read read %x @ %x\n",offset, m_maincpu->pc());
+	logerror("Unknown protection read %x @ %x\n",offset, m_maincpu->pc());
 
 	return 0;
 }
@@ -254,7 +256,7 @@ READ8_MEMBER(snesb_state::endless_580xxx_r)
 		case 0xe83: return 0x6b;
 	}
 
-	logerror("Unknown protection read read %x @ %x\n",offset, m_maincpu->pc());
+	logerror("Unknown protection read %x @ %x\n",offset, m_maincpu->pc());
 
 	return 0;
 }
@@ -283,6 +285,31 @@ READ8_MEMBER(snesb_state::sharedram2_r)
 WRITE8_MEMBER(snesb_state::sharedram2_w)
 {
 	m_shared_ram2[offset]=data;
+}
+
+/* Rushing Beat Shura */
+
+READ8_MEMBER(snesb_state::rushbets_75axxx_r)
+{
+/* protection checks */
+	switch(offset)
+	{
+		case 0xf49: return 0xe3;
+		case 0x05a: return 0xf4;
+		case 0x16b: return 0x05;
+		case 0x27c: return 0x16;
+		case 0x38d: return 0x27;
+	}
+
+	logerror("Unknown protection read %x @ %x\n",offset, m_maincpu->pc());
+
+	return 0;
+}
+
+READ8_MEMBER(snesb_state::rushbets_5b8e3c_r)
+{
+	/* protection check */
+	return ++m_cnt;
 }
 
 /* Generic read handlers for Dip Switches and coins inputs */
@@ -692,6 +719,39 @@ static INPUT_PORTS_START( endless )
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( rushbets )
+	PORT_INCLUDE(snes_common)
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            /* duplicate setting */
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x38, "0" )
+	PORT_DIPSETTING(    0x30, "1" )
+	PORT_DIPSETTING(    0x28, "2" )
+	PORT_DIPSETTING(    0x20, "2" )
+	PORT_DIPSETTING(    0x18, "2" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0xc0, "0" )
+	PORT_DIPSETTING(    0x80, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1206,6 +1266,17 @@ void snesb_state::init_rushbets()
 		}
 	}
 
+	/* protection checks */
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x75a000, 0x75afff, read8_delegate(*this, FUNC(snesb_state::rushbets_75axxx_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5b8e3c, 0x5b8e3c, read8_delegate(*this, FUNC(snesb_state::rushbets_5b8e3c_r)));
+
+	m_shared_ram = std::make_unique<int8_t[]>(0x10);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x785000, 0x78500f, read8_delegate(*this, FUNC(snesb_state::sharedram_r)), write8_delegate(*this, FUNC(snesb_state::sharedram_w)));
+
+	/* extra inputs */
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770071, 0x770071, read8_delegate(*this, FUNC(snesb_state::snesb_dsw1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770079, 0x770079, read8_delegate(*this, FUNC(snesb_state::snesb_coin_r)));
+
 	// boot vector
 	dst[0xfffc] = 0xec;
 	dst[0xfffd] = 0x80;
@@ -1499,5 +1570,5 @@ GAME( 1996, denseib2,     denseib, kinstb,         denseib,  snesb_state, init_d
 GAME( 1997, sblast2b,     0,       kinstb,         sblast2b, snesb_state, init_sblast2b, ROT0, "bootleg",  "Sonic Blast Man 2 Special Turbo (SNES bootleg)",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS)
 GAME( 1996, endless,      0,       kinstb,         endless,  snesb_state, init_endless,  ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg)",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, legendsb,     0,       kinstb,         kinstb,   snesb_state, init_legendsb, ROT0, "bootleg",  "Legend (SNES bootleg)",                                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, rushbets,     0,       kinstb,         kinstb,   snesb_state, init_rushbets, ROT0, "bootleg",  "Rushing Beat Shura (SNES bootleg)",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, rushbets,     0,       kinstb,         rushbets, snesb_state, init_rushbets, ROT0, "bootleg",  "Rushing Beat Shura (SNES bootleg)",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, venom,        0,       kinstb,         venom,    snesb_state, init_venom,    ROT0, "bootleg",  "Venom & Spider-Man - Separation Anxiety (SNES bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
