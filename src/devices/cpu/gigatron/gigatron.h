@@ -56,6 +56,8 @@ protected:
 	uint8_t m_x;
 	uint8_t m_y;
 	uint8_t m_npc;
+	uint8_t m_inReg;
+	uint16_t m_ramMask;
 
 	virtual void init();
 

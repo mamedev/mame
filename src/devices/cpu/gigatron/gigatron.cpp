@@ -98,6 +98,7 @@ void gigatron_cpu_device::init()
 	m_y = 0;
 	m_pc = 0;
 	m_npc = (m_pc + 1);
+	m_inReg = 0xFF;
 	state_add(GTRON_AC,        "AC",        m_ac);
 	state_add(GTRON_X,         "X",         m_x);
 	state_add(GTRON_Y,         "Y",         m_y);
@@ -169,6 +170,34 @@ uint8_t gigatron_cpu_device::offset(uint8_t bus, uint8_t d)
 
 void gigatron_cpu_device::storeOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d)
 {
+	uint8_t b = 0;
+	switch (bus) {
+		case 0:
+			b = d;
+			break;
+		case 1:
+			b = 0;
+			logerror("UNDEFINED BEHAVIOR!");
+			break;
+		case 2:
+			b = m_ac;
+			break;
+		case 3:
+			b = m_inReg;
+			break;
+	}
+	
+	u16 address = addr(mode, d) & m_ramMask;
+	gigatron_writemem8(address, b);
+	
+	switch (mode) {
+		case 4:
+			m_x = b;
+			break;
+		case 5:
+			m_y = b;
+			break;
+	}
 }
 
 void gigatron_cpu_device::device_reset()
