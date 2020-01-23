@@ -196,7 +196,23 @@ void gigatron_cpu_device::aluOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d
 
 uint16_t gigatron_cpu_device::addr(uint8_t mode, uint8_t d)
 {
-	return 0;
+	switch (mode) {
+		case 0:
+		case 4:
+		case 5:
+		case 6:
+			return d;
+		case 1:
+			return m_x;
+		case 2:
+			return (m_y << 8) | d;
+		case 3:
+			return (m_y << 8) | m_x;
+		case 7:
+			uint16_t addr2 = (m_y << 8) | m_x;
+			m_x = (m_x + 1) & 0xff;
+			return addr2;
+	}
 }
 
 uint8_t gigatron_cpu_device::offset(uint8_t bus, uint8_t d)
