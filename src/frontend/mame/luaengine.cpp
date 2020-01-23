@@ -1227,13 +1227,13 @@ void lua_engine::initialize()
 			if(e.type() != OPTION_FLOAT)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
-				e.set_value(string_format("%f", val).c_str(), OPTION_PRIORITY_CMDLINE);
+				e.set_value(string_format("%f", val), OPTION_PRIORITY_CMDLINE);
 		},
 		[this](core_options::entry &e, int val) {
 			if(e.type() != OPTION_INTEGER)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
-				e.set_value(string_format("%d", val).c_str(), OPTION_PRIORITY_CMDLINE);
+				e.set_value(string_format("%d", val), OPTION_PRIORITY_CMDLINE);
 		},
 		[this](core_options::entry &e, const char *val) {
 			if(e.type() != OPTION_STRING)
@@ -1647,9 +1647,9 @@ void lua_engine::initialize()
 				if(!item)
 					break;
 				name = &(strchr(item, '/')[1]);
-				if(name.substr(0, name.find("/")) == tag)
+				if(name.substr(0, name.find('/')) == tag)
 				{
-					name = name.substr(name.find("/") + 1, std::string::npos);
+					name = name.substr(name.find('/') + 1, std::string::npos);
 					table[name] = i;
 				}
 			}

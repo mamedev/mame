@@ -448,7 +448,7 @@ u8 *device_image_interface::get_software_region(const char *tag)
 		return nullptr;
 
 	std::string full_tag = util::string_format("%s:%s", device().tag(), tag);
-	memory_region *region = device().machine().root_device().memregion(full_tag.c_str());
+	memory_region *region = device().machine().root_device().memregion(full_tag);
 	return region != nullptr ? region->base() : nullptr;
 }
 
@@ -460,7 +460,7 @@ u8 *device_image_interface::get_software_region(const char *tag)
 u32 device_image_interface::get_software_region_length(const char *tag)
 {
 	std::string full_tag = util::string_format("%s:%s", device().tag(), tag);
-	memory_region *region = device().machine().root_device().memregion(full_tag.c_str());
+	memory_region *region = device().machine().root_device().memregion(full_tag);
 	return region != nullptr ? region->bytes() : 0;
 }
 
@@ -632,7 +632,7 @@ void device_image_interface::battery_load(void *buffer, int length, int fill)
 
 	osd_file::error filerr;
 	int bytes_read = 0;
-	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
+	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext).append(".nv");
 
 	/* try to open the battery file and read it in, if possible */
 	emu_file file(device().machine().options().nvram_directory(), OPEN_FLAG_READ);
@@ -651,7 +651,7 @@ void device_image_interface::battery_load(void *buffer, int length, const void *
 
 	osd_file::error filerr;
 	int bytes_read = 0;
-	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
+	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext).append(".nv");
 
 	// try to open the battery file and read it in, if possible
 	emu_file file(device().machine().options().nvram_directory(), OPEN_FLAG_READ);
@@ -680,7 +680,7 @@ void device_image_interface::battery_save(const void *buffer, int length)
 	if (!device().machine().options().nvram_save())
 		return;
 
-	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
+	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext).append(".nv");
 
 	// try to open the battery file and write it out, if possible
 	emu_file file(device().machine().options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
@@ -930,7 +930,7 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 				while (swinfo != nullptr)
 				{
 					locationtag.append(swinfo->shortname()).append(breakstr);
-					swinfo = !swinfo->parentname().empty() ? swlist.find(swinfo->parentname().c_str()) : nullptr;
+					swinfo = !swinfo->parentname().empty() ? swlist.find(swinfo->parentname()) : nullptr;
 				}
 				// strip the final '%'
 				locationtag.erase(locationtag.length() - 1, 1);

@@ -441,7 +441,7 @@ void video_manager::begin_recording_mng(const char *name, uint32_t index, screen
 			full_name = name_buf;
 		}
 
-		filerr = info.m_mng_file->open(full_name.c_str());
+		filerr = info.m_mng_file->open(full_name);
 	}
 	else
 	{
@@ -518,7 +518,7 @@ void video_manager::begin_recording_avi(const char *name, uint32_t index, screen
 				full_name = name_buf;
 			}
 
-			filerr = tempfile.open(full_name.c_str());
+			filerr = tempfile.open(full_name);
 		}
 		else
 		{
@@ -1350,7 +1350,7 @@ osd_file::error video_manager::open_next(emu_file &file, const char *extension, 
 	if (pos != -1)
 	{
 		// if more %d are found, revert to default and ignore them all
-		if (snapstr.find(snapdev.c_str(), pos + 3) != -1)
+		if (snapstr.find(snapdev, pos + 3) != -1)
 			snapstr.assign("%g/%i");
 		// else if there is a single %d, try to create the correct snapname
 		else
@@ -1397,7 +1397,7 @@ osd_file::error video_manager::open_next(emu_file &file, const char *extension, 
 						filename = filename.substr(0, filename.find_last_of('.'));
 
 						// setup snapname and remove the %d_
-						strreplace(snapstr, snapdevname.c_str(), filename.c_str());
+						strreplace(snapstr, snapdevname, filename);
 						snapstr.erase(pos, 3);
 						//printf("check image: %s\n", filename.c_str());
 
@@ -1433,10 +1433,10 @@ osd_file::error video_manager::open_next(emu_file &file, const char *extension, 
 		{
 			// build up the filename
 			fname.assign(snapstr);
-			strreplace(fname, "%i", string_format("%04d", seq).c_str());
+			strreplace(fname, "%i", string_format("%04d", seq));
 
 			// try to open the file; stop when we fail
-			osd_file::error filerr = file.open(fname.c_str());
+			osd_file::error filerr = file.open(fname);
 			if (filerr == osd_file::error::NOT_FOUND)
 			{
 				break;
@@ -1446,7 +1446,7 @@ osd_file::error video_manager::open_next(emu_file &file, const char *extension, 
 
 	// create the final file
 	file.set_openflags(origflags);
-	return file.open(fname.c_str());
+	return file.open(fname);
 }
 
 

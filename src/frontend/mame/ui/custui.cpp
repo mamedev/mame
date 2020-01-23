@@ -76,7 +76,7 @@ menu_custom_ui::~menu_custom_ui()
 	ui().options().set_value(OPTION_HIDE_PANELS, ui_globals::panels_status, OPTION_PRIORITY_CMDLINE);
 	if (!m_lang.empty())
 	{
-		machine().options().set_value(OPTION_LANGUAGE, m_lang[m_currlang].c_str(), OPTION_PRIORITY_CMDLINE);
+		machine().options().set_value(OPTION_LANGUAGE, m_lang[m_currlang], OPTION_PRIORITY_CMDLINE);
 		load_translation(machine().options());
 	}
 	ui_globals::reset = true;
@@ -172,7 +172,7 @@ void menu_custom_ui::populate(float &customtop, float &custombottom)
 	if (!m_lang.empty())
 	{
 		arrow_flags = get_arrow_flags<std::uint16_t>(0, m_lang.size() - 1, m_currlang);
-		item_append(_("Language"), m_lang[m_currlang].c_str(), arrow_flags, (void *)(uintptr_t)LANGUAGE_MENU);
+		item_append(_("Language"), m_lang[m_currlang], arrow_flags, (void *)(uintptr_t)LANGUAGE_MENU);
 	}
 
 	arrow_flags = get_arrow_flags<uint16_t>(0, HIDE_BOTH, ui_globals::panels_status);
@@ -445,7 +445,7 @@ menu_colors_ui::~menu_colors_ui()
 	for (int index = 1; index < MUI_RESTORE; index++)
 	{
 		dec_color = string_format("%x", (uint32_t)m_color_table[index].color);
-		ui().options().set_value(m_color_table[index].option, dec_color.c_str(), OPTION_PRIORITY_CMDLINE);
+		ui().options().set_value(m_color_table[index].option, dec_color, OPTION_PRIORITY_CMDLINE);
 	}
 
 	// refresh our cached colors

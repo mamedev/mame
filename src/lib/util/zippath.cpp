@@ -264,7 +264,7 @@ osd_file::error zippath_resolve(const char *path, osd::directory::entry::entry_t
 			apath = zippath_parent(apath);
 		}
 	}
-	while ((current_entry_type == osd::directory::entry::entry_type::NONE) && !is_root(apath.c_str()));
+	while ((current_entry_type == osd::directory::entry::entry_type::NONE) && !is_root(apath));
 
 	// if we did not find anything, then error out
 	if (current_entry_type == osd::directory::entry::entry_type::NONE)

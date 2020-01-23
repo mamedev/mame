@@ -520,7 +520,7 @@ void core_options::add_entry(const options_entry &opt, bool override_existing)
 	{
 		for (const std::string &name : names)
 		{
-			existing_entry = get_entry(name.c_str());
+			existing_entry = get_entry(name);
 			if (existing_entry)
 				break;
 		}

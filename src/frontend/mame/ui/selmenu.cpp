@@ -346,8 +346,8 @@ void menu_select_launch::bios_selection::handle()
 					machine().options().set_value(OPTION_BIOS, elem.second, OPTION_PRIORITY_CMDLINE); // oh dear, relying on this persisting through the part selection menu
 					driver_enumerator drivlist(machine().options(), *ui_swinfo->driver);
 					drivlist.next();
-					software_list_device *swlist = software_list_device::find_by_name(*drivlist.config(), ui_swinfo->listname.c_str());
-					const software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());
+					software_list_device *swlist = software_list_device::find_by_name(*drivlist.config(), ui_swinfo->listname);
+					const software_info *swinfo = swlist->find(ui_swinfo->shortname);
 					if (!select_part(ui(), container(), *swinfo, *ui_swinfo))
 					{
 						reselect_last::reselect(true);
@@ -693,7 +693,7 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 	else
 	{
 		std::string copyright(emulator_info::get_copyright());
-		size_t found = copyright.find("\n");
+		size_t found = copyright.find('\n');
 
 		tempbuf[0].clear();
 		tempbuf[1] = string_format(_("%1$s %2$s"), emulator_info::get_appname(), build_version);
@@ -1305,8 +1305,8 @@ void menu_select_launch::get_title_search(std::string &snaptext, std::string &se
 	}
 
 	std::string tmp(searchstr);
-	path_iterator path(tmp.c_str());
-	path_iterator path_iter(addpath.c_str());
+	path_iterator path(tmp);
+	path_iterator path_iter(addpath);
 	std::string c_path, curpath;
 
 	// iterate over path and add path for zipped formats
