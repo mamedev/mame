@@ -6696,7 +6696,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<!-- Listed as clone of 2400ad because not sure if different version -->
-	<software name="2400ad1" cloneof="2400ad" supported="yes">
+	<software name="2400ad1" cloneof="2400ad">
 		<description>2400 A.D. (set 2)</description>
 		<year>1987</year>
 		<publisher>Origin</publisher>
@@ -10090,7 +10090,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<!-- matches dump of 3.5" "International Version" -->
-	<software name="nova9a" cloneof="nova9" supported="yes">
+	<software name="nova9a" cloneof="nova9">
 		<description>Nova 9: The Return of Gir Draxon (version 1.0)</description>
 		<year>1991</year>
 		<publisher>Sierra</publisher>

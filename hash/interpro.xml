@@ -36,7 +36,7 @@
 		<part name="disc1" interface="cdrom">
 			<feature name="part_id" value="System Software Disc I" />
 			<diskarea name="cdrom">
-				<disk name="iss_050599_1" sha1="5d556b4df2dccdc681095fedcf836a5b0a7782a0" writeable="no" />
+				<disk name="iss_050599_1" sha1="5d556b4df2dccdc681095fedcf836a5b0a7782a0"/>
 			</diskarea>
 		</part>
 
@@ -44,7 +44,7 @@
 		<part name="disc2" interface="cdrom">
 			<feature name="part_id" value="System Software Disc II" />
 			<diskarea name="cdrom">
-				<disk name="iss_050599_2" sha1="3813db83871668eed97b43f2384b7e95a649598a" writeable="no" />
+				<disk name="iss_050599_2" sha1="3813db83871668eed97b43f2384b7e95a649598a"/>
 			</diskarea>
 		</part>
 
@@ -52,7 +52,7 @@
 		<part name="disc3" interface="cdrom">
 			<feature name="part_id" value="System Software Disc III" />
 			<diskarea name="cdrom">
-				<disk name="iss_050599_3" sha1="c8b08cd45ef1614b3db1cd0fb8e6539e3bcc5725" writeable="no" />
+				<disk name="iss_050599_3" sha1="c8b08cd45ef1614b3db1cd0fb8e6539e3bcc5725"/>
 			</diskarea>
 		</part>
 
@@ -60,7 +60,7 @@
 		<part name="disc4" interface="cdrom">
 			<feature name="part_id" value="System Software Disc IV" />
 			<diskarea name="cdrom">
-				<disk name="iss_050599_4" sha1="2681b4cd8d355b6abfcfebb1b40a6d8a5ef37fe9" writeable="no" />
+				<disk name="iss_050599_4" sha1="2681b4cd8d355b6abfcfebb1b40a6d8a5ef37fe9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -76,7 +76,7 @@
 		<part name="disc1" interface="cdrom">
 			<feature name="part_id" value="MDEM Software" />
 			<diskarea name="cdrom">
-				<disk name="mech_081797_1" sha1="a03f9a9b08d6220b49f1be8a50a2032323f69fb8" writeable="no" />
+				<disk name="mech_081797_1" sha1="a03f9a9b08d6220b49f1be8a50a2032323f69fb8"/>
 			</diskarea>
 		</part>
 
@@ -84,7 +84,7 @@
 		<part name="disc2" interface="cdrom">
 			<feature name="part_id" value="MDEM Disc II" />
 			<diskarea name="cdrom">
-				<disk name="mech_081797_2" sha1="a269113a742c8dbf081855bcf2135b70c42738ef" writeable="no" />
+				<disk name="mech_081797_2" sha1="a269113a742c8dbf081855bcf2135b70c42738ef"/>
 			</diskarea>
 		</part>
 	</software>
