@@ -38,6 +38,11 @@ private:
 
 	void prog_map(address_map &map);
 	void data_map(address_map &map);
+	
+	DECLARE_READ8_MEMBER(gigatron_random)
+	{
+		return machine().rand() & 0xff;
+	}
 
 	required_device<cpu_device> m_maincpu;
 };
@@ -54,6 +59,7 @@ void gigatron_state::prog_map(address_map &map)
 
 void gigatron_state::data_map(address_map &map)
 {
+	map(0x4000, 0xffff).r(FUNC(gigatron_state::gigatron_random));
 }
 
 void gigatron_state::machine_start()

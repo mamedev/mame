@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron_cpu", "Gigatron CPU")
 #endif
 
 
-#define gigatron_readop(A) m_program->read_dword(A)
+#define gigatron_readop(A) m_program->read_byte(A)
 #define gigatron_readmem16(A) m_data->read_dword(A)
 #define gigatron_readmem8(A) m_data->read_byte(A)
 #define gigatron_writemem16(A,B) m_data->write_dword((A),B)
@@ -78,7 +78,7 @@ void gigatron_cpu_device::execute_run()
 				gigatron_illegal();
 				break;
 		}
-
+		m_icount++;
 	} while( m_icount > 0 );
 }
 
