@@ -38,6 +38,7 @@
 #include "cpu/powerpc/ppc.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
+#include "machine/msm6242.h"
 #include "sound/ymz280b.h"
 #include "video/k057714.h"
 #include "emupal.h"
@@ -52,6 +53,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_gcu(*this, "gcu")
 		, m_eeprom(*this, "eeprom")
+		, m_rtc(*this, "rtc")
 	{ }
 
 	void init_konendev();
@@ -65,8 +67,6 @@ private:
 	DECLARE_READ32_MEMBER(ctrl0_r);
 	DECLARE_READ32_MEMBER(ctrl1_r);
 	DECLARE_READ32_MEMBER(ctrl2_r);
-	DECLARE_READ32_MEMBER(rtc_r);
-	DECLARE_WRITE32_MEMBER(rtc_w);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_READ32_MEMBER(sound_data_r);
 	DECLARE_WRITE32_MEMBER(sound_data_w);
@@ -84,6 +84,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<k057714_device> m_gcu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<rtc62423_device> m_rtc;
 };
 
 uint32_t konendev_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -134,49 +135,6 @@ READ32_MEMBER(konendev_state::ifu2_r)
 	return r;
 }
 
-// This seems to be Epson RTC-72423
-uint8_t konendev_state::rtc_dev_r(uint32_t reg)
-{
-	switch (reg)
-	{
-		case 0x0:       return 9;
-		case 0x1:       return 5;
-		case 0x2:       return 3;
-		case 0x3:       return 2;
-		case 0x4:       return 1;
-		case 0x5:       return 0;
-		case 0x6:       return 7;
-		case 0x7:       return 2;
-		case 0x8:       return 2;
-		case 0x9:       return 1;
-		case 0xa:       return 5;
-		case 0xb:       return 1;
-		case 0xc:       return 3;
-	}
-
-	return 0;
-}
-
-READ32_MEMBER(konendev_state::rtc_r)
-{
-	uint32_t r = 0;
-
-	if (ACCESSING_BITS_24_31)
-		r |= (uint32_t)(rtc_dev_r(offset * 4)) << 24;
-	if (ACCESSING_BITS_16_23)
-		r |= (uint32_t)(rtc_dev_r((offset * 4)+1)) << 16;
-	if (ACCESSING_BITS_8_15)
-		r |= (uint32_t)(rtc_dev_r((offset * 4)+2)) << 8;
-	if (ACCESSING_BITS_0_7)
-		r |= (uint32_t)(rtc_dev_r((offset * 4)+3));
-
-	return r;
-}
-
-WRITE32_MEMBER(konendev_state::rtc_w)
-{
-}
-
 READ32_MEMBER(konendev_state::ctrl0_r)
 {
 	return ((uint32_t)(ioport("IN1")->read() & 0xffff) << 16) | 0xffff;
@@ -218,7 +176,7 @@ void konendev_state::konendev_map(address_map &map)
 {
 	map(0x00000000, 0x00ffffff).ram();
 	map(0x78000000, 0x78000003).r(FUNC(konendev_state::mcu2_r));
-	map(0x78080000, 0x7808000f).rw(FUNC(konendev_state::rtc_r), FUNC(konendev_state::rtc_w));
+	map(0x78080000, 0x7808000f).rw(m_rtc, FUNC(rtc62423_device::read), FUNC(rtc62423_device::write));
 	map(0x780c0000, 0x780c0003).rw(FUNC(konendev_state::sound_data_r), FUNC(konendev_state::sound_data_w));
 	map(0x78100000, 0x78100003).w(FUNC(konendev_state::eeprom_w));
 	map(0x78800000, 0x78800003).r(FUNC(konendev_state::ifu2_r));
@@ -324,6 +282,8 @@ void konendev_state::konendev(machine_config &config)
 
 	K057714(config, m_gcu, 0);
 	m_gcu->irq_callback().set(FUNC(konendev_state::gcu_interrupt));
+
+	RTC62423(config, m_rtc, XTAL(32'768));
 
 	NVRAM(config, "nvram0", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0);
