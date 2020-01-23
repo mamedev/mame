@@ -108,6 +108,42 @@ void gigatron_cpu_device::init()
 
 void gigatron_cpu_device::branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d)
 {
+	const uint8_t ZERO = 0x80;
+	uint8_t c = 0;
+	uint8_t ac2 = m_ac ^ ZERO;
+	uint16_t base = m_pc & 0xff00;
+	switch (mode) {
+		case 0:
+			c = true;
+			base = m_y << 8;
+			break;
+		case 1:
+			c = (ac2 > ZERO);
+			break;
+		case 2:
+			c = (ac2 < ZERO);
+			break;
+		case 3:
+			c = (ac2 != ZERO);
+			break;
+		case 4:
+			c = (ac2 == ZERO);
+			break;
+		case 5:
+			c = (ac2 >= ZERO);
+			break;
+		case 6:
+			c = (ac2 <= ZERO);
+			break;
+		case 7:
+			c = true;
+			break;
+	}
+	
+	if (c) {
+		uint8_t b = offset(bus, d);
+		m_npc = base | b;
+	}
 }
 
 void gigatron_cpu_device::aluOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d)
