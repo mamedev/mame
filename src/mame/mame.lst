@@ -39872,6 +39872,8 @@ zon32bit                        // Zone 32-bit
 @source:spg2xx_senario.cpp
 senmil
 senbbs
+senapren
+sencosmo
 
 @source:spg2xx_senario_poker.cpp
 sentx6p                         //

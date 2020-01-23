@@ -64,9 +64,9 @@ private:
 	READ16_MEMBER(sentx_portb_r);
 	READ16_MEMBER(sentx_portc_r);
 
-	DECLARE_WRITE16_MEMBER(sentx_porta_w);
-	DECLARE_WRITE16_MEMBER(sentx_portb_w);
-	DECLARE_WRITE16_MEMBER(sentx_portc_w);
+	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
+	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
+	virtual DECLARE_WRITE16_MEMBER(portc_w) override;
 
 	DECLARE_WRITE8_MEMBER(sentx_tx_w);
 
@@ -427,19 +427,19 @@ READ16_MEMBER(sentx6p_state::sentx_portc_r)
 	return m_io_p3->read();
 }
 
-WRITE16_MEMBER(sentx6p_state::sentx_porta_w)
+WRITE16_MEMBER(sentx6p_state::porta_w)
 {
 	logerror("%s: sentx_porta_w %04x\n", machine().describe_context(), data);
 
 	COMBINE_DATA(&m_porta_data);
 }
 
-WRITE16_MEMBER(sentx6p_state::sentx_portb_w)
+WRITE16_MEMBER(sentx6p_state::portb_w)
 {
 	logerror("%s: sentx_portb_w %04x\n", machine().describe_context(), data);
 }
 
-WRITE16_MEMBER(sentx6p_state::sentx_portc_w)
+WRITE16_MEMBER(sentx6p_state::portc_w)
 {
 	logerror("%s: sentx_portc_w %04x\n", machine().describe_context(), data);
 }
@@ -657,9 +657,9 @@ void sentx6p_state::sentx6p(machine_config &config)
 	m_maincpu->portb_in().set(FUNC(sentx6p_state::sentx_portb_r));
 	m_maincpu->portc_in().set(FUNC(sentx6p_state::sentx_portc_r));
 
-	m_maincpu->porta_out().set(FUNC(sentx6p_state::sentx_porta_w));
-	m_maincpu->portb_out().set(FUNC(sentx6p_state::sentx_portb_w));
-	m_maincpu->portc_out().set(FUNC(sentx6p_state::sentx_portc_w));
+	m_maincpu->porta_out().set(FUNC(sentx6p_state::porta_w));
+	m_maincpu->portb_out().set(FUNC(sentx6p_state::portb_w));
+	m_maincpu->portc_out().set(FUNC(sentx6p_state::portc_w));
 
 	m_maincpu->uart_tx().set(FUNC(sentx6p_state::sentx_tx_w));
 

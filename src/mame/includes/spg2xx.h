@@ -52,6 +52,10 @@ protected:
 	DECLARE_WRITE8_MEMBER(i2c_w);
 	DECLARE_READ8_MEMBER(i2c_r);
 
+	virtual DECLARE_WRITE16_MEMBER(porta_w);
+	virtual DECLARE_WRITE16_MEMBER(portb_w);
+	virtual DECLARE_WRITE16_MEMBER(portc_w);
+
 	DECLARE_READ16_MEMBER(rad_porta_r);
 	DECLARE_READ16_MEMBER(rad_portb_r);
 	DECLARE_READ16_MEMBER(rad_portc_r);

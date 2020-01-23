@@ -19,7 +19,7 @@ protected:
 	//virtual void machine_start() override;
 	//virtual void machine_reset() override;
 
-	DECLARE_WRITE16_MEMBER(portb_w);
+	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
 };
 
 

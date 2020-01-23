@@ -41,9 +41,10 @@ public:
 
 protected:
 	DECLARE_READ16_MEMBER(jakks_porta_r);
+	DECLARE_READ16_MEMBER(walle_portc_r);
+
 	DECLARE_WRITE16_MEMBER(jakks_porta_w);
 	DECLARE_WRITE16_MEMBER(jakks_portb_w);
-	DECLARE_READ16_MEMBER(walle_portc_r);
 	DECLARE_WRITE16_MEMBER(walle_portc_w);
 
 	uint16_t m_walle_portc_data;
@@ -51,14 +52,15 @@ protected:
 private:
 	virtual void machine_start() override;
 
+	DECLARE_READ16_MEMBER(jakks_porta_key_io_r);
+
 	DECLARE_WRITE16_MEMBER(gkr_portc_w);
 	DECLARE_WRITE16_MEMBER(jakks_porta_key_io_w);
-	DECLARE_READ16_MEMBER(jakks_porta_key_io_r);
 	bool m_porta_key_mode;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_gamekey);
 
-	required_device<jakks_gamekey_slot_device> m_cart;
+	optional_device<jakks_gamekey_slot_device> m_cart;
 	memory_region *m_cart_region;
 };
 
