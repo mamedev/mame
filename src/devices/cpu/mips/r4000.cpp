@@ -191,13 +191,18 @@ void r4000_base_device::device_reset()
 	m_pc = s64(s32(0xbfc00000));
 	m_r[0] = 0;
 
-	m_cp0[CP0_Status] = SR_BEV | SR_ERL;
+	if (m_hard_reset)
+		m_cp0[CP0_Status] = SR_BEV | SR_ERL;
+	else
+		m_cp0[CP0_Status] = SR_BEV | SR_ERL | SR_SR;
+
 	m_cp0[CP0_Wired] = 0;
 	m_cp0[CP0_Compare] = 0;
 	m_cp0[CP0_Count] = 0;
 
 	m_cp0_timer_zero = total_cycles();
 
+	m_hard_reset = false;
 	m_ll_active = false;
 	m_bus_error = false;
 
