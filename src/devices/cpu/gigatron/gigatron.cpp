@@ -213,10 +213,21 @@ uint16_t gigatron_cpu_device::addr(uint8_t mode, uint8_t d)
 			m_x = (m_x + 1) & 0xff;
 			return addr2;
 	}
+	return 0;
 }
 
 uint8_t gigatron_cpu_device::offset(uint8_t bus, uint8_t d)
 {
+	switch (bus) {
+		case 0:
+			return d;
+		case 1:
+			return gigatron_readmem8(d);
+		case 2:
+			return m_ac;
+		case 3:	
+			return m_inReg;
+	}
 	return 0;
 }
 
@@ -261,19 +272,7 @@ void gigatron_cpu_device::execute_set_input(int irqline, int state)
 #if 0
 	switch(irqline)
 	{
-		case GTRON_INT_INTRM: // level-sensitive
-			m_intrm_pending = ((ASSERT_LINE == state) || (HOLD_LINE == state));
-			m_intrm_state = (ASSERT_LINE == state);
-			break;
-		case GTRON_RESET: // edge-sensitive
-			if (CLEAR_LINE != state)
-				m_reset_pending = 1;
-			m_reset_state = (ASSERT_LINE == state);
-			break;
-		case GTRON_INT_INTR: // edge-sensitive
-			if (CLEAR_LINE != state)
-				m_intr_pending = 1;
-			m_intr_state = (ASSERT_LINE == state);
+		default:
 			break;
 	}
 #endif
