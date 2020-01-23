@@ -46,13 +46,16 @@ protected:
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
-	void branchOp(int op, int mode, int bus, int d);
-	void aluOp(int op, int mode, int bus, int d);
-	void storeOp(int op, int mode, int bus, int d);
+	void branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d);
+	void aluOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d);
+	void storeOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d);
+	uint8_t offset(uint8_t bus, uint8_t d);
+	uint16_t addr(uint8_t mode, uint8_t d);
 
 	uint8_t m_ac;
 	uint8_t m_x;
 	uint8_t m_y;
+	uint8_t m_npc;
 
 	virtual void init();
 

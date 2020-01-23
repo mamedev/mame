@@ -13,7 +13,7 @@
 #include "gigatrondasm.h"
 
 
-DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron_cpu", "Gigatron CPU Device")
+DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron_cpu", "Gigatron CPU")
 
 
 /* FLAGS */
@@ -27,7 +27,9 @@ DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron_cpu", "Gigatron CPU Dev
 
 #define gigatron_readop(A) m_program->read_dword(A)
 #define gigatron_readmem16(A) m_data->read_dword(A)
+#define gigatron_readmem8(A) m_data->read_byte(A)
 #define gigatron_writemem16(A,B) m_data->write_dword((A),B)
+#define gigatron_writemem8(A,B) m_data->write_byte((A),B)
 
 
 /***********************************
@@ -95,6 +97,7 @@ void gigatron_cpu_device::init()
 	m_x = 0;
 	m_y = 0;
 	m_pc = 0;
+	m_npc = (m_pc + 1);
 	state_add(GTRON_AC,        "AC",        m_ac);
 	state_add(GTRON_X,         "X",         m_x);
 	state_add(GTRON_Y,         "Y",         m_y);
@@ -102,13 +105,13 @@ void gigatron_cpu_device::init()
 	set_icountptr(m_icount);
 }
 
-void gigatron_cpu_device::branchOp(int op, int mode, int bus, int d)
+void gigatron_cpu_device::branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d)
 {
 }
 
-void gigatron_cpu_device::aluOp(int op, int mode, int bus, int d)
+void gigatron_cpu_device::aluOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d)
 {
-	int b;
+	uint8_t b = 0;
 	(void)b;
 	switch(bus) {
 		case 0:
@@ -121,9 +124,50 @@ void gigatron_cpu_device::aluOp(int op, int mode, int bus, int d)
 		case 3:
 			break;
 	}
+	switch(op) {
+		case 1:
+			b = m_ac & b;
+			break;
+		case 2:
+			b = m_ac | b;
+			break;
+		case 3:
+			b = m_ac ^ b;
+			break;
+		case 4:
+			b = (m_ac + b);
+			break;
+		case 5:
+			b = (m_ac - b);
+			break;
+	}
+	switch (mode) {
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+			m_ac = b;
+			break;
+		case 4:
+			m_x = b;
+			break;
+		case 5:
+			m_y = b;
+			break;
+	}
 }
 
-void gigatron_cpu_device::storeOp(int op, int mode, int bus, int d)
+uint16_t gigatron_cpu_device::addr(uint8_t mode, uint8_t d)
+{
+	return 0;
+}
+
+uint8_t gigatron_cpu_device::offset(uint8_t bus, uint8_t d)
+{
+	return 0;
+}
+
+void gigatron_cpu_device::storeOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d)
 {
 }
 
