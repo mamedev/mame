@@ -30895,6 +30895,9 @@ ncd16                           // 1989 Network Computing Devices
 ncd17c                          // 1990 Network Computing Devices
 ncd19                           // 1990 Network Computing Devices
 
+@source:ncd88k.cpp
+ncd19c                          //
+
 @source:ncdmips.cpp
 hmxpro                          // 1994 Network Computing Devices
 

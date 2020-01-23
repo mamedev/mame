@@ -154,6 +154,7 @@ CPUS["PACE"] = true
 CPUS["WE32000"] = true
 CPUS["RX01"] = true
 CPUS["GTRON"] = true
+CPUS["M88000"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -2821,6 +2822,7 @@ files {
 createMESSProjects(_target, _subtarget, "ncd")
 files {
 	MAME_DIR .. "src/mame/drivers/ncd68k.cpp",
+	MAME_DIR .. "src/mame/drivers/ncd88k.cpp",
 	MAME_DIR .. "src/mame/drivers/ncdmips.cpp",
 	MAME_DIR .. "src/mame/drivers/ncdppc.cpp",
 	MAME_DIR .. "src/mame/machine/bert.cpp",
