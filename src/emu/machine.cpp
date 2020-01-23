@@ -85,7 +85,7 @@
 #include "romload.h"
 #include "tilemap.h"
 #include "ui/uimain.h"
-#include <time.h>
+#include <ctime>
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
 

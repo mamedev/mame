@@ -8,12 +8,12 @@
 
 *********************************************************************/
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <limits.h>
-#include <assert.h>
+#include <cstdlib>
+#include <cstring>
+#include <cstdio>
+#include <cctype>
+#include <climits>
+#include <cassert>
 
 #include "emu.h" // emu_fatalerror
 #include "osdcore.h"

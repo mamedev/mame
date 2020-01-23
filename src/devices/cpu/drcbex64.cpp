@@ -166,7 +166,7 @@
 
 ***************************************************************************/
 
-#include <stddef.h>
+#include <cstddef>
 #include "emu.h"
 #include "debugger.h"
 #include "emuopts.h"

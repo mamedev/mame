@@ -115,7 +115,7 @@
 #include "iflopimg.h"
 #include "formats/imageutl.h"
 
-#include <time.h>
+#include <ctime>
 
 
 #define MAXSIZE 80*16*256*2 /* room for two faces, double-density, 80 tracks */

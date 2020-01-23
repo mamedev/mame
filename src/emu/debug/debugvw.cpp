@@ -19,7 +19,7 @@
 #include "dvwpoints.h"
 #include "debugcpu.h"
 #include "debugger.h"
-#include <ctype.h>
+#include <cctype>
 
 
 

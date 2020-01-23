@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "coreutil.h"
-#include <assert.h>
+#include <cassert>
 #include <zlib.h>
 
 

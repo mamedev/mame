@@ -10,7 +10,7 @@
 
 #include "formats/ms0515_dsk.h"
 
-#include <assert.h>
+#include <cassert>
 
 ms0515_format::ms0515_format() : wd177x_format(formats)
 {

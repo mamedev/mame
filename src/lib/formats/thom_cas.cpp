@@ -8,8 +8,8 @@
 
 **********************************************************************/
 
-#include <math.h>
-#include <assert.h>
+#include <cmath>
+#include <cassert>
 
 #include "pool.h"
 #include "cassimg.h"

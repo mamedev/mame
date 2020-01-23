@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "includes/thomson.h"
 
-#include <math.h>
+#include <cmath>
 
 //#define VERBOSE 1
 #include "logmacro.h"

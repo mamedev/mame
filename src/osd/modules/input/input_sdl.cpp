@@ -18,9 +18,9 @@
 
 // standard sdl header
 #include <SDL2/SDL.h>
-#include <ctype.h>
+#include <cctype>
 // ReSharper disable once CppUnusedIncludeDirective
-#include <stddef.h>
+#include <cstddef>
 #include <mutex>
 #include <memory>
 #include <queue>

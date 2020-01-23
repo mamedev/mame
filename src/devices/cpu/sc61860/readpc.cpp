@@ -7,7 +7,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #endif
-#include <stdio.h>
+#include <cstdio>
 #include <dos.h>
 
 // gcc -O

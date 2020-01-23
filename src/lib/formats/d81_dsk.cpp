@@ -73,7 +73,7 @@ PER SECTOR ORGANIZATION:
 
 */
 
-#include <assert.h>
+#include <cassert>
 
 #include "formats/d81_dsk.h"
 

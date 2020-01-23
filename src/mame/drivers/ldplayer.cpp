@@ -25,7 +25,7 @@
 
 #include "pr8210.lh"
 
-#include <ctype.h>
+#include <cctype>
 
 
 class ldplayer_state : public driver_device

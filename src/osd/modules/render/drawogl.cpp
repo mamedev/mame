@@ -13,8 +13,8 @@
 //============================================================
 
 // standard C headers
-#include <math.h>
-#include <stdio.h>
+#include <cmath>
+#include <cstdio>
 
 // MAME headers
 #include "osdcomm.h"
@@ -41,8 +41,8 @@
 #include "modules/opengl/gl_shader_mgr.h"
 
 #if defined(SDLMAME_MACOSX) || defined(OSD_MAC)
-#include <string.h>
-#include <stdio.h>
+#include <cstring>
+#include <cstdio>
 #include <sys/types.h>
 #include <sys/sysctl.h>
 

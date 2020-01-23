@@ -11,7 +11,7 @@
 #include <windows.h>
 #include <mmsystem.h>
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #include <cstdio>
 #include <memory>

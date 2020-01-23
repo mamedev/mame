@@ -178,7 +178,7 @@ using util::BIT;
 #include <iostream>
 #include <stdexcept>
 
-#include <ctype.h>
+#include <cctype>
 
 using u8 = util::u8;
 using u16 = util::u16;

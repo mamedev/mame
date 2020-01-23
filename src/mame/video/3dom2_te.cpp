@@ -11,7 +11,7 @@
 
 #include "machine/3dom2.h"
 
-#include <math.h>
+#include <cmath>
 
 /*
     TODO:

@@ -10,7 +10,7 @@
 
 ******************************************************************************/
 
-#include <ctype.h>
+#include <cctype>
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/tms5220.h"

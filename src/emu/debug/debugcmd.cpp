@@ -20,7 +20,7 @@
 #include "debugvw.h"
 #include "natkeyboard.h"
 #include "render.h"
-#include <ctype.h>
+#include <cctype>
 #include <algorithm>
 #include <fstream>
 

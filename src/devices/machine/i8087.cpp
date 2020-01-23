@@ -21,7 +21,7 @@
 
 #include "emu.h"
 #include "i8087.h"
-#include <math.h>
+#include <cmath>
 
 /*************************************
  *

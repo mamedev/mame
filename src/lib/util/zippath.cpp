@@ -13,7 +13,7 @@
 #include "corestr.h"
 #include "osdcore.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #include <cassert>
 #include <cctype>

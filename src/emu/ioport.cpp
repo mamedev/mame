@@ -101,8 +101,8 @@
 
 #include "osdepend.h"
 
-#include <ctype.h>
-#include <time.h>
+#include <cctype>
+#include <ctime>
 
 
 namespace {

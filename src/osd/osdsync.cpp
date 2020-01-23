@@ -10,10 +10,10 @@
 #include <windows.h>
 #include <process.h>
 #include <tchar.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 #ifdef __GNUC__
-#include <stdint.h>
+#include <cstdint>
 #endif
 #endif
 #include <mutex>

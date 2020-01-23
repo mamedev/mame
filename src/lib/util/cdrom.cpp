@@ -16,11 +16,11 @@
 
 ***************************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "cdrom.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 #include "chdcd.h"
 
 

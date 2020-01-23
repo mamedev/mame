@@ -21,7 +21,7 @@
 #include <cstdint>
 #include <cstring>
 #include <vector>
-#include <time.h>
+#include <ctime>
 
 
 //**************************************************************************
