@@ -35,6 +35,10 @@ public:
 
 	void sentx6p(machine_config &config);
 
+	void init_sentx6p();
+	void init_sentx6puk();
+	void init_sentx6pd();
+
 	void mem_map_2m_texas(address_map &map);
 
 	DECLARE_INPUT_CHANGED_MEMBER(ok_latch)
@@ -108,12 +112,17 @@ private:
 	output_finder<6> m_option_allin;
 
 	output_finder<6> m_led;
+
+	// for I/O hacks
+	uint32_t m_pchackaddress1;
+	uint32_t m_pchackaddress2;
+	uint16_t m_controller_sense_addr;
 };
 
 
 void sentx6p_state::mem_map_2m_texas(address_map &map)
 {
-	map(0x000000, 0x1fffff).bankr("cartbank");
+	map(0x000000, 0x3fffff).bankr("cartbank");
 	map(0x3f0000, 0x3f7fff).ram();
 }
 
@@ -342,7 +351,7 @@ void sentx6p_state::machine_reset()
 	   following addresses are for the other controllers, and get set based on Port B
 	   status flags */
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
-	mem.write_word(0x1e08,0x0001);
+	mem.write_word(m_controller_sense_addr,0x0001);
 }
 
 void sentx6p_state::controller_send_data(int which)
@@ -365,7 +374,7 @@ void sentx6p_state::controller_send_data(int which)
 READ16_MEMBER(sentx6p_state::sentx_porta_r)
 {
 	int select_bits = (m_porta_data >> 8) & 0x3f;
-	logerror("%s: sentx_porta_r (with controller select bits %02x)\n", machine().describe_context(), select_bits);
+	printf("%s: sentx_porta_r (with controller select bits %02x)\n", machine().describe_context().c_str(), select_bits);
 
 	/* 0000 = no controller? (system buttons only?)
 	   0100 = controller 1?
@@ -392,14 +401,14 @@ READ16_MEMBER(sentx6p_state::sentx_porta_r)
 	// hacks needed for reading from the UART to work
 
 	// the select bit must be high here to read from the controller?
-	if (m_maincpu->pc() == 0x2981e)
+	if (m_maincpu->pc() == m_pchackaddress1)
 	{
 		ret ^= 0x3f;
 	}
 
 	// but must be low again here after writing the select bits in order to not
 	// get stuck in a timeout loop
-	if (m_maincpu->pc() == 0x29834)
+	if (m_maincpu->pc() == m_pchackaddress2)
 	{
 		ret &= ~0x3f;
 
@@ -667,14 +676,46 @@ void sentx6p_state::sentx6p(machine_config &config)
 }
 
 ROM_START( sentx6p )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "vsmaxxtexasholdem.bin", 0x000000, 0x400000, CRC(00180abb) SHA1(c2af28f64bfdfc9d671bb84561f8a916bc907176) )
+ROM_END
+
+ROM_START( sentx6puk )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	// chksum:05B58350 is @ 0x3000.
 	// This is the correct sum of 0x3010 - 0x1fffff (the first half of the ROM area after the checksum string)
 	// The 2nd half is not summed (and not used by the game?) but definitely exists in ROM (same data on 2 units)
 	ROM_LOAD16_WORD_SWAP( "senario texas holdem.bin", 0x000000, 0x400000, CRC(7c7d2d33) SHA1(71631074ba66e3b0cdeb86ebca3931599f3a911c) )
 ROM_END
 
-// "go 02d1d0" "do r1 = ff" to get past initial screen (currently bypassed by setting controller sense in RAM earlier, see hack in machine_reset)
-// a 'deluxe' version of this also exists with extra game modes
-CONS( 2004, sentx6p,    0,     0,        sentx6p,     sentx6p, sentx6p_state, empty_init, "Senario / Play Vision", "Vs Maxx Texas Hold'em TV Poker - 6 Player Edition (UK)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a UK Play Vision branded box, values in GBP
+ROM_START( sentx6pd )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "senariodeluxetvpoker.bin", 0x000000, 0x800000, CRC(e2b6844e) SHA1(2413195dfe7a08d16ca870c070a19034c9fe8c30) )
+ROM_END
 
+void sentx6p_state::init_sentx6puk()
+{
+	m_pchackaddress1 = 0x2981e;
+	m_pchackaddress2 = 0x29834;
+	m_controller_sense_addr = 0x1e08;
+}
+
+void sentx6p_state::init_sentx6p()
+{
+	m_pchackaddress1 = 0x29754;
+	m_pchackaddress2 = 0x2976a;
+	m_controller_sense_addr = 0x0804;
+}
+
+void sentx6p_state::init_sentx6pd()
+{
+	m_pchackaddress1 = 0xca20;
+	m_pchackaddress2 = 0xca36;
+	m_controller_sense_addr = 0x1e3a;
+}
+
+CONS( 2004, sentx6p,    0,           0,        sentx6p,     sentx6p, sentx6p_state, init_sentx6p,   "Senario",               "Vs Maxx Texas Hold'em TV Poker - 6 Player Edition (US)", MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a US version, values in USD
+CONS( 2004, sentx6puk,  sentx6p,     0,        sentx6p,     sentx6p, sentx6p_state, init_sentx6puk, "Senario / Play Vision", "Vs Maxx Texas Hold'em TV Poker - 6 Player Edition (UK)", MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a UK Play Vision branded box, values in GBP
+
+CONS( 2004, sentx6pd,   0,           0,        sentx6p,     sentx6p, sentx6p_state, init_sentx6pd,  "Senario",               "Deluxe TV Poker - Texas Hold'em, Blackjack & Video Poker (US)", MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) 
+// Deluxe version wasn't released outside of US?
