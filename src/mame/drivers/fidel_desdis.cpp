@@ -333,7 +333,10 @@ void desmas_state::fdes2265(machine_config &config)
 	M68000(config.replace(), m_maincpu, 16_MHz_XTAL); // MC68HC000P12F
 	m_maincpu->set_addrmap(AS_PROGRAM, &desmas_state::fdes2265_map);
 
-	m_irq_on->set_start_delay(attotime::from_hz(600) - attotime::from_usec(6)); // irq active for 6us
+	const attotime irq_period = attotime::from_hz(600); // from 555 timer, ideal frequency is 600Hz (measured 597Hz)
+	TIMER(config.replace(), m_irq_on).configure_periodic(FUNC(desmas_state::irq_on<M68K_IRQ_4>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_usec(6)); // active for 6us
+	TIMER(config.replace(), "irq_off").configure_periodic(FUNC(desmas_state::irq_off<M68K_IRQ_4>), irq_period);
 
 	config.set_default_layout(layout_fidel_desdis_68kr);
 }
