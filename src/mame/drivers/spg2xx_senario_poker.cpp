@@ -374,7 +374,7 @@ void sentx6p_state::controller_send_data(int which)
 READ16_MEMBER(sentx6p_state::sentx_porta_r)
 {
 	int select_bits = (m_porta_data >> 8) & 0x3f;
-	printf("%s: sentx_porta_r (with controller select bits %02x)\n", machine().describe_context().c_str(), select_bits);
+	//logerror("%s: sentx_porta_r (with controller select bits %02x)\n", machine().describe_context(), select_bits);
 
 	/* 0000 = no controller? (system buttons only?)
 	   0100 = controller 1?
