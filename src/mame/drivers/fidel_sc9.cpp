@@ -280,7 +280,7 @@ void sc9_state::sc9d(machine_config &config)
 	M6502(config, m_maincpu, 3.9_MHz_XTAL/2); // R6502AP, 3.9MHz resonator
 	m_maincpu->set_addrmap(AS_PROGRAM, &sc9_state::sc9d_map);
 
-	const attotime irq_period = attotime::from_hz(610); // from 555 timer (22nF, 102K, 2.7K)
+	const attotime irq_period = attotime::from_hz(600); // from 555 timer (22nF, 102K, 2.7K), ideal frequency is 600Hz
 	TIMER(config, m_irq_on).configure_periodic(FUNC(sc9_state::irq_on<M6502_IRQ_LINE>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_usec(41)); // active for 41us
 	TIMER(config, "irq_off").configure_periodic(FUNC(sc9_state::irq_off<M6502_IRQ_LINE>), irq_period);
