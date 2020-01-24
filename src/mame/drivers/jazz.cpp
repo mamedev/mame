@@ -60,11 +60,14 @@
 
 #include "debugger.h"
 
+#include "jazz.lh"
+
 #define VERBOSE 0
 #include "logmacro.h"
 
 void jazz_state::machine_start()
 {
+	m_led.resolve();
 }
 
 void jazz_state::machine_reset()
@@ -124,13 +127,7 @@ void jazz_state::jazz_common_map(address_map &map)
 	//map(0x8000d000, 0x8000dfff).noprw(); // dummy dma device?
 	map(0x8000d600, 0x8000d607).nopw();
 
-	map(0x8000f000, 0x8000f007).lrw8(
-			NAME([this] () { return m_led; }),
-			NAME([this] (u8 data)
-			{
-				logerror("led 0x%02x (%s)\n", data, machine().describe_context());
-				m_led = data;
-			})).umask64(0xff);
+	map(0x8000f000, 0x8000f007).w(FUNC(jazz_state::led_w)).umask64(0xff);
 
 	// lots of byte data written to 800
 	//map(0x800e0000, 0x800fffff).m() // dram config
@@ -312,6 +309,35 @@ void jazz_state::jazz(machine_config &config)
 	m_isp->out_spkr_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 
 	// TODO: 4 EISA slots
+
+	config.set_default_layout(layout_jazz);
+}
+
+void jazz_state::led_w(u8 data)
+{
+	// 7-segment diagnostic led
+	static u8 const patterns[16] =
+	{
+			  // test      output
+		0x3f, // mct-adr     0
+		0x06, // network     1
+		0x5b, // scsi        2
+		0x4f, // floppy      3
+		0x66, // isp/rtc     4
+		0x6d, // keyboard    5
+		0x7d, // serial      6
+		0x07, // nvram       7
+		0x7f, //             8?
+		0x6f, // video       9
+		0x77, // memory      A
+		0x40, //             -
+		0x39, // flash       C
+		0x00, //           (blank)
+		0x79, // cpu         E
+		0x71, //             F?
+	};
+
+	m_led = patterns[data & 0xf] | (BIT(data, 4) ? 0x80 : 0);
 }
 
 void jazz_state::mmr4000be(machine_config &config)
@@ -347,12 +373,10 @@ ROM_START(mmr4000le)
 	//ROM_LOAD64_BYTE("jazz_g300.bin", 0x00, 0x40, CRC(258eb00a) SHA1(6e3fd0272957524de82e7042d6e36aca492c4d26) BAD_DUMP)
 	// Jazz G364 (8.125MHz video clock)
 	//ROM_LOAD64_BYTE("jazz_g364.bin", 0x00, 0x40, CRC(6d1ee59f) SHA1(8ec928af5b72c52eae6a3e81942db7cfaf9b9c1d) BAD_DUMP)
-	// Jazz VXL
+	// Jazz VXL (aka Jaguar, part number 09-00184)
 	//ROM_LOAD64_BYTE("jazz_vxl.bin", 0x00, 0x40, CRC(df86e670) SHA1(2a9e8b1a42e4a29242131fa26c493f53eb866484) BAD_DUMP)
-	// MIPS Video G364 (5MHz video clock)
+	// MIPS Video G364 (5MHz video clock, part number 09-00176)
 	ROM_LOAD64_BYTE("mips_g364.bin", 0x00, 0x40, CRC(9265ccb6) SHA1(ef5c3a6bc5249274dd9c9a18d88a668cdd457370) BAD_DUMP)
-	// Maximum Jazz Video
-	//ROM_LOAD64_BYTE("jazz_max.bin", 0x00, 0x40, CRC(34ad0fd1) SHA1(5fef74f06d71b3e3a347aa43511d36dfb54dcdc1) BAD_DUMP)
 ROM_END
 
 /*   YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS       INIT         COMPANY  FULLNAME             FLAGS */

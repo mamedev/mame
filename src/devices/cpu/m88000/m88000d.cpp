@@ -23,6 +23,9 @@
     byte ordering by setting bit 30 of PSR, this has no effect on
     instruction decoding.
 
+    The MC88100 executes integer multiplication instructions by using the
+    floating-point multiply pipeline. This is not the case on the MC88110.
+
     The extended register file added to the MC88110 is used mainly for
     floating-point operations. Numbers of any precision can be stored in
     any of these 80-bit registers except x0, which is fixed to contain
@@ -1011,7 +1014,7 @@ offs_t m88000_disassembler::dasm_fp(std::ostream &stream, const char *mnemonic, 
 	if ((inst & 0xfc006000) == 0x84004000)
 	{
 		util::stream_format(stream, "%-12s%c%d,", mnemonic,
-							/*(inst & 0xfc007c00) == 0x84004200 ? 'x' : */'r',
+							(inst & 0xfc007e00) == 0x84004200 ? 'x' : 'r',
 							(inst & 0x03e00000) >> 21);
 	}
 	else

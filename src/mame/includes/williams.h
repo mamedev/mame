@@ -94,9 +94,9 @@ protected:
 	void sinistar_vram_select_w(u8 data);
 	DECLARE_WRITE8_MEMBER(blitter_w);
 
-	virtual TIMER_CALLBACK_MEMBER(deferred_snd_cmd_w);
+	TIMER_CALLBACK_MEMBER(deferred_snd_cmd_w);
 
-	virtual void snd_cmd_w(u8 data);
+	void snd_cmd_w(u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(lottofun_coin_lock_w);
 
@@ -220,7 +220,7 @@ public:
 private:
 	virtual void driver_init() override;
 
-	virtual void snd_cmd_w(u8 data) override;
+	void snd_cmd_w(u8 data);
 };
 
 class williams_muxed_state : public williams_state
@@ -296,8 +296,8 @@ private:
 	void bank_select_w(u8 data);
 	void remap_select_w(u8 data);
 	void video_control_w(u8 data);
-	virtual TIMER_CALLBACK_MEMBER(deferred_snd_cmd_w) override;
-	virtual void snd_cmd_w(u8 data) override;
+	TIMER_CALLBACK_MEMBER(deferred_snd_cmd_w);
+	void snd_cmd_w(u8 data);
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
@@ -345,8 +345,8 @@ protected:
 	void blit_window_enable_w(u8 data);
 	virtual TIMER_DEVICE_CALLBACK_MEMBER(va11_callback) override;
 	TIMER_DEVICE_CALLBACK_MEMBER(endscreen_callback);
-	virtual TIMER_CALLBACK_MEMBER(deferred_snd_cmd_w) override;
-	virtual void snd_cmd_w(u8 data) override;
+	TIMER_CALLBACK_MEMBER(deferred_snd_cmd_w);
+	void snd_cmd_w(u8 data);
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
@@ -465,8 +465,8 @@ private:
 	virtual TILE_GET_INFO_MEMBER(get_tile_info) override;
 	virtual void bg_select_w(u8 data) override;
 
-	virtual TIMER_CALLBACK_MEMBER(deferred_snd_cmd_w) override;
-	virtual void snd_cmd_w(u8 data) override;
+	TIMER_CALLBACK_MEMBER(deferred_snd_cmd_w);
+	void snd_cmd_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(pia_3_cb1_w);
 };
 
