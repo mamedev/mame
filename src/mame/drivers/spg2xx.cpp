@@ -196,21 +196,21 @@ READ8_MEMBER(spg2xx_game_state::i2c_r)
 READ16_MEMBER(spg2xx_game_state::rad_porta_r)
 {
 	uint16_t data = m_io_p1->read();
-	logerror("Port A Read: %04x\n", data);
+	logerror("%s: Port A Read: %04x\n", machine().describe_context(), data);
 	return data;
 }
 
 READ16_MEMBER(spg2xx_game_state::rad_portb_r)
 {
 	uint16_t data = m_io_p2->read();
-	logerror("Port B Read: %04x\n", data);
+	logerror("%s: Port B Read: %04x\n", machine().describe_context(), data);
 	return data;
 }
 
 READ16_MEMBER(spg2xx_game_state::rad_portc_r)
 {
 	uint16_t data = m_io_p3->read();
-	logerror("Port C Read: %04x\n", data);
+	logerror("%s: Port C Read: %04x\n", machine().describe_context(), data);
 	return data;
 }
 
@@ -463,6 +463,29 @@ static INPUT_PORTS_START( wiwi18 )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_CUSTOM ) // NTSC (1) / PAL (0) flag
 INPUT_PORTS_END
 
+
+
+static INPUT_PORTS_START( tvsprt10 )
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0180, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // Start
+	PORT_BIT( 0xfc00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( mattelcs ) // there is a 'secret test mode' that previously got activated before inputs were mapped, might need unused inputs to active?
 	PORT_START("P1")
 	PORT_BIT( 0x0007, IP_ACTIVE_LOW, IPT_UNUSED ) // must be IP_ACTIVE_LOW or you can't switch to Football properly?
@@ -712,6 +735,20 @@ void spg2xx_game_state::abltenni(machine_config &config)
 	m_maincpu->set_rowscroll_offset(8);
 }
 
+void spg2xx_game_state::tvsprt10(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_2m);
+	m_maincpu->set_force_no_drc(true); // uses JVS opcode, not implemented in recompiler
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_state::rad_porta_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_state::rad_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_state::rad_portc_r));
+}
+
+
 void spg2xx_game_state::rad_skatp(machine_config &config)
 {
 	rad_skat(config);
@@ -789,6 +826,11 @@ ROM_START( abltenni )
 	ROM_LOAD16_WORD_SWAP( "ablpnpwirelesstennis.bin", 0x000000, 0x400000, CRC(66bd8ef1) SHA1(a83640d5d9e84e10d29a065a61e0d7bbec16c6e4) )
 ROM_END
 
+ROM_START( tvsprt10 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "tvsports10in1.bin", 0x000000, 0x400000, CRC(98b79889) SHA1(b0ba534d59b794bb38c071c70ab5bcf711364e06) )
+ROM_END
+
 ROM_START( wiwi18 )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "26gl128.bin", 0x000000, 0x1000000, CRC(0b103ac9) SHA1(14434908f429942096fb8db5b5630603fd54fb2c) )
@@ -816,6 +858,23 @@ void spg2xx_game_state::init_wiwi18()
 	rom[0x1ca259] = 0xf165;
 }
 
+void spg2xx_game_state::init_tvsprt10()
+{
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
+	// hack 'MASK' check (some kind of EEPROM maybe?)
+	// this hack means the ROM CRC fails, but without it the CRC is OK, so dump is good.
+	/*
+	port b 0010 = chip select? / always set when accessing?
+		   0008 = write enable (set when writing, not when reading)
+		   0004 = chip select? / always set when accessing?
+		   0002 = clock? (toggles)
+		   0001 = data in / out
+	*/
+	rom[0x18c55d] ^= 0x0001;
+}
+
+
+
 // year, name, parent, compat, machine, input, class, init, company, fullname, flags
 
 // Radica TV games
@@ -826,7 +885,10 @@ CONS( 2007, rad_sktv,  0,        0, rad_sktv, rad_sktv,   spg2xx_game_state, ini
 CONS( 2007, rad_fb2,   0,        0, rad_skat, rad_fb2,    spg2xx_game_state, init_crc, "Radica", "Play TV Football 2",          MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // offers a 2 player option in menus, but seems to have only been programmed for, and released as, a single player unit, P2 controls appear unfinished.
 
 // ABL TV Games
-CONS( 2006, abltenni,    0,     0,        abltenni,       abltenni,    spg2xx_game_state, empty_init, "Advance Bright Ltd", "Wireless Tennis (WT2000, ABL TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, abltenni,    0,     0,        abltenni,       abltenni,    spg2xx_game_state, empty_init, "Advance Bright Ltd / V-Tac Technology Co Ltd.", "Wireless Tennis (WT2000, ABL TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// same as Excalibur Decathlon? not the same as the ABL game
+CONS( 2006, tvsprt10,    0,     0,        tvsprt10,       tvsprt10,    spg2xx_game_state, init_tvsprt10, "Simba / V-Tac Technology Co Ltd.", "TV Sports 10-in-1 / Decathlon Atlhetic Sport Games", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Mattel games
 CONS( 2005, mattelcs,  0,        0, rad_skat, mattelcs,   spg2xx_game_state, empty_init, "Mattel", "Mattel Classic Sports",     MACHINE_IMPERFECT_SOUND )

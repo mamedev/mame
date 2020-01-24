@@ -39,9 +39,11 @@ public:
 	void rad_crik(machine_config &config);
 	void non_spg_base(machine_config &config);
 	void abltenni(machine_config &config);
+	void tvsprt10(machine_config &config);
 
 	void init_crc();
 	void init_wiwi18();
+	void init_tvsprt10();
 
 protected:
 	virtual void machine_start() override;

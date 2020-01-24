@@ -12886,6 +12886,7 @@ rad_baskp
 rad_sinv
 rad_tetr
 airblsjs
+sudoelan
 
 @source:electra.cpp
 avenger                         // (c) 1975 Electra
@@ -31271,11 +31272,14 @@ vtpinball                       // From V.R. Technology VT SDK
 vtsndtest                       // From V.R. Technology VT SDK
 vtboxing                        // From V.R. Technology VT SDK
 ablpinb
+sudokuv
 mc_dgear
 dgun2500
 dgun2561
 lxcmcy
+lxcmc250
 lxcmcysw
+lxcmcyfz
 cybar120
 mc_dg101
 mc_aa2
@@ -31336,6 +31340,7 @@ miwi2_7
 intact89
 intg5410
 exsprt48
+exsprt48a
 wowwg
 
 @source:newbrain.cpp
@@ -33937,6 +33942,10 @@ sol20                           //
 
 @source:pturn.cpp
 pturn                           // (c) 1984 Jaleco
+
+@source:pubint_storyreader.cpp
+pi_stry
+pi_stry2
 
 @source:pubtimed.cpp
 pubtimed                        //
@@ -39836,6 +39845,7 @@ rad_crik                        //
 rad_fb2                         //
 mattelcs                        //
 abltenni                        //
+tvsprt10                        //
 wiwi18                          //
 
 @source:spg2xx_jakks.cpp
@@ -39882,6 +39892,8 @@ sencosmo
 
 @source:spg2xx_senario_poker.cpp
 sentx6p                         //
+sentx6puk
+sentx6pd
 
 @source:spg2xx_vii.cpp
 vii                             // KenSingTon / Jungle Soft / Siatronics Vii
