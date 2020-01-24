@@ -27,9 +27,9 @@ DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron_cpu", "Gigatron")
 
 #define gigatron_readop(A) m_program->read_byte(A)
 #define gigatron_readmem16(A) m_data->read_dword(A)
-#define gigatron_readmem8(A) m_data->read_byte(A)
+#define gigatron_readmem8(A) m_data->read_word(A)
 #define gigatron_writemem16(A,B) m_data->write_dword((A),B)
-#define gigatron_writemem8(A,B) m_data->write_byte((A),B)
+#define gigatron_writemem8(A,B) m_data->write_word((A),B)
 
 
 /***********************************
@@ -149,14 +149,13 @@ void gigatron_cpu_device::branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_
 void gigatron_cpu_device::aluOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d)
 {
 	uint8_t b = 0;
-	(void)b;
+	//(void)b;
 	switch(bus) {
 		case 0:
 			b = d;
 			break;
 		case 1:
-			uint16_t addr2 = addr(mode, d) & m_ramMask;
-			b = gigatron_readmem8(addr2);
+			b = gigatron_readmem8((uint16_t)(addr(mode, d) & m_ramMask));
 			break;
 		case 2:
 			b = m_ac;
