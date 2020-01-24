@@ -1,7 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, David Haywood
 
-/* 'Zone' systems */
+/* Senario 6 Player Poker systems
+
+TODO:
+improve controller hookup / simulation and remove PC-based hacks!
+
+*/
 
 #include "includes/spg2xx.h"
 #include "sentx6p.lh"
