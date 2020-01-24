@@ -56,7 +56,7 @@ void gigatron_cpu_device::execute_run()
 		uint8_t op = (opcode >> 13) & 0x0007;
 		uint8_t mode = (opcode >> 10) & 0x0007;
 		uint8_t bus = (opcode >> 8) & 0x0003;
-		uint8_t d = (opcode >> 0) & 0x00ff;
+		uint16_t d = (opcode >> 0) & 0x00ff;
 
 		switch( op)
 		{
@@ -146,7 +146,7 @@ void gigatron_cpu_device::branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_
 	}
 }
 
-void gigatron_cpu_device::aluOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d)
+void gigatron_cpu_device::aluOp(uint8_t op, uint8_t mode, uint8_t bus, uint16_t d)
 {
 	uint8_t b = 0;
 	//(void)b;
@@ -194,10 +194,18 @@ void gigatron_cpu_device::aluOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d
 		case 5:
 			m_y = b;
 			break;
+		case 6:
+		case 7:
+			uint16_t rising = ~(m_out & b);
+			if (rising & 0x40) {
+				m_outx = m_ac;
+			}
+			break;
+			
 	}
 }
 
-uint16_t gigatron_cpu_device::addr(uint8_t mode, uint8_t d)
+uint16_t gigatron_cpu_device::addr(uint8_t mode, uint16_t d)
 {
 	switch (mode) {
 		case 0:
@@ -219,7 +227,7 @@ uint16_t gigatron_cpu_device::addr(uint8_t mode, uint8_t d)
 	return 0;
 }
 
-uint8_t gigatron_cpu_device::offset(uint8_t bus, uint8_t d)
+uint8_t gigatron_cpu_device::offset(uint8_t bus, uint16_t d)
 {
 	switch (bus) {
 		case 0:
@@ -234,7 +242,7 @@ uint8_t gigatron_cpu_device::offset(uint8_t bus, uint8_t d)
 	return 0;
 }
 
-void gigatron_cpu_device::storeOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d)
+void gigatron_cpu_device::storeOp(uint8_t op, uint8_t mode, uint8_t bus, uint16_t d)
 {
 	uint8_t b = 0;
 	switch (bus) {
