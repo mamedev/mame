@@ -6,12 +6,21 @@
 
     as with most of the 'Modular System' setups, the hardware is heavily modified from the original
     and consists of a multi-board stack in a cage, hence different driver.
-	Update: it doesn't seem all that different than tokib, the differences are on paletteram, 
-	scrollram and (probably) spriteram;
+	Update: it doesn't seem all that different than tokib, the differences are:
+	* paletteram; 
+	* video registers;
+    * sprite chip interface (basically shifting all the ports, why even?);
+	* switching from YM3812 to a double YM2203 setup;
 
     TODO: 
 	- Subclass with tokib_state in toki.cpp driver;
-	- Sound needs improvements (meaning of port A/B of the two YMs, MSM playback, improve comms, ROM bank, other?);
+	- Sound needs improvements:
+		* meaning of port A/B of the two YMs;
+		* MSM playback;
+		* improve comms;
+		* ROM bank;
+		* One of the above for the scratchy sounds that happens from time to time;
+		* Mixing;
 	- Ranking screen has wrong colors, btanb?
 	- Slight sprite lag when game scrolls vertically, another btanb?
 	- "bajo licencia" -> "under license" ... from whoever developed Modular System or TAD itself?
@@ -323,6 +332,8 @@ private:
 	DECLARE_READ8_MEMBER(sound_status_r);
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(adpcm_w);
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	u8 m_adpcm_data;
 };
 
 TILE_GET_INFO_MEMBER(toki_ms_state::get_tile_info)
@@ -488,10 +499,11 @@ READ8_MEMBER(toki_ms_state::sound_status_r)
 	return 0;
 }
 
+// TODO: remove this trampoline after confirming it just writes to the sound latch
+// (definitely it isn't tied to irq 0)
 WRITE8_MEMBER(toki_ms_state::sound_command_w)
 {
 	m_soundlatch->write(data & 0xff);
-	m_audiocpu->set_input_line(0, HOLD_LINE);	
 }
 
 void toki_ms_state::tokims_map(address_map &map)
@@ -517,7 +529,7 @@ WRITE8_MEMBER(toki_ms_state::adpcm_w)
 //	membank("sound_bank")->set_entry(((data & 0x10) >> 4) ^ 1);
 	m_msm->reset_w(BIT(data, 4));
 	
-	// TODO: disabled cause it just farts
+	m_adpcm_data = data & 0xf;
 	//m_msm->write_data(data & 0xf);
 //	m_msm->vclk_w(BIT(data, 7));
 	//m_msm->vclk_w(1);
@@ -532,7 +544,8 @@ void toki_ms_state::audio_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("sound_bank");
 	map(0xc000, 0xc7ff).ram();
 	map(0xd000, 0xd7ff).ram();
-
+	// area 0xdff0-5 is never ever readback, applying a RAM mirror causes sound to go significantly worse,
+	// what they are even for?
 	map(0xdfff, 0xdfff).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xe000, 0xe001).w(m_ym1, FUNC(ym2203_device::write));
 	map(0xe002, 0xe003).w(m_ym2, FUNC(ym2203_device::write));
@@ -664,7 +677,11 @@ void toki_ms_state::machine_start()
 	membank("sound_bank")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x4000);
 }
 
-
+WRITE_LINE_MEMBER(toki_ms_state::adpcm_int)
+{
+	m_msm->write_data(m_adpcm_data);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
+}
 
 void toki_ms_state::tokims(machine_config &config)
 {
@@ -693,21 +710,22 @@ void toki_ms_state::tokims(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	YM2203(config, m_ym1, XTAL(4'000'000)/3); // unknown clock
+	YM2203(config, m_ym1, XTAL(4'000'000)/4); // unknown clock
 	m_ym1->add_route(0, "mono", 0.15);
 	m_ym1->add_route(1, "mono", 0.15);
 	m_ym1->add_route(2, "mono", 0.15);
 	m_ym1->add_route(3, "mono", 0.10);
 
-	YM2203(config, m_ym2, XTAL(4'000'000)/3); // unknown clock
+	YM2203(config, m_ym2, XTAL(4'000'000)/4); // unknown clock
 	m_ym2->add_route(0, "mono", 0.15);
 	m_ym2->add_route(1, "mono", 0.15);
 	m_ym2->add_route(2, "mono", 0.15);
 	m_ym2->add_route(3, "mono", 0.10);
 
 	MSM5205(config, m_msm, XTAL(384'000)); // unknown clock
-	m_msm->set_prescaler_selector(msm5205_device::SEX_4B);
-	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
+	m_msm->vck_legacy_callback().set(FUNC(toki_ms_state::adpcm_int));
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B); // unverified
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 
