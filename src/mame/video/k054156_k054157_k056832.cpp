@@ -479,7 +479,7 @@ void k056832_device::get_tile_info(  tile_data &tileinfo, int tile_index, int pa
 
 	const struct K056832_SHIFTMASKS *smptr;
 	int layer, flip, fbits, attr, code, color, flags;
-	int priority = 0
+	int priority = 0;
 	uint16_t *pMem;
 
 	pMem  = &m_videoram[(pageIndex << 12) + (tile_index << 1)];
