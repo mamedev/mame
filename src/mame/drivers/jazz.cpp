@@ -347,12 +347,10 @@ ROM_START(mmr4000le)
 	//ROM_LOAD64_BYTE("jazz_g300.bin", 0x00, 0x40, CRC(258eb00a) SHA1(6e3fd0272957524de82e7042d6e36aca492c4d26) BAD_DUMP)
 	// Jazz G364 (8.125MHz video clock)
 	//ROM_LOAD64_BYTE("jazz_g364.bin", 0x00, 0x40, CRC(6d1ee59f) SHA1(8ec928af5b72c52eae6a3e81942db7cfaf9b9c1d) BAD_DUMP)
-	// Jazz VXL
+	// Jazz VXL (aka Jaguar, part number 09-00184)
 	//ROM_LOAD64_BYTE("jazz_vxl.bin", 0x00, 0x40, CRC(df86e670) SHA1(2a9e8b1a42e4a29242131fa26c493f53eb866484) BAD_DUMP)
-	// MIPS Video G364 (5MHz video clock)
+	// MIPS Video G364 (5MHz video clock, part number 09-00176)
 	ROM_LOAD64_BYTE("mips_g364.bin", 0x00, 0x40, CRC(9265ccb6) SHA1(ef5c3a6bc5249274dd9c9a18d88a668cdd457370) BAD_DUMP)
-	// Maximum Jazz Video
-	//ROM_LOAD64_BYTE("jazz_max.bin", 0x00, 0x40, CRC(34ad0fd1) SHA1(5fef74f06d71b3e3a347aa43511d36dfb54dcdc1) BAD_DUMP)
 ROM_END
 
 /*   YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS       INIT         COMPANY  FULLNAME             FLAGS */
