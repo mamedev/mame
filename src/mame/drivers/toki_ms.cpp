@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, Angelo Salese
 
 /*
     Toki (Modular System)
@@ -10,7 +10,10 @@
 	scrollram and (probably) spriteram;
 
     TODO: 
-	- Merge with toki.cpp driver;
+	- Subclass with tokib_state in toki.cpp driver;
+	- Sound needs improvements (meaning of port A/B of the two YMs, MSM playback, improve comms, ROM bank, other?);
+	- Ranking screen has wrong colors, btanb?
+	- Slight sprite lag when game scrolls vertically, another btanb?
 	- "bajo licencia" -> "under license" ... from whoever developed Modular System or TAD itself?
 
     NOTES:
@@ -242,10 +245,15 @@ IC46->PAL16V8H 74LS393N 74LS368AP 74LS377B1|U||    |   |                        
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+#include "video/bufsprite.h"
+#include "sound/2203intf.h"
+#include "sound/msm5205.h"
 
 
 class toki_ms_state : public driver_device
@@ -254,13 +262,19 @@ public:
 	toki_ms_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_bk1vram(*this, "bk1vram")
 		, m_bk2vram(*this, "bk2vram")
 		, m_vram(*this, "vram")
+		, m_spriteram(*this, "spriteram")
 		, m_scrollram(*this, "scrollram")
+		, m_ym1(*this, "ym1")
+		, m_ym2(*this, "ym2")
+		, m_msm(*this, "msm5205")
+		, m_soundlatch(*this, "soundlatch")
 	{ }
 
 	void tokims(machine_config &config);
@@ -268,6 +282,7 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
@@ -275,7 +290,12 @@ private:
 	required_shared_ptr<u16> m_bk1vram;
 	required_shared_ptr<u16> m_bk2vram;
 	required_shared_ptr<u16> m_vram;
+	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<u16> m_scrollram;
+	required_device<ym2203_device> m_ym1;
+	required_device<ym2203_device> m_ym2;
+	required_device<msm5205_device> m_msm;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -283,6 +303,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bk1_info);
 	TILE_GET_INFO_MEMBER(get_bk2_info);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	DECLARE_WRITE16_MEMBER(bk1vram_w);
 	DECLARE_WRITE16_MEMBER(bk2vram_w);
 	DECLARE_WRITE16_MEMBER(vram_w);
@@ -297,8 +318,11 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void tokims_map(address_map &map);
+	void audio_map(address_map &map);
 	
-	DECLARE_READ16_MEMBER(sound_status_r);
+	DECLARE_READ8_MEMBER(sound_status_r);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(adpcm_w);
 };
 
 TILE_GET_INFO_MEMBER(toki_ms_state::get_tile_info)
@@ -335,6 +359,54 @@ TILE_GET_INFO_MEMBER(toki_ms_state::get_bk2_info)
 			0);
 }
 
+/*
+Copies from original location to an 8-bit RAM, split into two banks like paletteram.
+First entry are global flags (unchecked)
+Offsets are in 16-bit to make this less confusing
+[0x000] tttt tttt tttt tttt ---- ---- ---- ---- tile low offset
+		---- ---- ---- ---- yyyy yyyy yyyy yyyy Y offset
+[0x002] xxxx xxxx xxxx xxxx ---- ---- ---- ---- X offset
+		---- ---- ---- ---- ---- -f-- ---- ---- flip X
+		---- ---- ---- ---- ---- --t- ---- ---- tile banking
+		---- ---- ---- ---- ---- ---- tttt tttt tile upper offset
+[0x200] x--- ---- ---- ---- ---- ---- ---- ---- x wraparound
+		---- ---- ---- cccc ---- ---- ---- ---- color offset
+[0x202] ---- ---- ---- ---- ---- ---- ---- ---- <unused>
+*/
+void toki_ms_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
+{
+	int x,y,flipx,color;
+	u16 tile;
+	const int bank_size = m_spriteram->bytes() / 4;
+
+	for (int offs = bank_size-2; offs >= 2; offs -= 2)
+	{
+		u16 *lobank = &m_spriteram->buffer()[offs];
+		u16 *hibank = &m_spriteram->buffer()[offs+bank_size];
+
+		y = 240 - (lobank[0] & 0xff);
+		
+		x = lobank[1] >> 8;
+		if (!(hibank[0] & 0x8000))
+			x -= 256;
+		
+		flipx = (lobank[1] & 0x40);
+		
+		tile = (lobank[0] >> 8);
+		tile |= ((lobank[1] & 0x0f) << 8);
+		if (lobank[1] & 0x20)
+			tile |= 0x1000;
+		
+		color = (hibank[0] & 0x0f00) >> 8;
+
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+				tile,
+				color,
+				flipx,0,
+				x,y,15);
+	}
+}
+
 void toki_ms_state::video_start()
 {
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(toki_ms_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -354,9 +426,9 @@ uint32_t toki_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 {
 	bitmap.fill(m_palette->black_pen());
 	m_bk1_tilemap->set_scrollx(0, (0x33-m_scrollram[0]) & 0x1ff );
-	m_bk1_tilemap->set_scrolly(0, (m_scrollram[1]+1) & 0x1ff );
+	m_bk1_tilemap->set_scrolly(0, (511-m_scrollram[1]) & 0x1ff );
 	m_bk2_tilemap->set_scrollx(0, (0x31-m_scrollram[2]) & 0x1ff );
-	m_bk2_tilemap->set_scrolly(0, (m_scrollram[3]+1) & 0x1ff );
+	m_bk2_tilemap->set_scrolly(0, (511-m_scrollram[3]) & 0x1ff );
 
 	if (m_scrollram[4] & 1)
 	{
@@ -368,6 +440,7 @@ uint32_t toki_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		m_bk1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		m_bk2_tilemap->draw(screen, bitmap, cliprect, 0, 0);		
 	}
+	draw_sprites(bitmap, cliprect);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
@@ -409,9 +482,16 @@ WRITE8_MEMBER(toki_ms_state::palette_w)
 	m_palette->set_pen_color(pal_entry, pal4bit(r),pal4bit(g),pal4bit(b));
 }
 
-READ16_MEMBER(toki_ms_state::sound_status_r)
+READ8_MEMBER(toki_ms_state::sound_status_r)
 {
-	return 0xffff;
+	// if non-zero skips new command, either soundlatch readback or audiocpu handshake
+	return 0;
+}
+
+WRITE8_MEMBER(toki_ms_state::sound_command_w)
+{
+	m_soundlatch->write(data & 0xff);
+	m_audiocpu->set_input_line(0, HOLD_LINE);	
 }
 
 void toki_ms_state::tokims_map(address_map &map)
@@ -422,17 +502,46 @@ void toki_ms_state::tokims_map(address_map &map)
 	map(0x06f000, 0x06f7ff).ram().w(FUNC(toki_ms_state::bk2vram_w)).share("bk2vram");
 	map(0x06f800, 0x06ffff).ram().w(FUNC(toki_ms_state::vram_w)).share("vram");
 	map(0x070000, 0x0707ff).rw(FUNC(toki_ms_state::palette_r), FUNC(toki_ms_state::palette_w)).umask16(0xffff);
-	map(0x071000, 0x0713ff).ram(); // sprites
+	map(0x071000, 0x0713ff).ram().share("spriteram");
 	map(0x072000, 0x072001).nopr(); // irq ack?
 	map(0x073000, 0x07300f).ram().share("scrollram"); 
+	map(0x0a0000, 0x0a005f).nopw(); // scrollram left-over?
 	map(0x0c0000, 0x0c0001).portr("DSW");
 	map(0x0c0002, 0x0c0003).portr("INPUTS");
 	map(0x0c0004, 0x0c0005).portr("SYSTEM");
-	map(0x0c000e, 0x0c000f).r(FUNC(toki_ms_state::sound_status_r));
+	map(0x0c000e, 0x0c000f).rw(FUNC(toki_ms_state::sound_status_r), FUNC(toki_ms_state::sound_command_w)).umask16(0x00ff);
+}
+
+WRITE8_MEMBER(toki_ms_state::adpcm_w)
+{
+//	membank("sound_bank")->set_entry(((data & 0x10) >> 4) ^ 1);
+	m_msm->reset_w(BIT(data, 4));
+	
+	// TODO: disabled cause it just farts
+	//m_msm->write_data(data & 0xf);
+//	m_msm->vclk_w(BIT(data, 7));
+	//m_msm->vclk_w(1);
+	//m_msm->vclk_w(0);
+}
+
+
+void toki_ms_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8000).w(FUNC(toki_ms_state::adpcm_w));
+	map(0x8000, 0xbfff).bankr("sound_bank");
+	map(0xc000, 0xc7ff).ram();
+	map(0xd000, 0xd7ff).ram();
+
+	map(0xdfff, 0xdfff).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xe000, 0xe001).w(m_ym1, FUNC(ym2203_device::write));
+	map(0xe002, 0xe003).w(m_ym2, FUNC(ym2203_device::write));
+	map(0xe008, 0xe009).r(m_ym1, FUNC(ym2203_device::read));
+	map(0xe00a, 0xe00b).r(m_ym2, FUNC(ym2203_device::read));
 }
 
 static INPUT_PORTS_START( tokims )
-	// same as tokib
+	// TODO: same as tokib, subclass into tokib_io_device
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x001f, 0x001f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3,4,5")
 	PORT_DIPSETTING(      0x0015, DEF_STR( 6C_1C ) )
@@ -520,11 +629,12 @@ static const gfx_layout tiles16x16x4_layout =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 24,16,8,0 },
+	{ 0,8,16,24 },
 	{ 0,1,2,3,4,5,6,7, 512,513,514,515,516,517,518,519 },
 	{ STEP16(0,32) },
 	16 * 16 * 4
 };
+
 
 static const gfx_layout tokib_tilelayout =
 {
@@ -551,28 +661,53 @@ GFXDECODE_END
 
 void toki_ms_state::machine_start()
 {
+	membank("sound_bank")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x4000);
 }
+
 
 
 void toki_ms_state::tokims(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12_MHz_XTAL);
+	M68000(config, m_maincpu, 20_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &toki_ms_state::tokims_map);
 	m_maincpu->set_vblank_int("screen", FUNC(toki_ms_state::irq1_line_hold));
 
+	Z80(config, m_audiocpu, XTAL(4'000'000));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &toki_ms_state::audio_map);
+
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(12_MHz_XTAL / 2, 384, 0, 256, 272, 16, 240); // generic, not measured
+	m_screen->set_raw(20_MHz_XTAL / 3, 426, 0, 256, 272, 16, 240); // FIXME: generic, not measured
 	m_screen->set_screen_update(FUNC(toki_ms_state::screen_update));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 
 	PALETTE(config, m_palette).set_entries(0x400);
 	
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_toki_ms);
 
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
+	GENERIC_LATCH_8(config, m_soundlatch);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+	YM2203(config, m_ym1, XTAL(4'000'000)/3); // unknown clock
+	m_ym1->add_route(0, "mono", 0.15);
+	m_ym1->add_route(1, "mono", 0.15);
+	m_ym1->add_route(2, "mono", 0.15);
+	m_ym1->add_route(3, "mono", 0.10);
+
+	YM2203(config, m_ym2, XTAL(4'000'000)/3); // unknown clock
+	m_ym2->add_route(0, "mono", 0.15);
+	m_ym2->add_route(1, "mono", 0.15);
+	m_ym2->add_route(2, "mono", 0.15);
+	m_ym2->add_route(3, "mono", 0.10);
+
+	MSM5205(config, m_msm, XTAL(384'000)); // unknown clock
+	m_msm->set_prescaler_selector(msm5205_device::SEX_4B);
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 
@@ -594,7 +729,7 @@ ROM_START( tokims )
 	ROM_LOAD( "8_tk_827.ic24",     0x020000, 0x10000, CRC(d254ae6c) SHA1(cdbdd7d7c6cd4de8b8a0f54e1543caba5f3d11cb) )
 	ROM_LOAD( "8_tk_828.ic31",     0x030000, 0x10000, CRC(a6fae34b) SHA1(d9a276d30bdcc25d9cd299c2502cf910273890f6) )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASEFF ) // sprites (same rom subboard type as galpanic_ms.cpp)
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASEFF | ROMREGION_INVERT ) // sprites (same rom subboard type as galpanic_ms.cpp)
 	ROM_LOAD32_BYTE( "5_tk_501.ic3",         0x000003, 0x010000, CRC(c3cd26b6) SHA1(20d5a68eada4150642365dd61c699b7771de5372) )
 	ROM_LOAD32_BYTE( "5_tk_505.ic12",        0x000002, 0x010000, CRC(ec096351) SHA1(10417266c2280b2d9c301423d8c41ed73d9654c9) )
 	ROM_LOAD32_BYTE( "5_tk_509.ic18",        0x000001, 0x010000, CRC(a1a4ef7b) SHA1(92aad84f14f8257477920012bd1fe033ec96301b) )
@@ -648,11 +783,11 @@ ROM_START( tokims )
 	ROM_LOAD( "7_7640_gal20v8-20hb1.ic44", 0, 1, NO_DUMP )
 	ROM_LOAD( "51_503_palce16v8h-25pc.ic46", 0, 1, NO_DUMP )
 
-	ROM_REGION( 0x100, "proms", ROMREGION_ERASEFF )
-	ROM_LOAD( "1_10110_82s123.ic20",  0x0000, 0x020, CRC(e26e680a) SHA1(9bbe30e98e952a6113c64e1171330153ddf22ce7) )
+	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 )
 	ROM_LOAD( "51_502_82s129an.ic10", 0x0000, 0x100, CRC(15085e44) SHA1(646e7100fcb112594023cf02be036bd3d42cc13c) ) // same as every other modular bootleg
-	ROM_LOAD( "21_201_82s129.ic4",    0x0000, 0x100, CRC(2697da58) SHA1(e62516b886ff6e204b718e5f0c6ce2712e4b7fc5) )
-	ROM_LOAD( "21_202_82s129.ic12",   0x0000, 0x100, CRC(e434128a) SHA1(ef0f6d8daef8b25211095577a182cdf120a272c1) )
+	ROM_LOAD( "21_201_82s129.ic4",    0x0100, 0x100, CRC(2697da58) SHA1(e62516b886ff6e204b718e5f0c6ce2712e4b7fc5) )
+	ROM_LOAD( "21_202_82s129.ic12",   0x0200, 0x100, CRC(e434128a) SHA1(ef0f6d8daef8b25211095577a182cdf120a272c1) )
+	ROM_LOAD( "1_10110_82s123.ic20",  0x0300, 0x020, CRC(e26e680a) SHA1(9bbe30e98e952a6113c64e1171330153ddf22ce7) )
 ROM_END
 
 void toki_ms_state::init_tokims()
@@ -691,4 +826,4 @@ void toki_ms_state::init_tokims()
 	}
 }
 
-GAME( 1991, tokims,  toki,  tokims,  tokims,  toki_ms_state, init_tokims, ROT0, "bootleg", "Toki (Modular System)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1991, tokims,  toki,  tokims,  tokims,  toki_ms_state, init_tokims, ROT0, "bootleg", "Toki (Modular System)", MACHINE_IMPERFECT_SOUND )
