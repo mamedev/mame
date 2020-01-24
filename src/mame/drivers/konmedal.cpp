@@ -43,7 +43,6 @@ Konami PWB 402218 boards
  Notes and TODOs:
  - Priorities not understood and wrong in places of GX-based games, apparently controlled by PROM
  - Column scroll not correct in TMNT-based games
- - Screen size not correct in TMNT-based games
 
 ***************************************************************************/
 
@@ -817,7 +816,7 @@ void konmedal_state::shuriboy(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(30));
 	screen.set_size(64*8, 32*8);
-	screen.set_visarea(96, 416-1, 16, 240-1);
+	screen.set_visarea(112, 400-1, 16, 240-1);
 	screen.set_screen_update(FUNC(konmedal_state::screen_update_shuriboy));
 	screen.set_palette(m_palette);
 
@@ -874,6 +873,7 @@ void konmedal_state::shuriboy_nvram_init(nvram_device &nvram, void *base, size_t
 	ram[0x52] = 0x80;
 	ram[0x53] = 0x55;
 	ram[0x54] = 0xaa;
+	ram[0x5d] = 0x33;
 }
 
 void konmedal_state::fuusenpn_nvram_init(nvram_device &nvram, void *base, size_t size)
@@ -1053,15 +1053,15 @@ ROM_START( mariorou )
 	ROM_LOAD( "111_a10.3e.82s129", 0x000300, 0x000100, CRC(07ffc2ed) SHA1(37955d1788a86b90439233bb098c59b191056f68) )
 ROM_END
 
-// Konami PWB 452093A boards
+// Konami PWB 452093A boards (TMNT tilemaps)
 GAME( 1991, mariorou, 0,     mariorou, mario,    konmedal_state, mario_init,   ROT0, "Konami", "Mario Roulette", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 GAME( 1993, shuriboy, 0,     shuriboy, shuriboy, konmedal_state, shuri_init,   ROT0, "Konami", "Shuriken Boy", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 GAME( 1993, fuusenpn, 0,     fuusenpn, fuusenpn, konmedal_state, fuusen_init,  ROT0, "Konami", "Fuusen Pentai", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
-// Konami PWB 452574A boards
+// Konami PWB 452574A boards (GX tilemaps)
 GAME( 1994, buttobi,  0,     ddboy,    ddboy,    konmedal_state, buttobi_init, ROT0, "Konami", "Buttobi Striker", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 GAME( 1994, ddboy,    0,     ddboy,    ddboy,    konmedal_state, ddboy_init,   ROT0, "Konami", "Dam Dam Boy (on dedicated PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
-// Konami PWB 402218 boards
+// Konami PWB 402218 boards (GX tilemaps)
 GAME( 1994, ddboya,   ddboy, tsukande, ddboy,    konmedal_state, ddboy_init,   ROT0, "Konami", "Dam Dam Boy (on Tsukande Toru Chicchi PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 GAME( 1995, tsukande, 0,     tsukande, konmedal, konmedal_state, tsuka_init,   ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
