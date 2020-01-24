@@ -593,4 +593,4 @@ CONS( 2004, rad_tetr, 0, 0, elan_eu3a05, rad_tetr, elan_eu3a05_state, empty_init
 // ROM contains the string "Credit:XiAn Hummer Software Studio(CHINA) Tel:86-29-84270600 Email:HummerSoft@126.com"  PCB has datecode of "050423" (23rd April 2005)
 CONS( 2005, airblsjs, 0, 0, airblsjs, airblsjs, elan_eu3a05_state, empty_init, "Advance Bright Ltd", "Air-Blaster Joystick (AB1500, PAL)", MACHINE_NOT_WORKING )
 
-CONS( 200?, sudoelan, 0,        0, elan_sudoku,  sudoku,   elan_eu3a05_state, empty_init,  "Senario / All in 1 Products Ltd",  "Ultimate Sudoku TV Edition 3-in-1", MACHINE_NOT_WORKING )
+CONS( 2006, sudoelan, 0,        0, elan_sudoku,  sudoku,   elan_eu3a05_state, empty_init,  "Senario / All in 1 Products Ltd",  "Ultimate Sudoku TV Edition 3-in-1", MACHINE_NOT_WORKING )

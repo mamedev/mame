@@ -441,6 +441,7 @@ protected:
 private:
 	DECLARE_READ8_MEMBER(in0_r);
 	DECLARE_READ8_MEMBER(in1_r);
+	DECLARE_WRITE8_MEMBER(in0_w);
 
 	void nes_vt_sudoku_map(address_map& map);
 
@@ -1547,6 +1548,10 @@ READ8_MEMBER(nes_vt_sudoku_state::in1_r)
 	return machine().rand();
 }
 
+WRITE8_MEMBER(nes_vt_sudoku_state::in0_w)
+{
+}
+
 void nes_vt_state::nes_vt_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
@@ -1593,7 +1598,7 @@ void nes_vt_sudoku_state::nes_vt_sudoku_map(address_map& map)
 	nes_vt_map(map);
 
 	// override the inputs as specific non-standard 'controller' behavior is needed here and adding it to the generic NES controller bus wouldn't make sense.
-	map(0x4016, 0x4016).r(FUNC(nes_vt_sudoku_state::in0_r));
+	map(0x4016, 0x4016).rw(FUNC(nes_vt_sudoku_state::in0_r),FUNC(nes_vt_sudoku_state::in0_w));
 	map(0x4017, 0x4017).r(FUNC(nes_vt_sudoku_state::in1_r));
 }
 
@@ -2100,11 +2105,6 @@ ROM_START( vtboxing )
 	ROM_LOAD( "rom.bin", 0x00000, 0x80000, CRC(c115b1af) SHA1(82106e1c11c3279c5d8731c112f713fa3f290125) )
 ROM_END
 
-
-/* 
-Black pad marked 'SUDOKU' with tails on the S and U characters looping over the logo
-Has 2 sets of 4 buttons in circular 'direction pad' layouts (on the left for directions, on the right for functions) and 9 red numbered buttons with red power LED on left of them, and reset button on right
-*/
 ROM_START( sudokuv )
 	ROM_REGION( 0x80000, "mainrom", 0 )
 	ROM_LOAD( "sudoku2.bin", 0x00000, 0x80000, CRC(d1ffcc1e) SHA1(2010e60933a08d0b9271ef37f338758aacba6d2d) )
@@ -2449,6 +2449,9 @@ CONS( 200?, vtboxing,     0,  0,  nes_vt, nes_vt, nes_vt_state, empty_init, "VRT
 // 050329 (29th March 2005) date on PCB
 CONS( 2005, ablpinb, 0,  0,  nes_vt_ablpinb,    ablpinb, nes_vt_ablpinb_state, empty_init, "Advance Bright Ltd", "Pinball (P8002, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
+ 
+// Black pad marked 'SUDOKU' with tails on the S and U characters looping over the logo
+// Has 2 sets of 4 buttons in circular 'direction pad' layouts (on the left for directions, on the right for functions) and 9 red numbered buttons with red power LED on left of them, and reset button on right
 CONS( 200?, sudokuv,     0,  0,  nes_vt_sudoku, sudoku, nes_vt_sudoku_state, init_sudoku, "<unknown>", "Plug and Play Sudoku (VT based)", MACHINE_NOT_WORKING )
 
 
