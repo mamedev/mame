@@ -421,6 +421,34 @@ private:
 	required_ioport m_plunger;
 };
 
+class nes_vt_sudoku_state : public nes_vt_state
+{
+public:
+	nes_vt_sudoku_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_vt_state(mconfig, type, tag),
+		m_io0(*this,"IO0"),
+		m_io1(*this,"IO1")
+	{ }
+
+	void init_sudoku();
+
+	void nes_vt_sudoku(machine_config& config);
+
+protected:
+	//virtual void machine_start() override;
+	//virtual void machine_reset() override;
+
+private:
+	DECLARE_READ8_MEMBER(in0_r);
+	DECLARE_READ8_MEMBER(in1_r);
+	DECLARE_WRITE8_MEMBER(in0_w);
+
+	void nes_vt_sudoku_map(address_map& map);
+
+	required_ioport m_io0;
+	required_ioport m_io1;
+};
+
 
 
 
@@ -1510,6 +1538,19 @@ WRITE8_MEMBER(nes_vt_ablpinb_state::ablpinb_in0_w)
 	logerror("ablpinb_in0_w %02x\n", data);
 }
 
+READ8_MEMBER(nes_vt_sudoku_state::in0_r)
+{
+	return machine().rand();
+}
+
+READ8_MEMBER(nes_vt_sudoku_state::in1_r)
+{
+	return machine().rand();
+}
+
+WRITE8_MEMBER(nes_vt_sudoku_state::in0_w)
+{
+}
 
 void nes_vt_state::nes_vt_map(address_map &map)
 {
@@ -1550,6 +1591,15 @@ void nes_vt_ablpinb_state::nes_vt_ablpinb_map(address_map& map)
 	// override the inputs as specific non-standard 'controller' behavior is needed here and adding it to the generic NES controller bus wouldn't make sense.
 	map(0x4016, 0x4016).rw(FUNC(nes_vt_ablpinb_state::ablpinb_in0_r), FUNC(nes_vt_ablpinb_state::ablpinb_in0_w));
 	map(0x4017, 0x4017).r(FUNC(nes_vt_ablpinb_state::ablpinb_in1_r));
+}
+
+void nes_vt_sudoku_state::nes_vt_sudoku_map(address_map& map)
+{
+	nes_vt_map(map);
+
+	// override the inputs as specific non-standard 'controller' behavior is needed here and adding it to the generic NES controller bus wouldn't make sense.
+	map(0x4016, 0x4016).rw(FUNC(nes_vt_sudoku_state::in0_r),FUNC(nes_vt_sudoku_state::in0_w));
+	map(0x4017, 0x4017).r(FUNC(nes_vt_sudoku_state::in1_r));
 }
 
 /* Some later VT models have more RAM */
@@ -1783,6 +1833,14 @@ void nes_vt_ablpinb_state::nes_vt_ablpinb(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_ablpinb_state::nes_vt_ablpinb_map);
 }
 
+void nes_vt_sudoku_state::nes_vt_sudoku(machine_config &config)
+{
+	nes_vt_base(config);
+
+	// override for controllers
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_sudoku_state::nes_vt_sudoku_map);
+}
+
 void nes_vt_state::nes_vt(machine_config &config)
 {
 	nes_vt_base(config);
@@ -1968,6 +2026,48 @@ static INPUT_PORTS_START( ablpinb )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("NUDGE" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sudoku )
+	PORT_START("IO0")
+	PORT_START("IO1")
+INPUT_PORTS_END
+
+void nes_vt_sudoku_state::init_sudoku()
+{
+	u8 *src = memregion("mainrom")->base();
+	int len = memregion("mainrom")->bytes();
+
+	std::vector<u8> buffer(len);
+	{
+		for (int i = 0; i < len; i += 8)
+		{
+			buffer[i+0] = src[i+5];
+			buffer[i+1] = src[i+4];
+			buffer[i+2] = src[i+7];
+			buffer[i+3] = src[i+6];
+			buffer[i+4] = src[i+1];
+			buffer[i+5] = src[i+0];
+			buffer[i+6] = src[i+3];
+			buffer[i+7] = src[i+2];
+		}
+
+		std::copy(buffer.begin(), buffer.end(), &src[0]);
+	}	
+
+	if (0)
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"decrypted_%s", machine().system().name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(src, len, 1, fp);
+			fclose(fp);
+		}
+	}
+}
+
+
 
 ROM_START( vdogdeme )
 	ROM_REGION( 0x100000, "mainrom", 0 )
@@ -1978,6 +2078,7 @@ ROM_START( vdogdemo )
 	ROM_REGION( 0x80000, "mainrom", 0 )
 	ROM_LOAD( "rom.bin", 0x00000, 0x80000, CRC(054af705) SHA1(e730aeaa94b9cc28aa8b512a5bf411ec45226831) )
 ROM_END
+
 
 ROM_START( pinkjelly )
 	ROM_REGION( 0x200000, "mainrom", 0 )
@@ -2002,6 +2103,11 @@ ROM_END
 ROM_START( vtboxing )
 	ROM_REGION( 0x80000, "mainrom", 0 )
 	ROM_LOAD( "rom.bin", 0x00000, 0x80000, CRC(c115b1af) SHA1(82106e1c11c3279c5d8731c112f713fa3f290125) )
+ROM_END
+
+ROM_START( sudokuv )
+	ROM_REGION( 0x80000, "mainrom", 0 )
+	ROM_LOAD( "sudoku2.bin", 0x00000, 0x80000, CRC(d1ffcc1e) SHA1(2010e60933a08d0b9271ef37f338758aacba6d2d) )
 ROM_END
 
 ROM_START( mc_dgear )
@@ -2031,6 +2137,20 @@ ROM_START( lxcmcysw )
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "jl2365swr-1.u2", 0x00000, 0x4000000, CRC(60ece391) SHA1(655de6b36ba596d873de2839522b948ccf45e006) )
 ROM_END
+
+ROM_START( lxcmcyfz )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	// sub-board was marked for 2GB capacity (A0-A26 address lines), but only address lines A0-A24 are connected to the chip
+	ROM_LOAD( "jl2365_frozen.u1", 0x00000, 0x4000000, CRC(64d4c708) SHA1(1bc2d161326ce3039ab9ba46ad62695060cfb2e1) )
+ROM_END
+
+ROM_START( lxcmc250 )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	// sub-board was marked for 2GB capacity (A0-A26 address lines), but only address lines A0-A24 are connected to the chip
+	ROM_LOAD( "cca250in1.u1", 0x00000, 0x4000000, CRC(6ccd6ad6) SHA1(fafed339097c3d1538faa306021a8373c1b799b3) )
+ROM_END
+
+
 
 ROM_START( cybar120 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
@@ -2329,6 +2449,11 @@ CONS( 200?, vtboxing,     0,  0,  nes_vt, nes_vt, nes_vt_state, empty_init, "VRT
 // 050329 (29th March 2005) date on PCB
 CONS( 2005, ablpinb, 0,  0,  nes_vt_ablpinb,    ablpinb, nes_vt_ablpinb_state, empty_init, "Advance Bright Ltd", "Pinball (P8002, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
+ 
+// Black pad marked 'SUDOKU' with tails on the S and U characters looping over the logo
+// Has 2 sets of 4 buttons in circular 'direction pad' layouts (on the left for directions, on the right for functions) and 9 red numbered buttons with red power LED on left of them, and reset button on right
+CONS( 200?, sudokuv,     0,  0,  nes_vt_sudoku, sudoku, nes_vt_sudoku_state, init_sudoku, "<unknown>", "Plug and Play Sudoku (VT based)", MACHINE_NOT_WORKING )
+
 
 // should be VT03 based
 // for testing 'Shark', 'Octopus', 'Harbor', and 'Earth Fighter' use the extended colour modes, other games just seem to use standard NES modes
@@ -2360,16 +2485,18 @@ CONS( 200?, dgun2500,  0,  0,  nes_vt_dg, nes_vt, nes_vt_dg_state, empty_init, "
 // don't even get to menu. very enhanced chipset, VT368/9?
 CONS( 2012, dgun2561,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "dreamGEAR", "dreamGEAR My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
 CONS( 200?, lxcmcy,    0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmc250,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
 CONS( 200?, lxcmcysw,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcyfz,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING )
 // Also Lexibook Compact Cyber Arcade - Disney Princesses
 //      Lexibook Compact Cyber Arcade - Cars
-//      Lexibook Compact Cyber Arcade - Frozen
 //      Lexibook Compact Cyber Arcade - Paw Patrol
 //      Lexibook Compact Cyber Arcade - Barbie
 //      Lexibook Compact Cyber Arcade - Finding Dory
 //      Lexibook Compact Cyber Arcade - Marvel Ultimate Spiderman
 //      Lexibook Compact Cyber Arcade - PJ Masks
 // more?
+
 
 
 // boots, same platform with scrambled opcodes as FC pocket
@@ -2383,6 +2510,8 @@ CONS( 2015, dgun2573,  0,  0,  nes_vt_fp, nes_vt, nes_vt_hh_state, empty_init, "
 // CPU die is marked 'VH2009' There's also a 62256 RAM chip on the PCB, some scrambled opcodes
 CONS( 200?, polmega,   0,  0,  nes_vt_vh2009,        nes_vt, nes_vt_vh2009_state, empty_init, "Polaroid", "Megamax GPD001SDG", MACHINE_NOT_WORKING )
 CONS( 200?, silv35,    0,  0,  nes_vt_vh2009,        nes_vt, nes_vt_vh2009_state, empty_init, "SilverLit", "35 in 1 Super Twins", MACHINE_NOT_WORKING )
+
+
 
 // same encryption as above, but seems like newer hardware (or the above aren't using most of the features)
 CONS( 200?, lpgm240,    0,  0,  nes_vt_vh2009,        nes_vt, nes_vt_vh2009_state, empty_init, "<unknown>", "Let's Play! Game Machine 240 in 1", MACHINE_NOT_WORKING ) // mini 'retro-arcade' style cabinet

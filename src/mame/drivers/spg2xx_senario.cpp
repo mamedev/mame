@@ -264,6 +264,12 @@ void spg2xx_senario_cosmo_state::sencosmo(machine_config& config)
 {
 	senbbs(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_senario_cosmo_state::mem_map_flash_bypass);
+	/* the game crashes if you get no matches after the 2nd spin on the 'Fashion Disaster' slot machine mini-game.
+	   this could be a real game bug (as to trigger it you'd have to make a poor choice not to hold any matches after the first spin)
+	   however with the recompiler execution of bad data causes MAME to immediately drop to commandline with no error message
+	   without recompiler the game just hangs */
+	m_maincpu->set_force_no_drc(true);
+
 }
 
 
