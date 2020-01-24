@@ -66,6 +66,7 @@ public:
 		, m_lpt(*this, "lpt")
 		, m_isp(*this, "isp")
 		, m_buzzer(*this, "buzzer")
+		, m_led(*this, "led0")
 	{
 	}
 
@@ -79,6 +80,8 @@ protected:
 
 	// machine config
 	void jazz(machine_config &config);
+
+	void led_w(u8 data);
 
 public:
 	void mmr4000be(machine_config &config);
@@ -109,9 +112,7 @@ protected:
 	required_device<i82357_device> m_isp;
 	required_device<speaker_sound_device> m_buzzer;
 
-private:
-	// machine state
-	u8 m_led;
+	output_finder<> m_led;
 };
 
 #endif // MAME_INCLUDES_JAZZ_H

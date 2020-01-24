@@ -60,11 +60,14 @@
 
 #include "debugger.h"
 
+#include "jazz.lh"
+
 #define VERBOSE 0
 #include "logmacro.h"
 
 void jazz_state::machine_start()
 {
+	m_led.resolve();
 }
 
 void jazz_state::machine_reset()
@@ -124,13 +127,7 @@ void jazz_state::jazz_common_map(address_map &map)
 	//map(0x8000d000, 0x8000dfff).noprw(); // dummy dma device?
 	map(0x8000d600, 0x8000d607).nopw();
 
-	map(0x8000f000, 0x8000f007).lrw8(
-			NAME([this] () { return m_led; }),
-			NAME([this] (u8 data)
-			{
-				logerror("led 0x%02x (%s)\n", data, machine().describe_context());
-				m_led = data;
-			})).umask64(0xff);
+	map(0x8000f000, 0x8000f007).w(FUNC(jazz_state::led_w)).umask64(0xff);
 
 	// lots of byte data written to 800
 	//map(0x800e0000, 0x800fffff).m() // dram config
@@ -312,6 +309,35 @@ void jazz_state::jazz(machine_config &config)
 	m_isp->out_spkr_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 
 	// TODO: 4 EISA slots
+
+	config.set_default_layout(layout_jazz);
+}
+
+void jazz_state::led_w(u8 data)
+{
+	// 7-segment diagnostic led
+	static u8 const patterns[16] =
+	{
+			  // test      output
+		0x3f, // mct-adr     0
+		0x06, // network     1
+		0x5b, // scsi        2
+		0x4f, // floppy      3
+		0x66, // isp/rtc     4
+		0x6d, // keyboard    5
+		0x7d, // serial      6
+		0x07, // nvram       7
+		0x7f, //             8?
+		0x6f, // video       9
+		0x77, // memory      A
+		0x40, //             -
+		0x39, // flash       C
+		0x00, //           (blank)
+		0x79, // cpu         E
+		0x71, //             F?
+	};
+
+	m_led = patterns[data & 0xf] | (BIT(data, 4) ? 0x80 : 0);
 }
 
 void jazz_state::mmr4000be(machine_config &config)
