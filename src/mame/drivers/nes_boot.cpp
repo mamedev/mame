@@ -114,4 +114,4 @@ void nes_boot_state::init_nes_boot()
 {
 }
 
-GAME( 200?, pjoypj001, 0,        nes_boot, nes_boot, nes_boot_state, init_nes_boot, ROT0, "<unknown>", "PowerJoy (PJ001, NES based plug & play)", 0 )
+CONS( 200?, pjoypj001, 0, 0, nes_boot, nes_boot, nes_boot_state, init_nes_boot, "Trump Grand", "PowerJoy (PJ001, NES based plug & play)", 0 )
