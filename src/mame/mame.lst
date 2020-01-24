@@ -31268,6 +31268,7 @@ vtpinball                       // From V.R. Technology VT SDK
 vtsndtest                       // From V.R. Technology VT SDK
 vtboxing                        // From V.R. Technology VT SDK
 ablpinb
+sudokuv
 mc_dgear
 dgun2500
 dgun2561
@@ -33936,6 +33937,9 @@ sol20                           //
 
 @source:pturn.cpp
 pturn                           // (c) 1984 Jaleco
+
+@source:pubint_storyreader.cpp
+pi_stry
 
 @source:pubtimed.cpp
 pubtimed                        //
