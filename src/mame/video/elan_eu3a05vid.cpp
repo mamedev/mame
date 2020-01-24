@@ -8,12 +8,15 @@ DEFINE_DEVICE_TYPE(ELAN_EU3A05_VID, elan_eu3a05vid_device, "elan_eu3a05vid", "El
 
 // tilemaps start at 0x0600 in mainram, sprites at 0x3e00, unlike eu3a14 these could be fixed addresses
 
-elan_eu3a05vid_device::elan_eu3a05vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: elan_eu3a05commonvid_device(mconfig, ELAN_EU3A05_VID, tag, owner, clock),
+elan_eu3a05vid_device::elan_eu3a05vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	elan_eu3a05commonvid_device(mconfig, ELAN_EU3A05_VID, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_bank(*this, finder_base::DUMMY_TAG),
-	m_space_config("regs", ENDIANNESS_NATIVE, 8, 5, 0, address_map_constructor(FUNC(elan_eu3a05vid_device::map), this))
+	m_space_config("regs", ENDIANNESS_NATIVE, 8, 5, 0, address_map_constructor(FUNC(elan_eu3a05vid_device::map), this)),
+	m_bytes_per_tile_entry(4),
+	m_vrambase(0x600),
+	m_spritebase(0x3e00)
 {
 }
 
@@ -72,12 +75,20 @@ void elan_eu3a05vid_device::device_reset()
 
 	for (int i=0;i<2;i++)
 		m_splitpos[i] = 0x00;
+
+}
+
+void elan_eu3a05vid_device::set_is_sudoku()
+{
+	m_bytes_per_tile_entry = 2;
+	m_vrambase = 0x200;
+	m_spritebase = 0x1000;
 }
 
 uint8_t elan_eu3a05vid_device::read_spriteram(int offset)
 {
 	address_space& cpuspace = m_cpu->space(AS_PROGRAM);
-	int realoffset = offset+0x3e00;
+	int realoffset = offset+m_spritebase;
 	if (realoffset < 0x4000)
 	{
 		return cpuspace.read_byte(realoffset);
@@ -90,7 +101,7 @@ uint8_t elan_eu3a05vid_device::read_spriteram(int offset)
 uint8_t elan_eu3a05vid_device::read_vram(int offset)
 {
 	address_space& cpuspace = m_cpu->space(AS_PROGRAM);
-	int realoffset = offset+0x0600;
+	int realoffset = offset+m_vrambase;
 	if (realoffset < 0x4000)
 	{
 		return cpuspace.read_byte(realoffset);
@@ -259,12 +270,20 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 // a hacky mess for now
 bool elan_eu3a05vid_device::get_tile_data(int base, int drawpri, int& tile, int &attr, int &unk2)
 {
-	tile = read_vram(base * 4) + (read_vram((base * 4) + 1) << 8);
+	tile = read_vram(base * m_bytes_per_tile_entry) + (read_vram((base * m_bytes_per_tile_entry) + 1) << 8);
 
 	// these seem to be the basically the same as attr/unk2 in the sprites, which also make
 	// very little sense.
-	attr = read_vram((base * 4) + 2);
-	unk2 = read_vram((base * 4) + 3);
+	if (m_bytes_per_tile_entry == 4)
+	{
+		attr = read_vram((base * m_bytes_per_tile_entry) + 2);
+		unk2 = read_vram((base * m_bytes_per_tile_entry) + 3);
+	}
+	else
+	{
+		attr = 0;
+		unk2 = 0;
+	}
 
 	/* hack for phoenix title screens.. the have attr set to 0x3f which change the colour bank in ways we don't want
 	   and also by our interpretation of 0x0f bits sets the tiles to priority over sprites (although in this case
