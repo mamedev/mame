@@ -78,7 +78,7 @@ void gigatron_cpu_device::execute_run()
 				gigatron_illegal();
 				break;
 		}
-		m_icount++;
+		m_icount--;
 	} while( m_icount > 0 );
 }
 
@@ -109,7 +109,7 @@ void gigatron_cpu_device::init()
 void gigatron_cpu_device::branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d)
 {
 	const uint8_t ZERO = 0x80;
-	uint8_t c = 0;
+	bool c = false;
 	uint8_t ac2 = m_ac ^ ZERO;
 	uint16_t base = m_pc & 0xff00;
 	switch (mode) {
@@ -243,7 +243,7 @@ void gigatron_cpu_device::storeOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t
 			break;
 		case 1:
 			b = 0;
-			logerror("UNDEFINED BEHAVIOR! %b", m_pc);
+			logerror("UNDEFINED BEHAVIOR! 0x%04x\n", m_pc);
 			break;
 		case 2:
 			b = m_ac;
