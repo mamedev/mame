@@ -699,6 +699,7 @@ psion5.cpp
 psx.cpp
 pt68k4.cpp
 ptcsol.cpp
+pubint_storyreader.cpp
 pulsar.cpp
 pv1000.cpp
 pv2000.cpp
