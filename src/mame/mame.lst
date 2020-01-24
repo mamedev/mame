@@ -33941,6 +33941,7 @@ pturn                           // (c) 1984 Jaleco
 
 @source:pubint_storyreader.cpp
 pi_stry
+pi_stry2
 
 @source:pubtimed.cpp
 pubtimed                        //
