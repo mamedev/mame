@@ -31272,6 +31272,7 @@ dgun2500
 dgun2561
 lxcmcy
 lxcmcysw
+lxcmcyfz
 cybar120
 mc_dg101
 mc_aa2
@@ -39832,6 +39833,7 @@ rad_crik                        //
 rad_fb2                         //
 mattelcs                        //
 abltenni                        //
+tvsprt10                        //
 wiwi18                          //
 
 @source:spg2xx_jakks.cpp
