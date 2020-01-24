@@ -87,6 +87,9 @@ protected:
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
+	// device_state_interface overrides
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
 private:
 	enum class cycle {
 		IFETCH_M1, LEA_M2, RDEA_M3,

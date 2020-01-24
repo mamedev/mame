@@ -577,6 +577,7 @@ nanos.cpp
 nascom1.cpp
 nc.cpp
 ncd68k.cpp
+ncd88k.cpp
 ncdmips.cpp
 ncdppc.cpp
 nds.cpp

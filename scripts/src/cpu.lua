@@ -3098,5 +3098,21 @@ end
 if (CPUS["RX01"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/rx01/rx01dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/rx01/rx01dasm.h")
+end
 
+--------------------------------------------------
+-- Motorola M88000
+--@src/devices/cpu/m88000/m88000.h,CPUS["M88000"] = true
+--------------------------------------------------
+
+if (CPUS["M88000"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/m88000/m88000.cpp",
+		MAME_DIR .. "src/devices/cpu/m88000/m88000.h",
+	}
+end
+
+if (CPUS["M88000"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m88000/m88000d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m88000/m88000d.h")
 end
