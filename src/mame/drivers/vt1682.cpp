@@ -111,13 +111,13 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_fullrom(*this, "fullrom"),
 		m_bank(*this, "cartbank"),
+		m_screen(*this, "screen"),
 		m_soundcpu(*this, "soundcpu"),
 		m_maincpu_alu(*this, "mainalu"),
 		m_soundcpu_alu(*this, "soundalu"),
 		m_soundcpu_timer_a_dev(*this, "snd_timera_dev"),
 		m_soundcpu_timer_b_dev(*this, "snd_timerb_dev"),
 		m_system_timer_dev(*this, "sys_timer_dev"),
-		m_screen(*this, "screen"),
 		m_spriteram(*this, "spriteram"),
 		m_vram(*this, "vram"),
 		m_sound_share(*this, "sound_share"),
@@ -144,6 +144,8 @@ protected:
 
 	required_device<address_map_bank_device> m_fullrom;
 	required_memory_bank m_bank;
+	required_device<screen_device> m_screen;
+
 private:
 	required_device<cpu_device> m_soundcpu;
 	required_device<vrt_vt1682_alu_device> m_maincpu_alu;
@@ -153,7 +155,6 @@ private:
 	required_device<vrt_vt1682_timer_device> m_soundcpu_timer_b_dev;
 	required_device<vrt_vt1682_timer_device> m_system_timer_dev;
 
-	required_device<screen_device> m_screen;
 	required_device<address_map_bank_device> m_spriteram;
 	required_device<address_map_bank_device> m_vram;
 	required_shared_ptr<uint8_t> m_sound_share;
@@ -664,6 +665,7 @@ public:
 	{ }
 
 	void vt1682_exsport(machine_config& config);
+	void vt1682_exsportp(machine_config& config);
 
 	virtual DECLARE_READ8_MEMBER(uiob_r);
 	DECLARE_WRITE8_MEMBER(uiob_w);
@@ -5768,6 +5770,14 @@ void vt1682_exsport_state::vt1682_exsport(machine_config& config)
 	m_uio->portb_out().set(FUNC(vt1682_exsport_state::uiob_w));
 }
 
+void vt1682_exsport_state::vt1682_exsportp(machine_config& config)
+{
+	vt_vt1682_state::vt_vt1682(config);
+	// TODO, different clocks, timings etc.!
+	m_screen->set_refresh_hz(50);
+}
+
+
 
 void vt1682_wow_state::vt1682_wow(machine_config& config)
 {
@@ -5840,6 +5850,12 @@ ROM_START( exsprt48 )
 	ROM_LOAD( "excitesportgames_48.bin", 0x00000, 0x2000000, CRC(1bf239a0) SHA1(d69c16bac5fb15c62abb5a0c0920405647205539) ) // original dump had upper 2 address lines swapped, unmarked chip, so lines were guessed when dumping
 ROM_END
 
+// differs by 2 bytes from above, the rasters glitch in MotorStorm in a different way, so it's likely an NTSC/PAL difference?
+ROM_START( exsprt48a )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "48in1sports.bin", 0x00000, 0x2000000, CRC(8e490541) SHA1(aeb01b3d7229fc888b36aaa924fe6b10597a7783) )
+ROM_END
+
 ROM_START( wowwg )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "msp55lv128.bin", 0x00000, 0x1000000, CRC(f607c40c) SHA1(66d3960c3b8fbab06a88cf039419c79a6c8633f0) )
@@ -5885,8 +5901,11 @@ CONS( 200?, intg5410,  0,  0,  intech_interact_bank, miwi2, intec_interact_state
 
 // Other standalone Mi Kara units should fit here as well
 
-// European versions not verified as the same yet
-CONS( 200?, exsprt48,   0,  0,  vt1682_exsport,    exsprt48, vt1682_exsport_state, regular_init,  "Excite", "Excite Sports Wireless Interactive TV Game - 48-in-1 (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "32 Arcade, 8 Sports, 8 Stadium"
+
+// the timing code for MotorStorm differs between these sets (although fails wiht our emulation in both cases, even if the game runs fine in other collections)
+CONS( 200?, exsprt48,   0,         0,  vt1682_exsport,    exsprt48, vt1682_exsport_state, regular_init,  "Excite", "Excite Sports Wireless Interactive TV Game - 48-in-1 (set 1, NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "32 Arcade, 8 Sports, 8 Stadium"
+CONS( 200?, exsprt48a,  exsprt48,  0,  vt1682_exsportp,   exsprt48, vt1682_exsport_state, regular_init,  "Excite", "Excite Sports Wireless Interactive TV Game - 48-in-1 (set 2, PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // ^
+
 /*
 There is at least one alt US version of this also on VT1682
 
