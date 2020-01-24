@@ -25,11 +25,11 @@ DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron_cpu", "Gigatron")
 #endif
 
 
-#define gigatron_readop(A) m_program->read_byte(A)
+#define gigatron_readop(A) m_program->read_word(A)
 #define gigatron_readmem16(A) m_data->read_dword(A)
-#define gigatron_readmem8(A) m_data->read_word(A)
+#define gigatron_readmem8(A) m_data->read_byte(A)
 #define gigatron_writemem16(A,B) m_data->write_dword((A),B)
-#define gigatron_writemem8(A,B) m_data->write_word((A),B)
+#define gigatron_writemem8(A,B) m_data->write_byte((A),B)
 
 
 /***********************************
