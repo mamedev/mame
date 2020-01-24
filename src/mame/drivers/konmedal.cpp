@@ -3,33 +3,47 @@
 /***************************************************************************
 
  konmedal.cpp: Konami Z80 based medal games
+ Driver by R. Belmont, MetalliC
+
+Konami PWB 452093A boards
+
+ Mario Roulette
+ Shuriken Boy (しゅりけんボーイ)
+ Fuusen Pentai (ふうせんペン太)
+
+ Main CPU:  Z80
+ Sound: uPD7759C
+
+ Konami Custom chips:
+ K052109 (tilemaps)
+ K051962 (tilemaps)
+ K051649 (sound)
+
+Konami PWB 452574A boards
+
+ Dam Dam Boy (ダムダムボーイ)
+ Buttobi Striker (ぶっとびストライカー)
+
+ Main CPU:  Z80
+ Sound: OKIM6295
+
+ Konami Custom chips:
+ K053252 (timing/interrupt controller)
+ K054156 (tilemaps)
+ K054157 (tilemaps)
+ K051649 (sound)
+
+Konami PWB 402218 boards
 
  Tsukande Toru Chicchi (つかんでとるちっち)
- (c) 1995 Konami
+ Dam Dam Boy (ダムダムボーイ)
 
- Dam Dam Boy (ダムダム　ボーイ)
- (c) 1995 Konami
+ Mostly same as 452574A but sound chips replaced with YMZ280B
 
- Buttobi Striker
- (c) 1994 Konami
-
- Driver by R. Belmont
-
-Rundown of PCB:
-Main CPU:  Z80
-Sound: YMZ280B or OKIM6295
-
-Konami Custom chips:
-053252 (timing/interrupt controller?)
-054156 (tilemaps)
-054157 (tilemaps)
-
- Shuriken Boy
- Fuusen Pentai
-
-Konami Custom chips:
-K052109 (tilemaps)
-K051649 (sound)
+ Notes and TODOs:
+ - Priorities not understood and wrong in places of GX-based games, apparently controlled by PROM
+ - Column scroll not correct in TMNT-based games
+ - Screen size not correct in TMNT-based games
 
 ***************************************************************************/
 
@@ -64,7 +78,8 @@ public:
 		m_oki(*this, "oki"),
 		m_upd7759(*this, "upd"),
 		m_nvram(*this, "nvram"),
-		m_outport(*this, "OUT")
+		m_outport(*this, "OUT"),
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	void shuriboy(machine_config &config);
@@ -73,11 +88,15 @@ public:
 	void fuusenpn(machine_config &config);
 	void mariorou(machine_config &config);
 
-	void medal_init();
+	void ddboy_init();
 	void tsuka_init();
+	void buttobi_init();
 	void shuri_init();
+	void mario_init();
+	void fuusen_init();
 private:
 	void konmedal_palette(palette_device &palette) const;
+	void medal_nvram_init(nvram_device &nvram, void *base, size_t size);
 	void shuriboy_nvram_init(nvram_device &nvram, void *base, size_t size);
 	void fuusenpn_nvram_init(nvram_device &nvram, void *base, size_t size);
 	void mario_nvram_init(nvram_device &nvram, void *base, size_t size);
@@ -87,11 +106,11 @@ private:
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(control2_w);
+	DECLARE_WRITE8_MEMBER(medalcnt_w);
+	DECLARE_WRITE8_MEMBER(lamps_w);
 
 	uint32_t screen_update_konmedal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_shuriboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_fuusenpn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_mariorou(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	K056832_CB_MEMBER(tile_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(konmedal_scanline);
@@ -114,6 +133,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	void machine_start_common();
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<k056832_device> m_k056832;
@@ -125,22 +145,53 @@ private:
 	optional_device<upd7759_device> m_upd7759;
 	required_device<nvram_device> m_nvram;
 	required_ioport m_outport;
+	output_finder<8> m_lamps;
 
 	u8 m_control, m_control2, m_shuri_irq;
 	int m_ccu_int_time, m_ccu_int_time_count;
 	int m_avac;
 	int m_layer_colorbase[4];
+	int m_layer_order[4];
 };
 
 WRITE8_MEMBER(konmedal_state::control2_w)
 {
-	//printf("%02x to control2\n", data);
+/*  CN3
+	---- ---x uPD7759 /ST (TMNT-based boards)
+	---- --x- uPD7759 /RESET (TMNT-based boards)
+	---- -x-- 10Y Counter
+	---- x--- 100Y Counter
+	---x ---- 10Y Lock
+	--x- ---- 100Y Lock
+	-x-- ---- Hopper On
+	x--- ---- K056832 RAM/ROM access switch (GX-based boards)
+*/
 	m_control2 = data;
-
-	// note: this is needed because games clear reset line and assert start line at the same time, but MAME's outport can't handle right order
-	if (m_upd7759)
+	if (m_upd7759) 	// note: this is needed because games clear reset line and assert start line at the same time, but MAME's outport can't handle right order
 		m_upd7759->reset_w((data & 2) ? 1 : 0);
 	m_outport->write(data);
+	machine().bookkeeping().coin_counter_w(0, data & 4);
+	machine().bookkeeping().coin_counter_w(1, data & 8);
+	machine().bookkeeping().coin_lockout_w(0, (data & 0x10) ? 0 : 1);
+	machine().bookkeeping().coin_lockout_w(1, (data & 0x20) ? 0 : 1);
+}
+
+WRITE8_MEMBER(konmedal_state::medalcnt_w)
+{
+/*  CN5
+	---- ---x Medal counter +1 (medal in)
+	---- --x- Medal counter -1 (hopper out)
+	---- -x-- Medal Lock
+*/
+	machine().bookkeeping().coin_counter_w(2, data & 2);
+	machine().bookkeeping().coin_lockout_w(2, (data & 4) ? 0 : 1);
+}
+
+WRITE8_MEMBER(konmedal_state::lamps_w)
+{
+//	CN6
+	for (int i = 0; i < 8; i++)
+		m_lamps[i] = BIT(data, i);
 }
 
 READ8_MEMBER(konmedal_state::vram_r)
@@ -178,20 +229,43 @@ WRITE8_MEMBER(konmedal_state::vram_w)
 	m_k056832->ram_code_lo_w(offset>>1, data);
 }
 
-void konmedal_state::medal_init()
+void konmedal_state::ddboy_init()
 {
 	m_layer_colorbase[0] = 0;
 	m_layer_colorbase[1] = 8;
 	m_layer_colorbase[2] = 0;
 	m_layer_colorbase[3] = 8;
-}
 
+	// not 100% good, during gameplay should be 2 1 0 3, but this breaks title screen
+	m_layer_order[0] = 3;
+	m_layer_order[1] = 2;
+	m_layer_order[2] = 1;
+	m_layer_order[3] = 0;
+}
+void konmedal_state::buttobi_init()
+{
+	m_layer_colorbase[0] = 0;
+	m_layer_colorbase[1] = 8;
+	m_layer_colorbase[2] = 0;
+	m_layer_colorbase[3] = 8;
+
+	// not 100% good, in case of loss goalkeeper gfx sometimes became on top of player
+	m_layer_order[0] = 1;
+	m_layer_order[1] = 0;
+	m_layer_order[2] = 3;
+	m_layer_order[3] = 2;
+}
 void konmedal_state::tsuka_init()
 {
 	m_layer_colorbase[0] = 0;
 	m_layer_colorbase[1] = 8;
 	m_layer_colorbase[2] = 0;
 	m_layer_colorbase[3] = 0;
+
+	m_layer_order[0] = 3;
+	m_layer_order[1] = 1;
+	m_layer_order[2] = 0;
+	m_layer_order[3] = 2;
 }
 
 K056832_CB_MEMBER(konmedal_state::tile_callback)
@@ -207,8 +281,7 @@ K056832_CB_MEMBER(konmedal_state::tile_callback)
 
 	*code = bitswap<14>(*code, 8, 9, 13, 12, 11, 10, 7, 6, 5, 4, 3, 2, 1, 0);
 	*color = m_layer_colorbase[layer] + ((codebits >> 13) & 7);
-
-	// *priority = BIT(codebits, 12); // TODO per-tile priorities
+	*priority = BIT(codebits, 12);
 }
 
 void konmedal_state::video_start()
@@ -229,11 +302,9 @@ uint32_t konmedal_state::screen_update_konmedal(screen_device &screen, bitmap_in
 		m_k056832->mark_all_tilemaps_dirty();
 	}
 
-	// FIXME priorities all wrong
-	m_k056832->tilemap_draw(screen, bitmap, cliprect, 3, 0, 1);
-	m_k056832->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);
-	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, 0, 4);
-	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 8);
+	for (int p = 0; p < 2; p++)
+		for (int l = 0; l < 4; l++)
+			m_k056832->tilemap_draw(screen, bitmap, cliprect, m_layer_order[l], TILEMAP_DRAW_CATEGORY(p), 0);
 	return 0;
 }
 
@@ -241,38 +312,10 @@ uint32_t konmedal_state::screen_update_shuriboy(screen_device &screen, bitmap_in
 {
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
-
 	m_k052109->tilemap_update();
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 1);
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 2);
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 4);
-
-	return 0;
-}
-
-uint32_t konmedal_state::screen_update_fuusenpn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(0, cliprect);
-	screen.priority().fill(0, cliprect);
-
-	m_k052109->tilemap_update();
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 4);
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 2);
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 1);
-
-	return 0;
-}
-
-uint32_t konmedal_state::screen_update_mariorou(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(0, cliprect);
-	screen.priority().fill(0, cliprect);
-
-	m_k052109->tilemap_update();
-
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 1);
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 4);
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);
+	for (int p = 0; p < 2; p++)
+		for (int l = 0; l < 3; l++)
+			m_k052109->tilemap_draw(screen, bitmap, cliprect, m_layer_order[l], TILEMAP_DRAW_CATEGORY(p), 0);
 	return 0;
 }
 
@@ -324,6 +367,8 @@ void konmedal_state::medal_main(address_map &map)
 	map(0xa000, 0xbfff).ram().share("nvram"); // work RAM
 	map(0xc000, 0xc03f).w(FUNC(konmedal_state::k056832_w));
 	map(0xc100, 0xc100).w(FUNC(konmedal_state::control2_w));
+	map(0xc200, 0xc200).w(FUNC(konmedal_state::medalcnt_w));
+	map(0xc300, 0xc300).w(FUNC(konmedal_state::lamps_w));
 	map(0xc400, 0xc400).w(FUNC(konmedal_state::bankswitch_w));
 	map(0xc500, 0xc500).nopr(); // read to reset watchdog
 	map(0xc600, 0xc60f).w(FUNC(konmedal_state::k056832_b_w));
@@ -343,6 +388,8 @@ void konmedal_state::ddboy_main(address_map &map)
 	map(0xa000, 0xbfff).ram().share("nvram"); // work RAM
 	map(0xc000, 0xc03f).w(FUNC(konmedal_state::k056832_w));
 	map(0xc100, 0xc100).w(FUNC(konmedal_state::control2_w));
+	map(0xc200, 0xc200).w(FUNC(konmedal_state::medalcnt_w));
+	map(0xc300, 0xc300).w(FUNC(konmedal_state::lamps_w));
 	map(0xc400, 0xc400).w(FUNC(konmedal_state::bankswitch_w));
 	map(0xc500, 0xc500).nopr(); // read to reset watchdog
 	map(0xc600, 0xc60f).w(FUNC(konmedal_state::k056832_b_w));
@@ -366,9 +413,11 @@ void konmedal_state::shuriboy_main(address_map &map)
 	map(0x8802, 0x8802).portr("DSW1");
 	map(0x8803, 0x8803).portr("DSW2");
 	map(0x8900, 0x8900).w(FUNC(konmedal_state::control2_w));
+	map(0x8a00, 0x8a00).w(FUNC(konmedal_state::medalcnt_w));
 	map(0x8b00, 0x8b00).nopw();    // watchdog?
 	map(0x8c00, 0x8c00).w(FUNC(konmedal_state::shuri_bank_w));
 	map(0x8d00, 0x8d00).w(m_upd7759, FUNC(upd7759_device::port_w));
+	map(0x8e00, 0x8e00).w(FUNC(konmedal_state::lamps_w));
 	map(0x9000, 0x9000).nopw();     // writes alternating 00 and 3F
 	map(0x9800, 0x98ff).m("k051649", FUNC(k051649_device::scc_map));
 	map(0xa000, 0xbfff).bankr("bank1");
@@ -431,7 +480,7 @@ static INPUT_PORTS_START( konmedal )
 	PORT_DIPSETTING(    0x10, "24 sec" )
 	PORT_DIPSETTING(    0x20, "18 sec" )
 	PORT_DIPSETTING(    0x30, "12 sec" )
-	PORT_DIPNAME( 0x40, 0x00, "Backup Memory" )      PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, "Backup Memory" )      PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, "Keep" )
 	PORT_DIPSETTING(    0x00, "Clear" )
 	PORT_DIPNAME( 0x80, 0x00, "Demo Sound" )         PORT_DIPLOCATION("SW2:8")
@@ -441,19 +490,30 @@ static INPUT_PORTS_START( konmedal )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // medal
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Medal")
 	PORT_BIT( 0xd0, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test") PORT_CODE(KEYCODE_F2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) // 10Y
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) // 100Y for medals exchange, not game coin in to play
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused
 
 	PORT_START("OUT")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ddboy )
+	PORT_INCLUDE( konmedal )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x30, 0x00, "Play Timer" )         PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x00, "18 sec" )
+	PORT_DIPSETTING(    0x10, "15 sec" )
+	PORT_DIPSETTING(    0x20, "12 sec" )
+	PORT_DIPSETTING(    0x30, "10 sec" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( shuriboy )
@@ -467,14 +527,89 @@ static INPUT_PORTS_START( shuriboy )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("upd", upd7759_device, start_w)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( fuusenpn )
+	PORT_INCLUDE( shuriboy )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x07, 0x07, "Coin Slot 1" )   PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPSETTING(    0x00, "5 Coins/0 Credits" )
+	PORT_DIPSETTING(    0x01, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x04, "3 Coins/0 Credits" )
+	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mario )
+	PORT_INCLUDE( shuriboy )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x07, 0x07, "Coin Slot 1" )   PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPSETTING(    0x00, "5 Coins/2 Credits" )
+	PORT_DIPSETTING(    0x01, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x04, "3 Coins/0 Credits" )
+	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x38, 0x38, "Coin Slot 2" )   PORT_DIPLOCATION("SW1:4,5,6")
+	PORT_DIPSETTING(    0x00, "4 Medals" )
+	PORT_DIPSETTING(    0x08, "5 Medals" )
+	PORT_DIPSETTING(    0x10, "6 Medals" )
+	PORT_DIPSETTING(    0x18, "8 Medals" )
+	PORT_DIPSETTING(    0x20, "10 Medals" )
+	PORT_DIPSETTING(    0x28, "11 Medals" )
+	PORT_DIPSETTING(    0x30, "12 Medals" )
+	PORT_DIPSETTING(    0x38, "15 Medals" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x07, 0x00, "Standard of Payout" ) PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPSETTING(    0x00, "90%" )
+	PORT_DIPSETTING(    0x01, "80%" )
+	PORT_DIPSETTING(    0x02, "70%" )
+	PORT_DIPSETTING(    0x03, "60%" )
+	PORT_DIPSETTING(    0x04, "50%" )
+	PORT_DIPSETTING(    0x05, "40%" )
+	PORT_DIPSETTING(    0x06, "30%" )
+	PORT_DIPSETTING(    0x07, "20%" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x20, 0x20, "Play Timer" )         PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x00, "15 sec" )
+	PORT_DIPSETTING(    0x20, "20 sec" )
+INPUT_PORTS_END
+
+
+void konmedal_state::machine_start_common()
+{
+	m_lamps.resolve();
+	save_item(NAME(m_control));
+	save_item(NAME(m_control2));
+	save_item(NAME(m_shuri_irq));
+	save_item(NAME(m_ccu_int_time));
+	save_item(NAME(m_ccu_int_time_count));
+}
+
 void konmedal_state::machine_start()
 {
+	machine_start_common();
 	membank("bank1")->configure_entries(0, 0x10, memregion("maincpu")->base(), 0x2000);
 	membank("bank1")->set_entry(4);
 }
 
 MACHINE_START_MEMBER(konmedal_state, shuriboy)
 {
+	machine_start_common();
 	membank("bank1")->configure_entries(0, 0x8, memregion("maincpu")->base()+0x8000, 0x2000);
 	membank("bank1")->set_entry(0);
 }
@@ -484,6 +619,7 @@ void konmedal_state::machine_reset()
 	m_control = m_control2 = m_shuri_irq = 0;
 	m_ccu_int_time_count = 0;
 	m_ccu_int_time = 31;
+	m_avac = 0;
 }
 
 void konmedal_state::tsukande(machine_config &config)
@@ -494,13 +630,14 @@ void konmedal_state::tsukande(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal_state::konmedal_scanline), "screen", 0, 1);
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
+	m_nvram->set_custom_handler(FUNC(konmedal_state::medal_nvram_init));;
 	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	K053252(config, m_k053252, XTAL(14'318'181) / 2); // not verified
 	m_k053252->int1_ack().set(FUNC(konmedal_state::vbl_ack_w));
 	m_k053252->int2_ack().set(FUNC(konmedal_state::nmi_ack_w));
 	m_k053252->int_time().set(FUNC(konmedal_state::ccu_int_time_w));
-	m_k053252->set_offsets(32, 16);
+	m_k053252->set_offsets(32, 16); // not accurate
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -536,13 +673,14 @@ void konmedal_state::ddboy(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal_state::konmedal_scanline), "screen", 0, 1);
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
+	m_nvram->set_custom_handler(FUNC(konmedal_state::medal_nvram_init));;
 	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	K053252(config, m_k053252, XTAL(14'318'181) / 2); // not verified
 	m_k053252->int1_ack().set(FUNC(konmedal_state::vbl_ack_w));
 	m_k053252->int2_ack().set(FUNC(konmedal_state::nmi_ack_w));
 	m_k053252->int_time().set(FUNC(konmedal_state::ccu_int_time_w));
-	m_k053252->set_offsets(32, 16);
+	m_k053252->set_offsets(32, 16); // not accurate
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -587,6 +725,30 @@ void konmedal_state::shuri_init()
 	m_layer_colorbase[0] = 0;
 	m_layer_colorbase[1] = 8;
 	m_layer_colorbase[2] = 8;
+
+	m_layer_order[0] = 2;
+	m_layer_order[1] = 1;
+	m_layer_order[2] = 0;
+}
+void konmedal_state::fuusen_init()
+{
+	m_layer_colorbase[0] = 0;
+	m_layer_colorbase[1] = 8;
+	m_layer_colorbase[2] = 8;
+
+	m_layer_order[0] = 0;
+	m_layer_order[1] = 2;
+	m_layer_order[2] = 1;
+}
+void konmedal_state::mario_init()
+{
+	m_layer_colorbase[0] = 0;
+	m_layer_colorbase[1] = 8;
+	m_layer_colorbase[2] = 8;
+
+	m_layer_order[0] = 0;
+	m_layer_order[1] = 1;
+	m_layer_order[2] = 2;
 }
 
 K052109_CB_MEMBER(konmedal_state::shuriboy_tile_callback)
@@ -594,7 +756,7 @@ K052109_CB_MEMBER(konmedal_state::shuriboy_tile_callback)
 	*code |= ((*color & 0xc) << 6) | (bank << 10);
 	if (*color & 0x2) *code |= 0x1000;
 	*flags = (*color & 0x1) ? TILE_FLIPX : 0;
-	//*priority = BIT(*color, 4); // TODO
+	*priority = BIT(*color, 4);
 	*color = m_layer_colorbase[layer] + ((*color >> 5) & 7);
 }
 
@@ -681,38 +843,23 @@ void konmedal_state::shuriboy(machine_config &config)
 void konmedal_state::fuusenpn(machine_config &config)
 {
 	shuriboy(config);
-
 	m_nvram->set_custom_handler(FUNC(konmedal_state::fuusenpn_nvram_init));
-
-	screen_device &screen(SCREEN(config.replace(), "screen", SCREEN_TYPE_RASTER)); // everything not verified, just a placeholder
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(30));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(96, 416-1, 16, 240-1);
-	screen.set_screen_update(FUNC(konmedal_state::screen_update_fuusenpn));
-	screen.set_palette(m_palette);
-
-	m_k052109->set_tile_callback(FUNC(konmedal_state::shuriboy_tile_callback));
 }
 
 void konmedal_state::mariorou(machine_config &config)
 {
 	shuriboy(config);
-
 	m_nvram->set_custom_handler(FUNC(konmedal_state::mario_nvram_init));
-
-	screen_device &screen(SCREEN(config.replace(), "screen", SCREEN_TYPE_RASTER)); // everything not verified, just a placeholder
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(30));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(96, 416-1, 16, 240-1);
-	screen.set_screen_update(FUNC(konmedal_state::screen_update_mariorou));
-	screen.set_palette(m_palette);
-
-	m_k052109->set_tile_callback(FUNC(konmedal_state::shuriboy_tile_callback));
 }
 
-// required at 1st boot with "Backup Keep" DIPSW setting
+void konmedal_state::medal_nvram_init(nvram_device &nvram, void *base, size_t size)
+{
+	memset(base, 0x00, size);
+	u8 *ram = (u8*)base;
+	ram[0x303] = 0xff;
+	ram[0x309] = 0xaa;
+}
+
 void konmedal_state::shuriboy_nvram_init(nvram_device &nvram, void *base, size_t size)
 {
 	memset(base, 0x00, size);
@@ -906,13 +1053,15 @@ ROM_START( mariorou )
 	ROM_LOAD( "111_a10.3e.82s129", 0x000300, 0x000100, CRC(07ffc2ed) SHA1(37955d1788a86b90439233bb098c59b191056f68) )
 ROM_END
 
-// K052109 (TMNT tilemaps) board
-GAME( 1991, mariorou, 0,     mariorou, shuriboy, konmedal_state, shuri_init, ROT0, "Konami", "Mario Roulette", MACHINE_NOT_WORKING)
-GAME( 1993, shuriboy, 0,     shuriboy, shuriboy, konmedal_state, shuri_init, ROT0, "Konami", "Shuriken Boy", MACHINE_NOT_WORKING)
-GAME( 1993, fuusenpn, 0,     fuusenpn, shuriboy, konmedal_state, shuri_init, ROT0, "Konami", "Fuusen Pentai", MACHINE_NOT_WORKING)
+// Konami PWB 452093A boards
+GAME( 1991, mariorou, 0,     mariorou, mario,    konmedal_state, mario_init,   ROT0, "Konami", "Mario Roulette", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1993, shuriboy, 0,     shuriboy, shuriboy, konmedal_state, shuri_init,   ROT0, "Konami", "Shuriken Boy", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1993, fuusenpn, 0,     fuusenpn, fuusenpn, konmedal_state, fuusen_init,  ROT0, "Konami", "Fuusen Pentai", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
-// K054156/K054157 (GX tilemaps) board
-GAME( 1994, buttobi,  0,     ddboy,    konmedal, konmedal_state, medal_init, ROT0, "Konami", "Buttobi Striker", MACHINE_NOT_WORKING)
-GAME( 1995, tsukande, 0,     tsukande, konmedal, konmedal_state, tsuka_init, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)
-GAME( 1994, ddboy,    0,     ddboy,    konmedal, konmedal_state, medal_init, ROT0, "Konami", "Dam Dam Boy (on dedicated PCB)", MACHINE_NOT_WORKING)
-GAME( 1994, ddboya,   ddboy, tsukande, konmedal, konmedal_state, medal_init, ROT0, "Konami", "Dam Dam Boy (on Tsukande Toru Chicchi PCB)", MACHINE_NOT_WORKING)
+// Konami PWB 452574A boards
+GAME( 1994, buttobi,  0,     ddboy,    ddboy,    konmedal_state, buttobi_init, ROT0, "Konami", "Buttobi Striker", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1994, ddboy,    0,     ddboy,    ddboy,    konmedal_state, ddboy_init,   ROT0, "Konami", "Dam Dam Boy (on dedicated PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+
+// Konami PWB 402218 boards
+GAME( 1994, ddboya,   ddboy, tsukande, ddboy,    konmedal_state, ddboy_init,   ROT0, "Konami", "Dam Dam Boy (on Tsukande Toru Chicchi PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1995, tsukande, 0,     tsukande, konmedal, konmedal_state, tsuka_init,   ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
