@@ -218,11 +218,14 @@ void elan_eu3a05_state::elan_eu3a05_map(address_map &map)
 	//map(0xfffe, 0xffff).r(m_sys, FUNC(elan_eu3a05commonsys_device::irq_vector_r));  // allow normal IRQ for brk
 }
 
-// default e000 mapping is the same as eu3a14, other registers, seem closer to eua05, probably a different chip type
+// default e000 mapping is the same as eu3a14, other registers seem closer to eua05, probably a different chip type
 void elan_eu3a05_state::elan_sudoku_map(address_map& map)
 {
 	elan_eu3a05_map(map);
 	map(0xe000, 0xffff).rom().region("maincpu", 0x0000);
+	// not sure how these work, might be a modified 6502 core instead.
+	map(0xfffa, 0xfffb).r(m_sys, FUNC(elan_eu3a05commonsys_device::nmi_vector_r)); // custom vectors handled with NMI for now
+	//map(0xfffe, 0xffff).r(m_sys, FUNC(elan_eu3a05commonsys_device::irq_vector_r));  // allow normal IRQ for brk
 }
 
 
