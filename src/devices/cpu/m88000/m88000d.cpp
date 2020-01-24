@@ -1011,7 +1011,7 @@ offs_t m88000_disassembler::dasm_fp(std::ostream &stream, const char *mnemonic, 
 	if ((inst & 0xfc006000) == 0x84004000)
 	{
 		util::stream_format(stream, "%-12s%c%d,", mnemonic,
-							(inst & 0xfc007c00) == 0x84004200 ? 'x' : 'r',
+							/*(inst & 0xfc007c00) == 0x84004200 ? 'x' : */'r',
 							(inst & 0x03e00000) >> 21);
 	}
 	else
