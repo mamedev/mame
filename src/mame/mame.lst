@@ -12886,6 +12886,7 @@ rad_baskp
 rad_sinv
 rad_tetr
 airblsjs
+sudoelan
 
 @source:electra.cpp
 avenger                         // (c) 1975 Electra
