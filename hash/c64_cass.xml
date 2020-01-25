@@ -1389,6 +1389,24 @@
 		</part>
 	</software>
 
+	<software name="cfpp5">
+		<description>The CF Power Pack Tape 5</description>
+		<year>1991</year>
+		<publisher>Future Publishing</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1: Shockway Rider / Viz (Demo)"/>
+			<dataarea name="cass" size="954275">
+				<rom name="The CF Powerpack 5 Side 1.tap" size="954275" crc="c83b0f7a" sha1="2a9f63ba087f991d7eb739525d4d68784f4f6779"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2: Sun Star / Warlock (Demo)"/>
+			<dataarea name="cass" size="763444">
+				<rom name="The CF Powerpack 5 Side 2.tap" size="763444" crc="80af587a" sha1="8920fa414fdf2024aa965a90e3b656c23c4067c5"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chainreac">
 		<description>Chain Reaction</description>
 		<year>19??</year>
@@ -3922,13 +3940,24 @@
 	</software>
 
 	<software name="matchpnt">
-		<description>Match Point</description>
+		<description>Match Point (set 1)</description>
 		<year>1984</year>
 		<publisher>Psion</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="343643">
 				<rom name="Match_Point.tap" size="343643" crc="73ac1638" sha1="0323448e45573e700fe3426ff354bebc04556778"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matchpnt1" cloneof="matchpnt" >
+		<description>Match Point (set 2)</description>
+		<year>1984</year>
+		<publisher>The Hit Squad</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="412484">
+				<rom name="Match Point.tap" size="412484" crc="4fb72ed9" sha1="7bcc2d1c6dc9818b24236e1e8ef094e98111d623"/>
 			</dataarea>
 		</part>
 	</software>
