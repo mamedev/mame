@@ -3461,6 +3461,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/segas16b.cpp",
 	MAME_DIR .. "src/mame/includes/segas16b.h",
 	MAME_DIR .. "src/mame/video/segas16b.cpp",
+  MAME_DIR .. "src/mame/audio/nl_segas16b.cpp",
+  MAME_DIR .. "src/mame/audio/nl_segas16b.h",
 	MAME_DIR .. "src/mame/drivers/segas18.cpp",
 	MAME_DIR .. "src/mame/includes/segas18.h",
 	MAME_DIR .. "src/mame/video/segas18.cpp",

@@ -20,6 +20,7 @@
 #include "osdcomm.h"
 #include "emu.h"
 #include "emuopts.h"
+#include "rendutil.h"
 
 #ifdef OSD_MAC
 #define GL_SILENCE_DEPRECATION (1)
@@ -135,7 +136,7 @@ typedef void (APIENTRYP PFNGLDELETERENDERBUFFERSEXTPROC) (GLsizei n, const GLuin
 //============================================================
 
 #define DEBUG_MODE_SCORES   0
-#define USE_WIN32_STYLE_LINES   0   // use the same method baseline does - yields somewhat nicer vectors but a little buggy
+#define USE_WIN32_STYLE_LINES   1   // use the same method baseline does - yields somewhat nicer vectors but a little buggy
 
 //============================================================
 //  CONSTANTS
@@ -150,7 +151,8 @@ enum
 	TEXTURE_TYPE_SURFACE
 };
 
-
+//#undef GL_TEXTURE_2D
+//#define GL_TEXTURE_2D GL_TEXTURE_2D_MULTISAMPLE
 //============================================================
 //  MACROS
 //============================================================
@@ -185,7 +187,7 @@ struct line_aa_step
 	float       weight;                 // weight contribution
 };
 
-#if 0
+#if 1
 static const line_aa_step line_aa_1step[] =
 {
 	{  0.00f,  0.00f,  1.00f  },
@@ -1123,11 +1125,21 @@ int renderer_ogl::draw(const int update)
 
 		GLsizei iScale = 1;
 
+#if 1
+		//glEnable(GL_FRAMEBUFFER_SRGB);
+		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+		glEnable(GL_LINE_SMOOTH);
+		//glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+		//glEnable(GL_POLYGON_SMOOTH);
+		glEnable(GL_MULTISAMPLE_ARB);
+		glEnable(GL_MULTISAMPLE);
+#endif
 		/*
 		    Mac hack: macOS version 10.15 and later flipped from assuming you don't support Retina to
 		    assuming you do support Retina.  SDL 2.0.11 is scheduled to fix this, but it's not out yet.
 		    So we double-scale everything if you're on 10.15 or later and SDL is not at least version 2.0.11.
 		*/
+
 		#if defined(SDLMAME_MACOSX) || defined(OSD_MAC)
 		SDL_version sdlVers;
 		SDL_GetVersion(&sdlVers);
@@ -1263,10 +1275,10 @@ int renderer_ogl::draw(const int update)
 						pendingPrimitive=GL_NO_PRIMITIVE;
 					}
 
-					set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim.flags));
+					//set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim.flags));
 
 					// compute the effective width based on the direction of the line
-					effwidth = prim.width();
+					effwidth = prim.width;
 					if (effwidth < 0.5f)
 						effwidth = 0.5f;
 

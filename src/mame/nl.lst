@@ -290,6 +290,150 @@ popeyej
 popeyejo
 popeyehs
 
+@source:segas16b.cpp
+aceattac                        // (c) 1988 (FD1094)
+//afightere
+//afighterf
+//afighterg
+//afighterh
+aliensyn                        // (c) 1987 (Unprotected)
+aliensyn3                       // (c) 1987 (FD1089A)
+aliensyn7                       // (c) 1987 (MC-8123B)
+aliensynj                       // (c) 1987 (FD1089A)
+altbeast                        // (c) 1988 (8751)
+altbeast2                       // (c) 1988 (MC-8123B)
+altbeast4                       // (c) 1988 (MC-8123B)
+altbeast5                       // (c) 1988 (FD1094)
+altbeast5d                      //
+altbeast6                       // (c) 1988 (8751)
+altbeastj                       // (c) 1988 (8751)
+altbeastj1                      // (c) 1988 (protected)
+altbeastj3                      // (c) 1988 (FD1094)
+altbeastj3d                     //
+atomicp                         // (c) 1990 Philko - korean clone board
+aurail                          // (c) 1990 Sega / Westone
+aurail1                         // (c) 1990 Sega / Westone (FD1089B)
+aurail1d                        //
+aurailj                         // (C) 1990 Sega / Westone (FD1089A)
+aurailjd                        //
+bayroute                        // (c) 1989 Sunsoft / Sega (FD1094)
+bayroute1                       // (c) 1989 Sunsoft / Sega (Unprotected)
+bayrouted                       //
+bayroutej                       // (c) 1989 Sunsoft / Sega (FD1094)
+bayroutejd                      //
+bullet                          // (c) 1987 (FD1094)
+bulletd                         //
+cencourt                        // (c) 1988 (MC-8123B)
+cotton                          // (c) 1990 (FD1094)
+cottond                         //
+cottonj                         // (c) 1990 (FD1094)
+cottonja                        // (c) 1990 (FD1094)
+cottonjad                       //
+cottonjd                        //
+cottonu                         // (c) 1990 (FD1094)
+cottonud                        //
+ddux                            // (c) 1989 (FD1094)
+ddux1                           // (c) 1989 (8751)
+dduxd                           //
+dduxj                           // (c) 1989 (FD1094)
+dduxjd                          //
+//defense                         // (c) 1987 (FD1094)
+dfjail                          //
+dunkshot                        // (c) 1986 (FD1089A)
+dunkshota                       // (c) 1986 (FD1089A)
+dunkshoto                       // (c) 1986 (FD1089A)
+eswat                           // (c) 1989 (FD1094)
+eswatd                          //
+eswatj                          // (c) 1989 (FD1094)
+eswatj1                         // (c) 1989 (FD1094)
+eswatj1d                        //
+eswatjd                         //
+eswatu                          // (c) 1989 (FD1094)
+eswatud                         //
+exctleag                        // (c) 1988 (FD1094)
+exctleagd                       //
+fantzn2x                        // (c) 2008 Sega / M2
+fantzn2xp                       // (c) 2008 Sega / M2
+//fantzoneta                      // (c) 2008 Sega / M2 (bootleg conversion)
+fpoint                          // (c) 1989 (Japan, FD1094)
+fpoint1                         // (c) 1989 (Japan, FD1094)
+fpoint1d                        //
+fpointbj                        // (c) 1989 (Datsu bootleg, Japan)
+fpointbl                        // (c) 1989 (Datsu bootleg)
+fpointbla                       //
+fpointd                         //
+goldnaxe                        // (c) 1989 (8751)
+goldnaxe1                       // (c) 1989 (FD1094)
+goldnaxe1d                      //
+goldnaxe2                       // (c) 1989 (8751)
+goldnaxe3                       // (c) 1989 (FD1094)
+goldnaxe3d                      //
+goldnaxej                       // (c) 1989 (FD1094)
+goldnaxejd                      //
+goldnaxeu                       // (c) 1989 (FD1094)
+goldnaxeud                      //
+hwchamp                         // (c) 1987 (Unprotected)
+hwchampj                        // (c) 1987 (FD1094)
+hwchampjd                       //
+isgsm                           //
+lockonph                        //
+mvp                             // (c) 1989 (FD1094)
+mvpd                            //
+mvpj                            // (c) 1989 (FD1094)
+mvpjd                           //
+passsht                         // (c) 1988 (FD1094)
+passshta                        // (c) 1988 (FD1094)
+passshtad                       //
+passshtd                        //
+passshtj                        // (c) 1988 (FD1094)
+passshtjd                       //
+riotcity                        // (c) 1991 Sega / Westone (Unprotected)
+ryukyu                          // (c) 1990 (FD1094)
+ryukyua                         // (c) 1990 (FD1094)
+ryukyud                         //
+//sdib                            // (c) 1987 (FD1089A)
+//sdibl                           // (c) 1987 bootleg
+//sdibl2                          // bootleg
+//sdibl3                          // bootleg
+//sdibl4                          // bootleg
+//sdibl5                          // bootleg
+//sdibl6                          // bootleg
+shinfz                          //
+//shinobi2                        // (c) 1987 (FD1094)
+//shinobi2d                       //
+//shinobi3                        // (c) 1987 (MC-8123B)
+//shinobi4                        // (c) 1987 (MC-8123B)
+//shinobi5                        // (c) 1987 (Unprotected)
+//shinobi6                        // (c) 1987 (Unprotected)
+sjryuko                         // (c) 1988 White Board (FD1094)
+snapper                         // (c) 1990 Philko - korean clone board
+sonicbom                        // (c) 1987 (FD1094)
+sonicbomd                       //
+suprleag                        // (c) 1987 (FD1094)
+tetrbx                          //
+//tetris1                         // (c) 1988 (FD1094) S16B
+//tetris1d                        //
+//tetris2                         // (c) 1988 (FD1094) S16B
+//tetris2d                        //
+timescan                        // (c) 1987 (Unprotected)
+toryumon                        // (c) 1995 (Unprotected)
+tturf                           // (c) 1989 Sega / Sunsoft (8751)
+tturfu                          // (c) 1989 Sega / Sunsoft (8751)
+ultracin                        // (c) 1996 Sega (Unprotected)
+wb3                             // (c) 1988 Sega / Westone (8751)
+wb32                            // (c) 1988 Sega / Westone (FD1094)
+wb32d                           //
+wb33                            // (c) 1988 Sega / Westone (FD1094)
+wb33d                           //
+wb34                            // (c) 1988 Sega / Westone (FD1094)
+wb34d                           //
+wrestwar                        // (c) 1989 (8751)
+wrestwar1                       // (c) 1989 (FD1094)
+wrestwar1d                      //
+wrestwar2                       // (c) 1989 (FD1094)
+wrestwar2d                      //
+
+
 @source:testpat.cpp
 tp1983
 tp1985
