@@ -682,7 +682,7 @@ void sentx6p_state::sentx6p(machine_config &config)
 
 ROM_START( sentx6p )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "vsmaxxtexasholdem.bin", 0x000000, 0x400000, CRC(00180abb) SHA1(c2af28f64bfdfc9d671bb84561f8a916bc907176) )
+	ROM_LOAD16_WORD_SWAP( "vsmaxxtexasholdem.bin", 0x000000, 0x200000, CRC(d9d7ea1d) SHA1(ae531958d6074ea2034910f53e043d5fa10eaf8c) )
 ROM_END
 
 ROM_START( sentx6puk )

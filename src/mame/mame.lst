@@ -12887,6 +12887,7 @@ rad_sinv
 rad_tetr
 airblsjs
 sudoelan
+carlecfg
 
 @source:electra.cpp
 avenger                         // (c) 1975 Electra
@@ -31272,7 +31273,7 @@ vtpinball                       // From V.R. Technology VT SDK
 vtsndtest                       // From V.R. Technology VT SDK
 vtboxing                        // From V.R. Technology VT SDK
 ablpinb
-sudokuv
+papsudok
 mc_dgear
 dgun2500
 dgun2561
@@ -31309,6 +31310,8 @@ gprnrs16
 ddrdismx                        // (c) 2006 Majesco / Konami [(c) 2001 Disney on title screen]
 ddrstraw                        // (c) 2006 Majesco / Konami
 majkon
+majgnc
+sudopptv
 ablping
 vgpocket
 vgpmini

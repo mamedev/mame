@@ -449,6 +449,30 @@ private:
 	required_ioport m_io1;
 };
 
+class nes_vt_majgnc_state : public nes_vt_state
+{
+public:
+	nes_vt_majgnc_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_vt_state(mconfig, type, tag),
+		m_io0(*this,"IO0"),
+		m_io1(*this,"IO1")
+	{ }
+
+	void nes_vt_majgnc(machine_config& config);
+
+protected:
+
+private:
+	DECLARE_READ8_MEMBER(in0_r);
+	DECLARE_READ8_MEMBER(in1_r);
+	DECLARE_WRITE8_MEMBER(in0_w);
+
+	void nes_vt_majgnc_map(address_map& map);
+
+	required_ioport m_io0;
+	required_ioport m_io1;
+};
+
 
 
 
@@ -1207,12 +1231,19 @@ void nes_vt_state::scrambled_8000_w(address_space& space, uint16_t offset, uint8
 
 		//MMC3 compat
 		if((addr < 0xA000) && !(addr & 0x01)) {
+
+			logerror("scrambled_8000_w (%04x) %02x (banking)\n", offset+0x8000, data );
+
+
 			// Bank select
 			m_8000_addr_latch = data & 0x07;
 			// Bank config
 			m_410x[0x05] = data & ~(1 << 5);
 			update_banks();
 		} else if((addr < 0xA000) && (addr & 0x01)) {
+
+			logerror("scrambled_8000_w (%04x) %02x (other scrambled stuff)\n", offset+0x8000, data );
+
 			switch(m_410x[0x05] & 0x07) {
 				case 0x00:
 					m_ppu->set_201x_reg(m_8000_scramble[0], data);
@@ -1552,6 +1583,20 @@ WRITE8_MEMBER(nes_vt_sudoku_state::in0_w)
 {
 }
 
+READ8_MEMBER(nes_vt_majgnc_state::in0_r)
+{
+	return 0x00;// machine().rand();
+}
+
+READ8_MEMBER(nes_vt_majgnc_state::in1_r)
+{
+	return 0x00;// machine().rand();
+}
+
+WRITE8_MEMBER(nes_vt_majgnc_state::in0_w)
+{
+}
+
 void nes_vt_state::nes_vt_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
@@ -1600,6 +1645,16 @@ void nes_vt_sudoku_state::nes_vt_sudoku_map(address_map& map)
 	// override the inputs as specific non-standard 'controller' behavior is needed here and adding it to the generic NES controller bus wouldn't make sense.
 	map(0x4016, 0x4016).rw(FUNC(nes_vt_sudoku_state::in0_r),FUNC(nes_vt_sudoku_state::in0_w));
 	map(0x4017, 0x4017).r(FUNC(nes_vt_sudoku_state::in1_r));
+}
+
+void nes_vt_majgnc_state::nes_vt_majgnc_map(address_map& map)
+{
+	nes_vt_map(map);
+
+	map(0x4014, 0x4014).w(FUNC(nes_vt_majgnc_state::vt_dma_w));
+
+	map(0x4016, 0x4016).rw(FUNC(nes_vt_majgnc_state::in0_r),FUNC(nes_vt_majgnc_state::in0_w));
+	map(0x4017, 0x4017).r(FUNC(nes_vt_majgnc_state::in1_r));
 }
 
 /* Some later VT models have more RAM */
@@ -1836,9 +1891,14 @@ void nes_vt_ablpinb_state::nes_vt_ablpinb(machine_config &config)
 void nes_vt_sudoku_state::nes_vt_sudoku(machine_config &config)
 {
 	nes_vt_base(config);
-
-	// override for controllers
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_sudoku_state::nes_vt_sudoku_map);
+}
+
+void nes_vt_majgnc_state::nes_vt_majgnc(machine_config &config)
+{
+	nes_vt_base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_majgnc_state::nes_vt_majgnc_map);
+	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
 }
 
 void nes_vt_state::nes_vt(machine_config &config)
@@ -2031,6 +2091,60 @@ static INPUT_PORTS_START( sudoku )
 	PORT_START("IO1")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( majgnc )
+	PORT_START("IO0")
+	PORT_DIPNAME( 0x01, 0x01, "0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IO1")
+	PORT_DIPNAME( 0x01, 0x01, "1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 void nes_vt_sudoku_state::init_sudoku()
 {
 	u8 *src = memregion("mainrom")->base();
@@ -2105,7 +2219,7 @@ ROM_START( vtboxing )
 	ROM_LOAD( "rom.bin", 0x00000, 0x80000, CRC(c115b1af) SHA1(82106e1c11c3279c5d8731c112f713fa3f290125) )
 ROM_END
 
-ROM_START( sudokuv )
+ROM_START( papsudok )
 	ROM_REGION( 0x80000, "mainrom", 0 )
 	ROM_LOAD( "sudoku2.bin", 0x00000, 0x80000, CRC(d1ffcc1e) SHA1(2010e60933a08d0b9271ef37f338758aacba6d2d) )
 ROM_END
@@ -2323,6 +2437,17 @@ ROM_START( majkon )
 	ROM_LOAD( "konamicollectorsseries.bin", 0x00000, 0x100000, CRC(47505e51) SHA1(3bfb05d7cfa2bb4c115335f0383fa4aa59db0b28) )
 ROM_END
 
+ROM_START( majgnc )
+	ROM_REGION( 0x200000, "mainrom", ROMREGION_ERASEFF )
+	ROM_LOAD( "majescogoldennuggetcasino_st29w800at_002000d7.bin", 0x00000, 0x100000, CRC(1a156a9d) SHA1(08be4079dd68c9cf05bb92e11a3da4f092d7cfea) )
+ROM_END
+
+ROM_START( sudopptv )
+	ROM_REGION( 0x80000, "mainrom", ROMREGION_ERASEFF )
+	ROM_LOAD( "sudokupnptvgame_29lv400tc_000422b9.bin", 0x00000, 0x80000, CRC(722cc36d) SHA1(1f6d1f57478cf175a36722b39c52eded4b669f81) )
+ROM_END
+
+
 ROM_START( ablping )
 	ROM_REGION( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "abl_pingpong.bin", 0x00000, 0x200000, CRC(b31de1fb) SHA1(94e8afb2315ba1fa0892191c8e1832391e401c70) )
@@ -2450,9 +2575,9 @@ CONS( 200?, vtboxing,     0,  0,  nes_vt, nes_vt, nes_vt_state, empty_init, "VRT
 CONS( 2005, ablpinb, 0,  0,  nes_vt_ablpinb,    ablpinb, nes_vt_ablpinb_state, empty_init, "Advance Bright Ltd", "Pinball (P8002, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
  
-// Black pad marked 'SUDOKU' with tails on the S and U characters looping over the logo
+// Black pad marked 'SUDOKU' with tails on the S and U characters looping over the logo.  Box says "Plug and Play Sudoku"
 // Has 2 sets of 4 buttons in circular 'direction pad' layouts (on the left for directions, on the right for functions) and 9 red numbered buttons with red power LED on left of them, and reset button on right
-CONS( 200?, sudokuv,     0,  0,  nes_vt_sudoku, sudoku, nes_vt_sudoku_state, init_sudoku, "<unknown>", "Plug and Play Sudoku (VT based)", MACHINE_NOT_WORKING )
+CONS( 200?, papsudok,     0,  0,  nes_vt_sudoku, sudoku, nes_vt_sudoku_state, init_sudoku, "<unknown>", "Plug and Play Sudoku (VT based?)", MACHINE_NOT_WORKING )
 
 
 // should be VT03 based
@@ -2466,6 +2591,10 @@ CONS( 2006, vgtablet,  0, 0,  nes_vt_vg,        nes_vt, nes_vt_hh_state, empty_i
 // There is a 2004 Majesco Frogger "TV game" that appears to contain the same version of Frogger as above but with no other games, so probably fits here.
 CONS( 2004, majkon,    0, 0,  nes_vt_vg_baddma, nes_vt, nes_vt_hh_state, empty_init, "Majesco (licensed from Konami)", "Konami Collector's Series Arcade Advanced", MACHINE_NOT_WORKING ) // raster timing is broken for Frogger, palette issues
 
+CONS( 200?, majgnc,    0, 0,  nes_vt_majgnc, majgnc, nes_vt_majgnc_state, empty_init, "Majesco", "Golden Nugget Casino", MACHINE_NOT_WORKING )
+
+// small black unit, dpad on left, 4 buttons (A,B,X,Y) on right, Start/Reset/Select in middle, unit text "Sudoku Plug & Play TV Game"
+CONS( 200?, sudopptv,    0, 0,  nes_vt_majgnc, majgnc, nes_vt_majgnc_state, empty_init, "<unknown>", "Sudoku Plug & Play TV Game (VT based)", MACHINE_NOT_WORKING )
 
 // this is VT09 based
 // it boots, most games correct, but palette issues in some games still (usually they appear greyscale)

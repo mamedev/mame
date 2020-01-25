@@ -296,6 +296,7 @@ ROM_START( senpmate )
 	ROM_REGION16_BE( 0x800000, "flash", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "perfectmate.bin", 0x000000, 0x200000, CRC(fa7f8ca0) SHA1(fcc78f8efb183e9c65545eb502da475225253a94) )
 	// Perfect Mate's COB also had a sticker: 7DC1 16M 050822.  The 2MB file I dumped sums to 7DC1
+	// The Perfect Mate checksum in the ROM header matches the sum of bytes from 0x10 to the end.
 ROM_END
 
 ROM_START( sencosmo )
