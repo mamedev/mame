@@ -1,5 +1,5 @@
-// license:BSD-3-Clause
-// copyright-holders:Sterophonick
+// license:BSD-2-Clause
+// copyright-holders:Sterophonick, Phil Thomas
 /*****************************************************************************
  *
  * Skeleton device for Gigatron CPU Core
@@ -13,7 +13,7 @@
 #include "gigatrondasm.h"
 
 
-DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron_cpu", "Gigatron CPU Device")
+DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron_cpu", "Gigatron")
 
 
 /* FLAGS */
@@ -25,9 +25,11 @@ DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron_cpu", "Gigatron CPU Dev
 #endif
 
 
-#define gigatron_readop(A) m_program->read_dword(A)
+#define gigatron_readop(A) m_program->read_word(A)
 #define gigatron_readmem16(A) m_data->read_dword(A)
+#define gigatron_readmem8(A) m_data->read_byte(A)
 #define gigatron_writemem16(A,B) m_data->write_dword((A),B)
+#define gigatron_writemem8(A,B) m_data->write_byte((A),B)
 
 
 /***********************************
@@ -54,7 +56,7 @@ void gigatron_cpu_device::execute_run()
 		uint8_t op = (opcode >> 13) & 0x0007;
 		uint8_t mode = (opcode >> 10) & 0x0007;
 		uint8_t bus = (opcode >> 8) & 0x0003;
-		uint8_t d = (opcode >> 0) & 0x00ff;
+		uint16_t d = (opcode >> 0) & 0x00ff;
 
 		switch( op)
 		{
@@ -76,7 +78,7 @@ void gigatron_cpu_device::execute_run()
 				gigatron_illegal();
 				break;
 		}
-
+		m_icount--;
 	} while( m_icount > 0 );
 }
 
@@ -95,6 +97,8 @@ void gigatron_cpu_device::init()
 	m_x = 0;
 	m_y = 0;
 	m_pc = 0;
+	m_npc = (m_pc + 1);
+	m_inReg = 0xFF;
 	state_add(GTRON_AC,        "AC",        m_ac);
 	state_add(GTRON_X,         "X",         m_x);
 	state_add(GTRON_Y,         "Y",         m_y);
@@ -102,29 +106,172 @@ void gigatron_cpu_device::init()
 	set_icountptr(m_icount);
 }
 
-void gigatron_cpu_device::branchOp(int op, int mode, int bus, int d)
+void gigatron_cpu_device::branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d)
 {
+	const uint8_t ZERO = 0x80;
+	bool c = false;
+	uint8_t ac2 = m_ac ^ ZERO;
+	uint16_t base = m_pc & 0xff00;
+	switch (mode) {
+		case 0:
+			c = true;
+			base = m_y << 8;
+			break;
+		case 1:
+			c = (ac2 > ZERO);
+			break;
+		case 2:
+			c = (ac2 < ZERO);
+			break;
+		case 3:
+			c = (ac2 != ZERO);
+			break;
+		case 4:
+			c = (ac2 == ZERO);
+			break;
+		case 5:
+			c = (ac2 >= ZERO);
+			break;
+		case 6:
+			c = (ac2 <= ZERO);
+			break;
+		case 7:
+			c = true;
+			break;
+	}
+	
+	if (c) {
+		uint8_t b = offset(bus, d);
+		m_npc = base | b;
+	}
 }
 
-void gigatron_cpu_device::aluOp(int op, int mode, int bus, int d)
+void gigatron_cpu_device::aluOp(uint8_t op, uint8_t mode, uint8_t bus, uint16_t d)
 {
-	int b;
-	(void)b;
+	uint8_t b = 0;
+	//(void)b;
 	switch(bus) {
 		case 0:
 			b = d;
 			break;
 		case 1:
+			b = gigatron_readmem8((uint16_t)(addr(mode, d) & m_ramMask));
+			break;
 		case 2:
 			b = m_ac;
 			break;
 		case 3:
+			b = m_inReg;
 			break;
+	}
+	switch(op) {
+		case 1:
+			b = (m_ac & b);
+			break;
+		case 2:
+			b = (m_ac | b);
+			break;
+		case 3:
+			b = (m_ac ^ b);
+			break;
+		case 4:
+			b = (m_ac + b);
+			break;
+		case 5:
+			b = (m_ac - b);
+			break;
+	}
+	switch (mode) {
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+			m_ac = b;
+			break;
+		case 4:
+			m_x = b;
+			break;
+		case 5:
+			m_y = b;
+			break;
+		case 6:
+		case 7:
+			uint16_t rising = ~(m_out & b);
+			if (rising & 0x40) {
+				m_outx = m_ac;
+			}
+			break;
+			
 	}
 }
 
-void gigatron_cpu_device::storeOp(int op, int mode, int bus, int d)
+uint16_t gigatron_cpu_device::addr(uint8_t mode, uint16_t d)
 {
+	switch (mode) {
+		case 0:
+		case 4:
+		case 5:
+		case 6:
+			return d;
+		case 1:
+			return m_x;
+		case 2:
+			return (m_y << 8) | d;
+		case 3:
+			return (m_y << 8) | m_x;
+		case 7:
+			uint16_t addr2 = (m_y << 8) | m_x;
+			m_x = (m_x + 1) & 0xff;
+			return addr2;
+	}
+	return 0;
+}
+
+uint8_t gigatron_cpu_device::offset(uint8_t bus, uint16_t d)
+{
+	switch (bus) {
+		case 0:
+			return d;
+		case 1:
+			return gigatron_readmem8(d);
+		case 2:
+			return m_ac;
+		case 3:	
+			return m_inReg;
+	}
+	return 0;
+}
+
+void gigatron_cpu_device::storeOp(uint8_t op, uint8_t mode, uint8_t bus, uint16_t d)
+{
+	uint8_t b = 0;
+	switch (bus) {
+		case 0:
+			b = d;
+			break;
+		case 1:
+			b = 0;
+			logerror("UNDEFINED BEHAVIOR! 0x%04x\n", m_pc);
+			break;
+		case 2:
+			b = m_ac;
+			break;
+		case 3:
+			b = m_inReg;
+			break;
+	}
+	
+	u16 address = addr(mode, d) & m_ramMask;
+	gigatron_writemem8(address, b);
+	
+	switch (mode) {
+		case 4:
+			m_x = b;
+			break;
+		case 5:
+			m_y = b;
+			break;
+	}
 }
 
 void gigatron_cpu_device::device_reset()
@@ -136,19 +283,7 @@ void gigatron_cpu_device::execute_set_input(int irqline, int state)
 #if 0
 	switch(irqline)
 	{
-		case GTRON_INT_INTRM: // level-sensitive
-			m_intrm_pending = ((ASSERT_LINE == state) || (HOLD_LINE == state));
-			m_intrm_state = (ASSERT_LINE == state);
-			break;
-		case GTRON_RESET: // edge-sensitive
-			if (CLEAR_LINE != state)
-				m_reset_pending = 1;
-			m_reset_state = (ASSERT_LINE == state);
-			break;
-		case GTRON_INT_INTR: // edge-sensitive
-			if (CLEAR_LINE != state)
-				m_intr_pending = 1;
-			m_intr_state = (ASSERT_LINE == state);
+		default:
 			break;
 	}
 #endif

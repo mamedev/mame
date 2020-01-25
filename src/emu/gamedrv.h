@@ -75,7 +75,7 @@ constexpr u64 MACHINE_NO_SOUND_HW               = machine_flags::NO_SOUND_HW;
 constexpr u64 MACHINE_MECHANICAL                = machine_flags::MECHANICAL;
 constexpr u64 MACHINE_IS_INCOMPLETE             = machine_flags::IS_INCOMPLETE;
 
-// flags taht map to device feature flags
+// flags that map to device feature flags
 constexpr u64 MACHINE_UNEMULATED_PROTECTION     = 0x00000001'00000000;   // game's protection not fully emulated
 constexpr u64 MACHINE_WRONG_COLORS              = 0x00000002'00000000;   // colors are totally wrong
 constexpr u64 MACHINE_IMPERFECT_COLORS          = 0x00000004'00000000;   // colors are not 100% accurate, but close

@@ -1,8 +1,8 @@
-// license:BSD-3-Clause
-// copyright-holders:Sterophonick
+// license:BSD-2-Clause
+// copyright-holders:Sterophonick, Phil Thomas
 /*****************************************************************************
  *
- * Skeleton Device for Gigatron CPU Core
+ * Skeleton device for Gigatron CPU Core
  *
  *****************************************************************************/
 
@@ -46,13 +46,20 @@ protected:
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
-	void branchOp(int op, int mode, int bus, int d);
-	void aluOp(int op, int mode, int bus, int d);
-	void storeOp(int op, int mode, int bus, int d);
+	void branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d);
+	void aluOp(uint8_t op, uint8_t mode, uint8_t bus, uint16_t d);
+	void storeOp(uint8_t op, uint8_t mode, uint8_t bus, uint16_t d);
+	uint8_t offset(uint8_t bus, uint16_t d);
+	uint16_t addr(uint8_t mode, uint16_t d);
 
 	uint8_t m_ac;
 	uint8_t m_x;
 	uint8_t m_y;
+	uint8_t m_npc;
+	uint8_t m_inReg;
+	uint16_t m_ramMask;
+	uint16_t m_out;
+	uint16_t m_outx;
 
 	virtual void init();
 
