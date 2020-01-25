@@ -1585,12 +1585,12 @@ WRITE8_MEMBER(nes_vt_sudoku_state::in0_w)
 
 READ8_MEMBER(nes_vt_majgnc_state::in0_r)
 {
-	return machine().rand();
+	return 0x00;// machine().rand();
 }
 
 READ8_MEMBER(nes_vt_majgnc_state::in1_r)
 {
-	return machine().rand();
+	return 0x00;// machine().rand();
 }
 
 WRITE8_MEMBER(nes_vt_majgnc_state::in0_w)
@@ -1899,7 +1899,6 @@ void nes_vt_majgnc_state::nes_vt_majgnc(machine_config &config)
 	nes_vt_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_majgnc_state::nes_vt_majgnc_map);
 	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
-
 }
 
 void nes_vt_state::nes_vt(machine_config &config)
@@ -2220,7 +2219,7 @@ ROM_START( vtboxing )
 	ROM_LOAD( "rom.bin", 0x00000, 0x80000, CRC(c115b1af) SHA1(82106e1c11c3279c5d8731c112f713fa3f290125) )
 ROM_END
 
-ROM_START( sudokuv )
+ROM_START( papsudok )
 	ROM_REGION( 0x80000, "mainrom", 0 )
 	ROM_LOAD( "sudoku2.bin", 0x00000, 0x80000, CRC(d1ffcc1e) SHA1(2010e60933a08d0b9271ef37f338758aacba6d2d) )
 ROM_END
@@ -2443,6 +2442,12 @@ ROM_START( majgnc )
 	ROM_LOAD( "majescogoldennuggetcasino_st29w800at_002000d7.bin", 0x00000, 0x100000, CRC(1a156a9d) SHA1(08be4079dd68c9cf05bb92e11a3da4f092d7cfea) )
 ROM_END
 
+ROM_START( sudopptv )
+	ROM_REGION( 0x80000, "mainrom", ROMREGION_ERASEFF )
+	ROM_LOAD( "sudokupnptvgame_29lv400tc_000422b9.bin", 0x00000, 0x80000, CRC(722cc36d) SHA1(1f6d1f57478cf175a36722b39c52eded4b669f81) )
+ROM_END
+
+
 ROM_START( ablping )
 	ROM_REGION( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "abl_pingpong.bin", 0x00000, 0x200000, CRC(b31de1fb) SHA1(94e8afb2315ba1fa0892191c8e1832391e401c70) )
@@ -2570,9 +2575,9 @@ CONS( 200?, vtboxing,     0,  0,  nes_vt, nes_vt, nes_vt_state, empty_init, "VRT
 CONS( 2005, ablpinb, 0,  0,  nes_vt_ablpinb,    ablpinb, nes_vt_ablpinb_state, empty_init, "Advance Bright Ltd", "Pinball (P8002, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
  
-// Black pad marked 'SUDOKU' with tails on the S and U characters looping over the logo
+// Black pad marked 'SUDOKU' with tails on the S and U characters looping over the logo.  Box says "Plug and Play Sudoku"
 // Has 2 sets of 4 buttons in circular 'direction pad' layouts (on the left for directions, on the right for functions) and 9 red numbered buttons with red power LED on left of them, and reset button on right
-CONS( 200?, sudokuv,     0,  0,  nes_vt_sudoku, sudoku, nes_vt_sudoku_state, init_sudoku, "<unknown>", "Plug and Play Sudoku (VT based)", MACHINE_NOT_WORKING )
+CONS( 200?, papsudok,     0,  0,  nes_vt_sudoku, sudoku, nes_vt_sudoku_state, init_sudoku, "<unknown>", "Plug and Play Sudoku (VT based?)", MACHINE_NOT_WORKING )
 
 
 // should be VT03 based
@@ -2588,8 +2593,8 @@ CONS( 2004, majkon,    0, 0,  nes_vt_vg_baddma, nes_vt, nes_vt_hh_state, empty_i
 
 CONS( 200?, majgnc,    0, 0,  nes_vt_majgnc, majgnc, nes_vt_majgnc_state, empty_init, "Majesco", "Golden Nugget Casino", MACHINE_NOT_WORKING )
 
-
-
+// small black unit, dpad on left, 4 buttons (A,B,X,Y) on right, Start/Reset/Select in middle, unit text "Sudoku Plug & Play TV Game"
+CONS( 200?, sudopptv,    0, 0,  nes_vt_majgnc, majgnc, nes_vt_majgnc_state, empty_init, "<unknown>", "Sudoku Plug & Play TV Game (VT based)", MACHINE_NOT_WORKING )
 
 // this is VT09 based
 // it boots, most games correct, but palette issues in some games still (usually they appear greyscale)
