@@ -13,9 +13,9 @@
 namespace netlist
 {
 
-	static constexpr const char sHINT_NO_DEACTIVATE[] = ".HINT_NO_DEACTIVATE";
-	static constexpr const char sPowerGND[] = "GND";
-	static constexpr const char sPowerVCC[] = "VCC";
+	static constexpr const char sHINT_NO_DEACTIVATE[] = ".HINT_NO_DEACTIVATE"; // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
+	static constexpr const char sPowerGND[] = "GND"; // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
+	static constexpr const char sPowerVCC[] = "VCC"; // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 
 	// nl_base.cpp
 

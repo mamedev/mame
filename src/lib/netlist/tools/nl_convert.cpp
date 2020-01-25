@@ -15,6 +15,8 @@
 //        define a model param on core device
 
 // Format: external name,netlist device,model
+
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
 static constexpr const char s_lib_map[] =
 "SN74LS00D,   TTL_7400_DIP,  74LSXX\n"
 "SN74LS04D,   TTL_7404_DIP,  74LSXX\n"

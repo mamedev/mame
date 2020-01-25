@@ -156,10 +156,8 @@ namespace plib
 
 		typename TS::stream_ptr stream(const pstring &name) override
 		{
-			if (name == m_name)
-				return plib::make_unique<std::stringstream>(m_str);
-			else
-				return typename TS::stream_ptr(nullptr);
+			return (name == m_name) ?
+				plib::make_unique<std::stringstream>(m_str) : typename TS::stream_ptr(nullptr);
 		}
 	private:
 		pstring m_name;
@@ -279,7 +277,7 @@ namespace plib
 	std::vector<pstring> psplit(const pstring &str, const std::vector<pstring> &onstrl);
 	std::vector<std::string> psplit_r(const std::string &stri,
 			const std::string &token,
-			const std::size_t maxsplit);
+			std::size_t maxsplit);
 
 	//============================================================
 	//  penum - strongly typed enumeration

@@ -494,8 +494,6 @@ void nlwav_app::convert(std::ostream &ostrm)
 
 int nlwav_app::execute()
 {
-	for (auto &i : opt_args())
-		pout("Hello : " + i + "\n");
 	if (opt_help())
 	{
 		pout(usage());

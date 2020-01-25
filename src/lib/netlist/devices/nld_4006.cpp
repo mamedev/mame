@@ -54,10 +54,10 @@ namespace netlist
 			}
 			else
 			{
-				m_d[0] = (m_d[0] & 0x0f) | (m_I[0]() << 4);
-				m_d[1] = (m_d[1] & 0x1f) | (m_I[1]() << 5);
-				m_d[2] = (m_d[2] & 0x0f) | (m_I[2]() << 4);
-				m_d[3] = (m_d[3] & 0x1f) | (m_I[3]() << 5);
+				m_d[0] = static_cast<uint8_t>((m_d[0] & 0x0f) | (m_I[0]() << 4));
+				m_d[1] = static_cast<uint8_t>((m_d[1] & 0x1f) | (m_I[1]() << 5));
+				m_d[2] = static_cast<uint8_t>((m_d[2] & 0x0f) | (m_I[2]() << 4));
+				m_d[3] = static_cast<uint8_t>((m_d[3] & 0x1f) | (m_I[3]() << 5));
 			}
 		}
 

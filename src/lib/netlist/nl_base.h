@@ -135,7 +135,7 @@ class NETLIB_NAME(name) : public device_t
 /// Please see \ref NETLIB_IS_TIMESTEP for an example.
 
 #define NETLIB_TIMESTEPI()                                                     \
-	public: virtual void timestep(const nl_fptype step)  noexcept override
+	public: virtual void timestep(nl_fptype step)  noexcept override
 
 /// \brief Used to implement the body of the time stepping code.
 ///
@@ -590,7 +590,7 @@ namespace netlist
 			};
 
 			core_terminal_t(core_device_t &dev, const pstring &aname,
-					const state_e state, nldelegate delegate = nldelegate());
+					state_e state, nldelegate delegate = nldelegate());
 			virtual ~core_terminal_t() noexcept = default;
 
 			COPYASSIGNMOVE(core_terminal_t, delete)
@@ -632,7 +632,7 @@ namespace netlist
 
 			state_var_sig m_Q;
 	#else
-			void set_copied_input(netlist_sig_t val) const noexcept { plib::unused_var(val); }
+			static void set_copied_input(netlist_sig_t val) noexcept { plib::unused_var(val); }
 	#endif
 
 			void set_delegate(const nldelegate &delegate) noexcept { m_delegate = delegate; }
@@ -788,7 +788,7 @@ namespace netlist
 	{
 	public:
 
-		analog_t(core_device_t &dev, const pstring &aname, const state_e state,
+		analog_t(core_device_t &dev, const pstring &aname, state_e state,
 			nldelegate delegate = nldelegate());
 
 		const analog_net_t & net() const noexcept;
@@ -849,7 +849,7 @@ namespace netlist
 	{
 	public:
 		logic_t(core_device_t &dev, const pstring &aname,
-				const state_e state, nldelegate delegate = nldelegate());
+				state_e state, nldelegate delegate = nldelegate());
 
 		logic_net_t & net() noexcept;
 		const logic_net_t &  net() const noexcept;
@@ -1148,7 +1148,7 @@ namespace netlist
 	class param_num_t final: public param_t
 	{
 	public:
-		param_num_t(device_t &device, const pstring &name, const T val) noexcept(false);
+		param_num_t(device_t &device, const pstring &name, T val) noexcept(false);
 
 		T operator()() const noexcept { return m_param; }
 		operator T() const noexcept { return m_param; }
@@ -1162,7 +1162,7 @@ namespace netlist
 	class param_enum_t final: public param_t
 	{
 	public:
-		param_enum_t(device_t &device, const pstring &name, const T val) noexcept(false);
+		param_enum_t(device_t &device, const pstring &name, T val) noexcept(false);
 
 		T operator()() const noexcept { return T(m_param); }
 		operator T() const noexcept { return T(m_param); }
@@ -1932,12 +1932,10 @@ namespace netlist
 			state().log().fatal("Inconsistent nullptrs for terminal {}", name());
 			throw nl_exception("Inconsistent nullptrs for terminal {}", name());
 		}
-		else
-		{
-			m_gt1 = gt;
-			m_go1 = go;
-			m_Idr1 = Idr;
-		}
+
+		m_gt1 = gt;
+		m_go1 = go;
+		m_Idr1 = Idr;
 	}
 
 	inline logic_net_t & logic_t::net() noexcept

@@ -174,7 +174,7 @@ public:
 
 	size_type length() const noexcept { return traits_type::len(m_str); }
 	size_type size() const noexcept { return traits_type::len(m_str); }
-	bool empty() const noexcept { return m_str.size() == 0; }
+	bool empty() const noexcept { return m_str.empty(); }
 
 	pstring_t substr(size_type start, size_type nlen = npos) const;
 	int compare(const pstring_t &right) const noexcept;
@@ -317,7 +317,9 @@ struct putf8_traits
 		const mem_t *p1 = p;
 		std::size_t i = n;
 		while (i-- > 0)
+		{
 			p1 += codelen(p1);
+		}
 		return p1;
 	}
 };
@@ -336,7 +338,9 @@ struct putf16_traits
 			// FIXME: check that size is equal
 			auto c = static_cast<uint16_t>(*i++);
 			if (!((c & 0xd800) == 0xd800))
+			{
 				ret++;
+			}
 		}
 		return ret;
 	}
@@ -347,10 +351,7 @@ struct putf16_traits
 	}
 	static std::size_t codelen(const code_t c) noexcept
 	{
-		if (c < 0x10000)
-			return 1;
-		else // U+10000 U+1FFFFF
-			return 2;
+		return (c < 0x10000) ? 1 : 2; // U+10000 U+1FFFFF
 	}
 	static code_t code(const mem_t *p) noexcept
 	{
@@ -381,7 +382,9 @@ struct putf16_traits
 	{
 		std::size_t i = n;
 		while (i-- > 0)
+		{
 			p += codelen(p);
+		}
 		return p;
 	}
 };

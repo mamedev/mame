@@ -107,13 +107,13 @@ namespace plib {
 
 		parray(const parray &rhs) : m_a(rhs.m_a), m_size(rhs.m_size) {}
 		parray(parray &&rhs) noexcept : m_a(std::move(rhs.m_a)), m_size(std::move(rhs.m_size)) {}
-		parray &operator=(const parray &rhs) noexcept
+		parray &operator=(const parray &rhs) noexcept // NOLINT(bugprone-unhandled-self-assignment, cert-oop54-cpp)
 		{
-			if (this != &rhs)
-			{
-				m_a = rhs.m_a;
-				m_size = rhs.m_size;
-			}
+			if (this == &rhs)
+				return *this;
+
+			m_a = rhs.m_a;
+			m_size = rhs.m_size;
 			return *this;
 		}
 
