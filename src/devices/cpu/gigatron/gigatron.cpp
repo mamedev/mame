@@ -37,7 +37,7 @@ DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron_cpu", "Gigatron")
  ***********************************/
 void gigatron_cpu_device::gigatron_illegal()
 {
-	logerror("gigatron illegal opcode at 0x%04x\n", m_pc);
+	logerror("gigatron illegal opcode at 0x%04x\n", m_ppc);
 	m_icount -= 1;
 }
 
@@ -48,15 +48,16 @@ void gigatron_cpu_device::execute_run()
 
 	do
 	{
+		m_ppc = m_pc;
 		debugger_instruction_hook(m_pc);
 
 		opcode = gigatron_readop(m_pc);
-		m_pc++;
+		m_pc = m_npc++;
 
 		uint8_t op = (opcode >> 13) & 0x0007;
 		uint8_t mode = (opcode >> 10) & 0x0007;
 		uint8_t bus = (opcode >> 8) & 0x0003;
-		uint16_t d = (opcode >> 0) & 0x00ff;
+		uint8_t d = (opcode >> 0) & 0x00ff;
 
 		switch( op)
 		{
@@ -98,12 +99,26 @@ void gigatron_cpu_device::init()
 	m_y = 0;
 	m_pc = 0;
 	m_npc = (m_pc + 1);
+	m_ppc = 0;
 	m_inReg = 0xFF;
+
+	state_add(GTRON_PC,        "PC",        m_pc);
+	state_add(GTRON_NPC,       "NPC",       m_npc);
+	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",     m_ppc).noshow();
 	state_add(GTRON_AC,        "AC",        m_ac);
 	state_add(GTRON_X,         "X",         m_x);
 	state_add(GTRON_Y,         "Y",         m_y);
 
 	set_icountptr(m_icount);
+
+	save_item(NAME(m_ac));
+	save_item(NAME(m_x));
+	save_item(NAME(m_y));
+	save_item(NAME(m_npc));
+	save_item(NAME(m_ppc));
+	save_item(NAME(m_inReg));
+	save_item(NAME(m_pc));
 }
 
 void gigatron_cpu_device::branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d)
@@ -146,10 +161,9 @@ void gigatron_cpu_device::branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_
 	}
 }
 
-void gigatron_cpu_device::aluOp(uint8_t op, uint8_t mode, uint8_t bus, uint16_t d)
+void gigatron_cpu_device::aluOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d)
 {
 	uint8_t b = 0;
-	//(void)b;
 	switch(bus) {
 		case 0:
 			b = d;
@@ -205,7 +219,7 @@ void gigatron_cpu_device::aluOp(uint8_t op, uint8_t mode, uint8_t bus, uint16_t 
 	}
 }
 
-uint16_t gigatron_cpu_device::addr(uint8_t mode, uint16_t d)
+uint16_t gigatron_cpu_device::addr(uint8_t mode, uint8_t d)
 {
 	switch (mode) {
 		case 0:
@@ -227,7 +241,7 @@ uint16_t gigatron_cpu_device::addr(uint8_t mode, uint16_t d)
 	return 0;
 }
 
-uint8_t gigatron_cpu_device::offset(uint8_t bus, uint16_t d)
+uint8_t gigatron_cpu_device::offset(uint8_t bus, uint8_t d)
 {
 	switch (bus) {
 		case 0:
@@ -242,16 +256,12 @@ uint8_t gigatron_cpu_device::offset(uint8_t bus, uint16_t d)
 	return 0;
 }
 
-void gigatron_cpu_device::storeOp(uint8_t op, uint8_t mode, uint8_t bus, uint16_t d)
+void gigatron_cpu_device::storeOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d)
 {
 	uint8_t b = 0;
 	switch (bus) {
 		case 0:
 			b = d;
-			break;
-		case 1:
-			b = 0;
-			logerror("UNDEFINED BEHAVIOR! 0x%04x\n", m_pc);
 			break;
 		case 2:
 			b = m_ac;
@@ -261,8 +271,11 @@ void gigatron_cpu_device::storeOp(uint8_t op, uint8_t mode, uint8_t bus, uint16_
 			break;
 	}
 	
-	u16 address = addr(mode, d) & m_ramMask;
-	gigatron_writemem8(address, b);
+	u16 address = addr(mode, d);
+	if (bus == 1)
+		logerror("%04x: ctrl = 0x%04x\n", m_ppc, address);
+	else
+		gigatron_writemem8(address & m_ramMask, b);
 	
 	switch (mode) {
 		case 4:
@@ -291,6 +304,7 @@ void gigatron_cpu_device::execute_set_input(int irqline, int state)
 
 gigatron_cpu_device::gigatron_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, GTRON, tag, owner, clock)
+	, m_ramMask(0x7fff)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 14, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 8, 15, 0)
 {

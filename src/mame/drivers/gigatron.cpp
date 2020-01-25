@@ -59,7 +59,7 @@ void gigatron_state::prog_map(address_map &map)
 
 void gigatron_state::data_map(address_map &map)
 {
-	map(0x4000, 0x7fff).r(FUNC(gigatron_state::gigatron_random));
+	map(0x0000, 0x7fff).ram();
 }
 
 void gigatron_state::machine_start()
@@ -87,8 +87,7 @@ void gigatron_state::gigatron(machine_config &config)
 	screen.set_screen_update(FUNC(gigatron_state::screen_update));
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
+	//SPEAKER(config, "mono").front_center();
 }
 
 ROM_START( gigatron )
