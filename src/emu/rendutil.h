@@ -185,7 +185,6 @@ static inline int orientation_add(int orientation1, int orientation2)
 
 static inline float apply_brightness_contrast_gamma_fp(float srcval, float brightness, float contrast, float gamma)
 {
-#if 0
 	/* first apply gamma */
 	srcval = pow(srcval, 1.0f / gamma);
 
@@ -198,21 +197,6 @@ static inline float apply_brightness_contrast_gamma_fp(float srcval, float brigh
 	if (srcval > 1.0f)
 		srcval = 1.0f;
 	return srcval;
-#else
-	/* contrast/brightness */
-	srcval = (srcval * contrast) + brightness - 1.0f;
-
-	/* clamp and return */
-	if (srcval < 0.0f)
-		srcval = 0.0f;
-	if (srcval > 1.0f)
-		srcval = 1.0f;
-
-	/* apply gamma */
-	srcval = std::pow(srcval, gamma);
-
-	return srcval;
-#endif
 }
 
 
