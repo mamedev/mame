@@ -1429,7 +1429,7 @@ void nes_vt_state::do_dma(uint8_t data, bool has_ntsc_bug)
 		m_ppu->set_vram_dest(0x3F00);
 		m_ppu->set_palette_mode(PAL_MODE_VT0x);
 	}
-	
+
 	for (int i = 0; i < length; i++)
 	{
 		uint8_t spriteData = m_maincpu->space(AS_PROGRAM).read_byte(src_addr + i);
@@ -2212,7 +2212,7 @@ void nes_vt_sudoku_state::init_sudoku()
 		}
 
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
-	}	
+	}
 
 	if (0)
 	{
@@ -2621,7 +2621,7 @@ CONS( 200?, vtboxing,     0,  0,  nes_vt, nes_vt, nes_vt_state, empty_init, "VRT
 // 050329 (29th March 2005) date on PCB
 CONS( 2005, ablpinb, 0,  0,  nes_vt_ablpinb,    ablpinb, nes_vt_ablpinb_state, empty_init, "Advance Bright Ltd", "Pinball (P8002, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
- 
+
 // Black pad marked 'SUDOKU' with tails on the S and U characters looping over the logo.  Box says "Plug and Play Sudoku"
 // Has 2 sets of 4 buttons in circular 'direction pad' layouts (on the left for directions, on the right for functions) and 9 red numbered buttons with red power LED on left of them, and reset button on right
 CONS( 200?, papsudok,     0,  0,  nes_vt_sudoku, sudoku, nes_vt_sudoku_state, init_sudoku, "<unknown>", "Plug and Play Sudoku (VT based?)", MACHINE_NOT_WORKING )

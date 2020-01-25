@@ -118,7 +118,7 @@ void ppu_vt03_device::set_new_pen(int i)
 			float fLuma = (nLuma - 4) / 9.625;     // Value determined from matching saturation =0 phases 1-12
 			float fChroma = nChroma / 18.975;      // Value determined from matching phases 0 and 13 across all luminance and saturation levels
 			float fPhase = ((nPhase - 2) * 30.0 + phaseOffset) * M_PI / 180.0;
-			
+
 			if (m_pal_mode == PAL_MODE_NEW_VG)
 			{
 				if (fPhase > 0 && fPhase < 13)
@@ -368,8 +368,8 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 		else
 		{
 			/* this mode makes use of the extra planes to increase sprite width instead
-				we probably need to split them out again and draw them at xpos+8 with a
-				cliprect - not seen used yet */
+			    we probably need to split them out again and draw them at xpos+8 with a
+			    cliprect - not seen used yet */
 			if ((pixel_data & 0x03) != 0)
 				bitmap.pix32(m_scanline, sprite_xpos + pixel) = pen((pixel_data & 0x03) + (4 * color));
 			if (((pixel_data >> 5) & 0x03) != 0)
@@ -471,13 +471,13 @@ uint8_t ppu_vt03_device::get_speva2_speva0()
 void ppu_vt03_device::set_2010_reg(uint8_t data)
 {
 	/*  7   : COLCOMP
-		6   : UNUSED (8bpp enable on VT09?)
-		5   : UNUSED
-		4   : BKEXTEN
-		3   : SPEXTEN
-		2   : SP16EN
-		1   : BK16EN
-		0   : PIX16EN */
+	    6   : UNUSED (8bpp enable on VT09?)
+	    5   : UNUSED
+	    4   : BKEXTEN
+	    3   : SPEXTEN
+	    2   : SP16EN
+	    1   : BK16EN
+	    0   : PIX16EN */
 	uint8_t pal_mask = (m_pal_mode == PAL_MODE_NEW_VG) ? 0x08 : 0x80;
 	if ((m_201x_regs[0x0] & pal_mask) != (data & pal_mask))
 	{
