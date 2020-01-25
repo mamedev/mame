@@ -26,8 +26,7 @@ namespace plib {
 	#endif
 
 	app::app()
-	: options()
-	, pout(&std::cout)
+	: pout(&std::cout)
 	, perr(&std::cerr)
 	{
 

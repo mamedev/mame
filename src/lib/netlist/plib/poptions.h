@@ -139,8 +139,8 @@ namespace plib {
 				m_val = static_cast<T>(raw);
 				return 0;
 			}
-			else
-				return 1;
+
+			return 1;
 		}
 
 	private:

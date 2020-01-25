@@ -90,28 +90,28 @@ namespace plib
 		}
 
 		template <typename O>
-		constexpr const ptime operator-(const ptime<O, RES> &rhs) const noexcept
+		constexpr ptime operator-(const ptime<O, RES> &rhs) const noexcept
 		{
 			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
 			return ptime(m_time - rhs.m_time);
 		}
 
 		template <typename O>
-		constexpr const ptime operator+(const ptime<O, RES> &rhs) const noexcept
+		constexpr ptime operator+(const ptime<O, RES> &rhs) const noexcept
 		{
 			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
 			return ptime(m_time + rhs.m_time);
 		}
 
 		template <typename M>
-		constexpr const ptime operator*(const M &factor) const noexcept
+		constexpr ptime operator*(const M &factor) const noexcept
 		{
 			static_assert(plib::is_integral<M>::value, "Factor must be an integral type");
 			return ptime(m_time * static_cast<mult_type>(factor));
 		}
 
 		template <typename O>
-		constexpr const mult_type operator/(const ptime<O, RES> &rhs) const noexcept
+		constexpr mult_type operator/(const ptime<O, RES> &rhs) const noexcept
 		{
 			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
 			return static_cast<mult_type>(m_time / rhs.m_time);
@@ -175,34 +175,34 @@ namespace plib
 		// for save states ....
 		C14CONSTEXPR internal_type *get_internaltype_ptr() noexcept { return &m_time; }
 
-		static constexpr const ptime from_nsec(const internal_type ns) noexcept { return ptime(ns, UINT64_C(1000000000)); }
-		static constexpr const ptime from_usec(const internal_type us) noexcept { return ptime(us, UINT64_C(   1000000)); }
-		static constexpr const ptime from_msec(const internal_type ms) noexcept { return ptime(ms, UINT64_C(      1000)); }
-		static constexpr const ptime from_sec(const internal_type s) noexcept   { return ptime(s,  UINT64_C(         1)); }
-		static constexpr const ptime from_hz(const internal_type hz) noexcept { return ptime(1 , hz); }
-		static constexpr const ptime from_raw(const internal_type raw) noexcept { return ptime(raw); }
+		static constexpr ptime from_nsec(internal_type ns) noexcept { return ptime(ns, UINT64_C(1000000000)); }
+		static constexpr ptime from_usec(internal_type us) noexcept { return ptime(us, UINT64_C(   1000000)); }
+		static constexpr ptime from_msec(internal_type ms) noexcept { return ptime(ms, UINT64_C(      1000)); }
+		static constexpr ptime from_sec(internal_type s) noexcept   { return ptime(s,  UINT64_C(         1)); }
+		static constexpr ptime from_hz(internal_type hz) noexcept { return ptime(1 , hz); }
+		static constexpr ptime from_raw(internal_type raw) noexcept { return ptime(raw); }
 
 		template <typename FT>
-		static constexpr const typename std::enable_if<std::is_floating_point<FT>::value
+		static constexpr typename std::enable_if<std::is_floating_point<FT>::value
 #if PUSE_FLOAT128
 			|| std::is_same<FT, __float128>::value
 #endif
 		, ptime>::type
-		from_fp(const FT t) noexcept { return ptime(static_cast<internal_type>(plib::floor(t * static_cast<FT>(RES) + static_cast<FT>(0.5))), RES); }
+		from_fp(FT t) noexcept { return ptime(static_cast<internal_type>(plib::floor(t * static_cast<FT>(RES) + static_cast<FT>(0.5))), RES); }
 
-		static constexpr const ptime from_double(const double t) noexcept
+		static constexpr ptime from_double(double t) noexcept
 		{ return from_fp<double>(t); }
 
-		static constexpr const ptime from_float(const float t) noexcept
+		static constexpr ptime from_float(float t) noexcept
 		{ return from_fp<float>(t); }
 
-		static constexpr const ptime from_long_double(const long double t) noexcept
+		static constexpr ptime from_long_double(long double t) noexcept
 		{ return from_fp<long double>(t); }
 
-		static constexpr const ptime zero() noexcept { return ptime(0, RES); }
-		static constexpr const ptime quantum() noexcept { return ptime(1, RES); }
-		static constexpr const ptime never() noexcept { return ptime(plib::numeric_limits<internal_type>::max(), RES); }
-		static constexpr const internal_type resolution() noexcept { return RES; }
+		static constexpr ptime zero() noexcept { return ptime(0, RES); }
+		static constexpr ptime quantum() noexcept { return ptime(1, RES); }
+		static constexpr ptime never() noexcept { return ptime(plib::numeric_limits<internal_type>::max(), RES); }
+		static constexpr internal_type resolution() noexcept { return RES; }
 
 		constexpr internal_type in_nsec() const noexcept { return m_time / (RES / UINT64_C(1000000000)); }
 		constexpr internal_type in_usec() const noexcept { return m_time / (RES / UINT64_C(   1000000)); }

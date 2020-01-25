@@ -218,11 +218,11 @@ namespace netlist
 	template <>
 	struct fp_constants<float>
 	{
-		static inline constexpr float DIODE_MAXDIFF() noexcept { return  1e20f; }
-		static inline constexpr float DIODE_MAXVOLT() noexcept { return  90.0f; }
+		static inline constexpr float DIODE_MAXDIFF() noexcept { return  1e20F; }
+		static inline constexpr float DIODE_MAXVOLT() noexcept { return  90.0F; }
 
-		static inline constexpr float TIMESTEP_MAXDIFF() noexcept { return  1e30f; }
-		static inline constexpr float TIMESTEP_MINDIV() noexcept { return  1e-8f; }
+		static inline constexpr float TIMESTEP_MAXDIFF() noexcept { return  1e30F; }
+		static inline constexpr float TIMESTEP_MINDIV() noexcept { return  1e-8F; }
 
 		static inline constexpr const char * name() noexcept { return "float"; }
 		static inline constexpr const char * suffix() noexcept { return "f"; }

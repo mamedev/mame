@@ -14,9 +14,9 @@ int pstring_t<F>::compare(const pstring_t &right) const noexcept
 {
 	if (mem_t_size() == 0 && right.mem_t_size() == 0)
 		return 0;
-	else if (right.mem_t_size() == 0)
+	if (right.mem_t_size() == 0)
 		return 1;
-	else if (mem_t_size() == 0)
+	if (mem_t_size() == 0)
 		return -1;
 
 	auto si = this->begin();

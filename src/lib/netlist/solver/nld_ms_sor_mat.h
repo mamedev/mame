@@ -40,7 +40,7 @@ namespace solver
 			{
 			}
 
-		unsigned vsolve_non_dynamic(const bool newton_raphson) override;
+		unsigned vsolve_non_dynamic(bool newton_raphson) override;
 
 	private:
 		state_var<float_type> m_omega;
@@ -51,7 +51,7 @@ namespace solver
 	// ----------------------------------------------------------------------------------------
 
 	template <typename FT, int SIZE>
-	unsigned matrix_solver_SOR_mat_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raphson)
+	unsigned matrix_solver_SOR_mat_t<FT, SIZE>::vsolve_non_dynamic(bool newton_raphson)
 	{
 		// The matrix based code looks a lot nicer but actually is 30% slower than
 		// the optimized code which works directly on the data structures.

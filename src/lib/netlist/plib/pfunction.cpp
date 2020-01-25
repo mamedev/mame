@@ -92,21 +92,21 @@ namespace plib {
 	{
 		if (v == "(" || v == ")")
 			return 1;
-		else if (plib::left(v, 1) >= "a" && plib::left(v, 1) <= "z")
+		if (plib::left(v, 1) >= "a" && plib::left(v, 1) <= "z")
 			return 0;
-		else if (v == "*" || v == "/")
+		if (v == "*" || v == "/")
 			return 20;
-		else if (v == "+" || v == "-")
+		if (v == "+" || v == "-")
 			return 10;
-		else if (v == "^")
+		if (v == "^")
 			return 30;
-		else
-			return -1;
+
+		return -1;
 	}
 
 	static pstring pop_check(std::stack<pstring> &stk, const pstring &expr) noexcept(false)
 	{
-		if (stk.size() == 0)
+		if (stk.empty())
 			throw pexception(plib::pfmt("pfunction: stack underflow during infix parsing of: <{1}>")(expr));
 		pstring res = stk.top();
 		stk.pop();
@@ -183,7 +183,7 @@ namespace plib {
 					postfix.push_back(x);
 					x = pop_check(opstk, expr);
 				}
-				if (opstk.size() > 0 && get_prio(opstk.top()) == 0)
+				if (!opstk.empty() && get_prio(opstk.top()) == 0)
 					postfix.push_back(pop_check(opstk, expr));
 			}
 			else if (s==",")
@@ -200,7 +200,7 @@ namespace plib {
 				int p = get_prio(s);
 				if (p>0)
 				{
-					if (opstk.size() == 0)
+					if (opstk.empty())
 						opstk.push(s);
 					else
 					{
@@ -220,7 +220,7 @@ namespace plib {
 					postfix.push_back(s);
 			}
 		}
-		while (opstk.size() > 0)
+		while (!opstk.empty())
 		{
 			postfix.push_back(opstk.top());
 			opstk.pop();
@@ -238,8 +238,8 @@ namespace plib {
 		std::uint16_t lsb = lfsr & 1;
 		lfsr >>= 1;
 		if (lsb)
-			lfsr ^= 0xB400u; // taps 15, 13, 12, 10
-		return static_cast<NT>(lfsr) / static_cast<NT>(0xffffu);
+			lfsr ^= 0xB400U; // taps 15, 13, 12, 10
+		return static_cast<NT>(lfsr) / static_cast<NT>(0xffffU);
 	}
 
 	template <typename NT>
@@ -249,7 +249,7 @@ namespace plib {
 		std::uint16_t lsb = lfsr & 1;
 		lfsr >>= 1;
 		if (lsb)
-			lfsr ^= 0xB400u; // taps 15, 13, 12, 10
+			lfsr ^= 0xB400U; // taps 15, 13, 12, 10
 		return static_cast<NT>(lfsr);
 	}
 

@@ -337,8 +337,8 @@ namespace plib
 		void gaussian_elimination_parallel(V & RHS)
 		{
 			//printf("omp: %ld %d %d\n", m_ge_par.size(), nz_num, (int)m_ge_par[m_ge_par.size()-2].size());
-			for (auto l = 0ul; l < m_ge_par.size(); l++)
-				plib::omp::for_static(base::nz_num, 0ul, m_ge_par[l].size(), [this, &RHS, &l] (unsigned ll)
+			for (auto l = 0UL; l < m_ge_par.size(); l++)
+				plib::omp::for_static(base::nz_num, 0UL, m_ge_par[l].size(), [this, &RHS, &l] (unsigned ll)
 				{
 					auto &i = m_ge_par[l][ll];
 					{

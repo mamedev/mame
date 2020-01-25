@@ -299,7 +299,8 @@ namespace plib
 		template <typename T> explicit ename(T val) { m_v = static_cast<E>(val); } \
 		bool set_from_string (const pstring &s) { \
 			int f = from_string_int(strings(), s); \
-			if (f>=0) { m_v = static_cast<E>(f); return true; } else { return false; } \
+			if (f>=0) { m_v = static_cast<E>(f); return true; } \
+			return false;\
 		} \
 		operator E() const noexcept {return m_v;} \
 		bool operator==(const ename &rhs) const noexcept {return m_v == rhs.m_v;} \

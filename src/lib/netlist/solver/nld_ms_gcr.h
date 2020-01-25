@@ -110,7 +110,7 @@ namespace solver
 			}
 		}
 
-		unsigned vsolve_non_dynamic(const bool newton_raphson) override;
+		unsigned vsolve_non_dynamic(bool newton_raphson) override;
 
 		std::pair<pstring, pstring> create_solver_code() override;
 
@@ -226,7 +226,7 @@ namespace solver
 	}
 
 	template <typename FT, int SIZE>
-	unsigned matrix_solver_GCR_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raphson)
+	unsigned matrix_solver_GCR_t<FT, SIZE>::vsolve_non_dynamic(bool newton_raphson)
 	{
 		// populate matrix
 		mat.set_scalar(plib::constants<FT>::zero());

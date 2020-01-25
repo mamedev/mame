@@ -23,10 +23,7 @@ namespace plib
 		pstring basename(const pstring &filename)
 		{
 			auto p=find_last_of(filename, pstring(1, PATH_SEP));
-			if (p == pstring::npos)
-				return filename;
-			else
-				return filename.substr(p+1);
+			return (p == pstring::npos) ? filename : filename.substr(p+1);
 		}
 
 		pstring path(const pstring &filename)
@@ -34,10 +31,10 @@ namespace plib
 			auto p=find_last_of(filename, pstring(1, PATH_SEP));
 			if (p == pstring::npos)
 				return "";
-			else if (p == 0) // root case
+			if (p == 0) // root case
 				return filename.substr(0, 1);
-			else
-				return filename.substr(0, p);
+
+			return filename.substr(0, p);
 		}
 
 		pstring buildpath(std::initializer_list<pstring> list )
@@ -55,10 +52,8 @@ namespace plib
 
 		pstring environment(const pstring &var, const pstring &default_val)
 		{
-			if (std::getenv(var.c_str()) == nullptr)
-				return default_val;
-			else
-				return pstring(std::getenv(var.c_str()));
+			return (std::getenv(var.c_str()) == nullptr) ? default_val
+				: pstring(std::getenv(var.c_str()));
 		}
 	} // namespace util
 
@@ -94,7 +89,7 @@ namespace plib
 		std::vector<std::string> result;
 		std::size_t splits = 0;
 
-		while(str.size())
+		while(!str.empty())
 		{
 			std::size_t index = str.rfind(token);
 			bool found = index!=std::string::npos;
@@ -104,7 +99,7 @@ namespace plib
 			{
 				result.push_back(str.substr(index+token.size()));
 				str = str.substr(0, index);
-				if (str.size()==0)
+				if (str.empty())
 					result.push_back(str);
 			}
 			else

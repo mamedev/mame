@@ -632,7 +632,7 @@ namespace netlist
 
 			state_var_sig m_Q;
 	#else
-			static void set_copied_input(netlist_sig_t val) noexcept { plib::unused_var(val); }
+			void set_copied_input(netlist_sig_t val) noexcept { plib::unused_var(val); }
 	#endif
 
 			void set_delegate(const nldelegate &delegate) noexcept { m_delegate = delegate; }

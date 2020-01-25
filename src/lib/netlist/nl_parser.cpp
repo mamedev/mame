@@ -86,8 +86,9 @@ bool parser_t::parse(const pstring &nlname)
 			{
 				parse_netlist(name.str());
 				return true;
-			} else
-				in_nl = true;
+			}
+
+			in_nl = true;
 		}
 	}
 }

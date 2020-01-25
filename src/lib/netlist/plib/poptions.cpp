@@ -77,10 +77,8 @@ namespace plib {
 						{
 							throw pexception("other args can only be specified once!");
 						}
-						else
-						{
-							m_other_args = ov;
-						}
+
+						m_other_args = ov;
 					}
 					else
 						throw pexception("found option with neither short or long tag!" );
@@ -105,7 +103,7 @@ namespace plib {
 			if (!seen_other_args && plib::startsWith(arg, "--"))
 			{
 				auto v = psplit(arg.substr(2),"=");
-				if (v.size() && v[0] != "")
+				if (!v.empty() && v[0] != "")
 				{
 					opt = getopt_long(v[0]);
 					has_equal_arg = (v.size() > 1);

@@ -81,8 +81,8 @@ namespace devices
 			return ret;
 		}
 
-		static constexpr const pbitset all_bits() noexcept { return pbitset(~static_cast<T>(0)); }
-		static constexpr const pbitset no_bits() noexcept{ return pbitset(static_cast<T>(0)); }
+		static constexpr pbitset all_bits() noexcept { return pbitset(~static_cast<T>(0)); }
+		static constexpr pbitset no_bits() noexcept{ return pbitset(static_cast<T>(0)); }
 	private:
 		T m_bs;
 	};

@@ -180,8 +180,8 @@ namespace solver
 		const netlist_time solve(netlist_time_ext now);
 		void update_inputs();
 
-		bool has_dynamic_devices() const noexcept { return m_dynamic_devices.size() > 0; }
-		bool has_timestep_devices() const noexcept { return m_step_devices.size() > 0; }
+		bool has_dynamic_devices() const noexcept { return !m_dynamic_devices.empty(); }
+		bool has_timestep_devices() const noexcept { return !m_step_devices.empty(); }
 
 		void update_forced();
 		void update_after(netlist_time after) noexcept
@@ -211,8 +211,8 @@ namespace solver
 			const analog_net_t::list_t &nets,
 			const solver_parameters_t *params);
 
-		virtual unsigned vsolve_non_dynamic(const bool newton_raphson) = 0;
-		virtual netlist_time compute_next_timestep(const nl_fptype cur_ts) = 0;
+		virtual unsigned vsolve_non_dynamic(bool newton_raphson) = 0;
+		virtual netlist_time compute_next_timestep(nl_fptype cur_ts) = 0;
 
 		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_gonn;
 		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_gtn;

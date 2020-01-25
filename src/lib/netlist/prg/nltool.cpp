@@ -119,7 +119,7 @@ public:
 	{
 		pstring res = plib::pfmt(fmt)(std::forward<ARGS>(args)...);
 		auto lines(plib::psplit(res, "\n", false));
-		if (lines.size() == 0)
+		if (lines.empty())
 			pout(prefix + "\n");
 		else
 			for (auto &l : lines)
@@ -134,7 +134,7 @@ private:
 	void convert();
 	void static_compile();
 
-	void mac_out(const pstring &s, const bool cont = true);
+	void mac_out(const pstring &s, bool cont = true);
 	void header_entry(const netlist::factory::element_t *e);
 	void mac(const netlist::factory::element_t *e);
 
@@ -163,8 +163,7 @@ class netlist_data_folder_t : public netlist::source_data_t
 {
 public:
 	explicit netlist_data_folder_t(const pstring &folder)
-	: netlist::source_data_t()
-	, m_folder(folder)
+	: m_folder(folder)
 	{
 	}
 
@@ -174,11 +173,9 @@ public:
 		auto strm(plib::make_unique<std::ifstream>(plib::filesystem::u8path(name)));
 		if (strm->fail())
 			return stream_ptr(nullptr);
-		else
-		{
-			strm->imbue(std::locale::classic());
-			return std::move(strm);
-		}
+
+		strm->imbue(std::locale::classic());
+		return std::move(strm);
 	}
 
 private:
@@ -189,8 +186,7 @@ class netlist_tool_callbacks_t : public netlist::callbacks_t
 {
 public:
 	explicit netlist_tool_callbacks_t(tool_app_t &app)
-	: netlist::callbacks_t()
-	, m_app(app)
+	: m_app(app)
 	{ }
 
 	void vlog(const plib::plog_level &l, const pstring &ls) const noexcept override;
@@ -584,7 +580,7 @@ static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 			if (l != "")
 			{
 				auto a(plib::psplit(l, ":", true));
-				if ((a.size() < 1) || (a.size() > 2))
+				if (a.empty() || (a.size() > 2))
 					throw netlist::nl_exception(l+" size mismatch");
 				pstring n(plib::trim(a[0]));
 				pstring v(a.size() < 2 ? "" : plib::trim(a[1]));
@@ -621,7 +617,7 @@ static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 					else if (n == "Example")
 					{
 						ret.example = plib::psplit(plib::trim(v),",",true);
-						if (ret.example.size() != 2 && ret.example.size() != 0)
+						if (ret.example.size() != 2 && !ret.example.empty())
 							throw netlist::nl_exception("Example requires 2 parameters, but found {1}", ret.example.size());
 					}
 					else
@@ -696,7 +692,7 @@ void tool_app_t::mac(const netlist::factory::element_t *e)
 			vs += ", " + plib::replace_all(plib::replace_all(s, "+", ""), ".", "_");
 
 	pout("{1}(name{2})\n", e->name(), vs);
-	if (v.size() > 0)
+	if (!v.empty())
 	{
 		pout("/*\n");
 		for (const auto &s : v)
@@ -827,7 +823,7 @@ void tool_app_t::create_docheader()
 			poutprefix("///", "  @section {}_2 Connection Diagram", d.id);
 			poutprefix("///", "");
 
-			if (d.pinalias.size() > 0)
+			if (!d.pinalias.empty())
 			{
 				poutprefix("///", "  <pre>");
 				if (d.package == "DIP")
@@ -857,7 +853,7 @@ void tool_app_t::create_docheader()
 			poutprefix("///", "  @section {}_4 Limitations", d.id);
 			poutprefix("///", "");
 			poutprefix("///", "  {}", d.limitations);
-			if (d.example.size() > 0)
+			if (!d.example.empty())
 			{
 				poutprefix("///", "");
 				poutprefix("///", "  @section {}_5 Example", d.id);
@@ -911,7 +907,7 @@ void tool_app_t::listdevices()
 		}
 		out += ")";
 		pout("{}\n", out);
-		if (terms.size() > 0)
+		if (!terms.empty())
 		{
 			pstring t = "";
 			for (auto & j : terms)

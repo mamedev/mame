@@ -161,18 +161,16 @@ namespace netlist
 	{
 		if (dynamic_cast<const terminal_t *>(this) != nullptr)
 			return terminal_type::TERMINAL;
-		else if (dynamic_cast<const logic_input_t *>(this) != nullptr
+		if (dynamic_cast<const logic_input_t *>(this) != nullptr
 			|| dynamic_cast<const analog_input_t *>(this) != nullptr)
 			return terminal_type::INPUT;
-		else if (dynamic_cast<const logic_output_t *>(this) != nullptr
+		if (dynamic_cast<const logic_output_t *>(this) != nullptr
 			|| dynamic_cast<const analog_output_t *>(this) != nullptr)
 			return terminal_type::OUTPUT;
-		else
-		{
-			state().log().fatal(MF_UNKNOWN_TYPE_FOR_OBJECT(name()));
-			throw nl_exception(MF_UNKNOWN_TYPE_FOR_OBJECT(name()));
-			//return terminal_type::TERMINAL; // please compiler
-		}
+
+		state().log().fatal(MF_UNKNOWN_TYPE_FOR_OBJECT(name()));
+		throw nl_exception(MF_UNKNOWN_TYPE_FOR_OBJECT(name()));
+		//return terminal_type::TERMINAL; // please compiler
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -198,7 +196,6 @@ namespace netlist
 	netlist_state_t::netlist_state_t(const pstring &aname,
 		plib::unique_ptr<callbacks_t> &&callbacks)
 	: m_name(aname)
-	, m_state()
 	, m_callbacks(std::move(callbacks)) // Order is important here
 	, m_log(*m_callbacks)
 	, m_extended_validation(false)
@@ -442,7 +439,7 @@ namespace netlist
 			for (auto & j : index)
 			{
 				auto entry = m_state.m_devices[j].second.get();
-				auto stats = m_state.m_devices[j].second.get()->m_stats.get();
+				auto stats = entry->m_stats.get();
 				log().verbose("Device {1:20} : {2:12} {3:12} {4:15} {5:12}", entry->name(),
 						stats->m_stat_call_count(), stats->m_stat_total_time.count(),
 						stats->m_stat_total_time.total(), stats->m_stat_inc_active());
@@ -520,8 +517,7 @@ namespace netlist
 					m_log.fatal(MF_MORE_THAN_ONE_1_DEVICE_FOUND(classname));
 					throw nl_exception(MF_MORE_THAN_ONE_1_DEVICE_FOUND(classname));
 				}
-				else
-					ret = d.second.get();
+				ret = d.second.get();
 			}
 		}
 		return ret;
@@ -534,7 +530,6 @@ namespace netlist
 
 	core_device_t::core_device_t(netlist_state_t &owner, const pstring &name)
 		: object_t(name)
-		, logic_family_t()
 		, netlist_ref(owner.exec())
 		, m_hint_deactivate(false)
 		, m_active_outputs(*this, "m_active_outputs", 1)
@@ -547,7 +542,6 @@ namespace netlist
 
 	core_device_t::core_device_t(core_device_t &owner, const pstring &name)
 		: object_t(owner.name() + "." + name)
-		, logic_family_t()
 		, netlist_ref(owner.state().exec())
 		, m_hint_deactivate(false)
 		, m_active_outputs(*this, "m_active_outputs", 1)
@@ -759,7 +753,6 @@ namespace netlist
 	detail::core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &aname,
 			const state_e state, nldelegate delegate)
 	: device_object_t(dev, dev.name() + "." + aname)
-	, plib::linkedlist_t<core_terminal_t>::element_t()
 	#if NL_USE_COPY_INSTEAD_OF_REFERENCE
 	, m_Q(*this, "m_Q", 0)
 	#endif
@@ -778,7 +771,6 @@ namespace netlist
 	logic_t::logic_t(core_device_t &dev, const pstring &aname, const state_e state,
 			nldelegate delegate)
 		: core_terminal_t(dev, aname, state, delegate)
-		, logic_family_t()
 	{
 	}
 
@@ -896,19 +888,17 @@ namespace netlist
 	{
 		if (dynamic_cast<const param_str_t *>(this) != nullptr)
 			return STRING;
-		else if (dynamic_cast<const param_fp_t *>(this) != nullptr)
+		if (dynamic_cast<const param_fp_t *>(this) != nullptr)
 			return DOUBLE;
-		else if (dynamic_cast<const param_int_t *>(this) != nullptr)
+		if (dynamic_cast<const param_int_t *>(this) != nullptr)
 			return INTEGER;
-		else if (dynamic_cast<const param_logic_t *>(this) != nullptr)
+		if (dynamic_cast<const param_logic_t *>(this) != nullptr)
 			return LOGIC;
-		else if (dynamic_cast<const param_ptr_t *>(this) != nullptr)
+		if (dynamic_cast<const param_ptr_t *>(this) != nullptr)
 			return POINTER;
-		else
-		{
-			state().log().fatal(MF_UNKNOWN_PARAM_TYPE(name()));
-			throw nl_exception(MF_UNKNOWN_PARAM_TYPE(name()));
-		}
+
+		state().log().fatal(MF_UNKNOWN_PARAM_TYPE(name()));
+		throw nl_exception(MF_UNKNOWN_PARAM_TYPE(name()));
 	}
 
 
