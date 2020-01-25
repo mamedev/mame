@@ -802,7 +802,7 @@ ROM_END
 
     MCU Notes:
     i8751 MCU dumps confirmed good on original hardware
-    German language MCUs dumped for Quizard 1 through 4 are dumped
+    German language MCUs for Quizard 1 through 4 are dumped
     Czechoslovakian language MCU for Quizard 4 is dumped
     Known to exist a Quizard 1 Italian language MCU IT 11 L2 (not dumped)
     Known to exist is an alternate Quizard 2 German language MCU DE 122 D3 (not dumped)
