@@ -76,6 +76,7 @@
 #include "screen.h"
 #include "speaker.h"
 
+
 class nes_vt_state : public nes_base_state
 {
 public:
@@ -106,6 +107,7 @@ public:
 	void nes_vt_ddr(machine_config& config);
 
 	void nes_vt_xx(machine_config& config);
+	void nes_vt_sudopptv(machine_config& config);
 
 	/* OneBus read callbacks for getting sprite and tile data during rendering */
 	DECLARE_READ8_MEMBER(spr_r);
@@ -122,6 +124,8 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
 	void nes_vt_map(address_map& map);
 
@@ -226,7 +230,6 @@ private:
 	void do_dma(uint8_t data, bool has_ntsc_bug);
 };
 
-
 class nes_vt_vh2009_state : public nes_vt_state
 {
 public:
@@ -257,7 +260,6 @@ protected:
 
 private:
 };
-
 
 class nes_vt_pjoy_state : public nes_vt_state
 {
@@ -291,7 +293,6 @@ public:
 protected:
 	virtual void machine_reset() override;
 };
-
 
 class nes_vt_ablping_state : public nes_vt_sp69_state
 {
@@ -336,7 +337,6 @@ private:
 	DECLARE_READ8_MEMBER(vt03_414f_r);
 	DECLARE_READ8_MEMBER(vt03_415c_r);
 };
-
 
 class nes_vt_dg_state : public nes_vt_state
 {
@@ -393,9 +393,9 @@ public:
 	nes_vt_ablpinb_state(const machine_config& mconfig, device_type type, const char* tag) :
 		nes_vt_state(mconfig, type, tag),
 		m_ablpinb_in0_val(0),
-		m_io0(*this,"IO0"),
-		m_io1(*this,"IO1"),
-		m_plunger(*this,"PLUNGER")
+		m_io0(*this, "IO0"),
+		m_io1(*this, "IO1"),
+		m_plunger(*this, "PLUNGER")
 	{ }
 
 	void nes_vt_ablpinb(machine_config& config);
@@ -426,8 +426,8 @@ class nes_vt_sudoku_state : public nes_vt_state
 public:
 	nes_vt_sudoku_state(const machine_config& mconfig, device_type type, const char* tag) :
 		nes_vt_state(mconfig, type, tag),
-		m_io0(*this,"IO0"),
-		m_io1(*this,"IO1")
+		m_io0(*this, "IO0"),
+		m_io1(*this, "IO1")
 	{ }
 
 	void init_sudoku();
@@ -454,8 +454,8 @@ class nes_vt_majgnc_state : public nes_vt_state
 public:
 	nes_vt_majgnc_state(const machine_config& mconfig, device_type type, const char* tag) :
 		nes_vt_state(mconfig, type, tag),
-		m_io0(*this,"IO0"),
-		m_io1(*this,"IO1")
+		m_io0(*this, "IO0"),
+		m_io1(*this, "IO1")
 	{ }
 
 	void nes_vt_majgnc(machine_config& config);
@@ -472,9 +472,6 @@ private:
 	required_ioport m_io0;
 	required_ioport m_io1;
 };
-
-
-
 
 uint32_t nes_vt_state::get_banks(uint8_t bnk)
 {
@@ -511,11 +508,11 @@ void nes_vt_state::update_banks()
 	else
 		bank = 0xfe;
 
-	m_prgbank0->set_entry((amod | get_banks(bank)) & (m_numbanks-1));
+	m_prgbank0->set_entry((amod | get_banks(bank)) & (m_numbanks - 1));
 
 	// a000-bfff
 	bank = m_410x[0x8];
-	m_prgbank1->set_entry((amod | get_banks(bank)) & (m_numbanks-1));
+	m_prgbank1->set_entry((amod | get_banks(bank)) & (m_numbanks - 1));
 
 	// c000-dfff
 	if ((m_410x[0xb] & 0x40) != 0 || (m_410x[0x5] & 0x40) != 0)
@@ -528,21 +525,21 @@ void nes_vt_state::update_banks()
 	else
 		bank = 0xfe;
 
-	m_prgbank2->set_entry((amod | get_banks(bank)) & (m_numbanks-1));
+	m_prgbank2->set_entry((amod | get_banks(bank)) & (m_numbanks - 1));
 
 	// e000 - ffff
 	bank = m_initial_e000_bank;
-	m_prgbank3->set_entry((amod | get_banks(bank)) & (m_numbanks-1));
+	m_prgbank3->set_entry((amod | get_banks(bank)) & (m_numbanks - 1));
 }
 
-uint16_t nes_vt_state::decode_nt_addr(uint16_t addr) {
+uint16_t nes_vt_state::decode_nt_addr(uint16_t addr)
+{
 	bool vert_mirror = !(m_410x[0x6] & 0x01);
 	int a11 = (addr >> 11) & 0x01;
 	int a10 = (addr >> 10) & 0x01;
 	uint16_t base = (addr & 0x3FF);
 	return ((vert_mirror ? a10 : a11) << 10) | base;
 }
-
 
 WRITE8_MEMBER(nes_vt_state::vt03_410x_w)
 {
@@ -568,8 +565,6 @@ WRITE8_MEMBER(nes_vt_ablping_state::ablping_410f_w)
 };
 
 // Source: https://wiki.nesdev.com/w/index.php/NES_2.0_submappers/Proposals#NES_2.0_Mapper_256
-
-
 
 void nes_vt_state::scrambled_410x_w(uint16_t offset, uint8_t data)
 {
@@ -699,7 +694,6 @@ WRITE8_MEMBER(nes_vt_dg_state::vtfp_4242_w)
 	m_4242 = data;
 }
 
-
 WRITE8_MEMBER(nes_vt_hh_state::vtfp_411d_w)
 {
 	logerror("vtfp_411d_w  %02x\n", data);
@@ -714,7 +708,7 @@ WRITE8_MEMBER(nes_vt_dg_state::vtfa_412c_w)
 	m_ahigh |= (data & 0x01) ? (1 << 25) : 0x0;
 	m_ahigh |= (data & 0x02) ? (1 << 24) : 0x0;
 
-  //m_ahigh |= (m_csel->read() == 0x01) ? (1 << 25) : 0x0;
+	//m_ahigh |= (m_csel->read() == 0x01) ? (1 << 25) : 0x0;
 	update_banks();
 }
 
@@ -736,11 +730,12 @@ READ8_MEMBER(nes_vt_hh_state::vtfp_412d_r)
 
 READ8_MEMBER(nes_vt_cy_state::vt03_41bx_r)
 {
-	switch(offset) {
-		case 0x07:
-			return 0x04;
-		default:
-			return 0x00;
+	switch (offset)
+	{
+	case 0x07:
+		return 0x04;
+	default:
+		return 0x00;
 	}
 }
 
@@ -751,13 +746,14 @@ WRITE8_MEMBER(nes_vt_cy_state::vt03_48ax_w)
 
 READ8_MEMBER(nes_vt_cy_state::vt03_48ax_r)
 {
-	switch(offset) {
-		case 0x04:
-			return 0x01;
-		case 0x05:
-			return 0x01;
-		default:
-			return 0x00;
+	switch (offset)
+	{
+	case 0x04:
+		return 0x01;
+	case 0x05:
+		return 0x01;
+	default:
+		return 0x00;
 	}
 }
 
@@ -766,7 +762,8 @@ WRITE8_MEMBER(nes_vt_cy_state::vt03_413x_w)
 	logerror("vt03_413x_w %02x %02x\n", offset, data);
 	// VT168 style ALU ??
 	m_413x[offset] = data;
-	if(offset == 0x5) {
+	if (offset == 0x5)
+	{
 		uint32_t res = uint32_t((m_413x[5] << 8) | m_413x[4]) * uint32_t((m_413x[1] << 8) | m_413x[0]);
 		m_413x[0] = res & 0xFF;
 		m_413x[1] = (res >> 8) & 0xFF;
@@ -774,7 +771,9 @@ WRITE8_MEMBER(nes_vt_cy_state::vt03_413x_w)
 		m_413x[3] = (res >> 24) & 0xFF;
 		m_413x[6] = 0x00;
 
-	} else if(offset == 0x6) {
+	}
+	else if (offset == 0x6)
+	{
 		/*uint32_t res = uint32_t((m_413x[5] << 8) | m_413x[4]) * uint32_t((m_413x[1] << 8) | m_413x[0]);
 		m_413x[0] = res & 0xFF;
 		m_413x[1] = (res >> 8) & 0xFF;
@@ -782,7 +781,6 @@ WRITE8_MEMBER(nes_vt_cy_state::vt03_413x_w)
 		m_413x[3] = (res >> 24) & 0xFF;*/
 		m_413x[6] = 0x00;
 	}
-
 }
 
 
@@ -810,28 +808,35 @@ READ8_MEMBER(nes_vt_hh_state::vthh_414a_r)
 
 READ8_MEMBER(nes_vt_state::spr_r)
 {
-	if(m_4242 & 0x1 || m_411d & 0x04) {
+	if (m_4242 & 0x1 || m_411d & 0x04)
+	{
 		return m_chrram[offset];
-	} else {
+	}
+	else
+	{
 		int realaddr = calculate_real_video_address(offset, 0, 1);
-		return m_prgrom[realaddr & (m_romsize-1)];
+		return m_prgrom[realaddr & (m_romsize - 1)];
 	}
 }
 
 READ8_MEMBER(nes_vt_state::chr_r)
 {
-	if(m_4242 & 0x1  || m_411d & 0x04) {
+	if (m_4242 & 0x1 || m_411d & 0x04)
+	{
 		return m_chrram[offset];
-	} else {
+	}
+	else
+	{
 		int realaddr = calculate_real_video_address(offset, 1, 0);
-		return m_prgrom[realaddr &  (m_romsize-1)];
+		return m_prgrom[realaddr & (m_romsize - 1)];
 	}
 }
 
 
 WRITE8_MEMBER(nes_vt_state::chr_w)
 {
-	if(m_4242 & 0x1 || m_411d & 0x04) {
+	if (m_4242 & 0x1 || m_411d & 0x04)
+	{
 		logerror("vram write %04x %02x\n", offset, data);
 		m_chrram[offset] = data;
 	}
@@ -839,15 +844,17 @@ WRITE8_MEMBER(nes_vt_state::chr_w)
 	return m_prgrom[realaddr &  (m_romsize-1)];*/
 }
 
-WRITE8_MEMBER(nes_vt_hh_state::vtfp_411e_w) {
+WRITE8_MEMBER(nes_vt_hh_state::vtfp_411e_w)
+{
 	logerror("411e_w %02x\n", data);
-	if(data == 0x05)
+	if (data == 0x05)
 		dynamic_cast<m6502_vtscr&>(*m_maincpu).set_next_scramble(true);
-	else if(data == 0x00)
+	else if (data == 0x00)
 		dynamic_cast<m6502_vtscr&>(*m_maincpu).set_next_scramble(false);
 }
 
-WRITE8_MEMBER(nes_vt_hh_state::vtfp_4a00_w) {
+WRITE8_MEMBER(nes_vt_hh_state::vtfp_4a00_w)
+{
 	logerror("4a00_w %02x\n", data);
 	//if(data == 0x80)
 	//  dynamic_cast<m6502_vtscr&>(*m_maincpu).set_scramble(false);
@@ -867,7 +874,8 @@ void nes_vt_state::hblank_irq(int scanline, int vblank, int blanked)
 void nes_vt_state::video_irq(bool hblank, int scanline, int vblank, int blanked)
 {
 	//TSYNEN
-	if(((m_410x[0xb] >> 7) & 0x01) == hblank) {
+	if (((m_410x[0xb] >> 7) & 0x01) == hblank)
+	{
 		int irqstate = 0;
 
 		//logerror("scanline_irq %d\n", scanline);
@@ -891,7 +899,6 @@ void nes_vt_state::video_irq(bool hblank, int scanline, int vblank, int blanked)
 		//else
 		//  m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 	}
-
 }
 
 /* todo, handle custom VT nametable stuff here */
@@ -908,7 +915,7 @@ WRITE8_MEMBER(nes_vt_state::nt_w)
 
 void nes_vt_state::machine_start()
 {
-	m_romsize =  memregion("mainrom")->bytes();
+	m_romsize = memregion("mainrom")->bytes();
 	m_numbanks = m_romsize / 0x2000;
 
 	m_prg->set_bank(0);
@@ -936,8 +943,8 @@ void nes_vt_state::machine_start()
 	m_ppu->set_scanline_callback(*this, FUNC(nes_vt_state::scanline_irq));
 	m_ppu->set_hblank_callback(*this, FUNC(nes_vt_state::hblank_irq));
 
-//  m_ppu->set_hblank_callback(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::hblank_irq)));
-//  m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_r)), write8_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_w)));
+	//m_ppu->set_hblank_callback(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::hblank_irq)));
+	//m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_r)), write8_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_w)));
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(*this, FUNC(nes_vt_state::nt_r)), write8_delegate(*this, FUNC(nes_vt_state::nt_w)));
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(*this, FUNC(nes_vt_state::chr_r)), write8_delegate(*this, FUNC(nes_vt_state::chr_w)));
 }
@@ -1044,7 +1051,7 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 
 	int vbank_tva17_tva10 = 0x00;
 
-	switch ((sel>>10) & 0xf)
+	switch ((sel >> 10) & 0xf)
 	{
 	case 0x0:
 	case 0x1:
@@ -1119,13 +1126,13 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 	case 0x7: return -1;
 	}
 
-	int va34 =m_ppu->get_va34();
+	int va34 = m_ppu->get_va34();
 
 	if (!extended)
 	{
 		int is4bpp = 0;
-		if (readtype==0) is4bpp = m_ppu->get_201x_reg(0x0) & 0x02;
-		else if (readtype==1) is4bpp = m_ppu->get_201x_reg(0x0) & 0x04;
+		if (readtype == 0) is4bpp = m_ppu->get_201x_reg(0x0) & 0x02;
+		else if (readtype == 1) is4bpp = m_ppu->get_201x_reg(0x0) & 0x04;
 
 		int va20_va18 = (m_ppu->get_201x_reg(0x8) & 0x70) >> 4;
 
@@ -1135,7 +1142,7 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 		{
 			if (!alt_order)
 			{
-				finaladdr = ((finaladdr &~0xf) << 1) | (va34 << 4) | (finaladdr & 0xf);
+				finaladdr = ((finaladdr & ~0xf) << 1) | (va34 << 4) | (finaladdr & 0xf);
 			}
 			else
 			{
@@ -1183,7 +1190,7 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 		{
 			if (!alt_order)
 			{
-				finaladdr = ((finaladdr &~0xf) << 1) | (va34 << 4) | (finaladdr & 0xf);
+				finaladdr = ((finaladdr & ~0xf) << 1) | (va34 << 4) | (finaladdr & 0xf);
 			}
 			else
 			{
@@ -1205,9 +1212,10 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 void nes_vt_state::scrambled_8000_w(address_space& space, uint16_t offset, uint8_t data)
 {
 	uint16_t addr = offset + 0x8000;
-	if((m_411d & 0x01) && (m_411d & 0x03)) {
+	if ((m_411d & 0x01) && (m_411d & 0x03))
+	{
 		//CNROM compat
-		logerror("vtxx_cnrom_8000_w (%04x) %02x\n", offset+0x8000, data );
+		logerror("vtxx_cnrom_8000_w (%04x) %02x\n", offset + 0x8000, data);
 		m_ppu->set_201x_reg(0x6, data * 8);
 		m_ppu->set_201x_reg(0x7, data * 8 + 2);
 		m_ppu->set_201x_reg(0x2, data * 8 + 4);
@@ -1215,89 +1223,109 @@ void nes_vt_state::scrambled_8000_w(address_space& space, uint16_t offset, uint8
 		m_ppu->set_201x_reg(0x4, data * 8 + 6);
 		m_ppu->set_201x_reg(0x5, data * 8 + 7);
 
-	} else if(m_411d & 0x01) {
+	}
+	else if (m_411d & 0x01)
+	{
 		//MMC1 compat, TODO
-		logerror("vtxx_mmc1_8000_w (%04x) %02x\n", offset+0x8000, data );
+		logerror("vtxx_mmc1_8000_w (%04x) %02x\n", offset + 0x8000, data);
 
-	} else if(m_411d & 0x02) {
+	}
+	else if (m_411d & 0x02)
+	{
 		//UNROM compat
-		logerror("vtxx_unrom_8000_w (%04x) %02x\n", offset+0x8000, data );
+		logerror("vtxx_unrom_8000_w (%04x) %02x\n", offset + 0x8000, data);
 
 		m_410x[0x7] = ((data & 0x0F) << 1);
 		m_410x[0x8] = ((data & 0x0F) << 1) + 1;
 		update_banks();
-	} else {
+	}
+	else
+	{
 		//logerror("vtxx_mmc3_8000_w (%04x) %02x\n", offset+0x8000, data );
 
 		//MMC3 compat
-		if((addr < 0xA000) && !(addr & 0x01)) {
-
-			logerror("scrambled_8000_w (%04x) %02x (banking)\n", offset+0x8000, data );
-
-
+		if ((addr < 0xA000) && !(addr & 0x01))
+		{
+			logerror("scrambled_8000_w (%04x) %02x (banking)\n", offset + 0x8000, data);
 			// Bank select
 			m_8000_addr_latch = data & 0x07;
 			// Bank config
 			m_410x[0x05] = data & ~(1 << 5);
 			update_banks();
-		} else if((addr < 0xA000) && (addr & 0x01)) {
+		}
+		else if ((addr < 0xA000) && (addr & 0x01))
+		{
+			logerror("scrambled_8000_w (%04x) %02x (other scrambled stuff)\n", offset + 0x8000, data);
 
-			logerror("scrambled_8000_w (%04x) %02x (other scrambled stuff)\n", offset+0x8000, data );
+			switch (m_410x[0x05] & 0x07)
+			{
+			case 0x00:
+				m_ppu->set_201x_reg(m_8000_scramble[0], data);
+				break;
 
-			switch(m_410x[0x05] & 0x07) {
-				case 0x00:
-					m_ppu->set_201x_reg(m_8000_scramble[0], data);
-					break;
+			case 0x01:
+				m_ppu->set_201x_reg(m_8000_scramble[1], data);
+				break;
 
-				case 0x01:
-					m_ppu->set_201x_reg(m_8000_scramble[1], data);
-					break;
+			case 0x02: // hand?
+				m_ppu->set_201x_reg(m_8000_scramble[2], data);
+				break;
 
-				case 0x02: // hand?
-					m_ppu->set_201x_reg(m_8000_scramble[2], data);
-					break;
+			case 0x03: // dog?
+				m_ppu->set_201x_reg(m_8000_scramble[3], data);
+				break;
 
-				case 0x03: // dog?
-					m_ppu->set_201x_reg(m_8000_scramble[3], data);
-					break;
+			case 0x04: // ball thrown
+				m_ppu->set_201x_reg(m_8000_scramble[4], data);
+				break;
 
-				case 0x04: // ball thrown
-					m_ppu->set_201x_reg(m_8000_scramble[4], data);
-					break;
+			case 0x05: // ball thrown
+				m_ppu->set_201x_reg(m_8000_scramble[5], data);
+				break;
+			case 0x06:
+				m_410x[m_8000_scramble[6]] = data;
+				//m_410x[0x9] = data;
+				update_banks();
+				break;
 
-				case 0x05: // ball thrown
-					m_ppu->set_201x_reg(m_8000_scramble[5], data);
-					break;
-				case 0x06:
-					m_410x[m_8000_scramble[6]] = data;
-					//m_410x[0x9] = data;
-					update_banks();
-					break;
-
-				case 0x07:
-					m_410x[m_8000_scramble[7]] = data;
-					update_banks();
-					break;
+			case 0x07:
+				m_410x[m_8000_scramble[7]] = data;
+				update_banks();
+				break;
 			}
-		} else if((addr >= 0xA000) && (addr < 0xC000) && !(addr & 0x01)) {
+		}
+		else if ((addr >= 0xA000) && (addr < 0xC000) && !(addr & 0x01))
+		{
 			// Mirroring
 			m_410x[0x6] &= 0xFE;
 			m_410x[0x6] |= data & 0x01;
-		} else if((addr >= 0xA000) && (addr < 0xC000) && (addr & 0x01)) {
+		}
+		else if ((addr >= 0xA000) && (addr < 0xC000) && (addr & 0x01))
+		{
 			// PRG RAM control, ignore
-		} else if((addr >= 0xC000) && (addr < 0xE000) && !(addr & 0x01)) {
+		}
+		else if ((addr >= 0xC000) && (addr < 0xE000) && !(addr & 0x01))
+		{
 			// IRQ latch
 			vt03_410x_w(space, 1, data);
-		} else if((addr >= 0xC000) && (addr < 0xE000) && (addr & 0x01)) {
+		}
+		else if ((addr >= 0xC000) && (addr < 0xE000) && (addr & 0x01))
+		{
 			// IRQ reload
 			vt03_410x_w(space, 2, data);
-		} else if((addr >= 0xE000) && !(addr & 0x01)) {
+		}
+		else if ((addr >= 0xE000) && !(addr & 0x01))
+		{
 			// IRQ disable
 			vt03_410x_w(space, 3, data);
-		} else if((addr >= 0xE000) && (addr & 0x01)) {
+		}
+		else if ((addr >= 0xE000) && (addr & 0x01))
+		{
 			// IRQ enable
 			vt03_410x_w(space, 4, data);
-		} else {
+		}
+		else
+		{
 
 		}
 	}
@@ -1372,37 +1400,48 @@ void nes_vt_state::do_dma(uint8_t data, bool has_ntsc_bug)
 		has_ntsc_bug = false;
 
 	uint8_t dma_mode = m_vdma_ctrl & 0x01;
-	uint8_t dma_len  = (m_vdma_ctrl >> 1) & 0x07;
-	uint8_t src_nib_74 =  (m_vdma_ctrl >> 4) & 0x0F;
+	uint8_t dma_len = (m_vdma_ctrl >> 1) & 0x07;
+	uint8_t src_nib_74 = (m_vdma_ctrl >> 4) & 0x0F;
+
 	int length = 256;
-	switch(dma_len) {
-		case 0x0: length = 256; break;
-		case 0x4: length = 16; break;
-		case 0x5: length = 32; break;
-		case 0x6: length = 64; break;
-		case 0x7: length = 128; break;
+	switch (dma_len)
+	{
+	case 0x0: length = 256; break;
+	case 0x4: length = 16; break;
+	case 0x5: length = 32; break;
+	case 0x6: length = 64; break;
+	case 0x7: length = 128; break;
 	}
+	
 	uint16_t src_addr = (data << 8) | (src_nib_74 << 4);
 	logerror("vthh dma start ctrl=%02x addr=%04x\n", m_vdma_ctrl, src_addr);
-	if(dma_mode == 1) {
+	
+	if (dma_mode == 1)
+	{
 		logerror("vdma dest %04x\n", m_ppu->get_vram_dest());
 	}
-	if(has_ntsc_bug && (dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F00)
-		&& !(m_ppu->get_201x_reg(0x1) & 0x80)) {
+	
+	if (has_ntsc_bug && (dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F00) && !(m_ppu->get_201x_reg(0x1) & 0x80))
+	{
 		length -= 1;
 		src_addr += 1;
-	} else if((dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F01)
-		&& !(m_ppu->get_201x_reg(0x1) & 0x80)) {
+	}
+	else if ((dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F01) && !(m_ppu->get_201x_reg(0x1) & 0x80))
+	{
 		// Legacy mode for DGUN-2573 compat
 		m_ppu->set_vram_dest(0x3F00);
 		m_ppu->set_palette_mode(PAL_MODE_VT0x);
 	}
+
 	for (int i = 0; i < length; i++)
 	{
 		uint8_t spriteData = m_maincpu->space(AS_PROGRAM).read_byte(src_addr + i);
-		if(dma_mode) {
+		if (dma_mode)
+		{
 			m_maincpu->space(AS_PROGRAM).write_byte(0x2007, spriteData);
-		} else {
+		}
+		else
+		{
 			m_maincpu->space(AS_PROGRAM).write_byte(0x2004, spriteData);
 		}
 		//if(((src_addr + i) & 0xFF) == length && (i != 0)) break;
@@ -1827,6 +1866,10 @@ static GFXDECODE_START( vt03_gfx_helper )
 	GFXDECODE_ENTRY( "mainrom", 0, helper2_layout,  0x0, 2  )
 GFXDECODE_END
 
+uint32_t nes_vt_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+{
+	return m_ppu->screen_update(screen, bitmap, cliprect);
+}
 
 void nes_vt_state::nes_vt_base(machine_config &config)
 {
@@ -1840,7 +1883,7 @@ void nes_vt_state::nes_vt_base(machine_config &config)
 							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
 	m_screen->set_size(32*8, 262);
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
-	m_screen->set_screen_update("ppu", FUNC(ppu2c0x_device::screen_update));
+	m_screen->set_screen_update(FUNC(nes_vt_state::screen_update));
 
 	GFXDECODE(config, "gfxdecode", "ppu", vt03_gfx_helper);
 
@@ -1921,6 +1964,13 @@ void nes_vt_state::nes_vt_ddr(machine_config &config)
 	m_ctrl2->set_screen_tag(m_screen);
 }
 
+void nes_vt_state::nes_vt_sudopptv(machine_config &config)
+{
+	nes_vt(config);
+	m_ppu->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4); // reasonable
+	//                                    ^    ^
+}
+
 void nes_vt_hum_state::machine_reset()
 {
 	nes_vt_state::machine_reset();
@@ -1998,6 +2048,7 @@ void nes_vt_hh_state::nes_vt_vg_baddma(machine_config &config)
 	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
 }
 
+
 // New mystery handheld architecture, VTxx derived
 void nes_vt_hh_state::nes_vt_hh(machine_config &config)
 {
@@ -2014,7 +2065,7 @@ void nes_vt_hh_state::nes_vt_hh(machine_config &config)
 }
 
 static INPUT_PORTS_START( nes_vt )
-PORT_START("CARTSEL")
+	PORT_START("CARTSEL")
 INPUT_PORTS_END
 
 void nes_vt_hh_state::nes_vt_fp(machine_config &config)
@@ -2048,6 +2099,8 @@ void nes_vt_ts_state::nes_vt_ts(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_ts_state::nes_vt_ts_map);
 }
+
+
 
 static INPUT_PORTS_START( nes_vt_fp )
 	PORT_START("CARTSEL")
@@ -2165,7 +2218,7 @@ void nes_vt_sudoku_state::init_sudoku()
 		}
 
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
-	}	
+	}
 
 	if (0)
 	{
@@ -2574,7 +2627,7 @@ CONS( 200?, vtboxing,     0,  0,  nes_vt, nes_vt, nes_vt_state, empty_init, "VRT
 // 050329 (29th March 2005) date on PCB
 CONS( 2005, ablpinb, 0,  0,  nes_vt_ablpinb,    ablpinb, nes_vt_ablpinb_state, empty_init, "Advance Bright Ltd", "Pinball (P8002, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
- 
+
 // Black pad marked 'SUDOKU' with tails on the S and U characters looping over the logo.  Box says "Plug and Play Sudoku"
 // Has 2 sets of 4 buttons in circular 'direction pad' layouts (on the left for directions, on the right for functions) and 9 red numbered buttons with red power LED on left of them, and reset button on right
 CONS( 200?, papsudok,     0,  0,  nes_vt_sudoku, sudoku, nes_vt_sudoku_state, init_sudoku, "<unknown>", "Plug and Play Sudoku (VT based?)", MACHINE_NOT_WORKING )
@@ -2594,7 +2647,7 @@ CONS( 2004, majkon,    0, 0,  nes_vt_vg_baddma, nes_vt, nes_vt_hh_state, empty_i
 CONS( 200?, majgnc,    0, 0,  nes_vt_majgnc, majgnc, nes_vt_majgnc_state, empty_init, "Majesco", "Golden Nugget Casino", MACHINE_NOT_WORKING )
 
 // small black unit, dpad on left, 4 buttons (A,B,X,Y) on right, Start/Reset/Select in middle, unit text "Sudoku Plug & Play TV Game"
-CONS( 200?, sudopptv,    0, 0,  nes_vt_majgnc, majgnc, nes_vt_majgnc_state, empty_init, "<unknown>", "Sudoku Plug & Play TV Game (VT based)", MACHINE_NOT_WORKING )
+CONS( 200?, sudopptv,    0, 0,  nes_vt_sudopptv, nes_vt, nes_vt_state, empty_init, "Smart Planet", "Sudoku Plug & Play TV Game '6 Intelligent Games'", MACHINE_NOT_WORKING )
 
 // this is VT09 based
 // it boots, most games correct, but palette issues in some games still (usually they appear greyscale)
