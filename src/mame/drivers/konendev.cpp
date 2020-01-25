@@ -54,6 +54,7 @@ public:
 		, m_gcu(*this, "gcu")
 		, m_eeprom(*this, "eeprom")
 		, m_rtc(*this, "rtc")
+		, m_dpram(*this, "dpram")
 	{ }
 
 	void init_konendev();
@@ -85,6 +86,7 @@ private:
 	required_device<k057714_device> m_gcu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<rtc62423_device> m_rtc;
+	required_shared_ptr<uint32_t> m_dpram;
 };
 
 uint32_t konendev_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -182,6 +184,7 @@ void konendev_state::konendev_map(address_map &map)
 	map(0x78800000, 0x78800003).r(FUNC(konendev_state::ifu2_r));
 	map(0x78800004, 0x78800007).r(FUNC(konendev_state::ctrl0_r));
 	map(0x78a00000, 0x78a0001f).r(FUNC(konendev_state::ctrl1_r));
+	map(0x78c00000, 0x78c003ff).ram().share("dpram");
 	map(0x78e00000, 0x78e00003).r(FUNC(konendev_state::ctrl2_r));
 	map(0x79000000, 0x79000003).w(m_gcu, FUNC(k057714_device::fifo_w));
 	map(0x79800000, 0x798000ff).rw(m_gcu, FUNC(k057714_device::read), FUNC(k057714_device::write));
