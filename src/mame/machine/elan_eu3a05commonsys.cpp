@@ -174,7 +174,8 @@ elan_eu3a05commonsys_device::elan_eu3a05commonsys_device(const machine_config &m
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_bank(*this, finder_base::DUMMY_TAG),
 	m_is_pal(false),
-	m_allow_timer_irq(true)
+	m_allow_timer_irq(true),
+	m_whichtimer(0)
 {
 }
 
@@ -236,7 +237,7 @@ void elan_eu3a05commonsys_device::device_timer(emu_timer &timer, device_timer_id
 			// rad_bb3 unmasks the interrupt, but the jumps use pointers in RAM, which haven't been set up at the time
 			// of unmasking, so we need to find some kind of global enable / disable, or timer enable.
 			if (m_allow_timer_irq)
-				generate_custom_interrupt(0);
+				generate_custom_interrupt(m_whichtimer);
 			break;
 		}
 	}
