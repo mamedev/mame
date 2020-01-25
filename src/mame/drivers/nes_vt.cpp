@@ -1401,29 +1401,29 @@ void nes_vt_state::do_dma(uint8_t data, bool has_ntsc_bug)
 		has_ntsc_bug = false;
 
 	uint8_t dma_mode = m_vdma_ctrl & 0x01;
-	uint8_t dma_len  = (m_vdma_ctrl >> 1) & 0x07;
-	uint8_t src_nib_74 =  (m_vdma_ctrl >> 4) & 0x0F;
+	uint8_t dma_len = (m_vdma_ctrl >> 1) & 0x07;
+	uint8_t src_nib_74 = (m_vdma_ctrl >> 4) & 0x0F;
 	int length = 256;
-	switch(dma_len)
+	switch (dma_len)
 	{
-		case 0x0: length = 256; break;
-		case 0x4: length = 16; break;
-		case 0x5: length = 32; break;
-		case 0x6: length = 64; break;
-		case 0x7: length = 128; break;
+	case 0x0: length = 256; break;
+	case 0x4: length = 16; break;
+	case 0x5: length = 32; break;
+	case 0x6: length = 64; break;
+	case 0x7: length = 128; break;
 	}
 	uint16_t src_addr = (data << 8) | (src_nib_74 << 4);
 	logerror("vthh dma start ctrl=%02x addr=%04x\n", m_vdma_ctrl, src_addr);
-	if(dma_mode == 1)
+	if (dma_mode == 1)
 	{
 		logerror("vdma dest %04x\n", m_ppu->get_vram_dest());
 	}
-	if(has_ntsc_bug && (dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F00) && !(m_ppu->get_201x_reg(0x1) & 0x80))
+	if (has_ntsc_bug && (dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F00) && !(m_ppu->get_201x_reg(0x1) & 0x80))
 	{
 		length -= 1;
 		src_addr += 1;
 	}
-	else if((dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F01) && !(m_ppu->get_201x_reg(0x1) & 0x80))
+	else if ((dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F01) && !(m_ppu->get_201x_reg(0x1) & 0x80))
 	{
 		// Legacy mode for DGUN-2573 compat
 		m_ppu->set_vram_dest(0x3F00);
@@ -1433,7 +1433,7 @@ void nes_vt_state::do_dma(uint8_t data, bool has_ntsc_bug)
 	for (int i = 0; i < length; i++)
 	{
 		uint8_t spriteData = m_maincpu->space(AS_PROGRAM).read_byte(src_addr + i);
-		if(dma_mode)
+		if (dma_mode)
 		{
 			m_maincpu->space(AS_PROGRAM).write_byte(0x2007, spriteData);
 		}
