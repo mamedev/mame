@@ -42,7 +42,8 @@ Konami PWB 402218 boards
 
  Notes and TODOs:
  - Priorities not understood and wrong in places of GX-based games, apparently controlled by PROM
- - Column scroll not correct in TMNT-based games
+ - X/Y scroll effects not handled well by current K052109(TMNT tilemaps) emulation.
+   Mario Roulette glitches "resolved" using hack, Fuusen Pentai still have issues with column scroll (not OK with -6 added to column index).
 
 ***************************************************************************/
 
@@ -124,6 +125,7 @@ private:
 	DECLARE_WRITE8_MEMBER(shuri_bank_w);
 	DECLARE_READ8_MEMBER(shuri_irq_r);
 	DECLARE_WRITE8_MEMBER(shuri_irq_w);
+	DECLARE_WRITE8_MEMBER(mario_scrollhack_w);
 
 	void ddboy_main(address_map &map);
 	void medal_main(address_map &map);
@@ -422,6 +424,7 @@ void konmedal_state::shuriboy_main(address_map &map)
 	map(0xa000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xffff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
 	map(0xdd00, 0xdd00).rw(FUNC(konmedal_state::shuri_irq_r), FUNC(konmedal_state::shuri_irq_w));
+	map(0xdc80, 0xdc80).w(FUNC(konmedal_state::mario_scrollhack_w));
 }
 
 static INPUT_PORTS_START( konmedal )
@@ -798,6 +801,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(konmedal_state::shuri_scanline)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
+}
+
+WRITE8_MEMBER(konmedal_state::mario_scrollhack_w)
+{
+	// Mario Roulette enable X and Y scroll in the same time for both layers, which is currently not supported by emulated K052109.
+	// here we hacky disable Y scroll for layer A and X scroll for layer B.
+	if (data == 0x36)
+		data = 0x22;
+	m_k052109->write(0x1c80, data);
 }
 
 void konmedal_state::shuriboy(machine_config &config)
