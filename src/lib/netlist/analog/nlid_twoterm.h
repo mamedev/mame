@@ -283,6 +283,7 @@ namespace analog
 
 	protected:
 		//NETLIB_UPDATEI();
+		//FIXME: should be able to change
 		NETLIB_UPDATE_PARAMI() { }
 
 	private:
@@ -484,12 +485,12 @@ namespace analog
 
 		NETLIB_UPDATE_PARAMI()
 		{
+			//FIXME: works only for CS without function
 			solve_now();
 			const auto zero(nlconst::zero());
 			set_mat(zero, zero, -m_I(),
 					zero, zero,  m_I());
 		}
-
 
 	private:
 		state_var<nl_fptype> m_t;

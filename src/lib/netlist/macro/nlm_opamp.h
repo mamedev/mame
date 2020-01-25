@@ -24,6 +24,9 @@
 #define LM324_DIP(name)                                                        \
 		NET_REGISTER_DEV(LM324_DIP, name)
 
+#define TL084_DIP(name)                                                        \
+		NET_REGISTER_DEV(TL084_DIP, name)
+
 #define LM2902_DIP(name)                                                       \
 		NET_REGISTER_DEV(LM2902_DIP, name)
 
