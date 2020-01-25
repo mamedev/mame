@@ -77,7 +77,6 @@
 #include "speaker.h"
 
 
-
 class nes_vt_state : public nes_base_state
 {
 public:
@@ -1403,6 +1402,7 @@ void nes_vt_state::do_dma(uint8_t data, bool has_ntsc_bug)
 	uint8_t dma_mode = m_vdma_ctrl & 0x01;
 	uint8_t dma_len = (m_vdma_ctrl >> 1) & 0x07;
 	uint8_t src_nib_74 = (m_vdma_ctrl >> 4) & 0x0F;
+
 	int length = 256;
 	switch (dma_len)
 	{
@@ -1412,12 +1412,15 @@ void nes_vt_state::do_dma(uint8_t data, bool has_ntsc_bug)
 	case 0x6: length = 64; break;
 	case 0x7: length = 128; break;
 	}
+	
 	uint16_t src_addr = (data << 8) | (src_nib_74 << 4);
 	logerror("vthh dma start ctrl=%02x addr=%04x\n", m_vdma_ctrl, src_addr);
+	
 	if (dma_mode == 1)
 	{
 		logerror("vdma dest %04x\n", m_ppu->get_vram_dest());
 	}
+	
 	if (has_ntsc_bug && (dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F00) && !(m_ppu->get_201x_reg(0x1) & 0x80))
 	{
 		length -= 1;
@@ -2045,6 +2048,7 @@ void nes_vt_hh_state::nes_vt_vg_baddma(machine_config &config)
 	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
 }
 
+
 // New mystery handheld architecture, VTxx derived
 void nes_vt_hh_state::nes_vt_hh(machine_config &config)
 {
@@ -2095,6 +2099,8 @@ void nes_vt_ts_state::nes_vt_ts(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_ts_state::nes_vt_ts_map);
 }
+
+
 
 static INPUT_PORTS_START( nes_vt_fp )
 	PORT_START("CARTSEL")
