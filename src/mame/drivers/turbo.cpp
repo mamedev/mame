@@ -948,7 +948,7 @@ void turbo_state::buckrog(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &turbo_state::buckrog_cpu2_map);
 	m_subcpu->set_addrmap(AS_IO, &turbo_state::buckrog_cpu2_portmap);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 	MCFG_MACHINE_RESET_OVERRIDE(turbo_state,buckrog)
 
 	I8255(config, m_i8255_0);

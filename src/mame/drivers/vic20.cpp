@@ -846,9 +846,9 @@ void vic20_state::vic20(machine_config &config, const char* softlist_filter)
 
 	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(vic20_state::quickload_vc20));
 
-	SOFTWARE_LIST(config, "cart_list").set_type("vic1001_cart", SOFTWARE_LIST_ORIGINAL_SYSTEM).set_filter(softlist_filter);
-	SOFTWARE_LIST(config, "cass_list").set_type("vic1001_cass", SOFTWARE_LIST_ORIGINAL_SYSTEM).set_filter(softlist_filter);
-	SOFTWARE_LIST(config, "flop_list").set_type("vic1001_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM).set_filter(softlist_filter);
+	SOFTWARE_LIST(config, "cart_list").set_original("vic1001_cart").set_filter(softlist_filter);
+	SOFTWARE_LIST(config, "cass_list").set_original("vic1001_cass").set_filter(softlist_filter);
+	SOFTWARE_LIST(config, "flop_list").set_original("vic1001_flop").set_filter(softlist_filter);
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("5K");
@@ -860,7 +860,6 @@ void vic20_state::add_clocked_devices(machine_config &config, uint32_t clock)
 	// basic machine hardware
 	M6502(config, m_maincpu, clock);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vic20_state::vic20_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 
 	VIA6522(config, m_via1, clock);
 	m_via1->readpa_handler().set(FUNC(vic20_state::via1_pa_r));

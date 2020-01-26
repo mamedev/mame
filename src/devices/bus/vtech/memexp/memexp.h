@@ -45,7 +45,7 @@
 
 class device_vtech_memexp_interface;
 
-class vtech_memexp_slot_device : public device_t, public device_slot_interface
+class vtech_memexp_slot_device : public device_t, public device_single_card_slot_interface<device_vtech_memexp_interface>
 {
 	friend class device_vtech_memexp_interface;
 public:
@@ -78,12 +78,9 @@ protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	required_address_space m_program;
 	required_address_space m_io;
-
-	device_vtech_memexp_interface *m_cart;
 
 private:
 	devcb_write_line m_int_handler;
@@ -92,7 +89,7 @@ private:
 };
 
 // class representing interface-specific live memexp device
-class device_vtech_memexp_interface : public device_slot_card_interface
+class device_vtech_memexp_interface : public device_interface
 {
 public:
 	// construction/destruction

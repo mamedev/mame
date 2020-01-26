@@ -95,7 +95,7 @@
 
 class device_rs232_port_interface;
 
-class rs232_port_device : public device_t, public device_slot_interface
+class rs232_port_device : public device_t, public device_single_card_slot_interface<device_rs232_port_interface>
 {
 	friend class device_rs232_port_interface;
 
@@ -167,7 +167,7 @@ private:
 	device_rs232_port_interface *m_dev;
 };
 
-class device_rs232_port_interface : public device_slot_card_interface
+class device_rs232_port_interface : public device_interface
 {
 	friend class rs232_port_device;
 

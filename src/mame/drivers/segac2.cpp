@@ -1750,7 +1750,7 @@ ROM_START( tfrceac ) /* Thunder Force AC  (c)1990 Technosoft / Sega - 834-7745-0
 ROM_END
 
 
-ROM_START( tfrceacj ) /* Thunder Force AC (Japan)  (c)1990 Technosoft / Sega - 834-7745 THUNDER FORCE AC (EMP5032 labeled 317-0172)  */
+ROM_START( tfrceacj ) /* Thunder Force AC (Japan)  (c)1990 Technosoft / Sega - 834-7745 THUNDER FORCE AC (EMP5032 labeled 317-0172) */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-13657.ic32", 0x000000, 0x040000, CRC(a0f38ffd) SHA1(da548e7f61aed0e82a460553a119941da8857bc4) )
 	ROM_LOAD16_BYTE( "epr-13656.ic31", 0x000001, 0x040000, CRC(b9438d1e) SHA1(598209c9fec3527fde720af09e5bebd7379f5b2b) )
@@ -2005,7 +2005,7 @@ ROM_START( stkclmns ) /* Stack Columns  (c)1994 Sega */
 ROM_END
 
 
-ROM_START( stkclmnsj ) /* Stack Columns  (c)1994 Sega */
+ROM_START( stkclmnsj ) /* Stack Columns  (c)1994 Sega - 834-10853 (EMP5032 labeled 317-0219) */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-16795.ic32", 0x000000, 0x080000, CRC(b478fd02) SHA1(aaf9d9f9f4dc900b4e8ff6f258f26e782e5c3166) )
 	ROM_LOAD16_BYTE( "epr-16794.ic31", 0x000001, 0x080000, CRC(6d0e8c56) SHA1(8f98d9fd98a1faa70b173cfd72f15102d11e79ae) )
@@ -2037,7 +2037,7 @@ ROM_START( potopoto ) /* Poto Poto  (c)1994 Sega - 834-10778 (EMP5032 labeled 31
 ROM_END
 
 
-ROM_START( zunkyou ) /* Zunzunkyou no Yabou  (c)1994 Sega - 834-9029 (EMP5032 labeled 317-0221)  */
+ROM_START( zunkyou ) /* Zunzunkyou no Yabou  (c)1994 Sega - 834-9029 (EMP5032 labeled 317-0221) */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-16812.ic32", 0x000000, 0x080000, CRC(eb088fb0) SHA1(69089a3516ad50f35e81971ef3c33eb3f5d52374) )
 	ROM_LOAD16_BYTE( "epr-16811.ic31", 0x000001, 0x080000, CRC(9ac7035b) SHA1(1803ffbadc1213e04646d483e27da1591e22cd06) )

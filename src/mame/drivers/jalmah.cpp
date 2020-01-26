@@ -1151,8 +1151,8 @@ void urashima_state::urashima(machine_config &config)
 // the original MCU actually uploads these into shared work ram area
 // we actually compile it using EASy68k tool
 #define LOAD_FAKE_MCU_ROM \
-	ROM_REGION( 0x10000, "jmcu_rom", 0 ) \
-	ROM_LOAD16_WORD_SWAP( "mcu.bin", 0, 0x10000, BAD_DUMP CRC(35425d2f) SHA1(9a9914d4e50a665d4eb0efb80552f357fc719e7e)) \
+	ROM_REGION16_BE( 0x10000, "jmcu_rom", 0 ) \
+	ROM_LOAD16_WORD( "mcu.bin", 0, 0x10000, BAD_DUMP CRC(35425d2f) SHA1(9a9914d4e50a665d4eb0efb80552f357fc719e7e)) \
 
 
 /*

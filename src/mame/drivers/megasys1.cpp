@@ -1705,7 +1705,7 @@ void megasys1_state::system_A(machine_config &config)
 	M68000(config, m_audiocpu, SOUND_CPU_CLOCK); /* 7MHz verified */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1A_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(120000);
+	config.set_maximum_quantum(attotime::from_hz(120000));
 
 	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1)
 

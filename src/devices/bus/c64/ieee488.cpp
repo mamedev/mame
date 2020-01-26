@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C64_IEEE488, c64_ieee488_device, "c64_ieee488_device", "C64 IEEE-488 cartridge")
+DEFINE_DEVICE_TYPE(C64_IEEE488, c64_ieee488_device, "c64_ieee488", "C64 IEEE-488 cartridge")
 
 
 //-------------------------------------------------

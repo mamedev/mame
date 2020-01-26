@@ -548,15 +548,15 @@ void h19_state::h19(machine_config &config)
 	uart.out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
 	MM5740(config, m_mm5740, MM5740_CLOCK);
-	m_mm5740->x_cb<0>().set_ioport("X1");
-	m_mm5740->x_cb<1>().set_ioport("X2");
-	m_mm5740->x_cb<2>().set_ioport("X3");
-	m_mm5740->x_cb<3>().set_ioport("X4");
-	m_mm5740->x_cb<4>().set_ioport("X5");
-	m_mm5740->x_cb<5>().set_ioport("X6");
-	m_mm5740->x_cb<6>().set_ioport("X7");
-	m_mm5740->x_cb<7>().set_ioport("X8");
-	m_mm5740->x_cb<8>().set_ioport("X9");
+	m_mm5740->x_cb<1>().set_ioport("X1");
+	m_mm5740->x_cb<2>().set_ioport("X2");
+	m_mm5740->x_cb<3>().set_ioport("X3");
+	m_mm5740->x_cb<4>().set_ioport("X4");
+	m_mm5740->x_cb<5>().set_ioport("X5");
+	m_mm5740->x_cb<6>().set_ioport("X6");
+	m_mm5740->x_cb<7>().set_ioport("X7");
+	m_mm5740->x_cb<8>().set_ioport("X8");
+	m_mm5740->x_cb<9>().set_ioport("X9");
 	m_mm5740->shift_cb().set(FUNC(h19_state::mm5740_shift_r));
 	m_mm5740->control_cb().set(FUNC(h19_state::mm5740_control_r));
 	m_mm5740->data_ready_cb().set(FUNC(h19_state::mm5740_data_ready_w));

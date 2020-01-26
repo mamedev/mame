@@ -12,7 +12,7 @@
 *********************************************************************/
 
 #include "sdf_dsk.h"
-#include <assert.h>
+#include <cassert>
 
 sdf_format::sdf_format()
 {

@@ -2,35 +2,35 @@
 <mamelayout version="2">
 	<element name="overlay">
 		<rect>
-			<bounds left="0" top="0" right="192" bottom="47" />
+			<bounds left="0" top="0" right="192" bottom="44" />
 			<color red="1" green="1" blue="1" />
 		</rect>
 		<rect>
-			<bounds left="0" top="47" right="192" bottom="57" />
+			<bounds left="0" top="44" right="192" bottom="54" />
 			<color red="1" green="0.125" blue="0.125" />
 		</rect>
 		<rect>
-			<bounds left="0" top="57" right="192" bottom="67" />
+			<bounds left="0" top="54" right="192" bottom="64" />
 			<color red="1" green="0.5" blue="0.0625" />
 		</rect>
 		<rect>
-			<bounds left="0" top="67" right="192" bottom="77" />
+			<bounds left="0" top="64" right="192" bottom="74" />
 			<color red="0.25" green="1" blue="0.25" />
 		</rect>
 		<rect>
-			<bounds left="0" top="77" right="192" bottom="88" />
+			<bounds left="0" top="74" right="192" bottom="84" />
 			<color red="1" green="1" blue="0.25" />
 		</rect>
 		<rect>
-			<bounds left="0" top="88" right="192" bottom="231" />
+			<bounds left="0" top="84" right="192" bottom="231" />
 			<color red="1" green="1" blue="1" />
 		</rect>
 		<rect>
-			<bounds left="0" top="231" right="192" bottom="238" />
+			<bounds left="0" top="221" right="192" bottom="228" />
 			<color red="0.125" green="0.125" blue="1" />
 		</rect>
 		<rect>
-			<bounds left="0" top="238" right="192" bottom="244" />
+			<bounds left="0" top="228" right="192" bottom="244" />
 			<color red="1" green="1" blue="1" />
 		</rect>
 	</element>

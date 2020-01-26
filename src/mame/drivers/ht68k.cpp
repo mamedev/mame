@@ -81,7 +81,7 @@ void ht68k_state::ht68k_mem(address_map &map)
 	//map(0x00d80000, 0x00d8ffff) // Printer
 	map(0x00e00000, 0x00e00007).mirror(0xfff8).rw(m_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write)).umask16(0x00ff); // FDC WD1770
 	map(0x00e80000, 0x00e800ff).mirror(0xff00).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
-	map(0x00f00000, 0x00f07fff).rom().mirror(0xf8000).region("user1", 0);
+	map(0x00f00000, 0x00f07fff).rom().mirror(0xf8000).region("bios", 0);
 }
 
 /* Input ports */
@@ -90,9 +90,9 @@ INPUT_PORTS_END
 
 void ht68k_state::machine_reset()
 {
-	uint8_t* user1 = memregion("user1")->base();
+	uint8_t *bios = memregion("bios")->base();
 
-	memcpy((uint8_t*)m_p_ram.target(),user1,0x8000);
+	memcpy((uint8_t*)m_p_ram.target(),bios,0x8000);
 
 	m_fdc->reset();
 	m_fdc->set_floppy(nullptr);
@@ -157,9 +157,9 @@ void ht68k_state::ht68k(machine_config &config)
 
 /* ROM definition */
 ROM_START( ht68k )
-	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "ht68k-u4.bin", 0x0000, 0x4000, CRC(3fbcdd0a) SHA1(45fcbbf920dc1e9eada3b7b0a55f5720d08ffdd5))
-	ROM_LOAD16_BYTE( "ht68k-u3.bin", 0x0001, 0x4000, CRC(1d85d101) SHA1(8ba01e1595b0b3c4fb128a4a50242f3588b89c43))
+	ROM_REGION16_BE( 0x8000, "bios", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "ht68k-u4.bin", 0x0001, 0x4000, CRC(3fbcdd0a) SHA1(45fcbbf920dc1e9eada3b7b0a55f5720d08ffdd5))
+	ROM_LOAD16_BYTE( "ht68k-u3.bin", 0x0000, 0x4000, CRC(1d85d101) SHA1(8ba01e1595b0b3c4fb128a4a50242f3588b89c43))
 ROM_END
 
 /* Driver */

@@ -192,7 +192,7 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 						command = string_format("bpset 0x%X", address);
 					else
 						command = string_format("bpclear 0x%X", bp->index());
-					machine().debugger().console().execute_command(command.c_str(), true);
+					machine().debugger().console().execute_command(command, true);
 				}
 			}
 			return true;
@@ -220,7 +220,7 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 					{
 						std::string command;
 						command = string_format(bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", (uint32_t)bp->index());
-						machine().debugger().console().execute_command(command.c_str(), true);
+						machine().debugger().console().execute_command(command, true);
 					}
 				}
 			}
@@ -234,7 +234,7 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 				{
 					std::string command;
 					command = string_format("go 0x%X", address);
-					machine().debugger().console().execute_command(command.c_str(), true);
+					machine().debugger().console().execute_command(command, true);
 				}
 				else
 				{

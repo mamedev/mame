@@ -11,16 +11,8 @@
      - bcracers: write to undefined PWM register?
      - fifa96 / nbajamte: dies on the gameplay, waiting for a comm change that never occurs;
      - marsch1: doesn't boot, Master / Slave communicates through SCI
-     - nbajamte: missing I2C hookup, startup fails due of that (same I2C type as plain MD version);
-     - nflquart: black screen, missing h irq?
-     - sangoku4: black screen after the Sega logo
-     - soulstar: OSD and player sprite isn't drawn;
      - tempo: intro is too fast, mostly noticeable with the PWM sound that cuts off too early when it gets to the title screen;
      - tmek: gameplay is clearly too fast
-     - vrdxu: has 3d geometry bugs, caused by a SH-2 DRC bug;
-     - vrdxu: crashes if you attempt to enter into main menu;
-     - wwfwre: no 32x gfxs
-     - xmen: black screen after that you choose the level, needs bare minimum SH-2 SCI support
 
 
 32x Marsch tests documentation (keep start pressed at start-up for individual tests):
@@ -1683,7 +1675,7 @@ const rom_entry *sega_32x_device::device_rom_region() const
 // some games appear to dislike 'perfect' levels of interleave, probably due to
 // non-emulated cache, ram waitstates and other issues?
 #define _32X_INTERLEAVE_LEVEL \
-	config.m_minimum_quantum = attotime::from_hz(1800000);
+	config.set_maximum_quantum(attotime::from_hz(1800000));
 
 void sega_32x_device::device_add_mconfig(machine_config &config)
 {

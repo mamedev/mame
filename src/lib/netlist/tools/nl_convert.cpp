@@ -1,23 +1,23 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nl_convert.c
- *
- */
 
 #include "plib/palloc.h"
-#include "nl_convert.h"
+#include "plib/pstonum.h"
 #include "plib/putil.h"
 
-#include <algorithm>
-#include <cmath>
-#include <unordered_map>
+#include "nl_convert.h"
 
-/* FIXME: temporarily defined here - should be in a file */
-/* FIXME: family logic in netlist is convoluted, create
- *        define a model param on core device
- */
-/* Format: external name,netlist device,model */
+#include <algorithm>
+#include <unordered_map>
+#include <vector>
+
+// FIXME: temporarily defined here - should be in a file
+// FIXME: family logic in netlist is convoluted, create
+//        define a model param on core device
+
+// Format: external name,netlist device,model
+
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
 static constexpr const char s_lib_map[] =
 "SN74LS00D,   TTL_7400_DIP,  74LSXX\n"
 "SN74LS04D,   TTL_7404_DIP,  74LSXX\n"
@@ -55,24 +55,24 @@ static lib_map_t read_lib_map(const pstring &lm)
 	return m;
 }
 
-/*-------------------------------------------------
-    convert - convert a spice netlist
--------------------------------------------------*/
+// -------------------------------------------------
+//    convert - convert a spice netlist
+// -------------------------------------------------
 
 nl_convert_base_t::nl_convert_base_t()
 	: out(&m_buf)
-	, m_numberchars("0123456789-+e.")
+	, m_numberchars("0123456789-+Ee.")
 {
 	m_buf.imbue(std::locale::classic());
 	m_units = {
 			{"T",   "",      1.0e12 },
 			{"G",   "",      1.0e9  },
 			{"MEG", "RES_M({1})", 1.0e6  },
-			{"k",   "RES_K({1})", 1.0e3  }, /* eagle */
+			{"k",   "RES_K({1})", 1.0e3  }, // eagle
 			{"K",   "RES_K({1})", 1.0e3  },
 			{"",    "{1}",        1.0e0  },
 			{"M",   "CAP_M({1})", 1.0e-3 },
-			{"u",   "CAP_U({1})", 1.0e-6 }, /* eagle */
+			{"u",   "CAP_U({1})", 1.0e-6 }, // eagle
 			{"U",   "CAP_U({1})", 1.0e-6 },
 			{"μ",   "CAP_U({1})",  1.0e-6 },
 			{"µ",   "CAP_U({1})",  1.0e-6 },
@@ -84,6 +84,14 @@ nl_convert_base_t::nl_convert_base_t()
 			{"MIL", "{1}",  25.4e-6}
 	};
 
+	dev_map =
+	{
+		{ "VCCS", {"OP", "ON", "IP", "IN"} },
+		{ "VCVS", {"OP", "ON", "IP", "IN"} },
+		{ "CCCS", {"OP", "ON", "IP", "IN"} },
+		{ "CCVS", {"OP", "ON", "IP", "IN"} },
+		{ "VS", {"1", "2"} },
+	};
 }
 
 nl_convert_base_t::~nl_convert_base_t()
@@ -141,7 +149,7 @@ void nl_convert_base_t::add_term(const pstring &netname, const pstring &termname
 		m_nets.emplace(netname, std::move(nets));
 	}
 
-	/* if there is a pin alias, translate ... */
+	// if there is a pin alias, translate ...
 	pin_alias_t *alias = m_pins[termname].get();
 
 	if (alias != nullptr)
@@ -150,8 +158,65 @@ void nl_convert_base_t::add_term(const pstring &netname, const pstring &termname
 		net->terminals().push_back(termname);
 }
 
+void nl_convert_base_t::add_term(const pstring &netname, const pstring &devname, unsigned term)
+{
+	auto e = dev_map.find(get_device(devname)->type());
+	if (e == dev_map.end())
+		out("// ERROR: No terminals found for device {}\n", devname);
+	else
+	{
+		if (term >= e->second.size())
+			out("// ERROR: {} : Term {} exceeds number of terminals {}\n", netname, devname, term);
+		else
+			add_term(netname, devname + "." + e->second[term]);
+	}
+}
+
+void nl_convert_base_t::add_device_extra_s(const pstring &devname, const pstring &extra)
+{
+	auto dev = get_device(devname);
+	if (dev == nullptr)
+		out("// ERROR: Device {} not found\n", devname);
+	else
+	{
+		dev->add_extra(extra);
+	}
+}
+
+
+
 void nl_convert_base_t::dump_nl()
 {
+	// do replacements
+	for (auto &r : m_replace)
+	{
+		// Get the device entry
+		auto *d = get_device(r.m_ce);
+		if (d == nullptr)
+		{
+			out("ERROR: Can not find <{}>\n", r.m_ce);
+			continue;
+		}
+
+		auto e = dev_map.find(d->type());
+		if (e == dev_map.end())
+		{
+			out("ERROR: Can not find type {}\n", d->type());
+			continue;
+		}
+		pstring term1 = r.m_ce + "." + e->second[0];
+		// scan all nets
+		for (auto &n : m_nets)
+		{
+			for (auto &t : n.second->terminals())
+			{
+				if (t == term1)
+					t = r.m_repterm;
+			}
+		}
+		add_term(r.m_net, term1);
+	}
+
 	for (auto & alias : m_ext_alias)
 	{
 		net_t *net = m_nets[alias].get();
@@ -181,6 +246,9 @@ void nl_convert_base_t::dump_nl()
 		else
 			out("{}({})\n", m_devs[j]->type().c_str(),
 					m_devs[j]->name().c_str());
+		for (auto &e : m_devs[j]->extra())
+			out("{}\n", e);
+
 	}
 	// print nets
 	for (auto & i : m_nets)
@@ -196,17 +264,18 @@ void nl_convert_base_t::dump_nl()
 			out(")\n");
 		}
 	}
+	m_replace.clear();
 	m_devs.clear();
 	m_nets.clear();
 	m_pins.clear();
 	m_ext_alias.clear();
 }
 
-const pstring nl_convert_base_t::get_nl_val(const double val)
+pstring nl_convert_base_t::get_nl_val(double val)
 {
 	for (auto &e : m_units)
 	{
-		if (e.m_mult <= std::abs(val))
+		if (e.m_mult <= plib::abs(val))
 			return plib::pfmt(e.m_func)(val / e.m_mult);
 	}
 	return plib::pfmt("{1}")(val);
@@ -239,11 +308,11 @@ std::vector<nl_convert_base_t::unit_t> nl_convert_base_t::m_units = {
 		{"T",   "",      1.0e12 },
 		{"G",   "",      1.0e9  },
 		{"MEG", "RES_M({1})", 1.0e6  },
-		{"k",   "RES_K({1})", 1.0e3  }, /* eagle */
+		{"k",   "RES_K({1})", 1.0e3  }, // eagle
 		{"K",   "RES_K({1})", 1.0e3  },
 		{"",    "{1}",        1.0e0  },
 		{"M",   "CAP_M({1})", 1.0e-3 },
-		{"u",   "CAP_U({1})", 1.0e-6 }, /* eagle */
+		{"u",   "CAP_U({1})", 1.0e-6 }, // eagle
 		{"U",   "CAP_U({1})", 1.0e-6 },
 		{"μ",   "CAP_U({1})",  1.0e-6 },
 		{"µ",   "CAP_U({1})",  1.0e-6 },
@@ -294,6 +363,22 @@ static pstring rem(const std::vector<pstring> &vps, std::size_t start)
 	return r;
 }
 
+static int npoly(const pstring &s)
+{
+	// Brute force
+	if (s=="POLY(1)")
+		return 1;
+	if (s=="POLY(2)")
+		return 2;
+	if (s=="POLY(3)")
+		return 3;
+	if (s=="POLY(4)")
+		return 4;
+	if (s=="POLY(5)")
+		return 5;
+	return -1;
+}
+
 void nl_convert_spice_t::process_line(const pstring &line)
 {
 	if (line != "")
@@ -332,13 +417,13 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				break;
 			case 'Q':
 			{
-				/* check for fourth terminal ... should be numeric net
-				 * including "0" or start with "N" (ltspice)
-				 */
+				// check for fourth terminal ... should be numeric net
+				// including "0" or start with "N" (ltspice)
+
 				pstring model;
 				pstring pins ="CBE";
 				bool err(false);
-				auto nval = plib::pstonum_ne<long, true>(tt[4], err);
+				auto nval = plib::pstonum_ne<long>(tt[4], err);
 				plib::unused_var(nval);
 
 				if ((!err || plib::startsWith(tt[4], "N")) && tt.size() > 5)
@@ -387,24 +472,105 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				add_term(tt[2], tt[0] + ".N");
 				break;
 			case 'E':
-				add_device("VCVS", tt[0]);
-				add_term(tt[1], tt[0] + ".OP");
-				add_term(tt[2], tt[0] + ".ON");
-				add_term(tt[3], tt[0] + ".IP");
-				add_term(tt[4], tt[0] + ".IN");
-				out("PARAM({}, {})\n", tt[0] + ".G", tt[5]);
-				break;
-			case 'V':
-				// just simple Voltage sources ....
-				if (tt[2] == "0")
+			{
+				auto n=npoly(tt[3]);
+				if (n<0)
 				{
-					val = get_sp_val(tt[3]);
-					add_device("ANALOG_INPUT", tt[0], val);
-					add_term(tt[1], tt[0] + ".Q");
-					//add_term(tt[2], tt[0] + ".2");
+					add_device("VCVS", tt[0]);
+					add_term(tt[1], tt[0], 0);
+					add_term(tt[2], tt[0], 1);
+					add_term(tt[3], tt[0], 2);
+					add_term(tt[4], tt[0], 3);
+					add_device_extra(tt[0], "PARAM({}, {})", tt[0] + ".G", tt[5]);
 				}
 				else
-					plib::perrlogger("Voltage Source {} not connected to GND\n", tt[0]);
+				{
+					int sce(4);
+					int scoeff(5 + n);
+					if ((tt.size() != 5 + 2 * n) || (tt[scoeff-1] != "0"))
+					{
+						out("// IGNORED {}: {}\n", tt[0].c_str(), line.c_str());
+						break;
+					}
+					pstring lastnet = tt[1];
+					for (int i=0; i<n; i++)
+					{
+						pstring devname = tt[0] + plib::pfmt("{}")(i);
+						pstring nextnet = (i<n-1) ? tt[1] + "a" + plib::pfmt("{}")(i) : tt[2];
+						auto net2 = plib::psplit(plib::replace_all(plib::replace_all(tt[sce+i],")",""),"(",""),",");
+						add_device("VCVS", devname);
+						add_term(lastnet, devname, 0);
+						add_term(nextnet, devname, 1);
+						add_term(net2[0], devname, 2);
+						add_term(net2[1], devname, 3);
+						add_device_extra(devname, "PARAM({}, {})", devname + ".G", tt[scoeff+i]);
+						lastnet = nextnet;
+						//printf("xxx %d %s %s\n", (int) net2.size(), net2[0].c_str(), net2[1].c_str());
+#if 0
+						pstring extranetname = devname + "net";
+						m_replace.push_back({, devname + ".IP", extranetname });
+						add_term(extranetname, devname + ".IN");
+						add_device_extra(devname, "PARAM({}, {})", devname + ".G", tt[scoeff+i]);
+#endif
+					}
+				}
+			}
+				break;
+			case 'F':
+				{
+					auto n=npoly(tt[3]);
+					int sce(4);
+					int scoeff(5 + n);
+					if (n<0)
+					{
+						sce = 3;
+						scoeff = 4;
+						n = 1;
+					}
+					else
+					{
+						if ((tt.size() != 5 + 2 * n) || (tt[scoeff-1] != "0"))
+						{
+							out("// IGNORED {}: {}\n", tt[0].c_str(), line.c_str());
+							break;
+						}
+					}
+					for (int i=0; i<n; i++)
+					{
+						pstring devname = tt[0] + plib::pfmt("{}")(i);
+						add_device("CCCS", devname);
+						add_term(tt[1], devname, 0);
+						add_term(tt[2], devname, 1);
+
+						pstring extranetname = devname + "net";
+						m_replace.push_back({tt[sce+i], devname + ".IP", extranetname });
+						add_term(extranetname, devname + ".IN");
+						add_device_extra(devname, "PARAM({}, {})", devname + ".G", tt[scoeff+i]);
+					}
+				}
+				break;
+			case 'H':
+				add_device("CCVS", tt[0]);
+				add_term(tt[1], tt[0] + ".OP");
+				add_term(tt[2], tt[0] + ".ON");
+				m_replace.push_back({tt[3], tt[0] + ".IP", tt[2] + "a" });
+				add_term(tt[2] + "a", tt[0] + ".IN");
+				add_device_extra(tt[0], "PARAM({}, {})", tt[0] + ".G", tt[4]);
+				break;
+			case 'G':
+				add_device("VCCS", tt[0]);
+				add_term(tt[1], tt[0], 0);
+				add_term(tt[2], tt[0], 1);
+				add_term(tt[3], tt[0], 2);
+				add_term(tt[4], tt[0], 3);
+				add_device_extra(tt[0], "PARAM({}, {})", tt[0] + ".G", tt[5]);
+				break;
+			case 'V':
+				// only DC Voltage sources ....
+				val = get_sp_val(tt[3] == "DC" ? tt[4] : tt[3]);
+				add_device("VS", tt[0], val);
+				add_term(tt[1], tt[0] + ".1");
+				add_term(tt[2], tt[0] + ".2");
 				break;
 #if 0
 			// This is wrong ... Need to use something else for inputs!
@@ -418,7 +584,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 #else
 			case 'I':
 				{
-					val = get_sp_val(tt[3]);
+					val = get_sp_val(tt[3] == "DC" ? tt[4] : tt[3]);
 					add_device("CS", tt[0], val);
 					add_term(tt[1], tt[0] + ".1");
 					add_term(tt[2], tt[0] + ".2");
@@ -426,10 +592,11 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				break;
 #endif
 			case 'D':
-				add_device("DIODE", tt[0], tt[3]);
-				/* FIXME ==> does Kicad use different notation from LTSPICE */
-				add_term(tt[1], tt[0] + ".K");
-				add_term(tt[2], tt[0] + ".A");
+				add_device("DIODE", tt[0], m_subckt + tt[3]);
+				// Spice D Anode Kathode model
+				// FIXME ==> does Kicad use different notation from LTSPICE ?
+				add_term(tt[1], tt[0] + ".A");
+				add_term(tt[2], tt[0] + ".K");
 				break;
 			case 'U':
 			case 'X':
@@ -454,9 +621,9 @@ void nl_convert_spice_t::process_line(const pstring &line)
 	}
 }
 
-/*-------------------------------------------------
-    Eagle converter
--------------------------------------------------*/
+//-------------------------------------------------
+//    Eagle converter
+// -------------------------------------------------
 
 nl_convert_eagle_t::tokenizer::tokenizer(nl_convert_eagle_t &convert, plib::putf8_reader &&strm)
 	: plib::ptokenizer(std::move(strm))
@@ -465,21 +632,21 @@ nl_convert_eagle_t::tokenizer::tokenizer(nl_convert_eagle_t &convert, plib::putf
 	this->identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-")
 		.number_chars(".0123456789", "0123456789eE-.") //FIXME: processing of numbers
 		.whitespace(pstring("") + ' ' + static_cast<char>(9) +  static_cast<char>(10) + static_cast<char>(13))
-		/* FIXME: gnetlist doesn't print comments */
+		// FIXME: gnetlist doesn't print comments
 		.comment("/*", "*/", "//")
 		.string_char('\'');
 	m_tok_ADD = register_token("ADD");
 	m_tok_VALUE = register_token("VALUE");
 	m_tok_SIGNAL = register_token("SIGNAL");
 	m_tok_SEMICOLON = register_token(";");
-	/* currently not used, but required for parsing */
+	// currently not used, but required for parsing
 	register_token(")");
 	register_token("(");
 }
 
-void nl_convert_eagle_t::tokenizer::verror(const pstring &msg, int line_num, const pstring &line)
+void nl_convert_eagle_t::tokenizer::verror(const pstring &msg)
 {
-	m_convert.out("{} (line {}): {}\n", msg.c_str(), line_num, line.c_str());
+	m_convert.out("{}\n", msg);
 }
 
 //FIXME: should accept a stream as well
@@ -495,22 +662,23 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 	tokenizer::token_t token = tok.get_token();
 	while (true)
 	{
-		if (token.is_type(tokenizer::ENDOFFILE))
+		if (token.is_type(tokenizer::token_type::ENDOFFILE))
 		{
 			dump_nl();
 			// FIXME: Parameter
 			out("NETLIST_END()\n");
 			return;
 		}
-		else if (token.is(tok.m_tok_SEMICOLON))
+
+		if (token.is(tok.m_tok_SEMICOLON))
 		{
-			/* ignore empty statements */
+			// ignore empty statements
 			token = tok.get_token();
 		}
 		else if (token.is(tok.m_tok_ADD))
 		{
 			pstring name = tok.get_string();
-			/* skip to semicolon */
+			// skip to semicolon
 			do
 			{
 				token = tok.get_token();
@@ -553,7 +721,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 					add_pin_alias(name, "1", "Q");
 					break;
 				case 'D':
-					/* Pin 1 = Anode, Pin 2 = Cathode */
+					// Pin 1 = Anode, Pin 2 = Cathode
 					add_device("DIODE", name, sval);
 					add_pin_alias(name, "1", "A");
 					add_pin_alias(name, "2", "K");
@@ -566,7 +734,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 					break;
 				}
 				default:
-					tok.error("// IGNORED " + name);
+					tok.error(plib::perrmsg("// IGNORED {1}", name));
 			}
 
 		}
@@ -576,7 +744,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 			token = tok.get_token();
 			while (!token.is(tok.m_tok_SEMICOLON))
 			{
-				/* fixme: should check for string */
+				// fixme: should check for string
 				pstring devname = token.str();
 				pstring pin = tok.get_string();
 				add_term(netname, devname + "." + pin);
@@ -591,9 +759,9 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 
 }
 
-/*-------------------------------------------------
-    RINF converter
--------------------------------------------------*/
+// -------------------------------------------------
+//    RINF converter
+// -------------------------------------------------
 
 nl_convert_rinf_t::tokenizer::tokenizer(nl_convert_rinf_t &convert, plib::putf8_reader &&strm)
 	: plib::ptokenizer(std::move(strm))
@@ -602,7 +770,7 @@ nl_convert_rinf_t::tokenizer::tokenizer(nl_convert_rinf_t &convert, plib::putf8_
 	this->identifier_chars(".abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_-")
 		.number_chars("0123456789", "0123456789eE-.") //FIXME: processing of numbers
 		.whitespace(pstring("") + ' ' + static_cast<char>(9) +  static_cast<char>(10) + static_cast<char>(13))
-		/* FIXME: gnetlist doesn't print comments */
+		// FIXME: gnetlist doesn't print comments
 		.comment("","","//") // FIXME:needs to be confirmed
 		.string_char('"');
 	m_tok_HEA = register_token(".HEA");
@@ -616,21 +784,19 @@ nl_convert_rinf_t::tokenizer::tokenizer(nl_convert_rinf_t &convert, plib::putf8_
 	m_tok_END = register_token(".END");
 }
 
-void nl_convert_rinf_t::tokenizer::verror(const pstring &msg, int line_num, const pstring &line)
+void nl_convert_rinf_t::tokenizer::verror(const pstring &msg)
 {
-	m_convert.out("{} (line {}): {}\n", msg.c_str(), line_num, line.c_str());
+	m_convert.out("{}\n", msg);
 }
 
-/*      token_id_t m_tok_HFA;
-        token_id_t m_tok_APP;
-        token_id_t m_tok_TIM;
-        token_id_t m_tok_TYP;
-        token_id_t m_tok_ADDC;
-        token_id_t m_tok_ATTC;
-        token_id_t m_tok_NET;
-        token_id_t m_tok_TER;
- *
- */
+//        token_id_t m_tok_HFA;
+//        token_id_t m_tok_APP;
+//        token_id_t m_tok_TIM;
+//        token_id_t m_tok_TYP;
+//        token_id_t m_tok_ADDC;
+//        token_id_t m_tok_ATTC;
+//        token_id_t m_tok_NET;
+//        token_id_t m_tok_TER;
 
 void nl_convert_rinf_t::convert(const pstring &contents)
 {
@@ -644,28 +810,29 @@ void nl_convert_rinf_t::convert(const pstring &contents)
 	tokenizer::token_t token = tok.get_token();
 	while (true)
 	{
-		if (token.is_type(tokenizer::ENDOFFILE) || token.is(tok.m_tok_END))
+		if (token.is_type(tokenizer::token_type::ENDOFFILE) || token.is(tok.m_tok_END))
 		{
 			dump_nl();
 			// FIXME: Parameter
 			out("NETLIST_END()\n");
 			return;
 		}
-		else if (token.is(tok.m_tok_HEA))
+
+		if (token.is(tok.m_tok_HEA))
 		{
-			/* seems to be start token - ignore */
+			// seems to be start token - ignore
 			token = tok.get_token();
 		}
 		else if (token.is(tok.m_tok_APP))
 		{
-			/* version string */
+			// version string
 			pstring app = tok.get_string();
 			out("// APP: {}\n", app);
 			token = tok.get_token();
 		}
 		else if (token.is(tok.m_tok_TIM))
 		{
-			/* time */
+			// time
 			out("// TIM:");
 			for (int i=0; i<6; i++)
 			{
@@ -736,7 +903,7 @@ void nl_convert_rinf_t::convert(const pstring &contents)
 			if (token.is(tok.m_tok_TER))
 			{
 				token = tok.get_token();
-				while (token.is_type(plib::ptokenizer::IDENTIFIER))
+				while (token.is_type(plib::ptokenizer::token_type::IDENTIFIER))
 				{
 					pin = tok.get_identifier_or_number();
 					add_term(net, token.str() + "." + pin);
@@ -746,7 +913,7 @@ void nl_convert_rinf_t::convert(const pstring &contents)
 		}
 #if 0
 			token = tok.get_token();
-			/* skip to semicolon */
+			// skip to semicolon
 			do
 			{
 				token = tok.get_token();
@@ -789,7 +956,7 @@ void nl_convert_rinf_t::convert(const pstring &contents)
 					add_pin_alias(name, "1", "Q");
 					break;
 				case 'D':
-					/* Pin 1 = Anode, Pin 2 = Cathode */
+					// Pin 1 = Anode, Pin 2 = Cathode
 					add_device("DIODE", name, sval);
 					add_pin_alias(name, "1", "A");
 					add_pin_alias(name, "2", "K");
@@ -812,7 +979,7 @@ void nl_convert_rinf_t::convert(const pstring &contents)
 			token = tok.get_token();
 			while (!token.is(tok.m_tok_SEMICOLON))
 			{
-				/* fixme: should check for string */
+				// fixme: should check for string
 				pstring devname = token.str();
 				pstring pin = tok.get_string();
 				add_term(netname, devname + "." + pin);

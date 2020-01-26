@@ -2624,7 +2624,7 @@ void ssv_state::drifto94(machine_config &config)
 	m_dsp->set_addrmap(AS_PROGRAM, &ssv_state::dsp_prg_map);
 	m_dsp->set_addrmap(AS_DATA, &ssv_state::dsp_data_map);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2798,7 +2798,7 @@ void ssv_state::stmblade(machine_config &config)
 	m_dsp->set_addrmap(AS_DATA, &ssv_state::dsp_data_map);
 
 	/* don't need this, game just does a simple check at boot then the DSP stalls into a tight loop. */
-	//config.m_perfect_cpu_quantum = subtag("maincpu");
+	//config.set_perfect_quantum(m_maincpu);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2907,7 +2907,7 @@ void ssv_state::twineag2(machine_config &config)
 	m_dsp->set_addrmap(AS_PROGRAM, &ssv_state::dsp_prg_map);
 	m_dsp->set_addrmap(AS_DATA, &ssv_state::dsp_data_map);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	WATCHDOG_TIMER(config, "watchdog");
 

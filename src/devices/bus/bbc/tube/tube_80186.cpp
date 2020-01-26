@@ -19,6 +19,7 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(BBC_TUBE_80186, bbc_tube_80186_device, "bbc_tube_80186", "Acorn 80186 Co-Processor")
+DEFINE_DEVICE_TYPE(BBC_TUBE_PCPLUS, bbc_tube_pcplus_device, "bbc_tube_pcplus", "Solidisk PC-Plus Co-Processor")
 
 
 //-------------------------------------------------
@@ -50,6 +51,16 @@ ROM_START( tube_80186 )
 ROM_END
 
 //-------------------------------------------------
+//  ROM( tube_pcplus )
+//-------------------------------------------------
+
+ROM_START( tube_pcplus )
+	ROM_REGION(0x4000, "bootstrap", 0)
+	ROM_LOAD16_BYTE("pcplus_ic31.rom", 0x0000, 0x2000, CRC(5149417b) SHA1(a905c8570d70597bb2b2fca47a1a47783956af9c))
+	ROM_LOAD16_BYTE("pcplus_ic32.rom", 0x0001, 0x2000, CRC(e47f10b2) SHA1(45dc8d7e7936afbec6de423569d9005a1c350316))
+ROM_END
+
+//-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
@@ -72,6 +83,14 @@ void bbc_tube_80186_device::device_add_mconfig(machine_config &config)
 	SOFTWARE_LIST(config, "flop_ls_80186").set_original("bbc_flop_80186");
 }
 
+void bbc_tube_pcplus_device::device_add_mconfig(machine_config &config)
+{
+	bbc_tube_80186_device::device_add_mconfig(config);
+
+	/* internal ram */
+	m_ram->set_default_size("1M");
+}
+
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
@@ -79,6 +98,11 @@ void bbc_tube_80186_device::device_add_mconfig(machine_config &config)
 const tiny_rom_entry *bbc_tube_80186_device::device_rom_region() const
 {
 	return ROM_NAME( tube_80186 );
+}
+
+const tiny_rom_entry *bbc_tube_pcplus_device::device_rom_region() const
+{
+	return ROM_NAME( tube_pcplus );
 }
 
 //**************************************************************************
@@ -89,13 +113,23 @@ const tiny_rom_entry *bbc_tube_80186_device::device_rom_region() const
 //  bbc_tube_80186_device - constructor
 //-------------------------------------------------
 
+bbc_tube_80186_device::bbc_tube_80186_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_bbc_tube_interface(mconfig, *this)
+	, m_i80186(*this, "i80186")
+	, m_ula(*this, "ula")
+	, m_ram(*this, "ram")
+	, m_bootstrap(*this, "bootstrap")
+{
+}
+
 bbc_tube_80186_device::bbc_tube_80186_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBC_TUBE_80186, tag, owner, clock),
-		device_bbc_tube_interface(mconfig, *this),
-		m_i80186(*this, "i80186"),
-		m_ula(*this, "ula"),
-		m_ram(*this, "ram"),
-		m_bootstrap(*this, "bootstrap")
+	: bbc_tube_80186_device(mconfig, BBC_TUBE_80186, tag, owner, clock)
+{
+}
+
+bbc_tube_pcplus_device::bbc_tube_pcplus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: bbc_tube_80186_device(mconfig, BBC_TUBE_PCPLUS, tag, owner, clock)
 {
 }
 
@@ -121,6 +155,13 @@ void bbc_tube_80186_device::device_reset()
 	program.install_rom(0xc0000, 0xc3fff, 0x3c000, m_bootstrap->base());
 }
 
+void bbc_tube_pcplus_device::device_reset()
+{
+	address_space &program = m_i80186->space(AS_PROGRAM);
+
+	program.install_ram(0x00000, 0xfffff, m_ram->pointer());
+	program.install_rom(0xf0000, 0xf3fff, 0x0c000, m_bootstrap->base());
+}
 
 //**************************************************************************
 //  IMPLEMENTATION

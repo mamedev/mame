@@ -80,6 +80,11 @@ public:
 
 	void olibochu(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
@@ -97,15 +102,12 @@ private:
 	tilemap_t  *m_bg_tilemap;
 
 	/* misc */
-	int m_cmd;
+	uint16_t m_cmd;
 	DECLARE_WRITE8_MEMBER(olibochu_videoram_w);
 	DECLARE_WRITE8_MEMBER(olibochu_colorram_w);
 	DECLARE_WRITE8_MEMBER(olibochu_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	void olibochu_palette(palette_device &palette) const;
 	uint32_t screen_update_olibochu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(olibochu_scanline);
@@ -187,20 +189,16 @@ void olibochu_state::video_start()
 
 void olibochu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	uint8_t *spriteram = m_spriteram;
-	uint8_t *spriteram_2 = m_spriteram2;
-	int offs;
-
 	/* 16x16 sprites */
-	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
-		int attr = spriteram[offs + 1];
-		int code = spriteram[offs];
+		int attr = m_spriteram[offs + 1];
+		int code = m_spriteram[offs];
 		int color = attr & 0x3f;
 		int flipx = attr & 0x40;
 		int flipy = attr & 0x80;
-		int sx = spriteram[offs + 3];
-		int sy = ((spriteram[offs + 2] + 8) & 0xff) - 8;
+		int sx = m_spriteram[offs + 3];
+		int sy = ((m_spriteram[offs + 2] + 8) & 0xff) - 8;
 
 		if (flip_screen())
 		{
@@ -210,23 +208,23 @@ void olibochu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipy = !flipy;
 		}
 
-
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-			code, color,
-			flipx, flipy,
-			sx, sy, 0);
+		m_gfxdecode->gfx(1)->transpen(
+				bitmap, cliprect,
+				code, color,
+				flipx, flipy,
+				sx, sy, 0);
 	}
 
 	/* 8x8 sprites */
-	for (offs = 0; offs < m_spriteram2.bytes(); offs += 4)
+	for (int offs = 0; offs < m_spriteram2.bytes(); offs += 4)
 	{
-		int attr = spriteram_2[offs + 1];
-		int code = spriteram_2[offs];
+		int attr = m_spriteram2[offs + 1];
+		int code = m_spriteram2[offs];
 		int color = attr & 0x3f;
 		int flipx = attr & 0x40;
 		int flipy = attr & 0x80;
-		int sx = spriteram_2[offs + 3];
-		int sy = spriteram_2[offs + 2];
+		int sx = m_spriteram2[offs + 3];
+		int sy = m_spriteram2[offs + 2];
 
 		if (flip_screen())
 		{
@@ -236,11 +234,11 @@ void olibochu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipy = !flipy;
 		}
 
-
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
-			code, color,
-			flipx, flipy,
-			sx, sy, 0);
+		m_gfxdecode->gfx(0)->transpen(
+				bitmap, cliprect,
+				code, color,
+				flipx, flipy,
+				sx, sy, 0);
 	}
 }
 
@@ -254,17 +252,14 @@ uint32_t olibochu_state::screen_update_olibochu(screen_device &screen, bitmap_in
 
 WRITE8_MEMBER(olibochu_state::sound_command_w)
 {
-	int c;
-
 	if (offset == 0)
-		m_cmd = (m_cmd & 0x00ff) | (data << 8);
+		m_cmd = (m_cmd & 0x00ff) | (uint16_t(data) << 8);
 	else
-		m_cmd = (m_cmd & 0xff00) | data;
+		m_cmd = (m_cmd & 0xff00) | uint16_t(data);
 
-	for (c = 15; c >= 0; c--)
-		if (m_cmd & (1 << c)) break;
-
-	if (c >= 0) m_soundlatch->write(15 - c);
+	unsigned c = count_leading_zeros(uint32_t(m_cmd)) - 16;
+	if (c < 16)
+		m_soundlatch->write(c);
 }
 
 
@@ -473,7 +468,7 @@ void olibochu_state::olibochu(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &olibochu_state::olibochu_sound_map);
 	audiocpu.set_periodic_int(FUNC(olibochu_state::irq0_line_hold), attotime::from_hz(60)); //???
 
-//  config.m_perfect_cpu_quantum = subtag("maincpu");
+	//config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

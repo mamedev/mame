@@ -9,7 +9,7 @@
 
     CPU:  various AMD x86 CPUs, originally 80386DX (80387 available as an add-on).
           later models use 80386SX, 80486 and Pentium CPUs
-    Sound:  Yamaha YM3438
+    Sound:  Yamaha YM3438 (some later models are use YMF276; Low voltage variation of YM3438, needs External DAC)
             Ricoh RF5c68
             CD-DA
     Video:  Custom
@@ -2837,10 +2837,19 @@ void towns_state::towns_base(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
+
 	ym3438_device &fm(YM3438(config, "fm", 16000000 / 2)); // actual clock speed unknown
 	fm.irq_handler().set(FUNC(towns_state::towns_fm_irq));
 	fm.add_route(0, "lspeaker", 1.00);
 	fm.add_route(1, "rspeaker", 1.00);
+
+/*
+    // Later model uses YMF276 for FM
+    ymf276_device &fm(YMF276(config, "fm", 16000000 / 2)); // actual clock speed unknown
+    fm.irq_handler().set(FUNC(towns_state::towns_fm_irq));
+    fm.add_route(0, "lspeaker", 1.00);
+    fm.add_route(1, "rspeaker", 1.00);
+*/
 
 	rf5c68_device &pcm(RF5C68(config, "pcm", 16000000 / 2));  // actual clock speed unknown
 	pcm.set_end_callback(FUNC(towns_state::towns_pcm_irq));
@@ -3081,7 +3090,7 @@ ROM_END
 
 /* 16MHz 80386SX, 2MB RAM expandable up to 10MB (due to the limited 24-bit address space of the CPU), dumped from a UX10 */
 ROM_START( fmtownsux )
-	ROM_REGION32_LE( 0x480000, "user", 0)
+	ROM_REGION16_LE( 0x480000, "user", 0)
 	ROM_LOAD("fmt_dos_a.rom",  0x000000, 0x080000, CRC(22270e9f) SHA1(a7e97b25ff72b14121146137db8b45d6c66af2ae) )
 	// no F20 ROM
 	ROM_LOAD("fmt_dic.rom",  0x100000, 0x080000, CRC(82d1daa2) SHA1(7564020dba71deee27184824b84dbbbb7c72aa4e) )
@@ -3142,7 +3151,7 @@ ROM_START( fmtownsftv )
 ROM_END
 
 ROM_START( fmtmarty )
-	ROM_REGION32_LE( 0x480000, "user", 0)
+	ROM_REGION16_LE( 0x480000, "user", 0)
 	ROM_LOAD("mrom.m36",  0x000000, 0x080000, CRC(9c0c060c) SHA1(5721c5f9657c570638352fa9acac57fa8d0b94bd) )
 	ROM_CONTINUE(0x280000,0x180000)
 	ROM_LOAD("mrom.m37",  0x400000, 0x080000, CRC(fb66bb56) SHA1(e273b5fa618373bdf7536495cd53c8aac1cce9a5) )
@@ -3152,7 +3161,7 @@ ROM_START( fmtmarty )
 ROM_END
 
 ROM_START( fmtmarty2 )
-	ROM_REGION32_LE( 0x480000, "user", 0)
+	ROM_REGION16_LE( 0x480000, "user", 0)
 	ROM_LOAD("fmt_dos.rom",  0x000000, 0x080000, CRC(2bc2af96) SHA1(99cd51c5677288ad8ef711b4ac25d981fd586884) )
 	ROM_LOAD("fmt_dic.rom",  0x100000, 0x080000, CRC(82d1daa2) SHA1(7564020dba71deee27184824b84dbbbb7c72aa4e) )
 	ROM_LOAD("fmt_fnt.rom",  0x180000, 0x040000, CRC(dd6fd544) SHA1(a216482ea3162f348fcf77fea78e0b2e4288091a) )
@@ -3166,7 +3175,7 @@ ROM_START( fmtmarty2 )
 ROM_END
 
 ROM_START( carmarty )
-	ROM_REGION32_LE( 0x480000, "user", 0)
+	ROM_REGION16_LE( 0x480000, "user", 0)
 	ROM_LOAD("fmt_dos.rom",  0x000000, 0x080000, CRC(2bc2af96) SHA1(99cd51c5677288ad8ef711b4ac25d981fd586884) )
 	ROM_LOAD("fmt_dic.rom",  0x100000, 0x080000, CRC(82d1daa2) SHA1(7564020dba71deee27184824b84dbbbb7c72aa4e) )
 	ROM_LOAD("fmt_fnt.rom",  0x180000, 0x040000, CRC(dd6fd544) SHA1(a216482ea3162f348fcf77fea78e0b2e4288091a) )

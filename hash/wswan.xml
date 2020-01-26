@@ -1304,7 +1304,7 @@
 	<!--
 	The Robot Works cartridge has an integrated infrared port for programming an
 	external robot (the Wonder Borg).
-	There is an undumped Ver.1.5 cart labeled SWJ-BAN034.
+	The Wonder Borg itself uses an Elan EM78P451AQ MCU (undumped).
 	-->
 	<software name="robworks">
 		<description>Wonder Borg Robot Works</description>
@@ -1324,11 +1324,16 @@
 		</part>
 	</software>
 
+	<!--
+	The Robot Works cartridge has an integrated infrared port for programming an
+	external robot (the Wonder Borg).
+	The Wonder Borg itself uses an Elan EM78P451AQ MCU (undumped).
+	-->
 	<software name="robworks1" cloneof="robworks">
 		<description>Robot Works (Asia)</description>
 		<year>2000</year>
 		<publisher>Bandai</publisher>
-		<info name="serial" value="SWJ-BAN033"/>
+		<info name="serial" value="SWJ-BAN033"/> <!-- Same ROM as cart SWJ-BAN034 (labeled "Ver.1.5") -->
 		<info name="release" value="20000804"/>
 		<info name="alt_title" value="ワンダーボーグ 完"/>
 		<part name="cart" interface="wswan_cart">

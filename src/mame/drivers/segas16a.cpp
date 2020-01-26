@@ -7,7 +7,7 @@
 ****************************************************************************
 
     Known bugs:
-        * none at this time
+        * some games are stuck after reset when i8751 is present
 
     DIP locations verified from manual for:
         * aceattaca
@@ -607,7 +607,14 @@ void segas16a_state::machine_reset()
 {
 	// queue up a timer to either boost interleave or disable the MCU
 	synchronize(TID_INIT_I8751);
+	m_video_control = 0;
 	m_mcu_control = 0x00;
+	m_n7751_command = 0;
+	m_n7751_rom_address = 0;
+	m_last_buttons1 = 0;
+	m_last_buttons2 = 0;
+	m_read_port = 0;
+	m_mj_input_num = 0;
 }
 
 

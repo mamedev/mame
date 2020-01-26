@@ -176,22 +176,22 @@ void h8_device::request_state(int state)
 	requested_state = state;
 }
 
-uint32_t h8_device::execute_min_cycles() const
+uint32_t h8_device::execute_min_cycles() const noexcept
 {
 	return 1;
 }
 
-uint32_t h8_device::execute_max_cycles() const
+uint32_t h8_device::execute_max_cycles() const noexcept
 {
 	return 1;
 }
 
-uint32_t h8_device::execute_input_lines() const
+uint32_t h8_device::execute_input_lines() const noexcept
 {
 	return 0;
 }
 
-bool h8_device::execute_input_edge_triggered(int inputnum) const
+bool h8_device::execute_input_edge_triggered(int inputnum) const noexcept
 {
 	return inputnum == INPUT_LINE_NMI;
 }

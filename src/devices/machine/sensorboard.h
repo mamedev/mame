@@ -45,6 +45,8 @@ public:
 	u16 read_file(u8 x, bool reverse = false);
 	u16 read_rank(u8 y, bool reverse = false);
 
+	bool is_inductive() { return m_inductive; }
+
 	// handle board state
 	u8 read_piece(u8 x, u8 y) { return m_curstate[y * m_width + x]; }
 	void write_piece(u8 x, u8 y, u8 id) { m_curstate[y * m_width + x] = id; }

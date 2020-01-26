@@ -37,7 +37,6 @@
 #include "video/mc6845.h"
 #include "video/mos6566.h"
 
-#define M6509_TAG       "u13"
 #define PLA1_TAG        "u78"
 #define PLA2_TAG        "u88"
 #define MOS6567_TAG     "u23"
@@ -67,7 +66,7 @@ class cbm2_state : public driver_device
 public:
 	cbm2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, M6509_TAG),
+		m_maincpu(*this, "u13"),
 		m_pla1(*this, PLA1_TAG),
 		m_crtc(*this, MC68B45_TAG),
 		m_palette(*this, "palette"),
@@ -2249,15 +2248,14 @@ void p500_state::p500_ntsc(machine_config &config)
 
 	// basic hardware
 	M6509(config, m_maincpu, XTAL(14'318'181)/14);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->set_addrmap(AS_PROGRAM, &p500_state::p500_mem);
-	config.m_perfect_cpu_quantum = subtag(M6509_TAG);
+	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6509_device::IRQ_LINE);
 
 	// video hardware
 	mos6567_device &mos6567(MOS6567(config, MOS6567_TAG, XTAL(14'318'181)/14));
-	mos6567.set_cpu(M6509_TAG);
+	mos6567.set_cpu(m_maincpu);
 	mos6567.irq_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	mos6567.set_screen(SCREEN_TAG);
 	mos6567.set_addrmap(0, &p500_state::vic_videoram_map);
@@ -2383,15 +2381,14 @@ void p500_state::p500_pal(machine_config &config)
 
 	// basic hardware
 	M6509(config, m_maincpu, XTAL(17'734'472)/18);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->set_addrmap(AS_PROGRAM, &p500_state::p500_mem);
-	config.m_perfect_cpu_quantum = subtag(M6509_TAG);
+	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6509_device::IRQ_LINE);
 
 	// video hardware
 	mos6569_device &mos6569(MOS6569(config, MOS6569_TAG, XTAL(17'734'472)/18));
-	mos6569.set_cpu(M6509_TAG);
+	mos6569.set_cpu(m_maincpu);
 	mos6569.irq_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	mos6569.set_screen(SCREEN_TAG);
 	mos6569.set_addrmap(0, &p500_state::vic_videoram_map);
@@ -2514,9 +2511,8 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 
 	// basic hardware
 	M6509(config, m_maincpu, XTAL(18'000'000)/9);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->set_addrmap(AS_PROGRAM, &cbm2_state::cbm2_mem);
-	config.m_perfect_cpu_quantum = subtag(M6509_TAG);
+	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6509_device::IRQ_LINE);
 

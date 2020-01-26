@@ -6,6 +6,37 @@
 
 *********************************************************************/
 
+/*
+
+PCB Layout
+----------
+
+DATABOARD 4105-10
+
+|-------------------------------------------|
+|-  LS367   LS74    LS32    LS00    LS38 LED|
+||                                         -|
+||  LS367   LS06    LS38            LS14   ||
+|C                                         C|
+|N  ALS08   LS08    81LS96                 N|
+|1                                         2|
+||  81LS95  74S373  LS273           74S240 ||
+||                                         -|
+|-  SW1     DM8131  LS175           SW2     |
+|-------------------------------------------|
+
+Notes:
+    All IC's shown.
+
+    DM8131  - National Semiconductor DM8131N 6-Bit Unified Bus Comparator
+    LED     - Power LED
+    SW1     - Drive settings
+    SW2     - Card address
+    CN1     - 2x32 PCB header, ABC 1600 bus
+    CN2     - 2x25 PCB header, Xebec S1410
+
+*/
+
 #include "emu.h"
 #include "lux4105.h"
 #include "bus/scsi/scsihd.h"

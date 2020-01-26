@@ -893,7 +893,7 @@ void dectalk_state::dectalk(machine_config &config)
 	m_dsp->bio().set(FUNC(dectalk_state::spc_semaphore_r)); //read infifo-has-data-in-it fifo readable status
 
 #ifdef USE_LOOSE_TIMING
-	config.m_minimum_quantum = attotime::from_hz(100);
+	config.set_maximum_quantum(attotime::from_hz(100));
 #else
 	config.m_perfect_cpu_quantum = subtag("dsp");
 #endif

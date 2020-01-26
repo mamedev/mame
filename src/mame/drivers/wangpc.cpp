@@ -70,7 +70,7 @@ public:
 		m_centronics(*this, CENTRONICS_TAG),
 		m_cent_data_in(*this, "cent_data_in"),
 		m_cent_data_out(*this, "cent_data_out"),
-		m_bus(*this, WANGPC_BUS_TAG),
+		m_bus(*this, "wangpcbus"),
 		m_sw(*this, "SW"),
 		m_led_diagnostic(*this, LED_DIAGNOSTIC),
 		m_timer2_irq(1),
@@ -1363,11 +1363,11 @@ void wangpc_state::wangpc(machine_config &config)
 	m_bus->drq2_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq2_w));
 	m_bus->drq3_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w));
 	m_bus->ioerror_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	WANGPC_BUS_SLOT(config, "slot1", wangpc_cards, nullptr, 1);
-	WANGPC_BUS_SLOT(config, "slot2", wangpc_cards, "mvc", 2);
-	WANGPC_BUS_SLOT(config, "slot3", wangpc_cards, nullptr, 3);
-	WANGPC_BUS_SLOT(config, "slot4", wangpc_cards, nullptr, 4);
-	WANGPC_BUS_SLOT(config, "slot5", wangpc_cards, nullptr, 5);
+	WANGPC_BUS_SLOT(config, "slot1", m_bus, wangpc_cards, nullptr, 1);
+	WANGPC_BUS_SLOT(config, "slot2", m_bus, wangpc_cards, "mvc", 2);
+	WANGPC_BUS_SLOT(config, "slot3", m_bus, wangpc_cards, nullptr, 3);
+	WANGPC_BUS_SLOT(config, "slot4", m_bus, wangpc_cards, nullptr, 4);
+	WANGPC_BUS_SLOT(config, "slot5", m_bus, wangpc_cards, nullptr, 5);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("128K");

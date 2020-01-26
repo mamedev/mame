@@ -17677,7 +17677,6 @@ Unreleased (music source code exists, possibly no prototypes exist)
 			<feature name="u5" value="U5 [LVX04]" />
 			<feature name="batt" value="Batt CR2025" />
 			<feature name="slot" value="rom_huc3" />
-			<feature name="slot" value="rom_huc3" />
 			<dataarea name="rom" size="1048576">
 				<rom name="robopon - sun version (usa).bin" size="1048576" crc="32caef11" sha1="399c928a38a3901b7a1093bd61f5a4d8c05b9771"/>
 			</dataarea>

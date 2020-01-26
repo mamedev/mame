@@ -27,12 +27,12 @@
 
 // ======================> buscard_t
 
-class buscard_t : public device_t,
+class c64_buscard_device : public device_t,
 				  public device_c64_expansion_card_interface
 {
 public:
 	// construction/destruction
-	buscard_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c64_buscard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -79,7 +79,7 @@ private:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(C64_BUSCARD, buscard_t)
+DECLARE_DEVICE_TYPE(C64_BUSCARD, c64_buscard_device)
 
 
 #endif // MAME_BUS_C64_BUSCARD_H

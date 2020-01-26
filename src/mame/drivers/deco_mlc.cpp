@@ -102,6 +102,8 @@
 
     Driver by Bryan McPhail, bmcphail@tendril.co.uk, thank you to Avedis and The Guru.
 
+    Note: MLC stands for MotherLess Cassette
+
 ***************************************************************************/
 
 #include "emu.h"

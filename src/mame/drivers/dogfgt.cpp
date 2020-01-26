@@ -237,7 +237,7 @@ void dogfgt_state::dogfgt(machine_config &config)
 	M6502(config, m_subcpu, 1500000); /* 1.5 MHz ???? */
 	m_subcpu->set_addrmap(AS_PROGRAM, &dogfgt_state::sub_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

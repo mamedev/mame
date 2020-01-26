@@ -578,67 +578,6 @@ READ8_MEMBER( ti99_4x_state::psi_input_4a )
 		return 1;
 	}
 }
-/*  switch (offset & 0x03)
-    {
-    case tms9901_device::CB_INT7:
-        //
-        // Read pins INT3*-INT7* of TI99's 9901.
-        // bit 1: INT1 status
-        // bit 2: INT2 status
-        // bit 3-7: keyboard status bits 0 to 4
-        //
-        // |K|K|K|K|K|I2|I1|C|
-        //
-        if (m_keyboard_column >= (m_model==MODEL_4? 5:6)) // joy 1, 2, handset
-        {
-            answer = m_joyport->read_port();
-
-            if ((m_model!=MODEL_4) && (m_alphabug->read()!=0) ) answer |= (m_alpha->read() | m_alpha1->read());
-        }
-        else
-        {
-            answer = m_keyboard[m_keyboard_column]->read();
-        }
-        if (m_check_alphalock)  // never true for TI-99/4
-        {
-            answer &= ~(m_alpha->read() | m_alpha1->read());
-        }
-        answer = (answer << 3);
-        if (m_int1 == CLEAR_LINE) answer |= 0x02;
-        if (m_int2 == CLEAR_LINE) answer |= 0x04;
-
-        break;
-
-    case tms9901_device::INT8_INT15:
-        // |1|1|1|INT12|0|K|K|K|
-        if (m_keyboard_column >= (m_model==MODEL_4? 5:6)) answer = 0x07;
-        else answer = ((m_keyboard[m_keyboard_column]->read())>>5) & 0x07;
-        answer |= 0xe0;
-        if (m_model != MODEL_4 || m_int12==CLEAR_LINE) answer |= 0x10;
-        break;
-
-    case tms9901_device::P0_P7:
-        // Required for the handset (only on TI-99/4)
-        if ((m_joyport->read_port() & 0x20)!=0) answer |= 2;
-        break;
-
-    case tms9901_device::P8_P15:
-        // Preset to 1
-        answer = 4;
-
-        // Interrupt pin of the handset (only on TI-99/4)
-        // Negative logic (interrupt pulls line down)
-        if ((m_joyport->read_port() & 0x40)==0) answer = 0;
-
-        // we don't take CS2 into account, as CS2 is a write-only unit
-        if (m_cassette1->input() > 0)
-        {
-            answer |= 8;
-        }
-        break;
-    }
-    */
-
 
 /*
     Handler for TMS9901 P0 pin (handset data acknowledge); only for 99/4
@@ -885,6 +824,7 @@ WRITE_LINE_MEMBER( ti99_4x_state::console_reset )
 		LOGMASKED(LOG_RESETLOAD, "Console reset line = %d\n", state);
 		m_cpu->set_input_line(INT_9900_RESET, state);
 		m_video->reset_line(state);
+		m_ioport->reset_in(state);
 	}
 }
 
@@ -973,7 +913,7 @@ void ti99_4x_state::ti99_4_common(machine_config& config)
 	RAM(config, TI99_EXPRAM_TAG).set_default_size("32K").set_default_value(0);
 
 	// Software list
-	SOFTWARE_LIST(config, "cart_list_ti99").set_type("ti99_cart", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cart_list_ti99").set_original("ti99_cart");
 
 	// Cassette drives. Second drive is record-only.
 	SPEAKER(config, "cass_out").front_center();

@@ -26,8 +26,8 @@
 #include <winioctl.h>
 #include <tchar.h>
 #include <shlwapi.h>
-#include <stdlib.h>
-#include <ctype.h>
+#include <cstdlib>
+#include <cctype>
 
 
 namespace {

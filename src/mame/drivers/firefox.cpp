@@ -644,7 +644,7 @@ void firefox_state::firefox(machine_config &config)
 	M6502(config, m_audiocpu, MASTER_XTAL/8);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &firefox_state::audio_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60000);
+	config.set_maximum_quantum(attotime::from_hz(60000));
 
 	adc0809_device &adc(ADC0809(config, "adc", MASTER_XTAL/16)); // nominally 900 kHz
 	adc.in_callback<0>().set_ioport("PITCH");

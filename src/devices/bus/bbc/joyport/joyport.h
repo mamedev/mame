@@ -41,7 +41,7 @@
 
 class device_bbc_joyport_interface;
 
-class bbc_joyport_slot_device : public device_t, public device_slot_interface
+class bbc_joyport_slot_device : public device_t, public device_single_card_slot_interface<device_bbc_joyport_interface>
 {
 public:
 	// construction/destruction
@@ -69,9 +69,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	device_bbc_joyport_interface *m_device;
 
@@ -83,7 +81,7 @@ private:
 
 // ======================> device_bbc_joyport_interface
 
-class device_bbc_joyport_interface : public device_slot_card_interface
+class device_bbc_joyport_interface : public device_interface
 {
 public:
 	virtual uint8_t pb_r() { return 0xff; }

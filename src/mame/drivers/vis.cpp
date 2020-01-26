@@ -929,7 +929,7 @@ void vis_state::vis(machine_config &config)
 }
 
 ROM_START(vis)
-	ROM_REGION(0x100000,"bios", 0)
+	ROM_REGION16_LE(0x100000,"bios", 0)
 	ROM_LOAD( "p513bk0b.bin", 0x00000, 0x80000, CRC(364e3f74) SHA1(04260ef1e65e482c9c49d25ace40e22487d6aab9))
 	ROM_LOAD( "p513bk1b.bin", 0x80000, 0x80000, CRC(e18239c4) SHA1(a0262109e10a07a11eca43371be9978fff060bc5))
 ROM_END

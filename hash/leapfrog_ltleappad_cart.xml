@@ -7,7 +7,7 @@
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-10247"/>
-		<part name="cart" interface="leapfrog_mfleappad_cart"> <!-- change interface to "leapfrog_ltleappad_cart" once the Little Touch BIOS is dumped and added -->
+		<part name="cart" interface="leapfrog_ltleappad_cart">
 			<feature name="pcb" value="CT337V0"/>
 			<feature name="pcb_rev" value="1A"/>
 			<feature name="u1" value="Macronix ROM: MX23L3210"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
@@ -22,7 +22,7 @@
 		<year>2004</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11375"/>
-		<part name="cart" interface="leapfrog_mfleappad_cart"> <!-- change interface to "leapfrog_ltleappad_cart" once the Little Touch BIOS is dumped and added -->
+		<part name="cart" interface="leapfrog_ltleappad_cart">
 			<feature name="pcb" value="CT205V6"/>
 			<feature name="pcb_rev" value="1A"/>
 			<feature name="u1" value="Sunplus 16MBit ROM: SPR1600A"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
@@ -37,7 +37,7 @@
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-11468"/>
-		<part name="cart" interface="leapfrog_mfleappad_cart"> <!-- change interface to "leapfrog_ltleappad_cart" once the Little Touch BIOS is dumped and added -->
+		<part name="cart" interface="leapfrog_ltleappad_cart">
 			<feature name="pcb" value="CT316V0"/>
 			<feature name="pcb_rev" value="1A"/>
 			<feature name="u1" value="Sunplus ROM: SPR32100A"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->

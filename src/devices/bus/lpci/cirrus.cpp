@@ -64,8 +64,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cirrus.h"
 #include "video/pc_vga.h"
+#include "cirrus.h"
 
 #define LOG_PCIACCESS   0
 
@@ -85,7 +85,8 @@ DEFINE_DEVICE_TYPE(PCI_CIRRUS_SVGA, pci_cirrus_svga_device, "pci_cirrus_svga", "
 
 pci_cirrus_svga_device::pci_cirrus_svga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PCI_CIRRUS_SVGA, tag, owner, clock)
-	, pci_device_interface( mconfig, *this )
+	, pci_device_interface(mconfig, *this)
+	, m_vga(*this, "vga")
 {
 }
 
@@ -160,5 +161,5 @@ void pci_cirrus_svga_device::pci_write(pci_bus_device *pcibus, int function, int
 WRITE8_MEMBER( pci_cirrus_svga_device::cirrus_42E8_w )
 {
 	if (data & 0x80)
-		machine().device("vga")->reset();
+		m_vga->reset();
 }

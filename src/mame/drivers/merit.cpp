@@ -2431,6 +2431,24 @@ ROM_START( couplei )
 	ROM_LOAD( "7.7a",  0x00000, 0x0800, CRC(6c36361e) SHA1(7a018eecf3d8b7cf8845dcfcf8067feb292933b2) )  /*video timing?*/
 ROM_END
 
+ROM_START( matchemg )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "6221-55_u5-1.u5", 0x00000, 0x8000, CRC(152ad9f6) SHA1(fdd90ea7e5bbcd7dc8f7d6f10ac9efc08515b112) )
+	ROM_LOAD( "6221-55_u6-1.u6", 0x14000, 0x2000, CRC(0678d986) SHA1(c881aee9e977384a188f0f7b9e563b699da5fc0a) )
+	ROM_RELOAD(                  0x16000, 0x2000)
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "gex_1_u39.u39", 0x00000, 0x8000, CRC(da94fbc6) SHA1(af008eceba2e4ef35d0815d5cb1a5a50f1a9817f) ) /* labeled  GEX 1   U39  C1987 MII - U38 & U39 had a space between GEX and 1 */
+	ROM_LOAD( "gex_1_u38.u38", 0x08000, 0x8000, CRC(211b75cc) SHA1(52497743457afbcf2969a967d5982d8934a29864) ) /* labeled  GEX 1   U38  C1987 MII */
+	ROM_LOAD( "gex1_u37.u37",  0x10000, 0x8000, CRC(dfc73155) SHA1(a922953ba238c3ca2f2f0a046109186d1057d76d) ) /* labeled  GEX1   U37  C1987 MII - U37 & U40 had no space between GEX and 1 */
+
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "gex1_u40.u40", 0x00000, 0x8000, CRC(a6a9a73d) SHA1(f3cb1d434d730f6e00f48079eaf8b88f57779fa0) ) /* labeled  GEX1   U40  C1987 MII */
+
+	ROM_REGION( 0x0800, "proms", 0 )
+	ROM_LOAD( "crt-209_6221-55.cpu",  0x00000, 0x0800, CRC(2c22b3a8) SHA1(663e3b687d4f2adc34e421e23773f234ca35c629) )  //video timing?
+ROM_END
+
 void merit_state::init_key_0()
 {
 	m_decryption_key = 0;
@@ -2569,3 +2587,4 @@ GAME( 1987, dtrvwz5,  0,       dtrvwz5,  dtrvwh5,  merit_state, init_dtrvwz5,ROT
 GAME( 1988, couple,   0,       couple,   couple,   merit_state, init_couple, ROT0,  "Merit", "The Couples (set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1988, couplep,  couple,  couple,   couplep,  merit_state, init_couple, ROT0,  "Merit", "The Couples (set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1988, couplei,  couple,  couple,   couple,   merit_state, init_couple, ROT0,  "Merit", "The Couples (set 3)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1986, matchemg, couple,  couple,   couple,   merit_state, init_couple, ROT0,  "Merit", "Match'em Up (German)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )

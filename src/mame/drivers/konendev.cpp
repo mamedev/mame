@@ -36,8 +36,10 @@
 
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
+#include "cpu/h8/h83006.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
+#include "machine/msm6242.h"
 #include "sound/ymz280b.h"
 #include "video/k057714.h"
 #include "emupal.h"
@@ -50,8 +52,11 @@ public:
 	konendev_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_ifu(*this, "ifu")
 		, m_gcu(*this, "gcu")
 		, m_eeprom(*this, "eeprom")
+		, m_rtc(*this, "rtc")
+		, m_dpram(*this, "dpram")
 	{ }
 
 	void init_konendev();
@@ -59,17 +64,24 @@ public:
 
 	void konendev(machine_config &config);
 
+	virtual void machine_start() override
+	{
+		m_dpram_base = (uint16_t *)m_dpram.target();
+	}
+
 private:
 	DECLARE_READ32_MEMBER(mcu2_r);
 	DECLARE_READ32_MEMBER(ifu2_r);
 	DECLARE_READ32_MEMBER(ctrl0_r);
 	DECLARE_READ32_MEMBER(ctrl1_r);
 	DECLARE_READ32_MEMBER(ctrl2_r);
-	DECLARE_READ32_MEMBER(rtc_r);
-	DECLARE_WRITE32_MEMBER(rtc_w);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_READ32_MEMBER(sound_data_r);
 	DECLARE_WRITE32_MEMBER(sound_data_w);
+
+	DECLARE_READ16_MEMBER(ifu_unk_r);
+	DECLARE_READ16_MEMBER(ifu_dpram_r);
+	DECLARE_WRITE16_MEMBER(ifu_dpram_w);
 
 	DECLARE_WRITE_LINE_MEMBER(gcu_interrupt);
 	INTERRUPT_GEN_MEMBER(vbl_interrupt);
@@ -79,11 +91,17 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void konendev_map(address_map &map);
+	void ifu_map(address_map &map);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<h83007_device> m_ifu;
 	required_device<k057714_device> m_gcu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<rtc62423_device> m_rtc;
+	required_shared_ptr<uint32_t> m_dpram;
+
+	uint16_t *m_dpram_base;
 };
 
 uint32_t konendev_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -134,49 +152,6 @@ READ32_MEMBER(konendev_state::ifu2_r)
 	return r;
 }
 
-// This seems to be Epson RTC-72423
-uint8_t konendev_state::rtc_dev_r(uint32_t reg)
-{
-	switch (reg)
-	{
-		case 0x0:       return 9;
-		case 0x1:       return 5;
-		case 0x2:       return 3;
-		case 0x3:       return 2;
-		case 0x4:       return 1;
-		case 0x5:       return 0;
-		case 0x6:       return 7;
-		case 0x7:       return 2;
-		case 0x8:       return 2;
-		case 0x9:       return 1;
-		case 0xa:       return 5;
-		case 0xb:       return 1;
-		case 0xc:       return 3;
-	}
-
-	return 0;
-}
-
-READ32_MEMBER(konendev_state::rtc_r)
-{
-	uint32_t r = 0;
-
-	if (ACCESSING_BITS_24_31)
-		r |= (uint32_t)(rtc_dev_r(offset * 4)) << 24;
-	if (ACCESSING_BITS_16_23)
-		r |= (uint32_t)(rtc_dev_r((offset * 4)+1)) << 16;
-	if (ACCESSING_BITS_8_15)
-		r |= (uint32_t)(rtc_dev_r((offset * 4)+2)) << 8;
-	if (ACCESSING_BITS_0_7)
-		r |= (uint32_t)(rtc_dev_r((offset * 4)+3));
-
-	return r;
-}
-
-WRITE32_MEMBER(konendev_state::rtc_w)
-{
-}
-
 READ32_MEMBER(konendev_state::ctrl0_r)
 {
 	return ((uint32_t)(ioport("IN1")->read() & 0xffff) << 16) | 0xffff;
@@ -218,12 +193,13 @@ void konendev_state::konendev_map(address_map &map)
 {
 	map(0x00000000, 0x00ffffff).ram();
 	map(0x78000000, 0x78000003).r(FUNC(konendev_state::mcu2_r));
-	map(0x78080000, 0x7808000f).rw(FUNC(konendev_state::rtc_r), FUNC(konendev_state::rtc_w));
+	map(0x78080000, 0x7808000f).rw(m_rtc, FUNC(rtc62423_device::read), FUNC(rtc62423_device::write));
 	map(0x780c0000, 0x780c0003).rw(FUNC(konendev_state::sound_data_r), FUNC(konendev_state::sound_data_w));
 	map(0x78100000, 0x78100003).w(FUNC(konendev_state::eeprom_w));
 	map(0x78800000, 0x78800003).r(FUNC(konendev_state::ifu2_r));
 	map(0x78800004, 0x78800007).r(FUNC(konendev_state::ctrl0_r));
 	map(0x78a00000, 0x78a0001f).r(FUNC(konendev_state::ctrl1_r));
+	map(0x78c00000, 0x78c003ff).ram().share("dpram");
 	map(0x78e00000, 0x78e00003).r(FUNC(konendev_state::ctrl2_r));
 	map(0x79000000, 0x79000003).w(m_gcu, FUNC(k057714_device::fifo_w));
 	map(0x79800000, 0x798000ff).rw(m_gcu, FUNC(k057714_device::read), FUNC(k057714_device::write));
@@ -233,6 +209,30 @@ void konendev_state::konendev_map(address_map &map)
 	map(0x7ff00000, 0x7fffffff).rom().region("program", 0);
 }
 
+READ16_MEMBER(konendev_state::ifu_unk_r)
+{
+	return 0xc3c3;  // H8 program crashes immediately if it doesn't see
+}
+
+READ16_MEMBER(konendev_state::ifu_dpram_r)
+{
+	return m_dpram_base[offset];
+}
+
+WRITE16_MEMBER(konendev_state::ifu_dpram_w)
+{
+	COMBINE_DATA(&m_dpram_base[offset]);
+}
+
+void konendev_state::ifu_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom().region("ifu", 0);
+	map(0x200000, 0x20ffff).ram();
+	map(0x210000, 0x217fff).ram();
+	map(0x800000, 0x8003ff).rw(FUNC(konendev_state::ifu_dpram_r), FUNC(konendev_state::ifu_dpram_w));
+	map(0xa40000, 0xa40001).nopw();
+	map(0xfee010, 0xfee011).r(FUNC(konendev_state::ifu_unk_r));
+};
 
 static INPUT_PORTS_START( konendev )
 	PORT_START("IN0")
@@ -311,6 +311,9 @@ void konendev_state::konendev(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &konendev_state::konendev_map);
 	m_maincpu->set_vblank_int("screen", FUNC(konendev_state::vbl_interrupt));
 
+	H83007(config, m_ifu, 8000000); // Clock unknown
+	m_ifu->set_addrmap(AS_PROGRAM, &konendev_state::ifu_map);
+
 	/* video hardware */
 	PALETTE(config, "palette", palette_device::RGB_555);
 
@@ -324,6 +327,8 @@ void konendev_state::konendev(machine_config &config)
 
 	K057714(config, m_gcu, 0);
 	m_gcu->irq_callback().set(FUNC(konendev_state::gcu_interrupt));
+
+	RTC62423(config, m_rtc, XTAL(32'768));
 
 	NVRAM(config, "nvram0", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0);
@@ -340,9 +345,23 @@ void konendev_state::konendev(machine_config &config)
 }
 
 
+#define ENDEAVOUR_BIOS \
+	ROM_REGION( 0x200000, "ifu", 0 ) \
+	ROM_LOAD( "2v02s502_ifu.bin", 0x000000, 0x080000, CRC(36122a98) SHA1(3d2c40c9d504358d890364e26c9562e40314d8a4) )
+
+ROM_START( konendev )
+	ENDEAVOUR_BIOS
+
+	ROM_REGION32_BE( 0x200000, "program", ROMREGION_ERASE00 )
+	ROM_REGION32_BE( 0x1800000, "flash", ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x100, "eeprom", ROMREGION_ERASE00 )
+ROM_END
+
 /* Interesting sets */
 
 ROM_START( enchlamp )
+	ENDEAVOUR_BIOS
+
 	ROM_REGION32_BE( 0x200000, "program", 0 )
 	ROM_LOAD32_WORD_SWAP( "enl5rg26_01h.bin", 0x00000, 0x100000, CRC(fed5b988) SHA1(49442decd9b40f0a382c4fc7b231958f526ddbd1) )
 	ROM_LOAD32_WORD_SWAP( "enl5rg26_02l.bin", 0x00002, 0x100000, CRC(d0e42c9f) SHA1(10ff944ec0a626d47ec12be291ff5fe001342ed4) )
@@ -356,13 +375,11 @@ ROM_END
 
 
 ROM_START( whiterus )
+	ENDEAVOUR_BIOS
+
 	ROM_REGION32_BE( 0x200000, "program", 0 )
 	ROM_LOAD32_WORD_SWAP( "01h whr5ra26,c5df", 0x00000, 0x080000, CRC(d5a1ebb6) SHA1(14a8d1d8f8ae8919eaa878660c7e97e7ea7a02d8) )
 	ROM_LOAD32_WORD_SWAP( "02l whr5ra26,bc0a", 0x00002, 0x080000, CRC(48a2277c) SHA1(965d1da31e3bcde6fda4e15e8980a69e8bce5a84) )
-
-	ROM_REGION( 0x200000, "others", 0 )
-	ROM_LOAD( "u190.4 2v02s502.ifu_rus,95 7", 0x0000, 0x080000, CRC(36122a98) SHA1(3d2c40c9d504358d890364e26c9562e40314d8a4) )
-	ROM_LOAD( "2v02s502_ifu.bin", 0x0000, 0x080000, CRC(36122a98) SHA1(3d2c40c9d504358d890364e26c9562e40314d8a4) ) // was in 2V02S502_IFU.zip looks similar to above tho
 
 	ROM_REGION32_BE( 0x1800000, "flash", ROMREGION_ERASE00 )
 ROM_END
@@ -370,6 +387,8 @@ ROM_END
 /* Partial sets */
 
 ROM_START( aadvent )
+	ENDEAVOUR_BIOS
+
 	ROM_REGION32_BE( 0x200000, "program", 0 )
 	ROM_LOAD32_WORD_SWAP( "afa5re26_01h.bin", 0x00000, 0x100000, CRC(65ce6f7a) SHA1(018742f13fea4c52f822e7f12e8efd0aff61a713) )
 	ROM_LOAD32_WORD_SWAP( "afa5re26_02l.bin", 0x00002, 0x100000, CRC(73945b3a) SHA1(5ace9c439048f3555fe631917c15bee76362e784) )
@@ -378,6 +397,8 @@ ROM_START( aadvent )
 ROM_END
 
 ROM_START( dragnfly )
+	ENDEAVOUR_BIOS
+
 	ROM_REGION32_BE( 0x200000, "program", 0 )
 	ROM_LOAD32_WORD_SWAP( "drf5re26_01h.bin", 0x00000, 0x100000, CRC(ef6f1b69) SHA1(007a41cd1b08705184f69ce3e0e6c63bc2301e25) )
 	ROM_LOAD32_WORD_SWAP( "drf5re26_02l.bin", 0x00002, 0x100000, CRC(00e00c29) SHA1(a92d7220bf46655222ddc5d1c276dc469343f4c5) )
@@ -386,6 +407,8 @@ ROM_START( dragnfly )
 ROM_END
 
 ROM_START( gypmagic )
+	ENDEAVOUR_BIOS
+
 	ROM_REGION32_BE( 0x200000, "program", 0 )
 	ROM_LOAD32_WORD_SWAP( "gym5rc26_01h.bin", 0x00000, 0x080000, CRC(8643be94) SHA1(fc63872a55ac2229652566bd9795ce9bf8442fee) )
 	ROM_LOAD32_WORD_SWAP( "gym5rc26_02l.bin", 0x00002, 0x080000, CRC(4ee33c46) SHA1(9e0ef66e9d53a47827d04e6a89d13d37429e0c16) )
@@ -394,6 +417,8 @@ ROM_START( gypmagic )
 ROM_END
 
 ROM_START( incanp )
+	ENDEAVOUR_BIOS
+
 	ROM_REGION32_BE( 0x200000, "program", 0 )
 	ROM_LOAD32_WORD_SWAP( "inp5rg26_01h.bin", 0x00000, 0x100000, CRC(8434222e) SHA1(d03710e18f5b9e45db32685778a21a5dc598d043) )
 	ROM_LOAD32_WORD_SWAP( "inp5rg26_02l.bin", 0x00002, 0x100000, CRC(50c37109) SHA1(a638587f37f63b3f63ee51f541d991c3784c09f7) )
@@ -402,6 +427,8 @@ ROM_START( incanp )
 ROM_END
 
 ROM_START( jestmagi )
+	ENDEAVOUR_BIOS
+
 	ROM_REGION32_BE( 0x200000, "program", 0 )
 	ROM_LOAD32_WORD_SWAP( "jem5rc26_01h.bin", 0x00000, 0x080000, CRC(9145324c) SHA1(366baa22bde1b8da19dba756829305d0fd69b4ff) )
 	ROM_LOAD32_WORD_SWAP( "jem5rc26_02l.bin", 0x00002, 0x080000, CRC(cb49f466) SHA1(e3987de2e640fe8116d66d2c1755e6500dedf8a5) )
@@ -410,6 +437,8 @@ ROM_START( jestmagi )
 ROM_END
 
 ROM_START( luckfoun )
+	ENDEAVOUR_BIOS
+
 	ROM_REGION32_BE( 0x200000, "program", 0 )
 	ROM_LOAD32_WORD_SWAP( "luf5rd26_01h.bin", 0x00000, 0x080000, CRC(68b3d50a) SHA1(9b3d2a9f5d72db091e79b036017bd5d07f9fed00) )
 	ROM_LOAD32_WORD_SWAP( "luf5rd26_02l.bin", 0x00002, 0x080000, CRC(e7e9b8cd) SHA1(d8c421b0d58775f5a0ccae6395a604091b0acf1d) )
@@ -418,6 +447,8 @@ ROM_START( luckfoun )
 ROM_END
 
 ROM_START( mohicans )
+	ENDEAVOUR_BIOS
+
 	ROM_REGION32_BE( 0x200000, "program", 0 )
 	ROM_LOAD32_WORD_SWAP( "moh5rf26_01h.bin", 0x00000, 0x100000, CRC(527dda20) SHA1(0a71484421738517c17d76e9bf92943b57cc4cc8) )
 	ROM_LOAD32_WORD_SWAP( "moh5rf26_02l.bin", 0x00002, 0x100000, CRC(a9bd3846) SHA1(02d80ff6c20e3732ae582de5d4392d4d6d8ba955) )
@@ -426,6 +457,8 @@ ROM_START( mohicans )
 ROM_END
 
 ROM_START( monshow )
+	ENDEAVOUR_BIOS
+
 	ROM_REGION32_BE( 0x200000, "program", 0 )
 	ROM_LOAD32_WORD_SWAP( "tms5rc26_01h.bin", 0x00000, 0x100000, CRC(8209aafe) SHA1(e48a0524ad93a9b657d3efe67f7b5e1067b37e48) )
 	ROM_LOAD32_WORD_SWAP( "tms5rc26_02l.bin", 0x00002, 0x100000, CRC(78de8c59) SHA1(ad73bc926f5874d257171dfa6b727cb31e33bce9) )
@@ -434,6 +467,8 @@ ROM_START( monshow )
 ROM_END
 
 ROM_START( romanl )
+	ENDEAVOUR_BIOS
+
 	ROM_REGION32_BE( 0x200000, "program", 0 )
 	ROM_LOAD32_WORD_SWAP( "rol5rg26_01h.bin", 0x00000, 0x100000, CRC(d441d30c) SHA1(025111699a7e29781bbb4d0f4151c808e3d06235) )
 	ROM_LOAD32_WORD_SWAP( "rol5rg26_02l.bin", 0x00002, 0x100000, CRC(08bd72ca) SHA1(a082cffeb1bccc8ec468a618eaabba7dac89882c) )
@@ -442,6 +477,8 @@ ROM_START( romanl )
 ROM_END
 
 ROM_START( safemon )
+	ENDEAVOUR_BIOS
+
 	ROM_REGION32_BE( 0x200000, "program", 0 )
 	ROM_LOAD32_WORD_SWAP( "sam5rj26_01h.bin", 0x00000, 0x080000, CRC(7f82693f) SHA1(1c8540d209ab17f4fca5ff74bc687c83ec315208) )
 	ROM_LOAD32_WORD_SWAP( "sam5rj26_02l.bin", 0x00002, 0x080000, CRC(73bd981e) SHA1(f01b97201bd877c601cf3c742a6e0963de8e48dc) )
@@ -450,6 +487,8 @@ ROM_START( safemon )
 ROM_END
 
 ROM_START( showqn )
+	ENDEAVOUR_BIOS
+
 	ROM_REGION32_BE( 0x200000, "program", 0 )
 	ROM_LOAD32_WORD_SWAP( "shq_1h.bin", 0x00000, 0x080000, CRC(3fc44415) SHA1(f0be1b90a2a374f9fb9e059e834bbdbf714b6607) )
 	ROM_LOAD32_WORD_SWAP( "shq_2l.bin", 0x00002, 0x080000, CRC(38a03281) SHA1(1b4552b0ce347df4d87e398111bbf72f126a8ec1) )
@@ -458,6 +497,8 @@ ROM_START( showqn )
 ROM_END
 
 ROM_START( spiceup )
+	ENDEAVOUR_BIOS
+
 	ROM_REGION32_BE( 0x200000, "program", 0 )
 	ROM_LOAD32_WORD_SWAP( "siu5rc26_01h.bin", 0x00000, 0x100000, CRC(373bc2b1) SHA1(af3740fdcd028f162440701c952a3a87805bc65b) )
 	ROM_LOAD32_WORD_SWAP( "siu5rc26_02l.bin", 0x00002, 0x100000, CRC(2e584321) SHA1(ca98092dde76338117e989e774db2db672d87bfa) )
@@ -466,6 +507,8 @@ ROM_START( spiceup )
 ROM_END
 
 ROM_START( sultanw )
+	ENDEAVOUR_BIOS
+
 	ROM_REGION32_BE( 0x200000, "program", 0 )
 	ROM_LOAD32_WORD_SWAP( "suw5rc26_01h.bin", 0x00000, 0x100000, CRC(27760529) SHA1(b8970a706df52ee5792bbd7a4e719f2be87662ac) )
 	ROM_LOAD32_WORD_SWAP( "suw5rc26_02l.bin", 0x00002, 0x100000, CRC(1c98fd4d) SHA1(58ff948c0deba0bffb8866b15f46518524516501) )
@@ -479,6 +522,10 @@ ROM_START( konzero )
 	ROM_LOAD32_WORD_SWAP( "rmclr_l.bin", 0x00002, 0x080000, CRC(2806299c) SHA1(a069f4477b310f99ff1ff48f622dc30862589127) )
 
 	ROM_REGION32_BE( 0x1800000, "flash", ROMREGION_ERASE00 )
+
+	// Normal Endeavour games use a standard IFU BIOS; this clear chip set uses an undumped alternate version
+	ROM_REGION( 0x200000, "ifu", 0 )
+	ROM_LOAD( "konzero_ifu.bin", 0x000000, 0x080000, NO_DUMP )
 
 	ROM_REGION16_BE( 0x100, "eeprom", 0 )
 	ROM_LOAD( "93c56.u98", 0x00, 0x100, CRC(b2521a6a) SHA1(f44711545bee7e9c772a3dc23b79f0ea8059ec50) )          // empty eeprom with Konami header
@@ -502,23 +549,26 @@ void konendev_state::init_enchlamp()
 	rom[0] = 0x5782b930;                    // new checksum for program rom
 }
 
-// has a flash dump?
-GAME( 200?, enchlamp, 0, konendev, konendev, konendev_state, init_enchlamp, ROT0,  "Konami", "Enchanted Lamp (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-// missing flash but has other interesting files
-GAME( 200?, whiterus, 0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "White Russia (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// BIOS
+GAME( 200?, konendev, 0, konendev, konendev, konendev_state, init_enchlamp, ROT0,  "Konami", "Konami Endeavour BIOS", MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
 
-// partial sets
-GAME( 200?, aadvent,  0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "African Adventure (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, dragnfly, 0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Dragonfly (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, gypmagic, 0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Gypsy Magic (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, incanp,   0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Incan Pyramids (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, jestmagi, 0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Jester Magic (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, luckfoun, 0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Lucky Fountain (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, mohicans, 0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Mohican Sun (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, monshow,  0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "The Monster Show (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, romanl,   0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Roman Legions (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, safemon,  0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Safe Money (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, showqn,   0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Show Queen (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, spiceup,  0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Spice It Up (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, sultanw,  0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Sultan's Wish (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 200?, konzero,  0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Zero (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // doesn't seem to have a title string in it?
+// has a flash dump?
+GAME( 200?, enchlamp, konendev, konendev, konendev, konendev_state, init_enchlamp, ROT0,  "Konami", "Enchanted Lamp (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// missing flash but has other interesting files
+GAME( 200?, whiterus, konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "White Russia (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+// partial setk
+GAME( 200?, aadvent,  konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "African Adventure (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, dragnfly, konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Dragonfly (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, gypmagic, konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Gypsy Magic (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, incanp,   konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Incan Pyramids (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, jestmagi, konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Jester Magic (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, luckfoun, konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Lucky Fountain (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, mohicans, konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Mohican Sun (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, monshow,  konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "The Monster Show (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, romanl,   konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Roman Legions (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, safemon,  konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Safe Money (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, showqn,   konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Show Queen (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, spiceup,  konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Spice It Up (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, sultanw,  konendev, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Sultan's Wish (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, konzero,  0, konendev, konendev, konendev_state, init_konendev, ROT0,  "Konami", "Zero (Konami Endeavour)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // doesn't seem to have a title string in it?k

@@ -8,12 +8,10 @@
 #include "nld_schmitt.h"
 
 #include "netlist/analog/nlid_twoterm.h"
+#include "netlist/devices/nlid_system.h"
 #include "netlist/nl_base.h"
 #include "netlist/nl_errstr.h"
 #include "netlist/solver/nld_solver.h"
-
-#include <cmath>
-
 
 namespace netlist
 {
@@ -64,7 +62,7 @@ namespace netlist
 		{
 			NETLIB_CONSTRUCTOR(schmitt_trigger)
 				, m_A(*this, "A")
-				, m_GND(*this, "GND")
+				, m_supply(*this)
 				, m_RVI(*this, "RVI")
 				, m_RVO(*this, "RVO")
 				, m_model(*this, "MODEL", "TTL_7414_GATE")
@@ -74,8 +72,8 @@ namespace netlist
 				register_subalias("Q", m_RVO.m_P);
 
 				connect(m_A, m_RVI.m_P);
-				connect(m_GND, m_RVI.m_N);
-				connect(m_GND, m_RVO.m_N);
+				connect(m_supply.GND(), m_RVI.m_N);
+				connect(m_supply.GND(), m_RVO.m_N);
 			}
 
 		protected:
@@ -85,31 +83,32 @@ namespace netlist
 				m_RVI.reset();
 				m_RVO.reset();
 				m_is_timestep = m_RVO.m_P.net().solver()->has_timestep_devices();
-				m_RVI.set_G_V_I(plib::constants<nl_double>::one() / m_model.m_RI, m_model.m_VI, 0.0);
-				m_RVO.set_G_V_I(plib::constants<nl_double>::one() / m_model.m_ROL, m_model.m_VOL, 0.0);
+				m_RVI.set_G_V_I(plib::reciprocal(m_model.m_RI()), m_model.m_VI, nlconst::zero());
+				m_RVO.set_G_V_I(plib::reciprocal(m_model.m_ROL()), m_model.m_VOL, nlconst::zero());
 			}
 
 			NETLIB_UPDATEI()
 			{
+				const auto va(m_A.Q_Analog() - m_supply.GND().Q_Analog());
 				if (m_last_state)
 				{
-					if (m_A.Q_Analog() < m_model.m_VTM)
+					if (va < m_model.m_VTM)
 					{
 						m_last_state = 0;
 						if (m_is_timestep)
 							m_RVO.update();
-						m_RVO.set_G_V_I(plib::constants<nl_double>::one() / m_model.m_ROH, m_model.m_VOH, 0.0);
+						m_RVO.set_G_V_I(plib::reciprocal(m_model.m_ROH()), m_model.m_VOH, nlconst::zero());
 						m_RVO.solve_later();
 					}
 				}
 				else
 				{
-					if (m_A.Q_Analog() > m_model.m_VTP)
+					if (va > m_model.m_VTP)
 					{
 						m_last_state = 1;
 						if (m_is_timestep)
 							m_RVO.update();
-						m_RVO.set_G_V_I(plib::constants<nl_double>::one() / m_model.m_ROL, m_model.m_VOL, 0.0);
+						m_RVO.set_G_V_I(plib::reciprocal(m_model.m_ROL()), m_model.m_VOL, nlconst::zero());
 						m_RVO.solve_later();
 					}
 				}
@@ -117,7 +116,7 @@ namespace netlist
 
 		private:
 			analog_input_t m_A;
-			analog_input_t m_GND;
+			NETLIB_NAME(power_pins) m_supply;
 			analog::NETLIB_SUB(twoterm) m_RVI;
 			analog::NETLIB_SUB(twoterm) m_RVO;
 			schmitt_trigger_model_t m_model;

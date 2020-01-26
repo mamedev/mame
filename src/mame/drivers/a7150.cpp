@@ -566,7 +566,7 @@ void a7150_state::a7150(machine_config &config)
 
 /* ROM definition */
 ROM_START( a7150 )
-	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x10000, "user1", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("2.3")
 
 	// A7100

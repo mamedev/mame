@@ -82,7 +82,6 @@ if (MACHINES["ACORN_VIDC"]~=null) then
 	}
 end
 
-
 ---------------------------------------------------
 --
 --@src/devices/machine/akiko.h,MACHINES["AKIKO"] = true
@@ -95,6 +94,17 @@ if (MACHINES["AKIKO"]~=null) then
 	}
 end
 
+--------------------------------------------------
+--
+--@src/devices/machine/arm_iomd.h,MACHINES["ARM_IOMD"] = true
+--------------------------------------------------
+
+if (MACHINES["ARM_IOMD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/arm_iomd.cpp",
+		MAME_DIR .. "src/devices/machine/arm_iomd.h",
+	}
+end
 
 ---------------------------------------------------
 --
@@ -2813,6 +2823,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/swtpc8212.h,MACHINES["SWTPC8212"] = true
+---------------------------------------------------
+
+if (MACHINES["SWTPC8212"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/swtpc8212.cpp",
+		MAME_DIR .. "src/devices/machine/swtpc8212.h",
+	}
+end
+
+---------------------------------------------------
+--
 --
 ---------------------------------------------------
 
@@ -4172,5 +4194,29 @@ if (MACHINES["VRENDER0"]~=null) then
 		MAME_DIR .. "src/devices/machine/vrender0.cpp",
 		MAME_DIR .. "src/devices/machine/vr0uart.cpp",
 		MAME_DIR .. "src/devices/machine/vrender0.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/i3001.h,MACHINES["I3001"] = true
+---------------------------------------------------
+
+if (MACHINES["I3001"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/i3001.cpp",
+		MAME_DIR .. "src/devices/machine/i3001.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/i3002.h,MACHINES["I3002"] = true
+---------------------------------------------------
+
+if (MACHINES["I3002"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/i3002.cpp",
+		MAME_DIR .. "src/devices/machine/i3002.h",
 	}
 end

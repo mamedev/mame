@@ -10,6 +10,7 @@
         - fix MisterX LCD
         - MisterX bankswitch
         - dump the chargen
+        - change PC2000 to use a SED1278F-0B instead of an HD44780 (different charset)
 
 ****************************************************************************
 
@@ -1017,6 +1018,11 @@ ROM_START( pc2000 )
 	ROM_LOAD( "lh532hee_9344_d.u4", 0x000000, 0x040000, CRC(0b03bf33) SHA1(cb344b94b14975c685041d3e669f386e8a21909f))
 ROM_END
 
+ROM_START( pc2000s )
+	ROM_REGION( 0x40000, "bios", 0 )
+	ROM_LOAD( "lh531h74_9527_d.u4", 0x000000, 0x040000, CRC(b729d10a) SHA1(b0260649c9337f3cdf0fe619e6c8fa50f7b4803a))
+ROM_END
+
 ROM_START( gl2000 )
 	ROM_REGION( 0x40000, "bios", 0 )
 	ROM_LOAD( "lh532hez_9416_d.bin", 0x000000, 0x040000, CRC(532f219e) SHA1(4044f0cf098087af4cc9d1b2a80c3c9ec06f154e))
@@ -1100,6 +1106,7 @@ COMP( 1988, pc1000,   0,      0,      pc1000,   pc1000,  pc1000_state, empty_ini
 COMP( 1988, misterx,  0,      0,      misterx,  pc1000,  pc1000_state, empty_init, "Video Technology / Yeno", "MisterX",                                MACHINE_NOT_WORKING )
 COMP( 1988, ordisava, 0,      0,      pc1000,   pc1000,  pc1000_state, empty_init, "Video Technology",        "Ordisavant (France)",                    MACHINE_NOT_WORKING )
 COMP( 1993, pc2000,   0,      0,      pc2000,   pc2000,  pc2000_state, empty_init, "Video Technology",        "PreComputer 2000",                       MACHINE_NOT_WORKING )
+COMP( 1993, pc2000s,  pc2000, 0,      pc2000,   pc2000,  pc2000_state, empty_init, "Video Technology",        "PreComputer 2000 (Spain)",               MACHINE_NOT_WORKING )
 COMP( 1993, gl2000,   0,      0,      gl2000,   pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader 2000",                     MACHINE_NOT_WORKING )
 COMP( 1994, gl2000c,  gl2000, 0,      gl2000,   pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader 2000 Compact",             MACHINE_NOT_WORKING )
 COMP( 1995, gl2000p,  gl2000, 0,      gl2000,   pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader 2000 Plus",                MACHINE_NOT_WORKING )

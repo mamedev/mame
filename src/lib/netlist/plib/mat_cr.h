@@ -1,18 +1,19 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * mat_cr.h
- *
- * Compressed row format matrices
- *
- */
 
 #ifndef MAT_CR_H_
 #define MAT_CR_H_
 
+///
+/// \file mat_cr.h
+///
+/// Compressed row format matrices
+///
+
 #include "palloc.h"
 #include "parray.h"
 #include "pconfig.h"
+#include "pmath.h"
 #include "pomp.h"
 #include "pstate.h"
 #include "ptypes.h"
@@ -20,15 +21,11 @@
 
 #include <algorithm>
 #include <array>
-#include <cmath>
 #include <type_traits>
 #include <vector>
 
 namespace plib
 {
-
-	// FIXME: causes a crash with GMRES handler
-	// template<typename T, int N, typename C = std::size_t>
 
 	template<typename T, int N, typename C = uint16_t>
 	struct pmatrix_cr_t
@@ -51,9 +48,9 @@ namespace plib
 		parray<index_type, NSQ> col_idx;       // column index array nz_num, initially (n * n)
 		parray<value_type, NSQ> A;    // Matrix elements nz_num, initially (n * n)
 
-		index_type nz_num;
+		std::size_t nz_num;
 
-		explicit pmatrix_cr_t(const index_type n)
+		explicit pmatrix_cr_t(std::size_t n)
 		: diag(n)
 		, row_idx(n+1)
 		, col_idx(n*n)
@@ -63,7 +60,7 @@ namespace plib
 		, nzbd(n)
 		, m_size(n)
 		{
-			for (index_type i=0; i<n+1; i++)
+			for (std::size_t i=0; i<n+1; i++)
 			{
 				row_idx[i] = 0;
 			}
@@ -71,22 +68,22 @@ namespace plib
 
 		~pmatrix_cr_t() = default;
 
-		constexpr index_type size() const { return static_cast<index_type>((N>0) ? N : m_size); }
+		constexpr std::size_t size() const noexcept { return (N>0) ? static_cast<std::size_t>(N) : m_size; }
 
-		void clear()
+		void clear() noexcept
 		{
 			nz_num = 0;
-			for (index_type i=0; i < size() + 1; i++)
+			for (std::size_t i=0; i < size() + 1; i++)
 				row_idx[i] = 0;
 		}
 
-		void set_scalar(const T scalar)
+		void set_scalar(T scalar) noexcept
 		{
-			for (index_type i=0, e=nz_num; i<e; i++)
+			for (std::size_t i=0, e=nz_num; i<e; i++)
 				A[i] = scalar;
 		}
 
-		void set(C r, C c, T val)
+		void set(C r, C c, T val) noexcept
 		{
 			C ri = row_idx[r];
 			while (ri < row_idx[r+1] && col_idx[ri] < c)
@@ -113,7 +110,7 @@ namespace plib
 
 		template <typename M>
 		void build_from_fill_mat(const M &f, std::size_t max_fill = FILL_INFINITY - 1,
-			std::size_t band_width = FILL_INFINITY)
+			std::size_t band_width = FILL_INFINITY) noexcept(false)
 		{
 			C nz = 0;
 			if (nz_num != 0)
@@ -123,7 +120,7 @@ namespace plib
 				row_idx[k] = nz;
 
 				for (std::size_t j=0; j < size(); j++)
-					if (f[k][j] <= max_fill && std::abs(static_cast<int>(k)-static_cast<int>(j)) <= static_cast<int>(band_width))
+					if (f[k][j] <= max_fill && plib::abs(static_cast<int>(k)-static_cast<int>(j)) <= static_cast<int>(band_width))
 					{
 						col_idx[nz] = static_cast<C>(j);
 						if (j == k)
@@ -135,7 +132,7 @@ namespace plib
 			row_idx[size()] = nz;
 			nz_num = nz;
 
-			/* build nzbd */
+			// build nzbd
 
 			for (std::size_t k=0; k < size(); k++)
 			{
@@ -148,18 +145,17 @@ namespace plib
 		}
 
 		template <typename VTV, typename VTR>
-		void mult_vec(VTR & res, const VTV & x)
+		void mult_vec(VTR & res, const VTV & x) const noexcept
 		{
-			/*
-			 * res = A * x
-			 */
+
+			 // res = A * x
 #if 0
 			//plib::omp::set_num_threads(4);
-			plib::omp::for_static(0, constants<index_type>::zero(), m_size, [this, &res, &x](index_type row)
+			plib::omp::for_static(0, constants<std::size_t>::zero(), m_size, [this, &res, &x](std::size_t row)
 			{
 				T tmp(0.0);
-				const index_type e(row_idx[row+1]);
-				for (index_type k = row_idx[row]; k < e; k++)
+				const std::size_t e(row_idx[row+1]);
+				for (std::size_t k = row_idx[row]; k < e; k++)
 					tmp += A[k] * x[col_idx[k]];
 				res[row] = tmp;
 			});
@@ -170,7 +166,7 @@ namespace plib
 			const std::size_t oe = nz_num;
 			while (k < oe)
 			{
-				T tmp = 0.0;
+				T tmp = plib::constants<T>::zero();
 				const std::size_t e = row_idx[row+1];
 				for (; k < e; k++)
 					tmp += A[k] * x[col_idx[k]];
@@ -179,39 +175,39 @@ namespace plib
 #endif
 		}
 
-		/* throws error if P(source)>P(destination) */
+		// throws error if P(source)>P(destination)
 		template <typename LUMAT>
-		void slim_copy_from(LUMAT & src)
+		void slim_copy_from(LUMAT & src) noexcept(false)
 		{
 			for (std::size_t r=0; r<src.size(); r++)
 			{
 				C dp = row_idx[r];
 				for (C sp = src.row_idx[r]; sp < src.row_idx[r+1]; sp++)
 				{
-					/* advance dp to source column and fill 0s if necessary */
+					// advance dp to source column and fill 0s if necessary
 					while (col_idx[dp] < src.col_idx[sp])
 						A[dp++] = 0;
 					if (row_idx[r+1] <= dp || col_idx[dp] != src.col_idx[sp])
-						throw plib::pexception("slim_copy_from error");
+						throw pexception("slim_copy_from error");
 					A[dp++] = src.A[sp];
 				}
-				/* fill remaining elements in row */
+				// fill remaining elements in row
 				while (dp < row_idx[r+1])
 					A[dp++] = 0;
 			}
 		}
 
-		/* only copies common elements */
+		// only copies common elements
 		template <typename LUMAT>
-		void reduction_copy_from(LUMAT & src)
+		void reduction_copy_from(LUMAT & src) noexcept
 		{
 			C sp(0);
-			for (index_type r=0; r<src.size(); r++)
+			for (std::size_t r=0; r<src.size(); r++)
 			{
 				C dp(row_idx[r]);
 				while(sp < src.row_idx[r+1])
 				{
-					/* advance dp to source column and fill 0s if necessary */
+					// advance dp to source column and fill 0s if necessary
 					if (col_idx[dp] < src.col_idx[sp])
 						A[dp++] = 0;
 					else if (col_idx[dp] == src.col_idx[sp])
@@ -219,17 +215,17 @@ namespace plib
 					else
 						sp++;
 				}
-				/* fill remaining elements in row */
+				// fill remaining elements in row
 				while (dp < row_idx[r+1])
 					A[dp++] = 0;
 			}
 		}
 
-		/* no checks at all - may crash */
+		// no checks at all - may crash
 		template <typename LUMAT>
-		void raw_copy_from(LUMAT & src)
+		void raw_copy_from(LUMAT & src) noexcept
 		{
-			for (index_type k = 0; k < nz_num; k++)
+			for (std::size_t k = 0; k < nz_num; k++)
 				A[k] = src.A[k];
 		}
 
@@ -237,7 +233,7 @@ namespace plib
 		parray<std::vector<index_type>, N > nzbd;    // Support for gaussian elimination
 	private:
 		//parray<C, N < 0 ? -N * (N-1) / 2 : N * (N+1) / 2 > nzbd;    // Support for gaussian elimination
-		index_type m_size;
+		std::size_t m_size;
 	};
 
 	template<typename B>
@@ -248,7 +244,7 @@ namespace plib
 
 		COPYASSIGNMOVE(pGEmatrix_cr_t, default)
 
-		explicit pGEmatrix_cr_t(const index_type n)
+		explicit pGEmatrix_cr_t(std::size_t n)
 		: B(n)
 		{
 		}
@@ -297,7 +293,7 @@ namespace plib
 			{
 				std::size_t nzbdp = 0;
 				std::size_t pi = base::diag[i];
-				const typename base::value_type f = 1.0 / base::A[pi++];
+				auto f = reciprocal(base::A[pi++]);
 				const std::size_t piie = base::row_idx[i+1];
 				const auto &nz = base::nzbd[i];
 
@@ -341,14 +337,14 @@ namespace plib
 		void gaussian_elimination_parallel(V & RHS)
 		{
 			//printf("omp: %ld %d %d\n", m_ge_par.size(), nz_num, (int)m_ge_par[m_ge_par.size()-2].size());
-			for (auto l = 0ul; l < m_ge_par.size(); l++)
-				plib::omp::for_static(base::nz_num, 0ul, m_ge_par[l].size(), [this, &RHS, &l] (unsigned ll)
+			for (auto l = 0UL; l < m_ge_par.size(); l++)
+				plib::omp::for_static(base::nz_num, 0UL, m_ge_par[l].size(), [this, &RHS, &l] (unsigned ll)
 				{
 					auto &i = m_ge_par[l][ll];
 					{
 						std::size_t nzbdp = 0;
 						std::size_t pi = base::diag[i];
-						const typename base::value_type f = 1.0 / base::A[pi++];
+						const auto f = reciprocal(base::A[pi++]);
 						const std::size_t piie = base::row_idx[i+1];
 						const auto &nz = base::nzbd[i];
 
@@ -361,7 +357,7 @@ namespace plib
 							while (base::col_idx[pj] < i)
 								pj++;
 
-							const typename base::value_type f1 = - base::A[pj++] * f;
+							auto f1 = - base::A[pj++] * f;
 
 							// subtract row i from j
 							// fill-in available assumed, i.e. matrix was prepared
@@ -382,7 +378,7 @@ namespace plib
 		void gaussian_back_substitution(V1 &V, const V2 &RHS)
 		{
 			const std::size_t iN = base::size();
-			/* row n-1 */
+			// row n-1
 			V[iN - 1] = RHS[iN - 1] / base::A[base::diag[iN - 1]];
 
 			for (std::size_t j = iN - 1; j-- > 0;)
@@ -400,7 +396,7 @@ namespace plib
 		void gaussian_back_substitution(V1 &V)
 		{
 			const std::size_t iN = base::size();
-			/* row n-1 */
+			// row n-1
 			V[iN - 1] = V[iN - 1] / base::A[base::diag[iN - 1]];
 
 			for (std::size_t j = iN - 1; j-- > 0;)
@@ -419,10 +415,10 @@ namespace plib
 		void build_parallel_gaussian_execution_scheme(const M &fill)
 		{
 			// calculate parallel scheme for gaussian elimination
-			std::vector<std::vector<index_type>> rt(base::size());
-			for (index_type k = 0; k < base::size(); k++)
+			std::vector<std::vector<std::size_t>> rt(base::size());
+			for (std::size_t k = 0; k < base::size(); k++)
 			{
-				for (index_type j = k+1; j < base::size(); j++)
+				for (std::size_t j = k+1; j < base::size(); j++)
 				{
 					if (fill[j][k] < base::FILL_INFINITY)
 					{
@@ -431,15 +427,15 @@ namespace plib
 				}
 			}
 
-			std::vector<index_type> levGE(base::size(), 0);
-			index_type cl = 0;
+			std::vector<std::size_t> levGE(base::size(), 0);
+			std::size_t cl = 0;
 
-			for (index_type k = 0; k < base::size(); k++ )
+			for (std::size_t k = 0; k < base::size(); k++ )
 			{
 				if (levGE[k] >= cl)
 				{
-					std::vector<index_type> t = rt[k];
-					for (index_type j = k+1; j < base::size(); j++ )
+					std::vector<std::size_t> t = rt[k];
+					for (std::size_t j = k+1; j < base::size(); j++ )
 					{
 						bool overlap = false;
 						// is there overlap
@@ -466,13 +462,12 @@ namespace plib
 
 			m_ge_par.clear();
 			m_ge_par.resize(cl+1);
-			for (index_type k = 0; k < base::size(); k++)
+			for (std::size_t k = 0; k < base::size(); k++)
 				m_ge_par[levGE[k]].push_back(k);
 			//for (std::size_t k = 0; k < m_ge_par.size(); k++)
 			//  printf("%d %d\n", (int) k, (int) m_ge_par[k].size());
 		}
-		// contains elimination rows below the diagonal
-		std::vector<std::vector<index_type>> m_ge_par; // parallel execution support for Gauss
+		std::vector<std::vector<std::size_t>> m_ge_par; // parallel execution support for Gauss
 	};
 
 	template<typename B>
@@ -483,7 +478,7 @@ namespace plib
 
 		COPYASSIGNMOVE(pLUmatrix_cr_t, default)
 
-		explicit pLUmatrix_cr_t(const index_type n)
+		explicit pLUmatrix_cr_t(std::size_t n)
 		: B(n)
 		, ilu_rows(n+1)
 		, m_ILUp(0)
@@ -495,8 +490,8 @@ namespace plib
 		template <typename M>
 		void build(M &fill, std::size_t ilup)
 		{
-			index_type p(0);
-			/* build ilu_rows */
+			std::size_t p(0);
+			// build ilu_rows
 			for (decltype(fill.size()) i=1; i < fill.size(); i++)
 			{
 				bool found(false);
@@ -510,14 +505,7 @@ namespace plib
 						{
 							auto f = std::min(fill[i][j], 1 + fill[i][k] + fill[k][j]);
 							if (f <= ilup)
-							{
-#if 0
-								if (f > fill_max)
-									fill_max = f;
-								ops += 2;
-#endif
 								fill[i][j] = f;
-							}
 						}
 						found = true;
 					}
@@ -530,31 +518,31 @@ namespace plib
 			m_ILUp = ilup;
 		}
 
+		/// \brief incomplete LU Factorization.
+		///
+		/// We are following http://de.wikipedia.org/wiki/ILU-Zerlegung here.
+		///
+		/// The result is stored in matrix LU
+		///
+		/// For i = 1,...,N-1
+		///   For k = 0, ... , i - 1
+		///     If a[i,k] != 0
+		///       a[i,k] = a[i,k] / a[k,k]
+		///       For j = k + 1, ... , N - 1
+		///         If a[i,j] != 0
+		///           a[i,j] = a[i,j] - a[i,k] * a[k,j]
+		///         j=j+1
+		///      k=k+1
+		///    i=i+1
+		///
 		void incomplete_LU_factorization(const base &mat)
 		{
-			/*
-			 * incomplete LU Factorization according to http://de.wikipedia.org/wiki/ILU-Zerlegung
-			 *
-			 * Result is stored in matrix LU
-			 *
-			 * For i = 1,...,N-1
-			 *   For k = 0, ... , i - 1
-			 *     If a[i,k] != 0
-			 *       a[i,k] = a[i,k] / a[k,k]
-			 *       For j = k + 1, ... , N - 1
-			 *         If a[i,j] != 0
-			 *           a[i,j] = a[i,j] - a[i,k] * a[k,j]
-			 *         j=j+1
-			 *      k=k+1
-			 *    i=i+1
-			 *
-			 */
 			if (m_ILUp < 1)
 				this->raw_copy_from(mat);
 			else
 				this->reduction_copy_from(mat);
 
-			index_type p(0);
+			std::size_t p(0);
 			while (auto i = ilu_rows[p++]) // NOLINT(bugprone-infinite-loop)
 			{
 				const auto p_i_end = base::row_idx[i + 1];
@@ -567,13 +555,13 @@ namespace plib
 					const auto p_k_end(base::row_idx[k + 1]);
 					const typename base::value_type LUp_i_k = base::A[i_k] = base::A[i_k] / base::A[base::diag[k]];
 
-					index_type k_j(base::diag[k] + 1);
-					index_type i_j(i_k + 1);
+					std::size_t k_j(base::diag[k] + 1);
+					std::size_t i_j(i_k + 1);
 
 					while (i_j < p_i_end && k_j < p_k_end )  // pj = (i, j)
 					{
-						// we can assume that within a row ja increases continuously */
-						const index_type c_i_j(base::col_idx[i_j]); // row i, column j
+						// we can assume that within a row ja increases continuously
+						const std::size_t c_i_j(base::col_idx[i_j]); // row i, column j
 						const auto c_k_j(base::col_idx[k_j]); // row k, column j
 
 						if (c_k_j == c_i_j)
@@ -586,31 +574,33 @@ namespace plib
 			}
 		}
 
+
+		/// \brief Solve a linear equation
+		///
+		/// Solve a linear equation Ax = r
+		///
+		/// where
+		///     A = L*U
+		///
+		///     L unit lower triangular
+		///     U upper triangular
+		///
+		/// ==> LUx = r
+		///
+		/// ==> Ux = L⁻¹ r = w
+		///
+		/// ==> r = Lw
+		///
+		/// This can be solved for w using backwards elimination in L.
+		///
+		/// Now Ux = w
+		///
+		/// This can be solved for x using backwards elimination in U.
+		///
 		template <typename R>
 		void solveLU (R &r)
 		{
-			/*
-			 * Solve a linear equation Ax = r
-			 * where
-			 *      A = L*U
-			 *
-			 *      L unit lower triangular
-			 *      U upper triangular
-			 *
-			 * ==> LUx = r
-			 *
-			 * ==> Ux = L⁻¹ r = w
-			 *
-			 * ==> r = Lw
-			 *
-			 * This can be solved for w using backwards elimination in L.
-			 *
-			 * Now Ux = w
-			 *
-			 * This can be solved for x using backwards elimination in U.
-			 *
-			 */
-			for (index_type i = 1; i < base::size(); ++i )
+			for (std::size_t i = 1; i < base::size(); ++i )
 			{
 				typename base::value_type tmp(0);
 				const auto j1(base::row_idx[i]);
@@ -621,12 +611,12 @@ namespace plib
 				r[i] -= tmp;
 			}
 			// i now is equal to n;
-			for (index_type i = base::size(); i-- > 0; )
+			for (std::size_t i = base::size(); i-- > 0; )
 			{
 				typename base::value_type tmp(0);
 				const auto di(base::diag[i]);
 				const auto j2(base::row_idx[i+1]);
-				for (index_type j = di + 1; j < j2; j++ )
+				for (std::size_t j = di + 1; j < j2; j++ )
 					tmp += base::A[j] * r[base::col_idx[j]];
 				r[i] = (r[i] - tmp) / base::A[di];
 			}
@@ -638,4 +628,4 @@ namespace plib
 
 } // namespace plib
 
-#endif /* MAT_CR_H_ */
+#endif // MAT_CR_H_

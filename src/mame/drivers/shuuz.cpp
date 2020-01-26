@@ -249,7 +249,7 @@ void shuuz_state::shuuz(machine_config &config)
 
 	ATARI_VAD(config, m_vad, 0, m_screen);
 	m_vad->scanline_int_cb().set(FUNC(shuuz_state::scanline_int_write_line));
-	TILEMAP(config, "vad:playfield", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(DEVICE_SELF_OWNER, FUNC(shuuz_state::get_playfield_tile_info));
+	TILEMAP(config, "vad:playfield", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(shuuz_state::get_playfield_tile_info));
 	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, m_screen, shuuz_state::s_mob_config).set_gfxdecode(m_gfxdecode);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

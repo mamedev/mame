@@ -1189,6 +1189,7 @@ public:
     virtual void traverse(TIntermTraverser*);
     TOperator getFlowOp() const { return flowOp; }
     TIntermTyped* getExpression() const { return expression; }
+    void setExpression(TIntermTyped* pExpression) { expression = pExpression; }
 protected:
     TOperator flowOp;
     TIntermTyped* expression;
@@ -1309,11 +1310,13 @@ public:
     bool isSparseTexture()  const { return false; }
     bool isImageFootprint() const { return false; }
     bool isSparseImage()    const { return false; }
+    bool isSubgroup()       const { return false; }
 #else
     bool isImage()    const { return op > EOpImageGuardBegin    && op < EOpImageGuardEnd; }
     bool isSparseTexture() const { return op > EOpSparseTextureGuardBegin && op < EOpSparseTextureGuardEnd; }
     bool isImageFootprint() const { return op > EOpImageFootprintGuardBegin && op < EOpImageFootprintGuardEnd; }
     bool isSparseImage()   const { return op == EOpSparseImageLoad; }
+    bool isSubgroup() const { return op > EOpSubgroupGuardStart && op < EOpSubgroupGuardStop; }
 #endif
 
     void setOperationPrecision(TPrecisionQualifier p) { operationPrecision = p; }

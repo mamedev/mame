@@ -2036,12 +2036,11 @@ void fm7_state::fm7(machine_config &config)
 	MC6809(config, m_maincpu, 16.128_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fm7_state::fm7_mem);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_irq_ack));
-	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	MC6809(config, m_sub, 16.128_MHz_XTAL / 2);
 	m_sub->set_addrmap(AS_PROGRAM, &fm7_state::fm7_sub_mem);
 	m_sub->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_sub_irq_ack));
-	config.m_perfect_cpu_quantum = subtag("sub");
+	config.set_perfect_quantum(m_sub);
 
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, m_psg, 4.9152_MHz_XTAL / 4).add_route(ALL_OUTPUTS,"mono", 1.00);
@@ -2090,12 +2089,11 @@ void fm7_state::fm8(machine_config &config)
 	MC6809(config, m_maincpu, 4.9152_MHz_XTAL);  // 1.2MHz 68A09
 	m_maincpu->set_addrmap(AS_PROGRAM, &fm7_state::fm8_mem);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_irq_ack));
-	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	MC6809(config, m_sub, 16.128_MHz_XTAL / 2);
 	m_sub->set_addrmap(AS_PROGRAM, &fm7_state::fm7_sub_mem);
 	m_sub->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_sub_irq_ack));
-	config.m_perfect_cpu_quantum = subtag("sub");
+	config.set_perfect_quantum(m_sub);
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -2138,12 +2136,11 @@ void fm7_state::fm77av(machine_config &config)
 	MC6809E(config, m_maincpu, 16.128_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fm7_state::fm77av_mem);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_irq_ack));
-	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	MC6809E(config, m_sub, 16.128_MHz_XTAL / 8);
 	m_sub->set_addrmap(AS_PROGRAM, &fm7_state::fm77av_sub_mem);
 	m_sub->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_sub_irq_ack));
-	config.m_perfect_cpu_quantum = subtag("sub");
+	config.set_perfect_quantum(m_sub);
 
 	SPEAKER(config, "mono").front_center();
 	YM2203(config, m_ym, 4.9152_MHz_XTAL / 4);
@@ -2202,12 +2199,11 @@ void fm7_state::fm11(machine_config &config)
 	MC6809E(config, m_maincpu, 2000000);  // 2MHz 68B09E
 	m_maincpu->set_addrmap(AS_PROGRAM, &fm7_state::fm11_mem);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_irq_ack));
-	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	MC6809(config, m_sub, 8000000);  // 2MHz 68B09
 	m_sub->set_addrmap(AS_PROGRAM, &fm7_state::fm11_sub_mem);
 	m_sub->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_sub_irq_ack));
-	config.m_perfect_cpu_quantum = subtag("sub");
+	config.set_perfect_quantum(m_sub);
 
 	I8088(config, m_x86, 8000000);  // 8MHz i8088
 	m_x86->set_addrmap(AS_PROGRAM, &fm7_state::fm11_x86_mem);
@@ -2259,12 +2255,11 @@ void fm7_state::fm16beta(machine_config &config)
 	I8086(config, m_maincpu, 8000000);  // 8MHz i8086
 	m_maincpu->set_addrmap(AS_PROGRAM, &fm7_state::fm16_mem);
 	m_maincpu->set_addrmap(AS_IO, &fm7_state::fm16_io);
-	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	MC6809(config, m_sub, 8000000);
 	m_sub->set_irq_acknowledge_callback(FUNC(fm7_state::fm7_sub_irq_ack));
 	m_sub->set_addrmap(AS_PROGRAM, &fm7_state::fm16_sub_mem);
-	config.m_perfect_cpu_quantum = subtag("sub");
+	config.set_perfect_quantum(m_sub);
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS, "mono", 0.50);

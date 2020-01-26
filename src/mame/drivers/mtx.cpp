@@ -269,15 +269,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(mtx_state::cassette_tick)
 	}
 }
 
-/*-------------------------------------------------
-    mtx_tms9928a_interface
--------------------------------------------------*/
-
-WRITE_LINE_MEMBER(mtx_state::mtx_tms9929a_interrupt)
-{
-	m_z80ctc->trg0(state ? 0 : 1);
-}
-
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
@@ -298,7 +289,7 @@ void mtx_state::mtx512(machine_config &config)
 	tms9929a_device &vdp(TMS9929A(config, "tms9929a", 10.6875_MHz_XTAL));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
-	vdp.int_callback().set(FUNC(mtx_state::mtx_tms9929a_interrupt));
+	vdp.int_callback().set(m_z80ctc, FUNC(z80ctc_device::trg0)).invert();
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */

@@ -269,7 +269,7 @@ void ddribble_state::ddribble(machine_config &config)
 	mc6809e_device &cpu2(MC6809E(config, "cpu2", XTAL(18'432'000)/12));  /* verified on pcb */
 	cpu2.set_addrmap(AS_PROGRAM, &ddribble_state::cpu2_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* we need heavy synch */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* we need heavy synch */
 
 	WATCHDOG_TIMER(config, "watchdog");
 

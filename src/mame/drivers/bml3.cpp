@@ -30,6 +30,7 @@
 #include "bus/bml3/bml3mp1802.h"
 #include "bus/bml3/bml3mp1805.h"
 #include "bus/bml3/bml3kanji.h"
+#include "bus/bml3/bml3rtc.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -914,6 +915,7 @@ static void bml3_cards(device_slot_interface &device)
 	device.option_add("bml3mp1802", BML3BUS_MP1802); // MP-1802 Floppy Controller Card
 	device.option_add("bml3mp1805", BML3BUS_MP1805); // MP-1805 Floppy Controller Card
 	device.option_add("bml3kanji",  BML3BUS_KANJI);
+	device.option_add("bml3rtc",    BML3BUS_RTC);
 }
 
 
@@ -970,22 +972,21 @@ void bml3_state::bml3_common(machine_config &config)
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* slot devices */
-	bml3bus_device &bus(BML3BUS(config, "bml3bus", 0));
-	bus.set_space(m_maincpu, AS_PROGRAM);
-	bus.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	bus.irq_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
-	bus.firq_callback().set_inputline(m_maincpu, M6809_FIRQ_LINE);
-	/* Default to MP-1805 disk (3" or 5.25" SS/SD), as our MB-6892 ROM dump includes
-	   the MP-1805 ROM.
+	BML3BUS(config, m_bml3bus, 0);
+	m_bml3bus->set_space(m_maincpu, AS_PROGRAM);
+	m_bml3bus->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_bml3bus->irq_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	m_bml3bus->firq_callback().set_inputline(m_maincpu, M6809_FIRQ_LINE);
+	/* Default to MP-1805 disk (3" or 5.25" SS/SD), as our MB-6892 ROM dump includes the MP-1805 ROM.
 	   User may want to switch this to MP-1802 (5.25" DS/DD).
 	   Note it isn't feasible to use both, as they each place boot ROM at F800.
 	 */
-	BML3BUS_SLOT(config, "sl1", "bml3bus", bml3_cards, "bml3mp1805");
-	BML3BUS_SLOT(config, "sl2", "bml3bus", bml3_cards, nullptr);
-	BML3BUS_SLOT(config, "sl3", "bml3bus", bml3_cards, nullptr);
-	BML3BUS_SLOT(config, "sl4", "bml3bus", bml3_cards, nullptr);
-	BML3BUS_SLOT(config, "sl5", "bml3bus", bml3_cards, nullptr);
-	BML3BUS_SLOT(config, "sl6", "bml3bus", bml3_cards, "bml3kanji");
+	BML3BUS_SLOT(config, "sl1", m_bml3bus, bml3_cards, "bml3mp1805");
+	BML3BUS_SLOT(config, "sl2", m_bml3bus, bml3_cards, "bml3rtc");
+	BML3BUS_SLOT(config, "sl3", m_bml3bus, bml3_cards, nullptr);
+	BML3BUS_SLOT(config, "sl4", m_bml3bus, bml3_cards, nullptr);
+	BML3BUS_SLOT(config, "sl5", m_bml3bus, bml3_cards, nullptr);
+	BML3BUS_SLOT(config, "sl6", m_bml3bus, bml3_cards, "bml3kanji");
 }
 
 void bml3_state::bml3(machine_config &config)

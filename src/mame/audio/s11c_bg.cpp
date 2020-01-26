@@ -62,7 +62,7 @@ void s11c_bg_device::device_add_mconfig(machine_config &config)
 {
 	MC6809E(config, m_cpu, XTAL(8'000'000) / 4); // MC68B09E
 	m_cpu->set_addrmap(AS_PROGRAM, &s11c_bg_device::s11c_bg_map);
-	config.m_minimum_quantum = attotime::from_hz(50);
+	config.set_maximum_quantum(attotime::from_hz(50));
 
 	YM2151(config, m_ym2151, XTAL(3'579'545)); // "3.58 MHz" on schematics and parts list
 	m_ym2151->irq_handler().set(FUNC(s11c_bg_device::ym2151_irq_w));

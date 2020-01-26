@@ -20,8 +20,8 @@ DEFINE_DEVICE_TYPE(NEOGEO_CART_SLOT, neogeo_cart_slot_device, "neogeo_cart_slot"
 //  device_neogeo_cart_interface - constructor
 //-------------------------------------------------
 
-device_neogeo_cart_interface::device_neogeo_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
+device_neogeo_cart_interface::device_neogeo_cart_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "neogeocart"),
 	m_region_rom(*this, "^maincpu"),
 	m_region_fixed(*this, "^fixed"),
 	m_region_audio(*this, "^audiocpu"),
@@ -100,7 +100,7 @@ void device_neogeo_cart_interface::optimize_sprites(uint8_t* region_sprites, uin
 neogeo_cart_slot_device::neogeo_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock) :
 	device_t(mconfig, NEOGEO_CART_SLOT, tag, owner, clock),
 	device_image_interface(mconfig, *this),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_neogeo_cart_interface>(mconfig, *this),
 	m_cart(nullptr)
 {
 }

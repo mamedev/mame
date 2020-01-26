@@ -111,6 +111,7 @@ if __name__ == '__main__':
     group = subparser.add_mutually_exclusive_group(required=True)
     group.add_argument('--executable', metavar='<exe>', help='emulator executable')
     group.add_argument('--file', metavar='<xmlfile>', help='XML machine information file')
+    subparser.add_argument('--softwarepath', required=True, action='append', metavar='<path>', help='Software list directory path')
 
     options = parser.parse_args()
 

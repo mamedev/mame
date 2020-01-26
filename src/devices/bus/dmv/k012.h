@@ -42,7 +42,6 @@ protected:
 
 private:
 	required_device<wd1000_device> m_hdc;
-	required_device<dmvcart_slot_device> m_bus;
 	required_ioport m_jumpers;
 };
 

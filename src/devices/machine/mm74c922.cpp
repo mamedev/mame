@@ -18,8 +18,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(MM74C922, mm74c922_device, "mm74c922", "MM74C923 16/20-Key Encoder")
-decltype(MM74C922) MM74C923 = MM74C922;
+DEFINE_DEVICE_TYPE(MM74C922, mm74c922_device, "mm74c922", "MM74C923 16-Key Encoder")
+DEFINE_DEVICE_TYPE(MM74C923, mm74c923_device, "mm74c923", "MM74C923 20-Key Encoder")
 
 
 
@@ -32,20 +32,27 @@ decltype(MM74C922) MM74C923 = MM74C922;
 //  mm74c922_device - constructor
 //-------------------------------------------------
 
-mm74c922_device::mm74c922_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MM74C922, tag, owner, clock),
+mm74c922_device::mm74c922_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int max_y) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_write_da(*this),
-	m_read_x1(*this),
-	m_read_x2(*this),
-	m_read_x3(*this),
-	m_read_x4(*this),
-	m_read_x5(*this), m_cap_osc(0), m_cap_debounce(0),
-	m_max_y(5), // TODO 4 for 74C922, 5 for 74C923
-	m_inhibit(0),
+	m_read_x{{*this}, {*this}, {*this}, {*this}},
+	m_cap_osc(0), m_cap_debounce(0),
+	m_max_y(max_y),
+	m_inhibit(false),
 	m_x(0),
 	m_y(0), m_data(0),
-	m_da(0),
-	m_next_da(0), m_scan_timer(nullptr)
+	m_da(false),
+	m_next_da(false), m_scan_timer(nullptr)
+{
+}
+
+mm74c922_device::mm74c922_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	mm74c922_device(mconfig, MM74C922, tag, owner, clock, 4)
+{
+}
+
+mm74c923_device::mm74c923_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	mm74c922_device(mconfig, MM74C923, tag, owner, clock, 5)
 {
 }
 
@@ -58,11 +65,8 @@ void mm74c922_device::device_start()
 {
 	// resolve callbacks
 	m_write_da.resolve_safe();
-	m_read_x1.resolve_safe(0);
-	m_read_x2.resolve_safe(0);
-	m_read_x3.resolve_safe(0);
-	m_read_x4.resolve_safe(0);
-	m_read_x5.resolve_safe(0);
+	for (auto &read_x : m_read_x)
+		read_x.resolve_safe((1 << m_max_y) - 1);
 
 	// set initial values
 	change_output_lines();
@@ -117,7 +121,8 @@ void mm74c922_device::change_output_lines()
 
 		LOG("MM74C922 Data Available: %u\n", m_da);
 
-		m_write_da(m_da);
+		// active high output
+		m_write_da(m_da ? 1 : 0);
 	}
 }
 
@@ -142,24 +147,16 @@ void mm74c922_device::clock_scan_counters()
 
 void mm74c922_device::detect_keypress()
 {
-	uint8_t data = 0xff;
-
-	switch (m_x)
-	{
-	case 0: data = m_read_x1(0); break;
-	case 1: data = m_read_x2(0); break;
-	case 2: data = m_read_x3(0); break;
-	case 3: data = m_read_x4(0); break;
-	case 4: data = m_read_x5(0); break;
-	}
+	assert(m_x >= 0 && m_x < 4);
+	uint8_t data = m_read_x[m_x]();
 
 	if (m_inhibit)
 	{
 		if (BIT(data, m_y))
 		{
 			// key released
-			m_inhibit = 0;
-			m_next_da = 0;
+			m_inhibit = false;
+			m_next_da = false;
 			m_data = 0xff; // high-Z
 
 			LOG("MM74C922 Key Released\n");
@@ -172,8 +169,8 @@ void mm74c922_device::detect_keypress()
 			if (!BIT(data, y))
 			{
 				// key depressed
-				m_inhibit = 1;
-				m_next_da = 1;
+				m_inhibit = true;
+				m_next_da = true;
 				m_y = y;
 
 				m_data = (y << 2) | m_x;

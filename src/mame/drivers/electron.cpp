@@ -1,8 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Wilbert Pol, Nigel Barnes
 /******************************************************************************
-    Acorn Electron driver
-    By Wilbert Pol
 
 Hardware Overview
 -----------------
@@ -46,6 +44,26 @@ Notes: (all IC's shown. Only 16 ICs are used)
  KBD_CONN - 22-pin keyboard connector
      SPKR - 2-pin internal speaker connector
 
+
+Master RAM Board
+----------------
+The Master RAM Board (MRB) is an internal expansion board from Slogger, and could
+also be purchased pre-fitted in the form of the Electron 64.
+The MRB comes with a new MOS which provides three modes of operation, selected by a
+switch, which are Normal, Turbo, and 64K. The 64K mode was the first to provide a
+'shadow mode' on the Electron.
+
+
+Stop Press 64i
+--------------
+The Stop Press 64i (SP64i) is another internal expansion board from Slogger, which
+also requires the MRB to fitted. Being released in the early 90's there are no known
+working examples, but bare prototype boards and ROMs were discovered during a Slogger
+workshop clearout.
+It provides a re-written AMX Stop Press (Desktop Publishing) for the Electron to take
+advantage of the extra memory provided by the Master RAM Board, and also offers
+ROM/RAM sockets and User Port for a mouse.
+
 ******************************************************************************
 Emulation notes:
 
@@ -57,6 +75,11 @@ Incomplete:
     - Graphics (seems to be wrong for several games)
     - 1 MHz bus is not emulated
     - Bus claiming by ULA is not implemented
+
+Other internal boards to emulate:
+    - Slogger Turbo Driver
+    - Jafa Mode7 Mk2 Display Unit
+    - move MRB and SP64i to an internal slot device?
 
 ******************************************************************************/
 
@@ -211,10 +234,28 @@ static INPUT_PORTS_START( electron64 )
 	PORT_CONFSETTING(0x02, "64K")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(electronsp)
+	PORT_INCLUDE(electron64)
+
+	PORT_START("ROMPAGES")
+	/* TODO: Actual 4bit dip settings are unknown, require a manual */
+	PORT_DIPNAME(0x0f, 0x06, "SP64i ROM Pages")
+	PORT_DIPSETTING(0x00, "0&1")
+	PORT_DIPSETTING(0x02, "2&3")
+	PORT_DIPSETTING(0x04, "4&5")
+	PORT_DIPSETTING(0x06, "6&7")
+	PORT_DIPSETTING(0x08, "8&9 (reserved)")
+	PORT_DIPSETTING(0x0a, "10&11 (reserved)")
+	PORT_DIPSETTING(0x0c, "12&13")
+	PORT_DIPSETTING(0x0e, "14&15")
+INPUT_PORTS_END
+
 void electron_state::electron(machine_config &config)
 {
 	M6502(config, m_maincpu, 16_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &electron_state::electron_mem);
+
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
@@ -237,7 +278,7 @@ void electron_state::electron(machine_config &config)
 
 	/* expansion port */
 	ELECTRON_EXPANSION_SLOT(config, m_exp, 16_MHz_XTAL, electron_expansion_devices, "plus3");
-	m_exp->irq_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
+	m_exp->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_exp->nmi_handler().set_inputline(m_maincpu, M6502_NMI_LINE);
 
 	/* software lists */
@@ -277,6 +318,30 @@ void electron_state::electron64(machine_config &config)
 }
 
 
+void electronsp_state::electronsp(machine_config &config)
+{
+	/* install mrb board */
+	electron64(config);
+
+	/* rom sockets */
+	GENERIC_SOCKET(config, m_romi[0], generic_plain_slot, "electron_rom", "bin,rom");
+	m_romi[0]->set_device_load(FUNC(electronsp_state::rom1_load));
+	GENERIC_SOCKET(config, m_romi[1], generic_plain_slot, "electron_rom", "bin,rom");
+	m_romi[1]->set_device_load(FUNC(electronsp_state::rom2_load));
+
+	/* via */
+	VIA6522(config, m_via, 16_MHz_XTAL / 16);
+	m_via->readpb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_r));
+	m_via->writepb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_w));
+	m_via->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
+
+	/* user port */
+	BBC_USERPORT_SLOT(config, m_userport, bbc_userport_devices, "amxmouse");
+	m_userport->cb1_handler().set(m_via, FUNC(via6522_device::write_cb1));
+	m_userport->cb2_handler().set(m_via, FUNC(via6522_device::write_cb2));
+}
+
+
 ROM_START(electron)
 	ROM_REGION( 0x4000, "mos", 0 )
 	ROM_LOAD( "b02_acornos-1.rom", 0x0000, 0x4000, CRC(a0c2cf43) SHA1(a27ce645472cc5497690e4bfab43710efbb0792d) )
@@ -295,15 +360,32 @@ ROM_END
 ROM_START(electron64)
 	ROM_REGION( 0x4000, "mos", 0 )
 	ROM_LOAD( "os_300.rom", 0x0000, 0x4000, CRC(f80a0cea) SHA1(165e42ff4164a842e56f08ebd420d5027af99fdd) )
-	ROM_REGION(0x4000, "basic", 0)
+	ROM_REGION( 0x4000, "basic", 0 )
 	ROM_LOAD( "basic.rom", 0x0000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281) )
+ROM_END
+
+ROM_START(electronsp)
+	ROM_REGION( 0x4000, "mos", 0 )
+	ROM_LOAD( "os_310.rom", 0x0000, 0x4000, CRC(8b7a9003) SHA1(6d4e2f8ddc1d829b14206d2747749c4c24789568) )
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROM_LOAD( "basic.rom", 0x0000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281) )
+	ROM_REGION( 0x8000, "sp64", 0 )
+	ROM_SYSTEM_BIOS( 0, "101_2", "v1.01 (2x16K)" )
+	ROMX_LOAD( "sp64_101_1.rom", 0x0000, 0x4000, CRC(07e2c5d6) SHA1(837e3382c376e3cc1ae42f1ca51158657ef2fd73), ROM_BIOS(0) )
+	ROMX_LOAD( "sp64_101_2.rom", 0x4000, 0x4000, CRC(3d0e5dc1) SHA1(89743c43b24950d481c150fd4b4de985600cca2d), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "100", "v1.00 (32K)" )
+	ROMX_LOAD( "sp64_100.rom", 0x0000, 0x8000, CRC(4918221c) SHA1(f185873106e7e7225b2e0c718803dc1ec4ebc685), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "100_2", "v1.00 (2x16K)" )
+	ROMX_LOAD( "sp64_100_1.rom", 0x0000, 0x4000, CRC(6053e5a0) SHA1(6d79e5494349f157672e7c59949f3941e5a3dbdb), ROM_BIOS(2) )
+	ROMX_LOAD( "sp64_100_2.rom", 0x4000, 0x4000, CRC(25d11d8e) SHA1(c1bceeb50fee1e11de7505a3b664b844cfb56289), ROM_BIOS(2) )
 ROM_END
 
 #define rom_btm2105 rom_electron
 
 
-/*     YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY                             FULLNAME                                 FLAGS */
-COMP ( 1983, electron,   0,        0,      electron,   electron,   electron_state, empty_init, "Acorn",                            "Acorn Electron",                        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-COMP ( 1983, electront,  electron, 0,      electron,   electron,   electron_state, empty_init, "Acorn",                            "Acorn Electron (Trial)",                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-COMP ( 1985, btm2105,    electron, 0,      btm2105,    electron,   electron_state, empty_init, "British Telecom Business Systems", "BT Merlin M2105",                       MACHINE_NOT_WORKING )
-COMP ( 1987, electron64, electron, 0,      electron64, electron64, electron_state, empty_init, "Acorn/Slogger",                    "Acorn Electron (64K Master RAM Board)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+/*     YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY                             FULLNAME                                 FLAGS */
+COMP ( 1983, electron,   0,        0,      electron,   electron,   electron_state,   empty_init, "Acorn Computers",                  "Acorn Electron",                        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP ( 1983, electront,  electron, 0,      electron,   electron,   electron_state,   empty_init, "Acorn Computers",                  "Acorn Electron (Trial)",                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP ( 1985, btm2105,    electron, 0,      btm2105,    electron,   electron_state,   empty_init, "British Telecom Business Systems", "BT Merlin M2105",                       MACHINE_NOT_WORKING )
+COMP ( 1987, electron64, electron, 0,      electron64, electron64, electron_state,   empty_init, "Acorn Computers / Slogger",        "Acorn Electron (64K Master RAM Board)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP ( 1991, electronsp, electron, 0,      electronsp, electronsp, electronsp_state, empty_init, "Acorn Computers / Slogger",        "Acorn Electron (Stop Press 64i)",       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

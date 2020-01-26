@@ -623,9 +623,9 @@ void mrgame_state::wcup90(machine_config &config)
 / Dakar (06/1988)
 /-------------------------------------------------------------------*/
 ROM_START(dakar)
-	ROM_REGION(0x10000, "roms", 0)
-	ROM_LOAD16_BYTE("cpu_ic13.rom", 0x000001, 0x8000, CRC(83183929) SHA1(977ac10a1e78c759eb0550794f2639fe0e2d1507))
-	ROM_LOAD16_BYTE("cpu_ic14.rom", 0x000000, 0x8000, CRC(2010d28d) SHA1(d262dabd9298566df43df298cf71c974bee1434a))
+	ROM_REGION16_BE(0x10000, "roms", 0)
+	ROM_LOAD16_BYTE("cpu_ic13.rom", 0x000000, 0x8000, CRC(83183929) SHA1(977ac10a1e78c759eb0550794f2639fe0e2d1507))
+	ROM_LOAD16_BYTE("cpu_ic14.rom", 0x000001, 0x8000, CRC(2010d28d) SHA1(d262dabd9298566df43df298cf71c974bee1434a))
 
 	ROM_REGION(0x8000, "video", 0)
 	ROM_LOAD("vid_ic14.rom", 0x0000, 0x8000, CRC(88a9ca81) SHA1(9660d416b2b8f1937cda7bca51bd287641c7730c))
@@ -653,9 +653,9 @@ ROM_END
 / Motor Show (1989)
 /-------------------------------------------------------------------*/
 ROM_START(motrshow)
-	ROM_REGION(0x10000, "roms", 0)
-	ROM_LOAD16_BYTE("cpu_ic13.rom", 0x000001, 0x8000, CRC(e862ca71) SHA1(b02e5f39f9427d58b70b7999a5ff6075beff05ae))
-	ROM_LOAD16_BYTE("cpu_ic14.rom", 0x000000, 0x8000, CRC(c898ae25) SHA1(f0e1369284a1e0f394f1d40281fd46252016602e))
+	ROM_REGION16_BE(0x10000, "roms", 0)
+	ROM_LOAD16_BYTE("cpu_ic13.rom", 0x000000, 0x8000, CRC(e862ca71) SHA1(b02e5f39f9427d58b70b7999a5ff6075beff05ae))
+	ROM_LOAD16_BYTE("cpu_ic14.rom", 0x000001, 0x8000, CRC(c898ae25) SHA1(f0e1369284a1e0f394f1d40281fd46252016602e))
 
 	ROM_REGION(0x8000, "video", 0)
 	ROM_LOAD("vid_ic14.rom", 0x0000, 0x8000, CRC(1d4568e2) SHA1(bfc2bb59708ce3a09f9a1b3460ed8d5269840c97))
@@ -679,9 +679,9 @@ ROM_START(motrshow)
 ROM_END
 
 ROM_START(motrshowa)
-	ROM_REGION(0x10000, "roms", 0)
-	ROM_LOAD16_BYTE("cpuic13a.rom", 0x000001, 0x8000, CRC(2dbdd9d4) SHA1(b404814a4e83ead6da3c57818ae97f23d380f9da))
-	ROM_LOAD16_BYTE("cpuic14b.rom", 0x000000, 0x8000, CRC(0bd98fec) SHA1(b90a7e997db59740398003ba94a69118b1ee70af))
+	ROM_REGION16_BE(0x10000, "roms", 0)
+	ROM_LOAD16_BYTE("cpuic13a.rom", 0x000000, 0x8000, CRC(2dbdd9d4) SHA1(b404814a4e83ead6da3c57818ae97f23d380f9da))
+	ROM_LOAD16_BYTE("cpuic14b.rom", 0x000001, 0x8000, CRC(0bd98fec) SHA1(b90a7e997db59740398003ba94a69118b1ee70af))
 
 	ROM_REGION(0x8000, "video", 0)
 	ROM_LOAD("vid_ic14.rom", 0x0000, 0x8000, CRC(1d4568e2) SHA1(bfc2bb59708ce3a09f9a1b3460ed8d5269840c97))
@@ -708,9 +708,9 @@ ROM_END
 / Mac Attack (1990)
 /-------------------------------------------------------------------*/
 ROM_START(macattck)
-	ROM_REGION(0x10000, "roms", 0)
-	ROM_LOAD16_BYTE("cpu_ic13.rom", 0x000001, 0x8000, NO_DUMP)
-	ROM_LOAD16_BYTE("cpu_ic14.rom", 0x000000, 0x8000, NO_DUMP)
+	ROM_REGION16_BE(0x10000, "roms", 0)
+	ROM_LOAD16_BYTE("cpu_ic13.rom", 0x000000, 0x8000, NO_DUMP)
+	ROM_LOAD16_BYTE("cpu_ic14.rom", 0x000001, 0x8000, NO_DUMP)
 
 	ROM_REGION(0x8000, "video", 0)
 	ROM_LOAD("vid_ic91.rom", 0x0000, 0x8000, CRC(42d2ba01) SHA1(c13d38c2798575760461912cef65dde57dfd938c))
@@ -740,9 +740,9 @@ ROM_END
 / World Cup 90 (1990)
 /-------------------------------------------------------------------*/
 ROM_START(wcup90)
-	ROM_REGION(0x10000, "roms", 0)
-	ROM_LOAD16_BYTE("cpu_ic13.rom", 0x000001, 0x8000, CRC(0e2edfb0) SHA1(862fb1f6509fb1f560d0b2bb8a5764f64b259f04))
-	ROM_LOAD16_BYTE("cpu_ic14.rom", 0x000000, 0x8000, CRC(fdd03165) SHA1(6dc6e68197218f8808436098c26cd04fc3215b1c))
+	ROM_REGION16_BE(0x10000, "roms", 0)
+	ROM_LOAD16_BYTE("cpu_ic13.rom", 0x000000, 0x8000, CRC(0e2edfb0) SHA1(862fb1f6509fb1f560d0b2bb8a5764f64b259f04))
+	ROM_LOAD16_BYTE("cpu_ic14.rom", 0x000001, 0x8000, CRC(fdd03165) SHA1(6dc6e68197218f8808436098c26cd04fc3215b1c))
 
 	ROM_REGION(0x8000, "video", 0)
 	ROM_LOAD("vid_ic91.rom", 0x0000, 0x8000, CRC(3287ad20) SHA1(d5a453efc7292670073f157dca04897be857b8ed))

@@ -758,7 +758,7 @@ void chinagat_state::chinagat(machine_config &config)
 	Z80(config, m_soundcpu, XTAL(3'579'545));     /* 3.579545 MHz */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &chinagat_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* heavy interleaving to sync up sprite<->main cpu's */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* heavy interleaving to sync up sprite<->main cpu's */
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -805,7 +805,7 @@ void chinagat_state::saiyugoub1(machine_config &config)
 	mcu.p1_out_cb().set(FUNC(chinagat_state::saiyugoub1_adpcm_rom_addr_w));
 	mcu.p2_out_cb().set(FUNC(chinagat_state::saiyugoub1_adpcm_control_w));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* heavy interleaving to sync up sprite<->main cpu's */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* heavy interleaving to sync up sprite<->main cpu's */
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -846,7 +846,7 @@ void chinagat_state::saiyugoub2(machine_config &config)
 	Z80(config, m_soundcpu, XTAL(3'579'545));       /* 3.579545 MHz oscillator */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &chinagat_state::ym2203c_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* heavy interleaving to sync up sprite<->main cpu's */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* heavy interleaving to sync up sprite<->main cpu's */
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

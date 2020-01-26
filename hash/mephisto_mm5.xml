@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
+<softwarelist name="mephisto_mm5" description="Mephisto MM V Modules">
+
 <!-- HG 550 module is exclusively used with MM V -->
 
-<softwarelist name="mephisto_mm5" description="Mephisto MM V Modules">
 	<software name="hg550">
 		<description>Mephisto HG 550 Opening Library</description>
 		<year>1990</year>
@@ -14,4 +15,5 @@
 			</dataarea>
 		</part>
 	</software>
+
 </softwarelist>

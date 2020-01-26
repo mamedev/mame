@@ -400,7 +400,7 @@ void airraid_state::airraid(machine_config &config)
 	audiocpu.set_addrmap(AS_OPCODES, &airraid_state::airraid_sound_decrypted_opcodes_map);
 	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x100);
 

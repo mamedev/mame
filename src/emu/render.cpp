@@ -697,7 +697,7 @@ const rgb_t *render_container::bcg_lookup_table(int texformat, u32 &out_length, 
 		case TEXFORMAT_RGB32:
 		case TEXFORMAT_ARGB32:
 		case TEXFORMAT_YUY16:
-			out_length = 256;
+			out_length = ARRAY_LENGTH(m_bcglookup256);
 			return m_bcglookup256;
 
 		default:
@@ -1062,17 +1062,18 @@ int render_target::configured_view(const char *viewname, int targetindex, int nu
 		{
 			int ourindex = index() % scrcount;
 			screen_device *screen = iter.byindex(ourindex);
+			assert(screen != nullptr);
 
 			// find the first view with this screen and this screen only
 			for (view = view_by_index(viewindex = 0); view != nullptr; view = view_by_index(++viewindex))
 			{
-				const render_screen_list &viewscreens = view->screens();
-				if (viewscreens.count() == 0)
+				auto const &viewscreens = view->screens();
+				if (viewscreens.empty())
 				{
 					view = nullptr;
 					break;
 				}
-				else if (viewscreens.count() == viewscreens.contains(*screen))
+				else if (std::find_if(viewscreens.begin(), viewscreens.end(), [&screen](auto const &scr) { return &scr.get() != screen; }) == viewscreens.end())
 					break;
 			}
 		}
@@ -1082,13 +1083,12 @@ int render_target::configured_view(const char *viewname, int targetindex, int nu
 		{
 			for (view = view_by_index(viewindex = 0); view != nullptr; view = view_by_index(++viewindex))
 			{
-				render_screen_list const &viewscreens(view->screens());
-				if (viewscreens.count() >= scrcount)
+				if (view->screen_count() >= scrcount)
 				{
 					bool screen_missing(false);
 					for (screen_device &screen : iter)
 					{
-						if (!viewscreens.contains(screen))
+						if (!view->has_screen(screen))
 						{
 							screen_missing = true;
 							break;
@@ -1114,19 +1114,6 @@ const char *render_target::view_name(int viewindex)
 {
 	layout_view const *const view = view_by_index(viewindex);
 	return view ? view->name().c_str() : nullptr;
-}
-
-
-//-------------------------------------------------
-//  render_target_get_view_screens - return a
-//  bitmask of which screens are visible on a
-//  given view
-//-------------------------------------------------
-
-const render_screen_list &render_target::view_screens(int viewindex)
-{
-	layout_view *view = view_by_index(viewindex);
-	return (view != nullptr) ? view->screens() : s_empty_screen_list;
 }
 
 
@@ -1797,13 +1784,12 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 			int viewindex(0);
 			for (layout_view *view = view_by_index(viewindex); need_tiles && view; view = view_by_index(++viewindex))
 			{
-				render_screen_list const &viewscreens(view->screens());
-				if (viewscreens.count() >= screens.size())
+				if (view->screen_count() >= screens.size())
 				{
 					bool screen_missing(false);
 					for (screen_device &screen : iter)
 					{
-						if (!viewscreens.contains(screen))
+						if (!view->has_screen(screen))
 						{
 							screen_missing = true;
 							break;
@@ -1995,11 +1981,10 @@ bool render_target::load_layout_file(const char *dirname, const internal_layout 
 	z_stream stream;
 	int zerr;
 
-	/* initialize the stream */
+	// initialize the stream
 	memset(&stream, 0, sizeof(stream));
 	stream.next_out = tempout.get();
 	stream.avail_out = layout_data.decompressed_size;
-
 
 	zerr = inflateInit(&stream);
 	if (zerr != Z_OK)
@@ -2008,12 +1993,12 @@ bool render_target::load_layout_file(const char *dirname, const internal_layout 
 		return false;
 	}
 
-	/* decompress this chunk */
+	// decompress this chunk
 	stream.next_in = (unsigned char *)layout_data.data;
 	stream.avail_in = layout_data.compressed_size;
 	zerr = inflate(&stream, Z_NO_FLUSH);
 
-	/* stop at the end of the stream */
+	// stop at the end of the stream
 	if (zerr == Z_STREAM_END)
 	{
 		// OK
@@ -2024,7 +2009,7 @@ bool render_target::load_layout_file(const char *dirname, const internal_layout 
 		return false;
 	}
 
-	/* clean up */
+	// clean up
 	zerr = inflateEnd(&stream);
 	if (zerr != Z_OK)
 	{
@@ -2056,7 +2041,7 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 
 	// attempt to open the file; bail if we can't
 	emu_file layoutfile(m_manager.machine().options().art_path(), OPEN_FLAG_READ);
-	osd_file::error const filerr(layoutfile.open(fname.c_str()));
+	osd_file::error const filerr(layoutfile.open(fname));
 	if (filerr != osd_file::error::NONE)
 		return false;
 
@@ -2978,9 +2963,15 @@ render_manager::~render_manager()
 bool render_manager::is_live(screen_device &screen) const
 {
 	// iterate over all live targets and or together their screen masks
-	for (render_target &target : m_targetlist)
-		if (!target.hidden() && target.view_screens(target.view()).contains(screen))
-			return true;
+	for (render_target const &target : m_targetlist)
+	{
+		if (!target.hidden())
+		{
+			layout_view const *view = target.current_view();
+			if (view != nullptr && view->has_screen(screen))
+				return true;
+		}
+	}
 	return false;
 }
 

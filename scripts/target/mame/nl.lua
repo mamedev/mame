@@ -23,10 +23,11 @@ CPUS["M6803"] = true
 CPUS["M6809"] = true
 CPUS["MCS48"] = true
 CPUS["I8085"] = true
---CPUS["MCS51"] = true
+CPUS["MCS51"] = true
 --CPUS["M6800"] = true
 --CPUS["M6809"] = true
 --CPUS["M680X0"] = true
+CPUS["M680X0"] = true
 --CPUS["TMS9900"] = true
 --CPUS["COP400"] = true
 CPUS["F8"] = true
@@ -43,14 +44,18 @@ SOUNDS["AY8910"] = true
 SOUNDS["MSM5205"] = true
 --SOUNDS["ASTROCADE"] = true
 SOUNDS["TMS5220"] = true
---SOUNDS["OKIM6295"] = true
+SOUNDS["OKIM6295"] = true
+SOUNDS["UPD7759"] = true
 --SOUNDS["HC55516"] = true
 --SOUNDS["YM3812"] = true
 --SOUNDS["CEM3394"] = true
 --SOUNDS["VOTRAX"] = true
+SOUNDS["YM2151"] = true
+SOUNDS["YM2413"] = true
 SOUNDS["BEEP"] = true
 SOUNDS["VOLT_REG"] = true
 SOUNDS["SPEAKER"] = true
+SOUNDS["DIGITALKER"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -80,6 +85,8 @@ MACHINES["6821PIA"] = true
 MACHINES["I8255"] = true
 MACHINES["WATCHDOG"] = true
 MACHINES["EEPROMDEV"] = true
+MACHINES["UPD4701"] = true
+MACHINES["CXD1095"] = true
 --MACHINES["TTL74148"] = true
 --MACHINES["TTL74153"] = true
 --MACHINES["TTL7474"] = true
@@ -149,17 +156,17 @@ files{
 	MAME_DIR .. "src/mame/includes/1942.h",
 	MAME_DIR .. "src/mame/video/1942.cpp",
 	MAME_DIR .. "src/mame/audio/nl_1942.cpp",
-  MAME_DIR .. "src/mame/audio/nl_1942.h",
+	MAME_DIR .. "src/mame/audio/nl_1942.h",
 
 	MAME_DIR .. "src/mame/drivers/gamemachine.cpp",
-  MAME_DIR .. "src/mame/audio/nl_gamemachine.h",
-  MAME_DIR .. "src/mame/audio/nl_gamemachine.cpp",
+	MAME_DIR .. "src/mame/audio/nl_gamemachine.h",
+	MAME_DIR .. "src/mame/audio/nl_gamemachine.cpp",
 
 	MAME_DIR .. "src/mame/drivers/popeye.cpp",
 	MAME_DIR .. "src/mame/includes/popeye.h",
 	MAME_DIR .. "src/mame/video/popeye.cpp",
-  MAME_DIR .. "src/mame/audio/nl_popeye.cpp",
-  MAME_DIR .. "src/mame/audio/nl_popeye.h",
+	MAME_DIR .. "src/mame/audio/nl_popeye.cpp",
+	MAME_DIR .. "src/mame/audio/nl_popeye.h",
 
 	MAME_DIR .. "src/mame/drivers/mario.cpp",
 	MAME_DIR .. "src/mame/includes/mario.h",
@@ -184,6 +191,17 @@ files{
 	MAME_DIR .. "src/mame/includes/cheekyms.h",
 	MAME_DIR .. "src/mame/video/cheekyms.cpp",
 
+	MAME_DIR .. "src/mame/drivers/galaxian.cpp",
+	MAME_DIR .. "src/mame/includes/galaxian.h",
+	MAME_DIR .. "src/mame/audio/galaxian.cpp",
+	MAME_DIR .. "src/mame/audio/galaxian.h",
+	MAME_DIR .. "src/mame/video/galaxian.cpp",
+	MAME_DIR .. "src/mame/audio/nl_konami.h",
+	MAME_DIR .. "src/mame/audio/nl_konami.cpp",
+
+	MAME_DIR .. "src/mame/audio/cclimber.cpp",
+	MAME_DIR .. "src/mame/audio/cclimber.h",
+
 	MAME_DIR .. "src/mame/audio/nl_zac1b11142.cpp",
 	MAME_DIR .. "src/mame/audio/nl_zacc1b11142.h",
 	MAME_DIR .. "src/mame/audio/zaccaria.cpp",
@@ -193,12 +211,34 @@ files{
 	MAME_DIR .. "src/mame/video/zaccaria.cpp",
 
 	MAME_DIR .. "src/mame/drivers/cocoloco.cpp",
-  MAME_DIR .. "src/mame/audio/nl_cocoloco.h",
-  MAME_DIR .. "src/mame/audio/nl_cocoloco.cpp",
+	MAME_DIR .. "src/mame/audio/nl_cocoloco.h",
+	MAME_DIR .. "src/mame/audio/nl_cocoloco.cpp",
 
 	MAME_DIR .. "src/mame/drivers/palestra.cpp",
 	MAME_DIR .. "src/mame/machine/nl_palestra.cpp",
 	MAME_DIR .. "src/mame/machine/nl_palestra.h",
+
+	MAME_DIR .. "src/mame/drivers/segas16b.cpp",
+	MAME_DIR .. "src/mame/includes/segas16b.h",
+	MAME_DIR .. "src/mame/video/segas16b.cpp",
+	MAME_DIR .. "src/mame/audio/nl_segas16b.cpp",
+	MAME_DIR .. "src/mame/audio/nl_segas16b.h",
+	MAME_DIR .. "src/mame/machine/315_5195.cpp",
+	MAME_DIR .. "src/mame/machine/315_5195.h",
+	MAME_DIR .. "src/mame/machine/fd1089.cpp",
+	MAME_DIR .. "src/mame/machine/fd1089.h",
+	MAME_DIR .. "src/mame/machine/fd1094.cpp",
+	MAME_DIR .. "src/mame/machine/fd1094.h",
+	MAME_DIR .. "src/mame/machine/segaic16.cpp",
+	MAME_DIR .. "src/mame/machine/segaic16.h",
+	MAME_DIR .. "src/mame/video/sega16sp.cpp",
+	MAME_DIR .. "src/mame/video/sega16sp.h",
+	MAME_DIR .. "src/mame/machine/mc8123.cpp",
+	MAME_DIR .. "src/mame/machine/mc8123.h",
+	MAME_DIR .. "src/mame/video/segaic16.cpp",
+	MAME_DIR .. "src/mame/video/segaic16.h",
+	MAME_DIR .. "src/mame/video/segaic16_road.cpp",
+	MAME_DIR .. "src/mame/video/segaic16_road.h",
 
 	MAME_DIR .. "src/mame/drivers/testpat.cpp",
 	MAME_DIR .. "src/mame/machine/nl_tp1983.cpp",

@@ -585,7 +585,25 @@ segas32_state::segas32_state(const machine_config &mconfig, device_type type, co
 	, m_multipcm_bank_hi(*this, "multipcmbankhi")
 	, m_multipcm_bank_lo(*this, "multipcmbanklo")
 	, m_is_multi32(is_multi32)
+	, m_sound_irq_input(0)
+	, m_sound_dummy_value(0)
+	, m_sound_bank(0)
+	, m_system32_tilebank_external(0)
+	, m_sprite_render_count(0)
+	, m_print_count(0)
+	, m_vblank_end_int_timer(nullptr)
+	, m_update_sprites_timer(nullptr)
 {
+	std::fill(std::begin(m_v60_irq_control), std::end(m_v60_irq_control), 0);
+	std::fill(std::begin(m_v60_irq_timer), std::end(m_v60_irq_timer), nullptr);
+	std::fill(std::begin(m_sound_irq_control), std::end(m_sound_irq_control), 0);
+	std::fill(std::begin(m_system32_displayenable), std::end(m_system32_displayenable), 0);
+	std::fill(std::begin(m_arescue_dsp_io), std::end(m_arescue_dsp_io), 0);
+	std::fill(std::begin(m_sprite_control_latched), std::end(m_sprite_control_latched), 0);
+	std::fill(std::begin(m_sprite_control), std::end(m_sprite_control), 0);
+
+	for (int i = 0; i < 2; i++)
+		std::fill(std::begin(m_mixer_control[i]), std::end(m_mixer_control[i]), 0);
 }
 
 
@@ -2729,6 +2747,7 @@ DEFINE_DEVICE_TYPE(SEGA_MULTI32_ANALOG_DEVICE, sega_multi32_analog_state, "segas
 sega_multi32_analog_state::sega_multi32_analog_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sega_multi32_state(mconfig, SEGA_MULTI32_ANALOG_DEVICE, tag, owner, clock)
 	, m_analog_ports(*this, "ANALOG%u", 1)
+	, m_analog_bank(0)
 {
 }
 
@@ -2966,7 +2985,7 @@ void segas32_new_state::sega_multi32_6p(machine_config &config)
     ROM PCB No: 834-8526-01 (US)
                 834-8526-02 (Export)
                 834-8526-03 (Japan)
-                834-8526-05 (Export)
+                834-8526-05 (Export, had the DSP 837-8341 board attached)
    Link PCB No: 837-8223-01
      A/D BD No: 837-7536 (one for each mainboard)
      DSP BD No: 837-8341
@@ -3027,8 +3046,10 @@ ROM_START( arescue )
 
 	ROM_REGION( 0x20000, "mainpcb:dsp", 0 ) /* NEC uPD77P25 DSP Internal ROM */ // ONLY PRESENT ON ONE PCB STACK
 	ROM_LOAD( "d7725.01", 0x000000, 0x002800, CRC(a7ec5644) SHA1(e9b05c70b639ee289e557dfd9a6c724b36338e2b) )
-	ROM_REGION(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
-	ROM_REGION(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_REGION32_BE(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x0000, 0x0000, 0x2000 )
+	ROM_REGION16_BE(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x2000, 0x0000, 0x0800 )
 
 	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x4( "epr-14542.ic13",     0x000000, 0x020000, CRC(6d39fc18) SHA1(7fbddfb2605a020331e1e81a7bc4466196df17bd) ) /* 834-8526-05 (Export) */
@@ -3103,8 +3124,10 @@ ROM_START( arescueu )
 
 	ROM_REGION( 0x20000, "mainpcb:dsp", 0 ) /* NEC uPD77P25 DSP Internal ROM */ // ONLY PRESENT ON ONE PCB STACK
 	ROM_LOAD( "d7725.01", 0x000000, 0x002800, CRC(a7ec5644) SHA1(e9b05c70b639ee289e557dfd9a6c724b36338e2b) )
-	ROM_REGION(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
-	ROM_REGION(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_REGION32_BE(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x0000, 0x0000, 0x2000 )
+	ROM_REGION16_BE(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x2000, 0x0000, 0x0800 )
 
 	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x4( "epr-14540.ic13",     0x000000, 0x020000, CRC(c2b4e5d0) SHA1(69f8ddded5095df9012663d0ded61b78f1692a8d) )
@@ -3179,8 +3202,10 @@ ROM_START( arescuej )
 
 	ROM_REGION( 0x20000, "mainpcb:dsp", 0 ) /* NEC uPD77P25 DSP Internal ROM */ // ONLY PRESENT ON ONE PCB STACK
 	ROM_LOAD( "d7725.01", 0x000000, 0x002800, CRC(a7ec5644) SHA1(e9b05c70b639ee289e557dfd9a6c724b36338e2b) )
-	ROM_REGION(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
-	ROM_REGION(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_REGION32_BE(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x0000, 0x0000, 0x2000 )
+	ROM_REGION16_BE(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x2000, 0x0000, 0x0800 )
 
 	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x4( "epr-14515.ic13",     0x000000, 0x020000, CRC(fb5eefbd) SHA1(f2739ad2e168843fe992d7fb546ffd859fa6c17a) )
@@ -5695,26 +5720,6 @@ void segas32_state::init_arescue(int m_hasdsp)
 	for (auto & elem : m_arescue_dsp_io)
 		elem = 0x00;
 
-	if (m_hasdsp)
-	{
-		// massages the data from the BPMicro-compatible dump to runnable form
-		uint8_t *dspsrc = (uint8_t *)memregion("dsp")->base();
-		uint32_t *dspprg = (uint32_t *)memregion("dspprg")->base();
-		uint16_t *dspdata = (uint16_t *)memregion("dspdata")->base();
-
-		// copy DSP program
-		for (int i = 0; i < 0x2000; i+= 4)
-		{
-			*dspprg = dspsrc[0+i]<<24 | dspsrc[1+i]<<16 | dspsrc[2+i]<<8;
-			dspprg++;
-		}
-
-		// copy DSP data
-		for (int i = 0; i < 0x800; i+= 2)
-		{
-			*dspdata++ = dspsrc[0x2000+i]<<8 | dspsrc[0x2001+i];
-		}
-	}
 	m_sw1_output = &segas32_state::arescue_sw1_output;
 }
 

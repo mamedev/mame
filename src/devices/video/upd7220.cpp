@@ -1111,21 +1111,27 @@ void upd7220_device::process_fifo()
 	uint8_t data;
 	int flag;
 	uint16_t eff_pitch = m_pitch >> m_figs.m_gd;
+	int cr;
 
 	dequeue(&data, &flag);
 
 	if (flag == FIFO_COMMAND)
 	{
-		m_cr = data;
-		m_param_ptr = 1;
+		cr = translate_command(data);
+		if (cr != COMMAND_BCTRL) // workaround for Rainbow 100 Windows 1.03, needs verification
+		{
+			m_cr = data;
+			m_param_ptr = 1;
+		}
 	}
 	else
 	{
+		cr = translate_command(m_cr);
 		m_pr[m_param_ptr] = data;
 		m_param_ptr++;
 	}
 
-	switch (translate_command(m_cr))
+	switch (cr)
 	{
 	case COMMAND_INVALID:
 		logerror("uPD7220 Invalid Command Byte %02x\n", m_cr);
@@ -1258,7 +1264,7 @@ void upd7220_device::process_fifo()
 		break;
 
 	case COMMAND_BCTRL: /* display blanking control */
-		m_de = m_cr & 0x01;
+		m_de = data & 0x01;
 
 		//LOG("uPD7220 DE: %u\n", m_de);
 		break;

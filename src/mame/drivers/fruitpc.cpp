@@ -151,7 +151,7 @@ void fruitpc_state::fruitpc(machine_config &config)
 }
 
 ROM_START( fruitpc )
-	ROM_REGION( 0x20000, "bios", 0 )
+	ROM_REGION32_LE( 0x20000, "bios", 0 )
 	ROM_LOAD( "at-gs001.bin", 0x000000, 0x020000, CRC(7dec34d0) SHA1(81d194d67fef9f6531bd3cd1ee0baacb5c2558bf) )
 
 	DISK_REGION( "ide:0:hdd:image" )    // 8 MB Compact Flash card
@@ -163,7 +163,7 @@ GAME( 2006, fruitpc, 0, fruitpc, fruitpc, fruitpc_state, empty_init, ROT0, "<unk
 // this doesn't really belong here, but is some kind of x86 pc-like hardware, exact CPU type etc. unknown
 // hardware ia by Paokai, motherboard has logos, large chip with logo too, http://www.paokai.com.tw/
 ROM_START( gogostrk )
-	ROM_REGION( 0x40000, "bios", 0 )
+	ROM_REGION32_LE( 0x40000, "bios", 0 )
 	ROM_LOAD( "39sf020a.rom1", 0x000000, 0x040000, CRC(236d4d95) SHA1(50579acddc93c05d5f8e17ad3669a29d2dc49965) )
 
 	DISK_REGION( "ide:0:hdd:image" )    // 128 MB CF Card

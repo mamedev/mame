@@ -33,7 +33,7 @@
 #include "emu.h"
 #include "k054321.h"
 
-#include <math.h>
+#include <cmath>
 
 DEFINE_DEVICE_TYPE(K054321, k054321_device, "k054321", "K054321 Maincpu-Soundcpu interface")
 

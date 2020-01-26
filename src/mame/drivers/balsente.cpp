@@ -1419,7 +1419,7 @@ void balsente_state::shrike(machine_config &config)
 	M68000(config, m_68k, 8000000);
 	m_68k->set_addrmap(AS_PROGRAM, &balsente_state::shrike68k_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 }
 
 

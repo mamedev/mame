@@ -25,18 +25,18 @@
 #include "emu.h"
 #include "buddha.h"
 
-//**************************************************************************
-//  CONSTANTS / MACROS
-//**************************************************************************
-
 #define VERBOSE 1
+#include "logmacro.h"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(BUDDHA, buddha_device, "buddha", "Buddha IDE controller")
+DEFINE_DEVICE_TYPE_NS(ZORRO_BUDDHA, bus::amiga::zorro, buddha_device, "zorro_buddha", "Buddha IDE controller")
+
+
+namespace bus { namespace amiga { namespace zorro {
 
 //-------------------------------------------------
 //  mmio_map - device-specific memory mapped I/O
@@ -95,7 +95,7 @@ const tiny_rom_entry *buddha_device::device_rom_region() const
 //-------------------------------------------------
 
 buddha_device::buddha_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, BUDDHA, tag, owner, clock),
+	device_t(mconfig, ZORRO_BUDDHA, tag, owner, clock),
 	device_zorro2_card_interface(mconfig, *this),
 	m_ata_0(*this, "ata_0"),
 	m_ata_1(*this, "ata_1"),
@@ -111,8 +111,6 @@ buddha_device::buddha_device(const machine_config &mconfig, const char *tag, dev
 
 void buddha_device::device_start()
 {
-	set_zorro_device();
-
 	save_item(NAME(m_ide_interrupts_enabled));
 	save_item(NAME(m_ide_0_interrupt));
 	save_item(NAME(m_ide_1_interrupt));
@@ -136,11 +134,8 @@ void buddha_device::device_reset()
 
 void buddha_device::autoconfig_base_address(offs_t address)
 {
-	if (VERBOSE)
-		logerror("autoconfig_base_address received: 0x%06x\n", address);
-
-	if (VERBOSE)
-		logerror("-> installing buddha\n");
+	LOG("autoconfig_base_address received: 0x%06x\n", address);
+	LOG("-> installing buddha\n");
 
 	// stop responding to default autoconfig
 	m_slot->space().unmap_readwrite(0xe80000, 0xe8007f);
@@ -162,8 +157,7 @@ void buddha_device::autoconfig_base_address(offs_t address)
 
 WRITE_LINE_MEMBER( buddha_device::cfgin_w )
 {
-	if (VERBOSE)
-		logerror("configin_w (%d)\n", state);
+	LOG("configin_w (%d)\n", state);
 
 	if (state == 0)
 	{
@@ -191,22 +185,20 @@ READ16_MEMBER( buddha_device::speed_r )
 {
 	uint16_t data = 0xffff;
 
-	if (VERBOSE)
-		logerror("speed_r %04x [mask = %04x]\n", data, mem_mask);
+	if (!machine().side_effects_disabled())
+		LOG("speed_r %04x [mask = %04x]\n", data, mem_mask);
 
 	return data;
 }
 
 WRITE16_MEMBER( buddha_device::speed_w )
 {
-	if (VERBOSE)
-		logerror("speed_w %04x [mask = %04x]\n", data, mem_mask);
+	LOG("speed_w %04x [mask = %04x]\n", data, mem_mask);
 }
 
-WRITE_LINE_MEMBER( buddha_device::ide_0_interrupt_w)
+WRITE_LINE_MEMBER( buddha_device::ide_0_interrupt_w )
 {
-	if (VERBOSE)
-		logerror("ide_0_interrupt_w (%d)\n", state);
+	LOG("ide_0_interrupt_w (%d)\n", state);
 
 	m_ide_0_interrupt = state;
 
@@ -214,10 +206,9 @@ WRITE_LINE_MEMBER( buddha_device::ide_0_interrupt_w)
 		m_slot->int2_w(state);
 }
 
-WRITE_LINE_MEMBER( buddha_device::ide_1_interrupt_w)
+WRITE_LINE_MEMBER( buddha_device::ide_1_interrupt_w )
 {
-	if (VERBOSE)
-		logerror("ide_1_interrupt_w (%d)\n", state);
+	LOG("ide_1_interrupt_w (%d)\n", state);
 
 	m_ide_1_interrupt = state;
 
@@ -231,8 +222,7 @@ READ16_MEMBER( buddha_device::ide_0_interrupt_r )
 
 	data = m_ide_0_interrupt << 15;
 
-//  if (VERBOSE)
-//      logerror("ide_0_interrupt_r %04x [mask = %04x]\n", data, mem_mask);
+//  LOG("ide_0_interrupt_r %04x [mask = %04x]\n", data, mem_mask);
 
 	return data;
 }
@@ -243,16 +233,14 @@ READ16_MEMBER( buddha_device::ide_1_interrupt_r )
 
 	data = m_ide_1_interrupt << 15;
 
-//  if (VERBOSE)
-//      logerror("ide_1_interrupt_r %04x [mask = %04x]\n", data, mem_mask);
+//  LOG("ide_1_interrupt_r %04x [mask = %04x]\n", data, mem_mask);
 
 	return data;
 }
 
 WRITE16_MEMBER( buddha_device::ide_interrupt_enable_w )
 {
-	if (VERBOSE)
-		logerror("ide_interrupt_enable_w %04x [mask = %04x]\n", data, mem_mask);
+	LOG("ide_interrupt_enable_w %04x [mask = %04x]\n", data, mem_mask);
 
 	// writing any value here enables ide interrupts to the zorro slot
 	m_ide_interrupts_enabled = true;
@@ -263,16 +251,14 @@ READ16_MEMBER( buddha_device::ide_0_cs0_r )
 	uint16_t data = m_ata_0->read_cs0((offset >> 1) & 0x07, (mem_mask << 8) | (mem_mask >> 8));
 	data = (data << 8) | (data >> 8);
 
-	if (VERBOSE)
-		logerror("ide_0_cs0_r(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
+	LOG("ide_0_cs0_r(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
 
 	return data;
 }
 
 WRITE16_MEMBER( buddha_device::ide_0_cs0_w )
 {
-	if (VERBOSE)
-		logerror("ide_0_cs0_w(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
+	LOG("ide_0_cs0_w(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
 
 	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
 	data = (data << 8) | (data >> 8);
@@ -285,16 +271,14 @@ READ16_MEMBER( buddha_device::ide_0_cs1_r )
 	uint16_t data = m_ata_0->read_cs1((offset >> 1) & 0x07, (mem_mask << 8) | (mem_mask >> 8));
 	data = (data << 8) | (data >> 8);
 
-	if (VERBOSE)
-		logerror("ide_0_cs1_r(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
+	LOG("ide_0_cs1_r(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
 
 	return data;
 }
 
 WRITE16_MEMBER( buddha_device::ide_0_cs1_w )
 {
-	if (VERBOSE)
-		logerror("ide_0_cs1_w(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
+	LOG("ide_0_cs1_w(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
 
 	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
 	data = (data << 8) | (data >> 8);
@@ -307,16 +291,14 @@ READ16_MEMBER( buddha_device::ide_1_cs0_r )
 	uint16_t data = m_ata_1->read_cs0((offset >> 1) & 0x07, (mem_mask << 8) | (mem_mask >> 8));
 	data = (data << 8) | (data >> 8);
 
-	if (VERBOSE)
-		logerror("ide_1_cs0_r(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
+	LOG("ide_1_cs0_r(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
 
 	return data;
 }
 
 WRITE16_MEMBER( buddha_device::ide_1_cs0_w )
 {
-	if (VERBOSE)
-		logerror("ide_1_cs0_w(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
+	LOG("ide_1_cs0_w(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
 
 	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
 	data = (data << 8) | (data >> 8);
@@ -329,19 +311,19 @@ READ16_MEMBER( buddha_device::ide_1_cs1_r )
 	uint16_t data = m_ata_1->read_cs1((offset >> 1) & 0x07, (mem_mask << 8) | (mem_mask >> 8));
 	data = (data << 8) | (data >> 8);
 
-	if (VERBOSE)
-		logerror("ide_1_cs1_r(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
+	LOG("ide_1_cs1_r(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
 
 	return data;
 }
 
 WRITE16_MEMBER( buddha_device::ide_1_cs1_w )
 {
-	if (VERBOSE)
-		logerror("ide_1_cs1_w(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
+	LOG("ide_1_cs1_w(%04x) %04x [mask = %04x]\n", offset, data, mem_mask);
 
 	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
 	data = (data << 8) | (data >> 8);
 
 	m_ata_1->write_cs1((offset >> 1) & 0x07, data, mem_mask);
 }
+
+} } } // namespace bus::amiga::zorro

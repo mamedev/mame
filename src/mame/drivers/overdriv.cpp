@@ -341,7 +341,7 @@ void overdriv_state::overdriv(machine_config &config)
 																			  /* This might just mean that the video refresh rate is less than */
 																			  /* 60 fps, that's how I fixed it for now. */
 
-	config.m_minimum_quantum = attotime::from_hz(12000);
+	config.set_maximum_quantum(attotime::from_hz(12000));
 
 	EEPROM_ER5911_16BIT(config, "eeprom").default_data(overdriv_default_eeprom, 128);
 

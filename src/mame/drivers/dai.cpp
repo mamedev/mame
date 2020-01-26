@@ -194,7 +194,7 @@ void dai_state::dai(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dai_state::dai_mem);
 	m_maincpu->set_addrmap(AS_IO, &dai_state::dai_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(dai_state::int_ack));
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(2000000);

@@ -34,8 +34,8 @@ spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, co
 	, m_portb_in(*this)
 	, m_portc_in(*this)
 	, m_adc_in{{*this}, {*this}}
-	, m_eeprom_w(*this)
-	, m_eeprom_r(*this)
+	, m_i2c_w(*this)
+	, m_i2c_r(*this)
 	, m_uart_tx(*this)
 	, m_chip_sel(*this)
 	, m_screen(*this, finder_base::DUMMY_TAG)
@@ -79,23 +79,37 @@ void spg2xx_device::device_start()
 	m_portc_in.resolve_safe(0);
 	m_adc_in[0].resolve_safe(0x0fff);
 	m_adc_in[1].resolve_safe(0x0fff);
-	m_eeprom_w.resolve_safe();
-	m_eeprom_r.resolve_safe(0);
+	m_i2c_w.resolve_safe();
+	m_i2c_r.resolve_safe(0);
 	m_uart_tx.resolve_safe();
 	m_chip_sel.resolve_safe();
 
 	save_item(NAME(m_sprite_limit));
 	save_item(NAME(m_pal_flag));
+	save_item(NAME(m_fiq_vector));
 }
 
 void spg2xx_device::device_reset()
 {
 	unsp_device::device_reset();
+	m_fiq_vector = 0xff;
+}
+
+WRITE8_MEMBER(spg2xx_device::fiq_vector_w)
+{
+	m_fiq_vector = data;
 }
 
 WRITE_LINE_MEMBER(spg2xx_device::videoirq_w)
 {
-	set_state_unsynced(UNSP_IRQ0_LINE, state);
+	if (m_fiq_vector == 0)
+	{
+		set_state_unsynced(UNSP_FIQ_LINE, state);
+	}
+	else
+	{
+		set_state_unsynced(UNSP_IRQ0_LINE, state);
+	}
 }
 
 WRITE_LINE_MEMBER(spg2xx_device::timerirq_w)
@@ -146,8 +160,8 @@ void spg2xx_device::configure_spg_io(spg2xx_io_device* io)
 	io->portc_out().set(FUNC(spg2xx_device::portc_w));
 	io->adc_in<0>().set(FUNC(spg2xx_device::adc_r<0>));
 	io->adc_in<1>().set(FUNC(spg2xx_device::adc_r<1>));
-	io->eeprom_w().set(FUNC(spg2xx_device::eepromx_w));
-	io->eeprom_r().set(FUNC(spg2xx_device::eepromx_r));
+	io->i2c_w().set(FUNC(spg2xx_device::eepromx_w));
+	io->i2c_r().set(FUNC(spg2xx_device::eepromx_r));
 	io->uart_tx().set(FUNC(spg2xx_device::tx_w));
 	io->chip_select().set(FUNC(spg2xx_device::cs_w));
 	io->pal_read_callback().set(FUNC(spg2xx_device::get_pal_ntsc));
@@ -156,6 +170,7 @@ void spg2xx_device::configure_spg_io(spg2xx_io_device* io)
 	io->write_external_irq_callback().set(FUNC(spg2xx_device::extirq_w));
 	io->write_ffrq_tmr1_irq_callback().set(FUNC(spg2xx_device::ffreq1_w));
 	io->write_ffrq_tmr2_irq_callback().set(FUNC(spg2xx_device::ffreq2_w));
+	io->write_fiq_vector_callback().set(FUNC(spg2xx_device::fiq_vector_w));
 }
 
 void spg24x_device::device_add_mconfig(machine_config &config)

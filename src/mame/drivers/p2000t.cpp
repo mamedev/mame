@@ -256,7 +256,7 @@ void p2000m_state::p2000m(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &p2000m_state::p2000m_mem);
 	m_maincpu->set_addrmap(AS_IO, &p2000m_state::p2000t_io);
 	m_maincpu->set_vblank_int("screen", FUNC(p2000m_state::p2000_interrupt));
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

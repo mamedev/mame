@@ -152,6 +152,45 @@ static NETLIST_START(CD4016_DIP)
 	)
 NETLIST_END()
 
+/*
+ *  DM7486: Quad 2-Input Exclusive-OR Gates
+ *
+ *             Y = A+B
+ *          +---+---++---+
+ *          | A | B || Y |
+ *          +===+===++===+
+ *          | 0 | 0 || 0 |
+ *          | 0 | 1 || 1 |
+ *          | 1 | 0 || 1 |
+ *          | 1 | 1 || 0 |
+ *          +---+---++---+
+ *
+ *  Naming conventions follow National Semiconductor datasheet
+ *
+ */
+
+static NETLIST_START(CD4070_DIP)
+	CD4070_GATE(A)
+	CD4070_GATE(B)
+	CD4070_GATE(C)
+	CD4070_GATE(D)
+
+	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
+	NET_C(A.GND, B.GND, C.GND, D.GND)
+
+	DIPPINS(  /*       +--------------+      */
+		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
+		A.B,  /*    B1 |2           13| B4   */ D.B,
+		A.Q,  /*    Y1 |3           12| A4   */ D.A,
+		B.Q,  /*    Y2 |4    7486   11| Y4   */ D.Q,
+		B.A,  /*    A2 |5           10| Y3   */ C.Q,
+		B.B,  /*    B2 |6            9| B3   */ C.B,
+		A.GND,/*   GND |7            8| A3   */ C.A
+			  /*       +--------------+      */
+	)
+NETLIST_END()
+
+
 static NETLIST_START(CD4316_DIP)
 	CD4316_GATE(A)
 	CD4316_GATE(B)
@@ -191,7 +230,17 @@ NETLIST_START(CD4XXX_lib)
 		TT_FAMILY("CD4XXX")
 	TRUTHTABLE_END()
 
+	TRUTHTABLE_START(CD4070_GATE, 2, 1, "")
+		TT_HEAD("A,B|Q ")
+		TT_LINE("0,0|0|15")
+		TT_LINE("0,1|1|22")
+		TT_LINE("1,0|1|22")
+		TT_LINE("1,1|0|15")
+		TT_FAMILY("CD4XXX")
+	TRUTHTABLE_END()
+
 	LOCAL_LIB_ENTRY(CD4001_DIP)
+	LOCAL_LIB_ENTRY(CD4070_DIP)
 
 	/* DIP ONLY */
 	LOCAL_LIB_ENTRY(CD4020_DIP)

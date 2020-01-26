@@ -487,7 +487,7 @@ void xain_state::xsleena(machine_config &config)
 
 	TAITO68705_MCU(config, m_mcu, MCU_CLOCK);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

@@ -547,7 +547,7 @@ void dmndrby_state::dderby(machine_config &config)
 	Z80(config, m_audiocpu, 4000000);  /* verified on schematics */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dmndrby_state::dderby_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */

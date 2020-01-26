@@ -20,6 +20,7 @@ public:
 		, m_sharedram(*this, "sharedram")
 		, m_videoram1(*this, "videoram1")
 		, m_videoram2(*this, "videoram2")
+		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
 		, m_protection_data(0)
@@ -31,10 +32,12 @@ public:
 	void speakres(machine_config &config);
 	void stratvox(machine_config &config);
 	void route16(machine_config &config);
+	void vscompmj(machine_config &config);
 
 	void init_route16();
 	void init_route16a();
 	void init_route16c();
+	void init_vscompmj();
 
 private:
 	DECLARE_WRITE8_MEMBER(out0_w);
@@ -62,6 +65,8 @@ private:
 	void stratvox_cpu1_map(address_map &map);
 	void stratvox_cpu2_map(address_map &map);
 	void jongpute_cpu1_map(address_map &map);
+	void vscompmj_cpu1_map(address_map &map);
+	void vscompmj_decrypted_opcodes(address_map &map);
 
 	required_device<cpu_device> m_cpu1;
 	required_device<cpu_device> m_cpu2;
@@ -70,6 +75,7 @@ private:
 	required_shared_ptr<uint8_t> m_sharedram;
 	required_shared_ptr<uint8_t> m_videoram1;
 	required_shared_ptr<uint8_t> m_videoram2;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	uint8_t m_protection_data;

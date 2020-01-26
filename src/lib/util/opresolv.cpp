@@ -8,10 +8,10 @@
 
 ****************************************************************************/
 
-#include <ctype.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
+#include <cctype>
+#include <cstdlib>
+#include <cstring>
+#include <cassert>
 
 #include "pool.h"
 #include "corestr.h"

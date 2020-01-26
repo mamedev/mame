@@ -18,7 +18,7 @@
 //-------------------------------------------------
 
 device_ata_interface::device_ata_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device),
+	device_interface(device, "ata"),
 	m_irq_handler(device),
 	m_dmarq_handler(device),
 	m_dasp_handler(device),
@@ -38,10 +38,10 @@ DEFINE_DEVICE_TYPE(ATA_SLOT, ata_slot_device, "ata_slot", "ATA Connector")
 //  ata_slot_device - constructor
 //-------------------------------------------------
 
-ata_slot_device::ata_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ATA_SLOT, tag, owner, clock),
-		device_slot_interface(mconfig, *this),
-		m_dev(nullptr)
+ata_slot_device::ata_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ATA_SLOT, tag, owner, clock),
+	device_single_card_slot_interface<device_ata_interface>(mconfig, *this),
+	m_dev(nullptr)
 {
 }
 
@@ -53,7 +53,7 @@ ata_slot_device::ata_slot_device(const machine_config &mconfig, const char *tag,
 
 void ata_slot_device::device_config_complete()
 {
-	m_dev = dynamic_cast<device_ata_interface *>(get_card_device());
+	m_dev = get_card_device();
 }
 
 //-------------------------------------------------

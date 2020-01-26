@@ -99,6 +99,9 @@ JoJo's Venture                                             JJK98cA0F  CP3000C0G 
 JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  CAP-JJK000  CAP-JJK-140  981202
 JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  CAP-JJK-2   CAP-JJK-160  990108
 JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  CAP-JJK-3   CAP-JJK-161  990128
+JoJo's Venture                                             JJK98cA0F  CP3000B0G  EUROPE  X          CAP-JJK0A0  CAP-JJK000  CAP-JJK-140  981202
+JoJo's Venture                                             JJK98cA0F  CP3000B0G  EUROPE  X          CAP-JJK0A0  CAP-JJK-2   CAP-JJK-160  990108
+JoJo's Venture                                             JJK98cA0F  CP3000B0G  EUROPE  X          CAP-JJK0A0  CAP-JJK-3   CAP-JJK-161  990128
 
 Street Fighter III 3rd Strike: Fight for the Future  1999  33S99400F  CP300000G  JAPAN   X          CAP-33S000  CAP-33S-1   CAP-33S-1    990512
 Street Fighter III 3rd Strike: Fight for the Future        33S99400F  CP300000G  JAPAN   X          CAP-33S000  CAP-33S-2   CAP-33S-2    990608
@@ -252,17 +255,17 @@ CP SYSTEM III
 |                                                             |  |       | |
 |                               |--------|   |-|              |  |       | |
 |                               |CAPCOM  |   | |   |-------|  |  |       | |
-|        TD62064                |DL-2929 |   | |   |CAPCOM |  |  |       | |
+|        TD62064   **ADM202     |DL-2929 |   | |   |CAPCOM |  |  |       | |
 |                               |IOU     |   | |   |DL-3429|  |  |       | |
-|        TD62064                |--------|   | |   |GLL1   |  S  S       | |
+|        TD62064   **ADM202     |--------|   | |   |GLL1   |  S  S       | |
 |--|                            *HA16103FPJ  | |   |-------|  I  I       |-|
    |                                         | |CN5           M  M        |
    |                                         | |   |-------|  M  M        |
   |-|                        93C46           | |   |CAPCOM |  2  1        |
   | |      PS2501                            | |   |DL-2829|  |  | |-----||
-  | |CN1                                     | |   |CCU    |  |  | |AMD  ||
+  | |CN1                         **62256     | |   |CCU    |  |  | |AMD  ||
   | |      PS2501                            | |   |-------|  |  | |33C93||
-  |-|                                        |-|              |  | |-----||
+  |-|             **CN3       **BT1          |-|              |  | |-----||
    |   SW1                                         HM514260   |  |        |
    |----------------------------------------------------------------------|
 Notes:
@@ -300,6 +303,12 @@ Notes:
                    surface mounted TSOP48 FlashROMs
       SIMM 3-7   - 72-Pin SIMM Connector, holds double sided SIMMs containing 8x Fujitsu 29F016A
                    surface mounted TSOP48 FlashROMs
+
+** Populated at small number of 95682A-2 boards only:
+      62256      - 32k x8 SRAM (SOP28)
+      ADM202     - 2-channel RS-232 line driver/receiver
+      CN3        - 8-pin connector
+      BT1        - Battery
 
                    SIMM Layout -
                           |----------------------------------------------------|
@@ -525,11 +534,11 @@ Hardware registers info
         AE      ---- ---- ---- ---0 Palette DMA Lenght high bit
                 ---- ---- ---- --1- Palette DMA Start
 
-        All CRTC-related values is last clock/line of given area, i.e. actual sizes is +1 to value.
+        CRTC-related H/V values is last clock/line of given area, i.e. actual numbers is +1 to value, actual V Total is +2 to register value.
 
     (*) H Total value is same for all 15KHz modes, uses fixed clock (not affected by pixel clock modifier) -
-        42.954545MHz/6 (similar to SSV) /(454+1) = 15734.25Hz /(262+1) = 59.826Hz
-        unused 24KHz 512x384 mode uses H Total 293 V Total 424 (42.954545MHz/6 /(293+1) = 24350.62Hz /(424+1) = 57.29Hz)
+        42.954545MHz/6 (similar to SSV) /(454+1) = 15734.25Hz /(262+2) = 59.59Hz
+        unused 24KHz 512x384 mode uses H Total 293 V Total 424 (42.954545MHz/6 /(293+1) = 24350.62Hz /(424+2) = 57.16Hz)
 
 
         'SS' foreground tilemap layer generator (presumable located in 'SSU' chip) registers (write only?)
@@ -1689,7 +1698,7 @@ READ16_MEMBER(cps3_state::dma_status_r)
 
 READ16_MEMBER(cps3_state::dev_dipsw_r)
 {
-	// not present on retail motherboards but games read this
+	// presumably these data came from serial interface populated on early boards
 	// inverted words from 5000a00-5000a0f area ANDed with inverted words from 5000a10-5000a1f. perhaps one return DIPSW in 8 high bits, while other in 8 low bits.
 	//  warzard will crash before booting if some of bits is not 0
 	return 0xffff;
@@ -2503,7 +2512,7 @@ void cps3_state::cps3(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(42'954'545)/5, (454+1)*6/5, 0, 384, 262+1, 0, 224); // H Total counter uses XTAL/6 clock
+	screen.set_raw(XTAL(42'954'545)/5, (454+1)*6/5, 0, 384, 262+2, 0, 224); // H Total counter uses XTAL/6 clock
 	screen.set_screen_update(FUNC(cps3_state::screen_update));
 	screen.screen_vblank().set(FUNC(cps3_state::vbl_interrupt));
 /*
@@ -2511,8 +2520,8 @@ void cps3_state::cps3(machine_config &config)
         Video DAC = 8.602MHz (384 wide mode) ~ 42.9545MHz / 5
                     10.73MHZ (496 wide mode) ~ 42.9545MHz / 4
         H = 15.73315kHz
-        V = 59.8Hz
-        H/V ~ 263 lines
+        V = 59.59Hz
+        H/V ~ 264 lines
 */
 
 	TIMER(config, m_dma_timer).configure_generic(FUNC(cps3_state::dma_interrupt));
@@ -2689,7 +2698,7 @@ ROM_END
 
 ROM_START( jojo )
 	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
-	ROM_LOAD( "jojo_usa.29f400.u2", 0x000000, 0x080000, CRC(8d40f7be) SHA1(2a4bd83db2f959c33b071e517941aa55a0f919c0) )
+	ROM_LOAD( "jojo_euro.29f400.u2", 0x000000, 0x080000, CRC(513e40ec) SHA1(03b91f0fbd5be56d24feed4698c7543d4df07837) )
 
 	DISK_REGION( "scsi:1:cdrom" )
 	DISK_IMAGE_READONLY( "cap-jjk-3", 0, SHA1(dc6e74b5e02e13f62cb8c4e234dd6061501e49c1) )
@@ -2697,13 +2706,37 @@ ROM_END
 
 ROM_START( jojor1 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
-	ROM_LOAD( "jojo_usa.29f400.u2", 0x000000, 0x080000, CRC(8d40f7be) SHA1(2a4bd83db2f959c33b071e517941aa55a0f919c0) )
+	ROM_LOAD( "jojo_euro.29f400.u2", 0x000000, 0x080000, CRC(513e40ec) SHA1(03b91f0fbd5be56d24feed4698c7543d4df07837) )
 
 	DISK_REGION( "scsi:1:cdrom" )
 	DISK_IMAGE_READONLY( "cap-jjk-2", 0, SHA1(ce22d10f2b35a0e00f8d83642b97842c9b2327fa) )
 ROM_END
 
 ROM_START( jojor2 )
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_LOAD( "jojo_euro.29f400.u2", 0x000000, 0x080000, CRC(513e40ec) SHA1(03b91f0fbd5be56d24feed4698c7543d4df07837) )
+
+	DISK_REGION( "scsi:1:cdrom" )
+	DISK_IMAGE_READONLY( "cap-jjk000", 0, SHA1(a24e174aaaf47f98312a38129645026a613cd344) )
+ROM_END
+
+ROM_START( jojou )
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_LOAD( "jojo_usa.29f400.u2", 0x000000, 0x080000, CRC(8d40f7be) SHA1(2a4bd83db2f959c33b071e517941aa55a0f919c0) )
+
+	DISK_REGION( "scsi:1:cdrom" )
+	DISK_IMAGE_READONLY( "cap-jjk-3", 0, SHA1(dc6e74b5e02e13f62cb8c4e234dd6061501e49c1) )
+ROM_END
+
+ROM_START( jojour1 )
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_LOAD( "jojo_usa.29f400.u2", 0x000000, 0x080000, CRC(8d40f7be) SHA1(2a4bd83db2f959c33b071e517941aa55a0f919c0) )
+
+	DISK_REGION( "scsi:1:cdrom" )
+	DISK_IMAGE_READONLY( "cap-jjk-2", 0, SHA1(ce22d10f2b35a0e00f8d83642b97842c9b2327fa) )
+ROM_END
+
+ROM_START( jojour2 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
 	ROM_LOAD( "jojo_usa.29f400.u2", 0x000000, 0x080000, CRC(8d40f7be) SHA1(2a4bd83db2f959c33b071e517941aa55a0f919c0) )
 
@@ -3901,17 +3934,20 @@ GAMEL(1997, sfiii2n,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,
 /* JoJo's Venture / JoJo no Kimyou na Bouken */
 
 // 990128
-GAME( 1998, jojo,        0,        jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990128)", GAME_FLAGS )
+GAME( 1998, jojo,        0,        jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Euro 990128)", GAME_FLAGS )
+GAME( 1998, jojou,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990128)", GAME_FLAGS )
 GAME( 1998, jojoj,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 990128)", GAME_FLAGS )
 GAME( 1998, jojon,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990128, NO CD)", GAME_FLAGS )
 
 // 990108
-GAME( 1998, jojor1,      jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990108)", GAME_FLAGS )
+GAME( 1998, jojor1,      jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Euro 990108)", GAME_FLAGS )
+GAME( 1998, jojour1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990108)", GAME_FLAGS )
 GAME( 1998, jojojr1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 990108)", GAME_FLAGS )
 GAME( 1998, jojonr1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990108, NO CD)", GAME_FLAGS )
 
 // 981202
-GAME( 1998, jojor2,      jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 981202)", GAME_FLAGS )
+GAME( 1998, jojor2,      jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Euro 981202)", GAME_FLAGS )
+GAME( 1998, jojour2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 981202)", GAME_FLAGS )
 GAME( 1998, jojojr2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 981202)", GAME_FLAGS )
 GAME( 1998, jojonr2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 981202, NO CD)", GAME_FLAGS )
 

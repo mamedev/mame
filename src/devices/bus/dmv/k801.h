@@ -46,8 +46,6 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(epci_irq_w);
-
-	dmvcart_slot_device * m_bus;
 };
 
 

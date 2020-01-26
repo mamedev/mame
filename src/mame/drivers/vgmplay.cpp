@@ -223,9 +223,9 @@ public:
 
 	vgmplay_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint32_t execute_min_cycles() const override;
-	virtual uint32_t execute_max_cycles() const override;
-	virtual uint32_t execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const noexcept override;
+	virtual uint32_t execute_max_cycles() const noexcept override;
+	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -620,17 +620,17 @@ void vgmplay_device::play()
 		device_reset();
 }
 
-uint32_t vgmplay_device::execute_min_cycles() const
+uint32_t vgmplay_device::execute_min_cycles() const noexcept
 {
 	return 0;
 }
 
-uint32_t vgmplay_device::execute_max_cycles() const
+uint32_t vgmplay_device::execute_max_cycles() const noexcept
 {
 	return 65536;
 }
 
-uint32_t vgmplay_device::execute_input_lines() const
+uint32_t vgmplay_device::execute_input_lines() const noexcept
 {
 	return 0;
 }
@@ -3889,7 +3889,7 @@ ROM_START( vgmplay )
 	ROM_REGION( 0x4000, "master", ROMREGION_ERASE00 )
 	ROM_REGION( 0x4000, "slave", ROMREGION_ERASE00 )
 	ROM_REGION( 0x400000, "gamecart", ROMREGION_ERASE00 )
-	ROM_REGION( 0x400000, "gamecart_sh2", ROMREGION_ERASE00 )
+	ROM_REGION32_BE( 0x400000, "gamecart_sh2", ROMREGION_ERASE00 )
 ROM_END
 
 CONS( 2016, vgmplay, 0, 0, vgmplay, vgmplay, vgmplay_state, empty_init, "MAME", "VGM player", MACHINE_CLICKABLE_ARTWORK )

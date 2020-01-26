@@ -52,15 +52,18 @@ public:
 	void set_cap_debounce(double value) { m_cap_debounce = value; }
 
 	auto da_wr_callback() { return m_write_da.bind(); }
-	auto x1_rd_callback() { return m_read_x1.bind(); }
-	auto x2_rd_callback() { return m_read_x2.bind(); }
-	auto x3_rd_callback() { return m_read_x3.bind(); }
-	auto x4_rd_callback() { return m_read_x4.bind(); }
-	auto x5_rd_callback() { return m_read_x5.bind(); }
+	auto x1_rd_callback() { return m_read_x[0].bind(); }
+	auto x2_rd_callback() { return m_read_x[1].bind(); }
+	auto x3_rd_callback() { return m_read_x[2].bind(); }
+	auto x4_rd_callback() { return m_read_x[3].bind(); }
 
 	uint8_t read();
 
+	DECLARE_READ_LINE_MEMBER(da_r) { return m_da; }
+
 protected:
+	mm74c922_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int max_y);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -71,33 +74,38 @@ private:
 	void detect_keypress();
 
 	devcb_write_line   m_write_da;
-	devcb_read8        m_read_x1;
-	devcb_read8        m_read_x2;
-	devcb_read8        m_read_x3;
-	devcb_read8        m_read_x4;
-	devcb_read8        m_read_x5;
+	devcb_read8        m_read_x[4];
 
 	double              m_cap_osc;
 	double              m_cap_debounce;
 
-	int m_max_y;
+	const int m_max_y;
 
-	int m_inhibit;              // scan counter clock inhibit
+	bool m_inhibit;             // scan counter clock inhibit
 	int m_x;                    // currently scanned column
 	int m_y;                    // latched row
 
-	uint8_t m_data;               // data latch
+	uint8_t m_data;             // data latch
 
-	int m_da;                   // data available flag
-	int m_next_da;              // next value of data available flag
+	bool m_da;                  // data available flag
+	bool m_next_da;             // next value of data available flag
 
 	// timers
 	emu_timer *m_scan_timer;    // keyboard scan timer
 };
 
+// ======================> mm74c923_device
+
+class mm74c923_device :  public mm74c922_device
+{
+public:
+	// construction/destruction
+	mm74c923_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(MM74C922, mm74c922_device)
-DECLARE_DEVICE_TYPE(MM74C923, mm74c922_device)
+DECLARE_DEVICE_TYPE(MM74C923, mm74c923_device)
 
 #endif // MAME_MACHINE_MM74C922_H

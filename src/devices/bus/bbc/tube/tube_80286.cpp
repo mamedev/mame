@@ -48,7 +48,7 @@ void bbc_tube_80286_device::tube_80286_io(address_map &map)
 //-------------------------------------------------
 
 ROM_START(tube_80286)
-	ROM_REGION(0x4000, "bootstrap", 0)
+	ROM_REGION16_LE(0x4000, "bootstrap", 0)
 	ROM_LOAD16_BYTE("m512_lo.ic31", 0x0000, 0x2000, CRC(c0df8707) SHA1(7f6d843d5aea6bdb36cbd4623ae942b16b96069d)) // 2201,287-02
 	ROM_LOAD16_BYTE("m512_hi.ic32", 0x0001, 0x2000, CRC(e47f10b2) SHA1(45dc8d7e7936afbec6de423569d9005a1c350316)) // 2201,288-02
 ROM_END

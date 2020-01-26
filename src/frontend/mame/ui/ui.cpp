@@ -843,7 +843,7 @@ void mame_ui_manager::process_natural_keyboard()
 	{
 		// if this was a UI_EVENT_CHAR event, post it
 		if (event.event_type == ui_event::IME_CHAR)
-			machine().ioport().natkeyboard().post(event.ch);
+			machine().ioport().natkeyboard().post_char(event.ch);
 	}
 
 	// process natural keyboard keys that don't get UI_EVENT_CHARs
@@ -866,7 +866,7 @@ void mame_ui_manager::process_natural_keyboard()
 			*key_down_ptr |= key_down_mask;
 
 			// post the key
-			machine().ioport().natkeyboard().post(UCHAR_MAMEKEY_BEGIN + code.item_id());
+			machine().ioport().natkeyboard().post_char(UCHAR_MAMEKEY_BEGIN + code.item_id());
 		}
 		else if (!pressed && (*key_down_ptr & key_down_mask))
 		{
@@ -1233,21 +1233,6 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	// toggle throttle?
 	if (machine().ui_input().pressed(IPT_UI_THROTTLE))
 		machine().video().toggle_throttle();
-
-	// toggle autofire
-	if (machine().ui_input().pressed(IPT_UI_TOGGLE_AUTOFIRE))
-	{
-		if (!machine().options().cheat())
-		{
-			machine().popmessage(_("Autofire can't be enabled"));
-		}
-		else
-		{
-			bool autofire_toggle = machine().ioport().get_autofire_toggle();
-			machine().ioport().set_autofire_toggle(!autofire_toggle);
-			machine().popmessage("Autofire %s", autofire_toggle ? _("Enabled") : _("Disabled"));
-		}
-	}
 
 	// check for fast forward
 	if (machine().ioport().type_pressed(IPT_UI_FAST_FORWARD))

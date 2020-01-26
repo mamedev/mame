@@ -22,6 +22,7 @@
 #include "svga_tseng.h"
 #include "svga_trident.h"
 #include "num9rev.h"
+#include "eis_hgb107x.h"
 
 // storage
 #include "fdc.h"
@@ -66,6 +67,7 @@
 #include "ne2000.h"
 #include "3c505.h"
 #include "eis_sad8852.h"
+#include "eis_twib.h"
 #include "np600.h"
 
 // communication ports
@@ -129,6 +131,7 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("chessmsr", ISA8_CHESSMSR);
 	device.option_add("finalchs", ISA8_FINALCHS);
 	device.option_add("epc_mda", ISA8_EPC_MDA);
+	device.option_add("epc_twib", ISA8_EIS_TWIB);
 }
 
 void pc_isa16_cards(device_slot_interface &device)
@@ -171,6 +174,7 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("chessmsr", ISA8_CHESSMSR);
 	device.option_add("finalchs", ISA8_FINALCHS);
 	device.option_add("epc_mda", ISA8_EPC_MDA);
+	device.option_add("epc_twib", ISA8_EIS_TWIB);
 	// 16-bit
 	device.option_add("ide", ISA16_IDE);
 	device.option_add("ne2000", NE2000);

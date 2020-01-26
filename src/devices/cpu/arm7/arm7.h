@@ -120,9 +120,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 3; }
-	virtual uint32_t execute_max_cycles() const override { return 4; }
-	virtual uint32_t execute_input_lines() const override { return 4; } /* There are actually only 2 input lines: we use 3 variants of the ABORT line while there is only 1 real one */
+	virtual uint32_t execute_min_cycles() const noexcept override { return 3; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 4; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 4; } /* There are actually only 2 input lines: we use 3 variants of the ABORT line while there is only 1 real one */
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -602,6 +602,13 @@ public:
 	arm710a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class arm710t_cpu_device : public arm7_cpu_device
+{
+public:
+	// construction/destruction
+	arm710t_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 class arm9_cpu_device : public arm7_cpu_device
 {
 public:
@@ -694,6 +701,7 @@ public:
 DECLARE_DEVICE_TYPE(ARM7,         arm7_cpu_device)
 DECLARE_DEVICE_TYPE(ARM7_BE,      arm7_be_cpu_device)
 DECLARE_DEVICE_TYPE(ARM710A,      arm710a_cpu_device)
+DECLARE_DEVICE_TYPE(ARM710T,      arm710t_cpu_device)
 DECLARE_DEVICE_TYPE(ARM7500,      arm7500_cpu_device)
 DECLARE_DEVICE_TYPE(ARM9,         arm9_cpu_device)
 DECLARE_DEVICE_TYPE(ARM920T,      arm920t_cpu_device)

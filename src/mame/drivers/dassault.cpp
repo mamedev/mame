@@ -538,8 +538,8 @@ void dassault_state::dassault(machine_config &config)
 	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
-//  config.m_minimum_quantum = attotime::from_hz(8400); /* 140 CPU slices per frame */
-	config.m_perfect_cpu_quantum = subtag("maincpu"); // I was seeing random lockups.. let's see if this helps
+//  config.set_maximum_quantum(attotime::from_hz(8400)); /* 140 CPU slices per frame */
+	config.set_perfect_quantum(m_maincpu); // I was seeing random lockups.. let's see if this helps
 
 	mb8421_mb8431_16_device &sharedram(MB8421_MB8431_16BIT(config, "sharedram"));
 	sharedram.intl_callback().set_inputline("maincpu", M68K_IRQ_5);

@@ -121,6 +121,8 @@ private:
 	required_device<e05a30_device> m_e05a30;
 	required_device<screen_device> m_screen;
 
+	output_finder<> m_online_led;
+
 	int m_93c06_clk;
 	int m_93c06_cs;
 	uint16_t m_printhead;

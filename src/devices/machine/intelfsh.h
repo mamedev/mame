@@ -20,6 +20,7 @@ public:
 		FLASH_FUJITSU_29F160T,
 		FLASH_FUJITSU_29F016A,
 		FLASH_FUJITSU_29DL16X,
+		FLASH_FUJITSU_29LV002TC,
 		FLASH_ATMEL_29C010,
 		FLASH_AMD_29F010,
 		FLASH_AMD_29F040,
@@ -48,6 +49,7 @@ public:
 		FLASH_INTEL_TE28F320,
 		FLASH_SHARP_LH28F320BF,
 		FLASH_INTEL_28F320J3D,
+		FLASH_SPANSION_S29GL064S,
 		FLASH_INTEL_28F320J5,
 		FLASH_SST_39VF400A,
 		FLASH_ATMEL_49F4096
@@ -159,6 +161,12 @@ class fujitsu_29dl16x_device : public intelfsh8_device
 {
 public:
 	fujitsu_29dl16x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+class fujitsu_29lv002tc_device : public intelfsh8_device
+{
+public:
+	fujitsu_29lv002tc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class atmel_29c010_device : public intelfsh8_device
@@ -300,6 +308,12 @@ public:
 	intel_te28f320_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class spansion_s29gl064s_device : public intelfsh16_device
+{
+public:
+	spansion_s29gl064s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 class intel_e28f400b_device : public intelfsh16_device
 {
 public:
@@ -352,6 +366,7 @@ DECLARE_DEVICE_TYPE(AMD_29LV200T,          amd_29lv200t_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29F160T,       fujitsu_29f160t_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29F016A,       fujitsu_29f016a_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29DL16X,       fujitsu_29dl16x_device)
+DECLARE_DEVICE_TYPE(FUJITSU_29LV002TC,     fujitsu_29lv002tc_device)
 DECLARE_DEVICE_TYPE(INTEL_E28F400B,        intel_e28f400b_device)
 DECLARE_DEVICE_TYPE(MACRONIX_29L001MC,     macronix_29l001mc_device)
 DECLARE_DEVICE_TYPE(MACRONIX_29LV160TMC,   macronix_29lv160tmc_device)
@@ -368,6 +383,7 @@ DECLARE_DEVICE_TYPE(INTEL_E28F008SA,       intel_e28f008sa_device)
 DECLARE_DEVICE_TYPE(INTEL_TE28F160,        intel_te28f160_device)
 DECLARE_DEVICE_TYPE(SHARP_LH28F160S3,      sharp_lh28f160s3_device)
 DECLARE_DEVICE_TYPE(INTEL_TE28F320,        intel_te28f320_device)
+DECLARE_DEVICE_TYPE(SPANSION_S29GL064S,    spansion_s29gl064s_device)
 DECLARE_DEVICE_TYPE(SHARP_LH28F320BF,      sharp_lh28f320bf_device)
 DECLARE_DEVICE_TYPE(INTEL_28F320J3D,       intel_28f320j3d_device)
 DECLARE_DEVICE_TYPE(INTEL_28F320J5,        intel_28f320j5_device)

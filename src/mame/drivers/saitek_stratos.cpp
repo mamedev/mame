@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert, hap
 // thanks-to:Berger
-/***************************************************************************
+/******************************************************************************
 
 SciSys/Saitek Stratos chesscomputer family (1987-1990)
 (SciSys renamed themselves to Saitek in 1987)
@@ -18,7 +18,17 @@ When not using -autosave, press that button before exiting MAME, or NVRAM can ge
 If that happens, the chesscomputer will become unresponsive on next boot. To force a
 cold boot, press ACL, then hold the PLAY button and press GO.
 
-*******************************************************************************
+TODO:
+- emulate LCD at lower level, probably an MCU with embedded LCDC
+- LCD status bit handling is guessed. stratos expects it to be high after lcd command 0xf,
+  but tking2 won't work if it's done that way, and corona is different too
+- irq timing is derived from the main XTAL, but result should be similar with 5MHz and 5.67MHz,
+  there are a couple of "FREQ. SEL" nodes on the PCB, maybe related (not the ones in input ports)
+- tking(old revisions) and stratos slow responsive buttons, related to irq timing, but if that's changed,
+  the led blinking and in-game clock is too fast
+- does nvram.u7 work? it's cleared during boot, but not used after
+
+===============================================================================
 
 Hardware notes:
 - W65C02 or R65C02 at 5MHz or ~5.6MHz (for latter, box says 6MHz but that's a marketing lie)
@@ -40,17 +50,7 @@ as such by the chesscomputer community. Saitek simply advertised them as an impr
 The initial Stratos/Turbo King (PRG ROM labels known: M,K,L,P) are probably engine version B,
 very few bytes difference between revisions. The first Corona is engine version C.
 
-TODO:
-- emulate LCD at lower level, probably an MCU with embedded LCDC
-- LCD status bit handling is guessed. stratos expects it to be high after lcd command 0xf,
-  but tking2 won't work if it's done that way, and corona is different too
-- irq timing is derived from the main XTAL, but result should be similar with 5MHz and 5.67MHz,
-  there are a couple of "FREQ. SEL" nodes on the PCB, maybe related (not the ones in input ports)
-- tking(old revisions) and stratos slow responsive buttons, related to irq timing, but if that's changed,
-  the led blinking and in-game clock is too fast
-- does nvram.u7 work? it's cleared during boot, but not used after
-
-***************************************************************************/
+******************************************************************************/
 
 #include "emu.h"
 #include "includes/saitek_stratos.h"
@@ -84,7 +84,7 @@ public:
 
 	int lcd_ready_r() { return m_lcd_ready ? 1 : 0; }
 
-	// machine drivers
+	// machine configs
 	void stratos(machine_config &config);
 	void tking(machine_config &config);
 	void tking2(machine_config &config);
@@ -485,7 +485,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void stratos_state::stratos(machine_config &config)

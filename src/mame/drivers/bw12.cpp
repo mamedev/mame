@@ -73,39 +73,14 @@ void bw12_state::bankswitch()
 	membank("bank1")->set_entry(m_bank);
 }
 
-void bw12_state::floppy_motor_off()
+TIMER_DEVICE_CALLBACK_MEMBER(bw12_state::floppy_motor_off_tick)
 {
+	if (m_motor0 || m_motor1)
+		return;
 	m_floppy0->mon_w(1);
 	m_floppy1->mon_w(1);
 
 	m_motor_on = 0;
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(bw12_state::floppy_motor_off_tick)
-{
-	floppy_motor_off();
-}
-
-void bw12_state::set_floppy_motor_off_timer()
-{
-	if (m_motor0 || m_motor1)
-	{
-		m_motor_on = 1;
-		m_floppy_timer->enable(false);
-	}
-	else
-	{
-		/* trigger floppy motor off NE556 timer */
-		/*
-
-		    R18 = RES_K(100)
-		    C11 = CAP_U(4.7)
-
-		*/
-
-		//m_floppy_timer->adjust(attotime::zero);
-		floppy_motor_off();
-	}
 }
 
 void bw12_state::write_ls259(int address, int data)
@@ -145,10 +120,16 @@ void bw12_state::write_ls259(int address, int data)
 		break;
 	}
 
-	m_motor_on = m_motor0 || m_motor1;
 
-	m_floppy0->mon_w(!m_motor_on);
-	m_floppy1->mon_w(!m_motor_on);
+	if (m_motor0 || m_motor1)
+	{
+		m_motor_on = 1;
+		m_floppy0->mon_w(0);
+		m_floppy1->mon_w(0);
+		m_floppy_timer->adjust(attotime::never);
+	}
+	else
+		m_floppy_timer->adjust(attotime::from_msec(170));
 }
 
 WRITE8_MEMBER( bw12_state::ls259_w )
@@ -684,8 +665,17 @@ ROM_END
 
 #define rom_bw14 rom_bw12
 
+ROM_START( bw14d )
+	ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_LOAD( "bw14boot.ic41", 0x0000, 0x1000, CRC(782fe341) SHA1(eefe5ad6b1ef77a1caf0af743b74de5fa1c4c19d) )
+
+	ROM_REGION(0x1000, "chargen", 0)
+	ROM_LOAD( "gcrd.bin",  0x0000, 0x1000, CRC(638f3e1d) SHA1(5a0b2f47c66fe8db6f58d348ac29074a4db51258) )
+ROM_END
+
 /* System Drivers */
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME       FLAGS */
 COMP( 1984, bw12, 0,      0,      bw12,    bw12,  bw12_state, empty_init, "Bondwell Holding", "Bondwell 12", MACHINE_SUPPORTS_SAVE )
 COMP( 1984, bw14, bw12,   0,      bw14,    bw12,  bw12_state, empty_init, "Bondwell Holding", "Bondwell 14", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, bw14d, 0,     0,      bw14,    bw12,  bw12_state, empty_init, "Bondwell Holding", "Bondwell Portable Computer Model 14 (German keyboard)", MACHINE_SUPPORTS_SAVE )

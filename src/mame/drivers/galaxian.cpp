@@ -667,6 +667,8 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+#include "audio/nl_konami.h"
+
 /*************************************
  *
  *  Interrupts
@@ -817,25 +819,25 @@ READ8_MEMBER(galaxian_state::konami_sound_timer_r)
 			0x0e;                   /* assume remaining bits are high, except B0 which is grounded */
 }
 
-
 WRITE8_MEMBER(galaxian_state::konami_sound_filter_w)
 {
-	if (m_discrete != nullptr)
+	if (m_netlist != nullptr)
 	{
 		/* the offset is used as data, 6 channels * 2 bits each */
-		/* AV0 .. AV5 ==> AY8910 #2 */
-		/* AV6 .. AV11 ==> AY8910 #1 */
+		/* AV0 .. AV5  ==> AY8910 #2 - 3C */
+		/* AV6 .. AV11 ==> AY8910 #1 - 3D */
 		for (int which = 0; which < 2; which++)
 		{
 			if (m_ay8910[which] != nullptr)
 			{
-				for (int chan = 0; chan < 3; chan++)
+				for (int flt = 0; flt < 6; flt++)
 				{
-					uint8_t bits = (offset >> (2 * chan + 6 * (1 - which))) & 3;
+					const int fltnum = (flt + 6 * which);
+					const uint8_t bit = (offset >> (flt + 6 * (1 - which))) & 1;
 
 					/* low bit goes to 0.22uF capacitor = 220000pF  */
 					/* high bit goes to 0.047uF capacitor = 47000pF */
-					m_discrete->write(NODE(3 * which + chan + 11), bits);
+					m_filter_ctl[fltnum]->write(bit);
 				}
 			}
 		}
@@ -5924,62 +5926,6 @@ static GFXDECODE_START(gfx_videight)
 GFXDECODE_END
 
 
-/*************************************
- *
- *  Sound configuration
- *
- *************************************/
-
-static const discrete_mixer_desc konami_sound_mixer_desc =
-	{DISC_MIXER_IS_OP_AMP,
-		{RES_K(5.1), RES_K(5.1), RES_K(5.1), RES_K(5.1), RES_K(5.1), RES_K(5.1)},
-		{0,0,0,0,0,0},  /* no variable resistors   */
-		{0,0,0,0,0,0},  /* no node capacitors      */
-		0, RES_K(2.2),
-		0,
-		0, /* modelled separately */
-		0, 1};
-
-static DISCRETE_SOUND_START( konami_sound_discrete )
-
-	DISCRETE_INPUTX_STREAM(NODE_01, 0, 1.0, 0)
-	DISCRETE_INPUTX_STREAM(NODE_02, 1, 1.0, 0)
-	DISCRETE_INPUTX_STREAM(NODE_03, 2, 1.0, 0)
-
-	DISCRETE_INPUTX_STREAM(NODE_04, 3, 1.0, 0)
-	DISCRETE_INPUTX_STREAM(NODE_05, 4, 1.0, 0)
-	DISCRETE_INPUTX_STREAM(NODE_06, 5, 1.0, 0)
-
-	DISCRETE_INPUT_DATA(NODE_11)
-	DISCRETE_INPUT_DATA(NODE_12)
-	DISCRETE_INPUT_DATA(NODE_13)
-
-	DISCRETE_INPUT_DATA(NODE_14)
-	DISCRETE_INPUT_DATA(NODE_15)
-	DISCRETE_INPUT_DATA(NODE_16)
-
-	DISCRETE_RCFILTER_SW(NODE_21, 1, NODE_01, NODE_11, AY8910_INTERNAL_RESISTANCE+1000, CAP_U(0.22), CAP_U(0.047), 0, 0)
-	DISCRETE_RCFILTER_SW(NODE_22, 1, NODE_02, NODE_12, AY8910_INTERNAL_RESISTANCE+1000, CAP_U(0.22), CAP_U(0.047), 0, 0)
-	DISCRETE_RCFILTER_SW(NODE_23, 1, NODE_03, NODE_13, AY8910_INTERNAL_RESISTANCE+1000, CAP_U(0.22), CAP_U(0.047), 0, 0)
-
-	DISCRETE_RCFILTER_SW(NODE_24, 1, NODE_04, NODE_14, AY8910_INTERNAL_RESISTANCE+1000, CAP_U(0.22), CAP_U(0.047), 0, 0)
-	DISCRETE_RCFILTER_SW(NODE_25, 1, NODE_05, NODE_15, AY8910_INTERNAL_RESISTANCE+1000, CAP_U(0.22), CAP_U(0.047), 0, 0)
-	DISCRETE_RCFILTER_SW(NODE_26, 1, NODE_06, NODE_16, AY8910_INTERNAL_RESISTANCE+1000, CAP_U(0.22), CAP_U(0.047), 0, 0)
-
-	DISCRETE_MIXER6(NODE_30, 1, NODE_21, NODE_22, NODE_23, NODE_24, NODE_25, NODE_26, &konami_sound_mixer_desc)
-
-	/* FIXME the amplifier M51516L has a decay circuit */
-	/* This is handled with sound_global_enable but    */
-	/* belongs here.                                   */
-
-	/* Input impedance of a M51516L is typically 30k (datasheet) */
-	DISCRETE_CRFILTER(NODE_40,NODE_30,RES_K(30),CAP_U(0.15))
-
-	DISCRETE_OUTPUT(NODE_40, 10.0 )
-
-DISCRETE_SOUND_END
-
-
 
 /*************************************
  *
@@ -6038,6 +5984,7 @@ void galaxian_state::konami_base(machine_config &config)
 	m_ppi8255[1]->out_pb_callback().set(FUNC(galaxian_state::konami_sound_control_w));
 	m_ppi8255[1]->in_pc_callback().set_ioport("IN3");
 	m_ppi8255[1]->out_pc_callback().set(FUNC(galaxian_state::konami_portc_1_w));
+
 }
 
 
@@ -6052,15 +5999,32 @@ void galaxian_state::konami_sound_1x_ay8910(machine_config &config)
 
 	/* sound hardware */
 	AY8910(config, m_ay8910[0], KONAMI_SOUND_CLOCK/8);
-	m_ay8910[0]->set_flags(AY8910_DISCRETE_OUTPUT);
-	m_ay8910[0]->set_resistors_load(RES_K(5.1), RES_K(5.1), RES_K(5.1));
+	m_ay8910[0]->set_flags(AY8910_RESISTOR_OUTPUT);
+	m_ay8910[0]->set_resistors_load(1000.0, 1000.0, 1000.0);
 	m_ay8910[0]->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	m_ay8910[0]->port_b_read_callback().set(FUNC(galaxian_state::frogger_sound_timer_r));
 	m_ay8910[0]->add_route(0, "konami", 1.0, 0);
 	m_ay8910[0]->add_route(1, "konami", 1.0, 1);
 	m_ay8910[0]->add_route(2, "konami", 1.0, 2);
 
-	DISCRETE(config, m_discrete, konami_sound_discrete).add_route(ALL_OUTPUTS, "speaker", 0.75);
+	NETLIST_SOUND(config, "konami", 48000)
+		.set_source(netlist_konami1x)
+		.add_route(ALL_OUTPUTS, "speaker", 1.0);
+
+	// Filter
+	NETLIST_LOGIC_INPUT(config, "konami:ctl0", "CTL0.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl1", "CTL1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl2", "CTL2.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl3", "CTL3.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl4", "CTL4.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl5", "CTL5.IN", 0);
+
+	// CHA1 - 3D
+	NETLIST_STREAM_INPUT(config, "konami:cin0", 0, "R_AY3D_A.R");
+	NETLIST_STREAM_INPUT(config, "konami:cin1", 1, "R_AY3D_B.R");
+	NETLIST_STREAM_INPUT(config, "konami:cin2", 2, "R_AY3D_C.R");
+
+	NETLIST_STREAM_OUTPUT(config, "konami:cout0", 0, "OUT").set_mult_offset(30000.0 / 0.05, 0.0);
 }
 
 
@@ -6075,8 +6039,8 @@ void galaxian_state::konami_sound_2x_ay8910(machine_config &config)
 
 	/* sound hardware */
 	AY8910(config, m_ay8910[0], KONAMI_SOUND_CLOCK/8);
-	m_ay8910[0]->set_flags(AY8910_DISCRETE_OUTPUT);
-	m_ay8910[0]->set_resistors_load(RES_K(5.1), RES_K(5.1), RES_K(5.1));
+	m_ay8910[0]->set_flags(AY8910_RESISTOR_OUTPUT);
+	m_ay8910[0]->set_resistors_load(1000.0, 1000.0, 1000.0);
 	m_ay8910[0]->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	m_ay8910[0]->port_b_read_callback().set(FUNC(galaxian_state::konami_sound_timer_r));
 	m_ay8910[0]->add_route(0, "konami", 1.0, 0);
@@ -6084,13 +6048,40 @@ void galaxian_state::konami_sound_2x_ay8910(machine_config &config)
 	m_ay8910[0]->add_route(2, "konami", 1.0, 2);
 
 	AY8910(config, m_ay8910[1], KONAMI_SOUND_CLOCK/8);
-	m_ay8910[1]->set_flags(AY8910_DISCRETE_OUTPUT);
-	m_ay8910[1]->set_resistors_load(RES_K(5.1), RES_K(5.1), RES_K(5.1));
+	m_ay8910[1]->set_flags(AY8910_RESISTOR_OUTPUT);
+	m_ay8910[1]->set_resistors_load(1000.0, 1000.0, 1000.0);
 	m_ay8910[1]->add_route(0, "konami", 1.0, 3);
 	m_ay8910[1]->add_route(1, "konami", 1.0, 4);
 	m_ay8910[1]->add_route(2, "konami", 1.0, 5);
 
-	DISCRETE(config, m_discrete, konami_sound_discrete).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	NETLIST_SOUND(config, "konami", 48000)
+		.set_source(netlist_konami2x)
+		.add_route(ALL_OUTPUTS, "speaker", 1.0);
+
+	// Filter
+	NETLIST_LOGIC_INPUT(config, "konami:ctl0", "CTL0.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl1", "CTL1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl2", "CTL2.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl3", "CTL3.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl4", "CTL4.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl5", "CTL5.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl6", "CTL6.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl7", "CTL7.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl8", "CTL8.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl9", "CTL9.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl10", "CTL10.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "konami:ctl11", "CTL11.IN", 0);
+
+	// CHA1 - 3D
+	NETLIST_STREAM_INPUT(config, "konami:cin0", 0, "R_AY3D_A.R");
+	NETLIST_STREAM_INPUT(config, "konami:cin1", 1, "R_AY3D_B.R");
+	NETLIST_STREAM_INPUT(config, "konami:cin2", 2, "R_AY3D_C.R");
+
+	// CHA2 - 3C
+	NETLIST_STREAM_INPUT(config, "konami:cin3", 3, "R_AY3C_A.R");
+	NETLIST_STREAM_INPUT(config, "konami:cin4", 4, "R_AY3C_B.R");
+	NETLIST_STREAM_INPUT(config, "konami:cin5", 5, "R_AY3C_C.R");
+	NETLIST_STREAM_OUTPUT(config, "konami:cout0", 0, "OUT").set_mult_offset(30000.0 / 0.05, 0.0);
 }
 
 
@@ -6115,9 +6106,7 @@ void galaxian_state::galaxian(machine_config &config)
 {
 	galaxian_base(config);
 
-	GALAXIAN(config, "cust", 0).add_route(ALL_OUTPUTS, "speaker", 0.4);
-
-	DISCRETE(config, GAL_AUDIO, galaxian_discrete).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	GALAXIAN_SOUND(config, "cust", 0);
 }
 
 void galaxian_state::victoryc(machine_config &config)
@@ -6199,9 +6188,7 @@ void galaxian_state::mooncrst(machine_config &config)
 	// alternate memory map
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::mooncrst_map);
 
-	GALAXIAN(config, "cust", 0).add_route(ALL_OUTPUTS, "speaker", 0.4);
-
-	DISCRETE(config, GAL_AUDIO, mooncrst_discrete).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	MOONCRST_SOUND(config, "cust", 0);
 }
 
 void galaxian_state::eagle(machine_config &config)
@@ -6250,7 +6237,6 @@ void galaxian_state::fantastc(machine_config &config)
 
 	// sound hardware
 	AY8910(config, m_ay8910[0], GALAXIAN_PIXEL_CLOCK/3/2).add_route(ALL_OUTPUTS, "speaker", 0.25); // 3.072MHz
-
 	AY8910(config, m_ay8910[1], GALAXIAN_PIXEL_CLOCK/3/2).add_route(ALL_OUTPUTS, "speaker", 0.25); // 3.072MHz
 }
 
@@ -6374,6 +6360,7 @@ void galaxian_state::frogger(machine_config &config)
 void galaxian_state::froggermc(machine_config &config)
 {
 	galaxian_base(config);
+
 	konami_sound_1x_ay8910(config);
 
 	// alternate memory map
@@ -6701,10 +6688,6 @@ void galaxian_state::turpins(machine_config &config) // the ROMs came from a bli
 void galaxian_state::anteater(machine_config &config)
 {
 	scobra(config);
-
-	/* quiet down the sounds */
-	m_discrete->reset_routes();
-	m_discrete->add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
@@ -7573,15 +7556,22 @@ void galaxian_state::init_scramble()
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, nullptr, nullptr);
 }
 
-void galaxian_state::init_mandinga()
+void galaxian_state::init_mandingaeg()
 {
 	init_scramble();
 
 	/* watchdog is in a different location */
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	watchdog_timer_device *wdog = subdevice<watchdog_timer_device>("watchdog");
-	space.unmap_read(0x7000, 0x7000, 0x7ff);
 	space.install_read_handler(0x6800, 0x6800, 0, 0x7ff, 0, read8mo_delegate(*wdog, FUNC(watchdog_timer_device::reset_r)));
+}
+
+void galaxian_state::init_mandinga()
+{
+	init_mandingaeg();
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	space.unmap_read(0x7000, 0x7000, 0x7ff);
 }
 
 void galaxian_state::init_sfx()
@@ -11264,6 +11254,29 @@ ROM_START( mandinga )
 	ROM_LOAD( "6e.bin",       0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) ) // 82s123
 ROM_END
 
+ROM_START( mandingaeg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "eg-01.2c", 0x0000, 0x0800, CRC(9e765a39) SHA1(5e6ddd2f929304cb01b4130fb54f24df70c0c5f5) ) // AM4716
+	ROM_LOAD( "eg-02.2e", 0x0800, 0x0800, CRC(4c64161e) SHA1(5b2e49ff915295617671b13f15b566046a5dbc15) ) // MBM2716
+	ROM_LOAD( "eg-03.2f", 0x1000, 0x0800, CRC(b3987a72) SHA1(1d72e9ae3005029628c6f9beb6ca65afcb1f7893) ) // HN462716G
+	ROM_LOAD( "eg-04.2h", 0x1800, 0x0800, CRC(29873461) SHA1(7d0ee9a82f02163b4cc6a7097e88ae34e96ebf58) ) // i2716
+	ROM_LOAD( "eg-05.2j", 0x2000, 0x0800, CRC(a684578c) SHA1(a71c06cc87fa7c64b49433a8d25a480c26a2d700) ) // MB8516
+	ROM_LOAD( "eg-06.2l", 0x2800, 0x0800, CRC(5382f7ed) SHA1(425ec2c2caf404fc8ab13ee38d6567413022e1a1) ) // AM2716
+	ROM_LOAD( "eg-07.2m", 0x3000, 0x0800, CRC(1d7109e9) SHA1(e0d24475547bbe5a94b45be6abefb84ad84d2534) ) // TMS2516
+	ROM_LOAD( "eg-08.2p", 0x3800, 0x0800, CRC(cf52fb24) SHA1(420c0cd0543e59d9698b14547d23bd38210439ff) ) // TMS2516
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "eg-m11s.5c", 0x0000, 0x1000, BAD_DUMP CRC(8ca7b750) SHA1(4f4c2915503b85abe141d717fd254ee10c9da99e) ) // TMS2532, ROM corrupted, using the one from amidars for now
+	ROM_LOAD( "eg-m12s.5d", 0x1000, 0x1000, CRC(9b5bdc0a) SHA1(84d953618c8bf510d23b42232a856ac55f1baff5) ) // TMS2532
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "eg-09.5f", 0x0000, 0x0800, CRC(09ed5818) SHA1(69dce85228b2c9176d4be429f530410350a1c76c) ) // MB8516
+	ROM_LOAD( "eg-10.5h", 0x0800, 0x0800, CRC(3029f94f) SHA1(3b432b42e79f8b0a7d65e197f373a04e3c92ff20) ) // MB8516
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "eg-mb7051.6e", 0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) ) // Dumped as 82s123
+ROM_END
+
 ROM_START( mandingarf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2716-mg1.bin",  0x0000, 0x0800, CRC(a684a494) SHA1(76885bb3bdab09f46c7daa25164a2fdaa744742f) ) // 2716
@@ -12892,28 +12905,29 @@ GAME( 1981, froggeram,   frogger,  froggeram,  froggeram,  galaxian_state, init_
 // Turtles based hardware
 // CPU/Video Board: KT-4108-2
 // Sound Board:     KT-4108-1
-GAME( 1981, turtles,     0,        turtles,    turtles,    galaxian_state, init_turtles,    ROT90,  "Konami (Stern Electronics license)", "Turtles", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, turpin,      turtles,  turtles,    turpin,     galaxian_state, init_turtles,    ROT90,  "Konami (Sega license)", "Turpin", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, 600,         turtles,  turtles,    turtles,    galaxian_state, init_turtles,    ROT90,  "Konami", "600", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, turpins,     turtles,  turpins,    turtles,    galaxian_state, init_turtles,    ROT90,  "bootleg", "Turpin (bootleg on Super Cobra hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // needs different sound timer
+GAME( 1981, turtles,     0,        turtles,    turtles,    galaxian_state, init_turtles,    ROT90,  "Konami (Stern Electronics license)", "Turtles",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1981, turpin,      turtles,  turtles,    turpin,     galaxian_state, init_turtles,    ROT90,  "Konami (Sega license)",              "Turpin",                                   MACHINE_SUPPORTS_SAVE )
+GAME( 1981, 600,         turtles,  turtles,    turtles,    galaxian_state, init_turtles,    ROT90,  "Konami",                             "600",                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1981, turpins,     turtles,  turpins,    turtles,    galaxian_state, init_turtles,    ROT90,  "bootleg",                            "Turpin (bootleg on Super Cobra hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // needs different sound timer
 
-GAME( 1982, amidar,      0,        turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "Konami", "Amidar", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, amidar1,     amidar,   turtles,    amidar,     galaxian_state, init_turtles,    ROT90,  "Konami", "Amidar (older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, amidaru,     amidar,   turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "Konami (Stern Electronics license)", "Amidar (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, amidaro,     amidar,   turtles,    amidaro,    galaxian_state, init_turtles,    ROT90,  "Konami (Olympia license)", "Amidar (Olympia)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, amidarb,     amidar,   turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "bootleg", "Amidar (bootleg)", MACHINE_SUPPORTS_SAVE ) /* similar to Amigo bootleg */
-GAME( 1982, amigo,       amidar,   turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "bootleg", "Amigo (bootleg of Amidar, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, amigo2,      amidar,   amigo2,     amidaru,    galaxian_state, init_amigo2,     ROT90,  "bootleg", "Amigo (bootleg of Amidar, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // sound timer might be different?
-GAME( 1982, amidars,     amidar,   scramble,   amidars,    galaxian_state, init_scramble,   ROT90,  "Konami", "Amidar (Scramble hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mandinga,    amidar,   scramble,   amidars,    galaxian_state, init_mandinga,   ROT90,  "bootleg (Artemi)", "Mandinga (bootleg of Amidar)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // color PROM needs bitswap<8> on addressing, reference: http://www.youtube.com/watch?v=6uGK4AZxV2U
-GAME( 1982, mandingarf,  amidar,   mandingarf, mandingarf, galaxian_state, init_galaxian,   ROT90,  "bootleg (Recreativos Franco S.A.)", "Mandanga (bootleg of Mandinga on Galaxian hardware, set 1)", MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // assume same issue as mandinga
-GAME( 1982, mandingac,   amidar,   mandingarf, mandingarf, galaxian_state, init_galaxian,   ROT90,  "bootleg (Centromatic)", "Mandanga (bootleg of Mandinga on Galaxian hardware, set 2)", MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // assume same issue as mandinga
+GAME( 1982, amidar,      0,        turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "Konami",                             "Amidar",                                                     MACHINE_SUPPORTS_SAVE )
+GAME( 1981, amidar1,     amidar,   turtles,    amidar,     galaxian_state, init_turtles,    ROT90,  "Konami",                             "Amidar (older)",                                             MACHINE_SUPPORTS_SAVE )
+GAME( 1982, amidaru,     amidar,   turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "Konami (Stern Electronics license)", "Amidar (Stern Electronics)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1982, amidaro,     amidar,   turtles,    amidaro,    galaxian_state, init_turtles,    ROT90,  "Konami (Olympia license)",           "Amidar (Olympia)",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, amidarb,     amidar,   turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "bootleg",                            "Amidar (bootleg)",                                           MACHINE_SUPPORTS_SAVE ) /* similar to Amigo bootleg */
+GAME( 1982, amigo,       amidar,   turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "bootleg",                            "Amigo (bootleg of Amidar, set 1)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, amigo2,      amidar,   amigo2,     amidaru,    galaxian_state, init_amigo2,     ROT90,  "bootleg",                            "Amigo (bootleg of Amidar, set 2)",                           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // sound timer might be different?
+GAME( 1982, amidars,     amidar,   scramble,   amidars,    galaxian_state, init_scramble,   ROT90,  "Konami",                             "Amidar (Scramble hardware)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mandinga,    amidar,   scramble,   amidars,    galaxian_state, init_mandinga,   ROT90,  "bootleg (Artemi)",                   "Mandinga (Artemi bootleg of Amidar)",                        MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // color PROM needs bitswap<8> on addressing, reference: http://www.youtube.com/watch?v=6uGK4AZxV2U
+GAME( 1982, mandingaeg,  amidar,   scramble,   amidars,    galaxian_state, init_mandingaeg, ROT90,  "bootleg (Electrogame S.A.)",         "Mandinga (Electrogame S.A. bootleg of Amidar)",              MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mandingarf,  amidar,   mandingarf, mandingarf, galaxian_state, init_galaxian,   ROT90,  "bootleg (Recreativos Franco S.A.)",  "Mandanga (bootleg of Mandinga on Galaxian hardware, set 1)", MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // assume same issue as mandinga
+GAME( 1982, mandingac,   amidar,   mandingarf, mandingarf, galaxian_state, init_galaxian,   ROT90,  "bootleg (Centromatic)",              "Mandanga (bootleg of Mandinga on Galaxian hardware, set 2)", MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // assume same issue as mandinga
 
 
 /* The End/Scramble based hardware */
-GAME( 1980, theend,      0,        theend,     theend,     galaxian_state, init_theend,     ROT90,  "Konami", "The End", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, theends,     theend,   theend,     theend,     galaxian_state, init_theend,     ROT90,  "Konami (Stern Electronics license)", "The End (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, takeoff,     theend,   takeoff,    explorer,   galaxian_state, init_explorer,   ROT90,  "bootleg (Sidam)", "Take Off (bootleg of The End)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // colors likely need bitswap<8> somewhere; needs different sound timer. reference: https://www.youtube.com/watch?v=iPYX3yJORTE
+GAME( 1980, theend,      0,        theend,     theend,     galaxian_state, init_theend,     ROT90,  "Konami",                             "The End",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1980, theends,     theend,   theend,     theend,     galaxian_state, init_theend,     ROT90,  "Konami (Stern Electronics license)", "The End (Stern Electronics)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1981, takeoff,     theend,   takeoff,    explorer,   galaxian_state, init_explorer,   ROT90,  "bootleg (Sidam)",                    "Take Off (bootleg of The End)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // colors likely need bitswap<8> somewhere; needs different sound timer. reference: https://www.youtube.com/watch?v=iPYX3yJORTE
 
 GAME( 1981, scramble,    0,        scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "Konami",                             "Scramble",                                               MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scrambles,   scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "Konami (Stern Electronics license)", "Scramble (Stern Electronics set 1)",                     MACHINE_SUPPORTS_SAVE )

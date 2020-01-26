@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#include <string.h>
-#include <assert.h>
+#include <cstring>
+#include <cassert>
 #include "flopimg.h"
 
 #define CQM_HEADER_SIZE 133

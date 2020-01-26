@@ -284,11 +284,11 @@ void ultrsprt_state::ultrsprt(machine_config &config)
 /*****************************************************************************/
 
 ROM_START( fiveside )
-	ROM_REGION(0x200000, "program", 0) /* PowerPC program ROMs */
-	ROM_LOAD32_BYTE("479uaa01.bin", 0x000003, 0x80000, CRC(1bc4893d) SHA1(2c9df38ecb7efa7b686221ee98fa3aad9a63e152))
-	ROM_LOAD32_BYTE("479uaa02.bin", 0x000002, 0x80000, CRC(ae74a6d0) SHA1(6113c2eea1628b22737c7b87af0e673d94984e88))
-	ROM_LOAD32_BYTE("479uaa03.bin", 0x000001, 0x80000, CRC(5c0b176f) SHA1(9560259bc081d4cfd72eb485c3fdcecf484ba7a8))
-	ROM_LOAD32_BYTE("479uaa04.bin", 0x000000, 0x80000, CRC(01a3e4cb) SHA1(819df79909d57fa12481698ffdb32b00586131d8))
+	ROM_REGION32_BE(0x200000, "program", 0) /* PowerPC program ROMs */
+	ROM_LOAD32_BYTE("479uaa01.bin", 0x000000, 0x80000, CRC(1bc4893d) SHA1(2c9df38ecb7efa7b686221ee98fa3aad9a63e152))
+	ROM_LOAD32_BYTE("479uaa02.bin", 0x000001, 0x80000, CRC(ae74a6d0) SHA1(6113c2eea1628b22737c7b87af0e673d94984e88))
+	ROM_LOAD32_BYTE("479uaa03.bin", 0x000002, 0x80000, CRC(5c0b176f) SHA1(9560259bc081d4cfd72eb485c3fdcecf484ba7a8))
+	ROM_LOAD32_BYTE("479uaa04.bin", 0x000003, 0x80000, CRC(01a3e4cb) SHA1(819df79909d57fa12481698ffdb32b00586131d8))
 
 	ROM_REGION(0x20000, "audiocpu", 0) /* M68K program */
 	ROM_LOAD("479_a05.bin", 0x000000, 0x20000, CRC(251ae299) SHA1(5ffd74357e3c6ddb3a208c39a3b32b53fea90282))

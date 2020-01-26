@@ -14,7 +14,7 @@
 #include "debugvw.h"
 #include "textbuf.h"
 #include "debugger.h"
-#include <ctype.h>
+#include <cctype>
 #include <fstream>
 
 /***************************************************************************
@@ -37,7 +37,6 @@ debugger_console::debugger_console(running_machine &machine)
 	: m_machine(machine)
 	, m_console_textbuf(nullptr)
 	, m_errorlog_textbuf(nullptr)
-	, m_commandlist(nullptr)
 {
 	/* allocate text buffers */
 	m_console_textbuf = text_buffer_alloc(CONSOLE_BUF_SIZE, CONSOLE_MAX_LINES);
@@ -84,7 +83,7 @@ void debugger_console::exit()
 	m_errorlog_textbuf = nullptr;
 
 	/* free the command list */
-	m_commandlist = nullptr;
+	m_commandlist.clear();
 }
 
 
@@ -95,24 +94,29 @@ void debugger_console::exit()
 
 ***************************************************************************/
 
+debugger_console::debug_command::debug_command(const char *_command, u32 _flags, int _ref, int _minparams, int _maxparams, std::function<void(int, const std::vector<std::string> &)> _handler)
+	: params(nullptr), help(nullptr), handler(_handler), flags(_flags), ref(_ref), minparams(_minparams), maxparams(_maxparams)
+{
+	strcpy(command, _command);
+}
+
+
 /*------------------------------------------------------------
     execute_help_custom - execute the helpcustom command
 ------------------------------------------------------------*/
 
 void debugger_console::execute_help_custom(int ref, const std::vector<std::string> &params)
 {
-	debug_command *cmd = m_commandlist;
 	char buf[64];
-	while (cmd)
+	for (const debug_command &cmd : m_commandlist)
 	{
-		if (cmd->flags & CMDFLAG_CUSTOM_HELP)
+		if (cmd.flags & CMDFLAG_CUSTOM_HELP)
 		{
-			snprintf(buf, 63, "%s help", cmd->command);
+			snprintf(buf, 63, "%s help", cmd.command);
 			buf[63] = 0;
 			char *temp_params[1] = { buf };
 			internal_execute_command(true, 1, &temp_params[0]);
 		}
-		cmd = cmd->next;
 	}
 }
 
@@ -181,7 +185,6 @@ void debugger_console::trim_parameter(char **paramptr, bool keep_quotes)
 
 CMDERR debugger_console::internal_execute_command(bool execute, int params, char **param)
 {
-	debug_command *cmd, *found = nullptr;
 	int i, foundcount = 0;
 	char *p, *command;
 	size_t len;
@@ -210,12 +213,13 @@ CMDERR debugger_console::internal_execute_command(bool execute, int params, char
 
 	/* search the command list */
 	len = strlen(command);
-	for (cmd = m_commandlist; cmd != nullptr; cmd = cmd->next)
-		if (!strncmp(command, cmd->command, len))
+	debug_command *found = nullptr;
+	for (debug_command &cmd : m_commandlist)
+		if (!strncmp(command, cmd.command, len))
 		{
 			foundcount++;
-			found = cmd;
-			if (strlen(cmd->command) == len)
+			found = &cmd;
+			if (strlen(cmd.command) == len)
 			{
 				foundcount = 1;
 				break;
@@ -404,19 +408,8 @@ void debugger_console::register_command(const char *command, u32 flags, int ref,
 	if (!(m_machine.debug_flags & DEBUG_FLAG_ENABLED))
 		throw emu_fatalerror("Cannot call debugger_console::register_command() when debugger is not running");
 
-	debug_command *cmd = auto_alloc_clear(m_machine, <debug_command>());
-
-	/* fill in the command */
-	strcpy(cmd->command, command);
-	cmd->flags = flags;
-	cmd->ref = ref;
-	cmd->minparams = minparams;
-	cmd->maxparams = maxparams;
-	cmd->handler = handler;
-
-	/* link it */
-	cmd->next = m_commandlist;
-	m_commandlist = cmd;
+	assert(strlen(command) < 32);
+	m_commandlist.emplace_front(command, flags, ref, minparams, maxparams, handler);
 }
 
 

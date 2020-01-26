@@ -20,7 +20,7 @@
 #include "debugvw.h"
 #include "natkeyboard.h"
 #include "render.h"
-#include <ctype.h>
+#include <cctype>
 #include <algorithm>
 #include <fstream>
 
@@ -114,16 +114,16 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	/* add all single-entry save state globals */
 	for (int itemnum = 0; itemnum < MAX_GLOBALS; itemnum++)
 	{
-		u32 valsize, valcount;
 		void *base;
+		u32 valsize, valcount, blockcount, stride;
 
 		/* stop when we run out of items */
-		const char* name = m_machine.save().indexed_item(itemnum, base, valsize, valcount);
-		if (name == nullptr)
+		const char* name = m_machine.save().indexed_item(itemnum, base, valsize, valcount, blockcount, stride);
+		if (!name)
 			break;
 
 		/* if this is a single-entry global, add it */
-		if (valcount == 1 && strstr(name, "/globals/"))
+		if ((valcount == 1) && (blockcount == 1) && strstr(name, "/globals/"))
 		{
 			char symname[100];
 			sprintf(symname, ".%s", strrchr(name, '/') + 1);
@@ -169,6 +169,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("observe",   CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_observe, this, _1, _2));
 	m_console.register_command("suspend",   CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_suspend, this, _1, _2));
 	m_console.register_command("resume",    CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_resume, this, _1, _2));
+	m_console.register_command("cpulist",   CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_cpulist, this, _1, _2));
 
 	m_console.register_command("comadd",    CMDFLAG_NONE, 0, 1, 2, std::bind(&debugger_commands::execute_comment_add, this, _1, _2));
 	m_console.register_command("//",        CMDFLAG_NONE, 0, 1, 2, std::bind(&debugger_commands::execute_comment_add, this, _1, _2));
@@ -1175,6 +1176,21 @@ void debugger_commands::execute_resume(int ref, const std::vector<std::string> &
 			devicelist[paramnum]->debug()->suspend(false);
 			m_console.printf("Resumed device '%s'\n", devicelist[paramnum]->tag());
 		}
+	}
+}
+
+//-------------------------------------------------
+//  execute_cpulist - list all CPUs
+//-------------------------------------------------
+
+void debugger_commands::execute_cpulist(int ref, const std::vector<std::string> &params)
+{
+	int index = 0;
+	for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
+	{
+		device_state_interface *state;
+		if (exec.device().interface(state) && state->state_find_entry(STATE_GENPCBASE) != nullptr)
+			m_console.printf("[%s%d] %s\n", &exec.device() == m_cpu.get_visible_cpu() ? "*" : "", index++, exec.device().tag());
 	}
 }
 
@@ -3103,7 +3119,7 @@ void debugger_commands::execute_snap(int ref, const std::vector<std::string> &pa
 		if (fname.find(".png") == -1)
 			fname.append(".png");
 		emu_file file(m_machine.options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		osd_file::error filerr = file.open(fname.c_str());
+		osd_file::error filerr = file.open(fname);
 
 		if (filerr != osd_file::error::NONE)
 		{

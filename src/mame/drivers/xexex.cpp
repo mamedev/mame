@@ -481,7 +481,7 @@ void xexex_state::xexex(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(32'000'000)/4); // Z80E 8Mhz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &xexex_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(1920);
+	config.set_maximum_quantum(attotime::from_hz(1920));
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 

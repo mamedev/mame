@@ -35,6 +35,8 @@ void isa8_chessmdr_device::device_start()
 {
 	set_isa_device();
 	m_installed = false;
+
+	save_item(NAME(m_installed));
 }
 
 

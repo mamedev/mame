@@ -11,19 +11,18 @@
 #include "emu.h"
 #include "a2052.h"
 
-
-//**************************************************************************
-//  CONSTANTS / MACROS
-//**************************************************************************
-
 #define VERBOSE 1
+#include "logmacro.h"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2052, a2052_device, "a2052", "CBM A2052 Fast Memory")
+DEFINE_DEVICE_TYPE_NS(ZORRO_A2052, bus::amiga::zorro, a2052_device, "zorro_a2052", "CBM A2052 Fast Memory")
+
+
+namespace bus { namespace amiga { namespace zorro {
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -52,7 +51,7 @@ ioport_constructor a2052_device::device_input_ports() const
 //-------------------------------------------------
 
 a2052_device::a2052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2052, tag, owner, clock),
+	device_t(mconfig, ZORRO_A2052, tag, owner, clock),
 	device_zorro2_card_interface(mconfig, *this),
 	m_config(*this, "config")
 {
@@ -64,7 +63,6 @@ a2052_device::a2052_device(const machine_config &mconfig, const char *tag, devic
 
 void a2052_device::device_start()
 {
-	set_zorro_device();
 }
 
 
@@ -74,11 +72,8 @@ void a2052_device::device_start()
 
 void a2052_device::autoconfig_base_address(offs_t address)
 {
-	if (VERBOSE)
-		logerror("%s('%s'): autoconfig_base_address received: 0x%06x\n", shortname(), basetag(), address);
-
-	if (VERBOSE)
-		logerror("-> installing a2052\n");
+	LOG("%s: autoconfig_base_address received: 0x%06x\n", shortname(), address);
+	LOG("-> installing a2052\n");
 
 	// stop responding to default autoconfig
 	m_slot->space().unmap_readwrite(0xe80000, 0xe8007f);
@@ -92,8 +87,7 @@ void a2052_device::autoconfig_base_address(offs_t address)
 
 WRITE_LINE_MEMBER( a2052_device::cfgin_w )
 {
-	if (VERBOSE)
-		logerror("%s('%s'): configin_w (%d)\n", shortname(), basetag(), state);
+	LOG("%s: configin_w (%d)\n", shortname(), state);
 
 	if (state == 0)
 	{
@@ -133,3 +127,5 @@ WRITE_LINE_MEMBER( a2052_device::cfgin_w )
 				write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 	}
 }
+
+} } } // namespace bus::amiga::zorro

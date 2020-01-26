@@ -138,6 +138,7 @@ something wrong in the disk geometry reported by calchase.chd (20,255,63) since 
 #include "machine/idectrl.h"
 #include "machine/pcshare.h"
 #include "machine/ds128x.h"
+#include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/pc_vga.h"
@@ -153,14 +154,23 @@ public:
 	{
 	}
 
+	void calchase(machine_config &config);
+	void hostinv(machine_config &config);
+	void init_calchase();
+	void init_hostinv();
+
+private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
 	std::unique_ptr<uint32_t[]> m_bios_ext_ram;
+	std::unique_ptr<uint8_t[]> m_nvram_data;
 	uint8_t m_mtxc_config_reg[256];
 	uint8_t m_piix4_config_reg[4][256];
 
 	uint32_t m_idle_skip_ram;
 	DECLARE_WRITE32_MEMBER(bios_ext_ram_w);
 	DECLARE_WRITE32_MEMBER(bios_ram_w);
+	uint8_t nvram_r(offs_t offset);
+	void nvram_w(offs_t offset, uint8_t data);
 	DECLARE_READ16_MEMBER(calchase_iocard1_r);
 	DECLARE_READ16_MEMBER(calchase_iocard2_r);
 	DECLARE_READ16_MEMBER(calchase_iocard3_r);
@@ -168,13 +178,10 @@ public:
 	DECLARE_READ16_MEMBER(calchase_iocard5_r);
 	DECLARE_READ32_MEMBER(calchase_idle_skip_r);
 	DECLARE_WRITE32_MEMBER(calchase_idle_skip_w);
-	void init_calchase();
-	void init_hostinv();
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
-	void calchase(machine_config &config);
-	void hostinv(machine_config &config);
 	void calchase_io(address_map &map);
 	void calchase_map(address_map &map);
 
@@ -360,6 +367,16 @@ WRITE32_MEMBER(calchase_state::bios_ext_ram_w)
 	}
 }
 
+uint8_t calchase_state::nvram_r(offs_t offset)
+{
+	return m_nvram_data[offset];
+}
+
+void calchase_state::nvram_w(offs_t offset, uint8_t data)
+{
+	m_nvram_data[offset] = data;
+}
+
 READ16_MEMBER(calchase_state::calchase_iocard1_r)
 {
 	return ioport("IOCARD1")->read();
@@ -402,8 +419,7 @@ void calchase_state::calchase_map(address_map &map)
 	map(0x000d0008, 0x000d000b).nopw(); // ???
 	map(0x000d0024, 0x000d0025).w("ldac", FUNC(dac_word_interface::data_w));
 	map(0x000d0028, 0x000d0029).w("rdac", FUNC(dac_word_interface::data_w));
-	map(0x000d0800, 0x000d0fff).rom().region("nvram", 0); //
-//  map(0x000d0800, 0x000d0fff).ram();  // GAME_CMOS
+	map(0x000d0800, 0x000d0fff).rw(FUNC(calchase_state::nvram_r), FUNC(calchase_state::nvram_w)); // GAME_CMOS
 
 	map(0x000e0000, 0x000effff).bankr("bios_ext").w(FUNC(calchase_state::bios_ext_ram_w));
 	map(0x000f0000, 0x000fffff).bankr("bios_bank").w(FUNC(calchase_state::bios_ram_w));
@@ -668,6 +684,9 @@ void calchase_state::machine_start()
 {
 	m_bios_ram = std::make_unique<uint32_t[]>(0x10000/4);
 	m_bios_ext_ram = std::make_unique<uint32_t[]>(0x10000/4);
+
+	m_nvram_data = std::make_unique<uint8_t[]>(0x800);
+	subdevice<nvram_device>("nvram")->set_base(m_nvram_data.get(), 0x800);
 }
 
 void calchase_state::machine_reset()
@@ -692,6 +711,8 @@ void calchase_state::calchase(machine_config &config)
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
 	pcibus.set_device(0, FUNC(calchase_state::intel82439tx_pci_r), FUNC(calchase_state::intel82439tx_pci_w));
 	pcibus.set_device(7, FUNC(calchase_state::intel82371ab_pci_r), FUNC(calchase_state::intel82371ab_pci_w));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // DS1220Y
 
 	/* video hardware */
 	pcvideo_trident_vga(config);
@@ -725,6 +746,8 @@ void calchase_state::hostinv(machine_config &config)
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
 	pcibus.set_device(0, FUNC(calchase_state::intel82439tx_pci_r), FUNC(calchase_state::intel82439tx_pci_w));
 	pcibus.set_device(7, FUNC(calchase_state::intel82371ab_pci_r), FUNC(calchase_state::intel82371ab_pci_w));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // DS1220Y
 
 	/* video hardware */
 	pcvideo_trident_vga(config);
@@ -770,10 +793,10 @@ void calchase_state::init_hostinv()
 }
 
 ROM_START( calchase )
-	ROM_REGION( 0x40000, "bios", 0 )
+	ROM_REGION32_LE( 0x40000, "bios", 0 )
 	ROM_LOAD( "mb_bios.bin", 0x00000, 0x20000, CRC(dea7a51b) SHA1(e2028c00bfa6d12959fc88866baca8b06a1eab68) )
 
-	ROM_REGION( 0x8000, "video_bios", 0 )
+	ROM_REGION32_LE( 0x8000, "video_bios", 0 )
 	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
 	ROM_CONTINUE(                                 0x0001, 0x4000 )
 
@@ -785,10 +808,10 @@ ROM_START( calchase )
 ROM_END
 
 ROM_START( hostinv )
-	ROM_REGION( 0x40000, "bios", 0 )
+	ROM_REGION32_LE( 0x40000, "bios", 0 )
 	ROM_LOAD( "hostinv_bios.bin", 0x000000, 0x020000, CRC(5111e4b8) SHA1(20ab93150b61fd068f269368450734bba5dcb284) )
 
-	ROM_REGION( 0x8000, "video_bios", 0 )
+	ROM_REGION32_LE( 0x8000, "video_bios", 0 )
 	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
 	ROM_CONTINUE(                                 0x0001, 0x4000 )
 
@@ -800,10 +823,10 @@ ROM_START( hostinv )
 ROM_END
 
 ROM_START( eggsplc )
-	ROM_REGION( 0x40000, "bios", 0 )
+	ROM_REGION32_LE( 0x40000, "bios", 0 )
 	ROM_LOAD( "hostinv_bios.bin", 0x000000, 0x020000, CRC(5111e4b8) SHA1(20ab93150b61fd068f269368450734bba5dcb284) )
 
-	ROM_REGION( 0x8000, "video_bios", 0 )
+	ROM_REGION32_LE( 0x8000, "video_bios", 0 )
 	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
 	ROM_CONTINUE(                                 0x0001, 0x4000 )
 

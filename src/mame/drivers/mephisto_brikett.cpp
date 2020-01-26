@@ -91,7 +91,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { if (newval) machine_reset(); }
 	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
 
-	// machine drivers
+	// machine configs
 	void mephisto(machine_config &config);
 	void mephisto2(machine_config &config);
 	void mephisto2e(machine_config &config);
@@ -251,6 +251,7 @@ READ8_MEMBER(brikett_state::input_r)
 
 WRITE8_MEMBER(brikett_state::esb_w)
 {
+	// CDP1852 SR + DO0-DO7 goes to external port, to chessboard
 	if (!m_inputs[5].read_safe(0))
 	{
 		// chessboard disabled
@@ -258,14 +259,14 @@ WRITE8_MEMBER(brikett_state::esb_w)
 		return;
 	}
 
-	// CDP1852 SR clocks CD4017, goes to external port together with DO0-DO7
+	// SR clocks CD4017
 	// 4017 Q0: N/C
 	// 4017 Q1 + d0-d7: 74374 to led data
 	// 4017 Q2 + d0-d7: 74373 to row select
 	// 4017 Q2-Q9: column select
 	m_esb_select = (m_esb_select + 1) % 10;
 
-	// d0-d7 ANDed together: 4017 reset
+	// DO0-DO7 ANDed together: 4017 reset
 	if (data == 0xff)
 		m_esb_select = 0;
 
@@ -405,7 +406,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void brikett_state::mephisto(machine_config &config)

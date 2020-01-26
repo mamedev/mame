@@ -19,7 +19,7 @@ class vsmile_ctrl_port_device;
 
 // ======================> device_vsmile_ctrl_interface
 
-class device_vsmile_ctrl_interface : public device_slot_card_interface
+class device_vsmile_ctrl_interface : public device_interface
 {
 public:
 	virtual ~device_vsmile_ctrl_interface();
@@ -48,7 +48,7 @@ private:
 
 // ======================> vsmile_ctrl_port_device
 
-class vsmile_ctrl_port_device : public device_t, public device_slot_interface
+class vsmile_ctrl_port_device : public device_t, public device_single_card_slot_interface<device_vsmile_ctrl_interface>
 {
 public:
 	// configuration
@@ -74,7 +74,6 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_validity_check(validity_checker &valid) const override ATTR_COLD;
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 

@@ -3007,8 +3007,8 @@ ROM_START( lohtb2 )
 	ROM_LOAD16_BYTE( "loht-a12.bin", 0x60000, 0x10000, CRC(cfb0390d) SHA1(4acc61a51a7ae681bd8d835e2644b44c4d6d7bcb) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "loht-a26.bin",  0x00000, 0x01000, CRC(9fa9b496) SHA1(b529bcd7bf123894e11f2a8df8826932122e375a) ) // unprotected?? - same as original lohtj MCU
+	ROM_REGION( 0x10000, "mcu", 0 ) /* MCU running in external mode on daughtercard. Same data as lohtj just padded with 0xff */
+	ROM_LOAD( "loht-a26.bin",  0x00000, 0x02000, CRC(ac901e17) SHA1(70a73288d594c78ad2aca78ce55a699cb040bede) )
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "loht-a16.bin",  0x00000, 0x10000, CRC(df5ac5ee) SHA1(5b45417ada402047d97dfb6cee6545686ad26e37) )
@@ -3209,7 +3209,7 @@ ROM_END
  |  |74S74N   XTAL  74LS368AN     74LS132N    |      |                                           |___|
  |__________20.000MHz_________________________|      |_____________________________________________|
 
- Board 5                                             Sound Board (1/3)
+ Board 5                                             Sound Board 1/3
  _____________________________________________       ______________________________________________
  |                                            |      |                                             |
  | __________  ________ ________ ________     |      |  ________  ________  ________               |
@@ -3253,7 +3253,7 @@ IC64->PAL16R6A 74LS393N 74LS368AN 74LS377N |U||    |   |                        
 |__|                                          |    |___|        __________________________         |
  |____________________________________________|      |__________| |_|_|_|_|_|_|_|_|_|_|_| |________|
                                                                           PRE-JAMMA
- Board (6)
+ Board 7/4
  __________________________________________________________
  | _________  _________ __________  _________  _________ __|_
  | 74LS163AP| 74LS163AP||_GAL20V8_| |74S174N_| |74S189N_||   |
@@ -3269,10 +3269,10 @@ IC64->PAL16R6A 74LS393N 74LS368AN 74LS377N |U||    |   |                        
  |              7536      |____________| _________       |   |
  | _________  __________  _____________  |74S174N_|      |   |
  | |74LS283N| |74LS245P_| |KM62256AP-10| __________      |   |
- |                        |____________| |74LS245P_|     |   |
+ | _________  __________  |____________| |74LS245P_|     |   |
+ | |74LS20B1| |74LS245P_|                                |   |
  | _________  __________    __________   _________       |   |
  | |74LS20B1| |74LS374N_|   |74LS273P_|  |74LS74AP|      |   |
- |                                                       |   |
  | _________  __________    __________   _________       |___|
  | |74LS04N_| |_GAL16V8_|   |74LS374N_|  |74LS157N|        |
  |               7336                                      |
@@ -3306,9 +3306,9 @@ IC64->PAL16R6A 74LS393N 74LS368AN 74LS377N |U||    |   |                        
 ROM_START( loht_ms ) // really similar to lohtb, even if it runs on 'Modular Hardware'
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "6_lg_604.ic17", 0x00001, 0x10000, CRC(7e84b6ce) SHA1(a9a54f045917a191b6d6bbe061fc7a3344efb3bb) )
-	ROM_LOAD16_BYTE( "6_lg_604.ic20", 0x10001, 0x10000, CRC(abdcd211) SHA1(6ad79c4ef14d908032e4dbded7696a66fe5d31da) )
+	ROM_LOAD16_BYTE( "6_lg_605.ic20", 0x20001, 0x10000, CRC(abdcd211) SHA1(6ad79c4ef14d908032e4dbded7696a66fe5d31da) )
 	ROM_LOAD16_BYTE( "6_lg_601.ic8",  0x00000, 0x10000, CRC(7e080cb8) SHA1(598bcd8ecebe1922735b61cc1305e8839d9d054e) )
-	ROM_LOAD16_BYTE( "6_lg_602.ic11", 0x10000, 0x10000, CRC(150d1178) SHA1(71df3c9a49eb74cf40790e9b4cf7c6260fbd07d6) )
+	ROM_LOAD16_BYTE( "6_lg_602.ic11", 0x20000, 0x10000, CRC(150d1178) SHA1(71df3c9a49eb74cf40790e9b4cf7c6260fbd07d6) )
 	ROM_LOAD16_BYTE( "6_lg_606.ic26", 0x40001, 0x20000, CRC(714778b5) SHA1(e2eaa35d6b5fa5df5163fe0d7b45fa66667f9947) )
 	ROM_RELOAD(                       0xc0001, 0x20000 )
 	ROM_LOAD16_BYTE( "6_lg_603.ic25", 0x40000, 0x20000, CRC(2f049b03) SHA1(21047cb10912b1fc23795673af3ea7de249328b7) )

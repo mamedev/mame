@@ -102,7 +102,7 @@ private:
 	uint8_t m_outx;
 	uint8_t m_mpage;
 	uint8_t *m_combase_mb;
-	irmb_ops *m_mbops;
+	std::unique_ptr<irmb_ops[]> m_mbops;
 	const irmb_ops *m_irmb_stack[16];
 	uint32_t m_irmb_regs[16];
 	uint32_t m_irmb_latch;

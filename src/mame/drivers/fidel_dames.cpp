@@ -50,7 +50,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void dsc(machine_config &config);
 
 protected:
@@ -224,7 +224,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void dsc_state::dsc(machine_config &config)

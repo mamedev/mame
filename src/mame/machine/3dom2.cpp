@@ -8,9 +8,8 @@
 
 #include "emu.h"
 #include "3dom2.h"
-#include <algorithm> // std::min
-#include "screen.h"
 
+#include <algorithm> // std::min
 
 
 //**************************************************************************

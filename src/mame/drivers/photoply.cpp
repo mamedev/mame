@@ -200,7 +200,7 @@ void photoply_state::photoply_map(address_map &map)
 //  map(0x000c8000, 0x000cffff).rom().region("ex_bios", 0);
 	map(0x000c0000, 0x000fffff).rw(FUNC(photoply_state::bios_r), FUNC(photoply_state::bios_w));
 	map(0x00100000, 0x07ffffff).ram(); // 64MB RAM, guess!
-	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
+	map(0xfffe0000, 0xffffffff).lr8([this] (offs_t offset) { return m_main_bios[offset]; }, "bios_upper_r");
 }
 
 
@@ -372,3 +372,4 @@ ROM_END
 
 GAME( 199?, photoply,     0,  photoply, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2000 (v2.01)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
 GAME( 2004, photoply2k4,  0,  photoply, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2004", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+

@@ -439,7 +439,7 @@ void pwrview_state::pwrview(machine_config &config)
 }
 
 ROM_START(pwrview)
-	ROM_REGION(0x8000, "bios", 0)
+	ROM_REGION16_LE(0x8000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "bios", "bios")
 	ROMX_LOAD("215856-003.bin", 0x0000, 0x4000, CRC(1fa2cd11) SHA1(b4755c7d5200a423a750ecf71c0aed33e364138b), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("215856-004.bin", 0x0001, 0x4000, CRC(4fd01e0a) SHA1(c4d1d40d4e8e529c03857f4a3c8428ccf6b8ff99), ROM_SKIP(1) | ROM_BIOS(0))

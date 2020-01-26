@@ -336,7 +336,7 @@ void zaccaria_state::zaccaria(machine_config &config)
 	Z80(config, m_maincpu, XTAL(18'432'000)/6);   /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &zaccaria_state::main_map);
 
-//  config.m_minimum_quantum = attotime::from_hz(1000000);
+//  config.set_maximum_quantum(attotime::from_hz(1000000));
 
 	WATCHDOG_TIMER(config, "watchdog");
 

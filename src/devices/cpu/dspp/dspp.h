@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_DSPP_DSPP_H
+#define MAME_CPU_DSPP_DSPP_H
 
-#ifndef DEVICES_CPU_DSPP_DSPP_H
-#define DEVICES_CPU_DSPP_DSPP_H
+#pragma once
 
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
@@ -78,8 +78,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override;
-	virtual uint32_t execute_max_cycles() const override;
+	virtual uint32_t execute_min_cycles() const noexcept override;
+	virtual uint32_t execute_max_cycles() const noexcept override;
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -392,4 +392,4 @@ public: // TODO
 DECLARE_DEVICE_TYPE(DSPP, dspp_device);
 
 
-#endif // DEVICES_CPU_DSPP_DSPP_H
+#endif // MAME_CPU_DSPP_DSPP_H

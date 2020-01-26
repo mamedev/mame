@@ -60,24 +60,28 @@ unsp_device::unsp_device(const machine_config &mconfig, device_type type, const 
 	, m_enable_drc(false)
 {
 	m_iso = 10;
+	m_numregs = 8;
 }
 
 unsp_device::unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: unsp_device(mconfig, UNSP, tag, owner, clock, address_map_constructor())
 {
 	m_iso = 10;
+	m_numregs = 8;
 }
 
 unsp_11_device::unsp_11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: unsp_device(mconfig, UNSP_11, tag, owner, clock, address_map_constructor())
 {
 	m_iso = 11;
+	m_numregs = 8;
 }
 
 unsp_11_device::unsp_11_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal)
 	: unsp_device(mconfig, type, tag, owner, clock, internal)
 {
 	m_iso = 11;
+	m_numregs = 8;
 }
 
 
@@ -85,24 +89,28 @@ unsp_12_device::unsp_12_device(const machine_config &mconfig, const char *tag, d
 	: unsp_11_device(mconfig, UNSP_12, tag, owner, clock, address_map_constructor())
 {
 	m_iso = 12;
+	m_numregs = 8;
 }
 
 unsp_12_device::unsp_12_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal)
 	: unsp_11_device(mconfig, type, tag, owner, clock, internal)
 {
 	m_iso = 12;
+	m_numregs = 8;
 }
 
 unsp_20_device::unsp_20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: unsp_12_device(mconfig, UNSP_20, tag, owner, clock, address_map_constructor())
 {
 	m_iso = 20;
+	m_numregs = 16;
 }
 
 unsp_20_device::unsp_20_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal)
 	: unsp_12_device(mconfig, type, tag, owner, clock, internal)
 {
 	m_iso = 20;
+	m_numregs = 16;
 }
 
 unsp_device::~unsp_device()
@@ -120,6 +128,7 @@ char const* const unsp_device::bitops[] =
 	"tstb", "setb", "clrb", "invb"
 };
 
+// log/barrel shift
 char const* const unsp_device::lsft[] =
 {
 	"asr", "asror", "lsl", "lslor", "lsr", "lsror", "rol", "ror"
@@ -181,8 +190,11 @@ void unsp_device::unimplemented_opcode(uint16_t op, uint16_t ximm, uint16_t ximm
 
 void unsp_device::device_start()
 {
+
 	m_core = (internal_unsp_state *)m_cache.alloc_near(sizeof(internal_unsp_state));
 	memset(m_core, 0, sizeof(internal_unsp_state));
+
+	m_core->m_r.resize(m_numregs);
 
 #if ENABLE_UNSP_DRC
 	m_enable_drc = allow_drc() && (m_iso < 12);
@@ -264,15 +276,41 @@ void unsp_device::device_start()
 	set_icountptr(m_core->m_icount);
 }
 
+void unsp_20_device::device_start()
+{
+	unsp_12_device::device_start();
+
+#if UNSP_LOG_OPCODES || UNSP_LOG_REGS
+	int baseindex = UNSP_LOG_OPS + 1;
+#else
+	int baseindex = UNSP_SB + 1;
+#endif
+
+	state_add(baseindex + UNSP20_R8,     "R8", m_core->m_r[UNSP20_R8+8]).formatstr("%04X");
+	state_add(baseindex + UNSP20_R9,     "R9", m_core->m_r[UNSP20_R9+8]).formatstr("%04X");
+	state_add(baseindex + UNSP20_R10,    "R10", m_core->m_r[UNSP20_R10+8]).formatstr("%04X");
+	state_add(baseindex + UNSP20_R11,    "R11", m_core->m_r[UNSP20_R11+8]).formatstr("%04X");
+	state_add(baseindex + UNSP20_R12,    "R12", m_core->m_r[UNSP20_R12+8]).formatstr("%04X");
+	state_add(baseindex + UNSP20_R13,    "R13", m_core->m_r[UNSP20_R13+8]).formatstr("%04X");
+	state_add(baseindex + UNSP20_R14,    "R14", m_core->m_r[UNSP20_R14+8]).formatstr("%04X");
+	state_add(baseindex + UNSP20_R15,    "R15", m_core->m_r[UNSP20_R15+8]).formatstr("%04X");
+}
+
 void unsp_device::device_reset()
 {
-	memset(m_core->m_r, 0, sizeof(uint32_t) * 8);
+	for (int i = 0; i < m_numregs; i++)
+		m_core->m_r[i] = 0;
 
 	m_core->m_r[REG_PC] = read16(0xfff7);
 	m_core->m_enable_irq = 0;
 	m_core->m_enable_fiq = 0;
 	m_core->m_irq = 0;
 	m_core->m_fiq = 0;
+}
+
+void unsp_20_device::device_reset()
+{
+	unsp_12_device::device_reset();
 }
 
 void unsp_device::device_stop()
@@ -398,6 +436,7 @@ inline void unsp_device::trigger_fiq()
 	push(m_core->m_r[REG_SR], &m_core->m_r[REG_SP]);
 	m_core->m_r[REG_PC] = read16(0xfff6);
 	m_core->m_r[REG_SR] = 0;
+	standard_irq_callback(UNSP_FIQ_LINE);
 }
 
 inline void unsp_device::trigger_irq(int line)
@@ -414,6 +453,7 @@ inline void unsp_device::trigger_irq(int line)
 	push(m_core->m_r[REG_SR], &m_core->m_r[REG_SP]);
 	m_core->m_r[REG_PC] = read16(0xfff8 + line);
 	m_core->m_r[REG_SR] = 0;
+	standard_irq_callback(UNSP_IRQ0_LINE+line);
 }
 
 void unsp_device::check_irqs()

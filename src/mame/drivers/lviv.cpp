@@ -426,7 +426,7 @@ void lviv_state::lviv(machine_config &config)
 	I8080(config, m_maincpu, 2500000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lviv_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &lviv_state::io_map);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	I8255(config, m_ppi[0]);
 	m_ppi[0]->in_pa_callback().set(FUNC(lviv_state::ppi_0_porta_r));

@@ -624,7 +624,7 @@ void pmd85_state::pmd85(machine_config &config, bool with_uart)
 	I8080(config, m_maincpu, XTAL(18'432'000)/9);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pmd85_state::pmd85_mem);
 	m_maincpu->set_addrmap(AS_IO, &pmd85_state::pmd85_io_map);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 
 /*******************************************************************************

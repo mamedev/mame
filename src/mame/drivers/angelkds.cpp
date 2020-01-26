@@ -541,7 +541,7 @@ void angelkds_state::angelkds(machine_config &config)
 	ppi1.in_pb_callback().set_ioport("I81");
 	ppi1.in_pc_callback().set_ioport("I82");
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

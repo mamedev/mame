@@ -1266,8 +1266,8 @@ void pcw_state::pcw(machine_config &config)
 	m_keyboard_mcu->t0_in_cb().set(FUNC(pcw_state::mcu_kb_t0_r));
 	m_keyboard_mcu->bus_in_cb().set(FUNC(pcw_state::mcu_kb_data_r));
 
-//  config.m_minimum_quantum = attotime::from_hz(50);
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+//  config.set_maximum_quantum(attotime::from_hz(50));
+	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

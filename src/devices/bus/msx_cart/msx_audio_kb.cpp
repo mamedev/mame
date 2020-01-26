@@ -7,9 +7,15 @@
 DEFINE_DEVICE_TYPE(MSX_AUDIO_KBDC_PORT, msx_audio_kbdc_port_device, "msx_audio_kbdc_port", "MSX Audio keyboard connector port")
 
 
+msx_audio_kb_port_interface::msx_audio_kb_port_interface(machine_config const &mconfig, device_t &device)
+	: device_interface(device, "msxaudiokb")
+{
+}
+
+
 msx_audio_kbdc_port_device::msx_audio_kbdc_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_AUDIO_KBDC_PORT, tag, owner, clock)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<msx_audio_kb_port_interface>(mconfig, *this)
 	, m_keyboard(nullptr)
 {
 }
@@ -17,26 +23,23 @@ msx_audio_kbdc_port_device::msx_audio_kbdc_port_device(const machine_config &mco
 
 void msx_audio_kbdc_port_device::device_start()
 {
-	m_keyboard = dynamic_cast<msx_audio_kb_port_interface *>(get_card_device());
+	m_keyboard = get_card_device();
 }
 
 
 void msx_audio_kbdc_port_device::write(uint8_t data)
 {
 	if (m_keyboard)
-	{
 		m_keyboard->write(data);
-	}
 }
 
 
 uint8_t msx_audio_kbdc_port_device::read()
 {
 	if (m_keyboard)
-	{
 		return m_keyboard->read();
-	}
-	return 0xff;
+	else
+		return 0xff;
 }
 
 

@@ -14,8 +14,8 @@
 #if defined(OSD_MAC)
 
 // System headers
-#include <ctype.h>
-#include <stddef.h>
+#include <cctype>
+#include <cstddef>
 #include <mutex>
 #include <memory>
 #include <algorithm>
@@ -33,7 +33,7 @@
 
 extern void MacPollInputs();
 
-void mac_osd_interface::customize_input_type_list(simple_list<input_type_entry> &typelist)
+void mac_osd_interface::customize_input_type_list(std::vector<input_type_entry> &typelist)
 {
 }
 

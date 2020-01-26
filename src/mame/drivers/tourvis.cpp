@@ -402,7 +402,7 @@ void tourvision_state::tourvision(machine_config &config)
 	m_maincpu->add_route(0, "lspeaker", 1.00);
 	m_maincpu->add_route(1, "rspeaker", 1.00);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	I8085A(config, m_subcpu, 18000000/3 /*?*/);
 	m_subcpu->set_addrmap(AS_PROGRAM, &tourvision_state::tourvision_8085_map);

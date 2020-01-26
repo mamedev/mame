@@ -171,6 +171,7 @@ public:
 	{}
 
 	uint16_t *m_buffer_spriteram;
+	std::unique_ptr<uint16_t[]> m_allocated_spriteram;
 	void wildplt_map(address_map &map);
 	void wildplt(machine_config &config);
 	DECLARE_WRITE16_MEMBER(sprite_dma_w);

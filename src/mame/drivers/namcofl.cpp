@@ -155,6 +155,9 @@ OSC3: 48.384MHz
 23D : IR2C24AN
 13E : HN58C65 EEPROM
 
+TODO
+    finalapr : Some objects aren't displayed, Wrong shadow behavior
+    speedrcr : Incorrect ROZ layer
 */
 
 #include "emu.h"
@@ -167,41 +170,40 @@ OSC3: 48.384MHz
 
 #include "namcofl.lh"
 
+#include <algorithm>
 
-READ32_MEMBER(namcofl_state::fl_unk1_r)
+READ32_MEMBER(namcofl_state::unk1_r)
 {
 	return 0xffffffff;
 }
 
-READ32_MEMBER(namcofl_state::fl_network_r)
+READ32_MEMBER(namcofl_state::network_r)
 {
 	return 0xffffffff;
 }
 
-READ32_MEMBER(namcofl_state::namcofl_sysreg_r)
+READ32_MEMBER(namcofl_state::sysreg_r)
 {
 	return 0;
 }
 
-WRITE32_MEMBER(namcofl_state::namcofl_sysreg_w)
+WRITE32_MEMBER(namcofl_state::sysreg_w)
 {
 	if ((offset == 2) && ACCESSING_BITS_0_7)  // address space configuration
 	{
 		if (data == 0)  // RAM at 00000000, ROM at 10000000
 		{
-			membank("bank1")->set_entry(1);
-			membank("bank2")->set_entry(1);
+			set_bank(1);
 		}
 		else        // ROM at 00000000, RAM at 10000000
 		{
-			membank("bank1")->set_entry(0);
-			membank("bank2")->set_entry(0);
+			set_bank(0);
 		}
 	}
 }
 
 // FIXME: remove this trampoline once the IRQ is moved into the actual device
-WRITE8_MEMBER(namcofl_state::namcofl_c116_w)
+WRITE8_MEMBER(namcofl_state::c116_w)
 {
 	m_c116->write(space, offset, data);
 
@@ -214,23 +216,29 @@ WRITE8_MEMBER(namcofl_state::namcofl_c116_w)
 
 void namcofl_state::namcofl_mem(address_map &map)
 {
-	map(0x00000000, 0x000fffff).bankrw("bank1");
-	map(0x10000000, 0x100fffff).bankrw("bank2");
+	map(0x00000000, 0x000fffff).m(m_mainbank[0], FUNC(address_map_bank_device::amap32));
+	map(0x10000000, 0x100fffff).m(m_mainbank[1], FUNC(address_map_bank_device::amap32));
 	map(0x20000000, 0x201fffff).rom().region("data", 0);
 	map(0x30000000, 0x30001fff).ram().share("nvram"); /* nvram */
-	map(0x30100000, 0x30100003).w(FUNC(namcofl_state::namcofl_spritebank_w));
+	map(0x30100000, 0x30100003).w(FUNC(namcofl_state::spritebank_w));
 	map(0x30284000, 0x3028bfff).ram().share("shareram");
 	map(0x30300000, 0x30303fff).ram(); /* COMRAM */
-	map(0x30380000, 0x303800ff).r(FUNC(namcofl_state::fl_network_r)); /* network registers */
-	map(0x30400000, 0x30407fff).r(m_c116, FUNC(namco_c116_device::read)).w(FUNC(namcofl_state::namcofl_c116_w));
+	map(0x30380000, 0x303800ff).r(FUNC(namcofl_state::network_r)); /* network registers */
+	map(0x30400000, 0x30407fff).r(m_c116, FUNC(namco_c116_device::read)).w(FUNC(namcofl_state::c116_w));
 	map(0x30800000, 0x3080ffff).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram16_r), FUNC(namco_c123tmap_device::videoram16_w));
 	map(0x30a00000, 0x30a0003f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control16_r), FUNC(namco_c123tmap_device::control16_w));
 	map(0x30c00000, 0x30c1ffff).rw(m_c169roz, FUNC(namco_c169roz_device::videoram_r), FUNC(namco_c169roz_device::videoram_w));
 	map(0x30d00000, 0x30d0001f).rw(m_c169roz, FUNC(namco_c169roz_device::control_r), FUNC(namco_c169roz_device::control_w));
 	map(0x30e00000, 0x30e1ffff).rw(m_c355spr, FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w)).share("objram");
 	map(0x30f00000, 0x30f0000f).ram(); /* NebulaM2 code says this is int enable at 0000, int request at 0004, but doesn't do much about it */
-	map(0x40000000, 0x4000005f).rw(FUNC(namcofl_state::namcofl_sysreg_r), FUNC(namcofl_state::namcofl_sysreg_w));
-	map(0xfffffffc, 0xffffffff).r(FUNC(namcofl_state::fl_unk1_r));
+	map(0x40000000, 0x4000005f).rw(FUNC(namcofl_state::sysreg_r), FUNC(namcofl_state::sysreg_w));
+	map(0xfffffffc, 0xffffffff).r(FUNC(namcofl_state::unk1_r));
+}
+
+void namcofl_state::namcofl_bank_mem(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom().region("maincpu", 0);
+	map(0x100000, 0x1fffff).ram().share("workram");
 }
 
 
@@ -483,14 +491,6 @@ MACHINE_START_MEMBER(namcofl_state,namcofl)
 	m_raster_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcofl_state::raster_interrupt_callback),this));
 	m_network_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcofl_state::network_interrupt_callback),this));
 	m_vblank_interrupt_timer =  machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcofl_state::vblank_interrupt_callback),this));
-
-	membank("bank1")->configure_entry(0, memregion("maincpu")->base());
-	membank("bank1")->configure_entry(1, m_workram.get());
-	membank("bank1")->set_entry(0);
-
-	membank("bank2")->configure_entry(0, m_workram.get());
-	membank("bank2")->configure_entry(1, memregion("maincpu")->base());
-	membank("bank2")->set_entry(0);
 }
 
 
@@ -499,10 +499,9 @@ MACHINE_RESET_MEMBER(namcofl_state,namcofl)
 	m_network_interrupt_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().max_y + 3));
 	m_vblank_interrupt_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().max_y + 1));
 
-	memset(m_workram.get(), 0x00, 0x100000);
+	std::fill_n(&m_workram[0], m_workram.bytes() / 4, 0);
 
-	membank("bank1")->set_entry(0);
-	membank("bank2")->set_entry(0);
+	set_bank(0);
 }
 
 
@@ -510,6 +509,13 @@ void namcofl_state::namcofl(machine_config &config)
 {
 	I960(config, m_maincpu, 80_MHz_XTAL/4); // i80960KA-20 == 20 MHz part
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcofl_state::namcofl_mem);
+
+	for (int bank = 0; bank < 2; bank++)
+	{
+		ADDRESS_MAP_BANK(config, m_mainbank[bank]);
+		m_mainbank[bank]->set_map(&namcofl_state::namcofl_bank_mem);
+		m_mainbank[bank]->set_options(ENDIANNESS_LITTLE, 32, 21, 0x100000);
+	}
 
 	NAMCO_C75(config, m_mcu, 48.384_MHz_XTAL/3);
 	m_mcu->set_addrmap(AS_PROGRAM, &namcofl_state::namcoc75_am);
@@ -533,10 +539,9 @@ void namcofl_state::namcofl(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(NAMCOFL_HTOTAL, NAMCOFL_VTOTAL);
-	m_screen->set_visarea(0, NAMCOFL_HBSTART-1, 0, NAMCOFL_VBSTART-1);
-	m_screen->set_screen_update(FUNC(namcofl_state::screen_update_namcofl));
+	m_screen->set_raw(48.384_MHz_XTAL/8, 384, 0, 288, 264, 0, 224); // same as namconb1.cpp?
+	m_screen->set_screen_update(FUNC(namcofl_state::screen_update));
+	m_screen->screen_vblank().set(m_c355spr, FUNC(namco_c355spr_device::vblank));
 	m_screen->set_palette(m_c116);
 
 	NAMCO_C169ROZ(config, m_c169roz, 0);
@@ -553,6 +558,7 @@ void namcofl_state::namcofl(machine_config &config)
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namcofl_state::FLobjcode2tile, this));
 	m_c355spr->set_palxor(0x0);
 	m_c355spr->set_color_base(0);
+	m_c355spr->set_buffer(1);
 
 	NAMCO_C123TMAP(config, m_c123tmap, 0);
 	m_c123tmap->set_palette(m_c116);
@@ -744,26 +750,13 @@ ROM_START( finalaprj )
 	ROM_LOAD("finalapr.nv",   0x000000, 0x2000, CRC(d51d65fe) SHA1(8a0a523cb6ba2880951e41ca04db23584f0a108c) )
 ROM_END
 
-void namcofl_state::common_init()
+void namcofl_state::driver_init()
 {
-	m_workram = std::make_unique<uint32_t[]>(0x100000/4);
-	save_pointer(NAME(m_workram), 0x100000/4),
-
 	save_item(NAME(m_mcu_port6));
 	save_item(NAME(m_sprbank));
 }
 
-void namcofl_state::init_speedrcr()
-{
-	common_init();
-}
-
-void namcofl_state::init_finalapr()
-{
-	common_init();
-}
-
-GAME(  1995, speedrcr,         0, namcofl, speedrcr, namcofl_state, init_speedrcr, ROT0, "Namco", "Speed Racer", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAMEL( 1995, finalapr,         0, namcofl, finalapr, namcofl_state, init_finalapr, ROT0, "Namco", "Final Lap R (Rev. B)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
-GAMEL( 1995, finalapro, finalapr, namcofl, finalapr, namcofl_state, init_finalapr, ROT0, "Namco", "Final Lap R", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
-GAMEL( 1995, finalaprj, finalapr, namcofl, finalapr, namcofl_state, init_finalapr, ROT0, "Namco", "Final Lap R (Japan Rev. C)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
+GAME(  1995, speedrcr,         0, namcofl, speedrcr, namcofl_state, driver_init, ROT0, "Namco", "Speed Racer",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1995, finalapr,         0, namcofl, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R (Rev. B)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
+GAMEL( 1995, finalapro, finalapr, namcofl, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
+GAMEL( 1995, finalaprj, finalapr, namcofl, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R (Japan Rev. C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )

@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "debughlp.h"
-#include <ctype.h>
+#include <cctype>
 
 
 
@@ -147,6 +147,7 @@ static const help_item static_help_list[] =
 		"  observe [<CPU>[,<CPU>[,...]]] -- resumes debugging on <CPU>\n"
 		"  suspend [<CPU>[,<CPU>[,...]]] -- suspends execution on <CPU>\n"
 		"  resume [<CPU>[,<CPU>[,...]]] -- resumes execution on <CPU>\n"
+		"  cpulist -- list all CPUs\n"
 		"  trace {<filename>|OFF}[,<CPU>[,<detectloops>[,<action>]]] -- trace the given CPU to a file (defaults to active CPU)\n"
 		"  traceover {<filename>|OFF}[,<CPU>[,<detectloops>[,<action>]]] -- trace the given CPU to a file, but skip subroutines (defaults to active CPU)\n"
 		"  traceflush -- flushes all open trace files\n"

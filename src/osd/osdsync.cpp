@@ -10,10 +10,10 @@
 #include <windows.h>
 #include <process.h>
 #include <tchar.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 #ifdef __GNUC__
-#include <stdint.h>
+#include <cstdint>
 #endif
 #endif
 #include <mutex>
@@ -447,8 +447,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 	{
 		osd_work_item *item = (osd_work_item *)queue->free;
 		queue->free = item->next;
-		if (item->event != nullptr)
-			delete item->event;
+		delete item->event;
 		delete item;
 	}
 
@@ -457,8 +456,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 	{
 		osd_work_item *item = (osd_work_item *)queue->list;
 		queue->list = item->next;
-		if (item->event != nullptr)
-			delete item->event;
+		delete item->event;
 		delete item;
 	}
 

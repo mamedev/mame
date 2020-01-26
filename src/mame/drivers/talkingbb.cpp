@@ -18,14 +18,13 @@ The speech driver is by Forrest S. Mozer's company.
 
 The cartridge slots are for extra teams. There are around 8 cartridges, each one
 included 3 or 4 baseball teams, with exception to the "Hall of Fame" cartridge.
-Players enter 3-digit code to select the team.
+Players enter a 3-digit code to select the team.
 
 TODO:
 - add cartridge slots
 - Buttons are unresponsive at initial game setup, you need to hold the yes/no button
   until it responds. The keypad reading routine is at $1A5D, it gets skipped for several
   seconds at a time. Once in-game, everything is fine though. BTANB or different cause?
-- get rid of savestate workaround once outputs support savestates
 
 *******************************************************************************
 

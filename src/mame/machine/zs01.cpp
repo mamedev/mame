@@ -30,9 +30,10 @@ inline void ATTR_PRINTF( 3, 4 ) zs01_device::verboselog( int n_level, const char
 // device type definition
 DEFINE_DEVICE_TYPE(ZS01, zs01_device, "zs01", "Konami ZS01 PIC")
 
-zs01_device::zs01_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
-	: device_t(mconfig, ZS01, tag, owner, clock),
+zs01_device::zs01_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock ) :
+	device_t(mconfig, ZS01, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
+	m_ds2401(*this, finder_base::DUMMY_TAG),
 	m_region(*this, DEVICE_SELF),
 	m_cs( 0 ),
 	m_rst( 0 ),
@@ -48,11 +49,8 @@ zs01_device::zs01_device( const machine_config &mconfig, const char *tag, device
 
 void zs01_device::device_start()
 {
-	m_ds2401 = siblingdevice<ds2401_device>(m_ds2401_tag);
-	if( m_ds2401 == nullptr )
-	{
-		logerror( "ds2401 '%s' not found\n", m_ds2401_tag );
-	}
+	if( !m_ds2401 )
+		logerror( "ds2401 '%s' not found\n", m_ds2401.finder_tag() );
 
 	memset( m_write_buffer, 0, sizeof( m_write_buffer ) );
 	memset( m_read_buffer, 0, sizeof( m_read_buffer ) );

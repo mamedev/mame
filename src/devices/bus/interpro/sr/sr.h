@@ -120,7 +120,7 @@ private:
 	required_device<cbus_bus_device> m_bus;
 };
 
-class device_cbus_card_interface : public device_slot_card_interface
+class device_cbus_card_interface : public device_interface
 {
 protected:
 	friend class cbus_slot_device;
@@ -133,7 +133,7 @@ public:
 
 protected:
 	device_cbus_card_interface(const machine_config &mconfig, device_t &device, const char *idprom_region = "idprom")
-		: device_slot_card_interface(mconfig, device)
+		: device_interface(device, "interprocbus")
 		, m_bus(nullptr)
 		, m_idprom_region(idprom_region)
 	{
@@ -232,7 +232,7 @@ private:
 	required_device<srx_bus_device> m_bus;
 };
 
-class device_srx_card_interface : public device_slot_card_interface
+class device_srx_card_interface : public device_interface
 {
 protected:
 	friend class srx_slot_device;
@@ -245,7 +245,7 @@ public:
 
 protected:
 	device_srx_card_interface(const machine_config &mconfig, device_t &device, const char *idprom_region = "idprom")
-		: device_slot_card_interface(mconfig, device)
+		: device_interface(device, "interprosrx")
 		, m_bus(nullptr)
 		, m_idprom_region(idprom_region)
 	{

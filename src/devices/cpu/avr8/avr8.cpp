@@ -795,30 +795,10 @@ void avr8_device::device_start()
 	// register our state for saving
 	save_item(NAME(m_pc));
 	save_item(NAME(m_r));
-	save_item(NAME(m_timer_top[0]));
-	save_item(NAME(m_timer_increment[0]));
-	save_item(NAME(m_timer_prescale[0]));
-	save_item(NAME(m_timer_prescale_count[0]));
-	save_item(NAME(m_timer_top[1]));
-	save_item(NAME(m_timer_increment[1]));
-	save_item(NAME(m_timer_prescale[1]));
-	save_item(NAME(m_timer_prescale_count[1]));
-	save_item(NAME(m_timer_top[2]));
-	save_item(NAME(m_timer_increment[2]));
-	save_item(NAME(m_timer_prescale[2]));
-	save_item(NAME(m_timer_prescale_count[2]));
-	save_item(NAME(m_timer_top[3]));
-	save_item(NAME(m_timer_increment[3]));
-	save_item(NAME(m_timer_prescale[3]));
-	save_item(NAME(m_timer_prescale_count[3]));
-	save_item(NAME(m_timer_top[4]));
-	save_item(NAME(m_timer_increment[4]));
-	save_item(NAME(m_timer_prescale[4]));
-	save_item(NAME(m_timer_prescale_count[4]));
-	save_item(NAME(m_timer_top[5]));
-	save_item(NAME(m_timer_increment[5]));
-	save_item(NAME(m_timer_prescale[5]));
-	save_item(NAME(m_timer_prescale_count[5]));
+	save_item(NAME(m_timer_top));
+	save_item(NAME(m_timer_increment));
+	save_item(NAME(m_timer_prescale));
+	save_item(NAME(m_timer_prescale_count));
 	save_item(NAME(m_addr_mask));
 	save_item(NAME(m_interrupt_pending));
 	save_item(NAME(m_elapsed_cycles));
@@ -2895,7 +2875,7 @@ READ8_MEMBER( avr8_device::regs_r )
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t avr8_device::execute_min_cycles() const
+uint32_t avr8_device::execute_min_cycles() const noexcept
 {
 	return 1;
 }
@@ -2906,7 +2886,7 @@ uint32_t avr8_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t avr8_device::execute_max_cycles() const
+uint32_t avr8_device::execute_max_cycles() const noexcept
 {
 	return 4;
 }
@@ -2917,7 +2897,7 @@ uint32_t avr8_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-uint32_t avr8_device::execute_input_lines() const
+uint32_t avr8_device::execute_input_lines() const noexcept
 {
 	return 0;
 }

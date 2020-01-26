@@ -36,6 +36,7 @@ private slots:
 
 private:
 	void populateComboBox();
+	void setToCurrentCpu();
 
 
 	// Widgets

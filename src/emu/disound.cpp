@@ -260,7 +260,7 @@ void device_sound_interface::interface_validity_check(validity_checker &valid) c
 		// find a device with the requested tag
 		device_t const *const target = route.m_base.get().subdevice(route.m_target.c_str());
 		if (!target)
-			osd_printf_error("Attempting to route sound to non-existent device '%s'\n", route.m_base.get().subtag(route.m_target.c_str()));
+			osd_printf_error("Attempting to route sound to non-existent device '%s'\n", route.m_base.get().subtag(route.m_target));
 
 		// if it's not a speaker or a sound device, error
 		device_sound_interface const *sound;
@@ -461,7 +461,7 @@ void device_mixer_interface::sound_stream_update(sound_stream &stream, stream_sa
 {
 	// clear output buffers
 	for (int output = 0; output < m_outputs; output++)
-		memset(outputs[output], 0, samples * sizeof(outputs[0][0]));
+		std::fill_n(outputs[output], samples, 0);
 
 	// loop over samples
 	const u8 *outmap = &m_outputmap[0];

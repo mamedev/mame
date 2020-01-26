@@ -32,7 +32,7 @@ class device_einstein_userport_interface;
 // supported devices
 void einstein_userport_cards(device_slot_interface &device);
 
-class einstein_userport_device : public device_t, public device_slot_interface
+class einstein_userport_device : public device_t, public device_single_card_slot_interface<device_einstein_userport_interface>
 {
 public:
 	// construction/destruction
@@ -61,7 +61,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	device_einstein_userport_interface *m_card;
 
@@ -70,7 +69,7 @@ private:
 };
 
 // class representing interface-specific live userport device
-class device_einstein_userport_interface : public device_slot_card_interface
+class device_einstein_userport_interface : public device_interface
 {
 public:
 	// construction/destruction

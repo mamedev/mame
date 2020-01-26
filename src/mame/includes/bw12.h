@@ -62,8 +62,6 @@ public:
 	{ }
 
 	void bankswitch();
-	void floppy_motor_off();
-	void set_floppy_motor_off_timer();
 	void write_ls259(int address, int data);
 
 	DECLARE_READ8_MEMBER( ls259_r );

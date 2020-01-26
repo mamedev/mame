@@ -35,6 +35,7 @@ protected:
 	virtual void device_reset() override;
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	void command_write(uint16_t data);
 	uint16_t status_read();
@@ -49,6 +50,8 @@ protected:
 	void write_sector(int ddam);
 
 private:
+	void firmware_map(address_map &map);
+
 	enum rx01_state {
 		RX01_FILL,
 		RX01_EMPTY,
@@ -59,7 +62,7 @@ private:
 		RX01_INIT
 	};
 
-	legacy_floppy_image_device *m_image[2];
+	required_device_array<legacy_floppy_image_device, 2> m_image;
 	uint8_t m_buffer[128];
 	int m_buf_pos;
 

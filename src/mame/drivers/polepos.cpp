@@ -898,7 +898,7 @@ void polepos_state::polepos(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);   // 128V clocks the same as VBLANK
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* some interleaving */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* some interleaving */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1007,7 +1007,7 @@ void polepos_state::topracern(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);   // 128V clocks the same as VBLANK
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* some interleaving */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* some interleaving */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 

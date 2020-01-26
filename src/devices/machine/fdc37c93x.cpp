@@ -21,7 +21,7 @@ fdc37c93x_device::fdc37c93x_device(const machine_config &mconfig, const char *ta
 	, mode(OperatingMode::Run)
 	, config_key_step(0)
 	, config_index(0)
-	, logical_device(0)
+	, logical_device(LogicalDevice::FDC)
 	, last_dma_line(-1)
 	, m_gp20_reset_callback(*this)
 	, m_gp25_gatea20_callback(*this)
@@ -48,22 +48,22 @@ fdc37c93x_device::fdc37c93x_device(const machine_config &mconfig, const char *ta
 	global_configuration_registers[0x21] = 1;
 	global_configuration_registers[0x24] = 4;
 	memset(configuration_registers, 0, sizeof(configuration_registers));
-	configuration_registers[0][0x60] = 3;
-	configuration_registers[0][0x61] = 0xf0;
-	configuration_registers[0][0x70] = 6;
-	configuration_registers[0][0x74] = 2;
-	configuration_registers[0][0xf0] = 0xe;
-	configuration_registers[0][0xf2] = 0xff;
-	configuration_registers[1][0x60] = 1;
-	configuration_registers[1][0x61] = 0xf0;
-	configuration_registers[1][0x62] = 3;
-	configuration_registers[1][0x63] = 0xf6;
-	configuration_registers[1][0x70] = 0xe;
-	configuration_registers[3][0x74] = 4;
-	configuration_registers[3][0xf0] = 0x3c;
-	configuration_registers[6][0xf4] = 3;
+	configuration_registers[LogicalDevice::FDC][0x60] = 3;
+	configuration_registers[LogicalDevice::FDC][0x61] = 0xf0;
+	configuration_registers[LogicalDevice::FDC][0x70] = 6;
+	configuration_registers[LogicalDevice::FDC][0x74] = 2;
+	configuration_registers[LogicalDevice::FDC][0xf0] = 0xe;
+	configuration_registers[LogicalDevice::FDC][0xf2] = 0xff;
+	configuration_registers[LogicalDevice::IDE1][0x60] = 1;
+	configuration_registers[LogicalDevice::IDE1][0x61] = 0xf0;
+	configuration_registers[LogicalDevice::IDE1][0x62] = 3;
+	configuration_registers[LogicalDevice::IDE1][0x63] = 0xf6;
+	configuration_registers[LogicalDevice::IDE1][0x70] = 0xe;
+	configuration_registers[LogicalDevice::Parallel][0x74] = 4;
+	configuration_registers[LogicalDevice::Parallel][0xf0] = 0x3c;
+	configuration_registers[LogicalDevice::RTC][0xf4] = 3;
 	for (int n = 0xe0; n <= 0xed; n++)
-		configuration_registers[8][n] = 1;
+		configuration_registers[LogicalDevice::AuxIO][n] = 1;
 	for (int n = 0; n <= 8; n++)
 		enabled_logical[n] = false;
 	for (int n = 0; n < 4; n++)
@@ -248,6 +248,7 @@ void fdc37c93x_device::device_add_mconfig(machine_config &config)
 	fdcdev.drq_wr_callback().set(FUNC(fdc37c93x_device::drq_floppy_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", fdc37c93x_device::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", fdc37c93x_device::floppy_formats);
+
 	// parallel port
 	PC_LPT(config, pc_lpt_lptdev);
 	pc_lpt_lptdev->irq_handler().set(FUNC(fdc37c93x_device::irq_parallel_w));
@@ -759,31 +760,31 @@ void fdc37c93x_device::write_logical_configuration_register(int index, int data)
 	configuration_registers[logical_device][index] = data;
 	switch (logical_device)
 	{
-	case 0:
+	case LogicalDevice::FDC:
 		write_fdd_configuration_register(index, data);
 		break;
-	case 1:
+	case LogicalDevice::IDE1:
 		write_ide1_configuration_register(index, data);
 		break;
-	case 2:
+	case LogicalDevice::IDE2:
 		write_ide2_configuration_register(index, data);
 		break;
-	case 3:
+	case LogicalDevice::Parallel:
 		write_parallel_configuration_register(index, data);
 		break;
-	case 4:
+	case LogicalDevice::Serial1:
 		write_serial1_configuration_register(index, data);
 		break;
-	case 5:
+	case LogicalDevice::Serial2:
 		write_serial2_configuration_register(index, data);
 		break;
-	case 6:
+	case LogicalDevice::RTC:
 		write_rtc_configuration_register(index, data);
 		break;
-	case 7:
+	case LogicalDevice::Keyboard:
 		write_keyboard_configuration_register(index, data);
 		break;
-	case 8:
+	case LogicalDevice::AuxIO:
 		write_auxio_configuration_register(index, data);
 		break;
 	}
@@ -957,31 +958,31 @@ uint16_t fdc37c93x_device::read_logical_configuration_register(int index)
 
 	switch (logical_device)
 	{
-	case 0:
+	case LogicalDevice::FDC:
 		ret = read_fdd_configuration_register(index);
 		break;
-	case 1:
+	case LogicalDevice::IDE1:
 		ret = read_ide1_configuration_register(index);
 		break;
-	case 2:
+	case LogicalDevice::IDE2:
 		ret = read_ide2_configuration_register(index);
 		break;
-	case 3:
+	case LogicalDevice::Parallel:
 		ret = read_parallel_configuration_register(index);
 		break;
-	case 4:
+	case LogicalDevice::Serial1:
 		ret = read_serial1_configuration_register(index);
 		break;
-	case 5:
+	case LogicalDevice::Serial2:
 		ret = read_serial2_configuration_register(index);
 		break;
-	case 6:
+	case LogicalDevice::RTC:
 		ret = read_rtc_configuration_register(index);
 		break;
-	case 7:
+	case LogicalDevice::Keyboard:
 		ret = read_keyboard_configuration_register(index);
 		break;
-	case 8:
+	case LogicalDevice::AuxIO:
 		ret = read_auxio_configuration_register(index);
 		break;
 	}
@@ -991,17 +992,17 @@ uint16_t fdc37c93x_device::read_logical_configuration_register(int index)
 
 uint16_t fdc37c93x_device::read_rtc_configuration_register(int index)
 {
-	return configuration_registers[6][index];
+	return configuration_registers[LogicalDevice::RTC][index];
 }
 
 uint16_t fdc37c93x_device::read_keyboard_configuration_register(int index)
 {
-	return configuration_registers[7][index];
+	return configuration_registers[LogicalDevice::Keyboard][index];
 }
 
 uint16_t fdc37c93x_device::read_auxio_configuration_register(int index)
 {
-	return configuration_registers[8][index];
+	return configuration_registers[LogicalDevice::AuxIO][index];
 }
 
 /* Device management */

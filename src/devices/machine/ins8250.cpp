@@ -436,7 +436,7 @@ u8 ins8250_uart_device::ins8250_r(offs_t offset)
 			clear the int if this is the source of the int */
 			if (!machine().side_effects_disabled())
 			{
-				if (m_regs.iir == 0x02)
+				if ((m_regs.iir & 0x0f) == 0x02)
 					clear_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
 			}
 			break;

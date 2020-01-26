@@ -85,7 +85,7 @@
 #include "romload.h"
 #include "tilemap.h"
 #include "ui/uimain.h"
-#include <time.h>
+#include <ctime>
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
 
@@ -249,8 +249,6 @@ void running_machine::start()
 		m_debugger = std::make_unique<debugger_manager>(*this);
 	}
 
-	m_render->resolve_tags();
-
 	manager().create_custom(*this);
 
 	// resolve objects that are created by memory maps
@@ -263,6 +261,13 @@ void running_machine::start()
 	save().register_presave(save_prepost_delegate(FUNC(running_machine::presave_all_devices), this));
 	start_all_devices();
 	save().register_postload(save_prepost_delegate(FUNC(running_machine::postload_all_devices), this));
+
+	// save outputs created before start time
+	output().register_save();
+
+	m_render->resolve_tags();
+
+	// load cheat files
 	manager().load_cheatfiles(*this);
 
 	// start recording movie if specified
@@ -388,7 +393,7 @@ int running_machine::run(bool quiet)
 	}
 	catch (emu_fatalerror &fatal)
 	{
-		osd_printf_error("Fatal error: %s\n", fatal.string());
+		osd_printf_error("Fatal error: %s\n", fatal.what());
 		error = EMU_ERR_FATALERROR;
 		if (fatal.exitcode() != 0)
 			error = fatal.exitcode();
@@ -508,7 +513,7 @@ std::string running_machine::get_statename(const char *option) const
 	if (pos != -1)
 	{
 		// if more %d are found, revert to default and ignore them all
-		if (statename_str.find(statename_dev.c_str(), pos + 3) != -1)
+		if (statename_str.find(statename_dev, pos + 3) != -1)
 			statename_str.assign("%g");
 		// else if there is a single %d, try to create the correct snapname
 		else
@@ -552,7 +557,7 @@ std::string running_machine::get_statename(const char *option) const
 						std::string filename(image.basename_noext());
 
 						// setup snapname and remove the %d_
-						strreplace(statename_str, devname_str.c_str(), filename.c_str());
+						strreplace(statename_str, devname_str, filename);
 						statename_str.erase(pos, 3);
 						//printf("check image: %s\n", filename.c_str());
 

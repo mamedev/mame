@@ -69,7 +69,7 @@ DEFINE_DEVICE_TYPE(SNS_BSX_CART_SLOT,    sns_bsx_cart_slot_device,    "sns_bsx_c
 //-------------------------------------------------
 
 device_sns_cart_interface::device_sns_cart_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device),
+	device_interface(device, "snescart"),
 	m_rom(nullptr),
 	m_rom_size(0),
 	m_slot(nullptr)

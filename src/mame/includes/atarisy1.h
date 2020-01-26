@@ -106,7 +106,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_reset_yscroll_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_int3off_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_int3_callback);
-	void update_timers(int scanline);
+	virtual void update_timers(int scanline);
 	void decode_gfx(uint16_t *pflookup, uint16_t *molookup);
 	int get_bank(uint8_t prom1, uint8_t prom2, int bpp);
 	DECLARE_READ16_MEMBER( atarisy1_int3state_r );
@@ -127,6 +127,14 @@ public:
 	void marble(machine_config &config);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
+};
+
+class atarisy1r_state : public atarisy1_state
+{
+public:
+	using atarisy1_state::atarisy1_state;
+
+	virtual void update_timers(int scanline) override;
 };
 
 #endif // MAME_INCLUDES_ATARISY1_H

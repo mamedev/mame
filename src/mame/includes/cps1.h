@@ -9,10 +9,13 @@
 #ifndef MAME_INCLUDES_CPS1_H
 #define MAME_INCLUDES_CPS1_H
 
+#pragma once
+
 #include "sound/msm5205.h"
 #include "sound/qsound.h"
 #include "sound/okim6295.h"
 #include "machine/gen_latch.h"
+#include "machine/74157.h"
 #include "machine/timekpr.h"
 #include "machine/timer.h"
 #include "cpu/m68000/m68000.h"
@@ -120,8 +123,6 @@ protected:
 		, m_audiocpu(*this, "audiocpu")
 		, m_oki(*this, "oki")
 		, m_m48t35(*this,"m48t35")
-		, m_msm_1(*this, "msm1")
-		, m_msm_2(*this, "msm2")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
@@ -132,130 +133,139 @@ protected:
 	{ }
 
 public:
-	DECLARE_READ16_MEMBER(cps1_hack_dsw_r);
+	void cps1_10MHz(machine_config &config);
+	void forgottn(machine_config &config);
+	void cps1_12MHz(machine_config &config);
+	void pang3(machine_config &config);
+	void ganbare(machine_config &config);
+	void qsound(machine_config &config);
+	void wofhfh(machine_config &config);
+	void sf2m3(machine_config &config);
+	void sf2cems6(machine_config &config);
+	void sf2m10(machine_config &config);
+
+	void init_cps1();
+	void init_sf2ee();
+	void init_wof();
+	void init_dino();
+	void init_punisher();
+	void init_slammast();
+	void init_pang3();
+	void init_ganbare();
+	void init_pang3b();
+	void init_sf2rb();
+	void init_sf2rb2();
+	void init_sf2thndr();
+	void init_sf2hack();
+	void init_sf2rk();
+	void init_sf2dongb();
+	void init_sf2ceblp();
+	void init_sf2m8();
+	void init_dinohunt();
+
+protected:
+	DECLARE_MACHINE_START(common);
+	DECLARE_MACHINE_START(cps1);
+	DECLARE_MACHINE_START(qsound);
+	DECLARE_MACHINE_START(ganbare);
+	DECLARE_MACHINE_RESET(cps);
+
+	DECLARE_READ16_MEMBER(cps1_dsw_r);
 	DECLARE_READ16_MEMBER(cps1_in1_r);
 	DECLARE_READ16_MEMBER(cps1_in2_r);
 	DECLARE_READ16_MEMBER(cps1_in3_r);
-	DECLARE_WRITE8_MEMBER(cps1_snd_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(cps1_coinctrl_w);
+	DECLARE_WRITE16_MEMBER(cpsq_coinctrl2_w);
+	DECLARE_WRITE16_MEMBER(cps1_cps_a_w);
+	DECLARE_READ16_MEMBER(cps1_cps_b_r);
+	DECLARE_WRITE16_MEMBER(cps1_cps_b_w);
+	DECLARE_WRITE16_MEMBER(cps1_gfxram_w);
 	DECLARE_WRITE16_MEMBER(cps1_soundlatch_w);
 	DECLARE_WRITE16_MEMBER(cps1_soundlatch2_w);
-	DECLARE_WRITE16_MEMBER(cpsq_coinctrl2_w);
+	DECLARE_WRITE8_MEMBER(cps1_snd_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(cps1_oki_pin7_w);
 	DECLARE_READ16_MEMBER(qsound_rom_r);
+	DECLARE_READ16_MEMBER(qsound_sharedram1_r);
+	DECLARE_WRITE16_MEMBER(qsound_sharedram1_w);
 	DECLARE_READ16_MEMBER(qsound_sharedram2_r);
 	DECLARE_WRITE16_MEMBER(qsound_sharedram2_w);
 	DECLARE_WRITE8_MEMBER(qsound_banksw_w);
+	DECLARE_READ16_MEMBER(ganbare_ram_r);
+	DECLARE_WRITE16_MEMBER(ganbare_ram_w);
+	DECLARE_READ16_MEMBER(cps1_hack_dsw_r);
 	DECLARE_READ16_MEMBER(sf2rb_prot_r);
 	DECLARE_READ16_MEMBER(sf2rb2_prot_r);
 	DECLARE_READ16_MEMBER(sf2dongb_prot_r);
 	DECLARE_READ16_MEMBER(sf2ceblp_prot_r);
 	DECLARE_WRITE16_MEMBER(sf2ceblp_prot_w);
-	DECLARE_READ16_MEMBER(cps1_dsw_r);
-	DECLARE_WRITE16_MEMBER(cps1_coinctrl_w);
-	DECLARE_READ16_MEMBER(qsound_sharedram1_r);
-	DECLARE_WRITE16_MEMBER(qsound_sharedram1_w);
-	DECLARE_READ16_MEMBER(ganbare_ram_r);
-	DECLARE_WRITE16_MEMBER(ganbare_ram_w);
-	DECLARE_WRITE16_MEMBER(cps1_cps_a_w);
-	DECLARE_READ16_MEMBER(cps1_cps_b_r);
-	DECLARE_WRITE16_MEMBER(cps1_cps_b_w);
-	DECLARE_WRITE16_MEMBER(cps1_gfxram_w);
-	DECLARE_WRITE8_MEMBER(cps1_oki_pin7_w);
-	DECLARE_WRITE16_MEMBER(sf2m1_layer_w);
 	DECLARE_WRITE16_MEMBER(sf2m3_layer_w);
 	DECLARE_READ16_MEMBER(dinohunt_sound_r);
-	void init_sf2rb();
-	void init_sf2rb2();
-	void init_sf2thndr();
-	void init_dinohunt();
-	void init_sf2hack();
-	void init_sf2rk();
-	void init_slammast();
-	void init_pang3b();
-	void init_pang3();
-	void init_sf2ee();
-	void init_sf2m8();
-	void init_cps1();
-	void init_dino();
-	void init_punisher();
-	void init_wof();
-	void init_ganbare();
-	void init_sf2dongb();
-	void init_sf2ceblp();
+
 	TILEMAP_MAPPER_MEMBER(tilemap0_scan);
 	TILEMAP_MAPPER_MEMBER(tilemap1_scan);
 	TILEMAP_MAPPER_MEMBER(tilemap2_scan);
 	TILE_GET_INFO_MEMBER(get_tile0_info);
 	TILE_GET_INFO_MEMBER(get_tile1_info);
 	TILE_GET_INFO_MEMBER(get_tile2_info);
-	DECLARE_MACHINE_START(cps1);
 	virtual void video_start() override;
-	DECLARE_MACHINE_START(common);
-	DECLARE_MACHINE_START(qsound);
-	DECLARE_MACHINE_START(ganbare);
-	DECLARE_MACHINE_RESET(cps);
-	DECLARE_MACHINE_START(sf2m1);
+
+	INTERRUPT_GEN_MEMBER(cps1_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(ganbare_interrupt);
+
 	virtual void render_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_cps1);
-	INTERRUPT_GEN_MEMBER(cps1_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(ganbare_interrupt);
-	void cpu_space_map(address_map &map);
 
 	void kabuki_setup(void (*decode)(uint8_t *src, uint8_t *dst));
 
-	/* fcrash handlers */
-	void init_kodb();
-	void init_cawingbl();
-	void init_dinopic();
-	void init_knightsb();
-	void init_mtwinsb();
-	void init_punipic();
-	void init_punipic3();
-	void init_sf2m1();
-	void init_sf2mdt();
-	void init_sf2mdta();
-	void init_sf2mdtb();
-	void init_sf2b();
-	void init_slampic();
-	void init_wofabl();
-	DECLARE_MACHINE_START(fcrash);
-	DECLARE_MACHINE_RESET(fcrash);
-	DECLARE_MACHINE_START(cawingbl);
-	DECLARE_MACHINE_START(dinopic);
-	DECLARE_MACHINE_START(knightsb);
-	DECLARE_MACHINE_START(kodb);
-	DECLARE_MACHINE_START(mtwinsb);
-	DECLARE_MACHINE_START(punipic);
-	DECLARE_MACHINE_START(sf2mdt);
-	DECLARE_MACHINE_START(slampic);
-	DECLARE_MACHINE_START(sgyxz);
-	DECLARE_WRITE16_MEMBER(cawingbl_soundlatch_w);
-	DECLARE_WRITE16_MEMBER(dinopic_layer_w);
-	DECLARE_WRITE16_MEMBER(dinopic_layer2_w);
-	DECLARE_WRITE16_MEMBER(knightsb_layer_w);
-	DECLARE_WRITE16_MEMBER(kodb_layer_w);
-	DECLARE_WRITE16_MEMBER(mtwinsb_layer_w);
-	DECLARE_WRITE16_MEMBER(punipic_layer_w);
-	DECLARE_WRITE16_MEMBER(sf2mdt_layer_w);
-	DECLARE_WRITE16_MEMBER(sf2mdta_layer_w);
-	DECLARE_WRITE16_MEMBER(sf2b_layer_w);
-	DECLARE_WRITE16_MEMBER(slampic_layer_w);
-	DECLARE_WRITE16_MEMBER(fcrash_soundlatch_w);
-	DECLARE_WRITE8_MEMBER(fcrash_snd_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(sf2mdt_snd_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(knightsb_snd_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(fcrash_msm5205_0_data_w);
-	DECLARE_WRITE8_MEMBER(fcrash_msm5205_1_data_w);
-	DECLARE_WRITE16_MEMBER(varthb_layer_w);
-	uint32_t screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void fcrash_update_transmasks();
-	void fcrash_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void fcrash_render_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int primask);
-	void fcrash_render_high_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
-	void fcrash_build_palette();
+	/* maps */
+	void cpu_space_map(address_map &map);
+	void main_map(address_map &map);
+	void forgottn_map(address_map &map);
+	void qsound_main_map(address_map &map);
+	void qsound_decrypted_opcodes_map(address_map &map);
+	void sub_map(address_map &map);
+	void qsound_sub_map(address_map &map);
+	void sf2m3_map(address_map &map);
+	void sf2cems6_map(address_map &map);
+	void sf2m10_map(address_map &map);
 
+	// game-specific
+	uint16_t sf2ceblp_prot;
 
-	/* cps video */
+	/* video-related */
+	tilemap_t *m_bg_tilemap[3];
+	int m_scanline1;
+	int m_scanline2;
+	int m_scancalls;
+
+	int m_scroll1x;
+	int m_scroll1y;
+	int m_scroll2x;
+	int m_scroll2y;
+	int m_scroll3x;
+	int m_scroll3y;
+
+	int m_stars_enabled[2];        /* Layer enabled [Y/N] */
+	int m_stars1x;
+	int m_stars1y;
+	int m_stars2x;
+	int m_stars2y;
+	int m_last_sprite_offset;      /* Offset of the last sprite */
+
+	bitmap_ind16 m_dummy_bitmap;
+
+	/* video config (never changed after video_start) */
+	const struct CPS1config *m_game_config;
+	int m_scroll_size;
+	int m_obj_size;
+	int m_other_size;
+	int m_palette_align;
+	int m_palette_size;
+	int m_stars_rom_size;
+	uint8_t m_empty_tile[32*32];
+
+	/* video/cps1.cpp */
 	inline uint16_t *cps1_base( int offset, int boundary );
 	void cps1_get_video_base();
 	int gfxrom_bank_mapper(int type, int code);
@@ -267,139 +277,27 @@ public:
 	void cps1_render_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int primask);
 	void cps1_render_high_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
 
-
-	/* cps2 driver */
-	DECLARE_WRITE_LINE_MEMBER(m5205_int1);
-	DECLARE_WRITE_LINE_MEMBER(m5205_int2);
-	void cawingbl(machine_config &config);
-	void sf2mdt(machine_config &config);
-	void sf2m1(machine_config &config);
-	void kodb(machine_config &config);
-	void mtwinsb(machine_config &config);
-	void varthb(machine_config &config);
-	void sgyxz(machine_config &config);
-	void wofabl(machine_config &config);
-	void punipic(machine_config &config);
-	void dinopic(machine_config &config);
-	void slampic(machine_config &config);
-	void sf2b(machine_config &config);
-	void knightsb(machine_config &config);
-	void fcrash(machine_config &config);
-	void sf2m10(machine_config &config);
-	void sf2m3(machine_config &config);
-	void sf2cems6(machine_config &config);
-	void forgottn(machine_config &config);
-	void ganbare(machine_config &config);
-	void qsound(machine_config &config);
-	void cps1_12MHz(machine_config &config);
-	void wofhfh(machine_config &config);
-	void cps1_10MHz(machine_config &config);
-	void pang3(machine_config &config);
-	void dinopic_map(address_map &map);
-	void fcrash_map(address_map &map);
-	void forgottn_map(address_map &map);
-	void knightsb_map(address_map &map);
-	void knightsb_z80map(address_map &map);
-	void kodb_sound_map(address_map &map);
-	void main_map(address_map &map);
-	void mtwinsb_map(address_map &map);
-	void punipic_map(address_map &map);
-	void qsound_decrypted_opcodes_map(address_map &map);
-	void qsound_main_map(address_map &map);
-	void qsound_sub_map(address_map &map);
-	void sf2b_map(address_map &map);
-	void sf2m10_map(address_map &map);
-	void sf2m1_map(address_map &map);
-	void sf2m3_map(address_map &map);
-	void sf2cems6_map(address_map &map);
-	void sf2mdt_map(address_map &map);
-	void sf2mdt_z80map(address_map &map);
-	void sgyxz_map(address_map &map);
-	void sgyxz_sound_map(address_map &map);
-	void wofabl_map(address_map &map);
-	void slampic_map(address_map &map);
-	void sound_map(address_map &map);
-	void sub_map(address_map &map);
-	void varthb_map(address_map &map);
-
-protected:
 	/* memory pointers */
-	// cps1
 	optional_shared_ptr<uint16_t> m_mainram;
 	required_shared_ptr<uint16_t> m_gfxram;
 	required_shared_ptr<uint16_t> m_cps_a_regs;
 	required_shared_ptr<uint16_t> m_cps_b_regs;
-	uint16_t *     m_scroll1;
-	uint16_t *     m_scroll2;
-	uint16_t *     m_scroll3;
-	uint16_t *     m_obj;
-	uint16_t *     m_other;
-	std::unique_ptr<uint16_t[]>     m_buffered_obj;
+	uint16_t * m_scroll1;
+	uint16_t * m_scroll2;
+	uint16_t * m_scroll3;
+	uint16_t * m_obj;
+	uint16_t * m_other;
+	std::unique_ptr<uint16_t[]> m_buffered_obj;
 	optional_shared_ptr<uint8_t> m_qsound_sharedram1;
 	optional_shared_ptr<uint8_t> m_qsound_sharedram2;
 	std::unique_ptr<uint8_t[]> m_decrypt_kabuki;
-
-	// game-specific
-	uint16_t  sf2ceblp_prot;
-
-	/* video-related */
-	tilemap_t      *m_bg_tilemap[3];
-	int          m_scanline1;
-	int          m_scanline2;
-	int          m_scancalls;
-
-	int          m_scroll1x;
-	int          m_scroll1y;
-	int          m_scroll2x;
-	int          m_scroll2y;
-	int          m_scroll3x;
-	int          m_scroll3y;
-
-	int          m_stars_enabled[2];        /* Layer enabled [Y/N] */
-	int          m_stars1x;
-	int          m_stars1y;
-	int          m_stars2x;
-	int          m_stars2y;
-	int          m_last_sprite_offset;      /* Offset of the last sprite */
-
-	bitmap_ind16 m_dummy_bitmap;
-
-	/* fcrash sound hw */
-	int          m_sample_buffer1;
-	int          m_sample_buffer2;
-	int          m_sample_select1;
-	int          m_sample_select2;
-
-	/* video config (never changed after video_start) */
-	const struct CPS1config *m_game_config;
-	int          m_scroll_size;
-	int          m_obj_size;
-	int          m_other_size;
-	int          m_palette_align;
-	int          m_palette_size;
-	int          m_stars_rom_size;
-	uint8_t        m_empty_tile[32*32];
-	int          m_cps_version;
-
-	/* fcrash video config */
-	uint8_t        m_layer_enable_reg;
-	uint8_t        m_layer_mask_reg[4];
-	int          m_layer_scroll1x_offset;
-	int          m_layer_scroll2x_offset;
-	int          m_layer_scroll3x_offset;
-	int          m_sprite_base;
-	int          m_sprite_list_end_marker;
-	int          m_sprite_x_offset;
-	std::unique_ptr<uint16_t[]> m_bootleg_sprite_ram;
-	std::unique_ptr<uint16_t[]> m_bootleg_work_ram;
+	int m_cps_version;
 
 	/* devices */
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki;
 	optional_device<m48t35_device> m_m48t35;
-	optional_device<msm5205_device> m_msm_1;    // fcrash
-	optional_device<msm5205_device> m_msm_2;    // fcrash
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -512,7 +410,8 @@ private:
 	int          m_ecofghtr_dial_last1;
 };
 
-/*----------- defined in drivers/cps1.c -----------*/
+
+/*----------- defined in drivers/cps1.cpp -----------*/
 
 extern gfx_decode_entry const gfx_cps1[];
 
@@ -523,6 +422,6 @@ INPUT_PORTS_EXTERN( punisher );
 INPUT_PORTS_EXTERN( sf2 );
 INPUT_PORTS_EXTERN( slammast );
 INPUT_PORTS_EXTERN( varth );
-
+INPUT_PORTS_EXTERN( captcomm );
 
 #endif // MAME_INCLUDES_CPS1_H

@@ -85,7 +85,7 @@ DEFINE_DEVICE_TYPE(R4000, r4000_device, "r4000", "MIPS R4000")
 DEFINE_DEVICE_TYPE(R4400, r4400_device, "r4400", "MIPS R4400")
 DEFINE_DEVICE_TYPE(R4600, r4600_device, "r4600", "QED R4600")
 
-r4000_base_device::r4000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 prid, u32 fcr, cache_size_t icache_size, cache_size_t dcache_size)
+r4000_base_device::r4000_base_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 prid, u32 fcr, cache_size icache_size, cache_size dcache_size)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config_le("program", ENDIANNESS_LITTLE, 64, 32)
 	, m_program_config_be("program", ENDIANNESS_BIG, 64, 32)
@@ -189,14 +189,20 @@ void r4000_base_device::device_reset()
 {
 	m_branch_state = NONE;
 	m_pc = s64(s32(0xbfc00000));
+	m_r[0] = 0;
 
-	m_cp0[CP0_Status] = SR_BEV | SR_ERL;
+	if (m_hard_reset)
+		m_cp0[CP0_Status] = SR_BEV | SR_ERL;
+	else
+		m_cp0[CP0_Status] = SR_BEV | SR_ERL | SR_SR;
+
 	m_cp0[CP0_Wired] = 0;
 	m_cp0[CP0_Compare] = 0;
 	m_cp0[CP0_Count] = 0;
 
 	m_cp0_timer_zero = total_cycles();
 
+	m_hard_reset = false;
 	m_ll_active = false;
 	m_bus_error = false;
 
@@ -240,7 +246,7 @@ bool r4000_base_device::memory_translate(int spacenum, int intention, offs_t &ad
 	// FIXME: address truncation
 	u64 placeholder = s32(address);
 
-	translate_t const t = translate(intention, placeholder);
+	translate_result const t = translate(intention, placeholder);
 
 	if (t == ERROR || t == MISS)
 		return false;
@@ -1146,7 +1152,7 @@ void r4000_base_device::cpu_lwl(u32 const op)
 	u64 const offset = ADDR(m_r[RSREG], s16(op));
 	unsigned const shift = ((offset & 3) ^ R4000_ENDIAN_LE_BE(3, 0)) << 3;
 
-	load<u32>(offset & ~3,
+	load<u32, false>(offset,
 		[this, op, shift](u32 const data)
 		{
 			m_r[RTREG] = s32((m_r[RTREG] & ~u32(~u32(0) << shift)) | (data << shift));
@@ -1158,7 +1164,7 @@ void r4000_base_device::cpu_lwr(u32 const op)
 	u64 const offset = ADDR(m_r[RSREG], s16(op));
 	unsigned const shift = ((offset & 0x3) ^ R4000_ENDIAN_LE_BE(0, 3)) << 3;
 
-	load<u32>(offset & ~3,
+	load<u32, false>(offset,
 		[this, op, shift](u32 const data)
 		{
 			m_r[RTREG] = s32((m_r[RTREG] & ~u32(~u32(0) >> shift)) | (data >> shift));
@@ -1170,7 +1176,7 @@ void r4000_base_device::cpu_swl(u32 const op)
 	u64 const offset = ADDR(m_r[RSREG], s16(op));
 	unsigned const shift = ((offset & 3) ^ R4000_ENDIAN_LE_BE(3, 0)) << 3;
 
-	store<u32>(offset & ~3, u32(m_r[RTREG]) >> shift, ~u32(0) >> shift);
+	store<u32, false>(offset, u32(m_r[RTREG]) >> shift, ~u32(0) >> shift);
 }
 
 void r4000_base_device::cpu_swr(u32 const op)
@@ -1178,7 +1184,7 @@ void r4000_base_device::cpu_swr(u32 const op)
 	u64 const offset = ADDR(m_r[RSREG], s16(op));
 	unsigned const shift = ((offset & 3) ^ R4000_ENDIAN_LE_BE(0, 3)) << 3;
 
-	store<u32>(offset & ~3, u32(m_r[RTREG]) << shift, ~u32(0) << shift);
+	store<u32, false>(offset, u32(m_r[RTREG]) << shift, ~u32(0) << shift);
 }
 
 void r4000_base_device::cpu_ldl(u32 const op)
@@ -1186,7 +1192,7 @@ void r4000_base_device::cpu_ldl(u32 const op)
 	u64 const offset = ADDR(m_r[RSREG], s16(op));
 	unsigned const shift = ((offset & 7) ^ R4000_ENDIAN_LE_BE(7, 0)) << 3;
 
-	load<u64>(offset & ~7,
+	load<u64, false>(offset,
 		[this, op, shift](u64 const data)
 		{
 			m_r[RTREG] = (m_r[RTREG] & ~u64(~u64(0) << shift)) | (data << shift);
@@ -1198,7 +1204,7 @@ void r4000_base_device::cpu_ldr(u32 const op)
 	u64 const offset = ADDR(m_r[RSREG], s16(op));
 	unsigned const shift = ((offset & 7) ^ R4000_ENDIAN_LE_BE(0, 7)) << 3;
 
-	load<u64>(offset & ~7,
+	load<u64, false>(offset,
 		[this, op, shift](u64 const data)
 		{
 			m_r[RTREG] = (m_r[RTREG] & ~u64(~u64(0) >> shift)) | (data >> shift);
@@ -1210,7 +1216,7 @@ void r4000_base_device::cpu_sdl(u32 const op)
 	u64 const offset = ADDR(m_r[RSREG], s16(op));
 	unsigned const shift = ((offset & 7) ^ R4000_ENDIAN_LE_BE(7, 0)) << 3;
 
-	store<u64>(offset & ~7, m_r[RTREG] >> shift, ~u64(0) >> shift);
+	store<u64, false>(offset, m_r[RTREG] >> shift, ~u64(0) >> shift);
 }
 
 void r4000_base_device::cpu_sdr(u32 const op)
@@ -1218,7 +1224,7 @@ void r4000_base_device::cpu_sdr(u32 const op)
 	u64 const offset = ADDR(m_r[RSREG], s16(op));
 	unsigned const shift = ((offset & 7) ^ R4000_ENDIAN_LE_BE(0, 7)) << 3;
 
-	store<u64>(offset & ~7, m_r[RTREG] << shift, ~u64(0) << shift);
+	store<u64, false>(offset, m_r[RTREG] << shift, ~u64(0) << shift);
 }
 
 void r4000_base_device::cp0_execute(u32 const op)
@@ -1469,7 +1475,7 @@ void r4000_base_device::cp0_tlbr()
 
 	if (index < ARRAY_LENGTH(m_tlb))
 	{
-		tlb_entry_t const &entry = m_tlb[index];
+		tlb_entry const &entry = m_tlb[index];
 
 		m_cp0[CP0_PageMask] = entry.mask;
 		m_cp0[CP0_EntryHi] = entry.vpn;
@@ -1482,7 +1488,7 @@ void r4000_base_device::cp0_tlbwi(u8 const index)
 {
 	if (index < ARRAY_LENGTH(m_tlb))
 	{
-		tlb_entry_t &entry = m_tlb[index];
+		tlb_entry &entry = m_tlb[index];
 
 		entry.mask = m_cp0[CP0_PageMask];
 		entry.vpn = m_cp0[CP0_EntryHi] & EH_WM;
@@ -1517,7 +1523,7 @@ void r4000_base_device::cp0_tlbp()
 	m_cp0[CP0_Index] = 0x80000000;
 	for (u8 index = 0; index < ARRAY_LENGTH(m_tlb); index++)
 	{
-		tlb_entry_t const &entry = m_tlb[index];
+		tlb_entry const &entry = m_tlb[index];
 
 		u64 const mask = (cp0_64() ? EH_R | (EH_VPN2_64 & ~entry.mask) : (EH_VPN2_32 & ~entry.mask))
 			| ((entry.vpn & EH_G) ? 0 : EH_ASID);
@@ -1530,9 +1536,9 @@ void r4000_base_device::cp0_tlbp()
 	}
 
 	if (m_cp0[CP0_Index] == 0x80000000)
-		LOGMASKED(LOG_TLB, "tlbp miss 0x%08x\n", m_cp0[CP0_EntryHi]);
+		LOGMASKED(LOG_TLB, "tlbp miss 0x%08x (%s)\n", m_cp0[CP0_EntryHi], machine().describe_context());
 	else
-		LOGMASKED(LOG_TLB, "tlbp hit 0x%08x index %02d\n", m_cp0[CP0_EntryHi], m_cp0[CP0_Index]);
+		LOGMASKED(LOG_TLB, "tlbp hit 0x%08x index %02d (%s)\n", m_cp0[CP0_EntryHi], m_cp0[CP0_Index], machine().describe_context());
 }
 
 void r4000_base_device::cp0_update_timer(bool start)
@@ -2727,7 +2733,7 @@ void r4000_base_device::cp2_execute(u32 const op)
 	}
 }
 
-r4000_base_device::translate_t r4000_base_device::translate(int intention, u64 &address)
+r4000_base_device::translate_result r4000_base_device::translate(int intention, u64 &address)
 {
 	/*
 	 * Decode the program address into one of the following ranges depending on
@@ -2890,7 +2896,7 @@ r4000_base_device::translate_t r4000_base_device::translate(int intention, u64 &
 	for (unsigned i = 0; i < ARRAY_LENGTH(m_tlb); i++)
 	{
 		unsigned const index = mru[i];
-		tlb_entry_t const &entry = m_tlb[index];
+		tlb_entry const &entry = m_tlb[index];
 
 		// test vpn and asid
 		u64 const mask = (extended ? EH_R | (EH_VPN2_64 & ~entry.mask) : (EH_VPN2_32 & ~entry.mask))
@@ -2934,13 +2940,13 @@ r4000_base_device::translate_t r4000_base_device::translate(int intention, u64 &
 	{
 		if (VERBOSE & LOG_TLB)
 		{
-			char const mode[] = { 'r', 'w', 'x' };
+			static char const mode[] = { 'r', 'w', 'x' };
 
 			if (modify)
-				LOGMASKED(LOG_TLB, "tlb modify asid %d address 0x%016x (%s)\n",
-				m_cp0[CP0_EntryHi] & EH_ASID, address, machine().describe_context());
+				LOGMASKED(LOG_TLB, "tlb modify asid 0x%02x address 0x%016x (%s)\n",
+					m_cp0[CP0_EntryHi] & EH_ASID, address, machine().describe_context());
 			else
-				LOGMASKED(LOG_TLB, "tlb miss %c asid %d address 0x%016x (%s)\n",
+				LOGMASKED(LOG_TLB, "tlb miss %c asid 0x%02x address 0x%016x (%s)\n",
 					mode[intention & TRANSLATE_TYPE_MASK], m_cp0[CP0_EntryHi] & EH_ASID, address, machine().describe_context());
 		}
 
@@ -2976,16 +2982,16 @@ void r4000_base_device::address_error(int intention, u64 const address)
 	}
 }
 
-template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, bool> r4000_base_device::load(u64 address, U &&apply)
+template <typename T, bool Aligned, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, bool> r4000_base_device::load(u64 address, U &&apply)
 {
 	// alignment error
-	if (address & (sizeof(T) - 1))
+	if (Aligned && (address & (sizeof(T) - 1)))
 	{
 		address_error(TRANSLATE_READ, address);
 		return false;
 	}
 
-	translate_t const t = translate(TRANSLATE_READ, address);
+	translate_result const t = translate(TRANSLATE_READ, address);
 
 	// address error
 	if (t == ERROR)
@@ -3010,6 +3016,10 @@ template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::f
 			return false;
 		}
 	}
+
+	// align address for l[dw][lr] instructions
+	if (!Aligned)
+		address &= ~(sizeof(T) - 1);
 
 	// TODO: cache lookup
 
@@ -3044,7 +3054,7 @@ template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::f
 		return false;
 	}
 
-	translate_t const t = translate(TRANSLATE_READ, address);
+	translate_result const t = translate(TRANSLATE_READ, address);
 
 	// address error
 	if (t == ERROR)
@@ -3080,16 +3090,16 @@ template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::f
 	return true;
 }
 
-template <typename T, typename U> std::enable_if_t<std::is_convertible<U, T>::value, bool> r4000_base_device::store(u64 address, U data, T mem_mask)
+template <typename T, bool Aligned, typename U> std::enable_if_t<std::is_convertible<U, T>::value, bool> r4000_base_device::store(u64 address, U data, T mem_mask)
 {
 	// alignment error
-	if (address & (sizeof(T) - 1))
+	if (Aligned && (address & (sizeof(T) - 1)))
 	{
 		address_error(TRANSLATE_WRITE, address);
 		return false;
 	}
 
-	translate_t const t = translate(TRANSLATE_WRITE, address);
+	translate_result const t = translate(TRANSLATE_WRITE, address);
 
 	// address error
 	if (t == ERROR)
@@ -3113,6 +3123,10 @@ template <typename T, typename U> std::enable_if_t<std::is_convertible<U, T>::va
 			return false;
 		}
 	}
+
+	// align address for s[dw][lr] instructions
+	if (!Aligned)
+		address &= ~(sizeof(T) - 1);
 
 	// TODO: cache lookup
 
@@ -3139,7 +3153,7 @@ bool r4000_base_device::fetch(u64 address, std::function<void(u32)> &&apply)
 		return false;
 	}
 
-	translate_t const t = translate(TRANSLATE_FETCH, address);
+	translate_result const t = translate(TRANSLATE_FETCH, address);
 
 	// address error
 	if (t == ERROR)

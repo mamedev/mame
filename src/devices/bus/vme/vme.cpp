@@ -455,12 +455,12 @@ void vme_device::install_device(vme_amod_t amod, offs_t start, offs_t end, read3
 // Card interface
 //
 device_vme_card_interface::device_vme_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
-	,m_vme(nullptr)
-	,m_vme_tag(nullptr)
-	,m_vme_slottag(nullptr)
-	,m_slot(0)
-	,m_next(nullptr)
+	: device_interface(device, "vme")
+	, m_vme(nullptr)
+	, m_vme_tag(nullptr)
+	, m_vme_slottag(nullptr)
+	, m_slot(0)
+	, m_next(nullptr)
 {
 	m_device = &device;
 	LOG("%s %s\n", m_device->tag(), FUNCNAME);

@@ -400,7 +400,7 @@ void shangkid_state::chinhero(machine_config &config)
 	mainlatch.q_out_cb<6>().set(FUNC(shangkid_state::coin_counter_1_w));
 	mainlatch.q_out_cb<7>().set(FUNC(shangkid_state::coin_counter_2_w));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

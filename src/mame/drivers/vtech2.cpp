@@ -490,7 +490,7 @@ void vtech2_state::laser350(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vtech2_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &vtech2_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(vtech2_state::vtech2_interrupt));
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	ADDRESS_MAP_BANK(config, "banka").set_map(&vtech2_state::m_map350).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 	ADDRESS_MAP_BANK(config, "bankb").set_map(&vtech2_state::m_map350).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
@@ -524,7 +524,7 @@ void vtech2_state::laser350(machine_config &config)
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "vtech_cart", "rom,bin").set_device_load(FUNC(vtech2_state::cart_load));
 
 	/* 5.25" Floppy drive */
-	LEGACY_FLOPPY(config, FLOPPY_0, 0, &vtech2_floppy_interface);
+	LEGACY_FLOPPY(config, m_laser_file[0], 0, &vtech2_floppy_interface);
 }
 
 
@@ -549,8 +549,8 @@ void vtech2_state::laser700(machine_config &config)
 	ADDRESS_MAP_BANK(config.replace(), "bankd").set_map(&vtech2_state::m_map700).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 
 	/* Second 5.25" floppy drive */
-	LEGACY_FLOPPY(config, FLOPPY_1, 0, &vtech2_floppy_interface);
-	}
+	LEGACY_FLOPPY(config, m_laser_file[1], 0, &vtech2_floppy_interface);
+}
 
 
 ROM_START(laser350)

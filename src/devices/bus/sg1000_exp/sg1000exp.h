@@ -23,7 +23,7 @@
 
 class device_sg1000_expansion_slot_interface;
 
-class sg1000_expansion_slot_device : public device_t, public device_slot_interface
+class sg1000_expansion_slot_device : public device_t, public device_single_card_slot_interface<device_sg1000_expansion_slot_interface>
 {
 public:
 	// construction/destruction
@@ -57,7 +57,7 @@ private:
 // ======================> device_sg1000_expansion_slot_interface
 
 // class representing interface-specific live sg1000_expansion card
-class device_sg1000_expansion_slot_interface : public device_slot_card_interface
+class device_sg1000_expansion_slot_interface : public device_interface
 {
 public:
 	// construction/destruction

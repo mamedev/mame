@@ -9,7 +9,7 @@
 //============================================================
 
 // standard C headers
-#include <math.h>
+#include <cmath>
 #ifndef _MSC_VER
 #include <unistd.h>
 #endif
@@ -498,9 +498,6 @@ void mac_window_info::update()
 			render_primitive_list &primlist = *renderer().get_primitives();
 
 			// and redraw now
-
-			// Some configurations require events to be polled in the worker thread
-			downcast< mac_osd_interface& >(machine().osd()).process_events_buf();
 
 			// Check whether window has vector screens
 

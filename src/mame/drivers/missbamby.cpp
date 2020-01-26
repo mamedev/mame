@@ -2,10 +2,22 @@
 // copyright-holders:
 
 /*
-Miss Bamby - Automatics Pasqual (ClawGrip 2019-01-21)
+Skeleton driver for Cirsa "Mini Super Fruits" and clones.
+Known games on this hardware:
+
+Dumped Game              Manufacturer
+NO     Mini Super Fruits Cirsa
+YES    Miss Bamby        Automatics Pasqual
+YES    Golden Winer      Reben
+NO     Golden Fruits     unknown
+NO     St.-Tropez        unknown
+
+*/
+/*
+Miss Bamby - Automatics Pasqual
    _____________________________________________________________
    |                             _______                        |
-   |                             |__??__|      ____________     |
+   |                             |_PROM_|      ____________     |
    |                  __________________       | EMPTY     |    |
    |                  | M5L8085AP       |      |_SOCKET____|    |
    |                  |_________________|      ____________     |
@@ -28,16 +40,41 @@ Miss Bamby - Automatics Pasqual (ClawGrip 2019-01-21)
 |__|                     |__________________| |P  | ______      |
 |__|                                          |S__| LM311N      |
    |____________________________________________________________|
+
+Golden Winner - Reben
+   _____________________________________________________________
+   |                             _______                        |
+   |                            DM74S188N      ____________     |
+   |                  __________________       | EMPTY     |    |
+   |                  | NEC D8085AC     |      |_SOCKET____|    |
+   |                  |_________________|      ____________     |
+   |                       ______________      | ROM-B     |    |
+   |         XTAL          |INS/DP8212N |      |___________|    |
+   |   __   6.000          |____________|      ____________     |
+   |   |R|                                     | ROM-A     |    |
+ __|                                           |___________|    |
+|__| ________  ________  ___________________   ____________     |
+|__| |_L203B_| |_L203B_| | NEC D8155HC      |  |MCM51L01P45|    |
+|__|                     |__________________|  ____________     |
+|__|                     ________   _________  |SCL 5101E-1|    |
+|__|           _______   |74LS393N  |DM7474N|                   |
+|__|           |7407N |                        ________         |
+|__|                     ________   ________   |GD4001B|        |
+|__|                     SN74LS14N  DM74LS153N                  |
+|__|                                          ____              |
+|__|   _______           ___________________  |D  |             |
+|__|   |LM380N|          |    AY-3-8910     | |I  |             |
+|__|                     |__________________| |P  | ______      |
+|__|                                          |S__| CA311E      |
+   |____________________________________________________________|
 */
 
 #include "emu.h"
 #include "emupal.h"
-#include "screen.h"
 #include "speaker.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8155.h"
 //#include "machine/nvram.h"
-#include "machine/pit8253.h"
 #include "sound/ay8910.h"
 
 class missbamby_state : public driver_device
@@ -50,22 +87,16 @@ public:
 	}
 
 	void missbamby(machine_config &config);
+	void gldwinner(machine_config &config);
 
 private:
 	required_device<cpu_device> m_maincpu;
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void io_map(address_map &map);
 	void prg_map(address_map &map);
 
 	virtual void machine_start() override;
 };
-
-uint32_t missbamby_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
 
 void missbamby_state::prg_map(address_map &map) // preliminary, everything to be taken with a grain of salt
 {
@@ -75,7 +106,9 @@ void missbamby_state::prg_map(address_map &map) // preliminary, everything to be
 	map(0x8000, 0x80ff).ram();
 	map(0x8800, 0x88ff).rw("i8155", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 	map(0x8900, 0x8907).rw("i8155", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
-	map(0x9000, 0x9003).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x9000, 0x9000).r("psg", FUNC(ay8910_device::data_r));
+	map(0x9001, 0x9001).w("psg", FUNC(ay8910_device::address_w));
+	map(0x9002, 0x9002).w("psg", FUNC(ay8910_device::data_w));
 }
 
 void missbamby_state::io_map(address_map &map)
@@ -109,18 +142,31 @@ void missbamby_state::machine_start()
 
 void missbamby_state::missbamby(machine_config &config)
 {
-	/* basic machine hardware */
 	I8085A(config, m_maincpu, 6.144_MHz_XTAL); // M5L8085AP
 	m_maincpu->set_addrmap(AS_PROGRAM, &missbamby_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &missbamby_state::io_map);
 
-	PIT8253(config, "pit", 6.144_MHz_XTAL/4); // guess: only ML82 readable, might be something else
-
 	I8155(config, "i8155", 6.144_MHz_XTAL/2); // M5L8155P, guessed divisor
 
-	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	AY8910(config, "ay8910", 6.144_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 1.0); // guess
+	ay8910_device &psg(AY8910(config, "psg", 6.144_MHz_XTAL / 4));
+	psg.port_a_read_callback().set_ioport("DSW1");
+	psg.add_route(ALL_OUTPUTS, "mono", 1.0); // guess
+}
+
+void missbamby_state::gldwinner(machine_config &config)
+{
+	I8085A(config, m_maincpu, 6_MHz_XTAL); // NEC D8085AC
+	m_maincpu->set_addrmap(AS_PROGRAM, &missbamby_state::prg_map);
+	m_maincpu->set_addrmap(AS_IO, &missbamby_state::io_map);
+
+	I8155(config, "i8155", 6_MHz_XTAL/2); // NEC D8155HC, guessed divisor
+
+	SPEAKER(config, "mono").front_center();
+	ay8910_device &psg(AY8910(config, "psg", 6_MHz_XTAL / 4));
+	psg.port_a_read_callback().set_ioport("DSW1");
+	psg.port_b_read_callback().set_ioport("IN0");
+	psg.add_route(ALL_OUTPUTS, "mono", 1.0); // guess
 }
 
 
@@ -128,7 +174,20 @@ ROM_START( msbamby )
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD( "1.bin", 0x0000, 0x2000, CRC(7b5efbd9) SHA1(abb4b4432021945aee474c4bdd83979f6460c671) )
 	ROM_LOAD( "2.bin", 0x2000, 0x2000, CRC(6048d5cd) SHA1(a3bbf43b1474de75aef9957b967ead96b9a18fc5) )
+
+	ROM_REGION(0x20, "prom", 0)
+	ROM_LOAD( "prom.bin", 0x00, 0x20, CRC(f7013c11) SHA1(6e4e6d7f2a041d44359a7f5662bb4302da234ace) ) // Unknown manufacturer, dumped as 82s123
+ROM_END
+
+ROM_START( gwinner )
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD( "reben_sa_gw-a_chk_8811_crc_2677.bin", 0x0000, 0x1000, CRC(ffcb4ba0) SHA1(2bc0dfc2b35a3a6cc3addf69a4c8916cc54347e4) )
+	ROM_LOAD( "reben_sa_gw-b_chk_f884_crc_7822.bin", 0x2000, 0x1000, CRC(0146a4ff) SHA1(d23048ba0f23daf5caba07affc57e88ab09ca91e) )
+
+	ROM_REGION(0x20, "prom", 0)
+	ROM_LOAD( "dm74s188n.bin", 0x00, 0x20, NO_DUMP )
 ROM_END
 
 
-GAME( 198?, msbamby, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 198?, msbamby, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",    MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1983, gwinner, 0, gldwinner, missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner", MACHINE_IS_SKELETON_MECHANICAL )

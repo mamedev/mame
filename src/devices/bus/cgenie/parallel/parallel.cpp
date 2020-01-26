@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(CG_PARALLEL_SLOT, cg_parallel_slot_device, "cg_parallel_slot"
 
 cg_parallel_slot_device::cg_parallel_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CG_PARALLEL_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_cg_parallel_interface>(mconfig, *this),
 	m_cart(nullptr)
 {
 }
@@ -48,15 +48,7 @@ cg_parallel_slot_device::~cg_parallel_slot_device()
 
 void cg_parallel_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_cg_parallel_interface *>(get_card_device());
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void cg_parallel_slot_device::device_reset()
-{
+	m_cart = get_card_device();
 }
 
 
@@ -102,7 +94,7 @@ WRITE8_MEMBER( cg_parallel_slot_device::pb_w )
 //-------------------------------------------------
 
 device_cg_parallel_interface::device_cg_parallel_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_interface(device, "cgeniepar")
 {
 	m_slot = dynamic_cast<cg_parallel_slot_device *>(device.owner());
 }

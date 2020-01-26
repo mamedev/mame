@@ -153,20 +153,20 @@ void vsmile_base_state::mem_map(address_map &map)
 
 void vsmile_state::banked_map(address_map &map)
 {
-	map(0x0000000, 0x00fffff).rom().region("maincpu", 0);
-	map(0x0100000, 0x01fffff).rom().region("maincpu", 0);
-	map(0x0200000, 0x02fffff).rom().region("maincpu", 0);
-	map(0x0300000, 0x03fffff).rom().region("maincpu", 0);
+	map(0x0000000, 0x00fffff).rom().region("sysrom", 0);
+	map(0x0100000, 0x01fffff).rom().region("sysrom", 0);
+	map(0x0200000, 0x02fffff).rom().region("sysrom", 0);
+	map(0x0300000, 0x03fffff).rom().region("sysrom", 0);
 
-	map(0x0400000, 0x04fffff).rom().region("maincpu", 0);
-	map(0x0500000, 0x05fffff).rom().region("maincpu", 0);
-	map(0x0600000, 0x06fffff).rom().region("maincpu", 0);
-	map(0x0700000, 0x07fffff).rom().region("maincpu", 0);
+	map(0x0400000, 0x04fffff).rom().region("sysrom", 0);
+	map(0x0500000, 0x05fffff).rom().region("sysrom", 0);
+	map(0x0600000, 0x06fffff).rom().region("sysrom", 0);
+	map(0x0700000, 0x07fffff).rom().region("sysrom", 0);
 
-	map(0x0800000, 0x08fffff).rom().region("maincpu", 0);
-	map(0x0900000, 0x09fffff).rom().region("maincpu", 0);
-	map(0x0a00000, 0x0afffff).rom().region("maincpu", 0);
-	map(0x0b00000, 0x0bfffff).rom().region("maincpu", 0);
+	map(0x0800000, 0x08fffff).rom().region("sysrom", 0);
+	map(0x0900000, 0x09fffff).rom().region("sysrom", 0);
+	map(0x0a00000, 0x0afffff).rom().region("sysrom", 0);
+	map(0x0b00000, 0x0bfffff).rom().region("sysrom", 0);
 
 	map(0x1000000, 0x13fffff).rw(m_cart, FUNC(vsmile_cart_slot_device::bank0_r), FUNC(vsmile_cart_slot_device::bank0_w));
 
@@ -187,7 +187,7 @@ void vsmile_state::banked_map(address_map &map)
 
 static INPUT_PORTS_START( vsmile )
 	PORT_START("REGION")
-	PORT_DIPNAME( 0x0f, 0x04, "BIOS Region" )
+	PORT_DIPNAME( 0x0f, 0x04, "sysrom Region" )
 	PORT_DIPSETTING(    0x04, "UK/US" )
 	PORT_DIPSETTING(    0x07, "China" )
 	PORT_DIPSETTING(    0x08, "Mexico" )
@@ -226,7 +226,7 @@ void vsmile_base_state::vsmile_base(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	ADDRESS_MAP_BANK(config, m_bankdev);
-	m_bankdev->set_endianness(ENDIANNESS_LITTLE);
+	m_bankdev->set_endianness(ENDIANNESS_BIG);
 	m_bankdev->set_data_width(16);
 	m_bankdev->set_shift(-1);
 	m_bankdev->set_stride(0x400000);
@@ -282,29 +282,24 @@ void vsmilem_state::vsmilem(machine_config &config)
  *
  ************************************/
 
-// TODO: decide on a dump endian, these likely differ in endianess due to different dumping technqiues
+// NOTE: many games contain additional spare copies of the BIOS in their own cartridge ROM, reason unknown
+
 ROM_START( vsmile )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "vsmilebios.bin", 0x000000, 0x200000, CRC(11f1b416) SHA1(11f77c4973d29c962567390e41879c86a759c93b) )
+	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS( 0, "v103", "v103" )
+	ROMX_LOAD( "vsmile_v103.bin", 0x000000, 0x200000, CRC(387fbc24) SHA1(5f2fd211b6ff3a6f5121b14adc6bbf4f49e89f33),  ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(0) ) // this is the earliest version used on the V.Smile Pocket, but it isn't system specific
+	ROM_SYSTEM_BIOS( 1, "v102", "v102" )
+	ROMX_LOAD( "vsmile_v102.bin", 0x000000, 0x200000, CRC(0cd0bdf5) SHA1(5c8d1eada1b6b545555b8d2b09325d7127681af8),  ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1) ) // found in all 'fat' model systems
+	ROM_SYSTEM_BIOS( 2, "v100", "v100" )
+	ROMX_LOAD( "vsmile_v100.bin", 0x000000, 0x200000, CRC(205c5296) SHA1(7fbcf761b5885c8b1524607aabaf364b4559c8cc),  ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2) )
 ROM_END
 
-ROM_START( vsmileg )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "bios german.bin", 0x000000, 0x200000, CRC(205c5296) SHA1(7fbcf761b5885c8b1524607aabaf364b4559c8cc) )
-ROM_END
-
-ROM_START( vsmilef )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "sysrom_france", 0x000000, 0x200000, CRC(0cd0bdf5) SHA1(5c8d1eada1b6b545555b8d2b09325d7127681af8) )
-ROM_END
 
 ROM_START( vsmilem )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
 	ROM_LOAD( "vsmilebios.bin", 0x000000, 0x200000, BAD_DUMP CRC(11f1b416) SHA1(11f77c4973d29c962567390e41879c86a759c93b) )
 ROM_END
 
 //    year, name,    parent, compat, machine, input,   class,         init,       company, fullname,              flags
-CONS( 2005, vsmile,  0,      0,      vsmile,  vsmile,  vsmile_state,  empty_init, "VTech", "V.Smile (US)",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2005, vsmileg, vsmile, 0,      vsmilep, vsmile,  vsmile_state,  empty_init, "VTech", "V.Smile (Germany)",   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2005, vsmilef, vsmile, 0,      vsmilep, vsmile,  vsmile_state,  empty_init, "VTech", "V.Smile (France)",    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, vsmile,  0,      0,      vsmile,  vsmile,  vsmile_state,  empty_init, "VTech", "V.Smile",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2008, vsmilem, vsmile, 0,      vsmilem, vsmile,  vsmilem_state, empty_init, "VTech", "V.Smile Motion (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

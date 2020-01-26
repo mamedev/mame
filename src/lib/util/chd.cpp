@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "chd.h"
 #include "avhuff.h"
@@ -17,9 +17,9 @@
 #include "cdrom.h"
 #include "coretmpl.h"
 #include <zlib.h>
-#include <time.h>
-#include <stddef.h>
-#include <stdlib.h>
+#include <ctime>
+#include <cstddef>
+#include <cstdlib>
 #include <new>
 #include "eminline.h"
 

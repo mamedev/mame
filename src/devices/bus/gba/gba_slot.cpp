@@ -478,10 +478,10 @@ DEFINE_DEVICE_TYPE(GBA_CART_SLOT, gba_cart_slot_device, "gba_cart_slot", "Game B
 //  device_gba_cart_interface - constructor
 //-------------------------------------------------
 
-device_gba_cart_interface::device_gba_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
-	, m_rom(nullptr)
-	, m_rom_size(0)
+device_gba_cart_interface::device_gba_cart_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "gbacart"),
+	m_rom(nullptr),
+	m_rom_size(0)
 {
 }
 

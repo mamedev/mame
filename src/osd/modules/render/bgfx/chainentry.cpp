@@ -13,6 +13,7 @@
 
 #include <bgfx/bgfx.h>
 #include <bx/math.h>
+#include <cmath>
 
 #include "chainmanager.h"
 #include "chainentry.h"
@@ -29,7 +30,7 @@
 #include "render.h"
 
 
-bgfx_chain_entry::bgfx_chain_entry(std::string name, bgfx_effect* effect, clear_state* clear, std::vector<bgfx_suppressor*> suppressors, std::vector<bgfx_input_pair*> inputs, std::vector<bgfx_entry_uniform*> uniforms, target_manager& targets, std::string output)
+bgfx_chain_entry::bgfx_chain_entry(std::string name, bgfx_effect* effect, clear_state* clear, std::vector<bgfx_suppressor*> suppressors, std::vector<bgfx_input_pair*> inputs, std::vector<bgfx_entry_uniform*> uniforms, target_manager& targets, std::string output, bool apply_tint)
 	: m_name(name)
 	, m_effect(effect)
 	, m_clear(clear)
@@ -38,6 +39,7 @@ bgfx_chain_entry::bgfx_chain_entry(std::string name, bgfx_effect* effect, clear_
 	, m_uniforms(uniforms)
 	, m_targets(targets)
 	, m_output(output)
+	, m_apply_tint(apply_tint)
 {
 }
 
@@ -68,8 +70,18 @@ void bgfx_chain_entry::submit(int view, chain_manager::screen_prim &prim, textur
 		input->bind(m_effect, screen);
 	}
 
+	uint32_t tint = 0xffffffff;
+	if (m_apply_tint)
+	{
+		const uint8_t a = (uint8_t)std::round(prim.m_prim->color.a * 255);
+		const uint8_t r = (uint8_t)std::round(prim.m_prim->color.r * 255);
+		const uint8_t g = (uint8_t)std::round(prim.m_prim->color.g * 255);
+		const uint8_t b = (uint8_t)std::round(prim.m_prim->color.b * 255);
+		tint = (a << 24) | (b << 16) | (g << 8) | r;
+	}
+
 	bgfx::TransientVertexBuffer buffer;
-	put_screen_buffer(prim.m_screen_width, prim.m_screen_height, &buffer);
+	put_screen_buffer(prim.m_screen_width, prim.m_screen_height, tint, &buffer);
 	bgfx::setVertexBuffer(0, &buffer);
 
 	setup_auto_uniforms(prim, textures, screen_count, screen_width, screen_height, screen_scale_x, screen_scale_y, screen_offset_x, screen_offset_y, rotation_type, swap_xy, screen);
@@ -268,7 +280,7 @@ bool bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t scre
 	return true;
 }
 
-void bgfx_chain_entry::put_screen_buffer(uint16_t screen_width, uint16_t screen_height, bgfx::TransientVertexBuffer* buffer) const
+void bgfx_chain_entry::put_screen_buffer(uint16_t screen_width, uint16_t screen_height, uint32_t screen_tint, bgfx::TransientVertexBuffer* buffer) const
 {
 	if (6 == bgfx::getAvailTransientVertexBuffer(6, ScreenVertex::ms_decl))
 	{
@@ -304,42 +316,42 @@ void bgfx_chain_entry::put_screen_buffer(uint16_t screen_width, uint16_t screen_
 	vertex[0].m_x = x[0];
 	vertex[0].m_y = y[0];
 	vertex[0].m_z = 0;
-	vertex[0].m_rgba = 0xffffffff;
+	vertex[0].m_rgba = screen_tint;
 	vertex[0].m_u = u[0];
 	vertex[0].m_v = v[0];
 
 	vertex[1].m_x = x[1];
 	vertex[1].m_y = y[1];
 	vertex[1].m_z = 0;
-	vertex[1].m_rgba = 0xffffffff;
+	vertex[1].m_rgba = screen_tint;
 	vertex[1].m_u = u[1];
 	vertex[1].m_v = v[1];
 
 	vertex[2].m_x = x[3];
 	vertex[2].m_y = y[3];
 	vertex[2].m_z = 0;
-	vertex[2].m_rgba = 0xffffffff;
+	vertex[2].m_rgba = screen_tint;
 	vertex[2].m_u = u[3];
 	vertex[2].m_v = v[3];
 
 	vertex[3].m_x = x[3];
 	vertex[3].m_y = y[3];
 	vertex[3].m_z = 0;
-	vertex[3].m_rgba = 0xffffffff;
+	vertex[3].m_rgba = screen_tint;
 	vertex[3].m_u = u[3];
 	vertex[3].m_v = v[3];
 
 	vertex[4].m_x = x[2];
 	vertex[4].m_y = y[2];
 	vertex[4].m_z = 0;
-	vertex[4].m_rgba = 0xffffffff;
+	vertex[4].m_rgba = screen_tint;
 	vertex[4].m_u = u[2];
 	vertex[4].m_v = v[2];
 
 	vertex[5].m_x = x[0];
 	vertex[5].m_y = y[0];
 	vertex[5].m_z = 0;
-	vertex[5].m_rgba = 0xffffffff;
+	vertex[5].m_rgba = screen_tint;
 	vertex[5].m_u = u[0];
 	vertex[5].m_v = v[0];
 }

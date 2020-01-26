@@ -511,7 +511,9 @@ void amstrad_pc_state::pc200(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &amstrad_pc_state::pc200_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	PCNOPPI_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
+	PCNOPPI_MOTHERBOARD(config, m_mb, 0).set_cputag(m_maincpu);
+	m_mb->int_callback().set_inputline(m_maincpu, 0);
+	m_mb->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	// FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "aga", 0, "mb:isa", pc_isa8_cards, "aga_pc200", true);

@@ -1733,7 +1733,6 @@ void pet_state::pet(machine_config &config)
 	// basic machine hardware
 	M6502(config, m_maincpu, XTAL(8'000'000)/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pet_state::pet2001_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2003,7 +2002,6 @@ void pet80_state::pet80(machine_config &config)
 	// basic machine hardware
 	M6502(config, m_maincpu, XTAL(16'000'000)/16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pet_state::pet2001_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 
 	// video hardware
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));

@@ -282,7 +282,7 @@ void menu_game_options::handle_item_event(event const &menu_event)
 		break;
 	case CUSTOM_MENU:
 		if (menu_event.iptkey == IPT_UI_SELECT)
-			menu::stack_push<menu_custom_ui>(ui(), container());
+			menu::stack_push<menu_custom_ui>(ui(), container(), [this] () { reset(reset_options::REMEMBER_REF); });
 		break;
 	default:
 		menu_simple_game_options::handle_item_event(menu_event);

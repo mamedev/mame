@@ -1,19 +1,19 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * palloc.h
- *
- */
 
 #ifndef PALLOC_H_
 #define PALLOC_H_
 
+///
+/// \file palloc.h
+///
+
 #include "pconfig.h"
+#include "pmath.h"
 #include "pstring.h"
 #include "ptypes.h"
 
 #include <cstddef>      // for std::max_align_t (usually long long)
-//#include <cstdlib>
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -36,33 +36,35 @@ namespace plib {
 		using arena_storage_type = typename std::conditional<P::is_stateless, P, P *>::type;
 
 		template <typename X, typename Y = void>
-		typename std::enable_if<!X::is_stateless, X&>::type getref(X *x) { return *x;}
+		typename std::enable_if<!X::is_stateless, X&>::type getref(X *x) const noexcept
+		{ return *x;}
 
 		template <typename X, typename Y = void *>
 		typename std::enable_if<std::remove_pointer<X>::type::is_stateless, X&>::type
-		getref(X &x, Y y = nullptr)
+		getref(X &x, Y y = nullptr) const noexcept
 		{
 			unused_var(y);
 			return x;
 		}
 
-		constexpr arena_deleter(arena_storage_type a = arena_storage_type())
+		constexpr arena_deleter(arena_storage_type a = arena_storage_type()) noexcept
 		: m_a(a) { }
 
 #if 1
 		template<typename U, typename = typename
 			   std::enable_if<std::is_convertible< U*, T*>::value>::type>
-		arena_deleter(const arena_deleter<P, U> &rhs) : m_a(rhs.m_a) { }
+		arena_deleter(const arena_deleter<P, U> &rhs) noexcept
+		: m_a(rhs.m_a) { }
 #else
 		template<typename PU, typename U, typename = typename
 			   std::enable_if<std::is_convertible< U*, T*>::value>::type>
 		arena_deleter(const arena_deleter<PU, U> &rhs) : m_a(rhs.m_a) { }
 #endif
-		void operator()(T *p) //const
+		void operator()(T *p) noexcept
 		{
-			/* call destructor */
+			// call destructor
 			p->~T();
-			getref(m_a).deallocate(p);
+			getref(m_a).deallocate(p, sizeof(T));
 		}
 	//private:
 		arena_storage_type m_a;
@@ -155,9 +157,9 @@ namespace plib {
 			m_ptr = nullptr;
 		}
 
-		/**
-		 * \brief Return @c true if the stored pointer is not null.
-		 */
+		///
+		/// \brief Return \c true if the stored pointer is not null.
+		///
 		explicit operator bool() const noexcept { return m_ptr != nullptr; }
 
 		pointer  release()
@@ -202,19 +204,20 @@ namespace plib {
 		: m_a(arena_type::instance())
 		{ }
 
-		~arena_allocator() noexcept = default;
+		//~arena_allocator() noexcept = default;
 
-		arena_allocator(arena_type & a) noexcept : m_a(a)
+		explicit arena_allocator(const arena_type & a) noexcept : m_a(a)
 		{
 		}
 
 		template <class U>
-		arena_allocator(const arena_allocator<ARENA, U, ALIGN>& rhs)
+		arena_allocator(const arena_allocator<ARENA, U, ALIGN>& rhs) noexcept
 		: m_a(rhs.m_a)
 		{
 		}
 
-		template <class U> struct rebind
+		template <class U>
+		struct rebind
 		{
 			using other = arena_allocator<ARENA, U, ALIGN>;
 		};
@@ -224,17 +227,18 @@ namespace plib {
 			return reinterpret_cast<T *>(m_a.allocate(ALIGN, sizeof(T) * n));
 		}
 
-		void deallocate(T* p, std::size_t n)
+		void deallocate(T* p, std::size_t n) noexcept
 		{
-			unused_var(n);
-			m_a.deallocate(p);
+			m_a.deallocate(p, n);
 		}
 
 		template <class AR1, class T1, std::size_t A1, class AR2, class T2, std::size_t A2>
 		friend bool operator==(const arena_allocator<AR1, T1, A1>& lhs,
 			const arena_allocator<AR2, T2, A2>& rhs) noexcept;
 
-		template <class AU, class U, std::size_t A> friend class arena_allocator;
+		template <class AU, class U, std::size_t A>
+		friend class arena_allocator;
+
 	private:
 		arena_type &m_a;
 	};
@@ -259,7 +263,9 @@ namespace plib {
 	struct aligned_arena
 	{
 		static constexpr const bool is_stateless = true;
-		template <class T, std::size_t ALIGN = alignof(T)>
+		using size_type = std::size_t;
+
+		template <class T, size_type ALIGN = alignof(T)>
 		using allocator_type = arena_allocator<aligned_arena, T, ALIGN>;
 
 		template <typename T>
@@ -268,7 +274,7 @@ namespace plib {
 		template <typename T>
 		using owned_pool_ptr = plib::owned_ptr<T, arena_deleter<aligned_arena, T>>;
 
-		static inline aligned_arena &instance()
+		static inline aligned_arena &instance() noexcept
 		{
 			static aligned_arena s_arena;
 			return s_arena;
@@ -276,6 +282,9 @@ namespace plib {
 
 		static inline void *allocate( size_t alignment, size_t size )
 		{
+			m_stat_cur_alloc() += size;
+			m_stat_max_alloc() = std::max(m_stat_max_alloc(), m_stat_cur_alloc());
+
 			#if (PUSE_ALIGNED_ALLOCATION)
 			#if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
 				return _aligned_malloc(size, alignment);
@@ -294,8 +303,10 @@ namespace plib {
 			#endif
 		}
 
-		static inline void deallocate( void *ptr )
+		static inline void deallocate( void *ptr, size_t size ) noexcept
 		{
+			//unused_var(size);
+			m_stat_cur_alloc() -= size;
 			#if (PUSE_ALIGNED_ALLOCATION)
 				// NOLINTNEXTLINE(cppcoreguidelines-no-malloc)
 				free(ptr);
@@ -315,7 +326,7 @@ namespace plib {
 			}
 			catch (...)
 			{
-				deallocate(mem);
+				deallocate(mem, sizeof(T));
 				throw;
 			}
 		}
@@ -331,21 +342,41 @@ namespace plib {
 			}
 			catch (...)
 			{
-				deallocate(mem);
+				deallocate(mem, sizeof(T));
 				throw;
 			}
 		}
 
-		bool operator ==(const aligned_arena &rhs) const
+		template<typename T, typename... Args>
+		static T *alloc(Args&&... args)
+		{
+			auto *p = allocate(alignof(T), sizeof(T));
+			return new(p) T(std::forward<Args>(args)...);
+		}
+
+		template<typename T>
+		static void free(T *ptr) noexcept
+		{
+			ptr->~T();
+			aligned_arena::deallocate(ptr, sizeof(T));
+		}
+
+		bool operator ==(const aligned_arena &rhs) const noexcept
 		{
 			plib::unused_var(rhs);
 			return true;
 		}
 
+		size_type cur_alloc() const noexcept { return m_stat_cur_alloc(); }
+		size_type max_alloc() const noexcept { return m_stat_max_alloc(); }
+	private:
+		static size_t &m_stat_cur_alloc() noexcept { static size_t val = 0; return val; }
+		static size_t &m_stat_max_alloc() noexcept { static size_t val = 0; return val; }
+
 	};
 
 	template <typename T, std::size_t ALIGN>
-	/*inline */ C14CONSTEXPR T *assume_aligned_ptr(T *p) noexcept
+	C14CONSTEXPR T *assume_aligned_ptr(T *p) noexcept
 	{
 		static_assert(ALIGN >= alignof(T), "Alignment must be greater or equal to alignof(T)");
 		static_assert(is_pow2(ALIGN), "Alignment must be a power of 2");
@@ -371,39 +402,14 @@ namespace plib {
 #endif
 	}
 
-	// FIXME: remove
-	template<typename T, typename... Args>
-	inline T *pnew(Args&&... args)
-	{
-		auto *p = aligned_arena::allocate(alignof(T), sizeof(T));
-		return new(p) T(std::forward<Args>(args)...);
-	}
-
-	template<typename T>
-	inline void pdelete(T *ptr)
-	{
-		ptr->~T();
-		aligned_arena::deallocate(ptr);
-	}
-
-
 	template <typename T>
-	using unique_ptr = std::unique_ptr<T, arena_deleter<aligned_arena, T>>;
+	using unique_ptr = aligned_arena::unique_pool_ptr<T>;
 
 	template<typename T, typename... Args>
 	plib::unique_ptr<T> make_unique(Args&&... args)
 	{
-		return plib::unique_ptr<T>(pnew<T>(std::forward<Args>(args)...));
+		return aligned_arena::instance().make_unique<T>(std::forward<Args>(args)...);
 	}
-
-#if 0
-	template<typename T, typename... Args>
-	static owned_ptr<T> make_owned(Args&&... args)
-	{
-		return owned_ptr<T>(pnew<T>(std::forward<Args>(args)...), true);
-	}
-#endif
-
 
 	template <class T, std::size_t ALIGN = alignof(T)>
 	using aligned_allocator = aligned_arena::allocator_type<T, ALIGN>;
@@ -436,7 +442,7 @@ namespace plib {
 	//============================================================
 
 	// FIXME: needs a separate file
-	template <class T, std::size_t ALIGN = alignof(T)>
+	template <class T, std::size_t ALIGN = PALIGN_VECTOROPT>
 	class aligned_vector : public std::vector<T, aligned_allocator<T, ALIGN>>
 	{
 	public:
@@ -449,6 +455,9 @@ namespace plib {
 		using size_type = typename base::size_type;
 
 		using base::base;
+
+		base & as_base() noexcept { return *this; }
+		const base & as_base() const noexcept { return *this; }
 
 		C14CONSTEXPR reference operator[](size_type i) noexcept
 		{
@@ -466,4 +475,4 @@ namespace plib {
 
 } // namespace plib
 
-#endif /* PALLOC_H_ */
+#endif // PALLOC_H_

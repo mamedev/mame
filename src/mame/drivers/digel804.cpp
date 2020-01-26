@@ -637,7 +637,7 @@ void digel804_state::digel804(machine_config &config)
 	Z80(config, m_maincpu, 3.6864_MHz_XTAL/2); /* Z80A, X1(aka E0 on schematics): 3.6864Mhz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &digel804_state::z80_mem_804_1_4);
 	m_maincpu->set_addrmap(AS_IO, &digel804_state::z80_io_1_4);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	ROC10937(config, m_vfd); // RIGHT_TO_LEFT
 

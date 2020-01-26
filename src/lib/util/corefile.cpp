@@ -20,7 +20,7 @@
 #include <cstring>
 #include <iterator>
 
-#include <ctype.h>
+#include <cctype>
 
 
 namespace util {

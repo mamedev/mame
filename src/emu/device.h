@@ -599,8 +599,8 @@ public:
 	void set_unscaled_clock_int(u32 clock) { set_unscaled_clock(clock); } // non-overloaded name because binding to overloads is ugly
 	double clock_scale() const { return m_clock_scale; }
 	void set_clock_scale(double clockscale);
-	attotime clocks_to_attotime(u64 clocks) const;
-	u64 attotime_to_clocks(const attotime &duration) const;
+	attotime clocks_to_attotime(u64 clocks) const noexcept;
+	u64 attotime_to_clocks(const attotime &duration) const noexcept;
 
 	// timer interfaces
 	emu_timer *timer_alloc(device_timer_id id = 0, void *ptr = nullptr);
@@ -610,9 +610,29 @@ public:
 
 	// state saving interfaces
 	template<typename ItemType>
-	void ATTR_COLD save_item(ItemType &&value, const char *valname, int index = 0) { assert(m_save != nullptr); m_save->save_item(this, name(), tag(), index, std::forward<ItemType>(value), valname); }
+	void ATTR_COLD save_item(ItemType &value, const char *valname, int index = 0)
+	{
+		assert(m_save);
+		m_save->save_item(this, name(), tag(), index, value, valname);
+	}
+	template<typename ItemType, typename StructType, typename ElementType>
+	void ATTR_COLD save_item(ItemType &value, ElementType StructType::*element, const char *valname, int index = 0)
+	{
+		assert(m_save);
+		m_save->save_item(this, name(), tag(), index, value, element, valname);
+	}
 	template<typename ItemType>
-	void ATTR_COLD save_pointer(ItemType &&value, const char *valname, u32 count, int index = 0) { assert(m_save != nullptr); m_save->save_pointer(this, name(), tag(), index, std::forward<ItemType>(value), valname, count); }
+	void ATTR_COLD save_pointer(ItemType &&value, const char *valname, u32 count, int index = 0)
+	{
+		assert(m_save);
+		m_save->save_pointer(this, name(), tag(), index, std::forward<ItemType>(value), valname, count);
+	}
+	template<typename ItemType, typename StructType, typename ElementType>
+	void ATTR_COLD save_pointer(ItemType &&value, ElementType StructType::*element, const char *valname, u32 count, int index = 0)
+	{
+		assert(m_save);
+		m_save->save_pointer(this, name(), tag(), index, std::forward<ItemType>(value), element, valname, count);
+	}
 
 	// debugging
 	device_debug *debug() const { return m_debug.get(); }

@@ -55,6 +55,7 @@ public:
 	// construction/destruction
 	sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	void set_hcounter_divide(unsigned divide) { m_hcounter_divide = divide; }
 	void set_is_pal(bool is_pal) { m_is_pal = is_pal; }
 
 	auto vblank() { return m_vblank_cb.bind(); }
@@ -102,6 +103,7 @@ protected:
 
 	void sega315_5124(address_map &map);
 
+	virtual int screen_hpos() { return screen().hpos() / ((m_hcounter_divide == 0) ? 1 : m_hcounter_divide); }
 	void set_display_settings();
 	void set_frame_timing();
 	virtual void vblank_end(int vpos);
@@ -130,6 +132,7 @@ protected:
 	void draw_scanline_mode0(int *line_buffer, int line);
 	void check_pending_flags();
 
+	unsigned         m_hcounter_divide;
 	u8               m_reg[16];                  /* All the registers */
 	u8               m_status;                   /* Status register */
 	u8               m_pending_status;           /* Pending status flags */
@@ -214,10 +217,15 @@ public:
 protected:
 	sega315_5246_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 cram_size, u8 palette_offset, u8 reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const u8 *line_timing);
 
+	virtual void device_add_mconfig(machine_config &config) override;
+
 	virtual u16 name_table_row_mode4(int row) override;
 	virtual u16 sprite_attributes_addr_mode4(u16 base) override;
 	virtual u8 sprite_tile_mask_mode4(u8 tile_number) override;
 	virtual void select_extended_res_mode4(bool M1, bool M2, bool M3) override;
+
+private:
+	void sega315_5246_palette(palette_device &palette) const;
 };
 
 

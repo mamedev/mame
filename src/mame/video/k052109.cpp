@@ -86,9 +86,11 @@ address lines), and then reading it from the 051962.
                     1 = 64 (actually 40) columns
            ---xx--- layer B row scroll
            --x----- layer B column scroll
-           surpratk sets this register to 70 during the second boss. There is
-           nothing obviously wrong so it's not clear what should happen.
+           suratk sets this register to 70 during the second boss to produce rotating star field, using X and Y scroll in the same time.
+           not emulated due to MAME's tilemaps restrictions, currently handled in hacky way.
            glfgreat sets it to 30 when showing the leader board
+           mariorou sets it to 36 when ingame, while actually does per-row scroll for layer A and per-collumn scroll for layer B.
+           such usage not supported by current implementation, hacked in game driver instead.
 1d00     : bits 0 & 1 might enable NMI and FIRQ, not sure
          : bit 2 = IRQ enable
 1d80     : ROM bank selector bits 0-3 = bank 0 bits 4-7 = bank 1
@@ -245,6 +247,9 @@ void k052109_device::device_start()
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(0);
 	m_tilemap[2]->set_transparent_pen(0);
+
+	m_tilemap[1]->set_scrolldx(6, 6);
+	m_tilemap[2]->set_scrolldx(6, 6);
 
 	save_pointer(NAME(m_ram), 0x6000);
 	save_item(NAME(m_rmrd_line));
@@ -516,19 +521,21 @@ popmessage("%x %x %x %x",
 }
 #endif
 
+// note: this chip can do both per-column and per-row scroll in the same time, currently not emulated.
+
 	if ((m_scrollctrl & 0x03) == 0x02)
 	{
 		uint8_t *scrollram = &m_ram[0x1a00];
 
-		m_tilemap[1]->set_scroll_rows(256);
+		m_tilemap[1]->set_scroll_rows(32);
 		m_tilemap[1]->set_scroll_cols(1);
 		yscroll = m_ram[0x180c];
 		m_tilemap[1]->set_scrolly(0, yscroll);
-		for (offs = 0; offs < 256; offs++)
+		yscroll /= 8;
+		for (offs = 0; offs < 32; offs++)
 		{
-			xscroll = scrollram[2 * (offs & 0xfff8) + 0] + 256 * scrollram[2 * (offs & 0xfff8) + 1];
-			xscroll -= 6;
-			m_tilemap[1]->set_scrollx((offs + yscroll) & 0xff, xscroll);
+			xscroll = scrollram[16 * offs + 0] + 256 * scrollram[16 * offs + 1];
+			m_tilemap[1]->set_scrollx((offs + yscroll) & 31, xscroll);
 		}
 	}
 	else if ((m_scrollctrl & 0x03) == 0x03)
@@ -542,7 +549,6 @@ popmessage("%x %x %x %x",
 		for (offs = 0; offs < 256; offs++)
 		{
 			xscroll = scrollram[2 * offs + 0] + 256 * scrollram[2 * offs + 1];
-			xscroll -= 6;
 			m_tilemap[1]->set_scrollx((offs + yscroll) & 0xff, xscroll);
 		}
 	}
@@ -551,14 +557,14 @@ popmessage("%x %x %x %x",
 		uint8_t *scrollram = &m_ram[0x1800];
 
 		m_tilemap[1]->set_scroll_rows(1);
-		m_tilemap[1]->set_scroll_cols(512);
+		m_tilemap[1]->set_scroll_cols(64);
 		xscroll = m_ram[0x1a00] + 256 * m_ram[0x1a01];
-		xscroll -= 6;
 		m_tilemap[1]->set_scrollx(0, xscroll);
-		for (offs = 0; offs < 512; offs++)
+		xscroll /= 8;
+		for (offs = 0; offs < 64; offs++)
 		{
-			yscroll = scrollram[offs / 8];
-			m_tilemap[1]->set_scrolly((offs + xscroll) & 0x1ff, yscroll);
+			yscroll = scrollram[offs];
+			m_tilemap[1]->set_scrolly((offs + xscroll) & 63, yscroll);
 		}
 	}
 	else
@@ -568,7 +574,6 @@ popmessage("%x %x %x %x",
 		m_tilemap[1]->set_scroll_rows(1);
 		m_tilemap[1]->set_scroll_cols(1);
 		xscroll = scrollram[0] + 256 * scrollram[1];
-		xscroll -= 6;
 		yscroll = m_ram[0x180c];
 		m_tilemap[1]->set_scrollx(0, xscroll);
 		m_tilemap[1]->set_scrolly(0, yscroll);
@@ -578,15 +583,18 @@ popmessage("%x %x %x %x",
 	{
 		uint8_t *scrollram = &m_ram[0x3a00];
 
-		m_tilemap[2]->set_scroll_rows(256);
+		m_tilemap[2]->set_scroll_rows(32);
 		m_tilemap[2]->set_scroll_cols(1);
 		yscroll = m_ram[0x380c];
+		//
+		if (m_scrollctrl == 0x70) yscroll = m_ram[0x3823]; // hack for suratk 2nd boss rotating star field
+		//
 		m_tilemap[2]->set_scrolly(0, yscroll);
-		for (offs = 0; offs < 256; offs++)
+		yscroll /= 8;
+		for (offs = 0; offs < 32; offs++)
 		{
-			xscroll = scrollram[2 * (offs & 0xfff8) + 0] + 256 * scrollram[2 * (offs & 0xfff8) + 1];
-			xscroll -= 6;
-			m_tilemap[2]->set_scrollx((offs + yscroll) & 0xff, xscroll);
+			xscroll = scrollram[16 * offs + 0] + 256 * scrollram[16 * offs + 1];
+			m_tilemap[2]->set_scrollx((offs + yscroll) & 31, xscroll);
 		}
 	}
 	else if ((m_scrollctrl & 0x18) == 0x18)
@@ -600,7 +608,6 @@ popmessage("%x %x %x %x",
 		for (offs = 0; offs < 256; offs++)
 		{
 			xscroll = scrollram[2 * offs + 0] + 256 * scrollram[2 * offs + 1];
-			xscroll -= 6;
 			m_tilemap[2]->set_scrollx((offs + yscroll) & 0xff, xscroll);
 		}
 	}
@@ -609,14 +616,14 @@ popmessage("%x %x %x %x",
 		uint8_t *scrollram = &m_ram[0x3800];
 
 		m_tilemap[2]->set_scroll_rows(1);
-		m_tilemap[2]->set_scroll_cols(512);
+		m_tilemap[2]->set_scroll_cols(64);
 		xscroll = m_ram[0x3a00] + 256 * m_ram[0x3a01];
-		xscroll -= 6;
 		m_tilemap[2]->set_scrollx(0, xscroll);
-		for (offs = 0; offs < 512; offs++)
+		xscroll /= 8;
+		for (offs = 0; offs < 64; offs++)
 		{
-			yscroll = scrollram[offs / 8];
-			m_tilemap[2]->set_scrolly((offs + xscroll) & 0x1ff, yscroll);
+			yscroll = scrollram[offs];
+			m_tilemap[2]->set_scrolly((offs + xscroll) & 63, yscroll);
 		}
 	}
 	else
@@ -626,7 +633,6 @@ popmessage("%x %x %x %x",
 		m_tilemap[2]->set_scroll_rows(1);
 		m_tilemap[2]->set_scroll_cols(1);
 		xscroll = scrollram[0] + 256 * scrollram[1];
-		xscroll -= 6;
 		yscroll = m_ram[0x380c];
 		m_tilemap[2]->set_scrollx(0, xscroll);
 		m_tilemap[2]->set_scrolly(0, yscroll);

@@ -42,7 +42,7 @@
 #else
 #include <unistd.h>
 #endif
-#include <errno.h>
+#include <cerrno>
 #ifdef SHARED_MEM_DRIVER
 #include <sys/mman.h>
 #endif

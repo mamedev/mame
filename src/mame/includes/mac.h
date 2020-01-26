@@ -259,7 +259,7 @@ private:
 	optional_device<egret_device> m_egret;
 	optional_device<cuda_device> m_cuda;
 	required_device<ram_device> m_ram;
-	required_device<scc8530_t> m_scc;
+	required_device<scc8530_legacy_device> m_scc;
 	optional_device<ncr539x_device> m_539x_1;
 	optional_device<ncr539x_device> m_539x_2;
 	optional_device<ncr5380_device> m_ncr5380;

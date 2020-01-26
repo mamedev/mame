@@ -25,7 +25,7 @@ bgfx_slider::bgfx_slider(running_machine &machine, std::string name, float min, 
 	m_max = max;
 	m_value = def;
 
-	for (std::string string : strings)
+	for (const std::string &string : strings)
 	{
 		m_strings.push_back(string);
 	}

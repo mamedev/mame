@@ -18,8 +18,11 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A590,  a590_device,  "a590",  "CBM A590 HD Controller")
-DEFINE_DEVICE_TYPE(A2091, a2091_device, "a2091", "CBM A2091 HD Controller")
+DEFINE_DEVICE_TYPE_NS(ZORRO_A590,  bus::amiga::zorro, a590_device,  "zorro_a590",  "CBM A590 HD Controller")
+DEFINE_DEVICE_TYPE_NS(ZORRO_A2091, bus::amiga::zorro, a2091_device, "zorro_a2091", "CBM A2091 HD Controller")
+
+
+namespace bus { namespace amiga { namespace zorro {
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -114,20 +117,20 @@ ioport_constructor a2091_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void dmac_hdc_device::wd33c93(device_t *device)
+void dmac_hdc_device_base::wd33c93(device_t *device)
 {
 	device->set_clock(10000000);
-	downcast<wd33c93a_device *>(device)->irq_cb().set(*this, FUNC(dmac_hdc_device::scsi_irq_w));
-	downcast<wd33c93a_device *>(device)->drq_cb().set(*this, FUNC(dmac_hdc_device::scsi_drq_w));
+	downcast<wd33c93a_device *>(device)->irq_cb().set(*this, FUNC(dmac_hdc_device_base::scsi_irq_w));
+	downcast<wd33c93a_device *>(device)->drq_cb().set(*this, FUNC(dmac_hdc_device_base::scsi_drq_w));
 }
 
-void dmac_hdc_device::device_add_mconfig(machine_config &config)
+void dmac_hdc_device_base::device_add_mconfig(machine_config &config)
 {
 	amiga_dmac_device &dmac(AMIGA_DMAC(config, "dmac", 0));
-	dmac.scsi_read_handler().set(FUNC(dmac_hdc_device::dmac_scsi_r));
-	dmac.scsi_write_handler().set(FUNC(dmac_hdc_device::dmac_scsi_w));
-	dmac.int_handler().set(FUNC(dmac_hdc_device::dmac_int_w));
-	dmac.cfgout_handler().set(FUNC(dmac_hdc_device::dmac_cfgout_w));
+	dmac.scsi_read_handler().set(FUNC(dmac_hdc_device_base::dmac_scsi_r));
+	dmac.scsi_write_handler().set(FUNC(dmac_hdc_device_base::dmac_scsi_w));
+	dmac.int_handler().set(FUNC(dmac_hdc_device_base::dmac_int_w));
+	dmac.cfgout_handler().set(FUNC(dmac_hdc_device_base::dmac_cfgout_w));
 
 	NSCSI_BUS(config, "scsi", 0);
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr, false);
@@ -137,7 +140,7 @@ void dmac_hdc_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("wd33c93", WD33C93A)
-		.machine_config([this](device_t *device) { wd33c93(device); });
+			.machine_config([this] (device_t *device) { wd33c93(device); });
 }
 
 
@@ -197,7 +200,7 @@ ROM_START( dmac_hdc )
 	ROM_LOAD("390333-03.u5", 0x000, 0x104, CRC(dc4a8d9b) SHA1(761a1318106e49057f95258699076ec1079967ad))
 ROM_END
 
-const tiny_rom_entry *dmac_hdc_device::device_rom_region() const
+const tiny_rom_entry *dmac_hdc_device_base::device_rom_region() const
 {
 	return ROM_NAME( dmac_hdc );
 }
@@ -208,10 +211,10 @@ const tiny_rom_entry *dmac_hdc_device::device_rom_region() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  dmac_hdc_device - constructor
+//  dmac_hdc_device_base - constructor
 //-------------------------------------------------
 
-dmac_hdc_device::dmac_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+dmac_hdc_device_base::dmac_hdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_int6(false),
 	m_dmac(*this, "dmac"),
@@ -220,7 +223,7 @@ dmac_hdc_device::dmac_hdc_device(const machine_config &mconfig, device_type type
 }
 
 a590_device::a590_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dmac_hdc_device(mconfig, A590, tag, owner, clock),
+	dmac_hdc_device_base(mconfig, ZORRO_A590, tag, owner, clock),
 	device_exp_card_interface(mconfig, *this),
 	m_dips(*this, "dips"),
 	m_jp1(*this, "jp1"),
@@ -230,7 +233,7 @@ a590_device::a590_device(const machine_config &mconfig, const char *tag, device_
 }
 
 a2091_device::a2091_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dmac_hdc_device(mconfig, A2091, tag, owner, clock),
+	dmac_hdc_device_base(mconfig, ZORRO_A2091, tag, owner, clock),
 	device_zorro2_card_interface(mconfig, *this),
 	m_jp1(*this, "jp1"),
 	m_jp2(*this, "jp2"),
@@ -244,13 +247,13 @@ a2091_device::a2091_device(const machine_config &mconfig, const char *tag, devic
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void dmac_hdc_device::device_start()
+void dmac_hdc_device_base::device_start()
 {
 }
 
 void a590_device::device_start()
 {
-	set_zorro_device();
+	dmac_hdc_device_base::device_start();
 
 	// setup DMAC
 	m_dmac->set_address_space(&m_slot->space());
@@ -259,7 +262,7 @@ void a590_device::device_start()
 
 void a2091_device::device_start()
 {
-	set_zorro_device();
+	dmac_hdc_device_base::device_start();
 
 	// setup DMAC
 	m_dmac->set_address_space(&m_slot->space());
@@ -270,11 +273,11 @@ void a2091_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void dmac_hdc_device::device_reset()
+void dmac_hdc_device_base::device_reset()
 {
 }
 
-void dmac_hdc_device::resize_ram(int config)
+void dmac_hdc_device_base::resize_ram(int config)
 {
 	// allocate space for RAM
 	switch (config & 0x0f)
@@ -302,10 +305,12 @@ void dmac_hdc_device::resize_ram(int config)
 
 void a590_device::device_reset()
 {
+	dmac_hdc_device_base::device_reset();
 }
 
 void a2091_device::device_reset()
 {
+	dmac_hdc_device_base::device_reset();
 }
 
 
@@ -333,7 +338,7 @@ WRITE_LINE_MEMBER( a2091_device::cfgin_w )
 	m_dmac->configin_w(state);
 }
 
-READ8_MEMBER( dmac_hdc_device::dmac_scsi_r )
+READ8_MEMBER( dmac_hdc_device_base::dmac_scsi_r )
 {
 	switch (offset)
 	{
@@ -344,7 +349,7 @@ READ8_MEMBER( dmac_hdc_device::dmac_scsi_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( dmac_hdc_device::dmac_scsi_w )
+WRITE8_MEMBER( dmac_hdc_device_base::dmac_scsi_w )
 {
 	switch (offset)
 	{
@@ -353,7 +358,7 @@ WRITE8_MEMBER( dmac_hdc_device::dmac_scsi_w )
 	}
 }
 
-WRITE_LINE_MEMBER( dmac_hdc_device::dmac_int_w )
+WRITE_LINE_MEMBER( dmac_hdc_device_base::dmac_int_w )
 {
 	if (m_int6)
 		int6_w(state);
@@ -361,13 +366,15 @@ WRITE_LINE_MEMBER( dmac_hdc_device::dmac_int_w )
 		int2_w(state);
 }
 
-WRITE_LINE_MEMBER( dmac_hdc_device::scsi_irq_w )
+WRITE_LINE_MEMBER( dmac_hdc_device_base::scsi_irq_w )
 {
 	// should be or'ed with xt-ide IRQ
 	m_dmac->intx_w(state);
 }
 
-WRITE_LINE_MEMBER( dmac_hdc_device::scsi_drq_w )
+WRITE_LINE_MEMBER( dmac_hdc_device_base::scsi_drq_w )
 {
 	m_dmac->xdreq_w(state);
 }
+
+} } } // namespace bus::amiga::zorro

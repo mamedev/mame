@@ -432,6 +432,51 @@
 		</part>
 	</software>
 
+	<software name="wasistdas" supported="no">
+		<description>Was ist das? von Richard Scarry (Germany)</description>
+		<year>1991</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10632 UBL"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-2612"/>
+			<feature name="pcb_rev" value="REV.01"/>
+			<feature name="u1" value="Sunplus16m-b"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="2097152">
+				<rom name="was ist das von richard scarry.u1" size="2097152" crc="744cd1f4" sha1="797b9856ef6f96c92978303c6604c2f1ae2e9278" />
+			</dataarea>
+			<dataarea name="pages" size="0x2000000"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="47060702" crc="b6a82c67" sha1="ee6dd6a64b8c876298d4d987ec0944b94601a36d" offset="0"/>
+				<rom name="0 - 0002.png" size="25273650" crc="951c77cf" sha1="901996b902f3954442d76924c3f33930e98cc21c" offset="0"/>
+				<rom name="0 - 0003.png" size="21119566" crc="85eacf2a" sha1="1bc18385434c23e247024ad950b4cadb87339dba" offset="0"/>
+				<rom name="0 - 0004.png" size="23684992" crc="2503c7b7" sha1="4320c484aaac5f49806bc1e0b2bd9108f32983c5" offset="0"/>
+				<rom name="0 - 0005.png" size="16347289" crc="689fea33" sha1="a2ace0a653fb132dc881e3576e51d39815ae6692" offset="0"/>
+				<rom name="0 - 0006.png" size="20184694" crc="55c2631a" sha1="6112afe98bfffb07281eab4c414926ff5144d903" offset="0"/>
+				<rom name="0 - 0007.png" size="17069814" crc="d3da8753" sha1="9311060be82ff98510730e2c923553c9fbb8a402" offset="0"/>
+				<rom name="0 - 0008.png" size="20251214" crc="20d001ea" sha1="d0d842e629157ee9c04c3c5796dac2fb636aaaee" offset="0"/>
+				<rom name="0 - 0009.png" size="14417135" crc="0c5a396e" sha1="d33624061891bf2b672f1d9f694c2b80ce01c7f4" offset="0"/>
+				<rom name="0 - 0010.png" size="17065831" crc="6eec4dc4" sha1="e876d9d23966e6e6c158ccffd32e4af3702d8bd1" offset="0"/>
+				<rom name="0 - 0011.png" size="11769417" crc="01e751b3" sha1="65ed32fffb2c3ab672196276321bd77a1fdfce10" offset="0"/>
+				<rom name="0 - 0012.png" size="19156970" crc="4e8e9639" sha1="2c69d7604b2aec35792973b858f816d216630b78" offset="0"/>
+				<rom name="0 - 0013.png" size="13617241" crc="17c4c1b7" sha1="b352a0fdfe39e30b513f2fefbd17b387571fb896" offset="0"/>
+				<rom name="0 - 0014.png" size="19519693" crc="58d0c36d" sha1="c65c06cf0a43f048d5a655bfd83ef86ccc03e644" offset="0"/>
+				<rom name="0 - 0015.png" size="13695576" crc="1ea8d254" sha1="fc782a5c28c2d2f11e3ad803c540d0b70f80e7ee" offset="0"/>
+				<rom name="0 - 0016.png" size="39894997" crc="46baaee6" sha1="4a18348852b6b6c23079ef200841b31ff894c6f1" offset="0"/>
+				<rom name="0 - 0017.png" size="40640147" crc="fc126222" sha1="1b59abd6e5a149e9bc610faf8bb71d17505429f9" offset="0"/>
+				<rom name="0 - 0018.png" size="39072330" crc="aab0e703" sha1="0c289ed02b67e2c363ca6739610cce5020514d13" offset="0"/>
+				<rom name="0 - 0019.png" size="24086990" crc="5de8bd88" sha1="13fa33a7ee5a77376f13ab5bbe4aaeb402c1c1ed" offset="0"/>
+				<rom name="0 - 0020.png" size="39366368" crc="65733694" sha1="033aac7aa5eb363c0da79fa0c4cc6b5b709b48fc" offset="0"/>
+				<rom name="0 - 0021.png" size="40358358" crc="811c493f" sha1="73d4a9c0b1b1edd0948982ef10e9e1941df5b119" offset="0"/>
+				<rom name="0 - 0022.png" size="18932594" crc="c56192cc" sha1="53145f204d60ecb79cdb93adfec34d500bb87047" offset="0"/>
+				<rom name="0 - 0023.png" size="11137648" crc="6692a2ed" sha1="73db4445496762789924e1d11b5f72feccccf344" offset="0"/>
+				<rom name="0 - 0024.png" size="20025564" crc="7c353906" sha1="07b77c67cb00fe46c4a0faad9bed8cc0b92fad42" offset="0"/>
+				<rom name="0 - 0025.png" size="14524148" crc="35cc0d4f" sha1="df7de27fdeb6ba16ad4fce84a488ce9fb3f04625" offset="0"/>
+				<rom name="0 - 0026.png" size="17479017" crc="c96927ed" sha1="24e7009718d17edf0998513f0f5d9557a543501c" offset="0"/>
+				<rom name="0 - 0027.png" size="19269004" crc="558a4f8a" sha1="3e437166e81016951c1effbe266b2d740dcc48e4" offset="0"/>
+				<rom name="0 - 0028.png" size="43628166" crc="d0b6e2da" sha1="d39d77c7965dbe271ad7e15d124fbccf4e04da0b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dinosaurg" cloneof="dinosaur" supported="no">
 		<description>Leap und die Welt der Dinosaurier (Germany)</description>
 		<year>2004</year>

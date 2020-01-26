@@ -11,7 +11,7 @@
 class device_sun_mouse_port_interface;
 
 
-class sun_mouse_port_device : public device_t, public device_slot_interface
+class sun_mouse_port_device : public device_t, public device_single_card_slot_interface<device_sun_mouse_port_interface>
 {
 	friend class device_sun_mouse_port_interface;
 
@@ -39,7 +39,6 @@ protected:
 	sun_mouse_port_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_config_complete() override;
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
@@ -52,7 +51,7 @@ private:
 };
 
 
-class device_sun_mouse_port_interface : public device_slot_card_interface
+class device_sun_mouse_port_interface : public device_interface
 {
 	friend class sun_mouse_port_device;
 

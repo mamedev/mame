@@ -76,7 +76,6 @@ void spg2xx_video_device::device_start()
 	m_rowscrolloffset_read_cb.resolve_safe(0);
 
 	m_video_irq_cb.resolve();
-
 }
 
 void spg2xx_video_device::device_reset()
@@ -209,6 +208,64 @@ void spg2xx_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_
 	}
 }
 
+void spg2xx_video_device::draw_bitmap(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t* regs)
+{
+	if ((scanline < 0) || (scanline >= 240))
+		return;
+
+	address_space &space = m_cpu->space(AS_PROGRAM);
+
+	uint32_t tilemap = regs[4];
+	uint32_t palette_map = regs[5];
+
+	//printf("draw bitmap bases %04x %04x\n", tilemap, palette_map);
+
+	uint32_t yscroll = regs[1];
+
+	int realline = (scanline + yscroll) & 0xff;
+
+
+	uint16_t tile = space.read_word(tilemap + realline);
+	uint16_t palette = 0;
+
+	//if (!tile)
+	//  continue;
+
+	palette = space.read_word(palette_map + realline / 2);
+	if (scanline & 1)
+		palette >>= 8;
+	else
+		palette &= 0x00ff;
+
+	//const int linewidth = 320 / 2;
+	int sourcebase = tile | (palette << 16); // this is correct for Texas Hold'em - TODO: get from a register?
+
+	uint32_t* dest = &m_screenbuf[320 * scanline];
+
+	for (int i = 0; i < 320 / 2; i++)
+	{
+		uint8_t palette_entry;
+		uint16_t color;
+		const uint16_t data = space.read_word(sourcebase + i);
+
+		palette_entry = (data & 0x00ff);
+		color = m_paletteram[palette_entry];
+
+		if (!(color & 0x8000))
+		{
+			dest[(i * 2)+0] = m_rgb555_to_rgb888[color & 0x7fff];
+		}
+
+		palette_entry = (data & 0xff00) >> 8;
+		color = m_paletteram[palette_entry];
+
+		if (!(color & 0x8000))
+		{
+			dest[(i * 2)+1] = m_rgb555_to_rgb888[color & 0x7fff];
+		}
+	}
+}
+
 void spg2xx_video_device::draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t *regs)
 {
 	uint32_t xscroll = regs[0];
@@ -228,6 +285,13 @@ void spg2xx_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 	{
 		return;
 	}
+
+	if (ctrl & 0x0001) // Bitmap mode!
+	{
+		draw_bitmap(cliprect, scanline, priority, bitmap_addr, regs);
+		return;
+	}
+
 
 	uint32_t tile_h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
 	uint32_t tile_w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
@@ -256,6 +320,8 @@ void spg2xx_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 		palette = (ctrl & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
 		if (x0 & 1)
 			palette >>= 8;
+		else
+			palette &= 0x00ff;
 
 		uint32_t tileattr = attr;
 		uint32_t tilectrl = ctrl;

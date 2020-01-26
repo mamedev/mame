@@ -33,17 +33,32 @@
 
 namespace emu { namespace detail {
 
-struct machine_config_replace { machine_config &config; };
+class machine_config_replace
+{
+public:
+	machine_config_replace(machine_config_replace const &) = default;
+	machine_config &config;
+private:
+	machine_config_replace(machine_config &c) : config(c) { }
+	friend class ::machine_config;
+};
 
 } } // namesapce emu::detail
 
 
+/// \brief Internal layout description
+///
+/// Holds the compressed and decompressed data size, compression method,
+/// and a reference to the compressed layout data.  Note that copying
+/// the structure will not copy the referenced data.
 struct internal_layout
 {
+	enum class compression { NONE, ZLIB };
+
 	size_t decompressed_size;
 	size_t compressed_size;
-	u8 compression_type;
-	const u8* data;
+	compression compression_type;
+	u8 const *data;
 };
 
 
@@ -96,18 +111,67 @@ public:
 	emu_options &options() const { return m_options; }
 	device_t *device(const char *tag) const { return root_device().subdevice(tag); }
 	template <class DeviceClass> DeviceClass *device(const char *tag) const { return downcast<DeviceClass *>(device(tag)); }
+	attotime maximum_quantum(attotime const &default_quantum) const;
+	device_execute_interface *perfect_quantum_device() const;
+
+	/// \brief Apply visitor to internal layouts
+	///
+	/// Calls the supplied visitor for each device with an internal
+	/// layout.  The order of devices is implementation-dependent.
+	/// \param [in] op The visitor.  It must provide a function call
+	//    operator that can be invoked with two arguments: a reference
+	//    to a #device_t and a const reference to an #internal_layout.
 	template <typename T> void apply_default_layouts(T &&op) const
 	{
 		for (std::pair<char const *, internal_layout const *> const &lay : m_default_layouts)
 			op(*device(lay.first), *lay.second);
 	}
 
-	// public state
-	attotime                m_minimum_quantum;          // minimum scheduling quantum
-	std::string             m_perfect_cpu_quantum;      // tag of CPU to use for "perfect" scheduling
+	/// \brief Get a device replacement helper
+	///
+	/// Pass the result in place of the machine configuration itself to
+	/// replace an existing device.
+	/// \return A device replacement helper to pass to a device type
+	///   when replacing an existing device.
+	emu::detail::machine_config_replace replace() { return emu::detail::machine_config_replace(*this); };
 
-	// configuration methods
+	/// \brief Set internal layout for current device
+	///
+	/// Set internal layout for current device.  Each device in the
+	/// system can have its own internal layout.  Tags in the layout
+	/// will be resolved relative to the device.  Replaces previously
+	/// set layout if any.
+	/// \param [in] layout Reference to the internal layout description
+	///   structure.  Neither the description structure nor the
+	///   compressed data is copied.  It is the caller's responsibility
+	///   to ensure both remain valid until layouts and views are
+	///   instantiated.
 	void set_default_layout(internal_layout const &layout);
+
+	/// \brief Set maximum scheduling quantum
+	///
+	/// Set the maximum scheduling quantum required for the current
+	/// device.  The smallest maximum quantum requested by a device in
+	/// the system will be used.
+	/// \param [in] quantum Maximum scheduling quantum in attoseconds.
+	void set_maximum_quantum(attotime const &quantum);
+
+	template <typename T>
+	void set_perfect_quantum(T &&tag)
+	{
+		set_perfect_quantum(current_device(), std::forward<T>(tag));
+	}
+	template <class DeviceClass, bool Required>
+	void set_perfect_quantum(device_finder<DeviceClass, Required> const &finder)
+	{
+		std::pair<device_t &, char const *> const target(finder.finder_target());
+		set_perfect_quantum(target.first, target.second);
+	}
+	template <class DeviceClass, bool Required>
+	void set_perfect_quantum(device_finder<DeviceClass, Required> &finder)
+	{
+		set_perfect_quantum(const_cast<device_finder<DeviceClass, Required> const &>(finder));
+	}
 
 	// helpers during configuration; not for general use
 	token begin_configuration(device_t &device)
@@ -116,7 +180,6 @@ public:
 		m_current_device = &device;
 		return token(*this, device);
 	}
-	emu::detail::machine_config_replace replace() { return emu::detail::machine_config_replace{ *this }; };
 	device_t *device_add(const char *tag, device_type type, u32 clock);
 	template <typename Creator>
 	device_t *device_add(const char *tag, Creator &&type, u32 clock)
@@ -162,11 +225,11 @@ public:
 		return device_replace(tag, std::forward<Creator>(type), clock.value(), std::forward<Params>(args)...);
 	}
 	device_t *device_remove(const char *tag);
-	device_t *device_find(device_t *owner, const char *tag);
 
 private:
 	class current_device_stack;
 	typedef std::map<char const *, internal_layout const *, bool (*)(char const *, char const *)> default_layout_map;
+	typedef std::map<char const *, attotime, bool (*)(char const *, char const *)> maximum_quantum_map;
 
 	// internal helpers
 	std::pair<const char *, device_t *> resolve_owner(const char *tag) const;
@@ -174,13 +237,16 @@ private:
 	device_t &add_device(std::unique_ptr<device_t> &&device, device_t *owner);
 	device_t &replace_device(std::unique_ptr<device_t> &&device, device_t &owner, device_t *existing);
 	void remove_references(device_t &device);
+	void set_perfect_quantum(device_t &device, std::string tag);
 
 	// internal state
-	game_driver const &         m_gamedrv;
-	emu_options &               m_options;
-	std::unique_ptr<device_t>   m_root_device;
-	default_layout_map          m_default_layouts;
-	device_t *                  m_current_device;
+	game_driver const &                 m_gamedrv;
+	emu_options &                       m_options;
+	std::unique_ptr<device_t>           m_root_device;
+	default_layout_map                  m_default_layouts;
+	device_t *                          m_current_device;
+	maximum_quantum_map                 m_maximum_quantums;
+	std::pair<device_t *, std::string>  m_perfect_quantum_device;
 };
 
 #endif // MAME_EMU_MCONFIG_H

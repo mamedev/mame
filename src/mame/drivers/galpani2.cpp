@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-	/***************************************************************************
+/***************************************************************************
 
-	                        -= Gals Panic II =-
+                            -= Gals Panic II =-
 
-	                driver by   Luca Elia (l.elia@tin.it)
+                    driver by   Luca Elia (l.elia@tin.it)
 
 CPU     :   2 x 68000  +  MCU
 SOUND   :   2 x OKIM6295
@@ -14,8 +14,8 @@ CUSTOM  :   ?
 To Do:
 
 - Simulation of the MCU: it sits between the 2 68000's and passes
-	messages along. It is currently incomplete, thus no backgrounds
-	and the game is unplayable
+    messages along. It is currently incomplete, thus no backgrounds
+    and the game is unplayable
 
 - The layers are offset
 
@@ -63,18 +63,18 @@ Z04G2-004
 |          6116 6116    G003K5.U63         |------|                  |
 |--------------------------------------------------------------------|
 Notes:
-	       * - These ROMs not populated. Korean-specific ROMs have a K as part of the label text
-	   68000 - Clock 13.500MHz [27/2]
-	   M6295 - Clock 2.000MHz [16/8]. Pin 7 HIGH
-	  V-080D - Custom Kaneko RGB DAC
-	 MC-1091 - Custom Kaneko I/O module
-	  LFP-6K - Custom Kaneko sound filter/DAC
-	  PX4460 - Custom Kaneko sound filter/DAC
-	  PISCES - NEC uPD78324 series MCU with 32k internal rom. Clock 13.500MHz [27/2] on pins 51 & 52
-	   VSync - 59.1856Hz
-	   HSync - 15.625kHz
+           * - These ROMs not populated. Korean-specific ROMs have a K as part of the label text
+       68000 - Clock 13.500MHz [27/2]
+       M6295 - Clock 2.000MHz [16/8]. Pin 7 HIGH
+      V-080D - Custom Kaneko RGB DAC
+     MC-1091 - Custom Kaneko I/O module
+      LFP-6K - Custom Kaneko sound filter/DAC
+      PX4460 - Custom Kaneko sound filter/DAC
+      PISCES - NEC uPD78324 series MCU with 32k internal rom. Clock 13.500MHz [27/2] on pins 51 & 52
+       VSync - 59.1856Hz
+       HSync - 15.625kHz
 
-	   (TODO: VTOTAL = 264, HTOTAL = 432, pixel clock 27 MHz / 4)
+       (TODO: VTOTAL = 264, HTOTAL = 432, pixel clock 27 MHz / 4)
 
 ***************************************************************************/
 

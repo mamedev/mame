@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#include <string.h>
-#include <ctype.h>
+#include <cstring>
+#include <cctype>
 #include <iostream>
 
 #include "imgtool.h"

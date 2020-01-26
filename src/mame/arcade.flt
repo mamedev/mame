@@ -149,6 +149,7 @@ blockhl.cpp
 blockout.cpp
 blocktax.cpp
 bloodbro.cpp
+bloodbro_ms.cpp
 blstroid.cpp
 blueprnt.cpp
 bmcbowl.cpp
@@ -207,8 +208,10 @@ cdi.cpp
 cedar_magnet.cpp
 centiped.cpp
 cesclass.cpp
+cgang.cpp
 chaknpop.cpp
 cham24.cpp
+chameleonrx1.cpp
 champbas.cpp
 champbwl.cpp
 chanbara.cpp
@@ -256,6 +259,8 @@ copsnrob.cpp
 corona.cpp
 cosmic.cpp
 cps1.cpp
+cps1bl_5205.cpp
+cps1bl_pic.cpp
 cps2.cpp
 cps3.cpp
 cpzodiac.cpp
@@ -319,6 +324,7 @@ destroyr.cpp
 dfruit.cpp
 dgpix.cpp
 dietgo.cpp
+dinoking.cpp
 discoboy.cpp
 divebomb.cpp
 diverboy.cpp
@@ -390,6 +396,7 @@ fastlane.cpp
 fcombat.cpp
 fcrash.cpp
 feversoc.cpp
+ffantasy_ms.cpp
 fgoal.cpp
 finalizr.cpp
 fireball.cpp
@@ -489,6 +496,7 @@ gradius3.cpp
 grchamp.cpp
 gridlee.cpp
 groundfx.cpp
+gsspade.cpp
 gstream.cpp
 gstriker.cpp
 gsword.cpp
@@ -618,6 +626,7 @@ kncljoe.cpp
 koftball.cpp
 koikoi.cpp
 konamigq.cpp
+konamigs.cpp
 konamigv.cpp
 konamigx.cpp
 konamim2.cpp
@@ -733,6 +742,7 @@ mephistp.cpp
 merit.cpp
 merit3xx.cpp
 meritm.cpp
+merits.cpp
 mermaid.cpp
 metalmx.cpp
 metlclsh.cpp
@@ -967,6 +977,7 @@ psikyo4.cpp
 psikyosh.cpp
 psychic5.cpp
 pturn.cpp
+pubtimed.cpp
 puckpkmn.cpp
 punchout.cpp
 pyson.cpp
@@ -987,6 +998,7 @@ r2dtank.cpp
 r2dx_v33.cpp
 rabbit.cpp
 raiden.cpp
+raiden_ms.cpp
 raiden2.cpp
 rallyx.cpp
 rampart.cpp
@@ -1105,6 +1117,7 @@ shtzone.cpp
 shuuz.cpp
 sidearms.cpp
 sidepckt.cpp
+sigma21.cpp
 sigmab52.cpp
 sigmab98.cpp
 silkroad.cpp
@@ -1114,6 +1127,7 @@ simple_st0016.cpp
 simpsons.cpp
 skeetsht.cpp
 skimaxx.cpp
+skopro.cpp
 skullxbo.cpp
 skyarmy.cpp
 skydiver.cpp
@@ -1220,6 +1234,7 @@ suprridr.cpp
 suprslam.cpp
 supstarf.cpp
 surpratk.cpp
+sweetland.cpp
 system1.cpp
 system16.cpp
 tagteam.cpp
@@ -1254,6 +1269,7 @@ tattack.cpp
 taxidriv.cpp
 tbowl.cpp
 tceptor.cpp
+teamjocs.cpp
 techno.cpp
 tecmo.cpp
 tecmo16.cpp
@@ -1335,6 +1351,7 @@ unkpoker.cpp
 upscope.cpp
 usbilliards.cpp
 usgames.cpp
+v0bowl.cpp
 vamphalf.cpp
 vaportra.cpp
 vastar.cpp
@@ -1421,6 +1438,7 @@ zaxxon.cpp
 zerozone.cpp
 zn.cpp
 zodiack.cpp
+zpinball.cpp
 zr107.cpp
 zwackery.cpp
 //exceptions + to add - to remove from imported list

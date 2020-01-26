@@ -152,12 +152,12 @@ public:
 	}
 
 	// execution management
-	device_scheduler &scheduler() const { assert(m_scheduler != nullptr); return *m_scheduler; }
-	bool executing() const { return scheduler().currently_executing() == this; }
-	s32 cycles_remaining() const { return executing() ? *m_icountptr : 0; } // cycles remaining in this timeslice
-	void eat_cycles(int cycles) { if (executing()) *m_icountptr = (cycles > *m_icountptr) ? 0 : (*m_icountptr - cycles); }
-	void adjust_icount(int delta) { if (executing()) *m_icountptr += delta; }
-	void abort_timeslice();
+	device_scheduler &scheduler() const noexcept { assert(m_scheduler != nullptr); return *m_scheduler; }
+	bool executing() const noexcept { return scheduler().currently_executing() == this; }
+	s32 cycles_remaining() const noexcept { return executing() ? *m_icountptr : 0; } // cycles remaining in this timeslice
+	void eat_cycles(int cycles) noexcept { if (executing()) *m_icountptr = (cycles > *m_icountptr) ? 0 : (*m_icountptr - cycles); }
+	void adjust_icount(int delta) noexcept { if (executing()) *m_icountptr += delta; }
+	void abort_timeslice() noexcept;
 
 	// input and interrupt management
 	void set_input_line(int linenum, int state) { m_input[linenum].set_state_synced(state); }
@@ -170,7 +170,7 @@ public:
 	// suspend/resume
 	void suspend(u32 reason, bool eatcycles);
 	void resume(u32 reason);
-	bool suspended(u32 reason = SUSPEND_ANY_REASON) const { return (m_nextsuspend & reason) != 0; }
+	bool suspended(u32 reason = SUSPEND_ANY_REASON) const noexcept { return (m_nextsuspend & reason) != 0; }
 	void yield() { suspend(SUSPEND_REASON_TIMESLICE, false); }
 	void spin() { suspend(SUSPEND_REASON_TIMESLICE, true); }
 	void spin_until_trigger(int trigid) { suspend_until_trigger(trigid, true); }
@@ -183,8 +183,8 @@ public:
 	void signal_interrupt_trigger() { trigger(m_inttrigger); }
 
 	// time and cycle accounting
-	attotime local_time() const;
-	u64 total_cycles() const;
+	attotime local_time() const noexcept;
+	u64 total_cycles() const noexcept;
 
 	// required operation overrides
 	void run() { execute_run(); }
@@ -195,15 +195,15 @@ public:
 
 protected:
 	// clock and cycle information getters
-	virtual u64 execute_clocks_to_cycles(u64 clocks) const;
-	virtual u64 execute_cycles_to_clocks(u64 cycles) const;
-	virtual u32 execute_min_cycles() const;
-	virtual u32 execute_max_cycles() const;
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept;
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept;
+	virtual u32 execute_min_cycles() const noexcept;
+	virtual u32 execute_max_cycles() const noexcept;
 
 	// input line information getters
-	virtual u32 execute_input_lines() const;
-	virtual u32 execute_default_irq_vector(int linenum) const;
-	virtual bool execute_input_edge_triggered(int linenum) const;
+	virtual u32 execute_input_lines() const noexcept;
+	virtual u32 execute_default_irq_vector(int linenum) const noexcept;
+	virtual bool execute_input_edge_triggered(int linenum) const noexcept;
 
 	// optional operation overrides
 	virtual void execute_run() = 0;
@@ -247,12 +247,12 @@ private:
 	// internal information about the state of inputs
 	class device_input
 	{
-		static const int USE_STORED_VECTOR = 0xff000000;
+		static constexpr int USE_STORED_VECTOR = 0xff000000;
 
 	public:
 		device_input();
 
-		void start(device_execute_interface *execute, int linenum);
+		void start(device_execute_interface &execute, int linenum);
 		void reset();
 
 		void set_state_synced(int state, int vector = USE_STORED_VECTOR);

@@ -6,6 +6,7 @@
  */
 
 #include "nld_tms4800.h"
+#include "netlist/devices/nlid_system.h"
 #include "netlist/nl_base.h"
 
 namespace netlist
@@ -22,6 +23,7 @@ namespace netlist
 		, m_D(*this, {{ "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7" }})
 		, m_last_data(*this, "m_last_data", 1)
 		, m_ROM(*this, "ROM")
+		, m_supply(*this)
 		{
 		}
 
@@ -37,6 +39,7 @@ namespace netlist
 		state_var<unsigned> m_last_data;
 
 		param_rom_t<uint8_t, 11, 8> m_ROM; // 16 Kbits, used as 2 Kbit x 8
+		NETLIB_NAME(power_pins) m_supply;
 	};
 
 	NETLIB_OBJECT_DERIVED(TMS4800_dip, TMS4800)
@@ -71,10 +74,9 @@ namespace netlist
 	};
 
 	// FIXME: timing!
+	// FIXME: CS: The code looks odd, looks like m_last_data should be pushed out.
 	NETLIB_UPDATE(TMS4800)
 	{
-		unsigned d = 0x00;
-
 		netlist_time delay = NLTIME_FROM_NS(450);
 		if (m_AR())
 		{
@@ -86,6 +88,7 @@ namespace netlist
 		}
 		else
 		{
+			unsigned d = 0x00;
 			for (std::size_t i=0; i<4; i++)
 			{
 				if (m_OE1())
@@ -97,7 +100,7 @@ namespace netlist
 		}
 	}
 
-	NETLIB_DEVICE_IMPL(TMS4800,     "ROM_TMS4800",     "+AR,+OE1,+OE2,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+A9,+A10")
+	NETLIB_DEVICE_IMPL(TMS4800,     "ROM_TMS4800",     "+AR,+OE1,+OE2,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+A9,+A10,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(TMS4800_dip, "ROM_TMS4800_DIP", "")
 
 	} //namespace devices

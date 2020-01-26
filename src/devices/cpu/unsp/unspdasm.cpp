@@ -59,10 +59,22 @@ void unsp_disassembler::print_alu_op_start(std::ostream &stream, uint8_t op0, ui
 {
 	static const char* const alu_op_start[] =
 	{
-		"%s += ", "%s += ", "%s -= ", "%s -= ",
-		"cmp %s, ", "<BAD>", "%s =- ", "<BAD>",
-		"%s ^= ", "%s = ", "%s |= ", "%s &= ",
-		"test %s, "
+		"%s += ",
+		"%s += ", // with carry
+		"%s -= ",
+		"%s -= ", // with carry
+		"cmp %s, ",
+		"<BAD>",
+		"%s =- ", // neg
+		"<BAD>",
+		"%s ^= ",
+		"%s = ", // load
+		"%s |= ",
+		"%s &= ",
+		"test %s, ",
+		"store", // syntax changes
+		"<BAD>", // bad
+		"<BAD>", // bad
 	};
 
 	util::stream_format(stream, alu_op_start[op0], regs[opA]);
@@ -72,10 +84,22 @@ void unsp_disassembler::print_alu_op3(std::ostream &stream, uint8_t op0, uint8_t
 {
 	static const char* const alu_op3[] =
 	{
-		"%s + ", "%s + ", "%s - ", "%s - ",
-		"cmp %s, ", "<BAD>", "-", "<BAD>",
-		"%s ^ ", "", "%s | ", "%s & ",
-		"test %s, "
+		"%s + ",
+		"%s + ", // with carry
+		"%s - ",
+		"%s - ", // with carry
+		"cmp %s, ",
+		"<BAD>",
+		"-", // neg
+		"<BAD>",
+		"%s ^ ",
+		"", // load
+		"%s | ",
+		"%s & ",
+		"test %s, ",
+		"store", // syntax changes
+		"<BAD>",
+		"<BAD>",
 	};
 
 	util::stream_format(stream, alu_op3[op0], regs[opB]);

@@ -426,7 +426,7 @@ void pacland_state::pacland(machine_config &config)
 	m_mcu->in_p2_cb().set_constant(0xff);  /* leds won't work otherwise */
 	m_mcu->out_p2_cb().set(FUNC(pacland_state::led_w));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* we need heavy synching between the MCU and the CPU */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* we need heavy synching between the MCU and the CPU */
 
 	WATCHDOG_TIMER(config, "watchdog");
 

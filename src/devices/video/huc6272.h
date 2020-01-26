@@ -27,6 +27,8 @@ class huc6272_device :  public device_t,
 						public device_memory_interface
 {
 public:
+	static constexpr feature_type imperfect_features() { return feature::SOUND | feature::GRAPHICS; } // Incorrect ADPCM and Graphics
+
 	// construction/destruction
 	huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 

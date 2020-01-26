@@ -375,7 +375,7 @@ void eprom_state::eprom(machine_config &config)
 	M68000(config, m_extra, ATARI_CLOCK_14MHz/2);
 	m_extra->set_addrmap(AS_PROGRAM, &eprom_state::extra_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
 	m_adc->in_callback<0>().set_ioport("ADC0");
@@ -425,7 +425,7 @@ void eprom_state::klaxp(machine_config &config)
 	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &eprom_state::main_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
@@ -468,7 +468,7 @@ void eprom_state::guts(machine_config &config)
 	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &eprom_state::guts_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
 	m_adc->in_callback<0>().set_ioport("ADC0");

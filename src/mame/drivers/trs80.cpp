@@ -546,8 +546,8 @@ void trs80_state::model1(machine_config &config)      // model I, level II
 
 	FLOPPY_CONNECTOR(config, "fdc:0", trs80_floppies, "sssd", trs80_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", trs80_floppies, "sssd", trs80_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:2", trs80_floppies, "", trs80_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:3", trs80_floppies, "", trs80_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:2", trs80_floppies, nullptr, trs80_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:3", trs80_floppies, nullptr, trs80_state::floppy_formats).enable_sound(true);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit7));

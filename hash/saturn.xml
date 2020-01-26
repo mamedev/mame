@@ -2523,7 +2523,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- -->
-	<software name="aishogi" supported="yes">
+	<software name="aishogi">
 		<description>AI Shougi (Jpn)</description>
 		<year>1995</year>
 		<publisher>Soft Bank</publisher>
@@ -3069,7 +3069,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Works including mouse support -->
-	<software name="catrip" supported="yes">
+	<software name="catrip">
 		<description>Cat the Ripper - 13-ninme no Tanteishi (Jpn)</description>
 		<year>1997</year>
 		<publisher>Tonkin House</publisher>
@@ -3555,7 +3555,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Works including loading from Save Game Manager CDs -->
-	<software name="dezaemn2" supported="yes">
+	<software name="dezaemn2">
 		<description>Dezaemon 2 (Jpn)</description>
 		<year>1997</year>
 		<publisher>Athena</publisher>
@@ -21034,9 +21034,9 @@ Olympic Soccer (Fra) T-7904H-09
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="T-3121G"/>
+		<!-- info name="serial" value="T-3120G"/ comment at the top of the file indicates T-3121G is correct, and T-3120G is the serial for KoF97 (Jpn) -->
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ'97 (拡張ラムカートリッジ付き「お買得セット」!!)"/>
-		<info name="serial" value="T-3120G"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<sharedfeat name="requirement" value="sat_cart:ram8"/>
 		<part name="cdrom" interface="sat_cdrom">

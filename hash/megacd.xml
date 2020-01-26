@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="megacd" description="Mega CD (Euro) CD-ROMs">
+<softwarelist name="megacd" description="Sega Mega CD (Euro) CD-ROMs">
 
 <!--- Images from the REDUMP set -->
 	<software name="spidking">

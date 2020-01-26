@@ -1336,7 +1336,7 @@ void sy6845e_device::device_start()
 
 void hd6345_device::device_start()
 {
-	mc6845_device::device_start();
+	hd6845s_device::device_start();
 
 	m_supports_disp_start_addr_r = true;
 	m_supports_vert_sync_width = true;
@@ -1549,6 +1549,12 @@ mc6845_1_device::mc6845_1_device(const machine_config &mconfig, const char *tag,
 }
 
 
+hd6845s_device::hd6845s_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: mc6845_device(mconfig, type, tag, owner, clock)
+{
+}
+
+
 hd6845s_device::hd6845s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6845_device(mconfig, HD6845S, tag, owner, clock)
 {
@@ -1574,7 +1580,7 @@ sy6845e_device::sy6845e_device(const machine_config &mconfig, const char *tag, d
 
 
 hd6345_device::hd6345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, HD6345, tag, owner, clock)
+	: hd6845s_device(mconfig, HD6345, tag, owner, clock)
 {
 }
 

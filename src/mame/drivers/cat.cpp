@@ -1134,7 +1134,7 @@ ROM_START( cat )
 	// According to Sandy Bumgarner, there should be a 2.42 version which fixes some bugs in the calc command vs 2.40
 	// According to the Cat Repair Manual page 4-20, there should be a version called B91U0x (maybe 1.91 or 0.91?) with sum16s of 9F1F, FF0A, 79BF and 03FF
 
-	ROM_REGION( 0x80000, "svrom", ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x80000, "svrom", ROMREGION_ERASE00 )
 	// SPELLING VERIFICATION ROM (SVROM)
 	/* Romspace here is a little strange: there are 3 ROM sockets on the board:
 	 * svrom-0 maps to 200000-21ffff every ODD byte (d8-d0)
@@ -1155,7 +1155,7 @@ ROM_START( cat )
 	 * Each of these will also have its own code ROMset as well.
 	 */
 	// NH7-0684 (US, dumped):
-	ROMX_LOAD( "uv1__nh7-0684__hn62301apc11__7h1.ic6", 0x00000, 0x20000, CRC(229ca210) SHA1(564b57647a34acdd82159993a3990a412233da14), ROM_SKIP(1)) // this is a 28pin tc531000 mask ROM, 128KB long; "US" SVROM
+	ROMX_LOAD( "uv1__nh7-0684__hn62301apc11__7h1.ic6", 0x00001, 0x20000, CRC(229ca210) SHA1(564b57647a34acdd82159993a3990a412233da14), ROM_SKIP(1)) // this is a 28pin tc531000 mask ROM, 128KB long; "US" SVROM
 
 	/* There is an unpopulated PAL16L8 at IC9 whose original purpose (based
 	 * on the schematics) was probably to cause a 68k bus error when

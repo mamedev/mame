@@ -117,39 +117,72 @@ DEFINE_DEVICE_TYPE(SEGA315_5124, sega315_5124_device, "sega315_5124", "Sega 315-
 DEFINE_DEVICE_TYPE(SEGA315_5246, sega315_5246_device, "sega315_5246", "Sega 315-5246 SMS2 VDP")
 DEFINE_DEVICE_TYPE(SEGA315_5377, sega315_5377_device, "sega315_5377", "Sega 315-5377 Gamegear VDP")
 
-
+// (reference for VDP colors : http://www.sega-16.com/forum/showthread.php?30530-SMS-VDP-output-levels)
 void sega315_5124_device::sega315_5124_palette(palette_device &palette) const
 {
+	static const u8 level[4] = {0,90,173,255};
 	for (int i = 0; i < 64; i++)
 	{
 		const u8 r = i & 0x03;
 		const u8 g = (i & 0x0c) >> 2;
 		const u8 b = (i & 0x30) >> 4;
-		palette.set_pen_color(i, pal2bit(r), pal2bit(g), pal2bit(b));
+		palette.set_pen_color(i, level[r], level[g], level[b]);
 	}
 	// sms and sg1000-mark3 uses a different palette for modes 0 to 3 - see http://www.smspower.org/Development/Palette
 	// TMS9918 palette
-	palette.set_pen_color(64+ 0,   0,   0,   0); // palette.set_pen_color(64+ 0,   0,   0,   0);
-	palette.set_pen_color(64+ 1,   0,   0,   0); // palette.set_pen_color(64+ 1,   0,   0,   0);
-	palette.set_pen_color(64+ 2,   0, 170,   0); // palette.set_pen_color(64+ 2,  33, 200,  66);
-	palette.set_pen_color(64+ 3,   0, 255,   0); // palette.set_pen_color(64+ 3,  94, 220, 120);
-	palette.set_pen_color(64+ 4,   0,   0,  85); // palette.set_pen_color(64+ 4,  84,  85, 237);
-	palette.set_pen_color(64+ 5,   0,   0, 255); // palette.set_pen_color(64+ 5, 125, 118, 252);
-	palette.set_pen_color(64+ 6,  85,   0,   0); // palette.set_pen_color(64+ 6, 212,  82,  77);
-	palette.set_pen_color(64+ 7,   0, 255, 255); // palette.set_pen_color(64+ 7,  66, 235, 245);
-	palette.set_pen_color(64+ 8, 170,   0,   0); // palette.set_pen_color(64+ 8, 252,  85,  84);
-	palette.set_pen_color(64+ 9, 255,   0,   0); // palette.set_pen_color(64+ 9, 255, 121, 120);
-	palette.set_pen_color(64+10,  85,  85,   0); // palette.set_pen_color(64+10, 212, 193,  84);
-	palette.set_pen_color(64+11, 255, 255,   0); // palette.set_pen_color(64+11, 230, 206, 128);
-	palette.set_pen_color(64+12,   0,  85,   0); // palette.set_pen_color(64+12,  33, 176,  59);
-	palette.set_pen_color(64+13, 255,   0, 255); // palette.set_pen_color(64+13, 201,  91, 186);
-	palette.set_pen_color(64+14,  85,  85,  85); // palette.set_pen_color(64+14, 204, 204, 204);
-	palette.set_pen_color(64+15, 255, 255, 255); // palette.set_pen_color(64+15, 255, 255, 255);
+	palette.set_pen_color(64+ 0, level[0], level[0], level[0]); // palette.set_pen_color(64+ 0,   0,   0,   0);
+	palette.set_pen_color(64+ 1, level[0], level[0], level[0]); // palette.set_pen_color(64+ 1,   0,   0,   0);
+	palette.set_pen_color(64+ 2, level[0], level[2], level[0]); // palette.set_pen_color(64+ 2,  33, 200,  66);
+	palette.set_pen_color(64+ 3, level[0], level[3], level[0]); // palette.set_pen_color(64+ 3,  94, 220, 120);
+	palette.set_pen_color(64+ 4, level[0], level[0], level[1]); // palette.set_pen_color(64+ 4,  84,  85, 237);
+	palette.set_pen_color(64+ 5, level[0], level[0], level[3]); // palette.set_pen_color(64+ 5, 125, 118, 252);
+	palette.set_pen_color(64+ 6, level[1], level[0], level[0]); // palette.set_pen_color(64+ 6, 212,  82,  77);
+	palette.set_pen_color(64+ 7, level[0], level[3], level[3]); // palette.set_pen_color(64+ 7,  66, 235, 245);
+	palette.set_pen_color(64+ 8, level[2], level[0], level[0]); // palette.set_pen_color(64+ 8, 252,  85,  84);
+	palette.set_pen_color(64+ 9, level[3], level[0], level[0]); // palette.set_pen_color(64+ 9, 255, 121, 120);
+	palette.set_pen_color(64+10, level[1], level[1], level[0]); // palette.set_pen_color(64+10, 212, 193,  84);
+	palette.set_pen_color(64+11, level[3], level[3], level[0]); // palette.set_pen_color(64+11, 230, 206, 128);
+	palette.set_pen_color(64+12, level[0], level[1], level[0]); // palette.set_pen_color(64+12,  33, 176,  59);
+	palette.set_pen_color(64+13, level[3], level[0], level[3]); // palette.set_pen_color(64+13, 201,  91, 186);
+	palette.set_pen_color(64+14, level[1], level[1], level[1]); // palette.set_pen_color(64+14, 204, 204, 204);
+	palette.set_pen_color(64+15, level[3], level[3], level[3]); // palette.set_pen_color(64+15, 255, 255, 255);
+}
+
+
+void sega315_5246_device::sega315_5246_palette(palette_device &palette) const
+{
+	// bit different output level compare to 315_5124
+	static const u8 level[4] = {0,89,174,255};
+	for (int i = 0; i < 64; i++)
+	{
+		const u8 r = i & 0x03;
+		const u8 g = (i & 0x0c) >> 2;
+		const u8 b = (i & 0x30) >> 4;
+		palette.set_pen_color(i, level[r], level[g], level[b]);
+	}
+	// TMS9918 palette (see sega315_5124_palette)
+	palette.set_pen_color(64+ 0, level[0], level[0], level[0]); // palette.set_pen_color(64+ 0,   0,   0,   0);
+	palette.set_pen_color(64+ 1, level[0], level[0], level[0]); // palette.set_pen_color(64+ 1,   0,   0,   0);
+	palette.set_pen_color(64+ 2, level[0], level[2], level[0]); // palette.set_pen_color(64+ 2,  33, 200,  66);
+	palette.set_pen_color(64+ 3, level[0], level[3], level[0]); // palette.set_pen_color(64+ 3,  94, 220, 120);
+	palette.set_pen_color(64+ 4, level[0], level[0], level[1]); // palette.set_pen_color(64+ 4,  84,  85, 237);
+	palette.set_pen_color(64+ 5, level[0], level[0], level[3]); // palette.set_pen_color(64+ 5, 125, 118, 252);
+	palette.set_pen_color(64+ 6, level[1], level[0], level[0]); // palette.set_pen_color(64+ 6, 212,  82,  77);
+	palette.set_pen_color(64+ 7, level[0], level[3], level[3]); // palette.set_pen_color(64+ 7,  66, 235, 245);
+	palette.set_pen_color(64+ 8, level[2], level[0], level[0]); // palette.set_pen_color(64+ 8, 252,  85,  84);
+	palette.set_pen_color(64+ 9, level[3], level[0], level[0]); // palette.set_pen_color(64+ 9, 255, 121, 120);
+	palette.set_pen_color(64+10, level[1], level[1], level[0]); // palette.set_pen_color(64+10, 212, 193,  84);
+	palette.set_pen_color(64+11, level[3], level[3], level[0]); // palette.set_pen_color(64+11, 230, 206, 128);
+	palette.set_pen_color(64+12, level[0], level[1], level[0]); // palette.set_pen_color(64+12,  33, 176,  59);
+	palette.set_pen_color(64+13, level[3], level[0], level[3]); // palette.set_pen_color(64+13, 201,  91, 186);
+	palette.set_pen_color(64+14, level[1], level[1], level[1]); // palette.set_pen_color(64+14, 204, 204, 204);
+	palette.set_pen_color(64+15, level[3], level[3], level[3]); // palette.set_pen_color(64+15, 255, 255, 255);
 }
 
 
 void sega315_5377_device::sega315_5377_palette(palette_device &palette) const
 {
+	// TODO : linear? measure this
 	for (int i = 0; i < 4096; i++)
 	{
 		const u8 r = i & 0x000f;
@@ -173,7 +206,7 @@ void sega315_5313_mode4_device::sega315_5313_palette(palette_device &palette) co
 		palette.set_pen_color(i + (512 * 1), level[r], level[g], level[b]); // shadow
 		palette.set_pen_color(i + (512 * 2), level[7 + r], level[7 + g], level[7 + b]); // hilight
 	}
-	// seperated SMS compatible mode color (reference : http://www.sega-16.com/forum/showthread.php?30530-SMS-VDP-output-levels)
+	// seperated SMS compatible mode color
 	static const u8 sms_level[4] = {0,99,162,255};
 	for (int i = 0; i < 64; i++)
 	{
@@ -204,6 +237,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
 	, device_mixer_interface(mconfig, *this, 2)
+	, m_hcounter_divide(1)
 	, m_cram_size(cram_size)
 	, m_line_timing(line_timing)
 	, m_palette_offset(palette_offset)
@@ -361,7 +395,7 @@ u8 sega315_5124_device::vcount_read()
 	const int active_scr_start = m_frame_timing[VERTICAL_SYNC] + m_frame_timing[TOP_BLANKING] + m_frame_timing[TOP_BORDER];
 	int vpos = screen().vpos();
 
-	if (screen().hpos() < m_line_timing[VCOUNT_CHANGE_HPOS])
+	if (screen_hpos() < m_line_timing[VCOUNT_CHANGE_HPOS])
 	{
 		vpos--;
 		if (vpos < 0)
@@ -382,7 +416,7 @@ u8 sega315_5124_device::hcount_read()
 void sega315_5124_device::hcount_latch()
 {
 	/* The hcount value returned by the VDP seems to be based on the previous hpos */
-	int hclock = screen().hpos() - 1;
+	int hclock = screen_hpos() - 1;
 	if (hclock < 0)
 		hclock += WIDTH;
 
@@ -677,7 +711,7 @@ void sega315_5124_device::check_pending_flags()
 	   return some position in the beginning of next line. To ensure the instruction
 	   will get updated status, here a maximum hpos is set if the timer reports no
 	   remaining time, what could also occur due to the ahead time of the timeslice. */
-	int const hpos = (m_pending_flags_timer->remaining() == attotime::zero) ? (WIDTH - 1) : screen().hpos();
+	int const hpos = (m_pending_flags_timer->remaining() == attotime::zero) ? (WIDTH - 1) : screen_hpos();
 
 	if ((m_pending_hint) && hpos >= m_line_timing[HINT_HPOS])
 	{
@@ -853,11 +887,11 @@ void sega315_5124_device::control_write(u8 data)
 				break;
 			case 1:
 				set_display_settings();
-				if (screen().hpos() <= DISPLAY_DISABLED_HPOS)
+				if (screen_hpos() <= DISPLAY_DISABLED_HPOS)
 					m_display_disabled = !BIT(m_reg[0x01], 6);
 				break;
 			case 8:
-				if (screen().hpos() <= m_line_timing[XSCROLL_HPOS])
+				if (screen_hpos() <= m_line_timing[XSCROLL_HPOS])
 					m_reg8copy = m_reg[0x08];
 			}
 
@@ -1303,7 +1337,7 @@ void sega315_5313_mode4_device::sprite_collision(int line, int sprite_col_x)
 		// This function is been used to check for sprite collision of
 		// the 315-5313 VDP, that occurs before the active screen is
 		// drawn, so it must not flag a collision again when drawing.
-		if (screen().hpos() < m_draw_time)
+		if (screen_hpos() < m_draw_time)
 		{
 			m_pending_status |= STATUS_SPRCOL;
 			m_pending_sprcol_x = m_line_timing[SPRCOL_BASEHPOS];
@@ -2016,6 +2050,12 @@ void sega315_5124_device::device_add_mconfig(machine_config &config)
 	PALETTE(config, m_palette_lut, FUNC(sega315_5124_device::sega315_5124_palette), SEGA315_5124_PALETTE_SIZE);
 
 	SEGAPSG(config, m_snsnd, DERIVED_CLOCK(1, 3)).add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+}
+
+void sega315_5246_device::device_add_mconfig(machine_config &config)
+{
+	sega315_5124_device::device_add_mconfig(config);
+	m_palette_lut->set_init(FUNC(sega315_5246_device::sega315_5246_palette));
 }
 
 void sega315_5377_device::device_reset()

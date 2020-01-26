@@ -45,7 +45,7 @@ public:
 		, m_centronics(*this, "centronics")
 		, m_cent_status_in(*this, "cent_status_in")
 		, m_statuslatch(*this, "statuslatch")
-		, m_bios(*this, "user1")
+		, m_bios(*this, "bios")
 		, m_biosram(*this, "biosram")
 		, m_sbx(*this, "sbx%u", 1U)
 	{ }
@@ -123,7 +123,7 @@ void isbc_state::rpc86_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0xcffff).ram();
-	map(0xf8000, 0xfffff).rom().region("user1", 0);
+	map(0xf8000, 0xfffff).rom().region("bios", 0);
 }
 
 void isbc_state::rpc86_io(address_map &map)
@@ -159,7 +159,7 @@ void isbc_state::isbc86_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0xfbfff).ram();
-	map(0xfc000, 0xfffff).rom().region("user1", 0);
+	map(0xfc000, 0xfffff).rom().region("bios", 0);
 }
 
 void isbc_state::isbc_io(address_map &map)
@@ -197,8 +197,8 @@ void isbc_state::isbc286_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0xdffff).ram();
-	map(0xe0000, 0xfffff).rom().region("user1", 0);
-	map(0xfe0000, 0xffffff).rom().region("user1", 0);
+	map(0xe0000, 0xfffff).rom().region("bios", 0);
+	map(0xfe0000, 0xffffff).rom().region("bios", 0);
 }
 
 void isbc_state::isbc2861_mem(address_map &map)
@@ -207,7 +207,7 @@ void isbc_state::isbc2861_mem(address_map &map)
 	map(0x00000, 0xdffff).ram();
 	map(0xe0000, 0xfffff).rw(FUNC(isbc_state::bioslo_r), FUNC(isbc_state::bioslo_w)).share("biosram");
 //  map(0x100000, 0x1fffff).ram(); // FIXME: XENIX doesn't like this, IRMX is okay with it
-	map(0xff0000, 0xffffff).rom().region("user1", 0);
+	map(0xff0000, 0xffffff).rom().region("bios", 0);
 }
 
 /* Input ports */
@@ -531,7 +531,7 @@ void isbc_state::isbc2861(machine_config &config)
 
 /* ROM definition */
 ROM_START( isbc86 )
-	ROM_REGION( 0x4000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x4000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "8612_2u.bin", 0x0001, 0x1000, CRC(84fa14cf) SHA1(783e1459ab121201fd49368d4bf769c1bab6447a))
 	ROM_LOAD16_BYTE( "8612_2l.bin", 0x0000, 0x1000, CRC(922bda5f) SHA1(15743e69f3aba56425fa004d19b82ec20532fd72))
 	ROM_LOAD16_BYTE( "8612_3u.bin", 0x2001, 0x1000, CRC(68d47c3e) SHA1(16c17f26b33daffa84d065ff7aefb581544176bd))
@@ -539,12 +539,12 @@ ROM_START( isbc86 )
 ROM_END
 
 ROM_START( isbc8605 )
-	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x8000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD( "i8605mon.bin", 0x4000, 0x4000, CRC(e16acb6e) SHA1(eb9a3fd21f7609d44f8052b6a0603ecbb52dc3f3))
 ROM_END
 
 ROM_START( isbc8630 )
-	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x8000, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "14378", "14378" )
 	ROMX_LOAD( "143780-001_isdm_for_isbc_86-30_socket_u57_i2732a.bin", 0x4000, 0x1000, CRC(db0ef880) SHA1(8ef296066d16881217618e54b410d12157f318ea), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD( "143782-001_isdm_for_isbc_86-30_socket_u39_i2732a.bin", 0x4001, 0x1000, CRC(ea1ebe78) SHA1(f03b63659e8f5e96f481dbc6c2ddef1d22850ebb), ROM_SKIP(1) | ROM_BIOS(0))
@@ -558,7 +558,7 @@ ROM_START( isbc8630 )
 ROM_END
 
 ROM_START( isbc286 )
-	ROM_REGION( 0x20000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x20000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "u79.bin", 0x00001, 0x10000, CRC(144182ea) SHA1(4620ca205a6ac98fe2636183eaead7c4bfaf7a72))
 	ROM_LOAD16_BYTE( "u36.bin", 0x00000, 0x10000, CRC(22db075f) SHA1(fd29ea77f5fc0697c8f8b66aca549aad5b9db3ea))
 ROM_END
@@ -636,7 +636,7 @@ ROM_END
  * :uart8274 B Reg 05 <- ea - Tx Enabled, Tx 8 bits, Send Break 0, RTS=0, DTR=0
 */
 ROM_START( isbc2861 )
-	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x10000, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v11", "iSDM Monitor V1.1" )
 	ROMX_LOAD( "174894-001.bin", 0x0000, 0x4000, CRC(79e4f7af) SHA1(911a4595d35e6e82b1149e75bb027927cd1c1658), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD( "174894-002.bin", 0x0001, 0x4000, CRC(66747d21) SHA1(4094b1f10a8bc7db8d6dd48d7128e14e875776c7), ROM_SKIP(1) | ROM_BIOS(0))
@@ -650,13 +650,13 @@ ROM_START( isbc2861 )
 ROM_END
 
 ROM_START( isbc28612 )
-	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x10000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "176346-001.bin", 0x0000, 0x8000, CRC(f86c8be5) SHA1(e2bb16b0aeb718219e65d61edabd7838ef34c560))
 	ROM_LOAD16_BYTE( "176346-002.bin", 0x0001, 0x8000, CRC(b964c6c3) SHA1(c3de8541182e32b3568fde77da8c435eab397498))
 ROM_END
 
 ROM_START( rpc86 )
-	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x8000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "145068-001.bin", 0x4001, 0x1000, CRC(0fa9db83) SHA1(4a44f8683c263c9ef6850cbe05aaa73f4d4d4e06))
 	ROM_LOAD16_BYTE( "145069-001.bin", 0x6001, 0x1000, CRC(1692a076) SHA1(0ce3a4a867cb92340871bb8f9c3e91ce2984c77c))
 	ROM_LOAD16_BYTE( "145070-001.bin", 0x4000, 0x1000, CRC(8c8303ef) SHA1(60f94daa76ab9dea6e309ac580152eb212b847a0))

@@ -313,7 +313,7 @@ void bladestl_state::bladestl(machine_config &config)
 	MC6809E(config, m_audiocpu, XTAL(24'000'000) / 16);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bladestl_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	WATCHDOG_TIMER(config, "watchdog");
 

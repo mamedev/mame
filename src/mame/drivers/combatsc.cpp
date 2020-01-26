@@ -710,7 +710,7 @@ void combatsc_state::combatsc(machine_config &config)
 	Z80(config, m_audiocpu, 3579545);   /* 3.579545 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &combatsc_state::combatsc_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(1200);
+	config.set_maximum_quantum(attotime::from_hz(1200));
 
 	MCFG_MACHINE_START_OVERRIDE(combatsc_state,combatsc)
 
@@ -762,7 +762,7 @@ void combatsc_state::combatscb(machine_config &config)
 	Z80(config, m_audiocpu, 3579545);   /* 3.579545 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &combatsc_state::combatscb_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(1200);
+	config.set_maximum_quantum(attotime::from_hz(1200));
 
 	MCFG_MACHINE_START_OVERRIDE(combatsc_state,combatscb)
 

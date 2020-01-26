@@ -57,18 +57,29 @@
 
 #include "netlist/nl_dice_compat.h"
 
-static Mono555Desc a3_555_desc(K_OHM(100.0), U_FARAD(0.1));
+#define a3_555_desc_R K_OHM(100.0)
+#define a3_555_desc_C U_FARAD(0.1)
 
-static Mono555Desc a10_555_desc(K_OHM(70.0), U_FARAD(0.1));  // actually 56k + 50k trimmer
-static Mono555Desc b10_555_desc(K_OHM(70.0), U_FARAD(0.1));  // actually 56k + 50k trimmer
+#define a10_555_desc_R K_OHM(70.0)  // actually 56k + 50k trimmer
+#define a10_555_desc_C U_FARAD(0.1)
 
-static Mono555Desc b9a_555_desc(K_OHM(70.0), U_FARAD(0.1));  // actually 56k + 50k trimmer
-static Mono555Desc b9b_555_desc(K_OHM(70.0), U_FARAD(0.1));  // actually 56k + 50k trimmer
+#define b10_555_desc_R K_OHM(70.0)  // actually 56k + 50k trimmer
+#define b10_555_desc_C U_FARAD(0.1)
 
-static Mono555Desc f5_555_desc(K_OHM(330.0), U_FARAD(4.7));
-static Mono555Desc g5_555_desc(K_OHM(220.0), U_FARAD(1.0));
+#define b9a_555_desc_R K_OHM(70.0)  // actually 56k + 50k trimmer
+#define b9a_555_desc_C U_FARAD(0.1)
 
-static SeriesRCDesc c33_desc(K_OHM(1.0), U_FARAD(0.1)); // Capacitor C33, Resistor R30
+#define b9b_555_desc_R K_OHM(70.0)  // actually 56k + 50k trimmer
+#define b9b_555_desc_C U_FARAD(0.1)
+
+#define f5_555_desc_R K_OHM(330.0)
+#define f5_555_desc_C U_FARAD(4.7)
+
+#define g5_555_desc_R K_OHM(220.0)
+#define g5_555_desc_C U_FARAD(1.0)
+
+#define c33_desc_R K_OHM(1.0)
+#define c33_desc_C U_FARAD(0.1)     // Capacitor C33, Resistor R30
 
 #if 0
 static Paddle1VerticalDesc pad1_desc(17000.0, 145000.0, &a10_555_desc);
@@ -126,7 +137,7 @@ CIRCUIT_LAYOUT( pongdoubles )
 	CHIP("D4", 7430)
 
 	//CHIP("B10", 555_Mono, &b10_555_desc)
-	CHIP_555_Mono(B10, &b10_555_desc)
+	CHIP_555_Mono(B10, b10_555_desc)
 
 	// NETLIST - analog start
 	POT(B10_POT, RES_K(1))     // This is a guess!!
@@ -146,7 +157,7 @@ CIRCUIT_LAYOUT( pongdoubles )
 	CHIP("A8", 7420)
 
 	//CHIP("A10", 555_Mono, &a10_555_desc)
-	CHIP_555_Mono(A10, &a10_555_desc)
+	CHIP_555_Mono(A10, a10_555_desc)
 
 	// NETLIST - analog start
 	POT(A10_POT, RES_K(1))     // This is a guess!!
@@ -180,10 +191,10 @@ CIRCUIT_LAYOUT( pongdoubles )
 	CHIP("H5", 7400)
 	CHIP("E7", 7400)
 	//CHIP("F5", 555_Mono, &f5_555_desc)
-	CHIP_555_Mono(F5, &f5_555_desc)
+	CHIP_555_Mono(F5, f5_555_desc)
 
 	//CHIP("G5", 555_Mono, &g5_555_desc)
-	CHIP_555_Mono(G5, &g5_555_desc)
+	CHIP_555_Mono(G5, g5_555_desc)
 	CHIP("C3", 7474)
 	CHIP("C2", 7400)
 
@@ -219,10 +230,10 @@ CIRCUIT_LAYOUT( pongdoubles )
 	CHIP("H10", 7474)
 	CHIP("G10", 7474)
 	//CHIP("A3", 555_Mono, &a3_555_desc)
-	CHIP_555_Mono(A3, &a3_555_desc)
+	CHIP_555_Mono(A3, a3_555_desc)
 
 	//CHIP("B9A", 555_Mono, &b9a_555_desc)
-	CHIP_555_Mono(B9A, &b9a_555_desc)
+	CHIP_555_Mono(B9A, b9a_555_desc)
 
 	// NETLIST - analog start
 	POT(B9A_POT, RES_K(1))     // This is a guess!!
@@ -236,7 +247,7 @@ CIRCUIT_LAYOUT( pongdoubles )
 	// NETLIST - analog end
 
 	//CHIP("B9B", 555_Mono, &b9b_555_desc)
-	CHIP_555_Mono(B9B, &b9b_555_desc)
+	CHIP_555_Mono(B9B, b9b_555_desc)
 
 	// NETLIST - analog start
 	POT(B9B_POT, RES_K(1))     // This is a guess!!
@@ -249,7 +260,7 @@ CIRCUIT_LAYOUT( pongdoubles )
 	NET_C(B9B_RPRE.2, B9B.5)
 	// NETLIST - analog end
 
-	CHIP_SERIES_RC(C33, &c33_desc)
+	CHIP_SERIES_RC(C33, c33_desc)
 
 #if 0
 	CHIP("PAD1", PADDLE1_VERTICAL_INPUT, &pad1_desc)

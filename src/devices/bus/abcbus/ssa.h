@@ -20,15 +20,15 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> super_smartaid_t
+// ======================> abc_super_smartaid_device
 
-class super_smartaid_t : public device_t,
+class abc_super_smartaid_device : public device_t,
 						 public device_abcbus_card_interface,
 						 public device_nvram_interface
 {
 public:
 	// construction/destruction
-	super_smartaid_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abc_super_smartaid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -68,6 +68,6 @@ private:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(SUPER_SMARTAID, super_smartaid_t)
+DECLARE_DEVICE_TYPE(ABC_SUPER_SMARTAID, abc_super_smartaid_device)
 
 #endif // MAME_BUS_ABCBUS_SSA_H

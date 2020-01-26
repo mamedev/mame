@@ -1488,7 +1488,7 @@ void fhawk_state::fhawk(machine_config &config)
 	slave.set_addrmap(AS_PROGRAM, &fhawk_state::fhawk_2_map);
 	slave.set_vblank_int("screen", FUNC(taitol_state::irq0_line_hold));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_main_cpu);
 
 	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc", 0));
 	tc0220ioc.read_0_callback().set_ioport("DSWA");
@@ -1553,7 +1553,7 @@ void taitol_2cpu_state::raimais(machine_config &config)
 	slave.set_addrmap(AS_PROGRAM, &taitol_2cpu_state::raimais_2_map);
 	slave.set_vblank_int("screen", FUNC(taitol_state::irq0_line_hold));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_main_cpu);
 
 	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
 	tc0040ioc.read_0_callback().set_ioport("DSWA");
@@ -1596,7 +1596,7 @@ void taitol_2cpu_state::kurikint(machine_config &config)
 	m_audio_cpu->set_addrmap(AS_PROGRAM, &taitol_2cpu_state::kurikint_2_map);
 	m_audio_cpu->set_vblank_int("screen", FUNC(taitol_state::irq0_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
 	tc0040ioc.read_0_callback().set_ioport("DSWA");
@@ -1739,7 +1739,7 @@ void taitol_2cpu_state::evilston(machine_config &config)
 	m_audio_cpu->set_addrmap(AS_PROGRAM, &taitol_2cpu_state::evilston_2_map);
 	m_audio_cpu->set_vblank_int("screen", FUNC(taitol_state::irq0_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
 	tc0510nio.read_0_callback().set_ioport("DSWA");

@@ -1,48 +1,69 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*!
- *  \file nld_NE555.cpp
- *
- *  \page NE555 NE555: PRECISION TIMERS
- *
- *  The Swiss army knife for timing purposes
- *
- *  \section ne555_1 Synopsis
- *
- *  \snippet devsyn.dox.h NE555 synopsis
- *  \snippet devsyn.dox.h NE555_DIP synopsis
 
- *  \section ne555_11 "C" Synopsis
+//- Identifier:  NE555_DIP
+//- Title: NE555 PRECISION TIMERS
+//- Description:
+//-   These devices are precision timing circuits capable of producing accurate
+//-   time delays or oscillation. In the time-delay or monostable mode of
+//-   operation, the timed interval is controlled by a single external resistor
+//-   and capacitor network. In the astable mode of operation, the frequency and
+//-   duty cycle can be controlled independently with two external resistors and
+//-   a single external capacitor.
+//-
+//-   The threshold and trigger levels normally are two-thirds and one-third,
+//-   respectively, of V CC. These levels can be altered by use of the
+//-   control-voltage terminal. When the trigger input falls below the trigger
+//-   level, the flip-flop is set and NC – No internal connection the output
+//-   goes high. If the trigger input is above the trigger level and the
+//-   threshold input is above the threshold level, the flip-flop is reset and
+//-   the output is low. The reset (RESET) input can override all other
+//-   inputs and can be used to initiate a new timing cycle. When RESET goes
+//-   low, the flip-flop is reset and the output goes low. When the output is low,
+//-   a low-impedance path is provided between discharge (DISCH) and ground.
+//-
+//-   The output circuit is capable of sinking or sourcing current up to 200 mA.
+//-   Operation is specified for supplies of 5 V to 15 V. With a 5-V supply,
+//-   output levels are compatible with TTL inputs.
+//-
+//-   The NE555 is characterized for operation from 0°C to 70°C. The SA555 is
+//-   characterized for operation from –40°C to 85°C. The SE555 is characterized
+//-   for operation over the full military range of –55°C to 125°C.
+//-
+//- Pinalias: GND,TRIG,OUT,RESET,CONT,THRES,DISCH,VCC
+//- Package: DIP
+//- NamingConvention: Naming conventions follow Texas instrument datasheet
+//- Limitations: Internal resistor network currently fixed to 5k
+//- Example: ne555_astable.c,ne555_example
+//- FunctionTable:
+//-
+//-    |RESET|TRIGGER VOLTAGE|THRESHOLD VOLTAGE|OUTPUT|DISCHARGE SWITCH|
+//-    |:---:|:-------------:|:---------------:|:----:|:--------------:|
+//-    |Low  | Irrelevant    | Irrelevant      |  Low |    On          |
+//-    |High | <1/3 VDD      | Irrelevant      | High |    Off         |
+//-    |High | >1/3 VDD      | >2/3 VDD        | Low  |    On          |
+//-    |High | >1/3 VDD      | <2/3 VDD        | As previously established||
+//-
+
+
+/*
+ * "Description: The Swiss army knife for timing purposes\n"
+ * "    which has a ton of applications.\n"
+ * "DipAlias: GND,TRIG,OUT,RESET,VCC,DISCH,THRES,CONT\n"
+ * "Package: DIP\n"
+ * "NamingConvention: Naming conventions follow Texas Instruments datasheet\n"
+ * "Limitations: Internal resistor network currently fixed to 5k\n"
+ * "     more limitations\n"
+ * "Function Table:\n"
  *
- *  \snippet devsyn.dox.h NE555 csynopsis
- *  \snippet devsyn.dox.h NE555_DIP csynopsis
+ *  Function table created from truthtable if missing.
  *
- *  For the \c NE555 use verbose pin assignments like \c name.TRIG or \c name.OUT.
- *  For the \c NE555_DIP use pin numbers like \c name.1.
+ *  For package, refer to:
  *
- *  \section ne555_2 Connection Diagram
+ *  https://en.wikipedia.org/wiki/List_of_integrated_circuit_packaging_types
  *
- *  <pre>
- *          +--------+
- *      GND |1  ++  8| VCC
- *     TRIG |2      7| DISCH
- *      OUT |3      6| THRES
- *    RESET |4      5| CONT
- *          +--------+
- *  </pre>
+ *  Special case: GATE -> use symbolic names
  *
- *  Naming conventions follow Texas Instruments datasheet
- *
- *  \section ne555_3 Function Table
- *
- *  Please refer to the datasheet.
- *
- *  \section ne555_4 Limitations
- *
- *  Internal resistor network currently fixed to 5k.
- *
- *  \section ne555_5 Example
- *  \snippet ne555_astable.c ne555 example
  */
 
 #include "nld_ne555.h"
@@ -103,10 +124,10 @@ namespace netlist
 		state_var<bool> m_ff;
 		state_var<bool> m_last_reset;
 
-		nl_double clamp(const nl_double v, const nl_double a, const nl_double b)
+		nl_fptype clamp(const nl_fptype v, const nl_fptype a, const nl_fptype b)
 		{
-			nl_double ret = v;
-			nl_double vcc = m_R1.m_P();
+			nl_fptype ret = v;
+			nl_fptype vcc = m_R1.m_P();
 
 			if (ret >  vcc - a)
 				ret = vcc - a;
@@ -140,11 +161,11 @@ namespace netlist
 		m_RDIS.reset();
 
 		/* FIXME make resistances a parameter, properly model other variants */
-		m_R1.set_R(5000);
-		m_R2.set_R(5000);
-		m_R3.set_R(5000);
-		m_ROUT.set_R(20);
-		m_RDIS.set_R(R_OFF);
+		m_R1.set_R(nlconst::magic(5000));
+		m_R2.set_R(nlconst::magic(5000));
+		m_R3.set_R(nlconst::magic(5000));
+		m_ROUT.set_R(nlconst::magic(20));
+		m_RDIS.set_R(nlconst::magic(R_OFF));
 
 		m_last_out = true;
 	}
@@ -161,9 +182,9 @@ namespace netlist
 		}
 		else
 		{
-			const nl_double vt = clamp(m_R2.m_P(), 0.7, 1.4);
+			const nl_fptype vt = clamp(m_R2.m_P(), nlconst::magic(0.7), nlconst::magic(1.4));
 			const bool bthresh = (m_THRES() > vt);
-			const bool btrig = (m_TRIG() > clamp(m_R2.m_N(), 0.7, 1.4));
+			const bool btrig = (m_TRIG() > clamp(m_R2.m_N(), nlconst::magic(0.7), nlconst::magic(1.4)));
 
 			if (!btrig)
 				m_ff = true;
@@ -177,14 +198,14 @@ namespace netlist
 		{
 			m_RDIS.update();
 			m_OUT.push(m_R3.m_N());
-			m_RDIS.set_R(R_ON);
+			m_RDIS.set_R(nlconst::magic(R_ON));
 		}
 		else if (!m_last_out && out)
 		{
 			m_RDIS.update();
 			// FIXME: Should be delayed by 100ns
 			m_OUT.push(m_R1.m_P());
-			m_RDIS.set_R(R_OFF);
+			m_RDIS.set_R(nlconst::magic(R_OFF));
 		}
 		m_last_reset = reset;
 		m_last_out = out;

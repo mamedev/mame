@@ -379,7 +379,7 @@ void bpmmicro_state::bpmmicro(machine_config &config)
 ******************************************************************************/
 
 ROM_START(bp1200)
-	ROM_REGION(0x20000, "bios", 0)
+	ROM_REGION16_LE(0x20000, "bios", 0)
 	// note about roms: the BP-1200 has two jumpers controlling what type of rom is installed;
 	// it needs 120ns or faster roms
 	// the "W1" and "W2" labels are next to pins A on the pcb

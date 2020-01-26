@@ -86,7 +86,7 @@ void menu_file_selector::custom_render(void *selectedref, float top, float botto
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
 
 	// take off the borders
-	x1 += ui().box_lr_border();
+	x1 += ui().box_lr_border() * machine().render().ui_aspect(&container());
 	y1 += ui().box_tb_border();
 
 	size_t hit_start = 0, hit_span = 0;

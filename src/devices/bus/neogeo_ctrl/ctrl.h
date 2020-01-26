@@ -18,9 +18,8 @@
 class neogeo_control_port_device;
 class neogeo_ctrl_edge_port_device;
 
-// ======================> device_neogeo_control_port_interface
 
-class device_neogeo_control_port_interface : public device_slot_card_interface
+class device_neogeo_control_port_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -36,9 +35,8 @@ protected:
 	neogeo_control_port_device *m_port;
 };
 
-// ======================> neogeo_control_port_device
 
-class neogeo_control_port_device : public device_t, public device_slot_interface
+class neogeo_control_port_device : public device_t, public device_single_card_slot_interface<device_neogeo_control_port_interface>
 {
 public:
 	// construction/destruction
@@ -57,7 +55,6 @@ public:
 	uint8_t read_ctrl();
 	uint8_t read_start_sel();
 	void write_ctrlsel(uint8_t data);
-	DECLARE_READ8_MEMBER( ctrl_r ) { return read_ctrl(); }
 
 protected:
 	// device-level overrides
@@ -67,17 +64,15 @@ protected:
 };
 
 
-// ======================> device_neogeo_ctrl_edge_interface
-
-class device_neogeo_ctrl_edge_interface : public device_slot_card_interface
+class device_neogeo_ctrl_edge_interface : public device_interface
 {
 public:
 	// construction/destruction
 	virtual ~device_neogeo_ctrl_edge_interface();
 
 	virtual uint8_t read_start_sel() { return 0xff; }
-	virtual DECLARE_READ8_MEMBER( in0_r ) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER( in1_r ) { return 0xff; }
+	virtual uint8_t in0_r() { return 0xff; }
+	virtual uint8_t in1_r() { return 0xff; }
 	virtual void write_ctrlsel(uint8_t data) { }
 
 protected:
@@ -86,9 +81,8 @@ protected:
 	neogeo_ctrl_edge_port_device *m_port;
 };
 
-// ======================> neogeo_ctrl_edge_port_device
 
-class neogeo_ctrl_edge_port_device : public device_t, public device_slot_interface
+class neogeo_ctrl_edge_port_device : public device_t, public device_single_card_slot_interface<device_neogeo_ctrl_edge_interface>
 {
 public:
 	// construction/destruction
@@ -105,8 +99,8 @@ public:
 	virtual ~neogeo_ctrl_edge_port_device();
 
 	uint8_t read_start_sel();
-	DECLARE_READ8_MEMBER( in0_r );
-	DECLARE_READ8_MEMBER( in1_r );
+	uint8_t in0_r();
+	uint8_t in1_r();
 	void write_ctrlsel(uint8_t data);
 
 protected:
@@ -117,7 +111,6 @@ protected:
 };
 
 
-// device type definition
 DECLARE_DEVICE_TYPE(NEOGEO_CONTROL_PORT,        neogeo_control_port_device)
 DECLARE_DEVICE_TYPE(NEOGEO_CTRL_EDGE_CONNECTOR, neogeo_ctrl_edge_port_device)
 
@@ -126,6 +119,5 @@ void neogeo_controls(device_slot_interface &device);
 void neogeo_arc_edge(device_slot_interface &device);
 void neogeo_arc_edge_fixed(device_slot_interface &device);
 void neogeo_arc_pin15(device_slot_interface &device);
-
 
 #endif // MAME_BUS_NEOGEO_CTRL_CTRL_H

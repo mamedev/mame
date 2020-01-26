@@ -25,6 +25,7 @@ TODO:
 
 // device type definition
 DEFINE_DEVICE_TYPE(S3520CF, s3520cf_device, "s3520cf", "Seiko Epson S-3520CF RTC")
+DEFINE_DEVICE_TYPE(RTC4553, rtc4553_device, "rtc4553", "Epson RTC-4553 RTC/SRAM") // functionally same as above but integrated oscillator
 
 
 //**************************************************************************
@@ -35,41 +36,55 @@ DEFINE_DEVICE_TYPE(S3520CF, s3520cf_device, "s3520cf", "Seiko Epson S-3520CF RTC
 //  s3520cf_device - constructor
 //-------------------------------------------------
 
-s3520cf_device::s3520cf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, S3520CF, tag, owner, clock)
-	, m_dir(0), m_latch(0), m_reset_line(0), m_read_latch(0), m_current_cmd(0), m_cmd_stream_pos(0), m_rtc_addr(0), m_mode(0), m_sysr(0), m_rtc_state()
+s3520cf_device::s3520cf_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: s3520cf_device(mconfig, S3520CF, tag, owner, clock)
 {
 }
 
-TIMER_CALLBACK_MEMBER(s3520cf_device::timer_callback)
+s3520cf_device::s3520cf_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_nvram_interface(mconfig, *this)
+	, m_region(*this, DEVICE_SELF)
+	, m_dir(0), m_latch(0), m_reset_line(0), m_read_latch(0), m_bitstream(0), m_stream_pos(0), m_mode(0), m_sysr(0), m_cntrl1(0), m_cntrl2(0)
 {
-	static constexpr uint8_t dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
+}
+
+void s3520cf_device::check_overflow()
+{
+	static constexpr u8 dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 	int dpm_count;
 
-	m_rtc.sec++;
-
-	if((m_rtc.sec & 0x0f) >= 0x0a)              { m_rtc.sec+=0x10; m_rtc.sec&=0xf0; }
-	if((m_rtc.sec & 0xf0) >= 0x60)              { m_rtc.min++; m_rtc.sec = 0; }
-	if((m_rtc.min & 0x0f) >= 0x0a)              { m_rtc.min+=0x10; m_rtc.min&=0xf0; }
-	if((m_rtc.min & 0xf0) >= 0x60)              { m_rtc.hour++; m_rtc.min = 0; }
-	if((m_rtc.hour & 0x0f) >= 0x0a)             { m_rtc.hour+=0x10; m_rtc.hour&=0xf0; }
-	if((m_rtc.hour & 0xff) >= 0x24)             { m_rtc.day++; m_rtc.wday++; m_rtc.hour = 0; }
-	if(m_rtc.wday >= 7)                         { m_rtc.wday = 0; }
-	if((m_rtc.day & 0x0f) >= 0x0a)              { m_rtc.day+=0x10; m_rtc.day&=0xf0; }
+	if ((m_rtc.sec & 0x0f) >= 0x0a) { m_rtc.sec += 0x10; m_rtc.sec &= 0xf0; }
+	if ((m_rtc.sec & 0xf0) >= 0x60) { m_rtc.min++; m_rtc.sec = 0; }
+	if ((m_rtc.min & 0x0f) >= 0x0a) { m_rtc.min += 0x10; m_rtc.min &= 0xf0; }
+	if ((m_rtc.min & 0xf0) >= 0x60) { m_rtc.hour++; m_rtc.min = 0; }
+	if ((m_rtc.hour & 0x0f) >= 0x0a) { m_rtc.hour += 0x10; m_rtc.hour &= 0xf0; }
+	if ((m_rtc.hour & 0xff) >= 0x24) { m_rtc.day++; m_rtc.wday++; m_rtc.hour = 0; }
+	if (m_rtc.wday >= 7) { m_rtc.wday = 0; }
+	if ((m_rtc.day & 0x0f) >= 0x0a) { m_rtc.day += 0x10; m_rtc.day &= 0xf0; }
 
 	/* TODO: crude leap year support */
-	dpm_count = (m_rtc.month & 0xf) + (((m_rtc.month & 0x10) >> 4)*10)-1;
+	dpm_count = (m_rtc.month & 0xf) + (((m_rtc.month & 0x10) >> 4) * 10) - 1;
 
-	if(((m_rtc.year % 4) == 0) && m_rtc.month == 2)
+	if (((m_rtc.year % 4) == 0) && m_rtc.month == 2)
 	{
-		if((m_rtc.day & 0xff) >= dpm[dpm_count]+1+1)
-			{ m_rtc.month++; m_rtc.day = 0x01; }
+		if ((m_rtc.day & 0xff) >= dpm[dpm_count] + 1 + 1)
+		{
+			m_rtc.month++; m_rtc.day = 0x01;
+		}
 	}
-	else if((m_rtc.day & 0xff) >= dpm[dpm_count]+1){ m_rtc.month++; m_rtc.day = 0x01; }
-	if((m_rtc.month & 0x0f) >= 0x0a)            { m_rtc.month = 0x10; }
-	if(m_rtc.month >= 0x13)                     { m_rtc.year++; m_rtc.month = 1; }
-	if((m_rtc.year & 0x0f) >= 0x0a)             { m_rtc.year+=0x10; m_rtc.year&=0xf0; }
-	if((m_rtc.year & 0xf0) >= 0xa0)             { m_rtc.year = 0; } //1901-2000 possible timeframe
+	else if ((m_rtc.day & 0xff) >= dpm[dpm_count] + 1) { m_rtc.month++; m_rtc.day = 0x01; }
+	if ((m_rtc.month & 0x0f) >= 0x0a) { m_rtc.month = 0x10; }
+	if (m_rtc.month >= 0x13) { m_rtc.year++; m_rtc.month = 1; }
+	if ((m_rtc.year & 0x0f) >= 0x0a) { m_rtc.year += 0x10; m_rtc.year &= 0xf0; }
+	if ((m_rtc.year & 0xf0) >= 0xa0) { m_rtc.year = 0; } //1901-2000 possible timeframe
+}
+
+
+TIMER_CALLBACK_MEMBER(s3520cf_device::timer_callback)
+{
+	m_rtc.sec++;
+	check_overflow();
 }
 
 
@@ -103,6 +118,25 @@ void s3520cf_device::device_start()
 	m_rtc.hour = ((systime.local_time.hour / 10)<<4) | ((systime.local_time.hour % 10) & 0xf);
 	m_rtc.min = ((systime.local_time.minute / 10)<<4) | ((systime.local_time.minute % 10) & 0xf);
 	m_rtc.sec = ((systime.local_time.second / 10)<<4) | ((systime.local_time.second % 10) & 0xf);
+
+	save_item(NAME(m_dir));
+	save_item(NAME(m_latch));
+	save_item(NAME(m_reset_line));
+	save_item(NAME(m_read_latch));
+	save_item(NAME(m_bitstream));
+	save_item(NAME(m_stream_pos));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_sysr));
+	save_item(NAME(m_cntrl1));
+	save_item(NAME(m_cntrl2));
+	save_item(NAME(m_rtc.sec));
+	save_item(NAME(m_rtc.min));
+	save_item(NAME(m_rtc.hour));
+	save_item(NAME(m_rtc.day));
+	save_item(NAME(m_rtc.wday));
+	save_item(NAME(m_rtc.month));
+	save_item(NAME(m_rtc.year));
+	save_item(NAME(m_nvdata));
 }
 
 
@@ -116,29 +150,64 @@ void s3520cf_device::device_reset()
 }
 
 //-------------------------------------------------
+//  nvram_default - called to initialize NVRAM to
+//  its default state
+//-------------------------------------------------
+
+void s3520cf_device::nvram_default()
+{
+	for (auto & elem : m_nvdata)
+		elem = 0x00;
+
+	if (!m_region.found())
+		logerror("s3520cf(%s) region not found\n", tag());
+	else if (m_region->bytes() != 15)
+		logerror("s3520cf(%s) region length 0x%x expected 0x%x\n", tag(), m_region->bytes(), 15);
+	else
+		memcpy(m_nvdata, m_region->base(), 15);
+}
+
+//-------------------------------------------------
+//  nvram_read - called to read NVRAM from the
+//  .nv file
+//-------------------------------------------------
+
+void s3520cf_device::nvram_read(emu_file &file)
+{
+	file.read(m_nvdata, 15);
+}
+
+//-------------------------------------------------
+//  nvram_write - called to write NVRAM to the
+//  .nv file
+//-------------------------------------------------
+
+void s3520cf_device::nvram_write(emu_file &file)
+{
+	file.write(m_nvdata, 15);
+}
+
+//-------------------------------------------------
 //  rtc_read - used to route RTC reading registers
 //-------------------------------------------------
 
-inline uint8_t s3520cf_device::rtc_read(uint8_t offset)
+inline u8 s3520cf_device::rtc_read(u8 offset)
 {
-	uint8_t res;
+	u8 res = 0;
 
-	res = 0;
-
-	if(m_mode != 0)
-	{
-		if(offset == 0xf)
-			res = (m_sysr << 3) | m_mode;
+	if (offset == 0xf)
+		res = (m_sysr << 3) | m_mode;
+	else
+		if (m_mode > 1)
+		{
+			if (m_mode > 2)
+				offset += 15;
+			res = (m_nvdata[offset / 2] >> ((offset & 1) * 4)) & 0xf;
+		}
 		else
 		{
-			res = 0;
-			printf("Warning: S-3520CF RTC reads SRAM %02x %02x\n",offset,m_mode);
-		}
-	}
-	else
-	{
-		switch(offset)
-		{
+			switch (offset)
+			{
 			case 0x0: res = m_rtc.sec & 0xf; break;
 			case 0x1: res = m_rtc.sec >> 4; break;
 			case 0x2: res = m_rtc.min & 0xf; break;
@@ -152,24 +221,56 @@ inline uint8_t s3520cf_device::rtc_read(uint8_t offset)
 			case 0xa: res = m_rtc.month >> 4; break;
 			case 0xb: res = m_rtc.year & 0xf; break;
 			case 0xc: res = m_rtc.year >> 4; break;
+			case 0xd: res = m_cntrl1; break;
+			case 0xe: res = m_cntrl2; break;
+			}
 		}
-	}
 
 	return res;
 }
 
-inline void s3520cf_device::rtc_write(uint8_t offset,uint8_t data)
+inline void s3520cf_device::rtc_write(u8 offset,u8 data)
 {
 	if(offset == 0xf)
 	{
 		m_mode = data & 3;
 		m_sysr = (data & 8) >> 3;
-		printf("%02x\n",data);
+		if (m_sysr)
+		{
+			m_rtc.wday = m_rtc.hour = m_rtc.min = m_rtc.sec = 0;
+			m_rtc.year = m_rtc.month = m_rtc.day = 1;
+		}
 	}
 	else
 	{
-		if(m_mode != 0)
-			printf("Warning: S-3520CF RTC writes SRAM %02x %d\n",offset,m_mode);
+		if (m_mode > 1)
+		{
+			if (m_mode > 2)
+				offset += 15;
+			if (offset & 1)
+				m_nvdata[offset / 2] = (m_nvdata[offset / 2] & 0xf) | (data << 4);
+			else
+				m_nvdata[offset / 2] = (m_nvdata[offset / 2] & 0xf0) | (data & 0xf);
+		}
+		else
+			switch (offset)
+			{
+			case 0x0: m_rtc.sec = (m_cntrl1 & 2) ? 0 : m_rtc.sec + 1; check_overflow(); break;
+			case 0x1: m_rtc.sec = (m_cntrl1 & 2) ? 0 : m_rtc.sec + 0x10; check_overflow(); break;
+			case 0x2: m_rtc.min = (m_cntrl1 & 2) ? 0 : m_rtc.min + 1; check_overflow(); break;
+			case 0x3: m_rtc.min = (m_cntrl1 & 2) ? 0 : m_rtc.min + 0x10; check_overflow(); break;
+			case 0x4: m_rtc.hour = (m_cntrl1 & 2) ? 0 : m_rtc.hour + 1; check_overflow(); break;
+			case 0x5: m_rtc.hour = (m_cntrl1 & 2) ? 0 : m_rtc.hour; check_overflow(); break;
+			case 0x6: m_rtc.wday = (m_cntrl1 & 2) ? 0 : m_rtc.wday + 1; check_overflow(); break;
+			case 0x7: m_rtc.day = (m_cntrl1 & 2) ? 1 : m_rtc.day + 1; check_overflow(); break;
+			case 0x8: m_rtc.day = (m_cntrl1 & 2) ? 1 : m_rtc.day + 0x10; check_overflow(); break;
+			case 0x9: m_rtc.month = (m_cntrl1 & 2) ? 1: m_rtc.month + 1; check_overflow(); break;
+			case 0xa: m_rtc.month = (m_cntrl1 & 2) ? 1 : m_rtc.month + 0x10; check_overflow(); break;
+			case 0xb: m_rtc.year = (m_cntrl1 & 2) ? m_rtc.year & 0xf0 : m_rtc.year + 1; check_overflow(); break;
+			case 0xc: m_rtc.year = (m_cntrl1 & 2) ? m_rtc.year & 0x0f : m_rtc.year + 0x10; check_overflow(); break;
+			case 0xd: m_cntrl1 = data & 0xf;
+			case 0xe: m_cntrl2 = data & 0xf;
+			}
 	}
 }
 
@@ -199,10 +300,8 @@ WRITE_LINE_MEMBER( s3520cf_device::set_cs_line )
 	if(m_reset_line != CLEAR_LINE)
 	{
 		//printf("Reset asserted\n");
-		m_current_cmd = 0;
-		m_cmd_stream_pos = 0;
-		m_rtc_state = RTC_SET_ADDRESS;
-		//m_latch = 0;
+		m_stream_pos = 0;
+		//m_latch = 0; // should be high impedance
 	}
 }
 
@@ -214,50 +313,26 @@ WRITE_LINE_MEMBER( s3520cf_device::write_bit )
 
 WRITE_LINE_MEMBER( s3520cf_device::set_clock_line )
 {
+	// NOTE: this device use 1-cycle (8 clocks) delayed data output
 	if(state == 1 && m_reset_line == CLEAR_LINE)
 	{
 		//printf("%d %d\n",m_latch, m_dir);
+		m_read_latch = m_bitstream & 1;
+		m_bitstream = (m_bitstream >> 1) | ((m_latch & 1) << 7);
+		m_stream_pos = (m_stream_pos + 1) & 7;
 
-		switch(m_rtc_state)
+		if (m_stream_pos == 0)
 		{
-			case RTC_SET_ADDRESS:
-				m_current_cmd = (m_current_cmd >> 1) | ((m_latch<<3)&8);
-				m_cmd_stream_pos++;
-
-				if(m_cmd_stream_pos == 4)
-				{
-					m_rtc_addr = (m_current_cmd) & 0xf;
-					m_rtc_state = RTC_SET_DATA;
-					m_cmd_stream_pos = 0;
-					m_current_cmd = 0;
-				}
-				break;
-			case RTC_SET_DATA:
-				if(m_dir == 1) // READ
-				{
-					//if(m_cmd_stream_pos == 0)
-					{
-						//printf("%02x %d\n",m_rtc_addr,m_cmd_stream_pos);
-					}
-					m_read_latch = (rtc_read((m_rtc_addr+1) & 0xf) >> (m_cmd_stream_pos)) & 1; /* TODO: +1??? */
-				}
-
-				m_current_cmd = (m_current_cmd >> 1) | ((m_latch<<3)&8);
-				m_cmd_stream_pos++;
-				if(m_cmd_stream_pos == 4)
-				{
-					if(m_dir == 0) // WRITE
-					{
-						//printf("%02x %02x\n",m_rtc_addr,m_current_cmd);
-						rtc_write((m_rtc_addr - 1) & 0xf,m_current_cmd); /* TODO: -1??? */
-					}
-
-					m_rtc_addr = m_current_cmd;
-					m_rtc_state = RTC_SET_ADDRESS;
-					m_cmd_stream_pos = 0;
-					m_current_cmd = 0;
-				}
-				break;
+			u8 addr = m_bitstream & 0xf;
+			if (m_dir == 0) // Write
+				rtc_write(addr, m_bitstream >> 4);
+			// Read/Verify
+			m_bitstream = addr | (rtc_read(addr) << 4);
 		}
 	}
+}
+
+rtc4553_device::rtc4553_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: s3520cf_device(mconfig, RTC4553, tag, owner, clock)
+{
 }
