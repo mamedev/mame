@@ -225,9 +225,10 @@ static NETLIST_START(LM3900)
 	ALIAS(MINUS, R2.1) // Negative input
 	ALIAS(OUT, G1.OP) // Opamp output ...
 	ALIAS(GND, G1.ON)  // V- terminal
-	ALIAS(VCC, DUMMY.I)  // V+ terminal
+	ALIAS(VCC, DUMMY.1)  // V+ terminal
 
-	DUMMY_INPUT(DUMMY)
+	RES(DUMMY, RES_K(1))
+	NET_C(DUMMY.2, GND)
 
 	/* The opamp model */
 
