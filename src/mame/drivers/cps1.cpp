@@ -255,6 +255,22 @@ Stephh's log (2006.09.20) :
 
 
 
+u16 cps_state::mainram_r(offs_t offset, u16 mem_mask)
+{
+	if (!machine().side_effects_disabled())
+		m_maincpu->spin_until_time(attotime::from_nsec(100)); // HM65256BSP-10 (100ns), CPS2 Work RAM has same access time
+
+	return (~mem_mask) | (m_mainram[offset] & mem_mask);
+}
+
+void cps_state::mainram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	if (!machine().side_effects_disabled())
+		m_maincpu->spin_until_time(attotime::from_nsec(100)); // HM65256BSP-10 (100ns), CPS2 Work RAM has same access time
+
+	COMBINE_DATA(&m_mainram[offset]);
+}
+
 READ16_MEMBER(cps_state::cps1_dsw_r)
 {
 	static const char *const dswname[] = { "IN0", "DSWA", "DSWB", "DSWC" };
@@ -390,24 +406,50 @@ READ16_MEMBER(cps_state::qsound_rom_r)
 
 READ16_MEMBER(cps_state::qsound_sharedram1_r)
 {
-	return m_qsound_sharedram1[offset] | 0xff00;
+	u16 ret = 0xffff;
+	if (ACCESSING_BITS_0_7)
+	{
+		if (!machine().side_effects_disabled())
+			m_maincpu->spin_until_time(attotime::from_nsec(100)); // MB8464A-10L (100ns)
+
+		ret = (ret & ~0xff) | m_qsound_sharedram1[offset];
+	}
+	return ret;
 }
 
 WRITE16_MEMBER(cps_state::qsound_sharedram1_w)
 {
 	if (ACCESSING_BITS_0_7)
+	{
+		if (!machine().side_effects_disabled())
+			m_maincpu->spin_until_time(attotime::from_nsec(100)); // MB8464A-10L (100ns)
+
 		m_qsound_sharedram1[offset] = data;
+	}
 }
 
 READ16_MEMBER(cps_state::qsound_sharedram2_r)
 {
-	return m_qsound_sharedram2[offset] | 0xff00;
+	u16 ret = 0xffff;
+	if (ACCESSING_BITS_0_7)
+	{
+		if (!machine().side_effects_disabled())
+			m_maincpu->spin_until_time(attotime::from_nsec(100)); // MB8464A-10L (100ns)
+
+		ret = (ret & ~0xff) | m_qsound_sharedram2[offset];
+	}
+	return ret;
 }
 
 WRITE16_MEMBER(cps_state::qsound_sharedram2_w)
 {
 	if (ACCESSING_BITS_0_7)
+	{
+		if (!machine().side_effects_disabled())
+			m_maincpu->spin_until_time(attotime::from_nsec(100)); // MB8464A-10L (100ns)
+
 		m_qsound_sharedram2[offset] = data;
+	}
 }
 
 WRITE8_MEMBER(cps_state::qsound_banksw_w)
@@ -556,8 +598,8 @@ void cps_state::main_map(address_map &map)
 	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");
 	map(0x800180, 0x800187).w(FUNC(cps_state::cps1_soundlatch_w));    /* Sound command */
 	map(0x800188, 0x80018f).w(FUNC(cps_state::cps1_soundlatch2_w));   /* Sound timer fade */
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram"); /* SF2CE executes code from here */
-	map(0xff0000, 0xffffff).ram().share("mainram");
+	map(0x900000, 0x92ffff).rw(FUNC(cps_state::cps1_gfxram_r), FUNC(cps_state::cps1_gfxram_w)).share("gfxram"); /* SF2CE executes code from here */
+	map(0xff0000, 0xffffff).rw(FUNC(cps_state::mainram_r), FUNC(cps_state::mainram_w)).share("mainram");
 }
 
 /* Forgotten Worlds has a NEC uPD4701AC on the B-board handling dial inputs from the CN-MOWS connector. */
@@ -616,7 +658,7 @@ void cps_state::qsound_main_map(address_map &map)
 	map(0x800030, 0x800037).w(FUNC(cps_state::cps1_coinctrl_w));
 	map(0x800100, 0x80013f).w(FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
 	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");    /* CPS-B custom (mapped by LWIO/IOB1 PAL on B-board) */
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram"); /* SF2CE executes code from here */
+	map(0x900000, 0x92ffff).rw(FUNC(cps_state::cps1_gfxram_r), FUNC(cps_state::cps1_gfxram_w)).share("gfxram"); /* SF2CE executes code from here */
 	map(0xf00000, 0xf0ffff).r(FUNC(cps_state::qsound_rom_r));          /* Slammasters protection */
 	map(0xf18000, 0xf19fff).rw(FUNC(cps_state::qsound_sharedram1_r), FUNC(cps_state::qsound_sharedram1_w));  /* Q RAM */
 	map(0xf1c000, 0xf1c001).portr("IN2");            /* Player 3 controls (later games) */
@@ -624,7 +666,7 @@ void cps_state::qsound_main_map(address_map &map)
 	map(0xf1c004, 0xf1c005).w(FUNC(cps_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
 	map(0xf1c006, 0xf1c007).portr("EEPROMIN").portw("EEPROMOUT");
 	map(0xf1e000, 0xf1ffff).rw(FUNC(cps_state::qsound_sharedram2_r), FUNC(cps_state::qsound_sharedram2_w));  /* Q RAM */
-	map(0xff0000, 0xffffff).ram().share("mainram");
+	map(0xff0000, 0xffffff).rw(FUNC(cps_state::mainram_r), FUNC(cps_state::mainram_w)).share("mainram");
 }
 
 void cps_state::qsound_sub_map(address_map &map)
@@ -656,8 +698,8 @@ void cps_state::sf2m3_map(address_map &map)
 	map(0x800198, 0x80019f).w(FUNC(cps_state::cps1_soundlatch2_w));   /* Sound timer fade */
 	map(0x8001a0, 0x8001c3).w(FUNC(cps_state::cps1_cps_a_w));
 	map(0x8001c4, 0x8001c5).w(FUNC(cps_state::sf2m3_layer_w));
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
-	map(0xff0000, 0xffffff).ram();
+	map(0x900000, 0x92ffff).rw(FUNC(cps_state::cps1_gfxram_r), FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
+	map(0xff0000, 0xffffff).rw(FUNC(cps_state::mainram_r), FUNC(cps_state::mainram_w)).share("mainram");
 }
 
 void cps_state::sf2cems6_map(address_map &map)
@@ -679,11 +721,11 @@ void cps_state::sf2m10_map(address_map &map)
 	map(0x800188, 0x80018f).w(FUNC(cps_state::cps1_soundlatch2_w));
 	map(0x8001a2, 0x8001b3).w(FUNC(cps_state::cps1_cps_a_w)); // make 8001b2 point at 800110
 	map(0x8001fe, 0x8001ff).nopw(); // writes FFFF here a lot
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
+	map(0x900000, 0x92ffff).rw(FUNC(cps_state::cps1_gfxram_r), FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
 	map(0xe00000, 0xefffff).ram(); // it writes to the whole range at start
 	map(0xf1c000, 0xf1c001).r(FUNC(cps_state::cps1_in2_r));
 	map(0xfeff00, 0xfeffff).ram(); // fix stack crash at start
-	map(0xff0000, 0xffffff).ram().share("mainram");
+	map(0xff0000, 0xffffff).rw(FUNC(cps_state::mainram_r), FUNC(cps_state::mainram_w)).share("mainram");
 }
 
 /***********************************************************
@@ -13390,6 +13432,9 @@ READ16_MEMBER(cps_state::ganbare_ram_r)
 {
 	uint16_t result = 0xffff;
 
+	if (!machine().side_effects_disabled())
+		m_maincpu->spin_until_time(attotime::from_nsec(100)); // HM65256BSP-10 (100ns)?, M48T35 has 70ns waits
+
 	if (ACCESSING_BITS_0_7)
 		result = (result & ~0x00ff) | m_m48t35->read(offset);
 	if (ACCESSING_BITS_8_15)
@@ -13400,6 +13445,9 @@ READ16_MEMBER(cps_state::ganbare_ram_r)
 
 WRITE16_MEMBER(cps_state::ganbare_ram_w)
 {
+	if (!machine().side_effects_disabled())
+		m_maincpu->spin_until_time(attotime::from_nsec(100)); // HM65256BSP-10 (100ns)?, M48T35 has 70ns waits
+
 	COMBINE_DATA(&m_mainram[offset]);
 
 	if (ACCESSING_BITS_0_7)

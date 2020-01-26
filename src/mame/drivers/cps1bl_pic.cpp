@@ -379,13 +379,13 @@ void cps1bl_pic_state::dinopic_map(address_map &map)
 	map(0x800140, 0x80017f).rw(FUNC(cps1bl_pic_state::cps1_cps_b_r), FUNC(cps1bl_pic_state::cps1_cps_b_w)).share("cps_b_regs");
 	map(0x800222, 0x800223).w(FUNC(cps1bl_pic_state::dinopic_layer2_w));
 	map(0x880000, 0x880001).nopw(); // always 0
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps1bl_pic_state::cps1_gfxram_w)).share("gfxram");
+	map(0x900000, 0x92ffff).rw(FUNC(cps1bl_pic_state::cps1_gfxram_r), FUNC(cps1bl_pic_state::cps1_gfxram_w)).share("gfxram");
 	map(0x980000, 0x98000b).w(FUNC(cps1bl_pic_state::dinopic_layer_w));
 	map(0xf18000, 0xf19fff).ram();
 	map(0xf1c000, 0xf1c001).portr("IN2");            /* Player 3 controls (later games) */
 	map(0xf1c004, 0xf1c005).w(FUNC(cps1bl_pic_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
 	map(0xf1c006, 0xf1c007).portr("EEPROMIN").portw("EEPROMOUT");
-	map(0xff0000, 0xffffff).ram().share("mainram");
+	map(0xff0000, 0xffffff).rw(FUNC(cps1bl_pic_state::mainram_r), FUNC(cps1bl_pic_state::mainram_w)).share("mainram");;
 }
 
 void cps1bl_pic_state::punipic_map(address_map &map)
@@ -398,13 +398,13 @@ void cps1bl_pic_state::punipic_map(address_map &map)
 	map(0x800100, 0x80013f).w(FUNC(cps1bl_pic_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
 	map(0x800140, 0x80017f).rw(FUNC(cps1bl_pic_state::cps1_cps_b_r), FUNC(cps1bl_pic_state::cps1_cps_b_w)).share("cps_b_regs");
 	map(0x880000, 0x880001).nopw(); // same as 98000C
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps1bl_pic_state::cps1_gfxram_w)).share("gfxram");
+	map(0x900000, 0x92ffff).rw(FUNC(cps1bl_pic_state::cps1_gfxram_r), FUNC(cps1bl_pic_state::cps1_gfxram_w)).share("gfxram");
 	map(0x980000, 0x98000f).w(FUNC(cps1bl_pic_state::punipic_layer_w));
 	map(0x990000, 0x990001).nopw(); // unknown
 	map(0x991000, 0x991017).nopw(); // unknown
 	map(0xf18000, 0xf19fff).ram();
 	map(0xf1c006, 0xf1c007).portr("EEPROMIN").portw("EEPROMOUT");
-	map(0xff0000, 0xffffff).ram().share("mainram");
+	map(0xff0000, 0xffffff).rw(FUNC(cps1bl_pic_state::mainram_r), FUNC(cps1bl_pic_state::mainram_w)).share("mainram");;
 }
 
 void cps1bl_pic_state::slampic_map(address_map &map)
@@ -417,7 +417,7 @@ void cps1bl_pic_state::slampic_map(address_map &map)
 	map(0x800100, 0x80013f).ram().w(FUNC(cps1bl_pic_state::slampic_layer2_w)).share("cps_a_regs");  /* CPS-A custom */
 	map(0x800140, 0x80017f).ram().share("cps_b_regs");
 	map(0x880000, 0x880001).nopw(); //.w(FUNC(cps1bl_pic_state::cps1_soundlatch_w));    /* Sound command */
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps1bl_pic_state::cps1_gfxram_w)).share("gfxram");
+	map(0x900000, 0x92ffff).rw(FUNC(cps1bl_pic_state::cps1_gfxram_r), FUNC(cps1bl_pic_state::cps1_gfxram_w)).share("gfxram");
 	map(0x980000, 0x98000d).w(FUNC(cps1bl_pic_state::slampic_layer_w));
 	map(0xf00000, 0xf0ffff).r(FUNC(cps1bl_pic_state::qsound_rom_r));          /* Slammasters protection */
 	map(0xf18000, 0xf19fff).ram();
@@ -425,7 +425,7 @@ void cps1bl_pic_state::slampic_map(address_map &map)
 	map(0xf1c004, 0xf1c005).w(FUNC(cps1bl_pic_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
 	map(0xf1c006, 0xf1c007).portr("EEPROMIN").portw("EEPROMOUT");
 	map(0xf1f000, 0xf1ffff).noprw(); // writes 0 to range, then reads F1F6EC, occasionally writes 0d5f->f1f6f0
-	map(0xff0000, 0xffffff).ram().share("mainram");
+	map(0xff0000, 0xffffff).rw(FUNC(cps1bl_pic_state::mainram_r), FUNC(cps1bl_pic_state::mainram_w)).share("mainram");;
 }
 
 void cps1bl_pic_state::slampic2_map(address_map &map)
@@ -440,12 +440,12 @@ void cps1bl_pic_state::slampic2_map(address_map &map)
 	map(0x800180, 0x800181).w(FUNC(cps1bl_pic_state::slampic2_sound_w));   // sound
 	map(0x800188, 0x800189).w(FUNC(cps1bl_pic_state::slampic2_sound2_w));  // sound
 	map(0x8ffff8, 0x8fffff).nopw();  // ?
-	map(0x900000, 0x92ffff).ram().mirror(0x6c0000).w(FUNC(cps1bl_pic_state::cps1_gfxram_w)).share("gfxram");
+	map(0x900000, 0x92ffff).mirror(0x6c0000).rw(FUNC(cps1bl_pic_state::cps1_gfxram_r), FUNC(cps1bl_pic_state::cps1_gfxram_w)).share("gfxram");
 	//  0x930000, 0x933fff  spriteram mirror?
 	//  0xf00000, 0xf3ffff  workram
 	//  0xfc0000, 0xfeffff  gfxram
 	//  0xff0000, 0xff3fff  spriteram
-	map(0xff4000, 0xffffff).ram().share("mainram");
+	map(0xff4000, 0xffffff).rw(FUNC(cps1bl_pic_state::mainram_r), FUNC(cps1bl_pic_state::mainram_w)).share("mainram");;
 
 	/*
 	                  slammast        slampic2

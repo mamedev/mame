@@ -572,8 +572,8 @@ void fcrash_state::fcrash_map(address_map &map)
 	map(0x880006, 0x880007).w(FUNC(fcrash_state::fcrash_soundlatch_w));       /* Sound command */
 	map(0x880008, 0x88000f).r(FUNC(fcrash_state::cps1_dsw_r));                /* System input ports / Dip Switches */
 	map(0x890000, 0x890001).nopw();    // palette related?
-	map(0x900000, 0x92ffff).ram().w(FUNC(fcrash_state::cps1_gfxram_w)).share("gfxram");
-	map(0xff0000, 0xffffff).ram().share("mainram");
+	map(0x900000, 0x92ffff).rw(FUNC(fcrash_state::cps1_gfxram_r), FUNC(fcrash_state::cps1_gfxram_w)).share("gfxram");
+	map(0xff0000, 0xffffff).rw(FUNC(fcrash_state::mainram_r), FUNC(fcrash_state::mainram_w)).share("mainram");;
 }
 
 void fcrash_state::mtwinsb_map(address_map &map)
@@ -586,8 +586,8 @@ void fcrash_state::mtwinsb_map(address_map &map)
 	map(0x800100, 0x80013f).w(FUNC(fcrash_state::cps1_cps_a_w)).share("cps_a_regs");
 	map(0x800140, 0x80017f).rw(FUNC(fcrash_state::cps1_cps_b_r), FUNC(fcrash_state::cps1_cps_b_w)).share("cps_b_regs");
 	map(0x980000, 0x98000b).w(FUNC(fcrash_state::mtwinsb_layer_w));
-	map(0x900000, 0x92ffff).ram().w(FUNC(fcrash_state::cps1_gfxram_w)).share("gfxram");
-	map(0xff0000, 0xffffff).ram().share("mainram");
+	map(0x900000, 0x92ffff).rw(FUNC(fcrash_state::cps1_gfxram_r), FUNC(fcrash_state::cps1_gfxram_w)).share("gfxram");
+	map(0xff0000, 0xffffff).rw(FUNC(fcrash_state::mainram_r), FUNC(fcrash_state::mainram_w)).share("mainram");;
 }
 
 void fcrash_state::sf2m1_map(address_map &map)
@@ -602,10 +602,10 @@ void fcrash_state::sf2m1_map(address_map &map)
 	map(0x800180, 0x800181).nopw(); // only once at boot, for 80010c
 	map(0x800188, 0x80018f).w(FUNC(fcrash_state::cps1_soundlatch2_w));   /* Sound timer fade */
 	map(0x880000, 0x880001).nopw(); // unknown
-	map(0x900000, 0x93ffff).ram().w(FUNC(fcrash_state::cps1_gfxram_w)).share("gfxram");
+	map(0x900000, 0x93ffff).rw(FUNC(fcrash_state::cps1_gfxram_r), FUNC(fcrash_state::cps1_gfxram_w)).share("gfxram");
 	map(0x980000, 0x9801ff).w(FUNC(fcrash_state::sf2m1_layer_w));
 	map(0x990000, 0x990001).nopw(); // same as 880000
-	map(0xff0000, 0xffffff).ram().share("mainram");
+	map(0xff0000, 0xffffff).rw(FUNC(fcrash_state::mainram_r), FUNC(fcrash_state::mainram_w)).share("mainram");;
 }
 
 void fcrash_state::sgyxz_map(address_map &map)
@@ -619,10 +619,10 @@ void fcrash_state::sgyxz_map(address_map &map)
 	map(0x88000e, 0x88000f).w(FUNC(fcrash_state::cps1_soundlatch_w));
 	map(0x880e78, 0x880e79).r(FUNC(fcrash_state::cps1_in2_r));            /* Player 3 controls (later games) */
 	map(0x890000, 0x890001).w(FUNC(fcrash_state::cps1_soundlatch2_w));
-	map(0x900000, 0x92ffff).ram().w(FUNC(fcrash_state::cps1_gfxram_w)).share("gfxram");
+	map(0x900000, 0x92ffff).rw(FUNC(fcrash_state::cps1_gfxram_r), FUNC(fcrash_state::cps1_gfxram_w)).share("gfxram");
 	map(0xf1c004, 0xf1c005).w(FUNC(fcrash_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
 	map(0xf1c006, 0xf1c007).portr("EEPROMIN").portw("EEPROMOUT");
-	map(0xff0000, 0xffffff).ram().share("mainram");
+	map(0xff0000, 0xffffff).rw(FUNC(fcrash_state::mainram_r), FUNC(fcrash_state::mainram_w)).share("mainram");;
 }
 
 void fcrash_state::wofabl_map(address_map &map)
@@ -636,10 +636,10 @@ void fcrash_state::wofabl_map(address_map &map)
 	map(0x880008, 0x88000f).r(FUNC(fcrash_state::cps1_dsw_r));            /* System input ports / Dip Switches */
 	map(0x880e78, 0x880e79).r(FUNC(fcrash_state::cps1_in2_r));            /* Player 3 controls (later games) */
 	map(0x890000, 0x890001).w(FUNC(fcrash_state::cps1_soundlatch2_w));
-	map(0x900000, 0x92ffff).ram().w(FUNC(fcrash_state::cps1_gfxram_w)).share("gfxram");
+	map(0x900000, 0x92ffff).rw(FUNC(fcrash_state::cps1_gfxram_r), FUNC(fcrash_state::cps1_gfxram_w)).share("gfxram");
 	map(0xf1c004, 0xf1c005).w(FUNC(fcrash_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
 	map(0xf1c006, 0xf1c007).portr("EEPROMIN").portw("EEPROMOUT");
-	map(0xff0000, 0xffffff).ram().share("mainram");
+	map(0xff0000, 0xffffff).rw(FUNC(fcrash_state::mainram_r), FUNC(fcrash_state::mainram_w)).share("mainram");;
 }
 
 void fcrash_state::varthb_map(address_map &map)
@@ -653,8 +653,8 @@ void fcrash_state::varthb_map(address_map &map)
 	map(0x800140, 0x80017f).rw(FUNC(fcrash_state::cps1_cps_b_r), FUNC(fcrash_state::cps1_cps_b_w)).share("cps_b_regs");
 	map(0x800188, 0x800189).w(FUNC(fcrash_state::varthb_layer2_w));
 	map(0x980000, 0x98000b).w(FUNC(fcrash_state::varthb_layer_w));
-	map(0x900000, 0x92ffff).ram().w(FUNC(fcrash_state::cps1_gfxram_w)).share("gfxram");
-	map(0xff0000, 0xffffff).ram().share("mainram");
+	map(0x900000, 0x92ffff).rw(FUNC(fcrash_state::cps1_gfxram_r), FUNC(fcrash_state::cps1_gfxram_w)).share("gfxram");
+	map(0xff0000, 0xffffff).rw(FUNC(fcrash_state::mainram_r), FUNC(fcrash_state::mainram_w)).share("mainram");;
 }
 
 void fcrash_state::fcrash_sound_map(address_map &map)

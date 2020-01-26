@@ -170,6 +170,9 @@ protected:
 	DECLARE_MACHINE_START(ganbare);
 	DECLARE_MACHINE_RESET(cps);
 
+	u16 mainram_r(offs_t offset, u16 mem_mask);
+	void mainram_w(offs_t offset, u16 data, u16 mem_mask);
+
 	DECLARE_READ16_MEMBER(cps1_dsw_r);
 	DECLARE_READ16_MEMBER(cps1_in1_r);
 	DECLARE_READ16_MEMBER(cps1_in2_r);
@@ -179,7 +182,8 @@ protected:
 	DECLARE_WRITE16_MEMBER(cps1_cps_a_w);
 	DECLARE_READ16_MEMBER(cps1_cps_b_r);
 	DECLARE_WRITE16_MEMBER(cps1_cps_b_w);
-	DECLARE_WRITE16_MEMBER(cps1_gfxram_w);
+	u16 cps1_gfxram_r(offs_t offset, u16 mem_mask);
+	void cps1_gfxram_w(offs_t offset, u16 data, u16 mem_mask);
 	DECLARE_WRITE16_MEMBER(cps1_soundlatch_w);
 	DECLARE_WRITE16_MEMBER(cps1_soundlatch2_w);
 	DECLARE_WRITE8_MEMBER(cps1_snd_bankswitch_w);

@@ -461,13 +461,13 @@ void cps1bl_5205_state::captcommb2_map(address_map &map)
 	map(0x800140, 0x80017f).ram().share("cps_b_regs");
 	map(0x800180, 0x800181).nopw();       // original sound latch, not used
 	map(0x880000, 0x880001).nopw();       // ?
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps1bl_5205_state::cps1_gfxram_w)).share("gfxram");
+	map(0x900000, 0x92ffff).rw(FUNC(cps1bl_5205_state::cps1_gfxram_r), FUNC(cps1bl_5205_state::cps1_gfxram_w)).share("gfxram");
 	map(0x980000, 0x980023).w(FUNC(cps1bl_5205_state::captcommb2_layer_w));
 	//  0x990000, 0x993fff  spriteram
 	//  0x990000, 0x990001  sprite buffer flip
 	//  0x991000, 0x9917ff  sprite buffer #1
 	//  0x993000, 0x9937ff  sprite buffer #2
-	map(0xff0000, 0xffffff).ram().share("mainram");
+	map(0xff0000, 0xffffff).rw(FUNC(cps1bl_5205_state::mainram_r), FUNC(cps1bl_5205_state::mainram_w)).share("mainram");;
 }
 
 void cps1bl_5205_state::sf2b_map(address_map &map)
@@ -482,8 +482,8 @@ void cps1bl_5205_state::sf2b_map(address_map &map)
 	//map(0x800030, 0x800031).w(FUNC(cps1bl_5205_state::cps1_coinctrl_w));
 	map(0x800100, 0x80013f).ram().share("cps_a_regs");  /* CPS-A custom */
 	map(0x800140, 0x80017f).rw(FUNC(cps1bl_5205_state::cps1_cps_b_r), FUNC(cps1bl_5205_state::cps1_cps_b_w)).share("cps_b_regs");  /* CPS-B custom */
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps1bl_5205_state::cps1_gfxram_w)).share("gfxram");
-	map(0xff0000, 0xffffff).ram().share("mainram");
+	map(0x900000, 0x92ffff).rw(FUNC(cps1bl_5205_state::cps1_gfxram_r), FUNC(cps1bl_5205_state::cps1_gfxram_w)).share("gfxram");
+	map(0xff0000, 0xffffff).rw(FUNC(cps1bl_5205_state::mainram_r), FUNC(cps1bl_5205_state::mainram_w)).share("mainram");;
 }
 
 void cps1bl_5205_state::sf2mdt_map(address_map &map)
@@ -498,8 +498,8 @@ void cps1bl_5205_state::sf2mdt_map(address_map &map)
 	//map(0x800030, 0x800031).w(FUNC(cps1bl_5205_state::cps1_coinctrl_w));
 	map(0x800100, 0x80013f).ram().share("cps_a_regs");  /* CPS-A custom */
 	map(0x800140, 0x80017f).ram().share("cps_b_regs");  /* CPS-B custom */
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps1bl_5205_state::cps1_gfxram_w)).share("gfxram");
-	map(0xff0000, 0xffffff).ram().share("mainram");
+	map(0x900000, 0x92ffff).rw(FUNC(cps1bl_5205_state::cps1_gfxram_r), FUNC(cps1bl_5205_state::cps1_gfxram_w)).share("gfxram");
+	map(0xff0000, 0xffffff).rw(FUNC(cps1bl_5205_state::mainram_r), FUNC(cps1bl_5205_state::mainram_w)).share("mainram");;
 }
 
 /*

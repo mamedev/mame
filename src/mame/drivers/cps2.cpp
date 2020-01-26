@@ -910,7 +910,6 @@ READ16_MEMBER(cps2_state::joy_or_paddle_ecofghtr_r)
 	}
 }
 
-
 /*************************************
  *
  *  Memory map
@@ -941,8 +940,8 @@ void cps2_state::cps2_map(address_map &map)
 	map(0x8040e0, 0x8040e1).w(FUNC(cps2_state::cps2_objram_bank_w));                                                   /* bit 0 = Object ram bank swap */
 	map(0x804100, 0x80413f).w(FUNC(cps2_state::cps1_cps_a_w)).share("cps_a_regs");                          /* CPS-A custom */
 	map(0x804140, 0x80417f).rw(FUNC(cps2_state::cps1_cps_b_r), FUNC(cps2_state::cps1_cps_b_w));                                       /* CPS-B custom */
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps2_state::cps1_gfxram_w)).share("gfxram"); /* Video RAM */
-	map(0xff0000, 0xffffff).ram();                                                                         /* RAM */
+	map(0x900000, 0x92ffff).rw(FUNC(cps2_state::cps1_gfxram_r), FUNC(cps2_state::cps1_gfxram_w)).share("gfxram"); /* Video RAM */
+	map(0xff0000, 0xffffff).rw(FUNC(cps2_state::mainram_r), FUNC(cps2_state::mainram_w)).share("mainram");        /* RAM */
 }
 
 void cps2_state::decrypted_opcodes_map(address_map &map)
@@ -974,8 +973,8 @@ void cps2_state::dead_cps2_map(address_map &map)
 	map(0x8040e0, 0x8040e1).w(FUNC(cps2_state::cps2_objram_bank_w));                                                   /* bit 0 = Object ram bank swap */
 	map(0x804100, 0x80413f).w(FUNC(cps2_state::cps1_cps_a_w)).share("cps_a_regs");                              /* CPS-A custom */
 	map(0x804140, 0x80417f).rw(FUNC(cps2_state::cps1_cps_b_r), FUNC(cps2_state::cps1_cps_b_w));                                       /* CPS-B custom */
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps2_state::cps1_gfxram_w)).share("gfxram"); /* Video RAM */
-	map(0xff0000, 0xffffef).ram();                                                                         /* RAM */
+	map(0x900000, 0x92ffff).rw(FUNC(cps2_state::cps1_gfxram_r), FUNC(cps2_state::cps1_gfxram_w)).share("gfxram"); /* Video RAM */
+	map(0xff0000, 0xffffef).rw(FUNC(cps2_state::mainram_r), FUNC(cps2_state::mainram_w)).share("mainram");        /* RAM */
 	map(0xfffff0, 0xfffffb).ram().share("output");                                                      /* CPS2 output */
 	map(0xfffffc, 0xffffff).ram();
 }
@@ -9952,7 +9951,7 @@ void cps2_state::init_cps2nc()
 
 	init_digital_volume();
 
-	m_maincpu->set_clock_scale(0.7375f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
+	//m_maincpu->set_clock_scale(0.7375f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
 }
 
 
