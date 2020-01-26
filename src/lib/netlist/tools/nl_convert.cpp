@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <unordered_map>
+#include <vector>
 
 // FIXME: temporarily defined here - should be in a file
 // FIXME: family logic in netlist is convoluted, create
@@ -60,7 +61,7 @@ static lib_map_t read_lib_map(const pstring &lm)
 
 nl_convert_base_t::nl_convert_base_t()
 	: out(&m_buf)
-	, m_numberchars("0123456789-+e.")
+	, m_numberchars("0123456789-+Ee.")
 {
 	m_buf.imbue(std::locale::classic());
 	m_units = {
@@ -83,6 +84,14 @@ nl_convert_base_t::nl_convert_base_t()
 			{"MIL", "{1}",  25.4e-6}
 	};
 
+	dev_map =
+	{
+		{ "VCCS", {"OP", "ON", "IP", "IN"} },
+		{ "VCVS", {"OP", "ON", "IP", "IN"} },
+		{ "CCCS", {"OP", "ON", "IP", "IN"} },
+		{ "CCVS", {"OP", "ON", "IP", "IN"} },
+		{ "VS", {"1", "2"} },
+	};
 }
 
 nl_convert_base_t::~nl_convert_base_t()
@@ -149,8 +158,65 @@ void nl_convert_base_t::add_term(const pstring &netname, const pstring &termname
 		net->terminals().push_back(termname);
 }
 
+void nl_convert_base_t::add_term(const pstring &netname, const pstring &devname, unsigned term)
+{
+	auto e = dev_map.find(get_device(devname)->type());
+	if (e == dev_map.end())
+		out("// ERROR: No terminals found for device {}\n", devname);
+	else
+	{
+		if (term >= e->second.size())
+			out("// ERROR: {} : Term {} exceeds number of terminals {}\n", netname, devname, term);
+		else
+			add_term(netname, devname + "." + e->second[term]);
+	}
+}
+
+void nl_convert_base_t::add_device_extra_s(const pstring &devname, const pstring &extra)
+{
+	auto dev = get_device(devname);
+	if (dev == nullptr)
+		out("// ERROR: Device {} not found\n", devname);
+	else
+	{
+		dev->add_extra(extra);
+	}
+}
+
+
+
 void nl_convert_base_t::dump_nl()
 {
+	// do replacements
+	for (auto &r : m_replace)
+	{
+		// Get the device entry
+		auto *d = get_device(r.m_ce);
+		if (d == nullptr)
+		{
+			out("ERROR: Can not find <{}>\n", r.m_ce);
+			continue;
+		}
+
+		auto e = dev_map.find(d->type());
+		if (e == dev_map.end())
+		{
+			out("ERROR: Can not find type {}\n", d->type());
+			continue;
+		}
+		pstring term1 = r.m_ce + "." + e->second[0];
+		// scan all nets
+		for (auto &n : m_nets)
+		{
+			for (auto &t : n.second->terminals())
+			{
+				if (t == term1)
+					t = r.m_repterm;
+			}
+		}
+		add_term(r.m_net, term1);
+	}
+
 	for (auto & alias : m_ext_alias)
 	{
 		net_t *net = m_nets[alias].get();
@@ -180,6 +246,9 @@ void nl_convert_base_t::dump_nl()
 		else
 			out("{}({})\n", m_devs[j]->type().c_str(),
 					m_devs[j]->name().c_str());
+		for (auto &e : m_devs[j]->extra())
+			out("{}\n", e);
+
 	}
 	// print nets
 	for (auto & i : m_nets)
@@ -195,6 +264,7 @@ void nl_convert_base_t::dump_nl()
 			out(")\n");
 		}
 	}
+	m_replace.clear();
 	m_devs.clear();
 	m_nets.clear();
 	m_pins.clear();
@@ -293,6 +363,22 @@ static pstring rem(const std::vector<pstring> &vps, std::size_t start)
 	return r;
 }
 
+static int npoly(const pstring &s)
+{
+	// Brute force
+	if (s=="POLY(1)")
+		return 1;
+	if (s=="POLY(2)")
+		return 2;
+	if (s=="POLY(3)")
+		return 3;
+	if (s=="POLY(4)")
+		return 4;
+	if (s=="POLY(5)")
+		return 5;
+	return -1;
+}
+
 void nl_convert_spice_t::process_line(const pstring &line)
 {
 	if (line != "")
@@ -386,24 +472,105 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				add_term(tt[2], tt[0] + ".N");
 				break;
 			case 'E':
-				add_device("VCVS", tt[0]);
-				add_term(tt[1], tt[0] + ".OP");
-				add_term(tt[2], tt[0] + ".ON");
-				add_term(tt[3], tt[0] + ".IP");
-				add_term(tt[4], tt[0] + ".IN");
-				out("PARAM({}, {})\n", tt[0] + ".G", tt[5]);
-				break;
-			case 'V':
-				// just simple Voltage sources ....
-				if (tt[2] == "0")
+			{
+				auto n=npoly(tt[3]);
+				if (n<0)
 				{
-					val = get_sp_val(tt[3]);
-					add_device("ANALOG_INPUT", tt[0], val);
-					add_term(tt[1], tt[0] + ".Q");
-					//add_term(tt[2], tt[0] + ".2");
+					add_device("VCVS", tt[0]);
+					add_term(tt[1], tt[0], 0);
+					add_term(tt[2], tt[0], 1);
+					add_term(tt[3], tt[0], 2);
+					add_term(tt[4], tt[0], 3);
+					add_device_extra(tt[0], "PARAM({}, {})", tt[0] + ".G", tt[5]);
 				}
 				else
-					plib::perrlogger("Voltage Source {} not connected to GND\n", tt[0]);
+				{
+					int sce(4);
+					int scoeff(5 + n);
+					if ((tt.size() != 5 + 2 * n) || (tt[scoeff-1] != "0"))
+					{
+						out("// IGNORED {}: {}\n", tt[0].c_str(), line.c_str());
+						break;
+					}
+					pstring lastnet = tt[1];
+					for (int i=0; i<n; i++)
+					{
+						pstring devname = tt[0] + plib::pfmt("{}")(i);
+						pstring nextnet = (i<n-1) ? tt[1] + "a" + plib::pfmt("{}")(i) : tt[2];
+						auto net2 = plib::psplit(plib::replace_all(plib::replace_all(tt[sce+i],")",""),"(",""),",");
+						add_device("VCVS", devname);
+						add_term(lastnet, devname, 0);
+						add_term(nextnet, devname, 1);
+						add_term(net2[0], devname, 2);
+						add_term(net2[1], devname, 3);
+						add_device_extra(devname, "PARAM({}, {})", devname + ".G", tt[scoeff+i]);
+						lastnet = nextnet;
+						//printf("xxx %d %s %s\n", (int) net2.size(), net2[0].c_str(), net2[1].c_str());
+#if 0
+						pstring extranetname = devname + "net";
+						m_replace.push_back({, devname + ".IP", extranetname });
+						add_term(extranetname, devname + ".IN");
+						add_device_extra(devname, "PARAM({}, {})", devname + ".G", tt[scoeff+i]);
+#endif
+					}
+				}
+			}
+				break;
+			case 'F':
+				{
+					auto n=npoly(tt[3]);
+					int sce(4);
+					int scoeff(5 + n);
+					if (n<0)
+					{
+						sce = 3;
+						scoeff = 4;
+						n = 1;
+					}
+					else
+					{
+						if ((tt.size() != 5 + 2 * n) || (tt[scoeff-1] != "0"))
+						{
+							out("// IGNORED {}: {}\n", tt[0].c_str(), line.c_str());
+							break;
+						}
+					}
+					for (int i=0; i<n; i++)
+					{
+						pstring devname = tt[0] + plib::pfmt("{}")(i);
+						add_device("CCCS", devname);
+						add_term(tt[1], devname, 0);
+						add_term(tt[2], devname, 1);
+
+						pstring extranetname = devname + "net";
+						m_replace.push_back({tt[sce+i], devname + ".IP", extranetname });
+						add_term(extranetname, devname + ".IN");
+						add_device_extra(devname, "PARAM({}, {})", devname + ".G", tt[scoeff+i]);
+					}
+				}
+				break;
+			case 'H':
+				add_device("CCVS", tt[0]);
+				add_term(tt[1], tt[0] + ".OP");
+				add_term(tt[2], tt[0] + ".ON");
+				m_replace.push_back({tt[3], tt[0] + ".IP", tt[2] + "a" });
+				add_term(tt[2] + "a", tt[0] + ".IN");
+				add_device_extra(tt[0], "PARAM({}, {})", tt[0] + ".G", tt[4]);
+				break;
+			case 'G':
+				add_device("VCCS", tt[0]);
+				add_term(tt[1], tt[0], 0);
+				add_term(tt[2], tt[0], 1);
+				add_term(tt[3], tt[0], 2);
+				add_term(tt[4], tt[0], 3);
+				add_device_extra(tt[0], "PARAM({}, {})", tt[0] + ".G", tt[5]);
+				break;
+			case 'V':
+				// only DC Voltage sources ....
+				val = get_sp_val(tt[3] == "DC" ? tt[4] : tt[3]);
+				add_device("VS", tt[0], val);
+				add_term(tt[1], tt[0] + ".1");
+				add_term(tt[2], tt[0] + ".2");
 				break;
 #if 0
 			// This is wrong ... Need to use something else for inputs!
@@ -417,7 +584,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 #else
 			case 'I':
 				{
-					val = get_sp_val(tt[3]);
+					val = get_sp_val(tt[3] == "DC" ? tt[4] : tt[3]);
 					add_device("CS", tt[0], val);
 					add_term(tt[1], tt[0] + ".1");
 					add_term(tt[2], tt[0] + ".2");
@@ -425,10 +592,11 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				break;
 #endif
 			case 'D':
-				add_device("DIODE", tt[0], tt[3]);
-				// FIXME ==> does Kicad use different notation from LTSPICE
-				add_term(tt[1], tt[0] + ".K");
-				add_term(tt[2], tt[0] + ".A");
+				add_device("DIODE", tt[0], m_subckt + tt[3]);
+				// Spice D Anode Kathode model
+				// FIXME ==> does Kicad use different notation from LTSPICE ?
+				add_term(tt[1], tt[0] + ".A");
+				add_term(tt[2], tt[0] + ".K");
 				break;
 			case 'U':
 			case 'X':
