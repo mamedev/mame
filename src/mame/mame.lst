@@ -18576,6 +18576,7 @@ kbadlands                       // GX455 (c) 1984
 kbadlandsh                      // GX455 (c) 1984
 
 @source:konendev.cpp
+konendev                        // Konami Endeavour BIOS
 aadvent                         // African Adventure
 dragnfly                        // Dragonfly
 enchlamp                        // Enchanted Lamp
