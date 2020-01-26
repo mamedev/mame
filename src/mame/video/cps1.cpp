@@ -2095,7 +2095,7 @@ void cps_state::cps1_get_video_base()
 u16 cps_state::cps1_gfxram_r(offs_t offset, u16 mem_mask)
 {
 	if (!machine().side_effects_disabled())
-		m_maincpu->spin_until_time(attotime::from_nsec(100)); // HM65256BSP-10 (100ns)
+		m_maincpu->spin_until_time(attotime::from_nsec(100)); // HM65256BSP-10 (100ns), CPS2 Video RAM has same access time
 
 	return m_gfxram[offset];
 }
@@ -2103,7 +2103,7 @@ u16 cps_state::cps1_gfxram_r(offs_t offset, u16 mem_mask)
 void cps_state::cps1_gfxram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (!machine().side_effects_disabled())
-		m_maincpu->spin_until_time(attotime::from_nsec(100)); // HM65256BSP-10 (100ns)
+		m_maincpu->spin_until_time(attotime::from_nsec(100)); // HM65256BSP-10 (100ns), CPS2 Video RAM has same access time
 
 	int page = (offset >> 7) & 0x3c0;
 	COMBINE_DATA(&m_gfxram[offset]);
