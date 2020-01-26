@@ -39879,6 +39879,8 @@ jak_sbfc                        //
 @source:spg2xx_zone.cpp
 wirels60                        // Wireless 60
 zone40                          // Zone 40
+reactmd
+sprt49
 zone60                          // Zone 60
 zone100                         //
 lx_jg7415                       //
