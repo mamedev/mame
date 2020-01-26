@@ -906,7 +906,7 @@ void s3virge_vga_device::command_start()
 {
 	// start next command in FIFO
 	int cmd_type = s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].op_type;
-	
+
 	switch(cmd_type)
 	{
 		case OP_BITBLT:
@@ -931,7 +931,7 @@ void s3virge_vga_device::command_start()
 			if(!(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x00000080))
 				m_draw_timer->adjust(attotime::from_nsec(250),0,attotime::from_nsec(250));
 			s3virge.s3d.bitblt_step_count = 0;
-			s3virge.s3d.bitblt_mono_pattern = 
+			s3virge.s3d.bitblt_mono_pattern =
 				s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_MONO_PAT_0] | (uint64_t)(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_MONO_PAT_1]) << 32;
 			s3virge.s3d.bitblt_current_pixel = 0;
 			s3virge.s3d.bitblt_pixel_pos = 0;
@@ -952,7 +952,7 @@ void s3virge_vga_device::command_finish()
 	if(s3virge.s3d.cmd_fifo_slots_free > 16)
 		s3virge.s3d.cmd_fifo_slots_free = 16;
 	m_draw_timer->adjust(attotime::never);
-	
+
 	// check if there is another command in the FIFO
 	if(s3virge.s3d.cmd_fifo_slots_free < 16)
 		command_start();
@@ -965,7 +965,7 @@ void s3virge_vga_device::command_finish()
 uint32_t s3virge_vga_device::GetROP(uint8_t rop, uint32_t src, uint32_t dst, uint32_t pat)
 {
 	uint32_t ret = 0;
-	
+
 	switch(rop)
 	{
 		case 0x00:  // 0
@@ -985,7 +985,7 @@ uint32_t s3virge_vga_device::GetROP(uint8_t rop, uint32_t src, uint32_t dst, uin
 			break;
 		case 0xb8:  // PSDPxax
 			ret = ((dst ^ pat) & src) ^ pat;
-//			machine().debug_break();
+//          machine().debug_break();
 			break;
 		case 0xcc:
 			ret = src;
@@ -999,14 +999,14 @@ uint32_t s3virge_vga_device::GetROP(uint8_t rop, uint32_t src, uint32_t dst, uin
 		default:
 			popmessage("Unimplemented ROP 0x%02x",rop);
 	}
-	
+
 	return ret;
 }
 
 bool s3virge_vga_device::advance_pixel()
 {
 	bool xpos, ypos;
-	int16_t top, left, right, bottom;  
+	int16_t top, left, right, bottom;
 	// advance src/dst and pattern location
 	xpos = s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x02000000;  // X Positive
 	ypos = s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x04000000;  // Y Positive
@@ -1025,7 +1025,7 @@ bool s3virge_vga_device::advance_pixel()
 		s3virge.s3d.bitblt_x_current--;
 		s3virge.s3d.bitblt_x_src_current--;
 		s3virge.s3d.bitblt_pat_x--;
-//		machine().debug_break();
+//      machine().debug_break();
 	}
 	if(ypos)
 	{
@@ -1089,7 +1089,7 @@ void s3virge_vga_device::bitblt_colour_step()
 	int align = (s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x000000c00) >> 10;
 	int x;
 	bool done = false;
-	
+
 	switch(pixel_size)
 	{
 		case 0:  // 8bpp
@@ -1148,7 +1148,7 @@ void s3virge_vga_device::bitblt_colour_step()
 				command_finish();
 				break;
 			}
-			if((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x80) && s3virge.s3d.bitblt_x_current == s3virge.s3d.bitblt_x_dst && align == 2)  
+			if((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x80) && s3virge.s3d.bitblt_x_current == s3virge.s3d.bitblt_x_dst && align == 2)
 				break;  // if a new line of an image transfer, and is dword aligned, stop here
 			if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x80)
 				src = s3virge.s3d.image_xfer >> 16;
@@ -1225,7 +1225,7 @@ void s3virge_vga_device::bitblt_colour_step()
 				command_finish();
 			break;
 	}
-	
+
 	s3virge.s3d.bitblt_step_count++;
 }
 
@@ -1249,7 +1249,7 @@ void s3virge_vga_device::bitblt_monosrc_step()
 			for(x=31;x>=0;x--)
 			{
 				if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x80)
-					src = bitswap<32>(s3virge.s3d.image_xfer,7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8,23,22,21,20,19,18,17,16,31,30,29,28,27,26,25,24); 
+					src = bitswap<32>(s3virge.s3d.image_xfer,7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8,23,22,21,20,19,18,17,16,31,30,29,28,27,26,25,24);
 				else
 					src = read_pixel8(src_base,s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current);
 				dst = read_pixel8(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current);
@@ -1286,7 +1286,7 @@ void s3virge_vga_device::bitblt_monosrc_step()
 			for(x=31;x>=0;x--)
 			{
 				if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x80)
-					src = bitswap<32>(s3virge.s3d.image_xfer,7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8,23,22,21,20,19,18,17,16,31,30,29,28,27,26,25,24); 
+					src = bitswap<32>(s3virge.s3d.image_xfer,7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8,23,22,21,20,19,18,17,16,31,30,29,28,27,26,25,24);
 				else
 					src = read_pixel16(src_base,s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current);
 				dst = read_pixel16(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current);
@@ -1323,7 +1323,7 @@ void s3virge_vga_device::bitblt_monosrc_step()
 			for(x=31;x>=0;x--)
 			{
 				if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x80)
-					src = bitswap<32>(s3virge.s3d.image_xfer,7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8,23,22,21,20,19,18,17,16,31,30,29,28,27,26,25,24); 
+					src = bitswap<32>(s3virge.s3d.image_xfer,7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8,23,22,21,20,19,18,17,16,31,30,29,28,27,26,25,24);
 				else
 					src = read_pixel24(src_base,s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current);
 				dst = read_pixel24(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current);
@@ -1357,7 +1357,7 @@ void s3virge_vga_device::bitblt_monosrc_step()
 			}
 			break;
 	}
-	
+
 	s3virge.s3d.bitblt_step_count++;
 }
 
@@ -1400,14 +1400,14 @@ void s3virge_vga_device::device_timer(emu_timer &timer, device_timer_id id, int 
 READ32_MEMBER(s3virge_vga_device::s3d_sub_status_r)
 {
 	uint32_t res = 0x00000000;
-	
+
 	if(!s3virge.s3d.busy)
 		res |= 0x00002000;  // S3d engine is idle
-	
+
 	//res |= (s3virge.s3d.cmd_fifo_slots_free << 8);
 	if(s3virge.s3d.cmd_fifo_slots_free == 16)
 		res |= 0x1f00;
-	
+
 	return res;
 }
 
@@ -1421,7 +1421,7 @@ WRITE32_MEMBER(s3virge_vga_device::s3d_sub_control_w)
 READ32_MEMBER(s3virge_vga_device::s3d_func_ctrl_r)
 {
 	uint32_t ret = 0;
-	
+
 	ret |= (s3virge.s3d.cmd_fifo_slots_free << 6);
 	return ret;
 }
@@ -1436,14 +1436,14 @@ READ32_MEMBER(s3virge_vga_device::s3d_register_r)
 		return 0;
 	if(offset >= 0x1c0/4 && offset < 0x400/4)
 		return 0;
-	
+
 	// handle BitBLT pattern registers
 	if((offset >= 0x100/4) && (offset < 0x1c0/4))
 		return s3virge.s3d.pattern[offset - (0x100/4)];
 
 	res = s3virge.s3d.reg[op_type][((offset*4) & 0x03ff) / 4];
 	LOGMMIO("MM%04X returning %08x\n", (offset*4)+0xa000, res);
-	
+
 	return res;
 }
 
@@ -1467,7 +1467,7 @@ WRITE32_MEMBER(s3virge_vga_device::s3d_register_w)
 		s3virge.s3d.pattern[((offset - 0x100/4)*4)] = (data & 0x000000ff);
 		return;
 	}
-	
+
 	s3virge.s3d.reg[op_type][((offset*4) & 0x03ff) / 4] = data;
 	LOGMMIO("MM%04X = %08x\n", (offset*4)+0xa000, data);
 	switch(offset)

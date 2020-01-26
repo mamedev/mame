@@ -597,8 +597,8 @@ ROM_START( atetb3482 )
 	/* Notes (3584 bits, which matches the datasheet's 512 7-bit notes).
 	   Raw dump from visual decap, needs further analysis. */
 	ROM_LOAD( "um3482araw.bin", 0x0000, 0x01c0, BAD_DUMP CRC(5871d564) SHA1(4203b6513ad08ece26177778e5defeb862d1a81d) )
- 
-        /* 16 entry by 9-bit ROM
+
+	/* 16 entry by 9-bit ROM
 	   Song starting locations?  Chip has 16 songs max, 512 total notes.
 	   All 16 entries have data, but only 12 songs on chip.
 	   Dump from visual decap with values padded to 16 bits, needs further analysis. */
@@ -607,9 +607,9 @@ ROM_START( atetb3482 )
 	/* 16 entry by 7-bit ROM.
 	   Tempo for each song?
 	   All 16 entries have data, but only 12 songs on chip.
-   	   Dump from visual decap with values padded to 8 bits, needs further analysis. */
+	   Dump from visual decap with values padded to 8 bits, needs further analysis. */
 	ROM_LOAD( "tempos.bin",     0x0000, 0x0010, BAD_DUMP CRC(c3a37f74) SHA1(67eac8c6530c202760d492f3e52c44f9cd183b46) )
-	
+
 	/* Not dumped, unused */
 	ROM_REGION( 0x71c, "plds", 0 )
 	ROM_LOAD( "pal16r4.1n" , 0x000, 0x104, NO_DUMP )

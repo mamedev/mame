@@ -2,67 +2,67 @@
 // copyright-holders:David Haywood
 /******************************************************************************
 
-	Non-video 'electronic book' reader that takes cartridges
+    Non-video 'electronic book' reader that takes cartridges
 
-	Cartridges are accessed using serial read methods, contain data, not code
-	so must be internal ROMs on the systems.
+    Cartridges are accessed using serial read methods, contain data, not code
+    so must be internal ROMs on the systems.
 
 
-	---
+    ---
 
-	V1 - rectangular cart
-	glob up, pins toward you, pins 1-10, left to right
+    V1 - rectangular cart
+    glob up, pins toward you, pins 1-10, left to right
 
-	1  tied high
-	2  CE1 left glob
-	3  CE2 right glob
-	4  pin 5
-	5  pin 4
-	6  data
-	7  ground
-	8  clock
-	9  3.3 volts
-	10 tied high
+    1  tied high
+    2  CE1 left glob
+    3  CE2 right glob
+    4  pin 5
+    5  pin 4
+    6  data
+    7  ground
+    8  clock
+    9  3.3 volts
+    10 tied high
 
-	----
-	
-	V2 - rounded top cart
+    ----
 
-	1  CE1 left glob
-	2  CE2 right glob
-	3  tied high
-	4  ground
-	5  clock
-	6  data
-	7  ground
-	8  ground
-	9  3.3 volts
-	10 tied high
+    V2 - rounded top cart
 
-	V2 PCB silkscreened with GPR23L822A - 8Mbit serial ROM
+    1  CE1 left glob
+    2  CE2 right glob
+    3  tied high
+    4  ground
+    5  clock
+    6  data
+    7  ground
+    8  ground
+    9  3.3 volts
+    10 tied high
 
-	----
+    V2 PCB silkscreened with GPR23L822A - 8Mbit serial ROM
 
-	To dump:
-	set data and clock high, CE1 low for 1 mS
-	set CE1 high for 3 uS
-	set data low for 2 uS
-	set clock low for 2 uS
-	set data high for 2 uS
-	set clock high for 2 uS
-	set clock low for 2 uS
-	set data low for 2 uS
-	loop 24 times:
-	  set clock high for 1 uS
-	  set clock low for 1 uS
-	make data high Z
-	loop 8M tims:
-	  set clock high for 1 uS
-	  sample data
-	  set clock low for 1 uS
-	set CE1 low
+    ----
 
-	if 2 globs, repeat with CE2
+    To dump:
+    set data and clock high, CE1 low for 1 mS
+    set CE1 high for 3 uS
+    set data low for 2 uS
+    set clock low for 2 uS
+    set data high for 2 uS
+    set clock high for 2 uS
+    set clock low for 2 uS
+    set data low for 2 uS
+    loop 24 times:
+      set clock high for 1 uS
+      set clock low for 1 uS
+    make data high Z
+    loop 8M tims:
+      set clock high for 1 uS
+      sample data
+      set clock low for 1 uS
+    set CE1 low
+
+    if 2 globs, repeat with CE2
 
 *******************************************************************************/
 

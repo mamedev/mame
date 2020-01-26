@@ -60,7 +60,7 @@ To Do:
 [gtmr2]
 - Finish the Inputs (different wheels and pedals);
 - Implement LAN comms;
-- Selecting Italian in the service mode settings causes no voice samples being played 
+- Selecting Italian in the service mode settings causes no voice samples being played
   (with lots of OKI invalid samples in logerror), sound bank bug or btanb?
 
 [brapboys / shogwarr]

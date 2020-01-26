@@ -229,7 +229,7 @@ void spg2xx_video_device::draw_bitmap(const rectangle& cliprect, uint32_t scanli
 	uint16_t palette = 0;
 
 	//if (!tile)
-	//	continue;
+	//  continue;
 
 	palette = space.read_word(palette_map + realline / 2);
 	if (scanline & 1)

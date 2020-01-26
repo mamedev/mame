@@ -9518,7 +9518,7 @@
 		<info name="release" value="2019-12-18"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 128K Apple //e or later. -->
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="234786">
@@ -9818,8 +9818,8 @@
 		<publisher>Automated Simulations</publisher>
 		<info name="release" value="2020-01-06"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
-		<!-- This is revision 2, which fixes unspecified bugs and adds a 
-		graphical title screen. It requires a 13-sector drive and a 
+		<!-- This is revision 2, which fixes unspecified bugs and adds a
+		graphical title screen. It requires a 13-sector drive and a
 		48K Apple ][+ or later. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -9835,8 +9835,8 @@
 		<publisher>Automated Simulations</publisher>
 		<info name="release" value="2020-01-07"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
-		<!-- This is revision 3, with updated copy protection and a hi-res 
-		character generator for on-screen text. It requires a 16-sector drive 
+		<!-- This is revision 3, with updated copy protection and a hi-res
+		character generator for on-screen text. It requires a 16-sector drive
 		and a 48K Apple ][+ or later. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -9909,8 +9909,8 @@
 		<info name="release" value="2020-01-11"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It runs on any Apple II with 48K. -->
-		<!-- This is version PV3S2V1 of 10-MAR-82. 
-		Note: some emulators may have difficulty loading this disk because of 
+		<!-- This is version PV3S2V1 of 10-MAR-82.
+		Note: some emulators may have difficulty loading this disk because of
 		its especially timing-sensitive copy protection.-->
 
 		<part name="flop1" interface="floppy_5_25">

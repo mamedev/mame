@@ -865,10 +865,10 @@ void spg2xx_game_state::init_tvsprt10()
 	// this hack means the ROM CRC fails, but without it the CRC is OK, so dump is good.
 	/*
 	port b 0010 = chip select? / always set when accessing?
-		   0008 = write enable (set when writing, not when reading)
-		   0004 = chip select? / always set when accessing?
-		   0002 = clock? (toggles)
-		   0001 = data in / out
+	       0008 = write enable (set when writing, not when reading)
+	       0004 = chip select? / always set when accessing?
+	       0002 = clock? (toggles)
+	       0001 = data in / out
 	*/
 	rom[0x18c55d] ^= 0x0001;
 }

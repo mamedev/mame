@@ -29,7 +29,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	
+
 	WRITE8_MEMBER(sprite_dma_w);
 
 private:
@@ -68,15 +68,15 @@ void nes_boot_state::machine_reset()
 
 void nes_boot_state::machine_start()
 {
-//	m_nt_ram = std::make_unique<uint8_t[]>(0x1000);
-//	m_nt_page[0] = m_nt_ram.get();
-//	m_nt_page[1] = m_nt_ram.get() + 0x400;
-//	m_nt_page[2] = m_nt_ram.get() + 0x800;
-//	m_nt_page[3] = m_nt_ram.get() + 0xc00;
+//  m_nt_ram = std::make_unique<uint8_t[]>(0x1000);
+//  m_nt_page[0] = m_nt_ram.get();
+//  m_nt_page[1] = m_nt_ram.get() + 0x400;
+//  m_nt_page[2] = m_nt_ram.get() + 0x800;
+//  m_nt_page[3] = m_nt_ram.get() + 0xc00;
 
-//	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(*this, FUNC(nes_boot_state::nes_boot_nt_r)), write8_delegate(*this, FUNC(nes_boot_state::nes_boot_nt_w)));
-//	m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "bank1");
-//	membank("bank1")->set_base(memregion("gfx1")->base());
+//  m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(*this, FUNC(nes_boot_state::nes_boot_nt_r)), write8_delegate(*this, FUNC(nes_boot_state::nes_boot_nt_w)));
+//  m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "bank1");
+//  membank("bank1")->set_base(memregion("gfx1")->base());
 }
 
 void nes_boot_state::nes_boot(machine_config &config)

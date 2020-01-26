@@ -371,7 +371,7 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 
 	int yy = (yoff + y);// &0x1ff;
 	//if (yy >= 0x01c0)
-	//	yy -= 0x0200;
+	//  yy -= 0x0200;
 
 	if (yy > cliprect.max_y || yy < 0)
 		return;
@@ -409,7 +409,7 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 		else if (nc_bpp < 8)
 		{
 			// 6bpp
-		//	current_palette_offset |= 0x0800;
+		//  current_palette_offset |= 0x0800;
 
 		}
 		else
@@ -426,7 +426,7 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 
 		//xx &= 0x01ff;
 		//if (xx >= 0x01c0)
-		//	xx -= 0x0200;
+		//  xx -= 0x0200;
 
 		if (xx >= 0 && xx <= cliprect.max_x)
 		{
@@ -511,7 +511,7 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 			if ((scanline >= 0) && (scanline < 480))
 			{
 				xx = i * 2;
-				
+
 				pal = (pix & 0xff) | 0x100;
 
 				if (xx >= 0 && xx <= cliprect.max_x)
@@ -555,12 +555,12 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 		if ((attr_reg >> 14) & 0x2)
 		{
 			total_width = 1024;
-		//	use_alt_drawmode = 1; // probably doesn't control this
+		//  use_alt_drawmode = 1; // probably doesn't control this
 		}
 		else
 		{
 			total_width = 512;
-		//	use_alt_drawmode = 0; // probably doesn't control this
+		//  use_alt_drawmode = 0; // probably doesn't control this
 		}
 
 		uint32_t tile_count_x = total_width / tile_w;

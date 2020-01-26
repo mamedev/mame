@@ -169,7 +169,7 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 
 		uint16_t b = m_core->m_r[rb];
 		uint16_t c = read16(imm16_2);
-		uint32_t storeaddr = imm16_2; // dest address for STORE 
+		uint32_t storeaddr = imm16_2; // dest address for STORE
 		uint32_t lres;
 
 		bool write = do_basic_alu_ops(aluop, lres, b, c, storeaddr, (ra != 7));
@@ -258,7 +258,7 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 		uint16_t b = m_core->m_r[rx + 8];
 		uint16_t c = imm6;
 
-		uint32_t storeaddr = 0; // dest address for STORE 
+		uint32_t storeaddr = 0; // dest address for STORE
 		uint32_t lres;
 
 		if (aluop == 0xd)
@@ -293,7 +293,7 @@ void unsp_20_device::execute_extended_group(uint16_t op)
 		uint16_t b = m_core->m_r[rx + 8];
 		uint16_t c = read16(addr);
 
-		uint32_t storeaddr = addr; // dest address for STORE 
+		uint32_t storeaddr = addr; // dest address for STORE
 		uint32_t lres;
 
 		bool write = do_basic_alu_ops(aluop, lres, b, c, storeaddr, true);

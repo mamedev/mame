@@ -1412,15 +1412,15 @@ void nes_vt_state::do_dma(uint8_t data, bool has_ntsc_bug)
 	case 0x6: length = 64; break;
 	case 0x7: length = 128; break;
 	}
-	
+
 	uint16_t src_addr = (data << 8) | (src_nib_74 << 4);
 	logerror("vthh dma start ctrl=%02x addr=%04x\n", m_vdma_ctrl, src_addr);
-	
+
 	if (dma_mode == 1)
 	{
 		logerror("vdma dest %04x\n", m_ppu->get_vram_dest());
 	}
-	
+
 	if (has_ntsc_bug && (dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F00) && !(m_ppu->get_201x_reg(0x1) & 0x80))
 	{
 		length -= 1;

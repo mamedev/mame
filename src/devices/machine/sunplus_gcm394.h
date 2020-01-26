@@ -72,7 +72,7 @@ public:
 	void default_cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4 );
 
 	void set_cs_space(address_space* csspace) { m_cs_space = csspace; }
-	
+
 	void set_paldisplaybank_high_hack(int pal_displaybank_high) { m_spg_video->set_paldisplaybank_high(pal_displaybank_high); }
 	void set_alt_tile_addressing_hack(int alt_tile_addressing) { m_spg_video->set_alt_tile_addressing(alt_tile_addressing); }
 	void set_romtype(int romtype) { m_romtype = romtype; }
@@ -186,7 +186,7 @@ private:
 
 	DECLARE_READ16_MEMBER(unk_r);
 	DECLARE_WRITE16_MEMBER(unk_w);
-	
+
 	void write_dma_params(int channel, int offset, uint16_t data);
 	uint16_t read_dma_params(int channel, int offset);
 	void trigger_systemm_dma(address_space &space, int channel, uint16_t data);

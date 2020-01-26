@@ -4,7 +4,7 @@
 
  Arcade games (hacks of console games) running on SNES hardware.
 
- Driver (based on nss.cpp) by Tomasz Slanina 
+ Driver (based on nss.cpp) by Tomasz Slanina
 
     Supported games:
     - Killer Instinct

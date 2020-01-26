@@ -35,17 +35,17 @@ TODO:
 #include "arm7core.h"   //include arm7 core
 #include "arm7help.h"
 
-#define LOG_MMU				(1 << 0)
-#define LOG_DSP				(1 << 1)
-#define LOG_COPRO_READS		(1 << 2)
-#define LOG_COPRO_WRITES	(1 << 3)
-#define LOG_COPRO_UNKNOWN	(1 << 4)
-#define LOG_COPRO_RESERVED	(1 << 5)
+#define LOG_MMU             (1 << 0)
+#define LOG_DSP             (1 << 1)
+#define LOG_COPRO_READS     (1 << 2)
+#define LOG_COPRO_WRITES    (1 << 3)
+#define LOG_COPRO_UNKNOWN   (1 << 4)
+#define LOG_COPRO_RESERVED  (1 << 5)
 
-#define VERBOSE				(0)
+#define VERBOSE             (0)
 #include "logmacro.h"
 
-#define PRINT_HAPYFSH2		(0)
+#define PRINT_HAPYFSH2      (0)
 
 /* prototypes of coprocessor functions */
 void arm7_dt_r_callback(arm_state *arm, uint32_t insn, uint32_t *prn, uint32_t (*read32)(arm_state *arm, uint32_t addr));

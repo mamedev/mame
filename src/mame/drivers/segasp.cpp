@@ -519,7 +519,7 @@ ROM_START( mirworld )
 	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(ec7e58cb) SHA1(8c6a45da31cd87a71b8e2f7454dc31bc2891210b) )
 
 	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
-	
+
 	ROM_REGION( 0x800, "pic_readout", ROMREGION_ERASEFF ) // not populated
 ROM_END
 

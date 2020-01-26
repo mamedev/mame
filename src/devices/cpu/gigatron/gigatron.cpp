@@ -154,7 +154,7 @@ void gigatron_cpu_device::branchOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_
 			c = true;
 			break;
 	}
-	
+
 	if (c) {
 		uint8_t b = offset(bus, d);
 		m_npc = base | b;
@@ -215,7 +215,7 @@ void gigatron_cpu_device::aluOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t d
 				m_outx = m_ac;
 			}
 			break;
-			
+
 	}
 }
 
@@ -250,7 +250,7 @@ uint8_t gigatron_cpu_device::offset(uint8_t bus, uint8_t d)
 			return gigatron_readmem8(d);
 		case 2:
 			return m_ac;
-		case 3:	
+		case 3:
 			return m_inReg;
 	}
 	return 0;
@@ -270,13 +270,13 @@ void gigatron_cpu_device::storeOp(uint8_t op, uint8_t mode, uint8_t bus, uint8_t
 			b = m_inReg;
 			break;
 	}
-	
+
 	u16 address = addr(mode, d);
 	if (bus == 1)
 		logerror("%04x: ctrl = 0x%04x\n", m_ppc, address);
 	else
 		gigatron_writemem8(address & m_ramMask, b);
-	
+
 	switch (mode) {
 		case 4:
 			m_x = b;

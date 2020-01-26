@@ -28,7 +28,7 @@ protected:
 
 	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
 	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
-	virtual	DECLARE_WRITE16_MEMBER(portc_w) override;
+	virtual DECLARE_WRITE16_MEMBER(portc_w) override;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_telestory);
 
@@ -292,11 +292,11 @@ ROM_START( telestry )
 ROM_END
 
 
-/* Sound data for the narrator is written to the SIO data port 
+/* Sound data for the narrator is written to the SIO data port
    013127: D319 3D54 [3d54] = r1   (Cinderella)  - 4-bit data?
    The hidden test mode calls the speech test 'CELP' (possibly "Code-excited linear prediction" based?)
    https://en.wikipedia.org/wiki/Code-excited_linear_prediction
-   
+
    TODO: check if it's a common implementation eg.  Speex
    SIO port is not currently implemented in spg2xx_io.cpp however
 */

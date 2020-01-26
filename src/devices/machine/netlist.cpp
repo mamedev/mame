@@ -545,7 +545,7 @@ protected:
 			// FIXME: The logic has a rounding issue because time resolution divided
 			//        by 48,000 is not a natural number. The fractional part
 			//        adds up to one samples every 13 seconds for 100 ps resolution.
-			// 		  Fixing this is possible but complicated and expensive.
+			//        Fixing this is possible but complicated and expensive.
 		}
 		m_pos++;
 
@@ -1497,7 +1497,7 @@ void netlist_mame_sound_device::sound_stream_update(sound_stream &stream, stream
 	}
 
 	auto cur(netlist().exec().time());
-    const auto delta(nltime_ext_from_clocks(samples));
+	const auto delta(nltime_ext_from_clocks(samples));
 	netlist().exec().process_queue(delta);
 
 	cur += delta;

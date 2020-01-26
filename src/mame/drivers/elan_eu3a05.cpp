@@ -48,7 +48,7 @@
     In Space Invaders the UFO can sometimes glitch for a frame when appearing, and wraps around at the edges
       (even if the hardware supports having higher priority tiles to prevent this, as used by Lunar Rescue, it isn't
        used here)
-	   
+
     Colony 7 has a typo in the instructions
 
     The fake 'colour band' effect does not apply to the thruster (and several other elements) in Lunar Rescue

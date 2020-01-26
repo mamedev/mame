@@ -171,46 +171,46 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 
 /* Write Register Layout
 
-	   76543210
-	00 -----xxx Channel Select
-	   -----000 Channel 0
-	   -----001 Channel 1
-	   -----010 Channel 2
-	   -----011 Channel 3
-	   -----100 Channel 4
-	   -----101 Channel 5
+       76543210
+    00 -----xxx Channel Select
+       -----000 Channel 0
+       -----001 Channel 1
+       -----010 Channel 2
+       -----011 Channel 3
+       -----100 Channel 4
+       -----101 Channel 5
 
-	01 xxxx---- Overall Left Volume
-	   ----xxxx Overall Right Volume
+    01 xxxx---- Overall Left Volume
+       ----xxxx Overall Right Volume
 
-	02 xxxxxxxx Frequency (Low 8 bits)
+    02 xxxxxxxx Frequency (Low 8 bits)
 
-	03 ----xxxx Frequency (High 4 bits)
+    03 ----xxxx Frequency (High 4 bits)
 
-	04 x------- Channel Enable
-	   -x------ Direct D/A
-	   00------ Write Data
-	   01------ Reset Counter
-	   10------ Mixing (Sound Output)
-	   11------ Direct D/A
-	   ---xxxxx Channel Master Volume
+    04 x------- Channel Enable
+       -x------ Direct D/A
+       00------ Write Data
+       01------ Reset Counter
+       10------ Mixing (Sound Output)
+       11------ Direct D/A
+       ---xxxxx Channel Master Volume
 
-	05 xxxx---- Channel Left Volume
-	   ----xxxx Channel Right Volume
+    05 xxxx---- Channel Left Volume
+       ----xxxx Channel Right Volume
 
-	06 ---xxxxx Waveform Data
+    06 ---xxxxx Waveform Data
 
-	07 x------- Noise Enable (channel 5, 6 only)
-	   ---xxxxx Noise Frequency ^ 0x1f
+    07 x------- Noise Enable (channel 5, 6 only)
+       ---xxxxx Noise Frequency ^ 0x1f
 
-	08 xxxxxxxx LFO Frequency
+    08 xxxxxxxx LFO Frequency
 
-	09 x------- LFO Reset
-	   ------xx LFO Control
-	   ------00 LFO off
-	   ------01 Direct Addition
-	   ------10 2 bit Shift Addition
-	   ------11 4 bit Shift Addition
+    09 x------- LFO Reset
+       ------xx LFO Control
+       ------00 LFO off
+       ------01 Direct Addition
+       ------10 2 bit Shift Addition
+       ------11 4 bit Shift Addition
 */
 
 WRITE8_MEMBER( c6280_device::c6280_w )

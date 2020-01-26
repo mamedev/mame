@@ -99,7 +99,7 @@ static floppy_format_type floppy_formats[] = {
 	FLOPPY_APPLIX_FORMAT,
 
 	FLOPPY_HPI_FORMAT,
-        FLOPPY_IMG_FORMAT,
+	FLOPPY_IMG_FORMAT,
 
 	FLOPPY_DVK_MX_FORMAT,
 	FLOPPY_AIM_FORMAT,

@@ -35774,9 +35774,9 @@
 		<info name="release" value="2019-12-16"/>
 		<!-- 4am has this to say about this disk:
 		There were several releases of this game. One only booted
-		on 13-sector drives and had no title screen at all. Another 
+		on 13-sector drives and had no title screen at all. Another
 		booted on 13-sector drives but had a title screen.
-		
+
 		This release only boots on 16-sector drives and has a title
 		screen and a hi-res character generator. There is at least one
 		later version that has all the features of this one, plus allows
@@ -35993,7 +35993,7 @@
 		<year>1992</year>
 		<publisher>Barnum Software</publisher>
 		<info name="release" value="2020-01-09"/>
-		<!-- This is version 4.0, originally distributed on a 3.5-inch (800K) 
+		<!-- This is version 4.0, originally distributed on a 3.5-inch (800K)
 		disk for Apple IIgs, //c+, or //e users with a UniDisk 3.5-inch drive.
 		-->
 

@@ -1,21 +1,21 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood	
+// copyright-holders:David Haywood
 /******************************************************************************
 
-	System is fairly barebones
-	Main PCB has the SoC, RAM, ROM
-	connects to other PCBs with various types of slots (USB, SD etc.)
-	(ADD FULL DETAILS)
-	
-	TODO: everything - emulate the SoC
+    System is fairly barebones
+    Main PCB has the SoC, RAM, ROM
+    connects to other PCBs with various types of slots (USB, SD etc.)
+    (ADD FULL DETAILS)
 
-	Presumably has an internal bootstrap (at least) to boot from the NAND
+    TODO: everything - emulate the SoC
 
-	--
+    Presumably has an internal bootstrap (at least) to boot from the NAND
 
-	reviews for this device were less than favourable with many comments
-	about how the SNES and Arcade games often did not run at full speed
-	and how the overall quality of emulation was unremarkable
+    --
+
+    reviews for this device were less than favourable with many comments
+    about how the SNES and Arcade games often did not run at full speed
+    and how the overall quality of emulation was unremarkable
 
 *******************************************************************************/
 

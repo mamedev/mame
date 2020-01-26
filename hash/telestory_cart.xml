@@ -61,7 +61,7 @@ Undumped carts:
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="poohs" supported="no">
 		<description>Winnie the Pooh - Salta, Tigger, Salta / Winnie the Pooh - Bounce, Tigger, Bounce (Spain)</description>
 		<year>2006</year>
@@ -83,5 +83,5 @@ Undumped carts:
 			</dataarea>
 		</part>
 	</software>
-	
+
 </softwarelist>

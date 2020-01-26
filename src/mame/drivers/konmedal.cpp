@@ -158,17 +158,17 @@ private:
 WRITE8_MEMBER(konmedal_state::control2_w)
 {
 /*  CN3
-	---- ---x uPD7759 /ST (TMNT-based boards)
-	---- --x- uPD7759 /RESET (TMNT-based boards)
-	---- -x-- 10Y Counter
-	---- x--- 100Y Counter
-	---x ---- 10Y Lock
-	--x- ---- 100Y Lock
-	-x-- ---- Hopper On
-	x--- ---- K056832 RAM/ROM access switch (GX-based boards)
+    ---- ---x uPD7759 /ST (TMNT-based boards)
+    ---- --x- uPD7759 /RESET (TMNT-based boards)
+    ---- -x-- 10Y Counter
+    ---- x--- 100Y Counter
+    ---x ---- 10Y Lock
+    --x- ---- 100Y Lock
+    -x-- ---- Hopper On
+    x--- ---- K056832 RAM/ROM access switch (GX-based boards)
 */
 	m_control2 = data;
-	if (m_upd7759) 	// note: this is needed because games clear reset line and assert start line at the same time, but MAME's outport can't handle right order
+	if (m_upd7759)  // note: this is needed because games clear reset line and assert start line at the same time, but MAME's outport can't handle right order
 		m_upd7759->reset_w((data & 2) ? 1 : 0);
 	m_outport->write(data);
 	machine().bookkeeping().coin_counter_w(0, data & 4);
@@ -180,9 +180,9 @@ WRITE8_MEMBER(konmedal_state::control2_w)
 WRITE8_MEMBER(konmedal_state::medalcnt_w)
 {
 /*  CN5
-	---- ---x Medal counter +1 (medal in)
-	---- --x- Medal counter -1 (hopper out)
-	---- -x-- Medal Lock
+    ---- ---x Medal counter +1 (medal in)
+    ---- --x- Medal counter -1 (hopper out)
+    ---- -x-- Medal Lock
 */
 	machine().bookkeeping().coin_counter_w(2, data & 2);
 	machine().bookkeeping().coin_lockout_w(2, (data & 4) ? 0 : 1);
@@ -190,7 +190,7 @@ WRITE8_MEMBER(konmedal_state::medalcnt_w)
 
 WRITE8_MEMBER(konmedal_state::lamps_w)
 {
-//	CN6
+//  CN6
 	for (int i = 0; i < 8; i++)
 		m_lamps[i] = BIT(data, i);
 }
@@ -277,7 +277,7 @@ K056832_CB_MEMBER(konmedal_state::tile_callback)
 	m_k056832->read_avac(&mode, &avac);
 	if (mode)
 		*code = (((avac >> ((codebits >> 8) & 0xc)) & 0xf) << 10) | (codebits & 0x3ff);
-	else 
+	else
 		*code = codebits & 0xfff;
 
 	*code = bitswap<14>(*code, 8, 9, 13, 12, 11, 10, 7, 6, 5, 4, 3, 2, 1, 0);

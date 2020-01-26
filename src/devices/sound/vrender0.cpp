@@ -7,11 +7,11 @@
                                       VRENDER ZERO
                                      AUDIO EMULATION
 
-	TODO
-	- Envelope, Interrupt functions aren't verified from real hardware behavior.
-	- Reverb, Pingpong/Reversed loop, Most of Channel/Overall control registers
-	  are Not implemented
-	- Sample Rate is unverified
+    TODO
+    - Envelope, Interrupt functions aren't verified from real hardware behavior.
+    - Reverb, Pingpong/Reversed loop, Most of Channel/Overall control registers
+      are Not implemented
+    - Sample Rate is unverified
 
 *************************************************************************************/
 static inline s32 sign_ext(s32 val, s32 bit)
@@ -91,10 +91,10 @@ void vr0sound_device::sound_map(address_map &map)
 	       -------- xxxxxxxx ChnClkNum (Clock Number per Channel)
 	602    x------- -------- RS (Run Sound)
 	       -------- --x----- TM (Texture Memory)
-		   -------- ---x---- RE (Reverb Enable)
-		   -------- -----x-- CW (32bit Adder Wait)
-		   -------- ------x- AW (16bit Adder Wait)
-		   -------- -------x MW (Multipler Wait)
+	       -------- ---x---- RE (Reverb Enable)
+	       -------- -----x-- CW (32bit Adder Wait)
+	       -------- ------x- AW (16bit Adder Wait)
+	       -------- -------x MW (Multipler Wait)
 	*/
 
 	map(0x404, 0x407).rw(FUNC(vr0sound_device::status_r), FUNC(vr0sound_device::status_w));
@@ -281,12 +281,12 @@ void vr0sound_device::revfactor_w(offs_t offset, u16 data, u16 mem_mask)
 }
 
 /*
-	Buffer Address
-		1                0
-		fedcba9876543210 fedcba9876543210
-		----------0xxxxx x--------------- BufferSAddr
-		---------------- -xxx------------ Buffer Select
-		---------------- ----xxxxxxxxxxxx Buffer Pointer
+    Buffer Address
+        1                0
+        fedcba9876543210 fedcba9876543210
+        ----------0xxxxx x--------------- BufferSAddr
+        ---------------- -xxx------------ Buffer Select
+        ---------------- ----xxxxxxxxxxxx Buffer Pointer
 */
 
 u16 vr0sound_device::buffersaddr_r(offs_t offset)
@@ -362,39 +362,39 @@ void vr0sound_device::ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 /*
 Channel Parameter Register (32 bytes for each channels)
 
-	fedcba98 76543210
-00	xxxxxxxx xxxxxxxx CurSAddr (15:0)
-02	xxxxxxxx xxxxxxxx CurSAddr (31:16)
-04	xxxxxxxx xxxxxxxx EnvVol (15:0)
-06	-11x---- -------- Loop Direction(LD)
-	-11-xxxx -------- EnvStage
-	-------- xxxxxxxx EnvVol (23:16)
-08	xxxxxxxx xxxxxxxx DSAddr (15:0)
-0a	-xxxxxxx -------- Modes
-0c	xxxxxxxx xxxxxxxx LoopBegin (15:0)
-0e	-xxxxxxx -------- LChnVol
-	-------- --xxxxxx LoopBegin (21:16)
-10	xxxxxxxx xxxxxxxx LoopEnd (15:0)
-12	-xxxxxxx -------- RChnVol
-	-------- --xxxxxx LoopEnd (21:16)
-14	xxxxxxxx xxxxxxxx EnvRate0 (15:0)
-16	xxxxxxxx xxxxxxxx EnvRate1 (15:0)
-18	xxxxxxxx xxxxxxxx EnvRate2 (15:0)
-1a	xxxxxxxx xxxxxxxx EnvRate3 (15:0)
-1c	x------- -------- EnvRate1 (16)
-	-xxxxxxx -------- EnvTarget1
-	-------- x------- EnvRate0 (16)
-	-------- -xxxxxxx EnvTarget0
-1e	x------- -------- EnvRate3 (16)
-	-xxxxxxx -------- EnvTarget3
-	-------- x------- EnvRate2 (16)
-	-------- -xxxxxxx EnvTarget2
+    fedcba98 76543210
+00  xxxxxxxx xxxxxxxx CurSAddr (15:0)
+02  xxxxxxxx xxxxxxxx CurSAddr (31:16)
+04  xxxxxxxx xxxxxxxx EnvVol (15:0)
+06  -11x---- -------- Loop Direction(LD)
+    -11-xxxx -------- EnvStage
+    -------- xxxxxxxx EnvVol (23:16)
+08  xxxxxxxx xxxxxxxx DSAddr (15:0)
+0a  -xxxxxxx -------- Modes
+0c  xxxxxxxx xxxxxxxx LoopBegin (15:0)
+0e  -xxxxxxx -------- LChnVol
+    -------- --xxxxxx LoopBegin (21:16)
+10  xxxxxxxx xxxxxxxx LoopEnd (15:0)
+12  -xxxxxxx -------- RChnVol
+    -------- --xxxxxx LoopEnd (21:16)
+14  xxxxxxxx xxxxxxxx EnvRate0 (15:0)
+16  xxxxxxxx xxxxxxxx EnvRate1 (15:0)
+18  xxxxxxxx xxxxxxxx EnvRate2 (15:0)
+1a  xxxxxxxx xxxxxxxx EnvRate3 (15:0)
+1c  x------- -------- EnvRate1 (16)
+    -xxxxxxx -------- EnvTarget1
+    -------- x------- EnvRate0 (16)
+    -------- -xxxxxxx EnvTarget0
+1e  x------- -------- EnvRate3 (16)
+    -xxxxxxx -------- EnvTarget3
+    -------- x------- EnvRate2 (16)
+    -------- -xxxxxxx EnvTarget2
 */
 
 u16 vr0sound_device::channel_t::read(offs_t offset)
 {
 	u16 ret = 0;
-	
+
 	switch (offset)
 	{
 		case 0x00/2:

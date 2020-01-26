@@ -53,7 +53,7 @@ void spg2xx_pdc100_game_state::machine_reset()
 WRITE16_MEMBER(spg2xx_pdc100_game_state::porta_w)
 {
 	//logerror("%s: porta_w %04x\n", machine().describe_context(), data);
-	
+
 	// simply writes 0000 at times during bootup while initializing stuff, which causes an invalid bankswitch mid-code execution
 	if (data & 0xff00)
 		switch_bank(data & 0x0007);

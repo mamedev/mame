@@ -38,11 +38,11 @@ void bbc_scsiaiv_device::device_add_mconfig(machine_config& config)
 
 //void bbc_vp415_device::device_add_mconfig(machine_config& config)
 //{
-//	bbc_scsiaiv_device::device_add_mconfig(config);
+//  bbc_scsiaiv_device::device_add_mconfig(config);
 //
-//	/* Philips VP415 */
-//	subdevice<nscsi_connector>("scsi:0")->set_default_option("vp415");
-//	subdevice<nscsi_connector>("scsi:0")->set_fixed(true);
+//  /* Philips VP415 */
+//  subdevice<nscsi_connector>("scsi:0")->set_default_option("vp415");
+//  subdevice<nscsi_connector>("scsi:0")->set_fixed(true);
 //}
 
 
@@ -67,7 +67,7 @@ bbc_scsiaiv_device::bbc_scsiaiv_device(const machine_config& mconfig, const char
 }
 
 //bbc_vp415_device::bbc_vp415_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
-//	: bbc_scsiaiv_device(mconfig, BBC_VP415, tag, owner, clock)
+//  : bbc_scsiaiv_device(mconfig, BBC_VP415, tag, owner, clock)
 //{
 //}
 

@@ -1941,7 +1941,7 @@ ROM_START( godzilla )
 	ROM_LOAD( "copx-d2.313",  0x000000, 0x080000, CRC(7c52581b) SHA1(7e668476f886806b0c06fa0bcf4bbc955878c87c) )
 ROM_END
 
-/* 
+/*
 
 Denjin Makai newer set
 PCB labeled BP942KS
@@ -1949,7 +1949,7 @@ All "denjin" ROM labels from this set are actually written in kanji chars.
 
 */
 
-ROM_START( denjinmk ) 
+ROM_START( denjinmk )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD32_BYTE( "denjin_1.u025", 0x000000, 0x040000, CRC(b23a6e6f) SHA1(73ab330dfc0d2799984874f02da51deb8323b9e2) )
 	ROM_LOAD32_BYTE( "denjin_2.u024", 0x000001, 0x040000, CRC(4fde59e7) SHA1(1618db14a18acc2acabdd93b8e2563d7221e643d) )

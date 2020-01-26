@@ -6,30 +6,30 @@
 
     as with most of the 'Modular System' setups, the hardware is heavily modified from the original
     and consists of a multi-board stack in a cage, hence different driver.
-	Update: it doesn't seem all that different than tokib, the differences are:
-	* paletteram; 
-	* video registers;
+    Update: it doesn't seem all that different than tokib, the differences are:
+    * paletteram;
+    * video registers;
     * sprite chip interface (basically shifting all the ports, why even?);
-	* switching from YM3812 to a double YM2203 setup;
+    * switching from YM3812 to a double YM2203 setup;
 
-    TODO: 
-	- Subclass with tokib_state in toki.cpp driver;
-	- Sound needs improvements:
-		* meaning of port A/B of the two YMs;
-		* MSM playback;
-		* improve comms;
-		* ROM bank;
-		* One of the above for the scratchy sounds that happens from time to time;
-		* Mixing;
-	- Ranking screen has wrong colors, btanb?
-	- Slight sprite lag when game scrolls vertically, another btanb?
-	- "bajo licencia" -> "under license" ... from whoever developed Modular System or TAD itself?
+    TODO:
+    - Subclass with tokib_state in toki.cpp driver;
+    - Sound needs improvements:
+        * meaning of port A/B of the two YMs;
+        * MSM playback;
+        * improve comms;
+        * ROM bank;
+        * One of the above for the scratchy sounds that happens from time to time;
+        * Mixing;
+    - Ranking screen has wrong colors, btanb?
+    - Slight sprite lag when game scrolls vertically, another btanb?
+    - "bajo licencia" -> "under license" ... from whoever developed Modular System or TAD itself?
 
     NOTES:
     PCB lacks raster effect on title screen (like toki bootlegs)
 
     BOARDS
-    
+
  Board 5-1
  ___________________________________________________________
  |                      ________________  ________________  |
@@ -77,7 +77,7 @@
  |    | EMPTY         | | EMPTY         |                   |
  |    |_______________| |_______________|                   |
  |__________________________________________________________|
- 
+
  Board 8
  __________________________________________________________________________________
  |           :::::::: <- Jumpers                                                   |
@@ -112,7 +112,7 @@
  |  _____________________________      _______  _________________________________  |
  |__|                            |____74LS138N_|                                |__|
     |____________________________|             |________________________________|
- 
+
  CPU Board 6/1                                       Board 21/1
  _____________________________________________       ______________________________________________
  |             _______________              __|_     |                                             |
@@ -156,7 +156,7 @@
  |  |74F74N    XTAL   74LS368AB1  74LS132B1   |    |   |  74LS245B1 74LS245B1 |74LS08N   74LS174N  |
  |           20.000MHz                        |    |___|                                           |
  |____________________________________________|      |_____________________________________________|
- 
+
  Board 51/3                                          Sound Board 1/3
  _____________________________________________       ______________________________________________
  |                                            |      |                                             |
@@ -328,7 +328,7 @@ private:
 
 	void tokims_map(address_map &map);
 	void audio_map(address_map &map);
-	
+
 	DECLARE_READ8_MEMBER(sound_status_r);
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(adpcm_w);
@@ -375,13 +375,13 @@ Copies from original location to an 8-bit RAM, split into two banks like palette
 First entry are global flags (unchecked)
 Offsets are in 16-bit to make this less confusing
 [0x000] tttt tttt tttt tttt ---- ---- ---- ---- tile low offset
-		---- ---- ---- ---- yyyy yyyy yyyy yyyy Y offset
+        ---- ---- ---- ---- yyyy yyyy yyyy yyyy Y offset
 [0x002] xxxx xxxx xxxx xxxx ---- ---- ---- ---- X offset
-		---- ---- ---- ---- ---- -f-- ---- ---- flip X
-		---- ---- ---- ---- ---- --t- ---- ---- tile banking
-		---- ---- ---- ---- ---- ---- tttt tttt tile upper offset
+        ---- ---- ---- ---- ---- -f-- ---- ---- flip X
+        ---- ---- ---- ---- ---- --t- ---- ---- tile banking
+        ---- ---- ---- ---- ---- ---- tttt tttt tile upper offset
 [0x200] x--- ---- ---- ---- ---- ---- ---- ---- x wraparound
-		---- ---- ---- cccc ---- ---- ---- ---- color offset
+        ---- ---- ---- cccc ---- ---- ---- ---- color offset
 [0x202] ---- ---- ---- ---- ---- ---- ---- ---- <unused>
 */
 void toki_ms_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
@@ -396,18 +396,18 @@ void toki_ms_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		u16 *hibank = &m_spriteram->buffer()[offs+bank_size];
 
 		y = 240 - (lobank[0] & 0xff);
-		
+
 		x = lobank[1] >> 8;
 		if (!(hibank[0] & 0x8000))
 			x -= 256;
-		
+
 		flipx = (lobank[1] & 0x40);
-		
+
 		tile = (lobank[0] >> 8);
 		tile |= ((lobank[1] & 0x0f) << 8);
 		if (lobank[1] & 0x20)
 			tile |= 0x1000;
-		
+
 		color = (hibank[0] & 0x0f00) >> 8;
 
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
@@ -449,7 +449,7 @@ uint32_t toki_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	else
 	{
 		m_bk1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_bk2_tilemap->draw(screen, bitmap, cliprect, 0, 0);		
+		m_bk2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	draw_sprites(bitmap, cliprect);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -516,7 +516,7 @@ void toki_ms_state::tokims_map(address_map &map)
 	map(0x070000, 0x0707ff).rw(FUNC(toki_ms_state::palette_r), FUNC(toki_ms_state::palette_w)).umask16(0xffff);
 	map(0x071000, 0x0713ff).ram().share("spriteram");
 	map(0x072000, 0x072001).nopr(); // irq ack?
-	map(0x073000, 0x07300f).ram().share("scrollram"); 
+	map(0x073000, 0x07300f).ram().share("scrollram");
 	map(0x0a0000, 0x0a005f).nopw(); // scrollram left-over?
 	map(0x0c0000, 0x0c0001).portr("DSW");
 	map(0x0c0002, 0x0c0003).portr("INPUTS");
@@ -526,12 +526,12 @@ void toki_ms_state::tokims_map(address_map &map)
 
 WRITE8_MEMBER(toki_ms_state::adpcm_w)
 {
-//	membank("sound_bank")->set_entry(((data & 0x10) >> 4) ^ 1);
+//  membank("sound_bank")->set_entry(((data & 0x10) >> 4) ^ 1);
 	m_msm->reset_w(BIT(data, 4));
-	
+
 	m_adpcm_data = data & 0xf;
 	//m_msm->write_data(data & 0xf);
-//	m_msm->vclk_w(BIT(data, 7));
+//  m_msm->vclk_w(BIT(data, 7));
 	//m_msm->vclk_w(1);
 	//m_msm->vclk_w(0);
 }
@@ -607,7 +607,7 @@ static INPUT_PORTS_START( tokims )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
-	
+
 	PORT_START("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -701,7 +701,7 @@ void toki_ms_state::tokims(machine_config &config)
 	m_screen->screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 
 	PALETTE(config, m_palette).set_entries(0x400);
-	
+
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_toki_ms);
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);

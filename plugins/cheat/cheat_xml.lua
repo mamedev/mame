@@ -110,12 +110,12 @@ function xml.conv_cheat(data)
 			elseif width == "q" then
 				width = "u64"
 			end
-			
+
 			local prefix = cpu:sub(1,1)
 			if prefix == ":" then
 				cpu = cpu:sub(2,cpu:len())
 			end
-			
+
 			local cpuname = cpu:gsub(":", "_")
 			if space == "m" then
 				regions[cpuname .. space] = ":" .. cpu

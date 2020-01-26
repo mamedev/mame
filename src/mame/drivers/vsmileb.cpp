@@ -4,7 +4,7 @@
 
     V-Tech V.Smile Baby console emulation
 
-	- mounting of cartridges doesn't appear to work?
+    - mounting of cartridges doesn't appear to work?
 
 *******************************************************************************/
 

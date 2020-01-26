@@ -284,7 +284,7 @@ void vsmilem_state::vsmilem(machine_config &config)
 
 // NOTE: many games contain additional spare copies of the BIOS in their own cartridge ROM, reason unknown
 
-ROM_START( vsmile ) 	
+ROM_START( vsmile )
 	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v103", "v103" )
 	ROMX_LOAD( "vsmile_v103.bin", 0x000000, 0x200000, CRC(387fbc24) SHA1(5f2fd211b6ff3a6f5121b14adc6bbf4f49e89f33),  ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(0) ) // this is the earliest version used on the V.Smile Pocket, but it isn't system specific

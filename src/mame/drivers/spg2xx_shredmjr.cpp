@@ -14,7 +14,7 @@ public:
 
 	void shredmjr(machine_config &config);
 	void taikeegr(machine_config &config);
-	
+
 	void init_taikeegr();
 
 protected:

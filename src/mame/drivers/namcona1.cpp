@@ -59,9 +59,9 @@ Notes:
 
 -   All rom pcb's have PLD's NA1R10 and NA1R2 OR they have a C354 in place of
     the 2 PLD's doing the same job (enable lines on the rom board)
-    Most games have been seen in both configurations / board styles. 
+    Most games have been seen in both configurations / board styles.
     C354 is not to be confused with the Keycus, Both devices are 32pin and C3xx.
-	
+
 -   Test mode for NA2 games includes an additional item: UART Test.
     No games are known to actually link up and use the UART feature.
     It's been confirmed that a Numan Athletics fails the UART test,

@@ -14623,7 +14623,7 @@ giclasex
 giclassvr
 
 @source:gigatron.cpp
-gigatron						// (c) 2018 Marcel van Kervinck
+gigatron                        // (c) 2018 Marcel van Kervinck
 
 @source:gijoe.cpp
 gijoe                           // GX069 (c) 1991 (World)

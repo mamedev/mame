@@ -26,7 +26,7 @@ Cart 52-107122-022(SP) "Aventuras en el Zoo" is a ROMless cart that unlocks the 
 	<!-- note these are NAND parts.
 	     the dump doesn't contain GPNANDNAND strings so probably not booted from? -->
 
-	<software name="eljardin" supported="no"> 
+	<software name="eljardin" supported="no">
 		<description>El Jardín de los Sueños... (Spain)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>

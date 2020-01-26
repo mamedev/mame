@@ -33,9 +33,9 @@ TODO:
 - Sky Adventure, probably others: sprite drawing is off-sync, cfr. notes in video file;
 - Gold Medalist: attract mode has missing finger on button 1, may be btanb;
 - Gold Medalist: incorrect blank effect on shooting pistol for dash events (cfr. alpha68k_palette_device);
-- Gold Medalist: dash events timers relies on MCU irq timings. 
+- Gold Medalist: dash events timers relies on MCU irq timings.
   Previous emulation of 180 Hz was making it way too hard, and the timer was updating at 0.03 secs (-> 30 Hz refresh rate).
-  Using a timer of 100 Hz seems a better approximation compared to a stopwatch, of course fine tuning 
+  Using a timer of 100 Hz seems a better approximation compared to a stopwatch, of course fine tuning
   this approximation needs HW probing and/or a MCU decap.
 - Gold Medalist: MCU irq routine has an event driven path that is never taken into account, what is it for?
 - Super Champion Baseball: enables opacity bit on fix layer, those are transparent on SNK Arcade Classics 0

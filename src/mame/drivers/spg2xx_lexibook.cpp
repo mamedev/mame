@@ -12,7 +12,7 @@ public:
 
 	void lexiseal(machine_config& config);
 	void lexizeus(machine_config &config);
-	
+
 	void init_zeus();
 
 protected:
@@ -185,7 +185,7 @@ INPUT_PORTS_END
 WRITE16_MEMBER(spg2xx_lexiseal_game_state::portb_w)
 {
 	//logerror("%s: portb_w %04x\n", machine().describe_context(), data);
-	
+
 	// only 2 banks
 	if (data == 0x5f)
 		switch_bank(0);
