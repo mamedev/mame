@@ -10360,7 +10360,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NCSE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NCSE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
@@ -10387,7 +10387,7 @@ patched out (+ a fix for internal checksum)
 		<description>San Francisco Rush - Extreme Racing (Europe)</description>
 		<year>1997</year>
 		<publisher>Midway</publisher>
-		<info name="serial" value="NUS-NSFP-EUR"/>
+		<info name="serial" value="NUS-NSFP-EUR, NUS-NSFP-NOE"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="san francisco rush - extreme racing (europe) (en,fr,de).bin" size="8388608" crc="78cd03c9" sha1="9339cce34d9eac2626ba14fa55f558bd7c827cc9" />
@@ -10396,7 +10396,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="sfrushu" cloneof="sfrush">
-		<description>San Francisco Rush - Extreme Racing (USA, Rev. A)</description>
+		<description>San Francisco Rush - Extreme Racing (USA, rev 1)</description>
 		<year>1997</year>
 		<publisher>Midway</publisher>
 		<info name="serial" value="NUS-NSFE-USA"/>
@@ -10414,7 +10414,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NSFE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NSFE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
@@ -10442,7 +10442,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NRUE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NRUE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="12582912">
@@ -10464,7 +10464,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="scoobyu" cloneof="scooby">
-		<description>Scooby-Doo! - Classic Creep Capers (USA, Rev. A)</description>
+		<description>Scooby-Doo! - Classic Creep Capers (USA, rev 1)</description>
 		<year>2000</year>
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="NUS-NSYE-USA"/>
@@ -10482,7 +10482,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NSYE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NSYE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
@@ -10548,7 +10548,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NSDE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NSDE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="33554432">
@@ -10625,7 +10625,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NSGE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NSGE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
@@ -10705,10 +10705,10 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="snobokid">
-		<description>Snowboard Kids (Europe)</description>
+		<description>Snowboard Kids (Australia, Europe)</description>
 		<year>1998</year>
 		<publisher>Atlus</publisher>
-		<info name="serial" value="NUS-NSKP-EUR"/>
+		<info name="serial" value="NUS-NSKP-AUS, NUS-NSKP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="snowboard kids (europe).bin" size="8388608" crc="4f2415f3" sha1="fd4ca5dc092da70996af699c8a4591faef58ec0c" />
@@ -10723,7 +10723,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NSKE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NSKE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
@@ -10751,7 +10751,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NK2E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NK2E-0]" />
 			<feature name="u2" value="U2 [BK4D-NUS]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
@@ -10805,7 +10805,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NDTE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NDTE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
@@ -10844,7 +10844,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NCYE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NCYE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -10872,7 +10872,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NPRE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NPRE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -10902,7 +10902,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NIVE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NIVE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="8388608">
@@ -10941,7 +10941,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NSVE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NSVE-0]" />
 			<feature name="u2" value="U2 [BU9850]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
@@ -10975,7 +10975,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NSLE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NSLE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="33554432">
@@ -10993,9 +10993,9 @@ patched out (+ a fix for internal checksum)
 		<info name="alt_title" value="スターフォックス64"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-01" />
-			<feature name="u1" value="NUS-NFXJ-0" />
-			<feature name="u2" value="BU9850" />
-			<feature name="u3" value="CIC-NUS-6101" />
+			<feature name="u1" value="U1 [NUS-NFXJ-0]" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6101]" />
 			<feature name="cart_model" value="NUS-006(JPN)" />
 			<feature name="cart_back_label" value="NUS-JPN" />
 			<dataarea name="rom" size="12582912">
@@ -11005,7 +11005,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="starfoxu" cloneof="lylatwar">
-		<description>Star Fox 64 (USA, Rev. A)</description>
+		<description>Star Fox 64 (USA, rev 1)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NFXE-USA"/>
@@ -11023,9 +11023,9 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NFXE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-01" /> <!-- Also with NUS-01A-02 -->
-			<feature name="u1" value="NUS-NFXE-0" />
-			<feature name="u2" value="BU9850" />
-			<feature name="u3" value="CIC-NUS-6101" />
+			<feature name="u1" value="U1 [NUS-NFXE-0]" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6101]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN" />
 			<dataarea name="rom" size="12582912">
@@ -11055,7 +11055,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NS6E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NS6E-0]" />
 			<feature name="u2" value="U2 [BK4D-NUS]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -11079,10 +11079,10 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="swrogue">
-		<description>Star Wars - Rogue Squadron (Europe, rev 1)</description>
+		<description>Star Wars - Rogue Squadron (Australia, Europe, rev 1)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NUS-NRSP-(EUR,AUS)"/>
+		<info name="serial" value="NUS-NRSP-AUS, NUS-NRSP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="star wars - rogue squadron (europe) (en,fr,de) (rev a).bin" size="16777216" crc="a6e336ce" sha1="d8b0aafc759f6bee328cc5d447250e3bc1d0905f" />
@@ -11091,15 +11091,15 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="swrogue1" cloneof="swrogue">
-		<description>Star Wars - Rogue Squadron (Europe)</description>
+		<description>Star Wars - Rogue Squadron (Australia, Europe)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NUS-NRSP-(EUR,AUS)"/>
+		<info name="serial" value="NUS-NRSP-AUS, NUS-NRSP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-NRSP-0" />
-			<feature name="u2" value="BK4D-NUS" />
-			<feature name="u3" value="CIC-NUS-7101" />
+			<feature name="u1" value="U1 [NUS-NRSP-0]" />
+			<feature name="u2" value="U2 [BK4D-NUS]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101]" />
 			<feature name="cart_model" value="NUS-006(EUR)" />
 			<dataarea name="rom" size="16777216">
 				<rom name="nus-nrsp-0.u1" size="16777216" crc="13cc4ca4" sha1="e09ff328184b25f6a9170901fac2d0a7158ce7b9" />
@@ -11108,15 +11108,15 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="swrogueu" cloneof="swrogue">
-		<description>Star Wars - Rogue Squadron (USA, Rev. A)</description>
+		<description>Star Wars - Rogue Squadron (USA, rev 1)</description>
 		<year>1998</year>
 		<publisher>LucasArts</publisher>
 		<info name="serial" value="NUS-NRSE-USA-1"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-NRSE-1" />
-			<feature name="u2" value="BU9850" />
-			<feature name="u3" value="CIC-NUS-6102A" />
+			<feature name="u1" value="U1 [NUS-NRSE-1]" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="16777216">
@@ -11138,10 +11138,10 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="swshadow">
-		<description>Star Wars - Shadows of the Empire (Europe)</description>
+		<description>Star Wars - Shadows of the Empire (Australia, Europe)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NUS-NSWP-EUR"/>
+		<info name="serial" value="NUS-NSWP-AUS, NUS-NSWP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="star wars - shadows of the empire (europe).bin" size="12582912" crc="675d15b2" sha1="c0f55dea0bb07d0a8cb25f633db3f86630b4c639" />
@@ -11167,7 +11167,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NSWE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NSWE-2]" />
 			<feature name="u2" value="U2 [BU9850]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -11183,10 +11183,10 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NSWE-USA" />
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-02A-01" />
-			<feature name="u1" value="NUS-NSWE-1 02" />
-			<feature name="u2" value="NUS-NSWE-1 12" />
-			<feature name="u3" value="BU9850" />
-			<feature name="u4" value="CIC-NUS-6102" />
+			<feature name="u1" value="U1 [NUS-NSWE-1 02]" />
+			<feature name="u2" value="U2 [NUS-NSWE-1 12]" />
+			<feature name="u3" value="U3 [BU9850]" />
+			<feature name="u4" value="U4 [CIC-NUS-6102]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN" />
 			<dataarea name="rom" size="12582912">
@@ -11203,10 +11203,10 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NSWE-USA" />
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-02A-01" />
-			<feature name="u1" value="NUS-NSWE-0 02" />
-			<feature name="u2" value="NUS-NSWE-0 12" />
-			<feature name="u3" value="BU9850" />
-			<feature name="u4" value="CIC-NUS-6102" />
+			<feature name="u1" value="U1 [NUS-NSWE-0 02]" />
+			<feature name="u2" value="U2 [NUS-NSWE-0 12]" />
+			<feature name="u3" value="U3 [BU9850]" />
+			<feature name="u4" value="U4 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
 				<rom name="nus-nswe-0 02.u1" size="8388608" crc="cfd53ca8" sha1="00191182504a864828910cb76e7652635d2f18b0" offset="0x000000" />
 				<rom name="nus-nswe-0 12.u2" size="4194304" crc="b509d2cb" sha1="bde74d9a98a9a89fab73ccbb32705e75421ff590" offset="0x800000" />
@@ -11261,7 +11261,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NNAE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NNAE-0]" />
 			<feature name="u2" value="U2 [BU9850]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="33554432">
@@ -11271,15 +11271,15 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="swracer">
-		<description>Star Wars Episode I - Racer (Europe)</description>
+		<description>Star Wars Episode I - Racer (Australia, Europe)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NUS-NEPP-(EUR,AUS)"/>
+		<info name="serial" value="NUS-NEPP-AUS, NUS-NEPP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-02" />
-			<feature name="u1" value="NUS-NEPP-0" />
-			<feature name="u2" value="BK16DA SH" />
-			<feature name="u3" value="CIC-NUS-7101" />
+			<feature name="u1" value="U1 [NUS-NEPP-0]" />
+			<feature name="u2" value="U2 [BK16DA SH]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101]" />
 			<feature name="cart_model" value="NUS-006(EUR)" />
 			<feature name="cart_back_label" value="NUS-EUR-1" />
 			<dataarea name="rom" size="33554432">
@@ -11309,9 +11309,9 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NEPE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-02" />
-			<feature name="u1" value="NUS-NEPE-0" />
-			<feature name="u2" value="BK16DA SH" />
-			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="u1" value="U1 [NUS-NEPE-0]" />
+			<feature name="u2" value="U2 [BK16DA SH]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="33554432">
@@ -11382,7 +11382,7 @@ patched out (+ a fix for internal checksum)
 		<description>Starshot - Space Circus Fever (Europe)</description>
 		<year>1998</year>
 		<publisher>Infogrames</publisher>
-		<info name="serial" value="NUS-NSCP-(FRA,SCN)"/>
+		<info name="serial" value="NUS-NSCP-FRA, NUS-NSCP-SCN"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="starshot - space circus fever (europe) (en,fr,de).bin" size="12582912" crc="171b80e1" sha1="4cccf890424728ba500db1046984edcbae280beb" />
@@ -11397,7 +11397,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NSCE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NSCE-0]" />
 			<feature name="u2" value="U2 [BK4D-NUS]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -11413,7 +11413,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NR3E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NR3E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="12582912">
@@ -11457,7 +11457,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NBWE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NBWE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
@@ -11485,12 +11485,12 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="sm64jse" cloneof="sm64">
-		<description>Super Mario 64 (Japan, Rev. A, Shindou Edition)</description>
+		<description>Super Mario 64 - Shindou Pak Taiou (Japan, rev 1)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NUS-P-NSMJ-JPN"/>
+		<info name="serial" value="NUS-NSMJ-JPN-1"/>
 		<info name="release" value="19970718"/>
-		<info name="alt_title" value="スーパーマリオ64 (振動パック対応バージョン)"/>
+		<info name="alt_title" value="スーパーマリオ64 振動パック対応, スーパーマリオ64 (振動パック対応バージョン) (box)"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="super mario 64 (japan) (rev a) (shindou edition).bin" size="8388608" crc="bc9ff5f2" sha1="2a2b85e94581545ca3c05b8f864b488b141a8a1f" />
@@ -11655,7 +11655,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NSXE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NSXE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -11694,7 +11694,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NSPE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NSPE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
@@ -11793,7 +11793,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NTAE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NTAE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -11806,7 +11806,7 @@ patched out (+ a fix for internal checksum)
 		<description>Taz Express (Europe)</description>
 		<year>2000</year>
 		<publisher>Infogrames</publisher>
-		<info name="serial" value="NUS-NTXP-(UKV,NOE)"/>
+		<info name="serial" value="NUS-NTXP-NOE, NUS-NTXP-UKV"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="taz express (europe) (en,fr,de,es,it,nl).bin" size="12582912" crc="85382541" sha1="fa61bd39f2a02bdf65fbe0b5730ff7c01f239b18" />
@@ -11875,7 +11875,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NTPE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NTPE-0]" />
 			<feature name="u2" value="U2 [BU9850]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
@@ -11891,9 +11891,9 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NL2X-UKV"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-NL2X-0" />
-			<feature name="u2" value="[empty]" />
-			<feature name="u3" value="CIC-NUS-7101A" />
+			<feature name="u1" value="U1 [NUS-NL2X-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101A]" />
 			<feature name="cart_model" value="NUS-006(EUR)" />
 			<dataarea name="rom" size="12582912">
 				<rom name="nus-nl2x-0.u1" size="12582912" crc="b5e8a1df" sha1="77baf3dd7b20c2c7faae4944d1f9d30476a25aac" />
@@ -11905,7 +11905,7 @@ clips onto the player's ear.
 		<description>Tigger's Honey Hunt (Europe)</description>
 		<year>2000</year>
 		<publisher>NewKidCo</publisher>
-		<info name="serial" value="NUS-NT9P-EUR"/>
+		<info name="serial" value="NUS-NT9P-EUR, NUS-NT9P-FRA"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="tigger's honey hunt (europe) (en,fr,de,es,it,nl,da).bin" size="16777216" crc="cf7aa5ef" sha1="92362bf5c1cf95b726fb9b05735bbeb00c0751e0" />
@@ -11920,7 +11920,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NT9E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-01" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NT9E-0]" />
 			<feature name="u2" value="U2 [29L1100KC-15B0]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -11948,7 +11948,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NTJE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NTJE-0]" />
 			<feature name="u2" value="U2 [BU9850]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="12582912">
@@ -11973,7 +11973,7 @@ clips onto the player's ear.
 		<description>Tom Clancy's Rainbow Six (France)</description>
 		<year>1999</year>
 		<publisher>Red Storm Entertainment</publisher>
-		<info name="serial" value="NUS-NR6F-FAH"/>
+		<info name="serial" value="NUS-NR6F-FRA"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="tom clancy's rainbow six (france).bin" size="16777216" crc="31bc7b49" sha1="ed7356fb54fb6f24eaf76bec971c5dad72252e74" />
@@ -12000,7 +12000,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NR6E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NR6E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -12039,7 +12039,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NTTE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NTTE-1]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -12049,7 +12049,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="thpsu" cloneof="thps">
-		<description>Tony Hawk's Pro Skater (USA, Rev. A)</description>
+		<description>Tony Hawk's Pro Skater (USA, rev 1)</description>
 		<year>2000</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="NUS-NTFE-USA"/>
@@ -12067,7 +12067,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NTFE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NTFE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="12582912">
@@ -12082,8 +12082,12 @@ clips onto the player's ear.
 		<publisher>Activision</publisher>
 		<info name="serial" value="NUS-NTQP-EUR"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-03" />
+			<feature name="u1" value="U1 [NUS-NTQP-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101A]" />
 			<dataarea name="rom" size="16777216">
-				<rom name="tony hawk's pro skater 2 (europe).bin" size="16777216" crc="dc703b1e" sha1="28b9c785bdc0a54f1675d6180a092c300f514633" />
+				<rom name="nus-ntqp-0.u1.bin" size="16777216" crc="dc703b1e" sha1="28b9c785bdc0a54f1675d6180a092c300f514633" />
 			</dataarea>
 		</part>
 	</software>
@@ -12095,7 +12099,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NTQE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NTQE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -12111,7 +12115,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-N3TE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-N3TE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -12121,10 +12125,10 @@ clips onto the player's ear.
 	</software>
 
 	<software name="thps">
-		<description>Tony Hawk's Skateboarding (Europe)</description>
+		<description>Tony Hawk's Skateboarding (Australia, Europe)</description>
 		<year>2002</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="NUS-NTFP-(NOE,UKV)"/>
+		<info name="serial" value="NUS-NTFP-AUS, NUS-NTFP-NOE, NUS-NTFP-UKV"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="tony hawk's skateboarding (europe).bin" size="12582912" crc="93a26129" sha1="9dc473f35cea9ba531590de833ebf32e25a6a9d1" />
@@ -12147,7 +12151,7 @@ clips onto the player's ear.
 		<description>Top Gear Hyper-Bike (Europe)</description>
 		<year>2000</year>
 		<publisher>Kemco</publisher>
-		<info name="serial" value="NUS-NGBP-(EUR,EUU)"/>
+		<info name="serial" value="NUS-NGBP-EUR, NUS-NGBP-EUU"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="top gear hyper-bike (europe).bin" size="16777216" crc="dc687ad1" sha1="29573e3a4016adcdfd2ee318d7700ad423eb369f" />
@@ -12176,7 +12180,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NGBE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NGBE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -12200,7 +12204,7 @@ clips onto the player's ear.
 		<description>Top Gear Overdrive (Europe)</description>
 		<year>1998</year>
 		<publisher>Kemco</publisher>
-		<info name="serial" value="NUS-NRCP-(EUR,NOE)"/>
+		<info name="serial" value="NUS-NRCP-EUR, NUS-NRCP-NOE"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="top gear overdrive (europe).bin" size="12582912" crc="52d39097" sha1="37013dffc9e8a61f3b40eb100133cd40f2ae523d" />
@@ -12229,7 +12233,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NRCE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NRCE-0]" />
 			<feature name="u2" value="U2 [BK4D-NUS]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -12271,7 +12275,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NGRE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NGRE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
@@ -12302,7 +12306,7 @@ clips onto the player's ear.
 		<description>Top Gear Rally 2 (Europe)</description>
 		<year>1999</year>
 		<publisher>Kemco</publisher>
-		<info name="serial" value="NUS-NL2P-(EUR,EUU)"/>
+		<info name="serial" value="NUS-NL2P-EUR, NUS-NL2P-EUU"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="top gear rally 2 (europe).bin" size="12582912" crc="88c8a6ea" sha1="cdeba42c305995a7fb66b26c8daf4e135152abec" />
@@ -12331,7 +12335,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NL2E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NL2E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="12582912">
@@ -12376,15 +12380,15 @@ clips onto the player's ear.
 	</software>
 
 	<software name="toystor2g" cloneof="toystor2">
-		<description>Toy Story 2 (Germany, Rev. A)</description>
+		<description>Toy Story 2 (Germany, rev 1)</description>
 		<year>1999</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="NUS-NTHD-NOE"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-NTHD-1" />
-			<feature name="u2" value="[empty]" />
-			<feature name="u3" value="CIC-NUS-7101A" />
+			<feature name="u1" value="U1 [NUS-NTHD-1]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101A]" />
 			<feature name="cart_model" value="NUS-006(EUR)" />
 			<dataarea name="rom" size="12582912">
 				<rom name="nus-nthd-1.u1" size="12582912" crc="1878086f" sha1="9786f138231509156bf23b1e9f1c327acec89b41" />
@@ -12411,9 +12415,9 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NTHE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" /> <!-- Also with NUS-01A-03 -->
-			<feature name="u1" value="NUS-NTHD-1" />
-			<feature name="u2" value="[empty]" />
-			<feature name="u3" value="CIC-NUS-6102A" />
+			<feature name="u1" value="U1 [NUS-NTHE-1]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<dataarea name="rom" size="12582912">
 				<rom name="nus-nthe-1.u1" size="12582912" crc="a11f0f8e" sha1="e0cd3699fd9f5443d3dfa2333726eaea724d892d" />
@@ -12454,7 +12458,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NOHE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NOHE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
@@ -12470,7 +12474,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-N3PE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-N3PE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
@@ -12494,7 +12498,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="turok">
-		<description>Turok - Dinosaur Hunter (Europe, Rev. B)</description>
+		<description>Turok - Dinosaur Hunter (Europe, rev 2)</description>
 		<year>1997</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NUS-NTUP-EUR-1"/>
@@ -12506,7 +12510,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="turoka" cloneof="turok">
-		<description>Turok - Dinosaur Hunter (Europe, Rev. A)</description>
+		<description>Turok - Dinosaur Hunter (Europe, rev 1)</description>
 		<year>1997</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NUS-NTUP-EUR"/>
@@ -12581,7 +12585,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="turoku" cloneof="turok">
-		<description>Turok - Dinosaur Hunter (USA, Rev. B)</description>
+		<description>Turok - Dinosaur Hunter (USA, rev 2)</description>
 		<year>1997</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NUS-NTUE-USA"/>
@@ -12611,9 +12615,9 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NTUE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-01" />
-			<feature name="u1" value="NUS-NTUE-0" />
-			<feature name="u2" value="[empty]" />
-			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="u1" value="U1 [NUS-NTUE-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<dataarea name="rom" size="8388608">
 				<rom name="nus-ntue-0.u1" size="8388608" crc="777d75e6" sha1="8a5d29e062f6893af4e817b90afd5f941968df6d" />
@@ -12625,23 +12629,24 @@ clips onto the player's ear.
 		<description>Turok - Legenden des Verlorenen Landes (Germany)</description>
 		<year>1999</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="NUS-NRWD-NOE"/>
+		<info name="serial" value="NUS-NRWD-NOE (CRT64192.03-GER)"/>
 		<info name="release" value="19991226"/>
-		<info name="alt_title" value="Turok - Rage Wars (Cart)"/>
+		<info name="alt_title" value="Turok - Rage Wars (cart)"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb_model" value="NUS-01A-02" />
-			<feature name="u1" value="U1" /> <!-- ROM -->
-			<feature name="u2" value="U2" /> <!-- empty socket -->
-			<feature name="u3" value="U3" /> <!-- CIC -->
+			<feature name="u1" value="U1 [NUS-NRWD-0]" /> 
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101A]" /> 
+			<feature name="cart_model" value="NUS-006(EUR)" />
 			<feature name="cart_back_label" value="NUS-EUR-1" />
 			<dataarea name="rom" size="8388608">
-				<rom name="NUS-NRWD-0.u1" size="8388608" crc="a2754ca4" sha1="51792351f4fd61c11f4b3b755a5eb8b9ea725b72" />
+				<rom name="nus-nrwd-0.u1" size="8388608" crc="a2754ca4" sha1="51792351f4fd61c11f4b3b755a5eb8b9ea725b72" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="turokrag">
-		<description>Turok - Rage Wars (Europe)</description>
+		<description>Turok - Rage Wars (Europe, English / French / Italian)</description>
 		<year>1999</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NUS-NRWX-EUR"/>
@@ -12653,7 +12658,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="turokrag1" cloneof="turokrag">
-		<description>Turok - Rage Wars (Europe, Alt)</description>
+		<description>Turok - Rage Wars (Europe, English)</description>
 		<year>1999</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NUS-NRWP-UKV"/>
@@ -12671,9 +12676,10 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NRWE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NRWE-1]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
+			<feature name="cart_model" value="NUS-006(USA)" />
 			<dataarea name="rom" size="8388608">
 				<rom name="nus-nrwe-1.u1" size="8388608" crc="282319a0" sha1="c94f093486f2ba2030f077254d0b6ce26372e684" />
 			</dataarea>
@@ -12686,8 +12692,13 @@ clips onto the player's ear.
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NUS-NRWE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NRWE-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
+			<feature name="cart_model" value="NUS-006(USA)" />
 			<dataarea name="rom" size="8388608">
-				<rom name="turok - rage wars (usa).bin" size="8388608" crc="416474d8" sha1="11c2dd51ffcecc5d8134cec96ffcf9c44b15db48" />
+				<rom name="nus-nrwe-0.u1" size="8388608" crc="416474d8" sha1="11c2dd51ffcecc5d8134cec96ffcf9c44b15db48" />
 			</dataarea>
 		</part>
 	</software>
@@ -12699,9 +12710,9 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NTYP-UKV"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-NTYP-0" />
-			<feature name="u2" value="[empty]" />
-			<feature name="u3" value="CIC-NUS-7101" />
+			<feature name="u1" value="U1 [NUS-NTYP-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101]" />
 			<feature name="cart_model" value="NUS-006(EUR)" />
 			<feature name="cart_back_label" value="NUS-EUR-1" />
 			<dataarea name="rom" size="12582912">
@@ -12711,10 +12722,10 @@ clips onto the player's ear.
 	</software>
 
 	<software name="turok2">
-		<description>Turok 2 - Seeds of Evil (Europe)</description>
+		<description>Turok 2 - Seeds of Evil (Europe, English)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="NUS-NT2P-(EUR/NKV)" />
+		<info name="serial" value="NUS-NT2P-EUR, NUS-NT2P-UKV" />
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="turok 2 - seeds of evil (europe).bin" size="33554432" crc="9791b9cf" sha1="54fd5142f25a5fa058bdd2eb9f47ee1dfdd93b10" />
@@ -12723,7 +12734,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="turok2a" cloneof="turok2">
-		<description>Turok 2 - Seeds of Evil (Europe, Alt)</description>
+		<description>Turok 2 - Seeds of Evil (Europe, English / French / Spanish / Italian)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NUS-NT2X-EUR" />
@@ -12856,7 +12867,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NTKE-USA" />
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NTKE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="33554432">
@@ -12869,7 +12880,7 @@ clips onto the player's ear.
 		<description>Twisted Edge - Extreme Snowboarding (Europe)</description>
 		<year>1998</year>
 		<publisher>Kemco</publisher>
-		<info name="serial" value="NUS-NSBP-(NOE,UKV)" />
+		<info name="serial" value="NUS-NSBP-HOL, NUS-NSBP-NOE, NUS-NSBP-UKV" />
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="twisted edge - extreme snowboarding (europe).bin" size="12582912" crc="394bdd25" sha1="e5bae263e692121a080308e6fdb2e42d20b1b347" />
@@ -12884,7 +12895,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NSBE-USA" />
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NSBE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -12911,7 +12922,7 @@ clips onto the player's ear.
 		<description>V-Rally Edition 99 (Europe)</description>
 		<year>1998</year>
 		<publisher>Infogrames</publisher>
-		<info name="serial" value="NUS-NVLP-(EUU,EUR)" />
+		<info name="serial" value="NUS-NVLP-EUR, NUS-NVLP-EUU" />
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="v-rally edition 99 (europe) (en,fr,de).bin" size="12582912" crc="d200f779" sha1="d55b29cee570d6bd7e8b5a4f817d987a8c08b32e" />
@@ -12992,9 +13003,9 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NV8E-USA" />
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-02" />
-			<feature name="u1" value="NUS-NV8E-0" />
-			<feature name="u2" value="[empty]" />
-			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="u1" value="U1 [NUS-NV8E-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="8388608">
@@ -13007,7 +13018,7 @@ clips onto the player's ear.
 		<description>Vigilante 8 - 2nd Offense (Europe)</description>
 		<year>2000</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="NUS-NVGP-(UKV,NOE,FRA)" />
+		<info name="serial" value="NUS-NVGP-FRA, NUS-NVGP-NOE, NUS-NVGP-UKV" />
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="vigilante 8 - 2nd offense (europe).bin" size="12582912" crc="763d501e" sha1="ad3f8cc2e2ead6e713621e25f5f6f02534a81ad5" />
@@ -13022,7 +13033,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NVGE-USA" />
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NVGE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="12582912">
@@ -13064,7 +13075,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NVCE-USA" />
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NVCE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="4194304">
@@ -13092,7 +13103,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NVRE-USA" />
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NVRE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="4194304">
@@ -13123,8 +13134,14 @@ clips onto the player's ear.
 		<info name="release" value="19971219"/>
 		<info name="alt_title" value="バーチャル・プロレスリング64"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-03A-01" />
+			<feature name="u1" value="U1 [NUS-NVPJ-0]" />
+			<feature name="u2" value="U2 [LH52V246]" />
+			<feature name="u3" value="U3 [BU9803A]" />
+			<feature name="u4" value="U4 [CIC-NUS-6102]" />
+			<feature name="bt1" value="BT1 [CR2032]" />
 			<dataarea name="rom" size="16777216">
-				<rom name="virtual pro wrestling 64 (japan).bin" size="16777216" crc="2b4b9bef" sha1="a98df45b6fdeb368fb906a2a1fb257658739cefe" />
+				<rom name="nus-nvpj-0.u1" size="16777216" crc="2b4b9bef" sha1="a98df45b6fdeb368fb906a2a1fb257658739cefe" />
 			</dataarea>
 		</part>
 	</software>
@@ -13154,7 +13171,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="waialaeu" cloneof="waialae">
-		<description>Waialae Country Club - True Golf Classics (USA, Rev. A)</description>
+		<description>Waialae Country Club - True Golf Classics (USA, rev 1)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NWLE-USA"/>
@@ -13202,7 +13219,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NWAE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-01" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NWAE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -13224,7 +13241,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="waveracej" cloneof="waverace">
-		<description>Wave Race 64 (Japan, Rev. A)</description>
+		<description>Wave Race 64 (Japan, rev 1)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NWRJ-JPN"/>
@@ -13238,12 +13255,12 @@ clips onto the player's ear.
 	</software>
 
 	<software name="waveracej1" cloneof="waverace">
-		<description>Wave Race 64 (Japan, Rev. B, Shindou Edition)</description>
+		<description>Wave Race 64 - Shindou Pak Taiou (Japan, rev 2)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NWRJ-JPN"/>
 		<info name="release" value="19970718"/>
-		<info name="alt_title" value="ウエーブレース64 (振動パック対応バージョン)"/>
+		<info name="alt_title" value="ウエーブレース64 振動パック対応, ウエーブレース64 (振動パック対応バージョン) (box)"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="wave race 64 (japan) (rev b) (shindou edition).bin" size="8388608" crc="d3610a02" sha1="443e3c3476568de9c36582184104f2dd09b59407" />
@@ -13266,15 +13283,15 @@ clips onto the player's ear.
 	</software>
 
 	<software name="waveraceu" cloneof="waverace">
-		<description>Wave Race 64 (USA, Rev. A)</description>
+		<description>Wave Race 64 (USA, rev 1)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NWRE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-01" /> <!-- Also with NUS-01A-02 -->
-			<feature name="u1" value="NUS-NWRE-1" />
-			<feature name="u2" value="BU9850" />
-			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="u1" value="U1 [NUS-NWRE-1]" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<dataarea name="rom" size="8388608">
 				<rom name="nus-nwre-1.u1" size="8388608" crc="dd2bb7b6" sha1="d37f82b15669502487b3e5790e76e3ed33ef9831" />
@@ -13298,7 +13315,7 @@ clips onto the player's ear.
 		<description>Wayne Gretzky's 3D Hockey '98 (Europe)</description>
 		<year>1997</year>
 		<publisher>Midway</publisher>
-		<info name="serial" value="NUS-NW8P-(UKV,NOE,FRA)"/>
+		<info name="serial" value="NUS-NW8P-FRA, NUS-NW8P-NOE, NUS-NW8P-UKV"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="wayne gretzky's 3d hockey '98 (europe) (en,fr,de,es).bin" size="8388608" crc="53751331" sha1="2f1462118b4aff3ded4ae5afd3952f2189b43a27" />
@@ -13313,7 +13330,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NW8E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NW8E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
@@ -13367,7 +13384,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NWGE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-01" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NWGE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="8388608">
@@ -13383,7 +13400,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NWVE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-03" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NWVE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="33554432">
@@ -13411,7 +13428,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NWME-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NWME-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -13427,7 +13444,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NW3E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NW3E-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -13515,11 +13532,11 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NW2E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-03A-01" />
-			<feature name="u1" value="NUS-NW2E-0" />
-			<feature name="u2" value="LH52V246A" />
-			<feature name="u3" value="74LV2416" />
-			<feature name="u4" value="CIC-NUS-6102" />
-			<feature name="bt1" value="CR2032" />
+			<feature name="u1" value="U1 [NUS-NW2E-0]" />
+			<feature name="u2" value="U2 [LH52V246A]" />
+			<feature name="u3" value="U3 [74LV2416]" />
+			<feature name="u4" value="U4 [CIC-NUS-6102]" />
+			<feature name="bt1" value="BT1 [CR2032]" />
 			<feature name="cart_model" value="NUS-006(-01)(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="16777216">
@@ -13561,9 +13578,9 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NWTE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-NWTE-0" />
-			<feature name="u2" value="[empty]" />
-			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="u1" value="U1 [NUS-NWTE-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="8388608">
@@ -13579,7 +13596,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NWFE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NWFE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="4194304">
@@ -13730,8 +13747,13 @@ clips onto the player's ear.
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="NUS-N8WP-UKV"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-N8WP-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101]" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
 			<dataarea name="rom" size="12582912">
-				<rom name="world cup 98 (europe) (en,fr,de,es,it,nl,sv,da).bin" size="12582912" crc="163481d0" sha1="5e115692c924ccd0ca6afa4c4777077f97a7d9c2" />
+				<rom name="nus-n8wp-0.u1" size="12582912" crc="163481d0" sha1="5e115692c924ccd0ca6afa4c4777077f97a7d9c2" />
 			</dataarea>
 		</part>
 	</software>

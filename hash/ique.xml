@@ -263,4 +263,214 @@
         </part>
     </software>
 
+    <software name="zeldaoot1" cloneof="zeldaoot" supported="no">
+        <description>Sàiěrdá Chuánshuō: Shíguāng zhī Dí (version 1)</description>
+        <year>2003</year>
+        <publisher>Nintendo</publisher>
+        <info name="serial" value="21061" />
+        <info name="alt_title" value="塞尔达传说 时光之笛" />
+        <info name="release" value="20031117" />
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="29868032">
+                <rom name="2106101.bin" size="29868032" crc="955079bb" sha1="770e21955d043ac7f277eb0ba67a8e1b462800b3" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="zeldaoot" supported="no">
+        <description>Sàiěrdá Chuánshuō: Shíguāng zhī Dí (version 4)</description>
+        <year>2003</year>
+        <publisher>Nintendo</publisher>
+        <info name="serial" value="21011" />
+        <info name="alt_title" value="塞尔达传说 时光之笛" />
+        <info name="release" value="20031117" />
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="29868032">
+                <rom name="2101104.bin" size="29868032" crc="45baa341" sha1="47bad44eb197b619fa7eb534f763267cf4437b08" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="zeldaoott" cloneof="zeldaoot" supported="no">
+        <description>Sàiěrdá Chuánshuō: Shíguāng zhī Dí (trailer)</description>
+        <year>2003</year>
+        <publisher>Nintendo</publisher>
+        <info name="serial" value="240000" />
+        <info name="alt_title" value="塞尔达传说 时光之笛" />
+        <info name="release" value="20031117" />
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="11813196">
+                <rom name="24000001.bin" size="11813196" crc="66e55dde" sha1="84d12d53676dfb7bd7783148b802331017093863" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="zeldaootm2" cloneof="zeldaoot" supported="no">
+        <description>Sàiěrdá Chuánshuō: Shíguāng zhī Dí (manual, version 2)</description>
+        <year>2003</year>
+        <publisher>Nintendo</publisher>
+        <info name="serial" value="21019" />
+        <info name="alt_title" value="塞尔达传说 时光之笛" />
+        <info name="release" value="20031117" />
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="278528">
+                <rom name="2101902.bin" size="278528" crc="e1e4940d" sha1="d2c97bf8ed7e30c5112c5c0e1e585052562ad4b3" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="zeldaootm4" cloneof="zeldaoot" supported="no">
+        <description>Sàiěrdá Chuánshuō: Shíguāng zhī Dí (manual, version 4)</description>
+        <year>2003</year>
+        <publisher>Nintendo</publisher>
+        <info name="serial" value="21019" />
+        <info name="alt_title" value="塞尔达传说 时光之笛" />
+        <info name="release" value="20031117" />
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="425984">
+                <rom name="2101904.bin" size="425984" crc="e50a4c5c" sha1="d13c93a6cea784304a2bd148040deb4a65c92cf6" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="smique" supported="no">
+        <description>Shén Yóu Mǎlìōu (version 4)</description>
+        <year>2003</year>
+        <publisher>Nintendo</publisher>
+        <info name="serial" value="11011" />
+        <info name="alt_title" value="神游马力欧" />
+        <info name="release" value="20031117" />
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="8060928">
+                <rom name="1101104.bin" size="8060928" crc="47dbf0d2" sha1="0891c8118466413ab0130a4e6a2c79cd5c684e64" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="smiquet1" cloneof="smique" supported="no">
+        <description>Shén Yóu Mǎlìōu (trailer, version 1)</description>
+        <year>2003</year>
+        <publisher>Nintendo</publisher>
+        <info name="serial" value="200000" />
+        <info name="alt_title" value="神游马力欧" />
+        <info name="release" value="20031117" />
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="9742586">
+                <rom name="20000001.bin" size="9742586" crc="db8f2d64" sha1="a1b8b047e153868d459f365da288466edf08bfae" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="smiquet2" cloneof="smique" supported="no">
+        <description>Shén Yóu Mǎlìōu (trailer, version 2)</description>
+        <year>2003</year>
+        <publisher>Nintendo</publisher>
+        <info name="serial" value="200000" />
+        <info name="alt_title" value="神游马力欧" />
+        <info name="release" value="20031117" />
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="12466444">
+                <rom name="20000002.bin" size="12466444" crc="81174c45" sha1="73768135f786e295975dc22283d642754151c201" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="smiquem2" cloneof="smique" supported="no">
+        <description>Shén Yóu Mǎlìōu (manual, version 2)</description>
+        <year>2003</year>
+        <publisher>Nintendo</publisher>
+        <info name="serial" value="11019" />
+        <info name="alt_title" value="神游马力欧" />
+        <info name="release" value="20031117" />
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="212992">
+                <rom name="1101902.bin" size="212992" crc="ffe7f77e" sha1="84d89fc95ec39ffafff1ee38c507b0dd31637a88" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="smiquem6" cloneof="smique" supported="no">
+        <description>Shén Yóu Mǎlìōu (manual, version 6)</description>
+        <year>2003</year>
+        <publisher>Nintendo</publisher>
+        <info name="serial" value="11019" />
+        <info name="alt_title" value="神游马力欧" />
+        <info name="release" value="20031117" />
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="409600">
+                <rom name="1101906.bin" size="409600" crc="12e05e8f" sha1="d784cefd9ebebe005625d405a643d0efa5322d57" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="waverace" supported="no">
+        <description>Shuǐ Shàng Mótuō (version 4)</description>
+        <year>2003</year>
+        <publisher>Nintendo</publisher>
+        <info name="serial" value="51011" />
+        <info name="alt_title" value="水上摩托" />
+        <info name="release" value="20031117" />
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="8159232">
+                <rom name="5101104.bin" size="8159232" crc="4b4963bb" sha1="c77dd1c861fe335eb8d72bcb1a3eec1bf227b5fc" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="waveracet1" cloneof="waverace" supported="no">
+        <description>Shuǐ Shàng Mótuō (trailer, version 1)</description>
+        <year>2003</year>
+        <publisher>Nintendo</publisher>
+        <info name="serial" value="210000" />
+        <info name="alt_title" value="水上摩托" />
+        <info name="release" value="20031117" />
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="10017052">
+                <rom name="21000001.bin" size="10017052" crc="cfbbce90" sha1="4bbe3e42cd1edb332c7517ce4600b28820ad5a8f" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="waveracet2" cloneof="waverace" supported="no">
+        <description>Shuǐ Shàng Mótuō (trailer, version 2)</description>
+        <year>2003</year>
+        <publisher>Nintendo</publisher>
+        <info name="serial" value="210000" />
+        <info name="alt_title" value="水上摩托" />
+        <info name="release" value="20031117" />
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="12198546">
+                <rom name="21000002.bin" size="12198546" crc="95f1990b" sha1="0758ad464197138f37e236fb76ee6d2b0d7943c8" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="waveracem2" cloneof="waverace" supported="no">
+        <description>Shuǐ Shàng Mótuō (manual, version 2)</description>
+        <year>2003</year>
+        <publisher>Nintendo</publisher>
+        <info name="serial" value="51019" />
+        <info name="alt_title" value="水上摩托" />
+        <info name="release" value="20031117" />
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="311296">
+                <rom name="5101902.bin" size="311296" crc="4e3a7574" sha1="c731962c2989d082e016f2ddb194a01ebc084692" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="waveracem4" cloneof="waverace" supported="no">
+        <description>Shuǐ Shàng Mótuō (manual, version 4)</description>
+        <year>2003</year>
+        <publisher>Nintendo</publisher>
+        <info name="serial" value="51019" />
+        <info name="alt_title" value="水上摩托" />
+        <info name="release" value="20031117" />
+        <part name="cart" interface="ique_cart">
+            <dataarea name="rom" size="491520">
+                <rom name="5101904.bin" size="491520" crc="2d1444e6" sha1="7c484eddac6c935089f15d19becb9d37fe97632d" />
+            </dataarea>
+        </part>
+    </software>
+
 </softwarelist>
