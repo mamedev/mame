@@ -23,6 +23,9 @@
 #define VCVS(name)                                                            \
 		NET_REGISTER_DEV(VCVS, name)
 
+#define CCVS(name)                                                            \
+		NET_REGISTER_DEV(CCVS, name)
+
 #define LVCCS(name)                                                           \
 		NET_REGISTER_DEV(LVCCS, name)
 

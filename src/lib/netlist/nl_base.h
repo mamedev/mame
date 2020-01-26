@@ -62,10 +62,17 @@ class NETLIB_NAME(name) : public device_t
 	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring &name) \
 	: NETLIB_NAME(pclass)(owner, name)
 
+// FIXME: Only used by diode
 #define NETLIB_CONSTRUCTOR_DERIVED_EX(cname, pclass, ...)                      \
 	private: detail::family_setter_t m_famsetter;                              \
 	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring &name, __VA_ARGS__) \
 	: NETLIB_NAME(pclass)(owner, name)
+
+#define NETLIB_CONSTRUCTOR_DERIVED_PASS(cname, pclass, ...)                      \
+	private: detail::family_setter_t m_famsetter;                              \
+	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring &name) \
+	: NETLIB_NAME(pclass)(owner, name, __VA_ARGS__)
+
 
 /// \brief Used to define the constructor of a netlist device.
 ///  Use this to define the constructor of a netlist device. Please refer to
