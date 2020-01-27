@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, David Haywood
 
-/* 'Zone' systems */
+/* Siatronics/KenSingTon/JungleSoft Vii */
 
 #include "includes/spg2xx.h"
 #include "bus/generic/slot.h"
