@@ -187,9 +187,9 @@ public:
 
 		m_sys->set_alt_timer();
 
-	//	m_gpio->read_0_callback().set(FUNC(elan_eu3a05_buzztime_state::rrrand_r));
-		m_gpio->read_1_callback().set(FUNC(elan_eu3a05_buzztime_state::rrrand_r));
-		m_gpio->read_2_callback().set(FUNC(elan_eu3a05_buzztime_state::rrrand_r));
+		m_gpio->read_0_callback().set(FUNC(elan_eu3a05_buzztime_state::random_r)); // I/O lives in here
+	//	m_gpio->read_1_callback().set(FUNC(elan_eu3a05_buzztime_state::random_r)); // nothing of note
+	//	m_gpio->read_2_callback().set(FUNC(elan_eu3a05_buzztime_state::random_r)); // nothing of note
 
 		GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "buzztime_cart");
 		m_cart->set_width(GENERIC_ROM16_WIDTH);
@@ -214,7 +214,7 @@ protected:
 	}
 
 private:
-	DECLARE_READ8_MEMBER(rrrand_r) { return machine().rand(); }
+	DECLARE_READ8_MEMBER(random_r) { return machine().rand(); }
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load)
 	{
