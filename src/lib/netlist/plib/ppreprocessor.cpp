@@ -56,7 +56,7 @@ namespace plib {
 		pstring e = plib::pfmt("{1}:{2}:0: error: {3}\n")
 				(m_stack.back().m_name, m_stack.back().m_lineno, err);
 		m_stack.pop_back();
-		while (m_stack.size() > 0)
+		while (!m_stack.empty())
 		{
 			if (m_stack.size() == 1)
 				trail = trail_first;
@@ -236,38 +236,51 @@ namespace plib {
 				tmpret.push_back(s);
 			}
 			else
-				if (!remove_ws || (tmp[pi] != " " && tmp[pi] != "\t"))
-					tmpret.push_back(tmp[pi]);
+			{
+				pstring tok=tmp[pi];
+				if (tok.size() >= 2 && pi < tmp.size() - 2 )
+				{
+					auto sc=tok.substr(0,1);
+					auto ec=tok.substr(tok.size()-1, 1);
+					if ((sc == "." || (sc>="0" && sc<="9")) && (ec=="e" || ec=="E"))
+					{
+						// looks like an incomplete float due splitting by - or +
+						tok = tok + tmp[pi+1] + tmp[pi+2];
+						pi += 2;
+					}
+				}
+				if (!remove_ws || (tok != " " && tok != "\t"))
+					tmpret.push_back(tok);
+			}
 			pi++;
 		}
+
 		if (!concat)
 			return tmpret;
-		else
+
+		// FIXME: error if concat at beginning or end
+		string_list ret;
+		pi = 0;
+		while (pi<tmpret.size())
 		{
-			// FIXME: error if concat at beginning or end
-			string_list ret;
-			pi = 0;
-			while (pi<tmpret.size())
+			if (tmpret[pi] == "##")
 			{
-				if (tmpret[pi] == "##")
-				{
-					while (ret.back() == " " || ret.back() == "\t")
-						ret.pop_back();
-					pstring cc = ret.back();
+				while (ret.back() == " " || ret.back() == "\t")
 					ret.pop_back();
-					pi++;
-					while (pi < tmpret.size() && (tmpret[pi] == " " || tmpret[pi] == "\t"))
-						pi++;
-					if (pi == tmpret.size())
-						error("## found at end of sequence");
-					ret.push_back(cc + tmpret[pi]);
-				}
-				else
-					ret.push_back(tmpret[pi]);
+				pstring cc = ret.back();
+				ret.pop_back();
 				pi++;
+				while (pi < tmpret.size() && (tmpret[pi] == " " || tmpret[pi] == "\t"))
+					pi++;
+				if (pi == tmpret.size())
+					error("## found at end of sequence");
+				ret.push_back(cc + tmpret[pi]);
 			}
-			return ret;
+			else
+				ret.push_back(tmpret[pi]);
+			pi++;
 		}
+		return ret;
 	}
 
 	bool ppreprocessor::is_valid_token(const pstring &str)

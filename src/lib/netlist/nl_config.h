@@ -10,6 +10,9 @@
 #include "plib/pconfig.h"
 #include "plib/pexception.h"
 
+// FIXME: Remove this again after testing
+#define USE_EVAL (0)
+
 ///
 /// \brief Version - Major.
 ///

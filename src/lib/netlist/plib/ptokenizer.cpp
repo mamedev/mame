@@ -292,7 +292,7 @@ namespace plib {
 		pstring e = plib::pfmt("{1}:{2}:0: error: {3}\n")
 				(m_source_location.back().file_name(), m_source_location.back().line(), errs());
 		m_source_location.pop_back();
-		while (m_source_location.size() > 0)
+		while (!m_source_location.empty())
 		{
 			if (m_source_location.size() == 1)
 				trail = trail_first;

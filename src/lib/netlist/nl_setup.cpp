@@ -1150,7 +1150,6 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 
 	auto ret = plib::make_unique<logic_family_std_proxy_t>();
 
-	ret->m_fixed_V = m_models.value(model, "FV");
 	ret->m_low_thresh_PCNT = m_models.value(model, "IVL");
 	ret->m_high_thresh_PCNT = m_models.value(model, "IVH");
 	ret->m_low_VO = m_models.value(model, "OVL");

@@ -485,18 +485,18 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				}
 				else
 				{
-					int sce(4);
-					int scoeff(5 + n);
-					if ((tt.size() != 5 + 2 * n) || (tt[scoeff-1] != "0"))
+					unsigned sce(4);
+					auto scoeff(static_cast<unsigned>(5 + n));
+					if ((tt.size() != 5 + 2 * static_cast<unsigned>(n)) || (tt[scoeff-1] != "0"))
 					{
 						out("// IGNORED {}: {}\n", tt[0].c_str(), line.c_str());
 						break;
 					}
 					pstring lastnet = tt[1];
-					for (int i=0; i<n; i++)
+					for (std::size_t i=0; i < static_cast<std::size_t>(n); i++)
 					{
 						pstring devname = tt[0] + plib::pfmt("{}")(i);
-						pstring nextnet = (i<n-1) ? tt[1] + "a" + plib::pfmt("{}")(i) : tt[2];
+						pstring nextnet = (i<static_cast<std::size_t>(n)-1) ? tt[1] + "a" + plib::pfmt("{}")(i) : tt[2];
 						auto net2 = plib::psplit(plib::replace_all(plib::replace_all(tt[sce+i],")",""),"(",""),",");
 						add_device("VCVS", devname);
 						add_term(lastnet, devname, 0);
@@ -519,8 +519,8 @@ void nl_convert_spice_t::process_line(const pstring &line)
 			case 'F':
 				{
 					auto n=npoly(tt[3]);
-					int sce(4);
-					int scoeff(5 + n);
+					unsigned sce(4);
+					unsigned scoeff(5 + static_cast<unsigned>(n));
 					if (n<0)
 					{
 						sce = 3;
@@ -529,13 +529,13 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					}
 					else
 					{
-						if ((tt.size() != 5 + 2 * n) || (tt[scoeff-1] != "0"))
+						if ((tt.size() != 5 + 2 *  static_cast<unsigned>(n)) || (tt[scoeff-1] != "0"))
 						{
 							out("// IGNORED {}: {}\n", tt[0].c_str(), line.c_str());
 							break;
 						}
 					}
-					for (int i=0; i<n; i++)
+					for (std::size_t i=0; i < static_cast<std::size_t>(n); i++)
 					{
 						pstring devname = tt[0] + plib::pfmt("{}")(i);
 						add_device("CCCS", devname);

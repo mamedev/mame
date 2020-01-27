@@ -291,7 +291,7 @@ namespace devices
 			// process all terminals connected to this net
 			for (auto &term : n.core_terms())
 			{
-				netlist.log().verbose("Term {} {}", term->name(), (int) term->type());
+				netlist.log().verbose("Term {} {}", term->name(), static_cast<int>(term->type()));
 				// only process analog terminals
 				if (term->is_type(detail::terminal_type::TERMINAL))
 				{

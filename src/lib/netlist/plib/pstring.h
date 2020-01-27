@@ -186,8 +186,8 @@ public:
 	pstring_t& operator+=(const pstring_t &string) { m_str.append(string.m_str); return *this; }
 	pstring_t& operator+=(const code_t c) { traits_type::encode(c, m_str); return *this; }
 	friend pstring_t operator+(const pstring_t &lhs, const pstring_t &rhs) { return pstring_t(lhs) += rhs; }
-	friend pstring_t operator+(const pstring_t &lhs, const code_t rhs) { return pstring_t(lhs) += rhs; }
-	friend pstring_t operator+(const code_t lhs, const pstring_t &rhs) { return pstring_t(1, lhs) += rhs; }
+	friend pstring_t operator+(const pstring_t &lhs, code_t rhs) { return pstring_t(lhs) += rhs; }
+	friend pstring_t operator+(code_t lhs, const pstring_t &rhs) { return pstring_t(1, lhs) += rhs; }
 
 	// comparison operators
 	bool operator==(const pstring_t &string) const noexcept { return (compare(string) == 0); }

@@ -218,8 +218,24 @@ public:
 		for (auto & r : roms)
 			setup().register_source(plib::make_unique<netlist_data_folder_t>(r));
 
+#if 0
 		using a = plib::psource_str_t<plib::psource_t>;
+#if USE_EVAL
+		const pstring content =
+		"#define RES_R(res) (res)            \n"
+		"#define RES_K(res) ((res) * 1e3)    \n"
+		"#define RES_M(res) ((res) * 1e6)    \n"
+		"#define CAP_U(cap) ((cap) * 1e-6)   \n"
+		"#define CAP_N(cap) ((cap) * 1e-9)   \n"
+		"#define CAP_P(cap) ((cap) * 1e-12)  \n"
+		"#define IND_U(ind) ((ind) * 1e-6)   \n"
+		"#define IND_N(ind) ((ind) * 1e-9)   \n"
+		"#define IND_P(ind) ((ind) * 1e-12)  \n";
+		setup().add_include(plib::make_unique<a>("netlist/devices/net_lib.h", content));
+#else
 		setup().add_include(plib::make_unique<a>("netlist/devices/net_lib.h",""));
+#endif
+#endif
 		for (auto & i : includes)
 			setup().add_include(plib::make_unique<netlist_data_folder_t>(i));
 

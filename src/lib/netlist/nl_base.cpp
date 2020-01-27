@@ -35,7 +35,6 @@ namespace netlist
 	public:
 		logic_family_ttl_t() : logic_family_desc_t()
 		{
-			m_fixed_V = nlconst::magic(5.0);
 			m_low_thresh_PCNT = nlconst::magic(0.8 / 5.0);
 			m_high_thresh_PCNT = nlconst::magic(2.0 / 5.0);
 			// m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
@@ -62,7 +61,6 @@ namespace netlist
 	public:
 		logic_family_cd4xxx_t() : logic_family_desc_t()
 		{
-			m_fixed_V = nlconst::magic(0.0);
 			m_low_thresh_PCNT = nlconst::magic(1.5 / 5.0);
 			m_high_thresh_PCNT = nlconst::magic(3.5 / 5.0);
 			// m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
@@ -214,6 +212,24 @@ namespace netlist
 
 		// Initialize factory
 		devices::initialize_factory(m_setup->factory());
+
+		// Add default include file
+		using a = plib::psource_str_t<plib::psource_t>;
+#if USE_EVAL
+		const pstring content =
+		"#define RES_R(res) (res)            \n"
+		"#define RES_K(res) ((res) * 1e3)    \n"
+		"#define RES_M(res) ((res) * 1e6)    \n"
+		"#define CAP_U(cap) ((cap) * 1e-6)   \n"
+		"#define CAP_N(cap) ((cap) * 1e-9)   \n"
+		"#define CAP_P(cap) ((cap) * 1e-12)  \n"
+		"#define IND_U(ind) ((ind) * 1e-6)   \n"
+		"#define IND_N(ind) ((ind) * 1e-9)   \n"
+		"#define IND_P(ind) ((ind) * 1e-12)  \n";
+		setup().add_include(plib::make_unique<a>("netlist/devices/net_lib.h", content));
+#else
+		setup().add_include(plib::make_unique<a>("netlist/devices/net_lib.h",""));
+#endif
 		NETLIST_NAME(base)(*m_setup);
 	}
 
