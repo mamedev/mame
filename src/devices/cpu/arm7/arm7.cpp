@@ -1796,62 +1796,8 @@ READ32_MEMBER( arm1176jzf_s_cpu_device::arm7_rt_r_callback )
 
 	if (cpnum == 15)
 	{
-		switch (crn)
-		{
-			case 0:
-			{
-				switch(op1)
-				{
-					case 0:
-					{
-						switch(crm)
-						{
-							case 0:
-							{
-								switch(op2)
-								{
-									case 0:
-									{
-										data = 0x410FB767; //ARM1176JZF-S Main ID.
-										break;
-									}
-								}
-								break;
-							}
-						}
-						break;
-					}
-				}
-				break;
-			}
-			case 1:
-			{
-				switch(op1)
-				{
-					case 0:
-					{
-						switch(crm)
-						{
-							case 0:
-							{
-								switch(op2)
-								{
-									case 0:
-									{
-										LOGMASKED(LOG_COPRO_READS, "arm7_rt_r_callback: CP15 Control %08x\n", m_control);
-										data = m_control;
-										break;
-									}
-								}
-								break;
-							}
-						}
-						break;
-					}
-				}
-				break;
-			}
-		}
+		if(crn == 0 && op1 == 0 && crm == 0 && op2 == 0) data = 0x410FB767; //ARM1176JZF-S Main ID.
+		if(crn == 1 && op1 == 0 && crm == 0 && op2 == 0) data = m_control;
 	}
 
 	return data;
@@ -1871,36 +1817,7 @@ WRITE32_MEMBER( arm1176jzf_s_cpu_device::arm7_rt_w_callback )
 	if (cpnum == 15)
 	{
 		LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback: CP15 CRn %02x Op1 %02x CRm %02x Op2 %02x data %08x\n", crn, op1, crm, op2, data);
-		switch (crn)
-		{
-			case 1:
-			{
-				switch(op1)
-				{
-					case 0:
-					{
-						switch(crm)
-						{
-							case 0:
-							{
-								switch(op2)
-								{
-									case 0:
-									{
-										LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback: CP15 Control %08x\n", data);
-										m_control = data;
-										break;
-									}
-								}
-								break;
-							}
-						}
-						break;
-					}
-				}
-				break;
-			}
-		}
+		if(crn == 1 && op1 == 0 && crm == 0 && op2 == 0) m_control = data;
 	}
 }
 
