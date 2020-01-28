@@ -4854,6 +4854,17 @@
 		</part>
 	</software>
 
+	<software name="postman2">
+		<description>Postman Pat 2</description>
+		<year>1989</year>
+		<publisher>Alternative Software</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="638869">
+				<rom name="postman pat 2.tap" size="638869" crc="b892a405" sha1="d85b42eecbabb3b615bfb783869c4d98ef5f772a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pwrpack">
 		<description>The Power Pack</description>
 		<year>1990</year>
