@@ -320,7 +320,7 @@ Games known to use this PCB include....
                                               Sticker    EPROM   FLASHROMs   X76F100  EPM7064S  315-5881
 Game                                          on cart    IC22#   # of SOP56  IC37#    IC41#     IC42#         Notes
 ----------------------------------------------------------------------------------------------------------------------------------
-Club Kart (2003, prototype, set 1)              no cart  *       21 (64Mb)** present  315-6206  not present   * flash-PCB ** game data ROMs is not dumped
+Club Kart (2003, prototype, set 1)              no cart  *       21 (64Mb)   present  315-6206  not present   * flash-PCB
 Club Kart (2003, prototype, set 2)              no cart  *       21 (64Mb)   present  315-6206  present       * flash-PCB
 Crackin' DJ part 2                            840-0068C  23674   20 (64Mb)   present  315-6206  317-0311-COM  PCB have label 840-0068B-01 837-14124, requires regular 837-13551 and 837-13938 rotary JVS boards, and turntable simulation
 Crazy Taxi                                    840-0002C  ?       13 (64Mb)   ?        315-6206  ?             not dumped, likely same as regular 171-7919A cart
