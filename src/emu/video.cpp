@@ -1358,8 +1358,8 @@ osd_file::error video_manager::open_next(emu_file &file, const char *extension, 
 			int name_found = 0;
 
 			// find length of the device name
-			int end1 = snapstr.find("/", pos + 3);
-			int end2 = snapstr.find("%", pos + 3);
+			int end1 = snapstr.find('/', pos + 3);
+			int end2 = snapstr.find('%', pos + 3);
 			int end;
 
 			if ((end1 != -1) && (end2 != -1))

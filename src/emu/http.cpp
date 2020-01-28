@@ -295,8 +295,8 @@ http_manager::http_manager(bool active, short port, const char *root)
 		}
 
 		// Determine the file extension.
-		std::size_t last_slash_pos = path.find_last_of("/");
-		std::size_t last_dot_pos = path.find_last_of(".");
+		std::size_t last_slash_pos = path.find_last_of('/');
+		std::size_t last_dot_pos = path.find_last_of('.');
 		std::string extension;
 		if (last_dot_pos != std::string::npos && last_dot_pos > last_slash_pos)
 		{
