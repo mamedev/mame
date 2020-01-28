@@ -181,23 +181,7 @@ public:
 		m_cart(*this, "cartslot")
 	{ }
 
-	void  elan_buzztime(machine_config &config)
-	{
-		elan_eu3a05_state::elan_eu3a05(config);
-
-		m_sys->set_alt_timer();
-
-		m_gpio->read_0_callback().set(FUNC(elan_eu3a05_buzztime_state::porta_r)); // I/O lives in here
-	//	m_gpio->read_1_callback().set(FUNC(elan_eu3a05_buzztime_state::random_r)); // nothing of note
-	//	m_gpio->read_2_callback().set(FUNC(elan_eu3a05_buzztime_state::random_r)); // nothing of note
-
-		GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "buzztime_cart");
-		m_cart->set_width(GENERIC_ROM16_WIDTH);
-		m_cart->set_device_load(FUNC(elan_eu3a05_buzztime_state::cart_load));
-		m_cart->set_must_be_loaded(true);
-
-		SOFTWARE_LIST(config, "buzztime_cart").set_original("buzztime_cart");
-	}
+	void elan_buzztime(machine_config& config);
 
 protected:
 	virtual void machine_start() override
@@ -216,6 +200,7 @@ protected:
 private:
 	//DECLARE_READ8_MEMBER(random_r) { return machine().rand(); }
 	DECLARE_READ8_MEMBER(porta_r);
+	DECLARE_WRITE8_MEMBER(portb_w);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load)
 	{
@@ -236,10 +221,34 @@ private:
 	required_device<generic_slot_device> m_cart;
 };
 
+void elan_eu3a05_buzztime_state::elan_buzztime(machine_config &config)
+{
+	elan_eu3a05_state::elan_eu3a05(config);
+
+	m_sys->set_alt_timer();
+
+	m_gpio->read_0_callback().set(FUNC(elan_eu3a05_buzztime_state::porta_r)); // I/O lives in here
+//	m_gpio->read_1_callback().set(FUNC(elan_eu3a05_buzztime_state::random_r)); // nothing of note
+//	m_gpio->read_2_callback().set(FUNC(elan_eu3a05_buzztime_state::random_r)); // nothing of note
+	m_gpio->write_1_callback().set(FUNC(elan_eu3a05_buzztime_state::portb_w)); // control related 
+
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "buzztime_cart");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_device_load(FUNC(elan_eu3a05_buzztime_state::cart_load));
+	m_cart->set_must_be_loaded(true);
+
+	SOFTWARE_LIST(config, "buzztime_cart").set_original("buzztime_cart");
+}
+
 READ8_MEMBER(elan_eu3a05_buzztime_state::porta_r)
 {
-	logerror("%s: porta_r\n", machine().describe_context().c_str());
+	logerror("%s: porta_r\n", machine().describe_context());
 	return machine().rand();
+}
+
+WRITE8_MEMBER(elan_eu3a05_buzztime_state::portb_w)
+{
+	logerror("%s: portb_w %02x\n", machine().describe_context(), data);
 }
 
 
