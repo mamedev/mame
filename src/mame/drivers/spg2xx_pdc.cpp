@@ -7,7 +7,8 @@ class spg2xx_pdc100_game_state : public spg2xx_game_state
 {
 public:
 	spg2xx_pdc100_game_state(const machine_config &mconfig, device_type type, const char *tag) :
-		spg2xx_game_state(mconfig, type, tag)
+		spg2xx_game_state(mconfig, type, tag),
+		m_numbanks(-1)
 	{ }
 
 	void pdc100(machine_config& config);
@@ -49,23 +50,22 @@ INPUT_PORTS_END
 
 void spg2xx_pdc100_game_state::machine_start()
 {
+	spg2xx_game_state::machine_start();
 	m_numbanks = memregion("maincpu")->bytes() / 0x800000;
 }
 
 void spg2xx_pdc100_game_state::machine_reset()
 {
 	m_current_bank = -1;
-	switch_bank(m_numbanks-1); // pdc100 must boot from upper bank
+	switch_bank(m_numbanks - 1); // pdc100 must boot from upper bank
 	m_maincpu->reset();
 }
 
 WRITE16_MEMBER(spg2xx_pdc100_game_state::porta_w)
 {
-	//logerror("%s: porta_w %04x\n", machine().describe_context(), data);
-
 	// pdc100 simply writes 0000 at times during bootup while initializing stuff, which causes an invalid bankswitch mid-code execution
 	if (data & 0xff00)
-		switch_bank(data & (m_numbanks-1));
+		switch_bank(data & (m_numbanks - 1));
 }
 
 
@@ -79,10 +79,11 @@ void spg2xx_pdc100_game_state::pdc100(machine_config &config)
 }
 
 ROM_START( pdc100 )
-	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
 	// only 1st half of this is used "Jumper resistor (0 ohm) that short A25 to ground"
 	// 2nd half just contains what seems to be random garbage
-	ROM_LOAD16_WORD_SWAP( "pdc100.bin", 0x000000, 0x8000000, CRC(57285b49) SHA1(cfb4be7877ec263d24063a004c56985db5c0f4e2) )
+	ROM_LOAD16_WORD_SWAP( "pdc100.bin", 0x000000, 0x4000000, CRC(57285b49) SHA1(cfb4be7877ec263d24063a004c56985db5c0f4e2) )
+	ROM_IGNORE(0x4000000)
 ROM_END
 
 ROM_START( tmntpdc )
