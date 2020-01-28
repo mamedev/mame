@@ -187,7 +187,7 @@ public:
 
 		m_sys->set_alt_timer();
 
-		m_gpio->read_0_callback().set(FUNC(elan_eu3a05_buzztime_state::random_r)); // I/O lives in here
+		m_gpio->read_0_callback().set(FUNC(elan_eu3a05_buzztime_state::porta_r)); // I/O lives in here
 	//	m_gpio->read_1_callback().set(FUNC(elan_eu3a05_buzztime_state::random_r)); // nothing of note
 	//	m_gpio->read_2_callback().set(FUNC(elan_eu3a05_buzztime_state::random_r)); // nothing of note
 
@@ -214,7 +214,8 @@ protected:
 	}
 
 private:
-	DECLARE_READ8_MEMBER(random_r) { return machine().rand(); }
+	//DECLARE_READ8_MEMBER(random_r) { return machine().rand(); }
+	DECLARE_READ8_MEMBER(porta_r);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load)
 	{
@@ -234,6 +235,12 @@ private:
 
 	required_device<generic_slot_device> m_cart;
 };
+
+READ8_MEMBER(elan_eu3a05_buzztime_state::porta_r)
+{
+	logerror("%s: porta_r\n", machine().describe_context().c_str());
+	return machine().rand();
+}
 
 
 void elan_eu3a05_state::video_start()

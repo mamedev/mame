@@ -36,38 +36,38 @@ DEFINE_DEVICE_TYPE(SPG28X_IO, spg28x_io_device, "spg28x_io", "SPG280-series Syst
 #define IO_IRQ_ENABLE       m_io_regs[0x21]
 #define IO_IRQ_STATUS       m_io_regs[0x22]
 
-spg2xx_io_device::spg2xx_io_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	, m_porta_out(*this)
-	, m_portb_out(*this)
-	, m_portc_out(*this)
-	, m_porta_in(*this)
-	, m_portb_in(*this)
-	, m_portc_in(*this)
-	, m_adc_in{{*this}, {*this}}
-	, m_i2c_w(*this)
-	, m_i2c_r(*this)
-	, m_uart_tx(*this)
-	, m_chip_sel(*this)
-	, m_cpu(*this, finder_base::DUMMY_TAG)
-	, m_screen(*this, finder_base::DUMMY_TAG)
-	, m_pal_read_cb(*this)
-	, m_timer_irq_cb(*this)
-	, m_uart_adc_irq_cb(*this)
-	, m_external_irq_cb(*this)
-	, m_ffreq_tmr1_irq_cb(*this)
-	, m_ffreq_tmr2_irq_cb(*this)
-	, m_fiq_vector_w(*this)
+spg2xx_io_device::spg2xx_io_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	m_porta_out(*this),
+	m_portb_out(*this),
+	m_portc_out(*this),
+	m_porta_in(*this),
+	m_portb_in(*this),
+	m_portc_in(*this),
+	m_adc_in{{*this}, {*this}},
+	m_i2c_w(*this),
+	m_i2c_r(*this),
+	m_uart_tx(*this),
+	m_chip_sel(*this),
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_screen(*this, finder_base::DUMMY_TAG),
+	m_pal_read_cb(*this),
+	m_timer_irq_cb(*this),
+	m_uart_adc_irq_cb(*this),
+	m_external_irq_cb(*this),
+	m_ffreq_tmr1_irq_cb(*this),
+	m_ffreq_tmr2_irq_cb(*this),
+	m_fiq_vector_w(*this)
 {
 }
 
-spg24x_io_device::spg24x_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: spg2xx_io_device(mconfig, SPG24X_IO, tag, owner, clock, 256)
+spg24x_io_device::spg24x_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	spg2xx_io_device(mconfig, SPG24X_IO, tag, owner, clock, 256)
 {
 }
 
-spg28x_io_device::spg28x_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: spg2xx_io_device(mconfig, SPG28X_IO, tag, owner, clock, 64)
+spg28x_io_device::spg28x_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	spg2xx_io_device(mconfig, SPG28X_IO, tag, owner, clock, 64)
 {
 }
 
