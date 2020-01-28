@@ -320,7 +320,8 @@ Games known to use this PCB include....
                                               Sticker    EPROM   FLASHROMs   X76F100  EPM7064S  315-5881
 Game                                          on cart    IC22#   # of SOP56  IC37#    IC41#     IC42#         Notes
 ----------------------------------------------------------------------------------------------------------------------------------
-Club Kart: European Session (2003, prototype)   no cart  *       21 (64Mb)** present  315-6206  not present   * flash-PCB ** game data ROMs is not dumped
+Club Kart (2003, prototype, set 1)              no cart  *       21 (64Mb)** present  315-6206  not present   * flash-PCB ** game data ROMs is not dumped
+Club Kart (2003, prototype, set 2)              no cart  *       21 (64Mb)   present  315-6206  present       * flash-PCB
 Crackin' DJ part 2                            840-0068C  23674   20 (64Mb)   present  315-6206  317-0311-COM  PCB have label 840-0068B-01 837-14124, requires regular 837-13551 and 837-13938 rotary JVS boards, and turntable simulation
 Crazy Taxi                                    840-0002C  ?       13 (64Mb)   ?        315-6206  ?             not dumped, likely same as regular 171-7919A cart
 Ferrari F355 Challenge (twin/deluxe, preview)   no cart  22848P* 21 (64Mb)   present  315-6206  317-0267-COM  * other ROM board we've seen had 2x flashroms PCB instead of IC22 EEPROM, contents is the same.
@@ -10043,30 +10044,61 @@ ROM_START( clubk2kp )
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0xa000000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD( "ic22.bin",       0x0000000, 0x400000, CRC(334fc561) SHA1(e8c8707b0d13216ec7071da05823e330deb810d4) ) // flash ROM module
-	// game data ROMs not dumped, not the same as regular revision. technically, all below should be marked as NO_DUMP.
-	ROM_LOAD32_WORD( "opr-24151.ic17s", 0x1000000, 0x800000, CRC(91594439) SHA1(a195bfe0c70a0c7048b547af0a92c98d126230c6) )
-	ROM_LOAD32_WORD( "opr-24152.ic18",  0x1000002, 0x800000, CRC(fd131f88) SHA1(bc27b3ab5b41a3fe33b541b7cca28d6baed157b3) )
-	ROM_LOAD32_WORD( "opr-24153.ic19s", 0x2000000, 0x800000, CRC(795df2a6) SHA1(80f740806dcaacc28752cea98b254cbee51972a4) )
-	ROM_LOAD32_WORD( "opr-24154.ic20",  0x2000002, 0x800000, CRC(7bba9a33) SHA1(e50199ce5c893ea81668cbf2972500803265dc19) )
-	ROM_LOAD32_WORD( "opr-24155.ic21s", 0x3000000, 0x800000, CRC(9e3b358d) SHA1(3dec18be49b2271f013e4f4a02f32fa515a4ca69) )
-	ROM_LOAD32_WORD( "opr-24156.ic22",  0x3000002, 0x800000, CRC(dd5286f7) SHA1(37ea254997cef1c45b53786c8abb2521acf24b56) )
-	ROM_LOAD32_WORD( "opr-24157.ic23s", 0x4000000, 0x800000, CRC(7edc4a7d) SHA1(f4ffa20c83226c0c0dccc3b1e9ec6601f145b01b) )
-	ROM_LOAD32_WORD( "opr-24158.ic24",  0x4000002, 0x800000, CRC(4d546427) SHA1(74a399c40f56af76077d47f996629a7fb650c804) )
-	ROM_LOAD32_WORD( "opr-24159.ic25s", 0x5000000, 0x800000, CRC(ae8d7de1) SHA1(15dadd9c5449d65310647e247a07da165c9e3d5e) )
-	ROM_LOAD32_WORD( "opr-24160.ic26",  0x5000002, 0x800000, CRC(e75210c9) SHA1(315c077201023740f63eab5de1d81eb71613b06f) )
-	ROM_LOAD32_WORD( "opr-24161.ic27s", 0x6000000, 0x800000, CRC(aeecf812) SHA1(d683f1c7f200481cf2342a387d7558d0d76f89f4) )
-	ROM_LOAD32_WORD( "opr-24162.ic28",  0x6000002, 0x800000, CRC(0e349c02) SHA1(4d0b4efeb125e23b1e73db2febf99565969d71d2) )
-	ROM_LOAD32_WORD( "opr-24163.ic29",  0x7000000, 0x800000, CRC(dab7f365) SHA1(9a707c8992ddfa58f81bb5278f66713e424b0f4f) )
-	ROM_LOAD32_WORD( "opr-24164.ic30s", 0x7000002, 0x800000, CRC(03be6b1d) SHA1(40792314fada46648f4f98a3d5a14822e6b1cf36) )
-	ROM_LOAD32_WORD( "opr-24165.ic31",  0x8000000, 0x800000, CRC(8fdb66a5) SHA1(32d2926328d9d804dcff781e2b758dd2a4b1a753) )
-	ROM_LOAD32_WORD( "opr-24166.ic32s", 0x8000002, 0x800000, CRC(790a1b5e) SHA1(bb0ad6de62d758f6869b3bb62cce9947f8b08681) )
-	ROM_LOAD32_WORD( "opr-24167.ic33",  0x9000000, 0x800000, CRC(15de1d97) SHA1(26a96644f183713a556a5ff2d491510589c9d7c8) )
-	ROM_LOAD32_WORD( "opr-24168.ic34s", 0x9000002, 0x800000, CRC(90dfdd5a) SHA1(5c98bc84b310fa70e6bceee190508e9eaa60c82c) )
+	ROM_LOAD( "ic22.bin",    0x0000000, 0x400000, CRC(334fc561) SHA1(e8c8707b0d13216ec7071da05823e330deb810d4) ) // flash ROM module
 
-	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
+	ROM_LOAD( "rom1.ic1s",   0x0800000, 0x800000, CRC(63bd7915) SHA1(3483f82ff801803c5abd04a0c66a1cecdff59c26) )
+	ROM_LOAD( "rom2.ic2s",   0x1000000, 0x800000, CRC(9d0d5e68) SHA1(4b2535b968eff1fc1d3266194da54bb3c17b24ec) )
+	ROM_LOAD( "rom3.ic3s",   0x1800000, 0x800000, CRC(ead5f480) SHA1(defcedeb150a9307f6fa36b36a53a59ab5ee274a) )
+	ROM_LOAD( "rom4.ic4s",   0x2000000, 0x800000, CRC(c9b21961) SHA1(8c35378f65a14433965228cce26c7c8cebda8ece) )
+	ROM_LOAD( "rom5.ic5s",   0x2800000, 0x800000, CRC(b42b5bdf) SHA1(da8c235f6e76ad5b4305a8d9722da8523a701924) )
+	ROM_LOAD( "rom6.ic6s",   0x3000000, 0x800000, CRC(6e69792e) SHA1(25fa82e823ab12ba9a0aafe9cf09c16e74aff130) )
+	ROM_LOAD( "rom7.ic7s",   0x3800000, 0x800000, CRC(0956796e) SHA1(69ed59a1e7f00cbf85ff72a47aa3eee75bc358fc) )
+	ROM_LOAD( "rom8.ic8s",   0x4000000, 0x800000, CRC(9dba44f5) SHA1(8de0a836b1aa78e0babd4b186f991d44bc0f34b6) )
+	ROM_LOAD( "rom9.ic9s",   0x4800000, 0x800000, CRC(1307b6a1) SHA1(a7108483e69994835e54f771a1f2ee05afda289d) )
+	ROM_LOAD( "rom10.ic10s", 0x5000000, 0x800000, CRC(4ec15b61) SHA1(1484d00b780675df5178b0d686f152683b66e6df) )
+	ROM_LOAD( "rom11.ic11s", 0x5800000, 0x800000, CRC(3c4a2f34) SHA1(f4b14ec9df023843bbbfeca174344c3f65a041b7) )
+	ROM_LOAD( "rom12.ic12s", 0x6000000, 0x800000, CRC(55548b90) SHA1(3d791c13a142e78f0122a0ec0064023063255861) )
+	ROM_LOAD( "rom13.ic13s", 0x6800000, 0x800000, CRC(373097e5) SHA1(561bf3ea396484b20ebb9fe63527329c005d067f) )
+	ROM_LOAD( "rom14.ic14s", 0x7000000, 0x800000, CRC(7297efb8) SHA1(9c3acdbb01c178ff18f9fb21c62b982cad8775e3) )
+	ROM_LOAD( "rom15.ic15s", 0x7800000, 0x800000, CRC(42dd18db) SHA1(8a0cc64128f2b823c99bcd1f45530ce85af6c6fe) )
+	ROM_LOAD( "rom16.ic16s", 0x8000000, 0x800000, CRC(aaaa39cf) SHA1(8de90fefa81b3d5b8602335b18a86249deccc6a8) )
+	ROM_LOAD( "rom17.ic17s", 0x8800000, 0x800000, CRC(382fc4cb) SHA1(8f79306fac4911748c362a4038ac6592ba0477c9) )
+	ROM_LOAD( "rom18.ic18s", 0x9000000, 0x800000, CRC(cdd71385) SHA1(4b16d00b57b7fd96a7858e1b9146ee3f2ff0d200) )
+	ROM_LOAD( "rom19.ic19s", 0x9800000, 0x800000, CRC(7ee9743b) SHA1(119f632c3d10d032fd15159aa37f3bcfe0938b06) )
 
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
+ROM_END
+
+ROM_START( clubk2kpa )
+	NAOMI2_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "rom0.ic22",   0x0000000, 0x400000, BAD_DUMP CRC(8514f0bf) SHA1(84ad7b8ccd41db38a5be8b0619e275b56482a5be) ) // one of ROM header bytes was clearly bad, manually fixed, but there might be more
+	// game data ROMs confirmed good, despite the fact they shown as all BAD in BIOS ROM TEST
+	ROM_LOAD( "rom1.ic1s",   0x0800000, 0x800000, CRC(63bd7915) SHA1(3483f82ff801803c5abd04a0c66a1cecdff59c26) )
+	ROM_LOAD( "rom2.ic2s",   0x1000000, 0x800000, CRC(9d0d5e68) SHA1(4b2535b968eff1fc1d3266194da54bb3c17b24ec) )
+	ROM_LOAD( "rom3.ic3s",   0x1800000, 0x800000, CRC(ead5f480) SHA1(defcedeb150a9307f6fa36b36a53a59ab5ee274a) )
+	ROM_LOAD( "rom4.ic4s",   0x2000000, 0x800000, CRC(c9b21961) SHA1(8c35378f65a14433965228cce26c7c8cebda8ece) )
+	ROM_LOAD( "rom5.ic5s",   0x2800000, 0x800000, CRC(b42b5bdf) SHA1(da8c235f6e76ad5b4305a8d9722da8523a701924) )
+	ROM_LOAD( "rom6.ic6s",   0x3000000, 0x800000, CRC(6e69792e) SHA1(25fa82e823ab12ba9a0aafe9cf09c16e74aff130) )
+	ROM_LOAD( "rom7.ic7s",   0x3800000, 0x800000, CRC(0956796e) SHA1(69ed59a1e7f00cbf85ff72a47aa3eee75bc358fc) )
+	ROM_LOAD( "rom8.ic8s",   0x4000000, 0x800000, CRC(9dba44f5) SHA1(8de0a836b1aa78e0babd4b186f991d44bc0f34b6) )
+	ROM_LOAD( "rom9.ic9s",   0x4800000, 0x800000, CRC(1307b6a1) SHA1(a7108483e69994835e54f771a1f2ee05afda289d) )
+	ROM_LOAD( "rom10.ic10s", 0x5000000, 0x800000, CRC(4ec15b61) SHA1(1484d00b780675df5178b0d686f152683b66e6df) )
+	ROM_LOAD( "rom11.ic11s", 0x5800000, 0x800000, CRC(3c4a2f34) SHA1(f4b14ec9df023843bbbfeca174344c3f65a041b7) )
+	ROM_LOAD( "rom12.ic12s", 0x6000000, 0x800000, CRC(55548b90) SHA1(3d791c13a142e78f0122a0ec0064023063255861) )
+	ROM_LOAD( "rom13.ic13s", 0x6800000, 0x800000, CRC(373097e5) SHA1(561bf3ea396484b20ebb9fe63527329c005d067f) )
+	ROM_LOAD( "rom14.ic14s", 0x7000000, 0x800000, CRC(7297efb8) SHA1(9c3acdbb01c178ff18f9fb21c62b982cad8775e3) )
+	ROM_LOAD( "rom15.ic15s", 0x7800000, 0x800000, CRC(42dd18db) SHA1(8a0cc64128f2b823c99bcd1f45530ce85af6c6fe) )
+	ROM_LOAD( "rom16.ic16s", 0x8000000, 0x800000, CRC(aaaa39cf) SHA1(8de90fefa81b3d5b8602335b18a86249deccc6a8) )
+	ROM_LOAD( "rom17.ic17s", 0x8800000, 0x800000, CRC(382fc4cb) SHA1(8f79306fac4911748c362a4038ac6592ba0477c9) )
+	ROM_LOAD( "rom18.ic18s", 0x9000000, 0x800000, CRC(cdd71385) SHA1(4b16d00b57b7fd96a7858e1b9146ee3f2ff0d200) )
+	ROM_LOAD( "rom19.ic19s", 0x9800000, 0x800000, CRC(7ee9743b) SHA1(119f632c3d10d032fd15159aa37f3bcfe0938b06) )
+	ROM_LOAD( "rom20.ic20s", 0xa000000, 0x800000, CRC(99ef6bb7) SHA1(afcf187febe94035c989ca4a6e45bc0c3a806043) ) // not used by game, garbage
+	ROM_LOAD( "rom21.ic21s", 0xa800000, 0x800000, CRC(21bd0a9c) SHA1(b0709f627f2d2532f9cc10b5f89528f98336de61) ) // not used by game, garbage
+
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 populated, not used
 ROM_END
 
 
@@ -11428,7 +11460,8 @@ ROM_END
 /* 0129 */ GAME( 2003, clubkprz, naomi2,  naomi2m1, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Club Kart Prize (Export, Japan, Rev A)", GAME_FLAGS )
 /* 0137 */ GAME( 2004, clubkpzb, naomi2,  naomi2m1, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Club Kart Prize Version B (Export, Japan)", GAME_FLAGS )
 /* 0139 */ GAME( 2003, clubk2k3, naomi2,  naomi2m1, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Club Kart: European Session (2003, Rev A)", GAME_FLAGS )
-/* none */ GAME( 2003, clubk2kp, clubk2k3,naomi2m2, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Club Kart: European Session (2003, prototype)", GAME_FLAGS )
+/* none */ GAME( 2003, clubk2kp, clubk2k3,naomi2m2, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Club Kart: European Session (2003, prototype, set 1)", GAME_FLAGS )
+/* none */ GAME( 2003, clubk2kpa,clubk2k3,naomi2m2, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Club Kart: European Session (2003, prototype, set 2)", GAME_FLAGS )
 
 /* 841-xxxxx ("Licensed by Sega" Naomi cart games)*/
 /* 0001 */       GAME( 1999, pstone,    naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Capcom",          "Power Stone", GAME_FLAGS )
