@@ -2081,6 +2081,8 @@ files {
 	MAME_DIR .. "src/mame/machine/decioga.h",
 	MAME_DIR .. "src/mame/drivers/dectalk.cpp",
 	MAME_DIR .. "src/mame/drivers/decwritr.cpp",
+	MAME_DIR .. "src/mame/machine/dc305.cpp",
+	MAME_DIR .. "src/mame/machine/dc305.h",
 	MAME_DIR .. "src/mame/drivers/jensen.cpp",
 	MAME_DIR .. "src/mame/includes/jensen.h",
 	MAME_DIR .. "src/mame/drivers/pdp11.cpp",
