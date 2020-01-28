@@ -76,7 +76,8 @@ protected:
 	virtual void machine_reset() override;
 
 	// address maps
-	void jazz_common_map(address_map &map);
+	void cpu_map(address_map &map);
+	void mct_map(address_map &map);
 
 	// machine config
 	void jazz(machine_config &config);
