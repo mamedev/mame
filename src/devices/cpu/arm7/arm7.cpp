@@ -42,7 +42,7 @@ TODO:
 #define LOG_COPRO_UNKNOWN   (1 << 4)
 #define LOG_COPRO_RESERVED  (1 << 5)
 
-#define VERBOSE             (LOG_MMU | LOG_COPRO_READS | LOG_COPRO_WRITES)
+#define VERBOSE             (0) //(LOG_MMU | LOG_COPRO_READS | LOG_COPRO_WRITES)
 #include "logmacro.h"
 
 #define PRINT_HAPYFSH2      (0)
