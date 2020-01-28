@@ -42,7 +42,7 @@ TODO:
 #define LOG_COPRO_UNKNOWN   (1 << 4)
 #define LOG_COPRO_RESERVED  (1 << 5)
 
-#define VERBOSE             (0)
+#define VERBOSE             (LOG_MMU | LOG_COPRO_READS | LOG_COPRO_WRITES)
 #include "logmacro.h"
 
 #define PRINT_HAPYFSH2      (0)
@@ -726,7 +726,6 @@ void arm946es_cpu_device::device_start()
 	save_item(NAME(DTCM));
 }
 
-
 void arm7_cpu_device::state_export(const device_state_entry &entry)
 {
 	switch (entry.index())
@@ -787,6 +786,11 @@ void arm7_cpu_device::device_reset()
 	m_impstate.cache_dirty = true;
 }
 
+void arm1176jzf_s_cpu_device::device_reset()
+{
+	arm7_cpu_device::device_reset();
+	m_control = 0x00050078;
+}
 
 #define UNEXECUTED() \
 	m_r[eR15] += 4; \
@@ -1413,7 +1417,7 @@ WRITE32_MEMBER( arm7_cpu_device::arm7_rt_w_callback )
 #if ARM7_MMU_ENABLE_HACK
 			if (((data & COPRO_CTRL_MMU_EN) != 0) && ((COPRO_CTRL & COPRO_CTRL_MMU_EN) == 0))
 			{
-				>m_mmu_enable_addr = R15;
+				m_mmu_enable_addr = R15;
 			}
 			if (((data & COPRO_CTRL_MMU_EN) == 0) && ((COPRO_CTRL & COPRO_CTRL_MMU_EN) != 0))
 			{
@@ -1778,6 +1782,127 @@ void arm7_cpu_device::arm7_dt_w_callback(uint32_t insn, uint32_t *prn)
 	}
 }
 
+READ32_MEMBER( arm1176jzf_s_cpu_device::arm7_rt_r_callback )
+{
+	uint32_t opcode = offset;
+	uint8_t crn = (opcode & INSN_COPRO_CREG) >> INSN_COPRO_CREG_SHIFT;
+	uint8_t op1 = (opcode & INSN_COPRO_OP1) >> INSN_COPRO_OP1_SHIFT;
+	uint8_t op2 = (opcode & INSN_COPRO_OP2)  >> INSN_COPRO_OP2_SHIFT;
+	uint8_t crm =  opcode & INSN_COPRO_OP3;
+	uint8_t cpnum = (opcode & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
+	uint32_t data = 0;
+
+//  printf("arm7946: copro %d write %x to cReg %d op2 %d op3 %d (mask %08x)\n", cpnum, data, cReg, op2, op3, mem_mask);
+
+	if (cpnum == 15)
+	{
+		switch (crn)
+		{
+			case 0:
+			{
+				switch(op1)
+				{
+					case 0:
+					{
+						switch(crm)
+						{
+							case 0:
+							{
+								switch(op2)
+								{
+									case 0:
+									{
+										data = 0x410FB767; //ARM1176JZF-S Main ID.
+										break;
+									}
+								}
+								break;
+							}
+						}
+						break;
+					}
+				}
+				break;
+			}
+			case 1:
+			{
+				switch(op1)
+				{
+					case 0:
+					{
+						switch(crm)
+						{
+							case 0:
+							{
+								switch(op2)
+								{
+									case 0:
+									{
+										LOGMASKED(LOG_COPRO_READS, "arm7_rt_r_callback: CP15 Control %08x\n", m_control);
+										data = m_control;
+										break;
+									}
+								}
+								break;
+							}
+						}
+						break;
+					}
+				}
+				break;
+			}
+		}
+	}
+
+	return data;
+}
+
+WRITE32_MEMBER( arm1176jzf_s_cpu_device::arm7_rt_w_callback )
+{
+	uint32_t opcode = offset;
+	uint8_t crn = (opcode & INSN_COPRO_CREG) >> INSN_COPRO_CREG_SHIFT;
+	uint8_t op1 = (opcode & INSN_COPRO_OP1) >> INSN_COPRO_OP1_SHIFT;
+	uint8_t op2 = (opcode & INSN_COPRO_OP2)  >> INSN_COPRO_OP2_SHIFT;
+	uint8_t crm =  opcode & INSN_COPRO_OP3;
+	uint8_t cpnum = (opcode & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
+
+//  printf("arm7946: copro %d write %x to cReg %d op2 %d op3 %d (mask %08x)\n", cpnum, data, cReg, op2, op3, mem_mask);
+
+	if (cpnum == 15)
+	{
+		LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback: CP15 CRn %02x Op1 %02x CRm %02x Op2 %02x data %08x\n", crn, op1, crm, op2, data);
+		switch (crn)
+		{
+			case 1:
+			{
+				switch(op1)
+				{
+					case 0:
+					{
+						switch(crm)
+						{
+							case 0:
+							{
+								switch(op2)
+								{
+									case 0:
+									{
+										LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback: CP15 Control %08x\n", data);
+										m_control = data;
+										break;
+									}
+								}
+								break;
+							}
+						}
+						break;
+					}
+				}
+				break;
+			}
+		}
+	}
+}
 
 /***************************************************************************
  * Default Memory Handlers

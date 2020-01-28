@@ -10,6 +10,8 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
+#include "cpu/arm7/arm7core.h"
+#include "machine/vic_pl192.h"
 #include "screen.h"
 
 class iphone2g_state : public driver_device
@@ -18,6 +20,8 @@ public:
 	iphone2g_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_vic0(*this, "vic0"),
+		m_vic1(*this, "vic1"),
 		m_ram(*this, "ram"),
 		m_bios(*this, "bios"),
 		m_screen(*this, "screen")
@@ -33,9 +37,14 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint32_t> m_ram;
+	required_device<vic_pl192_device> m_vic0;
+	required_device<vic_pl192_device> m_vic1;
+	optional_shared_ptr<uint32_t> m_ram;
 	required_region_ptr<uint32_t> m_bios;
 	required_device<screen_device> m_screen;
+
+	DECLARE_WRITE_LINE_MEMBER(irq_handler);
+	DECLARE_WRITE_LINE_MEMBER(fiq_handler);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -62,19 +71,30 @@ READ32_MEMBER(iphone2g_state::clock1_r)
 
 void iphone2g_state::mem_map(address_map &map)
 {
-	map(0x00000000, 0x07FFFFFF).mirror(0x18000000).ram().share("ram");                 /* DRAM */
-	map(0x20000000, 0x2000FFFF).rom().region("bios", 0);                               /* BIOS */
-	map(0x22000000, 0x224FFFFF).ram();                                                 /* SRAM */
-	map(0x3C500000, 0x3C500FFF).r(FUNC(iphone2g_state::clock1_r)).nopw();
+	map(0x00000000, 0x0000ffff).mirror(0x20000000).rom().region("bios", 0);            /* BIOS */
+	map(0x22000000, 0x224fffff).ram();                                                 /* SRAM */
+	map(0x38e00000, 0x38e00fff).rw(m_vic0, FUNC(vic_pl192_device::read), FUNC(vic_pl192_device::write));
+	map(0x38e01000, 0x38e01fff).rw(m_vic1, FUNC(vic_pl192_device::read), FUNC(vic_pl192_device::write));
+	map(0x3c500000, 0x3c500fff).r(FUNC(iphone2g_state::clock1_r)).nopw();
 }
 
 void iphone2g_state::machine_start()
 {
-	std::copy_n(m_bios.target(), m_bios.length(), m_ram.target());
+	//std::copy_n(m_bios.target(), m_bios.length(), m_ram.target());
 }
 
 void iphone2g_state::machine_reset()
 {
+}
+
+WRITE_LINE_MEMBER(iphone2g_state::irq_handler)
+{
+	m_maincpu->set_input_line(ARM7_IRQ_LINE, state);
+}
+
+WRITE_LINE_MEMBER(iphone2g_state::fiq_handler)
+{
+	m_maincpu->set_input_line(ARM7_FIRQ_LINE, state);
 }
 
 void iphone2g_state::iphone2g(machine_config &config)
@@ -82,6 +102,12 @@ void iphone2g_state::iphone2g(machine_config &config)
 	/* Basic machine hardware */
 	ARM1176JZF_S(config, m_maincpu, XTAL(12'000'000) * 103 / 3); //412 MHz, downclocked from 600 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &iphone2g_state::mem_map);
+
+	PL192_VIC(config, m_vic0);
+	m_vic0->out_irq_cb().set(FUNC(iphone2g_state::irq_handler));
+	m_vic0->out_fiq_cb().set(FUNC(iphone2g_state::fiq_handler));
+
+	PL192_VIC(config, m_vic1);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(12'000'000), 320, 0, 320, 480, 0, 480); //Complete guess
