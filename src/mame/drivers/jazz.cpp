@@ -91,7 +91,7 @@ void jazz_state::cpu_map(address_map &map)
 void jazz_state::mct_map(address_map &map)
 {
 	map(0x1fc00000, 0x1fc3ffff).r(m_flash, FUNC(amd_28f020_device::read));
-	
+
 	// VDR1
 	//map(0x60000000, 0x60001fff).m(m_cvc, FUNC(g364_device::map));
 	//map(0x60010000, 0x60010000); // id (r/w)

@@ -27,7 +27,7 @@ public:
 
 	void map(address_map &map);
 
-	u64 r4k_r(offs_t offset, u64 mem_mask) { return space(0).read_qword(offset << 3, mem_mask);	}
+	u64 r4k_r(offs_t offset, u64 mem_mask) { return space(0).read_qword(offset << 3, mem_mask); }
 	void r4k_w(offs_t offset, u64 data, u64 mem_mask) { space(0).write_qword(offset << 3, data, mem_mask); }
 
 	u16 isr_r();
