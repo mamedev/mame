@@ -4,6 +4,7 @@
 // ARM PrimeCell PL192 VIC emulation
 
 #include "emu.h"
+#include "machine/bankdev.h"
 #include "machine/vic_pl192.h"
 
 #define LOG_GENERAL (1U << 0)
@@ -34,150 +35,39 @@ void vic_pl192_device::set_irq_line(int irq, int state)
     }
 }
 
-uint32_t vic_pl192_device::read(offs_t offset)
+void vic_pl192_device::map(address_map &map)
 {
-    offset &= 0xffc;
-    switch(offset)
-    {
-        case 0x000:
-        {
-            return raw_intr & ~intr_select; // IRQ_STATUS
-        }
-        case 0x004:
-        {
-            return raw_intr & intr_select; // FIQ_STATUS
-        }
-        case 0x008:
-        {
-            return raw_intr;
-        }
-        case 0x00c:
-        {
-            return intr_select;
-        }
-        case 0x010:
-        {
-            return intr_en;
-        }
-        case 0x018:
-        {
-            return soft_intr;
-        }
-        case 0x020:
-        {
-            return protection;
-        }
-        case 0x024:
-        {
-            return sw_priority_mask;
-        }
-        case 0x028:
-        {
-            return daisy_priority;
-        }
-        case 0xf00:
-        {
-            return vicaddress;
-        }
-        case 0xfe0:
-        {
-            return periph_id[0];
-        }
-        case 0xfe4:
-        {
-            return periph_id[1];
-        }
-        case 0xfe8:
-        {
-            return periph_id[2];
-        }
-        case 0xfec:
-        {
-            return periph_id[3];
-        }
-        case 0xff0:
-        {
-            return pcell_id[0];
-        }
-        case 0xff4:
-        {
-            return pcell_id[1];
-        }
-        case 0xff8:
-        {
-            return pcell_id[2];
-        }
-        case 0xffc:
-        {
-            return pcell_id[3];
-        }
-    }
-    if((offset >= 0x100) && (offset < 0x180))
-    {
-        return vectaddr[(offset & 0x7c) >> 2];
-    }
-    if((offset >= 0x200) && (offset < 0x280))
-    {
-        return vectprio[(offset & 0x7c) >> 2];
-    }
-    return 0;
+    map(0x000, 0x003).lr32([this](offs_t offset){ return raw_intr & ~intr_select; }, "irq_status"); //IRQ_STATUS
+    map(0x004, 0x007).lr32([this](offs_t offset){ return raw_intr & intr_select; }, "fiq_status"); //FIQ_STATUS
+    map(0x008, 0x00b).lr32([this](offs_t offset){ return raw_intr; }, "raw_intr");
+    map(0x00c, 0x00f).lrw32(NAME([this](offs_t offset){ return intr_select; }), NAME([this](offs_t offset, u32 data){ intr_select = data; }));
+    map(0x010, 0x013).lrw32(NAME([this](offs_t offset){ return intr_en; }), NAME([this](offs_t offset, u32 data){ intr_en = data; }));
+    map(0x014, 0x017).lw32([this](u32 data){ intr_en &= ~data; }, "intr_en_clear");
+    map(0x018, 0x01b).lrw32(NAME([this](offs_t offset){ return soft_intr; }), NAME([this](offs_t offset, u32 data){ soft_intr = data; }));
+    map(0x01c, 0x01f).lw32([this](u32 data){ soft_intr &= ~data; }, "soft_intr_clear");
+    map(0x020, 0x020).lrw8(NAME([this](offs_t offset){ return protection; }), NAME([this](offs_t offset, u8 data){ protection = data & 1; })).umask32(0x000000ff);
+    map(0x024, 0x025).lrw8(NAME([this](offs_t offset){ return sw_priority_mask; }), NAME([this](offs_t offset, u16 data){ sw_priority_mask = data; })).umask32(0x0000ffff);
+    map(0x028, 0x028).lrw8(NAME([this](offs_t offset){ return daisy_priority; }), NAME([this](offs_t offset, u8 data){ daisy_priority = data & 0xf; })).umask32(0x000000ff);
+    map(0x100, 0x17f).lrw32(NAME([this](offs_t offset){ return vectaddr[(offset & 0x7c) >> 2]; }), NAME([this](offs_t offset, u32 data){ vectaddr[(offset & 0x7c) >> 2] = data; }));
+    map(0x200, 0x27f).lrw8(NAME([this](offs_t offset){ return vectprio[(offset & 0x7c) >> 2]; }), NAME([this](offs_t offset, u32 data){ vectprio[(offset & 0x7c) >> 2] = data & 0xf; }));
+    map(0xf00, 0xf03).lrw32(NAME([this](offs_t offset){ return vicaddress; }), NAME([this](offs_t offset, u32 data){ vectaddr[(offset & 0x7c) >> 2] = data; }));
+    map(0xfe0, 0xfe0).lr8([this](offs_t offset){ return periph_id[0]; }, "periph_id0").umask32(0x000000ff);
+    map(0xfe4, 0xfe4).lr8([this](offs_t offset){ return periph_id[1]; }, "periph_id1").umask32(0x000000ff);
+    map(0xfe8, 0xfe8).lr8([this](offs_t offset){ return periph_id[2]; }, "periph_id2").umask32(0x000000ff);
+    map(0xfec, 0xfec).lr8([this](offs_t offset){ return periph_id[3]; }, "periph_id3").umask32(0x000000ff);
+    map(0xff0, 0xff0).lr8([this](offs_t offset){ return pcell_id[0]; }, "pcell_id0").umask32(0x000000ff);
+    map(0xff4, 0xff4).lr8([this](offs_t offset){ return pcell_id[1]; }, "pcell_id1").umask32(0x000000ff);
+    map(0xff8, 0xff8).lr8([this](offs_t offset){ return pcell_id[2]; }, "pcell_id2").umask32(0x000000ff);
+    map(0xffc, 0xffc).lr8([this](offs_t offset){ return pcell_id[3]; }, "pcell_id3").umask32(0x000000ff);
 }
 
-void vic_pl192_device::write(offs_t offset, u32 data)
+device_memory_interface::space_config_vector vic_pl192_device::memory_space_config() const
 {
-    offset &= 0xffc;
-    switch(offset)
-    {
-        case 0x00c:
-        {
-            intr_select = data;
-            break;
-        }
-        case 0x010:
-        {
-            intr_en = data;
-            break;
-        }
-        case 0x014:
-        {
-            intr_en &= ~data;
-            break;
-        }
-        case 0x018:
-        {
-            soft_intr = data;
-            break;
-        }
-        case 0x01c:
-        {
-            soft_intr &= ~data;
-            break;
-        }
-        case 0x020:
-        {
-            protection = data & 1;
-            break;
-        }
-        case 0x024:
-        {
-            sw_priority_mask = data;
-            break;
-        }
-        case 0x028:
-        {
-            daisy_priority = data & 0xf;
-            break;
-        }
-    }
-    if((offset >= 0x100) && (offset < 0x180))
-    {
-        vectaddr[(offset & 0x7c) >> 2] = data;
-    }
-    if((offset >= 0x200) && (offset < 0x280))
-    {
-        vectprio[(offset & 0x7c) >> 2] = data & 0xf;
-    }
+	return space_config_vector{
+		std::make_pair(0, &m_mmio_config)
+	};
 }
+
 
 void vic_pl192_device::device_start()
 {
@@ -214,6 +104,8 @@ DEFINE_DEVICE_TYPE(PL192_VIC, vic_pl192_device, "vic_pl192", "ARM PL192 VIC")
 
 vic_pl192_device::vic_pl192_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+    , device_memory_interface(mconfig, *this)
+    , m_mmio_config("mmio", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_out_irq_func(*this)
 	, m_out_fiq_func(*this)
 	, periph_id{0x92, 0x11, 0x04, 0x00}

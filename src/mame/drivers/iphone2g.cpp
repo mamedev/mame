@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
+#include "machine/bankdev.h"
 #include "machine/vic_pl192.h"
 #include "screen.h"
 
@@ -73,8 +74,8 @@ void iphone2g_state::mem_map(address_map &map)
 {
 	map(0x00000000, 0x0000ffff).mirror(0x20000000).rom().region("bios", 0);            /* BIOS */
 	map(0x22000000, 0x224fffff).ram();                                                 /* SRAM */
-	map(0x38e00000, 0x38e00fff).rw(m_vic0, FUNC(vic_pl192_device::read), FUNC(vic_pl192_device::write));
-	map(0x38e01000, 0x38e01fff).rw(m_vic1, FUNC(vic_pl192_device::read), FUNC(vic_pl192_device::write));
+	map(0x38e00000, 0x38e00fff).m(m_vic0, FUNC(vic_pl192_device::map));
+	map(0x38e01000, 0x38e01fff).m(m_vic1, FUNC(vic_pl192_device::map));
 	map(0x3c500000, 0x3c500fff).r(FUNC(iphone2g_state::clock1_r)).nopw();
 }
 
