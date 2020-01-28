@@ -12,6 +12,18 @@
 #define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
+void vic_pl192_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+    if(u32 intrs = (raw_intr | soft_intr) & intr_en)
+    {
+        if(intrs & intr_select) m_out_fiq_func(1);
+        else m_out_fiq_func(0);
+
+        if(intrs & ~intr_select) m_out_irq_func(1);
+        else m_out_irq_func(0);
+    }
+}
+
 void vic_pl192_device::set_irq_line(int irq, int state)
 {
 	u32 mask = (1 << irq);
@@ -25,14 +37,7 @@ void vic_pl192_device::set_irq_line(int irq, int state)
         raw_intr &= ~mask;
     }
 
-    if(u32 intrs = (raw_intr | soft_intr) & intr_en)
-    {
-        if(intrs & intr_select) m_out_fiq_func(1);
-        else m_out_fiq_func(0);
-
-        if(intrs & ~intr_select) m_out_irq_func(1);
-        else m_out_irq_func(0);
-    }
+    timer_set(attotime::zero, TIMER_CHECK_IRQ);
 }
 
 void vic_pl192_device::map(address_map &map)
@@ -40,10 +45,10 @@ void vic_pl192_device::map(address_map &map)
     map(0x000, 0x003).lr32([this](offs_t offset){ return raw_intr & ~intr_select; }, "irq_status"); //IRQ_STATUS
     map(0x004, 0x007).lr32([this](offs_t offset){ return raw_intr & intr_select; }, "fiq_status"); //FIQ_STATUS
     map(0x008, 0x00b).lr32([this](offs_t offset){ return raw_intr; }, "raw_intr");
-    map(0x00c, 0x00f).lrw32(NAME([this](offs_t offset){ return intr_select; }), NAME([this](offs_t offset, u32 data){ intr_select = data; }));
-    map(0x010, 0x013).lrw32(NAME([this](offs_t offset){ return intr_en; }), NAME([this](offs_t offset, u32 data){ intr_en = data; }));
+    map(0x00c, 0x00f).lrw32(NAME([this](offs_t offset){ return intr_select; }), NAME([this](offs_t offset, u32 data){ intr_select = data; timer_set(attotime::zero, TIMER_CHECK_IRQ); }));
+    map(0x010, 0x013).lrw32(NAME([this](offs_t offset){ return intr_en; }), NAME([this](offs_t offset, u32 data){ intr_en = data; timer_set(attotime::zero, TIMER_CHECK_IRQ); }));
     map(0x014, 0x017).lw32([this](u32 data){ intr_en &= ~data; }, "intr_en_clear");
-    map(0x018, 0x01b).lrw32(NAME([this](offs_t offset){ return soft_intr; }), NAME([this](offs_t offset, u32 data){ soft_intr = data; }));
+    map(0x018, 0x01b).lrw32(NAME([this](offs_t offset){ return soft_intr; }), NAME([this](offs_t offset, u32 data){ soft_intr = data; timer_set(attotime::zero, TIMER_CHECK_IRQ); }));
     map(0x01c, 0x01f).lw32([this](u32 data){ soft_intr &= ~data; }, "soft_intr_clear");
     map(0x020, 0x020).lrw8(NAME([this](offs_t offset){ return protection; }), NAME([this](offs_t offset, u8 data){ protection = data & 1; })).umask32(0x000000ff);
     map(0x024, 0x025).lrw8(NAME([this](offs_t offset){ return sw_priority_mask; }), NAME([this](offs_t offset, u16 data){ sw_priority_mask = data; })).umask32(0x0000ffff);
@@ -68,6 +73,12 @@ device_memory_interface::space_config_vector vic_pl192_device::memory_space_conf
 	};
 }
 
+void vic_pl192_device::device_resolve_objects()
+{
+	// resolve callbacks
+	m_out_irq_func.resolve_safe();
+    m_out_fiq_func.resolve_safe();
+}
 
 void vic_pl192_device::device_start()
 {

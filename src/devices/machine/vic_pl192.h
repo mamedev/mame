@@ -23,12 +23,16 @@ protected:
 	vic_pl192_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	
 	// device-level overrides
+    virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
     virtual space_config_vector memory_space_config() const override;
 
 private:
+	static constexpr device_timer_id TIMER_CHECK_IRQ = 0;
+
 	void set_irq_line(int irq, int state);
 
     address_space_config m_mmio_config;
