@@ -520,7 +520,7 @@ INPUT_PORTS_END
 
 void mephisto_montec_state::montec(machine_config &config)
 {
-	M65C02(config, m_maincpu, XTAL(8'000'000) / 2);
+	M65C02(config, m_maincpu, XTAL(8'000'000) / 2); // R65C02P4
 	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_montec_state::montec_mem);
 	m_maincpu->set_periodic_int(FUNC(mephisto_montec_state::nmi_line_assert), attotime::from_hz(XTAL(8'000'000) / (1 << 14)));
 
@@ -618,9 +618,9 @@ ROM_START( montec )
 	ROM_DEFAULT_BIOS("v2")
 
 	ROM_SYSTEM_BIOS( 0, "v1", "V1" )
-	ROMX_LOAD("mc.bin",  0x8000, 0x8000, CRC(05524da9) SHA1(bee2ffe09a27095f733584e0fb1203b95c23e17e), ROM_BIOS(0) )
+	ROMX_LOAD("mc2_20.7.87",  0x8000, 0x8000, CRC(05524da9) SHA1(bee2ffe09a27095f733584e0fb1203b95c23e17e), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v2", "V2" )
-	ROMX_LOAD("mc2.bin", 0x8000, 0x8000, CRC(8eb26043) SHA1(26454a37eea29283bbb2762a3a68e95e4be6aa1c), ROM_BIOS(1) )
+	ROMX_LOAD("mc3_12.11.87", 0x8000, 0x8000, CRC(8eb26043) SHA1(26454a37eea29283bbb2762a3a68e95e4be6aa1c), ROM_BIOS(1) )
 ROM_END
 
 ROM_START( smondial )
@@ -650,7 +650,7 @@ ROM_END
 
 ROM_START( mondial2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("mondial ii 01 08 87 morsch.bin", 0x8000, 0x8000, CRC(e5945ce6) SHA1(e75bbf9d54087271d9d46fb1de7634eb957f8db0) )
+	ROM_LOAD("mondial_ii_01.08.87", 0x8000, 0x8000, CRC(e5945ce6) SHA1(e75bbf9d54087271d9d46fb1de7634eb957f8db0) )
 ROM_END
 
 
