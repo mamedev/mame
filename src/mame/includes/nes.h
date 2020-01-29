@@ -48,7 +48,6 @@
 #define NES_BATTERY 0
 #define NES_WRAM 1
 
-// so that the NES and Famiclones (VT03 for example) can use some common functionality
 class nes_base_state : public driver_device
 {
 public:

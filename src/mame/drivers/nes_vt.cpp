@@ -67,21 +67,23 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/nes.h"
 #include "cpu/m6502/n2a03.h"
 #include "machine/bankdev.h"
 #include "video/ppu2c0x_vt.h"
 #include "machine/m6502_vtscr.h"
 #include "machine/m6502_vh2009.h"
+#include "bus/nes_ctrl/ctrl.h"
 #include "screen.h"
 #include "speaker.h"
 
-
-class nes_vt_state : public nes_base_state
+class nes_vt_state : public driver_device
 {
 public:
 	nes_vt_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_base_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_ctrl1(*this, "ctrl1"),
+		m_ctrl2(*this, "ctrl2"),
 		m_screen(*this, "screen"),
 		m_ppu(*this, "ppu"),
 		m_apu(*this, "apu"),
@@ -125,9 +127,17 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	DECLARE_READ8_MEMBER(nes_in0_r);
+	DECLARE_READ8_MEMBER(nes_in1_r);
+	DECLARE_WRITE8_MEMBER(nes_in0_w);
+
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
 	void nes_vt_map(address_map& map);
+
+	required_device<cpu_device> m_maincpu;
+	optional_device<nes_control_port_device> m_ctrl1;
+	optional_device<nes_control_port_device> m_ctrl2;
 
 	required_device<screen_device> m_screen;
 	required_device<ppu_vt03_device> m_ppu;
@@ -218,7 +228,6 @@ private:
 	uint32_t get_banks(uint8_t bnk);
 
 	int calculate_real_video_address(int addr, int extended, int readtype);
-
 
 	required_memory_bank m_prgbank0;
 	required_memory_bank m_prgbank1;
@@ -472,6 +481,29 @@ private:
 	required_ioport m_io0;
 	required_ioport m_io1;
 };
+
+READ8_MEMBER(nes_vt_state::nes_in0_r)
+{
+	uint8_t ret = 0x40;
+	ret |= m_ctrl1->read_bit0();
+	ret |= m_ctrl1->read_bit34();
+	return ret;
+}
+
+READ8_MEMBER(nes_vt_state::nes_in1_r)
+{
+	uint8_t ret = 0x40;
+	ret |= m_ctrl2->read_bit0();
+	ret |= m_ctrl2->read_bit34();
+	return ret;
+}
+
+WRITE8_MEMBER(nes_vt_state::nes_in0_w)
+{
+	m_ctrl1->write(data);
+	m_ctrl2->write(data);
+}
+
 
 uint32_t nes_vt_state::get_banks(uint8_t bnk)
 {
