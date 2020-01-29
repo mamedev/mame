@@ -138,11 +138,9 @@ namespace analog
 		, m_Vmin(nlconst::zero()) // not used in MOS model
 		, m_Is(nlconst::zero())
 		, m_logIs(nlconst::zero())
-		, m_n(nlconst::zero())
 		, m_gmin(nlconst::magic(1e-15))
 		, m_VtInv(nlconst::zero())
 		, m_Vcrit(nlconst::zero())
-		, m_name(name)
 		{
 			set_param(
 				nlconst::magic(1e-15)
@@ -205,10 +203,9 @@ namespace analog
 		{
 			m_Is = Is;
 			m_logIs = plib::log(Is);
-			m_n = n;
 			m_gmin = gmin;
 
-			m_Vt = m_n * temp * nlconst::k_b() / nlconst::Q_e();
+			m_Vt = n * temp * nlconst::k_b() / nlconst::Q_e();
 
 			m_Vmin = nlconst::magic(-5.0) * m_Vt;
 
@@ -234,13 +231,10 @@ namespace analog
 		nl_fptype m_Vmin;
 		nl_fptype m_Is;
 		nl_fptype m_logIs;
-		nl_fptype m_n;
 		nl_fptype m_gmin;
 
 		nl_fptype m_VtInv;
 		nl_fptype m_Vcrit;
-
-		pstring m_name;
 	};
 
 

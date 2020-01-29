@@ -10,9 +10,6 @@
 #include "plib/pconfig.h"
 #include "plib/pexception.h"
 
-// FIXME: Remove this again after testing
-#define USE_EVAL (0)
-
 ///
 /// \brief Version - Major.
 ///
@@ -20,7 +17,7 @@
 ///
 /// \brief Version - Minor.
 ///
-#define NL_VERSION_MINOR           10
+#define NL_VERSION_MINOR           11
 /// \brief Version - Patch level.
 ///
 #define NL_VERSION_PATCHLEVEL      0

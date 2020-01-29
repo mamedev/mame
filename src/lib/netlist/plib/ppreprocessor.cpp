@@ -226,7 +226,6 @@ namespace plib {
 			{
 				pstring s(STR);
 				pi++;
-				// FIXME : \"
 				while (pi < tmp.size() && tmp[pi] != STR)
 				{
 					s += tmp[pi];
@@ -454,7 +453,6 @@ namespace plib {
 		line = process_comments(m_line);
 
 		pstring lt = plib::trim(plib::replace_all(line, "\t", " "));
-		// FIXME ... revise and extend macro handling
 		if (plib::startsWith(lt, "#"))
 		{
 			string_list lti(psplit(lt, " ", true));
@@ -462,7 +460,6 @@ namespace plib {
 			{
 				m_if_level++;
 				lt = replace_macros(lt);
-				//std::vector<pstring> t(psplit(replace_all(lt.substr(3), " ", ""), m_expr_sep));
 				auto t(simple_iter<ppreprocessor>(this, tokenize(lt.substr(3), m_expr_sep, true, true)));
 				auto val = static_cast<int>(prepro_expr(t, 255));
 				t.skip_ws();

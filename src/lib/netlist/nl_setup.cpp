@@ -121,11 +121,9 @@ namespace netlist
 					pstring paramfq = name + "." + tp;
 
 					log().debug("Defparam: {1}\n", paramfq);
-					// remove quotes
-					if (plib::startsWith(*ptok, "\"") && plib::endsWith(*ptok, "\""))
-						register_param(paramfq, ptok->substr(1, ptok->length() - 2));
-					else
-						register_param(paramfq, *ptok);
+
+					register_param(paramfq, *ptok);
+
 					++ptok;
 				}
 			}
@@ -216,11 +214,16 @@ namespace netlist
 	void nlparse_t::register_param(const pstring &param, const pstring &value)
 	{
 		pstring fqn = build_fqn(param);
+		pstring val(value);
+
+		// strip " from stringified strings
+		if (plib::startsWith(value, "\"") && plib::endsWith(value, "\""))
+			val = value.substr(1, value.length() - 2);
 
 		auto idx = m_param_values.find(fqn);
 		if (idx == m_param_values.end())
 		{
-			if (!m_param_values.insert({fqn, value}).second)
+			if (!m_param_values.insert({fqn, val}).second)
 			{
 				log().fatal(MF_ADDING_PARAMETER_1_TO_PARAMETER_LIST(param));
 				throw nl_exception(MF_ADDING_PARAMETER_1_TO_PARAMETER_LIST(param));
@@ -229,8 +232,8 @@ namespace netlist
 		else
 		{
 			log().warning(MW_OVERWRITING_PARAM_1_OLD_2_NEW_3(fqn, idx->second,
-					value));
-			m_param_values[fqn] = value;
+					val));
+			m_param_values[fqn] = val;
 		}
 	}
 
@@ -239,7 +242,7 @@ namespace netlist
 		m_factory.register_device(plib::make_unique<factory::library_element_t>(name, name, "", sourcefile));
 	}
 
-	void nlparse_t::register_frontier(const pstring &attach, const nl_fptype r_IN, const nl_fptype r_OUT)
+	void nlparse_t::register_frontier(const pstring &attach, const pstring &r_IN, const pstring &r_OUT)
 	{
 		pstring frontier_name = plib::pfmt("frontier_{1}")(m_frontier_cnt);
 		m_frontier_cnt++;
