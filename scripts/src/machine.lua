@@ -3132,6 +3132,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/vic_pl192.h,MACHINES["VIC_PL192"] = true
+---------------------------------------------------
+
+if (MACHINES["VIC_PL192"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/vic_pl192.cpp",
+		MAME_DIR .. "src/devices/machine/vic_pl192.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/wd_fdc.h,MACHINES["WD_FDC"] = true
 ---------------------------------------------------
 
