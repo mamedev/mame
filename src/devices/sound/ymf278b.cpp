@@ -44,6 +44,8 @@
    - accurate timing of envelopes
    - LFO (vibrato, tremolo)
    - integrate YMF262 mixing (used by Fuuki games, not used by Psikyo and Metro games)
+   - Envelope and LFO function is similar algorithm as multipcm.cpp (except Damp, Pseudo Reverb)
+     Can it be merged with/ported to this?
 */
 
 #include "emu.h"
