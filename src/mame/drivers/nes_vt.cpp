@@ -72,7 +72,6 @@
 #include "video/ppu2c0x_vt.h"
 #include "machine/m6502_vtscr.h"
 #include "machine/m6502_vh2009.h"
-#include "bus/nes_ctrl/ctrl.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -82,12 +81,12 @@ public:
 	nes_vt_state(const machine_config& mconfig, device_type type, const char* tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_ctrl1(*this, "ctrl1"),
-		m_ctrl2(*this, "ctrl2"),
+		m_io0(*this, "IO0"),
+		m_io1(*this, "IO1"),
 		m_screen(*this, "screen"),
 		m_ppu(*this, "ppu"),
 		m_apu(*this, "apu"),
-		m_csel(*this, "CARTSEL"),
+		m_cartsel(*this, "CARTSEL"),
 		m_exin0(*this, "EXTRAIN0"),
 		m_exin1(*this, "EXTRAIN1"),
 		m_exin2(*this, "EXTRAIN2"),
@@ -136,8 +135,10 @@ protected:
 	void nes_vt_map(address_map& map);
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<nes_control_port_device> m_ctrl1;
-	optional_device<nes_control_port_device> m_ctrl2;
+	optional_ioport m_io0;
+	optional_ioport m_io1;
+	uint8_t m_latch0;
+	uint8_t m_latch1;
 
 	required_device<screen_device> m_screen;
 	required_device<ppu_vt03_device> m_ppu;
@@ -170,7 +171,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(vt03_8000_w);
 	DECLARE_WRITE8_MEMBER(vt03_4034_w);
 
-	optional_ioport m_csel;
+	optional_ioport m_cartsel;
 	optional_ioport m_exin0;
 	optional_ioport m_exin1;
 	optional_ioport m_exin2;
@@ -402,8 +403,6 @@ public:
 	nes_vt_ablpinb_state(const machine_config& mconfig, device_type type, const char* tag) :
 		nes_vt_state(mconfig, type, tag),
 		m_ablpinb_in0_val(0),
-		m_io0(*this, "IO0"),
-		m_io1(*this, "IO1"),
 		m_plunger(*this, "PLUNGER")
 	{ }
 
@@ -425,8 +424,6 @@ private:
 	int m_plunger_off;
 	int m_plunger_state_count;
 
-	required_ioport m_io0;
-	required_ioport m_io1;
 	required_ioport m_plunger;
 };
 
@@ -434,9 +431,7 @@ class nes_vt_sudoku_state : public nes_vt_state
 {
 public:
 	nes_vt_sudoku_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_state(mconfig, type, tag),
-		m_io0(*this, "IO0"),
-		m_io1(*this, "IO1")
+		nes_vt_state(mconfig, type, tag)
 	{ }
 
 	void init_sudoku();
@@ -453,18 +448,13 @@ private:
 	DECLARE_WRITE8_MEMBER(in0_w);
 
 	void nes_vt_sudoku_map(address_map& map);
-
-	required_ioport m_io0;
-	required_ioport m_io1;
 };
 
 class nes_vt_majgnc_state : public nes_vt_state
 {
 public:
 	nes_vt_majgnc_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_state(mconfig, type, tag),
-		m_io0(*this, "IO0"),
-		m_io1(*this, "IO1")
+		nes_vt_state(mconfig, type, tag)
 	{ }
 
 	void nes_vt_majgnc(machine_config& config);
@@ -477,31 +467,31 @@ private:
 	DECLARE_WRITE8_MEMBER(in0_w);
 
 	void nes_vt_majgnc_map(address_map& map);
-
-	required_ioport m_io0;
-	required_ioport m_io1;
 };
 
 READ8_MEMBER(nes_vt_state::nes_in0_r)
 {
 	uint8_t ret = 0x40;
-	ret |= m_ctrl1->read_bit0();
-	ret |= m_ctrl1->read_bit34();
+	ret |= m_latch0 & 1;
+	m_latch0 >>= 1;
 	return ret;
 }
 
 READ8_MEMBER(nes_vt_state::nes_in1_r)
 {
 	uint8_t ret = 0x40;
-	ret |= m_ctrl2->read_bit0();
-	ret |= m_ctrl2->read_bit34();
+	ret |= m_latch1 & 1;
+	m_latch1 >>= 1;
 	return ret;
 }
 
 WRITE8_MEMBER(nes_vt_state::nes_in0_w)
 {
-	m_ctrl1->write(data);
-	m_ctrl2->write(data);
+	if (data & 0x01)
+		return;
+
+	m_latch0 = m_io0->read();
+	m_latch1 = m_io1->read();
 }
 
 
@@ -740,22 +730,22 @@ WRITE8_MEMBER(nes_vt_dg_state::vtfa_412c_w)
 	m_ahigh |= (data & 0x01) ? (1 << 25) : 0x0;
 	m_ahigh |= (data & 0x02) ? (1 << 24) : 0x0;
 
-	//m_ahigh |= (m_csel->read() == 0x01) ? (1 << 25) : 0x0;
+	//m_ahigh |= (m_cartsel->read() == 0x01) ? (1 << 25) : 0x0;
 	update_banks();
 }
 
 READ8_MEMBER(nes_vt_dg_state::vtfa_412c_r)
 {
-	if (m_csel)
-		return m_csel->read();
+	if (m_cartsel)
+		return m_cartsel->read();
 	else
 		return 0;
 }
 
 READ8_MEMBER(nes_vt_hh_state::vtfp_412d_r)
 {
-	if (m_csel)
-		return m_csel->read();
+	if (m_cartsel)
+		return m_cartsel->read();
 	else
 		return 0;
 }
@@ -1000,8 +990,8 @@ void nes_vt_state::machine_reset()
 	m_411d = 0x00;
 	m_4242 = 0x00;
 
-	if (m_csel)
-		m_ahigh = (m_csel->read() == 0x01) ? (1 << 25) : 0x0;
+	if (m_cartsel)
+		m_ahigh = (m_cartsel->read() == 0x01) ? (1 << 25) : 0x0;
 	else
 		m_ahigh = 0;
 
@@ -1979,21 +1969,11 @@ void nes_vt_majgnc_state::nes_vt_majgnc(machine_config &config)
 void nes_vt_state::nes_vt(machine_config &config)
 {
 	nes_vt_base(config);
-
-	NES_CONTROL_PORT(config, m_ctrl1, nes_control_port1_devices, "joypad");
-	NES_CONTROL_PORT(config, m_ctrl2, nes_control_port2_devices, "joypad");
-	m_ctrl1->set_screen_tag(m_screen);
-	m_ctrl2->set_screen_tag(m_screen);
 }
 
 void nes_vt_state::nes_vt_ddr(machine_config &config)
 {
 	nes_vt_base(config);
-
-	NES_CONTROL_PORT(config, m_ctrl1, majesco_control_port1_devices, "ddr");
-	NES_CONTROL_PORT(config, m_ctrl2, majesco_control_port2_devices, nullptr);
-	m_ctrl1->set_screen_tag(m_screen);
-	m_ctrl2->set_screen_tag(m_screen);
 }
 
 void nes_vt_state::nes_vt_sudopptv(machine_config &config)
@@ -2097,7 +2077,40 @@ void nes_vt_hh_state::nes_vt_hh(machine_config &config)
 }
 
 static INPUT_PORTS_START( nes_vt )
-	PORT_START("CARTSEL")
+	PORT_START("IO0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
+
+	PORT_START("IO1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( nes_vt_ddr )
+	PORT_START("IO0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_NAME("Up Arrow") PORT_16WAY // NOT A JOYSTICK!!
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_NAME("Down Arrow") PORT_16WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_NAME("Left Arrow") PORT_16WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Right Arrow") PORT_16WAY
+
+	PORT_START("IO1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 void nes_vt_hh_state::nes_vt_fp(machine_config &config)
@@ -2132,9 +2145,9 @@ void nes_vt_ts_state::nes_vt_ts(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_ts_state::nes_vt_ts_map);
 }
 
-
-
 static INPUT_PORTS_START( nes_vt_fp )
+	PORT_INCLUDE(nes_vt)
+
 	PORT_START("CARTSEL")
 	PORT_DIPNAME( 0x06, 0x00, "Cartridge Select" ) PORT_CODE(KEYCODE_3) PORT_TOGGLE
 	PORT_DIPSETTING(    0x00, "472-in-1" )
@@ -2142,6 +2155,8 @@ static INPUT_PORTS_START( nes_vt_fp )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nes_vt_fa )
+	PORT_INCLUDE(nes_vt)
+
 	PORT_START("CARTSEL")
 	PORT_DIPNAME( 0x01, 0x00, "Cartridge Select" ) PORT_CODE(KEYCODE_3) PORT_TOGGLE
 	PORT_DIPSETTING(    0x00, "508-in-1" )
@@ -2172,12 +2187,13 @@ static INPUT_PORTS_START( ablpinb )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sudoku )
-	PORT_START("IO0")
-	PORT_START("IO1")
+	PORT_INCLUDE(nes_vt)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( majgnc )
-	PORT_START("IO0")
+	PORT_INCLUDE(nes_vt)
+
+	PORT_MODIFY("IO0")
 	PORT_DIPNAME( 0x01, 0x01, "0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2203,7 +2219,7 @@ static INPUT_PORTS_START( majgnc )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IO1")
+	PORT_MODIFY("IO1")
 	PORT_DIPNAME( 0x01, 0x01, "1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2764,8 +2780,8 @@ CONS( 200?, gprnrs16,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_ini
 // Notes about the DDR games:
 // * Missing PCM sounds (unsupported in NES VT APU code right now)
 // * Console has stereo output (dual RCA connectors).
-CONS( 2006, ddrdismx,   0,        0,  nes_vt_ddr, nes_vt, nes_vt_state, empty_init, "Majesco (licensed from Konami, Disney)", "Dance Dance Revolution Disney Mix",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // shows (c)2001 Disney onscreen, but that's recycled art from the Playstation release, actual release was 2006
-CONS( 2006, ddrstraw,   0,        0,  nes_vt_ddr, nes_vt, nes_vt_state, empty_init, "Majesco (licensed from Konami)",         "Dance Dance Revolution Strawberry Shortcake", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ddrdismx,   0,        0,  nes_vt_ddr, nes_vt_ddr, nes_vt_state, empty_init, "Majesco (licensed from Konami, Disney)", "Dance Dance Revolution Disney Mix",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // shows (c)2001 Disney onscreen, but that's recycled art from the Playstation release, actual release was 2006
+CONS( 2006, ddrstraw,   0,        0,  nes_vt_ddr, nes_vt_ddr, nes_vt_state, empty_init, "Majesco (licensed from Konami)",         "Dance Dance Revolution Strawberry Shortcake", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 
 
