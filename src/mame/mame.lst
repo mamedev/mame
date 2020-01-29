@@ -12886,6 +12886,7 @@ rad_baskp
 rad_sinv
 rad_tetr
 airblsjs
+buzztime
 sudoelan
 carlecfg
 
@@ -39882,6 +39883,8 @@ jak_sbfc                        //
 @source:spg2xx_zone.cpp
 wirels60                        // Wireless 60
 zone40                          // Zone 40
+reactmd
+itvg49
 zone60                          // Zone 60
 zone100                         //
 lx_jg7415                       //
@@ -39924,6 +39927,7 @@ tvgogo                          //
 
 @source:spg2xx_pdc.cpp
 pdc100
+tmntpdc
 
 @source:spg2xx_dreamlife.cpp
 dreamlif                        //
