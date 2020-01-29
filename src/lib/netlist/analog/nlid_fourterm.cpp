@@ -124,10 +124,10 @@ NETLIB_RESET(CCVS)
 	} //namespace analog
 
 	namespace devices {
-		NETLIB_DEVICE_IMPL_NS(analog, VCVS,  "VCVS",  "")
-		NETLIB_DEVICE_IMPL_NS(analog, VCCS,  "VCCS",  "")
-		NETLIB_DEVICE_IMPL_NS(analog, CCCS,  "CCCS",  "")
-		NETLIB_DEVICE_IMPL_NS(analog, CCVS,  "CCVS",  "")
+		NETLIB_DEVICE_IMPL_NS(analog, VCVS,  "VCVS",  "G")
+		NETLIB_DEVICE_IMPL_NS(analog, VCCS,  "VCCS",  "G")
+		NETLIB_DEVICE_IMPL_NS(analog, CCCS,  "CCCS",  "G")
+		NETLIB_DEVICE_IMPL_NS(analog, CCVS,  "CCVS",  "G")
 		NETLIB_DEVICE_IMPL_NS(analog, LVCCS, "LVCCS", "")
 	} // namespace devices
 } // namespace netlist
