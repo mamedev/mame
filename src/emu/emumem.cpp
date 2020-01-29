@@ -2582,7 +2582,7 @@ void memory_bank::set_base(void *base)
 		m_curentry = 0;
 	}
 	m_entries[m_curentry] = reinterpret_cast<u8 *>(base);
-	for(auto cb : m_alloc_notifier)
+	for(const auto &cb : m_alloc_notifier)
 		cb(base);
 	m_alloc_notifier.clear();
 }
