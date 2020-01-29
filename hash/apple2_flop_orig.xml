@@ -10400,4 +10400,165 @@
 		</part>
 	</software>
 
+	<software name="advprgkt">
+		<description>Adventure Programming Kit (Versoin 10.84)</description>
+		<year>1984</year>
+		<publisher>Salty Software</publisher>
+		<info name="release" value="2020-01-24"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple ][+ or later. -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234823">
+				<rom name="adventure programming kit.woz" size="234823" crc="4da9593c" sha1="cc495b95c1c2cd9134e47865b913f7e9bfa4e41a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lgcyanct">
+		<description>Legacy of the Ancients</description>
+		<year>1987</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2020-01-24"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="242988">
+				<rom name="legacy of the ancients side 1.woz" size="242988" crc="ec4191a1" sha1="94cb308a22c03c669417611d5441a1c437165626"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="234796">
+				<rom name="legacy of the ancients side 2.woz" size="234796" crc="fbec7b4c" sha1="a094c00d4a38959ee45dde1c22f7699ae142711d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="241452">
+				<rom name="legacy of the ancients side 3.woz" size="241452" crc="f433fe37" sha1="3b30805dd474f75923363c74d12e75e950c74382"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side 4"/>
+			<dataarea name="flop" size="241452">
+				<rom name="legacy of the ancients side 4.woz" size="241452" crc="5f13fdfd" sha1="b38eb9353f999d780b5f56a53c4a6b7330715686"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mingchal">
+		<description>Ming's Challenge</description>
+		<year>1982</year>
+		<publisher>Micro Fun</publisher>
+		<info name="release" value="2020-01-24"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="233746">
+				<rom name="ming's challenge.woz" size="233746" crc="155dd8de" sha1="14179cd6704f849c0446c7f0402e71cf70742e24"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dragneye">
+		<description>The Dragon's Eye</description>
+		<year>1981</year>
+		<publisher>Automated Simulations</publisher>
+		<info name="release" value="2020-01-24"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234775">
+				<rom name="the dragon's eye.woz" size="234775" crc="0c51846e" sha1="69c5812255ee8c46724ff531ef3ad656199d0a77"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mn2049ii">
+		<description>Miner 2049er II</description>
+		<year>1984</year>
+		<publisher>Micro Fun</publisher>
+		<info name="release" value="2020-01-24"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234769">
+				<rom name="miner 2049er ii.woz" size="234769" crc="6ba9469f" sha1="b20e14d8a1dc69438c195e7512d6389aa1b83e94"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trcrsnct">
+		<description>The Tracer Sanction</description>
+		<year>1984</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2020-01-24"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234785">
+				<rom name="the tracer sanction side a.woz" size="234785" crc="17b27251" sha1="f2179fdbaf0a9da30ccd64a176d19d4576fc2fc0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234785">
+				<rom name="the tracer sanction side b.woz" size="234785" crc="4f60a127" sha1="6b202a70c0c769c177d36fdd8c20c492014d1993"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sumrgms2">
+		<description>Summer Games II</description>
+		<year>1985</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2020-01-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234963">
+				<rom name="summer games ii side a.woz" size="234963" crc="f42076b9" sha1="38aeed0677d67a34844b29b76d2cd4211df8c479"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234963">
+				<rom name="summer games ii side b.woz" size="234963" crc="76abeacd" sha1="a49c9e066bc164f6d3af5e355b30fbfbb5b31ea6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srpstr10">
+		<description>The Serpent's Star (Version 1.0)</description>
+		<year>1983</year>
+		<publisher>Ultrasoft</publisher>
+		<info name="release" value="2020-01-26"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!-- Note: due to subtle emulation bugs and extremely finicky copy
+        protection, this disk may reboot one or more times before loading. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234770">
+				<rom name="the serpent's star side a.woz" size="234770" crc="197cce52" sha1="900bf3e4ab89b538620fe35445833618c3a2e1b9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234770">
+				<rom name="the serpent's star side b.woz" size="234770" crc="ee240f18" sha1="4938d02b15b2d4b626dfd0a14514cf09a06a0afa"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
