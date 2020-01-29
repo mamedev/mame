@@ -105,9 +105,8 @@ public:
 	void nes_vt_base(machine_config& config);
 
 	void nes_vt(machine_config& config);
-	void nes_vt_ddr(machine_config& config);
 
-	void nes_vt_xx(machine_config& config);
+	void nes_vt_4k_ram(machine_config& config);
 	void nes_vt_sudopptv(machine_config& config);
 
 	/* OneBus read callbacks for getting sprite and tile data during rendering */
@@ -179,7 +178,7 @@ protected:
 
 	required_device<address_map_bank_device> m_prg;
 
-	void nes_vt_xx_map(address_map& map);
+	void nes_vt_4k_ram_map(address_map& map);
 
 	/* Misc */
 	DECLARE_READ8_MEMBER(rs232flags_region_r);
@@ -1685,7 +1684,7 @@ void nes_vt_state::nes_vt_map(address_map &map)
 }
 
 /* Some later VT models have more RAM */
-void nes_vt_state::nes_vt_xx_map(address_map &map)
+void nes_vt_state::nes_vt_4k_ram_map(address_map &map)
 {
 	nes_vt_map(map);
 	map(0x0800, 0x0fff).ram();
@@ -1699,7 +1698,7 @@ void nes_vt_ablping_state::nes_vt_ablping_map(address_map &map)
 
 void nes_vt_cy_state::nes_vt_cy_map(address_map &map)
 {
-	nes_vt_xx_map(map);
+	nes_vt_4k_ram_map(map);
 	map(0x41b0, 0x41bf).r(FUNC(nes_vt_cy_state::vt03_41bx_r)).w(FUNC(nes_vt_cy_state::vt03_41bx_w));
 	map(0x48a0, 0x48af).r(FUNC(nes_vt_cy_state::vt03_48ax_r)).w(FUNC(nes_vt_cy_state::vt03_48ax_w));
 	map(0x4130, 0x4136).r(FUNC(nes_vt_cy_state::vt03_413x_r)).w(FUNC(nes_vt_cy_state::vt03_413x_w));
@@ -1710,7 +1709,7 @@ void nes_vt_cy_state::nes_vt_cy_map(address_map &map)
 
 void nes_vt_cy_state::nes_vt_bt_map(address_map &map)
 {
-	nes_vt_xx_map(map);
+	nes_vt_4k_ram_map(map);
 	map(0x412c, 0x412c).w(FUNC(nes_vt_cy_state::vt03_412c_w));
 }
 
@@ -1932,11 +1931,6 @@ void nes_vt_state::nes_vt(machine_config &config)
 	nes_vt_base(config);
 }
 
-void nes_vt_state::nes_vt_ddr(machine_config &config)
-{
-	nes_vt_base(config);
-}
-
 void nes_vt_state::nes_vt_sudopptv(machine_config &config)
 {
 	nes_vt(config);
@@ -1975,27 +1969,27 @@ void nes_vt_ablping_state::nes_vt_ablping(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::nes_vt_ablping_map);
 }
 
-void nes_vt_state::nes_vt_xx(machine_config &config)
+void nes_vt_state::nes_vt_4k_ram(machine_config &config)
 {
 	nes_vt(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_xx_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_4k_ram_map);
 }
 
 void nes_vt_cy_state::nes_vt_cy(machine_config &config)
 {
-	nes_vt_xx(config);
+	nes_vt_4k_ram(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_cy_state::nes_vt_cy_map);
 }
 
 void nes_vt_cy_state::nes_vt_bt(machine_config &config)
 {
-	nes_vt_xx(config);
+	nes_vt_4k_ram(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_cy_state::nes_vt_bt_map);
 }
 
 void nes_vt_dg_state::nes_vt_dg(machine_config &config)
 {
-	nes_vt_xx(config);
+	nes_vt_4k_ram(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::nes_vt_dg_map);
 
 	m_screen->set_refresh_hz(50.0070);
@@ -2025,7 +2019,7 @@ void nes_vt_hh_state::nes_vt_vg_baddma(machine_config &config)
 // New mystery handheld architecture, VTxx derived
 void nes_vt_hh_state::nes_vt_hh(machine_config &config)
 {
-	nes_vt_xx(config);
+	nes_vt_4k_ram(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_hh_map);
 	m_ppu->set_palette_mode(PAL_MODE_NEW_RGB);
 
@@ -2076,7 +2070,7 @@ INPUT_PORTS_END
 
 void nes_vt_hh_state::nes_vt_fp(machine_config &config)
 {
-	nes_vt_xx(config);
+	nes_vt_4k_ram(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_fp_map);
 
 	m_ppu->set_palette_mode(PAL_MODE_NEW_RGB12);
@@ -2084,7 +2078,7 @@ void nes_vt_hh_state::nes_vt_fp(machine_config &config)
 
 void nes_vt_dg_state::nes_vt_fa(machine_config &config)
 {
-	nes_vt_xx(config);
+	nes_vt_4k_ram(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::nes_vt_fa_map);
 }
 
@@ -2741,8 +2735,8 @@ CONS( 200?, gprnrs16,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_ini
 // Notes about the DDR games:
 // * Missing PCM sounds (unsupported in NES VT APU code right now)
 // * Console has stereo output (dual RCA connectors).
-CONS( 2006, ddrdismx,   0,        0,  nes_vt_ddr, nes_vt_ddr, nes_vt_state, empty_init, "Majesco (licensed from Konami, Disney)", "Dance Dance Revolution Disney Mix",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // shows (c)2001 Disney onscreen, but that's recycled art from the Playstation release, actual release was 2006
-CONS( 2006, ddrstraw,   0,        0,  nes_vt_ddr, nes_vt_ddr, nes_vt_state, empty_init, "Majesco (licensed from Konami)",         "Dance Dance Revolution Strawberry Shortcake", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ddrdismx,   0,        0,  nes_vt, nes_vt_ddr, nes_vt_state, empty_init, "Majesco (licensed from Konami, Disney)", "Dance Dance Revolution Disney Mix",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // shows (c)2001 Disney onscreen, but that's recycled art from the Playstation release, actual release was 2006
+CONS( 2006, ddrstraw,   0,        0,  nes_vt, nes_vt_ddr, nes_vt_state, empty_init, "Majesco (licensed from Konami)",         "Dance Dance Revolution Strawberry Shortcake", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 
 
@@ -2774,7 +2768,7 @@ CONS( 201?, mc_89in1,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_ini
 CONS( 201?, mc_pg150,   0,        0,  nes_vt_bt, nes_vt, nes_vt_cy_state, empty_init, "<unknown>", "Pocket Games 150 in 1", MACHINE_NOT_WORKING )
 // No title screen, but press start and menu and games run fine. Makes odd
 // memory accesses which probably explain broken title screen
-CONS( 201?, mc_hh210,   0,        0,  nes_vt_xx, nes_vt, nes_vt_state, empty_init, "<unknown>", "Handheld 210 in 1", MACHINE_NOT_WORKING )
+CONS( 201?, mc_hh210,   0,        0,  nes_vt_4k_ram, nes_vt, nes_vt_state, empty_init, "<unknown>", "Handheld 210 in 1", MACHINE_NOT_WORKING )
 // First half of games don't work, probably bad dump
 CONS( 201?, dvnimbus,   0,        0,  nes_vt_vg, nes_vt, nes_vt_hh_state, empty_init, "<unknown>", "DVTech Nimbus 176 in 1", MACHINE_NOT_WORKING )
 // Works fine, VT02 based
