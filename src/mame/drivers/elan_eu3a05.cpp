@@ -184,42 +184,52 @@ public:
 	void elan_buzztime(machine_config& config);
 
 protected:
-	virtual void machine_start() override
-	{
-		elan_eu3a05_state::machine_start();
-
-		// if there's a cart make sure we can see it
-		if (m_cart && m_cart->exists())
-		{
-			uint8_t *rom = memregion("maincpu")->base();
-			uint8_t* cart = m_cart->get_rom_base();
-			std::copy(&cart[0x000000], &cart[0x200000], &rom[0x200000]);
-		}
-	}
+	virtual void machine_start() override;
 
 private:
 	//DECLARE_READ8_MEMBER(random_r) { return machine().rand(); }
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_WRITE8_MEMBER(portb_w);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load)
-	{
-		uint32_t size = m_cart->common_get_size("rom");
-
-		if (size != 0x200000)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			return image_init_result::FAIL;
-		}
-
-		m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_NATIVE);
-		m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
-
-		return image_init_result::PASS;
-	}
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	required_device<generic_slot_device> m_cart;
 };
+
+void elan_eu3a05_buzztime_state::machine_start()
+{
+	elan_eu3a05_state::machine_start();
+
+	// if there's a cart make sure we can see it
+	if (m_cart && m_cart->exists())
+	{
+		uint8_t *rom = memregion("maincpu")->base();
+		uint8_t* cart = m_cart->get_rom_base();
+		std::copy(&cart[0x000000], &cart[0x200000], &rom[0x200000]);
+	}
+	else
+	{
+		uint8_t *rom = memregion("maincpu")->base();
+		uint8_t* bios = memregion("bios")->base();
+		std::copy(&bios[0x000000], &bios[0x200000], &rom[0x200000]);
+	}
+}
+
+DEVICE_IMAGE_LOAD_MEMBER(elan_eu3a05_buzztime_state::cart_load)
+{
+	uint32_t size = m_cart->common_get_size("rom");
+
+	if (size != 0x200000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		return image_init_result::FAIL;
+	}
+
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_NATIVE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
 
 void elan_eu3a05_buzztime_state::elan_buzztime(machine_config &config)
 {
@@ -235,7 +245,6 @@ void elan_eu3a05_buzztime_state::elan_buzztime(machine_config &config)
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "buzztime_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
 	m_cart->set_device_load(FUNC(elan_eu3a05_buzztime_state::cart_load));
-	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "buzztime_cart").set_original("buzztime_cart");
 }
@@ -700,7 +709,9 @@ ROM_END
 
 ROM_START( buzztime )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "unit.rom", 0x200000, 0x200000, NO_DUMP ) // is there a default / internal program or not?
+
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "buzztimeunit.bin", 0x000000, 0x200000, CRC(8ba3569c) SHA1(3e704338a53daed63da90aba0db4f6adb5bccd21) )
 ROM_END
 
 
@@ -711,7 +722,7 @@ CONS( 2004, rad_tetr, 0, 0, elan_eu3a05, rad_tetr, elan_eu3a05_state, empty_init
 // ROM contains the string "Credit:XiAn Hummer Software Studio(CHINA) Tel:86-29-84270600 Email:HummerSoft@126.com"  PCB has datecode of "050423" (23rd April 2005)
 CONS( 2005, airblsjs, 0, 0, airblsjs, airblsjs, elan_eu3a05_state, empty_init, "Advance Bright Ltd", "Air-Blaster Joystick (AB1500, PAL)", MACHINE_NOT_WORKING )
 
-CONS( 200?, buzztime, 0, 0, elan_buzztime, sudoku, elan_eu3a05_buzztime_state, empty_init, "Cadaco", "Buzztime Trivia", MACHINE_NOT_WORKING )
+CONS( 2004, buzztime, 0, 0, elan_buzztime, sudoku, elan_eu3a05_buzztime_state, empty_init, "Cadaco", "Buzztime Home Trivia System", MACHINE_NOT_WORKING )
 
 // Below are probably not EU3A05 but use similar modes (possibly EU3A13?)
 
