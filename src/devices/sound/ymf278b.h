@@ -17,6 +17,9 @@ public:
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 
+	// for VGMPlay data handling
+	bool busy() { return m_status_ld | m_status_busy; }
+
 protected:
 	// device-level overrides
 	virtual void device_post_load() override;
@@ -88,7 +91,7 @@ private:
 	void precompute_rate_tables();
 	void register_save_state();
 
-	void update_request() { m_stream_ymf262->update(); }
+	void update_request() { m_stream->update(); }
 
 	static void static_irq_handler(device_t *param, int irq) { }
 	static void static_timer_handler(device_t *param, int c, const attotime &period) { }
@@ -134,7 +137,6 @@ private:
 
 	// ymf262
 	void *m_ymf262;
-	sound_stream * m_stream_ymf262;
 };
 
 DECLARE_DEVICE_TYPE(YMF278B, ymf278b_device)

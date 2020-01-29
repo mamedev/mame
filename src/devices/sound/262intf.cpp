@@ -9,7 +9,6 @@
 ***************************************************************************/
 #include "emu.h"
 #include "262intf.h"
-#include "ymf262.h"
 
 
 /* IRQ Handler */
@@ -24,12 +23,16 @@ void ymf262_device::device_timer(emu_timer &timer, device_timer_id id, int param
 {
 	switch(id)
 	{
-	case 0:
-		ymf262_timer_over(m_chip,0);
+	case OPL3_TIMER_1:
+		ymf262_timer_over(m_chip,OPL3_TIMER_1);
 		break;
 
-	case 1:
-		ymf262_timer_over(m_chip,1);
+	case OPL3_TIMER_2:
+		ymf262_timer_over(m_chip,OPL3_TIMER_2);
+		break;
+
+	case OPL3_TIMER_BUSY:
+		ymf262_timer_over(m_chip,OPL3_TIMER_BUSY);
 		break;
 	}
 }
@@ -58,6 +61,11 @@ void ymf262_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	ymf262_update_one(m_chip, outputs, samples);
 }
 
+void ymf289b_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	ymf289b_update_one(m_chip, outputs, samples);
+}
+
 //-------------------------------------------------
 //  device_post_load - device-specific post load
 //-------------------------------------------------
@@ -77,7 +85,7 @@ void ymf262_device::device_start()
 	m_irq_handler.resolve();
 
 	/* stream system initialize */
-	m_chip = ymf262_init(this,clock(),rate);
+	m_chip = ymf262_init(this,clock(),rate,288.0,32);
 	if (!m_chip)
 		throw emu_fatalerror("ymf262_device(%s): Error creating YMF262 chip", tag());
 
@@ -88,8 +96,32 @@ void ymf262_device::device_start()
 	ymf262_set_irq_handler   (m_chip, &ymf262_device::static_irq_handler, this);
 	ymf262_set_update_handler(m_chip, &ymf262_device::static_update_request, this);
 
-	m_timer[0] = timer_alloc(0);
-	m_timer[1] = timer_alloc(1);
+	m_timer[OPL3_TIMER_1] = timer_alloc(OPL3_TIMER_1);
+	m_timer[OPL3_TIMER_2] = timer_alloc(OPL3_TIMER_2);
+	m_timer[OPL3_TIMER_BUSY] = timer_alloc(OPL3_TIMER_BUSY);
+}
+
+void ymf289b_device::device_start()
+{
+	int rate = clock()/768;
+
+	m_irq_handler.resolve();
+
+	/* stream system initialize */
+	m_chip = ymf289b_init(this,clock(),rate,684.0,56);
+	if (!m_chip)
+		throw emu_fatalerror("ymf289b_device(%s): Error creating YMF262 chip", tag());
+
+	m_stream = machine().sound().stream_alloc(*this,0,2,rate);
+
+	/* YMF262 setup */
+	ymf262_set_timer_handler (m_chip, &ymf289b_device::static_timer_handler, this);
+	ymf262_set_irq_handler   (m_chip, &ymf289b_device::static_irq_handler, this);
+	ymf262_set_update_handler(m_chip, &ymf289b_device::static_update_request, this);
+
+	m_timer[OPL3_TIMER_1] = timer_alloc(OPL3_TIMER_1);
+	m_timer[OPL3_TIMER_2] = timer_alloc(OPL3_TIMER_2);
+	m_timer[OPL3_TIMER_BUSY] = timer_alloc(OPL3_TIMER_BUSY);
 }
 
 //-------------------------------------------------
@@ -122,6 +154,13 @@ void ymf262_device::device_clock_changed()
 	m_stream->set_sample_rate(rate);
 }
 
+void ymf289b_device::device_clock_changed()
+{
+	int rate = clock()/768;
+	ymf262_clock_changed(m_chip,clock(),rate);
+	m_stream->set_sample_rate(rate);
+}
+
 u8 ymf262_device::read(offs_t offset)
 {
 	return ymf262_read(m_chip, offset & 3);
@@ -135,11 +174,23 @@ void ymf262_device::write(offs_t offset, u8 data)
 DEFINE_DEVICE_TYPE(YMF262, ymf262_device, "ymf262", "YMF262 OPL3")
 
 ymf262_device::ymf262_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, YMF262, tag, owner, clock)
+	: ymf262_device(mconfig, YMF262, tag, owner, clock)
+{
+}
+
+ymf262_device::ymf262_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
 	, m_timer{ nullptr, nullptr }
 	, m_chip(nullptr)
 	, m_irq_handler(*this)
+{
+}
+
+DEFINE_DEVICE_TYPE(YMF289B, ymf289b_device, "ymf289b", "YMF289B OPL3-L")
+
+ymf289b_device::ymf289b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ymf262_device(mconfig, YMF289B, tag, owner, clock)
 {
 }

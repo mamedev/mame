@@ -7,6 +7,10 @@
 
 /* select number of output bits: 8 or 16 */
 #define OPL3_SAMPLE_BITS 16
+#define OPL3_TIMER_1 0
+#define OPL3_TIMER_2 1
+#define OPL3_TIMER_BUSY 2
+#define OPL3_TIMER_MAX 3
 
 typedef stream_sample_t OPL3SAMPLE;
 /*
@@ -22,8 +26,9 @@ typedef void (*OPL3_TIMERHANDLER)(device_t *device,int timer,const attotime &per
 typedef void (*OPL3_IRQHANDLER)(device_t *device,int irq);
 typedef void (*OPL3_UPDATEHANDLER)(device_t *device,int min_interval_us);
 
+bool internal_busy(void *chip);
 
-void *ymf262_init(device_t *device, int clock, int rate);
+void *ymf262_init(device_t *device, int clock, int rate, double divider, int busy_cycle);
 void ymf262_clock_changed(void *chip, int clock, int rate);
 void ymf262_post_load(void *chip);
 void ymf262_shutdown(void *chip);
@@ -32,6 +37,9 @@ int  ymf262_write(void *chip, int a, int v);
 unsigned char ymf262_read(void *chip, int a);
 int  ymf262_timer_over(void *chip, int c);
 void ymf262_update_one(void *chip, OPL3SAMPLE **buffers, int length);
+
+void *ymf289b_init(device_t *device, int clock, int rate, double divider, int busy_cycle);
+void ymf289b_update_one(void *chip, OPL3SAMPLE **buffers, int length);
 
 void ymf262_set_timer_handler(void *chip, OPL3_TIMERHANDLER TimerHandler, device_t *device);
 void ymf262_set_irq_handler(void *chip, OPL3_IRQHANDLER IRQHandler, device_t *device);

@@ -221,6 +221,8 @@ public:
 		A_GA20_1 = 0xa8000000,
 	};
 
+	enum { RESET, RUN, DONE };
+
 	vgmplay_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual uint32_t execute_min_cycles() const noexcept override;
@@ -272,14 +274,16 @@ public:
 	void play();
 	void toggle_loop() { m_loop = !m_loop; }
 
+	int state() const { return m_state; }
+	void set_paused(bool paused) { m_paused = paused; }
+	void reset() { device_reset(); }
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
 	enum { ACT_LED_PERSIST_MS = 100 };
-
-	enum { RESET, RUN, DONE };
 
 	using led_expiry = std::pair<vgm_chip, attotime>;
 	using led_expiry_list = std::list<led_expiry>;
@@ -413,6 +417,8 @@ public:
 	template<int Index> DECLARE_WRITE8_MEMBER(okim6295_clock_w);
 	template<int Index> DECLARE_WRITE8_MEMBER(okim6295_pin7_w);
 	template<int Index> DECLARE_WRITE8_MEMBER(scc_w);
+	template<int Index> DECLARE_WRITE8_MEMBER(ymf262_w);
+	template<int Index> DECLARE_WRITE8_MEMBER(ymf278b_w);
 
 	void vgmplay(machine_config &config);
 	void file_map(address_map &map);
@@ -443,6 +449,10 @@ public:
 	template<int Index> void x1_010_map(address_map &map);
 	template<int Index> void c352_map(address_map &map);
 	template<int Index> void ga20_map(address_map &map);
+
+protected:
+	void machine_start() override;
+	void machine_reset() override { reset(); }
 
 private:
 	std::vector<uint8_t> m_file_data;
@@ -491,6 +501,13 @@ private:
 	required_device_array<c352_device, 2> m_c352;
 	required_device_array<iremga20_device, 2> m_ga20;
 
+	void reset();
+	void stop();
+	void pause();
+	void play();
+	void restart();
+	void toggle_loop() { m_vgmplay->toggle_loop(); }
+
 	uint8_t m_okim6258_divider[2];
 	uint8_t m_okim6295_pin7[2];
 	uint8_t m_scc_reg[2];
@@ -502,6 +519,50 @@ private:
 
 	uint32_t r32(int offset) const;
 	uint8_t r8(int offset) const;
+
+	// needs for avoid busy cycle
+	struct busy_t
+	{
+		std::queue<uint32_t> data;
+		emu_timer *timer;
+		bool cleared = true;
+		void timer_clear()
+		{
+			if (!cleared)
+			{
+				timer->adjust(attotime::never);
+				timer->enable(false);
+				cleared = true;
+			}
+		}
+		void timer_adjust(u32 clock)
+		{
+			if (cleared)
+			{
+				timer->enable(true);
+				timer->adjust(attotime::from_hz(clock), clock);
+				cleared = false;
+			}
+		}
+		bool empty()
+		{
+			return data.empty();
+		}
+		void reset()
+		{
+			timer_clear();
+			while (!data.empty())
+			{
+				data.pop();
+			}
+		}
+	};
+
+	template<unsigned Index> TIMER_CALLBACK_MEMBER(ymf262_busy);
+	template<unsigned Index> TIMER_CALLBACK_MEMBER(ymf278b_busy);
+
+	busy_t m_ymf262_busy[2];
+	busy_t m_ymf278b_busy[2];
 };
 
 vgmplay_device::vgmplay_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -3128,6 +3189,122 @@ WRITE8_MEMBER(vgmplay_state::scc_w)
 	}
 }
 
+template<int Index>
+WRITE8_MEMBER(vgmplay_state::ymf262_w)
+{
+	if (m_ymf262[Index]->busy())
+	{
+		m_ymf262_busy[Index].data.push(((offset & 3) << 8) | (data & 0xff));
+		m_ymf262_busy[Index].timer_adjust(m_ymf262[Index]->clock());
+	}
+	else
+		m_ymf262[Index]->write(offset & 3, data);
+}
+
+template<int Index>
+WRITE8_MEMBER(vgmplay_state::ymf278b_w)
+{
+	if (m_ymf278b[Index]->busy())
+	{
+		m_ymf278b_busy[Index].data.push(((offset & 0xf) << 8) | (data & 0xff));
+		m_ymf278b_busy[Index].timer_adjust(m_ymf278b[Index]->clock());
+	}
+	else
+		m_ymf278b[Index]->write(offset & 0xf, data);
+}
+
+template<unsigned Index>
+TIMER_CALLBACK_MEMBER(vgmplay_state::ymf262_busy)
+{
+	if (!m_ymf262[Index]->busy())
+	{
+		if (m_ymf262_busy[Index].empty())
+		{
+			m_ymf262_busy[Index].timer_clear();
+			return;
+		}
+
+		if (!m_vgmplay->paused())
+		{
+			const uint32_t data(m_ymf262_busy[Index].data.front());
+			m_ymf262_busy[Index].data.pop();
+			m_ymf262[Index]->write((data >> 8) & 3, data & 0xff);
+		}
+	}
+	m_ymf262_busy[Index].timer->adjust(attotime::from_hz(param), param);
+}
+
+template<unsigned Index>
+TIMER_CALLBACK_MEMBER(vgmplay_state::ymf278b_busy)
+{
+	if (!m_ymf278b[Index]->busy())
+	{
+		if (m_ymf278b_busy[Index].empty())
+		{
+			m_ymf278b_busy[Index].timer_clear();
+			return;
+		}
+
+		if (!m_vgmplay->paused())
+		{
+			const uint32_t data(m_ymf278b_busy[Index].data.front());
+			m_ymf278b_busy[Index].data.pop();
+			m_ymf278b[Index]->write((data >> 8) & 0xf, data & 0xff);
+		}
+	}
+	m_ymf278b_busy[Index].timer->adjust(attotime::from_hz(param), param);
+}
+
+void vgmplay_state::machine_start()
+{
+	m_ymf262_busy[0].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vgmplay_state::ymf262_busy<0>), this));
+	m_ymf262_busy[1].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vgmplay_state::ymf262_busy<1>), this));
+	m_ymf278b_busy[0].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vgmplay_state::ymf278b_busy<0>), this));
+	m_ymf278b_busy[1].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vgmplay_state::ymf278b_busy<1>), this));
+}
+
+void vgmplay_state::reset()
+{
+	for (int index = 0; index < 2; index++)
+	{
+		m_ymf262_busy[index].reset();
+		m_ymf262_busy[index].timer_clear();
+		m_ymf278b_busy[index].reset();
+		m_ymf278b_busy[index].timer_clear();
+	}
+}
+
+void vgmplay_state::stop()
+{
+	reset();
+	m_vgmplay->reset();
+	m_vgmplay->set_paused(true);
+}
+
+void vgmplay_state::pause()
+{
+	m_vgmplay->set_paused(!m_vgmplay->paused());
+}
+
+void vgmplay_state::play()
+{
+	if (m_vgmplay->paused() && m_vgmplay->state() != vgmplay_device::DONE)
+		m_vgmplay->set_paused(false);
+	else
+	{
+		reset();
+		m_vgmplay->reset();
+	}
+}
+
+void vgmplay_state::restart()
+{
+	const bool old_paused = m_vgmplay->paused();
+	reset();
+	m_vgmplay->reset();
+	m_vgmplay->set_paused(old_paused);
+}
+
 INPUT_CHANGED_MEMBER(vgmplay_state::key_pressed)
 {
 	if (!newval)
@@ -3137,19 +3314,19 @@ INPUT_CHANGED_MEMBER(vgmplay_state::key_pressed)
 	switch (val)
 	{
 	case VGMPLAY_STOP:
-		m_vgmplay->stop();
+		stop();
 		break;
 	case VGMPLAY_PAUSE:
-		m_vgmplay->pause();
+		pause();
 		break;
 	case VGMPLAY_PLAY:
-		m_vgmplay->play();
+		play();
 		break;
 	case VGMPLAY_RESTART:
-		m_vgmplay->reset();
+		restart();
 		break;
 	case VGMPLAY_LOOP:
-		m_vgmplay->toggle_loop();
+		toggle_loop();
 		break;
 	}
 }
@@ -3197,10 +3374,10 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_YM3526_1, vgmplay_device::A_YM3526_1 + 1).w(m_ym3526[1], FUNC(ym3526_device::write));
 	map(vgmplay_device::A_Y8950_0, vgmplay_device::A_Y8950_0 + 1).w(m_y8950[0], FUNC(y8950_device::write));
 	map(vgmplay_device::A_Y8950_1, vgmplay_device::A_Y8950_1 + 1).w(m_y8950[1], FUNC(y8950_device::write));
-	map(vgmplay_device::A_YMF262_0, vgmplay_device::A_YMF262_0 + 1).w(m_ymf262[0], FUNC(ymf262_device::write));
-	map(vgmplay_device::A_YMF262_1, vgmplay_device::A_YMF262_1 + 1).w(m_ymf262[1], FUNC(ymf262_device::write));
-	map(vgmplay_device::A_YMF278B_0, vgmplay_device::A_YMF278B_0 + 0xf).w(m_ymf278b[0], FUNC(ymf278b_device::write));
-	map(vgmplay_device::A_YMF278B_1, vgmplay_device::A_YMF278B_1 + 0xf).w(m_ymf278b[1], FUNC(ymf278b_device::write));
+	map(vgmplay_device::A_YMF262_0, vgmplay_device::A_YMF262_0 + 3).w(FUNC(vgmplay_state::ymf262_w<0>));
+	map(vgmplay_device::A_YMF262_1, vgmplay_device::A_YMF262_1 + 3).w(FUNC(vgmplay_state::ymf262_w<1>));
+	map(vgmplay_device::A_YMF278B_0, vgmplay_device::A_YMF278B_0 + 0xf).w(FUNC(vgmplay_state::ymf278b_w<0>));
+	map(vgmplay_device::A_YMF278B_1, vgmplay_device::A_YMF278B_1 + 0xf).w(FUNC(vgmplay_state::ymf278b_w<1>));
 	map(vgmplay_device::A_YMF271_0, vgmplay_device::A_YMF271_0 + 0xf).w(m_ymf271[0], FUNC(ymf271_device::write));
 	map(vgmplay_device::A_YMF271_1, vgmplay_device::A_YMF271_1 + 0xf).w(m_ymf271[1], FUNC(ymf271_device::write));
 	map(vgmplay_device::A_YMZ280B_0, vgmplay_device::A_YMZ280B_0 + 0x1).w(m_ymz280b[0], FUNC(ymz280b_device::write));
@@ -3592,25 +3769,21 @@ void vgmplay_state::vgmplay(machine_config &config)
 	// TODO: prevent error.log spew
 	YMF278B(config, m_ymf278b[0], 0);
 	m_ymf278b[0]->set_addrmap(0, &vgmplay_state::ymf278b_map<0>);
-	m_ymf278b[0]->add_route(0, "lspeaker", 0.25);
-	m_ymf278b[0]->add_route(1, "rspeaker", 0.25);
-	m_ymf278b[0]->add_route(2, "lspeaker", 0.25);
-	m_ymf278b[0]->add_route(3, "rspeaker", 0.25);
-	m_ymf278b[0]->add_route(4, "lspeaker", 1.00);
-	m_ymf278b[0]->add_route(5, "rspeaker", 1.00);
-	m_ymf278b[0]->add_route(6, "lspeaker", 1.00);
-	m_ymf278b[0]->add_route(7, "rspeaker", 1.00);
+	m_ymf278b[0]->add_route(0, "lspeaker", 0.50);
+	m_ymf278b[0]->add_route(1, "rspeaker", 0.50);
+	m_ymf278b[0]->add_route(2, "lspeaker", 0.40);
+	m_ymf278b[0]->add_route(3, "rspeaker", 0.40);
+	m_ymf278b[0]->add_route(4, "lspeaker", 0.50);
+	m_ymf278b[0]->add_route(5, "rspeaker", 0.50);
 
 	YMF278B(config, m_ymf278b[1], 0);
 	m_ymf278b[1]->set_addrmap(0, &vgmplay_state::ymf278b_map<1>);
-	m_ymf278b[1]->add_route(0, "lspeaker", 0.25);
-	m_ymf278b[1]->add_route(1, "rspeaker", 0.25);
-	m_ymf278b[1]->add_route(2, "lspeaker", 0.25);
-	m_ymf278b[1]->add_route(3, "rspeaker", 0.25);
-	m_ymf278b[1]->add_route(4, "lspeaker", 1.00);
-	m_ymf278b[1]->add_route(5, "rspeaker", 1.00);
-	m_ymf278b[1]->add_route(6, "lspeaker", 1.00);
-	m_ymf278b[1]->add_route(7, "rspeaker", 1.00);
+	m_ymf278b[1]->add_route(0, "lspeaker", 0.50);
+	m_ymf278b[1]->add_route(1, "rspeaker", 0.50);
+	m_ymf278b[1]->add_route(2, "lspeaker", 0.40);
+	m_ymf278b[1]->add_route(3, "rspeaker", 0.40);
+	m_ymf278b[1]->add_route(4, "lspeaker", 0.50);
+	m_ymf278b[1]->add_route(5, "rspeaker", 0.50);
 
 	YMF271(config, m_ymf271[0], 0);
 	m_ymf271[0]->set_addrmap(0, &vgmplay_state::ymf271_map<0>);

@@ -4,6 +4,7 @@
 #define MAME_SOUND_262INTF_H
 
 #pragma once
+#include "ymf262.h"
 
 class ymf262_device : public device_t, public device_sound_interface
 {
@@ -16,7 +17,12 @@ public:
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 
+	// for VGMPlay data handling
+	bool busy() { return internal_busy(m_chip); }
+
 protected:
+	ymf262_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_post_load() override;
 	virtual void device_start() override;
@@ -29,7 +35,6 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-private:
 	void irq_handler(int irq);
 	void timer_handler(int c, const attotime &period);
 	void update_request() { m_stream->update(); }
@@ -40,11 +45,27 @@ private:
 
 	// internal state
 	sound_stream *  m_stream;
-	emu_timer *     m_timer[2];
+	emu_timer *     m_timer[OPL3_TIMER_MAX];
 	void *          m_chip;
 	devcb_write_line m_irq_handler;
 };
 
+class ymf289b_device : public ymf262_device
+{
+public:
+	ymf289b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_clock_changed() override;
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
+};
+
 DECLARE_DEVICE_TYPE(YMF262, ymf262_device)
+DECLARE_DEVICE_TYPE(YMF289B, ymf289b_device)
 
 #endif // MAME_SOUND_262INTF_H
