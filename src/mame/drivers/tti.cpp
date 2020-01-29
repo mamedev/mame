@@ -120,7 +120,7 @@ void tti_state::prg_map(address_map &map)
 	map(0x7e000, 0x7ffff).ram();
 	map(0x80000, 0x80017).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write));
 	map(0x80018, 0x8001f).ram();
-	map(0x80020, 0x8002b).rw(FUNC(tti_state::asc_r), FUNC(tti_state::asc_w));
+	map(0x80020, 0x80029).rw(FUNC(tti_state::asc_r), FUNC(tti_state::asc_w));
 	map(0x80070, 0x80077).w("bitlatch", FUNC(ls259_device::write_d0));
 	map(0x80078, 0x8007b).w(FUNC(tti_state::dma_address_w));
 	map(0x8007c, 0x8007c).r(FUNC(tti_state::io_status_r));
