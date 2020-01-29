@@ -126,9 +126,9 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(nes_in0_r);
-	DECLARE_READ8_MEMBER(nes_in1_r);
-	DECLARE_WRITE8_MEMBER(nes_in0_w);
+	virtual DECLARE_READ8_MEMBER(in0_r);
+	virtual DECLARE_READ8_MEMBER(in1_r);
+	virtual DECLARE_WRITE8_MEMBER(in0_w);
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
@@ -413,12 +413,10 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_READ8_MEMBER(ablpinb_in0_r);
-	DECLARE_READ8_MEMBER(ablpinb_in1_r);
-	DECLARE_WRITE8_MEMBER(ablpinb_in0_w);
-	DECLARE_READ8_MEMBER(ablpinb_410f_r);
+	virtual DECLARE_READ8_MEMBER(in0_r) override;
+	virtual DECLARE_READ8_MEMBER(in1_r) override;
+	virtual DECLARE_WRITE8_MEMBER(in0_w) override;
 
-	void nes_vt_ablpinb_map(address_map& map);
 	uint8_t m_ablpinb_in0_val;
 
 	int m_plunger_off;
@@ -443,11 +441,9 @@ protected:
 	//virtual void machine_reset() override;
 
 private:
-	DECLARE_READ8_MEMBER(in0_r);
-	DECLARE_READ8_MEMBER(in1_r);
-	DECLARE_WRITE8_MEMBER(in0_w);
-
-	void nes_vt_sudoku_map(address_map& map);
+	virtual DECLARE_READ8_MEMBER(in0_r) override;
+	virtual DECLARE_READ8_MEMBER(in1_r) override;
+	virtual DECLARE_WRITE8_MEMBER(in0_w) override;
 };
 
 class nes_vt_majgnc_state : public nes_vt_state
@@ -462,14 +458,12 @@ public:
 protected:
 
 private:
-	DECLARE_READ8_MEMBER(in0_r);
-	DECLARE_READ8_MEMBER(in1_r);
-	DECLARE_WRITE8_MEMBER(in0_w);
-
-	void nes_vt_majgnc_map(address_map& map);
+	virtual DECLARE_READ8_MEMBER(in0_r) override;
+	virtual DECLARE_READ8_MEMBER(in1_r) override;
+	virtual DECLARE_WRITE8_MEMBER(in0_w) override;
 };
 
-READ8_MEMBER(nes_vt_state::nes_in0_r)
+READ8_MEMBER(nes_vt_state::in0_r)
 {
 	uint8_t ret = 0x40;
 	ret |= m_latch0 & 1;
@@ -477,7 +471,7 @@ READ8_MEMBER(nes_vt_state::nes_in0_r)
 	return ret;
 }
 
-READ8_MEMBER(nes_vt_state::nes_in1_r)
+READ8_MEMBER(nes_vt_state::in1_r)
 {
 	uint8_t ret = 0x40;
 	ret |= m_latch1 & 1;
@@ -485,7 +479,7 @@ READ8_MEMBER(nes_vt_state::nes_in1_r)
 	return ret;
 }
 
-WRITE8_MEMBER(nes_vt_state::nes_in0_w)
+WRITE8_MEMBER(nes_vt_state::in0_w)
 {
 	if (data & 0x01)
 		return;
@@ -1579,7 +1573,7 @@ void nes_vt_ablpinb_state::machine_reset()
 }
 
 
-READ8_MEMBER(nes_vt_ablpinb_state::ablpinb_in0_r)
+READ8_MEMBER(nes_vt_ablpinb_state::in0_r)
 {
 	if (m_plunger_off)
 	{
@@ -1608,7 +1602,7 @@ READ8_MEMBER(nes_vt_ablpinb_state::ablpinb_in0_r)
 }
 
 
-READ8_MEMBER(nes_vt_ablpinb_state::ablpinb_in1_r)
+READ8_MEMBER(nes_vt_ablpinb_state::in1_r)
 {
 	uint8_t i = machine().rand() & 0x10;
 
@@ -1620,14 +1614,14 @@ READ8_MEMBER(nes_vt_ablpinb_state::ablpinb_in1_r)
 	return i | ret;
 }
 
-WRITE8_MEMBER(nes_vt_ablpinb_state::ablpinb_in0_w)
+WRITE8_MEMBER(nes_vt_ablpinb_state::in0_w)
 {
 	// write 0x04 to 0x4016 sets bit 0x08 in 0x4017
 	// write 0x00 to 0x4016 clears bit 0x08 in 0x4017
 	// could be related to vibration motor?
 
 	m_ablpinb_in0_val = data;
-	logerror("ablpinb_in0_w %02x\n", data);
+	logerror("in0_w %02x\n", data);
 }
 
 READ8_MEMBER(nes_vt_sudoku_state::in0_r)
@@ -1666,8 +1660,8 @@ void nes_vt_state::nes_vt_map(address_map &map)
 	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
 	map(0x4014, 0x4014).r(FUNC(nes_vt_state::psg1_4014_r)).w(FUNC(nes_vt_state::vt_dma_w));
 	map(0x4015, 0x4015).rw(FUNC(nes_vt_state::psg1_4015_r), FUNC(nes_vt_state::psg1_4015_w)); /* PSG status / first control register */
-	map(0x4016, 0x4016).rw(FUNC(nes_vt_state::nes_in0_r), FUNC(nes_vt_state::nes_in0_w));
-	map(0x4017, 0x4017).r(FUNC(nes_vt_state::nes_in1_r)).w(FUNC(nes_vt_state::psg1_4017_w));
+	map(0x4016, 0x4016).rw(FUNC(nes_vt_state::in0_r), FUNC(nes_vt_state::in0_w));
+	map(0x4017, 0x4017).r(FUNC(nes_vt_state::in1_r)).w(FUNC(nes_vt_state::psg1_4017_w));
 
 	map(0x4034, 0x4034).w(FUNC(nes_vt_state::vt03_4034_w));
 
@@ -1688,34 +1682,6 @@ void nes_vt_state::nes_vt_map(address_map &map)
 	map(0x8000, 0xffff).m(m_prg, FUNC(address_map_bank_device::amap8));
 	map(0x8000, 0xffff).w(FUNC(nes_vt_state::vt03_8000_w));
 	map(0x6000, 0x7fff).ram();
-}
-
-void nes_vt_ablpinb_state::nes_vt_ablpinb_map(address_map& map)
-{
-	nes_vt_map(map);
-
-	// override the inputs as specific non-standard 'controller' behavior is needed here and adding it to the generic NES controller bus wouldn't make sense.
-	map(0x4016, 0x4016).rw(FUNC(nes_vt_ablpinb_state::ablpinb_in0_r), FUNC(nes_vt_ablpinb_state::ablpinb_in0_w));
-	map(0x4017, 0x4017).r(FUNC(nes_vt_ablpinb_state::ablpinb_in1_r));
-}
-
-void nes_vt_sudoku_state::nes_vt_sudoku_map(address_map& map)
-{
-	nes_vt_map(map);
-
-	// override the inputs as specific non-standard 'controller' behavior is needed here and adding it to the generic NES controller bus wouldn't make sense.
-	map(0x4016, 0x4016).rw(FUNC(nes_vt_sudoku_state::in0_r),FUNC(nes_vt_sudoku_state::in0_w));
-	map(0x4017, 0x4017).r(FUNC(nes_vt_sudoku_state::in1_r));
-}
-
-void nes_vt_majgnc_state::nes_vt_majgnc_map(address_map& map)
-{
-	nes_vt_map(map);
-
-	map(0x4014, 0x4014).w(FUNC(nes_vt_majgnc_state::vt_dma_w));
-
-	map(0x4016, 0x4016).rw(FUNC(nes_vt_majgnc_state::in0_r),FUNC(nes_vt_majgnc_state::in0_w));
-	map(0x4017, 0x4017).r(FUNC(nes_vt_majgnc_state::in1_r));
 }
 
 /* Some later VT models have more RAM */
@@ -1756,8 +1722,8 @@ void nes_vt_hh_state::nes_vt_hh_map(address_map &map)
 
 	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
 	map(0x4015, 0x4015).rw(FUNC(nes_vt_hh_state::psg1_4015_r), FUNC(nes_vt_hh_state::psg1_4015_w)); /* PSG status / first control register */
-	map(0x4016, 0x4016).rw(FUNC(nes_vt_hh_state::nes_in0_r), FUNC(nes_vt_hh_state::nes_in0_w));
-	map(0x4017, 0x4017).r(FUNC(nes_vt_hh_state::nes_in1_r)).w(FUNC(nes_vt_hh_state::psg1_4017_w));
+	map(0x4016, 0x4016).rw(FUNC(nes_vt_hh_state::in0_r), FUNC(nes_vt_hh_state::in0_w));
+	map(0x4017, 0x4017).r(FUNC(nes_vt_hh_state::in1_r)).w(FUNC(nes_vt_hh_state::psg1_4017_w));
 
 	map(0x4100, 0x410b).r(FUNC(nes_vt_hh_state::vt03_410x_r)).w(FUNC(nes_vt_hh_state::vt03_410x_w));
 
@@ -1806,8 +1772,8 @@ void nes_vt_dg_state::nes_vt_dg_map(address_map &map)
 
 	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
 	map(0x4015, 0x4015).rw(FUNC(nes_vt_dg_state::psg1_4015_r), FUNC(nes_vt_dg_state::psg1_4015_w)); /* PSG status / first control register */
-	map(0x4016, 0x4016).rw(FUNC(nes_vt_dg_state::nes_in0_r), FUNC(nes_vt_dg_state::nes_in0_w));
-	map(0x4017, 0x4017).r(FUNC(nes_vt_dg_state::nes_in1_r)).w(FUNC(nes_vt_dg_state::psg1_4017_w));
+	map(0x4016, 0x4016).rw(FUNC(nes_vt_dg_state::in0_r), FUNC(nes_vt_dg_state::in0_w));
+	map(0x4017, 0x4017).r(FUNC(nes_vt_dg_state::in1_r)).w(FUNC(nes_vt_dg_state::psg1_4017_w));
 
 	map(0x4100, 0x410b).r(FUNC(nes_vt_dg_state::vt03_410x_r)).w(FUNC(nes_vt_dg_state::vt03_410x_w));
 
@@ -1948,21 +1914,16 @@ void nes_vt_ablpinb_state::nes_vt_ablpinb(machine_config &config)
 		(ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL - ppu2c0x_device::VBLANK_FIRST_SCANLINE_PALC + 1 + 2)));
 	m_screen->set_size(32 * 8, 312);
 	m_screen->set_visarea(0 * 8, 32 * 8 - 1, 0 * 8, 30 * 8 - 1);
-
-	// override for controllers
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_ablpinb_state::nes_vt_ablpinb_map);
 }
 
 void nes_vt_sudoku_state::nes_vt_sudoku(machine_config &config)
 {
 	nes_vt_base(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_sudoku_state::nes_vt_sudoku_map);
 }
 
 void nes_vt_majgnc_state::nes_vt_majgnc(machine_config &config)
 {
 	nes_vt_base(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_majgnc_state::nes_vt_majgnc_map);
 	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
 }
 
