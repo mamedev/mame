@@ -347,6 +347,28 @@ private:
 	DECLARE_READ8_MEMBER(vt03_415c_r);
 };
 
+class nes_vt_cy_lexibook_state : public nes_vt_cy_state
+{
+public:
+	nes_vt_cy_lexibook_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_vt_cy_state(mconfig, type, tag),
+		m_previous_port0(0),
+		m_latch0_bit(0),
+		m_latch1_bit(0)
+	{ }
+	
+protected:
+	virtual DECLARE_READ8_MEMBER(in0_r) override;
+	virtual DECLARE_READ8_MEMBER(in1_r) override;
+	virtual DECLARE_WRITE8_MEMBER(in0_w) override;
+
+private:
+	int m_previous_port0;
+	uint8_t m_latch0_bit;
+	uint8_t m_latch1_bit;
+};
+
+
 class nes_vt_dg_state : public nes_vt_state
 {
 public:
@@ -462,6 +484,8 @@ private:
 	virtual DECLARE_WRITE8_MEMBER(in0_w) override;
 };
 
+/* Standard I/O handlers (NES Controller clone) */
+
 READ8_MEMBER(nes_vt_state::in0_r)
 {
 	uint8_t ret = 0x40;
@@ -485,6 +509,42 @@ WRITE8_MEMBER(nes_vt_state::in0_w)
 
 	m_latch0 = m_io0->read();
 	m_latch1 = m_io1->read();
+}
+
+/* Lexibook I/O handlers */
+
+READ8_MEMBER(nes_vt_cy_lexibook_state::in0_r)
+{
+	//logerror("%s: in0_r\n", machine().describe_context());
+	uint8_t ret = m_latch0_bit;
+	return ret;
+}
+
+READ8_MEMBER(nes_vt_cy_lexibook_state::in1_r)
+{
+	//logerror("%s: in1_r\n", machine().describe_context());
+	uint8_t ret = m_latch1_bit;
+	return ret;
+}
+
+WRITE8_MEMBER(nes_vt_cy_lexibook_state::in0_w)
+{
+	//logerror("%s: in0_w %02x\n", machine().describe_context(), data);
+	if ((!(data & 0x01)) && (m_previous_port0 & 0x01)) // 0x03 -> 0x02 transition
+	{
+		m_latch0 = m_io0->read();
+		m_latch1 = m_io1->read();
+	}
+
+	if ((!(data & 0x02)) && (m_previous_port0 & 0x02)) // 0x02 -> 0x00 transition
+	{
+		m_latch0_bit = m_latch0 & 0x01;
+		m_latch0 >>= 1;
+		m_latch1_bit = m_latch1 & 0x01;
+		m_latch1 >>= 1;
+	}
+	
+	m_previous_port0 = data;
 }
 
 
@@ -2304,8 +2364,9 @@ ROM_START( lxcmcy )
 ROM_END
 
 ROM_START( lxcmcysw )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
-	ROM_LOAD( "jl2365swr-1.u2", 0x00000, 0x4000000, CRC(60ece391) SHA1(655de6b36ba596d873de2839522b948ccf45e006) )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "jl2365swr-1.u2", 0x00000, 0x2000000, CRC(60ece391) SHA1(655de6b36ba596d873de2839522b948ccf45e006) )
+	ROM_CONTINUE(0x0000000, 0x2000000)
 ROM_END
 
 ROM_START( lxcmcyfz )
@@ -2668,11 +2729,11 @@ CONS( 200?, vgpmini,   0,  0,  nes_vt_vg, nes_vt, nes_vt_hh_state, empty_init, "
 CONS( 200?, dgun2500,  0,  0,  nes_vt_dg, nes_vt, nes_vt_dg_state, empty_init, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
 
 // don't even get to menu. very enhanced chipset, VT368/9?
-CONS( 2012, dgun2561,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "dreamGEAR", "dreamGEAR My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcy,    0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmc250,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcysw,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcyfz,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING )
+CONS( 2012, dgun2561,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "dreamGEAR", "dreamGEAR My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcy,    0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmc250,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcysw,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcyfz,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING )
 // Also Lexibook Compact Cyber Arcade - Disney Princesses
 //      Lexibook Compact Cyber Arcade - Cars
 //      Lexibook Compact Cyber Arcade - Paw Patrol
