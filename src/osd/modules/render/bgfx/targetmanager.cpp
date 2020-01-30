@@ -95,7 +95,7 @@ bool target_manager::update_target_sizes(uint32_t screen, uint16_t width, uint16
 	// Ensure that there's an entry to fill
 	while (sizes.size() <= screen)
 	{
-		sizes.push_back(osd_dim(0, 0));
+		sizes.emplace_back(osd_dim(0, 0));
 	}
 
 	if (width != sizes[screen].width() || height != sizes[screen].height())
@@ -144,7 +144,7 @@ void target_manager::update_screen_count(uint32_t count)
 	// Ensure that there's an entry to fill
 	while (count > m_native_dims.size())
 	{
-		m_native_dims.push_back(osd_dim(0, 0));
+		m_native_dims.emplace_back(osd_dim(0, 0));
 	}
 
 	if (count != m_screen_count)
