@@ -565,6 +565,18 @@
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="chfpacmn">
+		<description>Pac-Man (PD)</description>
+		<year>2008</year>
+		<publisher>Blackbird</publisher>
+		<part name="cart" interface="channelf_cart">
+			<feature name="slot" value="std" />
+			<dataarea name="rom" size="8192">
+				<rom name="chfpacmn.bin" size="8192" crc="60f73c2f" sha1="83bc8e63640398252822f45d80c37d3676012575" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 
 </softwarelist>

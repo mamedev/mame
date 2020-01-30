@@ -26639,6 +26639,17 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 			</dataarea>
 		</part>
 	</software>
+	<software name="carazu" supported="partial">
+		<description>Carazu (World, v1.0)</description>
+		<year>2016</year>
+		<publisher>Martin Holtkamp</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="carazu (world) (PD).bin" size="262144" crc="c4e1e239" sha1="a6f31c65df9e1607101fa8072524fd37b897326b" />
+			</dataarea>
+		</part>
+	</software>
+
 
 	<!-- There is official Game Boy flash cart where players could load official games on stores.
 	    pcb="DMG-A20-01"

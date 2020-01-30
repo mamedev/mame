@@ -2842,6 +2842,17 @@ BASIC 5Z-008 V1.0B
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="bhopper">
+		<description>Building Hopper</description>
+		<year>1988</year>
+		<publisher>Taku Ito.</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="40479">
+				<rom name="building hopper.mzt" size="40479" crc="f68acb0d" sha1="4b1d519aad6dd943b0a90ee11795afc95f253dd3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 <!-- Modified version of mz5z008. -->
 	<software name="unigg" cloneof="mz5z008">
