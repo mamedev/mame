@@ -862,6 +862,7 @@ BUSES["SATURN"] = true
 BUSES["SBUS"] = true
 BUSES["SCSI"] = true
 BUSES["SCV"] = true
+BUSES["SDK85"] = true
 BUSES["SEGA8"] = true
 BUSES["SG1000_EXP"] = true
 BUSES["SGIKBD"] = true

@@ -2670,6 +2670,20 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/sdk85/memexp.h,BUSES["SDK85"] = true
+---------------------------------------------------
+
+if (BUSES["SDK85"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/sdk85/memexp.cpp",
+		MAME_DIR .. "src/devices/bus/sdk85/memexp.h",
+		MAME_DIR .. "src/devices/bus/sdk85/i8755.cpp",
+		MAME_DIR .. "src/devices/bus/sdk85/i8755.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/snes/snes_slot.h,BUSES["SNES"] = true
 ---------------------------------------------------
 
