@@ -2321,7 +2321,7 @@ bool address_space::needs_backing_store(const address_map_entry &entry)
 int address_space::add_change_notifier(std::function<void (read_or_write)> n)
 {
 	int id = m_notifier_id++;
-	m_notifiers.emplace_back(notifier_t{ n, id });
+	m_notifiers.emplace_back(notifier_t{ std::move(n), id });
 	return id;
 }
 
@@ -2593,7 +2593,7 @@ void memory_bank::set_base(void *base)
 //-------------------------------------------------
 void memory_bank::add_notifier(std::function<void (void *)> cb)
 {
-	m_alloc_notifier.emplace_back(cb);
+	m_alloc_notifier.emplace_back(std::move(cb));
 }
 
 //-------------------------------------------------

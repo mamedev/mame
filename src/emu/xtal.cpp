@@ -504,7 +504,7 @@ void XTAL::validate(const std::string &message) const
 		fail(m_base_clock, message);
 }
 
-void XTAL::fail(double base_clock, std::string message)
+void XTAL::fail(double base_clock, const std::string &message)
 {
 	std::string full_message = util::string_format("Unknown crystal value %.0f. ", base_clock);
 	if(xtal_error_low && xtal_error_high)
