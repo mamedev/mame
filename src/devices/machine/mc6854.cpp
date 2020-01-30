@@ -544,7 +544,7 @@ void mc6854_device::rfifo_terminate( )
 	{
 		if ( m_rfifo[ i ] & 0x100 )
 		{
-			m_tfifo[ i ] |= 0x200;
+			m_rfifo[ i ] |= 0x200;
 			break;
 		}
 
@@ -675,7 +675,7 @@ void mc6854_device::update_sr2( )
 	m_sr2 |= RDA2;
 	if ( ! (m_rfifo[ FIFO_SIZE - 1 ] & 0x100) )
 		m_sr2 &= ~RDA2;
-	else if ( TWOBYTES && ! (m_tfifo[ FIFO_SIZE - 2 ] & 0x100) )
+	else if ( TWOBYTES && ! (m_rfifo[ FIFO_SIZE - 2 ] & 0x100) )
 		m_sr2 &= ~RDA2;
 
 	/* update AP */
@@ -747,7 +747,7 @@ uint8_t mc6854_device::read(offs_t offset)
 	switch ( offset )
 	{
 	case 0: /* status register 1 */
-		update_sr1( );
+		//update_sr1( );
 		LOG( "%f %s mc6854_r: get SR1=$%02X (rda=%i,s2rq=%i,fd=%i,cts=%i,tu=%i,tdra=%i,irq=%i)\n",
 				machine().time().as_double(), machine().describe_context(), m_sr1,
 				( m_sr1 & RDA) ? 1 : 0, ( m_sr1 & S2RQ) ? 1 : 0,
@@ -757,7 +757,7 @@ uint8_t mc6854_device::read(offs_t offset)
 		return m_sr1;
 
 	case 1: /* status register 2 */
-		update_sr2( );
+		//update_sr2( );
 		LOG( "%f %s mc6854_r: get SR2=$%02X (ap=%i,fv=%i,ridle=%i,rabt=%i,err=%i,dcd=%i,ovrn=%i,rda2=%i)\n",
 				machine().time().as_double(), machine().describe_context(), m_sr2,
 				( m_sr2 & AP   ) ? 1 : 0, ( m_sr2 & FV  ) ? 1 : 0,
