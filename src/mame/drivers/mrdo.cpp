@@ -384,12 +384,15 @@ ROM_START( mrdoy )
 	ROM_LOAD( "j2-u001.bin",  0x0000, 0x0117, CRC(badf5876) SHA1(b301cfc7f8e83408fdcb742f552a0414af6aa16e) ) // PAL16R6 converted to GAL16V8
 ROM_END
 
+/* The white garbled graphics on the title screen should be the Fabremar logo (32px height), but it's drawn as
+   16px height, like the original Taito logo. Since the F4 ROM had a different label than the others and it matches
+   with 'mrdot', someone probably replaced the original F4 Fabremar ROM with the one from Taito. */
 ROM_START( mrdofabr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "md_fabre.a4", 0x0000, 0x2000, CRC(62593aed) SHA1(ac1cc4fa4ee3799e84938333a2a698d1ec0b527b) )
 	ROM_LOAD( "md_fabre.b4", 0x2000, 0x2000, CRC(710058d8) SHA1(168cc179f2266bbf9437445bef9ff7d3358a8e6b) )
 	ROM_LOAD( "md_fabre.c4", 0x4000, 0x2000, CRC(467d12d8) SHA1(7bb85e6a780de1c0c224229ee571cab39098f78d) )
-	ROM_LOAD( "md_fabre.f4", 0x6000, 0x2000, CRC(fce9afeb) SHA1(26236a42c1c620975d4480c4315d0c6f112429b6) )
+	ROM_LOAD( "md_fabre.f4", 0x6000, 0x2000, BAD_DUMP CRC(fce9afeb) SHA1(26236a42c1c620975d4480c4315d0c6f112429b6) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "md_fabre.t8", 0x0000, 0x1000, CRC(f2dff901) SHA1(ddc3b38bfd8b822d7803ee51e2c13443b25e39ee) )
