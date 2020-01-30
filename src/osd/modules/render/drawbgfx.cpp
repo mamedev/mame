@@ -454,7 +454,7 @@ bgfx::VertexLayout ScreenVertex::ms_decl;
 void renderer_bgfx::put_packed_quad(render_primitive *prim, uint32_t hash, ScreenVertex* vertices)
 {
 	rectangle_packer::packed_rectangle& rect = m_hash_to_entry[hash];
-	float size = float(CACHE_SIZE);
+	auto size = float(CACHE_SIZE);
 	float u0 = (float(rect.x()) + 0.5f) / size;
 	float v0 = (float(rect.y()) + 0.5f) / size;
 	float u1 = u0 + (float(rect.width()) - 1.0f) / size;
@@ -517,7 +517,7 @@ void renderer_bgfx::vertex(ScreenVertex* vertex, float x, float y, float z, uint
 
 void renderer_bgfx::render_post_screen_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer, int32_t screen)
 {
-	ScreenVertex* vertices = reinterpret_cast<ScreenVertex*>(buffer->data);
+	auto* vertices = reinterpret_cast<ScreenVertex*>(buffer->data);
 
 	float x[4] = { prim->bounds.x0, prim->bounds.x1, prim->bounds.x0, prim->bounds.x1 };
 	float y[4] = { prim->bounds.y0, prim->bounds.y0, prim->bounds.y1, prim->bounds.y1 };
@@ -553,7 +553,7 @@ void renderer_bgfx::render_avi_quad()
 
 	bgfx::TransientVertexBuffer buffer;
 	bgfx::allocTransientVertexBuffer(&buffer, 6, ScreenVertex::ms_decl);
-	ScreenVertex* vertices = reinterpret_cast<ScreenVertex*>(buffer.data);
+	auto* vertices = reinterpret_cast<ScreenVertex*>(buffer.data);
 
 	float x[4] = { 0.0f, float(m_width[0]), 0.0f, float(m_width[0]) };
 	float y[4] = { 0.0f, 0.0f, float(m_height[0]), float(m_height[0]) };
@@ -576,7 +576,7 @@ void renderer_bgfx::render_avi_quad()
 
 void renderer_bgfx::render_textured_quad(render_primitive* prim, bgfx::TransientVertexBuffer* buffer)
 {
-	ScreenVertex* vertices = reinterpret_cast<ScreenVertex*>(buffer->data);
+	auto* vertices = reinterpret_cast<ScreenVertex*>(buffer->data);
 	uint32_t rgba = u32Color(prim->color.r * 255, prim->color.g * 255, prim->color.b * 255, prim->color.a * 255);
 
 	float x[4] = { prim->bounds.x0, prim->bounds.x1, prim->bounds.x0, prim->bounds.x1 };

@@ -780,7 +780,7 @@ void win_window_info::create(running_machine &machine, int index, std::shared_pt
 	window->m_target = machine.render().target_alloc();
 
 	// set the specific view
-	windows_options &options = downcast<windows_options &>(machine.options());
+	auto &options = downcast<windows_options &>(machine.options());
 
 	const char *defview = options.view();
 	window->set_starting_view(index, defview, options.view(index));
@@ -1180,7 +1180,7 @@ int win_window_info::complete_create()
 LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
 	LONG_PTR ptr = GetWindowLongPtr(wnd, GWLP_USERDATA);
-	win_window_info *window = (win_window_info *)ptr;
+	auto *window = (win_window_info *)ptr;
 
 	// we may get called before SetWindowLongPtr is called
 	if (window != nullptr)
@@ -1293,7 +1293,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 		// get min/max info: set the minimum window size
 		case WM_GETMINMAXINFO:
 		{
-			MINMAXINFO *minmax = (MINMAXINFO *)lparam;
+			auto *minmax = (MINMAXINFO *)lparam;
 			minmax->ptMinTrackSize.x = MIN_WINDOW_DIM;
 			minmax->ptMinTrackSize.y = MIN_WINDOW_DIM;
 			break;

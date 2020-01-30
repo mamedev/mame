@@ -72,7 +72,7 @@ public:
 	virtual void input_init(running_machine &machine) override
 	{
 		// Add a single win32 keyboard device that we'll monitor using Win32
-		win32_keyboard_device *devinfo = devicelist()->create_device<win32_keyboard_device>(machine, "Win32 Keyboard 1", "Win32 Keyboard 1", *this);
+		auto *devinfo = devicelist()->create_device<win32_keyboard_device>(machine, "Win32 Keyboard 1", "Win32 Keyboard 1", *this);
 
 		keyboard_trans_table &table = keyboard_trans_table::instance();
 

@@ -262,7 +262,7 @@ protected:
 
 			if (module != nullptr)
 			{
-				generic_fptr_t function = reinterpret_cast<generic_fptr_t>(GetProcAddress(module, symbol));
+				auto function = reinterpret_cast<generic_fptr_t>(GetProcAddress(module, symbol));
 
 				if (function != nullptr)
 				{

@@ -443,7 +443,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 			}
 			if (img->device().type() == CASSETTE)
 			{
-				cassette_image_device *const cassette = downcast<cassette_image_device *>(&img->device());
+				auto *const cassette = downcast<cassette_image_device *>(&img->device());
 				bool s;
 				switch ((LOWORD(wparam) - ID_DEVICE_OPTIONS) % DEVOPTION_MAX)
 				{
