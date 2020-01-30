@@ -202,7 +202,7 @@ iphone2g_timer_device::iphone2g_timer_device(const machine_config &mconfig, devi
 }
 
 iphone2g_timer_device::iphone2g_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: iphone2g_timer_device(mconfig, IPHONE2G_SPI, tag, owner, clock)
+	: iphone2g_timer_device(mconfig, IPHONE2G_TIMER, tag, owner, clock)
 {
 }
 
