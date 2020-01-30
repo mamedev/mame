@@ -85,7 +85,7 @@ static void spin_while_not(const volatile _AtomType * volatile atom, const _Main
 //  osd_num_processors
 //============================================================
 
-int osd_get_num_processors(void)
+int osd_get_num_processors()
 {
 #if defined(SDLMAME_EMSCRIPTEN)
 	// multithreading is not supported at this time
@@ -211,7 +211,7 @@ int osd_num_processors = 0;
 //  FUNCTION PROTOTYPES
 //============================================================
 
-static int effective_num_processors(void);
+static int effective_num_processors();
 static void * worker_thread_entry(void *param);
 static void worker_thread_process(osd_work_queue *queue, work_thread_info *thread);
 static bool queue_has_list_items(osd_work_queue *queue);
@@ -639,7 +639,7 @@ void osd_work_item_release(osd_work_item *item)
 //  effective_num_processors
 //============================================================
 
-static int effective_num_processors(void)
+static int effective_num_processors()
 {
 	int physprocs = osd_get_num_processors();
 
