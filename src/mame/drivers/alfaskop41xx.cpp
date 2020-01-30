@@ -32,9 +32,10 @@ Dansk Datahistorisk Forening - http://datamuseum.dk/
 #include "screen.h"
 #include "machine/input_merger.h"
 #include "machine/output_latch.h"
+#include "machine/alfaskop_s41_kb.h"
 
 //#include "bus/rs232/rs232.h"
-//#include "machine/clock.h"
+#include "machine/clock.h"
 
 #define LOG_IO    (1U << 1)
 #define LOG_NVRAM (1U << 2)
@@ -43,8 +44,12 @@ Dansk Datahistorisk Forening - http://datamuseum.dk/
 #define LOG_DMA   (1U << 5)
 #define LOG_IRQ   (1U << 6)
 #define LOG_ADLC  (1U << 7)
+#define LOG_KBD   (1U << 8)
+#define LOG_AM    (1U << 9)
+#define LOG_LEDS  (1U << 10)
+#define LOG_BITS  (1U << 11)
 
-//#define VERBOSE (LOG_MIC|LOG_ADLC|LOG_IRQ|LOG_DMA|LOG_IO)
+//#define VERBOSE (LOG_MIC)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -56,6 +61,10 @@ Dansk Datahistorisk Forening - http://datamuseum.dk/
 #define LOGDMA(...)   LOGMASKED(LOG_DMA,   __VA_ARGS__)
 #define LOGIRQ(...)   LOGMASKED(LOG_IRQ,   __VA_ARGS__)
 #define LOGADLC(...)  LOGMASKED(LOG_ADLC,  __VA_ARGS__)
+#define LOGKBD(...)   LOGMASKED(LOG_KBD,   __VA_ARGS__)
+#define LOGAM(...)    LOGMASKED(LOG_AM,    __VA_ARGS__)
+#define LOGLEDS(...)  LOGMASKED(LOG_LEDS,  __VA_ARGS__)
+#define LOGBITS(...)  LOGMASKED(LOG_BITS,  __VA_ARGS__)
 
 #define PLA1_TAG "ic50"
 
@@ -72,6 +81,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_vram(*this, "vram")
 		, m_pla(*this, PLA1_TAG)
+		, m_kbd(*this, "keyboard")
 		, m_chargen(*this, "chargen")
 		, m_tia_adlc(*this, "tia_adlc")
 		, m_tia_dma(*this, "tia_dma")
@@ -94,6 +104,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_vram;
 	required_device<pls100_device> m_pla;
+	required_device<alfaskop_s41_keyboard_device> m_kbd;
 
 	/* Video controller */
 	required_region_ptr<uint8_t> m_chargen;
@@ -108,6 +119,9 @@ private:
 	uint8_t m_irq;
 	uint8_t m_imsk;
 
+	/* Kbd communications */
+	uint8_t m_txd;
+
 	/* Debug stuff */
 	/* Timer */
 	enum
@@ -118,6 +132,7 @@ private:
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// DEBUG stuff, will be removed when hooked up towards remote peer
+#if 1
 	/* zero extended SDLC poll message frame to feed into receiver as a test
 	   0 1 1 1 1 1 1 0   ; opening flag 0x7e
 	   0 0 0 0 0 0 0 0   ; 0x00
@@ -129,6 +144,22 @@ private:
 	   0 1 1 1 1 1 1 0   ; closing flag 0x7e
 	*/
 	uint8_t txBuf[10] = {0x7e, 0x00, 0xff, 0xc0, 0xa0, 0x8d, 0x55, 0x7e};
+
+#else // Alternative poll message body wih faulty CRC, CRC isn't checked yet by the ADLC
+
+	/* zero extended SDLC poll message frame to feed into receiver as a test
+	   0 1 1 1 1 1 1 0   ; opening flag 0x7e
+	   0 0 0 0 0 0 0 0   ; 0x00
+	   0 0 0 0 0 0 0 0   ; 0x00
+	   1 1 1 1 1 0 1 1 0 ; 0xfe <- a zero needs to be inserted, done by test code
+	   1 1 1 0 1 0 0 1   ; 0xe9
+	   1 0 1 1 0 0 0 1   ; CRC 0x8d - wrong
+	   1 0 1 0 1 0 1 0   ; CRC 0x55 - wrong
+	   0 1 1 1 1 1 1 0   ; closing flag 0x7e
+	*/
+	uint8_t txBuf[10] = {0x7e, 0x00, 0x00, 0xfe, 0xe9, 0x8d, 0x55, 0x7e};
+#endif
+
 	int index = 0;
 	int pos   = 0;
 	int ones  = 0;
@@ -179,24 +210,30 @@ void alfaskop4110_state::mem_map(address_map &map)
 	map(0x8000, 0xefff).ram();
 
 	// NVRAM
-	map(0xf600, 0xf6ff).lrw8(NAME([this](offs_t offset) -> uint8_t { LOGNVRAM("nvram_r %04x: %02x\n", offset, 0); return (uint8_t) 0; }),
-				 NAME( [this](offs_t offset, uint8_t data) {    LOGNVRAM("nvram_w %04x: %02x\n", offset, data); }));
+	map(0xf600, 0xf6ff).lrw8(NAME([this](offs_t offset) -> uint8_t
+				      {
+				          LOGNVRAM("nvram_r %04x: %02x\n", offset, 0); return (uint8_t) 0;
+				      }),
+				 NAME([this](offs_t offset, uint8_t data)
+				      {
+				          LOGNVRAM("nvram_w %04x: %02x\n", offset, data);
+				      }));
 	// TIA board
 	map(0xf700, 0xf71f).mirror(0x00).lrw8(NAME([this](offs_t offset) -> uint8_t    { LOGDMA("TIA DMA_r %04x: %02x\n", offset, 0); return m_tia_dma->read(offset); }),
-						  NAME([this](offs_t offset, uint8_t data) { LOGDMA("TIA DMA_w %04x: %02x\n", offset, data); m_tia_dma->write(offset, data); }));
+					      NAME([this](offs_t offset, uint8_t data) { LOGDMA("TIA DMA_w %04x: %02x\n", offset, data); m_tia_dma->write(offset, data); }));
 	map(0xf720, 0xf723).mirror(0x04).lrw8(NAME([this](offs_t offset) -> uint8_t    { LOGADLC("TIA ADLC_r %04x: %02x\n", offset, 0); return m_tia_adlc->read(offset); }),
-						  NAME([this](offs_t offset, uint8_t data) { LOGADLC("TIA ADLC_w %04x: %02x\n", offset, data); m_tia_adlc->write(offset, data); }));
+					      NAME([this](offs_t offset, uint8_t data) { LOGADLC("TIA ADLC_w %04x: %02x\n", offset, data); m_tia_adlc->write(offset, data); }));
 
 	// Main PCB
 	map(0xf7d9, 0xf7d9).mirror(0x06).lrw8(NAME([this](offs_t offset) -> uint8_t    { LOGIO("CRTC reg r %04x: %02x\n", offset, 0); return m_crtc->register_r(); }),
-						  NAME([this](offs_t offset, uint8_t data) { LOGIO("CRTC reg w %04x: %02x\n", offset, data); m_crtc->register_w(data);}));
+					      NAME([this](offs_t offset, uint8_t data) { LOGIO("CRTC reg w %04x: %02x\n", offset, data); m_crtc->register_w(data);}));
 	map(0xf7d8, 0xf7d8).mirror(0x06).lw8(NAME([this](offs_t offset, uint8_t data) { LOGIO("CRTC adr w %04x: %02x\n", offset, data); m_crtc->address_w(data); }));
 	map(0xf7d0, 0xf7d3).mirror(0x04).lrw8(NAME([this](offs_t offset) -> uint8_t    { LOGDIA("DIA pia_r %04x: %02x\n", offset, 0); return m_dia_pia->read(offset & 3); }),
-						  NAME([this](offs_t offset, uint8_t data) { LOGDIA("DIA pia_w %04x: %02x\n", offset, data); m_dia_pia->write(offset & 3, data); }));
+					      NAME([this](offs_t offset, uint8_t data) { LOGDIA("DIA pia_w %04x: %02x\n", offset, data); m_dia_pia->write(offset & 3, data); }));
 	map(0xf7c4, 0xf7c7).mirror(0x00).lrw8(NAME([this](offs_t offset) -> uint8_t    { uint8_t tmp = m_mic_pia->read(offset & 3); LOGMIC("\nMIC pia_r %04x: %02x\n", offset, tmp); return tmp; }),
-						  NAME([this](offs_t offset, uint8_t data) { LOGMIC("\nMIC pia_w %04x: %02x\n", offset, data); m_mic_pia->write(offset & 3, data); }));
-	map(0xf7c0, 0xf7c1).mirror(0x02).lrw8(NAME([this](offs_t offset) -> uint8_t    { LOGIO("KBD acia_r %04x: %02x\n", offset, 0); return m_kbd_acia->read(offset & 1); }),
-						  NAME([this](offs_t offset, uint8_t data) { LOGIO("KBD acia_w %04x: %02x\n", offset, data); m_kbd_acia->write(offset & 1, data); }));
+					      NAME([this](offs_t offset, uint8_t data) { LOGMIC("\nMIC pia_w %04x: %02x\n", offset, data); m_mic_pia->write(offset & 3, data); }));
+	map(0xf7c0, 0xf7c1).mirror(0x02).lrw8(NAME([this](offs_t offset) -> uint8_t    { LOGKBD("KBD acia_r %04x: %02x\n", offset, 0); return m_kbd_acia->read(offset & 1); }),
+					      NAME([this](offs_t offset, uint8_t data) { LOGKBD("KBD acia_w %04x: %02x\n", offset, data); m_kbd_acia->write(offset & 1, data); }));
 
 	map(0xf7fc, 0xf7fc).mirror(0x00).lr8(NAME([this](offs_t offset) -> uint8_t { LOGIO("Address Switch 0-7\n"); return 0; }));
 
@@ -204,32 +241,33 @@ void alfaskop4110_state::mem_map(address_map &map)
 
 	// IRQ mask setting
 	map(0xffe8, 0xfff7).rom().lrw8( NAME([this](offs_t offset) -> uint8_t
-				        {
-						if (!machine().side_effects_disabled())	LOGIO("AMSK read set %04x\n", offset >> 1);
-						m_imsk = (offset >> 1) & 7;
-						return ((uint8_t *) memregion("roms")->base() + 0x7e8)[offset];
-					}),
+					     {
+					         if (!machine().side_effects_disabled()) LOGAM("AMSK read set %04x\n", offset >> 1);
+						 m_imsk = (offset >> 1) & 7;
+						 return ((uint8_t *) memregion("roms")->base() + 0x7e8)[offset];
+					     }),
 					NAME([this](offs_t offset, uint8_t data)
-					{
-						if (!machine().side_effects_disabled()) LOGIO("AMSK write set %04x\n", offset);
-						m_imsk = (offset >> 1) & 7;
-					}));
+					     {
+					         if (!machine().side_effects_disabled()) LOGAM("AMSK write set %04x\n", offset);
+						 m_imsk = (offset >> 1) & 7;
+					     }));
 
 	// Address modification
 	map(0xfff8, 0xfff9).rom().lrw8( NAME([this](offs_t offset) -> uint8_t
-				        {
-						uint16_t ploffs = (~m_irq & 0xff) | ((m_imsk & 0x07) << 8) | 0x000 | (0x18 << 11);
-						uint8_t tmp =  ((uint8_t *) memregion("roms")->base())[0x7e0 | offset | ((m_pla->read(ploffs) & 0xf0) >> 3)];
-						if (!machine().side_effects_disabled())
-						{
-							LOGIO("AMOD read %04x: %02x\n", offset, tmp);
-							LOGIO("AMOD pla read %04x: %02x ==> %04x\n", ploffs, m_pla->read(ploffs), (0xffe0 | offset | ((m_pla->read(ploffs) & 0xf0) >> 3)));
-						}
-						return tmp; }),
+					     {
+					         uint16_t ploffs = (~m_irq & 0xff) | ((m_imsk & 0x07) << 8) | 0x000 | (0x18 << 11);
+						 uint8_t tmp =  ((uint8_t *) memregion("roms")->base())[0x7e0 | offset | ((m_pla->read(ploffs) & 0xf0) >> 3)];
+						 if (!machine().side_effects_disabled())
+						 {
+						 	LOGAM("AMOD read %04x: %02x\n", offset, tmp);
+							LOGAM("AMOD pla read %04x: %02x ==> %04x\n", ploffs, m_pla->read(ploffs), (0xffe0 | offset | ((m_pla->read(ploffs) & 0xf0) >> 3)));
+						 }
+						 return tmp;
+					     }),
 					NAME([this](offs_t offset, uint8_t data) // TODO: Check what a write does if anything
-					{
-						if (!machine().side_effects_disabled()) LOGIO("AMOD write %04x\n", offset);
-					}));
+					     {
+					         if (!machine().side_effects_disabled()) LOGAM("AMOD write %04x\n", offset);
+					     }));
 
 	map(0xfffa, 0xffff).rom().region("roms", 0x7fa);
 }
@@ -241,9 +279,9 @@ void alfaskop4120_state::mem_map(address_map &map)
 	map(0xf600, 0xf6ff).lrw8(NAME([this](offs_t offset) -> uint8_t { LOGNVRAM("nvram_r %04x: %02x\n", offset, 0); return (uint8_t) 0; }), // TODO: Move to MRO board
 				 NAME([this](offs_t offset, uint8_t data) { LOGNVRAM("nvram_w %04x: %02x\n", offset, data); }));
 	map(0xf740, 0xf743).mirror(0x0c).lrw8(NAME([this](offs_t offset) -> uint8_t    { LOGIO("FDA pia_r %04x: %02x\n", offset, 0); return m_fdapia->read(offset & 3); }),
-						  NAME([this](offs_t offset, uint8_t data) { LOGIO("FDA pia_w %04x: %02x\n", offset, data); m_fdapia->write(offset & 3, data); }));
+					      NAME([this](offs_t offset, uint8_t data) { LOGIO("FDA pia_w %04x: %02x\n", offset, data); m_fdapia->write(offset & 3, data); }));
 	map(0xf7c4, 0xf7c7).mirror(0x00).lrw8(NAME([this](offs_t offset) -> uint8_t    { LOGMIC("MIC pia_r %04x: %02x\n", offset, 0); return m_mic_pia->read(offset & 3); }),
-						  NAME([this](offs_t offset, uint8_t data) { LOGMIC("MIC pia_w %04x: %02x\n", offset, data); m_mic_pia->write(offset & 3, data); }));
+					      NAME([this](offs_t offset, uint8_t data) { LOGMIC("MIC pia_w %04x: %02x\n", offset, data); m_mic_pia->write(offset & 3, data); }));
 	map(0xf800, 0xffff).rom().region("roms", 0);
 }
 
@@ -254,7 +292,7 @@ void alfaskop4101_state::mem_map(address_map &map)
 	map(0xf600, 0xf6ff).lrw8(NAME([this](offs_t offset) -> uint8_t { LOGNVRAM("nvram_r %04x: %02x\n", offset, 0); return (uint8_t) 0; }),
 				 NAME([this](offs_t offset, uint8_t data) { LOGNVRAM("nvram_w %04x: %02x\n", offset, data); }));
 	map(0xf7c4, 0xf7c7).mirror(0x00).lrw8(NAME([this](offs_t offset) -> uint8_t    { LOGMIC("MIC pia_r %04x: %02x\n", offset, 0); return m_mic_pia->read(offset & 3); }),
-						  NAME([this](offs_t offset, uint8_t data) { LOGMIC("MIC pia_w %04x: %02x\n", offset, data); m_mic_pia->write(offset & 3, data); }));
+					      NAME([this](offs_t offset, uint8_t data) { LOGMIC("MIC pia_w %04x: %02x\n", offset, data); m_mic_pia->write(offset & 3, data); }));
 	map(0xf800, 0xffff).rom().region("roms", 0);
 }
 
@@ -300,6 +338,19 @@ void alfaskop4110_state::alfaskop4110(machine_config &config)
 	/* basic machine hardware */
 	M6800(config, m_maincpu, XTAL(19'170'000) / 18); // Verified from service manual
 	m_maincpu->set_addrmap(AS_PROGRAM, &alfaskop4110_state::mem_map);
+
+	// TTL-level serial keyboard callback
+	ALFASKOP_S41_KB(config, m_kbd);
+	m_kbd->txd_cb().set([this](bool state)
+			    {
+				LOGBITS("KBD->4110: %d\n", state);
+				m_kbd_acia->write_rxd(state);
+			    });
+	m_kbd->leds_cb().set([this] (uint8_t data)
+			     {
+			         LOGLEDS("LEDS: write %02x to LEDs\n", data);
+			     });
+
 
 	/* Interrupt controller and address modifier PLA */
 	/*
@@ -400,7 +451,8 @@ void alfaskop4110_state::alfaskop4110(machine_config &config)
 	m_mic_pia->writepa_handler().set([this](offs_t offset, uint8_t data)
 					 {
 						LOGMIC("->MIC PIA: Port A write %02x\n", data);
-						LOGMIC(" PA1 - KBD reset %s\n", BIT(data, 1) ? "active" : "inactive");
+						LOGKBD(" PA1 - KBD reset %s\n", BIT(data, 1) ? "active" : "inactive");
+						m_kbd->rst_line_w(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
 						LOGMIC(" PA5 - Int out %s\n", BIT(data, 5) ? "enabled": "disabled");
 						LOGMIC(" PA6 - I4 latch %s\n", BIT(data, 6) ? "enabled": "disabled");
 					 });
@@ -438,13 +490,24 @@ void alfaskop4110_state::alfaskop4110(machine_config &config)
 	m_dia_pia->readca1_handler().set([this](offs_t offset) -> uint8_t { LOGDIA("DIA PIA: CA1_r\n"); return 0;});
 	m_dia_pia->readca2_handler().set([this](offs_t offset) -> uint8_t { LOGDIA("DIA PIA: CA2_r\n"); return 0;});
 
-	ACIA6850(config, m_kbd_acia, 0);
-	//CLOCK(config, "acia_clock", ACIA_CLOCK).signal_handler().set(FUNC(alfaskop4110_state::write_acia_clock));
+	/* The ACIA RxC and TxC are fed from the systemclock divided through a by 14 dividing 74163, from the tech manual: 
+	   "A clock of 76 kHz is provided for the ACIA by the timing logic. ACIA divides this clock by 64 (Bit transfer rate 1188 Hz) and 
+	    synchronizes internally to received data. Furthermore ACIA may provide interrupt (at level 3) when transmit register is empty,
+	    receive register is full or an error has occured. */
+	ACIA6850(config, m_kbd_acia, XTAL(19'170'000) / 18);
+	CLOCK(config, "acia_clock", (XTAL(19'170'000) / 18) / 14 ).signal_handler().set([this](int state) { m_kbd_acia->write_txc(state); m_kbd_acia->write_rxc(state); });
 	m_kbd_acia->irq_handler().set("irq3", FUNC(input_merger_device::in_w<3>));
+	m_kbd_acia->txd_handler().set([this](bool state)
+	{
+		if (m_txd != state)
+		{
+			LOGBITS("4110->KBD: %d\n", state);
+			m_txd = state;
+			m_kbd->rxd_w(m_txd);
+		}
+	});
 
-	MC6854(config, m_tia_adlc, XTAL(19'170'000) / 18); // TODO: attach IRQ by IRQ 7 through descrete interrupt prioritization instead
-	//m_tia_adlc->out_irq_cb().set([this](bool state){ LOGDMA("TIA ADLC IRQ: %s\n", state == ASSERT_LINE ? "asserted" : "cleared"); m_maincpu->set_input_line(M6800_IRQ_LINE, state); });
-	//m_tia_adlc->out_irq_cb().set([this](bool state){ LOGDMA("TIA ADLC IRQ: %s\n", state == ASSERT_LINE ? "asserted" : "cleared"); m_maincpu->set_input_line(M6800_IRQ_LINE, state); });
+	MC6854(config, m_tia_adlc, XTAL(19'170'000) / 18);
 	m_tia_adlc->out_irq_cb().set("irq7", FUNC(input_merger_device::in_w<7>));
 	m_tia_adlc->out_rdsr_cb().set([this](bool state){ LOGDMA("TIA ADLC RDSR: %d\n", state); m_tia_dma->dreq_w<1>(state); });
 	m_tia_adlc->out_tdsr_cb().set([this](bool state){ LOGDMA("TIA ADLC TDSR: %d\n", state); m_tia_dma->dreq_w<0>(state); });
@@ -472,11 +535,15 @@ void alfaskop4110_state::machine_start()
 	save_item(NAME(m_irq));
 	save_item(NAME(m_imsk));
 	timer_set(attotime::from_msec(5000), TIMER_POLL_START);
+
+	// Hard wired inputs
+	m_kbd_acia->write_cts(0);
+	m_kbd_acia->write_dcd(0);
 }
 
 void alfaskop4110_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	// Debug, inserts a poll SDLC frame through the ADLC, it ends up at address 0x140 in RAM through DMA
+	// Debug feature, inserts a poll SDLC frame through the ADLC, it ends up at address 0x140 in RAM through DMA
 	switch (id)
 	{
 	case TIMER_POLL_START:
@@ -486,37 +553,42 @@ void alfaskop4110_state::device_timer(emu_timer &timer, device_timer_id id, int 
 		timer_set(attotime::from_hz(300000), TIMER_POLL_BIT);
 		break;
 	case TIMER_POLL_BIT:
-	  if (flank)
-	  {
-		if (index != 0 && index != 7 && BIT(txBuf[index], (pos % 8)) && ones == 5)
+		if (flank)
 		{
-			LOGADLC("%d%c", 2, (pos % 8) == 7 ? '\n' : ' ');
-			m_tia_adlc->set_rx(0);
-			ones = 0;
-		}
-		else
-		{
-			LOGADLC("%d%c", BIT(txBuf[index], (pos % 8)), (pos % 8) == 7 ? '\n' : ' ');
-			m_tia_adlc->set_rx(BIT(txBuf[index], (pos % 8)));
-			if (index != 0 && index != 7 && BIT(txBuf[index], (pos % 8)))
-				ones++;
-			else
+			if (index != 0 && index != 7 && BIT(txBuf[index], (pos % 8)) && ones == 5)
+			{
+				LOGADLC("%d%c", 2, (pos % 8) == 7 ? '\n' : ' ');
+				m_tia_adlc->set_rx(0);
 				ones = 0;
-			pos++;
-			index = pos / 8;
+			}
+			else
+			{
+				LOGADLC("%d%c", BIT(txBuf[index], (pos % 8)), (pos % 8) == 7 ? '\n' : ' ');
+				m_tia_adlc->set_rx(BIT(txBuf[index], (pos % 8)));
+				if (index != 0 && index != 7 && BIT(txBuf[index], (pos % 8)))
+					ones++;
+				else
+					ones = 0;
+				pos++;
+				index = pos / 8;
+			}
 		}
-	  }
-	  m_tia_adlc->rxc_w(flank ? 1 : 0);
-	  if (index < 8)
-		timer_set(attotime::from_hz(300000) / 2, TIMER_POLL_BIT);
-	  flank = !flank;
-	  break;
+		m_tia_adlc->rxc_w(flank ? 1 : 0);
+		if (index < 8)
+			timer_set(attotime::from_hz(300000) / 2, TIMER_POLL_BIT);
+		flank = !flank;
+		break;
 	}
 }
 
 void alfaskop4110_state::machine_reset()
 {
 	m_irq = 0x00;
+	m_kbd->rst_line_w(ASSERT_LINE);
+
+	// Hard wired inputs
+	m_kbd_acia->write_cts(0);
+	m_kbd_acia->write_dcd(0);
 }
 
 void alfaskop4120_state::alfaskop4120(machine_config &config)
@@ -545,7 +617,7 @@ ROM_START( alfaskop4110 ) // Display Unit
 	ROM_REGION( 0x800, "chargen", ROMREGION_ERASEFF )
 	ROM_LOAD( "e3405972067500.bin", 0x0000, 0x0400, CRC(fb12b549) SHA1(53783f62c5e51320a53e053fbcf8b3701d8a805f))
 	ROM_LOAD( "e3405972067600.bin", 0x0400, 0x0400, CRC(c7069d65) SHA1(587efcbee036d4c0c5b936cc5d7b1f97b6fe6dba))
-		ROM_REGION( 0xff, PLA1_TAG, 0 )
+	ROM_REGION( 0xff, PLA1_TAG, 0 )
 	//ROM_LOAD( "dtc_a_e34062_0100_ic50_e3405970303601_ml.bin", 0x00, 0xf5, CRC(b37395f2) SHA1(a00dc77d4bef084c0ddceef618986d83c69b1d65) ) // Signetics_N82S100N.bin MAXLOADER format
 	ROM_LOAD( "dtc_a_e34062_0100_ic50_e3405970303601.bin", 0x00, 0xfa, CRC(16339b7a) SHA1(9b313a7526460dc9bcedfda25bece91c924f0ddc) ) // Signetics_N82S100N.bin DATAIO format
 ROM_END
@@ -562,7 +634,7 @@ ROM_END
 
 /* Driver(S) */
 
-// Only 4101 may exist as a driver in the end making the 4110 and 4120 as slots devices on the SS3 bus, time will tell
+// Only 4101 should exist as a driver in the end, making the 4110 and 4120 as slots devices on the SS3 bus, time will tell
 
 //    YEAR  NAME          PARENT  COMPAT  MACHINE       INPUT         CLASS               INIT        COMPANY      FULLNAME       FLAGS
 COMP( 1984, alfaskop4110, 0,      0,      alfaskop4110, alfaskop4110, alfaskop4110_state, empty_init, "Ericsson",  "Alfaskop Display Unit 4110", MACHINE_IS_SKELETON)

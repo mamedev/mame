@@ -2217,6 +2217,9 @@ files {
 	MAME_DIR .. "src/mame/drivers/eispc.cpp",
 	MAME_DIR .. "src/mame/machine/eispc_kb.cpp",
 	MAME_DIR .. "src/mame/machine/eispc_kb.h",
+	MAME_DIR .. "src/mame/drivers/alfaskop41xx.cpp",
+	MAME_DIR .. "src/mame/machine/alfaskop_s41_kb.cpp",
+	MAME_DIR .. "src/mame/machine/alfaskop_s41_kb.h",
 }
 
 createMESSProjects(_target, _subtarget, "exidy")
