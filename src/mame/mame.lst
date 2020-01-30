@@ -34217,6 +34217,7 @@ metamaq2                        // Metamaquina 2 desktop 3d printer
 @source:rampart.cpp
 rampart                         // 136082           (c) 1990
 rampart2p                       // 136082           (c) 1990
+rampart2pa                      // 136082           (c) 1990
 rampartj                        // 136082           (c) 1990 (Japan)
 
 @source:ramtek.cpp
