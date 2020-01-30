@@ -29254,6 +29254,7 @@ mrdot                           // 8201 (c) 1982 + Taito license
 mrdoy                           // 8201 (c) 1982
 mrdu                            // bootleg
 mrlo                            // bootleg
+mrdofabr                        // bootleg (Fabremar)
 yankeedo                        // bootleg
 
 @source:mrflea.cpp
