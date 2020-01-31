@@ -57,7 +57,7 @@ public:
 	static error open_7z(const std::string &filename, ptr &result);
 
 	// close an archive file (may actually be left open due to caching)
-	virtual ~archive_file();
+	virtual ~archive_file() = default;
 
 	// clear out all open files from the cache
 	static void cache_clear();

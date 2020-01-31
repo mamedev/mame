@@ -19,7 +19,7 @@ class consolewin_info : public disasmbasewin_info
 {
 public:
 	consolewin_info(debugger_windows_interface &debugger);
-	virtual ~consolewin_info();
+	virtual ~consolewin_info() = default;
 
 	void set_cpu(device_t &device);
 

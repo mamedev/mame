@@ -111,7 +111,7 @@ public:
 		entry(entry &&) = delete;
 		entry& operator=(const entry &) = delete;
 		entry& operator=(entry &&) = delete;
-		virtual ~entry();
+		virtual ~entry() = default;
 
 		// accessors
 		const std::vector<std::string> &names() const noexcept { return m_names; }
@@ -147,12 +147,12 @@ public:
 	};
 
 	// construction/destruction
-	core_options();
+	core_options() = default;
 	core_options(const core_options &) = delete;
 	core_options(core_options &&) = default;
 	core_options& operator=(const core_options &) = delete;
 	core_options& operator=(core_options &&) = default;
-	virtual ~core_options();
+	virtual ~core_options() = default;
 
 	// getters
 	const std::string &command() const noexcept { return m_command; }
@@ -213,7 +213,7 @@ private:
 		simple_entry(simple_entry &&) = delete;
 		simple_entry& operator=(const simple_entry &) = delete;
 		simple_entry& operator=(simple_entry &&) = delete;
-		~simple_entry();
+		~simple_entry() = default;
 
 		// getters
 		virtual const char *value() const noexcept override;

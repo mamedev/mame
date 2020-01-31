@@ -19,7 +19,7 @@ class debugwin_info : protected debugbase_info
 {
 public:
 	debugwin_info(debugger_windows_interface &debugger, bool is_main_console, LPCSTR title, WNDPROC handler);
-	virtual ~debugwin_info();
+	virtual ~debugwin_info() = default;
 
 	bool is_valid() const { return m_wnd != nullptr; }
 

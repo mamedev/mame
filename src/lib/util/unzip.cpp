@@ -1479,9 +1479,4 @@ void archive_file::cache_clear()
 	m7z_file_cache_clear();
 }
 
-
-archive_file::~archive_file()
-{
-}
-
 } // namespace util

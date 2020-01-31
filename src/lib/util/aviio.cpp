@@ -3803,13 +3803,3 @@ const char *avi_file::error_string(error err)
 		default:                                return "undocumented error";
 	}
 }
-
-
-avi_file::avi_file()
-{
-}
-
-
-avi_file::~avi_file()
-{
-}

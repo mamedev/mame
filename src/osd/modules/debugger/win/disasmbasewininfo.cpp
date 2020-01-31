@@ -49,11 +49,6 @@ disasmbasewin_info::disasmbasewin_info(debugger_windows_interface &debugger, boo
 }
 
 
-disasmbasewin_info::~disasmbasewin_info()
-{
-}
-
-
 bool disasmbasewin_info::handle_key(WPARAM wparam, LPARAM lparam)
 {
 	if (GetAsyncKeyState(VK_CONTROL) & 0x8000)

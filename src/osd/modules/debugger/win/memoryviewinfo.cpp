@@ -18,11 +18,6 @@ memoryview_info::memoryview_info(debugger_windows_interface &debugger, debugwin_
 }
 
 
-memoryview_info::~memoryview_info()
-{
-}
-
-
 uint8_t memoryview_info::data_format() const
 {
 	return view<debug_view_memory>()->get_data_format();

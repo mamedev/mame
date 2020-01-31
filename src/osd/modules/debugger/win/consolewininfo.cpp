@@ -91,10 +91,6 @@ cleanup:
 }
 
 
-consolewin_info::~consolewin_info()
-{
-}
-
 void consolewin_info::set_cpu(device_t &device)
 {
 	// exit if this cpu is already selected

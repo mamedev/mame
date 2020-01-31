@@ -19,7 +19,7 @@ class pointswin_info : public debugwin_info
 {
 public:
 	pointswin_info(debugger_windows_interface &debugger);
-	virtual ~pointswin_info();
+	virtual ~pointswin_info() = default;
 
 	virtual bool handle_key(WPARAM wparam, LPARAM lparam) override;
 
