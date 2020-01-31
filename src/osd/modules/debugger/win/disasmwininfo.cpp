@@ -45,7 +45,7 @@ disasmwin_info::disasmwin_info(debugger_windows_interface &debugger) :
 }
 
 
-disasmview_info::~disasmwin_info()
+disasmwin_info::~disasmwin_info()
 {
 }
 
