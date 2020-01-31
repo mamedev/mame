@@ -3307,6 +3307,21 @@
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="carazu">
+		<description>Carazu (World, v1.0)</description>
+		<year>2016</year>
+		<publisher>Martin Holtkamp</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<feature name="batt" value="Batt CR1616" />
+			<dataarea name="rom" size="262144">
+				<rom name="carazu (world) (PD).bin" size="262144" crc="c4e1e239" sha1="a6f31c65df9e1607101fa8072524fd37b897326b" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="cardgame">
 		<description>Card Game (Japan)</description>
@@ -26636,20 +26651,6 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="game boy digital sampling oscilloscope (europe) (v3.6) (gbdso) (unl).bin" size="32768" crc="572ea59c" sha1="68128bd8b01970054590a88b785d553456b68ec1" />
-			</dataarea>
-		</part>
-	</software>
-	<software name="carazu">
-		<description>Carazu (World, v1.0)</description>
-		<year>2016</year>
-		<publisher>Martin Holtkamp</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1" />
-			<feature name="batt" value="Batt CR1616" />
-			<dataarea name="rom" size="262144">
-				<rom name="carazu (world) (PD).bin" size="262144" crc="c4e1e239" sha1="a6f31c65df9e1607101fa8072524fd37b897326b" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
 			</dataarea>
 		</part>
 	</software>
