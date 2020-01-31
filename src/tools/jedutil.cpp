@@ -7429,19 +7429,9 @@ static int command_convert(int argc, char *argv[])
 
 		/* read the binary data */
 		err = jedbin_parse(srcbuf, srcbuflen, &jed);
-
-		if (err == JEDERR_INVALID_DATA)
+		switch (err)
 		{
-			fprintf(stderr, "Fatal error: Invalid binary JEDEC file\n");
-			free(srcbuf);
-			return 1;
-		}
-
-		if (jed.binfmt == DATAIO) // DATAIO is detected and not supported yet, it has swapped inverted/non-inverted line fuses
-		{
-			fprintf(stderr, "Fatal error: Unsupported DATAIO PLA format detected\n");
-			free(srcbuf);
-			return 1;
+			case JEDERR_INVALID_DATA:   fprintf(stderr, "Fatal error: Invalid binary JEDEC file\n"); free(srcbuf); return 1;
 		}
 
 		/* print out data */
