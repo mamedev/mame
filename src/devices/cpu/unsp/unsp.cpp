@@ -296,7 +296,7 @@ void unsp_20_device::device_start()
 
 void unsp_device::device_reset()
 {
-	for (int i = 0; i < m_numregs; i++)
+	for (int i = 0; i < ARRAY_LENGTH(m_core->m_r); i++)
 	{
 		if (i < m_numregs)
 			m_core->m_r[i] = 0;
