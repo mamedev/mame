@@ -601,7 +601,7 @@ uintptr_t symbol_manager::get_text_section_base()
 	ImageNtHeader_fn image_nt_header = m_dbghelp_dll->bind<ImageNtHeader_fn>("ImageNtHeader");
 
 	// start with the image base
-	PVOID base = reinterpret_cast<PVOID>(GetModuleHandleUni());
+	auto base = reinterpret_cast<PVOID>(GetModuleHandleUni());
 	assert(base != nullptr);
 
 	// make sure we have the functions we need
@@ -694,8 +694,8 @@ void sampling_profiler::stop()
 
 int CLIB_DECL sampling_profiler::compare_address(const void *item1, const void *item2)
 {
-	const uintptr_t *entry1 = reinterpret_cast<const uintptr_t *>(item1);
-	const uintptr_t *entry2 = reinterpret_cast<const uintptr_t *>(item2);
+	const auto *entry1 = reinterpret_cast<const uintptr_t *>(item1);
+	const auto *entry2 = reinterpret_cast<const uintptr_t *>(item2);
 	int mincount = std::min(entry1[0], entry2[0]);
 
 	// sort in order of: bucket, caller, caller's caller, etc.
@@ -715,8 +715,8 @@ int CLIB_DECL sampling_profiler::compare_address(const void *item1, const void *
 
 int CLIB_DECL sampling_profiler::compare_frequency(const void *item1, const void *item2)
 {
-	const uintptr_t *entry1 = reinterpret_cast<const uintptr_t *>(item1);
-	const uintptr_t *entry2 = reinterpret_cast<const uintptr_t *>(item2);
+	const auto *entry1 = reinterpret_cast<const uintptr_t *>(item1);
+	const auto *entry2 = reinterpret_cast<const uintptr_t *>(item2);
 
 	// sort by frequency, then by address
 	if (entry1[0] != entry2[0])

@@ -114,7 +114,7 @@ public:
 
 		for (int y = 0; y < m_height; y++)
 		{
-			DWORD *src = (DWORD *)((BYTE *)rect.pBits + y * rect.Pitch);
+			auto *src = (DWORD *)((BYTE *)rect.pBits + y * rect.Pitch);
 			uint32_t *dst = &m_frame.pix32(y);
 
 			for (int x = 0; x < m_width; x++)
@@ -342,7 +342,7 @@ void shaders::render_snapshot(IDirect3DSurface9 *surface)
 
 	for (int y = 0; y < height; y++)
 	{
-		DWORD *src = (DWORD *)((BYTE *)rect.pBits + y * rect.Pitch);
+		auto *src = (DWORD *)((BYTE *)rect.pBits + y * rect.Pitch);
 		uint32_t *dst = &snapshot.pix32(y);
 
 		for (int x = 0; x < width; x++)
@@ -492,7 +492,7 @@ bool shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 
 	enumerate_screens();
 
-	windows_options &winoptions = downcast<windows_options &>(machine->options());
+	auto &winoptions = downcast<windows_options &>(machine->options());
 
 	post_fx_enable = winoptions.d3d_hlsl_enable();
 	oversampling_enable = winoptions.d3d_hlsl_oversampling();
@@ -2013,7 +2013,7 @@ int32_t slider::update(std::string *str, int32_t newval)
 	{
 		case SLIDER_INT_ENUM:
 		{
-			int32_t *val_ptr = reinterpret_cast<int32_t *>(m_value);
+			auto *val_ptr = reinterpret_cast<int32_t *>(m_value);
 			if (newval != SLIDER_NOCHANGE)
 			{
 				*val_ptr = newval;
@@ -2041,7 +2041,7 @@ int32_t slider::update(std::string *str, int32_t newval)
 
 		default:
 		{
-			float *val_ptr = reinterpret_cast<float *>(m_value);
+			auto *val_ptr = reinterpret_cast<float *>(m_value);
 			if (newval != SLIDER_NOCHANGE)
 			{
 				*val_ptr = (float)newval * m_desc->scale;
@@ -2354,7 +2354,7 @@ void shaders::init_slider_list()
 
 			for (int j = 0; j < count; j++)
 			{
-				slider* slider_arg = new slider(desc, get_slider_option(desc->id, j), &options->params_dirty);
+				auto* slider_arg = new slider(desc, get_slider_option(desc->id, j), &options->params_dirty);
 				internal_sliders.push_back(slider_arg);
 				std::string name = desc->name;
 				switch (desc->slider_type)

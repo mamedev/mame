@@ -445,7 +445,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 	// free all items in the free list
 	while (queue->free.load() != nullptr)
 	{
-		osd_work_item *item = (osd_work_item *)queue->free;
+		auto *item = (osd_work_item *)queue->free;
 		queue->free = item->next;
 		delete item->event;
 		delete item;
@@ -454,7 +454,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 	// free all items in the active list
 	while (queue->list.load() != nullptr)
 	{
-		osd_work_item *item = (osd_work_item *)queue->list;
+		auto *item = (osd_work_item *)queue->list;
 		queue->list = item->next;
 		delete item->event;
 		delete item;
@@ -670,7 +670,7 @@ static int effective_num_processors()
 
 static void *worker_thread_entry(void *param)
 {
-	work_thread_info *thread = (work_thread_info *)param;
+	auto *thread = (work_thread_info *)param;
 	osd_work_queue &queue = thread->queue;
 
 	// loop until we exit

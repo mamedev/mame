@@ -100,7 +100,7 @@ void disasmbasewin_info::update_menu()
 {
 	editwin_info::update_menu();
 
-	disasmview_info *const dasmview = downcast<disasmview_info *>(m_views[0].get());
+	auto *const dasmview = downcast<disasmview_info *>(m_views[0].get());
 	HMENU const menu = GetMenu(window());
 
 	bool const disasm_cursor_visible = dasmview->cursor_visible();
@@ -146,7 +146,7 @@ void disasmbasewin_info::update_menu()
 
 bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 {
-	disasmview_info *const dasmview = downcast<disasmview_info *>(m_views[0].get());
+	auto *const dasmview = downcast<disasmview_info *>(m_views[0].get());
 
 	switch (HIWORD(wparam))
 	{

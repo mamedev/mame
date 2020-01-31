@@ -619,7 +619,7 @@ protected:
 		{
 			std::lock_guard<std::mutex> scope_lock(m_module_lock);
 
-			RAWINPUT *input = reinterpret_cast<RAWINPUT*>(data);
+			auto *input = reinterpret_cast<RAWINPUT*>(data);
 
 			// find the device in the list and update
 			auto target_device = std::find_if(devicelist()->begin(), devicelist()->end(), [input](auto &device)
@@ -661,7 +661,7 @@ protected:
 			return;
 
 		// allocate and link in a new device
-		rawinput_keyboard_device *devinfo = create_rawinput_device<rawinput_keyboard_device>(machine, device);
+		auto *devinfo = create_rawinput_device<rawinput_keyboard_device>(machine, device);
 		if (devinfo == nullptr)
 			return;
 
@@ -706,7 +706,7 @@ protected:
 			return;
 
 		// allocate and link in a new device
-		rawinput_mouse_device *devinfo = create_rawinput_device<rawinput_mouse_device>(machine, device);
+		auto *devinfo = create_rawinput_device<rawinput_mouse_device>(machine, device);
 		if (devinfo == nullptr)
 			return;
 
@@ -755,7 +755,7 @@ protected:
 			return;
 
 		// allocate and link in a new device
-		rawinput_lightgun_device *devinfo = create_rawinput_device<rawinput_lightgun_device>(machine, device);
+		auto *devinfo = create_rawinput_device<rawinput_lightgun_device>(machine, device);
 		if (devinfo == nullptr)
 			return;
 
