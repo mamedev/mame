@@ -545,6 +545,7 @@ MACHINES["MC14411"] = true
 MACHINES["MC146818"] = true
 MACHINES["MC2661"] = true
 MACHINES["MC6843"] = true
+MACHINES["MC6844"] = true
 MACHINES["MC6846"] = true
 MACHINES["MC6852"] = true
 MACHINES["MC6854"] = true
@@ -2240,6 +2241,9 @@ files {
 	MAME_DIR .. "src/mame/drivers/eispc.cpp",
 	MAME_DIR .. "src/mame/machine/eispc_kb.cpp",
 	MAME_DIR .. "src/mame/machine/eispc_kb.h",
+	MAME_DIR .. "src/mame/drivers/alfaskop41xx.cpp",
+	MAME_DIR .. "src/mame/machine/alfaskop_s41_kb.cpp",
+	MAME_DIR .. "src/mame/machine/alfaskop_s41_kb.h",
 }
 
 createMESSProjects(_target, _subtarget, "exidy")
