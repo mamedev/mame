@@ -324,6 +324,7 @@ Club Kart (2003, prototype, set 1)              no cart  *       21 (64Mb)   pre
 Club Kart (2003, prototype, set 2)              no cart  *       21 (64Mb)   present  315-6206  present       * flash-PCB
 Crackin' DJ part 2                            840-0068C  23674   20 (64Mb)   present  315-6206  317-0311-COM  PCB have label 840-0068B-01 837-14124, requires regular 837-13551 and 837-13938 rotary JVS boards, and turntable simulation
 Crazy Taxi                                    840-0002C  ?       13 (64Mb)   ?        315-6206  ?             not dumped, likely same as regular 171-7919A cart
+Ferrari F355 Challenge (private show version)   no cart  **      21*(64Mb)   present  315-6206  317-0254-COM  * only first 19 flash roms contain game data, ** flash-PCB
 Ferrari F355 Challenge (twin/deluxe, preview)   no cart  22848P* 21 (64Mb)   present  315-6206  317-0267-COM  * other ROM board we've seen had 2x flashroms PCB instead of IC22 EEPROM, contents is the same.
 /Ferrari F355 Challenge 2 - International
 \Course Edition (twin/deluxe, prototype)        no cart  23399   21 (64Mb)   present  315-6206  317-0287-COM  content is the same as regular 171-7919A cart
@@ -4438,10 +4439,47 @@ ROM_START( f355 )
 	ROM_LOAD("mpr-21901.ic21s", 0xa800000, 0x0800000, CRC(266a3eea) SHA1(795ecc5589a0152b9cf1e03e454ed1ea01501942) )
 
 	ROM_REGION( 0x10000, "drivebd", 0 ) /* drive board ROM */
-	ROM_LOAD( "epr-21867p.bin", 0x000000, 0x010000, CRC(6143b911) SHA1(360ebc53696da7a29e6404376c82947563274835) ) // prototype / prewiev
 	ROM_LOAD( "epr-21867.bin", 0x000000, 0x010000, CRC(4f93a2a0) SHA1(875907e7fcfc44850e2c60c12268ac61c742f217) )
 
 	// 834-13842   1999     317-0254-COM   Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "280e8f84" )
+ROM_END
+
+// This set show "PRIVATE SHOW VERSION" text if run with 21862P Japan BIOS or "LOCATION TEST VERSION" if run with 21864P Export BIOS.
+// Multi-board only function if use one of 2 mentioned above prototype BIOSes, will boot as regular single-board game with any other BIOS.
+ROM_START( f355p )
+	F355DLX_BIOS
+	ROM_DEFAULT_BIOS("bios4")
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD("rom0.ic22",   0x0000000, 0x0400000, CRC(298cbe94) SHA1(68b5e7f4b71ebdeceaaede2a33b6be9931cf862e) )
+
+	ROM_LOAD("rom1.ic1s",   0x0800000, 0x0800000, BAD_DUMP CRC(ba0ee343) SHA1(d8d8bbfd330c9b9c7fe5974cb2f5f9d6a4ef1477) ) // file: 7ACD 7D37 right sums: 803F 81A7
+	ROM_LOAD("rom2.ic2s",   0x1000000, 0x0800000, CRC(adf8fa95) SHA1(d91ca2a8b45d744c5a6b84099b12c553acc2a83c) )
+	ROM_LOAD("rom3.ic3s",   0x1800000, 0x0800000, BAD_DUMP CRC(90fc7b08) SHA1(ac9b49239f731a9ebfdf998c6d2253dea2f5741c) ) // file: BF7E 589C right sums: BF70 579C 
+	ROM_LOAD("rom4.ic4s",   0x2000000, 0x0800000, CRC(9c18fe61) SHA1(acc0447e3aec6233d7211afe9578236e275330c7) )
+	ROM_LOAD("rom5.ic5s",   0x2800000, 0x0800000, CRC(ed3a6c95) SHA1(8545231342ebbf436551b73e17c91b59f53f47c1) )
+	ROM_LOAD("rom6.ic6s",   0x3000000, 0x0800000, CRC(a52d4b49) SHA1(9317da85a80d7a0bb8f9af19163724193088f3ab) )
+	ROM_LOAD("rom7.ic7s",   0x3800000, 0x0800000, BAD_DUMP CRC(e889e336) SHA1(c6cf3b2bf9d04315e78ffad8aad218adc86c7836) ) // file: 8DE7 F722 right sums: 8DD7 F712
+	ROM_LOAD("rom8.ic8s",   0x4000000, 0x0800000, CRC(1a16faef) SHA1(e216f96f1ae8e7af5d6b83ffd34a576e8548ddb2) )
+	ROM_LOAD("rom9.ic9s",   0x4800000, 0x0800000, CRC(5732d7ed) SHA1(1a536a08709ca5cf39fb28010be28eeb3b783ea3) )
+	ROM_LOAD("rom10.ic10s", 0x5000000, 0x0800000, BAD_DUMP CRC(99b5a926) SHA1(f3d7403df7873a3baf6ca73701353665d53e50f6) ) // file: 9ED5 D2B9 right sums: 9E95 92B9
+	ROM_LOAD("rom11.ic11s", 0x5800000, 0x0800000, BAD_DUMP CRC(280d23e8) SHA1(6afe1bbef2ece665113bc6de28d7349af433d16b) ) // file: 645B 525A right sums: 640B 421A
+	ROM_LOAD("rom12.ic12s", 0x6000000, 0x0800000, BAD_DUMP CRC(cacc562d) SHA1(a2e27f5d2872e24176e581453e1929f4132a7ed1) ) // file: 7AD0 2DC7 right sums: 66E6 2DD3
+	ROM_LOAD("rom13.ic13s", 0x6800000, 0x0800000, BAD_DUMP CRC(d706fa2f) SHA1(a7aebd7b220f0e780fe9340a8d10497afc177832) ) // file: B130 4E38 right sums: B12F 4D38
+	ROM_LOAD("rom14.ic14s", 0x7000000, 0x0800000, BAD_DUMP CRC(c1f9353c) SHA1(6d8c6df04b94499c798d0244e473127b45e51de4) ) // file: A24E 220C right sums: A24A 2208
+	ROM_LOAD("rom15.ic15s", 0x7800000, 0x0800000, CRC(1bff148f) SHA1(31d2a71191b2f4c4eaa325ff3a14def3b4cd778e) )
+	ROM_LOAD("rom16.ic16s", 0x8000000, 0x0800000, CRC(181eb548) SHA1(e1548d5f03aa2957e8049ad4c248b9681e46f30b) )
+	ROM_LOAD("rom17.ic17s", 0x8800000, 0x0800000, CRC(a326aac0) SHA1(31f17955c28e7e4e5155ef72b26dca43edb49e16) )
+	ROM_LOAD("rom18.ic18s", 0x9000000, 0x0800000, CRC(1c426bd4) SHA1(455d891d9d7f65abfbc39cfa14d949d3a43b6d77) )
+	ROM_LOAD("rom19.ic19s", 0x9800000, 0x0800000, CRC(e3a34c04) SHA1(4b2877311d7263f3f9c0f277f545fbecd4bf8209) )
+	// IC 20 and 21 populated, empty (FF)
+
+	ROM_REGION( 0x10000, "drivebd", 0 ) /* drive board ROM */
+	ROM_LOAD( "epr-21867p.bin", 0x000000, 0x010000, CRC(6143b911) SHA1(360ebc53696da7a29e6404376c82947563274835) ) // prototype / prewiev
+
+	//             1999     317-0254-COM   Naomi
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "280e8f84" )
 ROM_END
 
@@ -11325,6 +11363,7 @@ ROM_END
 /* ?????    */ GAME( 1998, hotd2e,   hotd2,    naomim2, hotd2, naomi_state,   init_hotd2, ROT0, "Sega", "The House of the Dead 2 (Export)", GAME_FLAGS ) /* specific BIOS "hod2bios" needed */
 /* none     */ GAME( 1998, hotd2p,   hotd2,    naomim2, hotd2, naomi_state,   init_hotd2, ROT0, "Sega", "The House of the Dead 2 (prototype)", GAME_FLAGS ) /* specific BIOS "hod2bios" needed */
 /* 13842    */ GAME( 1999, f355,     f355dlx,  naomim2, naomi, naomi_state,   empty_init, ROT0, "Sega", "Ferrari F355 Challenge (deluxe, no link)", GAME_FLAGS ) /* specific BIOS "f355dlx" needed */
+/* none     */ GAME( 1999, f355p,    f355,     naomim2, naomi, naomi_state,   empty_init, ROT0, "Sega", "Ferrari F355 Challenge (private show version)", GAME_FLAGS ) /* specific BIOS epr-21862p or epr-21864p needed */
 /* 13950    */ GAME( 1999, f355twin, f355bios, naomim2, naomi, naomi_state,   empty_init, ROT0, "Sega", "Ferrari F355 Challenge (twin/deluxe)", GAME_FLAGS ) /* specific BIOS "f355bios" needed */
 /* 13950P   */ GAME( 1999, f355twinp,f355twin, naomim2, naomi, naomi_state,   empty_init, ROT0, "Sega", "Ferrari F355 Challenge (twin/deluxe, preview)", GAME_FLAGS ) /* specific BIOS "f355bios" needed */
 /* none     */ GAME( 2001, f355twn2, f355bios, naomim2, naomi, naomi_state,   empty_init, ROT0, "Sega", "Ferrari F355 Challenge 2 - International Course Edition (twin/deluxe)", GAME_FLAGS ) /* specific BIOS "f355bios" needed */
