@@ -541,7 +541,7 @@ error:
 //  destroy_buffers
 //============================================================
 
-void sound_direct_sound::destroy_buffers(void)
+void sound_direct_sound::destroy_buffers()
 {
 	// stop any playback
 	if (m_stream_buffer)

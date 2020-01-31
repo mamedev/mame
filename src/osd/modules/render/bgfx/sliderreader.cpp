@@ -60,7 +60,7 @@ std::vector<bgfx_slider*> slider_reader::read_from_value(const Value& value, std
 			{
 				return sliders;
 			}
-			strings.push_back(std::string(string_array[i].GetString()));
+			strings.emplace_back(std::string(string_array[i].GetString()));
 		}
 	}
 

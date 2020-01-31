@@ -1240,7 +1240,7 @@ running_machine::notifier_callback_item::notifier_callback_item(machine_notify_d
 //-------------------------------------------------
 
 running_machine::logerror_callback_item::logerror_callback_item(logerror_callback func)
-	: m_func(func)
+	: m_func(std::move(func))
 {
 }
 

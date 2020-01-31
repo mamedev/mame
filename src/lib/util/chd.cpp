@@ -2947,7 +2947,7 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 			hunk_write_compressed(item.m_hunknum, item.m_compression, item.m_compressed, item.m_complen, item.m_hash[0].m_crc16);
 			m_total_out += item.m_complen;
 			m_current_map.add(item.m_hunknum, item.m_hash[0].m_crc16, item.m_hash[0].m_sha1);
-		} while (0);
+		} while (false);
 
 		// reset the item and advance
 		item.m_status = WS_READY;

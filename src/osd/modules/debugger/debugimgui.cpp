@@ -522,7 +522,7 @@ void debug_imgui::handle_console(running_machine* machine)
 		// don't bother adding to history if the current command matches the previous one
 		if(view_main_console->console_prev != view_main_console->console_input)
 		{
-			view_main_console->console_history.push_back(std::string(view_main_console->console_input));
+			view_main_console->console_history.emplace_back(std::string(view_main_console->console_input));
 			view_main_console->console_prev = view_main_console->console_input;
 		}
 		history_pos = view_main_console->console_history.size();

@@ -116,7 +116,7 @@ static bool s_aggressive_focus;
 //============================================================
 
 
-static void create_window_class(void);
+static void create_window_class();
 
 //============================================================
 //  window_init
@@ -577,7 +577,7 @@ void winwindow_dispatch_message(running_machine &machine, MSG *message)
 //  (main thread)
 //============================================================
 
-void winwindow_take_snap(void)
+void winwindow_take_snap()
 {
 	assert(GetCurrentThreadId() == main_threadid);
 
@@ -595,7 +595,7 @@ void winwindow_take_snap(void)
 //  (main thread)
 //============================================================
 
-void winwindow_toggle_fsfx(void)
+void winwindow_toggle_fsfx()
 {
 	assert(GetCurrentThreadId() == main_threadid);
 
@@ -613,7 +613,7 @@ void winwindow_toggle_fsfx(void)
 //  (main thread)
 //============================================================
 
-void winwindow_take_video(void)
+void winwindow_take_video()
 {
 	assert(GetCurrentThreadId() == main_threadid);
 
@@ -631,7 +631,7 @@ void winwindow_take_video(void)
 //  (main thread)
 //============================================================
 
-void winwindow_toggle_full_screen(void)
+void winwindow_toggle_full_screen()
 {
 	assert(GetCurrentThreadId() == main_threadid);
 
@@ -658,7 +658,7 @@ void winwindow_toggle_full_screen(void)
 //  (main or window thread)
 //============================================================
 
-bool winwindow_has_focus(void)
+bool winwindow_has_focus()
 {
 	// see if one of the video windows has focus
 	for (const auto &window : osd_common_t::s_window_list)
@@ -930,7 +930,7 @@ void win_window_info::update()
 //  (main thread)
 //============================================================
 
-static void create_window_class(void)
+static void create_window_class()
 {
 	static int classes_created = FALSE;
 

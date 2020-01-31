@@ -647,7 +647,7 @@ bool core_in_memory_file::eof() const
 {
 	// check for buffered chars
 	if (has_putback())
-		return 0;
+		return false;
 
 	// if the offset == length, we're at EOF
 	return (m_offset >= m_length);

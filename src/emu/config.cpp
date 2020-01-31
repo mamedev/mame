@@ -40,8 +40,8 @@ void configuration_manager::config_register(const char* nodename, config_load_de
 {
 	config_element element;
 	element.name = nodename;
-	element.load = load;
-	element.save = save;
+	element.load = std::move(load);
+	element.save = std::move(save);
 
 	m_typelist.push_back(element);
 }
