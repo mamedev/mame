@@ -48,11 +48,6 @@ debugwin_info::debugwin_info(debugger_windows_interface &debugger, bool is_main_
 }
 
 
-debugwin_info::~debugwin_info()
-{
-}
-
-
 void debugwin_info::destroy()
 {
 	for (int curview = 0; curview < MAX_VIEWS; curview++)

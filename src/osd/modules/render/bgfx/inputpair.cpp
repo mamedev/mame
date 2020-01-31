@@ -40,10 +40,6 @@ bgfx_input_pair::bgfx_input_pair(int index, std::string sampler, std::string tex
 	}
 }
 
-bgfx_input_pair::~bgfx_input_pair()
-{
-}
-
 void bgfx_input_pair::bind(bgfx_effect *effect, const int32_t screen) const
 {
 	if (effect->uniform(m_sampler) == nullptr)

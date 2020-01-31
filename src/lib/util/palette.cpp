@@ -256,15 +256,6 @@ palette_t::palette_t(uint32_t numcolors, uint32_t numgroups)
 //  palette_t - destructor
 //-------------------------------------------------
 
-palette_t::~palette_t()
-{
-}
-
-
-//-------------------------------------------------
-//  palette_t - destructor
-//-------------------------------------------------
-
 void palette_t::deref()
 {
 	if (--m_refcount == 0)

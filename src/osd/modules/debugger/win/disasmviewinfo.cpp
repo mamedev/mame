@@ -16,11 +16,6 @@ disasmview_info::disasmview_info(debugger_windows_interface &debugger, debugwin_
 }
 
 
-disasmview_info::~disasmview_info()
-{
-}
-
-
 disasm_right_column disasmview_info::right_column() const
 {
 	return view<debug_view_disasm>()->right_column();

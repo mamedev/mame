@@ -51,11 +51,6 @@ editwin_info::editwin_info(debugger_windows_interface &debugger, bool is_main_co
 }
 
 
-editwin_info::~editwin_info()
-{
-}
-
-
 bool editwin_info::restore_field(HWND wnd)
 {
 	if (wnd == m_editwnd)
