@@ -21,7 +21,7 @@ class disasmview_info : public debugview_info
 {
 public:
 	disasmview_info(debugger_windows_interface &debugger, debugwin_info &owner, HWND parent);
-	virtual ~disasmview_info() = default;
+	virtual ~disasmview_info();
 
 	disasm_right_column right_column() const;
 	offs_t selected_address() const;
@@ -30,4 +30,4 @@ public:
 	void set_right_column(disasm_right_column contents);
 };
 
-#endif
+#endif // MAME_DEBUGGER_WIN_DISASMVIEWINFO_H

@@ -577,10 +577,10 @@ namespace uml
 	private:
 		// internal configuration
 		void configure(opcode_t op, u8 size, condition_t cond = COND_ALWAYS);
-		void configure(opcode_t op, u8 size, const parameter &p0, condition_t cond = COND_ALWAYS);
-		void configure(opcode_t op, u8 size, const parameter &p0, const parameter &p1, condition_t cond = COND_ALWAYS);
-		void configure(opcode_t op, u8 size, const parameter &p0, const parameter &p1, const parameter &p2, condition_t cond = COND_ALWAYS);
-		void configure(opcode_t op, u8 size, const parameter &p0, const parameter &p1, const parameter &p2, const parameter &p3, condition_t cond = COND_ALWAYS);
+		void configure(opcode_t op, u8 size, parameter p0, condition_t cond = COND_ALWAYS);
+		void configure(opcode_t op, u8 size, parameter p0, parameter p1, condition_t cond = COND_ALWAYS);
+		void configure(opcode_t op, u8 size, parameter p0, parameter p1, parameter p2, condition_t cond = COND_ALWAYS);
+		void configure(opcode_t op, u8 size, parameter p0, parameter p1, parameter p2, parameter p3, condition_t cond = COND_ALWAYS);
 
 		// opcode validation and simplification
 		void validate();

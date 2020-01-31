@@ -22,7 +22,7 @@ class editwin_info : public debugwin_info
 {
 public:
 	editwin_info(debugger_windows_interface &debugger, bool is_main_console, LPCSTR title, WNDPROC handler);
-	virtual ~editwin_info() = default;
+	virtual ~editwin_info();
 
 	virtual bool restore_field(HWND wnd) override;
 

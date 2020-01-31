@@ -51,6 +51,11 @@ pointswin_info::pointswin_info(debugger_windows_interface &debugger) :
 }
 
 
+pointswin_info::~pointswin_info()
+{
+}
+
+
 bool pointswin_info::handle_key(WPARAM wparam, LPARAM lparam)
 {
 	if (GetAsyncKeyState(VK_CONTROL) & 0x8000)

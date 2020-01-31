@@ -18,6 +18,11 @@ logview_info::logview_info(debugger_windows_interface &debugger, debugwin_info &
 }
 
 
+logview_info::~logview_info()
+{
+}
+
+
 void logview_info::clear()
 {
 	view<debug_view_log>()->clear();

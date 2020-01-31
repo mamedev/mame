@@ -307,7 +307,7 @@ void uml::instruction::configure(opcode_t op, u8 size, condition_t condition)
 //  parameter
 //-------------------------------------------------
 
-void uml::instruction::configure(opcode_t op, u8 size, const parameter &p0, condition_t condition)
+void uml::instruction::configure(opcode_t op, u8 size, parameter p0, condition_t condition)
 {
 	// fill in the instruction
 	m_opcode = opcode_t(u8(op));
@@ -327,7 +327,7 @@ void uml::instruction::configure(opcode_t op, u8 size, const parameter &p0, cond
 //  parameters
 //-------------------------------------------------
 
-void uml::instruction::configure(opcode_t op, u8 size, const parameter &p0, const parameter &p1, condition_t condition)
+void uml::instruction::configure(opcode_t op, u8 size, parameter p0, parameter p1, condition_t condition)
 {
 	// fill in the instruction
 	m_opcode = opcode_t(u8(op));
@@ -348,7 +348,7 @@ void uml::instruction::configure(opcode_t op, u8 size, const parameter &p0, cons
 //  parameters
 //-------------------------------------------------
 
-void uml::instruction::configure(opcode_t op, u8 size, const parameter &p0, const parameter &p1, const parameter &p2, condition_t condition)
+void uml::instruction::configure(opcode_t op, u8 size, parameter p0, parameter p1, parameter p2, condition_t condition)
 {
 	// fill in the instruction
 	m_opcode = opcode_t(u8(op));
@@ -370,7 +370,7 @@ void uml::instruction::configure(opcode_t op, u8 size, const parameter &p0, cons
 //  parameters
 //-------------------------------------------------
 
-void uml::instruction::configure(opcode_t op, u8 size, const parameter &p0, const parameter &p1, const parameter &p2, const parameter &p3, condition_t condition)
+void uml::instruction::configure(opcode_t op, u8 size, parameter p0, parameter p1, parameter p2, parameter p3, condition_t condition)
 {
 	// fill in the instruction
 	m_opcode = opcode_t(u8(op));

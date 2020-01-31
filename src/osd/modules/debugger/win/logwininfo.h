@@ -19,7 +19,7 @@ class logwin_info : public debugwin_info
 {
 public:
 	logwin_info(debugger_windows_interface &debugger);
-	virtual ~logwin_info() = default;
+	virtual ~logwin_info();
 
 protected:
 	virtual bool handle_command(WPARAM wparam, LPARAM lparam) override;

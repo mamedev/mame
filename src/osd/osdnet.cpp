@@ -42,6 +42,10 @@ osd_netdev::osd_netdev(class device_network_interface *ifdev, int rate)
 	m_timer->adjust(attotime::from_hz(rate), 0, attotime::from_hz(rate));
 }
 
+osd_netdev::~osd_netdev()
+{
+}
+
 void osd_netdev::start()
 {
 	m_timer->enable(true);

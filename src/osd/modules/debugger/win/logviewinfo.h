@@ -19,9 +19,9 @@ class logview_info : public debugview_info
 {
 public:
 	logview_info(debugger_windows_interface &debugger, debugwin_info &owner, HWND parent);
-	virtual ~logview_info() = default;
+	virtual ~logview_info();
 
 	void clear();
 };
 
-#endif
+#endif // MAME_DEBUGGER_WIN_LOGVIEWINFO_H

@@ -100,7 +100,7 @@ public:
 
 	auto kbrst_cb() { return m_kbrst_cb.bind(); }
 
-	a1000_kbreset_device &set_delays(const attotime &detect, const attotime &stray, const attotime &output)
+	a1000_kbreset_device &set_delays(attotime detect, attotime stray, attotime output)
 	{
 		m_detect_time = detect;
 		m_stray_time = stray;

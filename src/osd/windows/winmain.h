@@ -275,7 +275,7 @@ class windows_osd_interface : public osd_common_t
 public:
 	// construction/destruction
 	windows_osd_interface(windows_options &options);
-	virtual ~windows_osd_interface() = default;
+	virtual ~windows_osd_interface();
 
 	// general overridables
 	virtual void init(running_machine &machine) override;

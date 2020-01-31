@@ -77,7 +77,7 @@ class symbol_manager
 public:
 	// construction/destruction
 	symbol_manager(const char *argv0);
-	~symbol_manager() = default;
+	~symbol_manager();
 
 	// getters
 	uintptr_t last_base() const { return m_last_base; }
@@ -128,7 +128,7 @@ class sampling_profiler
 {
 public:
 	sampling_profiler(uint32_t max_seconds, uint8_t stack_depth);
-	~sampling_profiler() = default;
+	~sampling_profiler();
 
 	void start();
 	void stop();
@@ -318,6 +318,15 @@ symbol_manager::symbol_manager(const char *argv0)
 
 	m_sym_from_addr = m_dbghelp_dll->bind<SymFromAddr_fn>("SymFromAddr");
 	m_sym_get_line_from_addr_64 = m_dbghelp_dll->bind<SymGetLineFromAddr64_fn>("SymGetLineFromAddr64");
+}
+
+
+//-------------------------------------------------
+//  ~symbol_manager - destructor
+//-------------------------------------------------
+
+symbol_manager::~symbol_manager()
+{
 }
 
 
@@ -646,6 +655,15 @@ sampling_profiler::sampling_profiler(uint32_t max_seconds, uint8_t stack_depth =
 
 
 //-------------------------------------------------
+//  sampling_profiler - destructor
+//-------------------------------------------------
+
+sampling_profiler::~sampling_profiler()
+{
+}
+
+
+////-------------------------------------------------
 //  start - begin gathering profiling information
 //-------------------------------------------------
 

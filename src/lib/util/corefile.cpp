@@ -1162,6 +1162,15 @@ osd_file::error core_file::open_proxy(core_file &file, ptr &proxy)
 
 
 /*-------------------------------------------------
+    closes a file
+-------------------------------------------------*/
+
+core_file::~core_file()
+{
+}
+
+
+/*-------------------------------------------------
     load - open a file with the specified
     filename, read it into memory, and return a
     pointer

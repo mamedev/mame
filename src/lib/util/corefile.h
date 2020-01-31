@@ -61,7 +61,7 @@ public:
 	static osd_file::error open_proxy(core_file &file, ptr &proxy);
 
 	// close an open file
-	virtual ~core_file() = default;
+	virtual ~core_file();
 
 	// enable/disable streaming file compression via zlib; level is 0 to disable compression, or up to 9 for max compression
 	virtual osd_file::error compress(int level) = 0;

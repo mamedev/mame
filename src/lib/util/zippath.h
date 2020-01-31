@@ -34,7 +34,7 @@ public:
 	static osd_file::error open(std::string const &path, ptr &directory);
 
 	// closes a directory
-	virtual ~zippath_directory() = default;
+	virtual ~zippath_directory();
 
 	// reads a directory entry
 	virtual osd::directory::entry const *readdir() = 0;

@@ -21,7 +21,7 @@ public:
 		create_netdev func;
 	};
 	osd_netdev(class device_network_interface *ifdev, int rate);
-	virtual ~osd_netdev() = default;
+	virtual ~osd_netdev();
 	void start();
 	void stop();
 

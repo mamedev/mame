@@ -615,6 +615,16 @@ osd_file::error zippath_directory::open(std::string const &path, ptr &directory)
 
 
 // -------------------------------------------------
+//  zippath_directory::~zippath_directory - closes
+//  a directory
+// -------------------------------------------------
+
+zippath_directory::~zippath_directory()
+{
+}
+
+
+// -------------------------------------------------
 //  zippath_parent - retrieves the parent directory
 // -------------------------------------------------
 

@@ -45,6 +45,11 @@ disasmwin_info::disasmwin_info(debugger_windows_interface &debugger) :
 }
 
 
+disasmview_info::~disasmwin_info()
+{
+}
+
+
 void disasmwin_info::recompute_children()
 {
 	// compute a client rect

@@ -19,7 +19,7 @@ class memoryview_info : public debugview_info
 {
 public:
 	memoryview_info(debugger_windows_interface &debugger, debugwin_info &owner, HWND parent);
-	virtual ~memoryview_info() = default;
+	virtual ~memoryview_info();
 
 	uint8_t data_format() const;
 	uint32_t chunks_per_row() const;
@@ -33,4 +33,4 @@ public:
 	void set_physical(bool physical);
 };
 
-#endif
+#endif // MAME_DEBUGGER_WIN_MEMORYVIEWINFO_H

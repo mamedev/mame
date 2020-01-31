@@ -19,7 +19,7 @@ class disasmwin_info : public disasmbasewin_info
 {
 public:
 	disasmwin_info(debugger_windows_interface &debugger);
-	virtual ~disasmwin_info() = default;
+	virtual ~disasmwin_info();
 
 protected:
 	virtual void recompute_children() override;
