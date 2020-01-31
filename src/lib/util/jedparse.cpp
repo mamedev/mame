@@ -391,23 +391,8 @@ int jedbin_parse(const void *data, size_t length, jed_data *result)
 	/* first unpack the number of fuses */
 	result->numfuses = (cursrc[0] << 24) | (cursrc[1] << 16) | (cursrc[2] << 8) | cursrc[3];
 	cursrc += 4;
-
 	if (result->numfuses == 0 || result->numfuses > JED_MAX_FUSES)
 		return JEDERR_INVALID_DATA;
-
-	/* Detect DataIO binary format and prepare for conversion. This transformation is based on observation of an 82S100 dump */
-	if (result->numfuses == ((cursrc[0] << 24) | (cursrc[1] << 16) | (cursrc[2] << 8) | cursrc[3]))
-	{
-		result->numfuses = (result->numfuses - 9) * 8; // Double 32 bit byte file size header + trailing byte to Single 32 byte fuse count
-		cursrc = cursrc + 4;                           // Adjust start of buffer, trailing byte will not be copied below
-		result->binfmt = DATAIO;                       // DataIO also has swapped inverted/non-inverted line fuses so remember origin
-		if (LOG_PARSE) printf("DATAIO format detected\n");
-	}
-	else
-	{
-		result->binfmt = MAXLOADER;                    // This is the old format just set for completeness.
-		if (LOG_PARSE) printf("MAXLOADER format detected\n");
-	}
 
 	/* now make sure we have enough data in the source */
 	if (length < 4 + (result->numfuses + 7) / 8)
