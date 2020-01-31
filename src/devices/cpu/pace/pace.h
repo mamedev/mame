@@ -91,7 +91,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 private:
-	enum class cycle {
+	enum class cycle : u8 {
 		IFETCH_M1, LEA_M2, RDEA_M3,
 
 		BOC_M4, BOC_M5,
