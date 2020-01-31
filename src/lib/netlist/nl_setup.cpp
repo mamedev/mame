@@ -313,9 +313,9 @@ namespace netlist
 
 	bool nlparse_t::parse_stream(plib::psource_t::stream_ptr &&istrm, const pstring &name)
 	{
-		plib::ppreprocessor y(m_includes, &m_defines);
-		plib::ppreprocessor &x(y.process(std::move(istrm)));
-		return parser_t(std::move(x), *this).parse(name);
+		auto y = plib::make_unique<plib::ppreprocessor>(m_includes, &m_defines);
+		y->process(std::move(istrm));
+		return parser_t(std::move(y), *this).parse(name);
 		//return parser_t(std::move(plib::ppreprocessor(&m_defines).process(std::move(istrm))), *this).parse(name);
 	}
 
@@ -1057,7 +1057,7 @@ void models_t::model_parse(const pstring &model_in, model_map_t &map)
 	}
 }
 
-pstring models_t::model_string(const model_map_t &map) const
+pstring models_t::model_string(const model_map_t &map)
 {
 	// operator [] has no const implementation
 	pstring ret = map.at("COREMODEL") + "(";

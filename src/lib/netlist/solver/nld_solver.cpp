@@ -252,8 +252,45 @@ namespace devices
 
 	struct net_splitter
 	{
+		void run(netlist_state_t &netlist)
+		{
+			for (auto & net : netlist.nets())
+			{
+				netlist.log().verbose("processing {1}", net->name());
+				if (!net->isRailNet() && net->num_cons() > 0)
+				{
+					netlist.log().verbose("   ==> not a rail net");
+					// Must be an analog net
+					auto &n = *static_cast<analog_net_t *>(net.get());
+					if (!already_processed(n))
+					{
+						groupspre.emplace_back(analog_net_t::list_t());
+						process_net(netlist, n);
+					}
+				}
+			}
+			for (auto &g : groupspre)
+				if (!g.empty())
+					groups.push_back(g);
+		}
 
-		bool already_processed(const analog_net_t &n)
+		std::vector<analog_net_t::list_t> groups;
+
+	private:
+
+		bool already_processed(const analog_net_t &n) const
+		{
+			// no need to process rail nets - these are known variables
+			if (n.isRailNet())
+				return true;
+			// if it's already processed - no need to continue
+			for (auto & grp : groups)
+				if (plib::container::contains(grp, &n))
+					return true;
+			return false;
+		}
+
+		bool check_if_processed_and_join(const analog_net_t &n)
 		{
 			// no need to process rail nets - these are known variables
 			if (n.isRailNet())
@@ -297,41 +334,14 @@ namespace devices
 				{
 					auto *pt = static_cast<terminal_t *>(term);
 					// check the connected terminal
-					// analog_net_t &connected_net = pt->connected_terminal()->net();
 					analog_net_t &connected_net = netlist.setup().get_connected_terminal(*pt)->net();
 					netlist.log().verbose("  Connected net {}", connected_net.name());
-					if (!already_processed(connected_net))
+					if (!check_if_processed_and_join(connected_net))
 						process_net(netlist, connected_net);
 				}
 			}
 		}
 
-		void run(netlist_state_t &netlist)
-		{
-			for (auto & net : netlist.nets())
-			{
-				netlist.log().debug("processing {1}", net->name());
-				netlist.log().verbose("processing {1}", net->name());
-				if (!net->isRailNet() && net->num_cons() > 0)
-				{
-					netlist.log().debug("   ==> not a rail net");
-					netlist.log().verbose("   ==> not a rail net");
-					// Must be an analog net
-					auto &n = *static_cast<analog_net_t *>(net.get());
-					if (!already_processed(n))
-					{
-						groupspre.emplace_back(analog_net_t::list_t());
-						process_net(netlist, n);
-					}
-				}
-			}
-			for (auto &g : groupspre)
-				if (!g.empty())
-					groups.push_back(g);
-		}
-
-		std::vector<analog_net_t::list_t> groups;
-	private:
 		std::vector<analog_net_t::list_t> groupspre;
 	};
 

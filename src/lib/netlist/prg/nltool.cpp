@@ -368,7 +368,7 @@ static std::vector<input_t> read_input(const netlist::setup_t &setup, const pstr
 	std::vector<input_t> ret;
 	if (fname != "")
 	{
-		plib::putf8_reader r = plib::putf8_reader(std::ifstream(plib::filesystem::u8path(fname)));
+		plib::putf8_reader r = plib::putf8_reader(plib::make_unique<std::ifstream>(plib::filesystem::u8path(fname)));
 		if (r.stream().fail())
 			throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(fname));
 		r.stream().imbue(std::locale::classic());
@@ -416,28 +416,31 @@ void tool_app_t::run()
 
 	pout("startup time ==> {1:5.3f}\n", t.as_seconds<nl_fptype>() );
 
+	// FIXME: error handling
+	if (opt_loadstate.was_specified())
+	{
+		std::ifstream strm(plib::filesystem::u8path(opt_loadstate()));
+		if (strm.fail())
+			throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(opt_loadstate()));
+		strm.imbue(std::locale::classic());
+		plib::pbinary_reader reader(strm);
+		std::vector<char> loadstate;
+		reader.read(loadstate);
+		nt.load_state(loadstate);
+		pout("Loaded state, run will continue at {1:.6f}\n", nt.exec().time().as_double());
+	}
+
 	t.reset();
 
-	netlist::netlist_time_ext nlt = nt.exec().time();
+	netlist::netlist_time_ext nlstart = nt.exec().time();
 	{
 		auto t_guard(t.guard());
 
-		// FIXME: error handling
-		if (opt_loadstate.was_specified())
-		{
-			std::ifstream strm(plib::filesystem::u8path(opt_loadstate()));
-			if (strm.fail())
-				throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(opt_loadstate()));
-			strm.imbue(std::locale::classic());
-			plib::pbinary_reader reader(strm);
-			std::vector<char> loadstate;
-			reader.read(loadstate);
-			nt.load_state(loadstate);
-			pout("Loaded state, run will continue at {1:.6f}\n", nt.exec().time().as_double());
-		}
+		pout("runnning ...\n");
 
 		unsigned pos = 0;
 
+		netlist::netlist_time_ext nlt = nlstart;
 
 		while (pos < inps.size()
 				&& inps[pos].m_time < ttr
@@ -449,8 +452,6 @@ void tool_app_t::run()
 			pos++;
 		}
 
-		pout("runnning ...\n");
-
 		if (ttr > nlt)
 			nt.exec().process_queue(ttr - nlt);
 		else
@@ -460,24 +461,25 @@ void tool_app_t::run()
 			ttr = nlt;
 		}
 
-		if (opt_savestate.was_specified())
-		{
-			auto savestate = nt.save_state();
-			std::ofstream strm(plib::filesystem::u8path(opt_savestate()), std::ios_base::binary);
-			if (strm.fail())
-				throw plib::file_open_e(opt_savestate());
-			strm.imbue(std::locale::classic());
-
-			plib::pbinary_writer writer(strm);
-			writer.write(savestate);
-		}
-		nt.exec().stop();
 	}
+
+	if (opt_savestate.was_specified())
+	{
+		auto savestate = nt.save_state();
+		std::ofstream strm(plib::filesystem::u8path(opt_savestate()), std::ios_base::binary);
+		if (strm.fail())
+			throw plib::file_open_e(opt_savestate());
+		strm.imbue(std::locale::classic());
+
+		plib::pbinary_writer writer(strm);
+		writer.write(savestate);
+	}
+	nt.exec().stop();
 
 	auto emutime(t.as_seconds<nl_fptype>());
 	pout("{1:f} seconds emulation took {2:f} real time ==> {3:5.2f}%\n",
-			(ttr - nlt).as_fp<nl_fptype>(), emutime,
-			(ttr - nlt).as_fp<nl_fptype>() / emutime * netlist::nlconst::magic(100.0));
+			(ttr - nlstart).as_fp<nl_fptype>(), emutime,
+			(ttr - nlstart).as_fp<nl_fptype>() / emutime * netlist::nlconst::magic(100.0));
 }
 
 void tool_app_t::validate()
@@ -578,7 +580,7 @@ struct doc_ext
 static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 {
 	//printf("file %s\n", fname.c_str());
-	plib::putf8_reader r = plib::putf8_reader(std::ifstream(plib::filesystem::u8path(fname)));
+	plib::putf8_reader r = plib::putf8_reader(plib::make_unique<std::ifstream>(plib::filesystem::u8path(fname)));
 	if (r.stream().fail())
 		throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(fname));
 	r.stream().imbue(std::locale::classic());

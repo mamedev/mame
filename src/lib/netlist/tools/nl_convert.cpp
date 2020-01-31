@@ -43,7 +43,7 @@ using lib_map_t = std::unordered_map<pstring, lib_map_entry>;
 
 static lib_map_t read_lib_map(const pstring &lm)
 {
-	auto reader = plib::putf8_reader(std::istringstream(lm));
+	auto reader = plib::putf8_reader(plib::make_unique<std::istringstream>(lm));
 	reader.stream().imbue(std::locale::classic());
 	lib_map_t m;
 	pstring line;
@@ -653,7 +653,7 @@ void nl_convert_eagle_t::tokenizer::verror(const pstring &msg)
 void nl_convert_eagle_t::convert(const pstring &contents)
 {
 
-	tokenizer tok(*this, plib::putf8_reader(std::istringstream(contents)));
+	tokenizer tok(*this, plib::putf8_reader(plib::make_unique<std::istringstream>(contents)));
 	tok.stream().stream().imbue(std::locale::classic());
 
 	out("NETLIST_START(dummy)\n");
@@ -800,7 +800,7 @@ void nl_convert_rinf_t::tokenizer::verror(const pstring &msg)
 
 void nl_convert_rinf_t::convert(const pstring &contents)
 {
-	tokenizer tok(*this, plib::putf8_reader(std::istringstream(contents)));
+	tokenizer tok(*this, plib::putf8_reader(plib::make_unique<std::istringstream>(contents)));
 	tok.stream().stream().imbue(std::locale::classic());
 	auto lm = read_lib_map(s_lib_map);
 
