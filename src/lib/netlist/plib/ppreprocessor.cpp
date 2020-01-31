@@ -447,8 +447,8 @@ namespace plib {
 			m_state = LINE_CONTINUATION;
 			return {"", false};
 		}
-		else
-			m_state = PROCESS;
+
+		m_state = PROCESS;
 
 		line = process_comments(m_line);
 
@@ -582,13 +582,11 @@ namespace plib {
 			}
 			return { "", false };
 		}
-		else
-		{
-			if (m_if_flag == 0)
-				return { replace_macros(lt), true };
-			else
-				return { "", false };
-		}
+
+		if (m_if_flag == 0)
+			return { replace_macros(lt), true };
+
+		return { "", false };
 	}
 
 	void ppreprocessor::push_out(const pstring &s)
@@ -600,7 +598,7 @@ namespace plib {
 
 	void ppreprocessor::process_stack()
 	{
-		while (m_stack.size() > 0)
+		while (!m_stack.empty())
 		{
 			pstring line;
 			pstring linemarker = pfmt("# {1} \"{2}\"\n")(m_stack.back().m_lineno, m_stack.back().m_name);
@@ -621,7 +619,7 @@ namespace plib {
 					last_skipped = true;
 			}
 			m_stack.pop_back();
-			if (m_stack.size() > 0)
+			if (!m_stack.empty())
 			{
 				linemarker = pfmt("# {1} \"{2}\" 2\n")(m_stack.back().m_lineno, m_stack.back().m_name);
 				push_out(linemarker);

@@ -132,7 +132,7 @@ namespace plib {
 		void process_stack();
 
 		string_list tokenize(const pstring &str, const string_list &sep, bool remove_ws, bool concat);
-		bool is_valid_token(const pstring &str);
+		static bool is_valid_token(const pstring &str);
 
 		std::pair<pstring,bool> process_line(pstring line);
 		pstring process_comments(pstring line);

@@ -321,7 +321,7 @@ namespace devices
 		{
 			tt_bitset bj(j);
 			size_t nb(bj.count());
-			if ((t[j] == false) && (nb>jb))
+			if (!t[j] && (nb > jb))
 			{
 				jb = nb;
 				jm = bj;
