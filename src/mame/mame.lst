@@ -19632,6 +19632,7 @@ mastboyia                       // (c) 1991 - No Ref on the PCB
 @source:mastboyo.cpp
 mastboyo                        // (c) 1987 - No Ref on the PCB
 mastboyoa                       // (c) 1987 - No Ref on the PCB
+mastboyob
 
 @source:matmania.cpp
 excthour                        // TA-0015 (c) 1985 + Taito license
@@ -36980,6 +36981,7 @@ jak_sbfc                        //
 @source:spg2xx_lexibook.cpp
 lexizeus                        // Lexibook
 lexiseal                        //
+discpal
 
 @source:spg2xx_pdc.cpp
 pdc100
@@ -41133,6 +41135,7 @@ ltv_tam                         //
 tak_geig                        //
 jarajal                         //
 tcarnavi                        //
+tomcpin
 ban_onep                        //
 ekara                           //
 ekaraa                          //

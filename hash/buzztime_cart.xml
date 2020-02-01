@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
+<!-- Only 4 cartridges were released for this system, all in 'Series 1' -->
 
 <softwarelist name="buzztime_cart" description="Cadaco Buzztime Trivia Cartridges">
 	<software name="s1tv" supported="no">
@@ -23,6 +24,17 @@
 				<rom name="buzztimeseries1history.bin" size="0x200000" crc="384b0c0e" sha1="c359e69b5c91ba98ebf477aee1bb5f62b721b427"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
+	
+	<software name="s1every" supported="no">
+		<description>Series 1 - Everything</description>
+		<year>200?</year>
+		<publisher>Cadaco</publisher>
+		<part name="cart" interface="buzztime_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="buzztimeseries1everything.bin" size="0x200000" crc="84acabd9" sha1="cbbda9134bd899a3ec0b91664a3db0f986d5636b"/>
+			</dataarea>
+		</part>
+	</software>		
 
 </softwarelist>
