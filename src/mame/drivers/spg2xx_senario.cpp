@@ -14,8 +14,11 @@
 
 */
 
+#include "emu.h"
 #include "includes/spg2xx.h"
+
 #include "machine/intelfsh.h"
+
 
 class spg2xx_senario_state : public spg2xx_game_state
 {

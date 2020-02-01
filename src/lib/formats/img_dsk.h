@@ -16,15 +16,15 @@
 
 #include <vector>
 
-// Geometry constants
-constexpr unsigned IMG_TRACKS = 77;
-constexpr unsigned IMG_HEADS = 1;
-constexpr unsigned IMG_SECTORS = 52;
-constexpr unsigned IMG_SECTOR_SIZE = 128;
-
 class img_format : public floppy_image_format_t
 {
 public:
+	// Geometry constants
+	static constexpr unsigned TRACKS = 77;
+	static constexpr unsigned HEADS = 1;
+	static constexpr unsigned SECTORS = 52;
+	static constexpr unsigned SECTOR_SIZE = 128;
+
 	img_format();
 
 	virtual int identify(io_generic *io, uint32_t form_factor) override;
