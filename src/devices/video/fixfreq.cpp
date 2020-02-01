@@ -20,7 +20,7 @@
 
 // for quick and dirty debugging
 #define VERBOSE 0
-#define LOG_OUTPUT_FUNC printf
+#define LOG_OUTPUT_STREAM std::cerr
 #include "logmacro.h"
 
 #include <algorithm>
