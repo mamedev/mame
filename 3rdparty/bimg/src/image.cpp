@@ -4709,23 +4709,31 @@ namespace bimg
 		case TextureFormat::ASTC8x5:
 		case TextureFormat::ASTC8x6:
 		case TextureFormat::ASTC10x5:
-			if (!astc_codec::ASTCDecompressToRGBA(
-				  (const uint8_t*)_src
-				, imageGetSize(NULL, uint16_t(_width), uint16_t(_height), 0, false, false, 1, _srcFormat)
-				, _width
-				, _height
-				, TextureFormat::ASTC4x4  == _srcFormat ? astc_codec::FootprintType::k4x4
-				: TextureFormat::ASTC5x5  == _srcFormat ? astc_codec::FootprintType::k5x5
-				: TextureFormat::ASTC6x6  == _srcFormat ? astc_codec::FootprintType::k6x6
-				: TextureFormat::ASTC8x5  == _srcFormat ? astc_codec::FootprintType::k8x5
-				: TextureFormat::ASTC8x6  == _srcFormat ? astc_codec::FootprintType::k8x6
-				:                                         astc_codec::FootprintType::k10x5
-				, (uint8_t*)_dst
-				, _width*_height*4
-				, _dstPitch
-				) )
+			if (BX_ENABLED(BIMG_DECODE_ASTC) )
 			{
-				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xffffff00) );
+				if (!astc_codec::ASTCDecompressToRGBA(
+					  (const uint8_t*)_src
+					, imageGetSize(NULL, uint16_t(_width), uint16_t(_height), 0, false, false, 1, _srcFormat)
+					, _width
+					, _height
+					, TextureFormat::ASTC4x4  == _srcFormat ? astc_codec::FootprintType::k4x4
+					: TextureFormat::ASTC5x5  == _srcFormat ? astc_codec::FootprintType::k5x5
+					: TextureFormat::ASTC6x6  == _srcFormat ? astc_codec::FootprintType::k6x6
+					: TextureFormat::ASTC8x5  == _srcFormat ? astc_codec::FootprintType::k8x5
+					: TextureFormat::ASTC8x6  == _srcFormat ? astc_codec::FootprintType::k8x6
+					:										  astc_codec::FootprintType::k10x5
+					, (uint8_t*)_dst
+					, _width*_height*4
+					, _dstPitch
+					) )
+				{
+					imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xffffff00) );
+				}
+			}
+			else
+			{
+				BX_WARN(false, "ASTC decoder is disabled (BIMG_DECODE_ASTC).");
+				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
 			}
 			break;
 
