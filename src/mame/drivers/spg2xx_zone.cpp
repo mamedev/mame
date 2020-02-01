@@ -3,7 +3,9 @@
 
 /* 'Zone' systems */
 
+#include "emu.h"
 #include "includes/spg2xx.h"
+
 
 class wireless60_state : public spg2xx_game_state
 {

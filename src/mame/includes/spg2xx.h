@@ -1,11 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, David Haywood
-#pragma once
-
 #ifndef MAME_INCLUDES_SPG2XX_H
 #define MAME_INCLUDES_SPG2XX_H
 
-#include "emu.h"
+#pragma once
 
 #include "cpu/unsp/unsp.h"
 #include "machine/i2cmem.h"

@@ -13,7 +13,7 @@
 #include "gigatrondasm.h"
 
 
-DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron_cpu", "Gigatron")
+DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron_cpu", "Gigatron CPU")
 
 
 /* FLAGS */
