@@ -36916,6 +36916,101 @@ speedspn                        // (c) 1994
 @source:speglsht.cpp
 speglsht                        // (c) 1994 Seta
 
+@source:spg110.cpp
+jak_capb                        //
+jak_spdmo                       //
+conyteni                        //
+conyping                        //
+conyfght
+
+@source:spg2xx.cpp
+rad_skat                        //
+rad_skatp                       //
+rad_sktv                        //
+rad_crik                        //
+rad_fb2                         //
+mattelcs                        //
+abltenni                        //
+tvsprt10                        //
+wiwi18                          //
+
+@source:spg2xx_dreamlife.cpp
+dreamlif                        //
+
+@source:spg2xx_ican.cpp
+icanguit                        //
+icanpian                        //
+
+@source:spg2xx_jakks.cpp
+jak_batm                        // The Batman, 2004
+jak_wall                        //
+jak_wwe                         //
+jak_fan4                        //
+jak_just                        //
+jak_dora                        //
+jak_dorr                        //
+jak_disn                        //
+jak_disf                        //
+jak_dpr                         //
+jak_dprs                        //
+jak_sith                        //
+jak_sdoo                        //
+jak_dbz                         //
+jak_mpac                        //
+jak_capc                        //
+jak_wof                         //
+jak_spdm                        //
+jak_pooh                        //
+jak_care                        //
+jak_nick                        //
+jak_sbfc                        //
+
+@source:spg2xx_lexibook.cpp
+lexizeus                        // Lexibook
+lexiseal                        //
+
+@source:spg2xx_pdc.cpp
+pdc100
+
+@source:spg2xx_playvision.cpp
+pvmil                           //
+
+@source:spg2xx_senario.cpp
+senmil
+senbbs
+senapren
+senpmate
+sencosmo
+
+@source:spg2xx_senario_poker.cpp
+sentx6p                         //
+sentx6puk
+sentx6pd
+
+@source:spg2xx_shredmjr.cpp
+taikeegr                        //
+shredmjr                        //
+
+@source:spg2xx_telestory.cpp
+telestry                        //
+
+@source:spg2xx_tvgogo.cpp
+tvgogo                          //
+
+@source:spg2xx_vii.cpp
+vii                             // KenSingTon / Jungle Soft / Siatronics Vii
+
+@source:spg2xx_zone.cpp
+wirels60                        // Wireless 60
+zone40                          // Zone 40
+zone60                          // Zone 60
+zone100                         //
+lx_jg7415                       //
+
+@source:spg2xx_zone_32bit.cpp
+mywicodx                        //
+zon32bit                        // Zone 32-bit
+
 @source:spiders.cpp
 spiders                         // (c) 1981 Sigma Ent. Inc.
 spiders2                        // (c) 1981 Sigma Ent. Inc.
@@ -39833,101 +39928,6 @@ vigilantc                       // (c) 1988 (World Rev C)
 vigilantd                       // (c) 1988 (Japan Rev D)
 vigilantg                       // (c) 1988 (US Rev G)
 vigilanto                       // (c) 1988 (US)
-
-@source:spg110.cpp
-jak_capb                        //
-jak_spdmo                       //
-conyteni                        //
-conyping                        //
-conyfght
-
-@source:spg2xx.cpp
-rad_skat                        //
-rad_skatp                       //
-rad_sktv                        //
-rad_crik                        //
-rad_fb2                         //
-mattelcs                        //
-abltenni                        //
-tvsprt10                        //
-wiwi18                          //
-
-@source:spg2xx_jakks.cpp
-jak_batm                        // The Batman, 2004
-jak_wall                        //
-jak_wwe                         //
-jak_fan4                        //
-jak_just                        //
-jak_dora                        //
-jak_dorr                        //
-jak_disn                        //
-jak_disf                        //
-jak_dpr                         //
-jak_dprs                        //
-jak_sith                        //
-jak_sdoo                        //
-jak_dbz                         //
-jak_mpac                        //
-jak_capc                        //
-jak_wof                         //
-jak_spdm                        //
-jak_pooh                        //
-jak_care                        //
-jak_nick                        //
-jak_sbfc                        //
-
-@source:spg2xx_zone.cpp
-wirels60                        // Wireless 60
-zone40                          // Zone 40
-zone60                          // Zone 60
-zone100                         //
-lx_jg7415                       //
-
-@source:spg2xx_zone_32bit.cpp
-mywicodx                        //
-zon32bit                        // Zone 32-bit
-
-@source:spg2xx_senario.cpp
-senmil
-senbbs
-senapren
-senpmate
-sencosmo
-
-@source:spg2xx_senario_poker.cpp
-sentx6p                         //
-sentx6puk
-sentx6pd
-
-@source:spg2xx_vii.cpp
-vii                             // KenSingTon / Jungle Soft / Siatronics Vii
-
-@source:spg2xx_ican.cpp
-icanguit                        //
-icanpian                        //
-
-@source:spg2xx_playvision.cpp
-pvmil                           //
-
-@source:spg2xx_shredmjr.cpp
-taikeegr                        //
-shredmjr                        //
-
-@source:spg2xx_telestory.cpp
-telestry                        //
-
-@source:spg2xx_tvgogo.cpp
-tvgogo                          //
-
-@source:spg2xx_pdc.cpp
-pdc100
-
-@source:spg2xx_dreamlife.cpp
-dreamlif                        //
-
-@source:spg2xx_lexibook.cpp
-lexizeus                        // Lexibook
-lexiseal                        //
 
 @source:vsmile.cpp
 vsmile                          //
