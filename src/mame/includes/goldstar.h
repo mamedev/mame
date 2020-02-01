@@ -199,11 +199,13 @@ public:
 	void amcoe2(machine_config &config);
 	void amcoe1(machine_config &config);
 	void chryangl(machine_config &config);
+	void ss2001(machine_config &config);
 	void amcoe1_portmap(address_map &map);
 	void amcoe2_portmap(address_map &map);
 	void cm_portmap(address_map &map);
 	void cm97_portmap(address_map &map);
 	void chryangl_decrypted_opcodes_map(address_map &map);
+	void ss2001_portmap(address_map &map);
 
 protected:
 	// installed by various driver init handlers to get stuff to work
