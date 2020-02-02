@@ -125,7 +125,7 @@ READ32_MEMBER( sh3_base_device::sh3_internal_high_r )
 		case SH3_INTEVT_ADDR:
 			//logerror("'%s' (%08x): unmapped internal read from %08x mask %08x (SH3 INTEVT - %08x)\n",tag(), m_sh2_state->pc & SH34_AM,(offset *4)+SH3_UPPER_REGBASE,mem_mask, m_sh3internal_upper[offset]);
 			return m_sh3internal_upper[offset];
-	
+
 		case SH3_SCSSR_ADDR:
 			// hack until SCI is not implemented
 			return 0x84<<24;

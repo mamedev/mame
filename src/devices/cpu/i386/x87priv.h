@@ -5,7 +5,7 @@
 #ifndef __X87PRIV_H__
 #define __X87PRIV_H__
 
-#include <math.h>
+#include <cmath>
 
 
 /*************************************

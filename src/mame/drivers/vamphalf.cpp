@@ -1591,7 +1591,7 @@ ROM_END
 Jumping Break & Poosho Poosho
 F2 System, 1999
 
-sequel to "Die Break" from the Bestri 3 game collection (see crospang.c)
+sequel to "Die Break" from the Bestri 3 game collection (see crospang.cpp)
 
 F-E1-16-002
 +----------------------------------------------+
@@ -1681,7 +1681,7 @@ ROM_END
 New Cross Pang
 F2 System, 1999
 
-sequel to "Cross Pang" (see crospang.c)
+sequel to "Cross Pang" (see crospang.cpp)
 
 F-E1-16-002
 +----------------------------------------------+

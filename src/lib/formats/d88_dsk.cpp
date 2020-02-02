@@ -29,7 +29,7 @@
  *
  */
 
-	#include <assert.h>
+	#include <cassert>
 
 #include "flopimg.h"
 #include "imageutl.h"

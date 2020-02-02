@@ -40,11 +40,11 @@ public:
 	DECLARE_READ32_MEMBER(s3d_register_r);
 	DECLARE_WRITE32_MEMBER(s3d_register_w);
 
-	DECLARE_WRITE32_MEMBER(image_xfer) 
-	{ 
-//		if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x00000080)
+	DECLARE_WRITE32_MEMBER(image_xfer)
+	{
+//      if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x00000080)
 		{
-//		logerror("IMG Xfer:(%u):%08x  X:%u(%u) Y:%u(%u)\n",s3virge.s3d.bitblt_step_count,data,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_width,s3virge.s3d.bitblt_y_current,s3virge.s3d.bitblt_height);
+//      logerror("IMG Xfer:(%u):%08x  X:%u(%u) Y:%u(%u)\n",s3virge.s3d.bitblt_step_count,data,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_width,s3virge.s3d.bitblt_y_current,s3virge.s3d.bitblt_height);
 		s3virge.s3d.image_xfer = data;
 		bitblt_step();
 		}
@@ -58,14 +58,14 @@ public:
 	bool is_new_mmio_active() { return s3.cr53 & 0x08; }
 	uint16_t dest_stride()
 	{
-//		if((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x0000001c) == 0x08) 
-//		{
-//			popmessage("Stride=%08x",(((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_DEST_SRC_STR] >> 16) & 0xfff8) / 3)
-//				+ ((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_DEST_SRC_STR] >> 16) & 0xfff8));
-//			return (((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_DEST_SRC_STR] >> 16) & 0xfff8) / 3)
-//				+ ((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_DEST_SRC_STR] >> 16) & 0xfff8);
-//		}
-//		else
+//      if((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x0000001c) == 0x08)
+//      {
+//          popmessage("Stride=%08x",(((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_DEST_SRC_STR] >> 16) & 0xfff8) / 3)
+//              + ((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_DEST_SRC_STR] >> 16) & 0xfff8));
+//          return (((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_DEST_SRC_STR] >> 16) & 0xfff8) / 3)
+//              + ((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_DEST_SRC_STR] >> 16) & 0xfff8);
+//      }
+//      else
 			return (s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_DEST_SRC_STR] >> 16) & 0xfff8;
 	}
 
@@ -75,8 +75,8 @@ public:
 	{
 		TIMER_DRAW_STEP = 10
 	};
-	
-	
+
+
 protected:
 	s3virge_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -84,7 +84,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual uint16_t offset() override;
-	
+
 	enum
 	{
 		LAW_64K = 0,
@@ -112,7 +112,7 @@ protected:
 		S3D_STATE_3DLINE,
 		S3D_STATE_3DPOLY
 	};
-	
+
 	enum
 	{
 		S3D_REG_SRC_BASE = 0xd4/4,
@@ -152,10 +152,10 @@ protected:
 			int cmd_fifo_next_ptr;  // command added here in FIFO
 			int cmd_fifo_current_ptr;  // command currently being processed in FIFO
 			int cmd_fifo_slots_free;
-			
+
 			uint8_t pattern[0xc0];
 			uint32_t reg[5][256];
-			
+
 			// BitBLT command state
 			uint16_t bitblt_x_src;
 			uint16_t bitblt_y_src;
@@ -182,56 +182,56 @@ protected:
 	} s3virge;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	void write_pixel32(uint32_t base, uint16_t x, uint16_t y, uint32_t val) 
-	{ 
+	void write_pixel32(uint32_t base, uint16_t x, uint16_t y, uint32_t val)
+	{
 		if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x00000002)
 			if(x < s3virge.s3d.clip_l || x > s3virge.s3d.clip_r || y < s3virge.s3d.clip_t || y > s3virge.s3d.clip_b)
 				return;
-		vga.memory[(base + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] = val & 0xff; 
+		vga.memory[(base + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] = val & 0xff;
 		vga.memory[(base + 1 + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] = (val >> 8) & 0xff;
 		vga.memory[(base + 2 + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] = (val >> 16) & 0xff;
 		vga.memory[(base + 3 + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] = (val >> 24) & 0xff;
 	}
-	void write_pixel24(uint32_t base, uint16_t x, uint16_t y, uint32_t val) 
-	{ 
+	void write_pixel24(uint32_t base, uint16_t x, uint16_t y, uint32_t val)
+	{
 		if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x00000002)
 			if(x < s3virge.s3d.clip_l || x > s3virge.s3d.clip_r || y < s3virge.s3d.clip_t || y > s3virge.s3d.clip_b)
 				return;
-		vga.memory[(base + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size] = val & 0xff; 
+		vga.memory[(base + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size] = val & 0xff;
 		vga.memory[(base + 1 + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size] = (val >> 8) & 0xff;
 		vga.memory[(base + 2 + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size] = (val >> 16) & 0xff;
 	}
-	void write_pixel16(uint32_t base, uint16_t x, uint16_t y, uint16_t val) 
-	{ 
+	void write_pixel16(uint32_t base, uint16_t x, uint16_t y, uint16_t val)
+	{
 		if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x00000002)
 			if(x < s3virge.s3d.clip_l || x > s3virge.s3d.clip_r || y < s3virge.s3d.clip_t || y > s3virge.s3d.clip_b)
 				return;
-		vga.memory[(base + (x*2) + (y*dest_stride())) % vga.svga_intf.vram_size] = val & 0xff; 
+		vga.memory[(base + (x*2) + (y*dest_stride())) % vga.svga_intf.vram_size] = val & 0xff;
 		vga.memory[(base + 1 + (x*2) + (y*dest_stride())) % vga.svga_intf.vram_size] = (val >> 8) & 0xff;
 	}
-	void write_pixel8(uint32_t base, uint16_t x, uint16_t y, uint8_t val) 
+	void write_pixel8(uint32_t base, uint16_t x, uint16_t y, uint8_t val)
 	{
 		if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x00000002)
 			if(x < s3virge.s3d.clip_l || x > s3virge.s3d.clip_r || y < s3virge.s3d.clip_t || y > s3virge.s3d.clip_b)
 				return;
 		vga.memory[(base + x + (y*dest_stride())) % vga.svga_intf.vram_size] = val;
 	}
-	uint32_t read_pixel32(uint32_t base, uint16_t x, uint16_t y) 
-	{ 
-		return (vga.memory[(base + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] << 24) | (vga.memory[(base + 1 + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] << 16) 
-			| (vga.memory[(base + 2 + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] << 8) | vga.memory[(base + 3 + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size]; 
+	uint32_t read_pixel32(uint32_t base, uint16_t x, uint16_t y)
+	{
+		return (vga.memory[(base + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] << 24) | (vga.memory[(base + 1 + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] << 16)
+			| (vga.memory[(base + 2 + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] << 8) | vga.memory[(base + 3 + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size];
 	}
-	uint32_t read_pixel24(uint32_t base, uint16_t x, uint16_t y) 
-	{ 
-		return (vga.memory[(base + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size]) | (vga.memory[(base + 1 + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size] << 8) 
-			| (vga.memory[(base + 2 + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size] << 16); 
+	uint32_t read_pixel24(uint32_t base, uint16_t x, uint16_t y)
+	{
+		return (vga.memory[(base + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size]) | (vga.memory[(base + 1 + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size] << 8)
+			| (vga.memory[(base + 2 + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size] << 16);
 	}
-	uint16_t read_pixel16(uint32_t base, uint16_t x, uint16_t y) 
-	{ 
-		return (vga.memory[(base + (x*2) + (y*dest_stride()) % vga.svga_intf.vram_size)]) | (vga.memory[(base + 1 + (x*2) + (y*dest_stride())) % vga.svga_intf.vram_size] << 8); 
+	uint16_t read_pixel16(uint32_t base, uint16_t x, uint16_t y)
+	{
+		return (vga.memory[(base + (x*2) + (y*dest_stride()) % vga.svga_intf.vram_size)]) | (vga.memory[(base + 1 + (x*2) + (y*dest_stride())) % vga.svga_intf.vram_size] << 8);
 	}
-	uint8_t read_pixel8(uint32_t base, uint16_t x, uint16_t y) 
-	{ 
+	uint8_t read_pixel8(uint32_t base, uint16_t x, uint16_t y)
+	{
 		return vga.memory[(base + x + (y*dest_stride())) % vga.svga_intf.vram_size];
 	}
 	uint32_t GetROP(uint8_t rop, uint32_t src, uint32_t dst, uint32_t pat);
@@ -244,7 +244,7 @@ private:
 	void add_command(int cmd_type);
 	void command_start();
 	void command_finish();
-	
+
 	virtual uint8_t s3_crtc_reg_read(uint8_t index);
 	virtual void s3_define_video_mode(void);
 	virtual void s3_crtc_reg_write(uint8_t index, uint8_t data);

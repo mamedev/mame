@@ -2844,11 +2844,11 @@ void towns_state::towns_base(machine_config &config)
 	fm.add_route(1, "rspeaker", 1.00);
 
 /*
-	// Later model uses YMF276 for FM
-	ymf276_device &fm(YMF276(config, "fm", 16000000 / 2)); // actual clock speed unknown
-	fm.irq_handler().set(FUNC(towns_state::towns_fm_irq));
-	fm.add_route(0, "lspeaker", 1.00);
-	fm.add_route(1, "rspeaker", 1.00);
+    // Later model uses YMF276 for FM
+    ymf276_device &fm(YMF276(config, "fm", 16000000 / 2)); // actual clock speed unknown
+    fm.irq_handler().set(FUNC(towns_state::towns_fm_irq));
+    fm.add_route(0, "lspeaker", 1.00);
+    fm.add_route(1, "rspeaker", 1.00);
 */
 
 	rf5c68_device &pcm(RF5C68(config, "pcm", 16000000 / 2));  // actual clock speed unknown

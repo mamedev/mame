@@ -4,7 +4,7 @@
 
  __________________________________IR___
  |                          ____  RX/TX |
- |   _____      ________    |   |    __ |       
+ |   _____      ________    |   |    __ |
  |   |    |     |       |   |   |    | ||
  |   |IC3 |     | IC2   |   |   |CN2->_||
  |   |    |     |       |   |   |       |
@@ -20,7 +20,7 @@
  |                                      |
  | SW2                                  |
  |______________________________________|
- 
+
  IC1 = Hitachi H8/328 (24K-byte internal ROM + 1K-byte RAM)
  IC2 = Hitachi HG62G010R21FBN Gate Array (low gatecount and low I/O-count packages)
  IC3 = Hitachi HM62256LFP-10T 256kbit CMOS SRAM

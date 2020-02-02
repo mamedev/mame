@@ -370,7 +370,7 @@ void egret_device::device_start()
 	save_item(NAME(pram));
 	save_item(NAME(disk_pram));
 
-	uint8_t *rom = device().machine().root_device().memregion(device().subtag(EGRET_CPU_TAG).c_str())->base();
+	uint8_t *rom = device().machine().root_device().memregion(device().subtag(EGRET_CPU_TAG))->base();
 
 	if (rom)
 	{

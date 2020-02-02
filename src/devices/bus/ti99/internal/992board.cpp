@@ -12,6 +12,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "992board.h"
 
 #define LOG_WARN        (1U<<1)   // Warnings
 #define LOG_CRU         (1U<<2)     // CRU logging
@@ -20,10 +21,9 @@
 #define LOG_BANK        (1U<<5)     // Change ROM banks
 #define LOG_KEYBOARD    (1U<<6)   // Keyboard operation
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE ( LOG_WARN )
 
 #include "logmacro.h"
-#include "992board.h"
 
 /*
     Emulation of the CRT Gate Array of the TI-99/2

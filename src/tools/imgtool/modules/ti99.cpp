@@ -18,11 +18,11 @@
     - check allocation bitmap against corruption when an image is opened
 */
 
-#include <limits.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <time.h>
+#include <climits>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+#include <ctime>
 #include "imgtool.h"
 #include "harddisk.h"
 #include "imghd.h"

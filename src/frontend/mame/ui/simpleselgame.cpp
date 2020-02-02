@@ -24,7 +24,7 @@
 #include "mame.h"
 #include "uiinput.h"
 
-#include <ctype.h>
+#include <cctype>
 
 
 namespace ui {

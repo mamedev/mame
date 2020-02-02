@@ -170,11 +170,14 @@ public:
 	void init_skill98();
 	void init_po33();
 	void init_match133();
+	void init_nfb96_a();
 	void init_nfb96_b();
-	void init_nfb96_dk();
+	void init_nfb96_c1();
+	void init_nfb96_c1_2();
 	void init_nfb96_c2();
 	void init_nfb96_d();
-	void init_nfb96_c1();
+	void init_nfb96_dk();
+	void init_nfb96_g();
 	void init_nfb96sea();
 	void init_fb2010();
 	void init_rp35();
@@ -196,11 +199,13 @@ public:
 	void amcoe2(machine_config &config);
 	void amcoe1(machine_config &config);
 	void chryangl(machine_config &config);
+	void ss2001(machine_config &config);
 	void amcoe1_portmap(address_map &map);
 	void amcoe2_portmap(address_map &map);
 	void cm_portmap(address_map &map);
 	void cm97_portmap(address_map &map);
 	void chryangl_decrypted_opcodes_map(address_map &map);
+	void ss2001_portmap(address_map &map);
 
 protected:
 	// installed by various driver init handlers to get stuff to work

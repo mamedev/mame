@@ -426,7 +426,7 @@ void vsc_state::vsc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vsc_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &vsc_state::main_io);
 
-	const attotime irq_period = attotime::from_hz(587); // 555 timer, measured
+	const attotime irq_period = attotime::from_hz(600); // 555 timer, ideal frequency is 600Hz (measurement was 587Hz)
 	TIMER(config, m_irq_on).configure_periodic(FUNC(vsc_state::irq_on<INPUT_LINE_NMI>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_usec(845)); // active for 0.845ms (approx half)
 	TIMER(config, "irq_off").configure_periodic(FUNC(vsc_state::irq_off<INPUT_LINE_NMI>), irq_period);

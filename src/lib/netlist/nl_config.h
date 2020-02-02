@@ -17,11 +17,10 @@
 ///
 /// \brief Version - Minor.
 ///
-#define NL_VERSION_MINOR  		   7
-///
+#define NL_VERSION_MINOR           11
 /// \brief Version - Patch level.
 ///
-#define NL_VERSION_PATCHLEVEL      1
+#define NL_VERSION_PATCHLEVEL      0
 
 ///
 /// \addtogroup compiledefine
@@ -143,13 +142,13 @@
 ///
 ///  | Bits |               Res |       Seconds |   Days | Years |
 ///  | ====-|               ===-|       =======-|   ====-| =====-|
-///  |  63	|     1,000,000,000	| 9,223,372,037	| 106,752| 292.3 |
-///  |  63	|    10,000,000,000	|   922,337,204	|  10,675|  29.2 |
-///  |  63	|   100,000,000,000	|    92,233,720	|   1,068|   2.9 |
-///  |  63	| 1,000,000,000,000	|     9,223,372	|     107|   0.3 |
+///  |  63  |     1,000,000,000 | 9,223,372,037 | 106,752| 292.3 |
+///  |  63  |    10,000,000,000 |   922,337,204 |  10,675|  29.2 |
+///  |  63  |   100,000,000,000 |    92,233,720 |   1,068|   2.9 |
+///  |  63  | 1,000,000,000,000 |     9,223,372 |     107|   0.3 |
 ///
 
-static constexpr const auto NETLIST_INTERNAL_RES = 10'000'000'000ll;
+static constexpr const auto NETLIST_INTERNAL_RES = 10'000'000'000LL;
 
 /// \brief Recommended clock to be used
 ///
@@ -219,11 +218,11 @@ namespace netlist
 	template <>
 	struct fp_constants<float>
 	{
-		static inline constexpr float DIODE_MAXDIFF() noexcept { return  1e20f; }
-		static inline constexpr float DIODE_MAXVOLT() noexcept { return  90.0f; }
+		static inline constexpr float DIODE_MAXDIFF() noexcept { return  1e20F; }
+		static inline constexpr float DIODE_MAXVOLT() noexcept { return  90.0F; }
 
-		static inline constexpr float TIMESTEP_MAXDIFF() noexcept { return  1e30f; }
-		static inline constexpr float TIMESTEP_MINDIV() noexcept { return  1e-8f; }
+		static inline constexpr float TIMESTEP_MAXDIFF() noexcept { return  1e30F; }
+		static inline constexpr float TIMESTEP_MINDIV() noexcept { return  1e-8F; }
 
 		static inline constexpr const char * name() noexcept { return "float"; }
 		static inline constexpr const char * suffix() noexcept { return "f"; }

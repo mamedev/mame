@@ -57,7 +57,7 @@ Cartridge pinout
 	<!-- upper half of the ROM contains the English for Beginners game (in German) the lower half of the ROM contains Entertainment Trivia (in English) -->
 	<!-- different carts would have been sold with the upper address line fixed high/low to select the correct game -->
 
-	<software name="efb" supported="no"> 
+	<software name="efb" supported="no">
 		<description>Englisch für Anfänger</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>

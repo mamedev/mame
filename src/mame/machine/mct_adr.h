@@ -1,19 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_MACHINE_JAZZ_MCT_ADR_H
-#define MAME_MACHINE_JAZZ_MCT_ADR_H
+#ifndef MAME_MACHINE_MCT_ADR_H
+#define MAME_MACHINE_MCT_ADR_H
 
 #pragma once
 
-class jazz_mct_adr_device : public device_t
+class mct_adr_device
+	: public device_t
+	, public device_memory_interface
 {
 public:
-	jazz_mct_adr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mct_adr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template <typename T> void set_bus(T &&tag, int spacenum) { m_bus.set_tag(std::forward<T>(tag), spacenum); }
-
 	auto out_int_dma_cb() { return m_out_int_dma.bind(); }
 	auto out_int_device_cb() { return m_out_int_device.bind(); }
 	auto out_int_timer_cb() { return m_out_int_timer.bind(); }
@@ -25,7 +25,10 @@ public:
 	template <unsigned IRQ> DECLARE_WRITE_LINE_MEMBER(irq) { set_irq_line(IRQ, state); }
 	template <unsigned DRQ> DECLARE_WRITE_LINE_MEMBER(drq) { set_drq_line(DRQ, state); }
 
-	virtual void map(address_map &map);
+	void map(address_map &map);
+
+	u64 r4k_r(offs_t offset, u64 mem_mask) { return space(0).read_qword(offset << 3, mem_mask); }
+	void r4k_w(offs_t offset, u64 data, u64 mem_mask) { space(0).write_qword(offset << 3, data, mem_mask); }
 
 	u16 isr_r();
 	u16 imr_r() { return m_imr; }
@@ -36,7 +39,16 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// device_memory_interface overrides
+	virtual space_config_vector memory_space_config() const override;
+	//virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
+
+	u32 dma_r(offs_t offset, u32 mem_mask);
+	void dma_w(offs_t offset, u32 data, u32 mem_mask);
+
 private:
+	void dma(address_map &map);
+
 	void set_irq_line(int number, int state);
 	void set_drq_line(int channel, int state);
 
@@ -46,7 +58,8 @@ private:
 
 	u32 translate_address(u32 logical_address);
 
-	required_address_space m_bus;
+	address_space_config m_io_config;
+	address_space_config m_dma_config;
 
 	devcb_write_line m_out_int_dma;
 	devcb_write_line m_out_int_device;
@@ -146,6 +159,6 @@ private:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(JAZZ_MCT_ADR, jazz_mct_adr_device)
+DECLARE_DEVICE_TYPE(MCT_ADR, mct_adr_device)
 
-#endif // MAME_MACHINE_JAZZ_MCT_ADR_H
+#endif // MAME_MACHINE_MCT_ADR_H

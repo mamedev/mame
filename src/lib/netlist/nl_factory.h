@@ -110,9 +110,9 @@ namespace factory {
 			register_device(plib::make_unique<device_element_t<device_class>>(name, classname, def_param));
 		}
 
-		void register_device(plib::unique_ptr<element_t> &&factory);
+		void register_device(plib::unique_ptr<element_t> &&factory) noexcept(false);
 
-		element_t * factory_by_name(const pstring &devname);
+		element_t * factory_by_name(const pstring &devname) noexcept(false);
 
 		template <class C>
 		bool is_class(element_t *f) noexcept

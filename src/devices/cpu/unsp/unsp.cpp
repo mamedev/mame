@@ -194,8 +194,6 @@ void unsp_device::device_start()
 	m_core = (internal_unsp_state *)m_cache.alloc_near(sizeof(internal_unsp_state));
 	memset(m_core, 0, sizeof(internal_unsp_state));
 
-	m_core->m_r.resize(m_numregs);
-
 #if ENABLE_UNSP_DRC
 	m_enable_drc = allow_drc() && (m_iso < 12);
 #else
@@ -298,8 +296,13 @@ void unsp_20_device::device_start()
 
 void unsp_device::device_reset()
 {
-	for (int i = 0; i < m_numregs; i++)
-		m_core->m_r[i] = 0;
+	for (int i = 0; i < ARRAY_LENGTH(m_core->m_r); i++)
+	{
+		if (i < m_numregs)
+			m_core->m_r[i] = 0;
+		else
+			m_core->m_r[i] = 0xdeadbeef;
+	}
 
 	m_core->m_r[REG_PC] = read16(0xfff7);
 	m_core->m_enable_irq = 0;

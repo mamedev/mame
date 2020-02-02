@@ -8,7 +8,7 @@
  *  Created on: 23/03/2014
  */
 
-	#include <assert.h>
+	#include <cassert>
 
 #include "formats/fmtowns_dsk.h"
 

@@ -23,21 +23,21 @@
  */
 
 static NETLIST_START(CD4001_DIP)
-	CD4001_NOR(s1)
-	CD4001_NOR(s2)
-	CD4001_NOR(s3)
-	CD4001_NOR(s4)
+	CD4001_GATE(s1)
+	CD4001_GATE(s2)
+	CD4001_GATE(s3)
+	CD4001_GATE(s4)
 
 	NET_C(s1.VCC, s2.VCC, s3.VCC, s4.VCC)
-	NET_C(s1.VDD, s2.VDD, s3.VDD, s4.VDD)
+	NET_C(s1.GND, s2.GND, s3.GND, s4.GND)
 	DIPPINS(    /*       +--------------+      */
-		s1.A,   /*    A1 |1     ++    14| VCC  */ s1.VCC,
+		s1.A,   /*    A1 |1     ++    14| VDD  */ s1.VCC,
 		s1.B,   /*    B1 |2           13| A6   */ s4.B,
 		s1.Q,   /*    A2 |3           12| Y6   */ s4.A,
 		s2.Q,   /*    Y2 |4    4001   11| A5   */ s4.Q,
 		s2.A,   /*    A3 |5           10| Y5   */ s3.Q,
 		s2.B,   /*    Y3 |6            9| A4   */ s3.B,
-		s1.VDD, /*   GND |7            8| Y4   */ s3.A
+		s1.GND, /*   VSS |7            8| Y4   */ s3.A
 				/*       +--------------+      */
 	)
 
@@ -152,6 +152,45 @@ static NETLIST_START(CD4016_DIP)
 	)
 NETLIST_END()
 
+/*
+ *  DM7486: Quad 2-Input Exclusive-OR Gates
+ *
+ *             Y = A+B
+ *          +---+---++---+
+ *          | A | B || Y |
+ *          +===+===++===+
+ *          | 0 | 0 || 0 |
+ *          | 0 | 1 || 1 |
+ *          | 1 | 0 || 1 |
+ *          | 1 | 1 || 0 |
+ *          +---+---++---+
+ *
+ *  Naming conventions follow National Semiconductor datasheet
+ *
+ */
+
+static NETLIST_START(CD4070_DIP)
+	CD4070_GATE(A)
+	CD4070_GATE(B)
+	CD4070_GATE(C)
+	CD4070_GATE(D)
+
+	NET_C(A.VCC, B.VCC, C.VCC, D.VCC)
+	NET_C(A.GND, B.GND, C.GND, D.GND)
+
+	DIPPINS(  /*       +--------------+      */
+		A.A,  /*    A1 |1     ++    14| VCC  */ A.VCC,
+		A.B,  /*    B1 |2           13| B4   */ D.B,
+		A.Q,  /*    Y1 |3           12| A4   */ D.A,
+		B.Q,  /*    Y2 |4    7486   11| Y4   */ D.Q,
+		B.A,  /*    A2 |5           10| Y3   */ C.Q,
+		B.B,  /*    B2 |6            9| B3   */ C.B,
+		A.GND,/*   GND |7            8| A3   */ C.A
+			  /*       +--------------+      */
+	)
+NETLIST_END()
+
+
 static NETLIST_START(CD4316_DIP)
 	CD4316_GATE(A)
 	CD4316_GATE(B)
@@ -183,7 +222,7 @@ NETLIST_END()
 
 NETLIST_START(CD4XXX_lib)
 
-	TRUTHTABLE_START(CD4001_NOR, 2, 1, "")
+	TRUTHTABLE_START(CD4001_GATE, 2, 1, "")
 		TT_HEAD("A , B | Q ")
 		TT_LINE("0,0|1|85")
 		TT_LINE("X,1|0|120")
@@ -191,7 +230,17 @@ NETLIST_START(CD4XXX_lib)
 		TT_FAMILY("CD4XXX")
 	TRUTHTABLE_END()
 
+	TRUTHTABLE_START(CD4070_GATE, 2, 1, "")
+		TT_HEAD("A,B|Q ")
+		TT_LINE("0,0|0|15")
+		TT_LINE("0,1|1|22")
+		TT_LINE("1,0|1|22")
+		TT_LINE("1,1|0|15")
+		TT_FAMILY("CD4XXX")
+	TRUTHTABLE_END()
+
 	LOCAL_LIB_ENTRY(CD4001_DIP)
+	LOCAL_LIB_ENTRY(CD4070_DIP)
 
 	/* DIP ONLY */
 	LOCAL_LIB_ENTRY(CD4020_DIP)

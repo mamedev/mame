@@ -15,7 +15,7 @@
 
 #include "osdcore.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #include <cstddef>
 #include <cstring>

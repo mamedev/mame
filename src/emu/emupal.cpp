@@ -502,7 +502,7 @@ void palette_device::device_start()
 	{
 		// find the extended (split) memory, if present
 		std::string tag_ext = std::string(tag()).append("_ext");
-		const memory_share *share_ext = memshare(tag_ext.c_str());
+		const memory_share *share_ext = memshare(tag_ext);
 
 		// make sure we have specified a format
 		if (m_raw_to_rgb.bytes_per_entry() <= 0)

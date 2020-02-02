@@ -87,7 +87,7 @@
 #include <iterator>
 #include <utility>
 
-#include <ctype.h>
+#include <cctype>
 
 
 

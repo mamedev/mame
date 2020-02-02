@@ -118,7 +118,7 @@ private:
 
 	void common_dev_start(netlist::netlist_state_t *lnetlist) const;
 
-	netlist::netlist_time_ext	 m_div;
+	netlist::netlist_time_ext    m_div;
 	netlist::netlist_time_ext    m_rem;
 	netlist::netlist_time_ext    m_old;
 

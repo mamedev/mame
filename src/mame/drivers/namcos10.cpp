@@ -28,6 +28,7 @@ Golgo 13 Juusei no Chinkonka (GLT1 Ver.A)          (C) Namco/8ing/Raizing, 2001
 Gunbalina (GNN1 Ver. A)                            (C) Namco, 2000
 *Hard Puncher Hajime no Ippo 2 Ouja e no Chousen   (C) Namco/Taito, 2002
 *Honne Hakkenki                                    (C) Namco, 2001
+**Knock Down 2001                                  (C) Namco, 2001
 Kotoba no Puzzle Mojipittan (KPM1 Ver.A)           (C) Namco, 2001
 *Kurukuru Food                                     (C) Namco, 2002
 Mr Driller 2 (DR21 Ver.A)                          (C) Namco, 2000
@@ -53,6 +54,7 @@ Uchuu Daisakusen Chocovader Contactee (CVC1 Ver.A) (C) Namco, 2002
 Unknown medal (?) game (MTL1 SPR0B)                (C) ?,     200?
 
 * - denotes not dumped yet.
+** - denotes incomplete dump.
 
 The Namco System 10 system comprises 2 or 3 PCB's....
 MAIN PCB - This is the mother board PCB. It holds the main CPU/GPU & SPU and all sound circuitry, program & video RAM,
@@ -266,6 +268,7 @@ Game                                  Sticker       KEYCUS   ROMs Populated     
 Gamshara                              10021 Ver.A   KC020A   8E, 8D               N/A
 Gekitoride-Jong Space                 10011 Ver.A   KC003A   8E, 8D, 7E, 7D       N/A
 Gunbalina                             GNN1  Ver.A   KC002A   8E, 8D               N/A           see note 3
+Knock Down 2001                       KD11  Ver.B   KC011A   8E, 8D               N/A           also has a Namco P-DRIVE PCB 1908961101 (1908971101) with an H8/3002
 Kono Tako                             10021 Ver.A   KC034A   8E, 8D               N/A
 Kotoba no Puzzle Mojipittan           KPM1  Ver.A   KC012A   8E, 8D, 7E           N/A
 Mr Driller G                          DRG1  Ver.A   KC007A   8E, 8D, 7E           N/A
@@ -390,7 +393,7 @@ Notes:
 
 This PCB is required by Point Blank 3 since it controls the gun opto signal. Only the CPLD and J8 and some minor
 logic and other small support parts are populated.
-This PCB has been found almost fully populated (minus J6) on some Taiko no Tatsujin games (TK51/TK61) but not
+This PCB has been found almost fully populated (minus J6) on some Taiko no Tatsujin games (TK51/TK61) (and on Knock Down 2001) but not
 earlier TK games, so it appears to be optional or is only used by the later TK51 and TK61 games.
 */
 
@@ -1264,6 +1267,18 @@ ROM_START( unks10md )
 	ROM_LOAD( "k9f2808u0c.8d",  0x1080000, 0x1080000, CRC(49a2a732) SHA1(1a473177827a6d0e58c289d9af064665b941519b) )
 ROM_END
 
+ROM_START( kd2001 )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION16_LE( 0x2100000, "user2", 0 ) /* main prg */
+	ROM_LOAD( "0.8e",  0x0000000, 0x1080000, NO_DUMP ) // broken flash ROM, couldn't be dumped
+	ROM_LOAD( "1.8d",  0x1080000, 0x1080000, CRC(2b0d0e8c) SHA1(d679e7044e1f93bb7bd449e6d8fcb7737d154025) )
+
+	ROM_REGION( 0x20000, "pdrivecpu", 0 )
+	ROM_LOAD( "kd11-dr0-ic10.bin", 0x00000, 0x20000, CRC(59649293) SHA1(71c3a0e73d077398e7f3d95acedc47814e99fbc6) )
+ROM_END
+
 
 GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2, namcos10, namcos10_state, init_mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
 GAME( 2000, mrdrlr2a,  mrdrilr2, ns10_mrdrilr2, namcos10, namcos10_state, init_mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (World, DR22 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
@@ -1274,6 +1289,7 @@ GAME( 2001, g13jnc,    0,        namcos10_memn, namcos10, namcos10_state, empty_
 GAME( 2001, mrdrilrg,  0,        namcos10_memn, namcos10, namcos10_state, init_mrdrilrg, ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
 GAME( 2001, mrdrilrga, mrdrilrg, namcos10_memn, namcos10, namcos10_state, init_mrdrilrg, ROT0, "Namco", "Mr. Driller G ALT (Japan, DRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
 GAME( 2001, knpuzzle,  0,        ns10_knpuzzle, namcos10, namcos10_state, init_knpuzzle, ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2001, kd2001,    0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME( 2002, chocovdr,  0,        ns10_chocovdr, namcos10, namcos10_state, init_chocovdr, ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, startrgn,  0,        ns10_startrgn, namcos10, namcos10_state, init_startrgn, ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME( 2002, panikuru,  0,        namcos10_memn, namcos10, namcos10_state, init_panikuru, ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

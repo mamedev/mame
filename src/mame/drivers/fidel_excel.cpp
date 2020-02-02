@@ -399,7 +399,7 @@ void excel_state::fexcel(machine_config &config)
 	M65SC02(config, m_maincpu, 12_MHz_XTAL/4); // G65SC102P-3, 12.0M ceramic resonator
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel_state::fexcel_map);
 
-	const attotime irq_period = attotime::from_hz(630); // from 556 timer (22nF, 102K, 1K)
+	const attotime irq_period = attotime::from_hz(600); // from 556 timer (22nF, 102K, 1K), ideal frequency is 600Hz
 	TIMER(config, m_irq_on).configure_periodic(FUNC(excel_state::irq_on<M6502_IRQ_LINE>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
 	TIMER(config, "irq_off").configure_periodic(FUNC(excel_state::irq_off<M6502_IRQ_LINE>), irq_period);
@@ -461,12 +461,6 @@ void excel_state::fdes2100(machine_config &config)
 	/* basic machine hardware */
 	M65C02(config.replace(), m_maincpu, 5_MHz_XTAL); // WDC 65C02
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel_state::fexcelb_map);
-
-	// change irq timer frequency
-	const attotime irq_period = attotime::from_hz(630); // from 556 timer (22nF, 102K, 1K)
-	TIMER(config.replace(), m_irq_on).configure_periodic(FUNC(excel_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
-	TIMER(config.replace(), "irq_off").configure_periodic(FUNC(excel_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	config.set_default_layout(layout_fidel_des);
 }

@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Kevin Thacker
-#include <assert.h>
+#include <cassert>
 
 #include "oric_tap.h"
 

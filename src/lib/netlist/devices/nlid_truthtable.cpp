@@ -81,8 +81,8 @@ namespace devices
 			return ret;
 		}
 
-		static constexpr const pbitset all_bits() noexcept { return pbitset(~static_cast<T>(0)); }
-		static constexpr const pbitset no_bits() noexcept{ return pbitset(static_cast<T>(0)); }
+		static constexpr pbitset all_bits() noexcept { return pbitset(~static_cast<T>(0)); }
+		static constexpr pbitset no_bits() noexcept{ return pbitset(static_cast<T>(0)); }
 	private:
 		T m_bs;
 	};
@@ -162,7 +162,7 @@ namespace devices
 		void parseline(unsigned cur, std::vector<pstring> list,
 				tt_bitset state, std::uint_least64_t val, std::vector<uint_least8_t> &timing_index);
 
-		tt_bitset calculate_ignored_inputs(tt_bitset i) const;
+		tt_bitset calculate_ignored_inputs(tt_bitset state) const;
 
 		unsigned m_NO;
 		unsigned m_NI;
@@ -264,7 +264,7 @@ namespace devices
 				m_family_desc = anetlist.setup().family_from_model(m_family_name);
 
 			if (m_family_desc == nullptr)
-				plib::pthrow<nl_exception>("family description not found for {1}", m_family_name);
+				throw nl_exception("family description not found for {1}", m_family_name);
 
 			return pool.make_unique<tt_type>(anetlist, name, *m_family_desc, *m_ttbl, m_desc);
 		}
@@ -321,7 +321,7 @@ namespace devices
 		{
 			tt_bitset bj(j);
 			size_t nb(bj.count());
-			if ((t[j] == false) && (nb>jb))
+			if (!t[j] && (nb > jb))
 			{
 				jb = nb;
 				jm = bj;
@@ -372,7 +372,7 @@ void truthtable_parser::parseline(unsigned cur, std::vector<pstring> list,
 		{
 			// cutoff previous inputs and outputs for ignore
 			if (m_out_state[nstate] != m_out_state.mask() &&  m_out_state[nstate] != val)
-				plib::pthrow<nl_exception>(plib::pfmt("Error in truthtable: State {1:04} already set, {2} != {3}\n")
+				throw nl_exception(plib::pfmt("Error in truthtable: State {1:04} already set, {2} != {3}\n")
 						.x(nstate.as_uint())(m_out_state[nstate])(val) );
 			m_out_state.set(nstate, val);
 			for (std::size_t j=0; j<m_NO; j++)
@@ -468,7 +468,7 @@ void truthtable_parser::parse(const std::vector<pstring> &truthtable)
 	for (size_t i=0; i<m_size; i++)
 	{
 		if (m_out_state[i] == m_out_state.mask())
-			plib::pthrow<nl_exception>(plib::pfmt("truthtable: found element not set {1}\n").x(i) );
+			throw nl_exception(plib::pfmt("truthtable: found element not set {1}\n").x(i) );
 		m_out_state.set(i, m_out_state[i] | (ign[i] << m_NO));
 	}
 }

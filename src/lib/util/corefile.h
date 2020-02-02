@@ -128,7 +128,7 @@ public:
 
 
 protected:
-	core_file();
+	core_file() = default;
 };
 
 

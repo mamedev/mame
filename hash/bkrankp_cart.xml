@@ -33,7 +33,7 @@ Known carts:
 
 <softwarelist name="bkrankp_cart" description="Bandai Karaoke Ranking Party cartridges">
 
-	<software name="jpoprose" supported="no"> 
+	<software name="jpoprose" supported="no">
 		<description>J-Pop Rose</description>
 		<year>20??</year>
 		<publisher>Bandai</publisher>
@@ -45,7 +45,7 @@ Known carts:
 		</part>
 	</software>
 
-	<software name="vocaloid" supported="no"> 
+	<software name="vocaloid" supported="no">
 		<description>Vocaloid</description>
 		<year>20??</year>
 		<publisher>Bandai</publisher>

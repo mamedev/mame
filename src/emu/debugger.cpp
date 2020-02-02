@@ -14,7 +14,7 @@
 #include "debug/debugcmd.h"
 #include "debug/debugcon.h"
 #include "debug/debugvw.h"
-#include <ctype.h>
+#include <cctype>
 
 /***************************************************************************
     GLOBAL VARIABLES

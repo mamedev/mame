@@ -80,7 +80,7 @@ namespace plib
 	// Avoid unused variable warnings
 	//============================================================
 	template<typename... Ts>
-	inline void unused_var(Ts&&...) noexcept {}
+	inline void unused_var(Ts&&...) noexcept {} // NOLINT(readability-named-parameter)
 
 } // namespace plib
 

@@ -87,7 +87,7 @@ void menu_tape_control::populate(float &customtop, float &custombottom)
 								? ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? _("playing") : _("(playing)"))
 								: ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? _("recording") : _("(recording)"))
 								),
-								timepos.c_str(),
+								timepos,
 						tapeflags,
 						TAPECMD_SLIDER);
 

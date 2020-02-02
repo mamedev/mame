@@ -13,13 +13,13 @@
 
 #include "etna.h"
 
-#define LOG_READS		(1 << 0)
-#define LOG_WRITES		(1 << 1)
-#define LOG_UNKNOWNS	(1 << 2)
-#define LOG_PROM		(1 << 3)
-#define LOG_ALL			(LOG_READS | LOG_WRITES | LOG_UNKNOWNS | LOG_PROM)
+#define LOG_READS       (1 << 0)
+#define LOG_WRITES      (1 << 1)
+#define LOG_UNKNOWNS    (1 << 2)
+#define LOG_PROM        (1 << 3)
+#define LOG_ALL         (LOG_READS | LOG_WRITES | LOG_UNKNOWNS | LOG_PROM)
 
-#define VERBOSE			(0)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(ETNA, etna_device, "etna", "Psion 5mx ETNA")
@@ -63,26 +63,26 @@ void etna_device::device_reset()
 	m_prom[0x0c] = 20;
 	m_prom[0x0d] = 30;
 
-    // some basic stuff to begin with
-    // set up the Psion's unique ID
-    m_prom[0x1b] = 0xde;
-    m_prom[0x1a] = 0xad;
-    m_prom[0x19] = 0xbe;
-    m_prom[0x18] = 0xef;
+	// some basic stuff to begin with
+	// set up the Psion's unique ID
+	m_prom[0x1b] = 0xde;
+	m_prom[0x1a] = 0xad;
+	m_prom[0x19] = 0xbe;
+	m_prom[0x18] = 0xef;
 
-    // give ourselves a neat custom device name
-    const char *key = "PSION";
-    const char *name = "MAME!";
-    m_prom[0x28] = strlen(name);
-    for (int i = 0; i < m_prom[0x28]; i++)
-        m_prom[0x29 + i] = name[i] ^ key[i];
+	// give ourselves a neat custom device name
+	const char *key = "PSION";
+	const char *name = "MAME!";
+	m_prom[0x28] = strlen(name);
+	for (int i = 0; i < m_prom[0x28]; i++)
+		m_prom[0x29 + i] = name[i] ^ key[i];
 
-    // calculate the checksum
-    uint8_t chk = 0;
-    for (int i = 0; i < 0x7F; i++)
-        chk ^= m_prom[i];
+	// calculate the checksum
+	uint8_t chk = 0;
+	for (int i = 0; i < 0x7F; i++)
+		chk ^= m_prom[i];
 
-    // EPOC is expecting 66
+	// EPOC is expecting 66
 	m_prom[0x7f] = chk ^ 66;
 }
 

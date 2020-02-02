@@ -27,11 +27,17 @@
 
 #ifndef NL_AUTO_DEVICES
 
-#define CD4001_NOR(name)                                                      \
-		NET_REGISTER_DEV(CD4001_NOR, name)
+#define CD4001_GATE(name)                                                      \
+		NET_REGISTER_DEV(CD4001_GATE, name)
 
 #define CD4001_DIP(name)                                                      \
 		NET_REGISTER_DEV(CD4001_DIP, name)
+
+#define CD4070_GATE(name)                                                      \
+		NET_REGISTER_DEV(CD4070_GATE, name)
+
+#define CD4070_DIP(name)                                                      \
+		NET_REGISTER_DEV(CD4070_DIP, name)
 
 /* ----------------------------------------------------------------------------
  *  DIP only macros

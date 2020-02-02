@@ -550,7 +550,7 @@
 		</part>
 	</software>
 
-	<software name="drafix" supported="yes">
+	<software name="drafix">
 		<description>Drafix Windows CAD (Demo)</description>
 		<year>1990</year>
 		<publisher>Fox Data</publisher>
@@ -6369,7 +6369,7 @@
 		</part>
 	</software>
 
-	<software name="5250emu" supported="yes">
+	<software name="5250emu">
 		<description>Enhanced 5250 Emulation Program</description>
 		<year>1986</year>
 		<publisher>IBM</publisher>
@@ -6874,7 +6874,7 @@
 	</software>
 
 	<!-- Bundled with "Mastering Borland C++ 3.1" by Tom Swan. ISBN10: 0-672-30274-8 -->
-	<software name="brlndcpp" supported="yes">
+	<software name="brlndcpp">
 		<description>Mastering Borland C++ 3.1</description>
 		<year>1992</year>
 		<publisher>Sams Publishing</publisher>
@@ -7588,7 +7588,7 @@
 	</software>
 
 	<!-- Bundled with "TMS320C5x DSK - Applications Guide" by Texas Instruments. TI ID: BPRA063 -->
-	<software name="tms320c5x" supported="yes">
+	<software name="tms320c5x">
 		<description>TMS320C5x DSK - Applications Guide - Application Software</description>
 		<year>1997</year>
 		<publisher>Texas Instruments</publisher>
@@ -10389,6 +10389,17 @@
 		</part>
 	</software>
 
+	<software name="goal">
+		<description>Goal!</description>
+		<year>1993</year>
+		<publisher>Virgin Interactive</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "4252733">
+				<rom name="Goal! [Virgin Games] [1993] [3.5''HD] [Disk 1 of 1].mfm" size="4252733" crc="7b3476a9" sha1="6a47b37798f62580b2d68ced87e60944d4dd92ab"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="goblins">
 		<description>Gobliiins (US - VGA release)</description>
 		<year>1992</year>
@@ -11771,7 +11782,7 @@
 		</part>
 	</software>
 
-	<software name="nova9_525" supported="yes">
+	<software name="nova9_525">
 		<description>Nova 9 (International Version, 5.25")</description>
 		<year>1991</year>
 		<publisher>Dynamix</publisher>
@@ -12629,6 +12640,28 @@
 		</part>
 	</software>
 
+	<software name="sf2">
+		<description>Street Fighter II</description>
+		<year>1993</year>
+		<publisher>US Gold</publisher>
+		<info name="developer" value="Capcom USA" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Street Fighter II [Capcom USA] [1992] [3.5''HD] [Disk 1 of 3].img" size="1474560" crc="8f19a1ba" sha1="4b8cb0adff1e7df836450738eeac74653de5654e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Street Fighter II [Capcom USA] [1992] [3.5''HD] [Disk 2 of 3].img" size="1474560" crc="696cccce" sha1="147845702699b98e08a22aa448f0a2d0e522a395"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Street Fighter II [Capcom USA] [1992] [3.5''HD] [Disk 3 of 3].img" size="1474560" crc="6cd1c68e" sha1="33dfd74a8a138d5605cae69f6c17e992612dff81"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="strkcomm" supported="no">
 		<description>Strike Commander</description>
 		<year>1992</year>
@@ -12902,7 +12935,7 @@
 		</part>
 	</software>
 
-	<software name="veildark" supported="yes">
+	<software name="veildark">
 		<description>Veil of Darkness</description>
 		<year>1993</year>
 		<publisher>Strategic Simulations, Inc.</publisher>

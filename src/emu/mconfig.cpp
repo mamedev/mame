@@ -12,7 +12,7 @@
 #include "emuopts.h"
 #include "screen.h"
 
-#include <ctype.h>
+#include <cctype>
 
 #include <cstring>
 #include <numeric>

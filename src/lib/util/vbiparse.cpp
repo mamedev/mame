@@ -10,7 +10,7 @@
 
 #include "osdcore.h"
 #include "vbiparse.h"
-#include <math.h>
+#include <cmath>
 #include <algorithm>
 
 

@@ -5,7 +5,7 @@
 
     Compared to vii.cpp this is clearly newer, has extra opcodes, different internal map etc. also scaling and higher resolutions based on Spongebob
 
-	note, these SoC types always have a 128Kwords internal ROM, which the JAKKS games appear to use for basic bootstrap purposes.
+    note, these SoC types always have a 128Kwords internal ROM, which the JAKKS games appear to use for basic bootstrap purposes.
 
     GPAC800 / GCM394 (SpongeBob Bikini Bottom 500 Test Mode also calls this GPAC800, even if the mappings appear different to the NAND version below - different CS base, maybe just depends on boot mode?)
         Smart Fit Park
@@ -31,14 +31,14 @@
     these are all unsp 2.0 type, as they use the extended ocpodes
 
 
-	NAND types:
+    NAND types:
 
-	Toy Story Mania H27U518S2C dumped as HY27US08121A (512+16) x 32 x 4096
-	Beam Box GPR27P512A dumped as HY27US08121A (512+16) x 32 x 4096
-	Golden Tee GPR27P512A dumped as HY27US08121A (512+16) x 32 x 4096
-	Cars 2 GPR27P512A dumped as HY27US08121A (512+16) x 32 x 4096
+    Toy Story Mania H27U518S2C dumped as HY27US08121A (512+16) x 32 x 4096
+    Beam Box GPR27P512A dumped as HY27US08121A (512+16) x 32 x 4096
+    Golden Tee GPR27P512A dumped as HY27US08121A (512+16) x 32 x 4096
+    Cars 2 GPR27P512A dumped as HY27US08121A (512+16) x 32 x 4096
 
-	V.Baby HY27UF081G2A (2048+64) x 64 x 1024
+    V.Baby HY27UF081G2A (2048+64) x 64 x 1024
 
 */
 
@@ -211,17 +211,17 @@ WRITE16_MEMBER(gcm394_game_state::cs4_w) { logerror("cs4_w %06x %04x\n", offset,
 
 
 /*
-	map info (NAND type)
+    map info (NAND type)
 
-	map(0x000000, 0x006fff) internal RAM
-	map(0x007000, 0x007fff) internal peripherals
-	map(0x008000, 0x00ffff) internal ROM (lower 32kwords) - can also be configured to mirror CS0 308000 area with external pin for boot from external ROM
-	map(0x010000, 0x027fff) internal ROM (upper 96kwords) - can't be switched
-	map(0x028000, 0x02ffff) reserved
+    map(0x000000, 0x006fff) internal RAM
+    map(0x007000, 0x007fff) internal peripherals
+    map(0x008000, 0x00ffff) internal ROM (lower 32kwords) - can also be configured to mirror CS0 308000 area with external pin for boot from external ROM
+    map(0x010000, 0x027fff) internal ROM (upper 96kwords) - can't be switched
+    map(0x028000, 0x02ffff) reserved
 
-	map(0x030000, 0x0.....) view into external spaces (CS0 area starts here. followed by CS1 area, CS2 area etc.)
-	
-	map(0x200000, 0x3fffff) continued view into external spaces, but this area is banked with m_membankswitch_7810 (valid bank values 0x00-0x3f)
+    map(0x030000, 0x0.....) view into external spaces (CS0 area starts here. followed by CS1 area, CS2 area etc.)
+
+    map(0x200000, 0x3fffff) continued view into external spaces, but this area is banked with m_membankswitch_7810 (valid bank values 0x00-0x3f)
 */
 
 
@@ -334,7 +334,41 @@ private:
 
 
 
+class tkmag220_game_state : public gcm394_game_state
+{
+public:
+	tkmag220_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		gcm394_game_state(mconfig, type, tag)
+	{
+	}
 
+	void tkmag220(machine_config &config);
+
+protected:
+
+	/*
+	virtual DECLARE_READ16_MEMBER(porta_r) override
+	{
+	    return machine().rand();
+	}
+
+	virtual DECLARE_READ16_MEMBER(portb_r) override
+	{
+	    return machine().rand();
+	}
+
+	virtual DECLARE_WRITE16_MEMBER(porta_w) override
+	{
+	}
+	*/
+
+private:
+
+	virtual DECLARE_READ16_MEMBER(cs0_r) override
+	{
+		return m_romregion[offset & 0x3ffffff];
+	}
+};
 
 class wrlshunt_game_state : public gcm394_game_state
 {
@@ -433,7 +467,7 @@ READ16_MEMBER(jak_s500_game_state::porta_r)
 
 	//address_space& mem = m_maincpu->space(AS_PROGRAM);
 	//if (mem.read_word(0x22b408) == 0x4846)
-	//	mem.write_word(0x22b408, 0x4840);    // jak_s500 force service mode
+	//  mem.write_word(0x22b408, 0x4840);    // jak_s500 force service mode
 
 	return data;
 }
@@ -577,6 +611,15 @@ void wrlshunt_game_state::wrlshunt(machine_config &config)
 	gcm394_game_state::base(config);
 }
 
+void tkmag220_game_state::tkmag220(machine_config &config)
+{
+	gcm394_game_state::base(config);
+
+	m_maincpu->porta_in().set_ioport("IN0");
+	m_maincpu->portb_in().set_ioport("IN1");
+	m_maincpu->portc_in().set_ioport("IN2");
+}
+
 
 READ16_MEMBER(wrlshunt_game_state::porta_r)
 {
@@ -591,14 +634,14 @@ WRITE16_MEMBER(wrlshunt_game_state::porta_w)
 
 	// HACK
 	address_space& mem = m_maincpu->space(AS_PROGRAM);
-	if (mem.read_word(0x5b354) == 0xafd0)  	// wrlshubt - skip check (EEPROM?)
+	if (mem.read_word(0x5b354) == 0xafd0)   // wrlshubt - skip check (EEPROM?)
 		mem.write_word(0x5b354, 0xB403);
 }
 
 
 void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 {
-	GPAC800(config, m_maincpu, 96000000/2, m_screen); 
+	GPAC800(config, m_maincpu, 96000000/2, m_screen);
 	m_maincpu->porta_in().set(FUNC(generalplus_gpac800_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(generalplus_gpac800_game_state::portb_r));
 	m_maincpu->portc_in().set(FUNC(generalplus_gpac800_game_state::portc_r));
@@ -673,32 +716,32 @@ void gcm394_game_state::cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, ui
 	int end_address;
 
 	int size; // cs region sizes in kwords
-	
-	size = (((cs0 & 0xff00) >> 8) + 1) * 0x10000; 
+
+	size = (((cs0 & 0xff00) >> 8) + 1) * 0x10000;
 	end_address = start_address + (size - 1);
 	logerror("installing cs0 handler start_address %08x end_address %08x\n", start_address, end_address);
 	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs0_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs0_w)));
 	start_address += size;
 
-	size = (((cs1 & 0xff00) >> 8) + 1) * 0x10000; 
+	size = (((cs1 & 0xff00) >> 8) + 1) * 0x10000;
 	end_address = start_address + (size - 1);
 	logerror("installing cs1 handler start_address %08x end_address %08x\n", start_address, end_address);
 	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs1_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs1_w)));
 	start_address += size;
 
-	size = (((cs2 & 0xff00) >> 8) + 1) * 0x10000; 
+	size = (((cs2 & 0xff00) >> 8) + 1) * 0x10000;
 	end_address = start_address + (size - 1);
 	logerror("installing cs2 handler start_address %08x end_address %08x\n", start_address, end_address);
 	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs2_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs2_w)));
 	start_address += size;
 
-	size = (((cs3 & 0xff00) >> 8) + 1) * 0x10000; 
+	size = (((cs3 & 0xff00) >> 8) + 1) * 0x10000;
 	end_address = start_address + (size - 1);
 	logerror("installing cs3 handler start_address %08x end_address %08x\n", start_address, end_address);
 	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs3_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs3_w)));
 	start_address += size;
 
-	size = (((cs4 & 0xff00) >> 8) + 1) * 0x10000; 
+	size = (((cs4 & 0xff00) >> 8) + 1) * 0x10000;
 	end_address = start_address + (size - 1);
 	logerror("installing cs4 handler start_address %08x end_address %08x\n", start_address, end_address);
 	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs4_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs4_w)));
@@ -708,7 +751,7 @@ void gcm394_game_state::cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, ui
 
 void generalplus_gpspispi_game_state::generalplus_gpspispi(machine_config &config)
 {
-	GP_SPISPI(config, m_maincpu, 96000000/2, m_screen); 
+	GP_SPISPI(config, m_maincpu, 96000000/2, m_screen);
 	m_maincpu->porta_in().set(FUNC(generalplus_gpspispi_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(generalplus_gpspispi_game_state::portb_r));
 	m_maincpu->portc_in().set(FUNC(generalplus_gpspispi_game_state::portc_r));
@@ -746,7 +789,7 @@ DEVICE_IMAGE_LOAD_MEMBER(generalplus_gpspispi_bkrankp_game_state::cart_load)
 
 void generalplus_gpspispi_bkrankp_game_state::generalplus_gpspispi_bkrankp(machine_config &config)
 {
-	generalplus_gpspispi_game_state::generalplus_gpspispi(config);	
+	generalplus_gpspispi_game_state::generalplus_gpspispi(config);
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "bkrankp_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
@@ -839,6 +882,158 @@ static INPUT_PORTS_START( wrlshunt )
 	PORT_START("IN0")
 	PORT_START("IN1")
 	PORT_START("IN2")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tkmag220 )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN0" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN1" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0000, "Important" ) // gets stuck in inf loop if this is wrong
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN2" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jak_car2 )
@@ -1133,6 +1328,14 @@ ROM_START(smartfp)
 	ROM_LOAD16_WORD_SWAP("smartfitpark.bin", 0x000000, 0x800000, CRC(ada84507) SHA1(a3a80bf71fae62ebcbf939166a51d29c24504428))
 ROM_END
 
+ROM_START( tkmag220 )
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "u1g-2a.u2", 0x0000000, 0x8000000, CRC(0fd769a1) SHA1(df19402bcd20075483d63fb98fb3fa42bd33ccfd) )
+ROM_END
+
 ROM_START(jak_s500)
 	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
@@ -1141,15 +1344,13 @@ ROM_START(jak_s500)
 	ROM_LOAD16_WORD_SWAP("spbwheel.bin", 0x000000, 0x800000, CRC(6ba1d335) SHA1(1bb3e4d02c7b35dd4d336971c6a9f82071cc6ce1) )
 ROM_END
 
-
 ROM_START(wrlshunt)
 	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
 
 	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD16_WORD_SWAP("wireless.bin", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796))		
+	ROM_LOAD16_WORD_SWAP("wireless.bin", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796))
 ROM_END
-
 
 /*
 Wireless Hunting Video Game System
@@ -1300,10 +1501,11 @@ ROM_START( beambox )
 ROM_END
 
 // the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
-CONS(2009, smartfp, 0, 0, base, smartfp, gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, smartfp,   0, 0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(200?, tkmag220,  0, 0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "TaiKee",         "Mini Arcade Games Console (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
 // Fun 2 Learn 3-in-1 SMART SPORTS  ?
 CONS(2009, jak_s500, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "SpongeBob SquarePants Bikini Bottom 500 (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-
 
 CONS(2011, wrlshunt, 0, 0, wrlshunt, wrlshunt, wrlshunt_game_state, init_wrlshunt, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
@@ -1494,17 +1696,17 @@ void generalplus_gpspispi_game_state::init_spi()
 
 	/*  Offset(h) 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
 
-		00000000  50 47 70 73 73 69 69 70 70 73 44 00 44 3F 44 00  PGpssiipps
-		00000010  -- -- -- -- -- bb -- -- -- -- -- -- -- -- -- -- 
-		                         ^^ copy dest, just like with nand type
+	    00000000  50 47 70 73 73 69 69 70 70 73 44 00 44 3F 44 00  PGpssiipps
+	    00000010  -- -- -- -- -- bb -- -- -- -- -- -- -- -- -- --
+	                             ^^ copy dest, just like with nand type
 
-		bb = where to copy first block
+	    bb = where to copy first block
 
-		The header is GPspispi (byteswapped) then some params
-		one of the params appears to be for the initial code copy operation done
-		by the bootstrap
+	    The header is GPspispi (byteswapped) then some params
+	    one of the params appears to be for the initial code copy operation done
+	    by the bootstrap
 	*/
-	
+
 	// probably more bytes are used
 	int dest = spirom[0x15] << 8;
 
@@ -1534,4 +1736,4 @@ void generalplus_gpspispi_game_state::init_spi()
 }
 
 
-CONS(200?, bkrankp, 0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state	, init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(200?, bkrankp, 0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state , init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

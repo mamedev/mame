@@ -296,8 +296,7 @@ namespace plib
 					vec_add_mult_scalar(n, x, m_v[i], m_y[i]);
 				return true;
 			}
-			else
-				return false;
+			return false;
 		}
 
 		template <int k, typename OPS, typename VT>

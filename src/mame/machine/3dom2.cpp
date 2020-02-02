@@ -1514,9 +1514,9 @@ void m2_cde_device::device_start()
 {
 	// Find our friend the BDA
 	m_bda = downcast<m2_bda_device *>(machine().device("bda"));
-	assert(m_bda != NULL);
+	assert(m_bda != nullptr);
 
-	if (m_bda == NULL)
+	if (m_bda == nullptr)
 		throw device_missing_dependencies();
 
 	// Resolve callbacks

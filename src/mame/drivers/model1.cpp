@@ -2,10 +2,20 @@
 // copyright-holders:Olivier Galibert
 /*
 
+Known functional issues:
+- Star Wars Arcade
+  * After recent changes, ship models periodically disappear for a frame or two during attract mode
+    and while in-game.
+  * There are indeterminate issues with the analog controls in-game.
+- Virtua Fighter
+  * Gameplay mechanics - specifically, collision detection - are significantly broken due to
+    imperfect TGP RAM port emulation or hookup. This is observable in both attract mode and
+    in-game. It seems to break when both characters attack at the same time.
+
 Sega Model 1 Hardware Overview
 ------------------------------
 
-Note! This document is a Work-In-Progress and covers all the dumped Sega Model 1 games, including....
+Note! This document is a Work-In-Progress and covers all the dumped Sega Model 1 games, including...
 
 Star Wars Arcade (C) Sega, 1994
 Virtua Fighter   (C) Sega, 1993
@@ -1874,11 +1884,11 @@ void model1_state::netmerc(machine_config &config)
 //**************************************************************************
 
 //    YEAR  NAME        PARENT   MACHINE     INPUT       CLASS         INIT        ROTATION  COMPANY  FULLNAME              FLAGS
-GAME( 1993, vf,         0,       vf,         vf,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Fighter",           0 )
+GAME( 1993, vf,         0,       vf,         vf,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Fighter",           MACHINE_NOT_WORKING )
 GAMEL(1992, vr,         0,       vr,         vr,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Racing",            0, layout_vr )
 GAME( 1993, vformula,   vr,      vformula,   vr,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Formula",           MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, swa,        0,       swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars Arcade (US)",    0 )
-GAME( 1993, swaj,       swa,     swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars Arcade (Japan)", 0 )
+GAME( 1993, swa,        0,       swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars Arcade (US)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1993, swaj,       swa,     swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars Arcade (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
 GAME( 1994, wingwar,    0,       wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (World)",         0 )
 GAME( 1994, wingwaru,   wingwar, wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (US)",            0 )
 GAME( 1994, wingwarj,   wingwar, wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (Japan)",         0 )

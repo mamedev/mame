@@ -48,12 +48,11 @@
 #define NES_BATTERY 0
 #define NES_WRAM 1
 
-// so that the NES and Famiclones (VT03 for example) can use some common functionality
 class nes_base_state : public driver_device
 {
 public:
-	nes_base_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	nes_base_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ctrl1(*this, "ctrl1"),
 		m_ctrl2(*this, "ctrl2")
@@ -71,8 +70,8 @@ public:
 class nes_state : public nes_base_state
 {
 public:
-	nes_state(const machine_config &mconfig, device_type type, const char *tag)
-		: nes_base_state(mconfig, type, tag),
+	nes_state(const machine_config &mconfig, device_type type, const char *tag) :
+		nes_base_state(mconfig, type, tag),
 		m_ppu(*this, "ppu"),
 		m_screen(*this, "screen"),
 		m_exp(*this, "exp"),

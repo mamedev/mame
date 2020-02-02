@@ -441,6 +441,7 @@ void bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 			flipy = !flipy;
 		}
 
+		pri >>= 4;
 		/* TODO: priority handling is completely wrong, but better than nothing */
 		if (pri == 0x0)
 			pri_mask = 0x00;

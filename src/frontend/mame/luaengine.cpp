@@ -1227,13 +1227,13 @@ void lua_engine::initialize()
 			if(e.type() != OPTION_FLOAT)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
-				e.set_value(string_format("%f", val).c_str(), OPTION_PRIORITY_CMDLINE);
+				e.set_value(string_format("%f", val), OPTION_PRIORITY_CMDLINE);
 		},
 		[this](core_options::entry &e, int val) {
 			if(e.type() != OPTION_INTEGER)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
-				e.set_value(string_format("%d", val).c_str(), OPTION_PRIORITY_CMDLINE);
+				e.set_value(string_format("%d", val), OPTION_PRIORITY_CMDLINE);
 		},
 		[this](core_options::entry &e, const char *val) {
 			if(e.type() != OPTION_STRING)
@@ -1647,9 +1647,9 @@ void lua_engine::initialize()
 				if(!item)
 					break;
 				name = &(strchr(item, '/')[1]);
-				if(name.substr(0, name.find("/")) == tag)
+				if(name.substr(0, name.find('/')) == tag)
 				{
-					name = name.substr(name.find("/") + 1, std::string::npos);
+					name = name.substr(name.find('/') + 1, std::string::npos);
 					table[name] = i;
 				}
 			}
@@ -1669,6 +1669,8 @@ void lua_engine::initialize()
  * space:write_log_*(addr, val)
  * space:read_direct_*(addr)
  * space:write_direct_*(addr, val)
+ * space:read_range(first_addr, last_addr, width, [opt] step) - read range of addresses and
+ *                                                              return as a binary string
  *
  * space.name - address space name
  * space.shift - address bus shift, bitshift required for a bytewise address
@@ -1731,6 +1733,63 @@ void lua_engine::initialize()
 	addr_space_type.set("write_direct_u32", &addr_space::direct_mem_write<uint32_t>);
 	addr_space_type.set("write_direct_i64", &addr_space::direct_mem_write<int64_t>);
 	addr_space_type.set("write_direct_u64", &addr_space::direct_mem_write<uint64_t>);
+	addr_space_type.set("read_range", [](addr_space &sp, sol::this_state s, u64 first, u64 last, int width, sol::object opt_step) {
+			lua_State *L = s;
+			luaL_Buffer buff;
+			offs_t space_size = sp.space.addrmask();
+			u64 step = 1;
+			if (opt_step.is<u64>())
+			{
+				step = opt_step.as<u64>();
+				if (step < 1 || step > last - first)
+				{
+					luaL_error(L, "Invalid step");
+					return sol::make_reference(L, nullptr);
+				}
+			}
+			if (first > space_size || last > space_size || last < first)
+			{
+				luaL_error(L, "Invalid offset");
+				return sol::make_reference(L, nullptr);
+			}
+			int byte_count = width / 8 * (last - first + 1) / step;
+			switch (width)
+			{
+			case 8:
+			{
+				u8 *dest = (u8 *)luaL_buffinitsize(L, &buff, byte_count);
+				for(; first <= last; first += step)
+					*dest++ = sp.mem_read<u8>(first);
+				break;
+			}
+			case 16:
+			{
+				u16 *dest = (u16 *)luaL_buffinitsize(L, &buff, byte_count);
+				for(; first <= last; first += step)
+					*dest++ = sp.mem_read<u16>(first);
+				break;
+			}
+			case 32:
+			{
+				u32 *dest = (u32 *)luaL_buffinitsize(L, &buff, byte_count);
+				for(; first <= last; first += step)
+					*dest++ = sp.mem_read<u32>(first);
+				break;
+			}
+			case 64:
+			{
+				u64 *dest = (u64 *)luaL_buffinitsize(L, &buff, byte_count);
+				for(; first <= last; first += step)
+					*dest++ = sp.mem_read<u64>(first);
+				break;
+			}
+			default:
+				luaL_error(L, "Invalid width. Must be 8/16/32/64");
+				return sol::make_reference(L, nullptr);
+			}
+			luaL_pushresultsize(&buff, byte_count);
+			return sol::make_reference(L, sol::stack_reference(L, -1));
+		});
 	addr_space_type.set("name", sol::property([](addr_space &sp) { return sp.space.name(); }));
 	addr_space_type.set("shift", sol::property([](addr_space &sp) { return sp.space.addr_shift(); }));
 	addr_space_type.set("index", sol::property([](addr_space &sp) { return sp.space.spacenum(); }));

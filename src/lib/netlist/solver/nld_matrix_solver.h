@@ -177,11 +177,11 @@ namespace solver
 		// after every call to solve, update inputs must be called.
 		// this can be done as well as a batch to ease parallel processing.
 
-		const netlist_time solve(netlist_time_ext now);
+		netlist_time solve(netlist_time_ext now);
 		void update_inputs();
 
-		bool has_dynamic_devices() const noexcept { return m_dynamic_devices.size() > 0; }
-		bool has_timestep_devices() const noexcept { return m_step_devices.size() > 0; }
+		bool has_dynamic_devices() const noexcept { return !m_dynamic_devices.empty(); }
+		bool has_timestep_devices() const noexcept { return !m_step_devices.empty(); }
 
 		void update_forced();
 		void update_after(netlist_time after) noexcept
@@ -211,8 +211,8 @@ namespace solver
 			const analog_net_t::list_t &nets,
 			const solver_parameters_t *params);
 
-		virtual unsigned vsolve_non_dynamic(const bool newton_raphson) = 0;
-		virtual netlist_time compute_next_timestep(const nl_fptype cur_ts) = 0;
+		virtual unsigned vsolve_non_dynamic(bool newton_raphson) = 0;
+		virtual netlist_time compute_next_timestep(nl_fptype cur_ts) = 0;
 
 		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_gonn;
 		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_gtn;
@@ -245,7 +245,7 @@ namespace solver
 		std::size_t m_ops;
 
 		// base setup - called from constructor
-		void setup_base(const analog_net_t::list_t &nets);
+		void setup_base(const analog_net_t::list_t &nets) noexcept(false);
 
 		void sort_terms(matrix_sort_type_e sort);
 
@@ -256,39 +256,15 @@ namespace solver
 		std::pair<int, int> get_left_right_of_diag(std::size_t irow, std::size_t idiag);
 		nl_fptype get_weight_around_diag(std::size_t row, std::size_t diag);
 
-		void add_term(std::size_t net_idx, terminal_t *term);
+		void add_term(std::size_t net_idx, terminal_t *term) noexcept(false);
 
 		// calculate matrix
 		void setup_matrix();
 
-		void set_pointers()
-		{
-			const std::size_t iN = this->m_terms.size();
+		void set_pointers();
 
-			std::size_t max_count = 0;
-			std::size_t max_rail = 0;
-			for (std::size_t k = 0; k < iN; k++)
-			{
-				max_count = std::max(max_count, m_terms[k].count());
-				max_rail = std::max(max_rail, m_terms[k].railstart());
-			}
-
-			m_gtn.resize(iN, max_count);
-			m_gonn.resize(iN, max_count);
-			m_Idrn.resize(iN, max_count);
-			m_connected_net_Vn.resize(iN, max_count);
-
-			for (std::size_t k = 0; k < iN; k++)
-			{
-				auto count = m_terms[k].count();
-
-				for (std::size_t i = 0; i < count; i++)
-				{
-					m_terms[k].terms()[i]->set_ptrs(&m_gtn[k][i], &m_gonn[k][i], &m_Idrn[k][i]);
-					m_connected_net_Vn[k][i] = m_terms[k].terms()[i]->connected_terminal()->net().Q_Analog_state_ptr();
-				}
-			}
-		}
+	private:
+		analog_net_t *get_connected_net(terminal_t *term);
 
 	};
 

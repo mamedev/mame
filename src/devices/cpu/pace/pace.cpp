@@ -144,7 +144,7 @@ void pace_device::device_start()
 	state_add(STATE_GENPC, "GENPC", m_pc).noshow();
 	state_add(STATE_GENPCBASE, "GENPCBASE", m_ppc).noshow();
 	state_add<u16>(PACE_FR, "FR", [this]() { return m_fr; }, [this](u16 data) { set_fr(data); });
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_fr).noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_fr).noshow().formatstr("%14s");
 	for (int i = 0; i < 4; i++)
 		state_add(PACE_AC0 + i, string_format("AC%d", i).c_str(), m_ac[i]);
 	state_add<u8>(PACE_STKD, "STKD", [this]() { return m_stack_depth; }, [this](u8 data) { m_stack_depth = data >= 10 ? 10 : data; }).mask(0xf);
@@ -971,5 +971,34 @@ void pace_device::execute_run()
 	{
 		m_cycle = execute_one();
 		m_icount--;
+	}
+}
+
+
+//-------------------------------------------------
+//  state_string_export -
+//-------------------------------------------------
+
+void pace_device::state_string_export(const device_state_entry &entry, std::string &str) const
+{
+	switch (entry.index())
+	{
+	case STATE_GENFLAGS:
+		str = string_format("%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+				BIT(m_fr, 14) ? 'F' : '.',
+				BIT(m_fr, 13) ? 'F' : '.',
+				BIT(m_fr, 12) ? 'F' : '.',
+				BIT(m_fr, 11) ? 'F' : '.',
+				BIT(m_fr, 10) ? 'B' : '.',
+				BIT(m_fr, 9) ? 'I' : '.',
+				BIT(m_fr, 8) ? 'L' : '.',
+				BIT(m_fr, 7) ? 'C' : '.',
+				BIT(m_fr, 6) ? 'O' : '.',
+				BIT(m_fr, 5) ? '5' : '.',
+				BIT(m_fr, 4) ? '4' : '.',
+				BIT(m_fr, 3) ? '3' : '.',
+				BIT(m_fr, 2) ? '2' : '.',
+				BIT(m_fr, 1) ? '1' : '.');
+		break;
 	}
 }

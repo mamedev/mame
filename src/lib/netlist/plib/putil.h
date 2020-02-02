@@ -156,10 +156,8 @@ namespace plib
 
 		typename TS::stream_ptr stream(const pstring &name) override
 		{
-			if (name == m_name)
-				return plib::make_unique<std::stringstream>(m_str);
-			else
-				return typename TS::stream_ptr(nullptr);
+			return (name == m_name) ?
+				plib::make_unique<std::stringstream>(m_str) : typename TS::stream_ptr(nullptr);
 		}
 	private:
 		pstring m_name;
@@ -279,7 +277,7 @@ namespace plib
 	std::vector<pstring> psplit(const pstring &str, const std::vector<pstring> &onstrl);
 	std::vector<std::string> psplit_r(const std::string &stri,
 			const std::string &token,
-			const std::size_t maxsplit);
+			std::size_t maxsplit);
 
 	//============================================================
 	//  penum - strongly typed enumeration
@@ -301,7 +299,8 @@ namespace plib
 		template <typename T> explicit ename(T val) { m_v = static_cast<E>(val); } \
 		bool set_from_string (const pstring &s) { \
 			int f = from_string_int(strings(), s); \
-			if (f>=0) { m_v = static_cast<E>(f); return true; } else { return false; } \
+			if (f>=0) { m_v = static_cast<E>(f); return true; } \
+			return false;\
 		} \
 		operator E() const noexcept {return m_v;} \
 		bool operator==(const ename &rhs) const noexcept {return m_v == rhs.m_v;} \

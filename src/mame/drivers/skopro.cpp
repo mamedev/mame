@@ -9,7 +9,7 @@
     1GB RAM
     nVidia GeForce 8400GS
     Integrated sound?
-    Hitachi Deskstar HDS721680PLA320 80 GB 
+    Hitachi Deskstar HDS721680PLA320 80 GB
     EGIS2JVS V1.2 card
     Windows XP embedded
 

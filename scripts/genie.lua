@@ -338,15 +338,6 @@ newoption {
 }
 
 newoption {
-	trigger = "FASTDEBUG",
-	description = "Fast DEBUG.",
-	allowed = {
-		{ "0",   "Disabled"     },
-		{ "1",   "Enabled"      },
-	}
-}
-
-newoption {
 	trigger = "SEPARATE_BIN",
 	description = "Use separate bin folders.",
 	allowed = {
@@ -619,13 +610,6 @@ configuration { "Debug" }
 		"MAME_PROFILER",
 --      "BGFX_CONFIG_DEBUG=1",
 	}
-
-if _OPTIONS["FASTDEBUG"]=="1" then
-	defines {
-		"MAME_DEBUG_FAST",
-		"NDEBUG",
-	}
-end
 
 configuration { }
 

@@ -978,7 +978,7 @@ static void gdrom_devices(device_slot_interface& device)
 }
 
 #define CPU_CLOCK 200000000 // need to set the correct value here
-#define PIC_CLOCK 20000000	// and here
+#define PIC_CLOCK 20000000  // and here
 
 void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 {

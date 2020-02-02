@@ -17,7 +17,7 @@ extern "C" {
 #define NOGDI
 #endif
 #include <windows.h>
-#include <stdio.h>
+#include <cstdio>
 
 int system(const char *command);
 

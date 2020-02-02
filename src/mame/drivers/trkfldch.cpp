@@ -299,10 +299,10 @@ void trkfldch_state::draw_sprites(screen_device& screen, bitmap_ind16& bitmap, c
 		// logerror("entry %02x %02x %02x %02x %02x\n", m_spriteram[i + 0], m_spriteram[i + 1], m_spriteram[i + 2], m_spriteram[i + 3], m_spriteram[i + 4]);
 		int tilegfxbase = (m_modebank[0x05] * 0x800);
 
-		/* m_spriteram[i + 0]  --pp tt-y    
-		   m_spriteram[i + 1]  yyyy yyyy    
-		   m_spriteram[i + 2]  tttt tttt    
-		   m_spriteram[i + 3]  xxxx xxxx    
+		/* m_spriteram[i + 0]  --pp tt-y
+		   m_spriteram[i + 1]  yyyy yyyy
+		   m_spriteram[i + 2]  tttt tttt
+		   m_spriteram[i + 3]  xxxx xxxx
 		   m_spriteram[i + 4]  --zfF-t-x
 
 		   p = palette bits
@@ -970,7 +970,7 @@ static INPUT_PORTS_START( abl4play )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-		
+
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)

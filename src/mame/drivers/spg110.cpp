@@ -11,7 +11,7 @@
         JAKKS Spiderman 5-in-1 (original release)
         Conny TV Virtual Tennis
         Conny Ping Pong
-		Conny TV Virtual Fighter
+        Conny TV Virtual Fighter
 
         assumed:
         JAKKS EA Sports (NHL 95 + Madden 95) (US)
@@ -556,5 +556,5 @@ CONS( 2003, conyteni,  0,        0, spg110_base, conyteni,  spg110_game_state, e
 CONS( 2003, conyping,  0,        0, spg110_base, conyteni,  spg110_game_state, empty_init, "Conny / SDW Games",      "Virtual Ping Pong (Conny / SDW Games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // from a Big Ben 'TV Virtual Fighter' unit, although shows Free Fight Kung Fu on title screen
-// Also sold by SDW Games as both TV Virtual Fighter and TV Kickboxing (unit still has TV Virtual Fighter stickers even when box is TV Kickboxing - possibly just box changed due to Sega?) 
+// Also sold by SDW Games as both TV Virtual Fighter and TV Kickboxing (unit still has TV Virtual Fighter stickers even when box is TV Kickboxing - possibly just box changed due to Sega?)
 CONS( 200?, conyfght,  0,        0, spg110_base, conyteni,  spg110_game_state, empty_init, "Conny / Big Ben",      "TV Virtual Fighter / Free Fight Kung Fu (Conny / Big Ben)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

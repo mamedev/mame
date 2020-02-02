@@ -19,7 +19,7 @@ We now support these three types below...
 
 ********************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "formats/cgen_cas.h"
 

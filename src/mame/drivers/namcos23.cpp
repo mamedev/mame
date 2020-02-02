@@ -1269,7 +1269,7 @@ Notes:
 #include "speaker.h"
 #include "tilemap.h"
 
-#include <float.h>
+#include <cfloat>
 
 
 #define JVSCLOCK    (XTAL(14'745'600))
