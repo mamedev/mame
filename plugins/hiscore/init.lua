@@ -46,7 +46,6 @@ function hiscore.startplugin()
 		emu.print_verbose( "hiscore: config found" );
 		local _conf = {}
 		for line in io.lines(config_path) do
-		  token, spaces, value = string.match(line, '([^ ]+)([ ]+)([^ ]+)');
 		  token, value = string.match(line, '([^ ]+) +([^ ]+)');
 		  if token ~= nil and token ~= '' then
 			_conf[token] = value;
@@ -114,7 +113,7 @@ function hiscore.startplugin()
 	  elseif manager:machine().images["cdrom"]:filename() ~= nil then
 		local basename = string.gsub(manager:machine().images["cdrom"]:filename(), "(.*/)(.*)", "%2");
 		local filename = string.gsub(basename, "(.*)(%..*)", "%1");   -- strip the extension (e.g. ".cue")
-		rm_match = emu.romname() .. "," .. filename .. ':';  -- append the system name as extension
+		rm_match = emu.romname() .. "," .. filename .. ':';
 		--rm_match_crc = string.format("%x", manager:machine().images["cdrom"]:crc()) .. ':';  -- always 0 with cdrom media?
 	  else
 		rm_match = emu.romname() .. ':';
