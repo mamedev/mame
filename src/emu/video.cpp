@@ -441,7 +441,7 @@ void video_manager::begin_recording_mng(const char *name, uint32_t index, screen
 			full_name = name_buf;
 		}
 
-		filerr = info.m_mng_file->open(full_name.c_str());
+		filerr = info.m_mng_file->open(full_name);
 	}
 	else
 	{
@@ -451,7 +451,7 @@ void video_manager::begin_recording_mng(const char *name, uint32_t index, screen
 	if (filerr == osd_file::error::NONE)
 	{
 		// start the capture
-		int rate = int(screen->frame_period().as_hz());
+		int rate = int(screen ? screen->frame_period().as_hz() : screen_device::DEFAULT_FRAME_RATE);
 		png_error pngerr = mng_capture_start(*info.m_mng_file, m_snap_bitmap, rate);
 		if (pngerr != PNGERR_NONE)
 		{
@@ -487,7 +487,7 @@ void video_manager::begin_recording_avi(const char *name, uint32_t index, screen
 	// build up information about this new movie
 	avi_file::movie_info info;
 	info.video_format = 0;
-	info.video_timescale = 1000 * screen->frame_period().as_hz();
+	info.video_timescale = 1000 * (screen ? screen->frame_period().as_hz() : screen_device::DEFAULT_FRAME_RATE);
 	info.video_sampletime = 1000;
 	info.video_numsamples = 0;
 	info.video_width = m_snap_bitmap.width();
@@ -518,7 +518,7 @@ void video_manager::begin_recording_avi(const char *name, uint32_t index, screen
 				full_name = name_buf;
 			}
 
-			filerr = tempfile.open(full_name.c_str());
+			filerr = tempfile.open(full_name);
 		}
 		else
 		{
@@ -554,7 +554,14 @@ void video_manager::begin_recording(const char *name, movie_format format)
 	// create a snapshot bitmap so we know what the target size is
 	screen_device_iterator iterator = screen_device_iterator(machine().root_device());
 	screen_device_iterator::auto_iterator iter = iterator.begin();
-	const uint32_t count = (uint32_t)iterator.count();
+	uint32_t count = (uint32_t)iterator.count();
+	const bool no_screens(!count);
+
+	if (no_screens)
+	{
+		assert(!m_snap_native);
+		count = 1;
+	}
 
 	switch (format)
 	{
@@ -1343,7 +1350,7 @@ osd_file::error video_manager::open_next(emu_file &file, const char *extension, 
 	if (pos != -1)
 	{
 		// if more %d are found, revert to default and ignore them all
-		if (snapstr.find(snapdev.c_str(), pos + 3) != -1)
+		if (snapstr.find(snapdev, pos + 3) != -1)
 			snapstr.assign("%g/%i");
 		// else if there is a single %d, try to create the correct snapname
 		else
@@ -1351,8 +1358,8 @@ osd_file::error video_manager::open_next(emu_file &file, const char *extension, 
 			int name_found = 0;
 
 			// find length of the device name
-			int end1 = snapstr.find("/", pos + 3);
-			int end2 = snapstr.find("%", pos + 3);
+			int end1 = snapstr.find('/', pos + 3);
+			int end2 = snapstr.find('%', pos + 3);
 			int end;
 
 			if ((end1 != -1) && (end2 != -1))
@@ -1390,7 +1397,7 @@ osd_file::error video_manager::open_next(emu_file &file, const char *extension, 
 						filename = filename.substr(0, filename.find_last_of('.'));
 
 						// setup snapname and remove the %d_
-						strreplace(snapstr, snapdevname.c_str(), filename.c_str());
+						strreplace(snapstr, snapdevname, filename);
 						snapstr.erase(pos, 3);
 						//printf("check image: %s\n", filename.c_str());
 
@@ -1426,10 +1433,10 @@ osd_file::error video_manager::open_next(emu_file &file, const char *extension, 
 		{
 			// build up the filename
 			fname.assign(snapstr);
-			strreplace(fname, "%i", string_format("%04d", seq).c_str());
+			strreplace(fname, "%i", string_format("%04d", seq));
 
 			// try to open the file; stop when we fail
-			osd_file::error filerr = file.open(fname.c_str());
+			osd_file::error filerr = file.open(fname);
 			if (filerr == osd_file::error::NOT_FOUND)
 			{
 				break;
@@ -1439,7 +1446,7 @@ osd_file::error video_manager::open_next(emu_file &file, const char *extension, 
 
 	// create the final file
 	file.set_openflags(origflags);
-	return file.open(fname.c_str());
+	return file.open(fname);
 }
 
 

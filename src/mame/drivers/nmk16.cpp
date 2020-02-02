@@ -131,19 +131,19 @@ remaps button 2 and 3 to button 1, so you can't enter the above sequence.
    - Tweaked enemy attack patterns
    - Tweaked boss behavior and attack patterns
    - Dramatically different stages (and only 7 of them):
-	  - Stage 1: Became Stage 5, very different layouts
-	  - Stage 2: Became Stage 7, with mostly slight enemy layout changes
-	  - Stage 3: Became Stage 6, almost the same as final
-	  - Stage 4: Stayed as Stage 4, with very minor enemy layout changes
-	  - Stage 5: Entirely unique stage, majorly reworked to become final Stage 2
-	  - Stage 6: Became Stage 3, many enemy layout changes
-	  - Stage 7: Entirely unique stage, majorly reworked to become final Stage 1
+      - Stage 1: Became Stage 5, very different layouts
+      - Stage 2: Became Stage 7, with mostly slight enemy layout changes
+      - Stage 3: Became Stage 6, almost the same as final
+      - Stage 4: Stayed as Stage 4, with very minor enemy layout changes
+      - Stage 5: Entirely unique stage, majorly reworked to become final Stage 2
+      - Stage 6: Became Stage 3, many enemy layout changes
+      - Stage 7: Entirely unique stage, majorly reworked to become final Stage 1
    - No ending, instead loops forever
-	  - Loop has extremely fast bullets
-	  - The difficulty seems the same on all loops
+      - Loop has extremely fast bullets
+      - The difficulty seems the same on all loops
    - Player's blue shot has a wider maximum and minimum spread
    - Player's main shot hitbox is symmetrical and wider than final
-	  - When the hitbox was shrunk for the final, it was only shrunk in one direction, making it extended to the right
+      - When the hitbox was shrunk for the final, it was only shrunk in one direction, making it extended to the right
 
 ---
 

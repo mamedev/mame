@@ -53,10 +53,10 @@
 		setup.register_link_arr( # term1 ", " # __VA_ARGS__);
 
 #define PARAM(name, val)                                                       \
-		setup.register_param(# name, val);
+		setup.register_param(# name, # val);
 
 #define HINT(name, val)                                                        \
-		setup.register_param(# name ".HINT_" # val, 1);
+		setup.register_param(# name ".HINT_" # val, "1");
 
 #define NETDEV_PARAMI(name, param, val)                                        \
 		setup.register_param(# name "." # param, val);
@@ -88,7 +88,7 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 		setup.namespace_pop();
 
 #define OPTIMIZE_FRONTIER(attach, r_in, r_out)                                 \
-		setup.register_frontier(# attach, r_in, r_out);
+		setup.register_frontier(# attach, PSTRINGIFY_VA(r_in), PSTRINGIFY_VA(r_out));
 
 // -----------------------------------------------------------------------------
 // truthtable defines
@@ -184,9 +184,7 @@ namespace netlist
 
 		friend class setup_t;
 
-		source_netlist_t()
-		: plib::psource_t()
-		{}
+		source_netlist_t() = default;
 
 		COPYASSIGNMOVE(source_netlist_t, delete)
 		~source_netlist_t() noexcept override = default;
@@ -200,9 +198,7 @@ namespace netlist
 
 		friend class setup_t;
 
-		source_data_t()
-		: plib::psource_t()
-		{}
+		source_data_t() = default;
 
 		COPYASSIGNMOVE(source_data_t, delete)
 		~source_data_t() noexcept override = default;
@@ -228,7 +224,7 @@ namespace netlist
 		using model_map_t = std::unordered_map<pstring, pstring>;
 
 		void model_parse(const pstring &model, model_map_t &map);
-		pstring model_string(const model_map_t &map) const;
+		static pstring model_string(const model_map_t &map);
 
 		std::unordered_map<pstring, pstring> m_models;
 		std::unordered_map<pstring, model_map_t> m_cache;
@@ -243,7 +239,7 @@ namespace netlist
 	public:
 		using link_t = std::pair<pstring, pstring>;
 
-		nlparse_t(setup_t &netlist, log_type &log);
+		nlparse_t(setup_t &setup, log_type &log);
 
 		void register_model(const pstring &model_in) { m_models.register_model(model_in); }
 		void register_alias(const pstring &alias, const pstring &out);
@@ -261,11 +257,11 @@ namespace netlist
 		void register_param(const pstring &param, const pstring &value);
 
 		// FIXME: quick hack
-		void register_param_x(const pstring &param, const nl_fptype value);
+		void register_param_x(const pstring &param, nl_fptype value);
 
 		template <typename T>
 		typename std::enable_if<std::is_floating_point<T>::value || std::is_integral<T>::value>::type
-		register_param(const pstring &param, T value)
+		register_param_val(const pstring &param, T value)
 		{
 			register_param_x(param, static_cast<nl_fptype>(value));
 		}
@@ -278,7 +274,7 @@ namespace netlist
 #endif
 
 		void register_lib_entry(const pstring &name, const pstring &sourcefile);
-		void register_frontier(const pstring &attach, const nl_fptype r_IN, const nl_fptype r_OUT);
+		void register_frontier(const pstring &attach, const pstring &r_IN, const pstring &r_OUT);
 
 		// register a source
 		void register_source(plib::unique_ptr<plib::psource_t> &&src)
@@ -385,6 +381,13 @@ namespace netlist
 		pstring get_initial_param_val(const pstring &name, const pstring &def) const;
 
 		void register_term(detail::core_terminal_t &term);
+		void register_term(terminal_t &term, terminal_t &other_term);
+
+		terminal_t *get_connected_terminal(const terminal_t &term) const noexcept
+		{
+			auto ret(m_connected_terminals.find(&term));
+			return (ret != m_connected_terminals.end()) ? ret->second : nullptr;
+		}
 
 		void remove_connections(const pstring &pin);
 
@@ -414,7 +417,7 @@ namespace netlist
 		const log_type &log() const;
 
 		// needed by proxy
-		detail::core_terminal_t *find_terminal(const pstring &outname_in, const detail::terminal_type atype, bool required = true) const;
+		detail::core_terminal_t *find_terminal(const pstring &terminal_in, detail::terminal_type atype, bool required = true) const;
 		detail::core_terminal_t *find_terminal(const pstring &terminal_in, bool required = true) const;
 
 		// core net handling
@@ -436,13 +439,14 @@ namespace netlist
 		bool connect_input_input(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 
 		// helpers
-		pstring termtype_as_str(detail::core_terminal_t &in) const;
+		static pstring termtype_as_str(detail::core_terminal_t &in);
 
 		devices::nld_base_proxy *get_d_a_proxy(detail::core_terminal_t &out);
 		devices::nld_base_proxy *get_a_d_proxy(detail::core_terminal_t &inp);
 		detail::core_terminal_t &resolve_proxy(detail::core_terminal_t &term);
 
 		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
+		std::unordered_map<const terminal_t *, terminal_t *> m_connected_terminals;
 
 		netlist_state_t                             &m_nlstate;
 		devices::nld_netlistparams                  *m_netlist_params;
@@ -462,7 +466,7 @@ namespace netlist
 	public:
 
 		explicit source_string_t(const pstring &source)
-		: source_netlist_t(), m_str(source)
+		: m_str(source)
 		{
 		}
 
@@ -478,7 +482,7 @@ namespace netlist
 	public:
 
 		explicit source_file_t(const pstring &filename)
-		: source_netlist_t(), m_filename(filename)
+		: m_filename(filename)
 		{
 		}
 
@@ -493,7 +497,7 @@ namespace netlist
 	{
 	public:
 		explicit source_mem_t(const char *mem)
-		: source_netlist_t(), m_str(mem)
+		: m_str(mem)
 		{
 		}
 
@@ -508,9 +512,8 @@ namespace netlist
 	{
 	public:
 		source_proc_t(const pstring &name, void (*setup_func)(nlparse_t &))
-		: source_netlist_t(),
-			m_setup_func(setup_func),
-			m_setup_func_name(name)
+		: m_setup_func(setup_func)
+		, m_setup_func_name(name)
 		{
 		}
 

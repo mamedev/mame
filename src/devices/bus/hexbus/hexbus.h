@@ -127,6 +127,9 @@ protected:
 
 	// Data lines
 	static int data_lines(uint8_t lines) { return (((lines & 0xc0) >> 4) | (lines & 0x03)); }
+
+	// Return the selected data bit (0-3)
+	int data_bit(int n);
 };
 
 // ------------------------------------------------------------------------

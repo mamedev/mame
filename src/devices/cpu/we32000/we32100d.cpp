@@ -57,7 +57,7 @@ void we32100_disassembler::format_signed(std::ostream &stream, s32 x)
 		util::stream_format(stream, "-0x%x", u32(-x));
 }
 
-void we32100_disassembler::dasm_am(std::ostream &stream, offs_t &pc, const we32100_disassembler::data_buffer &opcodes, u8 n, bool dst)
+void we32100_disassembler::dasm_am(std::ostream &stream, offs_t &pc, const we32100_disassembler::data_buffer &opcodes, u8 n, bool dst, bool spectype)
 {
 	switch (n & 0xf0)
 	{
@@ -183,6 +183,8 @@ void we32100_disassembler::dasm_am(std::ostream &stream, offs_t &pc, const we321
 			util::stream_format(stream, "*$0x%08x", swapendian_int32(opcodes.r32(pc)));
 			pc += 4;
 		}
+		else if (spectype)
+			util::stream_format(stream, "invalid(0x%02x)", n);
 		else if (BIT(n, 3) || (n & 0x03) == 0x01)
 			util::stream_format(stream, "reserved(0x%02x)", n);
 		else
@@ -195,7 +197,7 @@ void we32100_disassembler::dasm_am(std::ostream &stream, offs_t &pc, const we321
 			else
 				util::stream_format(stream, "{%cbyte}", BIT(n, 2) ? 's' : 'u');
 			u8 m = opcodes.r8(pc++);
-			dasm_am(stream, pc, opcodes, m, dst);
+			dasm_am(stream, pc, opcodes, m, dst, true);
 		}
 		break;
 	}
@@ -204,31 +206,25 @@ void we32100_disassembler::dasm_am(std::ostream &stream, offs_t &pc, const we321
 void we32100_disassembler::dasm_src(std::ostream &stream, offs_t &pc, const we32100_disassembler::data_buffer &opcodes)
 {
 	u8 n = opcodes.r8(pc++);
-	dasm_am(stream, pc, opcodes, n, false);
+	dasm_am(stream, pc, opcodes, n, false, false);
 }
 
 void we32100_disassembler::dasm_srcw(std::ostream &stream, offs_t &pc, const we32100_disassembler::data_buffer &opcodes)
 {
 	u8 n = opcodes.r8(pc++);
-	if (n < 0xe0 || n >= 0xef)
-		dasm_am(stream, pc, opcodes, n, false);
-	else
-		util::stream_format(stream, "invalid(0x%02x)", n);
+	dasm_am(stream, pc, opcodes, n, false, true);
 }
 
 void we32100_disassembler::dasm_dst(std::ostream &stream, offs_t &pc, const we32100_disassembler::data_buffer &opcodes)
 {
 	u8 n = opcodes.r8(pc++);
-	dasm_am(stream, pc, opcodes, n, true);
+	dasm_am(stream, pc, opcodes, n, true, false);
 }
 
 void we32100_disassembler::dasm_dstw(std::ostream &stream, offs_t &pc, const we32100_disassembler::data_buffer &opcodes)
 {
 	u8 n = opcodes.r8(pc++);
-	if (n < 0xe0 || n == 0xef)
-		dasm_am(stream, pc, opcodes, n, true);
-	else
-		util::stream_format(stream, "invalid(0x%02x)", n);
+	dasm_am(stream, pc, opcodes, n, true, true);
 }
 
 void we32100_disassembler::dasm_ea(std::ostream &stream, offs_t &pc, offs_t ppc, const we32100_disassembler::data_buffer &opcodes)
@@ -259,7 +255,7 @@ void we32100_disassembler::dasm_ea(std::ostream &stream, offs_t &pc, offs_t ppc,
 			util::stream_format(stream, "(%%%s) <%x>", s_rnames[15], u32(ppc + disp));
 		}
 		else
-			dasm_am(stream, pc, opcodes, n, false);
+			dasm_am(stream, pc, opcodes, n, false, true);
 	}
 	else
 		util::stream_format(stream, "invalid(0x%02x)", n);
@@ -297,7 +293,8 @@ offs_t we32100_disassembler::dasm_30xx(std::ostream &stream, offs_t &pc, const w
 	u8 op = opcodes.r8(pc++);
 
 	switch (op)
-	{	case 0x09:
+	{
+	case 0x09:
 		stream << "MVERNO";
 		break;
 

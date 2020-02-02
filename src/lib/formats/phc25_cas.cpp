@@ -29,7 +29,7 @@ enough to make it work.
 
 ********************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "phc25_cas.h"
 

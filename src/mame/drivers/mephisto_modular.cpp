@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Dirk Verwiebe, Cowering, Sandro Ronco, hap
 /******************************************************************************
 
@@ -32,7 +32,7 @@ TODO:
 
 Undocumented buttons:
 - holding ENTER and LEFT cursor on boot runs diagnostics
-- holding UP and RIGHT cursor on boot will clear the battery backed RAM
+- holding CLEAR on boot will clear the battery backed RAM
 
 ===============================================================================
 
@@ -48,8 +48,8 @@ Bavaria piece recognition board:
 XTAL = 7.37280MHz
 ROM = TC57256AD-12, sine table
 
-Only usable with Weltmeister modules, Portorose until London (aka this MAME driver)
-It does not work on Portorose 1.01. See German patent DE4207534 for detailed description.
+Only usable with Weltmeister modules, Portorose until London (aka this MAME driver), but
+it does not work on Portorose 1.01. See German patent DE4207534 for detailed description.
 
 Each piece has a Tank circuit, and in each square of the board there is a coil.
 By scanning all the squares at different frequencies, the resonance frequency
@@ -76,6 +76,7 @@ Reminder: unsupported on Almeria and Portorose 1.01, this is not a bug.
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "machine/mmboard.h"
+#include "video/mmdisplay2.h"
 
 // internal artwork
 #include "mephisto_alm16.lh" // clickable
@@ -239,8 +240,8 @@ void mmodular_state::alm16_mem(address_map &map)
 	map(0xf00000, 0xf00003).portr("KEY1");
 	map(0xf00004, 0xf00007).portr("KEY2");
 	map(0xf00008, 0xf0000b).portr("KEY3");
-	map(0xd80000, 0xd80000).w("display", FUNC(mephisto_display_modul_device::latch_w));
-	map(0xd80008, 0xd80008).w("display", FUNC(mephisto_display_modul_device::io_w));
+	map(0xd80000, 0xd80000).w("display", FUNC(mephisto_display_module2_device::latch_w));
+	map(0xd80008, 0xd80008).w("display", FUNC(mephisto_display_module2_device::io_w));
 }
 
 void mmodular_state::port16_mem(address_map &map)
@@ -270,8 +271,8 @@ void mmodular_state::alm32_mem(address_map &map)
 	map(0x800000fc, 0x800000fc).r("board", FUNC(mephisto_board_device::input_r));
 	map(0x88000000, 0x88000007).w("board", FUNC(mephisto_board_device::mux_w)).umask32(0xff000000);
 	map(0x90000000, 0x90000007).w("board", FUNC(mephisto_board_device::led_w)).umask32(0xff000000);
-	map(0xa0000000, 0xa0000000).w("display", FUNC(mephisto_display_modul_device::latch_w));
-	map(0xa0000010, 0xa0000010).w("display", FUNC(mephisto_display_modul_device::io_w));
+	map(0xa0000000, 0xa0000000).w("display", FUNC(mephisto_display_module2_device::latch_w));
+	map(0xa0000010, 0xa0000010).w("display", FUNC(mephisto_display_module2_device::io_w));
 	map(0xa8000000, 0xa8007fff).m("nvram_map", FUNC(address_map_bank_device::amap8)).umask32(0xff000000);
 }
 
@@ -305,8 +306,8 @@ void mmodular_state::gen32_mem(address_map &map)
 	map(0xd8000004, 0xd8000004).r(FUNC(mmodular_state::bavaria1_r));
 	map(0xd8000008, 0xd8000008).w(FUNC(mmodular_state::bavaria_w));
 	map(0xd800000c, 0xd800000c).r(FUNC(mmodular_state::bavaria2_r));
-	map(0xe0000000, 0xe0000000).w("display", FUNC(mephisto_display_modul_device::latch_w));
-	map(0xe0000010, 0xe0000010).w("display", FUNC(mephisto_display_modul_device::io_w));
+	map(0xe0000000, 0xe0000000).w("display", FUNC(mephisto_display_module2_device::latch_w));
+	map(0xe0000010, 0xe0000010).w("display", FUNC(mephisto_display_module2_device::io_w));
 	map(0xe8000000, 0xe8007fff).m("nvram_map", FUNC(address_map_bank_device::amap8)).umask32(0xff000000);
 	map(0xf0000004, 0xf0000007).portr("KEY1");
 	map(0xf0000008, 0xf000000b).portr("KEY2");
@@ -403,7 +404,7 @@ void mmodular_state::alm16(machine_config &config)
 	TIMER(config, "bav_busy").configure_generic(nullptr);
 
 	/* video hardware */
-	MEPHISTO_DISPLAY_MODUL(config, "display");
+	MEPHISTO_DISPLAY_MODULE2(config, "display");
 	config.set_default_layout(layout_mephisto_alm16);
 }
 
@@ -454,7 +455,7 @@ void mmodular_state::gen32(machine_config &config)
 	const attotime irq_period = attotime::from_hz(6.144_MHz_XTAL / 0x4000); // through 4060, 375Hz
 	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq2_line_hold), irq_period);
 
-	subdevice<hd44780_device>("display:hd44780")->set_busy_factor(0.25);
+	subdevice<hd44780_device>("display:hd44780")->set_busy_factor(0.25); // problem with waitstates
 	config.set_default_layout(layout_mephisto_gen32);
 }
 
@@ -532,7 +533,7 @@ ROM_END
 ROM_START( gen32 )
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "v401", "V4.01" ) // V401 D1BB 5A88
-	ROMX_LOAD("gen32_41.bin", 0x00000, 0x40000, CRC(ea9938c0) SHA1(645cf0b5b831b48104ad6cec8d78c63dbb6a588c), ROM_BIOS(0) )
+	ROMX_LOAD("genius_68030_version_4.01", 0x00000, 0x40000, CRC(ea9938c0) SHA1(645cf0b5b831b48104ad6cec8d78c63dbb6a588c), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v400", "V4.00" ) // V400 3B95 5A88
 	ROMX_LOAD("gen32_4.bin",  0x00000, 0x40000, CRC(6cc4da88) SHA1(ea72acf9c67ed17c6ac8de56a165784aa629c4a1), ROM_BIOS(1) )
 

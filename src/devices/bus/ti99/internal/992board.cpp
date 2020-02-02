@@ -12,6 +12,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "992board.h"
 
 #define LOG_WARN        (1U<<1)   // Warnings
 #define LOG_CRU         (1U<<2)     // CRU logging
@@ -20,10 +21,9 @@
 #define LOG_BANK        (1U<<5)     // Change ROM banks
 #define LOG_KEYBOARD    (1U<<6)   // Keyboard operation
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE ( LOG_WARN )
 
 #include "logmacro.h"
-#include "992board.h"
 
 /*
     Emulation of the CRT Gate Array of the TI-99/2
@@ -355,7 +355,8 @@ io992_device::io992_device(const machine_config &mconfig, device_type type, cons
 		m_videoctrl(*this, "^" TI992_VDC_TAG),
 		m_keyboard(*this, "LINE%u", 0U),
 		m_set_rom_bank(*this),
-		m_key_row(0)
+		m_key_row(0),
+		m_hsk_released(true)
 {
 }
 
@@ -473,14 +474,16 @@ uint8_t io992_device::cruread(offs_t offset)
 	case 0xe802:
 	case 0xe804:
 	case 0xe806:
+		return data_bit(offset&3);
 	case 0xe808:
+		return (bus_hsk_level()==ASSERT_LINE)? 0:1;
 	case 0xe80a:
-		return ((m_current_bus_value & m_hexbval[offset&7])==0)? 0:1;
+		return (bus_bav_level()==ASSERT_LINE)? 0:1;
 
 	case 0xe80c:
 		// e80c (bit 6) seems to indicate that the HSK* line has been released
-		// own HSK*=1 and HSK*=0 on the bus
-		return ((own_hsk_level()==CLEAR_LINE) && (bus_hsk_level()==ASSERT_LINE))? 0:1;
+		// and is now asserted again
+		return (m_hsk_released && (bus_hsk_level()==ASSERT_LINE))? 1:0;
 
 	case 0xe80e:
 		inp = m_cassette->input();
@@ -498,8 +501,6 @@ void io992_device::cruwrite(offs_t offset, uint8_t data)
 	int address = (offset << 1) & 0xf80e;
 
 	LOGMASKED(LOG_CRU, "CRU %04x <- %1x\n", address, data);
-
-//  uint8_t olddata = m_latch_out;
 
 	switch (address)
 	{
@@ -544,6 +545,7 @@ void io992_device::cruwrite(offs_t offset, uint8_t data)
 
 	case 0xe808:  // HSK
 		set_hsk_line(data!=0? CLEAR_LINE : ASSERT_LINE);
+		m_hsk_released = (bus_hsk_level()==CLEAR_LINE);
 		break;
 
 	case 0xe80c:
@@ -580,6 +582,11 @@ void io992_device::hexbus_value_changed(uint8_t data)
 			// by hardware
 			LOGMASKED(LOG_HEXBUS, "Latching HSK*; got data %01x\n", (data>>4)|(data&3));
 			latch_hsk();
+		}
+		else
+		{
+			LOGMASKED(LOG_HEXBUS, "HSK* released\n");
+			m_hsk_released = true;
 		}
 	}
 	else

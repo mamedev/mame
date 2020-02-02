@@ -8,7 +8,9 @@
 ********************************************************************************/
 #include "emu.h"
 #include "cpu/tms9900/tms9980a.h"
+#include "cpu/tms9900/tms9995.h"
 #include "cpu/m6800/m6800.h"
+#include "cpu/m6809/m6809.h"
 #include "machine/6522via.h"
 //#include "machine/74259.h"
 //#include "sound/ay8910.h"
@@ -24,6 +26,7 @@ public:
 	void common(machine_config &config);
 	void jvh(machine_config &config);
 	void jvh2(machine_config &config);
+	void jvh3(machine_config &config);
 
 	void init_jvh();
 
@@ -144,7 +147,28 @@ void jvh_state::jvh2(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &jvh_state::movmastr_io);
 }
 
+void jvh_state::jvh3(machine_config &config)
+{
+	TMS9995(config, m_maincpu, 12000000);
 
+	M6809(config, "soundcpu", 2000000);
+
+	M6809(config, "soundcpu2", 2000000);
+
+	// YM2203, YM3812, DAC
+}
+
+/*-------------------------------------------------------------------
+/ Ice Mania
+/-------------------------------------------------------------------*/
+ROM_START(icemania)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("1c1_ic1.bin", 0x0000, 0x2000, CRC(eae16d52) SHA1(9151e0ccec938d268a157cea30b4a23b69e194b8))
+	ROM_LOAD("2b1_ic7.bin", 0x2000, 0x2000, CRC(7b5fc604) SHA1(22c1c1a030877df99c3db50e7dd41dffe6c21dec))
+
+	ROM_REGION(0x10000, "soundcpu", 0)
+	ROM_LOAD("im_snd.bin",  0xc000, 0x2000, CRC(0d861f65) SHA1(6c17d1f674c95a4c877b42100ab6e0ae8213264b))
+ROM_END
 
 /*-------------------------------------------------------------------
 / Escape
@@ -170,6 +194,22 @@ ROM_START(movmastr)
 	ROM_LOAD("snd.bin", 0xc000, 0x2000, NO_DUMP)
 ROM_END
 
+/*-------------------------------------------------------------------
+/ Formula 1
+/-------------------------------------------------------------------*/
+ROM_START(formula1)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("f1_ic4.bin", 0x0000, 0x4000, CRC(6ca345da) SHA1(5532c5786d304744a69c7e892924edd03abe8209))
 
+	ROM_REGION(0x10000, "soundcpu", 0)
+	ROM_LOAD("f1_snd.bin", 0x8000, 0x8000, CRC(00562594) SHA1(3325ad4c0ec04457f4d5b78b9ac48218d6c7aef3))
+
+	ROM_REGION(0x10000, "soundcpu2", 0)
+	ROM_LOAD("f1_samples.bin", 0x0000, 0x10000, CRC(ecb7ff04) SHA1(1c11c8ce62ec2f0a4f7dae3b1661baddb04ad55a))
+ROM_END
+
+
+GAME( 1986, icemania, 0, jvh,  jvh, jvh_state, init_jvh, ROT0, "Jac Van Ham (Royal)", "Ice Mania",          MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1987, escape,   0, jvh,  jvh, jvh_state, init_jvh, ROT0, "Jac Van Ham (Royal)", "Escape",             MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 19??, movmastr, 0, jvh2, jvh, jvh_state, init_jvh, ROT0, "Jac Van Ham (Royal)", "Movie Masters",      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1988, formula1, 0, jvh3, jvh, jvh_state, init_jvh, ROT0, "Jac Van Ham (Royal)", "Formula 1",          MACHINE_IS_SKELETON_MECHANICAL)

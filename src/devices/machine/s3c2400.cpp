@@ -149,22 +149,6 @@
 #define S3C24XX_GPIO_PORT_F S3C2400_GPIO_PORT_F
 #define S3C24XX_GPIO_PORT_G S3C2400_GPIO_PORT_G
 
-
-#define VERBOSE_LEVEL ( 0 )
-
-static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
-{
-	if (VERBOSE_LEVEL >= n_level)
-	{
-		va_list v;
-		char buf[32768];
-		va_start(v, s_fmt);
-		vsprintf( buf, s_fmt, v);
-		va_end(v);
-		device.logerror("%s: %s", device.machine().describe_context( ), buf);
-	}
-}
-
 #define DEVICE_S3C2400
 #define S3C24_CLASS_NAME s3c2400_device
 #include "machine/s3c24xx.hxx"
@@ -225,7 +209,7 @@ void s3c2400_device::device_start()
 {
 	s3c24xx_device_start();
 
-	address_space &space = m_cpu->memory().space(AS_PROGRAM);
+	address_space &space = m_cpu->space(AS_PROGRAM);
 	space.install_readwrite_handler(0x14000000, 0x1400003b, read32_delegate(*this, FUNC(s3c2400_device::s3c24xx_memcon_r)), write32_delegate(*this, FUNC(s3c2400_device::s3c24xx_memcon_w)));
 	space.install_readwrite_handler(0x14200000, 0x1420005b, read32_delegate(*this, FUNC(s3c2400_device::s3c24xx_usb_host_r)), write32_delegate(*this, FUNC(s3c2400_device::s3c24xx_usb_host_w)));
 	space.install_readwrite_handler(0x14400000, 0x14400017, read32_delegate(*this, FUNC(s3c2400_device::s3c24xx_irq_r)), write32_delegate(*this, FUNC(s3c2400_device::s3c24xx_irq_w)));

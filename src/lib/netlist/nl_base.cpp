@@ -5,9 +5,9 @@
 #include "solver/nld_solver.h"
 
 #include "plib/palloc.h"
+#include "plib/pfmtlog.h"
 #include "plib/pmempool.h"
 #include "plib/putil.h"
-#include "plib/pfmtlog.h"
 
 #include "devices/nlid_proxy.h"
 #include "devices/nlid_system.h"
@@ -35,7 +35,6 @@ namespace netlist
 	public:
 		logic_family_ttl_t() : logic_family_desc_t()
 		{
-			m_fixed_V = nlconst::magic(5.0);
 			m_low_thresh_PCNT = nlconst::magic(0.8 / 5.0);
 			m_high_thresh_PCNT = nlconst::magic(2.0 / 5.0);
 			// m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
@@ -62,7 +61,6 @@ namespace netlist
 	public:
 		logic_family_cd4xxx_t() : logic_family_desc_t()
 		{
-			m_fixed_V = nlconst::magic(0.0);
 			m_low_thresh_PCNT = nlconst::magic(1.5 / 5.0);
 			m_high_thresh_PCNT = nlconst::magic(3.5 / 5.0);
 			// m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
@@ -102,7 +100,7 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	detail::queue_t::queue_t(netlist_t &nl)
-		: timed_queue<plib::pqentry_t<net_t *, netlist_time>, false>(512)
+		: timed_queue<plib::pqentry_t<net_t *, netlist_time_ext>, false>(512)
 		, netlist_ref(nl)
 		, m_qsize(0)
 		, m_times(512)
@@ -129,7 +127,6 @@ namespace netlist
 		}
 	}
 
-
 	void detail::queue_t::on_post_load(plib::state_manager_t &manager)
 	{
 		plib::unused_var(manager);
@@ -137,7 +134,7 @@ namespace netlist
 		for (std::size_t i = 0; i < m_qsize; i++ )
 		{
 			detail::net_t *n = state().nets()[m_net_ids[i]].get();
-			this->push<false>(queue_t::entry_t(netlist_time::from_raw(m_times[i]),n));
+			this->push<false>(queue_t::entry_t(netlist_time_ext::from_raw(m_times[i]),n));
 		}
 	}
 
@@ -162,18 +159,16 @@ namespace netlist
 	{
 		if (dynamic_cast<const terminal_t *>(this) != nullptr)
 			return terminal_type::TERMINAL;
-		else if (dynamic_cast<const logic_input_t *>(this) != nullptr
+		if (dynamic_cast<const logic_input_t *>(this) != nullptr
 			|| dynamic_cast<const analog_input_t *>(this) != nullptr)
 			return terminal_type::INPUT;
-		else if (dynamic_cast<const logic_output_t *>(this) != nullptr
+		if (dynamic_cast<const logic_output_t *>(this) != nullptr
 			|| dynamic_cast<const analog_output_t *>(this) != nullptr)
 			return terminal_type::OUTPUT;
-		else
-		{
-			state().log().fatal(MF_UNKNOWN_TYPE_FOR_OBJECT(name()));
-			plib::pthrow<nl_exception>(MF_UNKNOWN_TYPE_FOR_OBJECT(name()));
-			//return terminal_type::TERMINAL; // please compiler
-		}
+
+		state().log().fatal(MF_UNKNOWN_TYPE_FOR_OBJECT(name()));
+		throw nl_exception(MF_UNKNOWN_TYPE_FOR_OBJECT(name()));
+		//return terminal_type::TERMINAL; // please compiler
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -183,7 +178,7 @@ namespace netlist
 	netlist_t::netlist_t(netlist_state_t &state)
 		: m_state(state)
 		, m_solver(nullptr)
-		, m_time(netlist_time::zero())
+		, m_time(netlist_time_ext::zero())
 		, m_mainclock(nullptr)
 		, m_queue(*this)
 		, m_use_stats(false)
@@ -199,7 +194,6 @@ namespace netlist
 	netlist_state_t::netlist_state_t(const pstring &aname,
 		plib::unique_ptr<callbacks_t> &&callbacks)
 	: m_name(aname)
-	, m_state()
 	, m_callbacks(std::move(callbacks)) // Order is important here
 	, m_log(*m_callbacks)
 	, m_extended_validation(false)
@@ -218,6 +212,20 @@ namespace netlist
 
 		// Initialize factory
 		devices::initialize_factory(m_setup->factory());
+
+		// Add default include file
+		using a = plib::psource_str_t<plib::psource_t>;
+		const pstring content =
+		"#define RES_R(res) (res)            \n"
+		"#define RES_K(res) ((res) * 1e3)    \n"
+		"#define RES_M(res) ((res) * 1e6)    \n"
+		"#define CAP_U(cap) ((cap) * 1e-6)   \n"
+		"#define CAP_N(cap) ((cap) * 1e-9)   \n"
+		"#define CAP_P(cap) ((cap) * 1e-12)  \n"
+		"#define IND_U(ind) ((ind) * 1e-6)   \n"
+		"#define IND_N(ind) ((ind) * 1e-9)   \n"
+		"#define IND_P(ind) ((ind) * 1e-12)  \n";
+		setup().add_include(plib::make_unique<a>("netlist/devices/net_lib.h", content));
 		NETLIST_NAME(base)(*m_setup);
 	}
 
@@ -325,10 +333,10 @@ namespace netlist
 		log().debug("Searching for solver\n");
 		m_solver = m_state.get_single_device<devices::NETLIB_NAME(solver)>("solver");
 
-		m_time = netlist_time::zero();
+		m_time = netlist_time_ext::zero();
 		m_queue.clear();
 		if (m_mainclock != nullptr)
-			m_mainclock->m_Q.net().set_next_scheduled_time(netlist_time::zero());
+			m_mainclock->m_Q.net().set_next_scheduled_time(netlist_time_ext::zero());
 		//if (m_solver != nullptr)
 		//  m_solver->reset();
 
@@ -443,7 +451,7 @@ namespace netlist
 			for (auto & j : index)
 			{
 				auto entry = m_state.m_devices[j].second.get();
-				auto stats = m_state.m_devices[j].second.get()->m_stats.get();
+				auto stats = entry->m_stats.get();
 				log().verbose("Device {1:20} : {2:12} {3:12} {4:15} {5:12}", entry->name(),
 						stats->m_stat_call_count(), stats->m_stat_total_time.count(),
 						stats->m_stat_total_time.total(), stats->m_stat_inc_active());
@@ -519,10 +527,9 @@ namespace netlist
 				if (ret != nullptr)
 				{
 					m_log.fatal(MF_MORE_THAN_ONE_1_DEVICE_FOUND(classname));
-					plib::pthrow<nl_exception>(MF_MORE_THAN_ONE_1_DEVICE_FOUND(classname));
+					throw nl_exception(MF_MORE_THAN_ONE_1_DEVICE_FOUND(classname));
 				}
-				else
-					ret = d.second.get();
+				ret = d.second.get();
 			}
 		}
 		return ret;
@@ -535,7 +542,6 @@ namespace netlist
 
 	core_device_t::core_device_t(netlist_state_t &owner, const pstring &name)
 		: object_t(name)
-		, logic_family_t()
 		, netlist_ref(owner.exec())
 		, m_hint_deactivate(false)
 		, m_active_outputs(*this, "m_active_outputs", 1)
@@ -548,7 +554,6 @@ namespace netlist
 
 	core_device_t::core_device_t(core_device_t &owner, const pstring &name)
 		: object_t(owner.name() + "." + name)
-		, logic_family_t()
 		, netlist_ref(owner.state().exec())
 		, m_hint_deactivate(false)
 		, m_active_outputs(*this, "m_active_outputs", 1)
@@ -620,7 +625,7 @@ namespace netlist
 		if (!state().setup().connect(t1, t2))
 		{
 			log().fatal(MF_ERROR_CONNECTING_1_TO_2(t1.name(), t2.name()));
-			plib::pthrow<nl_exception>(MF_ERROR_CONNECTING_1_TO_2(t1.name(), t2.name()));
+			throw nl_exception(MF_ERROR_CONNECTING_1_TO_2(t1.name(), t2.name()));
 		}
 	}
 
@@ -654,7 +659,7 @@ namespace netlist
 		, m_new_Q(*this, "m_new_Q", 0)
 		, m_cur_Q (*this, "m_cur_Q", 0)
 		, m_in_queue(*this, "m_in_queue", queue_status::DELIVERED)
-		, m_next_scheduled_time(*this, "m_time", netlist_time::zero())
+		, m_next_scheduled_time(*this, "m_time", netlist_time_ext::zero())
 		, m_railterminal(railterminal)
 	{
 	}
@@ -675,7 +680,7 @@ namespace netlist
 
 	void detail::net_t::reset() noexcept
 	{
-		m_next_scheduled_time = netlist_time::zero();
+		m_next_scheduled_time = netlist_time_ext::zero();
 		m_in_queue = queue_status::DELIVERED;
 
 		m_new_Q = 0;
@@ -704,7 +709,7 @@ namespace netlist
 			if (t == &terminal)
 			{
 				state().log().fatal(MF_NET_1_DUPLICATE_TERMINAL_2(name(), t->name()));
-				plib::pthrow<nl_exception>(MF_NET_1_DUPLICATE_TERMINAL_2(name(), t->name()));
+				throw nl_exception(MF_NET_1_DUPLICATE_TERMINAL_2(name(), t->name()));
 			}
 
 		terminal.set_net(this);
@@ -722,7 +727,7 @@ namespace netlist
 		else
 		{
 			state().log().fatal(MF_REMOVE_TERMINAL_1_FROM_NET_2(terminal.name(), this->name()));
-			plib::pthrow<nl_exception>(MF_REMOVE_TERMINAL_1_FROM_NET_2(terminal.name(), this->name()));
+			throw nl_exception(MF_REMOVE_TERMINAL_1_FROM_NET_2(terminal.name(), this->name()));
 		}
 	}
 
@@ -760,7 +765,6 @@ namespace netlist
 	detail::core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &aname,
 			const state_e state, nldelegate delegate)
 	: device_object_t(dev, dev.name() + "." + aname)
-	, plib::linkedlist_t<core_terminal_t>::element_t()
 	#if NL_USE_COPY_INSTEAD_OF_REFERENCE
 	, m_Q(*this, "m_Q", 0)
 	#endif
@@ -779,7 +783,6 @@ namespace netlist
 	logic_t::logic_t(core_device_t &dev, const pstring &aname, const state_e state,
 			nldelegate delegate)
 		: core_terminal_t(dev, aname, state, delegate)
-		, logic_family_t()
 	{
 	}
 
@@ -792,9 +795,8 @@ namespace netlist
 	, m_Idr1(nullptr)
 	, m_go1(nullptr)
 	, m_gt1(nullptr)
-	, m_connected_terminal(otherterm)
 	{
-		state().setup().register_term(*this);
+		state().setup().register_term(*this, *otherterm);
 	}
 
 	void terminal_t::solve_now()
@@ -898,19 +900,17 @@ namespace netlist
 	{
 		if (dynamic_cast<const param_str_t *>(this) != nullptr)
 			return STRING;
-		else if (dynamic_cast<const param_fp_t *>(this) != nullptr)
+		if (dynamic_cast<const param_fp_t *>(this) != nullptr)
 			return DOUBLE;
-		else if (dynamic_cast<const param_int_t *>(this) != nullptr)
+		if (dynamic_cast<const param_int_t *>(this) != nullptr)
 			return INTEGER;
-		else if (dynamic_cast<const param_logic_t *>(this) != nullptr)
+		if (dynamic_cast<const param_logic_t *>(this) != nullptr)
 			return LOGIC;
-		else if (dynamic_cast<const param_ptr_t *>(this) != nullptr)
+		if (dynamic_cast<const param_ptr_t *>(this) != nullptr)
 			return POINTER;
-		else
-		{
-			state().log().fatal(MF_UNKNOWN_PARAM_TYPE(name()));
-			plib::pthrow<nl_exception>(MF_UNKNOWN_PARAM_TYPE(name()));
-		}
+
+		state().log().fatal(MF_UNKNOWN_PARAM_TYPE(name()));
+		throw nl_exception(MF_UNKNOWN_PARAM_TYPE(name()));
 	}
 
 

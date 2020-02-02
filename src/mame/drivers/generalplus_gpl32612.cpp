@@ -7,15 +7,15 @@
     unlike earlier SunPlus / GeneralPlus based SoCs this one is
     ARM based
 
-	NAND types
-	
-	MX30LF1G08AA
-	ID = C2F1
-	Capacity = (2048+64) x 64 x 512
+    NAND types
 
-	Star Wars Blaster - MX30LF1G08AA 
-	TMNT Hero Portal  - MX30LF1G08AA
-	DC Hero Portal    - MX30LF1G08AA 
+    MX30LF1G08AA
+    ID = C2F1
+    Capacity = (2048+64) x 64 x 512
+
+    Star Wars Blaster - MX30LF1G08AA
+    TMNT Hero Portal  - MX30LF1G08AA
+    DC Hero Portal    - MX30LF1G08AA
 
 *****************************************************************************/
 

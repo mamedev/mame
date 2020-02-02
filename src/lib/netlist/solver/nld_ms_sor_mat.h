@@ -36,78 +36,22 @@ namespace solver
 			const analog_net_t::list_t &nets,
 			const solver_parameters_t *params, std::size_t size)
 			: matrix_solver_direct_t<FT, SIZE>(anetlist, name, nets, params, size)
-			, m_Vdelta(*this, "m_Vdelta", std::vector<float_type>(size))
 			, m_omega(*this, "m_omega", static_cast<float_type>(params->m_gs_sor))
-			, m_lp_fact(*this, "m_lp_fact", 0)
 			{
 			}
 
-		unsigned vsolve_non_dynamic(const bool newton_raphson) override;
+		unsigned vsolve_non_dynamic(bool newton_raphson) override;
 
 	private:
-		//state_var<float_type[storage_N]> m_Vdelta;
-		state_var<std::vector<float_type>> m_Vdelta;
-
 		state_var<float_type> m_omega;
-		state_var<float_type> m_lp_fact;
-
 	};
 
 	// ----------------------------------------------------------------------------------------
 	// matrix_solver - Gauss - Seidel
 	// ----------------------------------------------------------------------------------------
 
-	#if 0
-	//FIXME: move to solve_base
-	template <unsigned m_N, unsigned storage_N>
-	float_type matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve()
-	{
-		//
-		// enable linear prediction on first newton pass
-		//
-
-		if (this->m_params->use_linear_prediction)
-			for (unsigned k = 0; k < this->size(); k++)
-			{
-				this->m_last_V[k] = this->m_nets[k]->m_cur_Analog;
-				this->m_nets[k]->m_cur_Analog = this->m_nets[k]->m_cur_Analog + this->m_Vdelta[k] * this->current_timestep() * m_lp_fact;
-			}
-		else
-			for (unsigned k = 0; k < this->size(); k++)
-			{
-				this->m_last_V[k] = this->m_nets[k]->m_cur_Analog;
-			}
-
-		this->solve_base(this);
-
-		if (this->m_params->use_linear_prediction)
-		{
-			float_type sq = 0;
-			float_type sqo = 0;
-			const float_type rez_cts = plib::reciprocal(this->current_timestep());
-			for (unsigned k = 0; k < this->size(); k++)
-			{
-				const analog_net_t *n = this->m_nets[k];
-				const float_type nv = (n->Q_Analog() - this->m_last_V[k]) * rez_cts ;
-				sq += nv * nv;
-				sqo += this->m_Vdelta[k] * this->m_Vdelta[k];
-				this->m_Vdelta[k] = nv;
-			}
-
-			// FIXME: used to be 1e90, but this would not be compatible with float
-			if (sqo > NL_FCONST(1e-20))
-				m_lp_fact = std::min(std::sqrt(sq/sqo), (float_type) 2.0);
-			else
-				m_lp_fact = NL_FCONST(0.0);
-		}
-
-
-		return this->compute_next_timestep();
-	}
-	#endif
-
 	template <typename FT, int SIZE>
-	unsigned matrix_solver_SOR_mat_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raphson)
+	unsigned matrix_solver_SOR_mat_t<FT, SIZE>::vsolve_non_dynamic(bool newton_raphson)
 	{
 		// The matrix based code looks a lot nicer but actually is 30% slower than
 		// the optimized code which works directly on the data structures.

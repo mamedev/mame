@@ -199,7 +199,7 @@ offs_t i960_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 				util::stream_format(stream, "%-8s%s,(%s)",NEM,REG_DST, REG_ABASE);
 				break;
 			case 3:
-				util::stream_format(stream, "%-8s%s,(%s)[%s*%ld]",NEM,REG_DST, REG_ABASE,REG_REG2,(iCode>>7)&0x7);
+				util::stream_format(stream, "%-8s%s,(%s)[%s*%ld]",NEM,REG_DST, REG_ABASE,REG_REG2,1<<((iCode>>7)&0x7));
 				break;
 			default:
 				util::stream_format(stream, "%s %02x:%01x %08lx %1x %1x",mnemonic[op].mnem,op,op2,iCode, modeh, model);
@@ -221,11 +221,11 @@ offs_t i960_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 				IPinc = 8;
 				break;
 			case 2:
-				util::stream_format(stream, "%-8s%s,0x%x[%s*%ld]",NEM,REG_DST, opcodes.r32(IP + 4),REG_REG2,(iCode>>7)&0x7);
+				util::stream_format(stream, "%-8s%s,0x%x[%s*%ld]",NEM,REG_DST, opcodes.r32(IP + 4),REG_REG2,1<<((iCode>>7)&0x7));
 				IPinc = 8;
 				break;
 			case 3:
-				util::stream_format(stream, "%-8s%s,0x%x(%s)[%s*%ld]",NEM,REG_DST, opcodes.r32(IP + 4),REG_ABASE,REG_REG2,(iCode>>7)&0x7);
+				util::stream_format(stream, "%-8s%s,0x%x(%s)[%s*%ld]",NEM,REG_DST, opcodes.r32(IP + 4),REG_ABASE,REG_REG2,1<<((iCode>>7)&0x7));
 				IPinc = 8;
 				break;
 			default:

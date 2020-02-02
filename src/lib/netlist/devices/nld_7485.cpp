@@ -86,7 +86,8 @@ namespace netlist
 				update_outputs(1, 0, 0);
 				return;
 			}
-			else if (m_A[i]() < m_B[i]())
+
+			if (m_A[i]() < m_B[i]())
 			{
 				update_outputs(0, 1, 0);
 				return;

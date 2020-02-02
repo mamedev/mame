@@ -91,7 +91,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { if (newval) machine_reset(); }
 	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
 
-	// machine drivers
+	// machine configs
 	void mephisto(machine_config &config);
 	void mephisto2(machine_config &config);
 	void mephisto2e(machine_config &config);
@@ -251,6 +251,7 @@ READ8_MEMBER(brikett_state::input_r)
 
 WRITE8_MEMBER(brikett_state::esb_w)
 {
+	// CDP1852 SR + DO0-DO7 goes to external port, to chessboard
 	if (!m_inputs[5].read_safe(0))
 	{
 		// chessboard disabled
@@ -258,14 +259,14 @@ WRITE8_MEMBER(brikett_state::esb_w)
 		return;
 	}
 
-	// CDP1852 SR clocks CD4017, goes to external port together with DO0-DO7
+	// SR clocks CD4017
 	// 4017 Q0: N/C
 	// 4017 Q1 + d0-d7: 74374 to led data
 	// 4017 Q2 + d0-d7: 74373 to row select
 	// 4017 Q2-Q9: column select
 	m_esb_select = (m_esb_select + 1) % 10;
 
-	// d0-d7 ANDed together: 4017 reset
+	// DO0-DO7 ANDed together: 4017 reset
 	if (data == 0xff)
 		m_esb_select = 0;
 
@@ -405,7 +406,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void brikett_state::mephisto(machine_config &config)
@@ -494,11 +495,18 @@ ROM_START( mephisto )
 ROM_END
 
 
-ROM_START( mephisto2 )
+ROM_START( mephisto2 ) // cartridge s/n 0302446
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("5619_03_351", 0x0000, 0x1000, CRC(5b13d7bf) SHA1(e1b7dee278a03f75e8a1554715fca4c7fbbc1cb8) ) // TC5334P
-	ROM_LOAD("5620_03_352", 0x1000, 0x1000, CRC(e93bf521) SHA1(42f9adce0d5e25b1b9d10217f8e3e0994d7b70d5) ) // "
-	ROM_LOAD("5621_03_353", 0x2000, 0x1000, CRC(430dac62) SHA1(a0e23fcb4cfa27778a9398bd4994a7792e4541d0) ) // "
+	ROM_LOAD("5619_03_351.1", 0x0000, 0x1000, CRC(5b13d7bf) SHA1(e1b7dee278a03f75e8a1554715fca4c7fbbc1cb8) ) // TC5334P
+	ROM_LOAD("5620_03_352.2", 0x1000, 0x1000, CRC(e93bf521) SHA1(42f9adce0d5e25b1b9d10217f8e3e0994d7b70d5) ) // "
+	ROM_LOAD("5621_03_353.3", 0x2000, 0x1000, CRC(430dac62) SHA1(a0e23fcb4cfa27778a9398bd4994a7792e4541d0) ) // "
+ROM_END
+
+ROM_START( mephisto2a ) // cartridge s/n 0037011
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("4005_02_351_01.1", 0x0000, 0x1000, CRC(5b13d7bf) SHA1(e1b7dee278a03f75e8a1554715fca4c7fbbc1cb8) ) // HN462532G
+	ROM_LOAD("4005_02_352_01.2", 0x1000, 0x1000, CRC(da88b62f) SHA1(f5e71521ba8ab0b481e4725ffa706b1c157424b5) ) // "
+	ROM_LOAD("4005_02_353_01.3", 0x2000, 0x1000, CRC(1f933d33) SHA1(5d5bfd40158354830c434f4c8b4ff1cac8ab4f5c) ) // "
 ROM_END
 
 ROM_START( mephisto2e )
@@ -532,7 +540,8 @@ ROM_END
 //    YEAR  NAME        PARENT    CMP MACHINE     INPUT       STATE          INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1980, mephisto,   0,         0, mephisto,   mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1981, mephisto2,  0,         0, mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, mephisto2,  0,         0, mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, mephisto2a, mephisto2, 0, mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1981, mephisto2e, mephisto2, 0, mephisto2e, mephisto2e, brikett_state, empty_init, "Hegener + Glaser", "Mephisto ESB II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1983, mephisto3,  0,         0, mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (ver. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

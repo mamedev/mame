@@ -381,9 +381,10 @@ ROM_START( revx )
 	ROM_LOAD32_BYTE( "revx.53",  0x0e00002, 0x80000, CRC(a045b265) SHA1(b294d3a56e41f5ec4ab9bbcc0088833b1cab1879) )
 	ROM_LOAD32_BYTE( "revx.54",  0x0e00003, 0x80000, CRC(24471269) SHA1(262345bd147402100785459af422dafd1c562787) )
 
-	ROM_REGION( 0x400, "plds", 0 )
+	ROM_REGION( 0x600, "plds", 0 )
 	ROM_LOAD( "a-17722.u1",   0x000, 0x117, CRC(054de7a3) SHA1(bb7abaec50ed704c03b44d5d54296898f7c80d38) )
 	ROM_LOAD( "a-17721.u955", 0x200, 0x117, CRC(033fe902) SHA1(6efb4e519ed3c9d49fff046a679762b506b3a75b) )
+	ROM_LOAD( "snd-gal16v8a.u17", 0x400, 0x117, NO_DUMP ) // Protected
 ROM_END
 
 ROM_START( revxp5 )
@@ -452,7 +453,6 @@ ROM_START( revxp5 )
 	ROM_LOAD( "a-17721.u955",     0x200, 0x117, CRC(033fe902) SHA1(6efb4e519ed3c9d49fff046a679762b506b3a75b) )
 	ROM_LOAD( "snd-gal16v8a.u17", 0x400, 0x117, NO_DUMP ) // Protected
 ROM_END
-
 
 
 /*************************************

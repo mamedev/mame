@@ -9,7 +9,7 @@
 #include <windows.h>
 #endif
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 // MAMEOS headers
 #include "strconv.h"
 

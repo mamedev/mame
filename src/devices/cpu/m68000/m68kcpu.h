@@ -21,7 +21,7 @@
 #undef REG_SP
 #undef REG_PC
 #else
-#include <limits.h>
+#include <climits>
 #endif
 
 /* ======================================================================== */

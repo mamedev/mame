@@ -240,7 +240,7 @@
 
 	<software name="cogito">
 		<description>Cogito! (cleanly cracked)</description>
-		<year>198??</year>
+		<year>1984</year>
 		<publisher>Reader's Digest Software</publisher>
 		<info name="release" value="2016-07-14"/>
 		<!-- No compatibility data known at this time. -->
@@ -298,7 +298,7 @@
 	</software>
 
 	<software name="carmntime35">
-		<description>Where in Time is Carmen Sandiego (Version 1.1) 800K 3.5 disk (cleanly cracked)</description>
+		<description>Where in Time is Carmen Sandiego (Version 1.1) (800K 3.5") (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Broderbund Software</publisher>
 		<!-- No compatibility data known at this time. -->
@@ -24739,7 +24739,7 @@
 
 	<software name="wrabbt10">
 		<description>Writer Rabbit (Version 1.0) (cleanly cracked)</description>
-		<year>19861986</year>
+		<year>1986</year>
 		<publisher>The Learning Company</publisher>
 		<info name="release" value="2015-09-04"/>
 
@@ -25219,7 +25219,7 @@
 
 	<software name="35mbpl37">
 		<description>Math Blaster Plus (800K 3.5") (Version 3.7) (cleanly cracked)</description>
-		<year>19871988</year>
+		<year>1987</year>
 		<publisher>Davidson and Associates</publisher>
 		<info name="release" value="2015-11-04"/>
 		<!-- This is version 3.7, distributed on a single 3.5-inch (800K) disk for
@@ -25281,7 +25281,7 @@
 
 	<software name="35spelit">
 		<description>Spell It (800K 3.5") (cleanly cracked)</description>
-		<year>19871984</year>
+		<year>1984</year>
 		<publisher>Davidson and Associates</publisher>
 		<info name="release" value="2015-12-08"/>
 		<!-- This is distributed on a single 3.5-inch (800K) disk for the Apple IIgs,
@@ -35654,7 +35654,6 @@
 		<year>1984</year>
 		<publisher>CBS</publisher>
 		<info name="release" value="2019-11-22"/>
-		<!-- No compatibility data known at this time. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -35775,9 +35774,9 @@
 		<info name="release" value="2019-12-16"/>
 		<!-- 4am has this to say about this disk:
 		There were several releases of this game. One only booted
-		on 13-sector drives and had no title screen at all. Another 
+		on 13-sector drives and had no title screen at all. Another
 		booted on 13-sector drives but had a title screen.
-		
+
 		This release only boots on 16-sector drives and has a title
 		screen and a hi-res character generator. There is at least one
 		later version that has all the features of this one, plus allows
@@ -35787,6 +35786,290 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="temple of apshai (4am crack).dsk" size="143360" crc="dd57eac2" sha1="b0b20e251ab5ffdf6981ffeaf4991ae31256e0e8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grglobge">
+		<description>Green Globs and Graphing Equations (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2020-01-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="green globs and graphing equations (4am crack).dsk" size="143360" crc="949b5a00" sha1="5c4453baf8d2eb89ee8a403c042861e36a219765"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inrecall">
+		<description>Instant Recall (Version 1.1) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Howard W. Sams, Inc.</publisher>
+		<info name="release" value="2020-01-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Master"/>
+			<dataarea name="flop" size="143360">
+				<rom name="instant recall (4am crack) disk 1 - master.dsk" size="143360" crc="9eb1544d" sha1="54b6c873b097f5656c9610b8786d3ec2cb8cc6d2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Data"/>
+			<dataarea name="flop" size="143360">
+				<rom name="instant recall (4am crack) disk 2 - data.dsk" size="143360" crc="372ec6b6" sha1="4bf6c083cd70bfb30a2671f6781ff3f6f1d5d4a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barrnsat">
+		<description>Barron's Computer SAT Study Program (Version 1.0) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Barron's Educational Series, Inc.</publisher>
+		<info name="release" value="2020-01-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Math preparation 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="barron's computer sat study program (4am crack) disk 1 - math preparation 1.dsk" size="143360" crc="9f87f812" sha1="97a8a14110dc62443f733eba4c3c8fade8f613c3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Math preparation 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="barron's computer sat study program (4am crack) disk 2 - math preparation 2.dsk" size="143360" crc="2db92df8" sha1="7971d64ed79365ddb89f43caabc87da8359b8cec"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Verbal preparation 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="barron's computer sat study program (4am crack) disk 3 - verbal preparation 1.dsk" size="143360" crc="0554261c" sha1="e293c115297811e90c30150be53551fd21d75510"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - Verbal preparation 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="barron's computer sat study program (4am crack) disk 4 - verbal preparation 2.dsk" size="143360" crc="3431ad95" sha1="f83be0824ee3189e393119c8818e9fee9a657dec"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5 - Verbal preparation 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="barron's computer sat study program (4am crack) disk 5 - verbal preparation 3.dsk" size="143360" crc="397dab95" sha1="4981c4296b67cab353fb7fee74afbecd520ee6a1"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6 - Verbal preparation 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="barron's computer sat study program (4am crack) disk 6 - verbal preparation 4.dsk" size="143360" crc="df710598" sha1="a726b79315090a9d471083d92bd7a0b8a5f849cd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizip201">
+		<description>Wiziprint (Version 2.01) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Sir-Tech</publisher>
+		<info name="release" value="2020-01-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="wiziprint (4am crack).dsk" size="143360" crc="354fab0c" sha1="00ab6c5edc0fd0985ecbf425bb2a5c850d0c7b87"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aeclfsci">
+		<description>Life Science (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>American Educational Computer</publisher>
+		<info name="release" value="2020-01-06"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="life science (4am crack).dsk" size="143360" crc="98d4717e" sha1="5f649d6d7f5cbbf2cdccfeeb1f05314df062fe4d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advcreat">
+		<description>Adventure Creator (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Spinnaker</publisher>
+		<info name="release" value="2020-01-06"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="adventure creator (4am crack).dsk" size="143360" crc="9113263a" sha1="dda864a6965a75f27b78bb0510bf21389b720b2a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midi4r5">
+		<description>MIDI/4 (Revision 5) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Passport Designs, Inc</publisher>
+		<info name="release" value="2020-01-06"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="midi-4 (4am and san inc crack).dsk" size="143360" crc="14b0ad62" sha1="9e9eb73bd28412c2176c8b6d6b7fbe14b3a2f65e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cnstwrd2">
+		<description>Construct-A-Word II (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Developmental Learning Materials</publisher>
+		<info name="release" value="2020-01-08"/>
+		<!-- It requires an Echo or compatible speech card. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Level 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="construct-a-word ii (4am crack) level 1.dsk" size="143360" crc="35aea731" sha1="913496e493d2c0bab3aac80c1f1d0d307e418bf8"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Level 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="construct-a-word ii (4am crack) level 2.dsk" size="143360" crc="bf747723" sha1="1a5f061a3346446ecb31b65d02d0bb28c7d37e0d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Level 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="construct-a-word ii (4am crack) level 3.dsk" size="143360" crc="2bd53e92" sha1="39c569049ea004fdac1e8854a4404ee936f7bb69"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - Level 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="construct-a-word ii (4am crack) level 4.dsk" size="143360" crc="08883e2e" sha1="02809df0cbc35e821daf6c9b5eb548ea90b9f3bc"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5 - Level 5"/>
+			<dataarea name="flop" size="143360">
+				<rom name="construct-a-word ii (4am crack) level 5.dsk" size="143360" crc="692e9ce2" sha1="25fdda6e4b6c0002333c861748861036549dd93a"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6 - Level 6"/>
+			<dataarea name="flop" size="143360">
+				<rom name="construct-a-word ii (4am crack) level 6.dsk" size="143360" crc="b1f7c706" sha1="2369e3b8838bda71a557aa4370b9aa0c29fe1c18"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 7 - Level 7"/>
+			<dataarea name="flop" size="143360">
+				<rom name="construct-a-word ii (4am crack) level 7.dsk" size="143360" crc="1e103d20" sha1="aa2326e6e2469b65c22956a58355c88731696111"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 8 - Level 8"/>
+			<dataarea name="flop" size="143360">
+				<rom name="construct-a-word ii (4am crack) level 8.dsk" size="143360" crc="d04a2d95" sha1="4dced6142950f8750afa80d5e3ce48ae4081e25e"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 9 - Level 9"/>
+			<dataarea name="flop" size="143360">
+				<rom name="construct-a-word ii (4am crack) level 9.dsk" size="143360" crc="4c1a7963" sha1="19f84f1241b97895b9265d55c1510454f64f6d34"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 10 - Level 10"/>
+			<dataarea name="flop" size="143360">
+				<rom name="construct-a-word ii (4am crack) level 10.dsk" size="143360" crc="3580d65d" sha1="8aa57e573de133dfc091912d2457b18686c26e2d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qmile40">
+		<description>The Quarter Mile (Version 4.0) (800K 3.5") (cleanly cracked)</description>
+		<year>1992</year>
+		<publisher>Barnum Software</publisher>
+		<info name="release" value="2020-01-09"/>
+		<!-- This is version 4.0, originally distributed on a 3.5-inch (800K)
+		disk for Apple IIgs, //c+, or //e users with a UniDisk 3.5-inch drive.
+		-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="the quarter mile v4.0 800k (4am crack).2mg" size="819264" crc="0ecf0ca5" sha1="09f1df0b1819296037ed00020cfca537bc510793"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="whtlgcr1">
+		<description>What's My Logic? (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Midwest Publications</publisher>
+		<info name="release" value="2020-01-21"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="what's my logic? (4am crack).dsk" size="143360" crc="433922c6" sha1="2902ea9aa9ef0f75d51d555d36b82feef4b51f12"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diaread1">
+		<description>Diascriptive Reading I (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Educational Activities</publisher>
+		<info name="release" value="2020-01-21"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Details"/>
+			<dataarea name="flop" size="143360">
+				<rom name="diascriptive reading i (4am crack) disk 1 - details.dsk" size="143360" crc="84cf8618" sha1="aa682b4da097993877d086b86717625b946944db"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Inference"/>
+			<dataarea name="flop" size="143360">
+				<rom name="diascriptive reading i (4am crack) disk 2 - inference.dsk" size="143360" crc="8585d61e" sha1="a0910aed62bddf4d56c59ae9b6057a8338f56b68"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Main idea"/>
+			<dataarea name="flop" size="143360">
+				<rom name="diascriptive reading i (4am crack) disk 3 - main idea.dsk" size="143360" crc="e36d1a25" sha1="bd0a63fd197d51c6271747e764eabfc2888c8a19"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - Sequence"/>
+			<dataarea name="flop" size="143360">
+				<rom name="diascriptive reading i (4am crack) disk 4 - sequence.dsk" size="143360" crc="bc8f308a" sha1="d63a62cef26488b2d76d6ceb26f791e5531b3127"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5 - Vocabulary"/>
+			<dataarea name="flop" size="143360">
+				<rom name="diascriptive reading i (4am crack) disk 5 - vocabulary.dsk" size="143360" crc="947000e5" sha1="e44284a73af9e9d15d6b1eacff9400096e10cf31"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6 - Diagnostic tests"/>
+			<dataarea name="flop" size="143360">
+				<rom name="diascriptive reading i (4am crack) disk 6 - diagnostic tests.dsk" size="143360" crc="d487f31c" sha1="ffba07158f024a3668b286e308734a637533b222"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airnavtr">
+		<description>Air Navigation Trainer (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Space-Time Associates</publisher>
+		<info name="release" value="2020-01-21"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="air navigation trainer (4am crack).dsk" size="143360" crc="dbd68189" sha1="03e9791a1bf6b4c0560935e8bd7e9b6b8566abcf"/>
 			</dataarea>
 		</part>
 	</software>

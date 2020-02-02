@@ -1389,6 +1389,42 @@
 		</part>
 	</software>
 
+	<software name="cfpp5">
+		<description>The CF Power Pack Tape 5</description>
+		<year>1991</year>
+		<publisher>Future Publishing</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1: Shockway Rider / Viz (Demo)"/>
+			<dataarea name="cass" size="954275">
+				<rom name="The CF Powerpack 5 Side 1.tap" size="954275" crc="c83b0f7a" sha1="2a9f63ba087f991d7eb739525d4d68784f4f6779"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2: Sun Star / Warlock (Demo)"/>
+			<dataarea name="cass" size="763444">
+				<rom name="The CF Powerpack 5 Side 2.tap" size="763444" crc="80af587a" sha1="8920fa414fdf2024aa965a90e3b656c23c4067c5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cfpp9">
+		<description>The CF Power Pack Tape 9</description>
+		<year>1991</year>
+		<publisher>Future Publishing</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1: Zamzara / HeroQuest"/>
+			<dataarea name="cass" size="1008161">
+				<rom name="The CF Powerpack 9 Side 1.tap" size="1008161" crc="6d6687a6" sha1="28de672d1ee73b5df64327f6c53608ea2d94c490"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2: Bulldog / Firepower"/>
+			<dataarea name="cass" size="1005608">
+				<rom name="The CF Powerpack 9 Side 2.tap" size="1005608" crc="7ef0ecff" sha1="e8e0d3c2f4ba04f2aa0a96e3216f259e49c945aa"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chainreac">
 		<description>Chain Reaction</description>
 		<year>19??</year>
@@ -3041,6 +3077,24 @@
 		</part>
 	</software>
 
+	<software name="holinone">
+		<description>Hole In One</description>
+		<year>1987</year>
+		<publisher>Mastertronic Added Dimension</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="692452">
+				<rom name="hole in one side a.tap" size="692452" crc="99fe83f3" sha1="6124084b5c7bdc0d68ab5625b1bba2d6e167abc6"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="710167">
+				<rom name="hole in one side b.tap" size="710167" crc="a9707464" sha1="d8ff00e94e4ff907657e6be074b43d26fabd9132"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hpoker">
 		<description>Hollywood Poker</description>
 		<year>1988</year>
@@ -3904,13 +3958,24 @@
 	</software>
 
 	<software name="matchpnt">
-		<description>Match Point</description>
+		<description>Match Point (set 1)</description>
 		<year>1984</year>
 		<publisher>Psion</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="343643">
 				<rom name="Match_Point.tap" size="343643" crc="73ac1638" sha1="0323448e45573e700fe3426ff354bebc04556778"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matchpnt1" cloneof="matchpnt" >
+		<description>Match Point (set 2)</description>
+		<year>1984</year>
+		<publisher>The Hit Squad</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="412484">
+				<rom name="Match Point.tap" size="412484" crc="4fb72ed9" sha1="7bcc2d1c6dc9818b24236e1e8ef094e98111d623"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4366,8 +4431,8 @@
 		<year>1984</year>
 		<publisher>Firebird Silver</publisher>
 		<part name="cass1" interface="cbm_cass">
-			<dataarea name="cass" size="517364">
-				<rom name="on court tennis.tap" size="517364" crc="b2351874" sha1="b055f200043ac0fee774976f8de495134f731de7"/>
+			<dataarea name="cass" size="517655">
+				<rom name="on court tennis.tap" size="517655" crc="c7dbf50b" sha1="df6dc7bec0c870a387cc6478c0a81e9a00ddbdaa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4491,13 +4556,13 @@
 		<year>1985</year>
 		<publisher>Ricochet</publisher>
 		<part name="cass1" interface="cbm_cass">
-			<dataarea name="cass" size="16387950">
-				<rom name="outlaws side a.wav" size="16387950" crc="b048919a" sha1="65660170e42b2239ddba44b021dd58c0e299b4c8"/>
+			<dataarea name="cass" size="663257">
+				<rom name="outlaws side a.tap" size="663257" crc="332f4483" sha1="f5752d3fad3971662c5b13f9570e5625821854a2"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="cbm_cass">
-			<dataarea name="cass" size="16378130">
-				<rom name="outlaws side b.wav" size="16378130" crc="e71d5da2" sha1="55b0036ff24c5c98f58c21a72085e7fb4382ae54"/>
+			<dataarea name="cass" size="658990">
+				<rom name="outlaws side b.tap" size="658990" crc="429754e6" sha1="5fae6c04243e532008efe477eb7ffeab6178ca7c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4803,6 +4868,17 @@
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="513058">
 				<rom name="Poster_Paster.tap" size="513058" crc="12dce91a" sha1="065f3402a970c7c9539bcb6875934f06b0217ea7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="postman2">
+		<description>Postman Pat 2</description>
+		<year>1989</year>
+		<publisher>Alternative Software</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="638869">
+				<rom name="postman pat 2.tap" size="638869" crc="b892a405" sha1="d85b42eecbabb3b615bfb783869c4d98ef5f772a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6672,6 +6748,22 @@
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="379352">
 				<rom name="Superkid_in_Space.tap" size="379352" crc="0b374edc" sha1="68b841770d681d2ef7f32478d41e3efe0fb5e7a0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sweep">
+		<description>Sweep</description>
+		<year>19??</year>
+		<publisher>Mastertronic</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="400020">
+				<rom name="sweep (c64) (side a).tap" size="400020" crc="5c9225bf" sha1="d1c27f0d9833b91b5fc506087c83d49578f93257"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="388837">
+				<rom name="sweep (c64) (side b).tap" size="388837" crc="ab92b874" sha1="0a24b3db81b5ffd378dbb50e82f13daf4a645072"/>
 			</dataarea>
 		</part>
 	</software>

@@ -20,7 +20,7 @@
 
 // for quick and dirty debugging
 #define VERBOSE 0
-#define LOG_OUTPUT_FUNC printf
+#define LOG_OUTPUT_STREAM std::cerr
 #include "logmacro.h"
 
 #include <algorithm>
@@ -112,7 +112,7 @@ void fixedfreq_monitor_state::update_sync_channel(const time_type &time, const d
 			m_line_time = time + 1.0 / m_desc.hsync_filter_timeconst();
 		}
 		//if (!m_sig_vsync && (m_last_x < m_desc.m_hscale * 100))
-		//	printf("HSYNC up %d %f\n", m_last_y, m_last_x);
+		//  printf("HSYNC up %d %f\n", m_last_y, m_last_x);
 	}
 	else if (last_comp && !m_sig_composite)
 	{
@@ -131,7 +131,7 @@ void fixedfreq_monitor_state::update_bm(const time_type &time)
 
 	//uint32_t col(0xffff0000); // Mark sync areas
 	//if (m_last_sync >= m_desc.m_sync_threshold)
-	//	col = m_col;
+	//  col = m_col;
 
 	if (!m_sig_vsync && !m_sig_composite)
 	{
@@ -373,14 +373,14 @@ uint32_t fixedfreq_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 				screen.container().add_line(
 					x0+w, y0, x1-w, y0, m_scanline_height*yscale,
 					nom_col(f.col),
-//					(0xff << 24) | (f.col & 0xffffff),
+//                  (0xff << 24) | (f.col & 0xffffff),
 					flags);
 #elif 1
 				const float y1((f.y + m_scanline_height - yoffs) * yscale);
 				screen.container().add_rect(
 					x0, y0, x1, y1,
 					nom_col(col),
-//					(0xaf << 24) | (f.col & 0xffffff),
+//                  (0xaf << 24) | (f.col & 0xffffff),
 					flags);
 #else
 				const float y1((f.y + m_scanline_height - yoffs) * yscale);
@@ -388,7 +388,7 @@ uint32_t fixedfreq_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 				screen.container().add_quad(
 					x0, y0, x1, y1,
 					rgb_t(nom_col(f.col)),
-//					(0xaf << 24) | (f.col & 0xffffff),
+//                  (0xaf << 24) | (f.col & 0xffffff),
 					m_texture,
 					flags);
 #endif

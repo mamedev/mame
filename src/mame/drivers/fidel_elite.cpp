@@ -97,7 +97,7 @@ public:
 		m_rotate(false)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void pc(machine_config &config);
 	void eas(machine_config &config);
 	void eas_priv(machine_config &config);
@@ -173,7 +173,7 @@ public:
 		m_rotate = true;
 	}
 
-	// machine drivers
+	// machine configs
 	void eag(machine_config &config);
 	void eag2100(machine_config &config);
 
@@ -419,7 +419,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void elite_state::pc(machine_config &config)

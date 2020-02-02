@@ -50,7 +50,7 @@ public:
 		m_out_lcd(*this, "lcd%u.%u", 0U, 0U)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void dominator(machine_config &config);
 
 protected:
@@ -195,7 +195,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void dominator_state::dominator(machine_config &config)

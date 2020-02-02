@@ -170,7 +170,7 @@ void menu_display_actual::populate(float &customtop, float &custombottom)
 	else
 		m_searchpath.assign(machine().options().value(s_folders[m_ref].option));
 
-	path_iterator path(m_searchpath.c_str());
+	path_iterator path(m_searchpath);
 	std::string curpath;
 	m_folders.clear();
 	while (path.next(curpath, nullptr))
@@ -226,7 +226,7 @@ menu_add_change_folder::menu_add_change_folder(mame_ui_manager &mui, render_cont
 	else
 		searchpath = mui.machine().options().value(s_folders[m_ref].option);
 
-	path_iterator path(searchpath.c_str());
+	path_iterator path(searchpath);
 	std::string curpath;
 	while (path.next(curpath, nullptr))
 		m_folders.push_back(curpath);
@@ -289,10 +289,10 @@ void menu_add_change_folder::handle()
 				if (m_change)
 				{
 					if (ui().options().exists(s_folders[m_ref].option))
-						ui().options().set_value(s_folders[m_ref].option, m_current_path.c_str(), OPTION_PRIORITY_CMDLINE);
+						ui().options().set_value(s_folders[m_ref].option, m_current_path, OPTION_PRIORITY_CMDLINE);
 					else if (strcmp(machine().options().value(s_folders[m_ref].option), m_current_path.c_str()) != 0)
 					{
-						machine().options().set_value(s_folders[m_ref].option, m_current_path.c_str(), OPTION_PRIORITY_CMDLINE);
+						machine().options().set_value(s_folders[m_ref].option, m_current_path, OPTION_PRIORITY_CMDLINE);
 					}
 				}
 				else
@@ -307,10 +307,10 @@ void menu_add_change_folder::handle()
 					}
 
 					if (ui().options().exists(s_folders[m_ref].option))
-						ui().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE);
+						ui().options().set_value(s_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
 					else if (strcmp(machine().options().value(s_folders[m_ref].option), tmppath.c_str()) != 0)
 					{
-						machine().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE);
+						machine().options().set_value(s_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
 					}
 				}
 
@@ -449,7 +449,7 @@ menu_remove_folder::menu_remove_folder(mame_ui_manager &mui, render_container &c
 	else
 		m_searchpath.assign(mui.machine().options().value(s_folders[m_ref].option));
 
-	path_iterator path(m_searchpath.c_str());
+	path_iterator path(m_searchpath);
 	std::string curpath;
 	while (path.next(curpath, nullptr))
 		m_folders.push_back(curpath);
@@ -479,10 +479,10 @@ void menu_remove_folder::handle()
 		}
 
 		if (ui().options().exists(s_folders[m_ref].option))
-			ui().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE);
+			ui().options().set_value(s_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
 		else if (strcmp(machine().options().value(s_folders[m_ref].option),tmppath.c_str())!=0)
 		{
-			machine().options().set_value(s_folders[m_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE);
+			machine().options().set_value(s_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
 		}
 
 		reset_parent(reset_options::REMEMBER_REF);

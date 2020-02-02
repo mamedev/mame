@@ -68,7 +68,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void bcc(machine_config &config);
 	void bkc(machine_config &config);
 
@@ -218,7 +218,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void bcc_state::bkc(machine_config &config)

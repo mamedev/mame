@@ -61,7 +61,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void savant(machine_config &config);
 
 protected:
@@ -349,7 +349,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void savant_state::savant(machine_config &config)

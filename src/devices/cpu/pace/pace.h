@@ -52,7 +52,7 @@ public:
 		PACE_PC,
 		PACE_FR,
 		PACE_AC0, PACE_AC1, PACE_AC2, PACE_AC3,
-		PACE_SP,
+		PACE_STKD,
 		PACE_STK0, PACE_STK1, PACE_STK2, PACE_STK3, PACE_STK4,
 		PACE_STK5, PACE_STK6, PACE_STK7, PACE_STK8, PACE_STK9
 	};
@@ -76,6 +76,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 4); }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int irqline, int state) override;
 
@@ -85,26 +87,127 @@ protected:
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
+	// device_state_interface overrides
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
 private:
-	// internal helpers
-	void fr_w(u16 data);
+	enum class cycle : u8 {
+		IFETCH_M1, LEA_M2, RDEA_M3,
+
+		BOC_M4, BOC_M5,
+		JMP_M4,
+		JMP_IND_M4,
+		JSR_M4, JSR_M5,
+		JSR_IND_M4, JSR_IND_M5,
+		RTS_M4, RTS_M5,
+		RTI_M4, RTI_M5, RTI_M6,
+		BRANCH,
+
+		SKNE_M4, SKNE_M5,
+		SKG_M4, SKG_M5, SKG_M6, SKG_M7,
+		SKAZ_M4, SKAZ_M5,
+		ISZ_M4, ISZ_M5, ISZ_M6, ISZ_M7,
+		DSZ_M4, DSZ_M5, DSZ_M6, DSZ_M7,
+		AISZ_M4, AISZ_M5,
+		SKIP,
+
+		LD_M4,
+		LD_IND_M4, LD_IND_M5,
+		ST_M4,
+		ST_IND_M4,
+		LSEX_M4,
+
+		AND_M4,
+		OR_M4,
+		ADD_M4,
+		SUBB_M4,
+		DECA_M4, DECA_M5, DECA_M6, DECA_M7,
+
+		LI_M4,
+		RCPY_M4,
+		RXCH_M4, RXCH_M5, RXCH_M6,
+		XCHRS_M4, XCHRS_M5, XCHRS_M6,
+		CFR_M4,
+		CRF_M4,
+		PUSH_M4,
+		PULL_M4,
+		PUSHF_M4,
+		PULLF_M4,
+
+		RADD_M4,
+		RADC_M4,
+		RAND_M4,
+		RXOR_M4,
+		CAI_M4, CAI_M5,
+
+		SHL_M4, SHL_M5, SHL_M6, SHL_M7, SHL_M8,
+		SHR_M4, SHR_M5, SHR_M6, SHR_M7, SHR_M8,
+		ROL_M4, ROL_M5, ROL_M6, ROL_M7, ROL_M8,
+		ROR_M4, ROR_M5, ROR_M6, ROR_M7, ROR_M8,
+
+		HALT_M4,
+		PFLG_M4, PFLG_M5, PFLG_M6,
+
+		UNKNOWN
+	};
+
+	static const cycle s_decode[64];
+
+	// flag and interrupt helpers
+	void set_control_flag(u8 fc);
+	void reset_control_flag(u8 fc);
+	void set_fr(u16 r);
+
+	// conditions and ALU helpers
+	bool sign_bit(u16 r) const noexcept;
+	bool equals_0(u16 r) const noexcept;
+	bool poll_condition(u8 cc);
+	static void sign_extend(u16 &r);
+	void add(u16 &dr, u16 sr, bool c);
+	void decimal_add(u16 &dr, u16 sr, unsigned stage);
+	void prepare_shift();
+	void shift_left(u16 &r, bool rotate);
+	void shift_right(u16 &r, bool rotate);
+
+	// stack helpers
+	void stack_push(u16 r);
+	u16 stack_pull();
+
+	// execution helpers
+	void read_instruction();
+	u16 get_effective_address();
+	void read_effective_address();
+	void write_effective_address(u16 r);
+	cycle execute_one();
 
 	// address space and cache
 	address_space_config m_space_config;
 	address_space *m_space;
-	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *m_inst_cache;
+	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *m_cache;
 
 	// callback objects
+	devcb_read_line m_bps_callback;
 	devcb_read_line m_jc_callback[3];
 	devcb_write_line m_flag_callback[4];
 
-	// execution state
-	s32 m_icount;
-	u16 m_pc;
+	// core registers
 	u16 m_fr;
+	u16 m_pc;
+	u16 m_mdr;
+	u16 m_mar;
 	u16 m_ac[4];
-	u8 m_sp;
-	u16 m_stk[10];
+
+	// stack
+	u8 m_stkp;
+	u8 m_stack_depth;
+	u16 m_stack[10];
+
+	// execution state
+	u16 m_ppc;
+	u16 m_cir;
+	bool m_shift_link;
+	cycle m_cycle;
+	s32 m_icount;
 };
 
 // ======================> ins8900_device

@@ -6,14 +6,22 @@ Mephisto Turniermaschinen (dedicated in-house chesscomputers used at tournaments
 and their limited-release home versions. These are mephisto_modular hardware
 generation, see that driver for more information.
 
+V versions were sold in limited quantities by Hobby Computer Centrale.
+T versions were the ones used in actual tournaments, some of them sold to fans.
+
 The Bavaria board does not work on these. Not only does it not have the connector
 for it, but no software 'driver' either.
 
 Mephisto TM Almeria is not on this hardware.
 
-Mephisto Berlin 68030 is an unreleased dev version, an update to Vancouver,
-not used in any tournament. Internal string and version matches Vancouver 68030,
+Mephisto TM Berlin is an unreleased dev version, an update to TM Vancouver, but
+not used in any tournament. Internal string and version matches TM Vancouver,
 but ROM has many differences.
+
+BTANB:
+- lyon32t8 still says "2048Kbyte" even though it uses 8MB RAM
+
+===============================================================================
 
 Hardware notes:
 
@@ -39,6 +47,7 @@ After boot, it copies ROM to RAM, probably to circumvent waitstates on slow ROM.
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "machine/mmboard.h"
+#include "video/mmdisplay2.h"
 
 // internal artwork
 #include "mephisto_modular_tm.lh" // clickable
@@ -58,7 +67,7 @@ public:
 		m_fake(*this, "FAKE")
 	{ }
 
-	// machine drivers
+	// machine configs
 	void mmtm_v(machine_config &config);
 	void mmtm_t(machine_config &config);
 
@@ -138,8 +147,8 @@ void mmtm_state::mmtm_2m_map(address_map &map)
 	map(0xfc020004, 0xfc020007).portr("KEY1");
 	map(0xfc020008, 0xfc02000b).portr("KEY2");
 	map(0xfc020010, 0xfc020013).portr("KEY3");
-	map(0xfc040000, 0xfc040000).w("display", FUNC(mephisto_display_modul_device::latch_w));
-	map(0xfc060000, 0xfc060000).w("display", FUNC(mephisto_display_modul_device::io_w));
+	map(0xfc040000, 0xfc040000).w("display", FUNC(mephisto_display_module2_device::latch_w));
+	map(0xfc060000, 0xfc060000).w("display", FUNC(mephisto_display_module2_device::io_w));
 	map(0xfc080000, 0xfc080000).w("board", FUNC(mephisto_board_device::mux_w));
 	map(0xfc0a0000, 0xfc0a0000).w("board", FUNC(mephisto_board_device::led_w));
 	map(0xfc0c0000, 0xfc0c0000).r("board", FUNC(mephisto_board_device::input_r));
@@ -186,7 +195,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void mmtm_state::mmtm_v(machine_config &config)
@@ -204,7 +213,7 @@ void mmtm_state::mmtm_v(machine_config &config)
 	ADDRESS_MAP_BANK(config, "nvram_map").set_map(&mmtm_state::nvram_map).set_options(ENDIANNESS_BIG, 8, 13);
 
 	MEPHISTO_SENSORS_BOARD(config, "board");
-	MEPHISTO_DISPLAY_MODUL(config, "display");
+	MEPHISTO_DISPLAY_MODULE2(config, "display");
 	config.set_default_layout(layout_mephisto_modular_tm);
 }
 

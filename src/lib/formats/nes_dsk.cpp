@@ -9,8 +9,8 @@
 *********************************************************************/
 
 
-#include <string.h>
-#include <assert.h>
+#include <cstring>
+#include <cassert>
 
 #include "formats/nes_dsk.h"
 #include "formats/basicdsk.h"

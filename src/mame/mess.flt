@@ -22,6 +22,7 @@ aci_ggm.cpp
 aci_prodigy.cpp
 acrnsys1.cpp
 acrnsys.cpp
+actions_atj2279b.cpp
 acvirus.cpp
 adam.cpp
 adm11.cpp
@@ -30,6 +31,7 @@ adm31.cpp
 adm36.cpp
 advision.cpp
 agat.cpp
+aid80f.cpp
 aim65.cpp
 aim65_40.cpp
 akaiax80.cpp
@@ -97,6 +99,7 @@ b16.cpp
 b2m.cpp
 babbage.cpp
 banctec.cpp
+bandai_design_master.cpp
 basic52.cpp
 bbc.cpp
 bbcbc.cpp
@@ -312,6 +315,7 @@ geneve.cpp
 geniusiq.cpp
 geniusjr.cpp
 genpc.cpp
+gigatron.cpp
 gimix.cpp
 gkidabc.cpp
 gizmondo.cpp
@@ -573,13 +577,14 @@ nanos.cpp
 nascom1.cpp
 nc.cpp
 ncd68k.cpp
+ncd88k.cpp
 ncdmips.cpp
 ncdppc.cpp
 nds.cpp
 neogeocd.cpp
 nes.cpp
+nes_boot.cpp
 nes_vt.cpp
-vt1682.cpp
 newbrain.cpp
 next.cpp
 nforcepc.cpp
@@ -694,6 +699,7 @@ psion5.cpp
 psx.cpp
 pt68k4.cpp
 ptcsol.cpp
+pubint_storyreader.cpp
 pulsar.cpp
 pv1000.cpp
 pv2000.cpp
@@ -797,6 +803,21 @@ special.cpp
 specpls3.cpp
 spectrum.cpp
 spg110.cpp
+spg2xx.cpp
+spg2xx_dreamlife.cpp
+spg2xx_ican.cpp
+spg2xx_jakks.cpp
+spg2xx_lexibook.cpp
+spg2xx_pdc.cpp
+spg2xx_playvision.cpp
+spg2xx_senario.cpp
+spg2xx_senario_poker.cpp
+spg2xx_shredmjr.cpp
+spg2xx_telestory.cpp
+spg2xx_tvgogo.cpp
+spg2xx_vii.cpp
+spg2xx_zone.cpp
+spg2xx_zone_32bit.cpp
 squale.cpp
 ssem.cpp
 st17xx.cpp
@@ -960,6 +981,7 @@ vt220.cpp
 vt240.cpp
 vt320.cpp
 vt520.cpp
+vt1682.cpp
 vta2000.cpp
 vtech1.cpp
 vtech2.cpp

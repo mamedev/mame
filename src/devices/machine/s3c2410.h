@@ -559,9 +559,11 @@ private:
 	};
 
 	// internal state
-	required_device<device_t> m_cpu;
+	required_device<arm7_cpu_device> m_cpu;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+
+	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_cache;
 
 	uint8_t m_steppingstone[4*1024];
 	memcon_t m_memcon;

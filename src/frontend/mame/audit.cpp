@@ -220,14 +220,14 @@ media_auditor::summary media_auditor::audit_samples()
 
 			// look for the files
 			emu_file file(m_enumerator.options().sample_path(), OPEN_FLAG_READ | OPEN_FLAG_NO_PRELOAD);
-			path_iterator path(searchpath.c_str());
+			path_iterator path(searchpath);
 			std::string curpath;
 			while (path.next(curpath, samplename))
 			{
 				// attempt to access the file (.flac) or (.wav)
-				osd_file::error filerr = file.open(curpath.c_str(), ".flac");
+				osd_file::error filerr = file.open(curpath, ".flac");
 				if (filerr != osd_file::error::NONE)
-					filerr = file.open(curpath.c_str(), ".wav");
+					filerr = file.open(curpath, ".wav");
 
 				if (filerr == osd_file::error::NONE)
 				{
@@ -397,9 +397,9 @@ media_auditor::audit_record &media_auditor::audit_one_rom(const rom_entry *rom)
 		// open the file if we can
 		osd_file::error filerr;
 		if (has_crc)
-			filerr = file.open(curpath.c_str(), crc);
+			filerr = file.open(curpath, crc);
 		else
-			filerr = file.open(curpath.c_str());
+			filerr = file.open(curpath);
 
 		// if it worked, get the actual length and hashes, then stop
 		if (filerr == osd_file::error::NONE)

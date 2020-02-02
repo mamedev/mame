@@ -53,6 +53,7 @@ logwin_info::~logwin_info()
 {
 }
 
+
 bool logwin_info::handle_command(WPARAM wparam, LPARAM lparam)
 {
 	if ((HIWORD(wparam) == 0) && (LOWORD(wparam) == ID_CLEAR_LOG))

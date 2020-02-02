@@ -85,7 +85,7 @@
 #include "romload.h"
 #include "tilemap.h"
 #include "ui/uimain.h"
-#include <time.h>
+#include <ctime>
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
 
@@ -513,7 +513,7 @@ std::string running_machine::get_statename(const char *option) const
 	if (pos != -1)
 	{
 		// if more %d are found, revert to default and ignore them all
-		if (statename_str.find(statename_dev.c_str(), pos + 3) != -1)
+		if (statename_str.find(statename_dev, pos + 3) != -1)
 			statename_str.assign("%g");
 		// else if there is a single %d, try to create the correct snapname
 		else
@@ -521,8 +521,8 @@ std::string running_machine::get_statename(const char *option) const
 			int name_found = 0;
 
 			// find length of the device name
-			int end1 = statename_str.find("/", pos + 3);
-			int end2 = statename_str.find("%", pos + 3);
+			int end1 = statename_str.find('/', pos + 3);
+			int end2 = statename_str.find('%', pos + 3);
 			int end;
 
 			if ((end1 != -1) && (end2 != -1))
@@ -557,7 +557,7 @@ std::string running_machine::get_statename(const char *option) const
 						std::string filename(image.basename_noext());
 
 						// setup snapname and remove the %d_
-						strreplace(statename_str, devname_str.c_str(), filename.c_str());
+						strreplace(statename_str, devname_str, filename);
 						statename_str.erase(pos, 3);
 						//printf("check image: %s\n", filename.c_str());
 
@@ -1240,7 +1240,7 @@ running_machine::notifier_callback_item::notifier_callback_item(machine_notify_d
 //-------------------------------------------------
 
 running_machine::logerror_callback_item::logerror_callback_item(logerror_callback func)
-	: m_func(func)
+	: m_func(std::move(func))
 {
 }
 

@@ -17,7 +17,7 @@
 #define MAME_EMU_MAIN_H
 
 #include <thread>
-#include <time.h>
+#include <ctime>
 
 //**************************************************************************
 //    CONSTANTS

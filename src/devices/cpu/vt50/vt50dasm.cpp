@@ -34,7 +34,7 @@ const char *const vt5x_disassembler::s_opcodes_e[8] = {
 };
 
 const char *const vt5x_disassembler::s_opcodes_f[8] = {
-	"DXDY", "IA", "IA1", "IY", "DY", "IROM", "DX", "DA"
+	"DXDY", "IA", "IA1", "IY", "DY", "IROM", "DX", "DA" // IA is functionally duplicated
 };
 
 const char *const vt50_disassembler::s_opcodes_g[8] = {
@@ -45,9 +45,14 @@ const char *const vt52_disassembler::s_opcodes_g[8] = {
 	"M2A", "A2M", "M2U", "B2M", "M2X", "U2M", "M2B", "GRPH"
 };
 
-const char *const vt5x_disassembler::s_jumps_h[2][8] = {
+const char *const vt50_disassembler::s_jumps_h[2][8] = {
 	{ "PSC", "TAB", "KCL", "FRQ", "PRQ", "TRU", "UT", "TOS" }, // mode 0
 	{ "UR", "AEM", "ALM", "ADX", "AEM2", nullptr, "VSC", "KEY" } // mode 1
+};
+
+const char *const vt52_disassembler::s_jumps_h[2][8] = {
+	{ "PSC", "TAB", "KCL", "FRQ", "PRQ", "COP", "UT", "TOS" }, // mode 0
+	{ "UR", "AEM", "ALM", "ADX", "AEM2", "TRU", "VSC", "KEY" } // mode 1
 };
 
 const char *const vt5x_disassembler::s_opcodes_w[8] = {
@@ -99,12 +104,21 @@ offs_t vt5x_disassembler::disassemble(std::ostream &stream, offs_t pc, const vt5
 		{
 			if (!first)
 				stream << "!";
-			util::stream_format(stream, "%sJ", m_jumps_h[0][(opcode & 0160) >> 4]);
-			if (m_jumps_h[1][(opcode & 0160) >> 4] != nullptr)
-				util::stream_format(stream, "/%sJ", m_jumps_h[1][(opcode & 0160) >> 4]);
+			bool m0 = (opcode & 0170) != 0130;
+			bool m1 = (opcode & 0170) != 0170;
+			if (m_jumps_h[1][(opcode & 0160) >> 4] == nullptr)
+				m0 = std::exchange(m1, false);
+			if (m0)
+			{
+				util::stream_format(stream, "%sJ", m_jumps_h[0][(opcode & 0160) >> 4]);
+				if (m1)
+					stream << "/";
+			}
+			if (m1)
+				util::stream_format(stream, "%sJ", m_jumps_h[1][(opcode & 0160) >> 4]);
 
 			u16 nextpc = pc + 1;
-			if ((opcode & 0164) == 0124) // IROM!TRUJ adjustment
+			if ((opcode & 0164) == 0124) // IROM adjustment
 				nextpc += 0400;
 			util::stream_format(stream, " %04o", (nextpc & 01400) | opcodes.r8(pc + 1));
 			return 2;

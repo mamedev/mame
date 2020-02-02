@@ -70,7 +70,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void sexpert(machine_config &config);
 
 	void init_sexpert();
@@ -162,7 +162,7 @@ public:
 		sexpert_state(mconfig, type, tag)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void sforte(machine_config &config);
 
 protected:
@@ -405,7 +405,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void sexpert_state::sexpert(machine_config &config)

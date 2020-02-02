@@ -843,7 +843,7 @@ void gaelco2_state::play2000(machine_config &config)
 
 	GAELCO_DS5002FP(config, "gaelco_ds5002fp", XTAL(32'000'000) / 2).set_addrmap(0, &gaelco2_state::mcu_hostmem_map); /* 16 MHz */
 	config.set_perfect_quantum("gaelco_ds5002fp:mcu");
-	
+
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
@@ -2132,7 +2132,7 @@ void wrally2_state::wrally2(machine_config &config)
 
 	GAELCO_DS5002FP(config, "gaelco_ds5002fp", XTAL(26'000'000) / 2).set_addrmap(0, &wrally2_state::mcu_hostmem_map); /* 13 MHz */
 	config.set_perfect_quantum("gaelco_ds5002fp:mcu");
-	
+
 	LS259(config, m_mainlatch); // IC6
 	m_mainlatch->q_out_cb<0>().set(FUNC(gaelco2_state::coin1_counter_w));
 	m_mainlatch->q_out_cb<1>().set(FUNC(gaelco2_state::coin2_counter_w));

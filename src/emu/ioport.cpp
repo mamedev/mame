@@ -101,8 +101,8 @@
 
 #include "osdepend.h"
 
-#include <ctype.h>
-#include <time.h>
+#include <cctype>
+#include <ctime>
 
 
 namespace {
@@ -436,7 +436,7 @@ digital_joystick::digital_joystick(int player, int number)
 digital_joystick::direction_t digital_joystick::add_axis(ioport_field &field)
 {
 	direction_t direction = direction_t((field.type() - (IPT_DIGITAL_JOYSTICK_FIRST + 1)) % 4);
-	m_field[direction].append(*global_alloc(simple_list_wrapper<ioport_field>(&field)));
+	m_field[direction].emplace_front(field);
 	return direction;
 }
 
@@ -456,10 +456,10 @@ void digital_joystick::frame_update()
 	// read all the associated ports
 	running_machine *machine = nullptr;
 	for (direction_t direction = JOYDIR_UP; direction < JOYDIR_COUNT; ++direction)
-		for (const simple_list_wrapper<ioport_field> &i : m_field[direction])
+		for (const std::reference_wrapper<ioport_field> &i : m_field[direction])
 		{
-			machine = &i.object()->machine();
-			if (machine->input().seq_pressed(i.object()->seq(SEQ_TYPE_STANDARD)))
+			machine = &i.get().machine();
+			if (machine->input().seq_pressed(i.get().seq(SEQ_TYPE_STANDARD)))
 				m_current |= 1 << direction;
 		}
 
@@ -2754,7 +2754,7 @@ void ioport_manager::timecode_init()
 	filename.append(record_filename).append(".timecode");
 	osd_printf_info("Record input timecode file: %s\n", record_filename);
 
-	osd_file::error filerr = m_timecode_file.open(filename.c_str());
+	osd_file::error filerr = m_timecode_file.open(filename);
 	if (filerr != osd_file::error::NONE)
 		throw emu_fatalerror("ioport_manager::timecode_init: Failed to open file for input timecode recording");
 
@@ -3028,7 +3028,7 @@ ioport_configurer& ioport_configurer::port_modify(const char *tag)
 	std::string fulltag = m_owner.subtag(tag);
 
 	// find the existing port
-	m_curport = m_portlist.find(fulltag.c_str())->second.get();
+	m_curport = m_portlist.find(fulltag)->second.get();
 	if (m_curport == nullptr)
 		throw emu_fatalerror("Requested to modify nonexistent port '%s'", fulltag.c_str());
 

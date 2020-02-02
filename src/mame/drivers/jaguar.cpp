@@ -298,6 +298,9 @@ Notes:
     F1D000-F1DFFF   R     xxxxxxxx xxxxxxxx   Wavetable ROM
     ------------------------------------------------------------
 
+  Jaguar console schematics include a ADC0844 at U16, selected by GPIOL5. This IC
+  may or may not be populated.
+
   Jaguar System Notes:
 
     Protection Check

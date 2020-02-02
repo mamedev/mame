@@ -52,6 +52,7 @@ using util::BIT;
 #include "cpu/f8/f8dasm.h"
 #include "cpu/fr/frdasm.h"
 #include "cpu/g65816/g65816ds.h"
+#include "cpu/gigatron/gigatrondasm.h"
 #include "cpu/h6280/6280dasm.h"
 #include "cpu/h8/h8d.h"
 #include "cpu/h8/h8hd.h"
@@ -89,6 +90,7 @@ using util::BIT;
 #include "cpu/m68000/m68kdasm.h"
 #include "cpu/m6805/6805dasm.h"
 #include "cpu/m6809/6x09dasm.h"
+#include "cpu/m88000/m88000d.h"
 #include "cpu/mb86233/mb86233d.h"
 #include "cpu/mb86235/mb86235d.h"
 #include "cpu/mb88xx/mb88dasm.h"
@@ -120,6 +122,7 @@ using util::BIT;
 #include "cpu/psx/psxdasm.h"
 #include "cpu/rii/riidasm.h"
 #include "cpu/rsp/rsp_dasm.h"
+#include "cpu/rx01/rx01dasm.h"
 #include "cpu/s2650/2650dasm.h"
 #include "cpu/saturn/saturnds.h"
 #include "cpu/sc61860/scdasm.h"
@@ -160,6 +163,7 @@ using util::BIT;
 #include "cpu/v60/v60d.h"
 #include "cpu/v810/v810dasm.h"
 #include "cpu/vt50/vt50dasm.h"
+#include "cpu/vt61/vt61dasm.h"
 #include "cpu/we32000/we32100d.h"
 #include "cpu/z180/z180dasm.h"
 #include "cpu/z8/z8dasm.h"
@@ -175,7 +179,7 @@ using util::BIT;
 #include <iostream>
 #include <stdexcept>
 
-#include <ctype.h>
+#include <cctype>
 
 using u8 = util::u8;
 using u16 = util::u16;
@@ -368,6 +372,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "f8",              be,  0, []() -> util::disasm_interface * { return new f8_disassembler; } },
 	{ "fr",              be,  0, []() -> util::disasm_interface * { return new fr_disassembler; } },
 	{ "g65816",          le,  0, []() -> util::disasm_interface * { return new g65816_disassembler(&g65816_unidasm); } },
+	{ "gigatron",        be, -1, []() -> util::disasm_interface * { return new gigatron_disassembler; } },
 	{ "h6280",           le,  0, []() -> util::disasm_interface * { return new h6280_disassembler; } },
 	{ "h8",              be,  0, []() -> util::disasm_interface * { return new h8_disassembler; } },
 	{ "h8h",             be,  0, []() -> util::disasm_interface * { return new h8h_disassembler; } },
@@ -436,6 +441,8 @@ static const dasm_table_entry dasm_table[] =
 	{ "mb86233",         le, -2, []() -> util::disasm_interface * { return new mb86233_disassembler; } },
 	{ "mb86235",         le, -3, []() -> util::disasm_interface * { return new mb86235_disassembler; } },
 	{ "mb88",            le,  0, []() -> util::disasm_interface * { return new mb88_disassembler; } },
+	{ "mc88100",         be,  0, []() -> util::disasm_interface * { return new mc88100_disassembler; } },
+	{ "mc88110",         be,  0, []() -> util::disasm_interface * { return new mc88110_disassembler; } },
 	{ "mcs48",           le,  0, []() -> util::disasm_interface * { return new mcs48_disassembler(false, false); } },
 	{ "minx",            le,  0, []() -> util::disasm_interface * { return new minx_disassembler; } },
 	{ "mips1be",         be,  0, []() -> util::disasm_interface * { return new mips1_disassembler; } },
@@ -460,7 +467,8 @@ static const dasm_table_entry dasm_table[] =
 	{ "r65c02",          le,  0, []() -> util::disasm_interface * { return new r65c02_disassembler; } },
 	{ "r65c19",          le,  0, []() -> util::disasm_interface * { return new r65c19_disassembler; } },
 	{ "rsp",             le,  0, []() -> util::disasm_interface * { return new rsp_disassembler; } },
-	{ "s2650",           le,  0, []() -> util::disasm_interface * { return new s2650_disassembler(&s2650_unidasm); } },
+	{ "rx01",            le,  0, []() -> util::disasm_interface * { return new rx01_disassembler; } },
+	{ "s2650",           be,  0, []() -> util::disasm_interface * { return new s2650_disassembler(&s2650_unidasm); } },
 	{ "saturn",          le,  0, []() -> util::disasm_interface * { return new saturn_disassembler(&saturn_unidasm); } },
 	{ "sc61860",         le,  0, []() -> util::disasm_interface * { return new sc61860_disassembler; } },
 	{ "scmp",            le,  0, []() -> util::disasm_interface * { return new scmp_disassembler; } },
@@ -529,6 +537,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "v810",            le,  0, []() -> util::disasm_interface * { return new v810_disassembler; } },
 	{ "vt50",            le,  0, []() -> util::disasm_interface * { return new vt50_disassembler; } },
 	{ "vt52",            le,  0, []() -> util::disasm_interface * { return new vt52_disassembler; } },
+	{ "vt61",            le, -1, []() -> util::disasm_interface * { return new vt61_disassembler; } },
 	{ "we32100",         be,  0, []() -> util::disasm_interface * { return new we32100_disassembler; } },
 	{ "x86_16",          le,  0, []() -> util::disasm_interface * { i386_unidasm.mode = 16; return new i386_disassembler(&i386_unidasm); } },
 	{ "x86_32",          le,  0, []() -> util::disasm_interface * { i386_unidasm.mode = 32; return new i386_disassembler(&i386_unidasm); } },
@@ -598,18 +607,17 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 		switch(entry->pcshift) {
 		case -1:
 			lr8  = [](offs_t pc) -> u8  { throw std::logic_error("debug_disasm_buffer::debug_data_buffer: r8 access on 16-bits granularity bus\n"); };
-			lr16 = [this](offs_t pc) -> u16 {
-				const u16 *src = get_ptr<u16>(pc);
-				return src[0];
-			};
-
 			switch(entry->endian) {
 			case le:
+				lr16 = [this](offs_t pc) -> u16 {
+					const u16 *src = get_ptr<u16>(pc);
+					return little_endianize_int16(src[0]);
+				};
 				lr32 = [this, page_mask](offs_t pc) -> u32 {
 					offs_t lpc = disasm->pc_real_to_linear(pc);
 					u32 r = 0;
 					for(int j=0; j != 2; j++) {
-						r |= get<u16>(disasm->pc_linear_to_real(lpc)) << (j*16);
+						r |= little_endianize_int16(get<u16>(disasm->pc_linear_to_real(lpc))) << (j*16);
 						lpc = (lpc & ~page_mask) | ((lpc + 1) & page_mask);
 					}
 					return r;
@@ -618,7 +626,7 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 					offs_t lpc = disasm->pc_real_to_linear(pc);
 					u64 r = 0;
 					for(int j=0; j != 4; j++) {
-						r |= u64(get<u16>(disasm->pc_linear_to_real(lpc))) << (j*16);
+						r |= u64(little_endianize_int16(get<u16>(disasm->pc_linear_to_real(lpc)))) << (j*16);
 						lpc = (lpc & ~page_mask) | ((lpc + 1) & page_mask);
 					}
 					return r;
@@ -626,11 +634,15 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 				break;
 
 			case be:
+				lr16 = [this](offs_t pc) -> u16 {
+					const u16 *src = get_ptr<u16>(pc);
+					return big_endianize_int16(src[0]);
+				};
 				lr32 = [this, page_mask](offs_t pc) -> u32 {
 					offs_t lpc = disasm->pc_real_to_linear(pc);
 					u32 r = 0;
 					for(int j=0; j != 2; j++) {
-						r |= get<u16>(disasm->pc_linear_to_real(lpc)) << ((1-j)*16);
+						r |= big_endianize_int16(get<u16>(disasm->pc_linear_to_real(lpc))) << ((1-j)*16);
 						lpc = (lpc & ~page_mask) | ((lpc + 1) & page_mask);
 					}
 					return r;
@@ -639,7 +651,7 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 					offs_t lpc = disasm->pc_real_to_linear(pc);
 					u64 r = 0;
 					for(int j=0; j != 4; j++) {
-						r |= u64(get<u16>(disasm->pc_linear_to_real(lpc))) << ((3-j)*16);
+						r |= u64(big_endianize_int16(get<u16>(disasm->pc_linear_to_real(lpc)))) << ((3-j)*16);
 						lpc = (lpc & ~page_mask) | ((lpc + 1) & page_mask);
 					}
 					return r;
@@ -792,46 +804,52 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 
 		case -1:
 			lr8 = [](offs_t pc) -> u8 { abort(); };
-			lr16 = [this](offs_t pc) -> u16 {
-				const u16 *p = get_ptr<u16>(pc);
-				return p ?
-				p[0]
-				: 0x0000;
-			};
 			switch(entry->endian) {
 			case le:
+				lr16 = [this](offs_t pc) -> u16 {
+					const u16 *p = get_ptr<u16>(pc);
+					return p ?
+					little_endianize_int16(p[0])
+					: 0x0000;
+				};
 				lr32 = [this](offs_t pc) -> u32 {
 					const u16 *p = get_ptr<u16>(pc);
 					return p ?
-					p[0] |
-					(p[1] << 16)
+					little_endianize_int16(p[0]) |
+					(little_endianize_int16(p[1]) << 16)
 					: 0x00000000;
 				};
 				lr64 = [this](offs_t pc) -> u64 {
 					const u16 *p = get_ptr<u16>(pc);
 					return p ?
-					p[0] |
-					(p[1] << 16) |
-					(u64(p[2]) << 32) |
-					(u64(p[3]) << 48)
+					little_endianize_int16(p[0]) |
+					(little_endianize_int16(p[1]) << 16) |
+					(u64(little_endianize_int16(p[2])) << 32) |
+					(u64(little_endianize_int16(p[3])) << 48)
 					: 0x0000000000000000;
 				};
 				break;
 			case be:
+				lr16 = [this](offs_t pc) -> u16 {
+					const u16 *p = get_ptr<u16>(pc);
+					return p ?
+					big_endianize_int16(p[0])
+					: 0x0000;
+				};
 				lr32 = [this](offs_t pc) -> u32 {
 					const u16 *p = get_ptr<u16>(pc);
 					return p ?
-					(p[0] << 16)|
-					p[1]
+					(big_endianize_int16(p[0]) << 16)|
+					big_endianize_int16(p[1])
 					: 0x00000000;
 				};
 				lr64 = [this](offs_t pc) -> u64 {
 					const u16 *p = get_ptr<u16>(pc);
 					return p ?
-					(u64(p[0]) << 48) |
-					(u64(p[1]) << 32) |
-					(p[2] << 16) |
-					p[3]
+					(u64(big_endianize_int16(p[0])) << 48) |
+					(u64(big_endianize_int16(p[1])) << 32) |
+					(big_endianize_int16(p[2]) << 16) |
+					big_endianize_int16(p[3])
 					: 0x0000000000000000;
 				};
 				break;
@@ -841,28 +859,34 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 		case -2:
 			lr8 = [](offs_t pc) -> u8 { abort(); };
 			lr16 = [](offs_t pc) -> u16 { abort(); };
-			lr32 = [this](offs_t pc) -> u32 {
-				const u32 *p = get_ptr<u32>(pc);
-				return p ?
-				p[0]
-				: 0x00000000;
-			};
 			switch(entry->endian) {
 			case le:
+				lr32 = [this](offs_t pc) -> u32 {
+					const u32 *p = get_ptr<u32>(pc);
+					return p ?
+					little_endianize_int32(p[0])
+					: 0x00000000;
+				};
 				lr64 = [this](offs_t pc) -> u64 {
 					const u32 *p = get_ptr<u32>(pc);
 					return p ?
-					p[0] |
-					(u64(p[1]) << 32)
+					little_endianize_int32(p[0]) |
+					(u64(little_endianize_int32(p[1])) << 32)
 					: 0x0000000000000000;
 				};
 				break;
 			case be:
+				lr32 = [this](offs_t pc) -> u32 {
+					const u32 *p = get_ptr<u32>(pc);
+					return p ?
+					big_endianize_int32(p[0])
+					: 0x00000000;
+				};
 				lr64 = [this](offs_t pc) -> u64 {
 					const u32 *p = get_ptr<u32>(pc);
 					return p ?
-					(u64(p[0]) << 32) |
-					p[1]
+					(u64(big_endianize_int32(p[0])) << 32) |
+					big_endianize_int32(p[1])
 					: 0x0000000000000000;
 				};
 				break;
@@ -873,26 +897,38 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 			lr8 = [](offs_t pc) -> u8 { abort(); };
 			lr16 = [](offs_t pc) -> u16 { abort(); };
 			lr32 = [](offs_t pc) -> u32 { abort(); };
-			lr64 = [this](offs_t pc) -> u64 {
-				const u64 *p = get_ptr<u64>(pc);
-				return p ?
-				p[0]
-				: 0x0000000000000000;
+			switch(entry->endian) {
+			case le:
+				lr64 = [this](offs_t pc) -> u64 {
+					const u64 *p = get_ptr<u64>(pc);
+					return p ?
+					little_endianize_int64(p[0])
+					: 0x0000000000000000;
+				};
+				break;
+			case be:
+				lr64 = [this](offs_t pc) -> u64 {
+					const u64 *p = get_ptr<u64>(pc);
+					return p ?
+					big_endianize_int64(p[0])
+					: 0x0000000000000000;
+				};
+				break;
 			};
 			break;
 
 		case 3:
 			lr8 = [](offs_t pc) -> u8 { abort(); };
-			lr16 = [this](offs_t pc) -> u16 {
-				if(pc < base_pc)
-					return 0x0000;
-				offs_t delta = (pc - base_pc) >> 3;
-				if(delta >= size)
-					return 0x0000;
-				return reinterpret_cast<const u16 *>(&data[delta])[0];
-			};
 			switch(entry->endian) {
 			case le:
+				lr16 = [this](offs_t pc) -> u16 {
+					if(pc < base_pc)
+						return 0x0000;
+					offs_t delta = (pc - base_pc) >> 3;
+					if(delta >= size)
+						return 0x0000;
+					return little_endianize_int16(reinterpret_cast<const u16 *>(&data[delta])[0]);
+				};
 				lr32 = [this](offs_t pc) -> u32 {
 					if(pc < base_pc)
 						return 0x00000000;
@@ -900,10 +936,18 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 					if(delta >= size + 2)
 						return 0x00000000;
 					auto p = reinterpret_cast<const u16 *>(&data[delta]);
-					return p[0] | (u32(p[1]) << 16);
+					return little_endianize_int16(p[0]) | (u32(little_endianize_int16(p[1])) << 16);
 				};
 				break;
 			case be:
+				lr16 = [this](offs_t pc) -> u16 {
+					if(pc < base_pc)
+						return 0x0000;
+					offs_t delta = (pc - base_pc) >> 3;
+					if(delta >= size)
+						return 0x0000;
+					return big_endianize_int16(reinterpret_cast<const u16 *>(&data[delta])[0]);
+				};
 				lr32 = [this](offs_t pc) -> u32 {
 					if(pc < base_pc)
 						return 0x00000000;
@@ -911,7 +955,7 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 					if(delta >= size + 2)
 						return 0x00000000;
 					auto p = reinterpret_cast<const u16 *>(&data[delta]);
-					return (u32(p[0]) << 16) | p[1];
+					return (u32(big_endianize_int16(p[0])) << 16) | big_endianize_int16(p[1]);
 				};
 				break;
 			}

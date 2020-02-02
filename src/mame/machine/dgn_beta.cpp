@@ -59,7 +59,7 @@
 
 #include <functional>
 
-#include <math.h>
+#include <cmath>
 #include "emu.h"
 #include "debug/debugcon.h"
 #include "cpu/m6809/m6809.h"

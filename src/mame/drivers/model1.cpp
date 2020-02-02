@@ -2,10 +2,20 @@
 // copyright-holders:Olivier Galibert
 /*
 
+Known functional issues:
+- Star Wars Arcade
+  * After recent changes, ship models periodically disappear for a frame or two during attract mode
+    and while in-game.
+  * There are indeterminate issues with the analog controls in-game.
+- Virtua Fighter
+  * Gameplay mechanics - specifically, collision detection - are significantly broken due to
+    imperfect TGP RAM port emulation or hookup. This is observable in both attract mode and
+    in-game. It seems to break when both characters attack at the same time.
+
 Sega Model 1 Hardware Overview
 ------------------------------
 
-Note! This document is a Work-In-Progress and covers all the dumped Sega Model 1 games, including....
+Note! This document is a Work-In-Progress and covers all the dumped Sega Model 1 games, including...
 
 Star Wars Arcade (C) Sega, 1994
 Virtua Fighter   (C) Sega, 1993
@@ -1214,11 +1224,17 @@ ROM_START( vf )
 	ROM_LOAD32_WORD( "mpr-16103.33", 0xc00002, 0x200000, CRC(526d1c76) SHA1(edc8dafc9261cd0e970c3b50e3c1ca51a32a4cdf) )
 ROM_END
 
+/*
+Virtua Racing
+
+        Sega game ID# 833-8942 VIRTUA RACING TWIN
+   Sega ROM board ID# 834-8941
+*/
 ROM_START( vr )
 	MODEL1_CPU_BOARD
 
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF ) /* v60 code */
-	ROM_LOAD16_BYTE( "epr-14882.14", 0x200000, 0x80000, CRC(547d75ad) SHA1(a57c11966886c37de1d7df131ad60457669231dd) ) /* Rom board with Sega ID# 834-8941 */
+	ROM_LOAD16_BYTE( "epr-14882.14", 0x200000, 0x80000, CRC(547d75ad) SHA1(a57c11966886c37de1d7df131ad60457669231dd) )
 	ROM_LOAD16_BYTE( "epr-14883.15", 0x200001, 0x80000, CRC(6bfad8b1) SHA1(c1f780e456b405abd42d92f4e03e40aad88f8c22) )
 
 	ROM_LOAD( "epr-14878a.4", 0xfc0000, 0x20000, CRC(6d69e695) SHA1(12d3612d3dfd474b8020cdfb8ffc5dcc64e2e1a3) )
@@ -1699,14 +1715,6 @@ void model1_state::model1(machine_config &config)
 	m_tgp_copro->set_addrmap(AS_IO, &model1_state::copro_io_map);
 	m_tgp_copro->set_addrmap(mb86233_device::AS_RF, &model1_state::copro_rf_map);
 
-	model1io_device &ioboard(SEGA_MODEL1IO(config, "ioboard", 0));
-	ioboard.read_callback().set(m_dpram, FUNC(mb8421_device::left_r));
-	ioboard.write_callback().set(m_dpram, FUNC(mb8421_device::left_w));
-	ioboard.in_callback<0>().set_ioport("IN.0");
-	ioboard.in_callback<1>().set_ioport("IN.1");
-
-	MB8421(config, m_dpram, 0);
-
 	S24TILE(config, m_tiles, 0, 0x3fff).set_palette(m_palette);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1716,6 +1724,15 @@ void model1_state::model1(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(model1_state::screen_vblank_model1));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 8192);
+
+	// create SEGA_MODEL1IO device *after* SCREEN device
+	model1io_device &ioboard(SEGA_MODEL1IO(config, "ioboard", 0));
+	ioboard.read_callback().set(m_dpram, FUNC(mb8421_device::left_r));
+	ioboard.write_callback().set(m_dpram, FUNC(mb8421_device::left_w));
+	ioboard.in_callback<0>().set_ioport("IN.0");
+	ioboard.in_callback<1>().set_ioport("IN.1");
+
+	MB8421(config, m_dpram, 0);
 
 	SEGAM1AUDIO(config, m_m1audio, 0);
 	m_m1audio->rxd_handler().set(m_m1uart, FUNC(i8251_device::write_rxd));
@@ -1867,11 +1884,11 @@ void model1_state::netmerc(machine_config &config)
 //**************************************************************************
 
 //    YEAR  NAME        PARENT   MACHINE     INPUT       CLASS         INIT        ROTATION  COMPANY  FULLNAME              FLAGS
-GAME( 1993, vf,         0,       vf,         vf,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Fighter",           0 )
+GAME( 1993, vf,         0,       vf,         vf,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Fighter",           MACHINE_NOT_WORKING )
 GAMEL(1992, vr,         0,       vr,         vr,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Racing",            0, layout_vr )
 GAME( 1993, vformula,   vr,      vformula,   vr,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Formula",           MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, swa,        0,       swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars Arcade (US)",    0 )
-GAME( 1993, swaj,       swa,     swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars Arcade (Japan)", 0 )
+GAME( 1993, swa,        0,       swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars Arcade (US)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1993, swaj,       swa,     swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars Arcade (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
 GAME( 1994, wingwar,    0,       wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (World)",         0 )
 GAME( 1994, wingwaru,   wingwar, wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (US)",            0 )
 GAME( 1994, wingwarj,   wingwar, wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (Japan)",         0 )

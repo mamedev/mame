@@ -25,7 +25,7 @@
 /// \brief System supports INT128
 ///
 /// Set this to one if you want to use 128 bit int for ptime.
-/// This is about 5% slower on a kaby lake processor.
+/// This is about 10% slower on a skylake processor for pongf.
 ///
 #ifndef PHAS_INT128
 #define PHAS_INT128 (0)

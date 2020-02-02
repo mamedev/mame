@@ -366,7 +366,7 @@ public:
 
 		// find the font
 		HR_RET0(find_font(
-			familyName.c_str(),
+			familyName,
 			bold ? DWRITE_FONT_WEIGHT_BOLD : DWRITE_FONT_WEIGHT_NORMAL,
 			DWRITE_FONT_STRETCH_NORMAL,
 			italic ? DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL,

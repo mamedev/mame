@@ -36,7 +36,7 @@
 
 */
 
-#include <assert.h>
+#include <cassert>
 
 #include "formats/comx35_dsk.h"
 

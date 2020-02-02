@@ -1,5 +1,5 @@
 #include "benchmark/benchmark_api.h"
-#include <time.h>
+#include <ctime>
 #include "osdcore.h"
 #include "osdcomm.h"
 #define MAME_NOASM 1

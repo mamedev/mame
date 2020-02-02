@@ -33,6 +33,8 @@ gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig
 	m_palette(*this, "palette"),
 	m_gfxdecode(*this, "gfxdecode"),
 	m_space_read_cb(*this),
+	m_rowscroll(*this, "^rowscroll"),
+	m_rowzoom(*this, "^rowzoom"),
 	m_global_y_mask(0x1ff),
 	m_pal_displaybank_high(0),
 	m_alt_tile_addressing(0)
@@ -215,10 +217,59 @@ void gcm394_base_video_device::device_start()
 	if (memregion(":maincpu"))
 		decodegfx(":maincpu");
 
-	save_item(NAME(m_spriteextra));
-	save_item(NAME(m_spriteram));
-
 	m_space_read_cb.resolve_safe(0);
+
+
+	save_item(NAME(m_screenbuf));
+	save_item(NAME(m_rgb5_to_rgb8));
+	save_item(NAME(m_rgb555_to_rgb888));
+	save_item(NAME(m_page0_addr_lsb));
+	save_item(NAME(m_page0_addr_msb));
+	save_item(NAME(m_page1_addr_lsb));
+	save_item(NAME(m_page1_addr_msb));
+	save_item(NAME(m_707e_videodma_bank));
+	save_item(NAME(m_videodma_size));
+	save_item(NAME(m_videodma_dest));
+	save_item(NAME(m_videodma_source));
+	save_item(NAME(m_tmap0_regs));
+	save_item(NAME(m_tmap1_regs));
+	save_item(NAME(m_tmap2_regs));
+	save_item(NAME(m_tmap3_regs));
+	save_item(NAME(m_tmap0_scroll));
+	save_item(NAME(m_tmap1_scroll));
+	save_item(NAME(m_tmap2_scroll));
+	save_item(NAME(m_tmap3_scroll));
+	save_item(NAME(m_707f));
+	save_item(NAME(m_703a_palettebank));
+	save_item(NAME(m_7062));
+	save_item(NAME(m_7063));
+	save_item(NAME(m_702a));
+	save_item(NAME(m_7030_brightness));
+	save_item(NAME(m_703c_tvcontrol1));
+	save_item(NAME(m_7042_sprite));
+	save_item(NAME(m_7080));
+	save_item(NAME(m_7081));
+	save_item(NAME(m_7082));
+	save_item(NAME(m_7083));
+	save_item(NAME(m_7084));
+	save_item(NAME(m_7085));
+	save_item(NAME(m_7086));
+	save_item(NAME(m_7087));
+	save_item(NAME(m_7088));
+	save_item(NAME(m_sprite_7022_gfxbase_lsb));
+	save_item(NAME(m_sprite_702d_gfxbase_msb));
+	save_item(NAME(m_page2_addr_lsb));
+	save_item(NAME(m_page2_addr_msb));
+	save_item(NAME(m_page3_addr_lsb));
+	save_item(NAME(m_page3_addr_msb));
+	save_item(NAME(m_video_irq_status));
+	save_item(NAME(m_spriteram));
+	save_item(NAME(m_spriteextra));
+	save_item(NAME(m_paletteram));
+	save_item(NAME(m_maxgfxelement));
+	save_item(NAME(m_global_y_mask));
+	save_item(NAME(m_pal_displaybank_high));
+	save_item(NAME(m_alt_tile_addressing));
 }
 
 void gcm394_base_video_device::device_reset()
@@ -256,7 +307,7 @@ void gcm394_base_video_device::device_reset()
 
 	m_702a = 0x0000;
 	m_7030_brightness = 0x0000;
-	m_703c = 0x0000;
+	m_703c_tvcontrol1 = 0x0000;
 
 	m_7042_sprite = 0x0000;
 
@@ -279,10 +330,10 @@ void gcm394_base_video_device::device_reset()
 
 	m_sprite_7022_gfxbase_lsb = 0;
 	m_sprite_702d_gfxbase_msb = 0;
-	m_unk_vid1_gfxbase_lsb = 0;
-	m_unk_vid1_gfxbase_msb = 0;
-	m_unk_vid2_gfxbase_lsb = 0;
-	m_unk_vid2_gfxbase_msb = 0;
+	m_page2_addr_lsb = 0;
+	m_page2_addr_msb = 0;
+	m_page3_addr_lsb = 0;
+	m_page3_addr_msb = 0;
 
 }
 
@@ -320,7 +371,7 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 
 	int yy = (yoff + y);// &0x1ff;
 	//if (yy >= 0x01c0)
-	//	yy -= 0x0200;
+	//  yy -= 0x0200;
 
 	if (yy > cliprect.max_y || yy < 0)
 		return;
@@ -335,7 +386,7 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 
 		if (nbits < nc_bpp)
 		{
-			uint16_t b = m_space_read_cb((m++ & 0x3fffff));
+			uint16_t b = m_space_read_cb((m++)&0x7ffffff); // smartfp suggests either 0x7ffffff mask, or some bits are being set incorrectly, jak_s500 needs over 0x3ffffff at least
 			b = (b << 8) | (b >> 8);
 			bits |= b << (nc_bpp - nbits);
 			nbits += 16;
@@ -358,6 +409,7 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 		else if (nc_bpp < 8)
 		{
 			// 6bpp
+		//  current_palette_offset |= 0x0800;
 
 		}
 		else
@@ -374,7 +426,7 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 
 		//xx &= 0x01ff;
 		//if (xx >= 0x01c0)
-		//	xx -= 0x0200;
+		//  xx -= 0x0200;
 
 		if (xx >= 0 && xx <= cliprect.max_x)
 		{
@@ -422,33 +474,44 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 		return;
 	}
 
-	if (ctrl_reg & 0x01) // bitmap mode jak_car2 uses this ingame
+	if (ctrl_reg & 0x01) // bitmap mode jak_car2 and jak_s500 use for the ingame race sections, also have a bitmap test in test mode
 	{
-		popmessage("bitmap mode %08x\n", bitmap_addr);
+		if (ctrl_reg & 0x10)
+			popmessage("bitmap mode %08x with rowscroll\n", bitmap_addr);
+		else
+			popmessage("bitmap mode %08x\n", bitmap_addr);
+
+		// note, in interlace modes it appears every other line is unused? (480 entry table, but with blank values)
+		// and furthermore the rowscroll and rowzoom tables only have 240 entries, not enough for every line
+		// the end of the rowscroll table (entries 240-255) contain something else, maybe garbage data as it's offscreen, maybe not
 
 		uint32_t linebase = space.read_word(tilemap + scanline); // every other word is unused, but there are only enough entries for 240 lines then, sometimes to do with interlace mode?
 		uint16_t palette = space.read_word(palette_map + (scanline / 2));
 
 		if (scanline & 1)
 			palette >>= 8;
+		else
+			palette &= 0xff;
 
-		//if (linebase != 0)
-		//	printf("scanline %d linebase %04x palette %04x\n", scanline, linebase, palette);
+		if (!linebase)
+			return;
 
-		linebase |= ((palette >> 8) << 16);
+		linebase = linebase | (palette << 16);
 
-		int gfxbase = bitmap_addr + linebase;
+		// this logic works for jak_s500 and the test modes to get the correct base, doesn't seem to work for jak_car2 ingame, maybe data is copied to wrong place?
+		int gfxbase = (bitmap_addr&0x7ffffff) + (linebase&0x7ffffff);
 
-		for (int i = 0; i < 160; i++) // will have to be 320 for jak_car2 ingame
+		for (int i = 0; i < 160; i++) // will have to be 320 for jak_car2 ingame, jak_s500 lines are wider than screen, and zoomed
 		{
-			uint16_t pix = m_space_read_cb((gfxbase++)&0xffffff);
+			uint16_t pix = m_space_read_cb((gfxbase++)&0x7ffffff);
 			int xx;
 			int y_index = scanline * m_screen->width();
 			uint16_t pal;
 
 			if ((scanline >= 0) && (scanline < 480))
 			{
-				xx = (i * 2);
+				xx = i * 2;
+
 				pal = (pix & 0xff) | 0x100;
 
 				if (xx >= 0 && xx <= cliprect.max_x)
@@ -492,12 +555,12 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 		if ((attr_reg >> 14) & 0x2)
 		{
 			total_width = 1024;
-		//	use_alt_drawmode = 1; // probably doesn't control this
+		//  use_alt_drawmode = 1; // probably doesn't control this
 		}
 		else
 		{
 			total_width = 512;
-		//	use_alt_drawmode = 0; // probably doesn't control this
+		//  use_alt_drawmode = 0; // probably doesn't control this
 		}
 
 		uint32_t tile_count_x = total_width / tile_w;
@@ -705,18 +768,44 @@ void gcm394_base_video_device::draw_sprites(const rectangle &cliprect, uint32_t 
 
 uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	memset(&m_screenbuf[m_screen->width() * cliprect.min_y], 0, 4 *  m_screen->width() * ((cliprect.max_y - cliprect.min_y) + 1));
+	// For jak_car2 and jak_gtg the palette entry for 'magenta' in the test mode is intentionally set to a transparent black pen
+	// (it is stored in the palette table in ROM that way, and copied directly) so the only way for the magenta entries on the screen
+	// to be correctly displayed is if there is a magenta BG pen to fall through to (or for another palette write to change the palette
+	// that is copied, but this does not appear to be the case).  How the bg pen is set is unknown, it is not a regular palette entry.
+	// The 'bitmap test mode' in jak_car2 requires this to be black instead.
+
+	// jak_s500 briely sets pen 0 of the layer to magenta, but then ends up erasing it
+
+	//const uint16_t bgcol = 0x7c1f; // magenta
+	const uint16_t bgcol = 0x0000; // black
+
+
+	if (m_707f & 0x0010)
+	{
+		m_screen->set_visible_area(0, 640-1, 0, 480-1);
+	}
+	else
+	{
+		m_screen->set_visible_area(0, 320-1, 0, 240-1);
+	}
 
 	for (uint32_t scanline = (uint32_t)cliprect.min_y; scanline <= (uint32_t)cliprect.max_y; scanline++)
 	{
+		uint32_t* bufferline = &m_screenbuf[scanline * m_screen->width()];
+
+		for (int x = 0; x < m_screen->width(); x++)
+		{
+			bufferline[x] = m_rgb555_to_rgb888[bgcol];
+		}
+
 		for (int i = 0; i < 4; i++)
 		{
 			if (1)
 			{
 				draw_page(cliprect, scanline, i, (m_page0_addr_lsb | (m_page0_addr_msb<<16)), m_tmap0_regs, m_tmap0_scroll);
 				draw_page(cliprect, scanline, i, (m_page1_addr_lsb | (m_page1_addr_msb<<16)), m_tmap1_regs, m_tmap1_scroll);
-				draw_page(cliprect, scanline, i, (m_unk_vid1_gfxbase_lsb | (m_unk_vid1_gfxbase_msb<<16)), m_tmap2_regs, m_tmap2_scroll);
-				draw_page(cliprect, scanline, i, (m_unk_vid2_gfxbase_lsb | (m_unk_vid2_gfxbase_msb<<16)), m_tmap3_regs, m_tmap3_scroll);
+				draw_page(cliprect, scanline, i, (m_page2_addr_lsb | (m_page2_addr_msb<<16)), m_tmap2_regs, m_tmap2_scroll);
+				draw_page(cliprect, scanline, i, (m_page3_addr_lsb | (m_page3_addr_msb<<16)), m_tmap3_regs, m_tmap3_scroll);
 
 			}
 			draw_sprites(cliprect, scanline, i);
@@ -939,29 +1028,29 @@ WRITE16_MEMBER(gcm394_base_video_device::tmap2_regs_w)
 	}
 }
 
-READ16_MEMBER(gcm394_base_video_device::unk_vid1_gfxbase_lsb_r)
+READ16_MEMBER(gcm394_base_video_device::tmap2_tilebase_lsb_r)
 {
-	return m_unk_vid1_gfxbase_lsb;
+	return m_page2_addr_lsb;
 }
 
 
-WRITE16_MEMBER(gcm394_base_video_device::unk_vid1_gfxbase_lsb_w)
+WRITE16_MEMBER(gcm394_base_video_device::tmap2_tilebase_lsb_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid1_gfxbase_lsb_w %04x\n", machine().describe_context(), data);
-	m_unk_vid1_gfxbase_lsb = data;
-	LOGMASKED(LOG_GCM394_TMAP, "\t(unk_vid1 tilegfxbase is now %04x%04x)\n", m_unk_vid1_gfxbase_msb, m_unk_vid1_gfxbase_lsb);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::tmap2_tilebase_lsb_w %04x\n", machine().describe_context(), data);
+	m_page2_addr_lsb = data;
+	LOGMASKED(LOG_GCM394_TMAP, "\t(unk_vid1 tilegfxbase is now %04x%04x)\n", m_page2_addr_msb, m_page2_addr_lsb);
 }
 
-READ16_MEMBER(gcm394_base_video_device::unk_vid1_gfxbase_msb_r)
+READ16_MEMBER(gcm394_base_video_device::tmap2_tilebase_msb_r)
 {
-	return m_unk_vid1_gfxbase_msb;
+	return m_page2_addr_msb;
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::unk_vid1_gfxbase_msb_w)
+WRITE16_MEMBER(gcm394_base_video_device::tmap2_tilebase_msb_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid1_gfxbase_msb_w %04x\n", machine().describe_context(), data);
-	m_unk_vid1_gfxbase_msb = data;
-	LOGMASKED(LOG_GCM394_TMAP, "\t(unk_vid1 tilegfxbase is now %04x%04x)\n", m_unk_vid1_gfxbase_msb, m_unk_vid1_gfxbase_lsb);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::tmap2_tilebase_msb_w %04x\n", machine().describe_context(), data);
+	m_page2_addr_msb = data;
+	LOGMASKED(LOG_GCM394_TMAP, "\t(unk_vid1 tilegfxbase is now %04x%04x)\n", m_page2_addr_msb, m_page2_addr_lsb);
 }
 
 // **************************************** unknown video device 2 (another tilemap? roz? lines? zooming sprite layer?) *************************************************
@@ -991,30 +1080,30 @@ WRITE16_MEMBER(gcm394_base_video_device::tmap3_regs_w)
 	}
 }
 
-READ16_MEMBER(gcm394_base_video_device::unk_vid2_gfxbase_lsb_r)
+READ16_MEMBER(gcm394_base_video_device::tmap3_tilebase_lsb_r)
 {
-	return m_unk_vid2_gfxbase_lsb;
+	return m_page3_addr_lsb;
 }
 
 
-WRITE16_MEMBER(gcm394_base_video_device::unk_vid2_gfxbase_lsb_w)
+WRITE16_MEMBER(gcm394_base_video_device::tmap3_tilebase_lsb_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid2_gfxbase_lsb_w %04x\n", machine().describe_context(), data);
-	m_unk_vid2_gfxbase_lsb = data;
-	LOGMASKED(LOG_GCM394_TMAP, "\t(unk_vid2 tilegfxbase is now %04x%04x)\n", m_unk_vid2_gfxbase_msb, m_unk_vid2_gfxbase_lsb);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::tmap3_tilebase_lsb_w %04x\n", machine().describe_context(), data);
+	m_page3_addr_lsb = data;
+	LOGMASKED(LOG_GCM394_TMAP, "\t(unk_vid2 tilegfxbase is now %04x%04x)\n", m_page3_addr_msb, m_page3_addr_lsb);
 }
 
-READ16_MEMBER(gcm394_base_video_device::unk_vid2_gfxbase_msb_r)
+READ16_MEMBER(gcm394_base_video_device::tmap3_tilebase_msb_r)
 {
-	return m_unk_vid2_gfxbase_msb;
+	return m_page3_addr_msb;
 }
 
 
-WRITE16_MEMBER(gcm394_base_video_device::unk_vid2_gfxbase_msb_w)
+WRITE16_MEMBER(gcm394_base_video_device::tmap3_tilebase_msb_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid2_gfxbase_msb_w %04x\n", machine().describe_context(), data);
-	m_unk_vid2_gfxbase_msb = data;
-	LOGMASKED(LOG_GCM394_TMAP, "\t(unk_vid2 tilegfxbase is now %04x%04x)\n", m_unk_vid2_gfxbase_msb, m_unk_vid2_gfxbase_lsb);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::tmap3_tilebase_msb_w %04x\n", machine().describe_context(), data);
+	m_page3_addr_msb = data;
+	LOGMASKED(LOG_GCM394_TMAP, "\t(unk_vid2 tilegfxbase is now %04x%04x)\n", m_page3_addr_msb, m_page3_addr_lsb);
 }
 
 // **************************************** sprite control registers *************************************************
@@ -1097,7 +1186,7 @@ WRITE16_MEMBER(gcm394_base_video_device::video_dma_size_trigger_w)
 
 WRITE16_MEMBER(gcm394_base_video_device::video_dma_unk_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s:gcm394_base_video_device::video_dma_unk_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_dma_unk_w %04x\n", machine().describe_context(), data);
 	m_707e_videodma_bank = data;
 }
 
@@ -1212,7 +1301,11 @@ WRITE16_MEMBER(gcm394_base_video_device::video_7063_videoirq_source_ack_w)
 	}
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::video_702a_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_702a_w %04x\n", machine().describe_context(), data); m_702a = data; }
+WRITE16_MEMBER(gcm394_base_video_device::video_702a_w)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_702a_w %04x\n", machine().describe_context(), data);
+	m_702a = data;
+}
 
 READ16_MEMBER(gcm394_base_video_device::video_curline_r)
 {
@@ -1238,7 +1331,17 @@ WRITE16_MEMBER(gcm394_base_video_device::video_7030_brightness_w)
 	m_7030_brightness = data;
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::video_703c_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703c_w %04x\n", machine().describe_context(), data); m_703c = data; }
+READ16_MEMBER(gcm394_base_video_device::video_703c_tvcontrol1_r)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703c_tvcontrol1_r\n", machine().describe_context());
+	return m_703c_tvcontrol1;
+}
+
+WRITE16_MEMBER(gcm394_base_video_device::video_703c_tvcontrol1_w)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703c_tvcontrol1_w %04x\n", machine().describe_context(), data);
+	m_703c_tvcontrol1 = data;
+}
 
 READ16_MEMBER(gcm394_base_video_device::video_7051_r)
 {
@@ -1334,6 +1437,11 @@ READ16_MEMBER(gcm394_base_video_device::palette_r)
 		offset |= (m_703a_palettebank & 0x000f) << 8;
 		return m_paletteram[offset];
 	}
+}
+
+WRITE16_MEMBER(gcm394_base_video_device::video_701c_w)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_701c_w %04x\n", machine().describe_context(), data);
 }
 
 

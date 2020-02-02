@@ -30,7 +30,7 @@ namespace solver
 
 		matrix_solver_direct_t(netlist_state_t &anetlist, const pstring &name,
 			const analog_net_t::list_t &nets,
-			const solver_parameters_t *params, const std::size_t size);
+			const solver_parameters_t *params, std::size_t size);
 
 		void reset() override { matrix_solver_t::reset(); }
 
@@ -42,8 +42,8 @@ namespace solver
 		static constexpr const std::size_t SIZEABS = plib::parray<FT, SIZE>::SIZEABS();
 		static constexpr const std::size_t m_pitch_ABS = (((SIZEABS + 0) + 7) / 8) * 8;
 
-		unsigned vsolve_non_dynamic(const bool newton_raphson) override;
-		unsigned solve_non_dynamic(const bool newton_raphson);
+		unsigned vsolve_non_dynamic(bool newton_raphson) override;
+		unsigned solve_non_dynamic(bool newton_raphson);
 
 		void LE_solve();
 
@@ -158,7 +158,7 @@ namespace solver
 	}
 
 	template <typename FT, int SIZE>
-	unsigned matrix_solver_direct_t<FT, SIZE>::solve_non_dynamic(const bool newton_raphson)
+	unsigned matrix_solver_direct_t<FT, SIZE>::solve_non_dynamic(bool newton_raphson)
 	{
 		this->LE_solve();
 		this->LE_back_subst(this->m_new_V);
@@ -171,7 +171,7 @@ namespace solver
 	}
 
 	template <typename FT, int SIZE>
-	unsigned matrix_solver_direct_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raphson)
+	unsigned matrix_solver_direct_t<FT, SIZE>::vsolve_non_dynamic(bool newton_raphson)
 	{
 		// populate matrix
 		this->clear_square_mat(m_A);
@@ -184,7 +184,7 @@ namespace solver
 	matrix_solver_direct_t<FT, SIZE>::matrix_solver_direct_t(netlist_state_t &anetlist, const pstring &name,
 		const analog_net_t::list_t &nets,
 		const solver_parameters_t *params,
-		const std::size_t size)
+		std::size_t size)
 	: matrix_solver_ext_t<FT, SIZE>(anetlist, name, nets, params, size)
 	, m_pitch(m_pitch_ABS ? m_pitch_ABS : (((size + 0) + 7) / 8) * 8)
 	, m_A(size, m_pitch)

@@ -49,18 +49,18 @@ public:
 
 	DECLARE_READ16_MEMBER(tmap2_regs_r);
 	DECLARE_WRITE16_MEMBER(tmap2_regs_w);
-	DECLARE_READ16_MEMBER(unk_vid1_gfxbase_lsb_r);
-	DECLARE_READ16_MEMBER(unk_vid1_gfxbase_msb_r);
-	DECLARE_WRITE16_MEMBER(unk_vid1_gfxbase_lsb_w);
-	DECLARE_WRITE16_MEMBER(unk_vid1_gfxbase_msb_w);
+	DECLARE_READ16_MEMBER(tmap2_tilebase_lsb_r);
+	DECLARE_READ16_MEMBER(tmap2_tilebase_msb_r);
+	DECLARE_WRITE16_MEMBER(tmap2_tilebase_lsb_w);
+	DECLARE_WRITE16_MEMBER(tmap2_tilebase_msb_w);
 
 	DECLARE_READ16_MEMBER(tmap3_regs_r);
 	DECLARE_WRITE16_MEMBER(tmap3_regs_w);
-	DECLARE_READ16_MEMBER(unk_vid2_gfxbase_lsb_r);
-	DECLARE_READ16_MEMBER(unk_vid2_gfxbase_msb_r);
-	DECLARE_WRITE16_MEMBER(unk_vid2_gfxbase_lsb_w);
-	DECLARE_WRITE16_MEMBER(unk_vid2_gfxbase_msb_w);
-	
+	DECLARE_READ16_MEMBER(tmap3_tilebase_lsb_r);
+	DECLARE_READ16_MEMBER(tmap3_tilebase_msb_r);
+	DECLARE_WRITE16_MEMBER(tmap3_tilebase_lsb_w);
+	DECLARE_WRITE16_MEMBER(tmap3_tilebase_msb_w);
+
 	DECLARE_READ16_MEMBER(sprite_7022_gfxbase_lsb_r);
 	DECLARE_READ16_MEMBER(sprite_702d_gfxbase_msb_r);
 
@@ -88,7 +88,9 @@ public:
 	DECLARE_READ16_MEMBER(video_7030_brightness_r);
 	DECLARE_WRITE16_MEMBER(video_7030_brightness_w);
 	DECLARE_READ16_MEMBER(video_curline_r);
-	DECLARE_WRITE16_MEMBER(video_703c_w);
+
+	DECLARE_READ16_MEMBER(video_703c_tvcontrol1_r);
+	DECLARE_WRITE16_MEMBER(video_703c_tvcontrol1_w);
 
 	DECLARE_READ16_MEMBER(video_707c_r);
 
@@ -114,6 +116,7 @@ public:
 	DECLARE_READ16_MEMBER(spriteram_r);
 
 	DECLARE_READ16_MEMBER(video_7051_r);
+	DECLARE_WRITE16_MEMBER(video_701c_w);
 
 	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
 
@@ -214,7 +217,7 @@ protected:
 
 	uint16_t m_702a;
 	uint16_t m_7030_brightness;
-	uint16_t m_703c;
+	uint16_t m_703c_tvcontrol1;
 
 	uint16_t m_7042_sprite;
 
@@ -230,10 +233,10 @@ protected:
 
 	uint16_t m_sprite_7022_gfxbase_lsb;
 	uint16_t m_sprite_702d_gfxbase_msb;
-	uint16_t m_unk_vid1_gfxbase_lsb;
-	uint16_t m_unk_vid1_gfxbase_msb;
-	uint16_t m_unk_vid2_gfxbase_lsb;
-	uint16_t m_unk_vid2_gfxbase_msb;
+	uint16_t m_page2_addr_lsb;
+	uint16_t m_page2_addr_msb;
+	uint16_t m_page3_addr_lsb;
+	uint16_t m_page3_addr_msb;
 
 	void unk_vid_regs_w(int which, int offset, uint16_t data);
 
@@ -246,6 +249,9 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	devcb_read16 m_space_read_cb;
+
+	required_shared_ptr<uint16_t> m_rowscroll;
+	required_shared_ptr<uint16_t> m_rowzoom;
 
 	int m_maxgfxelement;
 	void decodegfx(const char* tag);

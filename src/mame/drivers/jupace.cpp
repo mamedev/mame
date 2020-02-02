@@ -790,7 +790,11 @@ void ace_state::ace(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("jupace_cass");
 
-	SNAPSHOT(config, "snapshot", "ace", attotime::from_seconds(1)).set_load_callback(FUNC(ace_state::snapshot_cb));
+	// snapshot
+	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "ace"));
+	snapshot.set_delay(attotime::from_double(1.0));
+	snapshot.set_load_callback(FUNC(ace_state::snapshot_cb));
+	snapshot.set_interface("jupace_snap");
 
 	I8255A(config, m_ppi);
 	m_ppi->in_pb_callback().set(FUNC(ace_state::sby_r));
@@ -811,6 +815,7 @@ void ace_state::ace(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("1K").set_extra_options("16K,32K,48K");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("jupace_cass");
+	SOFTWARE_LIST(config, "snap_list").set_original("jupace_snap");
 }
 
 

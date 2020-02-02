@@ -17261,7 +17261,7 @@
 		</part>
 	</software>
 
-	<software name="pokepika">
+	<software name="pokepika" cloneof="pokeyell">
 		<description>Pocket Monsters - Pikachu (Japan, Rev. 3)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>

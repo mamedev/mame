@@ -49,6 +49,7 @@ public:
 		FLASH_INTEL_TE28F320,
 		FLASH_SHARP_LH28F320BF,
 		FLASH_INTEL_28F320J3D,
+		FLASH_SPANSION_S29GL064S,
 		FLASH_INTEL_28F320J5,
 		FLASH_SST_39VF400A,
 		FLASH_ATMEL_49F4096
@@ -307,6 +308,12 @@ public:
 	intel_te28f320_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class spansion_s29gl064s_device : public intelfsh16_device
+{
+public:
+	spansion_s29gl064s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 class intel_e28f400b_device : public intelfsh16_device
 {
 public:
@@ -376,6 +383,7 @@ DECLARE_DEVICE_TYPE(INTEL_E28F008SA,       intel_e28f008sa_device)
 DECLARE_DEVICE_TYPE(INTEL_TE28F160,        intel_te28f160_device)
 DECLARE_DEVICE_TYPE(SHARP_LH28F160S3,      sharp_lh28f160s3_device)
 DECLARE_DEVICE_TYPE(INTEL_TE28F320,        intel_te28f320_device)
+DECLARE_DEVICE_TYPE(SPANSION_S29GL064S,    spansion_s29gl064s_device)
 DECLARE_DEVICE_TYPE(SHARP_LH28F320BF,      sharp_lh28f320bf_device)
 DECLARE_DEVICE_TYPE(INTEL_28F320J3D,       intel_28f320j3d_device)
 DECLARE_DEVICE_TYPE(INTEL_28F320J5,        intel_28f320j5_device)

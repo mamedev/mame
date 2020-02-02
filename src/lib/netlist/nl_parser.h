@@ -43,9 +43,7 @@ namespace netlist
 
 		void verror(const pstring &msg) override;
 	private:
-
-		nl_fptype eval_param(const token_t &tok);
-
+		pstring stringify_expression(token_t &tok);
 		token_id_t m_tok_paren_left;
 		token_id_t m_tok_paren_right;
 		token_id_t m_tok_comma;

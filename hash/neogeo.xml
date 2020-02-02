@@ -2656,7 +2656,7 @@
 			</dataarea>
 			<dataarea name="sprites" size="0x400000">
 				<rom loadflag="load16_byte" name="048-c1.c1" offset="0x000000" size="0x200000" crc="3fa890e9" sha1="e73d2802bacfbc2b2b16fbbedddde17488e4bbde" />    <!-- mask rom TC5316200 -->
-				<rom loadflag="load16_byte" name="048-c2.c1" offset="0x000001" size="0x200000" crc="59c48ad8" sha1="2630817e735a6d197377558f4324c1442803fe15" />    <!-- mask rom TC5316200 -->
+				<rom loadflag="load16_byte" name="048-c2.c2" offset="0x000001" size="0x200000" crc="59c48ad8" sha1="2630817e735a6d197377558f4324c1442803fe15" />    <!-- mask rom TC5316200 -->
 			</dataarea>
 		</part>
 	</software>

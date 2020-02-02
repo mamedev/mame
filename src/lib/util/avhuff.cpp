@@ -58,14 +58,14 @@
 
 ***************************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "avhuff.h"
 #include "huffman.h"
 #include "chd.h"
 
-#include <math.h>
-#include <stdlib.h>
+#include <cmath>
+#include <cstdlib>
 #include <new>
 
 
@@ -677,18 +677,6 @@ uint16_t *avhuff_encoder::deltarle_encoder::rle_and_histo_bitmap(const uint8_t *
 //**************************************************************************
 //  AVHUFF DECODER
 //**************************************************************************
-
-/**
- * @fn  avhuff_decoder::avhuff_decoder()
- *
- * @brief   -------------------------------------------------
- *            avhuff_decoder - constructor
- *          -------------------------------------------------.
- */
-
-avhuff_decoder::avhuff_decoder()
-{
-}
 
 /**
  * @fn  void avhuff_decoder::configure(const avhuff_decompress_config &config)

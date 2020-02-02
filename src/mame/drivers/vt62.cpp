@@ -8,7 +8,7 @@
 
 #include "emu.h"
 //#include "bus/rs232/rs232.h"
-//#include "cpu/vt61/vt61.h"
+#include "cpu/vt61/vt61.h"
 #include "machine/ay31015.h"
 //#include "sound/spkrdev.h"
 #include "screen.h"
@@ -19,6 +19,7 @@ class vt62_state : public driver_device
 public:
 	vt62_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 		, m_uart(*this, "uart")
 	{
 	}
@@ -31,11 +32,11 @@ protected:
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	//void micro_map(address_map &map);
-	//void memory_map(address_map &map);
-	//void decode_map(address_map &map);
+	void micro_map(address_map &map);
+	void memory_map(address_map &map);
+	void decode_map(address_map &map);
 
-	//required_device<vt61_cpu_device> m_maincpu;
+	required_device<vt61_cpu_device> m_maincpu;
 	required_device<ay31015_device> m_uart;
 	//required_ioport_array<8> m_keys;
 	//required_ioport m_baud_sw;
@@ -50,35 +51,33 @@ u32 vt62_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	return 0;
 }
 
-#ifdef UNUSED_DEFINITION
 void vt62_state::micro_map(address_map &map)
 {
-	map(0x000, 0x3ff).rom().region("crom", 0);
+	map(00000, 01777).rom().region("crom", 0);
 }
 
 void vt62_state::memory_map(address_map &map)
 {
-	map(0x0000, 0x00ff).mirror(0x4f00).ram(); // static RAM A
-	map(0x1000, 0x1fff).mirror(0x4000).ram(); // dynamic RAM B
-	map(0x2000, 0x2fff).mirror(0x4000).ram(); // dynamic RAM C
-	map(0x8000, 0x9fff).mirror(0x6000).rom().region("mrom", 0);
+	map(0000000, 0000377).mirror(0047400).ram(); // static RAM A
+	map(0010000, 0013777).mirror(0040000).ram(); // dynamic RAM B
+	map(0020000, 0023777).mirror(0040000).ram(); // dynamic RAM C
+	map(0100000, 0117777).mirror(0060000).rom().region("mrom", 0);
 }
 
 void vt62_state::decode_map(address_map &map)
 {
-	map(0x00, 0x3f).rom().region("idr", 0);
+	map(000, 077).rom().region("idr", 0);
 }
-#endif
 
 static INPUT_PORTS_START(vt62)
 INPUT_PORTS_END
 
 void vt62_state::vt62(machine_config &mconfig)
 {
-	//VT61_CPU(mconfig, m_maincpu, 15.36_MHz_XTAL);
-	//m_maincpu->set_addrmap(AS_PROGRAM, &vt62_state::micro_map);
-	//m_maincpu->set_addrmap(AS_DATA, &vt62_state::memory_map);
-	//m_maincpu->set_addrmap(vt61_cpu_device::AS_IDR, &vt62_state::decode_map);
+	VT61_CPU(mconfig, m_maincpu, 15.36_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt62_state::micro_map);
+	m_maincpu->set_addrmap(AS_DATA, &vt62_state::memory_map);
+	m_maincpu->set_addrmap(vt61_cpu_device::AS_IDR, &vt62_state::decode_map);
 
 	AY51013(mconfig, m_uart);
 
@@ -104,10 +103,10 @@ ROM_START(vt62)
 	ROM_LOAD("23-195a1_82s23.e13", 0x00, 0x20, CRC(cd8d8020) SHA1(cd10097d7fc62676b62387495615f1e06a689cd3))
 	ROM_LOAD("23-194a1_82s23.e12", 0x20, 0x20, CRC(b05df6b5) SHA1(e13b7b0f75dbbc0d262606280bd5cf8be3561849))
 
-	ROM_REGION(0x20, "alu", 0) // ALU function decode
-	ROM_LOAD("e41", 0x00, 0x20, NO_DUMP)
+	ROM_REGION(0x20, "alu", 0) // ALU function decode (same as VT61)
+	ROM_LOAD("23-114a1.e41", 0x00, 0x20, NO_DUMP)
 
-	ROM_REGION(0x400, "cgrom", 0) // character generators
+	ROM_REGION(0x400, "cgrom", 0) // character generators (same as VT61)
 	ROM_LOAD_NIB_HIGH("23-053a9_82s131.e24", 0x000, 0x100, CRC(9a242be8) SHA1(4c619b6c0cfdda4af097b5702e45fad78ed6d601))
 	ROM_CONTINUE(                            0x300, 0x100)
 	ROM_LOAD_NIB_LOW( "23-052a9_82s131.e23", 0x000, 0x100, CRC(6c09ac7b) SHA1(e50060489500b1ca1b89530209c59e610c605c3d))

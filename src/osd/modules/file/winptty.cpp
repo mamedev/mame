@@ -10,7 +10,7 @@
 #include <cassert>
 
 #include <windows.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 
 namespace {
@@ -100,7 +100,7 @@ osd_file::error win_open_ptty(std::string const &path, std::uint32_t openflags, 
 	else
 	{
 		DWORD state = PIPE_NOWAIT;
-		SetNamedPipeHandleState(pipe, &state, NULL, NULL);
+		SetNamedPipeHandleState(pipe, &state, nullptr, nullptr);
 	}
 
 	try

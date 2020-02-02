@@ -20,7 +20,7 @@
 #include "debugvw.h"
 #include "natkeyboard.h"
 #include "render.h"
-#include <ctype.h>
+#include <cctype>
 #include <algorithm>
 #include <fstream>
 
@@ -3119,7 +3119,7 @@ void debugger_commands::execute_snap(int ref, const std::vector<std::string> &pa
 		if (fname.find(".png") == -1)
 			fname.append(".png");
 		emu_file file(m_machine.options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		osd_file::error filerr = file.open(fname.c_str());
+		osd_file::error filerr = file.open(fname);
 
 		if (filerr != osd_file::error::NONE)
 		{
