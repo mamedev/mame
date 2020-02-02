@@ -9,10 +9,10 @@ Notes:
 
 - The games don't cope well with corrupt NVRAM, and may fail to boot completely(!)
 
-- The code to handle the 'multple' reel layers is dubious.  rowscroll values are always used
+- The code to handle the 'multple' reel layers is dubious. Rowscroll values are always used
   based on only one of the tilemaps displayed in that screen region.
 
-- There are still priority bugs in Tiger Hook, I thuoght I'd fixed these by doing the single
+- There are still priority bugs in Tiger Hook, I thought I'd fixed these by doing the single
   pass rendering of the reels, but they seem to have been reintroduced somehow, needs further
   investigation
 
@@ -31,7 +31,7 @@ Notes on version letters:
 
 E  = Export (It displays a "Outside USA use only" message)
 R  = ?? (In some games, it displays value of winning combinations, see e.g. fb4 Ver. R vs. Ver. LT)
-LT = ?? (It displays a "PT/TKT" message, so maybe it has a minimum amount of poits
+LT = ?? (It displays a "PT/TKT" message, so maybe it has a minimum amount of points
      needed to get a ticket)
 XT = Texas XT / Arkansas / Iowa
 N  = ??
@@ -87,7 +87,7 @@ In a couple of cases, due to too many older revisions, I used: parent + version 
 Graphics: HM86171
      OSC: 25.000MHz, 12.000MHz & 4.9152MHz
    Sound: OKI M6295
-   Other: XILINX XC9536XL (used for programable protection, connected to H2)
+   Other: XILINX XC9536XL (used for programmable protection, connected to H2)
 
 HM86171-120 - HMC 28 pin DIP Color Palette RAMDAC
  FM1608-120 - RAMTRON 64Kb bytewide Ferroelectric Nonvolatile RAM
@@ -237,7 +237,7 @@ Model No. VCG-1 SALTIRE
 Graphics: HM86171
      OSC: 25.000MHz, 12.000MHz & 4.9152MHz
    Sound: OKI M6295
-   Other: XILINX XC9536XL (used for programable protection, connected to H2)
+   Other: XILINX XC9536XL (used for programmable protection, connected to H2)
 
 HM86171-120 - HMC 28 pin DIP Color Palette RAMDAC
  FM1608-120 - RAMTRON 64Kb bytewide Ferroelectric Nonvolatile RAM
@@ -259,7 +259,7 @@ ROM  2 is a AMIC 290021T
 
 MH86171 Color Palette RAMDAC
  Hardware & software compatible with VGA, MCGA & 8514/A graphics
- Compatible with the RS170 video stadard
+ Compatible with the RS170 video standard
  Single monolithic, high performance CMOS
  Pixel rates up to 50MHz
  256K possible colors
@@ -421,6 +421,7 @@ public:
 	void init_tighookv();
 	void init_robadv();
 	void init_pirpok2d();
+	void init_mcircus();
 
 private:
 	DECLARE_WRITE8_MEMBER(sfbonus_videoram_w);
@@ -826,7 +827,7 @@ TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_reel_tile_info)
 
 	SET_TILE_INFO_MEMBER(1,
 			code,
-			priority,  // colour aboused as priority
+			priority,  // colour abused as priority
 			TILE_FLIPYX(flipx | flipy));
 }
 
@@ -1398,7 +1399,7 @@ void sfbonus_state::sfbonus(machine_config &config)
 	screen.set_screen_update(FUNC(sfbonus_state::screen_update_sfbonus));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_entries(0x100*2); // *2 for priority workaraound / custom drawing
+	PALETTE(config, m_palette).set_entries(0x100*2); // *2 for priority workaround / custom drawing
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &sfbonus_state::ramdac_map);
@@ -5718,6 +5719,26 @@ ROM_START( getrich )
 ROM_END
 
 
+ROM_START( mcircus )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "rom1.bin", 0x00000, 0x80000, CRC(bba311c5) SHA1(1571bc2842c07b169b009a374402ee01a61f98e7) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "rom2.bin", 0x00000, 0x40000, CRC(7087f791) SHA1(cb39a0f8ab134c41f318cd2ad029ea149c2ad7a7) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "rom3.bin", 0x00000, 0x80000, CRC(89fbb1f1) SHA1(281fffe16cba23515fa085b0960dbea83c04bb51) )
+	ROM_LOAD16_BYTE( "rom4.bin", 0x00001, 0x80000, CRC(322c322e) SHA1(762b38b4d6e4abd194d5fdfb75ce81cf13a1a4de) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "rom5.bin", 0x00000, 0x80000, CRC(b83c7020) SHA1(a7fb01c8722c59162774f1e796f8bcfc0a2ad677) )
+	ROM_LOAD16_BYTE( "rom6.bin", 0x00001, 0x80000, CRC(aa5328ba) SHA1(2c371ccad65f4205bdb20ca90f3c194982f401c6) )
+
+	ROM_REGION( 0x1000, "nvram", 0 ) /* default settings */
+	ROM_LOAD( "mcircus.id", 0x0000, 0x1000, CRC(b882f282) SHA1(220377a57ee008d26708e86d435e0e942ae01771) )
+ROM_END
+
+
 /* Not working sets (due to incomplete dumps) */
 
 ROM_START( version4 )
@@ -6046,6 +6067,7 @@ void sfbonus_state::init_spooky()           { sfbonus_bitswap( 0x39, 1,2,7,6,5,4
 void sfbonus_state::init_fbdeluxe()         { sfbonus_bitswap( 0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x21, 1,0,2,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 1,0,7,6,5,4,3,2, 0xec, 1,7,6,5,4,3,2,0, 0x26, 0,2,1,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
 void sfbonus_state::init_fb3g()             { sfbonus_bitswap( 0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x25, 1,0,2,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 1,0,7,6,5,4,3,2, 0xec, 1,7,6,5,4,3,2,0, 0x24, 0,2,1,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
 void sfbonus_state::init_getrich()          { sfbonus_bitswap( 0x3c, 1,2,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x23, 1,0,2,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 1,0,7,6,5,4,3,2, 0xec, 1,7,6,5,4,3,2,0, 0x24, 0,2,1,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
+void sfbonus_state::init_mcircus()          { sfbonus_bitswap( 0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x21, 1,0,2,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 1,0,7,6,5,4,3,2, 0xe9, 1,7,6,5,4,3,2,0, 0x23, 0,2,1,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
 
 
 GAME( 2002, suprball,    0,        sfbonus, amcoe2_reels3, sfbonus_state, init_suprball,        ROT0,  "Amcoe", "Super Ball (Version 1.3)", 0)
@@ -6314,6 +6336,7 @@ GAME( 200?, fb3g,        0,        sfbonus, newer1_reels3, sfbonus_state, init_f
 
 GAME( 200?, getrich,     0,        sfbonus, newer1_reels3, sfbonus_state, init_getrich,         ROT0,  "Amcoe", "Get Rich (Version 1.0.1)", 0)
 
+GAME( 2009, mcircus,     0,        sfbonus, amcoe1_reels3, sfbonus_state, init_mcircus,         ROT0,  "Amcoe", "Merry Circus (Version 1.0.2)", 0)
 
 // no graphic / sound roms dumped for these sets, but functional program roms & descramble are in place
 /* Version 4 is a multi-game that has New Fruit Bonus ?96 Special Edition Ver. 4, New Cherry ?96 Special Edition Ver. 4 or Skill Cherry ?97 Ver. 4 */
@@ -6326,7 +6349,6 @@ GAME( 2006, version4v3,  version4, sfbonus, amcoe1_reels3, sfbonus_state, init_v
 GAME( 2006, version4o,   version4, sfbonus, amcoe1_reels3, sfbonus_state, init_version4,        ROT0,  "Amcoe", "Version 4 (Version 4.2R CGA)", MACHINE_NOT_WORKING)
 
 // Known sets but no roms dumped at all for these:
-// Merry Circus
 // Devil Island - 14 Liner version
 
 // ?? what is this
