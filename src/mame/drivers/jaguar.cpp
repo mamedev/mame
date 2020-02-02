@@ -299,7 +299,7 @@ Notes:
     ------------------------------------------------------------
 
   Jaguar console schematics include a ADC0844 at U16, selected by GPIOL5. This IC
-  is not populated.
+  may or may not be populated.
 
   Jaguar System Notes:
 
