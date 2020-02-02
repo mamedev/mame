@@ -91,6 +91,8 @@ nl_convert_base_t::nl_convert_base_t()
 		{ "CCCS", {"OP", "ON", "IP", "IN"} },
 		{ "CCVS", {"OP", "ON", "IP", "IN"} },
 		{ "VS", {"1", "2"} },
+		{ "TTL_INPUT", {"Q", "VCC", "GND"} },
+		{ "DIODE", {"A", "K"} },
 	};
 }
 
@@ -138,6 +140,10 @@ void nl_convert_base_t::add_device(const pstring &atype, const pstring &aname)
 
 void nl_convert_base_t::add_term(const pstring &netname, const pstring &termname)
 {
+	// Ignore NC nets!
+	if (plib::startsWith(netname,"NC_"))
+		return;
+
 	net_t * net = nullptr;
 	auto idx = m_nets.find(netname);
 	if (idx != m_nets.end())
@@ -254,7 +260,7 @@ void nl_convert_base_t::dump_nl()
 	for (auto & i : m_nets)
 	{
 		net_t * net = i.second.get();
-		if (!net->is_no_export())
+		if (!net->is_no_export() && !(net->terminals().size() == 1 && net->terminals()[0] == "GND" ))
 		{
 			out("NET_C({}", net->terminals()[0].c_str() );
 			for (std::size_t j=1; j<net->terminals().size(); j++)
@@ -276,8 +282,16 @@ pstring nl_convert_base_t::get_nl_val(double val)
 	for (auto &e : m_units)
 	{
 		if (e.m_mult <= plib::abs(val))
-			return plib::pfmt(e.m_func)(val / e.m_mult);
+		{
+			double v = val / e.m_mult;
+			if (plib::abs(v - std::round(v)) <= 1e-6)
+				return plib::pfmt(e.m_func)(static_cast<int>(std::round(v)));
+			return plib::pfmt(e.m_func)(v);
+		}
 	}
+
+	if (plib::abs(val - std::round(val)) <= 1e-6)
+		return plib::pfmt("{1}")(static_cast<int>(std::round(val)));
 	return plib::pfmt("{1}")(val);
 }
 
@@ -334,6 +348,7 @@ void nl_convert_spice_t::convert(const pstring &contents)
 	// FIXME: Parameter
 	out("NETLIST_START(dummy)\n");
 	add_term("0", "GND");
+	add_term("GND", "GND"); // For Kicad
 
 	pstring line = "";
 
@@ -411,6 +426,10 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				else if (tt[0] == ".MODEL")
 				{
 					out("NET_MODEL(\"{} {}\")\n", m_subckt + tt[1], rem(tt,2));
+				}
+				else if (tt[0] == ".TITLE" && tt[1] == "KICAD")
+				{
+					m_is_kicad = true;
 				}
 				else
 					out("// {}\n", line.c_str());
@@ -572,16 +591,6 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				add_term(tt[1], tt[0] + ".1");
 				add_term(tt[2], tt[0] + ".2");
 				break;
-#if 0
-			// This is wrong ... Need to use something else for inputs!
-			case 'I': // Input pin special notation
-				{
-					val = get_sp_val(tt[2]);
-					add_device("ANALOG_INPUT", tt[0], val);
-					add_term(tt[1], tt[0] + ".Q");
-				}
-				break;
-#else
 			case 'I':
 				{
 					val = get_sp_val(tt[3] == "DC" ? tt[4] : tt[3]);
@@ -590,13 +599,12 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					add_term(tt[2], tt[0] + ".2");
 				}
 				break;
-#endif
 			case 'D':
 				add_device("DIODE", tt[0], m_subckt + tt[3]);
 				// Spice D Anode Kathode model
-				// FIXME ==> does Kicad use different notation from LTSPICE ?
-				add_term(tt[1], tt[0] + ".A");
-				add_term(tt[2], tt[0] + ".K");
+				// Kicad outputs K first and D as second net
+				add_term(tt[1], tt[0], is_kicad() ? 1 : 0);
+				add_term(tt[2], tt[0], is_kicad() ? 0 : 1);
 				break;
 			case 'U':
 			case 'X':
@@ -606,13 +614,42 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				// FIXME: Parameter
 
 				pstring xname = plib::replace_all(tt[0], pstring("."), pstring("_"));
-				pstring tname = "TTL_" + tt[tt.size()-1] + "_DIP";
+				pstring modname = tt[tt.size()-1];
+				pstring tname = modname;
+				if (plib::startsWith(modname, "7"))
+					tname = "TTL_" + modname + "_DIP";
+				else if (plib::startsWith(modname, "4"))
+					tname = "CD" + modname + "_DIP";
+
 				add_device(tname, xname);
 				for (std::size_t i=1; i < tt.size() - 1; i++)
 				{
-					pstring term = plib::pfmt("{1}.{2}")(xname)(i);
+					pstring term = plib::pfmt("X{1}.{2}")(xname)(i);
 					add_term(tt[i], term);
 				}
+				break;
+			}
+			case 'Y':
+			{
+				auto st=tt[0].substr(0,3);
+				if (st == "YT_")
+				{
+					auto yname=pstring("I_") + tt[0].substr(3);
+					val = get_sp_val(tt[4]);
+					add_device("TTL_INPUT", yname, val);
+					add_term(tt[1], yname, 0);
+					add_term(tt[2], yname, 1);
+					add_term(tt[3], yname, 2);
+				}
+				else if (st == "YA_")
+				{
+					auto yname=pstring("I_") + tt[0].substr(3);
+					val = get_sp_val(tt[2]);
+					add_device("ANALOG_INPUT", yname, val);
+					add_term(tt[1], yname + ".Q");
+				}
+				else
+					out("// IGNORED {}: {}\n", tt[0].c_str(), line.c_str());
 				break;
 			}
 			default:

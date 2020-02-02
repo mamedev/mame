@@ -155,9 +155,6 @@ private:
 		pstring m_alias;
 	};
 
-
-private:
-
 	void add_device(plib::unique_ptr<dev_t> dev);
 	dev_t *get_device(const pstring &name)
 	{
@@ -185,16 +182,18 @@ class nl_convert_spice_t : public nl_convert_base_t
 {
 public:
 
-	nl_convert_spice_t() = default;
+	nl_convert_spice_t() : m_is_kicad(false) { }
 
 	void convert(const pstring &contents) override;
 
 protected:
 
+	bool is_kicad() const { return m_is_kicad; }
 	void process_line(const pstring &line);
 
 private:
 	pstring m_subckt;
+	bool m_is_kicad;
 };
 
 class nl_convert_eagle_t : public nl_convert_base_t
