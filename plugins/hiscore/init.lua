@@ -1,4 +1,4 @@
-s-- hiscore.lua
+-- hiscore.lua
 -- by borgar@borgar.net & eadmaster, WTFPL license
 --
 -- This uses MAME's built-in Lua scripting to implment
@@ -47,6 +47,7 @@ function hiscore.startplugin()
 		local _conf = {}
 		for line in io.lines(config_path) do
 		  token, spaces, value = string.match(line, '([^ ]+)([ ]+)([^ ]+)');
+		  token, value = string.match(line, '([^ ]+) +([^ ]+)');
 		  if token ~= nil and token ~= '' then
 			_conf[token] = value;
 		  end
