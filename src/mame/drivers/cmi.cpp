@@ -11,9 +11,8 @@
         * CMI IIx
 
     To do:
-
-    * MASTER 'TIM' test fails
-    * LGTST  'TIM' test is out of tolerance without 6840 hack.
+    * V12 system software reports that it can't load MIDI support and then hangs.
+    * V19 system software simply hangs.
 
     Information from:
 
@@ -84,11 +83,14 @@
 #include "machine/cmi_ankbd.h"
 #include "machine/cmi_mkbd.h"
 
+#include "bus/midi/midi.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
 
 #include "imagedev/floppy.h"
 #include "machine/6821pia.h"
+#include "machine/6850acia.h"
 #include "machine/6840ptm.h"
 #include "machine/7474.h"
 #include "machine/clock.h"
@@ -105,7 +107,8 @@
 #define VERBOSE		(0)
 #include "logmacro.h"
 
-#define Q209_CPU_CLOCK      40.21_MHz_XTAL / 40 // divider not verified (very complex circuit)
+#define Q209_CPU_CLOCK          (40.21_MHz_XTAL / 40) // verified by manual
+#define SYSTEM_CAS_CLOCK		(40.21_MHz_XTAL / 20) // likewise
 
 #define M6809_CLOCK             8000000 // wrong
 #define MASTER_OSCILLATOR       34.291712_MHz_XTAL
@@ -211,6 +214,10 @@ public:
 		, m_cmi02_pia(*this, "cmi02_pia_%u", 1U)
 		, m_cmi02_ptm(*this, "cmi02_ptm")
 		, m_cmi07_ptm(*this, "cmi07_ptm")
+		, m_midi_ptm(*this, "midi_ptm_%u", 1U)
+		, m_midi_acia(*this, "midi_acia_%u", 1U)
+		, m_midi_out(*this, "midi_out_%u", 1U)
+		, m_midi_in(*this, "midi_in_%u", 1U)
 		, m_qfc9_region(*this, "qfc9")
 		, m_floppy0(*this, "wd1791:0")
 		, m_floppy1(*this, "wd1791:1")
@@ -270,6 +277,8 @@ public:
 	DECLARE_WRITE8_MEMBER( video_attr_w );
 	DECLARE_READ8_MEMBER( vram_r );
 	DECLARE_WRITE8_MEMBER( vram_w );
+	DECLARE_READ8_MEMBER( tvt_r );
+	DECLARE_WRITE8_MEMBER( tvt_w );
 	DECLARE_WRITE_LINE_MEMBER( pia_q219_irqa );
 	DECLARE_WRITE_LINE_MEMBER( pia_q219_irqb );
 	DECLARE_WRITE_LINE_MEMBER( ptm_q219_irq );
@@ -291,6 +300,10 @@ public:
 	// MIDI/SMPTE
 	DECLARE_WRITE16_MEMBER( midi_dma_w );
 	DECLARE_READ16_MEMBER( midi_dma_r );
+	DECLARE_WRITE_LINE_MEMBER( midi_ptm0_c3_w );
+	DECLARE_WRITE_LINE_MEMBER( midi_ptm_irq );
+	DECLARE_WRITE_LINE_MEMBER( midi_acia_irq );
+	DECLARE_WRITE8_MEMBER( midi_latch_w );
 
 	// Floppy
 	DECLARE_WRITE8_MEMBER( fdc_w );
@@ -301,6 +314,7 @@ public:
 	// Master card
 	DECLARE_READ8_MEMBER( cmi02_r );
 	DECLARE_WRITE8_MEMBER( cmi02_w );
+	DECLARE_WRITE8_MEMBER( cmi02_chsel_w );
 	DECLARE_WRITE8_MEMBER( master_tune_w );
 	DECLARE_WRITE_LINE_MEMBER( cmi02_ptm_irq );
 	DECLARE_WRITE_LINE_MEMBER( cmi02_ptm_o2 );
@@ -346,6 +360,11 @@ protected:
 	required_device<ptm6840_device> m_cmi02_ptm;
 
 	required_device<ptm6840_device> m_cmi07_ptm;
+
+	required_device_array<ptm6840_device, 2> m_midi_ptm;
+	required_device_array<acia6850_device, 4> m_midi_acia;
+	required_device_array<midi_port_device, 4> m_midi_out;
+	required_device_array<midi_port_device, 3> m_midi_in;
 
 	required_memory_region m_qfc9_region;
 	required_device<floppy_connector> m_floppy0;
@@ -403,7 +422,6 @@ private:
 	std::unique_ptr<uint8_t[]>    m_q256_ram[2];
 	uint8_t   m_ram_indices[2][PAGE_COUNT];
 	uint8_t   m_map_ram_latch;
-	bool	m_cpu_irq_state[2];
 	int     m_cpu_active_space[2]; // TODO: Make one register
 	int     m_cpu_map_switch[2];
 	uint8_t m_irq_address[2][2];
@@ -433,6 +451,7 @@ private:
 
 	// Master card (CMI-02)
 	int     m_cmi02_ptm_irq;
+	uint8_t m_cmi02_pia_chsel;
 };
 
 /**************************************
@@ -555,7 +574,7 @@ void cmi_state::video_write(int offset)
 		case 0x9: update_video_pos(-1,  1, 0); break;
 		case 0xa: update_video_pos(-1, -1, 0); break;
 		case 0xb: update_video_pos(-1,  0, 1); break;
-//      default: printf("Video Write %x %x\n", offset, m_video_data);
+//      default: osd_printf_debug("Video Write %x %x\n", offset, m_video_data);
 	}
 }
 
@@ -603,6 +622,19 @@ WRITE8_MEMBER( cmi_state::video_attr_w )
 WRITE8_MEMBER( cmi_state::vram_w )
 {
 	m_video_ram[offset] = data;
+}
+
+WRITE8_MEMBER( cmi_state::tvt_w )
+{
+	if ((data >= 0x20 && data <= 0x7e) || data == 0x0a || data == 0x0d)
+	{
+		osd_printf_debug("%c", data);
+	}
+}
+
+READ8_MEMBER( cmi_state::tvt_r )
+{
+	return 0;
 }
 
 READ8_MEMBER( cmi_state::vram_r )
@@ -717,7 +749,7 @@ void cmi_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 READ8_MEMBER( cmi_state::atomic_r )
 {
 	// TODO
-	//printf("atomic access\n");
+	//osd_printf_debug("atomic access\n");
 	return 0;
 }
 
@@ -732,7 +764,7 @@ WRITE8_MEMBER( cmi_state::cpufunc_w )
 		case 0: set_interrupt(cpunum, IRQ_IPI2_LEVEL, bit ? ASSERT_LINE : CLEAR_LINE);
 				break;
 		case 2: // TODO: Hardware trace
-				printf("TODO: Hardware trace %02x\n", data);
+				osd_printf_debug("TODO: Hardware trace %02x\n", data);
 				break;
 		case 4: m_cpu_map_switch[cpunum] = bit;
 				break;
@@ -789,6 +821,53 @@ READ16_MEMBER( cmi_state::midi_dma_r )
 	return cmi_space->read_word(offset * 2);
 }
 
+WRITE_LINE_MEMBER( cmi_state::midi_ptm0_c3_w )
+{
+	m_midi_ptm[1]->set_clock(0, state);
+	m_midi_ptm[1]->set_clock(1, state);
+	m_midi_ptm[1]->set_clock(2, state);
+}
+
+WRITE_LINE_MEMBER( cmi_state::midi_ptm_irq )
+{
+	m_midicpu->set_input_line(M68K_IRQ_2, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER( cmi_state::midi_acia_irq )
+{
+	m_midicpu->set_input_line(M68K_IRQ_3, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE8_MEMBER( cmi_state::midi_latch_w )
+{
+	const uint8_t bit_offset = data & 0x7;
+	const uint8_t bit_value = BIT(data, 3);
+	switch (bit_offset)
+	{
+	case 0x00: // /INT1
+		LOG("%s: %sing INT1 line on SMIDI card\n", machine().describe_context(), bit_value ? "Clear" : "Sett");
+		break;
+	case 0x02: // SMIDINT L0
+		LOG("%s: %sing SMIDI to CMI interrupt P1 level 0\n", machine().describe_context(), bit_value ? "Sett" : "Clear");
+		break;
+	case 0x03: // /INT7
+		LOG("%s: %sing INT7 line on SMIDI card\n", machine().describe_context(), bit_value ? "Clear" : "Sett");
+		break;
+	case 0x04: // SMIDINT L3
+		LOG("%s: %sing SMIDI to CMI interrupt P1 level 3\n", machine().describe_context(), bit_value ? "Sett" : "Clear");
+		break;
+	case 0x05: // /HALT
+		LOG("%s: %sing HALT line on SMIDI card\n", machine().describe_context(), bit_value ? "Clear" : "Sett");
+		break;
+	case 0x06: // SYNCSW
+		LOG("%s: %sing SYNCSW line on SMIDI card\n", machine().describe_context(), bit_value ? "Sett" : "Clear");
+		break;
+	case 0x07: // /RESET
+		LOG("%s: %sing RESET line on SMIDI card\n", machine().describe_context(), bit_value ? "Clear" : "Sett");
+		break;
+	}
+}
+
 /* The maps are dynamically populated */
 void cmi_state::maincpu1_map(address_map &map)
 {
@@ -804,9 +883,13 @@ void cmi_state::midicpu_map(address_map &map)
 {
 	map(0x000000, 0x003fff).rom();
 	map(0x040000, 0x05ffff).rw(FUNC(cmi_state::midi_dma_r), FUNC(cmi_state::midi_dma_w));
-//  map(0x060000, 0x06001f) TIMERS
-//  map(0x060050, 0x06005f) ACIA
-//  map(0x060070, 0x06007f) SMPTE
+	map(0x060000, 0x06000f).rw(m_midi_ptm[0], FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0xff00);
+	map(0x060010, 0x06001f).rw(m_midi_ptm[1], FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0xff00);
+	map(0x060020, 0x06005f).rw(m_midi_acia[0], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+	map(0x060030, 0x06003f).rw(m_midi_acia[1], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+	map(0x060040, 0x06004f).rw(m_midi_acia[2], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+	map(0x060050, 0x06005f).rw(m_midi_acia[3], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+	//map(0x060060, 0x06007f) SMPTE
 	map(0x080000, 0x083fff).ram();
 }
 
@@ -935,6 +1018,8 @@ void cmi_state::update_address_space(int cpunum, uint8_t mapinfo)
 
 WRITE8_MEMBER( cmi_state::cmi07_w )
 {
+	LOG("%s: cmi07_w: %02x\n", machine().describe_context(), data);
+
 	m_cmi07_ctrl = data;
 
 	m_cmi07cpu->set_input_line(INPUT_LINE_RESET, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
@@ -952,7 +1037,7 @@ WRITE8_MEMBER( cmi_state::cmi07_w )
 
 READ8_MEMBER( cmi_state::cmi07_r )
 {
-	//printf("CMI 07 R: %x\n", offset);
+	LOG("%s: cmi07_r: %02x\n", machine().describe_context(), 0xff);
 	return 0xff;
 }
 
@@ -996,7 +1081,7 @@ void cmi_state::dma_fdc_rom()
 
 	if ((p_info & 0x80) == 0)
 	{
-		printf("Trying to DMA FDC driver to a non-enabled page!\n");
+		osd_printf_debug("Trying to DMA FDC driver to a non-enabled page!\n");
 		return;
 	}
 
@@ -1045,7 +1130,7 @@ WRITE8_MEMBER( cmi_state::fdc_w )
 			case 0xd: m_wd1791->track_w(data ^ 0xff);      break;
 			case 0xe: m_wd1791->sector_w(data ^ 0xff);     break;
 			case 0xf: m_wd1791->data_w(data ^ 0xff);       break;
-			default: printf("fdc_w: Invalid access (%x with %x)", m_fdc_addr, data);
+			default: osd_printf_debug("fdc_w: Invalid access (%x with %x)", m_fdc_addr, data);
 		}
 	}
 	else
@@ -1188,6 +1273,11 @@ WRITE8_MEMBER( cmi_state::master_tune_w )
 //  double mfreq = (double)data * ((double)MASTER_OSCILLATOR / 2.0) / 256.0;
 }
 
+WRITE8_MEMBER( cmi_state::cmi02_chsel_w )
+{
+	m_cmi02_pia_chsel = data;
+}
+
 WRITE_LINE_MEMBER( cmi_state::cmi02_ptm_irq )
 {
 	LOG("%s: cmi02_ptm_irq: %d\n", machine().describe_context(), state);
@@ -1227,7 +1317,7 @@ READ8_MEMBER( cmi_state::cmi02_r )
 
 	if (offset <= 0x1f)
 	{
-		int ch_mask = m_cmi02_pia[0]->a_output();
+		int ch_mask = m_cmi02_pia_chsel;
 
 		for (int i = 0; i < 8; ++i)
 		{
@@ -1274,7 +1364,7 @@ WRITE8_MEMBER( cmi_state::cmi02_w )
 {
 	if (offset <= 0x1f)
 	{
-		int ch_mask = m_cmi02_pia[0]->a_output();
+		int ch_mask = m_cmi02_pia_chsel;
 
 		for (int i = 0; i < 8; ++i)
 		{
@@ -1378,6 +1468,7 @@ READ8_MEMBER( cmi_state::shared_ram_r )
 
 WRITE8_MEMBER( cmi_state::shared_ram_w )
 {
+	//logerror("shared_ram_w: %04x = %02x\n", 0xfe00 + offset, data);
 	m_shared_ram[offset] = data;
 }
 
@@ -1408,6 +1499,8 @@ void cmi_state::install_peripherals(int cpunum)
 	space->install_readwrite_handler(0xfc8c, 0xfc8f, read8sm_delegate(*m_q133_acia[3], FUNC(mos6551_device::read)), write8sm_delegate(*m_q133_acia[3], FUNC(mos6551_device::write)));
 	space->install_readwrite_handler(0xfc90, 0xfc97, read8sm_delegate(*m_q133_ptm, FUNC(ptm6840_device::read)), write8sm_delegate(*m_q133_ptm, FUNC(ptm6840_device::write)));
 
+	space->install_write_handler(0xfca0, 0xfca0, write8_delegate(*this, FUNC(cmi_state::midi_latch_w)));
+
 	space->install_readwrite_handler(0xfcbc, 0xfcbc, read8_delegate(*this, FUNC(cmi_state::cmi07_r)), write8_delegate(*this, FUNC(cmi_state::cmi07_w)));
 
 	space->install_read_handler(0xfcc0, 0xfcc3, read8_delegate(*this, FUNC(cmi_state::lightpen_r)));
@@ -1434,6 +1527,7 @@ void cmi_state::install_peripherals(int cpunum)
 	}
 	else
 	{
+		space->install_readwrite_handler(0xd000, 0xdfff, read8_delegate(*this, FUNC(cmi_state::tvt_r)), write8_delegate(*this, FUNC(cmi_state::tvt_w)));
 		space->install_readwrite_handler(0xfff8, 0xfff9, read8_delegate(*this, FUNC(cmi_state::irq_ram_r<0>)), write8_delegate(*this, FUNC(cmi_state::irq_ram_w<0>)));
 		space->install_read_handler(0xfffe, 0xffff, read8_delegate(*this, FUNC(cmi_state::vector_r<0>)));
 	}
@@ -1459,9 +1553,6 @@ IRQ_CALLBACK_MEMBER( cmi_state::cpu1_interrupt_callback )
 
 	if (irqline == INPUT_LINE_IRQ0)
 	{
-		//if (!m_cpu_irq_state[CPU_1])
-			//m_maincpu1->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-
 		int vector = (m_hp_int ? 0xffe0 : 0xffd0);
 		int level = (m_hp_int ? m_i8214[2]->a_r() : m_i8214[0]->a_r()) ^ 7;
 		m_irq_address[CPU_1][0] = m_cpu1space->read_byte(vector + level*2);
@@ -1483,16 +1574,13 @@ IRQ_CALLBACK_MEMBER( cmi_state::cpu2_interrupt_callback )
 
 	if (irqline == INPUT_LINE_IRQ0)
 	{
-		//if (!m_cpu_irq_state[CPU_2])
-			//m_maincpu2->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-
 		int level = m_i8214[1]->a_r() ^ 7;
 		m_irq_address[CPU_2][0] = m_cpu2space->read_byte(0xffe0 + level*2);
 		m_irq_address[CPU_2][1] = m_cpu2space->read_byte(0xffe0 + level*2 + 1);
 
 		m_m6809_bs_hack_cnt[CPU_2] = 2;
 
-		//printf("cpu1 interrupt, will be pushing address %02x%02x\n", m_irq_address[CPU_2][0], m_irq_address[CPU_2][1]);
+		//osd_printf_debug("cpu1 interrupt, will be pushing address %02x%02x\n", m_irq_address[CPU_2][0], m_irq_address[CPU_2][1]);
 	}
 	return 0;
 }
@@ -1525,9 +1613,7 @@ void cmi_state::set_interrupt(int cpunum, int level, int state)
 WRITE_LINE_MEMBER( cmi_state::maincpu1_irq_w )
 {
 	LOG("%s: maincpu1_irq_w: %d\n", machine().describe_context(), state);
-	//if (state)
-		m_maincpu1->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-	//m_cpu_irq_state[CPU_1] = state;
+	m_maincpu1->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( cmi_state::maincpu2_irq0_w )
@@ -1551,7 +1637,6 @@ WRITE_LINE_MEMBER( cmi_state::i8214_2_int_w )
 	LOG("%s: i8214_2_int_w: %d\n", machine().describe_context(), state);
 	if (state)
 		m_maincpu2->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-	m_cpu_irq_state[CPU_2] = state;
 }
 
 WRITE_LINE_MEMBER( cmi_state::i8214_3_int_w )
@@ -1797,7 +1882,7 @@ void cmi_state::cmi2x(machine_config &config)
 
 	PIA6821(config, m_q133_pia[1]); // pia_q133_2_config
 
-	PTM6840(config, m_q133_ptm, 2000000); // ptm_q133_config
+	PTM6840(config, m_q133_ptm, SYSTEM_CAS_CLOCK); // ptm_q133_config, clock likely not accurate
 	m_q133_ptm->set_external_clocks(1024, 1, 111); // Third is todo
 	m_q133_ptm->irq_callback().set(FUNC(cmi_state::q133_ptm_irq_w));
 
@@ -1808,11 +1893,12 @@ void cmi_state::cmi2x(machine_config &config)
 	m_q219_pia->irqa_handler().set(FUNC(cmi_state::pia_q219_irqa));
 	m_q219_pia->irqb_handler().set(FUNC(cmi_state::pia_q219_irqb));
 
-	PTM6840(config, m_q219_ptm, 2000000); // ptm_q219_config
-	m_q219_ptm->set_external_clocks(HBLANK_FREQ.dvalue(), VBLANK_FREQ.dvalue(), 1'000'000); // TODO: does the third thing come from a crystal?
+	PTM6840(config, m_q219_ptm, SYSTEM_CAS_CLOCK); // ptm_q219_config
+	m_q219_ptm->set_external_clocks(HBLANK_FREQ.dvalue(), VBLANK_FREQ.dvalue(), SYSTEM_CAS_CLOCK.dvalue() / 2.0);
 	m_q219_ptm->irq_callback().set(FUNC(cmi_state::ptm_q219_irq));
 
 	PIA6821(config, m_cmi02_pia[0]); // pia_cmi02_1_config
+	m_cmi02_pia[0]->writepa_handler().set(FUNC(cmi_state::cmi02_chsel_w));
 	m_cmi02_pia[0]->writepb_handler().set(FUNC(cmi_state::master_tune_w));
 
 	PIA6821(config, m_cmi02_pia[1]); // pia_cmi02_2_config
@@ -1820,7 +1906,7 @@ void cmi_state::cmi2x(machine_config &config)
 	m_cmi02_pia[1]->readca1_handler().set(FUNC(cmi_state::cmi02_pia2_ca1_r));
 	m_cmi02_pia[1]->cb2_handler().set(FUNC(cmi_state::cmi02_pia2_cb2_w));
 
-	PTM6840(config, m_cmi02_ptm, 2000000); // ptm_cmi02_config
+	PTM6840(config, m_cmi02_ptm, SYSTEM_CAS_CLOCK); // ptm_cmi02_config, clock is incorrect
 	m_cmi02_ptm->o2_callback().set(FUNC(cmi_state::cmi02_ptm_o2));
 	m_cmi02_ptm->irq_callback().set(FUNC(cmi_state::cmi02_ptm_irq));
 
@@ -1851,8 +1937,51 @@ void cmi_state::cmi2x(machine_config &config)
 	alphakeys.txd_handler().set("mkbd", FUNC(cmi_music_keyboard_device::kbd_rxd_w));
 	alphakeys.rts_handler().set("mkbd", FUNC(cmi_music_keyboard_device::kbd_cts_w));
 
-	PTM6840(config, m_cmi07_ptm, 2000000); // ptm_cmi07_config TODO
+	PTM6840(config, m_cmi07_ptm, 2000000); // ptm_cmi07_config
 	m_cmi07_ptm->irq_callback().set(FUNC(cmi_state::cmi07_irq));
+
+	PTM6840(config, m_midi_ptm[0], 0);
+	m_midi_ptm[0]->set_external_clocks(0, 384000, 0); // C1 is 0, C2 is 384kHz per schematic block diagram, C3 is CLICK SYNC IN
+	//m_midi_ptm[0]->set_g1(1); // /G1 has unknown source, "TIMER 1A /GATE" per schematic
+	m_midi_ptm[0]->set_g2(0); // /G2 and /G3 wired to ground per schematic
+	m_midi_ptm[0]->set_g3(0);
+	//m_midi_ptm[0]->o1_callback().set(FUNC(cmi_state::midi_ptm0_c1_w)); // TIMER 1A O/P per schematic
+	//m_midi_ptm[0]->o2_callback().set(FUNC(cmi_state::midi_ptm0_c2_w)); // CLK 2 per schematic
+	m_midi_ptm[0]->o3_callback().set(FUNC(cmi_state::midi_ptm0_c3_w));
+
+	PTM6840(config, m_midi_ptm[1], 0); // entirely clocked by PTM 0
+	m_midi_ptm[1]->set_g1(0); // /G1, /G2, and /G3 wired to ground per schematic
+	m_midi_ptm[1]->set_g2(0);
+	m_midi_ptm[1]->set_g3(0);
+	//m_midi_ptm[1]->o1_callback().set(FUNC(cmi_state::midi_sync_out_1_w)); // SYNC OUT 1 per schematic
+	//m_midi_ptm[1]->o2_callback().set(FUNC(cmi_state::midi_sync_out_2_w)); // SYNC OUT 2 per schematic
+	//m_midi_ptm[1]->o3_callback().set(FUNC(cmi_state::midi_sync_out_3_w)); // SYNC OUT 3 per schematic
+
+	for (int i = 0; i < 4; i++)
+	{
+		ACIA6850(config, m_midi_acia[i]);
+		m_midi_acia[i]->txd_handler().set(m_midi_out[i], FUNC(midi_port_device::write_txd));
+
+		MIDI_PORT(config, m_midi_out[i]);
+		midiout_slot(*m_midi_out[i]);
+	}
+
+	for (int i = 0; i < 3; i++)
+	{
+		MIDI_PORT(config, m_midi_in[i]);
+		midiin_slot(*m_midi_in[i]);
+		m_midi_in[i]->rxd_handler().set(m_midi_acia[i], FUNC(acia6850_device::write_rxd));
+	}
+
+	INPUT_MERGER_ANY_HIGH(config, "midi_ptm_irq").output_handler().set(FUNC(cmi_state::midi_ptm_irq));
+	m_midi_ptm[0]->irq_callback().set("midi_ptm_irq", FUNC(input_merger_device::in_w<0>));
+	m_midi_ptm[1]->irq_callback().set("midi_ptm_irq", FUNC(input_merger_device::in_w<1>));
+
+	INPUT_MERGER_ANY_HIGH(config, "midi_acia_irq").output_handler().set(FUNC(cmi_state::midi_acia_irq));
+	m_midi_acia[0]->irq_handler().set("midi_acia_irq", FUNC(input_merger_device::in_w<0>));
+	m_midi_acia[1]->irq_handler().set("midi_acia_irq", FUNC(input_merger_device::in_w<1>));
+	m_midi_acia[2]->irq_handler().set("midi_acia_irq", FUNC(input_merger_device::in_w<2>));
+	m_midi_acia[3]->irq_handler().set("midi_acia_irq", FUNC(input_merger_device::in_w<3>));
 
 	FD1791(config, m_wd1791, 16_MHz_XTAL / 8); // wd1791_interface
 	m_wd1791->intrq_wr_callback().set(FUNC(cmi_state::wd1791_irq));
@@ -1863,28 +1992,28 @@ void cmi_state::cmi2x(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	// Channel cards
-	cmi01a_device &cmi01a_0(CMI01A_CHANNEL_CARD(config, "cmi01a_0", 0, 0));
+	cmi01a_device &cmi01a_0(CMI01A_CHANNEL_CARD(config, "cmi01a_0", SYSTEM_CAS_CLOCK, 0));
 	cmi01a_0.add_route(ALL_OUTPUTS, "mono", 0.25);
 	cmi01a_0.irq_callback().set(FUNC(cmi_state::channel_irq<0>));
-	cmi01a_device &cmi01a_1(CMI01A_CHANNEL_CARD(config, "cmi01a_1", 0, 1));
+	cmi01a_device &cmi01a_1(CMI01A_CHANNEL_CARD(config, "cmi01a_1", SYSTEM_CAS_CLOCK, 1));
 	cmi01a_1.add_route(ALL_OUTPUTS, "mono", 0.25);
 	cmi01a_1.irq_callback().set(FUNC(cmi_state::channel_irq<1>));
-	cmi01a_device &cmi01a_2(CMI01A_CHANNEL_CARD(config, "cmi01a_2", 0, 2));
+	cmi01a_device &cmi01a_2(CMI01A_CHANNEL_CARD(config, "cmi01a_2", SYSTEM_CAS_CLOCK, 2));
 	cmi01a_2.add_route(ALL_OUTPUTS, "mono", 0.25);
 	cmi01a_2.irq_callback().set(FUNC(cmi_state::channel_irq<2>));
-	cmi01a_device &cmi01a_3(CMI01A_CHANNEL_CARD(config, "cmi01a_3", 0, 3));
+	cmi01a_device &cmi01a_3(CMI01A_CHANNEL_CARD(config, "cmi01a_3", SYSTEM_CAS_CLOCK, 3));
 	cmi01a_3.add_route(ALL_OUTPUTS, "mono", 0.25);
 	cmi01a_3.irq_callback().set(FUNC(cmi_state::channel_irq<3>));
-	cmi01a_device &cmi01a_4(CMI01A_CHANNEL_CARD(config, "cmi01a_4", 0, 4));
+	cmi01a_device &cmi01a_4(CMI01A_CHANNEL_CARD(config, "cmi01a_4", SYSTEM_CAS_CLOCK, 4));
 	cmi01a_4.add_route(ALL_OUTPUTS, "mono", 0.25);
 	cmi01a_4.irq_callback().set(FUNC(cmi_state::channel_irq<4>));
-	cmi01a_device &cmi01a_5(CMI01A_CHANNEL_CARD(config, "cmi01a_5", 0, 5));
+	cmi01a_device &cmi01a_5(CMI01A_CHANNEL_CARD(config, "cmi01a_5", SYSTEM_CAS_CLOCK, 5));
 	cmi01a_5.add_route(ALL_OUTPUTS, "mono", 0.25);
 	cmi01a_5.irq_callback().set(FUNC(cmi_state::channel_irq<5>));
-	cmi01a_device &cmi01a_6(CMI01A_CHANNEL_CARD(config, "cmi01a_6", 0, 6));
+	cmi01a_device &cmi01a_6(CMI01A_CHANNEL_CARD(config, "cmi01a_6", SYSTEM_CAS_CLOCK, 6));
 	cmi01a_6.add_route(ALL_OUTPUTS, "mono", 0.25);
 	cmi01a_6.irq_callback().set(FUNC(cmi_state::channel_irq<6>));
-	cmi01a_device &cmi01a_7(CMI01A_CHANNEL_CARD(config, "cmi01a_7", 0, 7));
+	cmi01a_device &cmi01a_7(CMI01A_CHANNEL_CARD(config, "cmi01a_7", SYSTEM_CAS_CLOCK, 7));
 	cmi01a_7.add_route(ALL_OUTPUTS, "mono", 0.25);
 	cmi01a_7.irq_callback().set(FUNC(cmi_state::channel_irq<7>));
 }
