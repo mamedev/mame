@@ -39,22 +39,17 @@ public:
 	COPYASSIGN(putf8_reader, delete)
 	virtual ~putf8_reader() = default;
 
-	putf8_reader(putf8_reader &&rhs)
+	putf8_reader(putf8_reader &&rhs) noexcept
 	: m_strm(std::move(rhs.m_strm))
 	, m_linebuf(std::move(rhs.m_linebuf))
 	{
 	}
 
-	putf8_reader(plib::unique_ptr<std::istream> &&rhs)
+	putf8_reader(plib::unique_ptr<std::istream> &&rhs) noexcept
 	: m_strm(std::move(rhs))
 	{
 	}
-#if 0
-	template<typename T, typename... Args>
-	putf8_reader(Args&&... args)
-	: m_strm(plib::make_unique<T>(std::forward<Args>(args)...))
-	{}
-#endif
+
 	bool eof() const { return m_strm->eof(); }
 
 	bool readline(pstring &line)

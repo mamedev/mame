@@ -234,7 +234,9 @@ namespace plib {
 			ungetc(c);
 			return token_t(ret, tokstr);
 		}
-		else if (m_identifier_chars.find(c) != pstring::npos)
+
+		// not a number, try identifier
+		if (m_identifier_chars.find(c) != pstring::npos)
 		{
 			// read identifier till non identifier char
 			pstring tokstr = "";

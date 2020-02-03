@@ -56,10 +56,10 @@ protected:
 
 	void dump_nl();
 
-	pstring get_nl_val(double val);
-	double get_sp_unit(const pstring &unit);
+	pstring get_nl_val(double val) const;
+	double get_sp_unit(const pstring &unit) const;
 
-	double get_sp_val(const pstring &sin);
+	double get_sp_val(const pstring &sin) const;
 
 	plib::putf8_fmt_writer out;
 
@@ -189,6 +189,7 @@ public:
 protected:
 
 	bool is_kicad() const { return m_is_kicad; }
+	void convert_block(const str_list &contents);
 	void process_line(const pstring &line);
 
 private:

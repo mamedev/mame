@@ -138,7 +138,6 @@ public:
 
 	bool readmore(std::vector<plib::putf8_reader> &r)
 	{
-		fprintf(stderr, "%d %d\n", (int) m_e.size(), (int) r.size());
 		bool success = false;
 		for (std::size_t i = 0; i< r.size(); i++)
 		{
@@ -146,7 +145,6 @@ public:
 			{
 				pstring line;
 				m_e[i].eof = !r[i].readline(line);
-				//fprintf(stderr, "bla: <%s>\n", line.c_str());
 				if (!m_e[i].eof)
 				{
 					// sscanf is very fast ...
@@ -518,7 +516,6 @@ int nlwav_app::execute()
 	for (auto &oi: opt_args())
 	{
 		plib::unique_ptr<std::istream> fin;
-		printf("%s\n", oi.c_str());
 		if (oi == "-")
 		{
 			auto temp(plib::make_unique<std::stringstream>());

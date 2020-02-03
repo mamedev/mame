@@ -226,7 +226,7 @@ void nl_convert_base_t::dump_nl()
 	{
 		net_t *net = m_nets[alias].get();
 		// use the first terminal ...
-		out("ALIAS({}, {})\n", alias.c_str(), net->terminals()[0].c_str());
+		out("ALIAS({}, {})\n", alias, net->terminals()[0]);
 		// if the aliased net only has this one terminal connected ==> don't dump
 		if (net->terminals().size() == 1)
 			net->set_no_export();
@@ -243,14 +243,17 @@ void nl_convert_base_t::dump_nl()
 		std::size_t j = sorted[i];
 
 		if (m_devs[j]->has_value())
-			out("{}({}, {})\n", m_devs[j]->type().c_str(),
-					m_devs[j]->name().c_str(), get_nl_val(m_devs[j]->value()).c_str());
+		{
+			pstring t = m_devs[j]->type();
+			pstring vals = (t == "RES" || t == "CAP") ? get_nl_val(m_devs[j]->value()) : plib::pfmt("{1:g}")(m_devs[j]->value());
+			out("{}({}, {})\n", t, m_devs[j]->name(), vals);
+		}
 		else if (m_devs[j]->has_model())
-			out("{}({}, \"{}\")\n", m_devs[j]->type().c_str(),
-					m_devs[j]->name().c_str(), m_devs[j]->model().c_str());
+			out("{}({}, \"{}\")\n", m_devs[j]->type(),
+					m_devs[j]->name(), m_devs[j]->model());
 		else
-			out("{}({})\n", m_devs[j]->type().c_str(),
-					m_devs[j]->name().c_str());
+			out("{}({})\n", m_devs[j]->type(),
+					m_devs[j]->name());
 		for (auto &e : m_devs[j]->extra())
 			out("{}\n", e);
 
@@ -261,10 +264,10 @@ void nl_convert_base_t::dump_nl()
 		net_t * net = i.second.get();
 		if (!net->is_no_export() && !(net->terminals().size() == 1 && net->terminals()[0] == "GND" ))
 		{
-			out("NET_C({}", net->terminals()[0].c_str() );
+			out("NET_C({}", net->terminals()[0] );
 			for (std::size_t j=1; j<net->terminals().size(); j++)
 			{
-				out(", {}", net->terminals()[j].c_str() );
+				out(", {}", net->terminals()[j] );
 			}
 			out(")\n");
 		}
@@ -276,7 +279,7 @@ void nl_convert_base_t::dump_nl()
 	m_ext_alias.clear();
 }
 
-pstring nl_convert_base_t::get_nl_val(double val)
+pstring nl_convert_base_t::get_nl_val(double val) const
 {
 	for (auto &e : m_units)
 	{
@@ -294,7 +297,7 @@ pstring nl_convert_base_t::get_nl_val(double val)
 	return plib::pfmt("{1}")(val);
 }
 
-double nl_convert_base_t::get_sp_unit(const pstring &unit)
+double nl_convert_base_t::get_sp_unit(const pstring &unit) const
 {
 	for (auto &e : m_units)
 	{
@@ -305,7 +308,7 @@ double nl_convert_base_t::get_sp_unit(const pstring &unit)
 	return 0.0;
 }
 
-double nl_convert_base_t::get_sp_val(const pstring &sin)
+double nl_convert_base_t::get_sp_val(const pstring &sin) const
 {
 	std::size_t p = 0;
 	while (p < sin.length() && (m_numberchars.find(sin.substr(p, 1)) != pstring::npos))
@@ -316,18 +319,25 @@ double nl_convert_base_t::get_sp_val(const pstring &sin)
 	return ret;
 }
 
+void nl_convert_spice_t::convert_block(const str_list &contents)
+{
+	for (const auto &line : contents)
+		process_line(line);
+}
+
+
 void nl_convert_spice_t::convert(const pstring &contents)
 {
 	std::vector<pstring> spnl(plib::psplit(contents, "\n"));
+	std::vector<pstring> after_linecontinuation;
 
 	// Add gnd net
 
 	// FIXME: Parameter
-	out("NETLIST_START(dummy)\n");
-	add_term("0", "GND");
-	add_term("GND", "GND"); // For Kicad
 
 	pstring line = "";
+
+	// process linecontinuation
 
 	for (const auto &i : spnl)
 	{
@@ -337,11 +347,50 @@ void nl_convert_spice_t::convert(const pstring &contents)
 			line += inl.substr(1);
 		else
 		{
-			process_line(line);
+			after_linecontinuation.push_back(line);
 			line = inl;
 		}
 	}
-	process_line(line);
+	after_linecontinuation.push_back(line);
+	spnl.clear(); // no longer needed
+
+	// Process subcircuits
+
+	std::vector<std::vector<pstring>> subckts;
+	std::vector<pstring> nl;
+	auto inp = after_linecontinuation.begin();
+	while (inp != after_linecontinuation.end())
+	{
+		if (plib::startsWith(*inp, ".SUBCKT"))
+		{
+			std::vector<pstring> sub;
+			while (inp != after_linecontinuation.end())
+			{
+				auto s(*inp);
+				sub.push_back(s);
+				inp++;
+				if (plib::startsWith(s, ".ENDS"))
+					break;
+			}
+			subckts.push_back(sub);
+		}
+		else
+		{
+			nl.push_back(*inp);
+			inp++;
+		}
+	}
+
+	for (const auto &sub : subckts)
+	{
+		add_term("0", "GND");
+		add_term("GND", "GND"); // For Kicad
+		convert_block(sub);
+	}
+
+	out("NETLIST_START(dummy)\n");
+
+	convert_block(nl);
 	dump_nl();
 	// FIXME: Parameter
 	out("NETLIST_END()\n");
@@ -381,10 +430,8 @@ void nl_convert_spice_t::process_line(const pstring &line)
 		switch (tt[0].at(0))
 		{
 			case ';':
-				out("// {}\n", line.substr(1));
-				break;
 			case '*':
-				out("// {}\n", line.substr(1).c_str());
+				out("// {}\n", line.substr(1));
 				break;
 			case '.':
 				if (tt[0] == ".SUBCKT")
@@ -412,7 +459,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					m_is_kicad = true;
 				}
 				else
-					out("// {}\n", line.c_str());
+					out("// {}\n", line);
 				break;
 			case 'Q':
 			{
@@ -475,12 +522,12 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				auto n=npoly(tt[3]);
 				if (n<0)
 				{
-					add_device("VCVS", tt[0]);
+					add_device("VCVS", tt[0], get_sp_val(tt[5]));
 					add_term(tt[1], tt[0], 0);
 					add_term(tt[2], tt[0], 1);
 					add_term(tt[3], tt[0], 2);
 					add_term(tt[4], tt[0], 3);
-					add_device_extra(tt[0], "PARAM({}, {})", tt[0] + ".G", tt[5]);
+					//add_device_extra(tt[0], "PARAM({}, {})", tt[0] + ".G", tt[5]);
 				}
 				else
 				{
@@ -488,7 +535,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					auto scoeff(static_cast<unsigned>(5 + n));
 					if ((tt.size() != 5 + 2 * static_cast<unsigned>(n)) || (tt[scoeff-1] != "0"))
 					{
-						out("// IGNORED {}: {}\n", tt[0].c_str(), line.c_str());
+						out("// IGNORED {}: {}\n", tt[0], line);
 						break;
 					}
 					pstring lastnet = tt[1];
@@ -497,12 +544,12 @@ void nl_convert_spice_t::process_line(const pstring &line)
 						pstring devname = tt[0] + plib::pfmt("{}")(i);
 						pstring nextnet = (i<static_cast<std::size_t>(n)-1) ? tt[1] + "a" + plib::pfmt("{}")(i) : tt[2];
 						auto net2 = plib::psplit(plib::replace_all(plib::replace_all(tt[sce+i],")",""),"(",""),",");
-						add_device("VCVS", devname);
+						add_device("VCVS", devname, get_sp_val(tt[scoeff+i]));
 						add_term(lastnet, devname, 0);
 						add_term(nextnet, devname, 1);
 						add_term(net2[0], devname, 2);
 						add_term(net2[1], devname, 3);
-						add_device_extra(devname, "PARAM({}, {})", devname + ".G", tt[scoeff+i]);
+						//add_device_extra(devname, "PARAM({}, {})", devname + ".G", tt[scoeff+i]);
 						lastnet = nextnet;
 					}
 				}
@@ -523,39 +570,39 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					{
 						if ((tt.size() != 5 + 2 *  static_cast<unsigned>(n)) || (tt[scoeff-1] != "0"))
 						{
-							out("// IGNORED {}: {}\n", tt[0].c_str(), line.c_str());
+							out("// IGNORED {}: {}\n", tt[0], line);
 							break;
 						}
 					}
 					for (std::size_t i=0; i < static_cast<std::size_t>(n); i++)
 					{
 						pstring devname = tt[0] + plib::pfmt("{}")(i);
-						add_device("CCCS", devname);
+						add_device("CCCS", devname, get_sp_val(tt[scoeff+i]));
 						add_term(tt[1], devname, 0);
 						add_term(tt[2], devname, 1);
 
 						pstring extranetname = devname + "net";
 						m_replace.push_back({tt[sce+i], devname + ".IP", extranetname });
 						add_term(extranetname, devname + ".IN");
-						add_device_extra(devname, "PARAM({}, {})", devname + ".G", tt[scoeff+i]);
+						//add_device_extra(devname, "PARAM({}, {})", devname + ".G", tt[scoeff+i]);
 					}
 				}
 				break;
 			case 'H':
-				add_device("CCVS", tt[0]);
+				add_device("CCVS", tt[0], get_sp_val(tt[4]));
 				add_term(tt[1], tt[0] + ".OP");
 				add_term(tt[2], tt[0] + ".ON");
 				m_replace.push_back({tt[3], tt[0] + ".IP", tt[2] + "a" });
 				add_term(tt[2] + "a", tt[0] + ".IN");
-				add_device_extra(tt[0], "PARAM({}, {})", tt[0] + ".G", tt[4]);
+				//add_device_extra(tt[0], "PARAM({}, {})", tt[0] + ".G", tt[4]);
 				break;
 			case 'G':
-				add_device("VCCS", tt[0]);
+				add_device("VCCS", tt[0], get_sp_val(tt[5]));
 				add_term(tt[1], tt[0], 0);
 				add_term(tt[2], tt[0], 1);
 				add_term(tt[3], tt[0], 2);
 				add_term(tt[4], tt[0], 3);
-				add_device_extra(tt[0], "PARAM({}, {})", tt[0] + ".G", tt[5]);
+				//add_device_extra(tt[0], "PARAM({}, {})", tt[0] + ".G", tt[5]);
 				break;
 			case 'V':
 				// only DC Voltage sources ....
@@ -634,7 +681,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				break;
 			}
 			default:
-				out("// IGNORED {}: {}\n", tt[0].c_str(), line.c_str());
+				out("// IGNORED {}: {}\n", tt[0], line);
 		}
 	}
 }
@@ -770,7 +817,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 		}
 		else
 		{
-			out("Unexpected {}\n", token.str().c_str());
+			out("Unexpected {}\n", token.str());
 			return;
 		}
 	}
