@@ -278,7 +278,7 @@ void spg2xx_game_mysprtch_state::init_mysprtch()
 
 ROM_START( mysprtch )
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "xxx_mysprtch", 0x0000, 0x2000000, CRC(6911d19c) SHA1(c71bc38595e5505434395b6d59320caabfc7bce3) )
+	ROM_LOAD16_WORD_SWAP( "mysportschallengeplus.bin", 0x0000, 0x2000000, CRC(6911d19c) SHA1(c71bc38595e5505434395b6d59320caabfc7bce3) )
 ROM_END
 
 // unit with Blue surround to power button
