@@ -3,7 +3,7 @@
 /******************************************************************
  NEC V810 (upd70732) core
   Tomasz Slanina
-  Angelo Salese - lordkale[at]libero.it
+  Angelo Salese
 
  Change Log
  - 23/08/2012 - Implemented remaining BSU opcodes (Angelo Salese)
