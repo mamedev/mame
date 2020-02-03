@@ -107,7 +107,6 @@ public:
 	void nes_vt(machine_config& config);
 
 	void nes_vt_4k_ram(machine_config& config);
-	void nes_vt_sudopptv(machine_config& config);
 
 	/* OneBus read callbacks for getting sprite and tile data during rendering */
 	DECLARE_READ8_MEMBER(spr_r);
@@ -274,6 +273,17 @@ class nes_vt_pjoy_state : public nes_vt_state
 {
 public:
 	nes_vt_pjoy_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_vt_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void machine_reset() override;
+};
+
+class nes_vt_waixing_state : public nes_vt_state
+{
+public:
+	nes_vt_waixing_state(const machine_config& mconfig, device_type type, const char* tag) :
 		nes_vt_state(mconfig, type, tag)
 	{ }
 
@@ -1977,11 +1987,12 @@ void nes_vt_state::nes_vt(machine_config &config)
 	nes_vt_base(config);
 }
 
-void nes_vt_state::nes_vt_sudopptv(machine_config &config)
+void nes_vt_waixing_state::machine_reset()
 {
-	nes_vt(config);
+	nes_vt_state::machine_reset();
+
 	m_ppu->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4); // reasonable
-	//                                    ^    ^
+//	set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
 }
 
 void nes_vt_hum_state::machine_reset()
@@ -2508,6 +2519,11 @@ ROM_START( ddrdismx )
 	ROM_LOAD( "disney-ddr.bin", 0x00000, 0x200000, CRC(17fb3abb) SHA1(4d0eda4069ff46173468e579cdf9cc92b350146a) ) // 29LV160 Flash
 ROM_END
 
+ROM_START( megapad )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "megapad.bin", 0x00000, 0x200000, CRC(1eb603a8) SHA1(3de6f0620a0db0558daa7fd7ccf08d9d5607a6af) )
+ROM_END
+
 ROM_START( ddrstraw )
 	ROM_REGION( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "straws-ddr.bin", 0x00000, 0x200000, CRC(ce94e53a) SHA1(10c6970205a4df28086029c0a348225f57bf0cc5) ) // 26LV160 Flash
@@ -2675,7 +2691,10 @@ CONS( 2004, majkon,    0, 0,  nes_vt_vg_baddma, nes_vt, nes_vt_hh_state, empty_i
 CONS( 200?, majgnc,    0, 0,  nes_vt_majgnc, majgnc, nes_vt_majgnc_state, empty_init, "Majesco", "Golden Nugget Casino", MACHINE_NOT_WORKING )
 
 // small black unit, dpad on left, 4 buttons (A,B,X,Y) on right, Start/Reset/Select in middle, unit text "Sudoku Plug & Play TV Game"
-CONS( 200?, sudopptv,    0, 0,  nes_vt_sudopptv, nes_vt, nes_vt_state, empty_init, "Smart Planet", "Sudoku Plug & Play TV Game '6 Intelligent Games'", MACHINE_NOT_WORKING )
+CONS( 200?, sudopptv,    0, 0,  nes_vt, nes_vt, nes_vt_waixing_state, empty_init, "Smart Planet", "Sudoku Plug & Play TV Game '6 Intelligent Games'", MACHINE_NOT_WORKING )
+
+CONS( 200?, megapad,   0,        0,  nes_vt, nes_vt, nes_vt_waixing_state, empty_init, "Waixing",         "Megapad 31-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Happy Biqi has broken sprites, investigate before promoting
+
 
 // this is VT09 based
 // it boots, most games correct, but palette issues in some games still (usually they appear greyscale)
@@ -2762,7 +2781,6 @@ CONS( 200?, gprnrs16,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_ini
 // * Console has stereo output (dual RCA connectors).
 CONS( 2006, ddrdismx,   0,        0,  nes_vt, nes_vt_ddr, nes_vt_state, empty_init, "Majesco (licensed from Konami, Disney)", "Dance Dance Revolution Disney Mix",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // shows (c)2001 Disney onscreen, but that's recycled art from the Playstation release, actual release was 2006
 CONS( 2006, ddrstraw,   0,        0,  nes_vt, nes_vt_ddr, nes_vt_state, empty_init, "Majesco (licensed from Konami)",         "Dance Dance Revolution Strawberry Shortcake", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-
 
 
 // unsorted, these were all in nes.xml listed as ONE BUS systems

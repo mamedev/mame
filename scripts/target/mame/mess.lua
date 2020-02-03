@@ -3802,6 +3802,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/spg2xx_zone_32bit.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx_senario.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx_senario_poker.cpp",
+	MAME_DIR .. "src/mame/drivers/spg2xx_mysprtch.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx_vii.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx_ican.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx_playvision.cpp",
