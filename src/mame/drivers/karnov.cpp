@@ -872,7 +872,7 @@ void karnov_state::wndrplnt(machine_config &config)
 	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(karnov_state::screen_update));
 	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(karnov_state::vbint_w));
+	screen.screen_vblank().set(FUNC(karnov_state::mcusim_vbint_w));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_karnov);
 	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
