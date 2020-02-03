@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese, Tomasz Slanina
 /******************************************************************
  NEC V810 (upd70732) core
-  Tomasz Slanina - analog[at]op.pl
+  Tomasz Slanina
   Angelo Salese - lordkale[at]libero.it
 
  Change Log
