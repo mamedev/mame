@@ -21900,6 +21900,7 @@ menghong                        // 2004? Sealy
 
 @source:mephisto_berlin.cpp
 berl16                          // 1992 Mephisto Berlin 68000
+berl16a                         // 1992 Mephisto Berlin 68000
 berlinp                         // 1994 Mephisto Berlin Pro 68020
 berl16l                         // 1996 Mephisto Berlin 68000 London Upgrade
 berlinpl                        // 1996 Mephisto Berlin Pro London Upgrade
@@ -21930,26 +21931,39 @@ mmirage
 
 @source:mephisto_mm2.cpp
 mm2                             // Mephisto MM II
+mm2a                            // Mephisto MM II
+mm2b                            // Mephisto MM II
+mm2c                            // Mephisto MM II
+mm2d                            // Mephisto MM II
 bup                             // Mephisto B&P
-mm4tk                           // Mephisto MM IV (Turbo Kit)
+bupa                            // Mephisto B&P
 mm4                             // Mephisto MM IV
+mm4a                            // Mephisto MM IV
+mm4b                            // Mephisto MM IV
+mm4tk                           // Mephisto MM IV (Turbo Kit)
 mm5                             // Mephisto MM V
+mm5a                            // Mephisto MM V
 mm5p
 rebel5                          // Mephisto Rebell 5.0
+rebel5a                         // Mephisto Rebell 5.0
 
 @source:mephisto_modena.cpp
 modena                          // 1992 Mephisto Modena
+modenaa                         // 1992 Mephisto Modena
+modenab                         // 1992 Mephisto Modena
 
 @source:mephisto_modular.cpp
 alm16                           // 1988 Mephisto Almeria 16 Bit
 alm32                           // 1988 Mephisto Almeria 32 Bit
 port16                          // 1989 Mephisto Portorose 16 Bit
 port32                          // 1989 Mephisto Portorose 32 Bit
+port32a                         // 1989 Mephisto Portorose 32 Bit
 lyon16                          // 1990 Mephisto Lyon 16 Bit
 lyon32                          // 1990 Mephisto Lyon 32 Bit
 van16                           // 1991 Mephisto Vancouver 16 Bit
 van32                           // 1991 Mephisto Vancouver 32 Bit
 gen32                           // 1993 Mephisto Genius 68030
+gen32a                          // 1993 Mephisto Genius 68030
 gen32l                          // 1996 Mephisto Genius 68030 London Upgrade
 lond16                          // 1996 Mephisto London 16 Bit
 lond32                          // 1996 Mephisto London 32 Bit
@@ -21970,20 +21984,27 @@ mondl68k                        // 1988 Mephisto Mondial 68000XL
 @source:mephisto_montec.cpp
 mondial                         // 1985 Mephisto Mondial
 smondial                        // 1986 Mephisto Super Mondial (Ver A)
+smondialab                      // 1986 Mephisto Super Mondial (Ver AB)
 smondialb                       // 1986 Mephisto Super Mondial (Ver B)
 montec                          // 1987 Mephisto Monte Carlo
+monteca                         // 1987 Mephisto Monte Carlo
 mondial2                        // 1987 Mephisto Mondial II
 smondial2                       // 1989 Mephisto Super Mondial II
 megaiv                          // 1989 Mephisto Mega IV
+megaiva                         // 1989 Mephisto Mega IV
 monteciv                        // 1990 Mephisto Monte Carlo IV LE
 
 @source:mephisto_polgar.cpp
 polgar                          // 1989 Mephisto Polgar
 polgar10                        // 1990 Mephisto Polgar 10MHz
+polgar101                       // 1990 Mephisto Polgar 10MHz
 mrisc                           // 1992 Mephisto RISC 1MB
 mrisc2                          // 1994 Mephisto RISC II
 academy                         // 1989 Mephisto Academy
+academyg                        // 1989 Mephisto Academy
+academyga                       // 1989 Mephisto Academy
 milano                          // 1991 Mephisto Milano
+milanoa                         // 1991 Mephisto Milano
 nshort                          // 1993 Mephisto Nigel Short
 
 @source:mephistp.cpp
@@ -34796,6 +34817,7 @@ ccmk6
 
 @source:saitek_risc2500.cpp
 risc2500                        //
+risc2500a                       //
 montreux                        //
 
 @source:saitek_ssystem3.cpp
@@ -38451,6 +38473,9 @@ targeth10                       // (c) 1994 - Ref 940531
 
 @source:tasc.cpp
 tascr30
+tascr30a
+tascr30b
+tascr30g
 
 @source:tasman.cpp
 dragsphr                        //
