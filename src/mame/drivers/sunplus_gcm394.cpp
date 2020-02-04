@@ -236,7 +236,6 @@ class generalplus_gpac800_game_state : public gcm394_game_state
 public:
 	generalplus_gpac800_game_state(const machine_config& mconfig, device_type type, const char* tag) :
 		gcm394_game_state(mconfig, type, tag),
-		m_has_nand(false),
 		m_nandregion(*this, "nandrom"),
 		m_initial_copy_words(0x2000)
 	{
@@ -264,15 +263,16 @@ protected:
 	virtual DECLARE_READ16_MEMBER(cs1_r) override;
 	virtual DECLARE_WRITE16_MEMBER(cs1_w) override;
 
-	bool m_has_nand;
 private:
 	optional_region_ptr<uint8_t> m_nandregion;
 
-	void nand_init(int blocksize, int blocksize_stripped);
+	void nand_create_stripped_region();
 
 	std::vector<uint8_t> m_strippedrom;
 	int m_strippedsize;
 	int m_size;
+	int m_nandblocksize;
+	int m_nandblocksize_stripped;
 
 	int m_initial_copy_words;
 	int m_vectorbase;
@@ -1519,6 +1519,42 @@ void generalplus_gpac800_game_state::machine_start()
 	save_item(NAME(m_sdram));
 }
 
+void generalplus_gpac800_game_state::nand_create_stripped_region()
+{
+	uint8_t* rom = m_nandregion;
+	int size = memregion("nandrom")->bytes();
+	m_size = size;
+
+	int numblocks = size / m_nandblocksize;
+	m_strippedsize = numblocks * m_nandblocksize_stripped;
+	m_strippedrom.resize(m_strippedsize);
+
+	for (int i = 0; i < numblocks; i++)
+	{
+		const int base = i * m_nandblocksize;
+		const int basestripped = i * m_nandblocksize_stripped;
+
+		for (int j = 0; j < m_nandblocksize_stripped; j++)
+		{
+			m_strippedrom[basestripped + j] = rom[(base + j)];
+		}
+	}
+
+	// debug to allow for easy use of unidasm.exe
+	if (0)
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"stripped_%s", machine().system().name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(&m_strippedrom[0], m_nandblocksize_stripped * numblocks, 1, fp);
+			fclose(fp);
+		}
+	}
+}
+
 void generalplus_gpac800_game_state::machine_reset()
 {
 	// configure CS defaults
@@ -1529,11 +1565,12 @@ void generalplus_gpac800_game_state::machine_reset()
 	mem.write_word(0x007823, 0x0047);
 	mem.write_word(0x007824, 0x0047);
 
-
 	m_maincpu->set_cs_space(m_memory->get_program());
 
-	if (m_has_nand)
+	if (m_nandregion)
 	{
+		nand_create_stripped_region();
+
 		// up to 256 pages (16384kw) for each space
 
 		// (size of cs0 + cs1 + cs2 + cs3 + cs4) <= 81920kwords
@@ -1586,56 +1623,26 @@ void generalplus_gpac800_game_state::machine_reset()
 }
 
 
-void generalplus_gpac800_game_state::nand_init(int blocksize, int blocksize_stripped)
-{
-	m_sdram.resize(0x400000); // 0x400000 bytes, 0x800000 words
-	m_sdram2.resize(0x10000);
-
-	uint8_t* rom = memregion("nandrom")->base();
-	int size = memregion("nandrom")->bytes();
-	m_size = size;
-
-	int numblocks = size / blocksize;
-	m_strippedsize = numblocks * blocksize_stripped;
-	m_strippedrom.resize(m_strippedsize);
-
-	for (int i = 0; i < numblocks; i++)
-	{
-		const int base = i * blocksize;
-		const int basestripped = i * blocksize_stripped;
-
-		for (int j = 0; j < blocksize_stripped; j++)
-		{
-			m_strippedrom[basestripped + j] = rom[(base + j)];
-		}
-	}
-
-	// debug to allow for easy use of unidasm.exe
-	if (0)
-	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"stripped_%s", machine().system().name);
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(&m_strippedrom[0], blocksize_stripped * numblocks, 1, fp);
-			fclose(fp);
-		}
-	}
-
-	m_has_nand = true;
-	m_vectorbase = 0x6fe0;
-}
-
 void generalplus_gpac800_game_state::nand_init210()
 {
-	nand_init(0x210, 0x200);
+	m_sdram.resize(0x400000); // 0x400000 words (0x800000 bytes)
+	m_sdram2.resize(0x10000);
+
+	m_nandblocksize = 0x210;
+	m_nandblocksize_stripped = 0x200;
+
+	m_vectorbase = 0x6fe0;
 }
 
 void generalplus_gpac800_game_state::nand_init840()
 {
-	nand_init(0x840, 0x800);
+	m_sdram.resize(0x400000); // 0x400000 words (0x800000 bytes)
+	m_sdram2.resize(0x10000);
+
+	m_nandblocksize = 0x840;
+	m_nandblocksize_stripped = 0x800;
+
+	m_vectorbase = 0x6fe0;
 }
 
 void generalplus_gpac800_game_state::nand_wlsair60()
@@ -1726,8 +1733,6 @@ void generalplus_gpspispi_game_state::init_spi()
 
 	// these vectors must either directly point to RAM, or at least redirect there after some code
 	uint16_t* internal = (uint16_t*)memregion("maincpu:internal")->base();
-	internal[0x0000] = 0xb00b;
-
 	internal[0x7ff5] = vectorbase + 0x0a;
 	internal[0x7ff6] = vectorbase + 0x0c;
 	internal[0x7ff7] = dest + 0x20; // point boot vector at code in RAM (probably in reality points to internal code that copies the first block)

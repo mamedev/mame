@@ -182,17 +182,20 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 	// HACKS to get into service mode for debugging
 
 	// note, these patch the code copied to SRAM so the 'PROGRAM ROM' check fails (it passes otherwise)
+
+	//if (mem.read_word(0x4368c) == 0x4846)
+	//	mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
+
+	//if (mem.read_word(0x34410) == 0x4846)
+	//	mem.write_word(0x34410, 0x4840);    // golden tee force service mode
+
+	// what is it waiting for when we need these? (needed on some service mode screens)
 	if (mem.read_word(0x3f368) == 0x4840)
 		mem.write_word(0x3f368, 0x4841);    // cars 2 IRQ? wait hack
-
-	if (mem.read_word(0x4368c) == 0x4846)
-		mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
 
 	if (mem.read_word(0x4d8d4) == 0x4840)
 		mem.write_word(0x4d8d4, 0x4841);    // golden tee IRQ? wait hack
 
-	if (mem.read_word(0x34410) == 0x4846)
-		mem.write_word(0x34410, 0x4840);    // golden tee force service mode
 
 	// clear params after operation
 	m_dma_params[0][channel] = m_dma_params[1][channel] = m_dma_params[2][channel] = m_dma_params[3][channel] = m_dma_params[4][channel] = m_dma_params[5][channel] = m_dma_params[6][channel] = 0x0000;
