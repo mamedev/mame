@@ -200,7 +200,7 @@ private:
 	DECLARE_READ16_MEMBER(system_dma_params_channel3_r);
 	DECLARE_WRITE16_MEMBER(system_dma_params_channel3_w);
 	DECLARE_READ16_MEMBER(system_dma_status_r);
-	DECLARE_WRITE16_MEMBER(system_dma_trigger_w);
+	DECLARE_WRITE16_MEMBER(system_dma_7abf_unk_w);
 	DECLARE_READ16_MEMBER(system_dma_memtype_r);
 	DECLARE_WRITE16_MEMBER(system_dma_memtype_w);
 

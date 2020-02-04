@@ -59,9 +59,15 @@ uint16_t sunplus_gcm394_base_device::read_dma_params(int channel, int offset)
 
 void sunplus_gcm394_base_device::write_dma_params(int channel, int offset, uint16_t data, address_space& space)
 {
-	m_dma_params[offset][channel] = data;
-	if (offset == 0 && (data & 1)) trigger_systemm_dma(space, channel);
 	LOGMASKED(LOG_GCM394_SYSDMA, "%s:sunplus_gcm394_base_device::write_dma_params (channel %01x) %01x %04x\n", machine().describe_context(), channel, offset, data);
+
+	m_dma_params[offset][channel] = data;
+	
+	if (offset == 0 && (data & 1))
+	{
+		trigger_systemm_dma(space, channel);
+	}
+	
 }
 
 
@@ -127,99 +133,77 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 	uint32_t length = m_dma_params[3][channel] | (m_dma_params[6][channel] << 16);
 	int sourcedelta = 0;
 	int destdelta = 0;
-	if ((mode & 0xA0) == 0) sourcedelta = 1;
-	else if ((mode & 0xA0) == 0x20) sourcedelta = -1;
-	if ((mode & 0x50) == 0) destdelta = 1;
-	else if ((mode & 0x50) == 0x10) destdelta = -1;
+	
+	if ((mode & 0xa0) == 0x00)
+		sourcedelta = 1;
+	else if ((mode & 0xa0) == 0x20)
+		sourcedelta = -1;
+
+	if ((mode & 0x50) == 0x00)
+		destdelta = 1;
+	else if ((mode & 0x50) == 0x10)
+		destdelta = -1;
 
 	LOGMASKED(LOG_GCM394_SYSDMA, "%s:possible DMA operation (7abf) with params mode:%04x source:%08x (word offset) dest:%08x (word offset) length:%08x (words) while csbank is %02x\n", machine().describe_context().c_str(), mode, source, dest, length, m_membankswitch_7810 );
 
-	if ((source&0x0fffffff) >= 0x20000)
-		LOGMASKED(LOG_GCM394_SYSDMA, " likely transfer from ROM %08x - %08x\n", (source - 0x20000) * 2, (source - 0x20000) * 2 + (length * 2)- 1);
-
 	// wrlshunt transfers ROM to RAM, all RAM write addresses have 0x800000 in the destination set
 
-	// mode 0x0089 == no source inc, used for memory clear operations? (source usually points at stack value)
-	// mode 0x0009 == regular copy? (smartfp does 2 copies like this after the initial clears, source definitely points at a correctly sized data structure)
-	// what does having bit 0x4000 on mode set mean? (first transfer on wrlshunt - maybe an IRQ disable?)
+	address_space& mem = this->space(AS_PROGRAM);
+	source &= 0x0fffffff;
 
-//	if (mode == 0x1089) // 8-bit no increment mode, counter is in bytes? used for DMA from NAND  (first writes 0x1088 then does an OR with 0x0001)
+	for (int i = 0; i < length; i++)
 	{
-		address_space& mem = this->space(AS_PROGRAM);
-		source &= 0x0fffffff;
-
-
-		for (int i = 0; i < length; i++)
+		uint16_t val;
+		if (mode & 0x1000)
 		{
-			uint16_t val;
-			if (mode & 0x1000) {
-				val = (read_space(source) & 0xFF) | (read_space(source) << 8);
-				i++;
-			}
-			else val = read_space(source);
-			source += sourcedelta;
+			val = (read_space(source) & 0xFF) | (read_space(source) << 8);
+			i++;
+		}
+		else
+		{
+			val = read_space(source);
+		}
+
+		source += sourcedelta;
 	
-			//logerror("val1 %04x val2 %04x\n", val1, val2);
-
-			if (mode & 0x2000) {
-				write_space(dest, val & 0xFF);
-				write_space(dest, val >> 8);
-			}
-			else write_space(dest, val);
-			dest += destdelta;
-		}
-
-		// HACKS to get into service mode for debugging
-
-		// note, these patch the code copied to SRAM so the 'PROGRAM ROM' check fails (it passes otherwise)
-		if (mem.read_word(0x3f368) == 0x4840)
-			mem.write_word(0x3f368, 0x4841);    // cars 2 IRQ? wait hack
-
-		//if (mem.read_word(0x4368c) == 0x4846)
-		//  mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
-
-		if (mem.read_word(0x4d8d4) == 0x4840)
-			mem.write_word(0x4d8d4, 0x4841);    // golden tee IRQ? wait hack
-
-		//if (mem.read_word(0x34410) == 0x4846)
-		//  mem.write_word(0x34410, 0x4840);    // golden tee force service mode
-
-	}
-/*	else if ((mode == 0x0089) || (mode == 0x0009) || (mode == 0x4009))
-	{
-		for (int i = 0; i < length; i++)
+		if (mode & 0x2000)
 		{
-
-			uint16_t val = read_space(source);
-
-			write_space(dest , val);
-			dest += 1;
-
-			if ((mode&0x3fff) == 0x0009)
-				source += 1;
+			write_space(dest, val & 0xFF);
+			write_space(dest, val >> 8);
 		}
+		else
+		{
+			write_space(dest, val);
+		}
+
+		dest += destdelta;
 	}
-	else
-	{
-		LOGMASKED(LOG_GCM394_SYSDMA, "unhandled!\n");
-	}
-*/
+
+	// HACKS to get into service mode for debugging
+
+	// note, these patch the code copied to SRAM so the 'PROGRAM ROM' check fails (it passes otherwise)
+	if (mem.read_word(0x3f368) == 0x4840)
+		mem.write_word(0x3f368, 0x4841);    // cars 2 IRQ? wait hack
+
+	if (mem.read_word(0x4368c) == 0x4846)
+		mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
+
+	if (mem.read_word(0x4d8d4) == 0x4840)
+		mem.write_word(0x4d8d4, 0x4841);    // golden tee IRQ? wait hack
+
+	if (mem.read_word(0x34410) == 0x4846)
+		mem.write_word(0x34410, 0x4840);    // golden tee force service mode
+
+	// clear params after operation
 	m_dma_params[0][channel] = m_dma_params[1][channel] = m_dma_params[2][channel] = m_dma_params[3][channel] = m_dma_params[4][channel] = m_dma_params[5][channel] = m_dma_params[6][channel] = 0x0000;
 	//machine().debug_break();
 }
 
-WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
+WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_7abf_unk_w)
 {
-	// trigger is value based, not bit based, how many channels are there?
-/*
-	if (data == 1) trigger_systemm_dma(space, 0, data);
-	else if (data == 2) trigger_systemm_dma(space, 1, data);
-	else if (data == 3) trigger_systemm_dma(space, 2, data);
-	else
-	{
-		fatalerror("unknown DMA trigger type\n");
-	}
-*/
+	// if this isn't trigger, is it enable? (which could maybe used as similar if DMA only starts to happen if unmasked?)
+
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::system_dma_7abf_unk_w %04x\n", machine().describe_context(), data);
 }
 
 READ16_MEMBER(sunplus_gcm394_base_device::system_dma_memtype_r)
@@ -321,8 +305,17 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::membankswitch_7810_w)
 }
 
 
-WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7816_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7816_w %04x\n", machine().describe_context(), data); m_7816 = data; }
-WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7817_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7817_w %04x\n", machine().describe_context(), data); m_7817 = data; }
+WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7816_w)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7816_w %04x\n", machine().describe_context(), data);
+	m_7816 = data;
+}
+
+WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7817_w)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7817_w %04x\n", machine().describe_context(), data);
+	m_7817 = data;
+}
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::chipselect_csx_memory_device_control_w)
 {
@@ -831,7 +824,7 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	map(0x007a98, 0x007a9f).rw(FUNC(sunplus_gcm394_base_device::system_dma_params_channel3_r), FUNC(sunplus_gcm394_base_device::system_dma_params_channel3_w)); // not seen, but probably
 
 	map(0x007abe, 0x007abe).rw(FUNC(sunplus_gcm394_base_device::system_dma_memtype_r), FUNC(sunplus_gcm394_base_device::system_dma_memtype_w)); // 7abe - written with DMA stuff (source type for each channel so that device handles timings properly?)
-	map(0x007abf, 0x007abf).rw(FUNC(sunplus_gcm394_base_device::system_dma_status_r), FUNC(sunplus_gcm394_base_device::system_dma_trigger_w));
+	map(0x007abf, 0x007abf).rw(FUNC(sunplus_gcm394_base_device::system_dma_status_r), FUNC(sunplus_gcm394_base_device::system_dma_7abf_unk_w));
 
 	// ######################################################################################################################################################################################
 	// 7bxx-7fxx = audio
@@ -877,9 +870,7 @@ READ16_MEMBER(sunplus_gcm394_base_device::cs_bank_space_r)
 		return 0;
 	}
 
-	//return m_cs_space->read_word(offset + (0x200000 - m_csbase));
 	return m_cs_space->read_word(realoffset);
-
 }
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::cs_bank_space_w)
@@ -1015,7 +1006,7 @@ WRITE16_MEMBER(generalplus_gpac800_device::nand_addr_low_w)
 
 void generalplus_gpac800_device::recalculate_calculate_effective_nand_address()
 {
-	uint8_t type = m_nand_7856 & 0xF;
+	uint8_t type = m_nand_7856 & 0xf;
 	uint8_t shift = 0;
 	uint32_t page_offset = 0;
 	
