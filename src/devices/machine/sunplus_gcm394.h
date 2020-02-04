@@ -359,7 +359,9 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_READ16_MEMBER(nand_7850_r);
+	void recalculate_calculate_effective_nand_address();
+
+	DECLARE_READ16_MEMBER(nand_7850_status_r);
 	DECLARE_READ16_MEMBER(nand_7854_r);
 	DECLARE_WRITE16_MEMBER(nand_dma_ctrl_w);
 	DECLARE_WRITE16_MEMBER(nand_7850_w);
@@ -367,7 +369,7 @@ private:
 	DECLARE_WRITE16_MEMBER(nand_addr_low_w);
 	DECLARE_WRITE16_MEMBER(nand_addr_high_w);
 	DECLARE_READ16_MEMBER(nand_ecc_low_byte_error_flag_1_r);
-	DECLARE_WRITE16_MEMBER(nand_7856_w);
+	DECLARE_WRITE16_MEMBER(nand_7856_type_w);
 	DECLARE_WRITE16_MEMBER(nand_7857_w);
 	DECLARE_WRITE16_MEMBER(nand_785b_w);
 	DECLARE_WRITE16_MEMBER(nand_785c_w);

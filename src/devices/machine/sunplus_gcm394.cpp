@@ -1008,32 +1008,44 @@ WRITE16_MEMBER(generalplus_gpac800_device::nand_command_w)
 
 WRITE16_MEMBER(generalplus_gpac800_device::nand_addr_low_w)
 {
-	//logerror("%s:sunplus_gcm394_base_device::nand_addr_low_w %04x\n", machine().describe_context(), data);
+	logerror("%s:sunplus_gcm394_base_device::nand_addr_low_w %04x\n", machine().describe_context(), data);
 	m_nand_addr_low = data;
 	m_curblockaddr = 0;
 }
 
-WRITE16_MEMBER(generalplus_gpac800_device::nand_addr_high_w)
+void generalplus_gpac800_device::recalculate_calculate_effective_nand_address()
 {
-	//logerror("%s:sunplus_gcm394_base_device::nand_addr_high_w %04x\n", machine().describe_context(), data);
-	m_nand_addr_high = data;
-
-	uint32_t address = (m_nand_addr_high << 16) | m_nand_addr_low;
-
 	uint8_t type = m_nand_7856 & 0xF;
 	uint8_t shift = 0;
 	uint32_t page_offset = 0;
-	if (type == 7) shift = 4;
-	else if (type == 11) shift = 5;
-	if (m_nandcommand == 0x01) page_offset = 256;
-	else if (m_nandcommand == 0x50) page_offset = 512;
+	
+	if (type == 7)
+		shift = 4;
+	else if (type == 11)
+		shift = 5;
+
+	if (m_nandcommand == 0x01)
+		page_offset = 256;
+	else if (m_nandcommand == 0x50)
+		page_offset = 512;
 
 	uint32_t nandaddress = (m_nand_addr_high << 16) | m_nand_addr_low;
-	if (m_nand_7850 & 0x4000) nandaddress *= 2;
+
+	if (m_nand_7850 & 0x4000)
+		nandaddress *= 2;
+	
 	uint32_t page = type ? nandaddress : /*(m_nand_7850 & 0x4000) ?*/ nandaddress >> 8 /*: nandaddress >> 9*/;
 	m_effectiveaddress = (page * 528 + page_offset) << shift;
 
-	logerror("%s: Requested address is %08x, translating to %08x\n", machine().describe_context(), address, m_effectiveaddress);
+	logerror("%s: Requested address is %08x, translating to %08x\n", machine().describe_context(), nandaddress, m_effectiveaddress);
+}
+
+WRITE16_MEMBER(generalplus_gpac800_device::nand_addr_high_w)
+{
+	logerror("%s:sunplus_gcm394_base_device::nand_addr_high_w %04x\n", machine().describe_context(), data);
+	m_nand_addr_high = data;
+
+	recalculate_calculate_effective_nand_address();
 
 	m_curblockaddr = 0;
 }
@@ -1044,7 +1056,7 @@ WRITE16_MEMBER(generalplus_gpac800_device::nand_dma_ctrl_w)
 	m_nand_dma_ctrl = data;
 }
 
-READ16_MEMBER(generalplus_gpac800_device::nand_7850_r)
+READ16_MEMBER(generalplus_gpac800_device::nand_7850_status_r)
 {
 	// 0x8000 = ready
 	return m_nand_7850 | 0x8000;
@@ -1056,27 +1068,12 @@ WRITE16_MEMBER(generalplus_gpac800_device::nand_7850_w)
 	m_nand_7850 = data;
 }
 
-WRITE16_MEMBER(generalplus_gpac800_device::nand_7856_w)
+WRITE16_MEMBER(generalplus_gpac800_device::nand_7856_type_w)
 {
-	logerror("%s:sunplus_gcm394_base_device::nand_7856_w %04x\n", machine().describe_context(), data);
+	logerror("%s:sunplus_gcm394_base_device::nand_7856_type_w %04x\n", machine().describe_context(), data);
 	m_nand_7856 = data;
 
-	uint32_t address = (m_nand_addr_high << 16) | m_nand_addr_low;
-
-	uint8_t type = m_nand_7856 & 0xF;
-	uint8_t shift = 0;
-	uint32_t page_offset = 0;
-	if (type == 7) shift = 4;
-	else if (type == 11) shift = 5;
-	if (m_nandcommand == 0x01) page_offset = 256;
-	else if (m_nandcommand == 0x50) page_offset = 512;
-
-	uint32_t nandaddress = (m_nand_addr_high << 16) | m_nand_addr_low;
-	if (m_nand_7850 & 0x4000) nandaddress *= 2;
-	uint32_t page = type ? nandaddress : /*(m_nand_7850 & 0x4000) ?*/ nandaddress >> 8 /*: nandaddress >> 9*/;
-	m_effectiveaddress = (page * 528 + page_offset) << shift;
-
-	logerror("%s: Requested address is %08x, translating to %08x\n", machine().describe_context(), address, m_effectiveaddress);
+	recalculate_calculate_effective_nand_address();
 
 	m_curblockaddr = 0;
 }
@@ -1199,13 +1196,13 @@ void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
 	sunplus_gcm394_base_device::base_internal_map(map);
 
 	// 785x = NAND device
-	map(0x007850, 0x007850).rw(FUNC(generalplus_gpac800_device::nand_7850_r), FUNC(generalplus_gpac800_device::nand_7850_w)); // NAND Control Reg
+	map(0x007850, 0x007850).rw(FUNC(generalplus_gpac800_device::nand_7850_status_r), FUNC(generalplus_gpac800_device::nand_7850_w)); // NAND Control Reg
 	map(0x007851, 0x007851).w(FUNC(generalplus_gpac800_device::nand_command_w)); // NAND Command Reg
 	map(0x007852, 0x007852).w(FUNC(generalplus_gpac800_device::nand_addr_low_w)); // NAND Low Address Reg
 	map(0x007853, 0x007853).w(FUNC(generalplus_gpac800_device::nand_addr_high_w)); // NAND High Address Reg
 	map(0x007854, 0x007854).r(FUNC(generalplus_gpac800_device::nand_7854_r)); // NAND Data Reg
 	map(0x007855, 0x007855).w(FUNC(generalplus_gpac800_device::nand_dma_ctrl_w)); // NAND DMA / INT Control
-	map(0x007856, 0x007856).w(FUNC(generalplus_gpac800_device::nand_7856_w)); // usually 0x0021?
+	map(0x007856, 0x007856).w(FUNC(generalplus_gpac800_device::nand_7856_type_w)); // usually 0x0021?
 	map(0x007857, 0x007857).w(FUNC(generalplus_gpac800_device::nand_7857_w));
 
 	// most of these are likely ECC stuff for testing the ROM?
