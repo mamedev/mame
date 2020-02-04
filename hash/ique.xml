@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<softwarelist name="n64" description="Nintendo iQue depot downloads">
+<softwarelist name="ique" description="Nintendo iQue depot downloads">
 
     <software name="dongwu" supported="no">
         <description>Dòngwù Sēnlín (version 8)</description>
