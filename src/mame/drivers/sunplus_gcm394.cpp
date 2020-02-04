@@ -237,6 +237,7 @@ public:
 	generalplus_gpac800_game_state(const machine_config& mconfig, device_type type, const char* tag) :
 		gcm394_game_state(mconfig, type, tag),
 		m_has_nand(false),
+		m_nandregion(*this, "nandrom"),
 		m_initial_copy_words(0x2000)
 	{
 	}
@@ -265,11 +266,12 @@ protected:
 
 	bool m_has_nand;
 private:
+	optional_region_ptr<uint8_t> m_nandregion;
+
 	void nand_init(int blocksize, int blocksize_stripped);
 
 	std::vector<uint8_t> m_strippedrom;
 	int m_strippedsize;
-	uint8_t* m_rom;
 	int m_size;
 
 	int m_initial_copy_words;
@@ -534,10 +536,10 @@ WRITE16_MEMBER(generalplus_gpac800_game_state::cs1_w)
 
 READ8_MEMBER(generalplus_gpac800_game_state::read_nand)
 {
-	if (!m_has_nand)
+	if (!m_nandregion)
 		return 0x0000;
 
-	return (offset < m_size) ? m_rom[offset] : 0xFF;
+	return (offset < m_size) ? m_nandregion[offset] : 0xFF;
 	//return m_strippedrom[offset & (m_strippedsize - 1)];
 }
 
@@ -1459,48 +1461,48 @@ ROM_START( wlsair60 )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
-	ROM_REGION16_BE( 0x8400000, "nandrom", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "wlsair60.nand", 0x0000, 0x8400000, CRC(eec23b97) SHA1(1bb88290cf54579a5bb51c08a02d793cd4d79f7a) )
+	ROM_REGION( 0x8400000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "wlsair60.nand", 0x0000, 0x8400000, CRC(eec23b97) SHA1(1bb88290cf54579a5bb51c08a02d793cd4d79f7a) )
 ROM_END
 
 ROM_START( jak_gtg )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
-	ROM_REGION16_BE( 0x4200000, "nandrom", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "goldentee.bin", 0x0000, 0x4200000, CRC(87d5e815) SHA1(5dc46cd753b791449cc41d5eff4928c0dcaf35c0) )
+	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "goldentee.bin", 0x0000, 0x4200000, CRC(87d5e815) SHA1(5dc46cd753b791449cc41d5eff4928c0dcaf35c0) )
 ROM_END
 
 ROM_START( jak_car2 )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
-	ROM_REGION16_BE( 0x4200000, "nandrom", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "cars2.bin", 0x0000, 0x4200000, CRC(4d610e09) SHA1(bc59f5f7f676a8f2a78dfda7fb62c804bbf850b6) )
+	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "cars2.bin", 0x0000, 0x4200000, CRC(4d610e09) SHA1(bc59f5f7f676a8f2a78dfda7fb62c804bbf850b6) )
 ROM_END
 
 ROM_START( jak_tsm )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
-	ROM_REGION16_BE( 0x4200000, "nandrom", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "toystorymania.bin", 0x0000, 0x4200000, CRC(183b20a5) SHA1(eb4fa5ee9dfac58f5244d00d4e833b1e461cc52c) )
+	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "toystorymania.bin", 0x0000, 0x4200000, CRC(183b20a5) SHA1(eb4fa5ee9dfac58f5244d00d4e833b1e461cc52c) )
 ROM_END
 
 ROM_START( vbaby )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
-	ROM_REGION16_BE( 0x8400000, "nandrom", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "vbaby.bin", 0x0000, 0x8400000, CRC(d904441b) SHA1(3742bc4e1e403f061ce2813ecfafc6f30a44d287) )
+	ROM_REGION( 0x8400000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "vbaby.bin", 0x0000, 0x8400000, CRC(d904441b) SHA1(3742bc4e1e403f061ce2813ecfafc6f30a44d287) )
 ROM_END
 
 ROM_START( beambox )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
-	ROM_REGION16_BE( 0x4200000, "nandrom", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "beambox.bin", 0x0000, 0x4200000, CRC(a486f04e) SHA1(73c7d99d8922eba58d94e955e254b9c3baa4443e) )
+	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "beambox.bin", 0x0000, 0x4200000, CRC(a486f04e) SHA1(73c7d99d8922eba58d94e955e254b9c3baa4443e) )
 ROM_END
 
 // the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
@@ -1590,8 +1592,6 @@ void generalplus_gpac800_game_state::nand_init(int blocksize, int blocksize_stri
 	m_sdram2.resize(0x10000);
 
 	uint8_t* rom = memregion("nandrom")->base();
-	m_rom = rom;
-
 	int size = memregion("nandrom")->bytes();
 	m_size = size;
 
@@ -1606,7 +1606,7 @@ void generalplus_gpac800_game_state::nand_init(int blocksize, int blocksize_stri
 
 		for (int j = 0; j < blocksize_stripped; j++)
 		{
-			m_strippedrom[basestripped + j] = rom[base + j];
+			m_strippedrom[basestripped + j] = rom[(base + j)];
 		}
 	}
 
