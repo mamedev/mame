@@ -1468,6 +1468,11 @@ ROM_START( gba )
 	ROM_LOAD( "gba.bin", 0x000000, 0x004000, CRC(81977335) SHA1(300c20df6731a33952ded8c436f7f186d25d3492) )
 ROM_END
 
+ROM_START( gbad )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "gba.bin", 0x000000, 0x004000, CRC(15e1f676) SHA1(aa98a2ad32b86106340665d1222d7d973a1361c7) )
+ROM_END
 
 //   YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY     FULLNAME            FLAGS
 CONS(2001, gba,  0,      0,      gbadv,   gbadv, gba_state, empty_init, "Nintendo", "Game Boy Advance", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+CONS(2001, gbad, 0,      0,      gbadv,   gbadv, gba_state, empty_init, "Nintendo", "Game Boy Advance (Debug)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
