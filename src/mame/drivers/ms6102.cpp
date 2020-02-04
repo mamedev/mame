@@ -233,8 +233,7 @@ WRITE8_MEMBER(ms6102_state::kbd_uart_clock_w)
 
 WRITE8_MEMBER(ms6102_state::pic_w)
 {
-	m_pic->b_w((data & 7) ^ 7);
-	m_pic->sgs_w(BIT(data, 3) ^ 1);
+	m_pic->b_sgs_w(data);
 }
 
 WRITE8_MEMBER(ms6102_state::vdack_w)
