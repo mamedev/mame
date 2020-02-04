@@ -2382,8 +2382,14 @@ patched out (+ a fix for internal checksum)
 		<info name="release" value="19991208"/>
 		<info name="alt_title" value="カスタムロボ"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NCXJ-0]" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="16777216">
-				<rom name="custom robo (japan).bin" size="16777216" crc="30c84f36" sha1="9d462983d2f6c4417c328d97d430e0d62c5dac94" />
+				<rom name="nus-ncxj-0.u1" size="16777216" crc="30c84f36" sha1="9d462983d2f6c4417c328d97d430e0d62c5dac94" />
 			</dataarea>
 		</part>
 	</software>
@@ -4186,8 +4192,14 @@ This cart features a RTC, currently unemulated
 		<info name="release" value="19981204"/>
 		<info name="alt_title" value="ゲッターラブ!!"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NGLJ-0]" />
+			<feature name="u2" value="U2 [BK4D-NUS]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="12582912">
-				<rom name="getter love!! cho renai party game (japan).bin" size="12582912" crc="bbd2ae37" sha1="17507afa02aec34fe3af3077ef60a4a990626160" />
+				<rom name="nus-nglj-0.u1" size="12582912" crc="bbd2ae37" sha1="17507afa02aec34fe3af3077ef60a4a990626160" />
 			</dataarea>
 		</part>
 	</software>
@@ -5164,8 +5176,16 @@ This cart features a RTC, currently unemulated
 		<info name="release" value="20000331"/>
 		<info name="alt_title" value="糸井重里のバス釣りNo.1 決定版!"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-03A-01" />
+			<feature name="u1" value="U1 [NUS-NIBJ-0]" />
+			<feature name="u2" value="U2 [LH52V246A]" />
+			<feature name="u3" value="U3 [74LV2416]" />
+			<feature name="u4" value="U4 [CIC-NUS-6102A]" />
+			<feature name="bt1" value="BT1 [CR2032]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="16777216">
-				<rom name="itoi shigesato no bass tsuri no. 1 kettei ban! (japan).bin" size="16777216" crc="5e9c3e4b" sha1="e9581337df0f93638ddaf328f84bfe92e5764474" />
+				<rom name="nus-nibj-0.u1" size="16777216" crc="5e9c3e4b" sha1="e9581337df0f93638ddaf328f84bfe92e5764474" />
 			</dataarea>
 		</part>
 	</software>
@@ -6118,10 +6138,10 @@ This cart features a RTC, currently unemulated
 	</software>
 
 	<software name="zeldaootu2" cloneof="zeldaoot">
-		<description>The Legend of Zelda - Ocarina of Time (USA)</description>
+		<description>The Legend of Zelda - Ocarina of Time (Hong Kong, USA)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NUS-CZGE-USA (gold cart), NUS-CZLE-USA (grey cart)" />
+		<info name="serial" value="NUS-CZLE-HKG, NUS-CZGE-USA (gold cart), NUS-CZLE-USA (grey cart)" />
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-03A-01" />
 			<feature name="u1" value="U1 [NUS-CZLE-0]" />
@@ -6129,8 +6149,8 @@ This cart features a RTC, currently unemulated
 			<feature name="u3" value="U3 [BU9803A]" />
 			<feature name="u4" value="U4 [CIC-NUS-6105]" />
 			<feature name="bt1" value="BT1 [CR2032]" />
-			<feature name="cart_model" value="NUS-006(-01)(USA)" />
-			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<feature name="cart_model" value="NUS-006(-01)(USA)" /> <!-- Also with NUS-006(-01)(JPN) -->
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" /> <!-- Also with NUS-HKG-1 -->
 			<dataarea name="rom" size="33554432">
 				<rom name="nus-czle-0.u1" size="33554432" crc="ec95702d" sha1="79a4f053d34018e59279e6d4b83c7daccd985c87" />
 			</dataarea>
@@ -10642,8 +10662,14 @@ patched out (+ a fix for internal checksum)
 		<info name="release" value="19980104"/>
 		<info name="alt_title" value="新日本プロレスリング 闘魂炎導 BRAVE SPIRITS"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NTOJ-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="12582912">
-				<rom name="shin nihon pro wrestling toukon road - brave spirits (japan).bin" size="12582912" crc="62c99de2" sha1="4da682946b4a6f586f4d525f0649d7a1e36357d9" />
+				<rom name="nus-ntoj-0.u1" size="12582912" crc="62c99de2" sha1="4da682946b4a6f586f4d525f0649d7a1e36357d9" />
 			</dataarea>
 		</part>
 	</software>
@@ -11544,8 +11570,14 @@ patched out (+ a fix for internal checksum)
 		<info name="release" value="19980717"/>
 		<info name="alt_title" value="スーパーロボットスピリッツ"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NSSJ-0]" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="16777216">
-				<rom name="super robot spirits (japan).bin" size="16777216" crc="dab52b89" sha1="f7b7e507b7210e637ccfd2f788a95ef5c7970ec0" />
+				<rom name="nus-nssj-0.u1" size="16777216" crc="dab52b89" sha1="f7b7e507b7210e637ccfd2f788a95ef5c7970ec0" />
 			</dataarea>
 		</part>
 	</software>
@@ -11711,8 +11743,14 @@ patched out (+ a fix for internal checksum)
 		<info name="release" value="19980326"/>
 		<info name="alt_title" value="進め!対戦ぱずるだま 闘魂!まるたま町"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NPZJ-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="8388608">
-				<rom name="susume! taisen puzzle dama - toukon! marutama chou (japan).bin" size="8388608" crc="dc83bcd3" sha1="abd8ecdbfc3676488c4cb961439f13ef8dc7c0c7" />
+				<rom name="nus-npzj-0.u1" size="8388608" crc="dc83bcd3" sha1="abd8ecdbfc3676488c4cb961439f13ef8dc7c0c7" />
 			</dataarea>
 		</part>
 	</software>
@@ -12912,8 +12950,14 @@ clips onto the player's ear.
 		<info name="release" value="19971219"/>
 		<info name="alt_title" value="ウッチャンナンチャンの炎のチャレンジャー 電流イライラ棒"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NIRJ-0]" />
+			<feature name="u2" value="U2 [BK4D-NUS]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="8388608">
-				<rom name="utchan nanchan no hono no challenger - denryuu ira ira bou (japan).bin" size="8388608" crc="cb8c642b" sha1="9099c31fa07c8bfdd5dc94efebb9054144a1e34c" />
+				<rom name="nus-nirj-0.u1" size="8388608" crc="cb8c642b" sha1="9099c31fa07c8bfdd5dc94efebb9054144a1e34c" />
 			</dataarea>
 		</part>
 	</software>
@@ -13204,7 +13248,7 @@ clips onto the player's ear.
 		<description>War Gods (Europe)</description>
 		<year>1997</year>
 		<publisher>Midway</publisher>
-		<info name="serial" value="NUS-NWAP-EUR"/>
+		<info name="serial" value="NUS-NWAP-EUR, NUS-NWAP-FRA"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="war gods (europe).bin" size="12582912" crc="fd10aaa6" sha1="fc77e3d872220dafc41147ba79188a04e21f3805" />
@@ -13258,7 +13302,7 @@ clips onto the player's ear.
 		<description>Wave Race 64 - Shindou Pak Taiou (Japan, rev 2)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NUS-NWRJ-JPN"/>
+		<info name="serial" value="NUS-NWRJ-JPN-1"/>
 		<info name="release" value="19970718"/>
 		<info name="alt_title" value="ウエーブレース64 振動パック対応, ウエーブレース64 (振動パック対応バージョン) (box)"/>
 		<part name="cart" interface="n64_cart">
@@ -13276,8 +13320,14 @@ clips onto the player's ear.
 		<info name="release" value="19960927"/>
 		<info name="alt_title" value="ウエーブレース64"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="u1" value="U1 [NUS-NWRJ-0]" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN" />
 			<dataarea name="rom" size="8388608">
-				<rom name="wave race 64 (japan).bin" size="8388608" crc="0580eee7" sha1="b1b4435b15627830f7c932eb40df862eea2b38e4" />
+				<rom name="nus-nwrj-0.u1" size="8388608" crc="0580eee7" sha1="b1b4435b15627830f7c932eb40df862eea2b38e4" />
 			</dataarea>
 		</part>
 	</software>
@@ -13453,23 +13503,11 @@ clips onto the player's ear.
 		</part>
 	</software>
 
-	<software name="wcwnitro1" cloneof="wcwnitro">
-		<description>WCW Nitro (USA, Alt)</description>
-		<year>1999</year>
-		<publisher>T*HQ</publisher>
-		<info name="serial" value="NUS-NW3E-USA"/>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="wcw nitro (usa) (alt).bin" size="12582912" crc="428336e2" sha1="73634afa7ca80a955f0ca38d34ee0816e540ee4e" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="wcwvsnwo">
 		<description>WCW vs. nWo - World Tour (Europe)</description>
 		<year>1997</year>
 		<publisher>T*HQ</publisher>
-		<info name="serial" value="NUS-NWNP-EUR"/>
+		<info name="serial" value="NUS-NWNP-EUR, NUS-NWNP-EUU"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="wcw vs. nwo - world tour (europe).bin" size="12582912" crc="b3a472a3" sha1="dd07a3434ee38ac03f5d3e45bfb0b3f956ebdab5" />
@@ -13517,7 +13555,7 @@ clips onto the player's ear.
 		<description>WCW/nWo Revenge (Europe)</description>
 		<year>1998</year>
 		<publisher>T*HQ</publisher>
-		<info name="serial" value="NUS-NW2P-EUR"/>
+		<info name="serial" value="NUS-NW2P-EUR, NUS-NW2P-UKV"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="wcw-nwo revenge (europe).bin" size="16777216" crc="0abbe702" sha1="12c5ccbbb9744226517e6eecfba0ff103e83b905" />
@@ -13549,7 +13587,7 @@ clips onto the player's ear.
 		<description>Wetrix (Europe)</description>
 		<year>1998</year>
 		<publisher>Ocean</publisher>
-		<info name="serial" value="NUS-NWTP-EUR"/>
+		<info name="serial" value="NUS-NWTP-EUR, NUS-NWTP-EUU"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="wetrix (europe) (en,fr,de,es,it,nl).bin" size="8388608" crc="e26cff31" sha1="8967cd465fbcc1151f8794f0c58181da1040c2ec" />
@@ -13631,7 +13669,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="winbackj" cloneof="winback">
-		<description>WinBack (Japan, Rev. A)</description>
+		<description>WinBack (Japan, rev 1)</description>
 		<year>1999</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="NUS-NWDJ-JPN"/>
@@ -13665,7 +13703,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NWDE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NWDE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="16777216">
@@ -13678,7 +13716,7 @@ clips onto the player's ear.
 		<description>Wipeout 64 (Europe)</description>
 		<year>1998</year>
 		<publisher>Midway</publisher>
-		<info name="serial" value="NUS-NWPP-(EUR,EUU)"/>
+		<info name="serial" value="NUS-NWPP-EUR, NUS-NWPP-EUU"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="wipeout 64 (europe).bin" size="8388608" crc="0c3497e4" sha1="ccab769b06290671adbc81b09440049b487adbab" />
@@ -13690,10 +13728,16 @@ clips onto the player's ear.
 		<description>Wipeout 64 (USA)</description>
 		<year>1998</year>
 		<publisher>Midway</publisher>
-		<info name="serial" value="NUS-NWPP-USA"/>
+		<info name="serial" value="NUS-NWPE-USA"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NWPE-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="8388608">
-				<rom name="wipeout 64 (usa).bin" size="8388608" crc="3e8cce96" sha1="4b9d19e3010756d3106f8b20b2b90daddb80bc1c" />
+				<rom name="nus-nwpe-0.u1" size="8388608" crc="3e8cce96" sha1="4b9d19e3010756d3106f8b20b2b90daddb80bc1c" />
 			</dataarea>
 		</part>
 	</software>
@@ -13731,10 +13775,12 @@ clips onto the player's ear.
 		<info name="release" value="19961122"/>
 		<info name="alt_title" value="ワンダープロジェクト ジェイツーコルロの森のジョゼット"/>
 		<part name="cart" interface="n64_cart">
-			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="pcb" value="NUS-01A-01" />
 			<feature name="u1" value="U1 [NUS-NJ2J-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN" />
 			<dataarea name="rom" size="8388608">
 				<rom name="nus-nj2j-0.u1" size="8388608" crc="8aaf74a3" sha1="585b62b5ca10a5e296a7dd0065dccb91bb620ed2" />
 			</dataarea>
@@ -13765,7 +13811,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-N8WE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-N8WE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -13793,7 +13839,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NWOE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NWOE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="16777216">
@@ -13806,7 +13852,7 @@ clips onto the player's ear.
 		<description>Worms Armageddon (Europe)</description>
 		<year>2000</year>
 		<publisher>Infogrames</publisher>
-		<info name="serial" value="NUS-NWUP-(UKV,NOE)"/>
+		<info name="serial" value="NUS-NWUP-NOE, NUS-NWUP-UKV"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="worms armageddon (europe) (en,fr,de,es,it,nl).bin" size="12582912" crc="4862ebbd" sha1="ec23bb5489c76933eff1a2ba17658c7ebd116328" />
@@ -13821,7 +13867,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NADE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NADE-0]" />
 			<feature name="u2" value="U2 [BU9850]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="12582912">
@@ -13861,7 +13907,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NTIE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NTIE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="33554432">
@@ -13871,7 +13917,7 @@ clips onto the player's ear.
 	</software>
 
 	<software name="wwfnomer">
-		<description>WWF No Mercy (Europe, Rev. A)</description>
+		<description>WWF No Mercy (Europe, rev 1)</description>
 		<year>2000</year>
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="NUS-NW4P-EUR"/>
@@ -13888,14 +13934,20 @@ clips onto the player's ear.
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="NUS-NW4P-EUR"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-06A-01" />
+			<feature name="u1" value="U1 [NUS-NW4P-0]" />
+			<feature name="u2" value="U2 [NUS MN63F81MPN]" />
+			<feature name="u3" value="U3 [CIC-NUS-7101A]" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<feature name="cart_back_label" value="NUS-EUR-1" />
 			<dataarea name="rom" size="33554432">
-				<rom name="wwf no mercy (europe).bin" size="33554432" crc="eeb166b4" sha1="cadbcd5361dffaf2aa17f0cb4c4cc799bdc8350a" />
+				<rom name="nus-nw4p-0.u1" size="33554432" crc="eeb166b4" sha1="cadbcd5361dffaf2aa17f0cb4c4cc799bdc8350a" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="wwfnomeru" cloneof="wwfnomer">
-		<description>WWF No Mercy (USA, Rev. A)</description>
+		<description>WWF No Mercy (USA, rev 1)</description>
 		<year>2000</year>
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="NUS-NW4E-USA"/>
@@ -13913,7 +13965,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NW4E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-06A-01" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NW4E-0]" />
 			<feature name="u2" value="U2 [NUS MN63F81MPN]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="33554432">
@@ -13941,7 +13993,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NWWE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NWWE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="12582912">
@@ -13983,11 +14035,11 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NWXE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-03A-01" />
-			<feature name="u1" value="NUS-NWXE-0" />
-			<feature name="u2" value="LH52V246A" />
-			<feature name="u3" value="74LV2416" />
-			<feature name="u4" value="CIC-NUS-6102A" />
-			<feature name="bt1" value="CR2032" />
+			<feature name="u1" value="U1 [NUS-NWXE-0]" />
+			<feature name="u2" value="U2 [LH52V246A]" />
+			<feature name="u3" value="U3 [74LV2416]" />
+			<feature name="u4" value="U4 [CIC-NUS-6102A]" />
+			<feature name="bt1" value="BT1 [CR2032]" />
 			<feature name="cart_model" value="NUS-006(-01)(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="33554432">
@@ -14015,7 +14067,7 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NXFE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="U1" />
+			<feature name="u1" value="U1 [NUS-NXFE-0]" />
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
 			<dataarea name="rom" size="12582912">
@@ -14032,8 +14084,14 @@ clips onto the player's ear.
 		<info name="release" value="19991022"/>
 		<info name="alt_title" value="夜光虫II 殺人航路"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NYKJ-0]" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102A]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="33554432">
-				<rom name="yakouchuu ii - satsujin kouro (japan).bin" size="33554432" crc="5c97c412" sha1="e4035072f682fe16e189e57bf6a9a35706d3028a" />
+				<rom name="nus-nykj-0.u1" size="33554432" crc="5c97c412" sha1="e4035072f682fe16e189e57bf6a9a35706d3028a" />
 			</dataarea>
 		</part>
 	</software>
@@ -14047,11 +14105,11 @@ clips onto the player's ear.
 		<info name="alt_title" value="ヨッシーストーリー"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-NYSJ-0" />
-			<feature name="u2" value="BK16D 9851" />
-			<feature name="u3" value="CIC-NUS-6106" />
+			<feature name="u1" value="U1 [NUS-NYSJ-0]" />
+			<feature name="u2" value="U2 [BK16D 9851]" />
+			<feature name="u3" value="U3 [CIC-NUS-6106]" />
 			<feature name="cart_model" value="NUS-006(JPN)" />
-			<feature name="cart_back_label" value="NUS-JPN-1" />
+			<feature name="cart_back_label" value="NUS-JPN-1" /> <!-- Also with NUS-USA/CAN-1 -->
 			<dataarea name="rom" size="16777216">
 				<rom name="nus-nysj-0.u1" size="16777216" crc="feac925c" sha1="325a1487c4be295837728dbe7809a31823ad2554" />
 			</dataarea>
@@ -14065,9 +14123,9 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NYSP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-NYSP-0" />
-			<feature name="u2" value="BK16D 9851" />
-			<feature name="u3" value="CIC-NUS-7106" />
+			<feature name="u1" value="U1 [NUS-NYSP-0]" />
+			<feature name="u2" value="U2 [BK16D 9851]" />
+			<feature name="u3" value="U3 [CIC-NUS-7106]" />
 			<feature name="cart_model" value="NUS-006(EUR)" />
 			<feature name="cart_back_label" value="NUS-EUR-1" />
 			<dataarea name="rom" size="16777216">
@@ -14083,9 +14141,9 @@ clips onto the player's ear.
 		<info name="serial" value="NUS-NYSE-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
-			<feature name="u1" value="NUS-NYSE-0" />
-			<feature name="u2" value="BK16D 985" />
-			<feature name="u3" value="CIC-NUS-6106" />
+			<feature name="u1" value="U1 [NUS-NYSE-0]" />
+			<feature name="u2" value="U2 [BK16D 985]" />
+			<feature name="u3" value="U3 [CIC-NUS-6106]" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="16777216">
@@ -14102,14 +14160,20 @@ clips onto the player's ear.
 		<info name="release" value="19970627"/>
 		<info name="alt_title" value="ゆけゆけ!!トラブルメーカーズ"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NTMJ-0]" />
+			<feature name="u2" value="U2 [BU9850]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN" />
 			<dataarea name="rom" size="8388608">
-				<rom name="yuke yuke!! trouble makers (japan).bin" size="8388608" crc="f8bb860c" sha1="6807ebe5f95c30baee18f5da6c170396d6b8764e" />
+				<rom name="nus-ntmj-0.u1" size="8388608" crc="f8bb860c" sha1="6807ebe5f95c30baee18f5da6c170396d6b8764e" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="zeldamajj" cloneof="zeldamaj">
-		<description>Zelda no Densetsu - Mujura no Kamen (Japan, Rev. A)</description>
+		<description>Zelda no Densetsu - Mujura no Kamen (Japan, rev 1)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NZSJ-JPN"/>
@@ -14130,36 +14194,56 @@ clips onto the player's ear.
 		<info name="release" value="20000427"/>
 		<info name="alt_title" value="ゼルダの伝説 ムジュラの仮面"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-06A-01" />
+			<feature name="u1" value="U1 [NUS-NZSJ-0]" />
+			<feature name="u2" value="U2 [29L1100KC-15B0]" />
+			<feature name="u3" value="U3 [CIC-NUS-6105]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="33554432">
-				<rom name="zelda no densetsu - mujura no kamen (japan).bin" size="33554432" crc="3361b649" sha1="9afda65b3ae7d3714066dbccf820158c3286f423" />
+				<rom name="nus-nzsj-0.u1" size="33554432" crc="3361b649" sha1="9afda65b3ae7d3714066dbccf820158c3286f423" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="zeldaootj" cloneof="zeldaoot">
-		<description>Zelda no Densetsu - Toki no Ocarina (Japan, Rev. B)</description>
+		<description>Zelda no Densetsu - Toki no Ocarina (Japan, rev 2)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-CZLJ-JPN"/>
 		<info name="release" value="19981121"/>
 		<info name="alt_title" value="ゼルダの伝説 時のオカリナ"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-03A-01" />
+			<feature name="u1" value="U1 [NUS-CZLJ-2]" />
+			<feature name="u2" value="U2 [LH52V246A]" />
+			<feature name="u3" value="U3 [74LV2416]" />
+			<feature name="u4" value="U4 [CIC-NUS-6105]" />
+			<feature name="bt1" value="BT1 [CR2032]" />
 			<dataarea name="rom" size="33554432">
-				<rom name="zelda no densetsu - toki no ocarina (japan) (rev b).bin" size="33554432" crc="656657cd" sha1="2d8fb7140a9c5d11ce614561e5a36ffef0c17540" />
+				<rom name="nus-czlj-2.u1" size="33554432" crc="656657cd" sha1="2d8fb7140a9c5d11ce614561e5a36ffef0c17540" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="zeldaootj1" cloneof="zeldaoot">
-		<description>Zelda no Densetsu - Toki no Ocarina (Japan, Rev. A)</description>
+		<description>Zelda no Densetsu - Toki no Ocarina (Japan, rev 1)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-CZLJ-JPN"/>
 		<info name="release" value="19981121"/>
 		<info name="alt_title" value="ゼルダの伝説 時のオカリナ"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-03A-01" />
+			<feature name="u1" value="U1 [NUS-CZLJ-1]" />
+			<feature name="u2" value="U2 [LH52V246A]" />
+			<feature name="u3" value="U3 [74LV2416]" />
+			<feature name="u4" value="U4 [CIC-NUS-6105]" />
+			<feature name="bt1" value="BT1 [CR2032]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="33554432">
-				<rom name="zelda no densetsu - toki no ocarina (japan) (rev a).bin" size="33554432" crc="f31c202c" sha1="1181034d5f9533f53ebe8e1c781badbee115f5aa" />
+				<rom name="nus-czlj-1.u1" size="33554432" crc="f31c202c" sha1="1181034d5f9533f53ebe8e1c781badbee115f5aa" />
 			</dataarea>
 		</part>
 	</software>
@@ -14172,8 +14256,16 @@ clips onto the player's ear.
 		<info name="release" value="19981121"/>
 		<info name="alt_title" value="ゼルダの伝説 時のオカリナ"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-03A-01" />
+			<feature name="u1" value="U1 [NUS-CZLJ-0]" />
+			<feature name="u2" value="U2 [LH52V246AD]" />
+			<feature name="u3" value="U3 [74LV2416]" />
+			<feature name="u4" value="U4 [CIC-NUS-6105]" />
+			<feature name="bt1" value="BT1 [CR2032]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="33554432">
-				<rom name="zelda no densetsu - toki no ocarina (japan).bin" size="33554432" crc="b58e98bb" sha1="f9e2b6840b9103e9707ea390089a7b6943592a98" />
+				<rom name="nus-czlj-0.u1" size="33554432" crc="b58e98bb" sha1="f9e2b6840b9103e9707ea390089a7b6943592a98" />
 			</dataarea>
 		</part>
 	</software>
@@ -14186,8 +14278,14 @@ clips onto the player's ear.
 		<info name="release" value="19990611"/>
 		<info name="alt_title" value="ズール 魔獣使い伝説"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="U1 [NUS-NMZJ-0]" />
+			<feature name="u2" value="U2 [empty]" />
+			<feature name="u3" value="U3 [CIC-NUS-6102]" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
 			<dataarea name="rom" size="12582912">
-				<rom name="zool - majuu tsukai densetsu (japan).bin" size="12582912" crc="84428431" sha1="def9f1d097cef5857449827ae2b1291ba346c2a8" />
+				<rom name="nus-nmzj-0.u1" size="12582912" crc="84428431" sha1="def9f1d097cef5857449827ae2b1291ba346c2a8" />
 			</dataarea>
 		</part>
 	</software>
