@@ -269,6 +269,8 @@ private:
 
 	std::vector<uint8_t> m_strippedrom;
 	int m_strippedsize;
+	uint8_t* m_rom;
+	int m_size;
 
 	int m_initial_copy_words;
 	int m_vectorbase;
@@ -535,7 +537,8 @@ READ8_MEMBER(generalplus_gpac800_game_state::read_nand)
 	if (!m_has_nand)
 		return 0x0000;
 
-	return m_strippedrom[offset & (m_strippedsize - 1)];
+	return (offset < m_size) ? m_rom[offset] : 0xFF;
+	//return m_strippedrom[offset & (m_strippedsize - 1)];
 }
 
 READ16_MEMBER(gcm394_game_state::read_external_space)
@@ -1587,7 +1590,10 @@ void generalplus_gpac800_game_state::nand_init(int blocksize, int blocksize_stri
 	m_sdram2.resize(0x10000);
 
 	uint8_t* rom = memregion("nandrom")->base();
+	m_rom = rom;
+
 	int size = memregion("nandrom")->bytes();
+	m_size = size;
 
 	int numblocks = size / blocksize;
 	m_strippedsize = numblocks * blocksize_stripped;
