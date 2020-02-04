@@ -31343,6 +31343,7 @@ gprnrs1
 gprnrs16
 ddrdismx                        // (c) 2006 Majesco / Konami [(c) 2001 Disney on title screen]
 ddrstraw                        // (c) 2006 Majesco / Konami
+megapad
 majkon
 majgnc
 sudopptv
@@ -37007,6 +37008,9 @@ lexizeus                        // Lexibook
 lexiseal                        //
 discpal
 
+@source:spg2xx_mysprtch.cpp
+mysprtch
+
 @source:spg2xx_pdc.cpp
 pdc100
 tmntpdc
@@ -37020,6 +37024,7 @@ senbbs
 senapren
 senpmate
 sencosmo
+senstriv
 
 @source:spg2xx_senario_poker.cpp
 sentx6p                         //

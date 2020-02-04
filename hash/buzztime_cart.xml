@@ -4,8 +4,8 @@
 <!-- Only 4 cartridges were released for this system, all in 'Series 1' -->
 
 <softwarelist name="buzztime_cart" description="Cadaco Buzztime Trivia Cartridges">
-	<software name="s1tv" supported="no">
-		<description>Series 1 - TV</description>
+	<software name="tv" supported="no">
+		<description>Series 1 - TV Trivia</description>
 		<year>200?</year>
 		<publisher>Cadaco</publisher>
 		<part name="cart" interface="buzztime_cart">
@@ -15,8 +15,8 @@
 		</part>
 	</software>
 	
-	<software name="s1hist" supported="no">
-		<description>Series 1 - History</description>
+	<software name="history" supported="no">
+		<description>Series 1 - History Trivia</description>
 		<year>200?</year>
 		<publisher>Cadaco</publisher>
 		<part name="cart" interface="buzztime_cart">
@@ -26,8 +26,8 @@
 		</part>
 	</software>
 	
-	<software name="s1every" supported="no">
-		<description>Series 1 - Everything</description>
+	<software name="everytng" supported="no">
+		<description>Series 1 - Everything Trivia</description>
 		<year>200?</year>
 		<publisher>Cadaco</publisher>
 		<part name="cart" interface="buzztime_cart">
@@ -36,5 +36,16 @@
 			</dataarea>
 		</part>
 	</software>		
+	
+	<software name="sports" supported="no">
+		<description>Series 1 - Sports Trivia</description>
+		<year>200?</year>
+		<publisher>Cadaco</publisher>
+		<part name="cart" interface="buzztime_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="buzztimeseries1sports.bin" size="0x200000" crc="b1f00f7a" sha1="4a99f06831fd265a5f7c11d20a212baab0c0a707"/>
+			</dataarea>
+		</part>
+	</software>			
 
 </softwarelist>
