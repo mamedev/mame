@@ -356,3 +356,4 @@ CONS( 2011, lx_jg7415,0, 0, wireless60, wirels60, wireless60_state,  init_lx_jg7
 // This should actually boot to a menu on the MD size, with the SunPlus only being enabled if selected from that menu.  MD side menu runs in some enhanced / custom MD mode tho.  
 // Badminton hangs, as it does in the 49-in-1 above
 CONS( 2009, reactmd,  0, 0, zone40p,    wirels60, zone40_state,      init_reactmd,    "AtGames / Sega",                              "Reactor MD (PAL)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
