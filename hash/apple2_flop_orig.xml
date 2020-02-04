@@ -10561,4 +10561,26 @@
 		</part>
 	</software>
 
+	<software name="dallasq">
+		<description>The Dallas Quest</description>
+		<year>1984</year>
+		<publisher>Datasoft</publisher>
+		<info name="release" value="2020-01-31"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="239978">
+				<rom name="the dallas quest side a.woz" size="239978" crc="62d0d0f4" sha1="3169c6013e3fe94b62a2a1e23ad3cff5a2d55b7a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot"/>
+			<dataarea name="flop" size="88938">
+				<rom name="the dallas quest side b (boot).woz" size="88938" crc="1d58f16d" sha1="7e43338a09abe35b575b79dc8246659ad8c4c348"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
