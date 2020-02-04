@@ -84,14 +84,13 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NGEP-AUS, NUS-NGEP-EUR"/>
 		<part name="cart" interface="n64_cart">
-			<feature name="cart_model" value="NUS-006(EUR)" />
-			<dataarea name="rom" size="12582912">
-				<feature name="pcb" value="NUS-01A-02" />
+			<feature name="pcb" value="NUS-01A-02" />
 			<feature name="u1" value="U1 [NUS-NGEP-0]" />
 			<feature name="u2" value="U2 [BU9850]" /> <!-- Also with [BK4D-NUS] -->
 			<feature name="u3" value="U3 [CIC-NUS-7101]" />
 			<feature name="cart_model" value="NUS-006(EUR)" />
 			<feature name="cart_back_label" value="NUS-EUR-1" />
+			<dataarea name="rom" size="12582912">
 				<rom name="nus-ngep-0.u1" size="12582912" crc="7425ae2d" sha1="63627dba22be2b357c0e370e68dc5af56eeb0a24" />
 			</dataarea>
 		</part>
@@ -4972,7 +4971,7 @@ This cart features a RTC, currently unemulated
 		</part>
 	</software>
 
-	<software name="indyinfmp" cloneof="indyinfm">>
+	<software name="indyinfmp" cloneof="indyinfm">
 		<description>Indiana Jones and the Infernal Machine (Australia, prototype)</description>
 		<year>2000</year>
 		<publisher>LucasArts</publisher>
@@ -4983,7 +4982,7 @@ This cart features a RTC, currently unemulated
 		</part>
 	</software>
 
-	<software name="indyinfm"
+	<software name="indyinfm">
 		<description>Indiana Jones and the Infernal Machine (USA)</description>
 		<year>2000</year>
 		<publisher>LucasArts</publisher>
