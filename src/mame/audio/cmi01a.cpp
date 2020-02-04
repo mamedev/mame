@@ -183,7 +183,7 @@ void cmi01a_device::zx_timer_cb()
 	if (m_zx_flag == 0)
 	{
 		/* Low to high transition - clock flip flop */
-		int op = m_ptm->get_output_state(0);
+		int op = m_ptm_o1;
 
 		/* Set /ZCINT */
 		if (op != m_zx_ff)
@@ -348,7 +348,7 @@ void cmi01a_device::write(offs_t offset, uint8_t data)
 		{
 			/* PTM addressing is a little funky */
 			int a0 = offset & 1;
-			int a1 = (m_ptm->get_output_state(0) && BIT(offset, 3)) || (!BIT(offset, 3) && BIT(offset, 2));
+			int a1 = (m_ptm_o1 && BIT(offset, 3)) || (!BIT(offset, 3) && BIT(offset, 2));
 			int a2 = BIT(offset, 1);
 
 			//osd_printf_debug("CH%d PTM W: [%x] = %02x\n", m_channel, (a2 << 2) | (a1 << 1) | a0, data);

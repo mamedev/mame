@@ -524,7 +524,6 @@ void ptm6840_device::write(offs_t offset, uint8_t data)
 			{
 				// Output cleared
 				m_out_cb[idx](0);
-				m_output[idx] = 0;
 			}
 
 			// Reset?
@@ -691,12 +690,6 @@ void ptm6840_device::set_clock(int idx, int state)
 	}
 }
 
-
-int ptm6840_device::get_output_state(int counter)
-{
-	assert(counter < 3);
-	return m_output[counter];
-}
 
 //-------------------------------------------------
 //  set_ext_clock - set external clock frequency
