@@ -14509,6 +14509,7 @@ supergb2                        //
 
 @source:gba.cpp
 gba                             // Nintendo Game Boy Advance Handheld
+gbad							// Nintendo Game Boy Advance (Debug)
 
 @source:gberet.cpp
 gberet                          // GX577 (c) 1985

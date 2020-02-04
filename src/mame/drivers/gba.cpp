@@ -1475,4 +1475,4 @@ ROM_END
 
 //   YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY     FULLNAME            FLAGS
 CONS(2001, gba,  0,      0,      gbadv,   gbadv, gba_state, empty_init, "Nintendo", "Game Boy Advance", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
-CONS(2001, gbad, 0,      0,      gbadv,   gbadv, gba_state, empty_init, "Nintendo", "Game Boy Advance (Debug)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+CONS(2000?, gbad, 0,      0,      gbadv,   gbadv, gba_state, empty_init, "Nintendo", "Game Boy Advance (Debug)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
