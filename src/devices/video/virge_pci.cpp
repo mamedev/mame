@@ -26,11 +26,19 @@ virgedx_pci_device::virgedx_pci_device(const machine_config &mconfig, const char
 
 void virge_pci_device::mmio_map(address_map& map)
 {
+	// image transfer ports
+	map(0x1000000,0x1007fff).w(m_vga, FUNC(s3virge_vga_device::image_xfer));
+
 	// MMIO address map
 	map(0x1008504,0x1008507).rw(m_vga, FUNC(s3virge_vga_device::s3d_sub_status_r), FUNC(s3virge_vga_device::s3d_sub_control_w));
+	map(0x100850c,0x100850f).r(m_vga, FUNC(s3virge_vga_device::s3d_func_ctrl_r));
 
 	// S3D engine registers
 	map(0x100a000,0x100b7ff).rw(m_vga, FUNC(s3virge_vga_device::s3d_register_r), FUNC(s3virge_vga_device::s3d_register_w));
+
+	// alternate image transfer ports
+	map(0x100d000,0x100efff).w(m_vga, FUNC(s3virge_vga_device::image_xfer));
+
 }
 
 void virge_pci_device::lfb_map(address_map& map)

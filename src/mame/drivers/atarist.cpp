@@ -1780,11 +1780,6 @@ WRITE_LINE_MEMBER(st_state::write_acia_clock)
 }
 
 
-WRITE_LINE_MEMBER( st_state::mfp_tdo_w )
-{
-	m_mfp->clock_w(state);
-}
-
 WRITE_LINE_MEMBER( st_state::fdc_drq_w )
 {
 	if (state && (!(m_fdc_mode & DMA_MODE_ENABLED)) && (m_fdc_mode & DMA_MODE_FDC_HDC_ACK))
@@ -2019,14 +2014,13 @@ void st_state::common(machine_config &config)
 
 	MC68901(config, m_mfp, Y2/8);
 	m_mfp->set_timer_clock(Y1);
-	m_mfp->set_rx_clock(0);
-	m_mfp->set_tx_clock(0);
 	m_mfp->out_irq_cb().set_inputline(m_maincpu, M68K_IRQ_6);
-	m_mfp->out_tdo_cb().set(FUNC(st_state::mfp_tdo_w));
+	m_mfp->out_tdo_cb().set(m_mfp, FUNC(mc68901_device::tc_w));
+	m_mfp->out_tdo_cb().append(m_mfp, FUNC(mc68901_device::rc_w));
 	m_mfp->out_so_cb().set(m_rs232, FUNC(rs232_port_device::write_txd));
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
-	m_rs232->rxd_handler().set(m_mfp, FUNC(mc68901_device::write_rx));
+	m_rs232->rxd_handler().set(m_mfp, FUNC(mc68901_device::si_w));
 	m_rs232->dcd_handler().set(m_mfp, FUNC(mc68901_device::i1_w));
 	m_rs232->cts_handler().set(m_mfp, FUNC(mc68901_device::i2_w));
 	m_rs232->ri_handler().set(m_mfp, FUNC(mc68901_device::i6_w));
@@ -2224,10 +2218,9 @@ void stbook_state::stbook(machine_config &config)
 
 	MC68901(config, m_mfp, U517/8);
 	m_mfp->set_timer_clock(Y1);
-	m_mfp->set_rx_clock(0);
-	m_mfp->set_tx_clock(0);
 	m_mfp->out_irq_cb().set_inputline(M68000_TAG, M68K_IRQ_6);
-	m_mfp->out_tdo_cb().set(FUNC(st_state::mfp_tdo_w));
+	m_mfp->out_tdo_cb().set(m_mfp, FUNC(mc68901_device::tc_w));
+	m_mfp->out_tdo_cb().append(m_mfp, FUNC(mc68901_device::rc_w));
 	m_mfp->out_so_cb().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
 	WD1772(config, m_fdc, U517/2);
@@ -2243,7 +2236,7 @@ void stbook_state::stbook(machine_config &config)
 	m_centronics->set_output_latch(cent_data_out);
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
-	m_rs232->rxd_handler().set(m_mfp, FUNC(mc68901_device::write_rx));
+	m_rs232->rxd_handler().set(m_mfp, FUNC(mc68901_device::si_w));
 	m_rs232->dcd_handler().set(m_mfp, FUNC(mc68901_device::i1_w));
 	m_rs232->cts_handler().set(m_mfp, FUNC(mc68901_device::i2_w));
 	m_rs232->ri_handler().set(m_mfp, FUNC(mc68901_device::i6_w));

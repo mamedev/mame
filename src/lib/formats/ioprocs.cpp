@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Nathan Woods
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
+#include <cstdio>
+#include <cstring>
+#include <cassert>
 #include "osdcore.h"
 #include "ioprocs.h"
 #include "corefile.h"

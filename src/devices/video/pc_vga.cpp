@@ -1150,17 +1150,18 @@ uint32_t s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		uint16_t cy = s3.cursor_y & 0x07ff;
 		uint32_t bg_col;
 		uint32_t fg_col;
+		int r,g,b;
+		uint32_t datax;
 
 		if(cur_mode == SCREEN_OFF || cur_mode == TEXT_MODE || cur_mode == MONO_MODE || cur_mode == CGA_MODE || cur_mode == EGA_MODE)
 			return 0;  // cursor only works in VGA or SVGA modes
 
 		src = s3.cursor_start_addr * 1024;  // start address is in units of 1024 bytes
 
-		if(cur_mode == RGB16_MODE)
+		switch(cur_mode)
 		{
-			int r,g,b;
-			uint16_t datax;
-
+		case RGB15_MODE:
+		case RGB16_MODE:
 			datax = s3.cursor_bg[0]|s3.cursor_bg[1]<<8;
 			r = (datax&0xf800)>>11;
 			g = (datax&0x07e0)>>5;
@@ -1178,11 +1179,25 @@ uint32_t s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			g = (g << 2) | (g & 0x3);
 			b = (b << 3) | (b & 0x7);
 			fg_col = (0xff<<24)|(r<<16)|(g<<8)|(b<<0);
-		}
-		else /* TODO: other modes */
-		{
+			break;
+		case RGB24_MODE:
+			datax = s3.cursor_bg[0]|s3.cursor_bg[1]<<8|s3.cursor_bg[2]<<16;
+			r = (datax&0xff0000)>>16;
+			g = (datax&0x00ff00)>>8;
+			b = (datax&0x0000ff)>>0;
+			bg_col = (0xff<<24)|(r<<16)|(g<<8)|(b<<0);
+
+			datax = s3.cursor_fg[0]|s3.cursor_fg[1]<<8|s3.cursor_fg[2]<<16;
+			r = (datax&0xff0000)>>16;
+			g = (datax&0x00ff00)>>8;
+			b = (datax&0x0000ff)>>0;
+			fg_col = (0xff<<24)|(r<<16)|(g<<8)|(b<<0);
+			break;
+		case RGB8_MODE:
+		default:
 			bg_col = pen(s3.cursor_bg[0]);
 			fg_col = pen(s3.cursor_fg[0]);
+			break;
 		}
 
 		//popmessage("%08x %08x",(s3.cursor_bg[0])|(s3.cursor_bg[1]<<8)|(s3.cursor_bg[2]<<16)|(s3.cursor_bg[3]<<24)

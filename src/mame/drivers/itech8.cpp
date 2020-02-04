@@ -2348,44 +2348,44 @@ ROM_START( pokrdice )
 ROM_END
 
 
-ROM_START( hstennis )
+ROM_START( hstennis ) /* PCB  p/n 1030 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tenbim.v11", 0x00000, 0x10000, CRC(faffab5c) SHA1(4de525f6adb16205c47788b78aecdebd57008295) )
+	ROM_LOAD( "ten.bim_v1.1_u5.u5", 0x00000, 0x10000, CRC(faffab5c) SHA1(4de525f6adb16205c47788b78aecdebd57008295) ) /* labeled as TEN.BIM V1.1 (U5) */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "tensnd.v1", 0x08000, 0x8000, CRC(f034a694) SHA1(3540e2edff2ce47504260ec856bab9b638d9260d) )
+	ROM_LOAD( "tensnd.bim_v1_u27.u27", 0x08000, 0x8000, CRC(f034a694) SHA1(3540e2edff2ce47504260ec856bab9b638d9260d) ) /* labeled as TENSND.BIM V1 U27 */
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "grom0.bin", 0x00000, 0x20000, CRC(1e69ebae) SHA1(a32e2c2f4e4a527ae6b57adeccd2c4d2045ab5fe) )
-	ROM_LOAD( "grom1.bin", 0x20000, 0x20000, CRC(4e6a22d5) SHA1(3c2d51dd874f61c0a557ea2c1968afa02d9bfc42) )
-	ROM_LOAD( "grom2.bin", 0x40000, 0x20000, CRC(c0b643a9) SHA1(d240f703a55c39ce4a969612fbb9cd76e4b849ac) )
-	ROM_LOAD( "grom3.bin", 0x60000, 0x20000, CRC(54afb456) SHA1(0a7f10b1a490825a85489ac3f678eb1e11a0ac65) )
-	ROM_LOAD( "grom4.bin", 0x80000, 0x20000, CRC(ee09d645) SHA1(8233cfbd17d9de548ae3ca5e30928061712e0781) )
+	ROM_LOAD( "t_grom0.bim.grom0", 0x00000, 0x20000, CRC(1e69ebae) SHA1(a32e2c2f4e4a527ae6b57adeccd2c4d2045ab5fe) ) /* labeled as T GROM0.BIM, ect... */
+	ROM_LOAD( "t_grom1.bim.grom1", 0x20000, 0x20000, CRC(4e6a22d5) SHA1(3c2d51dd874f61c0a557ea2c1968afa02d9bfc42) )
+	ROM_LOAD( "t_grom2.bim.grom2", 0x40000, 0x20000, CRC(c0b643a9) SHA1(d240f703a55c39ce4a969612fbb9cd76e4b849ac) )
+	ROM_LOAD( "t_grom3.bim.grom3", 0x60000, 0x20000, CRC(54afb456) SHA1(0a7f10b1a490825a85489ac3f678eb1e11a0ac65) )
+	ROM_LOAD( "t_grom4.bim.grom4", 0x80000, 0x20000, CRC(ee09d645) SHA1(8233cfbd17d9de548ae3ca5e30928061712e0781) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "srom0.bin", 0x00000, 0x20000, CRC(d9ce58c3) SHA1(92574e60497d86b8608fba6278ccfc9036cb7f22) )
+	ROM_LOAD( "tennis.vr_srom0.srom0", 0x00000, 0x20000, CRC(d9ce58c3) SHA1(92574e60497d86b8608fba6278ccfc9036cb7f22) ) /* labeled as TENNIS.VR SROM0 */
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16l8-itvs.u11", 0x0000, 0x0104, CRC(fee03727) SHA1(e784ff18505cdccc1020dbe5cb0e7cc9efc068a4) )
 ROM_END
 
 
-ROM_START( hstennis10 )
+ROM_START( hstennis10 ) /* PCB  p/n 1030 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tenbim.v10", 0x00000, 0x10000, CRC(d108a6e0) SHA1(1041e1d95b10245fc50f6484e710803db2706f9a) )
+	ROM_LOAD( "ten.bim_v1.0_u5.u5", 0x00000, 0x10000, CRC(d108a6e0) SHA1(1041e1d95b10245fc50f6484e710803db2706f9a) ) /* labeled as TEN.BIM V1.0 (U5) */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "tensnd.v1", 0x08000, 0x8000, CRC(f034a694) SHA1(3540e2edff2ce47504260ec856bab9b638d9260d) )
+	ROM_LOAD( "tensnd.bim_v1_u27.u27", 0x08000, 0x8000, CRC(f034a694) SHA1(3540e2edff2ce47504260ec856bab9b638d9260d) ) /* labeled as TENSND.BIM V1 U27 */
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "grom0.bin", 0x00000, 0x20000, CRC(1e69ebae) SHA1(a32e2c2f4e4a527ae6b57adeccd2c4d2045ab5fe) )
-	ROM_LOAD( "grom1.bin", 0x20000, 0x20000, CRC(4e6a22d5) SHA1(3c2d51dd874f61c0a557ea2c1968afa02d9bfc42) )
-	ROM_LOAD( "grom2.bin", 0x40000, 0x20000, CRC(c0b643a9) SHA1(d240f703a55c39ce4a969612fbb9cd76e4b849ac) )
-	ROM_LOAD( "grom3.bin", 0x60000, 0x20000, CRC(54afb456) SHA1(0a7f10b1a490825a85489ac3f678eb1e11a0ac65) )
-	ROM_LOAD( "grom4.bin", 0x80000, 0x20000, CRC(ee09d645) SHA1(8233cfbd17d9de548ae3ca5e30928061712e0781) )
+	ROM_LOAD( "t_grom0.bim.grom0", 0x00000, 0x20000, CRC(1e69ebae) SHA1(a32e2c2f4e4a527ae6b57adeccd2c4d2045ab5fe) ) /* labeled as T GROM0.BIM, ect... */
+	ROM_LOAD( "t_grom1.bim.grom1", 0x20000, 0x20000, CRC(4e6a22d5) SHA1(3c2d51dd874f61c0a557ea2c1968afa02d9bfc42) )
+	ROM_LOAD( "t_grom2.bim.grom2", 0x40000, 0x20000, CRC(c0b643a9) SHA1(d240f703a55c39ce4a969612fbb9cd76e4b849ac) )
+	ROM_LOAD( "t_grom3.bim.grom3", 0x60000, 0x20000, CRC(54afb456) SHA1(0a7f10b1a490825a85489ac3f678eb1e11a0ac65) )
+	ROM_LOAD( "t_grom4.bim.grom4", 0x80000, 0x20000, CRC(ee09d645) SHA1(8233cfbd17d9de548ae3ca5e30928061712e0781) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "srom0.bin", 0x00000, 0x20000, CRC(d9ce58c3) SHA1(92574e60497d86b8608fba6278ccfc9036cb7f22) )
+	ROM_LOAD( "tennis.vr_srom0.srom0", 0x00000, 0x20000, CRC(d9ce58c3) SHA1(92574e60497d86b8608fba6278ccfc9036cb7f22) ) /* labeled as TENNIS.VR SROM0 */
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16l8-itvs.u11", 0x0000, 0x0104, CRC(fee03727) SHA1(e784ff18505cdccc1020dbe5cb0e7cc9efc068a4) )

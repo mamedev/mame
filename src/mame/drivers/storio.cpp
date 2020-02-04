@@ -15,6 +15,10 @@
 
     TODO: everything!
 
+    NAND types
+
+    Storio Spanish old BIOS TC58NVG0S3ETA00 (2048+64) x 64 x 1024
+
 *******************************************************************************/
 
 #include "emu.h"

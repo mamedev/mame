@@ -8,11 +8,11 @@
 
 ****************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <assert.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <cctype>
+#include <cassert>
 #include "corefile.h"
 #include "corestr.h"
 #include "sha1.h"

@@ -125,6 +125,7 @@ isa8_device::isa8_device(const machine_config &mconfig, device_type type, const 
 	m_out_drq1_cb(*this),
 	m_out_drq2_cb(*this),
 	m_out_drq3_cb(*this),
+	m_write_iochrdy(*this),
 	m_write_iochck(*this)
 {
 	std::fill(std::begin(m_dma_device), std::end(m_dma_device), nullptr);
@@ -223,6 +224,7 @@ void isa8_device::device_config_complete()
 void isa8_device::device_resolve_objects()
 {
 	// resolve callbacks
+	m_write_iochrdy.resolve_safe();
 	m_write_iochck.resolve_safe();
 
 	m_out_irq2_cb.resolve_safe();
@@ -405,6 +407,11 @@ void isa8_device::eop_w(int channel, int state)
 {
 	if (m_dma_eop[channel] && m_dma_device[channel])
 		m_dma_device[channel]->eop_w(state);
+}
+
+void isa8_device::set_ready(int state)
+{
+	m_write_iochrdy(state);
 }
 
 void isa8_device::nmi()

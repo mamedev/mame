@@ -166,23 +166,7 @@ WRITE16_MEMBER(md_cons_state::mess_md_io_write_data_port)
  *************************************/
 
 
-static INPUT_PORTS_START( md )
-	PORT_START("CTRLSEL")   /* Controller selection */
-	PORT_CONFNAME( 0x0f, 0x00, "Player 1 Controller" )
-	PORT_CONFSETTING( 0x00, "Joystick 3 Buttons" )
-	PORT_CONFSETTING( 0x01, "Joystick 6 Buttons" )
-//  PORT_CONFSETTING( 0x02, "Sega Mouse" )
-/* there exists both a 2 buttons version of the Mouse (Jpn ver, to be used with RPGs, it
-    can aslo be used as trackball) and a 3 buttons version (US ver, no trackball feats.) */
-//  PORT_CONFSETTING( 0x03, "Sega Menacer" )
-//  PORT_CONFSETTING( 0x04, "Konami Justifier" )
-//  PORT_CONFSETTING( 0x05, "Team Player (Sega Multitap)" )
-//  PORT_CONFSETTING( 0x06, "4-Play (EA Multitap)" )
-//  PORT_CONFSETTING( 0x07, "J-Cart" )
-	PORT_CONFNAME( 0xf0, 0x00, "Player 2 Controller" )
-	PORT_CONFSETTING( 0x00, "Joystick 3 Buttons" )
-	PORT_CONFSETTING( 0x10, "Joystick 6 Buttons" )
-
+static INPUT_PORTS_START( md_base )
 	PORT_START("PAD1_3B")       /* Joypad 1 (3 button + start) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x00)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x00)
@@ -239,6 +223,43 @@ static INPUT_PORTS_START( md )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( md )
+	PORT_INCLUDE( md_base )
+
+	PORT_START("CTRLSEL")   /* Controller selection */
+	PORT_CONFNAME( 0x0f, 0x00, "Player 1 Controller" )
+	PORT_CONFSETTING( 0x00, "Joystick 3 Buttons" )
+	PORT_CONFSETTING( 0x01, "Joystick 6 Buttons" )
+//  PORT_CONFSETTING( 0x02, "Sega Mouse" )
+/* there exists both a 2 buttons version of the Mouse (Jpn ver, to be used with RPGs, it
+    can aslo be used as trackball) and a 3 buttons version (US ver, no trackball feats.) */
+//  PORT_CONFSETTING( 0x03, "Sega Menacer" )
+//  PORT_CONFSETTING( 0x04, "Konami Justifier" )
+//  PORT_CONFSETTING( 0x05, "Team Player (Sega Multitap)" )
+//  PORT_CONFSETTING( 0x06, "4-Play (EA Multitap)" )
+//  PORT_CONFSETTING( 0x07, "J-Cart" )
+	PORT_CONFNAME( 0xf0, 0x00, "Player 2 Controller" )
+	PORT_CONFSETTING( 0x00, "Joystick 3 Buttons" )
+	PORT_CONFSETTING( 0x10, "Joystick 6 Buttons" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( megajet )
+	PORT_INCLUDE( md_base )
+
+	PORT_START("CTRLSEL")   /* Fixed controller setting for Player 1 */
+	PORT_CONFNAME( 0x0f, 0x01, "Player 1 Controller" ) // Fixed
+	PORT_CONFSETTING( 0x01, "Joystick 6 Buttons" )
+	PORT_CONFNAME( 0xf0, 0x00, "Player 2 Controller" )
+	PORT_CONFSETTING( 0x00, "Joystick 3 Buttons" )
+	PORT_CONFSETTING( 0x10, "Joystick 6 Buttons" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gen_nomd )
+	PORT_INCLUDE( megajet )
+
+	PORT_MODIFY("RESET")     /* No reset button */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
 
 
 /*************************************
@@ -402,6 +423,19 @@ void md_cons_state::ms_megadpal(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
 }
 
+void md_cons_state::ms_megadriv2(machine_config &config)
+{
+	md2_ntsc(config);
+
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megadriv)
+	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
+
+	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
+
+	MD_CART_SLOT(config, m_cart, md_cart, nullptr);
+	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
+}
+
 void md_cons_state::genesis_tmss(machine_config &config)
 {
 	ms_megadriv(config);
@@ -458,6 +492,16 @@ ROM_START(dcat16)
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "mg6025.u1", 0x0000,  0x800000, CRC(5453d673) SHA1(b9f8d849cbed81fe73525229f4897ccaeeb7a833) )
 
+	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
+ROM_END
+
+ROM_START(megajet)
+	ROM_REGION(MD_CPU_REGION_SIZE, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
+ROM_END
+
+ROM_START(gen_nomd)
+	ROM_REGION(MD_CPU_REGION_SIZE, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
 ROM_END
 
@@ -756,6 +800,27 @@ void md_cons_state::genesis_scd(machine_config &config)
 	SOFTWARE_LIST(config, "cd_list").set_original("segacd");
 }
 
+void md_cons_state::genesis2_scd(machine_config &config)
+{
+	md2_ntsc(config);
+
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
+	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
+
+	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
+
+	SEGA_SEGACD_US(config, m_segacd, 0);
+	m_segacd->set_palette("gen_vdp:gfx_palette");
+	m_segacd->set_hostcpu(m_maincpu);
+	m_segacd->set_screen("megadriv");
+
+	config.set_perfect_quantum("segacd:segacd_68k"); // perfect sync to the fastest cpu
+
+	CDROM(config, "cdrom").set_interface("scd_cdrom");
+
+	SOFTWARE_LIST(config, "cd_list").set_original("segacd");
+}
+
 void md_cons_state::md_scd(machine_config &config)
 {
 	md_pal(config);
@@ -777,9 +842,51 @@ void md_cons_state::md_scd(machine_config &config)
 	SOFTWARE_LIST(config, "cd_list").set_original("megacd");
 }
 
+void md_cons_state::md2_scd(machine_config &config)
+{
+	md2_pal(config);
+
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
+	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
+
+	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
+
+	SEGA_SEGACD_EUROPE(config, m_segacd, 0);
+	m_segacd->set_palette("gen_vdp:gfx_palette");
+	m_segacd->set_hostcpu(m_maincpu);
+	m_segacd->set_screen("megadriv");
+
+	config.set_perfect_quantum("segacd:segacd_68k"); // perfect sync to the fastest cpu
+
+	CDROM(config, "cdrom").set_interface("scd_cdrom");
+
+	SOFTWARE_LIST(config, "cd_list").set_original("megacd");
+}
+
 void md_cons_state::mdj_scd(machine_config &config)
 {
 	md_ntsc(config);
+
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
+	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
+
+	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
+
+	SEGA_SEGACD_JAPAN(config, m_segacd, 0);
+	m_segacd->set_palette("gen_vdp:gfx_palette");
+	m_segacd->set_hostcpu(m_maincpu);
+	m_segacd->set_screen("megadriv");
+
+	config.set_perfect_quantum("segacd:segacd_68k"); // perfect sync to the fastest cpu
+
+	CDROM(config, "cdrom").set_interface("scd_cdrom");
+
+	SOFTWARE_LIST(config, "cd_list").set_original("megacdj");
+}
+
+void md_cons_state::md2j_scd(machine_config &config)
+{
+	md2_ntsc(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
@@ -899,6 +1006,8 @@ ROM_START( megacdj )
 	// EEPROM had no SEGA's label, might be 14088(no rev) or 14088A
 	ROM_SYSTEM_BIOS(5, "v100c", "v1.00C")   // CRC: c3b60c13 when byteswapped
 	ROMX_LOAD( "100c.bin",       0x000000,  0x020000, CRC(41af44c4) SHA1(f30d109d1c2f7c9feaf38600c65834261db73d1f), ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS(6, "v111", "v1.11")   // CRC: e0a6179b when byteswapped
+	ROMX_LOAD( "mpr-14837.bin",  0x000000,  0x020000, CRC(4be18ff6) SHA1(204758d5a64c24e96e1a9fe6bd82e1878fef7ade), ROM_BIOS(6) )
 ROM_END
 
 /* Asia bios, when run in USA region will show :
@@ -1075,41 +1184,46 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME          PARENT    COMPAT  MACHINE          INPUT  CLASS          INIT       COMPANY   FULLNAME */
-CONS( 1989, genesis,      0,        0,      ms_megadriv,     md,    md_cons_state, init_genesis, "Sega",   "Genesis (USA, NTSC)",  MACHINE_SUPPORTS_SAVE )
-CONS( 1990, megadriv,     genesis,  0,      ms_megadpal,     md,    md_cons_state, init_md_eur,  "Sega",   "Mega Drive (Europe, PAL)", MACHINE_SUPPORTS_SAVE )
-CONS( 1988, megadrij,     genesis,  0,      ms_megadriv,     md,    md_cons_state, init_md_jpn,  "Sega",   "Mega Drive (Japan, NTSC)", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME          PARENT    COMPAT  MACHINE          INPUT     CLASS          INIT          COMPANY   FULLNAME */
+CONS( 1989, genesis,      0,        0,      ms_megadriv,     md,       md_cons_state, init_genesis, "Sega",   "Genesis (USA, NTSC)",  MACHINE_SUPPORTS_SAVE )
+CONS( 1990, megadriv,     genesis,  0,      ms_megadpal,     md,       md_cons_state, init_md_eur,  "Sega",   "Mega Drive (Europe, PAL)", MACHINE_SUPPORTS_SAVE )
+CONS( 1988, megadrij,     genesis,  0,      ms_megadriv,     md,       md_cons_state, init_md_jpn,  "Sega",   "Mega Drive (Japan, NTSC)", MACHINE_SUPPORTS_SAVE )
 
 // 1990+ models had the TMSS security chip, leave this as a clone, it reduces compatibility and nothing more.
-CONS( 1990, genesis_tmss, genesis,  0,      genesis_tmss,    md,    md_cons_state, init_genesis, "Sega",   "Genesis (USA, NTSC, with TMSS chip)",  MACHINE_SUPPORTS_SAVE )
-
+CONS( 1990, genesis_tmss, genesis,  0,      genesis_tmss,    md,       md_cons_state, init_genesis, "Sega",   "Genesis (USA, NTSC, with TMSS chip)",  MACHINE_SUPPORTS_SAVE )
 
 // the 32X plugged in the cart slot, games plugged into the 32x.  Maybe it should be handled as an expansion device?
-CONS( 1994, 32x,          0,        0,      genesis_32x,     md,    md_cons_state, init_genesis, "Sega",   "Genesis with 32X (USA, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1994, 32xe,         32x,      0,      md_32x,          md,    md_cons_state, init_md_eur,  "Sega",   "Mega Drive with 32X (Europe, PAL)", MACHINE_NOT_WORKING )
-CONS( 1994, 32xj,         32x,      0,      mdj_32x,         md,    md_cons_state, init_md_jpn,  "Sega",   "Mega Drive with 32X (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1994, 32x,          0,        0,      genesis_32x,     md,       md_cons_state, init_genesis, "Sega",   "Genesis with 32X (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1994, 32xe,         32x,      0,      md_32x,          md,       md_cons_state, init_md_eur,  "Sega",   "Mega Drive with 32X (Europe, PAL)", MACHINE_NOT_WORKING )
+CONS( 1994, 32xj,         32x,      0,      mdj_32x,         md,       md_cons_state, init_md_jpn,  "Sega",   "Mega Drive with 32X (Japan, NTSC)", MACHINE_NOT_WORKING )
 
 // the SegaCD plugged into the expansion port..
-CONS( 1992, segacd,       0,        0,      genesis_scd,     md,    md_cons_state, init_genesis, "Sega",   "Sega CD (USA, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1993, megacd,       segacd,   0,      md_scd,          md,    md_cons_state, init_md_eur,  "Sega",   "Mega-CD (Europe, PAL)", MACHINE_NOT_WORKING )
-CONS( 1991, megacdj,      segacd,   0,      mdj_scd,         md,    md_cons_state, init_md_jpn,  "Sega",   "Mega-CD (Japan, NTSC)", MACHINE_NOT_WORKING ) // this bios doesn't work with our ram interleave needed by a few games?!
-CONS( 1991, megacda,      segacd,   0,      md_scd,          md,    md_cons_state, init_md_eur,  "Sega",   "Mega-CD (Asia, PAL)", MACHINE_NOT_WORKING )
-CONS( 1993, segacd2,      0,        0,      genesis_scd,     md,    md_cons_state, init_genesis, "Sega",   "Sega CD 2 (USA, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1993, megacd2,      segacd2,  0,      md_scd,          md,    md_cons_state, init_md_eur,  "Sega",   "Mega-CD 2 (Europe, PAL)", MACHINE_NOT_WORKING )
-CONS( 1993, megacd2j,     segacd2,  0,      mdj_scd,         md,    md_cons_state, init_md_jpn,  "Sega",   "Mega-CD 2 (Japan, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1994, aiwamcd,      segacd2,  0,      mdj_scd,         md,    md_cons_state, init_md_jpn,  "AIWA",   "Mega-CD CSD-G1M (Japan, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1993, laseract,     0,        0,      genesis_scd,     md,    md_cons_state, init_genesis, "Pioneer","LaserActive (USA, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1993, laseractj,    laseract, 0,      mdj_scd,         md,    md_cons_state, init_md_jpn,  "Pioneer","LaserActive (Japan, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1993, xeye,         0,        0,      genesis_scd,     md,    md_cons_state, init_genesis, "JVC",    "X'eye (USA, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1992, wmega,        xeye,     0,      mdj_scd,         md,    md_cons_state, init_md_jpn,  "Sega",   "Wondermega (Japan, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1993, wmegam2,      xeye,     0,      mdj_scd,         md,    md_cons_state, init_md_jpn,  "Victor", "Wondermega M2 (Japan, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1994, cdx,          0,        0,      genesis_scd,     md,    md_cons_state, init_genesis, "Sega",   "CDX (USA, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1994, multmega,     cdx,      0,      md_scd,          md,    md_cons_state, init_md_eur,  "Sega",   "Multi-Mega (Europe, PAL)", MACHINE_NOT_WORKING )
+CONS( 1992, segacd,       0,        0,      genesis_scd,     md,       md_cons_state, init_genesis, "Sega",   "Sega CD (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1993, megacd,       segacd,   0,      md_scd,          md,       md_cons_state, init_md_eur,  "Sega",   "Mega-CD (Europe, PAL)", MACHINE_NOT_WORKING )
+CONS( 1991, megacdj,      segacd,   0,      mdj_scd,         md,       md_cons_state, init_md_jpn,  "Sega",   "Mega-CD (Japan, NTSC)", MACHINE_NOT_WORKING ) // this bios doesn't work with our ram interleave needed by a few games?!
+CONS( 1991, megacda,      segacd,   0,      md_scd,          md,       md_cons_state, init_md_eur,  "Sega",   "Mega-CD (Asia, PAL)", MACHINE_NOT_WORKING )
+CONS( 1993, segacd2,      0,        0,      genesis_scd,     md,       md_cons_state, init_genesis, "Sega",   "Sega CD 2 (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1993, megacd2,      segacd2,  0,      md_scd,          md,       md_cons_state, init_md_eur,  "Sega",   "Mega-CD 2 (Europe, PAL)", MACHINE_NOT_WORKING )
+CONS( 1993, megacd2j,     segacd2,  0,      mdj_scd,         md,       md_cons_state, init_md_jpn,  "Sega",   "Mega-CD 2 (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1994, aiwamcd,      segacd2,  0,      mdj_scd,         md,       md_cons_state, init_md_jpn,  "AIWA",   "Mega-CD CSD-G1M (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1993, laseract,     0,        0,      genesis_scd,     md,       md_cons_state, init_genesis, "Pioneer","LaserActive (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1993, laseractj,    laseract, 0,      mdj_scd,         md,       md_cons_state, init_md_jpn,  "Pioneer","LaserActive (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1993, xeye,         0,        0,      genesis2_scd,    md,       md_cons_state, init_genesis, "JVC",    "X'eye (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1992, wmega,        xeye,     0,      mdj_scd,         md,       md_cons_state, init_md_jpn,  "Sega",   "Wondermega (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1993, wmegam2,      xeye,     0,      md2j_scd,        md,       md_cons_state, init_md_jpn,  "Victor", "Wondermega M2 (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1994, cdx,          0,        0,      genesis2_scd,    md,       md_cons_state, init_genesis, "Sega",   "CDX (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1994, multmega,     cdx,      0,      md2_scd,         md,       md_cons_state, init_md_eur,  "Sega",   "Multi-Mega (Europe, PAL)", MACHINE_NOT_WORKING )
 
 //32X plugged in the cart slot + SegaCD plugged into the expansion port..
-CONS( 1994, 32x_scd,      0,        0,      genesis_32x_scd, md,    md_cons_state, init_genesis, "Sega",   "Sega CD with 32X (USA, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1995, 32x_mcd,      32x_scd,  0,      md_32x_scd,      md,    md_cons_state, init_md_eur,  "Sega",   "Mega-CD with 32X (Europe, PAL)", MACHINE_NOT_WORKING )
-CONS( 1994, 32x_mcdj,     32x_scd,  0,      mdj_32x_scd,     md,    md_cons_state, init_md_jpn,  "Sega",   "Mega-CD with 32X (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1994, 32x_scd,      0,        0,      genesis_32x_scd, md,       md_cons_state, init_genesis, "Sega",   "Sega CD with 32X (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1995, 32x_mcd,      32x_scd,  0,      md_32x_scd,      md,       md_cons_state, init_md_eur,  "Sega",   "Mega-CD with 32X (Europe, PAL)", MACHINE_NOT_WORKING )
+CONS( 1994, 32x_mcdj,     32x_scd,  0,      mdj_32x_scd,     md,       md_cons_state, init_md_jpn,  "Sega",   "Mega-CD with 32X (Japan, NTSC)", MACHINE_NOT_WORKING )
+
+// handheld hardware
+CONS( 1995, gen_nomd,     0,        0,      ms_megadriv2,    gen_nomd, md_cons_state, init_genesis, "Sega",   "Genesis Nomad (USA Genesis handheld)",  MACHINE_SUPPORTS_SAVE )
+
+// handheld without LCD
+CONS( 1993, megajet,      gen_nomd, 0,      ms_megadriv2,    megajet,  md_cons_state, init_md_jpn,  "Sega",   "Mega Jet (Japan Mega Drive handheld)",  MACHINE_SUPPORTS_SAVE )
 
 /* clone hardware - not sure if this hardware is running some kind of emulator, or enhanced MD clone, or just custom banking */
-CONS( 200?, dcat16,       0,        0,      dcat16_megadriv, md,    md_cons_state, init_genesis, "Firecore",   "D-CAT16 (Mega Drive handheld)",  MACHINE_NOT_WORKING )
+CONS( 200?, dcat16,       0,        0,      dcat16_megadriv, md,       md_cons_state, init_genesis, "Firecore",   "D-CAT16 (Mega Drive handheld)",  MACHINE_NOT_WORKING )

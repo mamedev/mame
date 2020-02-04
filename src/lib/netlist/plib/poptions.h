@@ -139,8 +139,8 @@ namespace plib {
 				m_val = static_cast<T>(raw);
 				return 0;
 			}
-			else
-				return 1;
+
+			return 1;
 		}
 
 	private:
@@ -236,7 +236,7 @@ namespace plib {
 		static pstring split_paragraphs(const pstring &text, unsigned width, unsigned indent,
 				unsigned firstline_indent);
 
-		void check_consistency();
+		void check_consistency() noexcept(false);
 
 		template <typename T>
 		T *getopt_type() const

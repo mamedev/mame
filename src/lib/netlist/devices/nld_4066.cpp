@@ -62,6 +62,7 @@ namespace netlist
 		{
 			R = rON;
 		}
+		//printf("%s %f %f %g\n", name().c_str(), sup, in, R);
 		if (R > nlconst::zero())
 		{
 			m_R.update();

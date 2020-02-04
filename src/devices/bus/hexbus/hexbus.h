@@ -27,9 +27,7 @@ enum
 enum
 {
 	HEXBUS_LINE_HSK = 0x10,
-	HEXBUS_LINE_BAV = 0x04,
-	HEXBUS_LINE_BIT32 = 0xc0,
-	HEXBUS_LINE_BIT10 = 0x03
+	HEXBUS_LINE_BAV = 0x04
 };
 
 class hexbus_device;
@@ -91,11 +89,47 @@ protected:
 	// Callback for changes on the hexbus
 	virtual void hexbus_value_changed(uint8_t data) { }
 
+	// Enable or disable the Hexbus component
+	bool m_enabled;
+	void set_communication_enabled(bool set);
+
 	// Levels of the lines at this device. 0 means pull down, 1 means release.
 	uint8_t m_myvalue;
 
-	// Utility method to create a Hexbus line state
-	uint8_t to_line_state(uint8_t data, bool bav, bool hsk);
+	// Set or release the HSK* and BAV* lines
+	void set_hsk_line(line_state level);
+	void set_bav_line(line_state level);
+
+	// Set the data latch for upcoming transmission
+	void set_data_latch(int value, int pos);
+
+	// Convenience method to create a Hexbus line state
+	static uint8_t to_line_state(uint8_t data, bool bav, bool hsk);
+
+	// Latch HSK*=0
+	void latch_hsk() { m_myvalue &= ~HEXBUS_LINE_HSK; }
+
+	// Convenience function to check HSK/BAV lines on given values
+	static line_state hsk_line(uint8_t lines) { return (lines & HEXBUS_LINE_HSK)? CLEAR_LINE : ASSERT_LINE; }
+	static line_state bav_line(uint8_t lines) { return (lines & HEXBUS_LINE_BAV)? CLEAR_LINE : ASSERT_LINE; }
+
+	// Return the HSK* level on the bus
+	line_state bus_hsk_level() { return hsk_line(m_current_bus_value); }
+
+	// Return the BAV* level on the bus
+	line_state bus_bav_level() { return bav_line(m_current_bus_value); }
+
+	// Return the HSK* level from this device
+	line_state own_hsk_level() { return hsk_line(m_myvalue); }
+
+	// Return the BAV* level from this device
+	line_state own_bav_level() { return bav_line(m_myvalue); }
+
+	// Data lines
+	static int data_lines(uint8_t lines) { return (((lines & 0xc0) >> 4) | (lines & 0x03)); }
+
+	// Return the selected data bit (0-3)
+	int data_bit(int n);
 };
 
 // ------------------------------------------------------------------------

@@ -385,29 +385,32 @@ void natural_keyboard::set_in_use(bool usage)
 
 
 //-------------------------------------------------
-//  post - post a single character
+//  post_char - post a single character
 //-------------------------------------------------
 
-void natural_keyboard::post(char32_t ch)
+void natural_keyboard::post_char(char32_t ch, bool normalize_crlf)
 {
-	// ignore any \n that are preceded by \r
-	if (m_last_cr && ch == '\n')
+	if (normalize_crlf)
 	{
-		m_last_cr = false;
-		return;
-	}
+		// ignore any \n that are preceded by \r
+		if (m_last_cr && ch == '\n')
+		{
+			m_last_cr = false;
+			return;
+		}
 
-	// change all eolns to '\r'
-	if (ch == '\n')
-		ch = '\r';
-	else
-		m_last_cr = (ch == '\r');
+		// change all eolns to '\r'
+		if (ch == '\n')
+			ch = '\r';
+		else
+			m_last_cr = (ch == '\r');
+	}
 
 	// logging
 	if (LOG_NATURAL_KEYBOARD)
 	{
 		const keycode_map_entry *code = find_code(ch);
-		machine().logerror("natural_keyboard::post(): code=%i (%s) field.name='%s'\n", int(ch), unicode_to_string(ch).c_str(), (code != nullptr && code->field[0] != nullptr) ? code->field[0]->name() : "<null>");
+		machine().logerror("natural_keyboard::post_char(): code=%i (%s) field.name='%s'\n", int(ch), unicode_to_string(ch).c_str(), (code != nullptr && code->field[0] != nullptr) ? code->field[0]->name() : "<null>");
 	}
 
 	// can we post this key in the queue directly?
@@ -447,7 +450,7 @@ void natural_keyboard::post(const char32_t *text, size_t length, const attotime 
 	while (length > 0 && !full())
 	{
 		// fetch next character
-		post(*text++);
+		post_char(*text++, true);
 		length--;
 	}
 }
@@ -479,7 +482,7 @@ void natural_keyboard::post_utf8(const char *text, size_t length, const attotime
 		}
 
 		// append to the buffer
-		post(uc);
+		post_char(uc, true);
 		text += count;
 		length -= count;
 	}
@@ -565,7 +568,7 @@ void natural_keyboard::post_coded(const char *text, size_t length, const attotim
 
 		// if we got a code, post it
 		if (ch != 0)
-			post(ch);
+			post_char(ch);
 		curpos += increment;
 	}
 }

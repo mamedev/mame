@@ -12,6 +12,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "992board.h"
 
 #define LOG_WARN        (1U<<1)   // Warnings
 #define LOG_CRU         (1U<<2)     // CRU logging
@@ -23,7 +24,6 @@
 #define VERBOSE ( LOG_WARN )
 
 #include "logmacro.h"
-#include "992board.h"
 
 /*
     Emulation of the CRT Gate Array of the TI-99/2
@@ -344,6 +344,8 @@ void video992_device::device_reset()
     E80E: Cassette
 
     [3] I/O Controller CF40051, Preliminary specification, Texas Instruments
+
+    TODO: Loading still unstable; often failing
 */
 
 io992_device::io992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -354,10 +356,7 @@ io992_device::io992_device(const machine_config &mconfig, device_type type, cons
 		m_keyboard(*this, "LINE%u", 0U),
 		m_set_rom_bank(*this),
 		m_key_row(0),
-		m_latch_out(0xd7),
-		m_latch_in(0xd7),
-		m_communication_disable(true),
-		m_response_phase(false)
+		m_hsk_released(true)
 {
 }
 
@@ -459,42 +458,42 @@ void io992_device::device_start()
 uint8_t io992_device::cruread(offs_t offset)
 {
 	int address = offset << 1;
-	uint8_t value = 0x7f;  // All Hexbus lines high
 	double inp = 0;
-	int i;
-	uint8_t bit = 1;
 
-	switch (address & 0xf800)
+	// CRU E000-E7fE: Keyboard
+	// Read: 1110 0*** **** xxx0 (mirror 07f0)
+	if ((address & 0xf800)==0xe000)
+		return BIT(m_keyboard[m_key_row]->read(), offset & 7);
+
+	// CRU E800-EFFE: Hexbus and other functions
+	//  Read: 1110 1*** **** xxx0 (mirror 007f0)
+	switch (address & 0xf80e)
 	{
-	case 0xe000:
-		// CRU E000-E7fE: Keyboard
-		//   Read: 0000 1110 0*** **** (mirror 007f)
-		value = m_keyboard[m_key_row]->read();
-		break;
+	// Hexbus
 	case 0xe800:
-		// CRU E800-EFFE: Hexbus and other functions
-		//  Read: 0000 1110 1*** **** (mirror 007f)
-		for (i=0; i < 6; i++)
-		{
-			if ((m_latch_in & m_hexbval[i])==0) value &= ~bit;
-			bit <<= 1;
-		}
-		// e80c (bit 6) seems to be a latch for the response phase
-		if (!m_response_phase)
-			value &= ~0x40;
+	case 0xe802:
+	case 0xe804:
+	case 0xe806:
+		return data_bit(offset&3);
+	case 0xe808:
+		return (bus_hsk_level()==ASSERT_LINE)? 0:1;
+	case 0xe80a:
+		return (bus_bav_level()==ASSERT_LINE)? 0:1;
 
+	case 0xe80c:
+		// e80c (bit 6) seems to indicate that the HSK* line has been released
+		// and is now asserted again
+		return (m_hsk_released && (bus_hsk_level()==ASSERT_LINE))? 1:0;
+
+	case 0xe80e:
 		inp = m_cassette->input();
-		if (inp > 0)
-			value |= 0x80;
 		LOGMASKED(LOG_CASSETTE, "value=%f\n", inp);
-		break;
+		return (inp > 0)? 1:0;
+
 	default:
-		LOGMASKED(LOG_CRU, "Unknown access to %04x\n", address);
+		LOGMASKED(LOG_CRU, "Invalid CRU access to %04x\n", address);
 	}
-
-	LOGMASKED(LOG_CRU, "CRU %04x ->  %02x\n", address, value);
-
-	return BIT(value, offset & 7);
+	return 0;
 }
 
 void io992_device::cruwrite(offs_t offset, uint8_t data)
@@ -502,8 +501,6 @@ void io992_device::cruwrite(offs_t offset, uint8_t data)
 	int address = (offset << 1) & 0xf80e;
 
 	LOGMASKED(LOG_CRU, "CRU %04x <- %1x\n", address, data);
-
-	uint8_t olddata = m_latch_out;
 
 	switch (address)
 	{
@@ -539,46 +536,22 @@ void io992_device::cruwrite(offs_t offset, uint8_t data)
 	case 0xe802:  // ID1
 	case 0xe804:  // ID2
 	case 0xe806:  // ID3
-		if (data != 0) m_latch_out |= m_hexbval[offset & 0x07];
-		else m_latch_out &= ~m_hexbval[offset & 0x07];
-		LOGMASKED(LOG_HEXBUS, "Hexbus latch out = %02x\n", m_latch_out);
+		set_data_latch(data, offset & 0x03);
 		break;
-	case 0xe80a:  // BAV
-		// Undocumented, but makes sense according to the ROM
-		if (data==0)
-			m_response_phase = false;
-		// no break
-	case 0xe808:  // HSK
-		if (data != 0) m_latch_out |= m_hexbval[offset & 0x07];
-		else m_latch_out &= ~m_hexbval[offset & 0x07];
 
-		if (m_latch_out != olddata)
-		{
-			LOGMASKED(LOG_HEXBUS, "%s %s\n", (address==0xe808)? "HSK*" : "BAV*", (data==0)? "assert" : "clear");
-			if (m_communication_disable)
-			{
-				// This is not explicitly stated in the specs, but since they
-				// also claim that communication is disabled on power-up,
-				// we must turn it on here; the ROM fails to do it.
-				LOGMASKED(LOG_HEXBUS, "Enabling Hexbus\n");
-				m_communication_disable = false;
-			}
-			LOGMASKED(LOG_HEXBUS, "Writing to Hexbus: BAV*=%d, HSK*=%d, DATA=%01x\n", (m_latch_out&0x04)!=0, (m_latch_out&0x10)!=0, ((m_latch_out>>4)&0x0c)|(m_latch_out&0x03));
-			hexbus_write(m_latch_out);
-			// Check how the bus has changed. This depends on the states of all
-			// connected peripherals
-			m_latch_in = hexbus_read();
-		}
+	case 0xe80a:  // BAV
+		set_bav_line(data!=0? CLEAR_LINE : ASSERT_LINE);
 		break;
+
+	case 0xe808:  // HSK
+		set_hsk_line(data!=0? CLEAR_LINE : ASSERT_LINE);
+		m_hsk_released = (bus_hsk_level()==CLEAR_LINE);
+		break;
+
 	case 0xe80c:
-		LOGMASKED(LOG_HEXBUS, "Hexbus inhibit = %d\n", data);
-		if (data == 1)
-		{
-			m_latch_in = 0xd7;
-			m_communication_disable = true;
-		}
-		else m_communication_disable = false;
+		set_communication_enabled(data == 0);
 		break;
+
 	case 0xe80e:
 		LOGMASKED(LOG_CRU, "Cassette output = %d\n", data);
 		// Tape output. See also ti99_4x.cpp.
@@ -601,29 +574,23 @@ void io992_device::hexbus_value_changed(uint8_t data)
 {
 	// Only latch the incoming data when BAV* is asserted and the Hexbus
 	// is not inhibited
-	bool bav_asserted = ((m_latch_out & bus::hexbus::HEXBUS_LINE_BAV)==0);
-	if (!m_communication_disable && bav_asserted)
+	if (own_bav_level()==ASSERT_LINE)
 	{
-		LOGMASKED(LOG_HEXBUS, "Hexbus changed and latched: %02x\n", data);
-		m_latch_in = data;
-
-		if ((data & bus::hexbus::HEXBUS_LINE_HSK)==0)
+		if (bus_hsk_level()==ASSERT_LINE)
 		{
-			// If HSK* is lowered and we as the host have it up, this indicates
-			// the response phase.
-			if (!m_response_phase && (m_myvalue & bus::hexbus::HEXBUS_LINE_HSK)!=0)
-			{
-				LOGMASKED(LOG_HEXBUS, "Incoming response\n");
-				m_response_phase = true;
-			}
-			// We cannot wait for the CPU explicitly latching HSK*
-			// as designed, because this implies a true parallel execution
-			LOGMASKED(LOG_HEXBUS, "Latching HSK*\n");
-			m_myvalue &= ~bus::hexbus::HEXBUS_LINE_HSK;
+			// According to the Hexbus spec, the incoming HSK must be latched
+			// by hardware
+			LOGMASKED(LOG_HEXBUS, "Latching HSK*; got data %01x\n", (data>>4)|(data&3));
+			latch_hsk();
+		}
+		else
+		{
+			LOGMASKED(LOG_HEXBUS, "HSK* released\n");
+			m_hsk_released = true;
 		}
 	}
 	else
-		LOGMASKED(LOG_HEXBUS, "Ignoring Hexbus change (to %02x), latch=%s, BAV*=%d\n", data, m_communication_disable? "inhibit":"enabled", bav_asserted? 0:1);
+		LOGMASKED(LOG_HEXBUS, "Ignoring Hexbus change (to %02x), BAV*=%d\n", data, (own_bav_level()==ASSERT_LINE)? 0:1);
 }
 
 ioport_constructor io992_device::device_input_ports() const

@@ -69,7 +69,7 @@ public:
 		{
 			if (c == 10)
 				break;
-			else if (c != 13) // ignore CR
+			if (c != 13) // ignore CR
 				m_linebuf += putf8string(1, c);
 			if (!this->readcode(c))
 				break;
@@ -83,9 +83,7 @@ public:
 		if (m_strm->eof())
 			return false;
 		m_strm->read(&b, 1);
-		if (m_strm->eof())
-			return false;
-		return true;
+		return (!m_strm->eof());
 	}
 
 	bool readcode(putf8string::traits_type::code_t &c)
@@ -170,8 +168,7 @@ class putf8_fmt_writer : public pfmt_writer_t<putf8_fmt_writer>, public putf8_wr
 public:
 
 	explicit putf8_fmt_writer(std::ostream *strm)
-	: pfmt_writer_t()
-	, putf8_writer(strm)
+	: putf8_writer(strm)
 	{
 	}
 

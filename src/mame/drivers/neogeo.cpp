@@ -4837,7 +4837,7 @@ ROM_START( janshin ) /* MVS ONLY RELEASE */
 
 	ROM_REGION( 0x400000, "cslot1:sprites", 0 )
 	ROM_LOAD16_BYTE( "048-c1.c1", 0x000000, 0x200000, CRC(3fa890e9) SHA1(e73d2802bacfbc2b2b16fbbedddde17488e4bbde) ) /* Plane 0,1 */ /* mask rom TC5316200 */
-	ROM_LOAD16_BYTE( "048-c2.c1", 0x000001, 0x200000, CRC(59c48ad8) SHA1(2630817e735a6d197377558f4324c1442803fe15) ) /* Plane 2,3 */ /* mask rom TC5316200 */
+	ROM_LOAD16_BYTE( "048-c2.c2", 0x000001, 0x200000, CRC(59c48ad8) SHA1(2630817e735a6d197377558f4324c1442803fe15) ) /* Plane 2,3 */ /* mask rom TC5316200 */
 ROM_END
 
 /****************************************

@@ -15,15 +15,16 @@ This entire hardware series is generally called 'GX400'
     Salamander (Version J)  (Game 587) PWB(B) 201012A GX587
     Lifeforce (US)          (Game 587) PWB(B) 201012A GX587
     Lifeforce (Japan)       (Game 587) PWB(B) 201012A GX587
+    Black Panther           (Game 604) GX604 PWB(B) 201017A
     City Bomber (World)     (Game 787) PWB(B) 250102A
     City Bomber (Japan)     (Game 787) PWB(B) 250102A
     Kitten Kaboodle         (Game 712) PWB(B) 250102A
     Nyan Nyan Panic (Japan) (Game 712) PWB(B) 250102A
     Hyper Crash (Version D) (Game 790) GX790 PWB(B) 250093A
     Hyper Crash (Version C) (Game 790) GX790 PWB(B) 250093A
-TODO: find pcb pics for below
-    Black Panther           (Game 604)
+
 Most of these boards share the same bottom/gfx board, labeled 'GX400PWB // (A)200204B'
+Black Panther uses a 'GX400PWB // (A)200204C' bottom/gfx board
 
 driver by Bryan McPhail
 

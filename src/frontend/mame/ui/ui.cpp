@@ -842,7 +842,7 @@ void mame_ui_manager::process_natural_keyboard()
 	{
 		// if this was a UI_EVENT_CHAR event, post it
 		if (event.event_type == ui_event::IME_CHAR)
-			machine().ioport().natkeyboard().post(event.ch);
+			machine().ioport().natkeyboard().post_char(event.ch);
 	}
 
 	// process natural keyboard keys that don't get UI_EVENT_CHARs
@@ -865,7 +865,7 @@ void mame_ui_manager::process_natural_keyboard()
 			*key_down_ptr |= key_down_mask;
 
 			// post the key
-			machine().ioport().natkeyboard().post(UCHAR_MAMEKEY_BEGIN + code.item_id());
+			machine().ioport().natkeyboard().post_char(UCHAR_MAMEKEY_BEGIN + code.item_id());
 		}
 		else if (!pressed && (*key_down_ptr & key_down_mask))
 		{

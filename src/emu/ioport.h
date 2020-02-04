@@ -21,7 +21,7 @@
 #include <cstdint>
 #include <cstring>
 #include <vector>
-#include <time.h>
+#include <ctime>
 
 
 //**************************************************************************
@@ -864,7 +864,7 @@ private:
 	digital_joystick *          m_next;                                         // next joystick in the list
 	int                         m_player;                                       // player number represented
 	int                         m_number;                                       // joystick number represented
-	simple_list<simple_list_wrapper<ioport_field> > m_field[JOYDIR_COUNT];  // potential input fields for each direction
+	std::forward_list<std::reference_wrapper<ioport_field> > m_field[JOYDIR_COUNT];  // potential input fields for each direction
 	u8                          m_current;                                      // current value
 	u8                          m_current4way;                                  // current 4-way value
 	u8                          m_previous;                                     // previous value

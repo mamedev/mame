@@ -15,6 +15,8 @@
 //        define a model param on core device
 
 // Format: external name,netlist device,model
+
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
 static constexpr const char s_lib_map[] =
 "SN74LS00D,   TTL_7400_DIP,  74LSXX\n"
 "SN74LS04D,   TTL_7404_DIP,  74LSXX\n"
@@ -199,7 +201,7 @@ void nl_convert_base_t::dump_nl()
 	m_ext_alias.clear();
 }
 
-const pstring nl_convert_base_t::get_nl_val(const double val)
+pstring nl_convert_base_t::get_nl_val(double val)
 {
 	for (auto &e : m_units)
 	{
@@ -499,7 +501,8 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 			out("NETLIST_END()\n");
 			return;
 		}
-		else if (token.is(tok.m_tok_SEMICOLON))
+
+		if (token.is(tok.m_tok_SEMICOLON))
 		{
 			// ignore empty statements
 			token = tok.get_token();
@@ -646,7 +649,8 @@ void nl_convert_rinf_t::convert(const pstring &contents)
 			out("NETLIST_END()\n");
 			return;
 		}
-		else if (token.is(tok.m_tok_HEA))
+
+		if (token.is(tok.m_tok_HEA))
 		{
 			// seems to be start token - ignore
 			token = tok.get_token();

@@ -10,12 +10,13 @@
         JAKKS Classic Arcade Pinball
         JAKKS Spiderman 5-in-1 (original release)
         Conny TV Virtual Tennis
+        Conny Ping Pong
+        Conny TV Virtual Fighter
 
         assumed:
         JAKKS EA Sports (NHL 95 + Madden 95) (US)
         JAKKS EA Sports (NHL 95 + Fifa 96) (US)
         JAKKS Bob the Builder
-        Conny Ping Pong
         JAKKS Disney (original release)
 
 *******************************************************************************/
@@ -532,6 +533,14 @@ ROM_START( conyping )
 	// MCU (I/O?) read protected TODO: add NO_DUMP
 ROM_END
 
+ROM_START( conyfght )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "mx29lw320.u2", 0x000000, 0x400000, CRC(515cce2c) SHA1(647cee206d23ff815d01f49cec391701b9a87de9) )
+
+	// MCU (I/O?) read protected TODO: add NO_DUMP
+ROM_END
+
+
 
 
 // JAKKS Pacific Inc TV games
@@ -546,3 +555,6 @@ CONS( 2003, conyteni,  0,        0, spg110_base, conyteni,  spg110_game_state, e
 // from a US SDW Games unit, has SDW Games banners in background so ROM might differ to other regsions
 CONS( 2003, conyping,  0,        0, spg110_base, conyteni,  spg110_game_state, empty_init, "Conny / SDW Games",      "Virtual Ping Pong (Conny / SDW Games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
+// from a Big Ben 'TV Virtual Fighter' unit, although shows Free Fight Kung Fu on title screen
+// Also sold by SDW Games as both TV Virtual Fighter and TV Kickboxing (unit still has TV Virtual Fighter stickers even when box is TV Kickboxing - possibly just box changed due to Sega?)
+CONS( 200?, conyfght,  0,        0, spg110_base, conyteni,  spg110_game_state, empty_init, "Conny / Big Ben",      "TV Virtual Fighter / Free Fight Kung Fu (Conny / Big Ben)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

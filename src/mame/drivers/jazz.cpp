@@ -13,10 +13,11 @@
  *   http://www.sensi.org/~alec/mips/mips-history.html
  *
  * TODO
- *   - make it boot Windows NT
  *   - big-endian support for RISC/os
  *   - EISA bus and slots
  *   - slotify and improve graphics board
+ *   - other models/variants
+ *   - sound and other loose ends
  *
  * Unconfirmed parts lists from ARCSystem reference design (which appears to
  * be very similar or identical to the Jazz system) taken from:
@@ -59,11 +60,14 @@
 
 #include "debugger.h"
 
+#include "jazz.lh"
+
 #define VERBOSE 0
 #include "logmacro.h"
 
 void jazz_state::machine_start()
 {
+	m_led.resolve();
 }
 
 void jazz_state::machine_reset()
@@ -85,56 +89,12 @@ void jazz_state::jazz_common_map(address_map &map)
 	map(0x1fc00000, 0x1fc3ffff).r(m_flash, FUNC(amd_28f020_device::read));
 
 	// NOTE: defaults to console on serial1 if no video rom found
-	map(0x60000000, 0x6000013f).lr8(
-		[] (offs_t offset)
-		{
-			/*
-			 * Board_Identifier, PROM_Stride, PROM_Width, PROM_Size
-			 *   0=JazzVideoG300, 1=JazzVideoG364, 2=JazzVideoVxl, 0x10=MipsVideoG364, 0x11=MaximumJazzVideo (jazzvideog364 osc period == 123077, MipsVideoG364 = 200000)
-			 * Test_Byte_0 - Test_Byte_3
-			 * VideoMemorySize, VideoControlSize
-			 * CodeOffset, CodeSize
-			 * ID string
-			 */
-			/*
-			static u8 const jazz_g364[] =
-			{
-			    0x01, 0x08, 0x01, 0x20,  'J',  'a',  'z',  'z',
-			    0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x20, 0x00,
-			    0x00, 0x02, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00,
-			     'J',  'a',  'z',  'z',  ' ',  'G',  '3',  '6',
-			     '4', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			};
-
-			static u8 const mips_g364[] =
-			{
-			    0x10, 0x08, 0x01, 0x20,  'J',  'a',  'z',  'z',
-			    0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x20, 0x00,
-			    0x00, 0x02, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00,
-			     'M',  'i',  'p',  's',  ' ',  'G',  '3',  '6',
-			     '4', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			};
-			*/
-
-			// FIXME: this is the MIPS G364 with the PROM fields zeroed to
-			// avoid a startup error, and should be replaced with the real
-			// signature above when an actual PROM dump is located.
-			static u8 const bogus_g364[] =
-			{
-				0x10, 0x00, 0x00, 0x00,  'J',  'a',  'z',  'z',
-				0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x20, 0x00,
-				0x00, 0x02, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00,
-				 'M',  'i',  'p',  's',  ' ',  'G',  '3',  '6',
-				 '4', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			};
-
-			return bogus_g364[offset];
-		}, "bogus_g364_r").umask64(0xff);
+	map(0x60000000, 0x600001ff).rom().region("graphics", 0);
 
 	map(0x60080000, 0x60081fff).m(m_cvc, FUNC(g364_device::map));
 	map(0x60180000, 0x60180007).lw32([this] (u32 data) { m_cvc->reset(); }, "g364_reset");
 
-	map(0x80000000, 0x80000fff).m(m_mct_adr, FUNC(jazz_mct_adr_device::map));
+	map(0x80000000, 0x80000fff).m(m_mct_adr, FUNC(mct_adr_device::map));
 
 	map(0x80001000, 0x800010ff).m(m_net, FUNC(dp83932c_device::map)).umask32(0x0000ffff);
 	map(0x80002000, 0x8000200f).m(m_scsi, FUNC(ncr53c94_device::map));
@@ -167,25 +127,25 @@ void jazz_state::jazz_common_map(address_map &map)
 	//map(0x8000d000, 0x8000dfff).noprw(); // dummy dma device?
 	map(0x8000d600, 0x8000d607).nopw();
 
-	map(0x8000f000, 0x8000f007).lrw8(
-			NAME([this] () { return m_led; }),
-			NAME([this] (u8 data)
-			{
-				logerror("led 0x%02x (%s)\n", data, machine().describe_context());
-				m_led = data;
-			})).umask64(0xff);
+	map(0x8000f000, 0x8000f007).w(FUNC(jazz_state::led_w)).umask64(0xff);
 
 	// lots of byte data written to 800
 	//map(0x800e0000, 0x800fffff).m() // dram config
 
 	map(0x90000000, 0x90ffffff).m(m_isp, FUNC(i82357_device::map));
 
+	// HACK: empty eisa slots
+	map(0x90001c80, 0x90001c87).ram();
+	map(0x90002c80, 0x90002c87).ram();
+	map(0x90003c80, 0x90003c87).ram();
+	map(0x90004c80, 0x90004c87).ram();
+
 	//map(0x91000000, 0x91ffffff).m();
 	//map(0x92000000, 0x92ffffff).m(); // EISA I/O ports?
 	//map(0x93000000, 0x93ffffff).m(); // EISA memory
 
-	map(0xf0000000, 0xf0000007).r(m_mct_adr, FUNC(jazz_mct_adr_device::isr_r)).umask64(0xffff);
-	map(0xf0000000, 0xf0000007).rw(m_mct_adr, FUNC(jazz_mct_adr_device::imr_r), FUNC(jazz_mct_adr_device::imr_w)).umask64(0xffff0000);
+	map(0xf0000000, 0xf0000007).r(m_mct_adr, FUNC(mct_adr_device::isr_r)).umask64(0xffff);
+	map(0xf0000000, 0xf0000007).rw(m_mct_adr, FUNC(mct_adr_device::imr_r), FUNC(mct_adr_device::imr_w)).umask64(0xffff0000);
 
 	map(0xfff00000, 0xfff3ffff).r(m_flash, FUNC(amd_28f020_device::read)); // mirror?
 }
@@ -216,7 +176,7 @@ void jazz_state::jazz(machine_config &config)
 	m_vram->set_default_value(0);
 
 	// local bus dma, timer and interrupt controller
-	JAZZ_MCT_ADR(config, m_mct_adr, 0);
+	MCT_ADR(config, m_mct_adr, 0);
 	m_mct_adr->set_bus(m_cpu, 0);
 	m_mct_adr->out_int_dma_cb().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 	m_mct_adr->out_int_device_cb().set_inputline(m_cpu, INPUT_LINE_IRQ1);
@@ -239,17 +199,17 @@ void jazz_state::jazz(machine_config &config)
 		{
 			ncr53c94_device &adapter = downcast<ncr53c94_device &>(*device);
 
-			adapter.irq_handler_cb().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<5>));;
-			adapter.drq_handler_cb().set(m_mct_adr, FUNC(jazz_mct_adr_device::drq<0>));
+			adapter.irq_handler_cb().set(m_mct_adr, FUNC(mct_adr_device::irq<5>));;
+			adapter.drq_handler_cb().set(m_mct_adr, FUNC(mct_adr_device::drq<0>));
 
-			subdevice<jazz_mct_adr_device>(":mct_adr")->dma_r_cb<0>().set(adapter, FUNC(ncr53c94_device::dma_r));
-			subdevice<jazz_mct_adr_device>(":mct_adr")->dma_w_cb<0>().set(adapter, FUNC(ncr53c94_device::dma_w));
+			subdevice<mct_adr_device>(":mct_adr")->dma_r_cb<0>().set(adapter, FUNC(ncr53c94_device::dma_r));
+			subdevice<mct_adr_device>(":mct_adr")->dma_w_cb<0>().set(adapter, FUNC(ncr53c94_device::dma_w));
 		});
 
 	// floppy controller and drive
 	N82077AA(config, m_fdc, 24_MHz_XTAL);
-	m_fdc->intrq_wr_callback().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<1>));
-	m_fdc->drq_wr_callback().set(m_mct_adr, FUNC(jazz_mct_adr_device::drq<1>));
+	m_fdc->intrq_wr_callback().set(m_mct_adr, FUNC(mct_adr_device::irq<1>));
+	m_fdc->drq_wr_callback().set(m_mct_adr, FUNC(mct_adr_device::drq<1>));
 	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, jazz_state::floppy_formats).enable_sound(false);
 	m_mct_adr->dma_r_cb<1>().set(m_fdc, FUNC(n82077aa_device::dma_r));
 	m_mct_adr->dma_w_cb<1>().set(m_fdc, FUNC(n82077aa_device::dma_w));
@@ -282,18 +242,18 @@ void jazz_state::jazz(machine_config &config)
 	// keyboard controller
 	PS2_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);
 	// FIXME: reset is probably routed through the MCT-ADR
-	m_kbdc->hot_res().set([this](int state) { logerror("reset %d\n", state); });
+	m_kbdc->hot_res().set([this](int state) { machine().schedule_soft_reset(); });
 	m_kbdc->kbd_clk().set(kbd_con, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_kbdc->kbd_data().set(kbd_con, FUNC(pc_kbdc_device::data_write_from_mb));
-	m_kbdc->kbd_irq().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<6>));
+	m_kbdc->kbd_irq().set(m_mct_adr, FUNC(mct_adr_device::irq<6>));
 	m_kbdc->aux_clk().set(aux_con, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_kbdc->aux_data().set(aux_con, FUNC(pc_kbdc_device::data_write_from_mb));
-	m_kbdc->aux_irq().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<7>));
+	m_kbdc->aux_irq().set(m_mct_adr, FUNC(mct_adr_device::irq<7>));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(78643200, 1280, 0, 1280, 1024, 0, 1024);
-	m_screen->set_screen_update("g364", FUNC(g364_device::screen_update));
-	m_screen->screen_vblank().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<3>)); // maybe?
+	m_screen->set_screen_update(m_cvc, FUNC(g364_device::screen_update));
+	m_screen->screen_vblank().set(m_mct_adr, FUNC(mct_adr_device::irq<3>)); // maybe?
 
 	G364(config, m_cvc, 5_MHz_XTAL); // FIXME: guessed clock
 	m_cvc->set_screen(m_screen);
@@ -306,7 +266,7 @@ void jazz_state::jazz(machine_config &config)
 	m_ace[0]->out_dtr_callback().set(serial0, FUNC(rs232_port_device::write_dtr));
 	m_ace[0]->out_rts_callback().set(serial0, FUNC(rs232_port_device::write_rts));
 	m_ace[0]->out_tx_callback().set(serial0, FUNC(rs232_port_device::write_txd));
-	m_ace[0]->out_int_callback().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<8>));
+	m_ace[0]->out_int_callback().set(m_mct_adr, FUNC(mct_adr_device::irq<8>));
 
 	serial0.cts_handler().set(m_ace[0], FUNC(ns16550_device::cts_w));
 	serial0.dcd_handler().set(m_ace[0], FUNC(ns16550_device::dcd_w));
@@ -320,7 +280,7 @@ void jazz_state::jazz(machine_config &config)
 	m_ace[1]->out_dtr_callback().set(serial1, FUNC(rs232_port_device::write_dtr));
 	m_ace[1]->out_rts_callback().set(serial1, FUNC(rs232_port_device::write_rts));
 	m_ace[1]->out_tx_callback().set(serial1, FUNC(rs232_port_device::write_txd));
-	m_ace[1]->out_int_callback().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<9>));
+	m_ace[1]->out_int_callback().set(m_mct_adr, FUNC(mct_adr_device::irq<9>));
 
 	serial1.cts_handler().set(m_ace[1], FUNC(ns16550_device::cts_w));
 	serial1.dcd_handler().set(m_ace[1], FUNC(ns16550_device::dcd_w));
@@ -329,7 +289,7 @@ void jazz_state::jazz(machine_config &config)
 	serial1.rxd_handler().set(m_ace[1], FUNC(ns16550_device::rx_w));
 
 	PC_LPT(config, m_lpt, 0);
-	m_lpt->irq_handler().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<0>));
+	m_lpt->irq_handler().set(m_mct_adr, FUNC(mct_adr_device::irq<0>));
 
 	// TODO: sound, interrupt 2, drq 2(l) & 3(r)
 
@@ -339,8 +299,8 @@ void jazz_state::jazz(machine_config &config)
 	m_buzzer->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	DP83932C(config, m_net, 20_MHz_XTAL);
-	m_net->out_int_cb().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<4>));
-	m_net->set_ram(RAM_TAG);
+	m_net->out_int_cb().set(m_mct_adr, FUNC(mct_adr_device::irq<4>));
+	m_net->set_bus(m_mct_adr, 0);
 
 	I82357(config, m_isp, 14.318181_MHz_XTAL);
 	m_isp->out_rtc_cb().set(m_rtc, FUNC(mc146818_device::write));
@@ -349,6 +309,35 @@ void jazz_state::jazz(machine_config &config)
 	m_isp->out_spkr_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 
 	// TODO: 4 EISA slots
+
+	config.set_default_layout(layout_jazz);
+}
+
+void jazz_state::led_w(u8 data)
+{
+	// 7-segment diagnostic led
+	static u8 const patterns[16] =
+	{
+			  // test      output
+		0x3f, // mct-adr     0
+		0x06, // network     1
+		0x5b, // scsi        2
+		0x4f, // floppy      3
+		0x66, // isp/rtc     4
+		0x6d, // keyboard    5
+		0x7d, // serial      6
+		0x07, // nvram       7
+		0x7f, //             8?
+		0x6f, // video       9
+		0x77, // memory      A
+		0x40, //             -
+		0x39, // flash       C
+		0x00, //           (blank)
+		0x79, // cpu         E
+		0x71, //             F?
+	};
+
+	m_led = patterns[data & 0xf] | (BIT(data, 4) ? 0x80 : 0);
 }
 
 void jazz_state::mmr4000be(machine_config &config)
@@ -369,14 +358,27 @@ ROM_START(mmr4000be)
 	ROM_REGION64_BE(0x40000, "flash", 0)
 	ROM_SYSTEM_BIOS(0, "riscos", "R4000 RISC/os PROM")
 	ROMX_LOAD("riscos.bin", 0x00000, 0x40000, CRC(cea6bc8f) SHA1(3e47b4ad5d1a0c7aac649e6aef3df1bf86fc938b), ROM_BIOS(0))
+
+	ROM_REGION64_BE(0x200, "graphics", 0)
+	ROM_LOAD64_BYTE("mips_g364.bin", 0x00, 0x40, CRC(9265ccb6) SHA1(ef5c3a6bc5249274dd9c9a18d88a668cdd457370) BAD_DUMP)
 ROM_END
 
 ROM_START(mmr4000le)
 	ROM_REGION64_LE(0x40000, "flash", 0)
 	ROM_SYSTEM_BIOS(0, "ntprom", "R4000 Windows NT PROM")
 	ROMX_LOAD("ntprom.bin", 0x00000, 0x40000, CRC(d91018d7) SHA1(316de17820192c89b8ee6d9936ab8364a739ca53), ROM_BIOS(0))
+
+	ROM_REGION64_LE(0x200, "graphics", 0)
+	// Jazz G300 (8.125MHz video clock)
+	//ROM_LOAD64_BYTE("jazz_g300.bin", 0x00, 0x40, CRC(258eb00a) SHA1(6e3fd0272957524de82e7042d6e36aca492c4d26) BAD_DUMP)
+	// Jazz G364 (8.125MHz video clock)
+	//ROM_LOAD64_BYTE("jazz_g364.bin", 0x00, 0x40, CRC(6d1ee59f) SHA1(8ec928af5b72c52eae6a3e81942db7cfaf9b9c1d) BAD_DUMP)
+	// Jazz VXL (aka Jaguar, part number 09-00184)
+	//ROM_LOAD64_BYTE("jazz_vxl.bin", 0x00, 0x40, CRC(df86e670) SHA1(2a9e8b1a42e4a29242131fa26c493f53eb866484) BAD_DUMP)
+	// MIPS Video G364 (5MHz video clock, part number 09-00176)
+	ROM_LOAD64_BYTE("mips_g364.bin", 0x00, 0x40, CRC(9265ccb6) SHA1(ef5c3a6bc5249274dd9c9a18d88a668cdd457370) BAD_DUMP)
 ROM_END
 
-/*    YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS       INIT         COMPANY  FULLNAME                 FLAGS */
-COMP( 1992,  mmr4000be, 0,      0,      mmr4000be, 0,     jazz_state, init_common, "MIPS",  "Magnum R4000 (big)",    MACHINE_IS_SKELETON)
-COMP( 1992,  mmr4000le, 0,      0,      mmr4000le, 0,     jazz_state, init_common, "MIPS",  "Magnum R4000 (little)", MACHINE_IS_SKELETON)
+/*   YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS       INIT         COMPANY  FULLNAME             FLAGS */
+COMP(1992,  mmr4000be, 0,      0,      mmr4000be, 0,     jazz_state, init_common, "MIPS",  "Magnum R4000 (be)", MACHINE_NOT_WORKING)
+COMP(1992,  mmr4000le, 0,      0,      mmr4000le, 0,     jazz_state, init_common, "MIPS",  "Magnum R4000 (le)", MACHINE_NO_SOUND)

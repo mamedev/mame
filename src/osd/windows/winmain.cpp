@@ -21,9 +21,9 @@
 #include "modules/monitor/monitor_common.h"
 
 // standard C headers
-#include <ctype.h>
-#include <stdarg.h>
-#include <stdio.h>
+#include <cctype>
+#include <cstdarg>
+#include <cstdio>
 
 // standard windows headers
 #include <windows.h>
@@ -566,7 +566,7 @@ void windows_osd_interface::init(running_machine &machine)
 	osd_common_t::init_subsystems();
 
 	// notify listeners of screen configuration
-	for (auto info : osd_common_t::s_window_list)
+	for (const auto &info : osd_common_t::s_window_list)
 	{
 		machine.output().set_value(string_format("Orientation(%s)", info->monitor()->devicename()).c_str(), std::static_pointer_cast<win_window_info>(info)->m_targetorient);
 	}

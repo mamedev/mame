@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Mathis Rosenhauer
-#include <math.h>
+#include <cmath>
 #include "emu.h"
 #include "includes/vectrex.h"
 #include "cpu/m6809/m6809.h"

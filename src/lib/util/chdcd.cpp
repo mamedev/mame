@@ -7,9 +7,9 @@
 
 ***************************************************************************/
 
-#include <ctype.h>
-#include <stdlib.h>
-#include <assert.h>
+#include <cctype>
+#include <cstdlib>
+#include <cassert>
 #include "osdcore.h"
 #include "chd.h"
 #include "chdcd.h"

@@ -21,7 +21,7 @@
 #include "cpu/pdp1/pdp1.h"
 #include "includes/pdp1.h"
 
-#include <math.h>
+#include <cmath>
 #include <algorithm>
 
 

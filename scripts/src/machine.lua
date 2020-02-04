@@ -4196,3 +4196,27 @@ if (MACHINES["VRENDER0"]~=null) then
 		MAME_DIR .. "src/devices/machine/vrender0.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/i3001.h,MACHINES["I3001"] = true
+---------------------------------------------------
+
+if (MACHINES["I3001"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/i3001.cpp",
+		MAME_DIR .. "src/devices/machine/i3001.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/i3002.h,MACHINES["I3002"] = true
+---------------------------------------------------
+
+if (MACHINES["I3002"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/i3002.cpp",
+		MAME_DIR .. "src/devices/machine/i3002.h",
+	}
+end

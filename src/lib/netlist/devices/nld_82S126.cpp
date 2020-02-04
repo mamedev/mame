@@ -73,7 +73,7 @@ namespace netlist
 		{
 			unsigned a = 0;
 			for (std::size_t i=0; i<8; i++)
-			a |= (m_A[i]() << i);
+				a |= (m_A[i]() << i);
 
 			o = m_ROM[a];
 

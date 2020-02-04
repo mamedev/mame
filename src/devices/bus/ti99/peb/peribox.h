@@ -49,6 +49,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( msast_in ) override;
 
 	DECLARE_WRITE_LINE_MEMBER( clock_in ) override;
+	DECLARE_WRITE_LINE_MEMBER( reset_in ) override;
 
 	// Part of configuration
 	void set_prefix(int prefix) { m_address_prefix = prefix; }
@@ -107,9 +108,6 @@ protected:
 
 	// Configured as a slot device (of the ioport)
 	bool    m_ioport_connected;
-
-	// Used for Genmod
-	bool    m_genmod;
 };
 
 /************************************************************************
@@ -182,6 +180,8 @@ public:
 	virtual DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) { };
 
 	virtual DECLARE_WRITE_LINE_MEMBER(clock_in) { }
+	virtual DECLARE_WRITE_LINE_MEMBER(reset_in) { }
+
 	void    set_senila(int state) { m_senila = state; }
 	void    set_senilb(int state) { m_senilb = state; }
 
@@ -196,15 +196,13 @@ protected:
 	// When true, card is accessible. Indicated by a LED.
 	bool    m_selected;
 
-	// When true, GenMod is selected. Modified by peribox_slot_device.
-	bool    m_genmod;
-
 	// CRU base. Used to configure the address by which a card is selected.
 	int     m_cru_base;
 
-	// Used to decide whether this card has been selected.
-	int     m_select_mask;
-	int     m_select_value;
+	// Methods to decide whether we are acccessing the 4000-5fff region (DSR)
+	// or the cartridge region
+	static bool in_dsr_space(offs_t offset, bool amadec);
+	static bool in_cart_space(offs_t offset, bool amadec);
 };
 
 /*****************************************************************************
@@ -236,6 +234,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(senila);
 	DECLARE_WRITE_LINE_MEMBER(senilb);
 	DECLARE_WRITE_LINE_MEMBER(clock_in);
+	DECLARE_WRITE_LINE_MEMBER(reset_in);
 
 	// Called from the card (direction to box)
 	DECLARE_WRITE_LINE_MEMBER( set_inta );
@@ -247,7 +246,6 @@ public:
 	void cruwrite(offs_t offset, uint8_t data);
 
 	// called from the box itself
-	void set_genmod(bool set);
 	void set_number(int number) { m_slotnumber = number; }
 
 protected:

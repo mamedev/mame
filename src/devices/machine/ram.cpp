@@ -12,8 +12,8 @@
 #include "ram.h"
 #include "emuopts.h"
 
-#include <stdio.h>
-#include <ctype.h>
+#include <cstdio>
+#include <cctype>
 
 #include <algorithm>
 #include <functional>

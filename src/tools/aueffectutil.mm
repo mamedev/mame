@@ -13,7 +13,7 @@
 #include <utility>
 #include <vector>
 
-#include <stdlib.h>
+#include <cstdlib>
 
 
 #ifdef MAC_OS_X_VERSION_MAX_ALLOWED

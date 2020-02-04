@@ -20,6 +20,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void set_is_sudoku();
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -75,6 +77,10 @@ private:
 
 	DECLARE_READ8_MEMBER(read_unmapped);
 	DECLARE_WRITE8_MEMBER(write_unmapped);
+
+	int m_bytes_per_tile_entry;
+	int m_vrambase;
+	int m_spritebase;
 };
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A05_VID, elan_eu3a05vid_device)

@@ -213,19 +213,32 @@ void spg2xx_video_device::draw_bitmap(const rectangle& cliprect, uint32_t scanli
 	if ((scanline < 0) || (scanline >= 240))
 		return;
 
-	address_space& space = m_cpu->space(AS_PROGRAM);
-	const int linewidth = 320 / 2;
-	int sourcebase = 0x3f0000; // this is correct for Texas Hold'em - TODO: get from a register?
+	address_space &space = m_cpu->space(AS_PROGRAM);
 
-	sourcebase++; // why is this needed?
-	int bitmapline = scanline - 20; // should be from scrolly?
+	uint32_t tilemap = regs[4];
+	uint32_t palette_map = regs[5];
 
-	// at least for Texas Hold'em there is only enough memory for this size bitmap, and other reads would be outside of memory and generate excessive logging
-	// maybe we just need to silence logging instead tho?
-	if ((bitmapline < 0) || (bitmapline >= 200))
-		return;
+	//printf("draw bitmap bases %04x %04x\n", tilemap, palette_map);
 
-	sourcebase += bitmapline * linewidth;
+	uint32_t yscroll = regs[1];
+
+	int realline = (scanline + yscroll) & 0xff;
+
+
+	uint16_t tile = space.read_word(tilemap + realline);
+	uint16_t palette = 0;
+
+	//if (!tile)
+	//  continue;
+
+	palette = space.read_word(palette_map + realline / 2);
+	if (scanline & 1)
+		palette >>= 8;
+	else
+		palette &= 0x00ff;
+
+	//const int linewidth = 320 / 2;
+	int sourcebase = tile | (palette << 16); // this is correct for Texas Hold'em - TODO: get from a register?
 
 	uint32_t* dest = &m_screenbuf[320 * scanline];
 
@@ -307,6 +320,8 @@ void spg2xx_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 		palette = (ctrl & PAGE_WALLPAPER_MASK) ? space.read_word(palette_map) : space.read_word(palette_map + tile_address / 2);
 		if (x0 & 1)
 			palette >>= 8;
+		else
+			palette &= 0x00ff;
 
 		uint32_t tileattr = attr;
 		uint32_t tilectrl = ctrl;

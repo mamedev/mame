@@ -53,6 +53,9 @@ DECLARE_DEVICE_TYPE(PIC16C622A,  pic16c622a_device)
 
 class pic16c62x_device : public cpu_device
 {
+public:
+	void set_config(int data);
+
 protected:
 	// construction/destruction
 	pic16c62x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int picmodel);
@@ -189,7 +192,6 @@ private:
 	void build_opcode_table(void);
 	void pic16c62x_reset_regs();
 	void pic16c62x_soft_reset();
-	void pic16c62x_set_config(int data);
 	void pic16c62x_update_watchdog(int counts);
 	void pic16c62x_update_timer(int counts);
 

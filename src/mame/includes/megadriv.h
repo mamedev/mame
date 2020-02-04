@@ -139,7 +139,9 @@ public:
 
 	void megadriv_timers(machine_config &config);
 	void md_ntsc(machine_config &config);
+	void md2_ntsc(machine_config &config);
 	void md_pal(machine_config &config);
+	void md2_pal(machine_config &config);
 	void md_bootleg(machine_config &config);
 	void dcat16_megadriv_base(machine_config &config);
 	void dcat16_megadriv_map(address_map &map);
@@ -201,11 +203,15 @@ public:
 	void md_32x_scd(machine_config &config);
 	void mdj_32x(machine_config &config);
 	void ms_megadriv(machine_config &config);
+	void ms_megadriv2(machine_config &config);
 	void mdj_scd(machine_config &config);
+	void md2j_scd(machine_config &config);
 	void md_32x(machine_config &config);
 	void genesis_32x(machine_config &config);
 	void md_scd(machine_config &config);
+	void md2_scd(machine_config &config);
 	void genesis_scd(machine_config &config);
+	void genesis2_scd(machine_config &config);
 	void genesis_tmss(machine_config &config);
 };
 

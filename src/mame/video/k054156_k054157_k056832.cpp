@@ -479,6 +479,7 @@ void k056832_device::get_tile_info(  tile_data &tileinfo, int tile_index, int pa
 
 	const struct K056832_SHIFTMASKS *smptr;
 	int layer, flip, fbits, attr, code, color, flags;
+	int priority = 0;
 	uint16_t *pMem;
 
 	pMem  = &m_videoram[(pageIndex << 12) + (tile_index << 1)];
@@ -505,12 +506,13 @@ void k056832_device::get_tile_info(  tile_data &tileinfo, int tile_index, int pa
 	color = (attr & smptr->palm1) | (attr >> smptr->pals2 & smptr->palm2);
 	flags = TILE_FLIPYX(flip);
 
-	m_k056832_cb(layer, &code, &color, &flags);
+	m_k056832_cb(layer, &code, &color, &flags, &priority);
 
 	SET_TILE_INFO_MEMBER(m_gfx_num,
 			code,
 			color,
 			flags);
+	tileinfo.category = priority;
 }
 
 
@@ -676,7 +678,7 @@ u32 k056832_device::k_6bpp_rom_long_r(offs_t offset, u32 mem_mask)
 
 u8 k056832_device::konmedal_rom_r(offs_t offset)
 {
-	uint32_t addr = ((m_regs[0x1b] << 7) | ((m_regs[0x1a] & 0xc) * 0x800)) + offset;
+	uint32_t addr = (((m_regs[0x1a] << 9) & 0x60000) | ((m_regs[0x1b] << 15) & 0x18000) | ((m_regs[0x1a] << 3) & 0x06000)) + offset;
 
 	return m_rombase[addr];
 }

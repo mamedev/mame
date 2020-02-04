@@ -51,9 +51,9 @@ void bebox_state::main_mem(address_map &map)
 	map(0x800002F8, 0x800002FF).rw("ns16550_1", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x80000380, 0x80000387).rw("ns16550_2", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x80000388, 0x8000038F).rw("ns16550_3", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
-	map(0x800003b0, 0x800003bf).rw("vga", FUNC(cirrus_gd5428_device::port_03b0_r), FUNC(cirrus_gd5428_device::port_03b0_w));
-	map(0x800003c0, 0x800003cf).rw("vga", FUNC(cirrus_gd5428_device::port_03c0_r), FUNC(cirrus_gd5428_device::port_03c0_w));
-	map(0x800003d0, 0x800003df).rw("vga", FUNC(cirrus_gd5428_device::port_03d0_r), FUNC(cirrus_gd5428_device::port_03d0_w));
+	map(0x800003b0, 0x800003bf).rw(m_vga, FUNC(cirrus_gd5428_device::port_03b0_r), FUNC(cirrus_gd5428_device::port_03b0_w));
+	map(0x800003c0, 0x800003cf).rw(m_vga, FUNC(cirrus_gd5428_device::port_03c0_r), FUNC(cirrus_gd5428_device::port_03c0_w));
+	map(0x800003d0, 0x800003df).rw(m_vga, FUNC(cirrus_gd5428_device::port_03d0_r), FUNC(cirrus_gd5428_device::port_03d0_w));
 	map(0x800003F0, 0x800003F7).rw("ide", FUNC(ide_controller_device::cs1_r), FUNC(ide_controller_device::cs1_w));
 	map(0x800003F0, 0x800003F7).m(m_smc37c78, FUNC(smc37c78_device::map));
 	map(0x800003F8, 0x800003FF).rw("ns16550_0", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
@@ -62,8 +62,8 @@ void bebox_state::main_mem(address_map &map)
 	//map(0x800042E8, 0x800042EF).w("cirrus", FUNC(cirrus_device::cirrus_42E8_w));
 
 	map(0xBFFFFFF0, 0xBFFFFFFF).r(FUNC(bebox_state::bebox_interrupt_ack_r));
-	map(0xC00A0000, 0xC00BFFFF).rw("vga", FUNC(cirrus_gd5428_device::mem_r), FUNC(cirrus_gd5428_device::mem_w));
-	map(0xC1000000, 0xC11FFFFF).rw("vga", FUNC(cirrus_gd5428_device::mem_linear_r), FUNC(cirrus_gd5428_device::mem_linear_w));
+	map(0xC00A0000, 0xC00BFFFF).rw(m_vga, FUNC(cirrus_gd5428_device::mem_r), FUNC(cirrus_gd5428_device::mem_w));
+	map(0xC1000000, 0xC11FFFFF).rw(m_vga, FUNC(cirrus_gd5428_device::mem_linear_r), FUNC(cirrus_gd5428_device::mem_linear_w));
 	map(0xFFF00000, 0xFFF03FFF).bankr("bank2");
 	map(0xFFF04000, 0xFFFFFFFF).rw(FUNC(bebox_state::bebox_flash_r), FUNC(bebox_state::bebox_flash_w));
 }
@@ -120,6 +120,12 @@ void bebox_state::mpc105_config(device_t *device)
 	mpc105_device &mpc105 = *downcast<mpc105_device *>(device);
 	mpc105.set_cpu(":ppc1");
 	mpc105.set_bank_base_default(0);
+}
+
+void bebox_state::cirrus_config(device_t *device)
+{
+	pci_cirrus_svga_device &cirruspci = *downcast<pci_cirrus_svga_device *>(device);
+	cirruspci.set_vga(m_vga);
 }
 
 /*************************************
@@ -186,9 +192,9 @@ void bebox_state::bebox_peripherals(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update("vga", FUNC(cirrus_gd5428_device::screen_update));
+	screen.set_screen_update(m_vga, FUNC(cirrus_gd5428_device::screen_update));
 
-	cirrus_gd5428_device &vga(CIRRUS_GD5428(config, "vga", 0));
+	cirrus_gd5428_device &vga(CIRRUS_GD5428(config, m_vga, 0));
 	vga.set_screen("screen");
 
 	speaker_device &speaker(SPEAKER(config, "mono"));
@@ -218,8 +224,9 @@ void bebox_state::bebox_peripherals(machine_config &config)
 	m_pcibus->set_busnum(0);
 
 	pci_connector_device &pcislot0 = add_pci_slot(config, "pcibus:0", 0, "mpc105");
-	pcislot0.set_option_machine_config("mpc105", mpc105_config);
-	add_pci_slot(config, "pcibus:1", 1, "cirrus");
+	pcislot0.set_option_machine_config("mpc105", [this](device_t *device) { mpc105_config(device); });
+	pci_connector_device &pcislot1 = add_pci_slot(config, "pcibus:1", 1, "cirrus");
+	pcislot1.set_option_machine_config("cirrus", [this](device_t *device) { cirrus_config(device); });
 
 	/*PCI_BUS_LEGACY_DEVICE(12, nullptr, scsi53c810_pci_read, scsi53c810_pci_write)*/
 

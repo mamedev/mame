@@ -1784,7 +1784,7 @@ void tilemap_device::device_start()
 
 		// look for an extension entry
 		std::string tag_ext = std::string(tag()).append("_ext");
-		share = memshare(tag_ext.c_str());
+		share = memshare(tag_ext);
 		if (share != nullptr)
 			m_extmem.set(*share, m_bytes_per_entry);
 	}

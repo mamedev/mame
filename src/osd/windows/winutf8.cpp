@@ -10,7 +10,7 @@
 #include "winutf8.h"
 #include "strconv.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 
 // standard windows headers
 #include <shellapi.h>

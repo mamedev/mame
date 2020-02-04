@@ -17,7 +17,7 @@
 #include "validity.h"
 #include "clifront.h"
 #include "luaengine.h"
-#include <time.h>
+#include <ctime>
 #include "ui/ui.h"
 #include "ui/selgame.h"
 #include "ui/simpleselgame.h"

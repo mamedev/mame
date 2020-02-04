@@ -8,7 +8,7 @@
 
 *********************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "formats/xdf_dsk.h"
 

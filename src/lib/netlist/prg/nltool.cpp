@@ -23,8 +23,6 @@
 #include <ios>
 #include <iostream> // scanf
 
-#define NLTOOL_VERSION  20190420
-
 class tool_app_t : public plib::app
 {
 public:
@@ -121,7 +119,7 @@ public:
 	{
 		pstring res = plib::pfmt(fmt)(std::forward<ARGS>(args)...);
 		auto lines(plib::psplit(res, "\n", false));
-		if (lines.size() == 0)
+		if (lines.empty())
 			pout(prefix + "\n");
 		else
 			for (auto &l : lines)
@@ -136,7 +134,7 @@ private:
 	void convert();
 	void static_compile();
 
-	void mac_out(const pstring &s, const bool cont = true);
+	void mac_out(const pstring &s, bool cont = true);
 	void header_entry(const netlist::factory::element_t *e);
 	void mac(const netlist::factory::element_t *e);
 
@@ -165,8 +163,7 @@ class netlist_data_folder_t : public netlist::source_data_t
 {
 public:
 	explicit netlist_data_folder_t(const pstring &folder)
-	: netlist::source_data_t()
-	, m_folder(folder)
+	: m_folder(folder)
 	{
 	}
 
@@ -176,11 +173,9 @@ public:
 		auto strm(plib::make_unique<std::ifstream>(plib::filesystem::u8path(name)));
 		if (strm->fail())
 			return stream_ptr(nullptr);
-		else
-		{
-			strm->imbue(std::locale::classic());
-			return std::move(strm);
-		}
+
+		strm->imbue(std::locale::classic());
+		return std::move(strm);
 	}
 
 private:
@@ -191,8 +186,7 @@ class netlist_tool_callbacks_t : public netlist::callbacks_t
 {
 public:
 	explicit netlist_tool_callbacks_t(tool_app_t &app)
-	: netlist::callbacks_t()
-	, m_app(app)
+	: m_app(app)
 	{ }
 
 	void vlog(const plib::plog_level &l, const pstring &ls) const noexcept override;
@@ -277,7 +271,7 @@ public:
 			size += s->dt().size() * s->count();
 
 		if (buf.size() != size)
-			plib::pthrow<netlist::nl_exception>("Size different during load state.");
+			throw netlist::nl_exception("Size different during load state.");
 
 		char *p = buf.data();
 
@@ -323,9 +317,9 @@ struct input_t
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 		int e = std::sscanf(line.c_str(), "%lf,%[^,],%lf", &t, buf.data(), &val);
 		if (e != 3)
-			plib::pthrow<netlist::nl_exception>(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
+			throw netlist::nl_exception(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
 		m_value = static_cast<nl_fptype>(val);
-		m_time = netlist::netlist_time::from_fp(t);
+		m_time = netlist::netlist_time_ext::from_fp(t);
 		m_param = setup.find_param(pstring(buf.data()), true);
 	}
 
@@ -335,7 +329,7 @@ struct input_t
 		{
 			case netlist::param_t::STRING:
 			case netlist::param_t::POINTER:
-				plib::pthrow<netlist::nl_exception>(plib::pfmt("param {1} is not numeric\n")(m_param->name()));
+				throw netlist::nl_exception(plib::pfmt("param {1} is not numeric\n")(m_param->name()));
 			case netlist::param_t::DOUBLE:
 				static_cast<netlist::param_fp_t*>(m_param)->setTo(m_value);
 				break;
@@ -348,7 +342,7 @@ struct input_t
 		}
 	}
 
-	netlist::netlist_time m_time;
+	netlist::netlist_time_ext m_time;
 	netlist::param_t *m_param;
 	nl_fptype m_value;
 };
@@ -360,7 +354,7 @@ static std::vector<input_t> read_input(const netlist::setup_t &setup, const pstr
 	{
 		plib::putf8_reader r = plib::putf8_reader(std::ifstream(plib::filesystem::u8path(fname)));
 		if (r.stream().fail())
-			plib::pthrow<netlist::nl_exception>(netlist::MF_FILE_OPEN_ERROR(fname));
+			throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(fname));
 		r.stream().imbue(std::locale::classic());
 		pstring l;
 		while (r.readline(l))
@@ -379,7 +373,7 @@ void tool_app_t::run()
 {
 	plib::chrono::timer<plib::chrono::system_ticks> t;
 	std::vector<input_t> inps;
-	netlist::netlist_time ttr;
+	netlist::netlist_time_ext ttr;
 	netlist_tool_t nt(*this, "netlist");
 
 	{
@@ -400,7 +394,7 @@ void tool_app_t::run()
 		nt.exec().reset();
 
 		inps = read_input(nt.setup(), opt_inp());
-		ttr = netlist::netlist_time::from_fp(opt_ttr());
+		ttr = netlist::netlist_time_ext::from_fp(opt_ttr());
 	}
 
 
@@ -408,7 +402,7 @@ void tool_app_t::run()
 
 	t.reset();
 
-	netlist::netlist_time nlt = nt.exec().time();
+	netlist::netlist_time_ext nlt = nt.exec().time();
 	{
 		auto t_guard(t.guard());
 
@@ -417,7 +411,7 @@ void tool_app_t::run()
 		{
 			std::ifstream strm(plib::filesystem::u8path(opt_loadstate()));
 			if (strm.fail())
-				plib::pthrow<netlist::nl_exception>(netlist::MF_FILE_OPEN_ERROR(opt_loadstate()));
+				throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(opt_loadstate()));
 			strm.imbue(std::locale::classic());
 			plib::pbinary_reader reader(strm);
 			std::vector<char> loadstate;
@@ -455,7 +449,7 @@ void tool_app_t::run()
 			auto savestate = nt.save_state();
 			std::ofstream strm(plib::filesystem::u8path(opt_savestate()), std::ios_base::binary);
 			if (strm.fail())
-				plib::pthrow<plib::file_open_e>(opt_savestate());
+				throw plib::file_open_e(opt_savestate());
 			strm.imbue(std::locale::classic());
 
 			plib::pbinary_writer writer(strm);
@@ -503,14 +497,14 @@ void tool_app_t::validate()
 	//pout("Validation errors: {}\n",   m_errors);
 
 	if (m_warnings + m_errors > 0)
-		plib::pthrow<netlist::nl_exception>("validation: {1} errors {2} warnings", m_errors, m_warnings);
+		throw netlist::nl_exception("validation: {1} errors {2} warnings", m_errors, m_warnings);
 
 }
 
 void tool_app_t::static_compile()
 {
 	if (!opt_dir.was_specified())
-		plib::pthrow<netlist::nl_exception>("--dir option needs to be specified");
+		throw netlist::nl_exception("--dir option needs to be specified");
 
 	netlist_tool_t nt(*this, "netlist");
 
@@ -570,7 +564,7 @@ static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 	//printf("file %s\n", fname.c_str());
 	plib::putf8_reader r = plib::putf8_reader(std::ifstream(plib::filesystem::u8path(fname)));
 	if (r.stream().fail())
-		plib::pthrow<netlist::nl_exception>(netlist::MF_FILE_OPEN_ERROR(fname));
+		throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(fname));
 	r.stream().imbue(std::locale::classic());
 	doc_ext ret;
 
@@ -586,8 +580,8 @@ static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 			if (l != "")
 			{
 				auto a(plib::psplit(l, ":", true));
-				if ((a.size() < 1) || (a.size() > 2))
-					plib::pthrow<netlist::nl_exception>(l+" size mismatch");
+				if (a.empty() || (a.size() > 2))
+					throw netlist::nl_exception(l+" size mismatch");
 				pstring n(plib::trim(a[0]));
 				pstring v(a.size() < 2 ? "" : plib::trim(a[1]));
 				if (n == "Identifier")
@@ -623,11 +617,11 @@ static doc_ext read_docsrc(const pstring &fname, const pstring &id)
 					else if (n == "Example")
 					{
 						ret.example = plib::psplit(plib::trim(v),",",true);
-						if (ret.example.size() != 2 && ret.example.size() != 0)
-							plib::pthrow<netlist::nl_exception>("Example requires 2 parameters, but found {1}", ret.example.size());
+						if (ret.example.size() != 2 && !ret.example.empty())
+							throw netlist::nl_exception("Example requires 2 parameters, but found {1}", ret.example.size());
 					}
 					else
-						plib::pthrow<netlist::nl_exception>(n);
+						throw netlist::nl_exception(n);
 				}
 			}
 		}
@@ -677,16 +671,12 @@ void tool_app_t::header_entry(const netlist::factory::element_t *e)
 
 	for (const auto &s : v)
 	{
-		pstring r(plib::replace_all(plib::replace_all(plib::replace_all(s, "+", ""), ".", "_"), "@",""));
-		if (plib::startsWith(s, "+"))
-			vs += ", p" + r;
-		else if (plib::startsWith(s, "@"))
+		if (!plib::startsWith(s, "@"))
 		{
-			// automatically connected
-			//mac_out("\tNET_CONNECT(name, " + r + ", " + r + ")");
-		}
-		else
+			// @ gets automatically connected
+			const pstring r(plib::replace_all(plib::replace_all(plib::replace_all(s, "+", ""), ".", "_"), "@",""));
 			vs += ", p" + r;
+		}
 	}
 
 	mac_out("\tNET_REGISTER_DEVEXT(" + e->name() +", name" + vs + ")", false);
@@ -702,7 +692,7 @@ void tool_app_t::mac(const netlist::factory::element_t *e)
 			vs += ", " + plib::replace_all(plib::replace_all(s, "+", ""), ".", "_");
 
 	pout("{1}(name{2})\n", e->name(), vs);
-	if (v.size() > 0)
+	if (!v.empty())
 	{
 		pout("/*\n");
 		for (const auto &s : v)
@@ -833,7 +823,7 @@ void tool_app_t::create_docheader()
 			poutprefix("///", "  @section {}_2 Connection Diagram", d.id);
 			poutprefix("///", "");
 
-			if (d.pinalias.size() > 0)
+			if (!d.pinalias.empty())
 			{
 				poutprefix("///", "  <pre>");
 				if (d.package == "DIP")
@@ -863,7 +853,7 @@ void tool_app_t::create_docheader()
 			poutprefix("///", "  @section {}_4 Limitations", d.id);
 			poutprefix("///", "");
 			poutprefix("///", "  {}", d.limitations);
-			if (d.example.size() > 0)
+			if (!d.example.empty())
 			{
 				poutprefix("///", "");
 				poutprefix("///", "  @section {}_5 Example", d.id);
@@ -917,7 +907,7 @@ void tool_app_t::listdevices()
 		}
 		out += ")";
 		pout("{}\n", out);
-		if (terms.size() > 0)
+		if (!terms.empty())
 		{
 			pstring t = "";
 			for (auto & j : terms)
@@ -945,7 +935,7 @@ void tool_app_t::convert()
 	{
 		std::ifstream strm(plib::filesystem::u8path(opt_file()));
 		if (strm.fail())
-			plib::pthrow<netlist::nl_exception>(netlist::MF_FILE_OPEN_ERROR(opt_file()));
+			throw netlist::nl_exception(netlist::MF_FILE_OPEN_ERROR(opt_file()));
 		strm.imbue(std::locale::classic());
 		plib::copystream(ostrm, strm);
 	}
@@ -1008,12 +998,12 @@ int tool_app_t::execute()
 	if (opt_version())
 	{
 		pout(
-			"nltool (netlist) " PSTRINGIFY(NLTOOL_VERSION) "\n"
-			"Copyright (C) 2019 Couriersud\n"
+			"nltool (netlist) {1}\n"
+			"Copyright (C) 2020 Couriersud\n"
 			"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
 			"This is free software: you are free to change and redistribute it.\n"
 			"There is NO WARRANTY, to the extent permitted by law.\n\n"
-			"Written by Couriersud.\n");
+			"Written by Couriersud.\n", netlist::netlist_state_t::version());
 		if (opt_verb())
 		{
 			std::vector<std::pair<pstring, pstring>> defs;
@@ -1027,7 +1017,7 @@ int tool_app_t::execute()
 	}
 
 	m_defines = opt_defines();
-	m_defines.emplace_back("NLTOOL_VERSION=" PSTRINGIFY(NLTOOL_VERSION));
+	m_defines.emplace_back("NLTOOL_VERSION=" + netlist::netlist_state_t::version());
 	if (opt_prepro())
 		m_defines.emplace_back("__PREPROCESSOR_DEBUG__=1");
 

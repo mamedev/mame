@@ -133,7 +133,7 @@ READ8Z_MEMBER(nouspikel_ide_interface_device::readz)
 	uint8_t reply = 0;
 	if (machine().side_effects_disabled()) return;
 
-	if (((offset & m_select_mask)==m_select_value) && m_selected)
+	if (in_dsr_space(offset, true) && m_selected)
 	{
 		int addr = offset & 0x1fff;
 
@@ -199,7 +199,7 @@ void nouspikel_ide_interface_device::write(offs_t offset, uint8_t data)
 {
 	if (machine().side_effects_disabled()) return;
 
-	if (((offset & m_select_mask)==m_select_value) && m_selected)
+	if (in_dsr_space(offset, true) && m_selected)
 	{
 		if (m_cru_register & cru_reg_page_switching)
 		{
@@ -326,16 +326,6 @@ void nouspikel_ide_interface_device::device_reset()
 	m_sram_enable = false;
 	m_cru_register = 0;
 
-	if (m_genmod)
-	{
-		m_select_mask = 0x1fe000;
-		m_select_value = 0x174000;
-	}
-	else
-	{
-		m_select_mask = 0x7e000;
-		m_select_value = 0x74000;
-	}
 	m_selected = false;
 
 	m_cru_base = ioport("CRUIDE")->read();

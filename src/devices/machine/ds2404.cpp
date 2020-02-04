@@ -12,7 +12,7 @@
 #include "ds2404.h"
 
 #include <algorithm>
-#include <time.h> // FIXME: re-write in terms of device_rtc_interface and remove this
+#include <ctime> // FIXME: re-write in terms of device_rtc_interface and remove this
 
 
 //**************************************************************************

@@ -150,7 +150,7 @@ SETADDRESS_DBIN_MEMBER( snug_bwg_device::setaddress_dbin )
 
 	// Is the card being selected?
 	m_address = offset;
-	m_inDsrArea = ((m_address & m_select_mask)==m_select_value);
+	m_inDsrArea = in_dsr_space(m_address, true);
 
 	if (!m_inDsrArea) return;
 
@@ -196,7 +196,7 @@ SETADDRESS_DBIN_MEMBER( snug_bwg_device::setaddress_dbin )
 */
 void snug_bwg_device::debug_read(offs_t offset, uint8_t* value)
 {
-	if (((offset & m_select_mask)==m_select_value) && m_selected)
+	if (in_dsr_space(offset, true) && m_selected)
 	{
 		if ((offset & 0x1c00)==0x1c00)
 		{
@@ -210,7 +210,7 @@ void snug_bwg_device::debug_read(offs_t offset, uint8_t* value)
 
 void snug_bwg_device::debug_write(offs_t offset, uint8_t data)
 {
-	if (((offset & m_select_mask)==m_select_value) && m_selected)
+	if (in_dsr_space(offset, true) && m_selected)
 	{
 		if (((offset & 0x1c00)==0x1c00) && ((offset & 0x1fe0)!=0x1fe0))
 			m_buffer_ram->pointer()[(m_crulatch8_15->q5_r()<<10) | (m_address & 0x03ff)] = data;
@@ -527,17 +527,6 @@ void snug_bwg_device::device_start()
 
 void snug_bwg_device::device_reset()
 {
-	if (m_genmod)
-	{
-		m_select_mask = 0x1fe000;
-		m_select_value = 0x174000;
-	}
-	else
-	{
-		m_select_mask = 0x7e000;
-		m_select_value = 0x74000;
-	}
-
 	m_DRQ = CLEAR_LINE;
 	m_IRQ = CLEAR_LINE;
 	m_MOTOR_ON = CLEAR_LINE;

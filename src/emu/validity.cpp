@@ -15,7 +15,7 @@
 #include "romload.h"
 #include "video/rgbutil.h"
 
-#include <ctype.h>
+#include <cctype>
 #include <type_traits>
 #include <typeinfo>
 

@@ -36,7 +36,7 @@
 
 #include <algorithm>
 #include <new>
-#include <ctype.h>
+#include <cctype>
 
 
 //**************************************************************************

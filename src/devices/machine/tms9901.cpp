@@ -147,7 +147,7 @@ Clock mode:
 #include "emu.h"
 #include "tms9901.h"
 
-#include <math.h>
+#include <cmath>
 
 #define LOG_GENERAL  (1U << 0)
 #define LOG_PINS     (1U << 1)

@@ -22,6 +22,7 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/xsu_cards.h"
+#include "bus/isa/mc1502_fdc.h"
 
 
 class mc1502_state : public driver_device
@@ -46,6 +47,8 @@ public:
 	void mc1502(machine_config &config);
 
 	void init_mc1502();
+
+	void fdc_config(device_t *device);
 
 private:
 	required_device<cpu_device>  m_maincpu;

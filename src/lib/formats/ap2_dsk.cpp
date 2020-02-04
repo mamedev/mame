@@ -8,9 +8,9 @@
 
 *********************************************************************/
 
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
+#include <cstdlib>
+#include <cstring>
+#include <cassert>
 
 #include "ap2_dsk.h"
 #include "basicdsk.h"
@@ -496,19 +496,19 @@ static uint32_t apple2_get_track_size(floppy_image_legacy *floppy, int head, int
 LEGACY_FLOPPY_OPTIONS_START( apple2 )
 	LEGACY_FLOPPY_OPTION( apple2_do, "do,dsk,bin",  "Apple ][ DOS order disk image",    apple2_dsk_identify,    apple2_do_construct, nullptr,
 		HEADS([1])
-		TRACKS([APPLE2_TRACK_COUNT])
+		TRACKS([40]) // APPLE2_TRACK_COUNT
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
 	LEGACY_FLOPPY_OPTION( apple2_po, "po,dsk,bin",  "Apple ][ ProDOS order disk image", apple2_dsk_identify,    apple2_po_construct, nullptr,
 		HEADS([1])
-		TRACKS([APPLE2_TRACK_COUNT])
+		TRACKS([40]) // APPLE2_TRACK_COUNT
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
 	LEGACY_FLOPPY_OPTION( apple2_nib, "dsk,nib",    "Apple ][ Nibble order disk image", apple2_nib_identify,    apple2_nib_construct, nullptr,
 		HEADS([1])
-		TRACKS([APPLE2_TRACK_COUNT])
+		TRACKS([40]) // APPLE2_TRACK_COUNT
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))

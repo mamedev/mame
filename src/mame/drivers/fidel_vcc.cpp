@@ -130,7 +130,7 @@ public:
 	// RE button is tied to Z80 RESET pin
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
 
-	// machine drivers
+	// machine configs
 	void vcc(machine_config &config);
 
 protected:
@@ -321,7 +321,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void vcc_state::vcc(machine_config &config)

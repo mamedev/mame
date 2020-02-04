@@ -67,7 +67,7 @@ Address  Function Register  R/W  When Reset          Remarks
 
 #include "debugger.h"
 
-#include <limits.h>
+#include <climits>
 
 
 /* ======================================================================== */

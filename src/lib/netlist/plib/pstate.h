@@ -162,7 +162,7 @@ public:
 		}
 	}
 
-	const std::vector<const entry_t *> save_list() const
+	std::vector<const entry_t *> save_list() const
 	{
 		std::vector<const entry_t *> ret;
 		for (auto &i : m_save)

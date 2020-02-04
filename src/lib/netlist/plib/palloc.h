@@ -9,6 +9,7 @@
 ///
 
 #include "pconfig.h"
+#include "pmath.h"
 #include "pstring.h"
 #include "ptypes.h"
 
@@ -281,6 +282,9 @@ namespace plib {
 
 		static inline void *allocate( size_t alignment, size_t size )
 		{
+			m_stat_cur_alloc() += size;
+			m_stat_max_alloc() = std::max(m_stat_max_alloc(), m_stat_cur_alloc());
+
 			#if (PUSE_ALIGNED_ALLOCATION)
 			#if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
 				return _aligned_malloc(size, alignment);
@@ -301,7 +305,8 @@ namespace plib {
 
 		static inline void deallocate( void *ptr, size_t size ) noexcept
 		{
-			unused_var(size);
+			//unused_var(size);
+			m_stat_cur_alloc() -= size;
 			#if (PUSE_ALIGNED_ALLOCATION)
 				// NOLINTNEXTLINE(cppcoreguidelines-no-malloc)
 				free(ptr);
@@ -342,11 +347,31 @@ namespace plib {
 			}
 		}
 
+		template<typename T, typename... Args>
+		static T *alloc(Args&&... args)
+		{
+			auto *p = allocate(alignof(T), sizeof(T));
+			return new(p) T(std::forward<Args>(args)...);
+		}
+
+		template<typename T>
+		static void free(T *ptr) noexcept
+		{
+			ptr->~T();
+			aligned_arena::deallocate(ptr, sizeof(T));
+		}
+
 		bool operator ==(const aligned_arena &rhs) const noexcept
 		{
 			plib::unused_var(rhs);
 			return true;
 		}
+
+		size_type cur_alloc() const noexcept { return m_stat_cur_alloc(); }
+		size_type max_alloc() const noexcept { return m_stat_max_alloc(); }
+	private:
+		static size_t &m_stat_cur_alloc() noexcept { static size_t val = 0; return val; }
+		static size_t &m_stat_max_alloc() noexcept { static size_t val = 0; return val; }
 
 	};
 
@@ -377,29 +402,13 @@ namespace plib {
 #endif
 	}
 
-	// FIXME: remove
-	template<typename T, typename... Args>
-	inline T *pnew(Args&&... args)
-	{
-		auto *p = aligned_arena::allocate(alignof(T), sizeof(T));
-		return new(p) T(std::forward<Args>(args)...);
-	}
-
-	template<typename T>
-	inline void pdelete(T *ptr) noexcept
-	{
-		ptr->~T();
-		aligned_arena::deallocate(ptr, sizeof(T));
-	}
-
-
 	template <typename T>
-	using unique_ptr = std::unique_ptr<T, arena_deleter<aligned_arena, T>>;
+	using unique_ptr = aligned_arena::unique_pool_ptr<T>;
 
 	template<typename T, typename... Args>
 	plib::unique_ptr<T> make_unique(Args&&... args)
 	{
-		return plib::unique_ptr<T>(pnew<T>(std::forward<Args>(args)...));
+		return aligned_arena::instance().make_unique<T>(std::forward<Args>(args)...);
 	}
 
 	template <class T, std::size_t ALIGN = alignof(T)>

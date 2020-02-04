@@ -105,7 +105,7 @@ SETADDRESS_DBIN_MEMBER( ti_fdc_device::setaddress_dbin )
 
 	// Is the card being selected?
 	m_address = offset;
-	m_inDsrArea = ((m_address & m_select_mask)==m_select_value);
+	m_inDsrArea = in_dsr_space(offset, true);
 
 	if (!m_inDsrArea || !m_selected) return;
 
@@ -124,7 +124,7 @@ SETADDRESS_DBIN_MEMBER( ti_fdc_device::setaddress_dbin )
 */
 void ti_fdc_device::debug_read(offs_t offset, uint8_t* value)
 {
-	if (((offset & m_select_mask)==m_select_value) && m_selected)
+	if (in_dsr_space(offset, true) && m_selected)
 	{
 		if ((offset & 0x1ff1)!=0x1ff0)
 			*value = m_dsrrom[offset & 0x1fff];
@@ -349,16 +349,6 @@ void ti_fdc_device::device_start()
 
 void ti_fdc_device::device_reset()
 {
-	if (m_genmod)
-	{
-		m_select_mask = 0x1fe000;
-		m_select_value = 0x174000;
-	}
-	else
-	{
-		m_select_mask = 0x7e000;
-		m_select_value = 0x74000;
-	}
 	m_DRQ = CLEAR_LINE;
 	m_IRQ = CLEAR_LINE;
 	m_DVENA = CLEAR_LINE;

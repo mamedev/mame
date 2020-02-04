@@ -42,7 +42,7 @@ Screen-Printer (standalone)
 
 	<!-- Applications -->
 
-	<software name="adressd2" supported="yes">
+	<software name="adressd2">
 		<description>Adressdatei II</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -54,7 +54,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="basicode" supported="yes">
+	<software name="basicode">
 		<description>Basicode</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -67,7 +67,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="basicp5" supported="yes">
+	<software name="basicp5">
 		<description>Basic +5</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -79,7 +79,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="baspack" supported="yes">
+	<software name="baspack">
 		<description>Basic-Packer 2.13</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -92,7 +92,7 @@ Screen-Printer (standalone)
 	</software>
 
 	<!-- This version doesn't have a help message when you start it with just / -->
-	<software name="baspacka" cloneof="baspack" supported="yes">
+	<software name="baspacka" cloneof="baspack">
 		<description>Basic-Packer 2.13 (alternate)</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -104,7 +104,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="benchm" supported="yes">
+	<software name="benchm">
 		<description>Benchmark Test</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -117,7 +117,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="casloader" supported="yes">
+	<software name="casloader">
 		<description>Genie I II / TRS 80 Cassettenlader</description>
 		<year>1984</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -130,7 +130,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="charset" supported="yes">
+	<software name="charset">
 		<description>Charset</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -143,7 +143,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="colcom" supported="yes">
+	<software name="colcom">
 		<description>Colour Basic Compiler 3.05</description>
 		<year>1982</year>
 		<publisher>TCS</publisher>
@@ -155,7 +155,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="coldesig" supported="yes">
+	<software name="coldesig">
 		<description>Colour Design 3.0</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -167,7 +167,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="colforth" supported="yes">
+	<software name="colforth">
 		<description>Colour-Forth 2.0 (with cassette support)</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -179,7 +179,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="colfortha" cloneof="colforth" supported="yes">
+	<software name="colfortha" cloneof="colforth">
 		<description>Colour-Forth 2.0</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -191,7 +191,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="colmon2" supported="yes">
+	<software name="colmon2">
 		<description>Colour-Monitor 2.0</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -203,7 +203,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="colmon3" supported="yes">
+	<software name="colmon3">
 		<description>Colour-Monitor 3.0</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -215,7 +215,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="colpasc" supported="yes">
+	<software name="colpasc">
 		<description>Colour-PASCAL 2.0</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -227,7 +227,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="colrot" supported="yes">
+	<software name="colrot">
 		<description>Colour-ROT</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -240,7 +240,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="colzap" supported="yes">
+	<software name="colzap">
 		<description>Colour-Zap Ver 1.0 (TCS)</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -252,7 +252,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="dezhex" supported="yes">
+	<software name="dezhex">
 		<description>Dez-Hex</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -264,7 +264,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="ebasic" supported="yes">
+	<software name="ebasic">
 		<description>EBASIC (32k version)</description>
 		<year>1985</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -277,7 +277,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="editdef" supported="yes">
+	<software name="editdef">
 		<description>Editor fuer definierbare Zeichen</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -294,7 +294,7 @@ Screen-Printer (standalone)
 	<!-- * Mastercopy (Joerg L) -->
 	<!-- * Kopiermonitor (1983, Ernst Schoeberl) -->
 	<!-- * Ultracopy (TTS) -->
-	<software name="excopy" supported="yes">
+	<software name="excopy">
 		<description>Extended Copy</description>
 		<year>198?</year>
 		<publisher>TTS</publisher>
@@ -306,7 +306,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="extrabas" supported="yes">
+	<software name="extrabas">
 		<description>Extra-Basic</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -319,7 +319,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="grafiked" supported="yes">
+	<software name="grafiked">
 		<description>Grafik-Editor</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -333,7 +333,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="natomors" supported="yes">
+	<software name="natomors">
 		<description>Nato Morsing Standard Code</description>
 		<year>1983</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -347,7 +347,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="nodos80" supported="yes">
+	<software name="nodos80">
 		<description>NODOS 80</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -359,7 +359,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="primzahl" supported="yes">
+	<software name="primzahl">
 		<description>Primzahlsuche</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -372,7 +372,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="realcomp" supported="yes">
+	<software name="realcomp">
 		<description>Real-Compiler</description>
 		<year>198?</year>
 		<publisher>MM-Software</publisher>
@@ -384,7 +384,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="rs232" supported="yes">
+	<software name="rs232">
 		<description>RS-232 Treiberprogramm</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -396,7 +396,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="screened" supported="yes">
+	<software name="screened">
 		<description>Screen Editor (incl. Adventure screen)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -408,7 +408,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="shifttra" supported="yes">
+	<software name="shifttra">
 		<description>Shift Transformation</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -421,7 +421,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="softschu" supported="yes">
+	<software name="softschu">
 		<description>Software-Schutz</description>
 		<year>1983</year>
 		<publisher>Harald Bögeholz</publisher>
@@ -433,7 +433,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="spriteed" supported="yes">
+	<software name="spriteed">
 		<description>Sprite-Editor</description>
 		<year>1983</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -446,7 +446,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="superbas" supported="yes">
+	<software name="superbas">
 		<description>Super-Basic</description>
 		<year>198?</year>
 		<publisher>Heinz Hübben Software Verlag</publisher>
@@ -458,7 +458,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="supergra" supported="yes">
+	<software name="supergra">
 		<description>Super-Grafik</description>
 		<year>1984</year>
 		<publisher>The Colour Connection</publisher>
@@ -471,7 +471,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="synthi" supported="yes">
+	<software name="synthi">
 		<description>Synthesizer (TCS)</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -484,7 +484,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="syscopy" supported="yes">
+	<software name="syscopy">
 		<description>System Copy</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -497,7 +497,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="tapedisk" supported="yes">
+	<software name="tapedisk">
 		<description>Tape-Disk Converter 1.11</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -509,7 +509,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="tapeedit" supported="yes">
+	<software name="tapeedit">
 		<description>Tape-Edit</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -522,7 +522,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="tracemon" supported="yes">
+	<software name="tracemon">
 		<description>Tracemon</description>
 		<year>1983</year>
 		<publisher>Juergen Buchmueller</publisher>
@@ -535,7 +535,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="transist" supported="yes">
+	<software name="transist">
 		<description>Die Physik des Transistors</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -559,7 +559,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="utpack2" supported="yes">
+	<software name="utpack2">
 		<description>Utilities Package Ver. 2.0</description>
 		<year>1983</year>
 		<publisher>Algray Software</publisher>
@@ -572,7 +572,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="zeichen2" supported="yes">
+	<software name="zeichen2">
 		<description>Zeicheneditor + (incl. SCREEN-Editor)</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -584,7 +584,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="zeichene" supported="yes">
+	<software name="zeichene">
 		<description>Zeicheneditor +</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -596,7 +596,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="zeichens" supported="yes">
+	<software name="zeichens">
 		<description>Zeichensätze (incl. Screen-Printer)</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -611,7 +611,7 @@ Screen-Printer (standalone)
 
 	<!-- Demos -->
 
-	<software name="coldemo" supported="yes">
+	<software name="coldemo">
 		<description>Colour Genie Demonstration Kassette</description>
 		<year>198?</year>
 		<publisher>Carsten Schmidt</publisher>
@@ -624,7 +624,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="floh" supported="yes">
+	<software name="floh">
 		<description>Der Flohwalzer</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -636,7 +636,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="musik" supported="yes">
+	<software name="musik">
 		<description>Musik</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -649,7 +649,7 @@ Screen-Printer (standalone)
 	</software>
 
 	<!-- From the Colour Genie manual -->
-	<software name="peng" supported="yes">
+	<software name="peng">
 		<description>Peng</description>
 		<year>198?</year>
 		<publisher>TCS</publisher>
@@ -663,7 +663,7 @@ Screen-Printer (standalone)
 
 	<!-- Games -->
 
-	<software name="abenteue" supported="yes">
+	<software name="abenteue">
 		<description>Abenteuerland</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -675,7 +675,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="africa" supported="yes">
+	<software name="africa">
 		<description>Africa</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -688,7 +688,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="andromed" supported="yes">
+	<software name="andromed">
 		<description>Andromeda (32k)</description>
 		<year>1982</year>
 		<publisher>TCG</publisher>
@@ -701,7 +701,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="andromed16" cloneof="andromed" supported="yes">
+	<software name="andromed16" cloneof="andromed">
 		<description>Andromeda (16k)</description>
 		<year>1982</year>
 		<publisher>TCG</publisher>
@@ -714,7 +714,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="astrnaut" supported="yes">
+	<software name="astrnaut">
 		<description>Astronaut</description>
 		<year>1984</year>
 		<publisher>N. A. Taylor</publisher>
@@ -726,7 +726,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="ballon" supported="yes">
+	<software name="ballon">
 		<description>Ballon</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -738,7 +738,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="botschaf" supported="yes">
+	<software name="botschaf">
 		<description>Botschaft</description>
 		<year>1985</year>
 		<publisher>Scholz Baeumner Schaffarzik (SBS)</publisher>
@@ -751,7 +751,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="bruecke" supported="yes">
+	<software name="bruecke">
 		<description>Brücke</description>
 		<year>1984</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -765,7 +765,7 @@ Screen-Printer (standalone)
 	</software>
 
 	<!-- From the Colour Genie manual -->
-	<software name="bumm" supported="yes">
+	<software name="bumm">
 		<description>Bumm Bumm</description>
 		<year>198?</year>
 		<publisher>TCS</publisher>
@@ -780,7 +780,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="caveman" supported="yes">
+	<software name="caveman">
 		<description>Cave Man</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -793,7 +793,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="chessm" supported="yes">
+	<software name="chessm">
 		<description>Chess Machine</description>
 		<year>1984</year>
 		<publisher>Heinz Hübben Software Verlag</publisher>
@@ -805,7 +805,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="chop83" supported="yes">
+	<software name="chop83">
 		<description>Chopper (1983)</description>
 		<year>1983</year>
 		<publisher>Jürgen Buchmüller</publisher>
@@ -818,7 +818,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="chopper" supported="yes">
+	<software name="chopper">
 		<description>Chopper (TCS)</description>
 		<year>198?</year>
 		<publisher>TCS</publisher>
@@ -831,7 +831,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="ciaagent" supported="yes">
+	<software name="ciaagent">
 		<description>CIA-Agent</description>
 		<year>1985</year>
 		<publisher>Scholz Baeumner Schaffarzik (SBS)</publisher>
@@ -844,7 +844,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="colkong" supported="yes">
+	<software name="colkong">
 		<description>Colour Kong (32k)</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -857,7 +857,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="colkong16" cloneof="colkong" supported="yes">
+	<software name="colkong16" cloneof="colkong">
 		<description>Colour Kong (16k)</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -870,7 +870,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="colkong16a" cloneof="colkong" supported="yes">
+	<software name="colkong16a" cloneof="colkong">
 		<description>Colour Kong (16k, no autostart)</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -883,7 +883,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="colscha" supported="yes">
+	<software name="colscha">
 		<description>Colour Schach</description>
 		<year>1983</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -896,7 +896,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="colsch" supported="yes">
+	<software name="colsch">
 		<description>Colour Schach (TCS)</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -909,7 +909,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="cosmicat" supported="yes">
+	<software name="cosmicat">
 		<description>Cosmic Attack</description>
 		<year>198?</year>
 		<publisher>Kansas Software</publisher>
@@ -922,7 +922,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="crzchase" supported="yes">
+	<software name="crzchase">
 		<description>Crazy Chaser</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -934,7 +934,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="crzpaint" supported="yes">
+	<software name="crzpaint">
 		<description>Crazy Paint</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -947,7 +947,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="crzpaintc" supported="yes">
+	<software name="crzpaintc">
 		<description>Crazy Paint (The Colour Connection)</description>
 		<year>1984</year>
 		<publisher>The Colour Connection</publisher>
@@ -960,7 +960,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="crzpaintca" cloneof="crzpaintc" supported="yes">
+	<software name="crzpaintca" cloneof="crzpaintc">
 		<description>Crazy Paint (The Colour Connection, alternate)</description>
 		<year>1984</year>
 		<publisher>The Colour Connection</publisher>
@@ -973,7 +973,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="deathsta" supported="yes">
+	<software name="deathsta">
 		<description>Deathstar</description>
 		<year>1983</year>
 		<publisher>Algray Software</publisher>
@@ -986,7 +986,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="deathtra" supported="yes">
+	<software name="deathtra">
 		<description>Deathtrap</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -999,7 +999,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="defender" supported="yes">
+	<software name="defender">
 		<description>Defender</description>
 		<year>198?</year>
 		<publisher>Andreas Goldau Softwareproduction</publisher>
@@ -1012,7 +1012,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="digboy" supported="yes">
+	<software name="digboy">
 		<description>DIG-BOY (TCS)</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -1025,7 +1025,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="disvilla" supported="yes">
+	<software name="disvilla">
 		<description>Disastrous Villa</description>
 		<year>1985</year>
 		<publisher>Scholz Baeumner Schaffarzik (SBS)</publisher>
@@ -1038,7 +1038,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="dracula" supported="yes">
+	<software name="dracula">
 		<description>Die Juwelen des Grafen Dracula</description>
 		<year>198?</year>
 		<publisher>Cooperated Software</publisher>
@@ -1056,7 +1056,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="eagle" supported="yes">
+	<software name="eagle">
 		<description>Eagle</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -1069,7 +1069,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="eatman" supported="yes">
+	<software name="eatman">
 		<description>Eatman</description>
 		<year>1983</year>
 		<publisher>Molimerx Ltd.</publisher>
@@ -1082,7 +1082,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="eis" supported="yes">
+	<software name="eis">
 		<description>Eis</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -1095,7 +1095,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="eliminat" supported="yes">
+	<software name="eliminat">
 		<description>Eliminator</description>
 		<year>1984</year>
 		<publisher>TCC</publisher>
@@ -1108,7 +1108,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="empire" supported="yes">
+	<software name="empire">
 		<description>Empire</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1120,7 +1120,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="exrevers" supported="yes">
+	<software name="exrevers">
 		<description>ExReversic</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -1133,7 +1133,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="fastfood" supported="yes">
+	<software name="fastfood">
 		<description>Fast Food</description>
 		<year>1983</year>
 		<publisher>cc Computer Studio</publisher>
@@ -1146,7 +1146,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="firebird" supported="yes">
+	<software name="firebird">
 		<description>Firebird</description>
 		<year>1983</year>
 		<publisher>Heinz Hübben Software Verlag</publisher>
@@ -1159,7 +1159,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="flugsim" supported="yes">
+	<software name="flugsim">
 		<description>Colour Genie Flugsimulator</description>
 		<year>1984</year>
 		<publisher>TCS</publisher>
@@ -1171,7 +1171,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="fraggels" supported="yes">
+	<software name="fraggels">
 		<description>Im Reich der Fraggels</description>
 		<year>19??</year>
 		<publisher>Scholz Baeumner Schaffarzik (SBS)</publisher>
@@ -1185,7 +1185,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="frog" supported="yes">
+	<software name="frog">
 		<description>Colour Frog</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -1198,7 +1198,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="glueck" supported="yes">
+	<software name="glueck">
 		<description>Glückspilz</description>
 		<year>1983</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1212,7 +1212,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="gorilla" supported="yes">
+	<software name="gorilla">
 		<description>Gorilla</description>
 		<year>1983</year>
 		<publisher>Heinz Hübben Software Verlag</publisher>
@@ -1225,7 +1225,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="grauen" supported="yes">
+	<software name="grauen">
 		<description>Schiff des Grauens</description>
 		<year>198?</year>
 		<publisher>Scholz Baeumner Schaffarzik (SBS)</publisher>
@@ -1239,7 +1239,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="hdeath" supported="yes">
+	<software name="hdeath">
 		<description>House of Death</description>
 		<year>1985</year>
 		<publisher>Scholz Baeumner Schaffarzik (SBS)</publisher>
@@ -1253,7 +1253,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="hektik" supported="yes">
+	<software name="hektik">
 		<description>Hektik</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -1266,7 +1266,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="hektika" cloneof="hektik" supported="yes">
+	<software name="hektika" cloneof="hektik">
 		<description>Hektik (alternate)</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -1279,7 +1279,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="helikopt" supported="yes">
+	<software name="helikopt">
 		<description>Helikopter</description>
 		<year>1983</year>
 		<publisher>Heinz Hübben Software Verlag</publisher>
@@ -1292,7 +1292,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="horror" supported="yes">
+	<software name="horror">
 		<description>Horror Castle</description>
 		<year>198?</year>
 		<publisher>Scholz Baeumner Schaffarzik (SBS)</publisher>
@@ -1305,7 +1305,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="invasion" supported="yes">
+	<software name="invasion">
 		<description>Invasion aus dem Weltraum</description>
 		<year>1982</year>
 		<publisher>TCS</publisher>
@@ -1337,7 +1337,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="jpoker" supported="yes">
+	<software name="jpoker">
 		<description>Joker Poker</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -1350,7 +1350,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="kaefer" supported="yes">
+	<software name="kaefer">
 		<description>Marienkäfer</description>
 		<year>1984</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1363,7 +1363,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="king" supported="yes">
+	<software name="king">
 		<description>King</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -1376,7 +1376,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="kniffel" supported="yes">
+	<software name="kniffel">
 		<description>Kniffel</description>
 		<year>1985</year>
 		<publisher>TTS</publisher>
@@ -1389,7 +1389,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="labyfear" supported="yes">
+	<software name="labyfear">
 		<description>Labyrinth of Fear</description>
 		<year>1983</year>
 		<publisher>Algray Software</publisher>
@@ -1407,7 +1407,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="laenquiz" supported="yes">
+	<software name="laenquiz">
 		<description>Länder-Quiz</description>
 		<year>1984</year>
 		<publisher>TCS</publisher>
@@ -1420,7 +1420,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="lasverga" supported="yes">
+	<software name="lasverga">
 		<description>Las Vergas Spiel-Automat</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1433,7 +1433,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="life" supported="yes">
+	<software name="life">
 		<description>Life</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -1446,7 +1446,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="lunarlan" supported="yes">
+	<software name="lunarlan">
 		<description>Lunar Lander</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -1471,7 +1471,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="madtree" supported="yes">
+	<software name="madtree">
 		<description>Madtree</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -1484,7 +1484,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="mampf2" supported="yes">
+	<software name="mampf2">
 		<description>Mampf Man II</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -1497,7 +1497,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="meteor" supported="yes">
+	<software name="meteor">
 		<description>Meteor</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -1522,7 +1522,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="mordzepp" supported="yes">
+	<software name="mordzepp">
 		<description>Mord im Zeppelin</description>
 		<year>198?</year>
 		<publisher>Scholz Baeumner Schaffarzik (SBS)</publisher>
@@ -1535,7 +1535,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="motten" supported="yes">
+	<software name="motten">
 		<description>Motten</description>
 		<year>1982</year>
 		<publisher>TCS</publisher>
@@ -1548,7 +1548,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="mysttave" supported="yes">
+	<software name="mysttave">
 		<description>Mysterious Tavern</description>
 		<year>198?</year>
 		<publisher>Scholz Baeumner Schaffarzik (SBS)</publisher>
@@ -1561,7 +1561,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="netzo" supported="yes">
+	<software name="netzo">
 		<description>Netzo</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -1574,7 +1574,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="pacboy" supported="yes">
+	<software name="pacboy">
 		<description>Pac Boy</description>
 		<year>1984</year>
 		<publisher>Heinz Hübben Software Verlag</publisher>
@@ -1587,7 +1587,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="santapar" supported="yes">
+	<software name="santapar">
 		<description>Santa Paravia und Fuimaccio</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1599,7 +1599,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="saug" supported="yes">
+	<software name="saug">
 		<description>Saug</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -1612,7 +1612,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="schnick" supported="yes">
+	<software name="schnick">
 		<description>Schnick Schnack Schnuck</description>
 		<year>1986</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1625,7 +1625,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="scuttle" supported="yes">
+	<software name="scuttle">
 		<description>Scuttle</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1638,7 +1638,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="skramble" supported="yes">
+	<software name="skramble">
 		<description>Skramble</description>
 		<year>1983</year>
 		<publisher>Algray Software</publisher>
@@ -1652,7 +1652,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="spaceatt" supported="yes">
+	<software name="spaceatt">
 		<description>Space Attack</description>
 		<year>1984</year>
 		<publisher>TCC</publisher>
@@ -1665,7 +1665,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="spaceman" supported="yes">
+	<software name="spaceman">
 		<description>Spaceman</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1691,7 +1691,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="superhrn" supported="yes">
+	<software name="superhrn">
 		<description>Superhirn</description>
 		<year>198?</year>
 		<publisher>TTS</publisher>
@@ -1704,7 +1704,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="tausend" supported="yes">
+	<software name="tausend">
 		<description>Tausendfuss</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
@@ -1716,7 +1716,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="toadman" supported="yes">
+	<software name="toadman">
 		<description>Toad Mania</description>
 		<year>1983</year>
 		<publisher>Gumboot Software</publisher>
@@ -1730,7 +1730,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="trashman" supported="yes">
+	<software name="trashman">
 		<description>Trash-Man</description>
 		<year>1983</year>
 		<publisher>Schmidtke Electronic</publisher>
@@ -1743,7 +1743,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="triton" supported="yes">
+	<software name="triton">
 		<description>Triton Battle</description>
 		<year>19??</year>
 		<publisher>Schmidtke Electronic</publisher>
@@ -1757,7 +1757,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="ubootjag" supported="yes">
+	<software name="ubootjag">
 		<description>U-Boot-Jagd</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1769,7 +1769,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="wurm" supported="yes">
+	<software name="wurm">
 		<description>Wurm</description>
 		<year>1982</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1781,7 +1781,7 @@ Screen-Printer (standalone)
 		</part>
 	</software>
 
-	<software name="zalaga" supported="yes">
+	<software name="zalaga">
 		<description>Zalaga</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>

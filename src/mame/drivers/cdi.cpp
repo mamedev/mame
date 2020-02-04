@@ -739,8 +739,6 @@ ROM_START( cdimono1 )
 	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 ROM_END
 
-
-
 ROM_START( cdi910 )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "cdi910", "CD-I 910-17P Mini-MMC" )
@@ -772,7 +770,6 @@ ROM_START( cdimono2 )
 	ROM_LOAD( "zc405352p__slave_cdi_4.1__0d67p__lltr9403.mc68hc705c8a.7206", 0x0000, 0x2000, CRC(5b19da07) SHA1(cf02d84977050c71e87a38f1249e83c43a93949b) )
 ROM_END
 
-
 ROM_START( cdi490a )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "cdi490", "CD-i 490" )
@@ -782,9 +779,6 @@ ROM_START( cdi490a )
 	ROM_LOAD( "impega.rom", 0x0000, 0x40000, CRC(84d6f6aa) SHA1(02526482a0851ea2a7b582d8afaa8ef14a8bd914) )
 	ROM_LOAD( "vmpega.rom", 0x0000, 0x40000, CRC(db264e8b) SHA1(be407fbc102f1731a0862554855e963e5a47c17b) )
 ROM_END
-
-
-
 
 ROM_START( cdibios ) // for the quizard sets
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -806,13 +800,19 @@ ROM_END
     Each Quizard game (1,2,3,4) requires it's own MCU, you can upgrade between revisions by changing
     just the CD, but not between games as a new MCU is required.
 
-    The only dumped MCUs are German region ones for Quizard 1 and 4.
-    A Czech Quizard 4 MCU was located but it was an 89c51 type instead
+    MCU Notes:
+    i8751 MCU dumps confirmed good on original hardware
+    German language MCUs for Quizard 1 through 4 are dumped
+    Czechoslovakian language MCU for Quizard 4 is dumped
+    Known to exist a Quizard 1 Italian language MCU IT 11 L2 (not dumped)
+    Known to exist is an alternate Quizard 2 German language MCU DE 122 D3 (not dumped)
 
 */
 
 
-// Quizard (1)
+//********************************************************
+//                     Quizard (1)
+//********************************************************
 
 ROM_START( quizard ) /* CD-ROM printed ??/?? */
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -828,9 +828,8 @@ ROM_START( quizard ) /* CD-ROM printed ??/?? */
 	DISK_IMAGE_READONLY( "quizard18", 0, BAD_DUMP SHA1(ede873b22957f2a707bbd3039e962ef2ca5aedbd) )
 
 	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard1_german_d8751.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) ) // confirmed good on original hardware
+	ROM_LOAD( "de_11_d3.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) ) // German language
 ROM_END
-
 
 ROM_START( quizard_17 )
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -845,8 +844,8 @@ ROM_START( quizard_17 )
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard17", 0, BAD_DUMP SHA1(4bd698f076505b4e17be978481bce027eb47123b) )
 
-	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard1_german_d8751.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) ) // confirmed good on original hardware
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "de_11_d3.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) ) // German language
 ROM_END
 
 ROM_START( quizard_12 ) /* CD-ROM printed 01/95 */
@@ -862,8 +861,8 @@ ROM_START( quizard_12 ) /* CD-ROM printed 01/95 */
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard12", 0, BAD_DUMP SHA1(6e41683b96b74e903040842aeb18437ad7813c82) )
 
-	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard1_german_d8751.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) ) // confirmed good on original hardware
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "de_11_d3.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) ) // German language
 ROM_END
 
 ROM_START( quizard_10 )
@@ -876,18 +875,19 @@ ROM_START( quizard_10 )
 	ROM_REGION(0x2000, "slave", 0)
 	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
-
 	// software: BurnAtOnce 0.99.5 / CHDMAN 0.163
 	// Drive: TS-L633R
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard10", 0, SHA1(5715db50f0d5ffe06f47c0943f4bf0481ab6048e) )
 
-	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard1_german_d8751.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) ) // confirmed good on original hardware
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "de_11_d3.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) ) // German language
 ROM_END
 
 
-// Quizard 2
+//********************************************************
+//                     Quizard 2
+//********************************************************
 
 ROM_START( quizard2 ) /* CD-ROM printed ??/?? */
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -902,8 +902,8 @@ ROM_START( quizard2 ) /* CD-ROM printed ??/?? */
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard23", 0, BAD_DUMP SHA1(cd909d9a54275d6f2d36e03e83eea996e781b4d3) )
 
-	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard2_d8751.bin", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "dn_122_d3.bin", 0x0000, 0x1000, CRC(d48063ea) SHA1(b512fa5e53f296a180340e09b53613dd1c0d38bc) ) // German language - DE 122 D3 known to exist
 ROM_END
 
 ROM_START( quizard2_22 )
@@ -919,11 +919,14 @@ ROM_START( quizard2_22 )
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard22", 0, BAD_DUMP SHA1(03c8fdcf27ead6e221691111e8c679b551099543) )
 
-	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard2_d8751.bin", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "dn_122_d3.bin", 0x0000, 0x1000, CRC(d48063ea) SHA1(b512fa5e53f296a180340e09b53613dd1c0d38bc) ) // German language - DE 122 D3 known to exist
 ROM_END
 
-// Quizard 3
+
+//********************************************************
+//                     Quizard 3
+//********************************************************
 
 ROM_START( quizard3 ) /* CD-ROM printed ??/?? */
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -938,8 +941,25 @@ ROM_START( quizard3 ) /* CD-ROM printed ??/?? */
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard34", 0, BAD_DUMP SHA1(37ad49b72b5175afbb87141d57bc8604347fe032) )
 
-	ROM_REGION(0x1000, "mcu", 0) // d8751h
-	ROM_LOAD( "de132d3.bin", 0x0000, 0x1000, CRC(8858251e) SHA1(2c1005a74bb6f0c2918dff4ab6326528eea48e1f) ) // confirmed good on original hardware
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "de_132_d3.bin", 0x0000, 0x1000, CRC(8858251e) SHA1(2c1005a74bb6f0c2918dff4ab6326528eea48e1f) ) // German language
+ROM_END
+
+ROM_START( quizard3a ) /* CD-ROM printed ??/?? */
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
+
+	ROM_REGION(0x2000, "cdic", 0)
+	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+
+	ROM_REGION(0x2000, "slave", 0)
+	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "quizard34", 0, BAD_DUMP SHA1(37ad49b72b5175afbb87141d57bc8604347fe032) )
+
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "de_132_a1.bin", 0x0000, 0x1000, CRC(313ac673) SHA1(cb0ee7e9a6eaa5f4d000f5ea99b7ee4c440b31d1) ) // German language - earlier version of MCU code
 ROM_END
 
 ROM_START( quizard3_32 )
@@ -955,10 +975,14 @@ ROM_START( quizard3_32 )
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard32", 0, BAD_DUMP SHA1(31e9fa2169aa44d799c37170b238134ab738e1a1) )
 
-	ROM_REGION(0x1000, "mcu", 0) // d8751h
-	ROM_LOAD( "de132d3.bin", 0x0000, 0x1000, CRC(8858251e) SHA1(2c1005a74bb6f0c2918dff4ab6326528eea48e1f) ) // confirmed good on original hardware
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "de_132_d3.bin", 0x0000, 0x1000, CRC(8858251e) SHA1(2c1005a74bb6f0c2918dff4ab6326528eea48e1f) ) // German language
 ROM_END
 
+
+//********************************************************
+//                     Quizard 4
+//********************************************************
 
 ROM_START( quizard4 ) /* CD-ROM printed 09/98 */
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -973,8 +997,25 @@ ROM_START( quizard4 ) /* CD-ROM printed 09/98 */
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard4r42", 0, BAD_DUMP SHA1(a5d5c8950b4650b8753f9119dc7f1ccaa2aa5442) )
 
-	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard4_german_d8751.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) ) // confirmed good on original hardware
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "de_142_d3.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) ) // German language
+ROM_END
+
+ROM_START( quizard4cz ) /* CD-ROM printed 09/98 */
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
+
+	ROM_REGION(0x2000, "cdic", 0)
+	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+
+	ROM_REGION(0x2000, "slave", 0)
+	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "quizard4r42", 0, BAD_DUMP SHA1(a5d5c8950b4650b8753f9119dc7f1ccaa2aa5442) )
+
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "ts142_cz1.bin", 0x0000, 0x1000, CRC(fdc1f457) SHA1(5169c4d2ea4073a854c3f619205161386c9af8af) ) // Czech language - works with all Quizard 4 versions
 ROM_END
 
 ROM_START( quizard4_41 )
@@ -990,8 +1031,8 @@ ROM_START( quizard4_41 )
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard4r41", 0, BAD_DUMP SHA1(2c0484c6545aac8e00b318328c6edce6f5dde43d) )
 
-	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard4_german_d8751.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) ) // confirmed good on original hardware
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "de_142_d3.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) ) // German language
 ROM_END
 
 ROM_START( quizard4_40 ) /* CD-ROM printed 07/97 */
@@ -1007,8 +1048,8 @@ ROM_START( quizard4_40 ) /* CD-ROM printed 07/97 */
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard4r40", 0, BAD_DUMP SHA1(288cc37a994e4f1cbd47aa8c92342879c6fc0b87) )
 
-	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard4_german_d8751.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) ) // confirmed good on original hardware
+	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
+	ROM_LOAD( "de_142_d3.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) ) // German language
 ROM_END
 
 
@@ -1025,21 +1066,22 @@ CONS( 1991, cdi490a,  0,      0,      cdimono1, cdi,      cdi_state, empty_init,
 
 // The Quizard games are RETAIL CD-i units, with additional JAMMA adapters & dongles for protection, hence being 'clones' of the system.
 /*    YEAR  NAME         PARENT    MACHINE        INPUT     DEVICE          INIT         MONITOR     COMPANY         FULLNAME */
-GAME( 1995, cdibios,     0,        cdimono1_base, quizard,  quizard_state,  empty_init,  ROT0,      "Philips",      "CD-i (Mono-I) (PAL) BIOS", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IS_BIOS_ROOT )
+GAME( 1995, cdibios,     0,        cdimono1_base, quizard,  quizard_state,  empty_init,  ROT0,     "Philips",  "CD-i (Mono-I) (PAL) BIOS", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IS_BIOS_ROOT )
 
-GAME( 1995, quizard,     cdibios,  quizard,       quizard,  quizard1_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.8)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1995, quizard_17,  quizard,  quizard,       quizard,  quizard1_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.7)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1995, quizard_12,  quizard,  quizard,       quizard,  quizard1_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1995, quizard_10,  quizard,  quizard,       quizard,  quizard1_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.0)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard,     cdibios,  quizard,       quizard,  quizard1_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.8, German, i8751 DE 11 D3)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard_17,  quizard,  quizard,       quizard,  quizard1_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.7, German, i8751 DE 11 D3)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard_12,  quizard,  quizard,       quizard,  quizard1_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.2, German, i8751 DE 11 D3)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard_10,  quizard,  quizard,       quizard,  quizard1_state, empty_init,  ROT0, "TAB Austria",  "Quizard (v1.0, German, i8751 DE 11 D3)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 
-GAME( 1995, quizard2,    cdibios,  quizard,       quizard,  quizard2_state, empty_init,  ROT0, "TAB Austria",  "Quizard 2 (v2.3)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1995, quizard2_22, quizard2, quizard,       quizard,  quizard2_state, empty_init,  ROT0, "TAB Austria",  "Quizard 2 (v2.2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard2,    cdibios,  quizard,       quizard,  quizard2_state, empty_init,  ROT0, "TAB Austria",  "Quizard 2 (v2.3, German, i8751 DN 122 D3)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard2_22, quizard2, quizard,       quizard,  quizard2_state, empty_init,  ROT0, "TAB Austria",  "Quizard 2 (v2.2, German, i8751 DN 122 D3)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 
 // Quizard 3 and 4 will hang after inserting a coin (incomplete protection sims?)
+GAME( 1995, quizard3,    cdibios,  quizard,       quizard,  quizard3_state, empty_init,  ROT0, "TAB Austria",  "Quizard 3 (v3.4, German, i8751 DE 132 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, quizard3a,   quizard3, quizard,       quizard,  quizard3_state, empty_init,  ROT0, "TAB Austria",  "Quizard 3 (v3.4, German, i8751 DE 132 A1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1996, quizard3_32, quizard3, quizard,       quizard,  quizard3_state, empty_init,  ROT0, "TAB Austria",  "Quizard 3 (v3.2, German, i8751 DE 132 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 
-GAME( 1995, quizard3,    cdibios,  quizard,       quizard,  quizard3_state, empty_init,  ROT0, "TAB Austria",  "Quizard 3 (v3.4)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996, quizard3_32, quizard3, quizard,       quizard,  quizard3_state, empty_init,  ROT0, "TAB Austria",  "Quizard 3 (v3.2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-
-GAME( 1998, quizard4,    cdibios,  quizard,       quizard,  quizard4_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1998, quizard4_41, quizard4, quizard,       quizard,  quizard4_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1997, quizard4_40, quizard4, quizard,       quizard,  quizard4_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1998, quizard4,    cdibios,  quizard,       quizard,  quizard4_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.2, German, i8751 DE 142 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1998, quizard4cz,  quizard4, quizard,       quizard,  quizard4_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.2, Czech, i8751 TS142 CZ1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1998, quizard4_41, quizard4, quizard,       quizard,  quizard4_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.1, German, i8751 DE 142 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1997, quizard4_40, quizard4, quizard,       quizard,  quizard4_state, empty_init,  ROT0, "TAB Austria",  "Quizard 4 Rainbow (v4.0, German, i8751 DE 142 D3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )

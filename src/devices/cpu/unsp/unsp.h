@@ -164,7 +164,7 @@ protected:
 
 	struct internal_unsp_state
 	{
-		uint32_t m_r[8]; // why are these 32-bit? they're 16-bit regs? (changing to uint16_t causes crashes tho, so something is depending on this)
+		uint32_t m_r[16]; // why are these 32-bit? they're 16-bit regs? (changing to uint16_t causes crashes tho, so something is depending on this)
 		uint32_t m_enable_irq;
 		uint32_t m_enable_fiq;
 		uint32_t m_irq;
@@ -232,6 +232,7 @@ protected:
 
 	void update_nz(uint32_t value);
 	void update_nzsc(uint32_t value, uint16_t r0, uint16_t r1);
+	bool do_basic_alu_ops(const uint16_t& op0, uint32_t& lres, uint16_t& r0, uint16_t& r1, uint32_t& r2, bool update_flags);
 
 private:
 	// compilation boundaries -- how far back/forward does the analysis extend?
@@ -320,6 +321,8 @@ private:
 #if UNSP_LOG_REGS
 	FILE *m_log_file;
 #endif
+protected:
+	int m_numregs;
 };
 
 

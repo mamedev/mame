@@ -38,6 +38,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include <algorithm>
+
 class zn_state : public driver_device
 {
 public:
@@ -57,6 +59,7 @@ public:
 
 	void zn_1mb_vram(machine_config &config);
 	void zn_2mb_vram(machine_config &config);
+	void zn2(machine_config &config);
 	void gameboard_cat702(machine_config &config);
 
 protected:
@@ -70,6 +73,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(coin_w);
 
 	void zn_base_map(address_map &map);
+	void zn_rom_base_map(address_map &map);
 
 	virtual void machine_start() override;
 
@@ -162,7 +166,6 @@ public:
 	{
 	}
 
-	void zn2(machine_config &config);
 	void coh3002c(machine_config &config);
 };
 

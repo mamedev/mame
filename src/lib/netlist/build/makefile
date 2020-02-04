@@ -14,7 +14,7 @@ VSBUILD = $(SRC)/buildVS
 DOC = $(SRC)/documentation
 TIDY_DB = ../compile_commands.json
 
-TIDY_FLAGSX = -checks=*,-google*,-hicpp*,-readability*,-fuchsia*,cert-*,-android-*,
+TIDY_FLAGSX = -checks=*,-google*,-hicpp*,readability*,-fuchsia*,cert-*,-android-*,
 TIDY_FLAGSX += -llvm-header-guard,-cppcoreguidelines-pro-type-reinterpret-cast,
 TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-owning-memory, 
 TIDY_FLAGSX += -modernize-use-default-member-init,-cppcoreguidelines-pro-bounds-constant-array-index,
@@ -25,7 +25,8 @@ TIDY_FLAGSX += -cppcoreguidelines-non-private-member-variables-in-classes,-misc-
 TIDY_FLAGSX += -bugprone-macro-parentheses,-misc-macro-parentheses,
 TIDY_FLAGSX += -bugprone-too-small-loop-variable,
 TIDY_FLAGSX += -modernize-use-trailing-return-type,
-TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay
+TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+TIDY_FLAGSX += -readability-magic-numbers,-readability-implicit-bool-conversion,-readability-braces-around-statements
 
 space := 
 space += 
@@ -106,6 +107,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_2102A.o \
 	$(NLOBJ)/devices/nld_2716.o \
 	$(NLOBJ)/devices/nld_tms4800.o \
+	$(NLOBJ)/devices/nld_4006.o \
 	$(NLOBJ)/devices/nld_4020.o \
 	$(NLOBJ)/devices/nld_4066.o \
 	$(NLOBJ)/devices/nld_4316.o \

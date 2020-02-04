@@ -13,11 +13,11 @@
 #include "modules.h"
 #include "strformat.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <time.h>
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cstdlib>
+#include <ctime>
 #include <iostream>
 
 #ifdef _WIN32

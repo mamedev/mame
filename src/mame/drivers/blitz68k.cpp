@@ -20,6 +20,7 @@ Year  Game                        Manufacturer
 1997  Deuces Wild 2               <unknown>
 1998  Funny Fruit                 Cadillac Jack
 1998  Triple Play                 Cadillac Jack
+1998  Texas Reels                 Cadillac Jack
 199?  Il Pagliaccio               <unknown>
 ----------------------------------------------------------------------
 
@@ -46,6 +47,7 @@ To Do:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/m6805/m68hc05.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/saa1099.h"
@@ -88,6 +90,7 @@ public:
 	void init_megadble();
 	void init_maxidbl();
 	void init_cj3play();
+	void init_texasrls();
 	void init_megadblj();
 	void init_hermit();
 	void init_dualgame();
@@ -102,6 +105,7 @@ public:
 	void dualgame(machine_config &config);
 	void bankroba(machine_config &config);
 	void ramdac_config(machine_config &config);
+	void texasrls(machine_config &config);
 
 protected:
 	virtual void machine_start() override { m_leds.resolve(); }
@@ -1830,6 +1834,13 @@ void blitz68k_state::cjffruit(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 }
 
+void blitz68k_state::texasrls(machine_config &config)
+{
+	cjffruit(config);
+
+	// not hooked up yet (some reads and writes in unimplemented features of the MCU core), but it's dumped
+	M68HC705C8A(config, "mcu", XTAL(4'000'000)); // clock and divider not verified, using the xtal found near the MCU
+}
 
 void blitz68k_state::bankrob(machine_config &config)
 {
@@ -2312,6 +2323,30 @@ ROM_START( cjffruit )
 
 	ROM_REGION( 0x80000, "samples", 0 ) // 8 bit unsigned
 	ROM_LOAD( "cjfunfruit-cj_1.13-g.u50", 0x00000, 0x80000, CRC(5fb53d3e) SHA1(f4a37b00a9417440685d198f1375b615848e7fb6) )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8d_vdp.u15", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_vdo.u53", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_ck2.u64", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_ck1.u69", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_dec.u70", 0x000, 0x117, NO_DUMP )
+ROM_END
+
+ROM_START( texasrls ) // CJ-8L REV-D, same PCB as cjffruit
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_WORD( "cjtxsreels ii-cj 2.00-a 040 for cjab checksum 855c.u65", 0x00000, 0x80000, CRC(8d4bf476) SHA1(dc5d72f35d4dffb3726d37f2975ba5277c1dde36) )
+
+	ROM_REGION( 0x2000, "mcu", 0 )  // 68HC705C8P code
+	ROM_LOAD( "cjtxsreels ii 5.2 for cj-8l.u30", 0x0000, 0x2000, CRC(1177ce65) SHA1(c0a8fba886e03c579c0f33b23020fbe0a511da36) )
+
+	ROM_REGION16_BE( 0x200000, "blitter", 0 ) // data for the blitter
+	ROM_LOAD16_BYTE( "cjtxsreels ii-cj 2.00-d 040 for cjab checksum b8d6.u68", 0x000000, 0x80000, CRC(e4f9e314) SHA1(a71e0a3b4ad528e9af36cf158866a76aea713d0d) )
+	ROM_LOAD16_BYTE( "cjtxsreels ii-cj 2.00-c 040 for cjab checksum 0e27.u75", 0x000001, 0x80000, CRC(2279ade0) SHA1(a219a143d113d433878033222da22880f813b14c) )
+	ROM_LOAD16_BYTE( "cjtxsreels ii-cj 2.00-f 020 for cjab checksum 3eee.u51", 0x100000, 0x80000, CRC(d1b5f9e3) SHA1(f7fd89d19828c4309cb17b699e506bd6fba1f16a) )
+	ROM_LOAD16_BYTE( "cjtxsreels ii-cj 2.00-e 020 for cjab checksum 9adf.u61", 0x100001, 0x80000, CRC(0c7d6175) SHA1(ba925faa80224f2c43dcb58b7c34a26114cd6494) )
+
+	ROM_REGION( 0x80000, "samples", 0 ) // 8 bit unsigned
+	ROM_LOAD( "cjtxreels ii-cj 2.00-g 040 for cjab checksum 011f.u50", 0x00000, 0x80000, CRC(5fb53d3e) SHA1(f4a37b00a9417440685d198f1375b615848e7fb6) )
 
 	ROM_REGION( 0x117, "plds", 0 )
 	ROM_LOAD( "gal16v8d_vdp.u15", 0x000, 0x117, NO_DUMP )
@@ -2900,6 +2935,17 @@ void blitz68k_state::init_cjffruit()
 	ROM[0x1e7b8/2] = 0x6050;
 }
 
+void blitz68k_state::init_texasrls()
+{
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+
+	// WRONG C8 #1
+	ROM[0x11f3a/2] = 0x6028; // TODO: the dump is available, hook up the MCU properly (it would give sound to the driver, too).
+
+	// ERROR CHECKSUM ROM PROGRAM
+	ROM[0x211bc/2] = 0x6050;
+}
+
 void blitz68k_state::init_deucesw2()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
@@ -2987,4 +3033,5 @@ GAME( 1995,  hermit,   0,       hermit,   hermit,   blitz68k_state, init_hermit,
 GAME( 1997,  deucesw2, 0,       deucesw2, deucesw2, blitz68k_state, init_deucesw2, ROT0, "<unknown>",                      "Deuces Wild 2 - American Heritage (Ver. 2.02F)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 10TH, 1997
 GAME( 1998,  cj3play,  0,       cjffruit, cjffruit, blitz68k_state, init_cj3play,  ROT0, "Cadillac Jack",                  "Triple Play (Ver. 1.10)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // FEBRUARY 24TH, 1999
 GAME( 1998,  cjffruit, 0,       cjffruit, cjffruit, blitz68k_state, init_cjffruit, ROT0, "Cadillac Jack",                  "Funny Fruit (Ver. 1.13)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 21ST, 1999
+GAME( 1998,  texasrls, 0,       texasrls, cjffruit, blitz68k_state, init_texasrls, ROT0, "Cadillac Jack",                  "Texas Reels (Ver. 2.00)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // OCTOBER 15TH, 2002
 GAME( 199?,  ilpag,    0,       ilpag,    ilpag,    blitz68k_state, empty_init,    ROT0, "<unknown>",                      "Il Pagliaccio (Italy, Ver. 2.7C)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )

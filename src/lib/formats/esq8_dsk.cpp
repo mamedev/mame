@@ -12,7 +12,7 @@
 
 *********************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "flopimg.h"
 #include "formats/esq8_dsk.h"

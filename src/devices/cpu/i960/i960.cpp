@@ -7,7 +7,7 @@
 
 #ifdef _MSC_VER
 /* logb prototype is different for MS Visual C */
-#include <float.h>
+#include <cfloat>
 #define logb _logb
 #endif
 

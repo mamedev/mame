@@ -18,7 +18,7 @@
 #pragma once
 
 #include "imagedev/harddriv.h"
-#include <ctype.h>
+#include <cctype>
 
 class corvus_hdc_device :  public device_t
 {

@@ -27,6 +27,7 @@
 #endif
 
 #include "netlist/nl_factory.h"
+#include "netlist/nl_setup.h" // FIXME: only needed for splitter code
 #include "nld_matrix_solver.h"
 #include "nld_ms_direct.h"
 #include "nld_ms_direct1.h"
@@ -68,10 +69,10 @@ namespace devices
 		if (m_params.m_dynamic_ts)
 			return;
 
-		netlist_time now(exec().time());
+		netlist_time_ext now(exec().time());
 		// force solving during start up if there are no time-step devices
 		// FIXME: Needs a more elegant solution
-		bool force_solve = (now < netlist_time::from_fp<decltype(m_params.m_max_timestep)>(2 * m_params.m_max_timestep));
+		bool force_solve = (now < netlist_time_ext::from_fp<decltype(m_params.m_max_timestep)>(2 * m_params.m_max_timestep));
 
 		std::size_t nthreads = std::min(static_cast<std::size_t>(m_params.m_parallel()), plib::omp::get_max_threads());
 
@@ -264,7 +265,7 @@ namespace devices
 			return false;
 		}
 
-		void process_net(analog_net_t &n)
+		void process_net(netlist_state_t &netlist, analog_net_t &n)
 		{
 			// ignore empty nets. FIXME: print a warning message
 			if (n.num_cons() == 0)
@@ -279,9 +280,10 @@ namespace devices
 				{
 					auto *pt = static_cast<terminal_t *>(term);
 					// check the connected terminal
-					analog_net_t &connected_net = pt->connected_terminal()->net();
+					// analog_net_t &connected_net = pt->connected_terminal()->net();
+					analog_net_t &connected_net = netlist.setup().get_connected_terminal(*pt)->net();
 					if (!already_processed(connected_net))
-						process_net(connected_net);
+						process_net(netlist, connected_net);
 				}
 			}
 		}
@@ -299,7 +301,7 @@ namespace devices
 					if (!already_processed(n))
 					{
 						groups.emplace_back(analog_net_t::list_t());
-						process_net(n);
+						process_net(netlist, n);
 					}
 				}
 			}

@@ -10,7 +10,7 @@
 
 *********************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "flopimg.h"
 #include "formats/concept_dsk.h"

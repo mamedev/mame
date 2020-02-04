@@ -8,7 +8,7 @@
 
 *********************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "formats/st_dsk.h"
 

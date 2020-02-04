@@ -46,7 +46,7 @@ protected:
 
 	void dump_nl();
 
-	const pstring get_nl_val(const double val);
+	pstring get_nl_val(double val);
 	double get_sp_unit(const pstring &unit);
 
 	double get_sp_val(const pstring &sin);
@@ -153,7 +153,7 @@ class nl_convert_spice_t : public nl_convert_base_t
 {
 public:
 
-	nl_convert_spice_t() : nl_convert_base_t() {}
+	nl_convert_spice_t() = default;
 
 	void convert(const pstring &contents) override;
 
@@ -169,7 +169,7 @@ class nl_convert_eagle_t : public nl_convert_base_t
 {
 public:
 
-	nl_convert_eagle_t() : nl_convert_base_t() {}
+	nl_convert_eagle_t() = default;
 
 	class tokenizer : public plib::ptokenizer
 	{
@@ -202,7 +202,7 @@ class nl_convert_rinf_t : public nl_convert_base_t
 {
 public:
 
-	nl_convert_rinf_t() : nl_convert_base_t() {}
+	nl_convert_rinf_t() = default;
 
 	class tokenizer : public plib::ptokenizer
 	{
