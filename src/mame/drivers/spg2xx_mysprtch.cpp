@@ -260,19 +260,12 @@ void spg2xx_game_mysprtch_state::init_mysprtch()
 
 	for (int i = 0; i < size / 2; i++)
 	{
-		ROM[i] = ROM[i] ^ 0xffac;
-
-		ROM[i] = (((ROM[i] & 0xff00) >> 8) | ((ROM[i] & 0x00ff) << 8));
-
-		ROM[i] = bitswap<16>(ROM[i],
-			3, 2, 1, 0,
-			11, 9, 10, 8,
-			7, 5, 6, 4,
-			15, 14, 13, 12
-
-			);
-
-		ROM[i] = (((ROM[i] & 0xff00) >> 8) | ((ROM[i] & 0x00ff) << 8));
+		ROM[i] = bitswap<16>(ROM[i], 15, 13, 14, 12,
+			                         7,  6,  5,  4,
+			                         11, 10, 9,  8,
+			                         3,  1,  2,  0);
+	
+		ROM[i] = ROM[i] ^ 0xfafa;
 	}
 }
 
@@ -281,5 +274,5 @@ ROM_START( mysprtch )
 	ROM_LOAD16_WORD_SWAP( "mysportschallengeplus.bin", 0x0000, 0x2000000, CRC(6911d19c) SHA1(c71bc38595e5505434395b6d59320caabfc7bce3) )
 ROM_END
 
-// unit with Blue surround to power button
+// Unit with Blue surround to power button. Box shows 'Wireless Sports Plus' but title screen shots "My Sports Challenge Plus"  Appears to be V-Tac developed as it has the common V-Tac test mode.
 CONS( 200?, mysprtch,  0, 0, mysprtch, mysprtch, spg2xx_game_mysprtch_state,  init_mysprtch,    "Senario / V-Tac Technology Co Ltd.",  "My Sports Challenge Plus / Wireless Sports Plus",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

@@ -274,10 +274,10 @@ void zone40_state::init_zone40()
 
 	for (int i = 0; i < size/2; i++)
 	{
-		ROM[i] = ROM[i] ^ 0xbb88;
-
 		ROM[i] = bitswap<16>(ROM[i], 11, 10, 3,  2,  4,  12, 5,  13,
 									 9,  1,  8,  0,  6,  7,  14, 15);
+	
+		ROM[i] = ROM[i] ^ 0xa5a5;
 	}
 }
 
@@ -289,11 +289,10 @@ void zone40_state::init_reactmd()
 
 	for (int i = 0; i < size/2; i++)
 	{
-		ROM[i] = ROM[i] ^ 0xca53;
-
 		ROM[i] = bitswap<16>(ROM[i], 15, 13, 14, 12,  7,  6,  5,  4,
 			                         11, 10, 9,  8,   3,  1,  2,  0);
 
+		ROM[i] = ROM[i] ^ 0xa5a5;
 	}
 }
 
