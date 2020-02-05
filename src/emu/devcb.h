@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include <array>
 #include <cassert>
 #include <functional>
 #include <memory>
@@ -169,6 +170,33 @@ protected:
 		std::make_unsigned_t<T> m_exor = std::make_unsigned_t<T>(0);
 		std::make_unsigned_t<T> m_mask;
 		bool m_inherited_mask = true;
+	};
+
+	/// \brief Callback array helper
+	///
+	/// Simplifies construction and resolution of arrays of callbacks.
+	template <typename T, unsigned Count>
+	class array : public std::array<T, Count>
+	{
+	private:
+		template <unsigned... V>
+		array(device_t &owner, std::integer_sequence<unsigned, V...> const &)
+			: std::array<T, Count>{{ { make_one<V>(owner) }... }}
+		{
+		}
+
+		template <unsigned N> device_t &make_one(device_t &owner) { return owner; }
+
+	public:
+		using std::array<T, Count>::array;
+
+		array(device_t &owner) : array(owner, std::make_integer_sequence<unsigned, Count>()) { }
+
+		void resolve_all()
+		{
+			for (T &elem : *this)
+				elem.resolve();
+		}
 	};
 
 	devcb_base(device_t &owner);
@@ -845,6 +873,19 @@ private:
 	std::vector<typename creator::ptr> m_creators;
 
 public:
+	template <unsigned Count>
+	class array : public devcb_read_base::array<devcb_read<Result, DefaultMask>, Count>
+	{
+	public:
+		using devcb_read_base::array<devcb_read<Result, DefaultMask>, Count>::array;
+
+		void resolve_all_safe(Result dflt)
+		{
+			for (devcb_read<Result, DefaultMask> &elem : *this)
+				elem.resolve_safe(dflt);
+		}
+	};
+
 	devcb_read(device_t &owner);
 
 	binder bind();
@@ -2310,6 +2351,19 @@ private:
 	std::vector<typename creator::ptr> m_creators;
 
 public:
+	template <unsigned Count>
+	class array : public devcb_write_base::array<devcb_write<Input, DefaultMask>, Count>
+	{
+	public:
+		using devcb_write_base::array<devcb_write<Input, DefaultMask>, Count>::array;
+
+		void resolve_all_safe()
+		{
+			for (devcb_write<Input, DefaultMask> &elem : *this)
+				elem.resolve_safe();
+		}
+	};
+
 	devcb_write(device_t &owner);
 
 	binder bind();

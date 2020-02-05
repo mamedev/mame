@@ -104,8 +104,8 @@ private:
 	uint32_t           m_xorvalue;  /* after mask */
 	uint32_t           m_nosync;
 
-	devcb_write_line   m_write_cb[8];
-	devcb_read_line    m_read_cb[8];
+	devcb_write_line::array<8> m_write_cb;
+	devcb_read_line::array<8> m_read_cb;
 };
 
 DECLARE_DEVICE_TYPE(LATCH8, latch8_device)
