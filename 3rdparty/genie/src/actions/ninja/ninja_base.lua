@@ -7,12 +7,10 @@
 local ninja = premake.ninja
 
 function ninja.esc(value)
-	if value then
-		value = string.gsub(value, "%$", "$$") -- TODO maybe there is better way
-		value = string.gsub(value, ":", "$:")
-		value = string.gsub(value, "\n", "$\n")
-		value = string.gsub(value, " ", "$ ")
-	end
+	value = value:gsub("%$", "$$") -- TODO maybe there is better way
+	value = value:gsub(":", "$:")
+	value = value:gsub("\n", "$\n")
+	value = value:gsub(" ", "$ ")
 	return value
 end
 

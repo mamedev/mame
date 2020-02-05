@@ -84,10 +84,8 @@
 		else
 			local dir, name = premake.findDefaultScript(path.getabsolute("./"))
 			if dir ~= nil then
-				local cwd = os.getcwd()
 				os.chdir(dir)
 				dofile(name)
-				os.chdir(cwd)
 			end
 		end
 
