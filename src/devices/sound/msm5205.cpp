@@ -49,7 +49,7 @@
     DA converter              12-bit                       10-bit
     Low-pass filter           -40dB/oct                    N/A
     Overflow prevent circuit  Included                     N/A
-	Cutoff Frequency          (Sampling Frequency/2.5)kHz  N/A
+    Cutoff Frequency          (Sampling Frequency/2.5)kHz  N/A
 
     Data capture follows VCK falling edge on MSM5205 (VCK rising edge on MSM6585)
 
@@ -58,8 +58,8 @@
 
  */
 
-DEFINE_DEVICE_TYPE(MSM5205, msm5205_device, "msm5205", "MSM5205")
-DEFINE_DEVICE_TYPE(MSM6585, msm6585_device, "msm6585", "MSM6585")
+DEFINE_DEVICE_TYPE(MSM5205, msm5205_device, "msm5205", "OKI MSM5205 ADPCM")
+DEFINE_DEVICE_TYPE(MSM6585, msm6585_device, "msm6585", "OKI MSM6585 ADPCM")
 
 
 msm5205_device::msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
