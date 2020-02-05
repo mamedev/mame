@@ -665,7 +665,7 @@ namespace bx
 		StringView ptr = strFind(_str, _word);
 		for (; !ptr.isEmpty(); ptr = strFind(StringView(ptr.getPtr() + len, _str.getTerm() ), _word) )
 		{
-			char ch = *(ptr.getPtr() - 1);
+			char ch = ptr.getPtr() != _str.getPtr() ? *(ptr.getPtr() - 1) : ' ';
 			if (isAlphaNum(ch) || '_' == ch)
 			{
 				continue;
