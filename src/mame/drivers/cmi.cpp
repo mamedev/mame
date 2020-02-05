@@ -1492,27 +1492,33 @@ WRITE8_MEMBER( cmi_state::shared_ram_w )
 
 READ8_MEMBER( cmi_state::aic_ad574_r )
 {
+	LOG("%s: AIC AD574 read\n", machine().describe_context());
 	// To Do
 	return 0;
 }
 
 template<int Dac> WRITE8_MEMBER( cmi_state::aic_dac_w )
 {
+	LOG("%s: AIC DAC%d write: %02x\n", machine().describe_context(), Dac + 1, data);
 	// To Do
 }
 
 WRITE8_MEMBER( cmi_state::aic_mux_latch_w )
 {
+	LOG("%s: AIC mux latch write: %02x\n", machine().describe_context(), data);
+	set_interrupt(CPU_1, IRQ_AIC_LEVEL, (BIT(data, 6) && BIT(data, 7)) ? ASSERT_LINE : CLEAR_LINE);
 	// To Do
 }
 
 WRITE8_MEMBER( cmi_state::aic_ad565_msb_w )
 {
+	LOG("%s: AIC AD565 MSB write: %02x\n", machine().describe_context(), data);
 	// To Do
 }
 
 WRITE8_MEMBER( cmi_state::aic_ad565_lsb_w )
 {
+	LOG("%s: AIC AD565 LSB write: %02x\n", machine().describe_context(), data);
 	// To Do
 }
 
