@@ -118,7 +118,10 @@ WRITE8_MEMBER( mondial68k_state::lcd_dlen_w )
 WRITE8_MEMBER( mondial68k_state::lcd_data_w )
 {
 	if (m_lcd_shift > 0 && m_lcd_shift < 0x21)
+	{
 		m_display->write_element((m_lcd_shift - 1) / 8, (m_lcd_shift - 1) % 8, BIT(data, 0));
+		m_display->update();
+	}
 }
 
 WRITE8_MEMBER( mondial68k_state::speaker_w )
@@ -227,10 +230,12 @@ void mondial68k_state::mondial68k(machine_config &config)
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->set_delay(attotime::from_msec(100));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
-	m_display->set_segmask(0xf, 0x7f);
+	m_display->set_segmask(0xf, 0xff);
+	m_display->set_segmask(0x8, 0x7f); // last digit: DP segment unused
 	m_display->output_digit().set([this](offs_t offset, u8 data) { m_digits[offset] = bitswap<8>(data, 7,4,5,0,1,2,3,6); });
 	config.set_default_layout(layout_mephisto_mondial68k);
 

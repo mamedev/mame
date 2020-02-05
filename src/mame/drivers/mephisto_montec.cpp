@@ -17,6 +17,7 @@
     - split driver into several files? need to make PCF2112T device
     - why are megaiv/smondial2 beeps noisy?
     - add Monte Carlo IV (non-LE)
+    - add MM 1000 module
 
 **************************************************************************************************/
 
