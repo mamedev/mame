@@ -260,6 +260,12 @@ public:
 	template<int cpunum> DECLARE_READ8_MEMBER( perr_r );
 	template<int cpunum> DECLARE_WRITE8_MEMBER( perr_w );
 
+	DECLARE_READ8_MEMBER( aic_ad574_r );
+	template<int Dac> DECLARE_WRITE8_MEMBER( aic_dac_w );
+	DECLARE_WRITE8_MEMBER( aic_mux_latch_w );
+	DECLARE_WRITE8_MEMBER( aic_ad565_msb_w );
+	DECLARE_WRITE8_MEMBER( aic_ad565_lsb_w );
+
 	DECLARE_READ8_MEMBER( q133_1_porta_r );
 	DECLARE_WRITE8_MEMBER( q133_1_porta_w );
 	DECLARE_WRITE8_MEMBER( q133_1_portb_w );
@@ -506,11 +512,11 @@ void cmi_state::hblank()
 		if (v == m_lp_y_port->read())
 		{
 			if (_touch)
-				m_q219_b_touch = 0;
-			else
 				m_q219_b_touch = 1 << 5;
+			else
+				m_q219_b_touch = 0;
 
-			m_q219_pia->ca1_w(!_touch ? 1 : 0);
+			m_q219_pia->ca1_w(_touch ? 1 : 0);
 
 			if (!_touch || !_tfh)
 			{
@@ -846,24 +852,30 @@ WRITE8_MEMBER( cmi_state::midi_latch_w )
 	{
 	case 0x00: // /INT1
 		LOG("%s: %sing INT1 line on SMIDI card\n", machine().describe_context(), bit_value ? "Clear" : "Sett");
+		m_midicpu->set_input_line(M68K_IRQ_1, bit_value ? CLEAR_LINE : ASSERT_LINE);
 		break;
 	case 0x02: // SMIDINT L0
 		LOG("%s: %sing SMIDI to CMI interrupt P1 level 0\n", machine().describe_context(), bit_value ? "Sett" : "Clear");
+		set_interrupt(CPU_1, IRQ_MIDINT_LEVEL, bit_value ? ASSERT_LINE : CLEAR_LINE);
 		break;
 	case 0x03: // /INT7
 		LOG("%s: %sing INT7 line on SMIDI card\n", machine().describe_context(), bit_value ? "Clear" : "Sett");
+		m_midicpu->set_input_line(M68K_IRQ_7, bit_value ? CLEAR_LINE : ASSERT_LINE);
 		break;
 	case 0x04: // SMIDINT L3
 		LOG("%s: %sing SMIDI to CMI interrupt P1 level 3\n", machine().describe_context(), bit_value ? "Sett" : "Clear");
+		set_interrupt(CPU_1, IRQ_SMIDINT_LEVEL, bit_value ? ASSERT_LINE : CLEAR_LINE);
 		break;
 	case 0x05: // /HALT
 		LOG("%s: %sing HALT line on SMIDI card\n", machine().describe_context(), bit_value ? "Clear" : "Sett");
+		m_midicpu->set_input_line(INPUT_LINE_HALT, bit_value ? CLEAR_LINE : ASSERT_LINE);
 		break;
 	case 0x06: // SYNCSW
 		LOG("%s: %sing SYNCSW line on SMIDI card\n", machine().describe_context(), bit_value ? "Sett" : "Clear");
 		break;
 	case 0x07: // /RESET
 		LOG("%s: %sing RESET line on SMIDI card\n", machine().describe_context(), bit_value ? "Clear" : "Sett");
+		m_midicpu->set_input_line(INPUT_LINE_RESET, bit_value ? CLEAR_LINE : ASSERT_LINE);
 		break;
 	}
 }
@@ -895,8 +907,14 @@ void cmi_state::midicpu_map(address_map &map)
 
 void cmi_state::cmi07cpu_map(address_map &map)
 {
-	map(0x0000, 0x3fff).noprw(); // TODO
-	map(0x4000, 0x4fff).noprw(); // TODO
+	map(0x0000, 0x0000).r(FUNC(cmi_state::aic_ad574_r)).mirror(0x3fff);
+	map(0x4000, 0x4000).w(FUNC(cmi_state::aic_dac_w<0>)).mirror(0x3ff8);
+	map(0x4001, 0x4001).w(FUNC(cmi_state::aic_dac_w<1>)).mirror(0x3ff8);
+	map(0x4002, 0x4002).w(FUNC(cmi_state::aic_dac_w<2>)).mirror(0x3ff8);
+	map(0x4003, 0x4003).w(FUNC(cmi_state::aic_dac_w<3>)).mirror(0x3ff8);
+	map(0x4004, 0x4004).w(FUNC(cmi_state::aic_mux_latch_w)).mirror(0x3ff8);
+	map(0x4006, 0x4006).w(FUNC(cmi_state::aic_ad565_msb_w)).mirror(0x3ff8);
+	map(0x4007, 0x4007).w(FUNC(cmi_state::aic_ad565_lsb_w)).mirror(0x3ff8);
 	map(0x8000, 0x8fff).rw(m_cmi07_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0xc000, 0xffff).ram().share("cmi07_ram");
 }
@@ -910,7 +928,7 @@ static INPUT_PORTS_START( cmi2x )
 	PORT_BIT( 0xffff, VBLANK_START/2, IPT_LIGHTGUN_Y) PORT_NAME ("Lightpen Y") PORT_MINMAX(0, VBLANK_START - 1) PORT_SENSITIVITY(50) PORT_CROSSHAIR(Y, 1.0, 0.0, 0)
 
 	PORT_START("LP_TOUCH")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME ( "Lightpen Touch" ) PORT_CODE( MOUSECODE_BUTTON1 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME ( "Lightpen Touch" ) PORT_CODE( MOUSECODE_BUTTON1 )
 INPUT_PORTS_END
 
 bool cmi_state::map_is_active(int cpunum, int map, uint8_t *map_info)
@@ -1470,6 +1488,32 @@ WRITE8_MEMBER( cmi_state::shared_ram_w )
 {
 	//logerror("shared_ram_w: %04x = %02x\n", 0xfe00 + offset, data);
 	m_shared_ram[offset] = data;
+}
+
+READ8_MEMBER( cmi_state::aic_ad574_r )
+{
+	// To Do
+	return 0;
+}
+
+template<int Dac> WRITE8_MEMBER( cmi_state::aic_dac_w )
+{
+	// To Do
+}
+
+WRITE8_MEMBER( cmi_state::aic_mux_latch_w )
+{
+	// To Do
+}
+
+WRITE8_MEMBER( cmi_state::aic_ad565_msb_w )
+{
+	// To Do
+}
+
+WRITE8_MEMBER( cmi_state::aic_ad565_lsb_w )
+{
+	// To Do
 }
 
 void cmi_state::install_peripherals(int cpunum)
