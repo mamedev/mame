@@ -90,8 +90,8 @@ protected:
 private:
 	u8 m_iocr_ddr;
 
-	devcb_read_line m_iocr_read_od_cb[2];
-	devcb_write_line m_iocr_write_od_cb[2];
+	devcb_read_line::array<2> m_iocr_read_od_cb;
+	devcb_write_line::array<2> m_iocr_write_od_cb;
 	devcb_read_line m_iocr_read_id_cb;
 	devcb_write_line m_iocr_write_id_cb;
 

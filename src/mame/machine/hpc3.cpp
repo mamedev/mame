@@ -49,11 +49,11 @@ hpc3_device::hpc3_device(const machine_config &mconfig, const char *tag, device_
 	, m_enet_reset_cb(*this)
 	, m_enet_loopback_cb(*this)
 	, m_enet_intr_out_cb(*this)
-	, m_hd_rd_cb{{*this}, {*this}}
-	, m_hd_wr_cb{{*this}, {*this}}
-	, m_hd_dma_rd_cb{{*this}, {*this}}
-	, m_hd_dma_wr_cb{{*this}, {*this}}
-	, m_hd_reset_cb{{*this}, {*this}}
+	, m_hd_rd_cb(*this)
+	, m_hd_wr_cb(*this)
+	, m_hd_dma_rd_cb(*this)
+	, m_hd_dma_wr_cb(*this)
+	, m_hd_reset_cb(*this)
 	, m_bbram_rd_cb(*this)
 	, m_bbram_wr_cb(*this)
 	, m_eeprom_dati_cb(*this)
@@ -92,14 +92,11 @@ void hpc3_device::device_resolve_objects()
 	m_enet_reset_cb.resolve_safe();
 	m_enet_loopback_cb.resolve_safe();
 	m_enet_intr_out_cb.resolve_safe();
-	for (int index = 0; index < 2; index++)
-	{
-		m_hd_rd_cb[index].resolve();
-		m_hd_wr_cb[index].resolve();
-		m_hd_dma_rd_cb[index].resolve_safe(0);
-		m_hd_dma_wr_cb[index].resolve_safe();
-		m_hd_reset_cb[index].resolve_safe();
-	}
+	m_hd_rd_cb.resolve_all();
+	m_hd_wr_cb.resolve_all();
+	m_hd_dma_rd_cb.resolve_all_safe(0);
+	m_hd_dma_wr_cb.resolve_all_safe();
+	m_hd_reset_cb.resolve_all_safe();
 	m_bbram_rd_cb.resolve_safe(0);
 	m_bbram_wr_cb.resolve_safe();
 	m_eeprom_dati_cb.resolve_safe(0);

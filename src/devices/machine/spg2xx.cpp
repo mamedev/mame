@@ -33,7 +33,7 @@ spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, co
 	, m_porta_in(*this)
 	, m_portb_in(*this)
 	, m_portc_in(*this)
-	, m_adc_in{{*this}, {*this}}
+	, m_adc_in(*this)
 	, m_i2c_w(*this)
 	, m_i2c_r(*this)
 	, m_uart_tx(*this)
@@ -77,8 +77,7 @@ void spg2xx_device::device_start()
 	m_porta_in.resolve_safe(0);
 	m_portb_in.resolve_safe(0);
 	m_portc_in.resolve_safe(0);
-	m_adc_in[0].resolve_safe(0x0fff);
-	m_adc_in[1].resolve_safe(0x0fff);
+	m_adc_in.resolve_all_safe(0x0fff);
 	m_i2c_w.resolve_safe();
 	m_i2c_r.resolve_safe(0);
 	m_uart_tx.resolve_safe();

@@ -80,7 +80,7 @@ DEFINE_DEVICE_TYPE(PTM6840, ptm6840_device, "ptm6840", "MC6840 PTM")
 ptm6840_device::ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PTM6840, tag, owner, clock)
 	, m_external_clock{ 0.0, 0.0, 0.0 }
-	, m_out_cb{*this, *this, *this}
+	, m_out_cb(*this)
 	, m_irq_cb(*this)
 {
 }
@@ -92,9 +92,7 @@ ptm6840_device::ptm6840_device(const machine_config &mconfig, const char *tag, d
 void ptm6840_device::device_start()
 {
 	// resolve callbacks
-	m_out_cb[0].resolve_safe();
-	m_out_cb[1].resolve_safe();
-	m_out_cb[2].resolve_safe();
+	m_out_cb.resolve_all_safe();
 	m_irq_cb.resolve_safe();
 
 	m_timer[0] = timer_alloc(0);

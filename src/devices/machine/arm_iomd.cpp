@@ -141,8 +141,8 @@ arm_iomd_device::arm_iomd_device(const machine_config &mconfig, device_type type
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
 	, m_vidc(*this, finder_base::DUMMY_TAG)
 	, m_kbdc(*this, finder_base::DUMMY_TAG)
-	, m_iocr_read_od_cb{{*this}, {*this}}
-	, m_iocr_write_od_cb{{*this}, {*this}}
+	, m_iocr_read_od_cb(*this)
+	, m_iocr_write_od_cb(*this)
 	, m_iocr_read_id_cb(*this)
 	, m_iocr_write_id_cb(*this)
 {
@@ -230,12 +230,8 @@ void arm7500fe_iomd_device::device_add_mconfig(machine_config &config)
 
 void arm_iomd_device::device_start()
 {
-	for (devcb_read_line &cb : m_iocr_read_od_cb)
-		cb.resolve_safe(1);
-
-	for (devcb_write_line &cb : m_iocr_write_od_cb)
-		cb.resolve_safe();
-
+	m_iocr_read_od_cb.resolve_all_safe(1);
+	m_iocr_write_od_cb.resolve_all_safe();
 	m_iocr_read_id_cb.resolve_safe(1);
 	m_iocr_write_id_cb.resolve_safe();
 
