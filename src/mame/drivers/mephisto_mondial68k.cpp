@@ -4,6 +4,7 @@
 /***************************************************************************
 
 Mephisto Mondial 68000XL
+The chess engine is actually the one from Mephisto Dallas.
 
 Hardware:
 - TS68000CP12 @ 12MHz
@@ -91,6 +92,12 @@ void mondial68k_state::machine_reset()
 	m_dac_data = 0;
 }
 
+
+
+/******************************************************************************
+    I/O
+******************************************************************************/
+
 TIMER_DEVICE_CALLBACK_MEMBER(mondial68k_state::refresh_leds)
 {
 	for (int i=0; i<16; i++)
@@ -153,6 +160,12 @@ READ8_MEMBER(mondial68k_state::inputs_r)
 	return data;
 }
 
+
+
+/******************************************************************************
+    Address Maps
+******************************************************************************/
+
 void mondial68k_state::mondial68k_mem(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
@@ -167,6 +180,11 @@ void mondial68k_state::mondial68k_mem(address_map &map)
 	map(0xc00000, 0xc03fff).ram();
 }
 
+
+
+/******************************************************************************
+    Input Ports
+******************************************************************************/
 
 static INPUT_PORTS_START( mondial68k )
 	PORT_START("IN.0")
@@ -195,6 +213,11 @@ static INPUT_PORTS_START( mondial68k )
 INPUT_PORTS_END
 
 
+
+/******************************************************************************
+    Machine Configs
+******************************************************************************/
+
 void mondial68k_state::mondial68k(machine_config &config)
 {
 	/* basic machine hardware */
@@ -220,19 +243,21 @@ void mondial68k_state::mondial68k(machine_config &config)
 }
 
 
-/***************************************************************************
-  ROM definitions
-***************************************************************************/
+
+/******************************************************************************
+    ROM Definitions
+******************************************************************************/
 
 ROM_START( mondl68k )
-	ROM_REGION16_BE( 0x1000000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("68000xl_u_06.11.87", 0x0000, 0x8000, CRC(aebe482a) SHA1(900c91ec836cd65e4cd38e50555976ab8064be41) )
 	ROM_LOAD16_BYTE("68000xl_l_06.11.87", 0x0001, 0x8000, CRC(564e32c5) SHA1(8c9df46bc5ced114e72fb663f1055d775b8e2e0b) )
 ROM_END
 
 
+
 /***************************************************************************
-  Game drivers
+    Game Drivers
 ***************************************************************************/
 
 /*    YEAR, NAME,      PARENT    COMPAT  MACHINE      INPUT       CLASS             INIT        COMPANY             FULLNAME                     FLAGS */
