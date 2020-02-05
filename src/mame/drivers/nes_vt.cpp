@@ -2643,6 +2643,13 @@ ROM_START( zdog )
 	ROM_LOAD( "zdog.bin", 0x00000, 0x400000, CRC(5ed3485b) SHA1(5ab0e9370d4ed1535205deb0456878c4e400dd81) )
 ROM_END
 
+
+
+ROM_START( bandgpad )
+	ROM_REGION( 0x100000, "mainrom", 0 )
+	ROM_LOAD( "gamepad.bin", 0x00000, 0x100000, CRC(e2fbb532) SHA1(e9170a7739a8355acbf263fe2b1d291951dc07f0) )
+ROM_END
+
 ROM_START( ts_handy11 )
 	ROM_REGION( 0x100000, "mainrom", 0 )
 	ROM_LOAD( "tvplaypowercontroller.bin", 0x00000, 0x100000, CRC(9c7fe9ff) SHA1(c872e91ca835b66c9dd3b380e8374b51f12bcae0) ) // 29LV008B
@@ -2829,5 +2836,8 @@ CONS( 2017, fapocket,   0,        0,  nes_vt_fa, nes_vt_fa, nes_vt_dg_state, emp
 // Plays intro music but then crashes. same hardware as SY-88x but uses more features
 CONS( 2016, mog_m320,   0,        0,  nes_vt_hh, nes_vt, nes_vt_hh_state, empty_init, "MOGIS",    "MOGIS M320 246 in 1 Handheld", MACHINE_NOT_WORKING )
 
-// uncertain VT type, odd accesses above PPU space, non-standard first bank (or scrambling)  possibly newer than 2001 but most games have a 2001 copyright.  Most games are higher colour versions of NES games, so it's an enhanced NES chipset at least but maybe not VT?
+// UMC 6578 based - NOT VT
+CONS( 1997, bandgpad,  0,  0,  nes_vt_ts,    nes_vt, nes_vt_ts_state, empty_init, "Bandai", "Gamppad (Bandai)", MACHINE_NOT_WORKING )
+// possibly newer than 2001 but most games have a 2001 copyright.  Most games are higher colour versions of NES games, so it's an enhanced NES chipset at least but maybe not VT?
 CONS( 2001, ts_handy11,  0,  0,  nes_vt_ts,    nes_vt, nes_vt_ts_state, empty_init, "Techno Source", "Handy Boy 11-in-1 (TV Play Power)", MACHINE_NOT_WORKING )
+
