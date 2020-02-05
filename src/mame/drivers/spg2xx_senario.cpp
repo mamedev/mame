@@ -310,7 +310,7 @@ ROM_END
 
 ROM_START( senstriv )
 	ROM_REGION16_BE( 0x400000, "flash", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "senariosportstriviapro_m5m29gt320_001c0020.BIN", 0x000000, 0x400000, CRC(095ffbca) SHA1(d91328855a9ca542ba38253d2353545dc8b47fa4) ) // chip was 'flipped' (reverse pinout)
+	ROM_LOAD16_WORD_SWAP( "senariosportstriviapro_m5m29gt320_001c0020.bin", 0x000000, 0x400000, CRC(095ffbca) SHA1(d91328855a9ca542ba38253d2353545dc8b47fa4) ) // chip was 'flipped' (reverse pinout)
 	// attempts to write to 0x380000 for flash user data? different Flash type?
 ROM_END
 
