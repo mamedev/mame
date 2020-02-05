@@ -153,16 +153,19 @@ namespace analog
 
 		void update_diode(nl_fptype nVd) noexcept
 		{
-			nl_fptype IseVDVt(nlconst::zero());
-
 			if (TYPE == diode_e::BIPOLAR)
 			{
 				//printf("%s: %g %g\n", m_name.c_str(), nVd, (nl_fptype) m_Vd);
 				if (nVd > m_Vcrit)
 				{
-					const nl_fptype d = std::min(+fp_constants<nl_fptype>::DIODE_MAXDIFF(), nVd - m_Vd);
+					// if the old voltage is less than zero and new is above
+					// make sure we move enough so that matrix and current
+					// changes.
+					const nl_fptype old = std::max(nlconst::zero(), m_Vd());
+					const nl_fptype d = std::min(+fp_constants<nl_fptype>::DIODE_MAXDIFF(), nVd - old);
 					const nl_fptype a = plib::abs(d) * m_VtInv;
-					m_Vd = m_Vd + nlconst::magic(d < 0 ? -1.0 : 1.0) * plib::log1p(a) * m_Vt;
+					m_Vd = old + nlconst::magic(d < 0 ? -1.0 : 1.0) * plib::log1p(a) * m_Vt;
+					//printf("new VD: %g\n", (nl_fptype)m_Vd);
 				}
 				else
 					m_Vd = std::max(-fp_constants<nl_fptype>::DIODE_MAXDIFF(), nVd);
@@ -175,7 +178,7 @@ namespace analog
 				}
 				else
 				{
-					IseVDVt = plib::exp(m_logIs + m_Vd * m_VtInv);
+					const auto IseVDVt = plib::exp(m_logIs + m_Vd * m_VtInv);
 					m_Id = IseVDVt - m_Is;
 					m_G = IseVDVt * m_VtInv + m_gmin;
 				}
@@ -191,7 +194,7 @@ namespace analog
 				else // log stepping should already be done in mosfet
 				{
 					m_Vd = nVd;
-					IseVDVt = plib::exp(std::min(+fp_constants<nl_fptype>::DIODE_MAXVOLT(), m_logIs + m_Vd * m_VtInv));
+					const auto IseVDVt = plib::exp(std::min(+fp_constants<nl_fptype>::DIODE_MAXVOLT(), m_logIs + m_Vd * m_VtInv));
 					m_Id = IseVDVt - m_Is;
 					m_G = IseVDVt * m_VtInv + m_gmin;
 				}

@@ -25,6 +25,7 @@ TODO:
 #include "emu.h"
 #include "audio/galaxian.h"
 #include "includes/galaxian.h"
+#include "speaker.h"
 
 /*************************************
  *
@@ -243,7 +244,7 @@ static const discrete_op_amp_filt_info galaxian_bandpass_desc =
  *************************************/
 
 
-DISCRETE_SOUND_START(galaxian_discrete)
+static DISCRETE_SOUND_START(galaxian_discrete)
 
 	/************************************************/
 	/* Input register mapping for galaxian          */
@@ -375,7 +376,7 @@ DISCRETE_SOUND_START(galaxian_discrete)
 DISCRETE_SOUND_END
 
 
-DISCRETE_SOUND_START(mooncrst_discrete)
+static DISCRETE_SOUND_START(mooncrst_discrete)
 	DISCRETE_IMPORT(galaxian_discrete)
 
 	/************************************************/
@@ -386,13 +387,18 @@ DISCRETE_SOUND_START(mooncrst_discrete)
 	DISCRETE_MIXER7(NODE_280, 1, NODE_133_00, NODE_133_02, NODE_133_02,NODE_133_03, NODE_120, NODE_157, NODE_182, &mooncrst_mixer_desc)
 DISCRETE_SOUND_END
 
-DEFINE_DEVICE_TYPE(GALAXIAN, galaxian_sound_device, "galaxian_sound", "Galaxian Custom Sound")
+DEFINE_DEVICE_TYPE(GALAXIAN_SOUND, galaxian_sound_device, "galaxian_sound", "Galaxian Custom Sound")
+DEFINE_DEVICE_TYPE(MOONCRST_SOUND, mooncrst_sound_device, "mooncrst_sound", "Mooncrst Custom Sound")
 
 galaxian_sound_device::galaxian_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, GALAXIAN, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
-	, m_lfo_val(0)
-	, m_discrete(*this, "^" GAL_AUDIO)
+: galaxian_sound_device(mconfig, GALAXIAN_SOUND, tag, owner, clock)
+{
+}
+
+galaxian_sound_device::galaxian_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+: device_t(mconfig, type, tag, owner, clock)
+, m_discrete(*this, "discrete")
+, m_lfo_val(0)
 {
 }
 
@@ -405,6 +411,17 @@ void galaxian_sound_device::device_start()
 	m_lfo_val = 0;
 
 	save_item(NAME(m_lfo_val));
+}
+
+//-------------------------------------------------
+//  machine_add_config - add device configuration
+//-------------------------------------------------
+
+void galaxian_sound_device::device_add_mconfig(machine_config &config)
+{
+	// sound hardware
+	DISCRETE(config, m_discrete).add_route(ALL_OUTPUTS, ":speaker", 1.0);
+	m_discrete->set_intf(galaxian_discrete);
 }
 
 /*************************************
@@ -480,10 +497,13 @@ WRITE8_MEMBER( galaxian_sound_device::sound_w )
 	}
 }
 
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void galaxian_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+mooncrst_sound_device::mooncrst_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+: galaxian_sound_device(mconfig, MOONCRST_SOUND, tag, owner, clock)
 {
+}
+
+void mooncrst_sound_device::device_add_mconfig(machine_config &config)
+{
+	galaxian_sound_device::device_add_mconfig(config);
+	m_discrete->set_intf(mooncrst_discrete);
 }

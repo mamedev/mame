@@ -15,7 +15,7 @@ namespace netlist
 void parser_t::verror(const pstring &msg)
 {
 	m_setup.log().fatal("{1}", msg);
-	plib::pthrow<nl_exception>(plib::pfmt("{1}")(msg));
+	throw nl_exception(plib::pfmt("{1}")(msg));
 }
 
 bool parser_t::parse(const pstring &nlname)
@@ -86,8 +86,9 @@ bool parser_t::parse(const pstring &nlname)
 			{
 				parse_netlist(name.str());
 				return true;
-			} else
-				in_nl = true;
+			}
+
+			in_nl = true;
 		}
 	}
 }

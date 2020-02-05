@@ -6,7 +6,8 @@
 
         TODO:
         - dump internal CGROM
-        - emulate osc pin, determine video timings and busy flag duration from it
+        - emulate osc pin, determine video timings and busy flag duration from it,
+          and if possible, remove m_busy_factor
 
 ***************************************************************************/
 
@@ -56,6 +57,7 @@ hd44780_device::hd44780_device(const machine_config &mconfig, const char *tag, d
 hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_pixel_update_cb(*this)
+	, m_busy_factor(1.0)
 	, m_cgrom(nullptr)
 	, m_cgrom_region(*this, DEVICE_SELF)
 	, m_rs_input(0)
@@ -102,6 +104,7 @@ void hd44780_device::device_start()
 	m_blink_timer->adjust(attotime::from_msec(409), 0, attotime::from_msec(409));
 
 	// state saving
+	save_item(NAME(m_busy_factor));
 	save_item(NAME(m_busy_flag));
 	save_item(NAME(m_ac));
 	save_item(NAME(m_dr));
@@ -191,7 +194,9 @@ void hd44780_device::set_charset_type(int type)
 void hd44780_device::set_busy_flag(uint16_t usec)
 {
 	m_busy_flag = true;
-	m_busy_timer->adjust( attotime::from_usec( usec ) );
+
+	usec = float(usec) * m_busy_factor + 0.5;
+	m_busy_timer->adjust(attotime::from_usec(usec));
 }
 
 void hd44780_device::correct_ac()

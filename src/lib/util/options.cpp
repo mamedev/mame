@@ -15,10 +15,10 @@
 #include <locale>
 #include <string>
 
-#include <assert.h>
-#include <ctype.h>
-#include <stdarg.h>
-#include <stdlib.h>
+#include <cassert>
+#include <cctype>
+#include <cstdarg>
+#include <cstdlib>
 
 
 const int core_options::MAX_UNADORNED_OPTIONS;
@@ -520,7 +520,7 @@ void core_options::add_entry(const options_entry &opt, bool override_existing)
 	{
 		for (const std::string &name : names)
 		{
-			existing_entry = get_entry(name.c_str());
+			existing_entry = get_entry(name);
 			if (existing_entry)
 				break;
 		}

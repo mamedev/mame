@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 
-#include <assert.h>
+#include <cassert>
 
 #include "cassimg.h"
 #include "adam_cas.h"

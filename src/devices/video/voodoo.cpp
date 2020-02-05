@@ -5621,7 +5621,7 @@ void voodoo_device::device_start()
 
 	/* create a multiprocessor work queue */
 	poly = poly_alloc(machine(), 64, sizeof(poly_extra_data), 0);
-	thread_stats = auto_alloc_array(machine(), stats_block, WORK_MAX_THREADS);
+	thread_stats = std::make_unique<stats_block[]>(WORK_MAX_THREADS);
 
 	/* create a table of precomputed 1/n and log2(n) values */
 	/* n ranges from 1.0000 to 2.0000 */
@@ -5726,14 +5726,14 @@ void voodoo_device::device_start()
 	if (vd_type <= TYPE_VOODOO_2)
 	{
 		/* separate FB/TMU memory */
-		fbmem = auto_alloc_array(machine(), uint8_t, m_fbmem << 20);
-		tmumem[0] = auto_alloc_array(machine(), uint8_t, m_tmumem0 << 20);
-		tmumem[1] = (m_tmumem1 != 0) ? auto_alloc_array(machine(), uint8_t, m_tmumem1 << 20) : nullptr;
+		fbmem = (m_fbmem_alloc = std::make_unique<uint8_t[]>(m_fbmem << 20)).get();
+		tmumem[0] = (m_tmumem_alloc[0] = std::make_unique<uint8_t[]>(m_tmumem0 << 20)).get();
+		tmumem[1] = (m_tmumem1 != 0) ? (m_tmumem_alloc[1] = std::make_unique<uint8_t[]>(m_tmumem1 << 20)).get() : nullptr;
 	}
 	else
 	{
 		/* shared memory */
-		tmumem[0] = tmumem[1] = fbmem = auto_alloc_array(machine(), uint8_t, m_fbmem << 20);
+		tmumem[0] = tmumem[1] = fbmem = (m_fbmem_alloc = std::make_unique<uint8_t[]>(m_fbmem << 20)).get();
 		tmumem0 = m_fbmem;
 		if (vd_type == TYPE_VOODOO_3)
 			tmumem1 = m_fbmem;

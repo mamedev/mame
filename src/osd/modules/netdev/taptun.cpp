@@ -10,7 +10,7 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <net/if.h>
-#include <errno.h>
+#include <cerrno>
 #endif
 
 #include "emu.h"

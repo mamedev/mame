@@ -141,7 +141,7 @@ uint32_t i386_device::Getx87EA(uint8_t modrm, int rwn)
 	uint32_t ea;
 	modrm_to_EA(modrm, &ea, &segment);
 	uint32_t ret = i386_translate(segment, ea, rwn);
-	m_x87_ds = segment;
+	m_x87_ds = m_sreg[segment].selector;
 	if (PROTECTED_MODE && !V8086_MODE)
 		m_x87_data_ptr = ea;
 	else
@@ -150,7 +150,7 @@ uint32_t i386_device::Getx87EA(uint8_t modrm, int rwn)
 	return ret;
 }
 
-int i386_device::x87_check_exceptions()
+int i386_device::x87_check_exceptions(bool store)
 {
 	m_x87_cs = m_sreg[CS].selector;
 	if (PROTECTED_MODE && !V8086_MODE)
@@ -179,7 +179,13 @@ int i386_device::x87_check_exceptions()
 		m_x87_sw |= X87_SW_PE;
 		float_exception_flags &= ~float_flag_inexact;
 	}
+	if (float_exception_flags & float_flag_divbyzero)
+	{
+		m_x87_sw |= X87_SW_ZE;
+		float_exception_flags &= ~float_flag_divbyzero;
+	}
 
+	uint16_t unmasked = (m_x87_sw & ~m_x87_cw) & 0x3f;
 	if ((m_x87_sw & ~m_x87_cw) & 0x3f)
 	{
 		// m_device->execute().set_input_line(INPUT_LINE_FERR, RAISE_LINE);
@@ -187,6 +193,8 @@ int i386_device::x87_check_exceptions()
 		// interrupt handler
 		m_x87_sw |= X87_SW_ES;
 		m_ferr_handler(1);
+		if (store || !(unmasked & (X87_SW_OE | X87_SW_UE)))
+			return 0;
 	}
 
 	return 1;
@@ -2935,11 +2943,9 @@ void i386_device::x87_fst_m32real(uint8_t modrm)
 		value = ST(0);
 	}
 
-	if (x87_check_exceptions())
-	{
-		uint32_t m32real = floatx80_to_float32(value);
+	uint32_t m32real = floatx80_to_float32(value);
+	if (x87_check_exceptions(true))
 		WRITE32(ea, m32real);
-	}
 
 	CYCLES(7);
 }
@@ -2962,11 +2968,9 @@ void i386_device::x87_fst_m64real(uint8_t modrm)
 		value = ST(0);
 	}
 
-	if (x87_check_exceptions())
-	{
-		uint64_t m64real = floatx80_to_float64(value);
+	uint64_t m64real = floatx80_to_float64(value);
+	if (x87_check_exceptions(true))
 		WRITE64(ea, m64real);
-	}
 
 	CYCLES(8);
 }
@@ -3016,9 +3020,9 @@ void i386_device::x87_fstp_m32real(uint8_t modrm)
 		value = ST(0);
 	}
 
-	if (x87_check_exceptions())
+	uint32_t m32real = floatx80_to_float32(value);
+	if (x87_check_exceptions(true))
 	{
-		uint32_t m32real = floatx80_to_float32(value);
 		WRITE32(ea, m32real);
 		x87_inc_stack();
 	}
@@ -3045,9 +3049,9 @@ void i386_device::x87_fstp_m64real(uint8_t modrm)
 
 
 	uint32_t ea = Getx87EA(modrm, 1);
-	if (x87_check_exceptions())
+	uint64_t m64real = floatx80_to_float64(value);
+	if (x87_check_exceptions(true))
 	{
-		uint64_t m64real = floatx80_to_float64(value);
 		WRITE64(ea, m64real);
 		x87_inc_stack();
 	}
@@ -3073,7 +3077,7 @@ void i386_device::x87_fstp_m80real(uint8_t modrm)
 	}
 
 	uint32_t ea = Getx87EA(modrm, 1);
-	if (x87_check_exceptions())
+	if (x87_check_exceptions(true))
 	{
 		WRITE80(ea, value);
 		x87_inc_stack();
@@ -3139,7 +3143,7 @@ void i386_device::x87_fist_m16int(uint8_t modrm)
 	}
 
 	uint32_t ea = Getx87EA(modrm, 1);
-	if (x87_check_exceptions())
+	if (x87_check_exceptions(true))
 	{
 		WRITE16(ea, m16int);
 	}
@@ -3174,7 +3178,7 @@ void i386_device::x87_fist_m32int(uint8_t modrm)
 	}
 
 	uint32_t ea = Getx87EA(modrm, 1);
-	if (x87_check_exceptions())
+	if (x87_check_exceptions(true))
 	{
 		WRITE32(ea, m32int);
 	}
@@ -3209,7 +3213,7 @@ if (X87_IS_ST_EMPTY(0))
 	}
 
 	uint32_t ea = Getx87EA(modrm, 1);
-	if (x87_check_exceptions())
+	if (x87_check_exceptions(true))
 	{
 		WRITE16(ea, m16int);
 		x87_inc_stack();
@@ -3245,7 +3249,7 @@ void i386_device::x87_fistp_m32int(uint8_t modrm)
 	}
 
 	uint32_t ea = Getx87EA(modrm, 1);
-	if (x87_check_exceptions())
+	if (x87_check_exceptions(true))
 	{
 		WRITE32(ea, m32int);
 		x87_inc_stack();
@@ -3281,7 +3285,7 @@ void i386_device::x87_fistp_m64int(uint8_t modrm)
 	}
 
 	uint32_t ea = Getx87EA(modrm, 1);
-	if (x87_check_exceptions())
+	if (x87_check_exceptions(true))
 	{
 		WRITE64(ea, m64int);
 		x87_inc_stack();
@@ -3318,7 +3322,7 @@ void i386_device::x87_fbstp(uint8_t modrm)
 	}
 
 	uint32_t ea = Getx87EA(modrm, 1);
-	if (x87_check_exceptions())
+	if (x87_check_exceptions(true))
 	{
 		WRITE80(ea, result);
 		x87_inc_stack();
@@ -4708,20 +4712,59 @@ void i386_device::x87_fldenv(uint8_t modrm)
 	if (x87_mf_fault())
 		return;
 	uint32_t ea = Getx87EA(modrm, 0);
+	uint32_t temp;
 
-	if (m_operand_size)
+	switch(((PROTECTED_MODE && !V8086_MODE) ? 1 : 0) | (m_operand_size & 1)<<1)
 	{
-		// 32-bit real/protected mode
-		x87_write_cw(READ16(ea));
-		m_x87_sw = READ16(ea + 4);
-		m_x87_tw = READ16(ea + 8);
-	}
-	else
-	{
-		// 16-bit real/protected mode
-		x87_write_cw(READ16(ea));
-		m_x87_sw = READ16(ea + 2);
-		m_x87_tw = READ16(ea + 4);
+		case 0: // 16-bit real mode
+			x87_write_cw(READ16(ea));
+			m_x87_sw = READ16(ea + 2);
+			m_x87_tw = READ16(ea + 4);
+			m_x87_inst_ptr = READ16(ea + 6);
+			temp = READ16(ea + 8);
+			m_x87_opcode = temp & 0x7ff;
+			m_x87_inst_ptr |= ((temp & 0xf000) << 4);
+			m_x87_data_ptr = READ16(ea + 10) | ((READ16(ea + 12) & 0xf000) << 4);
+			m_x87_cs = 0;
+			m_x87_ds = 0;
+			ea += 14;
+			break;
+		case 1: // 16-bit protected mode
+			x87_write_cw(READ16(ea));
+			m_x87_sw = READ16(ea + 2);
+			m_x87_tw = READ16(ea + 4);
+			m_x87_inst_ptr = READ16(ea + 6);
+			m_x87_opcode = 0;
+			m_x87_cs = READ16(ea + 8);
+			m_x87_data_ptr = READ16(ea + 10);
+			m_x87_ds = READ16(ea + 12);
+			ea += 14;
+			break;
+		case 2: // 32-bit real mode
+			x87_write_cw(READ16(ea));
+			m_x87_sw = READ16(ea + 4);
+			m_x87_tw = READ16(ea + 8);
+			m_x87_inst_ptr = READ16(ea + 12);
+			temp = READ32(ea + 16);
+			m_x87_opcode = temp & 0x7ff;
+			m_x87_inst_ptr |= ((temp & 0xffff000) << 4);
+			m_x87_data_ptr = READ16(ea + 20) | ((READ32(ea + 24) & 0xffff000) << 4);
+			m_x87_cs = 0;
+			m_x87_ds = 0;
+			ea += 28;
+			break;
+		case 3: // 32-bit protected mode
+			x87_write_cw(READ16(ea));
+			m_x87_sw = READ16(ea + 4);
+			m_x87_tw = READ16(ea + 8);
+			m_x87_inst_ptr = READ32(ea + 12);
+			temp = READ32(ea + 16);
+			m_x87_opcode = (temp >> 16) & 0x7ff;
+			m_x87_cs = temp & 0xffff;
+			m_x87_data_ptr = READ32(ea + 20);
+			m_x87_ds = READ16(ea + 24);
+			ea += 28;
+			break;
 	}
 
 	x87_check_exceptions();
@@ -4836,7 +4879,7 @@ void i386_device::x87_frstor(uint8_t modrm)
 	if (x87_mf_fault())
 		return;
 	uint32_t ea = GetEA(modrm, 0);
-	uint32 temp;
+	uint32_t temp;
 
 	switch(((PROTECTED_MODE && !V8086_MODE) ? 1 : 0) | (m_operand_size & 1)<<1)
 	{

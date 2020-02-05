@@ -97,16 +97,60 @@ inline void unsp_device::execute_fxxx_001_group(uint16_t op)
 		uint8_t bitop =  (op & 0x0030) >> 4;
 		uint8_t offset = (op & 0x000f) >> 0;
 		uint8_t d =      (op & 0x0400) >> 10;
+		uint16_t imm16 = read16(UNSP_LPC);
+		add_lpc(1);
 
 		if (d)
 		{
-			logerror("%s ds:[$04x],%d\n", bitops[bitop], offset);
-			unimplemented_opcode(op);
+			switch (bitop)
+			{
+			case 0x0: // tstb
+				logerror("tstb ds:[%04x],%d\n", imm16, offset);
+				unimplemented_opcode(op);
+				break;
+
+			case 0x1: // setb
+				logerror("setb ds:[%04x],%d\n", imm16, offset);
+				unimplemented_opcode(op);
+				break;
+
+			case 0x2: // clrb
+				logerror("clrb ds:[%04x],%d\n", imm16, offset);
+				unimplemented_opcode(op);
+				break;
+
+			case 0x3: // invb
+				logerror("invb ds:[%04x],%d\n", imm16, offset);
+				unimplemented_opcode(op);
+				break;
+			}
 		}
 		else
 		{
-			logerror("%s [$04x],%d\n", bitops[bitop], offset);
-			unimplemented_opcode(op);
+			switch (bitop)
+			{
+			case 0x0: // tstb
+				logerror("tstb [%04x],%d\n", imm16, offset);
+				unimplemented_opcode(op);
+				break;
+
+			case 0x1: // setb    (bkrankp uses this)
+			{
+				uint16_t temp = read16(imm16);
+				temp |= (1 << offset);
+				write16(imm16, temp);
+				break;
+			}
+			case 0x2: // clrb
+				logerror("clrb [%04x],%d\n", imm16, offset);
+				unimplemented_opcode(op);
+				break;
+
+			case 0x3: // invb
+				logerror("invb [%04x],%d\n", imm16, offset);
+				unimplemented_opcode(op);
+				break;
+			}
 		}
 
 		return;

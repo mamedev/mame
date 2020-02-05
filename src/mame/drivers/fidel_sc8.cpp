@@ -39,7 +39,7 @@ public:
 		m_inputs(*this, "IN.0")
 	{ }
 
-	// machine drivers
+	// machine configs
 	void scc(machine_config &config);
 
 protected:
@@ -153,7 +153,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void scc_state::scc(machine_config &config)

@@ -722,6 +722,18 @@ ROM_START(phntmshp)
 ROM_END
 
 /*-------------------------------------------------------------------
+/ ??/84 Flashman (Sport Matic)
+/-------------------------------------------------------------------*/
+ROM_START(flashman)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("pf7-1a0.u9", 0x0000, 0x2000, CRC(2cd16521) SHA1(bf9aa293e2ded3f5b1e61a10e6a8ebb8b4e9d4e1))
+
+	ROM_REGION(0x4000, "audiocpu", 0)
+	ROM_LOAD("mfm-1a0.u3", 0x00000, 0x2000, CRC(456fd555) SHA1(e91d6df15fdfc330ee9edb691ff925ad24afea35))
+	ROM_LOAD("mfm-1b0.u4", 0x02000, 0x0800, CRC(90256257) SHA1(c7f2554e500c4e512999b4edc54c86f3335a2b30))
+ROM_END
+
+/*-------------------------------------------------------------------
 / ??/86 Rider's Surf (JocMatic)
 /-------------------------------------------------------------------*/
 ROM_START(ridersrf)
@@ -780,8 +792,9 @@ GAME(1986,  fldragona, fldragon, play_3,   play_3,   play_3_state, empty_init, R
 GAME(1987,  phntmshp,  0,        sklflite, play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Phantom Ship",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 GAME(1987,  sklflite,  0,        sklflite, play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Skill Flight (Playmatic)",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // not by Playmatic, but same hardware
-GAME(1986,  ridersrf,  0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "JocMatic",  "Rider's Surf",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(1987,  ironball,  0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Stargame",  "Iron Balls",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(198?,  terrlake,  0,        sklflite, play_3,   play_3_state, empty_init, ROT0, "Sport Matic", "Terrific Lake",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1984,  flashman,  0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Sport Matic", "Flashman",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME(1986,  ridersrf,  0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "JocMatic",    "Rider's Surf",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME(1987,  ironball,  0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Stargame",    "Iron Balls",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME(1987,  terrlake,  0,        sklflite, play_3,   play_3_state, empty_init, ROT0, "Sport Matic", "Terrific Lake",              MACHINE_IS_SKELETON_MECHANICAL)
 // bingo hardware, to be split (?)
 GAME(1983,  msdisco,   0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Miss Disco (Bingo)",           MACHINE_IS_SKELETON_MECHANICAL)

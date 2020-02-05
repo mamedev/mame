@@ -130,6 +130,17 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		</part>
 	</software>
 
+	<software name="007twinep" cloneof="007twine">
+		<description>007 - The World Is Not Enough (prototype, version 21)</description>
+		<year>2000</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="the world is not enough ver 21.bin" size="33554432" crc="f0b6bf59" sha1="53c6de60383517f38d27e449d47bced319f8e87a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="1080snow">
 		<description>1080° Snowboarding (Euro)</description>
 		<year>1998</year>

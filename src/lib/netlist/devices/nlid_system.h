@@ -84,6 +84,8 @@ namespace devices
 		, m_feedback(*this, "FB")
 		, m_Q(*this, "Q")
 		, m_freq(*this, "FREQ", nlconst::magic(7159000.0 * 5.0))
+		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
+		, m_supply(*this)
 		{
 			m_inc = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
 
@@ -107,7 +109,10 @@ namespace devices
 
 		param_fp_t m_freq;
 		netlist_time m_inc;
-	};
+
+		param_model_t m_FAMILY;
+		NETLIB_NAME(power_pins) m_supply;
+};
 
 	// -----------------------------------------------------------------------------
 	// varclock
@@ -230,7 +235,11 @@ namespace devices
 
 		NETLIB_UPDATEI() { }
 		NETLIB_RESETI() { m_Q.initial(0); }
-		NETLIB_UPDATE_PARAMI() { m_Q.push(m_IN() & 1, netlist_time::from_nsec(1)); }
+		NETLIB_UPDATE_PARAMI()
+		{
+			//printf("%s %d\n", name().c_str(), m_IN());
+			m_Q.push(m_IN() & 1, netlist_time::from_nsec(1));
+		}
 
 	private:
 		logic_output_t m_Q;

@@ -42,6 +42,7 @@
 #include "bus/bbc/fdc/fdc.h"
 #include "bus/bbc/analogue/analogue.h"
 #include "bus/bbc/1mhzbus/1mhzbus.h"
+#include "bus/bbc/modem/modem.h"
 #include "bus/bbc/internal/internal.h"
 #include "bus/bbc/tube/tube.h"
 #include "bus/bbc/userport/userport.h"
@@ -74,7 +75,7 @@ public:
 		, m_acia(*this, "acia6850")
 		, m_acia_clock(*this, "acia_clock")
 		, m_latch(*this, "latch")
-		, m_rs232(*this, "rs232")
+		, m_rs232(*this, "rs423")
 		, m_via6522_0(*this, "via6522_0")
 		, m_via6522_1(*this, "via6522_1")
 		, m_upd7002(*this, "upd7002")
@@ -84,6 +85,7 @@ public:
 		, m_intube(*this, "intube")
 		, m_extube(*this, "extube")
 		, m_1mhzbus(*this, "1mhzbus")
+		, m_modem(*this, "modem")
 		, m_userport(*this, "userport")
 		, m_internal(*this, "internal")
 		, m_exp(*this, "exp")
@@ -243,6 +245,7 @@ protected:
 	optional_device<bbc_tube_slot_device> m_intube;
 	optional_device<bbc_tube_slot_device> m_extube;
 	optional_device<bbc_1mhzbus_slot_device> m_1mhzbus;
+	optional_device<bbc_modem_slot_device> m_modem;
 	optional_device<bbc_userport_slot_device> m_userport;
 	optional_device<bbc_internal_slot_device> m_internal;
 	optional_device<bbc_exp_slot_device> m_exp;
@@ -396,8 +399,7 @@ public:
 	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
 
 	void torchf(machine_config &config);
-	void torchh21(machine_config &config);
-	void torchh10(machine_config &config);
+	void torchh(machine_config &config);
 };
 
 

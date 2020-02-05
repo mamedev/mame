@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include <ctype.h>
+#include <cctype>
 
 
 //**************************************************************************

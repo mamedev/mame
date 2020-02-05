@@ -3,7 +3,7 @@
 // thanks-to:Berger
 /******************************************************************************
 
-Novag Super Expert (model 878/887/902) / Novag Super Forte
+Novag Super Expert (model 878/886/887/902) / Novag Super Forte
 
 Hardware notes (Super Expert)
 - 65C02 @ 5MHz or 6MHz (10MHz or 12MHz XTAL)
@@ -17,6 +17,14 @@ I/O via TTL, hardware design was very awkward.
 
 Super Forte is very similar, just a cheaper plastic case and chessboard buttons
 instead of magnet sensors.
+
+To distinguish between versions, press the Set Level button.
+- version A: no selectivity setting (but can turn on/off with level H8)
+- version B: default selectivity 3
+- version C: default selectivity 5
+
+Note that the H8 option doesn't appear to work with sexperta1, but when doing a
+hex compare with sexperta, the program differences are minor.
 
 ******************************************************************************/
 
@@ -62,7 +70,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void sexpert(machine_config &config);
 
 	void init_sexpert();
@@ -154,7 +162,7 @@ public:
 		sexpert_state(mconfig, type, tag)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void sforte(machine_config &config);
 
 protected:
@@ -397,7 +405,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void sexpert_state::sexpert(machine_config &config)
@@ -469,25 +477,25 @@ void sforte_state::sforte(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( sexperta )
+ROM_START( sexperta ) // from model 886
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD("se_lo_608.u3", 0x0000, 0x8000, CRC(5c98264c) SHA1(fbbe0d0cf64944fd3a90a7e9711b1deef8b9b51d) )
+	ROM_LOAD("se_hi1_608.u1", 0x8000, 0x8000, CRC(68009cb4) SHA1(ae8d1b5058eff72d3fcfd6a011608ae7b3de5060) )
+	ROM_LOAD("se_sf_hi0_c22.u2", 0x10000, 0x8000, CRC(3e42cf7c) SHA1(b2faa36a127e08e5755167a25ed4a07f12d62957) )
+ROM_END
+
+ROM_START( sexperta1 ) // from model 878
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD("se_lo_b15.u3", 0x0000, 0x8000, CRC(6cc9527c) SHA1(29bab809399f2863a88a9c41535ecec0a4fd65ea) )
 	ROM_LOAD("se_hi1_b15.u1", 0x8000, 0x8000, CRC(6e57f0c0) SHA1(ea44769a6f54721fd4543366bda932e86e497d43) )
 	ROM_LOAD("se_sf_hi0_a23.u2", 0x10000, 0x8000, CRC(7d4e1528) SHA1(53c7d458a5571afae402f00ae3d0f5066634b068) )
 ROM_END
 
-ROM_START( sexpertb )
+ROM_START( sexpertb ) // from model 887
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD("se_lo_619.u3", 0x0000, 0x8000, CRC(92002eb6) SHA1(ed8ca16701e00b48fa55c856fa4a8c6613079c02) )
 	ROM_LOAD("se_hi1_619.u1", 0x8000, 0x8000, CRC(814b4420) SHA1(c553e6a8c048dcc1cf48d410111a86e06b99d356) )
 	ROM_LOAD("se_f_hi0_605.u2", 0x10000, 0x8000, CRC(bb07ad52) SHA1(30cf9005021ab2d7b03facdf2d3588bc94dc68a6) )
-ROM_END
-
-ROM_START( sexpertb1 )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD("se_lo_608.u3", 0x0000, 0x8000, CRC(5c98264c) SHA1(fbbe0d0cf64944fd3a90a7e9711b1deef8b9b51d) )
-	ROM_LOAD("se_hi1_608.u1", 0x8000, 0x8000, CRC(68009cb4) SHA1(ae8d1b5058eff72d3fcfd6a011608ae7b3de5060) )
-	ROM_LOAD("se_sf_hi0_c22.u2", 0x10000, 0x8000, CRC(3e42cf7c) SHA1(b2faa36a127e08e5755167a25ed4a07f12d62957) )
 ROM_END
 
 ROM_START( sexpertc )
@@ -549,9 +557,9 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME       PARENT   CMP MACHINE  INPUT    STATE          INIT          COMPANY, FULLNAME, FLAGS
-CONS( 1987, sexperta,  0,        0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, sexpertb,  sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version B, model 887)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, sexpertb1, sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version B, model 886)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, sexperta,  0,        0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, sexperta1, sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version A, older)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, sexpertb,  sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1990, sexpertc,  sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, V3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1990, sexpertc1, sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, V1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 

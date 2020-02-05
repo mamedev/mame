@@ -876,6 +876,13 @@ S11 S13 S15 S17  |EPR12194 -        -        -        EPR12195 -        -       
 #include "sound/okim6295.h"
 #include "speaker.h"
 
+#define USE_NL (1)
+
+#if USE_NL
+#include "machine/netlist.h"
+#include "netlist/nl_setup.h"
+#include "audio/nl_segas16b.h"
+#endif
 
 //**************************************************************************
 //  CONSTANTS
@@ -3933,12 +3940,37 @@ void segas16b_state::system16b(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
+#if USE_NL
+	YM2151(config, m_ym2151, MASTER_CLOCK_8MHz/2)
+		.add_route(0, "netlist", 1.0, 0)
+		.add_route(1, "netlist", 1.0, 1);
+	UPD7759(config, m_upd7759);
+	m_upd7759->md_w(0);
+	m_upd7759->drq().set(FUNC(segas16b_state::upd7759_generate_nmi));
+	m_upd7759->add_route(0, "netlist", 1.0, 2);
+
+	NETLIST_SOUND(config, "netlist", 48000)
+		.set_source(netlist_segas16b_audio)
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	// please refer to the netlist code for details about
+	// the multipliers and offsets.
+	NETLIST_STREAM_INPUT(config, "netlist:cin0", 0, "CH1.IN")
+		.set_mult_offset(0.5/32768.0, 2.5);
+	NETLIST_STREAM_INPUT(config, "netlist:cin1", 1, "CH2.IN")
+		.set_mult_offset(0.5/32768.0, 2.5);
+	NETLIST_STREAM_INPUT(config, "netlist:cin2", 2, "SPEECH.I")
+		.set_mult_offset(0.001020/32768.0/2.0, 0.001020/2.0);
+
+	NETLIST_STREAM_OUTPUT(config, "netlist:cout0", 0, "OUT").set_mult_offset(30000.0 / 0.2, 0.0);
+#else
 	YM2151(config, m_ym2151, MASTER_CLOCK_8MHz/2).add_route(ALL_OUTPUTS, "mono", 0.43);
 
 	UPD7759(config, m_upd7759);
 	m_upd7759->md_w(0);
 	m_upd7759->drq().set(FUNC(segas16b_state::upd7759_generate_nmi));
 	m_upd7759->add_route(ALL_OUTPUTS, "mono", 0.48);
+#endif
 }
 
 void segas16b_state::system16b_mc8123(machine_config &config)

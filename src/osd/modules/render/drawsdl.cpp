@@ -11,8 +11,8 @@
 //============================================================
 
 // standard C headers
-#include <math.h>
-#include <stdio.h>
+#include <cmath>
+#include <cstdio>
 
 // MAME headers
 #include "emu.h"

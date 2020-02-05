@@ -81,13 +81,11 @@ uint8_t p1_fdc_device::p1_wd17xx_motor_r()
 
 uint8_t p1_fdc_device::p1_wd17xx_aux_r()
 {
-	cpu_device *maincpu = machine().device<cpu_device>("maincpu");
-
 	if (!m_fdc->drq_r() && !m_fdc->intrq_r())
 	{
 		// fake cpu wait by resetting PC one insn back
-		maincpu->set_state_int(I8086_IP, maincpu->state_int(I8086_IP) - 2);
-		maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_cpu->set_state_int(I8086_IP, m_cpu->state_int(I8086_IP) - 2);
+		m_isa->set_ready(ASSERT_LINE); // assert I/O CH RDY
 	}
 
 	return m_fdc->drq_r();
@@ -109,7 +107,8 @@ void p1_fdc_device::p1_wd17xx_aux_w(int data)
 	floppy_image_device *floppy1 = m_fdc->subdevice<floppy_connector>("1")->get_device();
 	floppy_image_device *floppy = ((data & 2) ? floppy1 : floppy0);
 
-	if (!BIT(data, 6)) m_fdc->reset();
+	if (!BIT(data, 6))
+		m_fdc->reset();
 
 	m_fdc->set_floppy(floppy);
 
@@ -122,9 +121,8 @@ void p1_fdc_device::p1_wd17xx_aux_w(int data)
 
 WRITE_LINE_MEMBER(p1_fdc_device::p1_fdc_irq_drq)
 {
-	cpu_device *maincpu = machine().device<cpu_device>("maincpu");
-
-	if (state) maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	if (state)
+		m_isa->set_ready(CLEAR_LINE); // deassert I/O CH RDY
 }
 
 READ8_MEMBER(p1_fdc_device::p1_fdc_r)
@@ -162,6 +160,7 @@ p1_fdc_device::p1_fdc_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, P1_FDC, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
 	, m_fdc(*this, "fdc")
+	, m_cpu(*this, finder_base::DUMMY_TAG)
 {
 }
 

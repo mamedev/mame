@@ -14,7 +14,7 @@
 #include "machine/28fxxx.h"
 
 // various hardware
-#include "machine/jazz_mct_adr.h"
+#include "machine/mct_adr.h"
 #include "machine/dp83932c.h"
 #include "machine/mc146818.h"
 #include "machine/ins8250.h"
@@ -66,6 +66,7 @@ public:
 		, m_lpt(*this, "lpt")
 		, m_isp(*this, "isp")
 		, m_buzzer(*this, "buzzer")
+		, m_led(*this, "led0")
 	{
 	}
 
@@ -80,6 +81,8 @@ protected:
 	// machine config
 	void jazz(machine_config &config);
 
+	void led_w(u8 data);
+
 public:
 	void mmr4000be(machine_config &config);
 	void mmr4000le(machine_config &config);
@@ -93,7 +96,7 @@ protected:
 	required_device<r4000_device> m_cpu;
 	required_device<ram_device> m_ram;
 	required_device<ram_device> m_vram;
-	required_device<jazz_mct_adr_device> m_mct_adr;
+	required_device<mct_adr_device> m_mct_adr;
 	required_device<nscsi_bus_device> m_scsibus;
 	required_device<ncr53c94_device> m_scsi;
 	required_device<n82077aa_device> m_fdc;
@@ -109,9 +112,7 @@ protected:
 	required_device<i82357_device> m_isp;
 	required_device<speaker_sound_device> m_buzzer;
 
-private:
-	// machine state
-	u8 m_led;
+	output_finder<> m_led;
 };
 
 #endif // MAME_INCLUDES_JAZZ_H

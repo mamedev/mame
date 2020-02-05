@@ -27,7 +27,7 @@
 #include "emu.h"
 #include "32010dsm.h"
 
-#include <ctype.h>
+#include <cctype>
 #include <stdexcept>
 
 

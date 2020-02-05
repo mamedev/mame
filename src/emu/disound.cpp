@@ -260,7 +260,7 @@ void device_sound_interface::interface_validity_check(validity_checker &valid) c
 		// find a device with the requested tag
 		device_t const *const target = route.m_base.get().subdevice(route.m_target.c_str());
 		if (!target)
-			osd_printf_error("Attempting to route sound to non-existent device '%s'\n", route.m_base.get().subtag(route.m_target.c_str()));
+			osd_printf_error("Attempting to route sound to non-existent device '%s'\n", route.m_base.get().subtag(route.m_target));
 
 		// if it's not a speaker or a sound device, error
 		device_sound_interface const *sound;

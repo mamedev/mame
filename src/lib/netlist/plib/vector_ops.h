@@ -76,15 +76,13 @@ namespace plib
 
 			return value;
 		}
-		else
-		{
-			using b8 = std::array<T, 8>;
-			PALIGNAS_VECTOROPT() b8 value = {0};
-			for (std::size_t i = 0; i < n ; i++ )
-				value[i & 7] += v[i];
 
-			return ((value[0] + value[1]) + (value[2] + value[3])) + ((value[4] + value[5]) + (value[6] + value[7]));
-		}
+		using b8 = std::array<T, 8>;
+		PALIGNAS_VECTOROPT() b8 value = {0};
+		for (std::size_t i = 0; i < n ; i++ )
+			value[i & 7] += v[i];
+
+		return ((value[0] + value[1]) + (value[2] + value[3])) + ((value[4] + value[5]) + (value[6] + value[7]));
 	}
 
 	template<typename VV, typename T, typename VR>

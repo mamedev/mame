@@ -69,6 +69,18 @@ inline void pgm_state::pgm_draw_pix_pri(int xdrawpos, u16* dest, u8* destpri, co
 	}
 }
 
+inline u8 pgm_state::get_sprite_pix()
+{
+	const u8 srcdat = ((m_adata[m_aoffset & m_adata.mask()] >> m_abit) & 0x1f);
+	m_abit += 5; // 5 bit per pixel, 3 pixels in each word; 15 bit used
+	if (m_abit >= 15)
+	{
+		m_aoffset++;
+		m_abit = 0;
+	}
+	return srcdat;
+}
+
 /*************************************************************************
  Full Sprite Renderer
   for complex zoomed cases
@@ -78,22 +90,17 @@ void pgm_state::draw_sprite_line(int wide, u16* dest, u8* destpri, const rectang
 {
 	int xoffset = 0;
 	int xdrawpos = 0;
-
-	u8 *adata = m_sprite_a_region.get();
-	size_t adatasize = m_sprite_a_region_size - 1;
-
 	int xcntdraw = 0;
 
 	for (int xcnt = 0; xcnt < wide; xcnt++)
 	{
-		u16 msk = ((m_bdata[(m_boffset + 1) & m_bdata.mask()] << 8) |(m_bdata[(m_boffset + 0) & m_bdata.mask()] << 0));
+		u16 msk = m_bdata[m_boffset & m_bdata.mask()];
 
 		for (int x = 0; x < 16; x++)
 		{
 			if (!(BIT(msk, 0)))
 			{
-				const u16 srcdat = adata[m_aoffset & adatasize] + palt * 32;
-				m_aoffset++;
+				const u16 srcdat = get_sprite_pix() + palt * 32;
 
 				if (draw)
 				{
@@ -151,7 +158,7 @@ void pgm_state::draw_sprite_line(int wide, u16* dest, u8* destpri, const rectang
 			msk >>= 1;
 		}
 
-		m_boffset += 2;
+		m_boffset++;
 	}
 }
 
@@ -160,11 +167,11 @@ void pgm_state::draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, i
 	int ydrawpos;
 	int xcnt = 0;
 
-	m_aoffset = (m_bdata[(m_boffset + 3) & m_bdata.mask()] << 24) | (m_bdata[(m_boffset + 2) & m_bdata.mask()] << 16) |
-				(m_bdata[(m_boffset + 1) & m_bdata.mask()] << 8) | (m_bdata[(m_boffset + 0) & m_bdata.mask()] << 0);
-	m_aoffset = m_aoffset >> 2; m_aoffset *= 3;
+	m_aoffset = (m_bdata[(m_boffset + 1) & m_bdata.mask()] << 16) | (m_bdata[(m_boffset + 0) & m_bdata.mask()] << 0);
+	m_aoffset = m_aoffset >> 2;
+	m_abit = 0;
 
-	m_boffset += 4;
+	m_boffset += 2;
 
 	/* precalculate where drawing will end, for flipped zoomed cases. */
 	/* if we're to avoid pre-decoding the data for each sprite each time we draw then we have to draw the sprite data
@@ -209,6 +216,7 @@ void pgm_state::draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, i
 		if (yzoombit && ygrow) // double this line
 		{
 			const int temp_aoffset = m_aoffset;
+			const int temp_abit = m_abit;
 			const int temp_boffset = m_boffset;
 
 			if (!(flip & 0x02))
@@ -231,6 +239,7 @@ void pgm_state::draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, i
 
 			// we need to draw this line again, so restore our pointers to previous values
 			m_aoffset = temp_aoffset;
+			m_abit = temp_abit;
 			m_boffset = temp_boffset;
 
 			if (!(flip & 0x02))
@@ -310,23 +319,19 @@ void pgm_state::draw_sprite_line_basic(int wide, u16* dest, u8* destpri, const r
 {
 	int xoffset = 0;
 	int xdrawpos = 0;
-	u8 *adata = m_sprite_a_region.get();
-	size_t adatasize = m_sprite_a_region_size - 1;
-
 	int xcntdraw = 0;
 
 	if (!pri)
 	{
 		for (int xcnt = 0; xcnt < wide; xcnt++)
 		{
-			u16 msk = ((m_bdata[(m_boffset + 1) & m_bdata.mask()] << 8) |(m_bdata[(m_boffset + 0) & m_bdata.mask()] << 0));
+			u16 msk = m_bdata[m_boffset & m_bdata.mask()];
 
 			for (int x = 0; x < 16; x++)
 			{
 				if (!(BIT(msk, 0)))
 				{
-					const u16 srcdat = adata[m_aoffset & adatasize] + palt * 32;
-					m_aoffset++;
+					const u16 srcdat = get_sprite_pix() + palt * 32;
 
 					if (draw)
 					{
@@ -352,21 +357,20 @@ void pgm_state::draw_sprite_line_basic(int wide, u16* dest, u8* destpri, const r
 				msk >>= 1;
 			}
 
-			m_boffset += 2;
+			m_boffset++;
 		}
 	}
 	else
 	{
 		for (int xcnt = 0; xcnt < wide; xcnt++)
 		{
-			u16 msk = ((m_bdata[(m_boffset + 1) & m_bdata.mask()] << 8) |(m_bdata[(m_boffset + 0) & m_bdata.mask()] << 0));
+			u16 msk = m_bdata[m_boffset & m_bdata.mask()];
 
 			for (int x = 0; x < 16; x++)
 			{
 				if (!(BIT(msk, 0)))
 				{
-					const u16 srcdat = adata[m_aoffset & adatasize] + palt * 32;
-					m_aoffset++;
+					const u16 srcdat = get_sprite_pix() + palt * 32;
 
 					if (draw)
 					{
@@ -392,7 +396,7 @@ void pgm_state::draw_sprite_line_basic(int wide, u16* dest, u8* destpri, const r
 				msk >>= 1;
 			}
 
-			m_boffset += 2;
+			m_boffset++;
 		}
 	}
 }
@@ -406,11 +410,11 @@ void pgm_state::draw_sprite_new_basic(int wide, int high, int xpos, int ypos, in
 {
 	int ydrawpos;
 
-	m_aoffset = (m_bdata[(m_boffset + 3) & m_bdata.mask()] << 24) | (m_bdata[(m_boffset + 2) & m_bdata.mask()] << 16) |
-				(m_bdata[(m_boffset + 1) & m_bdata.mask()] << 8) | (m_bdata[(m_boffset + 0) & m_bdata.mask()] << 0);
-	m_aoffset = m_aoffset >> 2; m_aoffset *= 3;
+	m_aoffset = (m_bdata[(m_boffset + 1) & m_bdata.mask()] << 16) | (m_bdata[(m_boffset + 0) & m_bdata.mask()] << 0);
+	m_aoffset = m_aoffset >> 2;
+	m_abit = 0;
 
-	m_boffset += 4;
+	m_boffset += 2;
 
 	const int realysize = high - 1;
 	const int realxsize = (wide * 16) - 1;
@@ -506,7 +510,6 @@ void pgm_state::draw_sprites(bitmap_ind16& spritebitmap, const rectangle &clipre
 		u32 xzoom = (sprite_zoomtable[xzom * 2] << 16) | sprite_zoomtable[xzom * 2 + 1];
 		u32 yzoom = (sprite_zoomtable[yzom * 2] << 16) | sprite_zoomtable[yzom * 2 + 1];
 
-		boff *= 2;
 		if (xpos > 0x3ff) xpos -= 0x800;
 		if (ypos > 0x1ff) ypos -= 0x400;
 
@@ -576,6 +579,7 @@ TILE_GET_INFO_MEMBER(pgm_state::get_bg_tile_info)
 void pgm_state::video_start()
 {
 	m_aoffset = 0;
+	m_abit = 0;
 	m_boffset = 0;
 
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pgm_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);

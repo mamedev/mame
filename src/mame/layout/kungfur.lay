@@ -19,7 +19,7 @@
 
 	<element name="digit" defstate="0">
 		<led7seg>
-			<color red="1.0" green="0.1" blue="0.1" />
+			<color red="1.0" green="0.1" blue="0.15" />
 		</led7seg>
 	</element>
 
@@ -27,11 +27,17 @@
 <!-- define level lamps -->
 
 	<element name="level1" defstate="0">
+		<disk>
+			<color red="0" green="0" blue="0" />
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15" />
+		</disk>
 		<disk state="1">
-			<color red="1.0" green="0.3" blue="0.3" />
+			<color red="1.0" green="0.1" blue="0.15" />
+			<bounds x="0" y="0" width="1" height="1" />
 		</disk>
 		<disk state="0">
-			<color red="0.2" green="0.0" blue="0.0" />
+			<color red="0.2" green="0.02" blue="0.03" />
+			<bounds x="0" y="0" width="1" height="1" />
 		</disk>
 		<text string="1">
 			<color red="0.0" green="0.0" blue="0.0" />
@@ -39,11 +45,17 @@
 		</text>
 	</element>
 	<element name="level2" defstate="0">
+		<disk>
+			<color red="0" green="0" blue="0" />
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15" />
+		</disk>
 		<disk state="1">
-			<color red="1.0" green="0.3" blue="0.3" />
+			<color red="1.0" green="0.1" blue="0.15" />
+			<bounds x="0" y="0" width="1" height="1" />
 		</disk>
 		<disk state="0">
-			<color red="0.2" green="0.0" blue="0.0" />
+			<color red="0.2" green="0.02" blue="0.03" />
+			<bounds x="0" y="0" width="1" height="1" />
 		</disk>
 		<text string="2">
 			<color red="0.0" green="0.0" blue="0.0" />
@@ -51,11 +63,17 @@
 		</text>
 	</element>
 	<element name="level3" defstate="0">
+		<disk>
+			<color red="0" green="0" blue="0" />
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15" />
+		</disk>
 		<disk state="1">
-			<color red="1.0" green="0.3" blue="0.3" />
+			<color red="1.0" green="0.1" blue="0.15" />
+			<bounds x="0" y="0" width="1" height="1" />
 		</disk>
 		<disk state="0">
-			<color red="0.2" green="0.0" blue="0.0" />
+			<color red="0.2" green="0.02" blue="0.03" />
+			<bounds x="0" y="0" width="1" height="1" />
 		</disk>
 		<text string="3">
 			<color red="0.0" green="0.0" blue="0.0" />
@@ -63,11 +81,17 @@
 		</text>
 	</element>
 	<element name="level4" defstate="0">
+		<disk>
+			<color red="0" green="0" blue="0" />
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15" />
+		</disk>
 		<disk state="1">
-			<color red="1.0" green="0.3" blue="0.3" />
+			<color red="1.0" green="0.1" blue="0.15" />
+			<bounds x="0" y="0" width="1" height="1" />
 		</disk>
 		<disk state="0">
-			<color red="0.2" green="0.0" blue="0.0" />
+			<color red="0.2" green="0.02" blue="0.03" />
+			<bounds x="0" y="0" width="1" height="1" />
 		</disk>
 		<text string="4">
 			<color red="0.0" green="0.0" blue="0.0" />
@@ -75,11 +99,17 @@
 		</text>
 	</element>
 	<element name="level5" defstate="0">
+		<disk>
+			<color red="0" green="0" blue="0" />
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15" />
+		</disk>
 		<disk state="1">
-			<color red="1.0" green="0.3" blue="0.3" />
+			<color red="1.0" green="0.1" blue="0.15" />
+			<bounds x="0" y="0" width="1" height="1" />
 		</disk>
 		<disk state="0">
-			<color red="0.2" green="0.0" blue="0.0" />
+			<color red="0.2" green="0.02" blue="0.03" />
+			<bounds x="0" y="0" width="1" height="1" />
 		</disk>
 		<text string="5">
 			<color red="0.0" green="0.0" blue="0.0" />
@@ -95,7 +125,7 @@
 			<color red="0.0" green="0.22" blue="0.22" />
 		</rect>
 		<text string="SCORE">
-			<color red="1.0" green="1.0" blue="1.0" />
+			<color red="0.85" green="0.85" blue="0.85" />
 			<bounds x="0.03" y="0" width="0.94" height="1" />
 		</text>
 	</element>
@@ -105,7 +135,7 @@
 			<color red="0.0" green="0.22" blue="0.22" />
 		</rect>
 		<text string="LEVEL">
-			<color red="1.0" green="1.0" blue="1.0" />
+			<color red="0.85" green="0.85" blue="0.85" />
 			<bounds x="0.03" y="0" width="0.94" height="1" />
 		</text>
 	</element>
@@ -115,7 +145,7 @@
 			<color red="0.0" green="0.22" blue="0.22" />
 		</rect>
 		<text string="REACTION TIME">
-			<color red="1.0" green="1.0" blue="1.0" />
+			<color red="0.85" green="0.85" blue="0.85" />
 			<bounds x="0.02" y="0" width="0.96" height="1" />
 		</text>
 	</element>
@@ -125,7 +155,7 @@
 			<color red="0.0" green="0.22" blue="0.22" />
 		</rect>
 		<text string="AVERAGE">
-			<color red="1.0" green="1.0" blue="1.0" />
+			<color red="0.85" green="0.85" blue="0.85" />
 			<bounds x="0.03" y="0" width="0.94" height="1" />
 		</text>
 	</element>
@@ -136,32 +166,35 @@
 		</rect>
 		<text string="TODAY'S BEST">
 			<bounds x="0.025" y="0" width="0.95" height="1" />
-			<color red="1.0" green="1.0" blue="1.0" />
+			<color red="0.85" green="0.85" blue="0.85" />
 		</text>
 	</element>
 
 	<element name="text_1">
 		<text string="1ST" align="2">
-			<color red="1.0" green="1.0" blue="1.0" />
+			<color red="0.85" green="0.85" blue="0.85" />
 		</text>
 	</element>
 	<element name="text_2">
 		<text string="2ND" align="2">
-			<color red="1.0" green="1.0" blue="1.0" />
+			<color red="0.85" green="0.85" blue="0.85" />
 		</text>
 	</element>
 	<element name="text_3">
 		<text string="3RD" align="2">
-			<color red="1.0" green="1.0" blue="1.0" />
+			<color red="0.85" green="0.85" blue="0.85" />
 		</text>
 	</element>
 
 	<element name="text_gameover" defstate="0">
+		<rect>
+			<color red="0.0" green="0.22" blue="0.22" />
+		</rect>
 		<text string="GAME OVER" state="1">
-			<color red="1.0" green="0.3" blue="0.3" />
+			<color red="1.0" green="0.1" blue="0.15" />
 		</text>
 		<text string="GAME OVER" state="0">
-			<color red="0.2" green="0.0" blue="0.0" />
+			<color red="0.2" green="0.02" blue="0.03" />
 		</text>
 	</element>
 
@@ -342,7 +375,7 @@
 		</bezel>
 
 		<bezel name="lamp5" element="text_gameover">
-			<bounds x="97" y="86" width="45" height="5" />
+			<bounds x="99" y="86" width="41" height="5" />
 		</bezel>
 
 

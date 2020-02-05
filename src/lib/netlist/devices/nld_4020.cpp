@@ -5,7 +5,6 @@
  *
  */
 
-//#include "nlid_cmos.h"
 #include "nld_4020.h"
 #include "nlid_system.h"
 

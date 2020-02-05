@@ -89,6 +89,9 @@ address lines), and then reading it from the 051962.
            surpratk sets this register to 70 during the second boss. There is
            nothing obviously wrong so it's not clear what should happen.
            glfgreat sets it to 30 when showing the leader board
+           mariorou sets it to 36 when ingame, while actually does per-row scroll for layer A and per-collumn scroll for layer B.
+           such usage not supported by current implementation, hacked in game driver instead.
+           fuusenpn sets this to 20 but not happy with -6 added to column index, apparently current logic is not entirely correct.
 1d00     : bits 0 & 1 might enable NMI and FIRQ, not sure
          : bit 2 = IRQ enable
 1d80     : ROM bank selector bits 0-3 = bank 0 bits 4-7 = bank 1

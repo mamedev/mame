@@ -250,7 +250,7 @@ void bbcm_state::bbcm_bankdev(address_map &map)
 	map(0x023c, 0x023f).mirror(0x400).r(FUNC(bbc_state::bbc_fe_r));                                                                   //    fe3c-fe3f  INTON
 	map(0x0240, 0x025f).mirror(0x400).m(m_via6522_0, FUNC(via6522_device::map));                                                      //    fe40-fe5f  6522 VIA       SYSTEM VIA
 	map(0x0260, 0x027f).mirror(0x400).m(m_via6522_1, FUNC(via6522_device::map));                                                      //    fe60-fe7f  6522 VIA       USER VIA
-	map(0x0280, 0x029f).mirror(0x400).r(FUNC(bbc_state::bbc_fe_r));                                                                   //    fe80-fe9f  Int. Modem     Int. Modem
+	map(0x0280, 0x029f).mirror(0x400).rw(m_modem, FUNC(bbc_modem_slot_device::read), FUNC(bbc_modem_slot_device::write));             //    fe80-fe9f  Int. Modem     Int. Modem
 	map(0x02a0, 0x02bf).mirror(0x400).rw(m_adlc, FUNC(mc6854_device::read), FUNC(mc6854_device::write));                              //    fea0-febf  68B54 ADLC     ECONET controller
 	map(0x02e0, 0x02ff).mirror(0x400).rw(FUNC(bbc_state::bbcm_tube_r), FUNC(bbc_state::bbcm_tube_w));                                 //    fee0-feff  Tube ULA       Tube system interface
 	/* ACCCON TST bit - hardware test */
@@ -966,7 +966,7 @@ void bbc_state::bbcb(machine_config &config)
 	m_via6522_1->readpb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_r));
 	m_via6522_1->writepb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_w));
 	m_via6522_1->writepb_handler().append(m_internal, FUNC(bbc_internal_slot_device::latch_fe60_w));
-	m_via6522_1->ca2_handler().set("centronics", FUNC(centronics_device::write_strobe));
+	m_via6522_1->ca2_handler().set("printer", FUNC(centronics_device::write_strobe));
 	m_via6522_1->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 
 	/* adc */
@@ -975,7 +975,7 @@ void bbc_state::bbcb(machine_config &config)
 	m_upd7002->set_eoc_callback(FUNC(bbc_state::upd7002_eoc));
 
 	/* printer */
-	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
+	centronics_device &centronics(CENTRONICS(config, "printer", centronics_devices, "printer"));
 	centronics.ack_handler().set(m_via6522_1, FUNC(via6522_device::write_ca1)).invert(); // ack seems to be inverted?
 	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
 	centronics.set_output_latch(latch);
@@ -1095,29 +1095,21 @@ void torch_state::torchf(machine_config &config)
 	FLOPPY_CONNECTOR(config, "i8271:0", bbc_floppies, "525qd", bbc_state::floppy_formats, true).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "i8271:1", bbc_floppies, "525qd", bbc_state::floppy_formats).enable_sound(true);
 
-	/* Add Torch Z80 Communicator co-processor */
+	/* Torch Z80 Communicator co-processor */
 	m_tube->set_default_option("zep100");
 	m_tube->set_fixed(true);
 }
 
 
-void torch_state::torchh10(machine_config &config)
+void torch_state::torchh(machine_config &config)
 {
 	torchf(config);
 	/* fdc */
 	m_i8271->subdevice<floppy_connector>("1")->set_default_option(nullptr);
 
-	/* 10MB HDD */
-}
-
-
-void torch_state::torchh21(machine_config &config)
-{
-	torchf(config);
-	/* fdc */
-	m_i8271->subdevice<floppy_connector>("1")->set_default_option(nullptr);
-
-	/* 21MB HDD */
+	/* 10MB or 21MB HDD */
+	//m_1mhzbus->set_default_option("sasi");
+	//m_1mhzbus->set_fixed(true);
 }
 
 
@@ -1201,9 +1193,9 @@ void bbcbp_state::abc110(machine_config &config)
 	m_tube->set_default_option("z80");
 	m_tube->set_fixed(true);
 
-	/* Adaptec ACB-4000 Winchester Disc Controller */
-
-	/* 10MB ST-412 Winchester */
+	/* Acorn Winchester Disc 10MB */
+	m_1mhzbus->set_default_option("awhd");
+	m_1mhzbus->set_fixed(true);
 
 	/* software lists */
 	config.device_remove("cass_ls_a");
@@ -1223,13 +1215,9 @@ void bbcbp_state::acw443(machine_config &config)
 	//m_tube->set_default_option("32016");
 	//m_tube->set_fixed(true);
 
-	/* Adaptec ACB-4000 Winchester Disc Controller */
-	//m_1mhzbus->set_default_option("awdd");
-	//m_1mhzbus->set_fixed(true);
-
-	/* 10MB ST-412 Winchester ABC210 */
-
-	/* 20MB ST-412 Winchester Cambridge */
+	/* Acorn Winchester Disc 20MB */
+	m_1mhzbus->set_default_option("awhd");
+	m_1mhzbus->set_fixed(true);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_ls_32016").set_original("bbc_flop_32016");
@@ -1250,9 +1238,9 @@ void bbcbp_state::abc310(machine_config &config)
 	m_tube->set_default_option("80286");
 	m_tube->set_fixed(true);
 
-	/* Adaptec ACB-4000 Winchester Disc Controller */
-
-	/* 10MB ST-412 Winchester */
+	/* Acorn Winchester Disc 10MB */
+	m_1mhzbus->set_default_option("awhd");
+	m_1mhzbus->set_fixed(true);
 
 	/* software lists */
 	config.device_remove("cass_ls_a");
@@ -1406,7 +1394,7 @@ void bbcm_state::bbcm(machine_config &config)
 	m_rtc->irq().set(m_irqs, FUNC(input_merger_device::in_w<7>));
 
 	/* printer */
-	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
+	centronics_device &centronics(CENTRONICS(config, "printer", centronics_devices, "printer"));
 	centronics.ack_handler().set(m_via6522_1, FUNC(via6522_device::write_ca1)).invert(); // ack seems to be inverted?
 	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
 	centronics.set_output_latch(latch);
@@ -1449,7 +1437,7 @@ void bbcm_state::bbcm(machine_config &config)
 	m_via6522_1->writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
 	m_via6522_1->readpb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_r));
 	m_via6522_1->writepb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_w));
-	m_via6522_1->ca2_handler().set("centronics", FUNC(centronics_device::write_strobe));
+	m_via6522_1->ca2_handler().set("printer", FUNC(centronics_device::write_strobe));
 	m_via6522_1->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 
 	/* fdc */
@@ -1510,6 +1498,10 @@ void bbcm_state::bbcm(machine_config &config)
 	m_internal->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<8>));
 	m_internal->nmi_handler().set(FUNC(bbc_state::bus_nmi_w));
 
+	/* internal modem port */
+	BBC_MODEM_SLOT(config, m_modem, 16_MHz_XTAL / 16, bbcm_modem_devices, nullptr);
+	m_modem->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<9>));
+
 	/* software lists */
 	SOFTWARE_LIST(config, "cass_ls_m").set_original("bbcm_cass");
 	SOFTWARE_LIST(config, "flop_ls_m").set_original("bbcm_flop");
@@ -1538,7 +1530,9 @@ void bbcm_state::bbcmaiv(machine_config &config)
 	m_intube->set_default_option("65c102");
 	m_intube->set_fixed(true);
 
-	/* Add Philips VP415 Laserdisc player */
+	/* Philips VP415 Laserdisc player */
+	m_modem->set_default_option("scsiaiv");
+	m_modem->set_fixed(true);
 
 	/* Acorn Tracker Ball */
 	m_userport->set_default_option("tracker");
@@ -1552,7 +1546,7 @@ void bbcm_state::bbcmet(machine_config &config)
 	m_bankdev->set_map(&bbcm_state::bbcmet_bankdev).set_options(ENDIANNESS_LITTLE, 8, 16, 0x0400);
 
 	/* printer */
-	config.device_remove("centronics");
+	config.device_remove("printer");
 	config.device_remove("cent_data_out");
 
 	/* cassette */
@@ -1572,7 +1566,7 @@ void bbcm_state::bbcmet(machine_config &config)
 
 	/* acia */
 	config.device_remove("acia6850");
-	config.device_remove("rs232");
+	config.device_remove("rs423");
 	config.device_remove("acia_clock");
 
 	/* devices */
@@ -1587,6 +1581,7 @@ void bbcm_state::bbcmet(machine_config &config)
 	config.device_remove("extube");
 	config.device_remove("1mhzbus");
 	config.device_remove("userport");
+	config.device_remove("modem");
 }
 
 
@@ -1608,6 +1603,9 @@ void bbcm_state::bbcmarm(machine_config &config)
 	/* Acorn ARM co-processor */
 	m_extube->set_default_option("arm");
 	m_extube->set_fixed(true);
+
+	/* Acorn Winchester Disc */
+	m_1mhzbus->set_default_option("awhd");
 }
 
 
@@ -1765,6 +1763,7 @@ void bbcm_state::bbcmc(machine_config &config)
 	config.device_remove("extube");
 	config.device_remove("userport");
 	config.device_remove("internal");
+	config.device_remove("modem");
 }
 
 
@@ -1918,8 +1917,7 @@ ROM_START(torchf)
 ROM_END
 
 
-#define rom_torchh10 rom_torchf
-#define rom_torchh21 rom_torchf
+#define rom_torchh rom_torchf
 
 
 ROM_START(bbcbp)
@@ -2099,6 +2097,8 @@ ROM_START(bbcm)
 	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "mos350", "Enhanced MOS 3.50" )
 	ROMX_LOAD("mos350.ic24", 0x20000, 0x20000, CRC(141027b9) SHA1(85211b5bc7c7a269952d2b063b7ec0e1f0196803), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 2, "mos329", "FinMOS 3.29")
+	ROMX_LOAD("mos329.ic24", 0x20000, 0x20000, CRC(8dd7338b) SHA1(4604203c70c04a9fd003103deec438fc5bd44839), ROM_BIOS(2))
 	ROM_COPY("swr", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x20000, 0x4000, 0xff)
 	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
@@ -2126,6 +2126,7 @@ ROM_START(bbcm)
 	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
 	ROMX_LOAD("mos320.cmos", 0x00, 0x40, CRC(c7f9e85a) SHA1(f24cc9db0525910689219f7204bf8b864033ee94), ROM_BIOS(0))
 	ROMX_LOAD("mos350.cmos", 0x00, 0x40, CRC(e84c1854) SHA1(f3cb7f12b7432caba28d067f01af575779220aac), ROM_BIOS(1))
+	ROMX_LOAD("mos350.cmos", 0x00, 0x40, CRC(e84c1854) SHA1(f3cb7f12b7432caba28d067f01af575779220aac), ROM_BIOS(2))
 ROM_END
 
 
@@ -2504,8 +2505,7 @@ ROM_END
 COMP ( 1981, bbcb,     0,      bbca,  bbcb,     bbcb,   bbc_state,   init_bbc,  "Acorn Computers", "BBC Micro Model B",                  MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1981, bbca,     bbcb,   0,     bbca,     bbca,   bbc_state,   init_bbc,  "Acorn Computers", "BBC Micro Model A",                  MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1982, torchf,   bbcb,   0,     torchf,   torch,  torch_state, init_bbc,  "Torch Computers", "Torch CF240",                        MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1982, torchh10, bbcb,   0,     torchh10, torch,  torch_state, init_bbc,  "Torch Computers", "Torch CH240/10",                     MACHINE_NOT_WORKING)
-COMP ( 1982, torchh21, bbcb,   0,     torchh21, torch,  torch_state, init_bbc,  "Torch Computers", "Torch CH240/21",                     MACHINE_NOT_WORKING)
+COMP ( 1982, torchh,   bbcb,   0,     torchh,   torch,  torch_state, init_bbc,  "Torch Computers", "Torch CH240",                        MACHINE_NOT_WORKING)
 COMP ( 1982, bbcb_de,  bbcb,   0,     bbcb_de,  bbcb,   bbc_state,   init_bbc,  "Acorn Computers", "BBC Micro Model B (German)",         MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1983, bbcb_us,  bbcb,   0,     bbcb_us,  bbcb,   bbc_state,   init_bbc,  "Acorn Computers", "BBC Micro Model B (US)",             MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1985, bbcbp,    0,      bbcb,  bbcbp,    bbcbp,  bbcbp_state, init_bbc,  "Acorn Computers", "BBC Micro Model B+ 64K",             MACHINE_IMPERFECT_GRAPHICS)

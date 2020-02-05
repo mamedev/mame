@@ -3,8 +3,8 @@
 #include "emu.h"
 #include "coco_dwsock.h"
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #ifdef __GNUC__
 #include <unistd.h>
 #endif

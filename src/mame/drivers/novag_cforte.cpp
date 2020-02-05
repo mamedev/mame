@@ -47,7 +47,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void cforte(machine_config &config);
 
 protected:
@@ -241,7 +241,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void cforte_state::cforte(machine_config &config)

@@ -10,6 +10,9 @@
  *
  *   http://bitsavers.org/components/intel/_dataBooks/1996_Intel_Peripheral_Components.pdf
  *
+ *   https://web.archive.org/web/20040214013557/http://www.techfest.com/hardware/bus/eisa.htm
+ *   https://web.archive.org/web/20040405230259/http://www.mindshare.com/pdf/eisabook.pdf
+ *
  * TODO
  *   - expose everything to an actual EISA bus
  *   - 32-bit dma functionality
@@ -151,7 +154,7 @@ void i82357_device::map(address_map &map)
 	map(0x407, 0x407).rw(m_dma[0], FUNC(eisa_dma_device::get_count_high<3>), FUNC(eisa_dma_device::set_count_high<3>));
 
 	//map(0x40a, 0x40a); // DMA1 Set Chaining Mode (w)/Interrupt Status (r)
-	//map(0x40b, 0x40b); // DMA1 Ext Write Mode (w)
+	map(0x40b, 0x40b).w(m_dma[0], FUNC(eisa_dma_device::set_ext_mode));
 	//map(0x40c, 0x40c); // Chain Buffer Control
 	//map(0x40d, 0x40d); // Stepping Level Register (ro)
 	//map(0x40e, 0x40e); // ISP Test Register
@@ -188,7 +191,7 @@ void i82357_device::map(address_map &map)
 			NAME([this] (offs_t offset, u8 data) { m_elcr[offset] = data; }));
 
 	//map(0x4d4, 0x4d4); // DMA2 Set Chaining Mode
-	//map(0x4d6, 0x4d6); // DMA2 Ext Write Mode Register
+	map(0x4d6, 0x4d6).w(m_dma[1], FUNC(eisa_dma_device::set_ext_mode));
 
 	map(0x4e0, 0x4e3).rw(m_dma[0], FUNC(eisa_dma_device::get_stop<0>), FUNC(eisa_dma_device::set_stop<0>));
 	map(0x4e4, 0x4e7).rw(m_dma[0], FUNC(eisa_dma_device::get_stop<1>), FUNC(eisa_dma_device::set_stop<1>));
@@ -218,6 +221,12 @@ void i82357_device::device_reset()
 	m_nmi_enabled = true;
 	m_nmi_reg = 0;
 	m_nmi_ext = 0;
+
+	for (unsigned i = 0; i < 4; i++)
+		m_dma[0]->set_ext_mode(0x00 | i);
+
+	for (unsigned i = 0; i < 4; i++)
+		m_dma[1]->set_ext_mode(0x04 | i);
 
 	m_nmi_check->adjust(attotime::zero);
 }

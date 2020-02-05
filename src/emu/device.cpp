@@ -13,7 +13,7 @@
 #include "speaker.h"
 #include "debug/debugcpu.h"
 
-#include <string.h>
+#include <cstring>
 
 
 //**************************************************************************
@@ -130,7 +130,7 @@ device_t::~device_t()
 memory_region *device_t::memregion(std::string _tag) const
 {
 	// build a fully-qualified name and look it up
-	auto search = machine().memory().regions().find(subtag(_tag).c_str());
+	auto search = machine().memory().regions().find(subtag(_tag));
 	if (search != machine().memory().regions().end())
 		return search->second.get();
 	else
@@ -146,7 +146,7 @@ memory_region *device_t::memregion(std::string _tag) const
 memory_share *device_t::memshare(std::string _tag) const
 {
 	// build a fully-qualified name and look it up
-	auto search = machine().memory().shares().find(subtag(_tag).c_str());
+	auto search = machine().memory().shares().find(subtag(_tag));
 	if (search != machine().memory().shares().end())
 		return search->second.get();
 	else
@@ -161,7 +161,7 @@ memory_share *device_t::memshare(std::string _tag) const
 
 memory_bank *device_t::membank(std::string _tag) const
 {
-	auto search = machine().memory().banks().find(subtag(_tag).c_str());
+	auto search = machine().memory().banks().find(subtag(_tag));
 	if (search != machine().memory().banks().end())
 		return search->second.get();
 	else

@@ -18,7 +18,7 @@
 #include "hashfile.h"
 #include "clifront.h"
 
-#include <ctype.h>
+#include <cctype>
 #include <stack>
 
 

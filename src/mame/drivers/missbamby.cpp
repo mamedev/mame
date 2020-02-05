@@ -2,6 +2,18 @@
 // copyright-holders:
 
 /*
+Skeleton driver for Cirsa "Mini Super Fruits" and clones.
+Known games on this hardware:
+
+Dumped Game              Manufacturer
+NO     Mini Super Fruits Cirsa
+YES    Miss Bamby        Automatics Pasqual
+YES    Golden Winer      Reben
+NO     Golden Fruits     unknown
+NO     St.-Tropez        unknown
+
+*/
+/*
 Miss Bamby - Automatics Pasqual
    _____________________________________________________________
    |                             _______                        |

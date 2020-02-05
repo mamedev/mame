@@ -19,6 +19,9 @@
  *   https://github.com/torvalds/linux/tree/master/arch/mips/jazz/
  *   http://cvsweb.netbsd.org/bsdweb.cgi/src/sys/arch/arc/jazz/
  *
+ *   https://www.linux-mips.org/archives/riscy/1993-08/msg00064.html
+ *   https://www.linux-mips.org/archives/riscy/1993-08/msg00069.html
+ *
  * TODO
  *   - proper width dma
  *   - dma address translation errors
@@ -27,15 +30,17 @@
  */
 
 #include "emu.h"
-#include "jazz_mct_adr.h"
+#include "mct_adr.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(JAZZ_MCT_ADR, jazz_mct_adr_device, "jazz_mct_adr", "Jazz MCT-ADR")
+DEFINE_DEVICE_TYPE(MCT_ADR, mct_adr_device, "mct_adr", "MCT-ADR Address Path Controller")
 
-jazz_mct_adr_device::jazz_mct_adr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, JAZZ_MCT_ADR, tag, owner, clock)
+mct_adr_device::mct_adr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MCT_ADR, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, m_dma_config("dma", ENDIANNESS_LITTLE, 32, 32, 0, address_map_constructor(FUNC(mct_adr_device::dma), this))
 	, m_bus(*this, finder_base::DUMMY_TAG, -1, 64)
 	, m_out_int_dma(*this)
 	, m_out_int_device(*this)
@@ -46,7 +51,7 @@ jazz_mct_adr_device::jazz_mct_adr_device(const machine_config &mconfig, const ch
 {
 }
 
-void jazz_mct_adr_device::map(address_map &map)
+void mct_adr_device::map(address_map &map)
 {
 	map(0x000, 0x007).lrw32(NAME([this] () { return m_config; }), NAME([this] (u32 data) { m_config = data; }));
 	map(0x008, 0x00f).lr32([] () { return 1; }, "revision_level");
@@ -118,7 +123,23 @@ void jazz_mct_adr_device::map(address_map &map)
 	map(0x238, 0x23b).lr32(NAME([this] () { return m_eisa_iack(); }));
 }
 
-void jazz_mct_adr_device::device_start()
+// HACK: this address map translates i386 bus master DMA device access (the
+// SONIC network controller) to DRAM.
+device_memory_interface::space_config_vector mct_adr_device::memory_space_config() const
+{
+	return space_config_vector{
+		std::make_pair(0, &m_dma_config)
+	};
+}
+
+void mct_adr_device::dma(address_map &map)
+{
+	map(0x00000000U, 0xffffffffU).lrw32(
+		[this](offs_t offset) { return m_bus->read_dword(translate_address(offset << 2)); }, "dma_r",
+		[this](offs_t offset, u32 data, u32 mem_mask) { m_bus->write_dword(translate_address(offset << 2), data, mem_mask); }, "dma_w");
+}
+
+void mct_adr_device::device_start()
 {
 	m_out_int_dma.resolve();
 	m_out_int_device.resolve();
@@ -131,11 +152,21 @@ void jazz_mct_adr_device::device_start()
 		m_dma_w[i].resolve_safe();
 	}
 
-	m_config = 0x104; // REV1, REV2 is 0x410
-
 	m_ioc_maint = 0;
 	m_ioc_physical_tag = 0;
 	m_ioc_logical_tag = 0;
+
+	m_irq_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mct_adr_device::irq_check), this));
+	m_dma_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mct_adr_device::dma_check), this));
+	m_interval_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mct_adr_device::interval_timer), this));
+
+	m_out_int_timer_asserted = false;
+	m_out_int_device_asserted = false;
+}
+
+void mct_adr_device::device_reset()
+{
+	m_config = 0x104; // REV1, REV2 is 0x410
 	m_trans_tbl_base = 0;
 	m_trans_tbl_limit = 0;
 	m_ioc_byte_mask = 0;
@@ -146,26 +177,19 @@ void jazz_mct_adr_device::device_start()
 	for (u32 &val : m_dma_reg)
 		val = 0;
 
+	m_dma_interrupt_source = 0;
 	m_memory_refresh_rate = 0x18186;
 	m_nvram_protect = 0x7;
 
-	m_irq_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jazz_mct_adr_device::irq_check), this));
-	m_dma_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jazz_mct_adr_device::dma_check), this));
-	m_interval_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jazz_mct_adr_device::interval_timer), this));
-
-	m_out_int_timer_asserted = false;
-	m_out_int_device_asserted = false;
-}
-
-void jazz_mct_adr_device::device_reset()
-{
 	m_isr = 0;
-	m_imr = 0; // 0x10;
+	m_imr = 0x10; // firmware diagnostic expects network interrupts to be unmasked at boot
 
 	m_interval_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+
+	irq_check(nullptr, 0);
 }
 
-void jazz_mct_adr_device::set_irq_line(int irq, int state)
+void mct_adr_device::set_irq_line(int irq, int state)
 {
 	if ((irq != 3) && (m_isr & (1 << irq)) ^ (state << irq))
 		LOG("set_irq_line %d state %d m_imr 0x%04x\n", irq, state, m_imr);
@@ -178,7 +202,7 @@ void jazz_mct_adr_device::set_irq_line(int irq, int state)
 	m_irq_check->adjust(attotime::zero);
 }
 
-TIMER_CALLBACK_MEMBER(jazz_mct_adr_device::irq_check)
+TIMER_CALLBACK_MEMBER(mct_adr_device::irq_check)
 {
 	if (bool(m_isr & m_imr) != m_out_int_device_asserted)
 	{
@@ -188,12 +212,9 @@ TIMER_CALLBACK_MEMBER(jazz_mct_adr_device::irq_check)
 	}
 }
 
-u16 jazz_mct_adr_device::isr_r()
+u16 mct_adr_device::isr_r()
 {
 	u16 const pending = m_isr & m_imr;
-
-	// FIXME: really?
-	//m_out_int_device(CLEAR_LINE);
 
 	for (u16 irq = 0; irq < 16; irq++)
 		if (BIT(pending, irq))
@@ -202,7 +223,7 @@ u16 jazz_mct_adr_device::isr_r()
 	return 0;
 }
 
-void jazz_mct_adr_device::imr_w(u16 data)
+void mct_adr_device::imr_w(u16 data)
 {
 	LOG("imr_w 0x%04x (%s)\n", data, machine().describe_context());
 
@@ -211,7 +232,7 @@ void jazz_mct_adr_device::imr_w(u16 data)
 	m_irq_check->adjust(attotime::zero);
 }
 
-TIMER_CALLBACK_MEMBER(jazz_mct_adr_device::interval_timer)
+TIMER_CALLBACK_MEMBER(mct_adr_device::interval_timer)
 {
 	if (m_out_int_timer_asserted)
 		m_out_int_timer(0);
@@ -221,7 +242,7 @@ TIMER_CALLBACK_MEMBER(jazz_mct_adr_device::interval_timer)
 	m_out_int_timer(1);
 }
 
-void jazz_mct_adr_device::set_drq_line(int channel, int state)
+void mct_adr_device::set_drq_line(int channel, int state)
 {
 	m_drq_active[channel] = state == ASSERT_LINE;
 
@@ -229,7 +250,7 @@ void jazz_mct_adr_device::set_drq_line(int channel, int state)
 		m_dma_check->adjust(attotime::zero);
 }
 
-TIMER_CALLBACK_MEMBER(jazz_mct_adr_device::dma_check)
+TIMER_CALLBACK_MEMBER(mct_adr_device::dma_check)
 {
 	bool active = false;
 
@@ -294,7 +315,7 @@ TIMER_CALLBACK_MEMBER(jazz_mct_adr_device::dma_check)
 		m_dma_check->adjust(attotime::zero);
 }
 
-u32 jazz_mct_adr_device::translate_address(u32 logical_address)
+u32 mct_adr_device::translate_address(u32 logical_address)
 {
 	u32 page = logical_address >> 12;
 	if (page < (m_trans_tbl_limit) >> 3)

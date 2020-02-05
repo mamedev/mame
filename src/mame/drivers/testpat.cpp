@@ -127,8 +127,8 @@ void tp1985_state::tp1985(machine_config &config)
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(MASTER_CLOCK);
-	m_video->set_horz_params(H_TOTAL_PONG-64,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG);
-	m_video->set_vert_params(V_TOTAL_PONG-19,V_TOTAL_PONG-16,V_TOTAL_PONG-12,V_TOTAL_PONG);
+	m_video->set_horz_params(H_TOTAL_PONG-80,H_TOTAL_PONG-56,H_TOTAL_PONG-8,H_TOTAL_PONG);
+	m_video->set_vert_params(V_TOTAL_PONG-19,V_TOTAL_PONG-15,V_TOTAL_PONG-12,V_TOTAL_PONG);
 	m_video->set_fieldcount(1);
 	m_video->set_threshold(1);
 	m_video->set_gain(0.36);

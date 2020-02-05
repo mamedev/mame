@@ -118,7 +118,7 @@ ti_pcode_card_device::ti_pcode_card_device(const machine_config &mconfig, const 
 SETADDRESS_DBIN_MEMBER( ti_pcode_card_device::setaddress_dbin )
 {
 	m_address = offset;
-	m_inDsrArea = ((m_address & m_select_mask)==m_select_value);
+	m_inDsrArea = in_dsr_space(offset, true);
 
 	line_state a14 = ((m_address & 2)!=0)? ASSERT_LINE : CLEAR_LINE;
 
@@ -145,7 +145,7 @@ SETADDRESS_DBIN_MEMBER( ti_pcode_card_device::setaddress_dbin )
 void ti_pcode_card_device::debugger_read(uint16_t offset, uint8_t& value)
 {
 	// The debuger does not call setaddress
-	if (m_active && ((offset & m_select_mask)==m_select_value))
+	if (m_active && in_dsr_space(offset, true))
 	{
 		bool isrom0 = ((offset & 0xf000)==0x4000);
 		bool isrom12 = ((offset & 0xf000)==0x5000);
@@ -287,16 +287,6 @@ void ti_pcode_card_device::device_start()
 
 void ti_pcode_card_device::device_reset()
 {
-	if (m_genmod)
-	{
-		m_select_mask = 0x1fe000;
-		m_select_value = 0x174000;
-	}
-	else
-	{
-		m_select_mask = 0x7e000;
-		m_select_value = 0x74000;
-	}
 	m_bank_select = 1;
 	m_selected = false;
 	m_clock_count = 0;

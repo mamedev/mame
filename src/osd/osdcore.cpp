@@ -10,7 +10,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#include <stdio.h>
+#include <cstdio>
 #include <shellapi.h>
 #include "strconv.h"
 #endif

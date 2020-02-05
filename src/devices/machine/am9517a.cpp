@@ -1319,4 +1319,5 @@ void eisa_dma_device::device_start()
 	m_address_mask = 0xffffffffU;
 
 	save_item(NAME(m_stop));
+	save_item(NAME(m_ext_mode));
 }

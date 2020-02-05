@@ -14,7 +14,7 @@
 
 ************************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "formats/ds9_dsk.h"
 

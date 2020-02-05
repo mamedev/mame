@@ -98,7 +98,7 @@ const tiny_rom_entry *intv_voice_device::device_rom_region() const
 
 uint16_t intv_voice_device::read_speech(offs_t offset)
 {
-	return 0xff00 | m_speech->spb640_r(offset);
+	return m_speech->spb640_r(offset);
 }
 
 /*-------------------------------------------------
@@ -107,7 +107,7 @@ uint16_t intv_voice_device::read_speech(offs_t offset)
 
 void intv_voice_device::write_speech(offs_t offset, uint16_t data)
 {
-	m_speech->spb640_w(offset, data & 0x00ff);
+	m_speech->spb640_w(offset, data);
 }
 
 

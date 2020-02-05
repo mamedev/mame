@@ -6477,6 +6477,64 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="ucsdpsys">
+		<description>UCSD p-System</description>
+		<year>1982</year>
+		<publisher>IBM</publisher>
+		<!-- software reports version as IV.03 -->
+		<info name="version" value="IV.0 Release 1" />
+		<!-- Origin: BitSavers -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="STARTUP:" />
+			<dataarea name="flop" size = "145805">
+				<rom name="STARTUP.IMD" size="145805" crc="7649f9e8" sha1="f84fe212e83064e574b00e24c412d486d1e89fb0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="SYSTEM2:" />
+			<dataarea name="flop" size = "148360">
+				<rom name="SYSTEM2.IMD" size="148360" crc="917fdc1d" sha1="aa871bc127168c2f17b528811e9bde4a0b75e209"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="SYSTEM4:" />
+			<dataarea name="flop" size = "150404">
+				<rom name="SYSTEM4.IMD" size="150404" crc="84ca430c" sha1="f8886fe4bdd58cb0ea88cfe8bc5d801e2b29ba58"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="UTILITY:" />
+			<dataarea name="flop" size = "124854">
+				<rom name="UTILITY.IMD" size="124854" crc="156f20c1" sha1="47d5f925380295959b16312f3db937607295f8da"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="EXTRAS:" />
+			<dataarea name="flop" size = "157047">
+				<rom name="EXTRAS.IMD" size="157047" crc="8bc772f1" sha1="6f29de1cb08d07944e9a93dd98e749c1d3b5b7ca"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="FORTRAN:" />
+			<dataarea name="flop" size = "112590">
+				<rom name="FORTRAN.IMD" size="112590" crc="192e0a52" sha1="c334ca3c13206dcd4296c90983fa1a67ce5e7654"/>
+			</dataarea>
+		</part>
+		<!-- Origin: z80.eu -->
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="SYSTEM2: (alternate)" />
+			<dataarea name="flop" size = "163840">
+				<rom name="UCSD_IV_3_SYSTEM2.IMA" size="163840" crc="4c6c6da0" sha1="dfa4c31d143bb99ee6bf3b75f64eb65fa9f681a4"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="PASCAL:" />
+			<dataarea name="flop" size = "163840">
+				<rom name="UCSD_IV_3_PASCAL.IMA" size="163840" crc="bdd699ba" sha1="df3392aa561a53148f193d070e84274f087127cf"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wendin">
 		<description>Wendin Multiuser DOS 2.11</description>
 		<year>1987</year>
@@ -6638,7 +6696,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<!-- Listed as clone of 2400ad because not sure if different version -->
-	<software name="2400ad1" cloneof="2400ad" supported="yes">
+	<software name="2400ad1" cloneof="2400ad">
 		<description>2400 A.D. (set 2)</description>
 		<year>1987</year>
 		<publisher>Origin</publisher>
@@ -7201,6 +7259,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="the ancient art of war at sea (alt).img" size="368640" crc="ac538af6" sha1="143b797aa13d71af042fa6f4b21679f25338c633"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apgbonus">
+		<description>Apogee Software Bonus Disk (Jumpman Lives!, Commander Keen in Invasion of the Vorticons)</description>
+		<year>1991</year>
+		<publisher>Apogee Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<!-- modified with a config file -->
+				<rom name="bonus.img" size="368640" crc="854ab346" sha1="1058146ce565871cd6f2cdcbf2758b948b3b9aac" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8800,6 +8870,31 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="intkarat">
+		<description>International Karate</description>
+		<year>1990</year>
+		<publisher>System 3 Software</publisher>
+		<info name="developer" value="System 3 Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="International Karate (Prism Leisure release) [System 3] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="e8b3d837" sha1="a469f0bb4bdd27b7c72366dbc9223d532f9031de"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="italy90">
+		<description>Italy '90 Soccer</description>
+		<year>1989</year>
+		<publisher>Simulmondo</publisher>
+		<info name="developer" value="Dardari Bros." />
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Italy '90 Soccer [Simulmondo] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="7bfdc1e0" sha1="0dbbc892ce27ace5da144ff8c6a9a55a2f295c32"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ironmnso">
 		<description>Ivan "Ironman" Stewart's Super Off Road (5.25")</description>
 		<year>1990</year>
@@ -8826,42 +8921,6 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Super Off Road (16 Blitz release) [Virgin Games] [1992] [3.5DD] [Disk 1 of 1].img" size="737280" crc="fce3d276" sha1="16d90ffc29f5422f5003f71f10e304b8454d3a48"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="italy90">
-		<description>Italy '90 Soccer</description>
-		<year>1989</year>
-		<publisher>Simulmondo</publisher>
-		<info name="developer" value="Dardari Bros." />
-		<info name="usage" value="PC Booter" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Italy '90 Soccer [Simulmondo] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="7bfdc1e0" sha1="0dbbc892ce27ace5da144ff8c6a9a55a2f295c32"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="intkarat">
-		<description>International Karate</description>
-		<year>1990</year>
-		<publisher>System 3 Software</publisher>
-		<info name="developer" value="System 3 Software" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="International Karate (Prism Leisure release) [System 3] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="e8b3d837" sha1="a469f0bb4bdd27b7c72366dbc9223d532f9031de"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="joeblade">
-		<description>Joe Blade (Smash16 release)</description>
-		<year>1992</year>
-		<publisher>Interceptor Software</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Joe Blade (Smash16 release) [Interceptor Software] [1992] [3.5DD] [Disk 1 of 1].img" size="737280" crc="69a11fc6" sha1="4a5265a03087ad94ee23f15de7896c9e1c069b7f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8908,6 +8967,17 @@ has been replaced with an all-zero block. -->
 			<feature name="disk_serial" value="24LB-JFT02" />
 			<dataarea name="flop" size = "737280">
 				<rom name="[PC] Jetfighter I [3.5].img" size="737280" crc="907b4d46" sha1="259a15e7aa6b45aa0328566c86ceffe36c97db24"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="joeblade">
+		<description>Joe Blade (Smash16 release)</description>
+		<year>1992</year>
+		<publisher>Interceptor Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Joe Blade (Smash16 release) [Interceptor Software] [1992] [3.5DD] [Disk 1 of 1].img" size="737280" crc="69a11fc6" sha1="4a5265a03087ad94ee23f15de7896c9e1c069b7f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10020,7 +10090,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<!-- matches dump of 3.5" "International Version" -->
-	<software name="nova9a" cloneof="nova9" supported="yes">
+	<software name="nova9a" cloneof="nova9">
 		<description>Nova 9: The Return of Gir Draxon (version 1.0)</description>
 		<year>1991</year>
 		<publisher>Sierra</publisher>

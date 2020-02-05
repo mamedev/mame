@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#include <assert.h>
+#include <cassert>
 #include "ipf_dsk.h"
 
 const floppy_format_type FLOPPY_IPF_FORMAT = &floppy_image_format_creator<ipf_format>;

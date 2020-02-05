@@ -9,6 +9,7 @@
 ///
 
 #include "pconfig.h"
+#include "ptypes.h"
 
 #include <algorithm>
 #include <cmath>
@@ -328,6 +329,91 @@ namespace plib
 	}
 
 #endif
+
+	/// \brief is argument a power of two?
+	///
+	/// \tparam T type of the argument
+	/// \param  v argument to be checked
+	/// \return true if argument is a power of two
+	///
+	template <typename T>
+	constexpr bool is_pow2(T v) noexcept
+	{
+		static_assert(is_integral<T>::value, "is_pow2 needs integer arguments");
+		return !(v & (v-1));
+	}
+
+	/// \brief return absolute value of signed argument
+	///
+	/// \tparam T type of the argument
+	/// \param  v argument
+	/// \return absolute value of argument
+	///
+	template<typename T>
+	constexpr
+	typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value, T>::type
+	abs(T v) noexcept
+	{
+		return v < 0 ? -v : v;
+	}
+
+	/// \brief return absolute value of unsigned argument
+	///
+	/// \tparam T type of the argument
+	/// \param  v argument
+	/// \return argument since it has no sign
+	///
+	template<typename T>
+	constexpr
+	typename std::enable_if<std::is_integral<T>::value && std::is_unsigned<T>::value, T>::type
+	abs(T v) noexcept
+	{
+		return v;
+	}
+
+	/// \brief return greatest common denominator
+	///
+	/// Function returns the greatest common denominator of m and n. For known
+	/// arguments, this function also works at compile time.
+	///
+	/// \tparam M type of the first argument
+	/// \tparam N type of the second argument
+	/// \param  m first argument
+	/// \param  n first argument
+	/// \return greatest common denominator of m and n
+	///
+	template<typename M, typename N>
+	constexpr typename std::common_type<M, N>::type
+	gcd(M m, N n) noexcept
+	{
+		static_assert(std::is_integral<M>::value, "gcd: M must be an integer");
+		static_assert(std::is_integral<N>::value, "gcd: N must be an integer");
+
+		return m == 0 ? plib::abs(n)
+			 : n == 0 ? plib::abs(m)
+			 : gcd(n, m % n);
+	}
+
+	/// \brief return least common multiple
+	///
+	/// Function returns the least common multiple of m and n. For known
+	/// arguments, this function also works at compile time.
+	///
+	/// \tparam M type of the first argument
+	/// \tparam N type of the second argument
+	/// \param  m first argument
+	/// \param  n first argument
+	/// \return least common multiple of m and n
+	///
+	template<typename M, typename N>
+	constexpr typename std::common_type<M, N>::type
+	lcm(M m, N n) noexcept
+	{
+		static_assert(std::is_integral<M>::value, "lcm: M must be an integer");
+		static_assert(std::is_integral<N>::value, "lcm: N must be an integer");
+
+		return (m != 0 && n != 0) ? (plib::abs(m) / gcd(m, n)) * plib::abs(n) : 0;
+	}
 
 	static_assert(noexcept(constants<double>::one()) == true, "Not evaluated as constexpr");
 

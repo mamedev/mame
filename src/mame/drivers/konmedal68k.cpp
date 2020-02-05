@@ -24,7 +24,9 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
+#include "machine/nvram.h"
 #include "machine/timer.h"
+#include "machine/ticket.h"
 #include "sound/ymz280b.h"
 #include "video/k054156_k054157_k056832.h"
 #include "video/k055555.h"
@@ -204,11 +206,12 @@ uint32_t konmedal68k_state::screen_update_konmedal68k(screen_device &screen, bit
 void konmedal68k_state::kzaurus_main(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
-	map(0x400000, 0x403fff).ram();
+	map(0x400000, 0x403fff).ram().share("nvram");
 	map(0x800000, 0x800001).w(FUNC(konmedal68k_state::control_w));
 	map(0x800004, 0x800005).portr("DSW");
 	map(0x800006, 0x800007).portr("IN1");
 	map(0x800008, 0x800009).portr("IN0");
+	map(0x820000, 0x820001).portw("OUT");
 	map(0x810000, 0x810001).w(FUNC(konmedal68k_state::control2_w));
 	map(0x830000, 0x83003f).rw(m_k056832, FUNC(k056832_device::word_r), FUNC(k056832_device::word_w));
 	map(0x840000, 0x84000f).w(m_k056832, FUNC(k056832_device::b_word_w));
@@ -224,12 +227,13 @@ void konmedal68k_state::kzaurus_main(address_map &map)
 void konmedal68k_state::koropens_main(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
-	map(0x400000, 0x403fff).ram();
+	map(0x400000, 0x403fff).ram().share("nvram");
 	map(0x800000, 0x800001).w(FUNC(konmedal68k_state::control_w));
 	map(0x800004, 0x800005).portr("DSW");
 	map(0x800006, 0x800007).portr("IN1");
 	map(0x800008, 0x800009).portr("IN0");
 	map(0x810000, 0x810001).w(FUNC(konmedal68k_state::control2_w));
+	map(0x820000, 0x820001).portw("OUT");
 	map(0x830000, 0x83003f).rw(m_k056832, FUNC(k056832_device::word_r), FUNC(k056832_device::word_w));
 	map(0x840000, 0x84000f).w(m_k056832, FUNC(k056832_device::b_word_w));
 	map(0x85001c, 0x85001f).nopw();
@@ -249,14 +253,17 @@ static INPUT_PORTS_START( kzaurus )
 	PORT_BIT( 0xff1f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )  // medal ack
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", hopper_device, line_r)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN3 )    // medal
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0xf0ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	PORT_START("OUT")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", hopper_device, motor_w)
+
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x07, 0x00, "Coin Slot 1" )   PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, "Coin Slot 1" )   PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x00, "5 Coins/2 Credits" )
 	PORT_DIPSETTING(    0x01, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_3C ) )
@@ -282,9 +289,9 @@ static INPUT_PORTS_START( kzaurus )
 	PORT_DIPSETTING(    0x68, "3 Medals" )
 	PORT_DIPSETTING(    0x70, "2 Medals" )
 	// PORT_DIPSETTING(    0x78, "2 Medals" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Free_Play ) )   PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 
 	PORT_DIPNAME( 0x0f00, 0x0000, "Standard of Payout" ) PORT_DIPLOCATION("SW2:1,2,3,4")
 	PORT_DIPSETTING(    0x0000, "90%" )
@@ -331,6 +338,8 @@ void konmedal68k_state::kzaurus(machine_config &config)
 	M68000(config, m_maincpu, XTAL(33'868'800)/4);    // 33.8688 MHz crystal verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal68k_state::kzaurus_main);
 	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal68k_state::scanline), "screen", 0, 1);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	HOPPER(config, "hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -433,8 +442,8 @@ ROM_START( kattobas )
 	ROM_LOAD( "841-a02-4f.bin", 0x080000, 0x080000, CRC(685c1c10) SHA1(9884940df8c079e8129fc8d870f90e5b7987e6f4) )
 ROM_END
 
-GAME( 1995, kzaurus, 0, kzaurus, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Pittanko Zaurus", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, koropens, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Korokoro Pensuke", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, kattobas, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Kattobase Power Pro Kun", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, kzaurus, 0, kzaurus, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Pittanko Zaurus", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, koropens, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Korokoro Pensuke", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, kattobas, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Kattobase Power Pro Kun", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, pwrchanc, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Powerful Chance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, ymcapsul, 0, kzaurus, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Yu-Gi-Oh Monster Capsule", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, ymcapsul, 0, kzaurus, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Yu-Gi-Oh Monster Capsule", MACHINE_IMPERFECT_GRAPHICS )

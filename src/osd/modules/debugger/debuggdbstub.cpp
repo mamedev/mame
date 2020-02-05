@@ -587,7 +587,7 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 #endif
 
 		std::string socket_name = string_format("socket.localhost:%d", m_debugger_port);
-		osd_file::error filerr = m_socket.open(socket_name.c_str());
+		osd_file::error filerr = m_socket.open(socket_name);
 		if ( filerr != osd_file::error::NONE )
 			fatalerror("gdbstub: failed to start listening on port %d\n", m_debugger_port);
 		osd_printf_info("gdbstub: listening on port %d\n", m_debugger_port);

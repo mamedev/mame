@@ -69,6 +69,7 @@ Verification still needed for the other PCBs.
 #include "machine/vs9209.h"
 #include "sound/2610intf.h"
 #include "sound/3812intf.h"
+#include "sound/ym2151.h"
 #include "video/vsystem_gga.h"
 #include "screen.h"
 #include "speaker.h"
@@ -202,7 +203,7 @@ void aerofgt_state::spikes91_map(address_map &map)
 	map(0xfff002, 0xfff003).portr("IN1");
 	map(0xfff003, 0xfff003).w(FUNC(aerofgt_state::pspikes_gfxbank_w));
 	map(0xfff004, 0xfff005).portr("DSW").w(FUNC(aerofgt_state::scrolly_w<0>));
-	map(0xfff006, 0xfff007).noprw();
+	map(0xfff007, 0xfff007).r(FUNC(aerofgt_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
 	map(0xfff008, 0xfff009).w(FUNC(aerofgt_state::spikes91_lookup_w));
 }
 
@@ -546,6 +547,15 @@ void aerofgt_state::kickball_sound_portmap(address_map &map)
 	map(0xc0, 0xc0).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
 }
 
+void aerofgt_state::spikes91_sound_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xe001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xe800, 0xe800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	//map(0xf000, 0xf000) // OKI M5205?
+	//map(0xf400, 0xf400) // OKI M5205?
+	map(0xf800, 0xffff).ram();
+}
 
 void aerofgt_state::oki_map(address_map &map)
 { //only for aerfboot for now
@@ -1520,10 +1530,14 @@ void aerofgt_state::spikes91(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_state::spikes91_map);
 	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_state::irq1_line_hold)); /* all irq vectors are the same */
 
-	/* + Z80 for sound */
+	Z80(config, m_audiocpu, 24000000/8); // ?
+	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_state::spikes91_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
+
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1541,12 +1555,12 @@ void aerofgt_state::spikes91(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
-	/* sound hardware */
-	/* the sound hardware is completely different on this:
-	    1x YM2151 (sound)(ic150)
-	    1x OKI M5205 (sound)(ic145)
-	    2x LM324N (sound)(ic152, ic153)
-	*/
+	SPEAKER(config, "mono").front_center();
+
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 24000000/8));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	// TODO: OKI M5205
 }
 
 void aerofgt_state::pspikesb(machine_config &config)
@@ -2374,9 +2388,9 @@ ROM_START( spikes91 )
 	ROM_LOAD16_BYTE( "10.ic104",   0x00000, 0x10000, CRC(769ade77) SHA1(9cb581d02592c69f37d4b5a902d3515f40915ec4) )
 	ROM_LOAD16_BYTE( "9.ic103",    0x00001, 0x10000, CRC(201cb748) SHA1(f78d384e4e9c5996a278f76fb4d5f28812a27de5) )
 
-	ROM_REGION( 0x20000, "cpu1", 0 ) /* Z80 Sound CPU + M5205 Samples */
-	ROM_LOAD( "1.ic140",   0x00000, 0x10000, CRC(e3065b1d) SHA1(c4a3a95ba7f43cdf1b0c574f41de06d007ad2bd8) )
-	ROM_LOAD( "2.ic141",   0x10000, 0x10000, CRC(5dd8bf22) SHA1(d1a12894fe8ca47e47b4a1e911cabf20dd41eda4) )
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 Sound CPU + M5205 Samples */
+	ROM_LOAD( "1.ic140",   0x00000, 0x10000, CRC(e3065b1d) SHA1(c4a3a95ba7f43cdf1b0c574f41de06d007ad2bd8) ) // matches svolleybl in rpunch.cpp
+	ROM_LOAD( "2.ic141",   0x10000, 0x10000, CRC(5dd8bf22) SHA1(d1a12894fe8ca47e47b4a1e911cabf20dd41eda4) ) // 1ST AND 2ND HALF IDENTICAL, matches svolleybl in rpunch.cpp when halved
 
 	ROM_REGION( 0x1000, "user2", 0 ) /* ? */
 	ROM_LOAD( "ep910pc.ic7",   0x00000, 0x884, CRC(e7a3913a) SHA1(6f18f55ecdc94a416baecd16fe7c6698b1ec9d87) )
@@ -2403,9 +2417,9 @@ ROM_START( spikes91b ) // todo, check how this differs, only 1 of the 68k pair a
 	ROM_LOAD16_BYTE( "10.ic104",    0x00000, 0x8000, CRC(b6fe4e57) SHA1(6b62936ff9d0f39fd02c3db488d53bc035c2272d) ) // sldh
 	ROM_LOAD16_BYTE( "9.ic103",     0x00001, 0x8000, CRC(5479ed35) SHA1(ca26289318352901841fcdf26d9b43e797ac39b6) ) // sldh
 
-	ROM_REGION( 0x20000, "cpu1", 0 ) /* Z80 Sound CPU + M5205 Samples */
-	ROM_LOAD( "1.ic140",   0x00000, 0x10000, CRC(e3065b1d) SHA1(c4a3a95ba7f43cdf1b0c574f41de06d007ad2bd8) )
-	ROM_LOAD( "2.ic141",   0x10000, 0x10000, CRC(5dd8bf22) SHA1(d1a12894fe8ca47e47b4a1e911cabf20dd41eda4) )
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 Sound CPU + M5205 Samples */
+	ROM_LOAD( "1.ic140",   0x00000, 0x10000, CRC(e3065b1d) SHA1(c4a3a95ba7f43cdf1b0c574f41de06d007ad2bd8) ) // matches svolleybl in rpunch.cpp
+	ROM_LOAD( "2.ic141",   0x10000, 0x10000, CRC(5dd8bf22) SHA1(d1a12894fe8ca47e47b4a1e911cabf20dd41eda4) ) // 1ST AND 2ND HALF IDENTICAL, matches svolleybl in rpunch.cpp when halved
 
 	ROM_REGION( 0x1000, "user2", 0 ) /* ? */
 	ROM_LOAD( "ep910pc.ic7",   0x00000, 0x884, CRC(e7a3913a) SHA1(6f18f55ecdc94a416baecd16fe7c6698b1ec9d87) )
@@ -3159,8 +3173,8 @@ GAME( 1991, pspikesu,  pspikes,   pspikes,    pspikes,   aerofgt_state, empty_in
 GAME( 1991, svolly91,  pspikes,   pspikes,    pspikes,   aerofgt_state, empty_init,      ROT0,   "Video System Co.",    "Super Volley '91 (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1991, pspikesb,  pspikes,   pspikesb,   pspikesb,  aerofgt_state, empty_init,      ROT0,   "bootleg",             "Power Spikes (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1991, pspikesba, pspikes,   pspikesb,   pspikesb,  aerofgt_state, empty_init,      ROT0,   "bootleg (Playmark?)", "Power Spikes (Italian bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, spikes91,  pspikes,   spikes91,   pspikes,   aerofgt_state, empty_init,      ROT0,   "bootleg",             "1991 Spikes (Italian bootleg, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL )
-GAME( 1991, spikes91b, pspikes,   spikes91,   pspikes,   aerofgt_state, empty_init,      ROT0,   "bootleg",             "1991 Spikes (Italian bootleg, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL )
+GAME( 1991, spikes91,  pspikes,   spikes91,   pspikes,   aerofgt_state, empty_init,      ROT0,   "bootleg",             "1991 Spikes (Italian bootleg, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // OKI M5205 not hooked up yet
+GAME( 1991, spikes91b, pspikes,   spikes91,   pspikes,   aerofgt_state, empty_init,      ROT0,   "bootleg",             "1991 Spikes (Italian bootleg, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // OKI M5205 not hooked up yet
 GAME( 1991, pspikesc,  pspikes,   pspikesc,   pspikesc,  aerofgt_state, empty_init,      ROT0,   "bootleg",             "Power Spikes (China)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, wbbc97,    0,         wbbc97,     wbbc97,    aerofgt_state, empty_init,      ROT0,   "Comad",               "Beach Festival World Championship 1997", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // based on power spikes codebase
 GAME( 1998, kickball,  0,         kickball,   pspikes,   aerofgt_state, init_kickball,   ROT0,   "Seoung Youn",    "Kick Ball", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) // based on power spikes codebase, wrong priorities

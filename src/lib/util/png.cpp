@@ -21,8 +21,8 @@
 #include <cmath>
 #include <new>
 
-#include <math.h>
-#include <stdlib.h>
+#include <cmath>
+#include <cstdlib>
 
 
 

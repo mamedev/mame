@@ -192,7 +192,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void ubc(machine_config &config);
 	void vbrc(machine_config &config);
 	void bv3(machine_config &config);
@@ -556,7 +556,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void card_state::brc_base(machine_config &config)

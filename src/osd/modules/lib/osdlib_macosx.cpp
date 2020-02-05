@@ -8,12 +8,12 @@
 //
 //============================================================
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/sysctl.h>
 #include <sys/types.h>
-#include <signal.h>
+#include <csignal>
 #include <dlfcn.h>
 
 #include <cstdio>

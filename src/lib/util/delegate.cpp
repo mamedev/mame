@@ -8,9 +8,9 @@
 
 ***************************************************************************/
 
-#include <assert.h>
+#include <cassert>
 #include <cstdint>
-#include <stdio.h>
+#include <cstdio>
 #include "delegate.h"
 
 

@@ -30,19 +30,6 @@ namespace plib {
 	[[noreturn]] void passert_fail(const char *assertion,
 		const char *file, int lineno, const char *msg) noexcept;
 
-	/// \brief throw an exception.
-	///
-	/// throws an exception E. The purpose is to clearly identify exception
-	/// throwing in the code
-	///
-	/// \tparam E Type of exception to be thrown
-	///
-	template<typename E, typename... Args>
-	[[noreturn]] static inline void pthrow(Args&&... args) noexcept(false)
-	{
-		throw E(std::forward<Args>(args)...);
-	}
-
 	//============================================================
 	//  exception base
 	//============================================================

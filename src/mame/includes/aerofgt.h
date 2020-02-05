@@ -170,6 +170,7 @@ public:
 	void pspikesc_map(address_map &map);
 	void sound_map(address_map &map);
 	void spikes91_map(address_map &map);
+	void spikes91_sound_map(address_map &map);
 	void spinlbrk_map(address_map &map);
 	void spinlbrk_sound_portmap(address_map &map);
 	void turbofrc_map(address_map &map);

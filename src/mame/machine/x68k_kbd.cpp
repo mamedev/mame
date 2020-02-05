@@ -276,7 +276,7 @@ void x68k_keyboard_device::device_reset()
 	buffered_rs232_device::device_reset();
 
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_rate(38'400); // TODO: Should be 2400 but MC68901 doesn't support divide by 16
+	set_rate(2400);
 	receive_register_reset();
 	transmit_register_reset();
 

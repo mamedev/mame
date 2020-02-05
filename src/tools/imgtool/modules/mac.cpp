@@ -89,11 +89,11 @@
 
 *****************************************************************************/
 
-#include <ctype.h>
-#include <string.h>
-#include <time.h>
-#include <limits.h>
-#include <stddef.h>
+#include <cctype>
+#include <cstring>
+#include <ctime>
+#include <climits>
+#include <cstddef>
 
 #include "formats/imageutl.h"
 #include "imgtool.h"

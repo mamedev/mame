@@ -95,7 +95,7 @@ namespace plib
 #endif
 
 	template<typename T, typename S>
-	T pstonum(const S &arg, const std::locale &loc = std::locale::classic())
+	T pstonum(const S &arg, const std::locale &loc = std::locale::classic()) noexcept(false)
 	{
 		decltype(arg.c_str()) cstr = arg.c_str();
 		std::size_t idx(0);
@@ -106,11 +106,11 @@ namespace plib
 			//&& (ret == T(0) || plib::abs(ret) >= std::numeric_limits<T>::min() ))
 		{
 			if (cstr[idx] != 0)
-				pthrow<pexception>(pstring("Continuation after numeric value ends: ") + pstring(cstr));
+				throw pexception(pstring("Continuation after numeric value ends: ") + pstring(cstr));
 		}
 		else
 		{
-			pthrow<pexception>(pstring("Out of range: ") + pstring(cstr));
+			throw pexception(pstring("Out of range: ") + pstring(cstr));
 		}
 		return static_cast<T>(ret);
 	}

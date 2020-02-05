@@ -273,7 +273,7 @@ namespace plib {
 	#endif
 		}
 		template<typename O>
-		R call(O *obj, Targs... args) const noexcept(true)
+		R call(O *obj, Targs&&... args) const noexcept(true)
 		{
 			using function_ptr = MEMBER_ABI R (*)(O *obj, Targs... args);
 			return (reinterpret_cast<function_ptr>(m_func))(obj, std::forward<Targs>(args)...);
@@ -311,7 +311,7 @@ namespace plib {
 			m_obj = reinterpret_cast<generic_class *>(object);
 		}
 
-		inline R operator()(Targs ... args) const noexcept(true)
+		inline R operator()(Targs... args) const noexcept(true)
 		{
 			return this->call(m_obj, std::forward<Targs>(args)...);
 		}

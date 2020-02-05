@@ -418,12 +418,12 @@ int psxgpu_device::DebugTextureDisplay( bitmap_rgb32 &bitmap )
 void psxgpu_device::updatevisiblearea()
 {
 	rectangle visarea;
-	float refresh;
+	double refresh;
 
 	if( ( n_gpustatus & ( 1 << 0x14 ) ) != 0 )
 	{
 		/* pal */
-		refresh = 50;
+		refresh = 50; // TODO: it's not exactly 50Hz
 		switch( ( n_gpustatus >> 0x13 ) & 1 )
 		{
 		case 0:
@@ -437,13 +437,16 @@ void psxgpu_device::updatevisiblearea()
 	else
 	{
 		/* ntsc */
-		refresh = 60;
+		// refresh rate derived from 53.693175MHz
+		// TODO: emulate display timings at lower level
 		switch( ( n_gpustatus >> 0x13 ) & 1 )
 		{
 		case 0:
+			refresh = 59.8260978565;
 			n_screenheight = 240;
 			break;
 		case 1:
+			refresh = 59.9400523286;
 			n_screenheight = 480;
 			break;
 		}

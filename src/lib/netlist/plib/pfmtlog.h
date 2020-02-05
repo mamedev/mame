@@ -412,7 +412,7 @@ namespace plib {
 	struct perrmsg
 	{
 		template<std::size_t N, typename... Args>
-		explicit perrmsg(const char (&fmt)[N], Args&&... args)
+		explicit perrmsg(const char (&fmt)[N], Args&&... args) // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 		: m_msg(plib::pfmt(fmt)(std::forward<Args>(args)...))
 		{ }
 		operator pstring const & () const noexcept { return m_msg; }

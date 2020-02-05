@@ -18,9 +18,9 @@
 
 // standard sdl header
 #include <SDL2/SDL.h>
-#include <ctype.h>
+#include <cctype>
 // ReSharper disable once CppUnusedIncludeDirective
-#include <stddef.h>
+#include <cstddef>
 #include <mutex>
 #include <memory>
 #include <queue>
@@ -386,6 +386,19 @@ public:
 			keyboard.state[sdlevent.key.keysym.scancode] = 0x80;
 			if (sdlevent.key.keysym.sym < 0x20)
 				machine().ui_input().push_char_event(osd_common_t::s_window_list.front()->target(), sdlevent.key.keysym.sym);
+			else if (keyboard.state[SDL_SCANCODE_LCTRL] == 0x80 || keyboard.state[SDL_SCANCODE_RCTRL] == 0x80)
+			{
+				// SDL filters out control characters for text input, so they are decoded here
+				if (sdlevent.key.keysym.sym >= 0x40 && sdlevent.key.keysym.sym < 0x7f)
+					machine().ui_input().push_char_event(osd_common_t::s_window_list.front()->target(), sdlevent.key.keysym.sym & 0x1f);
+				else if (keyboard.state[SDL_SCANCODE_LSHIFT] == 0x80 || keyboard.state[SDL_SCANCODE_RSHIFT] == 0x80)
+				{
+					if (sdlevent.key.keysym.sym == SDLK_6) // Ctrl-^ (RS)
+						machine().ui_input().push_char_event(osd_common_t::s_window_list.front()->target(), 0x1e);
+					else if (sdlevent.key.keysym.sym == SDLK_MINUS) // Ctrl-_ (US)
+						machine().ui_input().push_char_event(osd_common_t::s_window_list.front()->target(), 0x1f);
+				}
+			}
 			break;
 
 		case SDL_KEYUP:

@@ -91,7 +91,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void nconst(machine_config &config);
 	void nconst36(machine_config &config);
 	void nconst36a(machine_config &config);
@@ -325,7 +325,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void const_state::nconst(machine_config &config)

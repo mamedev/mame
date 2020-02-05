@@ -598,7 +598,7 @@ lc1.bin      [2/4]      1.l4         [4/4]      0.317383%
 lc1.bin      [4/4]      1.l4         [2/4]      0.317383%
 lc2.bin      [even 2/2] 2.k4         [odd 2/2]  0.146484%
 */
-ROM_START( lvcardsa )
+ROM_START( lvcardsa ) // Tehkan 5910A-1 PCB
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.l4", 0x0000, 0x4000, CRC(81a25f70) SHA1(ce8917674b3374e5e138420f062d9b7aba3f6e11) )
 	ROM_LOAD( "2.k4", 0x4000, 0x2000, CRC(d1c72fc2) SHA1(496606e129046d253d716254ef4e58a93ca10aa0) )

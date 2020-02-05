@@ -34,6 +34,7 @@
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
 #include "video/cgapal.h"
+#include "bus/isa/p1_fdc.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -84,6 +85,8 @@ public:
 	void poisk1(machine_config &config);
 
 	void init_poisk1();
+
+	void fdc_config(device_t *device);
 
 protected:
 	virtual void machine_start() override;
@@ -613,6 +616,12 @@ void p1_state::machine_reset()
  * macros
  */
 
+void p1_state::fdc_config(device_t *device)
+{
+	p1_fdc_device &fdc = *downcast<p1_fdc_device*>(device);
+	fdc.set_cpu(m_maincpu);
+}
+
 void p1_state::poisk1_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -673,11 +682,13 @@ void p1_state::poisk1(machine_config &config)
 	m_isabus->irq4_callback().set(m_pic8259, FUNC(pic8259_device::ir4_w));
 	m_isabus->irq5_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
 	m_isabus->irq7_callback().set(m_pic8259, FUNC(pic8259_device::ir7_w));
+	m_isabus->iochrdy_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
-	ISA8_SLOT(config, "isa1", 0, m_isabus, p1_isa8_cards, "fdc", false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", 0, m_isabus, p1_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa3", 0, m_isabus, p1_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa4", 0, m_isabus, p1_isa8_cards, nullptr, false);
+	// FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa1", 0, m_isabus, p1_isa8_cards, "fdc", false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
+	ISA8_SLOT(config, "isa2", 0, m_isabus, p1_isa8_cards, nullptr, false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
+	ISA8_SLOT(config, "isa3", 0, m_isabus, p1_isa8_cards, nullptr, false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
+	ISA8_SLOT(config, "isa4", 0, m_isabus, p1_isa8_cards, nullptr, false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);

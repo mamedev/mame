@@ -1106,5 +1106,5 @@ GAME( 1984, dowild,     0,        dorunrun, dowild,   docastle_state, empty_init
 GAME( 1984, jjack,      0,        dorunrun, jjack,    docastle_state, empty_init, ROT270, "Universal", "Jumping Jack", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, kickridr,   0,        dorunrun, kickridr, docastle_state, empty_init, ROT0,   "Universal", "Kick Rider", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, idsoccer,   0,        idsoccer, idsoccer, docastle_state, empty_init, ROT0,   "Universal", "Indoor Soccer (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1985, idsoccera,  idsoccer, idsoccer, idsoccer, docastle_state, empty_init, ROT0,   "Universal", "Indoor Soccer (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
-GAME( 1987, asoccer,    idsoccer, idsoccer, idsoccer, docastle_state, empty_init, ROT0,   "Universal", "American Soccer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, idsoccera,  idsoccer, idsoccer, idsoccer, docastle_state, empty_init, ROT0,   "Universal", "Indoor Soccer (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1987, asoccer,    idsoccer, idsoccer, idsoccer, docastle_state, empty_init, ROT0,   "Universal", "American Soccer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

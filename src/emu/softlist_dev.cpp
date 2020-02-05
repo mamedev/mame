@@ -15,7 +15,7 @@
 #include "softlist_dev.h"
 #include "validity.h"
 
-#include <ctype.h>
+#include <cctype>
 
 
 //**************************************************************************
@@ -282,7 +282,7 @@ void software_list_device::parse()
 	m_errors.clear();
 
 	// attempt to open the file
-	osd_file::error filerr = m_file.open(m_list_name.c_str(), ".xml");
+	osd_file::error filerr = m_file.open(m_list_name, ".xml");
 	if (filerr == osd_file::error::NONE)
 	{
 		// parse if no error
@@ -489,7 +489,7 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 			}
 
 			// make sure the parent exists
-			const software_info *swinfo2 = find(swinfo.parentname().c_str());
+			const software_info *swinfo2 = find(swinfo.parentname());
 
 			if (swinfo2 == nullptr)
 				osd_printf_error("%s: parent '%s' software for '%s' not found\n", filename(), swinfo.parentname(), shortname);

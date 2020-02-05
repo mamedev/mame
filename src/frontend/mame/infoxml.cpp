@@ -25,7 +25,7 @@
 
 #include "xmlfile.h"
 
-#include <ctype.h>
+#include <cctype>
 #include <cstring>
 #include <unordered_set>
 #include <queue>
@@ -239,8 +239,8 @@ static const char s_dtd_string[] =
 "\t\t\t\t<!ATTLIST slotoption devname CDATA #REQUIRED>\n"
 "\t\t\t\t<!ATTLIST slotoption default (yes|no) \"no\">\n"
 "\t\t<!ELEMENT softwarelist EMPTY>\n"
-"\t\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n"
 "\t\t\t<!ATTLIST softwarelist tag CDATA #REQUIRED>\n"
+"\t\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n"
 "\t\t\t<!ATTLIST softwarelist status (original|compatible) #REQUIRED>\n"
 "\t\t\t<!ATTLIST softwarelist filter CDATA #IMPLIED>\n"
 "\t\t<!ELEMENT ramoption (#PCDATA)>\n"
@@ -1950,8 +1950,8 @@ void output_software_lists(std::ostream &out, device_t &root, const char *root_t
 
 		std::string newtag(swlist.tag()), oldtag(":");
 		newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
-
 		out << util::string_format("\t\t<softwarelist tag=\"%s\" name=\"%s\" status=\"%s\"", normalize_string(newtag.c_str()), normalize_string(swlist.list_name().c_str()), swlist.is_original() ? "original" : "compatible");
+
 		if (swlist.filter())
 			out << util::string_format(" filter=\"%s\"", normalize_string(swlist.filter()));
 		out << "/>\n";

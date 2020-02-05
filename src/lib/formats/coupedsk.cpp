@@ -8,7 +8,7 @@
 
 **************************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "formats/coupedsk.h"
 #include "flopimg.h"

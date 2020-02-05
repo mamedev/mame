@@ -73,7 +73,7 @@ public:
 	// assume that RESET button is tied to CPU RESET pin
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
 
-	// machine drivers
+	// machine configs
 	void debutm(machine_config &config);
 
 protected:

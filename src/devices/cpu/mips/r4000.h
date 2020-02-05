@@ -45,7 +45,7 @@ public:
 	void bus_error() { m_bus_error = true; }
 
 protected:
-	enum cache_size_t
+	enum cache_size
 	{
 		CACHE_4K   = 0,
 		CACHE_8K   = 1,
@@ -56,7 +56,7 @@ protected:
 		CACHE_256K = 6,
 		CACHE_512K = 7,
 	};
-	r4000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 prid, u32 fcr, cache_size_t icache_size, cache_size_t dcache_size);
+	r4000_base_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 prid, u32 fcr, cache_size icache_size, cache_size dcache_size);
 
 	enum cp0_reg : int
 	{
@@ -361,13 +361,13 @@ protected:
 	void cp2_execute(u32 const op);
 
 	// address and memory handling
-	enum translate_t { ERROR, MISS, UNCACHED, CACHED };
-	translate_t translate(int intention, u64 &address);
+	enum translate_result { ERROR, MISS, UNCACHED, CACHED };
+	translate_result translate(int intention, u64 &address);
 	void address_error(int intention, u64 const address);
 
-	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, bool> load(u64 program_address, U &&apply);
+	template <typename T, bool Aligned = true, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, bool> load(u64 program_address, U &&apply);
 	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(u64, T)>>::value, bool> load_linked(u64 program_address, U &&apply);
-	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, T>::value, bool> store(u64 program_address, U data, T mem_mask = ~T(0));
+	template <typename T, bool Aligned = true, typename U> std::enable_if_t<std::is_convertible<U, T>::value, bool> store(u64 program_address, U data, T mem_mask = ~T(0));
 	bool fetch(u64 address, std::function<void(u32)> &&apply);
 
 	// debugging helpers
@@ -387,7 +387,7 @@ protected:
 	u64 m_r[32];
 	u64 m_hi;
 	u64 m_lo;
-	enum branch_state_t : unsigned
+	enum branch_state : unsigned
 	{
 		NONE      = 0,
 		DELAY     = 1, // delay slot instruction active
@@ -402,9 +402,10 @@ protected:
 	u64 m_cp0[32];
 	u64 m_cp0_timer_zero;
 	emu_timer *m_cp0_timer;
+	bool m_hard_reset = true;
 	bool m_ll_active;
 	bool m_bus_error;
-	struct tlb_entry_t
+	struct tlb_entry
 	{
 		u64 mask;
 		u64 vpn;
