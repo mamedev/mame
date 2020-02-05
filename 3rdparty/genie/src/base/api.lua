@@ -838,7 +838,6 @@ end
 				FloatFast = 1,
 				FloatStrict = 1,
 				FullSymbols = 1,
-				GenerateMapFiles = 1,
 				Hotpatchable = 1,
 				LinkSupportCircularDependencies = 1,
 				Managed = 1,
