@@ -725,9 +725,15 @@ READ16_MEMBER(gaelco2_state::srollnd_share_sim_r)
 			// sequence value: 0800 0800 1000 4000 2000
 			// default key:    x    x    c    b    v
 
-			// the 'password' in service mode checks the following (stored after above)
+			// the 'password' in service mode checks the following (stored after above) (anything related to countability or where changing it might clear things)
 			// sequence value: 0800 1000 0400 0800 4000
 			// default key:    x    c    z    x    b
+
+			// 0400 0800 1000 2000 4000  (just a default unused sequence?)
+			// z    x    c    v    b	
+				
+			// 0400 0400 1000 0800 4000  for advanced internal options in service mode
+			// z    z    c    x   b
 		}
 	}
 
