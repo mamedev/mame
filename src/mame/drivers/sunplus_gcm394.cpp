@@ -1497,6 +1497,14 @@ ROM_START( vbaby )
 	ROM_LOAD( "vbaby.bin", 0x0000, 0x8400000, CRC(d904441b) SHA1(3742bc4e1e403f061ce2813ecfafc6f30a44d287) )
 ROM_END
 
+ROM_START( mgtfit )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+
+	ROM_REGION( 0x8400000, "nandrom", ROMREGION_ERASE00 ) // Samsung 937 K9F1G08U0D  Ident: 0xEC 0xF1 Full Ident: 0xECF1001540
+	ROM_LOAD( "k9f1g08u0d.bin", 0x0000, 0x8400000, CRC(1ca5ac09) SHA1(c2e123085d2198999c2c0edb1df4895361c00a99) )
+ROM_END
+
 ROM_START( beambox )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
@@ -1682,13 +1690,13 @@ void generalplus_gpac800_game_state::nand_beambox()
 
 // NAND dumps w/ internal bootstrap (and u'nSP 2.0 extended opcodes)  (have gpnandnand strings)
 // the JAKKS ones seem to be known as 'Generalplus GPAC800' hardware
-CONS(2010, wlsair60, 0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_wlsair60, "Jungle Soft / Kids Station Toys Inc", "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, jak_gtg,  0, 0, generalplus_gpac800, jak_gtg,  generalplus_gpac800_game_state, nand_init210,  "JAKKS Pacific Inc", "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, jak_car2, 0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_init210,  "JAKKS Pacific Inc", "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, jak_tsm , 0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_tsm,      "JAKKS Pacific Inc", "Toy Story Mania (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, beambox,  0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_beambox,  "Hasbro", "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-
-CONS(200?, vbaby,    0, 0, generalplus_gpac800_vbaby, jak_car2, generalplus_gpac800_vbaby_game_state, nand_vbaby,    "VTech", "V.Baby",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2010, wlsair60, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60, "Jungle Soft / Kids Station Toys Inc", "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_gtg,  0, 0, generalplus_gpac800,       jak_gtg,  generalplus_gpac800_game_state,       nand_init210,  "JAKKS Pacific Inc",                   "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_car2, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,  "JAKKS Pacific Inc",                   "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_tsm , 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_tsm,      "JAKKS Pacific Inc",                   "Toy Story Mania (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, beambox,  0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_beambox,  "Hasbro",                              "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, mgtfit,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60, "MGT",                                 "Fitness Konsole (NC1470)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // probably has other names in English too? menus don't appear to be in German
+CONS(200?, vbaby,    0, 0, generalplus_gpac800_vbaby, jak_car2, generalplus_gpac800_vbaby_game_state, nand_vbaby,    "VTech",                               "V.Baby", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 
 ROM_START( bkrankp )
@@ -1748,3 +1756,5 @@ void generalplus_gpspispi_game_state::init_spi()
 
 
 CONS(200?, bkrankp, 0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state , init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+

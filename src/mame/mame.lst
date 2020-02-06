@@ -13813,6 +13813,7 @@ bangj                           // (c) 1999 - Ref ???
 play2000                        // (c) 1999 - Ref ???
 play2000_40i                    // (c) 1999 - Ref ???
 play2000_50i                    // (c) 1999 - Ref ???
+srollnd
 maniacsq                        // (c) 1996 - Ref 940411
 maniacsqa                       // (c) 1996 - Ref 940411
 maniacsqu                       // (c) 1996 - Ref 940411 - (unprotected)
@@ -14509,6 +14510,7 @@ gbpocket                        // Nintendo Game Boy Pocket Handheld
 megaduck                        // Megaduck
 supergb                         // Nintendo Super Game Boy SNES Cartridge
 supergb2                        //
+mducklrn
 
 @source:gba.cpp
 gba                             // Nintendo Game Boy Advance Handheld
@@ -31368,6 +31370,7 @@ fcpocket
 mog_m320
 fapocket
 zdog
+bandgpad
 ts_handy11
 
 @source:vt1682.cpp
@@ -37036,6 +37039,9 @@ sentx6pd
 taikeegr                        //
 shredmjr                        //
 
+@source:spg2xx_smarttv.cpp
+smartvad
+
 @source:spg2xx_telestory.cpp
 telestry                        //
 
@@ -37640,6 +37646,7 @@ jak_car2
 jak_gtg
 jak_tsm
 vbaby
+mgtfit
 beambox
 bkrankp
 
@@ -41169,6 +41176,8 @@ tak_geig                        //
 jarajal                         //
 tcarnavi                        //
 tomcpin
+tomplc
+mrangbat
 ban_onep                        //
 ekara                           //
 ekaraa                          //
