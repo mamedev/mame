@@ -106,9 +106,9 @@ protected:
 
 	inline s32 interpolate(s32 sample1, s32 sample2, u64 accum);
 	inline void apply_filters(es550x_voice *voice, s32 &sample);
-	virtual void update_envelopes(es550x_voice *voice);
-	virtual void check_for_end_forward(es550x_voice *voice, u64 &accum);
-	virtual void check_for_end_reverse(es550x_voice *voice, u64 &accum);
+	virtual void update_envelopes(es550x_voice *voice) = 0;
+	virtual void check_for_end_forward(es550x_voice *voice, u64 &accum) = 0;
+	virtual void check_for_end_reverse(es550x_voice *voice, u64 &accum) = 0;
 	void generate_dummy(es550x_voice *voice, u16 *base, s32 *lbuffer, s32 *rbuffer, int samples);
 	void generate_ulaw(es550x_voice *voice, u16 *base, s32 *lbuffer, s32 *rbuffer, int samples);
 	void generate_pcm(es550x_voice *voice, u16 *base, s32 *lbuffer, s32 *rbuffer, int samples);
