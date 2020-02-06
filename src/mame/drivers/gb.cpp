@@ -859,7 +859,7 @@ I assume it that means it has (undumped) internal ROM.
 
 */
 
-ROM_START(mducklrn)
+ROM_START(mduckspa)
 	ROM_REGION(0x80000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("megaduck.bin", 0x0000, 0x80000,  CRC(debd33fd) SHA1(fbf86dffa82f6e469da46623541f6f58f6c8a0d8) )
 
@@ -870,16 +870,16 @@ ROM_END
 
 
 /*   YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT    STATE           INIT        COMPANY     FULLNAME */
-CONS(1990, gameboy,  0,       0,       gameboy,  gameboy, gb_state,       empty_init, "Nintendo", "Game Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-CONS(1994, supergb,  gameboy, 0,       supergb,  gameboy, gb_state,       empty_init, "Nintendo", "Super Game Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+CONS(1990, gameboy,  0,       0,       gameboy,  gameboy, gb_state,       empty_init, "Nintendo", "Game Boy",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+CONS(1994, supergb,  gameboy, 0,       supergb,  gameboy, gb_state,       empty_init, "Nintendo", "Super Game Boy",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
 CONS(1998, supergb2, gameboy, 0,       supergb2, gameboy, gb_state,       empty_init, "Nintendo", "Super Game Boy 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-CONS(1996, gbpocket, gameboy, 0,       gbpocket, gameboy, gb_state,       empty_init, "Nintendo", "Game Boy Pocket", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-CONS(1998, gbcolor,  0,       0,       gbcolor,  gameboy, gb_state,       empty_init, "Nintendo", "Game Boy Color", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+CONS(1996, gbpocket, gameboy, 0,       gbpocket, gameboy, gb_state,       empty_init, "Nintendo", "Game Boy Pocket",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+CONS(1998, gbcolor,  0,       0,       gbcolor,  gameboy, gb_state,       empty_init, "Nintendo", "Game Boy Color",   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
 // Sound is not 100% yet, it generates some sounds which could be ok. Since we're lacking a real system there's no way to verify.
 CONS(1993, megaduck, 0,       0,       megaduck, gameboy, megaduck_state, empty_init, "Welback Holdings (Timlex International) / Creatronic / Videojet / Cougar USA", "Mega Duck / Cougar Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-CONS(199?, mducklrn, 0,       0,       megaduck, gameboy, megaduck_state, empty_init, "Hartung", "Mega Duck Lerncomputer (Germany)", MACHINE_NOT_WORKING ) // versions for other regions exist too
+CONS(199?, mduckspa, 0,       0,       megaduck, gameboy, megaduck_state, empty_init, "Cefa Toys", "Super Quique / Mega Duck (Spain)", MACHINE_NOT_WORKING ) // versions for other regions exist too
 
 
 // http://blog.gg8.se/wordpress/2012/11/11/gameboy-clone-game-fighter-teardown/
