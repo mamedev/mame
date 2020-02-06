@@ -347,6 +347,14 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw , 0xf);
 	}
 
 	template<>
+	BX_SIMD_FORCE_INLINE simd128_langext_t simd_cmpneq(simd128_langext_t _a, simd128_langext_t _b)
+	{
+		simd128_langext_t result;
+		result.vi = _a.vf != _b.vf;
+		return result;
+	}
+
+	template<>
 	BX_SIMD_FORCE_INLINE simd128_langext_t simd_cmplt(simd128_langext_t _a, simd128_langext_t _b)
 	{
 		simd128_langext_t result;

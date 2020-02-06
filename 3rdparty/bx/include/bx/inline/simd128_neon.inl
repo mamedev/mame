@@ -9,23 +9,15 @@
 
 namespace bx
 {
+
 #if BX_COMPILER_CLANG
-
-#define SHUFFLE_A(_a,  _i0, _i1, _i2, _i3)	\
-__builtin_shufflevector(_a, _a, _i0, _i1, _i2, _i3 )
-#define SHUFFLE_AB(_a, _b, _i0, _i1, _i2, _i3)	\
-__builtin_shufflevector(_a, _b, _i0, _i1, _i2, _i3 )
-	
+#	define SHUFFLE_A(_a,  _i0, _i1, _i2, _i3)     __builtin_shufflevector(_a, _a, _i0, _i1, _i2, _i3 )
+#	define SHUFFLE_AB(_a, _b, _i0, _i1, _i2, _i3) __builtin_shufflevector(_a, _b, _i0, _i1, _i2, _i3 )
 #else
-
-#define SHUFFLE_A(_a,  _i0, _i1, _i2, _i3)	\
-__builtin_shuffle(_a, (uint32x4_t){ _i0, _i1, _i2, _i3 })
-#define SHUFFLE_AB(_a, _b, _i0, _i1, _i2, _i3)	\
-__builtin_shuffle(_a, _b, (uint32x4_t){ _i0, _i1, _i2, _i3 })
-
+#	define SHUFFLE_A(_a,  _i0, _i1, _i2, _i3)     __builtin_shuffle(_a, (uint32x4_t){ _i0, _i1, _i2, _i3 })
+#	define SHUFFLE_AB(_a, _b, _i0, _i1, _i2, _i3) __builtin_shuffle(_a, _b, (uint32x4_t){ _i0, _i1, _i2, _i3 })
 #endif
 
-	
 #define ELEMx 0
 #define ELEMy 1
 #define ELEMz 2
@@ -292,10 +284,16 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 	}
 
 	template<>
+	BX_SIMD_FORCE_INLINE simd128_neon_t simd_cmpneq(simd128_neon_t _a, simd128_neon_t _b)
+	{
+		return simd_cmpneq_ni(_a, _b);
+	}
+
+	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_cmplt(simd128_neon_t _a, simd128_neon_t _b)
 	{
-		const uint32x4_t tmp    = vcltq_f32(_a, _b);
-		const simd128_neon_t   result = vreinterpretq_f32_u32(tmp);
+		const uint32x4_t tmp        = vcltq_f32(_a, _b);
+		const simd128_neon_t result = vreinterpretq_f32_u32(tmp);
 
 		return result;
 	}
@@ -303,8 +301,8 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_cmple(simd128_neon_t _a, simd128_neon_t _b)
 	{
-		const uint32x4_t tmp    = vcleq_f32(_a, _b);
-		const simd128_neon_t   result = vreinterpretq_f32_u32(tmp);
+		const uint32x4_t tmp        = vcleq_f32(_a, _b);
+		const simd128_neon_t result = vreinterpretq_f32_u32(tmp);
 
 		return result;
 	}
@@ -312,8 +310,8 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_cmpgt(simd128_neon_t _a, simd128_neon_t _b)
 	{
-		const uint32x4_t tmp    = vcgtq_f32(_a, _b);
-		const simd128_neon_t   result = vreinterpretq_f32_u32(tmp);
+		const uint32x4_t tmp        = vcgtq_f32(_a, _b);
+		const simd128_neon_t result = vreinterpretq_f32_u32(tmp);
 
 		return result;
 	}
@@ -321,8 +319,8 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_cmpge(simd128_neon_t _a, simd128_neon_t _b)
 	{
-		const uint32x4_t tmp    = vcgeq_f32(_a, _b);
-		const simd128_neon_t   result = vreinterpretq_f32_u32(tmp);
+		const uint32x4_t tmp        = vcgeq_f32(_a, _b);
+		const simd128_neon_t result = vreinterpretq_f32_u32(tmp);
 
 		return result;
 	}

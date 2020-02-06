@@ -309,6 +309,12 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw , 0xf);
 	}
 
 	template<>
+	BX_SIMD_FORCE_INLINE simd128_sse_t simd_cmpneq(simd128_sse_t _a, simd128_sse_t _b)
+	{
+		return _mm_cmpneq_ps(_a, _b);
+	}
+
+	template<>
 	BX_SIMD_FORCE_INLINE simd128_sse_t simd_cmplt(simd128_sse_t _a, simd128_sse_t _b)
 	{
 		return _mm_cmplt_ps(_a, _b);

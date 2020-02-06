@@ -125,6 +125,15 @@ namespace bx
 	}
 
 	template<typename Ty>
+	BX_SIMD_INLINE Ty simd_cmpneq_ni(Ty _a, Ty _b)
+	{
+		const Ty tmp0   = simd_cmpeq(_a, _b);
+		const Ty result = simd_not(tmp0);
+
+		return result;
+	}
+
+	template<typename Ty>
 	BX_SIMD_INLINE Ty simd_min_ni(Ty _a, Ty _b)
 	{
 		const Ty mask   = simd_cmplt(_a, _b);
