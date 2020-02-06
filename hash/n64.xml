@@ -6426,7 +6426,7 @@ This cart features a RTC, currently unemulated
 		<description>Madden NFL 99 (USA, prototype 19980805, "Beta 10 NTSC")</description>
 		<year>1998</year>
 		<publisher>Electronic Arts</publisher>
-´		<part name="cart" interface="n64_cart">
+		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="madden-99-n64-proto.bin" size="16777216" crc="e7f33cc8" sha1="4f38e57f5f6d0a0406b074d9b5473c3fe99a0f32" />
 			</dataarea>
