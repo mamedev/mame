@@ -197,6 +197,9 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw);
 	Ty simd_cmpeq(Ty _a, Ty _b);
 
 	template<typename Ty>
+	Ty simd_cmpneq(Ty _a, Ty _b);
+
+	template<typename Ty>
 	Ty simd_cmplt(Ty _a, Ty _b);
 
 	template<typename Ty>

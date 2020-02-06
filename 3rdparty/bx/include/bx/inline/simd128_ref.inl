@@ -397,6 +397,17 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw , 0xf);
 	}
 
 	template<>
+	BX_SIMD_FORCE_INLINE simd128_ref_t simd_cmpneq(simd128_ref_t _a, simd128_ref_t _b)
+	{
+		simd128_ref_t result;
+		result.ixyzw[0] = _a.fxyzw[0] != _b.fxyzw[0] ? 0xffffffff : 0x0;
+		result.ixyzw[1] = _a.fxyzw[1] != _b.fxyzw[1] ? 0xffffffff : 0x0;
+		result.ixyzw[2] = _a.fxyzw[2] != _b.fxyzw[2] ? 0xffffffff : 0x0;
+		result.ixyzw[3] = _a.fxyzw[3] != _b.fxyzw[3] ? 0xffffffff : 0x0;
+		return result;
+	}
+
+	template<>
 	BX_SIMD_FORCE_INLINE simd128_ref_t simd_cmplt(simd128_ref_t _a, simd128_ref_t _b)
 	{
 		simd128_ref_t result;
