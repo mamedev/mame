@@ -73,7 +73,7 @@ static INPUT_PORTS_START( smarttv )
 	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )  // important
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
@@ -249,4 +249,4 @@ ROM_END
 
 
 // Toyquest games
-CONS( 2005, smartvad,  0,        0, smarttv, smarttv,   smarttv_state, empty_init, "WinFun / KidConnection", "SmarTV Adventures / Funtastic TV Adventures",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, smartvad,  0,        0, smarttv, smarttv,   smarttv_state, empty_init, "WinFun / KidConnection", "",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
