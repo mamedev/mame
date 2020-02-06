@@ -14509,6 +14509,7 @@ gbpocket                        // Nintendo Game Boy Pocket Handheld
 megaduck                        // Megaduck
 supergb                         // Nintendo Super Game Boy SNES Cartridge
 supergb2                        //
+mducklrn
 
 @source:gba.cpp
 gba                             // Nintendo Game Boy Advance Handheld
