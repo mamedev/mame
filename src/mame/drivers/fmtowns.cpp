@@ -2067,7 +2067,6 @@ void towns_state::cdda_db_to_gain(float db)
 		return;
 	if(db > 0)
 		gain = 0;
-	logerror("port %d gain %f db %f\n", port, gain, db);
 	m_cdda->set_output_gain(port, gain);
 }
 
