@@ -708,6 +708,9 @@ READ16_MEMBER(gaelco2_state::srollnd_share_sim_r)
 	if (m_maincpu->pc() == 0x0035a6)
 		ret = 0x0000;
 
+	if (m_maincpu->pc() == 0x00857e) // after restoring default values (write back to nvram)
+		ret = 0x0000;
+	
 
 	// reads a bunch of data (game specific? backup ram? default backup ram?) from device (0x180 words - copied to start of RAM)
 	if (m_maincpu->pc() == 0x83da)
@@ -716,7 +719,15 @@ READ16_MEMBER(gaelco2_state::srollnd_share_sim_r)
 
 		if (offset == 0x274 / 2)
 		{
-			ret = 0x3112; // checked after copy, otherwise you get password? prompt
+			//	ret = 0x3112; // checked after copy, otherwise you get password? prompt
+
+			// the 'password' for bootup (reset to default values) is stored at 13454 in ROM
+			// sequence value: 0800 0800 1000 4000 2000
+			// default key:    x    x    c    b    v
+
+			// the 'password' in service mode checks the following (stored after above)
+			// sequence value: 0800 1000 0400 0800 4000
+			// default key:    x    c    z    x    b
 		}
 	}
 
