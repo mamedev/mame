@@ -1872,6 +1872,17 @@
 		</part>
 	</software>
 
+	<software name="dandare">
+		<description>Dan Dare - Pilot of the Future</description>
+		<year>1988</year>
+		<publisher>Ricochet</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="510098">
+				<rom name="dan dare pilot of the future.tap" size="510098" crc="3b41a86e" sha1="9684ce0c9c5d45ef4425364527382adf5a80bd41"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dandare2">
 		<description>Dan Dare II - Mekon's Revenge</description>
 		<year>19??</year>
