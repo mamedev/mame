@@ -526,7 +526,7 @@ uint8_t saturn_state::stv_read_gouraud_table( void )
 {
 	int gaddr;
 
-	if ( (stv2_current_sprite.CMDPMOD & 0x7) == 4 )
+	if ( (stv2_current_sprite.CMDPMOD & 0x4) == 4 )
 	{
 		gaddr = stv2_current_sprite.CMDGRDA * 8;
 		stv_gouraud_shading.GA = (m_vdp1_vram[gaddr/4] >> 16) & 0xffff;
