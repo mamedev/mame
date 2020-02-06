@@ -37036,6 +37036,9 @@ sentx6pd
 taikeegr                        //
 shredmjr                        //
 
+@source:spg2xx_smarttv.cpp
+smartvad
+
 @source:spg2xx_telestory.cpp
 telestry                        //
 
@@ -41169,6 +41172,7 @@ tak_geig                        //
 jarajal                         //
 tcarnavi                        //
 tomcpin
+tomplc
 mrangbat
 ban_onep                        //
 ekara                           //

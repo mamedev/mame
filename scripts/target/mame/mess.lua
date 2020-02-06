@@ -3812,6 +3812,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/spg2xx_pdc.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx_dreamlife.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx_lexibook.cpp",
+	MAME_DIR .. "src/mame/drivers/spg2xx_smarttv.cpp",
 	MAME_DIR .. "src/mame/includes/spg2xx.h",
 	MAME_DIR .. "src/mame/drivers/sunplus_gcm394.cpp",
 	MAME_DIR .. "src/mame/drivers/generalplus_gpl32612.cpp",
