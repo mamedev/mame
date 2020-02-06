@@ -2061,12 +2061,13 @@ READ8_MEMBER(towns_state::towns_volume_r)
 
 void towns_state::cdda_db_to_gain(float db)
 {
-	float gain = powf(10, db / 20);
+	float gain = powf(10, db / 20.0f);
 	int port = m_towns_volume_select & 3;
 	if(port > 1)
 		return;
-	if(db == -1)
+	if(db > 0)
 		gain = 0;
+	logerror("port %d gain %f db %f\n", port, gain, db);
 	m_cdda->set_output_gain(port, gain);
 }
 
@@ -2075,15 +2076,15 @@ WRITE8_MEMBER(towns_state::towns_volume_w)
 	switch(offset)
 	{
 	case 2:
+		m_towns_volume[m_towns_volume_select & 3] = data;
 		if(!(m_towns_volume_select & 4) || (m_towns_volume_select & 0x18))
 			return;
-		m_towns_volume[m_towns_volume_select & 3] = data;
-		cdda_db_to_gain(~(data & 0x3f) * -0.5f);
+		cdda_db_to_gain((~data & 0x3f) * -0.5f);
 		break;
 	case 3:  // select channel
 		m_towns_volume_select = data;
 		if(!(data & 4))
-			cdda_db_to_gain(-1);
+			cdda_db_to_gain(1);
 		else if(data & 8)
 			cdda_db_to_gain(0);
 		else if(data & 0x10)
