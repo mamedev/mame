@@ -10,7 +10,7 @@
 
 	    <part name="hdd" interface="scsi_hdd">
 	        <diskarea name="harddriv">
-	            <disk name="winnt31" sha1="5d556b4df2dccdc681095fedcf836a5b0a7782a0" writeable="yes" />
+	            <disk name="jazz_winnt31" sha1="5d556b4df2dccdc681095fedcf836a5b0a7782a0" writeable="yes" />
 	        </diskarea>
 	    </part>
 	</software>
@@ -23,7 +23,7 @@
 
 		<part name="hdd" interface="scsi_hdd">
 			<diskarea name="harddriv">
-				<disk name="winnt35" sha1="d0377ef1a150abc164a9cdac3eaccb204c5af040" writeable="yes" />
+				<disk name="jazz_winnt35" sha1="d0377ef1a150abc164a9cdac3eaccb204c5af040" writeable="yes" />
 			</diskarea>
 		</part>
 	</software>
@@ -35,7 +35,7 @@
 
 		<part name="hdd" interface="scsi_hdd">
 			<diskarea name="harddriv">
-				<disk name="winnt351" sha1="b60bea66e2187cc2406778a26fc9ca4b661ff71f" writeable="yes" />
+				<disk name="jazz_winnt351" sha1="b60bea66e2187cc2406778a26fc9ca4b661ff71f" writeable="yes" />
 			</diskarea>
 		</part>
 	</software>
@@ -47,7 +47,7 @@
 
 		<part name="hdd" interface="scsi_hdd">
 			<diskarea name="harddriv">
-				<disk name="winnt4sp1" sha1="a988e57e021174f859e972c50786656e408fb18a" writeable="yes" />
+				<disk name="jazz_winnt4sp1" sha1="a988e57e021174f859e972c50786656e408fb18a" writeable="yes" />
 			</diskarea>
 		</part>
 	</software>
