@@ -861,7 +861,7 @@ I assume it that means it has (undumped) internal ROM.
 
 ROM_START(mduckspa)
 	ROM_REGION(0x80000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("megaduck.bin", 0x0000, 0x80000,  CRC(debd33fd) SHA1(fbf86dffa82f6e469da46623541f6f58f6c8a0d8) )
+	ROM_LOAD("megaducksp.bin", 0x0000, 0x80000,  CRC(debd33fd) SHA1(fbf86dffa82f6e469da46623541f6f58f6c8a0d8) )
 
 	ROM_REGION(0x10000, "81x00", ROMREGION_ERASEFF) // unknown size / capacity
 	ROM_LOAD("81x00.bin", 0x0000, 0x10000, NO_DUMP )
