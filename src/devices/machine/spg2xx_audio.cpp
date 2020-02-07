@@ -37,7 +37,7 @@ DEFINE_DEVICE_TYPE(SUNPLUS_GCM394_AUDIO, sunplus_gcm394_audio_device, "gcm394_au
 #define LOG_ALL             (LOG_SPU_READS | LOG_SPU_WRITES | LOG_UNKNOWN_SPU | LOG_CHANNEL_READS | LOG_CHANNEL_WRITES \
 							| LOG_ENVELOPES | LOG_SAMPLES | LOG_RAMPDOWN | LOG_BEAT)
 
-#define VERBOSE             (LOG_ALL & ~(LOG_SAMPLES | LOG_ENVELOPES))
+#define VERBOSE             (0)
 #include "logmacro.h"
 
 #define SPG_DEBUG_AUDIO     (0)
