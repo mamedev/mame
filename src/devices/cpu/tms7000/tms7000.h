@@ -103,8 +103,8 @@ protected:
 
 	address_space_config m_program_config;
 
-	devcb_read8 m_port_in_cb[5];
-	devcb_write8 m_port_out_cb[5];
+	devcb_read8::array<5> m_port_in_cb;
+	devcb_write8::array<5> m_port_out_cb;
 
 	uint32_t m_info_flags;
 

@@ -107,8 +107,8 @@ protected:
 	required_device<address_map_bank_device> m_type1space;
 	address_space *m_space;
 
-	devcb_write_line    m_irq_cb[7];
-	devcb_write32       m_buserr;
+	devcb_write_line::array<7> m_irq_cb;
+	devcb_write32 m_buserr;
 
 	device_sbus_card_interface *m_device_list[3];
 

@@ -145,9 +145,9 @@ private:
 	address_space *m_program;
 	address_space *m_data;
 	address_space *m_io;
-	devcb_read8 m_port_input_cb[8];
-	devcb_write8 m_port_output_cb[8];
-	devcb_read8 m_analog_cb[8];
+	devcb_read8::array<8> m_port_input_cb;
+	devcb_write8::array<8> m_port_output_cb;
+	devcb_read8::array<8> m_analog_cb;
 	devcb_read8 m_spi2_data_input_cb;
 	devcb_write8 m_spi2_data_output_cb;
 	int m_icount;

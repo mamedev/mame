@@ -54,9 +54,9 @@ mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, device_t
 		: internal_ram_size > 512 ? 10
 		: internal_ram_size > 256 ? 9 : 8, 0, address_map_constructor(FUNC(mc68hc11_cpu_device::ram_map), this))
 	, m_io_config("I/O", ENDIANNESS_BIG, 8, reg_block_size > 128 ? 8 : reg_block_size > 64 ? 7 : 6, 0, reg_map)
-	, m_port_input_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_port_output_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_analog_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_port_input_cb(*this)
+	, m_port_output_cb(*this)
+	, m_analog_cb(*this)
 	, m_spi2_data_input_cb(*this)
 	, m_spi2_data_output_cb(*this)
 	, m_internal_ram_size(internal_ram_size)
@@ -111,12 +111,9 @@ device_memory_interface::space_config_vector mc68hc11_cpu_device::memory_space_c
 
 void mc68hc11_cpu_device::device_resolve_objects()
 {
-	for (auto &cb : m_port_input_cb)
-		cb.resolve_safe(0xff);
-	for (auto &cb : m_port_output_cb)
-		cb.resolve_safe();
-	for (auto &cb : m_analog_cb)
-		cb.resolve_safe(0);
+	m_port_input_cb.resolve_all_safe(0xff);
+	m_port_output_cb.resolve_all_safe();
+	m_analog_cb.resolve_all_safe(0);
 	m_spi2_data_input_cb.resolve_safe(0xff);
 	m_spi2_data_output_cb.resolve_safe();
 }
