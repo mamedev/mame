@@ -38,6 +38,8 @@ public:
 	void non_spg_base(machine_config &config);
 	void abltenni(machine_config &config);
 	void tvsprt10(machine_config &config);
+	void guitarfv(machine_config &config);
+
 
 	void init_crc();
 	void init_wiwi18();
