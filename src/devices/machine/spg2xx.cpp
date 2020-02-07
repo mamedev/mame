@@ -126,6 +126,11 @@ WRITE_LINE_MEMBER(spg2xx_device::audioirq_w)
 	set_state_unsynced(UNSP_IRQ4_LINE, state);
 }
 
+WRITE_LINE_MEMBER(spg2xx_device::audiochirq_w)
+{
+	set_state_unsynced(UNSP_FIQ_LINE, state);
+}
+
 WRITE_LINE_MEMBER(spg2xx_device::extirq_w)
 {
 	set_state_unsynced(UNSP_IRQ5_LINE, state);
@@ -176,6 +181,7 @@ void spg24x_device::device_add_mconfig(machine_config &config)
 {
 	SPG2XX_AUDIO(config, m_spg_audio, DERIVED_CLOCK(1, 1));
 	m_spg_audio->write_irq_callback().set(FUNC(spg24x_device::audioirq_w));
+	m_spg_audio->channel_irq_callback().set(FUNC(spg24x_device::audiochirq_w));
 	m_spg_audio->space_read_callback().set(FUNC(spg24x_device::space_r));
 
 	m_spg_audio->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
@@ -196,6 +202,7 @@ void spg28x_device::device_add_mconfig(machine_config &config)
 {
 	SPG2XX_AUDIO(config, m_spg_audio, DERIVED_CLOCK(1, 1));
 	m_spg_audio->write_irq_callback().set(FUNC(spg28x_device::audioirq_w));
+	m_spg_audio->channel_irq_callback().set(FUNC(spg28x_device::audiochirq_w));
 	m_spg_audio->space_read_callback().set(FUNC(spg28x_device::space_r));
 
 	m_spg_audio->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);

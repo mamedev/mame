@@ -458,7 +458,7 @@ inline void unsp_device::execute_fxxx_110_group(uint16_t op)
 	// MULS    1 1 1 1*  r r r 1*  1 0*s s   s r r r    (1* = sign bit, 1* = sign bit 0* = upper size bit)
 
 	// MULS ss with upper size bit not set
-	unimplemented_opcode(op);
+	//unimplemented_opcode(op);
 	//return;
 }
 
@@ -472,7 +472,7 @@ inline void unsp_device::execute_fxxx_111_group(uint16_t op)
 	// MULS    1 1 1 1*  r r r 1*  1 1*s s   s r r r    (1* = sign bit, 1* = sign bit 1* = upper size bit)
 
 	// MULS ss with upper size bit set.
-	unimplemented_opcode(op);
+	//unimplemented_opcode(op);
 	//return;
 }
 
