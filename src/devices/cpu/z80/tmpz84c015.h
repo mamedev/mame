@@ -151,7 +151,7 @@ private:
 	devcb_write_line m_out_rxdrqb_cb;
 	devcb_write_line m_out_txdrqb_cb;
 
-	devcb_write_line m_zc_cb[4];
+	devcb_write_line::array<4> m_zc_cb;
 
 	devcb_read8 m_in_pa_cb;
 	devcb_write8 m_out_pa_cb;
