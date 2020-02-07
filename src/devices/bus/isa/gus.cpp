@@ -592,7 +592,7 @@ READ8_MEMBER(gf1_device::global_reg_data_r)
 			return m_voice[m_current_voice].vol_ramp_ctrl;
 	case 0x8e:  // Active voices (6 bits, high 2 bits are always 1)
 		if(offset == 1)
-			return m_active_voices | 0xc0;
+			return (m_active_voices - 1) | 0xc0;
 	case 0x8f:  // IRQ source register
 		if(offset == 1)
 		{
@@ -738,15 +738,15 @@ WRITE8_MEMBER(gf1_device::global_reg_data_w)
 	case 0x0e:  // Active voices (6 bits, high 2 bits are always 1)
 		if(offset == 1)
 		{
-			m_active_voices = data & 0x3f;
-			if((data & 0x3f) < 14)
+			m_active_voices = (data & 0x3f) + 1;
+			if(m_active_voices < 14)
 				m_active_voices = 14;
-			if((data & 0x3f) > 32)
+			if(m_active_voices > 32)
 				m_active_voices = 32;
 			m_stream->set_sample_rate(rate_table[m_active_voices]);
 			m_voltimer->adjust(attotime::zero,0,attotime::from_usec(1000/(1.6*m_active_voices)));
 		}
-		logerror("GUS: Active Voices write %02x (%i Hz)\n", data, rate_table[m_active_voices]);
+		logerror("GUS: Active Voices write %02x (%d voices at %u Hz)\n", data, m_active_voices, rate_table[m_active_voices]);
 		break;
 	case 0x41:
 /* bit 0 - Enable the DMA channel.
@@ -826,7 +826,7 @@ WRITE8_MEMBER(gf1_device::global_reg_data_w)
 		{
 			m_timer1_count = data;
 			m_timer1_value = data;
-			logerror("GUS: Timer 1 count write %02x\n",data);
+			logerror("GUS: Timer 1 count write %02x (%d usec)\n",data,data*80);
 		}
 		break;
 	case 0x47:  // Timer 2 count
@@ -834,7 +834,7 @@ WRITE8_MEMBER(gf1_device::global_reg_data_w)
 		{
 			m_timer2_count = data;
 			m_timer2_value = data;
-			logerror("GUS: Timer 2 count write %02x\n",data);
+			logerror("GUS: Timer 2 count write %02x (%d usec)\n",data,data*320);
 		}
 		break;
 	case 0x48:  // Sampling Frequency - 9878400/(16*(FREQ+2))

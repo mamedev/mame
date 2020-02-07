@@ -66,10 +66,10 @@ static const int m_cmd_fifo_length[256] =
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 6x */
 	-1, -1, -1, -1,  3,  3,  3,  3, -1, -1, -1, -1, -1,  1, -1,  1, /* 7x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 8x */
-	1,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 9x */
+	1,  1,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 9x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* Ax */
-		4, -1, -1, -1, -1, -1,  4, -1,  4, -1, -1,  -1, -1, -1,  4, -1, /* Bx */
-		4, -1, -1, -1, -1, -1,  4, -1,  4, -1, -1,  -1, -1, -1,  4, -1, /* Cx */
+		4, -1,  4, -1,  4, -1,  4, -1,  4, -1, -1,  -1, -1, -1,  4, -1, /* Bx */
+		4, -1,  4, -1,  4, -1,  4, -1,  4, -1, -1,  -1, -1, -1,  4, -1, /* Cx */
 		1,  1, -1,  1, -1,  1,  1, -1,  1,  1,  1,  -1, -1, -1, -1, -1, /* Dx */
 		2,  1,  2,  1,  2, -1, -1, -1,  1, -1, -1,  -1, -1, -1, -1, -1, /* Ex */
 	-1, -1,  1, -1, -1, -1, -1, -1,  1, -1, -1, -1,  1, -1, -1, -1  /* Fx */
@@ -331,6 +331,7 @@ void sb_device::process_fifo(uint8_t cmd)
 				break;
 
 			case 0x14:  // 8-bit DMA, no autoinit
+			case 0x91:  // 8-bit DMA, no autoinit, high speed. XXX only on DSP 3.xx
 				m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
 //                printf("Start DMA (not autoinit, size = %x)\n", m_dsp.dma_length);
 				m_dsp.dma_transferred = 0;
@@ -578,8 +579,12 @@ void sb_device::process_fifo(uint8_t cmd)
 							m_dsp.dma_autoinit = 0;
 							break;
 						case 0xb0:
+						case 0xb2:
+						case 0xb4:
 						case 0xb6:
 						case 0xc0:
+						case 0xc2:
+						case 0xc4:
 						case 0xc6:
 							mode = m_dsp.fifo[1];
 							m_dsp.flags = 0;

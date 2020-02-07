@@ -65,17 +65,20 @@
 #include "cpu/nec/nec.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 #include "screen.h"
 #include "emupal.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 //#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
 #define LOG_KEYBOARD  (1U <<  1)
 #define LOG_DEBUG     (1U <<  2)
 
-#define VERBOSE (LOG_DEBUG)
+//#define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
 
@@ -103,6 +106,7 @@ public:
 		, m_isabus(*this, "isa")
 		, m_pic8259(*this, "pic8259")
 		, m_pit8254(*this, "pit8254")
+		, m_dac(*this, "dac")
 		, m_screen(*this, "screen")
 		, m_p_videoram(*this, "video")
 		, m_p_chargen(*this, "gfx1")
@@ -133,6 +137,7 @@ protected:
 	required_device<isa8_device> m_isabus;
 	required_device<pic8259_device> m_pic8259;
 	required_device<pit8254_device> m_pit8254;
+	required_device<dac_8bit_r2r_device> m_dac;
 	required_device<screen_device> m_screen;
 
 private:
@@ -287,6 +292,8 @@ void hp95lx_state::machine_reset()
 	m_kbit = 0;
 	m_scancode = 0;
 	m_kbdflag = 0;
+
+	m_dac->write(0x7f);
 }
 
 
@@ -356,6 +363,7 @@ WRITE8_MEMBER(hp95lx_state::e300_w)
 		break;
 
 	case 5: // DAC out (per snd.c)
+		m_dac->write(data);
 		break;
 
 	case 9: // b1 = 'a2d power' (per snd.c)
@@ -745,6 +753,13 @@ void hp95lx_state::hp95lx(machine_config &config)
 
 	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // RAM
 	NVRAM(config, "nvram3", nvram_device::DEFAULT_ALL_0); // card slot
+
+	SPEAKER(config, "speaker").front_center();
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 
 	// XXX When the AC adapter is plugged in, the LCD refresh rate is 73.14 Hz.
 	// XXX When the AC adapter is not plugged in (ie, running off of batteries) the refresh rate is 56.8 Hz.
