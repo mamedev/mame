@@ -31300,6 +31300,10 @@ nes                             // Nintendo Entertainment System
 nespal                          // Nintendo Entertainment System PAL
 
 @source:nes_boot.cpp
+bandgpad
+ts_handy11
+
+@source:nes_sh6578.cpp
 pjoypj001
 
 @source:nes_vt.cpp
@@ -31370,8 +31374,6 @@ fcpocket
 mog_m320
 fapocket
 zdog
-bandgpad
-ts_handy11
 
 @source:vt1682.cpp
 ii8in1
