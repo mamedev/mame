@@ -135,6 +135,6 @@ CONS( 1997, bandgpad,  0,  0,  nes_sh6578,    nes_sh6578, nes_sh6578_state, init
 // possibly newer than 2001
 CONS( 2001, ts_handy11,  0,  0,  nes_sh6578,    nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Techno Source", "Handy Boy 11-in-1 (TV Play Power)", MACHINE_NOT_WORKING )
 
-// might fit here
 CONS( 2004, afbm7800,  0,  0,  nes_sh6578,    nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Atari", "Atari Flashback Mini 7800", MACHINE_NOT_WORKING )
+
 CONS( 200?, cpatrolm,  0,  0,  nes_sh6578,    nes_sh6578, nes_sh6578_state, init_nes_sh6578, "<unknown>", "City Patrolman", MACHINE_NOT_WORKING )
