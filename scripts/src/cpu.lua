@@ -3118,7 +3118,7 @@ if (CPUS["M88000"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
--- Motorola XAVIX2
+-- XAVIX2
 --@src/devices/cpu/xavix2/xavix2.h,CPUS["XAVIX2"] = true
 --------------------------------------------------
 
