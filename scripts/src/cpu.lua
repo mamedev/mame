@@ -3116,3 +3116,20 @@ if (CPUS["M88000"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m88000/m88000d.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m88000/m88000d.h")
 end
+
+--------------------------------------------------
+-- Motorola XAVIX2
+--@src/devices/cpu/xavix2/xavix2.h,CPUS["XAVIX2"] = true
+--------------------------------------------------
+
+if (CPUS["XAVIX2"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/xavix2/xavix2.cpp",
+		MAME_DIR .. "src/devices/cpu/xavix2/xavix2.h",
+	}
+end
+
+if (CPUS["XAVIX2"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/xavix2/xavix2d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/xavix2/xavix2d.h")
+end

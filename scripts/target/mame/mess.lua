@@ -155,6 +155,7 @@ CPUS["WE32000"] = true
 CPUS["RX01"] = true
 CPUS["GTRON"] = true
 CPUS["M88000"] = true
+CPUS["XAVIX2"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
