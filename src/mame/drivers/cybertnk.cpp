@@ -4,7 +4,7 @@
 
 Cyber Tank HW (c) 1987/1988 Coreland Technology
 
-preliminary driver by Angelo Salese & David Haywood
+driver by Angelo Salese & David Haywood
 
 Maybe it has some correlation with WEC Le Mans HW? (supposedly that was originally done by Coreland too)
 
