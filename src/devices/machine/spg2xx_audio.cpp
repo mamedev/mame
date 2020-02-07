@@ -1099,12 +1099,23 @@ inline void spg2xx_audio_device::loop_channel(const uint32_t channel)
 
 void spg2xx_audio_device::audio_beat_tick()
 {
+	if (m_audio_curr_beat_base_count > 0)
+	{
+		m_audio_curr_beat_base_count--;
+	}
+
 	if (m_audio_curr_beat_base_count == 0)
 	{
 		LOGMASKED(LOG_BEAT, "Beat base count elapsed, reloading with %d\n", m_audio_ctrl_regs[AUDIO_BEAT_BASE_COUNT]);
 		m_audio_curr_beat_base_count = m_audio_ctrl_regs[AUDIO_BEAT_BASE_COUNT];
 
 		uint16_t beat_count = m_audio_ctrl_regs[AUDIO_BEAT_COUNT] & AUDIO_BEAT_COUNT_MASK;
+		if (beat_count > 0)
+		{
+			beat_count--;
+			m_audio_ctrl_regs[AUDIO_BEAT_COUNT] = (m_audio_ctrl_regs[AUDIO_BEAT_COUNT] & ~AUDIO_BEAT_COUNT_MASK) | beat_count;
+		}
+
 		if (beat_count == 0)
 		{
 			if (m_audio_ctrl_regs[AUDIO_BEAT_COUNT] & AUDIO_BIE_MASK)
@@ -1118,13 +1129,7 @@ void spg2xx_audio_device::audio_beat_tick()
 				LOGMASKED(LOG_BEAT, "Beat count elapsed but IRQ not enabled\n");
 			}
 		}
-		else
-		{
-			beat_count--;
-			m_audio_ctrl_regs[AUDIO_BEAT_COUNT] = (m_audio_ctrl_regs[AUDIO_BEAT_COUNT] & ~AUDIO_BEAT_COUNT_MASK) | beat_count;
-		}
 	}
-	m_audio_curr_beat_base_count--;
 }
 
 void spg2xx_audio_device::audio_rampdown_tick(const uint32_t channel)

@@ -86,7 +86,7 @@ sbus_device::sbus_device(const machine_config &mconfig, device_type type, const 
 	, m_space_config("SBus Space", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor())
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_type1space(*this, finder_base::DUMMY_TAG)
-	, m_irq_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_irq_cb(*this)
 	, m_buserr(*this)
 {
 }
@@ -94,8 +94,7 @@ sbus_device::sbus_device(const machine_config &mconfig, device_type type, const 
 void sbus_device::device_resolve_objects()
 {
 	// resolve callbacks
-	for (int i = 0; i < 7; i++)
-		m_irq_cb[i].resolve_safe();
+	m_irq_cb.resolve_all_safe();
 	m_buserr.resolve_safe();
 }
 

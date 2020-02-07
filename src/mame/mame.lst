@@ -10282,6 +10282,10 @@ cit101                          // (c) 1980 C. Itoh
 cit220p                         // (c) 1984 C. Itoh
 vp122                           //
 
+@source:cit1500.cpp
+teletup                         //
+trmavia                         //
+
 @source:citycon.cpp
 citycon                         // (c) 1985 Jaleco
 citycona                        // (c) 1985 Jaleco
@@ -14510,7 +14514,7 @@ gbpocket                        // Nintendo Game Boy Pocket Handheld
 megaduck                        // Megaduck
 supergb                         // Nintendo Super Game Boy SNES Cartridge
 supergb2                        //
-mducklrn
+mduckspa                        // Mega Duck / Super Quique (Spain)
 
 @source:gba.cpp
 gba                             // Nintendo Game Boy Advance Handheld

@@ -222,10 +222,10 @@ protected:
 	const address_space_config m_program_config;
 	const address_space_config m_data_config;
 
-	devcb_write_line m_porta_out[6];
-	devcb_write_line m_portb_out[3];
-	devcb_write_line m_portc_out[4];
-	devcb_write_line m_portd_out[7];
+	devcb_write_line::array<6> m_porta_out;
+	devcb_write_line::array<3> m_portb_out;
+	devcb_write_line::array<4> m_portc_out;
+	devcb_write_line::array<7> m_portd_out;
 
 	uint8_t m_port_dir[4];
 	uint8_t m_port_option[4];
