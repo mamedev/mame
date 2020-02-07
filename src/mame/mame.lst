@@ -31302,6 +31302,8 @@ nespal                          // Nintendo Entertainment System PAL
 @source:nes_boot.cpp
 bandgpad
 ts_handy11
+afbm7800
+cpatrolm
 
 @source:nes_sh6578.cpp
 pjoypj001
