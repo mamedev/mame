@@ -48,6 +48,7 @@ protected:
 
 	const format *formats;
 
+	virtual const wd177x_format::format &get_track_format(const format &f, int head, int track);
 	virtual floppy_image_format_t::desc_e* get_desc_fm(const format &f, int &current_size, int &end_gap_index);
 	virtual floppy_image_format_t::desc_e* get_desc_mfm(const format &f, int &current_size, int &end_gap_index);
 	virtual int find_size(io_generic *io, uint32_t form_factor);
