@@ -13,9 +13,9 @@
 DEFINE_DEVICE_TYPE(KR2376_ST,  kr2376_st_device,  "kr2376_st",  "SMC KR2376-ST Keyboard Encoder")
 //DEFINE_DEVICE_TYPE(KR2376_12,  kr2376_12_device,  "kr2376_12",  "SMC KR2376-12 Keyboard Encoder")
 
-kr2376_device::kr2376_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-	m_read_x{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
+kr2376_device::kr2376_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	m_read_x(*this),
 	m_read_shift(*this),
 	m_read_control(*this),
 	m_write_strobe(*this)
@@ -24,7 +24,9 @@ kr2376_device::kr2376_device(const machine_config &mconfig, device_type type, co
 
 kr2376_st_device::kr2376_st_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: kr2376_device(mconfig, KR2376_ST, tag, owner, clock)
-{}
+{
+}
+
 uint8_t kr2376_st_device::key_codes(int mode, int x, int y)
 {
 	static const uint8_t KEY_CODES[3][8][11] =
@@ -140,10 +142,7 @@ uint8_t kr2376_st_device::key_codes(int mode, int x, int y)
 void kr2376_device::device_start()
 {
 	/* resolve callbacks */
-	for (int i = 0; i < 8; i++)
-	{
-		m_read_x[i].resolve_safe(0x7ff);
-	}
+	m_read_x.resolve_all_safe(0x7ff);
 	m_read_shift.resolve_safe(0);
 	m_read_control.resolve_safe(0);
 	m_write_strobe.resolve_safe();

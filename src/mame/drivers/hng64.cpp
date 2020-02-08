@@ -1863,14 +1863,13 @@ DEFINE_DEVICE_TYPE(HNG64_LAMPS, hng64_lamps_device, "hng64_lamps", "HNG64 Lamps"
 
 hng64_lamps_device::hng64_lamps_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HNG64_LAMPS, tag, owner, clock)
-	, m_lamps_out_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_lamps_out_cb(*this)
 {
 }
 
 void hng64_lamps_device::device_start()
 {
-	for (auto &cb : m_lamps_out_cb)
-		cb.resolve_safe();
+	m_lamps_out_cb.resolve_all_safe();
 }
 
 WRITE8_MEMBER(hng64_state::hng64_drive_lamps7_w)

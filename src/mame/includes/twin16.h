@@ -106,7 +106,7 @@ protected:
 
 	int set_sprite_timer();
 	void spriteram_process();
-	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap );
+	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	int spriteram_process_enable();
 	void twin16_postload();
 };

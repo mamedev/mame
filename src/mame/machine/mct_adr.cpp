@@ -46,8 +46,8 @@ mct_adr_device::mct_adr_device(const machine_config &mconfig, const char *tag, d
 	, m_out_int_device(*this)
 	, m_out_int_timer(*this)
 	, m_eisa_iack(*this)
-	, m_dma_r{ *this, *this, *this, *this }
-	, m_dma_w{ *this, *this, *this, *this }
+	, m_dma_r(*this)
+	, m_dma_w(*this)
 {
 }
 
@@ -145,11 +145,8 @@ void mct_adr_device::device_start()
 	m_out_int_timer.resolve();
 	m_eisa_iack.resolve();
 
-	for (int i = 0; i < 4; i++)
-	{
-		m_dma_r[i].resolve_safe(0xff);
-		m_dma_w[i].resolve_safe();
-	}
+	m_dma_r.resolve_all_safe(0xff);
+	m_dma_w.resolve_all_safe();
 
 	m_ioc_maint = 0;
 	m_ioc_physical_tag = 0;

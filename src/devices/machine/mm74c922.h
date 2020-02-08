@@ -73,11 +73,11 @@ private:
 	void clock_scan_counters();
 	void detect_keypress();
 
-	devcb_write_line   m_write_da;
-	devcb_read8        m_read_x[4];
+	devcb_write_line m_write_da;
+	devcb_read8::array<4> m_read_x;
 
-	double              m_cap_osc;
-	double              m_cap_debounce;
+	double m_cap_osc;
+	double m_cap_debounce;
 
 	const int m_max_y;
 

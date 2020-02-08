@@ -181,9 +181,9 @@ namco_06xx_device::namco_06xx_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, NAMCO_06XX, tag, owner, clock)
 	, m_control(0)
 	, m_nmicpu(*this, finder_base::DUMMY_TAG)
-	, m_read{ { *this }, { *this }, { *this }, { *this } }
-	, m_readreq{ { *this }, { *this }, { *this }, { *this } }
-	, m_write{ { *this }, { *this }, { *this }, { *this } }
+	, m_read(*this)
+	, m_readreq(*this)
+	, m_write(*this)
 {
 }
 
@@ -193,14 +193,9 @@ namco_06xx_device::namco_06xx_device(const machine_config &mconfig, const char *
 
 void namco_06xx_device::device_start()
 {
-	for (devcb_read8 &cb : m_read)
-		cb.resolve_safe(0xff);
-
-	for (devcb_write_line &cb : m_readreq)
-		cb.resolve_safe();
-
-	for (devcb_write8 &cb : m_write)
-		cb.resolve_safe();
+	m_read.resolve_all_safe(0xff);
+	m_readreq.resolve_all_safe();
+	m_write.resolve_all_safe();
 
 	/* allocate a timer */
 	m_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namco_06xx_device::nmi_generate),this));

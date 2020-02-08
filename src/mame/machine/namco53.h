@@ -31,9 +31,9 @@ protected:
 private:
 	// internal state
 	required_device<mb88_cpu_device> m_cpu;
-	uint8_t           m_portO;
+	uint8_t        m_portO;
 	devcb_read8    m_k;
-	devcb_read8    m_in[4];
+	devcb_read8::array<4> m_in;
 	devcb_write8   m_p;
 	emu_timer *m_irq_cleared_timer;
 

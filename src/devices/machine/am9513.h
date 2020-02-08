@@ -129,7 +129,7 @@ private:
 	void fout_tick();
 
 	// output callbacks
-	devcb_write_line m_out_cb[5];
+	devcb_write_line::array<5> m_out_cb;
 	devcb_write_line m_fout_cb;
 
 	const bool m_is_am9513a;

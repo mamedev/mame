@@ -3,7 +3,7 @@
 /****************************************************************************
     Time Attacker
 
-    driver by Tomasz Slanina analog[at]op.pl
+    driver by Tomasz Slanina
     improvements by Angelo Salese
 
     Z80A,

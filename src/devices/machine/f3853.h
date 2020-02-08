@@ -138,8 +138,8 @@ protected:
 
 	virtual void device_resolve_objects() override;
 
-	devcb_read8 m_read_port[2];
-	devcb_write8 m_write_port[2];
+	devcb_read8::array<2> m_read_port;
+	devcb_write8::array<2> m_write_port;
 };
 
 class f3856_device : public f3851_device

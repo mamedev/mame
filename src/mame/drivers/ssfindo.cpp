@@ -9,7 +9,7 @@
  Tetris Fighters [Sego Entertainment 2001]
 
  driver by
-  Tomasz Slanina  analog[at]op.pl
+  Tomasz Slanina
 
 TODO:
  - Correct IOMD type (CL-PS7500 -> ARM7500FE?)

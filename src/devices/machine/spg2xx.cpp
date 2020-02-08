@@ -33,7 +33,7 @@ spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, co
 	, m_porta_in(*this)
 	, m_portb_in(*this)
 	, m_portc_in(*this)
-	, m_adc_in{{*this}, {*this}}
+	, m_adc_in(*this)
 	, m_i2c_w(*this)
 	, m_i2c_r(*this)
 	, m_uart_tx(*this)
@@ -77,8 +77,7 @@ void spg2xx_device::device_start()
 	m_porta_in.resolve_safe(0);
 	m_portb_in.resolve_safe(0);
 	m_portc_in.resolve_safe(0);
-	m_adc_in[0].resolve_safe(0x0fff);
-	m_adc_in[1].resolve_safe(0x0fff);
+	m_adc_in.resolve_all_safe(0x0fff);
 	m_i2c_w.resolve_safe();
 	m_i2c_r.resolve_safe(0);
 	m_uart_tx.resolve_safe();
@@ -125,6 +124,11 @@ WRITE_LINE_MEMBER(spg2xx_device::uartirq_w)
 WRITE_LINE_MEMBER(spg2xx_device::audioirq_w)
 {
 	set_state_unsynced(UNSP_IRQ4_LINE, state);
+}
+
+WRITE_LINE_MEMBER(spg2xx_device::audiochirq_w)
+{
+	set_state_unsynced(UNSP_FIQ_LINE, state);
 }
 
 WRITE_LINE_MEMBER(spg2xx_device::extirq_w)
@@ -177,6 +181,7 @@ void spg24x_device::device_add_mconfig(machine_config &config)
 {
 	SPG2XX_AUDIO(config, m_spg_audio, DERIVED_CLOCK(1, 1));
 	m_spg_audio->write_irq_callback().set(FUNC(spg24x_device::audioirq_w));
+	m_spg_audio->channel_irq_callback().set(FUNC(spg24x_device::audiochirq_w));
 	m_spg_audio->space_read_callback().set(FUNC(spg24x_device::space_r));
 
 	m_spg_audio->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
@@ -197,6 +202,7 @@ void spg28x_device::device_add_mconfig(machine_config &config)
 {
 	SPG2XX_AUDIO(config, m_spg_audio, DERIVED_CLOCK(1, 1));
 	m_spg_audio->write_irq_callback().set(FUNC(spg28x_device::audioirq_w));
+	m_spg_audio->channel_irq_callback().set(FUNC(spg28x_device::audiochirq_w));
 	m_spg_audio->space_read_callback().set(FUNC(spg28x_device::space_r));
 
 	m_spg_audio->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);

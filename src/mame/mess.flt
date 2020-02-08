@@ -157,6 +157,7 @@ chessmate.cpp
 chessmst.cpp
 cit101.cpp
 cit220.cpp
+cit1500.cpp
 cking_master.cpp
 clcd.cpp
 clickstart.cpp
@@ -584,6 +585,7 @@ nds.cpp
 neogeocd.cpp
 nes.cpp
 nes_boot.cpp
+nes_sh6578.cpp
 nes_vt.cpp
 newbrain.cpp
 next.cpp
@@ -652,6 +654,7 @@ pcw16.cpp
 pda600.cpp
 pdp1.cpp
 pdp11.cpp
+pdt3100.cpp
 pecom.cpp
 pegasus.cpp
 pencil2.cpp
@@ -750,6 +753,8 @@ saitek_cp2000.cpp
 saitek_delta1.cpp
 saitek_mark5.cpp
 saitek_risc2500.cpp
+spg2xx_mysprtch.cpp
+spg2xx_smarttv.cpp
 saitek_ssystem3.cpp
 saitek_stratos.cpp
 saitek_superstar.cpp
@@ -990,6 +995,7 @@ wangpc.cpp
 wicat.cpp
 wrinkles.cpp
 wswan.cpp
+wxstar4000.cpp
 wy100.cpp
 wy150.cpp
 wy30p.cpp

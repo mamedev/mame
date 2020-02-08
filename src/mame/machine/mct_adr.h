@@ -66,8 +66,8 @@ private:
 	devcb_write_line m_out_int_timer;
 	devcb_read32 m_eisa_iack;
 
-	devcb_read8 m_dma_r[4];
-	devcb_write8 m_dma_w[4];
+	devcb_read8::array<4> m_dma_r;
+	devcb_write8::array<4> m_dma_w;
 	bool m_drq_active[4];
 
 	emu_timer *m_irq_check;

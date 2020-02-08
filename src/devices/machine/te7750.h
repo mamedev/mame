@@ -62,8 +62,8 @@ private:
 	void set_ios();
 
 	// input/output callbacks
-	devcb_read8         m_input_cb[9];
-	devcb_write8        m_output_cb[9];
+	devcb_read8::array<9> m_input_cb;
+	devcb_write8::array<9> m_output_cb;
 
 	// mode callback
 	devcb_read8         m_ios_cb;

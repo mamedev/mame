@@ -177,15 +177,7 @@ tms9914_device::tms9914_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig , TMS9914 , tag , owner , clock),
 	  m_dio_read_func(*this),
 	  m_dio_write_func(*this),
-	  m_signal_wr_fns{
-		  devcb_write_line(*this),
-		  devcb_write_line(*this),
-		  devcb_write_line(*this),
-		  devcb_write_line(*this),
-		  devcb_write_line(*this),
-		  devcb_write_line(*this),
-		  devcb_write_line(*this),
-		  devcb_write_line(*this) },
+	  m_signal_wr_fns(*this),
 	  m_int_write_func(*this),
 	  m_accrq_write_func(*this)
 {
@@ -481,9 +473,7 @@ void tms9914_device::device_start()
 
 	m_dio_read_func.resolve_safe(0xff);
 	m_dio_write_func.resolve_safe();
-	for (auto& f : m_signal_wr_fns) {
-		f.resolve_safe();
-	}
+	m_signal_wr_fns.resolve_all_safe();
 	m_int_write_func.resolve_safe();
 	m_accrq_write_func.resolve_safe();
 

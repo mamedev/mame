@@ -10,7 +10,7 @@
     or at least not per-channel)
 
     SPG110 Beat interrupt frequency might be different too, seems to
-    trigger an FIQ, but music is very slow in jak_spdmo
+    trigger an IRQ, but music is very slow in jak_spdmo
 
     GCM394 has 32 channels, and potentially a different register layout
     it looks close but might be different enough to split off
@@ -48,6 +48,7 @@ spg2xx_audio_device::spg2xx_audio_device(const machine_config &mconfig, device_t
 	, device_sound_interface(mconfig, *this)
 	, m_space_read_cb(*this)
 	, m_irq_cb(*this)
+	, m_ch_irq_cb(*this)
 {
 }
 
@@ -65,7 +66,6 @@ sunplus_gcm394_audio_device::sunplus_gcm394_audio_device(const machine_config &m
 	: spg2xx_audio_device(mconfig, SUNPLUS_GCM394_AUDIO, tag, owner, clock)
 {
 }
-
 
 void spg2xx_audio_device::device_start()
 {
@@ -99,10 +99,14 @@ void spg2xx_audio_device::device_start()
 	{
 		save_item(NAME(m_adpcm[i].m_signal), i);
 		save_item(NAME(m_adpcm[i].m_step), i);
+
+		m_channel_irq[i] = timer_alloc(TIMER_IRQ + i);
+		m_channel_irq[i]->adjust(attotime::never);
 	}
 
 	m_space_read_cb.resolve_safe(0);
 	m_irq_cb.resolve();
+	m_ch_irq_cb.resolve();
 }
 
 void spg2xx_audio_device::device_reset()
@@ -128,11 +132,27 @@ void spg2xx_audio_device::device_reset()
 	m_audio_ctrl_regs[AUDIO_CHANNEL_ENV_MODE] = 0x3f;
 
 	m_audio_beat->adjust(attotime::from_ticks(4, 281250), 0, attotime::from_ticks(4, 281250));
+
+	for (int i = 0; i < 16; i++)
+	{
+		m_channel_irq[i]->adjust(attotime::never);
+	}
 }
 
 
 void spg2xx_audio_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
+	if (id >= TIMER_IRQ && id < (TIMER_IRQ + 16))
+	{
+		const uint32_t bit = id - TIMER_IRQ;
+		if (!BIT(m_audio_ctrl_regs[AUDIO_CHANNEL_FIQ_STATUS], bit))
+		{
+			m_audio_ctrl_regs[AUDIO_CHANNEL_FIQ_STATUS] |= (1 << (id - TIMER_IRQ));
+			m_ch_irq_cb(1);
+		}
+		return;
+	}
+
 	switch (id)
 	{
 	case TIMER_BEAT:
@@ -437,8 +457,17 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 			{
 				if (!(m_audio_ctrl_regs[AUDIO_CHANNEL_STATUS] & mask))
 				{
-					LOGMASKED(LOG_SPU_WRITES, "Enabling channel %d\n", channel_bit);
+					LOGMASKED(LOG_SPU_WRITES, "Enabling channel %d, rate %f\n", channel_bit, m_channel_rate[channel_bit]);
 					m_audio_ctrl_regs[offset] |= mask;
+					if (BIT(m_audio_ctrl_regs[AUDIO_CHANNEL_FIQ_ENABLE], channel_bit))
+					{
+						m_channel_irq[channel_bit]->adjust(attotime::from_hz(m_channel_rate[channel_bit]), 0, attotime::from_hz(m_channel_rate[channel_bit]));
+					}
+					else
+					{
+						m_channel_irq[channel_bit]->adjust(attotime::never);
+					}
+
 					if (!(m_audio_ctrl_regs[AUDIO_CHANNEL_STOP] & mask))
 					{
 						LOGMASKED(LOG_SPU_WRITES, "Stop not set, starting playback on channel %d, mask %04x\n", channel_bit, mask);
@@ -476,7 +505,12 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 
 	case AUDIO_CHANNEL_FIQ_STATUS:
 		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Channel FIQ Acknowledge: %04x\n", data);
+		//machine().debug_break();
 		m_audio_ctrl_regs[offset] &= ~(data & AUDIO_CHANNEL_FIQ_STATUS_MASK);
+		if (!m_audio_ctrl_regs[offset])
+		{
+			m_ch_irq_cb(0);
+		}
 		break;
 
 	case AUDIO_BEAT_BASE_COUNT:
@@ -601,11 +635,13 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 
 	case AUDIO_WAVE_IN_L:
 		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Wave In (L) / FIFO Write Data: %04x\n", data);
+		m_stream->update();
 		m_audio_ctrl_regs[offset] = data;
 		break;
 
 	case AUDIO_WAVE_IN_R:
 		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Wave In (R) / Software Channel FIFO IRQ Control: %04x\n", data);
+		m_stream->update();
 		m_audio_ctrl_regs[offset] = data;
 		break;
 
@@ -882,25 +918,38 @@ void spg2xx_audio_device::sound_stream_update(sound_stream &stream, stream_sampl
 				const uint16_t mask = (1 << channel);
 				if (m_audio_ctrl_regs[AUDIO_ENV_RAMP_DOWN] & mask)
 				{
+					if (m_rampdown_frame[channel] > 0)
+					{
+						m_rampdown_frame[channel]--;
+					}
+
 					if (m_rampdown_frame[channel] == 0)
 					{
 						LOGMASKED(LOG_RAMPDOWN, "Ticking rampdown for channel %d\n", channel);
 						audio_rampdown_tick(channel);
 					}
-					m_rampdown_frame[channel]--;
 				}
 				else if (!(m_audio_ctrl_regs[AUDIO_CHANNEL_ENV_MODE] & mask))
 				{
+					if (m_envclk_frame[channel] > 0)
+					{
+						m_envclk_frame[channel]--;
+					}
+
 					if (m_envclk_frame[channel] == 0)
 					{
 						LOGMASKED(LOG_ENVELOPES, "Ticking envelope for channel %d\n", channel);
 						audio_envelope_tick(channel);
 						m_envclk_frame[channel] = get_envclk_frame_count(channel);
 					}
-					m_envclk_frame[channel]--;
 				}
 			}
 		}
+
+		if (m_audio_ctrl_regs[AUDIO_WAVE_IN_L])
+			left_total += (int32_t)(m_audio_ctrl_regs[AUDIO_WAVE_IN_L] - 0x8000);
+		if (m_audio_ctrl_regs[AUDIO_WAVE_IN_R])
+			right_total += (int32_t)(m_audio_ctrl_regs[AUDIO_WAVE_IN_R] - 0x8000);
 
 		switch (get_vol_sel())
 		{
@@ -915,19 +964,23 @@ void spg2xx_audio_device::sound_stream_update(sound_stream &stream, stream_sampl
 				right_total >>= 2;
 				break;
 		}
-		*out_l++ = (left_total * (int16_t)m_audio_ctrl_regs[AUDIO_MAIN_VOLUME]) >> 7;
-		*out_r++ = (right_total * (int16_t)m_audio_ctrl_regs[AUDIO_MAIN_VOLUME]) >> 7;
+
+		int32_t left_final = (int16_t)((left_total * (int16_t)m_audio_ctrl_regs[AUDIO_MAIN_VOLUME]) >> 7);
+		int32_t right_final = (int16_t)((right_total * (int16_t)m_audio_ctrl_regs[AUDIO_MAIN_VOLUME]) >> 7);
+
+		*out_l++ = (int16_t)left_final;
+		*out_r++ = (int16_t)right_final;
 	}
 }
 
 inline void spg2xx_audio_device::stop_channel(const uint32_t channel)
 {
-	// TODO: IRQs
 	m_audio_ctrl_regs[AUDIO_CHANNEL_ENABLE] &= ~(1 << channel);
 	m_audio_ctrl_regs[AUDIO_CHANNEL_STATUS] &= ~(1 << channel);
 	m_audio_regs[(channel << 4) | AUDIO_MODE] &= ~AUDIO_ADPCM_MASK;
 	m_audio_ctrl_regs[AUDIO_CHANNEL_TONE_RELEASE] &= ~(1 << channel);
 	m_audio_ctrl_regs[AUDIO_ENV_RAMP_DOWN] &= ~(1 << channel);
+	m_channel_irq[channel]->adjust(attotime::never);
 }
 
 bool spg2xx_audio_device::advance_channel(const uint32_t channel)
@@ -1099,12 +1152,24 @@ inline void spg2xx_audio_device::loop_channel(const uint32_t channel)
 
 void spg2xx_audio_device::audio_beat_tick()
 {
+	if (m_audio_curr_beat_base_count > 0)
+	{
+		m_audio_curr_beat_base_count--;
+	}
+
 	if (m_audio_curr_beat_base_count == 0)
 	{
 		LOGMASKED(LOG_BEAT, "Beat base count elapsed, reloading with %d\n", m_audio_ctrl_regs[AUDIO_BEAT_BASE_COUNT]);
 		m_audio_curr_beat_base_count = m_audio_ctrl_regs[AUDIO_BEAT_BASE_COUNT];
 
 		uint16_t beat_count = m_audio_ctrl_regs[AUDIO_BEAT_COUNT] & AUDIO_BEAT_COUNT_MASK;
+
+		if (beat_count > 0)
+		{
+			beat_count--;
+			m_audio_ctrl_regs[AUDIO_BEAT_COUNT] = (m_audio_ctrl_regs[AUDIO_BEAT_COUNT] & ~AUDIO_BEAT_COUNT_MASK) | beat_count;
+		}
+
 		if (beat_count == 0)
 		{
 			if (m_audio_ctrl_regs[AUDIO_BEAT_COUNT] & AUDIO_BIE_MASK)
@@ -1118,13 +1183,7 @@ void spg2xx_audio_device::audio_beat_tick()
 				LOGMASKED(LOG_BEAT, "Beat count elapsed but IRQ not enabled\n");
 			}
 		}
-		else
-		{
-			beat_count--;
-			m_audio_ctrl_regs[AUDIO_BEAT_COUNT] = (m_audio_ctrl_regs[AUDIO_BEAT_COUNT] & ~AUDIO_BEAT_COUNT_MASK) | beat_count;
-		}
 	}
-	m_audio_curr_beat_base_count--;
 }
 
 void spg2xx_audio_device::audio_rampdown_tick(const uint32_t channel)
@@ -1193,6 +1252,12 @@ bool spg2xx_audio_device::audio_envelope_tick(const uint32_t channel)
 	const uint16_t curr_edd = get_edd(channel);
 	LOGMASKED(LOG_ENVELOPES, "envelope %d tick, count is %04x, curr edd is %04x\n", channel, new_count, curr_edd);
 	bool edd_changed = false;
+	if (new_count > 0)
+	{
+		new_count--;
+		set_envelope_count(channel, new_count);
+	}
+
 	if (new_count == 0)
 	{
 		const uint16_t target = get_envelope_target(channel);
@@ -1270,11 +1335,6 @@ bool spg2xx_audio_device::audio_envelope_tick(const uint32_t channel)
 		set_edd(channel, new_edd);
 		edd_changed = true;
 		LOGMASKED(LOG_ENVELOPES, "Setting channel %d edd to %04x, register is %04x\n", channel, new_edd, m_audio_regs[(channel << 4) | AUDIO_ENVELOPE_DATA]);
-	}
-	else
-	{
-		new_count--;
-		set_envelope_count(channel, new_count);
 	}
 	LOGMASKED(LOG_ENVELOPES, "envelope %d post-tick, count is now %04x, register is %04x\n", channel, new_count, m_audio_regs[(channel << 4) | AUDIO_ENVELOPE_DATA]);
 	return edd_changed;

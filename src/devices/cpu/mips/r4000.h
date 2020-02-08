@@ -402,7 +402,7 @@ protected:
 	u64 m_cp0[32];
 	u64 m_cp0_timer_zero;
 	emu_timer *m_cp0_timer;
-	bool m_hard_reset = true;
+	bool m_hard_reset;
 	bool m_ll_active;
 	bool m_bus_error;
 	struct tlb_entry

@@ -207,8 +207,8 @@ private:
 	u8              m_port_input[PORT_COUNT];
 	u8              m_port_latch[PORT_COUNT];
 	u8              m_port_ddr[PORT_COUNT];
-	devcb_read8     m_port_cb_r[PORT_COUNT];
-	devcb_write8    m_port_cb_w[PORT_COUNT];
+	devcb_read8::array<PORT_COUNT> m_port_cb_r;
+	devcb_write8::array<PORT_COUNT> m_port_cb_w;
 
 	// miscellaneous register
 	enum mr_mask : u8

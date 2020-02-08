@@ -89,6 +89,7 @@
 #include "bus/a2bus/a2vulcan.h"
 #include "bus/a2bus/4play.h"
 //#include "bus/a2bus/pc_xporter.h"
+#include "bus/a2bus/byte8251.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -4542,6 +4543,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("4play", A2BUS_4PLAY); /* 4Play Joystick Card (Rev. B) */
 //  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);    /* Magic Musician Card */
 //  device.option_add("pcxport", A2BUS_PCXPORTER); /* Applied Engineering PC Transporter */
+	device.option_add("byte8251", A2BUS_BYTE8251);
 }
 
 void apple2gs_state::apple2gs(machine_config &config)

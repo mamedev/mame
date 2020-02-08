@@ -20,8 +20,8 @@ namcoc68_device::namcoc68_device(const machine_config &mconfig, const char *tag,
 	m_in_pc_cb(*this),
 	m_in_ph_cb(*this),
 	m_in_pdsw_cb(*this),
-	m_port_analog_in_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}},
-	m_port_dial_in_cb{{*this}, {*this}, {*this}, {*this}},
+	m_port_analog_in_cb(*this),
+	m_port_dial_in_cb(*this),
 	m_dp_in(*this),
 	m_dp_out(*this)
 {
@@ -121,11 +121,8 @@ void namcoc68_device::device_resolve_objects()
 	m_in_ph_cb.resolve_safe(0xff);
 	m_in_pdsw_cb.resolve_safe(0xff);
 
-	for (auto &cb : m_port_analog_in_cb)
-		cb.resolve_safe(0xff);
-
-	for (auto &cb : m_port_dial_in_cb)
-		cb.resolve_safe(0xff);
+	m_port_analog_in_cb.resolve_all_safe(0xff);
+	m_port_dial_in_cb.resolve_all_safe(0xff);
 
 	m_dp_in.resolve_safe(0xff);
 	m_dp_out.resolve_safe();

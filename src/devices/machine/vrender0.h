@@ -134,7 +134,7 @@ private:
 	address_space *m_host_space = nullptr;
 	uint32_t m_ext_vclk = 0;
 
-	devcb_write_line write_tx[2];
+	devcb_write_line::array<2> write_tx;
 
 	// INTC
 	uint32_t m_inten = 0;
@@ -209,12 +209,6 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(VRENDER0_SOC, vrender0soc_device)
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
 
 
 #endif // MAME_MACHINE_VRENDER0_H

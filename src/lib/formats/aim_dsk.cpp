@@ -66,23 +66,41 @@ bool aim_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 			std::vector<uint8_t> track_data(track_size);
 			std::vector<uint32_t> raw_track_data;
 			int data_count = 0;
+			int splice_pos = -1;
 			bool header = false;
 
 			// Read track
 			io_generic_read(io, &track_data[0], ( heads * track + head ) * track_size, track_size);
 
+			// Find first sector header or index mark
 			for (int offset = 0; offset < track_size; offset += 2)
 			{
-				switch (track_data[offset + 1] & 1)
+				if (track_data[offset + 1] == 1 && splice_pos < 0)
 				{
-				case 0:
+					splice_pos = offset - (20 * 2);
+				}
+				if (track_data[offset + 1] == 3)
+				{
+					splice_pos = offset;
+				}
+			}
+			if (splice_pos < 0)
+			{
+				splice_pos = 0;
+			}
+
+			for (int offset = splice_pos; offset < track_size + splice_pos; offset += 2)
+			{
+				switch (track_data[(offset + 1) % track_size])
+				{
+				case 0: // regular data
 					if (data_count == 0)
-						header = (track_data[offset] == 0x95) ? true : false;
+						header = (track_data[offset % track_size] == 0x95) ? true : false;
 					data_count++;
-					mfm_w(raw_track_data, 8, track_data[offset]);
+					mfm_w(raw_track_data, 8, track_data[offset % track_size]);
 					break;
 
-				case 1:
+				case 1: // sync mark
 					if (header && data_count < 11) // XXX hack
 					{
 						for (; data_count < 12; data_count++)
@@ -93,6 +111,12 @@ bool aim_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 					raw_w(raw_track_data, 16, 0x8924);
 					raw_w(raw_track_data, 16, 0x5555);
 					data_count = 0;
+
+				// TELETEXT.AIM and others
+				case 0xff:
+					break;
+
+				default:
 					break;
 				}
 			}

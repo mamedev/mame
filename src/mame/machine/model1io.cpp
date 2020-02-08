@@ -169,9 +169,9 @@ model1io_device::model1io_device(const machine_config &mconfig, const char *tag,
 	m_buttons(*this, "buttons"),
 	m_dsw(*this, "dsw%u", 1U),
 	m_read_cb(*this), m_write_cb(*this),
-	m_in_cb{ {*this}, {*this}, {*this} },
+	m_in_cb(*this),
 	m_drive_read_cb(*this), m_drive_write_cb(*this),
-	m_an_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
+	m_an_cb(*this),
 	m_output_cb(*this),
 	m_secondary_controls(false)
 {
@@ -186,16 +186,10 @@ void model1io_device::device_start()
 	// resolve callbacks
 	m_read_cb.resolve_safe(0xff);
 	m_write_cb.resolve_safe();
-
-	for (unsigned i = 0; i < 3; i++)
-		m_in_cb[i].resolve_safe(0xff);
-
+	m_in_cb.resolve_all_safe(0xff);
 	m_drive_read_cb.resolve_safe(0xff);
 	m_drive_write_cb.resolve_safe();
-
-	for (unsigned i = 0; i < 8; i++)
-		m_an_cb[i].resolve_safe(0xff);
-
+	m_an_cb.resolve_all_safe(0xff);
 	m_output_cb.resolve_safe();
 
 	// register for save states

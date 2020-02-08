@@ -212,7 +212,7 @@ void jazz_state::jazz(machine_config &config)
 		{
 			ncr53c94_device &adapter = downcast<ncr53c94_device &>(*device);
 
-			adapter.irq_handler_cb().set(m_mct_adr, FUNC(mct_adr_device::irq<5>));;
+			adapter.irq_handler_cb().set(m_mct_adr, FUNC(mct_adr_device::irq<5>));
 			adapter.drq_handler_cb().set(m_mct_adr, FUNC(mct_adr_device::drq<0>));
 
 			subdevice<mct_adr_device>(":mct_adr")->dma_r_cb<0>().set(adapter, FUNC(ncr53c94_device::dma_r));
@@ -324,6 +324,9 @@ void jazz_state::jazz(machine_config &config)
 	// TODO: 4 EISA slots
 
 	config.set_default_layout(layout_jazz);
+
+	// software list
+	SOFTWARE_LIST(config, m_softlist).set_original("jazz");
 }
 
 void jazz_state::led_w(u8 data)
@@ -373,7 +376,7 @@ ROM_START(mmr4000be)
 	ROMX_LOAD("riscos.bin", 0x00000, 0x40000, CRC(cea6bc8f) SHA1(3e47b4ad5d1a0c7aac649e6aef3df1bf86fc938b), ROM_BIOS(0))
 
 	ROM_REGION32_LE(0x800000, "graphics", 0)
-	ROM_LOAD64_BYTE("mips_g364.bin", 0x00, 0x40, CRC(9265ccb6) SHA1(ef5c3a6bc5249274dd9c9a18d88a668cdd457370) BAD_DUMP)
+	ROM_LOAD64_BYTE("mips_g364.bin", 0x000000, 0x020000, CRC(be6a726e) SHA1(225c198f6a7f8445dac3de052ecceecbb5be6bc7) BAD_DUMP)
 ROM_END
 
 ROM_START(mmr4000le)
@@ -382,14 +385,14 @@ ROM_START(mmr4000le)
 	ROMX_LOAD("ntprom.bin", 0x00000, 0x40000, CRC(d91018d7) SHA1(316de17820192c89b8ee6d9936ab8364a739ca53), ROM_BIOS(0))
 
 	ROM_REGION32_LE(0x800000, "graphics", 0)
-	// Jazz G300 (8.125MHz video clock)
+	// Jazz G300 (8.125MHz video clock, Bt431)
 	//ROM_LOAD64_BYTE("jazz_g300.bin", 0x00, 0x40, CRC(258eb00a) SHA1(6e3fd0272957524de82e7042d6e36aca492c4d26) BAD_DUMP)
 	// Jazz G364 (8.125MHz video clock)
-	//ROM_LOAD64_BYTE("jazz_g364.bin", 0x00, 0x40, CRC(6d1ee59f) SHA1(8ec928af5b72c52eae6a3e81942db7cfaf9b9c1d) BAD_DUMP)
-	// Jazz VXL (aka Jaguar, part number 09-00184)
-	//ROM_LOAD64_BYTE("jazz_vxl.bin", 0x00, 0x40, CRC(df86e670) SHA1(2a9e8b1a42e4a29242131fa26c493f53eb866484) BAD_DUMP)
-	// MIPS Video G364 (5MHz video clock, part number 09-00176)
-	ROM_LOAD64_BYTE("mips_g364.bin", 0x00, 0x40, CRC(9265ccb6) SHA1(ef5c3a6bc5249274dd9c9a18d88a668cdd457370) BAD_DUMP)
+	//ROM_LOAD64_BYTE("jazz_g364.bin", 0x000000, 0x020000, CRC(495fb417) SHA1(c341f3d498822ec1ee07a70076d7bbbf7aa60cb5) BAD_DUMP)
+	// Jazz VXL (aka Jaguar, part number 09-00184, Bt484 or Bt485)
+	//ROM_LOAD64_BYTE("jazz_vxl.bin", 0x000000, 0x010000, CRC(8edf1a62) SHA1(7750833eac0708ee79f01f36523554d29a094692) BAD_DUMP)
+	// MIPS G364 (5MHz video clock, part number 09-00176)
+	ROM_LOAD64_BYTE("mips_g364.bin", 0x000000, 0x020000, CRC(be6a726e) SHA1(225c198f6a7f8445dac3de052ecceecbb5be6bc7) BAD_DUMP)
 ROM_END
 
 /*   YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS       INIT         COMPANY  FULLNAME             FLAGS */

@@ -48,8 +48,8 @@ public:
 
 	void set_init_info(int version, int seq_init) {m_version=version; m_seq_init=seq_init;}
 	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_irq_info(T &&tag, const int irq_num, int serial_num) {
-		m_cpu.set_tag(std::forward<T>(tag)); m_irq_num = irq_num; m_serial_irq_num = serial_num; }
+	template <typename T> void set_irq_info(T &&tag, const int irq_num, int serial_num)
+	{ m_cpu.set_tag(std::forward<T>(tag)); m_irq_num = irq_num; m_serial_irq_num = serial_num; }
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_update);
 	DECLARE_WRITE8_MEMBER(serial_rx_w);
@@ -73,7 +73,7 @@ private:
 	required_device<scc85c30_device> m_scc1;
 	required_device<screen_device> m_screen;
 	required_device<device_execute_interface> m_cpu;
-	devcb_read16 m_in_cb[3];
+	devcb_read16::array<3> m_in_cb;
 	devcb_read8 m_trackx_cb;
 	devcb_read8 m_tracky_cb;
 	devcb_read16 m_gunx_cb;

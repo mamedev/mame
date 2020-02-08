@@ -631,30 +631,31 @@ Specifies build flags to modify the compiling or linking process. Multiple calls
 _flags_ - List of flag names from list below. Names are case-insensitive and ignored if not supported on a platform.
 
 * _C7DebugInfo_ - Enables C7 compatible debug info for MSVC builds.
+* _EnableMinimalRebuild_ - Enable Visual Studio's minimal rebuild feature.
 * _EnableSSE, EnableSSE2, EnableAVX, EnableAVX2_ - Enable SSE/AVX instruction sets
 * _ExtraWarnings_ - Sets compiler's max warning level.
 * _FatalWarnings_ - Treat warnings as errors.
 * _FloatFast_ - Enable floating point optimizations at the expense of accuracy.
 * _FloatStrict_ - Improve floating point consistency at the expense of performance.
 * _FullSymbols_ - Use together with _Symbols_ to generate full debug symbols with Visual Studio.
+* _GenerateMapFiles_ - Enable .map file outputs from the Visual Studio linker.
 * _LinkSupportCircularDependencies_ - Enables the linker to iterate over provided libs in order to resolve circular dependencies (make and ninja only).
 * _Managed_ - Enable Managed C++ (.NET).
-* _MinimumWarnings_ - - Sets compiler's minimum warning level (Visual Studio only).
 * _MFC_ - Enable support for Microsoft Foundation Classes.
+* _MinimumWarnings_ - - Sets compiler's minimum warning level (Visual Studio only).
 * _NativeWChar, NoNativeWChar_ - Toggle support for the wchar data type.
 * _No64BitChecks_ - Disable 64-bit portability warnings.
 * _NoBufferSecurityCheck_ - Turns off Visual Studio 'Security Check' option. Can give up to 10% performance improvement.
 * _NoEditAndContinue_ - Disable support for Visual Studio's Edit-and-Continue feature.
 * _NoExceptions_ - Disable C++ exception support.
 * _NoFramePointer_ - Disable the generation of stack frame pointers.
-* _NoIncrementalLink_ - Disable support for Visual Studio's incremental linking feature.
 * _NoImportLib_ - Prevent the generation of an import library for a Windows DLL.
+* _NoIncrementalLink_ - Disable support for Visual Studio's incremental linking feature.
 * _NoManifest_ - Prevent the generation of a manifest for Windows executables and shared libraries.
 * _NoMultiProcessorCompilation_ - Disables Visual Studio's and FastBuild's multiprocessor compilation.
-* _NoRuntimeChecks_ - Disable Visual Studio's Basic Runtime Checks in Debug builds.
-* _EnableMinimalRebuild_ - Enable Visual Studio's minimal rebuild feature.
 * _NoPCH_ - Disable precompiled headers.
 * _NoRTTI_ - Disable C++ runtime type information.
+* _NoRuntimeChecks_ - Disable Visual Studio's Basic Runtime Checks in Debug builds.
 * _NoWinMD_ - Disables Generation of Windows Metadata.
 * _NoWinRT_ - Disables Windows RunTime Extension for project.
 * _ObjcARC_ - Enable automatic reference counting for Object-C and Objective-C++.
@@ -668,10 +669,10 @@ _flags_ - List of flag names from list below. Names are case-insensitive and ign
 * _Symbols_ - Generate debugging information.
 * _Unicode_ - Enable Unicode strings. If not specified, the default toolset behavior is used.
 * _Unsafe_ - Enable the use of unsafe code in .NET applications.
+* _UnsignedChar_ - Force `char`s to be `unsigned` by default.
 * _UseFullPaths_ - Enable absolute paths for `__FILE__`. 
 * _UseLDResponseFile_ - Enable use of response file (aka @file) for linking lib dependencies (make only).
 * _UseObjectResponseFile_ - Enable use of response file (aka @file) for linking objects (make only).
-* _UnsignedChar_ - Force `char`s to be `unsigned` by default.
 * _WinMain_ - Use WinMain() as the entry point for Windows applications, rather than main().
 
 **Note:** When not set, options will default to the tool default.

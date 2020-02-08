@@ -89,6 +89,7 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "bus/a2bus/4play.h"
 #include "bus/a2bus/computereyes2.h"
 #include "bus/a2bus/transwarp.h"
+#include "bus/a2bus/byte8251.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -1267,6 +1268,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("ceyes2", A2BUS_COMPUTEREYES2); /* ComputerEyes/2 Video Digitizer */
 	device.option_add("twarp", A2BUS_TRANSWARP);    /* AE TransWarp accelerator */
 //  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);    /* Magic Musician Card */
+	device.option_add("byte8251", A2BUS_BYTE8251);
 }
 
 void apple2_state::apple2_common(machine_config &config)

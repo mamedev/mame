@@ -33,7 +33,6 @@ public:
 	auto o3_callback() { return m_out_cb[2].bind(); }
 	auto irq_callback() { return m_irq_cb.bind(); }
 
-	int get_output_state(int counter);
 	int status(int clock) const { return m_enabled[clock]; } // get whether timer is enabled
 	int irq_state() const { return m_irq; }                 // get IRQ state
 	uint16_t count(int counter) const { return compute_counter(counter); }    // get counter value
@@ -103,7 +102,7 @@ private:
 
 	double m_external_clock[3];
 
-	devcb_write_line m_out_cb[3];
+	devcb_write_line::array<3> m_out_cb;
 	devcb_write_line m_irq_cb;
 
 	uint8_t m_control_reg[3];

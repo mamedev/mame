@@ -291,8 +291,8 @@ private:
 
 	// device callbacks
 	devcb_read8 m_porta_in_cb;
-	devcb_read8 m_port_in_cb[10];
-	devcb_write8 m_port_out_cb[10];
+	devcb_read8::array<10> m_port_in_cb;
+	devcb_write8::array<10> m_port_out_cb;
 
 	// model-specific parameters
 	const u32 m_pcmask;

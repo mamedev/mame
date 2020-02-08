@@ -23,7 +23,7 @@ elan_eu3a05_sound_device::elan_eu3a05_sound_device(const machine_config &mconfig
 	m_space_config("regs", ENDIANNESS_NATIVE, 8, 6, 0, address_map_constructor(FUNC(elan_eu3a05_sound_device::map), this)),
 	m_stream(nullptr),
 	m_space_read_cb(*this),
-	m_sound_end_cb{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this } }
+	m_sound_end_cb(*this)
 {
 }
 
@@ -56,8 +56,7 @@ void elan_eu3a05_sound_device::device_start()
 	m_space_read_cb.resolve_safe(0);
 	m_stream = stream_alloc(0, 1, 8000);
 
-	for (devcb_write_line &cb : m_sound_end_cb)
-		cb.resolve_safe();
+	m_sound_end_cb.resolve_all_safe();
 
 	save_item(NAME(m_sound_byte_address));
 	save_item(NAME(m_sound_byte_len));

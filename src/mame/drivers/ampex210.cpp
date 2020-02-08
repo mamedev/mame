@@ -2,14 +2,17 @@
 // copyright-holders:AJR
 /***************************************************************************
 
-    Skeleton driver for Ampex 210/210+ video display terminals.
+    Skeleton driver for Ampex 210(+) and 230(+) video display terminals.
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/ampex210_kbd.h"
 #include "machine/mos6551.h"
 #include "machine/nvram.h"
+#include "machine/z80ctc.h"
+#include "machine/z80dart.h"
 #include "video/scn2674.h"
 #include "screen.h"
 
@@ -24,15 +27,21 @@ public:
 	{ }
 
 	void ampex210p(machine_config &config);
+	void ampex230(machine_config &config);
 
 private:
+	void common_video(machine_config &config);
+
 	SCN2672_DRAW_CHARACTER_MEMBER(draw_character);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void ampex210_mem(address_map &map);
+	void ampex230_mem(address_map &map);
+	void ampex210_io(address_map &map);
+	void ampex230_io(address_map &map);
 	void vram_map(address_map &map);
+	void vram2_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_chargen;
 };
 
@@ -41,14 +50,22 @@ SCN2672_DRAW_CHARACTER_MEMBER(ampex210_state::draw_character)
 {
 }
 
-void ampex210_state::mem_map(address_map &map)
+void ampex210_state::ampex210_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0x8000, 0x87ff).ram().share("nvram");
 	map(0x8800, 0x9fff).ram();
 }
 
-void ampex210_state::io_map(address_map &map)
+void ampex210_state::ampex230_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x8000, 0x8007).rw("pvtc", FUNC(scn2672_device::read), FUNC(scn2672_device::write));
+	map(0xa000, 0xbfff).ram();
+	map(0xc000, 0xdfff).ram().share("nvram");
+}
+
+void ampex210_state::ampex210_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x07).rw("pvtc", FUNC(scn2672_device::read), FUNC(scn2672_device::write));
@@ -59,9 +76,25 @@ void ampex210_state::io_map(address_map &map)
 	map(0xc7, 0xc7).nopw();
 }
 
+void ampex210_state::ampex230_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x10).w("pvtc", FUNC(scn2672_device::buffer_w));
+	map(0x11, 0x11).r("pvtc", FUNC(scn2672_device::buffer_r));
+	map(0x12, 0x12).w("pvtc", FUNC(scn2672_device::attr_buffer_w));
+	map(0x13, 0x13).r("pvtc", FUNC(scn2672_device::attr_buffer_r));
+	map(0x30, 0x33).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x40, 0x43).rw("dart", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
+}
+
 void ampex210_state::vram_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram(); // MB8464A-10L (second half unused?)
+}
+
+void ampex210_state::vram2_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
 }
 
 
@@ -72,8 +105,8 @@ INPUT_PORTS_END
 void ampex210_state::ampex210p(machine_config &config)
 {
 	Z80(config, m_maincpu, 3.6864_MHz_XTAL); // Z80ACPU; clock uncertain
-	m_maincpu->set_addrmap(AS_PROGRAM, &ampex210_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &ampex210_state::io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ampex210_state::ampex210_mem);
+	m_maincpu->set_addrmap(AS_IO, &ampex210_state::ampex210_io);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // UM6116-2
 
@@ -88,8 +121,45 @@ void ampex210_state::ampex210p(machine_config &config)
 	pvtc.set_screen("screen");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::amber());
 	screen.set_raw(19.602_MHz_XTAL, 900, 0, 720, 363, 0, 300);
 	//screen.set_raw(32.147_MHz_XTAL, 1476, 0, 1188, 363, 0, 300);
+	screen.set_screen_update("pvtc", FUNC(scn2672_device::screen_update));
+}
+
+void ampex210_state::ampex230(machine_config &config)
+{
+	Z80(config, m_maincpu, 3.6864_MHz_XTAL); // Z80ACPU; clock uncertain
+	m_maincpu->set_addrmap(AS_PROGRAM, &ampex210_state::ampex230_mem);
+	m_maincpu->set_addrmap(AS_IO, &ampex210_state::ampex230_io);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	z80ctc_device &ctc(Z80CTC(config, "ctc", 3.6864_MHz_XTAL)); // Z8430AB1
+	ctc.set_clk<0>(3.6864_MHz_XTAL / 2);
+	ctc.set_clk<1>(3.6864_MHz_XTAL / 2);
+	ctc.set_clk<2>(3.6864_MHz_XTAL / 2);
+	ctc.zc_callback<0>().set("dart", FUNC(z80dart_device::rxca_w));
+	ctc.zc_callback<1>().set("dart", FUNC(z80dart_device::txca_w));
+	ctc.zc_callback<2>().set("dart", FUNC(z80dart_device::rxtxcb_w));
+
+	z80dart_device &dart(Z80DART(config, "dart", 3.6864_MHz_XTAL)); // Z80847004PSC
+	dart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0); // IM 1 autovectored
+
+	AMPEX230_KEYBOARD(config, "keyboard");
+
+	scn2672_device &pvtc(SCN2672(config, "pvtc", 19.602_MHz_XTAL / 9)); // MC2672B4P
+	pvtc.intr_callback().set_inputline("maincpu", INPUT_LINE_NMI);
+	pvtc.set_character_width(9);
+	pvtc.set_display_callback(FUNC(ampex210_state::draw_character));
+	pvtc.set_addrmap(0, &ampex210_state::vram_map);
+	pvtc.set_addrmap(1, &ampex210_state::vram2_map);
+	pvtc.set_screen("screen");
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::amber());
+	screen.set_raw(19.602_MHz_XTAL, 900, 0, 720, 363, 0, 312);
+	//screen.set_raw(32.147_MHz_XTAL, 1476, 0, 1188, 363, 0, 312);
 	screen.set_screen_update("pvtc", FUNC(scn2672_device::screen_update));
 }
 
@@ -102,4 +172,13 @@ ROM_START(ampex210p) // Z80 (+6551,MC2672,3515260-01, 3 xtals, speaker) // 8k ra
 	ROM_LOAD("35-526-01.u3", 0x0000, 0x1000, CRC(4659bcd2) SHA1(554574f55ed875baba0a6133648c44df763cc5c4))
 ROM_END
 
-COMP(1989, ampex210p, 0, 0, ampex210p, ampex210p, ampex210_state, empty_init, "Ampex",              "210+", MACHINE_IS_SKELETON)
+ROM_START(ampex230)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("230_u11.bin", 0x0000, 0x8000, CRC(c8f93719) SHA1(81019b42245ca60c7de3ee5d3194c4d22fd38a8d))
+
+	ROM_REGION(0x2000, "chargen", 0)
+	ROM_LOAD("230_u2.bin", 0x0000, 0x2000, CRC(7143b773) SHA1(616d3c0c1a1f7a00bf16857324043955ab842994))
+ROM_END
+
+COMP(1989, ampex210p, 0, 0, ampex210p, ampex210p, ampex210_state, empty_init, "Ampex", "210+", MACHINE_IS_SKELETON)
+COMP(1989, ampex230,  0, 0, ampex230,  ampex210p, ampex210_state, empty_init, "Ampex", "230", MACHINE_IS_SKELETON)

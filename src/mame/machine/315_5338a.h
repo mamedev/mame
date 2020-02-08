@@ -66,8 +66,8 @@ private:
 	// callbacks
 	devcb_read8 m_read_cb;
 	devcb_write8 m_write_cb;
-	devcb_read8 m_in_port_cb[7];
-	devcb_write8 m_out_port_cb[7];
+	devcb_read8::array<7> m_in_port_cb;
+	devcb_write8::array<7> m_out_port_cb;
 
 	uint8_t m_port_value[7];
 	uint8_t m_port_config;
