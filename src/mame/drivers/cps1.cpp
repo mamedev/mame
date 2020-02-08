@@ -7274,7 +7274,7 @@ ROM_END
 ROM_START( sf2um ) /* same as sf2jl - Street Fighter II: The World Warrior (Japan 920312) except for region byte */
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "sf-2u_30m.11e", 0x00000, 0x20000, CRC(34a1ce02) SHA1(6875813c49a92b8650f444c1857459adc86bc0d0) )   // == sf-2_30l.11e
-	ROM_LOAD16_BYTE( "sf-2u_37m.11f", 0x00001, 0x20000, CRC(8cbff19c) SHA1(48386d4dfb3a592094e6c3ee245b6f2c84d5d9af) )   // 1 byte difference to sf2j_37h.11f - 0x4C0 == 0x02 vs 0x00 for Japanese set
+	ROM_LOAD16_BYTE( "sf-2u_37m.11f", 0x00001, 0x20000, CRC(8cbff19c) SHA1(48386d4dfb3a592094e6c3ee245b6f2c84d5d9af) )   // 1 byte difference to sf-2_37l.11f - 0x4C0 == 0x02 vs 0x00 for Japanese set
 	ROM_LOAD16_BYTE( "sf-2u_31m.12e", 0x40000, 0x20000, CRC(64ebc8d2) SHA1(1817de5dcca47a1bb94838d26a9a3adf6b75c911) )   // == sf-2_31l.12e
 	ROM_LOAD16_BYTE( "sf-2u_38m.12f", 0x40001, 0x20000, CRC(73847443) SHA1(72fb5472a04061e4a50cb57e4f65ba8ec022a965) )   // == sf-2_38l.12f
 	ROM_LOAD16_BYTE( "sf-2u_28m.9e",  0x80000, 0x20000, CRC(eee2b426) SHA1(1d7b5073b9473d3c92fc95c0d0625716c82fc944) )   // == sf-2_28l.9e
@@ -7297,12 +7297,12 @@ ROM_START( sf2um ) /* same as sf2jl - Street Fighter II: The World Warrior (Japa
 	ROM_LOAD64_WORD( "sf2-11m.5d", 0x400006, 0x80000, CRC(0627c831) SHA1(f9a92d614e8877d648449de2612fc8b43c85e4c2) )    // in "22" socket
 
 	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
-	ROM_LOAD( "sf2j_09.12a", 0x00000, 0x08000, CRC(a4823a1b) SHA1(7b6bf59dfd578bfbbdb64c27988796783442d659) )   // == sf2_9.12a
+	ROM_LOAD( "sf2_09.12a", 0x00000, 0x08000, CRC(a4823a1b) SHA1(7b6bf59dfd578bfbbdb64c27988796783442d659) )   // == sf2_9.12a
 	ROM_CONTINUE(            0x10000, 0x08000 )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
-	ROM_LOAD( "sf2j_18.11c", 0x00000, 0x20000, CRC(7f162009) SHA1(346bf42992b4c36c593e21901e22c87ae4a7d86d) )   // == sf2_18.11c
-	ROM_LOAD( "sf2j_19.12c", 0x20000, 0x20000, CRC(beade53f) SHA1(277c397dc12752719ec6b47d2224750bd1c07f79) )   // == sf2_19.12c
+	ROM_LOAD( "sf2_18.11c", 0x00000, 0x20000, CRC(7f162009) SHA1(346bf42992b4c36c593e21901e22c87ae4a7d86d) )
+	ROM_LOAD( "sf2_19.12c", 0x20000, 0x20000, CRC(beade53f) SHA1(277c397dc12752719ec6b47d2224750bd1c07f79) )
 
 	ROM_REGION( 0x0200, "aboardplds", 0 )
 	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
