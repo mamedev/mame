@@ -32343,6 +32343,9 @@ pdp11ub                         //
 pdp11ub2                        //
 sms1000                         //
 
+@source:pdt3100.cpp
+pdt3100                         //
+
 @source:pecom.cpp
 pecom32                         //
 pecom64                         //

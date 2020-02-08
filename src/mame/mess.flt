@@ -654,6 +654,7 @@ pcw16.cpp
 pda600.cpp
 pdp1.cpp
 pdp11.cpp
+pdt3100.cpp
 pecom.cpp
 pegasus.cpp
 pencil2.cpp
