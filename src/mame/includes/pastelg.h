@@ -12,67 +12,74 @@
 class pastelg_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_BLITTER
-	};
-
 	pastelg_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_nb1413m3(*this, "nb1413m3"),
 		m_screen(*this, "screen"),
-		m_clut(*this, "clut")
+		m_clut(*this, "clut"),
+		m_blitter_rom(*this, "blitter"),
+		m_voice_rom(*this, "voice"),
+		m_p1_keys(*this, "PL1_KEY%u", 0U),
+		m_p2_keys(*this, "PL2_KEY%u", 0U)
 	{ }
 
+	void threeds(machine_config &config);
+	void pastelg(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<nb1413m3_device> m_nb1413m3;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_clut;
+	required_region_ptr<uint8_t> m_blitter_rom;
+	optional_region_ptr<uint8_t> m_voice_rom;
+	optional_ioport_array<5> m_p1_keys;
+	optional_ioport_array<5> m_p2_keys;
 
 	uint8_t m_mux_data;
-	int m_blitter_destx;
-	int m_blitter_desty;
-	int m_blitter_sizex;
-	int m_blitter_sizey;
-	int m_blitter_src_addr;
-	int m_gfxrom;
-	int m_dispflag;
-	int m_flipscreen;
-	int m_blitter_direction_x;
-	int m_blitter_direction_y;
-	int m_palbank;
+	uint8_t m_blitter_destx;
+	uint8_t m_blitter_desty;
+	uint8_t m_blitter_sizex;
+	uint8_t m_blitter_sizey;
+	uint16_t m_blitter_src_addr;
+	uint8_t m_gfxbank;
+	bool m_dispflag;
+	bool m_flipscreen;
+	bool m_blitter_direction_x;
+	bool m_blitter_direction_y;
+	uint8_t m_palbank;
 	std::unique_ptr<uint8_t[]> m_videoram;
-	int m_flipscreen_old;
+	bool m_flipscreen_old;
 	emu_timer *m_blitter_timer;
 
-	DECLARE_READ8_MEMBER(pastelg_sndrom_r);
-	DECLARE_READ8_MEMBER(pastelg_irq_ack_r);
-	DECLARE_READ8_MEMBER(threeds_inputport1_r);
-	DECLARE_READ8_MEMBER(threeds_inputport2_r);
-	DECLARE_WRITE8_MEMBER(threeds_inputportsel_w);
-	DECLARE_WRITE8_MEMBER(pastelg_blitter_w);
-	DECLARE_WRITE8_MEMBER(threeds_romsel_w);
-	DECLARE_WRITE8_MEMBER(threeds_output_w);
-	DECLARE_READ8_MEMBER(threeds_rom_readback_r);
-	DECLARE_WRITE8_MEMBER(pastelg_romsel_w);
+	uint8_t irq_ack_r();
+	void blitter_w(offs_t offset, uint8_t data);
+	void blitter_timer_callback(void *ptr, s32 param);
+
+	uint8_t pastelg_sndrom_r();
+	void pastelg_romsel_w(address_space &space, uint8_t data);
+
+	uint8_t threeds_inputport1_r();
+	uint8_t threeds_inputport2_r();
+	void threeds_inputportsel_w(uint8_t data);
+	void threeds_romsel_w(uint8_t data);
+	void threeds_output_w(uint8_t data);
+	uint8_t threeds_rom_readback_r();
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	void pastelg_palette(palette_device &palette) const;
-	uint32_t screen_update_pastelg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	int pastelg_blitter_src_addr_r();
-	void pastelg_vramflip();
-	void pastelg_gfxdraw();
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void vramflip();
+	void gfxdraw();
 
-	void threeds(machine_config &config);
-	void pastelg(machine_config &config);
+	uint16_t pastelg_blitter_src_addr_r();
+
+	void prg_map(address_map &map);
 	void pastelg_io_map(address_map &map);
-	void pastelg_map(address_map &map);
 	void threeds_io_map(address_map &map);
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 #endif // MAME_INCLUDES_PASTELG_H
