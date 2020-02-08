@@ -1729,6 +1729,7 @@ ROM_START( to16 )
 	ROM_LOAD("to16_103.bin", 0x8000, 0x8000, CRC(a2d55e16) SHA1(fcc61bbfe49164c4b79c368fb782d1ecc17e0a42))
 ROM_END
 
+
 /********************************************************** Sanyo SPC-400D ***
 ROM BIOS Version 1.18
 *****************************************************************************/
@@ -1737,6 +1738,38 @@ ROM_START( spc400d )
 	ROM_REGION(0x10000, "bios", 0)
 	ROM_LOAD("fb896.u6", 0xc000, 0x4000, CRC(a6f3ad8c) SHA1(1ee012f9a1757eb68150fedc9db16ff356722f72))
 ROM_END
+
+
+/******************************************* Triumph-Adler Alphatronic P10 ***
+Form factor: Desktop
+Links: https://www.marcuslausch.de/2020/01/21/triumph-adler-alphatronic-p10/, http://www.cc-computerarchiv.de/CC-Archiv/bc-alt/gb-triad/gb-triad-6_87.html
+CPU: 8088@4.77MHz on a motherboard branded Super-640
+RAM: 640KB
+Video: Hercules (branded MG-200), monitor: 12" amber
+Mass storage: 2x5.25" DSDD, a single floppy/hdd version was called P20
+Interfaces: V24, Centronics
+On board: RTC
+DIP switches: 1    2    3    4    5    6    7    8    effect
+             OFF                                      default
+                   ON                                 FPU present
+                  OFF                                 FPU absent
+                                  ON   ON             Display: none
+                                 OFF  OFF             monochrome
+                                 OFF   ON             Color 40x25
+                                  ON  OFF             Color 80x25
+                                            ON   ON   1 Floppy disk drive
+                                           OFF   ON   2
+                                            ON  OFF   3
+                                           OFF  OFF   4
+
+*****************************************************************************/
+
+ROM_START( alphatp10 )
+	ROM_REGION(0x10000,"bios", 0)
+	ROM_LOAD("cgab01_04_06.bin", 0x8000, 0x4000, CRC(4f1048e9) SHA1(c5feee7c00fdb7466c6afec753363d11b32983b5))
+	ROM_LOAD("cgab02_04_07.bin", 0xc000, 0x4000, CRC(a95998cb) SHA1(1d939f0b7ea3999c44f98b30c26d36e394b87503))
+ROM_END
+
 
 /***************************************************************************
 
@@ -1784,6 +1817,7 @@ COMP( 1992, iskr3104,       ibm5150, 0,      iskr3104,       pccga,    pc_state,
 COMP( 1985, sicpc1605,      ibm5150, 0,      siemens,        pccga,    pc_state, empty_init,    "Siemens",                         "Sicomp PC16-05",        MACHINE_NOT_WORKING )
 COMP( 1985, pc7000,         ibm5150, 0,      eagle1600,      pccga,    pc_state, empty_init,    "Sharp",                           "PC-7000",               MACHINE_NOT_WORKING )
 COMP( 1987, to16,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Thomson SIMIV",                   "TO16",                  MACHINE_NOT_WORKING )
+COMP( 1985, alphatp10,      ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Triumph-Adler",                   "Alphatronic P10",       MACHINE_NOT_WORKING )
 COMP( 198?, hstrtpls,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Vendex",                          "HeadStart Plus",        MACHINE_NOT_WORKING )
 COMP( 1988, laser_turbo_xt, ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "VTech",                           "Laser Turbo XT",        0 )
 COMP( 1989, laser_xt3,      ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "VTech",                           "Laser XT/3",            0 )
