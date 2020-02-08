@@ -167,7 +167,7 @@ protected:
 				f |= F_C;
 			m_f = f;
 			return r;
-		} else /*if(shift >= 32)*/ {
+		} else {
 			if(v1 & 0x80000000) {
 				m_f = F_C;
 				return 0xffffffff;
