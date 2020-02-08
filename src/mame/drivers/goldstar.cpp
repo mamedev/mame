@@ -10707,7 +10707,7 @@ ROM_START( 3cdpoker )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
-	ROM_LOAD( "82s129.u70", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
 
 	ROM_REGION( 0x100, "proms2", 0 )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
@@ -10734,7 +10734,7 @@ ROM_START( 3cdpokera )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
-	ROM_LOAD( "82s129.u70", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
 
 	ROM_REGION( 0x100, "proms2", 0 )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
@@ -18521,7 +18521,7 @@ GAMEL( 1992, cmv4a,     cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,
 GAMEL( 199?, cmwm,      cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (Watermelon bootleg / hack)",   0,                 layout_cmv4 ) // CM Fruit Bonus ver.2 T bootleg/hack
 GAMEL( 1995, cmfun,     cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (Fun USA v2.5 bootleg / hack)", 0,                 layout_cmv4 )
 GAMEL( 1995, 3cdpoker,  0,        cm,       cmv4,     cmaster_state,  empty_init,     ROT0, "Armaly Labs",       "3 Cards Poker 96 (V1.6)",                     MACHINE_NOT_WORKING,  layout_cmv4 ) // protected? See ROM definition for routine
-GAMEL( 1995, 3cdpokera, 3cdpoker, cm,       cmv4,     cmaster_state,  empty_init,     ROT0, "Armaly Labs",       "3 Cards Poker 96 (V1.0)",                     MACHINE_NOT_WORKING,  layout_cmv4 ) // hopper problem, possibly needs just correct inputs
+GAMEL( 1995, 3cdpokera, 3cdpoker, cm,       cmtetris, cmaster_state,  empty_init,     ROT0, "Armaly Labs",       "3 Cards Poker 96 (V1.0)",                     MACHINE_NOT_WORKING,  layout_cmv4 ) // hopper problem, possibly needs just correct inputs
 GAMEL( 1991, cmaster,   0,        cm,       cmaster,  cmaster_state,  empty_init,     ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 1)",           0,                 layout_cmaster )
 GAMEL( 1991, cmasterb,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 2)",           0,                 layout_cmasterb )
 GAMEL( 1991, cmezspin,  cmaster,  cm,       cmezspin, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (E-Z Spin bootleg / hack)",   0,                 layout_cmezspin ) // CM Fruit Bonus 55 ver.2 bootleg/hack
