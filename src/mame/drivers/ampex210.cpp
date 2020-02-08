@@ -127,19 +127,11 @@ void ampex210_state::ampex210p(machine_config &config)
 	screen.set_screen_update("pvtc", FUNC(scn2672_device::screen_update));
 }
 
-static const z80_daisy_config daisy_chain[] =
-{
-	{ "dart" },
-	{ "ctc" },
-	{ nullptr }
-};
-
 void ampex210_state::ampex230(machine_config &config)
 {
 	Z80(config, m_maincpu, 3.6864_MHz_XTAL); // Z80ACPU; clock uncertain
 	m_maincpu->set_addrmap(AS_PROGRAM, &ampex210_state::ampex230_mem);
 	m_maincpu->set_addrmap(AS_IO, &ampex210_state::ampex230_io);
-	m_maincpu->set_daisy_config(daisy_chain);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -150,10 +142,9 @@ void ampex210_state::ampex230(machine_config &config)
 	ctc.zc_callback<0>().set("dart", FUNC(z80dart_device::rxca_w));
 	ctc.zc_callback<1>().set("dart", FUNC(z80dart_device::txca_w));
 	ctc.zc_callback<2>().set("dart", FUNC(z80dart_device::rxtxcb_w));
-	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	z80dart_device &dart(Z80DART(config, "dart", 3.6864_MHz_XTAL)); // Z80847004PSC
-	dart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	dart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0); // IM 1 autovectored
 
 	AMPEX230_KEYBOARD(config, "keyboard");
 
