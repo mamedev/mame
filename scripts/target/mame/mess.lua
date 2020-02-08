@@ -4075,6 +4075,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/am1000.cpp",
 	MAME_DIR .. "src/mame/drivers/ampex.cpp",
 	MAME_DIR .. "src/mame/drivers/ampex210.cpp",
+	MAME_DIR .. "src/mame/machine/ampex210_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/ampex210_kbd.h",
 	MAME_DIR .. "src/mame/drivers/ampscarp.cpp",
 	MAME_DIR .. "src/mame/drivers/amust.cpp",
 	MAME_DIR .. "src/mame/drivers/anzterm.cpp",

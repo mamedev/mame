@@ -1288,6 +1288,7 @@ dialog80                        // Ampex Dialogue 80
 
 @source:ampex210.cpp
 ampex210p                       //
+ampex230                        //
 
 @source:ampro.cpp
 ampro                           //
