@@ -41092,6 +41092,9 @@ wwfsstaru7                      // TA-0024 (c) 1989 (US, newer)
 wwfsstaru6                      // TA-0024 (c) 1989 (US)
 wwfsstaru4                      // TA-0024 (c) 1989 (US)
 
+@source:wxstar4000.cpp
+wxstar4k                        // 1990 Applied Microelectronics Research (Amirix) / The Weather Channel
+
 @source:wy100.cpp
 wy100                           // WY-100
 

@@ -1084,6 +1084,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"alesis",
 		"altos",
 		"ami",
+		"amirix",
 		"amiga",
 		"ampro",
 		"amstrad",
@@ -1604,6 +1605,11 @@ files {
 createMESSProjects(_target, _subtarget, "ami")
 files {
 	MAME_DIR .. "src/mame/drivers/hh_amis2k.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "amirix")
+files {
+	MAME_DIR .. "src/mame/drivers/wxstar4000.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "amiga")
