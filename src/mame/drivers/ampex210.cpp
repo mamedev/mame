@@ -144,6 +144,12 @@ void ampex210_state::ampex230(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	z80ctc_device &ctc(Z80CTC(config, "ctc", 3.6864_MHz_XTAL)); // Z8430AB1
+	ctc.set_clk<0>(3.6864_MHz_XTAL / 2);
+	ctc.set_clk<1>(3.6864_MHz_XTAL / 2);
+	ctc.set_clk<2>(3.6864_MHz_XTAL / 2);
+	ctc.zc_callback<0>().set("dart", FUNC(z80dart_device::rxca_w));
+	ctc.zc_callback<1>().set("dart", FUNC(z80dart_device::txca_w));
+	ctc.zc_callback<2>().set("dart", FUNC(z80dart_device::rxtxcb_w));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	z80dart_device &dart(Z80DART(config, "dart", 3.6864_MHz_XTAL)); // Z80847004PSC
