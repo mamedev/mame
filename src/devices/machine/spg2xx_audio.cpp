@@ -67,7 +67,6 @@ sunplus_gcm394_audio_device::sunplus_gcm394_audio_device(const machine_config &m
 {
 }
 
-
 void spg2xx_audio_device::device_start()
 {
 	m_audio_beat = timer_alloc(TIMER_BEAT);
@@ -636,11 +635,13 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 
 	case AUDIO_WAVE_IN_L:
 		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Wave In (L) / FIFO Write Data: %04x\n", data);
+		m_stream->update();
 		m_audio_ctrl_regs[offset] = data;
 		break;
 
 	case AUDIO_WAVE_IN_R:
 		LOGMASKED(LOG_SPU_WRITES, "audio_ctrl_w: Wave In (R) / Software Channel FIFO IRQ Control: %04x\n", data);
+		m_stream->update();
 		m_audio_ctrl_regs[offset] = data;
 		break;
 
@@ -945,6 +946,11 @@ void spg2xx_audio_device::sound_stream_update(sound_stream &stream, stream_sampl
 			}
 		}
 
+		if (m_audio_ctrl_regs[AUDIO_WAVE_IN_L])
+			left_total += (int32_t)(m_audio_ctrl_regs[AUDIO_WAVE_IN_L] - 0x8000);
+		if (m_audio_ctrl_regs[AUDIO_WAVE_IN_R])
+			right_total += (int32_t)(m_audio_ctrl_regs[AUDIO_WAVE_IN_R] - 0x8000);
+
 		switch (get_vol_sel())
 		{
 			case 0: // 1/16
@@ -958,8 +964,12 @@ void spg2xx_audio_device::sound_stream_update(sound_stream &stream, stream_sampl
 				right_total >>= 2;
 				break;
 		}
-		*out_l++ = (left_total * (int16_t)m_audio_ctrl_regs[AUDIO_MAIN_VOLUME]) >> 7;
-		*out_r++ = (right_total * (int16_t)m_audio_ctrl_regs[AUDIO_MAIN_VOLUME]) >> 7;
+
+		int32_t left_final = (int16_t)((left_total * (int16_t)m_audio_ctrl_regs[AUDIO_MAIN_VOLUME]) >> 7);
+		int32_t right_final = (int16_t)((right_total * (int16_t)m_audio_ctrl_regs[AUDIO_MAIN_VOLUME]) >> 7);
+
+		*out_l++ = (int16_t)left_final;
+		*out_r++ = (int16_t)right_final;
 	}
 }
 

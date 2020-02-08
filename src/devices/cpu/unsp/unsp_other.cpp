@@ -281,40 +281,46 @@ void unsp_device::execute_remaining(const uint16_t op)
 
 bool unsp_device::do_basic_alu_ops(const uint16_t &op0, uint32_t &lres, uint16_t &r0, uint16_t &r1, uint32_t &r2, bool update_flags)
 {
+	int32_t sres = 0;
 	switch (op0)
 	{
 	case 0x00: // Add
 	{
 		lres = r0 + r1;
+		sres = (int16_t)r0 + (int16_t)r1;
 		if (update_flags)
-			update_nzsc(lres, r0, r1);
+			update_nzsc(lres, sres);
 		break;
 	}
 	case 0x01: // Add w/ carry
 	{
 		uint32_t c = (m_core->m_r[REG_SR] & UNSP_C) ? 1 : 0;
 		lres = r0 + r1 + c;
+		sres = (int16_t)r0 + (int16_t)r1 + (int16_t)c;
 		if (update_flags)
-			update_nzsc(lres, r0, r1);
+			update_nzsc(lres, sres);
 		break;
 	}
 	case 0x02: // Subtract
 		lres = r0 + (uint16_t)(~r1) + uint32_t(1);
+		sres = (int16_t)r0 - (int16_t)r1;
 		if (update_flags)
-			update_nzsc(lres, r0, ~r1);
+			update_nzsc(lres, sres);
 		break;
 	case 0x03: // Subtract w/ carry
 	{
 		uint32_t c = (m_core->m_r[REG_SR] & UNSP_C) ? 1 : 0;
 		lres = r0 + (uint16_t)(~r1) + c;
+		sres = (int16_t)r0 - ((int16_t)r1 - (int16_t)c);
 		if (update_flags)
-			update_nzsc(lres, r0, ~r1);
+			update_nzsc(lres, sres);
 		break;
 	}
 	case 0x04: // Compare
 		lres = r0 + (uint16_t)(~r1) + uint32_t(1);
+		sres = (int16_t)r0 - (int16_t)r1;
 		if (update_flags)
-			update_nzsc(lres, r0, ~r1);
+			update_nzsc(lres, sres);
 		return false;
 	case 0x06: // Negate
 		lres = -r1;
