@@ -31306,13 +31306,13 @@ nes                             // Nintendo Entertainment System
 nespal                          // Nintendo Entertainment System PAL
 
 @source:nes_boot.cpp
-bandgpad
-ts_handy11
-afbm7800
-cpatrolm
+pjoypj001
 
 @source:nes_sh6578.cpp
-pjoypj001
+afbm7800
+bandgpad
+cpatrolm
+ts_handy11
 
 @source:nes_vt.cpp
 vdogdeme
