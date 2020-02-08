@@ -7258,7 +7258,7 @@ This cart features two SmartMedia slots to import pictures to manipulate in the 
 			<feature name="cart_model" value="NUS-006(EUR)" />
 			<feature name="cart_back_label" value="NUS-EUR-1" />
 			<dataarea name="rom" size="12582912">
-				<rom name="nus-nmis-1.u1" size="12582912" crc="e1c470fd" sha1="e195bde1941f16f5bc693dcc4e47d63e770b18eb" />
+				<rom name="nus-nmis-1.u1" size="12582912" crc="ffd3f31e" sha1="816a3c905f28d43a9a0c4922951b90a48074626d" />
 			</dataarea>
 		</part>
 	</software>
@@ -12886,8 +12886,8 @@ clips onto the player's ear.
 		</part>
 	</software>
 
-	<software name="turok3up3" cloneof="turok3">
-		<description>Turok 3 - Shadow of Oblivion (USA, prototype 20000606)</description>
+	<software name="turok3p3" cloneof="turok3">
+		<description>Turok 3 - Shadow of Oblivion (Europe, prototype 20000606)</description>
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="n64_cart">
