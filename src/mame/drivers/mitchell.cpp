@@ -2020,6 +2020,7 @@ ROM_START( pangbb ) // Same bootleg hardware as pangba, but with original YM2413
 	ROM_LOAD( "10", 0x010000, 0x10000, CRC(082151ee) SHA1(0857b9f7430e0fc6217eafbaf008ff9da8e7a493) )
 ROM_END
 
+// Sound: Z80 (GoldStar Z8400A PS) + OKI M5205 + YM2413 + Xtal 10.000MHz
 ROM_START( pangbc )
 	ROM_REGION( 2*0x50000, "maincpu", 0 )
 	ROM_LOAD( "27c512-1.bin", 0x50000, 0x08000, CRC(f5e4a6c3) SHA1(2679d67877769389e726d601294c986e4bafabe6) )
