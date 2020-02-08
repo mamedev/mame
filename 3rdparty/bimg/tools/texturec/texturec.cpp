@@ -951,17 +951,19 @@ void help(const char* _error = NULL, bool _showHelp = true)
 		);
 }
 
-void help(const char* _str, const bx::Error& _err)
+void help(const bx::StringView _str, const bx::Error& _err)
 {
 	std::string str;
-	if (_str != NULL)
+	if (!_str.isEmpty() )
 	{
-		str.append(_str);
-		str.append(" ");
+		str.append(_str.getPtr(), _str.getTerm() - _str.getPtr() );
+		str.append(": ");
 	}
 
 	const bx::StringView& sv = _err.getMessage();
+	str.append("'");
 	str.append(sv.getPtr(), sv.getTerm() - sv.getPtr() );
+	str.append("'");
 
 	help(str.c_str(), false);
 }
@@ -1277,7 +1279,7 @@ int main(int _argc, const char* _argv[])
 
 			if (!err.isOk() )
 			{
-				help(NULL, err);
+				help("", err);
 				return bx::kExitFailure;
 			}
 		}
