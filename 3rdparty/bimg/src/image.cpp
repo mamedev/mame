@@ -1287,8 +1287,13 @@ namespace bimg
 		bx::read(&reader, magic);
 
 		ImageContainer imageContainer;
-		if (magicT != magic
-		|| !parseFnT(imageContainer, &reader, _err) )
+		if (magicT != magic)
+		{
+			BX_ERROR_SET(_err, BIMG_ERROR, "Invalid header magic.");
+			return NULL;
+		}
+
+		if (!parseFnT(imageContainer, &reader, _err) )
 		{
 			return NULL;
 		}
@@ -3516,6 +3521,7 @@ namespace bimg
 		if (!_err->isOk()
 		||  headerSize < DDS_HEADER_SIZE)
 		{
+			BX_ERROR_SET(_err, BIMG_ERROR, "DDS: Invalid header size.");
 			return false;
 		}
 
@@ -3946,6 +3952,7 @@ namespace bimg
 		if (identifier[1] != '1'
 		&&  identifier[2] != '1')
 		{
+			BX_ERROR_SET(_err, BIMG_ERROR, "KTX: Unrecognized version.");
 			return false;
 		}
 
@@ -4036,7 +4043,7 @@ namespace bimg
 
 		if (TextureFormat::Unknown == format)
 		{
-			BX_ERROR_SET(_err, BIMG_ERROR, "Unrecognized image format.");
+			BX_ERROR_SET(_err, BIMG_ERROR, "KTX: Unrecognized image format.");
 			return false;
 		}
 
