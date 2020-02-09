@@ -36996,8 +36996,10 @@ rad_fb2                         //
 mattelcs                        //
 abltenni                        //
 tvsprt10                        //
+decathln
 wiwi18                          //
 guitarfv
+jjstrip
 
 @source:spg2xx_dreamlife.cpp
 dreamlif                        //
@@ -37036,7 +37038,8 @@ lexiseal                        //
 discpal
 
 @source:spg2xx_mysprtch.cpp
-mysprtch
+mysprtcp
+mysptqvc
 mgt20in1
 
 @source:spg2xx_pdc.cpp

@@ -486,6 +486,25 @@ static INPUT_PORTS_START( tvsprt10 )
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( decathln )
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0180, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // Start
+	PORT_BIT( 0xfc00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( mattelcs ) // there is a 'secret test mode' that previously got activated before inputs were mapped, might need unused inputs to active?
 	PORT_START("P1")
@@ -868,6 +887,12 @@ ROM_START( tvsprt10 )
 	ROM_LOAD16_WORD_SWAP( "tvsports10in1.bin", 0x000000, 0x400000, CRC(98b79889) SHA1(b0ba534d59b794bb38c071c70ab5bcf711364e06) )
 ROM_END
 
+ROM_START( decathln )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "decathlon.bin", 0x000000, 0x400000, CRC(63c8e6b6) SHA1(6a25b68b45336e04a2bfd75b43a494349024d714) )
+ROM_END
+
+
 ROM_START( wiwi18 )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "26gl128.bin", 0x000000, 0x1000000, CRC(0b103ac9) SHA1(14434908f429942096fb8db5b5630603fd54fb2c) )
@@ -876,6 +901,11 @@ ROM_END
 ROM_START( guitarfv )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "mx26l64.bin", 0x000000, 0x800000, CRC(eaadd2c2) SHA1(0c3fe004dbaa52a335c6ddcecb9e9f5582d7ef35) )
+ROM_END
+
+ROM_START( jjstrip )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "strippoker.bin", 0x000000, 0x200000, CRC(7a70e6c8) SHA1(3d5da4774b00977939f309f3e71473dde9b70435) )
 ROM_END
 
 
@@ -913,7 +943,8 @@ void spg2xx_game_state::init_tvsprt10()
 	       0002 = clock? (toggles)
 	       0001 = data in / out
 	*/
-	rom[0x18c55d] ^= 0x0001;
+	if (rom[0x18c55d] == 0x9240) rom[0x18c55d] ^= 0x0001; // tvsprt10
+	if (rom[0x179911] == 0x9240) rom[0x179911] ^= 0x0001; // decathln
 }
 
 
@@ -931,10 +962,12 @@ CONS( 2007, rad_fb2,   0,        0, rad_skat, rad_fb2,    spg2xx_game_state, ini
 CONS( 2006, abltenni,    0,     0,        abltenni,       abltenni,    spg2xx_game_state, empty_init, "Advance Bright Ltd / V-Tac Technology Co Ltd.", "Wireless Tennis (WT2000, ABL TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // same as Excalibur Decathlon? not the same as the ABL game
-CONS( 2006, tvsprt10,    0,     0,        tvsprt10,       tvsprt10,    spg2xx_game_state, init_tvsprt10, "Simba / V-Tac Technology Co Ltd.", "TV Sports 10-in-1 / Decathlon Atlhetic Sport Games", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, tvsprt10,    0,     0,        tvsprt10,       tvsprt10,    spg2xx_game_state, init_tvsprt10, "Simba / V-Tac Technology Co Ltd.",              "TV Sports 10-in-1 / Decathlon Atlhetic Sport Games", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, decathln,    0,     0,        tvsprt10,       decathln,    spg2xx_game_state, init_tvsprt10, "Advance Bright Ltd / V-Tac Technology Co Ltd.", "Decathlon", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit found in Spain
 
 CONS( 2007, guitarfv,    0,     0,        guitarfv,       guitarfv,    spg2xx_game_state, empty_init, "Advance Bright Ltd", "Guitar Fever (2007.07.03 Ver 2.7)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
+CONS( 2007, jjstrip,    0,     0,        guitarfv,       guitarfv,    spg2xx_game_state, empty_init, "Shiggles Inc.", "Club Jenna Presents: Jenna Jameson's Strip Poker", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Mattel games
 CONS( 2005, mattelcs,  0,        0, rad_skat, mattelcs,   spg2xx_game_state, empty_init, "Mattel", "Mattel Classic Sports",     MACHINE_IMPERFECT_SOUND )

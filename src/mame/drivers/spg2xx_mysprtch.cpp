@@ -17,7 +17,7 @@ public:
 	void mysprtch(machine_config& config);
 	void mgt20in1(machine_config& config);
 
-	void init_mysprtch();
+	void init_mysprtcp();
 	void init_mgt20in1();
 
 protected:
@@ -28,16 +28,31 @@ protected:
 
 	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
 
-private:
-	DECLARE_READ16_MEMBER(mysprtch_rom_r);
-
-	required_region_ptr<uint16_t> m_romregion;
 	int m_romsize;
 	
 	int m_mysprtch_rombase;
 	uint16_t m_prev_porta;
 	int m_bank_enabled;
+
+private:
+	DECLARE_READ16_MEMBER(mysprtch_rom_r);
+	required_region_ptr<uint16_t> m_romregion;
 };
+
+class spg2xx_game_mysprtch24_state : public spg2xx_game_mysprtch_state
+{
+public:
+	spg2xx_game_mysprtch24_state(const machine_config& mconfig, device_type type, const char* tag) :
+		spg2xx_game_mysprtch_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void machine_reset() override;
+	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
+
+private:
+};
+
 
 
 READ16_MEMBER(spg2xx_game_mysprtch_state::mysprtch_rom_r)
@@ -72,7 +87,18 @@ void spg2xx_game_mysprtch_state::machine_reset()
 
 	m_maincpu->invalidate_cache();
 	m_maincpu->reset();
+}
 
+void spg2xx_game_mysprtch24_state::machine_reset()
+{
+	spg2xx_game_state::machine_reset();
+
+	m_mysprtch_rombase = 3;
+	m_prev_porta = 0x0000;
+	m_bank_enabled = 0;
+
+	m_maincpu->invalidate_cache();
+	m_maincpu->reset();
 }
 
 static INPUT_PORTS_START( mysprtch ) // Down + Button 1 and Button 2 for service mode
@@ -213,7 +239,7 @@ INPUT_PORTS_END
 
 WRITE16_MEMBER(spg2xx_game_mysprtch_state::porta_w)
 {
-	logerror("%s: porta_w %04x\n", machine().describe_context().c_str(), data);
+	logerror("%s: porta_w %04x\n", machine().describe_context(), data);
 
 	// this is rather ugly guesswork based on use and testmode
 
@@ -252,6 +278,11 @@ WRITE16_MEMBER(spg2xx_game_mysprtch_state::porta_w)
 	m_prev_porta = data;
 }
 
+WRITE16_MEMBER(spg2xx_game_mysprtch24_state::porta_w)
+{
+	printf("%s: porta_w %04x\n", machine().describe_context().c_str(), data);
+}
+	
 
 void spg2xx_game_mysprtch_state::mysprtch(machine_config& config)
 {
@@ -266,6 +297,8 @@ void spg2xx_game_mysprtch_state::mysprtch(machine_config& config)
 	m_maincpu->portc_in().set(FUNC(spg2xx_game_mysprtch_state::rad_portc_r));
 
 	m_maincpu->porta_out().set(FUNC(spg2xx_game_mysprtch_state::porta_w));
+
+	m_maincpu->set_rowscroll_offset(8); // for Tennis
 }
 
 void spg2xx_game_mysprtch_state::mgt20in1(machine_config& config)
@@ -276,7 +309,7 @@ void spg2xx_game_mysprtch_state::mgt20in1(machine_config& config)
 	m_screen->set_refresh_hz(50);
 }
 
-void spg2xx_game_mysprtch_state::init_mysprtch()
+void spg2xx_game_mysprtch_state::init_mysprtcp()
 {
 	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
@@ -334,10 +367,18 @@ void spg2xx_game_mysprtch_state::init_mgt20in1()
 }
 
 
-ROM_START( mysprtch )
+ROM_START( mysprtcp )
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "mysportschallengeplus.bin", 0x0000, 0x2000000, CRC(6911d19c) SHA1(c71bc38595e5505434395b6d59320caabfc7bce3) )
 ROM_END
+
+ROM_START( mysptqvc )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "qvcmysportschallenge.bin", 0x0000000, 0x2000000, CRC(04783adc) SHA1(a173145ec307fc12f231d3e3f6efa60f8c2f0c89) )
+ROM_END
+
+
+
 
 ROM_START( mgt20in1 )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
@@ -345,7 +386,11 @@ ROM_START( mgt20in1 )
 ROM_END
 
 // Unit with Blue surround to power button. Box shows 'Wireless Sports Plus' but title screen shots "My Sports Challenge Plus"  Appears to be V-Tac developed as it has the common V-Tac test mode.
-CONS( 200?, mysprtch,  0, 0, mysprtch, mysprtch, spg2xx_game_mysprtch_state,  init_mysprtch, "Senario / V-Tac Technology Co Ltd.",  "My Sports Challenge Plus / Wireless Sports Plus",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mysprtcp,  0, 0, mysprtch, mysprtch, spg2xx_game_mysprtch_state,  init_mysprtcp, "Senario / V-Tac Technology Co Ltd.",  "My Sports Challenge Plus / Wireless Sports Plus",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// from a QVC licensed unit with a different physical shape etc. uses a 32MByte rom with only 24MByte used, the regular units use an unusual 24MByte ROM, content might be the same, not yet verified.
+CONS( 200?, mysptqvc,  0, 0, mysprtch, mysprtch, spg2xx_game_mysprtch24_state,  init_mysprtcp, "Senario / V-Tac Technology Co Ltd. (QVC license)",  "My Sports Challenge (6-in-1 version, QVC license)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
 
 // 2009 date on PCB, not actually in German, so maybe sold under different brands?
 CONS( 2009, mgt20in1,  0, 0, mgt20in1, mgt20in1, spg2xx_game_mysprtch_state,  init_mgt20in1, "MGT",                                 "MGT 20-in-1 TV-Spielekonsole (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
