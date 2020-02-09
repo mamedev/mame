@@ -109,9 +109,17 @@ ROM_START( pjoypj001 )
 	ROM_LOAD( "powerjoy_pj001_te28f400ceb_00894471.bin", 0x00000, 0x80000, CRC(edca9b66) SHA1(f2f6d9043f524748282065b2fa0ca323ddd7d008) )
 ROM_END
 
+ROM_START( afbm7800 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "atariflashbackmini7800.bin", 0x00000, 0x100000, CRC(da4d9483) SHA1(c04465ff5bd5ca7abf088fe771b8e71c157afb89) )
+ROM_END
+
 
 void nes_clone_state::init_nes_clone()
 {
 }
 
 CONS( 200?, pjoypj001, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "Trump Grand", "PowerJoy (PJ001, NES based plug & play)", 0 )
+
+// "Flashback Mini 7800 uses normal NES-style hardware, together with a mapper chipset similar to the Waixing kk33xx cartridges (NES 2.0 Mapper 534)"
+CONS( 2004, afbm7800,  0,  0,  nes_clone,    nes_clone, nes_clone_state, init_nes_clone, "Atari", "Atari Flashback Mini 7800", MACHINE_NOT_WORKING )

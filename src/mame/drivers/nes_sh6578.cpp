@@ -119,10 +119,6 @@ ROM_START( ts_handy11 )
 	ROM_LOAD( "tvplaypowercontroller.bin", 0x00000, 0x100000, CRC(9c7fe9ff) SHA1(c872e91ca835b66c9dd3b380e8374b51f12bcae0) ) // 29LV008B
 ROM_END
 
-ROM_START( afbm7800 )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "atariflashbackmini7800.bin", 0x00000, 0x100000, CRC(da4d9483) SHA1(c04465ff5bd5ca7abf088fe771b8e71c157afb89) )
-ROM_END
 
 ROM_START( cpatrolm )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -135,6 +131,5 @@ CONS( 1997, bandgpad,  0,  0,  nes_sh6578,    nes_sh6578, nes_sh6578_state, init
 // possibly newer than 2001
 CONS( 2001, ts_handy11,  0,  0,  nes_sh6578,    nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Techno Source", "Handy Boy 11-in-1 (TV Play Power)", MACHINE_NOT_WORKING )
 
-CONS( 2004, afbm7800,  0,  0,  nes_sh6578,    nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Atari", "Atari Flashback Mini 7800", MACHINE_NOT_WORKING )
 
 CONS( 200?, cpatrolm,  0,  0,  nes_sh6578,    nes_sh6578, nes_sh6578_state, init_nes_sh6578, "<unknown>", "City Patrolman", MACHINE_NOT_WORKING )

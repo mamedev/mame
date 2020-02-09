@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="casio_rompack" description="Casio ROM Packs">
+
+	<software name="ro551">
+		<description>Casio ROM Pack RO-551</description>
+		<year>199?</year>
+		<publisher>Casio</publisher>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="0x1800">
+				<rom name="casiorompackro551.bin" size="0x1800" crc="85d88a29" sha1="943c9c89f0fb79e55714c8d7e103b77449add1f1"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

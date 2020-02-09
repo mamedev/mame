@@ -9803,6 +9803,9 @@ carpolo                         // (c) 1977
 bsebman                         // (c) 19?? BS Electronics
 carrera                         // (c) 19?? BS Electronics
 
+@source:casio_rompack.cpp
+casiorom
+
 @source:casloopy.cpp
 casloopy                        //
 
@@ -31313,9 +31316,9 @@ nespal                          // Nintendo Entertainment System PAL
 
 @source:nes_clone.cpp
 pjoypj001
+afbm7800
 
 @source:nes_sh6578.cpp
-afbm7800
 bandgpad
 cpatrolm
 ts_handy11
