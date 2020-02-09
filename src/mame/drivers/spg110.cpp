@@ -562,4 +562,4 @@ CONS( 2003, conyping,  0,        0, spg110_base, conyteni,  spg110_game_state, e
 // Also sold by SDW Games as both TV Virtual Fighter and TV Kickboxing (unit still has TV Virtual Fighter stickers even when box is TV Kickboxing - possibly just box changed due to Sega?)
 CONS( 200?, conyfght,  0,        0, spg110_base, conyteni,  spg110_game_state, empty_init, "Conny / Big Ben",      "TV Virtual Fighter / Free Fight Kung Fu (Conny / Big Ben)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 200?, karaokd2,  0,        0, spg110_base, conyteni,  spg110_game_state, empty_init, "<unknown>",      "Karao Kids Songs 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, karaokd2,  0,        0, spg110_base, conyteni,  spg110_game_state, empty_init, "Imaginarium / ItsMagical",      "Karao Kids Songs 2 (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // "ItsMagical" brand from Imaginarium

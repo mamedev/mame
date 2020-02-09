@@ -280,7 +280,27 @@ WRITE16_MEMBER(spg2xx_game_mysprtch_state::porta_w)
 
 WRITE16_MEMBER(spg2xx_game_mysprtch24_state::porta_w)
 {
-	printf("%s: porta_w %04x\n", machine().describe_context().c_str(), data);
+	logerror("%s: porta_w %04x\n", machine().describe_context(), data);
+
+	// this is rather ugly guesswork based on use and testmode
+	// the game writes 0x0000 to the ports during startup, which would cause an incorrect bank
+	// but this value can't just be ignored when we want to bank there
+	// so only bank if running from RAM
+
+	// probably should be the same logic for both games, as the test mode on this one proves
+	// that the logic in spg2xx_game_mysprtch_state::porta_w is incorrect
+
+	if (m_maincpu->pc() < 0x4000) 
+	{
+		int bank = 0;
+		bank |= (data & 0x0400) ? 1 : 0;
+		bank |= (data & 0x0800) ? 2 : 0;
+		bank |= (data & 0x0200) ? 0 : 4; // inverted
+
+		m_mysprtch_rombase = bank;
+	}
+
+	m_prev_porta = data;
 }
 	
 
