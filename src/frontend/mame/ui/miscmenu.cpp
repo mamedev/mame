@@ -94,12 +94,18 @@ void menu_bios_selection::populate(float &customtop, float &custombottom)
 		if (rom && !ROMENTRY_ISEND(rom))
 		{
 			const char *val = "default";
+			bool issystem_bios = false;
 			for ( ; !ROMENTRY_ISEND(rom); rom++)
 			{
-				if (ROMENTRY_ISSYSTEM_BIOS(rom) && ROM_GETBIOSFLAGS(rom) == device.system_bios())
-					val = rom->hashdata;
+				if (ROMENTRY_ISSYSTEM_BIOS(rom))
+				{
+					issystem_bios = true;
+					if (ROM_GETBIOSFLAGS(rom) == device.system_bios())
+						val = rom->hashdata;
+				}
 			}
-			item_append(!device.owner() ? "driver" : (device.tag() + 1), val, FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, (void *)&device);
+			if (issystem_bios)
+				item_append(!device.owner() ? "driver" : (device.tag() + 1), val, FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, (void *)&device);
 		}
 	}
 
