@@ -234,7 +234,7 @@ protected:
 	uint16_t pop(uint32_t *reg);
 
 	void update_nz(uint32_t value);
-	void update_nzsc(uint32_t value, int32_t svalue);
+	void update_nzsc(uint32_t value, uint16_t r0, uint16_t r1);
 	bool do_basic_alu_ops(const uint16_t& op0, uint32_t& lres, uint16_t& r0, uint16_t& r1, uint32_t& r2, bool update_flags);
 
 private:
