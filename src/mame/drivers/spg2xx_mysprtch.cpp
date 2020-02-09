@@ -336,33 +336,29 @@ void spg2xx_game_mysprtch_state::init_mgt20in1()
 	{
 		ROM[i] = ROM[i] ^ 0x4ec4;
 
-		ROM[i] = ((ROM[i] & 0xff00) >> 8) | ((ROM[i] & 0x00ff) << 8);
-
 		uint16_t res = 0;
 
-		if (ROM[i] & 0x0001) res ^= 0x0044; // 2 bits changed
-		if (ROM[i] & 0x0002) res ^= 0x8000;
-		if (ROM[i] & 0x0004) res ^= 0x0100;
-		if (ROM[i] & 0x0008) res ^= 0x0020;
+		if (ROM[i] & 0x0001) res ^= 0x0040;
+		if (ROM[i] & 0x0002) res ^= 0x0002;
+		if (ROM[i] & 0x0004) res ^= 0x0020;
+		if (ROM[i] & 0x0008) res ^= 0x1200; // 2 bits changed
 
-		if (ROM[i] & 0x0010) res ^= 0x0400;
-		if (ROM[i] & 0x0020) res ^= 0x0a00; // 2 bits changed
-		if (ROM[i] & 0x0040) res ^= 0x0002;
-		if (ROM[i] & 0x0080) res ^= 0x1080; // 2 bits changed
+		if (ROM[i] & 0x0010) res ^= 0x0100;
+		if (ROM[i] & 0x0020) res ^= 0x4000;
+		if (ROM[i] & 0x0040) res ^= 0x0010;
+		if (ROM[i] & 0x0080) res ^= 0x0800;
 
-		if (ROM[i] & 0x0100) res ^= 0x4000;
-		if (ROM[i] & 0x0200) res ^= 0x0200;
-		if (ROM[i] & 0x0400) res ^= 0x2000;
-		if (ROM[i] & 0x0800) res ^= 0x0012; // 2 bits changed
+		if (ROM[i] & 0x0100) res ^= 0x4400; // 2 bits changed
+		if (ROM[i] & 0x0200) res ^= 0x0080;
+		if (ROM[i] & 0x0400) res ^= 0x0001;
+		if (ROM[i] & 0x0800) res ^= 0x2000;
 
-		if (ROM[i] & 0x1000) res ^= 0x0001;
-		if (ROM[i] & 0x2000) res ^= 0x0040;
-		if (ROM[i] & 0x4000) res ^= 0x1000;
-		if (ROM[i] & 0x8000) res ^= 0x0008;
+		if (ROM[i] & 0x1000) res ^= 0x0004;
+		if (ROM[i] & 0x2000) res ^= 0x000a; // 2 bits changed
+		if (ROM[i] & 0x4000) res ^= 0x0200;
+		if (ROM[i] & 0x8000) res ^= 0x8010; // 2 bits changed
 
 		ROM[i] = res;
-
-		ROM[i] = ((ROM[i] & 0xff00) >> 8) | ((ROM[i] & 0x00ff) << 8);
 	}
 }
 
