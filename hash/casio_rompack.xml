@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="casio_rompack" description="Casio ROM Packs">
 
-	<software name="ro551">
+	<software name="ro551" supported="no">
 		<description>Casio ROM Pack RO-551</description>
 		<year>199?</year>
 		<publisher>Casio</publisher>
