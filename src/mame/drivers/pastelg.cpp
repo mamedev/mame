@@ -33,29 +33,29 @@ Memo:
 #include "speaker.h"
 
 
-void pastelg_state::machine_start()
+void threeds_state::machine_start()
 {
 	save_item(NAME(m_mux_data));
 }
 
-uint8_t pastelg_state::pastelg_sndrom_r()
+uint8_t pastelg_state::sndrom_r()
 {
-	return m_voice_rom[pastelg_blitter_src_addr_r() & 0x7fff];
+	return m_voice_rom[blitter_src_addr_r() & 0x7fff];
 }
 
-void pastelg_state::prg_map(address_map &map)
+void pastelg_common_state::prg_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xe000, 0xe7ff).ram().share("nvram");
 }
 
-uint8_t pastelg_state::irq_ack_r()
+uint8_t pastelg_common_state::irq_ack_r()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0;
 }
 
-void pastelg_state::pastelg_io_map(address_map &map)
+void pastelg_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 //  map(0x00, 0x00).nopw();
@@ -65,15 +65,15 @@ void pastelg_state::pastelg_io_map(address_map &map)
 	map(0x90, 0x90).portr("SYSTEM");
 	map(0x90, 0x96).w(FUNC(pastelg_state::blitter_w));
 	map(0xa0, 0xa0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport1_r), FUNC(nb1413m3_device::inputportsel_w));
-	map(0xb0, 0xb0).r(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r)).w(FUNC(pastelg_state::pastelg_romsel_w));
-	map(0xc0, 0xc0).r(FUNC(pastelg_state::pastelg_sndrom_r));
+	map(0xb0, 0xb0).r(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r)).w(FUNC(pastelg_state::romsel_w));
+	map(0xc0, 0xc0).r(FUNC(pastelg_state::sndrom_r));
 	map(0xc0, 0xcf).writeonly().share("clut");
 	map(0xd0, 0xd0).r(FUNC(pastelg_state::irq_ack_r)).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0xe0, 0xe0).portr("DSWC");
 }
 
 
-uint8_t pastelg_state::threeds_inputport1_r()
+uint8_t threeds_state::inputport1_r()
 {
 	switch(m_mux_data)
 	{
@@ -87,7 +87,7 @@ uint8_t pastelg_state::threeds_inputport1_r()
 	return 0xff;
 }
 
-uint8_t pastelg_state::threeds_inputport2_r()
+uint8_t threeds_state::inputport2_r()
 {
 	switch(m_mux_data)
 	{
@@ -101,23 +101,23 @@ uint8_t pastelg_state::threeds_inputport2_r()
 	return 0xff;
 }
 
-void pastelg_state::threeds_inputportsel_w(uint8_t data)
+void threeds_state::inputportsel_w(uint8_t data)
 {
 	m_mux_data = ~data;
 }
 
-void pastelg_state::threeds_io_map(address_map &map)
+void threeds_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x81, 0x81).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x82, 0x83).w("aysnd", FUNC(ay8910_device::data_address_w));
-	map(0x90, 0x90).portr("SYSTEM").w(FUNC(pastelg_state::threeds_romsel_w));
-	map(0xf0, 0xf6).w(FUNC(pastelg_state::blitter_w));
-	map(0xa0, 0xa0).rw(FUNC(pastelg_state::threeds_inputport1_r), FUNC(pastelg_state::threeds_inputportsel_w));
-	map(0xb0, 0xb0).r(FUNC(pastelg_state::threeds_inputport2_r)).w(FUNC(pastelg_state::threeds_output_w)); //writes: bit 3 is coin lockout, bit 1 is coin counter
+	map(0x90, 0x90).portr("SYSTEM").w(FUNC(threeds_state::romsel_w));
+	map(0xf0, 0xf6).w(FUNC(threeds_state::blitter_w));
+	map(0xa0, 0xa0).rw(FUNC(threeds_state::inputport1_r), FUNC(threeds_state::inputportsel_w));
+	map(0xb0, 0xb0).r(FUNC(threeds_state::inputport2_r)).w(FUNC(threeds_state::output_w)); //writes: bit 3 is coin lockout, bit 1 is coin counter
 	map(0xc0, 0xcf).writeonly().share("clut");
-	map(0xc0, 0xc0).r(FUNC(pastelg_state::threeds_rom_readback_r));
-	map(0xd0, 0xd0).r(FUNC(pastelg_state::irq_ack_r)).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0xc0, 0xc0).r(FUNC(threeds_state::rom_readback_r));
+	map(0xd0, 0xd0).r(FUNC(threeds_state::irq_ack_r)).w("dac", FUNC(dac_byte_interface::data_w));
 }
 
 static INPUT_PORTS_START( pastelg )
@@ -362,7 +362,7 @@ void pastelg_state::pastelg(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 19968000/4);    // unknown divider, galds definitely relies on this for correct voice pitch
 	m_maincpu->set_addrmap(AS_PROGRAM, &pastelg_state::prg_map);
-	m_maincpu->set_addrmap(AS_IO, &pastelg_state::pastelg_io_map);
+	m_maincpu->set_addrmap(AS_IO, &pastelg_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(pastelg_state::irq0_line_assert)); // nmiclock not written, chip is 1411M1 instead of 1413M3
 
 	NB1413M3(config, m_nb1413m3, 0, NB1413M3_PASTELG);
@@ -417,13 +417,13 @@ Note
 
 */
 
-void pastelg_state::threeds(machine_config &config)
+void threeds_state::threeds(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 19968000/4);    // unknown divider, galds definitely relies on this for correct voice pitch
-	m_maincpu->set_addrmap(AS_PROGRAM, &pastelg_state::prg_map);
-	m_maincpu->set_addrmap(AS_IO, &pastelg_state::threeds_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(pastelg_state::irq0_line_assert));
+	m_maincpu->set_addrmap(AS_PROGRAM, &threeds_state::prg_map);
+	m_maincpu->set_addrmap(AS_IO, &threeds_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(threeds_state::irq0_line_assert));
 
 	NB1413M3(config, m_nb1413m3, 0);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -434,10 +434,10 @@ void pastelg_state::threeds(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0, 256-1, 16, 240-1);
-	m_screen->set_screen_update(FUNC(pastelg_state::screen_update));
+	m_screen->set_screen_update(FUNC(threeds_state::screen_update));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(pastelg_state::palette), 32);
+	PALETTE(config, "palette", FUNC(threeds_state::palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -541,6 +541,6 @@ ROM_END
 
 
 GAME( 1985, pastelg,  0,       pastelg, pastelg, pastelg_state, empty_init, ROT0, "Nichibutsu", "Pastel Gal (Japan 851224)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, threeds,  0,       threeds, threeds, pastelg_state, empty_init, ROT0, "Nichibutsu", "Three Ds - Three Dealers Casino House (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, threedsa, threeds, threeds, threeds, pastelg_state, empty_init, ROT0, "Nichibutsu", "Three Ds - Three Dealers Casino House (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, galds,    threeds, threeds, galds,   pastelg_state, empty_init, ROT0, "Nihon System Corp.", "Gals Ds - Three Dealers Casino House (bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, threeds,  0,       threeds, threeds, threeds_state, empty_init, ROT0, "Nichibutsu", "Three Ds - Three Dealers Casino House (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, threedsa, threeds, threeds, threeds, threeds_state, empty_init, ROT0, "Nichibutsu", "Three Ds - Three Dealers Casino House (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, galds,    threeds, threeds, galds,   threeds_state, empty_init, ROT0, "Nihon System Corp.", "Gals Ds - Three Dealers Casino House (bootleg?)", MACHINE_SUPPORTS_SAVE )

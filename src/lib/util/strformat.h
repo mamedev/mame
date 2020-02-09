@@ -187,23 +187,10 @@
 #include <type_traits>
 #include <utility>
 
-#if defined(__GLIBCXX__)
-namespace std {
-namespace mame_cxx14_compat {
-template <typename T>
-inline constexpr auto cbegin(const T& cont) noexcept(noexcept(std::begin(cont))) -> decltype(std::begin(cont))
-{ return std::begin(cont); }
-
-template <typename T>
-inline constexpr auto cend(const T& cont) noexcept(noexcept(std::end(cont))) -> decltype(std::end(cont))
-{ return std::end(cont); }
-}
-using namespace mame_cxx14_compat;
-}
-#endif
-
 namespace util {
+
 namespace detail {
+
 //**************************************************************************
 //  FORMAT CHARACTER DEFINITIONS
 //**************************************************************************
@@ -595,6 +582,54 @@ private:
 	template <typename U> struct default_semantics
 	{ static constexpr bool value = !signed_integer_semantics<U>::value && !unsigned_integer_semantics<U>::value; };
 
+	static void apply_signed(Stream &str, char16_t const &value)
+	{
+		str << std::make_signed_t<std::uint_least16_t>(std::uint_least16_t(value));
+	}
+	static void apply_signed(Stream &str, char32_t const &value)
+	{
+		str << std::make_signed_t<std::uint_least32_t>(std::uint_least32_t(value));
+	}
+	template <typename U>
+	static std::enable_if_t<std::is_same<std::make_signed_t<U>, std::make_signed_t<char> >::value> apply_signed(Stream &str, U const &value)
+	{
+		str << int(std::make_signed_t<U>(value));
+	}
+	template <typename U>
+	static std::enable_if_t<!std::is_same<std::make_signed_t<U>, std::make_signed_t<char> >::value && signed_integer_semantics<U>::value> apply_signed(Stream &str, U const &value)
+	{
+		str << value;
+	}
+	template <typename U>
+	static std::enable_if_t<!std::is_same<std::make_signed_t<U>, std::make_signed_t<char> >::value && unsigned_integer_semantics<U>::value> apply_signed(Stream &str, U const &value)
+	{
+		str << std::make_signed_t<U>(value);
+	}
+
+	static void apply_unsigned(Stream &str, char16_t const &value)
+	{
+		str << std::uint_least16_t(value);
+	}
+	static void apply_unsigned(Stream &str, char32_t const &value)
+	{
+		str << std::uint_least32_t(value);
+	}
+	template <typename U>
+	static std::enable_if_t<std::is_same<std::make_unsigned_t<U>, std::make_unsigned_t<char> >::value> apply_unsigned(Stream &str, U const &value)
+	{
+		str << unsigned(std::make_unsigned_t<U>(value));
+	}
+	template <typename U>
+	static std::enable_if_t<!std::is_same<std::make_unsigned_t<U>, std::make_unsigned_t<char> >::value && signed_integer_semantics<U>::value> apply_unsigned(Stream &str, U const &value)
+	{
+		str << std::make_unsigned_t<U>(value);
+	}
+	template <typename U>
+	static std::enable_if_t<!std::is_same<std::make_unsigned_t<U>, std::make_unsigned_t<char> >::value && unsigned_integer_semantics<U>::value> apply_unsigned(Stream &str, U const &value)
+	{
+		str << value;
+	}
+
 public:
 	template <typename U>
 	static void apply(std::enable_if_t<signed_integer_semantics<U>::value, Stream> &str, format_flags const &flags, U const &value)
@@ -632,10 +667,7 @@ public:
 				str << std::int64_t(value);
 				break;
 			default:
-				if (std::is_same<std::make_signed_t<U>, std::make_signed_t<char> >::value)
-					str << int(value);
-				else
-					str << value;
+				apply_signed(str, value);
 			}
 			break;
 		case format_flags::conversion::unsigned_decimal:
@@ -671,10 +703,7 @@ public:
 				str << std::uint64_t(std::int64_t(value));
 				break;
 			default:
-				if (std::is_same<std::make_unsigned_t<U>, std::make_unsigned_t<char> >::value)
-					str << unsigned(std::make_unsigned_t<U>(value));
-				else
-					str << std::make_unsigned_t<U>(value);
+				apply_unsigned(str, value);
 			}
 			break;
 		case format_flags::conversion::character:
@@ -726,10 +755,7 @@ public:
 				str << std::int64_t(std::uint64_t(value));
 				break;
 			default:
-				if (std::is_same<std::make_signed_t<U>, std::make_signed_t<char> >::value)
-					str << int(std::make_signed_t<U>(value));
-				else
-					str << std::make_signed_t<U>(value);
+				apply_signed(str, value);
 			}
 			break;
 		case format_flags::conversion::unsigned_decimal:
@@ -765,10 +791,7 @@ public:
 				str << std::int64_t(value);
 				break;
 			default:
-				if (std::is_same<std::make_unsigned_t<U>, std::make_unsigned_t<char> >::value)
-					str << unsigned(value);
-				else
-					str << value;
+				apply_unsigned(str, value);
 			}
 			break;
 		case format_flags::conversion::character:

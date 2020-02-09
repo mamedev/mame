@@ -393,10 +393,10 @@ void unsp_device::state_import(const device_state_entry &entry)
 
 /*****************************************************************************/
 
-void unsp_device::update_nzsc(uint32_t value, int32_t svalue)
+void unsp_device::update_nzsc(uint32_t value, uint16_t r0, uint16_t r1)
 {
 	m_core->m_r[REG_SR] &= ~(UNSP_N | UNSP_Z | UNSP_S | UNSP_C);
-	if (svalue < 0)
+	if (BIT(value, 16) != BIT((r0 ^ r1), 15))
 		m_core->m_r[REG_SR] |= UNSP_S;
 	if (BIT(value, 15))
 		m_core->m_r[REG_SR] |= UNSP_N;

@@ -32189,6 +32189,8 @@ mpx16                           // Ciarcia's Circuit Cellar Micromint MPX-16
 hstrtpls                        // Vendex HeadStart Plus
 nms9100                         // Philips NMS 9100 series
 to16                            // Thomson TO16
+alphatp10                       // Triumph-Adler Alphatronic P10
+alphatp50                       // Triumph-Adler Alphatronic P50
 
 @source:pc100.cpp
 pc100                           //
