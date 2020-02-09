@@ -42,7 +42,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 | 500-11972-A |GER| Batman - Multipliziere, dividiere und reagiere            | LEAPSTER       |
 | 500-11993-A |ENG| Number Raiders - Arcade-Style Learning                    | LEAPSTER       |
 | 500-11994-A |ENG| Cosmic Math - Arcade-Style Learning!                      | LEAPSTER       |
-| 500-11995-A |ENG| Letterpillar                                              | LEAPSTER       | (*)
+| 500-11995-A |ENG| Letterpillar (v1.0)                                       | LEAPSTER       |
 | 500-11996-A |ENG| Word Chasers                                              | LEAPSTER       | (*)
 | 500-12098-A |ENG| Cars                                                      | LEAPSTER       |
 | 500-12099-A |ENG| NASCAR                                                    | LEAPSTER L-MAX |
@@ -64,7 +64,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 | 500-12293-A |ENG| Animal Genius                                             | LEAPSTER       |
 | 500-12296-A |ENG| SonicX                                                    | LEAPSTER       |
 | 500-12339-A |FRA| Dora L'Exploratrice - Au Secours Des Animaux              | LEAPSTER       |
-| 500-12350-A |ENG| Letterpillar                                              | LEAPSTER       |
+| 500-12350-A |ENG| Letterpillar (v1.1)                                       | LEAPSTER       |
 | 500-12352-A |ENG| Cosmic Math - Arcade-Style Learning!                      | LEAPSTER       | (*)
 | 500-12392-A |FRA| Dora L'Exploratrice - Le Pont Casse                       | LEAPSTER       |
 | 500-12393-A |FRA| La Rivière Des Lapins + L'atelier De Peinture             | LEAPSTER       |
@@ -121,6 +121,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 | 500-13982-A |ENG| Toy Story 3                                               | LEAPSTER       |
 | 500-14005-A |ENG| Scooby Doo!                                               | LEAPSTER       |
 | 500-14320-A |ENG| Cars 2                                                    | LEAPSTER       |
+| 500-14492-A |ENG| The Disney-Pixar Collection                               | LEAPSTER       |
 
 -->
 
@@ -135,7 +136,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-11000" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11000.bin" size="8388608" crc="db36283f" sha1="9f9509313a0ebdac84c2dc02566fedf04ea0eee7" offset="0" />
+				<rom name="500-11000.bin" size="8388608" crc="db36283f" sha1="9f9509313a0ebdac84c2dc02566fedf04ea0eee7" />
 			</dataarea>
 		</part>
 	</software>
@@ -147,7 +148,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12475-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12475-a.bin" size="8388608" crc="b0ba6d76" sha1="d5bf632b9c2a7850f9a6e1ce855ac48af366f859" offset="0" />
+				<rom name="500-12475-a.bin" size="8388608" crc="b0ba6d76" sha1="d5bf632b9c2a7850f9a6e1ce855ac48af366f859" />
 			</dataarea>
 		</part>
 	</software>
@@ -159,7 +160,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12293-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12293-A - Scholastic - Animal Genius (US).bin" size="8388608" crc="af063ba4" sha1="af22fdbb0466e1a078e68fe26752e606b529fcca" offset="0" />
+				<rom name="500-12293-A - Scholastic - Animal Genius (US).bin" size="8388608" crc="af063ba4" sha1="af22fdbb0466e1a078e68fe26752e606b529fcca" />
 			</dataarea>
 		</part>
 	</software>
@@ -171,7 +172,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-13453-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13453-a.bin" size="8388608" crc="de5fb26e" sha1="2a1df737ec907d1f1b837f9b58323ee908cb45a9" offset="0" />
+				<rom name="500-13453-a.bin" size="8388608" crc="de5fb26e" sha1="2a1df737ec907d1f1b837f9b58323ee908cb45a9" />
 			</dataarea>
 		</part>
 	</software>
@@ -183,7 +184,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12711-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12711-a.bin" size="8388608" crc="7c934681" sha1="8db48ba9caa2f87922cb289520acd97d9931a178" offset="0" />
+				<rom name="500-12711-a.bin" size="8388608" crc="7c934681" sha1="8db48ba9caa2f87922cb289520acd97d9931a178" />
 			</dataarea>
 		</part>
 	</software>
@@ -195,7 +196,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-11972-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11972-a.bin" size="8388608" crc="a0a362aa" sha1="442455a0bf2c3ca4c1084a1e8761eb80a4cd71e2" offset="0" />
+				<rom name="500-11972-a.bin" size="8388608" crc="a0a362aa" sha1="442455a0bf2c3ca4c1084a1e8761eb80a4cd71e2" />
 			</dataarea>
 		</part>
 	</software>
@@ -207,7 +208,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12830-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12830-a.bin" size="8388608" crc="6a7afd1c" sha1="3ae1372253b852b2cef8bfd549050b324375bda9" offset="0" />
+				<rom name="500-12830-a.bin" size="8388608" crc="6a7afd1c" sha1="3ae1372253b852b2cef8bfd549050b324375bda9" />
 			</dataarea>
 		</part>
 	</software>
@@ -219,7 +220,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12098-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12098-a.bin" size="8388608" crc="d4a7e5d4" sha1="c831db237e73e61e863e4f477dcc0298488b3d69" offset="0" />
+				<rom name="500-12098-a.bin" size="8388608" crc="d4a7e5d4" sha1="c831db237e73e61e863e4f477dcc0298488b3d69" />
 			</dataarea>
 		</part>
 	</software>
@@ -231,7 +232,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12414-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12414-a.bin" size="8388608" crc="b6aabb7b" sha1="82cc91536be8c18c10089c4ad85b9a82e63b824b" offset="0" />
+				<rom name="500-12414-a.bin" size="8388608" crc="b6aabb7b" sha1="82cc91536be8c18c10089c4ad85b9a82e63b824b" />
 			</dataarea>
 		</part>
 	</software>
@@ -243,7 +244,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12171-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12171-a.bin" size="8388608" crc="c7b62602" sha1="bbc2b70e588710b2096741046ae3e08095397ee9" offset="0" />
+				<rom name="500-12171-a.bin" size="8388608" crc="c7b62602" sha1="bbc2b70e588710b2096741046ae3e08095397ee9" />
 			</dataarea>
 		</part>
 	</software>
@@ -255,7 +256,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12223-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12223-a.bin" size="8388608" crc="2a704606" sha1="069f0e139231a3786472ab139e3d28bb2f2e098e" offset="0" />
+				<rom name="500-12223-a.bin" size="8388608" crc="2a704606" sha1="069f0e139231a3786472ab139e3d28bb2f2e098e" />
 			</dataarea>
 		</part>
 	</software>
@@ -267,7 +268,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-14320-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-14320-A - Cars 2 (US).bin" size="8388608" crc="29af42ba" sha1="01263c4b6b178599eca818a514f9a668bdf9081d" offset="0" />
+				<rom name="500-14320-A - Cars 2 (US).bin" size="8388608" crc="29af42ba" sha1="01263c4b6b178599eca818a514f9a668bdf9081d" />
 			</dataarea>
 		</part>
 	</software>
@@ -279,7 +280,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12712-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12712-a.bin" size="8388608" crc="beca3909" sha1="8cda80251d6e45427dba6acbae5dff306eb84d34" offset="0" />
+				<rom name="500-12712-a.bin" size="8388608" crc="beca3909" sha1="8cda80251d6e45427dba6acbae5dff306eb84d34" />
 			</dataarea>
 		</part>
 	</software>
@@ -291,7 +292,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12466-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12466-a.bin" size="8388608" crc="0134af49" sha1="29c3e2e9d56aeee09c752776bfd8c096e02b75c5" offset="0" />
+				<rom name="500-12466-a.bin" size="8388608" crc="0134af49" sha1="29c3e2e9d56aeee09c752776bfd8c096e02b75c5" />
 			</dataarea>
 		</part>
 	</software>
@@ -303,7 +304,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-11994-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11994-a.bin" size="4194304" crc="979346d5" sha1="ecd8d3f7bae4fea1710ee99c5637224180021dd6" offset="0" />
+				<rom name="500-11994-a.bin" size="4194304" crc="979346d5" sha1="ecd8d3f7bae4fea1710ee99c5637224180021dd6" />
 			</dataarea>
 		</part>
 	</software>
@@ -315,7 +316,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12677-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12677-A - Creature Create (US).bin" size="8388608" crc="9f08d02a" sha1="82a408b87ff5df6f17d314af17cd20ff4847b30f" offset="0" />
+				<rom name="500-12677-A - Creature Create (US).bin" size="8388608" crc="9f08d02a" sha1="82a408b87ff5df6f17d314af17cd20ff4847b30f" />
 			</dataarea>
 		</part>
 	</software>
@@ -327,7 +328,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-11603-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11603-a.bin" size="8388608" crc="71062cd7" sha1="eaf0656d29f61d89b97c6d66e73a2fa7021a92e3" offset="0" />
+				<rom name="500-11603-a.bin" size="8388608" crc="71062cd7" sha1="eaf0656d29f61d89b97c6d66e73a2fa7021a92e3" />
 			</dataarea>
 		</part>
 	</software>
@@ -339,7 +340,19 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-13681-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13681-a.bin" size="8388608" crc="822ca3da" sha1="ff0ac7f5fded346553e1a4697b45c27fc04ee3fe" offset="0" />
+				<rom name="500-13681-a.bin" size="8388608" crc="822ca3da" sha1="ff0ac7f5fded346553e1a4697b45c27fc04ee3fe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dispixcoll" supported="no">
+		<description>The Disney-Pixar Collection (USA)</description>
+		<year>2011</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-14492-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-14492-A - The Disney-Pixar Collection (US).bin" size="8388608" crc="d8ac1a09" sha1="bb6ae8a09a69133a116bd6ffc2b2bf23724b6da5" />
 			</dataarea>
 		</part>
 	</software>
@@ -351,7 +364,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-13366-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13366-a.bin" size="8388608" crc="fdcd1321" sha1="fbe422df83608a75f96168f83b32f45b700dacd5" offset="0" />
+				<rom name="500-13366-a.bin" size="8388608" crc="fdcd1321" sha1="fbe422df83608a75f96168f83b32f45b700dacd5" />
 			</dataarea>
 		</part>
 	</software>
@@ -363,7 +376,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-13763-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13763-a.bin" size="8388608" crc="d2f560c7" sha1="7a9a8f78eb245c3b8600b0658f1d1b1fa99e6a5c" offset="0" />
+				<rom name="500-13763-a.bin" size="8388608" crc="d2f560c7" sha1="7a9a8f78eb245c3b8600b0658f1d1b1fa99e6a5c" />
 			</dataarea>
 		</part>
 	</software>
@@ -375,7 +388,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-13514-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13514-a.bin" size="8388608" crc="5ccb2ad3" sha1="42740f6597f4a2eb878a54ddbf75452a2cca301d" offset="0" />
+				<rom name="500-13514-a.bin" size="8388608" crc="5ccb2ad3" sha1="42740f6597f4a2eb878a54ddbf75452a2cca301d" />
 			</dataarea>
 		</part>
 	</software>
@@ -387,7 +400,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-11496-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11496-a.bin" size="8388608" crc="bb6d5375" sha1="743d07ee756b54e2c72bf94da56dd8d18c4cd106" offset="0" />
+				<rom name="500-11496-a.bin" size="8388608" crc="bb6d5375" sha1="743d07ee756b54e2c72bf94da56dd8d18c4cd106" />
 			</dataarea>
 		</part>
 	</software>
@@ -399,7 +412,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12411-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12411-a.bin" size="8388608" crc="69eaa1ea" sha1="a7072e5fe5d143ad65fb16ad13bf738b1b43552f" offset="0" />
+				<rom name="500-12411-a.bin" size="8388608" crc="69eaa1ea" sha1="a7072e5fe5d143ad65fb16ad13bf738b1b43552f" />
 			</dataarea>
 		</part>
 	</software>
@@ -411,7 +424,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12218-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12218-a.bin" size="8388608" crc="5a52d3f0" sha1="072353a79c124855c5904137f15e8a84ad622914" offset="0" />
+				<rom name="500-12218-a.bin" size="8388608" crc="5a52d3f0" sha1="072353a79c124855c5904137f15e8a84ad622914" />
 			</dataarea>
 		</part>
 	</software>
@@ -423,7 +436,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-13448-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13448-a.bin" size="8388608" crc="2465f01d" sha1="d37d7ea21cf8ed01ecf497c3c99185529aee59af" offset="0" />
+				<rom name="500-13448-a.bin" size="8388608" crc="2465f01d" sha1="d37d7ea21cf8ed01ecf497c3c99185529aee59af" />
 			</dataarea>
 		</part>
 	</software>
@@ -435,7 +448,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-13405-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13405-a.bin" size="8388608" crc="71778536" sha1="9f8c5e02519def049078614dacc76b990e911add" offset="0" />
+				<rom name="500-13405-a.bin" size="8388608" crc="71778536" sha1="9f8c5e02519def049078614dacc76b990e911add" />
 			</dataarea>
 		</part>
 	</software>
@@ -447,7 +460,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12161-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="500-12161-a.bin" size="4194304" crc="ea544030" sha1="a9aaf73e5259db303f8bfc39bd6d7b40bddb127f" offset="0" />
+				<rom name="500-12161-a.bin" size="4194304" crc="ea544030" sha1="a9aaf73e5259db303f8bfc39bd6d7b40bddb127f" />
 			</dataarea>
 		</part>
 	</software>
@@ -459,7 +472,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12562-B" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12562-b.bin" size="8388608" crc="242907d4" sha1="262ee3e208fff0fc362bc879416cbdf31bf38304" offset="0" />
+				<rom name="500-12562-b.bin" size="8388608" crc="242907d4" sha1="262ee3e208fff0fc362bc879416cbdf31bf38304" />
 			</dataarea>
 		</part>
 	</software>
@@ -471,7 +484,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12339-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12339-a.bin" size="8388608" crc="e557c760" sha1="964150dfd525188a0e8d6bcbc715f9a40e4c6779" offset="0" />
+				<rom name="500-12339-a.bin" size="8388608" crc="e557c760" sha1="964150dfd525188a0e8d6bcbc715f9a40e4c6779" />
 			</dataarea>
 		</part>
 	</software>
@@ -483,7 +496,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12392-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="500-12392-a.bin" size="4194304" crc="b6607eee" sha1="278e89cdc99bdd9284447f31a1fd23de36eb8dca" offset="0" />
+				<rom name="500-12392-a.bin" size="4194304" crc="b6607eee" sha1="278e89cdc99bdd9284447f31a1fd23de36eb8dca" />
 			</dataarea>
 		</part>
 	</software>
@@ -495,7 +508,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-10775-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-10775-a.bin" size="8388608" crc="1895f946" sha1="8baf4f44f64d17333a82ce29e59c62e51e45c0c0" offset="0" />
+				<rom name="500-10775-a.bin" size="8388608" crc="1895f946" sha1="8baf4f44f64d17333a82ce29e59c62e51e45c0c0" />
 			</dataarea>
 		</part>
 	</software>
@@ -507,7 +520,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-11495-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11495-a.bin" size="8388608" crc="6a5e20ba" sha1="984638e1d9b869611de8900d8f5a6a760cd40539" offset="0" />
+				<rom name="500-11495-a.bin" size="8388608" crc="6a5e20ba" sha1="984638e1d9b869611de8900d8f5a6a760cd40539" />
 			</dataarea>
 		</part>
 	</software>
@@ -519,7 +532,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12227-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12227-A - Buscando a Nemo (Spa).bin" size="8388608" crc="7aa17c75" sha1="798e2bf0d2decc08430ff5d3009b60dffa341aba" offset="0" />
+				<rom name="500-12227-A - Buscando a Nemo (Spa).bin" size="8388608" crc="7aa17c75" sha1="798e2bf0d2decc08430ff5d3009b60dffa341aba" />
 			</dataarea>
 		</part>
 	</software>
@@ -531,7 +544,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12715-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12715-a.bin" size="8388608" crc="e62d1684" sha1="e43820efe9dbd8dddf6312493a7967c75a29431a" offset="0" />
+				<rom name="500-12715-a.bin" size="8388608" crc="e62d1684" sha1="e43820efe9dbd8dddf6312493a7967c75a29431a" />
 			</dataarea>
 		</part>
 	</software>
@@ -543,7 +556,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12692-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12692-a.bin" size="8388608" crc="05b608f0" sha1="04b3181f39e88b6cd47e39a7efb50fa14618ff2c" offset="0" />
+				<rom name="500-12692-a.bin" size="8388608" crc="05b608f0" sha1="04b3181f39e88b6cd47e39a7efb50fa14618ff2c" />
 			</dataarea>
 		</part>
 	</software>
@@ -555,7 +568,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-13447-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13447-a.bin" size="8388608" crc="ebbf83a0" sha1="2412607b40f8e46881368607b4fe15ecf2f2e9eb" offset="0" />
+				<rom name="500-13447-a.bin" size="8388608" crc="ebbf83a0" sha1="2412607b40f8e46881368607b4fe15ecf2f2e9eb" />
 			</dataarea>
 		</part>
 	</software>
@@ -567,7 +580,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-10935-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-10935-a.bin" size="8388608" crc="6fd44f1a" sha1="fe6e8e1aaf72901820ee99d22dcc40a01d627fac" offset="0" />
+				<rom name="500-10935-a.bin" size="8388608" crc="6fd44f1a" sha1="fe6e8e1aaf72901820ee99d22dcc40a01d627fac" />
 			</dataarea>
 		</part>
 	</software>
@@ -579,7 +592,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-11494-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11494-a.bin" size="8388608" crc="96d30f93" sha1="61dd156ae456a370a021061da9b3a4e33bda371e" offset="0" />
+				<rom name="500-11494-a.bin" size="8388608" crc="96d30f93" sha1="61dd156ae456a370a021061da9b3a4e33bda371e" />
 			</dataarea>
 		</part>
 	</software>
@@ -591,7 +604,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-13298-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13298-a.bin" size="8388608" crc="7c716016" sha1="35512ea5c267f5540cbfa64a4d35ebc54464fd31" offset="0" />
+				<rom name="500-13298-a.bin" size="8388608" crc="7c716016" sha1="35512ea5c267f5540cbfa64a4d35ebc54464fd31" />
 			</dataarea>
 		</part>
 	</software>
@@ -603,7 +616,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-10999" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-10999 - Kindergarten (US).bin" size="8388608" crc="db262164" sha1="2ece5050d65d020cce70e220af3c11c9827029ac" offset="0" />
+				<rom name="500-10999 - Kindergarten (US).bin" size="8388608" crc="db262164" sha1="2ece5050d65d020cce70e220af3c11c9827029ac" />
 			</dataarea>
 		</part>
 	</software>
@@ -615,7 +628,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12393-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="500-12393-a.bin" size="4194304" crc="e8c84241" sha1="dfdf21c90ce5807459c90d515f28f838effacde6" offset="0" />
+				<rom name="500-12393-a.bin" size="4194304" crc="e8c84241" sha1="dfdf21c90ce5807459c90d515f28f838effacde6" />
 			</dataarea>
 		</part>
 	</software>
@@ -627,7 +640,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12800-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12800-a.bin" size="8388608" crc="680f3323" sha1="fc28a2b4e86cbdbf5f3218bd36fb7b72d9bd44d3" offset="0" />
+				<rom name="500-12800-a.bin" size="8388608" crc="680f3323" sha1="fc28a2b4e86cbdbf5f3218bd36fb7b72d9bd44d3" />
 			</dataarea>
 		</part>
 	</software>
@@ -639,7 +652,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-10093" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-10093 - Learning with Leap (US).bin" size="8388608" crc="2c1fcf40" sha1="ee9dbfa8aabda493cc2a34dc82b253122fa96c91" offset="0" />
+				<rom name="500-10093 - Learning with Leap (US).bin" size="8388608" crc="2c1fcf40" sha1="ee9dbfa8aabda493cc2a34dc82b253122fa96c91" />
 			</dataarea>
 		</part>
 	</software>
@@ -651,7 +664,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-11078-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11078-a.bin" size="8388608" crc="e1f505e7" sha1="935eb17d3b6f9df2115a12445b3c8c977005481a" offset="0" />
+				<rom name="500-11078-a.bin" size="8388608" crc="e1f505e7" sha1="935eb17d3b6f9df2115a12445b3c8c977005481a" />
 			</dataarea>
 		</part>
 	</software>
@@ -663,19 +676,31 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-11493-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11493-a.bin" size="8388608" crc="e58eac06" sha1="a2f8c6df81fd5f72f6894b153306fd871fd20aac" offset="0" />
+				<rom name="500-11493-a.bin" size="8388608" crc="e58eac06" sha1="a2f8c6df81fd5f72f6894b153306fd871fd20aac" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="letrpilr" supported="no">
-		<description>Letterpillar (USA)</description>
+		<description>Letterpillar (v1.1, USA)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12350-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="500-12350-A - Letterpillar (US).bin" size="4194304" crc="9b86a0fb" sha1="c7d5381205340f85b302342cbe518f20c959a193" offset="0" />
+				<rom name="500-12350-A - Letterpillar (US).bin" size="4194304" crc="9b86a0fb" sha1="c7d5381205340f85b302342cbe518f20c959a193" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="letrpilr10" cloneof="letrpilr" supported="no">
+		<description>Letterpillar (v1.0, USA)</description>
+		<year>2005</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11995-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="500-11995-A - Letterpillar (v1.0) (US).bin" size="4194304" crc="fa919dff" sha1="dfb24dda3c2ca692495d9ad78f209645bf6e1b67" />
 			</dataarea>
 		</part>
 	</software>
@@ -687,7 +712,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-11003" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11003.bin" size="8388608" crc="dbb767cc" sha1="280b18a8cdf3ae09c5c7b32b8e592a8e2890302c" offset="0" />
+				<rom name="500-11003.bin" size="8388608" crc="dbb767cc" sha1="280b18a8cdf3ae09c5c7b32b8e592a8e2890302c" />
 			</dataarea>
 		</part>
 	</software>
@@ -699,7 +724,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12206-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12206-A - Don Lapiz - Aprender a Dibujar y Escribir (Spa).bin" size="8388608" crc="e6e50c84" sha1="9fb971ac661618bad549f37fbad28ffdd3873a30" offset="0" />
+				<rom name="500-12206-A - Don Lapiz - Aprender a Dibujar y Escribir (Spa).bin" size="8388608" crc="e6e50c84" sha1="9fb971ac661618bad549f37fbad28ffdd3873a30" />
 			</dataarea>
 		</part>
 	</software>
@@ -711,7 +736,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-13682-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13682-a.bin" size="8388608" crc="2fc77c9d" sha1="266e08439be2c91fbc9942c3620f49459c157fcc" offset="0" />
+				<rom name="500-13682-a.bin" size="8388608" crc="2fc77c9d" sha1="266e08439be2c91fbc9942c3620f49459c157fcc" />
 			</dataarea>
 		</part>
 	</software>
@@ -723,7 +748,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-11993-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="500-11993-A - Number Raiders (US).bin" size="4194304" crc="0f6d55cf" sha1="f30e7d55c5222e85aca08819ff613343b91138a4" offset="0" />
+				<rom name="500-11993-A - Number Raiders (US).bin" size="4194304" crc="0f6d55cf" sha1="f30e7d55c5222e85aca08819ff613343b91138a4" />
 			</dataarea>
 		</part>
 	</software>
@@ -735,7 +760,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12413-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="500-12413-a.bin" size="4194304" crc="c12334cf" sha1="b601d42a0cca30e3a4595cdd7f4ad24e89b82e41" offset="0" />
+				<rom name="500-12413-a.bin" size="4194304" crc="c12334cf" sha1="b601d42a0cca30e3a4595cdd7f4ad24e89b82e41" />
 			</dataarea>
 		</part>
 	</software>
@@ -747,7 +772,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12141-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="500-12141-a.bin" size="4194304" crc="334ab5d0" sha1="00eb76e267bfaded25fdf8361e933dc4ec72d059" offset="0" />
+				<rom name="500-12141-a.bin" size="4194304" crc="334ab5d0" sha1="00eb76e267bfaded25fdf8361e933dc4ec72d059" />
 			</dataarea>
 		</part>
 	</software>
@@ -759,7 +784,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12141-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="500-12202-A - La Conquista de los Numeros (Spa).bin" size="4194304" crc="2fb737c6" sha1="6490a57d98f83ef96b0f4f783632a97c0fa460e4" offset="0" />
+				<rom name="500-12202-A - La Conquista de los Numeros (Spa).bin" size="4194304" crc="2fb737c6" sha1="6490a57d98f83ef96b0f4f783632a97c0fa460e4" />
 			</dataarea>
 		</part>
 	</software>
@@ -771,7 +796,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12799-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12799-a.bin" size="8388608" crc="24c28bcd" sha1="f6af3d9629d66d71fcb0acf731bd0295e1142135" offset="0" />
+				<rom name="500-12799-a.bin" size="8388608" crc="24c28bcd" sha1="f6af3d9629d66d71fcb0acf731bd0295e1142135" />
 			</dataarea>
 		</part>
 	</software>
@@ -783,7 +808,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-13446-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13446-a.bin" size="8388608" crc="3c428a13" sha1="b90cdd518178849efabf7e3e17bf99072d964fad" offset="0" />
+				<rom name="500-13446-a.bin" size="8388608" crc="3c428a13" sha1="b90cdd518178849efabf7e3e17bf99072d964fad" />
 			</dataarea>
 		</part>
 	</software>
@@ -795,7 +820,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12824-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12824-a.bin" size="8388608" crc="b6d630e0" sha1="680508d157425523b8b0da3d99408e68c241acd0" offset="0" />
+				<rom name="500-12824-a.bin" size="8388608" crc="b6d630e0" sha1="680508d157425523b8b0da3d99408e68c241acd0" />
 			</dataarea>
 		</part>
 	</software>
@@ -807,7 +832,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-13445-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13445-A - Ratatouille (US).bin" size="8388608" crc="d0c4de47" sha1="372c61285eee5c8ce2670d12bedb09150fdaaa45" offset="0" />
+				<rom name="500-13445-A - Ratatouille (US).bin" size="8388608" crc="d0c4de47" sha1="372c61285eee5c8ce2670d12bedb09150fdaaa45" />
 			</dataarea>
 		</part>
 	</software>
@@ -819,7 +844,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12674-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12674-a.bin" size="8388608" crc="8f835af7" sha1="f3a67125ac50ce793a80ac2978e4e656b6696642" offset="0" />
+				<rom name="500-12674-a.bin" size="8388608" crc="8f835af7" sha1="f3a67125ac50ce793a80ac2978e4e656b6696642" />
 			</dataarea>
 		</part>
 	</software>
@@ -831,7 +856,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12738-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12738-a.bin" size="8388608" crc="df729fe7" sha1="af3c6b80d075f469388395cb065efa8bd6aeeab1" offset="0" />
+				<rom name="500-12738-a.bin" size="8388608" crc="df729fe7" sha1="af3c6b80d075f469388395cb065efa8bd6aeeab1" />
 			</dataarea>
 		</part>
 	</software>
@@ -843,7 +868,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-10829-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-10829-a.bin" size="8388608" crc="2c6e623e" sha1="c298181f00109b7f863fdb12b5bd462085c4ff4f" offset="0" />
+				<rom name="500-10829-a.bin" size="8388608" crc="2c6e623e" sha1="c298181f00109b7f863fdb12b5bd462085c4ff4f" />
 			</dataarea>
 		</part>
 	</software>
@@ -855,7 +880,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-11929-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11929-A - Scholastic I Spy - Challenger (US).bin" size="8388608" crc="da56181c" sha1="952a3135131b6543b7e6b4f784c7a239cfd6e75a" offset="0" />
+				<rom name="500-11929-A - Scholastic I Spy - Challenger (US).bin" size="8388608" crc="da56181c" sha1="952a3135131b6543b7e6b4f784c7a239cfd6e75a" />
 			</dataarea>
 		</part>
 	</software>
@@ -867,7 +892,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-13299-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13299-A.bin" size="8388608" crc="9e69c26a" sha1="395de47ca1e89eb63f4ff316d15da9b0425488d1" offset="0" />
+				<rom name="500-13299-A.bin" size="8388608" crc="9e69c26a" sha1="395de47ca1e89eb63f4ff316d15da9b0425488d1" />
 			</dataarea>
 		</part>
 	</software>
@@ -879,7 +904,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-14005-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-14005-A - Scooby Doo! (US).bin" size="8388608" crc="4cd2c497" sha1="9f06cb4aba2399464a799910be9df1d5678bb23a" offset="0" />
+				<rom name="500-14005-A - Scooby Doo! (US).bin" size="8388608" crc="4cd2c497" sha1="9f06cb4aba2399464a799910be9df1d5678bb23a" />
 			</dataarea>
 		</part>
 	</software>
@@ -891,7 +916,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12160-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="500-12160-A - Scooby Doo! - Spooky Snacks! (US).bin" size="4194304" crc="19da3dd8" sha1="8966d8d1e65ea0f778c9b435de94da793a874efe" offset="0" />
+				<rom name="500-12160-A - Scooby Doo! - Spooky Snacks! (US).bin" size="4194304" crc="19da3dd8" sha1="8966d8d1e65ea0f778c9b435de94da793a874efe" />
 			</dataarea>
 		</part>
 	</software>
@@ -903,7 +928,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12629-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="500-12629-a.bin" size="4194304" crc="648e3ee5" sha1="b483b8e04a287f3b6c2a80deabfd5812963b413b" offset="0" />
+				<rom name="500-12629-a.bin" size="4194304" crc="648e3ee5" sha1="b483b8e04a287f3b6c2a80deabfd5812963b413b" />
 			</dataarea>
 		</part>
 	</software>
@@ -915,7 +940,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12296-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12296-a.bin" size="8388608" crc="a9d2cdbd" sha1="e239b209239252f0f6cd2a4c71d2a46a3abfd5eb" offset="0" />
+				<rom name="500-12296-a.bin" size="8388608" crc="a9d2cdbd" sha1="e239b209239252f0f6cd2a4c71d2a46a3abfd5eb" />
 			</dataarea>
 		</part>
 	</software>
@@ -928,7 +953,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-11002" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11002.bin" size="8388608" crc="0f2ad725" sha1="258e5b006086a7fd4cfa4460f3008604a5d87e1d" offset="0" />
+				<rom name="500-11002.bin" size="8388608" crc="0f2ad725" sha1="258e5b006086a7fd4cfa4460f3008604a5d87e1d" />
 			</dataarea>
 		</part>
 	</software>
@@ -940,7 +965,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12415-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12415-a.bin" size="8388608" crc="7ccf1715" sha1="000a2658a787fb56a7b4597b8170a1ee4459bb1d" offset="0" />
+				<rom name="500-12415-a.bin" size="8388608" crc="7ccf1715" sha1="000a2658a787fb56a7b4597b8170a1ee4459bb1d" />
 			</dataarea>
 		</part>
 	</software>
@@ -952,7 +977,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-10933-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-10933-a.bin" size="8388608" crc="d11e7c30" sha1="71a844d9f38f7bc915e716d3d5485f558e9bffe9" offset="0" />
+				<rom name="500-10933-a.bin" size="8388608" crc="d11e7c30" sha1="71a844d9f38f7bc915e716d3d5485f558e9bffe9" />
 			</dataarea>
 		</part>
 	</software>
@@ -964,7 +989,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12719-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="500-12719-a.bin" size="4194304" crc="6b24a3ef" sha1="34dfb9ddef02731440085f3a1dad80654ad29c76" offset="0" />
+				<rom name="500-12719-a.bin" size="4194304" crc="6b24a3ef" sha1="34dfb9ddef02731440085f3a1dad80654ad29c76" />
 			</dataarea>
 		</part>
 	</software>
@@ -976,7 +1001,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-13273-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="500-13273-a.bin" size="4194304" crc="8761fc61" sha1="90b0e1faf6964ec74643a45b46f0b064ebf9ea8a" offset="0" />
+				<rom name="500-13273-a.bin" size="4194304" crc="8761fc61" sha1="90b0e1faf6964ec74643a45b46f0b064ebf9ea8a" />
 			</dataarea>
 		</part>
 	</software>
@@ -988,7 +1013,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-10825-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-10825-a.bin" size="8388608" crc="0ef61cbb" sha1="ff00b91ca8bcd2a5d1ead2c353d6d1c048994d69" offset="0" />
+				<rom name="500-10825-a.bin" size="8388608" crc="0ef61cbb" sha1="ff00b91ca8bcd2a5d1ead2c353d6d1c048994d69" />
 			</dataarea>
 		</part>
 	</software>
@@ -1000,7 +1025,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12416-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12416-a.bin" size="8388608" crc="cbe0de6f" sha1="12245cfacd1b67fb4cb0cc176789a5b7c1de698a" offset="0" />
+				<rom name="500-12416-a.bin" size="8388608" crc="cbe0de6f" sha1="12245cfacd1b67fb4cb0cc176789a5b7c1de698a" />
 			</dataarea>
 		</part>
 	</software>
@@ -1012,7 +1037,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-11497-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11497-a.bin" size="8388608" crc="9dc2e5f6" sha1="089e6739142edaaa5c0e72ba7faf6f443e1ddc59" offset="0" />
+				<rom name="500-11497-a.bin" size="8388608" crc="9dc2e5f6" sha1="089e6739142edaaa5c0e72ba7faf6f443e1ddc59" />
 			</dataarea>
 		</part>
 	</software>
@@ -1024,7 +1049,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12210-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12210-A - Spider-Man - El Caso de Las Letras Revueltas (Spa).bin" size="8388608" crc="96468ab9" sha1="24fab31e1b0aec1c963867da485d22b97da10660" offset="0" />
+				<rom name="500-12210-A - Spider-Man - El Caso de Las Letras Revueltas (Spa).bin" size="8388608" crc="96468ab9" sha1="24fab31e1b0aec1c963867da485d22b97da10660" />
 			</dataarea>
 		</part>
 	</software>
@@ -1036,7 +1061,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-13306-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13306-a.bin" size="8388608" crc="27000674" sha1="a7e8e63ab74931ad9546aba20755714df572badb" offset="0" />
+				<rom name="500-13306-a.bin" size="8388608" crc="27000674" sha1="a7e8e63ab74931ad9546aba20755714df572badb" />
 			</dataarea>
 		</part>
 	</software>
@@ -1048,7 +1073,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-13417-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13417-a.bin" size="8388608" crc="cf835b84" sha1="31ab97019d5e1fafa05cdb3a359e3c512a089b01" offset="0" />
+				<rom name="500-13417-a.bin" size="8388608" crc="cf835b84" sha1="31ab97019d5e1fafa05cdb3a359e3c512a089b01" />
 			</dataarea>
 		</part>
 	</software>
@@ -1060,7 +1085,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-13472-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13472-A - Star Wars - Jedi Reading (US).bin" size="8388608" crc="6239a178" sha1="55c09dbeaabfd21a12369aefa8eae6b7a8d7c1f3" offset="0" />
+				<rom name="500-13472-A - Star Wars - Jedi Reading (US).bin" size="8388608" crc="6239a178" sha1="55c09dbeaabfd21a12369aefa8eae6b7a8d7c1f3" />
 			</dataarea>
 		</part>
 	</software>
@@ -1072,7 +1097,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-11006" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="16777216">
-				<rom name="500-11006.bin" size="16777216" crc="58d08f36" sha1="14932442f9970ff0352e50a72c7e0cb18a64948d" offset="0" />
+				<rom name="500-11006.bin" size="16777216" crc="58d08f36" sha1="14932442f9970ff0352e50a72c7e0cb18a64948d" />
 			</dataarea>
 		</part>
 	</software>
@@ -1084,7 +1109,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-11204-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11204-A - Thomas and Friends - Calling all Engines! (US).bin" size="8388608" crc="5303d366" sha1="a7a65b5027d742634dd0860d3db44981c2351a05" offset="0" />
+				<rom name="500-11204-A - Thomas and Friends - Calling all Engines! (US).bin" size="8388608" crc="5303d366" sha1="a7a65b5027d742634dd0860d3db44981c2351a05" />
 			</dataarea>
 		</part>
 	</software>
@@ -1096,7 +1121,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-13982-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13982-a.bin" size="8388608" crc="a72c61fd" sha1="3524a9167e6139101a27fccef4a97ef30dd928fe" offset="0" />
+				<rom name="500-13982-a.bin" size="8388608" crc="a72c61fd" sha1="3524a9167e6139101a27fccef4a97ef30dd928fe" />
 			</dataarea>
 		</part>
 	</software>
@@ -1108,7 +1133,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-13563-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13563-A - Up (US).bin" size="8388608" crc="1e2a5031" sha1="ab74239918208cc7dfa7377549086b59e6c40818" offset="0" />
+				<rom name="500-13563-A - Up (US).bin" size="8388608" crc="1e2a5031" sha1="ab74239918208cc7dfa7377549086b59e6c40818" />
 			</dataarea>
 		</part>
 	</software>
@@ -1120,7 +1145,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-13643-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13643-a.bin" size="8388608" crc="975a0a85" sha1="d89e05c3afb2377efcdddf3099819541c28ee640" offset="0" />
+				<rom name="500-13643-a.bin" size="8388608" crc="975a0a85" sha1="d89e05c3afb2377efcdddf3099819541c28ee640" />
 			</dataarea>
 		</part>
 	</software>
@@ -1132,7 +1157,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-10934-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-10934-a.bin" size="8388608" crc="4c5e775e" sha1="87819e1a95f0d435fc94697423fcfca13f463a34" offset="0" />
+				<rom name="500-10934-a.bin" size="8388608" crc="4c5e775e" sha1="87819e1a95f0d435fc94697423fcfca13f463a34" />
 			</dataarea>
 		</part>
 	</software>
@@ -1144,7 +1169,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-13272-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13272-A - Wall-E (US).bin" size="8388608" crc="c71cff35" sha1="ac31af80cf3dedf13ddb94595e2914377f85f819" offset="0" />
+				<rom name="500-13272-A - Wall-E (US).bin" size="8388608" crc="c71cff35" sha1="ac31af80cf3dedf13ddb94595e2914377f85f819" />
 			</dataarea>
 		</part>
 	</software>
@@ -1156,7 +1181,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-13441-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13441-a.bin" size="8388608" crc="ee2c39ea" sha1="3606a63fb783ba1e16d0466766dd456eb84b4116" offset="0" />
+				<rom name="500-13441-a.bin" size="8388608" crc="ee2c39ea" sha1="3606a63fb783ba1e16d0466766dd456eb84b4116" />
 			</dataarea>
 		</part>
 	</software>
@@ -1168,7 +1193,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-13414-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13414-a.bin" size="8388608" crc="c10ab3dd" sha1="001d00815e42cd01c650d4cce81ea2a9de6d422c" offset="0" />
+				<rom name="500-13414-a.bin" size="8388608" crc="c10ab3dd" sha1="001d00815e42cd01c650d4cce81ea2a9de6d422c" />
 			</dataarea>
 		</part>
 	</software>
@@ -1180,7 +1205,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12140-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12140-a.bin" size="4194304" crc="75164c8e" sha1="6bebaef0d3b6f8a1a4b2bb957a00a0cce4ed65a2" offset="0" />
+				<rom name="500-12140-a.bin" size="4194304" crc="75164c8e" sha1="6bebaef0d3b6f8a1a4b2bb957a00a0cce4ed65a2" />
 			</dataarea>
 		</part>
 	</software>
@@ -1192,7 +1217,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-13744-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13744-a.bin" size="8388608" crc="67bd4a6a" sha1="70c35a12e368e19956ff43101f7125f9c5679cb2" offset="0" />
+				<rom name="500-13744-a.bin" size="8388608" crc="67bd4a6a" sha1="70c35a12e368e19956ff43101f7125f9c5679cb2" />
 			</dataarea>
 		</part>
 	</software>
@@ -1205,7 +1230,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12142-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12142-a.bin" size="4194304" crc="a707de61" sha1="76689979f08d8c585576a138579fcfb147449db5" offset="0" />
+				<rom name="500-12142-a.bin" size="4194304" crc="a707de61" sha1="76689979f08d8c585576a138579fcfb147449db5" />
 			</dataarea>
 		</part>
 	</software>
@@ -1217,7 +1242,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12259-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12259-A - El Laberinto de las Letras (Spa).bin" size="4194304" crc="4a999f60" sha1="91f79a22a8f9f1af6d8ab11f7dc03858b58510d1" offset="0" />
+				<rom name="500-12259-A - El Laberinto de las Letras (Spa).bin" size="4194304" crc="4a999f60" sha1="91f79a22a8f9f1af6d8ab11f7dc03858b58510d1" />
 			</dataarea>
 		</part>
 	</software>
@@ -1232,7 +1257,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-11904-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11904-A.bin" size="8388608" crc="74af5d57" sha1="0436c64cc08089e9ca96b006d54bf00120685e6e" offset="0" />
+				<rom name="500-11904-A.bin" size="8388608" crc="74af5d57" sha1="0436c64cc08089e9ca96b006d54bf00120685e6e" />
 			</dataarea>
 		</part>
 	</software>
@@ -1244,7 +1269,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-11779-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11779-A.bin" size="8388608" crc="b186a3bf" sha1="10bfa48a7627905bd9ba6af8399f70d35f814ded" offset="0" />
+				<rom name="500-11779-A.bin" size="8388608" crc="b186a3bf" sha1="10bfa48a7627905bd9ba6af8399f70d35f814ded" />
 			</dataarea>
 		</part>
 	</software>
@@ -1256,7 +1281,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-11202-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11202-A.bin" size="8388608" crc="a9c75d90" sha1="3509eb76178a20037fb277d2d0cf062dedbaba47" offset="0" />
+				<rom name="500-11202-A.bin" size="8388608" crc="a9c75d90" sha1="3509eb76178a20037fb277d2d0cf062dedbaba47" />
 			</dataarea>
 		</part>
 	</software>
@@ -1268,7 +1293,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12099-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12099-A.bin" size="8388608" crc="95c78f34" sha1="91619b2f1297b8d07c6122b92b8ff33f6f6c1629" offset="0" />
+				<rom name="500-12099-A.bin" size="8388608" crc="95c78f34" sha1="91619b2f1297b8d07c6122b92b8ff33f6f6c1629" />
 			</dataarea>
 		</part>
 	</software>
@@ -1280,7 +1305,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-11777-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11777-a.bin" size="8388608" crc="01f12ce7" sha1="6e468f68b57d93777347d6a2e8ce15b79ccefb7f" offset="0" />
+				<rom name="500-11777-a.bin" size="8388608" crc="01f12ce7" sha1="6e468f68b57d93777347d6a2e8ce15b79ccefb7f" />
 			</dataarea>
 		</part>
 	</software>
@@ -1292,7 +1317,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-11905-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11905-A.bin" size="8388608" crc="4d893b32" sha1="b108972cbd1408aa395af64ef0760e99cb956d28" offset="0" />
+				<rom name="500-11905-A.bin" size="8388608" crc="4d893b32" sha1="b108972cbd1408aa395af64ef0760e99cb956d28" />
 			</dataarea>
 		</part>
 	</software>
@@ -1304,7 +1329,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-11903-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11903-A.bin" size="8388608" crc="2eee5925" sha1="e5cd4a48d027fef14bbfc1c1304ebe9138353110" offset="0" />
+				<rom name="500-11903-A.bin" size="8388608" crc="2eee5925" sha1="e5cd4a48d027fef14bbfc1c1304ebe9138353110" />
 			</dataarea>
 		</part>
 	</software>
