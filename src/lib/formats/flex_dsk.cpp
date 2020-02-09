@@ -71,6 +71,15 @@ const char *flex_format::extensions() const
 	return "dsk";
 }
 
+int flex_format::identify(io_generic *io, uint32_t form_factor)
+{
+	int type = find_size(io, form_factor);
+
+	if (type != -1)
+		return 75;
+	return 0;
+}
+
 int flex_format::find_size(io_generic *io, uint32_t form_factor)
 {
 	uint64_t size = io_generic_size(io);

@@ -16,24 +16,22 @@
  - Graphics board contains a 68010 CPU and an i8051 which manages the palette
    and performs other functions.  Framebuffer is 8 bits per pixel and the
    framebuffer start position can be changed, possibly per-scanline.
+   RAMDAC is a Bt471.
  - Data/Audio board contains an Intel P8344AH, which is an MCU containing an
    i8051 and an SDLC decoder.  The "audio" is a TTL circuit to create an
    alert tone for severe weather conditions.
  - I/O board contains an i8051 CPU, an i8251A UART and serial port for a modem,
    and an AT-style keyboard interface and DIN connector.
 
-   RAM size routine at FE102E assumes bus error will stop it and set the flag
-   at 480.  Bus error handler is at FE074E and does that, but it doesn't return
-   correctly, possibly because we aren't generating the correct stack frame
-   for a 68010?
-
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/mcs51/mcs51.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
+#include "video/bt47x.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -44,6 +42,10 @@ public:
 	wxstar4k_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_gfxcpu(*this, "gfxcpu"),
+		m_gfxsubcpu(*this, "gfxsubcpu"),
+		m_datacpu(*this, "datacpu"),
+		m_iocpu(*this, "iocpu"),
 		m_mainram(*this, "mainram")
 	{ }
 
@@ -53,12 +55,20 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void cpubd_main(address_map &map);
+	void vidbd_main(address_map &map);
+	void vidbd_sub(address_map &map);
+	void vidbd_sub_io(address_map &map);
+	void databd_main(address_map &map);
+	void databd_main_io(address_map &map);
+	void iobd_main(address_map &map);
+	void iobd_main_io(address_map &map);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m68010_device> m_maincpu, m_gfxcpu;
+	required_device<i8051_device> m_gfxsubcpu, m_datacpu, m_iocpu;
 	required_shared_ptr<uint16_t> m_mainram;
 
 	DECLARE_READ16_MEMBER(buserr_r)
@@ -86,6 +96,42 @@ void wxstar4k_state::cpubd_main(address_map &map)
 	map(0xfe0000, 0xffffff).rom().region("maincpu", 0);
 }
 
+void wxstar4k_state::vidbd_main(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom().region("gfxcpu", 0);
+	map(0x100000, 0x10ffff).ram();  // shared with main?
+	map(0x200002, 0x200003).nopr(); // probably resets the watchdog
+	map(0x400000, 0x45ffff).ram();  // framebuffer?
+}
+
+void wxstar4k_state::vidbd_sub(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("gfxsubcpu", 0);
+}
+
+void wxstar4k_state::vidbd_sub_io(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+}
+
+void wxstar4k_state::databd_main(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("datacpu", 0);
+}
+
+void wxstar4k_state::databd_main_io(address_map &map)
+{
+}
+
+void wxstar4k_state::iobd_main(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("iocpu", 0);
+}
+
+void wxstar4k_state::iobd_main_io(address_map &map)
+{
+}
+
 static INPUT_PORTS_START( wxstar4k )
 INPUT_PORTS_END
 
@@ -103,8 +149,23 @@ void wxstar4k_state::machine_reset()
 void wxstar4k_state::wxstar4k(machine_config &config)
 {
 	/* basic machine hardware */
-	M68010(config, m_maincpu, XTAL(20'000'000)/2);    // 20 MHz crystal / 2 (QA output of a 74LS393)
+	M68010(config, m_maincpu, XTAL(20'000'000)/2);  // 20 MHz crystal / 2 (QA output of a 74LS393)
 	m_maincpu->set_addrmap(AS_PROGRAM, &wxstar4k_state::cpubd_main);
+
+	M68010(config, m_gfxcpu, XTAL(20'000'000)/2);   // runs on the system clock from the CPU board, so also 10 MHz
+	m_gfxcpu->set_addrmap(AS_PROGRAM, &wxstar4k_state::vidbd_main);
+
+	I8051(config, m_gfxsubcpu, XTAL(12'000'000));   // 12 MHz crystal connected directly to the CPU
+	m_gfxsubcpu->set_addrmap(AS_PROGRAM, &wxstar4k_state::vidbd_sub);
+	m_gfxsubcpu->set_addrmap(AS_IO, &wxstar4k_state::vidbd_sub_io);
+
+	I8051(config, m_datacpu, XTAL(7'372'800));  // 7.3728 MHz crystal connected directly to the CPU
+	m_datacpu->set_addrmap(AS_PROGRAM, &wxstar4k_state::databd_main);
+	m_datacpu->set_addrmap(AS_IO, &wxstar4k_state::databd_main_io);
+
+	I8051(config, m_iocpu, XTAL(11'059'200));   // 11.0592 MHz crystal connected directly to the CPU
+	m_iocpu->set_addrmap(AS_PROGRAM, &wxstar4k_state::iobd_main);
+	m_iocpu->set_addrmap(AS_IO, &wxstar4k_state::iobd_main_io);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
