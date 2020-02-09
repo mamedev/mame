@@ -110,6 +110,8 @@ public:
 	void cfunc_log_write();
 #endif
 
+	void cfunc_muls();
+
 protected:
 	unsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal);
 
@@ -216,7 +218,7 @@ protected:
 	void execute_fxxx_100_group(uint16_t op);
 	virtual void execute_extended_group(uint16_t op);
 	virtual void execute_exxx_group(uint16_t op);
-	void execute_muls(const uint16_t rd, const uint16_t rs, const uint16_t size);
+	void execute_muls_ss(const uint16_t rd, const uint16_t rs, const uint16_t size);
 	void unimplemented_opcode(uint16_t op);
 	void unimplemented_opcode(uint16_t op, uint16_t ximm);
 	void unimplemented_opcode(uint16_t op, uint16_t ximm, uint16_t ximm_2);
