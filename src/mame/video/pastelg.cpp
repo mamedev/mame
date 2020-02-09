@@ -11,11 +11,51 @@
 #include "emu.h"
 #include "includes/pastelg.h"
 
-/******************************************************************************
 
+// pastelg specific methods
 
-******************************************************************************/
-void pastelg_state::palette(palette_device &palette) const
+uint16_t pastelg_state::blitter_src_addr_r()
+{
+	return m_blitter_src_addr;
+}
+
+void pastelg_state::romsel_w(address_space &space, uint8_t data)
+{
+	m_gfxbank = ((data & 0xc0) >> 6);
+	m_palbank = ((data & 0x10) >> 4);
+	m_nb1413m3->sndrombank1_w(space, 0, data);
+
+	if ((m_gfxbank << 16) > m_blitter_rom.mask())
+	{
+#ifdef MAME_DEBUG
+		popmessage("GFXROM BANK OVER!!");
+#endif
+		m_gfxbank &= (m_blitter_rom.length() / 0x20000 - 1);
+	}
+}
+
+// threeds specific methods
+
+void threeds_state::romsel_w(uint8_t data)
+{
+	if (data & 0xfc) printf("%02x\n", data);
+	m_gfxbank = (data & 0x3);
+}
+
+void threeds_state::output_w(uint8_t data)
+{
+	m_palbank = ((data & 0x10) >> 4);
+
+}
+
+uint8_t threeds_state::rom_readback_r()
+{
+	return m_blitter_rom[(m_blitter_src_addr | (m_gfxbank << 16)) & 0x3ffff];
+}
+
+// common methods
+
+void pastelg_common_state::palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -44,16 +84,7 @@ void pastelg_state::palette(palette_device &palette) const
 	}
 }
 
-/******************************************************************************
-
-
-******************************************************************************/
-uint16_t pastelg_state::pastelg_blitter_src_addr_r()
-{
-	return m_blitter_src_addr;
-}
-
-void pastelg_state::blitter_w(offs_t offset, uint8_t data)
+void pastelg_common_state::blitter_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -75,45 +106,7 @@ void pastelg_state::blitter_w(offs_t offset, uint8_t data)
 	}
 }
 
-
-void pastelg_state::threeds_romsel_w(uint8_t data)
-{
-	if (data & 0xfc) printf("%02x\n", data);
-	m_gfxbank = (data & 0x3);
-}
-
-void pastelg_state::threeds_output_w(uint8_t data)
-{
-	m_palbank = ((data & 0x10) >> 4);
-
-}
-
-uint8_t pastelg_state::threeds_rom_readback_r()
-{
-	return m_blitter_rom[(m_blitter_src_addr | (m_gfxbank << 16)) & 0x3ffff];
-}
-
-
-void pastelg_state::pastelg_romsel_w(address_space &space, uint8_t data)
-{
-	m_gfxbank = ((data & 0xc0) >> 6);
-	m_palbank = ((data & 0x10) >> 4);
-	m_nb1413m3->sndrombank1_w(space, 0, data);
-
-	if ((m_gfxbank << 16) > m_blitter_rom.mask())
-	{
-#ifdef MAME_DEBUG
-		popmessage("GFXROM BANK OVER!!");
-#endif
-		m_gfxbank &= (m_blitter_rom.length() / 0x20000 - 1);
-	}
-}
-
-/******************************************************************************
-
-
-******************************************************************************/
-void pastelg_state::vramflip()
+void pastelg_common_state::vramflip()
 {
 	int width = m_screen->width();
 	int height = m_screen->height();
@@ -134,13 +127,13 @@ void pastelg_state::vramflip()
 	m_flipscreen_old = m_flipscreen;
 }
 
-void pastelg_state::blitter_timer_callback(void *ptr, s32 param)
+void pastelg_common_state::blitter_timer_callback(void *ptr, s32 param)
 {
 	m_nb1413m3->busyflag_w(1);
 }
 
 
-void pastelg_state::gfxdraw()
+void pastelg_common_state::gfxdraw()
 {
 	int width = m_screen->width();
 
@@ -257,7 +250,7 @@ void pastelg_state::gfxdraw()
 
 
 ******************************************************************************/
-void pastelg_state::video_start()
+void pastelg_common_state::video_start()
 {
 	int width = m_screen->width();
 	int height = m_screen->height();
@@ -284,7 +277,7 @@ void pastelg_state::video_start()
 
 
 ******************************************************************************/
-uint32_t pastelg_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pastelg_common_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_dispflag)
 	{
