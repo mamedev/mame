@@ -12,14 +12,12 @@
     2. swtpc09i
        MP-09 with SBUG rom + HDrom, MP-ID, MP-S2, MP-T, DMAF2, PIAIDE.
        Will boot Flex operating system
-       TODO: finish ide part and get this one working.
     3. swtpc09u
        MP-09 with UniBUG rom, MP-ID, MP-S2, DMAF2.
        Will boot UniFlex operating system
     4. swtpc09d3
        MP-09 with UniBUG U3 rom, MP-ID, MP-S2, DMAF3.
        Will boot UniFlex operating system
-       TODO: add Harddisk support, DMAF3 has WD1000 interface
 
 ***************************************************************************/
 
@@ -27,8 +25,8 @@
 #include "includes/swtpc09.h"
 #include "bus/ss50/interface.h"
 #include "formats/flex_dsk.h"
+#include "formats/os9_dsk.h"
 #include "formats/uniflex_dsk.h"
-
 
 /**************************************************************************
  Address maps
@@ -197,6 +195,29 @@ void swtpc09_state::uniflex_dmaf3_mem(address_map &map)
 	map(0xff800, 0xfffff).rom().region("bankdev", 0xff800);
 }
 
+void swtpc09_state::os9_mem(address_map &map)
+{
+	map(0x00000, 0xfffff).ram(); // by default everything is ram, 1MB ram emulated
+	map(0x0e000, 0x0e7ff).rw(FUNC(swtpc09_state::unmapped_r), FUNC(swtpc09_state::unmapped_w));
+
+	// 0x0e004, 0x0e005 ACIA
+	map(0x0e000, 0x0e00f).rw("io0", FUNC(ss50_interface_port_device::read), FUNC(ss50_interface_port_device::write));
+	// 0x0e014 0x0e018-0x0e01b DC5 FDC
+	map(0x0e010, 0x0e01f).rw("io1", FUNC(ss50_interface_port_device::read), FUNC(ss50_interface_port_device::write));
+	map(0x0e020, 0x0e02f).rw("io2", FUNC(ss50_interface_port_device::read), FUNC(ss50_interface_port_device::write));
+	map(0x0e030, 0x0e03f).rw("io3", FUNC(ss50_interface_port_device::read), FUNC(ss50_interface_port_device::write));
+	// MPT
+	map(0x0e040, 0x0e04f).rw("io4", FUNC(ss50_interface_port_device::read), FUNC(ss50_interface_port_device::write));
+	map(0x0e050, 0x0e05f).rw("io5", FUNC(ss50_interface_port_device::read), FUNC(ss50_interface_port_device::write));
+	map(0x0e060, 0x0e06f).rw("io6", FUNC(ss50_interface_port_device::read), FUNC(ss50_interface_port_device::write));
+	map(0x0e070, 0x0e07f).rw("io7", FUNC(ss50_interface_port_device::read), FUNC(ss50_interface_port_device::write));
+
+	// MPID
+	map(0x0e080, 0x0e083).mirror(0xc).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0e090, 0x0e097).mirror(0x8).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
+
+	map(0x0e400, 0x0ffff).rom().region("bankdev", 0x0e400);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( swtpc09 )
@@ -234,36 +255,39 @@ static INPUT_PORTS_START( swtpc09 )
 	PORT_CONFSETTING(0, "Low (x1)")
 	PORT_CONFSETTING(1, "High (x4)")
 
-	// Debug aid to hard code the density. The FLEX format uses single
-	// density for track zero. Many virtual disks 'fix' the format to be
-	// purely double density and often without properly implementing
-	// driver support for that. This setting is an aid to report
-	// unexpected usage, and it attempts to correct that. It is possible
-	// to patch the software to work with these pure double density disks.
+	// Debug aid to hard code the density. The OS9 format can use single
+	// density for track zero head zero. The FLEX format can use single
+	// density for track zero on all heads, and many virtual disks 'fix'
+	// the format to be purely double density and often without properly
+	// implementing driver support for that. This setting is an aid to
+	// report unexpected usage, and it attempts to correct that.
 	PORT_START("FLOPPY_EXPECTED_DENSITY")
-	PORT_CONFNAME(0xff, 0, "DMAF2/3 expected density")
+	PORT_CONFNAME(0x7, 0, "DMAF2/3 expected density")
 	PORT_CONFSETTING(0, "-")
 	PORT_CONFSETTING(1, "single density")
-	PORT_CONFSETTING(2, "double density, with single density track zero")
-	PORT_CONFSETTING(3, "double density")
+	PORT_CONFSETTING(2, "double density, with single density track zero head zero")
+	PORT_CONFSETTING(3, "double density, with single density track zero all heads")
+	PORT_CONFSETTING(4, "double density")
 
 	// Debug aid, to check that the sector head or side is set as expected
 	// for the sector ID being read for the FLEX floppy disk format. Many
 	// FLEX disk images were developed for vitural machines that have
-	// little regard for the actual head and can work off the sector ID
-	// and their drivers can set the head incorrectly. E.g. a disk with 18
-	// sectors per side might have a drive set to switch heads for sectors
-	// above 10. Another issue is that double density disk images are
-	// often 'fixed' so that they are pure double density without being
-	// single density onthe first track, and the drivers might still set
-	// the head based track zero being single density. This aid is not
-	// intended to be a substitute for fixing the drivers but it does help
-	// work through the issues while patching the disks.
+	// little regard for the actual number of heads and can work off the
+	// sector ID and their drivers can set the head incorrectly. E.g. a
+	// disk with 18 sectors per side might have a driver incorrectly switch
+	// heads for sectors above 10. Another issue is that double density
+	// disk images are often 'fixed' so that they are pure double density
+	// without being single density on the first track, and the drivers
+	// might still set the head based on track zero being single
+	// density. This aid is not intended to be a substitute for fixing the
+	// drivers but it does help work through the issues while patching the
+	// disks.
 	PORT_START("FLOPPY_EXPECTED_SECTORS")
-	PORT_CONFNAME(0xff, 0, "DMAF2/3 expected sectors per side")
+	PORT_CONFNAME(0xff, 0, "DMAF2/3 FLEX expected sectors per side")
 	PORT_CONFSETTING(0, "-")
 	PORT_CONFSETTING(10, "10") // 5 1/4" single density 256B
 	PORT_CONFSETTING(15, "15") // 8" single density 256B
+	PORT_CONFSETTING(16, "16") // 5 1/4" double density 256B, 8" DD 512B
 	PORT_CONFSETTING(18, "18") // 5 1/4" double density 256B
 	PORT_CONFSETTING(26, "26") // 8" double density 256B
 	PORT_CONFSETTING(36, "36") // 3.5" 1.4M QD 256B
@@ -272,10 +296,11 @@ static INPUT_PORTS_START( swtpc09 )
 	// driver sticks to that and if using a double density disk then set a
 	// single density size here.
 	PORT_START("FLOPPY_TRACK_ZERO_EXPECTED_SECTORS")
-	PORT_CONFNAME(0xff, 0, "DMAF2/3 track zero expected sectors per side")
+	PORT_CONFNAME(0xff, 0, "DMAF2/3 FLEX track zero expected sectors per side")
 	PORT_CONFSETTING(0, "-")
 	PORT_CONFSETTING(10, "10") // 5 1/4" single density 256B
 	PORT_CONFSETTING(15, "15") // 8" single density 256B
+	PORT_CONFSETTING(16, "16") // 5 1/4" double density 256B, 8" DD 512B
 	PORT_CONFSETTING(18, "18") // 5 1/4" double density 256B
 	PORT_CONFSETTING(26, "26") // 8" double density 256B
 	PORT_CONFSETTING(36, "36") // 3.5" 1.4M QD 256B
@@ -539,6 +564,17 @@ void swtpc09_state::swtpc09d3(machine_config &config)
 
 }
 
+/* MPU09, MPID, MPS2, DC5, MPT */
+void swtpc09_state::swtpc09o(machine_config &config)
+{
+	swtpc09_base(config);
+	m_bankdev->set_addrmap(AS_PROGRAM, &swtpc09_state::os9_mem);
+
+	subdevice<ss50_interface_port_device>("io1")->set_default_option("dc5");
+	subdevice<ss50_interface_port_device>("io1")->set_option_device_input_defaults("dc5", DEVICE_INPUT_DEFAULTS_NAME(dc5));
+	subdevice<ss50_interface_port_device>("io4")->set_default_option("mpt");
+}
+
 
 /* ROM definition */
 ROM_START( swtpc09 )
@@ -562,6 +598,12 @@ ROM_START( swtpc09d3 )
 	ROM_LOAD ( "uos3.bin", 0xff800, 0x00800, CRC(e95eb3e0) SHA1(3e971d3b7e143bc87e4b506e18a8c928c089c25a) )
 ROM_END
 
+ROM_START( swtpc09o )
+	ROM_REGION(0x100000, "bankdev", 0)
+	ROM_SYSTEM_BIOS(0, "os9l1v12", "OS9 Level 1 version 1.2")
+	ROMX_LOAD("os9l1v12.bin", 0x0e400, 0x01c00, CRC(f2ee7523) SHA1(4e47f672c43ee2dbb5f332feb276d2c109f08e78), ROM_BIOS(0))
+ROM_END
+
 /* Driver */
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT    CLASS          INIT            COMPANY  FULLNAME                    FLAGS
@@ -569,3 +611,4 @@ COMP( 1980, swtpc09,   0,       0,      swtpc09,   swtpc09, swtpc09_state, init_
 COMP( 1980, swtpc09i,  swtpc09, 0,      swtpc09i,  swtpc09, swtpc09_state, init_swtpc09i,  "SWTPC", "swtpc S/09 Sbug + piaide", MACHINE_NO_SOUND_HW )
 COMP( 1980, swtpc09u,  swtpc09, 0,      swtpc09u,  swtpc09, swtpc09_state, init_swtpc09u,  "SWTPC", "swtpc S/09 UNIBug + DMAF2", MACHINE_NO_SOUND_HW )
 COMP( 1980, swtpc09d3, swtpc09, 0,      swtpc09d3, swtpc09, swtpc09_state, init_swtpc09d3, "SWTPC", "swtpc S/09 UNIBug + DMAF3", MACHINE_NO_SOUND_HW )
+COMP( 1980, swtpc09o,  swtpc09, 0,      swtpc09o,  swtpc09, swtpc09_state, init_swtpc09o,  "SWTPC", "swtpc S/09 OS9",           MACHINE_NO_SOUND_HW )
