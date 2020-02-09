@@ -108,12 +108,26 @@ NETLIB_RESET(VCVS)
 	m_ON2.set_conductivity(m_gfac);
 }
 
+// ----------------------------------------------------------------------------------------
+// nld_CCVS
+// ----------------------------------------------------------------------------------------
+
+NETLIB_RESET(CCVS)
+{
+	m_gfac = plib::reciprocal(m_RO());
+	NETLIB_NAME(VCCS)::reset();
+
+	m_OP2.set_conductivity(m_gfac);
+	m_ON2.set_conductivity(m_gfac);
+}
+
 	} //namespace analog
 
 	namespace devices {
-		NETLIB_DEVICE_IMPL_NS(analog, VCVS,  "VCVS",  "")
-		NETLIB_DEVICE_IMPL_NS(analog, VCCS,  "VCCS",  "")
-		NETLIB_DEVICE_IMPL_NS(analog, CCCS,  "CCCS",  "")
+		NETLIB_DEVICE_IMPL_NS(analog, VCVS,  "VCVS",  "G")
+		NETLIB_DEVICE_IMPL_NS(analog, VCCS,  "VCCS",  "G")
+		NETLIB_DEVICE_IMPL_NS(analog, CCCS,  "CCCS",  "G")
+		NETLIB_DEVICE_IMPL_NS(analog, CCVS,  "CCVS",  "G")
 		NETLIB_DEVICE_IMPL_NS(analog, LVCCS, "LVCCS", "")
 	} // namespace devices
 } // namespace netlist

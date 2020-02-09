@@ -106,7 +106,7 @@ protected:
 private:
 	static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data)
 	{
-		win32_monitor_module* self = reinterpret_cast<win32_monitor_module*>(data);
+		auto* self = reinterpret_cast<win32_monitor_module*>(data);
 		MONITORINFOEX info;
 		BOOL result;
 

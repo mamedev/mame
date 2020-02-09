@@ -40,14 +40,14 @@ DEFINE_DEVICE_TYPE(MCT_ADR, mct_adr_device, "mct_adr", "MCT-ADR Address Path Con
 mct_adr_device::mct_adr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MCT_ADR, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
+	, m_io_config("io", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_dma_config("dma", ENDIANNESS_LITTLE, 32, 32, 0, address_map_constructor(FUNC(mct_adr_device::dma), this))
-	, m_bus(*this, finder_base::DUMMY_TAG, -1, 64)
 	, m_out_int_dma(*this)
 	, m_out_int_device(*this)
 	, m_out_int_timer(*this)
 	, m_eisa_iack(*this)
-	, m_dma_r{ *this, *this, *this, *this }
-	, m_dma_w{ *this, *this, *this, *this }
+	, m_dma_r(*this)
+	, m_dma_w(*this)
 {
 }
 
@@ -83,7 +83,7 @@ void mct_adr_device::map(address_map &map)
 				{
 					u32 const address = (m_ioc_physical_tag & ~0x1) + ((m_ioc_maint & 0x3) << 3);
 
-					m_bus->write_dword(address, data);
+					space(0).write_dword(address, data);
 				}
 			}, "io_cache_buffer_window_lo");
 	// io_cache_buffer_window_hi
@@ -128,15 +128,14 @@ void mct_adr_device::map(address_map &map)
 device_memory_interface::space_config_vector mct_adr_device::memory_space_config() const
 {
 	return space_config_vector{
-		std::make_pair(0, &m_dma_config)
+		std::make_pair(0, &m_io_config),
+		std::make_pair(1, &m_dma_config)
 	};
 }
 
 void mct_adr_device::dma(address_map &map)
 {
-	map(0x00000000U, 0xffffffffU).lrw32(
-		[this](offs_t offset) { return m_bus->read_dword(translate_address(offset << 2)); }, "dma_r",
-		[this](offs_t offset, u32 data, u32 mem_mask) { m_bus->write_dword(translate_address(offset << 2), data, mem_mask); }, "dma_w");
+	map(0x00000000U, 0xffffffffU).rw(FUNC(mct_adr_device::dma_r), FUNC(mct_adr_device::dma_w));
 }
 
 void mct_adr_device::device_start()
@@ -146,11 +145,8 @@ void mct_adr_device::device_start()
 	m_out_int_timer.resolve();
 	m_eisa_iack.resolve();
 
-	for (int i = 0; i < 4; i++)
-	{
-		m_dma_r[i].resolve_safe(0xff);
-		m_dma_w[i].resolve_safe();
-	}
+	m_dma_r.resolve_all_safe(0xff);
+	m_dma_w.resolve_all_safe();
 
 	m_ioc_maint = 0;
 	m_ioc_physical_tag = 0;
@@ -278,7 +274,7 @@ TIMER_CALLBACK_MEMBER(mct_adr_device::dma_check)
 		// perform dma transfer
 		if (m_dma_reg[(channel << 2) + REG_ENABLE] & DMA_DIRECTION)
 		{
-			u8 const data = m_bus->read_byte(address);
+			u8 const data = space(0).read_byte(address);
 
 			//LOG("dma_w data 0x%02x address 0x%08x\n", data, address);
 
@@ -290,7 +286,7 @@ TIMER_CALLBACK_MEMBER(mct_adr_device::dma_check)
 
 			//LOG("dma_r data 0x%02x address 0x%08x\n", data, address);
 
-			m_bus->write_byte(address, data);
+			space(0).write_byte(address, data);
 		}
 
 		// increment address, decrement count
@@ -322,7 +318,7 @@ u32 mct_adr_device::translate_address(u32 logical_address)
 	{
 		u32 entry_address = (m_trans_tbl_base & 0x7fffffff) + page * 8;
 
-		return m_bus->read_dword(entry_address) | (logical_address & 0xfff);
+		return space(0).read_dword(entry_address) | (logical_address & 0xfff);
 	}
 	else
 	{
@@ -330,4 +326,18 @@ u32 mct_adr_device::translate_address(u32 logical_address)
 
 		return 0; // FIXME: address error
 	}
+}
+
+u32 mct_adr_device::dma_r(offs_t offset, u32 mem_mask)
+{
+	u32 const address = translate_address(offset << 2);
+
+	return space(0).read_dword(address, mem_mask);
+}
+
+void mct_adr_device::dma_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	u32 const address = translate_address(offset << 2);
+
+	space(0).write_dword(address, data, mem_mask);
 }

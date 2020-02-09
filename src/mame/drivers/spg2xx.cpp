@@ -148,6 +148,7 @@
 
 *******************************************************************************/
 
+#include "emu.h"
 #include "includes/spg2xx.h"
 
 /*************************
@@ -662,6 +663,26 @@ static INPUT_PORTS_START( abltenni )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( guitarfv )
+	PORT_START("P1")  // Button 1 + 2 and start for service mode
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Wheel") // 'Wheel'
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
+INPUT_PORTS_END
+
 void spg2xx_game_state::machine_start()
 {
 	if (m_bank)
@@ -734,6 +755,22 @@ void spg2xx_game_state::abltenni(machine_config &config)
 
 	m_maincpu->set_rowscroll_offset(8);
 }
+
+void spg2xx_game_state::guitarfv(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_4m);
+
+	spg2xx_base(config);
+
+	m_maincpu->set_pal(true);
+	m_screen->set_refresh_hz(50);
+
+	m_maincpu->porta_in().set_ioport("P1");
+	m_maincpu->portb_in().set_ioport("P2");
+	m_maincpu->portc_in().set_ioport("P3");
+}
+
 
 void spg2xx_game_state::tvsprt10(machine_config &config)
 {
@@ -836,6 +873,12 @@ ROM_START( wiwi18 )
 	ROM_LOAD16_WORD_SWAP( "26gl128.bin", 0x000000, 0x1000000, CRC(0b103ac9) SHA1(14434908f429942096fb8db5b5630603fd54fb2c) )
 ROM_END
 
+ROM_START( guitarfv )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "mx26l64.bin", 0x000000, 0x800000, CRC(eaadd2c2) SHA1(0c3fe004dbaa52a335c6ddcecb9e9f5582d7ef35) )
+ROM_END
+
+
 void spg2xx_game_state::init_crc()
 {
 	// several games have a byte sum checksum listed at the start of ROM, this little helper function logs what it should match.
@@ -889,6 +932,9 @@ CONS( 2006, abltenni,    0,     0,        abltenni,       abltenni,    spg2xx_ga
 
 // same as Excalibur Decathlon? not the same as the ABL game
 CONS( 2006, tvsprt10,    0,     0,        tvsprt10,       tvsprt10,    spg2xx_game_state, init_tvsprt10, "Simba / V-Tac Technology Co Ltd.", "TV Sports 10-in-1 / Decathlon Atlhetic Sport Games", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2007, guitarfv,    0,     0,        guitarfv,       guitarfv,    spg2xx_game_state, empty_init, "Advance Bright Ltd", "Guitar Fever (2007.07.03 Ver 2.7)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
 
 // Mattel games
 CONS( 2005, mattelcs,  0,        0, rad_skat, mattelcs,   spg2xx_game_state, empty_init, "Mattel", "Mattel Classic Sports",     MACHINE_IMPERFECT_SOUND )

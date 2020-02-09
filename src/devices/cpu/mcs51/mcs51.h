@@ -153,8 +153,8 @@ protected:
 	address_space *m_data;
 	address_space *m_io;
 
-	devcb_read8 m_port_in_cb[4];
-	devcb_write8 m_port_out_cb[4];
+	devcb_read8::array<4> m_port_in_cb;
+	devcb_write8::array<4> m_port_out_cb;
 
 	/* Serial Port TX/RX Callbacks */
 	devcb_write8 m_serial_tx_cb;    //Call back function when sending data out of serial port

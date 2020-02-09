@@ -31,8 +31,8 @@ private:
 	// internal state
 	required_device<mb88_cpu_device> m_cpu;
 	required_device<screen_device> m_screen;
-	devcb_read8 m_in[4];
-	devcb_write8 m_out[2];
+	devcb_read8::array<4> m_in;
+	devcb_write8::array<2> m_out;
 
 	int32_t m_lastcoins;
 	int32_t m_lastbuttons;
@@ -47,6 +47,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(NAMCO_51XX, namco_51xx_device)
-
 
 #endif // NAMCO_51XX

@@ -175,12 +175,12 @@ protected:
 	address_space_config m_data_config;
 	address_space_config m_io_config;
 
-	devcb_read8   m_port_in_cb[2];
-	devcb_write8  m_port_out_cb[2];
-	devcb_read8   m_bus_in_cb;
-	devcb_write8  m_bus_out_cb;
+	devcb_read8::array<2> m_port_in_cb;
+	devcb_write8::array<2> m_port_out_cb;
+	devcb_read8 m_bus_in_cb;
+	devcb_write8 m_bus_out_cb;
 
-	devcb_read_line m_test_in_cb[2];
+	devcb_read_line::array<2> m_test_in_cb;
 	clock_update_delegate m_t0_clk_func;
 	devcb_write_line m_prog_out_cb;
 

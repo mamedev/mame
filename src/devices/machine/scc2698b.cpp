@@ -359,11 +359,10 @@ scc2698b_device::scc2698b_device(const machine_config &mconfig, const char *tag,
 	write_intr_B(*this),
 	write_intr_C(*this),
 	write_intr_D(*this),
-	write_tx{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this} },
-	write_mpp1{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this } },
-	write_mpp2{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this } },
-	write_mpo{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this } }
-
+	write_tx(*this),
+	write_mpp1(*this),
+	write_mpp2(*this),
+	write_mpo(*this)
 {
 
 }
@@ -383,14 +382,10 @@ void scc2698b_device::device_start()
 	write_intr_C.resolve_safe();
 	write_intr_D.resolve_safe();
 
-	for (auto &cb : write_tx)
-		cb.resolve_safe();
-	for (auto &cb : write_mpp1)
-		cb.resolve_safe();
-	for (auto &cb : write_mpp2)
-		cb.resolve_safe();
-	for (auto &cb : write_mpo)
-		cb.resolve_safe();
+	write_tx.resolve_all_safe();
+	write_mpp1.resolve_all_safe();
+	write_mpp2.resolve_all_safe();
+	write_mpo.resolve_all_safe();
 
 	for (int i = 0; i < 8; i++)
 	{

@@ -483,6 +483,9 @@ the rest are data used by it
    ---- ---- -S-- ---- | SPD (Transparent Pixel Disable)
    ---- ---- --cc c--- | Colour Mode
    ---- ---- ---- -CCC | Colour Calculation bits
+   ---- ---- ---- -1-- | Gouraud shading enable
+   ---- ---- ---- --1- | 1/2 original GFX enable
+   ---- ---- ---- ---1 | 1/2 background enable
 
 06 CMDCOLR
    mmmm mmmm mmmm mmmm | Colour Bank, Colour Lookup /8
@@ -526,7 +529,7 @@ uint8_t saturn_state::stv_read_gouraud_table( void )
 {
 	int gaddr;
 
-	if ( (stv2_current_sprite.CMDPMOD & 0x7) == 4 )
+	if ( stv2_current_sprite.CMDPMOD & 0x4 )
 	{
 		gaddr = stv2_current_sprite.CMDGRDA * 8;
 		stv_gouraud_shading.GA = (m_vdp1_vram[gaddr/4] >> 16) & 0xffff;

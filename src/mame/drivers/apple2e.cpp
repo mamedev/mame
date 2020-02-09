@@ -157,6 +157,7 @@ Address bus A0-A11 is Y0-Y11
 #include "bus/a2bus/a2vulcan.h"
 #include "bus/a2bus/4play.h"
 #include "bus/a2bus/computereyes2.h"
+#include "bus/a2bus/byte8251.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -4208,6 +4209,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("vulcan", A2BUS_VULCANIIE); /* Applied Engineering Vulcan IDE drive */
 	device.option_add("4play", A2BUS_4PLAY); /* 4Play Joystick Card (Rev. B) */
 	device.option_add("ceyes2", A2BUS_COMPUTEREYES2); /* ComputerEyes/2 Video Digitizer */
+	device.option_add("byte8251", A2BUS_BYTE8251);
 }
 
 static void apple2eaux_cards(device_slot_interface &device)

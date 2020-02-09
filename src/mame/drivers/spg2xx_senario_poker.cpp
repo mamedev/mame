@@ -8,7 +8,9 @@ improve controller hookup / simulation and remove PC-based hacks!
 
 */
 
+#include "emu.h"
 #include "includes/spg2xx.h"
+
 #include "sentx6p.lh"
 
 

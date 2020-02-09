@@ -79,7 +79,7 @@ private:
 	DECLARE_WRITE8_MEMBER(write_unmapped);
 	DECLARE_READ8_MEMBER(read_unmapped);
 
-	devcb_write_line m_sound_end_cb[6];
+	devcb_write_line::array<6> m_sound_end_cb;
 };
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A05_SOUND, elan_eu3a05_sound_device)

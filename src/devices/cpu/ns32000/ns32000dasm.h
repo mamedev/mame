@@ -101,7 +101,7 @@ private:
 	static char const *const M[];
 	static char const *const PR[];
 
-	std::string mnemonic_index(std::string form, std::string itype, std::string ftype);
+	std::string mnemonic_index(std::string form, const std::string &itype, const std::string &ftype);
 	uint8_t opcode_format(uint8_t byte);
 	int8_t short2int(uint8_t val);
 	static inline int32_t get_disp(offs_t &pc, const data_buffer &opcodes);

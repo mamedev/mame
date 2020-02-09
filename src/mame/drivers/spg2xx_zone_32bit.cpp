@@ -3,7 +3,9 @@
 
 /* 'Zone' '32-bit' systems */
 
+#include "emu.h"
 #include "includes/spg2xx.h"
+
 
 class zon32bit_state : public spg2xx_game_state
 {

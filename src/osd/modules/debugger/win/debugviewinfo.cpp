@@ -758,7 +758,7 @@ LRESULT debugview_info::view_proc(UINT message, WPARAM wparam, LPARAM lparam)
 
 void debugview_info::static_update(debug_view &view, void *osdprivate)
 {
-	debugview_info *const info = (debugview_info *)osdprivate;
+	auto *const info = (debugview_info *)osdprivate;
 	assert(info->m_view == &view);
 	info->update();
 }
@@ -774,7 +774,7 @@ LRESULT CALLBACK debugview_info::static_view_proc(HWND wnd, UINT message, WPARAM
 		return 0;
 	}
 
-	debugview_info *const info = (debugview_info *)(uintptr_t)GetWindowLongPtr(wnd, GWLP_USERDATA);
+	auto *const info = (debugview_info *)(uintptr_t)GetWindowLongPtr(wnd, GWLP_USERDATA);
 	if (info == nullptr)
 		return DefWindowProc(wnd, message, wparam, lparam);
 

@@ -2,12 +2,12 @@
 // copyright-holders:R. Belmont, Parduz
 /***************************************************************************
 
-    esq5505.c - Ensoniq ES5505 + ES5510 based synthesizers and samplers
+    esq5505.cpp - Ensoniq ES5505 + ES5510 based synthesizers and samplers
 
     Ensoniq VFX, VFX-SD, EPS, EPS-16 Plus, SD-1, SD-1 32, SQ-1 and SQ-R (SQ-1 Plus,
     SQ-2, and KS-32 are known to also be this architecture).
 
-    The Taito sound system in taito_en.c is directly derived from the 32-voice version
+    The Taito sound system in taito_en.cpp is directly derived from the 32-voice version
     of the SD-1.
 
     Driver by R. Belmont and Parduz with thanks to Christian Brunschen, and Phil Bennett
@@ -123,6 +123,40 @@
     20 = select sound?
     22 = second digit of patch # becomes 6
     23 = first digit of patch # becomes 6
+
+    Ensoniq SQ-2 MIDI keyboard
+    Ensoniq 1992
+    PCB Layout by Guru
+
+
+    PART NO.: 4001018001 REV B
+
+       |--|  |--|  |--|    |--|                       |--|     |--|   |--|   |--|
+    |--|J1|--|J2|--|J3|----|J4|-----------------------|J7|-----|J8|---|J9|---|J10--|
+    | PHONE  RAUD  LAUD    PEDAL      3V_BATT         FOOT     MIDI   MIDI   MIDI  |
+    |                      CV   74LS244 74LS244 74LS245        IN     OUT    THRU  |
+    |                                                                              |
+    |    TL072                  J5                                HP6N138   |---|  |
+    |            7912       4051      CARTRIDGE       LOWER.U27  UPPER.U32  | 6 |LM2926
+    |                 J15         |-------J6------|       62256       62256 | 8 |  |
+    |                             |---------------|   74HC4053              | 0 |7805
+    |            7812           7407                          ENSONIQ       | 0 |  |
+    |    TL072            TL072               ENSONIQ         GLU           | 0 |  |
+    |                                         SUPERGLU                      |---|  |
+    |                                                                              |
+    |                                            16MHz  30.47618MHz                |
+    |                                                                         POWER|
+    |TDA1541A        ROM3.U38   ROM1.U26    74HC74                LM339         J12|
+    |                                                                              |
+    |                    ROM2.U39   ROM0.U25              NCR6500/11  J13          |
+    |                                                                              |
+    |        OTISR2             74LS373      ESP        68681                      |
+    |                                                                              |
+    |7805    74HC74 74F139  6264      6264   ADJ-POT  ESPR6       LM339            |
+    |                                                                              |
+    |7915    74LS174 74HC161    74LS373    LM317T                 J11 J14          |
+    |------------------------------------------------------------------------------|
+    Note: All parts shown.
 
 ***************************************************************************/
 

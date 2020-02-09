@@ -42,6 +42,7 @@
 
 #include "imagedev/floppy.h"
 #include "formats/pc_dsk.h"
+#include "softlist.h"
 
 class jazz_state : public driver_device
 {
@@ -66,6 +67,7 @@ public:
 		, m_lpt(*this, "lpt")
 		, m_isp(*this, "isp")
 		, m_buzzer(*this, "buzzer")
+		, m_softlist(*this, "softlist")
 		, m_led(*this, "led0")
 	{
 	}
@@ -76,7 +78,8 @@ protected:
 	virtual void machine_reset() override;
 
 	// address maps
-	void jazz_common_map(address_map &map);
+	void cpu_map(address_map &map);
+	void mct_map(address_map &map);
 
 	// machine config
 	void jazz(machine_config &config);
@@ -111,6 +114,7 @@ protected:
 	required_device<pc_lpt_device> m_lpt;
 	required_device<i82357_device> m_isp;
 	required_device<speaker_sound_device> m_buzzer;
+	required_device<software_list_device> m_softlist;
 
 	output_finder<> m_led;
 };

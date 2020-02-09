@@ -98,7 +98,7 @@ private:
 
 	devcb_read8 m_dio_read_func;
 	devcb_write8 m_dio_write_func;
-	devcb_write_line m_signal_wr_fns[ IEEE_488_SIGNAL_COUNT ];
+	devcb_write_line::array<IEEE_488_SIGNAL_COUNT> m_signal_wr_fns;
 	devcb_write_line m_int_write_func;
 	devcb_write_line m_accrq_write_func;
 	bool m_int_line;

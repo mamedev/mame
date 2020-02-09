@@ -229,8 +229,8 @@ protected:
 
 	address_space_config m_data_config;
 
-	devcb_read8 m_in_port_cb[7];
-	devcb_write8 m_out_port_cb[7];
+	devcb_read8::array<7> m_in_port_cb;
+	devcb_write8::array<7> m_out_port_cb;
 
 	const u16 m_prr_mask;
 	const u16 m_drr_mask;

@@ -119,7 +119,7 @@ void bgfx_chain::process(chain_manager::screen_prim &prim, int view, int screen,
 	static int64_t last = m_current_time;
 	const int64_t frameTime = m_current_time - last;
 	last = m_current_time;
-	const double freq = double(bx::getHPFrequency());
+	const auto freq = double(bx::getHPFrequency());
 	const double toMs = 1000.0 / freq;
 	const double frameTimeInSeconds = (double)frameTime / 1000000.0;
 
@@ -145,7 +145,7 @@ uint32_t bgfx_chain::applicable_passes()
 
 void bgfx_chain::insert_effect(uint32_t index, bgfx_effect *effect, std::string name, std::string source, chain_manager &chains)
 {
-	clear_state *clear = new clear_state(BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH | BGFX_CLEAR_STENCIL, 0, 1.0f, 0);
+	auto *clear = new clear_state(BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH | BGFX_CLEAR_STENCIL, 0, 1.0f, 0);
 	std::vector<bgfx_suppressor*> suppressors;
 
 	std::vector<bgfx_input_pair*> inputs;

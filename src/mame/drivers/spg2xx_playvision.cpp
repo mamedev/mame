@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, David Haywood
 
+#include "emu.h"
 #include "includes/spg2xx.h"
+
 #include "pvmil.lh"
 
 

@@ -116,11 +116,11 @@ void tti_state::channel_w(u8 data)
 
 void tti_state::prg_map(address_map &map)
 {
-	map(0x00000, 0x07fff).rom().region("maincpu", 0);
+	map(0x00000, 0x07fff).rom().region("firmware", 0);
 	map(0x7e000, 0x7ffff).ram();
 	map(0x80000, 0x80017).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write));
 	map(0x80018, 0x8001f).ram();
-	map(0x80020, 0x8002b).rw(FUNC(tti_state::asc_r), FUNC(tti_state::asc_w));
+	map(0x80020, 0x80029).rw(FUNC(tti_state::asc_r), FUNC(tti_state::asc_w));
 	map(0x80070, 0x80077).w("bitlatch", FUNC(ls259_device::write_d0));
 	map(0x80078, 0x8007b).w(FUNC(tti_state::dma_address_w));
 	map(0x8007c, 0x8007c).r(FUNC(tti_state::io_status_r));
@@ -157,9 +157,9 @@ void tti_state::tti(machine_config &config)
 	m_maincpu->set_addrmap(m68008_device::AS_CPU_SPACE, &tti_state::fc7_map);
 
 	MC68901(config, m_mfp, 20_MHz_XTAL / 2); // guess
-	m_mfp->set_timer_clock(2'457'600); // guess
+	m_mfp->set_timer_clock(20_MHz_XTAL / 8); // guess
 	m_mfp->out_tco_cb().set(m_mfp, FUNC(mc68901_device::rc_w));
-	m_mfp->out_tdo_cb().set(m_mfp, FUNC(mc68901_device::tc_w));
+	m_mfp->out_tco_cb().append(m_mfp, FUNC(mc68901_device::tc_w));
 	m_mfp->out_so_cb().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_mfp->out_irq_cb().set_inputline("maincpu", M68K_IRQ_2); // probably
 
@@ -185,9 +185,11 @@ void tti_state::tti(machine_config &config)
 }
 
 ROM_START( tti )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "tti_10012000_rev2.3.bin", 0x0000, 0x8000, CRC(95a5bce8) SHA1(46d7c99e37ca5598aec2062dfd9759853a237c14) )
-	ROM_LOAD( "tti_10012000_rev1.7.bin", 0x0000, 0x8000, CRC(6660c059) SHA1(05d97009b5b8034dda520f655c73c474da97f822) )
+	ROM_REGION(0x8000, "firmware", 0)
+	ROM_SYSTEM_BIOS(0, "v2.3", "Firmware Version 2.3")
+	ROMX_LOAD("tti_10012000_rev2.3.bin", 0x0000, 0x8000, CRC(95a5bce8) SHA1(46d7c99e37ca5598aec2062dfd9759853a237c14), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v1.7", "Firmware Version 1.7")
+	ROMX_LOAD("tti_10012000_rev1.7.bin", 0x0000, 0x8000, CRC(6660c059) SHA1(05d97009b5b8034dda520f655c73c474da97f822), ROM_BIOS(1))
 ROM_END
 
 COMP( 1989, tti, 0, 0, tti, tti, tti_state, empty_init, "Transitional Technology Inc", "unknown TTI SCSI host adapter", MACHINE_IS_SKELETON )

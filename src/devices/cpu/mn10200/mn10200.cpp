@@ -49,8 +49,8 @@ void mn10200_device::mn1020012a_internal_map(address_map &map)
 mn10200_device::mn10200_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, program), m_program(nullptr)
-	, m_read_port{{*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_write_port{{*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_read_port(*this)
+	, m_write_port(*this)
 	, m_cycles(0), m_pc(0), m_psw(0), m_mdr(0), m_nmicr(0), m_iagr(0)
 	, m_extmdl(0), m_extmdh(0), m_possible_irq(false), m_pplul(0), m_ppluh(0), m_p3md(0), m_p4(0)
 { }
@@ -124,11 +124,8 @@ void mn10200_device::device_start()
 	m_program = &space(AS_PROGRAM);
 
 	// resolve callbacks
-	for (int i = 0; i < 5; i++)
-	{
-		m_read_port[i].resolve_safe(0xff);
-		m_write_port[i].resolve_safe();
-	}
+	m_read_port.resolve_all_safe(0xff);
+	m_write_port.resolve_all_safe();
 
 	// init and register for savestates
 	save_item(NAME(m_pc));

@@ -63,15 +63,6 @@ option_resolution::option_resolution(const option_guide &guide)
 
 
 // -------------------------------------------------
-//  dtor
-// -------------------------------------------------
-
-option_resolution::~option_resolution()
-{
-}
-
-
-// -------------------------------------------------
 //  lookup_in_specification
 // -------------------------------------------------
 

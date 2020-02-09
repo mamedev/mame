@@ -67,7 +67,7 @@ private:
 	devcb_read16 m_portb_in;
 	devcb_read16 m_portc_in;
 
-	devcb_read16 m_adc_in[2];
+	devcb_read16::array<2> m_adc_in;
 
 	devcb_write8 m_chip_sel;
 

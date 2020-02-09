@@ -29,7 +29,7 @@ spg110_device::spg110_device(const machine_config &mconfig, device_type type, co
 	, m_porta_in(*this)
 	, m_portb_in(*this)
 	, m_portc_in(*this)
-	, m_adc_in{{*this}, {*this}}
+	, m_adc_in(*this)
 	, m_chip_sel(*this)
 {
 }
@@ -90,7 +90,6 @@ void spg110_device::device_add_mconfig(machine_config &config)
 
 	m_spg_audio->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
 	m_spg_audio->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
-
 }
 
 void spg110_device::internal_map(address_map &map)
@@ -167,8 +166,7 @@ void spg110_device::device_start()
 	m_porta_in.resolve_safe(0);
 	m_portb_in.resolve_safe(0);
 	m_portc_in.resolve_safe(0);
-	m_adc_in[0].resolve_safe(0x0fff);
-	m_adc_in[1].resolve_safe(0x0fff);
+	m_adc_in.resolve_all_safe(0x0fff);
 	m_chip_sel.resolve_safe();
 }
 
@@ -176,4 +174,3 @@ void spg110_device::device_reset()
 {
 	unsp_device::device_reset();
 }
-

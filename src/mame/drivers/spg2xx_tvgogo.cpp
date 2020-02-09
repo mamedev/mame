@@ -1,9 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, David Haywood
 
+#include "emu.h"
 #include "includes/spg2xx.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
 
 class tvgogo_state : public spg2xx_game_state
 {

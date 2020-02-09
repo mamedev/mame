@@ -80,9 +80,9 @@ void s3virge_vga_device::device_start()
 	vga.memory.resize(vga.svga_intf.vram_size);
 	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
 	save_item(vga.memory,"Video RAM");
-	save_pointer(vga.crtc.data,"CRTC Registers",0x100);
-	save_pointer(vga.sequencer.data,"Sequencer Registers",0x100);
-	save_pointer(vga.attribute.data,"Attribute Registers", 0x15);
+	save_item(vga.crtc.data,"CRTC Registers");
+	save_item(vga.sequencer.data,"Sequencer Registers");
+	save_item(vga.attribute.data,"Attribute Registers");
 
 	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vga_device::vblank_timer_cb),this));
 	m_draw_timer = timer_alloc(TIMER_DRAW_STEP);
@@ -91,12 +91,12 @@ void s3virge_vga_device::device_start()
 	memset(&s3virge, 0, sizeof(s3virge));
 	s3virge.linear_address = 0x70000000;
 	s3virge.s3d.cmd_fifo_slots_free = 16;
-	save_pointer(s3virge.s3d.pattern,"S3D Pattern Data", 0xc0);
-	save_pointer(s3virge.s3d.reg[0],"S3D Registers: BitBLT",0x100);
-	save_pointer(s3virge.s3d.reg[1],"S3D Registers: 2D Line",0x100);
-	save_pointer(s3virge.s3d.reg[2],"S3D Registers: 2D Polygon",0x100);
-	save_pointer(s3virge.s3d.reg[3],"S3D Registers: 3D Line",0x100);
-	save_pointer(s3virge.s3d.reg[4],"S3D Registers: 3D Triangle",0x100);
+	save_item(s3virge.s3d.pattern,"S3D Pattern Data");
+	save_item(s3virge.s3d.reg[0],"S3D Registers: BitBLT");
+	save_item(s3virge.s3d.reg[1],"S3D Registers: 2D Line");
+	save_item(s3virge.s3d.reg[2],"S3D Registers: 2D Polygon");
+	save_item(s3virge.s3d.reg[3],"S3D Registers: 3D Line");
+	save_item(s3virge.s3d.reg[4],"S3D Registers: 3D Triangle");
 
 	// Initialise hardware graphics cursor colours, Windows 95 doesn't touch the registers for some reason
 	for(x=0;x<4;x++)
@@ -932,7 +932,7 @@ void s3virge_vga_device::command_start()
 				m_draw_timer->adjust(attotime::from_nsec(250),0,attotime::from_nsec(250));
 			s3virge.s3d.bitblt_step_count = 0;
 			s3virge.s3d.bitblt_mono_pattern =
-				s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_MONO_PAT_0] | (uint64_t)(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_MONO_PAT_1]) << 32;
+					s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_MONO_PAT_0] | (uint64_t)(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_MONO_PAT_1]) << 32;
 			s3virge.s3d.bitblt_current_pixel = 0;
 			s3virge.s3d.bitblt_pixel_pos = 0;
 			s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_PAT_BG_CLR] = 0xffffffff;  // win31 never sets this?
@@ -1058,8 +1058,10 @@ bool s3virge_vga_device::advance_pixel()
 		s3virge.s3d.bitblt_pat_x = s3virge.s3d.bitblt_x_current % 8;
 		if(s3virge.s3d.bitblt_pat_y >= 8 || s3virge.s3d.bitblt_pat_y < 0)
 			s3virge.s3d.bitblt_pat_y = s3virge.s3d.bitblt_y_current % 8;
-	logerror("SRC: %i,%i  DST: %i,%i PAT: %i,%i Bounds: %i,%i,%i,%i\n",
-				s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,s3virge.s3d.bitblt_pat_x,s3virge.s3d.bitblt_pat_y,
+		logerror("SRC: %i,%i  DST: %i,%i PAT: %i,%i Bounds: %i,%i,%i,%i\n",
+				s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current,
+				s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,
+				s3virge.s3d.bitblt_pat_x,s3virge.s3d.bitblt_pat_y,
 				left,right,top,bottom);
 		if((s3virge.s3d.bitblt_y_current >= bottom) || (s3virge.s3d.bitblt_y_current <= top))
 			return true;

@@ -262,7 +262,7 @@ static uint32_t parse_wav_sample(const char *filename, uint32_t *dataoffs)
 	}
 
 	/* seek until we find a format tag */
-	while (1)
+	while (true)
 	{
 		file->read(buf, offset, 4, actual);
 		offset += actual;
@@ -329,7 +329,7 @@ static uint32_t parse_wav_sample(const char *filename, uint32_t *dataoffs)
 	offset += length - 16;
 
 	/* seek until we find a data tag */
-	while (1)
+	while (true)
 	{
 		file->read(buf, offset, 4, actual);
 		offset += actual;

@@ -476,7 +476,11 @@ namespace analog
 
 		const nl_fptype Vctrl = (is_forward ? Vgs : Vgd) - Vth;
 
-		nl_fptype Ids(0), gm(0), gds(0), gmb(0);
+		nl_fptype Ids(0);
+		nl_fptype gm(0);
+		nl_fptype gds(0);
+		nl_fptype gmb(0);
+
 		const nl_fptype absVds = plib::abs(Vds);
 
 		if (Vctrl <= nlconst::zero())

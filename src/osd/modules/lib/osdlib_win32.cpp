@@ -192,7 +192,7 @@ static std::string convert_ansi(LPCVOID data)
 //  osd_get_clipboard_text
 //============================================================
 
-std::string osd_get_clipboard_text(void)
+std::string osd_get_clipboard_text()
 {
 	std::string result;
 
@@ -210,7 +210,7 @@ std::string osd_get_clipboard_text(void)
 //  osd_getpid
 //============================================================
 
-int osd_getpid(void)
+int osd_getpid()
 {
 	return GetCurrentProcessId();
 }
@@ -262,7 +262,7 @@ protected:
 
 			if (module != nullptr)
 			{
-				generic_fptr_t function = reinterpret_cast<generic_fptr_t>(GetProcAddress(module, symbol));
+				auto function = reinterpret_cast<generic_fptr_t>(GetProcAddress(module, symbol));
 
 				if (function != nullptr)
 				{

@@ -135,11 +135,11 @@ offs_t isbc202_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	uint32_t microcode = opcodes.r32(pc);
 
 	// Decode address control instruction
-	uint8_t ac = (uint8_t)(microcode >> 25);
+	uint8_t ac = uint8_t(microcode >> 25);
 
 	if ((ac & 0b1100000) == 0b0000000) {
 		// JCC
-		util::stream_format(stream , "JCC $%03x" , (((uint16_t)ac & 0b11111) << 4) | (pc & 0xf));
+		util::stream_format(stream , "JCC $%03x" , ((uint16_t(ac) & 0b11111) << 4) | (pc & 0xf));
 	} else if ((ac & 0b1110000) == 0b0100000) {
 		// JZR
 		util::stream_format(stream , "JZR $00%x" , ac & 0b1111);
@@ -173,11 +173,11 @@ offs_t isbc202_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	}
 
 	// Decode input multiplexer
-	uint8_t in = (uint8_t)((microcode >> 13) & 7);
+	uint8_t in = uint8_t((microcode >> 13) & 7);
 	util::stream_format(stream , " I=%u" , in);
 
 	// Decode function code
-	uint8_t fc = (uint8_t)((microcode >> 18) & 0x7f);
+	uint8_t fc = uint8_t((microcode >> 18) & 0x7f);
 	uint8_t fg;
 	uint8_t rg;
 	unsigned reg;
@@ -189,8 +189,8 @@ offs_t isbc202_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	stream << (BIT(microcode , 16) ? " HCZ" : " SCZ");
 
 	// Decode K
-	uint8_t slk = (uint8_t)((microcode >> 8) & 3);
-	uint8_t mask = (uint8_t)microcode;
+	uint8_t slk = uint8_t((microcode >> 8) & 3);
+	uint8_t mask = uint8_t(microcode);
 	uint8_t kbus;
 	if (!BIT(slk , 0)) {
 		kbus = mask;
@@ -204,7 +204,7 @@ offs_t isbc202_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	// Decode OUT
 	util::stream_format(stream , " S=%u M=$%02x" , slk , mask);
 	if (BIT(slk , 0) && !BIT(mask , 7)) {
-		uint8_t out = (uint8_t)((microcode >> 10) & 7);
+		uint8_t out = uint8_t((microcode >> 10) & 7);
 		util::stream_format(stream , " O=%u" , out);
 	}
 
@@ -481,11 +481,11 @@ void isbc202_device::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 ROM_START(isbc202)
-   ROM_REGION(0x800 , "microcode" , ROMREGION_32BIT | ROMREGION_BE)
-   ROM_LOAD32_BYTE("sbc202-a10-0230.bin" , 0x000 , 0x200 , CRC(e8fa3893) SHA1(88fab74b0466e8aac36eee46cd7536ed1b32a2c9))
-   ROM_LOAD32_BYTE("sbc202-a11-0261.bin" , 0x001 , 0x200 , CRC(3ad01769) SHA1(4c22b8fc3ea599dd49684ff4dcafc29ec3425c4c))
-   ROM_LOAD32_BYTE("sbc202-a12-0233.bin" , 0x002 , 0x200 , CRC(61496232) SHA1(b0473217944b2f6e966d97e97cf5ad8d883a09e4))
-   ROM_LOAD32_BYTE("sbc202-a13-0232.bin" , 0x003 , 0x200 , CRC(c369ab86) SHA1(fc3b7f9c3e71ea1442827c51247a9944c6d40b37))
+	ROM_REGION(0x800 , "microcode" , ROMREGION_32BIT | ROMREGION_BE)
+	ROM_LOAD32_BYTE("sbc202-a10-0230.bin" , 0x000 , 0x200 , CRC(e8fa3893) SHA1(88fab74b0466e8aac36eee46cd7536ed1b32a2c9))
+	ROM_LOAD32_BYTE("sbc202-a11-0261.bin" , 0x001 , 0x200 , CRC(3ad01769) SHA1(4c22b8fc3ea599dd49684ff4dcafc29ec3425c4c))
+	ROM_LOAD32_BYTE("sbc202-a12-0233.bin" , 0x002 , 0x200 , CRC(61496232) SHA1(b0473217944b2f6e966d97e97cf5ad8d883a09e4))
+	ROM_LOAD32_BYTE("sbc202-a13-0232.bin" , 0x003 , 0x200 , CRC(c369ab86) SHA1(fc3b7f9c3e71ea1442827c51247a9944c6d40b37))
 ROM_END
 
 const tiny_rom_entry *isbc202_device::device_rom_region() const
@@ -571,14 +571,14 @@ void isbc202_device::execute_run()
 		// 12..10   Output control
 		//  9..8    SLK field
 		//  7..0    Mask field
-		m_ac = (uint8_t)(m_code_word >> 25);
-		m_fc = (uint8_t)((m_code_word >> 18) & 0x7f);
+		m_ac = uint8_t(m_code_word >> 25);
+		m_fc = uint8_t((m_code_word >> 18) & 0x7f);
 		m_fc32 = BIT(m_code_word , 17);
 		m_fc10 = BIT(m_code_word , 16);
-		m_in_sel = (uint8_t)((m_code_word >> 13) & 7);
-		m_out_sel = (uint8_t)((m_code_word >> 10) & 7);
-		m_slk = (uint8_t)((m_code_word >> 8) & 3);
-		m_mask = (uint8_t)m_code_word;
+		m_in_sel = uint8_t((m_code_word >> 13) & 7);
+		m_out_sel = uint8_t((m_code_word >> 10) & 7);
+		m_slk = uint8_t((m_code_word >> 8) & 3);
+		m_mask = uint8_t(m_code_word);
 
 		m_mcu->fc_w((m_fc32 ? 0b1100 : 0b0000) | (m_fc10 ? 0b0011 : 0b0000));
 
@@ -852,7 +852,7 @@ void isbc202_device::set_output()
 			if (m_mem_wrt) {
 				if (!m_wrt_inh) {
 					// CPU memory write
-					uint16_t addr = m_addr_low_out | ((uint16_t)abus_r() << 8);
+					uint16_t addr = m_addr_low_out | (uint16_t(abus_r()) << 8);
 					if (m_mem_space) {
 						LOG_BUS("MEM W %04x=%02x\n" , addr , m_data_low_out);
 						m_mem_space->write_byte(addr , m_data_low_out);
@@ -862,7 +862,7 @@ void isbc202_device::set_output()
 				}
 			} else {
 				// CPU memory read
-				uint16_t addr = m_addr_low_out | ((uint16_t)abus_r() << 8);
+				uint16_t addr = m_addr_low_out | (uint16_t(abus_r()) << 8);
 				if (m_mem_space) {
 					m_data_low_in = m_mem_space->read_byte(addr);
 					LOG_BUS("MEM R %04x=%02x\n" , addr , m_data_low_in);
@@ -1130,7 +1130,7 @@ uint8_t isbc202_device::aligned_rd_data(uint16_t sr)
 		LOG_RD("Aligning by %u bits\n" , bits);
 		sr <<= bits;
 	}
-	return (uint8_t)(sr >> 8);
+	return uint8_t(sr >> 8);
 }
 
 void isbc202_device::rd_bits(unsigned n)

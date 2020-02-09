@@ -60,6 +60,7 @@ enum
 
 	UNSP_IRQ_EN,
 	UNSP_FIQ_EN,
+	UNSP_FIR_MOV_EN,
 	UNSP_IRQ,
 	UNSP_FIQ,
 #if UNSP_LOG_OPCODES || UNSP_LOG_REGS
@@ -164,9 +165,10 @@ protected:
 
 	struct internal_unsp_state
 	{
-		std::vector<u32> m_r; // why are these 32-bit? they're 16-bit regs? (changing to uint16_t causes crashes tho, so something is depending on this)
+		uint32_t m_r[16]; // required to be 32 bits due to DRC
 		uint32_t m_enable_irq;
 		uint32_t m_enable_fiq;
+		uint32_t m_fir_move;
 		uint32_t m_irq;
 		uint32_t m_fiq;
 		uint32_t m_curirq;
@@ -214,6 +216,7 @@ protected:
 	void execute_fxxx_100_group(uint16_t op);
 	virtual void execute_extended_group(uint16_t op);
 	virtual void execute_exxx_group(uint16_t op);
+	void execute_muls(const uint16_t rd, const uint16_t rs, const uint16_t size);
 	void unimplemented_opcode(uint16_t op);
 	void unimplemented_opcode(uint16_t op, uint16_t ximm);
 	void unimplemented_opcode(uint16_t op, uint16_t ximm, uint16_t ximm_2);
@@ -231,7 +234,7 @@ protected:
 	uint16_t pop(uint32_t *reg);
 
 	void update_nz(uint32_t value);
-	void update_nzsc(uint32_t value, uint16_t r0, uint16_t r1);
+	void update_nzsc(uint32_t value, int32_t svalue);
 	bool do_basic_alu_ops(const uint16_t& op0, uint32_t& lres, uint16_t& r0, uint16_t& r1, uint32_t& r2, bool update_flags);
 
 private:

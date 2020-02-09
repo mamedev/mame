@@ -76,7 +76,7 @@ namespace plib
 		/// later.
 		///
 		template <typename V>
-		static inline constexpr const T magic(V &&v) noexcept { return static_cast<T>(v); }
+		static inline constexpr T magic(V &&v) noexcept { return static_cast<T>(v); }
 	};
 
 	/// \brief typesafe reciprocal function
@@ -415,7 +415,7 @@ namespace plib
 		return (m != 0 && n != 0) ? (plib::abs(m) / gcd(m, n)) * plib::abs(n) : 0;
 	}
 
-	static_assert(noexcept(constants<double>::one()) == true, "Not evaluated as constexpr");
+	static_assert(noexcept(constants<double>::one()), "Not evaluated as constexpr");
 
 } // namespace plib
 

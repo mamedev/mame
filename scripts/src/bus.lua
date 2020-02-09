@@ -2288,6 +2288,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/4play.h",
 		MAME_DIR .. "src/devices/bus/a2bus/computereyes2.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/computereyes2.h",
+		MAME_DIR .. "src/devices/bus/a2bus/byte8251.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/byte8251.h",
 	}
 end
 
@@ -2665,6 +2667,20 @@ if (BUSES["NES_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/nes_ctrl/suborkey.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/zapper.cpp",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/zapper.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/sdk85/memexp.h,BUSES["SDK85"] = true
+---------------------------------------------------
+
+if (BUSES["SDK85"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/sdk85/memexp.cpp",
+		MAME_DIR .. "src/devices/bus/sdk85/memexp.h",
+		MAME_DIR .. "src/devices/bus/sdk85/i8755.cpp",
+		MAME_DIR .. "src/devices/bus/sdk85/i8755.h",
 	}
 end
 

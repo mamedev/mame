@@ -15,12 +15,12 @@
 DEFINE_DEVICE_TYPE(HD63450, hd63450_device, "hd63450", "Hitachi HD63450 DMAC")
 
 hd63450_device::hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HD63450, tag, owner, clock),
-		m_irq_callback(*this),
-		m_dma_end(*this),
-		m_dma_read{{*this}, {*this}, {*this}, {*this}},
-		m_dma_write{{*this}, {*this}, {*this}, {*this}},
-		m_cpu(*this, finder_base::DUMMY_TAG)
+	: device_t(mconfig, HD63450, tag, owner, clock)
+	, m_irq_callback(*this)
+	, m_dma_end(*this)
+	, m_dma_read(*this)
+	, m_dma_write(*this)
+	, m_cpu(*this, finder_base::DUMMY_TAG)
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -45,10 +45,8 @@ void hd63450_device::device_start()
 	// resolve callbacks
 	m_irq_callback.resolve_safe();
 	m_dma_end.resolve_safe();
-	for (auto &cb : m_dma_read)
-		cb.resolve();
-	for (auto &cb : m_dma_write)
-		cb.resolve();
+	m_dma_read.resolve_all();
+	m_dma_write.resolve_all();
 
 	// Initialise timers and registers
 	for (int x = 0; x < 4; x++)

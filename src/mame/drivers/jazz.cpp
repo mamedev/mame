@@ -79,20 +79,35 @@ void jazz_state::machine_reset()
 void jazz_state::init_common()
 {
 	// map the configured ram and vram
-	m_cpu->space(0).install_ram(0x00000000, 0x00000000 | m_ram->mask(), m_ram->pointer());
-	// FIXME: video ram must be written in emulated cpu order
-	m_cpu->space(0).install_ram(0x40000000, 0x40000000 | m_vram->mask(), m_vram->pointer());
+	m_mct_adr->space(0).install_ram(0x00000000, 0x00000000 | m_ram->mask(), m_ram->pointer());
+	m_mct_adr->space(0).install_ram(0x40000000, 0x40000000 | m_vram->mask(), m_vram->pointer());
 }
 
-void jazz_state::jazz_common_map(address_map &map)
+void jazz_state::cpu_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(m_mct_adr, FUNC(mct_adr_device::r4k_r), FUNC(mct_adr_device::r4k_w));
+}
+
+void jazz_state::mct_map(address_map &map)
 {
 	map(0x1fc00000, 0x1fc3ffff).r(m_flash, FUNC(amd_28f020_device::read));
 
-	// NOTE: defaults to console on serial1 if no video rom found
-	map(0x60000000, 0x600001ff).rom().region("graphics", 0);
+	// VDR1
+	//map(0x60000000, 0x60001fff).m(m_cvc, FUNC(g364_device::map));
+	//map(0x60010000, 0x60010000); // id (r/w)
+	//map(0x60020000, 0x60020000); // reset
 
+	// VDR1F "Fission"
+	map(0x60000000, 0x6007ffff).rom().region("graphics", 0);
 	map(0x60080000, 0x60081fff).m(m_cvc, FUNC(g364_device::map));
-	map(0x60180000, 0x60180007).lw32([this] (u32 data) { m_cvc->reset(); }, "g364_reset");
+	map(0x60100000, 0x60100000).lw8([this] (u8 data) { m_cvc->set_swapped(ENDIANNESS_NATIVE == ENDIANNESS_BIG); }, "little_endian");
+	map(0x60102000, 0x60102000).lw8([this] (u8 data) { m_cvc->set_swapped(ENDIANNESS_NATIVE == ENDIANNESS_LITTLE); }, "big_endian");
+	map(0x60180000, 0x60180000).lw8([this] (u8 data) { m_cvc->reset(); }, "g364_reset");
+	//map(0x60182000, 0x60182000); // TODO: monitor
+
+	// VDR2
+	//map(0x60000000, 0x60000fff).m(m_cvc, FUNC(g300_device::map));
+	//map(0x60008000, 0x60008fff).m(m_cursor, FUNC(bt431_device::map)).umask32(0x000000ff);
 
 	map(0x80000000, 0x80000fff).m(m_mct_adr, FUNC(mct_adr_device::map));
 
@@ -104,13 +119,13 @@ void jazz_state::jazz_common_map(address_map &map)
 	// BE: read 400d, write 400d, write 400c
 	map(0x80004000, 0x8000400f).lrw8(
 			NAME([this] (offs_t offset) { return m_rtc->read(1); }),
-			NAME([this] (offs_t offset, u8 data) { m_rtc->write(1, data); })).umask64(0xff);
-	map(0x80005000, 0x80005007).rw(m_kbdc, FUNC(ps2_keyboard_controller_device::data_r), FUNC(ps2_keyboard_controller_device::data_w)).umask64(0x00ff);
-	map(0x80005000, 0x80005007).rw(m_kbdc, FUNC(ps2_keyboard_controller_device::status_r), FUNC(ps2_keyboard_controller_device::command_w)).umask64(0xff00);
+			NAME([this] (offs_t offset, u8 data) { m_rtc->write(1, data); }));
+	map(0x80005000, 0x80005000).rw(m_kbdc, FUNC(ps2_keyboard_controller_device::data_r), FUNC(ps2_keyboard_controller_device::data_w));
+	map(0x80005001, 0x80005001).rw(m_kbdc, FUNC(ps2_keyboard_controller_device::status_r), FUNC(ps2_keyboard_controller_device::command_w));
 	map(0x80006000, 0x80006007).rw(m_ace[0], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x80007000, 0x80007007).rw(m_ace[1], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
-	map(0x80008000, 0x80008007).rw(m_lpt, FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write)).umask64(0xffffffff);
-	map(0x80009000, 0x8000afff).ram().share("nvram"); // 9000-9fff unprotected/a000-afff protected?
+	map(0x80008000, 0x80008003).rw(m_lpt, FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write));
+	map(0x80009000, 0x8000afff).ram().share("nvram");
 	map(0x8000b000, 0x8000b007).lr8(
 			[] (offs_t offset)
 			{
@@ -120,14 +135,12 @@ void jazz_state::jazz_common_map(address_map &map)
 				return mac[offset];
 			},
 			"mac");
-	// 3 4k pages of nvram: read/write, protected, read-only
-	// last page holds ethernet mac and checksum in bytes 0-7
 
 	//map(0x8000c000, 0x8000cfff) // sound
 	//map(0x8000d000, 0x8000dfff).noprw(); // dummy dma device?
 	map(0x8000d600, 0x8000d607).nopw();
 
-	map(0x8000f000, 0x8000f007).w(FUNC(jazz_state::led_w)).umask64(0xff);
+	map(0x8000f000, 0x8000f000).w(FUNC(jazz_state::led_w));
 
 	// lots of byte data written to 800
 	//map(0x800e0000, 0x800fffff).m() // dram config
@@ -144,8 +157,8 @@ void jazz_state::jazz_common_map(address_map &map)
 	//map(0x92000000, 0x92ffffff).m(); // EISA I/O ports?
 	//map(0x93000000, 0x93ffffff).m(); // EISA memory
 
-	map(0xf0000000, 0xf0000007).r(m_mct_adr, FUNC(mct_adr_device::isr_r)).umask64(0xffff);
-	map(0xf0000000, 0xf0000007).rw(m_mct_adr, FUNC(mct_adr_device::imr_r), FUNC(mct_adr_device::imr_w)).umask64(0xffff0000);
+	map(0xf0000000, 0xf0000001).r(m_mct_adr, FUNC(mct_adr_device::isr_r));
+	map(0xf0000002, 0xf0000003).rw(m_mct_adr, FUNC(mct_adr_device::imr_r), FUNC(mct_adr_device::imr_w));
 
 	map(0xfff00000, 0xfff3ffff).r(m_flash, FUNC(amd_28f020_device::read)); // mirror?
 }
@@ -164,7 +177,7 @@ void jazz_state::jazz(machine_config &config)
 {
 	// FIXME: slow the cpu clock to get past session manager bugcheck
 	R4000(config, m_cpu, 50_MHz_XTAL / 5);
-	m_cpu->set_addrmap(0, &jazz_state::jazz_common_map);
+	m_cpu->set_addrmap(0, &jazz_state::cpu_map);
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("16M");
@@ -177,7 +190,7 @@ void jazz_state::jazz(machine_config &config)
 
 	// local bus dma, timer and interrupt controller
 	MCT_ADR(config, m_mct_adr, 0);
-	m_mct_adr->set_bus(m_cpu, 0);
+	m_mct_adr->set_addrmap(0, &jazz_state::mct_map);
 	m_mct_adr->out_int_dma_cb().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 	m_mct_adr->out_int_device_cb().set_inputline(m_cpu, INPUT_LINE_IRQ1);
 	m_mct_adr->out_int_timer_cb().set_inputline(m_cpu, INPUT_LINE_IRQ4);
@@ -195,11 +208,11 @@ void jazz_state::jazz(machine_config &config)
 
 	// scsi host adapter
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53c94", NCR53C94).clock(24_MHz_XTAL).machine_config(
-		[this](device_t *device)
+		[this] (device_t *device)
 		{
 			ncr53c94_device &adapter = downcast<ncr53c94_device &>(*device);
 
-			adapter.irq_handler_cb().set(m_mct_adr, FUNC(mct_adr_device::irq<5>));;
+			adapter.irq_handler_cb().set(m_mct_adr, FUNC(mct_adr_device::irq<5>));
 			adapter.drq_handler_cb().set(m_mct_adr, FUNC(mct_adr_device::drq<0>));
 
 			subdevice<mct_adr_device>(":mct_adr")->dma_r_cb<0>().set(adapter, FUNC(ncr53c94_device::dma_r));
@@ -242,7 +255,7 @@ void jazz_state::jazz(machine_config &config)
 	// keyboard controller
 	PS2_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);
 	// FIXME: reset is probably routed through the MCT-ADR
-	m_kbdc->hot_res().set([this](int state) { machine().schedule_soft_reset(); });
+	m_kbdc->hot_res().set([this] (int state) { machine().schedule_soft_reset(); });
 	m_kbdc->kbd_clk().set(kbd_con, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_kbdc->kbd_data().set(kbd_con, FUNC(pc_kbdc_device::data_write_from_mb));
 	m_kbdc->kbd_irq().set(m_mct_adr, FUNC(mct_adr_device::irq<6>));
@@ -300,7 +313,7 @@ void jazz_state::jazz(machine_config &config)
 
 	DP83932C(config, m_net, 20_MHz_XTAL);
 	m_net->out_int_cb().set(m_mct_adr, FUNC(mct_adr_device::irq<4>));
-	m_net->set_bus(m_mct_adr, 0);
+	m_net->set_bus(m_mct_adr, 1);
 
 	I82357(config, m_isp, 14.318181_MHz_XTAL);
 	m_isp->out_rtc_cb().set(m_rtc, FUNC(mc146818_device::write));
@@ -311,6 +324,9 @@ void jazz_state::jazz(machine_config &config)
 	// TODO: 4 EISA slots
 
 	config.set_default_layout(layout_jazz);
+
+	// software list
+	SOFTWARE_LIST(config, m_softlist).set_original("jazz");
 }
 
 void jazz_state::led_w(u8 data)
@@ -355,30 +371,30 @@ void jazz_state::mmr4000le(machine_config &config)
 }
 
 ROM_START(mmr4000be)
-	ROM_REGION64_BE(0x40000, "flash", 0)
+	ROM_REGION32_LE(0x40000, "flash", 0)
 	ROM_SYSTEM_BIOS(0, "riscos", "R4000 RISC/os PROM")
 	ROMX_LOAD("riscos.bin", 0x00000, 0x40000, CRC(cea6bc8f) SHA1(3e47b4ad5d1a0c7aac649e6aef3df1bf86fc938b), ROM_BIOS(0))
 
-	ROM_REGION64_BE(0x200, "graphics", 0)
-	ROM_LOAD64_BYTE("mips_g364.bin", 0x00, 0x40, CRC(9265ccb6) SHA1(ef5c3a6bc5249274dd9c9a18d88a668cdd457370) BAD_DUMP)
+	ROM_REGION32_LE(0x800000, "graphics", 0)
+	ROM_LOAD64_BYTE("mips_g364.bin", 0x000000, 0x020000, CRC(be6a726e) SHA1(225c198f6a7f8445dac3de052ecceecbb5be6bc7) BAD_DUMP)
 ROM_END
 
 ROM_START(mmr4000le)
-	ROM_REGION64_LE(0x40000, "flash", 0)
+	ROM_REGION32_LE(0x40000, "flash", 0)
 	ROM_SYSTEM_BIOS(0, "ntprom", "R4000 Windows NT PROM")
 	ROMX_LOAD("ntprom.bin", 0x00000, 0x40000, CRC(d91018d7) SHA1(316de17820192c89b8ee6d9936ab8364a739ca53), ROM_BIOS(0))
 
-	ROM_REGION64_LE(0x200, "graphics", 0)
-	// Jazz G300 (8.125MHz video clock)
+	ROM_REGION32_LE(0x800000, "graphics", 0)
+	// Jazz G300 (8.125MHz video clock, Bt431)
 	//ROM_LOAD64_BYTE("jazz_g300.bin", 0x00, 0x40, CRC(258eb00a) SHA1(6e3fd0272957524de82e7042d6e36aca492c4d26) BAD_DUMP)
 	// Jazz G364 (8.125MHz video clock)
-	//ROM_LOAD64_BYTE("jazz_g364.bin", 0x00, 0x40, CRC(6d1ee59f) SHA1(8ec928af5b72c52eae6a3e81942db7cfaf9b9c1d) BAD_DUMP)
-	// Jazz VXL (aka Jaguar, part number 09-00184)
-	//ROM_LOAD64_BYTE("jazz_vxl.bin", 0x00, 0x40, CRC(df86e670) SHA1(2a9e8b1a42e4a29242131fa26c493f53eb866484) BAD_DUMP)
-	// MIPS Video G364 (5MHz video clock, part number 09-00176)
-	ROM_LOAD64_BYTE("mips_g364.bin", 0x00, 0x40, CRC(9265ccb6) SHA1(ef5c3a6bc5249274dd9c9a18d88a668cdd457370) BAD_DUMP)
+	//ROM_LOAD64_BYTE("jazz_g364.bin", 0x000000, 0x020000, CRC(495fb417) SHA1(c341f3d498822ec1ee07a70076d7bbbf7aa60cb5) BAD_DUMP)
+	// Jazz VXL (aka Jaguar, part number 09-00184, Bt484 or Bt485)
+	//ROM_LOAD64_BYTE("jazz_vxl.bin", 0x000000, 0x010000, CRC(8edf1a62) SHA1(7750833eac0708ee79f01f36523554d29a094692) BAD_DUMP)
+	// MIPS G364 (5MHz video clock, part number 09-00176)
+	ROM_LOAD64_BYTE("mips_g364.bin", 0x000000, 0x020000, CRC(be6a726e) SHA1(225c198f6a7f8445dac3de052ecceecbb5be6bc7) BAD_DUMP)
 ROM_END
 
 /*   YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS       INIT         COMPANY  FULLNAME             FLAGS */
-COMP(1992,  mmr4000be, 0,      0,      mmr4000be, 0,     jazz_state, init_common, "MIPS",  "Magnum R4000 (be)", MACHINE_NOT_WORKING)
+COMP(1992,  mmr4000be, 0,      0,      mmr4000be, 0,     jazz_state, init_common, "MIPS",  "Magnum R4000 (be)", MACHINE_NO_SOUND)
 COMP(1992,  mmr4000le, 0,      0,      mmr4000le, 0,     jazz_state, init_common, "MIPS",  "Magnum R4000 (le)", MACHINE_NO_SOUND)

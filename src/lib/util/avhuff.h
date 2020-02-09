@@ -144,7 +144,7 @@ class avhuff_decoder
 {
 public:
 	// construction/destruction
-	avhuff_decoder();
+	avhuff_decoder() = default;
 
 	// configuration
 	void configure(const avhuff_decompress_config &config);
