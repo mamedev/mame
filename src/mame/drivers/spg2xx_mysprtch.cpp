@@ -15,7 +15,10 @@ public:
 	{ }
 
 	void mysprtch(machine_config& config);
+	void mgt20in1(machine_config& config);
+
 	void init_mysprtch();
+	void init_mgt20in1();
 
 protected:
 	virtual void machine_start() override;
@@ -193,6 +196,19 @@ static INPUT_PORTS_START( mysprtch ) // Down + Button 1 and Button 2 for service
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mgt20in1 ) // this seems to expect rotated controls by default (although the bowling expects you to rotate the controller to match mysprtchl)
+	PORT_INCLUDE(mysprtch)
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 RF Key")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 LF Wave")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 LF Key") // doesn't show in test mode but still read at times
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 RF Wave")
+INPUT_PORTS_END
 
 
 WRITE16_MEMBER(spg2xx_game_mysprtch_state::porta_w)
@@ -237,7 +253,7 @@ WRITE16_MEMBER(spg2xx_game_mysprtch_state::porta_w)
 }
 
 
-void spg2xx_game_mysprtch_state::mysprtch(machine_config &config)
+void spg2xx_game_mysprtch_state::mysprtch(machine_config& config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_mysprtch_state::mem_map_mysprtch);
@@ -252,6 +268,13 @@ void spg2xx_game_mysprtch_state::mysprtch(machine_config &config)
 	m_maincpu->porta_out().set(FUNC(spg2xx_game_mysprtch_state::porta_w));
 }
 
+void spg2xx_game_mysprtch_state::mgt20in1(machine_config& config)
+{
+	mysprtch(config);
+
+	m_maincpu->set_pal(true);
+	m_screen->set_refresh_hz(50);
+}
 
 void spg2xx_game_mysprtch_state::init_mysprtch()
 {
@@ -269,10 +292,60 @@ void spg2xx_game_mysprtch_state::init_mysprtch()
 	}
 }
 
+
+
+void spg2xx_game_mysprtch_state::init_mgt20in1()
+{
+	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
+	int size = memregion("maincpu")->bytes();
+
+	for (int i = 0; i < size/2; i++)
+	{
+		ROM[i] = ROM[i] ^ 0x4ec4;
+
+		ROM[i] = ((ROM[i] & 0xff00) >> 8) | ((ROM[i] & 0x00ff) << 8);
+
+		uint16_t res = 0;
+
+		if (ROM[i] & 0x0001) res ^= 0x0044; // 2 bits changed
+		if (ROM[i] & 0x0002) res ^= 0x8000;
+		if (ROM[i] & 0x0004) res ^= 0x0100;
+		if (ROM[i] & 0x0008) res ^= 0x0020;
+
+		if (ROM[i] & 0x0010) res ^= 0x0400;
+		if (ROM[i] & 0x0020) res ^= 0x0a00; // 2 bits changed
+		if (ROM[i] & 0x0040) res ^= 0x0002;
+		if (ROM[i] & 0x0080) res ^= 0x1080; // 2 bits changed
+
+		if (ROM[i] & 0x0100) res ^= 0x4000;
+		if (ROM[i] & 0x0200) res ^= 0x0200;
+		if (ROM[i] & 0x0400) res ^= 0x2000;
+		if (ROM[i] & 0x0800) res ^= 0x0012; // 2 bits changed
+
+		if (ROM[i] & 0x1000) res ^= 0x0001;
+		if (ROM[i] & 0x2000) res ^= 0x0040;
+		if (ROM[i] & 0x4000) res ^= 0x1000;
+		if (ROM[i] & 0x8000) res ^= 0x0008;
+
+		ROM[i] = res;
+
+		ROM[i] = ((ROM[i] & 0xff00) >> 8) | ((ROM[i] & 0x00ff) << 8);
+	}
+}
+
+
 ROM_START( mysprtch )
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "mysportschallengeplus.bin", 0x0000, 0x2000000, CRC(6911d19c) SHA1(c71bc38595e5505434395b6d59320caabfc7bce3) )
 ROM_END
 
+ROM_START( mgt20in1 )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "m29gl128.u2", 0x000000, 0x1000000, CRC(41d594e3) SHA1(351890455bed28bcaf173d8fd9a4cc997c404d94) )
+ROM_END
+
 // Unit with Blue surround to power button. Box shows 'Wireless Sports Plus' but title screen shots "My Sports Challenge Plus"  Appears to be V-Tac developed as it has the common V-Tac test mode.
-CONS( 200?, mysprtch,  0, 0, mysprtch, mysprtch, spg2xx_game_mysprtch_state,  init_mysprtch,    "Senario / V-Tac Technology Co Ltd.",  "My Sports Challenge Plus / Wireless Sports Plus",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mysprtch,  0, 0, mysprtch, mysprtch, spg2xx_game_mysprtch_state,  init_mysprtch, "Senario / V-Tac Technology Co Ltd.",  "My Sports Challenge Plus / Wireless Sports Plus",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// 2009 date on PCB, not actually in German, so maybe sold under different brands?
+CONS( 2009, mgt20in1,  0, 0, mgt20in1, mgt20in1, spg2xx_game_mysprtch_state,  init_mgt20in1, "MGT",                                 "MGT 20-in-1 TV-Spielekonsole (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
