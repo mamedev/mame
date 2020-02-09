@@ -2316,6 +2316,12 @@ ROM_START( lxcmcyfz )
 	ROM_LOAD( "jl2365_frozen.u1", 0x00000, 0x4000000, CRC(64d4c708) SHA1(1bc2d161326ce3039ab9ba46ad62695060cfb2e1) )
 ROM_END
 
+ROM_START( lxcmcydp )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	// sub-board was marked for 2GB capacity (A0-A26 address lines), but only address lines A0-A24 are connected to the chip
+	ROM_LOAD( "cyberarcade-disneyprincess.bin", 0x00000, 0x4000000, CRC(05946f81) SHA1(33eea2b70f5427e7613c836b8a08148731fac231) )
+ROM_END
+
 ROM_START( lxcmc250 )
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	// sub-board was marked for 2GB capacity (A0-A26 address lines), but only address lines A0-A24 are connected to the chip
@@ -2679,6 +2685,8 @@ CONS( 200?, lxcmcy,    0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empt
 CONS( 200?, lxcmc250,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
 CONS( 200?, lxcmcysw,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING )
 CONS( 200?, lxcmcyfz,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcydp,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING )
+
 // Also Lexibook Compact Cyber Arcade - Disney Princesses
 //      Lexibook Compact Cyber Arcade - Cars
 //      Lexibook Compact Cyber Arcade - Paw Patrol

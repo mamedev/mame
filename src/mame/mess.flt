@@ -584,7 +584,7 @@ ncdppc.cpp
 nds.cpp
 neogeocd.cpp
 nes.cpp
-nes_boot.cpp
+nes_clone.cpp
 nes_sh6578.cpp
 nes_vt.cpp
 newbrain.cpp
