@@ -1407,6 +1407,24 @@
 		</part>
 	</software>
 
+	<software name="cfpp6">
+		<description>The CF Power Pack Tape 6</description>
+		<year>1991</year>
+		<publisher>Future Publishing</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1: Tenth Frame / Shadow Dancer (Demo)"/>
+			<dataarea name="cass" size="1123890">
+				<rom name="the cf powerpack 6 side 1.tap" size="1123890" crc="c62a1e61" sha1="fd1fafe06b769ae4b0c355d409a58ed3c67ef0d0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2: Chameleon / Star Control (Demo) / Chip's Challenge (Demo)"/>
+			<dataarea name="cass" size="1030538">
+				<rom name="the cf powerpack 6 side 2.tap" size="1030538" crc="66447d62" sha1="97a7b2ac1a9e9c3c88aa54b5010908631db4b605"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cfpp9">
 		<description>The CF Power Pack Tape 9</description>
 		<year>1991</year>
@@ -2131,6 +2149,22 @@
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="394781">
 				<rom name="European_5-a-Side.tap" size="394781" crc="64612755" sha1="09b6c648a7119075391f94b8ab5dc82242e5523d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="excaliba">
+		<description>Excaliba</description>
+		<year>1985</year>
+		<publisher>Mastertronic</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="505933">
+				<rom name="excaliba side a.tap" size="505933" crc="9d0738d4" sha1="e78da21e508e6ab8933b45989d77c79fcc3aa90d"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="501963">
+				<rom name="excaliba side b.tap" size="501963" crc="ea2769b1" sha1="34ad13cbea6c8fb1bd80854080a606040f4f2395"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5723,6 +5757,17 @@
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="1390242">
 				<rom name="Salamander.tap" size="1390242" crc="90178ef2" sha1="f5a7a57e4d3639317f12de2c68aa8a05122224a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="saracen">
+		<description>Saracen</description>
+		<year>1988</year>
+		<publisher>Americana</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="976175">
+				<rom name="saracen.tap" size="976175" crc="505c4431" sha1="9ff75ca511b8aa0a8f53ed7f551c815391fabb10"/>
 			</dataarea>
 		</part>
 	</software>
