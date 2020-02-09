@@ -2328,7 +2328,10 @@ ROM_START( lxcmc250 )
 	ROM_LOAD( "cca250in1.u1", 0x00000, 0x4000000, CRC(6ccd6ad6) SHA1(fafed339097c3d1538faa306021a8373c1b799b3) )
 ROM_END
 
-
+ROM_START( red5mam )
+	ROM_REGION( 0x8000000, "mainrom", 0 )
+	ROM_LOAD( "mam.u3", 0x00000, 0x8000000, CRC(05946f81) SHA1(33eea2b70f5427e7613c836b8a08148731fac231) )
+ROM_END
 
 ROM_START( cybar120 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
@@ -2687,8 +2690,7 @@ CONS( 200?, lxcmcysw,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empt
 CONS( 200?, lxcmcyfz,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING )
 CONS( 200?, lxcmcydp,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING )
 
-// Also Lexibook Compact Cyber Arcade - Disney Princesses
-//      Lexibook Compact Cyber Arcade - Cars
+// Also Lexibook Compact Cyber Arcade - Cars
 //      Lexibook Compact Cyber Arcade - Paw Patrol
 //      Lexibook Compact Cyber Arcade - Barbie
 //      Lexibook Compact Cyber Arcade - Finding Dory
@@ -2696,6 +2698,8 @@ CONS( 200?, lxcmcydp,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empt
 //      Lexibook Compact Cyber Arcade - PJ Masks
 // more?
 
+// intial code isn't valid? scrambled?
+CONS( 201?, red5mam,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Red5", "Mini Arcade Machine (Red5)", MACHINE_NOT_WORKING )
 
 
 // boots, same platform with scrambled opcodes as FC pocket
