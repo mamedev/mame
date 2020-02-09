@@ -2,6 +2,8 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="casio_rompack" description="Casio ROM Packs">
 
+	<!-- these are OKI M5268 ROMs -->
+
 	<software name="ro551" supported="no">
 		<description>Casio ROM Pack RO-551</description>
 		<year>199?</year>
@@ -12,5 +14,16 @@
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="ro251" supported="no">
+		<description>Casio ROM Pack RO-251</description>
+		<year>199?</year>
+		<publisher>Casio</publisher>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="0x1800">
+				<rom name="ro251.bin" size="0x1800" crc="6bfd4921" sha1="6b57f18f2f170c01dc929f60b55a0535e041a09d"/>
+			</dataarea>
+		</part>
+	</software>	
 
 </softwarelist>
