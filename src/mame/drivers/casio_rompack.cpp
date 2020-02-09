@@ -58,4 +58,4 @@ ROM_START( casiorom )
 ROM_END
 
 
-CONS( 199?, casiorom, 0, 0, casiorom,  casiorom, casiorom_state, empty_init, "Casio", "Casio ROM Pack Software List holder", MACHINE_IS_SKELETON )
+CONS( 198?, casiorom, 0, 0, casiorom,  casiorom, casiorom_state, empty_init, "Casio", "Casio ROM Pack Software List holder", MACHINE_IS_SKELETON )
