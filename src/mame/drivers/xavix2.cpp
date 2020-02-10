@@ -45,7 +45,11 @@ private:
 
 void xavix2_state::mem(address_map &map)
 {
-	map(0x00000000, 0x00ffffff).rom();
+	map(0x00000000, 0x000003ff).ram();
+
+	map(0x00200000, 0x00ffffff).rom().region("maincpu", 0x200000);
+
+	map(0x01000000, 0x01ffffff).rom().region("maincpu", 0);
 }
 
 uint32_t xavix2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
