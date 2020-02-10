@@ -66,7 +66,7 @@ Secret menu hack [totmejan only] (I couldn't find official way to enter, so it's
     Keys: Z
 
     PC=ECC72; 'HMODE' screen
-
+	TODO: find an actual way to access above, at worst find a suitable entry point -AS;
 
 *******************************************************************************************/
 
@@ -573,18 +573,18 @@ static INPUT_PORTS_START( goodejan )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "DSWA:8" )
 
-		PORT_DIPNAME( 0x0300, 0x0100, "Starting Points" )             PORT_DIPLOCATION("DSWB:1,2")
+	PORT_DIPNAME( 0x0300, 0x0300, "Starting Points" )             PORT_DIPLOCATION("DSWB:1,2")
 	PORT_DIPSETTING(      0x0300, "1500" )
 	PORT_DIPSETTING(      0x0200, "2000" )
 	PORT_DIPSETTING(      0x0100, "1000" )
 	PORT_DIPSETTING(      0x0000, "3000" )
 
-	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "DSWB:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "DSWB:4" )
 /*  [totmejan] Game definitely uses these, reads these 2 bits and stores at address 01A28h as 0-1st bit;
     Sub-routine at E7C19h does some arithmetic operations depending on these.
     I cound't understand whats going on. Call performs just before dealing tiles. */
-
+	// TODO: difficulty dips ofc
+	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "DSWB:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "DSWB:4" )
 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Demo_Sounds ) )        PORT_DIPLOCATION("DSWB:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( On ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
@@ -595,8 +595,8 @@ static INPUT_PORTS_START( goodejan )
 	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "DSWB:8" )
 
 	PORT_START("DSW2")
-		PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
-		PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNKNOWN ) // 0x0002 must be kept low to work as service coin
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNKNOWN ) // 0x0002 must be kept low to work as service coin
 INPUT_PORTS_END
 
 
@@ -690,7 +690,7 @@ void goodejan_state::goodejan(machine_config &config)
 	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	okim6295_device &oki(OKIM6295(config, "oki", GOODEJAN_MHZ2/16, okim6295_device::PIN7_LOW));
+	okim6295_device &oki(OKIM6295(config, "oki", GOODEJAN_MHZ2/16, okim6295_device::PIN7_HIGH));
 	oki.add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
