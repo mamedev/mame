@@ -12,7 +12,7 @@ const u8 xavix2_device::bpo[8] = { 4, 3, 3, 2, 2, 2, 2, 1 };
 
 xavix2_device::xavix2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, XAVIX2, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 32, 30)
+	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32)
 {
 }
 
@@ -49,7 +49,7 @@ void xavix2_device::device_start()
 
 void xavix2_device::device_reset()
 {
-	m_pc = 1 << 24;
+	m_pc = 0x40000000;
 }
 
 uint32_t xavix2_device::execute_min_cycles() const noexcept
@@ -114,7 +114,14 @@ void xavix2_device::execute_run()
 		case 0x0c: case 0x0d: m_r[r1(opcode)] = do_or (m_r[r2(opcode)], val19u(opcode)); break;
 		case 0x0e: case 0x0f: m_r[r1(opcode)] = do_xor(m_r[r2(opcode)], val19u(opcode)); break;
 
-			// 10-1f
+		case 0x10: case 0x11: m_r[r1(opcode)] = (s8)m_program->read_byte(m_r[r2(opcode)] + val19s(opcode)); break;
+		case 0x12: case 0x13: m_r[r1(opcode)] = m_program->read_byte(m_r[r2(opcode)] + val19s(opcode)); break;
+		case 0x14: case 0x15: m_r[r1(opcode)] = (s16)m_program->read_word(m_r[r2(opcode)] + val19s(opcode)); break;
+		case 0x16: case 0x17: m_r[r1(opcode)] = m_program->read_word(m_r[r2(opcode)] + val19s(opcode)); break;
+		case 0x18: case 0x19: m_r[r1(opcode)] = m_program->read_dword(m_r[r2(opcode)] + val19s(opcode)); break;
+		case 0x1a: case 0x1b: m_program->write_byte(m_r[r2(opcode)] + val19s(opcode), m_r[r1(opcode)]); break;
+		case 0x1c: case 0x1d: m_program->write_byte(m_r[r2(opcode)] + val19s(opcode), m_r[r1(opcode)]); break;
+		case 0x1e: case 0x1f: m_program->write_byte(m_r[r2(opcode)] + val19s(opcode), m_r[r1(opcode)]); break;
 
 		case 0x20: case 0x21: m_r[r1(opcode)] = do_sub(m_r[r1(opcode)], val14s(opcode)); break;
 		case 0x22: case 0x23: m_r[r1(opcode)] = val14h(opcode); break;

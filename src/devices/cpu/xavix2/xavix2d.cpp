@@ -91,6 +91,17 @@ std::string xavix2_disassembler::val3u()
 	return util::string_format("%x", (m_opcode >> 16) & 0x7);
 }
 
+std::string xavix2_disassembler::off19s()
+{
+	u16 r = m_opcode & 0x7ffff;
+	if(r & 0x40000)
+		return util::string_format(" - %05x", 0x80000 - r);
+	else if(r)
+		return util::string_format(" + %05x", r);
+	else
+		return "";
+}
+
 std::string xavix2_disassembler::off11s()
 {
 	u16 r = (m_opcode >> 8) & 0x7ff;
@@ -164,10 +175,15 @@ offs_t xavix2_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	case 0x0c: case 0x0d: util::stream_format(stream, "%s = %s | %s", r1(), r2(), val19u()); break;
 	case 0x0e: case 0x0f: util::stream_format(stream, "%s = %s ^ %s", r1(), r2(), val19u()); break;
 
-		// 10-1f
+	case 0x10: case 0x11: util::stream_format(stream, "%s = (%s%s).bs", r1(), r2(), off19s()); break;
+	case 0x12: case 0x13: util::stream_format(stream, "%s = (%s%s).bu", r1(), r2(), off19s()); break;
+	case 0x14: case 0x15: util::stream_format(stream, "%s = (%s%s).ws", r1(), r2(), off19s()); break;
+	case 0x16: case 0x17: util::stream_format(stream, "%s = (%s%s).wu", r1(), r2(), off19s()); break;
+	case 0x18: case 0x19: util::stream_format(stream, "%s = (%s%s).l", r1(), r2(), off19s()); break;
+	case 0x1a: case 0x1b: util::stream_format(stream, "(%s%s).b = %s", r2(), off19s(), r1()); break;
+	case 0x1c: case 0x1d: util::stream_format(stream, "(%s%s).w = %s", r2(), off19s(), r1()); break;
+	case 0x1e: case 0x1f: util::stream_format(stream, "(%s%s).l = %s", r2(), off19s(), r1()); break;
 
-		//	case 0x20:            util::stream_format(stream, "jmp %s", adr16()); break;
-		//	case 0x21:            util::stream_format(stream, "jsr %s", adr16()); flags = STEP_OVER; break;
 	case 0x20: case 0x21: util::stream_format(stream, "%s += %s", r1(), val14s()); break;
 	case 0x22: case 0x23: util::stream_format(stream, "%s = %s", r1(), val14h()); break;
 	case 0x24: case 0x25: util::stream_format(stream, "%s -= %s", r1(), val14s()); break;
@@ -265,8 +281,8 @@ offs_t xavix2_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 
 	case 0xe0:            util::stream_format(stream, "jmp lr"); flags = STEP_OUT; break;
 	case 0xe1:            util::stream_format(stream, "rti1"); flags = STEP_OUT; break;
-		// e2
-	case 0xe3:            util::stream_format(stream, "rti2"); flags = STEP_OUT; break;
+	case 0xe2:            util::stream_format(stream, "rti2"); flags = STEP_OUT; break;
+	case 0xe3:            util::stream_format(stream, "rti3"); flags = STEP_OUT; break;
 		// e4-fb
 	case 0xf8:            util::stream_format(stream, "di"); break;
 	case 0xf9:            util::stream_format(stream, "ei"); break;
