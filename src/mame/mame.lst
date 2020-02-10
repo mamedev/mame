@@ -2485,6 +2485,7 @@ pcd4x                           // Siemens-Nixdorf PCD-4H and other 486 desktops
 pcd4nl                          // 1995 Siemens-Nixdorf PCD-4NL 486 subnotebook
 pcd4nd                          // 1993 Siemens-Nixdorf 486 notebook
 ct386sx                         //
+v286c                           // Victor V286c
 wy220001                        // WYSEpc 286
 cxsxd                           //
 ec1842                          //
