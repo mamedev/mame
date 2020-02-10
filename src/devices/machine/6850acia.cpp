@@ -16,9 +16,14 @@
     MACROS
 ***************************************************************************/
 
-//#define VERBOSE 1
+#define LOG_SETUP    (1U << 1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_SETUP)
 //#define LOG_OUTPUT_STREAM std::cout
+
 #include "logmacro.h"
+
+#define LOGSETUP(...)    LOGMASKED(LOG_SETUP,    __VA_ARGS__)
 
 /***************************************************************************
     LOCAL VARIABLES
@@ -177,12 +182,14 @@ void acia6850_device::control_w(uint8_t data)
 	// CR0 & CR1
 	int counter_divide_select_bits = (data >> 0) & 3;
 	m_divide = counter_divide_select[counter_divide_select_bits];
+	LOGSETUP(" - Divide: x%d\n", counter_divide_select[counter_divide_select_bits]);
 
 	// CR2, CR3 & CR4
 	int word_select_bits = (data >> 2) & 7;
 	m_bits = word_select[word_select_bits][0];
 	m_parity = word_select[word_select_bits][1];
 	m_stopbits = word_select[word_select_bits][2];
+	LOGSETUP(" - %d%c%d\n", m_bits, m_parity == PARITY_NONE ? 'N' : (m_parity == PARITY_ODD ? 'O' : 'E'), m_stopbits);
 
 	// CR5 & CR6
 	int transmitter_control_bits = (data >> 5) & 3;
@@ -192,6 +199,7 @@ void acia6850_device::control_w(uint8_t data)
 
 	// CR7
 	m_rx_irq_enable = (data >> 7) & 1;
+	LOGSETUP(" - RTS:%d BRK:%d TxIE:%d RxIE:%d\n", rts, m_brk, m_tx_irq_enable, m_rx_irq_enable);
 
 	if (m_divide == 0)
 	{
