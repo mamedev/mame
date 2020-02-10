@@ -20,7 +20,7 @@
 #define UNIFLEX_DMAF2 2
 #define UNIFLEX_DMAF3 3
 #define FLEX_DC5_PIAIDE 4
-#define OS9_DC5 4
+#define OS9_DC5 5
 
 
 READ8_MEMBER(swtpc09_state::unmapped_r)
