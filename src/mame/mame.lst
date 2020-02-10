@@ -40258,6 +40258,9 @@ laser700                        // 1984? Laser 700
 @source:vtech_eu3a12.cpp
 vreadere
 
+@source:vtech_mobigo.cpp
+mobigo2
+
 @source:vulgus.cpp
 mach9                           // bootleg (ITISA)
 vulgus                          // 5/1984 (c) 1984

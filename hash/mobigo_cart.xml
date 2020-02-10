@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="mobigo_cart" description="VTech Mobigo Cartridges">
+	
+	<!-- 52-250704 - Mobigo 2 Game Cartridge (Internal Game) (GER) is a dummy cartridge to enable the game in the BIOS -->
+
+	<software name="kfpand2" supported="no">
+		<description>Kung Fu Panda 2 (Germany) (80-252004)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-252004 - kung fu panda 2 (ger).bin" size="0x1000000" crc="88b0b148" sha1="a2ce8915c8acf3a9c7741cae7fcc51aa59895de9"/>
+			</dataarea>
+		</part>
+	</software>
+		
+	<!-- this is from a special large scale Kiosk unit, which should also have a unique BIOS.  Maybe move into driver as a hardcodd cart once BIOS is dumped rather than having it here? -->
+	<software name="kiosk" supported="no">
+		<description>Mobigo Kiosk (Germany)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x2000000">
+				<rom name="mobigo kiosk cartridge (ger).bin" size="0x2000000" crc="8026b80d" sha1="ded9e5dcf89f30b6011e826da466f7cd6bbd5a2d"/>
+			</dataarea>
+		</part>
+	</software>				
+		
+</softwarelist>

@@ -137,6 +137,7 @@ camplynx.cpp
 candela.cpp
 canon_s80.cpp
 cardinal.cpp
+casio_rompack.cpp
 casloopy.cpp
 cat.cpp
 cbm2.cpp
@@ -991,6 +992,7 @@ vta2000.cpp
 vtech1.cpp
 vtech2.cpp
 vtech_eu3a12.cpp
+vtech_mobigo.cpp
 wangpc.cpp
 wicat.cpp
 wrinkles.cpp
