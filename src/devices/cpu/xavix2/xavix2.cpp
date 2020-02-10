@@ -193,14 +193,17 @@ void xavix2_device::execute_run()
 			// d0-d1
 		case 0xd2:            if(m_f & F_Z) npc = m_pc + val8s(opcode); break;
 		case 0xd3:            if((m_f & F_Z) || ((m_f & F_N) && !(m_f & F_V)) || ((m_f & F_V) && !(m_f & F_N))) npc = m_pc + val8s(opcode); break;
-			// d4
+		case 0xd4:            if(m_f & F_N) npc = m_pc + val8s(opcode); break;
 		case 0xd5:            npc = m_pc + val8s(opcode); break;
-			// d6
-		case 0xd7:            if((m_f & F_Z) || (m_f & F_N)) npc = m_pc + val8s(opcode); break;
+		case 0xd6:            if(m_f & F_C) npc = m_pc + val8s(opcode); break;
+		case 0xd7:            if((m_f & F_Z) || (m_f & F_C)) npc = m_pc + val8s(opcode); break;
 			// d8-d9
 		case 0xda:            if(!(m_f & F_Z)) npc = m_pc + val8s(opcode); break;
 		case 0xdb:            if((!(m_f & F_Z) && (m_f & F_N) && (m_f & F_V)) || (!(m_f & F_Z) && !(m_f & F_V) && !(m_f & F_N))) npc = m_pc + val8s(opcode); break;
-			// dc-df
+		case 0xdc:            if(!(m_f & F_N)) npc = m_pc + val8s(opcode); break;
+			// dd
+		case 0xde:            if(!(m_f & F_C)) npc = m_pc + val8s(opcode); break;
+		case 0xdf:            if(!(m_f & F_Z) && !(m_f & F_C)) npc = m_pc + val8s(opcode); break;
 
 		case 0xe0:            npc = m_r[7]; break;
 		case 0xe1:            /* rti1 */ break;

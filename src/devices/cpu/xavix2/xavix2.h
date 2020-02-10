@@ -53,8 +53,7 @@ protected:
 	static inline u32 val22s(u32 opcode) { return opcode & 0x200000 ? opcode | 0xffc00000 : opcode & 0x3fffff; }
 	static inline u32 val19s(u32 opcode) { return opcode & 0x40000 ? opcode | 0xfff80000 : opcode & 0x7ffff; }
 	static inline u32 val19u(u32 opcode) { return opcode & 0x0007ffff; }
-	static inline u32 val16u(u32 opcode) { return static_cast<u16>(opcode); }
-	static inline u32 val16s(u32 opcode) { return static_cast<s16>(opcode); }
+	static inline u32 val16s(u32 opcode) { return static_cast<s16>(opcode >> 8); }
 	static inline u32 val14h(u32 opcode) { return (opcode << 10) & 0xfffc0000; }
 	static inline u32 val14u(u32 opcode) { return (opcode >>  8) & 0x00003fff; }
 	static inline u32 val14s(u32 opcode) { return opcode & 0x200000 ? (opcode >> 8) | 0xffffc000 : (opcode >> 8) & 0x3fff; }

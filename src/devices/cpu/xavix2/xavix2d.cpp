@@ -250,27 +250,31 @@ offs_t xavix2_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	case 0xd1:            util::stream_format(stream, "b?1 %s", rel8()); break;
 	case 0xd2:            util::stream_format(stream, "beq %s", rel8()); break;
 	case 0xd3:            util::stream_format(stream, "bles %s", rel8()); break;
-	case 0xd4:            util::stream_format(stream, "b?4 %s", rel8()); break;
-	case 0xd5:            util::stream_format(stream, "bra  %s", rel8()); break;
-	case 0xd6:            util::stream_format(stream, "b?6 %s", rel8()); break;
+	case 0xd4:            util::stream_format(stream, "bmi %s", rel8()); break;
+	case 0xd5:            util::stream_format(stream, "bra %s", rel8()); break;
+	case 0xd6:            util::stream_format(stream, "bltu %s", rel8()); break;
 	case 0xd7:            util::stream_format(stream, "bleu %s", rel8()); break;
 	case 0xd8:            util::stream_format(stream, "b?8 %s", rel8()); break;
 	case 0xd9:            util::stream_format(stream, "b?9 %s", rel8()); break;
-	case 0xda:            util::stream_format(stream, "bne  %s", rel8()); break;
+	case 0xda:            util::stream_format(stream, "bne %s", rel8()); break;
 	case 0xdb:            util::stream_format(stream, "bgts %s", rel8()); break;
-	case 0xdc:            util::stream_format(stream, "b?c %s", rel8()); break;
+	case 0xdc:            util::stream_format(stream, "bpl %s", rel8()); break;
 	case 0xdd:            util::stream_format(stream, "b?d %s", rel8()); break;
-	case 0xde:            util::stream_format(stream, "b?e %s", rel8()); break;
-	case 0xdf:            util::stream_format(stream, "b?f %s", rel8()); break;
+	case 0xde:            util::stream_format(stream, "bgeu %s", rel8()); break;
+	case 0xdf:            util::stream_format(stream, "bgtu %s", rel8()); break;
 
 	case 0xe0:            util::stream_format(stream, "jmp lr"); flags = STEP_OUT; break;
 	case 0xe1:            util::stream_format(stream, "rti1"); flags = STEP_OUT; break;
 		// e2
 	case 0xe3:            util::stream_format(stream, "rti2"); flags = STEP_OUT; break;
 		// e4-fb
+	case 0xf8:            util::stream_format(stream, "di"); break;
+	case 0xf9:            util::stream_format(stream, "ei"); break;
+		// fa-fb
 	case 0xfc:            util::stream_format(stream, "nop"); break;
-		// fd-ff
-
+		// fd
+	case 0xfe:            util::stream_format(stream, "wait"); break;
+		// ff
 	default:	          util::stream_format(stream, "?%02x", m_opcode >> 24);
 	}
 
