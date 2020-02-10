@@ -37834,8 +37834,9 @@ swtpcm                          // MPA2 MPC Mikbug rom
 @source:swtpc09.cpp
 swtpc09                         // S09, DMF2 Floppy SBUG rom - FLEX
 swtpc09d3                       // S09, DMF3 Floppy UNIBUG U3 rom - UniFLEX U3
-swtpc09i                        // S09, DC4 Floppy + PIA IDE SBUG rom - FLEX
+swtpc09i                        // S09, DC5 Floppy + PIA IDE SBUG rom - FLEX
 swtpc09u                        // S09, DMF2 Floppy UNIBUG rom - UniFLEX
+swtpc09o                        // S09, DC5 Floppy - OS9
 
 @source:swtpc8212.cpp
 swtpc8212                       // Terminal
