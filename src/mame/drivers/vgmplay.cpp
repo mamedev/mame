@@ -3197,8 +3197,8 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_YM3526_1, vgmplay_device::A_YM3526_1 + 1).w(m_ym3526[1], FUNC(ym3526_device::write));
 	map(vgmplay_device::A_Y8950_0, vgmplay_device::A_Y8950_0 + 1).w(m_y8950[0], FUNC(y8950_device::write));
 	map(vgmplay_device::A_Y8950_1, vgmplay_device::A_Y8950_1 + 1).w(m_y8950[1], FUNC(y8950_device::write));
-	map(vgmplay_device::A_YMF262_0, vgmplay_device::A_YMF262_0 + 1).w(m_ymf262[0], FUNC(ymf262_device::write));
-	map(vgmplay_device::A_YMF262_1, vgmplay_device::A_YMF262_1 + 1).w(m_ymf262[1], FUNC(ymf262_device::write));
+	map(vgmplay_device::A_YMF262_0, vgmplay_device::A_YMF262_0 + 3).w(m_ymf262[0], FUNC(ymf262_device::write));
+	map(vgmplay_device::A_YMF262_1, vgmplay_device::A_YMF262_1 + 3).w(m_ymf262[1], FUNC(ymf262_device::write));
 	map(vgmplay_device::A_YMF278B_0, vgmplay_device::A_YMF278B_0 + 0xf).w(m_ymf278b[0], FUNC(ymf278b_device::write));
 	map(vgmplay_device::A_YMF278B_1, vgmplay_device::A_YMF278B_1 + 0xf).w(m_ymf278b[1], FUNC(ymf278b_device::write));
 	map(vgmplay_device::A_YMF271_0, vgmplay_device::A_YMF271_0 + 0xf).w(m_ymf271[0], FUNC(ymf271_device::write));
@@ -3592,25 +3592,21 @@ void vgmplay_state::vgmplay(machine_config &config)
 	// TODO: prevent error.log spew
 	YMF278B(config, m_ymf278b[0], 0);
 	m_ymf278b[0]->set_addrmap(0, &vgmplay_state::ymf278b_map<0>);
-	m_ymf278b[0]->add_route(0, "lspeaker", 0.25);
-	m_ymf278b[0]->add_route(1, "rspeaker", 0.25);
-	m_ymf278b[0]->add_route(2, "lspeaker", 0.25);
-	m_ymf278b[0]->add_route(3, "rspeaker", 0.25);
+	m_ymf278b[0]->add_route(0, "lspeaker", 1.00);
+	m_ymf278b[0]->add_route(1, "rspeaker", 1.00);
+	m_ymf278b[0]->add_route(2, "lspeaker", 1.00);
+	m_ymf278b[0]->add_route(3, "rspeaker", 1.00);
 	m_ymf278b[0]->add_route(4, "lspeaker", 1.00);
 	m_ymf278b[0]->add_route(5, "rspeaker", 1.00);
-	m_ymf278b[0]->add_route(6, "lspeaker", 1.00);
-	m_ymf278b[0]->add_route(7, "rspeaker", 1.00);
 
 	YMF278B(config, m_ymf278b[1], 0);
 	m_ymf278b[1]->set_addrmap(0, &vgmplay_state::ymf278b_map<1>);
-	m_ymf278b[1]->add_route(0, "lspeaker", 0.25);
-	m_ymf278b[1]->add_route(1, "rspeaker", 0.25);
-	m_ymf278b[1]->add_route(2, "lspeaker", 0.25);
-	m_ymf278b[1]->add_route(3, "rspeaker", 0.25);
+	m_ymf278b[1]->add_route(0, "lspeaker", 1.00);
+	m_ymf278b[1]->add_route(1, "rspeaker", 1.00);
+	m_ymf278b[1]->add_route(2, "lspeaker", 1.00);
+	m_ymf278b[1]->add_route(3, "rspeaker", 1.00);
 	m_ymf278b[1]->add_route(4, "lspeaker", 1.00);
 	m_ymf278b[1]->add_route(5, "rspeaker", 1.00);
-	m_ymf278b[1]->add_route(6, "lspeaker", 1.00);
-	m_ymf278b[1]->add_route(7, "rspeaker", 1.00);
 
 	YMF271(config, m_ymf271[0], 0);
 	m_ymf271[0]->set_addrmap(0, &vgmplay_state::ymf271_map<0>);

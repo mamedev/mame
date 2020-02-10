@@ -738,10 +738,10 @@ void deadang_state::init_ghunter()
 }
 
 /* Game Drivers */
-GAME( 1987, popnrun,  0,       popnrun, deadang, popnrun_state, init_popnrun, ROT0, "Seibu Kaihatsu / Yukai Tsukai",         "Pop'n Run - The Videogame (set 1)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, popnruna, popnrun, popnrun, deadang, popnrun_state, init_popnrun, ROT0, "Seibu Kaihatsu / Yukai Tsukai",         "Pop'n Run - The Videogame (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, popnrun,  0,       popnrun, deadang, popnrun_state, init_popnrun, ROT0, "Seibu Kaihatsu / Yukai Tsukai",           "Pop'n Run - The Videogame (set 1)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, popnruna, popnrun, popnrun, deadang, popnrun_state, init_popnrun, ROT0, "Seibu Kaihatsu / Yukai Tsukai",           "Pop'n Run - The Videogame (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, deadang,  0,       deadang, deadang, deadang_state, init_deadang, ROT0, "Seibu Kaihatsu",                        "Dead Angle",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, leadang,  deadang, deadang, deadang, deadang_state, init_deadang, ROT0, "Seibu Kaihatsu",                        "Lead Angle (Japan)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ghunter,  deadang, deadang, ghunter, deadang_state, init_ghunter, ROT0, "Seibu Kaihatsu",                        "Gang Hunter / Dead Angle",          MACHINE_SUPPORTS_SAVE ) // Title is 'Gang Hunter' or 'Dead Angle' depending on control method dipswitch
-GAME( 1988, ghunters, deadang, deadang, ghunter, deadang_state, init_ghunter, ROT0, "Seibu Kaihatsu (Segasa/Sonic license)", "Gang Hunter / Dead Angle (Spain)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, deadang,  0,       deadang, deadang, deadang_state, init_deadang, ROT0, "Seibu Kaihatsu",                          "Dead Angle",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, leadang,  deadang, deadang, deadang, deadang_state, init_deadang, ROT0, "Seibu Kaihatsu",                          "Lead Angle (Japan)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ghunter,  deadang, deadang, ghunter, deadang_state, init_ghunter, ROT0, "Seibu Kaihatsu",                          "Gang Hunter / Dead Angle",          MACHINE_SUPPORTS_SAVE ) // Title is 'Gang Hunter' or 'Dead Angle' depending on control method dipswitch
+GAME( 1988, ghunters, deadang, deadang, ghunter, deadang_state, init_ghunter, ROT0, "Seibu Kaihatsu (SegaSA / Sonic license)", "Gang Hunter / Dead Angle (Spain)",  MACHINE_SUPPORTS_SAVE )

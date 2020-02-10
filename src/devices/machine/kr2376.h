@@ -88,7 +88,7 @@ private:
 
 	/* timers */
 	emu_timer *m_scan_timer;          /* keyboard scan timer */
-	devcb_read16 m_read_x[8];
+	devcb_read16::array<8> m_read_x;
 	devcb_read_line m_read_shift, m_read_control;
 	devcb_write_line m_write_strobe;
 

@@ -2,36 +2,36 @@
 // copyright-holders:MetalliC
 /*************************************************************************
 
-	Konami GSAN1 hardware
-	(c) 2000
+    Konami GSAN1 hardware
+    (c) 2000
 
-	CPU: Hitachi HD6417709 SH-3
-	GPU: Hitachi HD64413AF 'Q2SD' Quick 2D Graphics Renderer with Synchronous DRAM Interface
-	SPU: Yamaha YMZ280B-F
-	Misc:
-		 Altera Max EPM3256ATC144-10
-		 Altera Max EPM3064ATC100-10
-		 Epson RTC-4553
+    CPU: Hitachi HD6417709 SH-3
+    GPU: Hitachi HD64413AF 'Q2SD' Quick 2D Graphics Renderer with Synchronous DRAM Interface
+    SPU: Yamaha YMZ280B-F
+    Misc:
+         Altera Max EPM3256ATC144-10
+         Altera Max EPM3064ATC100-10
+         Epson RTC-4553
 
-	Known games (preliminary, some of listed below might not belong to this hardware):
-	*Dance Dance Revolution Kids
-	 Muscle Ranking Football Masters
-	 Muscle Ranking Kick Target
-	*Muscle Ranking Spray Hitter
-	 Muscle Ranking Struck Out
-	 Neratte Don Don
-	 Pikkari Chance
-	 Run Run Puppy
-	 Soreike! Hanapuu
+    Known games (preliminary, some of listed below might not belong to this hardware):
+    *Dance Dance Revolution Kids
+     Muscle Ranking Football Masters
+     Muscle Ranking Kick Target
+    *Muscle Ranking Spray Hitter
+     Muscle Ranking Struck Out
+     Neratte Don Don
+     Pikkari Chance
+     Run Run Puppy
+     Soreike! Hanapuu
 
-	* denotes these games are archived
+    * denotes these games are archived
 
-	TODO:
-	 - currently implemented very basic set of Q2SD GPU features, required/used by dumped games, should be improved if more games will be found.
-	 - hook IRQs from GPU and SPU (not used by dumped games)
+    TODO:
+     - currently implemented very basic set of Q2SD GPU features, required/used by dumped games, should be improved if more games will be found.
+     - hook IRQs from GPU and SPU (not used by dumped games), possible controlled by one write registers in 140010xx area.
 
-	Notes:
-	 - hold Test + Service while booting to initialise RTC NVRAM
+    Notes:
+     - hold Test + Service while booting to initialise RTC NVRAM
 
 **************************************************************************/
 
@@ -105,6 +105,7 @@ protected:
 	DECLARE_WRITE64_MEMBER(portc_medal_w);
 	DECLARE_READ64_MEMBER(porte_r);
 	DECLARE_WRITE64_MEMBER(porte_w);
+	DECLARE_WRITE64_MEMBER(porte_medal_w);
 	DECLARE_READ16_MEMBER(dipsw_r);
 	u8 m_portc_data = 0xff;
 	u8 m_porte_data = 0xff;
@@ -256,16 +257,30 @@ READ64_MEMBER(gsan_state::portc_r)
 }
 WRITE64_MEMBER(gsan_state::portc_w)
 {
+/* DDR
+	---- x--- /Coin counter
+	--x- ---- Start button lamp
+	-x-- ---- Right button lamp 
+	x--- ---- Left button lamp 
+*/
 	m_portc_data = data;
-	// TODO
+
+	machine().bookkeeping().coin_counter_w(0, ~data & 8);
 }
 WRITE64_MEMBER(gsan_state::portc_medal_w)
 {
+/* Medal
+	---- ---x Medal in counter
+	---- --x- 100Y in counter
+	---- -x-- 10Y in counter
+	x--- ---- Hopper
+*/
 	m_portc_data = data;
 
 	m_hopper->motor_w(data & 0x80);
 	machine().bookkeeping().coin_counter_w(0, data & 4);
-	machine().bookkeeping().coin_counter_w(1, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
+	machine().bookkeeping().coin_counter_w(2, data & 1);
 }
 READ64_MEMBER(gsan_state::porte_r)
 {
@@ -273,13 +288,29 @@ READ64_MEMBER(gsan_state::porte_r)
 }
 WRITE64_MEMBER(gsan_state::porte_w)
 {
-	// lamps
-#if 0
-	u8 mask = m_porte_data ^ data;
-	if (mask)
-		logerror("PORT_E mask %02X val %02X\n", mask, data & mask);
-#endif
+/* DDR
+	---- -x-- Lamp R3
+	---- x--- Lamp R2
+	---x ---- Lamp R1
+	--x- ---- Lamp L3
+	-x-- ---- Lamp L2
+	x--- ---- Lamp L1
+*/
 	m_porte_data = data;
+}
+WRITE64_MEMBER(gsan_state::porte_medal_w)
+{
+/* Medal
+	---- ---x Medal in lock
+	---- --x- 100Y in lock
+	---- -x-- 10Y in lock
+	-x-- ---- Button lamp
+*/
+	m_porte_data = data;
+
+	machine().bookkeeping().coin_lockout_w(0, data & 4);
+	machine().bookkeeping().coin_lockout_w(1, data & 2);
+	machine().bookkeeping().coin_lockout_w(2, data & 1);
 }
 
 
@@ -352,10 +383,10 @@ WRITE16_MEMBER(gsan_state::gpu_w)
 		break;
 	// R/O registers
 	case 0x002 / 2: // Status
-	case 0x03e / 2:	case 0x040 / 2:
-	case 0x080 / 2:	case 0x082 / 2:
-	case 0x084 / 2:	case 0x086 / 2:
-	case 0x088 / 2:	case 0x08a / 2:	case 0x08c / 2:	case 0x08e / 2:
+	case 0x03e / 2: case 0x040 / 2:
+	case 0x080 / 2: case 0x082 / 2:
+	case 0x084 / 2: case 0x086 / 2:
+	case 0x088 / 2: case 0x08a / 2: case 0x08c / 2: case 0x08e / 2:
 	case 0x090 / 2: case 0x092 / 2:
 		m_gpuregs[offset] = prevval;
 		break;
@@ -402,7 +433,7 @@ WRITE_LINE_MEMBER(gsan_state::vblank)
 
 void gsan_state::draw_quad_tex(u16 cmd, u16 *data)
 {
-	//	logerror("Q2SD draw %04X src %d:%d sz %d:%d dst %d:%d %d:%d %d:%d %d:%d\n", cmd, data[0], data[1], data[2], data[3], (s16)data[4], (s16)data[5], (s16)data[6], (s16)data[7], (s16)data[8], (s16)data[9], (s16)data[10], (s16)data[11]);
+	//  logerror("Q2SD draw %04X src %d:%d sz %d:%d dst %d:%d %d:%d %d:%d %d:%d\n", cmd, data[0], data[1], data[2], data[3], (s16)data[4], (s16)data[5], (s16)data[6], (s16)data[7], (s16)data[8], (s16)data[9], (s16)data[10], (s16)data[11]);
 	if (cmd & 0x57f)
 		logerror("Q2SD unhandled draw tex mode %04X\n", cmd);
 	u32 ssx = data[0] & 0x3ff;
@@ -453,7 +484,7 @@ void gsan_state::draw_quad_tex(u16 cmd, u16 *data)
 
 void gsan_state::draw_quad_bin(u16 cmd, u16 *data)
 {
-	//	logerror("Q2SD draw %04X src %d:%d sz %d:%d dst %d:%d %d:%d %d:%d %d:%d\n", cmd, data[0], data[1], data[2], data[3], (s16)data[4], (s16)data[5], (s16)data[6], (s16)data[7], (s16)data[8], (s16)data[9], (s16)data[10], (s16)data[11]);
+	//  logerror("Q2SD draw %04X src %d:%d sz %d:%d dst %d:%d %d:%d %d:%d %d:%d\n", cmd, data[0], data[1], data[2], data[3], (s16)data[4], (s16)data[5], (s16)data[6], (s16)data[7], (s16)data[8], (s16)data[9], (s16)data[10], (s16)data[11]);
 	if (cmd & 0x57f)
 		logerror("Q2SD unhandled draw bin mode %04X\n", cmd);
 
@@ -511,7 +542,7 @@ void gsan_state::draw_quad_bin(u16 cmd, u16 *data)
 
 void gsan_state::fill_quad(u16 cmd, u16 *data)
 {
-	//	logerror("Q2SD fill dst %d:%d %d:%d %d:%d %d:%d col %04X\n", (s16)data[0], (s16)data[1], (s16)data[2], (s16)data[3], (s16)data[4], (s16)data[5], (s16)data[6], (s16)data[7], data[8]);
+	//  logerror("Q2SD fill dst %d:%d %d:%d %d:%d %d:%d col %04X\n", (s16)data[0], (s16)data[1], (s16)data[2], (s16)data[3], (s16)data[4], (s16)data[5], (s16)data[6], (s16)data[7], data[8]);
 	if (cmd & 0x77f)
 		logerror("Q2SD unhandled draw mode %04X\n", cmd);
 	s16 sdx = data[0];
@@ -770,6 +801,7 @@ void gsan_state::main_port_medal(address_map &map)
 {
 	main_port(map);
 	map(SH3_PORT_C, SH3_PORT_C + 7).rw(FUNC(gsan_state::portc_r), FUNC(gsan_state::portc_medal_w));
+	map(SH3_PORT_E, SH3_PORT_E + 7).rw(FUNC(gsan_state::porte_r), FUNC(gsan_state::porte_medal_w));
 }
 
 void gsan_state::ymz280b_map_medal(address_map &map)
@@ -881,7 +913,7 @@ static INPUT_PORTS_START( muscl )
 	PORT_DIPSETTING(      0x0000, "5 Coins/2 Credits" )
 	PORT_DIPNAME( 0x0078, 0x0078, "Coin Slot 2" ) PORT_DIPLOCATION("SW1:4,5,6,7")
 	PORT_DIPSETTING(      0x0078, "2 Medals" )
-//	PORT_DIPSETTING(      0x0070, "2 Medals" )
+//  PORT_DIPSETTING(      0x0070, "2 Medals" )
 	PORT_DIPSETTING(      0x0068, "3 Medals" )
 	PORT_DIPSETTING(      0x0060, "4 Medals" )
 	PORT_DIPSETTING(      0x0058, "5 Medals" )

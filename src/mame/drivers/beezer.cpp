@@ -9,6 +9,7 @@
 
     Notes:
     - To enter test mode, hold down 1P Start and 2P Start, then reset
+      (only works for version 9.0)
     - One of the ROMs contains a message that this game was created
       by "Pacific Polytechnical Corporation, Santa Cruz"
 
@@ -467,8 +468,8 @@ void beezer_state::machine_start()
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
 
 	// register for state saving
-	save_pointer(NAME(m_ch_sign), 4);
-	save_pointer(NAME(m_dac_data), 4);
+	save_item(NAME(m_ch_sign));
+	save_item(NAME(m_dac_data));
 	save_item(NAME(m_count));
 	save_item(NAME(m_noise));
 	save_item(NAME(m_pbus));
@@ -631,5 +632,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  MACHINE  INPUT   CLASS         INIT        ROTATION  COMPANY            FULLNAME          FLAGS
-GAME( 1982, beezer,  0,      beezer,  beezer, beezer_state, empty_init, ROT90,    "Tong Electronic", "Beezer (set 1)", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, beezer1, beezer, beezer,  beezer, beezer_state, empty_init, ROT90,    "Tong Electronic", "Beezer (set 2)", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, beezer,  0,      beezer,  beezer, beezer_state, empty_init, ROT90,    "Tong Electronic", "Beezer (version 9.0)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Has test mode, shows version
+GAME( 1982, beezer1, beezer, beezer,  beezer, beezer_state, empty_init, ROT90,    "Tong Electronic", "Beezer (unknown earlier version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // No test mode, possibly earlier?

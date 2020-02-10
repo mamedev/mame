@@ -308,7 +308,7 @@ static bool process_field(jed_data *data, const uint8_t **src, const uint8_t *sr
 
 int pla_parse(const void *data, size_t length, jed_data *result)
 {
-	const uint8_t *src = (const uint8_t *)data;
+	const auto *src = (const uint8_t *)data;
 	const uint8_t *srcend = src + length;
 
 	parse_info pinfo;

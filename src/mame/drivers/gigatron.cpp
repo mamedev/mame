@@ -38,7 +38,7 @@ private:
 
 	void prog_map(address_map &map);
 	void data_map(address_map &map);
-	
+
 	DECLARE_READ8_MEMBER(gigatron_random)
 	{
 		return machine().rand() & 0xff;

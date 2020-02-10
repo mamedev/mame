@@ -52,34 +52,34 @@ public:
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_WRITE16_MEMBER(dimm_command_w);		// 5f703c
+	DECLARE_WRITE16_MEMBER(dimm_command_w);     // 5f703c
 	DECLARE_READ16_MEMBER(dimm_command_r);
-	DECLARE_WRITE16_MEMBER(dimm_offsetl_w);		// 5f7040
+	DECLARE_WRITE16_MEMBER(dimm_offsetl_w);     // 5f7040
 	DECLARE_READ16_MEMBER(dimm_offsetl_r);
-	DECLARE_WRITE16_MEMBER(dimm_parameterl_w);	// 5f7044
+	DECLARE_WRITE16_MEMBER(dimm_parameterl_w);  // 5f7044
 	DECLARE_READ16_MEMBER(dimm_parameterl_r);
-	DECLARE_WRITE16_MEMBER(dimm_parameterh_w);	// 5f7048
+	DECLARE_WRITE16_MEMBER(dimm_parameterh_w);  // 5f7048
 	DECLARE_READ16_MEMBER(dimm_parameterh_r);
-	DECLARE_WRITE16_MEMBER(dimm_status_w);		// 5f704c
+	DECLARE_WRITE16_MEMBER(dimm_status_w);      // 5f704c
 	DECLARE_READ16_MEMBER(dimm_status_r);
 
-	DECLARE_WRITE32_MEMBER(sh4_unknown_w);		// 14000000
+	DECLARE_WRITE32_MEMBER(sh4_unknown_w);      // 14000000
 	DECLARE_READ32_MEMBER(sh4_unknown_r);
-	DECLARE_WRITE32_MEMBER(sh4_command_w);		// 14000014
+	DECLARE_WRITE32_MEMBER(sh4_command_w);      // 14000014
 	DECLARE_READ32_MEMBER(sh4_command_r);
-	DECLARE_WRITE32_MEMBER(sh4_offsetl_w);		// 14000018
+	DECLARE_WRITE32_MEMBER(sh4_offsetl_w);      // 14000018
 	DECLARE_READ32_MEMBER(sh4_offsetl_r);
-	DECLARE_WRITE32_MEMBER(sh4_parameterl_w);	// 1400001c
+	DECLARE_WRITE32_MEMBER(sh4_parameterl_w);   // 1400001c
 	DECLARE_READ32_MEMBER(sh4_parameterl_r);
-	DECLARE_WRITE32_MEMBER(sh4_parameterh_w);	// 14000020
+	DECLARE_WRITE32_MEMBER(sh4_parameterh_w);   // 14000020
 	DECLARE_READ32_MEMBER(sh4_parameterh_r);
-	DECLARE_WRITE32_MEMBER(sh4_status_w);		// 14000024
+	DECLARE_WRITE32_MEMBER(sh4_status_w);       // 14000024
 	DECLARE_READ32_MEMBER(sh4_status_r);
-	DECLARE_WRITE32_MEMBER(sh4_control_w);		// 14000028
+	DECLARE_WRITE32_MEMBER(sh4_control_w);      // 14000028
 	DECLARE_READ32_MEMBER(sh4_control_r);
-	DECLARE_WRITE32_MEMBER(sh4_des_keyl_w);		// 14000030
+	DECLARE_WRITE32_MEMBER(sh4_des_keyl_w);     // 14000030
 	DECLARE_READ32_MEMBER(sh4_des_keyl_r);
-	DECLARE_WRITE32_MEMBER(sh4_des_keyh_w);		// 14000034
+	DECLARE_WRITE32_MEMBER(sh4_des_keyh_w);     // 14000034
 	DECLARE_READ32_MEMBER(sh4_des_keyh_r);
 
 	DECLARE_READ64_MEMBER(i2cmem_dimm_r);

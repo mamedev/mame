@@ -284,7 +284,7 @@ void crc16_creator::append(const void *data, uint32_t length)
 		0x6e17, 0x7e36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0
 	};
 
-	const uint8_t *src = reinterpret_cast<const uint8_t *>(data);
+	const auto *src = reinterpret_cast<const uint8_t *>(data);
 
 	// fetch the current value into a local and rip through the source data
 	uint16_t crc = m_accum.m_raw;

@@ -131,9 +131,9 @@ private:
 	devcb_read8        m_in_memr_cb;
 	devcb_write8       m_out_memw_cb;
 
-	devcb_read8        m_in_ior_cb[4];
-	devcb_write8       m_out_iow_cb[4];
-	devcb_write_line   m_out_dack_cb[4];
+	devcb_read8::array<4> m_in_ior_cb;
+	devcb_write8::array<4> m_out_iow_cb;
+	devcb_write_line::array<4> m_out_dack_cb;
 };
 
 
@@ -165,8 +165,8 @@ protected:
 	// 16 bit transfer callbacks
 	devcb_read16 m_in_mem16r_cb;
 	devcb_write16 m_out_mem16w_cb;
-	devcb_read16 m_in_io16r_cb[4];
-	devcb_write16 m_out_io16w_cb[4];
+	devcb_read16::array<4> m_in_io16r_cb;
+	devcb_write16::array<4> m_out_io16w_cb;
 
 	int m_selected_channel;
 	int m_base;

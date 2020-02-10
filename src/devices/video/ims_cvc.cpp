@@ -154,6 +154,8 @@ void ims_cvc_device::device_start()
 	save_item(NAME(m_mask));
 	save_item(NAME(m_tos));
 	save_item(NAME(m_boot));
+
+	save_item(NAME(m_swap));
 }
 
 void ims_cvc_device::device_reset()
@@ -194,7 +196,7 @@ u32 g300_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rect
 
 	for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
 		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x++)
-			bitmap.pix(y, x) = pen_color(m_vram->read(address++) & m_mask);
+			bitmap.pix(y, x) = pen_color(m_vram->read(address++ ^ m_swap) & m_mask);
 
 	return 0;
 }
@@ -209,7 +211,7 @@ u32 g332_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rect
 		for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
 			for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 8)
 			{
-				u8 pixel_data = m_vram->read(address++);
+				u8 pixel_data = m_vram->read(address++ ^ m_swap);
 
 				bitmap.pix(y, x + 0) = pen_color(pixel_data & 0x1 & m_mask); pixel_data >>= 1;
 				bitmap.pix(y, x + 1) = pen_color(pixel_data & 0x1 & m_mask); pixel_data >>= 1;
@@ -226,7 +228,7 @@ u32 g332_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rect
 		for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
 			for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 4)
 			{
-				u8 pixel_data = m_vram->read(address++);
+				u8 pixel_data = m_vram->read(address++ ^ m_swap);
 
 				bitmap.pix(y, x + 0) = pen_color(pixel_data & 0x3 & m_mask); pixel_data >>= 2;
 				bitmap.pix(y, x + 1) = pen_color(pixel_data & 0x3 & m_mask); pixel_data >>= 2;
@@ -239,7 +241,7 @@ u32 g332_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rect
 		for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
 			for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 2)
 			{
-				u8 pixel_data = m_vram->read(address++);
+				u8 pixel_data = m_vram->read(address++ ^ m_swap);
 
 				bitmap.pix(y, x + 0) = pen_color(pixel_data & 0xf & m_mask); pixel_data >>= 4;
 				bitmap.pix(y, x + 1) = pen_color(pixel_data & 0xf & m_mask);
@@ -249,7 +251,7 @@ u32 g332_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rect
 	case BPP_8:
 		for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
 			for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x++)
-				bitmap.pix(y, x) = pen_color(m_vram->read(address++) & m_mask);
+				bitmap.pix(y, x) = pen_color(m_vram->read(address++ ^ m_swap) & m_mask);
 		break;
 	}
 

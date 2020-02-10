@@ -56,6 +56,8 @@
 #include "formats/aim_dsk.h"
 #include "formats/m20_dsk.h"
 
+#include "formats/os9_dsk.h"
+
 #include "formats/flex_dsk.h"
 #include "formats/uniflex_dsk.h"
 
@@ -99,11 +101,13 @@ static floppy_format_type floppy_formats[] = {
 	FLOPPY_APPLIX_FORMAT,
 
 	FLOPPY_HPI_FORMAT,
-        FLOPPY_IMG_FORMAT,
+	FLOPPY_IMG_FORMAT,
 
 	FLOPPY_DVK_MX_FORMAT,
 	FLOPPY_AIM_FORMAT,
 	FLOPPY_M20_FORMAT,
+
+	FLOPPY_OS9_FORMAT,
 
 	FLOPPY_FLEX_FORMAT,
 	FLOPPY_UNIFLEX_FORMAT

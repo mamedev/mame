@@ -42,8 +42,8 @@ Konami PWB 402218 boards
 
  Notes and TODOs:
  - Priorities not understood and wrong in places of GX-based games, apparently controlled by PROM
- - X/Y scroll effects not handled well by current K052109(TMNT tilemaps) emulation.
-   Mario Roulette glitches "resolved" using hack, Fuusen Pentai still have issues with column scroll (not OK with -6 added to column index).
+ - X/Y scroll effects not 100% handled by current K052109(TMNT tilemaps) emulation.
+   Mario Roulette issues currently "resolved" using hack.
 
 ***************************************************************************/
 
@@ -158,17 +158,17 @@ private:
 WRITE8_MEMBER(konmedal_state::control2_w)
 {
 /*  CN3
-	---- ---x uPD7759 /ST (TMNT-based boards)
-	---- --x- uPD7759 /RESET (TMNT-based boards)
-	---- -x-- 10Y Counter
-	---- x--- 100Y Counter
-	---x ---- 10Y Lock
-	--x- ---- 100Y Lock
-	-x-- ---- Hopper On
-	x--- ---- K056832 RAM/ROM access switch (GX-based boards)
+    ---- ---x uPD7759 /ST (TMNT-based boards)
+    ---- --x- uPD7759 /RESET (TMNT-based boards)
+    ---- -x-- 10Y Counter
+    ---- x--- 100Y Counter
+    ---x ---- 10Y Lock
+    --x- ---- 100Y Lock
+    -x-- ---- Hopper On
+    x--- ---- K056832 RAM/ROM access switch (GX-based boards)
 */
 	m_control2 = data;
-	if (m_upd7759) 	// note: this is needed because games clear reset line and assert start line at the same time, but MAME's outport can't handle right order
+	if (m_upd7759)  // note: this is needed because games clear reset line and assert start line at the same time, but MAME's outport can't handle right order
 		m_upd7759->reset_w((data & 2) ? 1 : 0);
 	m_outport->write(data);
 	machine().bookkeeping().coin_counter_w(0, data & 4);
@@ -180,9 +180,9 @@ WRITE8_MEMBER(konmedal_state::control2_w)
 WRITE8_MEMBER(konmedal_state::medalcnt_w)
 {
 /*  CN5
-	---- ---x Medal counter +1 (medal in)
-	---- --x- Medal counter -1 (hopper out)
-	---- -x-- Medal Lock
+    ---- ---x Medal counter +1 (medal in)
+    ---- --x- Medal counter -1 (hopper out)
+    ---- -x-- Medal Lock
 */
 	machine().bookkeeping().coin_counter_w(2, data & 2);
 	machine().bookkeeping().coin_lockout_w(2, (data & 4) ? 0 : 1);
@@ -190,7 +190,7 @@ WRITE8_MEMBER(konmedal_state::medalcnt_w)
 
 WRITE8_MEMBER(konmedal_state::lamps_w)
 {
-//	CN6
+//  CN6
 	for (int i = 0; i < 8; i++)
 		m_lamps[i] = BIT(data, i);
 }
@@ -277,7 +277,7 @@ K056832_CB_MEMBER(konmedal_state::tile_callback)
 	m_k056832->read_avac(&mode, &avac);
 	if (mode)
 		*code = (((avac >> ((codebits >> 8) & 0xc)) & 0xf) << 10) | (codebits & 0x3ff);
-	else 
+	else
 		*code = codebits & 0xfff;
 
 	*code = bitswap<14>(*code, 8, 9, 13, 12, 11, 10, 7, 6, 5, 4, 3, 2, 1, 0);
@@ -1066,9 +1066,9 @@ ROM_START( mariorou )
 ROM_END
 
 // Konami PWB 452093A boards (TMNT tilemaps)
-GAME( 1991, mariorou, 0,     mariorou, mario,    konmedal_state, mario_init,   ROT0, "Konami", "Mario Roulette", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1993, shuriboy, 0,     shuriboy, shuriboy, konmedal_state, shuri_init,   ROT0, "Konami", "Shuriken Boy", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1993, fuusenpn, 0,     fuusenpn, fuusenpn, konmedal_state, fuusen_init,  ROT0, "Konami", "Fuusen Pentai", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1991, mariorou, 0,     mariorou, mario,    konmedal_state, mario_init,   ROT0, "Konami", "Mario Roulette", MACHINE_SUPPORTS_SAVE)
+GAME( 1993, shuriboy, 0,     shuriboy, shuriboy, konmedal_state, shuri_init,   ROT0, "Konami", "Shuriken Boy", MACHINE_SUPPORTS_SAVE)
+GAME( 1993, fuusenpn, 0,     fuusenpn, fuusenpn, konmedal_state, fuusen_init,  ROT0, "Konami", "Fuusen Pentai", MACHINE_SUPPORTS_SAVE)
 
 // Konami PWB 452574A boards (GX tilemaps)
 GAME( 1994, buttobi,  0,     ddboy,    ddboy,    konmedal_state, buttobi_init, ROT0, "Konami", "Buttobi Striker", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
@@ -1076,4 +1076,4 @@ GAME( 1994, ddboy,    0,     ddboy,    ddboy,    konmedal_state, ddboy_init,   R
 
 // Konami PWB 402218 boards (GX tilemaps)
 GAME( 1994, ddboya,   ddboy, tsukande, ddboy,    konmedal_state, ddboy_init,   ROT0, "Konami", "Dam Dam Boy (on Tsukande Toru Chicchi PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1995, tsukande, 0,     tsukande, konmedal, konmedal_state, tsuka_init,   ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1995, tsukande, 0,     tsukande, konmedal, konmedal_state, tsuka_init,   ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_SUPPORTS_SAVE)

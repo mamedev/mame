@@ -3,8 +3,11 @@
 
 // Note: even after the GameKey port was physically removed and the PCBs redesigned, many of the test modes still show the value read from the port (and many games still show the Game Key Ready splash screen on startup)
 
+#include "emu.h"
 #include "includes/spg2xx.h"
+
 #include "bus/jakks_gamekey/slot.h"
+
 
 class jakks_gkr_state : public spg2xx_game_state
 {

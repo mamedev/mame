@@ -194,8 +194,6 @@ void unsp_device::device_start()
 	m_core = (internal_unsp_state *)m_cache.alloc_near(sizeof(internal_unsp_state));
 	memset(m_core, 0, sizeof(internal_unsp_state));
 
-	m_core->m_r.resize(m_numregs);
-
 #if ENABLE_UNSP_DRC
 	m_enable_drc = allow_drc() && (m_iso < 12);
 #else
@@ -230,6 +228,7 @@ void unsp_device::device_start()
 	m_drcuml->symbol_add(&m_core->m_r[REG_PC], sizeof(uint32_t), "PC");
 	m_drcuml->symbol_add(&m_core->m_enable_irq, sizeof(uint32_t), "IRQE");
 	m_drcuml->symbol_add(&m_core->m_enable_fiq, sizeof(uint32_t), "FIQE");
+	m_drcuml->symbol_add(&m_core->m_fir_move, sizeof(uint32_t), "FIR_MOV");
 	m_drcuml->symbol_add(&m_core->m_irq, sizeof(uint32_t), "IRQ");
 	m_drcuml->symbol_add(&m_core->m_fiq, sizeof(uint32_t), "FIQ");
 	m_drcuml->symbol_add(&m_core->m_sb, sizeof(uint32_t), "SB");
@@ -253,9 +252,10 @@ void unsp_device::device_start()
 	state_add(UNSP_PC,     "PC", m_debugger_temp).callimport().callexport().formatstr("%06X");
 	state_add(UNSP_IRQ_EN, "IRQE", m_core->m_enable_irq).formatstr("%1u");
 	state_add(UNSP_FIQ_EN, "FIQE", m_core->m_enable_fiq).formatstr("%1u");
+	state_add(UNSP_FIR_MOV_EN, "FIR_MOV", m_core->m_fir_move).formatstr("%1u");
 	state_add(UNSP_IRQ,    "IRQ", m_core->m_irq).formatstr("%1u");
 	state_add(UNSP_FIQ,    "FIQ", m_core->m_fiq).formatstr("%1u");
-	state_add(UNSP_SB,     "SB", m_core->m_sb).formatstr("%1u");
+	state_add(UNSP_SB,     "SB", m_core->m_sb).formatstr("%1X");
 #if UNSP_LOG_OPCODES || UNSP_LOG_REGS
 	state_add(UNSP_LOG_OPS,"LOG", m_log_ops).formatstr("%1u");
 #endif
@@ -266,6 +266,7 @@ void unsp_device::device_start()
 	save_item(NAME(m_core->m_r));
 	save_item(NAME(m_core->m_enable_irq));
 	save_item(NAME(m_core->m_enable_fiq));
+	save_item(NAME(m_core->m_fir_move));
 	save_item(NAME(m_core->m_irq));
 	save_item(NAME(m_core->m_fiq));
 	save_item(NAME(m_core->m_curirq));
@@ -298,12 +299,18 @@ void unsp_20_device::device_start()
 
 void unsp_device::device_reset()
 {
-	for (int i = 0; i < m_numregs; i++)
-		m_core->m_r[i] = 0;
+	for (int i = 0; i < ARRAY_LENGTH(m_core->m_r); i++)
+	{
+		if (i < m_numregs)
+			m_core->m_r[i] = 0;
+		else
+			m_core->m_r[i] = 0xdeadbeef;
+	}
 
 	m_core->m_r[REG_PC] = read16(0xfff7);
 	m_core->m_enable_irq = 0;
 	m_core->m_enable_fiq = 0;
+	m_core->m_fir_move = 1;
 	m_core->m_irq = 0;
 	m_core->m_fiq = 0;
 }
@@ -389,7 +396,7 @@ void unsp_device::state_import(const device_state_entry &entry)
 void unsp_device::update_nzsc(uint32_t value, uint16_t r0, uint16_t r1)
 {
 	m_core->m_r[REG_SR] &= ~(UNSP_N | UNSP_Z | UNSP_S | UNSP_C);
-	if (int16_t(r0) < int16_t(~r1))
+	if (BIT(value, 16) != BIT((r0 ^ r1), 15))
 		m_core->m_r[REG_SR] |= UNSP_S;
 	if (BIT(value, 15))
 		m_core->m_r[REG_SR] |= UNSP_N;

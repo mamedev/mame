@@ -18,6 +18,7 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include <algorithm>
 
 #if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
 #include <malloc.h>
@@ -283,7 +284,8 @@ namespace plib {
 		static inline void *allocate( size_t alignment, size_t size )
 		{
 			m_stat_cur_alloc() += size;
-			m_stat_max_alloc() = std::max(m_stat_max_alloc(), m_stat_cur_alloc());
+			if (m_stat_max_alloc() < m_stat_cur_alloc())
+				m_stat_max_alloc() = m_stat_cur_alloc();
 
 			#if (PUSE_ALIGNED_ALLOCATION)
 			#if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
@@ -367,8 +369,8 @@ namespace plib {
 			return true;
 		}
 
-		size_type cur_alloc() const noexcept { return m_stat_cur_alloc(); }
-		size_type max_alloc() const noexcept { return m_stat_max_alloc(); }
+		size_type cur_alloc() const noexcept { return m_stat_cur_alloc(); } // NOLINT(readability-convert-member-functions-to-static)
+		size_type max_alloc() const noexcept { return m_stat_max_alloc(); } // NOLINT(readability-convert-member-functions-to-static)
 	private:
 		static size_t &m_stat_cur_alloc() noexcept { static size_t val = 0; return val; }
 		static size_t &m_stat_max_alloc() noexcept { static size_t val = 0; return val; }

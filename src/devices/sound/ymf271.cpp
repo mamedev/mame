@@ -402,7 +402,7 @@ void ymf271_device::init_envelope(YMF271Slot *slot)
 
 	// init release state
 	rate = get_keyscaled_rate(slot->relrate * 4, keycode, slot->keyscale);
-	slot->env_release_step = (rate < 4) ? 0 : (int)(((double)(255-0) / m_lut_ar[rate]) * 65536.0);
+	slot->env_release_step = (rate < 4) ? 0 : (int)(((double)(255-0) / m_lut_dc[rate]) * 65536.0);
 
 	slot->volume = (255-160) << ENV_VOLUME_SHIFT; // -60db
 	slot->env_state = ENV_ATTACK;
@@ -1648,12 +1648,12 @@ void ymf271_device::calculate_clock_correction()
 
 	for (int i = 0; i < 64; i++)
 	{
-		// attack/release rate in number of samples
+		// attack rate in number of samples
 		m_lut_ar[i] = (ARTime[i] * clock_correction * 44100.0) / 1000.0;
 	}
 	for (int i = 0; i < 64; i++)
 	{
-		// decay rate in number of samples
+		// decay/release rate in number of samples
 		m_lut_dc[i] = (DCTime[i] * clock_correction * 44100.0) / 1000.0;
 	}
 }

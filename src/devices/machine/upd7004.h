@@ -55,7 +55,7 @@ private:
 	// callbacks
 	devcb_write_line m_eoc_cb;
 	devcb_write_line m_eoc_ff_cb;
-	devcb_read16 m_in_cb[8];
+	devcb_read16::array<8> m_in_cb;
 
 	enum state : int
 	{

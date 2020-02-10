@@ -28,6 +28,7 @@ public:
 
 	void maniacsq_d5002fp(machine_config &config);
 	void play2000(machine_config &config);
+	void srollnd(machine_config &config);
 	void alighunt(machine_config &config);
 	void touchgo(machine_config &config);
 	void alighunt_d5002fp(machine_config &config);
@@ -90,6 +91,11 @@ private:
 	void snowboar_map(address_map &map);
 	void touchgo_map(address_map &map);
 	void saltcrdi_map(address_map &map);
+	void srollnd_map(address_map &map);
+
+	// simulation
+	DECLARE_READ16_MEMBER(srollnd_share_sim_r);
+	DECLARE_WRITE16_MEMBER(srollnd_share_sim_w);
 
 	u32 m_snowboard_latch;
 

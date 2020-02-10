@@ -2149,14 +2149,14 @@ public:
 		// split out position names from string and figure out our number of symbols
 		int location;
 		m_numstops = 0;
-		location=symbollist.find(",");
+		location=symbollist.find(',');
 		while (location!=-1)
 		{
 			m_stopnames[m_numstops] = symbollist;
 			m_stopnames[m_numstops] = m_stopnames[m_numstops].substr(0, location);
 			symbollist = symbollist.substr(location+1, symbollist.length()-(location-1));
 			m_numstops++;
-			location=symbollist.find(",");
+			location=symbollist.find(',');
 		}
 		m_stopnames[m_numstops++] = symbollist;
 
@@ -2166,7 +2166,7 @@ public:
 
 		for (int i=0;i<m_numstops;i++)
 		{
-			location=m_stopnames[i].find(":");
+			location=m_stopnames[i].find(':');
 			if (location!=-1)
 			{
 				m_imagefile[i] = m_stopnames[i];

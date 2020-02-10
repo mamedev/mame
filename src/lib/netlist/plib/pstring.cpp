@@ -29,9 +29,9 @@ int pstring_t<F>::compare(const pstring_t &right) const noexcept
 
 	if (si != this->end() && ri != right.end())
 		return static_cast<int>(*si) - static_cast<int>(*ri);
-	else if (this->mem_t_size() > right.mem_t_size())
+	if (this->mem_t_size() > right.mem_t_size())
 		return 1;
-	else if (this->mem_t_size() < right.mem_t_size())
+	if (this->mem_t_size() < right.mem_t_size())
 		return -1;
 	return 0;
 }

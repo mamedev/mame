@@ -272,8 +272,8 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 	, m_num_interrupts(5)
 	, m_sfr_ram(*this, "sfr_ram")
 	, m_scratchpad(*this, "scratchpad")
-	, m_port_in_cb{{*this}, {*this}, {*this}, {*this}}
-	, m_port_out_cb{{*this}, {*this}, {*this}, {*this}}
+	, m_port_in_cb(*this)
+	, m_port_out_cb(*this)
 	, m_serial_tx_cb(*this)
 	, m_serial_rx_cb(*this)
 	, m_rtemp(0)
@@ -2128,11 +2128,8 @@ void mcs51_cpu_device::device_start()
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 
-	for (auto &cb : m_port_in_cb)
-		cb.resolve_safe(0xff);
-	for (auto &cb : m_port_out_cb)
-		cb.resolve_safe();
-
+	m_port_in_cb.resolve_all_safe(0xff);
+	m_port_out_cb.resolve_all_safe();
 	m_serial_rx_cb.resolve_safe(0);
 	m_serial_tx_cb.resolve_safe();
 

@@ -10298,7 +10298,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pharkas">
 		<description>Freddy Pharkas, Frontier Pharmacist</description>
 		<year>1993</year>
@@ -10398,7 +10398,7 @@
 				<rom name="Goal! [Virgin Games] [1993] [3.5''HD] [Disk 1 of 1].mfm" size="4252733" crc="7b3476a9" sha1="6a47b37798f62580b2d68ced87e60944d4dd92ab"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="goblins">
 		<description>Gobliiins (US - VGA release)</description>

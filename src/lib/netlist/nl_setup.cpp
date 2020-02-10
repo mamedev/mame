@@ -121,11 +121,9 @@ namespace netlist
 					pstring paramfq = name + "." + tp;
 
 					log().debug("Defparam: {1}\n", paramfq);
-					// remove quotes
-					if (plib::startsWith(*ptok, "\"") && plib::endsWith(*ptok, "\""))
-						register_param(paramfq, ptok->substr(1, ptok->length() - 2));
-					else
-						register_param(paramfq, *ptok);
+
+					register_param(paramfq, *ptok);
+
 					++ptok;
 				}
 			}
@@ -216,11 +214,16 @@ namespace netlist
 	void nlparse_t::register_param(const pstring &param, const pstring &value)
 	{
 		pstring fqn = build_fqn(param);
+		pstring val(value);
+
+		// strip " from stringified strings
+		if (plib::startsWith(value, "\"") && plib::endsWith(value, "\""))
+			val = value.substr(1, value.length() - 2);
 
 		auto idx = m_param_values.find(fqn);
 		if (idx == m_param_values.end())
 		{
-			if (!m_param_values.insert({fqn, value}).second)
+			if (!m_param_values.insert({fqn, val}).second)
 			{
 				log().fatal(MF_ADDING_PARAMETER_1_TO_PARAMETER_LIST(param));
 				throw nl_exception(MF_ADDING_PARAMETER_1_TO_PARAMETER_LIST(param));
@@ -229,8 +232,8 @@ namespace netlist
 		else
 		{
 			log().warning(MW_OVERWRITING_PARAM_1_OLD_2_NEW_3(fqn, idx->second,
-					value));
-			m_param_values[fqn] = value;
+					val));
+			m_param_values[fqn] = val;
 		}
 	}
 
@@ -239,7 +242,7 @@ namespace netlist
 		m_factory.register_device(plib::make_unique<factory::library_element_t>(name, name, "", sourcefile));
 	}
 
-	void nlparse_t::register_frontier(const pstring &attach, const nl_fptype r_IN, const nl_fptype r_OUT)
+	void nlparse_t::register_frontier(const pstring &attach, const pstring &r_IN, const pstring &r_OUT)
 	{
 		pstring frontier_name = plib::pfmt("frontier_{1}")(m_frontier_cnt);
 		m_frontier_cnt++;
@@ -310,9 +313,9 @@ namespace netlist
 
 	bool nlparse_t::parse_stream(plib::psource_t::stream_ptr &&istrm, const pstring &name)
 	{
-		plib::ppreprocessor y(m_includes, &m_defines);
-		plib::ppreprocessor &x(y.process(std::move(istrm)));
-		return parser_t(std::move(x), *this).parse(name);
+		auto y = plib::make_unique<plib::ppreprocessor>(m_includes, &m_defines);
+		y->process(std::move(istrm));
+		return parser_t(std::move(y), *this).parse(name);
 		//return parser_t(std::move(plib::ppreprocessor(&m_defines).process(std::move(istrm))), *this).parse(name);
 	}
 
@@ -1054,7 +1057,7 @@ void models_t::model_parse(const pstring &model_in, model_map_t &map)
 	}
 }
 
-pstring models_t::model_string(const model_map_t &map) const
+pstring models_t::model_string(const model_map_t &map)
 {
 	// operator [] has no const implementation
 	pstring ret = map.at("COREMODEL") + "(";
@@ -1150,7 +1153,6 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 
 	auto ret = plib::make_unique<logic_family_std_proxy_t>();
 
-	ret->m_fixed_V = m_models.value(model, "FV");
 	ret->m_low_thresh_PCNT = m_models.value(model, "IVL");
 	ret->m_high_thresh_PCNT = m_models.value(model, "IVH");
 	ret->m_low_VO = m_models.value(model, "OVL");

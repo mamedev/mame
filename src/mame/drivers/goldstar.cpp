@@ -862,6 +862,18 @@ void cmaster_state::cm97_portmap(address_map &map) // TODO: other reads/writes
 	map(0x12, 0x12).portr("IN2").w(FUNC(cmaster_state::outport0_w));
 }
 
+void cmaster_state::ss2001_portmap(address_map &map) // TODO: everything but ay
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x13, 0x13).portr("IN0");
+	map(0x14, 0x14).portr("IN1");
+	map(0x15, 0x15).portr("IN2");
+	map(0x16, 0x16).portr("DSW1");
+	map(0x17, 0x17).portr("DSW2");
+}
+
 void cmaster_state::chryangl_decrypted_opcodes_map(address_map &map)
 {
 	map(0x0000, 0xf7ff).rom().share("decrypted_opcodes");
@@ -8919,6 +8931,13 @@ void cmaster_state::cm97(machine_config &config)
 	config.device_remove("ppi8255_1");
 }
 
+void cmaster_state::ss2001(machine_config &config)
+{
+	cm97(config);
+
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::ss2001_portmap);
+}
+
 void cmaster_state::chryangl(machine_config &config)
 {
 	cm(config);
@@ -10649,6 +10668,78 @@ ROM_START( cmfun )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
+/* this has a little protection (?):
+
+8199: 3A 00 A0    ld   a,($A000) <---- 0x59
+819C: FE 5A       cp   $5A
+819E: 20 F9       jr   nz,$8199
+81A0: 21 60 82    ld   hl,$8260
+81A3: 06 0F       ld   b,$0F
+81A5: 7E          ld   a,(hl)
+81A6: C6 30       add  a,$30
+81A8: 4F          ld   c,a
+81A9: 3A 00 A0    ld   a,($A000)
+81AC: B9          cp   c
+81AD: 20 FA       jr   nz,$81A9
+81AF: 23          inc  hl
+81B0: 10 F3       djnz $81A5
+
+do PC = 0x81b2 to bypass and boot the game
+*/
+
+ROM_START( 3cdpoker )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "v1.6.u81",  0x0000, 0x10000, CRC(d0aeca41) SHA1(f780dbe2d2a0d82b8110a57e161547be41318a81) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7.u16",  0x00000, 0x8000, CRC(d09f9414) SHA1(db5eb359a3e3fcd4d964403888a5496643081f5e) )
+	ROM_LOAD( "6.u11",  0x08000, 0x8000, CRC(f169878f) SHA1(b8bd5e79a813cea0aff8c80e6284bc2f69644c3c) )
+	ROM_LOAD( "5.u4",   0x10000, 0x8000, CRC(591c355e) SHA1(dd4f63853a380c400ca22c4d8f5c6e4f4c002f23) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15",   0x0000, 0x2000, CRC(534bec1a) SHA1(ca7093bbb2ab9da5174688e8d0096ee5c50ca495) ) // this and the following are identical and only contain 0x00 and 0xff? GFX seem ok in game
+	ROM_LOAD( "3.u10",   0x2000, 0x2000, CRC(534bec1a) SHA1(ca7093bbb2ab9da5174688e8d0096ee5c50ca495) )
+	ROM_LOAD( "2.u14",   0x4000, 0x2000, CRC(ef4b3dc8) SHA1(85dc609ee133950f46ccdb8994bee1cf01bc53b9) )
+	ROM_LOAD( "1.u9",    0x6000, 0x2000, CRC(1a700a5f) SHA1(1c214e42644a0f551ad18aea869f4dbad17bfe94) )
+
+	ROM_REGION( 0x10000, "user1", 0 ) // girl bitmaps
+	ROM_LOAD( "8.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+
+ROM_START( 3cdpokera )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "v1.0.u81",  0x0000, 0x10000, CRC(26f21835) SHA1(9a29daeb60a91ab6c73820769911fa1ddd27e3b2) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7.u16",  0x00000, 0x8000, CRC(d09f9414) SHA1(db5eb359a3e3fcd4d964403888a5496643081f5e) )
+	ROM_LOAD( "6.u11",  0x08000, 0x8000, CRC(f169878f) SHA1(b8bd5e79a813cea0aff8c80e6284bc2f69644c3c) )
+	ROM_LOAD( "5.u4",   0x10000, 0x8000, CRC(591c355e) SHA1(dd4f63853a380c400ca22c4d8f5c6e4f4c002f23) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15",   0x0000, 0x2000, CRC(534bec1a) SHA1(ca7093bbb2ab9da5174688e8d0096ee5c50ca495) ) // this and the following are identical and only contain 0x00 and 0xff? GFX seem ok in game
+	ROM_LOAD( "3.u10",   0x2000, 0x2000, CRC(534bec1a) SHA1(ca7093bbb2ab9da5174688e8d0096ee5c50ca495) )
+	ROM_LOAD( "2.u14",   0x4000, 0x2000, CRC(ef4b3dc8) SHA1(85dc609ee133950f46ccdb8994bee1cf01bc53b9) )
+	ROM_LOAD( "1.u9",    0x6000, 0x2000, CRC(1a700a5f) SHA1(1c214e42644a0f551ad18aea869f4dbad17bfe94) )
+
+	ROM_REGION( 0x10000, "user1", 0 ) // girl bitmaps
+	ROM_LOAD( "8.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
 
 /* looks like a bootleg of cmv4 */
 ROM_START( cmaster )
@@ -11262,8 +11353,7 @@ ROM_START( war3cb ) // WANG QL-0B V1.00 in NVRAM, SANGHO in GFX ROMs
 	ROM_LOAD( "27c64 3.bin",   0x4000, 0x2000, CRC(7f2d9f4c) SHA1(f7f62cd09091bd8e713237c6ac4ee3b4c28350b2) )
 	ROM_LOAD( "27c64 4.bin",   0x6000, 0x2000, CRC(1d7f7f2a) SHA1(787f9d2cea1f0690445c65c0a4827b07d85571b7) )
 
-	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
-	ROM_FILL( 0x0000, 0x10000, 0xff ) // (girl bitmaps, not present)
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF ) // no girls bitmap ROM
 
 	ROM_REGION( 0x200, "proms", 0 ) // not yet dumped
 	ROM_LOAD( "prom1",   0x000, 0x100, BAD_DUMP CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
@@ -16853,6 +16943,34 @@ ROM_START( fl7_tw )  // Serial 00000050E9B7.
 ROM_END
 
 
+// PCB pic is blurred, but main components appear to be: TMPZ84C00AP-8, Winbond WF19054, 5 8-dip banks (dip sheet available)
+// it's a 3-reel 5-liner with an extra reel. Puts PATRICK SHANGHAI in NVRAM, so some kind of hack / bootleg
+ROM_START( ss2001 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "9.u26",   0x00000, 0x10000, CRC(9ddb0239) SHA1(15733481996de9becccd5b920e40220c6101becf) )
+
+	ROM_REGION( 0x80000, "gfx", 0 ) // all 27c1001
+	ROM_LOAD( "1.u1",  0x00000, 0x10000, CRC(f4075f1c) SHA1(16513735e181e14a01fe24be6de0b22ef5a894eb) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(0x10000)
+	ROM_LOAD( "2.u2",  0x10000, 0x10000, CRC(7df72d1b) SHA1(ad61c3de89be547014ca123b72bb9775bad55cdd) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(0x10000)
+	ROM_LOAD( "3.u3",  0x20000, 0x10000, CRC(c8db92f7) SHA1(3a77d9a21125e47396b06dc8c54625aa8ad54386) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(0x10000)
+	ROM_LOAD( "4.u4",  0x30000, 0x10000, CRC(bdca2cd5) SHA1(6139a697321475ac6fefac5b5a9f76c8de30f2f8) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(0x10000)
+	ROM_LOAD( "5.u5",  0x40000, 0x10000, CRC(c01acca1) SHA1(f2caed0b8624fb224f41323f15eaa9ce3fadd886) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(0x10000)
+	ROM_LOAD( "6.u6",  0x50000, 0x10000, CRC(a6194545) SHA1(74ddda87ad55e8bce1e986dde8fd371ab8843ceb) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(0x10000)
+	ROM_LOAD( "7.u7",  0x60000, 0x10000, CRC(03375cf9) SHA1(d336c4dff53a7368c9264a02fbc53afd0776a9cd) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(0x10000)
+	ROM_LOAD( "8.u8",  0x70000, 0x10000, CRC(2ad9778b) SHA1(05d8e0be028060cbe78ff1ff927f15f8114f8508) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(0x10000)
+
+	ROM_REGION( 0x2000, "proms", 0 )
+	ROM_LOAD( "d27hc65d.bin",   0x0000, 0x02000, CRC(af8ce88d) SHA1(59d59b6b739aed4f6ee618db04af9ab9d2873bed) ) // colour data is at 0x1800-0x18ff
+ROM_END
+
 /*********************************************************************************************************************/
 
 void goldstar_state::init_goldstar()
@@ -18396,12 +18514,14 @@ GAMEL( 198?, cmv801,    0,        cm,       cmv801,   cmaster_state,  init_cm,  
 
 
 // most of these are almost certainly bootlegs, with added features, hacked payouts etc. identifying which are
-// the original, unmodified dyna versions is almost impossible due to lack of documentation from back in the day,
+// the original, unmodified Dyna versions is almost impossible due to lack of documentation from back in the day,
 // even original boards almost always run modified sets
 GAMEL( 1992, cmv4,      0,        cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (ver.4, set 1)",                0,                 layout_cmv4 )
 GAMEL( 1992, cmv4a,     cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (ver.4, set 2)",                MACHINE_NOT_WORKING,  layout_cmv4 ) // stealth game?
 GAMEL( 199?, cmwm,      cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (Watermelon bootleg / hack)",   0,                 layout_cmv4 ) // CM Fruit Bonus ver.2 T bootleg/hack
 GAMEL( 1995, cmfun,     cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (Fun USA v2.5 bootleg / hack)", 0,                 layout_cmv4 )
+GAMEL( 1995, 3cdpoker,  0,        cm,       cmv4,     cmaster_state,  empty_init,     ROT0, "Armaly Labs",       "3 Cards Poker 96 (V1.6)",                     MACHINE_NOT_WORKING,  layout_cmv4 ) // protected? See ROM definition for routine
+GAMEL( 1995, 3cdpokera, 3cdpoker, cm,       cmtetris, cmaster_state,  empty_init,     ROT0, "Armaly Labs",       "3 Cards Poker 96 (V1.0)",                     MACHINE_NOT_WORKING,  layout_cmv4 ) // hopper problem, possibly needs just correct inputs
 GAMEL( 1991, cmaster,   0,        cm,       cmaster,  cmaster_state,  empty_init,     ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 1)",           0,                 layout_cmaster )
 GAMEL( 1991, cmasterb,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 2)",           0,                 layout_cmasterb )
 GAMEL( 1991, cmezspin,  cmaster,  cm,       cmezspin, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (E-Z Spin bootleg / hack)",   0,                 layout_cmezspin ) // CM Fruit Bonus 55 ver.2 bootleg/hack
@@ -18560,6 +18680,8 @@ GAMEL(1999, unkch4,   scmaster,  unkch,    unkch4,    unkch_state,    init_unkch
 
 GAME( 1996, cherry96, scmaster,  unkch,    unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "New Cherry '96 (bootleg of New Fruit Bonus?)",                 MACHINE_NOT_WORKING ) // need to be moved to another machine...
 
+// this has a 4th reel
+GAME( 200?, ss2001,    0,        ss2001,   cmaster,   cmaster_state,  empty_init,     ROT0, "bootleg", "Super Shanghai 2001",                                          MACHINE_IS_SKELETON ) // TODO: everything
 
 /* Stealth sets.
    These have hidden games inside that can be switched to avoid inspections, police or whatever purposes)... */

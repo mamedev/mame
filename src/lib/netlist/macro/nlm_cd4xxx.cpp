@@ -23,21 +23,21 @@
  */
 
 static NETLIST_START(CD4001_DIP)
-	CD4001_NOR(s1)
-	CD4001_NOR(s2)
-	CD4001_NOR(s3)
-	CD4001_NOR(s4)
+	CD4001_GATE(s1)
+	CD4001_GATE(s2)
+	CD4001_GATE(s3)
+	CD4001_GATE(s4)
 
 	NET_C(s1.VCC, s2.VCC, s3.VCC, s4.VCC)
-	NET_C(s1.VDD, s2.VDD, s3.VDD, s4.VDD)
+	NET_C(s1.GND, s2.GND, s3.GND, s4.GND)
 	DIPPINS(    /*       +--------------+      */
-		s1.A,   /*    A1 |1     ++    14| VCC  */ s1.VCC,
+		s1.A,   /*    A1 |1     ++    14| VDD  */ s1.VCC,
 		s1.B,   /*    B1 |2           13| A6   */ s4.B,
 		s1.Q,   /*    A2 |3           12| Y6   */ s4.A,
 		s2.Q,   /*    Y2 |4    4001   11| A5   */ s4.Q,
 		s2.A,   /*    A3 |5           10| Y5   */ s3.Q,
 		s2.B,   /*    Y3 |6            9| A4   */ s3.B,
-		s1.VDD, /*   GND |7            8| Y4   */ s3.A
+		s1.GND, /*   VSS |7            8| Y4   */ s3.A
 				/*       +--------------+      */
 	)
 
@@ -222,7 +222,7 @@ NETLIST_END()
 
 NETLIST_START(CD4XXX_lib)
 
-	TRUTHTABLE_START(CD4001_NOR, 2, 1, "")
+	TRUTHTABLE_START(CD4001_GATE, 2, 1, "")
 		TT_HEAD("A , B | Q ")
 		TT_LINE("0,0|1|85")
 		TT_LINE("X,1|0|120")

@@ -327,7 +327,7 @@ S1: is on some carts directly connected to VCC
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mc_4v05a" cloneof="mc_4v05" supported="partial">
 		<description>4 in 1 - SeaGuard + Whirlybird + Spectask + Captain (set 2)</description>
 		<year>200?</year>
@@ -337,7 +337,7 @@ S1: is on some carts directly connected to VCC
 				<rom name="seaguard-whirlybird-spectask-captain.gk" size="0x080000" crc="ab79bd72" sha1="5c364f6c21559bd6e0db3f73da7d6dc6e7fe4b4b"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="mc_4v06" supported="partial">
 		<description>4 in 1 - Three Battles + Light Sword + Risker + Metal Deform (512KB cartridge)</description>
@@ -416,7 +416,7 @@ S1: is on some carts directly connected to VCC
 				<rom name="4in1no10_1meg.bin" size="0x100000" crc="cb34960d" sha1="52c27538c8ad91b3b41c3b49236d4f4daa6a80cb"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="mc_4v11" supported="partial">
 		<description>4 in 1 Vol. 11 - Explorer + Magician + AirHero + HappyGarden</description>

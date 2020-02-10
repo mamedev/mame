@@ -5,7 +5,7 @@
 
     Compared to vii.cpp this is clearly newer, has extra opcodes, different internal map etc. also scaling and higher resolutions based on Spongebob
 
-	note, these SoC types always have a 128Kwords internal ROM, which the JAKKS games appear to use for basic bootstrap purposes.
+    note, these SoC types always have a 128Kwords internal ROM, which the JAKKS games appear to use for basic bootstrap purposes.
 
     GPAC800 / GCM394 (SpongeBob Bikini Bottom 500 Test Mode also calls this GPAC800, even if the mappings appear different to the NAND version below - different CS base, maybe just depends on boot mode?)
         Smart Fit Park
@@ -31,14 +31,14 @@
     these are all unsp 2.0 type, as they use the extended ocpodes
 
 
-	NAND types:
+    NAND types:
 
-	Toy Story Mania H27U518S2C dumped as HY27US08121A (512+16) x 32 x 4096
-	Beam Box GPR27P512A dumped as HY27US08121A (512+16) x 32 x 4096
-	Golden Tee GPR27P512A dumped as HY27US08121A (512+16) x 32 x 4096
-	Cars 2 GPR27P512A dumped as HY27US08121A (512+16) x 32 x 4096
+    Toy Story Mania H27U518S2C dumped as HY27US08121A (512+16) x 32 x 4096
+    Beam Box GPR27P512A dumped as HY27US08121A (512+16) x 32 x 4096
+    Golden Tee GPR27P512A dumped as HY27US08121A (512+16) x 32 x 4096
+    Cars 2 GPR27P512A dumped as HY27US08121A (512+16) x 32 x 4096
 
-	V.Baby HY27UF081G2A (2048+64) x 64 x 1024
+    V.Baby HY27UF081G2A (2048+64) x 64 x 1024
 
 */
 
@@ -211,17 +211,17 @@ WRITE16_MEMBER(gcm394_game_state::cs4_w) { logerror("cs4_w %06x %04x\n", offset,
 
 
 /*
-	map info (NAND type)
+    map info (NAND type)
 
-	map(0x000000, 0x006fff) internal RAM
-	map(0x007000, 0x007fff) internal peripherals
-	map(0x008000, 0x00ffff) internal ROM (lower 32kwords) - can also be configured to mirror CS0 308000 area with external pin for boot from external ROM
-	map(0x010000, 0x027fff) internal ROM (upper 96kwords) - can't be switched
-	map(0x028000, 0x02ffff) reserved
+    map(0x000000, 0x006fff) internal RAM
+    map(0x007000, 0x007fff) internal peripherals
+    map(0x008000, 0x00ffff) internal ROM (lower 32kwords) - can also be configured to mirror CS0 308000 area with external pin for boot from external ROM
+    map(0x010000, 0x027fff) internal ROM (upper 96kwords) - can't be switched
+    map(0x028000, 0x02ffff) reserved
 
-	map(0x030000, 0x0.....) view into external spaces (CS0 area starts here. followed by CS1 area, CS2 area etc.)
-	
-	map(0x200000, 0x3fffff) continued view into external spaces, but this area is banked with m_membankswitch_7810 (valid bank values 0x00-0x3f)
+    map(0x030000, 0x0.....) view into external spaces (CS0 area starts here. followed by CS1 area, CS2 area etc.)
+
+    map(0x200000, 0x3fffff) continued view into external spaces, but this area is banked with m_membankswitch_7810 (valid bank values 0x00-0x3f)
 */
 
 
@@ -236,7 +236,7 @@ class generalplus_gpac800_game_state : public gcm394_game_state
 public:
 	generalplus_gpac800_game_state(const machine_config& mconfig, device_type type, const char* tag) :
 		gcm394_game_state(mconfig, type, tag),
-		m_has_nand(false),
+		m_nandregion(*this, "nandrom"),
 		m_initial_copy_words(0x2000)
 	{
 	}
@@ -263,12 +263,16 @@ protected:
 	virtual DECLARE_READ16_MEMBER(cs1_r) override;
 	virtual DECLARE_WRITE16_MEMBER(cs1_w) override;
 
-	bool m_has_nand;
 private:
-	void nand_init(int blocksize, int blocksize_stripped);
+	optional_region_ptr<uint8_t> m_nandregion;
+
+	void nand_create_stripped_region();
 
 	std::vector<uint8_t> m_strippedrom;
 	int m_strippedsize;
+	int m_size;
+	int m_nandblocksize;
+	int m_nandblocksize_stripped;
 
 	int m_initial_copy_words;
 	int m_vectorbase;
@@ -349,12 +353,12 @@ protected:
 	/*
 	virtual DECLARE_READ16_MEMBER(porta_r) override
 	{
-		return machine().rand();
+	    return machine().rand();
 	}
 
 	virtual DECLARE_READ16_MEMBER(portb_r) override
 	{
-		return machine().rand();
+	    return machine().rand();
 	}
 
 	virtual DECLARE_WRITE16_MEMBER(porta_w) override
@@ -467,7 +471,7 @@ READ16_MEMBER(jak_s500_game_state::porta_r)
 
 	//address_space& mem = m_maincpu->space(AS_PROGRAM);
 	//if (mem.read_word(0x22b408) == 0x4846)
-	//	mem.write_word(0x22b408, 0x4840);    // jak_s500 force service mode
+	//  mem.write_word(0x22b408, 0x4840);    // jak_s500 force service mode
 
 	return data;
 }
@@ -532,10 +536,11 @@ WRITE16_MEMBER(generalplus_gpac800_game_state::cs1_w)
 
 READ8_MEMBER(generalplus_gpac800_game_state::read_nand)
 {
-	if (!m_has_nand)
+	if (!m_nandregion)
 		return 0x0000;
 
-	return m_strippedrom[offset & (m_strippedsize - 1)];
+	return (offset < m_size) ? m_nandregion[offset] : 0xFF;
+	//return m_strippedrom[offset & (m_strippedsize - 1)];
 }
 
 READ16_MEMBER(gcm394_game_state::read_external_space)
@@ -634,14 +639,14 @@ WRITE16_MEMBER(wrlshunt_game_state::porta_w)
 
 	// HACK
 	address_space& mem = m_maincpu->space(AS_PROGRAM);
-	if (mem.read_word(0x5b354) == 0xafd0)  	// wrlshubt - skip check (EEPROM?)
+	if (mem.read_word(0x5b354) == 0xafd0)   // wrlshubt - skip check (EEPROM?)
 		mem.write_word(0x5b354, 0xB403);
 }
 
 
 void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 {
-	GPAC800(config, m_maincpu, 96000000/2, m_screen); 
+	GPAC800(config, m_maincpu, 96000000/2, m_screen);
 	m_maincpu->porta_in().set(FUNC(generalplus_gpac800_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(generalplus_gpac800_game_state::portb_r));
 	m_maincpu->portc_in().set(FUNC(generalplus_gpac800_game_state::portc_r));
@@ -716,32 +721,32 @@ void gcm394_game_state::cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, ui
 	int end_address;
 
 	int size; // cs region sizes in kwords
-	
-	size = (((cs0 & 0xff00) >> 8) + 1) * 0x10000; 
+
+	size = (((cs0 & 0xff00) >> 8) + 1) * 0x10000;
 	end_address = start_address + (size - 1);
 	logerror("installing cs0 handler start_address %08x end_address %08x\n", start_address, end_address);
 	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs0_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs0_w)));
 	start_address += size;
 
-	size = (((cs1 & 0xff00) >> 8) + 1) * 0x10000; 
+	size = (((cs1 & 0xff00) >> 8) + 1) * 0x10000;
 	end_address = start_address + (size - 1);
 	logerror("installing cs1 handler start_address %08x end_address %08x\n", start_address, end_address);
 	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs1_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs1_w)));
 	start_address += size;
 
-	size = (((cs2 & 0xff00) >> 8) + 1) * 0x10000; 
+	size = (((cs2 & 0xff00) >> 8) + 1) * 0x10000;
 	end_address = start_address + (size - 1);
 	logerror("installing cs2 handler start_address %08x end_address %08x\n", start_address, end_address);
 	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs2_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs2_w)));
 	start_address += size;
 
-	size = (((cs3 & 0xff00) >> 8) + 1) * 0x10000; 
+	size = (((cs3 & 0xff00) >> 8) + 1) * 0x10000;
 	end_address = start_address + (size - 1);
 	logerror("installing cs3 handler start_address %08x end_address %08x\n", start_address, end_address);
 	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs3_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs3_w)));
 	start_address += size;
 
-	size = (((cs4 & 0xff00) >> 8) + 1) * 0x10000; 
+	size = (((cs4 & 0xff00) >> 8) + 1) * 0x10000;
 	end_address = start_address + (size - 1);
 	logerror("installing cs4 handler start_address %08x end_address %08x\n", start_address, end_address);
 	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16_delegate(*this, FUNC(gcm394_game_state::cs4_r)), write16_delegate(*this, FUNC(gcm394_game_state::cs4_w)));
@@ -751,7 +756,7 @@ void gcm394_game_state::cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, ui
 
 void generalplus_gpspispi_game_state::generalplus_gpspispi(machine_config &config)
 {
-	GP_SPISPI(config, m_maincpu, 96000000/2, m_screen); 
+	GP_SPISPI(config, m_maincpu, 96000000/2, m_screen);
 	m_maincpu->porta_in().set(FUNC(generalplus_gpspispi_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(generalplus_gpspispi_game_state::portb_r));
 	m_maincpu->portc_in().set(FUNC(generalplus_gpspispi_game_state::portc_r));
@@ -789,7 +794,7 @@ DEVICE_IMAGE_LOAD_MEMBER(generalplus_gpspispi_bkrankp_game_state::cart_load)
 
 void generalplus_gpspispi_bkrankp_game_state::generalplus_gpspispi_bkrankp(machine_config &config)
 {
-	generalplus_gpspispi_game_state::generalplus_gpspispi(config);	
+	generalplus_gpspispi_game_state::generalplus_gpspispi(config);
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "bkrankp_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
@@ -1349,7 +1354,7 @@ ROM_START(wrlshunt)
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
 
 	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD16_WORD_SWAP("wireless.bin", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796))		
+	ROM_LOAD16_WORD_SWAP("wireless.bin", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796))
 ROM_END
 
 /*
@@ -1456,48 +1461,56 @@ ROM_START( wlsair60 )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
-	ROM_REGION16_BE( 0x8400000, "nandrom", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "wlsair60.nand", 0x0000, 0x8400000, CRC(eec23b97) SHA1(1bb88290cf54579a5bb51c08a02d793cd4d79f7a) )
+	ROM_REGION( 0x8400000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "wlsair60.nand", 0x0000, 0x8400000, CRC(eec23b97) SHA1(1bb88290cf54579a5bb51c08a02d793cd4d79f7a) )
 ROM_END
 
 ROM_START( jak_gtg )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
-	ROM_REGION16_BE( 0x4200000, "nandrom", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "goldentee.bin", 0x0000, 0x4200000, CRC(87d5e815) SHA1(5dc46cd753b791449cc41d5eff4928c0dcaf35c0) )
+	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "goldentee.bin", 0x0000, 0x4200000, CRC(87d5e815) SHA1(5dc46cd753b791449cc41d5eff4928c0dcaf35c0) )
 ROM_END
 
 ROM_START( jak_car2 )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
-	ROM_REGION16_BE( 0x4200000, "nandrom", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "cars2.bin", 0x0000, 0x4200000, CRC(4d610e09) SHA1(bc59f5f7f676a8f2a78dfda7fb62c804bbf850b6) )
+	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "cars2.bin", 0x0000, 0x4200000, CRC(4d610e09) SHA1(bc59f5f7f676a8f2a78dfda7fb62c804bbf850b6) )
 ROM_END
 
 ROM_START( jak_tsm )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
-	ROM_REGION16_BE( 0x4200000, "nandrom", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "toystorymania.bin", 0x0000, 0x4200000, CRC(183b20a5) SHA1(eb4fa5ee9dfac58f5244d00d4e833b1e461cc52c) )
+	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "toystorymania.bin", 0x0000, 0x4200000, CRC(183b20a5) SHA1(eb4fa5ee9dfac58f5244d00d4e833b1e461cc52c) )
 ROM_END
 
 ROM_START( vbaby )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
-	ROM_REGION16_BE( 0x8400000, "nandrom", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "vbaby.bin", 0x0000, 0x8400000, CRC(d904441b) SHA1(3742bc4e1e403f061ce2813ecfafc6f30a44d287) )
+	ROM_REGION( 0x8400000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "vbaby.bin", 0x0000, 0x8400000, CRC(d904441b) SHA1(3742bc4e1e403f061ce2813ecfafc6f30a44d287) )
+ROM_END
+
+ROM_START( mgtfit )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+
+	ROM_REGION( 0x8400000, "nandrom", ROMREGION_ERASE00 ) // Samsung 937 K9F1G08U0D  Ident: 0xEC 0xF1 Full Ident: 0xECF1001540
+	ROM_LOAD( "k9f1g08u0d.bin", 0x0000, 0x8400000, CRC(1ca5ac09) SHA1(c2e123085d2198999c2c0edb1df4895361c00a99) )
 ROM_END
 
 ROM_START( beambox )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
 
-	ROM_REGION16_BE( 0x4200000, "nandrom", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "beambox.bin", 0x0000, 0x4200000, CRC(a486f04e) SHA1(73c7d99d8922eba58d94e955e254b9c3baa4443e) )
+	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "beambox.bin", 0x0000, 0x4200000, CRC(a486f04e) SHA1(73c7d99d8922eba58d94e955e254b9c3baa4443e) )
 ROM_END
 
 // the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
@@ -1514,6 +1527,42 @@ void generalplus_gpac800_game_state::machine_start()
 	save_item(NAME(m_sdram));
 }
 
+void generalplus_gpac800_game_state::nand_create_stripped_region()
+{
+	uint8_t* rom = m_nandregion;
+	int size = memregion("nandrom")->bytes();
+	m_size = size;
+
+	int numblocks = size / m_nandblocksize;
+	m_strippedsize = numblocks * m_nandblocksize_stripped;
+	m_strippedrom.resize(m_strippedsize);
+
+	for (int i = 0; i < numblocks; i++)
+	{
+		const int base = i * m_nandblocksize;
+		const int basestripped = i * m_nandblocksize_stripped;
+
+		for (int j = 0; j < m_nandblocksize_stripped; j++)
+		{
+			m_strippedrom[basestripped + j] = rom[(base + j)];
+		}
+	}
+
+	// debug to allow for easy use of unidasm.exe
+	if (0)
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"stripped_%s", machine().system().name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(&m_strippedrom[0], m_nandblocksize_stripped * numblocks, 1, fp);
+			fclose(fp);
+		}
+	}
+}
+
 void generalplus_gpac800_game_state::machine_reset()
 {
 	// configure CS defaults
@@ -1524,11 +1573,12 @@ void generalplus_gpac800_game_state::machine_reset()
 	mem.write_word(0x007823, 0x0047);
 	mem.write_word(0x007824, 0x0047);
 
-
 	m_maincpu->set_cs_space(m_memory->get_program());
 
-	if (m_has_nand)
+	if (m_nandregion)
 	{
+		nand_create_stripped_region();
+
 		// up to 256 pages (16384kw) for each space
 
 		// (size of cs0 + cs1 + cs2 + cs3 + cs4) <= 81920kwords
@@ -1581,55 +1631,26 @@ void generalplus_gpac800_game_state::machine_reset()
 }
 
 
-void generalplus_gpac800_game_state::nand_init(int blocksize, int blocksize_stripped)
-{
-	m_sdram.resize(0x400000); // 0x400000 bytes, 0x800000 words
-	m_sdram2.resize(0x10000);
-
-	uint8_t* rom = memregion("nandrom")->base();
-	int size = memregion("nandrom")->bytes();
-
-	int numblocks = size / blocksize;
-	m_strippedsize = numblocks * blocksize_stripped;
-	m_strippedrom.resize(m_strippedsize);
-
-	for (int i = 0; i < numblocks; i++)
-	{
-		const int base = i * blocksize;
-		const int basestripped = i * blocksize_stripped;
-
-		for (int j = 0; j < blocksize_stripped; j++)
-		{
-			m_strippedrom[basestripped + j] = rom[base + j];
-		}
-	}
-
-	// debug to allow for easy use of unidasm.exe
-	if (0)
-	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"stripped_%s", machine().system().name);
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(&m_strippedrom[0], blocksize_stripped * numblocks, 1, fp);
-			fclose(fp);
-		}
-	}
-
-	m_has_nand = true;
-	m_vectorbase = 0x6fe0;
-}
-
 void generalplus_gpac800_game_state::nand_init210()
 {
-	nand_init(0x210, 0x200);
+	m_sdram.resize(0x400000); // 0x400000 words (0x800000 bytes)
+	m_sdram2.resize(0x10000);
+
+	m_nandblocksize = 0x210;
+	m_nandblocksize_stripped = 0x200;
+
+	m_vectorbase = 0x6fe0;
 }
 
 void generalplus_gpac800_game_state::nand_init840()
 {
-	nand_init(0x840, 0x800);
+	m_sdram.resize(0x400000); // 0x400000 words (0x800000 bytes)
+	m_sdram2.resize(0x10000);
+
+	m_nandblocksize = 0x840;
+	m_nandblocksize_stripped = 0x800;
+
+	m_vectorbase = 0x6fe0;
 }
 
 void generalplus_gpac800_game_state::nand_wlsair60()
@@ -1669,13 +1690,13 @@ void generalplus_gpac800_game_state::nand_beambox()
 
 // NAND dumps w/ internal bootstrap (and u'nSP 2.0 extended opcodes)  (have gpnandnand strings)
 // the JAKKS ones seem to be known as 'Generalplus GPAC800' hardware
-CONS(2010, wlsair60, 0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_wlsair60, "Jungle Soft / Kids Station Toys Inc", "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, jak_gtg,  0, 0, generalplus_gpac800, jak_gtg,  generalplus_gpac800_game_state, nand_init210,  "JAKKS Pacific Inc", "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, jak_car2, 0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_init210,  "JAKKS Pacific Inc", "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, jak_tsm , 0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_tsm,      "JAKKS Pacific Inc", "Toy Story Mania (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, beambox,  0, 0, generalplus_gpac800, jak_car2, generalplus_gpac800_game_state, nand_beambox,  "Hasbro", "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-
-CONS(200?, vbaby,    0, 0, generalplus_gpac800_vbaby, jak_car2, generalplus_gpac800_vbaby_game_state, nand_vbaby,    "VTech", "V.Baby",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2010, wlsair60, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60, "Jungle Soft / Kids Station Toys Inc", "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_gtg,  0, 0, generalplus_gpac800,       jak_gtg,  generalplus_gpac800_game_state,       nand_init210,  "JAKKS Pacific Inc",                   "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_car2, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,  "JAKKS Pacific Inc",                   "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_tsm , 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_tsm,      "JAKKS Pacific Inc",                   "Toy Story Mania (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, beambox,  0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_beambox,  "Hasbro",                              "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, mgtfit,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60, "MGT",                                 "Fitness Konsole (NC1470)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // probably has other names in English too? menus don't appear to be in German
+CONS(200?, vbaby,    0, 0, generalplus_gpac800_vbaby, jak_car2, generalplus_gpac800_vbaby_game_state, nand_vbaby,    "VTech",                               "V.Baby", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 
 ROM_START( bkrankp )
@@ -1696,17 +1717,17 @@ void generalplus_gpspispi_game_state::init_spi()
 
 	/*  Offset(h) 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
 
-		00000000  50 47 70 73 73 69 69 70 70 73 44 00 44 3F 44 00  PGpssiipps
-		00000010  -- -- -- -- -- bb -- -- -- -- -- -- -- -- -- -- 
-		                         ^^ copy dest, just like with nand type
+	    00000000  50 47 70 73 73 69 69 70 70 73 44 00 44 3F 44 00  PGpssiipps
+	    00000010  -- -- -- -- -- bb -- -- -- -- -- -- -- -- -- --
+	                             ^^ copy dest, just like with nand type
 
-		bb = where to copy first block
+	    bb = where to copy first block
 
-		The header is GPspispi (byteswapped) then some params
-		one of the params appears to be for the initial code copy operation done
-		by the bootstrap
+	    The header is GPspispi (byteswapped) then some params
+	    one of the params appears to be for the initial code copy operation done
+	    by the bootstrap
 	*/
-	
+
 	// probably more bytes are used
 	int dest = spirom[0x15] << 8;
 
@@ -1720,8 +1741,6 @@ void generalplus_gpspispi_game_state::init_spi()
 
 	// these vectors must either directly point to RAM, or at least redirect there after some code
 	uint16_t* internal = (uint16_t*)memregion("maincpu:internal")->base();
-	internal[0x0000] = 0xb00b;
-
 	internal[0x7ff5] = vectorbase + 0x0a;
 	internal[0x7ff6] = vectorbase + 0x0c;
 	internal[0x7ff7] = dest + 0x20; // point boot vector at code in RAM (probably in reality points to internal code that copies the first block)
@@ -1736,4 +1755,6 @@ void generalplus_gpspispi_game_state::init_spi()
 }
 
 
-CONS(200?, bkrankp, 0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state	, init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(200?, bkrankp, 0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state , init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+

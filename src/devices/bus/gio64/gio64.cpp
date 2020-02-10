@@ -78,14 +78,13 @@ gio64_device::gio64_device(const machine_config &mconfig, device_type type, cons
 	, device_memory_interface(mconfig, *this)
 	, m_space_config("GIO64 Space", ENDIANNESS_BIG, 64, 32, 0, address_map_constructor())
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
-	, m_interrupt_cb{{*this}, {*this}, {*this}}
+	, m_interrupt_cb(*this)
 {
 }
 
 void gio64_device::device_resolve_objects()
 {
-	for (auto &cb : m_interrupt_cb)
-		cb.resolve_safe();
+	m_interrupt_cb.resolve_all_safe();
 }
 
 void gio64_device::device_start()

@@ -5,9 +5,9 @@
 #include "arm7core.h"
 #include "arm7help.h"
 
-#define LOG_OPS		(1 << 0)
+#define LOG_OPS     (1 << 0)
 
-#define VERBOSE		(0)
+#define VERBOSE     (0)
 #include "logmacro.h"
 
 int64_t arm7_cpu_device::saturate_qbit_overflow(int64_t res)

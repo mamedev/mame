@@ -9,10 +9,10 @@ Notes:
 
 - The games don't cope well with corrupt NVRAM, and may fail to boot completely(!)
 
-- The code to handle the 'multple' reel layers is dubious.  rowscroll values are always used
+- The code to handle the 'multiple' reel layers is dubious. Rowscroll values are always used
   based on only one of the tilemaps displayed in that screen region.
 
-- There are still priority bugs in Tiger Hook, I thuoght I'd fixed these by doing the single
+- There are still priority bugs in Tiger Hook, I thought I'd fixed these by doing the single
   pass rendering of the reels, but they seem to have been reintroduced somehow, needs further
   investigation
 
@@ -31,7 +31,7 @@ Notes on version letters:
 
 E  = Export (It displays a "Outside USA use only" message)
 R  = ?? (In some games, it displays value of winning combinations, see e.g. fb4 Ver. R vs. Ver. LT)
-LT = ?? (It displays a "PT/TKT" message, so maybe it has a minimum amount of poits
+LT = ?? (It displays a "PT/TKT" message, so maybe it has a minimum amount of points
      needed to get a ticket)
 XT = Texas XT / Arkansas / Iowa
 N  = ??
@@ -87,7 +87,7 @@ In a couple of cases, due to too many older revisions, I used: parent + version 
 Graphics: HM86171
      OSC: 25.000MHz, 12.000MHz & 4.9152MHz
    Sound: OKI M6295
-   Other: XILINX XC9536XL (used for programable protection, connected to H2)
+   Other: XILINX XC9536XL (used for programmable protection, connected to H2)
 
 HM86171-120 - HMC 28 pin DIP Color Palette RAMDAC
  FM1608-120 - RAMTRON 64Kb bytewide Ferroelectric Nonvolatile RAM
@@ -237,7 +237,7 @@ Model No. VCG-1 SALTIRE
 Graphics: HM86171
      OSC: 25.000MHz, 12.000MHz & 4.9152MHz
    Sound: OKI M6295
-   Other: XILINX XC9536XL (used for programable protection, connected to H2)
+   Other: XILINX XC9536XL (used for programmable protection, connected to H2)
 
 HM86171-120 - HMC 28 pin DIP Color Palette RAMDAC
  FM1608-120 - RAMTRON 64Kb bytewide Ferroelectric Nonvolatile RAM
@@ -259,7 +259,7 @@ ROM  2 is a AMIC 290021T
 
 MH86171 Color Palette RAMDAC
  Hardware & software compatible with VGA, MCGA & 8514/A graphics
- Compatible with the RS170 video stadard
+ Compatible with the RS170 video standard
  Single monolithic, high performance CMOS
  Pixel rates up to 50MHz
  256K possible colors
@@ -300,6 +300,7 @@ public:
 		m_2c01_regs(*this, "2c01_regs"),
 		m_3000_regs(*this, "3000_regs"),
 		m_3800_regs(*this, "3800_regs"),
+		m_mainbank(*this, "mainbank"),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
@@ -345,7 +346,7 @@ public:
 	void init_pirpok2v2();
 	void init_parrot3v2();
 	void init_fb4v3();
-	void init_sfbonus_common();
+	void init_common();
 	void init_seawld();
 	void init_moneymacv();
 	void init_fb3g();
@@ -421,20 +422,21 @@ public:
 	void init_tighookv();
 	void init_robadv();
 	void init_pirpok2d();
+	void init_mcircus();
 
 private:
-	DECLARE_WRITE8_MEMBER(sfbonus_videoram_w);
-	DECLARE_WRITE8_MEMBER(sfbonus_bank_w);
-	DECLARE_READ8_MEMBER(sfbonus_2800_r);
-	DECLARE_READ8_MEMBER(sfbonus_2801_r);
-	DECLARE_READ8_MEMBER(sfbonus_2c00_r);
-	DECLARE_READ8_MEMBER(sfbonus_2c01_r);
-	DECLARE_READ8_MEMBER(sfbonus_3800_r);
-	DECLARE_WRITE8_MEMBER(sfbonus_1800_w);
-	DECLARE_WRITE8_MEMBER(sfbonus_3800_w);
-	DECLARE_WRITE8_MEMBER(sfbonus_3000_w);
-	DECLARE_WRITE8_MEMBER(sfbonus_2801_w);
-	DECLARE_WRITE8_MEMBER(sfbonus_2c01_w);
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_WRITE8_MEMBER(bank_w);
+	DECLARE_READ8_MEMBER(_2800_r);
+	DECLARE_READ8_MEMBER(_2801_r);
+	DECLARE_READ8_MEMBER(_2c00_r);
+	DECLARE_READ8_MEMBER(_2c01_r);
+	DECLARE_READ8_MEMBER(_3800_r);
+	DECLARE_WRITE8_MEMBER(_1800_w);
+	DECLARE_WRITE8_MEMBER(_3800_w);
+	DECLARE_WRITE8_MEMBER(_3000_w);
+	DECLARE_WRITE8_MEMBER(_2801_w);
+	DECLARE_WRITE8_MEMBER(_2c01_w);
 
 	void sfbonus_bitswap(uint8_t xor0, uint8_t b00, uint8_t b01, uint8_t b02, uint8_t b03, uint8_t b04, uint8_t b05, uint8_t b06,uint8_t b07,
 						uint8_t xor1, uint8_t b10, uint8_t b11, uint8_t b12, uint8_t b13, uint8_t b14, uint8_t b15, uint8_t b16,uint8_t b17,
@@ -444,20 +446,16 @@ private:
 						uint8_t xor5, uint8_t b50, uint8_t b51, uint8_t b52, uint8_t b53, uint8_t b54, uint8_t b55, uint8_t b56,uint8_t b57,
 						uint8_t xor6, uint8_t b60, uint8_t b61, uint8_t b62, uint8_t b63, uint8_t b64, uint8_t b65, uint8_t b66,uint8_t b67,
 						uint8_t xor7, uint8_t b70, uint8_t b71, uint8_t b72, uint8_t b73, uint8_t b74, uint8_t b75, uint8_t b76,uint8_t b77 );
-	TILE_GET_INFO_MEMBER(get_sfbonus_tile_info);
-	TILE_GET_INFO_MEMBER(get_sfbonus_reel_tile_info);
-	TILE_GET_INFO_MEMBER(get_sfbonus_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_sfbonus_reel3_tile_info);
-	TILE_GET_INFO_MEMBER(get_sfbonus_reel4_tile_info);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	template<uint8_t Reel> TILE_GET_INFO_MEMBER(get_reel_tile_info);
 	void draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int category);
-	uint32_t screen_update_sfbonus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void ramdac_map(address_map &map);
 	void sfbonus_io(address_map &map);
 	void sfbonus_map(address_map &map);
 
-	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	virtual void video_start() override;
 
 	required_device<cpu_device> m_maincpu;
@@ -472,17 +470,13 @@ private:
 	required_shared_ptr<uint8_t> m_3000_regs;
 	required_shared_ptr<uint8_t> m_3800_regs;
 
+	required_memory_bank m_mainbank;
+
 	std::unique_ptr<bitmap_ind16> m_temp_reel_bitmap;
 	tilemap_t *m_tilemap;
-	tilemap_t *m_reel_tilemap;
-	tilemap_t *m_reel2_tilemap;
-	tilemap_t *m_reel3_tilemap;
-	tilemap_t *m_reel4_tilemap;
+	tilemap_t *m_reel_tilemap[4];
 	std::unique_ptr<uint8_t[]> m_tilemap_ram;
-	std::unique_ptr<uint8_t[]> m_reel_ram;
-	std::unique_ptr<uint8_t[]> m_reel2_ram;
-	std::unique_ptr<uint8_t[]> m_reel3_ram;
-	std::unique_ptr<uint8_t[]> m_reel4_ram;
+	std::unique_ptr<uint8_t[]> m_reel_ram[4];
 	std::unique_ptr<uint8_t[]> m_videoram;
 	output_finder<6> m_lamps;
 };
@@ -804,7 +798,7 @@ INPUT_PORTS_END
 
 
 
-TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_tile_info)
+TILE_GET_INFO_MEMBER(sfbonus_state::get_tile_info)
 {
 	int code = m_tilemap_ram[(tile_index*2)+0] | (m_tilemap_ram[(tile_index*2)+1]<<8);
 	int flipx = (m_tilemap_ram[(tile_index*2)+1] & 0x80)>>7;
@@ -816,27 +810,14 @@ TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_tile_info)
 			TILE_FLIPYX(flipx | flipy));
 }
 
-TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_reel_tile_info)
+template<uint8_t Reel>
+TILE_GET_INFO_MEMBER(sfbonus_state::get_reel_tile_info)
 {
-	int code = m_reel_ram[(tile_index*2)+0] | (m_reel_ram[(tile_index*2)+1]<<8);
-	int flipx = (m_reel_ram[(tile_index*2)+1] & 0x80)>>7;
-	int flipy = 0;//(m_reel_ram[(tile_index*2)+1] & 0x40)>>5;
+	int code = m_reel_ram[Reel][(tile_index*2)+0] | (m_reel_ram[Reel][(tile_index*2)+1]<<8);
+	int flipx = (m_reel_ram[Reel][(tile_index*2)+1] & 0x80)>>7;
+	int flipy = 0;//(m_reel_ram[Reel][(tile_index*2)+1] & 0x40)>>5;
 
-	int priority = (m_reel_ram[(tile_index*2)+1] & 0x40)>>6;
-
-	SET_TILE_INFO_MEMBER(1,
-			code,
-			priority,  // colour aboused as priority
-			TILE_FLIPYX(flipx | flipy));
-}
-
-TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_reel2_tile_info)
-{
-	int code = m_reel2_ram[(tile_index*2)+0] | (m_reel2_ram[(tile_index*2)+1]<<8);
-	int flipx = (m_reel2_ram[(tile_index*2)+1] & 0x80)>>7;
-	int flipy = 0;//(m_reel2_ram[(tile_index*2)+1] & 0x40)>>5;
-
-	int priority = (m_reel2_ram[(tile_index*2)+1] & 0x40)>>6;
+	int priority = (m_reel_ram[Reel][(tile_index*2)+1] & 0x40)>>6;
 
 	SET_TILE_INFO_MEMBER(1,
 			code,
@@ -844,36 +825,7 @@ TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_reel2_tile_info)
 			TILE_FLIPYX(flipx | flipy));
 }
 
-TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_reel3_tile_info)
-{
-	int code = m_reel3_ram[(tile_index*2)+0] | (m_reel3_ram[(tile_index*2)+1]<<8);
-	int flipx = (m_reel3_ram[(tile_index*2)+1] & 0x80)>>7;
-	int flipy = 0;//(m_reel3_ram[(tile_index*2)+1] & 0x40)>>5;
-
-	int priority = (m_reel3_ram[(tile_index*2)+1] & 0x40)>>6;
-
-	SET_TILE_INFO_MEMBER(1,
-			code,
-			priority,  // colour abused as priority
-			TILE_FLIPYX(flipx | flipy));
-}
-
-TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_reel4_tile_info)
-{
-	int code = m_reel4_ram[(tile_index*2)+0] | (m_reel4_ram[(tile_index*2)+1]<<8);
-	int flipx = (m_reel4_ram[(tile_index*2)+1] & 0x80)>>7;
-	int flipy = 0;//(m_reel4_ram[(tile_index*2)+1] & 0x40)>>5;
-
-	int priority = (m_reel4_ram[(tile_index*2)+1] & 0x40)>>6;
-
-	SET_TILE_INFO_MEMBER(1,
-			code,
-			priority, // colour abused as priority
-			TILE_FLIPYX(flipx | flipy));
-}
-
-
-WRITE8_MEMBER(sfbonus_state::sfbonus_videoram_w)
+WRITE8_MEMBER(sfbonus_state::videoram_w)
 {
 	if (offset<0x4000) /* 0x0000 - 0x3fff */
 	{
@@ -884,29 +836,29 @@ WRITE8_MEMBER(sfbonus_state::sfbonus_videoram_w)
 	{
 		offset-=0x4000;
 
-		m_reel_ram[offset] = data;
-		m_reel_tilemap->mark_tile_dirty(offset/2);
+		m_reel_ram[0][offset] = data;
+		m_reel_tilemap[0]->mark_tile_dirty(offset/2);
 	}
 	else if (offset<0x5000)  /* 0x4800 - 0x4fff */
 	{
 		offset-=0x4800;
 
-		m_reel2_ram[offset] = data;
-		m_reel2_tilemap->mark_tile_dirty(offset/2);
+		m_reel_ram[1][offset] = data;
+		m_reel_tilemap[1]->mark_tile_dirty(offset/2);
 	}
 	else if (offset<0x5800) /* 0x5000 - 0x57ff */
 	{
 		offset-=0x5000;
 
-		m_reel3_ram[offset] = data;
-		m_reel3_tilemap->mark_tile_dirty(offset/2);
+		m_reel_ram[2][offset] = data;
+		m_reel_tilemap[2]->mark_tile_dirty(offset/2);
 	}
 	else if (offset<0x6000) /* 0x5800 - 0x5fff */
 	{
 		offset-=0x5800;
 
-		m_reel4_ram[offset] = data;
-		m_reel4_tilemap->mark_tile_dirty(offset/2);
+		m_reel_ram[3][offset] = data;
+		m_reel_tilemap[3]->mark_tile_dirty(offset/2);
 	}
 	else if (offset<0x8000)
 	{
@@ -928,33 +880,27 @@ void sfbonus_state::video_start()
 {
 	m_temp_reel_bitmap = std::make_unique<bitmap_ind16>(1024,512);
 
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sfbonus_state::get_sfbonus_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	m_reel_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sfbonus_state::get_sfbonus_reel_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 16);
-	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sfbonus_state::get_sfbonus_reel2_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 16);
-	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sfbonus_state::get_sfbonus_reel3_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 16);
-	m_reel4_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sfbonus_state::get_sfbonus_reel4_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 16);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sfbonus_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sfbonus_state::get_reel_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 16);
+	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sfbonus_state::get_reel_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 16);
+	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sfbonus_state::get_reel_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 16);
+	m_reel_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sfbonus_state::get_reel_tile_info<3>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 16);
 
 	m_tilemap->set_transparent_pen(0);
-	m_reel_tilemap->set_transparent_pen(255);
-	m_reel2_tilemap->set_transparent_pen(255);
-	m_reel3_tilemap->set_transparent_pen(255);
-	m_reel4_tilemap->set_transparent_pen(255);
+
+	for (uint8_t i = 0; i < 4; i++)
+		m_reel_tilemap[i]->set_transparent_pen(255);
 
 	m_tilemap->set_scroll_rows(64);
 
-	m_reel_tilemap->set_scroll_cols(64);
-	m_reel2_tilemap->set_scroll_cols(64);
-	m_reel3_tilemap->set_scroll_cols(64);
-	m_reel4_tilemap->set_scroll_cols(64);
+	for (uint8_t i = 0; i < 4; i++)
+		m_reel_tilemap[i]->set_scroll_cols(64);
 
 
 }
 
 void sfbonus_state::draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int category)
 {
-	int zz;
-	int i;
-	int startclipmin;
 	const rectangle &visarea = screen.visible_area();
 	uint8_t* selectbase = &m_videoram[0x600];
 	uint8_t* bg_scroll = &m_videoram[0x000];
@@ -964,26 +910,26 @@ void sfbonus_state::draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap,
 	globalyscrollreels += 8;
 	globalxscrollreels += 8;
 
-	startclipmin = 0;
+	int startclipmin = 0;
 
-	for (i= 0;i < 0x80;i++)
+	for (int i = 0; i < 0x80; i++)
 	{
 		int scroll;
 		scroll = bg_scroll[(i*2)+0x000] | (bg_scroll[(i*2)+0x001]<<8);
-		m_reel_tilemap->set_scrolly(i, scroll + globalyscrollreels );
+		m_reel_tilemap[0]->set_scrolly(i, scroll + globalyscrollreels );
 
 		scroll = bg_scroll[(i*2)+0x080] | (bg_scroll[(i*2)+0x081]<<8);
-		m_reel2_tilemap->set_scrolly(i, scroll + globalyscrollreels);
+		m_reel_tilemap[1]->set_scrolly(i, scroll + globalyscrollreels);
 
 		scroll = bg_scroll[(i*2)+0x100] | (bg_scroll[(i*2)+0x101]<<8);
-		m_reel3_tilemap->set_scrolly(i, scroll + globalyscrollreels);
+		m_reel_tilemap[2]->set_scrolly(i, scroll + globalyscrollreels);
 
 		scroll = bg_scroll[(i*2)+0x180] | (bg_scroll[(i*2)+0x181]<<8);
-		m_reel4_tilemap->set_scrolly(i, scroll + globalyscrollreels);
+		m_reel_tilemap[3]->set_scrolly(i, scroll + globalyscrollreels);
 	}
 
 //  printf("------------\n");
-	for (zz=0;zz<288;zz++)
+	for (int zz = 0; zz < 288; zz++)
 	{
 		rectangle clip;
 
@@ -1007,91 +953,78 @@ void sfbonus_state::draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap,
 		{
 			rowscroll = reels_rowscroll[((line/8)*2)+0x000] | (reels_rowscroll[((line/8)*2)+0x001]<<8);
 			xxxscroll = globalxscrollreels + rowscroll;
-			m_reel_tilemap->set_scrollx(0, xxxscroll  );
-			m_reel2_tilemap->set_scrollx(0, xxxscroll );
-			m_reel3_tilemap->set_scrollx(0, xxxscroll );
-			m_reel4_tilemap->set_scrollx(0, xxxscroll );
+			for (uint8_t i = 0; i < 4; i++)
+				m_reel_tilemap[i]->set_scrollx(0, xxxscroll  );
 		}
 		else if (rowenable==0x1)
 		{
 			rowscroll = reels_rowscroll[((line/8)*2)+0x080] | (reels_rowscroll[((line/8)*2)+0x081]<<8);
 			xxxscroll = globalxscrollreels + rowscroll;
-			m_reel_tilemap->set_scrollx(0, xxxscroll  );
-			m_reel2_tilemap->set_scrollx(0, xxxscroll );
-			m_reel3_tilemap->set_scrollx(0, xxxscroll );
-			m_reel4_tilemap->set_scrollx(0, xxxscroll );
+			for (uint8_t i = 0; i < 4; i++)
+				m_reel_tilemap[i]->set_scrollx(0, xxxscroll  );
 		}
 		else if (rowenable==0x2)
 		{
 			rowscroll = reels_rowscroll[((line/8)*2)+0x100] | (reels_rowscroll[((line/8)*2)+0x101]<<8);
 			xxxscroll = globalxscrollreels + rowscroll;
-			m_reel_tilemap->set_scrollx(0, xxxscroll  );
-			m_reel2_tilemap->set_scrollx(0, xxxscroll );
-			m_reel3_tilemap->set_scrollx(0, xxxscroll );
-			m_reel4_tilemap->set_scrollx(0, xxxscroll );
+			for (uint8_t i = 0; i < 4; i++)
+				m_reel_tilemap[i]->set_scrollx(0, xxxscroll  );
 		}
 		else if (rowenable==0x3)
 		{
 			rowscroll = reels_rowscroll[((line/8)*2)+0x180] | (reels_rowscroll[((line/8)*2)+0x181]<<8);
 			xxxscroll = globalxscrollreels + rowscroll;
-			m_reel_tilemap->set_scrollx(0, xxxscroll  );
-			m_reel2_tilemap->set_scrollx(0, xxxscroll );
-			m_reel3_tilemap->set_scrollx(0, xxxscroll );
-			m_reel4_tilemap->set_scrollx(0, xxxscroll );
+			for (uint8_t i = 0; i < 4; i++)
+				m_reel_tilemap[i]->set_scrollx(0, xxxscroll  );
 		}
 
 		if (rowenable2==0)
 		{
-			m_reel_tilemap->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(category),3);
+			m_reel_tilemap[0]->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(category),3);
 		}
 		if (rowenable==0)
 		{
-			m_reel_tilemap->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(category),3);
+			m_reel_tilemap[0]->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(category),3);
 		}
 
 		if (rowenable2==0x1)
 		{
-			m_reel2_tilemap->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(category),2);
+			m_reel_tilemap[1]->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(category),2);
 		}
 		if (rowenable==0x1)
 		{
-			m_reel2_tilemap->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(category),2);
+			m_reel_tilemap[1]->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(category),2);
 		}
 
 		if (rowenable2==0x2)
 		{
-			m_reel3_tilemap->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(category),1);
+			m_reel_tilemap[2]->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(category),1);
 		}
 		if (rowenable==0x2)
 		{
-			m_reel3_tilemap->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(category),1);
+			m_reel_tilemap[2]->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(category),1);
 		}
 
 		if (rowenable2==0x3)
 		{
-			m_reel4_tilemap->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(category),4);
+			m_reel_tilemap[3]->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(category),4);
 		}
 		if (rowenable==0x3)
 		{
-			m_reel4_tilemap->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(category),4);
+			m_reel_tilemap[3]->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(category),4);
 		}
-
-
-
-
 
 		startclipmin+=1;
 	}
 
 }
 
-uint32_t sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sfbonus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int globalyscroll = (m_vregs[2] | m_vregs[3]<<8);
 	int globalxscroll = (m_vregs[0] | m_vregs[1]<<8);
 	uint8_t* front_rowscroll = &m_videoram[0x200];
 	ioport_constructor ipt;
-	int i;
 
 	// align to 0
 	globalyscroll += 8;
@@ -1104,11 +1037,9 @@ uint32_t sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind1
 	draw_reel_layer(screen,*m_temp_reel_bitmap,cliprect,0);
 
 	{
-		int y,x;
-
-		for (y=0;y<288;y++)
+		for (int y = 0; y < 288; y++)
 		{
-			for (x=0;x<512;x++)
+			for (int x = 0; x < 512; x++)
 			{
 				uint16_t* src = &m_temp_reel_bitmap->pix16(y, x);
 				uint16_t* dst = &bitmap.pix16(y, x);
@@ -1121,20 +1052,17 @@ uint32_t sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind1
 
 	/* Normal Tilemap */
 	m_tilemap->set_scrolly(0, globalyscroll );
-	for (i=0;i<64;i++)
+	for (int i = 0; i < 64; i++)
 	{
-		int scroll;
-		scroll = front_rowscroll[(i*2)+0x000] | (front_rowscroll[(i*2)+0x001]<<8);
+		int scroll = front_rowscroll[(i*2)+0x000] | (front_rowscroll[(i*2)+0x001]<<8);
 		m_tilemap->set_scrollx(i, scroll+globalxscroll );
 	}
 	m_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	{
-		int y,x;
-
-		for (y=0;y<288;y++)
+		for (int y = 0; y < 288; y++)
 		{
-			for (x=0;x<512;x++)
+			for (int x = 0; x < 512; x++)
 			{
 				uint16_t* src = &m_temp_reel_bitmap->pix16(y, x);
 				uint16_t* dst = &bitmap.pix16(y, x);
@@ -1224,70 +1152,63 @@ uint32_t sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind1
 
 void sfbonus_state::sfbonus_map(address_map &map)
 {
-	map(0x0000, 0xefff).bankr("bank1").w(FUNC(sfbonus_state::sfbonus_videoram_w));
+	map(0x0000, 0xefff).bankr(m_mainbank).w(FUNC(sfbonus_state::videoram_w));
 	map(0xf000, 0xffff).ram().share("nvram");
 }
 
-WRITE8_MEMBER(sfbonus_state::sfbonus_bank_w)
+WRITE8_MEMBER(sfbonus_state::bank_w)
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-	uint8_t bank;
-
-	bank = data & 7;
-
-	membank("bank1")->set_base(&ROM[bank * 0x10000]);
+	m_mainbank->set_entry(data & 7);
 }
 
-
-
-READ8_MEMBER(sfbonus_state::sfbonus_2800_r)
+READ8_MEMBER(sfbonus_state::_2800_r)
 {
 	return machine().rand();
 }
 
-READ8_MEMBER(sfbonus_state::sfbonus_2801_r)
+READ8_MEMBER(sfbonus_state::_2801_r)
 {
 	return machine().rand();
 }
 
-READ8_MEMBER(sfbonus_state::sfbonus_2c00_r)
+READ8_MEMBER(sfbonus_state::_2c00_r)
 {
 	return machine().rand();
 }
 
-READ8_MEMBER(sfbonus_state::sfbonus_2c01_r)
+READ8_MEMBER(sfbonus_state::_2c01_r)
 {
 	return machine().rand();
 }
 
-READ8_MEMBER(sfbonus_state::sfbonus_3800_r)
+READ8_MEMBER(sfbonus_state::_3800_r)
 {
 	return 0xff;
 }
 
 
 // lamps and coin counters
-WRITE8_MEMBER(sfbonus_state::sfbonus_1800_w)
+WRITE8_MEMBER(sfbonus_state::_1800_w)
 {
 	m_1800_regs[offset] = data;
 }
 
-WRITE8_MEMBER(sfbonus_state::sfbonus_3800_w)
+WRITE8_MEMBER(sfbonus_state::_3800_w)
 {
 	m_3800_regs[offset] = data;
 }
 
-WRITE8_MEMBER(sfbonus_state::sfbonus_3000_w)
+WRITE8_MEMBER(sfbonus_state::_3000_w)
 {
 	m_3000_regs[offset] = data;
 }
 
-WRITE8_MEMBER(sfbonus_state::sfbonus_2801_w)
+WRITE8_MEMBER(sfbonus_state::_2801_w)
 {
 	m_2801_regs[offset] = data;
 }
 
-WRITE8_MEMBER(sfbonus_state::sfbonus_2c01_w)
+WRITE8_MEMBER(sfbonus_state::_2c01_w)
 {
 	m_2c01_regs[offset] = data;
 }
@@ -1311,21 +1232,21 @@ void sfbonus_state::sfbonus_io(address_map &map)
 	map(0x0c01, 0x0c01).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x0c02, 0x0c02).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	map(0x1800, 0x1807).w(FUNC(sfbonus_state::sfbonus_1800_w)).share("1800_regs"); // lamps and coin counters
+	map(0x1800, 0x1807).w(FUNC(sfbonus_state::_1800_w)).share("1800_regs"); // lamps and coin counters
 
 	map(0x2400, 0x241f).ram().share("vregs");
 
-	map(0x2800, 0x2800).r(FUNC(sfbonus_state::sfbonus_2800_r));
-	map(0x2801, 0x2801).r(FUNC(sfbonus_state::sfbonus_2801_r)).w(FUNC(sfbonus_state::sfbonus_2801_w)).share("2801_regs");
+	map(0x2800, 0x2800).r(FUNC(sfbonus_state::_2800_r));
+	map(0x2801, 0x2801).r(FUNC(sfbonus_state::_2801_r)).w(FUNC(sfbonus_state::_2801_w)).share("2801_regs");
 
-	map(0x2c00, 0x2c00).r(FUNC(sfbonus_state::sfbonus_2c00_r));
-	map(0x2c01, 0x2c01).r(FUNC(sfbonus_state::sfbonus_2c01_r)).w(FUNC(sfbonus_state::sfbonus_2c01_w)).share("2c01_regs");
+	map(0x2c00, 0x2c00).r(FUNC(sfbonus_state::_2c00_r));
+	map(0x2c01, 0x2c01).r(FUNC(sfbonus_state::_2c01_r)).w(FUNC(sfbonus_state::_2c01_w)).share("2c01_regs");
 
-	map(0x3000, 0x3000).w(FUNC(sfbonus_state::sfbonus_3000_w)).share("3000_regs");
-	map(0x3400, 0x3400).w(FUNC(sfbonus_state::sfbonus_bank_w));
-	map(0x3800, 0x3800).r(FUNC(sfbonus_state::sfbonus_3800_r));
+	map(0x3000, 0x3000).w(FUNC(sfbonus_state::_3000_w)).share("3000_regs");
+	map(0x3400, 0x3400).w(FUNC(sfbonus_state::bank_w));
+	map(0x3800, 0x3800).r(FUNC(sfbonus_state::_3800_r));
 
-	map(0x3800, 0x3807).w(FUNC(sfbonus_state::sfbonus_3800_w)).share("3800_regs");
+	map(0x3800, 0x3807).w(FUNC(sfbonus_state::_3800_w)).share("3800_regs");
 }
 
 
@@ -1363,11 +1284,12 @@ static GFXDECODE_START( gfx_sfbonus )
 GFXDECODE_END
 
 
-void sfbonus_state::machine_reset()
+void sfbonus_state::machine_start()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
+	m_mainbank->configure_entries(0, 8, memregion("maincpu")->base(), 0x10000);
+	m_mainbank->set_entry(0);
 
-	membank("bank1")->set_base(&ROM[0]);
+	m_lamps.resolve();
 }
 
 
@@ -1395,10 +1317,10 @@ void sfbonus_state::sfbonus(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(128*8, 64*8);
 	screen.set_visarea(0*8, 512-1, 0*8, 288-1);
-	screen.set_screen_update(FUNC(sfbonus_state::screen_update_sfbonus));
+	screen.set_screen_update(FUNC(sfbonus_state::screen_update));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_entries(0x100*2); // *2 for priority workaraound / custom drawing
+	PALETTE(config, m_palette).set_entries(0x100*2); // *2 for priority workaround / custom drawing
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &sfbonus_state::ramdac_map);
@@ -5718,6 +5640,26 @@ ROM_START( getrich )
 ROM_END
 
 
+ROM_START( mcircus )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "rom1.bin", 0x00000, 0x80000, CRC(bba311c5) SHA1(1571bc2842c07b169b009a374402ee01a61f98e7) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "rom2.bin", 0x00000, 0x40000, CRC(7087f791) SHA1(cb39a0f8ab134c41f318cd2ad029ea149c2ad7a7) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "rom3.bin", 0x00000, 0x80000, CRC(89fbb1f1) SHA1(281fffe16cba23515fa085b0960dbea83c04bb51) )
+	ROM_LOAD16_BYTE( "rom4.bin", 0x00001, 0x80000, CRC(322c322e) SHA1(762b38b4d6e4abd194d5fdfb75ce81cf13a1a4de) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "rom5.bin", 0x00000, 0x80000, CRC(b83c7020) SHA1(a7fb01c8722c59162774f1e796f8bcfc0a2ad677) )
+	ROM_LOAD16_BYTE( "rom6.bin", 0x00001, 0x80000, CRC(aa5328ba) SHA1(2c371ccad65f4205bdb20ca90f3c194982f401c6) )
+
+	ROM_REGION( 0x1000, "nvram", 0 ) /* default settings */
+	ROM_LOAD( "mcircus.id", 0x0000, 0x1000, CRC(b882f282) SHA1(220377a57ee008d26708e86d435e0e942ae01771) )
+ROM_END
+
+
 /* Not working sets (due to incomplete dumps) */
 
 ROM_START( version4 )
@@ -5866,27 +5808,18 @@ ROM_START( amclink )
 	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00 )
 ROM_END
 
-void sfbonus_state::init_sfbonus_common()
+void sfbonus_state::init_common()
 {
 	m_tilemap_ram = std::make_unique<uint8_t[]>(0x4000);
 	memset(m_tilemap_ram.get(), 0xff, 0x4000);
 	save_pointer(NAME(m_tilemap_ram), 0x4000);
 
-	m_reel_ram = std::make_unique<uint8_t[]>(0x0800);
-	memset(m_reel_ram.get(), 0xff ,0x0800);
-	save_pointer(NAME(m_reel_ram), 0x0800);
-
-	m_reel2_ram = std::make_unique<uint8_t[]>(0x0800);
-	memset(m_reel2_ram.get(), 0xff, 0x0800);
-	save_pointer(NAME(m_reel2_ram), 0x0800);
-
-	m_reel3_ram = std::make_unique<uint8_t[]>(0x0800);
-	memset(m_reel3_ram.get(), 0xff, 0x0800);
-	save_pointer(NAME(m_reel3_ram), 0x0800);
-
-	m_reel4_ram = std::make_unique<uint8_t[]>(0x0800);
-	memset(m_reel4_ram.get(), 0xff, 0x0800);
-	save_pointer(NAME(m_reel4_ram), 0x0800);
+	for (uint8_t i = 0; i < 4; i++)
+	{
+		m_reel_ram[i] = std::make_unique<uint8_t[]>(0x0800);
+		memset(m_reel_ram[i].get(), 0xff ,0x0800);
+		save_pointer(NAME(m_reel_ram[i]), 0x0800, i);
+	}
 
 	m_videoram = std::make_unique<uint8_t[]>(0x10000);
 
@@ -5905,10 +5838,9 @@ void sfbonus_state::sfbonus_bitswap(
 						uint8_t xor6, uint8_t b60, uint8_t b61, uint8_t b62, uint8_t b63, uint8_t b64, uint8_t b65, uint8_t b66,uint8_t b67,
 						uint8_t xor7, uint8_t b70, uint8_t b71, uint8_t b72, uint8_t b73, uint8_t b74, uint8_t b75, uint8_t b76,uint8_t b77 )
 {
-	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	for(i = 0; i < memregion("maincpu")->bytes(); i++)
+	for(int i = 0; i < memregion("maincpu")->bytes(); i++)
 	{
 		uint8_t x = ROM[i];
 
@@ -5926,10 +5858,10 @@ void sfbonus_state::sfbonus_bitswap(
 
 		ROM[i] = x;
 	}
-	init_sfbonus_common();
+	init_common();
 }
 
-//static DRIVER_INIT(helper) { sfbonus_bitswap(machine,  0xff, 7,6,5,4,3,2,1,0, 0xff, 7,6,5,4,3,2,1,0, 0xff, 7,6,5,4,3,2,1,0, 0xff, 7,6,5,4,3,2,1,0, 0xff, 7,6,5,4,3,2,1,0, 0xff, 7,6,5,4,3,2,1,0, 0xff, 7,6,5,4,3,2,1,0, 0xff, 7,6,5,4,3,2,1,0); }
+//void sfbonus_state::init_xxx() { sfbonus_bitswap( 0xff, 7,6,5,4,3,2,1,0, 0xff, 7,6,5,4,3,2,1,0, 0xff, 7,6,5,4,3,2,1,0, 0xff, 7,6,5,4,3,2,1,0, 0xff, 7,6,5,4,3,2,1,0, 0xff, 7,6,5,4,3,2,1,0, 0xff, 7,6,5,4,3,2,1,0, 0xff, 7,6,5,4,3,2,1,0); }
 
 void sfbonus_state::init_abnudge()          { sfbonus_bitswap( 0x33, 0,3,7,6,5,2,1,4, 0xff, 3,7,6,5,1,0,4,2, 0x36, 4,2,3,7,6,5,1,0, 0xa8, 3,2,4,0,1,7,6,5, 0x2c, 0,1,7,6,5,2,4,3, 0xff, 3,7,6,5,1,0,4,2, 0x26, 2,4,3,7,6,5,1,0, 0xbe, 4,1,3,0,2,7,6,5); }
 void sfbonus_state::init_abnudged()         { sfbonus_bitswap( 0x3b, 0,1,7,6,5,4,3,2, 0xef, 0,7,6,5,4,3,2,1, 0x21, 0,2,1,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5, 0x3d, 2,1,7,6,5,4,3,0, 0xed, 2,7,6,5,4,3,1,0, 0x21, 0,2,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5); }
@@ -6046,288 +5978,289 @@ void sfbonus_state::init_spooky()           { sfbonus_bitswap( 0x39, 1,2,7,6,5,4
 void sfbonus_state::init_fbdeluxe()         { sfbonus_bitswap( 0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x21, 1,0,2,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 1,0,7,6,5,4,3,2, 0xec, 1,7,6,5,4,3,2,0, 0x26, 0,2,1,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
 void sfbonus_state::init_fb3g()             { sfbonus_bitswap( 0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x25, 1,0,2,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 1,0,7,6,5,4,3,2, 0xec, 1,7,6,5,4,3,2,0, 0x24, 0,2,1,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
 void sfbonus_state::init_getrich()          { sfbonus_bitswap( 0x3c, 1,2,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x23, 1,0,2,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 1,0,7,6,5,4,3,2, 0xec, 1,7,6,5,4,3,2,0, 0x24, 0,2,1,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
+void sfbonus_state::init_mcircus()          { sfbonus_bitswap( 0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x21, 1,0,2,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 1,0,7,6,5,4,3,2, 0xe9, 1,7,6,5,4,3,2,0, 0x23, 0,2,1,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
 
 
-GAME( 2002, suprball,    0,        sfbonus, amcoe2_reels3, sfbonus_state, init_suprball,        ROT0,  "Amcoe", "Super Ball (Version 1.3)", 0)
+GAME( 2002, suprball,    0,        sfbonus, amcoe2_reels3, sfbonus_state, init_suprball,        ROT0,  "Amcoe", "Super Ball (Version 1.3)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2003, sfbonus,     0,        sfbonus, amcoe2_reels3, sfbonus_state, init_sfbonus,         ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R, set 1)", 0)
-GAME( 2003, sfbonusd1,   sfbonus,  sfbonus, amcoe1_reels3, sfbonus_state, init_sfbonusd,        ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R, set 2)", 0)
-GAME( 2003, sfbonusv1,   sfbonus,  sfbonus, amcoe1_reels3, sfbonus_state, init_sfbonusv,        ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R Dual)", 0)
-GAME( 2003, sfbonuso,    sfbonus,  sfbonus, amcoe2_reels3, sfbonus_state, init_sfbonus,         ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.7)", 0)
-GAME( 2003, sfbonuso2,   sfbonus,  sfbonus, amcoe2_reels3, sfbonus_state, init_sfbonus,         ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.6)", 0)
+GAME( 2003, sfbonus,     0,        sfbonus, amcoe2_reels3, sfbonus_state, init_sfbonus,         ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, sfbonusd1,   sfbonus,  sfbonus, amcoe1_reels3, sfbonus_state, init_sfbonusd,        ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, sfbonusv1,   sfbonus,  sfbonus, amcoe1_reels3, sfbonus_state, init_sfbonusv,        ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, sfbonuso,    sfbonus,  sfbonus, amcoe2_reels3, sfbonus_state, init_sfbonus,         ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.7)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, sfbonuso2,   sfbonus,  sfbonus, amcoe2_reels3, sfbonus_state, init_sfbonus,         ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.6)", MACHINE_SUPPORTS_SAVE )
 
-GAMEL( 2004, parrot3,    0,        sfbonus, amcoe1_poker,  sfbonus_state, init_parrot3v,        ROT0,  "Amcoe", "Parrot Poker III (Version 2.6E Dual)", 0, layout_pirpok2)
-GAMEL( 2004, parrot3b1,  parrot3,  sfbonus, amcoe2_poker,  sfbonus_state, init_pirpok2,         ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R, set 1)", 0, layout_pirpok2)
-GAMEL( 2004, parrot3d1,  parrot3,  sfbonus, amcoe1_poker,  sfbonus_state, init_parrot3d,        ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R, set 2)", 0, layout_pirpok2)
-GAMEL( 2004, parrot3v1,  parrot3,  sfbonus, amcoe1_poker,  sfbonus_state, init_parrot3v2,       ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R Dual)", 0, layout_pirpok2)
-GAMEL( 2003, parrot3o,   parrot3,  sfbonus, amcoe2_poker,  sfbonus_state, init_pirpok2,         ROT0,  "Amcoe", "Parrot Poker III (Version 2.4)", 0, layout_pirpok2)
+GAMEL( 2004, parrot3,    0,        sfbonus, amcoe1_poker,  sfbonus_state, init_parrot3v,        ROT0,  "Amcoe", "Parrot Poker III (Version 2.6E Dual)", MACHINE_SUPPORTS_SAVE, layout_pirpok2)
+GAMEL( 2004, parrot3b1,  parrot3,  sfbonus, amcoe2_poker,  sfbonus_state, init_pirpok2,         ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R, set 1)", MACHINE_SUPPORTS_SAVE, layout_pirpok2)
+GAMEL( 2004, parrot3d1,  parrot3,  sfbonus, amcoe1_poker,  sfbonus_state, init_parrot3d,        ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R, set 2)", MACHINE_SUPPORTS_SAVE, layout_pirpok2)
+GAMEL( 2004, parrot3v1,  parrot3,  sfbonus, amcoe1_poker,  sfbonus_state, init_parrot3v2,       ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R Dual)", MACHINE_SUPPORTS_SAVE, layout_pirpok2)
+GAMEL( 2003, parrot3o,   parrot3,  sfbonus, amcoe2_poker,  sfbonus_state, init_pirpok2,         ROT0,  "Amcoe", "Parrot Poker III (Version 2.4)", MACHINE_SUPPORTS_SAVE, layout_pirpok2)
 
-GAME( 2000, hldspin1,    0,        sfbonus, amcoe2_reels3, sfbonus_state, init_hldspin1,        ROT0,  "Amcoe", "Hold & Spin I (Version 2.7T, set 1)", 0)
-GAME( 2000, hldspin1dt,  hldspin1, sfbonus, amcoe1_reels3, sfbonus_state, init_hldspin1d,       ROT0,  "Amcoe", "Hold & Spin I (Version 2.7T, set 2)", 0)
-GAME( 2000, hldspin1vt,  hldspin1, sfbonus, amcoe1_reels3, sfbonus_state, init_hldspin1v,       ROT0,  "Amcoe", "Hold & Spin I (Version 2.7T Dual)", 0)
-GAME( 2000, hldspin1o,   hldspin1, sfbonus, amcoe2_reels3, sfbonus_state, init_hldspin1,        ROT0,  "Amcoe", "Hold & Spin I (Version 2.5T)", 0)
+GAME( 2000, hldspin1,    0,        sfbonus, amcoe2_reels3, sfbonus_state, init_hldspin1,        ROT0,  "Amcoe", "Hold & Spin I (Version 2.7T, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hldspin1dt,  hldspin1, sfbonus, amcoe1_reels3, sfbonus_state, init_hldspin1d,       ROT0,  "Amcoe", "Hold & Spin I (Version 2.7T, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hldspin1vt,  hldspin1, sfbonus, amcoe1_reels3, sfbonus_state, init_hldspin1v,       ROT0,  "Amcoe", "Hold & Spin I (Version 2.7T Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hldspin1o,   hldspin1, sfbonus, amcoe2_reels3, sfbonus_state, init_hldspin1,        ROT0,  "Amcoe", "Hold & Spin I (Version 2.5T)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2000, hldspin2,    0,        sfbonus, amcoe2_reels3, sfbonus_state, init_hldspin2,        ROT0,  "Amcoe", "Hold & Spin II (Version 2.8R, set 1)", 0)
-GAME( 2000, hldspin2d1,  hldspin2, sfbonus, amcoe1_reels3, sfbonus_state, init_hldspin2d,       ROT0,  "Amcoe", "Hold & Spin II (Version 2.8R, set 2)", 0) // some text corruption on first reset (MIN PLAY etc. real game bug?)
-GAME( 2000, hldspin2v1,  hldspin2, sfbonus, amcoe1_reels3, sfbonus_state, init_hldspin2v,       ROT0,  "Amcoe", "Hold & Spin II (Version 2.8R Dual)", 0)  // some text corruption on first reset (MIN PLAY etc. real game bug?)
-GAME( 2000, hldspin2o,   hldspin2, sfbonus, amcoe2_reels3, sfbonus_state, init_hldspin2,        ROT0,  "Amcoe", "Hold & Spin II (Version 2.6)", 0)
+GAME( 2000, hldspin2,    0,        sfbonus, amcoe2_reels3, sfbonus_state, init_hldspin2,        ROT0,  "Amcoe", "Hold & Spin II (Version 2.8R, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hldspin2d1,  hldspin2, sfbonus, amcoe1_reels3, sfbonus_state, init_hldspin2d,       ROT0,  "Amcoe", "Hold & Spin II (Version 2.8R, set 2)", MACHINE_SUPPORTS_SAVE ) // some text corruption on first reset (MIN PLAY etc. real game bug?)
+GAME( 2000, hldspin2v1,  hldspin2, sfbonus, amcoe1_reels3, sfbonus_state, init_hldspin2v,       ROT0,  "Amcoe", "Hold & Spin II (Version 2.8R Dual)", MACHINE_SUPPORTS_SAVE )  // some text corruption on first reset (MIN PLAY etc. real game bug?)
+GAME( 2000, hldspin2o,   hldspin2, sfbonus, amcoe2_reels3, sfbonus_state, init_hldspin2,        ROT0,  "Amcoe", "Hold & Spin II (Version 2.6)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2003, fcnudge,     0,        sfbonus, amcoe1_reels3, sfbonus_state, init_fruitcar,        ROT0,  "Amcoe", "Fruit Carnival Nudge (Version 2.1 Dual)", 0)
-GAME( 2003, fcnudgeo,    fcnudge,  sfbonus, amcoe2_reels3, sfbonus_state, init_fruitcar2,       ROT0,  "Amcoe", "Fruit Carnival Nudge (Version 2.0, set 1)", 0)
-GAME( 2003, fcnudgeo2,   fcnudge,  sfbonus, amcoe1_reels3, sfbonus_state, init_fruitcar3,       ROT0,  "Amcoe", "Fruit Carnival Nudge (Version 2.0, set 2)", 0)
-GAME( 2003, fcnudgeo3,   fcnudge,  sfbonus, amcoe2_reels3, sfbonus_state, init_abnudge,         ROT0,  "Amcoe", "Fruit Carnival Nudge (Version 1.7)", 0)
+GAME( 2003, fcnudge,     0,        sfbonus, amcoe1_reels3, sfbonus_state, init_fruitcar,        ROT0,  "Amcoe", "Fruit Carnival Nudge (Version 2.1 Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, fcnudgeo,    fcnudge,  sfbonus, amcoe2_reels3, sfbonus_state, init_fruitcar2,       ROT0,  "Amcoe", "Fruit Carnival Nudge (Version 2.0, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, fcnudgeo2,   fcnudge,  sfbonus, amcoe1_reels3, sfbonus_state, init_fruitcar3,       ROT0,  "Amcoe", "Fruit Carnival Nudge (Version 2.0, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, fcnudgeo3,   fcnudge,  sfbonus, amcoe2_reels3, sfbonus_state, init_abnudge,         ROT0,  "Amcoe", "Fruit Carnival Nudge (Version 1.7)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, pickwin,     0,        sfbonus, amcoe1_reels4, sfbonus_state, init_pickwinv2,       ROT0,  "Amcoe", "Pick 'n Win (Version 2.9E Dual)", 0)
-GAME( 2001, pickwinb1,   pickwin,  sfbonus, amcoe2_reels4, sfbonus_state, init_pickwin,         ROT0,  "Amcoe", "Pick 'n Win (Version 2.9R, set 1)", 0)
-GAME( 2001, pickwind1,   pickwin,  sfbonus, amcoe1_reels4, sfbonus_state, init_pickwind,        ROT0,  "Amcoe", "Pick 'n Win (Version 2.9R, set 2)", 0)
-GAME( 2001, pickwinv1,   pickwin,  sfbonus, amcoe1_reels4, sfbonus_state, init_pickwinv,        ROT0,  "Amcoe", "Pick 'n Win (Version 2.9R Dual)", 0)
-GAME( 2001, pickwinbt,   pickwin,  sfbonus, amcoe2_reels4, sfbonus_state, init_pickwin,         ROT0,  "Amcoe", "Pick 'n Win (Version 2.8T, set 1)", 0)
-GAME( 2001, pickwindt,   pickwin,  sfbonus, amcoe1_reels4, sfbonus_state, init_pickwind,        ROT0,  "Amcoe", "Pick 'n Win (Version 2.8T, set 2)", 0)
-GAME( 2001, pickwinvt,   pickwin,  sfbonus, amcoe1_reels4, sfbonus_state, init_pickwinv,        ROT0,  "Amcoe", "Pick 'n Win (Version 2.8T, Dual)", 0)
-GAME( 2001, pickwino,    pickwin,  sfbonus, amcoe2_reels4, sfbonus_state, init_pickwin,         ROT0,  "Amcoe", "Pick 'n Win (Version 2.6)", 0)
-GAME( 2001, pickwino2,   pickwin,  sfbonus, amcoe2_reels4, sfbonus_state, init_pickwin,         ROT0,  "Amcoe", "Pick 'n Win (Version 2.5T)", 0)
+GAME( 2001, pickwin,     0,        sfbonus, amcoe1_reels4, sfbonus_state, init_pickwinv2,       ROT0,  "Amcoe", "Pick 'n Win (Version 2.9E Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pickwinb1,   pickwin,  sfbonus, amcoe2_reels4, sfbonus_state, init_pickwin,         ROT0,  "Amcoe", "Pick 'n Win (Version 2.9R, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pickwind1,   pickwin,  sfbonus, amcoe1_reels4, sfbonus_state, init_pickwind,        ROT0,  "Amcoe", "Pick 'n Win (Version 2.9R, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pickwinv1,   pickwin,  sfbonus, amcoe1_reels4, sfbonus_state, init_pickwinv,        ROT0,  "Amcoe", "Pick 'n Win (Version 2.9R Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pickwinbt,   pickwin,  sfbonus, amcoe2_reels4, sfbonus_state, init_pickwin,         ROT0,  "Amcoe", "Pick 'n Win (Version 2.8T, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pickwindt,   pickwin,  sfbonus, amcoe1_reels4, sfbonus_state, init_pickwind,        ROT0,  "Amcoe", "Pick 'n Win (Version 2.8T, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pickwinvt,   pickwin,  sfbonus, amcoe1_reels4, sfbonus_state, init_pickwinv,        ROT0,  "Amcoe", "Pick 'n Win (Version 2.8T, Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pickwino,    pickwin,  sfbonus, amcoe2_reels4, sfbonus_state, init_pickwin,         ROT0,  "Amcoe", "Pick 'n Win (Version 2.6)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pickwino2,   pickwin,  sfbonus, amcoe2_reels4, sfbonus_state, init_pickwin,         ROT0,  "Amcoe", "Pick 'n Win (Version 2.5T)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2004, tighook,     0,        sfbonus, amcoe1_reels3, sfbonus_state, init_tighookv2,       ROT0,  "Amcoe", "Tiger Hook (Version 2.1E Dual)", 0)
-GAME( 2004, tighookc1,   tighook,  sfbonus, amcoe1_reels3, sfbonus_state, init_tighook,         ROT0,  "Amcoe", "Tiger Hook (Version 2.1R, set 1)", 0)
-GAME( 2004, tighookd1,   tighook,  sfbonus, amcoe1_reels3, sfbonus_state, init_tighookd,        ROT0,  "Amcoe", "Tiger Hook (Version 2.1R, set 2)", 0)
-GAME( 2004, tighookv1,   tighook,  sfbonus, amcoe1_reels3, sfbonus_state, init_tighookv,        ROT0,  "Amcoe", "Tiger Hook (Version 2.1R Dual)", 0)
-GAME( 2004, tighookc2,   tighook,  sfbonus, amcoe1_reels3, sfbonus_state, init_tighook,         ROT0,  "Amcoe", "Tiger Hook (Version 2.0LT, set 1)", 0)
-GAME( 2004, tighookd2,   tighook,  sfbonus, amcoe1_reels3, sfbonus_state, init_tighookd,        ROT0,  "Amcoe", "Tiger Hook (Version 2.0LT, set 2)", 0)
-GAME( 2004, tighookv2,   tighook,  sfbonus, amcoe1_reels3, sfbonus_state, init_tighookv,        ROT0,  "Amcoe", "Tiger Hook (Version 2.0LT Dual)", 0)
-GAME( 2004, tighooko,    tighook,  sfbonus, amcoe1_reels3, sfbonus_state, init_tighook,         ROT0,  "Amcoe", "Tiger Hook (Version 1.7XT)", 0)
-GAME( 2004, tighooko2,   tighook,  sfbonus, amcoe1_reels3, sfbonus_state, init_tighook,         ROT0,  "Amcoe", "Tiger Hook (Version 1.7)", 0)
+GAME( 2004, tighook,     0,        sfbonus, amcoe1_reels3, sfbonus_state, init_tighookv2,       ROT0,  "Amcoe", "Tiger Hook (Version 2.1E Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, tighookc1,   tighook,  sfbonus, amcoe1_reels3, sfbonus_state, init_tighook,         ROT0,  "Amcoe", "Tiger Hook (Version 2.1R, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, tighookd1,   tighook,  sfbonus, amcoe1_reels3, sfbonus_state, init_tighookd,        ROT0,  "Amcoe", "Tiger Hook (Version 2.1R, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, tighookv1,   tighook,  sfbonus, amcoe1_reels3, sfbonus_state, init_tighookv,        ROT0,  "Amcoe", "Tiger Hook (Version 2.1R Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, tighookc2,   tighook,  sfbonus, amcoe1_reels3, sfbonus_state, init_tighook,         ROT0,  "Amcoe", "Tiger Hook (Version 2.0LT, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, tighookd2,   tighook,  sfbonus, amcoe1_reels3, sfbonus_state, init_tighookd,        ROT0,  "Amcoe", "Tiger Hook (Version 2.0LT, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, tighookv2,   tighook,  sfbonus, amcoe1_reels3, sfbonus_state, init_tighookv,        ROT0,  "Amcoe", "Tiger Hook (Version 2.0LT Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, tighooko,    tighook,  sfbonus, amcoe1_reels3, sfbonus_state, init_tighook,         ROT0,  "Amcoe", "Tiger Hook (Version 1.7XT)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, tighooko2,   tighook,  sfbonus, amcoe1_reels3, sfbonus_state, init_tighook,         ROT0,  "Amcoe", "Tiger Hook (Version 1.7)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2004, robadv,      0,        sfbonus, amcoe1_reels3, sfbonus_state, init_robadv2v4,       ROT0,  "Amcoe", "Robin's Adventure (Version 1.7E Dual)", 0)
-GAME( 2004, robadvc1,    robadv,   sfbonus, amcoe1_reels3, sfbonus_state, init_robadv,          ROT0,  "Amcoe", "Robin's Adventure (Version 1.7R, set 1)", 0)
-GAME( 2004, robadvd1,    robadv,   sfbonus, amcoe1_reels3, sfbonus_state, init_robadv2d,        ROT0,  "Amcoe", "Robin's Adventure (Version 1.7R, set 2)", 0)
-GAME( 2004, robadvv1,    robadv,   sfbonus, amcoe1_reels3, sfbonus_state, init_robadv2v1,       ROT0,  "Amcoe", "Robin's Adventure (Version 1.7R Dual)", 0)
-GAME( 2004, robadvo,     robadv,   sfbonus, amcoe1_reels3, sfbonus_state, init_robadv,          ROT0,  "Amcoe", "Robin's Adventure (Version 1.5)", 0)
+GAME( 2004, robadv,      0,        sfbonus, amcoe1_reels3, sfbonus_state, init_robadv2v4,       ROT0,  "Amcoe", "Robin's Adventure (Version 1.7E Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, robadvc1,    robadv,   sfbonus, amcoe1_reels3, sfbonus_state, init_robadv,          ROT0,  "Amcoe", "Robin's Adventure (Version 1.7R, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, robadvd1,    robadv,   sfbonus, amcoe1_reels3, sfbonus_state, init_robadv2d,        ROT0,  "Amcoe", "Robin's Adventure (Version 1.7R, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, robadvv1,    robadv,   sfbonus, amcoe1_reels3, sfbonus_state, init_robadv2v1,       ROT0,  "Amcoe", "Robin's Adventure (Version 1.7R Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, robadvo,     robadv,   sfbonus, amcoe1_reels3, sfbonus_state, init_robadv,          ROT0,  "Amcoe", "Robin's Adventure (Version 1.5)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2004, robadv2,     0,        sfbonus, amcoe1_reels3, sfbonus_state, init_robadv2v4,       ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.7E Dual)", 0)
-GAME( 2004, robadv2c1,   robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_robadv,          ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.7R, set 1)", 0)
-GAME( 2004, robadv2d1,   robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_robadv2d,        ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.7R, set 2)", 0)
-GAME( 2004, robadv2v1,   robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_robadv2v1,       ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.7R Dual)", 0)
-GAME( 2004, robadv2c2,   robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_robadv,          ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.7LT, set 1)", 0)
-GAME( 2004, robadv2d2,   robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_robadv2d,        ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.7LT, set 2)", 0)
-GAME( 2004, robadv2v2,   robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_robadv2v1,       ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.7LT Dual)", 0)
-GAME( 2004, robadv2c3,   robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_robadv,          ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.7SH, set 1)", 0)
-GAME( 2004, robadv2d3,   robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_robadv2d,        ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.7SH, set 2)", 0)
-GAME( 2004, robadv2v3,   robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_robadv2v1,       ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.7SH Dual)", 0)
-GAME( 2004, robadv2o,    robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_robadv,          ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.5SH)", 0)
-GAME( 2004, robadv2o2,   robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_robadv,          ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.5)", 0)
+GAME( 2004, robadv2,     0,        sfbonus, amcoe1_reels3, sfbonus_state, init_robadv2v4,       ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.7E Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, robadv2c1,   robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_robadv,          ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.7R, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, robadv2d1,   robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_robadv2d,        ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.7R, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, robadv2v1,   robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_robadv2v1,       ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.7R Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, robadv2c2,   robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_robadv,          ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.7LT, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, robadv2d2,   robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_robadv2d,        ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.7LT, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, robadv2v2,   robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_robadv2v1,       ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.7LT Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, robadv2c3,   robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_robadv,          ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.7SH, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, robadv2d3,   robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_robadv2d,        ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.7SH, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, robadv2v3,   robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_robadv2v1,       ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.7SH Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, robadv2o,    robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_robadv,          ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.5SH)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, robadv2o2,   robadv2,  sfbonus, amcoe1_reels3, sfbonus_state, init_robadv,          ROT0,  "Amcoe", "Robin's Adventure 2 (Version 1.5)", MACHINE_SUPPORTS_SAVE )
 
-GAMEL( 2003, pirpok2,    0,        sfbonus, amcoe1_poker,  sfbonus_state, init_pirpok2v2,       ROT0,  "Amcoe", "Pirate Poker II (Version 2.4E Dual)", 0, layout_pirpok2)
-GAMEL( 2003, pirpok2b1,  pirpok2,  sfbonus, amcoe2_poker,  sfbonus_state, init_pirpok2,         ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R, set 1)", 0, layout_pirpok2)
-GAMEL( 2003, pirpok2d1,  pirpok2,  sfbonus, amcoe1_poker,  sfbonus_state, init_pirpok2d,        ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R, set 2)", 0, layout_pirpok2)
-GAMEL( 2003, pirpok2v1,  pirpok2,  sfbonus, amcoe1_poker,  sfbonus_state, init_pirpok2v,        ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R Dual)", 0, layout_pirpok2)
-GAMEL( 2003, pirpok2o,   pirpok2,  sfbonus, amcoe2_poker,  sfbonus_state, init_pirpok2,         ROT0,  "Amcoe", "Pirate Poker II (Version 2.0)", 0, layout_pirpok2)
+GAMEL( 2003, pirpok2,    0,        sfbonus, amcoe1_poker,  sfbonus_state, init_pirpok2v2,       ROT0,  "Amcoe", "Pirate Poker II (Version 2.4E Dual)", MACHINE_SUPPORTS_SAVE, layout_pirpok2 )
+GAMEL( 2003, pirpok2b1,  pirpok2,  sfbonus, amcoe2_poker,  sfbonus_state, init_pirpok2,         ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R, set 1)", MACHINE_SUPPORTS_SAVE, layout_pirpok2)
+GAMEL( 2003, pirpok2d1,  pirpok2,  sfbonus, amcoe1_poker,  sfbonus_state, init_pirpok2d,        ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R, set 2)", MACHINE_SUPPORTS_SAVE, layout_pirpok2)
+GAMEL( 2003, pirpok2v1,  pirpok2,  sfbonus, amcoe1_poker,  sfbonus_state, init_pirpok2v,        ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R Dual)", MACHINE_SUPPORTS_SAVE, layout_pirpok2)
+GAMEL( 2003, pirpok2o,   pirpok2,  sfbonus, amcoe2_poker,  sfbonus_state, init_pirpok2,         ROT0,  "Amcoe", "Pirate Poker II (Version 2.0)", MACHINE_SUPPORTS_SAVE, layout_pirpok2)
 
-GAME( 2003, anibonus,    0,        sfbonus, amcoe1_reels3, sfbonus_state, init_anibonusv3,      ROT0,  "Amcoe", "Animal Bonus (Version 1.8E Dual)", 0)
-GAME( 2003, anibonusv1,  anibonus, sfbonus, amcoe1_reels3, sfbonus_state, init_anibonusv,       ROT0,  "Amcoe", "Animal Bonus (Version 1.8R Dual)", 0)
-GAME( 2003, anibonusv2,  anibonus, sfbonus, amcoe1_reels3, sfbonus_state, init_anibonusv,       ROT0,  "Amcoe", "Animal Bonus (Version 1.8LT Dual)", 0)
-GAME( 2003, anibonusb1,  anibonus, sfbonus, amcoe2_reels3, sfbonus_state, init_anibonus,        ROT0,  "Amcoe", "Animal Bonus (Version 1.7R, set 1)", 0)
-GAME( 2003, anibonusd1,  anibonus, sfbonus, amcoe1_reels3, sfbonus_state, init_anibonusd,       ROT0,  "Amcoe", "Animal Bonus (Version 1.7R, set 2)", 0)
-GAME( 2003, anibonusb2,  anibonus, sfbonus, amcoe2_reels3, sfbonus_state, init_anibonus,        ROT0,  "Amcoe", "Animal Bonus (Version 1.7LT, set 1)", 0)
-GAME( 2003, anibonusd2,  anibonus, sfbonus, amcoe1_reels3, sfbonus_state, init_anibonusd,       ROT0,  "Amcoe", "Animal Bonus (Version 1.7LT, set 2)", 0)
-GAME( 2003, anibonuso,   anibonus, sfbonus, amcoe2_reels3, sfbonus_state, init_anibonus,        ROT0,  "Amcoe", "Animal Bonus (Version 1.5)", 0)
-GAME( 2003, anibonuso2,  anibonus, sfbonus, amcoe2_reels3, sfbonus_state, init_anibonus3,       ROT0,  "Amcoe", "Animal Bonus (Version 1.4, set 1)", 0)
-GAME( 2003, anibonuso3,  anibonus, sfbonus, amcoe2_reels3, sfbonus_state, init_anibonus,        ROT0,  "Amcoe", "Animal Bonus (Version 1.4, set 2)", 0)
-GAME( 2003, anibonusxo,  anibonus, sfbonus, amcoe2_reels3, sfbonus_state, init_anibonus,        ROT0,  "Amcoe", "Animal Bonus (Version 1.50XT)", 0)
-GAME( 2003, anibonusxo2, anibonus, sfbonus, amcoe2_reels3, sfbonus_state, init_anibonus3,       ROT0,  "Amcoe", "Animal Bonus (Version 1.40XT, set 1)", 0)
-GAME( 2003, anibonusxo3, anibonus, sfbonus, amcoe2_reels3, sfbonus_state, init_anibonus,        ROT0,  "Amcoe", "Animal Bonus (Version 1.40XT, set 2)", 0)
+GAME( 2003, anibonus,    0,        sfbonus, amcoe1_reels3, sfbonus_state, init_anibonusv3,      ROT0,  "Amcoe", "Animal Bonus (Version 1.8E Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, anibonusv1,  anibonus, sfbonus, amcoe1_reels3, sfbonus_state, init_anibonusv,       ROT0,  "Amcoe", "Animal Bonus (Version 1.8R Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, anibonusv2,  anibonus, sfbonus, amcoe1_reels3, sfbonus_state, init_anibonusv,       ROT0,  "Amcoe", "Animal Bonus (Version 1.8LT Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, anibonusb1,  anibonus, sfbonus, amcoe2_reels3, sfbonus_state, init_anibonus,        ROT0,  "Amcoe", "Animal Bonus (Version 1.7R, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, anibonusd1,  anibonus, sfbonus, amcoe1_reels3, sfbonus_state, init_anibonusd,       ROT0,  "Amcoe", "Animal Bonus (Version 1.7R, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, anibonusb2,  anibonus, sfbonus, amcoe2_reels3, sfbonus_state, init_anibonus,        ROT0,  "Amcoe", "Animal Bonus (Version 1.7LT, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, anibonusd2,  anibonus, sfbonus, amcoe1_reels3, sfbonus_state, init_anibonusd,       ROT0,  "Amcoe", "Animal Bonus (Version 1.7LT, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, anibonuso,   anibonus, sfbonus, amcoe2_reels3, sfbonus_state, init_anibonus,        ROT0,  "Amcoe", "Animal Bonus (Version 1.5)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, anibonuso2,  anibonus, sfbonus, amcoe2_reels3, sfbonus_state, init_anibonus3,       ROT0,  "Amcoe", "Animal Bonus (Version 1.4, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, anibonuso3,  anibonus, sfbonus, amcoe2_reels3, sfbonus_state, init_anibonus,        ROT0,  "Amcoe", "Animal Bonus (Version 1.4, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, anibonusxo,  anibonus, sfbonus, amcoe2_reels3, sfbonus_state, init_anibonus,        ROT0,  "Amcoe", "Animal Bonus (Version 1.50XT)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, anibonusxo2, anibonus, sfbonus, amcoe2_reels3, sfbonus_state, init_anibonus3,       ROT0,  "Amcoe", "Animal Bonus (Version 1.40XT, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, anibonusxo3, anibonus, sfbonus, amcoe2_reels3, sfbonus_state, init_anibonus,        ROT0,  "Amcoe", "Animal Bonus (Version 1.40XT, set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2003, abnudge,     0,        sfbonus, amcoe1_reels3, sfbonus_state, init_abnudgev,        ROT0,  "Amcoe", "Animal Bonus Nudge (Version 2.1 Dual)", 0)
-GAME( 2003, abnudgeb,    abnudge,  sfbonus, amcoe2_reels3, sfbonus_state, init_abnudge,         ROT0,  "Amcoe", "Animal Bonus Nudge (Version 2.0, set 1)", 0)
-GAME( 2003, abnudged,    abnudge,  sfbonus, amcoe1_reels3, sfbonus_state, init_abnudged,        ROT0,  "Amcoe", "Animal Bonus Nudge (Version 2.0, set 2)", 0)
-GAME( 2003, abnudgeo,    abnudge,  sfbonus, amcoe2_reels3, sfbonus_state, init_abnudge,         ROT0,  "Amcoe", "Animal Bonus Nudge (Version 1.7)", 0)
+GAME( 2003, abnudge,     0,        sfbonus, amcoe1_reels3, sfbonus_state, init_abnudgev,        ROT0,  "Amcoe", "Animal Bonus Nudge (Version 2.1 Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, abnudgeb,    abnudge,  sfbonus, amcoe2_reels3, sfbonus_state, init_abnudge,         ROT0,  "Amcoe", "Animal Bonus Nudge (Version 2.0, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, abnudged,    abnudge,  sfbonus, amcoe1_reels3, sfbonus_state, init_abnudged,        ROT0,  "Amcoe", "Animal Bonus Nudge (Version 2.0, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, abnudgeo,    abnudge,  sfbonus, amcoe2_reels3, sfbonus_state, init_abnudge,         ROT0,  "Amcoe", "Animal Bonus Nudge (Version 1.7)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2003, dblchal,     0,        sfbonus, amcoe2_reels3, sfbonus_state, init_dblchal,         ROT0,  "Amcoe", "Double Challenge (Version 1.5R, set 1)", 0)
-GAME( 2003, dblchalc1,   dblchal,  sfbonus, amcoe1_reels3, sfbonus_state, init_dblchal,         ROT0,  "Amcoe", "Double Challenge (Version 1.5R, set 2)", 0)
-GAME( 2003, dblchald1,   dblchal,  sfbonus, amcoe1_reels3, sfbonus_state, init_dblchald,        ROT0,  "Amcoe", "Double Challenge (Version 1.5R, set 3)", 0)
-GAME( 2003, dblchalv1,   dblchal,  sfbonus, amcoe1_reels3, sfbonus_state, init_dblchalv,        ROT0,  "Amcoe", "Double Challenge (Version 1.5R Dual)", 0)
-GAME( 2003, dblchalo,    dblchal,  sfbonus, amcoe2_reels3, sfbonus_state, init_dblchal,         ROT0,  "Amcoe", "Double Challenge (Version 1.1)", 0)
+GAME( 2003, dblchal,     0,        sfbonus, amcoe2_reels3, sfbonus_state, init_dblchal,         ROT0,  "Amcoe", "Double Challenge (Version 1.5R, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, dblchalc1,   dblchal,  sfbonus, amcoe1_reels3, sfbonus_state, init_dblchal,         ROT0,  "Amcoe", "Double Challenge (Version 1.5R, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, dblchald1,   dblchal,  sfbonus, amcoe1_reels3, sfbonus_state, init_dblchald,        ROT0,  "Amcoe", "Double Challenge (Version 1.5R, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, dblchalv1,   dblchal,  sfbonus, amcoe1_reels3, sfbonus_state, init_dblchalv,        ROT0,  "Amcoe", "Double Challenge (Version 1.5R Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, dblchalo,    dblchal,  sfbonus, amcoe2_reels3, sfbonus_state, init_dblchal,         ROT0,  "Amcoe", "Double Challenge (Version 1.1)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2003, anithunt,    0,        sfbonus, amcoe2_reels3, sfbonus_state, init_anithunt,        ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.9R, set 1)", 0)
-GAME( 2003, anithuntd1,  anithunt, sfbonus, amcoe1_reels3, sfbonus_state, init_anithuntd,       ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.9R, set 2)", 0)
-GAME( 2003, anithuntv1,  anithunt, sfbonus, amcoe1_reels3, sfbonus_state, init_anithuntv,       ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.9R Dual)", 0)
-GAME( 2003, anithunto,   anithunt, sfbonus, amcoe2_reels3, sfbonus_state, init_anithunt,        ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.7)", 0)
-GAME( 2003, anithunto2,  anithunt, sfbonus, amcoe2_reels3, sfbonus_state, init_anithunt,        ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.5)", 0)
+GAME( 2003, anithunt,    0,        sfbonus, amcoe2_reels3, sfbonus_state, init_anithunt,        ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.9R, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, anithuntd1,  anithunt, sfbonus, amcoe1_reels3, sfbonus_state, init_anithuntd,       ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.9R, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, anithuntv1,  anithunt, sfbonus, amcoe1_reels3, sfbonus_state, init_anithuntv,       ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.9R Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, anithunto,   anithunt, sfbonus, amcoe2_reels3, sfbonus_state, init_anithunt,        ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.7)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, anithunto2,  anithunt, sfbonus, amcoe2_reels3, sfbonus_state, init_anithunt,        ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.5)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2002, sfruitb,     0,        sfbonus, amcoe1_reels3, sfbonus_state, init_sfruitbv2,       ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.5E Dual)", 0)
-GAME( 2002, sfruitbb1,   sfruitb,  sfbonus, amcoe2_reels3, sfbonus_state, init_sfruitb,         ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.5R, set 1)", 0)
-GAME( 2002, sfruitbd1,   sfruitb,  sfbonus, amcoe1_reels3, sfbonus_state, init_sfruitbd,        ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.5R, set 2)", 0)
-GAME( 2002, sfruitbv1,   sfruitb,  sfbonus, amcoe1_reels3, sfbonus_state, init_sfruitbv,        ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.5R Dual)", 0)
-GAME( 2002, sfruitbb2,   sfruitb,  sfbonus, amcoe2_reels3, sfbonus_state, init_sfruitb,         ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0LT, set 1)", 0)
-GAME( 2002, sfruitbd2,   sfruitb,  sfbonus, amcoe1_reels3, sfbonus_state, init_sfruitbd,        ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0LT, set 2)", 0)
-GAME( 2002, sfruitbv2,   sfruitb,  sfbonus, amcoe1_reels3, sfbonus_state, init_sfruitbv,        ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0LT Dual)", 0)
-GAME( 2002, sfruitbo,    sfruitb,  sfbonus, amcoe2_reels3, sfbonus_state, init_sfruitb,         ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0)", 0)
-GAME( 2002, sfruitbo2,   sfruitb,  sfbonus, amcoe2_reels3, sfbonus_state, init_sfruitb,         ROT0,  "Amcoe", "Super Fruit Bonus (Version 1.80XT)", 0)
+GAME( 2002, sfruitb,     0,        sfbonus, amcoe1_reels3, sfbonus_state, init_sfruitbv2,       ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.5E Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, sfruitbb1,   sfruitb,  sfbonus, amcoe2_reels3, sfbonus_state, init_sfruitb,         ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.5R, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, sfruitbd1,   sfruitb,  sfbonus, amcoe1_reels3, sfbonus_state, init_sfruitbd,        ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.5R, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, sfruitbv1,   sfruitb,  sfbonus, amcoe1_reels3, sfbonus_state, init_sfruitbv,        ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.5R Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, sfruitbb2,   sfruitb,  sfbonus, amcoe2_reels3, sfbonus_state, init_sfruitb,         ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0LT, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, sfruitbd2,   sfruitb,  sfbonus, amcoe1_reels3, sfbonus_state, init_sfruitbd,        ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0LT, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, sfruitbv2,   sfruitb,  sfbonus, amcoe1_reels3, sfbonus_state, init_sfruitbv,        ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0LT Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, sfruitbo,    sfruitb,  sfbonus, amcoe2_reels3, sfbonus_state, init_sfruitb,         ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, sfruitbo2,   sfruitb,  sfbonus, amcoe2_reels3, sfbonus_state, init_sfruitb,         ROT0,  "Amcoe", "Super Fruit Bonus (Version 1.80XT)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2002, sfruitbh,    sfruitb,  sfbonus, amcoe1_reels3, sfbonus_state, init_sfruitbv2,       ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.2EB Dual)", 0)
-GAME( 2002, sfruitbbh,   sfruitb,  sfbonus, amcoe2_reels3, sfbonus_state, init_sfruitb,         ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.2B, set 1)", 0)
-GAME( 2002, sfruitbdh,   sfruitb,  sfbonus, amcoe1_reels3, sfbonus_state, init_sfruitbd,        ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.2B, set 2)", 0)
-GAME( 2002, sfruitbvh,   sfruitb,  sfbonus, amcoe1_reels3, sfbonus_state, init_sfruitbv,        ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.2B Dual)", 0)
-GAME( 2002, sfruitboh,   sfruitb,  sfbonus, amcoe2_reels3, sfbonus_state, init_sfruitb,         ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0B)", 0)
+GAME( 2002, sfruitbh,    sfruitb,  sfbonus, amcoe1_reels3, sfbonus_state, init_sfruitbv2,       ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.2EB Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, sfruitbbh,   sfruitb,  sfbonus, amcoe2_reels3, sfbonus_state, init_sfruitb,         ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.2B, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, sfruitbdh,   sfruitb,  sfbonus, amcoe1_reels3, sfbonus_state, init_sfruitbd,        ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.2B, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, sfruitbvh,   sfruitb,  sfbonus, amcoe1_reels3, sfbonus_state, init_sfruitbv,        ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.2B Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, sfruitboh,   sfruitb,  sfbonus, amcoe2_reels3, sfbonus_state, init_sfruitb,         ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0B)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2004, fb2gen,      0,        sfbonus, amcoe1_reels3, sfbonus_state, init_fb2genv3,        ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8E Dual)", 0)
-GAME( 2004, fb2genc1,    fb2gen,   sfbonus, amcoe1_reels3, sfbonus_state, init_fb2gen,          ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8R, set 1)", 0)
-GAME( 2004, fb2gend1,    fb2gen,   sfbonus, amcoe1_reels3, sfbonus_state, init_fb2gend,         ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8R, set 2)", 0)
-GAME( 2004, fb2genv1,    fb2gen,   sfbonus, amcoe1_reels3, sfbonus_state, init_fb2genv,         ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8R Dual)", 0)
-GAME( 2004, fb2genc2,    fb2gen,   sfbonus, amcoe1_reels3, sfbonus_state, init_fb2gen,          ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8LT, set 1)", 0)
-GAME( 2004, fb2gend2,    fb2gen,   sfbonus, amcoe1_reels3, sfbonus_state, init_fb2gend,         ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8LT, set 2)", 0)
-GAME( 2004, fb2genv2,    fb2gen,   sfbonus, amcoe1_reels3, sfbonus_state, init_fb2genv,         ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8LT Dual)", 0)
-GAME( 2004, fb2geno,     fb2gen,   sfbonus, amcoe1_reels3, sfbonus_state, init_fb2gen,          ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.6XT)", 0)
-GAME( 2004, fb2geno2,    fb2gen,   sfbonus, amcoe1_reels3, sfbonus_state, init_fb2gen,          ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.5)", 0)
+GAME( 2004, fb2gen,      0,        sfbonus, amcoe1_reels3, sfbonus_state, init_fb2genv3,        ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8E Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb2genc1,    fb2gen,   sfbonus, amcoe1_reels3, sfbonus_state, init_fb2gen,          ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8R, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb2gend1,    fb2gen,   sfbonus, amcoe1_reels3, sfbonus_state, init_fb2gend,         ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8R, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb2genv1,    fb2gen,   sfbonus, amcoe1_reels3, sfbonus_state, init_fb2genv,         ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8R Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb2genc2,    fb2gen,   sfbonus, amcoe1_reels3, sfbonus_state, init_fb2gen,          ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8LT, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb2gend2,    fb2gen,   sfbonus, amcoe1_reels3, sfbonus_state, init_fb2gend,         ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8LT, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb2genv2,    fb2gen,   sfbonus, amcoe1_reels3, sfbonus_state, init_fb2genv,         ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8LT Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb2geno,     fb2gen,   sfbonus, amcoe1_reels3, sfbonus_state, init_fb2gen,          ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.6XT)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb2geno2,    fb2gen,   sfbonus, amcoe1_reels3, sfbonus_state, init_fb2gen,          ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.5)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2004, fb2nd,       0,        sfbonus, amcoe1_reels3, sfbonus_state, init_fb2nd,           ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8R, set 1)", 0)
-GAME( 2004, fb2ndd1,     fb2nd,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb2ndd,          ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8R, set 2)", 0)
-GAME( 2004, fb2ndv1,     fb2nd,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb2ndv,          ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8R Dual)", 0)
-GAME( 2004, fb2ndc2,     fb2nd,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb2nd,           ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8LT, set 1)", 0)
-GAME( 2004, fb2ndd2,     fb2nd,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb2ndd,          ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8LT, set 2)", 0)
-GAME( 2004, fb2ndv2,     fb2nd,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb2ndv,          ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8LT Dual)", 0)
-GAME( 2004, fb2ndo,      fb2nd,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb2nd,           ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.5)", 0)
+GAME( 2004, fb2nd,       0,        sfbonus, amcoe1_reels3, sfbonus_state, init_fb2nd,           ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8R, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb2ndd1,     fb2nd,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb2ndd,          ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8R, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb2ndv1,     fb2nd,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb2ndv,          ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8R Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb2ndc2,     fb2nd,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb2nd,           ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8LT, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb2ndd2,     fb2nd,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb2ndd,          ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8LT, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb2ndv2,     fb2nd,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb2ndv,          ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8LT Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb2ndo,      fb2nd,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb2nd,           ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.5)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2004, fb4,         0,        sfbonus, amcoe2_reels3, sfbonus_state, init_fb4,             ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.5R, set 1)", 0)
-GAME( 2004, fb4c1,       fb4,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb4,             ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.5R, set 2)", 0)
-GAME( 2004, fb4d1,       fb4,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb4d,            ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.5R, set 3)", 0)
-GAME( 2004, fb4v1,       fb4,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb4v,            ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.5R Dual)", 0)
-GAME( 2004, fb4exp,      fb4,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb4v3,           ROT0,  "Amcoe", "Fruit Bonus 2005 (2004 Export - Version 1.5E Dual)", 0) // the export version has '2005' title, but is considered the same game as fb4 and labeled as such
-GAME( 2004, fb4b2,       fb4,      sfbonus, amcoe2_reels3, sfbonus_state, init_fb4,             ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.5LT, set 1)", 0)
-GAME( 2004, fb4c2,       fb4,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb4,             ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.5LT, set 2)", 0)
-GAME( 2004, fb4d2,       fb4,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb4d,            ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.5LT, set 3)", 0)
-GAME( 2004, fb4v2,       fb4,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb4v,            ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.5LT Dual)", 0)
-GAME( 2004, fb4o,        fb4,      sfbonus, amcoe2_reels3, sfbonus_state, init_fb4,             ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.3XT)", 0)
-GAME( 2004, fb4o2,       fb4,      sfbonus, amcoe2_reels3, sfbonus_state, init_fb4,             ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.2)", 0)
+GAME( 2004, fb4,         0,        sfbonus, amcoe2_reels3, sfbonus_state, init_fb4,             ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.5R, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb4c1,       fb4,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb4,             ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.5R, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb4d1,       fb4,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb4d,            ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.5R, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb4v1,       fb4,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb4v,            ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.5R Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb4exp,      fb4,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb4v3,           ROT0,  "Amcoe", "Fruit Bonus 2005 (2004 Export - Version 1.5E Dual)", MACHINE_SUPPORTS_SAVE ) // the export version has '2005' title, but is considered the same game as fb4 and labeled as such
+GAME( 2004, fb4b2,       fb4,      sfbonus, amcoe2_reels3, sfbonus_state, init_fb4,             ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.5LT, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb4c2,       fb4,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb4,             ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.5LT, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb4d2,       fb4,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb4d,            ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.5LT, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb4v2,       fb4,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb4v,            ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.5LT Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb4o,        fb4,      sfbonus, amcoe2_reels3, sfbonus_state, init_fb4,             ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.3XT)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fb4o2,       fb4,      sfbonus, amcoe2_reels3, sfbonus_state, init_fb4,             ROT0,  "Amcoe", "Fruit Bonus 2004 (Version 1.2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1999, act2000,     0,        sfbonus, amcoe1_reels3, sfbonus_state, init_act2000v2,       ROT0,  "Amcoe", "Action 2000 (Version 3.5E Dual)", 0)
-GAME( 1999, act2000v1,   act2000,  sfbonus, amcoe1_reels3, sfbonus_state, init_act2000v,        ROT0,  "Amcoe", "Action 2000 (Version 3.5R Dual)", 0)
-GAME( 1999, act2000d1,   act2000,  sfbonus, amcoe1_reels3, sfbonus_state, init_act2000d,        ROT0,  "Amcoe", "Action 2000 (Version 3.5R, set 1)", 0)
-GAME( 1999, act2000b1,   act2000,  sfbonus, amcoe2_reels3, sfbonus_state, init_act2000,         ROT0,  "Amcoe", "Action 2000 (Version 3.5R, set 2)", 0)
-GAME( 1999, act2000vx,   act2000,  sfbonus, amcoe1_reels3, sfbonus_state, init_act2000v3,       ROT0,  "Amcoe", "Action 2000 (Version 3.30XT Dual)", 0)
-GAME( 1999, act2000dx,   act2000,  sfbonus, amcoe1_reels3, sfbonus_state, init_act2000d,        ROT0,  "Amcoe", "Action 2000 (Version 3.30XT, set 1)", 0)
-GAME( 1999, act2000bx,   act2000,  sfbonus, amcoe2_reels3, sfbonus_state, init_act2000,         ROT0,  "Amcoe", "Action 2000 (Version 3.30XT, set 2)", 0)
-GAME( 1999, act2000o,    act2000,  sfbonus, amcoe2_reels3, sfbonus_state, init_act2000,         ROT0,  "Amcoe", "Action 2000 (Version 3.3)", 0)
-GAME( 1999, act2000o2,   act2000,  sfbonus, amcoe2_reels3, sfbonus_state, init_act2000,         ROT0,  "Amcoe", "Action 2000 (Version 3.10XT)", 0)
-GAME( 1999, act2000o3,   act2000,  sfbonus, amcoe2_reels3, sfbonus_state, init_act2000,         ROT0,  "Amcoe", "Action 2000 (Version 1.2)", 0)
+GAME( 1999, act2000,     0,        sfbonus, amcoe1_reels3, sfbonus_state, init_act2000v2,       ROT0,  "Amcoe", "Action 2000 (Version 3.5E Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, act2000v1,   act2000,  sfbonus, amcoe1_reels3, sfbonus_state, init_act2000v,        ROT0,  "Amcoe", "Action 2000 (Version 3.5R Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, act2000d1,   act2000,  sfbonus, amcoe1_reels3, sfbonus_state, init_act2000d,        ROT0,  "Amcoe", "Action 2000 (Version 3.5R, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, act2000b1,   act2000,  sfbonus, amcoe2_reels3, sfbonus_state, init_act2000,         ROT0,  "Amcoe", "Action 2000 (Version 3.5R, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, act2000vx,   act2000,  sfbonus, amcoe1_reels3, sfbonus_state, init_act2000v3,       ROT0,  "Amcoe", "Action 2000 (Version 3.30XT Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, act2000dx,   act2000,  sfbonus, amcoe1_reels3, sfbonus_state, init_act2000d,        ROT0,  "Amcoe", "Action 2000 (Version 3.30XT, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, act2000bx,   act2000,  sfbonus, amcoe2_reels3, sfbonus_state, init_act2000,         ROT0,  "Amcoe", "Action 2000 (Version 3.30XT, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, act2000o,    act2000,  sfbonus, amcoe2_reels3, sfbonus_state, init_act2000,         ROT0,  "Amcoe", "Action 2000 (Version 3.3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, act2000o2,   act2000,  sfbonus, amcoe2_reels3, sfbonus_state, init_act2000,         ROT0,  "Amcoe", "Action 2000 (Version 3.10XT)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, act2000o3,   act2000,  sfbonus, amcoe2_reels3, sfbonus_state, init_act2000,         ROT0,  "Amcoe", "Action 2000 (Version 1.2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2000, ch2000,      0,        sfbonus, amcoe1_reels3, sfbonus_state, init_ch2000v2,        ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4E Dual)", 0)
-GAME( 2000, ch2000b1,    ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R, set 1)", 0)
-GAME( 2000, ch2000c1,    ch2000,   sfbonus, amcoe1_reels3, sfbonus_state, init_ch2000c,         ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R, set 2)", 0)
-GAME( 2000, ch2000d1,    ch2000,   sfbonus, amcoe1_reels3, sfbonus_state, init_ch2000d,         ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R, set 3)", 0)
-GAME( 2000, ch2000v1,    ch2000,   sfbonus, amcoe1_reels3, sfbonus_state, init_ch2000v,         ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R Dual)", 0)
-GAME( 2000, ch2000b2,    ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT, set 1)", 0)
-GAME( 2000, ch2000c2,    ch2000,   sfbonus, amcoe1_reels3, sfbonus_state, init_ch2000c,         ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT, set 2)", 0)
-GAME( 2000, ch2000d2,    ch2000,   sfbonus, amcoe1_reels3, sfbonus_state, init_ch2000d,         ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT, set 3)", 0)
-GAME( 2000, ch2000v2,    ch2000,   sfbonus, amcoe1_reels3, sfbonus_state, init_ch2000v3,        ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT Dual)", 0)
-GAME( 2000, ch2000o,     ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 3.9XT)", 0)
-GAME( 2000, ch2000o2,    ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 3.9D)", 0)
-GAME( 2000, ch2000o3,    ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 3.9)", 0)
+GAME( 2000, ch2000,      0,        sfbonus, amcoe1_reels3, sfbonus_state, init_ch2000v2,        ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4E Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, ch2000b1,    ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, ch2000c1,    ch2000,   sfbonus, amcoe1_reels3, sfbonus_state, init_ch2000c,         ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, ch2000d1,    ch2000,   sfbonus, amcoe1_reels3, sfbonus_state, init_ch2000d,         ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, ch2000v1,    ch2000,   sfbonus, amcoe1_reels3, sfbonus_state, init_ch2000v,         ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, ch2000b2,    ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, ch2000c2,    ch2000,   sfbonus, amcoe1_reels3, sfbonus_state, init_ch2000c,         ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, ch2000d2,    ch2000,   sfbonus, amcoe1_reels3, sfbonus_state, init_ch2000d,         ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, ch2000v2,    ch2000,   sfbonus, amcoe1_reels3, sfbonus_state, init_ch2000v3,        ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, ch2000o,     ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 3.9XT)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, ch2000o2,    ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 3.9D)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, ch2000o3,    ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 3.9)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, pir2001,     0,        sfbonus, amcoe1_reels3, sfbonus_state, init_pir2001v2,       ROT0,  "Amcoe", "Pirate 2001 (Version 2.5E Dual)", 0)
-GAME( 2001, pir2001b1,   pir2001,  sfbonus, amcoe2_reels3, sfbonus_state, init_pir2001,         ROT0,  "Amcoe", "Pirate 2001 (Version 2.5R, set 1)", 0)
-GAME( 2001, pir2001d1,   pir2001,  sfbonus, amcoe1_reels3, sfbonus_state, init_pir2001d,        ROT0,  "Amcoe", "Pirate 2001 (Version 2.5R, set 2)", 0)
-GAME( 2001, pir2001v1,   pir2001,  sfbonus, amcoe1_reels3, sfbonus_state, init_pir2001v,        ROT0,  "Amcoe", "Pirate 2001 (Version 2.5R Dual)", 0)
-GAME( 2001, pir2001bx,   pir2001,  sfbonus, amcoe2_reels3, sfbonus_state, init_pir2001,         ROT0,  "Amcoe", "Pirate 2001 (Version 2.40XT, set 1)", 0)
-GAME( 2001, pir2001dx,   pir2001,  sfbonus, amcoe1_reels3, sfbonus_state, init_pir2001d,        ROT0,  "Amcoe", "Pirate 2001 (Version 2.40XT, set 2)", 0)
-GAME( 2001, pir2001vx,   pir2001,  sfbonus, amcoe1_reels3, sfbonus_state, init_pir2001v,        ROT0,  "Amcoe", "Pirate 2001 (Version 2.40XT Dual)", 0)
-GAME( 2001, pir2001o,    pir2001,  sfbonus, amcoe2_reels3, sfbonus_state, init_pir2001,         ROT0,  "Amcoe", "Pirate 2001 (Version 2.3N)", 0)
-GAME( 2001, pir2001o2,   pir2001,  sfbonus, amcoe2_reels3, sfbonus_state, init_pir2001,         ROT0,  "Amcoe", "Pirate 2001 (Version 2.3)", 0)
-GAME( 2001, pir2001o3,   pir2001,  sfbonus, amcoe2_reels3, sfbonus_state, init_pir2001,         ROT0,  "Amcoe", "Pirate 2001 (Version 2.20XT)", 0)
+GAME( 2001, pir2001,     0,        sfbonus, amcoe1_reels3, sfbonus_state, init_pir2001v2,       ROT0,  "Amcoe", "Pirate 2001 (Version 2.5E Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pir2001b1,   pir2001,  sfbonus, amcoe2_reels3, sfbonus_state, init_pir2001,         ROT0,  "Amcoe", "Pirate 2001 (Version 2.5R, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pir2001d1,   pir2001,  sfbonus, amcoe1_reels3, sfbonus_state, init_pir2001d,        ROT0,  "Amcoe", "Pirate 2001 (Version 2.5R, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pir2001v1,   pir2001,  sfbonus, amcoe1_reels3, sfbonus_state, init_pir2001v,        ROT0,  "Amcoe", "Pirate 2001 (Version 2.5R Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pir2001bx,   pir2001,  sfbonus, amcoe2_reels3, sfbonus_state, init_pir2001,         ROT0,  "Amcoe", "Pirate 2001 (Version 2.40XT, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pir2001dx,   pir2001,  sfbonus, amcoe1_reels3, sfbonus_state, init_pir2001d,        ROT0,  "Amcoe", "Pirate 2001 (Version 2.40XT, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pir2001vx,   pir2001,  sfbonus, amcoe1_reels3, sfbonus_state, init_pir2001v,        ROT0,  "Amcoe", "Pirate 2001 (Version 2.40XT Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pir2001o,    pir2001,  sfbonus, amcoe2_reels3, sfbonus_state, init_pir2001,         ROT0,  "Amcoe", "Pirate 2001 (Version 2.3N)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pir2001o2,   pir2001,  sfbonus, amcoe2_reels3, sfbonus_state, init_pir2001,         ROT0,  "Amcoe", "Pirate 2001 (Version 2.3)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pir2001o3,   pir2001,  sfbonus, amcoe2_reels3, sfbonus_state, init_pir2001,         ROT0,  "Amcoe", "Pirate 2001 (Version 2.20XT)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, pir2002,     0,        sfbonus, amcoe1_reels3, sfbonus_state, init_pir2002v2,       ROT0,  "Amcoe", "Pirate 2002 (Version 2.0E Dual)", 0)
-GAME( 2001, pir2002b1,   pir2002,  sfbonus, amcoe2_reels3, sfbonus_state, init_pir2002,         ROT0,  "Amcoe", "Pirate 2002 (Version 2.0R, set 1)", 0)
-GAME( 2001, pir2002d1,   pir2002,  sfbonus, amcoe1_reels3, sfbonus_state, init_pir2002d,        ROT0,  "Amcoe", "Pirate 2002 (Version 2.0R, set 2)", 0)
-GAME( 2001, pir2002v1,   pir2002,  sfbonus, amcoe1_reels3, sfbonus_state, init_pir2002v,        ROT0,  "Amcoe", "Pirate 2002 (Version 2.0R Dual)", 0)
-GAME( 2001, pir2002bx,   pir2002,  sfbonus, amcoe2_reels3, sfbonus_state, init_pir2002,         ROT0,  "Amcoe", "Pirate 2002 (Version 1.90XT, set 1)", 0)
-GAME( 2001, pir2002dx,   pir2002,  sfbonus, amcoe1_reels3, sfbonus_state, init_pir2002d,        ROT0,  "Amcoe", "Pirate 2002 (Version 1.90XT, set 2)", 0)
-GAME( 2001, pir2002vx,   pir2002,  sfbonus, amcoe1_reels3, sfbonus_state, init_pir2002v,        ROT0,  "Amcoe", "Pirate 2002 (Version 1.90XT Dual)", 0)
-GAME( 2001, pir2002o,    pir2002,  sfbonus, amcoe2_reels3, sfbonus_state, init_pir2002,         ROT0,  "Amcoe", "Pirate 2002 (Version 1.8N)", 0)
-GAME( 2001, pir2002o2,   pir2002,  sfbonus, amcoe2_reels3, sfbonus_state, init_pir2002,         ROT0,  "Amcoe", "Pirate 2002 (Version 1.8)", 0)
-GAME( 2001, pir2002o3,   pir2002,  sfbonus, amcoe2_reels3, sfbonus_state, init_pir2002,         ROT0,  "Amcoe", "Pirate 2002 (Version 1.70XT)", 0)
+GAME( 2001, pir2002,     0,        sfbonus, amcoe1_reels3, sfbonus_state, init_pir2002v2,       ROT0,  "Amcoe", "Pirate 2002 (Version 2.0E Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pir2002b1,   pir2002,  sfbonus, amcoe2_reels3, sfbonus_state, init_pir2002,         ROT0,  "Amcoe", "Pirate 2002 (Version 2.0R, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pir2002d1,   pir2002,  sfbonus, amcoe1_reels3, sfbonus_state, init_pir2002d,        ROT0,  "Amcoe", "Pirate 2002 (Version 2.0R, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pir2002v1,   pir2002,  sfbonus, amcoe1_reels3, sfbonus_state, init_pir2002v,        ROT0,  "Amcoe", "Pirate 2002 (Version 2.0R Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pir2002bx,   pir2002,  sfbonus, amcoe2_reels3, sfbonus_state, init_pir2002,         ROT0,  "Amcoe", "Pirate 2002 (Version 1.90XT, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pir2002dx,   pir2002,  sfbonus, amcoe1_reels3, sfbonus_state, init_pir2002d,        ROT0,  "Amcoe", "Pirate 2002 (Version 1.90XT, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pir2002vx,   pir2002,  sfbonus, amcoe1_reels3, sfbonus_state, init_pir2002v,        ROT0,  "Amcoe", "Pirate 2002 (Version 1.90XT Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pir2002o,    pir2002,  sfbonus, amcoe2_reels3, sfbonus_state, init_pir2002,         ROT0,  "Amcoe", "Pirate 2002 (Version 1.8N)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pir2002o2,   pir2002,  sfbonus, amcoe2_reels3, sfbonus_state, init_pir2002,         ROT0,  "Amcoe", "Pirate 2002 (Version 1.8)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pir2002o3,   pir2002,  sfbonus, amcoe2_reels3, sfbonus_state, init_pir2002,         ROT0,  "Amcoe", "Pirate 2002 (Version 1.70XT)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2004, classice,    0,        sfbonus, amcoe1_reels3, sfbonus_state, init_classiced3,      ROT0,  "Amcoe", "Classic Edition (Version 1.6E)", 0)
-GAME( 2004, classicev,   classice, sfbonus, amcoe1_reels3, sfbonus_state, init_classicev3,      ROT0,  "Amcoe", "Classic Edition (Version 1.6E Dual)", 0)
-GAME( 2004, classice1,   classice, sfbonus, amcoe1_reels3, sfbonus_state, init_classice,        ROT0,  "Amcoe", "Classic Edition (Version 1.6R, set 1)", 0)
-GAME( 2004, classiced1,  classice, sfbonus, amcoe1_reels3, sfbonus_state, init_classiced,       ROT0,  "Amcoe", "Classic Edition (Version 1.6R, set 2)", 0)
-GAME( 2004, classicev1,  classice, sfbonus, amcoe1_reels3, sfbonus_state, init_classicev,       ROT0,  "Amcoe", "Classic Edition (Version 1.6R Dual)", 0)
-GAME( 2004, classice2,   classice, sfbonus, amcoe1_reels3, sfbonus_state, init_classice,        ROT0,  "Amcoe", "Classic Edition (Version 1.6LT, set 1)", 0)
-GAME( 2004, classiced2,  classice, sfbonus, amcoe1_reels3, sfbonus_state, init_classiced,       ROT0,  "Amcoe", "Classic Edition (Version 1.6LT, set 2)", 0)
-GAME( 2004, classicev2,  classice, sfbonus, amcoe1_reels3, sfbonus_state, init_classicev,       ROT0,  "Amcoe", "Classic Edition (Version 1.6LT Dual)", 0)
+GAME( 2004, classice,    0,        sfbonus, amcoe1_reels3, sfbonus_state, init_classiced3,      ROT0,  "Amcoe", "Classic Edition (Version 1.6E)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, classicev,   classice, sfbonus, amcoe1_reels3, sfbonus_state, init_classicev3,      ROT0,  "Amcoe", "Classic Edition (Version 1.6E Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, classice1,   classice, sfbonus, amcoe1_reels3, sfbonus_state, init_classice,        ROT0,  "Amcoe", "Classic Edition (Version 1.6R, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, classiced1,  classice, sfbonus, amcoe1_reels3, sfbonus_state, init_classiced,       ROT0,  "Amcoe", "Classic Edition (Version 1.6R, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, classicev1,  classice, sfbonus, amcoe1_reels3, sfbonus_state, init_classicev,       ROT0,  "Amcoe", "Classic Edition (Version 1.6R Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, classice2,   classice, sfbonus, amcoe1_reels3, sfbonus_state, init_classice,        ROT0,  "Amcoe", "Classic Edition (Version 1.6LT, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, classiced2,  classice, sfbonus, amcoe1_reels3, sfbonus_state, init_classiced,       ROT0,  "Amcoe", "Classic Edition (Version 1.6LT, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, classicev2,  classice, sfbonus, amcoe1_reels3, sfbonus_state, init_classicev,       ROT0,  "Amcoe", "Classic Edition (Version 1.6LT Dual)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2005, seawld,      0,        sfbonus, amcoe1_reels3, sfbonus_state, init_seawldv,         ROT0,  "Amcoe", "Sea World (Version 1.6E Dual)", 0)
-GAME( 2005, seawldd1,    seawld,   sfbonus, amcoe1_reels3, sfbonus_state, init_seawld,          ROT0,  "Amcoe", "Sea World (Version 1.6R CGA)", 0)
+GAME( 2005, seawld,      0,        sfbonus, amcoe1_reels3, sfbonus_state, init_seawldv,         ROT0,  "Amcoe", "Sea World (Version 1.6E Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2005, seawldd1,    seawld,   sfbonus, amcoe1_reels3, sfbonus_state, init_seawld,          ROT0,  "Amcoe", "Sea World (Version 1.6R CGA)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2005, moneymac,    0,        sfbonus, amcoe1_reels3, sfbonus_state, init_moneymacv,       ROT0,  "Amcoe", "Money Machine (Version 1.7E Dual)", 0)
-GAME( 2005, moneymacd1,  moneymac, sfbonus, amcoe1_reels3, sfbonus_state, init_moneymacd,       ROT0,  "Amcoe", "Money Machine (Version 1.7R)", 0)
-GAME( 2005, moneymacv1,  moneymac, sfbonus, amcoe1_reels3, sfbonus_state, init_moneymac,        ROT0,  "Amcoe", "Money Machine (Version 1.7R Dual)", 0)
-GAME( 2005, moneymacd2,  moneymac, sfbonus, amcoe1_reels3, sfbonus_state, init_moneymacd,       ROT0,  "Amcoe", "Money Machine (Version 1.7LT)", 0)
-GAME( 2005, moneymacv2,  moneymac, sfbonus, amcoe1_reels3, sfbonus_state, init_moneymac,        ROT0,  "Amcoe", "Money Machine (Version 1.7LT Dual)", 0)
+GAME( 2005, moneymac,    0,        sfbonus, amcoe1_reels3, sfbonus_state, init_moneymacv,       ROT0,  "Amcoe", "Money Machine (Version 1.7E Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2005, moneymacd1,  moneymac, sfbonus, amcoe1_reels3, sfbonus_state, init_moneymacd,       ROT0,  "Amcoe", "Money Machine (Version 1.7R)", MACHINE_SUPPORTS_SAVE )
+GAME( 2005, moneymacv1,  moneymac, sfbonus, amcoe1_reels3, sfbonus_state, init_moneymac,        ROT0,  "Amcoe", "Money Machine (Version 1.7R Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2005, moneymacd2,  moneymac, sfbonus, amcoe1_reels3, sfbonus_state, init_moneymacd,       ROT0,  "Amcoe", "Money Machine (Version 1.7LT)", MACHINE_SUPPORTS_SAVE )
+GAME( 2005, moneymacv2,  moneymac, sfbonus, amcoe1_reels3, sfbonus_state, init_moneymac,        ROT0,  "Amcoe", "Money Machine (Version 1.7LT Dual)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2005, fb5,         0,        sfbonus, amcoe2_reels3, sfbonus_state, init_fb5,             ROT0,  "Amcoe", "Fruit Bonus 2005 (Version 1.5SH, set 1)", 0)
-GAME( 2005, fb5c,        fb5,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb5,             ROT0,  "Amcoe", "Fruit Bonus 2005 (Version 1.5SH, set 2)", 0)
-GAME( 2005, fb5d,        fb5,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb5d,            ROT0,  "Amcoe", "Fruit Bonus 2005 (Version 1.5SH, set 3)", 0)
-GAME( 2005, fb5v,        fb5,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb5v,            ROT0,  "Amcoe", "Fruit Bonus 2005 (Version 1.5SH Dual)", 0)
+GAME( 2005, fb5,         0,        sfbonus, amcoe2_reels3, sfbonus_state, init_fb5,             ROT0,  "Amcoe", "Fruit Bonus 2005 (Version 1.5SH, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2005, fb5c,        fb5,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb5,             ROT0,  "Amcoe", "Fruit Bonus 2005 (Version 1.5SH, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2005, fb5d,        fb5,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb5d,            ROT0,  "Amcoe", "Fruit Bonus 2005 (Version 1.5SH, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 2005, fb5v,        fb5,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb5v,            ROT0,  "Amcoe", "Fruit Bonus 2005 (Version 1.5SH Dual)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2005, funriver,    0,        sfbonus, amcoe1_reels3, sfbonus_state, init_funriver,        ROT0,  "Amcoe", "Fun River (Version 1.4R CGA)", 0)
-GAME( 2005, funriverv,   funriver, sfbonus, amcoe1_reels3, sfbonus_state, init_funriverv,       ROT0,  "Amcoe", "Fun River (Version 1.4R Dual)", 0)
-GAME( 2005, funriverd1,  funriver, sfbonus, amcoe1_reels3, sfbonus_state, init_funriver,        ROT0,  "Amcoe", "Fun River (Version 1.3R CGA)", 0)
+GAME( 2005, funriver,    0,        sfbonus, amcoe1_reels3, sfbonus_state, init_funriver,        ROT0,  "Amcoe", "Fun River (Version 1.4R CGA)", MACHINE_SUPPORTS_SAVE )
+GAME( 2005, funriverv,   funriver, sfbonus, amcoe1_reels3, sfbonus_state, init_funriverv,       ROT0,  "Amcoe", "Fun River (Version 1.4R Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2005, funriverd1,  funriver, sfbonus, amcoe1_reels3, sfbonus_state, init_funriver,        ROT0,  "Amcoe", "Fun River (Version 1.3R CGA)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2006, fb6,         0,        sfbonus, amcoe1_reels3, sfbonus_state, init_fb6,             ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7E CGA)", 0)
-GAME( 2006, fb6v,        fb6,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb6v3,           ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7E Dual)", 0)
-GAME( 2006, fb6d1,       fb6,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb6d,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7R CGA)", 0)
-GAME( 2006, fb6s1,       fb6,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb6s,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7R CGA, Compact PCB)", 0)
-GAME( 2006, fb6v1,       fb6,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb6v,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7R Dual)", 0)
-GAME( 2006, fb6d2,       fb6,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb6d,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7LT CGA)", 0)
-GAME( 2006, fb6s2,       fb6,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb6s,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7LT CGA, Compact PCB)", 0)
-GAME( 2006, fb6v2,       fb6,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb6v,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7LT Dual)", 0)
-GAME( 2006, fb6s3,       fb6,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb6s,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.3R CGA, Compact PCB)", 0)
+GAME( 2006, fb6,         0,        sfbonus, amcoe1_reels3, sfbonus_state, init_fb6,             ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7E CGA)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, fb6v,        fb6,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb6v3,           ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7E Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, fb6d1,       fb6,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb6d,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7R CGA)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, fb6s1,       fb6,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb6s,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7R CGA, Compact PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, fb6v1,       fb6,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb6v,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7R Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, fb6d2,       fb6,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb6d,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7LT CGA)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, fb6s2,       fb6,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb6s,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7LT CGA, Compact PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, fb6v2,       fb6,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb6v,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7LT Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, fb6s3,       fb6,      sfbonus, amcoe1_reels3, sfbonus_state, init_fb6s,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.3R CGA, Compact PCB)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2006, fb6se,       0,        sfbonus, amcoe1_reels3, sfbonus_state, init_fb6,             ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4E CGA)", 0) /* Released August 2006 according to Amcoe web site */
-GAME( 2006, fb6sev,      fb6se,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb6v3,           ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4E Dual)", 0)
-GAME( 2006, fb6sed1,     fb6se,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb6d,            ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4R CGA)", 0)
-GAME( 2006, fb6sev1,     fb6se,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb6v,            ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4R Dual)", 0)
-GAME( 2006, fb6sed2,     fb6se,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb6d,            ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4LT CGA)", 0)
-GAME( 2006, fb6sev2,     fb6se,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb6v,            ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4LT Dual)", 0)
+GAME( 2006, fb6se,       0,        sfbonus, amcoe1_reels3, sfbonus_state, init_fb6,             ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4E CGA)", MACHINE_SUPPORTS_SAVE ) /* Released August 2006 according to Amcoe web site */
+GAME( 2006, fb6sev,      fb6se,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb6v3,           ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4E Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, fb6sed1,     fb6se,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb6d,            ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4R CGA)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, fb6sev1,     fb6se,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb6v,            ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4R Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, fb6sed2,     fb6se,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb6d,            ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4LT CGA)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, fb6sev2,     fb6se,    sfbonus, amcoe1_reels3, sfbonus_state, init_fb6v,            ROT0,  "Amcoe", "Fruit Bonus 2006 Special Edition (Version 1.4LT Dual)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2006, bugfever,    0,        sfbonus, amcoe1_reels3, sfbonus_state, init_bugfever,        ROT0,  "Amcoe", "Bugs Fever (Version 1.7R CGA)", 0) /* Released August 2006 according to Amcoe web site */
-GAME( 2006, bugfeverv,   bugfever, sfbonus, amcoe1_reels3, sfbonus_state, init_bugfeverv,       ROT0,  "Amcoe", "Bugs Fever (Version 1.7R Dual)", 0)
-GAME( 2006, bugfeverd,   bugfever, sfbonus, amcoe1_reels3, sfbonus_state, init_bugfeverd,       ROT0,  "Amcoe", "Bugs Fever (Version 1.7E CGA)", 0)
-GAME( 2006, bugfeverv2,  bugfever, sfbonus, amcoe1_reels3, sfbonus_state, init_bugfeverv2,      ROT0,  "Amcoe", "Bugs Fever (Version 1.7E Dual)", 0)
-GAME( 2006, bugfevero,   bugfever, sfbonus, amcoe1_reels3, sfbonus_state, init_bugfever,        ROT0,  "Amcoe", "Bugs Fever (Version 1.6R CGA)", 0)
+GAME( 2006, bugfever,    0,        sfbonus, amcoe1_reels3, sfbonus_state, init_bugfever,        ROT0,  "Amcoe", "Bugs Fever (Version 1.7R CGA)", MACHINE_SUPPORTS_SAVE ) /* Released August 2006 according to Amcoe web site */
+GAME( 2006, bugfeverv,   bugfever, sfbonus, amcoe1_reels3, sfbonus_state, init_bugfeverv,       ROT0,  "Amcoe", "Bugs Fever (Version 1.7R Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, bugfeverd,   bugfever, sfbonus, amcoe1_reels3, sfbonus_state, init_bugfeverd,       ROT0,  "Amcoe", "Bugs Fever (Version 1.7E CGA)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, bugfeverv2,  bugfever, sfbonus, amcoe1_reels3, sfbonus_state, init_bugfeverv2,      ROT0,  "Amcoe", "Bugs Fever (Version 1.7E Dual)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, bugfevero,   bugfever, sfbonus, amcoe1_reels3, sfbonus_state, init_bugfever,        ROT0,  "Amcoe", "Bugs Fever (Version 1.6R CGA)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2006, dvisland,    0,        sfbonus, amcoe1_reels3, sfbonus_state, init_dvisland,        ROT0,  "Amcoe", "Devil Island (Version 1.4R CGA)", 0)
-GAME( 2006, dvislando,   dvisland, sfbonus, amcoe1_reels3, sfbonus_state, init_dvisland,        ROT0,  "Amcoe", "Devil Island (Version 1.0R CGA)", 0)
+GAME( 2006, dvisland,    0,        sfbonus, amcoe1_reels3, sfbonus_state, init_dvisland,        ROT0,  "Amcoe", "Devil Island (Version 1.4R CGA)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, dvislando,   dvisland, sfbonus, amcoe1_reels3, sfbonus_state, init_dvisland,        ROT0,  "Amcoe", "Devil Island (Version 1.0R CGA)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2007, atworld,     0,        sfbonus, newlk1_reels3, sfbonus_state, init_atworldd,        ROT0,  "Amcoe", "Around The World (Version 1.4R CGA)", 0) /* Year according to Amcoe web site */
-GAME( 2007, atworlde1,   atworld,  sfbonus, newlk1_reels3, sfbonus_state, init_atworld,         ROT0,  "Amcoe", "Around The World (Version 1.3E CGA)", 0) /* Year according to Amcoe web site */
-GAME( 2007, atworldd1,   atworld,  sfbonus, newlk1_reels3, sfbonus_state, init_atworldd,        ROT0,  "Amcoe", "Around The World (Version 1.3R CGA)", 0) /* Year according to Amcoe web site */
+GAME( 2007, atworld,     0,        sfbonus, newlk1_reels3, sfbonus_state, init_atworldd,        ROT0,  "Amcoe", "Around The World (Version 1.4R CGA)", MACHINE_SUPPORTS_SAVE ) /* Year according to Amcoe web site */
+GAME( 2007, atworlde1,   atworld,  sfbonus, newlk1_reels3, sfbonus_state, init_atworld,         ROT0,  "Amcoe", "Around The World (Version 1.3E CGA)", MACHINE_SUPPORTS_SAVE ) /* Year according to Amcoe web site */
+GAME( 2007, atworldd1,   atworld,  sfbonus, newlk1_reels3, sfbonus_state, init_atworldd,        ROT0,  "Amcoe", "Around The World (Version 1.3R CGA)", MACHINE_SUPPORTS_SAVE ) /* Year according to Amcoe web site */
 
 /* The following sets were produced after Around The World, but specific month and year are unknown */
 
-GAME( 200?, spooky,      0,        sfbonus, newer1_reels3, sfbonus_state, init_spooky,          ROT0,  "Amcoe", "Spooky Night 2nd Edition (Version 2.0.4)", 0)
-GAME( 200?, spookyo,     spooky,   sfbonus, newer1_reels3, sfbonus_state, init_spooky,          ROT0,  "Amcoe", "Spooky Night (Version 1.0.1)", 0)
+GAME( 200?, spooky,      0,        sfbonus, newer1_reels3, sfbonus_state, init_spooky,          ROT0,  "Amcoe", "Spooky Night 2nd Edition (Version 2.0.4)", MACHINE_SUPPORTS_SAVE )
+GAME( 200?, spookyo,     spooky,   sfbonus, newer1_reels3, sfbonus_state, init_spooky,          ROT0,  "Amcoe", "Spooky Night (Version 1.0.1)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 200?, fbdeluxe,    0,        sfbonus, newer1_reels3, sfbonus_state, init_fbdeluxe,        ROT0,  "Amcoe", "Fruit Bonus Deluxe (Version 1.0.9)", 0)
-GAME( 200?, fbdeluxeo,   fbdeluxe, sfbonus, newer1_reels3, sfbonus_state, init_fbdeluxe,        ROT0,  "Amcoe", "Fruit Bonus Deluxe (Version 1.0.7)", 0)
+GAME( 200?, fbdeluxe,    0,        sfbonus, newer1_reels3, sfbonus_state, init_fbdeluxe,        ROT0,  "Amcoe", "Fruit Bonus Deluxe (Version 1.0.9)", MACHINE_SUPPORTS_SAVE )
+GAME( 200?, fbdeluxeo,   fbdeluxe, sfbonus, newer1_reels3, sfbonus_state, init_fbdeluxe,        ROT0,  "Amcoe", "Fruit Bonus Deluxe (Version 1.0.7)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 200?, fb3g,        0,        sfbonus, newer1_reels3, sfbonus_state, init_fb3g,            ROT0,  "Amcoe", "Fruit Bonus 3G (Version 1.0.3)", 0)
+GAME( 200?, fb3g,        0,        sfbonus, newer1_reels3, sfbonus_state, init_fb3g,            ROT0,  "Amcoe", "Fruit Bonus 3G (Version 1.0.3)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 200?, getrich,     0,        sfbonus, newer1_reels3, sfbonus_state, init_getrich,         ROT0,  "Amcoe", "Get Rich (Version 1.0.1)", 0)
+GAME( 200?, getrich,     0,        sfbonus, newer1_reels3, sfbonus_state, init_getrich,         ROT0,  "Amcoe", "Get Rich (Version 1.0.1)", MACHINE_SUPPORTS_SAVE )
 
+GAME( 2009, mcircus,     0,        sfbonus, amcoe1_reels3, sfbonus_state, init_mcircus,         ROT0,  "Amcoe", "Merry Circus (Version 1.0.2)", MACHINE_SUPPORTS_SAVE )
 
 // no graphic / sound roms dumped for these sets, but functional program roms & descramble are in place
 /* Version 4 is a multi-game that has New Fruit Bonus ?96 Special Edition Ver. 4, New Cherry ?96 Special Edition Ver. 4 or Skill Cherry ?97 Ver. 4 */
-GAME( 2006, version4,    0,        sfbonus, amcoe1_reels3, sfbonus_state, init_version4,        ROT0,  "Amcoe", "Version 4 (Version 4.3R CGA)",  MACHINE_NOT_WORKING)
-GAME( 2006, version4v,   version4, sfbonus, amcoe1_reels3, sfbonus_state, init_version4v,       ROT0,  "Amcoe", "Version 4 (Version 4.3R Dual)", MACHINE_NOT_WORKING)
-GAME( 2006, version4d2,  version4, sfbonus, amcoe1_reels3, sfbonus_state, init_version4d2,      ROT0,  "Amcoe", "Version 4 (Version 4.3E CGA)",  MACHINE_NOT_WORKING)
-GAME( 2006, version4v2,  version4, sfbonus, amcoe1_reels3, sfbonus_state, init_version4v2,      ROT0,  "Amcoe", "Version 4 (Version 4.3E Dual)", MACHINE_NOT_WORKING)
-GAME( 2006, version4d3,  version4, sfbonus, amcoe1_reels3, sfbonus_state, init_version4,        ROT0,  "Amcoe", "Version 4 (Version 4.3LT CGA)", MACHINE_NOT_WORKING)
-GAME( 2006, version4v3,  version4, sfbonus, amcoe1_reels3, sfbonus_state, init_version4v,       ROT0,  "Amcoe", "Version 4 (Version 4.3LT Dual)",MACHINE_NOT_WORKING)
-GAME( 2006, version4o,   version4, sfbonus, amcoe1_reels3, sfbonus_state, init_version4,        ROT0,  "Amcoe", "Version 4 (Version 4.2R CGA)", MACHINE_NOT_WORKING)
+GAME( 2006, version4,    0,        sfbonus, amcoe1_reels3, sfbonus_state, init_version4,        ROT0,  "Amcoe", "Version 4 (Version 4.3R CGA)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2006, version4v,   version4, sfbonus, amcoe1_reels3, sfbonus_state, init_version4v,       ROT0,  "Amcoe", "Version 4 (Version 4.3R Dual)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2006, version4d2,  version4, sfbonus, amcoe1_reels3, sfbonus_state, init_version4d2,      ROT0,  "Amcoe", "Version 4 (Version 4.3E CGA)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2006, version4v2,  version4, sfbonus, amcoe1_reels3, sfbonus_state, init_version4v2,      ROT0,  "Amcoe", "Version 4 (Version 4.3E Dual)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2006, version4d3,  version4, sfbonus, amcoe1_reels3, sfbonus_state, init_version4,        ROT0,  "Amcoe", "Version 4 (Version 4.3LT CGA)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2006, version4v3,  version4, sfbonus, amcoe1_reels3, sfbonus_state, init_version4v,       ROT0,  "Amcoe", "Version 4 (Version 4.3LT Dual)",MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2006, version4o,   version4, sfbonus, amcoe1_reels3, sfbonus_state, init_version4,        ROT0,  "Amcoe", "Version 4 (Version 4.2R CGA)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // Known sets but no roms dumped at all for these:
-// Merry Circus
 // Devil Island - 14 Liner version
 
 // ?? what is this
-GAME( 200?, amclink,     0,        sfbonus, amcoe1_reels3, sfbonus_state, init_sfbonus_common,  ROT0,  "Amcoe", "Amcoe Link Control Box (Version 2.2)", MACHINE_NOT_WORKING)
+GAME( 200?, amclink,     0,        sfbonus, amcoe1_reels3, sfbonus_state, init_common,          ROT0,  "Amcoe", "Amcoe Link Control Box (Version 2.2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

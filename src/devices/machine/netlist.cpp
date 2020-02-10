@@ -545,7 +545,7 @@ protected:
 			// FIXME: The logic has a rounding issue because time resolution divided
 			//        by 48,000 is not a natural number. The fractional part
 			//        adds up to one samples every 13 seconds for 100 ps resolution.
-			// 		  Fixing this is possible but complicated and expensive.
+			//        Fixing this is possible but complicated and expensive.
 		}
 		m_pos++;
 
@@ -991,9 +991,9 @@ void netlist_mame_stream_input_device::custom_netlist_additions(netlist::netlist
 	pstring sparam = plib::pfmt("STREAM_INPUT.CHAN{1}")(m_channel);
 	nlstate.setup().register_param(sparam, pstring(m_param_name));
 	sparam = plib::pfmt("STREAM_INPUT.MULT{1}")(m_channel);
-	nlstate.setup().register_param(sparam, m_mult);
+	nlstate.setup().register_param_val(sparam, m_mult);
 	sparam = plib::pfmt("STREAM_INPUT.OFFSET{1}")(m_channel);
-	nlstate.setup().register_param(sparam, m_offset);
+	nlstate.setup().register_param_val(sparam, m_offset);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -1027,9 +1027,9 @@ void netlist_mame_stream_output_device::custom_netlist_additions(netlist::netlis
 	//snd_out = dynamic_cast<NETLIB_NAME(sound_out) *>(setup.register_dev("nld_sound_out", sname));
 	nlstate.setup().register_dev("NETDEV_SOUND_OUT", sname);
 
-	nlstate.setup().register_param(sname + ".CHAN" , m_channel);
-	nlstate.setup().register_param(sname + ".MULT",  m_mult);
-	nlstate.setup().register_param(sname + ".OFFSET",  m_offset);
+	nlstate.setup().register_param_val(sname + ".CHAN" , m_channel);
+	nlstate.setup().register_param_val(sname + ".MULT",  m_mult);
+	nlstate.setup().register_param_val(sname + ".OFFSET",  m_offset);
 	nlstate.setup().register_link(sname + ".IN", pstring(m_out_name));
 }
 
@@ -1497,7 +1497,7 @@ void netlist_mame_sound_device::sound_stream_update(sound_stream &stream, stream
 	}
 
 	auto cur(netlist().exec().time());
-    const auto delta(nltime_ext_from_clocks(samples));
+	const auto delta(nltime_ext_from_clocks(samples));
 	netlist().exec().process_queue(delta);
 
 	cur += delta;

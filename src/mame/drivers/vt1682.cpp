@@ -39,22 +39,22 @@
 
     + more
 
-	-----------
+    -----------
 
     Intec InterAct:
 
     Is there meant to be a 2nd player? (many games prompt a 2nd player to start, but inputs don't appear to be read?)
 
-	-----------
+    -----------
 
-	Excite Sports 48-in-1:
+    Excite Sports 48-in-1:
 
-	Why are the rasters broken on MX Motorstorm when the game game works in other collections? does the alt input reading throw the timing off enough that the current hookup fails
-	or is there a different PAL/NTSC detection method that we're failing?
+    Why are the rasters broken on MX Motorstorm when the game game works in other collections? does the alt input reading throw the timing off enough that the current hookup fails
+    or is there a different PAL/NTSC detection method that we're failing?
 
-	Why is the priority incorrect in Ping Pong, again it was fine in the other collections
+    Why is the priority incorrect in Ping Pong, again it was fine in the other collections
 
-	No sound in Archery?
+    No sound in Archery?
 
 */
 
@@ -544,7 +544,7 @@ private:
 
 	void do_dma_external_to_internal(int data, bool is_video);
 	void do_dma_internal_to_internal(int data, bool is_video);
-	
+
 	/* Sound CPU Related*/
 
 	uint8_t m_soundcpu_2118_dacleft_7_0;
@@ -5872,7 +5872,7 @@ CONS( 200?, ii8in1,    0,  0,  intech_interact,    intec, intec_interact_state, 
 CONS( 200?, ii32in1,   0,  0,  intech_interact,    intec, intec_interact_state, regular_init,  "Intec", "InterAct 32-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // a 40-in-1 also exists which combines the above
 
-CONS( 200?, zone7in1,  0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "<unknown>", "Zone 7-in-1 Sports (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) 
+CONS( 200?, zone7in1,  0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "<unknown>", "Zone 7-in-1 Sports (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // UK version of Zone 7-in-1 has different games (Boxing / Tennis / Golf / Fishing / Table Tennis / Bowling / Football) with Fishing replacing Baseball
 
 CONS( 200?, miwi2_16,  0,  0,  intech_interact,    miwi2, intec_interact_state, regular_init,  "<unknown>", "MiWi2 16-in-1 + Drum Master", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // clearly older code, Highway has uncensored title screen, selection screen has 'Arcase' instead of 'Arcade'
@@ -5882,7 +5882,7 @@ CONS( 200?, miwi2_7,   0,  0,  intech_interact,    miwi2, intec_interact_state, 
 CONS( 200?, intact89,  0,  0,  intech_interact_bank, miwi2, intec_interact_state, banked_init,  "Intec", "InterAct Complete Video Game - 89-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 /*
-Box shows 
+Box shows
 
 InterAct
 Complete Video Game System

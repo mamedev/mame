@@ -142,7 +142,7 @@ private:
 
 	// Registers
 	u32 m_Status = 0; // Status (0 Idle, 1 Busy)
-	u32 m_NoteOn = 0; // Note On (0 Off, 1 On) (Not Implemented) 
+	u32 m_NoteOn = 0; // Note On (0 Off, 1 On) (Not Implemented)
 	u8 m_RevFactor = 0; // Reverb Factor (Not Implemented)
 	u32 m_BufferAddr = 0; // 21bit Reverb Buffer Start Address (Not Implemented)
 	u16 m_BufferSize[4] = {0, 0, 0, 0}; // Reverb Buffer Size (Not Implemented)

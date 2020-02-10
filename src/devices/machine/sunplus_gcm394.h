@@ -72,7 +72,7 @@ public:
 	void default_cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4 );
 
 	void set_cs_space(address_space* csspace) { m_cs_space = csspace; }
-	
+
 	void set_paldisplaybank_high_hack(int pal_displaybank_high) { m_spg_video->set_paldisplaybank_high(pal_displaybank_high); }
 	void set_alt_tile_addressing_hack(int alt_tile_addressing) { m_spg_video->set_alt_tile_addressing(alt_tile_addressing); }
 	void set_romtype(int romtype) { m_romtype = romtype; }
@@ -98,7 +98,7 @@ protected:
 
 	devcb_write16 m_porta_out;
 
-	uint16_t m_dma_params[7][3];
+	uint16_t m_dma_params[8][4];
 
 	// unk 78xx
 	uint16_t m_7803;
@@ -186,10 +186,10 @@ private:
 
 	DECLARE_READ16_MEMBER(unk_r);
 	DECLARE_WRITE16_MEMBER(unk_w);
-	
-	void write_dma_params(int channel, int offset, uint16_t data);
+
+	void write_dma_params(int channel, int offset, uint16_t data, address_space& space);
 	uint16_t read_dma_params(int channel, int offset);
-	void trigger_systemm_dma(address_space &space, int channel, uint16_t data);
+	void trigger_systemm_dma(address_space &space, int channel);
 
 	DECLARE_READ16_MEMBER(system_dma_params_channel0_r);
 	DECLARE_WRITE16_MEMBER(system_dma_params_channel0_w);
@@ -197,8 +197,10 @@ private:
 	DECLARE_WRITE16_MEMBER(system_dma_params_channel1_w);
 	DECLARE_READ16_MEMBER(system_dma_params_channel2_r);
 	DECLARE_WRITE16_MEMBER(system_dma_params_channel2_w);
+	DECLARE_READ16_MEMBER(system_dma_params_channel3_r);
+	DECLARE_WRITE16_MEMBER(system_dma_params_channel3_w);
 	DECLARE_READ16_MEMBER(system_dma_status_r);
-	DECLARE_WRITE16_MEMBER(system_dma_trigger_w);
+	DECLARE_WRITE16_MEMBER(system_dma_7abf_unk_w);
 	DECLARE_READ16_MEMBER(system_dma_memtype_r);
 	DECLARE_WRITE16_MEMBER(system_dma_memtype_w);
 
@@ -357,7 +359,9 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_READ16_MEMBER(nand_7850_r);
+	void recalculate_calculate_effective_nand_address();
+
+	DECLARE_READ16_MEMBER(nand_7850_status_r);
 	DECLARE_READ16_MEMBER(nand_7854_r);
 	DECLARE_WRITE16_MEMBER(nand_dma_ctrl_w);
 	DECLARE_WRITE16_MEMBER(nand_7850_w);
@@ -365,7 +369,7 @@ private:
 	DECLARE_WRITE16_MEMBER(nand_addr_low_w);
 	DECLARE_WRITE16_MEMBER(nand_addr_high_w);
 	DECLARE_READ16_MEMBER(nand_ecc_low_byte_error_flag_1_r);
-	DECLARE_WRITE16_MEMBER(nand_7856_w);
+	DECLARE_WRITE16_MEMBER(nand_7856_type_w);
 	DECLARE_WRITE16_MEMBER(nand_7857_w);
 	DECLARE_WRITE16_MEMBER(nand_785b_w);
 	DECLARE_WRITE16_MEMBER(nand_785c_w);
@@ -386,6 +390,7 @@ private:
 	uint16_t m_nand_7857;
 
 	int m_curblockaddr;
+	uint32_t m_effectiveaddress;
 };
 
 

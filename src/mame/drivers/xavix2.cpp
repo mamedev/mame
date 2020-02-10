@@ -16,15 +16,16 @@
 #include "emupal.h"
 #include "softlist.h"
 #include "speaker.h"
+#include "cpu/xavix2/xavix2.h"
 
 class xavix2_state : public driver_device
 {
 public:
 	xavix2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
-		, m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	void xavix2(machine_config &config);
@@ -35,10 +36,21 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	required_device<xavix2_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device<gfxdecode_device> m_gfxdecode;
+
+	void mem(address_map &map);
 };
+
+void xavix2_state::mem(address_map &map)
+{
+	map(0x00000000, 0x00001fff).ram();
+
+	map(0x00200000, 0x00ffffff).rom().region("maincpu", 0x200000);
+
+	map(0x40000000, 0x40ffffff).rom().region("maincpu", 0);
+}
 
 uint32_t xavix2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -56,61 +68,11 @@ void xavix2_state::machine_reset()
 static INPUT_PORTS_START( xavix2 )
 INPUT_PORTS_END
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ 1*4,0*4,3*4,2*4,5*4,4*4,7*4,6*4 },
-	{ STEP8(0,4*8) },
-	8*8*4
-};
-
-static const gfx_layout char16layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ 1*4,0*4,3*4,2*4,5*4,4*4,7*4,6*4, 9*4,8*4,11*4,10*4,13*4,12*4,15*4,14*4 },
-	{ STEP16(0,4*16) },
-	16*16*4
-};
-
-static const gfx_layout charlayout8bpp =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	{ STEP8(0,8*8) },
-	8*8*8
-};
-
-static const gfx_layout char16layout8bpp =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP8(0,1) },
-	{ STEP16(0,8) },
-	{ STEP16(0,16*8) },
-	16*16*8
-};
-
-static GFXDECODE_START( gfx_xavix )
-	GFXDECODE_ENTRY( "maincpu", 0, charlayout, 0, 16 )
-	GFXDECODE_ENTRY( "maincpu", 0, char16layout, 0, 16 )
-	GFXDECODE_ENTRY( "maincpu", 0, charlayout8bpp, 0, 1 )
-	GFXDECODE_ENTRY( "maincpu", 0, char16layout8bpp, 0, 1 )
-GFXDECODE_END
-
-
 void xavix2_state::xavix2(machine_config &config)
 {
 	// unknown CPU 'SSD 2002-2004 NEC 800208-51'
+	XAVIX2(config, m_maincpu, 98'000'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &xavix2_state::mem);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -119,8 +81,6 @@ void xavix2_state::xavix2(machine_config &config)
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	m_screen->set_palette(m_palette);
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_xavix);
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 256);
 
@@ -133,7 +93,7 @@ void xavix2_state::xavix2(machine_config &config)
 
 
 ROM_START( ltv_naru )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "naruto.bin", 0x000000, 0x800000, CRC(e3465ad2) SHA1(13e3d2de5d5a084635cab158f3639a1ea73265dc) )
 ROM_END
 

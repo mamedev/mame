@@ -636,8 +636,8 @@ void m2_powerbus_device::update_interrupts()
 
 m2_memctl_device::m2_memctl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, M2_MEMCTL, tag, owner, clock),
-		m_gpio_in{{*this}, {*this}, {*this}, {*this}},
-		m_gpio_out{{*this}, {*this}, {*this}, {*this}}
+		m_gpio_in(*this),
+		m_gpio_out(*this)
 {
 }
 
@@ -649,11 +649,8 @@ m2_memctl_device::m2_memctl_device(const machine_config &mconfig, const char *ta
 void m2_memctl_device::device_start()
 {
 	// Resolve our callbacks
-	for (int i = 0; i < 4; i++)
-	{
-		m_gpio_in[i].resolve_safe(0);
-		m_gpio_out[i].resolve_safe();
-	}
+	m_gpio_in.resolve_all_safe(0);
+	m_gpio_out.resolve_all_safe();
 
 	// TODO: DELETE ME
 	m2_bda_device *m_bda = (m2_bda_device*)owner(); // TEMP
@@ -1514,9 +1511,9 @@ void m2_cde_device::device_start()
 {
 	// Find our friend the BDA
 	m_bda = downcast<m2_bda_device *>(machine().device("bda"));
-	assert(m_bda != NULL);
+	assert(m_bda != nullptr);
 
-	if (m_bda == NULL)
+	if (m_bda == nullptr)
 		throw device_missing_dependencies();
 
 	// Resolve callbacks

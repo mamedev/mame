@@ -81,6 +81,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(fiq_vector_w);
 	DECLARE_WRITE_LINE_MEMBER(videoirq_w);
 	DECLARE_WRITE_LINE_MEMBER(audioirq_w);
+	DECLARE_WRITE_LINE_MEMBER(audiochirq_w);
 	DECLARE_WRITE_LINE_MEMBER(timerirq_w);
 	DECLARE_WRITE_LINE_MEMBER(uartirq_w);
 	DECLARE_WRITE_LINE_MEMBER(extirq_w);
@@ -107,7 +108,7 @@ protected:
 	devcb_read16 m_portb_in;
 	devcb_read16 m_portc_in;
 
-	devcb_read16 m_adc_in[2];
+	devcb_read16::array<2> m_adc_in;
 
 	devcb_write8 m_i2c_w;
 	devcb_read8 m_i2c_r;

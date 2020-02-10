@@ -11,7 +11,7 @@
     ADPCM related patents:
     - https://patents.google.com/patent/US5692099
     - https://patents.google.com/patent/US6453286
-	- https://patents.google.com/patent/US5548655A
+    - https://patents.google.com/patent/US5548655A
 
 ***************************************************************************/
 

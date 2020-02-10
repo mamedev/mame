@@ -34,7 +34,7 @@ DEFINE_DEVICE_TYPE(Z8038, z8038_device, "z8038", "FIFO Input/Output Interface Un
 
 z8038_device::z8038_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, Z8038, tag, owner, clock)
-	, m_out_int_cb{ *this, *this }
+	, m_out_int_cb(*this)
 	, m_out_E_cb(*this)
 	, m_out_F_cb(*this)
 	, m_out_H_cb(*this)
@@ -60,8 +60,7 @@ template void z8038_device::zbus_map<2>(address_map &map);
 
 void z8038_device::device_start()
 {
-	m_out_int_cb[0].resolve_safe();
-	m_out_int_cb[1].resolve_safe();
+	m_out_int_cb.resolve_all_safe();
 
 	m_out_E_cb.resolve_safe();
 	m_out_F_cb.resolve_safe();

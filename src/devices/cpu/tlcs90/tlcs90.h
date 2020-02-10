@@ -68,8 +68,8 @@ private:
 
 	address_space_config m_program_config;
 
-	devcb_read8 m_port_read_cb[MAX_PORTS];
-	devcb_write8 m_port_write_cb[MAX_PORTS];
+	devcb_read8::array<MAX_PORTS> m_port_read_cb;
+	devcb_write8::array<MAX_PORTS> m_port_write_cb;
 
 	PAIR        m_prvpc,m_pc,m_sp,m_af,m_bc,m_de,m_hl,m_ix,m_iy;
 	PAIR        m_af2,m_bc2,m_de2,m_hl2;

@@ -71,7 +71,7 @@ strange palette format.
 
 TODO:
 - Proper fix for twins & twinsed2 crash after round 1 (MT #07516):
-  after clearing 1-5 it pings i2c for a couple times, expect it to be 0 then 1 otherwise 
+  after clearing 1-5 it pings i2c for a couple times, expect it to be 0 then 1 otherwise
   jumps to lalaland;
 - Improve blitter / clear logic for Spider.
 - Merge with hotblock.cpp;
@@ -85,9 +85,9 @@ It is possible the Twins PCB has them too and doesn't use them.
 twinsed1 is significantly changed hardware, uses a regular RAMDAC hookup for palette etc.
 
 To access Service Mode:
-- twins, twinsed2: you must boot with coin 1 and start 1 held down 
+- twins, twinsed2: you must boot with coin 1 and start 1 held down
   (there's a test button on the PCB tho?)
-- spider, twinsed1: you must boot with P1 Left and P1 Right held down, 
+- spider, twinsed1: you must boot with P1 Left and P1 Right held down,
   this requires the -joystick_contradictory switch on the commandline;
 
 */
@@ -149,7 +149,7 @@ protected:
 
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void video_start() override;
-	
+
 	static constexpr u32 ram_size = 0x10000/2;
 
 	inline u16* get_vram_base();
@@ -173,7 +173,7 @@ public:
 	twinsed1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: twins_state(mconfig, type, tag)
 	{}
-	
+
 	void twinsed1(machine_config &config);
 
 private:
@@ -188,7 +188,7 @@ public:
 	spider_state(const machine_config &mconfig, device_type type, const char *tag)
 		: twins_state(mconfig, type, tag)
 	{}
-	
+
 	void spider(machine_config &config);
 
 private:
@@ -213,11 +213,11 @@ void twins_state::video_start()
 	save_item(NAME(m_spritesinit));
 	save_item(NAME(m_spriteswidth));
 	save_item(NAME(m_spritesaddr));
-	
+
 	m_bgvram = std::make_unique<u16 []>(ram_size);
 	std::fill_n(m_bgvram.get(), ram_size, 0);
 	save_pointer(NAME(m_bgvram), ram_size);
-	
+
 	m_fgvram = std::make_unique<u16 []>(ram_size);
 	std::fill_n(m_fgvram.get(), ram_size, 0);
 	save_pointer(NAME(m_fgvram), ram_size);
@@ -283,7 +283,7 @@ READ16_MEMBER(twins_state::eeprom_r)
 //  printf("%08x: eeprom_r %04x\n", m_maincpu->pc(), mem_mask);
 //  return m_i2cmem->read_sda();// | 0xfffe;
 	// TODO: bit 1, i2c clock readback?
-	
+
 	return m_i2cmem->read_sda();
 }
 
@@ -348,7 +348,7 @@ WRITE16_MEMBER(twins_state::vram_rmw_w)
 {
 	u16 *vram = get_vram_base();
 
-//	printf("spider_blitter_w %08x %04x %04x (previous data width %d address %08x)\n", offset * 2, data, mem_mask, m_spriteswidth, m_spritesaddr);
+//  printf("spider_blitter_w %08x %04x %04x (previous data width %d address %08x)\n", offset * 2, data, mem_mask, m_spriteswidth, m_spritesaddr);
 
 	for (int i = 0; i < m_spriteswidth; i++)
 	{
@@ -552,7 +552,7 @@ INPUT_PORTS_END
 void twins_state::base_config(machine_config &config)
 {
 	I2C_24C02(config, m_i2cmem);
-	
+
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&twins_state::base_map).set_options(ENDIANNESS_LITTLE, 16, 24, 0x100000);
 }
 
@@ -691,7 +691,7 @@ ROM_END
 void twins_state::init_twins()
 {
 	u8 *rom = (u8 *)memregion("ipl")->base();
-	
+
 	rom[0x3497d] = 0x90;
 	rom[0x3497e] = 0x90;
 
@@ -702,7 +702,7 @@ void twins_state::init_twins()
 void twins_state::init_twinsed2()
 {
 	u8 *rom = (u8 *)memregion("ipl")->base();
-	
+
 	rom[0x349d3] = 0x90;
 	rom[0x349d4] = 0x90;
 

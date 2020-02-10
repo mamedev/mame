@@ -60,6 +60,7 @@ enum
 
 	UNSP_IRQ_EN,
 	UNSP_FIQ_EN,
+	UNSP_FIR_MOV_EN,
 	UNSP_IRQ,
 	UNSP_FIQ,
 #if UNSP_LOG_OPCODES || UNSP_LOG_REGS
@@ -108,6 +109,8 @@ public:
 	void log_write(uint32_t addr, uint32_t data);
 	void cfunc_log_write();
 #endif
+
+	void cfunc_muls();
 
 protected:
 	unsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal);
@@ -164,9 +167,10 @@ protected:
 
 	struct internal_unsp_state
 	{
-		std::vector<u32> m_r; // why are these 32-bit? they're 16-bit regs? (changing to uint16_t causes crashes tho, so something is depending on this)
+		uint32_t m_r[16]; // required to be 32 bits due to DRC
 		uint32_t m_enable_irq;
 		uint32_t m_enable_fiq;
+		uint32_t m_fir_move;
 		uint32_t m_irq;
 		uint32_t m_fiq;
 		uint32_t m_curirq;
@@ -214,6 +218,7 @@ protected:
 	void execute_fxxx_100_group(uint16_t op);
 	virtual void execute_extended_group(uint16_t op);
 	virtual void execute_exxx_group(uint16_t op);
+	void execute_muls_ss(const uint16_t rd, const uint16_t rs, const uint16_t size);
 	void unimplemented_opcode(uint16_t op);
 	void unimplemented_opcode(uint16_t op, uint16_t ximm);
 	void unimplemented_opcode(uint16_t op, uint16_t ximm, uint16_t ximm_2);

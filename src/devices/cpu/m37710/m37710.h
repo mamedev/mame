@@ -230,11 +230,11 @@ private:
 	address_space_config m_io_config;
 
 	// I/O port callbacks
-	devcb_read8 m_port_in_cb[11];
-	devcb_write8 m_port_out_cb[11];
+	devcb_read8::array<11> m_port_in_cb;
+	devcb_write8::array<11> m_port_out_cb;
 
 	// A-D callbacks
-	devcb_read16 m_analog_cb[8];
+	devcb_read16::array<8> m_analog_cb;
 
 	uint32_t m_a;         /* Accumulator */
 	uint32_t m_b;         /* holds high byte of accumulator */

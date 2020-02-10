@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, David Haywood
 
+#include "emu.h"
 #include "includes/spg2xx.h"
+
 
 class shredmjr_game_state : public spg2xx_game_state
 {
@@ -14,7 +16,7 @@ public:
 
 	void shredmjr(machine_config &config);
 	void taikeegr(machine_config &config);
-	
+
 	void init_taikeegr();
 
 protected:

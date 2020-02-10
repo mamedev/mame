@@ -143,22 +143,22 @@ private:
 
 	enum
 	{
-		IRQ_EXTFIQ    = 0,	// FiqExternal
-		IRQ_BLINT     = 1,	// FiqBatLow
-		IRQ_WEINT     = 2,	// FiqWatchDog
-		IRQ_MCINT     = 3,	// FiqMediaChg
-		IRQ_CSINT     = 4,	// IrqCodec
-		IRQ_EINT1     = 5,	// IrqExt1
-		IRQ_EINT2     = 6,	// IrqExt2
-		IRQ_EINT3     = 7,	// IrqExt3
-		IRQ_TC1OI     = 8,	// IrqTimer1
-		IRQ_TC2OI     = 9,	// IrqTimer2
-		IRQ_RTCMI     = 10,	// IrqRtcMatch
-		IRQ_TINT      = 11,	// IrqTick
-		IRQ_UART1     = 12,	// IrqUart1
-		IRQ_UART2     = 13,	// IrqUart2
-		IRQ_LCDINT    = 14,	// IrqLcd
-		IRQ_SSEOTI    = 15,	// IrqSpi
+		IRQ_EXTFIQ    = 0,  // FiqExternal
+		IRQ_BLINT     = 1,  // FiqBatLow
+		IRQ_WEINT     = 2,  // FiqWatchDog
+		IRQ_MCINT     = 3,  // FiqMediaChg
+		IRQ_CSINT     = 4,  // IrqCodec
+		IRQ_EINT1     = 5,  // IrqExt1
+		IRQ_EINT2     = 6,  // IrqExt2
+		IRQ_EINT3     = 7,  // IrqExt3
+		IRQ_TC1OI     = 8,  // IrqTimer1
+		IRQ_TC2OI     = 9,  // IrqTimer2
+		IRQ_RTCMI     = 10, // IrqRtcMatch
+		IRQ_TINT      = 11, // IrqTick
+		IRQ_UART1     = 12, // IrqUart1
+		IRQ_UART2     = 13, // IrqUart2
+		IRQ_LCDINT    = 14, // IrqLcd
+		IRQ_SSEOTI    = 15, // IrqSpi
 		IRQ_FIQ_MASK  = 0x000f,
 		IRQ_IRQ_MASK  = 0xfff0
 	};

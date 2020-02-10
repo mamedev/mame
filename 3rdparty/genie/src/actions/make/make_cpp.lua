@@ -73,8 +73,8 @@
 		if (prj.kind == "StaticLib" and prj.options.ArchiveSplit) then
 			_p('define max_args')
 			_p('\t$(eval _args:=)')
-			_p('\t$(foreach obj,$3,$(eval _args+=$(obj))$(if $(word $2,$(_args)),$1$(_args)$(EOL)$(eval _args:=)))')
-			_p('\t$(if $(_args),$1$(_args))')
+			_p('\t$(foreach obj,$3,$(eval _args+=$(obj))$(if $(word $2,$(_args)),$1 $(_args)$(EOL)$(eval _args:=)))')
+			_p('\t$(if $(_args),$1 $(_args))')
 			_p('endef')
 			_p('')
 			_p('define EOL')

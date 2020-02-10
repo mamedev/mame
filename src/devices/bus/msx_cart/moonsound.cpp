@@ -47,12 +47,10 @@ void msx_cart_moonsound_device::device_add_mconfig(machine_config &config)
 	m_ymf278b->irq_handler().set(FUNC(msx_cart_moonsound_device::irq_w));
 	m_ymf278b->add_route(0, "lspeaker", 0.50);
 	m_ymf278b->add_route(1, "rspeaker", 0.50);
-	m_ymf278b->add_route(2, "lspeaker", 0.50);
-	m_ymf278b->add_route(3, "rspeaker", 0.50);
-	m_ymf278b->add_route(4, "lspeaker", 0.40);
-	m_ymf278b->add_route(5, "rspeaker", 0.40);
-	m_ymf278b->add_route(6, "lspeaker", 0.40);
-	m_ymf278b->add_route(7, "rspeaker", 0.40);
+	m_ymf278b->add_route(2, "lspeaker", 0.40);
+	m_ymf278b->add_route(3, "rspeaker", 0.40);
+	m_ymf278b->add_route(4, "lspeaker", 0.50);
+	m_ymf278b->add_route(5, "rspeaker", 0.50);
 }
 
 

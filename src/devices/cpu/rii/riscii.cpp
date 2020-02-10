@@ -65,8 +65,8 @@ riscii_series_device::riscii_series_device(const machine_config &mconfig, device
 	, m_regs(nullptr)
 	, m_cache(nullptr)
 	, m_porta_in_cb(*this)
-	, m_port_in_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_port_out_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_port_in_cb(*this)
+	, m_port_out_cb(*this)
 	, m_pcmask((1 << pcbits) - 1)
 	, m_datastart(datastart)
 	, m_tbptmask(((1 << (addrbits + 1)) - 1) | (datastart != 0 ? 0x800000 : 0))
@@ -191,10 +191,8 @@ device_memory_interface::space_config_vector riscii_series_device::memory_space_
 void riscii_series_device::device_resolve_objects()
 {
 	m_porta_in_cb.resolve_safe(0xff);
-	for (auto &cb : m_port_in_cb)
-		cb.resolve_safe(0xff);
-	for (auto &cb : m_port_out_cb)
-		cb.resolve_safe();
+	m_port_in_cb.resolve_all_safe(0xff);
+	m_port_out_cb.resolve_all_safe();
 }
 
 void riscii_series_device::device_start()

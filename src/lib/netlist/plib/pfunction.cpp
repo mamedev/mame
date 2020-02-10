@@ -211,7 +211,7 @@ namespace plib {
 				}
 				else if (p == 0) // Function or variable
 				{
-					if (sexpr[i+1] == "(")
+					if ((i+1<sexpr.size()) && sexpr[i+1] == "(")
 						opstk.push(s);
 					else
 						postfix.push_back(s);

@@ -4,8 +4,6 @@
 
     V-Tech V.Smile Baby console emulation
 
-	- mounting of cartridges doesn't appear to work?
-
 *******************************************************************************/
 
 #include "emu.h"

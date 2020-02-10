@@ -62,10 +62,17 @@ class NETLIB_NAME(name) : public device_t
 	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring &name) \
 	: NETLIB_NAME(pclass)(owner, name)
 
+// FIXME: Only used by diode
 #define NETLIB_CONSTRUCTOR_DERIVED_EX(cname, pclass, ...)                      \
 	private: detail::family_setter_t m_famsetter;                              \
 	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring &name, __VA_ARGS__) \
 	: NETLIB_NAME(pclass)(owner, name)
+
+#define NETLIB_CONSTRUCTOR_DERIVED_PASS(cname, pclass, ...)                      \
+	private: detail::family_setter_t m_famsetter;                              \
+	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring &name) \
+	: NETLIB_NAME(pclass)(owner, name, __VA_ARGS__)
+
 
 /// \brief Used to define the constructor of a netlist device.
 ///  Use this to define the constructor of a netlist device. Please refer to
@@ -258,8 +265,6 @@ namespace netlist
 		virtual unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name,
 				logic_input_t *proxied) const = 0;
 
-		// FIXME: remove fixed_V()
-		nl_fptype fixed_V() const noexcept{return m_fixed_V; }
 		nl_fptype low_thresh_V(nl_fptype VN, nl_fptype VP) const noexcept{ return VN + (VP - VN) * m_low_thresh_PCNT; }
 		nl_fptype high_thresh_V(nl_fptype VN, nl_fptype VP) const noexcept{ return VN + (VP - VN) * m_high_thresh_PCNT; }
 		nl_fptype low_offset_V() const noexcept{ return m_low_VO; }
@@ -273,7 +278,6 @@ namespace netlist
 		bool is_below_low_thresh_V(nl_fptype V, nl_fptype VN, nl_fptype VP) const noexcept
 		{ return (V - VN) < low_thresh_V(VN, VP); }
 
-		nl_fptype m_fixed_V;           //!< For variable voltage families, specify 0. For TTL this would be 5.
 		nl_fptype m_low_thresh_PCNT;   //!< low input threshhold offset. If the input voltage is below this value times supply voltage, a "0" input is signalled
 		nl_fptype m_high_thresh_PCNT;  //!< high input threshhold offset. If the input voltage is above the value times supply voltage, a "0" input is signalled
 		nl_fptype m_low_VO;            //!< low output voltage offset. This voltage is output if the ouput is "0"

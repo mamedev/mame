@@ -23,8 +23,8 @@ protected:
 private:
 	// internal state
 	required_device<mb88_cpu_device> m_cpu;
-	devcb_read8 m_in[4];
-	devcb_write8 m_out[2];
+	devcb_read8::array<4> m_in;
+	devcb_write8::array<2> m_out;
 };
 
 DECLARE_DEVICE_TYPE(NAMCO_62XX, namco_62xx_device)

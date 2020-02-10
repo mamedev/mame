@@ -1,6 +1,5 @@
-// license:GPL-2.0+
-// copyright-holders:Couriersud
-/* € */ // ABC
+// license:CC0
+// copyright-holders:Andrew Gardner,Couriersud
 
 #include "netlist/devices/net_lib.h"
 
@@ -19,12 +18,8 @@
 
 #ifndef __PLIB_PREPROCESSOR__
 
-#define LM358_DIP(_name)                                                       \
-		NET_REGISTER_DEV_X(LM358_DIP, _name)
-
 #define G501534_DIP(_name)                                                     \
 		NET_REGISTER_DEV_X(G501534_DIP, _name)
-
 
 NETLIST_EXTERNAL(congob_lib)
 
@@ -43,23 +38,27 @@ NETLIST_START(dummy)
 // IGNORED O_AUDIO0: O_AUDIO0  64 0
 // .END
 
-	PARAM(Solver.ACCURACY, 1e-7)
-	PARAM(Solver.NR_LOOPS, 90000)
+	PARAM(Solver.RELTOL, 1e-3)
+	PARAM(Solver.VNTOL, 1e-5)
+	PARAM(Solver.NR_LOOPS, 30)
 	PARAM(Solver.SOR_FACTOR, 1.0)
 	PARAM(Solver.GS_LOOPS, 99)
-	//PARAM(Solver.METHOD, "GMRES")
 	PARAM(Solver.METHOD, "MAT_CR")
+
+	//PARAM(Solver.METHOD, "GMRES")
+	PARAM(Solver.ACCURACY, 1e-5)
 	//PARAM(Solver.METHOD, "SOR")
 
 #if USE_OPTMIZATIONS
 #if USE_FRONTIERS
-	SOLVER(Solver, 48000)
+	SOLVER(Solver, 96000)
 #else
 	SOLVER(Solver, 48000)
 #endif
 	PARAM(Solver.DYNAMIC_TS, 0)
-	PARAM(Solver.PARALLEL, 1)
+	PARAM(Solver.PARALLEL, 4)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-6)
+	PARAM(Solver.DYNAMIC_LTE, 1e-4)
 #else
 	SOLVER(Solver, 48000)
 	PARAM(Solver.DYNAMIC_TS, 1)
@@ -78,8 +77,6 @@ NETLIST_START(dummy)
 	TTL_INPUT(I_GORILLA0, 0)
 	TTL_INPUT(I_RIM0, 0)
 
-	ALIAS(I_V0.Q, GND.Q)
-
 	ANALOG_INPUT(I_V12, 12)
 	ANALOG_INPUT(I_V5, 5)
 	ANALOG_INPUT(I_V6, 6)
@@ -90,7 +87,7 @@ NETLIST_START(dummy)
 
 	NET_C(R94.1, CO.1)
 	NET_C(CO.2, RO.1)
-	NET_C(RO.2, GND)
+	NET_C(GND, RO.2)
 
 	// Found here: https://hamesspam.sakura.ne.jp/hes2016/160521.html
 	NET_MODEL("1S2075 D(IS=1.387E-9 N=1.702 RS=1.53 CJO=1.92pf VJ=0.4996 M=0.0605 TT=5ns BV=75 IBV=100E-15)")
@@ -98,6 +95,9 @@ NETLIST_START(dummy)
 	NET_MODEL("2SC1941 NPN(IS=46.416f BF=210 NF=1.0022 VAF=600 IKF=500m ISE=60f NE=1.5 BR=2.0122 NR=1.0022 VAR=10G IKR=10G ISC=300p NC=2 RB=13.22 IRB=10G RBM=13.22 RE=100m RC=790m CJE=26.52p VJE=900m MJE=518m TF=1.25n XTF=10 VTF=10 ITF=500m PTF=0 CJC=4.89p VJC=750m MJC=237m XCJC=500m TR=100n CJS=0 VJS=750m MJS=500m XTB=1.5 EG=1.11 XTI=3 KF=0 AF=1 FC=500m)")
 
 	INCLUDE(CongoBongo_schematics)
+
+	NET_C(I_V5, I_RIM0.VCC, I_CONGA_H0.VCC, I_CONGA_L0.VCC, I_GORILLA0.VCC, I_BASS_DRUM0.VCC)
+	NET_C(GND, I_RIM0.GND, I_CONGA_H0.GND, I_CONGA_L0.GND, I_GORILLA0.GND, I_BASS_DRUM0.GND)
 
 #if USE_OPTMIZATIONS
 	/* provide resistance feedback loop. This helps convergence for
@@ -114,8 +114,11 @@ NETLIST_START(dummy)
 	/* The opamp actually has an FPF of about 1000k. This doesn't work here and causes oscillations.
 	 * FPF here therefore about half the Solver clock.
 	 */
-	PARAM(XU16.B.MODEL, "MB3614(TYPE=3)")
+#if 1
+	PARAM(XU16.B.MODEL, "MB3614(TYPE=3 UGF=22k)")
+	//PARAM(XU17.A.MODEL, "MB3614(TYPE=3 UGF=22k)")
 	PARAM(XU17.C.MODEL, "MB3614(TYPE=3 UGF=44k)")
+#endif
 #if 0
 	PARAM(XU17.A.MODEL, "MB3614(TYPE=1)")
 	PARAM(XU17.B.MODEL, "MB3614(TYPE=1)")
@@ -288,14 +291,14 @@ NETLIST_START(CongoBongo_schematics)
 	NET_C(XU13.1, C37.2, C36.1, R48.1)
 	NET_C(XU13.2, C35.2, R48.2)
 	NET_C(XU13.3, R44.1, R46.2, R45.1)
-	NET_C(XU13.4, R27.1, R21.1, R37.1, R31.1, R47.1, R41.1, R57.1, R51.1, C46.2, C45.2, XU17.4, R80.2, XU16.4, XU20.4, XU15.12, I_V12.Q)
+	NET_C(I_V12.Q, XU13.4, R27.1, R21.1, R37.1, R31.1, R47.1, R41.1, R57.1, R51.1, C46.2, C45.2, XU17.4, R80.2, XU16.4, XU20.4, XU15.12)
 	NET_C(XU13.5, R54.1, R56.2, R55.1)
 	NET_C(XU13.6, C41.2, R58.2, R60.2)
 	NET_C(XU13.7, C44.2, C42.1, R58.1, R61.1)
 	NET_C(XU13.8, C29.2, C31.1, R38.1)
 	NET_C(XU13.9, C30.2, R38.2)
 	NET_C(XU13.10, R34.1, R36.2, R35.1)
-	NET_C(XU13.11, C22.2, R29.2, R25.2, R23.2, R22.2, XU6.1, XU6.3, XU6.7, C28.2, R39.2, R35.2, R33.2, R32.2, C34.2, R49.2, R45.2, R43.2, R42.2, C40.2, R59.2, R55.2, R53.2, R52.2, C43.2, R69.1, R64.1, C49.2, C48.2, C47.2, C46.1, C45.1, XU17.11, XU19.1, XU19.4, XU19.8, XU19.12, XU19.15, R81.1, C56.2, C55.2, C53.2, C52.2, XU18.1, XU18.2, XU18.7, XU18.12, XU18.13, C54.2, XU16.11, R84.1, R88.1, Q2.E, C58.2, C60.2, XU20.1, XU20.2, XU15.4, I_V0.Q)
+	NET_C(GND, XU13.11, C22.2, R29.2, R25.2, R23.2, R22.2, XU6.1, XU6.3, XU6.7, C28.2, R39.2, R35.2, R33.2, R32.2, C34.2, R49.2, R45.2, R43.2, R42.2, C40.2, R59.2, R55.2, R53.2, R52.2, C43.2, R69.1, R64.1, C49.2, C48.2, C47.2, C46.1, C45.1, XU17.11, XU19.1, XU19.4, XU19.8, XU19.12, XU19.15, R81.1, C56.2, C55.2, C53.2, C52.2, XU18.1, XU18.2, XU18.7, XU18.12, XU18.13, C54.2, XU16.11, R84.1, R88.1, Q2.E, C58.2, C60.2, XU20.1, XU20.2, XU15.4)
 	NET_C(XU13.12, R24.1, R26.2, R25.1)
 	NET_C(XU13.13, C23.2, R28.2)
 	NET_C(XU13.14, C25.2, C24.1, R28.1)
@@ -377,6 +380,7 @@ NETLIST_START(CongoBongo_schematics)
 	NET_C(C60.1, XU15.2)
 	NET_C(XU15.3, C61.2)
 	NET_C(C61.1, R94.2)
+
 NETLIST_END()
 
 
@@ -385,7 +389,8 @@ NETLIST_START(G501534_DIP)
 	//AFUNC(f, 2, "A0 A1 A1 A1 * * 0.01 * *")
 	//AFUNC(f, 2, "A0")
 	//AFUNC(f, 2, "A0 6 - A1 3 pow * 0.02 * 6 +")
-	AFUNC(f, 2, "A0 * pow(A1,3.0) * 0.02")
+	//AFUNC(f, 2, "A0 * pow(A1,3.0) * 0.02")
+	AFUNC(f, 2, "A0 * A1 * 0.2")
 
 	/*
 	 * 12:   VCC
@@ -396,15 +401,13 @@ NETLIST_START(G501534_DIP)
 	 *  2:   RDL - connected via Capacitor to ground
 	 */
 
-	DUMMY_INPUT(DU1)
-	DUMMY_INPUT(DU2)
-	DUMMY_INPUT(DU3)
+	RES(DUMMY, RES_K(1))
 
 	RES(RO, 1000)
 
-	ALIAS(12, DU1.I)
-	ALIAS(4,  DU2.I)
-	ALIAS(2,  DU3.I)
+	ALIAS(12, DUMMY.1) // VCC
+	ALIAS(4,  DUMMY.2) // GND
+	ALIAS(2,  DUMMY.2) // RDL
 	ALIAS(1,  f.A0)
 	ALIAS(13, f.A1)
 	NET_C(f.Q, RO.1)

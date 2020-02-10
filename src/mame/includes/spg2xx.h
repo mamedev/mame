@@ -1,11 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, David Haywood
-#pragma once
-
 #ifndef MAME_INCLUDES_SPG2XX_H
 #define MAME_INCLUDES_SPG2XX_H
 
-#include "emu.h"
+#pragma once
 
 #include "cpu/unsp/unsp.h"
 #include "machine/i2cmem.h"
@@ -40,6 +38,8 @@ public:
 	void non_spg_base(machine_config &config);
 	void abltenni(machine_config &config);
 	void tvsprt10(machine_config &config);
+	void guitarfv(machine_config &config);
+
 
 	void init_crc();
 	void init_wiwi18();

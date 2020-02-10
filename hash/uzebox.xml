@@ -1426,4 +1426,100 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="finalbld">
+		<description>Final Blood</description>
+		<year>2018</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Dominik Kristen"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="45886">
+				<rom name="finalblood.bin" size="45886" crc="091d0ba4" sha1="d6888bc0d60d4f12c3f23e9ea5d5bc99baaec1fa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogfeas">
+		<description>Frog Feast</description>
+		<year>201?</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Lee Weber"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="61028">
+				<rom name="frogfeast.bin" size="61028" crc="63532540" sha1="305f6b96538b390d07ade5fe0d381f9b26baa4ff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="laserpuz">
+		<description>Laser Puzzle</description>
+		<year>201?</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Matt Pandina"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="60904">
+				<rom name="laserpuzzle.bin" size="60904" crc="948ab76e" sha1="c243bb87d612155bb1fc79b31a76851703fcd11b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="laserpuz2">
+		<description>Laser Puzzle II</description>
+		<year>201?</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Matt Pandina"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="60454">
+				<rom name="laserpuzzle2.bin" size="60454" crc="907bfe44" sha1="e5a8e8d07dba7ed02be2a39cd84ea684c2e7fc79"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="melli">
+		<description>Melli's RetroLand</description>
+		<year>201?</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Grobian99"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="53736">
+				<rom name="melli.bin" size="53736" crc="f5ae4323" sha1="95b787a8314a3308bc642f03e3aa450946c3e903"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reels">
+		<description>Reels of Fortune</description>
+		<year>2019</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Dominik Kristen"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="56304">
+				<rom name="reels.bin" size="56304" crc="8643e2cf" sha1="ad132c49d22f46214408fa687f6cdd4715e5c6c5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tactics">
+		<description>Uzebox Tactics</description>
+		<year>2019</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Dominik Kristen"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="46628">
+				<rom name="tactics.bin" size="46628" crc="29d88c0e" sha1="b1334f6d6cfd5352cda5271db73ee58a0a059047"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uzewars">
+		<description>Uzi Wars</description>
+		<year>201?</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Jon Thomasson"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="25776">
+				<rom name="uzewars.bin" size="25776" crc="21861b9e" sha1="aae3ec5aeda329832a8717ab89d2d5360f2a9c65"/>
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

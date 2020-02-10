@@ -635,6 +635,7 @@ public:
 	void xavix2000_i2c_24c02(machine_config &config);
 
 	void xavix2002_i2c_24c04(machine_config &config);
+	void xavix2002_i2c_mrangbat(machine_config& config);
 
 	void init_epo_efdx()
 	{
@@ -755,7 +756,7 @@ public:
 	xavix_cart_state(const machine_config &mconfig, device_type type, const char *tag) :
 		xavix_state(mconfig, type, tag),
 		m_cartslot(*this, "cartslot")
-	{ 
+	{
 		m_cartlimit = 0x400000;
 	}
 
@@ -936,7 +937,7 @@ class xavix_cart_gcslottv_state : public xavix_cart_state
 public:
 	xavix_cart_gcslottv_state(const machine_config &mconfig, device_type type, const char *tag) :
 		xavix_cart_state(mconfig, type, tag)
-	{ 
+	{
 		m_cartlimit = 0x800000;
 	}
 

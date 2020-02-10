@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, David Haywood
 
+#include "emu.h"
 #include "includes/spg2xx.h"
+
 #include "machine/eepromser.h"
 
 class dreamlif_state : public spg2xx_game_state

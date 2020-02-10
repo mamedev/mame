@@ -20,8 +20,10 @@ public:
 	auto chip_select_callback() { return m_out_chip_select_func.bind(); }
 	auto tmrout0_handler() { return m_out_tmrout0_func.bind(); }
 	auto tmrout1_handler() { return m_out_tmrout1_func.bind(); }
+	auto irmx_irq_cb() { return m_irmx_irq_cb.bind(); }
 
 	IRQ_CALLBACK_MEMBER(int_callback);
+	IRQ_CALLBACK_MEMBER(inta_callback);
 	DECLARE_WRITE_LINE_MEMBER(drq0_w) { m_dma[0].drq_state = state; }
 	DECLARE_WRITE_LINE_MEMBER(drq1_w) { m_dma[1].drq_state = state; }
 	DECLARE_WRITE_LINE_MEMBER(tmrin0_w) { if(state && (m_timer[0].control & 0x8004) == 0x8004) { inc_timer(0); } }
@@ -30,6 +32,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(int1_w) { external_int(1, state); }
 	DECLARE_WRITE_LINE_MEMBER(int2_w) { external_int(2, state); }
 	DECLARE_WRITE_LINE_MEMBER(int3_w) { external_int(3, state); }
+	template <typename... T> void set_irmx_irq_ack(T &&... args) { m_irmx_irq_ack.set(std::forward<T>(args)...); }
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -121,6 +124,7 @@ private:
 
 	struct intr_state
 	{
+		uint8_t       vector;
 		uint8_t       pending;
 		uint16_t      ack_mask;
 		uint16_t      priority_mask;
@@ -128,7 +132,7 @@ private:
 		uint16_t      request;
 		uint16_t      status;
 		uint16_t      poll_status;
-		uint16_t      timer;
+		uint16_t      timer[3];
 		uint16_t      dma[2];
 		uint16_t      ext[4];
 		uint8_t       ext_state;
@@ -154,6 +158,8 @@ private:
 	devcb_write16 m_out_chip_select_func;
 	devcb_write_line m_out_tmrout0_func;
 	devcb_write_line m_out_tmrout1_func;
+	devcb_write_line m_irmx_irq_cb;
+	device_irq_acknowledge_delegate m_irmx_irq_ack;
 };
 
 class i80188_cpu_device : public i80186_cpu_device

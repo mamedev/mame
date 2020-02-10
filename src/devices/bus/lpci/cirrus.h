@@ -23,7 +23,7 @@ public:
 	// construction/destruction
 	pci_cirrus_svga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	template <typename T>
-	void set_vga(T &&tag) {	m_vga.set_tag(std::forward<T>(tag)); }
+	void set_vga(T &&tag) { m_vga.set_tag(std::forward<T>(tag)); }
 
 	virtual uint32_t pci_read(pci_bus_device *pcibus, int function, int offset, uint32_t mem_mask) override;
 	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, uint32_t data, uint32_t mem_mask) override;

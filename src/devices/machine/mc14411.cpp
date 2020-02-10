@@ -102,7 +102,7 @@ mc14411_device::mc14411_device(const machine_config &mconfig, const char *tag, d
 
 mc14411_device::mc14411_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_out_fx_cbs{*this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this }
+	, m_out_fx_cbs(*this)
 	, m_divider(0)
 	, m_reset(CLEAR_LINE)
 {

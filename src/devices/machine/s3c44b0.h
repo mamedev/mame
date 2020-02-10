@@ -599,6 +599,8 @@ private:
 	devcb_write_line m_sda_w_cb;
 	devcb_read32 m_data_r_cb;
 	devcb_write16 m_data_w_cb;
+
+	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_cache;
 };
 
 DECLARE_DEVICE_TYPE(S3C44B0, s3c44b0_device)

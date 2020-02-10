@@ -423,15 +423,6 @@ const char *core_options::simple_entry::maximum() const noexcept
 //**************************************************************************
 
 //-------------------------------------------------
-//  core_options - constructor
-//-------------------------------------------------
-
-core_options::core_options()
-{
-}
-
-
-//-------------------------------------------------
 //  ~core_options - destructor
 //-------------------------------------------------
 
@@ -657,7 +648,7 @@ void core_options::parse_command_line(const std::vector<std::string> &args, int 
 		// special case - collect unadorned arguments after commands into a special place
 		if (is_unadorned && !m_command.empty())
 		{
-			m_command_arguments.push_back(std::move(args[arg]));
+			m_command_arguments.push_back(args[arg]);
 			command_argument_processed();
 			continue;
 		}

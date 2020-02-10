@@ -179,8 +179,6 @@ namespace devices
 			netlist_time::mult_type total = 0;
 			for (unsigned i=0; i<m_size; i++)
 			{
-				// FIXME: use pstonum_ne
-				//pati[i] = plib::pstonum<decltype(pati[i])>(pat[i]);
 				pati[i] = plib::pstonum<std::int64_t>(pat[i]);
 				total += pati[i];
 			}
@@ -344,7 +342,6 @@ namespace devices
 
 	private:
 		analog::NETLIB_NAME(twoterm) m_RIN;
-		// Fixme: only works if the device is time-stepped - need to rework
 		analog::NETLIB_NAME(twoterm) m_ROUT;
 		analog_input_t m_I;
 		analog_output_t m_Q;
@@ -355,8 +352,6 @@ namespace devices
 
 	// -----------------------------------------------------------------------------
 	// nld_function
-	//
-	// FIXME: Currently a proof of concept to get congo bongo working
 	// ----------------------------------------------------------------------------- */
 
 	NETLIB_OBJECT(function)
@@ -437,7 +432,7 @@ namespace devices
 				const nl_fptype R = state ? m_RON() : m_ROFF();
 
 				// FIXME: We only need to update the net first if this is a time stepping net
-				m_R.update();
+				m_R.solve_now();
 				m_R.set_R(R);
 				m_R.solve_later();
 			}

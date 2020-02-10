@@ -17,6 +17,7 @@
     - split driver into several files? need to make PCF2112T device
     - why are megaiv/smondial2 beeps noisy?
     - add Monte Carlo IV (non-LE)
+    - add MM 1000 module
 
 **************************************************************************************************/
 
@@ -520,7 +521,7 @@ INPUT_PORTS_END
 
 void mephisto_montec_state::montec(machine_config &config)
 {
-	M65C02(config, m_maincpu, XTAL(8'000'000) / 2);
+	M65C02(config, m_maincpu, XTAL(8'000'000) / 2); // R65C02P4
 	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_montec_state::montec_mem);
 	m_maincpu->set_periodic_int(FUNC(mephisto_montec_state::nmi_line_assert), attotime::from_hz(XTAL(8'000'000) / (1 << 14)));
 
@@ -600,12 +601,12 @@ void mephisto_montec_state::smondial2(machine_config &config)
 
 ROM_START( megaiv )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_DEFAULT_BIOS("v2")
+	ROM_LOAD("megaiv.bin", 0x8000, 0x8000, CRC(dee355d2) SHA1(6bc79c0fb169020f017412f5f9696b9ecafbf99f) )
+ROM_END
 
-	ROM_SYSTEM_BIOS( 0, "v1", "V1" )
-	ROMX_LOAD("mega_iv_17.03.88",  0x8000, 0x8000, CRC(85267e82) SHA1(654c9cf84bf2165fc94f8c4cf9c662786ef3283b), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "v2", "V2" )
-	ROMX_LOAD("megaiv.bin",        0x8000, 0x8000, CRC(dee355d2) SHA1(6bc79c0fb169020f017412f5f9696b9ecafbf99f), ROM_BIOS(1) )
+ROM_START( megaiva )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("mega_iv_17.03.88", 0x8000, 0x8000, CRC(85267e82) SHA1(654c9cf84bf2165fc94f8c4cf9c662786ef3283b) )
 ROM_END
 
 ROM_START( monteciv )
@@ -615,22 +616,22 @@ ROM_END
 
 ROM_START( montec )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_DEFAULT_BIOS("v2")
+	ROM_LOAD("mc3_12.11.87", 0x8000, 0x8000, CRC(8eb26043) SHA1(26454a37eea29283bbb2762a3a68e95e4be6aa1c) )
+ROM_END
 
-	ROM_SYSTEM_BIOS( 0, "v1", "V1" )
-	ROMX_LOAD("mc.bin",  0x8000, 0x8000, CRC(05524da9) SHA1(bee2ffe09a27095f733584e0fb1203b95c23e17e), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "v2", "V2" )
-	ROMX_LOAD("mc2.bin", 0x8000, 0x8000, CRC(8eb26043) SHA1(26454a37eea29283bbb2762a3a68e95e4be6aa1c), ROM_BIOS(1) )
+ROM_START( monteca )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("mc2_20.7.87", 0x8000, 0x8000, CRC(05524da9) SHA1(bee2ffe09a27095f733584e0fb1203b95c23e17e) )
 ROM_END
 
 ROM_START( smondial )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_DEFAULT_BIOS("ab")
+	ROM_LOAD("supermondial_a.bin", 0x8000, 0x8000, CRC(c1d7d0a5) SHA1(d7f0da6938458c06925f0936e63915319144d7e0) )
+ROM_END
 
-	ROM_SYSTEM_BIOS( 0, "a",  "Ver A" )
-	ROMX_LOAD("supermondial_a.bin",  0x8000, 0x8000, CRC(c1d7d0a5) SHA1(d7f0da6938458c06925f0936e63915319144d7e0), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "ab", "Ver AB" )
-	ROMX_LOAD("supermondial_ab.bin", 0x8000, 0x8000, CRC(a8781685) SHA1(fd4c97e13bd398dc4c85e3e1778bf7e59fccd71e), ROM_BIOS(1) )
+ROM_START( smondialab )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("supermondial_ab.bin", 0x8000, 0x8000, CRC(a8781685) SHA1(fd4c97e13bd398dc4c85e3e1778bf7e59fccd71e) )
 ROM_END
 
 ROM_START( smondialb )
@@ -650,16 +651,22 @@ ROM_END
 
 ROM_START( mondial2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("mondial ii 01 08 87 morsch.bin", 0x8000, 0x8000, CRC(e5945ce6) SHA1(e75bbf9d54087271d9d46fb1de7634eb957f8db0) )
+	ROM_LOAD("mondial_ii_01.08.87", 0x8000, 0x8000, CRC(e5945ce6) SHA1(e75bbf9d54087271d9d46fb1de7634eb957f8db0) )
 ROM_END
 
 
-/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS                  INIT        COMPANY             FULLNAME                      FLAGS */
-CONS( 1985, mondial,   0,        0,      mondial,   mondial2,  mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Mondial",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, smondial,  0,        0,      smondial,  megaiv,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (Ver A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, smondialb, smondial, 0,      megaiv,    megaiv,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (Ver B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, montec,    0,        0,      montec,    montec,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo",       MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, mondial2,  0,        0,      mondial2,  mondial2,  mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Mondial II",        MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, smondial2, 0,        0,      smondial2, smondial2, mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial II",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, megaiv,    0,        0,      megaiv,    megaiv,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Mega IV",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, monteciv,  montec,   0,      monteciv,  montec,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo IV - Limited Edition", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT      CLASS                  INIT        COMPANY             FULLNAME                     FLAGS */
+CONS( 1985, mondial,    0,        0,      mondial,   mondial2,  mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Mondial",          MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, mondial2,   0,        0,      mondial2,  mondial2,  mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Mondial II",       MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1988, megaiv,     0,        0,      megaiv,    megaiv,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Mega IV (set 1)",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, megaiva,    megaiv,   0,      megaiv,    megaiv,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Mega IV (set 2)",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1986, smondial,   0,        0,      smondial,  megaiv,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (ver. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, smondialab, smondial, 0,      smondial,  megaiv,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (ver. AB)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, smondialb,  smondial, 0,      megaiv,    megaiv,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (ver. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, smondial2,  0,        0,      smondial2, smondial2, mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1987, montec,     0,        0,      montec,    montec,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo (ver. MC3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, monteca,    montec,   0,      montec,    montec,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo (ver. MC2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, monteciv,   montec,   0,      monteciv,  montec,    mephisto_montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo IV - Limited Edition", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -36,6 +36,10 @@ Mephisto II/ESB II program module:
 - 2*TC5514P (1KBx4 RAM)
 - 2*CDP1859CE (4bit latch)
 
+Mephisto 1X program module:
+- PCB label: DH 4005 02 301 00
+- rest is same as Mephisto II, but ROM chips are CM3200-2
+
 Mephisto III program module:
 - PCB label: HG 4005 02 401 00
 - 2*HN4827128G (16KB EPROM), also seen with HN613256P G81 (32KB ROM)
@@ -495,19 +499,34 @@ ROM_START( mephisto )
 ROM_END
 
 
-ROM_START( mephisto2 )
+ROM_START( mephisto1x )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("5619_03_351", 0x0000, 0x1000, CRC(5b13d7bf) SHA1(e1b7dee278a03f75e8a1554715fca4c7fbbc1cb8) ) // TC5334P
-	ROM_LOAD("5620_03_352", 0x1000, 0x1000, CRC(e93bf521) SHA1(42f9adce0d5e25b1b9d10217f8e3e0994d7b70d5) ) // "
-	ROM_LOAD("5621_03_353", 0x2000, 0x1000, CRC(430dac62) SHA1(a0e23fcb4cfa27778a9398bd4994a7792e4541d0) ) // "
+	ROM_LOAD("3-2911_adi.1", 0x0000, 0x1000, CRC(0d62fa67) SHA1(b4bd934fec595f37f99b74eb341d220c511c07a5) ) // CM3200-2
+	ROM_LOAD("3-2501_adj.2", 0x1000, 0x1000, CRC(4e1b67ae) SHA1(4fded3ed1a1e168dedc07eea4086fa31805252d9) ) // "
+	ROM_LOAD("3-2841_adk.3", 0x2000, 0x1000, CRC(5dd05a5d) SHA1(372ed83a936fb0720b68590ca6ff4a02c80f4bab) ) // "
+ROM_END
+
+
+ROM_START( mephisto2 ) // cartridge s/n 0302446
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("5619_03_351.1", 0x0000, 0x1000, CRC(5b13d7bf) SHA1(e1b7dee278a03f75e8a1554715fca4c7fbbc1cb8) ) // TC5334P
+	ROM_LOAD("5620_03_352.2", 0x1000, 0x1000, CRC(e93bf521) SHA1(42f9adce0d5e25b1b9d10217f8e3e0994d7b70d5) ) // "
+	ROM_LOAD("5621_03_353.3", 0x2000, 0x1000, CRC(430dac62) SHA1(a0e23fcb4cfa27778a9398bd4994a7792e4541d0) ) // "
+ROM_END
+
+ROM_START( mephisto2a ) // cartridge s/n 0037011
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("4005_02_351_01.1", 0x0000, 0x1000, CRC(5b13d7bf) SHA1(e1b7dee278a03f75e8a1554715fca4c7fbbc1cb8) ) // HN462532G
+	ROM_LOAD("4005_02_352_01.2", 0x1000, 0x1000, CRC(da88b62f) SHA1(f5e71521ba8ab0b481e4725ffa706b1c157424b5) ) // "
+	ROM_LOAD("4005_02_353_01.3", 0x2000, 0x1000, CRC(1f933d33) SHA1(5d5bfd40158354830c434f4c8b4ff1cac8ab4f5c) ) // "
 ROM_END
 
 ROM_START( mephisto2e )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("251-11", 0x0000, 0x1000, CRC(3c8e2631) SHA1(5960e47f0659b1e5f164107069738e730e3ff255) ) // M2532A
-	ROM_LOAD("252-10", 0x1000, 0x1000, CRC(832b053e) SHA1(b0dfe857c38f13a4b04ac67a8a46f37c962a8629) ) // "
-	ROM_LOAD("253-09", 0x2000, 0x1000, CRC(00788b63) SHA1(cf94dc19ef85b359989410e7824280c59433fca9) ) // "
-	ROM_LOAD("254-09", 0x3000, 0x1000, CRC(d6be47a6) SHA1(3d577036111c026292b6c445efcb126cf7a6a472) ) // "
+	ROM_LOAD("251-11.1", 0x0000, 0x1000, CRC(3c8e2631) SHA1(5960e47f0659b1e5f164107069738e730e3ff255) ) // M2532A
+	ROM_LOAD("252-10.2", 0x1000, 0x1000, CRC(832b053e) SHA1(b0dfe857c38f13a4b04ac67a8a46f37c962a8629) ) // "
+	ROM_LOAD("253-09.3", 0x2000, 0x1000, CRC(00788b63) SHA1(cf94dc19ef85b359989410e7824280c59433fca9) ) // "
+	ROM_LOAD("254-09.4", 0x3000, 0x1000, CRC(d6be47a6) SHA1(3d577036111c026292b6c445efcb126cf7a6a472) ) // "
 ROM_END
 
 
@@ -533,7 +552,10 @@ ROM_END
 //    YEAR  NAME        PARENT    CMP MACHINE     INPUT       STATE          INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1980, mephisto,   0,         0, mephisto,   mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1981, mephisto2,  0,         0, mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, mephisto1x, 0,         0, mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto 1X", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1981, mephisto2,  0,         0, mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, mephisto2a, mephisto2, 0, mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1981, mephisto2e, mephisto2, 0, mephisto2e, mephisto2e, brikett_state, empty_init, "Hegener + Glaser", "Mephisto ESB II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1983, mephisto3,  0,         0, mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (ver. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

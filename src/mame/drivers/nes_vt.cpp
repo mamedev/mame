@@ -67,7 +67,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/nes.h"
 #include "cpu/m6502/n2a03.h"
 #include "machine/bankdev.h"
 #include "video/ppu2c0x_vt.h"
@@ -76,16 +75,18 @@
 #include "screen.h"
 #include "speaker.h"
 
-
-class nes_vt_state : public nes_base_state
+class nes_vt_state : public driver_device
 {
 public:
 	nes_vt_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_base_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_io0(*this, "IO0"),
+		m_io1(*this, "IO1"),
 		m_screen(*this, "screen"),
 		m_ppu(*this, "ppu"),
 		m_apu(*this, "apu"),
-		m_csel(*this, "CARTSEL"),
+		m_cartsel(*this, "CARTSEL"),
 		m_exin0(*this, "EXTRAIN0"),
 		m_exin1(*this, "EXTRAIN1"),
 		m_exin2(*this, "EXTRAIN2"),
@@ -104,10 +105,8 @@ public:
 	void nes_vt_base(machine_config& config);
 
 	void nes_vt(machine_config& config);
-	void nes_vt_ddr(machine_config& config);
 
-	void nes_vt_xx(machine_config& config);
-	void nes_vt_sudopptv(machine_config& config);
+	void nes_vt_4k_ram(machine_config& config);
 
 	/* OneBus read callbacks for getting sprite and tile data during rendering */
 	DECLARE_READ8_MEMBER(spr_r);
@@ -125,9 +124,19 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	virtual DECLARE_READ8_MEMBER(in0_r);
+	virtual DECLARE_READ8_MEMBER(in1_r);
+	virtual DECLARE_WRITE8_MEMBER(in0_w);
+
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
 	void nes_vt_map(address_map& map);
+
+	required_device<cpu_device> m_maincpu;
+	optional_ioport m_io0;
+	optional_ioport m_io1;
+	uint8_t m_latch0;
+	uint8_t m_latch1;
 
 	required_device<screen_device> m_screen;
 	required_device<ppu_vt03_device> m_ppu;
@@ -160,7 +169,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(vt03_8000_w);
 	DECLARE_WRITE8_MEMBER(vt03_4034_w);
 
-	optional_ioport m_csel;
+	optional_ioport m_cartsel;
 	optional_ioport m_exin0;
 	optional_ioport m_exin1;
 	optional_ioport m_exin2;
@@ -168,7 +177,7 @@ protected:
 
 	required_device<address_map_bank_device> m_prg;
 
-	void nes_vt_xx_map(address_map& map);
+	void nes_vt_4k_ram_map(address_map& map);
 
 	/* Misc */
 	DECLARE_READ8_MEMBER(rs232flags_region_r);
@@ -219,7 +228,6 @@ private:
 
 	int calculate_real_video_address(int addr, int extended, int readtype);
 
-
 	required_memory_bank m_prgbank0;
 	required_memory_bank m_prgbank1;
 	required_memory_bank m_prgbank2;
@@ -244,27 +252,21 @@ protected:
 private:
 };
 
-class nes_vt_ts_state : public nes_vt_state
-{
-public:
-	nes_vt_ts_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_state(mconfig, type, tag)
-	{
-		m_initial_e000_bank = 0x03; // or the banking is just different / ROM is scrambled
-	}
-
-	void nes_vt_ts(machine_config& config);
-
-protected:
-	void nes_vt_ts_map(address_map& map);
-
-private:
-};
-
 class nes_vt_pjoy_state : public nes_vt_state
 {
 public:
 	nes_vt_pjoy_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_vt_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void machine_reset() override;
+};
+
+class nes_vt_waixing_state : public nes_vt_state
+{
+public:
+	nes_vt_waixing_state(const machine_config& mconfig, device_type type, const char* tag) :
 		nes_vt_state(mconfig, type, tag)
 	{ }
 
@@ -338,6 +340,28 @@ private:
 	DECLARE_READ8_MEMBER(vt03_415c_r);
 };
 
+class nes_vt_cy_lexibook_state : public nes_vt_cy_state
+{
+public:
+	nes_vt_cy_lexibook_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_vt_cy_state(mconfig, type, tag),
+		m_previous_port0(0),
+		m_latch0_bit(0),
+		m_latch1_bit(0)
+	{ }
+	
+protected:
+	virtual DECLARE_READ8_MEMBER(in0_r) override;
+	virtual DECLARE_READ8_MEMBER(in1_r) override;
+	virtual DECLARE_WRITE8_MEMBER(in0_w) override;
+
+private:
+	int m_previous_port0;
+	uint8_t m_latch0_bit;
+	uint8_t m_latch1_bit;
+};
+
+
 class nes_vt_dg_state : public nes_vt_state
 {
 public:
@@ -393,8 +417,6 @@ public:
 	nes_vt_ablpinb_state(const machine_config& mconfig, device_type type, const char* tag) :
 		nes_vt_state(mconfig, type, tag),
 		m_ablpinb_in0_val(0),
-		m_io0(*this, "IO0"),
-		m_io1(*this, "IO1"),
 		m_plunger(*this, "PLUNGER")
 	{ }
 
@@ -405,19 +427,15 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_READ8_MEMBER(ablpinb_in0_r);
-	DECLARE_READ8_MEMBER(ablpinb_in1_r);
-	DECLARE_WRITE8_MEMBER(ablpinb_in0_w);
-	DECLARE_READ8_MEMBER(ablpinb_410f_r);
+	virtual DECLARE_READ8_MEMBER(in0_r) override;
+	virtual DECLARE_READ8_MEMBER(in1_r) override;
+	virtual DECLARE_WRITE8_MEMBER(in0_w) override;
 
-	void nes_vt_ablpinb_map(address_map& map);
 	uint8_t m_ablpinb_in0_val;
 
 	int m_plunger_off;
 	int m_plunger_state_count;
 
-	required_ioport m_io0;
-	required_ioport m_io1;
 	required_ioport m_plunger;
 };
 
@@ -425,9 +443,7 @@ class nes_vt_sudoku_state : public nes_vt_state
 {
 public:
 	nes_vt_sudoku_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_state(mconfig, type, tag),
-		m_io0(*this, "IO0"),
-		m_io1(*this, "IO1")
+		nes_vt_state(mconfig, type, tag)
 	{ }
 
 	void init_sudoku();
@@ -439,23 +455,16 @@ protected:
 	//virtual void machine_reset() override;
 
 private:
-	DECLARE_READ8_MEMBER(in0_r);
-	DECLARE_READ8_MEMBER(in1_r);
-	DECLARE_WRITE8_MEMBER(in0_w);
-
-	void nes_vt_sudoku_map(address_map& map);
-
-	required_ioport m_io0;
-	required_ioport m_io1;
+	virtual DECLARE_READ8_MEMBER(in0_r) override;
+	virtual DECLARE_READ8_MEMBER(in1_r) override;
+	virtual DECLARE_WRITE8_MEMBER(in0_w) override;
 };
 
 class nes_vt_majgnc_state : public nes_vt_state
 {
 public:
 	nes_vt_majgnc_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_state(mconfig, type, tag),
-		m_io0(*this, "IO0"),
-		m_io1(*this, "IO1")
+		nes_vt_state(mconfig, type, tag)
 	{ }
 
 	void nes_vt_majgnc(machine_config& config);
@@ -463,15 +472,74 @@ public:
 protected:
 
 private:
-	DECLARE_READ8_MEMBER(in0_r);
-	DECLARE_READ8_MEMBER(in1_r);
-	DECLARE_WRITE8_MEMBER(in0_w);
-
-	void nes_vt_majgnc_map(address_map& map);
-
-	required_ioport m_io0;
-	required_ioport m_io1;
 };
+
+/* Standard I/O handlers (NES Controller clone) */
+
+READ8_MEMBER(nes_vt_state::in0_r)
+{
+	//logerror("%s: in0_r\n", machine().describe_context());
+	uint8_t ret = 0x40;
+	ret |= m_latch0 & 1;
+	m_latch0 >>= 1;
+	return ret;
+}
+
+READ8_MEMBER(nes_vt_state::in1_r)
+{
+	//logerror("%s: in1_r\n", machine().describe_context());
+	uint8_t ret = 0x40;
+	ret |= m_latch1 & 1;
+	m_latch1 >>= 1;
+	return ret;
+}
+
+WRITE8_MEMBER(nes_vt_state::in0_w)
+{
+	//logerror("%s: in0_w %02x\n", machine().describe_context(), data);
+	if (data & 0x01)
+		return;
+
+	m_latch0 = m_io0->read();
+	m_latch1 = m_io1->read();
+}
+
+/* Lexibook I/O handlers */
+
+READ8_MEMBER(nes_vt_cy_lexibook_state::in0_r)
+{
+	//logerror("%s: in0_r\n", machine().describe_context());
+	uint8_t ret = m_latch0_bit;
+	return ret;
+}
+
+READ8_MEMBER(nes_vt_cy_lexibook_state::in1_r)
+{
+	//logerror("%s: in1_r\n", machine().describe_context());
+	uint8_t ret = m_latch1_bit;
+	return ret;
+}
+
+WRITE8_MEMBER(nes_vt_cy_lexibook_state::in0_w)
+{
+	//logerror("%s: in0_w %02x\n", machine().describe_context(), data);
+	if ((!(data & 0x01)) && (m_previous_port0 & 0x01)) // 0x03 -> 0x02 transition
+	{
+		m_latch0 = m_io0->read();
+		m_latch1 = m_io1->read();
+	}
+
+	if ((!(data & 0x02)) && (m_previous_port0 & 0x02)) // 0x02 -> 0x00 transition
+	{
+		m_latch0_bit = m_latch0 & 0x01;
+		m_latch0 >>= 1;
+		m_latch1_bit = m_latch1 & 0x01;
+		m_latch1 >>= 1;
+	}
+	
+	m_previous_port0 = data;
+}
+
 
 uint32_t nes_vt_state::get_banks(uint8_t bnk)
 {
@@ -708,22 +776,22 @@ WRITE8_MEMBER(nes_vt_dg_state::vtfa_412c_w)
 	m_ahigh |= (data & 0x01) ? (1 << 25) : 0x0;
 	m_ahigh |= (data & 0x02) ? (1 << 24) : 0x0;
 
-	//m_ahigh |= (m_csel->read() == 0x01) ? (1 << 25) : 0x0;
+	//m_ahigh |= (m_cartsel->read() == 0x01) ? (1 << 25) : 0x0;
 	update_banks();
 }
 
 READ8_MEMBER(nes_vt_dg_state::vtfa_412c_r)
 {
-	if (m_csel)
-		return m_csel->read();
+	if (m_cartsel)
+		return m_cartsel->read();
 	else
 		return 0;
 }
 
 READ8_MEMBER(nes_vt_hh_state::vtfp_412d_r)
 {
-	if (m_csel)
-		return m_csel->read();
+	if (m_cartsel)
+		return m_cartsel->read();
 	else
 		return 0;
 }
@@ -968,8 +1036,8 @@ void nes_vt_state::machine_reset()
 	m_411d = 0x00;
 	m_4242 = 0x00;
 
-	if (m_csel)
-		m_ahigh = (m_csel->read() == 0x01) ? (1 << 25) : 0x0;
+	if (m_cartsel)
+		m_ahigh = (m_cartsel->read() == 0x01) ? (1 << 25) : 0x0;
 	else
 		m_ahigh = 0;
 
@@ -1412,15 +1480,15 @@ void nes_vt_state::do_dma(uint8_t data, bool has_ntsc_bug)
 	case 0x6: length = 64; break;
 	case 0x7: length = 128; break;
 	}
-	
+
 	uint16_t src_addr = (data << 8) | (src_nib_74 << 4);
 	logerror("vthh dma start ctrl=%02x addr=%04x\n", m_vdma_ctrl, src_addr);
-	
+
 	if (dma_mode == 1)
 	{
 		logerror("vdma dest %04x\n", m_ppu->get_vram_dest());
 	}
-	
+
 	if (has_ntsc_bug && (dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F00) && !(m_ppu->get_201x_reg(0x1) & 0x80))
 	{
 		length -= 1;
@@ -1473,7 +1541,7 @@ WRITE8_MEMBER(nes_vt_state::extra_io_control_w)
 	0x80 Extra I/O port 3 enable (1 = enable, 0 = disable)
 	*/
 
-	logerror("%s: extra_io_control_w %02x\n", data);
+	logerror("%s: extra_io_control_w %02x\n", machine().describe_context(), data);
 }
 
 READ8_MEMBER(nes_vt_state::extrain_01_r)
@@ -1557,7 +1625,7 @@ void nes_vt_ablpinb_state::machine_reset()
 }
 
 
-READ8_MEMBER(nes_vt_ablpinb_state::ablpinb_in0_r)
+READ8_MEMBER(nes_vt_ablpinb_state::in0_r)
 {
 	if (m_plunger_off)
 	{
@@ -1586,7 +1654,7 @@ READ8_MEMBER(nes_vt_ablpinb_state::ablpinb_in0_r)
 }
 
 
-READ8_MEMBER(nes_vt_ablpinb_state::ablpinb_in1_r)
+READ8_MEMBER(nes_vt_ablpinb_state::in1_r)
 {
 	uint8_t i = machine().rand() & 0x10;
 
@@ -1598,14 +1666,14 @@ READ8_MEMBER(nes_vt_ablpinb_state::ablpinb_in1_r)
 	return i | ret;
 }
 
-WRITE8_MEMBER(nes_vt_ablpinb_state::ablpinb_in0_w)
+WRITE8_MEMBER(nes_vt_ablpinb_state::in0_w)
 {
 	// write 0x04 to 0x4016 sets bit 0x08 in 0x4017
 	// write 0x00 to 0x4016 clears bit 0x08 in 0x4017
 	// could be related to vibration motor?
 
 	m_ablpinb_in0_val = data;
-	logerror("ablpinb_in0_w %02x\n", data);
+	logerror("in0_w %02x\n", data);
 }
 
 READ8_MEMBER(nes_vt_sudoku_state::in0_r)
@@ -1622,20 +1690,6 @@ WRITE8_MEMBER(nes_vt_sudoku_state::in0_w)
 {
 }
 
-READ8_MEMBER(nes_vt_majgnc_state::in0_r)
-{
-	return 0x00;// machine().rand();
-}
-
-READ8_MEMBER(nes_vt_majgnc_state::in1_r)
-{
-	return 0x00;// machine().rand();
-}
-
-WRITE8_MEMBER(nes_vt_majgnc_state::in0_w)
-{
-}
-
 void nes_vt_state::nes_vt_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
@@ -1644,8 +1698,8 @@ void nes_vt_state::nes_vt_map(address_map &map)
 	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
 	map(0x4014, 0x4014).r(FUNC(nes_vt_state::psg1_4014_r)).w(FUNC(nes_vt_state::vt_dma_w));
 	map(0x4015, 0x4015).rw(FUNC(nes_vt_state::psg1_4015_r), FUNC(nes_vt_state::psg1_4015_w)); /* PSG status / first control register */
-	map(0x4016, 0x4016).rw(FUNC(nes_vt_state::nes_in0_r), FUNC(nes_vt_state::nes_in0_w));
-	map(0x4017, 0x4017).r(FUNC(nes_vt_state::nes_in1_r)).w(FUNC(nes_vt_state::psg1_4017_w));
+	map(0x4016, 0x4016).rw(FUNC(nes_vt_state::in0_r), FUNC(nes_vt_state::in0_w));
+	map(0x4017, 0x4017).r(FUNC(nes_vt_state::in1_r)).w(FUNC(nes_vt_state::psg1_4017_w));
 
 	map(0x4034, 0x4034).w(FUNC(nes_vt_state::vt03_4034_w));
 
@@ -1668,36 +1722,8 @@ void nes_vt_state::nes_vt_map(address_map &map)
 	map(0x6000, 0x7fff).ram();
 }
 
-void nes_vt_ablpinb_state::nes_vt_ablpinb_map(address_map& map)
-{
-	nes_vt_map(map);
-
-	// override the inputs as specific non-standard 'controller' behavior is needed here and adding it to the generic NES controller bus wouldn't make sense.
-	map(0x4016, 0x4016).rw(FUNC(nes_vt_ablpinb_state::ablpinb_in0_r), FUNC(nes_vt_ablpinb_state::ablpinb_in0_w));
-	map(0x4017, 0x4017).r(FUNC(nes_vt_ablpinb_state::ablpinb_in1_r));
-}
-
-void nes_vt_sudoku_state::nes_vt_sudoku_map(address_map& map)
-{
-	nes_vt_map(map);
-
-	// override the inputs as specific non-standard 'controller' behavior is needed here and adding it to the generic NES controller bus wouldn't make sense.
-	map(0x4016, 0x4016).rw(FUNC(nes_vt_sudoku_state::in0_r),FUNC(nes_vt_sudoku_state::in0_w));
-	map(0x4017, 0x4017).r(FUNC(nes_vt_sudoku_state::in1_r));
-}
-
-void nes_vt_majgnc_state::nes_vt_majgnc_map(address_map& map)
-{
-	nes_vt_map(map);
-
-	map(0x4014, 0x4014).w(FUNC(nes_vt_majgnc_state::vt_dma_w));
-
-	map(0x4016, 0x4016).rw(FUNC(nes_vt_majgnc_state::in0_r),FUNC(nes_vt_majgnc_state::in0_w));
-	map(0x4017, 0x4017).r(FUNC(nes_vt_majgnc_state::in1_r));
-}
-
 /* Some later VT models have more RAM */
-void nes_vt_state::nes_vt_xx_map(address_map &map)
+void nes_vt_state::nes_vt_4k_ram_map(address_map &map)
 {
 	nes_vt_map(map);
 	map(0x0800, 0x0fff).ram();
@@ -1711,7 +1737,7 @@ void nes_vt_ablping_state::nes_vt_ablping_map(address_map &map)
 
 void nes_vt_cy_state::nes_vt_cy_map(address_map &map)
 {
-	nes_vt_xx_map(map);
+	nes_vt_4k_ram_map(map);
 	map(0x41b0, 0x41bf).r(FUNC(nes_vt_cy_state::vt03_41bx_r)).w(FUNC(nes_vt_cy_state::vt03_41bx_w));
 	map(0x48a0, 0x48af).r(FUNC(nes_vt_cy_state::vt03_48ax_r)).w(FUNC(nes_vt_cy_state::vt03_48ax_w));
 	map(0x4130, 0x4136).r(FUNC(nes_vt_cy_state::vt03_413x_r)).w(FUNC(nes_vt_cy_state::vt03_413x_w));
@@ -1722,7 +1748,7 @@ void nes_vt_cy_state::nes_vt_cy_map(address_map &map)
 
 void nes_vt_cy_state::nes_vt_bt_map(address_map &map)
 {
-	nes_vt_xx_map(map);
+	nes_vt_4k_ram_map(map);
 	map(0x412c, 0x412c).w(FUNC(nes_vt_cy_state::vt03_412c_w));
 }
 
@@ -1734,8 +1760,8 @@ void nes_vt_hh_state::nes_vt_hh_map(address_map &map)
 
 	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
 	map(0x4015, 0x4015).rw(FUNC(nes_vt_hh_state::psg1_4015_r), FUNC(nes_vt_hh_state::psg1_4015_w)); /* PSG status / first control register */
-	map(0x4016, 0x4016).rw(FUNC(nes_vt_hh_state::nes_in0_r), FUNC(nes_vt_hh_state::nes_in0_w));
-	map(0x4017, 0x4017).r(FUNC(nes_vt_hh_state::nes_in1_r)).w(FUNC(nes_vt_hh_state::psg1_4017_w));
+	map(0x4016, 0x4016).rw(FUNC(nes_vt_hh_state::in0_r), FUNC(nes_vt_hh_state::in0_w));
+	map(0x4017, 0x4017).r(FUNC(nes_vt_hh_state::in1_r)).w(FUNC(nes_vt_hh_state::psg1_4017_w));
 
 	map(0x4100, 0x410b).r(FUNC(nes_vt_hh_state::vt03_410x_r)).w(FUNC(nes_vt_hh_state::vt03_410x_w));
 
@@ -1784,8 +1810,8 @@ void nes_vt_dg_state::nes_vt_dg_map(address_map &map)
 
 	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
 	map(0x4015, 0x4015).rw(FUNC(nes_vt_dg_state::psg1_4015_r), FUNC(nes_vt_dg_state::psg1_4015_w)); /* PSG status / first control register */
-	map(0x4016, 0x4016).rw(FUNC(nes_vt_dg_state::nes_in0_r), FUNC(nes_vt_dg_state::nes_in0_w));
-	map(0x4017, 0x4017).r(FUNC(nes_vt_dg_state::nes_in1_r)).w(FUNC(nes_vt_dg_state::psg1_4017_w));
+	map(0x4016, 0x4016).rw(FUNC(nes_vt_dg_state::in0_r), FUNC(nes_vt_dg_state::in0_w));
+	map(0x4017, 0x4017).r(FUNC(nes_vt_dg_state::in1_r)).w(FUNC(nes_vt_dg_state::psg1_4017_w));
 
 	map(0x4100, 0x410b).r(FUNC(nes_vt_dg_state::vt03_410x_r)).w(FUNC(nes_vt_dg_state::vt03_410x_w));
 
@@ -1806,16 +1832,6 @@ void nes_vt_dg_state::nes_vt_fa_map(address_map &map)
 
 	map(0x412c, 0x412c).r(FUNC(nes_vt_dg_state::vtfa_412c_r)).w(FUNC(nes_vt_dg_state::vtfa_412c_w));
 	map(0x4242, 0x4242).w(FUNC(nes_vt_dg_state::vtfp_4242_w));
-}
-
-void nes_vt_ts_state::nes_vt_ts_map(address_map& map)
-{
-	nes_vt_map(map);
-	map(0x0800, 0x1fff).ram(); // how much RAM?
-
-	map(0x5000, 0x57ff).ram(); // plays music if you map this as RAM
-
-	map(0x2040, 0x207f).ram(); // strange regs in vdp area
 }
 
 void nes_vt_state::prg_map(address_map &map)
@@ -1926,49 +1942,30 @@ void nes_vt_ablpinb_state::nes_vt_ablpinb(machine_config &config)
 		(ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL - ppu2c0x_device::VBLANK_FIRST_SCANLINE_PALC + 1 + 2)));
 	m_screen->set_size(32 * 8, 312);
 	m_screen->set_visarea(0 * 8, 32 * 8 - 1, 0 * 8, 30 * 8 - 1);
-
-	// override for controllers
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_ablpinb_state::nes_vt_ablpinb_map);
 }
 
 void nes_vt_sudoku_state::nes_vt_sudoku(machine_config &config)
 {
 	nes_vt_base(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_sudoku_state::nes_vt_sudoku_map);
 }
 
 void nes_vt_majgnc_state::nes_vt_majgnc(machine_config &config)
 {
 	nes_vt_base(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_majgnc_state::nes_vt_majgnc_map);
 	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
 }
 
 void nes_vt_state::nes_vt(machine_config &config)
 {
 	nes_vt_base(config);
-
-	NES_CONTROL_PORT(config, m_ctrl1, nes_control_port1_devices, "joypad");
-	NES_CONTROL_PORT(config, m_ctrl2, nes_control_port2_devices, "joypad");
-	m_ctrl1->set_screen_tag(m_screen);
-	m_ctrl2->set_screen_tag(m_screen);
 }
 
-void nes_vt_state::nes_vt_ddr(machine_config &config)
+void nes_vt_waixing_state::machine_reset()
 {
-	nes_vt_base(config);
+	nes_vt_state::machine_reset();
 
-	NES_CONTROL_PORT(config, m_ctrl1, majesco_control_port1_devices, "ddr");
-	NES_CONTROL_PORT(config, m_ctrl2, majesco_control_port2_devices, nullptr);
-	m_ctrl1->set_screen_tag(m_screen);
-	m_ctrl2->set_screen_tag(m_screen);
-}
-
-void nes_vt_state::nes_vt_sudopptv(machine_config &config)
-{
-	nes_vt(config);
 	m_ppu->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4); // reasonable
-	//                                    ^    ^
+//	set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
 }
 
 void nes_vt_hum_state::machine_reset()
@@ -2002,27 +1999,27 @@ void nes_vt_ablping_state::nes_vt_ablping(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::nes_vt_ablping_map);
 }
 
-void nes_vt_state::nes_vt_xx(machine_config &config)
+void nes_vt_state::nes_vt_4k_ram(machine_config &config)
 {
 	nes_vt(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_xx_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_4k_ram_map);
 }
 
 void nes_vt_cy_state::nes_vt_cy(machine_config &config)
 {
-	nes_vt_xx(config);
+	nes_vt_4k_ram(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_cy_state::nes_vt_cy_map);
 }
 
 void nes_vt_cy_state::nes_vt_bt(machine_config &config)
 {
-	nes_vt_xx(config);
+	nes_vt_4k_ram(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_cy_state::nes_vt_bt_map);
 }
 
 void nes_vt_dg_state::nes_vt_dg(machine_config &config)
 {
-	nes_vt_xx(config);
+	nes_vt_4k_ram(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::nes_vt_dg_map);
 
 	m_screen->set_refresh_hz(50.0070);
@@ -2052,7 +2049,7 @@ void nes_vt_hh_state::nes_vt_vg_baddma(machine_config &config)
 // New mystery handheld architecture, VTxx derived
 void nes_vt_hh_state::nes_vt_hh(machine_config &config)
 {
-	nes_vt_xx(config);
+	nes_vt_4k_ram(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_hh_map);
 	m_ppu->set_palette_mode(PAL_MODE_NEW_RGB);
 
@@ -2065,12 +2062,45 @@ void nes_vt_hh_state::nes_vt_hh(machine_config &config)
 }
 
 static INPUT_PORTS_START( nes_vt )
-	PORT_START("CARTSEL")
+	PORT_START("IO0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
+
+	PORT_START("IO1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( nes_vt_ddr )
+	PORT_START("IO0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_NAME("Up Arrow") PORT_16WAY // NOT A JOYSTICK!!
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_NAME("Down Arrow") PORT_16WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_NAME("Left Arrow") PORT_16WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Right Arrow") PORT_16WAY
+
+	PORT_START("IO1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 void nes_vt_hh_state::nes_vt_fp(machine_config &config)
 {
-	nes_vt_xx(config);
+	nes_vt_4k_ram(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_fp_map);
 
 	m_ppu->set_palette_mode(PAL_MODE_NEW_RGB12);
@@ -2078,7 +2108,7 @@ void nes_vt_hh_state::nes_vt_fp(machine_config &config)
 
 void nes_vt_dg_state::nes_vt_fa(machine_config &config)
 {
-	nes_vt_xx(config);
+	nes_vt_4k_ram(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::nes_vt_fa_map);
 }
 
@@ -2093,16 +2123,9 @@ void nes_vt_vh2009_state::nes_vt_vh2009(machine_config &config)
 	//m_ppu->set_palette_mode(PAL_MODE_NEW_VG); // gives better title screens, but worse ingame, must be able to switch
 }
 
-void nes_vt_ts_state::nes_vt_ts(machine_config &config)
-{
-	nes_vt(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_ts_state::nes_vt_ts_map);
-}
-
-
-
 static INPUT_PORTS_START( nes_vt_fp )
+	PORT_INCLUDE(nes_vt)
+
 	PORT_START("CARTSEL")
 	PORT_DIPNAME( 0x06, 0x00, "Cartridge Select" ) PORT_CODE(KEYCODE_3) PORT_TOGGLE
 	PORT_DIPSETTING(    0x00, "472-in-1" )
@@ -2110,6 +2133,8 @@ static INPUT_PORTS_START( nes_vt_fp )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nes_vt_fa )
+	PORT_INCLUDE(nes_vt)
+
 	PORT_START("CARTSEL")
 	PORT_DIPNAME( 0x01, 0x00, "Cartridge Select" ) PORT_CODE(KEYCODE_3) PORT_TOGGLE
 	PORT_DIPSETTING(    0x00, "508-in-1" )
@@ -2140,62 +2165,41 @@ static INPUT_PORTS_START( ablpinb )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sudoku )
-	PORT_START("IO0")
-	PORT_START("IO1")
+	PORT_INCLUDE(nes_vt)
 INPUT_PORTS_END
 
+// the test mode shows 2 gamepads, however this is not the control scheme the game uses
+// there is a reset button too but it doesn't seem to be a software switch
 static INPUT_PORTS_START( majgnc )
-	PORT_START("IO0")
-	PORT_DIPNAME( 0x01, 0x01, "0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_INCLUDE(nes_vt)
 
-	PORT_START("IO1")
-	PORT_DIPNAME( 0x01, 0x01, "1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_MODIFY("IO0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+
+	PORT_MODIFY("IO1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("EXTRAIN0")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("EXTRAIN1")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("EXTRAIN2")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("EXTRAIN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("3")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("5 / BET")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("4")
 INPUT_PORTS_END
 
 void nes_vt_sudoku_state::init_sudoku()
@@ -2301,8 +2305,9 @@ ROM_START( lxcmcy )
 ROM_END
 
 ROM_START( lxcmcysw )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
-	ROM_LOAD( "jl2365swr-1.u2", 0x00000, 0x4000000, CRC(60ece391) SHA1(655de6b36ba596d873de2839522b948ccf45e006) )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "jl2365swr-1.u2", 0x00000, 0x2000000, CRC(60ece391) SHA1(655de6b36ba596d873de2839522b948ccf45e006) )
+	ROM_CONTINUE(0x0000000, 0x2000000)
 ROM_END
 
 ROM_START( lxcmcyfz )
@@ -2480,6 +2485,11 @@ ROM_START( ddrdismx )
 	ROM_LOAD( "disney-ddr.bin", 0x00000, 0x200000, CRC(17fb3abb) SHA1(4d0eda4069ff46173468e579cdf9cc92b350146a) ) // 29LV160 Flash
 ROM_END
 
+ROM_START( megapad )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "megapad.bin", 0x00000, 0x200000, CRC(1eb603a8) SHA1(3de6f0620a0db0558daa7fd7ccf08d9d5607a6af) )
+ROM_END
+
 ROM_START( ddrstraw )
 	ROM_REGION( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "straws-ddr.bin", 0x00000, 0x200000, CRC(ce94e53a) SHA1(10c6970205a4df28086029c0a348225f57bf0cc5) ) // 26LV160 Flash
@@ -2599,10 +2609,6 @@ ROM_START( zdog )
 	ROM_LOAD( "zdog.bin", 0x00000, 0x400000, CRC(5ed3485b) SHA1(5ab0e9370d4ed1535205deb0456878c4e400dd81) )
 ROM_END
 
-ROM_START( ts_handy11 )
-	ROM_REGION( 0x100000, "mainrom", 0 )
-	ROM_LOAD( "tvplaypowercontroller.bin", 0x00000, 0x100000, CRC(9c7fe9ff) SHA1(c872e91ca835b66c9dd3b380e8374b51f12bcae0) ) // 29LV008B
-ROM_END
 
 
 // earlier version of vdogdemo
@@ -2647,7 +2653,10 @@ CONS( 2004, majkon,    0, 0,  nes_vt_vg_baddma, nes_vt, nes_vt_hh_state, empty_i
 CONS( 200?, majgnc,    0, 0,  nes_vt_majgnc, majgnc, nes_vt_majgnc_state, empty_init, "Majesco", "Golden Nugget Casino", MACHINE_NOT_WORKING )
 
 // small black unit, dpad on left, 4 buttons (A,B,X,Y) on right, Start/Reset/Select in middle, unit text "Sudoku Plug & Play TV Game"
-CONS( 200?, sudopptv,    0, 0,  nes_vt_sudopptv, nes_vt, nes_vt_state, empty_init, "Smart Planet", "Sudoku Plug & Play TV Game '6 Intelligent Games'", MACHINE_NOT_WORKING )
+CONS( 200?, sudopptv,    0, 0,  nes_vt, nes_vt, nes_vt_waixing_state, empty_init, "Smart Planet", "Sudoku Plug & Play TV Game '6 Intelligent Games'", MACHINE_NOT_WORKING )
+
+CONS( 200?, megapad,   0,        0,  nes_vt, nes_vt, nes_vt_waixing_state, empty_init, "Waixing",         "Megapad 31-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Happy Biqi has broken sprites, investigate before promoting
+
 
 // this is VT09 based
 // it boots, most games correct, but palette issues in some games still (usually they appear greyscale)
@@ -2665,11 +2674,11 @@ CONS( 200?, vgpmini,   0,  0,  nes_vt_vg, nes_vt, nes_vt_hh_state, empty_init, "
 CONS( 200?, dgun2500,  0,  0,  nes_vt_dg, nes_vt, nes_vt_dg_state, empty_init, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
 
 // don't even get to menu. very enhanced chipset, VT368/9?
-CONS( 2012, dgun2561,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "dreamGEAR", "dreamGEAR My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcy,    0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmc250,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcysw,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcyfz,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING )
+CONS( 2012, dgun2561,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "dreamGEAR", "dreamGEAR My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcy,    0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmc250,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcysw,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcyfz,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_lexibook_state, empty_init, "Lexibook", "Lexibook Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING )
 // Also Lexibook Compact Cyber Arcade - Disney Princesses
 //      Lexibook Compact Cyber Arcade - Cars
 //      Lexibook Compact Cyber Arcade - Paw Patrol
@@ -2732,9 +2741,8 @@ CONS( 200?, gprnrs16,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_ini
 // Notes about the DDR games:
 // * Missing PCM sounds (unsupported in NES VT APU code right now)
 // * Console has stereo output (dual RCA connectors).
-CONS( 2006, ddrdismx,   0,        0,  nes_vt_ddr, nes_vt, nes_vt_state, empty_init, "Majesco (licensed from Konami, Disney)", "Dance Dance Revolution Disney Mix",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // shows (c)2001 Disney onscreen, but that's recycled art from the Playstation release, actual release was 2006
-CONS( 2006, ddrstraw,   0,        0,  nes_vt_ddr, nes_vt, nes_vt_state, empty_init, "Majesco (licensed from Konami)",         "Dance Dance Revolution Strawberry Shortcake", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-
+CONS( 2006, ddrdismx,   0,        0,  nes_vt, nes_vt_ddr, nes_vt_state, empty_init, "Majesco (licensed from Konami, Disney)", "Dance Dance Revolution Disney Mix",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // shows (c)2001 Disney onscreen, but that's recycled art from the Playstation release, actual release was 2006
+CONS( 2006, ddrstraw,   0,        0,  nes_vt, nes_vt_ddr, nes_vt_state, empty_init, "Majesco (licensed from Konami)",         "Dance Dance Revolution Strawberry Shortcake", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 
 // unsorted, these were all in nes.xml listed as ONE BUS systems
@@ -2765,7 +2773,7 @@ CONS( 201?, mc_89in1,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_ini
 CONS( 201?, mc_pg150,   0,        0,  nes_vt_bt, nes_vt, nes_vt_cy_state, empty_init, "<unknown>", "Pocket Games 150 in 1", MACHINE_NOT_WORKING )
 // No title screen, but press start and menu and games run fine. Makes odd
 // memory accesses which probably explain broken title screen
-CONS( 201?, mc_hh210,   0,        0,  nes_vt_xx, nes_vt, nes_vt_state, empty_init, "<unknown>", "Handheld 210 in 1", MACHINE_NOT_WORKING )
+CONS( 201?, mc_hh210,   0,        0,  nes_vt_4k_ram, nes_vt, nes_vt_state, empty_init, "<unknown>", "Handheld 210 in 1", MACHINE_NOT_WORKING )
 // First half of games don't work, probably bad dump
 CONS( 201?, dvnimbus,   0,        0,  nes_vt_vg, nes_vt, nes_vt_hh_state, empty_init, "<unknown>", "DVTech Nimbus 176 in 1", MACHINE_NOT_WORKING )
 // Works fine, VT02 based
@@ -2783,5 +2791,3 @@ CONS( 2017, fapocket,   0,        0,  nes_vt_fa, nes_vt_fa, nes_vt_dg_state, emp
 // Plays intro music but then crashes. same hardware as SY-88x but uses more features
 CONS( 2016, mog_m320,   0,        0,  nes_vt_hh, nes_vt, nes_vt_hh_state, empty_init, "MOGIS",    "MOGIS M320 246 in 1 Handheld", MACHINE_NOT_WORKING )
 
-// uncertain VT type, odd accesses above PPU space, non-standard first bank (or scrambling)  possibly newer than 2001 but most games have a 2001 copyright.  Most games are higher colour versions of NES games, so it's an enhanced NES chipset at least but maybe not VT?
-CONS( 2001, ts_handy11,  0,  0,  nes_vt_ts,    nes_vt, nes_vt_ts_state, empty_init, "Techno Source", "Handy Boy 11-in-1 (TV Play Power)", MACHINE_NOT_WORKING )

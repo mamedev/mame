@@ -3,7 +3,9 @@
 
 /* 'Zone' '32-bit' systems */
 
+#include "emu.h"
 #include "includes/spg2xx.h"
+
 
 class zon32bit_state : public spg2xx_game_state
 {
@@ -14,7 +16,7 @@ public:
 	{ }
 
 	void zon32bit(machine_config& config);
-	
+
 	void mem_map_zon32bit(address_map &map);
 
 	void init_zon32bit() { m_game = 0; };
@@ -23,7 +25,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	
+
 	DECLARE_READ16_MEMBER(z32_rom_r);
 
 	required_region_ptr<uint16_t> m_romregion;
@@ -48,15 +50,15 @@ private:
 };
 
 READ16_MEMBER(zon32bit_state::porta_r)
-{	
+{
 	return m_porta_dat;
 }
 
 
 WRITE16_MEMBER(zon32bit_state::porta_w)
-{	
+{
 	//if (data != 0x0101)
-	//	logerror("%s: porta_w (%04x)\n", machine().describe_context(), data);
+	//  logerror("%s: porta_w (%04x)\n", machine().describe_context(), data);
 
 	m_porta_dat = data;
 
@@ -75,15 +77,15 @@ WRITE16_MEMBER(zon32bit_state::porta_w)
 	/*
 	if (data == 0x0335)
 	{
-		logerror("%s: port a write 0x0355, port c is %04x %04X\n", machine().describe_context(), data, data & 0x1800);
+	    logerror("%s: port a write 0x0355, port c is %04x %04X\n", machine().describe_context(), data, data & 0x1800);
 
-		m_upperbank = (m_portc_dat & 0x1800);
+	    m_upperbank = (m_portc_dat & 0x1800);
 	}
 	*/
 }
 
 READ16_MEMBER(zon32bit_state::portc_r)
-{	
+{
 	// 0x03ff seem to be inputs for buttons (and some kind of output?)
 	// 0xfc00 gets masked for other reasons (including banking?)
 
@@ -98,7 +100,7 @@ READ16_MEMBER(zon32bit_state::portc_r)
 
 
 READ16_MEMBER(zon32bit_state::portb_r)
-{	
+{
 	return m_portb_dat;
 }
 
@@ -118,7 +120,7 @@ WRITE16_MEMBER(zon32bit_state::portc_w)
 	//logerror("%s: portc_w (%04x)\n", machine().describe_context(), data);
 
 	//if ((pc >= 0x77261) && (pc <= 0x77268))
-	//	logerror("%s: port c %04x %04X-- BANK STUFF\n", machine().describe_context(), data, data & 0x1800);
+	//  logerror("%s: port c %04x %04X-- BANK STUFF\n", machine().describe_context(), data, data & 0x1800);
 
 	//logerror("%s: port c %04x %04x\n", machine().describe_context(), data, data & 0x1800);
 
@@ -201,9 +203,9 @@ void zon32bit_state::mem_map_zon32bit(address_map &map)
 READ16_MEMBER(zon32bit_state::z32_rom_r)
 {
 	/*
-		This has upper and lower bank, which can be changed independently.
-		Banking hookup is currently very hacky as bank values are written
-		to ports then erased at the moment, maybe they latch somehow?
+	    This has upper and lower bank, which can be changed independently.
+	    Banking hookup is currently very hacky as bank values are written
+	    to ports then erased at the moment, maybe they latch somehow?
 	*/
 
 	if (m_game == 0) // zon32bit
@@ -213,7 +215,7 @@ READ16_MEMBER(zon32bit_state::z32_rom_r)
 			if (m_hackbank == 0) // if lower bank is 0
 				return m_romregion[offset + 0x000000];
 			else
-			{	// if lower bank is 1
+			{   // if lower bank is 1
 				return m_romregion[offset + 0x400000];
 			}
 		}
@@ -250,7 +252,7 @@ READ16_MEMBER(zon32bit_state::z32_rom_r)
 			{
 				return m_romregion[offset + (0x3000000 / 2)];
 			}
-			else 	// Mi Guitar
+			else    // Mi Guitar
 			{
 				return m_romregion[offset + (0x0000000 / 2)];
 			}
@@ -270,7 +272,7 @@ READ16_MEMBER(zon32bit_state::z32_rom_r)
 			{
 				if ((m_upperbank & 0x1800) == 0x1000)  return m_romregion[offset + (0x3400000 / 2)]; // base code for other bank
 				else if ((m_upperbank & 0x1800) == 0x0800)  return m_romregion[offset + (0x3800000 / 2)]; //
-				else if ((m_upperbank & 0x1800) == 0x1800)  return m_romregion[offset + (0x3c00000 / 2)]; // 
+				else if ((m_upperbank & 0x1800) == 0x1800)  return m_romregion[offset + (0x3c00000 / 2)]; //
 				else if ((m_upperbank & 0x1800) == 0x0000)  return m_romregion[offset + (0x3400000 / 2)]; //
 			}
 			else
@@ -403,7 +405,7 @@ static INPUT_PORTS_START( zon32bit )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	
+
 	PORT_START("P3")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Up (vertical) Left (horizontal)")
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("Down (vertical) Right (horizontal)")
@@ -434,7 +436,7 @@ static INPUT_PORTS_START( zon32bit )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )		
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 void zon32bit_state::zon32bit(machine_config &config)
@@ -464,7 +466,7 @@ ROM_END
 ROM_START( zon32bit )
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "41sports.bin", 0x0000, 0x2000000, CRC(86eee6e0) SHA1(3f6cab6649aebf596de5a8af21658bb1a27edb10) )
-ROM_END                                             
+ROM_END
 
 
 // Box advertises this as '40 Games Included' but the cartridge, which was glued directly to the PCB, not removable, is a 41-in-1.  Maybe some versions exist with a 40 game selection.

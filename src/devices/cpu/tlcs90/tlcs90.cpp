@@ -80,8 +80,8 @@ void tlcs90_device::tmp90ph44_mem(address_map &map)
 tlcs90_device::tlcs90_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0, program_map)
-	, m_port_read_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_port_write_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_port_read_cb(*this)
+	, m_port_write_cb(*this)
 {
 }
 
@@ -2727,10 +2727,8 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 
 void tlcs90_device::device_start()
 {
-	for (auto &cb : m_port_read_cb)
-		cb.resolve_safe(0xff);
-	for (auto &cb : m_port_write_cb)
-		cb.resolve_safe();
+	m_port_read_cb.resolve_all_safe(0xff);
+	m_port_write_cb.resolve_all_safe();
 
 	save_item(NAME(m_prvpc.w.l));
 	save_item(NAME(m_pc.w.l));

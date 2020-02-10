@@ -10,42 +10,42 @@
 
     To see bootloader messages, uncomment the UART_PRINTF define in s3c24xx.hxx.
 
-	The primary blocker at this point is a lack of a viable workaround for the
-	FameG FS8806 I2C/SPI authentication key chip.
+    The primary blocker at this point is a lack of a viable workaround for the
+    FameG FS8806 I2C/SPI authentication key chip.
 
-	The FS8806 provides 96 bytes of on-board EEPROM as well as a 24-byte key,
-	with which it can perform either hashing or Triple DES. The expected
-	response bytes are not yet known, and the key-check routine is hundreds
-	of instructions' worth of assorted bitwise operations.
+    The FS8806 provides 96 bytes of on-board EEPROM as well as a 24-byte key,
+    with which it can perform either hashing or Triple DES. The expected
+    response bytes are not yet known, and the key-check routine is hundreds
+    of instructions' worth of assorted bitwise operations.
 
-	To work around the FS8806 initialization and initial challenge/response
-	tests, run MAME with its debugger enabled, and do the following:
+    To work around the FS8806 initialization and initial challenge/response
+    tests, run MAME with its debugger enabled, and do the following:
 
-	1. bp C002D788 [Enter]
-	2. bp C002D84C [Enter]
-	3. Close the debugger window.
-	4. The debugger will reappear when the first breakpoint is hit.
-	5a. R0=1 [Enter]
-	5b. This will force the FS8806 init function to report success.
-	6. Close the debugger window.
-	7. The debugger will reappear when the second breakpoint is hit.
-	8a. R4=1 [Enter]
-	8b. This will force the first challenge/response test to report success.
+    1. bp C002D788 [Enter]
+    2. bp C002D84C [Enter]
+    3. Close the debugger window.
+    4. The debugger will reappear when the first breakpoint is hit.
+    5a. R0=1 [Enter]
+    5b. This will force the FS8806 init function to report success.
+    6. Close the debugger window.
+    7. The debugger will reappear when the second breakpoint is hit.
+    8a. R4=1 [Enter]
+    8b. This will force the first challenge/response test to report success.
 
-	The system will begin its startup sequence, displaying a red fish logo.
+    The system will begin its startup sequence, displaying a red fish logo.
 
-	After some time checking the filesystem, it will then boot into the main
-	menu. Currently, inputs are not hooked up.
+    After some time checking the filesystem, it will then boot into the main
+    menu. Currently, inputs are not hooked up.
 
-	It will then watchdog at around 52 seconds remaining on the timer, for
-	reasons not yet known, though the following kernel messages might provide
-	a clue:
+    It will then watchdog at around 52 seconds remaining on the timer, for
+    reasons not yet known, though the following kernel messages might provide
+    a clue:
 
-	<3>dma2: IRQ with no loaded buffer?
-	<3>dma2: IRQ with no loaded buffer?
-	<0>Restarting system.
-	.
-	arch_reset: attempting watchdog reset
+    <3>dma2: IRQ with no loaded buffer?
+    <3>dma2: IRQ with no loaded buffer?
+    <0>Restarting system.
+    .
+    arch_reset: attempting watchdog reset
 
 *******************************************************************************/
 
@@ -60,12 +60,12 @@
 
 #include <algorithm>
 
-#define LOG_GPIO	(1 << 0)
-#define LOG_ADC		(1 << 1)
-#define LOG_I2C		(1 << 2)
-#define LOG_INPUTS	(1 << 3)
+#define LOG_GPIO    (1 << 0)
+#define LOG_ADC     (1 << 1)
+#define LOG_I2C     (1 << 2)
+#define LOG_INPUTS  (1 << 3)
 
-#define VERBOSE		(LOG_GPIO | LOG_ADC | LOG_I2C | LOG_INPUTS)
+#define VERBOSE     (LOG_GPIO | LOG_ADC | LOG_I2C | LOG_INPUTS)
 #include "logmacro.h"
 
 class hapyfish_state : public driver_device
@@ -558,24 +558,24 @@ void hapyfish_state::hapyfish(machine_config &config)
 
 static INPUT_PORTS_START( hapyfish )
 	PORT_START("INPUT0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)		PORT_PLAYER(1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)	PORT_PLAYER(1)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)	PORT_PLAYER(1)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)	PORT_PLAYER(1)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)			PORT_PLAYER(1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) 			PORT_PLAYER(1)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3) 			PORT_PLAYER(1)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON4) 			PORT_PLAYER(1)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)      PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)    PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)    PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)   PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)          PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2)          PORT_PLAYER(1)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3)          PORT_PLAYER(1)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON4)          PORT_PLAYER(1)
 
 	PORT_START("INPUT1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)		PORT_PLAYER(2)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)	PORT_PLAYER(2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)	PORT_PLAYER(2)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)	PORT_PLAYER(2)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) 			PORT_PLAYER(2)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) 			PORT_PLAYER(2)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3) 			PORT_PLAYER(2)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON4) 			PORT_PLAYER(2)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)      PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)    PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)    PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)   PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)          PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2)          PORT_PLAYER(2)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3)          PORT_PLAYER(2)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON4)          PORT_PLAYER(2)
 
 	PORT_START("INPUT2")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)

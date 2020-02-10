@@ -394,6 +394,6 @@ void microtouch_device::tra_complete()
 
 const tiny_rom_entry *microtouch_device::device_rom_region() const
 {
-    return ROM_NAME(microtouch);
+	return ROM_NAME(microtouch);
 }
 

@@ -2,20 +2,23 @@
 // copyright-holders:Ryan Holtz, David Haywood
 
 /*
-	General Senario games on SunPlus hardware
-	
-	these check for flash ROM and actually save user data at 0x700000 (senmil/senbbs/senapren) in the flash ROM
+    General Senario games on SunPlus hardware
 
-	TODO:
-	senmil - Are the LEDs on the controllers meant to go out as players select answers like with pvmil, or are they just to show that the controller is connected?
-	sencosmo - fix Flash hookup (crashes if you use a Flash chip right now)
-	senapren - should it actually save data? chip really seems to be 2MB, data written at 7MB can't be saved at mirrored 1MB address or it would erase game code / data
-	senpmate - again seems to actually be a 2MB chip
+    these check for flash ROM and actually save user data at 0x700000 (senmil/senbbs/senapren) in the flash ROM
+
+    TODO:
+    senmil - Are the LEDs on the controllers meant to go out as players select answers like with pvmil, or are they just to show that the controller is connected?
+    sencosmo - fix Flash hookup (crashes if you use a Flash chip right now)
+    senapren - should it actually save data? chip really seems to be 2MB, data written at 7MB can't be saved at mirrored 1MB address or it would erase game code / data
+    senpmate - again seems to actually be a 2MB chip
 
 */
 
+#include "emu.h"
 #include "includes/spg2xx.h"
+
 #include "machine/intelfsh.h"
+
 
 class spg2xx_senario_state : public spg2xx_game_state
 {
@@ -80,7 +83,7 @@ public:
 	{ }
 
 	void senmil(machine_config& config);
-	
+
 protected:
 	//virtual void machine_start() override;
 	//virtual void machine_reset() override;
@@ -238,7 +241,7 @@ WRITE16_MEMBER(spg2xx_senario_mil_state::portc_w)
 	logerror("%s: spg2xx_senario_mil_state::portc_w %04x ---- %04x %04x \n", machine().describe_context(), data, data & 0x55, data & 0xaa);
 	m_portc_data = data;
 }
-	
+
 READ16_MEMBER(spg2xx_senario_mil_state::portc_r)
 {
 	uint16_t ret = m_io_p3->read() & 0xffaa; // 0xaa must be set to register all controllers as turned on
@@ -305,6 +308,12 @@ ROM_START( sencosmo )
 	// attempts to write to 0x380000 for flash user data? different Flash type?
 ROM_END
 
+ROM_START( senstriv )
+	ROM_REGION16_BE( 0x400000, "flash", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "senariosportstriviapro_m5m29gt320_001c0020.bin", 0x000000, 0x400000, CRC(095ffbca) SHA1(d91328855a9ca542ba38253d2353545dc8b47fa4) ) // chip was 'flipped' (reverse pinout)
+	// attempts to write to 0x380000 for flash user data? different Flash type?
+ROM_END
+
 ROM_START( senmil )
 	ROM_REGION16_BE( 0x800000, "flash", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "wwtbam_nouserdata.bin", 0x000000, 0x800000, CRC(b2626df6) SHA1(f06943d63dbb1c9d211cb35b40dcb18cb8b39ecd) )
@@ -321,4 +330,5 @@ CONS( 2005, senbbs,      0,     0,        senbbs,       senbbs,    spg2xx_senari
 CONS( 2005, senapren,    0,     0,        senbbs,       senappren, spg2xx_senario_bbs_state,   empty_init, "Senario", "The Apprentice (Senario, Plug and Play)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2005, senpmate,    0,     0,        senbbs,       senpmate,  spg2xx_senario_bbs_state,   empty_init, "Senario", "The Perfect Mate (Senario, Plug and Play)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2005, sencosmo,    0,     0,        sencosmo,     sencosmo,  spg2xx_senario_cosmo_state, empty_init, "Senario", "Cosmo Girl (Senario, Plug and Play)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, senstriv,    0,     0,        sencosmo,     sencosmo,  spg2xx_senario_cosmo_state, empty_init, "Senario", "Sports Trivia Professional Edition (Senario, Plug and Play)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2005?,senmil,      0,     0,        senmil,       senmil,    spg2xx_senario_mil_state,   empty_init, "Senario", "Who Wants to Be a Millionaire? (Senario, Plug and Play, US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

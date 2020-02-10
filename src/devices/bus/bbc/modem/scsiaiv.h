@@ -54,12 +54,12 @@ private:
 //class bbc_vp415_device : public bbc_scsiaiv_device
 //{
 //public:
-//	// construction/destruction
-//	bbc_vp415_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+//  // construction/destruction
+//  bbc_vp415_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 //
 //protected:
-//	// optional information overrides
-//	virtual void device_add_mconfig(machine_config& config) override;
+//  // optional information overrides
+//  virtual void device_add_mconfig(machine_config& config) override;
 //};
 
 

@@ -4700,32 +4700,32 @@ ROM_END
 
 ROM_START( fitegolfu )  /*  Later US version containing enhancements to make the game a little easier */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "np45.4p",    0x00000, 0x04000, CRC(16e8e763) SHA1(0b5296f2a91a7f3176b7461ca4958865ce998241) )
-	ROM_LOAD( "mn45.4m",    0x04000, 0x08000, CRC(a4fa09d5) SHA1(ae7f0cb47de06006ae71252c4201a93a01a26887) )
+	ROM_LOAD( "gu2_ver2.4p", 0x00000, 0x04000, CRC(16e8e763) SHA1(0b5296f2a91a7f3176b7461ca4958865ce998241) )
+	ROM_LOAD( "gu1_ver2.4m", 0x04000, 0x08000, CRC(a4fa09d5) SHA1(ae7f0cb47de06006ae71252c4201a93a01a26887) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "gu6.8p",     0x00000, 0x04000, CRC(2b9978c5) SHA1(5490e9f796697318650fc5f70c0e64d6785ad7fc) ) // NP8.256
-	ROM_LOAD( "gu5.8m",     0x04000, 0x08000, CRC(ea3d138c) SHA1(af0a0bfe2d266179946948cf42fe697505798a4f) ) // MN8.256
+	ROM_LOAD( "gu6.8p", 0x00000, 0x04000, CRC(2b9978c5) SHA1(5490e9f796697318650fc5f70c0e64d6785ad7fc) )
+	ROM_LOAD( "gu5.8m", 0x04000, 0x08000, CRC(ea3d138c) SHA1(af0a0bfe2d266179946948cf42fe697505798a4f) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "gu3.6g",     0x00000, 0x04000, CRC(811b87d7) SHA1(fb387f42085d6e0e5a88729ca0e50656411ce037) ) // FG67.256
-	ROM_LOAD( "gu4.6k",     0x04000, 0x08000, CRC(2d998e2b) SHA1(a471cfbb4dabc90fcc29c562620b9965eaff6861) ) // K67.256
+	ROM_LOAD( "gu3.6g", 0x00000, 0x04000, CRC(811b87d7) SHA1(fb387f42085d6e0e5a88729ca0e50656411ce037) )
+	ROM_LOAD( "gu4.6k", 0x04000, 0x08000, CRC(2d998e2b) SHA1(a471cfbb4dabc90fcc29c562620b9965eaff6861) )
 
 	ROM_REGION( 0x0c00, "proms", 0 )
-	ROM_LOAD( "3.2c",       0x00000, 0x00400, CRC(6e4c7836) SHA1(3ab3c498939fac992e2bf1c33983ee821a9b6a18) ) /* 82s137 */
-	ROM_LOAD( "1.1b",       0x00400, 0x00400, CRC(29e7986f) SHA1(85ba8d3443458c27728f633745857a1315dd183f) ) /* 82s137 */
-	ROM_LOAD( "2.1c",       0x00800, 0x00400, CRC(27ba9ff9) SHA1(f021d10460f40de4447560df5ac47fa53bb57ff9) ) /* 82s137 */
+	ROM_LOAD( "3.2c", 0x00000, 0x00400, CRC(6e4c7836) SHA1(3ab3c498939fac992e2bf1c33983ee821a9b6a18) ) /* 82s137 */
+	ROM_LOAD( "1.1b", 0x00400, 0x00400, CRC(29e7986f) SHA1(85ba8d3443458c27728f633745857a1315dd183f) ) /* 82s137 */
+	ROM_LOAD( "2.1c", 0x00800, 0x00400, CRC(27ba9ff9) SHA1(f021d10460f40de4447560df5ac47fa53bb57ff9) ) /* 82s137 */
 
 	ROM_REGION( 0x4000, "tx_tiles", 0 )
-	ROM_LOAD( "gu8.2d",     0x00000, 0x04000, CRC(f1628dcf) SHA1(efea343d3a9dd45ef74947c297e166e34afbb680) ) // D2.128
+	ROM_LOAD( "gu8.2d", 0x00000, 0x04000, CRC(f1628dcf) SHA1(efea343d3a9dd45ef74947c297e166e34afbb680) )
 
 	ROM_REGION( 0x8000, "bg_tiles", 0 )
-	ROM_LOAD( "gu7.2b",     0x00000, 0x08000, CRC(4655f94e) SHA1(08526206d8e929bb01d61fff8de2ee99fd287c17) ) // BC2.256
+	ROM_LOAD( "gu7.2b", 0x00000, 0x08000, CRC(4655f94e) SHA1(08526206d8e929bb01d61fff8de2ee99fd287c17) )
 
 	ROM_REGION( 0x18000, "sp16_tiles", 0 )
-	ROM_LOAD( "gu9.2p",     0x00000, 0x08000, CRC(d4957ec5) SHA1(8ead7866ba5ac66ead6b707aa868bcae30c486e1) ) // P2.256
-	ROM_LOAD( "gu10.2rs",   0x08000, 0x08000, CRC(b3acdac2) SHA1(7377480d5e1b5ab2c49f5fee2927623ce8240e19) ) // R2.256
-	ROM_LOAD( "gu11.2t",    0x10000, 0x08000, CRC(b99cf73b) SHA1(23989fc3914e77d364807a9eb96a4ddf75ad7cf1) ) // S2.256
+	ROM_LOAD( "gu9.2p",   0x00000, 0x08000, CRC(d4957ec5) SHA1(8ead7866ba5ac66ead6b707aa868bcae30c486e1) )
+	ROM_LOAD( "gu10.2rs", 0x08000, 0x08000, CRC(b3acdac2) SHA1(7377480d5e1b5ab2c49f5fee2927623ce8240e19) )
+	ROM_LOAD( "gu11.2t",  0x10000, 0x08000, CRC(b99cf73b) SHA1(23989fc3914e77d364807a9eb96a4ddf75ad7cf1) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
 	ROM_LOAD( "a6001-1.6c", 0x00000, 0x00104, CRC(de291f4e) SHA1(b50294d30cb8eacc7a9bb8b46695a7463ef45ff1) ) /* PAL16R6A */
@@ -4741,7 +4741,7 @@ CPU/Sound Board: ?
 Video Board:     ?
 */
 
-ROM_START( fitegolf2 )
+ROM_START( fitegolfua )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "fg_ver2_6.4e", 0x0000, 0x4000, CRC(4cc9ef0c) SHA1(0ac6071725db3ec85659b170eecec91d22e76abd) )
 	ROM_LOAD( "fg_ver2_7.g4", 0x4000, 0x4000, CRC(144b0beb) SHA1(5b5e58ee93cabbdd560487b16d0cc7217d9cea7f) )
@@ -6369,8 +6369,8 @@ GAME( 1986, athena,    0,        athena,    athena,    snk_state, empty_init, RO
 GAME( 1986, athenab,   athena,   athena,    athena,    snk_state, empty_init, ROT0,   "SNK",     "Athena (bootleg)", 0 ) // is this really a bootleg?
 GAME( 1987, sathena,   athena,   athena,    athena,    snk_state, empty_init, ROT0,   "bootleg", "Super Athena (bootleg)", 0 )
 GAME( 1988, fitegolf,  0,        fitegolf,  fitegolf,  snk_state, empty_init, ROT0,   "SNK",     "Lee Trevino's Fighting Golf (World?)", 0 )
-GAME( 1988, fitegolfu, fitegolf, fitegolf,  fitegolfu, snk_state, empty_init, ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US)", 0 )
-GAME( 1988, fitegolf2, fitegolf, fitegolf2, fitegolfu, snk_state, empty_init, ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US, Ver 2)", 0 )
+GAME( 1988, fitegolfu, fitegolf, fitegolf,  fitegolfu, snk_state, empty_init, ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US, Ver 2, set 1)", 0 )
+GAME( 1988, fitegolfua,fitegolf, fitegolf2, fitegolfu, snk_state, empty_init, ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US, Ver 2, set 2)", 0 )
 GAME( 1988, countryc,  0,        countryc,  countryc,  snk_state, empty_init, ROT0,   "SNK",     "Country Club", 0 )
 
 GAME( 1986, ikari,     0,        ikari,     ikari,     snk_state, empty_init, ROT270, "SNK",     "Ikari Warriors (US JAMMA)", 0 ) // distributed by Tradewest(?)

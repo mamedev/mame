@@ -146,7 +146,7 @@ namespace solver
 		{
 			const auto &nzbd = this->m_terms[i].m_nzbd;
 
-			if (nzbd.size() > 0)
+			if (!nzbd.empty())
 			{
 				std::size_t pi = mat.diag[i];
 

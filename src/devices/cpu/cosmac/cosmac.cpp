@@ -367,7 +367,7 @@ cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, co
 		m_io_config("io", ENDIANNESS_LITTLE, 8, 3),
 		m_read_wait(*this),
 		m_read_clear(*this),
-		m_read_ef{{*this}, {*this}, {*this}, {*this}},
+		m_read_ef(*this),
 		m_write_q(*this),
 		m_read_dma(*this),
 		m_write_dma(*this),
@@ -459,8 +459,7 @@ void cosmac_device::device_start()
 	// resolve callbacks
 	m_read_wait.resolve();
 	m_read_clear.resolve();
-	for (auto &cb : m_read_ef)
-		cb.resolve();
+	m_read_ef.resolve_all();
 	m_write_q.resolve_safe();
 	m_read_dma.resolve_safe(0);
 	m_write_dma.resolve_safe();

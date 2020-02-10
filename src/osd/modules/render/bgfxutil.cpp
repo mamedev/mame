@@ -39,9 +39,9 @@ const bgfx::Memory* bgfx_util::mame_texture_data_to_bgfx_texture_data(bgfx::Text
 const bgfx::Memory* bgfx_util::mame_texture_data_to_argb32(uint32_t src_format, int width, int height, int rowpixels, const rgb_t *palette, void *base)
 {
 	const bgfx::Memory* mem = bgfx::alloc(width * height * 4);
-	uint32_t* dst = reinterpret_cast<uint32_t*>(mem->data);
-	uint16_t* src16 = reinterpret_cast<uint16_t*>(base);
-	uint32_t* src32 = reinterpret_cast<uint32_t*>(base);
+	auto* dst = reinterpret_cast<uint32_t*>(mem->data);
+	auto* src16 = reinterpret_cast<uint16_t*>(base);
+	auto* src32 = reinterpret_cast<uint32_t*>(base);
 
 	for (int y = 0; y < height; y++)
 	{

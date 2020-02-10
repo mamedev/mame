@@ -138,11 +138,9 @@ namespace analog
 		, m_Vmin(nlconst::zero()) // not used in MOS model
 		, m_Is(nlconst::zero())
 		, m_logIs(nlconst::zero())
-		, m_n(nlconst::zero())
 		, m_gmin(nlconst::magic(1e-15))
 		, m_VtInv(nlconst::zero())
 		, m_Vcrit(nlconst::zero())
-		, m_name(name)
 		{
 			set_param(
 				nlconst::magic(1e-15)
@@ -151,6 +149,15 @@ namespace analog
 			  , nlconst::magic(300.0));
 		}
 
+		// Basic math
+		//
+		// I(V) = f(V)
+		//
+		// G(V) = df/dV(V)
+		//
+		// Ieq(V) = I(V) - V * G(V)
+		//
+		//
 		void update_diode(nl_fptype nVd) noexcept
 		{
 			if (TYPE == diode_e::BIPOLAR)
@@ -165,11 +172,9 @@ namespace analog
 					const nl_fptype d = std::min(+fp_constants<nl_fptype>::DIODE_MAXDIFF(), nVd - old);
 					const nl_fptype a = plib::abs(d) * m_VtInv;
 					m_Vd = old + nlconst::magic(d < 0 ? -1.0 : 1.0) * plib::log1p(a) * m_Vt;
-					//printf("new VD: %g\n", (nl_fptype)m_Vd);
 				}
 				else
 					m_Vd = std::max(-fp_constants<nl_fptype>::DIODE_MAXDIFF(), nVd);
-					//m_Vd = nVd;
 
 				if (m_Vd < m_Vmin)
 				{
@@ -185,15 +190,14 @@ namespace analog
 			}
 			else if (TYPE == diode_e::MOS)
 			{
+				m_Vd = nVd;
 				if (nVd < nlconst::zero())
 				{
-					m_Vd = nVd;
 					m_G = m_Is * m_VtInv + m_gmin;
 					m_Id = m_G * m_Vd;
 				}
 				else // log stepping should already be done in mosfet
 				{
-					m_Vd = nVd;
 					const auto IseVDVt = plib::exp(std::min(+fp_constants<nl_fptype>::DIODE_MAXVOLT(), m_logIs + m_Vd * m_VtInv));
 					m_Id = IseVDVt - m_Is;
 					m_G = IseVDVt * m_VtInv + m_gmin;
@@ -205,16 +209,15 @@ namespace analog
 		{
 			m_Is = Is;
 			m_logIs = plib::log(Is);
-			m_n = n;
 			m_gmin = gmin;
 
-			m_Vt = m_n * temp * nlconst::k_b() / nlconst::Q_e();
+			m_Vt = n * temp * nlconst::k_b() / nlconst::Q_e();
 
 			m_Vmin = nlconst::magic(-5.0) * m_Vt;
 
+			// Vcrit : f(V) has smallest radius of curvature rho(V) == min(rho(v))
 			m_Vcrit = m_Vt * plib::log(m_Vt / m_Is / nlconst::sqrt2());
 			m_VtInv = plib::reciprocal(m_Vt);
-			//printf("%g %g\n", m_Vmin, m_Vcrit);
 		}
 
 
@@ -234,13 +237,10 @@ namespace analog
 		nl_fptype m_Vmin;
 		nl_fptype m_Is;
 		nl_fptype m_logIs;
-		nl_fptype m_n;
 		nl_fptype m_gmin;
 
 		nl_fptype m_VtInv;
 		nl_fptype m_Vcrit;
-
-		pstring m_name;
 	};
 
 
