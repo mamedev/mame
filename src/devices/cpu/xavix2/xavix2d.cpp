@@ -246,20 +246,20 @@ offs_t xavix2_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	case 0xb2: case 0xb3: util::stream_format(stream, "?b2 %s %s %s", r1(), r2(), r3()); break;
 		// b4-cf
 
-	case 0xd0:            util::stream_format(stream, "b?0 %s", rel8()); break;
-	case 0xd1:            util::stream_format(stream, "b?1 %s", rel8()); break;
+	case 0xd0:            util::stream_format(stream, "bvs %s", rel8()); break;
+	case 0xd1:            util::stream_format(stream, "blts %s", rel8()); break;
 	case 0xd2:            util::stream_format(stream, "beq %s", rel8()); break;
 	case 0xd3:            util::stream_format(stream, "bles %s", rel8()); break;
 	case 0xd4:            util::stream_format(stream, "bmi %s", rel8()); break;
 	case 0xd5:            util::stream_format(stream, "bra %s", rel8()); break;
 	case 0xd6:            util::stream_format(stream, "bltu %s", rel8()); break;
 	case 0xd7:            util::stream_format(stream, "bleu %s", rel8()); break;
-	case 0xd8:            util::stream_format(stream, "b?8 %s", rel8()); break;
-	case 0xd9:            util::stream_format(stream, "b?9 %s", rel8()); break;
+	case 0xd8:            util::stream_format(stream, "bvc %s", rel8()); break;
+	case 0xd9:            util::stream_format(stream, "bges %s", rel8()); break;
 	case 0xda:            util::stream_format(stream, "bne %s", rel8()); break;
 	case 0xdb:            util::stream_format(stream, "bgts %s", rel8()); break;
 	case 0xdc:            util::stream_format(stream, "bpl %s", rel8()); break;
-	case 0xdd:            util::stream_format(stream, "b?d %s", rel8()); break;
+	case 0xdd:            util::stream_format(stream, "bnv %s", rel8()); break;
 	case 0xde:            util::stream_format(stream, "bgeu %s", rel8()); break;
 	case 0xdf:            util::stream_format(stream, "bgtu %s", rel8()); break;
 
