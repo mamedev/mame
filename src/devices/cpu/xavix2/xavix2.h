@@ -63,6 +63,7 @@ protected:
 	static inline u32 val11s(u32 opcode) { return opcode & 0x40000 ? (opcode >> 8) | 0xfffff800 : (opcode >> 8) & 0x7ff; }
 	static inline u32 val11u(u32 opcode) { return (opcode >>  8) & 0x000007ff; }
 	static inline u32 val8s(u32 opcode)  { return static_cast<s8>(opcode >> 16); }
+	static inline u32 val6u(u32 opcode)  { return (opcode >> 16) & 0x0000003f; }
 	static inline u32 val6s(u32 opcode)  { return opcode & 0x200000 ? (opcode >> 16) | 0xffffffc0 : (opcode >> 16) & 0x3f; }
 	static inline u32 val3u(u32 opcode)  { return (opcode >> 16) & 0x00000007; }
 	static inline u32 val3s(u32 opcode)  { return opcode & 0x40000 ? (opcode >> 16) | 0xfffffff8 : (opcode >> 16) & 0x7; }

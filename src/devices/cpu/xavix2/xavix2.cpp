@@ -325,6 +325,9 @@ void xavix2_device::execute_run()
 			break;
 		}
 
+		case 0xc8: case 0xc9: m_r[r1(opcode)] = snz(m_hr[val6u(opcode)]); break;
+		case 0xca: case 0xcb: m_hr[val6u(opcode)] = m_r[r1(opcode)]; break;
+
 		case 0xd0:            if(m_f & F_V) npc = m_pc + val8s(opcode); break;
 		case 0xd1:            if(((m_f & F_N) && !(m_f & F_V)) || ((m_f & F_V) && !(m_f & F_N))) npc = m_pc + val8s(opcode); break;
 		case 0xd2:            if(m_f & F_Z) npc = m_pc + val8s(opcode); break;
