@@ -551,7 +551,7 @@ offs_t upd78k1_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		else
 		{
 			u8 n = opcodes.r8(pc + 1);
-			if ((n & 0xc0) != 0xc1)
+			if ((n & 0xc1) != 0xc1)
 			{
 				util::stream_format(stream, "%-8s", s_shift_ops[op & 0x01][(n & 0xc0) >> 6]);
 				if (n >= 0xc0)
