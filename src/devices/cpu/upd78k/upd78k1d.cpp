@@ -106,7 +106,7 @@ offs_t upd78k1_disassembler::dasm_02xx(std::ostream &stream, u8 op1, u8 op2, off
 			util::stream_format(stream, "%s", s_psw_bits[op2 & 0x07]);
 		return 2 | SUPPORTED;
 	}
-	else if (op2 < (BIT(op2, 3) ? 0xa0 : 0x80))
+	else if (op2 < 0xa0)
 	{
 		util::stream_format(stream, "%-8s", op2 < 0x80 ? "NOT1" : BIT(op2, 4) ? "CLR1" : "SET1");
 		if (BIT(op1, 0))
@@ -551,15 +551,14 @@ offs_t upd78k1_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		else
 		{
 			u8 n = opcodes.r8(pc + 1);
-			util::stream_format(stream, "%-8s", s_shift_ops[op & 0x01][(n & 0xc0) >> 6]);
-			if (n < 0xc0)
+			if ((n & 0xc0) != 0xc1)
 			{
-				util::stream_format(stream, "%s,%d", s_r_names[n & 0x07], (n & 0x38) >> 3);
-				return 2 | SUPPORTED;
-			}
-			else if (!BIT(n, 0))
-			{
-				util::stream_format(stream, "%s,%d", s_rp_names[(n & 0x06) >> 1], (n & 0x38) >> 3);
+				util::stream_format(stream, "%-8s", s_shift_ops[op & 0x01][(n & 0xc0) >> 6]);
+				if (n >= 0xc0)
+					stream << s_rp_names[(n & 0x06) >> 1];
+				else
+					stream << s_r_names[n & 0x07];
+				util::stream_format(stream, ",%d", (n & 0x38) >> 3);
 				return 2 | SUPPORTED;
 			}
 			else

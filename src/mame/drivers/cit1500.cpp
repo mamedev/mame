@@ -7,7 +7,7 @@
 Components (trmavia):
 
   Parts side:
-CIT1500 (78K/0 MCU): NEC CITESA ICS1 7CE52872AA 0143H8L01
+CIT1500 (80-pin 78K/0 MCU): NEC CITESA ICS1 7CE52872AA 0143H8L01
 CIT1200: ST HCF4067 Analog Multiplexer/demultiplexer
 CIT500: Philips TEA1067AT Telephone Transmission Circuit With Dialler Interface
 CIT1400 (display?) NEC D7225GB 0119EY002
@@ -23,7 +23,7 @@ Philips 74HC573D (behind the LCD)
 Components (teletup):
 
   Parts side:
-CIT1500 (78K/0 MCU): NEC CITESA ICS1 7CE52872AA 0143H8L01
+CIT1500 (80-pin 78K/0 MCU): NEC CITESA ICS1 7CE52872AA 0143H8L01
 CIT1200: ST HCF4067 Analog Multiplexer/demultiplexer
 CIT500: Philips TEA1067AT Telephone Transmission Circuit With Dialler Interface
 CIT1400: (display?) NEC D7225GB 0119EY002
