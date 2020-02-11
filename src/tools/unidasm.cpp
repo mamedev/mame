@@ -168,6 +168,7 @@ using util::BIT;
 #include "cpu/vt50/vt50dasm.h"
 #include "cpu/vt61/vt61dasm.h"
 #include "cpu/we32000/we32100d.h"
+#include "cpu/xavix2/xavix2d.h"
 #include "cpu/z180/z180dasm.h"
 #include "cpu/z8/z8dasm.h"
 #include "cpu/z80/z80dasm.h"
@@ -566,6 +567,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "x86_64",          le,  0, []() -> util::disasm_interface * { i386_unidasm.mode = 64; return new i386_disassembler(&i386_unidasm); } },
 	{ "xavix",           le,  0, []() -> util::disasm_interface * { return new xavix_disassembler; } },
 	{ "xavix2000",       le,  0, []() -> util::disasm_interface * { return new xavix2000_disassembler; } },
+	{ "xavix2",          le,  0, []() -> util::disasm_interface * { return new xavix2_disassembler; } },
 	{ "z180",            le,  0, []() -> util::disasm_interface * { return new z180_disassembler; } },
 	{ "z8",              be,  0, []() -> util::disasm_interface * { return new z8_disassembler; } },
 	{ "z80",             le,  0, []() -> util::disasm_interface * { return new z80_disassembler; } },

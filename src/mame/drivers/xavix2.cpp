@@ -46,8 +46,10 @@ private:
 void xavix2_state::mem(address_map &map)
 {
 	map(0x00000000, 0x00001fff).ram();
+	map(0x00002630, 0x00002631).lr16(NAME([]() { return 0x210; }));
+	map(0x00002632, 0x00002633).lr16(NAME([]() { return 0x210; }));
 
-	map(0x00200000, 0x00ffffff).rom().region("maincpu", 0x200000);
+	map(0x00010000, 0x00ffffff).rom().region("maincpu", 0x010000);
 
 	map(0x40000000, 0x40ffffff).rom().region("maincpu", 0);
 }

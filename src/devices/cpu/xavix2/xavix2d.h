@@ -33,9 +33,11 @@ private:
 	std::string val14u();
 	std::string val14s();
 	std::string val11u();
+	std::string val6u();
 	std::string val6s();
 	std::string val3u();
 	std::string off19s();
+	std::string off14s();
 	std::string off11s();
 	std::string off6s();
 	std::string off3s();

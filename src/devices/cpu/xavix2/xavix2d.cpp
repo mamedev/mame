@@ -77,6 +77,11 @@ std::string xavix2_disassembler::val11u()
 	return util::string_format("%03x", (m_opcode >> 8) & 0x7ff);
 }
 
+std::string xavix2_disassembler::val6u()
+{
+	return util::string_format("%02x", (m_opcode >> 16) & 0x3f);
+}
+
 std::string xavix2_disassembler::val6s()
 {
 	u16 r = (m_opcode >> 16) & 0x3f;
@@ -98,6 +103,17 @@ std::string xavix2_disassembler::off19s()
 		return util::string_format(" - %05x", 0x80000 - r);
 	else if(r)
 		return util::string_format(" + %05x", r);
+	else
+		return "";
+}
+
+std::string xavix2_disassembler::off14s()
+{
+	u16 r = (m_opcode >> 8) & 0x3fff;
+	if(r & 0x2000)
+		return util::string_format(" - %04x", 0x4000 - r);
+	else if(r)
+		return util::string_format(" + %04x", r);
 	else
 		return "";
 }
@@ -194,7 +210,14 @@ offs_t xavix2_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	case 0x2c: case 0x2d: util::stream_format(stream, "%s = %s | %s", r1(), r2(), val11u()); break;
 	case 0x2e: case 0x2f: util::stream_format(stream, "%s = %s ^ %s", r1(), r2(), val11u()); break;
 
-		// 30-3f
+	case 0x30: case 0x31: util::stream_format(stream, "%s = (sp%s).bs", r1(), off14s()); break;
+	case 0x32: case 0x33: util::stream_format(stream, "%s = (sp%s).bu", r1(), off14s()); break;
+	case 0x34: case 0x35: util::stream_format(stream, "%s = (sp%s).ws", r1(), off14s()); break;
+	case 0x36: case 0x37: util::stream_format(stream, "%s = (sp%s).wu", r1(), off14s()); break;
+	case 0x38: case 0x39: util::stream_format(stream, "%s = (sp%s).l", r1(), off14s()); break;
+	case 0x3a: case 0x3b: util::stream_format(stream, "(sp%s).b = %s", off14s(), r1()); break;
+	case 0x3c: case 0x3d: util::stream_format(stream, "(sp%s).w = %s", off14s(), r1()); break;
+	case 0x3e: case 0x3f: util::stream_format(stream, "(sp%s).l = %s", off14s(), r1()); break;
 
 	case 0x40: case 0x41: util::stream_format(stream, "%s = (%s%s).bs", r1(), r2(), off11s()); break;
 	case 0x42: case 0x43: util::stream_format(stream, "%s = (%s%s).bu", r1(), r2(), off11s()); break;
@@ -235,7 +258,9 @@ offs_t xavix2_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	case 0x80: case 0x81: util::stream_format(stream, "%s = %s + %s", r1(), r2(), r3()); break;
 		// 82-83
 	case 0x84: case 0x85: util::stream_format(stream, "%s = %s - %s", r1(), r2(), r3()); break;
-		// 86-89
+		// 86-87
+	case 0x88:            util::stream_format(stream, "jmp (%s)", r2()); break;
+		// 89
 	case 0x8a: case 0x8b: util::stream_format(stream, "%s = %s & %s", r1(), r2(), r3()); break;
 	case 0x8c: case 0x8d: util::stream_format(stream, "%s = %s | %s", r1(), r2(), r3()); break;
 	case 0x8e: case 0x8f: util::stream_format(stream, "%s = %s ^ %s", r1(), r2(), r3()); break;
@@ -249,18 +274,27 @@ offs_t xavix2_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	case 0x9c: case 0x9d: util::stream_format(stream, "(%s%s).w = %s", r2(), off3s(), r1()); break;
 	case 0x9e: case 0x9f: util::stream_format(stream, "(%s%s).l = %s", r2(), off3s(), r1()); break;
 
-		// a0-a1
+	case 0xa0: case 0xa1: util::stream_format(stream, "%s = ~%s", r1(), r2()); break;
 	case 0xa2: case 0xa3: util::stream_format(stream, "%s = %s", r1(), r2()); break;
-		// a4-a5
+	case 0xa4: case 0xa5: util::stream_format(stream, "%s = -%s", r1(), r2()); break;
 	case 0xa6: case 0xa7: util::stream_format(stream, "cmp %s, %s", r1(), r2()); break;
-		// a8-a9
+	case 0xa8:            util::stream_format(stream, "jsr (%s)", r2()); flags = STEP_OVER; break;
+		// a9
 	case 0xaa: case 0xab: util::stream_format(stream, "%s = %s >>s %s", r1(), r2(), r3()); break;
 	case 0xac: case 0xad: util::stream_format(stream, "%s = %s >> %s", r1(), r2(), r3()); break;
 	case 0xae: case 0xaf: util::stream_format(stream, "%s = %s << %s", r1(), r2(), r3()); break;
 
-		// b0-b1
-	case 0xb2: case 0xb3: util::stream_format(stream, "?b2 %s %s %s", r1(), r2(), r3()); break;
-		// b4-cf
+	case 0xb0: case 0xb1: util::stream_format(stream, "hreg[00] = %s *u %s", r1(), r2()); break;
+	case 0xb2: case 0xb3: util::stream_format(stream, "hreg[00] = %s *s %s", r1(), r2()); break;
+	case 0xb4: case 0xb5: util::stream_format(stream, "hreg[01:00] = %s *u %s", r1(), r2()); break;
+	case 0xb6: case 0xb7: util::stream_format(stream, "hreg[01:00] = %s *s %s", r1(), r2()); break;
+	case 0xbc: case 0xbd: util::stream_format(stream, "hreg[03], hreg[02] = %s /s %s", r1(), r2()); break;
+	case 0xbe: case 0xbf: util::stream_format(stream, "hreg[03], hreg[02] = %s /u %s", r1(), r2()); break;
+		// b6-c7
+
+	case 0xc8: case 0xc9: util::stream_format(stream, "%s = hreg[%s]", r1(), val6u()); break;
+	case 0xca: case 0xcb: util::stream_format(stream, "hreg[%s] = %s", val6u(), r1()); break;
+		// cc-cf
 
 	case 0xd0:            util::stream_format(stream, "bvs %s", rel8()); break;
 	case 0xd1:            util::stream_format(stream, "blts %s", rel8()); break;
