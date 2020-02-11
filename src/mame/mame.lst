@@ -9803,6 +9803,9 @@ carpolo                         // (c) 1977
 bsebman                         // (c) 19?? BS Electronics
 carrera                         // (c) 19?? BS Electronics
 
+@source:casio_rompack.cpp
+casiorom
+
 @source:casloopy.cpp
 casloopy                        //
 
@@ -31312,11 +31315,11 @@ m82p                            // Nintendo M82 Display Unit PAL
 nes                             // Nintendo Entertainment System
 nespal                          // Nintendo Entertainment System PAL
 
-@source:nes_boot.cpp
+@source:nes_clone.cpp
 pjoypj001
+afbm7800
 
 @source:nes_sh6578.cpp
-afbm7800
 bandgpad
 cpatrolm
 ts_handy11
@@ -31337,6 +31340,8 @@ lxcmcy
 lxcmc250
 lxcmcysw
 lxcmcyfz
+lxcmcydp
+red5mam
 cybar120
 mc_dg101
 mc_aa2
@@ -31385,6 +31390,7 @@ dvnimbus
 cbrs8
 mc_tv200
 unkra200
+ppgc200g
 fcpocket
 mog_m320
 fapocket
@@ -36987,6 +36993,7 @@ jak_spdmo                       //
 conyteni                        //
 conyping                        //
 conyfght
+karaokd2
 
 @source:spg2xx.cpp
 rad_skat                        //
@@ -36997,8 +37004,11 @@ rad_fb2                         //
 mattelcs                        //
 abltenni                        //
 tvsprt10                        //
+decathln
 wiwi18                          //
 guitarfv
+jjstrip
+tmntmutm
 
 @source:spg2xx_dreamlife.cpp
 dreamlif                        //
@@ -37037,7 +37047,9 @@ lexiseal                        //
 discpal
 
 @source:spg2xx_mysprtch.cpp
-mysprtch
+mysprtcp
+mysptqvc
+mgt20in1
 
 @source:spg2xx_pdc.cpp
 pdc100
@@ -37662,12 +37674,17 @@ starfigh                        // (c) 1990 SunA
 
 @source:sunplus_gcm394.cpp
 jak_s500
+jak_totm
 smartfp                         // Smart Fit Park
 wlsair60                        // Wireless Air 60
 wrlshunt                        // Wireless: Hunting Video Game System
 tkmag220                        //
 jak_car2
 jak_gtg
+jak_duck
+jak_swc
+jak_wdzh
+jak_wdbg
 jak_tsm
 vbaby
 mgtfit
@@ -40243,6 +40260,9 @@ laser700                        // 1984? Laser 700
 
 @source:vtech_eu3a12.cpp
 vreadere
+
+@source:vtech_mobigo.cpp
+mobigo2
 
 @source:vulgus.cpp
 mach9                           // bootleg (ITISA)

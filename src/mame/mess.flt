@@ -137,6 +137,7 @@ camplynx.cpp
 candela.cpp
 canon_s80.cpp
 cardinal.cpp
+casio_rompack.cpp
 casloopy.cpp
 cat.cpp
 cbm2.cpp
@@ -584,7 +585,7 @@ ncdppc.cpp
 nds.cpp
 neogeocd.cpp
 nes.cpp
-nes_boot.cpp
+nes_clone.cpp
 nes_sh6578.cpp
 nes_vt.cpp
 newbrain.cpp
@@ -991,6 +992,7 @@ vta2000.cpp
 vtech1.cpp
 vtech2.cpp
 vtech_eu3a12.cpp
+vtech_mobigo.cpp
 wangpc.cpp
 wicat.cpp
 wrinkles.cpp
