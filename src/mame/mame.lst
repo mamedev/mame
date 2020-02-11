@@ -29328,24 +29328,25 @@ ms0515                          //
 ms6102                          //
 
 @source:ms32.cpp
-suchie2                         // (c) 1994
-suchie2o                        // (c) 1994
-akiss                           // (c) 1995
-bbbxing                         // (c) 1994
-bnstars                         // (c) 1997
-desertwr                        // (c) 1995
+akiss                           // (c) 1995 - Ver 1.0
+bbbxing                         // (c) 1994 - Ver 1.3
+bnstars                         // (c) 1997 - Ver 1.1
+desertwr                        // (c) 1995 - Ver 1.0
 f1superb                        // (c) 1994
-gametngk                        // (c) 1995
-gratia                          // (c) 1996
-gratiaa                         // (c) 1996
+gametngk                        // (c) 1995 - Ver 1.0
+gratia                          // (c) 1996 - 92047-01 encrypted
+gratiaa                         // (c) 1996 - 91022-10 encrypted
 hayaosi2                        // (c) 1993
-hayaosi3                        // (c) 1994
-hayaosi3a                       // (c) 1994
+hayaosi3                        // (c) 1994 - Ver 1.5
+hayaosi3a                       // (c) 1994 - Ver 1.2
 kirarast                        // (c) 1996
-p47aces                         // (c) 1995
-tetrisp                         // (c) 1995 Jaleco / BPS
-tp2m32                          // (c) 1997
-wpksocv2                        // (c) 1997
+p47aces                         // (c) 1995 - Ver 1.1
+p47acesa                        // (c) 1995 - Ver 1.0
+suchie2                         // (c) 1994 - Ver 1.1
+suchie2o                        // (c) 1994 - Ver 1.0
+tetrisp                         // (c) 1995 Jaleco / BPS - Ver 1.0
+tp2m32                          // (c) 1997 - Ver 1.0
+wpksocv2                        // (c) 1997 - Ver 1.1
 
 @source:ms9540.cpp
 ms9540                          //
