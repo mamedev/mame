@@ -691,7 +691,7 @@ static INPUT_PORTS_START( guitarfv )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Wheel") // 'Wheel'
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Wheel / Whammy") // 'Wheel' in test mode
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
 
@@ -700,6 +700,27 @@ static INPUT_PORTS_START( guitarfv )
 
 	PORT_START("P3")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( guitarss )
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("B1: Blue / Up")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("B2: ellow / Down")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("B3: Purple")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("B4: Red")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("B5: Green")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Strum / Select")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) // unused? no Strum down?
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Whammy")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Start / Select") // pause
+	PORT_BIT( 0xfe00, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // unused?
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // unused?
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // unused?
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jjstrip )
@@ -1074,6 +1095,12 @@ ROM_START( guitarfv )
 	ROM_LOAD16_WORD_SWAP( "mx26l64.bin", 0x000000, 0x800000, CRC(eaadd2c2) SHA1(0c3fe004dbaa52a335c6ddcecb9e9f5582d7ef35) )
 ROM_END
 
+ROM_START( guitarss )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "guitarssuitar.bin", 0x000000, 0x800000, CRC(63950016) SHA1(28b9613571f47c49995aa35c4d4a2d6f68389813) )
+ROM_END
+
+
 ROM_START( jjstrip )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "strippoker.bin", 0x000000, 0x200000, CRC(7a70e6c8) SHA1(3d5da4774b00977939f309f3e71473dde9b70435) )
@@ -1142,6 +1169,9 @@ CONS( 2006, tvsprt10,    0,     0,        tvsprt10,       tvsprt10,    spg2xx_ga
 CONS( 200?, decathln,    0,     0,        tvsprt10,       decathln,    spg2xx_game_state, init_tvsprt10, "Advance Bright Ltd / V-Tac Technology Co Ltd.", "Decathlon", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit found in Spain
 
 CONS( 2007, guitarfv,    0,     0,        guitarfv,       guitarfv,    spg2xx_game_state, empty_init, "Advance Bright Ltd", "Guitar Fever (2007.07.03 Ver 2.7)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// Another version of this has a red "Gibson Flying V" style controller.  The difference is reflected on the title screen, songs are the same.
+CONS( 200?, guitarss,    0,     0,        abltenni,       guitarss,    spg2xx_game_state, empty_init, "Senario", "Guitar Super Star (Fender Stratocaster style)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 200?, jjstrip,    0,     0,        tvsprt10,       jjstrip,    spg2xx_game_state, empty_init, "Shiggles Inc.", "Club Jenna Presents: Jenna Jameson's Strip Poker", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
