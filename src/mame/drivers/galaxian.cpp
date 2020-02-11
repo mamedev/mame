@@ -9986,7 +9986,7 @@ ROM_START( mooncptc )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "mc1.bin",          0x0000, 0x0800, CRC(16f17cd5) SHA1(b3bbea2d91a6deeda7e045fc694ea3afb2e88a29) )
 	ROM_LOAD( "mc2.bin",          0x0800, 0x0800, CRC(e2128805) SHA1(98aba5fd27eb7a3fdd3006f47c1eb7a0ea9d9a6f) )
-	ROM_LOAD( "mc3.bin",          0x1000, 0x0800, CRC(716eaa10) SHA1(780fc785e6651f19dc1a0ccf48cf9485d6562a71) ) //  = 929                   smooncrs   Super Moon Cresta
+	ROM_LOAD( "mc3.bin",          0x1000, 0x0800, CRC(716eaa10) SHA1(780fc785e6651f19dc1a0ccf48cf9485d6562a71) ) //  = 929 smooncrs Super Moon Cresta
 	ROM_LOAD( "mc4.bin",          0x1800, 0x0800, CRC(bd45cd8f) SHA1(045e8b56d46a11c6f974ea9455618d067ba0ef50) )
 	ROM_LOAD( "mc5.bin",          0x2000, 0x0800, CRC(9a1e0528) SHA1(d77e7daa9fc79ea0503f93af8c714441c7fd9ca5) )
 	ROM_LOAD( "mc6.bin",          0x2800, 0x0800, CRC(f0230048) SHA1(8a4363323530b21ee14dbe608aa0de5241d8bb39) )
@@ -10009,6 +10009,32 @@ ROM_START( mooncptc )
 	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
 ROM_END
 
+ROM_START( sirio2 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "sirio2_1.bin",      0x0000, 0x0800, CRC(1e6a4b49) SHA1(6f71f10e73b7a385cd455e74129544cd58932781) )
+	ROM_LOAD( "sirio2_2.bin",      0x0800, 0x0800, CRC(0b316f33) SHA1(687cbc9b1a7b9ead836a074f8418b1fe96b9e1bf) )
+	ROM_LOAD( "sirio2_3.bin",      0x1000, 0x0800, CRC(716eaa10) SHA1(780fc785e6651f19dc1a0ccf48cf9485d6562a71) ) //  = 929 smooncrs Super Moon Cresta
+	ROM_LOAD( "sirio2_4.bin",      0x1800, 0x0800, CRC(092ab94b) SHA1(5a71aeead0968b660e6fb42e57564bd267cc8ba6) )
+	ROM_LOAD( "sirio2_5.bin",      0x2000, 0x0800, CRC(413a836a) SHA1(64c95b8ad78e19b718a68fdbd03c72ee0603396d) )
+	ROM_LOAD( "sirio2_6.bin",      0x2800, 0x0800, CRC(2a9c3f13) SHA1(a3b1c9e11a18fdf94517457f80b3a87a6c2c96e6) )
+	ROM_LOAD( "sirio2_7.bin",      0x3000, 0x0800, CRC(eafd4d02) SHA1(b75ed5358646d8a377ccd1f282136e638aaa9d0c) )
+	ROM_LOAD( "sirio2_8.bin",      0x3800, 0x0800, CRC(6e614bd6) SHA1(52da7f6ae444352c035c1bf29f380812ccd535de) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "sirio2_f2.bin",     0x0000, 0x0800, CRC(528da705) SHA1(d726ee18b79774c982f88afb2a508eb5d5783193) ) // == 1h_1_10.bin
+	ROM_LOAD( "sirio2_f4.bin",     0x0800, 0x0200, CRC(8acfabb9) SHA1(c212be2aa158161365f712e7a5a25f27bf6412f3) )
+	ROM_CONTINUE(                  0x0c00, 0x0200 )  /* this version of the gfx ROMs has two */
+	ROM_CONTINUE(                  0x0a00, 0x0200 )  /* groups of 16 sprites swapped */
+	ROM_CONTINUE(                  0x0e00, 0x0200 )
+	ROM_LOAD( "sirio2_f1.bin",     0x1000, 0x0800, CRC(4e79ff6b) SHA1(f72386a3766a7fcc7b4b8cedfa58b8d57f911f6f) ) // == 1k_1_11.bin
+	ROM_LOAD( "sirio2_f3.bin",     0x1800, 0x0200, CRC(e0edccbd) SHA1(0839a4c9b6e863d12253ae8e1732e80e08702228) ) // == 11.chr
+	ROM_CONTINUE(                  0x1c00, 0x0200 )
+	ROM_CONTINUE(                  0x1a00, 0x0200 )
+	ROM_CONTINUE(                  0x1e00, 0x0200 )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "sirio2_im5610.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) // Compatible with 82s123 PROM
+ROM_END
 
 ROM_START( sstarcrs )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -12783,39 +12809,38 @@ GAME( 1979, kamakazi3,   galaxian, galaxian,   superg,     galaxian_state, init_
 /* different bullet color */
 GAME( 1982, azurian,     0,        galaxian,   azurian,    galaxian_state, init_azurian,    ROT90,  "Rait Electronics Ltd", "Azurian Attack", MACHINE_SUPPORTS_SAVE )
 
-/* extra characters controlled via bank at $6002 */
-GAME( 19??, pisces,      0,        galaxian,   pisces,     galaxian_state, init_pisces,     ROT90,  "Subelectro", "Pisces", MACHINE_SUPPORTS_SAVE )
-GAME( 19??, piscesb,     pisces,   galaxian,   piscesb,    galaxian_state, init_pisces,     ROT90,  "bootleg", "Pisces (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 19??, omni,        pisces,   galaxian,   piscesb,    galaxian_state, init_pisces,     ROT90,  "bootleg", "Omni", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, uniwars,     0,        galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "Irem", "UniWar S", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, uniwarsa,    uniwars,  galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "bootleg (Karateco)", "UniWar S (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, mltiwars,    uniwars,  galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "bootleg (Gayton Games)", "Multi Wars (bootleg of UniWar S)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, gteikoku,    uniwars,  galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "Irem", "Gingateikoku no Gyakushu", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, gteikokub,   uniwars,  galaxian,   gteikokub,  galaxian_state, init_pisces,     ROT270, "bootleg", "Gingateikoku no Gyakushu (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, gteikokub2,  uniwars,  galaxian,   gteikokub2, galaxian_state, init_pisces,     ROT90,  "bootleg", "Gingateikoku no Gyakushu (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, gteikokub3,  uniwars,  galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "bootleg (Honly)", "Gingateikoku no Gyakushu (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacbatt,    uniwars,  galaxian,   spacbatt,   galaxian_state, init_pisces,     ROT90,  "bootleg", "Space Battle (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacbat2,    uniwars,  galaxian,   spacbatt,   galaxian_state, init_pisces,     ROT90,  "bootleg", "Space Battle (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacempr,    uniwars,  galaxian,   spacbatt,   galaxian_state, init_pisces,     ROT90,  "bootleg", "Space Empire (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, skyraidr,    uniwars,  galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "bootleg", "Sky Raider (Uniwars bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, galemp,      uniwars,  galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "bootleg (Taito do Brasil)", "Galaxy Empire (bootleg?)", MACHINE_SUPPORTS_SAVE ) // clearly a hack, but was it licensed?
-GAME( 1980, asideral,    uniwars,  galaxian,   asideral,   galaxian_state, init_pisces,     ROT90,  "bootleg (Electrogame S.A.)", "Ataque Sideral (Spanish bootleg of UniWar S)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, pajaroes,    uniwars,  galaxian,   asideral,   galaxian_state, init_pisces,     ROT90,  "bootleg (PSV S.A.)", "Pajaro del Espacio (Spanish bootleg of UniWar S)", MACHINE_SUPPORTS_SAVE ) // very similar to above
+// Extra characters controlled via bank at $6002
+GAME( 19??, pisces,      0,        galaxian,   pisces,     galaxian_state, init_pisces,     ROT90,  "Subelectro",                 "Pisces",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 19??, piscesb,     pisces,   galaxian,   piscesb,    galaxian_state, init_pisces,     ROT90,  "bootleg",                    "Pisces (bootleg)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 19??, omni,        pisces,   galaxian,   piscesb,    galaxian_state, init_pisces,     ROT90,  "bootleg",                    "Omni",                                             MACHINE_SUPPORTS_SAVE )
+GAME( 1980, uniwars,     0,        galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "Irem",                       "UniWar S",                                         MACHINE_SUPPORTS_SAVE )
+GAME( 1980, uniwarsa,    uniwars,  galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "bootleg (Karateco)",         "UniWar S (bootleg)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mltiwars,    uniwars,  galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "bootleg (Gayton Games)",     "Multi Wars (bootleg of UniWar S)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1980, gteikoku,    uniwars,  galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "Irem",                       "Gingateikoku no Gyakushu",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1980, gteikokub,   uniwars,  galaxian,   gteikokub,  galaxian_state, init_pisces,     ROT270, "bootleg",                    "Gingateikoku no Gyakushu (bootleg set 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1980, gteikokub2,  uniwars,  galaxian,   gteikokub2, galaxian_state, init_pisces,     ROT90,  "bootleg",                    "Gingateikoku no Gyakushu (bootleg set 2)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1980, gteikokub3,  uniwars,  galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "bootleg (Honly)",            "Gingateikoku no Gyakushu (bootleg set 3)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacbatt,    uniwars,  galaxian,   spacbatt,   galaxian_state, init_pisces,     ROT90,  "bootleg",                    "Space Battle (bootleg set 1)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacbat2,    uniwars,  galaxian,   spacbatt,   galaxian_state, init_pisces,     ROT90,  "bootleg",                    "Space Battle (bootleg set 2)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacempr,    uniwars,  galaxian,   spacbatt,   galaxian_state, init_pisces,     ROT90,  "bootleg",                    "Space Empire (bootleg)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1980, skyraidr,    uniwars,  galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "bootleg",                    "Sky Raider (Uniwars bootleg)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1980, galemp,      uniwars,  galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "bootleg (Taito do Brasil)",  "Galaxy Empire (bootleg?)",                         MACHINE_SUPPORTS_SAVE ) // Clearly a hack, but was it licensed?
+GAME( 1980, asideral,    uniwars,  galaxian,   asideral,   galaxian_state, init_pisces,     ROT90,  "bootleg (Electrogame S.A.)", "Ataque Sideral (Spanish bootleg of UniWar S)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1980, pajaroes,    uniwars,  galaxian,   asideral,   galaxian_state, init_pisces,     ROT90,  "bootleg (PSV S.A.)",         "Pajaro del Espacio (Spanish bootleg of UniWar S)", MACHINE_SUPPORTS_SAVE ) // Very similar to 'asideral'
 
-/* Artic Multi-System games - separate tile/sprite ROMs */
-GAME( 1980, streakng,    0,        pacmanbl,   streakng,   galaxian_state, init_galaxian,   ROT90,  "Shoei", "Streaking (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, streaknga,   streakng, pacmanbl,   streakng,   galaxian_state, init_galaxian,   ROT90,  "Shoei", "Streaking (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pacmanbl,    puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg", "Pac-Man (Galaxian hardware, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pacmanbla,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg", "Pac-Man (Galaxian hardware, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pacmanblb,   puckman,  pacmanbl,   pacmanblb,  galaxian_state, init_pacmanbl,   ROT90,  "bootleg", "Pac-Man (Moon Alien 'AL-10A1' hardware)", MACHINE_SUPPORTS_SAVE ) // doesn't have separate tile / sprite roms, probably should move it
-GAME( 1981, pacmanblv,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Video Dens)", "Pac-Man (Video Dens, Spanish bootleg on Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ghostmun,    puckman,  pacmanbl,   streakng,   galaxian_state, init_ghostmun,   ROT90,  "bootleg (Leisure and Allied)", "Ghost Muncher", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, phoenxp2,    phoenix,  galaxian,   phoenxp2,   galaxian_state, init_batman2,    ROT270, "bootleg", "Phoenix Part 2", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, batman2,     phoenix,  galaxian,   batman2,    galaxian_state, init_batman2,    ROT270, "bootleg", "Batman Part 2", MACHINE_SUPPORTS_SAVE ) /* similar to pisces, but with different video banking characteristics */
-GAME( 1983, ladybugg,    ladybug,  galaxian,   ladybugg,   galaxian_state, init_batman2,    ROT270, "bootleg", "Lady Bug (bootleg on Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, atlantisb,   atlantis, galaxian,   atlantib,   galaxian_state, init_galaxian,   ROT270, "bootleg", "Battle of Atlantis (bootleg)", MACHINE_SUPPORTS_SAVE ) // I don't know if this should have a starfield...
-GAME( 1982, tenspot,     0,        tenspot,    tenspot,    galaxian_state, init_tenspot,    ROT270, "Thomas Automatics", "Ten Spot", MACHINE_NOT_WORKING ) // work out how menu works
-
+// Artic Multi-System games - separate tile/sprite ROMs
+GAME( 1980, streakng,    0,        pacmanbl,   streakng,   galaxian_state, init_galaxian,   ROT90,  "Shoei",                        "Streaking (set 1)",                                          MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, streaknga,   streakng, pacmanbl,   streakng,   galaxian_state, init_galaxian,   ROT90,  "Shoei",                        "Streaking (set 2)",                                          MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pacmanbl,    puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg",                      "Pac-Man (Galaxian hardware, set 1)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pacmanbla,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg",                      "Pac-Man (Galaxian hardware, set 2)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pacmanblb,   puckman,  pacmanbl,   pacmanblb,  galaxian_state, init_pacmanbl,   ROT90,  "bootleg",                      "Pac-Man (Moon Alien 'AL-10A1' hardware)",                    MACHINE_SUPPORTS_SAVE ) // Doesn't have separate tile / sprite roms, probably should move it
+GAME( 1981, pacmanblv,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Video Dens)",         "Pac-Man (Video Dens, Spanish bootleg on Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ghostmun,    puckman,  pacmanbl,   streakng,   galaxian_state, init_ghostmun,   ROT90,  "bootleg (Leisure and Allied)", "Ghost Muncher",                                              MACHINE_SUPPORTS_SAVE )
+GAME( 1981, phoenxp2,    phoenix,  galaxian,   phoenxp2,   galaxian_state, init_batman2,    ROT270, "bootleg",                      "Phoenix Part 2",                                             MACHINE_SUPPORTS_SAVE )
+GAME( 1981, batman2,     phoenix,  galaxian,   batman2,    galaxian_state, init_batman2,    ROT270, "bootleg",                      "Batman Part 2",                                              MACHINE_SUPPORTS_SAVE ) // Similar to pisces, but with different video banking characteristics
+GAME( 1983, ladybugg,    ladybug,  galaxian,   ladybugg,   galaxian_state, init_batman2,    ROT270, "bootleg",                      "Lady Bug (bootleg on Galaxian hardware)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1981, atlantisb,   atlantis, galaxian,   atlantib,   galaxian_state, init_galaxian,   ROT270, "bootleg",                      "Battle of Atlantis (bootleg)",                               MACHINE_SUPPORTS_SAVE ) // I don't know if this should have a starfield...
+GAME( 1982, tenspot,     0,        tenspot,    tenspot,    galaxian_state, init_tenspot,    ROT270, "Thomas Automatics",            "Ten Spot",                                                   MACHINE_NOT_WORKING ) // Work out how menu works
 
 /* separate tile/sprite ROMs, plus INT instead of NMI */
 GAME( 1984, devilfsg,    devilfsh, pacmanbl,   devilfsg,   galaxian_state, init_devilfsg,   ROT270, "Vision / Artic", "Devil Fish (Galaxian hardware, bootleg?)", MACHINE_SUPPORTS_SAVE )
@@ -12829,9 +12854,8 @@ GAME( 1982, zigzagb2,    zigzagb,  zigzag,     zigzag,     galaxian_state, init_
 GAME( 1981, gmgalax,     0,        gmgalax,    gmgalax,    gmgalax_state,  init_gmgalax,    ROT90,  "bootleg", "Ghostmuncher Galaxian (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // Multigames
-GAME( 2002, fourplay,    0,        fourplay,   galaxian,   galaxian_state, init_fourplay,   ROT90, "Macro", "Four Play", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, fourplay,    0,        fourplay,   galaxian,   galaxian_state, init_fourplay,   ROT90, "Macro", "Four Play",   MACHINE_SUPPORTS_SAVE )
 GAME( 2001, videight,    0,        videight,   warofbug,   galaxian_state, init_videight,   ROT90, "Macro", "Video Eight", MACHINE_SUPPORTS_SAVE )
-
 
 
 /*************************************
@@ -12841,38 +12865,40 @@ GAME( 2001, videight,    0,        videight,   warofbug,   galaxian_state, init_
  *
  *************************************/
 
-/* based on Galaxian, but with altered address map for more ROM */
-GAME( 1980, mooncrst,    0,        mooncrst,   mooncrst,   galaxian_state, init_mooncrst,   ROT90,  "Nichibutsu", "Moon Cresta (Nichibutsu)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, mooncrstuk,  mooncrst, mooncrst,   mooncrst,   galaxian_state, init_mooncrst,   ROT90,  "Nichibutsu UK", "Moon Cresta (Nichibutsu UK)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, mooncrstuku, mooncrst, mooncrst,   mooncrst,   galaxian_state, init_mooncrsu,   ROT90,  "Nichibutsu UK", "Moon Cresta (Nichibutsu UK, unencrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, mooncrstu,   mooncrst, mooncrst,   mooncrst,   galaxian_state, init_mooncrsu,   ROT90,  "Nichibutsu USA", "Moon Cresta (Nichibutsu USA, unencrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, mooncrsto,   mooncrst, mooncrst,   mooncrsa,   galaxian_state, init_mooncrst,   ROT90,  "Nichibutsu", "Moon Cresta (Nichibutsu, old rev)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, mooncrstg,   mooncrst, mooncrst,   mooncrsg,   galaxian_state, init_mooncrsu,   ROT90,  "Nichibutsu (Gremlin license)", "Moon Cresta (Gremlin)", MACHINE_SUPPORTS_SAVE )
-/* straight Moon Cresta ripoffs on basic mooncrst hardware */
-GAME( 1980, eagle,       mooncrst, eagle,      mooncrsa,   galaxian_state, init_mooncrsu,   ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 1)", MACHINE_SUPPORTS_SAVE ) // or bootleg?
-GAME( 1980, eagle2,      mooncrst, eagle,      eagle2,     galaxian_state, init_mooncrsu,   ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 2)", MACHINE_SUPPORTS_SAVE ) // "
-GAME( 1980, eagle3,      mooncrst, eagle,      mooncrsa,   galaxian_state, init_mooncrsu,   ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 3)", MACHINE_SUPPORTS_SAVE ) // "
-GAME( 1980, mooncrsb,    mooncrst, mooncrst,   mooncrsa,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg", "Moon Cresta (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, mooncrs2,    mooncrst, mooncrst,   mooncrsa,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg", "Moon Cresta (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, mooncrs3,    mooncrst, mooncrst,   mooncrst,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Jeutel)", "Moon Cresta (bootleg set 3)", MACHINE_SUPPORTS_SAVE ) /* Jeutel bootleg, similar to bootleg set 2 */
-GAME( 1980, mooncrs4,    mooncrst, mooncrst,   mooncrst,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (SG-Florence)", "Moon Crest (Moon Cresta bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, mooncrs5,    mooncrst, mooncrst,   mooncrst,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg", "Moon Cresta (bootleg set 4)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, fantazia,    mooncrst, mooncrst,   fantazia,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Subelectro)", "Fantazia (bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981?,spctbird,    mooncrst, mooncrst,   eagle2,     galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Fortrek)", "Space Thunderbird", MACHINE_SUPPORTS_SAVE )
-GAME( 1980?,smooncrs,    mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Gremlin)", "Super Moon Cresta (Gremlin, bootleg)", MACHINE_SUPPORTS_SAVE ) // probably a bootleg, still has the 'POR' text in the bottom right corner that the Sonic version has?!
-GAME( 1980, mooncrstso,  mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Sonic)", "Moon Cresta (SegaSA / Sonic)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980?,mooncptc,    mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Petaco S.A.)", "Moon Cresta (Petaco S.A. Spanish bootleg)", MACHINE_SUPPORTS_SAVE )
-// there may be an alternate version called "Star Crest" according to flyers; is it the same?
-GAME( 1980?,sstarcrs,    mooncrst, mooncrst,   mooncrsg,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Taito do Brasil)", "Super Star Crest", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, mooncmw,     mooncrst, mooncrst,   mooncrsa,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg", "Moon War (Moon Cresta bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, starfgmc,    mooncrst, mooncrst,   mooncrsa,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Samyra Engineering)", "Starfighter (Moon Cresta bootleg)", MACHINE_SUPPORTS_SAVE )
+// Based on Galaxian, but with altered address map for more ROM
+GAME( 1980, mooncrst,    0,        mooncrst,   mooncrst,   galaxian_state, init_mooncrst,   ROT90,  "Nichibutsu",                   "Moon Cresta (Nichibutsu)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mooncrstuk,  mooncrst, mooncrst,   mooncrst,   galaxian_state, init_mooncrst,   ROT90,  "Nichibutsu UK",                "Moon Cresta (Nichibutsu UK)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mooncrstuku, mooncrst, mooncrst,   mooncrst,   galaxian_state, init_mooncrsu,   ROT90,  "Nichibutsu UK",                "Moon Cresta (Nichibutsu UK, unencrypted)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mooncrstu,   mooncrst, mooncrst,   mooncrst,   galaxian_state, init_mooncrsu,   ROT90,  "Nichibutsu USA",               "Moon Cresta (Nichibutsu USA, unencrypted)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mooncrsto,   mooncrst, mooncrst,   mooncrsa,   galaxian_state, init_mooncrst,   ROT90,  "Nichibutsu",                   "Moon Cresta (Nichibutsu, old rev)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mooncrstg,   mooncrst, mooncrst,   mooncrsg,   galaxian_state, init_mooncrsu,   ROT90,  "Nichibutsu (Gremlin license)", "Moon Cresta (Gremlin)",                                  MACHINE_SUPPORTS_SAVE )
+
+// Straight Moon Cresta ripoffs on basic mooncrst hardware
+GAME( 1980, eagle,       mooncrst, eagle,      mooncrsa,   galaxian_state, init_mooncrsu,   ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 1)",                                          MACHINE_SUPPORTS_SAVE ) // Or bootleg?
+GAME( 1980, eagle2,      mooncrst, eagle,      eagle2,     galaxian_state, init_mooncrsu,   ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 2)",                                          MACHINE_SUPPORTS_SAVE ) // "
+GAME( 1980, eagle3,      mooncrst, eagle,      mooncrsa,   galaxian_state, init_mooncrsu,   ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 3)",                                          MACHINE_SUPPORTS_SAVE ) // "
+GAME( 1980, mooncrsb,    mooncrst, mooncrst,   mooncrsa,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg",                      "Moon Cresta (bootleg set 1)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mooncrs2,    mooncrst, mooncrst,   mooncrsa,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg",                      "Moon Cresta (bootleg set 2)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mooncrs3,    mooncrst, mooncrst,   mooncrst,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Jeutel)",             "Moon Cresta (bootleg set 3)",                            MACHINE_SUPPORTS_SAVE ) // Jeutel bootleg, similar to bootleg set 2
+GAME( 1980, mooncrs4,    mooncrst, mooncrst,   mooncrst,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (SG-Florence)",        "Moon Crest (Moon Cresta bootleg)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mooncrs5,    mooncrst, mooncrst,   mooncrst,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg",                      "Moon Cresta (bootleg set 4)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, fantazia,    mooncrst, mooncrst,   fantazia,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Subelectro)",         "Fantazia (bootleg?)",                                    MACHINE_SUPPORTS_SAVE )
+GAME( 1981?,spctbird,    mooncrst, mooncrst,   eagle2,     galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Fortrek)",            "Space Thunderbird",                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1980?,smooncrs,    mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Gremlin)",            "Super Moon Cresta (Gremlin, bootleg)",                   MACHINE_SUPPORTS_SAVE ) // Probably a bootleg, still has the 'POR' text in the bottom right corner that the Sonic version has?!
+GAME( 1980, mooncrstso,  mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Sonic)",              "Moon Cresta (SegaSA / Sonic)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1980?,mooncptc,    mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Petaco S.A.)",        "Moon Cresta (Petaco S.A. Spanish bootleg)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1980?,sirio2,      mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Calfesa S.L.)",       "Sirio II (Calfesa S.L. Spanish Moon Cresta bootleg)",    MACHINE_SUPPORTS_SAVE )
+// There may be an alternate version called "Star Crest" according to flyers; is it the same?
+GAME( 1980?,sstarcrs,    mooncrst, mooncrst,   mooncrsg,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Taito do Brasil)",    "Super Star Crest",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 198?, mooncmw,     mooncrst, mooncrst,   mooncrsa,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg",                      "Moon War (Moon Cresta bootleg)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 198?, starfgmc,    mooncrst, mooncrst,   mooncrsa,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Samyra Engineering)", "Starfighter (Moon Cresta bootleg)",                      MACHINE_SUPPORTS_SAVE )
 // The boards were marked 'Space Dragon' although this doesn't appear in the games.
-GAME( 1980, spcdrag,     mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg", "Space Dragon (Moon Cresta bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spcdraga,    mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg", "Space Dragon (Moon Cresta bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, mooncreg,    mooncrst, mooncrst,   mooncreg,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Electrogame S.A.)", "Moon Cresta (Electrogame S.A. Spanish bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, mooncrsl,    mooncrst, mooncrst,   mooncrsl,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Laguna S.A.)", "Cresta Mundo (Laguna S.A. Spanish Moon Cresta bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, stera,       mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg", "Steraranger (Moon Cresta bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, mooncrgx,    mooncrst, galaxian,   mooncrgx,   galaxian_state, init_mooncrgx,   ROT270, "bootleg", "Moon Cresta (Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spcdrag,     mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg",                      "Space Dragon (Moon Cresta bootleg, set 1)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spcdraga,    mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg",                      "Space Dragon (Moon Cresta bootleg, set 2)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mooncreg,    mooncrst, mooncrst,   mooncreg,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Electrogame S.A.)",   "Moon Cresta (Electrogame S.A. Spanish bootleg)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mooncrsl,    mooncrst, mooncrst,   mooncrsl,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Laguna S.A.)",        "Cresta Mundo (Laguna S.A. Spanish Moon Cresta bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, stera,       mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg",                      "Steraranger (Moon Cresta bootleg)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mooncrgx,    mooncrst, galaxian,   mooncrgx,   galaxian_state, init_mooncrgx,   ROT270, "bootleg",                      "Moon Cresta (Galaxian hardware)",                        MACHINE_SUPPORTS_SAVE )
 
 GAME( 1980, moonqsr,     0,        moonqsr,    moonqsr,    galaxian_state, init_moonqsr,    ROT90,  "Nichibutsu", "Moon Quasar", MACHINE_SUPPORTS_SAVE )
 
