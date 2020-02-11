@@ -24,7 +24,7 @@ void xavix2_device::device_start()
 	state_add(STATE_GENPC,     "GENPC",     m_pc).callexport().noshow();
 	state_add(STATE_GENPCBASE, "CURPC",     m_pc).callexport().noshow();
 	state_add(STATE_GENSP,     "GENSP",     m_r[7]).noshow();
-	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_f).callimport().formatstr("%4s").noshow();
+	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_f).callimport().formatstr("%5s").noshow();
 	state_add(XAVIX2_PC,       "PC",        m_pc).callimport();
 	state_add(XAVIX2_FLAGS,    "FLAGS",     m_f).callimport();
 	state_add(XAVIX2_R0,       "R0",        m_r[0]);
@@ -109,11 +109,14 @@ void xavix2_device::device_start()
 	save_item(NAME(m_ilr1));
 	save_item(NAME(m_if1));
 	save_item(NAME(m_hr));
+	save_item(NAME(m_int_line));
 
 	set_icountptr(m_icount);
 
 	m_pc = 0;
 	m_f = 0;
+	m_int_line = false;
+
 	memset(m_r, 0, sizeof(m_r));
 	memset(m_hr, 0, sizeof(m_hr));
 }
@@ -135,17 +138,25 @@ uint32_t xavix2_device::execute_max_cycles() const noexcept
 }
 
 uint32_t xavix2_device::execute_input_lines() const noexcept
-{
-	return 0;
+{	
+	return 1;
 }
 
-u32 xavix2_device::check_interrupts(u32 npc)
+u32 xavix2_device::check_interrupt(u32 cpc)
 {
-	return npc;
+	if(m_int_line && !(m_f & F_I)) {
+		standard_irq_callback(0);
+		m_ilr1 = cpc;
+		m_if1 = m_f;
+		m_f |= F_I;
+		return 0x40000010;
+	}
+	return cpc;
 }
 
 void xavix2_device::execute_set_input(int inputnum, int state)
 {
+	m_int_line = state;
 }
 
 device_memory_interface::space_config_vector xavix2_device::memory_space_config() const
@@ -162,10 +173,21 @@ std::unique_ptr<util::disasm_interface> xavix2_device::create_disassembler()
 
 void xavix2_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
+	switch(entry.index()) {
+	case STATE_GENFLAGS:
+		str = util::string_format("%c%c%c%c%c",
+								  m_f & F_I ? 'I' : '-',
+								  m_f & F_V ? 'V' : '-',
+								  m_f & F_C ? 'C' : '-',
+								  m_f & F_N ? 'N' : '-',
+								  m_f & F_Z ? 'Z' : '-');
+		break;
+	}
 }
 
 void xavix2_device::execute_run()
 {
+	m_pc = check_interrupt(m_pc);
 	while(m_icount > 0) {
 		if(machine().debug_flags & DEBUG_FLAG_ENABLED)
 			debugger_instruction_hook(m_pc);
@@ -351,7 +373,7 @@ void xavix2_device::execute_run()
 		case 0xe3:            /* rti2 */ break;
 			// e4-fb
 		case 0xf8:            m_f |= F_I; break;
-		case 0xf9:            m_f &= ~F_I; npc = check_interrupts(npc); break;
+		case 0xf9:            m_f &= ~F_I; npc = check_interrupt(npc); break;
 
 		case 0xfc:            break;
 			// fd-ff

@@ -46,8 +46,10 @@ protected:
 	u32 m_r[8], m_hr[64];
 	u32 m_ilr1;
 	u8 m_f;
-
 	u8 m_if1;
+
+	bool m_int_line;
+
 	static inline int r1(u32 opcode) { return (opcode >> 22) & 7; }
 	static inline int r2(u32 opcode) { return (opcode >> 19) & 7; }
 	static inline int r3(u32 opcode) { return (opcode >> 16) & 7; }
@@ -170,7 +172,7 @@ protected:
 		}
 	}
 
-	u32 check_interrupts(u32 npc);
+	u32 check_interrupt(u32 npc);
 };
 
 enum {

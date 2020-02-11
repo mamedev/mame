@@ -45,13 +45,19 @@ private:
 
 void xavix2_state::mem(address_map &map)
 {
-	map(0x00000000, 0x00001fff).ram();
+	map(0x00000000, 0x00001fff).ram().share("part1");
 	map(0x00002630, 0x00002631).lr16(NAME([]() { return 0x210; }));
 	map(0x00002632, 0x00002633).lr16(NAME([]() { return 0x210; }));
-
+	map(0x00003c00, 0x00003c00).lr8(NAME([]() { return 7; })); // Current active interrupt number
+	map(0x00004000, 0x0000ffff).ram().share("part2");
 	map(0x00010000, 0x00ffffff).rom().region("maincpu", 0x010000);
 
 	map(0x40000000, 0x40ffffff).rom().region("maincpu", 0);
+
+	map(0xc0000000, 0xc0001fff).ram().share("part1");
+	map(0xc0002000, 0xc0003fff).ram();
+	map(0xc0004000, 0xc000ffff).ram().share("part2");
+	map(0xc0010000, 0xc001ffff).ram();
 }
 
 uint32_t xavix2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -65,6 +71,9 @@ void xavix2_state::machine_start()
 
 void xavix2_state::machine_reset()
 {
+	auto &prg = m_maincpu->space(AS_PROGRAM);
+	for(u32 adr=0; adr != 0x2000; adr++)
+		prg.write_byte(adr, prg.read_byte(0x40000000 + adr));
 }
 
 static INPUT_PORTS_START( xavix2 )
@@ -75,6 +84,7 @@ void xavix2_state::xavix2(machine_config &config)
 	// unknown CPU 'SSD 2002-2004 NEC 800208-51'
 	XAVIX2(config, m_maincpu, 98'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &xavix2_state::mem);
+	m_maincpu->set_vblank_int("screen", FUNC(xavix2_state::irq0_line_hold));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
