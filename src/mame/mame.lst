@@ -1169,6 +1169,9 @@ alphatp2u
 alphatp3                        // 1982 Triumph-Adler
 alphatp30
 
+@source:alphatpc16.cpp
+alphatpc16
+
 @source:alphatro.cpp
 alphatro                        //
 alphatron                       //

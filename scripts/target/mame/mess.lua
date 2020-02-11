@@ -3541,6 +3541,7 @@ files {
 createMESSProjects(_target, _subtarget, "ta")
 files {
 	MAME_DIR .. "src/mame/drivers/alphatpx.cpp",
+	MAME_DIR .. "src/mame/drivers/alphatpc16.cpp",
 	MAME_DIR .. "src/mame/drivers/alphatro.cpp",
 }
 
