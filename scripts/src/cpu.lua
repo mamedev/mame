@@ -3133,3 +3133,28 @@ if (CPUS["XAVIX2"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/xavix2/xavix2d.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/xavix2/xavix2d.h")
 end
+
+--------------------------------------------------
+-- NEC 78K
+--@src/devices/cpu/upd78k/upd78k.h,CPUS["UPD78K"] = true
+--------------------------------------------------
+
+if (CPUS["UPD78K"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/upd78k/upd78k0.cpp",
+		MAME_DIR .. "src/devices/cpu/upd78k/upd78k0.h",
+		MAME_DIR .. "src/devices/cpu/upd78k/upd78k2.cpp",
+		MAME_DIR .. "src/devices/cpu/upd78k/upd78k2.h",
+	}
+end
+
+if (CPUS["UPD78K"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78kd.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78kd.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k0d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k0d.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k1d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k1d.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k2d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k2d.h")
+end

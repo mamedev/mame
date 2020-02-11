@@ -160,6 +160,9 @@ using util::BIT;
 #include "cpu/unsp/unspdasm.h"
 #include "cpu/upd7725/dasm7725.h"
 #include "cpu/upd7810/upd7810_dasm.h"
+#include "cpu/upd78k/upd78k0d.h"
+#include "cpu/upd78k/upd78k1d.h"
+#include "cpu/upd78k/upd78k2d.h"
 #include "cpu/v60/v60d.h"
 #include "cpu/v810/v810dasm.h"
 #include "cpu/vt50/vt50dasm.h"
@@ -529,9 +532,28 @@ static const dasm_table_entry dasm_table[] =
 	{ "unsp20",          be, -1, []() -> util::disasm_interface * { return new unsp_20_disassembler; } },
 	{ "upd7725",         be, -2, []() -> util::disasm_interface * { return new necdsp_disassembler; } },
 	{ "upd7801",         le,  0, []() -> util::disasm_interface * { return new upd7801_disassembler; } },
+	{ "upd78c05",        le,  0, []() -> util::disasm_interface * { return new upd78c05_disassembler; } },
 	{ "upd7807",         le,  0, []() -> util::disasm_interface * { return new upd7807_disassembler; } },
 	{ "upd7810",         le,  0, []() -> util::disasm_interface * { return new upd7810_disassembler; } },
-	{ "upd78c05",        le,  0, []() -> util::disasm_interface * { return new upd78c05_disassembler; } },
+	{ "upd78014",        le,  0, []() -> util::disasm_interface * { return new upd78014_disassembler; } },
+	{ "upd78024",        le,  0, []() -> util::disasm_interface * { return new upd78024_disassembler; } },
+	{ "upd78044a",       le,  0, []() -> util::disasm_interface * { return new upd78044a_disassembler; } },
+	{ "upd78054",        le,  0, []() -> util::disasm_interface * { return new upd78054_disassembler; } },
+	{ "upd78064",        le,  0, []() -> util::disasm_interface * { return new upd78064_disassembler; } },
+	{ "upd78078",        le,  0, []() -> util::disasm_interface * { return new upd78078_disassembler; } },
+	{ "upd78083",        le,  0, []() -> util::disasm_interface * { return new upd78083_disassembler; } },
+	{ "upd78138",        le,  0, []() -> util::disasm_interface * { return new upd78138_disassembler; } },
+	{ "upd78148",        le,  0, []() -> util::disasm_interface * { return new upd78148_disassembler; } },
+	{ "upd78214",        le,  0, []() -> util::disasm_interface * { return new upd78214_disassembler; } },
+	{ "upd78218a",       le,  0, []() -> util::disasm_interface * { return new upd78218a_disassembler; } },
+	{ "upd78224",        le,  0, []() -> util::disasm_interface * { return new upd78224_disassembler; } },
+	{ "upd78234",        le,  0, []() -> util::disasm_interface * { return new upd78234_disassembler; } },
+	{ "upd78244",        le,  0, []() -> util::disasm_interface * { return new upd78244_disassembler; } },
+	{ "upd780024a",      le,  0, []() -> util::disasm_interface * { return new upd780024a_disassembler; } },
+	{ "upd780065",       le,  0, []() -> util::disasm_interface * { return new upd780065_disassembler; } },
+	{ "upd780988",       le,  0, []() -> util::disasm_interface * { return new upd78083_disassembler; } },
+	{ "upd78k0kx1",      le,  0, []() -> util::disasm_interface * { return new upd78k0kx1_disassembler; } },
+	{ "upd78k0kx2",      le,  0, []() -> util::disasm_interface * { return new upd78k0kx2_disassembler; } },
 	{ "upi41",           le,  0, []() -> util::disasm_interface * { return new mcs48_disassembler(true, false); } },
 	{ "v60",             le,  0, []() -> util::disasm_interface * { return new v60_disassembler; } },
 	{ "v810",            le,  0, []() -> util::disasm_interface * { return new v810_disassembler; } },
