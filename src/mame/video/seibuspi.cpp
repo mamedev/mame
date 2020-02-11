@@ -288,7 +288,7 @@ void seibuspi_state::tilemap_dma_start_w(u32 data)
 	/* fore layer row scroll */
 	if (m_rowscroll_enable)
 	{
-		std::copy_n(&m_mainram[index], 0x800/4, &m_tilemap_ram[0x1800/4]); // 0x2800/4?
+		std::copy_n(&m_mainram[index], 0x800/4, &m_tilemap_ram[0x2800/4]);
 		index += 0x800/4;
 	}
 
@@ -308,7 +308,7 @@ void seibuspi_state::tilemap_dma_start_w(u32 data)
 	/* middle layer row scroll */
 	if (m_rowscroll_enable)
 	{
-		std::copy_n(&m_mainram[index], 0x800/4, &m_tilemap_ram[0x2800/4]); // 0x1800/4?
+		std::copy_n(&m_mainram[index], 0x800/4, &m_tilemap_ram[0x1800/4]);
 		index += 0x800/4;
 	}
 
