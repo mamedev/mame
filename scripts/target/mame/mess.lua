@@ -3826,6 +3826,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/spg2xx_smarttv.cpp",
 	MAME_DIR .. "src/mame/includes/spg2xx.h",
 	MAME_DIR .. "src/mame/drivers/sunplus_gcm394.cpp",
+	MAME_DIR .. "src/mame/drivers/vtech_mobigo.cpp",
 	MAME_DIR .. "src/mame/drivers/generalplus_gpl32612.cpp",
 	MAME_DIR .. "src/mame/drivers/xavix.cpp",
 	MAME_DIR .. "src/mame/video/xavix.cpp",
@@ -3982,7 +3983,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/vsmileb.cpp",
 	MAME_DIR .. "src/mame/drivers/clickstart.cpp",
 	MAME_DIR .. "src/mame/drivers/storio.cpp",
-	MAME_DIR .. "src/mame/drivers/vtech_mobigo.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "wang")
