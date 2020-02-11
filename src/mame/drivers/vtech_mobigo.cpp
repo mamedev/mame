@@ -71,7 +71,7 @@ void mobigo_state::mobigo(machine_config &config)
 
 ROM_START( mobigo2 )
 	ROM_REGION( 0x8400000, "mainrom", 0 )
-	ROM_LOAD( "mobigo2_bios_ger.bin", 0x00000, 0x8400000, CRC(d5ab613d) SHA1(6fb104057dc3484fa958e2cb20c5dd0c19589f75) ) // TODO: what type of NAND?
+	ROM_LOAD( "mobigo2_bios_ger.bin", 0x00000, 0x8400000, CRC(d5ab613d) SHA1(6fb104057dc3484fa958e2cb20c5dd0c19589f75) ) // SPANSION S34ML01G100TF100  
 ROM_END
 
 
