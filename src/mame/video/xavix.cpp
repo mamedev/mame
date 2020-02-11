@@ -836,7 +836,7 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		uint16_t start = ((m_bmp_base[0x11] << 8) | m_bmp_base[0x10]);
 		uint8_t end = m_bmp_base[0x12]; // ?? related to width?
 		uint8_t size = m_bmp_base[0x13]; // some kind of additional scaling?
-		uint8_t mode = m_bmp_base[0x14]; // eanble,bpp, zval etc.
+		uint8_t mode = m_bmp_base[0x14]; // enable,bpp, zval etc.
 
 		uint32_t unused = ((m_bmp_base[0x15] << 16) | (m_bmp_base[0x16] << 8) | (m_bmp_base[0x17] << 0));
 
@@ -856,29 +856,35 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			int width = (rgtadr * 8) / bpp;
 
 			//int count = 0;
-			set_data_address(base + base2, 0);
 
-			for (int y = top; y < 256; y++)
+			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
-				for (int x = 0; x < width; x++)
+				int line = y - top;
+
+				if ((line > 0) && (y < bot))
 				{
-					uint32_t* yposptr = &bitmap.pix32(y);
-					uint16_t* zyposptr = &m_zbuffer.pix16(y);
+					set_data_address(base + base2 + ((line * width * bpp) / 8), 0);
 
-					uint8_t dat = 0;
-					for (int i = 0; i < bpp; i++)
+					for (int x = 0; x < width; x++)
 					{
-						dat |= (get_next_bit() << i);
-					}
+						uint32_t* yposptr = &bitmap.pix32(y);
+						uint16_t* zyposptr = &m_zbuffer.pix16(y);
 
-					if (((x <= cliprect.max_x) && (x >= cliprect.min_x)) && ((y <= cliprect.max_y) && (y >= cliprect.min_y)))
-					{
-						if ((m_bmp_palram_sh[dat] & 0x1f) < 24) // same transparency logic as everything else? (baseball title)
+						uint8_t dat = 0;
+						for (int i = 0; i < bpp; i++)
 						{
-							if (zval >= zyposptr[x])
+							dat |= (get_next_bit() << i);
+						}
+
+						if (((x <= cliprect.max_x) && (x >= cliprect.min_x)) && ((y <= cliprect.max_y) && (y >= cliprect.min_y)))
+						{
+							if ((m_bmp_palram_sh[dat] & 0x1f) < 24) // same transparency logic as everything else? (baseball title)
 							{
-								yposptr[x] = paldata[dat + 0x100];
-								zyposptr[x] = zval;
+								if (zval >= zyposptr[x])
+								{
+									yposptr[x] = paldata[dat + 0x100];
+									zyposptr[x] = zval;
+								}
 							}
 						}
 					}
