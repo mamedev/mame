@@ -723,6 +723,6 @@ ROM_END
 //    YEAR  NAME  PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY   FULLNAME     FLAGS
 COMP( 2006, hyprscan,   0,      0,      hyperscan, hyperscan, spg29x_game_state, empty_init, "Mattel", "HyperScan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-COMP( 200?, jak_bbsf,   0,      0,      hyperscan, hyperscan, spg29x_nand_game_state, nand_init210, "JAKKS Pacific Inc", "Big Buck Hunter Safari (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 2009, jak_bbsf,   0,      0,      hyperscan, hyperscan, spg29x_nand_game_state, nand_init210, "JAKKS Pacific Inc", "Big Buck Hunter Safari (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 
