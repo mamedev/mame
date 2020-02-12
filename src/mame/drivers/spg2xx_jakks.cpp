@@ -798,7 +798,7 @@ void jakks_gkr_state::jakks_tvtouch(machine_config &config)
 
 ROM_START( tvtchsw )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "touchstarwars.bin", 0x000000, 0x400000, CRC(11f848e5) SHA1(5875d57bb3fe0cac5d20e626e4f82a0e5f9bb94c) )
+	ROM_LOAD16_WORD_SWAP( "touchstarwars.bin", 0x000000, 0x400000, CRC(db5ccc31) SHA1(786af933ef1fb644faf8eed935c448b93296bc33) )
 ROM_END
 
 ROM_START( jak_batm )
