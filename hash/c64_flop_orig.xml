@@ -185,6 +185,150 @@
 		</part>
 	</software>
 
+	<software name="input64_25">
+		<description>INPUT 64 1/87</description>
+		<year>1987</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8701.g64" size="278234" crc="062cb4c1" sha1="9b06a7d9f934e06574392e9f1b15435ba3a29bbe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_26">
+		<description>INPUT 64 2/87</description>
+		<year>1987</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8702.g64" size="278234" crc="619587c5" sha1="3f685030f76e9b23658d055d853f33741d46e289"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_27">
+		<description>INPUT 64 3/87</description>
+		<year>1987</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8703.g64" size="278234" crc="39c40893" sha1="22f30dbb1e4b554a6348865a6fea15f99454d067"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_28">
+		<description>INPUT 64 4/87</description>
+		<year>1987</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8704.g64" size="278234" crc="dfcb814a" sha1="dcad7168be21651c91138c825f00b8b55de67f59"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_29">
+		<description>INPUT 64 5/87</description>
+		<year>1987</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8705.g64" size="278234" crc="94cc9dd3" sha1="0220b14fa8641c18a81129c944e06ba95c35d944"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_30">
+		<description>INPUT 64 6/87</description>
+		<year>1987</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8706.g64" size="278234" crc="3d0408dc" sha1="e16288ce00593e14ae345a28bb18593b56e80a8d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_31">
+		<description>INPUT 64 7/87</description>
+		<year>1987</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8707.g64" size="278234" crc="ce9dfa34" sha1="cd87c56d27b6525a1c4cdf1ac5620652758e9da9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_32">
+		<description>INPUT 64 8/87</description>
+		<year>1987</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="309954">
+				<rom name="input64-8708.g64" size="309954" crc="a7c91709" sha1="793ef78e2a883f133c7fe8356adf8ab3d41317e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_33">
+		<description>INPUT 64 9/87</description>
+		<year>1987</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8709.g64" size="278234" crc="53e02004" sha1="91ac02ea88af2b1b9ef4384a7a5b717bc0fa317e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_34">
+		<description>INPUT 64 10/87</description>
+		<year>1987</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8710.g64" size="278234" crc="b58a1b2f" sha1="79894cb1eb1ec9e436888526d8cb46ccfa51a64d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_35">
+		<description>INPUT 64 11/87</description>
+		<year>1987</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8711.g64" size="278234" crc="3c74fccd" sha1="66ade471b5cce456f22d8cda27a0fe519066460e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_36">
+		<description>INPUT 64 12/87</description>
+		<year>1987</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8712.g64" size="278234" crc="0d6b298e" sha1="a828ef7ec17a2a5b88edd6887287b6656c4a8357"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jacknpr" supported="no">
 		<description>Jack the Nipper</description>
 		<year>1986</year>
