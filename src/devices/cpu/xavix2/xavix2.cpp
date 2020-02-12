@@ -230,10 +230,10 @@ void xavix2_device::execute_run()
 		case 0x16: case 0x17: m_r[r1(opcode)] = snz(m_program->read_word(m_r[r2(opcode)] + val19s(opcode))); break;
 		case 0x18: case 0x19: m_r[r1(opcode)] = snz(m_program->read_dword(m_r[r2(opcode)] + val19s(opcode))); break;
 		case 0x1a: case 0x1b: m_program->write_byte(m_r[r2(opcode)] + val19s(opcode), m_r[r1(opcode)]); break;
-		case 0x1c: case 0x1d: m_program->write_byte(m_r[r2(opcode)] + val19s(opcode), m_r[r1(opcode)]); break;
-		case 0x1e: case 0x1f: m_program->write_byte(m_r[r2(opcode)] + val19s(opcode), m_r[r1(opcode)]); break;
+		case 0x1c: case 0x1d: m_program->write_word(m_r[r2(opcode)] + val19s(opcode), m_r[r1(opcode)]); break;
+		case 0x1e: case 0x1f: m_program->write_dword(m_r[r2(opcode)] + val19s(opcode), m_r[r1(opcode)]); break;
 
-		case 0x20: case 0x21: m_r[r1(opcode)] = do_sub(m_r[r1(opcode)], val14s(opcode)); break;
+		case 0x20: case 0x21: m_r[r1(opcode)] = do_add(m_r[r1(opcode)], val14s(opcode)); break;
 		case 0x22: case 0x23: m_r[r1(opcode)] = val14h(opcode); break;
 		case 0x24: case 0x25: m_r[r1(opcode)] = do_sub(m_r[r1(opcode)], val14s(opcode)); break;
 		case 0x26: case 0x27: do_sub(m_r[r1(opcode)], val14s(opcode)); break;
@@ -249,8 +249,8 @@ void xavix2_device::execute_run()
 		case 0x36: case 0x37: m_r[r1(opcode)] = snz(m_program->read_word(m_r[6] + val14s(opcode))); break;
 		case 0x38: case 0x39: m_r[r1(opcode)] = snz(m_program->read_dword(m_r[6] + val14s(opcode))); break;
 		case 0x3a: case 0x3b: m_program->write_byte(m_r[6] + val14s(opcode), m_r[r1(opcode)]); break;
-		case 0x3c: case 0x3d: m_program->write_byte(m_r[6] + val14s(opcode), m_r[r1(opcode)]); break;
-		case 0x3e: case 0x3f: m_program->write_byte(m_r[6] + val14s(opcode), m_r[r1(opcode)]); break;
+		case 0x3c: case 0x3d: m_program->write_word(m_r[6] + val14s(opcode), m_r[r1(opcode)]); break;
+		case 0x3e: case 0x3f: m_program->write_dword(m_r[6] + val14s(opcode), m_r[r1(opcode)]); break;
 
 		case 0x40: case 0x41: m_r[r1(opcode)] = snz((s8)m_program->read_byte(m_r[r2(opcode)] + val11s(opcode))); break;
 		case 0x42: case 0x43: m_r[r1(opcode)] = snz(m_program->read_byte(m_r[r2(opcode)] + val11s(opcode))); break;
@@ -258,8 +258,8 @@ void xavix2_device::execute_run()
 		case 0x46: case 0x47: m_r[r1(opcode)] = snz(m_program->read_word(m_r[r2(opcode)] + val11s(opcode))); break;
 		case 0x48: case 0x49: m_r[r1(opcode)] = snz(m_program->read_dword(m_r[r2(opcode)] + val11s(opcode))); break;
 		case 0x4a: case 0x4b: m_program->write_byte(m_r[r2(opcode)] + val11s(opcode), m_r[r1(opcode)]); break;
-		case 0x4c: case 0x4d: m_program->write_byte(m_r[r2(opcode)] + val11s(opcode), m_r[r1(opcode)]); break;
-		case 0x4e: case 0x4f: m_program->write_byte(m_r[r2(opcode)] + val11s(opcode), m_r[r1(opcode)]); break;
+		case 0x4c: case 0x4d: m_program->write_word(m_r[r2(opcode)] + val11s(opcode), m_r[r1(opcode)]); break;
+		case 0x4e: case 0x4f: m_program->write_dword(m_r[r2(opcode)] + val11s(opcode), m_r[r1(opcode)]); break;
 
 		case 0x50: case 0x51: m_r[r1(opcode)] = snz((s8)m_program->read_byte(val14u(opcode))); break;
 		case 0x52: case 0x53: m_r[r1(opcode)] = snz(m_program->read_byte(val14u(opcode))); break;
