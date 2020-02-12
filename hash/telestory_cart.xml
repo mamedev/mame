@@ -54,7 +54,7 @@ Undumped carts:
 	<software name="cinders" supported="no">
 		<description>La Cenicienta - Bellezas en Flor / Cinderella - Beauties in Bloom (Spain)</description>
 		<year>2006</year>
-		<publisher>JAKKS Pacific / Toymax</publisher>
+		<publisher>JAKKS Pacific / Toymax / Handheld Games</publisher>
 		<part name="cart" interface="telestory_cart">
 			<dataarea name="rom" size="0x400000">
 				<rom name="telestorycinderellasp.bin" size="0x400000" crc="e1b2fd69" sha1="0f3109f30672dacbf52668d485eeed51829993a9"/>
@@ -65,7 +65,7 @@ Undumped carts:
 	<software name="poohs" supported="no">
 		<description>Winnie the Pooh - Salta, Tigger, Salta / Winnie the Pooh - Bounce, Tigger, Bounce (Spain)</description>
 		<year>2006</year>
-		<publisher>JAKKS Pacific / Toymax</publisher>
+		<publisher>JAKKS Pacific / Toymax / Handheld Games</publisher>
 		<part name="cart" interface="telestory_cart">
 			<dataarea name="rom" size="0x400000">
 				<rom name="telestorypoohsp.bin" size="0x400000" crc="f0ef00e8" sha1="bc407c127a64f6b5cfcf3239f1af3d7896d5a6c2"/>
@@ -76,12 +76,34 @@ Undumped carts:
 	<software name="lionkings" supported="no">
 		<description>El Rey León II - El orgullo de Simba / The Lion King II - Simba's Pride (Spain)</description>
 		<year>2006</year>
-		<publisher>JAKKS Pacific / Toymax</publisher>
+		<publisher>JAKKS Pacific / Toymax / Handheld Games</publisher>
 		<part name="cart" interface="telestory_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="telestorylionkingsp.bin" size="0x800000" crc="459ed493" sha1="8528d4fd5d4a7ff457935d618527621b8ec2a100"/>
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="prmystic" supported="no"> <!-- from a UK sourced cartridge, check if it differs to US -->
+		<description>Power Rangers - Mystic Force</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Toymax / HotGen</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="telestory_powerrangers.bin" size="0x800000" crc="6da57a64" sha1="3f2d22188baefee07b11e7cd986188533a5faa4f"/>
+			</dataarea>
+		</part>
+	</software>	
+
+	<software name="dora" supported="no"> <!-- from a UK sourced cartridge, but appears to be in Spanish, check if it differs to US -->
+		<description>Dora the Explorer (Spanish)</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Toymax / HotGen</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="telestory_dora.bin" size="0x400000" crc="79334d40" sha1="8e326e14f16fc93e494afdb2557ffdf751b7faf8"/>
+			</dataarea>
+		</part>
+	</software>	
 
 </softwarelist>
