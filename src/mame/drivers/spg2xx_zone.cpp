@@ -120,7 +120,7 @@ WRITE16_MEMBER(zone40_state::zone40_porta_w)
 	//logerror("%s: zone40_porta_w %04x z80 bank is now %04x \n", machine().describe_context(), data, m_z40_rombase);
 
 	m_maincpu->invalidate_cache();
-	
+
 }
 
 READ16_MEMBER(zone40_state::zone40_porta_r)
@@ -276,7 +276,7 @@ void zone40_state::init_zone40()
 	{
 		ROM[i] = bitswap<16>(ROM[i], 11, 10, 3,  2,  4,  12, 5,  13,
 									 9,  1,  8,  0,  6,  7,  14, 15);
-	
+
 		ROM[i] = ROM[i] ^ 0xa5a5;
 	}
 }
@@ -290,7 +290,7 @@ void zone40_state::init_reactmd()
 	for (int i = 0; i < size/2; i++)
 	{
 		ROM[i] = bitswap<16>(ROM[i], 15, 13, 14, 12,  7,  6,  5,  4,
-			                         11, 10, 9,  8,   3,  1,  2,  0);
+									 11, 10, 9,  8,   3,  1,  2,  0);
 
 		ROM[i] = ROM[i] ^ 0xa5a5;
 	}
@@ -352,7 +352,7 @@ CONS( 2011, lx_jg7415,0, 0, wireless60, wirels60, wireless60_state,  init_lx_jg7
 
 
 // Two systems in one unit - Genesis on a Chip and SunPlus, only the SunPlus part is currently emulated.  Genesis on a chip is a very poor implementation with many issues on real hardware.
-// This should actually boot to a menu on the MD size, with the SunPlus only being enabled if selected from that menu.  MD side menu runs in some enhanced / custom MD mode tho.  
+// This should actually boot to a menu on the MD size, with the SunPlus only being enabled if selected from that menu.  MD side menu runs in some enhanced / custom MD mode tho.
 // Badminton hangs, as it does in the 49-in-1 above
 CONS( 2009, reactmd,  0, 0, zone40p,    wirels60, zone40_state,      init_reactmd,    "AtGames / Sega",                              "Reactor MD (PAL)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 

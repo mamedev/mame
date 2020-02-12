@@ -83,7 +83,7 @@ Undumped carts:
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="prmystic" supported="no"> <!-- from a UK sourced cartridge, check if it differs to US -->
 		<description>Power Rangers - Mystic Force</description>
 		<year>2006</year>
@@ -93,7 +93,7 @@ Undumped carts:
 				<rom name="telestory_powerrangers.bin" size="0x800000" crc="6da57a64" sha1="3f2d22188baefee07b11e7cd986188533a5faa4f"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="dora" supported="no"> <!-- from a UK sourced cartridge, but appears to be in Spanish, check if it differs to US -->
 		<description>Dora the Explorer (Spanish)</description>
@@ -104,6 +104,6 @@ Undumped carts:
 				<rom name="telestory_dora.bin" size="0x400000" crc="79334d40" sha1="8e326e14f16fc93e494afdb2557ffdf751b7faf8"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 </softwarelist>

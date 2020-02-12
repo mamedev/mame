@@ -349,7 +349,7 @@ public:
 		m_latch0_bit(0),
 		m_latch1_bit(0)
 	{ }
-	
+
 protected:
 	virtual DECLARE_READ8_MEMBER(in0_r) override;
 	virtual DECLARE_READ8_MEMBER(in1_r) override;
@@ -536,7 +536,7 @@ WRITE8_MEMBER(nes_vt_cy_lexibook_state::in0_w)
 		m_latch1_bit = m_latch1 & 0x01;
 		m_latch1 >>= 1;
 	}
-	
+
 	m_previous_port0 = data;
 }
 
@@ -1965,7 +1965,7 @@ void nes_vt_waixing_state::machine_reset()
 	nes_vt_state::machine_reset();
 
 	m_ppu->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4); // reasonable
-//	set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
+//  set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
 }
 
 void nes_vt_hum_state::machine_reset()

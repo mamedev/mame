@@ -2,8 +2,8 @@
 // copyright-holders:David Haywood
 
 /*
-	SH6578 NES clone hardware
-	enhanced NES, different to VT / OneBus systems
+    SH6578 NES clone hardware
+    enhanced NES, different to VT / OneBus systems
 */
 
 #include "emu.h"

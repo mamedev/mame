@@ -112,7 +112,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ro251" supported="no">
 		<description>How to Play your Casio ROM Keyboard (RO-251)</description>
 		<year>1984</year>
@@ -122,6 +122,6 @@
 				<rom name="ro251.bin" size="0x1800" crc="6bfd4921" sha1="6b57f18f2f170c01dc929f60b55a0535e041a09d"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 </softwarelist>

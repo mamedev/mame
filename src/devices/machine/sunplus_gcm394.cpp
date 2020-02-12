@@ -62,12 +62,12 @@ void sunplus_gcm394_base_device::write_dma_params(int channel, int offset, uint1
 	LOGMASKED(LOG_GCM394_SYSDMA, "%s:sunplus_gcm394_base_device::write_dma_params (channel %01x) %01x %04x\n", machine().describe_context(), channel, offset, data);
 
 	m_dma_params[offset][channel] = data;
-	
+
 	if (offset == 0 && (data & 1))
 	{
 		trigger_systemm_dma(space, channel);
 	}
-	
+
 }
 
 
@@ -133,7 +133,7 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 	uint32_t length = m_dma_params[3][channel] | (m_dma_params[6][channel] << 16);
 	int sourcedelta = 0;
 	int destdelta = 0;
-	
+
 	if ((mode & 0xa0) == 0x00)
 		sourcedelta = 1;
 	else if ((mode & 0xa0) == 0x20)
@@ -165,7 +165,7 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 		}
 
 		source += sourcedelta;
-	
+
 		if (mode & 0x2000)
 		{
 			write_space(dest, val & 0xFF);
@@ -184,10 +184,10 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(address_space &space, int c
 	// note, these patch the code copied to SRAM so the 'PROGRAM ROM' check fails (it passes otherwise)
 
 	//if (mem.read_word(0x4368c) == 0x4846)
-	//	mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
+	//  mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
 
 	//if (mem.read_word(0x34410) == 0x4846)
-	//	mem.write_word(0x34410, 0x4840);    // golden tee force service mode
+	//  mem.write_word(0x34410, 0x4840);    // golden tee force service mode
 
 	// what is it waiting for when we need these? (needed on some service mode screens)
 	if (mem.read_word(0x3f368) == 0x4840)
@@ -1012,7 +1012,7 @@ void generalplus_gpac800_device::recalculate_calculate_effective_nand_address()
 	uint8_t type = m_nand_7856 & 0xf;
 	uint8_t shift = 0;
 	uint32_t page_offset = 0;
-	
+
 	if (type == 7)
 		shift = 4;
 	else if (type == 11)
@@ -1027,7 +1027,7 @@ void generalplus_gpac800_device::recalculate_calculate_effective_nand_address()
 
 	if (m_nand_7850 & 0x4000)
 		nandaddress *= 2;
-	
+
 	uint32_t page = type ? nandaddress : /*(m_nand_7850 & 0x4000) ?*/ nandaddress >> 8 /*: nandaddress >> 9*/;
 	m_effectiveaddress = (page * 528 + page_offset) << shift;
 

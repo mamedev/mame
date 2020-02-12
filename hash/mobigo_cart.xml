@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="mobigo_cart" description="VTech Mobigo Cartridges">
-	
+
 	<!-- 52-250704 - Mobigo 2 Game Cartridge (Internal Game) (ger) is a dummy cartridge to enable the game in the BIOS -->
 
 	<software name="kfpand2" supported="no">
@@ -14,7 +14,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="penmad" supported="no">
 		<description>Die Pinguine aus Madagascar - Operation Krone (Germany) (80-250304)</description>
 		<year>201?</year>
@@ -35,8 +35,8 @@
 				<rom name="80-250504 - micky maus - wunderhaus (ger).bin" size="0x1000000" crc="90467973" sha1="7abcf0064ad961b6a22f43cf78158a8e37905800"/>
 			</dataarea>
 		</part>
-	</software>	
-		
+	</software>
+
 	<software name="ben10" supported="no">
 		<description>Ben 10 - UltimateAlien - Mine der Gedanken  (Germany) (80-250604)</description>
 		<year>201?</year>
@@ -46,8 +46,8 @@
 				<rom name="80-250604 - ben 10 - ultimatealien - mine der gedanken (ger).bin" size="0x1000000" crc="22dcb2b8" sha1="12628f4ae7cf6e059dd5e7db99e3080dc804cf27"/>
 			</dataarea>
 		</part>
-	</software>		
-	
+	</software>
+
 	<software name="dora" supported="no">
 		<description>Dora - Tag des Zwillings (Germany) (80-250804)</description>
 		<year>201?</year>
@@ -57,8 +57,8 @@
 				<rom name="80-250804 - dora - tag des zwillings (ger).bin" size="0x1000000" crc="4d38d6be" sha1="fe6ec3c4febb91f7f5d2450ce1a8a78956e2c453"/>
 			</dataarea>
 		</part>
-	</software>		
-	
+	</software>
+
 	<software name="dprinces" supported="no">
 		<description>Disney Princess (Germany) (80-251104)</description>
 		<year>201?</year>
@@ -68,8 +68,8 @@
 				<rom name="80-251104 - disney princess (ger).bin" size="0x1000000" crc="3919d5c1" sha1="1ee7bed2ed36dca4bcedfef382fdfb75f47f19fb"/>
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="carstoon" supported="no">
 		<description>Cars Toon - Hooks unglaubliche Geschichten (Germany) (80-251204)</description>
 		<year>201?</year>
@@ -79,8 +79,8 @@
 				<rom name="80-251204 - cars toon - hooks unglaubliche geschichten (ger).bin" size="0x1000000" crc="d36ea48d" sha1="aaa90b3b44a77ea0dd013b38c7d789e23e4a6f55"/>
 			</dataarea>
 		</part>
-	</software>	
-		
+	</software>
+
 	<software name="rapunzel" supported="no">
 		<description>Rapunzel - Neu Verfohnt (Germany) (80-251704)</description>
 		<year>201?</year>
@@ -90,8 +90,8 @@
 				<rom name="80-251704 - rapunzel - neu verfohnt (ger).bin" size="0x1000000" crc="23cd9cd4" sha1="ef9ee2f21ff741668d65ea343f4b47e4472fada7"/>
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="cars2" supported="no">
 		<description>Cars 2 (Germany) (80-251904)</description>
 		<year>201?</year>
@@ -101,8 +101,8 @@
 				<rom name="80-251904 - cars 2 (ger).bin" size="0x1000000" crc="9c3ae94a" sha1="ed7c52e7121a337a662c9196499d4ff8a1482f96"/>
 			</dataarea>
 		</part>
-	</software>		
-	
+	</software>
+
 	<!-- this is from a special large scale Kiosk unit, which should also have a unique BIOS.  Maybe move into driver as a hardcodd cart once BIOS is dumped rather than having it here? -->
 	<software name="kiosk" supported="no">
 		<description>Mobigo Kiosk (Germany)</description>
@@ -113,6 +113,6 @@
 				<rom name="mobigo kiosk cartridge (ger).bin" size="0x2000000" crc="8026b80d" sha1="ded9e5dcf89f30b6011e826da466f7cd6bbd5a2d"/>
 			</dataarea>
 		</part>
-	</software>				
-		
+	</software>
+
 </softwarelist>

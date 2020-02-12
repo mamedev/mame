@@ -1,15 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:
 
-/* 
-	This is just a holder for the Casio ROM Pack Software List to ensure they aren't orphaned
-	These ROM Packs are used by various devices, but none of the devices have been dumped
-	
-	Once a supported system is dumped this can be removed and the list can be hooked up to that
+/*
+    This is just a holder for the Casio ROM Pack Software List to ensure they aren't orphaned
+    These ROM Packs are used by various devices, but none of the devices have been dumped
 
-	Possible systems:
+    Once a supported system is dumped this can be removed and the list can be hooked up to that
 
-	TODO
+    Possible systems:
+
+    TODO
 */
 
 #include "emu.h"
