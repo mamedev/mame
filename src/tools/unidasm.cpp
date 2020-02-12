@@ -163,6 +163,7 @@ using util::BIT;
 #include "cpu/upd78k/upd78k0d.h"
 #include "cpu/upd78k/upd78k1d.h"
 #include "cpu/upd78k/upd78k2d.h"
+#include "cpu/upd78k/upd78k3d.h"
 #include "cpu/v60/v60d.h"
 #include "cpu/v810/v810dasm.h"
 #include "cpu/vt50/vt50dasm.h"
@@ -551,6 +552,14 @@ static const dasm_table_entry dasm_table[] =
 	{ "upd78234",        le,  0, []() -> util::disasm_interface * { return new upd78234_disassembler; } },
 	{ "upd78244",        le,  0, []() -> util::disasm_interface * { return new upd78244_disassembler; } },
 	{ "upd780024a",      le,  0, []() -> util::disasm_interface * { return new upd780024a_disassembler; } },
+	{ "upd78312",        le,  0, []() -> util::disasm_interface * { return new upd78312_disassembler; } },
+	{ "upd78322",        le,  0, []() -> util::disasm_interface * { return new upd78322_disassembler; } },
+	{ "upd78328",        le,  0, []() -> util::disasm_interface * { return new upd78328_disassembler; } },
+	{ "upd78334",        le,  0, []() -> util::disasm_interface * { return new upd78334_disassembler; } },
+	{ "upd78352",        le,  0, []() -> util::disasm_interface * { return new upd78352_disassembler; } },
+	{ "upd78356",        le,  0, []() -> util::disasm_interface * { return new upd78356_disassembler; } },
+	{ "upd78366a",       le,  0, []() -> util::disasm_interface * { return new upd78366a_disassembler; } },
+	{ "upd78372",        le,  0, []() -> util::disasm_interface * { return new upd78372_disassembler; } },
 	{ "upd780065",       le,  0, []() -> util::disasm_interface * { return new upd780065_disassembler; } },
 	{ "upd780988",       le,  0, []() -> util::disasm_interface * { return new upd78083_disassembler; } },
 	{ "upd78k0kx1",      le,  0, []() -> util::disasm_interface * { return new upd78k0kx1_disassembler; } },

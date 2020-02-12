@@ -25,6 +25,7 @@ protected:
 	void format_saddr(std::ostream &stream, u8 addr);
 	void format_sfrp(std::ostream &stream, u8 addr);
 	void format_saddrp(std::ostream &stream, u8 addr);
+	void format_count(std::ostream &stream, u8 n);
 
 	// generic illegal instruction dissasembly
 	offs_t dasm_illegal(std::ostream &stream, u8 op);

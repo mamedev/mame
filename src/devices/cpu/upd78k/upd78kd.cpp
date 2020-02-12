@@ -105,6 +105,18 @@ void upd78k_family_disassembler::format_sfrp(std::ostream &stream, u8 addr)
 		util::stream_format(stream, "0%04XH", 0xff00 + addr);
 }
 
+void upd78k_family_disassembler::format_count(std::ostream &stream, u8 n)
+{
+	if (n < 0x0a)
+		util::stream_format(stream, "%d", n);
+	else
+	{
+		if (n >= 0x0a)
+			stream << "0";
+		util::stream_format(stream, "%02XH", n);
+	}
+}
+
 void upd78k_family_disassembler::format_saddrp(std::ostream &stream, u8 addr)
 {
 	if (addr < 0x20)

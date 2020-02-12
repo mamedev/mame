@@ -3145,6 +3145,8 @@ if (CPUS["UPD78K"]~=null) then
 		MAME_DIR .. "src/devices/cpu/upd78k/upd78k0.h",
 		MAME_DIR .. "src/devices/cpu/upd78k/upd78k2.cpp",
 		MAME_DIR .. "src/devices/cpu/upd78k/upd78k2.h",
+		MAME_DIR .. "src/devices/cpu/upd78k/upd78k3.cpp",
+		MAME_DIR .. "src/devices/cpu/upd78k/upd78k3.h",
 	}
 end
 
@@ -3157,4 +3159,6 @@ if (CPUS["UPD78K"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k1d.h")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k2d.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k2d.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k3d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k3d.h")
 end
