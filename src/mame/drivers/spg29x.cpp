@@ -641,7 +641,7 @@ void hyperscan_state::hyperscan(machine_config &config)
 
 
 /* ROM definition */
-ROM_START( hs )
+ROM_START( hyprscan )
 	ROM_REGION( 0x100000, "bios", ROMREGION_32BIT | ROMREGION_LE )
 	ROM_LOAD32_DWORD("hyperscan.bin", 0x000000, 0x100000, CRC(ce346a14) SHA1(560cb747e7193e6781d4b8b0bd4d7b45d3d28690))
 
@@ -653,4 +653,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY   FULLNAME     FLAGS
-COMP( 2006, hs,   0,      0,      hyperscan, hyperscan, hyperscan_state, empty_init, "Mattel", "HyperScan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 2006, hyprscan,   0,      0,      hyperscan, hyperscan, hyperscan_state, empty_init, "Mattel", "HyperScan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

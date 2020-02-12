@@ -2681,7 +2681,7 @@ files {
 	MAME_DIR .. "src/mame/includes/aquarius.h",
 	MAME_DIR .. "src/mame/video/aquarius.cpp",
 	MAME_DIR .. "src/mame/drivers/juicebox.cpp",
-	MAME_DIR .. "src/mame/drivers/hyperscan.cpp",
+	MAME_DIR .. "src/mame/drivers/spg29x.cpp",
 	MAME_DIR .. "src/mame/drivers/mattelchess.cpp",
 }
 

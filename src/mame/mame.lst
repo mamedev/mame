@@ -16198,9 +16198,6 @@ ecm6127                         //
 hyhoo                           // (c) 1987
 hyhoo2                          // (c) 1987
 
-@source:hyperscan.cpp
-hs                              //
-
 @source:hyperspt.cpp
 hpolym84                        // GX330 (c) 1984
 hyperspt                        // GX330 (c) 1984 + Centuri
@@ -36999,6 +36996,9 @@ conyteni                        //
 conyping                        //
 conyfght
 karaokd2
+
+@source:spg29x.cpp
+hyprscan                        //
 
 @source:spg2xx.cpp
 rad_skat                        //
