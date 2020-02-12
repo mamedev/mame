@@ -34342,9 +34342,6 @@ rcorsair                        // (c) 1984 Nakasawa
 @source:rd100.cpp
 rd100                           //
 
-@source:rd110.cpp
-d110                            //
-
 @source:re900.cpp
 bs94                            // (c) 1994 Entretenimientos GEMINIS
 re900                           // (c) 1993 Entretenimientos GEMINIS
@@ -34434,13 +34431,6 @@ themj                           // (c) 1987 Visco
 @source:rmnimbus.cpp
 nimbus                          // RM Nimbus 186
 
-@source:rmt32.cpp
-cm32l                           //
-mt32                            //
-
-@source:rcm32p.cpp
-cm32p                           //
-
 @source:rockrage.cpp
 rockrage                        // GX620 (c) 1986 (World?)
 rockragea                       // GX620 (c) 1986 (Prototype?)
@@ -34466,6 +34456,19 @@ wizdfire                        // MAS (c) 1992 Data East Corporation (Over Sea)
 wizdfireu                       // MAS (c) 1992 Data East Corporation (US)
 wolffang                        // MAM (c) 1991 Data East Corporation (Japan)
 hangzo
+
+@source:roland_cm32p.cpp
+cm32p                           //
+
+@source:roland_d110.cpp
+d110                            //
+
+@source:roland_mt32.cpp
+cm32l                           //
+mt32                            //
+
+@source:roland_sc55.cpp
+sc55                            // 1991 Sound Canvas SC-55
 
 @source:rollerg.cpp
 rollerg                         // GX999 (c) 1991 (US)
@@ -34562,9 +34565,6 @@ svolley                         // (c) 1989 V-System Co. (Japan)
 svolleybl                       // bootleg
 svolleyk                        // (c) 1989 V-System Co. (Korea)
 svolleyu                        // (c) 1989 V-System Co. + Data East license (US)
-
-@source:rsc55.cpp
-sc55                            // 1991 Sound Canvas SC-55
 
 @source:rt1715.cpp
 rt1715                          //
