@@ -21,6 +21,7 @@ protected:
 		F_N = 2,
 		F_C = 4,
 		F_V = 8,
+		F_MASK = 15,
 		F_I = 16
 	};
 		
@@ -41,14 +42,14 @@ protected:
 	address_space *m_program;
 	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_program_cache;
 
-	int m_icount;
+	int m_icount, m_ei_count;
 	u32 m_pc;
 	u32 m_r[8], m_hr[64];
 	u32 m_ilr1;
 	u8 m_f;
 	u8 m_if1;
 
-	bool m_int_line;
+	bool m_int_line, m_wait;
 
 	static inline int r1(u32 opcode) { return (opcode >> 22) & 7; }
 	static inline int r2(u32 opcode) { return (opcode >> 19) & 7; }
@@ -81,7 +82,7 @@ protected:
 			f |= F_C;
 		if(((v1 ^ r) & (v2 ^ r)) & 0x80000000)
 			f |= F_V;
-		m_f = f;
+		m_f = (m_f & ~F_MASK) | f;
 		return r;
 	}
 
@@ -96,7 +97,7 @@ protected:
 			f |= F_C;
 		if(((v1 ^ v2) & (v2 ^ r)) & 0x80000000)
 			f |= F_V;
-		m_f = f;
+		m_f = (m_f & ~F_MASK) | f;
 		return r;
 	}
 
@@ -106,67 +107,67 @@ protected:
 			f |= F_Z;
 		if(r & 0x80000000)
 			f |= F_N;
-		m_f = f;
+		m_f = (m_f & ~F_MASK) | f;
 		return r;		
 	}		
 
 	inline u32 do_lsl(u32 v1, u32 shift) {
 		if(!shift) {
-			m_f = v1 ? v1 & 0x80000000 ? F_N : 0 : F_Z;
+			m_f = (m_f & ~F_MASK) | (v1 ? v1 & 0x80000000 ? F_N : 0 : F_Z);
 			return v1;
 		} else if(shift < 32) {
 			u32 r = v1 << shift;
 			u32 f = v1 ? v1 & 0x80000000 ? F_N : 0 : F_Z;
 			if(v1 & (1 << (32-shift)))
 				f |= F_C;
-			m_f = f;
+			m_f = (m_f & ~F_MASK) | f;
 			return r;
 		} else if(shift == 32) {
-			m_f = v1 & 1 ? F_C|F_Z : F_Z;
+			m_f = (m_f & ~F_MASK) | (v1 & 1 ? F_C|F_Z : F_Z);
 			return 0;
 		} else {
-			m_f = F_Z;
+			m_f = (m_f & ~F_MASK) | F_Z;
 			return 0;
 		}
 	}
 
 	inline u32 do_lsr(u32 v1, u32 shift) {
 		if(!shift) {
-			m_f = v1 ? v1 & 0x80000000 ? F_N : 0 : F_Z;
+			m_f = (m_f & ~F_MASK) | (v1 ? v1 & 0x80000000 ? F_N : 0 : F_Z);
 			return v1;
 		} else if(shift < 32) {
 			u32 r = v1 >> shift;
 			u32 f = v1 ? 0 : F_Z;
 			if(v1 & (1 << (shift - 1)))
 				f |= F_C;
-			m_f = f;
+			m_f = (m_f & ~F_MASK) | f;
 			return r;
 		} else if(shift == 32) {
-			m_f = v1 & 0x80000000 ? F_C|F_Z : F_Z;
+			m_f = (m_f & ~F_MASK) | (v1 & 0x80000000 ? F_C|F_Z : F_Z);
 			return 0;
 		} else {
-			m_f = F_Z;
+			m_f = (m_f & ~F_MASK) | F_Z;
 			return 0;
 		}
 	}
 
 	inline u32 do_asr(u32 v1, u32 shift) {
 		if(!shift) {
-			m_f = v1 ? v1 & 0x80000000 ? F_N : 0 : F_Z;
+			m_f = (m_f & ~F_MASK) | (v1 ? v1 & 0x80000000 ? F_N : 0 : F_Z);
 			return v1;
 		} else if(shift < 32) {
 			u32 r = static_cast<s32>(v1) >> shift;
 			u32 f = v1 ? v1 & 0x80000000 ? F_N : 0 : F_Z;
 			if(v1 & (1 << (shift - 1)))
 				f |= F_C;
-			m_f = f;
+			m_f = (m_f & ~F_MASK) | f;
 			return r;
 		} else {
 			if(v1 & 0x80000000) {
-				m_f = F_C;
+				m_f = (m_f & ~F_MASK) | F_C;
 				return 0xffffffff;
 			} else {
-				m_f = F_Z;
+				m_f = (m_f & ~F_MASK) | F_Z;
 				return 0;
 			}
 		}

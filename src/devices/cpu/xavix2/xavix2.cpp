@@ -110,12 +110,15 @@ void xavix2_device::device_start()
 	save_item(NAME(m_if1));
 	save_item(NAME(m_hr));
 	save_item(NAME(m_int_line));
+	save_item(NAME(m_wait));
+	save_item(NAME(m_ei_count));
 
 	set_icountptr(m_icount);
 
 	m_pc = 0;
 	m_f = 0;
 	m_int_line = false;
+	m_wait = false;
 
 	memset(m_r, 0, sizeof(m_r));
 	memset(m_hr, 0, sizeof(m_hr));
@@ -144,9 +147,11 @@ uint32_t xavix2_device::execute_input_lines() const noexcept
 
 u32 xavix2_device::check_interrupt(u32 cpc)
 {
-	if(m_int_line && !(m_f & F_I)) {
+	if(m_int_line && (!(m_f & F_I) || m_wait)) {
 		standard_irq_callback(0);
-		m_ilr1 = cpc;
+		m_ilr1 = m_wait ? cpc + 1 : cpc;
+		m_wait = false;
+		m_ei_count = 0;
 		m_if1 = m_f;
 		m_f |= F_I;
 		return 0x40000010;
@@ -187,8 +192,14 @@ void xavix2_device::state_string_export(const device_state_entry &entry, std::st
 
 void xavix2_device::execute_run()
 {
-	m_pc = check_interrupt(m_pc);
+	if(!m_ei_count)
+		m_pc = check_interrupt(m_pc);
 	while(m_icount > 0) {
+		if(m_ei_count) {
+			m_ei_count--;
+			if(!m_ei_count)
+				m_pc = check_interrupt(m_pc);
+		}
 		if(machine().debug_flags & DEBUG_FLAG_ENABLED)
 			debugger_instruction_hook(m_pc);
 
@@ -373,10 +384,12 @@ void xavix2_device::execute_run()
 		case 0xe3:            /* rti2 */ break;
 			// e4-fb
 		case 0xf8:            m_f |= F_I; break;
-		case 0xf9:            m_f &= ~F_I; npc = check_interrupt(npc); break;
+		case 0xf9:            m_f &= ~F_I; m_ei_count = 2; break;
 
 		case 0xfc:            break;
-			// fd-ff
+			// fd
+		case 0xfe:            m_wait = true; npc = check_interrupt(npc-1); if(m_wait) m_icount = 0; break;
+			// ff
 		}
 			
 		m_pc = npc;
