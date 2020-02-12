@@ -74,7 +74,7 @@ void mobigo_state::mobigo(machine_config &config)
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "mobigo_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
 	m_cart->set_device_load(FUNC(mobigo_state::cart_load));
-	m_cart->set_must_be_loaded(true);
+	//m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("mobigo_cart");
 }
