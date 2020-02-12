@@ -30,6 +30,11 @@ const char *xavix2_disassembler::r3()
 	return reg_names[(m_opcode >> 16) & 7];
 }
 
+std::string xavix2_disassembler::val22h()
+{
+	return util::string_format("%08x", u32(m_opcode << 10));
+}
+
 std::string xavix2_disassembler::val22s()
 {
 	u32 r = m_opcode & 0x3fffff;
@@ -182,7 +187,7 @@ offs_t xavix2_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	u32 flags = 0;
 	switch(m_opcode >> 24) {
 	case 0x00: case 0x01: util::stream_format(stream, "%s = %s + %s", r1(), r2(), val19s()); break;
-		// 02-03
+	case 0x02: case 0x03: util::stream_format(stream, "%s = %s", r1(), val22h()); break;
 	case 0x04: case 0x05: util::stream_format(stream, "%s = %s - %s", r1(), r2(), val19s()); break;
 	case 0x06: case 0x07: util::stream_format(stream, "%s = %s", r1(), val22s()); break;
 	case 0x08:            util::stream_format(stream, "jmp %s", adr24()); break;

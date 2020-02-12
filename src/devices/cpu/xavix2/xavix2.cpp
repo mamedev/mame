@@ -215,7 +215,7 @@ void xavix2_device::execute_run()
 
 		switch(opcode >> 24) {
 		case 0x00: case 0x01: m_r[r1(opcode)] = do_add(m_r[r2(opcode)], val19s(opcode)); break;
-			// 02-03
+		case 0x02: case 0x03: m_r[r1(opcode)] = val22h(opcode); break;
 		case 0x04: case 0x05: m_r[r1(opcode)] = do_sub(m_r[r2(opcode)], val19s(opcode)); break;
 		case 0x06: case 0x07: m_r[r1(opcode)] = val22s(opcode); break;
 		case 0x08:            npc = val24u(opcode) | (m_pc & 0xff000000); break;

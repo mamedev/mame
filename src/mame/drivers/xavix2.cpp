@@ -115,9 +115,10 @@ void xavix2_state::dma_count_w(offs_t, u16 data, u16 mem_mask)
 void xavix2_state::dma_control_w(u8 data)
 {
 	if(data == 3 || data == 7) {
-		logerror("DMA %s:%08x -> %04x (%04x)\n",
+		logerror("DMA %s:%08x -> %04x (%04x) %s\n",
 				 data == 3 ? "ram" : "rom",
-				 m_dma_src, m_dma_dst, m_dma_count);
+				 m_dma_src, m_dma_dst, m_dma_count,
+				 machine().describe_context());
 		u32 sadr = m_dma_src | (data == 3 ? 0xc0000000 : 0x40000000);
 		u32 dadr = m_dma_dst | 0xc0000000;
 		auto &prg = m_maincpu->space(AS_PROGRAM);

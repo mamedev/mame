@@ -56,6 +56,7 @@ protected:
 	static inline int r3(u32 opcode) { return (opcode >> 16) & 7; }
 
 	static inline u32 val24u(u32 opcode) { return opcode & 0x00ffffff; }
+	static inline u32 val22h(u32 opcode) { return opcode << 10; }
 	static inline u32 val22s(u32 opcode) { return opcode & 0x200000 ? opcode | 0xffc00000 : opcode & 0x3fffff; }
 	static inline u32 val19s(u32 opcode) { return opcode & 0x40000 ? opcode | 0xfff80000 : opcode & 0x7ffff; }
 	static inline u32 val19u(u32 opcode) { return opcode & 0x0007ffff; }

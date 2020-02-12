@@ -26,6 +26,7 @@ private:
 	const char *r1();
 	const char *r2();
 	const char *r3();
+	std::string val22h();
 	std::string val22s();
 	std::string val19s();
 	std::string val19u();
