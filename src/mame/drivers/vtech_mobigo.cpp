@@ -53,7 +53,7 @@ DEVICE_IMAGE_LOAD_MEMBER(mobigo_state::cart_load)
 
 void mobigo_state::mobigo(machine_config &config)
 {
-	// CPU type not identified (ARM? S+Core?)
+	// unSP based (but no Gpnandnand header in NAND rom)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "mobigo_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
