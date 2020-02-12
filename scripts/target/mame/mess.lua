@@ -2681,7 +2681,6 @@ files {
 	MAME_DIR .. "src/mame/includes/aquarius.h",
 	MAME_DIR .. "src/mame/video/aquarius.cpp",
 	MAME_DIR .. "src/mame/drivers/juicebox.cpp",
-	MAME_DIR .. "src/mame/drivers/spg29x.cpp",
 	MAME_DIR .. "src/mame/drivers/mattelchess.cpp",
 }
 
@@ -3825,8 +3824,10 @@ files {
 	MAME_DIR .. "src/mame/drivers/spg2xx_lexibook.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx_smarttv.cpp",
 	MAME_DIR .. "src/mame/includes/spg2xx.h",
-	MAME_DIR .. "src/mame/drivers/sunplus_gcm394.cpp",
-	MAME_DIR .. "src/mame/drivers/vtech_mobigo.cpp",
+	MAME_DIR .. "src/mame/drivers/spg29x.cpp",
+	MAME_DIR .. "src/mame/drivers/spg29x_lexibook_jg7425.cpp",
+	MAME_DIR .. "src/mame/drivers/sunplus_unsp20soc.cpp",
+	MAME_DIR .. "src/mame/drivers/sunplus_unsp20soc_mobigo.cpp",
 	MAME_DIR .. "src/mame/drivers/generalplus_gpl32612.cpp",
 	MAME_DIR .. "src/mame/drivers/xavix.cpp",
 	MAME_DIR .. "src/mame/video/xavix.cpp",
@@ -3849,7 +3850,6 @@ files {
 	MAME_DIR .. "src/mame/machine/xavix2002_io.h",
 	MAME_DIR .. "src/mame/drivers/xavix2.cpp",
 	MAME_DIR .. "src/mame/drivers/titan_soc.cpp",
-	MAME_DIR .. "src/mame/drivers/lexibook_jg7425.cpp",
 	MAME_DIR .. "src/mame/drivers/unkmandd.cpp",
 	MAME_DIR .. "src/mame/drivers/bbl380.cpp",
 	MAME_DIR .. "src/mame/drivers/actions_atj2279b.cpp",

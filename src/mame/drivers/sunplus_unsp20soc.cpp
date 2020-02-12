@@ -1,7 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*
-    SunPlus unSP based hardware, SPG-??? (6xx?) (die is GCM394)
+	(unSP 2.0 based System on a Chip)
+
+    JAKKS call this GPAC800, other sources call it GPL16250
+
+	die on Smart Fit Park and Spongebob Bikini Bottom 500 is marked GCM394
+	some of the systems here might use newer dies but the video etc. appears the same.
 
     Compared to vii.cpp this is clearly newer, has extra opcodes, different internal map etc. also scaling and higher resolutions based on Spongebob
 
@@ -43,7 +48,7 @@
 */
 
 #include "emu.h"
-#include "includes/sunplus_gcm394.h"
+#include "includes/sunplus_unsp20soc.h"
 
 
 // device type definition

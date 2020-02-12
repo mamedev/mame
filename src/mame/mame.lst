@@ -19027,9 +19027,6 @@ lethalj                         // (c) 1996 The Game Room
 ripribit                        // (c) 1997 LAI Games
 ripribita                       // (c) 1997 LAI Games
 
-@source:lexibook_jg7425.cpp
-lx_jg7425
-
 @source:lft.cpp
 lft1230                         //
 lft1510                         //
@@ -36999,6 +36996,10 @@ karaokd2
 
 @source:spg29x.cpp
 hyprscan                        //
+jak_bbsf
+
+@source:spg29x_lexibook_jg7425.cpp
+lx_jg7425
 
 @source:spg2xx.cpp
 rad_skat                        //
@@ -37679,7 +37680,7 @@ srangero                        // (c) 1988
 srangerw                        // (c) 1988 SunA (WDK License)
 starfigh                        // (c) 1990 SunA
 
-@source:sunplus_gcm394.cpp
+@source:sunplus_unsp20soc.cpp
 jak_s500
 jak_totm
 smartfp                         // Smart Fit Park
@@ -37697,6 +37698,9 @@ vbaby
 mgtfit
 beambox
 bkrankp
+
+@source:sunplus_unsp20soc_mobigo.cpp
+mobigo2
 
 @source:supbtime.cpp
 chinatwn                        // MAK (c) 1991 Data East Corporation (Japan)
@@ -40267,9 +40271,6 @@ laser700                        // 1984? Laser 700
 
 @source:vtech_eu3a12.cpp
 vreadere
-
-@source:vtech_mobigo.cpp
-mobigo2
 
 @source:vulgus.cpp
 mach9                           // bootleg (ITISA)
