@@ -3346,6 +3346,138 @@
 		</part>
 	</software>
 
+	<software name="input64_1">
+		<description>INPUT 64 1/85</description>
+		<year>1985</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="694592">
+				<rom name="input64-8501.tap" size="694592" crc="bb8eabe3" sha1="a08fb8893e47b2ab3c107696993706ac7a4d6909"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_2">
+		<description>INPUT 64 2/85</description>
+		<year>1985</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1296419">
+				<rom name="input64-8502.tap" size="1296419" crc="3b5a4f51" sha1="3614c1dbe74a1890a9bb24ceb4d0da8bc5c1cc5f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_3">
+		<description>INPUT 64 3/85</description>
+		<year>1985</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1348915">
+				<rom name="input64-8503.tap" size="1348915" crc="818d5cf4" sha1="d3c4cb993706210af2595f6c52ade8ea1d536329"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_4">
+		<description>INPUT 64 4/85</description>
+		<year>1985</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1254766">
+				<rom name="input64-8504.tap" size="1254766" crc="a299b9eb" sha1="04055415b36ace144c0acf1ea5cd30da0fa953bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_5">
+		<description>INPUT 64 5/85</description>
+		<year>1985</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1262862">
+				<rom name="input64-8505.tap" size="1262862" crc="c7fbfdcb" sha1="635d4bad92f8b81ced144dd16bd1db925766b62d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_6">
+		<description>INPUT 64 6/85</description>
+		<year>1985</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1221345">
+				<rom name="input64-8506.tap" size="1221345" crc="ef85138f" sha1="93508c85518376367820f3faa529f1b300400863"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_7">
+		<description>INPUT 64 7/85</description>
+		<year>1985</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1267881">
+				<rom name="input64-8507.tap" size="1267881" crc="431df642" sha1="ad3a6675b35b49794ab6b25774918bb723275f94"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_8">
+		<description>INPUT 64 8/85</description>
+		<year>1985</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1205875">
+				<rom name="input64-8508.tap" size="1205875" crc="b4354f73" sha1="beabc065f9980835c43151378abf779200c1a2f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_9">
+		<description>INPUT 64 9/85</description>
+		<year>1985</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1163733">
+				<rom name="input64-8509.tap" size="1163733" crc="290c26d3" sha1="afe65bd9ccf200427277edaa3faaae40117153f3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_10">
+		<description>INPUT 64 10/85</description>
+		<year>1985</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1187285">
+				<rom name="input64-8510.tap" size="1187285" crc="323e9356" sha1="3668a38fb17c502afdca0840744621600113533a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_11">
+		<description>INPUT 64 11/85</description>
+		<year>1985</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1257167">
+				<rom name="input64-8511.tap" size="1257167" crc="ad591402" sha1="517880d2e7de3bae27e9a2dd0bceee454372fe8c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_12">
+		<description>INPUT 64 12/85</description>
+		<year>1985</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1270957">
+				<rom name="input64-8512.tap" size="1270957" crc="91853b75" sha1="7c0b137e430be5ebe18cc5c087033a27932b5f9c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="intrugby">
 		<description>International Rugby Simulator</description>
 		<year>1988</year>
