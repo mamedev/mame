@@ -149,6 +149,42 @@
 		</part>
 	</software>
 
+	<software name="input64_22">
+		<description>INPUT 64 10/86</description>
+		<year>1986</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="286164">
+				<rom name="input64-8610.g64" size="286164" crc="52043960" sha1="5c260d975237c6aad87d3629b277f59044f620ee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_23">
+		<description>INPUT 64 11/86</description>
+		<year>1986</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8611.g64" size="278234" crc="6edbc714" sha1="aa2f3672d3bf1d09b650f194f5760fdbfe8ced43"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="input64_24">
+		<description>INPUT 64 12/86</description>
+		<year>1986</year>
+		<publisher>Verlag Heinz Heise</publisher>
+		<info name="video" value="PAL" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="278234">
+				<rom name="input64-8612.g64" size="278234" crc="5fe6a642" sha1="b70829b2df402ff6f3c0632d4532eaf1314300d0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jacknpr" supported="no">
 		<description>Jack the Nipper</description>
 		<year>1986</year>
