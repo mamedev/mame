@@ -23,13 +23,13 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	
+
 	void mem_map_mysprtch(address_map& map);
 
 	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
 
 	int m_romsize;
-	
+
 	int m_mysprtch_rombase;
 	uint16_t m_prev_porta;
 	int m_bank_enabled;
@@ -71,7 +71,7 @@ void spg2xx_game_mysprtch_state::machine_start()
 	spg2xx_game_state::machine_start();
 
 	m_romsize = (memregion("maincpu")->bytes()/2);
-	
+
 	save_item(NAME(m_mysprtch_rombase));
 	save_item(NAME(m_prev_porta));
 	save_item(NAME(m_bank_enabled));
@@ -290,7 +290,7 @@ WRITE16_MEMBER(spg2xx_game_mysprtch24_state::porta_w)
 	// probably should be the same logic for both games, as the test mode on this one proves
 	// that the logic in spg2xx_game_mysprtch_state::porta_w is incorrect
 
-	if (m_maincpu->pc() < 0x4000) 
+	if (m_maincpu->pc() < 0x4000)
 	{
 		int bank = 0;
 		bank |= (data & 0x0400) ? 1 : 0;
@@ -302,7 +302,7 @@ WRITE16_MEMBER(spg2xx_game_mysprtch24_state::porta_w)
 
 	m_prev_porta = data;
 }
-	
+
 
 void spg2xx_game_mysprtch_state::mysprtch(machine_config& config)
 {
@@ -337,10 +337,10 @@ void spg2xx_game_mysprtch_state::init_mysprtcp()
 	for (int i = 0; i < size / 2; i++)
 	{
 		ROM[i] = bitswap<16>(ROM[i], 15, 13, 14, 12,
-			                         7,  6,  5,  4,
-			                         11, 10, 9,  8,
-			                         3,  1,  2,  0);
-	
+									 7,  6,  5,  4,
+									 11, 10, 9,  8,
+									 3,  1,  2,  0);
+
 		ROM[i] = ROM[i] ^ 0xfafa;
 	}
 }

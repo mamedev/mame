@@ -2,8 +2,8 @@
 // copyright-holders:David Haywood
 
 /*
-	SH6578 NES clone hardware
-	enhanced NES, different to VT / OneBus systems
+    SH6578 NES clone hardware
+    enhanced NES, different to VT / OneBus systems
 */
 
 #include "emu.h"
@@ -119,10 +119,14 @@ ROM_START( ts_handy11 )
 	ROM_LOAD( "tvplaypowercontroller.bin", 0x00000, 0x100000, CRC(9c7fe9ff) SHA1(c872e91ca835b66c9dd3b380e8374b51f12bcae0) ) // 29LV008B
 ROM_END
 
-
 ROM_START( cpatrolm )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "citypatrolman.bin", 0x00000, 0x100000, CRC(4b139c67) SHA1(a5b03f472a94ee879f58bbff201b671fbf4f1ea1) )
+ROM_END
+
+ROM_START( ablwikid )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "mx29f1610atc.u2", 0x00000, 0x200000, CRC(f16abf79) SHA1(aeccbb40d7fdd451ba8e5cca20464da2cf116461) )
 ROM_END
 
 
@@ -131,5 +135,7 @@ CONS( 1997, bandgpad,  0,  0,  nes_sh6578,    nes_sh6578, nes_sh6578_state, init
 // possibly newer than 2001
 CONS( 2001, ts_handy11,  0,  0,  nes_sh6578,    nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Techno Source", "Handy Boy 11-in-1 (TV Play Power)", MACHINE_NOT_WORKING )
 
-
 CONS( 200?, cpatrolm,  0,  0,  nes_sh6578,    nes_sh6578, nes_sh6578_state, init_nes_sh6578, "<unknown>", "City Patrolman", MACHINE_NOT_WORKING )
+
+// this may or may not belong here, it appears to have 4bpp gfx, but unless the banks are scrambled, doesn't fit a standard VT scheme
+CONS( 200?, ablwikid,   0,        0,  nes_sh6578, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Advance Bright Ltd.",         "Wikid Joystick", MACHINE_NOT_WORKING ) // or Wik!d Joystick

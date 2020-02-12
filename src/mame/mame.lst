@@ -16202,9 +16202,6 @@ ecm6127                         //
 hyhoo                           // (c) 1987
 hyhoo2                          // (c) 1987
 
-@source:hyperscan.cpp
-hs                              //
-
 @source:hyperspt.cpp
 hpolym84                        // GX330 (c) 1984
 hyperspt                        // GX330 (c) 1984 + Centuri
@@ -19033,9 +19030,6 @@ franticf                        // (c) 1996 The Game Room
 lethalj                         // (c) 1996 The Game Room
 ripribit                        // (c) 1997 LAI Games
 ripribita                       // (c) 1997 LAI Games
-
-@source:lexibook_jg7425.cpp
-lx_jg7425
 
 @source:lft.cpp
 lft1230                         //
@@ -31331,6 +31325,7 @@ afbm7800
 bandgpad
 cpatrolm
 ts_handy11
+ablwikid
 
 @source:nes_vt.cpp
 vdogdeme
@@ -37005,6 +37000,13 @@ conyping                        //
 conyfght
 karaokd2
 
+@source:spg29x.cpp
+hyprscan                        //
+jak_bbsf
+
+@source:spg29x_lexibook_jg7425.cpp
+lx_jg7425
+
 @source:spg2xx.cpp
 rad_skat                        //
 rad_skatp                       //
@@ -37017,6 +37019,7 @@ tvsprt10                        //
 decathln
 wiwi18                          //
 guitarfv
+guitarss
 jjstrip
 tmntmutm
 
@@ -37050,6 +37053,7 @@ jak_pooh                        //
 jak_care                        //
 jak_nick                        //
 jak_sbfc                        //
+tvtchsw
 
 @source:spg2xx_lexibook.cpp
 lexizeus                        // Lexibook
@@ -37682,7 +37686,7 @@ srangero                        // (c) 1988
 srangerw                        // (c) 1988 SunA (WDK License)
 starfigh                        // (c) 1990 SunA
 
-@source:sunplus_gcm394.cpp
+@source:sunplus_unsp20soc.cpp
 jak_s500
 jak_totm
 smartfp                         // Smart Fit Park
@@ -37700,6 +37704,9 @@ vbaby
 mgtfit
 beambox
 bkrankp
+
+@source:sunplus_unsp20soc_mobigo.cpp
+mobigo2
 
 @source:supbtime.cpp
 chinatwn                        // MAK (c) 1991 Data East Corporation (Japan)
@@ -40271,9 +40278,6 @@ laser700                        // 1984? Laser 700
 @source:vtech_eu3a12.cpp
 vreadere
 
-@source:vtech_mobigo.cpp
-mobigo2
-
 @source:vulgus.cpp
 mach9                           // bootleg (ITISA)
 vulgus                          // 5/1984 (c) 1984
@@ -41220,6 +41224,7 @@ epo_epp                         //
 epo_eppk                        //
 epo_epp3                        //
 epo_efdx                        //
+epo_tfit
 epo_ebox                        //
 epo_sdb                         //
 epo_guru                        //

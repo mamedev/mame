@@ -14,7 +14,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="history" supported="no">
 		<description>Series 1 - History Trivia</description>
 		<year>200?</year>
@@ -25,7 +25,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="everytng" supported="no">
 		<description>Series 1 - Everything Trivia</description>
 		<year>200?</year>
@@ -35,8 +35,8 @@
 				<rom name="buzztimeseries1everything.bin" size="0x200000" crc="84acabd9" sha1="cbbda9134bd899a3ec0b91664a3db0f986d5636b"/>
 			</dataarea>
 		</part>
-	</software>		
-	
+	</software>
+
 	<software name="sports" supported="no">
 		<description>Series 1 - Sports Trivia</description>
 		<year>200?</year>
@@ -46,6 +46,6 @@
 				<rom name="buzztimeseries1sports.bin" size="0x200000" crc="b1f00f7a" sha1="4a99f06831fd265a5f7c11d20a212baab0c0a707"/>
 			</dataarea>
 		</part>
-	</software>			
+	</software>
 
 </softwarelist>

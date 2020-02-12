@@ -377,7 +377,7 @@ hunter2.cpp
 hunter16.cpp
 husky.cpp
 hx20.cpp
-hyperscan.cpp
+spg29x.cpp
 i7000.cpp
 ibm3153.cpp
 ibm6580.cpp
@@ -453,7 +453,7 @@ leapfrog_leappad.cpp
 leapster.cpp
 learnwin.cpp
 lee1214.cpp
-lexibook_jg7425.cpp
+spg29x_lexibook_jg7425.cpp
 lft.cpp
 lg-dvd.cpp
 lilith.cpp
@@ -835,7 +835,8 @@ sun2.cpp
 sun3.cpp
 sun3x.cpp
 sun4.cpp
-sunplus_gcm394.cpp
+sunplus_unsp20soc.cpp
+sunplus_unsp20soc_mobigo.cpp
 super6.cpp
 super80.cpp
 superga2.cpp
@@ -993,7 +994,6 @@ vta2000.cpp
 vtech1.cpp
 vtech2.cpp
 vtech_eu3a12.cpp
-vtech_mobigo.cpp
 wangpc.cpp
 wicat.cpp
 wrinkles.cpp
