@@ -27,6 +27,9 @@ protected:
 
 
 static INPUT_PORTS_START( mobigo )
+	PORT_START("IN0")
+	PORT_START("IN1")
+	PORT_START("IN2")
 INPUT_PORTS_END
 
 
@@ -41,7 +44,7 @@ DEVICE_IMAGE_LOAD_MEMBER(mobigo_state::cart_load)
 
 void mobigo_state::mobigo(machine_config &config)
 {
-	GPAC800(config, m_maincpu, 96000000/2, m_screen);  // Doesn't have GPnandnand header in NAND tho, 
+	GPAC800(config, m_maincpu, 96000000/2, m_screen);  // Doesn't have GPnandnand header in NAND tho, so non-standard bootloader
 	m_maincpu->porta_in().set(FUNC(mobigo_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(mobigo_state::portb_r));
 	m_maincpu->portc_in().set(FUNC(mobigo_state::portc_r));
