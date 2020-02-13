@@ -153,7 +153,7 @@ offs_t romp_disassembler::disassemble(std::ostream &stream, offs_t pc, data_buff
 		case 0xa0: util::stream_format(stream, "sari   %s,#%d", gpr[R2], R3); break; // shift algebraic right immediate
 		case 0xa1: util::stream_format(stream, "sari16 %s,#%d", gpr[R2], R3); break; // shift algebraic right immediate plus sixteen
 		// a2, a3
-		case 0xa4: util::stream_format(stream, "lis    %s,#%x", gpr[R2], R3); break; // load immediate short
+		case 0xa4: util::stream_format(stream, "lis    %s,#0x%x", gpr[R2], R3); break; // load immediate short
 		// a5, a6, a7
 		case 0xa8: util::stream_format(stream, "sri    %s,#%d", gpr[R2], R3); break; // shift right immediate
 		case 0xa9: util::stream_format(stream, "sri16  %s,#%d", gpr[R2], R3); break; // shift right immediate plus sixteen
