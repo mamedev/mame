@@ -3162,3 +3162,20 @@ if (CPUS["UPD78K"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k3d.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k3d.h")
 end
+
+--------------------------------------------------
+-- IBM ROMP
+--@src/devices/cpu/romp/romp.h,CPUS["ROMP"] = true
+--------------------------------------------------
+
+if (CPUS["ROMP"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/romp/romp.cpp",
+		MAME_DIR .. "src/devices/cpu/romp/romp.h",
+	}
+end
+
+if (CPUS["ROMP"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/romp/rompdasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/romp/rompdasm.h")
+end

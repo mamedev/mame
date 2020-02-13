@@ -121,6 +121,7 @@ using util::BIT;
 #include "cpu/pps4/pps4dasm.h"
 #include "cpu/psx/psxdasm.h"
 #include "cpu/rii/riidasm.h"
+#include "cpu/romp/rompdasm.h"
 #include "cpu/rsp/rsp_dasm.h"
 #include "cpu/rx01/rx01dasm.h"
 #include "cpu/s2650/2650dasm.h"
@@ -471,6 +472,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "psxcpu",          le,  0, []() -> util::disasm_interface * { return new psxcpu_disassembler; } },
 	{ "r65c02",          le,  0, []() -> util::disasm_interface * { return new r65c02_disassembler; } },
 	{ "r65c19",          le,  0, []() -> util::disasm_interface * { return new r65c19_disassembler; } },
+	{ "romp",            be,  0, []() -> util::disasm_interface * { return new romp_disassembler; } },
 	{ "rsp",             le,  0, []() -> util::disasm_interface * { return new rsp_disassembler; } },
 	{ "rx01",            le,  0, []() -> util::disasm_interface * { return new rx01_disassembler; } },
 	{ "s2650",           be,  0, []() -> util::disasm_interface * { return new s2650_disassembler(&s2650_unidasm); } },
