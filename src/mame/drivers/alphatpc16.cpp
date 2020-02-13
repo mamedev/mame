@@ -1,6 +1,47 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
 
+/******************************************************************************************
+The Alphatronic PC 16 was modeled after the earlier 8 bit Alphatronic PC – a typical "breadbox"
+home computer case with an integrated keyboard and external floppy disk drives. It came out in
+the early phase of DOS computers, when IBM’s standard was not yet set into stone, but would
+vanquish all "incompatible" solutions within short time. The start screen allows the selection
+of functions by entering the first (two) letters of the command or using the F-key as shown on the screen.
+
+CPU: 8088@5MHz - RAM: 64KB, can be extended to 128KB - ROM: 64KB (monitor and BASIC)
+
+Keyboard: ALP: the key marked with a Greek alpha character makes the computer/printer combo a
+          typewriter, everything is typed "through".
+          BRK: BREAK stops a BASIC program or acts like CTRL-C
+          GRAPH: allows the entering of semigraphics characters, locks into place like CAPSLK
+          numeric and BTX function keys:
+          UP, DWN, LFT and RWT are marked with their respective arrows and move the cursor
+          DEL is marked (R) for BTX mode and reloads the page
+          CLR is marked (i) in BTX mode for “info” and loads the start page
+          = is marked with a page that’s being turned and is a "reveal" key, e.g. for quizzes
+          <-/ is marked with an envelope, it loads BTX’s messaging service
+          the + and – keys aren’t defined yet in BTX mode, they are marked with a page and an arrow each
+         * shows a screen with a black/white contrast and turns BTX screen attributes on and off
+          / has a telephone receiver and three lines and is the online/offline/dialing key
+
+                                                  [RST] [F1 ] [F2] [F3 ] [F4 ] [F5 ] [F6 ]
+
+[ESC] [1 !] [2 ”] [3 §] [4 $] [5 %] [6 &] [7 /] [8 (][9 )] [0 =] [ß ?] [´ `] [BRK] [GRAPH]   [ 7 ] [ 8 ] [ 9 ] [ * ] [ / ]
+[TAB  ] [ Q ] [ W ] [ E ] [ R ] [ T ] [ Z ] [ U ] [ I ] [ O ] [ P ] [ Ü ] [+ *] [CTR] [| ]   [ 4 ] [ 5 ] [ 6 ] [ + ] [ - ]
+[CAPSLK]  [ A ] [ S ] [ D ] [ F ] [ G ] [ H ] [ J ] [ K ] [ L ] [ Ö ] [ Ä ] [^ #] [  <-- ]   [ 1 ] [ 2 ] [ 3 ] [ = ] [<-/]
+[SHFT] [< >] [ Y ] [ X ] [ C ] [ V ] [ B ] [ N ] [ M ] [, ;] [: .] [- _] [  SHFT  ]  [ALP]   [ 0 ] [UP ] [ . ] [DEL] [CLR]
+                   [                      LEER                   ]                           [LFT] [DWN] [RGT] [INS] [HOM]
+
+Graphics options: Standard monitor cassette (Cinch for bw and DIN for SCART/RGB connectors) 40/80x21/25
+characters, Full graphics cassette (512x256 pixels, 16 colours, vector graphics, 64K video RAM),
+BTX cassette (compatible with the standard monitor cassette but includes a modem for BTX functionality)
+Floppy: 1 or 2 5.25” DSDD 40 tracks x 5 sectors x 1024 bytes
+Connectors: joystick, cassette recorder (600/1200 BD) FSK, printer (recommended: TRD 7020 or
+GABRIELE 9009 typewriter, V24), floppy, module slot
+Options: 2 versions of an autonomous processor PCB (Z8671 based, programmable in TinyBasic
+via the PC 16 Terminal, operates independently after programming), connects to the printer port
+******************************************************************************************/
+
 #include "emu.h"
 
 #include "cpu/i86/i86.h"
@@ -133,7 +174,7 @@ void alphatpc16_state::apc16_z80_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x20, 0x23).rw(m_wdfdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
-	map(0x62, 0x63)	.rw(FUNC(alphatpc16_state::flop_scsi_r), FUNC(alphatpc16_state::flop_scsi_w));
+	map(0x62, 0x63) .rw(FUNC(alphatpc16_state::flop_scsi_r), FUNC(alphatpc16_state::flop_scsi_w));
 }
 
 static INPUT_PORTS_START( alphatpc16 )
