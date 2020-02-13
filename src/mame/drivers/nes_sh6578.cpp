@@ -49,9 +49,10 @@ WRITE8_MEMBER(nes_sh6578_state::sprite_dma_w)
 
 void nes_sh6578_state::nes_sh6578_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram();
+	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
 	map(0x4014, 0x4014).w(FUNC(nes_sh6578_state::sprite_dma_w));
+	map(0x5000, 0x57ff).ram();
 	map(0x8000, 0xffff).rom();
 }
 
