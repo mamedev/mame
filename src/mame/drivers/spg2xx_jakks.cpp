@@ -791,9 +791,9 @@ void jakks_gkr_state::jakks_tvtouch(machine_config &config)
 
 	spg2xx_base(config);
 
-	m_maincpu->porta_in().set(FUNC(jakks_gkr_state::rad_porta_r));
-	m_maincpu->portb_in().set(FUNC(jakks_gkr_state::rad_portb_r));
-	m_maincpu->portc_in().set(FUNC(jakks_gkr_state::rad_portc_r));
+	m_maincpu->porta_in().set(FUNC(jakks_gkr_state::base_porta_r));
+	m_maincpu->portb_in().set(FUNC(jakks_gkr_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(jakks_gkr_state::base_portc_r));
 }
 
 ROM_START( tvtchsw )
@@ -944,7 +944,7 @@ CONS( 2005, jak_wof,  0, 0, jakks_gkr_wf_i2c, jak_wf_i2c,   jakks_gkr_state, emp
 // There is a 'Second Edition' version of Wheel of Fortune with a Gold case, GameKey port removed, and a '2' over the usual Game Key Ready logo, internals are different too, not Game-Key Ready
 CONS( 2004, jak_spdm, 0, 0, jakks_gkr_mv_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse",         "Spider-Man (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) //  MV (1 key available)
 CONS( 2005, jak_pooh, 0, 0, jakks_gkr_wp,     jak_pooh,     jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Backbone Entertainment",  "Winnie the Pooh - Piglet's Special Day (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // WP (no game-keys released)
-CONS( 2005, jak_care, 0, 0, jakks_gkr_cb,     jak_care,     jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Backbone Entertainment",  "Care Bears TV Games (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // CB (no game-keys released)
+CONS( 2005, jak_care, 0, 0, jakks_gkr_cb,     jak_care,     jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Backbone Entertainment",  "Care Bears TV Games (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // CB (no game-keys released)
 
 // Some versions of the Shrek - Over the Hedge unit show the GameKey logo on startup (others don't) there is no evidence to suggest it was ever released with a GameKey port tho, and the internal PCB has no place for one on the versions we've seen (which show the logo)
 

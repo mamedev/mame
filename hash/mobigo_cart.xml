@@ -102,6 +102,51 @@
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="teamumiz" supported="no">
+		<description>Team Umizoomi - Die grosse Umiauto Rettung (Germany) (80-252504)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80252504 - team umizoomi - die grosse umiauto rettung (ger).bin" size="0x1000000" crc="48a52f91" sha1="c34865bbbd3a0854e3e6876673ad9c721531278c"/>
+			</dataarea>
+		</part>
+	</software>
+		
+	<software name="chugg" supported="no">
+		<description>Chuggington (Germany) (80-251804)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-251804 - chuggington (ger).bin" size="0x1000000" crc="62bd91aa" sha1="b8e185107f1764d469cca37472a18553fe1e55fa"/>
+			</dataarea>
+		</part>
+	</software>		
+	
+	<software name="tstory3" supported="no">
+		<description>Toy Story 3 (Germany) (80-250104)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250104 - toy story 3 (ger).bin" size="0x1000000" crc="caafa975" sha1="0dd2b13a05711412493255fcf2b8ac31a3445800"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="fishrek" supported="no">
+		<description>Fur immer Shrek (Germany) (80-250004)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250004 - fur immer shrek (ger).bin" size="0x1000000" crc="812a3f90" sha1="1cbd4728201c76b4fb26a8523b080330515153d5"/>
+			</dataarea>
+		</part>
+	</software>		
+	
 
 	<!-- this is from a special large scale Kiosk unit, which should also have a unique BIOS.  Maybe move into driver as a hardcodd cart once BIOS is dumped rather than having it here? -->
 	<software name="kiosk" supported="no">
