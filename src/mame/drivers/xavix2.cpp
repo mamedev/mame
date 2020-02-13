@@ -52,6 +52,7 @@ private:
 	void irq_raise(u32 level);
 	void irq_clear(u32 level);
 	bool irq_state(u32 level) const;
+	void irq_clear_w(u16 data);
 	u8 irq_level_r();
 
 	void dma_src_w(offs_t, u32 data, u32 mem_mask);
@@ -90,6 +91,14 @@ void xavix2_state::irq_clear(u32 level)
 	m_int_active &= ~(1 << level);
 	if(!m_int_active)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
+}
+
+void xavix2_state::irq_clear_w(u16 data)
+{
+	m_int_active &= ~data;
+	if(!m_int_active)
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+	
 }
 
 u8 xavix2_state::irq_level_r()
@@ -240,6 +249,7 @@ void xavix2_state::mem(address_map &map)
 	map(0xffffe634, 0xffffe64b).w(FUNC(xavix2_state::crtc_w));
 
 	map(0xfffffc00, 0xfffffc00).r(FUNC(xavix2_state::irq_level_r));
+	map(0xfffffc04, 0xfffffc05).w(FUNC(xavix2_state::irq_clear_w));
 }
 
 uint32_t xavix2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -250,9 +260,6 @@ uint32_t xavix2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 void xavix2_state::machine_start()
 {
 	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix2_state::dma_end), this));
-
-	m_maincpu->space(AS_PROGRAM).install_write_tap(0x7c0, 0x7c3, "7c0", [this](offs_t offset, u32 &data, u32 mem_mask) { logerror("write %x, %x @ %x (%x)\n", offset, data, mem_mask, machine().describe_context()); });
-	m_maincpu->space(AS_PROGRAM).install_write_tap(0xc00007c0, 0xc00007c3, "7c0", [this](offs_t offset, u32 &data, u32 mem_mask) { logerror("write %x, %x @ %x (%x)\n", offset, data, mem_mask, machine().describe_context()); });
 }
 
 void xavix2_state::machine_reset()

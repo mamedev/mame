@@ -87,7 +87,7 @@ void tulip1_state::io_map(address_map &map)
 //	map(0xfca0, 0xfcaf) // ?
 //	map(0xfcb0) // ?
 //	map(0xfc80) // ?
-	map(0xfc91, 0xfc91).lr8(NAME([this]() -> u8 { return 0x04; })); // ?
+	map(0xfc91, 0xfc91).lr8(NAME([]() -> u8 { return 0x04; })); // ?
 //	map(0xfd00, 0xfd1f) // muart
 	map(0xfd98, 0xfd98).rw(m_acia, FUNC(acia6850_device::status_r), FUNC(acia6850_device::control_w));
 	map(0xfd9c, 0xfd9c).rw(m_acia, FUNC(acia6850_device::data_r), FUNC(acia6850_device::data_w));
