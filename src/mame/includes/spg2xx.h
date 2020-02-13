@@ -27,6 +27,8 @@ public:
 		m_io_p1(*this, "P1"),
 		m_io_p2(*this, "P2"),
 		m_io_p3(*this, "P3"),
+		m_io_guny(*this, "GUNY"),
+		m_io_gunx(*this, "GUNX"),
 		m_i2cmem(*this, "i2cmem")
 	{ }
 
@@ -39,6 +41,8 @@ public:
 	void abltenni(machine_config &config);
 	void tvsprt10(machine_config &config);
 	void guitarfv(machine_config &config);
+	void pballpup(machine_config &config);
+	void tmntmutm(machine_config &config);
 
 
 	void init_crc();
@@ -58,10 +62,11 @@ protected:
 	virtual DECLARE_WRITE16_MEMBER(portb_w);
 	virtual DECLARE_WRITE16_MEMBER(portc_w);
 
-	DECLARE_READ16_MEMBER(rad_porta_r);
-	DECLARE_READ16_MEMBER(rad_portb_r);
-	DECLARE_READ16_MEMBER(rad_portc_r);
-
+	DECLARE_READ16_MEMBER(base_porta_r);
+	DECLARE_READ16_MEMBER(base_portb_r);
+	DECLARE_READ16_MEMBER(base_portc_r);
+	DECLARE_READ16_MEMBER(base_guny_r);
+	DECLARE_READ16_MEMBER(base_gunx_r);
 
 	required_device<spg2xx_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -77,6 +82,8 @@ protected:
 	required_ioport m_io_p1;
 	optional_ioport m_io_p2;
 	optional_ioport m_io_p3;
+	optional_ioport m_io_guny;
+	optional_ioport m_io_gunx;
 	optional_device<i2cmem_device> m_i2cmem;
 };
 

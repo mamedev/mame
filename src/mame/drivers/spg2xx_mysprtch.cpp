@@ -312,9 +312,9 @@ void spg2xx_game_mysprtch_state::mysprtch(machine_config& config)
 
 	spg2xx_base(config);
 
-	m_maincpu->porta_in().set(FUNC(spg2xx_game_mysprtch_state::rad_porta_r));
-	m_maincpu->portb_in().set(FUNC(spg2xx_game_mysprtch_state::rad_portb_r));
-	m_maincpu->portc_in().set(FUNC(spg2xx_game_mysprtch_state::rad_portc_r));
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_mysprtch_state::base_porta_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_mysprtch_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_mysprtch_state::base_portc_r));
 
 	m_maincpu->porta_out().set(FUNC(spg2xx_game_mysprtch_state::porta_w));
 

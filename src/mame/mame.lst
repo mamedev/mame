@@ -31398,6 +31398,7 @@ fcpocket
 mog_m320
 fapocket
 zdog
+otrail
 
 @source:vt1682.cpp
 ii8in1
@@ -37022,6 +37023,7 @@ guitarfv
 guitarss
 jjstrip
 tmntmutm
+pballpup
 
 @source:spg2xx_dreamlife.cpp
 dreamlif                        //
@@ -37088,6 +37090,7 @@ sentx6pd
 @source:spg2xx_shredmjr.cpp
 taikeegr                        //
 shredmjr                        //
+guitarst
 
 @source:spg2xx_smarttv.cpp
 smartvad
