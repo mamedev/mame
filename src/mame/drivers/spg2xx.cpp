@@ -1293,7 +1293,7 @@ CONS( 2005, tmntmutm,   0,     0,        tmntmutm,       tmntmutm,    spg2xx_gam
 
 CONS( 2006, pballpup,   0,     0,        pballpup,       pballpup,    spg2xx_game_pballpup_state, empty_init, "Hasbro / Tiger Electronics", "Mission: Paintball Powered Up", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-// some garbage sprites (not meant to be displayed at all) seeprom hookup, gun fine-tuning etc.
+// some garbage sprites (not meant to be displayed at all) seeprom hookup (24LC08), gun fine-tuning etc.
 CONS( 2008, swclone,   0,     0,        pballpup,       pballpup,    spg2xx_game_pballpup_state, empty_init, "Hasbro / Tiger Electronics", "Star Wars - The Clone Wars", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Mattel games
