@@ -142,7 +142,7 @@ void xavix2_state::dma_status_w(u8 data)
 
 u8 xavix2_state::dma_status_r()
 {
-	return irq_state(IRQ_DMA) ? 7 : 0;
+	return irq_state(IRQ_DMA) ? 6 : 0;
 }
 
 TIMER_CALLBACK_MEMBER(xavix2_state::dma_end)
