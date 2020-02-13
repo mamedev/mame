@@ -68,6 +68,8 @@ private:
 	u8 debug_port_r();
 	u8 debug_port_status_r();
 
+	void crtc_w(offs_t reg, u16 data);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -178,17 +180,50 @@ u8 xavix2_state::debug_port_status_r()
 	return 1<<1;
 }
 
+/*
+  NTSC? (63.55us)
+[:] crtc[0] = 50034 (c372)
+[:] crtc[1] = 463 (1cf)
+[:] crtc[2] = 6760 (1a68)
+[:] crtc[3] = 522 (20a)
+[:] crtc[4] = 770 (302)
+[:] crtc[5] = 525 (20d)
+[:] crtc[6] = 9 (9)
+[:] crtc[7] = 15 (f)
+[:] crtc[8] = 3 (3)
+[:] crtc[9] = 3 (3)
+[:] crtc[10] = 3 (3)
+[:] crtc[11] = 43 (2b)
+
+  PAL? (64us)
+[:] crtc[0] = 49924 (c304)
+[:] crtc[1] = 457 (1c9)
+[:] crtc[2] = 6758 (1a66)
+[:] crtc[3] = 545 (221)
+[:] crtc[4] = 765 (2fd)
+[:] crtc[5] = 627 (273)
+[:] crtc[6] = 8 (8)
+[:] crtc[7] = 13 (d)
+[:] crtc[8] = 3 (3)
+[:] crtc[9] = 3 (3)
+[:] crtc[10] = 3 (3)
+[:] crtc[11] = 23 (17)
+*/
+
+void xavix2_state::crtc_w(offs_t reg, u16 data)
+{
+	logerror("crtc[%d] = %d (%x)\n", reg, (u32)data, data);
+}
 
 
 void xavix2_state::mem(address_map &map)
 {
-	map(0x00000000, 0x0000ffff).ram().share("mainram");
+	map(0x00000000, 0x0000ffff).ram();	
 	map(0x00010000, 0x00ffffff).rom().region("maincpu", 0x010000);
 
 	map(0x40000000, 0x40ffffff).rom().region("maincpu", 0);
 
-	map(0xc0000000, 0xc000ffff).ram().share("mainram");
-	map(0xc0010000, 0xc001ffff).ram();
+	map(0xc0000000, 0xc001ffff).ram();
 
 	map(0xffffe000, 0xffffe003).w(FUNC(xavix2_state::dma_src_w));
 	map(0xffffe004, 0xffffe005).w(FUNC(xavix2_state::dma_dst_w));
@@ -199,8 +234,11 @@ void xavix2_state::mem(address_map &map)
 	map(0xffffe238, 0xffffe238).rw(FUNC(xavix2_state::debug_port_r), FUNC(xavix2_state::debug_port_w));
 	map(0xffffe239, 0xffffe239).r(FUNC(xavix2_state::debug_port_status_r));
 
+	map(0xffffe60a, 0xffffe60a).lr8(NAME([]() { return 0x40; })); // pal/ntsc
 	map(0xffffe630, 0xffffe631).lr16(NAME([]() { return 0x210; }));
 	map(0xffffe632, 0xffffe633).lr16(NAME([]() { return 0x210; }));
+	map(0xffffe634, 0xffffe64b).w(FUNC(xavix2_state::crtc_w));
+
 	map(0xfffffc00, 0xfffffc00).r(FUNC(xavix2_state::irq_level_r));
 }
 
@@ -212,6 +250,9 @@ uint32_t xavix2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 void xavix2_state::machine_start()
 {
 	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix2_state::dma_end), this));
+
+	m_maincpu->space(AS_PROGRAM).install_write_tap(0x7c0, 0x7c3, "7c0", [this](offs_t offset, u32 &data, u32 mem_mask) { logerror("write %x, %x @ %x (%x)\n", offset, data, mem_mask, machine().describe_context()); });
+	m_maincpu->space(AS_PROGRAM).install_write_tap(0xc00007c0, 0xc00007c3, "7c0", [this](offs_t offset, u32 &data, u32 mem_mask) { logerror("write %x, %x @ %x (%x)\n", offset, data, mem_mask, machine().describe_context()); });
 }
 
 void xavix2_state::machine_reset()
