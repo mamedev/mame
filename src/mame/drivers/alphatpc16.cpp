@@ -2,10 +2,13 @@
 // copyright-holders:Carl
 
 /******************************************************************************************
-The Alphatronic PC 16 was modeled after the earlier 8 bit Alphatronic PC – a typical "breadbox"
-home computer case with an integrated keyboard and external floppy disk drives. It came out in
-the early phase of DOS computers, when IBM’s standard was not yet set into stone, but would
-vanquish all "incompatible" solutions within short time. The start screen allows the selection
+The Alphatronic PC 16 was modeled after the earlier 8 bit Alphatronic PC – on the outside
+a typical "breadbox" home computer case with an integrated keyboard and external floppy disk drives.
+Coming from a typewriter company, it had ambitions for office use - its high price and mismatched
+intended use and design coupled with its release date gave it little success. It was released
+in the early phase of DOS computers, when IBM’s standard was not yet set into stone, but would
+vanquish all "incompatible" solutions within short time.
+The start screen allows the selection
 of functions by entering the first (two) letters of the command or using the F-key as shown on the screen.
 
 CPU: 8088@5MHz - RAM: 64KB, can be extended to 128KB - ROM: 64KB (monitor and BASIC)
@@ -239,5 +242,5 @@ ROM_START( alphatpc16 )
 	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )                // from dcvg5k
 ROM_END
 
-COMP( 198?, alphatpc16,  0, 0, alphatpc16, alphatpc16, alphatpc16_state, empty_init, "Triumph-Adler", "alphatronic PC-16",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1985, alphatpc16,  0, 0, alphatpc16, alphatpc16, alphatpc16_state, empty_init, "Triumph-Adler", "alphatronic PC-16",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 
