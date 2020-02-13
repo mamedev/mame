@@ -13,6 +13,7 @@
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
+#include "machine/eepromser.h"
 
 
 
@@ -87,6 +88,23 @@ protected:
 	optional_device<i2cmem_device> m_i2cmem;
 };
 
+
+class spg2xx_game_pballpup_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_pballpup_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_eeprom(*this, "eeprom")
+	{ }
+
+	void pballpup(machine_config &config);
+
+private:
+	DECLARE_READ16_MEMBER(porta_r);
+	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
+
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+};
 
 
 
