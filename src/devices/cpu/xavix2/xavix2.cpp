@@ -261,14 +261,14 @@ void xavix2_device::execute_run()
 		case 0x4c: case 0x4d: m_program->write_word(m_r[r2(opcode)] + val11s(opcode), m_r[r1(opcode)]); break;
 		case 0x4e: case 0x4f: m_program->write_dword(m_r[r2(opcode)] + val11s(opcode), m_r[r1(opcode)]); break;
 
-		case 0x50: case 0x51: m_r[r1(opcode)] = snz((s8)m_program->read_byte(val14u(opcode))); break;
-		case 0x52: case 0x53: m_r[r1(opcode)] = snz(m_program->read_byte(val14u(opcode))); break;
-		case 0x54: case 0x55: m_r[r1(opcode)] = snz((s16)m_program->read_word(val14u(opcode))); break;
-		case 0x56: case 0x57: m_r[r1(opcode)] = snz(m_program->read_word(val14u(opcode))); break;
-		case 0x58: case 0x59: m_r[r1(opcode)] = snz(m_program->read_dword(val14u(opcode))); break;
-		case 0x5a: case 0x5b: m_program->write_byte(val14u(opcode), m_r[r1(opcode)]); break;
-		case 0x5c: case 0x5d: m_program->write_word(val14u(opcode), m_r[r1(opcode)]); break;
-		case 0x5e: case 0x5f: m_program->write_dword(val14u(opcode), m_r[r1(opcode)]); break;
+		case 0x50: case 0x51: m_r[r1(opcode)] = snz((s8)m_program->read_byte(val14s(opcode))); break;
+		case 0x52: case 0x53: m_r[r1(opcode)] = snz(m_program->read_byte(val14s(opcode))); break;
+		case 0x54: case 0x55: m_r[r1(opcode)] = snz((s16)m_program->read_word(val14s(opcode))); break;
+		case 0x56: case 0x57: m_r[r1(opcode)] = snz(m_program->read_word(val14s(opcode))); break;
+		case 0x58: case 0x59: m_r[r1(opcode)] = snz(m_program->read_dword(val14s(opcode))); break;
+		case 0x5a: case 0x5b: m_program->write_byte(val14s(opcode), m_r[r1(opcode)]); break;
+		case 0x5c: case 0x5d: m_program->write_word(val14s(opcode), m_r[r1(opcode)]); break;
+		case 0x5e: case 0x5f: m_program->write_dword(val14s(opcode), m_r[r1(opcode)]); break;
 
 		case 0x60: case 0x61: m_r[r1(opcode)] = do_add(m_r[r1(opcode)], val6s(opcode)); break;
 		case 0x62: case 0x63: m_r[r1(opcode)] = val6s(opcode); break;

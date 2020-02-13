@@ -120,7 +120,7 @@ void xavix2_state::dma_control_w(u8 data)
 				 m_dma_src, m_dma_dst, m_dma_count,
 				 machine().describe_context());
 		u32 sadr = m_dma_src | (data == 3 ? 0xc0000000 : 0x40000000);
-		u32 dadr = m_dma_dst | 0xc0000000;
+		u32 dadr = m_dma_dst;
 		auto &prg = m_maincpu->space(AS_PROGRAM);
 		for(u32 i=0; i != m_dma_count; i++)
 			prg.write_byte(dadr + i, prg.read_byte(sadr + i));
@@ -153,27 +153,23 @@ INTERRUPT_GEN_MEMBER(xavix2_state::vblank_irq)
 
 void xavix2_state::mem(address_map &map)
 {
-	map(0x00000000, 0x00001fff).ram().share("part1");
-
-	map(0x00002000, 0x00002003).w(FUNC(xavix2_state::dma_src_w));
-	map(0x00002004, 0x00002005).w(FUNC(xavix2_state::dma_dst_w));
-	map(0x00002008, 0x00002009).w(FUNC(xavix2_state::dma_count_w));
-	map(0x0000200c, 0x0000200c).w(FUNC(xavix2_state::dma_control_w));
-	map(0x00002010, 0x00002010).rw(FUNC(xavix2_state::dma_status_r), FUNC(xavix2_state::dma_status_w));
-
-	map(0x00002630, 0x00002631).lr16(NAME([]() { return 0x210; }));
-	map(0x00002632, 0x00002633).lr16(NAME([]() { return 0x210; }));
-	map(0x00003c00, 0x00003c00).r(FUNC(xavix2_state::irq_level_r));
-
-	map(0x00004000, 0x0000ffff).ram().share("part2");
+	map(0x00000000, 0x0000ffff).ram().share("mainram");
 	map(0x00010000, 0x00ffffff).rom().region("maincpu", 0x010000);
 
 	map(0x40000000, 0x40ffffff).rom().region("maincpu", 0);
 
-	map(0xc0000000, 0xc0001fff).ram().share("part1");
-	map(0xc0002000, 0xc0003fff).ram();
-	map(0xc0004000, 0xc000ffff).ram().share("part2");
+	map(0xc0000000, 0xc000ffff).ram().share("mainram");
 	map(0xc0010000, 0xc001ffff).ram();
+
+	map(0xffffe000, 0xffffe003).w(FUNC(xavix2_state::dma_src_w));
+	map(0xffffe004, 0xffffe005).w(FUNC(xavix2_state::dma_dst_w));
+	map(0xffffe008, 0xffffe009).w(FUNC(xavix2_state::dma_count_w));
+	map(0xffffe00c, 0xffffe00c).w(FUNC(xavix2_state::dma_control_w));
+	map(0xffffe010, 0xffffe010).rw(FUNC(xavix2_state::dma_status_r), FUNC(xavix2_state::dma_status_w));
+
+	map(0xffffe630, 0xffffe631).lr16(NAME([]() { return 0x210; }));
+	map(0xffffe632, 0xffffe633).lr16(NAME([]() { return 0x210; }));
+	map(0xfffffc00, 0xfffffc00).r(FUNC(xavix2_state::irq_level_r));
 }
 
 uint32_t xavix2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

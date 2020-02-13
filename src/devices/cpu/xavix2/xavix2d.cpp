@@ -77,6 +77,15 @@ std::string xavix2_disassembler::val14s()
 		return util::string_format("%04x", r);
 }
 
+std::string xavix2_disassembler::val14sa()
+{
+	u16 r = (m_opcode >> 8) & 0x3fff;
+	if(r & 0x2000)
+		return util::string_format("%08x", r - 0x4000);
+	else
+		return util::string_format("%04x", r);
+}
+
 std::string xavix2_disassembler::val11u()
 {
 	return util::string_format("%03x", (m_opcode >> 8) & 0x7ff);
@@ -233,14 +242,14 @@ offs_t xavix2_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	case 0x4c: case 0x4d: util::stream_format(stream, "(%s%s).w = %s", r2(), off11s(), r1()); break;
 	case 0x4e: case 0x4f: util::stream_format(stream, "(%s%s).l = %s", r2(), off11s(), r1()); break;
 
-	case 0x50: case 0x51: util::stream_format(stream, "%s = %s.bs", r1(), val14u()); break;
-	case 0x52: case 0x53: util::stream_format(stream, "%s = %s.bu", r1(), val14u()); break;
-	case 0x54: case 0x55: util::stream_format(stream, "%s = %s.ws", r1(), val14u()); break;
-	case 0x56: case 0x57: util::stream_format(stream, "%s = %s.wu", r1(), val14u()); break;
-	case 0x58: case 0x59: util::stream_format(stream, "%s = %s.l", r1(), val14u()); break;
-	case 0x5a: case 0x5b: util::stream_format(stream, "%s.b = %s", val14u(), r1()); break;
-	case 0x5c: case 0x5d: util::stream_format(stream, "%s.w = %s", val14u(), r1()); break;
-	case 0x5e: case 0x5f: util::stream_format(stream, "%s.l = %s", val14u(), r1()); break;
+	case 0x50: case 0x51: util::stream_format(stream, "%s = %s.bs", r1(), val14sa()); break;
+	case 0x52: case 0x53: util::stream_format(stream, "%s = %s.bu", r1(), val14sa()); break;
+	case 0x54: case 0x55: util::stream_format(stream, "%s = %s.ws", r1(), val14sa()); break;
+	case 0x56: case 0x57: util::stream_format(stream, "%s = %s.wu", r1(), val14sa()); break;
+	case 0x58: case 0x59: util::stream_format(stream, "%s = %s.l", r1(), val14sa()); break;
+	case 0x5a: case 0x5b: util::stream_format(stream, "%s.b = %s", val14sa(), r1()); break;
+	case 0x5c: case 0x5d: util::stream_format(stream, "%s.w = %s", val14sa(), r1()); break;
+	case 0x5e: case 0x5f: util::stream_format(stream, "%s.l = %s", val14sa(), r1()); break;
 
 	case 0x60: case 0x61: util::stream_format(stream, "%s += %s", r1(), val6s()); break;
 	case 0x62: case 0x63: util::stream_format(stream, "%s = %s", r1(), val6s()); break;
