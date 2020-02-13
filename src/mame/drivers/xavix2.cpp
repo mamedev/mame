@@ -47,6 +47,8 @@ private:
 
 	u32 m_int_active;
 
+	std::string m_debug_string;
+
 	void irq_raise(u32 level);
 	void irq_clear(u32 level);
 	bool irq_state(u32 level) const;
@@ -61,6 +63,10 @@ private:
 
 	TIMER_CALLBACK_MEMBER(dma_end);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+
+	void debug_port_w(u8 data);
+	u8 debug_port_r();
+	u8 debug_port_status_r();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -149,6 +155,29 @@ INTERRUPT_GEN_MEMBER(xavix2_state::vblank_irq)
 	irq_raise(IRQ_TIMER);
 }
 
+void xavix2_state::debug_port_w(u8 data)
+{
+	if(data) {
+		if(data == 0xa) {
+			logerror("debug [%s]\n", m_debug_string);
+			m_debug_string = "";
+		} else if(data != 0xd)
+			m_debug_string += char(data);
+	}
+}
+
+u8 xavix2_state::debug_port_r()
+{
+	return 0;
+}
+
+u8 xavix2_state::debug_port_status_r()
+{
+	// 0: ok to recieve
+	// 1: ok to send
+	return 1<<1;
+}
+
 
 
 void xavix2_state::mem(address_map &map)
@@ -166,6 +195,9 @@ void xavix2_state::mem(address_map &map)
 	map(0xffffe008, 0xffffe009).w(FUNC(xavix2_state::dma_count_w));
 	map(0xffffe00c, 0xffffe00c).w(FUNC(xavix2_state::dma_control_w));
 	map(0xffffe010, 0xffffe010).rw(FUNC(xavix2_state::dma_status_r), FUNC(xavix2_state::dma_status_w));
+
+	map(0xffffe238, 0xffffe238).rw(FUNC(xavix2_state::debug_port_r), FUNC(xavix2_state::debug_port_w));
+	map(0xffffe239, 0xffffe239).r(FUNC(xavix2_state::debug_port_status_r));
 
 	map(0xffffe630, 0xffffe631).lr16(NAME([]() { return 0x210; }));
 	map(0xffffe632, 0xffffe633).lr16(NAME([]() { return 0x210; }));
