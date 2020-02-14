@@ -11409,6 +11409,26 @@ ROM_START( mandingarf )
 	ROM_LOAD( "6e.bin",        0x0000, 0x0020, BAD_DUMP CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) ) // not present, using mandinga PROM
 ROM_END
 
+ROM_START( olmandingo )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "olmandingo_1.bin",  0x0000, 0x0800, CRC(b5b9fcd9) SHA1(7a134de30041ac18521274f330eb4afe349da2db) )
+	ROM_LOAD( "olmandingo_2.bin",  0x0800, 0x0800, CRC(f4038373) SHA1(8823b9816fc4ea03b92e08776c13610980f5ea7a) )
+	ROM_LOAD( "olmandingo_3.bin",  0x1000, 0x0800, CRC(96842877) SHA1(043ce4ed2628a209ca21cc42516c02366cd9f1fa) )
+	ROM_LOAD( "olmandingo_4.bin",  0x1800, 0x0800, CRC(cb1e8437) SHA1(a20577afda152718ff7a79afdd023f80f5c95c70) )
+	ROM_LOAD( "olmandingo_5.bin",  0x2000, 0x0800, CRC(3f536791) SHA1(e1ba306c4f9063db8d7a9f3d702986d205e480dc) )
+	ROM_LOAD( "olmandingo_6.bin",  0x2800, 0x0800, CRC(5382f7ed) SHA1(425ec2c2caf404fc8ab13ee38d6567413022e1a1) )
+	ROM_LOAD( "olmandingo_7.bin",  0x3000, 0x0800, CRC(e78d0c6d) SHA1(947ac20463384ca0721875954d59ec4ae15b0670) )
+	ROM_LOAD( "olmandingo_8.bin",  0x3800, 0x0800, CRC(8a4018ae) SHA1(9aba6f4527c59b0b016038236d5a6074e65966f6) )
+	ROM_LOAD( "olmandingo_9.bin",  0xc000, 0x0800, CRC(e4cbb827) SHA1(4efa49bd7486b4fa77d7faa130e842f4030f822b) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "olmandingo_jh.bin", 0x0000, 0x0800, CRC(09ed5818) SHA1(69dce85228b2c9176d4be429f530410350a1c76c) )
+	ROM_LOAD( "olmandingo_lk.bin", 0x0800, 0x0800, CRC(3029f94f) SHA1(3b432b42e79f8b0a7d65e197f373a04e3c92ff20) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "olmandingo_pr.bin", 0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+ROM_END
+
 ROM_START( mandingac )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2716-4.bin",  0x0000, 0x0800, CRC(a684a494) SHA1(76885bb3bdab09f46c7daa25164a2fdaa744742f) ) // 2716
@@ -12825,7 +12845,7 @@ GAME( 1979, galturbo,    galaxian, galaxian,   superg,     galaxian_state, init_
 GAME( 1979, galap1,      galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "hack",                              "Space Invaders Galactica (galaxiana hack)",                                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galap4,      galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "hack (G.G.I)",                      "Galaxian Part 4 (hack)",                                                                       MACHINE_SUPPORTS_SAVE )
 GAME( 1979, zerotime,    galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg? (Petaco S.A.)",            "Zero Time (Petaco S.A.)",                                                                      MACHINE_SUPPORTS_SAVE )
-GAME( 1979, galaktron,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Petaco S.A.)",             "Galaktron (Petaco S.A.)",                                                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1979, galaktron,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg? (Petaco S.A.)",            "Galaktron (Petaco S.A.)",                                                                      MACHINE_SUPPORTS_SAVE )
 GAME( 1979, zerotimed,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Datamat)",                 "Zero Time (Datamat)",                                                                          MACHINE_SUPPORTS_SAVE ) // a 1994 bootleg of the Petaco bootleg
 GAME( 1979, zerotimemc,  galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Marti Colls)",             "Zero Time (Marti Colls)",                                                                      MACHINE_SUPPORTS_SAVE )
 GAME( 1979, starfght,    galaxian, galaxian,   swarm,      galaxian_state, init_galaxian,   ROT90,  "bootleg (Jeutel)",                  "Star Fighter",                                                                                 MACHINE_SUPPORTS_SAVE )
@@ -13043,24 +13063,24 @@ GAME( 1981, froggeram,   frogger,  froggeram,  froggeram,  galaxian_state, init_
 // Turtles based hardware
 // CPU/Video Board: KT-4108-2
 // Sound Board:     KT-4108-1
-GAME( 1981, turtles,     0,        turtles,    turtles,    galaxian_state, init_turtles,    ROT90,  "Konami (Stern Electronics license)", "Turtles",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1981, turpin,      turtles,  turtles,    turpin,     galaxian_state, init_turtles,    ROT90,  "Konami (Sega license)",              "Turpin",                                   MACHINE_SUPPORTS_SAVE )
-GAME( 1981, 600,         turtles,  turtles,    turtles,    galaxian_state, init_turtles,    ROT90,  "Konami",                             "600",                                      MACHINE_SUPPORTS_SAVE )
-GAME( 1981, turpins,     turtles,  turpins,    turtles,    galaxian_state, init_turtles,    ROT90,  "bootleg",                            "Turpin (bootleg on Super Cobra hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // needs different sound timer
+GAME( 1981, turtles,     0,        turtles,    turtles,    galaxian_state, init_turtles,    ROT90,  "Konami (Stern Electronics license)", "Turtles",                                                        MACHINE_SUPPORTS_SAVE )
+GAME( 1981, turpin,      turtles,  turtles,    turpin,     galaxian_state, init_turtles,    ROT90,  "Konami (Sega license)",              "Turpin",                                                         MACHINE_SUPPORTS_SAVE )
+GAME( 1981, 600,         turtles,  turtles,    turtles,    galaxian_state, init_turtles,    ROT90,  "Konami",                             "600",                                                            MACHINE_SUPPORTS_SAVE )
+GAME( 1981, turpins,     turtles,  turpins,    turtles,    galaxian_state, init_turtles,    ROT90,  "bootleg",                            "Turpin (bootleg on Super Cobra hardware)",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // needs different sound timer
 
-GAME( 1982, amidar,      0,        turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "Konami",                             "Amidar",                                                     MACHINE_SUPPORTS_SAVE )
-GAME( 1981, amidar1,     amidar,   turtles,    amidar,     galaxian_state, init_turtles,    ROT90,  "Konami",                             "Amidar (older)",                                             MACHINE_SUPPORTS_SAVE )
-GAME( 1982, amidaru,     amidar,   turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "Konami (Stern Electronics license)", "Amidar (Stern Electronics)",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1982, amidaro,     amidar,   turtles,    amidaro,    galaxian_state, init_turtles,    ROT90,  "Konami (Olympia license)",           "Amidar (Olympia)",                                           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, amidarb,     amidar,   turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "bootleg",                            "Amidar (bootleg)",                                           MACHINE_SUPPORTS_SAVE ) /* similar to Amigo bootleg */
-GAME( 1982, amigo,       amidar,   turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "bootleg",                            "Amigo (bootleg of Amidar, set 1)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, amigo2,      amidar,   amigo2,     amidaru,    galaxian_state, init_amigo2,     ROT90,  "bootleg",                            "Amigo (bootleg of Amidar, set 2)",                           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // sound timer might be different?
-GAME( 1982, amidars,     amidar,   scramble,   amidars,    galaxian_state, init_scramble,   ROT90,  "Konami",                             "Amidar (Scramble hardware)",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mandinga,    amidar,   scramble,   amidars,    galaxian_state, init_mandinga,   ROT90,  "bootleg (Artemi)",                   "Mandinga (Artemi bootleg of Amidar)",                        MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // color PROM needs bitswap<8> on addressing, reference: http://www.youtube.com/watch?v=6uGK4AZxV2U
-GAME( 1982, mandingaeg,  amidar,   scramble,   amidars,    galaxian_state, init_mandingaeg, ROT90,  "bootleg (Electrogame S.A.)",         "Mandinga (Electrogame S.A. bootleg of Amidar)",              MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mandingarf,  amidar,   mandingarf, mandingarf, galaxian_state, init_galaxian,   ROT90,  "bootleg (Recreativos Franco S.A.)",  "Mandanga (bootleg of Mandinga on Galaxian hardware, set 1)", MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // assume same issue as mandinga
-GAME( 1982, mandingac,   amidar,   mandingarf, mandingarf, galaxian_state, init_galaxian,   ROT90,  "bootleg (Centromatic)",              "Mandanga (bootleg of Mandinga on Galaxian hardware, set 2)", MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // assume same issue as mandinga
-
+GAME( 1982, amidar,      0,        turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "Konami",                             "Amidar",                                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1981, amidar1,     amidar,   turtles,    amidar,     galaxian_state, init_turtles,    ROT90,  "Konami",                             "Amidar (older)",                                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, amidaru,     amidar,   turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "Konami (Stern Electronics license)", "Amidar (Stern Electronics)",                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1982, amidaro,     amidar,   turtles,    amidaro,    galaxian_state, init_turtles,    ROT90,  "Konami (Olympia license)",           "Amidar (Olympia)",                                                MACHINE_SUPPORTS_SAVE )
+GAME( 1982, amidarb,     amidar,   turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "bootleg",                            "Amidar (bootleg)",                                                MACHINE_SUPPORTS_SAVE ) // Similar to Amigo bootleg
+GAME( 1982, amigo,       amidar,   turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "bootleg",                            "Amigo (bootleg of Amidar, set 1)",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1982, amigo2,      amidar,   amigo2,     amidaru,    galaxian_state, init_amigo2,     ROT90,  "bootleg",                            "Amigo (bootleg of Amidar, set 2)",                                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // sound timer might be different?
+GAME( 1982, amidars,     amidar,   scramble,   amidars,    galaxian_state, init_scramble,   ROT90,  "Konami",                             "Amidar (Scramble hardware)",                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mandinga,    amidar,   scramble,   amidars,    galaxian_state, init_mandinga,   ROT90,  "bootleg (Artemi)",                   "Mandinga (Artemi bootleg of Amidar)",                             MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // color PROM needs bitswap<8> on addressing, reference: http://www.youtube.com/watch?v=6uGK4AZxV2U
+GAME( 1982, mandingaeg,  amidar,   scramble,   amidars,    galaxian_state, init_mandingaeg, ROT90,  "bootleg (Electrogame S.A.)",         "Mandinga (Electrogame S.A. bootleg of Amidar)",                   MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mandingarf,  amidar,   mandingarf, mandingarf, galaxian_state, init_galaxian,   ROT90,  "bootleg (Recreativos Franco S.A.)",  "Mandanga (bootleg of Mandinga on Galaxian hardware, set 1)",      MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // assume same issue as mandinga
+GAME( 1982, olmandingo,  amidar,   mandingarf, mandingarf, galaxian_state, init_galaxian,   ROT90,  "bootleg",                            "Olivmandingo (Spanish bootleg of Mandinga on Galaxian hardware)", MACHINE_NOT_WORKING ) // Bad inputs
+GAME( 1982, mandingac,   amidar,   mandingarf, mandingarf, galaxian_state, init_galaxian,   ROT90,  "bootleg (Centromatic)",              "Mandanga (bootleg of Mandinga on Galaxian hardware, set 2)",      MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // assume same issue as mandinga
 
 // The End/Scramble based hardware
 GAME( 1980, theend,      0,        theend,     theend,     galaxian_state, init_theend,     ROT90,  "Konami",                             "The End",                       MACHINE_SUPPORTS_SAVE )
