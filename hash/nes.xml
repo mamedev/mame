@@ -51084,14 +51084,14 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<description>English Pyramid (Pirate)</description>
 		<year>1991</year>
 		<publisher>Sachen</publisher>
-		<info name="serial" value="KA-001"/>
+		<info name="serial" value="K-001"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
-				<rom name="ka-001 prg" size="32768" crc="7093ac82" sha1="7ec247a4fa445d8ee029ec5577767261e5685b8e" />
+				<rom name="k-001 prg" size="32768" crc="7093ac82" sha1="7ec247a4fa445d8ee029ec5577767261e5685b8e" />
 			</dataarea>
 			<dataarea name="chr" size="16384">
-				<rom name="ka-001 chr" size="16384" crc="45600bf5" sha1="6d37d046e45098a0e596994a6dc0ea88ae9d06cc" />
+				<rom name="k-001 chr" size="16384" crc="45600bf5" sha1="6d37d046e45098a0e596994a6dc0ea88ae9d06cc" />
 			</dataarea>
 		</part>
 	</software>
