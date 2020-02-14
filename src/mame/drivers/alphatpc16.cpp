@@ -72,7 +72,8 @@ public:
 		m_ef9345(*this, "ef9345"),
 		m_beep(*this, "beeper"),
 		m_wdfdc(*this, "wdfdc"),
-		m_ram(*this, RAM_TAG)
+		m_ram(*this, RAM_TAG),
+		m_z80(*this, "z80")
 	{ }
 
 public:
@@ -102,8 +103,10 @@ private:
 	required_device<beep_device> m_beep;
 	required_device<wd1770_device> m_wdfdc;
 	required_device<ram_device> m_ram;
+	required_device<cpu_device> m_z80;
 
-	u8 m_p1, m_p2;
+	u8 m_p1, m_p2, m_data;
+	bool m_bsy, m_req, m_ack, m_cd, m_io, m_sel;
 };
 
 void alphatpc16_state::machine_start()
@@ -137,19 +140,64 @@ READ8_MEMBER(alphatpc16_state::p2_r)
 
 WRITE8_MEMBER(alphatpc16_state::host_scsi_w)
 {
+	switch(offset)
+	{
+		case 0:
+			m_ack = true;
+			m_sel = false;
+			m_data = data;
+			m_z80->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+			break;
+		case 2:
+			m_ack = false;
+			m_sel = true;
+			m_data = data;
+			m_z80->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+			break;
+	}
 }
 
 READ8_MEMBER(alphatpc16_state::host_scsi_r)
 {
+	switch(offset)
+	{
+		case 0:
+			m_ack = true;
+			m_req = false;
+			return m_data;
+		case 1:
+			return (m_req << 1) | (m_bsy << 2) | (m_cd << 3) | (m_io << 5);
+	}
 	return 0;
 }
 
 WRITE8_MEMBER(alphatpc16_state::flop_scsi_w)
 {
+	switch(offset)
+	{
+		case 0:
+			m_req = true;
+			m_ack = false;
+			m_data = data;
+			break;
+		case 1:
+			m_bsy = !BIT(data, 0);
+			m_cd = !BIT(data, 2);
+			m_io = !BIT(data, 3);
+	}
 }
 
 READ8_MEMBER(alphatpc16_state::flop_scsi_r)
 {
+	switch(offset)
+	{
+		case 0:
+			m_ack = false;
+			m_req = false;
+			return m_data;
+		case 1:
+			return m_bsy | (m_sel << 1) | (m_ack << 2);
+	}
 	return 0;
 }
 
@@ -197,9 +245,9 @@ void alphatpc16_state::alphatpc16(machine_config &config)
 	z80dart_device &dart(Z80DART(config, "z80dart", 15_MHz_XTAL / 3)); // clock?
 	dart.out_int_callback().set(m_pic8259, FUNC(pic8259_device::ir7_w));
 
-	cpu_device& z80(Z80(config, "z80", 8_MHz_XTAL / 2));
-	z80.set_addrmap(AS_PROGRAM, &alphatpc16_state::apc16_z80_map);
-	z80.set_addrmap(AS_IO, &alphatpc16_state::apc16_z80_io);
+	Z80(config, m_z80, 8_MHz_XTAL / 2);
+	m_z80->set_addrmap(AS_PROGRAM, &alphatpc16_state::apc16_z80_map);
+	m_z80->set_addrmap(AS_IO, &alphatpc16_state::apc16_z80_io);
 	WD1770(config, m_wdfdc, 8_MHz_XTAL);
 
 	i8741a_device& i8741(I8741A(config, "i8741", 4.608_MHz_XTAL));
@@ -242,5 +290,5 @@ ROM_START( alphatpc16 )
 	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )                // from dcvg5k
 ROM_END
 
-COMP( 1985, alphatpc16,  0, 0, alphatpc16, alphatpc16, alphatpc16_state, empty_init, "Triumph-Adler", "alphatronic PC-16",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1985, alphatpc16,  0, 0, alphatpc16, alphatpc16, alphatpc16_state, empty_init, "Triumph-Adler", "alphatronic PC-16",  MACHINE_NOT_WORKING)
 
