@@ -902,7 +902,10 @@ offs_t upd78k3_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 				{
 					if (BIT(post, n))
 					{
-						stream << s_rp_names[n];
+						if (n == 5 && BIT(op, 1))
+							stream << "PSW";
+						else
+							stream << s_rp_names[n];
 						post &= ~(1 << n);
 						if (post != 0)
 							stream << ",";
@@ -918,7 +921,10 @@ offs_t upd78k3_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 				{
 					if (BIT(post, n))
 					{
-						stream << s_rp_names[n];
+						if (n == 5 && BIT(op, 1))
+							stream << "PSW";
+						else
+							stream << s_rp_names[n];
 						post &= ~(1 << n);
 						if (post != 0)
 							stream << ",";
