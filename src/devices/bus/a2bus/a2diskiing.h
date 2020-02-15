@@ -45,9 +45,9 @@ protected:
 	required_device<diskii_fdc_device> m_wozfdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 
-private:
 	const uint8_t *m_rom;
 
+private:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
@@ -70,8 +70,35 @@ private:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
+class a2bus_applesurance_device: public diskiing_device
+{
+public:
+	a2bus_applesurance_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	virtual uint8_t read_cnxx(uint8_t offset) override;
+	virtual uint8_t read_c800(uint16_t offset) override;
+
+	virtual void write_cnxx(uint8_t offset, uint8_t data) override
+	{
+		printf("write %x to cn00 + %x\n", data, offset);
+	}
+
+	virtual void write_c800(uint16_t offset, uint8_t data) override
+	{
+		printf("write %x to c800 + %x\n", data, offset);
+	}
+
+	virtual bool take_c800() override { return true; }
+
+private:
+};
+
 // device type definition
 DECLARE_DEVICE_TYPE(A2BUS_DISKIING, a2bus_diskiing_device)
 DECLARE_DEVICE_TYPE(A2BUS_DISKIING13, a2bus_diskiing13_device)
+DECLARE_DEVICE_TYPE(A2BUS_APPLESURANCE, a2bus_applesurance_device)
 
 #endif  // MAME_BUS_A2BUS_A2DISKIING_H

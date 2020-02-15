@@ -491,12 +491,12 @@ void pgm_state::machine_reset()
 void pgm_state::pgmbase(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 20000000); /* 20 mhz! verified on real board */
+	M68000(config, m_maincpu, 20_MHz_XTAL); /* 20 mhz! verified on real board */
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_state::pgm_basic_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(pgm_state::irq6_line_hold));
 	TIMER(config, "scantimer").configure_scanline(FUNC(pgm_state::interrupt), "screen", 0, 1);
 
-	Z80(config, m_soundcpu, 33868800/4);
+	Z80(config, m_soundcpu, 33.8688_MHz_XTAL/4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &pgm_state::pgm_z80_mem);
 	m_soundcpu->set_addrmap(AS_IO, &pgm_state::pgm_z80_io);
 
@@ -524,7 +524,7 @@ void pgm_state::pgmbase(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch2");
 	GENERIC_LATCH_8(config, m_soundlatch3);
 
-	ICS2115(config, m_ics, 0);
+	ICS2115(config, m_ics, 33.8688_MHz_XTAL);
 	m_ics->irq().set_inputline("soundcpu", 0);
 	m_ics->add_route(ALL_OUTPUTS, "mono", 5.0);
 }

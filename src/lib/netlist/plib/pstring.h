@@ -16,6 +16,7 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <ostream>
 
 // ----------------------------------------------------------------------------------------
 // pstring: semi-immutable strings ...

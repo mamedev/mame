@@ -28,21 +28,23 @@ DEFINE_DEVICE_TYPE(SPG24X_VIDEO, spg24x_video_device, "spg24x_video", "SPG240-se
 #define VIDEO_IRQ_ENABLE    m_video_regs[0x62]
 #define VIDEO_IRQ_STATUS    m_video_regs[0x63]
 
-spg2xx_video_device::spg2xx_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	, m_sprlimit_read_cb(*this)
-	, m_rowscrolloffset_read_cb(*this)
-	, m_cpu(*this, finder_base::DUMMY_TAG)
-	, m_screen(*this, finder_base::DUMMY_TAG)
-	, m_scrollram(*this, "scrollram")
-	, m_paletteram(*this, "paletteram")
-	, m_spriteram(*this, "spriteram")
-	, m_video_irq_cb(*this)
+spg2xx_video_device::spg2xx_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	m_guny_in(*this),
+	m_gunx_in(*this),
+	m_sprlimit_read_cb(*this),
+	m_rowscrolloffset_read_cb(*this),
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_screen(*this, finder_base::DUMMY_TAG),
+	m_scrollram(*this, "scrollram"),
+	m_paletteram(*this, "paletteram"),
+	m_spriteram(*this, "spriteram"),
+	m_video_irq_cb(*this)
 {
 }
 
-spg24x_video_device::spg24x_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: spg2xx_video_device(mconfig, SPG24X_VIDEO, tag, owner, clock)
+spg24x_video_device::spg24x_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	spg2xx_video_device(mconfig, SPG24X_VIDEO, tag, owner, clock)
 {
 }
 
@@ -58,6 +60,9 @@ void spg2xx_video_device::device_start()
 								(m_rgb5_to_rgb8[(i >>  5) & 0x1f] <<  8) |
 								(m_rgb5_to_rgb8[(i >>  0) & 0x1f] <<  0);
 	}
+
+	m_guny_in.resolve_safe(0);
+	m_gunx_in.resolve_safe(0);
 
 	m_screenpos_timer = timer_alloc(TIMER_SCREENPOS);
 	m_screenpos_timer->adjust(attotime::never);
@@ -635,6 +640,14 @@ READ16_MEMBER(spg2xx_video_device::video_r)
 		LOGMASKED(LOG_VLINES, "video_r: Current Line: %04x\n", m_screen->vpos());
 		return m_screen->vpos();
 
+	case 0x3e: // Light Pen Y Position
+		LOGMASKED(LOG_PPU_READS, "video_r: Light Pen Y / Lightgun Y = %04x\n");
+		return m_guny_in();
+
+	case 0x3f: // Light Pen X Position
+		LOGMASKED(LOG_PPU_READS, "video_r: Light Pen X / Lightgun X = %04x\n");
+		return m_gunx_in();
+
 	case 0x62: // Video IRQ Enable
 		LOGMASKED(LOG_IRQS, "video_r: Video IRQ Enable: %04x\n", VIDEO_IRQ_ENABLE);
 		return VIDEO_IRQ_ENABLE;
@@ -773,11 +786,11 @@ WRITE16_MEMBER(spg2xx_video_device::video_w)
 	}
 
 	case 0x3e: // Light Pen Y Position
-		LOGMASKED(LOG_PPU_WRITES, "video_w: Light Pen Y (read only) = %04x\n", data & 0x01ff);
+		LOGMASKED(LOG_PPU_WRITES, "video_w: Light Pen Y / Lightgun Y (read only) = %04x\n", data & 0x01ff);
 		break;
 
-	case 0x3f: // Light Pen YXPosition
-		LOGMASKED(LOG_PPU_WRITES, "video_w: Light Pen X (read only) = %04x\n", data & 0x01ff);
+	case 0x3f: // Light Pen X Position
+		LOGMASKED(LOG_PPU_WRITES, "video_w: Light Pen X / Lightgun X (read only) = %04x\n", data & 0x01ff);
 		break;
 
 	case 0x42: // Sprite Control
@@ -787,7 +800,7 @@ WRITE16_MEMBER(spg2xx_video_device::video_w)
 
 	case 0x62: // Video IRQ Enable
 	{
-		LOGMASKED(LOG_IRQS, "video_w: Video IRQ Enable = %04x (DMA:%d, Timing:%d, Blanking:%d)\n", data & 0x0007, BIT(data, 2), BIT(data, 1), BIT(data, 0));
+		LOGMASKED(LOG_IRQS, "video_w: Video IRQ Enable = %04x (DMA:%d, Timing:%d, Blanking:%d)\n", data, BIT(data, 2), BIT(data, 1), BIT(data, 0));
 		const uint16_t old = VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS;
 		VIDEO_IRQ_ENABLE = data & 0x0007;
 		const uint16_t changed = old ^ (VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS);

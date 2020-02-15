@@ -45,6 +45,15 @@ WRITE_LINE_MEMBER(spg110_device::videoirq_w)
 	set_state_unsynced(UNSP_IRQ0_LINE, state);
 }
 
+WRITE_LINE_MEMBER(spg110_device::ffreq1_w)
+{
+}
+
+WRITE_LINE_MEMBER(spg110_device::ffreq2_w)
+{
+}
+
+
 void spg110_device::configure_spg_io(spg2xx_io_device* io)
 {
 	io->porta_in().set(FUNC(spg110_device::porta_r));
@@ -60,8 +69,8 @@ void spg110_device::configure_spg_io(spg2xx_io_device* io)
 //  io->write_timer_irq_callback().set(FUNC(spg110_device::timerirq_w));
 //  io->write_uart_adc_irq_callback().set(FUNC(spg110_device::uartirq_w));
 //  io->write_external_irq_callback().set(FUNC(spg110_device::extirq_w));
-//  io->write_ffrq_tmr1_irq_callback().set(FUNC(spg110_device::ffreq1_w));
-//  io->write_ffrq_tmr2_irq_callback().set(FUNC(spg110_device::ffreq2_w));
+	io->write_ffrq_tmr1_irq_callback().set(FUNC(spg110_device::ffreq1_w));
+	io->write_ffrq_tmr2_irq_callback().set(FUNC(spg110_device::ffreq2_w));
 }
 
 READ16_MEMBER(spg110_device::space_r)

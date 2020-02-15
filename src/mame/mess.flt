@@ -41,6 +41,7 @@ alesis_qs.cpp
 alfaskop41xx.cpp
 alphasma.cpp
 alphatpx.cpp
+alphatpc16.cpp
 alphatro.cpp
 altair.cpp
 alto1.cpp
@@ -137,6 +138,7 @@ camplynx.cpp
 candela.cpp
 canon_s80.cpp
 cardinal.cpp
+casio_rompack.cpp
 casloopy.cpp
 cat.cpp
 cbm2.cpp
@@ -375,7 +377,7 @@ hunter2.cpp
 hunter16.cpp
 husky.cpp
 hx20.cpp
-hyperscan.cpp
+spg29x.cpp
 i7000.cpp
 ibm3153.cpp
 ibm6580.cpp
@@ -451,7 +453,7 @@ leapfrog_leappad.cpp
 leapster.cpp
 learnwin.cpp
 lee1214.cpp
-lexibook_jg7425.cpp
+spg29x_lexibook_jg7425.cpp
 lft.cpp
 lg-dvd.cpp
 lilith.cpp
@@ -584,7 +586,7 @@ ncdppc.cpp
 nds.cpp
 neogeocd.cpp
 nes.cpp
-nes_boot.cpp
+nes_clone.cpp
 nes_sh6578.cpp
 nes_vt.cpp
 newbrain.cpp
@@ -729,17 +731,18 @@ rambo.cpp
 ravens.cpp
 rc702.cpp
 rc759.cpp
-rcm32p.cpp
 rd100.cpp
-rd110.cpp
 regence.cpp
 replicator.cpp
 rex6000.cpp
 riscpc.cpp
 rm380z.cpp
 rmnimbus.cpp
-rmt32.cpp
-rsc55.cpp
+roland_cm32p.cpp
+roland_d50.cpp
+roland_d110.cpp
+roland_mt32.cpp
+roland_sc55.cpp
 rt1715.cpp
 rvoice.cpp
 rx78.cpp
@@ -833,7 +836,8 @@ sun2.cpp
 sun3.cpp
 sun3x.cpp
 sun4.cpp
-sunplus_gcm394.cpp
+sunplus_unsp20soc.cpp
+sunplus_unsp20soc_mobigo.cpp
 super6.cpp
 super80.cpp
 superga2.cpp
@@ -924,6 +928,7 @@ ts816.cpp
 ts3000.cpp
 tsispch.cpp
 tti.cpp
+tulip1.cpp
 tutor.cpp
 tv910.cpp
 tv912.cpp

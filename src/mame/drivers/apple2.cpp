@@ -700,12 +700,19 @@ READ8_MEMBER(apple2_state::c800_r)
 {
 	if (offset == 0x7ff)
 	{
+		uint8_t rv = 0xff;
+
+		if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != nullptr))
+		{
+			rv = m_slotdevice[m_cnxx_slot]->read_c800(offset&0xfff);
+		}
+
 		if (!machine().side_effects_disabled())
 		{
 			m_cnxx_slot = -1;
 		}
 
-		return 0xff;
+		return rv;
 	}
 
 	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != nullptr))
@@ -718,6 +725,11 @@ READ8_MEMBER(apple2_state::c800_r)
 
 WRITE8_MEMBER(apple2_state::c800_w)
 {
+	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != nullptr))
+	{
+		m_slotdevice[m_cnxx_slot]->write_c800(offset&0xfff, data);
+	}
+
 	if (offset == 0x7ff)
 	{
 		if (!machine().side_effects_disabled())
@@ -726,11 +738,6 @@ WRITE8_MEMBER(apple2_state::c800_w)
 		}
 
 		return;
-	}
-
-	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != nullptr))
-	{
-		m_slotdevice[m_cnxx_slot]->write_c800(offset&0xfff, data);
 	}
 }
 
@@ -1267,8 +1274,9 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("4play", A2BUS_4PLAY); /* 4Play Joystick Card (Rev. B) */
 	device.option_add("ceyes2", A2BUS_COMPUTEREYES2); /* ComputerEyes/2 Video Digitizer */
 	device.option_add("twarp", A2BUS_TRANSWARP);    /* AE TransWarp accelerator */
+	device.option_add("applesurance", A2BUS_APPLESURANCE);  /* Applesurance Diagnostic Controller */
 //  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);    /* Magic Musician Card */
-	device.option_add("byte8251", A2BUS_BYTE8251);
+	device.option_add("byte8251", A2BUS_BYTE8251); /* BYTE Magazine 8251 serial card */
 }
 
 void apple2_state::apple2_common(machine_config &config)

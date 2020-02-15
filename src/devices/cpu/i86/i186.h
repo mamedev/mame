@@ -21,6 +21,7 @@ public:
 	auto tmrout0_handler() { return m_out_tmrout0_func.bind(); }
 	auto tmrout1_handler() { return m_out_tmrout1_func.bind(); }
 	auto irmx_irq_cb() { return m_irmx_irq_cb.bind(); }
+	template <typename... T> void set_irmx_irq_ack(T &&... args) { m_irmx_irq_ack.set(std::forward<T>(args)...); }
 
 	IRQ_CALLBACK_MEMBER(int_callback);
 	IRQ_CALLBACK_MEMBER(inta_callback);
@@ -32,7 +33,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(int1_w) { external_int(1, state); }
 	DECLARE_WRITE_LINE_MEMBER(int2_w) { external_int(2, state); }
 	DECLARE_WRITE_LINE_MEMBER(int3_w) { external_int(3, state); }
-	template <typename... T> void set_irmx_irq_ack(T &&... args) { m_irmx_irq_ack.set(std::forward<T>(args)...); }
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;

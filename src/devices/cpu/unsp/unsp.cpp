@@ -310,7 +310,7 @@ void unsp_device::device_reset()
 	m_core->m_r[REG_PC] = read16(0xfff7);
 	m_core->m_enable_irq = 0;
 	m_core->m_enable_fiq = 0;
-	m_core->m_fir_move = 0;
+	m_core->m_fir_move = 1;
 	m_core->m_irq = 0;
 	m_core->m_fiq = 0;
 }

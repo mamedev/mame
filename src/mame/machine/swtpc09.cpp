@@ -20,6 +20,7 @@
 #define UNIFLEX_DMAF2 2
 #define UNIFLEX_DMAF3 3
 #define FLEX_DC5_PIAIDE 4
+#define OS9_DC5 5
 
 
 READ8_MEMBER(swtpc09_state::unmapped_r)
@@ -138,8 +139,7 @@ void swtpc09_state::validate_floppy_side(uint8_t cmd)
 				}
 			}
 		}
-
-		if (expected_sectors)
+		else if (expected_sectors)
 		{
 			uint8_t expected_side = sector > expected_sectors ? 1 : 0;
 
@@ -169,13 +169,13 @@ uint8_t swtpc09_state::validate_fdc_dden(uint8_t dden)
 			return 1;
 		case 2:
 		{
-			// Double density with track zero single density.
+			// Double density with track zero head zero single density.
 			uint8_t track = m_fdc->track_r();
 
-			if (track == 0)
+			if (track == 0 && m_fdc_side == 0)
 			{
 				if (!dden)
-					logerror("%s Unexpected DDEN %d for single density trak 0\n", machine().describe_context(), dden);
+					logerror("%s Unexpected DDEN %d for single density track 0 head 0\n", machine().describe_context(), dden);
 				return 1;
 			}
 			if (dden)
@@ -183,6 +183,21 @@ uint8_t swtpc09_state::validate_fdc_dden(uint8_t dden)
 			return 0;
 		}
 		case 3:
+		{
+			// Double density with track zero all heads single density.
+			uint8_t track = m_fdc->track_r();
+
+			if (track == 0)
+			{
+				if (!dden)
+					logerror("%s Unexpected DDEN %d for single density track 0\n", machine().describe_context(), dden);
+				return 1;
+			}
+			if (dden)
+				logerror("%s Unexpected DDEN %d for double density\n", machine().describe_context(), dden);
+			return 0;
+		}
+		case 4:
 			// Pure double density.
 			if (dden)
 				logerror("%s Unexpected DDEN %d for double density\n", machine().describe_context(), dden);
@@ -229,6 +244,7 @@ WRITE8_MEMBER ( swtpc09_state::dmaf2_fdc_w )
 
 	if (offset == 0) {
 		validate_floppy_side(data);
+		m_fdc->dden_w(validate_fdc_dden(m_fdc_dden));
 		data = validate_fdc_sector_size(data);
 	}
 
@@ -298,6 +314,7 @@ WRITE8_MEMBER ( swtpc09_state::dmaf2_control_reg_w )
 	uint8_t dden = BIT(data, 5);
 	dden = validate_fdc_dden(dden);
 	m_fdc->dden_w(dden);
+	m_fdc_dden = dden;
 }
 
 /* common interrupt handler */
@@ -410,6 +427,7 @@ WRITE8_MEMBER ( swtpc09_state::dmaf3_fdc_w )
 
 	if (offset == 0) {
 		validate_floppy_side(data);
+		m_fdc->dden_w(validate_fdc_dden(m_fdc_dden));
 		data = validate_fdc_sector_size(data);
 	}
 
@@ -517,6 +535,7 @@ WRITE8_MEMBER ( swtpc09_state::dmaf3_control_reg_w )
 	uint8_t dden = BIT(data, 5);
 	dden = validate_fdc_dden(dden);
 	m_fdc->dden_w(dden);
+	m_fdc_dden = dden;
 }
 
 // DMAF3 WD1000 hard disk controller.
@@ -605,6 +624,8 @@ READ8_MEMBER(swtpc09_state::main_r)
 {
 	if (offset < 0xff00)
 		return m_banked_space->read_byte(dat_translate(offset));
+	else if (m_system_type == OS9_DC5)
+		return m_banked_space->read_byte(offset | 0x0ff00);
 	else
 		return m_banked_space->read_byte(offset | 0xfff00);
 }
@@ -613,12 +634,13 @@ WRITE8_MEMBER(swtpc09_state::main_w)
 {
 	if (offset < 0xff00)
 		m_banked_space->write_byte(dat_translate(offset), data);
+	else if (m_system_type == OS9_DC5)
+		m_banked_space->write_byte(offset | 0x0ff00, data);
 	else
 		m_banked_space->write_byte(offset | 0xfff00, data);
 }
 
 /*  MC6844 DMA controller I/O */
-
 
 void swtpc09_state::m6844_update_interrupt()
 {
@@ -983,6 +1005,7 @@ void swtpc09_state::machine_start()
 	m_active_interrupt = false;
 
 	m_fdc_side = 0;
+	m_fdc_dden = 0;
 
 	// Start with the IRQ disabled?
 	m_dmaf2_interrupt_enable = 0;
@@ -1014,6 +1037,7 @@ void swtpc09_state::machine_start()
 	save_item(NAME(m_fdc_status));
 	save_item(NAME(m_floppy_motor_on));
 	save_item(NAME(m_fdc_side));
+	save_item(NAME(m_fdc_dden));
 	save_item(NAME(m_dmaf3_via_porta));
 	save_item(NAME(m_dmaf3_via_portb));
 	save_item(NAME(m_active_interrupt));
@@ -1052,4 +1076,9 @@ void swtpc09_state::init_swtpc09d3()
 	m_system_type = UNIFLEX_DMAF3;
 	// UniFLEX numbers sectors from 1.
 	m_hdc->set_sector_base(1);
+}
+
+void swtpc09_state::init_swtpc09o()
+{
+	m_system_type = OS9_DC5;
 }

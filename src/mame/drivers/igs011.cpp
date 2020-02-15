@@ -4198,7 +4198,7 @@ void igs011_state::vbowl(machine_config &config)
 //  GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011_hi);
 
 	config.device_remove("oki");
-	ICS2115(config, m_ics, 0);
+	ICS2115(config, m_ics, 33.8688_MHz_XTAL);
 	m_ics->irq().set(FUNC(igs011_state::sound_irq));
 	m_ics->add_route(ALL_OUTPUTS, "mono", 5.0);
 }

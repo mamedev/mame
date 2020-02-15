@@ -14,9 +14,9 @@ function lfs.env_replace(str)
 	end
 
 	if pathsep == '\\' then
-		str = str:gsub("%%(%w+)%%", dorep)
+		str = str:gsub("%%([%w_]+)%%", dorep)
 	else
-		str = str:gsub("%$(%w+)", dorep)
+		str = str:gsub("%$([%w_]+)", dorep)
 	end
 	return str
 end

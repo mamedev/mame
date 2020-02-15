@@ -1,7 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*
-    SunPlus unSP based hardware, SPG-??? (6xx?) (die is GCM394)
+	(unSP 2.0 based System on a Chip)
+
+    JAKKS call this GPAC800, other sources call it GPL16250
+
+	die markings GCM394
+	 - Smart Fit Park
+	 - Spongebob Bikini Bottom 500
+	 - Mobigo2 (sunplus_unsp20soc_mobigo.cpp)
+
+	some of the systems here might use newer dies but the video etc. appears the same.
 
     Compared to vii.cpp this is clearly newer, has extra opcodes, different internal map etc. also scaling and higher resolutions based on Spongebob
 
@@ -43,49 +52,8 @@
 */
 
 #include "emu.h"
+#include "includes/sunplus_unsp20soc.h"
 
-#include "machine/sunplus_gcm394.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
-
-#include "screen.h"
-#include "speaker.h"
-
-
-
-
-class full_memory_device :
-	public device_t,
-	public device_memory_interface
-{
-public:
-	// construction/destruction
-	full_memory_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
-
-	// configuration helpers
-	template <typename... T> full_memory_device& set_map(T &&... args) { set_addrmap(0, std::forward<T>(args)...); return *this; }
-
-	template <typename... T> full_memory_device& map(T &&... args) { set_addrmap(0, std::forward<T>(args)...); return *this; }
-
-	address_space* get_program() { return m_program; }
-
-protected:
-	virtual void device_start() override;
-	virtual void device_config_complete() override;
-
-	// device_memory_interface overrides
-	virtual space_config_vector memory_space_config() const override;
-
-
-private:
-	// internal state
-	address_space_config m_program_config;
-	address_space *m_program;
-};
-
-
-// device type definition
-DECLARE_DEVICE_TYPE(FULL_MEMORY, full_memory_device)
 
 // device type definition
 DEFINE_DEVICE_TYPE(FULL_MEMORY, full_memory_device, "full_memory", "SunPlus Full CS Memory Map")
@@ -134,61 +102,6 @@ void full_memory_device::device_start()
 }
 
 
-class gcm394_game_state : public driver_device
-{
-public:
-	gcm394_game_state(const machine_config& mconfig, device_type type, const char* tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen"),
-		m_io(*this, "IN%u", 0U),
-		m_romregion(*this, "maincpu"),
-		m_memory(*this, "memory")
-	{
-	}
-
-	void base(machine_config &config);
-
-	void cs_map_base(address_map &map);
-
-	virtual DECLARE_READ16_MEMBER(cs0_r);
-	virtual DECLARE_WRITE16_MEMBER(cs0_w);
-	virtual DECLARE_READ16_MEMBER(cs1_r);
-	virtual DECLARE_WRITE16_MEMBER(cs1_w);
-	virtual DECLARE_READ16_MEMBER(cs2_r);
-	virtual DECLARE_WRITE16_MEMBER(cs2_w);
-	virtual DECLARE_READ16_MEMBER(cs3_r);
-	virtual DECLARE_WRITE16_MEMBER(cs3_w);
-	virtual DECLARE_READ16_MEMBER(cs4_r);
-	virtual DECLARE_WRITE16_MEMBER(cs4_w);
-
-	void cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-
-	required_device<sunplus_gcm394_base_device> m_maincpu;
-	required_device<screen_device> m_screen;
-
-
-	required_ioport_array<3> m_io;
-
-
-	optional_region_ptr<uint16_t> m_romregion;
-	required_device<full_memory_device> m_memory;
-
-	virtual DECLARE_READ16_MEMBER(porta_r);
-	virtual DECLARE_READ16_MEMBER(portb_r);
-	virtual DECLARE_READ16_MEMBER(portc_r);
-	virtual DECLARE_WRITE16_MEMBER(porta_w);
-
-	virtual DECLARE_READ16_MEMBER(read_external_space);
-	virtual DECLARE_WRITE16_MEMBER(write_external_space);
-
-private:
-};
 
 READ16_MEMBER(gcm394_game_state::cs0_r)
 {
@@ -230,199 +143,6 @@ void gcm394_game_state::cs_map_base(address_map& map)
 {
 }
 
-
-class generalplus_gpac800_game_state : public gcm394_game_state
-{
-public:
-	generalplus_gpac800_game_state(const machine_config& mconfig, device_type type, const char* tag) :
-		gcm394_game_state(mconfig, type, tag),
-		m_nandregion(*this, "nandrom"),
-		m_initial_copy_words(0x2000)
-	{
-	}
-
-	void generalplus_gpac800(machine_config &config);
-
-	void nand_init210();
-	void nand_init840();
-	void nand_wlsair60();
-	void nand_vbaby();
-	void nand_tsm();
-	void nand_beambox();
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	DECLARE_READ8_MEMBER(read_nand);
-	std::vector<uint16_t> m_sdram;
-	std::vector<uint16_t> m_sdram2;
-
-	virtual DECLARE_READ16_MEMBER(cs0_r) override;
-	virtual DECLARE_WRITE16_MEMBER(cs0_w) override;
-	virtual DECLARE_READ16_MEMBER(cs1_r) override;
-	virtual DECLARE_WRITE16_MEMBER(cs1_w) override;
-
-private:
-	optional_region_ptr<uint8_t> m_nandregion;
-
-	void nand_create_stripped_region();
-
-	std::vector<uint8_t> m_strippedrom;
-	int m_strippedsize;
-	int m_size;
-	int m_nandblocksize;
-	int m_nandblocksize_stripped;
-
-	int m_initial_copy_words;
-	int m_vectorbase;
-};
-
-class generalplus_gpac800_vbaby_game_state : public generalplus_gpac800_game_state
-{
-public:
-	generalplus_gpac800_vbaby_game_state(const machine_config& mconfig, device_type type, const char* tag) :
-		generalplus_gpac800_game_state(mconfig, type, tag),
-		m_cart(*this, "cartslot")
-	{
-	}
-
-	void generalplus_gpac800_vbaby(machine_config &config);
-
-protected:
-	required_device<generic_slot_device> m_cart;
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-
-private:
-};
-
-
-class generalplus_gpspispi_game_state : public gcm394_game_state
-{
-public:
-	generalplus_gpspispi_game_state(const machine_config& mconfig, device_type type, const char* tag) :
-		gcm394_game_state(mconfig, type, tag)
-	{
-	}
-
-	void generalplus_gpspispi(machine_config &config);
-
-	void init_spi();
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-private:
-};
-
-
-
-class generalplus_gpspispi_bkrankp_game_state : public generalplus_gpspispi_game_state
-{
-public:
-	generalplus_gpspispi_bkrankp_game_state(const machine_config& mconfig, device_type type, const char* tag) :
-		generalplus_gpspispi_game_state(mconfig, type, tag),
-		m_cart(*this, "cartslot")
-	{
-	}
-
-	void generalplus_gpspispi_bkrankp(machine_config &config);
-
-protected:
-	required_device<generic_slot_device> m_cart;
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-
-private:
-};
-
-
-
-class tkmag220_game_state : public gcm394_game_state
-{
-public:
-	tkmag220_game_state(const machine_config& mconfig, device_type type, const char* tag) :
-		gcm394_game_state(mconfig, type, tag)
-	{
-	}
-
-	void tkmag220(machine_config &config);
-
-protected:
-
-	/*
-	virtual DECLARE_READ16_MEMBER(porta_r) override
-	{
-	    return machine().rand();
-	}
-
-	virtual DECLARE_READ16_MEMBER(portb_r) override
-	{
-	    return machine().rand();
-	}
-
-	virtual DECLARE_WRITE16_MEMBER(porta_w) override
-	{
-	}
-	*/
-
-private:
-
-	virtual DECLARE_READ16_MEMBER(cs0_r) override
-	{
-		return m_romregion[offset & 0x3ffffff];
-	}
-};
-
-class wrlshunt_game_state : public gcm394_game_state
-{
-public:
-	wrlshunt_game_state(const machine_config& mconfig, device_type type, const char* tag) :
-		gcm394_game_state(mconfig, type, tag)
-	{
-	}
-
-	void wrlshunt(machine_config &config);
-
-	void init_wrlshunt();
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	std::vector<uint16_t> m_sdram;
-
-	virtual DECLARE_READ16_MEMBER(porta_r) override;
-	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
-
-private:
-
-
-	//required_shared_ptr<u16> m_mainram;
-
-	virtual DECLARE_READ16_MEMBER(cs0_r) override;
-	virtual DECLARE_WRITE16_MEMBER(cs0_w) override;
-	virtual DECLARE_READ16_MEMBER(cs1_r) override;
-	virtual DECLARE_WRITE16_MEMBER(cs1_w) override;
-};
-
-class jak_s500_game_state : public wrlshunt_game_state
-{
-public:
-	jak_s500_game_state(const machine_config& mconfig, device_type type, const char* tag) :
-		wrlshunt_game_state(mconfig, type, tag)
-	{
-	}
-
-protected:
-	//virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	virtual DECLARE_READ16_MEMBER(porta_r) override;
-	virtual DECLARE_READ16_MEMBER(portb_r) override;
-
-private:
-};
 
 
 
@@ -470,8 +190,12 @@ READ16_MEMBER(jak_s500_game_state::porta_r)
 	logerror("%s: Port A Read: %04x\n", machine().describe_context(), data);
 
 	//address_space& mem = m_maincpu->space(AS_PROGRAM);
+
 	//if (mem.read_word(0x22b408) == 0x4846)
 	//  mem.write_word(0x22b408, 0x4840);    // jak_s500 force service mode
+
+	//if (mem.read_word(0x236271) == 0x4846)
+	//  mem.write_word(0x236271, 0x4840);    // jak_totm force service mode
 
 	return data;
 }
@@ -1349,6 +1073,15 @@ ROM_START(jak_s500)
 	ROM_LOAD16_WORD_SWAP("spbwheel.bin", 0x000000, 0x800000, CRC(6ba1d335) SHA1(1bb3e4d02c7b35dd4d336971c6a9f82071cc6ce1) )
 ROM_END
 
+ROM_START(jak_totm)
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("toysonthemove.bin", 0x000000, 0x800000, CRC(d08fb72a) SHA1(1fea98542ef7c65eef31afb70fd50952b4cef1c1) )
+ROM_END
+
+
 ROM_START(wrlshunt)
 	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
@@ -1489,6 +1222,40 @@ ROM_START( jak_tsm )
 	ROM_LOAD( "toystorymania.bin", 0x0000, 0x4200000, CRC(183b20a5) SHA1(eb4fa5ee9dfac58f5244d00d4e833b1e461cc52c) )
 ROM_END
 
+
+ROM_START( jak_duck )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+
+	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "duckcommander_gpr27p512a_c276_as_hy27us08121a.bin", 0x0000, 0x4200000, CRC(d9356d5b) SHA1(aca05525b4a504f7ad264ae9bbc2f1f8f399c4ca) )
+ROM_END
+
+ROM_START( jak_swc )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+
+	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "jakksstarwarspistol_gpr27p512a_c276_as_hy27us08121a.bin", 0x0000, 0x4200000, CRC(024d49b8) SHA1(9694f4c7cd083c976ffbbcfa6f626fc6b4bc8d91) )
+ROM_END
+
+ROM_START( jak_wdzh )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+
+	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "walkingdeadrifle_gpr27p512a_c276_as_hy27us08121a.bin", 0x0000, 0x4200000, CRC(b2c762f0) SHA1(7e10df517cc24924e0ec55e2a263563023d945f8) )
+ROM_END
+
+ROM_START( jak_wdbg )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+
+	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "amcwalkingdeadcrossbow_gpr27p512a_c276_as_hy27us08121a.bin", 0x0000, 0x4200000, CRC(66510fd4) SHA1(3ad6347c5a7758c035654cb3e96858320875b97a) )
+ROM_END
+
+
 ROM_START( vbaby )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
@@ -1518,7 +1285,9 @@ CONS(2009, smartfp,   0, 0, base, smartfp,  gcm394_game_state, empty_init, "Fish
 CONS(200?, tkmag220,  0, 0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "TaiKee",         "Mini Arcade Games Console (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Fun 2 Learn 3-in-1 SMART SPORTS  ?
+
 CONS(2009, jak_s500, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "SpongeBob SquarePants Bikini Bottom 500 (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(200?, jak_totm, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "Toy Story - Toys on the Move (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // Toys on the Move has ISSI 404A
 
 CONS(2011, wrlshunt, 0, 0, wrlshunt, wrlshunt, wrlshunt_game_state, init_wrlshunt, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
@@ -1693,6 +1462,10 @@ void generalplus_gpac800_game_state::nand_beambox()
 CONS(2010, wlsair60, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60, "Jungle Soft / Kids Station Toys Inc", "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, jak_gtg,  0, 0, generalplus_gpac800,       jak_gtg,  generalplus_gpac800_game_state,       nand_init210,  "JAKKS Pacific Inc",                   "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, jak_car2, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,  "JAKKS Pacific Inc",                   "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_duck, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,  "JAKKS Pacific Inc",                   "Duck Commander (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // gun games all had Atmel 16CM (24C16).
+CONS(200?, jak_swc,  0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,  "JAKKS Pacific Inc",                   "Star Wars Clone Trooper (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_wdzh, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,  "JAKKS Pacific Inc",                   "The Walking Dead: Zombie Hunter (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_wdbg, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,  "JAKKS Pacific Inc",                   "The Walking Dead: Battleground (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, jak_tsm , 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_tsm,      "JAKKS Pacific Inc",                   "Toy Story Mania (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, beambox,  0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_beambox,  "Hasbro",                              "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, mgtfit,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60, "MGT",                                 "Fitness Konsole (NC1470)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // probably has other names in English too? menus don't appear to be in German

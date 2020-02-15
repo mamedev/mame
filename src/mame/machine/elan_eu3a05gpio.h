@@ -16,7 +16,7 @@ public:
 	auto read_0_callback() { return m_read_0_callback.bind(); }
 	auto read_1_callback() { return m_read_1_callback.bind(); }
 	auto read_2_callback() { return m_read_2_callback.bind(); }
-	
+
 	DECLARE_READ8_MEMBER(gpio_r);
 	DECLARE_WRITE8_MEMBER(gpio_w);
 

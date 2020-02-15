@@ -7,10 +7,9 @@
 DEFINE_DEVICE_TYPE(SEGA315_6154, sega_315_6154_device, "sega315_6154", "Sega 315-6154 Northbridge")
 
 sega_315_6154_device::sega_315_6154_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SEGA315_6154, tag, owner, clock),
-	device_memory_interface(mconfig, *this),
-	m_memory_config("memory", ENDIANNESS_LITTLE, 32, 32),
-	m_configuration_config("configuration", ENDIANNESS_LITTLE, 32, 32)
+	: pci_host_device(mconfig, SEGA315_6154, tag, owner, clock),
+	m_configuration_config("configuration_space", ENDIANNESS_LITTLE, 32, 20),
+	m_memory_config("memory_space", ENDIANNESS_LITTLE, 32, 32)
 {
 	memset(m_registers, 0, sizeof(m_registers));
 	memset(m_bases, 0, sizeof(m_bases));
@@ -20,8 +19,19 @@ sega_315_6154_device::sega_315_6154_device(const machine_config &mconfig, const 
 
 void sega_315_6154_device::device_start()
 {
-	m_memory = &space(AS_PCI_MEMORY);
-	m_configuration = &space(AS_PCI_CONFIGURATION);
+	pci_host_device::device_start();
+	memory_space = &space(AS_PCI_MEMORY);
+	// never unmap addresses lower than start
+	memory_window_start = 0x80000000;
+	memory_window_end =   0xffffffff;
+	memory_offset = 0;
+
+	m_configuration = &space(AS_PCI_CONFIG);
+
+	io_space = memory_space;
+	io_window_start = 0xc0000000;
+	io_window_end = 0xc000ffff;
+	io_offset = 0xc0000000;
 
 	save_item(NAME(m_registers));
 	save_item(NAME(m_bases));
@@ -31,15 +41,32 @@ void sega_315_6154_device::device_start()
 
 void sega_315_6154_device::device_reset()
 {
+	pci_host_device::device_reset();
 	memset(m_registers, 0, sizeof(m_registers));
 }
 
 device_memory_interface::space_config_vector sega_315_6154_device::memory_space_config() const
 {
 	return space_config_vector{
-		std::make_pair(AS_PCI_MEMORY, &m_memory_config),
-		std::make_pair(AS_PCI_CONFIGURATION, &m_configuration_config)
+		std::make_pair(AS_PCI_CONFIG, &m_configuration_config),
+		std::make_pair(AS_PCI_MEMORY, &m_memory_config)
 	};
+}
+
+void sega_315_6154_device::regenerate_config_mapping()
+{
+	// like pci_bridge_device::regenerate_config_mapping() in pci.cpp
+	// but each device n is assigned bit n+11 in the configuration space
+	// devices in different buses must have different numbers
+	address_space *config_space = &space(AS_PCI_CONFIG);
+	config_space->unmap_readwrite(0x00000, 0xfffff);
+	for (int i = 0; i < 9; i++)
+		if (sub_devices[i])
+		{
+			const int s = i >> 3;
+			const int o = (i & 7) << 8;
+			config_space->install_device((0x800 << s) + o, ((0x800 << s) + o) | 0xff, *sub_devices[i], &pci_device::config_map);
+		}
 }
 
 READ32_MEMBER(sega_315_6154_device::registers_r)
@@ -85,7 +112,7 @@ WRITE32_MEMBER(sega_315_6154_device::registers_w)
 			logerror("got dma transfer request from 0x%08x to 0x%08x size 0x%08x bytes\n", s, d, l << 2);
 			while (l != 0)
 			{
-				m_memory->write_dword(d, m_memory->read_dword(s));
+				memory_space->write_dword(d, memory_space->read_dword(s));
 				s += 4;
 				d += 4;
 				l--;
@@ -106,7 +133,7 @@ u32 sega_315_6154_device::aperture_r(address_space &space, offs_t offset, u32 me
 		return m_configuration->read_dword(destination_offset << 2, mem_mask);
 	if ((Aperture == 1) && (destination == 0) && (m_useconfig_18x == true))
 		return m_configuration->read_dword(destination_offset << 2, mem_mask);
-	return m_memory->read_dword(m_bases[index] + (destination_offset << 2), mem_mask);
+	return memory_space->read_dword(m_bases[index] + (destination_offset << 2), mem_mask);
 }
 
 template u32 sega_315_6154_device::aperture_r<0>(address_space &space, offs_t offset, u32 mem_mask);
@@ -130,7 +157,7 @@ void sega_315_6154_device::aperture_w(address_space &space, offs_t offset, u32 d
 		m_configuration->write_dword(destination_offset << 2, data, mem_mask);
 		return;
 	}
-	m_memory->write_dword(m_bases[index] + (destination_offset << 2), data, mem_mask);
+	memory_space->write_dword(m_bases[index] + (destination_offset << 2), data, mem_mask);
 }
 
 template void sega_315_6154_device::aperture_w<0>(address_space &space, offs_t offset, u32 data, u32 mem_mask);

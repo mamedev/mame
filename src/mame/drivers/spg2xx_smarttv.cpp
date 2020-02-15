@@ -249,5 +249,5 @@ ROM_END
 
 
 // Toyquest games
-CONS( 2005, smartvad,  0,        0, smarttv, smarttv,   smarttv_state, empty_init, "WinFun / KidConnection", "",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, smartvad,  0,        0, smarttv, smarttv,   smarttv_state, empty_init, "WinFun / KidConnection", "SmarTV Adventures",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
