@@ -51080,6 +51080,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- Sachen / Thin Chen (and clones) -->
 
+	<software name="englpyrm">
+		<description>English Pyramid (Pirate)</description>
+		<year>1991</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="K-001"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="ffe4" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="k-001 prg" size="32768" crc="7093ac82" sha1="7ec247a4fa445d8ee029ec5577767261e5685b8e" />
+			</dataarea>
+			<dataarea name="chr" size="16384">
+				<rom name="k-001 chr" size="16384" crc="45600bf5" sha1="6d37d046e45098a0e596994a6dc0ea88ae9d06cc" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jovial">
 		<!-- Important: there is also an image with prg crc 55089f7e which according to my research
 		should be a Chinese translation by Puszta of the original Sachen game, so we don't include it here -->
