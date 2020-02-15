@@ -41,7 +41,7 @@ DEFINE_DEVICE_TYPE(SUNPLUS_GCM394_AUDIO, sunplus_gcm394_audio_device, "gcm394_au
 #include "logmacro.h"
 
 #define SPG_DEBUG_AUDIO     (0)
-#define SPG_LOG_ADPCM36     (1)
+#define SPG_LOG_ADPCM36     (0)
 
 #if SPG_LOG_ADPCM36
 static FILE *adpcm_file[16] = {};
@@ -465,9 +465,6 @@ WRITE16_MEMBER(spg2xx_audio_device::audio_ctrl_w)
 		const uint16_t changed = m_audio_ctrl_regs[AUDIO_CHANNEL_ENABLE] ^ data;
 		for (uint32_t channel_bit = 0; channel_bit < 16; channel_bit++)
 		{
-			if (channel_bit == 0)
-				continue;
-
 			const uint16_t mask = 1 << channel_bit;
 			if (!(changed & mask))
 				continue;
