@@ -45,6 +45,7 @@ private:
 	u16 m_dma_count;
 	emu_timer *m_dma_timer;
 
+	u16 m_gpu_adr;
 	u32 m_int_active;
 
 	std::string m_debug_string;
@@ -54,6 +55,9 @@ private:
 	bool irq_state(u32 level) const;
 	void irq_clear_w(u16 data);
 	u8 irq_level_r();
+
+	void gpu_adr_w(u16 data);
+	void gpu_count_w(u16 data);
 
 	void dma_src_w(offs_t, u32 data, u32 mem_mask);
 	void dma_dst_w(offs_t, u16 data, u16 mem_mask);
@@ -112,6 +116,29 @@ u8 xavix2_state::irq_level_r()
 bool xavix2_state::irq_state(u32 level) const
 {
 	return m_int_active & (1 << level);
+}
+
+void xavix2_state::gpu_adr_w(u16 data)
+{
+	m_gpu_adr = data;
+}
+
+void xavix2_state::gpu_count_w(u16 data)
+{
+	for(u32 i=0; i != data; i++) {
+		u64 command = m_maincpu->space(AS_PROGRAM).read_qword(m_gpu_adr + 8*i);
+		logerror("gpu %02d: %016x x=%03x y=%03x ?=%02x ?=%x ?=%02x ?=%02x ?=%02x c=%04x %s\n",
+				 i, command,
+				 (command >>  0) &  0x7ff,
+				 (command >> 11) &  0x3ff,
+				 (command >> 21) &   0xff,
+				 (command >> 29) &    0x1,
+				 (command >> 30) &   0x3f,
+				 (command >> 36) &   0x3f,
+				 (command >> 42) &   0x3f,
+				 (command >> 48) & 0xffff,
+				 machine().describe_context());
+	}
 }
 
 void xavix2_state::dma_src_w(offs_t, u32 data, u32 mem_mask)
@@ -242,6 +269,9 @@ void xavix2_state::mem(address_map &map)
 
 	map(0xffffe238, 0xffffe238).rw(FUNC(xavix2_state::debug_port_r), FUNC(xavix2_state::debug_port_w));
 	map(0xffffe239, 0xffffe239).r(FUNC(xavix2_state::debug_port_status_r));
+
+	map(0xffffe604, 0xffffe605).w(FUNC(xavix2_state::gpu_adr_w));
+	map(0xffffe606, 0xffffe607).w(FUNC(xavix2_state::gpu_count_w));
 
 	map(0xffffe60a, 0xffffe60a).lr8(NAME([]() { return 0x40; })); // pal/ntsc
 	map(0xffffe630, 0xffffe631).lr16(NAME([]() { return 0x210; }));
