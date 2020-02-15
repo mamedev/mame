@@ -2934,8 +2934,10 @@ files {
 	MAME_DIR .. "src/mame/drivers/gamecube.cpp",
 	MAME_DIR .. "src/mame/machine/m6502_vtscr.cpp",
 	MAME_DIR .. "src/mame/machine/m6502_vtscr.h",
-	MAME_DIR .. "src/mame/machine/m6502_vh2009.cpp",
-	MAME_DIR .. "src/mame/machine/m6502_vh2009.h",
+	MAME_DIR .. "src/mame/machine/m6502_swap_op_d5_d6.cpp",
+	MAME_DIR .. "src/mame/machine/m6502_swap_op_d5_d6.h",
+	MAME_DIR .. "src/mame/machine/m6502_swap_op_d2_d7.cpp",
+	MAME_DIR .. "src/mame/machine/m6502_swap_op_d2_d7.h",
 	MAME_DIR .. "src/mame/drivers/vt1682.cpp",
 	MAME_DIR .. "src/mame/machine/vt1682_io.h",
 	MAME_DIR .. "src/mame/machine/vt1682_io.cpp",
@@ -2945,8 +2947,6 @@ files {
 	MAME_DIR .. "src/mame/machine/vt1682_alu.cpp",
 	MAME_DIR .. "src/mame/machine/vt1682_timer.h",
 	MAME_DIR .. "src/mame/machine/vt1682_timer.cpp",
-	MAME_DIR .. "src/mame/machine/m6502_vt1682.cpp",
-	MAME_DIR .. "src/mame/machine/m6502_vt1682.h",
 }
 
 createMESSProjects(_target, _subtarget, "nokia")

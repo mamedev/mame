@@ -59,8 +59,8 @@
 */
 
 #include "emu.h"
-#include "machine/m6502_vt1682.h"
-#include "machine/m6502_vh2009.h"
+#include "machine/m6502_swap_op_d2_d7.h"
+#include "machine/m6502_swap_op_d5_d6.h"
 #include "machine/vt1682_io.h"
 #include "machine/vt1682_uio.h"
 #include "machine/vt1682_alu.h"
@@ -5434,7 +5434,7 @@ GFXDECODE_END
 void vt_vt1682_state::vt_vt1682_ntscbase(machine_config& config)
 {
 	/* basic machine hardware */
-	M6502_VT1682(config, m_maincpu, MAIN_CPU_CLOCK_NTSC);
+	M6502_SWAP_OP_D2_D7(config, m_maincpu, MAIN_CPU_CLOCK_NTSC);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt_vt1682_state::vt_vt1682_map);
 	//m_maincpu->set_vblank_int("screen", FUNC(vt_vt1682_state::nmi));
 
@@ -5460,7 +5460,7 @@ void vt_vt1682_state::vt_vt1682_ntscbase(machine_config& config)
 
 void vt_vt1682_state::vt_vt1682_palbase(machine_config& config)
 {
-	M6502_VT1682(config, m_maincpu, MAIN_CPU_CLOCK_PAL);
+	M6502_SWAP_OP_D2_D7(config, m_maincpu, MAIN_CPU_CLOCK_PAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt_vt1682_state::vt_vt1682_map);
 	//m_maincpu->set_vblank_int("screen", FUNC(vt_vt1682_state::nmi));
 
@@ -5903,7 +5903,7 @@ void vt1682_wow_state::vt1682_wow(machine_config& config)
 	m_uio->portb_in().set(FUNC(vt1682_exsport_state::uiob_r));
 	m_uio->portb_out().set(FUNC(vt1682_exsport_state::uiob_w));
 
-	M6502_VH2009(config.replace(), m_maincpu, MAIN_CPU_CLOCK_NTSC); // doesn't use the same bitswap as the other VT1682 games...
+	M6502_SWAP_OP_D5_D6(config.replace(), m_maincpu, MAIN_CPU_CLOCK_NTSC); // doesn't use the same bitswap as the other VT1682 games...
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt1682_wow_state::vt_vt1682_map);
 }
 

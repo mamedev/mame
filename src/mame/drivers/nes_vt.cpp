@@ -71,7 +71,7 @@
 #include "machine/bankdev.h"
 #include "video/ppu2c0x_vt.h"
 #include "machine/m6502_vtscr.h"
-#include "machine/m6502_vh2009.h"
+#include "machine/m6502_swap_op_d5_d6.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -2117,7 +2117,7 @@ void nes_vt_vh2009_state::nes_vt_vh2009(machine_config &config)
 {
 	nes_vt(config);
 
-	M6502_VH2009(config.replace(), m_maincpu, NTSC_APU_CLOCK);
+	M6502_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_vh2009_state::nes_vt_map);
 
 	//m_ppu->set_palette_mode(PAL_MODE_NEW_VG); // gives better title screens, but worse ingame, must be able to switch
