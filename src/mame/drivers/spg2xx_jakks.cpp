@@ -949,4 +949,4 @@ CONS( 2005, jak_care, 0, 0, jakks_gkr_cb,     jak_care,     jakks_gkr_state, emp
 // Some versions of the Shrek - Over the Hedge unit show the GameKey logo on startup (others don't) there is no evidence to suggest it was ever released with a GameKey port tho, and the internal PCB has no place for one on the versions we've seen (which show the logo)
 
 // TV Touch Games (these are re-release versions of classic JAKKS games but using a touchpad controller)
-CONS( 2012, tvtchsw, 0, 0, jakks_tvtouch, tvtouch, jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Code Mystics", "TV Touch Games: Star Wars Original Trilogy",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2012, tvtchsw, 0, 0, jakks_tvtouch, tvtouch, jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Code Mystics", "TV Touch Games: Star Wars Original Trilogy",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Touch games have 24C04

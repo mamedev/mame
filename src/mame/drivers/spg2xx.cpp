@@ -33,6 +33,9 @@
             Clickstart ( see clickstart.cpp instead)
             Wheel of Fortune 2nd Edition
             Spider-man - Villain Roundup
+			Dream Life Superstar
+			Designer's World
+			Star Wars TV Touch
 
         "SunPlus QU7074-P69A"
 
@@ -82,7 +85,7 @@
         - see spg110.cpp instead
 
         "GCM394" (this is clearly newer, has extra opcodes, different internal map etc. also scaling and higher resolutions based on Spongebob)
-        - see sunplus_gcm394.cpp instead
+        - see sunplus_unsp20soc.cpp instead
 
     Status:
 
