@@ -5,7 +5,11 @@
 
     JAKKS call this GPAC800, other sources call it GPL16250
 
-	die on Smart Fit Park and Spongebob Bikini Bottom 500 is marked GCM394
+	die markings GCM394
+	 - Smart Fit Park
+	 - Spongebob Bikini Bottom 500
+	 - Mobigo2 (sunplus_unsp20soc_mobigo.cpp)
+
 	some of the systems here might use newer dies but the video etc. appears the same.
 
     Compared to vii.cpp this is clearly newer, has extra opcodes, different internal map etc. also scaling and higher resolutions based on Spongebob
@@ -1283,7 +1287,7 @@ CONS(200?, tkmag220,  0, 0, tkmag220, tkmag220, tkmag220_game_state,  empty_init
 // Fun 2 Learn 3-in-1 SMART SPORTS  ?
 
 CONS(2009, jak_s500, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "SpongeBob SquarePants Bikini Bottom 500 (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(200?, jak_totm, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "Toy Story - Toys on the Move (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(200?, jak_totm, 0, 0, wrlshunt, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc", "Toy Story - Toys on the Move (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // Toys on the Move has ISSI 404A
 
 CONS(2011, wrlshunt, 0, 0, wrlshunt, wrlshunt, wrlshunt_game_state, init_wrlshunt, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
@@ -1458,7 +1462,7 @@ void generalplus_gpac800_game_state::nand_beambox()
 CONS(2010, wlsair60, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60, "Jungle Soft / Kids Station Toys Inc", "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, jak_gtg,  0, 0, generalplus_gpac800,       jak_gtg,  generalplus_gpac800_game_state,       nand_init210,  "JAKKS Pacific Inc",                   "Golden Tee Golf (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, jak_car2, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,  "JAKKS Pacific Inc",                   "Cars 2 (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS(200?, jak_duck, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,  "JAKKS Pacific Inc",                   "Duck Commander (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(200?, jak_duck, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,  "JAKKS Pacific Inc",                   "Duck Commander (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // gun games all had Atmel 16CM (24C16).
 CONS(200?, jak_swc,  0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,  "JAKKS Pacific Inc",                   "Star Wars Clone Trooper (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, jak_wdzh, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,  "JAKKS Pacific Inc",                   "The Walking Dead: Zombie Hunter (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, jak_wdbg, 0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_init210,  "JAKKS Pacific Inc",                   "The Walking Dead: Battleground (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

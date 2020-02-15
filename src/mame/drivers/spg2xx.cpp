@@ -33,6 +33,9 @@
             Clickstart ( see clickstart.cpp instead)
             Wheel of Fortune 2nd Edition
             Spider-man - Villain Roundup
+			Dream Life Superstar
+			Designer's World
+			Star Wars TV Touch
 
         "SunPlus QU7074-P69A"
 
@@ -82,7 +85,7 @@
         - see spg110.cpp instead
 
         "GCM394" (this is clearly newer, has extra opcodes, different internal map etc. also scaling and higher resolutions based on Spongebob)
-        - see sunplus_gcm394.cpp instead
+        - see sunplus_unsp20soc.cpp instead
 
     Status:
 
@@ -1217,7 +1220,7 @@ ROM_END
 
 ROM_START( pballpup )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "paintballpoweredup.bin", 0x000000, 0x1000000, CRC(df6b77bf) SHA1(aa3c55025e80c7a943d7cfe313d16b53a574a285) )
+	ROM_LOAD16_WORD_SWAP( "paintballpoweredup.bin", 0x000000, 0x1000000, CRC(57dbdfd1) SHA1(d98cb7321cc7af092f6f4f83e85fabbdbc1bbd95) )
 ROM_END
 
 ROM_START( swclone )
