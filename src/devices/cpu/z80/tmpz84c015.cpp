@@ -26,8 +26,8 @@ void tmpz84c015_device::tmpz84c015_internal_io_map(address_map &map)
 }
 
 
-tmpz84c015_device::tmpz84c015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80_device(mconfig, TMPZ84C015, tag, owner, clock),
+tmpz84c015_device::tmpz84c015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	z80_device(mconfig, TMPZ84C015, tag, owner, clock),
 	m_io_space_config( "io", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(tmpz84c015_device::tmpz84c015_internal_io_map), this)),
 	m_ctc(*this, "tmpz84c015_ctc"),
 	m_sio(*this, "tmpz84c015_sio"),
@@ -51,7 +51,7 @@ tmpz84c015_device::tmpz84c015_device(const machine_config &mconfig, const char *
 	m_out_rxdrqb_cb(*this),
 	m_out_txdrqb_cb(*this),
 
-	m_zc_cb{ {*this}, {*this}, {*this}, {*this} },
+	m_zc_cb(*this),
 
 	m_in_pa_cb(*this),
 	m_out_pa_cb(*this),
@@ -97,8 +97,7 @@ void tmpz84c015_device::device_start()
 	m_out_rxdrqb_cb.resolve_safe();
 	m_out_txdrqb_cb.resolve_safe();
 
-	for (unsigned i = 0; i < 4; i++)
-		m_zc_cb[i].resolve_safe();
+	m_zc_cb.resolve_all_safe();
 
 	m_in_pa_cb.resolve_safe(0);
 	m_out_pa_cb.resolve_safe();

@@ -10,6 +10,8 @@
 
     ADPCM related patents:
     - https://patents.google.com/patent/US5692099
+    - https://patents.google.com/patent/US6453286
+    - https://patents.google.com/patent/US5548655A
 
 ***************************************************************************/
 
@@ -497,9 +499,9 @@ uint8_t huc6272_device::adpcm_update(int chan)
 	if (!m_adpcm.playing[chan])
 		return 0;
 
-	int rate = (1 << m_adpcm.rate);
+	const unsigned rate = (1 << m_adpcm.rate);
 	m_adpcm.pos[chan]++;
-	if (m_adpcm.pos[chan] > rate)
+	if (m_adpcm.pos[chan] >= rate)
 	{
 		if (m_adpcm.input[chan] == -1)
 		{
@@ -541,6 +543,7 @@ uint8_t huc6272_device::adpcm_update(int chan)
 			if (m_adpcm.nibble[chan] >= 28)
 				m_adpcm.input[chan] = -1;
 		}
+		m_adpcm.pos[chan] = 0;
 	}
 
 	return (m_adpcm.input[chan] >> m_adpcm.nibble[chan]) & 0xf;

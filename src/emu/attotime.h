@@ -38,7 +38,7 @@
 #include "emucore.h"
 #include "xtal.h"
 
-#include <math.h>
+#include <cmath>
 #undef min
 #undef max
 

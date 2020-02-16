@@ -79,7 +79,7 @@
 	</software>
 
 	<!-- boot OK -->
-	<software name="toughman" supported="yes">
+	<software name="toughman">
 		<description>Toughman Contest (Euro, USA)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>

@@ -12,7 +12,7 @@
 #endif
 #include <windows.h>
 #include <tchar.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <vector>
 #include <string>
 

@@ -53,7 +53,7 @@ class dc_state : public driver_device
 		uint8_t indirect;
 		uint8_t start;
 		uint8_t sel;
-	}m_g2_dma[4];
+	} m_g2_dma[4];
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -84,6 +84,7 @@ class dc_state : public driver_device
 	DECLARE_WRITE16_MEMBER( soundram_w );
 	DECLARE_WRITE_LINE_MEMBER(aica_irq);
 	DECLARE_WRITE_LINE_MEMBER(sh4_aica_irq);
+	DECLARE_WRITE_LINE_MEMBER(external_irq);
 
 
 	required_device<sh4_base_device> m_maincpu;

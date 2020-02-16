@@ -2041,7 +2041,7 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 
 	// attempt to open the file; bail if we can't
 	emu_file layoutfile(m_manager.machine().options().art_path(), OPEN_FLAG_READ);
-	osd_file::error const filerr(layoutfile.open(fname.c_str()));
+	osd_file::error const filerr(layoutfile.open(fname));
 	if (filerr != osd_file::error::NONE)
 		return false;
 

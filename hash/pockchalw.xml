@@ -196,8 +196,8 @@
 			<feature name="u310" value="LH5168N-10L" />
 			<feature name="u311" value="74HC139A" />
 			<feature name="bt301" value="[empty?]" />
-			<dataarea name="rom" size="1048576">
-				<rom name="n-g1 7bi711 98cj4mb c1d1.u307" size="1048576" crc="efef730e" sha1="6f4906d36fc751cf2c52bf9ff4a388fd19ae51d2" offset="0" />
+			<dataarea name="rom" size="4194304">
+				<rom name="n-g1 7bi711 98cj4mb c1d1.u307" size="4194304" crc="53c2ff43" sha1="1baba9ecb24b46d9319bf0b13b1d8e5409ff5214" offset="0" />
 			</dataarea>
 		</part>
 	</software>

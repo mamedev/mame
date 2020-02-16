@@ -104,17 +104,19 @@
 #include "machine/elan_eu3a05gpio.h"
 #include "machine/elan_eu3a05sys.h"
 #include "video/elan_eu3a05vid.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 class elan_eu3a05_state : public driver_device
 {
 public:
 	elan_eu3a05_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_sys(*this, "sys"),
+		m_gpio(*this, "gpio"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_ram(*this, "ram"),
-		m_gpio(*this, "gpio"),
-		m_sys(*this, "sys"),
 		m_sound(*this, "eu3a05sound"),
 		m_vid(*this, "vid"),
 		m_pixram(*this, "pixram"),
@@ -125,6 +127,17 @@ public:
 
 	void elan_eu3a05(machine_config &config);
 	void airblsjs(machine_config& config);
+
+	void elan_sudoku(machine_config &config);
+
+
+protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	required_device<elan_eu3a05sys_device> m_sys;
+	required_device<elan_eu3a05gpio_device> m_gpio;
 
 private:
 	// screen updates
@@ -137,18 +150,14 @@ private:
 
 	void elan_eu3a05_bank_map(address_map &map);
 	void elan_eu3a05_map(address_map &map);
+	void elan_sudoku_map(address_map &map);
 
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	virtual void video_start() override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_ram;
-	required_device<elan_eu3a05gpio_device> m_gpio;
-	required_device<elan_eu3a05sys_device> m_sys;
 	required_device<elan_eu3a05_sound_device> m_sound;
 	required_device<elan_eu3a05vid_device> m_vid;
 	required_shared_ptr<uint8_t> m_pixram;
@@ -163,6 +172,94 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(sound_end4) { m_sys->generate_custom_interrupt(6); }
 	DECLARE_WRITE_LINE_MEMBER(sound_end5) { m_sys->generate_custom_interrupt(7); }
 };
+
+class elan_eu3a05_buzztime_state : public elan_eu3a05_state
+{
+public:
+	elan_eu3a05_buzztime_state(const machine_config &mconfig, device_type type, const char *tag) :
+		elan_eu3a05_state(mconfig, type, tag),
+		m_cart(*this, "cartslot")
+	{ }
+
+	void elan_buzztime(machine_config& config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	//DECLARE_READ8_MEMBER(random_r) { return machine().rand(); }
+	DECLARE_READ8_MEMBER(porta_r);
+	DECLARE_WRITE8_MEMBER(portb_w);
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+
+	required_device<generic_slot_device> m_cart;
+};
+
+void elan_eu3a05_buzztime_state::machine_start()
+{
+	elan_eu3a05_state::machine_start();
+
+	// if there's a cart make sure we can see it
+	if (m_cart && m_cart->exists())
+	{
+		uint8_t *rom = memregion("maincpu")->base();
+		uint8_t* cart = m_cart->get_rom_base();
+		std::copy(&cart[0x000000], &cart[0x200000], &rom[0x200000]);
+	}
+	else
+	{
+		uint8_t *rom = memregion("maincpu")->base();
+		uint8_t* bios = memregion("bios")->base();
+		std::copy(&bios[0x000000], &bios[0x200000], &rom[0x200000]);
+	}
+}
+
+DEVICE_IMAGE_LOAD_MEMBER(elan_eu3a05_buzztime_state::cart_load)
+{
+	uint32_t size = m_cart->common_get_size("rom");
+
+	if (size != 0x200000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		return image_init_result::FAIL;
+	}
+
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_NATIVE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
+void elan_eu3a05_buzztime_state::elan_buzztime(machine_config &config)
+{
+	elan_eu3a05_state::elan_eu3a05(config);
+
+	m_sys->set_alt_timer();
+
+	m_gpio->read_0_callback().set(FUNC(elan_eu3a05_buzztime_state::porta_r)); // I/O lives in here
+//  m_gpio->read_1_callback().set(FUNC(elan_eu3a05_buzztime_state::random_r)); // nothing of note
+//  m_gpio->read_2_callback().set(FUNC(elan_eu3a05_buzztime_state::random_r)); // nothing of note
+	m_gpio->write_1_callback().set(FUNC(elan_eu3a05_buzztime_state::portb_w)); // control related
+
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "buzztime_cart");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_device_load(FUNC(elan_eu3a05_buzztime_state::cart_load));
+
+	SOFTWARE_LIST(config, "buzztime_cart").set_original("buzztime_cart");
+}
+
+READ8_MEMBER(elan_eu3a05_buzztime_state::porta_r)
+{
+	logerror("%s: porta_r\n", machine().describe_context());
+	return machine().rand();
+}
+
+WRITE8_MEMBER(elan_eu3a05_buzztime_state::portb_w)
+{
+	logerror("%s: portb_w %02x\n", machine().describe_context(), data);
+}
+
 
 void elan_eu3a05_state::video_start()
 {
@@ -209,6 +306,16 @@ void elan_eu3a05_state::elan_eu3a05_map(address_map &map)
 	map(0x6000, 0xdfff).m(m_bank, FUNC(address_map_bank_device::amap8));
 
 	map(0xe000, 0xffff).rom().region("maincpu", 0x3f8000);
+	// not sure how these work, might be a modified 6502 core instead.
+	map(0xfffa, 0xfffb).r(m_sys, FUNC(elan_eu3a05commonsys_device::nmi_vector_r)); // custom vectors handled with NMI for now
+	//map(0xfffe, 0xffff).r(m_sys, FUNC(elan_eu3a05commonsys_device::irq_vector_r));  // allow normal IRQ for brk
+}
+
+// default e000 mapping is the same as eu3a14, other registers seem closer to eua05, probably a different chip type
+void elan_eu3a05_state::elan_sudoku_map(address_map& map)
+{
+	elan_eu3a05_map(map);
+	map(0xe000, 0xffff).rom().region("maincpu", 0x0000);
 	// not sure how these work, might be a modified 6502 core instead.
 	map(0xfffa, 0xfffb).r(m_sys, FUNC(elan_eu3a05commonsys_device::nmi_vector_r)); // custom vectors handled with NMI for now
 	//map(0xfffe, 0xffff).r(m_sys, FUNC(elan_eu3a05commonsys_device::irq_vector_r));  // allow normal IRQ for brk
@@ -283,6 +390,105 @@ static INPUT_PORTS_START( airblsjs )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Trigger")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Missile")
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( sudoku )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x01, "IN0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "IN2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( carlecfg )
+	PORT_START("IN0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Start/Pause")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) // guess, not used?
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) // guess, not used?
+
+	PORT_START("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -447,13 +653,21 @@ void elan_eu3a05_state::elan_eu3a05(machine_config &config)
 	*/
 }
 
+void elan_eu3a05_state::elan_sudoku(machine_config& config)
+{
+	elan_eu3a05(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a05_state::elan_sudoku_map);
+	m_vid->set_is_sudoku();
+	m_sys->set_alt_timer(); // for Carl Edwards'
+}
+
+
 void elan_eu3a05_state::airblsjs(machine_config& config)
 {
 	elan_eu3a05(config);
 	m_screen->set_refresh_hz(50);
 	m_sys->set_pal(); // TODO: also set PAL clocks
 }
-
 
 ROM_START( rad_tetr )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
@@ -476,6 +690,30 @@ ROM_START( airblsjs )
 	ROM_LOAD( "airblsjs.bin", 0x000000, 0x400000, BAD_DUMP CRC(d10a6a84) SHA1(fa65f06e7da229006ddaffb245eef2cc4f90a66d) ) // ROM probably ok, but needs verification pass
 ROM_END
 
+ROM_START( sudoelan )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "sudoku.bin", 0x00000, 0x100000, CRC(c2596173) SHA1(cc74932648b577b735151014e8c04ed778e11704) )
+	ROM_RELOAD(0x100000,0x100000)
+	ROM_RELOAD(0x200000,0x100000)
+	ROM_RELOAD(0x300000,0x100000)
+ROM_END
+
+ROM_START( carlecfg )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "carledwardsracing.bin", 0x00000, 0x100000, CRC(920f633e) SHA1(8460b77b9635a2484edab1111f35bbda74eb68e4) )
+	ROM_RELOAD(0x100000,0x100000)
+	ROM_RELOAD(0x200000,0x100000)
+	ROM_RELOAD(0x300000,0x100000)
+ROM_END
+
+
+ROM_START( buzztime )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "buzztimeunit.bin", 0x000000, 0x200000, CRC(8ba3569c) SHA1(3e704338a53daed63da90aba0db4f6adb5bccd21) )
+ROM_END
+
 
 CONS( 2004, rad_sinv, 0, 0, elan_eu3a05, rad_sinv, elan_eu3a05_state, empty_init, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
 
@@ -483,3 +721,11 @@ CONS( 2004, rad_tetr, 0, 0, elan_eu3a05, rad_tetr, elan_eu3a05_state, empty_init
 
 // ROM contains the string "Credit:XiAn Hummer Software Studio(CHINA) Tel:86-29-84270600 Email:HummerSoft@126.com"  PCB has datecode of "050423" (23rd April 2005)
 CONS( 2005, airblsjs, 0, 0, airblsjs, airblsjs, elan_eu3a05_state, empty_init, "Advance Bright Ltd", "Air-Blaster Joystick (AB1500, PAL)", MACHINE_NOT_WORKING )
+
+CONS( 2004, buzztime, 0, 0, elan_buzztime, sudoku, elan_eu3a05_buzztime_state, empty_init, "Cadaco", "Buzztime Home Trivia System", MACHINE_NOT_WORKING )
+
+// Below are probably not EU3A05 but use similar modes (possibly EU3A13?)
+
+CONS( 2006, sudoelan, 0,        0, elan_sudoku,  sudoku,   elan_eu3a05_state, empty_init,  "Senario / All in 1 Products Ltd",  "Ultimate Sudoku TV Edition 3-in-1", MACHINE_NOT_WORKING )
+
+CONS( 200?, carlecfg, 0,        0, elan_sudoku,  carlecfg,   elan_eu3a05_state, empty_init,  "Excalibur Electronics Inc",  "Carl Edwards' Chase For Glory", MACHINE_NOT_WORKING )

@@ -111,11 +111,13 @@ DEFINE_DEVICE_TYPE(SHARP_LH28F160S3,      sharp_lh28f160s3_device,      "sharp_l
 DEFINE_DEVICE_TYPE(INTEL_TE28F320,        intel_te28f320_device,        "intel_te28f320",        "Intel TE28F320 Flash")
 DEFINE_DEVICE_TYPE(SHARP_LH28F320BF,      sharp_lh28f320bf_device,      "sharp_lh28f320bf",      "Sharp LH28F320BFHE-PBTL Flash")
 DEFINE_DEVICE_TYPE(INTEL_28F320J3D,       intel_28f320j3d_device,       "intel_28f320j3d",       "Intel 28F320J3D Flash")
+DEFINE_DEVICE_TYPE(SPANSION_S29GL064S,    spansion_s29gl064s_device,    "spansion_s29gl064s",    "Spansion / Cypress S29GL064S Flash" )
 DEFINE_DEVICE_TYPE(INTEL_28F320J5,        intel_28f320j5_device,        "intel_28f320j5",        "Intel 28F320J5 Flash")
 
 DEFINE_DEVICE_TYPE(SST_39VF400A,          sst_39vf400a_device,          "sst_39vf400a",          "SST 39VF400A Flash")
 
 DEFINE_DEVICE_TYPE(ATMEL_49F4096,         atmel_49f4096_device,         "atmel_49f4096",         "Atmel AT49F4096 Flash")
+
 
 
 //**************************************************************************
@@ -227,6 +229,13 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_maker_id = MFG_INTEL;
 		m_device_id = 0x16;
 		m_sector_is_4k = true;
+		break;
+	case FLASH_SPANSION_S29GL064S: // senbbs
+		m_bits = 16;
+		m_size = 0x800000;
+		m_maker_id = MFG_SPANSION;
+		m_device_id = 0x227e;
+		m_sector_is_4k = false;
 		break;
 	case FLASH_INTEL_28F320J5: // funkball
 		m_bits = 16;
@@ -456,6 +465,9 @@ sharp_lh28f160s3_device::sharp_lh28f160s3_device(const machine_config &mconfig, 
 
 intel_te28f320_device::intel_te28f320_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh16_device(mconfig, INTEL_TE28F320, tag, owner, clock, FLASH_INTEL_TE28F320) { }
+
+spansion_s29gl064s_device::spansion_s29gl064s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh16_device(mconfig, SPANSION_S29GL064S, tag, owner, clock, FLASH_SPANSION_S29GL064S) { }
 
 intel_e28f400b_device::intel_e28f400b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh16_device(mconfig, INTEL_E28F400B, tag, owner, clock, FLASH_INTEL_E28F400B) { }
@@ -1000,8 +1012,12 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			else
 				m_data[address] = data;
 			break;
+		case 16: // senbbs test mode requires this, note, flash type is guessed there based on manufacturer + device ident as markings were erased
+			m_data[address*2] = data >> 8;
+			m_data[address*2+1] = data;
+			break;
 		default:
-			logerror( "FM_BYTEPROGRAM not supported when m_bits == %d\n", m_bits );
+			logerror( "FM_BYTEPROGRAM not supported when m_bits == %d (address %08x data %04x)\n", m_bits, address, data );
 			break;
 		}
 		m_flash_mode = FM_NORMAL;

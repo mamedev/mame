@@ -13,8 +13,8 @@
 //============================================================
 
 // standard C headers
-#include <math.h>
-#include <stdio.h>
+#include <cmath>
+#include <cstdio>
 
 // MAME headers
 #include "osdcomm.h"
@@ -41,8 +41,8 @@
 #include "modules/opengl/gl_shader_mgr.h"
 
 #if defined(SDLMAME_MACOSX) || defined(OSD_MAC)
-#include <string.h>
-#include <stdio.h>
+#include <cstring>
+#include <cstdio>
 #include <sys/types.h>
 #include <sys/sysctl.h>
 
@@ -1649,7 +1649,7 @@ void renderer_ogl::texture_compute_size_type(const render_texinfo *texsource, og
 //  texture_create
 //============================================================
 
-static int gl_checkFramebufferStatus(void)
+static int gl_checkFramebufferStatus()
 {
 	GLenum status;
 	status=(GLenum)pfn_glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT);
@@ -1714,8 +1714,8 @@ static int texture_fbo_create(uint32_t text_unit, uint32_t text_name, uint32_t f
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	pfn_glFramebufferTexture2D(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
 					GL_TEXTURE_2D, text_name, 0);
@@ -1893,8 +1893,8 @@ int renderer_ogl::texture_shader_create(const render_texinfo *texsource, ogl_tex
 	}
 	else
 	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	}
 
 	GL_CHECK_ERROR_NORMAL();
@@ -2015,8 +2015,8 @@ ogl_texture_info *renderer_ogl::texture_create(const render_texinfo *texsource, 
 		if( texture->texTarget==GL_TEXTURE_RECTANGLE_ARB )
 		{
 			// texture rectangles can't wrap
-			glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-			glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+			glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		} else {
 			// set wrapping mode appropriately
 			if (texture->flags & PRIMFLAG_TEXWRAP_MASK)
@@ -2026,8 +2026,8 @@ ogl_texture_info *renderer_ogl::texture_create(const render_texinfo *texsource, 
 			}
 			else
 			{
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			}
 		}
 	}

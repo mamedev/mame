@@ -24,13 +24,13 @@ public:
 	: osd_module(OSD_MIDI_PROVIDER, "pm"), midi_module()
 	{
 	}
-	virtual ~pm_module() { }
+	virtual ~pm_module() = default;
 
 	virtual int init(const osd_options &options)override;
 	virtual void exit()override;
 
 	virtual osd_midi_device *create_midi_device() override;
-	virtual void list_midi_devices(void) override;
+	virtual void list_midi_devices() override;
 };
 
 
@@ -43,7 +43,7 @@ class osd_midi_device_pm : public osd_midi_device
 {
 public:
 	osd_midi_device_pm(): pmStream(nullptr), xmit_cnt(0), last_status(0), rx_sysex(false) { }
-	virtual ~osd_midi_device_pm() { }
+	virtual ~osd_midi_device_pm() = default;
 	virtual bool open_input(const char *devname) override;
 	virtual bool open_output(const char *devname) override;
 	virtual void close() override;
@@ -77,7 +77,7 @@ void pm_module::exit()
 	Pm_Terminate();
 }
 
-void pm_module::list_midi_devices(void)
+void pm_module::list_midi_devices()
 {
 	int num_devs = Pm_CountDevices();
 	const PmDeviceInfo *pmInfo;

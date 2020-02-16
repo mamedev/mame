@@ -42,7 +42,7 @@ ALLOW_SAVE_TYPE(adc0808_device::state);
 adc0808_device::adc0808_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_eoc_cb(*this), m_eoc_ff_cb(*this),
-	m_in_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
+	m_in_cb(*this),
 	m_state(STATE_IDLE),
 	m_cycle_timer(nullptr),
 	m_start(0), m_address(0), m_sar(0xff), m_eoc(1)
@@ -81,9 +81,7 @@ void adc0808_device::device_start()
 	// resolve callbacks
 	m_eoc_cb.resolve_safe();
 	m_eoc_ff_cb.resolve_safe();
-
-	for (int i = 0; i < 8; i++)
-		m_in_cb[i].resolve_safe(0xff);
+	m_in_cb.resolve_all_safe(0xff);
 
 	// allocate timers
 	m_cycle_timer = timer_alloc();

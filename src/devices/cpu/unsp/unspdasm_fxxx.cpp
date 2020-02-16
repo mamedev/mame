@@ -83,9 +83,9 @@ offs_t unsp_disassembler::disassemble_fxxx_001_group(std::ostream& stream, offs_
 		uint8_t d =      (op & 0x0400) >> 10;
 
 		if (d)
-			util::stream_format(stream, "%s ds:[$04x],%d", bitops[bitop], offset);
+			util::stream_format(stream, "%s ds:[%04x],%d", bitops[bitop], ximm, offset);
 		else
-			util::stream_format(stream, "%s [$04x],%d", bitops[bitop], offset);
+			util::stream_format(stream, "%s [%04x],%d", bitops[bitop], ximm, offset);
 
 		return UNSP_DASM_OK;
 	}
@@ -263,6 +263,14 @@ offs_t unsp_disassembler::disassemble_fxxx_101_group(std::ostream& stream, offs_
 
 	case 0xf143: case 0xf343: case 0xf543: case 0xf743: case 0xf943: case 0xfb43: case 0xfd43: case 0xff43:
 		util::stream_format(stream, "int fiq,irq");
+		return UNSP_DASM_OK;
+
+	case 0xf144: case 0xf344: case 0xf544: case 0xf744: case 0xf944: case 0xfb44: case 0xfd44: case 0xff44:
+		util::stream_format(stream, "fir_mov on");
+		return UNSP_DASM_OK;
+
+	case 0xf145: case 0xf345: case 0xf545: case 0xf745: case 0xf945: case 0xfb45: case 0xfd45: case 0xff45:
+		util::stream_format(stream, "fir_mov off");
 		return UNSP_DASM_OK;
 
 	case 0xf160: case 0xf360: case 0xf560: case 0xf760: case 0xf960: case 0xfb60: case 0xfd60: case 0xff60:

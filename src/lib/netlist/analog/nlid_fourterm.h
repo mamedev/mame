@@ -36,9 +36,9 @@ namespace analog {
 	NETLIB_OBJECT(VCCS)
 	{
 	public:
-		NETLIB_CONSTRUCTOR(VCCS)
+		NETLIB_CONSTRUCTOR_EX(VCCS, nl_fptype ari = nlconst::magic(1e9))
 		, m_G(*this, "G", nlconst::one())
-		, m_RI(*this, "RI", nlconst::magic(1e9))
+		, m_RI(*this, "RI", ari)
 		, m_OP(*this, "OP", &m_IP)
 		, m_ON(*this, "ON", &m_IP)
 		, m_IP(*this, "IP", &m_IN)   // <= this should be NULL and terminal be filtered out prior to solving...
@@ -126,7 +126,7 @@ namespace analog {
 	NETLIB_OBJECT_DERIVED(CCCS, VCCS)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED(CCCS, VCCS)
+		NETLIB_CONSTRUCTOR_DERIVED_PASS(CCCS, VCCS, nlconst::one())
 		{
 			m_gfac = plib::reciprocal(m_RI());
 		}
@@ -190,6 +190,57 @@ namespace analog {
 
 
 	};
+
+	// ----------------------------------------------------------------------------------------
+	// nld_CCVS
+	// ----------------------------------------------------------------------------------------
+
+	//
+	//   Voltage controlled voltage source
+	//
+	//   Parameters:
+	//     G        Default: 1
+	//     RO       Default: 1  (would be typically 50 for an op-amp
+	//
+	//   IP ---+           +--+---- OP
+	//         |           |  |
+	//         RI          I  RO
+	//         RI => G =>  I  RO              V(OP) - V(ON) = (V(IP)-V(IN)) / RI * G
+	//         RI          I  RO
+	//         |           |  |
+	//   IN ---+           +--+---- ON
+	//
+	//   G=1 ==> 1A ==> 1V
+	//
+	//   RI = 1
+	//
+	//   Internal GI = G / RO
+	//
+
+	NETLIB_OBJECT_DERIVED(CCVS, VCCS)
+	{
+	public:
+		NETLIB_CONSTRUCTOR_DERIVED_PASS(CCVS, VCCS, nlconst::one())
+		, m_RO(*this, "RO", nlconst::one())
+		, m_OP2(*this, "_OP2", &m_ON2)
+		, m_ON2(*this, "_ON2", &m_OP2)
+		{
+			connect(m_OP2, m_OP1);
+			connect(m_ON2, m_ON1);
+		}
+
+		NETLIB_RESETI();
+
+		param_fp_t m_RO;
+
+	private:
+		//NETLIB_UPDATEI();
+		//NETLIB_UPDATE_PARAMI();
+
+		terminal_t m_OP2;
+		terminal_t m_ON2;
+	};
+
 
 } // namespace analog
 } // namespace netlist

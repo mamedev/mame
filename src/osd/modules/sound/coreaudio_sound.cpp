@@ -21,7 +21,7 @@
 
 #include <memory>
 #include <new>
-#include <string.h>
+#include <cstring>
 
 
 #ifdef MAC_OS_X_VERSION_MAX_ALLOWED

@@ -47,14 +47,14 @@ void tmp95c063_device::tmp95c063_mem16(address_map &map)
 }
 
 
-tlcs900h_device::tlcs900h_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, type, tag, owner, clock),
+tlcs900h_device::tlcs900h_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	cpu_device(mconfig, type, tag, owner, clock),
 	m_am8_16(0)
 {
 }
 
-tmp95c061_device::tmp95c061_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs900h_device(mconfig, TMP95C061, tag, owner, clock),
+tmp95c061_device::tmp95c061_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	tlcs900h_device(mconfig, TMP95C061, tag, owner, clock),
 	m_port1_read(*this),
 	m_port1_write(*this),
 	m_port2_write(*this),
@@ -99,8 +99,8 @@ void tmp95c061_device::device_config_complete()
 	}
 }
 
-tmp95c063_device::tmp95c063_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs900h_device(mconfig, TMP95C063, tag, owner, clock),
+tmp95c063_device::tmp95c063_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	tlcs900h_device(mconfig, TMP95C063, tag, owner, clock),
 	m_port1_read(*this),
 	m_port1_write(*this),
 	m_port2_write(*this),
@@ -123,7 +123,7 @@ tmp95c063_device::tmp95c063_device(const machine_config &mconfig, const char *ta
 	m_portd_write(*this),
 	m_porte_read(*this),
 	m_porte_write(*this),
-	m_an_read{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	m_an_read(*this)
 {
 }
 
@@ -1919,8 +1919,7 @@ void tmp95c063_device::device_start()
 	m_portd_write.resolve_safe();
 	m_porte_read.resolve_safe(0);
 	m_porte_write.resolve_safe();
-	for (devcb_read16 &an_read : m_an_read)
-		an_read.resolve_safe(0);
+	m_an_read.resolve_all_safe(0);
 }
 
 void tmp95c063_device::device_reset()

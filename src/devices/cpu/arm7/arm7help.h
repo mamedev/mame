@@ -7,12 +7,6 @@
 #define ARM7_ICOUNT         m_icount
 
 
-#if 0
-#define LOG(x) osd_printf_debug x
-#else
-#define LOG(x) logerror x
-#endif
-
 /***************
  * helper funcs
  ***************/

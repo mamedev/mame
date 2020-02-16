@@ -64,7 +64,7 @@ namespace analog
 	{
 		plib::unused_var(d1);
 		if (b)
-			plib::pthrow<nl_exception>("bselect with netlist and b==true");
+			throw nl_exception("bselect with netlist and b==true");
 		return d2;
 	}
 
@@ -167,8 +167,10 @@ namespace analog
 
 		NETLIB_UPDATE_PARAMI()
 		{
+			// FIXME: We only need to update the net first if this is a time stepping net
 			solve_now();
 			set_R(std::max(m_R(), exec().gmin()));
+			solve_later();
 		}
 
 	private:
@@ -283,6 +285,7 @@ namespace analog
 
 	protected:
 		//NETLIB_UPDATEI();
+		//FIXME: should be able to change
 		NETLIB_UPDATE_PARAMI() { }
 
 	private:
@@ -484,12 +487,14 @@ namespace analog
 
 		NETLIB_UPDATE_PARAMI()
 		{
+			// FIXME: We only need to update the net first if this is a time stepping net
+			//FIXME: works only for CS without function
 			solve_now();
 			const auto zero(nlconst::zero());
 			set_mat(zero, zero, -m_I(),
 					zero, zero,  m_I());
+			solve_later();
 		}
-
 
 	private:
 		state_var<nl_fptype> m_t;

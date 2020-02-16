@@ -32,7 +32,7 @@ namespace solver
 		// ----------------------------------------------------------------------------------------
 		// matrix_solver - Direct1
 		// ----------------------------------------------------------------------------------------
-		unsigned vsolve_non_dynamic(const bool newton_raphson) override
+		unsigned vsolve_non_dynamic(bool newton_raphson) override
 		{
 			this->clear_square_mat(this->m_A);
 			this->fill_matrix_and_rhs();

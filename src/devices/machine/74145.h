@@ -37,7 +37,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	devcb_write_line m_output_line_cb[10];
+	devcb_write_line::array<10> m_output_line_cb;
 
 	/* decoded number */
 	uint16_t m_number;

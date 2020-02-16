@@ -7,13 +7,19 @@
   * update to latest TOSEC (2014-10-31)
   * add usage instructions
   * check which games work and which don't and fix the supported flag accordingly
+
+  NOTES:
+  * It is recommended to run with 32k of ram (-ram 32k)
+  * Paste the usage string literally, up to but not including the period, then press enter, then start the tape. Note that currently, paste of uppercase is buggy.
+
 -->
 
 <softwarelist name="jupace_cass" description="Jupiter Cantab Jupiter Ace cassettes">
-	<software name="3dmaze" supported="no">
+	<software name="3dmaze">
 		<description>3D Maze</description>
 		<year>2007</year>
 		<publisher>Ricardo Fernandes Lopes</publisher>
+		<info name="usage" value="load 3dmaze 3dmaze" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="4169">
 				<rom name="3d maze (2007-05)(lopes, ricardo fernandes)(pd)[19k].tap" size="4169" crc="a7d40f66" sha1="0ef5fec603846859c2780399b1d39ff7d9ba9020"/>
@@ -21,10 +27,11 @@
 		</part>
 	</software>
 
-	<software name="avoider" supported="no">
+	<software name="avoider">
 		<description>Ace Avoider</description>
 		<year>1984</year>
 		<publisher>Personal Computer World</publisher>
+		<info name="usage" value="load avoider run" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="874">
 				<rom name="ace avoider (1984-07)(personal computer world)(gb)[3k].tap" size="874" crc="5e9c9468" sha1="aa15ec8a4ef6e698aba63bd876d8b7aa2b7831a8"/>
@@ -36,6 +43,7 @@
 		<description>Ace Case</description>
 		<year>1984</year>
 		<publisher>Personal Computer World</publisher>
+		<info name="usage" value="load case" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="332">
 				<rom name="ace case (1984-03)(personal computer world)(gb)[3k].tap" size="332" crc="85ed47c5" sha1="4aaf98b299f7d80ef43c05b36f897451bdcbdddb"/>
@@ -48,6 +56,7 @@
 		<description>Ace Demonstration Tape</description>
 		<year>1983</year>
 		<publisher>Jupiter Cantab</publisher>
+		<info name="usage" value="load banner" />
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Banner"/>
 			<dataarea name="cass" size="993">
@@ -84,6 +93,7 @@
 		<description>Ace Graphics (large)</description>
 		<year>1983</year>
 		<publisher>Personal Computer World</publisher>
+		<info name="usage" value="load ?plot" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="93">
 				<rom name="ace graphics (1983-09)(personal computer world)(gb)[large][3k].tap" size="93" crc="5dc239b1" sha1="7fbb43fa71eac2f177d5fc97ab55b1d1f6898f0c"/>
@@ -95,6 +105,7 @@
 		<description>Ace Graphics (small)</description>
 		<year>1983</year>
 		<publisher>Personal Computer World</publisher>
+		<info name="usage" value="load ?plot" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="85">
 				<rom name="ace graphics (1983-09)(personal computer world)(gb)[small][3k].tap" size="85" crc="6764333f" sha1="1b74c30727f1503e312fa43fe82cdcc925c6cf1e"/>
@@ -102,10 +113,11 @@
 		</part>
 	</software>
 
-	<software name="aceinvad" supported="no">
+	<software name="aceinvad">
 		<description>Ace Invaders (Hi-Tech Microsoft)</description>
 		<year>1982</year>
 		<publisher>Hi-Tech Microsoft</publisher>
+		<info name="usage" value="load graphics gr load run run" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="1141">
 				<rom name="ace invaders (1982)(hi-tech microsoft)(gb)[3k].tap" size="1141" crc="e5d9c8e1" sha1="f914f71198eb62e7a61ddb3809131b2d5b53e7b4"/>
@@ -113,10 +125,11 @@
 		</part>
 	</software>
 
-	<software name="invader1" supported="no">
+	<software name="invader1">
 		<description>Ace Invaders (Forth Dimension)</description>
 		<year>1983</year>
 		<publisher>Forth Dimension</publisher>
+		<info name="usage" value="load GR load GR load GR load GM load GM load GM z p" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="4689">
 				<rom name="ace invaders (1983)(forth dimension)[1k].tap" size="4689" crc="f8858cb9" sha1="082f81b8320a6d1d930e028cf88acefb94c4f1e3"/>
@@ -124,7 +137,7 @@
 		</part>
 	</software>
 
-	<software name="amce11" supported="no">
+	<software name="amce11">
 		<description>Ace Manual Code Examples - Chapter 11 (mice)</description>
 		<year>2007</year>
 		<publisher>Ricardo Fernandes Lopes</publisher>
@@ -247,6 +260,7 @@
 		<description>Ace Manual Code Examples - Chapter 17 (hex)</description>
 		<year>2007</year>
 		<publisher>Ricardo Fernandes Lopes</publisher>
+		<info name="usage" value="load hex" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="51">
 				<rom name="ace manual code examples - chapter 17 (2007)(lopes, ricardo fernandes)(pd)[hex][3k].tap" size="51" crc="d497883e" sha1="a2c81b7d0b8e499a90a2725f31634e6fd238a194"/>
@@ -409,10 +423,11 @@
 		</part>
 	</software>
 
-	<software name="acemines" supported="no">
+	<software name="acemines">
 		<description>Ace Mines</description>
 		<year>2004</year>
 		<publisher>Ricardo Fernandes Lopes</publisher>
+		<info name="usage" value="load mines mines" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="3006">
 				<rom name="ace mines (2004)(lopes, ricardo fernandes)[19k].tap" size="3006" crc="d508f3e5" sha1="d2038a9e0ed23db9a834f0845e06ff132bcc8412"/>
@@ -420,10 +435,11 @@
 		</part>
 	</software>
 
-	<software name="acestar" supported="no">
+	<software name="acestar"><!-- only levels 1 and 2 are playable -->
 		<description>Ace Star</description>
 		<year>2010</year>
 		<publisher>Jupiter Ace Archive Team</publisher>
+		<info name="usage" value="0 0 bload astar 16384 call" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="10365">
 				<rom name="ace star (2010)(jupiter ace archive team)(gb)(pd)[19k].tap" size="10365" crc="01217f3f" sha1="d3c69c182323c3ad45e01601611f36b40970e22d"/>
@@ -435,6 +451,7 @@
 		<description>Ace Vocab Select</description>
 		<year>1983</year>
 		<publisher>Personal Computer World</publisher>
+		<info name="usage" value="load listv" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="115">
 				<rom name="ace vocab select (1983-04)(personal computer world)(gb)[3k].tap" size="115" crc="587a7272" sha1="89ca8b51b686a964d3f710669493c61bfafcf2ea"/>
@@ -442,10 +459,11 @@
 		</part>
 	</software>
 
-	<software name="acevader" supported="no">
+	<software name="acevader">
 		<description>Acevaders</description>
 		<year>1983</year>
 		<publisher>Micro Marketing</publisher>
+		<info name="usage" value="load gr load acevaders gr r. Z = left, X = right, M = fire" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="1307">
 				<rom name="acevaders (1983)(micro marketing)(gb)[3k].tap" size="1307" crc="9e8ef6c0" sha1="8ed92d3847e59730d16232426153d10dd53712e9"/>
@@ -453,10 +471,11 @@
 		</part>
 	</software>
 
-	<software name="adventa" supported="no">
+	<software name="adventa">
 		<description>Adventure A - Planet of Death</description>
 		<year>1981</year>
 		<publisher>Artic Computing</publisher>
+		<info name="usage" value="0 0 bload adva 16384 call" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="14811">
 				<rom name="adventure a - planet of death (1981)(artic computing)(pd)[19k].tap" size="14811" crc="be67ed38" sha1="e70ed38c14e2ba34ce8faa42e0c828081d53e4b5"/>
@@ -464,10 +483,11 @@
 		</part>
 	</software>
 
-	<software name="aliendef" supported="no">
+	<software name="aliendef">
 		<description>Alien Defender</description>
 		<year>1984</year>
 		<publisher>Boldfield Computing</publisher>
+		<info name="usage" value="load defender g" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="2667">
 				<rom name="alien defender (1984)(boldfield computing)(gb)[19k].tap" size="2667" crc="38259232" sha1="d3078ea35296466da62afc45170d0955af435801"/>
@@ -479,6 +499,7 @@
 		<description>Alien Swarm</description>
 		<year>1983</year>
 		<publisher>Popular Computing Weekly</publisher>
+		<info name="usage" value="load gr load swarm gr go" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="1570">
 				<rom name="alien swarm (1983-01-20)(popular computing weekly)(gb)[3k].tap" size="1570" crc="645fc362" sha1="65a29f0ed18fd7a5269d72c065e2c70b1c2fb61e"/>
@@ -486,10 +507,11 @@
 		</part>
 	</software>
 
-	<software name="amazmaze" supported="no">
+	<software name="amazmaze">
 		<description>Amazing Maze</description>
 		<year>1984</year>
 		<publisher>Boldfield Computing</publisher>
+		<info name="usage" value="load maze g" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="1706">
 				<rom name="amazing maze (1984)(boldfield computing)(gb)[19k].tap" size="1706" crc="b8eb2dfa" sha1="b5b8a2684d8d81e715a962d697bf2a488ca89ea5"/>
@@ -501,6 +523,7 @@
 		<description>AMI Sound Toolkit</description>
 		<year>2007</year>
 		<publisher>Jupiter Ace Archive Team</publisher>
+		<info name="usage" value="load amisndkit go" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="2103">
 				<rom name="ami sound toolkit (2007)(jupiter ace archive team)(gb)(pd)[19k].tap" size="2103" crc="20cd6c82" sha1="a9fa23e053b326295b12740445225cef4ef14347"/>
@@ -512,6 +535,7 @@
 		<description>Assembler &amp; Dis-assembler</description>
 		<year>1984</year>
 		<publisher>Boldfield Computing</publisher>
+		<info name="usage" value="load a1" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="13501">
 				<rom name="assembler &amp; dis-assembler (1984)(boldfield computing)(gb)[19k].tap" size="13501" crc="bd1df519" sha1="acc4f09e4b0849e89d32be9eff677fa96ea08849"/>
@@ -519,10 +543,11 @@
 		</part>
 	</software>
 
-	<software name="astrian" supported="no">
+	<software name="astrian">
 		<description>Astrian Descent (Prototype)</description>
 		<year>1983</year>
 		<publisher>Brian Bates</publisher>
+		<info name="usage" value="load Lander run" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="7538">
 				<rom name="astrian descent (1983-08)(bates, brian)[unreleased][19k].tap" size="7538" crc="ebbe6695" sha1="1316fdf0d33cc0874f8e9addba035361bca6b533"/>
@@ -530,10 +555,11 @@
 		</part>
 	</software>
 
-	<software name="aticraid" supported="no">
+	<software name="aticraid">
 		<description>Atic Raid</description>
 		<year>1984</year>
 		<publisher>Boldfield Computing</publisher>
+		<info name="usage" value="load atic go" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="16587">
 				<rom name="atic raid (1984)(boldfield computing)(gb)(pd)[19k].tap" size="16587" crc="fd3fc960" sha1="f6758bf3e34a20260673a62d213021c5251fd419"/>
@@ -541,10 +567,11 @@
 		</part>
 	</software>
 
-	<software name="blackisl" supported="no">
+	<software name="blackisl">
 		<description>Black Island Adventure</description>
 		<year>1984</year>
 		<publisher>Boldfield Computing</publisher>
+		<info name="usage" value="load black island" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="67678">
 				<rom name="black island adventure (1984)(boldfield computing)(gb)[19k].tap" size="67678" crc="ec520816" sha1="68edb835f83ad1588bd7a840fd333cdb5ce9578f"/>
@@ -552,10 +579,11 @@
 		</part>
 	</software>
 
-	<software name="bomber" supported="no">
+	<software name="bomber">
 		<description>Bomber</description>
 		<year>1997</year>
 		<publisher>Paul Robson</publisher>
+		<info name="usage" value="load bomber play" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="1649">
 				<rom name="bomber (1997)(robson, paul)(pd)[3k].tap" size="1649" crc="feb62f38" sha1="95bc411f9d456d4f0a3d0d6a4d009de5cf69bf17"/>
@@ -563,10 +591,11 @@
 		</part>
 	</software>
 
-	<software name="breakout" supported="no">
+	<software name="breakout">
 		<description>Breakout</description>
 		<year>1983</year>
 		<publisher>Popular Computing Weekly</publisher>
+		<info name="usage" value="load breakout b. Left = A, Right = L" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="844">
 				<rom name="breakout (1983-03-17)(popular computing weekly)(gb)[3k].tap" size="844" crc="1027393d" sha1="7dbe94751150c2b378fe6ea359c55a350f8babad"/>
@@ -578,6 +607,7 @@
 		<description>Calendar</description>
 		<year>2007</year>
 		<publisher>Ricardo Fernandes Lopes</publisher>
+		<info name="usage" value="load calendar" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="549">
 				<rom name="calendar (2007)(lopes, ricardo fernandes)(pd)[3k].tap" size="549" crc="f0952595" sha1="596e02f76327d1a82eb77b2069605781c11465d9"/>
@@ -585,10 +615,11 @@
 		</part>
 	</software>
 
-	<software name="callisto" supported="no">
+	<software name="callisto">
 		<description>Callisto</description>
 		<year>1983</year>
 		<publisher>ACS Software</publisher>
+		<info name="usage" value="8930 0 bload callisto" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="8832">
 				<rom name="callisto (1983)(acs software)[16k].tap" size="8832" crc="aa6ba879" sha1="4e70e44db33c4197a6d68da3ff17ca82c23cff93"/>
@@ -596,10 +627,11 @@
 		</part>
 	</software>
 
-	<software name="cavern" supported="no">
+	<software name="cavern">
 		<description>Cavern Attack</description>
 		<year>1983</year>
 		<publisher>Hi-Tech Microsoft</publisher>
+		<info name="usage" value="load graphics load run gr run. A = up, Z = down" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="1026">
 				<rom name="cavern attack (1983)(hi-tech microsoft)(gb)[3k].tap" size="1026" crc="1518ca67" sha1="2153980802c9fd92cadcd74b729fa7ae3525142f"/>
@@ -607,10 +639,11 @@
 		</part>
 	</software>
 
-	<software name="cenipede" supported="no">
-		<description>Cenipede</description>
+	<software name="cenipede">
+		<description>Centipede</description>
 		<year>1984</year>
 		<publisher>Boldfield Computing</publisher>
+		<info name="usage" value="load centipede go" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="6361">
 				<rom name="cenipede (1984)(boldfield computing)(gb)[19k].tap" size="6361" crc="a3280ac0" sha1="32d8d0433ddd7598d03dd4acc74a891c31067a06"/>
@@ -622,6 +655,7 @@
 		<description>Champs de Mines + Casse Briques (Fra)</description>
 		<year>1983</year>
 		<publisher>ERE</publisher>
+		<info name="usage" value="0 0 bload mines 11272 64 bload g load m 7 jeu" />
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Side A (Champs de Mines)"/>
 			<dataarea name="cass" size="1009">
@@ -636,10 +670,11 @@
 		</part>
 	</software>
 
-	<software name="chase" supported="no">
+	<software name="chase">
 		<description>Chase</description>
 		<year>1983</year>
 		<publisher>Popular Computing Weekly</publisher>
+		<info name="usage" value="load chase chase. Cursor keys to move" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="557">
 				<rom name="chase (1983-01-27)(popular computing weekly)(gb)[3k].tap" size="557" crc="db067f32" sha1="14c2238920bd984003f500a175ec56c877a164fd"/>
@@ -647,13 +682,26 @@
 		</part>
 	</software>
 
-	<software name="chess" supported="no">
+	<software name="chess">
 		<description>Chess</description>
 		<year>1984</year>
 		<publisher>Boldfield Computing</publisher>
+		<info name="usage" value="load chess run" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="14409">
 				<rom name="chess (1984)(boldfield computing)(gb)[19k].tap" size="14409" crc="554a759c" sha1="376a638a45c13ba52105bb72cf79332d0cb4bc0f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="schess2"><!-- looks the same as "chess" above, but the .ace versions have different checksums, so presumably there's something different. -->
+		<description>Superchess II</description>
+		<year>1983</year>
+		<publisher>C.P. Software</publisher>
+		<info name="usage" value="load chess run" />
+		<part name="cass1" interface="jupace_cass">
+			<dataarea name="cass" size="7379620">
+				<rom name="superchess ii (1983)(cp software)[19k].wav" size="7379620" crc="d8e11db8" sha1="af47d5fdf816f47c5727ffa05252958ba678d0b4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -662,6 +710,7 @@
 		<description>Cygnus</description>
 		<year>1984</year>
 		<publisher>Boldfield Computing</publisher>
+		<info name="usage" value="load cygnus g" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="16549">
 				<rom name="cygnus (1984)(boldfield computing)(gb)[19k].tap" size="16549" crc="d0a31a28" sha1="5b0260200cafde332c514bdf319e7f29e3d312c2"/>
@@ -673,6 +722,7 @@
 		<description>Database</description>
 		<year>1985</year>
 		<publisher>Boldfield Computing</publisher>
+		<info name="usage" value="load database" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="7414">
 				<rom name="database (1985)(boldfield computing)(gb)[19k].tap" size="7414" crc="fd4d1d6b" sha1="5144c48b796a45a1d07318307cfa46f23a72f521"/>
@@ -709,10 +759,11 @@
 		</part>
 	</software>
 
-	<software name="dodge" supported="no">
-		<description>Dodge (Prototype)</description>
+	<software name="dodge">
+		<description>Dodge the Munch (Prototype)</description>
 		<year>1983</year>
 		<publisher>Brian Bates</publisher>
+		<info name="usage" value="load Dodger game" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="8496">
 				<rom name="dodge (1983-07)(bates, brian)[unreleased][19k].tap" size="8496" crc="299438f5" sha1="fcf156fc3f23d8ab256feaed6b8b625abc381ff5"/>
@@ -724,6 +775,7 @@
 		<description>Dot Man</description>
 		<year>1983</year>
 		<publisher>Micro Marketing</publisher>
+		<info name="usage" value="load s load run s run. Cursor keys to move" /><!-- When all dots are eaten, level does not end -->
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="1381">
 				<rom name="dot man (1983)(micro marketing)(gb)[3k].tap" size="1381" crc="ddb81ec6" sha1="6ee455454b1973c45f3766dcb7a181d2665477bd"/>
@@ -731,10 +783,11 @@
 		</part>
 	</software>
 
-	<software name="ducksht" supported="no">
+	<software name="ducksht">
 		<description>Duckshoot</description>
 		<year>1983</year>
 		<publisher>Micro Marketing</publisher>
+		<info name="usage" value="11272 0 bload dchars load duckshoot d. Fire = Enter" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="802">
 				<rom name="duckshoot (1983)(micro marketing)(gb)[3k].tap" size="802" crc="105055d8" sha1="1286c483d0365acbf258336c89e940d981a1ed13"/>
@@ -753,10 +806,11 @@
 		</part>
 	</software>
 
-	<software name="firebird" supported="no">
+	<software name="firebird">
 		<description>Firebird</description>
 		<year>1983</year>
 		<publisher>Voyager Software</publisher>
+		<info name="usage" value="load FIREBIRD run" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="13767">
 				<rom name="firebird (1983)(voyager software)(gb)[19k].tap" size="13767" crc="a7717297" sha1="7a16edfab50c465fb7232ba57a329a685b127180"/>
@@ -826,13 +880,14 @@
 		</part>
 	</software>
 
-	<software name="frogger" supported="no">
+	<software name="frogger">
 		<description>Frogger (Boldfield Computing)</description>
 		<year>1984</year>
 		<publisher>Boldfield Computing</publisher>
+		<info name="usage" value="load frogger go" />
 		<part name="cass1" interface="jupace_cass">
-			<dataarea name="cass" size="8284">
-				<rom name="frogger (1984)(boldfield computing)(gb)(pd)[16k].tap" size="8284" crc="ff0f890c" sha1="d921609941c978d364f5cd0055c7618a9fa7d897"/>
+			<dataarea name="cass" size="1056924">
+				<rom name="frogger (1984)(boldfield computing)[16k].wav" size="1056924" crc="6a42d361" sha1="e6860dd3be37b0b8af633c3daaea68a835be4a1a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -841,6 +896,7 @@
 		<description>Frogger (Plasma Software, Prototype)</description>
 		<year>1984</year>
 		<publisher>Plasma Software</publisher>
+		<info name="usage" value="load frogger g" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="10966">
 				<rom name="frogger (1984)(plasma software)(gb)[unreleased][19k].tap" size="10966" crc="6af2e369" sha1="679e668b89894e309f5228e160f2e6b503f00132"/>
@@ -848,10 +904,11 @@
 		</part>
 	</software>
 
-	<software name="fungle" supported="no">
-		<description>Fungle Monster (Prototype)</description>
+	<software name="fungle">
+		<description>Fungle Monsters (Prototype)</description>
 		<year>1983</year>
 		<publisher>Voyager Software</publisher>
+		<info name="usage" value="load FU run" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="7919">
 				<rom name="fungle monster (1983)(voyager software)(gb)[unreleased][19k].tap" size="7919" crc="f4bb53ba" sha1="49b215354d243a8a9bae560e0309a4fba8a328e1"/>
@@ -902,21 +959,23 @@
 		</part>
 	</software>
 
-	<software name="gobbgook" supported="no">
+	<software name="gobbgook">
 		<description>Gobbledegook</description>
 		<year>1983</year>
 		<publisher>Jupiter Cantab</publisher>
+		<info name="usage" value="load gobblegook gobblegook" />
 		<part name="cass1" interface="jupace_cass">
-			<dataarea name="cass" size="9369">
-				<rom name="gobbledegook (1983)(jupiter cantab)(gb)[19k].tap" size="9369" crc="6f2300c1" sha1="176b5fc9e7e82a7350cd62ad5a118ed76e019ec6"/>
+			<dataarea name="cass" size="1204556">
+				<rom name="gobbledegook (1983)(jupiter cantab)[19k].wav" size="1204556" crc="058a888d" sha1="70fb714a710cfd4cabe9a6ff3d5901114f71c6ac"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="grandprx" supported="no">
+	<software name="grandprx" supported="no"><!-- Error 7 -->
 		<description>Grandprix (Prototype)</description>
 		<year>1983</year>
 		<publisher>Plasma Software</publisher>
+		<info name="usage" value="load grandprix g" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="9891">
 				<rom name="grandprix (1983)(plasma software)(gb)(alpha)[unreleased][19k].tap" size="9891" crc="6c9bc237" sha1="d5cc3ff3b07a3709efbd735c9eedb86feba269f6"/>
@@ -953,10 +1012,11 @@
 		</part>
 	</software>
 
-	<software name="grexfrog" supported="no">
+	<software name="grexfrog">
 		<description>Green X Frog</description>
 		<year>1982</year>
 		<publisher>Hi-Tech Microsoft</publisher>
+		<info name="usage" value="load graphics load run grf run" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="1050">
 				<rom name="green x frog (1982)(hi-tech microsoft)(gb)[3k].tap" size="1050" crc="4aa7cdfc" sha1="cdeeb7a645e4d08d8af5c866a9f73a9f67aa78ba"/>
@@ -964,10 +1024,11 @@
 		</part>
 	</software>
 
-	<software name="guessing" supported="no">
+	<software name="guessing">
 		<description>Guessing Game</description>
 		<year>1983</year>
 		<publisher>Practical Computing</publisher>
+		<info name="usage" value="load game game" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="557">
 				<rom name="guessing game (1983-05)(practical computing)(gb)[3k].tap" size="557" crc="23b22442" sha1="46c96e4b48cb13fa2eeeca88119401561152c5d5"/>
@@ -979,6 +1040,7 @@
 		<description>HDRmon</description>
 		<year>2007</year>
 		<publisher>Edwin Blink</publisher>
+		<info name="usage" value="load HDRMON go" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="272">
 				<rom name="hdrmon (2007)(blink, edwin)(pd)[3k].tap" size="272" crc="d0e2b2fb" sha1="84e2bafdfba36b3c580dde45383425c7d6d9119f"/>
@@ -990,6 +1052,7 @@
 		<description>Invaders (Prototype)</description>
 		<year>1984</year>
 		<publisher>Plasma Software</publisher>
+		<info name="usage" value="load invaders g" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="11341">
 				<rom name="invaders (1984)(plasma software)(gb)[unreleased][19k].tap" size="11341" crc="84754081" sha1="0b7d720308d642cbc01c36f9ae440bd8b3d32eec"/>
@@ -1001,6 +1064,7 @@
 		<description>Jumpman</description>
 		<year>1984</year>
 		<publisher>Callisto Software</publisher>
+		<info name="usage" value="load jumpman start. Start = S, movement keys are Z,X,N,M" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="8735">
 				<rom name="jumpman (1984)(callisto software)[32k].tap" size="8735" crc="de04b476" sha1="94aea64e9f67bd936028b559a5824f3d6d9322a0"/>
@@ -1008,10 +1072,11 @@
 		</part>
 	</software>
 
-	<software name="kkong" supported="no">
+	<software name="kkong">
 		<description>Krazy Kong (Prototype)</description>
 		<year>198?</year>
 		<publisher>Voyager Software</publisher>
+		<info name="usage" value="load CHARACTERS CHARACTERS load KONG run" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="8243">
 				<rom name="krazy kong (19xx)(voyager software)(gb)[unreleased][19k].tap" size="8243" crc="ddd263b6" sha1="36f9be4b58c76f68791fefa228c610a3db2b2d53"/>
@@ -1023,6 +1088,7 @@
 		<description>Life (Julian Skidmore)</description>
 		<year>2006</year>
 		<publisher>Julian Skidmore</publisher>
+		<info name="usage" value="load life13 life" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="7597">
 				<rom name="life (2006)(skidmore, julian)(pd)[19k].tap" size="7597" crc="fd48c670" sha1="1ed3e807aca1d6b58551b5761f6a747fe2f6a0f4"/>
@@ -1059,10 +1125,11 @@
 		</part>
 	</software>
 
-	<software name="lightrac" supported="no">
+	<software name="lightrac">
 		<description>Light Racer (Prototype)</description>
 		<year>1983</year>
 		<publisher>Brian Bates</publisher>
+		<info name="usage" value="load LightRacer run" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="7770">
 				<rom name="light racer (1983-10)(bates, brian)[unreleased][19k].tap" size="7770" crc="24f5efc0" sha1="b7cd8e6fd4c191df907960caf66df1c85e994e33"/>
@@ -1074,6 +1141,7 @@
 		<description>Loader</description>
 		<year>1983</year>
 		<publisher>Popular Computing Weekly</publisher>
+		<info name="usage" value="load loader" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="212">
 				<rom name="loader (1983-03-01)(popular computing weekly)(gb)[3k].tap" size="212" crc="89cf2815" sha1="89b7a6d38399e67943ab5c87499e005f47706949"/>
@@ -1085,6 +1153,7 @@
 		<description>Lunar Lander</description>
 		<year>1983</year>
 		<publisher>Popular Computing Weekly</publisher>
+		<info name="usage" value="load ll ll" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="591">
 				<rom name="lunar lander (1983-04-21)(popular computing weekly)(gb)[3k].tap" size="591" crc="d2ed39d2" sha1="45ba6c6291df27a4b7be5f1b4aa5312cec0d05a3"/>
@@ -1092,10 +1161,11 @@
 		</part>
 	</software>
 
-	<software name="memstars" supported="no">
+	<software name="memstars">
 		<description>Memory Stars</description>
 		<year>1982</year>
 		<publisher>Hi-Tech Microsoft</publisher>
+		<info name="usage" value="load run run" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="819">
 				<rom name="memory stars (1982)(hi-tech microsoft)(gb)[3k].tap" size="819" crc="a4075ebe" sha1="236cf7ca47a5ee18dd9e871fc6218df9d5b1332f"/>
@@ -1103,10 +1173,11 @@
 		</part>
 	</software>
 
-	<software name="meteor" supported="no">
+	<software name="meteor">
 		<description>Meteor</description>
 		<year>1983</year>
 		<publisher>Popular Computing Weekly</publisher>
+		<info name="usage" value="load gr meteor load meteor game" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="751">
 				<rom name="meteor (1983-03-24)(popular computing weekly)(gb)[3k].tap" size="751" crc="d468a6bd" sha1="58259d1409c84425009b64084ed1eb7b8cdb49fc"/>
@@ -1114,10 +1185,11 @@
 		</part>
 	</software>
 
-	<software name="metracer" supported="no">
+	<software name="metracer">
 		<description>Meteor Racer</description>
 		<year>1983</year>
 		<publisher>Forth Dimension</publisher>
+		<info name="usage" value="load GR load GR load GR load GM load GM z p" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="3441">
 				<rom name="meteor racer (1983)(forth dimension)[1k].tap" size="3441" crc="653ceffd" sha1="04518005d92668be718ce60608ccc5664826348c"/>
@@ -1125,10 +1197,11 @@
 		</part>
 	</software>
 
-	<software name="meteors" supported="no">
+	<software name="meteors">
 		<description>Meteors (Prototype)</description>
 		<year>1984</year>
 		<publisher>Plasma Software</publisher>
+		<info name="usage" value="load asteroids g" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="10481">
 				<rom name="meteors (1984)(plasma software)(gb)[unreleased][19k].tap" size="10481" crc="e4453013" sha1="46e128fe0bd7a8d6a59d4bde99c95747cdc58a05"/>
@@ -1136,10 +1209,11 @@
 		</part>
 	</software>
 
-	<software name="micromaz" supported="no">
+	<software name="micromaz">
 		<description>Micro Maze</description>
 		<year>1982</year>
 		<publisher>Hi-Tech Microsoft</publisher>
+		<info name="usage" value="load graphics load run s run" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="2903">
 				<rom name="micro maze (1982)(hi-tech microsoft)(gb)[3k].tap" size="2903" crc="d19ff48a" sha1="cf21c6fd5bc41819e1ecea67612420457bb90bb3"/>
@@ -1147,10 +1221,11 @@
 		</part>
 	</software>
 
-	<software name="minefld" supported="no">
+	<software name="minefld">
 		<description>Minefield</description>
 		<year>1983</year>
 		<publisher>Micro Marketing</publisher>
+		<info name="usage" value="11272 0 bload mchars load minefield m" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="839">
 				<rom name="minefield (1983)(micro marketing)(gb)[3k].tap" size="839" crc="dc70bee6" sha1="6245ed5e8c97ef22189c874dfc1c703c36d21922"/>
@@ -1220,6 +1295,7 @@
 		<description>Moon Buggy (Prototype)</description>
 		<year>1984</year>
 		<publisher>Plasma Software</publisher>
+		<info name="usage" value="load moonbuggy g" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="16986">
 				<rom name="moon buggy (1984)(plasma software)(gb)[unreleased][19k].tap" size="16986" crc="8a824119" sha1="1673d33bc78223f28ff2cf85a52a9d0f3d4a9f1a"/>
@@ -1231,6 +1307,7 @@
 		<description>Morse Code Tutor</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="load morse_tuto go" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="1265">
 				<rom name="morse code tutor (19xx)(-)[19k].tap" size="1265" crc="e39c1d77" sha1="89ecfb6831c1cfe4d2d96888e9a41cad46f096a3"/>
@@ -1260,10 +1337,11 @@
 		</part>
 	</software>
 
-	<software name="othello" supported="no">
+	<software name="othello">
 		<description>Othello</description>
 		<year>1983</year>
 		<publisher>Jupiter Cantab</publisher>
+		<info name="usage" value="load othello 11272 0 bload pieces go" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="2686">
 				<rom name="othello (1983)(jupiter cantab)(gb)[19k].tap" size="2686" crc="52c4d4a8" sha1="2bf56bb00593c812122e6cdcce30e20ddec620a3"/>
@@ -1289,10 +1367,11 @@
 		</part>
 	</software>
 
-	<software name="owler" supported="no">
+	<software name="owler">
 		<description>Owler</description>
 		<year>1984</year>
 		<publisher>Callisto Software</publisher>
+		<info name="usage" value="load owler loading" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="14885">
 				<rom name="owler (1984)(callisto software)[32k].tap" size="14885" crc="7e93c42f" sha1="893dc5a34ab3a4c260304ade09191a24fc08d33b"/>
@@ -1318,10 +1397,11 @@
 		</part>
 	</software>
 
-	<software name="quickdrw" supported="no">
+	<software name="quickdrw">
 		<description>Quick-Draw (Prototype)</description>
 		<year>1983</year>
 		<publisher>Brian Bates</publisher>
+		<info name="usage" value="load quick-draw go" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="14757">
 				<rom name="quick-draw (1983-11)(bates, brian)[unreleased][19k].tap" size="14757" crc="a7ee7cfe" sha1="dd5c530defde838bdc4a02cdf8b168864d6ad971"/>
@@ -1329,10 +1409,11 @@
 		</part>
 	</software>
 
-	<software name="quickdrp" supported="no">
+	<software name="quickdrp">
 		<description>Quick-Draw Practice (Prototype)</description>
 		<year>1983</year>
 		<publisher>Brian Bates</publisher>
+		<info name="usage" value="load Qdraw run" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="15106">
 				<rom name="quick-draw practice (1983-11)(bates, brian)[unreleased][19k].tap" size="15106" crc="32b350e4" sha1="5c5e2bc35bf96f226076ef8a5cb9ce735921bb86"/>
@@ -1340,10 +1421,11 @@
 		</part>
 	</software>
 
-	<software name="robohnch" supported="no">
+	<software name="robohnch">
 		<description>Robohench (Prototype)</description>
 		<year>1984</year>
 		<publisher>Plasma Software</publisher>
+		<info name="usage" value="load robohench g" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="14200">
 				<rom name="robohench (1984)(plasma software)(gb)[unreleased][19k].tap" size="14200" crc="77b2fb21" sha1="df8ce9460aa1129cdaa3c479f28496df28b6920e"/>
@@ -1351,10 +1433,11 @@
 		</part>
 	</software>
 
-	<software name="robohunt" supported="no">
+	<software name="robohunt">
 		<description>Robohunt (Prototype)</description>
 		<year>1984</year>
 		<publisher>Plasma Software</publisher>
+		<info name="usage" value="load robohunt g" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="15678">
 				<rom name="robohunt (1984)(plasma software)(gb)[unreleased][19k].tap" size="15678" crc="e80c6db2" sha1="b5f82d7aa494fda7af6d6a096aac28fa1bfae16e"/>
@@ -1362,10 +1445,11 @@
 		</part>
 	</software>
 
-	<software name="sailhorn" supported="no">
+	<software name="sailhorn">
 		<description>Sallors' Hornpipe</description>
 		<year>1982</year>
 		<publisher>Popular Computing Weekly</publisher>
+		<info name="usage" value="load hornpipe hornpipe" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="715">
 				<rom name="sallors' hornpipe (1982-12-16)(popular computing weekly)(gb)[3k].tap" size="715" crc="770a5f4d" sha1="faca2f968632c04d46c7a46bc412b697f14cc85e"/>
@@ -1373,10 +1457,11 @@
 		</part>
 	</software>
 
-	<software name="sambombs" supported="no">
+	<software name="sambombs">
 		<description>Sam and the Time Bombs (Prototype)</description>
 		<year>1984</year>
 		<publisher>Plasma Software</publisher>
+		<info name="usage" value="load sam g" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="12654">
 				<rom name="sam and the time bombs (1984)(plasma software)(gb)[unreleased][19k].tap" size="12654" crc="edc5d37a" sha1="65289d38c4f902805edef5750247d231d42ef2ab"/>
@@ -1388,6 +1473,7 @@
 		<description>Scrambler</description>
 		<year>1982</year>
 		<publisher>Electronics &amp; Computing</publisher>
+		<info name="usage" value="load scrambler" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="729">
 				<rom name="scrambler (1982-05)(electronics &amp; computing)(gb)[3k].tap" size="729" crc="7a06c3bc" sha1="d0d1082b230633950535de09df4f2da575a38b7c"/>
@@ -1417,7 +1503,7 @@
 		</part>
 	</software>
 
-	<software name="m_snake"> <!-- was there a side B? -->
+	<software name="m_snake" supported="no"> <!-- was there a side B? -->
 		<description>Snake + Superbat</description>
 		<year>1985</year>
 		<publisher>Waylandsoft</publisher>
@@ -1435,10 +1521,11 @@
 		</part>
 	</software>
 
-	<software name="sokoace" supported="no">
+	<software name="sokoace">
 		<description>SokoACE</description>
 		<year>2006</year>
 		<publisher>Ricardo Fernandes Lopes</publisher>
+		<info name="usage" value="load sokoace play" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="14367">
 				<rom name="sokoace (2006)(lopes, ricardo fernandes)(pd)[19k].tap" size="14367" crc="b02e398d" sha1="fcda8a2a50ca573d972cc635204fe36ed2cc4f4b"/>
@@ -1446,10 +1533,11 @@
 		</part>
 	</software>
 
-	<software name="sacemap" supported="no">
+	<software name="sacemap">
 		<description>SokoACE Map Editor</description>
 		<year>2006</year>
 		<publisher>Ricardo Fernandes Lopes</publisher>
+		<info name="usage" value="load sokoed ed" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="2160">
 				<rom name="sokoace map editor (2006)(lopes, ricardo fernandes)(pd)[19k].tap" size="2160" crc="76a356e5" sha1="5f80ea127fd48e4d442cc46061dad30e2e4df1c7"/>
@@ -1457,10 +1545,11 @@
 		</part>
 	</software>
 
-	<software name="sbattle" supported="no">
+	<software name="sbattle">
 		<description>Space Battle</description>
 		<year>1982</year>
 		<publisher>Hi-Tech Microsoft</publisher>
+		<info name="usage" value="load graphics load run gr run. Fire = F" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="1224">
 				<rom name="space battle (1982)(hi-tech microsoft)(gb)[3k].tap" size="1224" crc="1569208e" sha1="b53fedd4b227ab995a15f64b595ba2a124e57062"/>
@@ -1472,6 +1561,7 @@
 		<description>Spreadsheet</description>
 		<year>1984</year>
 		<publisher>Boldfield Computing</publisher>
+		<info name="usage" value="load s" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="9882">
 				<rom name="spreadsheet (1984)(boldfield computing)(gb)[19k].tap" size="9882" crc="df789644" sha1="53a4545d04ebadbea98797684bac261a0a5b6b81"/>
@@ -1479,10 +1569,11 @@
 		</part>
 	</software>
 
-	<software name="startrek" supported="no">
+	<software name="startrek">
 		<description>Star Trek</description>
 		<year>1984</year>
 		<publisher>Plasma Software</publisher>
+		<info name="usage" value="load startrek g" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="14756">
 				<rom name="star trek (1984)(plasma software)(gb)[unreleased][19k].tap" size="14756" crc="6d084e74" sha1="53450a452cdf9b7fd70f1ef9539ff1ec581043ea"/>
@@ -1490,10 +1581,11 @@
 		</part>
 	</software>
 
-	<software name="sudoku" supported="no">
+	<software name="sudoku">
 		<description>Sudoku</description>
 		<year>2007</year>
 		<publisher>Ricardo Fernandes Lopes</publisher>
+		<info name="usage" value="load sudoku sudoku" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="3887">
 				<rom name="sudoku (2007)(lopes, ricardo fernandes)(pd)[19k].tap" size="3887" crc="a994a6fd" sha1="e1915263651eae3d5a953aa9f8f8cb39b9d31f0c"/>
@@ -1501,10 +1593,23 @@
 		</part>
 	</software>
 
-	<software name="tankbatl" supported="no">
+	<software name="surround">
+		<description>Forth Surround</description>
+		<year>1983</year>
+		<publisher>Your Computer</publisher>
+		<info name="usage" value="load surround go" />
+		<part name="cass1" interface="jupace_cass">
+			<dataarea name="cass" size="450618">
+				<rom name="forth surround (1983-06)(your computer)[3k]" size="450618" crc="11cfef0d" sha1="aece6398f52f8ba159111846a4c6885dd92f4629"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tankbatl">
 		<description>Tank Battle (Prototype)</description>
 		<year>1984</year>
 		<publisher>Plasma Software</publisher>
+		<info name="usage" value="load tankbattle g" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="14380">
 				<rom name="tank battle (1984)(plasma software)(gb)[unreleased][19k].tap" size="14380" crc="27b07d5d" sha1="12448adfad4e0ab5abacd0f9c7f8d6852cad567d"/>
@@ -1516,6 +1621,7 @@
 		<description>Teach Yourself Forth on the Jupiter Ace</description>
 		<year>1982</year>
 		<publisher>Viscount</publisher>
+		<info name="usage" value="load forth" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="18676">
 				<rom name="teach yourself forth on the jupiter ace (1982)(viscount)[3k].tap" size="18676" crc="85aecda2" sha1="2ef64991e6a961a9942a7442d0d49003741c015a"/>
@@ -1523,10 +1629,11 @@
 		</part>
 	</software>
 
-	<software name="tetris" supported="no">
+	<software name="tetris">
 		<description>Tetris</description>
 		<year>2009</year>
 		<publisher>Jupiter Ace Archive Team</publisher>
+		<info name="usage" value="load tetris tetris" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="1398">
 				<rom name="tetris (2009)(jupiter ace archive team)(gb)(pd)[19k].tap" size="1398" crc="f4b103d4" sha1="a7f264ec1375cc2befc64203f516ae5861bda40b"/>
@@ -1552,10 +1659,11 @@
 		</part>
 	</software>
 
-	<software name="hanoi" supported="no">
+	<software name="hanoi">
 		<description>Towers of Hanoi</description>
 		<year>2006</year>
 		<publisher>Ricardo Fernandes Lopes</publisher>
+		<info name="usage" value="load hanoi hanoi" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="835">
 				<rom name="towers of hanoi (2006)(lopes, ricardo fernandes)(pd)[3k].tap" size="835" crc="43c2ed79" sha1="6be70c75aaf9f6f548e29e8f874208d455d065c7"/>
@@ -1587,10 +1695,11 @@
 		</part>
 	</software>
 
-	<software name="turbo" supported="no">
+	<software name="turbo">
 		<description>Turbo (Prototype)</description>
 		<year>1984</year>
 		<publisher>Plasma Software</publisher>
+		<info name="usage" value="load turbo 0 0 bload track turbo. Left = 5, Right = 6" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="16958">
 				<rom name="turbo (1984)(plasma software)(gb)[unreleased][19k].tap" size="16958" crc="b1d5aad0" sha1="6f23ddf66bcd4cb6a7bfc0f2b88b6282e7136a2e"/>
@@ -1694,6 +1803,7 @@
 		<description>Valkyr + Life (Prototype)</description>
 		<year>1985</year>
 		<publisher>Colinsoft</publisher>
+		<info name="usage" value="load valkyr go" /><!-- computer reboots when starting the game, bad dump? -->
 		<part name="cass1" interface="jupace_cass">
 			<feature name="part_id" value="Tape 1 (Valkyr)"/>
 			<dataarea name="cass" size="12855">
@@ -1712,6 +1822,7 @@
 		<description>Words</description>
 		<year>1983</year>
 		<publisher>Popular Computing Weekly</publisher>
+		<info name="usage" value="load words" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="217">
 				<rom name="words (1983-10-27)(popular computing weekly)(gb)[3k].tap" size="217" crc="26dde89c" sha1="7160df6c1014124467482843f8df4165a083bcab"/>
@@ -1723,6 +1834,7 @@
 		<description>WRD</description>
 		<year>2006</year>
 		<publisher>Ricardo Fernandes Lopes</publisher>
+		<info name="usage" value="load wrd" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="614">
 				<rom name="wrd (2006)(lopes, ricardo fernandes)(pd)[3k].tap" size="614" crc="11dfa38f" sha1="ece1603e9e81093092aae91fcf19b7d45b9496cb"/>
@@ -1730,10 +1842,11 @@
 		</part>
 	</software>
 
-	<software name="zapem" supported="no">
+	<software name="zapem">
 		<description>Zapem</description>
 		<year>1983</year>
 		<publisher>Micro Marketing</publisher>
+		<info name="usage" value="11272 0 bload zchars load zapem z. Left = 6, Right = 7, 9 = Thrust, 0 = Fire" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="943">
 				<rom name="zapem (1983)(micro marketing)(gb)[3k].tap" size="943" crc="f14dcfec" sha1="8f60e73a34ec2f967caffd37e9cc6d2c44b919c8"/>
@@ -1741,10 +1854,11 @@
 		</part>
 	</software>
 
-	<software name="zombies" supported="no">
-		<description>Zombies &amp; Potholes</description>
+	<software name="zombies">
+		<description>Zombies and Potholes</description>
 		<year>1983</year>
 		<publisher>Jupiter Cantab</publisher>
+		<info name="usage" value="load zombpot zombpot" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="7961">
 				<rom name="zombies &amp; potholes (1983)(jupiter cantab)(gb)[19k].tap" size="7961" crc="3a60a598" sha1="bc26562c10583be35e322dbdad666d19b7e27822"/>
@@ -1756,6 +1870,7 @@
 		<description>ZX Printer Driver</description>
 		<year>1983</year>
 		<publisher>Remsoft</publisher>
+		<info name="usage" value="load zx-printer" />
 		<part name="cass1" interface="jupace_cass">
 			<dataarea name="cass" size="2882">
 				<rom name="zx printer driver (1983)(remsoft)(gb)[tape 11][3k].tap" size="2882" crc="ed237c12" sha1="76f10c96a056edc1151a24f9e87209ec379b73d5"/>

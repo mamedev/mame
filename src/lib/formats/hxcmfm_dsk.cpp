@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 
-#include <assert.h>
+#include <cassert>
 
 #include "hxcmfm_dsk.h"
 

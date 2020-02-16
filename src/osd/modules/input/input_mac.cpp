@@ -14,8 +14,8 @@
 #if defined(OSD_MAC)
 
 // System headers
-#include <ctype.h>
-#include <stddef.h>
+#include <cctype>
+#include <cstddef>
 #include <mutex>
 #include <memory>
 #include <algorithm>

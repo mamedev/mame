@@ -202,11 +202,13 @@ void xavix_state::update_pen(int pen, uint8_t shval, uint8_t lval)
 	int b_real = b1 * 255.0f;
 
 	m_palette->set_pen_color(pen, r_real, g_real, b_real);
+
+	m_screen->update_partial(m_screen->vpos());
 }
 
 
 
-void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
+void xavix_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which)
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -287,7 +289,7 @@ void xavix_state::decode_inline_header(int &flipx, int &flipy, int &test, int &p
 	//if (debug_packets) LOG("\n");
 }
 
-void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int line)
+void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which, int line)
 {
 	uint8_t* tileregs;
 	if (which == 0)
@@ -488,7 +490,7 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap,
 	}
 }
 
-void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void xavix_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -496,7 +498,7 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 	}
 }
 
-void xavix_state::draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int line)
+void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int line)
 {
 	int alt_addressing = 0;
 
@@ -703,9 +705,9 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap,
 	}
 }
 
-void xavix_state::draw_tile_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line)
+void xavix_state::draw_tile_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line)
 {
-	//const pen_t *paldata = m_palette->pens();
+	const pen_t *paldata = m_palette->pens();
 	if (ypos > cliprect.max_y || ypos < cliprect.min_y)
 		return;
 
@@ -760,11 +762,8 @@ void xavix_state::draw_tile_line(screen_device &screen, bitmap_ind16 &bitmap, co
 
 					if ((m_palram_sh[pen] & 0x1f) < 24) // hue values 24-31 are transparent
 					{
-						uint16_t* yposptr = &bitmap.pix16(ypos);
-						yposptr[col] = pen;
-
-						//uint32_t* yposptr = &bitmap.pix32(ypos);
-						//yposptr[col] = paldata[pen];
+						uint32_t* yposptr = &bitmap.pix32(ypos);
+						yposptr[col] = paldata[pen];
 
 						zyposptr[col] = zval;
 					}
@@ -774,8 +773,9 @@ void xavix_state::draw_tile_line(screen_device &screen, bitmap_ind16 &bitmap, co
 	}
 }
 
-uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	const pen_t *paldata = m_palette->pens();
 	// not sure what you end up with if you fall through all layers as transparent, so far no issues noticed
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_zbuffer.fill(0, cliprect);
@@ -810,7 +810,7 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				clip.max_x = cliprect.max_x;
 		}
 	}
-	bitmap.fill(0, clip);
+	bitmap.fill(paldata[0], clip);
 
 	draw_tilemap(screen, bitmap, clip, 1);
 	draw_tilemap(screen, bitmap, clip, 0);
@@ -836,7 +836,7 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		uint16_t start = ((m_bmp_base[0x11] << 8) | m_bmp_base[0x10]);
 		uint8_t end = m_bmp_base[0x12]; // ?? related to width?
 		uint8_t size = m_bmp_base[0x13]; // some kind of additional scaling?
-		uint8_t mode = m_bmp_base[0x14]; // eanble,bpp, zval etc.
+		uint8_t mode = m_bmp_base[0x14]; // enable,bpp, zval etc.
 
 		uint32_t unused = ((m_bmp_base[0x15] << 16) | (m_bmp_base[0x16] << 8) | (m_bmp_base[0x17] << 0));
 
@@ -856,29 +856,35 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			int width = (rgtadr * 8) / bpp;
 
 			//int count = 0;
-			set_data_address(base + base2, 0);
 
-			for (int y = top; y < 256; y++)
+			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
-				for (int x = 0; x < width; x++)
+				int line = y - top;
+
+				if ((line > 0) && (y < bot))
 				{
-					uint16_t* yposptr = &bitmap.pix16(y);
-					uint16_t* zyposptr = &m_zbuffer.pix16(y);
+					set_data_address(base + base2 + ((line * width * bpp) / 8), 0);
 
-					uint8_t dat = 0;
-					for (int i = 0; i < bpp; i++)
+					for (int x = 0; x < width; x++)
 					{
-						dat |= (get_next_bit() << i);
-					}
+						uint32_t* yposptr = &bitmap.pix32(y);
+						uint16_t* zyposptr = &m_zbuffer.pix16(y);
 
-					if (((x <= cliprect.max_x) && (x >= cliprect.min_x)) && ((y <= cliprect.max_y) && (y >= cliprect.min_y)))
-					{
-						if ((m_bmp_palram_sh[dat] & 0x1f) < 24) // same transparency logic as everything else? (baseball title)
+						uint8_t dat = 0;
+						for (int i = 0; i < bpp; i++)
 						{
-							if (zval >= zyposptr[x])
+							dat |= (get_next_bit() << i);
+						}
+
+						if (((x <= cliprect.max_x) && (x >= cliprect.min_x)) && ((y <= cliprect.max_y) && (y >= cliprect.min_y)))
+						{
+							if ((m_bmp_palram_sh[dat] & 0x1f) < 24) // same transparency logic as everything else? (baseball title)
 							{
-								yposptr[x] = dat + 0x100;
-								zyposptr[x] = zval;
+								if (zval >= zyposptr[x])
+								{
+									yposptr[x] = paldata[dat + 0x100];
+									zyposptr[x] = zval;
+								}
 							}
 						}
 					}

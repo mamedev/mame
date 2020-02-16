@@ -300,6 +300,27 @@ ROM_START( mastboyoa )
 	ROM_LOAD( "masterboy-1987-82s129-l-ic40.bin", 0x000, 0x100, CRC(4d061216) SHA1(1abf9320da75a3fd23c6bdbcc4088d18e133c4e5) )  // Identical to the parent set.
 ROM_END
 
+ROM_START( mastboyob )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "mb_p1.ic14", 0x0000, 0x4000, CRC(9ff8d386) SHA1(4bf0df6d5cb605f2a4c9ef3cf0ece229ce8cbb40) ) // masterboy-1987-27128-ic14.bin       43.347168%
 
-GAME( 1987, mastboyo,  0,        mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Covielsa license)", "Master Boy (1987, Z80 hardware, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, mastboyoa, mastboyo, mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Covielsa license)", "Master Boy (1987, Z80 hardware, set 2)", MACHINE_SUPPORTS_SAVE )
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "fij.c36", 0x0000, 0x4000, CRC(bdd0f821) SHA1(63f607bccf1eded92531b2a10605d0578d371f77) ) // masterboy-1987-27128-mbfij-ic36.bin    97.308350%
+
+	ROM_REGION( 0x80000, "questions", ROMREGION_ERASEFF )
+	ROM_LOAD( "mb_3.ic9",  0x60000, 0x08000, CRC(b92ffd4f) SHA1(34431d6771e58f2ec083756f07e8b2a02bdb0e5a) ) // mastboy_27256.ic10    IDENTICAL
+	ROM_LOAD( "mb_4.ic8",  0x68000, 0x08000, CRC(c4844264) SHA1(e8a45b87878f95ad4590ad5e19c15339fde1a762) ) // mastboy_27256.ic9     99.996948%
+	ROM_LOAD( "mb_1.ic11", 0x70000, 0x08000, CRC(f5a9bf63) SHA1(53890e615cd73809c950a302bb423ec111ee493b) ) // mastboy_27256.ic12    99.996948%
+	ROM_LOAD( "mb_2.ic10", 0x78000, 0x08000, CRC(f2611186) SHA1(05860fecc23014c39cb28762763e94bc91412b34) ) // mastboy_27256.ic11    IDENTICAL
+
+	ROM_REGION( 0x100, "proms", 0 ) // timing or memory mapping?
+	ROM_LOAD( "d_82s129.ic23", 0x000, 0x100, CRC(d5fd2dfd) SHA1(66e3afa9e73507db0647d125c0be992b27d08adc) )
+
+	ROM_REGION( 0x200, "palette", 0 )
+	ROM_LOAD( "h_82s129.ic39", 0x100, 0x100, CRC(8e965fc3) SHA1(b52c8e505438937c7a5d3e1393d54f0ad0425e78) )
+	ROM_LOAD( "l_82s129.ic40", 0x000, 0x100, CRC(4d061216) SHA1(1abf9320da75a3fd23c6bdbcc4088d18e133c4e5) )
+ROM_END
+
+GAME( 1987, mastboyo,  0,        mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Covielsa license)",    "Master Boy (1987, Z80 hardware, Covielsa, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mastboyoa, mastboyo, mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Covielsa license)",    "Master Boy (1987, Z80 hardware, Covielsa, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mastboyob, mastboyo, mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Ichi-Funtel license)", "Master Boy (1987, Z80 hardware, Ichi-Funtel)", MACHINE_SUPPORTS_SAVE )

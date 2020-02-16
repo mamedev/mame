@@ -117,7 +117,7 @@ private:
 
 	// internal state
 	devcb_write_line   m_intr_cb;              // interrupt callback
-	devcb_write_line   m_zc_cb[4];             // zero crossing/timer output callbacks
+	devcb_write_line::array<4> m_zc_cb;             // zero crossing/timer output callbacks
 
 	u8                 m_vector;               // interrupt vector
 

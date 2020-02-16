@@ -66,6 +66,7 @@ namespace analog
 
 	NETLIB_UPDATE_PARAM(POT)
 	{
+		// FIXME: We only need to update the net first if this is a time stepping net
 		m_R1.solve_now();
 		m_R2.solve_now();
 
@@ -76,6 +77,8 @@ namespace analog
 			v = nlconst::one() - v;
 		m_R1.set_R(std::max(m_R() * v, exec().gmin()));
 		m_R2.set_R(std::max(m_R() * (nlconst::one() - v), exec().gmin()));
+		m_R1.solve_later();
+		m_R2.solve_later();
 
 	}
 
@@ -97,6 +100,7 @@ namespace analog
 
 	NETLIB_UPDATE_PARAM(POT2)
 	{
+		// FIXME: We only need to update the net first if this is a time stepping net
 		m_R1.solve_now();
 
 		nl_fptype v = m_Dial();
@@ -106,6 +110,7 @@ namespace analog
 		if (m_Reverse())
 			v = nlconst::one() - v;
 		m_R1.set_R(std::max(m_R() * v, exec().gmin()));
+		m_R1.solve_later();
 	}
 
 	// ----------------------------------------------------------------------------------------

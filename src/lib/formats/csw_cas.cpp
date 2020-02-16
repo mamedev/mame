@@ -22,10 +22,10 @@ Offset  Value   Type    Description
 
 */
 
-#include <string.h>
+#include <cstring>
 
 #include <zlib.h>
-#include <assert.h>
+#include <cassert>
 #include "uef_cas.h"
 #include "csw_cas.h"
 

@@ -1630,14 +1630,13 @@ void x68k_state::x68000_base(machine_config &config)
 	/* device hardware */
 	MC68901(config, m_mfpdev, 16_MHz_XTAL / 4);
 	m_mfpdev->set_timer_clock(16_MHz_XTAL / 4);
-	m_mfpdev->set_rx_clock(0);
-	m_mfpdev->set_tx_clock(0);
 	m_mfpdev->out_irq_cb().set(FUNC(x68k_state::mfp_irq_callback));
-	m_mfpdev->out_tbo_cb().set(m_mfpdev, FUNC(mc68901_device::clock_w));
+	m_mfpdev->out_tbo_cb().set(m_mfpdev, FUNC(mc68901_device::tc_w));
+	m_mfpdev->out_tbo_cb().append(m_mfpdev, FUNC(mc68901_device::rc_w));
 	m_mfpdev->out_so_cb().set("keyboard", FUNC(rs232_port_device::write_txd));
 
 	rs232_port_device &keyboard(RS232_PORT(config, "keyboard", keyboard_devices, "x68k"));
-	keyboard.rxd_handler().set(m_mfpdev, FUNC(mc68901_device::write_rx));
+	keyboard.rxd_handler().set(m_mfpdev, FUNC(mc68901_device::si_w));
 
 	I8255A(config, m_ppi, 0);
 	m_ppi->in_pa_callback().set(FUNC(x68k_state::ppi_port_a_r));

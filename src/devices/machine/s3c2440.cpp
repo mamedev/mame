@@ -220,22 +220,6 @@ static const uint32_t MAP_SUBINT_TO_INT[15] =
 #define S3C24XX_CORE_PIN_OM0  S3C2440_CORE_PIN_OM0
 #define S3C24XX_CORE_PIN_OM1  S3C2440_CORE_PIN_OM1
 
-
-#define VERBOSE_LEVEL ( 0 )
-
-static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, const char *s_fmt, ...)
-{
-	if (VERBOSE_LEVEL >= n_level)
-	{
-		va_list v;
-		char buf[32768];
-		va_start(v, s_fmt);
-		vsprintf(buf, s_fmt, v);
-		va_end(v);
-		device.logerror("%s: %s", device.machine().describe_context( ), buf);
-	}
-}
-
 #define DEVICE_S3C2440
 #define S3C24_CLASS_NAME s3c2440_device
 #include "machine/s3c24xx.hxx"
@@ -302,7 +286,7 @@ s3c2440_device::~s3c2440_device()
 
 void s3c2440_device::device_start()
 {
-	address_space &space = m_cpu->memory().space( AS_PROGRAM);
+	address_space &space = m_cpu->space(AS_PROGRAM);
 	space.install_readwrite_handler(0x48000000, 0x4800003b, read32_delegate(*this, FUNC(s3c2440_device::s3c24xx_memcon_r)), write32_delegate(*this, FUNC(s3c2440_device::s3c24xx_memcon_w)));
 	space.install_readwrite_handler(0x49000000, 0x4900005b, read32_delegate(*this, FUNC(s3c2440_device::s3c24xx_usb_host_r)), write32_delegate(*this, FUNC(s3c2440_device::s3c24xx_usb_host_w)));
 	space.install_readwrite_handler(0x4a000000, 0x4a00001f, read32_delegate(*this, FUNC(s3c2440_device::s3c24xx_irq_r)), write32_delegate(*this, FUNC(s3c2440_device::s3c24xx_irq_w)));

@@ -20,8 +20,8 @@
 
 // standard sdl header
 #include <SDL2/SDL.h>
-#include <ctype.h>
-#include <stddef.h>
+#include <cctype>
+#include <cstddef>
 #include <mutex>
 #include <memory>
 #include <queue>

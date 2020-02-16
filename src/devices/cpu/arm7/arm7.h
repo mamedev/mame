@@ -179,7 +179,7 @@ protected:
 	uint32_t m_domainAccessControl;
 	uint8_t m_decoded_access_control[16];
 
-	uint8_t m_archRev;          // ARM architecture revision (3, 4, and 5 are valid)
+	uint8_t m_archRev;          // ARM architecture revision (3, 4, 5, and 6 are valid)
 	uint32_t m_archFlags;        // architecture flags
 
 	uint32_t m_vectorbase;
@@ -602,6 +602,13 @@ public:
 	arm710a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class arm710t_cpu_device : public arm7_cpu_device
+{
+public:
+	// construction/destruction
+	arm710t_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 class arm9_cpu_device : public arm7_cpu_device
 {
 public:
@@ -667,6 +674,12 @@ class arm1176jzf_s_cpu_device : public arm11_cpu_device
 public:
 	// construction/destruction
 	arm1176jzf_s_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual DECLARE_READ32_MEMBER( arm7_rt_r_callback ) override;
+	virtual DECLARE_WRITE32_MEMBER( arm7_rt_w_callback ) override;
+
+protected:
+	virtual void device_reset() override;
 };
 
 class igs036_cpu_device : public arm946es_cpu_device
@@ -694,6 +707,7 @@ public:
 DECLARE_DEVICE_TYPE(ARM7,         arm7_cpu_device)
 DECLARE_DEVICE_TYPE(ARM7_BE,      arm7_be_cpu_device)
 DECLARE_DEVICE_TYPE(ARM710A,      arm710a_cpu_device)
+DECLARE_DEVICE_TYPE(ARM710T,      arm710t_cpu_device)
 DECLARE_DEVICE_TYPE(ARM7500,      arm7500_cpu_device)
 DECLARE_DEVICE_TYPE(ARM9,         arm9_cpu_device)
 DECLARE_DEVICE_TYPE(ARM920T,      arm920t_cpu_device)

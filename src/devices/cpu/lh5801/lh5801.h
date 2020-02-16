@@ -75,6 +75,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 2); }
 	virtual uint32_t execute_min_cycles() const noexcept override { return 2; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 19; }
 	virtual uint32_t execute_input_lines() const noexcept override { return 2; }

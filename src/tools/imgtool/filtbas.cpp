@@ -18,9 +18,9 @@
 
 *****************************************************************************/
 
-#include <string.h>
-#include <stdarg.h>
-#include <ctype.h>
+#include <cstring>
+#include <cstdarg>
+#include <cctype>
 
 #include "imgtool.h"
 #include "formats/imageutl.h"

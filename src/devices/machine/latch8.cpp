@@ -109,8 +109,8 @@ latch8_device::latch8_device(const machine_config &mconfig, const char *tag, dev
 	, m_maskout(0)
 	, m_xorvalue(0)
 	, m_nosync(0)
-	, m_write_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_read_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_write_cb(*this)
+	, m_read_cb(*this)
 {
 }
 

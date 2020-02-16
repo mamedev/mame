@@ -70,7 +70,7 @@ public:
 		m_inputs(*this, "IN.0")
 	{ }
 
-	// machine drivers
+	// machine configs
 	void fdes2000d(machine_config &config);
 	void fdes2100d(machine_config &config);
 
@@ -129,7 +129,7 @@ public:
 		desdis_state(mconfig, type, tag)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void fdes2265(machine_config &config);
 	void fdes2325(machine_config &config);
 
@@ -287,7 +287,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void desdis_state::fdes2100d(machine_config &config)
@@ -296,7 +296,7 @@ void desdis_state::fdes2100d(machine_config &config)
 	M65C02(config, m_maincpu, 6_MHz_XTAL); // W65C02P-6
 	m_maincpu->set_addrmap(AS_PROGRAM, &desdis_state::fdes2100d_map);
 
-	const attotime irq_period = attotime::from_hz(630); // from 556 timer (22nF, 102K, 1K)
+	const attotime irq_period = attotime::from_hz(600); // from 556 timer (22nF, 102K, 1K), ideal frequency is 600Hz
 	TIMER(config, m_irq_on).configure_periodic(FUNC(desdis_state::irq_on<M6502_IRQ_LINE>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
 	TIMER(config, "irq_off").configure_periodic(FUNC(desdis_state::irq_off<M6502_IRQ_LINE>), irq_period);
@@ -333,9 +333,9 @@ void desmas_state::fdes2265(machine_config &config)
 	M68000(config.replace(), m_maincpu, 16_MHz_XTAL); // MC68HC000P12F
 	m_maincpu->set_addrmap(AS_PROGRAM, &desmas_state::fdes2265_map);
 
-	const attotime irq_period = attotime::from_hz(597); // from 555 timer, measured
+	const attotime irq_period = attotime::from_hz(600); // from 555 timer, ideal frequency is 600Hz (measured 597Hz)
 	TIMER(config.replace(), m_irq_on).configure_periodic(FUNC(desmas_state::irq_on<M68K_IRQ_4>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(6000)); // active for 6us
+	m_irq_on->set_start_delay(irq_period - attotime::from_usec(6)); // active for 6us
 	TIMER(config.replace(), "irq_off").configure_periodic(FUNC(desmas_state::irq_off<M68K_IRQ_4>), irq_period);
 
 	config.set_default_layout(layout_fidel_desdis_68kr);
@@ -401,4 +401,4 @@ CONS( 1988, fdes2100d, 0,         0, fdes2100d, desdis, desdis_state, init_fdes2
 CONS( 1988, fdes2000d, fdes2100d, 0, fdes2000d, desdis, desdis_state, init_fdes2100d, "Fidelity Electronics", "Designer 2000 Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1989, fdes2265,  0,         0, fdes2265,  desdis, desmas_state, init_fdes2265,  "Fidelity Electronics", "Designer Mach III Master 2265", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, fdes2325,  fdes2265,  0, fdes2325,  desdis, desmas_state, empty_init,     "Fidelity Electronics", "Designer Mach IV Master 2325", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, fdes2325,  fdes2265,  0, fdes2325,  desdis, desmas_state, empty_init,     "Fidelity Electronics", "Designer Mach IV 68020 Master 2325", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

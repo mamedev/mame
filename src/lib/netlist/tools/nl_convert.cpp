@@ -9,12 +9,15 @@
 
 #include <algorithm>
 #include <unordered_map>
+#include <vector>
 
 // FIXME: temporarily defined here - should be in a file
 // FIXME: family logic in netlist is convoluted, create
 //        define a model param on core device
 
 // Format: external name,netlist device,model
+
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays)
 static constexpr const char s_lib_map[] =
 "SN74LS00D,   TTL_7400_DIP,  74LSXX\n"
 "SN74LS04D,   TTL_7404_DIP,  74LSXX\n"
@@ -40,7 +43,7 @@ using lib_map_t = std::unordered_map<pstring, lib_map_entry>;
 
 static lib_map_t read_lib_map(const pstring &lm)
 {
-	auto reader = plib::putf8_reader(std::istringstream(lm));
+	auto reader = plib::putf8_reader(plib::make_unique<std::istringstream>(lm));
 	reader.stream().imbue(std::locale::classic());
 	lib_map_t m;
 	pstring line;
@@ -58,29 +61,38 @@ static lib_map_t read_lib_map(const pstring &lm)
 
 nl_convert_base_t::nl_convert_base_t()
 	: out(&m_buf)
-	, m_numberchars("0123456789-+e.")
+	, m_numberchars("0123456789-+Ee.")
 {
 	m_buf.imbue(std::locale::classic());
 	m_units = {
-			{"T",   "",      1.0e12 },
-			{"G",   "",      1.0e9  },
-			{"MEG", "RES_M({1})", 1.0e6  },
-			{"k",   "RES_K({1})", 1.0e3  }, // eagle
-			{"K",   "RES_K({1})", 1.0e3  },
-			{"",    "{1}",        1.0e0  },
-			{"M",   "CAP_M({1})", 1.0e-3 },
-			{"u",   "CAP_U({1})", 1.0e-6 }, // eagle
-			{"U",   "CAP_U({1})", 1.0e-6 },
+			{"T",   "{1}e12",      1.0e12 },
+			{"G",   "{1}e9",       1.0e9  },
+			{"MEG", "RES_M({1})",  1.0e6  },
+			{"k",   "RES_K({1})",  1.0e3  }, // eagle
+			{"K",   "RES_K({1})",  1.0e3  },
+			{"",    "{1}",         1.0e0  },
+			{"M",   "{1}e-3",      1.0e-3 },
+			{"u",   "CAP_U({1})",  1.0e-6 }, // eagle
+			{"U",   "CAP_U({1})",  1.0e-6 },
 			{"μ",   "CAP_U({1})",  1.0e-6 },
-			{"µ",   "CAP_U({1})",  1.0e-6 },
-			{"N",   "CAP_N({1})", 1.0e-9 },
-			{"pF",  "CAP_P({1})", 1.0e-12},
-			{"P",   "CAP_P({1})", 1.0e-12},
-			{"F",   "{1}e-15",    1.0e-15},
+			{"N",   "CAP_N({1})",  1.0e-9 },
+			{"pF",  "CAP_P({1})",  1.0e-12},
+			{"P",   "CAP_P({1})",  1.0e-12},
+			{"F",   "{1}e-15",     1.0e-15},
 
 			{"MIL", "{1}",  25.4e-6}
 	};
 
+	dev_map =
+	{
+		{ "VCCS", {"OP", "ON", "IP", "IN"} },
+		{ "VCVS", {"OP", "ON", "IP", "IN"} },
+		{ "CCCS", {"OP", "ON", "IP", "IN"} },
+		{ "CCVS", {"OP", "ON", "IP", "IN"} },
+		{ "VS", {"1", "2"} },
+		{ "TTL_INPUT", {"Q", "VCC", "GND"} },
+		{ "DIODE", {"A", "K"} },
+	};
 }
 
 nl_convert_base_t::~nl_convert_base_t()
@@ -127,6 +139,10 @@ void nl_convert_base_t::add_device(const pstring &atype, const pstring &aname)
 
 void nl_convert_base_t::add_term(const pstring &netname, const pstring &termname)
 {
+	// Ignore NC nets!
+	if (plib::startsWith(netname,"NC_"))
+		return;
+
 	net_t * net = nullptr;
 	auto idx = m_nets.find(netname);
 	if (idx != m_nets.end())
@@ -147,13 +163,70 @@ void nl_convert_base_t::add_term(const pstring &netname, const pstring &termname
 		net->terminals().push_back(termname);
 }
 
+void nl_convert_base_t::add_term(const pstring &netname, const pstring &devname, unsigned term)
+{
+	auto e = dev_map.find(get_device(devname)->type());
+	if (e == dev_map.end())
+		out("// ERROR: No terminals found for device {}\n", devname);
+	else
+	{
+		if (term >= e->second.size())
+			out("// ERROR: {} : Term {} exceeds number of terminals {}\n", netname, devname, term);
+		else
+			add_term(netname, devname + "." + e->second[term]);
+	}
+}
+
+void nl_convert_base_t::add_device_extra_s(const pstring &devname, const pstring &extra)
+{
+	auto dev = get_device(devname);
+	if (dev == nullptr)
+		out("// ERROR: Device {} not found\n", devname);
+	else
+	{
+		dev->add_extra(extra);
+	}
+}
+
+
+
 void nl_convert_base_t::dump_nl()
 {
+	// do replacements
+	for (auto &r : m_replace)
+	{
+		// Get the device entry
+		auto *d = get_device(r.m_ce);
+		if (d == nullptr)
+		{
+			out("ERROR: Can not find <{}>\n", r.m_ce);
+			continue;
+		}
+
+		auto e = dev_map.find(d->type());
+		if (e == dev_map.end())
+		{
+			out("ERROR: Can not find type {}\n", d->type());
+			continue;
+		}
+		pstring term1 = r.m_ce + "." + e->second[0];
+		// scan all nets
+		for (auto &n : m_nets)
+		{
+			for (auto &t : n.second->terminals())
+			{
+				if (t == term1)
+					t = r.m_repterm;
+			}
+		}
+		add_term(r.m_net, term1);
+	}
+
 	for (auto & alias : m_ext_alias)
 	{
 		net_t *net = m_nets[alias].get();
 		// use the first terminal ...
-		out("ALIAS({}, {})\n", alias.c_str(), net->terminals()[0].c_str());
+		out("ALIAS({}, {})\n", alias, net->terminals()[0]);
 		// if the aliased net only has this one terminal connected ==> don't dump
 		if (net->terminals().size() == 1)
 			net->set_no_export();
@@ -170,46 +243,61 @@ void nl_convert_base_t::dump_nl()
 		std::size_t j = sorted[i];
 
 		if (m_devs[j]->has_value())
-			out("{}({}, {})\n", m_devs[j]->type().c_str(),
-					m_devs[j]->name().c_str(), get_nl_val(m_devs[j]->value()).c_str());
+		{
+			pstring t = m_devs[j]->type();
+			pstring vals = (t == "RES" || t == "CAP") ? get_nl_val(m_devs[j]->value()) : plib::pfmt("{1:g}")(m_devs[j]->value());
+			out("{}({}, {})\n", t, m_devs[j]->name(), vals);
+		}
 		else if (m_devs[j]->has_model())
-			out("{}({}, \"{}\")\n", m_devs[j]->type().c_str(),
-					m_devs[j]->name().c_str(), m_devs[j]->model().c_str());
+			out("{}({}, \"{}\")\n", m_devs[j]->type(),
+					m_devs[j]->name(), m_devs[j]->model());
 		else
-			out("{}({})\n", m_devs[j]->type().c_str(),
-					m_devs[j]->name().c_str());
+			out("{}({})\n", m_devs[j]->type(),
+					m_devs[j]->name());
+		for (auto &e : m_devs[j]->extra())
+			out("{}\n", e);
+
 	}
 	// print nets
 	for (auto & i : m_nets)
 	{
 		net_t * net = i.second.get();
-		if (!net->is_no_export())
+		if (!net->is_no_export() && !(net->terminals().size() == 1 && net->terminals()[0] == "GND" ))
 		{
-			out("NET_C({}", net->terminals()[0].c_str() );
+			out("NET_C({}", net->terminals()[0] );
 			for (std::size_t j=1; j<net->terminals().size(); j++)
 			{
-				out(", {}", net->terminals()[j].c_str() );
+				out(", {}", net->terminals()[j] );
 			}
 			out(")\n");
 		}
 	}
+	m_replace.clear();
 	m_devs.clear();
 	m_nets.clear();
 	m_pins.clear();
 	m_ext_alias.clear();
 }
 
-const pstring nl_convert_base_t::get_nl_val(const double val)
+pstring nl_convert_base_t::get_nl_val(double val) const
 {
 	for (auto &e : m_units)
 	{
 		if (e.m_mult <= plib::abs(val))
-			return plib::pfmt(e.m_func)(val / e.m_mult);
+		{
+			double v = val / e.m_mult;
+			if (plib::abs(v - std::round(v)) <= 1e-6)
+				return plib::pfmt(e.m_func)(static_cast<int>(std::round(v)));
+			return plib::pfmt(e.m_func)(v);
+		}
 	}
+
+	if (plib::abs(val - std::round(val)) <= 1e-6)
+		return plib::pfmt("{1}")(static_cast<int>(std::round(val)));
 	return plib::pfmt("{1}")(val);
 }
 
-double nl_convert_base_t::get_sp_unit(const pstring &unit)
+double nl_convert_base_t::get_sp_unit(const pstring &unit) const
 {
 	for (auto &e : m_units)
 	{
@@ -220,7 +308,7 @@ double nl_convert_base_t::get_sp_unit(const pstring &unit)
 	return 0.0;
 }
 
-double nl_convert_base_t::get_sp_val(const pstring &sin)
+double nl_convert_base_t::get_sp_val(const pstring &sin) const
 {
 	std::size_t p = 0;
 	while (p < sin.length() && (m_numberchars.find(sin.substr(p, 1)) != pstring::npos))
@@ -231,39 +319,25 @@ double nl_convert_base_t::get_sp_val(const pstring &sin)
 	return ret;
 }
 
-#if 0
-std::vector<nl_convert_base_t::unit_t> nl_convert_base_t::m_units = {
-		{"T",   "",      1.0e12 },
-		{"G",   "",      1.0e9  },
-		{"MEG", "RES_M({1})", 1.0e6  },
-		{"k",   "RES_K({1})", 1.0e3  }, // eagle
-		{"K",   "RES_K({1})", 1.0e3  },
-		{"",    "{1}",        1.0e0  },
-		{"M",   "CAP_M({1})", 1.0e-3 },
-		{"u",   "CAP_U({1})", 1.0e-6 }, // eagle
-		{"U",   "CAP_U({1})", 1.0e-6 },
-		{"μ",   "CAP_U({1})",  1.0e-6 },
-		{"µ",   "CAP_U({1})",  1.0e-6 },
-		{"N",   "CAP_N({1})", 1.0e-9 },
-		{"pF",  "CAP_P({1})", 1.0e-12},
-		{"P",   "CAP_P({1})", 1.0e-12},
-		{"F",   "{1}e-15",    1.0e-15},
+void nl_convert_spice_t::convert_block(const str_list &contents)
+{
+	for (const auto &line : contents)
+		process_line(line);
+}
 
-		{"MIL", "{1}",  25.4e-6}
-};
-#endif
 
 void nl_convert_spice_t::convert(const pstring &contents)
 {
 	std::vector<pstring> spnl(plib::psplit(contents, "\n"));
+	std::vector<pstring> after_linecontinuation;
 
 	// Add gnd net
 
 	// FIXME: Parameter
-	out("NETLIST_START(dummy)\n");
-	add_term("0", "GND");
 
 	pstring line = "";
+
+	// process linecontinuation
 
 	for (const auto &i : spnl)
 	{
@@ -273,11 +347,50 @@ void nl_convert_spice_t::convert(const pstring &contents)
 			line += inl.substr(1);
 		else
 		{
-			process_line(line);
+			after_linecontinuation.push_back(line);
 			line = inl;
 		}
 	}
-	process_line(line);
+	after_linecontinuation.push_back(line);
+	spnl.clear(); // no longer needed
+
+	// Process subcircuits
+
+	std::vector<std::vector<pstring>> subckts;
+	std::vector<pstring> nl;
+	auto inp = after_linecontinuation.begin();
+	while (inp != after_linecontinuation.end())
+	{
+		if (plib::startsWith(*inp, ".SUBCKT"))
+		{
+			std::vector<pstring> sub;
+			while (inp != after_linecontinuation.end())
+			{
+				auto s(*inp);
+				sub.push_back(s);
+				inp++;
+				if (plib::startsWith(s, ".ENDS"))
+					break;
+			}
+			subckts.push_back(sub);
+		}
+		else
+		{
+			nl.push_back(*inp);
+			inp++;
+		}
+	}
+
+	for (const auto &sub : subckts)
+	{
+		add_term("0", "GND");
+		add_term("GND", "GND"); // For Kicad
+		convert_block(sub);
+	}
+
+	out("NETLIST_START(dummy)\n");
+
+	convert_block(nl);
 	dump_nl();
 	// FIXME: Parameter
 	out("NETLIST_END()\n");
@@ -291,6 +404,22 @@ static pstring rem(const std::vector<pstring> &vps, std::size_t start)
 	return r;
 }
 
+static int npoly(const pstring &s)
+{
+	// Brute force
+	if (s=="POLY(1)")
+		return 1;
+	if (s=="POLY(2)")
+		return 2;
+	if (s=="POLY(3)")
+		return 3;
+	if (s=="POLY(4)")
+		return 4;
+	if (s=="POLY(5)")
+		return 5;
+	return -1;
+}
+
 void nl_convert_spice_t::process_line(const pstring &line)
 {
 	if (line != "")
@@ -301,10 +430,8 @@ void nl_convert_spice_t::process_line(const pstring &line)
 		switch (tt[0].at(0))
 		{
 			case ';':
-				out("// {}\n", line.substr(1));
-				break;
 			case '*':
-				out("// {}\n", line.substr(1).c_str());
+				out("// {}\n", line.substr(1));
 				break;
 			case '.':
 				if (tt[0] == ".SUBCKT")
@@ -322,10 +449,17 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				}
 				else if (tt[0] == ".MODEL")
 				{
-					out("NET_MODEL(\"{} {}\")\n", m_subckt + tt[1], rem(tt,2));
+					pstring mod(rem(tt,2));
+					// Filter out ngspice X=X model declarations
+					if (tt[1] != mod)
+						out("NET_MODEL(\"{} {}\")\n", m_subckt + tt[1], mod);
+				}
+				else if (tt[0] == ".TITLE" && tt[1] == "KICAD")
+				{
+					m_is_kicad = true;
 				}
 				else
-					out("// {}\n", line.c_str());
+					out("// {}\n", line);
 				break;
 			case 'Q':
 			{
@@ -384,49 +518,113 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				add_term(tt[2], tt[0] + ".N");
 				break;
 			case 'E':
-				add_device("VCVS", tt[0]);
-				add_term(tt[1], tt[0] + ".OP");
-				add_term(tt[2], tt[0] + ".ON");
-				add_term(tt[3], tt[0] + ".IP");
-				add_term(tt[4], tt[0] + ".IN");
-				out("PARAM({}, {})\n", tt[0] + ".G", tt[5]);
-				break;
-			case 'V':
-				// just simple Voltage sources ....
-				if (tt[2] == "0")
+			{
+				auto n=npoly(tt[3]);
+				if (n<0)
 				{
-					val = get_sp_val(tt[3]);
-					add_device("ANALOG_INPUT", tt[0], val);
-					add_term(tt[1], tt[0] + ".Q");
-					//add_term(tt[2], tt[0] + ".2");
+					add_device("VCVS", tt[0], get_sp_val(tt[5]));
+					add_term(tt[1], tt[0], 0);
+					add_term(tt[2], tt[0], 1);
+					add_term(tt[3], tt[0], 2);
+					add_term(tt[4], tt[0], 3);
+					//add_device_extra(tt[0], "PARAM({}, {})", tt[0] + ".G", tt[5]);
 				}
 				else
-					plib::perrlogger("Voltage Source {} not connected to GND\n", tt[0]);
-				break;
-#if 0
-			// This is wrong ... Need to use something else for inputs!
-			case 'I': // Input pin special notation
 				{
-					val = get_sp_val(tt[2]);
-					add_device("ANALOG_INPUT", tt[0], val);
-					add_term(tt[1], tt[0] + ".Q");
+					unsigned sce(4);
+					auto scoeff(static_cast<unsigned>(5 + n));
+					if ((tt.size() != 5 + 2 * static_cast<unsigned>(n)) || (tt[scoeff-1] != "0"))
+					{
+						out("// IGNORED {}: {}\n", tt[0], line);
+						break;
+					}
+					pstring lastnet = tt[1];
+					for (std::size_t i=0; i < static_cast<std::size_t>(n); i++)
+					{
+						pstring devname = tt[0] + plib::pfmt("{}")(i);
+						pstring nextnet = (i<static_cast<std::size_t>(n)-1) ? tt[1] + "a" + plib::pfmt("{}")(i) : tt[2];
+						auto net2 = plib::psplit(plib::replace_all(plib::replace_all(tt[sce+i],")",""),"(",""),",");
+						add_device("VCVS", devname, get_sp_val(tt[scoeff+i]));
+						add_term(lastnet, devname, 0);
+						add_term(nextnet, devname, 1);
+						add_term(net2[0], devname, 2);
+						add_term(net2[1], devname, 3);
+						//add_device_extra(devname, "PARAM({}, {})", devname + ".G", tt[scoeff+i]);
+						lastnet = nextnet;
+					}
+				}
+			}
+				break;
+			case 'F':
+				{
+					auto n=npoly(tt[3]);
+					unsigned sce(4);
+					unsigned scoeff(5 + static_cast<unsigned>(n));
+					if (n<0)
+					{
+						sce = 3;
+						scoeff = 4;
+						n = 1;
+					}
+					else
+					{
+						if ((tt.size() != 5 + 2 *  static_cast<unsigned>(n)) || (tt[scoeff-1] != "0"))
+						{
+							out("// IGNORED {}: {}\n", tt[0], line);
+							break;
+						}
+					}
+					for (std::size_t i=0; i < static_cast<std::size_t>(n); i++)
+					{
+						pstring devname = tt[0] + plib::pfmt("{}")(i);
+						add_device("CCCS", devname, get_sp_val(tt[scoeff+i]));
+						add_term(tt[1], devname, 0);
+						add_term(tt[2], devname, 1);
+
+						pstring extranetname = devname + "net";
+						m_replace.push_back({tt[sce+i], devname + ".IP", extranetname });
+						add_term(extranetname, devname + ".IN");
+						//add_device_extra(devname, "PARAM({}, {})", devname + ".G", tt[scoeff+i]);
+					}
 				}
 				break;
-#else
+			case 'H':
+				add_device("CCVS", tt[0], get_sp_val(tt[4]));
+				add_term(tt[1], tt[0] + ".OP");
+				add_term(tt[2], tt[0] + ".ON");
+				m_replace.push_back({tt[3], tt[0] + ".IP", tt[2] + "a" });
+				add_term(tt[2] + "a", tt[0] + ".IN");
+				//add_device_extra(tt[0], "PARAM({}, {})", tt[0] + ".G", tt[4]);
+				break;
+			case 'G':
+				add_device("VCCS", tt[0], get_sp_val(tt[5]));
+				add_term(tt[1], tt[0], 0);
+				add_term(tt[2], tt[0], 1);
+				add_term(tt[3], tt[0], 2);
+				add_term(tt[4], tt[0], 3);
+				//add_device_extra(tt[0], "PARAM({}, {})", tt[0] + ".G", tt[5]);
+				break;
+			case 'V':
+				// only DC Voltage sources ....
+				val = get_sp_val(tt[3] == "DC" ? tt[4] : tt[3]);
+				add_device("VS", tt[0], val);
+				add_term(tt[1], tt[0] + ".1");
+				add_term(tt[2], tt[0] + ".2");
+				break;
 			case 'I':
 				{
-					val = get_sp_val(tt[3]);
+					val = get_sp_val(tt[3] == "DC" ? tt[4] : tt[3]);
 					add_device("CS", tt[0], val);
 					add_term(tt[1], tt[0] + ".1");
 					add_term(tt[2], tt[0] + ".2");
 				}
 				break;
-#endif
 			case 'D':
-				add_device("DIODE", tt[0], tt[3]);
-				// FIXME ==> does Kicad use different notation from LTSPICE
-				add_term(tt[1], tt[0] + ".K");
-				add_term(tt[2], tt[0] + ".A");
+				add_device("DIODE", tt[0], m_subckt + tt[3]);
+				// Spice D Anode Kathode model
+				// Kicad outputs K first and D as second net
+				add_term(tt[1], tt[0], is_kicad() ? 1 : 0);
+				add_term(tt[2], tt[0], is_kicad() ? 0 : 1);
 				break;
 			case 'U':
 			case 'X':
@@ -436,17 +634,54 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				// FIXME: Parameter
 
 				pstring xname = plib::replace_all(tt[0], pstring("."), pstring("_"));
-				pstring tname = "TTL_" + tt[tt.size()-1] + "_DIP";
-				add_device(tname, xname);
-				for (std::size_t i=1; i < tt.size() - 1; i++)
+				// Extract parameters of form X=Y
+				std::vector<pstring> nets;
+				std::vector<pstring> params;
+				for (std::size_t i=1; i < tt.size(); i++)
 				{
-					pstring term = plib::pfmt("{1}.{2}")(xname)(i);
-					add_term(tt[i], term);
+					if (tt[i].find('=') != pstring::npos)
+						params.push_back(tt[i]);
+					else
+					{
+						nets.push_back(tt[i]);
+					}
+				}
+				pstring modname = nets[nets.size()-1];
+				pstring tname = modname;
+				if (plib::startsWith(modname, "7"))
+					tname = "TTL_" + modname + "_DIP";
+				else if (plib::startsWith(modname, "4"))
+					tname = "CD" + modname + "_DIP";
+				else if (modname == "ANALOG_INPUT" && params.size()== 1 && params[0].substr(0,2) == "V=")
+				{
+					auto yname=pstring("I_") + tt[0].substr(1);
+					val = get_sp_val(params[0].substr(2));
+					add_device(modname, yname, val);
+					add_term(nets[0], yname + ".Q");
+					break;
+				}
+				else if (modname == "TTL_INPUT" && params.size()== 1 && params[0].substr(0,2) == "L=")
+				{
+					auto yname=pstring("I_") + tt[0].substr(1);
+					val = get_sp_val(params[0].substr(2));
+					add_device(modname, yname, val);
+					add_term(nets[0], yname, 0);
+					add_term(nets[1], yname, 1);
+					add_term(nets[2], yname, 2);
+					break;
+				}
+
+				add_device(tname, xname);
+				for (std::size_t i=0; i < nets.size(); i++)
+				{
+					// FIXME:
+					pstring term = plib::pfmt("X{1}.{2}")(xname)(i+1);
+					add_term(nets[i], term);
 				}
 				break;
 			}
 			default:
-				out("// IGNORED {}: {}\n", tt[0].c_str(), line.c_str());
+				out("// IGNORED {}: {}\n", tt[0], line);
 		}
 	}
 }
@@ -483,7 +718,7 @@ void nl_convert_eagle_t::tokenizer::verror(const pstring &msg)
 void nl_convert_eagle_t::convert(const pstring &contents)
 {
 
-	tokenizer tok(*this, plib::putf8_reader(std::istringstream(contents)));
+	tokenizer tok(*this, plib::putf8_reader(plib::make_unique<std::istringstream>(contents)));
 	tok.stream().stream().imbue(std::locale::classic());
 
 	out("NETLIST_START(dummy)\n");
@@ -499,7 +734,8 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 			out("NETLIST_END()\n");
 			return;
 		}
-		else if (token.is(tok.m_tok_SEMICOLON))
+
+		if (token.is(tok.m_tok_SEMICOLON))
 		{
 			// ignore empty statements
 			token = tok.get_token();
@@ -581,7 +817,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 		}
 		else
 		{
-			out("Unexpected {}\n", token.str().c_str());
+			out("Unexpected {}\n", token.str());
 			return;
 		}
 	}
@@ -629,7 +865,7 @@ void nl_convert_rinf_t::tokenizer::verror(const pstring &msg)
 
 void nl_convert_rinf_t::convert(const pstring &contents)
 {
-	tokenizer tok(*this, plib::putf8_reader(std::istringstream(contents)));
+	tokenizer tok(*this, plib::putf8_reader(plib::make_unique<std::istringstream>(contents)));
 	tok.stream().stream().imbue(std::locale::classic());
 	auto lm = read_lib_map(s_lib_map);
 
@@ -646,7 +882,8 @@ void nl_convert_rinf_t::convert(const pstring &contents)
 			out("NETLIST_END()\n");
 			return;
 		}
-		else if (token.is(tok.m_tok_HEA))
+
+		if (token.is(tok.m_tok_HEA))
 		{
 			// seems to be start token - ignore
 			token = tok.get_token();

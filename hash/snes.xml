@@ -1717,7 +1717,7 @@ Beyond that last category are the roms waiting to be classified.
 		<year>1997</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SHVC-2P3B-01" /> 
+			<feature name="pcb" value="SHVC-2P3B-01" />
 			<feature name="u1" value="U1 EPROM(J)" />
 			<feature name="u2" value="U2 EPROM(J)" /> <!-- empty socket -->
 			<feature name="u3" value="U3 SRAM [LH5168FB-10TL]" />
@@ -9734,7 +9734,7 @@ more investigation needed...
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="SHVC-AC6J-JPN" />
 		<info name="release" value="19961220" />
-		<info name="alt_title" value="クオンハ SFC" />
+		<info name="alt_title" value="クオンパ SFC" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1A3M-30" />
@@ -13675,7 +13675,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="gdleena">
+	<software name="gdleena" cloneof="gdleen">
 		<description>Gdleen (Jpn)</description>
 		<year>1991</year>
 		<publisher>Seta</publisher>
@@ -16053,7 +16053,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="kamaita1">
+	<software name="kamaita1" cloneof="kamaita">
 		<description>Kamaitachi no Yoru (Jpn, Alt)</description>
 		<year>1994</year>
 		<publisher>Chunsoft</publisher>
@@ -28233,7 +28233,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="sscope6j" cloneof="sscope6">
+	<software name="sscope6j" cloneof="nscope6">
 		<description>Super Scope 6 (Jpn)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
@@ -32048,7 +32048,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="yuyua">
+	<software name="yuyua" cloneof="yuyu">
 		<description>Yu Yu Hakusho (Jpn, Alt)</description>
 		<year>1993</year>
 		<publisher>Namco</publisher>
@@ -36573,7 +36573,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="classro2" cloneof="classrod">
+	<software name="classro2">
 		<description>Classic Road II (Jpn)</description>
 		<year>1995</year>
 		<publisher>Victor Entertainment</publisher>
@@ -44636,7 +44636,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="keiba8sa">
+	<software name="keiba8sa" cloneof="keiba8s">
 		<description>Keiba Eight Special (Jpn)</description>
 		<year>1993</year>
 		<publisher>Misawa Entertainment</publisher>
@@ -47378,7 +47378,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<publisher>Shouei System</publisher>
 		<info name="serial" value="SHVC-24" />
 		<info name="release" value="19940826" />
-		<info name="alt_title" value="松村邦洋伝 最強の歴史をぬりかえ ろ!" />
+		<info name="alt_title" value="松村邦洋伝 最強の歴史をぬりかえろ!" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="3145728">
@@ -54300,7 +54300,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-	<software name="shinstrk">
+	<software name="shinstrk" cloneof="stng">
 		<description>Shin Star Trek - Ooinaru Isan IFD no Nazo o Oe (Jpn)</description>
 		<year>1995</year>
 		<publisher>Takuma Shoten</publisher>
@@ -58874,7 +58874,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-	<software name="sscope6">
+	<software name="sscope6" cloneof="nscope6">
 		<description>Super Scope 6 (USA)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>

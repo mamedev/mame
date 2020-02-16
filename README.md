@@ -93,7 +93,7 @@ Please note that MAME is a registered trademark of Gregory Ember, and permission
 <img align="right" src="http://opensource.org/trademarks/opensource/OSI-Approved-License-100x137.png">
 </a>
 
-    Copyright (C) 1997-2019  MAMEDev and contributors
+    Copyright (C) 1997-2020  MAMEDev and contributors
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

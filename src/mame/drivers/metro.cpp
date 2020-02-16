@@ -4194,6 +4194,24 @@ ROM_START( dharma )
 	ROM_LOAD( "dd__wa-7.u3", 0x000000, 0x040000, CRC(7ce817eb) SHA1(9dfb79021a552877fbc26049cca853c0b93735b5) ) // == dd_ja-7
 ROM_END
 
+ROM_START( dharmag )
+	ROM_REGION( 0x040000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "dd__wga5.u39", 0x000000, 0x020000, CRC(b08664f7) SHA1(d4df2af4c8c0a736d5454d74cd2ce1d770feb8e3) )
+	ROM_LOAD16_BYTE( "dd__wga6.u42", 0x000001, 0x020000, CRC(4ae89edc) SHA1(a02dba09359fa99f946c8afad89625c63c7ed14e) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )       /* NEC78C10 Code */
+	ROM_LOAD( "dd__wa-8.u9", 0x000000, 0x020000, CRC(af7ebc4c) SHA1(6abf0036346da10be56932f9674f8c250a3ea592) ) // (c)1992 Imagetek (11xxxxxxxxxxxxxxx = 0xFF) // == dd_ja-8
+
+	ROM_REGION( 0x200000, "vdp2", 0 )   /* Gfx + Data (Addressable by CPU & Blitter) */
+	ROM_LOAD64_WORD( "dd__wa-2.u4",  0x000000, 0x080000, CRC(2c67a5c8) SHA1(777d5f64446004bbb6dafee610ad9a1ff262349d) )
+	ROM_LOAD64_WORD( "dd__wa-4.u5",  0x000002, 0x080000, CRC(36ca7848) SHA1(278788727193ae65ed012d230a4e5966c07afe9e) )
+	ROM_LOAD64_WORD( "dd__wa-1.u10", 0x000004, 0x080000, CRC(d8034574) SHA1(a9bf29ae980033dfaae43b6ab46f850744020d92) )
+	ROM_LOAD64_WORD( "dd__wa-3.u11", 0x000006, 0x080000, CRC(fe320fa3) SHA1(80532cc38bd21608e4cff1254d993e0df72eaccf) )
+
+	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
+	ROM_LOAD( "dd__wa-7.u3", 0x000000, 0x040000, CRC(7ce817eb) SHA1(9dfb79021a552877fbc26049cca853c0b93735b5) ) // == dd_ja-7
+ROM_END
+
 ROM_START( dharmaj )
 	ROM_REGION( 0x040000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "dd_jc-5", 0x000000, 0x020000, CRC(b5d44426) SHA1(d68aaf6b9976ccf5cb665d7ec0afa44e2453094d) )
@@ -5664,6 +5682,7 @@ GAME( 1994, lastfortg, lastfort, lastforg,  ladykill,   metro_state, init_lastfo
 GAME( 1993, poitto,    0,        poitto,    poitto,     metro_state, init_metro,    ROT0,   "Metro / Able Corp.",                              "Poitto! (revision D)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, poittoc,   poitto,   poitto,    poitto,     metro_state, init_metro,    ROT0,   "Metro / Able Corp.",                              "Poitto! (revision C)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // missing 1 program ROM
 GAME( 1994, dharma,    0,        dharma,    dharma,     metro_state, init_dharmak,  ROT0,   "Metro",                                           "Dharma Doujou", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, dharmag,   dharma,   dharma,    dharma,     metro_state, init_dharmak,  ROT0,   "Metro",                                           "Dharma Doujou (Germany)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, dharmaj,   dharma,   dharma,    dharma,     metro_state, init_metro,    ROT0,   "Metro",                                           "Dharma Doujou (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, dharmak,   dharma,   dharma,    dharma,     metro_state, init_dharmak,  ROT0,   "Metro",                                           "Dharma Doujou (Korea)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, toride2g,  0,        toride2g,  toride2g,   metro_state, init_metro,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

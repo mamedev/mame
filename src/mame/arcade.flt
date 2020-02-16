@@ -396,6 +396,7 @@ fastlane.cpp
 fcombat.cpp
 fcrash.cpp
 feversoc.cpp
+ffantasy_ms.cpp
 fgoal.cpp
 finalizr.cpp
 fireball.cpp
@@ -741,6 +742,7 @@ mephistp.cpp
 merit.cpp
 merit3xx.cpp
 meritm.cpp
+merits.cpp
 mermaid.cpp
 metalmx.cpp
 metlclsh.cpp
@@ -1125,6 +1127,7 @@ simple_st0016.cpp
 simpsons.cpp
 skeetsht.cpp
 skimaxx.cpp
+skopro.cpp
 skullxbo.cpp
 skyarmy.cpp
 skydiver.cpp
@@ -1266,6 +1269,7 @@ tattack.cpp
 taxidriv.cpp
 tbowl.cpp
 tceptor.cpp
+teamjocs.cpp
 techno.cpp
 tecmo.cpp
 tecmo16.cpp

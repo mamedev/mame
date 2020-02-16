@@ -67,8 +67,8 @@ namespace solver
 		void reset() override { matrix_solver_t::reset(); }
 
 	protected:
-		unsigned vsolve_non_dynamic(const bool newton_raphson) override;
-		unsigned solve_non_dynamic(const bool newton_raphson);
+		unsigned vsolve_non_dynamic(bool newton_raphson) override;
+		unsigned solve_non_dynamic(bool newton_raphson);
 
 		void LE_invert();
 
@@ -197,7 +197,7 @@ namespace solver
 	}
 
 	template <typename FT, int SIZE>
-	unsigned matrix_solver_sm_t<FT, SIZE>::solve_non_dynamic(const bool newton_raphson)
+	unsigned matrix_solver_sm_t<FT, SIZE>::solve_non_dynamic(bool newton_raphson)
 	{
 		static constexpr const bool incremental = true;
 		const std::size_t iN = this->size();
@@ -283,7 +283,7 @@ namespace solver
 	}
 
 	template <typename FT, int SIZE>
-	unsigned matrix_solver_sm_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raphson)
+	unsigned matrix_solver_sm_t<FT, SIZE>::vsolve_non_dynamic(bool newton_raphson)
 	{
 
 		this->clear_square_mat(this->m_A);

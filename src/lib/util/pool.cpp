@@ -8,9 +8,9 @@
 
 ***************************************************************************/
 
-#include <stdarg.h>
-#include <stddef.h>
-#include <stdlib.h>
+#include <cstdarg>
+#include <cstddef>
+#include <cstdlib>
 #include "pool.h"
 #include "coreutil.h"
 
@@ -578,7 +578,7 @@ static void memory_error(const char *message)
  * @return  An int.
  */
 
-bool test_memory_pools(void)
+bool test_memory_pools()
 {
 	object_pool *pool;
 	void *ptrs[16];

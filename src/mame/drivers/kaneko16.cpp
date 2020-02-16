@@ -60,7 +60,7 @@ To Do:
 [gtmr2]
 - Finish the Inputs (different wheels and pedals);
 - Implement LAN comms;
-- Selecting Italian in the service mode settings causes no voice samples being played 
+- Selecting Italian in the service mode settings causes no voice samples being played
   (with lots of OKI invalid samples in logerror), sound bank bug or btanb?
 
 [brapboys / shogwarr]
@@ -86,7 +86,6 @@ Dip locations verified from manual for:
 
 [general]
 - interrupt timing/behaviour
-- replace sample bank copying with new ADDRESS MAP system for OKI and do banking like CPUs
 
 Non-Bugs (happen on real PCB)
 
@@ -308,9 +307,7 @@ void kaneko16_state::bakubrkr_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();     // ROM
 	map(0x100000, 0x10ffff).ram();     // Work RAM
-	map(0x400000, 0x40001f).r(FUNC(kaneko16_state::ym2149_r<0>)); // Sound
-	map(0x400000, 0x40001d).w(FUNC(kaneko16_state::ym2149_w<0>));
-	map(0x40001f, 0x40001f).w(FUNC(kaneko16_state::oki_bank0_w<7>)); // OKI bank Switch
+	map(0x400000, 0x40001f).rw(FUNC(kaneko16_state::ym2149_r<0>), FUNC(kaneko16_state::ym2149_w<0>)); // Sound
 	map(0x400200, 0x40021f).rw(FUNC(kaneko16_state::ym2149_r<1>), FUNC(kaneko16_state::ym2149_w<1>));          // Sound
 	map(0x400401, 0x400401).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));  //
 	map(0x500000, 0x503fff).m(m_view2[0], FUNC(kaneko_view2_tilemap_device::vram_map));
@@ -1659,6 +1656,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_state::interrupt)
 	// main vblank interrupt
 	if (scanline == 224)
 	{
+		// 2 frame delayed normaly; differs per PCB?
+		m_kaneko_spr->render_sprites(m_screen->visible_area(), m_spriteram->buffer(), m_spriteram->bytes());
 		m_spriteram->copy();
 		m_maincpu->set_input_line(5, HOLD_LINE);
 	}
@@ -1789,6 +1788,7 @@ void kaneko16_state::bakubrkr(machine_config &config)
 
 	YM2149(config, m_ym2149[0], XTAL(12'000'000)/6); /* verified on pcb */
 	m_ym2149[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_ym2149[0]->port_b_write_callback().set(FUNC(kaneko16_state::oki_bank0_w<7>)); /* outputs B:  OKI bank Switch */
 
 	YM2149(config, m_ym2149[1], XTAL(12'000'000)/6); /* verified on pcb */
 	m_ym2149[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -2139,8 +2139,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_shogwarr_state::shogwarr_interrupt)
 
 	if (scanline == 224)
 	{
-		m_spriteram->copy(); // TODO : shogwarr sprites are 1 frame delayed? reference : https://youtu.be/aj4ayOc4MuI
-		// the code for this interrupt is provided by the MCU..
+		m_kaneko_spr->render_sprites(m_screen->visible_area(), m_spriteram->buffer(), m_spriteram->bytes());
+		m_spriteram->copy();
 		m_maincpu->set_input_line(4, HOLD_LINE);
 	}
 
@@ -2923,7 +2923,6 @@ ROM_START( bloodwar )
 
 	ROM_REGION( 0x020000, "mcudata", 0 )            /* MCU Code */
 	ROM_LOAD16_WORD_SWAP( "ofd0x3.124",  0x000000, 0x020000, CRC(399f2005) SHA1(ff0370724770c35963953fd9596d9f808ba87d8f) )
-
 
 	ROM_REGION( 0x1e00000, "kan_spr", 0 )  /* Sprites */
 	ROM_LOAD       ( "of-200-0201.8",   0x0000000, 0x200000, CRC(bba63025) SHA1(daec5285469ee953f6f838fe3cb3903524e9ac39) )

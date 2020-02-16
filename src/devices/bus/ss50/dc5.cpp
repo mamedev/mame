@@ -32,6 +32,8 @@
 #include "machine/wd_fdc.h"
 #include "imagedev/floppy.h"
 #include "formats/flex_dsk.h"
+#include "formats/os9_dsk.h"
+#include "formats/uniflex_dsk.h"
 
 class ss50_dc5_device : public device_t, public ss50_card_interface
 {
@@ -47,6 +49,7 @@ public:
 		, m_interrupt_select(*this, "INTERRUPT_SELECT")
 		, m_address_mode(*this, "ADDRESS_MODE")
 		, m_two_control_regs(*this, "TWO_CONTROL_REGS")
+		, m_force_ready(*this, "FORCE_READY")
 		, m_ctrl_reg_bit7_side_select(*this, "CTRL_REG_BIT7_SIDE_SELECT")
 		, m_expected_clock(*this, "EXPECTED_CLOCK")
 		, m_expected_density(*this, "EXPECTED_DENSITY")
@@ -55,6 +58,7 @@ public:
 	{
 	}
 
+	DECLARE_INPUT_CHANGED_MEMBER(force_ready_change);
 	DECLARE_INPUT_CHANGED_MEMBER(ctrl_reg_bit7_side_select_change);
 	DECLARE_INPUT_CHANGED_MEMBER(expected_clock_change);
 
@@ -99,6 +103,7 @@ private:
 	required_ioport m_interrupt_select;
 	required_ioport m_address_mode;
 	required_ioport m_two_control_regs;
+	required_ioport m_force_ready;
 	required_ioport m_ctrl_reg_bit7_side_select;
 	required_ioport m_expected_clock;
 	required_ioport m_expected_density;
@@ -109,20 +114,31 @@ private:
 
 static INPUT_PORTS_START( dc5 )
 	PORT_START("INTERRUPT_SELECT")
-	PORT_DIPNAME(0xf, 0, "Interrupt select")
+	PORT_DIPNAME(0x3, 0, "Interrupt select")
 	PORT_DIPSETTING(0, "N/C")
 	PORT_DIPSETTING(1, "IRQ")
 	PORT_DIPSETTING(2, "NMI/FIRQ")
 
 	PORT_START("ADDRESS_MODE")
-	PORT_DIPNAME(0xf, 1, "Address mode")
+	PORT_DIPNAME(0x1, 1, "Address mode")
 	PORT_DIPSETTING(0, "4 address")
 	PORT_DIPSETTING(1, "16 address")
 
 	PORT_START("TWO_CONTROL_REGS")
-	PORT_DIPNAME(0xf, 0, "Two control registers")
+	PORT_DIPNAME(0x1, 0, "Two control registers")
 	PORT_DIPSETTING(0, "No, DC4 compatible")
 	PORT_DIPSETTING(1, "Yes, DC5 extension")
+
+	// The DC5 has two modes for controlling the FDC 'ready' input. One
+	// mode forces the 'ready' line for a period triggered by the chip
+	// select, along with the motors. The other mode detects index pulses
+	// from the disk to control the 'ready' line. Flex2 for the 6800
+	// generally needs the 'ready' line forced and Flex9 can use the index
+	// pulse detection to determine if disks are present.
+	PORT_START("FORCE_READY")
+	PORT_CONFNAME(0x1, 0, "Force ready") PORT_CHANGED_MEMBER(DEVICE_SELF, ss50_dc5_device, force_ready_change, 0)
+	PORT_CONFSETTING(0, DEF_STR(No))
+	PORT_CONFSETTING(1, DEF_STR(Yes))
 
 	// This config setting allows checking of the FDC clock rate and
 	// overriding it to assist driver development. The DC5 supports
@@ -149,39 +165,43 @@ static INPUT_PORTS_START( dc5 )
 	// drive selection. These drivers need to be corrected, but this
 	// option helps identify this issue and work around it.
 	PORT_START("CTRL_REG_BIT7_SIDE_SELECT")
-	PORT_CONFNAME(0x01, 0, "Control register bit 7") PORT_CHANGED_MEMBER(DEVICE_SELF, ss50_dc5_device, ctrl_reg_bit7_side_select_change, 0)
+	PORT_CONFNAME(0x1, 0, "Control register bit 7") PORT_CHANGED_MEMBER(DEVICE_SELF, ss50_dc5_device, ctrl_reg_bit7_side_select_change, 0)
 	PORT_CONFSETTING(0, "Inhibits drive selection")
 	PORT_CONFSETTING(1, "Erroneous side select")
 
-	// Debug aid to hard code the density. The FLEX format uses single
-	// density for track zero. Many virtual disks 'fix' the format to be
-	// purely double density and often without properly implement driver
-	// support for that. This setting is an aid to report unexpected
-	// usage, and it attempts to correct that.
+	// Debug aid to hard code the density. The OS9 format can use single
+	// density for track zero head zero. The FLEX format can use single
+	// density for track zero on all heads, and many virtual disks 'fix'
+	// the format to be purely double density and often without properly
+	// implementing driver support for that. This setting is an aid to
+	// report unexpected usage, and it attempts to correct that.
 	PORT_START("EXPECTED_DENSITY")
-	PORT_CONFNAME(0xff, 0, "Expected density")
+	PORT_CONFNAME(0x7, 0, "Expected density")
 	PORT_CONFSETTING(0, "-")
 	PORT_CONFSETTING(1, "single density") // Purely single density.
-	PORT_CONFSETTING(2, "double density, with single density track zero") // The default FLEX double density format.
-	PORT_CONFSETTING(3, "double density") // Purely double density.
+	PORT_CONFSETTING(2, "double density, with single density track zero head zero") // OS9 format
+	PORT_CONFSETTING(3, "double density, with single density track zero all heads") // The default FLEX double density format.
+	PORT_CONFSETTING(4, "double density") // Purely double density.
 
 	// Debug aid, to check that the sector head or side is set as expected
 	// for the sector ID being read for the FLEX floppy disk format. Many
 	// FLEX disk images were developed for vitural machines that have
-	// little regard for the actual head and can work off the sector ID
-	// and their drivers can set the head incorrectly. E.g. a disk with 18
-	// sectors per side might have a driver switch heads for sectors
-	// above 10. Another issue is that double density disk images are
-	// often 'fixed' so that they are pure double density without being
-	// single density on the first track, and the drivers might still set
-	// the head based on track zero being single density. This aid is not
-	// intended to be a substitute for fixing the drivers but it does help
-	// work through the issues while patching the disks.
+	// little regard for the actual number of heads and can work off the
+	// sector ID and their drivers can set the head incorrectly. E.g. a
+	// disk with 18 sectors per side might have a driver incorrectly switch
+	// heads for sectors above 10. Another issue is that double density
+	// disk images are often 'fixed' so that they are pure double density
+	// without being single density on the first track, and the drivers
+	// might still set the head based on track zero being single
+	// density. This aid is not intended to be a substitute for fixing the
+	// drivers but it does help work through the issues while patching the
+	// disks.
 	PORT_START("EXPECTED_SECTORS")
-	PORT_CONFNAME(0xff, 0, "Expected sectors per side")
+	PORT_CONFNAME(0xff, 0, "FLEX expected sectors per side")
 	PORT_CONFSETTING(0, "-")
 	PORT_CONFSETTING(10, "10") // 5 1/4" single density 256B
 	PORT_CONFSETTING(15, "15") // 8" single density 256B
+	PORT_CONFSETTING(16, "16") // 5 1/4" double density 256B
 	PORT_CONFSETTING(18, "18") // 5 1/4" double density 256B
 	PORT_CONFSETTING(26, "26") // 8" double density 256B
 	PORT_CONFSETTING(36, "36") // 3.5" 1.4M QD 256B
@@ -190,10 +210,11 @@ static INPUT_PORTS_START( dc5 )
 	// driver sticks to that and if using a double density disk then set a
 	// single density size here.
 	PORT_START("TRACK_ZERO_EXPECTED_SECTORS")
-	PORT_CONFNAME(0xff, 0, "Track zero expected sectors per side")
+	PORT_CONFNAME(0xff, 0, "FLEX track zero expected sectors per side")
 	PORT_CONFSETTING(0, "-")
 	PORT_CONFSETTING(10, "10") // 5 1/4" single density 256B
 	PORT_CONFSETTING(15, "15") // 8" single density 256B
+	PORT_CONFSETTING(16, "16") // 5 1/4" double density 256B
 	PORT_CONFSETTING(18, "18") // 5 1/4" double density 256B
 	PORT_CONFSETTING(26, "26") // 8" double density 256B
 	PORT_CONFSETTING(36, "36") // 3.5" 1.4M QD 256B
@@ -216,10 +237,12 @@ ioport_constructor ss50_dc5_device::device_input_ports() const
 //-------------------------------------------------
 
 FLOPPY_FORMATS_MEMBER( ss50_dc5_device::floppy_formats )
-	FLOPPY_FLEX_FORMAT
+	FLOPPY_MFI_FORMAT,
+	FLOPPY_FLEX_FORMAT,
+	FLOPPY_OS9_FORMAT,
+	FLOPPY_UNIFLEX_FORMAT
 FLOPPY_FORMATS_END
 
-// todo: implement floppy controller cards as slot devices and do this properly
 static void flex_floppies(device_slot_interface &device)
 {
 	device.option_add("sssd35", FLOPPY_525_SSSD_35T); // 35 trks ss sd 5.25
@@ -270,6 +293,7 @@ void ss50_dc5_device::device_start()
 	m_fdc_side = 0;
 	m_floppy_motor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ss50_dc5_device::floppy_motor_callback),this));
 	m_motor_timer_out = 0;
+	m_fdc->set_force_ready(0);
 	m_fdc_prog_clock_div = 12;
 
 	save_item(NAME(m_fdc_status));
@@ -280,6 +304,11 @@ void ss50_dc5_device::device_start()
 	save_item(NAME(m_fdc_prog_clock_div));
 }
 
+
+INPUT_CHANGED_MEMBER(ss50_dc5_device::force_ready_change)
+{
+	control_register_update();
+}
 
 INPUT_CHANGED_MEMBER(ss50_dc5_device::ctrl_reg_bit7_side_select_change)
 {
@@ -334,7 +363,7 @@ void ss50_dc5_device::validate_floppy_side(uint8_t cmd)
 
 			if (m_fdc_side != expected_side)
 			{
-				logerror("%s Unexpected size %d for track %d sector %d expected side %d\n", machine().describe_context(), m_fdc_side, track, sector, expected_side);
+				logerror("%s Unexpected side %d for track %d sector %d expected side %d\n", machine().describe_context(), m_fdc_side, track, sector, expected_side);
 				if (m_fdc_selected_floppy)
 				{
 					m_fdc_selected_floppy->ss_w(expected_side);
@@ -342,8 +371,7 @@ void ss50_dc5_device::validate_floppy_side(uint8_t cmd)
 				}
 			}
 		}
-
-		if (expected_sectors)
+		else if (expected_sectors)
 		{
 			uint8_t expected_side = sector > expected_sectors ? 1 : 0;
 
@@ -373,17 +401,17 @@ uint8_t ss50_dc5_device::validate_fdc_dden(uint8_t dden)
 			return 1;
 		case 2:
 		{
-			// Double density with track zero single density.
+			// Double density with track zero head zero single density.
 			uint8_t track = m_fdc->track_r();
 
-			if (track == 0)
+			if (track == 0 && m_fdc_side == 0)
 			{
-				// If this path is call on an update of the
+				// If this path is called on an update of the
 				// second control register then the track need
 				// not be accurate so this message might not
 				// be accurate.
 				if (!dden)
-					logerror("%s Unexpected DDEN %d for single density trak 0\n", machine().describe_context(), dden);
+					logerror("%s Unexpected DDEN %d for single density track 0 head 0\n", machine().describe_context(), dden);
 				return 1;
 			}
 			if (dden)
@@ -391,6 +419,25 @@ uint8_t ss50_dc5_device::validate_fdc_dden(uint8_t dden)
 			return 0;
 		}
 		case 3:
+		{
+			// Double density with track zero all heads single density.
+			uint8_t track = m_fdc->track_r();
+
+			if (track == 0)
+			{
+				// If this path is called on an update of the
+				// second control register then the track need
+				// not be accurate so this message might not
+				// be accurate.
+				if (!dden)
+					logerror("%s Unexpected DDEN %d for single density track 0\n", machine().describe_context(), dden);
+				return 1;
+			}
+			if (dden)
+				logerror("%s Unexpected DDEN %d for double density\n", machine().describe_context(), dden);
+			return 0;
+		}
+		case 4:
 			// Pure double density.
 			if (dden)
 				logerror("%s Unexpected DDEN %d for double density\n", machine().describe_context(), dden);
@@ -498,13 +545,13 @@ WRITE_LINE_MEMBER( ss50_dc5_device::fdc_sso_w )
 			break;
 		case 2:
 		{
-			// Double density with track zero single density.
+			// Double density with track zero head zero single density.
 			uint8_t track = m_fdc->track_r();
 
-			if (track == 0)
+			if (track == 0 && m_fdc_side == 0)
 			{
 				if (state)
-					logerror("Unexpected SSO %d for single density trak 0\n", state);
+					logerror("Unexpected SSO %d for single density track 0 head 0\n", state);
 				m_fdc->dden_w(1);
 			}
 			else
@@ -516,6 +563,25 @@ WRITE_LINE_MEMBER( ss50_dc5_device::fdc_sso_w )
 			break;
 		}
 		case 3:
+		{
+			// Double density with track zero all heads single density.
+			uint8_t track = m_fdc->track_r();
+
+			if (track == 0)
+			{
+				if (state)
+					logerror("Unexpected SSO %d for single density track 0\n", state);
+				m_fdc->dden_w(1);
+			}
+			else
+			{
+				if (!state)
+					logerror("Unexpected SSO %d for double density\n", state);
+				m_fdc->dden_w(0);
+			}
+			break;
+		}
+		case 4:
 			// Pure double density.
 			if (!state)
 				logerror("Unexpected SSO %d for double density\n", state);
@@ -588,6 +654,10 @@ void ss50_dc5_device::control_register_update()
 		floppy->ss_w(side);
 		m_fdc_side = side;
 	}
+
+	// Force the FDC 'ready' line on if the motor line is asserted, but
+	// only when this forced mode is enabled.
+	m_fdc->set_force_ready(m_motor_timer_out && m_force_ready->read());
 }
 
 

@@ -97,6 +97,8 @@ public:
 
 	void regs_map(address_map &map);
 	void audiovideo_map(address_map &map);
+	void texture_map(address_map &map);
+	void frame_map(address_map &map);
 	template<class T> void set_host_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
 	void set_external_vclk(const uint32_t vclk) { m_ext_vclk = vclk; }
 	void set_external_vclk(const XTAL vclk) { m_ext_vclk = vclk.value(); }
@@ -132,7 +134,7 @@ private:
 	address_space *m_host_space = nullptr;
 	uint32_t m_ext_vclk = 0;
 
-	devcb_write_line write_tx[2];
+	devcb_write_line::array<2> write_tx;
 
 	// INTC
 	uint32_t m_inten = 0;
@@ -146,6 +148,8 @@ private:
 	uint32_t m_intst = 0;
 	DECLARE_READ32_MEMBER(intst_r);
 	DECLARE_WRITE32_MEMBER(intst_w);
+
+	DECLARE_WRITE_LINE_MEMBER(soundirq_cb);
 
 	// Timer
 	template<int Which> DECLARE_WRITE32_MEMBER(tmcon_w);
@@ -205,12 +209,6 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(VRENDER0_SOC, vrender0soc_device)
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
 
 
 #endif // MAME_MACHINE_VRENDER0_H

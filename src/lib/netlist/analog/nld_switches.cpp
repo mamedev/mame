@@ -108,13 +108,13 @@ namespace netlist
 			m_R1.set_R(R_OFF);
 			m_R2.set_R(R_ON);
 		}
-
-		//m_R1.update_dev(time);
-		//m_R2.update_dev(time);
 	}
 
 	NETLIB_UPDATE_PARAM(switch2)
 	{
+		// FIXME: We only need to update the net first if this is a time stepping net
+		m_R1.solve_now();
+		m_R2.solve_now();
 		if (!m_POS())
 		{
 			m_R1.set_R(R_ON);
@@ -125,9 +125,8 @@ namespace netlist
 			m_R1.set_R(R_OFF);
 			m_R2.set_R(R_ON);
 		}
-
-		m_R1.solve_now();
-		m_R2.solve_now();
+		m_R1.solve_later();
+		m_R2.solve_later();
 	}
 
 	} //namespace analog

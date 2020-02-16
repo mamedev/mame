@@ -47,7 +47,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void ch2001(machine_config &config);
 
 protected:
@@ -179,7 +179,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void ch2001_state::ch2001(machine_config &config)

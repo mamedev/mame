@@ -1719,8 +1719,8 @@ ROM_END
 
 ROM_START( borench ) /* Borench  (c)1990 Sega */
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "ic32.bin", 0x000000, 0x040000, CRC(2c54457d) SHA1(adf3ea5393d2633ec6215e64f0cd89ad4567e765) )
-	ROM_LOAD16_BYTE( "ic31.bin", 0x000001, 0x040000, CRC(b46445fc) SHA1(24e85ef5abbc5376a854b13ed90f08f0c30d7f25) )
+	ROM_LOAD16_BYTE( "ic32.bin", 0x000000, 0x040000, CRC(2c54457d) SHA1(adf3ea5393d2633ec6215e64f0cd89ad4567e765) ) // Need to verify proper label
+	ROM_LOAD16_BYTE( "ic31.bin", 0x000001, 0x040000, CRC(b46445fc) SHA1(24e85ef5abbc5376a854b13ed90f08f0c30d7f25) ) // Need to verify proper label
 
 	ROM_REGION( 0x020000, "upd", 0 )
 	ROM_LOAD( "13587.ic4", 0x000000, 0x020000, CRC(62b85e56) SHA1(822ab733c87938bb70a9e32cc5dd36bbf6f21d11) )
@@ -1750,7 +1750,7 @@ ROM_START( tfrceac ) /* Thunder Force AC  (c)1990 Technosoft / Sega - 834-7745-0
 ROM_END
 
 
-ROM_START( tfrceacj ) /* Thunder Force AC (Japan)  (c)1990 Technosoft / Sega - 834-7745 THUNDER FORCE AC (EMP5032 labeled 317-0172)  */
+ROM_START( tfrceacj ) /* Thunder Force AC (Japan)  (c)1990 Technosoft / Sega - 834-7745 THUNDER FORCE AC (EMP5032 labeled 317-0172) */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-13657.ic32", 0x000000, 0x040000, CRC(a0f38ffd) SHA1(da548e7f61aed0e82a460553a119941da8857bc4) )
 	ROM_LOAD16_BYTE( "epr-13656.ic31", 0x000001, 0x040000, CRC(b9438d1e) SHA1(598209c9fec3527fde720af09e5bebd7379f5b2b) )
@@ -1845,6 +1845,18 @@ ROM_START( ribbit ) /* Ribbit  (c)1991 Sega */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-13833.ic32", 0x000000, 0x040000, CRC(5347f8ce) SHA1(b95b99536157edfbf0d74a42f64235f47dca7ee1) )
 	ROM_LOAD16_BYTE( "epr-13832.ic31", 0x000001, 0x040000, CRC(889c42c2) SHA1(0839a50a68b64a66d995f1bfaff42fcb60bb4d45) )
+	ROM_COPY( "maincpu", 0x000000, 0x080000, 0x080000 )
+	ROM_LOAD16_BYTE( "epr-13838.ic34", 0x100000, 0x080000, CRC(a5d62ac3) SHA1(8d83a7bc4017e125ef4231278f766b2368d5fc1f) )
+	ROM_LOAD16_BYTE( "epr-13837.ic33", 0x100001, 0x080000, CRC(434de159) SHA1(cf2973131cabf2bc0ebb2bfe9f804ad3d7d0a733) )
+
+	ROM_REGION( 0x080000, "upd", 0 )
+	ROM_LOAD( "epr-13834.ic4", 0x000000, 0x020000, CRC(ab0c1833) SHA1(f864e12ecf6c0524da20fc66747a4fa4280e67e9) )
+ROM_END
+
+ROM_START( ribbitj ) /* Ribbit  (c)1991 Sega */
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "epr-13833.ic32", 0x000000, 0x040000, CRC(21f222e2) SHA1(1e4b640833d3ec428bd50d89dc93a670a17a4451) ) // sldh - odd, Sega was very good about using different labels
+	ROM_LOAD16_BYTE( "epr-13832.ic31", 0x000001, 0x040000, CRC(1c4b291a) SHA1(61b2e7721aefb97bbd38b3ca9275d7f345f3d0a6) ) // sldh - odd, Sega was very good about using different labels
 	ROM_COPY( "maincpu", 0x000000, 0x080000, 0x080000 )
 	ROM_LOAD16_BYTE( "epr-13838.ic34", 0x100000, 0x080000, CRC(a5d62ac3) SHA1(8d83a7bc4017e125ef4231278f766b2368d5fc1f) )
 	ROM_LOAD16_BYTE( "epr-13837.ic33", 0x100001, 0x080000, CRC(434de159) SHA1(cf2973131cabf2bc0ebb2bfe9f804ad3d7d0a733) )
@@ -2005,7 +2017,7 @@ ROM_START( stkclmns ) /* Stack Columns  (c)1994 Sega */
 ROM_END
 
 
-ROM_START( stkclmnsj ) /* Stack Columns  (c)1994 Sega */
+ROM_START( stkclmnsj ) /* Stack Columns  (c)1994 Sega - 834-10853 (EMP5032 labeled 317-0219) */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-16795.ic32", 0x000000, 0x080000, CRC(b478fd02) SHA1(aaf9d9f9f4dc900b4e8ff6f258f26e782e5c3166) )
 	ROM_LOAD16_BYTE( "epr-16794.ic31", 0x000001, 0x080000, CRC(6d0e8c56) SHA1(8f98d9fd98a1faa70b173cfd72f15102d11e79ae) )
@@ -2037,7 +2049,7 @@ ROM_START( potopoto ) /* Poto Poto  (c)1994 Sega - 834-10778 (EMP5032 labeled 31
 ROM_END
 
 
-ROM_START( zunkyou ) /* Zunzunkyou no Yabou  (c)1994 Sega - 834-9029 (EMP5032 labeled 317-0221)  */
+ROM_START( zunkyou ) /* Zunzunkyou no Yabou  (c)1994 Sega - 834-9029 (EMP5032 labeled 317-0221) */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-16812.ic32", 0x000000, 0x080000, CRC(eb088fb0) SHA1(69089a3516ad50f35e81971ef3c33eb3f5d52374) )
 	ROM_LOAD16_BYTE( "epr-16811.ic31", 0x000001, 0x080000, CRC(9ac7035b) SHA1(1803ffbadc1213e04646d483e27da1591e22cd06) )
@@ -2556,6 +2568,7 @@ GAME( 1990, borench,   0,        segac2, borench,         segac2_state,    init_
 GAME( 1990, borencha,  borench,  segac2, borench,         segac2_state,    init_borench,  ROT0,   "Sega", "Borench (set 2)", 0 )
 
 GAME( 1991, ribbit,    0,        segac2, ribbit,          segac2_state,    init_ribbit,   ROT0,   "Sega", "Ribbit!", 0 )
+GAME( 1991, ribbitj,   ribbit,   segac2, ribbit,          segac2_state,    init_ribbit,   ROT0,   "Sega", "Ribbit! (Japan)", 0 )
 
 GAME( 1991, twinsqua,  0,        segac2, twinsqua,        segac2_state,    init_twinsqua, ROT0,   "Sega", "Twin Squash", 0 )
 

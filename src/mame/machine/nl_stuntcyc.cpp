@@ -12,8 +12,8 @@
 NETLIST_START(stuntcyc)
 
 	SOLVER(Solver, 48000)
+
 	PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers
-	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
 	PARAM(NETLIST.USE_DEACTIVATE, 1)
 
 	ANALOG_INPUT(V5, 5)
@@ -22,8 +22,8 @@ NETLIST_START(stuntcyc)
 	TTL_INPUT(high, 1)
 	TTL_INPUT(low, 0)
 
-	MAINCLOCK(main_clk, 14258400)
-	//MAINCLOCK(main_clk, 14318181)
+	//MAINCLOCK(main_clk, 14258400)
+	MAINCLOCK(main_clk, 14318000)
 	ALIAS(Y1, main_clk)
 
 #if 1
@@ -325,6 +325,10 @@ NETLIST_START(stuntcyc)
 	RES(R15, RES_K(1))
 	NET_C(R15.1, E4_2.Q)
 	//RES(R107, RES_K(1))
+
+	// FIXME: Having the diode in the video output has a negative impact
+	//        on performance. A "fast-but-not-perfect" approach could
+	//        use a switched resistor.
 
 	DIODE(D17, "1N914")
 	NET_C(D17.K, COMP_SYNC_Q)
@@ -661,8 +665,8 @@ NETLIST_START(stuntcyc)
 	// Power terminals
 
 	NET_C(VCC, high.VCC, low.VCC, ANTENNA.VCC, FREESCORE_SW_B0.VCC, FREESCORE_SW_B1.VCC, FREESCORE_SW_B2.VCC, FREESCORE_SW_B3.VCC,
-		MISS_SW_B0.VCC, MISS_SW_B1.VCC, MISS_SW_B2.VCC, R38_2.VCC, R39_2.VCC)
+		MISS_SW_B0.VCC, MISS_SW_B1.VCC, MISS_SW_B2.VCC, R38_2.VCC, R39_2.VCC, SPEED_PULSES.VCC, PROBECLK.VCC)
 	NET_C(GND, high.GND, low.GND, ANTENNA.GND, FREESCORE_SW_B0.GND, FREESCORE_SW_B1.GND, FREESCORE_SW_B2.GND, FREESCORE_SW_B3.GND,
-		MISS_SW_B0.GND, MISS_SW_B1.GND, MISS_SW_B2.GND, R38_2.GND, R39_2.GND)
+		MISS_SW_B0.GND, MISS_SW_B1.GND, MISS_SW_B2.GND, R38_2.GND, R39_2.GND, SPEED_PULSES.GND, PROBECLK.GND)
 #endif
 NETLIST_END()

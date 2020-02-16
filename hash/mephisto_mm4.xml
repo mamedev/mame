@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
+<softwarelist name="mephisto_mm4" description="Mephisto MM IV Modules">
+
 <!-- HG 440 module is exclusively used with MM IV -->
 
-<softwarelist name="mephisto_mm4" description="Mephisto MM IV Modules">
 	<software name="hg440">
 		<description>Mephisto HG 440 Opening Library</description>
 		<year>1987</year>
@@ -14,4 +15,5 @@
 			</dataarea>
 		</part>
 	</software>
+
 </softwarelist>

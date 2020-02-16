@@ -112,15 +112,17 @@ void bbc_1mhzbus_slot_device::jim_w(offs_t offset, uint8_t data)
 //#include "teletext.h"
 //#include "digitiser.h"
 #include "emrmidi.h"
+#include "ide.h"
 #include "ieee488.h"
 #include "m2000.h"
 //#include "m5000.h"
-//#include "scsi.h"
+#include "scsi.h"
 //#include "multiform.h"
 #include "opus3.h"
 #include "pms64k.h"
 #include "ramdisc.h"
 //#include "graduate.h"
+#include "beebopl.h"
 #include "beebsid.h"
 //#include "prisma3.h"
 #include "sprite.h"
@@ -132,19 +134,21 @@ void bbc_1mhzbus_devices(device_slot_interface &device)
 	//device.option_add("teletext",   BBC_TELETEXT);        /* Acorn ANE01 Teletext Adapter */
 	device.option_add("ieee488",    BBC_IEEE488);         /* Acorn ANK01 IEEE488 Interface */
 	//device.option_add("m500",       BBC_M500);            /* Acorn ANV02 Music 500 */
-	//device.option_add("awdd",       BBC_AWDD);            /* Acorn Winchester 110/130 */
+	device.option_add("awhd",       BBC_AWHD);            /* Acorn Winchester Disc */
 	device.option_add("autoprom",   BBC_AUTOPROM);        /* ATPL AutoPrommer */
+	device.option_add("beebide",    BBC_BEEBIDE);         /* Sprow BeebIDE 16-bit */
+	device.option_add("ide8",       BBC_IDE8);            /* RetroClinic BBC 8-bit IDE */
 	//device.option_add("beebscan",   BBC_BEEBSCAN);        /* Beeb HandScan */
 	device.option_add("b488",       BBC_B488);            /* Aries B488 */
 	//device.option_add("videodig",   BBC_VIDEODIG);        /* Video Digitiser (RH Electronics) */
 	device.option_add("emrmidi",    BBC_EMRMIDI);         /* EMR Midi Interface */
 	//device.option_add("procyon",    BBC_PROCYON);         /* CST Procyon IEEE Interface */
-	//device.option_add("twdd",       BBC_TWDD);            /* Technomatic Winchester (Akhter Host Adaptor + ABD4070 */
 	//device.option_add("multiform",  BBC_MULTIFORM);       /* Technomatic Multiform Z80 */
 	device.option_add("opus3",      BBC_OPUS3);           /* Opus Challenger 3 */
 	device.option_add("pms64k",     BBC_PMS64K);          /* PMS 64K Non-Volatile Ram Module */
 	device.option_add("ramdisc",    BBC_RAMDISC);         /* Morley Electronics RAM Disc */
 	//device.option_add("graduate",   BBC_GRADUATE);        /* The Torch Graduate G400/G800 */
+	device.option_add("beebopl",    BBC_BEEBOPL);         /* BeebOPL */
 	device.option_add("beebsid",    BBC_BEEBSID);         /* BeebSID */
 	//device.option_add("prisma3",    BBC_PRISMA3);         /* PRISMA-3 - Millipede 1989 */
 	device.option_add("sprite",     BBC_SPRITE);          /* Logotron Sprite Board */
@@ -155,12 +159,13 @@ void bbcm_1mhzbus_devices(device_slot_interface &device)
 	//device.option_add("teletext",   BBC_TELETEXT);        /* Acorn ANE01 Teletext Adapter */
 	device.option_add("ieee488",    BBC_IEEE488);         /* Acorn ANK01 IEEE488 Interface */
 	//device.option_add("m500",       BBC_M500);            /* Acorn ANV02 Music 500 */
-	//device.option_add("awdd",       BBC_AWDD);            /* Acorn Winchester 110/130 */
+	device.option_add("awhd",       BBC_AWHD);            /* Acorn Winchester Disc */
+	device.option_add("beebide",    BBC_BEEBIDE);         /* Sprow BeebIDE 16-bit */
+	device.option_add("ide8",       BBC_IDE8);            /* RetroClinic BBC 8-bit IDE */
 	device.option_add("b488",       BBC_B488);            /* Aries B488 */
 	//device.option_add("videodig",   BBC_VIDEODIG);        /*  Video Digitiser (RH Electronics) */
 	device.option_add("emrmidi",    BBC_EMRMIDI);         /* EMR Midi Interface */
 	//device.option_add("procyon",    BBC_PROCYON);         /* CST Procyon IEEE Interface */
-	//device.option_add("twdd",       BBC_TWDD);            /* Technomatic Winchester (Akhter Host Adaptor + ABD4070 */
 	device.option_add("m2000",      BBC_M2000);           /* Hybrid Music 2000 Interface */
 	//device.option_add("m3000",      BBC_M3000);           /* Hybrid Music 3000 Expander */
 	//device.option_add("m5000",      BBC_M5000);           /* Hybrid Music 5000 Synthesiser */
@@ -170,6 +175,7 @@ void bbcm_1mhzbus_devices(device_slot_interface &device)
 	device.option_add("pms64k",     BBC_PMS64K);          /* PMS 64K Non-Volatile Ram Module */
 	device.option_add("ramdisc",    BBC_RAMDISC);         /* Morley Electronics RAM Disc */
 	//device.option_add("graduate",   BBC_GRADUATE);        /* The Torch Graduate G400/G800 */
+	device.option_add("beebopl",    BBC_BEEBOPL);         /* BeebOPL */
 	device.option_add("beebsid",    BBC_BEEBSID);         /* BeebSID */
 	//device.option_add("prisma3",    BBC_PRISMA3);         /* PRISMA-3 - Millipede 1989 */
 	device.option_add("sprite",     BBC_SPRITE);          /* Logotron Sprite Board */

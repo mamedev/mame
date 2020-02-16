@@ -43,7 +43,7 @@ void osd_watchdog::setTimeout(int timeout)
 
 void *osd_watchdog::watchdog_thread(void *param)
 {
-	osd_watchdog *const thiz(reinterpret_cast<osd_watchdog *>(param));
+	auto *const thiz(reinterpret_cast<osd_watchdog *>(param));
 
 	while (true)
 	{

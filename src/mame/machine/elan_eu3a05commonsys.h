@@ -25,6 +25,8 @@ public:
 	DECLARE_READ8_MEMBER(nmi_vector_r);
 	DECLARE_READ8_MEMBER(irq_vector_r);
 
+	void set_alt_timer() { m_whichtimer = 1; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -62,7 +64,7 @@ private:
 
 	emu_timer *m_unk_timer;
 	static const device_timer_id TIMER_UNK = 0;
-
+	int m_whichtimer;
 
 };
 

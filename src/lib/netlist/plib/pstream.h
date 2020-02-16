@@ -26,12 +26,6 @@
 
 namespace plib {
 
-template <typename T>
-struct constructor_helper
-{
-	plib::unique_ptr<std::istream> operator()(T &&s) { return std::move(plib::make_unique<T>(std::move(s))); }
-};
-
 ///
 /// \brief: putf8reader_t: reader on top of istream.
 ///
@@ -43,16 +37,18 @@ class putf8_reader
 public:
 
 	COPYASSIGN(putf8_reader, delete)
-	putf8_reader &operator=(putf8_reader &&src) = delete;
 	virtual ~putf8_reader() = default;
 
-	template <typename T>
-	friend struct constructor_helper;
+	putf8_reader(putf8_reader &&rhs) noexcept
+	: m_strm(std::move(rhs.m_strm))
+	, m_linebuf(std::move(rhs.m_linebuf))
+	{
+	}
 
-	template <typename T>
-	putf8_reader(T &&strm) // NOLINT(cppcoreguidelines-special-member-functions, misc-forwarding-reference-overload, bugprone-forwarding-reference-overload)
-	: m_strm(std::move(constructor_helper<T>()(std::move(strm)))) // NOLINT(bugprone-move-forwarding-reference)
-	{}
+	putf8_reader(plib::unique_ptr<std::istream> &&rhs) noexcept
+	: m_strm(std::move(rhs))
+	{
+	}
 
 	bool eof() const { return m_strm->eof(); }
 
@@ -69,7 +65,7 @@ public:
 		{
 			if (c == 10)
 				break;
-			else if (c != 13) // ignore CR
+			if (c != 13) // ignore CR
 				m_linebuf += putf8string(1, c);
 			if (!this->readcode(c))
 				break;
@@ -83,9 +79,7 @@ public:
 		if (m_strm->eof())
 			return false;
 		m_strm->read(&b, 1);
-		if (m_strm->eof())
-			return false;
-		return true;
+		return (!m_strm->eof());
 	}
 
 	bool readcode(putf8string::traits_type::code_t &c)
@@ -112,19 +106,6 @@ private:
 	plib::unique_ptr<std::istream> m_strm;
 	putf8string m_linebuf;
 };
-
-template <>
-struct constructor_helper<putf8_reader>
-{
-	plib::unique_ptr<std::istream> operator()(putf8_reader &&s) const { return std::move(s.m_strm); }
-};
-
-template <>
-struct constructor_helper<plib::unique_ptr<std::istream>>
-{
-	plib::unique_ptr<std::istream> operator()(plib::unique_ptr<std::istream> &&s) const { return std::move(s); }
-};
-
 
 // -----------------------------------------------------------------------------
 // putf8writer_t: writer on top of ostream
@@ -170,8 +151,7 @@ class putf8_fmt_writer : public pfmt_writer_t<putf8_fmt_writer>, public putf8_wr
 public:
 
 	explicit putf8_fmt_writer(std::ostream *strm)
-	: pfmt_writer_t()
-	, putf8_writer(strm)
+	: putf8_writer(strm)
 	{
 	}
 

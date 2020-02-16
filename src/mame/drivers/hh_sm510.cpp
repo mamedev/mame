@@ -23,14 +23,15 @@ TODO:
 - confirm gnw_bfight rom (assumed to be the same as gnw_bfightn)
 - confirm gnw_climber rom (assumed to be the same as gnw_climbern)
 - confirm gnw_smb rom (assumed to be the same as gnw_smbn)
-- dump/add purple version of gnw_judge
+- dump/add purple version of gnw_judge, different MCU label?
+- dump/add 2nd version of gnw_mariocmt, different MCU label?
 - dump/add CN-07 version of gnw_helmet
 - Currently there is no accurate way to dump the SM511/SM512 melody ROM
   electronically. For the ones that weren't decapped, they were read by
   playing back all melody data and reconstructing it to ROM. Visual(decap)
   verification is wanted for: gnw_bfightn, gnw_bjack, gnw_bsweep, gnw_climbern,
-  gnw_dkcirc, gnw_dkjrp, gnw_gcliff, gnw_mariotj, gnw_mbaway, gnw_mmousep,
-  gnw_sbuster, gnw_zelda
+  gnw_dkcirc, gnw_dkjrp, gnw_gcliff, gnw_mariocmt, gnw_mariotj, gnw_mbaway,
+  gnw_mmousep, gnw_sbuster, gnw_zelda
 
 ****************************************************************************
 
@@ -82,7 +83,7 @@ JB-63     ms   SM511   Safe Buster
 MV-64     ms   SM512   Gold Cliff
 ZL-65     ms   SM512   Zelda
 CJ-71*    tt   SM511?  Donkey Kong Jr.
-CM-72*    tt   SM511?  Mario's Cement Factory
+CM-72     tt   SM511   Mario's Cement Factory
 SM-73*    tt   SM511?  Snoopy
 PG-74*    tt   SM511?  Popeye
 SM-91*    p    SM511?  Snoopy (assume same ROM & LCD as tabletop version)
@@ -111,6 +112,9 @@ YM-901-S* x    SM511   Super Mario Bros.  "
 
 RGW-001 (2010 Ball remake) is on different hardware, ATmega169PV MCU.
 The "Mini Classics" keychains are by Nelsonic, not Nintendo.
+
+Bassmate Computer (BM-501) is on identical hardware as G&W Multi Screen,
+but it's not part of the game series.
 
 ***************************************************************************/
 
@@ -2772,6 +2776,83 @@ ROM_START( gnw_zelda )
 
 	ROM_REGION( 424886, "screen_bottom", 0)
 	ROM_LOAD( "gnw_zelda_bottom.svg", 0, 424886, CRC(09f00d09) SHA1(33045028bd7e0df4e976e79dc180028c6886359a) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Mario's Cement Factory (model CM-72)
+  * PCB labels: CM-72 M (main board)
+                CM-72 C (joystick controller board)
+                CM-72 S (buttons controller board)
+  * Sharp SM511 label CM-72 534A (no decap)
+  * inverted lcd screen with custom segments, 1-bit sound
+
+  This is the tabletop version. There's also a new wide screen version which is
+  a different game. Unlike the other tabletop games, there is no panorama version.
+  There are two known versions, distinguished by the startup jingle. The first
+  version sounds like Queen's "Another One Bites the Dust".
+
+***************************************************************************/
+
+class gnw_mariocmt_state : public hh_sm510_state
+{
+public:
+	gnw_mariocmt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void gnw_mariocmt(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_mariocmt )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Open
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void gnw_mariocmt_state::gnw_mariocmt(machine_config &config)
+{
+	sm511_common(config, 1920, 1046);
+}
+
+// roms
+
+ROM_START( gnw_mariocmt )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "cm-72.program", 0x0000, 0x1000, CRC(b2ae4596) SHA1(f64bf11e18c9fbd4de4134f685bb2d7bda3d7487) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "cm-72.melody", 0x000, 0x100, BAD_DUMP CRC(db4f0fc1) SHA1(e386df3e3e88fa36a73bcd0649feb904180493c8) ) // decap needed for verification
+
+	ROM_REGION( 293317, "screen", 0)
+	ROM_LOAD( "gnw_mariocmt.svg", 0, 293317, CRC(4f969dc7) SHA1(fec72c4a8600c0753f81bfb296b53cca6aee14cc) )
 ROM_END
 
 
@@ -8772,33 +8853,33 @@ ROM_END
 
 //    YEAR  NAME         PARENT   COMP  MACHINE      INPUT        CLASS              INIT        COMPANY, FULLNAME, FLAGS
 
-// Nintendo G&W: silver/gold (initial series is uncategorized, "silver" was made up later)
+// Nintendo G&W: Silver/Gold (initial series is uncategorized, "Silver" was made up later)
 CONS( 1980, gnw_ball,    0,          0, gnw_ball,    gnw_ball,    gnw_ball_state,    empty_init, "Nintendo", "Game & Watch: Ball", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, gnw_flagman, 0,          0, gnw_flagman, gnw_flagman, gnw_flagman_state, empty_init, "Nintendo", "Game & Watch: Flagman", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, gnw_vermin,  0,          0, gnw_vermin,  gnw_vermin,  gnw_vermin_state,  empty_init, "Nintendo", "Game & Watch: Vermin", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, gnw_fires,   0,          0, gnw_fires,   gnw_fires,   gnw_fires_state,   empty_init, "Nintendo", "Game & Watch: Fire (silver)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, gnw_judge,   0,          0, gnw_judge,   gnw_judge,   gnw_judge_state,   empty_init, "Nintendo", "Game & Watch: Judge (green)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, gnw_manholeg,0,          0, gnw_manholeg,gnw_manholeg,gnw_manholeg_state,empty_init, "Nintendo", "Game & Watch: Manhole (gold)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, gnw_helmet,  0,          0, gnw_helmet,  gnw_helmet,  gnw_helmet_state,  empty_init, "Nintendo", "Game & Watch: Helmet (Rev. 2)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, gnw_fires,   0,          0, gnw_fires,   gnw_fires,   gnw_fires_state,   empty_init, "Nintendo", "Game & Watch: Fire (Silver)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, gnw_judge,   0,          0, gnw_judge,   gnw_judge,   gnw_judge_state,   empty_init, "Nintendo", "Game & Watch: Judge (green version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, gnw_manholeg,0,          0, gnw_manholeg,gnw_manholeg,gnw_manholeg_state,empty_init, "Nintendo", "Game & Watch: Manhole (Gold)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, gnw_helmet,  0,          0, gnw_helmet,  gnw_helmet,  gnw_helmet_state,  empty_init, "Nintendo", "Game & Watch: Helmet (CN-17 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_lion,    0,          0, gnw_lion,    gnw_lion,    gnw_lion_state,    empty_init, "Nintendo", "Game & Watch: Lion", MACHINE_SUPPORTS_SAVE )
 
-// Nintendo G&W: wide screen
+// Nintendo G&W: Wide Screen
 CONS( 1981, gnw_pchute,  0,          0, gnw_pchute,  gnw_pchute,  gnw_pchute_state,  empty_init, "Nintendo", "Game & Watch: Parachute", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_octopus, 0,          0, gnw_octopus, gnw_octopus, gnw_octopus_state, empty_init, "Nintendo", "Game & Watch: Octopus", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, gnw_popeye,  0,          0, gnw_popeye,  gnw_popeye,  gnw_popeye_state,  empty_init, "Nintendo", "Game & Watch: Popeye (wide screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, gnw_popeye,  0,          0, gnw_popeye,  gnw_popeye,  gnw_popeye_state,  empty_init, "Nintendo", "Game & Watch: Popeye (Wide Screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_chef,    0,          0, gnw_chef,    gnw_chef,    gnw_chef_state,    empty_init, "Nintendo", "Game & Watch: Chef", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, merrycook,   gnw_chef,   0, merrycook,   gnw_chef,    gnw_chef_state,    empty_init, "Elektronika", "Merry Cook", MACHINE_SUPPORTS_SAVE)
-CONS( 1981, gnw_mmouse,  0,          0, gnw_mmouse,  gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Mickey Mouse (wide screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, gnw_mmouse,  0,          0, gnw_mmouse,  gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Mickey Mouse (Wide Screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_egg,     gnw_mmouse, 0, gnw_egg,     gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE )
 CONS( 1984, nupogodi,    gnw_mmouse, 0, nupogodi,    gnw_mmouse,  gnw_mmouse_state,  empty_init, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, exospace,    gnw_mmouse, 0, exospace,    exospace,    gnw_mmouse_state,  empty_init, "Elektronika", "Explorers of Space", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, gnw_fire,    0,          0, gnw_fire,    gnw_fire,    gnw_fire_state,    empty_init, "Nintendo", "Game & Watch: Fire (wide screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, gnw_fire,    0,          0, gnw_fire,    gnw_fire,    gnw_fire_state,    empty_init, "Nintendo", "Game & Watch: Fire (Wide Screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, spacebridge, gnw_fire,   0, spacebridge, gnw_fire,    gnw_fire_state,    empty_init, "Elektronika", "Space Bridge", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, gnw_tbridge, 0,          0, gnw_tbridge, gnw_tbridge, gnw_tbridge_state, empty_init, "Nintendo", "Game & Watch: Turtle Bridge", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, gnw_fireatk, 0,          0, gnw_fireatk, gnw_fireatk, gnw_fireatk_state, empty_init, "Nintendo", "Game & Watch: Fire Attack", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, gnw_stennis, 0,          0, gnw_stennis, gnw_stennis, gnw_stennis_state, empty_init, "Nintendo", "Game & Watch: Snoopy Tennis", MACHINE_SUPPORTS_SAVE )
 
-// Nintendo G&W: multi screen
+// Nintendo G&W: Multi Screen
 CONS( 1982, gnw_opanic,  0,          0, gnw_opanic,  gnw_opanic,  gnw_opanic_state,  empty_init, "Nintendo", "Game & Watch: Oil Panic", MACHINE_SUPPORTS_SAVE)
 CONS( 1982, gnw_dkong,   0,          0, gnw_dkong,   gnw_dkong,   gnw_dkong_state,   empty_init, "Nintendo", "Game & Watch: Donkey Kong", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, gnw_mickdon, 0,          0, gnw_mickdon, gnw_mickdon, gnw_mickdon_state, empty_init, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE )
@@ -8814,29 +8895,30 @@ CONS( 1988, gnw_sbuster, 0,          0, gnw_sbuster, gnw_sbuster, gnw_sbuster_st
 CONS( 1988, gnw_gcliff,  0,          0, gnw_gcliff,  gnw_gcliff,  gnw_gcliff_state,  empty_init, "Nintendo", "Game & Watch: Gold Cliff", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, gnw_zelda,   0,          0, gnw_zelda,   gnw_zelda,   gnw_zelda_state,   empty_init, "Nintendo", "Game & Watch: Zelda", MACHINE_SUPPORTS_SAVE )
 
-// Nintendo G&W: new wide screen / crystal screen
-CONS( 1982, gnw_dkjr,    0,          0, gnw_dkjr,    gnw_dkjr,    gnw_dkjr_state,    empty_init, "Nintendo", "Game & Watch: Donkey Kong Jr. (new wide screen)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, gnw_mariocm, 0,          0, gnw_mariocm, gnw_mariocm, gnw_mariocm_state, empty_init, "Nintendo", "Game & Watch: Mario's Cement Factory (new wide screen)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, gnw_manhole, 0,          0, gnw_manhole, gnw_manhole, gnw_manhole_state, empty_init, "Nintendo", "Game & Watch: Manhole (new wide screen)", MACHINE_SUPPORTS_SAVE )
+// Nintendo G&W: New Wide Screen / Crystal Screen
+CONS( 1982, gnw_dkjr,    0,          0, gnw_dkjr,    gnw_dkjr,    gnw_dkjr_state,    empty_init, "Nintendo", "Game & Watch: Donkey Kong Jr. (New Wide Screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gnw_mariocm, 0,          0, gnw_mariocm, gnw_mariocm, gnw_mariocm_state, empty_init, "Nintendo", "Game & Watch: Mario's Cement Factory (New Wide Screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gnw_manhole, 0,          0, gnw_manhole, gnw_manhole, gnw_manhole_state, empty_init, "Nintendo", "Game & Watch: Manhole (New Wide Screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1985, gnw_tfish,   0,          0, gnw_tfish,   gnw_tfish,   gnw_tfish_state,   empty_init, "Nintendo", "Game & Watch: Tropical Fish", MACHINE_SUPPORTS_SAVE )
-CONS( 1986, gnw_smb,     0,          0, gnw_smb,     gnw_smb,     gnw_smb_state,     empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (crystal screen)", MACHINE_SUPPORTS_SAVE )
-CONS( 1988, gnw_smbn,    gnw_smb,    0, gnw_smbn,    gnw_smb,     gnw_smb_state,     empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (new wide screen)", MACHINE_SUPPORTS_SAVE )
-CONS( 1986, gnw_climber, 0,          0, gnw_climber, gnw_climber, gnw_climber_state, empty_init, "Nintendo", "Game & Watch: Climber (crystal screen)", MACHINE_SUPPORTS_SAVE )
-CONS( 1988, gnw_climbern,gnw_climber,0, gnw_climbern,gnw_climber, gnw_climber_state, empty_init, "Nintendo", "Game & Watch: Climber (new wide screen)", MACHINE_SUPPORTS_SAVE )
-CONS( 1986, gnw_bfight,  0,          0, gnw_bfight,  gnw_bfight,  gnw_bfight_state,  empty_init, "Nintendo", "Game & Watch: Balloon Fight (crystal screen)", MACHINE_SUPPORTS_SAVE )
-CONS( 1988, gnw_bfightn, gnw_bfight, 0, gnw_bfightn, gnw_bfight,  gnw_bfight_state,  empty_init, "Nintendo", "Game & Watch: Balloon Fight (new wide screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1986, gnw_smb,     0,          0, gnw_smb,     gnw_smb,     gnw_smb_state,     empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (Crystal Screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1988, gnw_smbn,    gnw_smb,    0, gnw_smbn,    gnw_smb,     gnw_smb_state,     empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (New Wide Screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1986, gnw_climber, 0,          0, gnw_climber, gnw_climber, gnw_climber_state, empty_init, "Nintendo", "Game & Watch: Climber (Crystal Screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1988, gnw_climbern,gnw_climber,0, gnw_climbern,gnw_climber, gnw_climber_state, empty_init, "Nintendo", "Game & Watch: Climber (New Wide Screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1986, gnw_bfight,  0,          0, gnw_bfight,  gnw_bfight,  gnw_bfight_state,  empty_init, "Nintendo", "Game & Watch: Balloon Fight (Crystal Screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1988, gnw_bfightn, gnw_bfight, 0, gnw_bfightn, gnw_bfight,  gnw_bfight_state,  empty_init, "Nintendo", "Game & Watch: Balloon Fight (New Wide Screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1991, gnw_mariotj, 0,          0, gnw_mariotj, gnw_mariotj, gnw_mariotj_state, empty_init, "Nintendo", "Game & Watch: Mario The Juggler", MACHINE_SUPPORTS_SAVE )
 
-// Nintendo G&W: table top / panorama screen
-CONS( 1983, gnw_dkjrp,   0,          0, gnw_dkjrp,   gnw_dkjrp,   gnw_dkjrp_state,   empty_init, "Nintendo", "Game & Watch: Donkey Kong Jr. (panorama screen)", MACHINE_SUPPORTS_SAVE )
+// Nintendo G&W: Table Top / Panorama Screen
+CONS( 1983, gnw_mariocmt,0,          0, gnw_mariocmt,gnw_mariocmt,gnw_mariocmt_state,empty_init, "Nintendo", "Game & Watch: Mario's Cement Factory (Table Top)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gnw_dkjrp,   0,          0, gnw_dkjrp,   gnw_dkjrp,   gnw_dkjrp_state,   empty_init, "Nintendo", "Game & Watch: Donkey Kong Jr. (Panorama Screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_mbaway,  0,          0, gnw_mbaway,  gnw_mbaway,  gnw_mbaway_state,  empty_init, "Nintendo", "Game & Watch: Mario's Bombs Away", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, gnw_mmousep, 0,          0, gnw_mmousep, gnw_mmousep, gnw_mmousep_state, empty_init, "Nintendo", "Game & Watch: Mickey Mouse (panorama screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, gnw_mmousep, 0,          0, gnw_mmousep, gnw_mmousep, gnw_mmousep_state, empty_init, "Nintendo", "Game & Watch: Mickey Mouse (Panorama Screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1984, gnw_dkcirc,  gnw_mmousep,0, gnw_dkcirc,  gnw_mmousep, gnw_mmousep_state, empty_init, "Nintendo", "Game & Watch: Donkey Kong Circus", MACHINE_SUPPORTS_SAVE )
 
-// Nintendo G&W: super color
+// Nintendo G&W: Super Color
 CONS( 1984, gnw_ssparky, 0,          0, gnw_ssparky, gnw_ssparky, gnw_ssparky_state, empty_init, "Nintendo", "Game & Watch: Spitball Sparky", MACHINE_SUPPORTS_SAVE )
 
-// Nintendo G&W: micro vs. system (actually, no official Game & Watch logo anywhere)
+// Nintendo G&W: Micro Vs. System (actually, no official Game & Watch logo anywhere)
 CONS( 1984, gnw_boxing,  0,          0, gnw_boxing,  gnw_boxing,  gnw_boxing_state,  empty_init, "Nintendo", "Micro Vs. System: Boxing", MACHINE_SUPPORTS_SAVE )
 
 // Konami

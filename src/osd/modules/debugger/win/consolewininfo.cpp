@@ -95,6 +95,7 @@ consolewin_info::~consolewin_info()
 {
 }
 
+
 void consolewin_info::set_cpu(device_t &device)
 {
 	// exit if this cpu is already selected
@@ -281,7 +282,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 						std::string as = slmap.find(opt_name)->second;
 
 						/* Make sure a folder was specified, and that it exists */
-						if ((!osd::directory::open(as.c_str())) || (as.find(':') == std::string::npos))
+						if ((!osd::directory::open(as)) || (as.find(':') == std::string::npos))
 						{
 							/* Default to emu directory */
 							osd_get_full_path(as, ".");
@@ -321,7 +322,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 							buf.erase(0, t1+1);
 
 							// load software
-							img->load_software( buf.c_str());
+							img->load_software(buf);
 						}
 					}
 				}
@@ -351,7 +352,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 							as = buf; // the only path
 
 						/* Make sure a folder was specified, and that it exists */
-						if ((!osd::directory::open(as.c_str())) || (as.find(':') == std::string::npos))
+						if ((!osd::directory::open(as)) || (as.find(':') == std::string::npos))
 						{
 							/* Default to emu directory */
 							osd_get_full_path(as, ".");
@@ -377,7 +378,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 						if (GetOpenFileName(&ofn))
 						{
 							auto utf8_buf = osd::text::from_tstring(selectedFilename);
-							img->load(utf8_buf.c_str());
+							img->load(utf8_buf);
 						}
 					}
 				}
@@ -406,7 +407,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 							as = buf; // the only path
 
 						/* Make sure a folder was specified, and that it exists */
-						if ((!osd::directory::open(as.c_str())) || (as.find(':') == std::string::npos))
+						if ((!osd::directory::open(as)) || (as.find(':') == std::string::npos))
 						{
 							/* Default to emu directory */
 							osd_get_full_path(as, ".");
@@ -432,7 +433,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 						if (GetSaveFileName(&ofn))
 						{
 							auto utf8_buf = osd::text::from_tstring(selectedFilename);
-							img->create(utf8_buf.c_str(), img->device_get_indexed_creatable_format(0), nullptr);
+							img->create(utf8_buf, img->device_get_indexed_creatable_format(0), nullptr);
 						}
 					}
 				}
@@ -443,7 +444,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 			}
 			if (img->device().type() == CASSETTE)
 			{
-				cassette_image_device *const cassette = downcast<cassette_image_device *>(&img->device());
+				auto *const cassette = downcast<cassette_image_device *>(&img->device());
 				bool s;
 				switch ((LOWORD(wparam) - ID_DEVICE_OPTIONS) % DEVOPTION_MAX)
 				{
@@ -598,7 +599,7 @@ bool consolewin_info::get_softlist_info(device_image_interface *img)
 		while (sl_root && !passes_tests)
 		{
 			std::string test_path = sl_root + sl_dir;
-			if (osd::directory::open(test_path.c_str()))
+			if (osd::directory::open(test_path))
 			{
 				passes_tests = true;
 				slmap[opt_name] = test_path;

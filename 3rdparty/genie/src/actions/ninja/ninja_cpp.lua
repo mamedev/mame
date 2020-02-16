@@ -85,7 +85,7 @@ end
 		_p("  command         = " .. wrap_ninja_cmd("$pre_link " .. link .. " -o $out @$out.rsp $all_ldflags $post_build"))
 		_p("  description     = link $out")
 		_p("  rspfile         = $out.rsp")
-  		_p("  rspfile_content = $all_outputfiles " .. string.format("%s $libs %s", startgroup, endgroup))
+		_p("  rspfile_content = $all_outputfiles $walibs" .. string.format("%s $libs %s", startgroup, endgroup))
 		_p("")
 
 		_p("rule exec")
@@ -330,15 +330,36 @@ end
 	end
 
 	function cpp.linker(prj, cfg, objfiles, tool)
-		local all_ldflags = ninja.list(table.join(tool.getlibdirflags(cfg), tool.getldflags(cfg), cfg.linkoptions))
-		local lddeps      = ninja.list(premake.getlinks(cfg, "siblings", "fullpath"))
-		local libs        = lddeps .. " " .. ninja.list(tool.getlinkflags(cfg))
-
+		local all_ldflags    = ninja.list(table.join(tool.getlibdirflags(cfg), tool.getldflags(cfg), cfg.linkoptions))
 		local prebuildsuffix = #cfg.prebuildcommands > 0 and "||__prebuildcommands" or ""
+		local libs           = {}
+		local walibs         = {}
+		local lddeps         = {}
+
+		if #cfg.wholearchive > 0 then
+			for _, linkcfg in ipairs(premake.getlinks(cfg, "siblings", "object")) do
+				local linkpath = path.rebase(linkcfg.linktarget.fullpath, linkcfg.location, cfg.location)
+				table.insert(lddeps, linkpath)
+
+				if table.icontains(cfg.wholearchive, linkcfg.project.name) then
+					table.insert(walibs, table.concat(tool.wholearchive(linkpath), ' '))
+				else
+					table.insert(libs, linkpath)
+				end
+			end
+		else
+			lddeps = premake.getlinks(cfg, "siblings", "fullpath")
+			libs   = lddeps
+		end
+
+		lddeps               = ninja.list(lddeps)
+		libs                 = ninja.list(libs) .. " " .. ninja.list(tool.getlinkflags(cfg))
+		walibs               = ninja.list(walibs)
 
 		local function writevars()
 			_p(1, "all_ldflags     = " .. all_ldflags)
 			_p(1, "libs            = " .. libs)
+			_p(1, "walibs          = " .. walibs)
 			_p(1, "all_outputfiles = " .. table.concat(objfiles, " "))
 			if #cfg.prelinkcommands > 0 then
 				_p(1, 'pre_link        = echo Running pre-link commands && ' .. table.implode(cfg.prelinkcommands, "", "", " && ") .. " && ")

@@ -15,7 +15,7 @@
 #include "emu.h"
 #include "machine/ds1994.h"
 
-#include <time.h>
+#include <ctime>
 
 #define VERBOSE_LEVEL 0
 

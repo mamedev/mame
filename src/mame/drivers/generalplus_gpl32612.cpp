@@ -4,14 +4,18 @@
 
 /*****************************************************************************
 
-    unlike earlier SunPlus / GeneralPlus based SoCs this one seems to be
+    unlike earlier SunPlus / GeneralPlus based SoCs this one is
     ARM based
 
+    NAND types
 
-	NAND types
-	
-	Star Wars Blaster MX30LF1G08AA (2048+64) x 64 x 512
-	TMNT Hero Portal MX30LF1G08AA (2048+64) x 64 x 512
+    MX30LF1G08AA
+    ID = C2F1
+    Capacity = (2048+64) x 64 x 512
+
+    Star Wars Blaster - MX30LF1G08AA
+    TMNT Hero Portal  - MX30LF1G08AA
+    DC Hero Portal    - MX30LF1G08AA
 
 *****************************************************************************/
 
@@ -85,14 +89,24 @@ void generalplus_gpl32612_game_state::gpl32612(machine_config &config)
 
 // NAND dumps, so there will be a bootloader / boot strap at least
 
+ROM_START( jak_swbstrik )
+	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "starwarsblaster.bin", 0x000000, 0x8400000, CRC(02c3c4d6) SHA1(a6ae05a7d7b2015023113f6baad25458f3c01102) )
+ROM_END
+
 ROM_START( jak_tmnthp )
 	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "tmntheroportal.bin", 0x000000, 0x8400000, CRC(75ec7127) SHA1(cd05f55a1f5a7fd3d1b0658ad6805b8777857a7e) )
 ROM_END
 
-ROM_START( jak_swbstrik )
+ROM_START( jak_ddhp )
 	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "starwarsblaster.bin", 0x000000, 0x8400000, CRC(02c3c4d6) SHA1(a6ae05a7d7b2015023113f6baad25458f3c01102) )
+	ROM_LOAD( "dragonsheroesportal_mx30lf1g08aa_c2f1.bin", 0x000000, 0x8400000, CRC(825cce7b) SHA1(2185137138f2a20e5cfe9c167eeb67a146953b65) )
+ROM_END
+
+ROM_START( jak_dchp )
+	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "dcheroportal_mx30lf1g08aa_c2f1.bin", 0x000000, 0x8400000, CRC(576a3005) SHA1(6cd9edc4def707aede3f82a21c87269d2a6bc870) )
 ROM_END
 
 void generalplus_gpl32612_game_state::nand_init(int blocksize, int blocksize_stripped)
@@ -137,8 +151,8 @@ void generalplus_gpl32612_game_state::nand_init840()
 
 
 //    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags
-CONS( 200?, jak_tmnthp,      0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Teenage Mutant Ninja Turtles Hero Portal", MACHINE_IS_SKELETON )
 CONS( 200?, jak_swbstrik,    0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Star Wars Blaster Strike", MACHINE_IS_SKELETON )
-// Hero Portal Dreamworks Dragons
+CONS( 200?, jak_tmnthp,      0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Teenage Mutant Ninja Turtles Hero Portal", MACHINE_IS_SKELETON )
+CONS( 200?, jak_ddhp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "DreamWorks Dragons Hero Portal", MACHINE_IS_SKELETON )
 // Hero Portal Power Rangers
-// Hero Portal DC Super Heroes
+CONS( 200?, jak_dchp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "DC Super Heroes The Watchtower Hero Portal", MACHINE_IS_SKELETON )

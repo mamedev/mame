@@ -178,7 +178,7 @@ void windows_osd_interface::extract_video_config()
 	video_config.triplebuf     = options().triple_buffer();
 	video_config.switchres     = options().switch_res();
 
-	if (video_config.prescale < 1 || video_config.prescale > 3)
+	if (video_config.prescale < 1 || video_config.prescale > 8)
 	{
 		osd_printf_warning("Invalid prescale option, reverting to '1'\n");
 		video_config.prescale = 1;

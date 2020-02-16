@@ -8,11 +8,11 @@
 
 ******************************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "palette.h"
-#include <stdlib.h>
-#include <math.h>
+#include <cstdlib>
+#include <cmath>
 #include <algorithm>
 
 
@@ -249,15 +249,6 @@ palette_t::palette_t(uint32_t numcolors, uint32_t numgroups)
 	m_adjusted_rgb15[numcolors * numgroups + 0] = rgb_t::black().as_rgb15();
 	m_adjusted_color[numcolors * numgroups + 1] = rgb_t::white();
 	m_adjusted_rgb15[numcolors * numgroups + 1] = rgb_t::white().as_rgb15();
-}
-
-
-//-------------------------------------------------
-//  palette_t - destructor
-//-------------------------------------------------
-
-palette_t::~palette_t()
-{
 }
 
 

@@ -949,6 +949,10 @@
 			_p(3, '<CreateHotPatchableImage>Enabled</CreateHotPatchableImage>')
 		end
 
+		if cfg.flags.GenerateMapFiles then
+			_p(3, '<GenerateMapFile>true</GenerateMapFile>')
+		end
+
 		_p(2,'</Link>')
 
 		-- If any libraries are to be linked as whole archive, we need to

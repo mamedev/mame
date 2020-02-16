@@ -60,24 +60,28 @@ unsp_device::unsp_device(const machine_config &mconfig, device_type type, const 
 	, m_enable_drc(false)
 {
 	m_iso = 10;
+	m_numregs = 8;
 }
 
 unsp_device::unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: unsp_device(mconfig, UNSP, tag, owner, clock, address_map_constructor())
 {
 	m_iso = 10;
+	m_numregs = 8;
 }
 
 unsp_11_device::unsp_11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: unsp_device(mconfig, UNSP_11, tag, owner, clock, address_map_constructor())
 {
 	m_iso = 11;
+	m_numregs = 8;
 }
 
 unsp_11_device::unsp_11_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal)
 	: unsp_device(mconfig, type, tag, owner, clock, internal)
 {
 	m_iso = 11;
+	m_numregs = 8;
 }
 
 
@@ -85,24 +89,28 @@ unsp_12_device::unsp_12_device(const machine_config &mconfig, const char *tag, d
 	: unsp_11_device(mconfig, UNSP_12, tag, owner, clock, address_map_constructor())
 {
 	m_iso = 12;
+	m_numregs = 8;
 }
 
 unsp_12_device::unsp_12_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal)
 	: unsp_11_device(mconfig, type, tag, owner, clock, internal)
 {
 	m_iso = 12;
+	m_numregs = 8;
 }
 
 unsp_20_device::unsp_20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: unsp_12_device(mconfig, UNSP_20, tag, owner, clock, address_map_constructor())
 {
 	m_iso = 20;
+	m_numregs = 16;
 }
 
 unsp_20_device::unsp_20_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal)
 	: unsp_12_device(mconfig, type, tag, owner, clock, internal)
 {
 	m_iso = 20;
+	m_numregs = 16;
 }
 
 unsp_device::~unsp_device()
@@ -182,6 +190,7 @@ void unsp_device::unimplemented_opcode(uint16_t op, uint16_t ximm, uint16_t ximm
 
 void unsp_device::device_start()
 {
+
 	m_core = (internal_unsp_state *)m_cache.alloc_near(sizeof(internal_unsp_state));
 	memset(m_core, 0, sizeof(internal_unsp_state));
 
@@ -219,6 +228,7 @@ void unsp_device::device_start()
 	m_drcuml->symbol_add(&m_core->m_r[REG_PC], sizeof(uint32_t), "PC");
 	m_drcuml->symbol_add(&m_core->m_enable_irq, sizeof(uint32_t), "IRQE");
 	m_drcuml->symbol_add(&m_core->m_enable_fiq, sizeof(uint32_t), "FIQE");
+	m_drcuml->symbol_add(&m_core->m_fir_move, sizeof(uint32_t), "FIR_MOV");
 	m_drcuml->symbol_add(&m_core->m_irq, sizeof(uint32_t), "IRQ");
 	m_drcuml->symbol_add(&m_core->m_fiq, sizeof(uint32_t), "FIQ");
 	m_drcuml->symbol_add(&m_core->m_sb, sizeof(uint32_t), "SB");
@@ -242,9 +252,10 @@ void unsp_device::device_start()
 	state_add(UNSP_PC,     "PC", m_debugger_temp).callimport().callexport().formatstr("%06X");
 	state_add(UNSP_IRQ_EN, "IRQE", m_core->m_enable_irq).formatstr("%1u");
 	state_add(UNSP_FIQ_EN, "FIQE", m_core->m_enable_fiq).formatstr("%1u");
+	state_add(UNSP_FIR_MOV_EN, "FIR_MOV", m_core->m_fir_move).formatstr("%1u");
 	state_add(UNSP_IRQ,    "IRQ", m_core->m_irq).formatstr("%1u");
 	state_add(UNSP_FIQ,    "FIQ", m_core->m_fiq).formatstr("%1u");
-	state_add(UNSP_SB,     "SB", m_core->m_sb).formatstr("%1u");
+	state_add(UNSP_SB,     "SB", m_core->m_sb).formatstr("%1X");
 #if UNSP_LOG_OPCODES || UNSP_LOG_REGS
 	state_add(UNSP_LOG_OPS,"LOG", m_log_ops).formatstr("%1u");
 #endif
@@ -255,6 +266,7 @@ void unsp_device::device_start()
 	save_item(NAME(m_core->m_r));
 	save_item(NAME(m_core->m_enable_irq));
 	save_item(NAME(m_core->m_enable_fiq));
+	save_item(NAME(m_core->m_fir_move));
 	save_item(NAME(m_core->m_irq));
 	save_item(NAME(m_core->m_fiq));
 	save_item(NAME(m_core->m_curirq));
@@ -275,25 +287,30 @@ void unsp_20_device::device_start()
 	int baseindex = UNSP_SB + 1;
 #endif
 
-	state_add(baseindex + UNSP20_R8,     "R8", m_secondary_r[UNSP20_R8]).formatstr("%04X");
-	state_add(baseindex + UNSP20_R9,     "R9", m_secondary_r[UNSP20_R9]).formatstr("%04X");
-	state_add(baseindex + UNSP20_R10,    "R10", m_secondary_r[UNSP20_R10]).formatstr("%04X");
-	state_add(baseindex + UNSP20_R11,    "R11", m_secondary_r[UNSP20_R11]).formatstr("%04X");
-	state_add(baseindex + UNSP20_R12,    "R12", m_secondary_r[UNSP20_R12]).formatstr("%04X");
-	state_add(baseindex + UNSP20_R13,    "R13", m_secondary_r[UNSP20_R13]).formatstr("%04X");
-	state_add(baseindex + UNSP20_R14,    "R14", m_secondary_r[UNSP20_R14]).formatstr("%04X");
-	state_add(baseindex + UNSP20_R15,    "R15", m_secondary_r[UNSP20_R15]).formatstr("%04X");
-
-	save_item(NAME(m_secondary_r));
+	state_add(baseindex + UNSP20_R8,     "R8", m_core->m_r[UNSP20_R8+8]).formatstr("%04X");
+	state_add(baseindex + UNSP20_R9,     "R9", m_core->m_r[UNSP20_R9+8]).formatstr("%04X");
+	state_add(baseindex + UNSP20_R10,    "R10", m_core->m_r[UNSP20_R10+8]).formatstr("%04X");
+	state_add(baseindex + UNSP20_R11,    "R11", m_core->m_r[UNSP20_R11+8]).formatstr("%04X");
+	state_add(baseindex + UNSP20_R12,    "R12", m_core->m_r[UNSP20_R12+8]).formatstr("%04X");
+	state_add(baseindex + UNSP20_R13,    "R13", m_core->m_r[UNSP20_R13+8]).formatstr("%04X");
+	state_add(baseindex + UNSP20_R14,    "R14", m_core->m_r[UNSP20_R14+8]).formatstr("%04X");
+	state_add(baseindex + UNSP20_R15,    "R15", m_core->m_r[UNSP20_R15+8]).formatstr("%04X");
 }
 
 void unsp_device::device_reset()
 {
-	memset(m_core->m_r, 0, sizeof(uint32_t) * 8);
+	for (int i = 0; i < ARRAY_LENGTH(m_core->m_r); i++)
+	{
+		if (i < m_numregs)
+			m_core->m_r[i] = 0;
+		else
+			m_core->m_r[i] = 0xdeadbeef;
+	}
 
 	m_core->m_r[REG_PC] = read16(0xfff7);
 	m_core->m_enable_irq = 0;
 	m_core->m_enable_fiq = 0;
+	m_core->m_fir_move = 1;
 	m_core->m_irq = 0;
 	m_core->m_fiq = 0;
 }
@@ -301,11 +318,6 @@ void unsp_device::device_reset()
 void unsp_20_device::device_reset()
 {
 	unsp_12_device::device_reset();
-
-	for (int i = 0; i < 8; i++)
-	{
-		m_secondary_r[i] = 0;
-	}
 }
 
 void unsp_device::device_stop()
@@ -384,7 +396,7 @@ void unsp_device::state_import(const device_state_entry &entry)
 void unsp_device::update_nzsc(uint32_t value, uint16_t r0, uint16_t r1)
 {
 	m_core->m_r[REG_SR] &= ~(UNSP_N | UNSP_Z | UNSP_S | UNSP_C);
-	if (int16_t(r0) < int16_t(~r1))
+	if (BIT(value, 16) != BIT((r0 ^ r1), 15))
 		m_core->m_r[REG_SR] |= UNSP_S;
 	if (BIT(value, 15))
 		m_core->m_r[REG_SR] |= UNSP_N;

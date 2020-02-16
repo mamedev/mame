@@ -3,7 +3,7 @@
 
 /* Field Combat (c)1985 Jaleco
 
-    TS 2004.10.22. analog[at]op.pl
+    TS 2004.10.22.
     - fixed sprite issues
     - added backgrounds and terrain info (external roms)
 

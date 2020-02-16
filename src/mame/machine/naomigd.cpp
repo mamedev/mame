@@ -401,11 +401,135 @@ void naomi_gdrom_board::write_from_qword(uint8_t *region, uint64_t qword)
 		region[i] = qword >> (56-(i*8));
 }
 
+// For ide gdrom controller
+
+DEFINE_DEVICE_TYPE(IDE_GDROM, idegdrom_device, "ide_gdrom", "ide gdrom controller")
+
+idegdrom_device::idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const char *image_tag, const char *space_tag, int space_id)
+	: idegdrom_device(mconfig, tag, owner, clock)
+{
+	space_owner_tag = space_tag;
+	space_owner_id = space_id;
+}
+
+idegdrom_device::idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, IDE_GDROM, tag, owner, clock),
+	m_ide(*this, "ide"),
+	irq_cb(*this)
+{
+	set_ids(0x11db189d, 0, 0, 0); // 0x10221000 or 0x00011172 possible too
+}
+
+void idegdrom_device::device_start()
+{
+	pci_device::device_start();
+	irq_cb.resolve_safe();
+	add_map(0x00000020, M_IO, FUNC(idegdrom_device::map_command));
+	bank_infos[0].adr = 0x01c0;
+	// pci system does not support base addresses not multiples of size
+	add_map(0x00000020, M_IO | M_DISABLED, FUNC(idegdrom_device::map_control));
+	bank_infos[1].adr = 0x03b0;
+	add_map(0x00000010, M_IO, FUNC(idegdrom_device::map_dma));
+	bank_infos[2].adr = 0xcc00;
+	command = 0x0083;
+}
+
+void idegdrom_device::device_reset()
+{
+	pci_device::device_reset();
+}
+
+void idegdrom_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
+{
+	io_space->install_device(io_offset + 0x03b0, io_offset + 0x03cf, *static_cast<idegdrom_device*>(this), &idegdrom_device::map_control);
+}
+
+static void gdrom_devices(device_slot_interface &device)
+{
+	device.option_add(":gdrom", GDROM);
+}
+
+
+WRITE_LINE_MEMBER(idegdrom_device::ide_irq)
+{
+	irq_cb(state);
+}
+
+void idegdrom_device::device_add_mconfig(machine_config &config)
+{
+	BUS_MASTER_IDE_CONTROLLER(config, m_ide).options(gdrom_devices, ":gdrom", nullptr, true);
+	m_ide->irq_handler().set(*this, FUNC(idegdrom_device::ide_irq));
+	m_ide->set_bus_master_space(space_owner_tag, space_owner_id);
+}
+
+void idegdrom_device::map_command(address_map &map)
+{
+	map(0x0000, 0x001f).rw(FUNC(idegdrom_device::ide_cs0_r), FUNC(idegdrom_device::ide_cs0_w));
+}
+
+void idegdrom_device::map_control(address_map &map)
+{
+	map(0x0000, 0x001f).rw(FUNC(idegdrom_device::ide_cs1_r), FUNC(idegdrom_device::ide_cs1_w));
+}
+
+void idegdrom_device::map_dma(address_map &map)
+{
+	map(0x0000, 0x000f).rw("ide", FUNC(bus_master_ide_controller_device::bmdma_r), FUNC(bus_master_ide_controller_device::bmdma_w));
+}
+
+READ32_MEMBER(idegdrom_device::ide_cs0_r)
+{
+	const int o = offset >> 2;
+	const int r = (offset & 3) << 3;
+
+	return m_ide->cs0_r(space, o, mem_mask << r) >> r;
+}
+
+READ32_MEMBER(idegdrom_device::ide_cs1_r)
+{
+	const int o = offset >> 2;
+	const int r = (offset & 3) << 3;
+
+	return m_ide->cs1_r(space, o, mem_mask << r) >> r;
+}
+
+WRITE32_MEMBER(idegdrom_device::ide_cs0_w)
+{
+	const int o = offset >> 2;
+	const int r = (offset & 3) << 3;
+
+	m_ide->cs0_w(space, o, data << r, mem_mask << r);
+}
+
+WRITE32_MEMBER(idegdrom_device::ide_cs1_w)
+{
+	const int o = offset >> 2;
+	const int r = (offset & 3) << 3;
+
+	m_ide->cs1_w(space, o, data << r, mem_mask << r);
+}
+
+// The board
+
 naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: naomi_board(mconfig, NAOMI_GDROM_BOARD, tag, owner, clock),
 	m_maincpu(*this, "dimmcpu"),
 	m_securitycpu(*this, "pic"),
-	picdata(*this, finder_base::DUMMY_TAG)
+	m_i2c0(*this, "i2c_0"),
+	m_i2c1(*this, "i2c_1"),
+	m_eeprom(*this, "eeprom"),
+	m_315_6154(*this, "pci:00.0"),
+	m_idegdrom(*this, "pci:01.0"),
+	picdata(*this, finder_base::DUMMY_TAG),
+	dimm_command(0xffff),
+	dimm_offsetl(0xffff),
+	dimm_parameterl(0xffff),
+	dimm_parameterh(0xffff),
+	dimm_status(0xffff),
+	dimm_control(0),
+	sh4_unknown(0),
+	dimm_des_key(0)
 {
 	image_tag = nullptr;
 	picbus = 0;
@@ -415,9 +539,24 @@ naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *
 	picbus_used = false;
 }
 
+void naomi_gdrom_board::submap(address_map &map)
+{
+	naomi_board::submap(map);
+	map(0x3c / 2, 0x3c / 2 + 1).rw(FUNC(naomi_gdrom_board::dimm_command_r), FUNC(naomi_gdrom_board::dimm_command_w));
+	map(0x40 / 2, 0x40 / 2 + 1).rw(FUNC(naomi_gdrom_board::dimm_offsetl_r), FUNC(naomi_gdrom_board::dimm_offsetl_w));
+	map(0x44 / 2, 0x44 / 2 + 1).rw(FUNC(naomi_gdrom_board::dimm_parameterl_r), FUNC(naomi_gdrom_board::dimm_parameterl_w));
+	map(0x48 / 2, 0x48 / 2 + 1).rw(FUNC(naomi_gdrom_board::dimm_parameterh_r), FUNC(naomi_gdrom_board::dimm_parameterh_w));
+	map(0x4c / 2, 0x4c / 2 + 1).rw(FUNC(naomi_gdrom_board::dimm_status_r), FUNC(naomi_gdrom_board::dimm_status_w));
+}
+
 void naomi_gdrom_board::sh4_map(address_map &map)
 {
-	map(0x00000000, 0x001fffff).rom().region("bios", 0);
+	map(0x00000000, 0x001fffff).mirror(0xa0000000).rom().region("bios", 0);
+	map(0x04000000, 0x040000ff).rw(m_315_6154, FUNC(sega_315_6154_device::registers_r), FUNC(sega_315_6154_device::registers_w));
+	map(0x0c000000, 0x0cffffff).ram().share("pci:sh4sdram");
+	map(0x10000000, 0x103fffff).ram().share("pci:6154sdram");
+	map(0x14000000, 0x17ffffff).rw(m_315_6154, FUNC(sega_315_6154_device::aperture_r<0>), FUNC(sega_315_6154_device::aperture_w<0>));
+	map(0x18000000, 0x1bffffff).rw(m_315_6154, FUNC(sega_315_6154_device::aperture_r<1>), FUNC(sega_315_6154_device::aperture_w<1>));
 	map.unmap_value_high();
 }
 
@@ -426,26 +565,227 @@ void naomi_gdrom_board::sh4_io_map(address_map &map)
 	map(0x00, 0x0f).rw(FUNC(naomi_gdrom_board::i2cmem_dimm_r), FUNC(naomi_gdrom_board::i2cmem_dimm_w));
 }
 
+void naomi_gdrom_board::pci_map(address_map &map)
+{
+	const char *t = tag();
+
+	map(0x00000000, 0x00000003).rw(t, FUNC(naomi_gdrom_board::sh4_unknown_r), FUNC(naomi_gdrom_board::sh4_unknown_w));
+	map(0x00000014, 0x00000017).rw(t, FUNC(naomi_gdrom_board::sh4_command_r), FUNC(naomi_gdrom_board::sh4_command_w));
+	map(0x00000018, 0x0000001b).rw(t, FUNC(naomi_gdrom_board::sh4_offsetl_r), FUNC(naomi_gdrom_board::sh4_offsetl_w));
+	map(0x0000001c, 0x0000001f).rw(t, FUNC(naomi_gdrom_board::sh4_parameterl_r), FUNC(naomi_gdrom_board::sh4_parameterl_w));
+	map(0x00000020, 0x00000023).rw(t, FUNC(naomi_gdrom_board::sh4_parameterh_r), FUNC(naomi_gdrom_board::sh4_parameterh_w));
+	map(0x00000024, 0x00000027).rw(t, FUNC(naomi_gdrom_board::sh4_status_r), FUNC(naomi_gdrom_board::sh4_status_w));
+	map(0x00000028, 0x0000002b).rw(t, FUNC(naomi_gdrom_board::sh4_control_r), FUNC(naomi_gdrom_board::sh4_control_w));
+	map(0x0000002c, 0x0000002f).lr32([]() { return 0x0c; }, "Constant 0x0c"); // 0x0a or 0x0e possible too
+	map(0x00000030, 0x00000033).rw(t, FUNC(naomi_gdrom_board::sh4_des_keyl_r), FUNC(naomi_gdrom_board::sh4_des_keyl_w));
+	map(0x00000034, 0x00000037).rw(t, FUNC(naomi_gdrom_board::sh4_des_keyh_r), FUNC(naomi_gdrom_board::sh4_des_keyh_w));
+	map(0x70000000, 0x70ffffff).ram().share("sh4sdram");
+	map(0x78000000, 0x783fffff).ram().share("6154sdram");
+}
+
+WRITE16_MEMBER(naomi_gdrom_board::dimm_command_w)
+{
+	dimm_command = data;
+}
+
+READ16_MEMBER(naomi_gdrom_board::dimm_command_r)
+{
+	return dimm_command & 0xffff;
+}
+
+WRITE16_MEMBER(naomi_gdrom_board::dimm_offsetl_w)
+{
+	dimm_offsetl = data;
+}
+
+READ16_MEMBER(naomi_gdrom_board::dimm_offsetl_r)
+{
+	return dimm_offsetl & 0xffff;
+}
+
+WRITE16_MEMBER(naomi_gdrom_board::dimm_parameterl_w)
+{
+	dimm_parameterl = data;
+}
+
+READ16_MEMBER(naomi_gdrom_board::dimm_parameterl_r)
+{
+	return dimm_parameterl & 0xffff;
+}
+
+WRITE16_MEMBER(naomi_gdrom_board::dimm_parameterh_w)
+{
+	dimm_parameterh = data;
+}
+
+READ16_MEMBER(naomi_gdrom_board::dimm_parameterh_r)
+{
+	return dimm_parameterh & 0xffff;
+}
+
+WRITE16_MEMBER(naomi_gdrom_board::dimm_status_w)
+{
+	dimm_status = data;
+	if (dimm_status & 0x001)
+		m_maincpu->set_input_line(SH4_IRL3, CLEAR_LINE);
+	else
+		m_maincpu->set_input_line(SH4_IRL3, ASSERT_LINE);
+	if (dimm_status & 0x100)
+		set_ext_irq(CLEAR_LINE);
+	else
+		set_ext_irq(ASSERT_LINE);
+}
+
+READ16_MEMBER(naomi_gdrom_board::dimm_status_r)
+{
+	return dimm_status & 0xffff;
+}
+
+WRITE32_MEMBER(naomi_gdrom_board::sh4_unknown_w)
+{
+	sh4_unknown = data;
+}
+
+READ32_MEMBER(naomi_gdrom_board::sh4_unknown_r)
+{
+	return sh4_unknown;
+}
+
+WRITE32_MEMBER(naomi_gdrom_board::sh4_command_w)
+{
+	dimm_command = data;
+}
+
+READ32_MEMBER(naomi_gdrom_board::sh4_command_r)
+{
+	return dimm_command;
+}
+
+WRITE32_MEMBER(naomi_gdrom_board::sh4_offsetl_w)
+{
+	dimm_offsetl = data;
+}
+
+READ32_MEMBER(naomi_gdrom_board::sh4_offsetl_r)
+{
+	return dimm_offsetl;
+}
+
+WRITE32_MEMBER(naomi_gdrom_board::sh4_parameterl_w)
+{
+	dimm_parameterl = data;
+}
+
+READ32_MEMBER(naomi_gdrom_board::sh4_parameterl_r)
+{
+	return dimm_parameterl;
+}
+
+WRITE32_MEMBER(naomi_gdrom_board::sh4_parameterh_w)
+{
+	dimm_parameterh = data;
+}
+
+READ32_MEMBER(naomi_gdrom_board::sh4_parameterh_r)
+{
+	return dimm_parameterh;
+}
+
+WRITE32_MEMBER(naomi_gdrom_board::sh4_status_w)
+{
+	dimm_status = data;
+	if (dimm_status & 0x001)
+		m_maincpu->set_input_line(SH4_IRL3, CLEAR_LINE);
+	else
+		m_maincpu->set_input_line(SH4_IRL3, ASSERT_LINE);
+	if (dimm_status & 0x100)
+		set_ext_irq(CLEAR_LINE);
+	else
+		set_ext_irq(ASSERT_LINE);
+}
+
+READ32_MEMBER(naomi_gdrom_board::sh4_status_r)
+{
+	return dimm_status;
+}
+
+WRITE32_MEMBER(naomi_gdrom_board::sh4_control_w)
+{
+	uint32_t old = dimm_control;
+
+	dimm_control = data;
+	if (dimm_control & 2)
+		m_315_6154->memory()->unmap_readwrite(0x10000000, 0x10000000 + dimm_data_size - 1);
+	else
+		m_315_6154->memory()->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data);
+	if (((old & 1) == 0) && ((dimm_control & 1) == 1))
+		set_reset_out();
+}
+
+READ32_MEMBER(naomi_gdrom_board::sh4_control_r)
+{
+	return dimm_control;
+}
+
+WRITE32_MEMBER(naomi_gdrom_board::sh4_des_keyl_w)
+{
+	dimm_des_key = (dimm_des_key & 0xffffffff00000000) | (uint64_t)data;
+}
+
+READ32_MEMBER(naomi_gdrom_board::sh4_des_keyl_r)
+{
+	return (uint32_t)dimm_des_key;
+}
+
+WRITE32_MEMBER(naomi_gdrom_board::sh4_des_keyh_w)
+{
+	dimm_des_key = (dimm_des_key & 0xffffffff) | ((uint64_t)data << 32);
+}
+
+READ32_MEMBER(naomi_gdrom_board::sh4_des_keyh_r)
+{
+	return (uint32_t)(dimm_des_key >> 32);
+}
+
 READ64_MEMBER(naomi_gdrom_board::i2cmem_dimm_r)
 {
+	uint8_t ret;
+
+	ret = m_i2c0->read_sda();
+	ret |= m_i2c1->read_sda();
+	ret = ret << 1;
 	if (picbus_used == true)
-		return ((picbus | picbus_pullup) & 0xf) << 2;
+		ret |= ((picbus | picbus_pullup) & 0xf) << 2;
 	else
-		return 0;
+		ret |= m_eeprom->do_read() << 5;
+	return ret;
 }
 
 WRITE64_MEMBER(naomi_gdrom_board::i2cmem_dimm_w)
 {
+	if (data & 0x40000)
+	{
+		m_i2c0->write_sda((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+		m_i2c1->write_sda((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+	}
+	m_i2c0->write_scl((data & 0x1) ? ASSERT_LINE : CLEAR_LINE);
+	m_i2c1->write_scl((data & 0x1) ? ASSERT_LINE : CLEAR_LINE);
 	if (data & 0x0200)
 	{
 		picbus_used = true;
 		picbus_io[0] = (uint8_t)(~data >> (16 + 5 * 2 - 3)) & 0x8; // clock only for now
 		picbus = (data >> 2) & 0xf;
 		picbus_pullup = (picbus_io[0] & picbus_io[1]) & 0xf; // high if both are inputs
-		// TODO: abort timeslice of sh4
+		m_maincpu->abort_timeslice();
+		machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(1));
 	}
 	else
+	{
 		picbus_used = false;
+		m_eeprom->di_write((data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->clk_write((data & 0x8) ? ASSERT_LINE : CLEAR_LINE);
+	}
 }
 
 void naomi_gdrom_board::pic_map(address_map &map)
@@ -465,7 +805,7 @@ WRITE8_MEMBER(naomi_gdrom_board::pic_dimm_w)
 	if (offset == 1)
 	{
 		picbus = data;
-		// TODO: abort timeslice of pic
+		m_securitycpu->abort_timeslice();
 	}
 	if (offset == 3)
 	{
@@ -523,6 +863,7 @@ void naomi_gdrom_board::device_start()
 	naomi_board::device_start();
 
 	dimm_data = nullptr;
+	dimm_des_data = nullptr;
 	dimm_data_size = 0;
 
 	char name[128];
@@ -531,6 +872,15 @@ void naomi_gdrom_board::device_start()
 	uint64_t key;
 	uint8_t netpic = 0;
 
+
+	logerror("Work mode is %d\n", work_mode);
+	if (work_mode != 0)
+	{
+		dimm_command = 0;
+		dimm_offsetl = 0;
+		dimm_parameterl = 0;
+		dimm_parameterh = 0;
+	}
 
 	if(picdata) {
 		if(picdata.length() >= 0x4000) {
@@ -549,7 +899,8 @@ void naomi_gdrom_board::device_start()
 			netpic = picdata[0x6ee];
 
 			// set data for security pic rom
-			memcpy((uint8_t*)m_securitycpu->space(AS_PROGRAM).get_read_ptr(0), picdata, 0x400);
+			address_space &ps = m_securitycpu->space(AS_PROGRAM);
+			memcpy((uint8_t*)ps.get_read_ptr(0), picdata, 0x1000);
 		} else {
 			// use extracted pic data
 			// printf("This PIC key hasn't been converted to a proper PIC binary yet!\n");
@@ -626,22 +977,26 @@ void naomi_gdrom_board::device_start()
 			uint32_t file_rounded_size = (file_size + 2047) & -2048;
 			for (dimm_data_size = 4096; dimm_data_size < file_rounded_size; dimm_data_size <<= 1);
 			dimm_data = auto_alloc_array(machine(), uint8_t, dimm_data_size);
+			if (work_mode == 0)
+				dimm_des_data = dimm_data;
+			else
+				dimm_des_data = auto_alloc_array(machine(), uint8_t, dimm_data_size);
 			if (dimm_data_size != file_rounded_size)
 				memset(dimm_data + file_rounded_size, 0, dimm_data_size - file_rounded_size);
 
-			// read encrypted data into dimm_data
+			// read encrypted data into dimm_des_data
 			uint32_t sectors = file_rounded_size / 2048;
 			for (uint32_t sec = 0; sec != sectors; sec++)
-				cdrom_read_data(gdromfile, file_start + sec, dimm_data + 2048 * sec, CD_TRACK_MODE1);
+				cdrom_read_data(gdromfile, file_start + sec, dimm_des_data + 2048 * sec, CD_TRACK_MODE1);
 
 			uint32_t des_subkeys[32];
 			des_generate_subkeys(rev64(key), des_subkeys);
 
+			// decrypt read data from dimm_des_data to dimm_data
 			for (int i = 0; i < file_rounded_size; i += 8)
-				write_from_qword(dimm_data + i, rev64(des_encrypt_decrypt(true, rev64(read_to_qword(dimm_data + i)), des_subkeys)));
+				write_from_qword(dimm_data + i, rev64(des_encrypt_decrypt(true, rev64(read_to_qword(dimm_des_data + i)), des_subkeys)));
 		}
 
-		// decrypt loaded data
 		cdrom_close(gdromfile);
 
 		if(!dimm_data)
@@ -653,6 +1008,14 @@ void naomi_gdrom_board::device_start()
 	save_item(NAME(picbus_pullup));
 	save_item(NAME(picbus_io));
 	save_item(NAME(picbus_used));
+	save_item(NAME(dimm_command));
+	save_item(NAME(dimm_offsetl));
+	save_item(NAME(dimm_parameterl));
+	save_item(NAME(dimm_parameterh));
+	save_item(NAME(dimm_status));
+	save_item(NAME(dimm_control));
+	save_item(NAME(sh4_unknown));
+	save_item(NAME(dimm_des_key));
 }
 
 void naomi_gdrom_board::device_reset()
@@ -660,6 +1023,8 @@ void naomi_gdrom_board::device_reset()
 	naomi_board::device_reset();
 
 	dimm_cur_address = 0;
+	if (work_mode != 0)
+		m_315_6154->memory()->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data);
 }
 
 void naomi_gdrom_board::board_setup_address(uint32_t address, bool is_dma)
@@ -681,6 +1046,7 @@ void naomi_gdrom_board::board_advance(uint32_t size)
 }
 
 #define CPU_CLOCK 200000000 // need to set the correct value here
+#define PIC_CLOCK 20000000  // and here
 
 void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 {
@@ -697,10 +1063,28 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 	m_maincpu->set_sh4_clock(CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &naomi_gdrom_board::sh4_map);
 	m_maincpu->set_addrmap(AS_IO, &naomi_gdrom_board::sh4_io_map);
-	m_maincpu->set_disable();
-	PIC16C621A(config, m_securitycpu, 2000000); // need to set the correct value for clock
+
+
+	PCI_ROOT(config, "pci", 0);
+	SEGA315_6154(config, m_315_6154, 0);
+	m_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_MEMORY, &naomi_gdrom_board::pci_map);
+	IDE_GDROM(config, m_idegdrom, 0, image_tag, m_315_6154->tag(), sega_315_6154_device::AS_PCI_MEMORY);
+	m_idegdrom->irq_callback().set_inputline(m_maincpu, SH4_IRL2);
+	PIC16C622(config, m_securitycpu, PIC_CLOCK);
 	m_securitycpu->set_addrmap(AS_IO, &naomi_gdrom_board::pic_map);
-	m_securitycpu->set_disable();
+	m_securitycpu->set_config(0x3fff - 0x04);
+	I2C_24C01(config, m_i2c0, 0);
+	m_i2c0->set_e0(0);
+	m_i2c0->set_wc(1);
+	I2C_24C01(config, m_i2c1, 0);
+	m_i2c1->set_e0(1);
+	m_i2c1->set_wc(1);
+	EEPROM_93C46_8BIT(config, m_eeprom, 0);
+	if (work_mode == 0)
+	{
+		m_maincpu->set_disable();
+		m_securitycpu->set_disable();
+	}
 }
 
 // DIMM firmwares:
@@ -754,7 +1138,13 @@ ROM_START( dimm )
 	ROMX_LOAD( "401_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(edb52597108462bcea8eb2a47c19e51e5fb60638), ROM_BIOS(7))
 
 	// dynamically filled with data
-	ROM_REGION(0x400, "pic", ROMREGION_ERASE00)
+	ROM_REGION(0x1000, "pic", ROMREGION_ERASE00)
+	ROM_REGION(0x80, "i2c_0", ROMREGION_ERASE00)
+	ROM_LOAD("dimmspd.bin", 0x00, 0x80, CRC(45dac6d7) SHA1(4548675f8d31348fa6828d5b4f247af1f072b62d))
+	ROM_REGION(0x80, "i2c_1", ROMREGION_ERASE00)
+	ROM_LOAD("dimmspd.bin", 0x00, 0x80, CRC(45dac6d7) SHA1(4548675f8d31348fa6828d5b4f247af1f072b62d))
+	ROM_REGION(0x80, "eeprom", ROMREGION_ERASE00)
+	ROM_LOAD("93c46.bin", 0x00, 0x80, CRC(daafbccd) SHA1(1e39983779a62ebc6801ec6f2a5138717a7a5259))
 ROM_END
 
 const tiny_rom_entry *naomi_gdrom_board::device_rom_region() const

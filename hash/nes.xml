@@ -6336,7 +6336,7 @@
 		</part>
 	</software>
 
-	<software name="chevlzod">
+	<software name="chevlzod" cloneof="sseiya">
 		<description>Les Chevaliers Du Zodiaque - La Legende D'Or (Fra)</description>
 		<year>1992</year>
 		<publisher>Bandai</publisher>
@@ -21914,7 +21914,7 @@
 		</part>
 	</software>
 
-	<software name="worldjen">
+	<software name="wordjen">
 		<description>Lost Word of Jenny - Ushinawareta Message (Jpn)</description>
 		<year>1987</year>
 		<publisher>Takara</publisher>
@@ -40800,7 +40800,7 @@
 		<publisher>Sigma Shouji</publisher>
 		<info name="serial" value="SEI-1B"/>
 		<info name="release" value="19891124"/>
-		<info name="alt_title" value="ベガスコネクション カジノより愛をこめて"/>
+		<info name="alt_title" value="ベガスコネクション カジノから愛をこめて"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
@@ -51079,6 +51079,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 
 <!-- Sachen / Thin Chen (and clones) -->
+
+	<software name="englpyrm">
+		<description>English Pyramid (Pirate)</description>
+		<year>1991</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="K-001"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="ffe4" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="k-001 prg" size="32768" crc="7093ac82" sha1="7ec247a4fa445d8ee029ec5577767261e5685b8e" />
+			</dataarea>
+			<dataarea name="chr" size="16384">
+				<rom name="k-001 chr" size="16384" crc="45600bf5" sha1="6d37d046e45098a0e596994a6dc0ea88ae9d06cc" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="jovial">
 		<!-- Important: there is also an image with prg crc 55089f7e which according to my research
@@ -62588,10 +62605,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="jyc_a" />
 			<feature name="pcb" value="JYCOMPANY-A" />
 			<dataarea name="chr" size="262144">
-				<rom name="mickey mania 7 (pirate origianl).chr" size="262144" crc="ad8c83c3" sha1="5308a96d5c54fa63398f20c8c703225330cb423c" offset="00000" status="baddump" />
+				<rom name="mickey mania 7 (pirate original).chr" size="262144" crc="ad8c83c3" sha1="5308a96d5c54fa63398f20c8c703225330cb423c" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
-				<rom name="mickey mania 7 (pirate origianl).prg" size="262144" crc="60fb492c" sha1="4826b32e22a60985020acaf3a06f2d32e4ca0c8d" offset="00000" status="baddump" />
+				<rom name="mickey mania 7 (pirate original).prg" size="262144" crc="60fb492c" sha1="4826b32e22a60985020acaf3a06f2d32e4ca0c8d" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -69549,7 +69566,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="edu18a">
+	<software name="edu18a" cloneof="edu18">
 		<description>Education Games 18 in 1 (Chi, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -69897,7 +69914,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="subor_keyboard" />
 			<dataarea name="prg" size="1048576">
-				<rom name="unknown_arabic_study_cartridge_contain_32_itmes_(unl).prg" size="1048576" crc="c0a76428" sha1="68a826b1f8589015cad42f22e6593a682e56ab25" offset="00000" status="baddump" />
+				<rom name="unknown_arabic_study_cartridge_contain_32_items_(unl).prg" size="1048576" crc="c0a76428" sha1="68a826b1f8589015cad42f22e6593a682e56ab25" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -81133,7 +81150,7 @@ that the real dumps might surface -->
 		<description>Family Computer Disk System (Jpn)</description>
 		<year>1986</year>
 		<publisher>Nintendo</publisher>
-		<info name="usage" value="This only is only supported by Famicom"/>
+		<info name="usage" value="This is only supported by Famicom"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="disksys" />
 			<!-- This is a fake and unused PRG dataarea to avoid changing the loading routines for the moment-->

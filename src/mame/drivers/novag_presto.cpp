@@ -48,7 +48,7 @@ public:
 		m_inputs(*this, "IN.0")
 	{ }
 
-	// machine drivers
+	// machine configs
 	void presto(machine_config &config);
 	void octo(machine_config &config);
 
@@ -194,7 +194,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void presto_state::presto(machine_config &config)

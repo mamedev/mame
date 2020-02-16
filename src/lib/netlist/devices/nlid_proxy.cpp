@@ -39,9 +39,9 @@ namespace netlist
 			if (tp_ct && tp_cn)
 			{
 				if (tp_ct && !tp_ct->is_analog())
-					plib::pthrow<nl_exception>(plib::pfmt("Not an analog terminal: {1}")(tp_ct->name()));
+					throw nl_exception(plib::pfmt("Not an analog terminal: {1}")(tp_ct->name()));
 				if (tp_cn && !tp_cn->is_analog())
-					plib::pthrow<nl_exception>(plib::pfmt("Not an analog terminal: {1}")(tp_cn->name()));
+					throw nl_exception(plib::pfmt("Not an analog terminal: {1}")(tp_cn->name()));
 
 				auto tp_t = static_cast<analog_t* >(tp_ct);
 				auto tn_t = static_cast<analog_t *>(tp_cn);

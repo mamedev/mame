@@ -875,5 +875,5 @@ uint8_t ide_hdd_device::calculate_status()
 
 void ide_hdd_device::device_add_mconfig(machine_config &config)
 {
-	HARDDISK(config, "image");
+	HARDDISK(config, "image", "ide_hdd");
 }

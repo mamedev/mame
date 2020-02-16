@@ -65,7 +65,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	// machine drivers
+	// machine configs
 	void sstar28k(machine_config &config);
 	void tstar432(machine_config &config);
 
@@ -202,7 +202,7 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
-    Machine Drivers
+    Machine Configs
 ******************************************************************************/
 
 void star_state::sstar28k(machine_config &config)

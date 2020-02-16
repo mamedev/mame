@@ -15,7 +15,7 @@
 namespace plib {
 
 	template <typename NT>
-	void pfunction<NT>::compile(const pstring &expr, const std::vector<pstring> &inputs)
+	void pfunction<NT>::compile(const pstring &expr, const std::vector<pstring> &inputs) noexcept(false)
 	{
 		if (plib::startsWith(expr, "rpn:"))
 			compile_postfix(expr.substr(4), inputs);
@@ -24,7 +24,7 @@ namespace plib {
 	}
 
 	template <typename NT>
-	void pfunction<NT>::compile_postfix(const pstring &expr, const std::vector<pstring> &inputs)
+	void pfunction<NT>::compile_postfix(const pstring &expr, const std::vector<pstring> &inputs) noexcept(false)
 	{
 		std::vector<pstring> cmds(plib::psplit(expr, " "));
 		compile_postfix(inputs, cmds, expr);
@@ -32,7 +32,7 @@ namespace plib {
 
 	template <typename NT>
 	void pfunction<NT>::compile_postfix(const std::vector<pstring> &inputs,
-			const std::vector<pstring> &cmds, const pstring &expr)
+			const std::vector<pstring> &cmds, const pstring &expr) noexcept(false)
 	{
 		m_precompiled.clear();
 		int stk = 0;
@@ -76,38 +76,38 @@ namespace plib {
 					bool err(false);
 					rc.m_param = plib::pstonum_ne<decltype(rc.m_param)>(cmd, err);
 					if (err)
-						pthrow<pexception>(plib::pfmt("pfunction: unknown/misformatted token <{1}> in <{2}>")(cmd)(expr));
+						throw pexception(plib::pfmt("pfunction: unknown/misformatted token <{1}> in <{2}>")(cmd)(expr));
 					stk += 1;
 				}
 			}
 			if (stk < 1)
-				pthrow<pexception>(plib::pfmt("pfunction: stack underflow on token <{1}> in <{2}>")(cmd)(expr));
+				throw pexception(plib::pfmt("pfunction: stack underflow on token <{1}> in <{2}>")(cmd)(expr));
 			m_precompiled.push_back(rc);
 		}
 		if (stk != 1)
-			pthrow<pexception>(plib::pfmt("pfunction: stack count different to one on <{2}>")(expr));
+			throw pexception(plib::pfmt("pfunction: stack count different to one on <{2}>")(expr));
 	}
 
 	static int get_prio(const pstring &v)
 	{
 		if (v == "(" || v == ")")
 			return 1;
-		else if (plib::left(v, 1) >= "a" && plib::left(v, 1) <= "z")
+		if (plib::left(v, 1) >= "a" && plib::left(v, 1) <= "z")
 			return 0;
-		else if (v == "*" || v == "/")
+		if (v == "*" || v == "/")
 			return 20;
-		else if (v == "+" || v == "-")
+		if (v == "+" || v == "-")
 			return 10;
-		else if (v == "^")
+		if (v == "^")
 			return 30;
-		else
-			return -1;
+
+		return -1;
 	}
 
-	static pstring pop_check(std::stack<pstring> &stk, const pstring &expr)
+	static pstring pop_check(std::stack<pstring> &stk, const pstring &expr) noexcept(false)
 	{
-		if (stk.size() == 0)
-			pthrow<pexception>(plib::pfmt("pfunction: stack underflow during infix parsing of: <{1}>")(expr));
+		if (stk.empty())
+			throw pexception(plib::pfmt("pfunction: stack underflow during infix parsing of: <{1}>")(expr));
 		pstring res = stk.top();
 		stk.pop();
 		return res;
@@ -183,7 +183,7 @@ namespace plib {
 					postfix.push_back(x);
 					x = pop_check(opstk, expr);
 				}
-				if (opstk.size() > 0 && get_prio(opstk.top()) == 0)
+				if (!opstk.empty() && get_prio(opstk.top()) == 0)
 					postfix.push_back(pop_check(opstk, expr));
 			}
 			else if (s==",")
@@ -200,7 +200,7 @@ namespace plib {
 				int p = get_prio(s);
 				if (p>0)
 				{
-					if (opstk.size() == 0)
+					if (opstk.empty())
 						opstk.push(s);
 					else
 					{
@@ -211,7 +211,7 @@ namespace plib {
 				}
 				else if (p == 0) // Function or variable
 				{
-					if (sexpr[i+1] == "(")
+					if ((i+1<sexpr.size()) && sexpr[i+1] == "(")
 						opstk.push(s);
 					else
 						postfix.push_back(s);
@@ -220,7 +220,7 @@ namespace plib {
 					postfix.push_back(s);
 			}
 		}
-		while (opstk.size() > 0)
+		while (!opstk.empty())
 		{
 			postfix.push_back(opstk.top());
 			opstk.pop();
@@ -238,8 +238,8 @@ namespace plib {
 		std::uint16_t lsb = lfsr & 1;
 		lfsr >>= 1;
 		if (lsb)
-			lfsr ^= 0xB400u; // taps 15, 13, 12, 10
-		return static_cast<NT>(lfsr) / static_cast<NT>(0xffffu);
+			lfsr ^= 0xB400U; // taps 15, 13, 12, 10
+		return static_cast<NT>(lfsr) / static_cast<NT>(0xffffU);
 	}
 
 	template <typename NT>
@@ -249,7 +249,7 @@ namespace plib {
 		std::uint16_t lsb = lfsr & 1;
 		lfsr >>= 1;
 		if (lsb)
-			lfsr ^= 0xB400u; // taps 15, 13, 12, 10
+			lfsr ^= 0xB400U; // taps 15, 13, 12, 10
 		return static_cast<NT>(lfsr);
 	}
 

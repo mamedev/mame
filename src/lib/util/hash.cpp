@@ -12,7 +12,7 @@
 
 #include "hash.h"
 #include "hashing.h"
-#include <ctype.h>
+#include <cctype>
 
 
 namespace util {

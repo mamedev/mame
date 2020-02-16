@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "debughlp.h"
-#include <ctype.h>
+#include <cctype>
 
 
 

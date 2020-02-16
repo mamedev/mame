@@ -127,7 +127,7 @@ offs_t jaguar_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		case 35:    util::stream_format(stream, "moveq   %d,r%d", reg1, reg2);                  break;
 		case 36:    util::stream_format(stream, "moveta  r%d,r%d", reg1, reg2);                 break;
 		case 37:    util::stream_format(stream, "movefa  r%d,r%d", reg1, reg2);                 break;
-		case 38:    util::stream_format(stream, "movei   $%x,r%d", opcodes.r32(pc+2), reg2); size = 6; break;
+		case 38:    util::stream_format(stream, "movei   $%x,r%d", opcodes.r16(pc)|(opcodes.r16(pc+2)<<16), reg2); size = 6; break;
 		case 39:    util::stream_format(stream, "loadb   (r%d),r%d", reg1, reg2);                   break;
 		case 40:    util::stream_format(stream, "loadw   (r%d),r%d", reg1, reg2);                   break;
 		case 41:    util::stream_format(stream, "load    (r%d),r%d", reg1, reg2);                   break;

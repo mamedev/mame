@@ -19,7 +19,7 @@
 
 #include <functional>
 
-#include <time.h>
+#include <ctime>
 
 //**************************************************************************
 //  CONSTANTS

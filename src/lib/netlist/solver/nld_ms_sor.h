@@ -39,7 +39,7 @@ namespace solver
 			{
 			}
 
-		unsigned vsolve_non_dynamic(const bool newton_raphson) override;
+		unsigned vsolve_non_dynamic(bool newton_raphson) override;
 
 	private:
 		state_var<float_type> m_lp_fact;
@@ -52,7 +52,7 @@ namespace solver
 	// ----------------------------------------------------------------------------------------
 
 	template <typename FT, int SIZE>
-	unsigned matrix_solver_SOR_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raphson)
+	unsigned matrix_solver_SOR_t<FT, SIZE>::vsolve_non_dynamic(bool newton_raphson)
 	{
 		const std::size_t iN = this->size();
 		bool resched = false;

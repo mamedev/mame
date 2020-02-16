@@ -80,6 +80,7 @@ const double XTAL::known_xtals[] = {
 	  2'097'152, /* 2.097152_MHz_XTAL      Icatel 1995 - Brazilian public payphone */
 	  2'457'600, /* 2.4576_MHz_XTAL        Atari ST MFP */
 	  2'500'000, /* 2.5_MHz_XTAL           Janken Man units */
+	  2'600'000, /* 2.6_MHz_XTAL           Sharp PC-1500 */
 	  2'950'000, /* 2.95_MHz_XTAL          Playmatic MPU-C, MPU-III & Sound-3 */
 	  3'000'000, /* 3_MHz_XTAL             Probably only used to drive 68705 or similar MCUs on 80's Taito PCBs */
 	  3'072'000, /* 3.072_MHz_XTAL         INS 8520 input clock rate */
@@ -88,6 +89,7 @@ const double XTAL::known_xtals[] = {
 	  3'521'280, /* 3.52128_MHz_XTAL       RCA COSMAC VIP */
 	  3'570'000, /* 3.57_MHz_XTAL          Telmac TMC-600 */
 	  3'578'640, /* 3.57864_MHz_XTAL       Atari Portfolio PCD3311T */
+	  3'579'000, /* 3.579_MHz_XTAL         BeebOPL */
 	  3'579'545, /* 3.579545_MHz_XTAL      NTSC color subcarrier, extremely common, used on 100's of PCBs (Keytronic custom part #48-300-010 is equivalent) */
 	  3'686'400, /* 3.6864_MHz_XTAL        Baud rate clock for MC68681 and similar UARTs */
 	  3'840'000, /* 3.84_MHz_XTAL          Fairlight CMI Alphanumeric Keyboard */
@@ -139,6 +141,7 @@ const double XTAL::known_xtals[] = {
 	  8'867'236, /* 8.867236_MHz_XTAL      RCA CDP1869 PAL color clock (~2x PAL subcarrier) */
 	  8'867'238, /* 8.867238_MHz_XTAL      ETI-660 (~2x PAL subcarrier) */
 	  8'945'000, /* 8.945_MHz_XTAL         Hit Me */
+	  9'000'000, /* 9_MHz_XTAL             Homedata PCBs */
 	  9'216'000, /* 9.216_MHz_XTAL         Univac UTS 20 */
 	  9'600'000, /* 9.6_MHz_XTAL           WD37C65 second clock (for 300 KB/sec rate) */
 	  9'828'000, /* 9.828_MHz_XTAL         Universal PCBs */
@@ -227,6 +230,7 @@ const double XTAL::known_xtals[] = {
 	 15'700'000, /* 15.7_MHz_XTAL          Motogonki */
 	 15'897'600, /* 15.8976_MHz_XTAL       IAI Swyft */
 	 15'920'000, /* 15.92_MHz_XTAL         HP Integral PC */
+	 15'930'000, /* 15.93_MHz_XTAL         ADM 12 */
 	 15'974'400, /* 15.9744_MHz_XTAL       Osborne 1 (9600 * 52 * 32) */
 	 16'000'000, /* 16_MHz_XTAL            Extremely common, used on 100's of PCBs */
 	 16'097'280, /* 16.09728_MHz_XTAL      DEC VT240 (1024 * 262 * 60) */
@@ -284,6 +288,7 @@ const double XTAL::known_xtals[] = {
 	 21'281'370, /* 21.28137_MHz_XTAL      Radica Tetris (PAL) */
 	 21'300'000, /* 21.3_MHz_XTAL          - */
 	 21'477'272, /* 21.477272_MHz_XTAL     BMC bowling, some Data East 90's games, Vtech Socrates; (6x NTSC subcarrier) */
+	 21'667'500, /* 21.6675_MHz_XTAL       AT&T 610 (80-column display clock) */
 	 22'000'000, /* 22_MHz_XTAL            - */
 	 22'032'000, /* 22.032_MHz_XTAL        Intellec Series II I/O controller */
 	 22'096'000, /* 22.096_MHz_XTAL        ADDS Viewpoint 122 */
@@ -323,6 +328,7 @@ const double XTAL::known_xtals[] = {
 	 27'164'000, /* 27.164_MHz_XTAL        Typically used on 90's Taito PCBs to drive the custom chips */
 	 27'210'900, /* 27.2109_MHz_XTAL       LA Girl */
 	 27'562'000, /* 27.562_MHz_XTAL        Visual 220 */
+	 27'720'000, /* 27.72_MHz_XTAL         AT&T 610 (132-column display clock) */
 	 28'000'000, /* 28_MHz_XTAL            - */
 	 28'322'000, /* 28.322_MHz_XTAL        Saitek RISC 2500, Mephisto Montreux */
 	 28'375'160, /* 28.37516_MHz_XTAL      Amiga PAL systems */
@@ -408,6 +414,7 @@ const double XTAL::known_xtals[] = {
 	 61'440'000, /* 61.44_MHz_XTAL         Donkey Kong */
 	 64'000'000, /* 64_MHz_XTAL            BattleToads */
 	 64'108'800, /* 64.1088_MHz_XTAL       HP Topcat high-res */
+	 66'000'000, /* 66_MHz_XTAL            - */
 	 66'666'700, /* 66.6667_MHz_XTAL       Later Midway games */
 	 67'737'600, /* 67.7376_MHz_XTAL       PSX-based h/w, Sony ZN1-2-based */
 	 68'850'000, /* 68.85_MHz_XTAL         Wyse WY-50 */
@@ -497,7 +504,7 @@ void XTAL::validate(const std::string &message) const
 		fail(m_base_clock, message);
 }
 
-void XTAL::fail(double base_clock, std::string message)
+void XTAL::fail(double base_clock, const std::string &message)
 {
 	std::string full_message = util::string_format("Unknown crystal value %.0f. ", base_clock);
 	if(xtal_error_low && xtal_error_high)

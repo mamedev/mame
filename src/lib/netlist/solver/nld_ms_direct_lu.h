@@ -38,12 +38,12 @@ public:
 
 	unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
 
-	int vsolve_non_dynamic(const bool newton_raphson);
+	int vsolve_non_dynamic(bool newton_raphson);
 
 protected:
 	virtual void add_term(int net_idx, terminal_t *term) override;
 
-	int solve_non_dynamic(const bool newton_raphson);
+	int solve_non_dynamic(bool newton_raphson);
 	void build_LE_A();
 	void build_LE_RHS(nl_double * RESTRICT rhs);
 
@@ -565,7 +565,7 @@ void matrix_solver_direct_t<m_N, storage_N>::store(
 
 
 template <unsigned m_N, unsigned storage_N>
-unsigned matrix_solver_direct_t<m_N, storage_N>::solve_non_dynamic(const bool newton_raphson)
+unsigned matrix_solver_direct_t<m_N, storage_N>::solve_non_dynamic(bool newton_raphson)
 {
 	nl_double new_V[storage_N]; // = { 0.0 };
 
@@ -587,7 +587,7 @@ unsigned matrix_solver_direct_t<m_N, storage_N>::solve_non_dynamic(const bool ne
 }
 
 template <unsigned m_N, unsigned storage_N>
-int matrix_solver_direct_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
+int matrix_solver_direct_t<m_N, storage_N>::vsolve_non_dynamic(bool newton_raphson)
 {
 	this->build_LE_A();
 	this->build_LE_RHS(m_RHS);

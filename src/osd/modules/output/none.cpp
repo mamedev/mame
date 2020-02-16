@@ -18,7 +18,7 @@ public:
 	: osd_module(OSD_OUTPUT_PROVIDER, "none"), output_module()
 	{
 	}
-	virtual ~output_none() { }
+	virtual ~output_none() = default;
 
 	virtual int init(const osd_options &options) override { return 0; }
 	virtual void exit() override { }

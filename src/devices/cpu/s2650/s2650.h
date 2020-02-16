@@ -84,7 +84,7 @@ private:
 	uint8_t   m_irq_state;
 
 	int     m_icount;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
 
 	// For debugger
 	uint16_t  m_debugger_temp;

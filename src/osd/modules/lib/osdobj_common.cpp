@@ -95,7 +95,7 @@ const options_entry osd_options::s_option_entries[] =
 
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OSD ACCELERATED VIDEO OPTIONS" },
 	{ OSDOPTION_FILTER ";glfilter;flt",       "1",              OPTION_BOOLEAN,   "use bilinear filtering when scaling emulated video" },
-	{ OSDOPTION_PRESCALE "(1-3)",             "1",              OPTION_INTEGER,   "scale emulated video by this factor before applying filters/shaders" },
+	{ OSDOPTION_PRESCALE "(1-8)",             "1",              OPTION_INTEGER,   "scale emulated video by this factor before applying filters/shaders" },
 
 #if USE_OPENGL
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OpenGL-SPECIFIC OPTIONS" },
@@ -445,7 +445,7 @@ void osd_common_t::init(running_machine &machine)
 
 	m_machine = &machine;
 
-	osd_options &options = downcast<osd_options &>(machine.options());
+	auto &options = downcast<osd_options &>(machine.options());
 	// extract the verbose printing option
 	if (options.verbose())
 		set_verbose(true);
@@ -624,7 +624,7 @@ bool osd_common_t::execute_command(const char *command)
 	else if (strcmp(command, OSDCOMMAND_LIST_MIDI_DEVICES) == 0)
 	{
 		osd_module *om = select_module_options(options(), OSD_MIDI_PROVIDER);
-		midi_module *pm = select_module_options<midi_module *>(options(), OSD_MIDI_PROVIDER);
+		auto *pm = select_module_options<midi_module *>(options(), OSD_MIDI_PROVIDER);
 
 		if (om->probe())
 		{

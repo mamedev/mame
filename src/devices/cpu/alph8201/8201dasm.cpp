@@ -22,7 +22,7 @@ cpu/alph8201/ will be removed when the alpha 8304 has been dumped.
 #include "emu.h"
 #include "8201dasm.h"
 
-#include <ctype.h>
+#include <cctype>
 #include <stdexcept>
 
 

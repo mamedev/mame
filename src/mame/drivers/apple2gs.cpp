@@ -89,6 +89,7 @@
 #include "bus/a2bus/a2vulcan.h"
 #include "bus/a2bus/4play.h"
 //#include "bus/a2bus/pc_xporter.h"
+#include "bus/a2bus/byte8251.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -1294,6 +1295,8 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_intflag));
 	save_item(NAME(m_vgcint));
 	save_item(NAME(m_inten));
+	save_item(NAME(m_slot_irq));
+	save_item(NAME(m_slow_counter));
 	save_item(m_clkdata, "CLKDATA");
 	save_item(m_clock_control, "CLKCTRL");
 	save_item(m_clock_read, "CLKRD");
@@ -1321,6 +1324,8 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_lastchar));
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_transchar));
+	save_item(NAME(m_anykeydown));
+	save_item(NAME(m_repeatdelay));
 #endif
 	save_item(m_mouse_x, "MX");
 	save_item(m_mouse_y, "MY");
@@ -2919,9 +2924,15 @@ READ8_MEMBER(apple2gs_state::c800_r)
 
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
+		uint8_t rv = 0xff;
+		if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
+		{
+			rv = m_slotdevice[m_cnxx_slot]->read_c800(offset&0xfff);
+		}
+
 		m_cnxx_slot = CNXX_UNCLAIMED;
 		update_slotrom_banks();
-		return 0xff;
+		return rv;
 	}
 
 	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
@@ -2955,16 +2966,16 @@ WRITE8_MEMBER(apple2gs_state::c800_w)
 {
 	slow_cycle();
 
+	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
+	{
+		m_slotdevice[m_cnxx_slot]->write_c800(offset&0xfff, data);
+	}
+
 	if (offset == 0x7ff)
 	{
 		m_cnxx_slot = CNXX_UNCLAIMED;
 		update_slotrom_banks();
 		return;
-	}
-
-	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
-	{
-		m_slotdevice[m_cnxx_slot]->write_c800(offset&0xfff, data);
 	}
 }
 
@@ -4542,6 +4553,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("4play", A2BUS_4PLAY); /* 4Play Joystick Card (Rev. B) */
 //  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);    /* Magic Musician Card */
 //  device.option_add("pcxport", A2BUS_PCXPORTER); /* Applied Engineering PC Transporter */
+	device.option_add("byte8251", A2BUS_BYTE8251); /* BYTE Magazine 8251 serial card */
 }
 
 void apple2gs_state::apple2gs(machine_config &config)

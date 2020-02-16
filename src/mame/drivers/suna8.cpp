@@ -1246,7 +1246,7 @@ void suna8_state::sparkman_map(address_map &map)
 	map(0xc001, 0xc001).portr("P2");                         // P2
 	map(0xc002, 0xc002).portr("DSW1");                       // DSW 1
 	map(0xc003, 0xc003).portr("DSW2");                       // DSW 2
-	map(0xc080, 0xc080).portr("BUTTONS");                    // Buttons
+	map(0xc080, 0xc080).mirror(0x01).portr("BUTTONS");       // Buttons
 	map(0xc0a3, 0xc0a3).r(FUNC(suna8_state::sparkman_c0a3_r));   // ???
 
 	map(0xc200, 0xc27f).w(FUNC(suna8_state::sparkman_spritebank_w));   // Sprite RAM Bank
@@ -1533,7 +1533,7 @@ static INPUT_PORTS_START( brickzn )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x38, 0x18, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW-A:4,5,6")
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW-A:4,5,6")
 	PORT_DIPSETTING(    0x38, DEF_STR( Easiest ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Very_Easy) )
 	PORT_DIPSETTING(    0x28, DEF_STR( Easy ) )
@@ -1557,7 +1557,7 @@ static INPUT_PORTS_START( brickzn )
 	PORT_DIPNAME( 0x04, 0x04, "Play Together" )     PORT_DIPLOCATION("SW-B:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x38, 0x30, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW-B:4,5,6")
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW-B:4,5,6")
 	PORT_DIPSETTING(    0x30, "10K" )
 	PORT_DIPSETTING(    0x28, "30K" )
 	PORT_DIPSETTING(    0x18, "50K, Every 50K" )
@@ -1599,14 +1599,13 @@ static INPUT_PORTS_START( brickzn )
 	PORT_CONFSETTING(    0x40, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Finish Stage (Cheat)")
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( brickznv6 )
 	PORT_INCLUDE(brickzn)
 
 	PORT_MODIFY("DSW2") // DSW 2 - $c103
-	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW-B:4,5")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW-B:4,5")
 	PORT_DIPSETTING(    0x18, "None" )
 	PORT_DIPSETTING(    0x10, "10K" )
 	PORT_DIPSETTING(    0x08, "30K" )

@@ -730,7 +730,7 @@ void powervr2_device::tex_get_info(texinfo *t)
 //  fprintf(stderr, "tex %d %d %d %d\n", t->pf, t->mode, pal_ram_ctrl, t->mipmapped);
 	if(!t->textured)
 	{
-		t->r = NULL;
+		t->r = nullptr;
 	}
 	else
 	{

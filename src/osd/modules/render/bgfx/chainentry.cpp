@@ -73,11 +73,11 @@ void bgfx_chain_entry::submit(int view, chain_manager::screen_prim &prim, textur
 	uint32_t tint = 0xffffffff;
 	if (m_apply_tint)
 	{
-		const uint8_t a = (uint8_t)std::round(prim.m_prim->color.a * 255);
-		const uint8_t r = (uint8_t)std::round(prim.m_prim->color.r * 255);
-		const uint8_t g = (uint8_t)std::round(prim.m_prim->color.g * 255);
-		const uint8_t b = (uint8_t)std::round(prim.m_prim->color.b * 255);
-		tint = (a << 24) | (r << 16) | (g << 8) | b;
+		const auto a = (uint8_t)std::round(prim.m_prim->color.a * 255);
+		const auto r = (uint8_t)std::round(prim.m_prim->color.r * 255);
+		const auto g = (uint8_t)std::round(prim.m_prim->color.g * 255);
+		const auto b = (uint8_t)std::round(prim.m_prim->color.b * 255);
+		tint = (a << 24) | (b << 16) | (g << 8) | r;
 	}
 
 	bgfx::TransientVertexBuffer buffer;
@@ -291,7 +291,7 @@ void bgfx_chain_entry::put_screen_buffer(uint16_t screen_width, uint16_t screen_
 		return;
 	}
 
-	ScreenVertex* vertex = reinterpret_cast<ScreenVertex*>(buffer->data);
+	auto* vertex = reinterpret_cast<ScreenVertex*>(buffer->data);
 
 	float x[4] = { 0, 1, 0, 1 };
 	float y[4] = { 0, 0, 1, 1 };

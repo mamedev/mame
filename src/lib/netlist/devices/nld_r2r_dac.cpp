@@ -39,12 +39,13 @@ namespace netlist
 
 	NETLIB_UPDATE_PARAM(r2r_dac)
 	{
+		// FIXME: We only need to update the net first if this is a time stepping net
 		solve_now();
-
 		nl_fptype V = m_VIN() / static_cast<nl_fptype>(1 << m_num())
 				* static_cast<nl_fptype>(m_val());
 
 		this->set_G_V_I(plib::reciprocal(m_R()), V, nlconst::zero());
+		solve_later();
 	}
 	} //namespace analog
 

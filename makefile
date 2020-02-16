@@ -94,7 +94,6 @@
 # LTO = 1
 # SSE2 = 1
 # OPENMP = 1
-# FASTDEBUG = 1
 
 # SEPARATE_BIN = 1
 # PYTHON_EXECUTABLE = python3
@@ -808,10 +807,6 @@ endif
 
 ifdef OPENMP
 PARAMS += --OPENMP='$(OPENMP)'
-endif
-
-ifdef FASTDEBUG
-PARAMS += --FASTDEBUG='$(FASTDEBUG)'
 endif
 
 ifdef SEPARATE_BIN
@@ -1704,14 +1699,14 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.217"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.218"' > $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char build_version[];' >> $@
 	@echo 'const char bare_build_version[] = BARE_BUILD_VERSION;' >> $@
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " ($(NEW_GIT_VERSION))";' >> $@
 else
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo #define BARE_BUILD_VERSION "0.217" > $@
+	@echo #define BARE_BUILD_VERSION "0.218" > $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char build_version[]; >> $@
 	@echo const char bare_build_version[] = BARE_BUILD_VERSION; >> $@

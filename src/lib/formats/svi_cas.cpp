@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sean Young
-#include <assert.h>
+#include <cassert>
 
 #include "svi_cas.h"
 

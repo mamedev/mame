@@ -25,6 +25,7 @@ Driver file for IBM PC, IBM PC XT, and related machines.
 #include "machine/genpc.h"
 #include "machine/i8251.h"
 #include "cpu/i86/i86.h"
+#include "cpu/i86/i186.h"
 #include "cpu/nec/nec.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
@@ -67,6 +68,8 @@ public:
 	void ittxtra(machine_config &config);
 	void cadd810(machine_config &config);
 	void juko16(machine_config &config);
+	void alphatp50(machine_config &config);
+	void mbc16lt(machine_config &config);
 
 	void init_bondwell();
 
@@ -249,8 +252,21 @@ RAM: 512K / 640KB
 Bus: 4x ISA
 Video: Hercules/CGA/EGA
 Mass storage: 1 5.25" 360K floppy and 1 5.25" 360K floppy or 20MB hard drive
-On board ports: floppy, graphics, parallel, serial, mouse
+On board ports: floppy, external floppy (Atari ST style), graphics, parallel, serial, mouse
 Expansion: 8087 FPU
+
+DIP switches:                      Sw.1  Sw.2  Sw.3  Sw.4
+                EGA Monitor         OFF    ON   OFF   OFF
+                Color Monitor        ON   OFF   OFF    ON
+                Monochrome Monitor   ON   OFF    ON    ON
+
+EGA.COM, CGA.COM, HGC.COM, MDA.COM, PALETTE.COM, HCOLOR.COM and CURSOR are utilities to change
+the behavior of the integrated graphics card.
+
+Turbo option: From DOS, commands "TURBO ON" and "TURRBO OFF or key combos [Ctrl][Alt][1] or
+[Ctrl][Alt][+] for Turbo on, [Ctrl][Alt][2] or [Ctrl][Alt][-] for Turbo off
+Keyboard click: From DOS, "CLICK ON" and "CLICK OFF" or key combos [Ctrl][Alt][<]
+for click on, [Ctrl][Alt][>] for click off
 
 ******************************************************************************/
 
@@ -265,8 +281,10 @@ ROM_START ( ataripc1 )
 	ROM_REGION(0x10000,"bios", 0)
 	ROM_SYSTEM_BIOS( 0, "v3.06", "v3.06" )
 	ROMX_LOAD("award_atari_pc_bios_3.06.bin", 0x8000, 0x8000, CRC(256427ce) SHA1(999f6af64b79f88c1d3492f386d9bee08efb50e7), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS( 1, "v3.08", "v3.08" )
-	ROMX_LOAD("award_atari_pc_bios_3.08.bin", 0x8000, 0x8000, CRC(929a2443) SHA1(8e98f3c9180c55b1f5521727779c016083d27960), ROM_BIOS(1)) //same as on Atari PC3, also used on Atari PC2
+	ROM_SYSTEM_BIOS( 1, "v3.07", "v3.07" )
+	ROMX_LOAD("award_atari_pc_bios_3.07.bin", 0x8000, 0x8000, CRC(a73b80e6) SHA1(03af5902cdfd1cde217022b823162f24aba435ab), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 2, "v3.08", "v3.08" )
+	ROMX_LOAD("award_atari_pc_bios_3.08.bin", 0x8000, 0x8000, CRC(929a2443) SHA1(8e98f3c9180c55b1f5521727779c016083d27960), ROM_BIOS(2)) //same as on Atari PC3, also used on Atari PC2
 ROM_END
 
 
@@ -282,6 +300,22 @@ Video: On-board MDA/CGA/Hercules/EGA
 Mass storage: 1x 5.25" 360K floppy + 30MB RLL harddisk
 On board ports: floppy, parallel, serial, mouse, speaker
 Options: 8087 FPU
+DIP switches:                    4   3   2   1
+                EGA (smart on)  OFF OFF  ON OFF
+                EGA (smart OFF) OFF  ON  ON OFF
+                Color monitor    ON OFF OFF  ON
+                monochrome       ON  ON OFF  ON
+
+If you add a monochrome adapter board, set the switches to "Smart OFF", the HGC, MDA and HCOLOR
+options are meaningless, then.
+EGA.COM, CGA.COM, HGC.COM, MDA.COM, PALETTE.COM, HCOLOR.COM and CURSOR are utilities to change
+the behavior of the integrated graphics card.
+
+Turbo option: From DOS, commands "TURBO ON" and "TURRBO OFF or key combos [Ctrl][Alt][1] or
+[Ctrl][Alt][+] for Turbo on, [Ctrl][Alt][2] or [Ctrl][Alt][-] for Turbo off
+Keyboard click: From DOS, "CLICK ON" and "CLICK OFF" or key combos [Ctrl][Alt][<]
+for click on, [Ctrl][Alt][>] for click off
+
 ******************************************************************************/
 
 ROM_START( ataripc3 )
@@ -345,7 +379,7 @@ ROM_END
 
 /****************************************** Columbia Data Products MPC 1600 ***
 
-Links:  http://www.old-computers.com/museum/computer.asp?st=1&c=633, https://winworldpc.com/download/6f07e280-9d12-7ae2-80a6-11c3a6e28094,
+Links:  https://www.old-computers.com/museum/computer.asp?st=1&c=633, https://winworldpc.com/download/6f07e280-9d12-7ae2-80a6-11c3a6e28094,
         http://www.minuszerodegrees.net/rom/rom.htm
 Form Factor: Desktop
 CPU: 8088 @ 4.77 MHz
@@ -353,9 +387,17 @@ RAM: 128K, up to 1MB
 Bus: 8x ISA
 Video: CGA
 Mass storage: 2x 5.25" 320K
-On board ports: Floppy
-Options: 5MB harddisk
+On board ports: Floppy, serial, console, Centronics, hard disk ("The Winchester disk interface is an 8 bit parallel data port with 4 control lines
+    for byte and unit synchronization. This interface connects the MPC system board to the CDP cache buffered Winchester controller.")
+Options: 5MB harddisk, light pen
 ToDo: The ROM for the CGA is available (see ROM section)
+
+If all of the testing is accomplished, the system will respond with a single 1/2 second tone and continue according to the input output media attached.
+If a dumb terminal is used, another tone will sound and the system will produce another 1/2 second tone then wait until an ASCII period(.)is typed at the
+terminal. The system uses the ASCII character to determine the baud-rate of the terminal device. If an ASCII(.)is not received in 5 seconds, the system
+will default to 19200 baud. If a keyboard and monitor is attached, then no baud rate determination is required.
+Note:Type[ESC] here to activate the ROM monitor for system testing. If a response is not made within five (5) seconds, the MPC will automatically
+enter the system bootstrap sequence detailed below.
 
 ******************************************************************************/
 
@@ -385,7 +427,40 @@ Links:  https://en.wikipedia.org/wiki/Compaq_Portable , http://oldcomputers.net/
         http://www.digibarn.com/collections/systems/compaq/index.html ,
         http://www.old-computers.com/museum/computer.asp?c=547 , https://www.seasip.info/VintagePC/compaq.html
 Form Factor: Luggable
-CPU:
+CPU: 8088 @ 4.77 MHz
+RAM: 128K, up to 640KB
+Bus: 5x ISA
+Video: CGA/MDA capable card, both fonts available, Ctrl+Alt+> switches between internal and external monitor
+Mass storage: 1/2x 5.25" double sided/double density (320K/360K), Plus: 10-21MB harddisk
+
+SW1: 1   2   3   4   5   6   7   8  Descr.
+    OFF                             Not used/always OFF (def.)
+     ON                             Coprocessor/always ON (def.)
+            OFF OFF                 Processor board memory/always OFF (def.)
+                     ON OFF         Compaq video display Controller board (def.)
+                    OFF OFF         Optional monochrome video board
+                             ON  ON 1 Diskette drive (def.)
+                            OFF  ON 2
+                             ON OFF 3
+                            OFF OFF
+
+SW2: 1   2   3   4   5   6   7   8  Descr.
+     ON OFF  ON  ON OFF OFF OFF OFF 128 Kbyte total memory
+     ON  ON OFF  ON OFF OFF OFF OFF 192 Kbyte total memory
+     ON OFF OFF  ON OFF OFF OFF OFF 156 Kbyte total memory
+     ON  ON  ON OFF OFF OFF OFF OFF 320 Kbyte total memory
+     ON OFF  ON OFF OFF OFF OFF OFF 384 Kbyte total memory
+     ON  ON OFF OFF OFF OFF OFF OFF 448 Kbyte total memory
+     ON OFF OFF OFF OFF OFF OFF OFF 512 Kbyte total memory
+    OFF OFF OFF OFF OFF OFF OFF OFF 544 Kbyte total memory
+
+If the ROMs installed in socket(s) U40 (and U47 if available) are Revision C or above,
+SW2 is ignored.  Therefore, on system boards ofRevision J or above, SW2 has been removed.
+If Revision C ROMs or above are installed, 256K x 1 RAM chips may be usedinstead of 64K x 1 bit
+RAM chips in banks 2 and 3 of the system board.  To dothis, however, a new decoder PROM must
+be used in socket U35:o PN 101257-001 (No longer available) if banks 2 and 3 are filled with
+256K x 1 RAM chips for a total of 640 Kbytes.o  PN 101256-001 if only bank 3 is filled with
+256K x 1 RAM chips for a total of 448 Kbytes.
 
 ******************************************************************************/
 
@@ -490,6 +565,7 @@ Links: http://www.digibarn.com/collections/systems/eagle-pc/index.html , https:/
 Form Factor: Desktop
 
 Error message: Cannot read boot sector
+
 ******************************************************************************/
 
 ROM_START( eaglepc2 )
@@ -509,6 +585,26 @@ CPU: 8088 @ 4.77 MHz
 RAM: 128K, up to 640K
 Video: CGA
 Mass storage: 1/2x 5.25" 360KB floppy or 1x 360KB floppy and 10MB harddisk (XL model)
+
+Pressing "T" after a hard reset brings up a ROM based test suite.
+
+DIP switches:
+SW801: Sw.1  Sw.2  Sw.3  Sw.4 Max.RAM     J13  Sw.5  Sw.6  Floppy  Sw.7  Sw.8  Display@
+                              on mainbd.                   drives              powerup
+         ON    ON    ON    ON    64K      OUT
+        OFF    ON    ON    ON   128K      OUT
+         ON   OFF    ON    ON   192K      OUT
+        OFF   OFF    ON    ON   256K      OUT
+        OFF    ON   OFF    ON   384K       IN
+        OFF    ON    ON   OFF   640K       IN
+                                                  ON    ON    1
+                                                  ON   OFF    2
+                                                 OFF    ON    3
+                                                 OFF   OFF    4
+                                                                      ON    ON    No Display
+                                                                      ON   OFF    Color 40x35
+                                                                     OFF    ON    Color 80x25
+                                                                      OFF   OFF   Monochrome
 
 ******************************************************************************/
 
@@ -609,12 +705,42 @@ Info:   Model I: 128K RAM, 14" mono (green or amber) or 12" colour screen; Model
         Model III: 256K RAM, 1 floppy, 10MB harddisk
 Form Factor: Desktop
 CPU: 8088
-RAM: 128K or 256K on board
+RAM: 128K or 256K on board, expandable to 512K
 Bus: 5xISA
 Mass storage: 1/2x 5.25" floppy drives
-Options: 8087 FPU, ISA Memory expansion cards, 10MB harddisk
+Options: 8087 FPU, 10MB harddisk, combo board: "The optional Combo board plugs into one of the 62-pin motherboard expansion slots
+    and provides an additional 128KB of memory, a battery backup real-time clock, and an 8-bit general purpose port which can be
+    used for a parallel printer. Two "baby" add-on memory cards of 128KB each can also be plugged into the Combo board raising the
+    available memory on the board to 384K.
 On board connectors: Floppy, keyboard, serial, parallel
-ToDo: Machine boots, but shows keyboard error; find dump of original graphics card ROM
+ToDo: find dump of original graphics card ROM
+
+DIP switches:
+SW1: 1   2   3   4   5   6   7   8   effect
+        OFF                          FPU installed
+         ON                          no FPU
+            OFF  ON                  128K mainboard memory
+             ON OFF                  192K
+            OFF OFF                  256K
+                     ON  ON          80x25 color monitor
+                    OFF  ON          40x25 color monitor
+                     ON OFF          color monitor in the 80x25 mode
+                    OFF OFF          monochrome or both mono and color monitors
+                              ON  ON 1 floppy drive
+                             OFF  ON 2
+                              ON OFF 3
+                             OFF OFF 4
+
+SW2: 1   2   3   4   5   6   7   8   effect
+                     ON  ON          Screen Time out ON
+                    OFF  ON          Screen Time out OFF
+                            OFF      Power up Self Test ON
+                             ON      Power up Self Test OFF
+                                 OFF Normal Operation
+                                  ON Factory Testing
+
+The ROM contains a monitor program that can be activated by pressing "ESC" at the "Insert Diskette"  prompt
+or by pressing [Ctrl]-[Alt]-[Esc]
 
 ******************************************************************************/
 
@@ -641,6 +767,17 @@ Mass storage: 1x 5.25" 360K, 10MB harddisk (Seagate ST212)
 Options: 8087 FPU
 Misc: A Kaypro 16/2 is a configuration without harddisk but with two floppy disk drives (interface ics on mainboard were not populated)
 
+DIP switches:
+SW1 on the PROCESSOR CARD: Position 1 is used to specify the numeric processor option. Positions 2 and 3 are used to specify the size and type
+of display interface. Positions 4 and 5 are used to specify the number of disk drives.
+(1: on, 2: off, 3: on, 4: on, 5: on); Kapro 16/2: (1: on, 2: off, 3: on, 4: on, 5: off)
+SW1 on the FLOPPY-RAM-I/O CARD: Positions 1,2,3 and 4 are used to specify the starting address for the RAM on the FLOPPY-RAM-I/O card (the
+memory expansion). Positions 5 and 6 indicate the number of RAM banks on the FLOPPY-RAM-I/O card. Position 7 is used to specify whether those
+banks contain 64K or 256K. Position 8 is used to enable or disable parity checking.
+(1: off, 2: on, 3: on, 5: on, 5: on, 6: off, 7: on).
+SW2 on the FLOPPY-RAM-I/O card: Positions 1 and 2 are used to select the serial port. Positions 3 and 4 are used to select the parallel port.
+(1: on, 2: on, 3: on, 4: off).
+
 ******************************************************************************/
 
 void pc_state::kaypro16(machine_config &config)
@@ -662,6 +799,8 @@ ROM_END
 /**************************************************************** Kaypro PC ***
 
 Links:  https://www.youtube.com/watch?v=2YAEOhYEZbc ,
+
+DIP switches: 2 blocks of 8 switches on the FLOPPY-RAM-I/O board, 1 block of 5 switches on the CPU board
 
 ******************************************************************************/
 
@@ -716,6 +855,20 @@ Display: Mono or color CRT 640x400 pixel
 Mass storage: 1x 5.25" 360K floppy and 1x 5.25" 360K floppy or 10 MB harddisk
 On board ports: parallel, serial, speaker, floppy
 Options: 8087 FPU, K101 memory upgrade in 64K steps, 1.2MB floppy and controller board
+
+Regular motherboard, an alternate board using more integrated components exists.
+Jumpers: JP1 closed: enable flex. disk drives, JP2 closed: enable standad serial I/O
+JP3 closed: enable parallel interface OR just JP5: closed, enable standard serial I/O
+
+DIP settings:  Sw.1  Sw.2  Sw.3  Sw.4  Sw.5  Sw.6  Sw.7  Sw.8  effect
+                OFF                                            normal operation
+                       ON                                      FPU not installed
+                             OFF  OFF                          256KB RAM
+                                        OFF   OFF              Alpha Controller
+                                        OFF    ON              40x25 Graphics Controller
+                                         ON   OFF              80x25 Graphics Controller
+                                                     ON    ON  1 Flexible Disk Drive
+                                                    OFF    ON  2 Flexible Disk Drives
 
 ******************************************************************************/
 
@@ -787,13 +940,14 @@ Mass storage: 1x 3.5" 720K, 20MB Miniscribe harddisk
 On board ports: speaker
 Options: 8087 FPU
 
+DIP switches: block with six switches on the CPU board
 ******************************************************************************/
 
 void pc_state::olytext30(machine_config &config)
 {
 	pccga(config);
 
-	v20_device &maincpu(V20(config.replace(), "maincpu", XTAL(14'318'181)/3)); /* 4.77 MHz */
+	v20_device &maincpu(V20(config.replace(), "maincpu", XTAL(25'000'000)/3)); /* 8.33 MHz */ // determine divider, it's a 25MHz crystal and a 10MHz V20
 	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc8_map);
 	maincpu.set_addrmap(AS_IO, &pc_state::pc8_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
@@ -986,7 +1140,9 @@ Video: MDA/Hercules, exchangable via ISA-slot
 Mass storage: 1x 5.25" 360K floppy and 1x 5.25" 360K floppy or MFM hard drive (10MB or 20MB)
 On board ports: parallel, serial, beeper
 Options: 8087 FPU
+OSC: 24MHz, 1843.200KHz
 
+Two blocks of dip switches, 8 switches each
 ******************************************************************************/
 
 static DEVICE_INPUT_DEFAULTS_START( siemens )
@@ -996,7 +1152,7 @@ DEVICE_INPUT_DEFAULTS_END
 void pc_state::siemens(machine_config &config)
 {
 	/* basic machine hardware */
-	i8088_cpu_device &maincpu(I8088(config, "maincpu", XTAL(14'318'181)/3)); /* 4.77 MHz */
+	i8088_cpu_device &maincpu(I8088(config, "maincpu", XTAL(24'000'000)/3)); /* 8.00 MHz */ // Turbo, can be changed to 4.77MHz
 	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc8_map);
 	maincpu.set_addrmap(AS_IO, &pc_state::pc8_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
@@ -1025,6 +1181,10 @@ void pc_state::siemens(machine_config &config)
 ROM_START( sicpc1605 )
 	ROM_REGION(0x10000,"bios", 0)
 	ROM_LOAD("multitech pc-700 3.1.bin", 0xe000, 0x2000, CRC(0ac7a2e1) SHA1(b9c8504e21213d81a068dde9f51f9c973d726e7b))
+
+	// ROM for INS8039N-11 keyboard MCU in Siemens KB-097B/SI keyboard
+	ROM_REGION(0x8000,"kbd", 0)
+	ROM_LOAD("kb097b-st_v1.0.bin", 0x0000, 0x2000, CRC(5fc5903f) SHA1(5fc14d12800e22bb354e4b329c6ffc25efa0397c))
 ROM_END
 
 
@@ -1041,6 +1201,43 @@ Video: MDA/CGA/Hercules
 Mass storage: 2x 5.25" 360K floppies and 1 or 2 harddisks (20MB / 30MB / 40MB)
 On board ports: speaker
 Options: 8087 FPU
+
+DIP settings:
+SW1: 1    2    3    4    5    6    7    8    effect
+     OFF                                     normal operation
+      ON                                     Factory Testing only
+           ON                                FPU absent
+          OFF                                FPU present
+               OFF  ON                       512K conventional memory
+               OFF OFF                       640K conventional memory
+                          ON   ON            normally on
+                                    ON   ON  1 floppy drive
+                                   OFF   ON  2
+                                    ON  OFF  3
+                                   OFF  OFF  4
+
+Switch SW2 is used for the starting address for the expanded memory in the Turbo XT. If you have up to
+one megabyte of expanded memory, the settings are easy: 512K: 01111111 1MB 01110111
+Expanded memory is broken into two bundles as you install it. For example, with 1MB you have 512K in both
+bundle 1 and bundle 2.
+The positions of switches 1, 2 and 3 determine the address of the first bundle of expanded memory. Likewise,
+switches 4, 5 and 6 determine the second bundle's address. Each 512K must have a unique starting address
+
+SW2: 1/4  2/5  3/6  effect
+     OFF   ON   ON  208h I/O port expanded memory
+      ON  OFF   ON  218h
+     OFF  OFF   ON  258h
+      ON   ON  OFF  268h
+     OFF   ON  OFF  2A8h
+      ON  OFF  OFF  2B8h
+     OFF  OFF  OFF  2E8h
+      ON   ON   ON  bundle disabled
+
+At 4.77MHz, memory accesses take four clock cycles (840ns), while I/O accesses take five clock
+cycles (1050ns). At 10MHz, the internal RAM accesses take four cycles (400ns) while all other
+memory accesses take 5 cycles (500ns). I/O accesses still take 5 cycles. However, the clock is
+slowed down to 4.77MHz for all I/O accesses. The same is true for DMA cycles. This ensures the
+Turbo XT is compatible with most expansion cards even when running at 10MHz.
 
 ******************************************************************************/
 
@@ -1063,6 +1260,34 @@ Video: MDA/Hercules/CGA
 Mass storage: 2x 5.25" 360K or 1x 5.25" 360K and 1x 3.5" 720K, additional harddisk optional
 On board ports: speaker
 Options: 8087 FPU
+
+DIP settings:
+SW1: 1    2    3    4    5    6    7    8    effect
+     OFF                                     normal operation
+      ON                                     Factory Testing only
+           ON                                FPU absent
+          OFF                                FPU present
+                ON                           512K conventional memory
+               OFF                           640K conventional memory
+                    --                       not used
+                          ON   ON            EGA or VGA
+                         OFF   ON            CGA 40x25 mode
+                          ON  OFF            CGA 80x25 mode
+                         OFF  OFF            MDA or Hercules
+                                    ON   ON  1 floppy drive
+                                   OFF   ON  2
+                                    ON  OFF  3
+                                   OFF  OFF  4
+
+SW2: 1    2    3    effect
+     OFF   ON   ON  208h I/O port expanded memory
+      ON  OFF   ON  218h
+     OFF  OFF   ON  258h
+      ON   ON  OFF  268h
+     OFF   ON  OFF  2A8h
+      ON  OFF  OFF  2B8h
+     OFF  OFF  OFF  2E8h
+      ON   ON   ON  expanded memory disabled
 
 ******************************************************************************/
 
@@ -1136,6 +1361,26 @@ ROM_END
 /****************************************************** Zenith Z-150 series ***
 
 Form factor: Desktop
+Bus: 8 slot passive backplane: 1) CPU/memory card
+                               2) Floppy/Video card (color and monochrome)
+CPU: Intel 8088 4.77MHz/8MHz, FPU socket present
+RAM: up to 640KB
+Mass storage: 2xDSDD 5.25" floppy disks / DSDD 5.25" floppy disk + winchester
+on board: speaker
+
+
+DIP settings:
+SW202: 1    2    3    4    effect
+       ON                  60Hz display frequency
+      OFF                  50Hz display frequency
+            ON             autoboot floppy drive
+           OFF             autoboot winchester
+                 ON        floppy controller not installed
+                OFF        floppy controller installed
+                      ON   color video adapter
+                     OFF   monochrome video adapter
+
+Pres "ESC" during powerup to enter the ROM monitor
 
 ******************************************************************************/
 
@@ -1161,8 +1406,16 @@ ROM_END
 http://mkgraham.dx.am/810.html
 https://smg.photobucket.com/user/zzm113/library?page=1
 
-System has an AT style enhanced keyboard, despite changing that, the emulated 810
+CPU: NEC V20@4.77MHZ/5.15MHZ/9.54 MHz / FPU socket provided
+on board: dual disk drive controller, dual IDE hard drive interface, 2xser, game
+Bus: 5 ISA slots on a riser
+RAM: 640KB
+mass storage: 5.25" DSDD floppy drive
+options: 20MB/40MB hard drive, RTC
+
+System has an AT style enhanced keyboard, despite providing that, the emulated 810
 emits a steady beep and waits for F1 to be pressed.
+SW1 and SW2 DIP switch blocks
 
 ******************************************************************************/
 
@@ -1180,12 +1433,36 @@ ROM_START( cadd810 )
 	ROM_LOAD("wd_ide_bios_rev_2.0.bin",0x0000,0x2000, NO_DUMP) //missing: dump of hd controller
 ROM_END
 
-/****************************** JUKO NEST true 16 bit variants (8086 and V30 ***
+/**************************************** JUKO NEST N3 true 16 bit variants ***
 
 https://www.vogons.org/viewtopic.php?f=46&t=60077
 https://sites.google.com/site/misterzeropage/
 http://www.vcfed.org/forum/showthread.php?67127-Juko-nest-n3
 
+CPU: 8086 and V30, 4.77MHz/7.16MHz/10MHz hardware or software selectable
+Bus: 8 ISA slots, dynamic bus speed control
+RAM: 512K/640K/1MB on board, EMS 4.0 support (384K on board can be configured either as
+RAMDISK in extended memory or EMS in expanded memory
+
+key commands: [Ctrl]-[Alt]-[1]/[2]/[3] to select CPU speed after running CONTROL.COM
+
+DIP switches: (SW3 to SW8 are autodetected by the NEST BIOS, they need to be set if another BIOS is used).
+SWA: SW1  SW2  SW3  SW4  SW5  SW6  SW7  SW8  effect
+     ---                                     reserved, ON/OFF don't matter
+           ON                                no 8087
+          OFF                                8087 present
+                ON   ON                      0KB memory size
+               OFF   ON                      512KB
+                ON  OFF                      640KB
+               OFF  OFF                      1MB
+                          ON   ON            EGA
+                         OFF   ON            CGA 40x25
+                          ON  OFF            CGA 80x25
+                         OFF  OFF            MDA
+                                    ON   ON  1 diskette drive
+                                   OFF   ON  2
+                                    ON  OFF  3
+                                   OFF  OFF  4
 ******************************************************************************/
 
 void pc_state::juko16(machine_config &config)
@@ -1229,6 +1506,15 @@ ROM_END
 
 http://minuszerodegrees.net/xt_clone_bios/xt_clone_bios.htm
 
+CPU: 8088, FPU socket provided
+RAM: 27xKM41256AP-15 (768KB)
+Bus: 5xISA
+on board:  'Paradise' CGA (ROM not dumped), floppy controller  (connector labelled DISC)  (supporting 4 drives on the one connector), RTC
+    par(connector labelled PR), 2xser(connectors labelled ASYNC1 and ASYNC2), Light pen connector
+OSC: 22.440000MHz, 14.31818, 16MHz, 1.8432MHz
+
+DIP switches: one block of 8 DIP switches
+
 ******************************************************************************/
 
 ROM_START( hyo88t )
@@ -1253,6 +1539,33 @@ Luggable machine with a 9" monochrome enhanced CGA display and an electrostatic 
 ROM is identical between the Nixdorf and the Panasonic
 Displays "PIT1 ERROR"
 
+CPU: Intel 8088 @ 4.77MHz
+RAM: 256KB
+Monitor: 9" amber
+Bus: 2xISA
+mass storage: 2xDSDD 5.25"
+integrated thermal printer, 80/132 characters per line, Epson MX 80 compatible
+on board: parallel port, serial port, RGB port for color monitor
+
+The version 8810/25 CPC has 256KB RAM on the mainboard, a harddisk and RAM can be expanded on the harddisk controller by 320/512KB
+in addition to the DIP switches on the mainboard, DIP switches on the HD controller have to be set.
+
+DIP switches: 1    2    3    4    5    6    7    8    effect
+              ON  OFF   ON   ON   ON                  128 KB RAM
+              ON  OFF  OFF   ON   ON                  256
+              ON   ON   ON  OFF   ON                  320
+              ON  OFF   ON  OFF   ON                  384
+              ON   ON  OFF  OFF   ON                  448
+              ON  OFF  OFF  OFF   ON                  512
+              ON   ON   ON   ON  OFF                  576
+              ON  OFF   ON   ON  OFF                  640
+                                       OFF            8087 present
+                                        ON            8087 absent
+                                             OFF      80 char/line
+                                              ON      40 char/line
+                                                  OFF 1 FDD
+                                                   ON 2 FDD
+
 ******************************************************************************/
 
 ROM_START( nixpc01 )
@@ -1264,6 +1577,8 @@ ROM_END
 
 Those use an Intel Wildcard 88, a XT computer sans slots and DRAM on a SIMM like module
 Chipset: Faraday FE2010A
+
+0300-031F Clock port
 
 ******************************************************************************/
 
@@ -1288,6 +1603,8 @@ acording to http://www.o3one.org/hwdocs/bios_doc/dosref22.html this machine had 
 The "M" stood for a Mitsubishi made machine, the "Leading Edge Model D" was made by Daewoo
 Works with the "siemens" config, so instead of duplicating it until more is known we'll use that.
 
+Interrupt 1Ah  Time of Day, Function 02h, 03h, 04h, 05h are valid on the Model M
+
 ******************************************************************************/
 
 ROM_START( ledgmodm )
@@ -1303,6 +1620,8 @@ ROM_END
 Circuit Cellar Project
 The ROMs are marked "Micromint MPX16 5/8 PC/Term 3/1/84"
 hangs on boot, maybe they are waiting for a serial connection
+
+One block of eight DIP switches
 
 ******************************************************************************/
 
@@ -1422,6 +1741,135 @@ ROM_START( spc400d )
 	ROM_LOAD("fb896.u6", 0xc000, 0x4000, CRC(a6f3ad8c) SHA1(1ee012f9a1757eb68150fedc9db16ff356722f72))
 ROM_END
 
+
+/******************************************* Triumph-Adler Alphatronic P10 ***
+Form factor: Desktop
+Links: https://www.marcuslausch.de/2020/01/21/triumph-adler-alphatronic-p10/, http://www.cc-computerarchiv.de/CC-Archiv/bc-alt/gb-triad/gb-triad-6_87.html
+CPU: 8088@4.77MHz on a motherboard branded Super-640
+RAM: 640KB
+Video: Hercules (branded MG-200), monitor: 12" amber
+Mass storage: 2x5.25" DSDD, a single floppy/hdd version was called P20
+Interfaces: V24, Centronics
+On board: RTC
+DIP switches: 1    2    3    4    5    6    7    8    effect
+             OFF                                      default
+                   ON                                 FPU present
+                  OFF                                 FPU absent
+                                  ON   ON             Display: none
+                                 OFF  OFF             monochrome
+                                 OFF   ON             Color 40x25
+                                  ON  OFF             Color 80x25
+                                            ON   ON   1 Floppy disk drive
+                                           OFF   ON   2
+                                            ON  OFF   3
+                                           OFF  OFF   4
+
+*****************************************************************************/
+
+ROM_START( alphatp10 )
+	ROM_REGION(0x10000,"bios", 0)
+	ROM_LOAD("cgab01_04_06.bin", 0x8000, 0x4000, CRC(4f1048e9) SHA1(c5feee7c00fdb7466c6afec753363d11b32983b5))
+	ROM_LOAD("cgab02_04_07.bin", 0xc000, 0x4000, CRC(a95998cb) SHA1(1d939f0b7ea3999c44f98b30c26d36e394b87503))
+ROM_END
+
+
+/******************************************* Triumph-Adler Alphatronic P50 ***
+Form factor: Desktop
+CPU: 80186@6MHz
+RAM: 512KB
+Mass storage: 2x5.25" DSDD-2, a single floppy/hdd (15MB unformatted) version was called P60-1,
+machines with 5.25" DSQD drives (Panasonic  JU465-5 ALY, 720K) had the -2 suffix
+Ports: Parallel, serial (V24) - OSC: 16.0MHz, 12.000MHz, 14.3181MHz - on board battery
+ISA: 5 slots, one occupied by graphics card (P50)
+Graphics: S230790/00 GEJA04, MC6845P based, OSC: 20.0000 MHz, modes: 160x100 (16col. incl. black and white),
+320x200 or 320x400 (4col. altogether: 1/16 for the background, 1 for the foreground (red, green or brown,
+alt. cobalt blue, violet or white), 640x200 or 640x400 (black, white and two intermediate hues)
+Floppy controller: S131005/00A CE0121/8AJ00072 - NEC B9201C, Intel P8272A
+Keyboard: has seperate "Shift Locke" and "Caps Lock" keys, "Clear" key (Ctrl-Clear to clear the screen),
+an "alpha" key and 18 function keys, it has no NumLock key.
+If you load the "tw" utility and press Ctrl-Alpha, you switch the computer into typewriter mode,
+and all typed text goes straight to the printer.
+
+DIP switches: 1    2    3    4    5    6    7    8    effect
+             OFF                                      load OS from floppy disk
+              ON                                      load OS from hard disk
+                       ON    ON                       128KB RAM
+                      OFF    ON                       256KB
+                       ON   OFF                       384KB
+                      OFF   OFF                       512KB
+                                  ON   ON             no monitor connected
+                                 OFF   ON             color graphics monitor 40x25
+                                  ON  OFF             color graphics monitor 80x25
+                                 OFF  OFF             monochrome screen connected
+                                           ON   ON    1 floppy disk drive
+                                          OFF   ON    2, other positions of switches 7 and 8 are not allowed
+*****************************************************************************/
+
+void pc_state::alphatp50(machine_config &config)
+{
+	/* basic machine hardware */
+	I80186(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc_state::pc16_map);
+	m_maincpu->set_addrmap(AS_IO, &pc_state::pc16_io);
+	downcast<i80186_cpu_device &>(*m_maincpu).set_irmx_irq_ack("mb:pic8259", FUNC(pic8259_device::inta_cb));
+
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
+	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
+
+	// FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false);
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
+	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+
+	/* keyboard */
+	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+
+	/* internal ram */
+	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("128K, 256K, 384K");
+
+	/* software lists */
+	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
+}
+
+ROM_START( alphatp50 )
+	ROM_REGION16_LE(0x10000, "bios", 0)
+	ROMX_LOAD("pc50ii_even_103_16.4.87.bin", 0x8000, 0x4000, CRC(97067b5b) SHA1(260bdeb0a2640141d707eda7b55f2ad4e9c466cd), ROM_SKIP(1))
+	ROMX_LOAD("pc50ii_odd_104_16.4.87.bin", 0x8001, 0x4000, CRC(a628a056) SHA1(0ea6b1bcb8fe9cdf85a570df5fb169abfd5cbbe8), ROM_SKIP(1))
+ROM_END
+
+
+/********************************************************** Sanyo MBC-16LT ***
+Form factor: Laptop
+Motherboard ID: SPC-500B, ROM BIOS Version 1.03, at least a Version 1.06 exists as well
+CPU: i8088
+Yamaha V6366B-F (graphics), Toshiba T4770, Sanyo MB622110 16LT-Dual, VL82C50A-QC
+Mass storage: 2x3.5" DSDD floppy drives (720KB)
+DIP switches: one block of four DIP switches
+
+*****************************************************************************/
+
+void pc_state::mbc16lt(machine_config &config)
+{
+	pccga(config);
+
+	subdevice<isa8_slot_device>("isa1")->set_default_option("mda");
+	subdevice<isa8_slot_device>("isa2")->set_option_machine_config("fdc_xt", cfg_dual_720K);
+}
+
+ROM_START( mbc16lt ) // screen remains blank
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("fb1d4d.bin", 0xc000, 0x4000, CRC(476df338) SHA1(d04c3d0540de27781252bb70c7031a635e801433))
+
+	// NMC27C64Q EPROM next to a M5M80C49H MCU next to the keyboard connector
+	ROM_REGION(0x2000, "kbd", 0)
+	ROM_LOAD("fc2x.bin", 0x0000, 0x2000, NO_DUMP)
+ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -1463,11 +1911,14 @@ COMP( 198?, nms9100,        ibm5150, 0,      pccga,          pccga,    pc_state,
 COMP( 1989, ssam88s,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Samsung",                         "Samtron 88S",           MACHINE_NOT_WORKING )
 COMP( 1988, sx16,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sanyo",                           "SX-16",                 MACHINE_NOT_WORKING )
 COMP( 198?, mbc16,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sanyo",                           "MBC-16",                MACHINE_NOT_WORKING )
+COMP( 198?, mbc16lt,        ibm5150, 0,      mbc16lt,        pccga,    pc_state, empty_init,    "Sanyo",                           "MBC-16LT",              MACHINE_NOT_WORKING )
 COMP( 198?, spc400d,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sanyo",                           "SPC-400D",              MACHINE_NOT_WORKING )
 COMP( 1992, iskr3104,       ibm5150, 0,      iskr3104,       pccga,    pc_state, empty_init,    "Schetmash",                       "Iskra 3104",            MACHINE_NOT_WORKING )
 COMP( 1985, sicpc1605,      ibm5150, 0,      siemens,        pccga,    pc_state, empty_init,    "Siemens",                         "Sicomp PC16-05",        MACHINE_NOT_WORKING )
 COMP( 1985, pc7000,         ibm5150, 0,      eagle1600,      pccga,    pc_state, empty_init,    "Sharp",                           "PC-7000",               MACHINE_NOT_WORKING )
 COMP( 1987, to16,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Thomson SIMIV",                   "TO16",                  MACHINE_NOT_WORKING )
+COMP( 1985, alphatp10,      ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Triumph-Adler",                   "Alphatronic P10",       0 )
+COMP( 1985, alphatp50,      ibm5150, 0,      alphatp50,      pccga,    pc_state, empty_init,    "Triumph-Adler",                   "Alphatronic P50",       0 )
 COMP( 198?, hstrtpls,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Vendex",                          "HeadStart Plus",        MACHINE_NOT_WORKING )
 COMP( 1988, laser_turbo_xt, ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "VTech",                           "Laser Turbo XT",        0 )
 COMP( 1989, laser_xt3,      ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "VTech",                           "Laser XT/3",            0 )

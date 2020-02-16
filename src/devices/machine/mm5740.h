@@ -110,7 +110,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	devcb_read16 m_read_x[9];
+	devcb_read16::array<9> m_read_x;
 	devcb_read_line m_read_shift, m_read_control;
 	devcb_write_line m_write_data_ready;
 

@@ -46,7 +46,7 @@
 
 *****************************************************************************/
 
-#include <string.h>
+#include <cstring>
 
 #include "imgtool.h"
 #include "formats/imageutl.h"

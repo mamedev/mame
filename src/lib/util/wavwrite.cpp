@@ -23,7 +23,7 @@ wav_file *wav_open(const char *filename, int sample_rate, int channels)
 	std::uint16_t temp16;
 
 	// allocate memory for the wav struct
-	wav_file *const wav = new (std::nothrow) wav_file;
+	auto *const wav = new (std::nothrow) wav_file;
 	if (!wav)
 		return nullptr;
 

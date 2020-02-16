@@ -2,6 +2,7 @@
 // copyright-holders:Couriersud
 
 #include "nld_matrix_solver.h"
+#include "nl_setup.h"
 #include "plib/putil.h"
 
 namespace netlist
@@ -45,7 +46,7 @@ namespace solver
 		, m_stat_calculations(*this, "m_stat_calculations", 0)
 		, m_stat_newton_raphson(*this, "m_stat_newton_raphson", 0)
 		, m_stat_vsolver_calls(*this, "m_stat_vsolver_calls", 0)
-		, m_last_step(*this, "m_last_step", netlist_time::zero())
+		, m_last_step(*this, "m_last_step", netlist_time_ext::zero())
 		, m_fb_sync(*this, "FB_sync")
 		, m_Q_sync(*this, "Q_sync")
 		, m_ops(0)
@@ -55,6 +56,11 @@ namespace solver
 
 		// now setup the matrix
 		setup_matrix();
+	}
+
+	analog_net_t *matrix_solver_t::get_connected_net(terminal_t *term)
+	{
+		return &state().setup().get_connected_terminal(*term)->net();
 	}
 
 	void matrix_solver_t::setup_base(const analog_net_t::list_t &nets)
@@ -121,7 +127,7 @@ namespace solver
 						break;
 					case detail::terminal_type::OUTPUT:
 						log().fatal(MF_UNHANDLED_ELEMENT_1_FOUND(p->name()));
-						plib::pthrow<nl_exception>(MF_UNHANDLED_ELEMENT_1_FOUND(p->name()));
+						throw nl_exception(MF_UNHANDLED_ELEMENT_1_FOUND(p->name()));
 				}
 			}
 		}
@@ -211,7 +217,7 @@ namespace solver
 			for (std::size_t i = 0; i < term.count(); i++)
 				//FIXME: this is weird
 				if (other[i] != -1)
-					other[i] = get_net_idx(&term.terms()[i]->connected_terminal()->net());
+					other[i] = get_net_idx(get_connected_net(term.terms()[i]));
 		}
 	}
 
@@ -342,6 +348,36 @@ namespace solver
 		}
 	}
 
+	void matrix_solver_t::set_pointers()
+	{
+		const std::size_t iN = this->m_terms.size();
+
+		std::size_t max_count = 0;
+		std::size_t max_rail = 0;
+		for (std::size_t k = 0; k < iN; k++)
+		{
+			max_count = std::max(max_count, m_terms[k].count());
+			max_rail = std::max(max_rail, m_terms[k].railstart());
+		}
+
+		m_gtn.resize(iN, max_count);
+		m_gonn.resize(iN, max_count);
+		m_Idrn.resize(iN, max_count);
+		m_connected_net_Vn.resize(iN, max_count);
+
+		for (std::size_t k = 0; k < iN; k++)
+		{
+			auto count = m_terms[k].count();
+
+			for (std::size_t i = 0; i < count; i++)
+			{
+				m_terms[k].terms()[i]->set_ptrs(&m_gtn[k][i], &m_gonn[k][i], &m_Idrn[k][i]);
+				//m_connected_net_Vn[k][i] = m_terms[k].terms()[i]->connected_terminal()->net().Q_Analog_state_ptr();
+				m_connected_net_Vn[k][i] = get_connected_net(m_terms[k].terms()[i])->Q_Analog_state_ptr();
+			}
+		}
+	}
+
 	void matrix_solver_t::update_inputs()
 	{
 		// avoid recursive calls. Inputs are updated outside this call
@@ -358,7 +394,7 @@ namespace solver
 
 	void matrix_solver_t::reset()
 	{
-		m_last_step = netlist_time::zero();
+		m_last_step = netlist_time_ext::zero();
 	}
 
 	void matrix_solver_t::update() noexcept
@@ -397,18 +433,18 @@ namespace solver
 			d->timestep(dd);
 	}
 
-	const netlist_time matrix_solver_t::solve(netlist_time now)
+	netlist_time matrix_solver_t::solve(netlist_time_ext now)
 	{
-		const netlist_time delta = now - m_last_step;
+		const netlist_time_ext delta = now - m_last_step();
 
 		// We are already up to date. Avoid oscillations.
 		// FIXME: Make this a parameter!
-		if (delta < netlist_time::quantum())
+		if (delta < netlist_time_ext::quantum())
 			return netlist_time::zero();
 
 		// update all terminals for new time step
 		m_last_step = now;
-		step(delta);
+		step(static_cast<netlist_time>(delta));
 
 		++m_stat_vsolver_calls;
 		if (has_dynamic_devices())
@@ -438,9 +474,7 @@ namespace solver
 			this->vsolve_non_dynamic(false);
 		}
 
-		const netlist_time next_time_step = compute_next_timestep(delta.as_fp<nl_fptype>());
-
-		return next_time_step;
+		return compute_next_timestep(delta.as_fp<nl_fptype>());
 	}
 
 	int matrix_solver_t::get_net_idx(const analog_net_t *net) const noexcept
@@ -468,7 +502,7 @@ namespace solver
 
 		for (std::size_t i = 0; i < term.count(); i++)
 		{
-			auto col = get_net_idx(&term.terms()[i]->connected_terminal()->net());
+			auto col = get_net_idx(get_connected_net(term.terms()[i]));
 			if (col != -1)
 			{
 				if (col==row) col = diag;
@@ -496,7 +530,7 @@ namespace solver
 			auto &term = m_terms[row];
 			for (std::size_t i = 0; i < term.count(); i++)
 			{
-				auto col = get_net_idx(&term.terms()[i]->connected_terminal()->net());
+				auto col = get_net_idx(get_connected_net(term.terms()[i]));
 				if (col >= 0)
 				{
 					auto colu = static_cast<std::size_t>(col);
@@ -510,29 +544,27 @@ namespace solver
 					}
 				}
 			}
-			return weight; // / static_cast<nl_fptype>(term.railstart());
+			return weight;
 		}
 	}
 
 	void matrix_solver_t::add_term(std::size_t net_idx, terminal_t *term)
 	{
-		if (term->connected_terminal()->net().isRailNet())
+		if (get_connected_net(term)->isRailNet())
 		{
 			m_rails_temp[net_idx].add_terminal(term, -1, false);
 		}
 		else
 		{
-			int ot = get_net_idx(&term->connected_terminal()->net());
+			int ot = get_net_idx(get_connected_net(term));
 			if (ot>=0)
 			{
 				m_terms[net_idx].add_terminal(term, ot, true);
 			}
-			// Should this be allowed ?
-			else // if (ot<0)
+			else
 			{
-				m_rails_temp[net_idx].add_terminal(term, ot, true);
 				log().fatal(MF_FOUND_TERM_WITH_MISSING_OTHERNET(term->name()));
-				plib::pthrow<nl_exception>(MF_FOUND_TERM_WITH_MISSING_OTHERNET(term->name()));
+				throw nl_exception(MF_FOUND_TERM_WITH_MISSING_OTHERNET(term->name()));
 			}
 		}
 	}

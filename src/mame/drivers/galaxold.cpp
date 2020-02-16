@@ -2292,16 +2292,12 @@ void galaxold_state::galaxold_base(machine_config &config)
 
 void galaxold_state::galaxian_audio(machine_config &config)
 {
-	GALAXIAN(config, "cust", 0).add_route(ALL_OUTPUTS, "speaker", 0.4);
-
-	DISCRETE(config, GAL_AUDIO, galaxian_discrete).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	GALAXIAN_SOUND(config, "cust", 0);
 }
 
 void galaxold_state::mooncrst_audio(machine_config &config)
 {
-	GALAXIAN(config, "cust", 0).add_route(ALL_OUTPUTS, "speaker", 0.4);
-
-	DISCRETE(config, GAL_AUDIO, mooncrst_discrete).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	MOONCRST_SOUND(config, "cust", 0);
 }
 
 
@@ -3231,6 +3227,26 @@ ROM_START( porter )
 	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
 ROM_END
 
+ROM_START( portera )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "port_man_sub_1.a1",  0x0000, 0x0800, CRC(09b80d10) SHA1(d2de4023fd71434fa9f53b5a900fc962729882e0) )
+	ROM_LOAD( "port_man_sub_2.a2",  0x0800, 0x0800, CRC(c86973fb) SHA1(f635da2662da18f81f2da2df0a44d6684bab0505) )
+	ROM_LOAD( "port_man_sub_3.b2",  0x1000, 0x0800, CRC(610b2da8) SHA1(8c4030fefa67a1841cdef2b26546fcafad95631d) )
+	ROM_LOAD( "port_man_sub_4.c1",  0x1800, 0x0800, CRC(5a3b3584) SHA1(f17e7429f9ace6e0c53b957e078969ca2565d366) )
+	ROM_LOAD( "port_man_sub_5.d1",  0x2000, 0x0800, CRC(2a34cfba) SHA1(74b19a0de47a02f2125bc8790196ad8f675f3c8d) )
+	ROM_LOAD( "port_man_sub_6.e2",  0x2800, 0x0800, CRC(58c01681) SHA1(ef1c7035960073299348092226f69927ebbc8e69) )
+	ROM_LOAD( "port_man_sub_7.f2",  0x3000, 0x0800, CRC(72a38ad0) SHA1(df07d5514d987eecd43e9a24113add8be9a67129) )
+	ROM_LOAD( "port_man_sub_8.f1",  0x3800, 0x0800, CRC(d7017450) SHA1(8e901c40ceab4ddbeaaafe0384729a431e0aedd0) )
+	ROM_LOAD( "port_man_sub_9.1d",  0x4000, 0x1000, CRC(2459fe44) SHA1(55d70eca43aa4497eaaedbddf639a87973d439b4) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "port_man_4k.kl",     0x0000, 0x1000, CRC(71e3debd) SHA1(c0f4caa7f6f64016c6c339085925e5f831948d3d) )
+	ROM_LOAD( "port_man_4k.hj",     0x1000, 0x1000, CRC(b66a763d) SHA1(995b473b1942ff666b0989993587e41e89542172) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "port_man_82s123.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
 ROM_START( tazzmang )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tazzm1.4k",    0x0000, 0x1000, CRC(a14480a1) SHA1(60dac6b57e8331cc4daedaf87faf3e3acc68f378) )
@@ -3383,7 +3399,7 @@ ROM_START( drivfrcg )
 	ROM_LOAD( "bot.clr",      0x0020, 0x0020, CRC(0f0782af) SHA1(32c0dd09ead5c70cee2657e9cb8cb9fcf54c5a6a) )
 ROM_END
 
-ROM_START( drivfrcsg ) // This PCB has a big epoxy block by Tanaka Enterprises marked E-0010, possibly providing ROM addressing
+ROM_START( drivfrcsg ) // This PCB has a big epoxy block by Tanaka Enterprises marked E-0010, providing ROM addressing
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "6n-2-2764a.bin", 0x2800, 0x0400, CRC(85242241) SHA1(bad2609c7f6d83a15809b602a0c141793909ceb0) )
 	ROM_CONTINUE(               0x2c00, 0x0400 )
@@ -3410,6 +3426,35 @@ ROM_START( drivfrcsg ) // This PCB has a big epoxy block by Tanaka Enterprises m
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123-1.bin",      0x0000, 0x0020, CRC(3110ddae) SHA1(53b2e1cc07915592f6c868131ec296c63a407f04) )
 	ROM_LOAD( "82s123-2.bin",      0x0020, 0x0020, CRC(0f0782af) SHA1(32c0dd09ead5c70cee2657e9cb8cb9fcf54c5a6a) )
+ROM_END
+
+ROM_START( drivfrcsga ) // This PCB has a big epoxy block by Tanaka Enterprises marked E-0237, possibly providing ROM addressing
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "xx.bin", 0x2800, 0x0400, NO_DUMP ) // missing
+	ROM_CONTINUE(       0x2c00, 0x0400 )
+	ROM_CONTINUE(       0x0000, 0x0400 )
+	ROM_CONTINUE(       0x0400, 0x0400 )
+	ROM_CONTINUE(       0x0800, 0x0400 )
+	ROM_CONTINUE(       0x0c00, 0x0400 )
+	ROM_CONTINUE(       0x2000, 0x0400 )
+	ROM_CONTINUE(       0x2400, 0x0400 )
+	ROM_LOAD( "1p.bin", 0x6800, 0x0400, CRC(58b12215) SHA1(73c8bd16994704d8b1d007c5924ba5e83f7233ea) ) // unique
+	ROM_CONTINUE(       0x6c00, 0x0400 )
+	ROM_CONTINUE(       0x4000, 0x0400 )
+	ROM_CONTINUE(       0x4400, 0x0400 )
+	ROM_CONTINUE(       0x4800, 0x0400 )
+	ROM_CONTINUE(       0x4c00, 0x0400 )
+	ROM_CONTINUE(       0x6000, 0x0400 )
+	ROM_CONTINUE(       0x6400, 0x0400 )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "kj_5.22.bin", 0x0000, 0x2000, CRC(7b6d837a) SHA1(925ca351635e77cacfb5a2d6e31487c5e4aaf0ec) ) // unique
+	ROM_LOAD( "kl_5.22.bin", 0x2000, 0x2000, CRC(86cd5438) SHA1(c921d8cd031fd0fa78488ae95a1570dd1be919e9) ) // unique
+
+	/* piggy-backed colour proms */
+	ROM_REGION( 0x0040, "proms", 0 )  // missing
+	ROM_LOAD( "82s123-1.bin", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "82s123-2.bin", 0x0020, 0x0020, NO_DUMP )
 ROM_END
 
 ROM_START( drivfrcb )
@@ -3652,6 +3697,7 @@ GAME( 1984, bagmanm2,  bagman,   bagmanmc,  bagmanmc,  galaxold_state, empty_ini
 GAME( 1982, dkongjrm,  dkongjr,  dkongjrm,  dkongjrm,  galaxold_state, empty_init,     ROT90,  "bootleg", "Donkey Kong Jr. (bootleg on Moon Cresta hardware, set 1)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dkongjrmc, dkongjr,  dkongjrmc, dkongjrmc, galaxold_state, empty_init,     ROT90,  "bootleg (Centromatic)", "Donkey Kong Jr. (bootleg on Moon Cresta hardware, set 2)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // sprites leave artifacts
 GAME( 1982, porter,    dockman,  porter,    porter,    galaxold_state, empty_init,     ROT90,  "bootleg", "Port Man (bootleg on Moon Cresta hardware)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
+GAME( 1982, portera,   dockman,  porter,    porter,    galaxold_state, empty_init,     ROT90,  "bootleg", "El Estivador (Spanish bootleg of Port Man on Galaxian hardware)", MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
 GAME( 1982, tazzmang,  tazmania, tazzmang,  tazzmang,  galaxold_state, empty_init,     ROT90,  "bootleg", "Tazz-Mania (bootleg on Galaxian hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, tazzmang2, tazmania, tazzmang,  tazzmang,  galaxold_state, empty_init,     ROT90,  "bootleg", "Tazz-Mania (bootleg on Galaxian hardware with Starfield)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, bongo,     0,        bongo,     bongo,     galaxold_state, empty_init,     ROT90,  "Jetsoft", "Bongo", MACHINE_SUPPORTS_SAVE )
@@ -3669,7 +3715,8 @@ GAME( 1983, spcwarp,   0,        spcwarp,   hunchbkg,  galaxold_state, empty_ini
 GAME( 1984, drivfrcg,  drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, empty_init,     ROT90,  "Shinkai Inc. (Magic Electronics USA license)", "Driving Force (Galaxian conversion)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, drivfrct,  drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, empty_init,     ROT90,  "bootleg (EMT Germany)", "Top Racer (bootleg of Driving Force)", MACHINE_SUPPORTS_SAVE ) // Video Klein PCB
 GAME( 1985, drivfrcb,  drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, empty_init,     ROT90,  "bootleg (Elsys Software)", "Driving Force (Galaxian conversion bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, drivfrcsg, drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, empty_init,     ROT90,  "Seatongrove UK", "Driving Force (Galaxian conversion, Seatongrove UK)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, drivfrcsg, drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, empty_init,     ROT90,  "Seatongrove UK", "Driving Force (Galaxian conversion, Seatongrove UK, E-0010)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, drivfrcsga,drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, empty_init,     ROT90,  "Seatongrove UK", "Driving Force (Galaxian conversion, Seatongrove UK, E-0237)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // incomplete dump
 GAME( 1986, racknrol,  0,        racknrol,  racknrol,  galaxold_state, empty_init,     ROT0,   "Senko Industries (Status license from Shinkai Inc.)", "Rack + Roll", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, hexpool,   racknrol, racknrol,  racknrol,  galaxold_state, empty_init,     ROT90,  "Senko Industries (Shinkai Inc. license)", "Hex Pool (Shinkai)", MACHINE_SUPPORTS_SAVE ) // still has Senko logo in gfx rom
 GAME( 1985, hexpoola,  racknrol, hexpoola,  racknrol,  galaxold_state, empty_init,     ROT90,  "Senko Industries", "Hex Pool (Senko)", MACHINE_SUPPORTS_SAVE )

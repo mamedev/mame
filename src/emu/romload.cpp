@@ -414,7 +414,7 @@ void rom_load_manager::display_loading_rom_message(const char *name, bool from_l
 	char buffer[200];
 
 	if (name != nullptr)
-		sprintf(buffer, "%s (%d%%)", from_list ? "Loading Software" : "Loading Machine", u32(100 * u64(m_romsloadedsize) / u64(m_romstotalsize)));
+		sprintf(buffer, "%s (%d%%)", from_list ? "Loading Software" : "Loading Machine", u32(100 * m_romsloadedsize / m_romstotalsize));
 	else
 		sprintf(buffer, "Loading Complete");
 
@@ -1093,7 +1093,7 @@ chd_error rom_load_manager::open_disk_diff(emu_options &options, const rom_entry
 	/* try to open the diff */
 	LOG("Opening differencing image file: %s\n", fname.c_str());
 	emu_file diff_file(options.diff_directory(), OPEN_FLAG_READ | OPEN_FLAG_WRITE);
-	osd_file::error filerr = diff_file.open(fname.c_str());
+	osd_file::error filerr = diff_file.open(fname);
 	if (filerr == osd_file::error::NONE)
 	{
 		std::string fullpath(diff_file.fullpath());
@@ -1106,7 +1106,7 @@ chd_error rom_load_manager::open_disk_diff(emu_options &options, const rom_entry
 	/* didn't work; try creating it instead */
 	LOG("Creating differencing image: %s\n", fname.c_str());
 	diff_file.set_openflags(OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	filerr = diff_file.open(fname.c_str());
+	filerr = diff_file.open(fname);
 	if (filerr == osd_file::error::NONE)
 	{
 		std::string fullpath(diff_file.fullpath());
@@ -1282,7 +1282,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 		while (swinfo != nullptr)
 		{
 			locationtag.append(swinfo->shortname()).append(breakstr);
-			swinfo = !swinfo->parentname().empty() ? swlist.find(swinfo->parentname().c_str()) : nullptr;
+			swinfo = !swinfo->parentname().empty() ? swlist.find(swinfo->parentname()) : nullptr;
 		}
 		// strip the final '%'
 		locationtag.erase(locationtag.length() - 1, 1);
@@ -1303,7 +1303,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 		/* if this is a device region, override with the device width and endianness */
 		endianness_t endianness = ROMREGION_ISBIGENDIAN(region) ? ENDIANNESS_BIG : ENDIANNESS_LITTLE;
 		u8 width = ROMREGION_GETWIDTH(region) / 8;
-		memory_region *memregion = machine().root_device().memregion(regiontag.c_str());
+		memory_region *memregion = machine().root_device().memregion(regiontag);
 		if (memregion != nullptr)
 		{
 			normalize_flags_for_device(regiontag.c_str(), width, endianness);
@@ -1413,7 +1413,7 @@ void rom_load_manager::process_region_list()
 	for (device_t &device : deviter)
 		for (const rom_entry *param = rom_first_parameter(device); param != nullptr; param = rom_next_parameter(param))
 		{
-			std::string regiontag = device.subtag(param->name().c_str());
+			std::string regiontag = device.subtag(param->name());
 			machine().parameters().add(regiontag, param->hashdata());
 		}
 }

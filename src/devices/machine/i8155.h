@@ -71,7 +71,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	devcb_read8        m_in_pa_cb;
@@ -100,16 +99,17 @@ private:
 	// counter
 	uint16_t m_count_length;    // count length register (assigned)
 	uint16_t m_count_loaded;    // count length register (loaded)
-	uint16_t m_counter;         // counter register
-	bool m_count_extra;         // extra cycle when count is odd
 	int m_to;                   // timer output
+	bool m_count_even_phase;
 
 	// timers
 	emu_timer *m_timer;         // counter timer
+	emu_timer *m_timer_tc;      // counter timer (for TC)
 
 	const address_space_config      m_space_config;
 
-	inline uint8_t get_timer_mode();
+	inline uint8_t get_timer_mode() const;
+	inline uint16_t get_timer_count() const;
 	inline void timer_output(int to);
 	inline void timer_stop_count();
 	inline void timer_reload_count();
@@ -119,6 +119,9 @@ private:
 	void write_command(uint8_t data);
 
 	void register_w(int offset, uint8_t data);
+
+	TIMER_CALLBACK_MEMBER(timer_half_counted);
+	TIMER_CALLBACK_MEMBER(timer_tc);
 };
 
 

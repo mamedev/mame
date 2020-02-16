@@ -19,6 +19,10 @@ class spg2xx_video_device : public device_t
 public:
 	spg2xx_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	auto guny_in() { return m_guny_in.bind(); }
+	auto gunx_in() { return m_gunx_in.bind(); }
+
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank);
 
@@ -31,6 +35,9 @@ public:
 	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
 
 protected:
+
+	devcb_read16 m_guny_in;
+	devcb_read16 m_gunx_in;
 
 	enum
 	{

@@ -34,8 +34,7 @@
 
 #pragma once
 
-class i8257_device :  public device_t,
-						public device_execute_interface
+class i8257_device : public device_t, public device_execute_interface
 {
 public:
 	// construction/destruction
@@ -99,14 +98,14 @@ private:
 	devcb_write_line   m_out_hrq_cb;
 	devcb_write_line   m_out_tc_cb;
 
-	/* accessors to main memory */
+	// accessors to main memory
 	devcb_read8        m_in_memr_cb;
 	devcb_write8       m_out_memw_cb;
 
-	/* channel accessors */
-	devcb_read8        m_in_ior_cb[4];
-	devcb_write8       m_out_iow_cb[4];
-	devcb_write_line   m_out_dack_cb[4];
+	// channel accessors
+	devcb_read8::array<4> m_in_ior_cb;
+	devcb_write8::array<4> m_out_iow_cb;
+	devcb_write_line::array<4> m_out_dack_cb;
 
 	struct
 	{
