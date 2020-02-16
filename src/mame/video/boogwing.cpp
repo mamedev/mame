@@ -54,7 +54,7 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 			uint16_t pix2 = srcline2[x];
 
 			/* Here we have
-			 pix1 - raw pixel / colour / priority data from first 1sdt chip
+			 pix1 - raw pixel / colour / priority data from first 1st chip
 			 pix2 - raw pixel / colour / priority data from first 2nd chip
 			*/
 
@@ -102,8 +102,14 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 			// Transparency
 			if (pix2 & 0x100)
-				alpha2 = 0x80; // TODO : Uses 0x10-0x14 of Aceram?
-				// alpha2 = m_deco_ace->get_alpha(0x14 + ((pix & 0xf0) > 0x50) ? 0x5 : ((pix2 >> 4) & 0x7)); This fixes explosion effects, but this is HACK.
+			{
+				if (pix2 & 0x800) // Use LUT, ex : Explosions
+					alpha2 = (pix2 & 8) ? 0xff : m_deco_ace->get_alpha(0x14 + (pix2 & 0x7)); // TODO : -1?
+				else
+					alpha2 = m_deco_ace->get_alpha(0x10 + ((pix2 & 0x80) >> 7));
+			}
+			else if (pix2 & 0x800)
+				alpha2 = m_deco_ace->get_alpha(0x12 + ((pix2 & 0x80) >> 7));
 
 			// pix2 sprite vs playfield
 			switch (priority)

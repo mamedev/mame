@@ -48,6 +48,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(priority_w);
+	DECLARE_WRITE16_MEMBER(boogwing_ace_w);
 	void init_boogwing();
 	virtual void machine_reset() override;
 	virtual void video_start() override;

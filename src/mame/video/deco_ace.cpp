@@ -241,7 +241,6 @@ uint8_t deco_ace_device::get_alpha(uint8_t val)
 
 uint16_t deco_ace_device::get_aceram(uint8_t val)
 {
-	val &= 0x3f;
 	return m_ace_ram[val];
 }
 
