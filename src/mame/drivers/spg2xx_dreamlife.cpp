@@ -59,6 +59,22 @@ static INPUT_PORTS_START( dreamlif )
 	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dsgnwrld )
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Select")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Cancel")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Menu")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // must be low or the Tiger logo gets skipped, also must be low for service mode (hold pause while booting) to work
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Pause")
+	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
 
 void dreamlif_state::dreamlif(machine_config &config)
 {
@@ -88,4 +104,4 @@ ROM_END
 
 // Hasbro games
 CONS( 2005, dreamlif,  0,        0, dreamlif, dreamlif,   dreamlif_state, empty_init, "Hasbro", "Dream Life (Version 1.0, Feb 07 2005)",  MACHINE_IMPERFECT_SOUND )
-CONS( 2005, dsgnwrld,  0,        0, dreamlif, dreamlif,   dreamlif_state, empty_init, "Hasbro", "Designer's World (Version 1.0, Dec 20 2005)",  MACHINE_IMPERFECT_SOUND )
+CONS( 2005, dsgnwrld,  0,        0, dreamlif, dsgnwrld,   dreamlif_state, empty_init, "Hasbro", "Designer's World (Version 1.0, Dec 20 2005)",  MACHINE_IMPERFECT_SOUND )
