@@ -329,6 +329,7 @@ gp2x.cpp
 gp32.cpp
 grfd2301.cpp
 gridcomp.cpp
+h01x.cpp
 h19.cpp
 h8.cpp
 h89.cpp
@@ -338,7 +339,6 @@ hazeltin.cpp
 hazl1420.cpp
 hec2hrp.cpp
 hektor.cpp
-h01x.cpp
 hh_amis2k.cpp
 hh_cop400.cpp
 hh_hmcs40.cpp
@@ -352,7 +352,6 @@ hk68v10.cpp
 homelab.cpp
 homez80.cpp
 horizon.cpp
-hp_ipc.cpp
 hp16500.cpp
 hp2100.cpp
 hp2620.cpp
@@ -362,6 +361,7 @@ hp48.cpp
 hp49gp.cpp
 hp64k.cpp
 hp700.cpp
+hp80.cpp
 hp95lx.cpp
 hp9825.cpp
 hp9845.cpp
@@ -369,7 +369,7 @@ hp9k.cpp
 hp9k_3xx.cpp
 hprot1.cpp
 hpz80unk.cpp
-hp80.cpp
+hp_ipc.cpp
 ht6000.cpp
 ht68k.cpp
 huebler.cpp
@@ -377,7 +377,6 @@ hunter2.cpp
 hunter16.cpp
 husky.cpp
 hx20.cpp
-spg29x.cpp
 i7000.cpp
 ibm3153.cpp
 ibm6580.cpp
@@ -386,7 +385,6 @@ ibmpcjr.cpp
 icatel.cpp
 icebox.cpp
 ie15.cpp
-lx_jg7425.cpp
 if800.cpp
 ikt5a.cpp
 imds2.cpp
@@ -453,7 +451,6 @@ leapfrog_leappad.cpp
 leapster.cpp
 learnwin.cpp
 lee1214.cpp
-spg29x_lexibook_jg7425.cpp
 lft.cpp
 lg-dvd.cpp
 lilith.cpp
@@ -463,6 +460,7 @@ lms46.cpp
 lola8a.cpp
 lviv.cpp
 lwriter.cpp
+lx_jg7425.cpp
 lynx.cpp
 m20.cpp
 m24.cpp
@@ -802,8 +800,8 @@ sms.cpp
 snes.cpp
 socrates.cpp
 softbox.cpp
-sorcerer.cpp
 solbourne.cpp
+sorcerer.cpp
 spc1000.cpp
 spc1500.cpp
 spec128.cpp
@@ -811,6 +809,8 @@ special.cpp
 specpls3.cpp
 spectrum.cpp
 spg110.cpp
+spg29x.cpp
+spg29x_lexibook_jg7425.cpp
 spg2xx.cpp
 spg2xx_dreamlife.cpp
 spg2xx_ican.cpp
