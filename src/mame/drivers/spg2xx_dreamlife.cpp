@@ -80,6 +80,12 @@ ROM_START( dreamlif )
 	ROM_LOAD16_WORD_SWAP( "dreamlife.bin", 0x000000, 0x800000, CRC(632e0237) SHA1(a8586e8a626d75cf7782f13cfd9f1b938af23d56) )
 ROM_END
 
+ROM_START( dsgnwrld )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "designersworld.bin", 0x000000, 0x800000, CRC(b3987161) SHA1(f7d03b172fd0accc6370d9ccc340b3aa6317426f) )
+ROM_END
+
 
 // Hasbro games
 CONS( 2005, dreamlif,  0,        0, dreamlif, dreamlif,   dreamlif_state, empty_init, "Hasbro", "Dream Life (Version 1.0, Feb 07 2005)",  MACHINE_IMPERFECT_SOUND )
+CONS( 2005, dsgnwrld,  0,        0, dreamlif, dreamlif,   dreamlif_state, empty_init, "Hasbro", "Designer's World (Version 1.0, Dec 20 2005)",  MACHINE_IMPERFECT_SOUND )

@@ -14,7 +14,7 @@
 #include "softlist.h"
 #include "speaker.h"
 #include "machine/eepromser.h"
-
+#include "machine/i2cmem.h"
 
 
 class spg2xx_game_state : public driver_device
@@ -42,7 +42,6 @@ public:
 	void abltenni(machine_config &config);
 	void tvsprt10(machine_config &config);
 	void guitarfv(machine_config &config);
-	void pballpup(machine_config &config);
 	void tmntmutm(machine_config &config);
 
 
@@ -104,6 +103,23 @@ private:
 	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+};
+
+class spg2xx_game_dreamlss_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_dreamlss_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_i2cmem(*this, "i2cmem")
+	{ }
+
+	void dreamlss(machine_config &config);
+
+private:
+	DECLARE_READ16_MEMBER(portb_r);
+	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
+
+	required_device<i2cmem_device> m_i2cmem;
 };
 
 
