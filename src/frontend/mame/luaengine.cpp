@@ -785,6 +785,7 @@ void lua_engine::initialize()
  * emu.keypost(keys) - post keys to natural keyboard
  * emu.wait(len) - wait for len within coroutine
  * emu.lang_translate(str) - get translation for str if available
+ * emu.subst_env(str) - substitute environment variables with values for str
  *
  * emu.register_prestart(callback) - register callback before reset
  * emu.register_start(callback) - register callback after reset
@@ -879,6 +880,11 @@ void lua_engine::initialize()
 		});
 	emu["lang_translate"] = &lang_translate;
 	emu["pid"] = &osd_getpid;
+	emu["subst_env"] = [](const std::string &str) {
+			std::string result;
+			osd_subst_env(result, str);
+			return result;
+		};
 
 
 /*  emu_file library
@@ -1529,7 +1535,7 @@ void lua_engine::initialize()
 			dev.single_step(steps);
 		});
 	device_debug_type.set("go", &device_debug::go);
-	device_debug_type.set("bpset", [](device_debug &dev, offs_t addr, const char *cond, const char *act) { return dev.breakpoint_set(addr, cond, act); });
+	device_debug_type.set("bpset", [](device_debug &dev, offs_t addr) { return dev.breakpoint_set(addr); });
 	device_debug_type.set("bpclr", &device_debug::breakpoint_clear);
 	device_debug_type.set("bplist", [this](device_debug &dev) {
 			sol::table table = sol().create_table();
@@ -1544,13 +1550,13 @@ void lua_engine::initialize()
 			}
 			return table;
 		});
-	device_debug_type.set("wpset", [](device_debug &dev, addr_space &sp, const std::string &type, offs_t addr, offs_t len, const char *cond, const char *act) {
+	device_debug_type.set("wpset", [](device_debug &dev, addr_space &sp, const std::string &type, offs_t addr, offs_t len) {
 			read_or_write wptype = read_or_write::READ;
 			if(type == "w")
 				wptype = read_or_write::WRITE;
 			else if((type == "rw") || (type == "wr"))
 				wptype = read_or_write::READWRITE;
-			return dev.watchpoint_set(sp.space, wptype, addr, len, cond, act);
+			return dev.watchpoint_set(sp.space, wptype, addr, len);
 		});
 	device_debug_type.set("wpclr", &device_debug::watchpoint_clear);
 	device_debug_type.set("wplist", [this](device_debug &dev, addr_space &sp) {
