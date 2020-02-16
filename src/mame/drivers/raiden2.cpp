@@ -1309,7 +1309,7 @@ ROM_START( raiden2 )
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
 
-	// Common Raiden II Soldered mask ROMs below
+	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
@@ -1350,7 +1350,7 @@ ROM_START( raiden2g )
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
 
-	// Common Raiden II Soldered mask ROMs below
+	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
@@ -1410,7 +1410,7 @@ ROM_START( raiden2hk )
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
 
-	// Common Raiden II Soldered mask ROMs below
+	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
@@ -1486,7 +1486,7 @@ ROM_START( raiden2j )
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
 
-	// Common Raiden II Soldered mask ROMs below
+	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
@@ -1527,7 +1527,7 @@ ROM_START( raiden2sw ) // original board with serial # 0008307
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
 
-	// Common Raiden II Soldered mask ROMs below
+	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
@@ -1568,7 +1568,7 @@ ROM_START( raiden2f ) // original board with serial # 12476 that matches raiden2
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
 
-	// Common Raiden II Soldered mask ROMs below
+	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
@@ -1609,7 +1609,7 @@ ROM_START( raiden2nl )
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
 
-	// Common Raiden II Soldered mask ROMs below
+	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
@@ -1650,7 +1650,7 @@ ROM_START( raiden2u )
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
 
-	// Common Raiden II Soldered mask ROMs below
+	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
@@ -1691,7 +1691,7 @@ ROM_START( raiden2i )
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
 
-	// Common Raiden II Soldered mask ROMs below
+	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
@@ -1733,7 +1733,7 @@ ROM_START( raiden2k )
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
 
-	// Common Raiden II Soldered mask ROMs below
+	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
@@ -1791,7 +1791,7 @@ ROM_START( raiden2e )
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
 
-	// Common Raiden II Soldered mask ROMs below
+	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
@@ -1832,7 +1832,7 @@ ROM_START( raiden2ea )
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
 
-	// Common Raiden II Soldered mask ROMs below
+	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
@@ -1873,7 +1873,7 @@ ROM_START( raiden2eu ) // same as raiden2ea, different region
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
 
-	// Common Raiden II Soldered mask ROMs below
+	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
@@ -1918,7 +1918,7 @@ ROM_START( raiden2eua ) // sort of a mixture of raiden2e easy set with voice ROM
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
 
-	// Common Raiden II Soldered mask ROMs below
+	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
@@ -1963,7 +1963,7 @@ ROM_START( raiden2eg ) // this is the same code revision as raiden2eua but a ger
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
 
-	// Common Raiden II Soldered mask ROMs below
+	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
@@ -2008,7 +2008,7 @@ ROM_START( raiden2eup )
 	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x335, CRC(d1a039af) SHA1(f88ff8674d5be17ae9085b51aefcf6abf0574883) )
 
-	// Common Raiden II Soldered mask ROMs below
+	// Common Raiden II soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
@@ -2045,7 +2045,7 @@ ROM_START( raiden2dx ) // this set is very weird, it's Raiden II on a Raiden DX 
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "dx_6.3b",   0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
-	// Common Raiden DX(!) Soldered mask ROMs below
+	// Common Raiden DX(!) soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.6s",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
@@ -2083,7 +2083,7 @@ ROM_START( raidendx )
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
-	// Common Raiden DX Soldered mask ROMs below
+	// Common Raiden DX soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
@@ -2119,7 +2119,7 @@ ROM_START( raidendxg )
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
-	// Common Raiden DX Soldered mask ROMs below
+	// Common Raiden DX soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
@@ -2155,7 +2155,7 @@ ROM_START( raidendxpt )
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
-	// Common Raiden DX Soldered mask ROMs below
+	// Common Raiden DX soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
@@ -2191,7 +2191,7 @@ ROM_START( raidendxa1 )
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
-	// Common Raiden DX Soldered mask ROMs below
+	// Common Raiden DX soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
@@ -2227,7 +2227,7 @@ ROM_START( raidendxa2 )
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
-	// Common Raiden DX Soldered mask ROMs below
+	// Common Raiden DX soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
@@ -2263,7 +2263,7 @@ ROM_START( raidendxk )
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
-	// Common Raiden DX Soldered mask ROMs below
+	// Common Raiden DX soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
@@ -2299,7 +2299,7 @@ ROM_START( raidendxu )
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
-	// Common Raiden DX Soldered mask ROMs below
+	// Common Raiden DX soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
@@ -2335,7 +2335,7 @@ ROM_START( raidendxnl )
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
-	// Common Raiden DX Soldered mask ROMs below
+	// Common Raiden DX soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
@@ -2371,7 +2371,7 @@ ROM_START( raidendxj )
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
-	// Common Raiden DX Soldered mask ROMs below
+	// Common Raiden DX soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
@@ -2407,7 +2407,7 @@ ROM_START( raidendxja )
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
-	// Common Raiden DX Soldered mask ROMs below
+	// Common Raiden DX soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
@@ -2444,7 +2444,7 @@ ROM_START( raidendxch )
 	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
 	ROM_LOAD( "seibu_6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
-	// Common Raiden DX Soldered mask ROMs below
+	// Common Raiden DX soldered mask ROMs below
 	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
 	ROM_LOAD( "copx-d2.u0313",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
