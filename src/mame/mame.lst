@@ -37724,6 +37724,7 @@ beambox
 bkrankp
 
 @source:sunplus_unsp20soc_mobigo.cpp
+mobigo
 mobigo2
 
 @source:supbtime.cpp
