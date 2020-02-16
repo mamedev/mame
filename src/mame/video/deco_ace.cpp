@@ -221,7 +221,7 @@ uint8_t deco_ace_device::get_alpha(uint8_t val)
 	int alpha = m_ace_ram[val] & 0xff;
 	if (alpha > 0x20)
 	{
-		return 0x80; // TODO
+		return 0x80; // TODO : Special blending command? 0x21, 0x22 confirmed
 	}
 	else
 	{
