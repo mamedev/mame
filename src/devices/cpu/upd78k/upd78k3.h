@@ -64,13 +64,18 @@ private:
 
 	// internal helpers
 	inline u8 register_base() const noexcept;
+protected:
+	u8 iram_byte_r(offs_t offset);
+	void iram_byte_w(offs_t offset, u8 data);
 
+private:
 	// address spaces, caches & configuration
 	address_space_config m_program_config;
 	address_space_config m_iram_config;
 	address_space_config m_sfr_config;
 	address_space *m_program_space;
 	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_program_cache;
+	required_shared_ptr<u16> m_iram;
 	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_iram_cache;
 	address_space *m_sfr_space;
 
