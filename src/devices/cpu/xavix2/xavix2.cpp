@@ -233,9 +233,9 @@ void xavix2_device::execute_run()
 		case 0x1c: case 0x1d: m_program->write_word(m_r[r2(opcode)] + val19s(opcode), m_r[r1(opcode)]); break;
 		case 0x1e: case 0x1f: m_program->write_dword(m_r[r2(opcode)] + val19s(opcode), m_r[r1(opcode)]); break;
 
-		case 0x20: case 0x21: m_r[r1(opcode)] = do_add(m_r[r1(opcode)], val14s(opcode)); break;
+		case 0x20: case 0x21: m_r[r1(opcode)] = do_add(m_r[r2(opcode)], val11s(opcode)); break;
 		case 0x22: case 0x23: m_r[r1(opcode)] = val14h(opcode); break;
-		case 0x24: case 0x25: m_r[r1(opcode)] = do_sub(m_r[r1(opcode)], val14s(opcode)); break;
+		case 0x24: case 0x25: m_r[r1(opcode)] = do_sub(m_r[r2(opcode)], val11s(opcode)); break;
 		case 0x26: case 0x27: do_sub(m_r[r1(opcode)], val14s(opcode)); break;
 		case 0x28:            npc = m_pc + val16s(opcode); break;
 		case 0x29:            m_r[7] = npc; npc = m_pc + val16s(opcode); break;

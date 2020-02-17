@@ -86,6 +86,15 @@ std::string xavix2_disassembler::val14sa()
 		return util::string_format("%04x", r);
 }
 
+std::string xavix2_disassembler::val11s()
+{
+	u16 r = (m_opcode >> 8) & 0x7ff;
+	if(r & 0x400)
+		return util::string_format("-%03x", 0x800 - r);
+	else
+		return util::string_format("%03x", r);
+}
+
 std::string xavix2_disassembler::val11u()
 {
 	return util::string_format("%03x", (m_opcode >> 8) & 0x7ff);
@@ -214,9 +223,9 @@ offs_t xavix2_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	case 0x1c: case 0x1d: util::stream_format(stream, "(%s%s).w = %s", r2(), off19s(), r1()); break;
 	case 0x1e: case 0x1f: util::stream_format(stream, "(%s%s).l = %s", r2(), off19s(), r1()); break;
 
-	case 0x20: case 0x21: util::stream_format(stream, "%s += %s", r1(), val14s()); break;
+	case 0x20: case 0x21: util::stream_format(stream, "%s = %s + %s", r1(), r2(), val11s()); break;
 	case 0x22: case 0x23: util::stream_format(stream, "%s = %s", r1(), val14h()); break;
-	case 0x24: case 0x25: util::stream_format(stream, "%s -= %s", r1(), val14s()); break;
+	case 0x24: case 0x25: util::stream_format(stream, "%s = %s - %s", r1(), r2(), val11s()); break;
 	case 0x26: case 0x27: util::stream_format(stream, "cmp %s, %s", r1(), val14s()); break;
 	case 0x28:            util::stream_format(stream, "bra %s", rel16()); break;
 	case 0x29:            util::stream_format(stream, "bsr %s", rel16()); flags = STEP_OVER; break;
