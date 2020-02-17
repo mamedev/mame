@@ -372,7 +372,7 @@ u32 nslasher_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2].get(), m_pf_rowscroll[3].get());
 
 	/* This is not a conclusive test for deciding if tilemap needs alpha blending */
-	if ((m_deco_ace->get_aceram(0x17) & 0x3f) != 0x0 && m_pri)
+	if (m_deco_ace->get_aceram(0x17) != 0x0 && m_pri)
 		alphaTilemap = true;
 
 	screen.priority().fill(0, cliprect);
