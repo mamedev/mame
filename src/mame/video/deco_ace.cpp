@@ -241,6 +241,9 @@ uint8_t deco_ace_device::get_alpha(uint8_t val)
 
 uint16_t deco_ace_device::get_aceram(uint8_t val)
 {
+	if (val >= 0x28)
+		return 0;
+
 	return m_ace_ram[val];
 }
 
