@@ -4791,6 +4791,67 @@ static INPUT_PORTS_START( mandingarf )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( olmandingo )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_4WAY
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) // unused?
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	// the rest appear to be unused, except for Lives?
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0xc0, "3" )
+	PORT_DIPSETTING(    0x40, "4" )
+	PORT_DIPSETTING(    0x80, "5" )
+	PORT_DIPSETTING(    0x00, "255 (Cheat)" )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, "30000 70000" )
+	PORT_DIPSETTING(    0x02, "50000 80000" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, "A 1/1 B 1/6" )
+	PORT_DIPSETTING(    0x04, "A 2/1 B 1/3" )
+	// the rest appear to be unused?
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( theend )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -13079,7 +13140,7 @@ GAME( 1982, amidars,     amidar,   scramble,   amidars,    galaxian_state, init_
 GAME( 1982, mandinga,    amidar,   scramble,   amidars,    galaxian_state, init_mandinga,   ROT90,  "bootleg (Artemi)",                   "Mandinga (Artemi bootleg of Amidar)",                             MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // color PROM needs bitswap<8> on addressing, reference: http://www.youtube.com/watch?v=6uGK4AZxV2U
 GAME( 1982, mandingaeg,  amidar,   scramble,   amidars,    galaxian_state, init_mandingaeg, ROT90,  "bootleg (Electrogame S.A.)",         "Mandinga (Electrogame S.A. bootleg of Amidar)",                   MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, mandingarf,  amidar,   mandingarf, mandingarf, galaxian_state, init_galaxian,   ROT90,  "bootleg (Recreativos Franco S.A.)",  "Mandanga (bootleg of Mandinga on Galaxian hardware, set 1)",      MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // assume same issue as mandinga
-GAME( 1982, olmandingo,  amidar,   mandingarf, mandingarf, galaxian_state, init_galaxian,   ROT90,  "bootleg",                            "Olivmandingo (Spanish bootleg of Mandinga on Galaxian hardware)", MACHINE_NOT_WORKING ) // Bad inputs
+GAME( 1982, olmandingo,  amidar,   mandingarf, olmandingo, galaxian_state, init_galaxian,   ROT90,  "bootleg",                            "Olivmandingo (Spanish bootleg of Mandinga on Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, mandingac,   amidar,   mandingarf, mandingarf, galaxian_state, init_galaxian,   ROT90,  "bootleg (Centromatic)",              "Mandanga (bootleg of Mandinga on Galaxian hardware, set 2)",      MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // assume same issue as mandinga
 
 // The End/Scramble based hardware
