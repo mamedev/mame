@@ -203,18 +203,34 @@ WRITE8_MEMBER(_1942_state::_1942_c804_w)
 
 void _1942_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// Sprites 0 to 15 are drawn on all scanlines.
+	// Sprites 16 to 23 are drawn on scanlines 16 to 127.
+	// Sprites 24 to 31 are drawn on scanlines 128 to 239.
+	//
+	// The reason for this is ostensibly so that the back half of the sprite list can
+	// be used to selectively mask sprites along the midpoint of the screen.
+	//
+	// Moreover, the H counter runs from 128 to 511 for a total of 384 horizontal
+	// clocks per scanline. With an effective 6MHz pixel clock, this produces a
+	// horizontal scan rate of exactly 15.625kHz, a standard scan rate for games
+	// of this era.
+	// 
+	// Sprites are drawn by MAME in reverse order, as the actual hardware only
+	// permits a transparent pixel to be overwritten by an opaque pixel, and does
+	// not support opaque-opaque overwriting - i.e., the first sprite to draw wins
+	// control over its horizontal range. If MAME drew in forward order, it would
+	// instead produce a last-sprite-wins behavior.
+
 	uint8_t objdata[4];
 	uint8_t v = flip_screen() ? ~m_screen->vpos() : m_screen->vpos();
-	for (int h_idx = 0; h_idx < 32; h_idx++)
+	for (int h = 496; h >= 128; h -= 16)
 	{
-		const int h = h_idx << 4;
 		const bool objcnt4 = BIT(h, 8) != BIT(~h, 7);
 		const bool objcnt3 = (BIT(v, 7) && objcnt4) != BIT(~h, 7);
-		uint8_t obj_idx = h_idx & 7;
+		uint8_t obj_idx = (h >> 4) & 7;
 		obj_idx |= objcnt3 ? 0x08 : 0x00;
 		obj_idx |= objcnt4 ? 0x10 : 0x00;
 		obj_idx <<= 2;
-
 		for (int i = 0; i < 4; i++)
 			objdata[i] = m_spriteram[obj_idx | i];
 
