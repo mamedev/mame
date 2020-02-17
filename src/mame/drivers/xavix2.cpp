@@ -25,7 +25,6 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
-		, m_palette(*this, "palette")
 	{ }
 
 	void xavix2(machine_config &config);
@@ -38,15 +37,18 @@ private:
 
 	required_device<xavix2_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 
 	u32 m_dma_src;
 	u16 m_dma_dst;
 	u16 m_dma_count;
 	emu_timer *m_dma_timer;
 
+	u16 m_port0_ddr, m_port0_data;
+
 	u16 m_gpu_adr, m_gpu_descsize_adr, m_gpu_descdata_adr;
 	u32 m_int_active;
+
+	u32 m_sd[0x400][0x800];
 
 	std::string m_debug_string;
 
@@ -75,12 +77,17 @@ private:
 	u8 debug_port_r();
 	u8 debug_port_status_r();
 
+	void port0_ddr_w(u16 data);
+	u16 port0_ddr_r();
+	void port0_w(u16 data);
+	u16 port0_r();
+
 	void crtc_w(offs_t reg, u16 data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void mem(address_map &map);
 };
@@ -143,7 +150,69 @@ void xavix2_state::gpu_count_w(u16 data)
 		u32 idx = (command >> 58) & 0x3f;
 		u32 descsize = m_maincpu->space(AS_PROGRAM).read_dword(m_gpu_descsize_adr + 4*idx);
 		u16 descdata = m_maincpu->space(AS_PROGRAM).read_word(m_gpu_descdata_adr + 2*idx);
-		logerror("gpu    - data %06x size %08x w=%x ?=%x h=%x ?=%x bpp=%x ?=%x\n", (descdata << 14) | ((command >> 43) & 0x3fe0), descsize, 1+(descsize & 0x3f), (descsize >> 6) & 3, 1 + ((descsize >> 8) & 0x3f), (descsize >> 10) & 0x3ff, 1 + ((descsize >> 24) & 7), descsize >> 27);
+
+		u32 sadr = (descdata << 14) | ((command >> 43) & 0x3fe0);
+		u32 x = (command >>  0) &  0x7ff;
+		u32 y = (command >> 11) &  0x3ff;
+		u32 sx = 1+(descsize & 0xff);
+		u32 sy = 1 + ((descsize >> 8) & 0xff);
+		u32 bpp = 1 + ((descsize >> 24) & 7);
+		logerror("gpu    - data %06x size %08x w=%x h=%x ?=%x bpp=%x ?=%x\n", sadr, descsize, sx, sy, (descsize >> 16) & 0xff, bpp, descsize >> 27);
+
+		u32 stride = sx;
+
+		if(x+sx > 0x800)
+			sx = 0x800 - x;
+		if(y+sy > 0x400)
+			sy = 0x400 - y;
+
+		switch(bpp) {
+		case 2: {
+			stride = 8*((sx+31)/32);
+			for(u32 yy=0; yy<sy; yy++) {
+				u32 cadr = sadr;
+				for(u32 xx=0; xx<sx; xx += 32) {
+					u64 v = m_maincpu->space(AS_PROGRAM).read_qword(cadr);
+					u32 xxl = sx - xx;
+					if(xxl > 32)
+						xxl = 32;
+					for(u32 xxx=0; xxx<xxl; xxx++) {
+						u32 c = (v >> (2*xxx)) & 3;
+						m_sd[y+yy][x+xx+xxx] = 0xff000000 | (0x555555 * c);
+					}
+					cadr += 8;
+				}
+				sadr += stride;
+			}
+			break;
+		}
+
+		case 3: {
+			stride = 8*((sx+20)/21);
+			for(u32 yy=0; yy<sy; yy++) {
+				u32 cadr = sadr;
+				for(u32 xx=0; xx<sx; xx += 21) {
+					u64 v = m_maincpu->space(AS_PROGRAM).read_qword(cadr);
+					u32 xxl = sx - xx;
+					if(xxl > 21)
+						xxl = 21;
+					for(u32 xxx=0; xxx<xxl; xxx++) {
+						u32 c = (v >> (3*xxx)) & 7;
+						m_sd[y+yy][x+xx+xxx] = 0xff000000 | (0x242424 * c);
+					}
+					cadr += 8;
+				}
+				sadr += stride;
+			}
+			break;
+		}
+			
+		default:
+			for(u32 yy=0; yy<sy; yy++)
+				for(u32 xx=0; xx<sx; xx++)
+					m_sd[yy+y][xx+x] = 0x00000000;
+			break;
+		}		
 	}
 }
 
@@ -208,6 +277,8 @@ TIMER_CALLBACK_MEMBER(xavix2_state::dma_end)
 
 INTERRUPT_GEN_MEMBER(xavix2_state::vblank_irq)
 {
+	logerror("clear\n");
+	memset(m_sd, 0, sizeof(m_sd));
 	irq_raise(IRQ_TIMER);
 }
 
@@ -232,6 +303,28 @@ u8 xavix2_state::debug_port_status_r()
 	// 0: ok to recieve
 	// 1: ok to send
 	return 1<<1;
+}
+
+void xavix2_state::port0_ddr_w(u16 data)
+{
+	m_port0_ddr = data;
+	logerror("port0 ddr %04x\n", data);
+}
+
+u16 xavix2_state::port0_ddr_r()
+{
+	return m_port0_ddr;
+}
+
+void xavix2_state::port0_w(u16 data)
+{
+	m_port0_data = data;
+	logerror("port0 %04x\n", data);
+}
+
+u16 xavix2_state::port0_r()
+{
+	return m_port0_data;
 }
 
 /*
@@ -285,15 +378,16 @@ void xavix2_state::mem(address_map &map)
 	map(0xffffe00c, 0xffffe00c).w(FUNC(xavix2_state::dma_control_w));
 	map(0xffffe010, 0xffffe010).rw(FUNC(xavix2_state::dma_status_r), FUNC(xavix2_state::dma_status_w));
 
+	map(0xffffe204, 0xffffe205).rw(FUNC(xavix2_state::port0_ddr_r), FUNC(xavix2_state::port0_ddr_w));
+	map(0xffffe20a, 0xffffe20b).rw(FUNC(xavix2_state::port0_r), FUNC(xavix2_state::port0_w));
 	map(0xffffe238, 0xffffe238).rw(FUNC(xavix2_state::debug_port_r), FUNC(xavix2_state::debug_port_w));
 	map(0xffffe239, 0xffffe239).r(FUNC(xavix2_state::debug_port_status_r));
 
 	map(0xffffe604, 0xffffe605).w(FUNC(xavix2_state::gpu_adr_w));
 	map(0xffffe606, 0xffffe607).w(FUNC(xavix2_state::gpu_count_w));
 	map(0xffffe608, 0xffffe609).w(FUNC(xavix2_state::gpu_descsize_w));
-	map(0xffffe622, 0xffffe623).w(FUNC(xavix2_state::gpu_descdata_w));
-
 	map(0xffffe60a, 0xffffe60a).lr8(NAME([]() { return 0x40; })); // pal/ntsc
+	map(0xffffe622, 0xffffe623).w(FUNC(xavix2_state::gpu_descdata_w));
 	map(0xffffe630, 0xffffe631).lr16(NAME([]() { return 0x210; }));
 	map(0xffffe632, 0xffffe633).lr16(NAME([]() { return 0x210; }));
 	map(0xffffe634, 0xffffe64b).w(FUNC(xavix2_state::crtc_w));
@@ -302,8 +396,16 @@ void xavix2_state::mem(address_map &map)
 	map(0xfffffc04, 0xfffffc05).w(FUNC(xavix2_state::irq_clear_w));
 }
 
-uint32_t xavix2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t xavix2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	logerror("draw\n");
+	constexpr int dx = 0x400 - 320;
+	constexpr int dy = 0x200 - 200;
+
+	for(int y=0; y < 400; y++)
+		for(int x=0; x<640; x++)
+			bitmap.pix(y, x) = m_sd[y+dy][x+dx];
+
 	return 0;
 }
 
@@ -334,11 +436,8 @@ void xavix2_state::xavix2(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_screen_update(FUNC(xavix2_state::screen_update));
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	m_screen->set_palette(m_palette);
-
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 256);
+	m_screen->set_size(640, 400);
+	m_screen->set_visarea(0, 639, 0, 399);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
