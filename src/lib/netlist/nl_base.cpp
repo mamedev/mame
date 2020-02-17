@@ -66,8 +66,10 @@ namespace netlist
 			// m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
 			m_low_VO = nlconst::magic(0.05);
 			m_high_VO = nlconst::magic(0.05); // 4.95
-			m_R_low = nlconst::magic(10.0);
-			m_R_high = nlconst::magic(10.0);
+			// https://www.classe.cornell.edu/~ib38/teaching/p360/lectures/wk09/l26/EE2301Exp3F10.pdf
+			// typical CMOS may sink 0.4mA while output stays <= 0.4V
+			m_R_low = nlconst::magic(500.0);
+			m_R_high = nlconst::magic(500.0);
 		}
 		unique_pool_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const override;
 		unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
@@ -559,6 +561,7 @@ namespace netlist
 		, m_active_outputs(*this, "m_active_outputs", 1)
 	{
 		set_logic_family(owner.logic_family());
+		//printf("%s %f %f\n", this->name().c_str(), logic_family()->R_low(), logic_family()->R_high());
 		if (logic_family() == nullptr)
 			set_logic_family(family_TTL());
 		owner.state().register_device(this->name(), owned_pool_ptr<core_device_t>(this, false));
