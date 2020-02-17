@@ -35,7 +35,7 @@ came to clearing out my boxes of junk i took another look at it, and
 it was the bank of 4116 rams that made me take a closer look.
 
 I hooked it up and saw some video on my scope, then it died.
-The +12v had shorted.. Suspecting the godamn tantalum capacitors
+The +12v had shorted.. Suspecting the annoying tantalum capacitors
 (often short out for no reason) i found a shorted one, removed
 it and away we went. It had separate H + V sync, so i loaded
 a 74ls08 into a spare ic space and AND'ed the two signals to get
