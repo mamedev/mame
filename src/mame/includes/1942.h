@@ -14,12 +14,14 @@
 #include "machine/timer.h"
 #include "emupal.h"
 #include "tilemap.h"
+#include "screen.h"
 
 class _1942_state : public driver_device
 {
 public:
 	_1942_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_screen(*this, "screen")
 		, m_spriteram(*this, "spriteram")
 		, m_fg_videoram(*this, "fg_videoram")
 		, m_bg_videoram(*this, "bg_videoram")
@@ -56,6 +58,8 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	required_device<screen_device> m_screen;
+
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_fg_videoram;
@@ -73,6 +77,7 @@ protected:
 	int m_palette_bank;
 	uint8_t m_scroll[2];
 	void create_palette(palette_device &palette) const;
+	uint8_t m_sprite_bufs[2][512];
 };
 
 class _1942p_state : public _1942_state

@@ -233,9 +233,9 @@ void xavix2_device::execute_run()
 		case 0x1c: case 0x1d: m_program->write_word(m_r[r2(opcode)] + val19s(opcode), m_r[r1(opcode)]); break;
 		case 0x1e: case 0x1f: m_program->write_dword(m_r[r2(opcode)] + val19s(opcode), m_r[r1(opcode)]); break;
 
-		case 0x20: case 0x21: m_r[r1(opcode)] = do_add(m_r[r1(opcode)], val14s(opcode)); break;
+		case 0x20: case 0x21: m_r[r1(opcode)] = do_add(m_r[r2(opcode)], val11s(opcode)); break;
 		case 0x22: case 0x23: m_r[r1(opcode)] = val14h(opcode); break;
-		case 0x24: case 0x25: m_r[r1(opcode)] = do_sub(m_r[r1(opcode)], val14s(opcode)); break;
+		case 0x24: case 0x25: m_r[r1(opcode)] = do_sub(m_r[r2(opcode)], val11s(opcode)); break;
 		case 0x26: case 0x27: do_sub(m_r[r1(opcode)], val14s(opcode)); break;
 		case 0x28:            npc = m_pc + val16s(opcode); break;
 		case 0x29:            m_r[7] = npc; npc = m_pc + val16s(opcode); break;
@@ -362,17 +362,17 @@ void xavix2_device::execute_run()
 		case 0xca: case 0xcb: m_hr[val6u(opcode)] = m_r[r1(opcode)]; break;
 
 		case 0xd0:            if(m_f & F_V) npc = m_pc + val8s(opcode); break;
-		case 0xd1:            if((m_f & F_Z) || (m_f & F_C)) npc = m_pc + val8s(opcode); break;
+		case 0xd1:            if(m_f & F_C) npc = m_pc + val8s(opcode); break;
 		case 0xd2:            if(m_f & F_Z) npc = m_pc + val8s(opcode); break;
-		case 0xd3:            if(m_f & F_C) npc = m_pc + val8s(opcode); break;
+		case 0xd3:            if((m_f & F_Z) || (m_f & F_C)) npc = m_pc + val8s(opcode); break;
 		case 0xd4:            if(m_f & F_N) npc = m_pc + val8s(opcode); break;
 		case 0xd5:            npc = m_pc + val8s(opcode); break;
 		case 0xd6:            if(((m_f & F_N) && !(m_f & F_V)) || ((m_f & F_V) && !(m_f & F_N))) npc = m_pc + val8s(opcode); break;
 		case 0xd7:            if((m_f & F_Z) || ((m_f & F_N) && !(m_f & F_V)) || ((m_f & F_V) && !(m_f & F_N))) npc = m_pc + val8s(opcode); break;
 		case 0xd8:            if(!(m_f & F_V)) npc = m_pc + val8s(opcode); break;
-		case 0xd9:            if(!(m_f & F_Z) && !(m_f & F_C)) npc = m_pc + val8s(opcode); break;
+		case 0xd9:            if(!(m_f & F_C)) npc = m_pc + val8s(opcode); break;
 		case 0xda:            if(!(m_f & F_Z)) npc = m_pc + val8s(opcode); break;
-		case 0xdb:            if(!(m_f & F_C)) npc = m_pc + val8s(opcode); break;
+		case 0xdb:            if(!(m_f & F_Z) && !(m_f & F_C)) npc = m_pc + val8s(opcode); break;
 		case 0xdc:            if(!(m_f & F_N)) npc = m_pc + val8s(opcode); break;
 		case 0xdd:            break;														  
 		case 0xde:            if(((m_f & F_N) && (m_f & F_V)) || (!(m_f & F_V) && !(m_f & F_N))) npc = m_pc + val8s(opcode); break;
@@ -382,10 +382,19 @@ void xavix2_device::execute_run()
 		case 0xe1:            m_f = m_if1; npc = m_ilr1; break;
 			// e2
 		case 0xe3:            /* rti2 */ break;
-			// e4-fb
+			// e4-ef
+
+		case 0xf0:            m_f |= F_C; break;
+		case 0xf1:            m_f &= ~F_C; break;
+		case 0xf2:            m_f |= F_Z; break;
+		case 0xf3:            m_f &= ~F_Z; break;
+		case 0xf4:            m_f |= F_N; break;
+		case 0xf5:            m_f &= ~F_N; break;
+		case 0xf6:            m_f |= F_V; break;
+		case 0xf7:            m_f &= ~F_V; break;
 		case 0xf8:            m_f |= F_I; break;
 		case 0xf9:            m_f &= ~F_I; m_ei_count = 2; break;
-
+			// fa-fb
 		case 0xfc:            break;
 			// fd
 		case 0xfe:            m_wait = true; npc = check_interrupt(npc-1); if(m_wait) m_icount = 0; break;
