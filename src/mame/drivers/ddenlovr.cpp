@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria, Luca Elia
-/***************************************************************************
+/**********************************************************************************************************************
 
 Some Dynax/Nakanihon games using the third version of their blitter
 
@@ -103,6 +103,9 @@ TODO:
 
 - mjflove: Transparency problems in title screen, staff roll and gal display (the background is not visible)
 
+- mjflove: 1st level sports a slot-like gal rotation that is hidden in 2nd with a solid green color. 
+  Most likely a bug, related to above?
+
 - implement palette RAM enable in most games. Done for seljan2 (in a convoluted way).
 
 Notes:
@@ -110,7 +113,7 @@ Notes:
 - daimyojn: In Test->Option, press "N Ron Ron N" to access more options
 - kotbinyo: To access service mode, during boot press start+button+right (start+d+e in keyboard mode)
 
-***************************************************************************/
+**********************************************************************************************************************/
 
 #include "emu.h"
 #include "includes/dynax.h"
