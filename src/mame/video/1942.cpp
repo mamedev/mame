@@ -221,76 +221,77 @@ void _1942_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	// control over its horizontal range. If MAME drew in forward order, it would
 	// instead produce a last-sprite-wins behavior.
 
-	uint8_t objdata[4];
-	uint8_t v = flip_screen() ? ~m_screen->vpos() : m_screen->vpos();
-	for (int h = 496; h >= 128; h -= 16)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const bool objcnt4 = BIT(h, 8) != BIT(~h, 7);
-		const bool objcnt3 = (BIT(v, 7) && objcnt4) != BIT(~h, 7);
-		uint8_t obj_idx = (h >> 4) & 7;
-		obj_idx |= objcnt3 ? 0x08 : 0x00;
-		obj_idx |= objcnt4 ? 0x10 : 0x00;
-		obj_idx <<= 2;
-		for (int i = 0; i < 4; i++)
-			objdata[i] = m_spriteram[obj_idx | i];
-
-		int code = (objdata[0] & 0x7f) + ((objdata[1] & 0x20) << 2) + ((objdata[0] & 0x80) << 1);
-		int col = objdata[1] & 0x0f;
-		int sx = objdata[3] - 0x10 * (objdata[1] & 0x10);
-		int sy = objdata[2];
-		int dir = 1;
-
-		uint8_t valpha = (uint8_t)sy;
-		uint8_t v2c = (uint8_t)(~v) + (flip_screen() ? 0x01 : 0xff);
-		uint8_t lvbeta = v2c + valpha;//(sy - m_screen->vpos());// flip_screen() ? (sy - m_screen->vpos()) : (sy - m_screen->vpos() + 1));
-		uint8_t vbeta = ~lvbeta;
-		bool vleq = vbeta <= ((~valpha) & 0xff);
-		bool vinlen = true;
-		uint8_t vlen = objdata[1] >> 6;
-		switch (vlen & 3)
+		const rectangle cliprecty(cliprect.min_x, cliprect.max_x, y, y);
+		uint8_t objdata[4];
+		uint8_t v = flip_screen() ? ~y : y;
+		for (int h = 496; h >= 128; h -= 16)
 		{
-		case 0:
-			vinlen = BIT(lvbeta, 7) && BIT(lvbeta, 6) && BIT(lvbeta, 5) && BIT(lvbeta, 4);
-			break;
-		case 1:
-			vinlen = BIT(lvbeta, 7) && BIT(lvbeta, 6) && BIT(lvbeta, 5);
-			break;
-		case 2:
-			vinlen = BIT(lvbeta, 7) && BIT(lvbeta, 6);
-			break;
-		case 3:
-			vinlen = true;
-			break;
-		}
-		bool vinzone = !(vleq && vinlen);
+			const bool objcnt4 = BIT(h, 8) != BIT(~h, 7);
+			const bool objcnt3 = (BIT(v, 7) && objcnt4) != BIT(~h, 7);
+			uint8_t obj_idx = (h >> 4) & 7;
+			obj_idx |= objcnt3 ? 0x08 : 0x00;
+			obj_idx |= objcnt4 ? 0x10 : 0x00;
+			obj_idx <<= 2;
+			for (int i = 0; i < 4; i++)
+				objdata[i] = m_spriteram[obj_idx | i];
 
-		if (flip_screen())
-		{
-			sx = 240 - sx;
-			sy = 240 - sy;
-			dir = -1;
-		}
+			int code = (objdata[0] & 0x7f) + ((objdata[1] & 0x20) << 2) + ((objdata[0] & 0x80) << 1);
+			int col = objdata[1] & 0x0f;
+			int sx = objdata[3] - 0x10 * (objdata[1] & 0x10);
+			int sy = objdata[2];
+			int dir = 1;
 
-		/* handle double / quadruple height */
-		int i = (objdata[1] & 0xc0) >> 6;
-		if (i == 2)
-			i = 3;
-
-		if (!vinzone)
-		{
-			do
+			uint8_t valpha = (uint8_t)sy;
+			uint8_t v2c = (uint8_t)(~v) + (flip_screen() ? 0x01 : 0xff);
+			uint8_t lvbeta = v2c + valpha;
+			uint8_t vbeta = ~lvbeta;
+			bool vleq = vbeta <= ((~valpha) & 0xff);
+			bool vinlen = true;
+			uint8_t vlen = objdata[1] >> 6;
+			switch (vlen & 3)
 			{
-				m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, code + i, col, flip_screen(), flip_screen(), sx, sy + 16 * i * dir, 15);
-			} while (i-- > 0);
+			case 0:
+				vinlen = BIT(lvbeta, 7) && BIT(lvbeta, 6) && BIT(lvbeta, 5) && BIT(lvbeta, 4);
+				break;
+			case 1:
+				vinlen = BIT(lvbeta, 7) && BIT(lvbeta, 6) && BIT(lvbeta, 5);
+				break;
+			case 2:
+				vinlen = BIT(lvbeta, 7) && BIT(lvbeta, 6);
+				break;
+			case 3:
+				vinlen = true;
+				break;
+			}
+			bool vinzone = !(vleq && vinlen);
+
+			if (flip_screen())
+			{
+				sx = 240 - sx;
+				sy = 240 - sy;
+				dir = -1;
+			}
+
+			/* handle double / quadruple height */
+			int i = (objdata[1] & 0xc0) >> 6;
+			if (i == 2)
+				i = 3;
+
+			if (!vinzone)
+			{
+				do
+				{
+					m_gfxdecode->gfx(2)->transpen(bitmap, cliprecty, code + i, col, flip_screen(), flip_screen(), sx, sy + 16 * i * dir, 15);
+				} while (i-- > 0);
+			}
 		}
 	}
 }
 
 uint32_t _1942_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (cliprect.min_y != cliprect.max_y)
-		return 0;
-
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

@@ -95,9 +95,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(_1942_state::_1942_scanline)
 {
 	int scanline = param;
 
-	//buffer_sprites(m_screen->vpos());
-	m_screen->update_partial(m_screen->vpos());
-
 	if (scanline == 0x2c) // audio irq point 1
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 
