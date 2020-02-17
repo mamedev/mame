@@ -472,7 +472,14 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 					{
 						for (x = 0; x < 14; x++)
 						{
-							bitmap.pix16(row + y, col * 14 + x) = bits & (1 << (x % 4)) ? fg : 0;
+							if (col & 1)
+							{
+								bitmap.pix16(row + y, col * 14 + x) = bits & (1 << ((x+2) % 4)) ? fg : 0;
+							}
+							else
+							{
+								bitmap.pix16(row + y, col * 14 + x) = bits & (1 << (x % 4)) ? fg : 0;
+							}
 						}
 					}
 				}
@@ -484,10 +491,20 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 					{
 						for (x = 0; x < 14; x++)
 						{
-							bitmap.pix16(row + y, col * 14 + x) = bits & (1 << (x % 4)) ? fg : 0;
+							if (col & 1)
+							{
+								bitmap.pix16(row + y, col * 14 + x) = bits & (1 << ((x+2) % 4)) ? fg : 0;
+							}
+							else
+							{
+								bitmap.pix16(row + y, col * 14 + x) = bits & (1 << (x % 4)) ? fg : 0;
+							}
 						}
 					}
 				}
+
+				if (row == 64) printf("\n");
+
 			}
 		}
 	}
@@ -592,20 +609,40 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 				{
 					uint16_t *vram = &bitmap.pix16(row + y, (col * 14));
 
-					*vram++ = abits & (1 << 0) ? fg : 0;
-					*vram++ = abits & (1 << 1) ? fg : 0;
-					*vram++ = abits & (1 << 2) ? fg : 0;
-					*vram++ = abits & (1 << 3) ? fg : 0;
-					*vram++ = abits & (1 << 0) ? fg : 0;
-					*vram++ = abits & (1 << 1) ? fg : 0;
-					*vram++ = abits & (1 << 2) ? fg : 0;
-					*vram++ = bits & (1 << 0) ? fg : 0;
-					*vram++ = bits & (1 << 1) ? fg : 0;
-					*vram++ = bits & (1 << 2) ? fg : 0;
-					*vram++ = bits & (1 << 3) ? fg : 0;
-					*vram++ = bits & (1 << 0) ? fg : 0;
-					*vram++ = bits & (1 << 1) ? fg : 0;
-					*vram++ = bits & (1 << 2) ? fg : 0;
+					if (col & 1)
+					{
+						*vram++ = abits & (1 << 2) ? fg : 0;
+						*vram++ = abits & (1 << 3) ? fg : 0;
+						*vram++ = abits & (1 << 0) ? fg : 0;
+						*vram++ = abits & (1 << 1) ? fg : 0;
+						*vram++ = abits & (1 << 2) ? fg : 0;
+						*vram++ = abits & (1 << 3) ? fg : 0;
+						*vram++ = abits & (1 << 0) ? fg : 0;
+						*vram++ = bits & (1 << 1) ? fg : 0;
+						*vram++ = bits & (1 << 2) ? fg : 0;
+						*vram++ = bits & (1 << 3) ? fg : 0;
+						*vram++ = bits & (1 << 0) ? fg : 0;
+						*vram++ = bits & (1 << 1) ? fg : 0;
+						*vram++ = bits & (1 << 2) ? fg : 0;
+						*vram++ = bits & (1 << 3) ? fg : 0;
+					}
+					else
+					{
+						*vram++ = abits & (1 << 0) ? fg : 0;
+						*vram++ = abits & (1 << 1) ? fg : 0;
+						*vram++ = abits & (1 << 2) ? fg : 0;
+						*vram++ = abits & (1 << 3) ? fg : 0;
+						*vram++ = abits & (1 << 0) ? fg : 0;
+						*vram++ = abits & (1 << 1) ? fg : 0;
+						*vram++ = abits & (1 << 2) ? fg : 0;
+						*vram++ = bits & (1 << 0) ? fg : 0;
+						*vram++ = bits & (1 << 1) ? fg : 0;
+						*vram++ = bits & (1 << 2) ? fg : 0;
+						*vram++ = bits & (1 << 3) ? fg : 0;
+						*vram++ = bits & (1 << 0) ? fg : 0;
+						*vram++ = bits & (1 << 1) ? fg : 0;
+						*vram++ = bits & (1 << 2) ? fg : 0;
+					}
 				}
 
 				bits = (code >> 4) & 0x0F;
@@ -615,20 +652,40 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 				{
 					uint16_t *vram = &bitmap.pix16(row + y, (col * 14));
 
-					*vram++ = abits & (1 << 0) ? fg : 0;
-					*vram++ = abits & (1 << 1) ? fg : 0;
-					*vram++ = abits & (1 << 2) ? fg : 0;
-					*vram++ = abits & (1 << 3) ? fg : 0;
-					*vram++ = abits & (1 << 0) ? fg : 0;
-					*vram++ = abits & (1 << 1) ? fg : 0;
-					*vram++ = abits & (1 << 2) ? fg : 0;
-					*vram++ = bits & (1 << 0) ? fg : 0;
-					*vram++ = bits & (1 << 1) ? fg : 0;
-					*vram++ = bits & (1 << 2) ? fg : 0;
-					*vram++ = bits & (1 << 3) ? fg : 0;
-					*vram++ = bits & (1 << 0) ? fg : 0;
-					*vram++ = bits & (1 << 1) ? fg : 0;
-					*vram++ = bits & (1 << 2) ? fg : 0;
+					if (col & 1)
+					{
+						*vram++ = abits & (1 << 2) ? fg : 0;
+						*vram++ = abits & (1 << 3) ? fg : 0;
+						*vram++ = abits & (1 << 0) ? fg : 0;
+						*vram++ = abits & (1 << 1) ? fg : 0;
+						*vram++ = abits & (1 << 2) ? fg : 0;
+						*vram++ = abits & (1 << 3) ? fg : 0;
+						*vram++ = abits & (1 << 0) ? fg : 0;
+						*vram++ = bits & (1 << 1) ? fg : 0;
+						*vram++ = bits & (1 << 2) ? fg : 0;
+						*vram++ = bits & (1 << 3) ? fg : 0;
+						*vram++ = bits & (1 << 0) ? fg : 0;
+						*vram++ = bits & (1 << 1) ? fg : 0;
+						*vram++ = bits & (1 << 2) ? fg : 0;
+						*vram++ = bits & (1 << 3) ? fg : 0;
+					}
+					else
+					{
+						*vram++ = abits & (1 << 0) ? fg : 0;
+						*vram++ = abits & (1 << 1) ? fg : 0;
+						*vram++ = abits & (1 << 2) ? fg : 0;
+						*vram++ = abits & (1 << 3) ? fg : 0;
+						*vram++ = abits & (1 << 0) ? fg : 0;
+						*vram++ = abits & (1 << 1) ? fg : 0;
+						*vram++ = abits & (1 << 2) ? fg : 0;
+						*vram++ = bits & (1 << 0) ? fg : 0;
+						*vram++ = bits & (1 << 1) ? fg : 0;
+						*vram++ = bits & (1 << 2) ? fg : 0;
+						*vram++ = bits & (1 << 3) ? fg : 0;
+						*vram++ = bits & (1 << 0) ? fg : 0;
+						*vram++ = bits & (1 << 1) ? fg : 0;
+						*vram++ = bits & (1 << 2) ? fg : 0;
+					}
 				}
 			}
 		}
@@ -872,9 +929,9 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 				case 1:
 					w >>= 7;
-					if (vram_row[col] & 0x80)
+					if (vram_row[col+1] & 0x80)
 					{
-						p--;
+						p++;
 					}
 					for (b = 0; b < 7; b++)
 					{
@@ -883,17 +940,17 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 						*(p++) = v ? WHITE : BLACK;
 						*(p++) = v ? WHITE : BLACK;
 					}
-					if (vram_row[col] & 0x80)
+					if (vram_row[col+1] & 0x80)
 					{
-						p++;
+						p--;
 					}
 					break;
 
 				case 2:
 					w >>= 7;
-					if (vram_row[col] & 0x80)
+					if (vram_row[col+1] & 0x80)
 					{
-						p--;
+						p++;
 					}
 					for (b = 0; b < 7; b++)
 					{
@@ -902,17 +959,17 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 						*(p++) = v ? GREEN : BLACK;
 						*(p++) = v ? GREEN : BLACK;
 					}
-					if (vram_row[col] & 0x80)
+					if (vram_row[col+1] & 0x80)
 					{
-						p++;
+						p--;
 					}
 					break;
 
 				case 3:
 					w >>= 7;
-					if (vram_row[col] & 0x80)
+					if (vram_row[col+1] & 0x80)
 					{
-						p--;
+						p++;
 					}
 					for (b = 0; b < 7; b++)
 					{
@@ -921,9 +978,9 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 						*(p++) = v ? ORANGE : BLACK;
 						*(p++) = v ? ORANGE : BLACK;
 					}
-					if (vram_row[col] & 0x80)
+					if (vram_row[col+1] & 0x80)
 					{
-						p++;
+						p--;
 					}
 					break;
 			}
