@@ -45,7 +45,7 @@ private:
 	u16 m_dma_count;
 	emu_timer *m_dma_timer;
 
-	u16 m_gpu_adr;
+	u16 m_gpu_adr, m_gpu_descsize_adr, m_gpu_descdata_adr;
 	u32 m_int_active;
 
 	std::string m_debug_string;
@@ -56,6 +56,8 @@ private:
 	void irq_clear_w(u16 data);
 	u8 irq_level_r();
 
+	void gpu_descsize_w(u16 data);
+	void gpu_descdata_w(u16 data);
 	void gpu_adr_w(u16 data);
 	void gpu_count_w(u16 data);
 
@@ -127,7 +129,7 @@ void xavix2_state::gpu_count_w(u16 data)
 {
 	for(u32 i=0; i != data; i++) {
 		u64 command = m_maincpu->space(AS_PROGRAM).read_qword(m_gpu_adr + 8*i);
-		logerror("gpu %02d: %016x x=%03x y=%03x ?=%02x ?=%x ?=%02x ?=%02x ?=%02x c=%04x %s\n",
+		logerror("gpu %02d: %016x x=%03x y=%03x ?=%02x ?=%x ?=%02x w=%02x h=%02x c=%04x %s\n",
 				 i, command,
 				 (command >>  0) &  0x7ff,
 				 (command >> 11) &  0x3ff,
@@ -138,7 +140,23 @@ void xavix2_state::gpu_count_w(u16 data)
 				 (command >> 42) &   0x3f,
 				 (command >> 48) & 0xffff,
 				 machine().describe_context());
+		u32 idx = (command >> 58) & 0x3f;
+		u32 descsize = m_maincpu->space(AS_PROGRAM).read_dword(m_gpu_descsize_adr + 4*idx);
+		u16 descdata = m_maincpu->space(AS_PROGRAM).read_word(m_gpu_descdata_adr + 2*idx);
+		logerror("gpu    - data %06x size %08x w=%x ?=%x h=%x ?=%x bpp=%x ?=%x\n", (descdata << 14) | ((command >> 43) & 0x3fe0), descsize, 1+(descsize & 0x3f), (descsize >> 6) & 3, 1 + ((descsize >> 8) & 0x3f), (descsize >> 10) & 0x3ff, 1 + ((descsize >> 24) & 7), descsize >> 27);
 	}
+}
+
+void xavix2_state::gpu_descsize_w(u16 data)
+{
+	m_gpu_descsize_adr = data;
+	logerror("gpu descsize_w %04x\n", data);
+}
+
+void xavix2_state::gpu_descdata_w(u16 data)
+{
+	m_gpu_descdata_adr = data;
+	logerror("gpu descdata_w %04x\n", data);
 }
 
 void xavix2_state::dma_src_w(offs_t, u32 data, u32 mem_mask)
@@ -272,6 +290,8 @@ void xavix2_state::mem(address_map &map)
 
 	map(0xffffe604, 0xffffe605).w(FUNC(xavix2_state::gpu_adr_w));
 	map(0xffffe606, 0xffffe607).w(FUNC(xavix2_state::gpu_count_w));
+	map(0xffffe608, 0xffffe609).w(FUNC(xavix2_state::gpu_descsize_w));
+	map(0xffffe622, 0xffffe623).w(FUNC(xavix2_state::gpu_descdata_w));
 
 	map(0xffffe60a, 0xffffe60a).lr8(NAME([]() { return 0x40; })); // pal/ntsc
 	map(0xffffe630, 0xffffe631).lr16(NAME([]() { return 0x210; }));
