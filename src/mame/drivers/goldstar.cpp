@@ -11365,13 +11365,13 @@ ROM_START( chryangl )
 	ROM_LOAD( "8.u6",  0x0000, 0x10000, CRC(331961e4) SHA1(50c7e0e983aed1f199f238442bb8fafce1849f84) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
-	ROM_LOAD( "7.e1",  0x00000,  0x10000, CRC(f8e523ba) SHA1(bfbe1803f0f3c3426a4cc252257c8a4dd83a70ac) )
-	ROM_LOAD( "6.e2",  0x10000,  0x10000, CRC(0d3b322a) SHA1(64b6bd387a78f51f83002c67d857b157a4651279) )
-	ROM_LOAD( "5.e3",  0x20000,  0x10000, CRC(da87dbeb) SHA1(3656b569d08540171003820ec86944d2a7a55b3b) )
+	ROM_LOAD( "7.e1",  0x00000,  0x10000, CRC(f8e523ba) SHA1(bfbe1803f0f3c3426a4cc252257c8a4dd83a70ac) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "6.e2",  0x10000,  0x10000, CRC(0d3b322a) SHA1(64b6bd387a78f51f83002c67d857b157a4651279) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "5.e3",  0x20000,  0x10000, CRC(da87dbeb) SHA1(3656b569d08540171003820ec86944d2a7a55b3b) ) // 1ST AND 2ND HALF IDENTICAL
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "1.f3",  0x0000,  0x2000, CRC(7cc6d26b) SHA1(de33e8985affce7bd3ead89463117c9aaa93d5e4) )
-	ROM_LOAD( "2.f2",  0x2000,  0x2000, CRC(e73ea4e3) SHA1(c9fd56461f6986d6bc170403d298fcc408a524e9) )
+	ROM_LOAD( "1.f3",  0x0000,  0x2000, CRC(7cc6d26b) SHA1(de33e8985affce7bd3ead89463117c9aaa93d5e4) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "2.f2",  0x2000,  0x2000, CRC(e73ea4e3) SHA1(c9fd56461f6986d6bc170403d298fcc408a524e9) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_LOAD( "3.h3",  0x4000,  0x2000, CRC(91162010) SHA1(3acc21e7074602b247f2f392eb181802092d2f21) )
 	ROM_LOAD( "4.h2",  0x6000,  0x2000, CRC(cbcc6bfb) SHA1(5bafc934fef1f50d8c182c39d3a7ce795c89d175) )
 
@@ -11384,6 +11384,32 @@ ROM_START( chryangl )
 
 	ROM_REGION( 0x100, "proms2", 0 )
 	ROM_LOAD( "82s129a.e9", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+ROM_START( chryanglb ) // PCB tyoe: CK88 / CM99 LONG BLUE BOARD
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ca5-main-27c512.bin",  0x0000, 0x10000, CRC(55a78b9f) SHA1(d262ecb0628401a7a39dfe5ffeaac908b86f67b2) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "rom5-27c256.bin",  0x00000,  0x08000, CRC(7b687bc5) SHA1(c6be9c62dec3887ab5279f852f0c84b87acd2e95) )
+	ROM_LOAD( "rom6-27c256.bin",  0x08000,  0x08000, CRC(e9997f3d) SHA1(db7fa59b2023bfe5b78f7e98db326bcb518aa2a8) )
+	ROM_LOAD( "rom7-27c256.bin",  0x10000,  0x08000, CRC(9ad8e541) SHA1(e28b6ba68c5c51c7eed6aea0d3fa7019b34356a5) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "rom4-27c128.bin.001",  0x0000,  0x2000, CRC(7cc6d26b) SHA1(de33e8985affce7bd3ead89463117c9aaa93d5e4) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "rom3-27c128.bin.001",  0x2000,  0x2000, CRC(e455694e) SHA1(335815baa8912d4195ae790bbd8ec3e16f9ec916) )
+	ROM_LOAD( "rom2-27c128.bin.001",  0x4000,  0x2000, CRC(4015b2b3) SHA1(806bff41fc388f25cacd78f4d396c8b8e2ed6d67) )
+	ROM_LOAD( "rom1-27c128.bin.001",  0x6000,  0x2000, CRC(cbcc6bfb) SHA1(5bafc934fef1f50d8c182c39d3a7ce795c89d175) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+	// nothing
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "c15-u79-bprom-82s129.bin", 0x0000, 0x0100, CRC(6144d7fc) SHA1(4563ea31864d8732e3a4b0270449a0a79db334a2) )
+	ROM_LOAD( "c16-u84-bprom-82s129.bin", 0x0100, 0x0100, CRC(0893e05d) SHA1(fabd58d498f5efdddae4c7142915cb7b092d6804) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "9-e,-bprom-82s129.bin", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
 ROM_START( tonypok )
@@ -18505,7 +18531,8 @@ GAME(  1994, chryangla, ncb3,     chryangla,ncb3,     cb3_state,      init_chrya
 GAME(  1991, eldoradd,  0,        eldoradd, chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "El Dorado",                                   MACHINE_NOT_WORKING) // everything
 
 // looks like a hack of Cherry Bonus 3
-GAME(  1994, chryangl,  ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel",                                MACHINE_NOT_WORKING ) // SKY SUPERCB 1.0 string, decrypted but hangs when betting
+GAME(  1994, chryangl,  ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (set 1)",                                MACHINE_NOT_WORKING ) // SKY SUPERCB 1.0 string, decrypted but hangs when betting
+GAME(  1994, chryanglb, ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg",           "Cherry Angel (set 2)",                                MACHINE_NOT_WORKING ) // ANGEL TL+YF 1.00 string, decrypted but hangs when betting
 
 
 // cherry master hardware has a rather different mem map, but is basically the same
