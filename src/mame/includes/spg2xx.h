@@ -48,6 +48,7 @@ public:
 	void init_crc();
 	void init_wiwi18();
 	void init_tvsprt10();
+	void init_dreamlss();
 
 protected:
 	virtual void machine_start() override;
@@ -116,8 +117,13 @@ public:
 	void dreamlss(machine_config &config);
 
 private:
+	uint16_t m_porta_data;
+	uint16_t m_portb_data;
+
+	DECLARE_READ16_MEMBER(porta_r);
 	DECLARE_READ16_MEMBER(portb_r);
 	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
+	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
 
 	required_device<i2cmem_device> m_i2cmem;
 };
