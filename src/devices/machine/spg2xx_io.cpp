@@ -118,6 +118,9 @@ void spg2xx_io_device::device_start()
 	m_rng_timer = timer_alloc(TIMER_RNG);
 	m_rng_timer->adjust(attotime::never);
 
+	m_watchdog_timer = timer_alloc(TIMER_WATCHDOG);
+	m_watchdog_timer->adjust(attotime::never);
+
 	save_item(NAME(m_timer_a_preload));
 	save_item(NAME(m_timer_b_preload));
 	save_item(NAME(m_timer_b_divisor));
@@ -765,7 +768,15 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 			, data, BIT(data, 15), BIT(data, 14), s_sysclk[(data >> 12) & 3], BIT(data, 11), BIT(data, 9), BIT(data, 8));
 		LOGMASKED(LOG_IO_WRITES, "      LVDEn:%d, LVDVoltSel:%s, 32kHzDisable:%d, StrWkMode:%s, VDACDisable:%d, ADACDisable:%d, ADACOutDisable:%d)\n"
 			, BIT(data, 7), s_lvd_voltage[(data >> 5) & 3], BIT(data, 4), s_weak_strong[BIT(data, 3)], BIT(data, 2), BIT(data, 1), BIT(data, 0));
+		const uint16_t old = m_io_regs[offset];
 		m_io_regs[offset] = data;
+		if (BIT(old, 15) != BIT(data, 15))
+		{
+			if (BIT(data, 15))
+				m_watchdog_timer->adjust(attotime::from_msec(750));
+			else
+				m_watchdog_timer->adjust(attotime::never);
+		}
 		break;
 	}
 
@@ -832,6 +843,10 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 
 	case 0x24: // Watchdog
 		LOGMASKED(LOG_WATCHDOG, "%s: io_w: Watchdog Pet = %04x\n", machine().describe_context(), data);
+		if (data == 0x55aa && BIT(m_io_regs[0x20], 15))
+		{
+			m_watchdog_timer->adjust(attotime::from_msec(750));
+		}
 		break;
 
 	case 0x25: // ADC Control
@@ -1163,6 +1178,11 @@ void spg2xx_io_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 		case TIMER_RNG:
 			clock_rng(0);
 			clock_rng(1);
+			break;
+
+		case TIMER_WATCHDOG:
+			m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+			m_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 			break;
 	}
 }

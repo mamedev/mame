@@ -61,13 +61,13 @@ protected:
 
 	static const device_timer_id TIMER_TMB1 = 0;
 	static const device_timer_id TIMER_TMB2 = 1;
-
 	static const device_timer_id TIMER_UART_TX = 4;
 	static const device_timer_id TIMER_UART_RX = 5;
 	static const device_timer_id TIMER_4KHZ = 6;
 	static const device_timer_id TIMER_SRC_AB = 7;
 	static const device_timer_id TIMER_SRC_C = 8;
 	static const device_timer_id TIMER_RNG = 9;
+	static const device_timer_id TIMER_WATCHDOG = 10;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -140,6 +140,7 @@ protected:
 	emu_timer *m_uart_rx_timer;
 
 	emu_timer *m_rng_timer;
+	emu_timer *m_watchdog_timer;
 
 	uint8_t m_sio_bits_remaining;
 	bool m_sio_writing;
