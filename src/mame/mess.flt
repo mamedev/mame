@@ -815,6 +815,8 @@ spg2xx.cpp
 spg2xx_dreamlife.cpp
 spg2xx_ican.cpp
 spg2xx_jakks.cpp
+spg2xx_jakks_gkr.cpp
+spg2xx_jakks_tvtouch.cpp
 spg2xx_lexibook.cpp
 spg2xx_pdc.cpp
 spg2xx_playvision.cpp
