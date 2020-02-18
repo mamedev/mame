@@ -111,7 +111,7 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 			if (pix2 & 0x100)
 			{
 				if (pix2 & 0x800) // Use LUT, ex : Explosions
-					alpha2 = (pix2 & 8) ? 0xff : m_deco_ace->get_alpha(0x14 + (pix2 & 0x7)); // TODO : -1?
+					alpha2 = (pix2 & 8) ? 0xff : m_deco_ace->get_alpha(0x14 + ((pix2 - 1) & 0x7));
 				else
 					alpha2 = m_deco_ace->get_alpha(0x10 + ((pix2 & 0x80) >> 7));
 			}
@@ -123,10 +123,6 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 			{
 				case 0x02:
 					{
-						// Additional sprite alpha in this mode
-						if (pix2 & 0x400)
-							alpha2 = 0x80; // TODO
-
 						// Sprite vs playfield
 						if ((pix2 & 0x600) == 0x600)
 							pri2 = 4;
