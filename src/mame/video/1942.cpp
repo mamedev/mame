@@ -225,7 +225,7 @@ void _1942_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	{
 		const rectangle cliprecty(cliprect.min_x, cliprect.max_x, y, y);
 		uint8_t objdata[4];
-		uint8_t v = flip_screen() ? ~y : y;
+		uint8_t v = flip_screen() ? ~(y - 1) : y - 1;
 		for (int h = 496; h >= 128; h -= 16)
 		{
 			const bool objcnt4 = BIT(h, 8) != BIT(~h, 7);
