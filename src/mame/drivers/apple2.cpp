@@ -1697,6 +1697,28 @@ ROM_START(hkc8800a)
 	ROM_LOAD ( "hkc8800a_f8.bin", 0x3800, 0x0800, CRC(f2287c5f) SHA1(0b6c2d6df11a0aa8c5737831758d9668fce11887))
 ROM_END
 
+ROM_START(albert)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD( "albert 95-6005_rom_2732.bin", 0x0000, 0x1000, CRC(30df7410) SHA1(cb884efb12992e8a0140fdf6368b0268b6c0df8c) )
+
+	ROM_REGION( 0x1000, "keyboard", ROMREGION_ERASE00 )
+	ROM_LOAD( "albert_95-6004_rom_2732.bin", 0x0000, 0x1000, CRC(6d9a435f) SHA1(ce1da16659922daff5bc0065ff45b00d271108f9) )
+
+	ROM_REGION(0x4000,"maincpu",0)
+	ROM_LOAD( "albert_main_rom_27128.bin", 0x0000, 0x4000, CRC(ccf5696b) SHA1(59504a51d91486289330266e851f2ea1719766c1) )
+ROM_END
+
+ROM_START(am100)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD( "nfl-asem-am100-u43.bin", 0x0000, 0x0800, CRC(863e657f) SHA1(cc954204c503bc545ec0d08862483aaad83805d5) )
+
+	ROM_REGION( 0x1000, "keyboard", ROMREGION_ERASE00 )
+	ROM_LOAD( "nfl-asem-am100-keyboard-u5.bin", 0x0000, 0x0800, CRC(28f5ea38) SHA1(9f24c54f7cee41f7fef41294f05c4bc89d65acfb) )
+
+	ROM_REGION(0x4000, "maincpu",0)
+	ROM_LOAD("nfl-asem-am100-u24.bin", 0x0000, 0x4000, CRC(2fb0c717) SHA1(cb4f754d3e1aec9603faebc308a4a63466242e43) )
+ROM_END
+
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY                FULLNAME
 COMP( 1977, apple2,   0,      0,      apple2,   apple2,  apple2_state, empty_init, "Apple Computer",      "Apple ][", MACHINE_SUPPORTS_SAVE )
@@ -1720,3 +1742,5 @@ COMP( 1985, am64,     apple2, 0,      space84,  apple2p, apple2_state, empty_ini
 COMP( 1985, laser2c,  apple2, 0,      space84,  apple2p, apple2_state, empty_init, "Milmar",              "Laser //c", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, basis108, apple2, 0,      apple2,   apple2p, apple2_state, empty_init, "Basis",               "Basis 108", MACHINE_SUPPORTS_SAVE )
 COMP( 1984, hkc8800a, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "China HKC",           "HKC 8800A", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, albert,   apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Albert Computers, Inc.", "Albert", MACHINE_SUPPORTS_SAVE )
+COMP( 198?, am100,    apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "ASEM S.p.A.",         "AM100",     MACHINE_SUPPORTS_SAVE )
