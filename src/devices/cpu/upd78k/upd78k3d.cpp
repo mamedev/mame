@@ -502,10 +502,10 @@ offs_t upd78k3_disassembler::dasm_0axx(std::ostream &stream, u8 op2, offs_t pc, 
 		else if (!BIT(op2, 7))
 			stream << "A,";
 
-		if (BIT(op2, 5))
-			format_ix_disp16(stream, BIT(op2, 4) ? "B" : "A", opcodes.r16(pc + 2));
+		if (BIT(op2, 4))
+			format_ix_base16(stream, BIT(op2, 5) ? "B" : "A", opcodes.r16(pc + 2));
 		else
-			format_ix_disp16(stream, m_ix_bases[(op2 & 0x10) >> 3], opcodes.r16(pc + 2));
+			format_ix_disp16(stream, m_ix_bases[(op2 & 0x20) >> 4], opcodes.r16(pc + 2));
 
 		if ((op2 & 0x8b) == 0x81)
 			stream << ",AX";
@@ -897,7 +897,7 @@ offs_t upd78k3_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			{
 				util::stream_format(stream, "%-8s", BIT(op, 1) ? "PUSHU" : "PUSH");
 				if (post == 0)
-					stream << "none";
+					stream << "0"; // none
 				else for (int n = 7; n >= 0; n--)
 				{
 					if (BIT(post, n))
@@ -916,7 +916,7 @@ offs_t upd78k3_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			{
 				util::stream_format(stream, "%-8s", BIT(op, 1) ? "POPU" : "POP");
 				if (post == 0)
-					stream << "none";
+					stream << "0"; // none
 				else for (int n = 0; n < 8; n++)
 				{
 					if (BIT(post, n))
@@ -1192,7 +1192,7 @@ offs_t upd78312_disassembler::dasm_07xx(std::ostream &stream, u8 op2, offs_t pc,
 
 offs_t upd78312_disassembler::dasm_09xx(std::ostream &stream, u8 op2, offs_t pc, const upd78312_disassembler::data_buffer &opcodes)
 {
-	// STBC and WDM are moved; no RETCSB
+	// STBC and WDM are moved; no RETCSB (also no absolute MOVW except on µPD78310A/312A)
 	if (op2 == 0x42 || op2 == 0x44)
 		return dasm_09xx_sfrmov(stream, op2, pc, opcodes);
 	else if ((op2 & 0xd0) != 0xc0)
