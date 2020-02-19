@@ -173,7 +173,7 @@ void spg2xx_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_
 
 		if (RowScroll)
 		{
-			xx -= (int16_t)m_scrollram[(yy + yscroll) & 0x1ff];
+			xx -= (int16_t)m_scrollram[(yy + yscroll) & 0xff];
 		}
 
 		xx &= 0x01ff;
