@@ -78,22 +78,23 @@ public:
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	virtual void device_reset() override;
+
 	virtual uint8_t read_cnxx(uint8_t offset) override;
 	virtual uint8_t read_c800(uint16_t offset) override;
 
-	virtual void write_cnxx(uint8_t offset, uint8_t data) override
-	{
-		printf("write %x to cn00 + %x\n", data, offset);
-	}
-
 	virtual void write_c800(uint16_t offset, uint8_t data) override
 	{
-		printf("write %x to c800 + %x\n", data, offset);
+		if (offset == 0x7ff)
+		{
+			m_c800_bank = data & 1;
+		}
 	}
 
 	virtual bool take_c800() override { return true; }
 
 private:
+	int m_c800_bank;
 };
 
 // device type definition
