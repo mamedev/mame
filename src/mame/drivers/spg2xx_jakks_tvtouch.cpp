@@ -20,10 +20,6 @@ private:
 	DECLARE_WRITE16_MEMBER(porta_w) override;
 	DECLARE_WRITE16_MEMBER(portb_w) override;
 	DECLARE_WRITE16_MEMBER(portc_w) override;
-
-	uint16_t m_porta_latch;
-	uint16_t m_portb_latch;
-	uint16_t m_portc_latch;
 };
 
 static INPUT_PORTS_START( tvtouch )
