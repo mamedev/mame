@@ -48,7 +48,6 @@ public:
 	void init_crc();
 	void init_wiwi18();
 	void init_tvsprt10();
-	void init_dreamlss();
 
 protected:
 	virtual void machine_start() override;
@@ -105,6 +104,22 @@ private:
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
+
+class spg2xx_game_swclone_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_swclone_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_i2cmem(*this, "i2cmem")
+	{ }
+
+	void swclone(machine_config &config);
+	void init_swclone();
+
+private:
+	required_device<i2cmem_device> m_i2cmem;
+};
+
 
 class spg2xx_game_dreamlss_state : public spg2xx_game_state
 {

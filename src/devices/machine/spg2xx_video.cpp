@@ -33,7 +33,6 @@ spg2xx_video_device::spg2xx_video_device(const machine_config &mconfig, device_t
 	m_guny_in(*this),
 	m_gunx_in(*this),
 	m_sprlimit_read_cb(*this),
-	m_rowscrolloffset_read_cb(*this),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_screen(*this, finder_base::DUMMY_TAG),
 	m_scrollram(*this, "scrollram"),
@@ -78,7 +77,6 @@ void spg2xx_video_device::device_start()
 	save_item(NAME(m_video_regs));
 
 	m_sprlimit_read_cb.resolve_safe(0);
-	m_rowscrolloffset_read_cb.resolve_safe(0);
 
 	m_video_irq_cb.resolve();
 }
@@ -113,7 +111,7 @@ inline uint8_t spg2xx_video_device::mix_channel(uint8_t bottom, uint8_t top)
 }
 
 template<spg2xx_video_device::blend_enable_t Blend, spg2xx_video_device::rowscroll_enable_t RowScroll, spg2xx_video_device::flipx_t FlipX>
-void spg2xx_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t bitmap_addr, uint16_t tile, int32_t h, int32_t w, uint8_t bpp, uint32_t yflipmask, uint32_t palette_offset)
+void spg2xx_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t bitmap_addr, uint16_t tile, int32_t h, int32_t w, uint8_t bpp, uint32_t yflipmask, uint32_t palette_offset, int yscroll)
 {
 	address_space &space = m_cpu->space(AS_PROGRAM);
 
@@ -174,7 +172,9 @@ void spg2xx_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_
 		bits &= 0xffff;
 
 		if (RowScroll)
-			xx -= (int16_t)m_scrollram[(yy + m_rowscrolloffset_read_cb()) & 0x1ff];
+		{
+			xx -= (int16_t)m_scrollram[(yy + yscroll) & 0x1ff];
+		}
 
 		xx &= 0x01ff;
 		if (xx >= 0x01c0)
@@ -355,16 +355,16 @@ void spg2xx_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 			if (row_scroll)
 			{
 				if (flip_x)
-					draw<BlendOn, RowScrollOn, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset);
+					draw<BlendOn, RowScrollOn, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, yscroll);
 				else
-					draw<BlendOn, RowScrollOn, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset);
+					draw<BlendOn, RowScrollOn, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, yscroll);
 			}
 			else
 			{
 				if (flip_x)
-					draw<BlendOn, RowScrollOff, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset);
+					draw<BlendOn, RowScrollOff, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, yscroll);
 				else
-					draw<BlendOn, RowScrollOff, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset);
+					draw<BlendOn, RowScrollOff, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, yscroll);
 			}
 		}
 		else
@@ -372,16 +372,16 @@ void spg2xx_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 			if (row_scroll)
 			{
 				if (flip_x)
-					draw<BlendOff, RowScrollOn, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset);
+					draw<BlendOff, RowScrollOn, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, yscroll);
 				else
-					draw<BlendOff, RowScrollOn, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset);
+					draw<BlendOff, RowScrollOn, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, yscroll);
 			}
 			else
 			{
 				if (flip_x)
-					draw<BlendOff, RowScrollOff, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset);
+					draw<BlendOff, RowScrollOff, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, yscroll);
 				else
-					draw<BlendOff, RowScrollOff, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset);
+					draw<BlendOff, RowScrollOff, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, yscroll);
 			}
 		}
 	}
@@ -441,32 +441,32 @@ void spg2xx_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanli
 	if (blend)
 	{
 		if (flip_x)
-			draw<BlendOn, RowScrollOff, FlipXOn>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset);
+			draw<BlendOn, RowScrollOff, FlipXOn>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset, 0);
 		else
-			draw<BlendOn, RowScrollOff, FlipXOff>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset);
+			draw<BlendOn, RowScrollOff, FlipXOff>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset, 0);
 	}
 	else
 	{
 		if (flip_x)
-			draw<BlendOff, RowScrollOff, FlipXOn>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset);
+			draw<BlendOff, RowScrollOff, FlipXOn>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset, 0);
 		else
-			draw<BlendOff, RowScrollOff, FlipXOff>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset);
+			draw<BlendOff, RowScrollOff, FlipXOff>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset, 0);
 	}
 	m_debug_blit = false;
 #else
 	if (blend)
 	{
 		if (flip_x)
-			draw<BlendOn, RowScrollOff, FlipXOn>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset);
+			draw<BlendOn, RowScrollOff, FlipXOn>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset, 0);
 		else
-			draw<BlendOn, RowScrollOff, FlipXOff>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset);
+			draw<BlendOn, RowScrollOff, FlipXOff>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset, 0);
 	}
 	else
 	{
 		if (flip_x)
-			draw<BlendOff, RowScrollOff, FlipXOn>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset);
+			draw<BlendOff, RowScrollOff, FlipXOn>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset, 0);
 		else
-			draw<BlendOff, RowScrollOff, FlipXOff>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset);
+			draw<BlendOff, RowScrollOff, FlipXOff>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset, 0);
 	}
 #endif
 }

@@ -788,6 +788,33 @@ static INPUT_PORTS_START( pballpup )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( swclone ) // TODO
+	PORT_START("GUNY")
+	PORT_BIT(0x0ff, 0x80, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 256.0f / 240.0f, 0.0, 0) PORT_MINMAX(0x000, 0x0ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("GUNX")
+	PORT_BIT(0x1ff, 0x100, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 512.0f / 320.0f, -0.03f, 0) PORT_MINMAX(0x000, 0x1ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("P1")
+	PORT_BIT( 0x003f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0xfc00, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON4 ) // pause
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // trigger
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // hide
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // reload
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( tmntmutm )
 	PORT_START("GUNY")
 	PORT_BIT(0x0ff, 0x80, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 256.0f / 240.0f, 0.0, 0) PORT_MINMAX(0x000, 0x0ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -1034,8 +1061,6 @@ void spg2xx_game_state::abltenni(machine_config &config)
 	m_maincpu->porta_in().set_ioport("P1");
 	m_maincpu->portb_in().set_ioport("P2");
 	m_maincpu->portc_in().set_ioport("P3");
-
-	m_maincpu->set_rowscroll_offset(8);
 }
 
 void spg2xx_game_state::guitarfv(machine_config &config)
@@ -1123,6 +1148,28 @@ void spg2xx_game_pballpup_state::pballpup(machine_config &config)
 	EEPROM_93C66_16BIT(config, m_eeprom); // type?
 }
 
+void spg2xx_game_swclone_state::swclone(machine_config &config)
+{
+	SPG2XX_128(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_swclone_state::mem_map_4m);
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_swclone_state::base_porta_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_swclone_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_swclone_state::base_portc_r));
+
+	m_maincpu->porta_out().set(FUNC(spg2xx_game_swclone_state::porta_w));
+	m_maincpu->portb_out().set(FUNC(spg2xx_game_swclone_state::portb_w));
+	m_maincpu->portc_out().set(FUNC(spg2xx_game_swclone_state::portc_w));
+
+	m_maincpu->guny_in().set(FUNC(spg2xx_game_swclone_state::base_guny_r));
+	m_maincpu->gunx_in().set(FUNC(spg2xx_game_swclone_state::base_gunx_r));
+
+	I2C_24C08(config, "i2cmem", 0);
+}
+
+
 
 READ16_MEMBER(spg2xx_game_dreamlss_state::porta_r)
 {
@@ -1180,7 +1227,7 @@ void spg2xx_game_dreamlss_state::dreamlss(machine_config &config)
 	m_maincpu->portb_out().set(FUNC(spg2xx_game_dreamlss_state::portb_w));
 	m_maincpu->portc_out().set(FUNC(spg2xx_game_dreamlss_state::portc_w));
 
-	I2C_24C08(config, "i2cmem", 0); // 24LC08
+	I2C_24C08(config, "i2cmem", 0);
 }
 
 
@@ -1309,8 +1356,6 @@ ROM_START( dreamlss )
 	ROM_LOAD16_WORD_SWAP( "dreamlifesuperstar.bin", 0x000000, 0x1000000, CRC(aefad2c3) SHA1(cf962082f09e27d7d24cfc722ae978d9aa735a57) )
 ROM_END
 
-
-
 ROM_START( swclone )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "swclone.bin", 0x000000, 0x800000, CRC(2c983509) SHA1(6138f21fe0b82a7121c4639b6833d4014d5aeb74) )
@@ -1355,11 +1400,10 @@ void spg2xx_game_state::init_tvsprt10()
 	if (rom[0x179911] == 0x9240) rom[0x179911] ^= 0x0001; // decathln
 }
 
-void spg2xx_game_state::init_dreamlss()
+void spg2xx_game_swclone_state::init_swclone()
 {
-	// temp hack! skip I2CMEM loading / test!
-	//uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
-	//rom[0x4bb37] = 0x9640;
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
+	rom[0x2649d1] = 0x0000; // don't write 0x1234 to the start of the RAM that is copied to spriteram on startup (this is an explicit write, probably actually a failure condition for something?)
 }
 
 
@@ -1390,11 +1434,11 @@ CONS( 2005, tmntmutm,   0,     0,        tmntmutm,       tmntmutm,    spg2xx_gam
 
 CONS( 2006, pballpup,   0,     0,        pballpup,       pballpup,    spg2xx_game_pballpup_state, empty_init, "Hasbro / Tiger Electronics", "Mission: Paintball Powered Up", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2007, dreamlss,   0,     0,        dreamlss,       dreamlss,    spg2xx_game_dreamlss_state, init_dreamlss, "Hasbro / Tiger Electronics", "Dream Life Superstar (Version 0.3, Mar 16 2007)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2007, dreamlss,   0,     0,        dreamlss,       dreamlss,    spg2xx_game_dreamlss_state, empty_init, "Hasbro / Tiger Electronics", "Dream Life Superstar (Version 0.3, Mar 16 2007)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 
 // some garbage sprites (not meant to be displayed at all) seeprom hookup (24LC08), gun fine-tuning etc.
-CONS( 2008, swclone,   0,     0,        pballpup,       pballpup,    spg2xx_game_pballpup_state, empty_init, "Hasbro / Tiger Electronics", "Star Wars - The Clone Wars", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, swclone,   0,     0,        swclone,       swclone,    spg2xx_game_swclone_state, init_swclone, "Hasbro / Tiger Electronics", "Star Wars - The Clone Wars", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Mattel games
 CONS( 2005, mattelcs,  0,        0, rad_skat, mattelcs,   spg2xx_game_state, empty_init, "Mattel", "Mattel Classic Sports",     MACHINE_IMPERFECT_SOUND )

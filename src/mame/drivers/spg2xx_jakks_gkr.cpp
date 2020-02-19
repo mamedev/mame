@@ -442,7 +442,6 @@ void jakks_gkr_state::jakks_gkr(machine_config &config)
 	m_maincpu->portb_out().set(FUNC(jakks_gkr_state::jakks_portb_w));
 	m_maincpu->portc_in().set_ioport("P3");
 	m_maincpu->portc_out().set(FUNC(jakks_gkr_state::gkr_portc_w));
-	m_maincpu->set_rowscroll_offset(0);
 
 	JAKKS_GAMEKEY_SLOT(config, m_cart, 0, jakks_gamekey, nullptr);
 }
