@@ -36,8 +36,6 @@ public:
 	void jakks_gkr_wp(machine_config &config);
 	void jakks_gkr_cb(machine_config &config);
 
-	void jakks_tvtouch(machine_config& config);
-
 	DECLARE_READ_LINE_MEMBER(i2c_gkr_r);
 
 protected:
