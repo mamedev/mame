@@ -27,10 +27,11 @@ public:
 	auto i2c_r() { return m_i2c_r.bind(); }
 
 	auto uart_tx() { return m_uart_tx.bind(); }
-
+	auto spi_tx() { return m_spi_tx.bind(); }
 	auto chip_select() { return m_chip_sel.bind(); }
 
 	void uart_rx(uint8_t data);
+	void spi_rx(int state);
 
 	void extint_w(int channel, bool state);
 
@@ -156,6 +157,7 @@ protected:
 	static const device_timer_id TIMER_SRC_C = 8;
 	static const device_timer_id TIMER_RNG = 9;
 	static const device_timer_id TIMER_WATCHDOG = 10;
+	static const device_timer_id TIMER_SPI_TX = 11;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -178,6 +180,10 @@ protected:
 
 	void system_timer_tick();
 
+	void do_spi_tx();
+	void set_spi_irq(bool set);
+	void update_spi_irqs();
+
 	void do_i2c();
 
 	uint16_t m_io_regs[0x100];
@@ -189,6 +195,20 @@ protected:
 	bool m_uart_rx_available;
 	bool m_uart_rx_irq;
 	bool m_uart_tx_irq;
+
+	uint8_t m_spi_tx_fifo[16];
+	uint8_t m_spi_tx_fifo_start;
+	uint8_t m_spi_tx_fifo_end;
+	uint8_t m_spi_tx_fifo_count;
+	uint8_t m_spi_tx_buf;
+	uint8_t m_spi_tx_bit;
+
+	uint8_t m_spi_rx_fifo[16];
+	uint8_t m_spi_rx_fifo_start;
+	uint8_t m_spi_rx_fifo_end;
+	uint8_t m_spi_rx_fifo_count;
+	uint8_t m_spi_rx_buf;
+	uint8_t m_spi_rx_bit;
 
 	bool m_extint[2];
 
@@ -205,6 +225,7 @@ protected:
 	devcb_read8 m_i2c_r;
 
 	devcb_write8 m_uart_tx;
+	devcb_write_line m_spi_tx;
 
 	devcb_write8 m_chip_sel;
 
@@ -229,6 +250,9 @@ protected:
 
 	emu_timer *m_rng_timer;
 	emu_timer *m_watchdog_timer;
+
+	uint32_t m_spi_rate;
+	emu_timer* m_spi_tx_timer;
 
 	uint8_t m_sio_bits_remaining;
 	bool m_sio_writing;

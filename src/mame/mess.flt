@@ -177,6 +177,7 @@ compuchess.cpp
 compucolor.cpp
 comquest.cpp
 comx35.cpp
+conchess.cpp
 concept.cpp
 controlid.cpp
 cortex.cpp
