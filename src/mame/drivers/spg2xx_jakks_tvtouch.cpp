@@ -17,9 +17,9 @@ private:
 	DECLARE_READ16_MEMBER(porta_r);
 	DECLARE_READ16_MEMBER(portb_r);
 	DECLARE_READ16_MEMBER(portc_r);
-	DECLARE_WRITE16_MEMBER(porta_w);
-	DECLARE_WRITE16_MEMBER(portb_w);
-	DECLARE_WRITE16_MEMBER(portc_w);
+	DECLARE_WRITE16_MEMBER(porta_w) override;
+	DECLARE_WRITE16_MEMBER(portb_w) override;
+	DECLARE_WRITE16_MEMBER(portc_w) override;
 
 	uint16_t m_porta_latch;
 	uint16_t m_portb_latch;

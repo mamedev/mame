@@ -16,7 +16,7 @@ public:
 	void walle(machine_config& config);
 
 private:
-	DECLARE_WRITE16_MEMBER(portc_w);
+	DECLARE_WRITE16_MEMBER(portc_w) override;
 };
 
 WRITE16_MEMBER(jakks_state::portc_w)

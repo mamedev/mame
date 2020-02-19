@@ -1094,7 +1094,7 @@ WRITE16_MEMBER(spg2xx_io_device::io_extended_w)
 
 	case REG_SPI_MISC:
 	{
-		static const char* const s_spi_clock[8] = { "SYSCLK/2" , "SYSCLK/4", "SYSCLK/8", "SYSCLK/16", "SYSCLK/32", "SYSCLK/64", "SYSCLK/128", "Reserved" };
+		//static const char* const s_spi_clock[8] = { "SYSCLK/2" , "SYSCLK/4", "SYSCLK/8", "SYSCLK/16", "SYSCLK/32", "SYSCLK/64", "SYSCLK/128", "Reserved" };
 		LOGMASKED(LOG_SIO, "%s: io_r: SPI Misc. = %04x (Over:%d, SmartInt:%d, Busy:%d, RxFull:%d, RxNotEmpty:%d, TxNotFull:%d, TxEmpty:%d)\n", machine().describe_context(), data,
 			BIT(data, 9), BIT(data, 8), BIT(data, 4), BIT(data, 3), BIT(data, 2), BIT(data, 1), BIT(data, 0));
 		m_io_regs[offset] &= ~0x0300;
