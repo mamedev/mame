@@ -1349,6 +1349,9 @@ ROM_END
 ROM_START( pballpup )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "paintballpoweredup.bin", 0x000000, 0x1000000, CRC(57dbdfd1) SHA1(d98cb7321cc7af092f6f4f83e85fabbdbc1bbd95) )
+
+	ROM_REGION16_BE( 0x200, "eeprom", ROMREGION_ERASE00 )
+	// ensure eeprom defaults to 00 or there are unwanted invalid entries already saved
 ROM_END
 
 ROM_START( dreamlss )
