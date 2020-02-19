@@ -453,10 +453,10 @@ inline void unsp_device::execute_fxxx_110_group(uint16_t op)
 	const uint16_t size = ((op >> 3) & 7) ? ((op >> 3) & 7) : 16;
 	const uint16_t rd = (op >> 9) & 7;
 	const uint16_t rs = op & 7;
-	execute_muls(rd, rs, size);
+	execute_muls_ss(rd, rs, size);
 }
 
-inline void unsp_device::execute_muls(const uint16_t rd, const uint16_t rs, const uint16_t size)
+void unsp_device::execute_muls_ss(const uint16_t rd, const uint16_t rs, const uint16_t size)
 {
 	const uint32_t rdv = m_core->m_r[rd];
 	const uint32_t rsv = m_core->m_r[rs];
@@ -503,7 +503,7 @@ inline void unsp_device::execute_fxxx_111_group(uint16_t op)
 	// MULS ss with upper size bit set.
 	const uint16_t rd = (op >> 9) & 7;
 	const uint16_t rs = op & 7;
-	execute_muls(rd, rs, ((op >> 3) & 7) + 8);
+	execute_muls_ss(rd, rs, ((op >> 3) & 7) + 8);
 }
 
 void unsp_device::execute_fxxx_group(uint16_t op)

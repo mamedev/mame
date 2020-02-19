@@ -17,7 +17,8 @@
 #define LOG_SETUP   0x02
 #define LOG_CA1     0x08
 
-//#define VERBOSE (LOG_SETUP | LOG_GENERAL)
+//#define VERBOSE (LOG_SETUP | LOG_GENERAL | LOG_CA1)
+//#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
@@ -596,7 +597,7 @@ void pia6821_device::send_to_out_a_func(const char* message)
 	// input pins are pulled high
 	const uint8_t data = get_out_a_value();
 
-	LOG("PIA %s = %02X\n", message, data);
+	LOG("PIA %s = %02X DDRA=%02x\n", message, data, m_ddr_a);
 
 	if (!m_out_a_handler.isnull())
 	{
@@ -621,7 +622,7 @@ void pia6821_device::send_to_out_b_func(const char* message)
 	// input pins are high-impedance - we just send them as zeros for backwards compatibility
 	const uint8_t data = get_out_b_value();
 
-	LOG("PIA %s = %02X\n", message, data);
+	LOG("PIA %s = %02X DDRB=%02x\n", message, data, m_ddr_b);
 
 	if (!m_out_b_handler.isnull())
 	{
@@ -646,6 +647,7 @@ void pia6821_device::port_a_w(uint8_t data)
 	// buffer the output value
 	m_out_a = data;
 
+	LOGSETUP("PIA ");
 	send_to_out_a_func("port A write");
 }
 
@@ -720,6 +722,9 @@ void pia6821_device::control_a_w(uint8_t data)
 	data &= 0x3f;
 
 	LOGSETUP("PIA control A write = %02X\n", data);
+	LOGSETUP(" - CA1 interrupts %s\n", (data & 0x01) ? "enabled" : "disabled");
+	LOGSETUP(" - CA1 interrupts active on %s transition\n", (data & 0x02) ? "low-to-high" : "high-to-low");
+	LOGSETUP(" - Port A %s register selected\n", (data & 0x04) ? "Data" : "DDR");
 
 	// update the control register
 	m_ctl_a = data;
@@ -729,10 +734,17 @@ void pia6821_device::control_a_w(uint8_t data)
 	{
 		bool temp;
 		if (c2_set_mode(m_ctl_a))
+		{
+			LOGSETUP(" - CA2 set/reset mode: ");
 			temp = c2_set(m_ctl_a); // set/reset mode - bit value determines the new output
+		}
 		else
+		{
+			LOGSETUP(" - CA2 strobe mode: ");
 			temp = true; // strobe mode - output is always high unless strobed
+		}
 
+		LOGSETUP("%d\n", temp);
 		set_out_ca2(temp);
 	}
 
@@ -751,16 +763,26 @@ void pia6821_device::control_b_w(uint8_t data)
 	data &= 0x3f;
 
 	LOGSETUP("PIA control B write = %02X\n", data);
+	LOGSETUP(" - CB1 interrupts %s\n", (data & 0x01) ? "enabled" : "disabled");
+	LOGSETUP(" - CB1 interrupts active on %s transition\n", (data & 0x02) ? "low-to-high" : "high-to-low");
+	LOGSETUP(" - Port B %s register selected\n", (data & 0x04) ? "Data" : "DDR");
 
 	// update the control register
 	m_ctl_b = data;
 
 	bool temp;
 	if (c2_set_mode(m_ctl_b))
+	{
+		LOGSETUP(" - CB2 set/reset mode: ");
 		temp = c2_set(m_ctl_b); // set/reset mode - bit value determines the new output
+	}
 	else
+	{
+		LOGSETUP(" - CB2 strobe mode: ");
 		temp = true; // strobe mode - output is always high unless strobed
+	}
 
+	LOGSETUP("%d\n", temp);
 	set_out_cb2(temp);
 
 	// update externals

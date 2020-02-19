@@ -727,6 +727,35 @@ ROM_START( bloodbrou )
 	ROM_LOAD( "cb006.u083.6c", 0x0000, 0x0100, CRC(b2b89a74) SHA1(1878823801048d677aef9702feedd5bf775e62d0) ) // N82S135N
 ROM_END
 
+ROM_START( bloodbrok )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "2k.u021.7n",  0x00001, 0x20000, CRC(d65f5e1f) SHA1(e232a155a5501a7e46f6f44c05177b93ab7bded8) )
+	ROM_LOAD16_BYTE( "1k.u022.8n",  0x00000, 0x20000, CRC(3d4b48fd) SHA1(3b293af6cc1c24668124022f028ab489c0db5bf5) )
+	ROM_LOAD16_BYTE( "4.u023.7l",   0x40001, 0x20000, CRC(fd951c2c) SHA1(f4031bf303c67c82f2f78f7456f78382d8c1ac85) )
+	ROM_LOAD16_BYTE( "3.u024.8l",   0x40000, 0x20000, CRC(18d3c460) SHA1(93b86af1199f0fedeaf1fe64d27ffede4b819e42) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "u1016.6a", 0x000000, 0x08000, CRC(4f462b4f) SHA1(5200bb930ff1576b1800793d98889e0bfabbb298) )
+	ROM_CONTINUE(         0x010000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "bb_05.u061.6f", 0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) ) /* characters */
+	ROM_LOAD( "bb_06.u063.6d", 0x10000, 0x10000, CRC(7092e35b) SHA1(659d30b2e2fd9ffa34a47e98193c8f0a87ac1315) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD( "blood_bros_bk__=c=1990_tad_corp.u064.4d", 0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )  /* Background+Foreground */
+
+	ROM_REGION( 0x100000, "gfx3", 0 )
+	ROM_LOAD( "blood_bros_obj__=c=1990_tad_corp.u078.2n", 0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) ) /* sprites */
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "bb_08.u095.5a",  0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "cb006.u083.6c", 0x0000, 0x0100, CRC(b2b89a74) SHA1(1878823801048d677aef9702feedd5bf775e62d0) ) // N82S135N
+ROM_END
+
 ROM_START( weststry )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for cpu code; based on bloodbrob */
 	ROM_LOAD16_BYTE( "ws13.bin",  0x00001, 0x20000, CRC(158e302a) SHA1(52cc1bf526424ff025a6b79f3fc7bba4b9bbfcbb) )
@@ -878,6 +907,7 @@ GAME( 1990, bloodbro,   0,        bloodbro, bloodbro, bloodbro_state, empty_init
 GAME( 1990, bloodbroj,  bloodbro, bloodbro, bloodbro, bloodbro_state, empty_init,    ROT0,   "TAD Corporation", "Blood Bros. (Japan, rev A)",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, bloodbroja, bloodbro, bloodbro, bloodbro, bloodbro_state, empty_init,    ROT0,   "TAD Corporation", "Blood Bros. (Japan)",                        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, bloodbrou,  bloodbro, bloodbro, bloodbro, bloodbro_state, empty_init,    ROT0,   "TAD Corporation (Fabtek license)", "Blood Bros. (US)",          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, bloodbrok,  bloodbro, bloodbro, bloodbro, bloodbro_state, empty_init,    ROT0,   "TAD Corporation", "Blood Bros. (Korea)",                        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, weststry,   bloodbro, weststry, weststry, bloodbro_state, init_weststry, ROT0,   "bootleg (Datsu)", "West Story (bootleg of Blood Bros., set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, weststrya,  bloodbro, weststry, weststry, bloodbro_state, init_weststry, ROT0,   "bootleg (Datsu)", "West Story (bootleg of Blood Bros., set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, skysmash,   0,        skysmash, skysmash, bloodbro_state, empty_init,    ROT270, "Nihon System",    "Sky Smasher",                                MACHINE_SUPPORTS_SAVE )

@@ -27,6 +27,7 @@
     1991  Twin Squash                Sega              317-0193         C2
     1991  Waku Waku Sonic Patrol Car Sega              317-0140         C2
     1992  Ribbit!                    Sega              317-0178         C2
+    1992  Ribbit! (Japan)            Sega              317-0178         C2
     1992  Puyo Puyo                  Sega / Compile    317-0203         C2     171-5992A
     1992  Tant-R (Japan)             Sega              317-0211         C2
     1992  Tant-R (Korea)             Sega              ?                C2
@@ -1076,6 +1077,7 @@ static INPUT_PORTS_START( anpanman )
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( ribbit )
 	PORT_INCLUDE( systemc_generic )
 
@@ -1100,6 +1102,41 @@ static INPUT_PORTS_START( ribbit )
 	PORT_DIPSETTING(    0x08, "1" )
 	PORT_DIPSETTING(    0x0c, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	//"SW2:7" unused
+	//"SW2:8" unused
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( ribbitj )
+	PORT_INCLUDE( systemc_generic )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 1 Unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 1 Unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "Credits to Start" ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:3,4") /* Lives are different */
+	PORT_DIPSETTING(    0x04, "1" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
@@ -1719,8 +1756,8 @@ ROM_END
 
 ROM_START( borench ) /* Borench  (c)1990 Sega */
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "ic32.bin", 0x000000, 0x040000, CRC(2c54457d) SHA1(adf3ea5393d2633ec6215e64f0cd89ad4567e765) )
-	ROM_LOAD16_BYTE( "ic31.bin", 0x000001, 0x040000, CRC(b46445fc) SHA1(24e85ef5abbc5376a854b13ed90f08f0c30d7f25) )
+	ROM_LOAD16_BYTE( "ic32.bin", 0x000000, 0x040000, CRC(2c54457d) SHA1(adf3ea5393d2633ec6215e64f0cd89ad4567e765) ) // Need to verify proper label
+	ROM_LOAD16_BYTE( "ic31.bin", 0x000001, 0x040000, CRC(b46445fc) SHA1(24e85ef5abbc5376a854b13ed90f08f0c30d7f25) ) // Need to verify proper label
 
 	ROM_REGION( 0x020000, "upd", 0 )
 	ROM_LOAD( "13587.ic4", 0x000000, 0x020000, CRC(62b85e56) SHA1(822ab733c87938bb70a9e32cc5dd36bbf6f21d11) )
@@ -1845,6 +1882,18 @@ ROM_START( ribbit ) /* Ribbit  (c)1991 Sega */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-13833.ic32", 0x000000, 0x040000, CRC(5347f8ce) SHA1(b95b99536157edfbf0d74a42f64235f47dca7ee1) )
 	ROM_LOAD16_BYTE( "epr-13832.ic31", 0x000001, 0x040000, CRC(889c42c2) SHA1(0839a50a68b64a66d995f1bfaff42fcb60bb4d45) )
+	ROM_COPY( "maincpu", 0x000000, 0x080000, 0x080000 )
+	ROM_LOAD16_BYTE( "epr-13838.ic34", 0x100000, 0x080000, CRC(a5d62ac3) SHA1(8d83a7bc4017e125ef4231278f766b2368d5fc1f) )
+	ROM_LOAD16_BYTE( "epr-13837.ic33", 0x100001, 0x080000, CRC(434de159) SHA1(cf2973131cabf2bc0ebb2bfe9f804ad3d7d0a733) )
+
+	ROM_REGION( 0x080000, "upd", 0 )
+	ROM_LOAD( "epr-13834.ic4", 0x000000, 0x020000, CRC(ab0c1833) SHA1(f864e12ecf6c0524da20fc66747a4fa4280e67e9) )
+ROM_END
+
+ROM_START( ribbitj ) /* Ribbit  (c)1991 Sega */
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "epr-13836.ic32", 0x000000, 0x040000, CRC(21f222e2) SHA1(1e4b640833d3ec428bd50d89dc93a670a17a4451) )
+	ROM_LOAD16_BYTE( "epr-13835.ic31", 0x000001, 0x040000, CRC(1c4b291a) SHA1(61b2e7721aefb97bbd38b3ca9275d7f345f3d0a6) )
 	ROM_COPY( "maincpu", 0x000000, 0x080000, 0x080000 )
 	ROM_LOAD16_BYTE( "epr-13838.ic34", 0x100000, 0x080000, CRC(a5d62ac3) SHA1(8d83a7bc4017e125ef4231278f766b2368d5fc1f) )
 	ROM_LOAD16_BYTE( "epr-13837.ic33", 0x100001, 0x080000, CRC(434de159) SHA1(cf2973131cabf2bc0ebb2bfe9f804ad3d7d0a733) )
@@ -2556,6 +2605,7 @@ GAME( 1990, borench,   0,        segac2, borench,         segac2_state,    init_
 GAME( 1990, borencha,  borench,  segac2, borench,         segac2_state,    init_borench,  ROT0,   "Sega", "Borench (set 2)", 0 )
 
 GAME( 1991, ribbit,    0,        segac2, ribbit,          segac2_state,    init_ribbit,   ROT0,   "Sega", "Ribbit!", 0 )
+GAME( 1991, ribbitj,   ribbit,   segac2, ribbitj,         segac2_state,    init_ribbit,   ROT0,   "Sega", "Ribbit! (Japan)", 0 )
 
 GAME( 1991, twinsqua,  0,        segac2, twinsqua,        segac2_state,    init_twinsqua, ROT0,   "Sega", "Twin Squash", 0 )
 

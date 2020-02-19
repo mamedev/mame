@@ -22581,19 +22581,19 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="143360">
-				<rom name="un día típico (4am crack) disk 1.dsk" size="143360" crc="52b778b5" sha1="ed1a8e64cfd0eb99bc6af05e3b9c62bbf278758e" />
+				<rom name="un dia tipico (4am crack) disk 1.dsk" size="143360" crc="52b778b5" sha1="ed1a8e64cfd0eb99bc6af05e3b9c62bbf278758e" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="143360">
-				<rom name="un día típico (4am crack) disk 2.dsk" size="143360" crc="f68796d9" sha1="84edf33806a3cd9c77722f10738f3ae7407af216" />
+				<rom name="un dia tipico (4am crack) disk 2.dsk" size="143360" crc="f68796d9" sha1="84edf33806a3cd9c77722f10738f3ae7407af216" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="143360">
-				<rom name="un día típico (4am crack) disk 3.dsk" size="143360" crc="126fdfe1" sha1="8f7647a79fd360c9087211a3fedc2c5092f9031b" />
+				<rom name="un dia tipico (4am crack) disk 3.dsk" size="143360" crc="126fdfe1" sha1="8f7647a79fd360c9087211a3fedc2c5092f9031b" />
 			</dataarea>
 		</part>
 	</software>
@@ -36012,7 +36012,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="what's my logic? (4am crack).dsk" size="143360" crc="433922c6" sha1="2902ea9aa9ef0f75d51d555d36b82feef4b51f12"/>
+				<rom name="what's my logic (4am crack).dsk" size="143360" crc="433922c6" sha1="2902ea9aa9ef0f75d51d555d36b82feef4b51f12"/>
 			</dataarea>
 		</part>
 	</software>

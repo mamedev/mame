@@ -913,9 +913,9 @@ ROM_END
 ***************************************************************************/
 
 // 1995
-		 GAME( 1995, csplayh1, 0,        csplayh5, csplayh5, csplayh5_state, init_csplayh1, ROT0, "Sphinx/AV Japan/Astro System Japan",   "Super CD Dai8dan Mahjong Hanafuda Cosplay Tengoku (Japan)", MACHINE_NOT_WORKING )
+GAME( 1995, csplayh1, 0,        csplayh5, csplayh5, csplayh5_state, init_csplayh1, ROT0, "Sphinx/AV Japan/Astro System Japan",   "Super CD Dai8dan Mahjong Hanafuda Cosplay Tengoku (Japan)", MACHINE_NOT_WORKING )
 
-		 GAME( 1998, nichidvd, 0,        csplayh5, csplayh5, csplayh5_state, empty_init,    ROT0, "Nichibutsu",                           "Nichibutsu High Rate DVD BIOS", MACHINE_IS_BIOS_ROOT )
+GAME( 1998, nichidvd, 0,        csplayh5, csplayh5, csplayh5_state, empty_init,    ROT0, "Nichibutsu",                           "Nichibutsu High Rate DVD BIOS", MACHINE_IS_BIOS_ROOT )
 
 // 1998
 /* 01 */ GAME( 1998, mjgalpri, nichidvd, csplayh5, csplayh5, csplayh5_state, init_mjgalpri, ROT0, "Nichibutsu/Just&Just", "Mahjong Gal-pri - World Gal-con Grandprix (Japan)", MACHINE_NOT_WORKING )
@@ -939,7 +939,7 @@ ROM_END
 /* 15 */ GAME( 2000, fuudol,   nichidvd, csplayh5, csplayh5, csplayh5_state, init_fuudol,   ROT0, "Nichibutsu/eic", "Fuudol (Japan)", MACHINE_NOT_WORKING )
 /* 16 */ GAME( 2000, nuretemi, nichidvd, csplayh5, csplayh5, csplayh5_state, init_nuretemi, ROT0, "Nichibutsu/Love Factory", "Nurete Mitaino... - Net Idol Hen (Japan)", MACHINE_NOT_WORKING )
 /* 17 */ GAME( 2000, tsuwaku,  nichidvd, csplayh5, csplayh5, csplayh5_state, init_tsuwaku,  ROT0, "Nichibutsu/Love Factory/Just&Just", "Tsuugakuro no Yuuwaku (Japan)", MACHINE_NOT_WORKING )
-/* 18 */ GAME( 2000, torarech, nichidvd, csplayh5, csplayh5, csplayh5_state, init_torarech, ROT0,  "Nichibutsu/Love Factory/M Friend", "Torarechattano - AV Kantoku Hen (Japan)", MACHINE_NOT_WORKING )
+/* 18 */ GAME( 2000, torarech, nichidvd, csplayh5, csplayh5, csplayh5_state, init_torarech, ROT0, "Nichibutsu/Love Factory/M Friend", "Torarechattano - AV Kantoku Hen (Japan)", MACHINE_NOT_WORKING )
 /* sp */ GAME( 2000, nichisel, nichidvd, csplayh5, csplayh5, csplayh5_state, init_nichisel, ROT0, "Nichibutsu", "DVD Select (Japan)", MACHINE_NOT_WORKING )
 
 // 2001

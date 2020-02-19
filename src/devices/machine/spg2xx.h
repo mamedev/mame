@@ -55,6 +55,9 @@ public:
 
 	template <size_t Line> auto adc_in() { return m_adc_in[Line].bind(); }
 
+	auto guny_in() { return m_guny_in.bind(); }
+	auto gunx_in() { return m_gunx_in.bind(); }
+
 	auto i2c_w() { return m_i2c_w.bind(); }
 	auto i2c_r() { return m_i2c_r.bind(); }
 
@@ -110,6 +113,9 @@ protected:
 
 	devcb_read16::array<2> m_adc_in;
 
+	devcb_read16 m_guny_in;
+	devcb_read16 m_gunx_in;
+
 	devcb_write8 m_i2c_w;
 	devcb_read8 m_i2c_r;
 
@@ -125,6 +131,8 @@ protected:
 
 	void configure_spg_io(spg2xx_io_device* io);
 
+	DECLARE_READ16_MEMBER(guny_in_r) { return m_guny_in(); }
+	DECLARE_READ16_MEMBER(gunx_in_r) { return m_gunx_in(); }
 	DECLARE_READ16_MEMBER(porta_r) { return m_porta_in(); }
 	DECLARE_READ16_MEMBER(portb_r) { return m_portb_in(); }
 	DECLARE_READ16_MEMBER(portc_r) { return m_portc_in(); }

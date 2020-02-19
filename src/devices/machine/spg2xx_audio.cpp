@@ -41,7 +41,11 @@ DEFINE_DEVICE_TYPE(SUNPLUS_GCM394_AUDIO, sunplus_gcm394_audio_device, "gcm394_au
 #include "logmacro.h"
 
 #define SPG_DEBUG_AUDIO     (0)
+#define SPG_LOG_ADPCM36     (0)
 
+#if SPG_LOG_ADPCM36
+static FILE *adpcm_file[16] = {};
+#endif
 
 spg2xx_audio_device::spg2xx_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
@@ -139,6 +143,18 @@ void spg2xx_audio_device::device_reset()
 	}
 }
 
+void spg2xx_audio_device::device_stop()
+{
+#if SPG_LOG_ADPCM36
+	for (int i = 0; i < 16; i++)
+	{
+		if (adpcm_file[i])
+		{
+			fclose(adpcm_file[i]);
+		}
+	}
+#endif
+}
 
 void spg2xx_audio_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -981,6 +997,13 @@ inline void spg2xx_audio_device::stop_channel(const uint32_t channel)
 	m_audio_ctrl_regs[AUDIO_CHANNEL_TONE_RELEASE] &= ~(1 << channel);
 	m_audio_ctrl_regs[AUDIO_ENV_RAMP_DOWN] &= ~(1 << channel);
 	m_channel_irq[channel]->adjust(attotime::never);
+#if SPG_LOG_ADPCM36
+	if (get_adpcm36_bit(channel))
+	{
+		fclose(adpcm_file[channel]);
+		adpcm_file[channel] = nullptr;
+	}
+#endif
 }
 
 bool spg2xx_audio_device::advance_channel(const uint32_t channel)
@@ -1048,7 +1071,27 @@ bool spg2xx_audio_device::fetch_sample(const uint32_t channel)
 	const uint16_t tone_mode = get_tone_mode(channel);
 	uint16_t raw_sample = tone_mode ? read_space(m_sample_addr[channel]) : m_audio_regs[wave_data_reg];
 
-	LOGMASKED(LOG_SAMPLES, "Channel %d: Raw sample %04x\n", channel, raw_sample);
+#if SPG_LOG_ADPCM36
+	if (get_adpcm36_bit(channel))
+	{
+		static int adpcm_file_counts[16] = {};
+
+		if (adpcm_file[channel] == nullptr)
+		{
+			char file_buf[256];
+			snprintf(file_buf, 256, "adpcm36_chan%d_%d.bin", channel, adpcm_file_counts[channel]);
+			adpcm_file[channel] = fopen(file_buf, "wb");
+		}
+		static int blah[16] = {};
+		if ((blah[channel] & 3) == 0)
+		{
+			LOGMASKED(LOG_SAMPLES, "Channel %d: Raw sample %04x\n", channel, raw_sample);
+			fwrite(&raw_sample, sizeof(uint16_t), 1, adpcm_file[channel]);
+		}
+		blah[channel]++;
+		blah[channel] &= 3;
+	}
+#endif
 
 	if (get_adpcm_bit(channel))
 	{

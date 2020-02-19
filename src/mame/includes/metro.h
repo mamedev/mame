@@ -71,6 +71,7 @@ public:
 	void vmetal(machine_config &config);
 	void daitorid(machine_config &config);
 	void puzzli(machine_config &config);
+	void puzzlia(machine_config &config);
 	void pangpoms(machine_config &config);
 	void dokyusp(machine_config &config);
 	void dokyusei(machine_config &config);

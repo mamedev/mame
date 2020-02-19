@@ -38,6 +38,7 @@ protected:
 	void add_pin_alias(const pstring &devname, const pstring &name, const pstring &alias);
 
 	void add_ext_alias(const pstring &alias);
+	void add_ext_alias(const pstring &alias, const pstring &net);
 
 	void add_device(const pstring &atype, const pstring &aname, const pstring &amodel);
 	void add_device(const pstring &atype, const pstring &aname, double aval);
@@ -168,7 +169,7 @@ private:
 
 	std::vector<plib::unique_ptr<dev_t>> m_devs;
 	std::unordered_map<pstring, plib::unique_ptr<net_t> > m_nets;
-	std::vector<pstring> m_ext_alias;
+	std::vector<std::pair<pstring, pstring>> m_ext_alias;
 	std::unordered_map<pstring, plib::unique_ptr<pin_alias_t>> m_pins;
 
 	std::vector<unit_t> m_units;

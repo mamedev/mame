@@ -287,22 +287,22 @@ namespace plib {
 			if (m_stat_max_alloc() < m_stat_cur_alloc())
 				m_stat_max_alloc() = m_stat_cur_alloc();
 
-			#if (PUSE_ALIGNED_ALLOCATION)
-			#if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
-				return _aligned_malloc(size, alignment);
-			#elif defined(__APPLE__)
-				void* p;
-				if (::posix_memalign(&p, alignment, size) != 0) {
-					p = nullptr;
-				}
-				return p;
-			#else
-				return aligned_alloc(alignment, size);
-			#endif
-			#else
-				unused_var(alignment);
-				return ::operator new(size);
-			#endif
+		#if (PUSE_ALIGNED_ALLOCATION)
+		#if defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)
+			return _aligned_malloc(size, alignment);
+		#elif defined(__APPLE__)
+			void* p;
+			if (::posix_memalign(&p, alignment, size) != 0) {
+				p = nullptr;
+			}
+			return p;
+		#else
+			return aligned_alloc(alignment, size);
+		#endif
+		#else
+			unused_var(alignment);
+			return ::operator new(size);
+		#endif
 		}
 
 		static inline void deallocate( void *ptr, size_t size ) noexcept

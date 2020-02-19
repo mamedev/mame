@@ -427,6 +427,30 @@ ROM_START( dblewing )
 	ROM_RELOAD(               0x020000, 0x020000 )
 ROM_END
 
+/*
+The most noticeable difference with the set below is that it doesn't use checkpoints, but respawns you when you die.
+Checkpoints were more common in Japan, so this is likely to be an export version.
+*/
+ROM_START( dblewinga )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE102 code (encrypted) */
+	ROM_LOAD16_BYTE( "17.3d",    0x000001, 0x040000, CRC(3a7ba822) SHA1(726db048ae3ab45cca45f631ad1f04b5cbc7f741) )
+	ROM_LOAD16_BYTE( "18.5d",    0x000000, 0x040000, CRC(e5f5f004) SHA1(4bd40ef88027554a0328df1cf6f1c9c975a7a73f) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // sound cpu
+	ROM_LOAD( "kp_02-.10h",   0x000000, 0x010000, CRC(def035fa) SHA1(fd50314e5c94c25df109ee52c0ce701b0ff2140c) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "mbe-02.8h",    0x000000, 0x100000, CRC(5a6d3ac5) SHA1(738bb833e2c5d929ac75fe4e69ee0af88197d8a6) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD( "mbe-00.14a",   0x000000, 0x100000, CRC(e33f5c93) SHA1(720904b54d02dace2310ac6bd07d5ed4bc4fd69c) )
+	ROM_LOAD( "mbe-01.16a",   0x100000, 0x100000, CRC(ef452ad7) SHA1(7fe49123b5c2778e46104eaa3a2104ce09e05705) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Oki samples */
+	ROM_LOAD( "kp_03-.16h",   0x000000, 0x020000, CRC(5d7f930d) SHA1(ad23aa804ea3ccbd7630ade9b53fc3ea2718a6ec) )
+	ROM_RELOAD(               0x020000, 0x020000 )
+ROM_END
+
 void dblewing_state::init_dblewing()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
@@ -436,4 +460,5 @@ void dblewing_state::init_dblewing()
 }
 
 
-GAME( 1993, dblewing, 0, dblewing, dblewing, dblewing_state, init_dblewing, ROT90, "Mitchell", "Double Wings", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, dblewing,  0,        dblewing, dblewing, dblewing_state, init_dblewing, ROT90, "Mitchell", "Double Wings", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, dblewinga, dblewing, dblewing, dblewing, dblewing_state, init_dblewing, ROT90, "Mitchell", "Double Wings (Asia)", MACHINE_SUPPORTS_SAVE )

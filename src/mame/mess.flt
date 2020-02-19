@@ -41,6 +41,7 @@ alesis_qs.cpp
 alfaskop41xx.cpp
 alphasma.cpp
 alphatpx.cpp
+alphatpc16.cpp
 alphatro.cpp
 altair.cpp
 alto1.cpp
@@ -137,6 +138,7 @@ camplynx.cpp
 candela.cpp
 canon_s80.cpp
 cardinal.cpp
+casio_rompack.cpp
 casloopy.cpp
 cat.cpp
 cbm2.cpp
@@ -327,6 +329,7 @@ gp2x.cpp
 gp32.cpp
 grfd2301.cpp
 gridcomp.cpp
+h01x.cpp
 h19.cpp
 h8.cpp
 h89.cpp
@@ -336,7 +339,6 @@ hazeltin.cpp
 hazl1420.cpp
 hec2hrp.cpp
 hektor.cpp
-h01x.cpp
 hh_amis2k.cpp
 hh_cop400.cpp
 hh_hmcs40.cpp
@@ -350,7 +352,6 @@ hk68v10.cpp
 homelab.cpp
 homez80.cpp
 horizon.cpp
-hp_ipc.cpp
 hp16500.cpp
 hp2100.cpp
 hp2620.cpp
@@ -360,6 +361,7 @@ hp48.cpp
 hp49gp.cpp
 hp64k.cpp
 hp700.cpp
+hp80.cpp
 hp95lx.cpp
 hp9825.cpp
 hp9845.cpp
@@ -367,7 +369,7 @@ hp9k.cpp
 hp9k_3xx.cpp
 hprot1.cpp
 hpz80unk.cpp
-hp80.cpp
+hp_ipc.cpp
 ht6000.cpp
 ht68k.cpp
 huebler.cpp
@@ -375,7 +377,6 @@ hunter2.cpp
 hunter16.cpp
 husky.cpp
 hx20.cpp
-hyperscan.cpp
 i7000.cpp
 ibm3153.cpp
 ibm6580.cpp
@@ -384,7 +385,6 @@ ibmpcjr.cpp
 icatel.cpp
 icebox.cpp
 ie15.cpp
-lx_jg7425.cpp
 if800.cpp
 ikt5a.cpp
 imds2.cpp
@@ -451,7 +451,6 @@ leapfrog_leappad.cpp
 leapster.cpp
 learnwin.cpp
 lee1214.cpp
-lexibook_jg7425.cpp
 lft.cpp
 lg-dvd.cpp
 lilith.cpp
@@ -461,6 +460,7 @@ lms46.cpp
 lola8a.cpp
 lviv.cpp
 lwriter.cpp
+lx_jg7425.cpp
 lynx.cpp
 m20.cpp
 m24.cpp
@@ -584,7 +584,7 @@ ncdppc.cpp
 nds.cpp
 neogeocd.cpp
 nes.cpp
-nes_boot.cpp
+nes_clone.cpp
 nes_sh6578.cpp
 nes_vt.cpp
 newbrain.cpp
@@ -686,6 +686,7 @@ poly.cpp
 poly88.cpp
 poly880.cpp
 powerstack.cpp
+pp.cpp
 pp01.cpp
 prestige.cpp
 primo.cpp
@@ -729,17 +730,18 @@ rambo.cpp
 ravens.cpp
 rc702.cpp
 rc759.cpp
-rcm32p.cpp
 rd100.cpp
-rd110.cpp
 regence.cpp
 replicator.cpp
 rex6000.cpp
 riscpc.cpp
 rm380z.cpp
 rmnimbus.cpp
-rmt32.cpp
-rsc55.cpp
+roland_cm32p.cpp
+roland_d50.cpp
+roland_d110.cpp
+roland_mt32.cpp
+roland_sc55.cpp
 rt1715.cpp
 rvoice.cpp
 rx78.cpp
@@ -799,8 +801,8 @@ sms.cpp
 snes.cpp
 socrates.cpp
 softbox.cpp
-sorcerer.cpp
 solbourne.cpp
+sorcerer.cpp
 spc1000.cpp
 spc1500.cpp
 spec128.cpp
@@ -808,10 +810,14 @@ special.cpp
 specpls3.cpp
 spectrum.cpp
 spg110.cpp
+spg29x.cpp
+spg29x_lexibook_jg7425.cpp
 spg2xx.cpp
 spg2xx_dreamlife.cpp
 spg2xx_ican.cpp
 spg2xx_jakks.cpp
+spg2xx_jakks_gkr.cpp
+spg2xx_jakks_tvtouch.cpp
 spg2xx_lexibook.cpp
 spg2xx_pdc.cpp
 spg2xx_playvision.cpp
@@ -833,7 +839,8 @@ sun2.cpp
 sun3.cpp
 sun3x.cpp
 sun4.cpp
-sunplus_gcm394.cpp
+sunplus_unsp20soc.cpp
+sunplus_unsp20soc_mobigo.cpp
 super6.cpp
 super80.cpp
 superga2.cpp
@@ -924,6 +931,7 @@ ts816.cpp
 ts3000.cpp
 tsispch.cpp
 tti.cpp
+tulip1.cpp
 tutor.cpp
 tv910.cpp
 tv912.cpp

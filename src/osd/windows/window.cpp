@@ -1812,6 +1812,7 @@ void win_window_info::set_fullscreen(int fullscreen)
 	m_fullscreen = fullscreen;
 
 	// reset UI to main menu
+	// FIXME: this cause crash if called when running_machine.m_ui not yet initialised. e.g. when trying to show error/warning messagebox at startup (during auto-switch from full screen to windowed mode).
 	machine().ui().menu_reset();
 
 	// kill off the drawers

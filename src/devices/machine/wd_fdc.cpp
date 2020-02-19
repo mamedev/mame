@@ -275,7 +275,7 @@ void wd_fdc_device_base::command_end()
 	main_state = sub_state = IDLE;
 	motor_timeout = 0;
 
-	if (!drq) {
+	if(!drq && (status & S_BUSY)) {
 		status &= ~S_BUSY;
 		intrq = true;
 		if(!intrq_cb.isnull())
@@ -2194,7 +2194,7 @@ void wd_fdc_device_base::drop_drq()
 		drq = false;
 		if(!drq_cb.isnull())
 			drq_cb(false);
-		if (main_state == IDLE) {
+		if(main_state == IDLE && (status & S_BUSY)) {
 			status &= ~S_BUSY;
 			intrq = true;
 			if(!intrq_cb.isnull())

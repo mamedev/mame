@@ -241,20 +241,10 @@ public:
 
 		setup().register_source(plib::make_unique<netlist::source_file_t>(filename));
 		setup().include(name);
-		create_dynamic_logs(logs);
+		setup().register_dynamic_log_devices(logs);
 
 		// start devices
 		setup().prepare_to_run();
-	}
-
-	void create_dynamic_logs(const std::vector<pstring> &logs)
-	{
-		log().debug("Creating dynamic logs ...\n");
-		for (auto & log : logs)
-		{
-			pstring name = "log_" + log;
-			setup().register_link(name + ".I", log);
-		}
 	}
 
 	std::vector<char> save_state()

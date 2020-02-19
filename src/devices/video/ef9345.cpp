@@ -382,6 +382,7 @@ uint16_t ef9345_device::indexblock(uint16_t x, uint16_t y)
 {
 	uint16_t i = x, j;
 	j = (y == 0) ? ((m_tgs & 0x20) >> 5) : ((m_ror & 0x1f) + y - 1);
+	j = (j > 31) ? (j - 24) : j;
 
 	//right side of a double width character
 	if ((m_tgs & 0x80) == 0 && x > 0)
@@ -845,7 +846,7 @@ void ef9345_device::ef9345_exec(uint8_t cmd)
 			if (cmd&1)
 			{
 				if ((m_registers[7] & 0x80) == 0x00) { m_registers[7] |= 0x80; return; }
-				m_registers[7] &= 0x80;
+				m_registers[7] &= ~0x80;
 				inc_x(7);
 			}
 			break;

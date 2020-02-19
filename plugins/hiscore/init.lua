@@ -1,5 +1,5 @@
 -- hiscore.lua
--- by borgar@borgar.net, WTFPL license
+-- by borgar@borgar.net & eadmaster, WTFPL license
 --
 -- This uses MAME's built-in Lua scripting to implment
 -- high-score saving with hiscore.dat infom just as older
@@ -7,10 +7,10 @@
 --
 local exports = {}
 exports.name = "hiscore"
-exports.version = "1.0.0"
+exports.version = "1.1.0"
 exports.description = "Hiscore"
 exports.license = "WTFPL license"
-exports.author = { name = "borgar@borgar.net" }
+exports.author = { name = "borgar@borgar.net & eadmaster" }
 local hiscore = exports
 
 local hiscore_plugin_path = ""
@@ -46,7 +46,7 @@ function hiscore.startplugin()
 		emu.print_verbose( "hiscore: config found" );
 		local _conf = {}
 		for line in io.lines(config_path) do
-		  token, spaces, value = string.match(line, '([^ ]+)([ ]+)([^ ]+)');
+		  token, value = string.match(line, '([^ ]+) +([^ ]+)');
 		  if token ~= nil and token ~= '' then
 			_conf[token] = value;
 		  end
@@ -98,14 +98,25 @@ function hiscore.startplugin()
 	local function read_hiscore_dat ()
 	  local file = io.open( hiscoredata_path, "r" );
 	  local rm_match;
+	  local rm_match_crc = 0;
 	  if not file then
-		file = io.open( hiscore_plugin_path .. "/hiscore.dat", "r" );
+		file = io.open( hiscore_plugin_path .. "/console_hiscore.dat", "r" );
 	  end
 	  if emu.softname() ~= "" then
 		local soft = emu.softname():match("([^:]*)$")
-		rm_match = '^' .. emu.romname() .. ',' .. soft .. ':';
+		rm_match = emu.romname() .. ',' .. soft .. ':';
+	  elseif manager:machine().images["cart"]:filename() ~= nil then
+		local basename = string.gsub(manager:machine().images["cart"]:filename(), "(.*/)(.*)", "%2");
+		local filename = string.gsub(basename, "(.*)(%..*)", "%1");   -- strip the extension (e.g. ".nes")
+		rm_match = emu.romname() .. "," .. filename .. ':';
+		rm_match_crc = emu.romname() .. ",crc32=" .. string.format("%x", manager:machine().images["cart"]:crc()) .. ':';
+	  elseif manager:machine().images["cdrom"]:filename() ~= nil then
+		local basename = string.gsub(manager:machine().images["cdrom"]:filename(), "(.*/)(.*)", "%2");
+		local filename = string.gsub(basename, "(.*)(%..*)", "%1");   -- strip the extension (e.g. ".cue")
+		rm_match = emu.romname() .. "," .. filename .. ':';
+		--rm_match_crc = string.format("%x", manager:machine().images["cdrom"]:crc()) .. ':';  -- always 0 with cdrom media?
 	  else
-		rm_match = '^' .. emu.romname() .. ':';
+		rm_match = emu.romname() .. ':';
 	  end
 	  local cluster = "";
 	  local current_is_match = false;
@@ -122,7 +133,9 @@ function hiscore.startplugin()
 			  end
 			elseif string.find(line, rm_match) then --- match this game
 			  current_is_match = true;
-			elseif string.find(line, '^[a-z0-9_]+:') then --- some game
+			elseif line == rm_match_crc then --- match this game crc
+			  current_is_match = true;
+			elseif string.find(line, '^.+:') then --- some game
 			  if current_is_match and string.len(cluster) > 0 then
 				break; -- we're done
 			  end
@@ -158,8 +171,17 @@ function hiscore.startplugin()
 	  local r;
 	  if emu.softname() ~= "" then
 		local soft = emu.softname():match("([^:]*)$")
-		r = hiscore_path .. '/' .. emu.romname() .. "_" .. soft .. ".hi";
+		r = hiscore_path .. '/' .. emu.romname() .. '/' .. soft .. ".hi";
+	  elseif manager:machine().images["cart"]:filename() ~= nil then
+		local basename = string.gsub(manager:machine().images["cart"]:filename(), "(.*/)(.*)", "%2")
+		local filename = string.gsub(basename, "(.*)(%..*)", "%1");   -- strip the extension (e.g. ".nes")
+		r = hiscore_path .. '/' .. emu.romname() .. '/' .. filename .. ".hi";
+	  elseif manager:machine().images["cdrom"]:filename() ~= nil then
+		local basename = string.gsub(manager:machine().images["cdrom"]:filename(), "(.*/)(.*)", "%2");
+		local filename = string.gsub(basename, "(.*)(%..*)", "%1");   -- strip the media extension (e.g. ".cue")
+		r = hiscore_path .. '/' .. emu.romname() .. '/' .. filename .. ".hi";
 	  else
+		-- arcade games
 		r = hiscore_path .. '/' .. emu.romname() .. ".hi";
 	  end
 	  return r;
@@ -172,6 +194,7 @@ function hiscore.startplugin()
 	  if not output then
 		-- attempt to create the directory, and try again
 		lfs.mkdir( hiscore_path );
+		lfs.mkdir( hiscore_path .. '/' .. emu.romname() );
 		output = io.open(get_file_name(), "wb");
 	  end
 	  emu.print_verbose("hiscore: write_scores output")

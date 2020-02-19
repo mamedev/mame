@@ -185,8 +185,16 @@ ROM_START( shredmjr )
 	ROM_LOAD16_WORD_SWAP( "shredmasterjr.bin", 0x000000, 0x800000, CRC(95a6dcf1) SHA1(44893cd6ebe6b7f33a73817b72ae7be70c3126dc) )
 ROM_END
 
+ROM_START( guitarst )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "guitarstar_s29gl064m11tfir4_0001227e.bin", 0x000000, 0x800000, CRC(feaace47) SHA1(dd426bb4f03a16b1b96b63b4e0d79ea75097bf72) )
+ROM_END
+
+
 // there are multiple versions of this with different songs, was also sold by dreamGEAR as 'Shredmaster Jr.' (different title screen)
 // for the UK version the title screen always shows "Guitar Rock", however there are multiple boxes with different titles and song selections.
 // ROM is glued on the underside and soldered to the PCB, very difficult to remove without damaging.
-CONS( 2007, taikeegr,    0,        0,        taikeegr,     taikeegr, shredmjr_game_state, init_taikeegr, "TaiKee", "Rockstar Guitar / Guitar Rock (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad music timings (too slow)
-CONS( 2007, shredmjr,    taikeegr, 0,        shredmjr,     taikeegr, shredmjr_game_state, init_taikeegr, "dreamGEAR", "Shredmaster Jr (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad music timings (too slow)
+CONS( 2007, taikeegr,    0,        0,        taikeegr,     taikeegr, shredmjr_game_state, init_taikeegr, "TaiKee", "Rockstar Guitar / Guitar Rock (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // timing not quite correct yet
+CONS( 2007, shredmjr,    taikeegr, 0,        shredmjr,     taikeegr, shredmjr_game_state, init_taikeegr, "dreamGEAR", "Shredmaster Jr (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^
+
+CONS( 200?, guitarst,    0,        0,        taikeegr,     taikeegr, shredmjr_game_state, init_taikeegr, "Senario", "Guitar Star", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^

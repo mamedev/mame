@@ -92,7 +92,6 @@
 #include "machine/gen_latch.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "screen.h"
 #include "speaker.h"
 
 #define MAIN_XTAL XTAL(28'000'000)
@@ -118,7 +117,14 @@ WRITE16_MEMBER( boogwing_state::boogwing_protection_region_0_104_w )
 WRITE16_MEMBER( boogwing_state::priority_w )
 {
 	COMBINE_DATA(&m_priority);
-	m_deco_ace->set_palette_effect_max((m_priority & 0x8) ? 0x6ff : 0xfff);
+	m_deco_ace->set_palette_effect_max((m_priority & 0x8) ? ((m_deco_ace->get_aceram(0x10) & 0x1000) ? 0x4ff : 0x6ff) : 0xfff);
+}
+
+WRITE16_MEMBER( boogwing_state::boogwing_ace_w )
+{
+	m_deco_ace->ace_w(space, offset, data, mem_mask);
+	if (offset == 0x10)
+		m_deco_ace->set_palette_effect_max((m_priority & 0x8) ? ((m_deco_ace->get_aceram(0x10) & 0x1000) ? 0x4ff : 0x6ff) : 0xfff);
 }
 
 
@@ -157,7 +163,7 @@ void boogwing_state::boogwing_map(address_map &map)
 	map(0x282008, 0x282009).w(m_deco_ace, FUNC(deco_ace_device::palette_dma_w));
 	map(0x284000, 0x285fff).rw(m_deco_ace, FUNC(deco_ace_device::buffered_palette16_r), FUNC(deco_ace_device::buffered_palette16_w));
 
-	map(0x3c0000, 0x3c004f).rw(m_deco_ace, FUNC(deco_ace_device::ace_r), FUNC(deco_ace_device::ace_w));
+	map(0x3c0000, 0x3c004f).r(m_deco_ace, FUNC(deco_ace_device::ace_r)).w(FUNC(boogwing_state::boogwing_ace_w));
 }
 
 void boogwing_state::decrypted_opcodes_map(address_map &map)
@@ -339,9 +345,9 @@ void boogwing_state::boogwing(machine_config &config)
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(MAIN_XTAL / 4, 442, 0, 320, 274, 8, 248); // same as robocop2(cninja.cpp)? verify this from real pcb.
-	screen.set_screen_update(FUNC(boogwing_state::screen_update_boogwing));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MAIN_XTAL / 4, 442, 0, 320, 274, 8, 248); // same as robocop2(cninja.cpp)? verify this from real pcb.
+	m_screen->set_screen_update(FUNC(boogwing_state::screen_update_boogwing));
 
 	GFXDECODE(config, "gfxdecode", m_deco_ace, gfx_boogwing);
 
