@@ -788,12 +788,12 @@ static INPUT_PORTS_START( pballpup )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( swclone ) // TODO
+static INPUT_PORTS_START( swclone )
 	PORT_START("GUNY")
-	PORT_BIT(0x0ff, 0x80, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 256.0f / 240.0f, 0.0, 0) PORT_MINMAX(0x000, 0x0ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+	PORT_BIT(0x0ff, 0x80, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0f, 0.0, 0) PORT_MINMAX(0x000, 0x0ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
 	PORT_START("GUNX")
-	PORT_BIT(0x1ff, 0x100, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 512.0f / 320.0f, -0.03f, 0) PORT_MINMAX(0x000, 0x1ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+	PORT_BIT(0x1ff, 0x100, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 512.0f / 320.0f, -0.105f, 0) PORT_MINMAX(0x000, 0x1ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
 	PORT_START("P1")
 	PORT_BIT( 0x003f, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -810,8 +810,8 @@ static INPUT_PORTS_START( swclone ) // TODO
 	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON4 ) // pause
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // trigger
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // hide
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // reload
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // grenade
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // reload (doesn't exist here?)
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -1148,6 +1148,28 @@ void spg2xx_game_pballpup_state::pballpup(machine_config &config)
 	EEPROM_93C66_16BIT(config, m_eeprom); // type?
 }
 
+READ16_MEMBER(spg2xx_game_swclone_state::porta_r)
+{
+	uint16_t ret = m_porta_data & 0xfffe;
+	ret |= m_i2cmem->read_sda() ? 0x1: 0x0;
+
+	//logerror("%s: spg2xx_game_swclone_state::porta_r (%04x)\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE16_MEMBER(spg2xx_game_swclone_state::porta_w)
+{
+	//logerror("%s: spg2xx_game_swclone_state::porta_w (%04x & %04x)\n", machine().describe_context(), data, mem_mask);
+
+	if (BIT(mem_mask, 1))
+		m_i2cmem->write_scl(BIT(data, 1));
+	if (BIT(mem_mask, 0))
+		m_i2cmem->write_sda(BIT(data, 0));
+
+	m_porta_data = data;
+}
+
+
 void spg2xx_game_swclone_state::swclone(machine_config &config)
 {
 	SPG2XX_128(config, m_maincpu, XTAL(27'000'000), m_screen);
@@ -1155,7 +1177,7 @@ void spg2xx_game_swclone_state::swclone(machine_config &config)
 
 	spg2xx_base(config);
 
-	m_maincpu->porta_in().set(FUNC(spg2xx_game_swclone_state::base_porta_r));
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_swclone_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(spg2xx_game_swclone_state::base_portb_r));
 	m_maincpu->portc_in().set(FUNC(spg2xx_game_swclone_state::base_portc_r));
 
@@ -1362,6 +1384,9 @@ ROM_END
 ROM_START( swclone )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "swclone.bin", 0x000000, 0x800000, CRC(2c983509) SHA1(6138f21fe0b82a7121c4639b6833d4014d5aeb74) )
+
+	ROM_REGION( 0x400, "i2cmem", ROMREGION_ERASE00 )
+	// ensure eeprom defaults to 00 or there are unwanted invalid entries already saved
 ROM_END
 
 
