@@ -14,12 +14,19 @@ public:
 	void tvtouch(machine_config &config);
 
 private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	DECLARE_READ16_MEMBER(porta_r);
 	DECLARE_READ16_MEMBER(portb_r);
 	DECLARE_READ16_MEMBER(portc_r);
 	DECLARE_WRITE16_MEMBER(porta_w) override;
 	DECLARE_WRITE16_MEMBER(portb_w) override;
 	DECLARE_WRITE16_MEMBER(portc_w) override;
+	DECLARE_WRITE_LINE_MEMBER(spi_w);
+
+	uint8_t m_spi_bit;
+	uint8_t m_spi_val;
 };
 
 static INPUT_PORTS_START( tvtouch )
@@ -172,6 +179,22 @@ static INPUT_PORTS_START( tvtouch )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+void jakks_tvtouch_state::machine_start()
+{
+	spg2xx_game_state::machine_start();
+
+	save_item(NAME(m_spi_bit));
+	save_item(NAME(m_spi_val));
+}
+
+void jakks_tvtouch_state::machine_reset()
+{
+	spg2xx_game_state::machine_reset();
+
+	m_spi_bit = 7;
+	m_spi_val = 0x00;
+}
+
 READ16_MEMBER(jakks_tvtouch_state::porta_r)
 {
 	logerror("%s: porta_r: %04x & %04x\n", machine().describe_context(), 0, mem_mask);
@@ -187,8 +210,6 @@ READ16_MEMBER(jakks_tvtouch_state::portb_r)
 READ16_MEMBER(jakks_tvtouch_state::portc_r)
 {
 	uint16_t data = m_i2cmem->read_sda();
-	//if (mem_mask & 0xfffc)
-		//logerror("%s: portc_r: %04x & %04x\n", machine().describe_context(), data, mem_mask);
 	return data;
 }
 
@@ -204,19 +225,38 @@ WRITE16_MEMBER(jakks_tvtouch_state::portb_w)
 
 WRITE16_MEMBER(jakks_tvtouch_state::portc_w)
 {
-	//if (mem_mask & 0xfffc)
-		//logerror("%s: portc_w: %04x & %04x\n", machine().describe_context(), data, mem_mask);
 	if (BIT(mem_mask, 1))
 		m_i2cmem->write_scl(BIT(data, 1));
 	if (BIT(mem_mask, 0))
 		m_i2cmem->write_sda(BIT(data, 0));
 }
 
+WRITE_LINE_MEMBER(jakks_tvtouch_state::spi_w)
+{
+	m_spi_val |= state << m_spi_bit;
+	if (m_spi_bit == 0)
+	{
+		logerror("Received via SPI: %02x\n", m_spi_val);
+		m_spi_bit = 7;
+		m_spi_val = 0x00;
+		/*static uint8_t s_value = 0x40;
+		for (int bit = 7; bit >= 0; bit--)
+		{
+			m_maincpu->spi_rx(BIT(s_value, bit));
+		}
+		s_value ^= 0x80;*/
+	}
+	else
+	{
+		m_spi_bit--;
+	}
+}
+
 void jakks_tvtouch_state::tvtouch(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
-	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_tvtouch_state::mem_map_4m);
-
+	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_tvtouch_state::mem_map_2m);
+	m_maincpu->spi_tx().set(FUNC(jakks_tvtouch_state::spi_w));
 	spg2xx_base(config);
 
 	m_maincpu->porta_in().set(FUNC(jakks_tvtouch_state::porta_r));

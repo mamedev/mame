@@ -265,6 +265,11 @@ uint32_t boogwing_state::screen_update_boogwing(screen_device &screen, bitmap_rg
 		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		m_deco_tilegen[1]->tilemap_12_combine_draw(screen, bitmap, cliprect, 0, 32);
 	}
+	else if ((priority & 0x7) == 0x4)
+	{
+		m_deco_tilegen[1]->tilemap_12_combine_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 32);
+	}
 	else if ((priority & 0x7) == 0x1 || (priority & 0x7) == 0x2)
 	{
 		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);

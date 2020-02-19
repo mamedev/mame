@@ -565,9 +565,7 @@ void seibuspi_state::combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &clip
 	{
 		int rx = sx;
 		if (rowscroll)
-		{
-			rx += rowscroll[(y + sy) & yscroll_mask];
-		}
+			rx += rowscroll[(y + 19) & yscroll_mask]; // adder value probably not hardcoded but came from CRTC
 
 		u32 *dest = &bitmap.pix32(y);
 		const u16 *src = &pen_bitmap.pix16((y + sy) & yscroll_mask);

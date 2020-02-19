@@ -49,6 +49,7 @@ spg2xx_io_device::spg2xx_io_device(const machine_config &mconfig, device_type ty
 	m_i2c_w(*this),
 	m_i2c_r(*this),
 	m_uart_tx(*this),
+	m_spi_tx(*this),
 	m_chip_sel(*this),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_screen(*this, finder_base::DUMMY_TAG),
@@ -85,6 +86,7 @@ void spg2xx_io_device::device_start()
 	m_i2c_w.resolve_safe();
 	m_i2c_r.resolve_safe(0);
 	m_uart_tx.resolve_safe();
+	m_spi_tx.resolve_safe();
 	m_chip_sel.resolve_safe();
 	m_pal_read_cb.resolve_safe(0);
 
@@ -122,20 +124,47 @@ void spg2xx_io_device::device_start()
 	m_watchdog_timer = timer_alloc(TIMER_WATCHDOG);
 	m_watchdog_timer->adjust(attotime::never);
 
+	m_spi_tx_timer = timer_alloc(TIMER_SPI_TX);
+	m_spi_tx_timer->adjust(attotime::never);
+
+	save_item(NAME(m_io_regs));
+
+	save_item(NAME(m_uart_rx_fifo));
+	save_item(NAME(m_uart_rx_fifo_start));
+	save_item(NAME(m_uart_rx_fifo_end));
+	save_item(NAME(m_uart_rx_fifo_count));
+	save_item(NAME(m_uart_rx_available));
+	save_item(NAME(m_uart_rx_irq));
+	save_item(NAME(m_uart_tx_irq));
+
+	save_item(NAME(m_spi_tx_fifo));
+	save_item(NAME(m_spi_tx_fifo_start));
+	save_item(NAME(m_spi_tx_fifo_end));
+	save_item(NAME(m_spi_tx_fifo_count));
+	save_item(NAME(m_spi_tx_buf));
+	save_item(NAME(m_spi_tx_bit));
+
+	save_item(NAME(m_spi_rx_fifo));
+	save_item(NAME(m_spi_rx_fifo_start));
+	save_item(NAME(m_spi_rx_fifo_end));
+	save_item(NAME(m_spi_rx_fifo_count));
+	save_item(NAME(m_spi_rx_buf));
+	save_item(NAME(m_spi_rx_bit));
+
+	save_item(NAME(m_extint));
+
 	save_item(NAME(m_timer_a_preload));
 	save_item(NAME(m_timer_b_preload));
 	save_item(NAME(m_timer_b_divisor));
 	save_item(NAME(m_timer_b_tick_rate));
-
-	save_item(NAME(m_io_regs));
-
-	save_item(NAME(m_extint));
 
 	save_item(NAME(m_2khz_divider));
 	save_item(NAME(m_1khz_divider));
 	save_item(NAME(m_4hz_divider));
 
 	save_item(NAME(m_uart_baud_rate));
+
+	save_item(NAME(m_spi_rate));
 
 	save_item(NAME(m_sio_bits_remaining));
 	save_item(NAME(m_sio_writing));
@@ -154,13 +183,29 @@ void spg2xx_io_device::device_reset()
 	m_io_regs[REG_PRNG1] = 0x1418;
 	m_io_regs[REG_PRNG2] = 0x1658;
 
-	m_uart_rx_available = false;
 	memset(m_uart_rx_fifo, 0, ARRAY_LENGTH(m_uart_rx_fifo));
 	m_uart_rx_fifo_start = 0;
 	m_uart_rx_fifo_end = 0;
 	m_uart_rx_fifo_count = 0;
+	m_uart_rx_available = false;
 	m_uart_tx_irq = false;
 	m_uart_rx_irq = false;
+
+	memset(m_spi_tx_fifo, 0, ARRAY_LENGTH(m_spi_tx_fifo));
+	m_spi_tx_fifo_start = 0;
+	m_spi_tx_fifo_end = 0;
+	m_spi_tx_fifo_count = 0;
+	m_spi_tx_buf = 0x00;
+	m_spi_tx_bit = 8;
+
+	memset(m_spi_rx_fifo, 0, ARRAY_LENGTH(m_spi_rx_fifo));
+	m_spi_rx_fifo_start = 0;
+	m_spi_rx_fifo_end = 0;
+	m_spi_rx_fifo_count = 0;
+	m_spi_rx_buf = 0x00;
+	m_spi_rx_bit = 7;
+
+	m_spi_rate = 0;
 
 	memset(m_extint, 0, sizeof(bool) * 2);
 
@@ -190,6 +235,134 @@ void spg2xx_io_device::uart_rx(uint8_t data)
 		m_uart_rx_fifo_count++;
 		if (m_uart_rx_timer->remaining() == attotime::never)
 			m_uart_rx_timer->adjust(attotime::from_ticks(BIT(m_io_regs[REG_UART_CTRL], 5) ? 11 : 10, m_uart_baud_rate));
+	}
+}
+
+void spg2xx_io_device::set_spi_irq(bool set)
+{
+	const uint16_t old = IO_IRQ_STATUS;
+	if (set)
+	{
+		LOGMASKED(LOG_SPI, "Raising SPI IRQ\n");
+		IO_IRQ_STATUS |= 0x4000;
+	}
+	else
+	{
+		LOGMASKED(LOG_SPI, "Lowering SPI IRQ\n");
+		IO_IRQ_STATUS &= ~0x4000;
+	}
+
+	const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
+	if (changed)
+		check_irqs(changed);
+}
+
+void spg2xx_io_device::update_spi_irqs()
+{
+	bool ovf_set = BIT(m_io_regs[REG_SPI_RXSTATUS], 8);
+	bool rxi_set = BIT(m_io_regs[REG_SPI_RXSTATUS], 15) && BIT(m_io_regs[REG_SPI_RXSTATUS], 14);
+	bool txi_set = BIT(m_io_regs[REG_SPI_TXSTATUS], 15) && BIT(m_io_regs[REG_SPI_TXSTATUS], 14);
+	set_spi_irq(ovf_set || rxi_set || txi_set);
+}
+
+void spg2xx_io_device::do_spi_tx()
+{
+	if (!BIT(m_io_regs[REG_SPI_CTRL], 15) || m_spi_tx_fifo_count == 0)
+	{
+		LOGMASKED(LOG_SPI, "Nothing to transmit or SPI disabled, bailing.\n");
+		return;
+	}
+
+	if (m_spi_tx_bit == 8)
+	{
+		m_spi_tx_bit--;
+		m_spi_tx_buf = m_spi_tx_fifo[m_spi_tx_fifo_end];
+		m_spi_tx_fifo_end = (m_spi_tx_fifo_end + 1) & 0x0f;
+		LOGMASKED(LOG_SPI, "Peeling off byte %02x and putting it in the Tx buffer.\n", m_spi_tx_buf);
+	}
+
+	m_spi_tx(BIT(m_spi_tx_buf, m_spi_tx_bit));
+	
+	if (m_spi_tx_bit == 0)
+	{
+		m_spi_tx_bit = 8;
+		m_spi_tx_fifo_count--;
+		LOGMASKED(LOG_SPI, "Done transmitting byte, new FIFO count is %d.\n", m_spi_tx_fifo_count);
+		if (m_spi_tx_fifo_count == 0)
+		{
+			LOGMASKED(LOG_SPI, "Stopping Tx timer.\n");
+			m_spi_tx_timer->adjust(attotime::never);
+		}
+
+		m_io_regs[REG_SPI_TXSTATUS] &= ~0x000f;
+		m_io_regs[REG_SPI_TXSTATUS] |= m_spi_tx_fifo_count;
+
+		if ((m_io_regs[REG_SPI_TXSTATUS] & 0x000f) < ((m_io_regs[REG_SPI_TXSTATUS] >> 4) & 0x000f))
+		{
+			LOGMASKED(LOG_SPI, "We're below the Tx IRQ threshold, flagging IRQ.\n");
+			m_io_regs[REG_SPI_TXSTATUS] |= 0x8000;
+			update_spi_irqs();
+		}
+	}
+	else
+	{
+		m_spi_tx_bit--;
+	}
+}
+
+void spg2xx_io_device::spi_rx(int state)
+{
+	if (!BIT(m_io_regs[REG_SPI_CTRL], 15))
+	{
+		LOGMASKED(LOG_SPI, "SPI Rx, but SPI is disabled, bailing.\n");
+		return;
+	}
+
+	m_spi_rx_buf |= state << (m_spi_rx_bit);
+	if (m_spi_rx_bit == 0)
+	{
+		LOGMASKED(LOG_SPI, "Done receiving byte: %02x\n", m_spi_rx_buf);
+		m_spi_rx_bit = 7;
+		if (m_spi_rx_fifo_count == 16)
+		{
+			LOGMASKED(LOG_SPI, "Rx FIFO overflow.\n");
+			m_io_regs[REG_SPI_RXSTATUS] |= 0x0100; // Set RFOV flag
+
+			update_spi_irqs();
+
+			if (BIT(m_io_regs[REG_SPI_MISC], 9))
+				m_spi_rx_fifo[(m_spi_rx_fifo_start - 1) & 0x0f] = m_spi_rx_buf;
+			
+			m_spi_rx_buf = 0x00;
+			return;
+		}
+
+		m_spi_rx_fifo[m_spi_rx_fifo_start] = m_spi_rx_buf;
+		m_spi_rx_fifo_start = (m_spi_rx_fifo_start + 1) & 0x0f;
+		LOGMASKED(LOG_SPI, "Putting byte into Rx buffer.\n");
+
+		m_io_regs[REG_SPI_MISC] |= 0x0004; // Set RNE flag
+		
+		if (m_spi_rx_fifo_count == 0)
+			m_io_regs[REG_SPI_RXDATA] = m_spi_rx_buf;
+
+		m_spi_rx_buf = 0x00;
+		m_spi_rx_fifo_count++;
+		LOGMASKED(LOG_SPI, "New Rx FIFO count: %d\n", m_spi_rx_fifo_count);
+
+		m_io_regs[REG_SPI_RXSTATUS] &= ~0x000f;
+		m_io_regs[REG_SPI_RXSTATUS] |= m_spi_rx_fifo_count; // Update RXFFLAG bits
+
+		if (m_spi_rx_fifo_count >= ((m_io_regs[REG_SPI_RXSTATUS] >> 4) & 0x000f))
+		{
+			LOGMASKED(LOG_SPI, "Rx buffer is at or above threshold, flagging IRQ\n");
+			m_io_regs[REG_SPI_RXSTATUS] |= 0x8000; // Set SPIRXIF
+			update_spi_irqs();
+		}
+	}
+	else
+	{
+		m_spi_rx_bit--;
 	}
 }
 
@@ -362,27 +535,43 @@ READ16_MEMBER(spg2xx_io_device::io_extended_r)
 		break;
 
 	case REG_SPI_CTRL:
-		LOGMASKED(LOG_SIO, "%s: io_r: SPI Control = %04x\n", machine().describe_context(), val);
+		LOGMASKED(LOG_SPI, "%s: io_r: SPI Control = %04x\n", machine().describe_context(), val);
 		break;
 
 	case REG_SPI_TXSTATUS:
-		LOGMASKED(LOG_SIO, "%s: io_r: SPI Tx Status = %04x\n", machine().describe_context(), val);
+		LOGMASKED(LOG_SPI, "%s: io_r: SPI Tx Status = %04x\n", machine().describe_context(), val);
 		break;
 
 	case REG_SPI_TXDATA:
-		LOGMASKED(LOG_SIO, "%s: io_r: SPI Tx Data = %04x\n", machine().describe_context(), val);
+		LOGMASKED(LOG_SPI, "%s: io_r: SPI Tx Data = %04x\n", machine().describe_context(), val);
 		break;
 
 	case REG_SPI_RXSTATUS:
-		LOGMASKED(LOG_SIO, "%s: io_r: SPI Rx Status = %04x\n", machine().describe_context(), val);
+		LOGMASKED(LOG_SPI, "%s: io_r: SPI Rx Status = %04x\n", machine().describe_context(), val);
 		break;
 
 	case REG_SPI_RXDATA:
-		LOGMASKED(LOG_SIO, "%s: io_r: SPI Rx Data = %04x\n", machine().describe_context(), val);
+		LOGMASKED(LOG_SPI, "%s: io_r: SPI Rx Data = %04x, FIFO count %d\n", machine().describe_context(), val, m_spi_rx_fifo_count);
+		if (m_spi_rx_fifo_count > 0)
+		{
+			m_spi_rx_fifo_count--;
+			if (m_spi_rx_fifo_count > 0)
+			{
+				m_spi_rx_fifo_end = (m_spi_rx_fifo_end + 1) & 0x0f;
+				m_io_regs[REG_SPI_RXDATA] = m_spi_rx_fifo[m_spi_rx_fifo_end];
+			}
+
+			m_io_regs[REG_SPI_RXSTATUS] &= ~(0x0200); // Clear RXFULL
+			m_io_regs[REG_SPI_MISC] &= ~(0x0008); // Clear RFF
+			if (m_spi_rx_fifo_count == 0)
+			{
+				m_io_regs[REG_SPI_MISC] &= ~(0x0004); // Clear RNE
+			}
+		}
 		break;
 
 	case REG_SPI_MISC:
-		LOGMASKED(LOG_SIO, "%s: io_r: SPI Misc. = %04x\n", machine().describe_context(), val);
+		LOGMASKED(LOG_SPI, "%s: io_r: SPI Misc. = %04x\n", machine().describe_context(), val);
 		break;
 
 	case REG_SIO_SETUP:
@@ -1058,44 +1247,76 @@ WRITE16_MEMBER(spg2xx_io_device::io_extended_w)
 	case REG_SPI_CTRL:
 	{
 		static const char* const s_spi_clock[8] = { "SYSCLK/2" , "SYSCLK/4", "SYSCLK/8", "SYSCLK/16", "SYSCLK/32", "SYSCLK/64", "SYSCLK/128", "Reserved" };
-		LOGMASKED(LOG_SIO, "%s: io_r: SPI Control = %04x (Enable:%d, Loopback:%d, Reset:%d, Mode:%s, Phase:%d, Polarity:%d, Clock:%s)\n", machine().describe_context(), data,
+		LOGMASKED(LOG_SPI, "%s: io_w: SPI Control = %04x (Enable:%d, Loopback:%d, Reset:%d, Mode:%s, Phase:%d, Polarity:%d, Clock:%s)\n", machine().describe_context(), data,
 			BIT(data, 15), BIT(data, 13), BIT(data, 11), BIT(data, 8) ? "Slave" : "Master", BIT(data, 5), BIT(data, 4), s_spi_clock[data & 7]);
 		m_io_regs[offset] = data;
+		if ((data & 7) == 7 || !BIT(m_io_regs[offset], 15))
+		{
+			m_spi_rate = 0;
+			m_spi_tx_timer->adjust(attotime::never);
+		}
+		else
+		{
+			m_spi_rate = 2 << (data & 7);
+			attotime rate = attotime::from_ticks(m_spi_rate, clock());
+			if (m_spi_tx_timer->remaining() != attotime::never)
+				m_spi_tx_timer->adjust(rate);
+		}
 		break;
 	}
 
 	case REG_SPI_TXSTATUS:
-		LOGMASKED(LOG_SIO, "%s: io_r: SPI Tx Status = %04x\n", machine().describe_context(), data);
+		LOGMASKED(LOG_SPI, "%s: io_w: SPI Tx Status = %04x\n", machine().describe_context(), data);
 		m_io_regs[offset] &= ~0x40f0;
 		m_io_regs[offset] |= data & 0x40f0;
 		if (BIT(data, 15))
 		{
 			m_io_regs[offset] &= ~0x8000;
+			update_spi_irqs();
 		}
 		break;
 
 	case REG_SPI_TXDATA:
-		LOGMASKED(LOG_SIO, "%s: io_r: SPI Tx Data = %04x\n", machine().describe_context(), data);
+		LOGMASKED(LOG_SPI, "%s: io_w: SPI Tx Data = %04x\n", machine().describe_context(), data);
+		m_io_regs[offset] = data;
+		if (BIT(m_io_regs[REG_SPI_CTRL], 15))
+		{
+			if (m_spi_tx_fifo_count < 16)
+			{
+				LOGMASKED(LOG_SPI, "%s: SPI Tx FIFO is full, pushing onto FIFO and enabling timer.\n", machine().describe_context());
+				m_spi_tx_fifo[m_spi_tx_fifo_start] = (uint8_t)m_io_regs[REG_SPI_TXDATA];
+				m_spi_tx_fifo_start = (m_spi_tx_fifo_start + 1) & 0x0f;
+				m_spi_tx_fifo_count++;
+
+				attotime rate = attotime::from_ticks(m_spi_rate, clock());
+				m_spi_tx_timer->adjust(rate, 0, rate);
+			}
+			else
+			{
+				LOGMASKED(LOG_SPI, "%s: SPI Tx FIFO is full, not pushing.\n", machine().describe_context());
+			}
+		}
 		break;
 
 	case REG_SPI_RXSTATUS:
-		LOGMASKED(LOG_SIO, "%s: io_r: SPI Rx Status = %04x\n", machine().describe_context(), data);
+		LOGMASKED(LOG_SPI, "%s: io_w: SPI Rx Status = %04x\n", machine().describe_context(), data);
 		m_io_regs[offset] &= ~0x40f0;
 		m_io_regs[offset] |= data & 0x40f0;
+		m_io_regs[offset] &= ~0x0100; // Clear RXFOV
 		if (BIT(data, 15))
 		{
 			m_io_regs[offset] &= ~0x8000;
+			update_spi_irqs();
 		}
 		break;
 
 	case REG_SPI_RXDATA:
-		LOGMASKED(LOG_SIO, "%s: io_r: SPI Rx Data = %04x\n", machine().describe_context(), data);
+		LOGMASKED(LOG_SPI, "%s: io_w: SPI Rx Data = %04x\n", machine().describe_context(), data);
 		break;
 
 	case REG_SPI_MISC:
 	{
-		//static const char* const s_spi_clock[8] = { "SYSCLK/2" , "SYSCLK/4", "SYSCLK/8", "SYSCLK/16", "SYSCLK/32", "SYSCLK/64", "SYSCLK/128", "Reserved" };
-		LOGMASKED(LOG_SIO, "%s: io_r: SPI Misc. = %04x (Over:%d, SmartInt:%d, Busy:%d, RxFull:%d, RxNotEmpty:%d, TxNotFull:%d, TxEmpty:%d)\n", machine().describe_context(), data,
+		LOGMASKED(LOG_SPI, "%s: io_w: SPI Misc. = %04x (Over:%d, SmartInt:%d, Busy:%d, RxFull:%d, RxNotEmpty:%d, TxNotFull:%d, TxEmpty:%d)\n", machine().describe_context(), data,
 			BIT(data, 9), BIT(data, 8), BIT(data, 4), BIT(data, 3), BIT(data, 2), BIT(data, 1), BIT(data, 0));
 		m_io_regs[offset] &= ~0x0300;
 		m_io_regs[offset] |= data & 0x0300;
@@ -1250,6 +1471,10 @@ void spg2xx_io_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 			m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 			m_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 			break;
+
+		case TIMER_SPI_TX:
+			do_spi_tx();
+			break;
 	}
 }
 
@@ -1358,10 +1583,10 @@ void spg2xx_io_device::check_irqs(const uint16_t changed)
 		m_timer_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
-	if (changed & 0x2100) // UART, ADC IRQ
+	if (changed & 0x6100) // UART, SPI, SIO, I2C, ADC IRQ
 	{
-		LOGMASKED(LOG_UART, "%ssserting IRQ3 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100), changed);
-		m_uart_adc_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100) ? ASSERT_LINE : CLEAR_LINE);
+		LOGMASKED(LOG_UART | LOG_SIO | LOG_SPI | LOG_I2C, "%ssserting IRQ3 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x6100) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100), changed);
+		m_uart_adc_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x6100) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	if (changed & 0x1200) // External IRQ

@@ -10502,6 +10502,9 @@ comquest                        // Comquest Plus German
 comx35n                         //
 comx35p                         //
 
+@source:conchess.cpp
+concstd
+
 @source:concept.cpp
 concept                         // 1982 Corvus Concept
 
