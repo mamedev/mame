@@ -8190,6 +8190,18 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="domino">
+		<description>Domino 1.0</description>
+		<year>1991</year>
+		<publisher>Scandinavian PC Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="4A-046-015495" />
+			<dataarea name="flop" size = "737280">
+				<rom name="domino.img" size="737280" crc="81d00da4" sha1="9aa0b963c79f8e63e49d5f2cacddf228b74f25e2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ddragon">
 		<description>Double Dragon (5.25")</description>
 		<year>1988</year>
