@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "bus/centronics/ctronics.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/i8279.h"
 #include "machine/input_merger.h"
 #include "machine/output_latch.h"
@@ -26,6 +27,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_int4(*this, "int4")
 		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:%u", 0U)
 		, m_pvtc(*this, "pvtc")
 		, m_speaker(*this, "speaker")
 		, m_printer(*this, "printer")
@@ -40,6 +42,7 @@ public:
 		, m_kbd_scan(0)
 		, m_kbd_release(false)
 		, m_printer_busy(false)
+		, m_dr(0)
 		, m_mode(0)
 	{
 	}
@@ -67,6 +70,7 @@ private:
 	void memory_w(offs_t offset, u8 data);
 	u8 stat_r();
 	void co_w(u8 data);
+	DECLARE_WRITE_LINE_MEMBER(hld_w);
 	void mode_w(u8 data);
 
 	void mem_map(address_map &map);
@@ -76,6 +80,7 @@ private:
 	required_device<z80_device> m_maincpu;
 	required_device<input_merger_device> m_int4;
 	required_device<fd1793_device> m_fdc;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<scn2672_device> m_pvtc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<centronics_device> m_printer;
@@ -92,6 +97,7 @@ private:
 	u8 m_kbd_scan;
 	bool m_kbd_release;
 	bool m_printer_busy;
+	u8 m_dr;
 	u8 m_mode;
 };
 
@@ -99,6 +105,8 @@ void pp_state::machine_start()
 {
 	m_kbd_leds.resolve();
 	m_kbd_leds[0] = 1; // power LED (green) is always on
+
+	m_fdc->dden_w(0);
 
 	// 64K of dynamic RAM (8x 4864)
 	m_ram = make_unique_clear<u8[]>(0x10000);
@@ -110,6 +118,7 @@ void pp_state::machine_start()
 	save_item(NAME(m_kbd_scan));
 	save_item(NAME(m_kbd_release));
 	save_item(NAME(m_printer_busy));
+	save_item(NAME(m_dr));
 	save_item(NAME(m_mode));
 }
 
@@ -244,13 +253,27 @@ u8 pp_state::stat_r()
 	if (!machine().side_effects_disabled())
 		m_rom_enabled = !BIT(m_mode, 4);
 
-	// TODO: D6 = floppy index
-	return m_int_status | (BIT(m_modifiers->read(), 3) ? 0x10 : 0x00) | (m_printer_busy ? 0x20 : 0x00) | (BIT(m_kbd_scan, 3) ? 0x80 : 0x00);
+	bool index_pulse = (BIT(m_dr, 0) && m_floppy[0]->get_device() != nullptr && m_floppy[0]->get_device()->idx_r())
+			|| (BIT(m_dr, 1) && m_floppy[1]->get_device() != nullptr && m_floppy[1]->get_device()->idx_r());
+
+	return m_int_status
+			| (BIT(m_modifiers->read(), 3) ? 0x10 : 0x00)
+			| (m_printer_busy ? 0x20 : 0x00)
+			| (index_pulse ? 0x00 : 0x40)
+			| (BIT(m_kbd_scan, 3) ? 0x80 : 0x00);
 }
 
 void pp_state::co_w(u8 data)
 {
-	// TODO: D0 = DR1/, D1 = DR2/, D2 = SS/
+	// D0 = DR1, D1 = DR2, D2 = SS
+	m_dr = data & 0x07;
+	floppy_image_device *floppy = nullptr;
+	for (int i = 0; i < 2 && floppy == nullptr; i++)
+		if (BIT(data, i))
+			floppy = m_floppy[i]->get_device();
+	m_fdc->set_floppy(floppy);
+	if (floppy != nullptr)
+		floppy->ss_w(BIT(data, 2));
 
 	m_kbd_leds[2] = BIT(data, 0); // pin 21 of J13 connector
 	m_kbd_leds[1] = BIT(data, 1); // pin 22 of J13 connector
@@ -264,6 +287,13 @@ void pp_state::co_w(u8 data)
 
 	// KBREL
 	m_kbd_release = BIT(data, 7);
+}
+
+WRITE_LINE_MEMBER(pp_state::hld_w)
+{
+	for (int i = 0; i < 2; i++)
+		if (m_floppy[i]->get_device() != nullptr)
+			m_floppy[i]->get_device()->mon_w(!state);
 }
 
 void pp_state::mode_w(u8 data)
@@ -390,6 +420,12 @@ static INPUT_PORTS_START(pp)
 	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps Lock") PORT_TOGGLE PORT_CODE(KEYCODE_CAPSLOCK)
 INPUT_PORTS_END
 
+static void pp_floppies(device_slot_interface &device)
+{
+	// Mitsubishi M485X
+	device.option_add("525dd", FLOPPY_525_DD);
+}
+
 void pp_state::pp(machine_config &config)
 {
 	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
@@ -398,7 +434,7 @@ void pp_state::pp(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(pp_state::intak_cb));
 
 	INPUT_MERGER_ALL_HIGH(config, m_int4).output_handler().set(FUNC(pp_state::int_w<4>));
-	INPUT_MERGER_ANY_HIGH(config, "int6")/*.output_handler().set(FUNC(pp_state::int_w<6>))*/;
+	INPUT_MERGER_ANY_HIGH(config, "int6").output_handler().set(FUNC(pp_state::int_w<6>));
 	INPUT_MERGER_ANY_HIGH(config, "int7").output_handler().set(FUNC(pp_state::int_w<7>));
 
 	i8279_device &pkdi(I8279(config, "pkdi", 8_MHz_XTAL / 8));
@@ -410,8 +446,13 @@ void pp_state::pp(machine_config &config)
 	pkdi.in_ctrl_callback().set(FUNC(pp_state::cntl_r));
 
 	FD1793(config, m_fdc, 8_MHz_XTAL / 8); // with FDC9216 data separator
+	m_fdc->set_force_ready(true);
 	m_fdc->intrq_wr_callback().set("int6", FUNC(input_merger_device::in_w<0>));
 	m_fdc->drq_wr_callback().set("int7", FUNC(input_merger_device::in_w<0>));
+	m_fdc->hld_wr_callback().set(FUNC(pp_state::hld_w));
+
+	FLOPPY_CONNECTOR(config, m_floppy[0], pp_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], pp_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	SCN2672(config, m_pvtc, 13_MHz_XTAL / 8);
 	m_pvtc->set_character_width(8); // 8 or 7 depending on mode
