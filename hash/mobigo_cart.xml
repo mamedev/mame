@@ -147,6 +147,39 @@
 		</part>
 	</software>		
 	
+	
+	<software name="tstory3a" supported="no"> <!-- part #? full title? region? -->
+		<description>Toy Story 3</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="mobigotoystory3.bin" size="0x1000000" crc="bf7bc6e1" sha1="cc86160f29848d6620923cffd0f740a593ba2d94"/>
+			</dataarea>
+		</part>
+	</software>	
+	
+	<software name="mickey" supported="no"> <!-- part #? full title? region? -->
+		<description>Mickey Mouse</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="mobigomickey.bin" size="0x1000000" crc="51671cd0" sha1="73a2d1a0a8701d3a5daaa98972af545b4b448bf2"/>
+			</dataarea>
+		</part>
+	</software>	
+
+	<software name="tangled" supported="no"> <!-- part #? full title? region? -->
+		<description>Tangled</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="mobigotangled.bin" size="0x1000000" crc="8883ecf6" sha1="b51cff0333644e758a4cc7ef26b2365e9a58877c"/>
+			</dataarea>
+		</part>
+	</software>				
 
 	<!-- this is from a special large scale Kiosk unit, which should also have a unique BIOS.  Maybe move into driver as a hardcodd cart once BIOS is dumped rather than having it here? -->
 	<software name="kiosk" supported="no">
