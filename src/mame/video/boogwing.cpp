@@ -70,10 +70,28 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 			alpha3 = m_deco_ace->get_alpha(0x1f);
 
 			// pix1 sprite vs pix2 sprite
-			if (pix1 & 0x400)       // TODO - check only in pri mode 2??
-				spri1 = 8;
-			else
-				spri1 = 32;
+			switch (priority)
+			{
+				// TODO - check only in pri mode 0/2??
+				case 0x00:
+					{
+						if ((pix1 & 0x600) == 0x600)
+							spri1 = 2;
+						else if ((pix1 & 0x600) == 0x400)
+							spri1 = 8;
+						else
+							spri1 = 32;
+					}
+					break;
+				default:
+					{
+						if (pix1 & 0x400)
+							spri1 = 8;
+						else
+							spri1 = 32;
+					}
+					break;
+			}
 
 			// pix1 sprite vs playfield
 			switch (priority)
@@ -81,6 +99,15 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 				case 0x01:
 					{
 						if ((pix1 & 0x600))
+							pri1 = 16;
+						else
+							pri1 = 64;
+					}
+					break;
+
+				case 0x00:
+					{
+						if ((pix1 & 0x400) == 0x400)
 							pri1 = 16;
 						else
 							pri1 = 64;
@@ -150,7 +177,7 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 			pri1 - 4/16/64 (sprite chip 1 pixel priority relative to bg)
 			pri2 - 4/16/64 (sprite chip 2 pixel priority relative to bg)
-			spri1 - 8/32 (priority of sprite chip 1 relative to other sprite chip)
+			spri1 - 2/8/32 (priority of sprite chip 1 relative to other sprite chip)
 			spri2 - 4/16/64 (priority of sprite chip 2 relative to other sprite chip)
 			alpha2 - 0x80/0xff alpha level of sprite chip 2 pixels (0x80 if enabled, 0xff if not)
 			alpha3 - alpha level of alpha-blended playfield pixels
