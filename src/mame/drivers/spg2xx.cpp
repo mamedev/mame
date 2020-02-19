@@ -1437,7 +1437,7 @@ CONS( 2006, pballpup,   0,     0,        pballpup,       pballpup,    spg2xx_gam
 CONS( 2007, dreamlss,   0,     0,        dreamlss,       dreamlss,    spg2xx_game_dreamlss_state, empty_init, "Hasbro / Tiger Electronics", "Dream Life Superstar (Version 0.3, Mar 16 2007)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 
-// some garbage sprites (not meant to be displayed at all) seeprom hookup (24LC08), gun fine-tuning etc.
+// meeds a hack to not show garbage sprite on startup, seeprom hookup (24LC08), gun fine-tuning etc.
 CONS( 2008, swclone,   0,     0,        swclone,       swclone,    spg2xx_game_swclone_state, init_swclone, "Hasbro / Tiger Electronics", "Star Wars - The Clone Wars", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Mattel games
