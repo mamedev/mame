@@ -1268,6 +1268,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"sony",
 		"sord",
 		"special",
+		"stm",
 		"sun",
 		"svi",
 		"svision",
@@ -3499,6 +3500,11 @@ files {
 	MAME_DIR .. "src/mame/audio/special.h",
 	MAME_DIR .. "src/mame/machine/special.cpp",
 	MAME_DIR .. "src/mame/video/special.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "stm")
+files {
+	MAME_DIR .. "src/mame/drivers/pp.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "sun")

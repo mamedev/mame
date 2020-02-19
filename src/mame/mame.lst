@@ -33738,6 +33738,9 @@ powerinspu                      // prototype (USA)
 @source:powerstack.cpp
 powerstk                        // Motorola Powerstack II
 
+@source:pp.cpp
+pp                              // STM Pied Piper Communicator 1
+
 @source:pp01.cpp
 pp01                            //
 
