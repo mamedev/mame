@@ -273,4 +273,16 @@
 		</part>
 	</software>
 
+	<software name="srscooby" supported="no">
+		<description>Scooby Doo - Miniature Golf Mystery / Museum Mystery / Haunted Theater</description>
+		<year>200?</year>
+		<publisher>Publications International Ltd.</publisher>
+		<part name="cart" interface="pi_storyreader_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="srscooby.1.bin" offset="0x000000" size="0x200000" crc="13b5a30a" sha1="294c9a7c2afa81fc038feaf2f89a36f8b2c9b0c6" />
+				<rom name="srscooby.2.bin" offset="0x200000" size="0x100000" crc="e8b9214e" sha1="7ca6b5ca2726904990f5987397a768926117fa09" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
