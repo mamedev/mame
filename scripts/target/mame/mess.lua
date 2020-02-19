@@ -1122,6 +1122,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"citoh",
 		"coleco",
 		"compugraphic",
+		"consumenta",
 		"cromemco",
 		"comx",
 		"concept",
@@ -1997,6 +1998,11 @@ files {
 createMESSProjects(_target, _subtarget, "compugraphic")
 files {
 	MAME_DIR .. "src/mame/drivers/pwrview.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "consumenta")
+files {
+	MAME_DIR .. "src/mame/drivers/conchess.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "cromemco")
