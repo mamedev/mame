@@ -1941,6 +1941,19 @@ ROM_START( tantrbl ) /* Tant-R (Puzzle & Action) (Bootleg)  (c)1992 Sega */
 ROM_END
 
 
+ROM_START( tantrbl4 ) // extremely similar to tantrbl, but in this one the card dispenser related text hasn't been removed
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "a.bin", 0x000000, 0x080000, CRC(25cafec2) SHA1(872ce10c080c8bddc2eaf1a48be7b43eeae32f28) )
+	ROM_LOAD16_BYTE( "b.bin", 0x000001, 0x080000, CRC(8cf5ffd5) SHA1(21bcde46d3e075a93725292a344c3d9784ae5178) )
+	ROM_LOAD16_BYTE( "d.bin", 0x100000, 0x080000, CRC(17b80202) SHA1(f47bf2aa0c5972647438619b8453c7dede5c422f) )
+	ROM_LOAD16_BYTE( "c.bin", 0x100001, 0x080000, CRC(36a88bd4) SHA1(cc7f6a947d1b79bb86957c43035b53d6d2bcfa28) )
+
+	ROM_REGION( 0x040000, "upd", 0 )
+	ROM_LOAD( "2.bin", 0x000000, 0x020000, CRC(72918c58) SHA1(cb42363b163727a887a0b762519c72dcdf0a6460) )
+	ROM_LOAD( "1.bin", 0x020000, 0x020000, CRC(4e85b2a3) SHA1(3f92fb931d315c5a2d6c54b3204718574928cb7b) )
+ROM_END
+
+
 ROM_START( puyo ) /* Puyo Puyo  (c)1992 Sega / Compile */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-15198.ic32", 0x000000, 0x020000, CRC(9610d80c) SHA1(1ffad09d3369c1942d4db611c41bae47d08c7564) )
@@ -2619,6 +2632,7 @@ GAME( 1992, puyoja,    puyo,     segac2, puyo,            segac2_state,    init_
 GAME( 1992, tantr,     0,        segac2, ichir,           segac2_state,    init_tantr,    ROT0,   "Sega", "Puzzle & Action: Tant-R (Japan)", 0 )
 GAME( 1993, tantrkor,  tantr,    segac2, ichir,           segac2_state,    init_tantrkor, ROT0,   "Sega", "Puzzle & Action: Tant-R (Korea)", 0 )
 GAME( 1992, tantrbl,   tantr,    segac2, ichir,           segac2_state,    init_c2boot,   ROT0,   "bootleg", "Puzzle & Action: Tant-R (Japan) (bootleg set 1)", 0 )
+GAME( 1992, tantrbl4,  tantr,    segac2, ichir,           segac2_state,    init_c2boot,   ROT0,   "bootleg", "Puzzle & Action: Tant-R (Japan) (bootleg set 4)", 0 )
 GAME( 1994, tantrbl2,  tantr,    segac,  ichir,           segac2_state,    init_tantr,    ROT0,   "bootleg", "Puzzle & Action: Tant-R (Japan) (bootleg set 2)", 0 ) // Common bootleg in Europe, C board, no samples
 GAME( 1994, tantrbl3,  tantr,    segac,  ichir,           segac2_state,    init_tantr,    ROT0,   "bootleg", "Puzzle & Action: Tant-R (Japan) (bootleg set 3)", 0 ) // Common bootleg in Europe, C board, no samples
 
