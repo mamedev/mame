@@ -110,6 +110,7 @@ class spg2xx_game_swclone_state : public spg2xx_game_state
 public:
 	spg2xx_game_swclone_state(const machine_config &mconfig, device_type type, const char *tag) :
 		spg2xx_game_state(mconfig, type, tag),
+		m_porta_data(0),
 		m_i2cmem(*this, "i2cmem")
 	{ }
 
@@ -117,8 +118,30 @@ public:
 	void init_swclone();
 
 private:
+	DECLARE_READ16_MEMBER(porta_r);
+	DECLARE_WRITE16_MEMBER(porta_w) override;
+	uint16_t m_porta_data;
+
 	required_device<i2cmem_device> m_i2cmem;
 };
+
+class spg2xx_game_tmntmutm_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_tmntmutm_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_i2cmem(*this, "i2cmem")
+	{ }
+
+	void tmntmutm(machine_config &config);
+
+private:
+	DECLARE_READ16_MEMBER(guny_r);
+	DECLARE_READ16_MEMBER(gunx_r);
+
+	required_device<i2cmem_device> m_i2cmem;
+};
+
 
 
 class spg2xx_game_dreamlss_state : public spg2xx_game_state
@@ -126,6 +149,8 @@ class spg2xx_game_dreamlss_state : public spg2xx_game_state
 public:
 	spg2xx_game_dreamlss_state(const machine_config &mconfig, device_type type, const char *tag) :
 		spg2xx_game_state(mconfig, type, tag),
+		m_porta_data(0),
+		m_portb_data(0),
 		m_i2cmem(*this, "i2cmem")
 	{ }
 
