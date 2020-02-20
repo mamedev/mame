@@ -796,7 +796,8 @@ static INPUT_PORTS_START( swclone )
 	PORT_BIT(0x1ff, 0x100, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 512.0f / 320.0f, -0.105f, 0) PORT_MINMAX(0x000, 0x1ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
 	PORT_START("P1")
-	PORT_BIT( 0x003f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED ) // i2cmem here
+	PORT_BIT( 0x003e, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
@@ -1150,7 +1151,7 @@ void spg2xx_game_pballpup_state::pballpup(machine_config &config)
 
 READ16_MEMBER(spg2xx_game_swclone_state::porta_r)
 {
-	uint16_t ret = m_porta_data & 0xfffe;
+	uint16_t ret = m_io_p1->read() & 0xfffe;
 	ret |= m_i2cmem->read_sda() ? 0x1: 0x0;
 
 	//logerror("%s: spg2xx_game_swclone_state::porta_r (%04x)\n", machine().describe_context(), ret);
