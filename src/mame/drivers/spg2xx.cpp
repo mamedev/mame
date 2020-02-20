@@ -1467,7 +1467,7 @@ CONS( 2007, dreamlss,   0,     0,        dreamlss,       dreamlss,    spg2xx_gam
 
 
 // meeds a hack to not show garbage sprite on startup, seeprom hookup (24LC08), gun fine-tuning etc.
-CONS( 2008, swclone,   0,     0,        swclone,       swclone,    spg2xx_game_swclone_state, init_swclone, "Hasbro / Tiger Electronics", "Star Wars - The Clone Wars", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, swclone,   0,     0,        swclone,       swclone,    spg2xx_game_swclone_state, init_swclone, "Hasbro / Tiger Electronics", "Star Wars - The Clone Wars", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Mattel games
 CONS( 2005, mattelcs,  0,        0, rad_skat, mattelcs,   spg2xx_game_state, empty_init, "Mattel", "Mattel Classic Sports",     MACHINE_IMPERFECT_SOUND )
