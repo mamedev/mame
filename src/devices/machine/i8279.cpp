@@ -223,7 +223,7 @@ void i8279_device::new_key(u8 data, bool skey, bool ckey)
 		sl = i;
 	}
 	else
-		sl = m_scanner;
+		sl = m_scanner & 7;
 
 	new_fifo( (ckey << 7) | (skey << 6) | (sl << 3) | rl);
 }
@@ -302,11 +302,11 @@ void i8279_device::timer_mainloop()
 		u8 rl = m_in_rl_cb(0);
 
 		// see if key still down from last time
-		u16 key_down = (m_scanner << 8) | rl;
+		u16 key_down = ((m_scanner & scanner_mask) << 8) | rl;
 		if (key_down == m_key_down)
 			rl = 0xff;
 		else
-		if ((rl == 0xff) && (m_scanner == m_key_down >> 8))
+		if ((rl == 0xff) && ((m_scanner & scanner_mask) == m_key_down >> 8))
 			m_key_down = 0xffff;
 
 		// now process new key
