@@ -102,11 +102,6 @@
 
         jak_wall, jak_sdoo:
             Game seems unhappy with NVRAM, clears contents on each boot.
-        jak_pooh:
-            In the 'Light Tag' minigame (select the rock) the game usually softlocks when you find a friend (with or without DRC)
-        jak_care:
-            All but one mini-game waits on RAM address 0x0165 changing from 0x00f9 to 0x00f8
-            The bottom left game "Wish Bear's Wishing Tree" appears to fail for more complex reasons.
         jak_disf:
             Shows corrupt logo on first boot with no valid nvram (possibly hardware does too - verify if possible to invalidate EEPROM on device)
         lexizeus:
@@ -1340,7 +1335,7 @@ CONS( 200?, guitarss,    0,     0,        abltenni,       guitarss,    spg2xx_ga
 
 CONS( 200?, jjstrip,    0,     0,        tvsprt10,       jjstrip,    spg2xx_game_state, empty_init, "Shiggles Inc.", "Club Jenna Presents: Jenna Jameson's Strip Poker", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2005, tmntmutm,   0,     0,        tmntmutm,       tmntmutm,    spg2xx_game_tmntmutm_state, empty_init, "Tech2Go / WayForward", "Teenage Mutant Ninja Turtles: Mutant and Monster Mayhem", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, tmntmutm,   0,     0,        tmntmutm,       tmntmutm,    spg2xx_game_tmntmutm_state, empty_init, "Tech2Go / WayForward", "Teenage Mutant Ninja Turtles: Mutant and Monster Mayhem", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2006, pballpup,   0,     0,        pballpup,       pballpup,    spg2xx_game_pballpup_state, empty_init, "Hasbro / Tiger Electronics", "Mission: Paintball Powered Up", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
