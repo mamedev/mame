@@ -167,15 +167,10 @@ void i8279_device::device_reset()
 void i8279_device::timer_adjust()
 {
 // Real device runs at about 100kHz internally, clock divider is chosen so that
-// this is the case. We do not need such speed, 2000Hz is enough.
-// If this is too long, the sensor mode doesn't work correctly.
+// this is the case. If this is too long, the sensor mode doesn't work correctly.
 
-#if 0
 	u8 divider = (m_cmd[1]) ? m_cmd[1] : 1;
 	u32 new_clock = clock() / divider;
-#else
-	u32 new_clock = 2000;
-#endif
 
 	if (m_scanclock != new_clock)
 	{
@@ -360,7 +355,7 @@ void i8279_device::timer_mainloop()
 	else
 		m_scanner++;
 
-	m_scanner &= scanner_mask; // 4-bit port
+	m_scanner &= 15; // 4-bit port
 
 	if ( !m_out_sl_cb.isnull() )
 		m_out_sl_cb((offs_t)0, m_scanner);
@@ -368,7 +363,7 @@ void i8279_device::timer_mainloop()
 	// output a digit
 
 	if ( !m_out_disp_cb.isnull() )
-		m_out_disp_cb((offs_t)0, m_d_ram[m_scanner] );
+		m_out_disp_cb((offs_t)0, m_d_ram[m_scanner & scanner_mask] );
 }
 
 
