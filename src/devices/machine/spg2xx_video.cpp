@@ -641,11 +641,11 @@ READ16_MEMBER(spg2xx_video_device::video_r)
 		return m_screen->vpos();
 
 	case 0x3e: // Light Pen Y Position
-		LOGMASKED(LOG_PPU_READS, "video_r: Light Pen Y / Lightgun Y = %04x\n");
+		LOGMASKED(LOG_PPU_READS, "video_r: Light Pen Y / Lightgun Y\n");
 		return m_guny_in();
 
 	case 0x3f: // Light Pen X Position
-		LOGMASKED(LOG_PPU_READS, "video_r: Light Pen X / Lightgun X = %04x\n");
+		LOGMASKED(LOG_PPU_READS, "video_r: Light Pen X / Lightgun X\n");
 		return m_gunx_in();
 
 	case 0x62: // Video IRQ Enable

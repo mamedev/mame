@@ -1092,20 +1092,39 @@ void spg2xx_game_state::tvsprt10(machine_config &config)
 	m_maincpu->portc_in().set(FUNC(spg2xx_game_state::base_portc_r));
 }
 
+READ16_MEMBER(spg2xx_game_tmntmutm_state::guny_r)
+{
+	int frame = m_screen->frame_number() & 1; // game will not register shots if the co-ordinates are exactly the same as previous shot
+	uint16_t data = m_io_guny->read() ^ frame;
+	logerror("%s: Gun Y Read: %04x\n", machine().describe_context(), data);
+	return data;
+}
 
-void spg2xx_game_state::tmntmutm(machine_config &config)
+READ16_MEMBER(spg2xx_game_tmntmutm_state::gunx_r)
+{
+	int frame = (m_screen->frame_number() >> 1) & 1;
+	uint16_t data = m_io_gunx->read() ^ frame;
+	logerror("%s: Gun X Read: %04x\n", machine().describe_context(), data);
+	return data;
+}
+
+
+
+void spg2xx_game_tmntmutm_state::tmntmutm(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
-	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_4m);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_tmntmutm_state::mem_map_4m);
 
 	spg2xx_base(config);
 
-	m_maincpu->porta_in().set(FUNC(spg2xx_game_state::base_porta_r));
-	m_maincpu->portb_in().set(FUNC(spg2xx_game_state::base_portb_r));
-	m_maincpu->portc_in().set(FUNC(spg2xx_game_state::base_portc_r));
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_tmntmutm_state::base_porta_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_tmntmutm_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_tmntmutm_state::base_portc_r));
 
-	m_maincpu->guny_in().set(FUNC(spg2xx_game_state::base_guny_r));
-	m_maincpu->gunx_in().set(FUNC(spg2xx_game_state::base_gunx_r));
+	m_maincpu->guny_in().set(FUNC(spg2xx_game_tmntmutm_state::guny_r));
+	m_maincpu->gunx_in().set(FUNC(spg2xx_game_tmntmutm_state::gunx_r));
+
+	I2C_24C08(config, "i2cmem", 0);
 }
 
 READ16_MEMBER(spg2xx_game_pballpup_state::porta_r)
@@ -1431,8 +1450,8 @@ void spg2xx_game_state::init_tvsprt10()
 
 void spg2xx_game_swclone_state::init_swclone()
 {
-	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
-	rom[0x2649d1] = 0x0000; // don't write 0x1234 to the start of the RAM that is copied to spriteram on startup (this is an explicit write, probably actually a failure condition for something?)
+//	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
+//	rom[0x2649d1] = 0x0000; // don't write 0x1234 to the start of the RAM that is copied to spriteram on startup (this is an explicit write, probably actually a failure condition for something?)
 }
 
 
@@ -1459,7 +1478,7 @@ CONS( 200?, guitarss,    0,     0,        abltenni,       guitarss,    spg2xx_ga
 
 CONS( 200?, jjstrip,    0,     0,        tvsprt10,       jjstrip,    spg2xx_game_state, empty_init, "Shiggles Inc.", "Club Jenna Presents: Jenna Jameson's Strip Poker", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2005, tmntmutm,   0,     0,        tmntmutm,       tmntmutm,    spg2xx_game_state, empty_init, "Tech2Go / WayForward", "Teenage Mutant Ninja Turtles: Mutant and Monster Mayhem", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, tmntmutm,   0,     0,        tmntmutm,       tmntmutm,    spg2xx_game_tmntmutm_state, empty_init, "Tech2Go / WayForward", "Teenage Mutant Ninja Turtles: Mutant and Monster Mayhem", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2006, pballpup,   0,     0,        pballpup,       pballpup,    spg2xx_game_pballpup_state, empty_init, "Hasbro / Tiger Electronics", "Mission: Paintball Powered Up", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
