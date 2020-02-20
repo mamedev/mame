@@ -102,6 +102,7 @@ protected:
 	bool side_control;
 	bool side_compare;
 	bool head_control;
+	int hld_timeout;
 	bool motor_control;
 	bool ready_hooked;
 	int clock_ratio;
