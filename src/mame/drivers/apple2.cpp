@@ -157,6 +157,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dodo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
@@ -193,6 +194,7 @@ public:
 	void apple2jp(machine_config &config);
 	void apple2(machine_config &config);
 	void space84(machine_config &config);
+	void dodo(machine_config &config);
 	void apple2p(machine_config &config);
 	void apple2_map(address_map &map);
 	void inhbank_map(address_map &map);
@@ -496,6 +498,46 @@ uint32_t apple2_state::screen_update_jp(screen_device &screen, bitmap_ind16 &bit
 	else
 	{
 		m_video->text_update_jplus(screen, bitmap, cliprect, 0, 191);
+	}
+
+	return 0;
+}
+
+uint32_t apple2_state::screen_update_dodo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// always update the flash timer here so it's smooth regardless of mode switches
+	m_video->m_flash = ((machine().time() * 4).seconds() & 1) ? true : false;
+
+	if (m_video->m_graphics)
+	{
+		if (m_video->m_hires)
+		{
+			if (m_video->m_mix)
+			{
+				m_video->hgr_update(screen, bitmap, cliprect, 0, 159);
+				m_video->text_update_dodo(screen, bitmap, cliprect, 160, 191);
+			}
+			else
+			{
+				m_video->hgr_update(screen, bitmap, cliprect, 0, 191);
+			}
+		}
+		else    // lo-res
+		{
+			if (m_video->m_mix)
+			{
+				m_video->lores_update(screen, bitmap, cliprect, 0, 159);
+				m_video->text_update_dodo(screen, bitmap, cliprect, 160, 191);
+			}
+			else
+			{
+				m_video->lores_update(screen, bitmap, cliprect, 0, 191);
+			}
+		}
+	}
+	else
+	{
+		m_video->text_update_dodo(screen, bitmap, cliprect, 0, 191);
 	}
 
 	return 0;
@@ -1392,6 +1434,12 @@ void apple2_state::apple2jp(machine_config &config)
 	m_screen->set_screen_update(FUNC(apple2_state::screen_update_jp));
 }
 
+void apple2_state::dodo(machine_config &config)
+{
+	apple2p(config);
+	m_screen->set_screen_update(FUNC(apple2_state::screen_update_dodo));
+}
+
 #if 0
 void apple2_state::laba2p(machine_config &config)
 {
@@ -1719,6 +1767,18 @@ ROM_START(am100)
 	ROM_LOAD("nfl-asem-am100-u24.bin", 0x0000, 0x4000, CRC(2fb0c717) SHA1(cb4f754d3e1aec9603faebc308a4a63466242e43) )
 ROM_END
 
+ROM_START(dodo)
+	ROM_REGION(0x2000,"gfx1", 0)
+	ROM_LOAD( "gtac_2_charrom_um2316_a5.bin", 0x0000, 0x0800, CRC(a2dfcfeb) SHA1(adea922f950667d3b24297d2f64de697c28d6c17) )
+
+	ROM_REGION( 0x1000, "keyboard", ROMREGION_ERASE00 )
+	ROM_LOAD( "nfl-asem-am100-keyboard-u5.bin", 0x0000, 0x0800, CRC(28f5ea38) SHA1(9f24c54f7cee41f7fef41294f05c4bc89d65acfb) ) // borrowed from the am100
+
+	ROM_REGION(0x4000, "maincpu",0)
+	ROM_LOAD( "dodo2764.bin", 0x2000, 0x1000, CRC(4b761f87) SHA1(2e1741db8134c4c715ecae480f5bda51d58ae296) )
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_LOAD( "dodo2732.bin", 0x3000, 0x1000, CRC(405cdb0c) SHA1(3ed133eb94ee33194c668c4ee3f67885dd489d13) )
+ROM_END
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY                FULLNAME
 COMP( 1977, apple2,   0,      0,      apple2,   apple2,  apple2_state, empty_init, "Apple Computer",      "Apple ][", MACHINE_SUPPORTS_SAVE )
@@ -1744,3 +1804,4 @@ COMP( 1982, basis108, apple2, 0,      apple2,   apple2p, apple2_state, empty_ini
 COMP( 1984, hkc8800a, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "China HKC",           "HKC 8800A", MACHINE_SUPPORTS_SAVE )
 COMP( 1984, albert,   apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Albert Computers, Inc.", "Albert", MACHINE_SUPPORTS_SAVE )
 COMP( 198?, am100,    apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "ASEM S.p.A.",         "AM100",     MACHINE_SUPPORTS_SAVE )
+COMP( 198?, dodo,     apple2, 0,         dodo,  apple2p, apple2_state, empty_init, "GTAC",                "Do-Do",     MACHINE_SUPPORTS_SAVE )
