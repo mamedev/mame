@@ -818,10 +818,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( tmntmutm )
 	PORT_START("GUNY")
-	PORT_BIT(0x0ff, 0x80, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 256.0f / 240.0f, 0.0, 0) PORT_MINMAX(0x000, 0x0ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+	PORT_BIT(0x0ff, 0x80, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 256.0f / 240.0f, -0.033f, 0) PORT_MINMAX(0x000, 0x0ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
 	PORT_START("GUNX")
-	PORT_BIT(0x1ff, 0x100, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 512.0f / 320.0f, -0.03f, 0) PORT_MINMAX(0x000, 0x1ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+	PORT_BIT(0x1ff, 0x100, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 512.0f / 320.0f, -0.128f, 0) PORT_MINMAX(0x000, 0x1ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
 	PORT_START("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // trigger
@@ -1450,8 +1450,8 @@ void spg2xx_game_state::init_tvsprt10()
 
 void spg2xx_game_swclone_state::init_swclone()
 {
-//	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
-//	rom[0x2649d1] = 0x0000; // don't write 0x1234 to the start of the RAM that is copied to spriteram on startup (this is an explicit write, probably actually a failure condition for something?)
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
+	rom[0x2649d1] = 0x0000; // don't write 0x1234 to the start of the RAM that is copied to spriteram on startup (this is an explicit write, probably actually a failure condition for something?)
 }
 
 
