@@ -1289,7 +1289,6 @@ namespace bimg
 		ImageContainer imageContainer;
 		if (magicT != magic)
 		{
-			BX_ERROR_SET(_err, BIMG_ERROR, "Invalid header magic.");
 			return NULL;
 		}
 
