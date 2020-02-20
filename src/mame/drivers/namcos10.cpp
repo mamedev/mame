@@ -13,45 +13,47 @@ Guru Readme for Namco System 10 Hardware
 Note! This document is a Work-In-Progress and will be updated from time to time when more dumps are available.
 
 This document covers all the known Namco System 10 games, including....
-*Drum Master                                       (C) Namco, 2001
-*Drum Master 2                                     (C) Namco, 2001
-*Drum Master 3                                     (C) Namco, 2002
-*Drum Master 4                                     (C) Namco, 2003
-*Drum Master 5                                     (C) Namco, 2003
-*Drum Master 6                                     (C) Namco, 2004
-*Drum Master 7                                     (C) Namco, 2005
-GAHAHA Ippatsu-dou (GID2 Ver.A)                    (C) Namco/Metro, 2000
-GAHAHA Ippatsu-dou 2 (GIS1 Ver.A)                  (C) Namco/Metro, 2001
-Gamshara (10021 Ver.A)                             (C) Mitchell, 2003
-Gekitoride-Jong Space (10011 Ver.A)                (C) Namco/Metro, 2001
-Golgo 13 Juusei no Chinkonka (GLT1 Ver.A)          (C) Namco/8ing/Raizing, 2001
-Gunbalina (GNN1 Ver. A)                            (C) Namco, 2000
-*Hard Puncher Hajime no Ippo 2 Ouja e no Chousen   (C) Namco/Taito, 2002
-*Honne Hakkenki                                    (C) Namco, 2001
-**Knock Down 2001                                  (C) Namco, 2001
-Kotoba no Puzzle Mojipittan (KPM1 Ver.A)           (C) Namco, 2001
-*Kurukuru Food                                     (C) Namco, 2002
-Mr Driller 2 (DR21 Ver.A)                          (C) Namco, 2000
-Mr Driller 2 (DR22 Ver.A)                          (C) Namco, 2000
-Mr Driller G (DRG1 Ver.A)                          (C) Namco, 2001
-NFL Classic Football (NCF3 Ver.A)                  (C) Namco, 2003
-Panicuru Panekuru (PPA1 Ver.A)                     (C) Namco, 2001
-*Photo Battle                                      (C) Namco, 2001
-Point Blank 3 (GNN2 Ver. A)                        (C) Namco, 2000
-*Ren-ai Quiz High School Angel                     (C) Namco, 2002
-Seishun Quiz Colorful High School (CHS1 Ver.A)     (C) Namco, 2002
-Sekai Kaseki Hakken (Japan, SKH1 Ver.A)            (C) Namco, 2004
-Shamisen Brothers                                  (C) Kato/Konami, 2003
-Star Trigon (STT1 Ver.A)                           (C) Namco, 2002
-*Taiko no Tatsujin                                 (C) Namco, 2001
-Taiko no Tatsujin 2 (TK21 Ver.C)                   (C) Namco, 2001
-Taiko no Tatsujin 3 (TK31 Ver.A)                   (C) Namco, 2002
-Taiko no Tatsujin 4 (TK41 Ver.A)                   (C) Namco, 2003
-Taiko no Tatsujin 5 (TK51 Ver.A)                   (C) Namco, 2003
-Taiko no Tatsujin 6 (TK61 Ver.A)                   (C) Namco, 2004
-Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)    (C) Namco/Metro, 2002
-Uchuu Daisakusen Chocovader Contactee (CVC1 Ver.A) (C) Namco, 2002
-Unknown medal (?) game (MTL1 SPR0B)                (C) ?,     200?
+*Drum Master                                                     (C) Namco, 2001
+*Drum Master 2                                                   (C) Namco, 2001
+*Drum Master 3                                                   (C) Namco, 2002
+*Drum Master 4                                                   (C) Namco, 2003
+*Drum Master 5                                                   (C) Namco, 2003
+*Drum Master 6                                                   (C) Namco, 2004
+*Drum Master 7                                                   (C) Namco, 2005
+GAHAHA Ippatsu-dou (GID2 Ver.A)                                  (C) Namco/Metro, 2000
+GAHAHA Ippatsu-dou 2 (GIS1 Ver.A)                                (C) Namco/Metro, 2001
+Gamshara (10021 Ver.A)                                           (C) Mitchell, 2003
+Gegege no Kitarō Yōkai Yokochō Matsuri De Batoru Ja (GYM1 Ver.A) (C) Namco, 2007
+Gekitoride-Jong Space (10011 Ver.A)                              (C) Namco/Metro, 2001
+Golgo 13 Juusei no Chinkonka (GLT1 Ver.A)                        (C) Namco/8ing/Raizing, 2001
+Gunbalina (GNN1 Ver. A)                                          (C) Namco, 2000
+*Hard Puncher Hajime no Ippo 2 Ouja e no Chousen                 (C) Namco/Taito, 2002
+*Honne Hakkenki                                                  (C) Namco, 2001
+Keroro Gunsō Chikyū Shinryaku Shirei Dearimasu! (KRG1 Ver.A)     (C) Namco, 2006
+**Knock Down 2001                                                (C) Namco, 2001
+Kotoba no Puzzle Mojipittan (KPM1 Ver.A)                         (C) Namco, 2001
+*Kurukuru Food                                                   (C) Namco, 2002
+Mr Driller 2 (DR21 Ver.A)                                        (C) Namco, 2000
+Mr Driller 2 (DR22 Ver.A)                                        (C) Namco, 2000
+Mr Driller G (DRG1 Ver.A)                                        (C) Namco, 2001
+NFL Classic Football (NCF3 Ver.A)                                (C) Namco, 2003
+Panicuru Panekuru (PPA1 Ver.A)                                   (C) Namco, 2001
+*Photo Battle                                                    (C) Namco, 2001
+Point Blank 3 (GNN2 Ver. A)                                      (C) Namco, 2000
+*Ren-ai Quiz High School Angel                                   (C) Namco, 2002
+Seishun Quiz Colorful High School (CHS1 Ver.A)                   (C) Namco, 2002
+Sekai Kaseki Hakken (Japan, SKH1 Ver.A)                          (C) Namco, 2004
+Shamisen Brothers                                                (C) Kato/Konami, 2003
+Star Trigon (STT1 Ver.A)                                         (C) Namco, 2002
+*Taiko no Tatsujin                                               (C) Namco, 2001
+Taiko no Tatsujin 2 (TK21 Ver.C)                                 (C) Namco, 2001
+Taiko no Tatsujin 3 (TK31 Ver.A)                                 (C) Namco, 2002
+Taiko no Tatsujin 4 (TK41 Ver.A)                                 (C) Namco, 2003
+Taiko no Tatsujin 5 (TK51 Ver.A)                                 (C) Namco, 2003
+Taiko no Tatsujin 6 (TK61 Ver.A)                                 (C) Namco, 2004
+Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)                  (C) Namco/Metro, 2002
+Uchuu Daisakusen Chocovader Contactee (CVC1 Ver.A)               (C) Namco, 2002
+Unknown medal (?) game (MTL1 SPR0B)                              (C) ?,     200?
 
 * - denotes not dumped yet.
 ** - denotes incomplete dump.
@@ -262,28 +264,30 @@ Notes:
 
 This PCB is used on:
 
-                                      MEM PCB
-Game                                  Sticker       KEYCUS   ROMs Populated       CD            Notes
-----------------------------------------------------------------------------------------------------------------------------------------------
-Gamshara                              10021 Ver.A   KC020A   8E, 8D               N/A
-Gekitoride-Jong Space                 10011 Ver.A   KC003A   8E, 8D, 7E, 7D       N/A
-Gunbalina                             GNN1  Ver.A   KC002A   8E, 8D               N/A           see note 3
-Knock Down 2001                       KD11  Ver.B   KC011A   8E, 8D               N/A           also has a Namco P-DRIVE PCB 1908961101 (1908971101) with an H8/3002
-Kono Tako                             10021 Ver.A   KC034A   8E, 8D               N/A
-Kotoba no Puzzle Mojipittan           KPM1  Ver.A   KC012A   8E, 8D, 7E           N/A
-Mr Driller G                          DRG1  Ver.A   KC007A   8E, 8D, 7E           N/A
-NFL Classic Football                  NCF3  Ver.A   KC027A   8E, 8D, 7E, 7D       N/A
-Panicuru Panekuru                     PPA1  Ver.A   KC017A   8E, 8D, 7E           N/A
-Point Blank 3                         GNN2  Ver.A   KC002A   8E, 8D               N/A           see note 3
-Sekai Kaseki Hakken                   SKH1  Ver.A   KC035A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
-Star Trigon                           STT1  Ver.A   KC019A   8E, 8D               N/A
-Taiko no Tatsujin 2                   TK21  Ver.C   KC010A   8E, 8D, 7E           TK21-A        KEYCUS is marked KC007A, KC010A is a sticker
-Taiko no Tatsujin 3                   TK31  Ver.A   KC016A   8E, 8D, 7E           not dumped    For all TK* games see note 2
-Taiko no Tatsujin 4                   TK41  Ver.A   KC024A   8E, 8D, 7E           TK-4
-Taiko no Tatsujin 5                   TK51  Ver.A   KC031A   8E, 8D, 7E           not dumped
-Taiko no Tatsujin 6                   TK61  Ver.A   KC036A   8E, 8D, 7E           TK-6
-Utyuu Daisakusen Chocovader Contactee CVC1  Ver.A   KC022A   8E, 8D, 7E, 7D, 6E   N/A
-unknown medal (?) game                MTL1  SPR0B   KC043A   8E, 8D               N/A           also has a Namco System10 EXFINAL PCB 8906962603 (8906962703)
+                                                    MEM PCB
+Game                                                Sticker       KEYCUS   ROMs Populated       CD            Notes
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Gamshara                                            10021 Ver.A   KC020A   8E, 8D               N/A
+Gegege no Kitarō Yōkai Yokochō Matsuri De Batoru Ja GYM1  Ver.A   KC052A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960200) PCB
+Gekitoride-Jong Space                               10011 Ver.A   KC003A   8E, 8D, 7E, 7D       N/A
+Gunbalina                                           GNN1  Ver.A   KC002A   8E, 8D               N/A           see note 3
+Keroro Gunsō Chikyū Shinryaku Shirei Dearimasu!     KRG1  Ver.A   KC047A1  8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960200) PCB
+Knock Down 2001                                     KD11  Ver.B   KC011A   8E, 8D               N/A           also has a Namco P-DRIVE PCB 1908961101 (1908971101) with an H8/3002
+Kono Tako                                           10021 Ver.A   KC034A   8E, 8D               N/A
+Kotoba no Puzzle Mojipittan                         KPM1  Ver.A   KC012A   8E, 8D, 7E           N/A
+Mr Driller G                                        DRG1  Ver.A   KC007A   8E, 8D, 7E           N/A
+NFL Classic Football                                NCF3  Ver.A   KC027A   8E, 8D, 7E, 7D       N/A
+Panicuru Panekuru                                   PPA1  Ver.A   KC017A   8E, 8D, 7E           N/A
+Point Blank 3                                       GNN2  Ver.A   KC002A   8E, 8D               N/A           see note 3
+Sekai Kaseki Hakken                                 SKH1  Ver.A   KC035A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
+Star Trigon                                         STT1  Ver.A   KC019A   8E, 8D               N/A
+Taiko no Tatsujin 2                                 TK21  Ver.C   KC010A   8E, 8D, 7E           TK21-A        KEYCUS is marked KC007A, KC010A is a sticker
+Taiko no Tatsujin 3                                 TK31  Ver.A   KC016A   8E, 8D, 7E           not dumped    For all TK* games see note 2
+Taiko no Tatsujin 4                                 TK41  Ver.A   KC024A   8E, 8D, 7E           TK-4
+Taiko no Tatsujin 5                                 TK51  Ver.A   KC031A   8E, 8D, 7E           not dumped
+Taiko no Tatsujin 6                                 TK61  Ver.A   KC036A   8E, 8D, 7E           TK-6
+Utyuu Daisakusen Chocovader Contactee               CVC1  Ver.A   KC022A   8E, 8D, 7E, 7D, 6E   N/A
+unknown medal (?) game                              MTL1  SPR0B   KC043A   8E, 8D               N/A           also has a Namco System10 EXFINAL PCB 8906962603 (8906962703)
 
       Notes:
       1. The ROM PCB has locations for 16x 128MBit FlashROMs (Total capacity = 2048MBits) but usually only a few are populated.
@@ -1279,6 +1283,26 @@ ROM_START( kd2001 )
 	ROM_LOAD( "kd11-dr0-ic10.bin", 0x00000, 0x20000, CRC(59649293) SHA1(71c3a0e73d077398e7f3d95acedc47814e99fbc6) )
 ROM_END
 
+ROM_START( keroro )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION16_LE( 0x4200000, "user2", 0 ) /* main prg */
+	ROM_LOAD( "krg1.8e",  0x0000000, 0x2100000, CRC(12e78c66) SHA1(83573f68f27ace345a3be16f29f874f14e593233) ) // K9F5608U0D, double sized wrt to the other games and PCB silkscreen
+	ROM_LOAD( "krg1.8d",  0x2100000, 0x2100000, CRC(879a87b7) SHA1(fcef8eb9423b4825bf27fbfe8cae6d4018cb534f) ) // K9F5608U0D, double sized wrt to the other games and PCB silkscreen
+ROM_END
+
+ROM_START( gegemdb )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION16_LE( 0x4200000, "user2", 0 ) /* main prg */
+	ROM_LOAD( "gym1.8e",  0x0000000, 0x2100000, CRC(ea740351) SHA1(4dc7ce256a2d60be512d04a992b2103602bcfaa9) ) // K9F5608U0D, double sized wrt to the other games and PCB silkscreen
+	ROM_LOAD( "gym1.8d",  0x2100000, 0x2100000, CRC(0145a8c1) SHA1(a32dd944d022df14450bbcb01b4d1712683c0680) ) // K9F5608U0D, double sized wrt to the other games and PCB silkscreen
+
+	ROM_REGION( 0x8000, "nvram", 0 )
+	ROM_LOAD( "nvram.bin", 0x0000, 0x8000, CRC(c0c87c71) SHA1(263f7f3df772644bcf973413d3fac9ae305fda6c) )
+ROM_END
 
 GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2, namcos10, namcos10_state, init_mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
 GAME( 2000, mrdrlr2a,  mrdrilr2, ns10_mrdrilr2, namcos10, namcos10_state, init_mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (World, DR22 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
@@ -1299,4 +1323,6 @@ GAME( 2003, nflclsfb,  0,        ns10_nflclsfb, namcos10, namcos10_state, init_n
 GAME( 2003, konotako,  0,        ns10_konotako, namcos10, namcos10_state, init_konotako, ROT0, "Mitchell", "Kono Tako (10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME( 2004, sekaikh,   0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME( 2004, taiko6,    0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 2006, keroro,    0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Keroro Gunso Chikyu Shinryaku Shirei Dearimasu! (KRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // ケロロ軍曹　地球侵略指令…であります！
+GAME( 2007, gegemdb,   0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Gegege no Kitaro Yokai Yokocho Matsuri De Batoru Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ
 GAME( 200?, unks10md,  0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Namco", "unknown Namco System 10 medal game (MTL1 SPR0B)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
