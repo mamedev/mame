@@ -73,7 +73,7 @@ void bbl380_state::lcdc_data_w(u8 data)
 
 void bbl380_state::bbl380_map(address_map &map)
 {
-	map(0x000000, 0x3fffff).rom().region("maincpu", 0); // not correct
+	map(0x000000, 0x3fffff).rom().region("maincpu", 0); // FIXME: probably not directly mapped (ST2205U has serial Flash interface on port F)
 	map(0x600000, 0x600000).w(FUNC(bbl380_state::lcdc_command_w));
 	map(0x604000, 0x604000).rw(FUNC(bbl380_state::lcdc_data_r), FUNC(bbl380_state::lcdc_data_w));
 }
@@ -98,11 +98,12 @@ void bbl380_state::bbl380(machine_config &config)
 
 	// LCD controller seems to be either Sitronix ST7735R or (if RDDID bytes match) Ilitek ILI9163C
 	// (unless the SoC's built-in one is used and the routines which program these are leftovers)
+	// Several other LCDC models are identified by ragc153 and dphh8630
 }
 
 ROM_START( bbl380 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "st2205u_otp.bin", 0x000000, 0x004000, NO_DUMP ) // internal OTPROM BIOS
+	ROM_LOAD( "bbl380_st2205u.bin", 0x000000, 0x004000, NO_DUMP ) // internal OTPROM BIOS
 	ROM_LOAD( "bbl 380 180 in 1.bin", 0x000000, 0x400000, CRC(146c88da) SHA1(7f18526a6d8cf991f86febce3418d35aac9f49ad) BAD_DUMP )
 	// 0x0022XX, 0x0026XX, 0x002AXX, 0x002CXX, 0x002DXX, 0x0031XX, 0x0036XX, etc. should not be FF fill
 ROM_END
@@ -110,11 +111,13 @@ ROM_END
 
 ROM_START( ragc153 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "ragc153_st2205u.bin", 0x000000, 0x004000, NO_DUMP ) // internal OTPROM BIOS (addresses are different from bbl380)
 	ROM_LOAD( "25q32ams.bin", 0x000000, 0x400000, CRC(de328d73) SHA1(d17b97e9057be4add68b9f5a26e04c9f0a139673) ) // first 0x100 bytes would read as 0xff at regular speed, but give valid looking consistent data at a slower rate
 ROM_END
 
 ROM_START( dphh8630 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "ragc153_st2205u.bin", 0x000000, 0x004000, NO_DUMP ) // internal OTPROM BIOS
 	ROM_LOAD( "bg25q16.bin", 0x000000, 0x200000, CRC(277850d5) SHA1(740087842e1e63bf99b4ca9c1b2053361f267269) )
 ROM_END
 
