@@ -76,9 +76,13 @@ static INPUT_PORTS_START( mk )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
 
-	PORT_START("P3")
-	PORT_BIT( 0x7fff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x8000, 0x8000, "Link State" )
+	PORT_START("P3") // In addition to the "M/T" pad documented below, PCB also has "P/N" (PAL / NTSC) pad (not read?) and a "F/S" pad (also not read)
+	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x1000, 0x1000, "Blood" ) // see code at 05EC30 ( "M/T" (Mature / Teen?) pad on PCB, set at factory
+	PORT_DIPSETTING(      0x0000, "Disabled" )
+	PORT_DIPSETTING(      0x1000, "Enabled" )
+	PORT_BIT( 0x6000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x8000, 0x8000, "Link State" ) // see code at 05EA54
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -144,9 +148,8 @@ ROM_END
 
 ROM_START( jak_mk )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
-	// Sources indicate this should use a 6MB ROM.  The ROM here dosen't end on a blank fill and even the ROM checksum listed in the header seems to be about 50% off.  Both these support that claim.
-	// However no content actually seems to be missing aside from what is intentionally cut in the 'no blood' version, and there are no accesses observed from beyond the 4MB mark
-	// Maybe the 'with blood' version has extra data that was simply chopped off as it was no longer needed, without correcting the checksum?
+	// Sources indicate this should use a 6MB ROM.  The ROM here dosen't end on a blank fill and even the ROM checksum listed in the header seems to be about 50% off.
+	// However no content actually seems to be missing, so are sources claiming a 6MB ROM just incorrect, with the checksum also being misleading?
 	ROM_LOAD16_WORD_SWAP( "jakmk.bin", 0x000000, 0x400000, CRC(b7d7683e) SHA1(e54a020ee746d240267ef78bed7aea744351b421) )
 ROM_END
 
@@ -155,4 +158,4 @@ CONS( 2004, jak_batm, 0, 0, batman, batman, jakks_state, empty_init, "JAKKS Paci
 CONS( 2008, jak_wall, 0, 0, walle,  walle,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Wall-E (JAKKS Pacific TV Game)",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // you could link 2 pads of this together for 2 player mode as you could with WWE (feature not emulated)
-CONS( 2004, jak_mk,   0, 0, mk,     mk,     jakks_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Mortal Kombat (JAKKS Pacific TV Game) (no blood/fatalities version)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, jak_mk,   0, 0, mk,     mk,     jakks_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Mortal Kombat (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
