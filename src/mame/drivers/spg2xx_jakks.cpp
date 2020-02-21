@@ -1,8 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, David Haywood
 
+// Mortal Kombat - attract demo almost always picked Johnny Cage vs. Johhny Cage until some unknown factor starts to randomize it
+//               - Scorpion's 'get over here' sounds don't decode well
+
 #include "emu.h"
 #include "includes/spg2xx.h"
+#include "machine/nvram.h"
 
 class jakks_state : public spg2xx_game_state
 {
@@ -14,10 +18,13 @@ public:
 	void base_config(machine_config& config);
 	void batman(machine_config &config);
 	void walle(machine_config& config);
+	void mk(machine_config& config);
 
 private:
+	void mem_map_2m_mkram(address_map& map);
 	DECLARE_WRITE16_MEMBER(portc_w) override;
 };
+
 
 WRITE16_MEMBER(jakks_state::portc_w)
 {
@@ -58,6 +65,32 @@ static INPUT_PORTS_START( walle )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC (unverified here)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mk )
+	PORT_START("P1")
+	PORT_BIT( 0x001f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON7 )        PORT_PLAYER(1) PORT_NAME("Pause / Menu")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON6 )        PORT_PLAYER(1) PORT_NAME("Block (alt)") // which one of these is actually connected to the button?
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON5 )        PORT_PLAYER(1) PORT_NAME("Block")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_PLAYER(1) PORT_NAME("High Kick")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("High Punch")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("Low Kick")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("Low Punch")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
+
+	PORT_START("P3") // In addition to the "M/T" pad documented below, PCB also has "P/N" (PAL / NTSC) pad (not read?) and a "F/S" pad (also not read?)
+	PORT_BIT( 0x0fff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_CONFNAME( 0x1000, 0x1000, "Blood" ) // see code at 05EC30 - "M/T" (Mature / Teen?) pad on PCB, set at factory
+	PORT_CONFSETTING(      0x0000, "Disabled" )
+	PORT_CONFSETTING(      0x1000, "Enabled" )
+	PORT_BIT( 0x6000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_CONFNAME( 0x8000, 0x8000, "Link State" ) // see code at 05EA54
+	PORT_CONFSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_CONFSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
 void jakks_state::base_config(machine_config& config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
@@ -83,6 +116,29 @@ void jakks_state::walle(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_state::mem_map_2m);
 }
 
+void jakks_state::mem_map_2m_mkram(address_map &map)
+{
+	map(0x000000, 0x1fffff).bankr("cartbank");
+	map(0x3e0000, 0x3fffff).ram().share("nvram"); // backed up by the CR2032
+}
+
+void jakks_state::mk(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+
+	spg2xx_base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_state::mem_map_2m_mkram);
+
+	m_maincpu->porta_in().set_ioport("P1");
+	//m_maincpu->portb_in().set(FUNC(jakks_state::base_portb_r));
+	m_maincpu->portc_in().set_ioport("P3");
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
+}
+
+
+
 ROM_START( jak_batm )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "batman.bin", 0x000000, 0x400000, CRC(46f848e5) SHA1(5875d57bb3fe0cac5d20e626e4f82a0e5f9bb94c) )
@@ -95,6 +151,16 @@ ROM_START( jak_wall )
 	//ROM_LOAD16_WORD_SWAP( "walle.bin", 0x000000, 0x400000, BAD_DUMP CRC(6bc90b16) SHA1(184d72de059057aae7800da510fcf05ed1da9ec9))
 ROM_END
 
+ROM_START( jak_mk )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	// Sources indicate this should use a 6MB ROM.  The ROM here dosen't end on a blank fill and even the ROM checksum listed in the header seems to be about 50% off.
+	// However no content actually seems to be missing, so are sources claiming a 6MB ROM just incorrect, with the checksum also being misleading?
+	ROM_LOAD16_WORD_SWAP( "jakmk.bin", 0x000000, 0x400000, CRC(b7d7683e) SHA1(e54a020ee746d240267ef78bed7aea744351b421) )
+ROM_END
+
 // JAKKS Pacific Inc TV games
-CONS( 2004, jak_batm, 0, 0, batman, batman, jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "The Batman (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2008, jak_wall, 0, 0, walle,  walle,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Wall-E (JAKKS Pacific TV Game)",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, jak_batm, 0, 0, batman, batman, jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "The Batman (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, jak_wall, 0, 0, walle,  walle,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Wall-E (JAKKS Pacific TV Game)",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// you could link 2 pads of this together for 2 player mode as you could with WWE (feature not emulated)
+CONS( 2004, jak_mk,   0, 0, mk,     mk,     jakks_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Mortal Kombat (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
