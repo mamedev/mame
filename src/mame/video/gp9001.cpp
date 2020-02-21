@@ -34,7 +34,7 @@
         in from the left)
     -  Teki Paki tests video RAM from address 0 past SpriteRAM to $37ff.
         This seems to be a bug in Teki Paki's vram test routine !
-	-  Measure cycle usage / max usable cycle for sprite drawing
+    -  Measure cycle usage / max usable cycle for sprite drawing
 
 
 
