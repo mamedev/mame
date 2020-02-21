@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:cam900
 /***************************************************************************
 
     Sharp LZ8420M Z80 with Built-in RAM
