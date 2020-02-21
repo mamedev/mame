@@ -81,6 +81,7 @@ This was pointed out by Bart Puype
 #include "includes/psikyo.h"
 
 #include "cpu/z80/z80.h"
+#include "cpu/z80/lz8420m.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/2610intf.h"
@@ -1086,7 +1087,7 @@ void psikyo_state::gunbird(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::gunbird_map);
 	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq1_line_hold));
 
-	Z80(config, m_audiocpu, 4000000);  /* ! LZ8420M (Z80 core) ! */
+	LZ8420M(config, m_audiocpu, 4000000);  /* ! LZ8420M (Z80 core) ! */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &psikyo_state::gunbird_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &psikyo_state::gunbird_sound_io_map);
 
@@ -1170,7 +1171,7 @@ void psikyo_state::s1945(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::s1945_map);
 	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq1_line_hold));
 
-	Z80(config, m_audiocpu, 16_MHz_XTAL / 2);  /* ! LZ8420M (Z80 core) ! */
+	LZ8420M(config, m_audiocpu, 16_MHz_XTAL / 2);  /* ! LZ8420M (Z80 core) ! */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &psikyo_state::gunbird_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &psikyo_state::s1945_sound_io_map);
 
