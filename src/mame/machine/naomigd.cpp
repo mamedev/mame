@@ -512,8 +512,19 @@ WRITE32_MEMBER(idegdrom_device::ide_cs1_w)
 
 // The board
 
+static INPUT_PORTS_START(gdrom_board_ioports)
+	PORT_START("DEBUG ONLY")
+	PORT_DIPNAME(0x01, 0x00, "Full emulation") PORT_DIPLOCATION("DEBUG:1")
+	PORT_DIPSETTING(0x01, "Enabled")
+	PORT_DIPSETTING(0x00, "Disabled")
+	PORT_DIPNAME(0x02, 0x02, "Initialized") PORT_DIPLOCATION("DEBUG:2")
+	PORT_DIPSETTING(0x02, "Yes")
+	PORT_DIPSETTING(0x00, "No")
+INPUT_PORTS_END
+
 naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: naomi_board(mconfig, NAOMI_GDROM_BOARD, tag, owner, clock),
+	work_mode(0),
 	m_maincpu(*this, "dimmcpu"),
 	m_securitycpu(*this, "pic"),
 	m_i2c0(*this, "i2c_0"),
@@ -521,6 +532,7 @@ naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *
 	m_eeprom(*this, "eeprom"),
 	m_315_6154(*this, "pci:00.0"),
 	m_idegdrom(*this, "pci:01.0"),
+	m_debug_dipswitches(*this, "DEBUG ONLY"),
 	picdata(*this, finder_base::DUMMY_TAG),
 	dimm_command(0xffff),
 	dimm_offsetl(0xffff),
@@ -872,16 +884,6 @@ void naomi_gdrom_board::device_start()
 	uint64_t key;
 	uint8_t netpic = 0;
 
-
-	logerror("Work mode is %d\n", work_mode);
-	if (work_mode != 0)
-	{
-		dimm_command = 0;
-		dimm_offsetl = 0;
-		dimm_parameterl = 0;
-		dimm_parameterh = 0;
-	}
-
 	if(picdata) {
 		if(picdata.length() >= 0x4000) {
 			printf("Real PIC binary found\n");
@@ -907,7 +909,7 @@ void naomi_gdrom_board::device_start()
 			memcpy(name, picdata+33, 7);
 			memcpy(name+7, picdata+25, 7);
 
-			key =((uint64_t(picdata[0x31]) << 56) |
+			key = ((uint64_t(picdata[0x31]) << 56) |
 					(uint64_t(picdata[0x32]) << 48) |
 					(uint64_t(picdata[0x33]) << 40) |
 					(uint64_t(picdata[0x34]) << 32) |
@@ -977,10 +979,7 @@ void naomi_gdrom_board::device_start()
 			uint32_t file_rounded_size = (file_size + 2047) & -2048;
 			for (dimm_data_size = 4096; dimm_data_size < file_rounded_size; dimm_data_size <<= 1);
 			dimm_data = auto_alloc_array(machine(), uint8_t, dimm_data_size);
-			if (work_mode == 0)
-				dimm_des_data = dimm_data;
-			else
-				dimm_des_data = auto_alloc_array(machine(), uint8_t, dimm_data_size);
+			dimm_des_data = auto_alloc_array(machine(), uint8_t, dimm_data_size);
 			if (dimm_data_size != file_rounded_size)
 				memset(dimm_data + file_rounded_size, 0, dimm_data_size - file_rounded_size);
 
@@ -1020,11 +1019,43 @@ void naomi_gdrom_board::device_start()
 
 void naomi_gdrom_board::device_reset()
 {
+	int dips = m_debug_dipswitches->read();
+
 	naomi_board::device_reset();
 
-	dimm_cur_address = 0;
+	if (dips & 1)
+	{
+		if (dips & 2)
+			work_mode = 1; // real emulation, dimm ram contains valid game data
+		else
+			work_mode = 2; // real emulation, dimm ram not initialized
+	}
+	else
+		work_mode = 0; // default cartridge-like mode
+	logerror("Work mode is %d\n", work_mode);
 	if (work_mode != 0)
+	{
+		dimm_command = 0;
+		dimm_offsetl = 0;
+		dimm_parameterl = 0;
+		dimm_parameterh = 0;
 		m_315_6154->memory()->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data);
+		if (work_mode == 2) // invalidate dimm memory contents by setting the first 2048 bytes to 0
+			memset(dimm_des_data, 0, 2048);
+	}
+	else
+	{
+		m_maincpu->set_disable();
+		m_securitycpu->set_disable();
+		m_315_6154->memory()->unmap_readwrite(0x10000000, 0x10000000 + dimm_data_size - 1);
+	}
+
+	dimm_cur_address = 0;
+}
+
+ioport_constructor naomi_gdrom_board::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(gdrom_board_ioports);
 }
 
 void naomi_gdrom_board::board_setup_address(uint32_t address, bool is_dma)
@@ -1064,7 +1095,6 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &naomi_gdrom_board::sh4_map);
 	m_maincpu->set_addrmap(AS_IO, &naomi_gdrom_board::sh4_io_map);
 
-
 	PCI_ROOT(config, "pci", 0);
 	SEGA315_6154(config, m_315_6154, 0);
 	m_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_MEMORY, &naomi_gdrom_board::pci_map);
@@ -1080,11 +1110,6 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 	m_i2c1->set_e0(1);
 	m_i2c1->set_wc(1);
 	EEPROM_93C46_8BIT(config, m_eeprom, 0);
-	if (work_mode == 0)
-	{
-		m_maincpu->set_disable();
-		m_securitycpu->set_disable();
-	}
 }
 
 // DIMM firmwares:

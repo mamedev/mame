@@ -127,6 +127,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	virtual void board_setup_address(uint32_t address, bool is_dma) override;
 	virtual void board_get_buffer(uint8_t *&base, uint32_t &limit) override;
@@ -134,7 +135,7 @@ protected:
 
 private:
 	enum { FILENAME_LENGTH=24 };
-	const int work_mode = 0; // set to 1 and rebuild to enable the cpus and full dimm board emulation
+	int work_mode; // set it different from 0 to enable the cpus and full dimm board emulation
 
 	required_device<sh4_device> m_maincpu;
 	required_device<pic16c622_device> m_securitycpu;
@@ -143,6 +144,7 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<sega_315_6154_device> m_315_6154;
 	required_device<idegdrom_device> m_idegdrom;
+	required_ioport m_debug_dipswitches;
 
 	const char *image_tag;
 	optional_region_ptr<uint8_t> picdata;
