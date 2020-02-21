@@ -1,6 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, David Haywood
 
+// Mortal Kombat - attract demo almost always picked Johnny Cage vs. Johhny Cage until some unknown factor starts to randomize it
+//               - Scorpion's 'get over here' sounds don't decode well
+
 #include "emu.h"
 #include "includes/spg2xx.h"
 #include "machine/nvram.h"
@@ -18,7 +21,7 @@ public:
 	void mk(machine_config& config);
 
 private:
-	void mem_map_4m_mkram(address_map& map);
+	void mem_map_2m_mkram(address_map& map);
 	DECLARE_WRITE16_MEMBER(portc_w) override;
 };
 
@@ -113,7 +116,7 @@ void jakks_state::walle(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_state::mem_map_2m);
 }
 
-void jakks_state::mem_map_4m_mkram(address_map &map)
+void jakks_state::mem_map_2m_mkram(address_map &map)
 {
 	map(0x000000, 0x1fffff).bankr("cartbank");
 	map(0x3e0000, 0x3fffff).ram().share("nvram"); // backed up by the CR2032
@@ -125,7 +128,7 @@ void jakks_state::mk(machine_config &config)
 
 	spg2xx_base(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_state::mem_map_4m_mkram);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_state::mem_map_2m_mkram);
 
 	m_maincpu->porta_in().set_ioport("P1");
 	//m_maincpu->portb_in().set(FUNC(jakks_state::base_portb_r));
