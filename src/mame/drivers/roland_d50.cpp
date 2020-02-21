@@ -62,11 +62,9 @@ ROM_START(d50)
 	ROM_LOAD("d78312g-022_15179266.ic25", 0x0000, 0x2000, NO_DUMP) // 8-digit Roland part number not printed on IC
 	ROM_COPY("progrom", 0x0000, 0x0000, 0x2000)
 
-	ROM_REGION(0x40000, "pcma", 0)
-	ROM_LOAD("tc532000p-7469.ic30", 0x00000, 0x40000, NO_DUMP)
-
-	ROM_REGION(0x40000, "pcmb", 0)
-	ROM_LOAD("tc532000p-7470.ic29", 0x00000, 0x40000, NO_DUMP)
+	ROM_REGION(0x80000, "pcm", 0)
+	ROM_LOAD("tc532000p-7469.ic30", 0x00000, 0x40000, NO_DUMP) // A
+	ROM_LOAD("tc532000p-7470.ic29", 0x40000, 0x40000, NO_DUMP) // B
 ROM_END
 
 ROM_START(d50a)
@@ -78,11 +76,9 @@ ROM_START(d50a)
 	ROM_LOAD("d78312g-017_15179261.ic25", 0x0000, 0x2000, NO_DUMP) // not compatible with newer firmware
 	ROM_COPY("progrom", 0x0000, 0x0000, 0x2000)
 
-	ROM_REGION(0x40000, "pcma", 0)
-	ROM_LOAD("tc532000p-7469.ic30", 0x00000, 0x40000, NO_DUMP)
-
-	ROM_REGION(0x40000, "pcmb", 0)
-	ROM_LOAD("tc532000p-7470.ic29", 0x00000, 0x40000, NO_DUMP)
+	ROM_REGION(0x80000, "pcm", 0)
+	ROM_LOAD("tc532000p-7469.ic30", 0x00000, 0x40000, NO_DUMP) // A
+	ROM_LOAD("tc532000p-7470.ic29", 0x40000, 0x40000, NO_DUMP) // B
 ROM_END
 
 ROM_START(d550)
@@ -98,13 +94,11 @@ ROM_START(d550)
 	ROM_LOAD("d78312g-022_15179266.ic25", 0x0000, 0x2000, NO_DUMP)
 	ROM_COPY("progrom", 0x0000, 0x0000, 0x2000)
 
-	ROM_REGION(0x40000, "pcma", 0)
-	ROM_LOAD("tc532000p-7469.ic30", 0x00000, 0x40000, NO_DUMP)
-
-	ROM_REGION(0x40000, "pcmb", 0)
-	ROM_LOAD("tc532000p-7470.ic29", 0x00000, 0x40000, NO_DUMP)
+	ROM_REGION(0x80000, "pcm", 0)
+	ROM_LOAD("tc532000p-7469.ic30", 0x00000, 0x40000, NO_DUMP) // A
+	ROM_LOAD("tc532000p-7470.ic29", 0x40000, 0x40000, NO_DUMP) // B
 ROM_END
 
-SYST(1987, d50,  0,   0, d50, d50, roland_d50_state, empty_init, "Roland", "D-50 (Ver. 2.xx)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-SYST(1987, d50a, d50, 0, d50, d50, roland_d50_state, empty_init, "Roland", "D-50 (Ver. 1.xx)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-SYST(1987, d550, d50, 0, d50, d50, roland_d50_state, empty_init, "Roland", "D-550", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST(1987, d50,  0,   0, d50, d50, roland_d50_state, empty_init, "Roland", "D-50 Linear Synthesizer (Ver. 2.xx)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST(1987, d50a, d50, 0, d50, d50, roland_d50_state, empty_init, "Roland", "D-50 Linear Synthesizer (Ver. 1.xx)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST(1987, d550, d50, 0, d50, d50, roland_d50_state, empty_init, "Roland", "D-550 Linear Synthesizer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
