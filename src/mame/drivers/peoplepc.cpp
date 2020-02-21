@@ -105,9 +105,14 @@ MC6845_UPDATE_ROW(peoplepc_state::update_row)
 		}
 		else
 		{
-			uint8_t data = m_charram[(m_cvram[(ma + i) & 0x3fff] & 0x7f) * 32 + ra];
+			uint16_t data = m_cvram[(ma + i) & 0x3fff];
+			uint8_t chr = m_charram[(data & 0x7f) * 32 + ra];
+			if(data & 0x1000)
+				chr ^= 0xff;
+			if((data & 0x800) && (ra > 14))
+				chr = 0xff;
 			for(j = 0; j < 8; j++)
-				bitmap.pix32(y, (i * 8) + j) = palette[(data & (1 << j)) ? 1 : 0];
+				bitmap.pix32(y, (i * 8) + j) = palette[(chr & (1 << j)) ? 1 : 0];
 		}
 	}
 }

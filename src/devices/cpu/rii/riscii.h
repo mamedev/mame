@@ -193,6 +193,8 @@ protected:
 	u8 tr2c_r();
 	u8 sfcr_r();
 	void sfcr_w(u8 data);
+	void spht_reload();
+	TIMER_CALLBACK_MEMBER(speech_timer);
 	u8 addl_r();
 	void addl_w(u8 data);
 	u8 addm_r();
@@ -354,6 +356,7 @@ private:
 	u8 m_sphtcon;
 	u8 m_sphtrl;
 	u8 m_vocon;
+	emu_timer *m_speech_timer;
 
 	// execution sequencing
 	s32 m_icount;

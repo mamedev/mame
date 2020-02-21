@@ -206,6 +206,8 @@ void riscii_series_device::device_start()
 
 	set_icountptr(m_icount);
 
+	m_speech_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(riscii_series_device::speech_timer), this));
+
 	state_add<u32>(RII_PC, "PC", [this]() { return m_pc; }, [this](u32 pc) { debug_set_pc(pc); }).mask(m_pcmask);
 	state_add<u32>(STATE_GENPC, "GENPC", [this]() { return m_pc; }, [this](u32 pc) { debug_set_pc(pc); }).mask(m_pcmask).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_ppc).mask(m_pcmask).noshow();
@@ -357,6 +359,7 @@ void riscii_series_device::device_reset()
 	m_sphtcon = 0x00;
 	m_sphtrl = 0x00;
 	m_vocon = 0x07;
+	m_speech_timer->adjust(attotime::never);
 }
 
 void riscii_series_device::debug_set_pc(u32 pc)
@@ -898,6 +901,21 @@ void riscii_series_device::sfcr_w(u8 data)
 //  MUSIC/SPEECH SYNTHESIZER
 //**************************************************************************
 
+void riscii_series_device::spht_reload()
+{
+	unsigned sphtpsr_shift = ((m_sphtcon & 0xc0) >> 5) + 1;
+	m_speech_timer->adjust(clocks_to_attotime(((u16(m_sphtcon & 0x07) << 8 | m_sphtrl) + 1) << sphtpsr_shift));
+}
+
+TIMER_CALLBACK_MEMBER(riscii_series_device::speech_timer)
+{
+	// Speech timer interrupt
+	if (BIT(m_sphtcon, 4))
+		m_sphtcon |= 0x20;
+
+	spht_reload();
+}
+
 u8 riscii_series_device::addl_r()
 {
 	return m_add[BIT(m_sfcr, 2) ? 3 : m_sfcr & 0x03] & 0x0000ff;
@@ -958,7 +976,13 @@ u8 riscii_series_device::mtcon_sphtcon_r()
 void riscii_series_device::mtcon_sphtcon_w(u8 data)
 {
 	if (BIT(m_sfcr, 2))
-		m_sphtcon = data;
+	{
+		bool old_data = std::exchange(m_sphtcon, data);
+		if (BIT(data, 3) && !BIT(old_data, 3))
+			spht_reload();
+		else if (!BIT(data, 3))
+			m_speech_timer->adjust(attotime::never);
+	}
 	else
 		m_mtcon[m_sfcr & 0x03] = data;
 }
