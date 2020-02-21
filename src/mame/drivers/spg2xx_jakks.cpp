@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "includes/spg2xx.h"
+#include "machine/nvram.h"
 
 class jakks_state : public spg2xx_game_state
 {
@@ -63,7 +64,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mk )
 	PORT_START("P1")
-	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x001f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON7 )        PORT_PLAYER(1) PORT_NAME("Pause / Menu")
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON6 )        PORT_PLAYER(1) PORT_NAME("Block (alt)") // which one of these is actually connected to the button?
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON5 )        PORT_PLAYER(1) PORT_NAME("Block")
@@ -115,7 +116,7 @@ void jakks_state::walle(machine_config &config)
 void jakks_state::mem_map_4m_mkram(address_map &map)
 {
 	map(0x000000, 0x1fffff).bankr("cartbank");
-	map(0x3e0000, 0x3fffff).ram(); // is some of this battery backed by the CR2032, or is it the system area that gets backed up?
+	map(0x3e0000, 0x3fffff).ram().share("nvram"); // backed up by the CR2032
 }
 
 void jakks_state::mk(machine_config &config)
@@ -127,9 +128,10 @@ void jakks_state::mk(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_state::mem_map_4m_mkram);
 
 	m_maincpu->porta_in().set_ioport("P1");
+	//m_maincpu->portb_in().set(FUNC(jakks_state::base_portb_r));
 	m_maincpu->portc_in().set_ioport("P3");
 
-	// has a CR2032 battery to keep scores etc. not SEEPROM
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 }
 
 
