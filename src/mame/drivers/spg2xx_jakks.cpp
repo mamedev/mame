@@ -77,14 +77,14 @@ static INPUT_PORTS_START( mk )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
 
 	PORT_START("P3") // In addition to the "M/T" pad documented below, PCB also has "P/N" (PAL / NTSC) pad (not read?) and a "F/S" pad (also not read?)
-	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x1000, 0x1000, "Blood" ) // see code at 05EC30 - "M/T" (Mature / Teen?) pad on PCB, set at factory
-	PORT_DIPSETTING(      0x0000, "Disabled" )
-	PORT_DIPSETTING(      0x1000, "Enabled" )
-	PORT_BIT( 0x6000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x8000, 0x8000, "Link State" ) // see code at 05EA54
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0fff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_CONFNAME( 0x1000, 0x1000, "Blood" ) // see code at 05EC30 - "M/T" (Mature / Teen?) pad on PCB, set at factory
+	PORT_CONFSETTING(      0x0000, "Disabled" )
+	PORT_CONFSETTING(      0x1000, "Enabled" )
+	PORT_BIT( 0x6000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_CONFNAME( 0x8000, 0x8000, "Link State" ) // see code at 05EA54
+	PORT_CONFSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_CONFSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 void jakks_state::base_config(machine_config& config)
