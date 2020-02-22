@@ -139,6 +139,7 @@ CPUS["HPC"] = true
 --CPUS["CR16B"] = true
 CPUS["FR"] = true
 CPUS["UPD78K"] = true
+CPUS["KS0164"] = true
 
 --------------------------------------------------
 -- specify available sound cores

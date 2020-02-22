@@ -210,7 +210,7 @@ void xavix2_state::gpu_count_w(u16 data)
 		default:
 			for(u32 yy=0; yy<sy; yy++)
 				for(u32 xx=0; xx<sx; xx++)
-					m_sd[yy+y][xx+x] = 0x00000000;
+					m_sd[yy+y][xx+x] = 0xffff0000;
 			break;
 		}		
 	}
