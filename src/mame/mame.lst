@@ -1291,7 +1291,7 @@ dialog80                        // Ampex Dialogue 80
 
 @source:ampex210.cpp
 ampex210p                       //
-ampex230                        //
+ampex230p                       //
 
 @source:ampro.cpp
 ampro                           //
@@ -34494,7 +34494,7 @@ cm32p                           //
 
 @source:roland_d50.cpp
 d50                             //
-d50a                            //
+d50o                            //
 d550                            //
 
 @source:roland_d110.cpp
