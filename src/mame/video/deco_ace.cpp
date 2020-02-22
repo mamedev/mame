@@ -17,12 +17,14 @@
     Bytes 0x17(0x5c) to 0x1f(0x7c) - tilemap alpha control
 
     Boogie Wings:
-    Bytes 0x00 to 0x0f(0x1f) - object alpha control (if ((pix & 0x100) == 0))
-    Bytes 0x10(0x20) to 0x13(0x26) - another object alpha control?
-    Bytes 0x14(0x28) to 0x19(0x32) - fixed value 0x1c 0x18 0x14 0x10 0x0c 0x08. it controls explosion object's alpha?
-    Bytes 0x1a(0x34) to 0x1f(0x3f) - tilemap alpha control?
+    Bytes 0x00 to 0x0f(0x1f) - object alpha control per palette bank (if ((pix & 0x900) == 0))
+    Bytes 0x10(0x20) to 0x11(0x26) - object alpha control per palette bit 3 (if ((pix & 0x900) == 0x100))
+    Bytes 0x12(0x20) to 0x13(0x26) - object alpha control per palette bit 3 (if ((pix & 0x900) == 0x800))
+    Bytes 0x14(0x28) to 0x19(0x32) - object alpha control per pixel (if ((pix & 0x900) == 0x900))
+    Bytes 0x1a(0x34) to 0x1e(0x3c) - unused/unknown
+    Bytes 0x1f(0x3e) - 2nd tilemap chip, 'tilemap_1' alpha control, used at shadowing
 
-    0 = opaque, 0x10 = 50% transparent, 0x20 = fully transparent
+    0 = opaque, 0x10 = 50% transparent, 0x20 = fully transparent, 0x21/0x22/0x1000 = used,unknown
 
     Byte 0x00: ACEO000P0
                         P8
@@ -157,20 +159,20 @@ WRITE16_MEMBER( deco_ace_device::ace_w )
 
 void deco_ace_device::palette_update()
 {
-	uint8_t fadeptr=m_ace_ram[0x20] & 0xff;
-	uint8_t fadeptg=m_ace_ram[0x21] & 0xff;
-	uint8_t fadeptb=m_ace_ram[0x22] & 0xff;
-	uint8_t fadepsr=m_ace_ram[0x23] & 0xff;
-	uint8_t fadepsg=m_ace_ram[0x24] & 0xff;
-	uint8_t fadepsb=m_ace_ram[0x25] & 0xff;
+	int fadeptr=m_ace_ram[0x20] & 0xff;
+	int fadeptg=m_ace_ram[0x21] & 0xff;
+	int fadeptb=m_ace_ram[0x22] & 0xff;
+	int fadepsr=m_ace_ram[0x23] & 0xff;
+	int fadepsg=m_ace_ram[0x24] & 0xff;
+	int fadepsb=m_ace_ram[0x25] & 0xff;
 	uint16_t mode=m_ace_ram[0x26] & 0xffff;
 
 	for (int i = 0; i < 2048; i++)
 	{
 		/* Lerp palette entry to 'fadept' according to 'fadeps' */
-		uint8_t b = (m_paletteram_buffered[i] >>16) & 0xff;
-		uint8_t g = (m_paletteram_buffered[i] >> 8) & 0xff;
-		uint8_t r = (m_paletteram_buffered[i] >> 0) & 0xff;
+		int b = (m_paletteram_buffered[i] >>16) & 0xff;
+		int g = (m_paletteram_buffered[i] >> 8) & 0xff;
+		int r = (m_paletteram_buffered[i] >> 0) & 0xff;
 
 		if ((i>=m_palette_effect_min) && (i<=m_palette_effect_max))
 		{
@@ -179,9 +181,9 @@ void deco_ace_device::palette_update()
 				default:
 				case 0x1100: // multiplicative fade
 					/* Yeah, this should really be fixed point, I know */
-					b = (uint8_t)((float)b + (((float)fadeptb - (float)b) * (float)fadepsb/255.0f));
-					g = (uint8_t)((float)g + (((float)fadeptg - (float)g) * (float)fadepsg/255.0f));
-					r = (uint8_t)((float)r + (((float)fadeptr - (float)r) * (float)fadepsr/255.0f));
+					b = std::max<int>(0, std::min<int>(255, u8((b + (((fadeptb - b) * fadepsb) / 255)))));
+					g = std::max<int>(0, std::min<int>(255, u8((g + (((fadeptg - g) * fadepsg) / 255)))));
+					r = std::max<int>(0, std::min<int>(255, u8((r + (((fadeptr - r) * fadepsr) / 255)))));
 					break;
 				case 0x1000: // additive fade, correct?
 					b = std::min(b + fadepsb, 0xff);
@@ -221,7 +223,7 @@ uint8_t deco_ace_device::get_alpha(uint8_t val)
 	int alpha = m_ace_ram[val] & 0xff;
 	if (alpha > 0x20)
 	{
-		return 0x80; // TODO
+		return 0x80; // TODO : Special blending command? 0x21, 0x22, 0x1000 confirmed
 	}
 	else
 	{
@@ -241,7 +243,9 @@ uint8_t deco_ace_device::get_alpha(uint8_t val)
 
 uint16_t deco_ace_device::get_aceram(uint8_t val)
 {
-	val &= 0x3f;
+	if (val >= 0x28)
+		return 0;
+
 	return m_ace_ram[val];
 }
 

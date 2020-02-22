@@ -1122,6 +1122,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"citoh",
 		"coleco",
 		"compugraphic",
+		"consumenta",
 		"cromemco",
 		"comx",
 		"concept",
@@ -1268,6 +1269,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"sony",
 		"sord",
 		"special",
+		"stm",
 		"sun",
 		"svi",
 		"svision",
@@ -1996,6 +1998,11 @@ files {
 createMESSProjects(_target, _subtarget, "compugraphic")
 files {
 	MAME_DIR .. "src/mame/drivers/pwrview.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "consumenta")
+files {
+	MAME_DIR .. "src/mame/drivers/conchess.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "cromemco")
@@ -3501,6 +3508,11 @@ files {
 	MAME_DIR .. "src/mame/video/special.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "stm")
+files {
+	MAME_DIR .. "src/mame/drivers/pp.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "sun")
 files {
 	MAME_DIR .. "src/mame/drivers/sun1.cpp",
@@ -3810,6 +3822,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/spg110.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx_jakks.cpp",
+	MAME_DIR .. "src/mame/drivers/spg2xx_jakks_gkr.cpp",
+	MAME_DIR .. "src/mame/drivers/spg2xx_jakks_tvtouch.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx_zone.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx_zone_32bit.cpp",
 	MAME_DIR .. "src/mame/drivers/spg2xx_senario.cpp",

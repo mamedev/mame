@@ -275,7 +275,7 @@ void wd_fdc_device_base::command_end()
 	main_state = sub_state = IDLE;
 	motor_timeout = 0;
 
-	if (!drq) {
+	if(!drq && (status & S_BUSY)) {
 		status &= ~S_BUSY;
 		intrq = true;
 		if(!intrq_cb.isnull())
@@ -1339,7 +1339,7 @@ void wd_fdc_device_base::index_callback(floppy_image_device *floppy, int state)
 					floppy->mon_w(1);
 			}
 
-			if (head_control && motor_timeout >= 3)
+			if (head_control && motor_timeout >= hld_timeout)
 			{
 				hld = false;
 
@@ -2194,7 +2194,7 @@ void wd_fdc_device_base::drop_drq()
 		drq = false;
 		if(!drq_cb.isnull())
 			drq_cb(false);
-		if (main_state == IDLE) {
+		if(main_state == IDLE && (status & S_BUSY)) {
 			status &= ~S_BUSY;
 			intrq = true;
 			if(!intrq_cb.isnull())
@@ -2511,6 +2511,7 @@ fd1771_device::fd1771_device(const machine_config &mconfig, const char *tag, dev
 	side_control = false;
 	side_compare = false;
 	head_control = true;
+	hld_timeout = 3;
 	motor_control = false;
 	ready_hooked = true;
 }
@@ -2535,6 +2536,7 @@ fd1781_device::fd1781_device(const machine_config &mconfig, const char *tag, dev
 	side_control = false;
 	side_compare = false;
 	head_control = true;
+	hld_timeout = 3;
 	motor_control = false;
 	ready_hooked = true;
 }
@@ -2561,6 +2563,7 @@ fd1791_device::fd1791_device(const machine_config &mconfig, const char *tag, dev
 	side_control = false;
 	side_compare = true;
 	head_control = true;
+	hld_timeout = 15;
 	motor_control = false;
 	ready_hooked = true;
 }
@@ -2576,6 +2579,7 @@ fd1792_device::fd1792_device(const machine_config &mconfig, const char *tag, dev
 	side_control = false;
 	side_compare = true;
 	head_control = true;
+	hld_timeout = 15;
 	motor_control = false;
 	ready_hooked = true;
 }
@@ -2591,6 +2595,7 @@ fd1793_device::fd1793_device(const machine_config &mconfig, const char *tag, dev
 	side_control = false;
 	side_compare = true;
 	head_control = true;
+	hld_timeout = 15;
 	motor_control = false;
 	ready_hooked = true;
 }
@@ -2606,6 +2611,7 @@ kr1818vg93_device::kr1818vg93_device(const machine_config &mconfig, const char *
 	side_control = false;
 	side_compare = true;
 	head_control = true;
+	hld_timeout = 15;
 	motor_control = false;
 	ready_hooked = true;
 }
@@ -2621,6 +2627,7 @@ fd1794_device::fd1794_device(const machine_config &mconfig, const char *tag, dev
 	side_control = false;
 	side_compare = true;
 	head_control = true;
+	hld_timeout = 15;
 	motor_control = false;
 	ready_hooked = true;
 }
@@ -2636,6 +2643,7 @@ fd1795_device::fd1795_device(const machine_config &mconfig, const char *tag, dev
 	side_control = true;
 	side_compare = false;
 	head_control = true;
+	hld_timeout = 15;
 	motor_control = false;
 	ready_hooked = true;
 }
@@ -2659,6 +2667,7 @@ fd1797_device::fd1797_device(const machine_config &mconfig, const char *tag, dev
 	side_control = true;
 	side_compare = false;
 	head_control = true;
+	hld_timeout = 15;
 	motor_control = false;
 	ready_hooked = true;
 }
@@ -2682,6 +2691,7 @@ mb8866_device::mb8866_device(const machine_config &mconfig, const char *tag, dev
 	side_control = false;
 	side_compare = true;
 	head_control = true;
+	hld_timeout = 15;
 	motor_control = false;
 	ready_hooked = true;
 }
@@ -2697,6 +2707,7 @@ mb8876_device::mb8876_device(const machine_config &mconfig, const char *tag, dev
 	side_control = false;
 	side_compare = true;
 	head_control = true;
+	hld_timeout = 15;
 	motor_control = false;
 	ready_hooked = true;
 }
@@ -2712,6 +2723,7 @@ mb8877_device::mb8877_device(const machine_config &mconfig, const char *tag, dev
 	side_control = false;
 	side_compare = true;
 	head_control = true;
+	hld_timeout = 15;
 	motor_control = false;
 	ready_hooked = true;
 }
@@ -2727,6 +2739,7 @@ fd1761_device::fd1761_device(const machine_config &mconfig, const char *tag, dev
 	side_control = false;
 	side_compare = true;
 	head_control = true;
+	hld_timeout = 15;
 	motor_control = false;
 	ready_hooked = true;
 }
@@ -2742,6 +2755,7 @@ fd1763_device::fd1763_device(const machine_config &mconfig, const char *tag, dev
 	side_control = false;
 	side_compare = true;
 	head_control = true;
+	hld_timeout = 15;
 	motor_control = false;
 	ready_hooked = true;
 }
@@ -2757,6 +2771,7 @@ fd1765_device::fd1765_device(const machine_config &mconfig, const char *tag, dev
 	side_control = true;
 	side_compare = false;
 	head_control = true;
+	hld_timeout = 15;
 	motor_control = false;
 	ready_hooked = true;
 }
@@ -2780,6 +2795,7 @@ fd1767_device::fd1767_device(const machine_config &mconfig, const char *tag, dev
 	side_control = true;
 	side_compare = false;
 	head_control = true;
+	hld_timeout = 15;
 	motor_control = false;
 	ready_hooked = true;
 }
@@ -2803,6 +2819,7 @@ wd2791_device::wd2791_device(const machine_config &mconfig, const char *tag, dev
 	side_control = false;
 	side_compare = true;
 	head_control = true;
+	hld_timeout = 15;
 	motor_control = false;
 	ready_hooked = true;
 }
@@ -2818,6 +2835,7 @@ wd2793_device::wd2793_device(const machine_config &mconfig, const char *tag, dev
 	side_control = false;
 	side_compare = true;
 	head_control = true;
+	hld_timeout = 15;
 	motor_control = false;
 	ready_hooked = true;
 }
@@ -2833,6 +2851,7 @@ wd2795_device::wd2795_device(const machine_config &mconfig, const char *tag, dev
 	side_control = true;
 	side_compare = false;
 	head_control = true;
+	hld_timeout = 15;
 	motor_control = false;
 	ready_hooked = true;
 }
@@ -2856,6 +2875,7 @@ wd2797_device::wd2797_device(const machine_config &mconfig, const char *tag, dev
 	side_control = true;
 	side_compare = false;
 	head_control = true;
+	hld_timeout = 15;
 	motor_control = false;
 	ready_hooked = true;
 }
@@ -2879,6 +2899,7 @@ wd1770_device::wd1770_device(const machine_config &mconfig, const char *tag, dev
 	side_control = false;
 	side_compare = false;
 	head_control = false;
+	hld_timeout = 0;
 	motor_control = true;
 	ready_hooked = false;
 }
@@ -2896,6 +2917,7 @@ wd1772_device::wd1772_device(const machine_config &mconfig, const char *tag, dev
 	side_control = false;
 	side_compare = false;
 	head_control = false;
+	hld_timeout = 0;
 	motor_control = true;
 	ready_hooked = false;
 
@@ -2921,6 +2943,7 @@ wd1773_device::wd1773_device(const machine_config &mconfig, const char *tag, dev
 	side_control = false;
 	side_compare = true;
 	head_control = false;
+	hld_timeout = 0;
 	motor_control = false;
 	ready_hooked = true;
 }

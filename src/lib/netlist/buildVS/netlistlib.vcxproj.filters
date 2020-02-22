@@ -252,6 +252,15 @@
     <ClCompile Include="..\analog\nld_mosfet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\devices\nld_7442.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\devices\nld_7492.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\devices\nld_4006.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\nl_errstr.h">
@@ -619,6 +628,9 @@
     </ClInclude>
     <ClInclude Include="..\analog\nld_mosfet.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\devices\nld_7442.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

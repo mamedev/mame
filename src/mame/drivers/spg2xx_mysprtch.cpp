@@ -317,8 +317,6 @@ void spg2xx_game_mysprtch_state::mysprtch(machine_config& config)
 	m_maincpu->portc_in().set(FUNC(spg2xx_game_mysprtch_state::base_portc_r));
 
 	m_maincpu->porta_out().set(FUNC(spg2xx_game_mysprtch_state::porta_w));
-
-	m_maincpu->set_rowscroll_offset(8); // for Tennis
 }
 
 void spg2xx_game_mysprtch_state::mgt20in1(machine_config& config)

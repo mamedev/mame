@@ -75,7 +75,7 @@ offs_t upd78k2_disassembler::dasm_01xx(std::ostream &stream, u8 op2, offs_t pc, 
 				stream << "A,";
 			stream << "&";
 			if (BIT(op2, 4))
-				format_ix_disp16(stream, BIT(op2, 5) ? "B" : "A", opcodes.r16(pc + 2));
+				format_ix_base16(stream, BIT(op2, 5) ? "B" : "A", opcodes.r16(pc + 2));
 			else
 				format_ix_disp16(stream, BIT(op2, 5) ? "HL" : "DE", opcodes.r16(pc + 2));
 			if (BIT(op2, 7))
@@ -180,7 +180,7 @@ offs_t upd78k2_disassembler::dasm_0axx(std::ostream &stream, u8 op2, offs_t pc, 
 		if (!BIT(op2, 7))
 			stream << "A,";
 		if (BIT(op2, 4))
-			format_ix_disp16(stream, BIT(op2, 5) ? "B" : "A", opcodes.r16(pc + 2));
+			format_ix_base16(stream, BIT(op2, 5) ? "B" : "A", opcodes.r16(pc + 2));
 		else
 			format_ix_disp16(stream, BIT(op2, 5) ? "HL" : "DE", opcodes.r16(pc + 2));
 		if (BIT(op2, 7))

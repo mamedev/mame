@@ -92,7 +92,6 @@
 #include "machine/gen_latch.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "screen.h"
 #include "speaker.h"
 
 #define MAIN_XTAL XTAL(28'000'000)
@@ -118,7 +117,7 @@ WRITE16_MEMBER( boogwing_state::boogwing_protection_region_0_104_w )
 WRITE16_MEMBER( boogwing_state::priority_w )
 {
 	COMBINE_DATA(&m_priority);
-	m_deco_ace->set_palette_effect_max((m_priority & 0x8) ? 0x6ff : 0xfff);
+	m_deco_ace->set_palette_effect_max((m_priority & 0x8) ? 0x4ff : 0xfff);
 }
 
 
@@ -339,9 +338,9 @@ void boogwing_state::boogwing(machine_config &config)
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(MAIN_XTAL / 4, 442, 0, 320, 274, 8, 248); // same as robocop2(cninja.cpp)? verify this from real pcb.
-	screen.set_screen_update(FUNC(boogwing_state::screen_update_boogwing));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MAIN_XTAL / 4, 442, 0, 320, 274, 8, 248); // same as robocop2(cninja.cpp)? verify this from real pcb.
+	m_screen->set_screen_update(FUNC(boogwing_state::screen_update_boogwing));
 
 	GFXDECODE(config, "gfxdecode", m_deco_ace, gfx_boogwing);
 

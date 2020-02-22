@@ -160,6 +160,7 @@ Notes:
 
 void v1050_state::set_interrupt(int line, int state)
 {
+	line ^= 7;
 	if (state)
 	{
 		m_int_state |= (1 << line);

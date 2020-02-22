@@ -253,7 +253,7 @@ offs_t upd78k1_disassembler::dasm_0axx(std::ostream &stream, u8 op2, offs_t pc, 
 		util::stream_format(stream, "%-8s", BIT(op2, 3) ? s_alu_ops[op2 & 0x07] : BIT(op2, 2) ? "XCH" : "MOV");
 		if (!BIT(op2, 7))
 			stream << "A,";
-		format_ix_disp16(stream, BIT(op2, 5) ? "B" : "A", opcodes.r16(pc + 2));
+		format_ix_base16(stream, BIT(op2, 5) ? "B" : "A", opcodes.r16(pc + 2));
 		if (BIT(op2, 7))
 			stream << ",A";
 		return 4 | SUPPORTED;

@@ -1274,6 +1274,15 @@ VOL             - Volume pot              / These are on a small daughterboard t
 CN3             - 10 pin Speaker output & Extension serial connector
 3V_BATT         - Panasonic ML2020 3 Volt Coin Battery
 
+Sega 837-14624R
+later PCB revision from Sega, mostly same as above, notable differences:
+ROMEO           - SEGA 315-6434
+315-6232        - SEGA 315-6232A
+315-6258        - SEGA 315-6258A
+315-6267        - SEGA 315-6318A
+SH4             - Hitachi HD6417091T
+BIOS.IC48       - Amic A29L004A 4MBit flash ROM (TSOP40) labeled FPR-24363
+
 CN3 Pinout
 Pin     Function    I/O    Pin   Function  I/O
 ----------------------------------------------
@@ -3555,12 +3564,19 @@ Region byte encoding is as follows:
    First half is BIOS, second half is game settings and is blanked/reprogrammed by the BIOS if game cartridge exchange was detected
    area 0x1A000-0x1BFFF is write protected and contain 12 bytes of unit-specific unique information (probably serial number, manufacture date, etc),
    2 dumps included for reference
+   fpr-24363.ic48 - later Sega's boot ROM, have removed Sammy logo, only last 1/4 used (2 high address bits tied to Vcc).
 */
 #define AW_BIOS \
 	ROM_REGION64_LE( 0x200000, "awflash", 0) \
-	ROM_SYSTEM_BIOS( 0, "bios0", "Atomiswave BIOS" ) \
+	ROM_SYSTEM_BIOS( 0, "bios0", "Sammy BIOS" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios0.ic23", 0x000000, 0x020000, CRC(719b2b0b) SHA1(b4c1a26bc8906d5275eb28c701dff2b9365bcdfa) ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios1.ic23", 0x000000, 0x020000, CRC(d3e80a9f) SHA1(33024f9d51c04884c2b44ce146f340e7a857b959) )
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios1.ic23", 0x000000, 0x020000, CRC(d3e80a9f) SHA1(33024f9d51c04884c2b44ce146f340e7a857b959) ) \
+	ROM_SYSTEM_BIOS( 1, "bios1", "Sega BIOS" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "fpr-24363.ic48", 0x000000, 0x020000, CRC(82a105f0) SHA1(5128fe2ddcced77332bdcab691c09958051fa564) ) \
+	ROM_CONTINUE( 0x000000, 0x020000 ) \
+	ROM_CONTINUE( 0x000000, 0x020000 ) \
+	ROM_CONTINUE( 0x000000, 0x020000 )
+
 /* default EEPROM values, same works for all games */
 #define NAOMI_DEFAULT_EEPROM \
 	ROM_REGION16_BE( 0x80, "main_eeprom", 0 ) \

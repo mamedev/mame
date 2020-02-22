@@ -139,6 +139,7 @@ CPUS["HPC"] = true
 --CPUS["CR16B"] = true
 CPUS["FR"] = true
 CPUS["UPD78K"] = true
+CPUS["KS0164"] = true
 
 --------------------------------------------------
 -- specify available sound cores
@@ -5010,8 +5011,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/wms.cpp",
 	MAME_DIR .. "src/mame/drivers/xtom3d.cpp",
 	MAME_DIR .. "src/mame/drivers/xyonix.cpp",
-	MAME_DIR .. "src/mame/includes/xyonix.h",
-	MAME_DIR .. "src/mame/video/xyonix.cpp",
 	MAME_DIR .. "src/mame/drivers/yuvomz80.cpp",
 }
 end

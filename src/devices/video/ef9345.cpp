@@ -382,6 +382,7 @@ uint16_t ef9345_device::indexblock(uint16_t x, uint16_t y)
 {
 	uint16_t i = x, j;
 	j = (y == 0) ? ((m_tgs & 0x20) >> 5) : ((m_ror & 0x1f) + y - 1);
+	j = (j > 31) ? (j - 24) : j;
 
 	//right side of a double width character
 	if ((m_tgs & 0x80) == 0 && x > 0)

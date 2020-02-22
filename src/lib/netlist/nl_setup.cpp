@@ -893,7 +893,7 @@ void setup_t::resolve_inputs()
 	// after all other terminals were connected.
 
 	unsigned tries = m_netlist_params->m_max_link_loops();
-	while (!m_links.empty() > 0 && tries >  0)
+	while (!m_links.empty() && tries >  0)
 	{
 
 		for (auto li = m_links.begin(); li != m_links.end(); )
@@ -967,22 +967,16 @@ void setup_t::resolve_inputs()
 
 }
 
-void setup_t::register_dynamic_log_devices()
+void setup_t::register_dynamic_log_devices(const std::vector<pstring> &loglist)
 {
-	pstring env = plib::util::environment("NL_LOGS", "");
-
-	if (env != "")
+	log().debug("Creating dynamic logs ...");
+	for (const pstring &ll : loglist)
 	{
-		log().debug("Creating dynamic logs ...");
-		std::vector<pstring> loglist(plib::psplit(env, ":"));
-		for (const pstring &ll : loglist)
-		{
-			pstring name = "log_" + ll;
-			auto nc = factory().factory_by_name("LOG")->Create(m_nlstate.pool(), m_nlstate, name);
-			register_link(name + ".I", ll);
-			log().debug("    dynamic link {1}: <{2}>\n",ll, name);
-			m_nlstate.register_device(nc->name(), std::move(nc));
-		}
+		pstring name = "log_" + ll;
+		auto nc = factory().factory_by_name("LOG")->Create(m_nlstate.pool(), m_nlstate, name);
+		register_link(name + ".I", ll);
+		log().debug("    dynamic link {1}: <{2}>\n",ll, name);
+		m_nlstate.register_device(nc->name(), std::move(nc));
 	}
 }
 
@@ -1207,7 +1201,14 @@ void setup_t::delete_empty_nets()
 
 void setup_t::prepare_to_run()
 {
-	register_dynamic_log_devices();
+	pstring envlog = plib::util::environment("NL_LOGS", "");
+
+	if (envlog != "")
+	{
+		std::vector<pstring> loglist(plib::psplit(envlog, ":"));
+		register_dynamic_log_devices(loglist);
+	}
+
 
 	// make sure the solver and parameters are started first!
 

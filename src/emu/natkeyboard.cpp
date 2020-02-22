@@ -638,7 +638,7 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 				{
 					if (!(curshift & ~mask))
 					{
-						// fetch the code, ignoring 0 and shiters
+						// fetch the code, ignoring 0 and shifters
 						std::vector<char32_t> const codes = field.keyboard_codes(curshift);
 						for (char32_t code : codes)
 						{

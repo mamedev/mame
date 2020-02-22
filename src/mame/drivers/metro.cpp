@@ -650,7 +650,7 @@ void metro_state::msgogo_map(address_map &map)
 }
 
 /***************************************************************************
-                                Daitoride
+                       Daitoride and Puzzli (revision B)
 ***************************************************************************/
 
 void metro_state::daitorid_map(address_map &map)
@@ -1027,7 +1027,7 @@ void metro_state::skyalert_map(address_map &map)
 
 
 /***************************************************************************
-                                Pururun
+                        Pururun and Puzzli (revision A)
 ***************************************************************************/
 
 void metro_state::pururun_map(address_map &map)
@@ -3208,6 +3208,13 @@ void metro_state::puzzli(machine_config &config)
 	m_screen->screen_vblank().set_nop();
 }
 
+void metro_state::puzzlia(machine_config &config)
+{
+	puzzli(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::pururun_map);
+}
+
 void metro_state::dharma(machine_config &config)
 {
 	/* basic machine hardware */
@@ -5162,6 +5169,23 @@ ROM_START( puzzli )
 	ROM_LOAD( "pz_jb7.3g", 0x000000, 0x040000, CRC(b3aab610) SHA1(9bcf1f98e19a7e26b22e152313dfbd43c882f008) )
 ROM_END
 
+ROM_START( puzzlia )
+	ROM_REGION( 0x80000, "maincpu", 0 )        // 68000 Code
+	ROM_LOAD16_BYTE( "pz-ja-5.20e", 0x000000, 0x020000, CRC(4e162574) SHA1(808de335064d6483cfaf8548ba0b1b8769828ca8) )
+	ROM_LOAD16_BYTE( "pz-ja-6.20c", 0x000001, 0x020000, CRC(19210626) SHA1(d0d20dbe65cbe255f66526db6fc75d8c37d2a842) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )       // NEC78C10 Code
+	ROM_LOAD( "pz-ja-8.3i", 0x000000, 0x020000, CRC(fd492a57) SHA1(43699a4607d586827b771180fcd6581988173bed) )
+
+	ROM_REGION( 0x200000, "vdp2", 0 )   // Gfx + Data (Addressable by CPU & Blitter)
+	ROM_LOAD64_WORD( "pz-ja-2.14i", 0x000000, 0x080000, CRC(0c0997d4) SHA1(922d8553ef505f65238e5cc77b45861a80022d75) )
+	ROM_LOAD64_WORD( "pz-ja-4.18i", 0x000002, 0x080000, CRC(576bc5c2) SHA1(08c10e0a3356ee1f79b78eff92395d8b18e43485) )
+	ROM_LOAD64_WORD( "pz-ja-1.12i", 0x000004, 0x080000, CRC(29f01eb3) SHA1(1a56f0b8efb599ae4f3cd0a4f0b6a6152ea6b117) )
+	ROM_LOAD64_WORD( "pz-ja-3.16i", 0x000006, 0x080000, CRC(6753e282) SHA1(49d092543db34f2cb54697897790df12ca3eda74) )
+
+	ROM_REGION( 0x040000, "oki", 0 )    // Samples
+	ROM_LOAD( "pz-ja-7.3g", 0x000000, 0x040000, CRC(de285717) SHA1(040f999a640337716baa1c09ab0740f2d2ca09d2) )
+ROM_END
 
 /***************************************************************************
 
@@ -5692,7 +5716,8 @@ GAME( 1994, toride2j,  toride2g, toride2g,  toride2g,   metro_state, init_metro,
 GAME( 1994, gunmast,   0,        pururun,   gunmast,    metro_state, init_metro,    ROT0,   "Metro",                                           "Gun Master", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, daitorid,  0,        daitorid,  daitorid,   metro_state, init_metro,    ROT0,   "Metro",                                           "Daitoride", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, pururun,   0,        pururun,   pururun,    metro_state, init_metro,    ROT0,   "Metro / Banpresto",                               "Pururun", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, puzzli,    0,        puzzli,    puzzli,     metro_state, init_metro,    ROT0,   "Metro / Banpresto",                               "Puzzli",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, puzzli,    0,        puzzli,    puzzli,     metro_state, init_metro,    ROT0,   "Metro / Banpresto",                               "Puzzli (revision B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, puzzlia,   puzzli,   puzzlia,   puzzli,     metro_state, init_metro,    ROT0,   "Metro / Banpresto",                               "Puzzli (revision A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, 3kokushi,  0,        sankokushi,sankokushi, metro_state, init_karatour, ROT0,   "Mitchell",                                        "Sankokushi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // ? with additional gfx data scramble (probably MTR5260 based)

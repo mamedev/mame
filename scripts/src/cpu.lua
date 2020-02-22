@@ -2529,6 +2529,8 @@ if (CPUS["Z80"]~=null) then
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c015.h",
 		MAME_DIR .. "src/devices/cpu/z80/kl5c80a12.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/kl5c80a12.h",
+		MAME_DIR .. "src/devices/cpu/z80/lz8420m.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/lz8420m.h",
 	}
 end
 
@@ -3178,4 +3180,21 @@ end
 if (CPUS["ROMP"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/romp/rompdasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/romp/rompdasm.h")
+end
+
+--------------------------------------------------
+-- KS0164
+--@src/devices/cpu/ks0164/ks0164.h,CPUS["KS0164"] = true
+--------------------------------------------------
+
+if (CPUS["KS0164"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/ks0164/ks0164.cpp",
+		MAME_DIR .. "src/devices/cpu/ks0164/ks0164.h",
+	}
+end
+
+if (CPUS["KS0164"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ks0164/ks0164d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ks0164/ks0164d.h")
 end
