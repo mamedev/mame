@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Sterophonick
+// copyright-holders:Sterophonick, Phil Thomas
 /***************************************************************************
 
    Skeleton driver for Gigatron TTL Microcomputer
@@ -21,8 +21,9 @@ class gigatron_state : public driver_device
 {
 public:
 	gigatron_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_io_inputs(*this, "INPUTS")
 	{
 	}
 
@@ -38,6 +39,11 @@ private:
 
 	void prog_map(address_map &map);
 	void data_map(address_map &map);
+	
+	void blinkenlights();
+	uint16_t fetch_outx();
+	
+	uint16_t lights_changed;
 
 	DECLARE_READ8_MEMBER(gigatron_random)
 	{
@@ -45,6 +51,7 @@ private:
 	}
 
 	required_device<cpu_device> m_maincpu;
+	required_ioport m_io_inputs;
 };
 
 uint32_t gigatron_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -59,7 +66,7 @@ void gigatron_state::prog_map(address_map &map)
 
 void gigatron_state::data_map(address_map &map)
 {
-	map(0x0000, 0x7fff).ram();
+	map(0x3fff, 0x20000).ram();
 }
 
 void gigatron_state::machine_start()
@@ -70,7 +77,27 @@ void gigatron_state::machine_reset()
 {
 }
 
+uint16_t gigatron_state::fetch_outx()
+{
+	return 0;
+}
+
+void gigatron_state::blinkenlights()
+{
+	uint16_t light = fetch_outx() & 0xF;
+	lights_changed ^= light;
+}
+
 static INPUT_PORTS_START(gigatron)
+	PORT_START("INPUTS")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1) // START
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SELECT ) PORT_PLAYER(1)    // SELECT
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("B Button") PORT_PLAYER(1)    // B Button
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("A Button") PORT_PLAYER(1)    // A Button
 INPUT_PORTS_END
 
 void gigatron_state::gigatron(machine_config &config)
@@ -87,7 +114,7 @@ void gigatron_state::gigatron(machine_config &config)
 	screen.set_screen_update(FUNC(gigatron_state::screen_update));
 
 	/* sound hardware */
-	//SPEAKER(config, "mono").front_center();
+	SPEAKER(config, "mono").front_center();
 }
 
 ROM_START( gigatron )
