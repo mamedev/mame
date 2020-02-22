@@ -514,12 +514,12 @@ WRITE32_MEMBER(idegdrom_device::ide_cs1_w)
 
 static INPUT_PORTS_START(gdrom_board_ioports)
 	PORT_START("DEBUG ONLY")
-	PORT_DIPNAME(0x01, 0x00, "Full emulation") PORT_DIPLOCATION("DEBUG:1")
-	PORT_DIPSETTING(0x01, "Enabled")
-	PORT_DIPSETTING(0x00, "Disabled")
-	PORT_DIPNAME(0x02, 0x02, "Initialized") PORT_DIPLOCATION("DEBUG:2")
-	PORT_DIPSETTING(0x02, "Yes")
-	PORT_DIPSETTING(0x00, "No")
+	PORT_CONFNAME(0x01, 0x00, "Full emulation")
+	PORT_CONFSETTING(0x01, "Enabled")
+	PORT_CONFSETTING(0x00, "Disabled")
+	PORT_CONFNAME(0x02, 0x02, "Initialized")
+	PORT_CONFSETTING(0x02, "Yes")
+	PORT_CONFSETTING(0x00, "No")
 INPUT_PORTS_END
 
 naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
