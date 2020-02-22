@@ -154,7 +154,7 @@ offs_t upd78k3_disassembler::dasm_01xx(std::ostream &stream, u8 op2, offs_t pc, 
 		util::stream_format(stream, "%-8s", s_16bit_ops[op2 & 0x03]);
 		format_sfrp(stream, opcodes.r8(pc + 2));
 		stream << ",";
-		format_imm16(stream, opcodes.r8(pc + 3));
+		format_imm16(stream, opcodes.r16(pc + 3));
 		return 5 | SUPPORTED;
 	}
 	else if (op2 == 0x1b)
@@ -177,7 +177,7 @@ offs_t upd78k3_disassembler::dasm_01xx(std::ostream &stream, u8 op2, offs_t pc, 
 	}
 	else if ((op2 & 0xf8) == 0x68)
 	{
-		util::stream_format(stream, "%-8sA,", s_alu_ops[op2 & 0x07]);
+		util::stream_format(stream, "%-8s", s_alu_ops[op2 & 0x07]);
 		format_sfr(stream, opcodes.r8(pc + 2));
 		stream << ",";
 		format_imm8(stream, opcodes.r8(pc + 3));
