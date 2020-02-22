@@ -25,7 +25,8 @@ class gigatron_cpu_device :  public cpu_device
 public:
 	// construction/destruction
 	gigatron_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
+	uint16_t read_outx() const { return m_outx; }
+	
 protected:
 	// device-level overrides
 	virtual void device_start() override;
