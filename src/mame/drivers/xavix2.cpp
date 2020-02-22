@@ -17,6 +17,7 @@
 #include "softlist.h"
 #include "speaker.h"
 #include "cpu/xavix2/xavix2.h"
+#include "machine/i2cmem.h"
 
 class xavix2_state : public driver_device
 {
@@ -25,6 +26,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
+		, m_i2cmem(*this, "i2cmem")
 	{ }
 
 	void xavix2(machine_config &config);
@@ -37,6 +39,7 @@ private:
 
 	required_device<xavix2_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	required_device<i2c_24c08_device> m_i2cmem;
 
 	u32 m_dma_src;
 	u16 m_dma_dst;
@@ -319,12 +322,17 @@ u16 xavix2_state::port0_ddr_r()
 void xavix2_state::port0_w(u16 data)
 {
 	m_port0_data = data;
-	logerror("port0 %04x\n", data);
+	m_i2cmem->write_sda(data & 0x20);
+	m_i2cmem->write_scl(data & 0x10);
+	logerror("port0_w %04x\n", data);
 }
 
 u16 xavix2_state::port0_r()
 {
-	return m_port0_data;
+	// Slightly hacky, should take ddr into account
+	u16 data = m_port0_data & (m_i2cmem->read_sda() ? ~0x00 : ~0x20);
+	logerror("port0_r %04x\n", data);
+	return data;
 }
 
 /*
@@ -438,6 +446,8 @@ void xavix2_state::xavix2(machine_config &config)
 	m_screen->set_screen_update(FUNC(xavix2_state::screen_update));
 	m_screen->set_size(640, 400);
 	m_screen->set_visarea(0, 639, 0, 399);
+
+	I2C_24C08(config, m_i2cmem);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
