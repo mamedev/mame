@@ -19,6 +19,9 @@
 #include "riscii.h"
 #include "riidasm.h"
 
+#define LOG_TBRD (1 << 1U)
+#include "logmacro.h"
+
 // device type definitions
 DEFINE_DEVICE_TYPE(EPG3231, epg3231_device, "epg3231", "Elan ePG3231")
 
@@ -57,7 +60,7 @@ std::unique_ptr<util::disasm_interface> epg3231_device::create_disassembler()
 	return std::make_unique<epg3231_disassembler>();
 }
 
-riscii_series_device::riscii_series_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, unsigned addrbits, unsigned pcbits, u32 datastart, unsigned bankbits, u8 maxbank, u8 post_id_mask, address_map_constructor regs)
+riscii_series_device::riscii_series_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, unsigned addrbits, unsigned pcbits, unsigned bankbits, u8 maxbank, u8 post_id_mask, address_map_constructor regs)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, addrbits, -1)
 	, m_regs_config("register", ENDIANNESS_LITTLE, 8, 8 + bankbits, 0, regs)
@@ -68,8 +71,7 @@ riscii_series_device::riscii_series_device(const machine_config &mconfig, device
 	, m_port_in_cb(*this)
 	, m_port_out_cb(*this)
 	, m_pcmask((1 << pcbits) - 1)
-	, m_datastart(datastart)
-	, m_tbptmask(((1 << (addrbits + 1)) - 1) | (datastart != 0 ? 0x800000 : 0))
+	, m_tbptmask(((1 << (addrbits + 1)) - 1) | 0x800000)
 	, m_bankmask((1 << bankbits) - 1)
 	, m_maxbank(maxbank)
 	, m_post_id_mask(post_id_mask)
@@ -175,7 +177,7 @@ void epg3231_device::regs_map(address_map &map)
 }
 
 epg3231_device::epg3231_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: riscii_series_device(mconfig, EPG3231, tag, owner, clock, 22, 18, 0x40000, 5, 0x1f, 0xbb,
+	: riscii_series_device(mconfig, EPG3231, tag, owner, clock, 22, 18, 5, 0x1f, 0xbb,
 		address_map_constructor(FUNC(epg3231_device::regs_map), this))
 {
 }
@@ -1140,8 +1142,8 @@ void riscii_series_device::execute_move(u8 dstreg, u8 srcreg)
 void riscii_series_device::execute_add(u8 reg, bool a, bool c)
 {
 	u16 addr = get_banked_address(reg);
-	s8 data = m_regs->read_byte(addr);
-	s16 tmp = s16(data) + s8(m_acc) + (c ? m_status & 0x01 : 0);
+	u8 data = m_regs->read_byte(addr);
+	s16 tmp = s16(s8(data)) + s8(m_acc) + (c ? m_status & 0x01 : 0);
 	bool cy = u16(data) + m_acc + (c ? m_status & 0x01 : 0) >= 0x100;
 	bool dc = (data & 0x0f) + (m_acc & 0x0f) + (c ? m_status & 0x01 : 0) >= 0x10;
 	if (a)
@@ -1163,9 +1165,9 @@ void riscii_series_device::execute_add(u8 reg, bool a, bool c)
 void riscii_series_device::execute_sub(u8 reg, bool a, bool c)
 {
 	u16 addr = get_banked_address(reg);
-	s8 data = m_regs->read_byte(addr);
-	s16 tmp = s16(data) - s8(m_acc) - (c ? ~m_status & 0x01 : 0);
-	bool cy = u8(data) >= m_acc + (c ? m_status & 0x01 : 0); // borrow is inverted
+	u8 data = m_regs->read_byte(addr);
+	s16 tmp = s16(s8(data)) - s8(m_acc) - (c ? ~m_status & 0x01 : 0);
+	bool cy = u16(data) >= m_acc + (c ? m_status & 0x01 : 0); // borrow is inverted
 	bool dc = (data & 0x0f) >= (m_acc & 0x0f) + (c ? ~m_status & 0x01 : 0);
 	if (a)
 		acc_w(tmp & 0xff);
@@ -1502,7 +1504,7 @@ void riscii_series_device::execute_inc(u8 reg, bool a)
 void riscii_series_device::execute_dec(u8 reg, bool a)
 {
 	u16 addr = get_banked_address(reg);
-	u16 tmp = (u16(m_regs->read_byte(addr)) - 1) & 0x1ff;
+	u16 tmp = (u16(m_regs->read_byte(addr)) + 0xff) & 0x1ff;
 	if (a)
 		acc_w(tmp & 0xff);
 	else
@@ -1833,15 +1835,16 @@ void riscii_series_device::execute_tbrd(u32 ptr)
 {
 	u16 addr = get_banked_address(m_curreg);
 	u32 memaddr = (ptr & 0x7ffffe) >> 1;
-	if (BIT(ptr, 23))
-		memaddr += m_datastart;
-	else
+	if (!BIT(ptr, 23))
 		memaddr &= m_pcmask;
 	u16 data = m_program->read_word(memaddr);
 	if (BIT(ptr, 0))
-		m_regs->write_byte(addr, data >> 8);
+		data >>= 8;
 	else
-		m_regs->write_byte(addr, data);
+		data &= 0x00ff;
+	LOGMASKED(LOG_TBRD, "%05X: TBRD(%06Xh) = %02Xh -> %02X:%02Xh\n", m_ppc, ptr, data, addr >> 8, addr & 0x00ff);
+	m_regs->write_byte(addr, data);
+
 	if (m_repeat != 0)
 		--m_repeat;
 	else

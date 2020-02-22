@@ -80,7 +80,7 @@ public:
 	auto out_portk_cb() { return m_port_out_cb[9].bind(); }
 
 protected:
-	riscii_series_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, unsigned addrbits, unsigned pcbits, u32 datastart, unsigned bankbits, u8 maxbank, u8 post_id_mask, address_map_constructor regs);
+	riscii_series_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, unsigned addrbits, unsigned pcbits, unsigned bankbits, u8 maxbank, u8 post_id_mask, address_map_constructor regs);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -298,7 +298,6 @@ private:
 
 	// model-specific parameters
 	const u32 m_pcmask;
-	const u32 m_datastart;
 	const u32 m_tbptmask;
 	const u8 m_bankmask;
 	const u8 m_maxbank;
