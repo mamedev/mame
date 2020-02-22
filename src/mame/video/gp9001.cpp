@@ -638,7 +638,7 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 
 	for (int offs = 0; offs < (m_spriteram->bytes() / 2); offs += 4)
 	{
-		clk += 8;
+		clk += 8; // 8 cycle per each sprite
 		if (clk > clk_max)
 			return;
 
@@ -719,7 +719,7 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 				else       sy = sy_base + dim_y;
 				for (int dim_x = 0; dim_x < sprite_sizex; dim_x += 8)
 				{
-					clk += 64;
+					clk += 64; // 64? cycle per each tile
 					if (clk > clk_max)
 						return;
 
