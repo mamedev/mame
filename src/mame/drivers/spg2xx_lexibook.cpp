@@ -5,17 +5,31 @@
 #include "includes/spg2xx.h"
 
 
-class spg2xx_lexiseal_game_state : public spg2xx_game_state
+class spg2xx_lexizeus_game_state : public spg2xx_game_state
 {
 public:
-	spg2xx_lexiseal_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+	spg2xx_lexizeus_game_state(const machine_config &mconfig, device_type type, const char *tag) :
 		spg2xx_game_state(mconfig, type, tag)
 	{ }
 
-	void lexiseal(machine_config& config);
 	void lexizeus(machine_config &config);
 
 	void init_zeus();
+
+protected:
+	//virtual void machine_start() override;
+	//virtual void machine_reset() override;
+};
+
+
+class spg2xx_lexiseal_game_state : public spg2xx_lexizeus_game_state
+{
+public:
+	spg2xx_lexiseal_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_lexizeus_game_state(mconfig, type, tag)
+	{ }
+
+	void lexiseal(machine_config& config);
 
 protected:
 	//virtual void machine_start() override;
@@ -208,7 +222,7 @@ void spg2xx_lexiseal_game_state::lexiseal(machine_config &config)
 	m_maincpu->portc_in().set_ioport("P3");
 }
 
-void spg2xx_lexiseal_game_state::lexizeus(machine_config &config)
+void spg2xx_lexizeus_game_state::lexizeus(machine_config &config)
 {
 	non_spg_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_lexiseal_game_state::mem_map_4m);
@@ -217,7 +231,7 @@ void spg2xx_lexiseal_game_state::lexizeus(machine_config &config)
 	m_maincpu->portc_in().set_ioport("P3");
 }
 
-void spg2xx_lexiseal_game_state::init_zeus()
+void spg2xx_lexizeus_game_state::init_zeus()
 {
 	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
@@ -316,7 +330,7 @@ ROM_END
 
 // these all have the same ROM scrambling
 
-CONS( 200?, lexizeus,    0,     0,        lexizeus,     lexizeus, spg2xx_lexiseal_game_state, init_zeus, "Lexibook", "Zeus IG900 20-in-1 (US?)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad sound and some corrupt bg tilemap entries in Tiger Rescue, verify ROM data (same game runs in Zone 60 without issue)
+CONS( 200?, lexizeus,    0,     0,        lexizeus,     lexizeus, spg2xx_lexizeus_game_state, init_zeus, "Lexibook", "Zeus IG900 20-in-1 (US?)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad sound and some corrupt bg tilemap entries in Tiger Rescue, verify ROM data (same game runs in Zone 60 without issue)
 CONS( 200?, lexiseal,    0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Lexibook / Sit Up Limited", "Seal 50-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // also has bad sound in Tiger Rescue, but no corrupt tilemap
 CONS( 200?, discpal,     0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Performance Designed Products / Disney / Jungle Soft", "Disney Game It! Classic Pals",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // there was also a Game It! Princess Pals
