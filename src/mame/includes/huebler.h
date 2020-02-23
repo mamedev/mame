@@ -17,7 +17,7 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/z80pio.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/z80ctc.h"
 #include "emupal.h"
 
@@ -49,7 +49,7 @@ protected:
 private:
 	required_device<z80_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
-	required_device<z80dart_device> m_sio;
+	required_device<z80sio_device> m_sio;
 	required_device<palette_device> m_palette;
 	required_memory_region m_kb_rom;
 	required_memory_region m_char_rom;

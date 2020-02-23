@@ -19,7 +19,7 @@
 #include "machine/x820kb.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "sound/spkrdev.h"
 #include "sound/beep.h"
 #include "imagedev/floppy.h"
@@ -101,7 +101,7 @@ protected:
 	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_kbpio;
 	required_device<z80ctc_device> m_ctc;
-	required_device<z80sio0_device> m_sio;
+	required_device<z80sio_device> m_sio;
 	required_device<wd_fdc_device_base> m_fdc;
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;

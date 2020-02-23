@@ -796,7 +796,7 @@ void mcr_nflfoot_state::ipu_91695_portmap(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x03).mirror(0xe0).rw(m_ipu_pio0, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0x04, 0x07).mirror(0xe0).rw(m_ipu_sio, FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
+	map(0x04, 0x07).mirror(0xe0).rw(m_ipu_sio, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x08, 0x0b).mirror(0xe0).rw(m_ipu_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0c, 0x0f).mirror(0xe0).rw(m_ipu_pio1, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x10, 0x13).mirror(0xe0).w(FUNC(mcr_nflfoot_state::ipu_laserdisk_w));
@@ -1891,7 +1891,7 @@ void mcr_nflfoot_state::mcr_91490_ipu(machine_config &config)
 	Z80PIO(config, m_ipu_pio1, 7372800/2);
 	m_ipu_pio1->out_int_callback().set_inputline(m_ipu, INPUT_LINE_IRQ0);
 
-	Z80SIO0(config, m_ipu_sio, 7372800/2);
+	Z80SIO(config, m_ipu_sio, 7372800/2); // Z8440BB1
 	m_ipu_sio->out_int_callback().set_inputline(m_ipu, INPUT_LINE_IRQ0);
 	m_ipu_sio->out_txda_callback().set(FUNC(mcr_nflfoot_state::sio_txda_w));
 	m_ipu_sio->out_txdb_callback().set(FUNC(mcr_nflfoot_state::sio_txdb_w));

@@ -14,7 +14,7 @@
 
 #include "cpu/i86/i186.h"
 #include "cpu/mcs51/mcs51.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/wd_fdc.h"
 #include "bus/scsi/scsi.h"
 #include "machine/6522via.h"
@@ -106,7 +106,7 @@ private:
 	required_device<input_buffer_device> m_scsi_data_in;
 	required_device<output_latch_device> m_scsi_ctrl_out;
 	required_device<wd2793_device> m_fdc;
-	required_device<z80sio2_device> m_z80sio;
+	required_device<z80sio_device> m_z80sio;
 	required_device<screen_device> m_screen;
 	required_ioport m_io_config;
 	required_ioport m_io_joystick0;

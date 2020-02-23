@@ -181,7 +181,7 @@ void xerox820_state::xerox820_mem(address_map &map)
 void xerox820_state::xerox820_io(address_map &map)
 {
 	map(0x00, 0x00).mirror(0xff03).w(COM8116_TAG, FUNC(com8116_device::str_w));
-	map(0x04, 0x07).mirror(0xff00).rw(m_sio, FUNC(z80sio0_device::ba_cd_r), FUNC(z80sio0_device::ba_cd_w));
+	map(0x04, 0x07).mirror(0xff00).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x08, 0x0b).mirror(0xff00).rw(Z80PIO_GP_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x0c, 0x0c).mirror(0xff03).w(COM8116_TAG, FUNC(com8116_device::stt_w));
 	map(0x10, 0x13).mirror(0xff00).rw(FUNC(xerox820_state::fdc_r), FUNC(xerox820_state::fdc_w));
@@ -639,7 +639,7 @@ void xerox820_state::xerox820(machine_config &config)
 	FLOPPY_CONNECTOR(config, FD1771_TAG":0", xerox820_floppies, "sa400l", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, FD1771_TAG":1", xerox820_floppies, "sa400l", floppy_image_device::default_floppy_formats);
 
-	Z80SIO0(config, m_sio, 20_MHz_XTAL / 8);
+	Z80SIO(config, m_sio, 20_MHz_XTAL / 8); // MK3884 (SIO/0)
 	m_sio->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
 	m_sio->out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
 	m_sio->out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
@@ -649,15 +649,15 @@ void xerox820_state::xerox820(machine_config &config)
 	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
-	rs232a.rxd_handler().set(m_sio, FUNC(z80sio0_device::rxa_w));
+	rs232a.rxd_handler().set(m_sio, FUNC(z80sio_device::rxa_w));
 
 	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
-	rs232b.rxd_handler().set(m_sio, FUNC(z80sio0_device::rxb_w));
+	rs232b.rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
 
 	com8116_device &dbrg(COM8116(config, COM8116_TAG, 5.0688_MHz_XTAL));
-	dbrg.fr_handler().set(m_sio, FUNC(z80dart_device::rxca_w));
-	dbrg.fr_handler().append(m_sio, FUNC(z80dart_device::txca_w));
-	dbrg.ft_handler().set(m_sio, FUNC(z80dart_device::rxtxcb_w));
+	dbrg.fr_handler().set(m_sio, FUNC(z80sio_device::rxca_w));
+	dbrg.fr_handler().append(m_sio, FUNC(z80sio_device::txca_w));
+	dbrg.ft_handler().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
 
 	XEROX_820_KEYBOARD(config, m_kb, 0);
 	m_kb->kbstb_wr_callback().set(m_kbpio, FUNC(z80pio_device::strobe_b));
@@ -728,7 +728,7 @@ void xerox820ii_state::xerox820ii(machine_config &config)
 	FLOPPY_CONNECTOR(config, FD1797_TAG":0", xerox820_floppies, "sa450", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, FD1797_TAG":1", xerox820_floppies, "sa450", floppy_image_device::default_floppy_formats);
 
-	Z80SIO0(config, m_sio, 16_MHz_XTAL / 4);
+	Z80SIO(config, m_sio, 16_MHz_XTAL / 4); // MK3884 (SIO/0)
 	m_sio->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
 	m_sio->out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
 	m_sio->out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
@@ -738,15 +738,15 @@ void xerox820ii_state::xerox820ii(machine_config &config)
 	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
-	rs232a.rxd_handler().set(m_sio, FUNC(z80sio0_device::rxa_w));
+	rs232a.rxd_handler().set(m_sio, FUNC(z80sio_device::rxa_w));
 
 	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
-	rs232b.rxd_handler().set(m_sio, FUNC(z80sio0_device::rxb_w));
+	rs232b.rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
 
 	com8116_device &dbrg(COM8116(config, COM8116_TAG, 5.0688_MHz_XTAL));
-	dbrg.fr_handler().set(m_sio, FUNC(z80dart_device::rxca_w));
-	dbrg.fr_handler().append(m_sio, FUNC(z80dart_device::txca_w));
-	dbrg.ft_handler().set(m_sio, FUNC(z80dart_device::rxtxcb_w));
+	dbrg.fr_handler().set(m_sio, FUNC(z80sio_device::rxca_w));
+	dbrg.fr_handler().append(m_sio, FUNC(z80sio_device::txca_w));
+	dbrg.ft_handler().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
 
 	XEROX_820_KEYBOARD(config, m_kb, 0);
 	m_kb->kbstb_wr_callback().set(m_kbpio, FUNC(z80pio_device::strobe_b));

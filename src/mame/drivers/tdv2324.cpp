@@ -28,7 +28,7 @@
     *40-pin: P8085AH-2, F4265030, C INTEL '80 (cpus, there are 2 of these)
     *28-pin: JAPAN 8442, 00009SS0, HN4827128G-25 (eprom, sticker: "962107")
     *22-pin: ER3400, GI 8401HHA (EAROM)
-    *  -pin: MOSTEK C 8424, MK3887N-4 (Z80 Serial I/O Controller)
+    *  -pin: MOSTEK C 8424, MK3887N-4 (Z80-SIO/2 Serial I/O Controller)
     *20-pin: (pal, sticker: "961420 0")
     *24-pin: D2716, L3263271, INTEL '77 (eprom, sticker: "962058 1")
     *3 tiny 16-pins which look socketed (proms)
@@ -158,7 +158,7 @@ void tdv2324_state::tdv2324_io(address_map &map)
 //  map(0xe2, 0xe2).w(FUNC(tdv2324_state::tdv2324_main_io_e2)); console output
 	map(0xe6, 0xe6).r(FUNC(tdv2324_state::tdv2324_main_io_e6));
 //  map(0x, 0x).rw(P8253_5_0_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-//  map(0x, 0x).rw(MK3887N4_TAG, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
+//  map(0x, 0x).rw(MK3887N4_TAG, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 //  map(0x, 0x).rw(P8259A_TAG, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 }
 
@@ -291,13 +291,13 @@ void tdv2324_state::tdv2324(machine_config &config)
 	TMS9927(config, m_tms, 25.39836_MHz_XTAL / 8).set_char_width(8);
 
 	// devices
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 
-	PIT8253(config, m_pit0, 0);
+	PIT8253(config, m_pit0);
 
-	PIT8253(config, m_pit1, 0);
+	PIT8253(config, m_pit1);
 
-	Z80SIO2(config, MK3887N4_TAG, 8000000/2);
+	Z80SIO(config, MK3887N4_TAG, 8000000/2);
 
 	FD1797(config, FD1797PL02_TAG, 8000000/4);
 	FLOPPY_CONNECTOR(config, FD1797PL02_TAG":0", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats);

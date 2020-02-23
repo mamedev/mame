@@ -13,7 +13,10 @@
     check that an operation is invalid because of package type but relies
     on the software to be adapated for the particular version.
 
-    Package:                DIP40  SIO/0, SIO/1, SIO/2, SIO/9
+    Package:                DIP40  SIO/0 (RxCB and TxCB share one pin)
+                            DIP40  SIO/1 (no DTRB pin)
+                            DIP40  SIO/2 (no SYNCB pin)
+                            DIP40  SIO/9 (channel B is nonfunctional)
                             QFP44  SIO/3
                             PLCC44 SIO/4
     -------------------------------------------------------------------

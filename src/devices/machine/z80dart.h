@@ -3,7 +3,6 @@
 /***************************************************************************
 
     Z80-DART Dual Asynchronous Receiver/Transmitter emulation
-    Z80-SIO/0/1/2/3/4 Serial Input/Output Controller emulation
 
 ****************************************************************************
                             _____   _____
@@ -21,72 +20,6 @@
                   RxDA  12 |             | 29  _RIB
                  _RxCA  13 |             | 28  RxDB
                  _TxCA  14 |             | 27  _RxTxCB
-                  TxDA  15 |             | 26  TxDB
-                 _DTRA  16 |             | 25  _DTRB
-                 _RTSA  17 |             | 24  _RTSB
-                 _CTSA  18 |             | 23  _CTSB
-                 _DCDA  19 |             | 22  _DCDB
-                   CLK  20 |_____________| 21  _RESET
-
-                            _____   _____
-                    D1   1 |*    \_/     | 40  D0
-                    D3   2 |             | 39  D2
-                    D5   3 |             | 38  D4
-                    D7   4 |             | 37  D6
-                  _INT   5 |             | 36  _IORQ
-                   IEI   6 |             | 35  _CE
-                   IEO   7 |             | 34  B/_A
-                   _M1   8 |             | 33  C/_D
-                   Vdd   9 |             | 32  _RD
-               _W/RDYA  10 |  Z80-SIO/0  | 31  GND
-                _SYNCA  11 |    Z8440    | 30  _W/RDYB
-                  RxDA  12 |             | 29  _SYNCB
-                 _RxCA  13 |             | 28  RxDB
-                 _TxCA  14 |             | 27  _RxTxCB
-                  TxDA  15 |             | 26  TxDB
-                 _DTRA  16 |             | 25  _DTRB
-                 _RTSA  17 |             | 24  _RTSB
-                 _CTSA  18 |             | 23  _CTSB
-                 _DCDA  19 |             | 22  _DCDB
-                   CLK  20 |_____________| 21  _RESET
-
-                            _____   _____
-                    D1   1 |*    \_/     | 40  D0
-                    D3   2 |             | 39  D2
-                    D5   3 |             | 38  D4
-                    D7   4 |             | 37  D6
-                  _INT   5 |             | 36  _IORQ
-                   IEI   6 |             | 35  _CE
-                   IEO   7 |             | 34  B/_A
-                   _M1   8 |             | 33  C/_D
-                   Vdd   9 |             | 32  _RD
-               _W/RDYA  10 |  Z80-SIO/1  | 31  GND
-                _SYNCA  11 |    Z8441    | 30  _W/RDYB
-                  RxDA  12 |             | 29  _SYNCB
-                 _RxCA  13 |             | 28  RxDB
-                 _TxCA  14 |             | 27  _RxCB
-                  TxDA  15 |             | 26  _TxCB
-                 _DTRA  16 |             | 25  TxDB
-                 _RTSA  17 |             | 24  _RTSB
-                 _CTSA  18 |             | 23  _CTSB
-                 _DCDA  19 |             | 22  _DCDB
-                   CLK  20 |_____________| 21  _RESET
-
-                            _____   _____
-                    D1   1 |*    \_/     | 40  D0
-                    D3   2 |             | 39  D2
-                    D5   3 |             | 38  D4
-                    D7   4 |             | 37  D6
-                  _INT   5 |             | 36  _IORQ
-                   IEI   6 |             | 35  _CE
-                   IEO   7 |             | 34  B/_A
-                   _M1   8 |             | 33  C/_D
-                   Vdd   9 |             | 32  _RD
-               _W/RDYA  10 |  Z80-SIO/2  | 31  GND
-                _SYNCA  11 |    Z8442    | 30  _W/RDYB
-                  RxDA  12 |             | 29  _RxDB
-                 _RxCA  13 |             | 28  _RxCB
-                 _TxCA  14 |             | 27  _TxCB
                   TxDA  15 |             | 26  TxDB
                  _DTRA  16 |             | 25  _DTRB
                  _RTSA  17 |             | 24  _RTSB
@@ -476,63 +409,8 @@ protected:
 };
 
 
-// ======================> z80sio0_device
-
-class z80sio0_device : public z80dart_device
-{
-public:
-	// construction/destruction
-	z80sio0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-
-// ======================> z80sio1_device
-
-class z80sio1_device :  public z80dart_device
-{
-public:
-	// construction/destruction
-	z80sio1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-
-// ======================> z80sio2_device
-
-class z80sio2_device :  public z80dart_device
-{
-public:
-	// construction/destruction
-	z80sio2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-
-// ======================> z80sio3_device
-
-class z80sio3_device :  public z80dart_device
-{
-public:
-	// construction/destruction
-	z80sio3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-
-// ======================> z80sio4_device
-
-class z80sio4_device :  public z80dart_device
-{
-public:
-	// construction/destruction
-	z80sio4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-
 // device type definition
 DECLARE_DEVICE_TYPE(Z80DART_CHANNEL, z80dart_channel)
 DECLARE_DEVICE_TYPE(Z80DART,         z80dart_device)
-DECLARE_DEVICE_TYPE(Z80SIO0,         z80sio0_device)
-DECLARE_DEVICE_TYPE(Z80SIO1,         z80sio1_device)
-DECLARE_DEVICE_TYPE(Z80SIO2,         z80sio2_device)
-DECLARE_DEVICE_TYPE(Z80SIO3,         z80sio3_device)
-DECLARE_DEVICE_TYPE(Z80SIO4,         z80sio4_device)
 
 #endif // MAME_MACHINE_Z80DART_H

@@ -70,7 +70,7 @@ void wangpc_rtc_device::wangpc_rtc_mem(address_map &map)
 void wangpc_rtc_device::wangpc_rtc_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x03).rw(m_sio, FUNC(z80sio0_device::cd_ba_r), FUNC(z80sio0_device::cd_ba_w));
+	map(0x00, 0x03).rw(m_sio, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x10, 0x1f).rw(AM9517A_TAG, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x20, 0x23).rw(m_ctc0, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x30, 0x30); //.w(FUNC(wangpc_rtc_device::clear_char_w));
@@ -120,7 +120,7 @@ void wangpc_rtc_device::device_add_mconfig(machine_config &config)
 	Z80CTC(config, m_ctc1, 2000000);
 	m_ctc1->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	Z80SIO0(config, m_sio, 2000000);
+	Z80SIO(config, m_sio, 2000000); // SIO/0?
 	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 }
 
