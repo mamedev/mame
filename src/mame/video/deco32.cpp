@@ -233,6 +233,8 @@ u32 fghthist_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
     bitmaps is the only reasonable way to implement proper priority &
     blending support - it can't be done in-place on the final framebuffer
     without a lot of support bitmaps.
+
+    reference : https://www.youtube.com/watch?v=y73dJ6UQw8M (nslasher)
 */
 void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap)
 {
@@ -259,8 +261,9 @@ void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bi
 			const u16 pri0 = (priColAlphaPal0 & 0x6000) >> 13;
 			const u16 pri1 = (priColAlphaPal1 & 0x6000) >> 13;
 			const u16 col0 = (((priColAlphaPal0 & 0x1f00) >> 8) % gfx0->colors()) * gfx0->granularity();
-			const u16 col1 = (((priColAlphaPal1 & 0x0f00) >> 8) % gfx1->colors()) * gfx1->granularity();
-			const u16 alpha1 = priColAlphaPal1 & 0x8000;
+			u16 col1 = ((priColAlphaPal1 & 0x0f00) >> 8);
+			const bool alpha1 = (priColAlphaPal1 & 0x8000);
+			const bool alpha2 = (!(priColAlphaPal1 & 0x1000));
 
 			// Apply sprite bitmap 0 according to priority rules
 			if ((priColAlphaPal0 & 0xff) != 0)
@@ -289,6 +292,13 @@ void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bi
 				}
 			}
 
+			/* Alpha values are tied to ACE ram... */
+			int alpha = ((!alpha1) || alpha2) ? m_deco_ace->get_alpha((col1 & 0x8) ? (0x4 + ((col1 & 0x3) / 2)) : ((col1 & 0x7) / 2)) : 0xff;
+
+			/* I don't really understand how object ACE ram is really hooked up,
+				 the only obvious place in Night Slashers is the stagecoach in level 2 */
+
+			col1 = (col1 % gfx1->colors()) * gfx1->granularity();
 			// Apply sprite bitmap 1 according to priority rules
 			if ((priColAlphaPal1 & 0xff) != 0)
 			{
@@ -299,30 +309,23 @@ void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bi
 					    Alpha rules:
 
 					    Pri 0 - Over all tilemaps, but under sprite 0 pri 0, pri 1, pri 2
-					    Pri 1 -
+					    Pri 1 - Under uppermost tilemap, sprite 0 pri 0, pri 1?
 					    Pri 2 -
 					    Pri 3 -
 					*/
 
-					/* Alpha values are tied to ACE ram... */
-					//int alpha = m_deco_ace->get_alpha(((priColAlphaPal1 & 0xf0) >> 4) / 2);
-					//if (alpha < 0)
-					//  alpha = 0;
-
-					/* I don't really understand how object ACE ram is really hooked up,
-					    the only obvious place in Night Slashers is the stagecoach in level 2 */
-
 					if (pri1 == 0 && (((priColAlphaPal0 & 0xff) == 0 || ((pri0 & 0x3) != 0 && (pri0 & 0x3) != 1 && (pri0 & 0x3) != 2))))
 					{
-						if ((m_pri & 1) == 0 || ((m_pri & 1) == 1 && tilemapPri[x] < 4) || ((m_pri & 1) == 1 && mixAlphaTilemap))
-							destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], 0x80);
+						if ((m_pri & 1) == 0 || ((m_pri & 1) == 0 || tilemapPri[x] < 4) || ((m_pri & 1) == 1 && mixAlphaTilemap))
+							destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], alpha);
 					}
-					else if (pri1 == 1 && ((priColAlphaPal0 & 0xff) == 0 || ((pri0 & 0x3) != 0 && (pri0 & 0x3) != 1 && (pri0 & 0x3) != 2)))
-						destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], 0x80);
-					else if (pri1 == 2) // TOdo
-						destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], 0x80);
-					else if (pri1 == 3) // TOdo
-						destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], 0x80);
+					else if (pri1 == 1 && ((m_pri & 1) == 0 || tilemapPri[x] < 4)
+						&& ((priColAlphaPal0 & 0xff) == 0 || ((pri0 & 0x3) != 0 && (pri0 & 0x3) != 1)))
+						destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], alpha);
+					else if (pri1 == 2) // TODO
+						destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], alpha);
+					else if (pri1 == 3) // TODO
+						destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], alpha);
 				}
 				else
 				{
@@ -332,13 +335,13 @@ void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bi
 					    Pri 0 - Under sprite 0 pri 0, over all tilemaps
 					*/
 					if (pri1 == 0 && ((priColAlphaPal0 & 0xff) == 0 || ((pri0 & 0x3) != 0)))
-						destLine[x] = pal1[(priColAlphaPal1 & 0xff) + col1];
-					else if (pri1 == 1) // todo
-						destLine[x] = pal1[(priColAlphaPal1 & 0xff) + col1];
-					else if (pri1 == 2) // todo
-						destLine[x] = pal1[(priColAlphaPal1 & 0xff) + col1];
-					else if (pri1 == 3) // todo
-						destLine[x] = pal1[(priColAlphaPal1 & 0xff) + col1];
+						destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], alpha);
+					else if (pri1 == 1) // TODO
+						destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], alpha);
+					else if (pri1 == 2) // TODO
+						destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], alpha);
+					else if (pri1 == 3) // TODO
+						destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], alpha);
 				}
 			}
 
@@ -354,8 +357,6 @@ void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bi
 					{
 						/* Alpha values are tied to ACE ram */
 						int alpha = m_deco_ace->get_alpha(0x17 + (((p & 0xf0) >> 4) / 2));
-						if (alpha < 0)
-							alpha = 0;
 
 						destLine[x] = alpha_blend_r32(destLine[x], pal2[p], alpha);
 					}
