@@ -1,8 +1,37 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
+// thanks-to:Sean Riddle
 /***************************************************************************
 
-    Skeleton driver for Nintendo Computer Mahjong
+Skeleton driver for Nintendo Computer Mahjong
+
+2 PCBs, MJ-CPU and MJ-DR. Each chip is custom labeled.
+MJ-CPU: MJ-01, MJ-02, MJ-04, 2*MJ-03
+MJ-DR: 2*MJ-06, MJ-05
+
+MJ-01 is definitely a Sharp LH5801 or LH5803 (?MHz).  I'm not sure of the
+difference; the pinouts are the same.  The PC-1600 Technical Reference says
+LH-5803 is an "upper" version of LH-5801 that supports most of the same
+machine language instructions except SDP, RDP and OFF are NOPs.
+MJ-02 is an LH5367 8Kx8 ROM.  It is edge-enabled, so one of the CE lines has
+to toggle for the byte at the address to be output.  This is different from
+most modern ROMs that you can dump by simply tying /CE low and setting
+different addresses.  It's mapped at $E000 - $FFFF.
+MJ-03 is LH5101 256x4 SRAM.  There are 2 of them to provide 256x8 RAM.  They
+are mapped to $8000-$80FF.
+MJ-04 is a parallel I/O controller, like LH5081 or LH5810/LH5811, but it's
+in a QFP48, whereas LH5081 is QFP44 and LH5810/11 is QFP60.  The pinout
+doesn't match either of those either, so it's not just one of those in a
+different package.
+
+MJ-05 is QFP44 and is likely LH5031 LCD dot matrix common driver.
+MJ-06 is QFP96 and is likely LH5035A/LH5036A LCD dot matrix segment driver.
+
+LCD display: 1st and 3rd row is 20 8*11-pixel characters. 2nd row is 19
+8*10-pixel characters, and a couple of custom segments to the right.
+
+20 buttons, 3-pos switch. There's a 12-pin connector for linking 2
+Computer Mahjongs together, using MJ 8002 link cable.
 
 ****************************************************************************/
 
@@ -51,5 +80,5 @@ ROM_START( compmahj )
 	ROM_LOAD( "mj02.bin", 0x0000, 0x2000, CRC(56d51944) SHA1(5923d72753642314f1e64bd30a6bd69da3985ce9) )
 ROM_END
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY     FULLNAME            FLAGS */
-CONS( 1987, compmahj, 0,      0,      compmahj, compmahj, compmahj_state, empty_init, "Nintendo", "Computer Mahjong", MACHINE_IS_SKELETON )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY     FULLNAME                     FLAGS */
+CONS( 1983, compmahj, 0,      0,      compmahj, compmahj, compmahj_state, empty_init, "Nintendo", "Computer Mah-jong Yakuman", MACHINE_IS_SKELETON )
