@@ -943,6 +943,8 @@ void applix_state::applix(machine_config &config)
 	serial_b.rxd_handler().set("scc", FUNC(scc8530_device::rxb_w));
 	serial_b.cts_handler().set("scc", FUNC(scc8530_device::ctsb_w));
 	serial_b.cts_handler().set("scc", FUNC(scc8530_device::dcdb_w));
+
+	SOFTWARE_LIST(config, "flop_list").set_original("applix_flop");
 }
 
 /* ROM definition */
