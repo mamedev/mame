@@ -341,6 +341,109 @@ save_error save_manager::write_file(emu_file &file)
 
 
 //-------------------------------------------------
+//  save - write the current machine state to the
+//  allocated stream
+//-------------------------------------------------
+
+save_error save_manager::write_buffer(u8 *data, size_t size)
+{
+	// if we have illegal registrations, return an error
+	if (m_illegal_regs > 0)
+		return STATERR_ILLEGAL_REGISTRATIONS;
+
+	// verify the buffer length
+	if (size != ram_state::get_size(*this))
+		return STATERR_WRITE_ERROR;
+
+	// generate the header
+	u8 header[HEADER_SIZE];
+	memcpy(&header[0], STATE_MAGIC_NUM, 8);
+	header[8] = SAVE_VERSION;
+	header[9] = NATIVE_ENDIAN_VALUE_LE_BE(0, SS_MSB_FIRST);
+	strncpy((char *)&header[0x0a], machine().system().name, 0x1c - 0x0a);
+	u32 sig = signature();
+	*(u32 *)&header[0x1c] = little_endianize_int32(sig);
+
+	// write the header
+	memcpy(data, header, sizeof(header));
+
+	// advance the pointer
+	u8 *byte_ptr = data + sizeof(header);
+
+	// call the pre-save functions
+	dispatch_presave();
+
+	// then write all the data
+	for (auto &entry : m_entry_list)
+	{
+		u32 totalsize = entry->m_typesize * entry->m_typecount;
+
+		// check bounds before writing
+		if (byte_ptr + totalsize > data + size)
+			return STATERR_WRITE_ERROR;
+
+		memcpy(byte_ptr, entry->m_data, totalsize);
+		byte_ptr += totalsize;
+	}
+	return STATERR_NONE;
+}
+
+
+//-------------------------------------------------
+//  load - restore the machine state from the
+//  stream
+//-------------------------------------------------
+
+save_error save_manager::read_buffer(u8 *data, size_t size)
+{
+	// if we have illegal registrations, return an error
+	if (m_illegal_regs > 0)
+		return STATERR_ILLEGAL_REGISTRATIONS;
+
+	// verify the buffer length
+	if (size != ram_state::get_size(*this))
+		return STATERR_WRITE_ERROR;
+
+	// read the header
+	u8 header[HEADER_SIZE];
+	memcpy(header, data, sizeof(header));
+
+	// advance the pointer
+	u8 *byte_ptr = data + sizeof(header);
+
+	// verify the header and report an error if it doesn't match
+	u32 sig = signature();
+	if (validate_header(header, machine().system().name, sig, nullptr, "Error: ")  != STATERR_NONE)
+		return STATERR_INVALID_HEADER;
+
+	// determine whether or not to flip the data when done
+	bool flip = NATIVE_ENDIAN_VALUE_LE_BE((header[9] & SS_MSB_FIRST) != 0, (header[9] & SS_MSB_FIRST) == 0);
+
+	// read all the data, flipping if necessary
+	for (auto &entry : m_entry_list)
+	{
+		u32 totalsize = entry->m_typesize * entry->m_typecount;
+
+		// check bounds before reading
+		if (byte_ptr + totalsize > data + size)
+			return STATERR_READ_ERROR;
+
+		memcpy(entry->m_data, byte_ptr, totalsize);
+		byte_ptr += totalsize;
+
+		// handle flipping
+		if (flip)
+			entry->flip_data();
+	}
+
+	// call the post-load functions
+	dispatch_postload();
+
+	return STATERR_NONE;
+}
+
+
+//-------------------------------------------------
 //  signature - compute the signature, which
 //  is a CRC over the structure of the data
 //-------------------------------------------------
