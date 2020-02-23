@@ -388,9 +388,14 @@ ROM_END
 
 ROM_START( mysptqvc )
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "qvcmysportschallenge.bin", 0x0000000, 0x2000000, CRC(04783adc) SHA1(a173145ec307fc12f231d3e3f6efa60f8c2f0c89) )
+	ROM_LOAD16_WORD_SWAP( "qvcmysportschallenge.bin", 0x0000000, 0x2000000, CRC(04783adc) SHA1(a173145ec307fc12f231d3e3f6efa60f8c2f0c89) ) // last 8MB is unused
 ROM_END
 
+ROM_START( mysprtch )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 ) // SOP64 M6MLT947, has two /CE lines so internally this '24MByte / 192Mbit' chip is likely 2 ROM dies in a single package
+	ROM_LOAD16_WORD_SWAP( "senariomysportschallengesop64h.bin", 0x0000000, 0x1000000, CRC(3714df21) SHA1(f725dad48b9dfeba188879a6fd28652a7330d3e5) )
+	ROM_LOAD16_WORD_SWAP( "senariomysportschallengesop64l.bin", 0x1000000, 0x0800000, CRC(0f71099f) SHA1(6e4b9ce329edbb6f0b962cb5669e04c6bd209596) )
+ROM_END
 
 
 
@@ -402,9 +407,10 @@ ROM_END
 // Unit with Blue surround to power button. Box shows 'Wireless Sports Plus' but title screen shots "My Sports Challenge Plus"  Appears to be V-Tac developed as it has the common V-Tac test mode.
 CONS( 200?, mysprtcp,  0, 0, mysprtch, mysprtch, spg2xx_game_mysprtch_state,  init_mysprtcp, "Senario / V-Tac Technology Co Ltd.",  "My Sports Challenge Plus / Wireless Sports Plus",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-// from a QVC licensed unit with a different physical shape etc. uses a 32MByte rom with only 24MByte used, the regular units use an unusual 24MByte ROM, content might be the same, not yet verified.
+// from a QVC licensed unit with a different physical shape etc. uses a 32MByte rom with only 24MByte used
 CONS( 200?, mysptqvc,  0, 0, mysprtch, mysprtch, spg2xx_game_mysprtch24_state,  init_mysprtcp, "Senario / V-Tac Technology Co Ltd. (QVC license)",  "My Sports Challenge (6-in-1 version, QVC license)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
+CONS( 200?, mysprtch,  0, 0, mysprtch, mysprtch, spg2xx_game_mysprtch24_state,  init_mysprtcp, "Senario / V-Tac Technology Co Ltd.",                "My Sports Challenge (5-in-1 version)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // 2009 date on PCB, not actually in German, so maybe sold under different brands?
 CONS( 2009, mgt20in1,  0, 0, mgt20in1, mgt20in1, spg2xx_game_mysprtch_state,  init_mgt20in1, "MGT",                                 "MGT 20-in-1 TV-Spielekonsole (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
