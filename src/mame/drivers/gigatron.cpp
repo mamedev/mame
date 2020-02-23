@@ -66,7 +66,7 @@ void gigatron_state::prog_map(address_map &map)
 
 void gigatron_state::data_map(address_map &map)
 {
-	map(0x3fff, 0x20000).ram();
+	map(0x0000, 0x7fff).ram();
 }
 
 void gigatron_state::machine_start()
