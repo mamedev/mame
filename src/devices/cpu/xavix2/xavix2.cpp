@@ -124,7 +124,7 @@ void xavix2_device::device_start()
 
 void xavix2_device::device_reset()
 {
-	m_hr[4] = F_I;
+	m_hr[4] = 0;
 	m_pc = 0x40000000;
 }
 
@@ -145,13 +145,13 @@ uint32_t xavix2_device::execute_input_lines() const noexcept
 
 u32 xavix2_device::check_interrupt(u32 cpc)
 {
-	if(m_int_line && (!(m_hr[4] & F_I) || m_wait)) {
+	if(m_int_line && ((m_hr[4] & F_I) || m_wait)) {
 		standard_irq_callback(0);
 		m_ilr1 = m_wait ? cpc + 1 : cpc;
 		m_wait = false;
 		m_ei_count = 0;
 		m_if1 = m_hr[4];
-		m_hr[4] |= F_I;
+		m_hr[4] &= ~F_I;
 		return 0x40000010;
 	}
 	return cpc;
@@ -222,11 +222,11 @@ void xavix2_device::execute_run()
 		case 0x0c: case 0x0d: m_r[r1(opcode)] = snz(m_r[r2(opcode)] | val19u(opcode)); break;
 		case 0x0e: case 0x0f: m_r[r1(opcode)] = snz(m_r[r2(opcode)] ^ val19u(opcode)); break;
 
-		case 0x10: case 0x11: m_r[r1(opcode)] = snz((s8)m_program->read_byte(m_r[r2(opcode)] + val19s(opcode))); break;
-		case 0x12: case 0x13: m_r[r1(opcode)] = snz(m_program->read_byte(m_r[r2(opcode)] + val19s(opcode))); break;
-		case 0x14: case 0x15: m_r[r1(opcode)] = snz((s16)m_program->read_word(m_r[r2(opcode)] + val19s(opcode))); break;
-		case 0x16: case 0x17: m_r[r1(opcode)] = snz(m_program->read_word(m_r[r2(opcode)] + val19s(opcode))); break;
-		case 0x18: case 0x19: m_r[r1(opcode)] = snz(m_program->read_dword(m_r[r2(opcode)] + val19s(opcode))); break;
+		case 0x10: case 0x11: m_r[r1(opcode)] = (s8)m_program->read_byte(m_r[r2(opcode)] + val19s(opcode)); break;
+		case 0x12: case 0x13: m_r[r1(opcode)] = m_program->read_byte(m_r[r2(opcode)] + val19s(opcode)); break;
+		case 0x14: case 0x15: m_r[r1(opcode)] = (s16)m_program->read_word(m_r[r2(opcode)] + val19s(opcode)); break;
+		case 0x16: case 0x17: m_r[r1(opcode)] = m_program->read_word(m_r[r2(opcode)] + val19s(opcode)); break;
+		case 0x18: case 0x19: m_r[r1(opcode)] = m_program->read_dword(m_r[r2(opcode)] + val19s(opcode)); break;
 		case 0x1a: case 0x1b: m_program->write_byte(m_r[r2(opcode)] + val19s(opcode), m_r[r1(opcode)]); break;
 		case 0x1c: case 0x1d: m_program->write_word(m_r[r2(opcode)] + val19s(opcode), m_r[r1(opcode)]); break;
 		case 0x1e: case 0x1f: m_program->write_dword(m_r[r2(opcode)] + val19s(opcode), m_r[r1(opcode)]); break;
@@ -241,29 +241,29 @@ void xavix2_device::execute_run()
 		case 0x2c: case 0x2d: m_r[r1(opcode)] = snz(m_r[r2(opcode)] | val11u(opcode)); break;
 		case 0x2e: case 0x2f: m_r[r1(opcode)] = snz(m_r[r2(opcode)] ^ val11u(opcode)); break;
 
-		case 0x30: case 0x31: m_r[r1(opcode)] = snz((s8)m_program->read_byte(m_r[6] + val14s(opcode))); break;
-		case 0x32: case 0x33: m_r[r1(opcode)] = snz(m_program->read_byte(m_r[6] + val14s(opcode))); break;
-		case 0x34: case 0x35: m_r[r1(opcode)] = snz((s16)m_program->read_word(m_r[6] + val14s(opcode))); break;
-		case 0x36: case 0x37: m_r[r1(opcode)] = snz(m_program->read_word(m_r[6] + val14s(opcode))); break;
-		case 0x38: case 0x39: m_r[r1(opcode)] = snz(m_program->read_dword(m_r[6] + val14s(opcode))); break;
+		case 0x30: case 0x31: m_r[r1(opcode)] = (s8)m_program->read_byte(m_r[6] + val14s(opcode)); break;
+		case 0x32: case 0x33: m_r[r1(opcode)] = m_program->read_byte(m_r[6] + val14s(opcode)); break;
+		case 0x34: case 0x35: m_r[r1(opcode)] = (s16)m_program->read_word(m_r[6] + val14s(opcode)); break;
+		case 0x36: case 0x37: m_r[r1(opcode)] = m_program->read_word(m_r[6] + val14s(opcode)); break;
+		case 0x38: case 0x39: m_r[r1(opcode)] = m_program->read_dword(m_r[6] + val14s(opcode)); break;
 		case 0x3a: case 0x3b: m_program->write_byte(m_r[6] + val14s(opcode), m_r[r1(opcode)]); break;
 		case 0x3c: case 0x3d: m_program->write_word(m_r[6] + val14s(opcode), m_r[r1(opcode)]); break;
 		case 0x3e: case 0x3f: m_program->write_dword(m_r[6] + val14s(opcode), m_r[r1(opcode)]); break;
 
-		case 0x40: case 0x41: m_r[r1(opcode)] = snz((s8)m_program->read_byte(m_r[r2(opcode)] + val11s(opcode))); break;
-		case 0x42: case 0x43: m_r[r1(opcode)] = snz(m_program->read_byte(m_r[r2(opcode)] + val11s(opcode))); break;
-		case 0x44: case 0x45: m_r[r1(opcode)] = snz((s16)m_program->read_word(m_r[r2(opcode)] + val11s(opcode))); break;
-		case 0x46: case 0x47: m_r[r1(opcode)] = snz(m_program->read_word(m_r[r2(opcode)] + val11s(opcode))); break;
-		case 0x48: case 0x49: m_r[r1(opcode)] = snz(m_program->read_dword(m_r[r2(opcode)] + val11s(opcode))); break;
+		case 0x40: case 0x41: m_r[r1(opcode)] = (s8)m_program->read_byte(m_r[r2(opcode)] + val11s(opcode)); break;
+		case 0x42: case 0x43: m_r[r1(opcode)] = m_program->read_byte(m_r[r2(opcode)] + val11s(opcode)); break;
+		case 0x44: case 0x45: m_r[r1(opcode)] = (s16)m_program->read_word(m_r[r2(opcode)] + val11s(opcode)); break;
+		case 0x46: case 0x47: m_r[r1(opcode)] = m_program->read_word(m_r[r2(opcode)] + val11s(opcode)); break;
+		case 0x48: case 0x49: m_r[r1(opcode)] = m_program->read_dword(m_r[r2(opcode)] + val11s(opcode)); break;
 		case 0x4a: case 0x4b: m_program->write_byte(m_r[r2(opcode)] + val11s(opcode), m_r[r1(opcode)]); break;
 		case 0x4c: case 0x4d: m_program->write_word(m_r[r2(opcode)] + val11s(opcode), m_r[r1(opcode)]); break;
 		case 0x4e: case 0x4f: m_program->write_dword(m_r[r2(opcode)] + val11s(opcode), m_r[r1(opcode)]); break;
 
-		case 0x50: case 0x51: m_r[r1(opcode)] = snz((s8)m_program->read_byte(val14s(opcode))); break;
-		case 0x52: case 0x53: m_r[r1(opcode)] = snz(m_program->read_byte(val14s(opcode))); break;
-		case 0x54: case 0x55: m_r[r1(opcode)] = snz((s16)m_program->read_word(val14s(opcode))); break;
-		case 0x56: case 0x57: m_r[r1(opcode)] = snz(m_program->read_word(val14s(opcode))); break;
-		case 0x58: case 0x59: m_r[r1(opcode)] = snz(m_program->read_dword(val14s(opcode))); break;
+		case 0x50: case 0x51: m_r[r1(opcode)] = (s8)m_program->read_byte(val14s(opcode)); break;
+		case 0x52: case 0x53: m_r[r1(opcode)] = m_program->read_byte(val14s(opcode)); break;
+		case 0x54: case 0x55: m_r[r1(opcode)] = (s16)m_program->read_word(val14s(opcode)); break;
+		case 0x56: case 0x57: m_r[r1(opcode)] = m_program->read_word(val14s(opcode)); break;
+		case 0x58: case 0x59: m_r[r1(opcode)] = m_program->read_dword(val14s(opcode)); break;
 		case 0x5a: case 0x5b: m_program->write_byte(val14s(opcode), m_r[r1(opcode)]); break;
 		case 0x5c: case 0x5d: m_program->write_word(val14s(opcode), m_r[r1(opcode)]); break;
 		case 0x5e: case 0x5f: m_program->write_dword(val14s(opcode), m_r[r1(opcode)]); break;
@@ -382,16 +382,16 @@ void xavix2_device::execute_run()
 		case 0xe3:            /* rti2 */ break;
 			// e4-ef
 
-		case 0xf0:            m_hr[4] |= F_C; break;
-		case 0xf1:            m_hr[4] &= ~F_C; break;
-		case 0xf2:            m_hr[4] |= F_Z; break;
-		case 0xf3:            m_hr[4] &= ~F_Z; break;
-		case 0xf4:            m_hr[4] |= F_N; break;
-		case 0xf5:            m_hr[4] &= ~F_N; break;
-		case 0xf6:            m_hr[4] |= F_V; break;
-		case 0xf7:            m_hr[4] &= ~F_V; break;
-		case 0xf8:            m_hr[4] |= F_I; break;
-		case 0xf9:            m_hr[4] &= ~F_I; m_ei_count = 2; break;
+		case 0xf0:            m_hr[4] &= ~F_C; break;
+		case 0xf1:            m_hr[4] |= F_C; break;
+		case 0xf2:            m_hr[4] &= ~F_Z; break;
+		case 0xf3:            m_hr[4] |= F_Z; break;
+		case 0xf4:            m_hr[4] &= ~F_N; break;
+		case 0xf5:            m_hr[4] |= F_N; break;
+		case 0xf6:            m_hr[4] &= ~F_V; break;
+		case 0xf7:            m_hr[4] |= F_V; break;
+		case 0xf8:            m_hr[4] &= ~F_I; break;
+		case 0xf9:            m_hr[4] |= F_I; m_ei_count = 2; break;
 			// fa-fb
 		case 0xfc:            break;
 			// fd
