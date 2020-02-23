@@ -10401,7 +10401,7 @@
 	</software>
 
 	<software name="advprgkt">
-		<description>Adventure Programming Kit (Versoin 10.84)</description>
+		<description>Adventure Programming Kit (Version 10.84)</description>
 		<year>1984</year>
 		<publisher>Salty Software</publisher>
 		<info name="release" value="2020-01-24"/>
@@ -11104,6 +11104,114 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234873">
 				<rom name="generic computer games.woz" size="234873" crc="85d333f6" sha1="eebdbaab826298355df82a3859fa9e33af5fa922" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crscrwmn">
+		<description>The Curse of Crowley Manor</description>
+		<year>1981</year>
+		<publisher>Adventure International</publisher>
+		<info name="release" value="2020-02-22"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234833">
+				<rom name="the curse of crowley manor.woz" size="234833" crc="347d21ee" sha1="1c8eeebb2b48199e4772efda9d7bab0584fd041c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elysflds">
+		<description>The Elysian Fields and Other Greek Myths</description>
+		<year>1984</year>
+		<publisher>American Eagle</publisher>
+		<info name="release" value="2020-02-21"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234803">
+				<rom name="the elysian fields and other greek myths side a.woz" size="234803" crc="ac522a7e" sha1="1f8c406ef352908816b01c92087a19ee7cb98d64" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234803">
+				<rom name="the elysian fields and other greek myths side b.woz" size="234803" crc="b026c686" sha1="d76f1e326bf16d097db8884d8bbca1e00c302d17" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="murdmiss">
+		<description>Murder on the Mississippi</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2020-02-21"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+	
+			<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234791">
+				<rom name="murder on the mississippi side a.woz" size="234791" crc="5b615fa1" sha1="c6d9bbff02f896b4bdac6dec1adf9bf52ae92cda" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234791">
+				<rom name="murder on the mississippi side b.woz" size="234791" crc="8d1c2ac2" sha1="42e605a010209eb15c7bc033f961f7aaa8b1ddc1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pmmandmr">
+		<description>Perry Mason: The Case of the Mandarin Murder</description>
+		<year>1985</year>
+		<publisher>Telarium</publisher>
+		<info name="release" value="2020-02-21"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234784">
+				<rom name="perry mason- the case of the mandarin murder - side a.woz" size="234784" crc="38f4ce1e" sha1="9c8f7d53099d99efca66a0c37bf571b62c553210" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234784">
+				<rom name="perry mason- the case of the mandarin murder - side b.woz" size="234784" crc="b3f009d0" sha1="5458b42139db7050924c43cfe738264937053827" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C"/>
+			<dataarea name="flop" size="234784">
+				<rom name="perry mason- the case of the mandarin murder - side c.woz" size="234784" crc="75b3c942" sha1="42bc543854a5a40165bca57dfd10b1190ec95d5b" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side D"/>
+			<dataarea name="flop" size="234784">
+				<rom name="perry mason- the case of the mandarin murder - side d.woz" size="234784" crc="8b384f2a" sha1="fac1b3d0b8e720be9febc68b0454ff7fb67778d3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="typetut3">
+		<description>Typing Tutor III with Letter Invaders</description>
+		<year>1984</year>
+		<publisher>Simon &amp; Schuster</publisher>
+		<info name="release" value="2020-02-21"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241496">
+				<rom name="typing tutor iii with letter invaders.woz" size="241496" crc="28f9acbc" sha1="1b80d0d0d6fe4fda09501799b03cc3486851a3b5" />
 			</dataarea>
 		</part>
 	</software>
