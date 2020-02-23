@@ -592,6 +592,8 @@ void aussiebyte_state::aussiebyte(machine_config &config)
 
 	/* quickload */
 	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(aussiebyte_state::quickload_cb));
+
+	SOFTWARE_LIST(config, "flop_list").set_original("aussiebyte");
 }
 
 
