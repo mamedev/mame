@@ -9,7 +9,7 @@ Skeleton driver for Nintendo Computer Mahjong
 MJ-CPU: MJ-01, MJ-02, MJ-04, 2*MJ-03
 MJ-DR: 2*MJ-06, MJ-05
 
-MJ-01 is definitely a Sharp LH5801 or LH5803 (?MHz).  I'm not sure of the
+MJ-01 is definitely a Sharp LH5801 or LH5803.  I'm not sure of the
 difference; the pinouts are the same.  The PC-1600 Technical Reference says
 LH-5803 is an "upper" version of LH-5801 that supports most of the same
 machine language instructions except SDP, RDP and OFF are NOPs.
@@ -30,8 +30,8 @@ MJ-06 is QFP96 and is likely LH5035A/LH5036A LCD dot matrix segment driver.
 LCD display: 1st and 3rd row is 20 8*11-pixel characters. 2nd row is 19
 8*10-pixel characters, and a couple of custom segments to the right.
 
-20 buttons, 3-pos switch. There's a 12-pin connector for linking 2
-Computer Mahjongs together, using MJ 8002 link cable.
+Piezo speaker, 20 buttons, 3-pos switch. There's a 12-pin connector for
+linking 2 Computer Mahjongs together, using MJ 8002 link cable.
 
 ****************************************************************************/
 
@@ -53,7 +53,15 @@ private:
 	void io_map(address_map &map);
 
 	required_device<lh5801_cpu_device> m_maincpu;
+
+	DECLARE_READ8_MEMBER(ita_r);
 };
+
+READ8_MEMBER(compmahj_state::ita_r)
+{
+	// f75e/f760
+	return 0;
+}
 
 void compmahj_state::main_map(address_map &map)
 {
@@ -70,14 +78,15 @@ INPUT_PORTS_END
 
 void compmahj_state::compmahj(machine_config &config)
 {
-	LH5801(config, m_maincpu, 1000000); // total guess
+	LH5801(config, m_maincpu, 2.5_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &compmahj_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &compmahj_state::io_map);
+	m_maincpu->in_func().set(FUNC(compmahj_state::ita_r));
 }
 
 ROM_START( compmahj )
 	ROM_REGION( 0x2000, "maincpu", 0)
-	ROM_LOAD( "mj02.bin", 0x0000, 0x2000, CRC(56d51944) SHA1(5923d72753642314f1e64bd30a6bd69da3985ce9) )
+	ROM_LOAD( "mj-02", 0x0000, 0x2000, CRC(56d51944) SHA1(5923d72753642314f1e64bd30a6bd69da3985ce9) )
 ROM_END
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY     FULLNAME                     FLAGS */
