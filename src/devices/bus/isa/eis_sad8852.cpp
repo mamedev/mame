@@ -205,7 +205,7 @@ void isa16_sad8852_device::device_add_mconfig(machine_config &config)
 	cpu.set_addrmap(AS_PROGRAM, &isa16_sad8852_device::sad8852_mem);
 	cpu.set_addrmap(AS_IO, &isa16_sad8852_device::sad8852_io);
 
-	I8274_NEW(config, "terminal", XTAL(12'000'000) / 3); // Needs verification
+	I8274(config, "terminal", XTAL(12'000'000) / 3); // Needs verification
 }
 
 isa16_sad8852_device::isa16_sad8852_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

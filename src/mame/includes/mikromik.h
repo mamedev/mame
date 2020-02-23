@@ -15,7 +15,7 @@
 #include "machine/mm1kb.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/upd765.h"
 #include "video/i8275.h"
 #include "video/upd7220.h"

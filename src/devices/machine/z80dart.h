@@ -2,56 +2,10 @@
 // copyright-holders:Curt Coder
 /***************************************************************************
 
-    Intel 8274 Multi-Protocol Serial Controller emulation
-    NEC uPD7201 Multiprotocol Serial Communications Controller emulation
     Z80-DART Dual Asynchronous Receiver/Transmitter emulation
     Z80-SIO/0/1/2/3/4 Serial Input/Output Controller emulation
 
 ****************************************************************************
-                            _____   _____
-                   CLK   1 |*    \_/     | 40  Vcc
-                _RESET   2 |             | 39  _CTSA
-                  _CDA   3 |             | 38  _RTSA
-                 _RxCB   4 |             | 37  TxDA
-                  _CDB   5 |             | 36  _TxCA
-                 _CTSB   6 |             | 35  _RxCA
-                 _TxCB   7 |             | 34  RxDA
-                  TxDB   8 |             | 33  _SYNDETA
-                  RxDB   9 |             | 32  RDYA/RxDRQA
-        _RTSB/_SYNDETB  10 |    I8274    | 31  _DTRA
-          RDYB/_TxDRQA  11 |             | 30  _IPO/TxDRQB
-                    D7  12 |             | 29  _IPI/RxDRQB
-                    D6  13 |             | 28  _INT
-                    D5  14 |             | 27  _INTA
-                    D4  15 |             | 26  _DTRB
-                    D3  16 |             | 25  A0
-                    D2  17 |             | 24  A1
-                    D1  18 |             | 23  _CS
-                    D0  19 |             | 22  _RD
-                   Vss  20 |_____________| 21  _WR
-
-                            _____   _____
-                   CLK   1 |*    \_/     | 40  Vcc
-                _RESET   2 |             | 39  _CTSA
-                 _DCDA   3 |             | 38  _RTSA
-                 _RxCB   4 |             | 37  TxDA
-                 _DCDB   5 |             | 36  _TxCA
-                 _CTSB   6 |             | 35  _RxCA
-                 _TxCB   7 |             | 34  RxDA
-                  TxDB   8 |             | 33  _SYNCA
-                  RxDB   9 |             | 32  _WAITA/DRQRxA
-          _RTSB/_SYNCB  10 |   UPD7201   | 31  _DTRA/_HAO
-        _WAITB/_DRQTxA  11 |             | 30  _PRO/DRQTxB
-                    D7  12 |             | 29  _PRI/DRQRxB
-                    D6  13 |             | 28  _INT
-                    D5  14 |             | 27  _INTAK
-                    D4  15 |             | 26  _DTRB/_HAI
-                    D3  16 |             | 25  B/_A
-                    D2  17 |             | 24  C/_D
-                    D1  18 |             | 23  _CS
-                    D0  19 |             | 22  _RD
-                   Vss  20 |_____________| 21  _WR
-
                             _____   _____
                     D1   1 |*    \_/     | 40  D0
                     D3   2 |             | 39  D2
@@ -572,28 +526,6 @@ public:
 };
 
 
-// ======================> i8274_device
-
-class i8274_device :  public z80dart_device
-{
-public:
-	// construction/destruction
-	i8274_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	uint8_t inta_r() { return m1_r(); };
-};
-
-
-// ======================> upd7201_device
-
-class upd7201_device :  public z80dart_device
-{
-public:
-	// construction/destruction
-	upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-
 // device type definition
 DECLARE_DEVICE_TYPE(Z80DART_CHANNEL, z80dart_channel)
 DECLARE_DEVICE_TYPE(Z80DART,         z80dart_device)
@@ -602,7 +534,5 @@ DECLARE_DEVICE_TYPE(Z80SIO1,         z80sio1_device)
 DECLARE_DEVICE_TYPE(Z80SIO2,         z80sio2_device)
 DECLARE_DEVICE_TYPE(Z80SIO3,         z80sio3_device)
 DECLARE_DEVICE_TYPE(Z80SIO4,         z80sio4_device)
-DECLARE_DEVICE_TYPE(I8274,           i8274_device)
-DECLARE_DEVICE_TYPE(UPD7201,         upd7201_device)
 
 #endif // MAME_MACHINE_Z80DART_H

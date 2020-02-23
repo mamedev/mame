@@ -44,7 +44,7 @@
 #include "machine/qx10kbd.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "video/upd7220.h"
 #include "emupal.h"
 
@@ -556,7 +556,7 @@ void qx10_state::qx10_io(address_map &map)
 	map(0x04, 0x07).rw(m_pit_2, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x08, 0x09).rw(m_pic_m, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0c, 0x0d).rw(m_pic_s, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x10, 0x13).rw(m_scc, FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
+	map(0x10, 0x13).rw(m_scc, FUNC(upd7201_device::cd_ba_r), FUNC(upd7201_device::cd_ba_w));
 	map(0x14, 0x17).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x18, 0x1b).portr("DSW").w(FUNC(qx10_state::qx10_18_w));
 	map(0x1c, 0x1f).w(FUNC(qx10_state::prom_sel_w));
@@ -765,7 +765,7 @@ void qx10_state::qx10(machine_config &config)
 	m_pit_2->set_clk<1>(MAIN_CLK / 8);
 	m_pit_2->out_handler<1>().set(FUNC(qx10_state::keyboard_clk));
 	m_pit_2->set_clk<2>(MAIN_CLK / 8);
-	m_pit_2->out_handler<2>().set(m_scc, FUNC(z80dart_device::rxtxcb_w));
+	m_pit_2->out_handler<2>().set(m_scc, FUNC(upd7201_device::rxtxcb_w));
 
 	PIC8259(config, m_pic_m, 0);
 	m_pic_m->out_int_callback().set_inputline(m_maincpu, 0);

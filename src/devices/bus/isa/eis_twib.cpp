@@ -200,7 +200,7 @@ ioport_constructor isa8_eistwib_device::device_input_ports() const
 void isa8_eistwib_device::device_add_mconfig(machine_config &config)
 {
 	SDLC_LOGGER(config, m_sdlclogger, 0); // To decode the frames
-	I8274_NEW(config, m_uart8274, (XTAL(14'318'181)/ 3) / 2); // Half the 4,77 MHz ISA bus CLK signal
+	I8274(config, m_uart8274, (XTAL(14'318'181)/ 3) / 2); // Half the 4,77 MHz ISA bus CLK signal
 	//m_uart8274->out_rtsa_callback().set([this] (int state) { m_rts = state; });
 	m_uart8274->out_txda_callback().set([this] (int state) { m_txd = state; m_sdlclogger->data_w(state); });
 	m_uart8274->out_int_callback().set([this] (int state)

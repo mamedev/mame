@@ -57,7 +57,7 @@ void ft68m_state::mem_map(address_map &map)
 	map(0x000000, 0x1fffff).ram().share("rambase");
 	map(0x200000, 0x201fff).rom().region("roms", 0x0000);
 	map(0x400000, 0x401fff).rom().region("roms", 0x2000);
-	map(0x600000, 0x600007).mirror(0x1ffff8).rw("mpsc", FUNC(upd7201_new_device::ba_cd_r), FUNC(upd7201_new_device::ba_cd_w)).umask16(0xff00);
+	map(0x600000, 0x600007).mirror(0x1ffff8).rw("mpsc", FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::ba_cd_w)).umask16(0xff00);
 	map(0x800000, 0x800003).mirror(0x1ffffc).rw("stc", FUNC(am9513_device::read16), FUNC(am9513_device::write16));
 	map(0xa00000, 0xbfffff).ram(); //Page Map
 	map(0xc00000, 0xdfffff).ram(); //Segment Map
@@ -88,7 +88,7 @@ void ft68m_state::ft68m(machine_config &config)
 	M68000(config, m_maincpu, XTAL(19'660'800) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ft68m_state::mem_map);
 
-	upd7201_new_device& mpsc(UPD7201_NEW(config, "mpsc", 0));
+	upd7201_device& mpsc(UPD7201(config, "mpsc", 0));
 	mpsc.out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
 	mpsc.out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	mpsc.out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
@@ -98,18 +98,18 @@ void ft68m_state::ft68m(machine_config &config)
 	am9513_device &stc(AM9513A(config, "stc", XTAL(19'660'800) / 8));
 	stc.out2_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	stc.out3_cb().set_inputline(m_maincpu, M68K_IRQ_7);
-	stc.out4_cb().set("mpsc", FUNC(upd7201_new_device::rxca_w));
-	stc.out4_cb().append("mpsc", FUNC(upd7201_new_device::txca_w));
-	stc.out5_cb().set("mpsc", FUNC(upd7201_new_device::rxcb_w));
-	stc.out5_cb().append("mpsc", FUNC(upd7201_new_device::txcb_w));
+	stc.out4_cb().set("mpsc", FUNC(upd7201_device::rxca_w));
+	stc.out4_cb().append("mpsc", FUNC(upd7201_device::txca_w));
+	stc.out5_cb().set("mpsc", FUNC(upd7201_device::rxcb_w));
+	stc.out5_cb().append("mpsc", FUNC(upd7201_device::txcb_w));
 
 	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, "terminal"));
-	rs232a.rxd_handler().set("mpsc", FUNC(upd7201_new_device::rxa_w));
-	rs232a.dsr_handler().set("mpsc", FUNC(upd7201_new_device::dcda_w));
-	rs232a.cts_handler().set("mpsc", FUNC(upd7201_new_device::ctsa_w));
+	rs232a.rxd_handler().set("mpsc", FUNC(upd7201_device::rxa_w));
+	rs232a.dsr_handler().set("mpsc", FUNC(upd7201_device::dcda_w));
+	rs232a.cts_handler().set("mpsc", FUNC(upd7201_device::ctsa_w));
 
 	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, nullptr));
-	rs232b.rxd_handler().set("mpsc", FUNC(upd7201_new_device::rxb_w));
+	rs232b.rxd_handler().set("mpsc", FUNC(upd7201_device::rxb_w));
 }
 
 /* ROM definition */

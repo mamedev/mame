@@ -3,6 +3,8 @@
 /***************************************************************************
 
     Z80-SIO Serial Input/Output emulation
+    Intel 8274 Multi-Protocol Serial Controller emulation
+    NEC µPD7201 Multiprotocol Serial Communications Controller emulation
 
     The variants in the SIO family are only different in the packaging
     but has the same register features. However, since some signals are
@@ -252,8 +254,8 @@ DEFINE_DEVICE_TYPE(Z80SIO_CHANNEL,  z80sio_channel,     "z80sio_channel",  "Z80 
 DEFINE_DEVICE_TYPE(I8274_CHANNEL,   i8274_channel,      "i8274_channel",   "Intel 8274 MPSC channel")
 DEFINE_DEVICE_TYPE(MK68564_CHANNEL, mk68564_channel,    "mk68564_channel", "Mostek MK68564 SIO channel")
 DEFINE_DEVICE_TYPE(Z80SIO,          z80sio_device,      "z80sio",          "Z80 SIO")
-DEFINE_DEVICE_TYPE(I8274_NEW,       i8274_new_device,   "i8274_new",       "Intel 8274 MPSC (new)") // Remove trailing N when z80dart.cpp's 8274 implementation is fully replaced
-DEFINE_DEVICE_TYPE(UPD7201_NEW,     upd7201_new_device, "upd7201_new",     "NEC uPD7201 MPSC (new)") // Remove trailing N when z80dart.cpp's 7201 implementation is fully replaced
+DEFINE_DEVICE_TYPE(I8274,           i8274_device,       "i8274",           "Intel 8274 MPSC")
+DEFINE_DEVICE_TYPE(UPD7201,         upd7201_device,     "upd7201",         "NEC uPD7201 MPSC")
 DEFINE_DEVICE_TYPE(MK68564,         mk68564_device,     "mk68564",         "Mostek MK68564 SIO")
 
 //-------------------------------------------------
@@ -265,7 +267,7 @@ void z80sio_device::device_add_mconfig(machine_config &config)
 	Z80SIO_CHANNEL(config, CHANB_TAG, 0);
 }
 
-void i8274_new_device::device_add_mconfig(machine_config &config)
+void i8274_device::device_add_mconfig(machine_config &config)
 {
 	I8274_CHANNEL(config, CHANA_TAG, 0);
 	I8274_CHANNEL(config, CHANB_TAG, 0);
@@ -402,23 +404,23 @@ z80sio_device::z80sio_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-i8274_new_device::i8274_new_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+i8274_device::i8274_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	z80sio_device(mconfig, type, tag, owner, clock)
 {
 }
 
-i8274_new_device::i8274_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	i8274_new_device(mconfig, I8274_NEW, tag, owner, clock)
+i8274_device::i8274_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	i8274_device(mconfig, I8274, tag, owner, clock)
 {
 }
 
-upd7201_new_device::upd7201_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	i8274_new_device(mconfig, UPD7201_NEW, tag, owner, clock)
+upd7201_device::upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	i8274_device(mconfig, UPD7201, tag, owner, clock)
 {
 }
 
 mk68564_device::mk68564_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	i8274_new_device(mconfig, MK68564, tag, owner, clock)
+	i8274_device(mconfig, MK68564, tag, owner, clock)
 {
 }
 
@@ -534,7 +536,7 @@ int z80sio_device::z80daisy_irq_ack()
 	return -1;
 }
 
-int i8274_new_device::z80daisy_irq_ack()
+int i8274_device::z80daisy_irq_ack()
 {
 	// FIXME: we're not modelling the full behaviour of this chip
 	// The 8274 is designed to work with Intel processors with multiple interrupt acknowledge cycles
@@ -612,7 +614,7 @@ void z80sio_device::z80daisy_irq_reti()
 	return_from_interrupt();
 }
 
-void i8274_new_device::z80daisy_irq_reti()
+void i8274_device::z80daisy_irq_reti()
 {
 	LOGINT("%s - i8274/uPD7201 lacks RETI detection, no action taken\n", FUNCNAME);
 }
@@ -760,7 +762,7 @@ uint8_t z80sio_device::read_vector()
    interrrupt is generated, otherwise it will indicate the previous state."
    8274: "If RR2 is specified but not read, no internal interrupts, regardless of priority, are accepted."
 */
-uint8_t i8274_new_device::read_vector()
+uint8_t i8274_device::read_vector()
 {
 	// 8086 and 8085 modes have different variable bits
 	bool const aff(m_chanB->m_wr1 & WR1_STATUS_VECTOR);
@@ -835,7 +837,7 @@ int const *z80sio_device::interrupt_priorities() const
 	return prio;
 }
 
-int const *i8274_new_device::interrupt_priorities() const
+int const *i8274_device::interrupt_priorities() const
 {
 	static constexpr EQUIVALENT_ARRAY(m_int_state, int) prio_a{
 			0 + z80sio_channel::INT_RECEIVE, 3 + z80sio_channel::INT_RECEIVE,
@@ -856,12 +858,6 @@ int z80sio_device::m1_r()
 {
 	LOGINT("%s %s \n",FUNCNAME, tag());
 	return z80daisy_irq_ack();
-}
-
-int i8274_new_device::m1_r()
-{
-	LOGINT("%s %s \n",FUNCNAME, tag());
-	return 0;
 }
 
 

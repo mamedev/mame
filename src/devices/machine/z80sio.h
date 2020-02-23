@@ -3,6 +3,8 @@
 /***************************************************************************
 
     Z80-SIO Serial Input/Output
+    Intel 8274 Multi-Protocol Serial Controller
+    NEC µPD7201 Multiprotocol Serial Communications Controller
 
 ****************************************************************************
              _____   _____               _____               _____
@@ -49,6 +51,50 @@
           R S S D K S D S S R D                  R S S D K S D S S R C
           A A A A   E B B B B B                  A A A A   E B B B B
                     T                                      T
+                                 _____   _____
+                        CLK   1 |*    \_/     | 40  Vcc
+                     _RESET   2 |             | 39  _CTSA
+                       _CDA   3 |             | 38  _RTSA
+                      _RxCB   4 |             | 37  TxDA
+                       _CDB   5 |             | 36  _TxCA
+                      _CTSB   6 |             | 35  _RxCA
+                      _TxCB   7 |             | 34  RxDA
+                       TxDB   8 |             | 33  _SYNDETA
+                       RxDB   9 |    DIP40    | 32  RDYA/RxDRQA
+             _RTSB/_SYNDETB  10 |    I8274    | 31  _DTRA
+               RDYB/_TxDRQA  11 |             | 30  _IPO/TxDRQB
+                         D7  12 |             | 29  _IPI/RxDRQB
+                         D6  13 |             | 28  _INT
+                         D5  14 |             | 27  _INTA
+                         D4  15 |             | 26  _DTRB
+                         D3  16 |             | 25  A0
+                         D2  17 |             | 24  A1
+                         D1  18 |             | 23  _CS
+                         D0  19 |             | 22  _RD
+                        Vss  20 |_____________| 21  _WR
+
+                                 _____   _____
+                        CLK   1 |*    \_/     | 40  Vcc
+                     _RESET   2 |             | 39  _CTSA
+                      _DCDA   3 |             | 38  _RTSA
+                      _RxCB   4 |             | 37  TxDA
+                      _DCDB   5 |             | 36  _TxCA
+                      _CTSB   6 |             | 35  _RxCA
+                      _TxCB   7 |             | 34  RxDA
+                       TxDB   8 |             | 33  _SYNCA
+                       RxDB   9 |   DIP40     | 32  _WAITA/DRQRxA
+               _RTSB/_SYNCB  10 |   D7201     | 31  _DTRA/_HAO
+             _WAITB/_DRQTxA  11 |             | 30  _PRO/DRQTxB
+                         D7  12 |             | 29  _PRI/DRQRxB
+                         D6  13 |             | 28  _INT
+                         D5  14 |             | 27  _INTAK
+                         D4  15 |             | 26  _DTRB/_HAI
+                         D3  16 |             | 25  B/_A
+                         D2  17 |             | 24  C/_D
+                         D1  18 |             | 23  _CS
+                         D0  19 |             | 22  _RD
+                        Vss  20 |_____________| 21  _WR
+
                                  _____   _____
                            D1  1|*    \_/     |48 D0
                            D3  2|             |47 D2
@@ -103,8 +149,8 @@ class z80sio_device;
 class z80sio_channel : public device_t
 {
 	friend class z80sio_device;
-	friend class i8274_new_device;
-	friend class upd7201_new_device;
+	friend class i8274_device;
+	friend class upd7201_device;
 	friend class mk68564_device;
 
 public:
@@ -488,15 +534,15 @@ protected:
 	int m_int_source[8]; // interrupt source
 };
 
-class i8274_new_device : public z80sio_device
+class i8274_device : public z80sio_device
 {
 public:
-	i8274_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8274_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual int m1_r() override;
+	uint8_t inta_r() { return m1_r(); }
 
 protected:
-	i8274_new_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	i8274_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -509,13 +555,13 @@ protected:
 	virtual int const *interrupt_priorities() const override;
 };
 
-class upd7201_new_device : public i8274_new_device
+class upd7201_device : public i8274_device
 {
 public:
-	upd7201_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-class mk68564_device : public i8274_new_device
+class mk68564_device : public i8274_device
 {
 public:
 	mk68564_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -536,8 +582,8 @@ private:
 
 // device type declaration
 DECLARE_DEVICE_TYPE(Z80SIO,         z80sio_device)
-DECLARE_DEVICE_TYPE(I8274_NEW,      i8274_new_device)
-DECLARE_DEVICE_TYPE(UPD7201_NEW,    upd7201_new_device)
+DECLARE_DEVICE_TYPE(I8274,          i8274_device)
+DECLARE_DEVICE_TYPE(UPD7201,        upd7201_device)
 DECLARE_DEVICE_TYPE(MK68564,        mk68564_device)
 
 #endif // MAME_MACHINE_Z80SIO_H

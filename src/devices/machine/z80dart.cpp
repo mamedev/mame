@@ -2,8 +2,6 @@
 // copyright-holders:Curt Coder
 /***************************************************************************
 
-    Intel 8274 Multi-Protocol Serial Controller emulation
-    NEC µPD7201 Multiprotocol Serial Communications Controller emulation
     Z80-DART Dual Asynchronous Receiver/Transmitter emulation
     Z80-SIO/0/1/2/3/4 Serial Input/Output Controller emulation
 
@@ -51,8 +49,6 @@ DEFINE_DEVICE_TYPE(Z80SIO1,         z80sio1_device,  "z80sio1",         "Z80 SIO
 DEFINE_DEVICE_TYPE(Z80SIO2,         z80sio2_device,  "z80sio2",         "Z80 SIO/2")
 DEFINE_DEVICE_TYPE(Z80SIO3,         z80sio3_device,  "z80sio3",         "Z80 SIO/3")
 DEFINE_DEVICE_TYPE(Z80SIO4,         z80sio4_device,  "z80sio4",         "Z80 SIO/4")
-DEFINE_DEVICE_TYPE(I8274,           i8274_device,    "i8274",           "Intel 8274 MPSC")
-DEFINE_DEVICE_TYPE(UPD7201,         upd7201_device,  "upd7201",         "NEC uPD7201 MPSC")
 
 
 //-------------------------------------------------
@@ -131,16 +127,6 @@ z80sio3_device::z80sio3_device(const machine_config &mconfig, const char *tag, d
 
 z80sio4_device::z80sio4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80dart_device(mconfig, Z80SIO4, tag, owner, clock, TYPE_SIO4)
-{
-}
-
-i8274_device::i8274_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80dart_device(mconfig, I8274, tag, owner, clock, TYPE_I8274)
-{
-}
-
-upd7201_device::upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80dart_device(mconfig, UPD7201, tag, owner, clock, TYPE_UPD7201)
 {
 }
 

@@ -634,7 +634,7 @@ protected:
 
 	required_device<corvus_hdc_device> m_corvus_hdc;
 
-	required_device<upd7201_new_device> m_mpsc;
+	required_device<upd7201_device> m_mpsc;
 	required_device<com8116_003_device> m_dbrg;
 	required_device<rs232_port_device> m_comm_port;
 
@@ -2771,7 +2771,7 @@ WRITE8_MEMBER(rainbow_base_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4
 	// Install 8088 read / write handler once loopback test is over
 	if ( !(data & 32) && (m_diagnostic & 32) )
 	{
-			io.install_readwrite_handler(0x40, 0x43, read8sm_delegate(*m_mpsc, FUNC(upd7201_new_device::cd_ba_r)), write8sm_delegate(*m_mpsc, FUNC(upd7201_new_device::cd_ba_w)));
+			io.install_readwrite_handler(0x40, 0x43, read8sm_delegate(*m_mpsc, FUNC(upd7201_device::cd_ba_r)), write8sm_delegate(*m_mpsc, FUNC(upd7201_device::cd_ba_w)));
 			logerror("\n **** COMM HANDLER INSTALLED **** ");
 			//popmessage("Autoboot from drive %c", m_p_nvram[0xab] ? (64 + m_p_nvram[0xab]) : 0x3F );
 	}
@@ -3306,20 +3306,20 @@ void rainbow_base_state::rainbow_base(machine_config &config)
 	m_dbrg->fr_handler().set(FUNC(rainbow_base_state::dbrg_fr_w));
 	m_dbrg->ft_handler().set(FUNC(rainbow_base_state::dbrg_ft_w));
 
-	UPD7201_NEW(config, m_mpsc, 24.0734_MHz_XTAL / 5 / 2); // 2.4073 MHz (nominally 2.5 MHz)
+	UPD7201(config, m_mpsc, 24.0734_MHz_XTAL / 5 / 2); // 2.4073 MHz (nominally 2.5 MHz)
 	m_mpsc->out_int_callback().set(FUNC(rainbow_base_state::mpsc_irq));
 	m_mpsc->out_txda_callback().set(m_comm_port, FUNC(rs232_port_device::write_txd));
 	m_mpsc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
 	// RTS and DTR outputs are not connected
 
 	RS232_PORT(config, m_comm_port, default_rs232_devices, nullptr);
-	m_comm_port->rxd_handler().set(m_mpsc, FUNC(upd7201_new_device::rxa_w));
-	m_comm_port->cts_handler().set(m_mpsc, FUNC(upd7201_new_device::ctsa_w));
-	m_comm_port->dcd_handler().set(m_mpsc, FUNC(upd7201_new_device::dcda_w));
+	m_comm_port->rxd_handler().set(m_mpsc, FUNC(upd7201_device::rxa_w));
+	m_comm_port->cts_handler().set(m_mpsc, FUNC(upd7201_device::ctsa_w));
+	m_comm_port->dcd_handler().set(m_mpsc, FUNC(upd7201_device::dcda_w));
 
 	rs232_port_device &printer(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
-	printer.rxd_handler().set(m_mpsc, FUNC(upd7201_new_device::rxb_w));
-	printer.dcd_handler().set(m_mpsc, FUNC(upd7201_new_device::ctsb_w)); // actually DTR
+	printer.rxd_handler().set(m_mpsc, FUNC(upd7201_device::rxb_w));
+	printer.dcd_handler().set(m_mpsc, FUNC(upd7201_device::ctsb_w)); // actually DTR
 
 	m_comm_port->option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
 	m_comm_port->option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
