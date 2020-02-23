@@ -1324,6 +1324,5 @@ u32 taitof2_state::screen_update_deadconx(screen_device &screen, bitmap_ind16 &b
 	}
 
 	draw_sprites(screen, bitmap, cliprect, primasks, 0);
-
 	return 0;
 }
