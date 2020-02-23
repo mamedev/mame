@@ -38,7 +38,7 @@ Keyboard: ALP: the key marked with a Greek alpha character makes the computer/pr
 Graphics options: Standard monitor cassette (Cinch for bw and DIN for SCART/RGB connectors) 40/80x21/25
 characters, Full graphics cassette (512x256 pixels, 16 colours, vector graphics, 64K video RAM),
 BTX cassette (compatible with the standard monitor cassette but includes a modem for BTX functionality)
-Floppy: 1 or 2 5.25” DSDD 40 tracks x 5 sectors x 1024 bytes
+Floppy: 1 or 2 5.25” DSDD 40 tracks x 5 sectors x 1024 bytes, external via SCSI, z80+wd1770+sa455
 Connectors: joystick, cassette recorder (600/1200 BD) FSK, printer (recommended: TRD 7020 or
 GABRIELE 9009 typewriter, V24), floppy, module slot
 Options: 2 versions of an autonomous processor PCB (Z8671 based, programmable in TinyBasic
@@ -171,20 +171,25 @@ WRITE8_MEMBER(alphatpc16_state::host_scsi_w)
 			}
 			break;
 	}
+	logerror("%s, data %x bsy %d sel %d req %d ack %d cd %d io %d\n", machine().describe_context(), m_data, m_bsy, m_sel, m_req, m_ack, m_cd, m_io);
 }
 
 READ8_MEMBER(alphatpc16_state::host_scsi_r)
 {
+	u8 ret = 0;
 	switch(offset)
 	{
 		case 0:
-			m_ack = false;
+			m_ack = true;
 			m_req = false;
-			return m_data;
+			ret = m_data;
+			logerror("%s, data %x bsy %d sel %d req %d ack %d cd %d io %d\n", machine().describe_context(), m_data, m_bsy, m_sel, m_req, m_ack, m_cd, m_io);
+			break;
 		case 1:
-			return m_req | (m_bsy << 1) | (m_cd << 3) | (m_io << 5);
+			ret = m_req | (m_bsy << 1) | (m_cd << 3) | (m_io << 5); // bit 2 msg?
+			break;
 	}
-	return 0;
+	return ret;
 }
 
 WRITE8_MEMBER(alphatpc16_state::flop_scsi_w)
@@ -200,21 +205,28 @@ WRITE8_MEMBER(alphatpc16_state::flop_scsi_w)
 			m_bsy = !BIT(data, 0);
 			m_cd = !BIT(data, 2);
 			m_io = !BIT(data, 3);
+			break;
 	}
+	logerror("%s, data %x bsy %d sel %d req %d ack %d cd %d io %d\n", machine().describe_context(), m_data, m_bsy, m_sel, m_req, m_ack, m_cd, m_io);
 }
 
 READ8_MEMBER(alphatpc16_state::flop_scsi_r)
 {
+	u8 ret = 0;
 	switch(offset)
 	{
 		case 0:
 			m_ack = false;
 			m_req = false;
-			return m_data;
+			ret = m_data;
+			logerror("%s, data %x bsy %d sel %d req %d ack %d cd %d io %d\n", machine().describe_context(), m_data, m_bsy, m_sel, m_req, m_ack, m_cd, m_io);
+			break;
 		case 1:
-			return m_bsy | m_sel << 1 | m_ack << 2;
+			ret = m_bsy | m_sel << 1 | !m_ack << 2;
+			m_ack = false;
+			break;
 	}
-	return 0;
+	return ret;
 }
 
 void alphatpc16_state::apc16_map(address_map &map)
@@ -352,6 +364,11 @@ static INPUT_PORTS_START( alphatpc16 )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME)
 INPUT_PORTS_END
 
+static void atpc16_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD); // sa455
+}
+
 void alphatpc16_state::alphatpc16(machine_config &config)
 {
 	/* basic machine hardware */
@@ -370,6 +387,7 @@ void alphatpc16_state::alphatpc16(machine_config &config)
 	m_z80->set_addrmap(AS_PROGRAM, &alphatpc16_state::apc16_z80_map);
 	m_z80->set_addrmap(AS_IO, &alphatpc16_state::apc16_z80_io);
 	WD1770(config, m_wdfdc, 8_MHz_XTAL);
+	FLOPPY_CONNECTOR(config, "wdfdc:0", atpc16_floppies, "525dd", floppy_image_device::default_floppy_formats);
 
 	i8741a_device& i8741(I8741A(config, "i8741", 4.608_MHz_XTAL));
 	i8741.p1_in_cb().set(FUNC(alphatpc16_state::p1_r));
