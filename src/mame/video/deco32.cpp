@@ -234,7 +234,7 @@ u32 fghthist_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
     blending support - it can't be done in-place on the final framebuffer
     without a lot of support bitmaps.
 
-	reference : https://www.youtube.com/watch?v=y73dJ6UQw8M (nslasher)
+    reference : https://www.youtube.com/watch?v=y73dJ6UQw8M (nslasher)
 */
 void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap)
 {
