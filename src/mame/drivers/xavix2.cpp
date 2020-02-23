@@ -46,7 +46,7 @@ private:
 	u16 m_dma_count;
 	emu_timer *m_dma_timer;
 
-	u16 m_port0_ddr, m_port0_data;
+	u32 m_port0_ddr, m_port0_data;
 
 	u16 m_gpu_adr, m_gpu_descsize_adr, m_gpu_descdata_adr;
 	u32 m_int_active;
@@ -80,10 +80,10 @@ private:
 	u8 debug_port_r();
 	u8 debug_port_status_r();
 
-	void port0_ddr_w(u16 data);
-	u16 port0_ddr_r();
-	void port0_w(u16 data);
-	u16 port0_r();
+	void port0_ddr_w(offs_t, u32 data, u32 mem_mask);
+	u32 port0_ddr_r();
+	void port0_w(offs_t, u32 data, u32 mem_mask);
+	u32 port0_r();
 
 	void crtc_w(offs_t reg, u16 data);
 
@@ -280,7 +280,6 @@ TIMER_CALLBACK_MEMBER(xavix2_state::dma_end)
 
 INTERRUPT_GEN_MEMBER(xavix2_state::vblank_irq)
 {
-	logerror("clear\n");
 	memset(m_sd, 0, sizeof(m_sd));
 	irq_raise(IRQ_TIMER);
 }
@@ -308,30 +307,30 @@ u8 xavix2_state::debug_port_status_r()
 	return 1<<1;
 }
 
-void xavix2_state::port0_ddr_w(u16 data)
+void xavix2_state::port0_ddr_w(offs_t, u32 data, u32 mem_mask)
 {
-	m_port0_ddr = data;
-	logerror("port0 ddr %04x\n", data);
+	COMBINE_DATA(&m_port0_ddr);
+	logerror("port0 ddr %08x\n", data);
 }
 
-u16 xavix2_state::port0_ddr_r()
+u32 xavix2_state::port0_ddr_r()
 {
 	return m_port0_ddr;
 }
 
-void xavix2_state::port0_w(u16 data)
+void xavix2_state::port0_w(offs_t, u32 data, u32 mem_mask)
 {
-	m_port0_data = data;
-	m_i2cmem->write_sda(data & 0x20);
-	m_i2cmem->write_scl(data & 0x10);
-	logerror("port0_w %04x\n", data);
+	COMBINE_DATA(&m_port0_data);
+	m_i2cmem->write_sda((m_port0_data & 0x00200000) && m_i2cmem->read_sda());
+	m_i2cmem->write_scl(!!(m_port0_data & 0x00100000));
+	logerror("port0_w %08x\n", m_port0_data);
 }
 
-u16 xavix2_state::port0_r()
+u32 xavix2_state::port0_r()
 {
 	// Slightly hacky, should take ddr into account
-	u16 data = m_port0_data & (m_i2cmem->read_sda() ? ~0x00 : ~0x20);
-	logerror("port0_r %04x\n", data);
+	u32 data = m_i2cmem->read_sda() ? m_port0_data | 0x00200000 : m_port0_data & ~0x00200000;
+	logerror("port0_r %08x\n", data);
 	return data;
 }
 
@@ -386,8 +385,8 @@ void xavix2_state::mem(address_map &map)
 	map(0xffffe00c, 0xffffe00c).w(FUNC(xavix2_state::dma_control_w));
 	map(0xffffe010, 0xffffe010).rw(FUNC(xavix2_state::dma_status_r), FUNC(xavix2_state::dma_status_w));
 
-	map(0xffffe204, 0xffffe205).rw(FUNC(xavix2_state::port0_ddr_r), FUNC(xavix2_state::port0_ddr_w));
-	map(0xffffe20a, 0xffffe20b).rw(FUNC(xavix2_state::port0_r), FUNC(xavix2_state::port0_w));
+	map(0xffffe204, 0xffffe207).rw(FUNC(xavix2_state::port0_ddr_r), FUNC(xavix2_state::port0_ddr_w));
+	map(0xffffe208, 0xffffe20b).rw(FUNC(xavix2_state::port0_r), FUNC(xavix2_state::port0_w));
 	map(0xffffe238, 0xffffe238).rw(FUNC(xavix2_state::debug_port_r), FUNC(xavix2_state::debug_port_w));
 	map(0xffffe239, 0xffffe239).r(FUNC(xavix2_state::debug_port_status_r));
 
@@ -406,7 +405,6 @@ void xavix2_state::mem(address_map &map)
 
 uint32_t xavix2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	logerror("draw\n");
 	constexpr int dx = 0x400 - 320;
 	constexpr int dy = 0x200 - 200;
 
