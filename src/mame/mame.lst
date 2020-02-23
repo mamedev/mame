@@ -37104,6 +37104,7 @@ jak_sbfc                        //
 
 @source:spg2xx_jakks_tvtouch.cpp
 tvtchsw
+tvtchspd
 
 @source:spg2xx_lexibook.cpp
 lexizeus                        // Lexibook
@@ -37111,6 +37112,7 @@ lexiseal                        //
 discpal
 
 @source:spg2xx_mysprtch.cpp
+mysprtch
 mysprtcp
 mysptqvc
 mgt20in1
