@@ -173,6 +173,7 @@ codata.cpp
 coleco.cpp
 compc.cpp
 compis.cpp
+compmahj.cpp
 compuchess.cpp
 compucolor.cpp
 comquest.cpp
