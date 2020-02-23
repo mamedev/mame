@@ -8,7 +8,7 @@
         0x30000000 - 0x30017fff     ROM (3x32k)
         0x30800000 - 0x30800000     Mouse Buttons (1)
         0x31000000 - 0x31000001     Mouse Quadrature (2)
-        0x31800000 - 0x31800001		DIP Switches
+        0x31800000 - 0x31800001     DIP Switches
         0x32000000 - 0x3200000f     DUART0 (serial console on channel B at 19200 baud 8N1, channel A set to 600 baud 8N1 (mouse?))
         0x32800000 - 0x3280000f     DUART1 (printer/modem?)
         0x33000000 - 0x330007ff     SRAM (2k)
@@ -25,7 +25,7 @@
         0x3f000000 - 0x3f000001     Stack Limit (2)
 
     TODO:
-    	Most everything
+        Most everything
 
     Interrupts:
         M68K:
@@ -45,11 +45,11 @@
 
 #include <vector>
 
-#define LOG_RTC				(1 << 0)
-#define LOG_INVALID_SEGMENT	(1 << 1)
-#define LOG_OTHER			(1 << 2)
+#define LOG_RTC             (1 << 0)
+#define LOG_INVALID_SEGMENT (1 << 1)
+#define LOG_OTHER           (1 << 2)
 
-#define VERBOSE		(LOG_OTHER)
+#define VERBOSE     (LOG_OTHER)
 
 #include "logmacro.h"
 
@@ -153,48 +153,48 @@ private:
 		MOUSE_BUTTON_RIGHT      = 0x01,
 		MOUSE_BUTTON_MIDDLE     = 0x02,
 		MOUSE_BUTTON_LEFT       = 0x04,
-		BOARD_REV1      		= 0x60,	/* Board revision - #1 */
-		BOARD_REV2      		= 0x50,	/* Board revision - #2 */
+		BOARD_REV1              = 0x60, /* Board revision - #1 */
+		BOARD_REV2              = 0x50, /* Board revision - #2 */
 
-		MOUSE_XFIRE     = 0x01,	/* X Quadrature Fired, active low */
-		MOUSE_XCHANGE   = 0x02,	/* MOUSE_XCHANGE ? x-- : x++ */
-		MOUSE_YFIRE     = 0x04,	/* Y Quadrature Fired, active low */
-		MOUSE_YCHANGE   = 0x08,	/* MOUSE_YCHANGE ? y-- : y++ */
+		MOUSE_XFIRE     = 0x01, /* X Quadrature Fired, active low */
+		MOUSE_XCHANGE   = 0x02, /* MOUSE_XCHANGE ? x-- : x++ */
+		MOUSE_YFIRE     = 0x04, /* Y Quadrature Fired, active low */
+		MOUSE_YCHANGE   = 0x08, /* MOUSE_YCHANGE ? y-- : y++ */
 
-		PAR_UR      = 0x01,	/* Check parity on user-mode reads */
-		PAR_UW      = 0x02,	/* Check parity on user-mode writes */
-		PAR_KR      = 0x04,	/* Check parity on kernel-mode reads */
-		PAR_KW      = 0x08,	/* Check parity on kernel-mode writes */
-		PAR_DIS0    = 0x10,	/* Disable access to DUART0 and LEDs */
-		PAR_DIS1    = 0x20,	/* Disable access to DUART1 */
-		PAR_MBR     = 0x40,	/* Check parity on multibus reads */
-		PAR_MBW     = 0x80,	/* Check parity on multibus writes */
+		PAR_UR      = 0x01, /* Check parity on user-mode reads */
+		PAR_UW      = 0x02, /* Check parity on user-mode writes */
+		PAR_KR      = 0x04, /* Check parity on kernel-mode reads */
+		PAR_KW      = 0x08, /* Check parity on kernel-mode writes */
+		PAR_DIS0    = 0x10, /* Disable access to DUART0 and LEDs */
+		PAR_DIS1    = 0x20, /* Disable access to DUART1 */
+		PAR_MBR     = 0x40, /* Check parity on multibus reads */
+		PAR_MBW     = 0x80, /* Check parity on multibus writes */
 
-		MBP_DCACC   = 0x01,	/* Display controller access (I/O page 4) */
-		MBP_UCACC   = 0x02,	/* Update controller access (I/O page 3) */
-		MBP_GFACC   = 0x04,	/* Allow GF access (I/O page 1) */
-		MBP_DMACC   = 0x08,	/* Allow GL2 DMA access (0x8nnnnn - x0bnnnnn) */
-		MBP_LIOACC  = 0x10,	/* Allow lower I/O access (0x0nnnnn - 0x7nnnnn) */
-		MBP_HIOACC  = 0x20,	/* Allow upper I/O access (0x8nnnnn - 0xfnnnnn) */
-		MBP_LMACC   = 0x40,	/* Allow lower memory access (0x0nnnnn - 0x7nnnnn) */
-		MBP_HMACC   = 0x80,	/* Allow upper memory access (0x8nnnnn - 0xfnnnnn) */
+		MBP_DCACC   = 0x01, /* Display controller access (I/O page 4) */
+		MBP_UCACC   = 0x02, /* Update controller access (I/O page 3) */
+		MBP_GFACC   = 0x04, /* Allow GF access (I/O page 1) */
+		MBP_DMACC   = 0x08, /* Allow GL2 DMA access (0x8nnnnn - x0bnnnnn) */
+		MBP_LIOACC  = 0x10, /* Allow lower I/O access (0x0nnnnn - 0x7nnnnn) */
+		MBP_HIOACC  = 0x20, /* Allow upper I/O access (0x8nnnnn - 0xfnnnnn) */
+		MBP_LMACC   = 0x40, /* Allow lower memory access (0x0nnnnn - 0x7nnnnn) */
+		MBP_HMACC   = 0x80, /* Allow upper memory access (0x8nnnnn - 0xfnnnnn) */
 
-		STATUS_DIAG0		= 0,
-		STATUS_DIAG1		= 1,
-		STATUS_DIAG2		= 2,
-		STATUS_DIAG3		= 3,
-		STATUS_ENABEXT		= 4,
-		STATUS_ENABINT		= 5,
-		STATUS_BINIT		= 6,
-		STATUS_NOTBOOT		= 7,
-		STATUS_USERFPA		= 8,
-		STATUS_USERGE		= 9,
-		STATUS_SLAVE		= 10,
-		STATUS_ENABCBRQ		= 11,
-		STATUS_NOTGEMASTER	= 12,
-		STATUS_GENBAD		= 13,
-		STATUS_ENABWDOG		= 14,
-		STATUS_QUICK_TOUT	= 15
+		STATUS_DIAG0        = 0,
+		STATUS_DIAG1        = 1,
+		STATUS_DIAG2        = 2,
+		STATUS_DIAG3        = 3,
+		STATUS_ENABEXT      = 4,
+		STATUS_ENABINT      = 5,
+		STATUS_BINIT        = 6,
+		STATUS_NOTBOOT      = 7,
+		STATUS_USERFPA      = 8,
+		STATUS_USERGE       = 9,
+		STATUS_SLAVE        = 10,
+		STATUS_ENABCBRQ     = 11,
+		STATUS_NOTGEMASTER  = 12,
+		STATUS_GENBAD       = 13,
+		STATUS_ENABWDOG     = 14,
+		STATUS_QUICK_TOUT   = 15
 	};
 
 	std::vector<uint8_t> m_file_data;

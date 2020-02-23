@@ -114,7 +114,7 @@ void xavix2_state::irq_clear_w(u16 data)
 	m_int_active &= ~data;
 	if(!m_int_active)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
-	
+
 }
 
 u8 xavix2_state::irq_level_r()
@@ -209,13 +209,13 @@ void xavix2_state::gpu_count_w(u16 data)
 			}
 			break;
 		}
-			
+
 		default:
 			for(u32 yy=0; yy<sy; yy++)
 				for(u32 xx=0; xx<sx; xx++)
 					m_sd[yy+y][xx+x] = 0xffff0000;
 			break;
-		}		
+		}
 	}
 }
 
@@ -258,7 +258,7 @@ void xavix2_state::dma_control_w(u8 data)
 		auto &prg = m_maincpu->space(AS_PROGRAM);
 		for(u32 i=0; i != m_dma_count; i++)
 			prg.write_byte(dadr + i, prg.read_byte(sadr + i));
-		m_dma_timer->adjust(attotime::from_ticks(m_dma_count, m_maincpu->clock()));			
+		m_dma_timer->adjust(attotime::from_ticks(m_dma_count, m_maincpu->clock()));
 	}
 }
 
@@ -373,7 +373,7 @@ void xavix2_state::crtc_w(offs_t reg, u16 data)
 
 void xavix2_state::mem(address_map &map)
 {
-	map(0x00000000, 0x0000ffff).ram();	
+	map(0x00000000, 0x0000ffff).ram();
 	map(0x00010000, 0x00ffffff).rom().region("maincpu", 0x010000);
 
 	map(0x40000000, 0x40ffffff).rom().region("maincpu", 0);

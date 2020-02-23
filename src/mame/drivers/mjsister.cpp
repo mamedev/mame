@@ -149,8 +149,8 @@ MC6845_UPDATE_ROW( mjsister_state::crtc_update_row )
 		uint8_t c2 = ((data_fg & 0xf0) >> 4);
 
 		// 0 is transparent
-		if (c1)	bitmap.pix32(y, x1) = pen[m_colorbank << 5 | 0x10 | c1];
-		if (c2)	bitmap.pix32(y, x2) = pen[m_colorbank << 5 | 0x10 | c2];
+		if (c1) bitmap.pix32(y, x1) = pen[m_colorbank << 5 | 0x10 | c1];
+		if (c2) bitmap.pix32(y, x2) = pen[m_colorbank << 5 | 0x10 | c2];
 	}
 }
 
@@ -299,7 +299,7 @@ void mjsister_state::mjsister_io_map(address_map &map)
 	map(0x33, 0x33).w(FUNC(mjsister_state::input_sel2_w));
 	map(0x34, 0x34).w(FUNC(mjsister_state::dac_adr_s_w));
 	map(0x35, 0x35).w(FUNC(mjsister_state::dac_adr_e_w));
-//	map(0x36, 0x36) // writes 0xf8 here once
+//  map(0x36, 0x36) // writes 0xf8 here once
 }
 
 

@@ -30,7 +30,7 @@
 
   Source: https://en.wikipedia.org/wiki/File:Motorola_Microcomputer_Components_1978_pg13.jpg
 
-  CREDITS & Prior Work: 
+  CREDITS & Prior Work:
   The base code was ripped out of swtpc09.cpp and deviceified but similar code is also to be found
   in exidy440.cpp so copyrigt is probably shared among the authors there: Robert Justice, 68bit and
   Aaron Giles.
@@ -120,7 +120,7 @@ void mc6844_device::device_start()
 {
 	// set our instruction counter
 	set_icountptr(m_icount);
-	
+
 	save_item(NAME(m_m6844_priority));
 	save_item(NAME(m_m6844_interrupt));
 	save_item(NAME(m_m6844_chain));

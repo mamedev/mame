@@ -214,7 +214,7 @@ void _1942_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	// clocks per scanline. With an effective 6MHz pixel clock, this produces a
 	// horizontal scan rate of exactly 15.625kHz, a standard scan rate for games
 	// of this era.
-	// 
+	//
 	// Sprites are drawn by MAME in reverse order, as the actual hardware only
 	// permits a transparent pixel to be overwritten by an opaque pixel, and does
 	// not support opaque-opaque overwriting - i.e., the first sprite to draw wins

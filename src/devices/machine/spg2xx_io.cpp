@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(SPG28X_IO, spg28x_io_device, "spg28x_io", "SPG280-series Syst
 #define LOG_SIO             (1U << 26)
 #define LOG_EXT_MEM         (1U << 27)
 #define LOG_EXTINT          (1U << 28)
-#define LOG_SPI				(1U << 29)
+#define LOG_SPI             (1U << 29)
 #define LOG_IO              (LOG_IO_READS | LOG_IO_WRITES | LOG_IRQS | LOG_GPIO | LOG_UART | LOG_I2C | LOG_TIMERS | LOG_EXTINT | LOG_UNKNOWN_IO | LOG_SPI)
 #define LOG_ALL             (LOG_IO | LOG_VLINES | LOG_SEGMENT | LOG_WATCHDOG | LOG_FIQ | LOG_SIO | LOG_EXT_MEM)
 
@@ -282,7 +282,7 @@ void spg2xx_io_device::do_spi_tx()
 	}
 
 	m_spi_tx(BIT(m_spi_tx_buf, m_spi_tx_bit));
-	
+
 	if (m_spi_tx_bit == 0)
 	{
 		m_spi_tx_bit = 8;
@@ -332,7 +332,7 @@ void spg2xx_io_device::spi_rx(int state)
 
 			if (BIT(m_io_regs[REG_SPI_MISC], 9))
 				m_spi_rx_fifo[(m_spi_rx_fifo_start - 1) & 0x0f] = m_spi_rx_buf;
-			
+
 			m_spi_rx_buf = 0x00;
 			return;
 		}
@@ -342,7 +342,7 @@ void spg2xx_io_device::spi_rx(int state)
 		LOGMASKED(LOG_SPI, "Putting byte into Rx buffer.\n");
 
 		m_io_regs[REG_SPI_MISC] |= 0x0004; // Set RNE flag
-		
+
 		if (m_spi_rx_fifo_count == 0)
 			m_io_regs[REG_SPI_RXDATA] = m_spi_rx_buf;
 

@@ -35,8 +35,8 @@ namespace netlist
 		analog::NETLIB_SUB(R_base) m_R;
 
 		analog_input_t             m_control;
-		param_fp_t             	   m_base_r;
-		state_var<bool>			   m_last;
+		param_fp_t                 m_base_r;
+		state_var<bool>            m_last;
 	};
 
 	NETLIB_RESET(CD4066_GATE)

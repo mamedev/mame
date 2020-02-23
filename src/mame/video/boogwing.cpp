@@ -22,7 +22,7 @@ void boogwing_state::video_start()
  fixed, with manual mixing you have full control.
 
  apparently priority is based on a PROM, that should be used if possible.
- 
+
  Reference video : https://www.youtube.com/watch?v=mRdIlP_erBM (Live stream)
 */
 void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

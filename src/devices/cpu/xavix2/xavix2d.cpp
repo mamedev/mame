@@ -357,7 +357,7 @@ offs_t xavix2_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		// fd
 	case 0xfe:            util::stream_format(stream, "wait"); break;
 		// ff
-	default:	          util::stream_format(stream, "?%02x", m_opcode >> 24);
+	default:              util::stream_format(stream, "?%02x", m_opcode >> 24);
 	}
 
 	return nb | flags | SUPPORTED;

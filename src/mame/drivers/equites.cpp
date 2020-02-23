@@ -105,12 +105,12 @@ Notes:
 - similarly, splndrbt hardware only appears to be capable of displaying 24 sprites.
   This time, they are consecutive in RAM.
 
-- gekisou doesn't have dip-switches but battery backed RAM. 
-  By pressing service button (F2) at any time after POST operator can access to 
-  a simple config menu with no setting OSD indication about what they do but just a 
-  laconic number for each, basically mimicking an actual dip bank. 
-  END arrows indicates where to exit and return back to title screen, basically 
-  giving the operator to either read or rewrite all the settings. 
+- gekisou doesn't have dip-switches but battery backed RAM.
+  By pressing service button (F2) at any time after POST operator can access to
+  a simple config menu with no setting OSD indication about what they do but just a
+  laconic number for each, basically mimicking an actual dip bank.
+  END arrows indicates where to exit and return back to title screen, basically
+  giving the operator to either read or rewrite all the settings.
   Defaults are all ON.
 
   Settings:                1   2   3   4   5   6   7   8
@@ -155,9 +155,9 @@ TODO:
 - gekisou: there is a small glitch during the text intro at the beginning of player
   2 game in cocktail mode: a white line spills out from the text box as characters
   in the last line are written. This might well be a bug in the original.
-  Update: background is actually misaligned one line, cfr. the blue buildings 
+  Update: background is actually misaligned one line, cfr. the blue buildings
   that are near the status bar (missing on the other side).
-  
+
 - splndrbt, hvoltage: the interpretation of the scaling PROMs might be wrong.
   The sprite x scaling is not used at all because I couldn't figure it out.
   Sprite y scaling is slightly wrong and leaves gaps in tall objects.

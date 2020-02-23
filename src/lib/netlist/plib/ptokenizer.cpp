@@ -249,7 +249,7 @@ namespace plib {
 			auto id = m_tokens.find(tokstr);
 			return (id != m_tokens.end()) ?
 					token_t(id->second, tokstr)
-				: 	token_t(token_type::IDENTIFIER, tokstr);
+				:   token_t(token_type::IDENTIFIER, tokstr);
 		}
 		else if (c == m_string)
 		{
@@ -282,7 +282,7 @@ namespace plib {
 			auto id = m_tokens.find(tokstr);
 			return (id != m_tokens.end()) ?
 					token_t(id->second, tokstr)
-				:	token_t(token_type::UNKNOWN, tokstr);
+				:   token_t(token_type::UNKNOWN, tokstr);
 		}
 	}
 

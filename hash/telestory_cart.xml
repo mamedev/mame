@@ -157,7 +157,7 @@ Undumped carts:
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="thomas" supported="no">
 		<description>Thomas &amp; Friends - Thomas Visits the Toy Shop / Thomas' Milkshake Mix</description>
 		<year>2006</year>
@@ -167,6 +167,6 @@ Undumped carts:
 				<rom name="telestory_thomasvisitstoyshop_milkshakemix.bin" size="0x800000" crc="4b99c75d" sha1="a3885e435b0bf5a87f3952da2880c36d118af17e"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 </softwarelist>

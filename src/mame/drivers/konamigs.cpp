@@ -258,10 +258,10 @@ READ64_MEMBER(gsan_state::portc_r)
 WRITE64_MEMBER(gsan_state::portc_w)
 {
 /* DDR
-	---- x--- /Coin counter
-	--x- ---- Start button lamp
-	-x-- ---- Right button lamp 
-	x--- ---- Left button lamp 
+    ---- x--- /Coin counter
+    --x- ---- Start button lamp
+    -x-- ---- Right button lamp
+    x--- ---- Left button lamp
 */
 	m_portc_data = data;
 
@@ -270,10 +270,10 @@ WRITE64_MEMBER(gsan_state::portc_w)
 WRITE64_MEMBER(gsan_state::portc_medal_w)
 {
 /* Medal
-	---- ---x Medal in counter
-	---- --x- 100Y in counter
-	---- -x-- 10Y in counter
-	x--- ---- Hopper
+    ---- ---x Medal in counter
+    ---- --x- 100Y in counter
+    ---- -x-- 10Y in counter
+    x--- ---- Hopper
 */
 	m_portc_data = data;
 
@@ -289,22 +289,22 @@ READ64_MEMBER(gsan_state::porte_r)
 WRITE64_MEMBER(gsan_state::porte_w)
 {
 /* DDR
-	---- -x-- Lamp R3
-	---- x--- Lamp R2
-	---x ---- Lamp R1
-	--x- ---- Lamp L3
-	-x-- ---- Lamp L2
-	x--- ---- Lamp L1
+    ---- -x-- Lamp R3
+    ---- x--- Lamp R2
+    ---x ---- Lamp R1
+    --x- ---- Lamp L3
+    -x-- ---- Lamp L2
+    x--- ---- Lamp L1
 */
 	m_porte_data = data;
 }
 WRITE64_MEMBER(gsan_state::porte_medal_w)
 {
 /* Medal
-	---- ---x Medal in lock
-	---- --x- 100Y in lock
-	---- -x-- 10Y in lock
-	-x-- ---- Button lamp
+    ---- ---x Medal in lock
+    ---- --x- 100Y in lock
+    ---- -x-- 10Y in lock
+    -x-- ---- Button lamp
 */
 	m_porte_data = data;
 

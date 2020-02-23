@@ -104,11 +104,11 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define VERBOSE		(0)
+#define VERBOSE     (0)
 #include "logmacro.h"
 
 #define Q209_CPU_CLOCK          (40.21_MHz_XTAL / 40) // verified by manual
-#define SYSTEM_CAS_CLOCK		(40.21_MHz_XTAL / 20) // likewise
+#define SYSTEM_CAS_CLOCK        (40.21_MHz_XTAL / 20) // likewise
 
 #define M6809_CLOCK             8000000 // wrong
 #define MASTER_OSCILLATOR       34.291712_MHz_XTAL

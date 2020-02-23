@@ -10,7 +10,7 @@
 #include "audio/cmi01a.h"
 #include "machine/input_merger.h"
 
-#define VERBOSE		(0)
+#define VERBOSE     (0)
 #include "logmacro.h"
 
 #define MASTER_OSCILLATOR       XTAL(34'291'712)

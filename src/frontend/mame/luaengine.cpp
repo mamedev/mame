@@ -1504,7 +1504,7 @@ void lua_engine::initialize()
  * #log - entry count
  */
 
- 	sol().registry().new_usertype<wrap_textbuf>("text_buffer", "new", sol::no_constructor,
+	sol().registry().new_usertype<wrap_textbuf>("text_buffer", "new", sol::no_constructor,
 			"__metatable", [](){},
 			"__newindex", [](){},
 			"__index", [](wrap_textbuf &buf, int index) { return text_buffer_get_seqnum_line(buf.textbuf, index - 1); },

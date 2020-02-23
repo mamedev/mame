@@ -9152,7 +9152,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="cischeat">
 		<!-- Dumped via Kryoflux -->
 		<description>Cisco Heat - All American Police Car Race</description>
@@ -10094,8 +10094,8 @@
 				<rom name="Epic Pinball - Cyborgirl [The B&amp;N Companies] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="7370af3e" sha1="6ae169ff06c03da063ac72cb3318b76facbf0559"/>
 			</dataarea>
 		</part>
-	</software>		
-	
+	</software>
+
 	<software name="epdeepsea">
 		<description>Epic Pinball: Deep Sea</description>
 		<year>1994</year>
@@ -10108,7 +10108,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 
 	<software name="epenigma">
 		<description>Epic Pinball: Enigma</description>
@@ -10133,7 +10133,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="epicpin1">
 		<description>Epic Pinball Pack 1 (v2.1)</description>
 		<year>1994</year>

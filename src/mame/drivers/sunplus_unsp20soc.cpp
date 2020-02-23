@@ -1,16 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*
-	(unSP 2.0 based System on a Chip)
+    (unSP 2.0 based System on a Chip)
 
     JAKKS call this GPAC800, other sources call it GPL16250
 
-	die markings GCM394
-	 - Smart Fit Park
-	 - Spongebob Bikini Bottom 500
-	 - Mobigo2 (sunplus_unsp20soc_mobigo.cpp)
+    die markings GCM394
+     - Smart Fit Park
+     - Spongebob Bikini Bottom 500
+     - Mobigo2 (sunplus_unsp20soc_mobigo.cpp)
 
-	some of the systems here might use newer dies but the video etc. appears the same.
+    some of the systems here might use newer dies but the video etc. appears the same.
 
     Compared to vii.cpp this is clearly newer, has extra opcodes, different internal map etc. also scaling and higher resolutions based on Spongebob
 

@@ -242,7 +242,7 @@ WRITE_LINE_MEMBER(jakks_tvtouch_state::spi_w)
 		/*static uint8_t s_value = 0x40;
 		for (int bit = 7; bit >= 0; bit--)
 		{
-			m_maincpu->spi_rx(BIT(s_value, bit));
+		    m_maincpu->spi_rx(BIT(s_value, bit));
 		}
 		s_value ^= 0x80;*/
 	}

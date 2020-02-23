@@ -53,7 +53,7 @@
 
 -------
 
-		CPU die markings on Big Buck Hunter "SunplusmM LU9001"
+        CPU die markings on Big Buck Hunter "SunplusmM LU9001"
 
 
 ****************************************************************************/

@@ -56,7 +56,7 @@ private:
 	void run_voice();
 	void update_wave_addr(int inc);
 
-	uint32_t	m_channel;
+	uint32_t    m_channel;
 	emu_timer * m_zx_timer;
 	uint8_t     m_zx_flag;
 	uint8_t     m_zx_ff;

@@ -106,7 +106,7 @@ void spg2xx_audio_device::device_start()
 		save_item(NAME(m_adpcm36_state[i].m_prevsamp), i);
 
 		memset(m_adpcm36_state + i, 0, sizeof(adpcm36_state));
-		
+
 		m_channel_irq[i] = timer_alloc(TIMER_IRQ + i);
 		m_channel_irq[i]->adjust(attotime::never);
 	}
@@ -1078,22 +1078,22 @@ uint16_t spg2xx_audio_device::decode_adpcm36_nybble(const uint32_t channel, cons
 {
 	/*static const int8_t s_filter_coef[16][2] =
 	{
-		{ 0, 0 },
-		{ 60, 0 },
-		{ 115,-52 },
-		{ 98,-55 },
-		{ 122,-60 },
-		{ 122,-60 },
-		{ 122,-60 },
-		{ 122,-60 },
-		{ 0, 0 },
-		{ 60, 0 },
-		{ 115,-52 },
-		{ 98,-55 },
-		{ 122,-60 },
-		{ 122,-60 },
-		{ 122,-60 },
-		{ 122,-60 },
+	    { 0, 0 },
+	    { 60, 0 },
+	    { 115,-52 },
+	    { 98,-55 },
+	    { 122,-60 },
+	    { 122,-60 },
+	    { 122,-60 },
+	    { 122,-60 },
+	    { 0, 0 },
+	    { 60, 0 },
+	    { 115,-52 },
+	    { 98,-55 },
+	    { 122,-60 },
+	    { 122,-60 },
+	    { 122,-60 },
+	    { 122,-60 },
 	};*/
 
 	adpcm36_state &state = m_adpcm36_state[channel];

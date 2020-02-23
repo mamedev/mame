@@ -24,7 +24,7 @@ protected:
 		F_MASK = 15,
 		F_I = 16
 	};
-		
+
 	static const u8 bpo[8];
 
 	virtual void device_start() override;
@@ -109,8 +109,8 @@ protected:
 		if(r & 0x80000000)
 			f |= F_N;
 		m_f = (m_f & ~F_MASK) | f;
-		return r;		
-	}		
+		return r;
+	}
 
 	inline u32 do_lsl(u32 v1, u32 shift) {
 		if(!shift) {

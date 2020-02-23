@@ -7,7 +7,7 @@
     6502 with instruction scrambling
 
     Seen on die marked VH2009, used on polmega, silv35
-	but also elsewhere
+    but also elsewhere
 
 ***************************************************************************/
 

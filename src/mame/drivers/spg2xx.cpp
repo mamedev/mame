@@ -33,9 +33,9 @@
             Clickstart ( see clickstart.cpp instead)
             Wheel of Fortune 2nd Edition
             Spider-man - Villain Roundup
-			Dream Life Superstar
-			Designer's World
-			Star Wars TV Touch
+            Dream Life Superstar
+            Designer's World
+            Star Wars TV Touch
 
         "SunPlus QU7074-P69A"
 
@@ -987,7 +987,7 @@ void spg2xx_game_tmntmutm_state::tmntmutm(machine_config &config)
 READ16_MEMBER(spg2xx_game_pballpup_state::porta_r)
 {
 	uint16_t ret = m_io_p1->read() & 0xfff7;
-//	logerror("%s: spg2xx_game_pballpup_state::porta_r\n", machine().describe_context());
+//  logerror("%s: spg2xx_game_pballpup_state::porta_r\n", machine().describe_context());
 	ret |= m_eeprom->do_read() ? 0x8 : 0x0;
 	return ret;
 }

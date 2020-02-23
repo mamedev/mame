@@ -141,7 +141,7 @@ uint32_t xavix2_device::execute_max_cycles() const noexcept
 }
 
 uint32_t xavix2_device::execute_input_lines() const noexcept
-{	
+{
 	return 1;
 }
 
@@ -374,7 +374,7 @@ void xavix2_device::execute_run()
 		case 0xda:            if(!(m_f & F_Z)) npc = m_pc + val8s(opcode); break;
 		case 0xdb:            if(!(m_f & F_Z) && !(m_f & F_C)) npc = m_pc + val8s(opcode); break;
 		case 0xdc:            if(!(m_f & F_N)) npc = m_pc + val8s(opcode); break;
-		case 0xdd:            break;														  
+		case 0xdd:            break;
 		case 0xde:            if(((m_f & F_N) && (m_f & F_V)) || (!(m_f & F_V) && !(m_f & F_N))) npc = m_pc + val8s(opcode); break;
 		case 0xdf:            if((!(m_f & F_Z) && (m_f & F_N) && (m_f & F_V)) || (!(m_f & F_Z) && !(m_f & F_V) && !(m_f & F_N))) npc = m_pc + val8s(opcode); break;
 
@@ -400,7 +400,7 @@ void xavix2_device::execute_run()
 		case 0xfe:            m_wait = true; npc = check_interrupt(npc-1); if(m_wait) m_icount = 0; break;
 			// ff
 		}
-			
+
 		m_pc = npc;
 	}
 }
