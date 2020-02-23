@@ -23,7 +23,7 @@ public:
 	gigatron_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_io_inputs(*this, "INPUTS")
+		m_io_inputs(*this, "GAMEPAD")
 	{
 	}
 
@@ -89,7 +89,7 @@ void gigatron_state::blinkenlights()
 }
 
 static INPUT_PORTS_START(gigatron)
-	PORT_START("INPUTS")
+	PORT_START("GAMEPAD")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
@@ -114,7 +114,7 @@ void gigatron_state::gigatron(machine_config &config)
 	screen.set_screen_update(FUNC(gigatron_state::screen_update));
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
+	//SPEAKER(config, "mono").front_center();
 }
 
 ROM_START( gigatron )
