@@ -316,7 +316,7 @@ void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bi
 
 					if (pri1 == 0 && (((priColAlphaPal0 & 0xff) == 0 || ((pri0 & 0x3) != 0 && (pri0 & 0x3) != 1 && (pri0 & 0x3) != 2))))
 					{
-						if ((m_pri & 1) == 0 || ((m_pri & 1) == 0 || tilemapPri[x] < 4) || ((m_pri & 1) == 1 && mixAlphaTilemap))
+						if ((m_pri & 1) == 0 || ((m_pri & 1) == 1 && tilemapPri[x] < 4) || ((m_pri & 1) == 1 && mixAlphaTilemap))
 							destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], alpha);
 					}
 					else if (pri1 == 1 && ((m_pri & 1) == 0 || tilemapPri[x] < 4)
