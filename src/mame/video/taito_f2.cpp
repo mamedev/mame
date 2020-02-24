@@ -283,7 +283,7 @@ void taitof2_state::koshien_spritebank_w(u16 data)
 }
 
 void taitof2_state::taito_f2_tc360_spritemixdraw(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
-		u32 code, u32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley)
+		u32 code, u32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, u64 primask, bool use_mixer)
 {
 	const u16 pal_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
 	const u8 *source_base = gfx->get_data(code % gfx->elements());
@@ -353,77 +353,96 @@ void taitof2_state::taito_f2_tc360_spritemixdraw(screen_device &screen, bitmap_i
 		if (ex > sx)
 		{
 			/* skip if inner loop doesn't draw anything */
-			for (int y = sy; y < ey; y++)
+			if (use_mixer)
 			{
-				const u8 *source = source_base + (y_index >> 16) * gfx->rowbytes();
-				u16 *dest = &dest_bmp.pix16(y);
-				u8 *pri = &priority_bitmap.pix8(y);
-
-				int x_index = x_index_base;
-				for (int x = sx; x < ex; x++)
+				for (int y = sy; y < ey; y++)
 				{
-					const u8 c = source[x_index >> 16];
-					if (c && (pri[x] & 0x80) == 0)
+					const u8 *source = source_base + (y_index >> 16) * gfx->rowbytes();
+					u16 *dest = &dest_bmp.pix16(y);
+					u8 *pri = &priority_bitmap.pix8(y);
+
+					int x_index = x_index_base;
+					for (int x = sx; x < ex; x++)
 					{
-						u8 tilemap_priority = 0, sprite_priority = 0;
-
-						// Get tilemap priority (0 - 0xf) for this destination pixel
-						if (pri[x] & 0x10) tilemap_priority = m_tilepri[4];
-						else if (pri[x] & 0x8) tilemap_priority = m_tilepri[3];
-						else if (pri[x] & 0x4) tilemap_priority = m_tilepri[2];
-						else if (pri[x] & 0x2) tilemap_priority = m_tilepri[1];
-						else if (pri[x] & 0x1) tilemap_priority = m_tilepri[0];
-
-						// Get sprite priority (0 - 0xf) for this source pixel
-						if ((color & 0xc0) == 0xc0)
-							sprite_priority = m_spritepri[3];
-						else if ((color & 0xc0) == 0x80)
-							sprite_priority = m_spritepri[2];
-						else if ((color & 0xc0) == 0x40)
-							sprite_priority = m_spritepri[1];
-						else if ((color & 0xc0) == 0x00)
-							sprite_priority = m_spritepri[0];
-
-						// Blend mode 1 - Sprite under tilemap, use sprite palette with tilemap data
-						if ((m_spriteblendmode & 0xc0) == 0xc0 && sprite_priority == (tilemap_priority - 1))
+						const u8 c = source[x_index >> 16];
+						if (c && (pri[x] & 0x80) == 0)
 						{
-							dest[x] = ((pal_base + c) & 0xfff0) | (dest[x] & 0xf);
-						}
-						// Blend mode 1 - Sprite over tilemap, use sprite data with tilemap palette
-						else if ((m_spriteblendmode & 0xc0) == 0xc0 && sprite_priority == (tilemap_priority + 1))
-						{
-							if (dest[x] & 0xf)
-								dest[x] = (dest[x] & 0xfff0) | ((pal_base + c) & 0xf);
+							u8 tilemap_priority = 0, sprite_priority = 0;
+
+							// Get tilemap priority (0 - 0xf) for this destination pixel
+							if (pri[x] & 0x10) tilemap_priority = m_tilepri[4];
+							else if (pri[x] & 0x8) tilemap_priority = m_tilepri[3];
+							else if (pri[x] & 0x4) tilemap_priority = m_tilepri[2];
+							else if (pri[x] & 0x2) tilemap_priority = m_tilepri[1];
+							else if (pri[x] & 0x1) tilemap_priority = m_tilepri[0];
+
+							// Get sprite priority (0 - 0xf) for this source pixel
+							sprite_priority = m_spritepri[primask & 0x03];
+
+							// Blend mode 1 - Sprite under tilemap, use sprite palette with tilemap data
+							if ((m_spriteblendmode & 0xc0) == 0xc0 && sprite_priority == (tilemap_priority - 1))
+							{
+								dest[x] = ((pal_base + c) & 0xfff0) | (dest[x] & 0xf);
+							}
+							// Blend mode 1 - Sprite over tilemap, use sprite data with tilemap palette
+							else if ((m_spriteblendmode & 0xc0) == 0xc0 && sprite_priority == (tilemap_priority + 1))
+							{
+								if (dest[x] & 0xf)
+									dest[x] = (dest[x] & 0xfff0) | ((pal_base + c) & 0xf);
+								else
+									dest[x] = pal_base + c;
+							}
+							// Blend mode 2 - Sprite under tilemap, use sprite data with tilemap palette
+							else if ((m_spriteblendmode & 0xc0) == 0x80 && sprite_priority == (tilemap_priority - 1))
+							{
+								dest[x] = (dest[x] & 0xffef);
+							}
+							// Blend mode 2 - Sprite over tilemap, alternate sprite palette, confirmed in Pulirula level 2
+							else if ((m_spriteblendmode & 0xc0) == 0x80 && sprite_priority == (tilemap_priority + 1))
+							{
+								dest[x] = ((pal_base + c) & 0xffef); // Pulirula level 2, Liquid Kids attract mode
+							}
+							// No blending
 							else
-								dest[x] = pal_base + c;
+							{
+								if (sprite_priority > tilemap_priority) // Ninja Kids confirms tilemap takes priority in equal value case
+									dest[x] = pal_base + c;
+							}
+							pri[x] |= 0x80;
 						}
-						// Blend mode 2 - Sprite under tilemap, use sprite data with tilemap palette
-						else if ((m_spriteblendmode & 0xc0) == 0x80 && sprite_priority == (tilemap_priority - 1))
-						{
-							dest[x] = (dest[x] & 0xffef);
-						}
-						// Blend mode 2 - Sprite over tilemap, alternate sprite palette, confirmed in Pulirula level 2
-						else if ((m_spriteblendmode & 0xc0) == 0x80 && sprite_priority == (tilemap_priority + 1))
-						{
-							dest[x] = ((pal_base + c) & 0xffef); // Pulirula level 2, Liquid Kids attract mode
-						}
-						// No blending
-						else
-						{
-							if (sprite_priority > tilemap_priority) // Ninja Kids confirms tilemap takes priority in equal value case
-								dest[x] = pal_base + c;
-						}
-						pri[x] |= 0x80;
+						x_index += dx;
 					}
-					x_index += dx;
+					y_index += dy;
 				}
-				y_index += dy;
+			}
+			else // without blending
+			{
+				for (int y = sy; y < ey; y++)
+				{
+					const u8 *source = source_base + (y_index >> 16) * gfx->rowbytes();
+					u16 *dest = &dest_bmp.pix16(y);
+					u8 *pri = &priority_bitmap.pix8(y);
+
+					int x_index = x_index_base;
+					for (int x = sx; x < ex; x++)
+					{
+						const u8 c = source[x_index >> 16];
+						if (c && (pri[x] & 0x80) == 0)
+						{
+							if (((1 << (pri[x] & 0x3f)) & primask) == 0)
+								dest[x] = pal_base + c;
+							pri[x] |= 0x80;
+						}
+						x_index += dx;
+					}
+					y_index += dy;
+				}
 			}
 		}
 	}
 }
 
-void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u32 *primasks, int uses_tc360_mixer)
+void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u64 *primasks, int uses_tc360_mixer)
 {
 	/*
 	    Sprite format:
@@ -755,7 +774,9 @@ void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 			if (primasks || uses_tc360_mixer)
 			{
-				if (primasks)
+				if (uses_tc360_mixer)
+					sprite_ptr->primask = (color & 0xc0) >> 6;
+				else if (primasks)
 					sprite_ptr->primask = primasks[(color & 0xc0) >> 6];
 
 				sprite_ptr++;
@@ -778,21 +799,12 @@ void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 	{
 		sprite_ptr--;
 
-		if (!uses_tc360_mixer)
-			m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap,cliprect,
-					sprite_ptr->code,
-					sprite_ptr->color,
-					sprite_ptr->flipx,sprite_ptr->flipy,
-					sprite_ptr->x,sprite_ptr->y,
-					sprite_ptr->zoomx,sprite_ptr->zoomy,
-					screen.priority(),sprite_ptr->primask,0);
-		else
-			taito_f2_tc360_spritemixdraw(screen,bitmap,cliprect,m_gfxdecode->gfx(0),
-					sprite_ptr->code,
-					sprite_ptr->color,
-					sprite_ptr->flipx,sprite_ptr->flipy,
-					sprite_ptr->x,sprite_ptr->y,
-					sprite_ptr->zoomx,sprite_ptr->zoomy);
+		taito_f2_tc360_spritemixdraw(screen,bitmap,cliprect,m_gfxdecode->gfx(0),
+				sprite_ptr->code,
+				sprite_ptr->color,
+				sprite_ptr->flipx,sprite_ptr->flipy,
+				sprite_ptr->x,sprite_ptr->y,
+				sprite_ptr->zoomx,sprite_ptr->zoomy,sprite_ptr->primask,uses_tc360_mixer);
 	}
 }
 
@@ -1140,14 +1152,8 @@ u32 taitof2_state::screen_update_thundfox(screen_device &screen, bitmap_ind16 &b
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);   /* wrong color? */
 
-	/*
-	TODO: This isn't the correct way to handle the priority. At the moment of
-	writing, pdrawgfx() doesn't support 6 layers, so I have to cheat, assuming
-	that the two FG layers are always on top of sprites.
-	*/
-
 	drawn[0] = drawn[1] = 0;
-	while (drawn[0] < 2 && drawn[1] < 2)
+	while (drawn[0] < 3 && drawn[1] < 3)
 	{
 		int pick;
 
@@ -1160,48 +1166,33 @@ u32 taitof2_state::screen_update_thundfox(screen_device &screen, bitmap_ind16 &b
 			pick = 1;
 		}
 
-		m_tc0100scn[pick]->tilemap_draw(screen, bitmap, cliprect, layer[pick][drawn[pick]], 0, 1 << (drawn[pick] + 2 * pick));
+		m_tc0100scn[pick]->tilemap_draw(screen, bitmap, cliprect, layer[pick][drawn[pick]], 0, 1 << (drawn[pick] + 3 * pick));
 		drawn[pick]++;
 	}
-	while (drawn[0] < 2)
+	while (drawn[0] < 3)
 	{
 		m_tc0100scn[0]->tilemap_draw(screen, bitmap, cliprect, layer[0][drawn[0]], 0, 1 << drawn[0]);
 		drawn[0]++;
 	}
-	while (drawn[1] < 2)
+	while (drawn[1] < 3)
 	{
-		m_tc0100scn[1]->tilemap_draw(screen, bitmap, cliprect, layer[1][drawn[1]], 0, 1 << (drawn[1] + 2));
+		m_tc0100scn[1]->tilemap_draw(screen, bitmap, cliprect, layer[1][drawn[1]], 0, 1 << (drawn[1] + 3));
 		drawn[1]++;
 	}
 
-	u32 primasks[4] = {0,0,0,0};
+	u64 primasks[4] = {0,0,0,0};
 
 	for (int i = 0; i < 4; i++)
 	{
-		if (spritepri[i] < tilepri[0][0]) primasks[i] |= 0xaaaa;
-		if (spritepri[i] < tilepri[0][1]) primasks[i] |= 0xcccc;
-		if (spritepri[i] < tilepri[1][0]) primasks[i] |= 0xf0f0;
-		if (spritepri[i] < tilepri[1][1]) primasks[i] |= 0xff00;
+		if (spritepri[i] < tilepri[0][0]) primasks[i] |= 0xaaaaaaaaaaaaaaaaU;
+		if (spritepri[i] < tilepri[0][1]) primasks[i] |= 0xccccccccccccccccU;
+		if (spritepri[i] < tilepri[0][2]) primasks[i] |= 0xf0f0f0f0f0f0f0f0U;
+		if (spritepri[i] < tilepri[1][0]) primasks[i] |= 0xff00ff00ff00ff00U;
+		if (spritepri[i] < tilepri[1][1]) primasks[i] |= 0xffff0000ffff0000U;
+		if (spritepri[i] < tilepri[1][2]) primasks[i] |= 0xffffffff00000000U;
 	}
 
 	draw_sprites(screen, bitmap,cliprect,primasks,0);
-
-	/*
-	TODO: This isn't the correct way to handle the priority. At the moment of
-	writing, pdrawgfx() doesn't support 6 layers, so I have to cheat, assuming
-	that the two FG layers are always on top of sprites.
-	*/
-
-	if (tilepri[0][2] < tilepri[1][2])
-	{
-		m_tc0100scn[0]->tilemap_draw(screen, bitmap, cliprect, layer[0][2], 0, 0);
-		m_tc0100scn[1]->tilemap_draw(screen, bitmap, cliprect, layer[1][2], 0, 0);
-	}
-	else
-	{
-		m_tc0100scn[1]->tilemap_draw(screen, bitmap, cliprect, layer[1][2], 0, 0);
-		m_tc0100scn[0]->tilemap_draw(screen, bitmap, cliprect, layer[0][2], 0, 0);
-	}
 	return 0;
 }
 
@@ -1305,8 +1296,6 @@ u32 taitof2_state::screen_update_deadconx(screen_device &screen, bitmap_ind16 &b
 	tilepri[1] = m_tc0360pri->read(5) & 0x0f;    /* bg1 */
 	tilepri[2] = m_tc0360pri->read(5) >> 4;      /* bg2 */
 	tilepri[3] = m_tc0360pri->read(4) & 0x0f;    /* bg3 */
-
-/* we actually assume text layer is on top of everything anyway, but FWIW... */
 	tilepri[layer[4]] = m_tc0360pri->read(9) >> 4;    /* fg (text layer) */
 
 	spritepri[0] = m_tc0360pri->read(6) & 0x0f;
@@ -1321,25 +1310,19 @@ u32 taitof2_state::screen_update_deadconx(screen_device &screen, bitmap_ind16 &b
 	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
 	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
 	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[3], 0, 8);
+	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[4], 0, 16);
 
-	u32 primasks[4] = {0,0,0,0};
+	u64 primasks[4] = {0,0,0,0};
 
 	for (int i = 0; i < 4; i++)
 	{
-		if (spritepri[i] < tilepri[(layer[0])]) primasks[i] |= 0xaaaa;
-		if (spritepri[i] < tilepri[(layer[1])]) primasks[i] |= 0xcccc;
-		if (spritepri[i] < tilepri[(layer[2])]) primasks[i] |= 0xf0f0;
-		if (spritepri[i] < tilepri[(layer[3])]) primasks[i] |= 0xff00;
+		if (spritepri[i] < tilepri[(layer[0])]) primasks[i] |= 0xaaaaaaaaaaaaaaaaU;
+		if (spritepri[i] < tilepri[(layer[1])]) primasks[i] |= 0xccccccccccccccccU;
+		if (spritepri[i] < tilepri[(layer[2])]) primasks[i] |= 0xf0f0f0f0f0f0f0f0U;
+		if (spritepri[i] < tilepri[(layer[3])]) primasks[i] |= 0xff00ff00ff00ff00U;
+		if (spritepri[i] < tilepri[(layer[4])]) primasks[i] |= 0xffff0000ffff0000U;
 	}
 
 	draw_sprites(screen, bitmap, cliprect, primasks, 0);
-
-	/*
-	TODO: This isn't the correct way to handle the priority. At the moment of
-	writing, pdrawgfx() doesn't support 5 layers, so I have to cheat, assuming
-	that the FG layer is always on top of sprites.
-	*/
-
-	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[4], 0, 0);
 	return 0;
 }
