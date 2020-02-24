@@ -93,7 +93,14 @@ public:
 	// Set memory space
 	void install_mem_rw(address_space& space);
 	
-	template <std::size_t Level> auto irq_callback() { return m_irq_cb[Level].bind(); }
+	auto irq0_callback() { return m_irq_cb[0].bind(); }
+	auto irq1_callback() { return m_irq_cb[1].bind(); }
+	auto irq2_callback() { return m_irq_cb[2].bind(); }
+	auto irq3_callback() { return m_irq_cb[3].bind(); }
+	auto irq4_callback() { return m_irq_cb[4].bind(); }
+	auto irq5_callback() { return m_irq_cb[5].bind(); }
+	auto irq6_callback() { return m_irq_cb[6].bind(); }
+	auto irq7_callback() { return m_irq_cb[7].bind(); }
 	auto irqa_callback() { return m_irqa_cb.bind(); }
 	
 	DECLARE_WRITE_LINE_MEMBER( irq0_w );
