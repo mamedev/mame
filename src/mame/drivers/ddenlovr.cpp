@@ -9641,6 +9641,8 @@ MACHINE_RESET_MEMBER(ddenlovr_state,ddenlovr)
 	m_romdata[1] = 0;
 
 	memset(m_palram, 0, ARRAY_LENGTH(m_palram));
+
+	m_blitter_irq_handler(1);
 }
 
 MACHINE_START_MEMBER(ddenlovr_state,rongrong)
@@ -9857,7 +9859,6 @@ void ddenlovr_state::quizchq(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::quizchq_portmap);
 	maincpu.in_pa_callback().set(FUNC(ddenlovr_state::rongrong_input_r));
 	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::rongrong_select_w));
-	// bit 5 of 0x1b (SIO CTSB?) = blitter busy
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,rongrong)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
@@ -9876,6 +9877,7 @@ void ddenlovr_state::quizchq(machine_config &config)
 
 	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg0));
 	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg1));
+	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::ctsb_w));
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,ddenlovr)
 
