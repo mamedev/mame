@@ -58,7 +58,23 @@ READ16_MEMBER(zon32bit_state::porta_r)
 WRITE16_MEMBER(zon32bit_state::porta_w)
 {
 	//if (data != 0x0101)
-	//  logerror("%s: porta_w (%04x)\n", machine().describe_context(), data);
+	logerror("%s: porta_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
+		(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
+		(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
+		(mem_mask & 0x2000) ? ((data & 0x2000) ? '1' : '0') : 'x',
+		(mem_mask & 0x1000) ? ((data & 0x1000) ? '1' : '0') : 'x',
+		(mem_mask & 0x0800) ? ((data & 0x0800) ? '1' : '0') : 'x',
+		(mem_mask & 0x0400) ? ((data & 0x0400) ? '1' : '0') : 'x',
+		(mem_mask & 0x0200) ? ((data & 0x0200) ? '1' : '0') : 'x',
+		(mem_mask & 0x0100) ? ((data & 0x0100) ? '1' : '0') : 'x',
+		(mem_mask & 0x0080) ? ((data & 0x0080) ? '1' : '0') : 'x',
+		(mem_mask & 0x0040) ? ((data & 0x0040) ? '1' : '0') : 'x',
+		(mem_mask & 0x0020) ? ((data & 0x0020) ? '1' : '0') : 'x',
+		(mem_mask & 0x0010) ? ((data & 0x0010) ? '1' : '0') : 'x',
+		(mem_mask & 0x0008) ? ((data & 0x0008) ? '1' : '0') : 'x',
+		(mem_mask & 0x0004) ? ((data & 0x0004) ? '1' : '0') : 'x',
+		(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
+		(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
 
 	m_porta_dat = data;
 
@@ -107,7 +123,7 @@ READ16_MEMBER(zon32bit_state::portb_r)
 WRITE16_MEMBER(zon32bit_state::portb_w)
 {
 	if (data != 0x0001)
-		logerror("%s: portb_w (%04x)\n", machine().describe_context(), data);
+		logerror("%s: portb_w %04x (%04x)\n", machine().describe_context(), data, mem_mask);
 
 	m_portb_dat = data;
 }
@@ -117,81 +133,25 @@ WRITE16_MEMBER(zon32bit_state::portc_w)
 	// very noisy
 	// is the code actually sending the sound to the remotes?
 
-	//logerror("%s: portc_w (%04x)\n", machine().describe_context(), data);
+	//logerror("%s: portc_w %04x (%04x)\n", machine().describe_context(), data, mem_mask);
 
-	//if ((pc >= 0x77261) && (pc <= 0x77268))
-	//  logerror("%s: port c %04x %04X-- BANK STUFF\n", machine().describe_context(), data, data & 0x1800);
-
-	//logerror("%s: port c %04x %04x\n", machine().describe_context(), data, data & 0x1800);
-
-	/*
-
-	this logic seems to apply for some of the mini-games, but cases where the lower bank doesn't change, this sequence doesn't happen either...
-
-	we can only trigger bank on 0335 writes, because it gets lost shortly after (unless that's an issue with the io code in spg2xx_io.cpp)
-
-	':maincpu' (077250): port c 0000 0000
-	':maincpu' (077263): port c fe00 1800-- BANK STUFF
-	':maincpu' (0677DC): porta_w (0311)
-	':maincpu' (0677E9): porta_w (0301)
-	':maincpu' (0677F6): porta_w (0335)  // bank take effect?
-	':maincpu' (067803): port c fc00 1800
-	':maincpu' (067810): port c fe00 1800
-	':maincpu' (06781B): port c f800 1800
-	*/
-
-// bits 0x0600 are explicitly set when changing bank, but this logic doesn't work for all cases, causes bad bank changes after boot in some games
-#if 0
-	if ((data & 0x0600) == (0x0600))
+	if (mem_mask & 0x1000)
 	{
-		if ((m_portc_dat & 0x0600) != 0x0600)
-			m_upperbank = data & 0x1800;
+		if (data & 0x1000)
+			m_upperbank |= 0x1000;
+		else
+			m_upperbank &= ~0x1000;
 	}
 
-#else // ugly PC based hacked to ensure we always have the correct bank
-	int pc = m_maincpu->pc();
-	if (m_game == 0)
+	if (mem_mask & 0x0800)
 	{
-		if ((pc == 0x077263) && m_hackbank == 1) // when using upper code bank
-		{
-			//printf("zon32bit change upper bank from upper code bank %04x\n", data & 0x1800);
-			m_upperbank = data & 0x1800;
-		}
-
-		if ((pc == 0x05ff63) && m_hackbank == 0) // when using lower code bank
-		{
-			//printf("zon32bit change upper bank from lower code bank %04x\n", data & 0x1800);
-			m_upperbank = data & 0x1800;
-		}
+		if (data & 0x0800)
+			m_upperbank |= 0x0800;
+		else
+			m_upperbank &= ~0x0800;
 	}
-	else if (m_game == 1)
-	{
-		if ((pc == 0x09369c) && m_hackbank == 0) // when using lower code bank
-		{
-			printf("mywicodx change upper bank from main menu code bank %04x\n", data & 0x1800);
-			m_upperbank = data & 0x1800;
-		}
-
-		if ((pc == 0x530) && m_hackbank == 1)
-		{
-			printf("mywicodx change upper bank from other menu code bank %04x\n", data & 0x1800);
-			m_upperbank = data & 0x1800;
-		}
-
-		if ((pc == 0x159E2) && m_hackbank == 2)
-		{
-			printf("mywicodx change guitar music bank %04x\n", data & 0x1800);
-			m_upperbank = data & 0x1800;
-		}
-
-	}
-#endif
-
+		 
 	m_portc_dat = data;
-
-//077261: r4 = r2
-//077262: [r4] = r3         // writes to  3d0b   (port c?)
-//077263: sp += 04
 }
 
 
