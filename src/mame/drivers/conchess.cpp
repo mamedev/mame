@@ -9,6 +9,11 @@ Hardware development by Loproc (Germany), manufactured at Wallharn Electronics
 and Johan Enroth. After Consumenta went under in 1983, the Conchess brand was
 continued by Systemhuset, Enroth's company.
 
+TODO:
+- add more chess modules
+- L16 library module does not work, ROM seems scrambled, or maybe incompatible
+  with 1st program version
+
 Hardware notes:
 
 Chess boards released were Escorter, Ambassador, and Monarch, each should be the
@@ -24,6 +29,10 @@ A0 (untitled standard pack-in module):
 - 3*8KB ROM, 4KB RAM(2*TMM2016P)
 - TTL, beeper
 
+Library modules:
+- L: small PCB, PCB label: CCL L-2, 8KB EPROM no label
+- L16: 2*8KB EPROM (have no photo of PCB)
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -32,6 +41,8 @@ A0 (untitled standard pack-in module):
 #include "machine/timer.h"
 #include "sound/beep.h"
 #include "video/pwm.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "speaker.h"
 
 // internal artwork
@@ -138,6 +149,7 @@ void conchess_state::main_map(address_map &map)
 	map(0x1050, 0x1050).r(FUNC(conchess_state::input_r));
 	map(0x1060, 0x106f).w(FUNC(conchess_state::leds_w));
 	map(0x1800, 0x1800).w(FUNC(conchess_state::sound_w));
+	map(0x4000, 0x7fff).r("cartslot", FUNC(generic_slot_device::read_rom));
 	map(0xa000, 0xffff).rom();
 }
 
@@ -189,6 +201,9 @@ void conchess_state::concstd(machine_config &config)
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
+
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "conchess");
+	SOFTWARE_LIST(config, "cart_list").set_original("conchess");
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
