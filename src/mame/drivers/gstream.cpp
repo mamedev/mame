@@ -781,10 +781,10 @@ uint32_t gstream_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	draw_bg(bitmap, cliprect, 0, m_vram + 0x000/4); // move on top for x2222 , check
 
 	int clk = 0;
-	int clk_max = 432 * 262; // TODO : measure screen size, related to that?
+	int clk_max = 432 * 262; // total usable cycle count for sprites; TODO : measure screen size, related to that?
 	for (i = 0x0000 / 4; i < 0x4000 / 4; i += 4) // can't be drawable everything
 	{
-		clk += 8+128;
+		clk += 8+128; // uses 8 cycle per RAM, 128 cycle per drawing tile
 		if (clk >= clk_max)
 			break;
 
