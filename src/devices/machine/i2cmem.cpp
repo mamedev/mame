@@ -344,7 +344,13 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 					switch( m_state )
 					{
 					case STATE_DEVSEL:
-						m_devsel = m_shift;
+						if( m_shift & 1 )
+						{
+							verboselog( this, 1, "switching to read\n");
+							m_devsel &= 0x0e;
+							m_devsel |= (m_shift & 0xf1);
+						}
+						else m_devsel = m_shift;
 
 						if( !select_device() )
 						{
@@ -506,6 +512,13 @@ int i2cmem_device::select_device()
 {
 	int device = ( m_slave_address & 0xf0 ) | ( m_e2 << 3 ) | ( m_e1 << 2 ) | ( m_e0 << 1 );
 	int mask = DEVSEL_ADDRESS & ~( address_mask() >> 7 );
+
+	if( m_devsel == 0 )
+	{
+		verboselog( this, 2, "acknowledging global call\n");
+		m_sdar = 0;
+		return 1;
+	}
 
 	if( ( m_devsel & mask ) == ( device & mask ) )
 	{
