@@ -24,7 +24,7 @@ public:
 	: osd_module(OSD_MIDI_PROVIDER, "pm"), midi_module()
 	{
 	}
-	virtual ~pm_module() = default;
+	virtual ~pm_module() { }
 
 	virtual int init(const osd_options &options)override;
 	virtual void exit()override;
@@ -43,7 +43,7 @@ class osd_midi_device_pm : public osd_midi_device
 {
 public:
 	osd_midi_device_pm(): pmStream(nullptr), xmit_cnt(0), last_status(0), rx_sysex(false) { }
-	virtual ~osd_midi_device_pm() = default;
+	virtual ~osd_midi_device_pm() { }
 	virtual bool open_input(const char *devname) override;
 	virtual bool open_output(const char *devname) override;
 	virtual void close() override;

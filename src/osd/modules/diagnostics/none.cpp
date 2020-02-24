@@ -11,7 +11,9 @@
 class diagnostics_none : public diagnostics_module
 {
 public:
-	diagnostics_none() = default;
+	diagnostics_none()
+	{
+	}
 
 	int init_crash_diagnostics() override
 	{

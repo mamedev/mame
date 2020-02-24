@@ -678,6 +678,14 @@ void huffman_context_base::build_lookup_table()
 //  8-BIT ENCODER
 //**************************************************************************
 
+//-------------------------------------------------
+//  huffman_8bit_encoder - constructor
+//-------------------------------------------------
+
+huffman_8bit_encoder::huffman_8bit_encoder()
+{
+}
+
 
 //-------------------------------------------------
 //  encode - encode a full buffer
@@ -713,6 +721,14 @@ huffman_error huffman_8bit_encoder::encode(const uint8_t *source, uint32_t sleng
 //**************************************************************************
 //  8-BIT DECODER
 //**************************************************************************
+
+//-------------------------------------------------
+//  huffman_8bit_decoder - constructor
+//-------------------------------------------------
+
+huffman_8bit_decoder::huffman_8bit_decoder()
+{
+}
 
 /**
  * @fn  huffman_error huffman_8bit_decoder::decode(const uint8_t *source, uint32_t slength, uint8_t *dest, uint32_t dlength)

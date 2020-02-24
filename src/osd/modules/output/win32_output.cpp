@@ -69,7 +69,7 @@ public:
 		: osd_module(OSD_OUTPUT_PROVIDER, "windows"), output_module(), m_output_hwnd(nullptr), m_clientlist(nullptr)
 	{
 	}
-	virtual ~output_win32() = default;
+	virtual ~output_win32() { }
 
 	virtual int init(const osd_options &options) override;
 	virtual void exit() override;

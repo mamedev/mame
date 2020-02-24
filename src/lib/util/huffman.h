@@ -149,7 +149,7 @@ class huffman_8bit_encoder : public huffman_encoder<>
 {
 public:
 	// construction/destruction
-	huffman_8bit_encoder() = default;
+	huffman_8bit_encoder();
 
 	// operations
 	huffman_error encode(const uint8_t *source, uint32_t slength, uint8_t *dest, uint32_t destlength, uint32_t &complength);
@@ -163,7 +163,7 @@ class huffman_8bit_decoder : public huffman_decoder<>
 {
 public:
 	// construction/destruction
-	huffman_8bit_decoder() = default;
+	huffman_8bit_decoder();
 
 	// operations
 	huffman_error decode(const uint8_t *source, uint32_t slength, uint8_t *dest, uint32_t destlength);

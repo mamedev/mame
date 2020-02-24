@@ -663,6 +663,15 @@ sampling_profiler::~sampling_profiler()
 }
 
 
+//-------------------------------------------------
+//  sampling_profiler - destructor
+//-------------------------------------------------
+
+sampling_profiler::~sampling_profiler()
+{
+}
+
+
 ////-------------------------------------------------
 //  start - begin gathering profiling information
 //-------------------------------------------------

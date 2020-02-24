@@ -40,7 +40,7 @@ public:
 	taptun_module() : osd_module(OSD_NETDEV_PROVIDER, "taptun"), netdev_module()
 	{
 	}
-	virtual ~taptun_module() = default;
+	virtual ~taptun_module() { }
 
 	virtual int init(const osd_options &options);
 	virtual void exit();

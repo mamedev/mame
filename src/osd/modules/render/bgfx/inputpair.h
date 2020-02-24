@@ -27,7 +27,7 @@ class bgfx_input_pair : public slider_changed_notifier
 {
 public:
 	bgfx_input_pair(int index, std::string sampler, std::string texture, std::vector<std::string> available_textures, std::string selection, chain_manager& chains, uint32_t screen_index);
-	virtual ~bgfx_input_pair();
+	~bgfx_input_pair();
 
 	void bind(bgfx_effect *effect, const int32_t screen) const;
 	int32_t texture_changed(int32_t index, std::string *str, int32_t newval);

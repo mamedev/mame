@@ -44,7 +44,7 @@ public:
 	{
 	}
 
-	virtual ~debugger_windows() = default;
+	virtual ~debugger_windows() { }
 
 	virtual int init(const osd_options &options) override { return 0; }
 	virtual void exit() override;

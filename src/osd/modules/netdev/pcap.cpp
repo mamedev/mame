@@ -46,7 +46,7 @@ public:
 	{
 	}
 
-	virtual ~pcap_module() = default;
+	virtual ~pcap_module() { }
 
 	virtual int init(const osd_options &options) override;
 	virtual void exit() override;
