@@ -38,22 +38,35 @@ protected:
 	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
 	virtual DECLARE_WRITE16_MEMBER(portc_w) override;
 
-private:
 	int m_porta_dat;
 	int m_portb_dat;
 	int m_portc_dat;
 	int m_porta_mask;
-	int m_porta_real;
 
 	int m_upperbank;
 
-	int m_hackbank;
+	int m_basebank;
 	int m_game;
 };
 
+class mywicodx_state : public zon32bit_state
+{
+public:
+	mywicodx_state(const machine_config& mconfig, device_type type, const char* tag) :
+		zon32bit_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
+
+	virtual void machine_reset() override;
+};
+
+
+
 READ16_MEMBER(zon32bit_state::porta_r)
 {
-	return m_porta_real;
+	return m_porta_dat;
 }
 
 
@@ -81,25 +94,57 @@ WRITE16_MEMBER(zon32bit_state::porta_w)
 	m_porta_dat = data;
 	m_porta_mask = mem_mask;
 
-	m_porta_real = (m_porta_real & ~mem_mask) | (data & mem_mask);
-
 	// where is the banking?! this gets written from the RAM-based code when the lower bank needs to change, but the upper bank needs to change in places too
 	// (and all these bits get unset again after this write, so this probably isn't the bank)
 	if (data == 0x0e01)
 	{
-		m_hackbank ^= 1;
-		logerror("bank is now %d\n", m_hackbank);
+		m_basebank ^= 1;
+		logerror("bank is now %d\n", m_basebank);
 	}
-
-	/*
-	if (data == 0x0335)
-	{
-	    logerror("%s: port a write 0x0355, port c is %04x %04X\n", machine().describe_context(), data, data & 0x1800);
-
-	    m_upperbank = (m_portc_dat & 0x1800);
-	}
-	*/
 }
+
+
+WRITE16_MEMBER(mywicodx_state::porta_w)
+{
+	if ((m_porta_dat != data) || (m_porta_mask != mem_mask))
+		logerror("%s: porta_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
+			(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
+			(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
+			(mem_mask & 0x2000) ? ((data & 0x2000) ? '1' : '0') : 'x',
+			(mem_mask & 0x1000) ? ((data & 0x1000) ? '1' : '0') : 'x',
+			(mem_mask & 0x0800) ? ((data & 0x0800) ? '1' : '0') : 'x',
+			(mem_mask & 0x0400) ? ((data & 0x0400) ? '1' : '0') : 'x',
+			(mem_mask & 0x0200) ? ((data & 0x0200) ? '1' : '0') : 'x',
+			(mem_mask & 0x0100) ? ((data & 0x0100) ? '1' : '0') : 'x',
+			(mem_mask & 0x0080) ? ((data & 0x0080) ? '1' : '0') : 'x',
+			(mem_mask & 0x0040) ? ((data & 0x0040) ? '1' : '0') : 'x',
+			(mem_mask & 0x0020) ? ((data & 0x0020) ? '1' : '0') : 'x',
+			(mem_mask & 0x0010) ? ((data & 0x0010) ? '1' : '0') : 'x',
+			(mem_mask & 0x0008) ? ((data & 0x0008) ? '1' : '0') : 'x',
+			(mem_mask & 0x0004) ? ((data & 0x0004) ? '1' : '0') : 'x',
+			(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
+			(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
+
+	m_porta_dat = data;
+	m_porta_mask = mem_mask;
+
+	if (mem_mask & 0x0400)
+	{
+		if (data & 0x0400)
+			m_basebank |= 1;
+		else
+			m_basebank &= ~1;
+	}
+
+	if (mem_mask & 0x0800)
+	{
+		if (data & 0x0800)
+			m_basebank |= 2;
+		else
+			m_basebank &= ~2;
+	}
+}
+
 
 READ16_MEMBER(zon32bit_state::portc_r)
 {
@@ -189,12 +234,12 @@ READ16_MEMBER(zon32bit_state::z32_rom_r)
 
 	if (m_game == 0) // zon32bit
 	{
-		if (m_hackbank) base |= 0x1000000;
+		if (m_basebank) base |= 0x1000000;
 	}
 	else if (m_game == 1) // mywicodx
 	{
-		if (m_porta_real & 0x0800)  base |= 0x2000000;
-		if (m_porta_real & 0x0400)  base |= 0x1000000;
+		if (m_basebank & 2)  base |= 0x2000000;
+		if (m_basebank & 1)  base |= 0x1000000;
 	}
 
 	if (offset < 0x200000)
@@ -227,9 +272,14 @@ void zon32bit_state::machine_reset()
 	m_porta_dat = 0xffff;
 	m_porta_mask = 0xffff;
 	m_portb_dat = 0x0000;
-	m_porta_real = 0xffff;
 
-	m_hackbank = 0;
+	m_basebank = 0;
+}
+
+void mywicodx_state::machine_reset()
+{
+	zon32bit_state::machine_reset();
+	m_basebank = 3;
 }
 
 
@@ -405,5 +455,5 @@ CONS( 200?, zon32bit,  0, 0, zon32bit, zon32bit, zon32bit_state,  init_zon32bit,
 // My Wico Deluxe was also available under the MiWi brand (exact model unknown, but it was a cart there instead of built in)
 // Box claimed 53 Arcade Games + 8 Sports games + 24 Music games, although it's unclear where 24 Music Games comes from, there are 3, which are identical aside from the title screen.
 // The Mi Guitar menu contains 24 games, but they're dupes, and just counting those would exclude the other Mi Fit and Mi Papacon menus (which also contain dupes)
-CONS( 200?, mywicodx,  0, 0, zon32bit, zon32bit, zon32bit_state,  init_mywicodx,      "<unknown>",                                   "My Wico Deluxe (Family Sport 85-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mywicodx,  0, 0, zon32bit, zon32bit, mywicodx_state,  init_mywicodx,      "<unknown>",                                   "My Wico Deluxe (Family Sport 85-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
