@@ -16,6 +16,7 @@
         - floppy format has 3xcd at the end of track data
             :u109: write track 0
             :u109: track description 16xff ... 109xff 3xcd
+        - keyboard conflicts with optional serial terminal
     - Xerox 820-II
         - floppy (read/write to FDC triggers Z80 WAIT)
         - Winchester
@@ -181,7 +182,7 @@ void xerox820_state::xerox820_mem(address_map &map)
 void xerox820_state::xerox820_io(address_map &map)
 {
 	map(0x00, 0x00).mirror(0xff03).w(COM8116_TAG, FUNC(com8116_device::str_w));
-	map(0x04, 0x07).mirror(0xff00).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x04, 0x07).mirror(0xff00).rw(m_sio, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x08, 0x0b).mirror(0xff00).rw(Z80PIO_GP_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x0c, 0x0c).mirror(0xff03).w(COM8116_TAG, FUNC(com8116_device::stt_w));
 	map(0x10, 0x13).mirror(0xff00).rw(FUNC(xerox820_state::fdc_r), FUNC(xerox820_state::fdc_w));
@@ -602,6 +603,15 @@ static GFXDECODE_START( gfx_xerox820ii )
 	GFXDECODE_ENTRY( "chargen", 0x0800, xerox820_gfxlayout, 0, 1 )
 GFXDECODE_END
 
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_300 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_300 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_ODD )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
+
 /* Machine Drivers */
 
 void xerox820_state::xerox820(machine_config &config)
@@ -662,6 +672,7 @@ void xerox820_state::xerox820(machine_config &config)
 	rs232b.rxd_handler().append(m_sio, FUNC(z80sio_device::syncb_w));
 	rs232b.cts_handler().set(m_sio, FUNC(z80sio_device::ctsb_w));
 	rs232b.dcd_handler().set(m_sio, FUNC(z80sio_device::dcdb_w));
+	rs232b.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	com8116_device &dbrg(COM8116(config, COM8116_TAG, 5.0688_MHz_XTAL));
 	dbrg.fr_handler().set(m_sio, FUNC(z80sio_device::rxca_w));
@@ -947,4 +958,4 @@ COMP( 1981, x820,     bigboard, 0,      xerox820,   xerox820, xerox820_state,   
 COMP( 1982, mk82,     bigboard, 0,      bigboard,   xerox820, bigboard_state,   empty_init, "Scomar",                     "MK-82",        0 )
 COMP( 1983, x820ii,   0,        0,      xerox820ii, xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 820-II", MACHINE_NOT_WORKING )
 COMP( 1983, x168,     x820ii,   0,      xerox168,   xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8",   MACHINE_NOT_WORKING )
-COMP( 1983, mk83,     x820ii,   0,      mk83,       xerox820, xerox820_state,   empty_init, "Scomar",                     "MK-83",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1983, mk83,     bigboard, 0,      mk83,       xerox820, xerox820_state,   empty_init, "Scomar",                     "MK-83",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
