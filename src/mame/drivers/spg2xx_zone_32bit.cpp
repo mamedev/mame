@@ -88,13 +88,7 @@ WRITE16_MEMBER(zon32bit_state::porta_w)
 	if (data == 0x0e01)
 	{
 		m_hackbank ^= 1;
-		printf("bank is now %d\n", m_hackbank);
-	}
-
-	if (data == 0x0301)
-	{
-		m_hackbank = 2;
-		printf("bank is now %d\n", m_hackbank);
+		logerror("bank is now %d\n", m_hackbank);
 	}
 
 	/*
@@ -186,63 +180,35 @@ void zon32bit_state::mem_map_zon32bit(address_map &map)
 READ16_MEMBER(zon32bit_state::z32_rom_r)
 {
 	/*
-	    This has upper and lower bank, which can be changed independently.
-	    Banking hookup is currently very hacky as bank values are written
-	    to ports then erased at the moment, maybe they latch somehow?
+		This has upper and lower bank, which can be changed independently.
+		Banking hookup is currently very hacky as bank values are written
+		to ports then erased at the moment, maybe they latch somehow?
 	*/
+
+	int base = 0x0000000;
 
 	if (m_game == 0) // zon32bit
 	{
-		if (offset < 0x200000)
-		{
-			if (m_hackbank == 0) // if lower bank is 0
-				return m_romregion[offset + 0x000000];
-			else
-			{   // if lower bank is 1
-				return m_romregion[offset + 0x400000];
-			}
-		}
-		else
-		{
-			offset &= 0x1fffff;
-
-			if (m_hackbank == 0) // if lower bank is 0
-			{
-				if ((m_upperbank & 0x1800) == 0x0000)  return m_romregion[offset + (0x0000000 / 2)]; // ? (not used?)
-				else if ((m_upperbank & 0x1800) == 0x1000)  return m_romregion[offset + (0x0400000 / 2)]; // this upper bank is needed to boot to the menu 
-				else if ((m_upperbank & 0x1800) == 0x0800)  return m_romregion[offset + (0x1000000 / 2)]; // golf, tennis, several mini games
-				else if ((m_upperbank & 0x1800) == 0x1800)  return m_romregion[offset + (0x1400000 / 2)]; // baseball, more minigames
-			}
-			else // if lower bank is 1
-			{
-				// these banks are used for different 'mini' games (and boxing) with the 2nd lower bank enabled
-				if ((m_upperbank & 0x1800) == 0x0000)      return m_romregion[offset + (0x0800000 / 2)]; // ? (not used?) 
-				else if ((m_upperbank & 0x1800) == 0x1000) return m_romregion[offset + (0x0c00000 / 2)]; // 31-44   some mini games
-				else if ((m_upperbank & 0x1800) == 0x0800) return m_romregion[offset + (0x1800000 / 2)]; // 45-49   some mini games + boxing
-				else if ((m_upperbank & 0x1800) == 0x1800) return m_romregion[offset + (0x1c00000 / 2)]; // 50-59   some mini games
-			}
-		}
+		if (m_hackbank) base |= 0x1000000;
 	}
 	else if (m_game == 1) // mywicodx
 	{
-		int base = 0x0000000;
-
 		if (m_porta_real & 0x0800)  base |= 0x2000000;
 		if (m_porta_real & 0x0400)  base |= 0x1000000;
+	}
 
-		if (offset < 0x200000)
-		{
-			return m_romregion[offset + (base / 2)];
-		}
-		else
-		{
-			offset &= 0x1fffff;
+	if (offset < 0x200000)
+	{
+		return m_romregion[offset + (base / 2)];
+	}
+	else
+	{
+		offset &= 0x1fffff;
 
-			if (m_upperbank & 0x1000) base |= 0x0400000;
-			if (m_upperbank & 0x0800) base |= 0x0800000;
+		if (m_upperbank & 0x1000) base |= 0x0400000;
+		if (m_upperbank & 0x0800) base |= 0x0800000;
 
-			return m_romregion[offset + (base / 2)];
-		}
+		return m_romregion[offset + (base / 2)];
 	}
 
 	return 0x0000;// m_romregion[offset];
@@ -426,8 +392,11 @@ ROM_END
 
 
 ROM_START( zon32bit )
-	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "41sports.bin", 0x0000, 0x2000000, CRC(86eee6e0) SHA1(3f6cab6649aebf596de5a8af21658bb1a27edb10) )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 ) // probably should just swap upper 2 line of ROM, as pinout was unknown
+	ROM_LOAD16_WORD_SWAP( "41sports.bin", 0x0000000, 0x0800000, CRC(86eee6e0) SHA1(3f6cab6649aebf596de5a8af21658bb1a27edb10) )
+	ROM_CONTINUE(0x1000000, 0x0800000)
+	ROM_CONTINUE(0x0800000, 0x0800000)
+	ROM_CONTINUE(0x1800000, 0x0800000)
 ROM_END
 
 
