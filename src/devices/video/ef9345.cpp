@@ -535,7 +535,7 @@ void ef9345_device::quadrichrome40(uint8_t c, uint8_t b, uint8_t a, uint16_t x, 
 }
 
 // draw bichrome character (80 columns)
-void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y)
+void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, uint8_t cursor)
 {
 	uint8_t c0, c1, pix[60];
 	uint16_t i, j, d;
@@ -561,6 +561,13 @@ void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y)
 			c0 = i;
 		}
 
+		if ((cursor == 0x40) || ((cursor == 0x60) && m_blink))
+		{
+			i = c1;
+			c1 = c0;
+			c0 = i;
+		}
+
 		d = ((c & 0x7f) >> 2) * 0x40 + (c & 0x03);  //char position
 
 		for(i=0, j=0; i < 10; i++)
@@ -571,7 +578,7 @@ void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y)
 		}
 
 		//draw the underline
-		if (a & 2)
+		if ((a & 2) || (cursor == 0x50) || ((cursor == 0x70) && m_blink))
 			memset(&pix[54], c1, 6);
 
 		break;
@@ -693,8 +700,19 @@ void ef9345_device::makechar_24x40(uint16_t x, uint16_t y)
 void ef9345_device::makechar_12x80(uint16_t x, uint16_t y)
 {
 	uint16_t iblock = indexblock(x, y);
-	bichrome80(m_videoram->read_byte(m_block + iblock), (m_videoram->read_byte(m_block + iblock + 0x1000) >> 4) & 0x0f, 2 * x + 1, y + 1);
-	bichrome80(m_videoram->read_byte(m_block + iblock + 0x0800), m_videoram->read_byte(m_block + iblock + 0x1000) & 0x0f, 2 * x + 2, y + 1);
+	//draw the cursor
+	uint8_t cursor = 0;
+	uint8_t b = BIT(m_registers[7], 7);
+
+	uint8_t i = (m_registers[6] & 0x1f);
+	if (i < 8)
+		i &= 1;
+
+	if (iblock == 0x40 * i + (m_registers[7] & 0x3f))   //cursor position
+		cursor = m_mat & 0x70;
+
+	bichrome80(m_videoram->read_byte(m_block + iblock), (m_videoram->read_byte(m_block + iblock + 0x1000) >> 4) & 0x0f, 2 * x + 1, y + 1, b ? 0 : cursor);
+	bichrome80(m_videoram->read_byte(m_block + iblock + 0x0800), m_videoram->read_byte(m_block + iblock + 0x1000) & 0x0f, 2 * x + 2, y + 1, b ? cursor : 0);
 }
 
 void ef9345_device::draw_border(uint16_t line)
