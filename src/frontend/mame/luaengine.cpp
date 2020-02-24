@@ -1280,7 +1280,7 @@ void lua_engine::initialize()
  * machine:save(filename) - save state to filename
  * machine:load(filename) - load state from filename
  * machine:buffer_save() - return save state buffer as binary string
- * machine:buffer_load(str) - load state from binary string buffer. returns true on success
+ * machine:buffer_load(str) - load state from binary string buffer. returns true on success, otherwise nil
  * machine:popmessage(str) - print str as popup
  * machine:popmessage() - clear displayed popup message
  * machine:logerror(str) - print str to log
