@@ -36206,19 +36206,6 @@
 		</part>
 	</software>
 
-	<software name="pickpart">
-		<description>Pick The Part (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Sunburst Communications</publisher>
-		<info name="release" value="2020-02-17"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="pick the part (4am crack).dsk" size="143360" crc="4ef73c91" sha1="b4900ba310892fc33eb8c6b4bff54f224edf2701" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bldpersp">
 		<description>Building Perspective (cleanly cracked)</description>
 		<year>1986</year>
@@ -36241,6 +36228,19 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="world atlas action - geography facts (4am crack).dsk" size="143360" crc="11dfdc5c" sha1="061e654a08f0503a52402dc6207936884903ae52" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pickpart">
+		<description>Pick The Part (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2020-02-17"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pick the part (4am crack).dsk" size="143360" crc="4ef73c91" sha1="b4900ba310892fc33eb8c6b4bff54f224edf2701" />
 			</dataarea>
 		</part>
 	</software>
