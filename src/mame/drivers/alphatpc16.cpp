@@ -74,6 +74,7 @@ public:
 		m_wdfdc(*this, "wdfdc"),
 		m_ram(*this, RAM_TAG),
 		m_z80(*this, "z80"),
+		m_flop0(*this, "wdfdc:0"),
 		m_keys(*this, "KEYS.%u", 0)
 	{ }
 
@@ -97,6 +98,8 @@ private:
 	DECLARE_WRITE8_MEMBER(host_scsi_w);
 	DECLARE_READ8_MEMBER(flop_scsi_r);
 	DECLARE_WRITE8_MEMBER(flop_scsi_w);
+	DECLARE_READ8_MEMBER(p00_r);
+	DECLARE_WRITE8_MEMBER(p40_w);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic8259;
@@ -105,15 +108,17 @@ private:
 	required_device<wd1770_device> m_wdfdc;
 	required_device<ram_device> m_ram;
 	required_device<cpu_device> m_z80;
+	required_device<floppy_connector> m_flop0;
 	required_ioport_array<7> m_keys;
 
-	u8 m_p1, m_p2, m_data;
+	u8 m_p1, m_p2, m_data, m_p40;
 	bool m_bsy, m_req, m_ack, m_cd, m_io, m_sel;
 };
 
 void alphatpc16_state::machine_start()
 {
 	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - 1, m_ram->pointer());
+	m_wdfdc->set_floppy(m_flop0->get_device());
 }
 
 WRITE8_MEMBER(alphatpc16_state::p1_w)
@@ -143,21 +148,36 @@ READ8_MEMBER(alphatpc16_state::p2_r)
 	return (m_p2 | 0x40) & ~(key ? (m_p1 < 0x40 ? 2 : 1) : 0);
 }
 
+READ8_MEMBER(alphatpc16_state::p00_r)
+{
+	return (m_flop0->get_device()->exists() << 3);
+}
+
+WRITE8_MEMBER(alphatpc16_state::p40_w)
+{
+	m_flop0->get_device()->ss_w(BIT(data, 2));
+	m_p40 = data;
+}
+
+// this scsi emulation is an unrealistic mess
 WRITE8_MEMBER(alphatpc16_state::host_scsi_w)
 {
 	switch(offset)
 	{
 		case 0:
 			m_ack = true;
+			m_req = false;
 			m_sel = false;
 			m_data = data;
 			m_z80->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+			m_z80->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 			break;
 		case 2:
 			m_ack = false;
 			m_sel = true;
 			m_data = data;
 			m_z80->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+			m_z80->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 			break;
 		case 3: //rst ?
 			if(data)
@@ -169,6 +189,7 @@ WRITE8_MEMBER(alphatpc16_state::host_scsi_w)
 				m_cd = false;
 				m_io = false;
 			}
+			m_z80->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 			break;
 	}
 	logerror("%s, data %x bsy %d sel %d req %d ack %d cd %d io %d\n", machine().describe_context(), m_data, m_bsy, m_sel, m_req, m_ack, m_cd, m_io);
@@ -180,9 +201,15 @@ READ8_MEMBER(alphatpc16_state::host_scsi_r)
 	switch(offset)
 	{
 		case 0:
+			if(!m_req && (m_maincpu->state_int(I8086_IP) == 0x2f46))
+			{
+				m_maincpu->set_state_int(I8086_IP, m_maincpu->state_int(I8086_IP) - 2);
+				break;
+			}
 			m_ack = true;
 			m_req = false;
 			ret = m_data;
+			m_z80->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 			logerror("%s, data %x bsy %d sel %d req %d ack %d cd %d io %d\n", machine().describe_context(), m_data, m_bsy, m_sel, m_req, m_ack, m_cd, m_io);
 			break;
 		case 1:
@@ -197,6 +224,8 @@ WRITE8_MEMBER(alphatpc16_state::flop_scsi_w)
 	switch(offset)
 	{
 		case 0:
+			if(m_z80->state_int(STATE_GENPC) == 0xcd)
+				m_z80->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 			m_req = true;
 			m_ack = false;
 			m_data = data;
@@ -216,6 +245,8 @@ READ8_MEMBER(alphatpc16_state::flop_scsi_r)
 	switch(offset)
 	{
 		case 0:
+			if(m_z80->state_int(STATE_GENPC) == 0xbc)
+				m_z80->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 			m_ack = false;
 			m_req = false;
 			ret = m_data;
@@ -252,8 +283,10 @@ void alphatpc16_state::apc16_z80_map(address_map &map)
 void alphatpc16_state::apc16_z80_io(address_map &map)
 {
 	map.global_mask(0xff);
+	map(0x00, 0x00).r(FUNC(alphatpc16_state::p00_r));
 	map(0x20, 0x23).rw(m_wdfdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
-	map(0x62, 0x63) .rw(FUNC(alphatpc16_state::flop_scsi_r), FUNC(alphatpc16_state::flop_scsi_w));
+	map(0x40, 0x40).w(FUNC(alphatpc16_state::p40_w));
+	map(0x62, 0x63).rw(FUNC(alphatpc16_state::flop_scsi_r), FUNC(alphatpc16_state::flop_scsi_w));
 }
 
 // not sure the actual layout of the rows
@@ -387,7 +420,8 @@ void alphatpc16_state::alphatpc16(machine_config &config)
 	m_z80->set_addrmap(AS_PROGRAM, &alphatpc16_state::apc16_z80_map);
 	m_z80->set_addrmap(AS_IO, &alphatpc16_state::apc16_z80_io);
 	WD1770(config, m_wdfdc, 8_MHz_XTAL);
-	FLOPPY_CONNECTOR(config, "wdfdc:0", atpc16_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_flop0, atpc16_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	dynamic_cast<device_slot_interface *>(m_flop0.target())->set_fixed(true);
 
 	i8741a_device& i8741(I8741A(config, "i8741", 4.608_MHz_XTAL));
 	i8741.p1_in_cb().set(FUNC(alphatpc16_state::p1_r));
