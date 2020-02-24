@@ -19,12 +19,10 @@ public:
 
 	void mem_map_zon32bit(address_map &map);
 
-	void init_zon32bit() { m_game = 0; };
-	void init_mywicodx() { m_game = 1; };
-
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void device_post_load() override;
 
 	DECLARE_READ16_MEMBER(z32_rom_r);
 
@@ -46,7 +44,6 @@ protected:
 	int m_upperbank;
 
 	int m_basebank;
-	int m_game;
 };
 
 class mywicodx_state : public zon32bit_state
@@ -62,7 +59,11 @@ protected:
 	virtual void machine_reset() override;
 };
 
-
+void zon32bit_state::device_post_load()
+{
+	// load state can change the bank, so we must invalide cache
+	m_maincpu->invalidate_cache();
+}
 
 READ16_MEMBER(zon32bit_state::porta_r)
 {
@@ -72,7 +73,7 @@ READ16_MEMBER(zon32bit_state::porta_r)
 
 WRITE16_MEMBER(zon32bit_state::porta_w)
 {
-	if ((m_porta_dat != data) || (m_porta_mask != mem_mask))
+	if (0)
 		logerror("%s: porta_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
 			(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
 			(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
@@ -92,21 +93,21 @@ WRITE16_MEMBER(zon32bit_state::porta_w)
 			(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
 
 	m_porta_dat = data;
-	m_porta_mask = mem_mask;
 
-	// where is the banking?! this gets written from the RAM-based code when the lower bank needs to change, but the upper bank needs to change in places too
-	// (and all these bits get unset again after this write, so this probably isn't the bank)
+	// The banking on zon32bit doesn't seem the same as mywicodx.
+	// The same values get written here both in the case of switching to upper bank and switching to lower bank, so presumably it must be some kind of toggle
 	if (data == 0x0e01)
 	{
 		m_basebank ^= 1;
 		logerror("bank is now %d\n", m_basebank);
+		m_maincpu->invalidate_cache();
 	}
 }
 
 
 WRITE16_MEMBER(mywicodx_state::porta_w)
 {
-	if ((m_porta_dat != data) || (m_porta_mask != mem_mask))
+	if (0)
 		logerror("%s: porta_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
 			(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
 			(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
@@ -126,7 +127,8 @@ WRITE16_MEMBER(mywicodx_state::porta_w)
 			(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
 
 	m_porta_dat = data;
-	m_porta_mask = mem_mask;
+
+	int oldbank = m_basebank;
 
 	if (mem_mask & 0x0400)
 	{
@@ -143,6 +145,9 @@ WRITE16_MEMBER(mywicodx_state::porta_w)
 		else
 			m_basebank &= ~2;
 	}
+
+	if (oldbank != m_basebank)
+		m_maincpu->invalidate_cache();
 }
 
 
@@ -197,6 +202,8 @@ WRITE16_MEMBER(zon32bit_state::portc_w)
 			(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
 			(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
 
+	int oldbank = m_upperbank;
+
 	if (mem_mask & 0x1000)
 	{
 		if (data & 0x1000)
@@ -213,6 +220,9 @@ WRITE16_MEMBER(zon32bit_state::portc_w)
 			m_upperbank &= ~0x0800;
 	}
 		 
+	if (oldbank != m_basebank)
+		m_maincpu->invalidate_cache();
+
 	m_portc_dat = data;
 }
 
@@ -232,15 +242,8 @@ READ16_MEMBER(zon32bit_state::z32_rom_r)
 
 	int base = 0x0000000;
 
-	if (m_game == 0) // zon32bit
-	{
-		if (m_basebank) base |= 0x1000000;
-	}
-	else if (m_game == 1) // mywicodx
-	{
-		if (m_basebank & 2)  base |= 0x2000000;
-		if (m_basebank & 1)  base |= 0x1000000;
-	}
+	if (m_basebank & 2)  base |= 0x2000000;
+	if (m_basebank & 1)  base |= 0x1000000;
 
 	if (offset < 0x200000)
 	{
@@ -262,6 +265,13 @@ READ16_MEMBER(zon32bit_state::z32_rom_r)
 void zon32bit_state::machine_start()
 {
 	spg2xx_game_state::machine_start();
+
+	save_item(NAME(m_porta_dat));
+	save_item(NAME(m_portb_dat));
+	save_item(NAME(m_portc_dat));
+	save_item(NAME(m_porta_mask));
+	save_item(NAME(m_upperbank));
+	save_item(NAME(m_basebank));
 }
 
 
@@ -270,16 +280,17 @@ void zon32bit_state::machine_reset()
 	spg2xx_game_state::machine_reset();
 
 	m_porta_dat = 0xffff;
-	m_porta_mask = 0xffff;
 	m_portb_dat = 0x0000;
 
 	m_basebank = 0;
+	m_maincpu->invalidate_cache();
 }
 
 void mywicodx_state::machine_reset()
 {
 	zon32bit_state::machine_reset();
 	m_basebank = 3;
+	m_maincpu->invalidate_cache();
 }
 
 
@@ -421,7 +432,6 @@ void zon32bit_state::zon32bit(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zon32bit_state::mem_map_zon32bit);
-	m_maincpu->set_force_no_drc(true); // uses JVS opcode, not implemented in recompiler
 
 	spg2xx_base(config);
 
@@ -451,9 +461,9 @@ ROM_END
 
 
 // Box advertises this as '40 Games Included' but the cartridge, which was glued directly to the PCB, not removable, is a 41-in-1.  Maybe some versions exist with a 40 game selection.
-CONS( 200?, zon32bit,  0, 0, zon32bit, zon32bit, zon32bit_state,  init_zon32bit,      "Jungle Soft / Ultimate Products (HK) Ltd",    "Zone 32-bit Gaming Console System (Family Sport 41-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, zon32bit,  0, 0, zon32bit, zon32bit, zon32bit_state,  empty_init,      "Jungle Soft / Ultimate Products (HK) Ltd",    "Zone 32-bit Gaming Console System (Family Sport 41-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // My Wico Deluxe was also available under the MiWi brand (exact model unknown, but it was a cart there instead of built in)
 // Box claimed 53 Arcade Games + 8 Sports games + 24 Music games, although it's unclear where 24 Music Games comes from, there are 3, which are identical aside from the title screen.
 // The Mi Guitar menu contains 24 games, but they're dupes, and just counting those would exclude the other Mi Fit and Mi Papacon menus (which also contain dupes)
-CONS( 200?, mywicodx,  0, 0, zon32bit, zon32bit, mywicodx_state,  init_mywicodx,      "<unknown>",                                   "My Wico Deluxe (Family Sport 85-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mywicodx,  0, 0, zon32bit, zon32bit, mywicodx_state,  empty_init,      "<unknown>",                                   "My Wico Deluxe (Family Sport 85-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
