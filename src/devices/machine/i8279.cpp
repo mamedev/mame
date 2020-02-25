@@ -277,6 +277,10 @@ void i8279_device::timer_mainloop()
 	bool ctrl_key = 1;
 	bool strobe_pulse = 0;
 
+	// hack to prevent infinite loops
+	if (decoded && m_scanner == 0)
+		m_scanner = 1;
+
 	// keyboard
 	// type 0 = kbd, 2-key lockout
 	// type 1 = kdb, n-key
