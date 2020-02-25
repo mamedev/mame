@@ -19,12 +19,10 @@ public:
 
 	void mem_map_zon32bit(address_map &map);
 
-	void init_zon32bit() { m_game = 0; };
-	void init_mywicodx() { m_game = 1; };
-
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void device_post_load() override;
 
 	DECLARE_READ16_MEMBER(z32_rom_r);
 
@@ -38,16 +36,34 @@ protected:
 	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
 	virtual DECLARE_WRITE16_MEMBER(portc_w) override;
 
-private:
 	int m_porta_dat;
 	int m_portb_dat;
 	int m_portc_dat;
+	int m_porta_mask;
 
 	int m_upperbank;
 
-	int m_hackbank;
-	int m_game;
+	int m_basebank;
 };
+
+class mywicodx_state : public zon32bit_state
+{
+public:
+	mywicodx_state(const machine_config& mconfig, device_type type, const char* tag) :
+		zon32bit_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
+
+	virtual void machine_reset() override;
+};
+
+void zon32bit_state::device_post_load()
+{
+	// load state can change the bank, so we must invalide cache
+	m_maincpu->invalidate_cache();
+}
 
 READ16_MEMBER(zon32bit_state::porta_r)
 {
@@ -57,32 +73,83 @@ READ16_MEMBER(zon32bit_state::porta_r)
 
 WRITE16_MEMBER(zon32bit_state::porta_w)
 {
-	//if (data != 0x0101)
-	//  logerror("%s: porta_w (%04x)\n", machine().describe_context(), data);
+	if (0)
+		logerror("%s: porta_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
+			(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
+			(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
+			(mem_mask & 0x2000) ? ((data & 0x2000) ? '1' : '0') : 'x',
+			(mem_mask & 0x1000) ? ((data & 0x1000) ? '1' : '0') : 'x',
+			(mem_mask & 0x0800) ? ((data & 0x0800) ? '1' : '0') : 'x',
+			(mem_mask & 0x0400) ? ((data & 0x0400) ? '1' : '0') : 'x',
+			(mem_mask & 0x0200) ? ((data & 0x0200) ? '1' : '0') : 'x',
+			(mem_mask & 0x0100) ? ((data & 0x0100) ? '1' : '0') : 'x',
+			(mem_mask & 0x0080) ? ((data & 0x0080) ? '1' : '0') : 'x',
+			(mem_mask & 0x0040) ? ((data & 0x0040) ? '1' : '0') : 'x',
+			(mem_mask & 0x0020) ? ((data & 0x0020) ? '1' : '0') : 'x',
+			(mem_mask & 0x0010) ? ((data & 0x0010) ? '1' : '0') : 'x',
+			(mem_mask & 0x0008) ? ((data & 0x0008) ? '1' : '0') : 'x',
+			(mem_mask & 0x0004) ? ((data & 0x0004) ? '1' : '0') : 'x',
+			(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
+			(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
 
 	m_porta_dat = data;
 
-	// where is the banking?! this gets written from the RAM-based code when the lower bank needs to change, but the upper bank needs to change in places too
-	// (and all these bits get unset again after this write, so this probably isn't the bank)
+	// The banking on zon32bit doesn't seem the same as mywicodx.
+	// The same values get written here both in the case of switching to upper bank and switching to lower bank, so presumably it must be some kind of toggle
 	if (data == 0x0e01)
 	{
-		m_hackbank ^= 1;
+		m_basebank ^= 1;
+		logerror("bank is now %d\n", m_basebank);
+		m_maincpu->invalidate_cache();
 	}
-
-	if (data == 0x0301)
-	{
-		m_hackbank = 2;
-	}
-
-	/*
-	if (data == 0x0335)
-	{
-	    logerror("%s: port a write 0x0355, port c is %04x %04X\n", machine().describe_context(), data, data & 0x1800);
-
-	    m_upperbank = (m_portc_dat & 0x1800);
-	}
-	*/
 }
+
+
+WRITE16_MEMBER(mywicodx_state::porta_w)
+{
+	if (0)
+		logerror("%s: porta_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c  \n", machine().describe_context(), data, mem_mask,
+			(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
+			(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
+			(mem_mask & 0x2000) ? ((data & 0x2000) ? '1' : '0') : 'x',
+			(mem_mask & 0x1000) ? ((data & 0x1000) ? '1' : '0') : 'x',
+			(mem_mask & 0x0800) ? ((data & 0x0800) ? '1' : '0') : 'x',
+			(mem_mask & 0x0400) ? ((data & 0x0400) ? '1' : '0') : 'x',
+			(mem_mask & 0x0200) ? ((data & 0x0200) ? '1' : '0') : 'x',
+			(mem_mask & 0x0100) ? ((data & 0x0100) ? '1' : '0') : 'x',
+			(mem_mask & 0x0080) ? ((data & 0x0080) ? '1' : '0') : 'x',
+			(mem_mask & 0x0040) ? ((data & 0x0040) ? '1' : '0') : 'x',
+			(mem_mask & 0x0020) ? ((data & 0x0020) ? '1' : '0') : 'x',
+			(mem_mask & 0x0010) ? ((data & 0x0010) ? '1' : '0') : 'x',
+			(mem_mask & 0x0008) ? ((data & 0x0008) ? '1' : '0') : 'x',
+			(mem_mask & 0x0004) ? ((data & 0x0004) ? '1' : '0') : 'x',
+			(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
+			(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
+
+	m_porta_dat = data;
+
+	int oldbank = m_basebank;
+
+	if (mem_mask & 0x0400)
+	{
+		if (data & 0x0400)
+			m_basebank |= 1;
+		else
+			m_basebank &= ~1;
+	}
+
+	if (mem_mask & 0x0800)
+	{
+		if (data & 0x0800)
+			m_basebank |= 2;
+		else
+			m_basebank &= ~2;
+	}
+
+	if (oldbank != m_basebank)
+		m_maincpu->invalidate_cache();
+}
+
 
 READ16_MEMBER(zon32bit_state::portc_r)
 {
@@ -107,7 +174,7 @@ READ16_MEMBER(zon32bit_state::portb_r)
 WRITE16_MEMBER(zon32bit_state::portb_w)
 {
 	if (data != 0x0001)
-		logerror("%s: portb_w (%04x)\n", machine().describe_context(), data);
+		logerror("%s: portb_w %04x (%04x)\n", machine().describe_context(), data, mem_mask);
 
 	m_portb_dat = data;
 }
@@ -116,82 +183,47 @@ WRITE16_MEMBER(zon32bit_state::portc_w)
 {
 	// very noisy
 	// is the code actually sending the sound to the remotes?
+	if (0)
+		logerror("%s: portc_w %04x (%04x) %c %c %c %c | %c %c %c %c | %c %c %c %c | %c %c %c %c\n", machine().describe_context(), data, mem_mask,
+			(mem_mask & 0x8000) ? ((data & 0x8000) ? '1' : '0') : 'x',
+			(mem_mask & 0x4000) ? ((data & 0x4000) ? '1' : '0') : 'x',
+			(mem_mask & 0x2000) ? ((data & 0x2000) ? '1' : '0') : 'x',
+			(mem_mask & 0x1000) ? ((data & 0x1000) ? '1' : '0') : 'x',
+			(mem_mask & 0x0800) ? ((data & 0x0800) ? '1' : '0') : 'x',
+			(mem_mask & 0x0400) ? ((data & 0x0400) ? '1' : '0') : 'x',
+			(mem_mask & 0x0200) ? ((data & 0x0200) ? '1' : '0') : 'x',
+			(mem_mask & 0x0100) ? ((data & 0x0100) ? '1' : '0') : 'x',
+			(mem_mask & 0x0080) ? ((data & 0x0080) ? '1' : '0') : 'x',
+			(mem_mask & 0x0040) ? ((data & 0x0040) ? '1' : '0') : 'x',
+			(mem_mask & 0x0020) ? ((data & 0x0020) ? '1' : '0') : 'x',
+			(mem_mask & 0x0010) ? ((data & 0x0010) ? '1' : '0') : 'x',
+			(mem_mask & 0x0008) ? ((data & 0x0008) ? '1' : '0') : 'x',
+			(mem_mask & 0x0004) ? ((data & 0x0004) ? '1' : '0') : 'x',
+			(mem_mask & 0x0002) ? ((data & 0x0002) ? '1' : '0') : 'x',
+			(mem_mask & 0x0001) ? ((data & 0x0001) ? '1' : '0') : 'x');
 
-	//logerror("%s: portc_w (%04x)\n", machine().describe_context(), data);
+	int oldbank = m_upperbank;
 
-	//if ((pc >= 0x77261) && (pc <= 0x77268))
-	//  logerror("%s: port c %04x %04X-- BANK STUFF\n", machine().describe_context(), data, data & 0x1800);
-
-	//logerror("%s: port c %04x %04x\n", machine().describe_context(), data, data & 0x1800);
-
-	/*
-
-	this logic seems to apply for some of the mini-games, but cases where the lower bank doesn't change, this sequence doesn't happen either...
-
-	we can only trigger bank on 0335 writes, because it gets lost shortly after (unless that's an issue with the io code in spg2xx_io.cpp)
-
-	':maincpu' (077250): port c 0000 0000
-	':maincpu' (077263): port c fe00 1800-- BANK STUFF
-	':maincpu' (0677DC): porta_w (0311)
-	':maincpu' (0677E9): porta_w (0301)
-	':maincpu' (0677F6): porta_w (0335)  // bank take effect?
-	':maincpu' (067803): port c fc00 1800
-	':maincpu' (067810): port c fe00 1800
-	':maincpu' (06781B): port c f800 1800
-	*/
-
-// bits 0x0600 are explicitly set when changing bank, but this logic doesn't work for all cases, causes bad bank changes after boot in some games
-#if 0
-	if ((data & 0x0600) == (0x0600))
+	if (mem_mask & 0x1000)
 	{
-		if ((m_portc_dat & 0x0600) != 0x0600)
-			m_upperbank = data & 0x1800;
+		if (data & 0x1000)
+			m_upperbank |= 0x1000;
+		else
+			m_upperbank &= ~0x1000;
 	}
 
-#else // ugly PC based hacked to ensure we always have the correct bank
-	int pc = m_maincpu->pc();
-	if (m_game == 0)
+	if (mem_mask & 0x0800)
 	{
-		if ((pc == 0x077263) && m_hackbank == 1) // when using upper code bank
-		{
-			//printf("zon32bit change upper bank from upper code bank %04x\n", data & 0x1800);
-			m_upperbank = data & 0x1800;
-		}
-
-		if ((pc == 0x05ff63) && m_hackbank == 0) // when using lower code bank
-		{
-			//printf("zon32bit change upper bank from lower code bank %04x\n", data & 0x1800);
-			m_upperbank = data & 0x1800;
-		}
+		if (data & 0x0800)
+			m_upperbank |= 0x0800;
+		else
+			m_upperbank &= ~0x0800;
 	}
-	else if (m_game == 1)
-	{
-		if ((pc == 0x09369c) && m_hackbank == 0) // when using lower code bank
-		{
-			printf("mywicodx change upper bank from main menu code bank %04x\n", data & 0x1800);
-			m_upperbank = data & 0x1800;
-		}
-
-		if ((pc == 0x530) && m_hackbank == 1)
-		{
-			printf("mywicodx change upper bank from other menu code bank %04x\n", data & 0x1800);
-			m_upperbank = data & 0x1800;
-		}
-
-		if ((pc == 0x159E2) && m_hackbank == 2)
-		{
-			printf("mywicodx change guitar music bank %04x\n", data & 0x1800);
-			m_upperbank = data & 0x1800;
-		}
-
-	}
-#endif
+		 
+	if (oldbank != m_basebank)
+		m_maincpu->invalidate_cache();
 
 	m_portc_dat = data;
-
-//077261: r4 = r2
-//077262: [r4] = r3         // writes to  3d0b   (port c?)
-//077263: sp += 04
 }
 
 
@@ -203,86 +235,28 @@ void zon32bit_state::mem_map_zon32bit(address_map &map)
 READ16_MEMBER(zon32bit_state::z32_rom_r)
 {
 	/*
-	    This has upper and lower bank, which can be changed independently.
-	    Banking hookup is currently very hacky as bank values are written
-	    to ports then erased at the moment, maybe they latch somehow?
+		This has upper and lower bank, which can be changed independently.
+		Banking hookup is currently very hacky as bank values are written
+		to ports then erased at the moment, maybe they latch somehow?
 	*/
 
-	if (m_game == 0) // zon32bit
-	{
-		if (offset < 0x200000)
-		{
-			if (m_hackbank == 0) // if lower bank is 0
-				return m_romregion[offset + 0x000000];
-			else
-			{   // if lower bank is 1
-				return m_romregion[offset + 0x400000];
-			}
-		}
-		else
-		{
-			offset &= 0x1fffff;
+	int base = 0x0000000;
 
-			if (m_hackbank == 0) // if lower bank is 0
-			{
-				if ((m_upperbank & 0x1800) == 0x1000)  return m_romregion[offset + (0x0400000 / 2)]; // this upper bank is needed to boot to the menu
-				else if ((m_upperbank & 0x1800) == 0x0800)  return m_romregion[offset + (0x1000000 / 2)]; // golf, tennis, several mini games
-				else if ((m_upperbank & 0x1800) == 0x1800)  return m_romregion[offset + (0x1400000 / 2)]; // baseball, more minigames
-				else if ((m_upperbank & 0x1800) == 0x0000)  return m_romregion[offset + (0x0400000 / 2)]; // ? (not used?)
-			}
-			else // if lower bank is 1
-			{
-				// these banks are used for different 'mini' games (and boxing) with the 2nd lower bank enabled
-				if ((m_upperbank & 0x1800) == 0x1000)      return m_romregion[offset + (0x0c00000 / 2)]; // 31-44   some mini games
-				else if ((m_upperbank & 0x1800) == 0x0800) return m_romregion[offset + (0x1800000 / 2)]; // 45-49   some mini games + boxing
-				else if ((m_upperbank & 0x1800) == 0x1800) return m_romregion[offset + (0x1c00000 / 2)]; // 50-59   some mini games
-				else if ((m_upperbank & 0x1800) == 0x0000) return m_romregion[offset + (0x0400000 / 2)]; // ? (not used?)
-			}
-		}
+	if (m_basebank & 2)  base |= 0x2000000;
+	if (m_basebank & 1)  base |= 0x1000000;
+
+	if (offset < 0x200000)
+	{
+		return m_romregion[offset + (base / 2)];
 	}
-	else if (m_game == 1) // mywicodx
+	else
 	{
-		if (offset < 0x200000)
-		{
-			if (m_hackbank == 0) // if lower bank is 0 (main menu)
-			{
-				return m_romregion[offset + (0x2000000 / 2)];
-			}
-			else if (m_hackbank == 1) // if lower bank is 0 (debug menu code / extra cames)
-			{
-				return m_romregion[offset + (0x3000000 / 2)];
-			}
-			else    // Mi Guitar
-			{
-				return m_romregion[offset + (0x0000000 / 2)];
-			}
-		}
-		else
-		{
-			offset &= 0x1fffff;
+		offset &= 0x1fffff;
 
-			if (m_hackbank == 0)
-			{
-				if ((m_upperbank & 0x1800) == 0x1000)  return m_romregion[offset + (0x2400000 / 2)]; // this upper bank is needed to boot to the menu, boxing
-				else if ((m_upperbank & 0x1800) == 0x0800)  return m_romregion[offset + (0x2800000 / 2)]; // ? tennis, golf
-				else if ((m_upperbank & 0x1800) == 0x1800)  return m_romregion[offset + (0x2c00000 / 2)]; // ? table tennis, bowling, basketball, baseball
-				else if ((m_upperbank & 0x1800) == 0x0000)  return m_romregion[offset + (0x2400000 / 2)]; // ? (not used?)
-			}
-			else if (m_hackbank == 1)
-			{
-				if ((m_upperbank & 0x1800) == 0x1000)  return m_romregion[offset + (0x3400000 / 2)]; // base code for other bank
-				else if ((m_upperbank & 0x1800) == 0x0800)  return m_romregion[offset + (0x3800000 / 2)]; //
-				else if ((m_upperbank & 0x1800) == 0x1800)  return m_romregion[offset + (0x3c00000 / 2)]; //
-				else if ((m_upperbank & 0x1800) == 0x0000)  return m_romregion[offset + (0x3400000 / 2)]; //
-			}
-			else
-			{
-				if ((m_upperbank & 0x1800) == 0x1000)  return m_romregion[offset + (0x0400000 / 2)]; // song data 1
-				else if ((m_upperbank & 0x1800) == 0x0800)  return m_romregion[offset + (0x0800000 / 2)]; // song data 2
-				else if ((m_upperbank & 0x1800) == 0x1800)  return m_romregion[offset + (0x0c00000 / 2)]; // song data 3
-				else if ((m_upperbank & 0x1800) == 0x0000)  return m_romregion[offset + (0x0400000 / 2)]; //
-			}
-		}
+		if (m_upperbank & 0x1000) base |= 0x0400000;
+		if (m_upperbank & 0x0800) base |= 0x0800000;
+
+		return m_romregion[offset + (base / 2)];
 	}
 
 	return 0x0000;// m_romregion[offset];
@@ -291,6 +265,13 @@ READ16_MEMBER(zon32bit_state::z32_rom_r)
 void zon32bit_state::machine_start()
 {
 	spg2xx_game_state::machine_start();
+
+	save_item(NAME(m_porta_dat));
+	save_item(NAME(m_portb_dat));
+	save_item(NAME(m_portc_dat));
+	save_item(NAME(m_porta_mask));
+	save_item(NAME(m_upperbank));
+	save_item(NAME(m_basebank));
 }
 
 
@@ -298,10 +279,18 @@ void zon32bit_state::machine_reset()
 {
 	spg2xx_game_state::machine_reset();
 
-	m_porta_dat = 0x0000;
+	m_porta_dat = 0xffff;
 	m_portb_dat = 0x0000;
 
-	m_hackbank = 0;
+	m_basebank = 0;
+	m_maincpu->invalidate_cache();
+}
+
+void mywicodx_state::machine_reset()
+{
+	zon32bit_state::machine_reset();
+	m_basebank = 3;
+	m_maincpu->invalidate_cache();
 }
 
 
@@ -443,7 +432,6 @@ void zon32bit_state::zon32bit(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zon32bit_state::mem_map_zon32bit);
-	m_maincpu->set_force_no_drc(true); // uses JVS opcode, not implemented in recompiler
 
 	spg2xx_base(config);
 
@@ -464,15 +452,18 @@ ROM_END
 
 
 ROM_START( zon32bit )
-	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "41sports.bin", 0x0000, 0x2000000, CRC(86eee6e0) SHA1(3f6cab6649aebf596de5a8af21658bb1a27edb10) )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 ) // probably should just swap upper 2 line of ROM, as pinout was unknown
+	ROM_LOAD16_WORD_SWAP( "41sports.bin", 0x0000000, 0x0800000, CRC(86eee6e0) SHA1(3f6cab6649aebf596de5a8af21658bb1a27edb10) )
+	ROM_CONTINUE(0x1000000, 0x0800000)
+	ROM_CONTINUE(0x0800000, 0x0800000)
+	ROM_CONTINUE(0x1800000, 0x0800000)
 ROM_END
 
 
 // Box advertises this as '40 Games Included' but the cartridge, which was glued directly to the PCB, not removable, is a 41-in-1.  Maybe some versions exist with a 40 game selection.
-CONS( 200?, zon32bit,  0, 0, zon32bit, zon32bit, zon32bit_state,  init_zon32bit,      "Jungle Soft / Ultimate Products (HK) Ltd",    "Zone 32-bit Gaming Console System (Family Sport 41-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, zon32bit,  0, 0, zon32bit, zon32bit, zon32bit_state,  empty_init,      "Jungle Soft / Ultimate Products (HK) Ltd",    "Zone 32-bit Gaming Console System (Family Sport 41-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // My Wico Deluxe was also available under the MiWi brand (exact model unknown, but it was a cart there instead of built in)
 // Box claimed 53 Arcade Games + 8 Sports games + 24 Music games, although it's unclear where 24 Music Games comes from, there are 3, which are identical aside from the title screen.
 // The Mi Guitar menu contains 24 games, but they're dupes, and just counting those would exclude the other Mi Fit and Mi Papacon menus (which also contain dupes)
-CONS( 200?, mywicodx,  0, 0, zon32bit, zon32bit, zon32bit_state,  init_mywicodx,      "<unknown>",                                   "My Wico Deluxe (Family Sport 85-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mywicodx,  0, 0, zon32bit, zon32bit, mywicodx_state,  empty_init,      "<unknown>",                                   "My Wico Deluxe (Family Sport 85-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 

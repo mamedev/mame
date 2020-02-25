@@ -147,7 +147,72 @@
 		</part>
 	</software>
 
+	<software name="tbellger" supported="no">
+		<description>Tinkerbell - Tal der Feen (Germany) (80-250904)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-250904 - tinkerbell - tal der feen (ger).bin" size="0x1000000" crc="f711f920" sha1="0fc8890d604ec89e061a35a0d577864e937920ce"/>
+			</dataarea>
+		</part>
+	</software>
 
+	<software name="dzugger" supported="no">
+		<description>Dino-Zug - Erforsche die Welt (Germany) (80-252304)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-252304 - dino-zug - erforsche die welt (ger).bin" size="0x1000000" crc="7019a906" sha1="a9b0caa59cd7119d8fac305729b75b4da0702dc1"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="planeger" supported="no">
+		<description>Planes (Germany) (80-253004)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-253004 - planes (ger).bin" size="0x1000000" crc="f945b3cd" sha1="4b7f17f3d7b7edc1626b4e84e26e01ae67bb4f5a"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="sofiager" supported="no">
+		<description>Sofia die Erste (Germany) (80-253204)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-253204 - sofia die erste (ger).bin" size="0x1000000" crc="8559a363" sha1="2892e33c48ef25ecaf3753a6d3f0bff7afb826d7"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="docmcger" supported="no">
+		<description>Doc McStuffins - Spielzeugarztin (Germany) (80-253304)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-253304 - doc mcstuffins - spielzeugarztin (ger).bin" size="0x1000000" crc="53100cbe" sha1="6d47ff9d2623c8012fa394154cd5a39bb99bc805"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="uspidger" supported="no">
+		<description>Ultimate Spider-Man (Germany) (80-253604)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="80-253604 - ultimate spider-man (ger).bin" size="0x1000000" crc="953d470c" sha1="e74fb15fcb92aadd0d36ec1f5bf6799c46ca5425"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="tstory3a" supported="no"> <!-- part #? full title? region? -->
 		<description>Toy Story 3</description>
 		<year>201?</year>
