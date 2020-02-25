@@ -210,13 +210,13 @@ u8 pp_state::kbd_cols_r()
 READ_LINE_MEMBER(pp_state::cntl_r)
 {
 	// pin 1 of J13 connector
-	return (m_modifiers->read() & 0x5) != 0x5;
+	return (m_modifiers->read() & 0x5) == 0x5;
 }
 
 READ_LINE_MEMBER(pp_state::shift_r)
 {
 	// pin 3 of J13 connector
-	return (m_modifiers->read() & 0x6) != 0x6;
+	return (m_modifiers->read() & 0x6) == 0x6;
 }
 
 WRITE_LINE_MEMBER(pp_state::printer_busy_w)
