@@ -97,7 +97,7 @@ Notes (couriersud)
     ipminvad:       N/A
     spacbeam:       not listed
     headon:         not listed
-    greenber:       N/A
+    greenber:       M-15T, M-24S
 
     M10-Board: Has SN76477
 
@@ -1023,9 +1023,9 @@ ROM_START( greenber )
 	ROM_RELOAD(      0xfc00, 0x0400 )   /* for the reset and interrupt vectors */
 	ROM_LOAD( "gb5", 0x2000, 0x0400, CRC(b2f8e69a) SHA1(44295e58da890a8c4aba6fe90defe9c578c95592) )
 	ROM_LOAD( "gb6", 0x2400, 0x0400, CRC(50ea8bd3) SHA1(a816c5fcc603b28c2ae59f217871a7e85fb794e1) )
-	ROM_LOAD( "gb7", 0x2800, 0x0400, NO_DUMP ) // 2be8 entry
+	ROM_LOAD( "gb7", 0x2800, 0x0400, CRC(695124aa) SHA1(0715b1ebc5e08f91ebff7fb6c2a9dca457a7c13c) ) // 2be8 entry
 	ROM_LOAD( "gb8", 0x2c00, 0x0400, CRC(34700b31) SHA1(c148e2475eaaa0e9d1e2412eea359a7ba744e563) )
-	ROM_LOAD( "gb9", 0x3000, 0x0400, CRC(c27b9ba3) SHA1(a2f4f0c4b61eb03bba13ae5d25dc01009a4f86ee) ) // ok ?
+	ROM_LOAD( "gb9", 0x3000, 0x0400, CRC(c27b9ba3) SHA1(a2f4f0c4b61eb03bba13ae5d25dc01009a4f86ee) ) // ok
 ROM_END
 
 GAME( 1979, andromed,  0,        m11,     skychut,  m10_state, init_andromed, ROT270, "IPM",  "Andromeda (Japan?)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
