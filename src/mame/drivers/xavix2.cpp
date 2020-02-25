@@ -18,6 +18,7 @@
 #include "speaker.h"
 #include "cpu/xavix2/xavix2.h"
 #include "machine/i2cmem.h"
+#include <algorithm>
 
 class xavix2_state : public driver_device
 {
@@ -47,6 +48,7 @@ private:
 	emu_timer *m_dma_timer;
 
 	u16 m_port0_ddr;
+	u32 m_port0_full;
 	u8  m_port0_dataw, m_port0_data;
 	u8  m_port0_maskw, m_port0_maskr;
 
@@ -59,6 +61,7 @@ private:
 	u32 m_int_nmi;
 
 	u16 m_bg_color;
+	u32 m_palette[0x200];
 	u32 m_sd[0x400][0x800];
 
 	std::string m_debug_string;
@@ -76,6 +79,8 @@ private:
 	u8 irq_level_r();
 
 	void bg_color_w(u16 data);
+	u32 palette_r(offs_t reg);
+	void palette_w(offs_t reg, u32 data);
 
 	void gpu0_adr_w(u16 data);
 	u16 gpu0b_adr_r();
@@ -117,8 +122,10 @@ private:
 	void port0_ddr_w(u16 data);
 	u16 port0_ddr_r();
 	void port0_update();
-	void port0_w(u8 data);
-	u8 port0_r();
+	void port0_w(u32 data);
+	void port0_w8(u8 data);
+	u32 port0_r();
+	u8 port0_r8();
 
 	void crtc_w(offs_t reg, u16 data);
 
@@ -132,18 +139,28 @@ private:
 
 u32 xavix2_state::rgb555_888(u16 color)
 {
-	u8 r = (color >> 10) & 31;
+	u8 r = (color >>  0) & 31;
 	u8 g = (color >>  5) & 31;
-	u8 b = (color >>  0) & 31;
+	u8 b = (color >> 10) & 31;
 	r = (r << 3) | (r >> 2);
 	g = (g << 3) | (g >> 2);
 	b = (b << 3) | (b >> 2);
-	return (r << 16) | (b << 8) | g;
+	return (r << 16) | (g << 8) | b;
 }
 
 void xavix2_state::bg_color_w(u16 data)
 {
 	m_bg_color = data;
+}
+
+u32 xavix2_state::palette_r(offs_t reg)
+{
+	return m_palette[reg];
+}
+
+void xavix2_state::palette_w(offs_t reg, u32 data)
+{
+	m_palette[reg] = data & 0x8000 ? 0: rgb555_888(data) | 0xff000000;
 }
 
 void xavix2_state::irq_raise(u32 level)
@@ -277,9 +294,15 @@ void xavix2_state::gpu1_trigger_w(u8 data)
 
 void xavix2_state::gpu_update(u16 count, u16 adr)
 {
+	int list[count];
 	for(u32 i=0; i != count; i++) {
 		u64 command = m_maincpu->space(AS_PROGRAM).read_qword(adr + 8*i);
-		logerror("gpu %02d: %016x x=%03x y=%03x ?=%02x ?=%x ?=%02x w=%02x h=%02x c=%04x %s\n",
+		list[i] = (command & 0x1fe00000) | i;
+	}
+	std::sort(list, list + count, std::greater<int>());
+	for(u32 i=0; i != count; i++) {
+		u64 command = m_maincpu->space(AS_PROGRAM).read_qword(adr + 8*(list[i] & 0xffff));
+		logerror("gpu %02d: %016x x=%03x y=%03x ?=%02x ?=%x s=%02x w=%02x h=%02x c=%04x %s\n",
 				 i, command,
 				 (command >>  0) &  0x7ff,
 				 (command >> 11) &  0x3ff,
@@ -295,13 +318,13 @@ void xavix2_state::gpu_update(u16 count, u16 adr)
 		u32 descsize = m_maincpu->space(AS_PROGRAM).read_dword(m_gpu_descsize_adr + 4*idx);
 		u16 descdata = m_maincpu->space(AS_PROGRAM).read_word(m_gpu_descdata_adr + 2*idx2);
 
-		u32 sadr = (descdata << 14) | ((command >> 43) & 0x3fe0);
+		u32 sadr = (descdata << 14) + ((command >> 43) & 0x7fe0);
 		u32 x = (command >>  0) &  0x7ff;
 		u32 y = (command >> 11) &  0x3ff;
 		u32 sx = 1+(descsize & 0xff);
 		u32 sy = 1 + ((descsize >> 8) & 0xff);
 		u32 bpp = 1 + ((descsize >> 24) & 7);
-		logerror("gpu    - data %06x size %08x w=%x h=%x ?=%x bpp=%x ?=%x\n", sadr, descsize, sx, sy, (descsize >> 16) & 0xff, bpp, descsize >> 27);
+		logerror("gpu    - data %06x size %08x w=%x h=%x ?=%x bpp=%x pal=%x\n", sadr, descsize, sx, sy, (descsize >> 16) & 0xff, bpp, descsize >> 27);
 
 		if(x+sx > 0x800)
 			sx = 0x800 - x;
@@ -310,7 +333,7 @@ void xavix2_state::gpu_update(u16 count, u16 adr)
 
 		u32 avail = 0;
 		u32 mask  = (1 << bpp) - 1;
-		u32 shift = (8 - bpp);
+		u32 palette = ((descsize >> 27) & 0x1f) << bpp;
 		for(u32 yy=0; yy<sy; yy++) {
 			u64 v = m_maincpu->space(AS_PROGRAM).read_qword(sadr);
 			sadr += 8;
@@ -321,8 +344,8 @@ void xavix2_state::gpu_update(u16 count, u16 adr)
 					sadr += 8;
 					avail = 64;
 				}
-				u32 c = (v & mask) << shift;
-				m_sd[y+yy][x+xx] = 0xff000000 | (0x010101 * c);
+				u32 color = m_palette[palette | (v & mask)];
+				if (color) m_sd[y+yy][x+xx] = color;
 				v >>= bpp;
 				avail -= bpp;
 			}
@@ -456,13 +479,23 @@ void xavix2_state::port0_update()
 	}
 }
 
-void xavix2_state::port0_w(u8 data)
+void xavix2_state::port0_w(u32 data)
+{
+	m_port0_full = data;
+	port0_w8(data >> 16);
+}
+
+void xavix2_state::port0_w8(u8 data)
 {
 	m_port0_dataw = data;
 	port0_update();
 }
 
-u8 xavix2_state::port0_r()
+u32 xavix2_state::port0_r()
+{
+	return (m_port0_full & 0xff00ffff) | (port0_r8() << 16);
+}
+u8 xavix2_state::port0_r8()
 {
 	u8 data = (m_port0_dataw & m_port0_maskw) | (m_port0_data & m_port0_maskr);
 	return data;
@@ -511,7 +544,8 @@ void xavix2_state::mem(address_map &map)
 
 	map(0x40000000, 0x40ffffff).rom().region("maincpu", 0);
 
-	map(0xc0000000, 0xc001ffff).ram();
+	map(0xc0000000, 0xc00007ff).rw(FUNC(xavix2_state::palette_r), FUNC(xavix2_state::palette_w));
+	map(0xc0000800, 0xc001ffff).ram();
 
 	map(0xffffe000, 0xffffe003).w(FUNC(xavix2_state::dma_src_w));
 	map(0xffffe004, 0xffffe005).w(FUNC(xavix2_state::dma_dst_w));
@@ -520,7 +554,7 @@ void xavix2_state::mem(address_map &map)
 	map(0xffffe010, 0xffffe010).rw(FUNC(xavix2_state::dma_status_r), FUNC(xavix2_state::dma_status_w));
 
 	map(0xffffe204, 0xffffe205).rw(FUNC(xavix2_state::port0_ddr_r), FUNC(xavix2_state::port0_ddr_w));
-	map(0xffffe20a, 0xffffe20a).rw(FUNC(xavix2_state::port0_r), FUNC(xavix2_state::port0_w));
+	map(0xffffe208, 0xffffe20b).rw(FUNC(xavix2_state::port0_r), FUNC(xavix2_state::port0_w));
 	map(0xffffe238, 0xffffe238).rw(FUNC(xavix2_state::debug_port_r), FUNC(xavix2_state::debug_port_w));
 	map(0xffffe239, 0xffffe239).r(FUNC(xavix2_state::debug_port_status_r));
 
