@@ -159,8 +159,8 @@ void i8279_device::device_reset()
 	// from here is confirmed
 	m_cmd[0] = 8;
 	m_cmd[1] = 31;
-	logerror("Initial clock = 3100kHz\n");
 	timer_adjust();
+	logerror("Initial clock = %.2f kHz\n", m_scanclock / 1000.0);
 }
 
 
@@ -169,12 +169,12 @@ void i8279_device::timer_adjust()
 // Real device runs at about 100kHz internally, clock divider is chosen so that
 // this is the case. If this is too long, the sensor mode doesn't work correctly.
 
-	u8 divider = (m_cmd[1]) ? m_cmd[1] : 1;
+	u8 divider = (m_cmd[1] >= 2) ? m_cmd[1] : 2;
 	u32 new_clock = clock() / divider;
 
 	if (m_scanclock != new_clock)
 	{
-		m_timer->adjust(attotime::from_hz(new_clock), 0, attotime::from_hz(new_clock));
+		m_timer->adjust(attotime::from_ticks(64, new_clock), 0, attotime::from_ticks(64, new_clock));
 
 		m_scanclock = new_clock;
 	}
@@ -477,8 +477,8 @@ void i8279_device::cmd_w(u8 data)
 		case 1:
 			if (data > 1)
 			{
-				logerror("Clock set to %dkHz\n",data*100);
 				timer_adjust();
+				logerror("Clock set to %.2f kHz\n", m_scanclock / 1000.0);
 			}
 			break;
 		case 2:
