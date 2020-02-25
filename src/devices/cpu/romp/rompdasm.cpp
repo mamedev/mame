@@ -196,8 +196,8 @@ offs_t romp_disassembler::disassemble(std::ostream &stream, offs_t pc, data_buff
 		case 0xeb: util::stream_format(stream, "lhs    %s,0(%s)", gpr[R2], gpr[R3]); break; // load half short
 		case 0xec: util::stream_format(stream, "balr   %s,%s", gpr[R2], gpr[R3]); flags |= STEP_OVER; break; // branch and link
 		case 0xed: util::stream_format(stream, "balrx  %s,%s", gpr[R2], gpr[R3]); flags |= STEP_OVER | step_over_extra(1); break; // branch and link with execute
-		case 0xee: util::stream_format(stream, "b%-5s %s,%s", util::string_format("%sr",  cc[N]), gpr[R3]); break; // branch on condition bit
-		case 0xef: util::stream_format(stream, "b%-5s %s,%s", util::string_format("%srx", cc[N]), gpr[R3]); break; // branch on condition bit with execute
+		case 0xee: util::stream_format(stream, "b%-5s %s", util::string_format("%sr",  cc[N]), gpr[R3]); break; // branch on condition bit
+		case 0xef: util::stream_format(stream, "b%-5s %s", util::string_format("%srx", cc[N]), gpr[R3]); break; // branch on condition bit with execute
 
 		case 0xf0: util::stream_format(stream, "wait"); break; // wait
 		case 0xf1: util::stream_format(stream, "ae     %s,%s", gpr[R2], gpr[R3]); break; // add extended
