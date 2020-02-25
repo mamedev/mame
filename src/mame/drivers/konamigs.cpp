@@ -28,10 +28,12 @@
 
     TODO:
      - currently implemented very basic set of Q2SD GPU features, required/used by dumped games, should be improved if more games will be found.
-     - hook IRQs from GPU and SPU (not used by dumped games), possible controlled by one write registers in 140010xx area.
+     - hook IRQs from GPU and SPU (not used by dumped games), possible controlled by one MMIO registers in 140010xx area.
+     - fix/improve timings, currently DDR Kids have notable desync with music.
 
     Notes:
      - hold Test + Service while booting to initialise RTC NVRAM
+     - games do not enable SH-3 CPU cache, so it's actual rate is way lower than may/should be.
 
 **************************************************************************/
 
@@ -350,7 +352,9 @@ WRITE16_MEMBER(gsan_state::gpu_w)
 		}
 		if (BIT(data, 14)) // display reset
 		{
-			m_gpuregs[0x002 / 2] &= ~(1 << 11);
+			m_gpuregs[0x002 / 2] &= ~(1 << 15); // TVR
+			m_gpuregs[0x002 / 2] &= ~(1 << 14); // FRM
+			m_gpuregs[0x002 / 2] &= ~(1 << 11); // VBK
 		}
 		if (BIT(data, 10)) // render break
 		{
@@ -1066,7 +1070,7 @@ void gsan_state::gs_medal(machine_config &config)
 
 void gsan_state::init_gsan()
 {
-	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY | SH2DRC_STRICT_PCREL);
 	m_maincpu->sh2drc_add_fastram(0x00000000, 0x0000ffff, 0, memregion("maincpu")->base());
 	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0c3fffff, 1, memshare("main_ram")->ptr());
 }
@@ -1103,5 +1107,5 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-GAME( 2000, ddrkids,       0, gsan,     ddrkids, gsan_state, init_gsan, ROT0, "Konami",       "Dance Dance Revolution Kids (GQAN4 JAA)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_SUPPORTS_SAVE )
+GAME( 2000, ddrkids,       0, gsan,     ddrkids, gsan_state, init_gsan, ROT0, "Konami",       "Dance Dance Revolution Kids (GQAN4 JAA)", MACHINE_IMPERFECT_TIMING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_SUPPORTS_SAVE )
 GAME( 2000, musclhit,      0, gs_medal, muscl,   gsan_state, init_gsan, ROT0, "Konami / TBS", "Muscle Ranking Kinniku Banzuke Spray Hitter", MACHINE_IMPERFECT_GRAPHICS|MACHINE_SUPPORTS_SAVE )
