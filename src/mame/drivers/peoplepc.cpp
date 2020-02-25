@@ -133,7 +133,7 @@ MC6845_UPDATE_ROW(peoplepc_state::update_row)
 			uint8_t chr = m_charram[(data & 0x7f) * 32 + ra];
 			if(data & 0x1000)
 				chr ^= 0xff;
-			if((data & 0x800) && (ra > 14))
+			if(((data & 0x800) && (ra > 14)) || (i == cursor_x))
 				chr = 0xff;
 			for(j = 0; j < 8; j++)
 				bitmap.pix32(y, (i * 8) + j) = palette[BIT(chr, j)];
