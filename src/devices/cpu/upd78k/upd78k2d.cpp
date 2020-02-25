@@ -229,9 +229,9 @@ offs_t upd78k2_disassembler::dasm_29(std::ostream &stream, offs_t pc, const upd7
 offs_t upd78k2_disassembler::dasm_38(std::ostream &stream, u8 op, offs_t pc, const upd78k2_disassembler::data_buffer &opcodes)
 {
 	util::stream_format(stream, "%-8s", BIT(op, 0) ? "XCH" : "MOV");
-	format_saddr(stream, opcodes.r8(pc + 1));
-	stream << ",";
 	format_saddr(stream, opcodes.r8(pc + 2));
+	stream << ",";
+	format_saddr(stream, opcodes.r8(pc + 1));
 	return 3 | SUPPORTED;
 }
 
@@ -272,9 +272,9 @@ offs_t upd78k2_disassembler::dasm_50(std::ostream &stream, u8 op)
 offs_t upd78k2_disassembler::dasm_78(std::ostream &stream, u8 op, offs_t pc, const upd78k2_disassembler::data_buffer &opcodes)
 {
 	util::stream_format(stream, "%-8s", s_alu_ops[op & 0x07]);
-	format_saddr(stream, opcodes.r8(pc + 1));
-	stream << ",";
 	format_saddr(stream, opcodes.r8(pc + 2));
+	stream << ",";
+	format_saddr(stream, opcodes.r8(pc + 1));
 	return 3 | SUPPORTED;
 }
 
