@@ -1072,4 +1072,4 @@ GAME( 1979, ipminvad1, ipminvad, m10,     ipminvad, m10_state, init_ipminva1, RO
 GAME( 1980, skychut,   0,        m11,     skychut,  m10_state, empty_init,    ROT270, "Irem", "Sky Chuter",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, spacbeam,  0,        m15,     spacbeam, m10_state, empty_init,    ROT270, "Irem", "Space Beam",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // IPM or Irem?
 GAME( 1979, headoni,   0,        headoni, headoni,  m10_state, empty_init,    ROT270, "Irem", "Head On (Irem, M-15 Hardware)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, greenber,  0,        m15,     greenber, m10_state, empty_init,    ROT270, "Irem", "Green Beret (Irem)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, greenber,  0,        m15,     greenber, m10_state, empty_init,    ROT270, "Irem", "Green Beret (Irem)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
