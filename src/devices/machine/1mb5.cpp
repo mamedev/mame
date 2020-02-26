@@ -76,18 +76,22 @@ READ8_MEMBER(hp_1mb5_device::cpu_r)
 	case 1:
 		// Read IB
 		res = m_ib;
-		m_ibf = false;
-		update_halt();
+		if (m_ibf) {
+			machine().scheduler().boost_interleave(attotime::from_usec(50) , attotime::from_usec(100));
+			space.device().execute().spin();
+			m_ibf = false;
+			update_halt();
+		}
 		break;
 	}
 
-	//LOG("RD %u=%02x\n" , offset , res);
+	LOG("RD %u=%02x\n" , offset , res);
 	return res;
 }
 
 WRITE8_MEMBER(hp_1mb5_device::cpu_w)
 {
-	//LOG("WR %u=%02x\n" , offset , data);
+	LOG("WR %u=%02x\n" , offset , data);
 	bool need_resched = false;
 
 	switch (offset) {
@@ -107,7 +111,8 @@ WRITE8_MEMBER(hp_1mb5_device::cpu_w)
 	}
 	if (need_resched) {
 		LOG("resched %s\n" , space.device().tag());
-		space.device().execute().yield();
+		machine().scheduler().boost_interleave(attotime::from_usec(5) , attotime::from_usec(100));
+		space.device().execute().spin();
 	}
 }
 
@@ -250,7 +255,7 @@ bool hp_1mb5_device::set_service(bool new_service)
 {
 	if (new_service != m_service) {
 		m_service = new_service;
-		//LOG("irl=%d\n" , m_service);
+		LOG("irl=%d\n" , m_service);
 		m_irl_handler(m_service);
 		return true;
 	} else {
@@ -262,7 +267,7 @@ bool hp_1mb5_device::update_halt()
 {
 	bool new_halt = m_hlten && m_obf && !m_ibf;
 	if (new_halt != m_halt) {
-		//LOG("HALT=%d\n" , new_halt);
+		LOG("HALT=%d\n" , new_halt);
 		m_halt = new_halt;
 		m_halt_handler(m_halt);
 		return true;
