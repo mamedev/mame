@@ -82,7 +82,7 @@
 	</software>
 
 	<software name="rapunzel" supported="no">
-		<description>Rapunzel - Neu Verfohnt (Germany) (80-251704)</description>
+		<description>Rapunzel - Neu verföhnt (Germany) (80-251704)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="mobigo_cart">
