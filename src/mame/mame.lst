@@ -37062,7 +37062,6 @@ lx_jg7425
 @source:spg2xx.cpp
 rad_skat                        //
 rad_skatp                       //
-rad_sktv                        //
 rad_crik                        //
 rad_fb2                         //
 mattelcs                        //
@@ -37135,6 +37134,9 @@ tmntpdc
 
 @source:spg2xx_playvision.cpp
 pvmil                           //
+
+@source:spg2xx_skannerztv.cpp
+rad_sktv                        //
 
 @source:spg2xx_senario.cpp
 senmil
