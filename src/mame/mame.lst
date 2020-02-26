@@ -34365,9 +34365,6 @@ rbislande                       // B39 (c) 1988 Taito Corporation
 rbmk                            // (c) 1998 GMS
 rbspm                           // (c) 1998 GMS
 
-@source:rc2014.cpp
-rc2014                          // 2014, RFC2795 Ltd
-
 @source:rc702.cpp
 rc702                           // 1979 RC702
 
