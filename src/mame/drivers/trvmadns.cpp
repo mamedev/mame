@@ -95,40 +95,48 @@ Technology = NMOS
 #include "speaker.h"
 #include "tilemap.h"
 
+#include "trvmadns.lh"
 
 class trvmadns_state : public driver_device
 {
 public:
 	trvmadns_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_gfxram(*this, "gfxram"),
-		m_tileram(*this, "tileram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_8(*this, "paletteram") { }
+		m_generic_paletteram_8(*this, "paletteram"),
+		m_gfxram(*this, "gfxram"),
+		m_tileram(*this, "tileram"),
+		m_lamps(*this, "button_%u", 1U)
+	{ }
 
 	void trvmadns(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
-	tilemap_t *m_bg_tilemap;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_generic_paletteram_8;
 	required_shared_ptr<uint8_t> m_gfxram;
 	required_shared_ptr<uint8_t> m_tileram;
+	output_finder<6> m_lamps;
+
+	tilemap_t *m_bg_tilemap;
 	int m_old_data;
 	DECLARE_WRITE8_MEMBER(trvmadns_banking_w);
 	DECLARE_WRITE8_MEMBER(trvmadns_gfxram_w);
 	DECLARE_WRITE8_MEMBER(trvmadns_palette_w);
 	DECLARE_WRITE8_MEMBER(w2);
-	DECLARE_WRITE8_MEMBER(w3);
+	DECLARE_WRITE8_MEMBER(lamps_w);
 	DECLARE_WRITE8_MEMBER(trvmadns_tileram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_trvmadns(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_shared_ptr<uint8_t> m_generic_paletteram_8;
 	void cpu_map(address_map &map);
 	void io_map(address_map &map);
 };
@@ -234,12 +242,19 @@ WRITE8_MEMBER(trvmadns_state::w2)
 */
 }
 
-WRITE8_MEMBER(trvmadns_state::w3)
+WRITE8_MEMBER(trvmadns_state::lamps_w)
 {
-/*  static int old = -1;
-    if(data!=old)
-        logerror("w3 = %02X\n",old=data);
-*/
+	// 7-------  not used
+	// -6------  start button led
+	// --5-----  not used
+	// ---43210  button lamps 5 to 1
+
+	m_lamps[0] = BIT(data, 0); // button 1
+	m_lamps[1] = BIT(data, 1); // button 2
+	m_lamps[2] = BIT(data, 2); // button 3
+	m_lamps[3] = BIT(data, 3); // button 4
+	m_lamps[4] = BIT(data, 4); // button 5
+	m_lamps[5] = BIT(data, 6); // button start
 }
 
 WRITE8_MEMBER(trvmadns_state::trvmadns_tileram_w)
@@ -266,31 +281,32 @@ void trvmadns_state::cpu_map(address_map &map)
 	map(0x6000, 0x6fff).bankr("bank1");
 	map(0x7000, 0x7fff).bankr("bank2");
 	map(0x6000, 0x7fff).w(FUNC(trvmadns_state::trvmadns_gfxram_w)).share("gfxram");
-	map(0x8000, 0x87ff).ram();
-	map(0xa000, 0xa7ff).ram().w(FUNC(trvmadns_state::trvmadns_tileram_w)).share("tileram");
+	map(0x8000, 0x87ff).ram(); // u3
+	map(0xa000, 0xa7ff).ram().w(FUNC(trvmadns_state::trvmadns_tileram_w)).share("tileram"); // u17
 	map(0xc000, 0xc01f).ram().w(FUNC(trvmadns_state::trvmadns_palette_w)).share("paletteram");
 	map(0xe000, 0xe000).w(FUNC(trvmadns_state::w2));//NOP
-	map(0xe004, 0xe004).w(FUNC(trvmadns_state::w3));//NOP
+	map(0xe004, 0xe004).w(FUNC(trvmadns_state::lamps_w));
 }
 
 void trvmadns_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0x02, 0x02).portr("IN0");
+	map(0x00, 0x00).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x01, 0x01).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x02, 0x02).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x80, 0x80).w(FUNC(trvmadns_state::trvmadns_banking_w));
 }
 
 static INPUT_PORTS_START( trvmadns )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SERVICE)
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -383,6 +399,11 @@ uint32_t trvmadns_state::screen_update_trvmadns(screen_device &screen, bitmap_in
 	return 0;
 }
 
+void trvmadns_state::machine_start()
+{
+	m_lamps.resolve();
+}
+
 void trvmadns_state::machine_reset()
 {
 	m_old_data = -1;
@@ -410,7 +431,11 @@ void trvmadns_state::trvmadns(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "aysnd", XTAL(10'000'000)/2/4).add_route(ALL_OUTPUTS, "mono", 1.0); //?
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(10'000'000)/2/4)); //?
+	aysnd.port_a_read_callback().set_ioport("IN0");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	config.set_default_layout(layout_trvmadns);
 }
 
 
