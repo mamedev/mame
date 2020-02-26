@@ -76,6 +76,8 @@ public:
 		m_z80(*this, "z80"),
 		m_flop0(*this, "wdfdc:0"),
 		m_flop1(*this, "wdfdc:1"),
+		m_flop2(*this, "wdfdc:2"),
+		m_flop3(*this, "wdfdc:3"),
 		m_keys(*this, "KEYS.%u", 0)
 	{ }
 
@@ -111,6 +113,8 @@ private:
 	required_device<cpu_device> m_z80;
 	required_device<floppy_connector> m_flop0;
 	required_device<floppy_connector> m_flop1;
+	required_device<floppy_connector> m_flop2;
+	required_device<floppy_connector> m_flop3;
 	required_ioport_array<8> m_keys;
 
 	u8 m_p1, m_p2, m_data, m_p40;
@@ -152,12 +156,46 @@ READ8_MEMBER(alphatpc16_state::p2_r)
 
 READ8_MEMBER(alphatpc16_state::p00_r)
 {
-	return (m_flop0->get_device()->exists() << 3);
+	u8 ret = 0;
+	switch(m_p40 & 0xf0)
+	{
+		case 0x00:
+			ret |= m_flop0->get_device()->exists() << 3;
+			break;
+		case 0x10:
+			ret |= m_flop1->get_device()->exists() << 3;
+			break;
+		case 0x20:
+			ret |= m_flop2->get_device()->exists() << 3;
+			break;
+		case 0x40:
+			ret |= m_flop3->get_device()->exists() << 3;
+			break;
+	}
+	return ret;
 }
 
 WRITE8_MEMBER(alphatpc16_state::p40_w)
 {
-	m_flop0->get_device()->ss_w(BIT(data, 2));
+	switch(data & 0xf0)
+	{
+		case 0x00:
+			m_wdfdc->set_floppy(m_flop0->get_device());
+			m_flop0->get_device()->ss_w(BIT(data, 2));
+			break;
+		case 0x10:
+			m_wdfdc->set_floppy(m_flop1->get_device());
+			m_flop1->get_device()->ss_w(BIT(data, 2));
+			break;
+		case 0x20:
+			m_wdfdc->set_floppy(m_flop2->get_device());
+			m_flop2->get_device()->ss_w(BIT(data, 2));
+			break;
+		case 0x40:
+			m_wdfdc->set_floppy(m_flop3->get_device());
+			m_flop3->get_device()->ss_w(BIT(data, 2));
+			break;
+	}
 	m_p40 = data;
 }
 
@@ -328,11 +366,11 @@ static INPUT_PORTS_START( alphatpc16 )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('@')
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
 	PORT_START("KEYS.2")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('P')
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('Q')
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('R')
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('S')
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('T')
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('/')
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('{') PORT_CHAR('[')
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('|') PORT_CHAR('\\')
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('}') PORT_CHAR(']')
@@ -365,15 +403,15 @@ static INPUT_PORTS_START( alphatpc16 )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3_PAD) PORT_CHAR('3')
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(O_UMLAUT)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Unknown 0x7f")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Unknown 0x93")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR('.')
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR('\r')
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("< >") PORT_CHAR('<') PORT_CHAR('>')
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5_PAD) PORT_CHAR('5')
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9_PAD) PORT_CHAR('9')
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR('8')
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Unknown 0x95")
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Unknown 0x9f")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(DEL))
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('2')
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR('6')
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('*')
@@ -407,7 +445,7 @@ static INPUT_PORTS_START( alphatpc16 )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Unknown 0x6b")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_MAMEKEY(LSHIFT))
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -457,6 +495,8 @@ void alphatpc16_state::alphatpc16(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_flop0, atpc16_floppies, "525dd", floppy_image_device::default_floppy_formats);
 	dynamic_cast<device_slot_interface *>(m_flop0.target())->set_fixed(true);
 	FLOPPY_CONNECTOR(config, m_flop1, atpc16_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_flop2, atpc16_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_flop3, atpc16_floppies, "525dd", floppy_image_device::default_floppy_formats);
 
 	i8741a_device& i8741(I8741A(config, "i8741", 4.608_MHz_XTAL));
 	i8741.p1_in_cb().set(FUNC(alphatpc16_state::p1_r));
