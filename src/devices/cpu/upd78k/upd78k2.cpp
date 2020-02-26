@@ -12,7 +12,8 @@
 #include "upd78k2.h"
 #include "upd78k2d.h"
 
-// device type definition
+// device type definitions
+DEFINE_DEVICE_TYPE(UPD78210, upd78210_device, "upd78210", "NEC uPD78210")
 DEFINE_DEVICE_TYPE(UPD78213, upd78213_device, "upd78213", "NEC uPD78213")
 
 //**************************************************************************
@@ -23,11 +24,12 @@ DEFINE_DEVICE_TYPE(UPD78213, upd78213_device, "upd78213", "NEC uPD78213")
 //  upd78k2_device - constructor
 //-------------------------------------------------
 
-upd78k2_device::upd78k2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor mem_map, address_map_constructor sfr_map)
+upd78k2_device::upd78k2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int iram_bits, address_map_constructor mem_map, address_map_constructor sfr_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0, mem_map)
-	, m_iram_config("IRAM", ENDIANNESS_LITTLE, 16, 8, 0, address_map_constructor(FUNC(upd78k2_device::iram_map), this))
+	, m_iram_config("IRAM", ENDIANNESS_LITTLE, 16, iram_bits, 0, address_map_constructor(FUNC(upd78k2_device::iram_map), this))
 	, m_sfr_config("SFR", ENDIANNESS_LITTLE, 16, 8, 0, sfr_map)
+	, m_iram_addrmask((offs_t(1) << iram_bits) - 1)
 	, m_program_space(nullptr)
 	, m_program_cache(nullptr)
 	, m_iram_cache(nullptr)
@@ -47,7 +49,7 @@ upd78k2_device::upd78k2_device(const machine_config &mconfig, device_type type, 
 
 void upd78k2_device::iram_map(address_map &map)
 {
-	map(0x00, 0xff).ram().share("iram");
+	map(0, m_iram_addrmask).ram().share("iram");
 }
 
 
@@ -73,7 +75,7 @@ device_memory_interface::space_config_vector upd78k2_device::memory_space_config
 
 inline u8 upd78k2_device::register_base() const noexcept
 {
-	return (BIT(m_psw, 5) ? 0xe0 : 0xf0) | (~m_psw & 0x08);
+	return ((BIT(m_psw, 5) ? 0xe0 : 0xf0) & m_iram_addrmask) | (~m_psw & 0x08);
 }
 
 
@@ -174,11 +176,43 @@ void upd78k2_device::state_string_export(const device_state_entry &entry, std::s
 //**************************************************************************
 
 //-------------------------------------------------
+//  upd78210_device - constructor
+//-------------------------------------------------
+
+upd78210_device::upd78210_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: upd78k2_device(mconfig, UPD78210, tag, owner, clock, 7,
+						address_map_constructor(),
+						address_map_constructor(FUNC(upd78210_device::sfr_map), this))
+{
+}
+
+
+//-------------------------------------------------
+//  create_disassembler -
+//-------------------------------------------------
+
+std::unique_ptr<util::disasm_interface> upd78210_device::create_disassembler()
+{
+	return std::make_unique<upd78214_disassembler>();
+}
+
+
+//-------------------------------------------------
+//  sfr_map - type-specific SFR map
+//-------------------------------------------------
+
+void upd78210_device::sfr_map(address_map &map)
+{
+	// TODO
+}
+
+
+//-------------------------------------------------
 //  upd78213_device - constructor
 //-------------------------------------------------
 
 upd78213_device::upd78213_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: upd78k2_device(mconfig, UPD78213, tag, owner, clock,
+	: upd78k2_device(mconfig, UPD78213, tag, owner, clock, 8,
 						address_map_constructor(FUNC(upd78213_device::mem_map), this),
 						address_map_constructor(FUNC(upd78213_device::sfr_map), this))
 {
