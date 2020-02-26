@@ -10507,6 +10507,8 @@ comx35n                         //
 comx35p                         //
 
 @source:conchess.cpp
+concply
+concplyv
 concstd
 
 @source:concept.cpp
