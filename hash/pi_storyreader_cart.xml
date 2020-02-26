@@ -310,7 +310,7 @@
 	</software>
 
 	<software name="koniglow" supported="no">
-		<description>Der Konig der Lowen (Germany)</description>
+		<description>Der König der Löwen (Germany)</description>
 		<year>200?</year>
 		<publisher>Publications International Ltd. / Disney</publisher>
 		<part name="cart" interface="pi_storyreader_cart">
@@ -343,7 +343,7 @@
 	</software>
 
 	<software name="puuhtag" supported="no">
-		<description>Winnie Puuh - Ein sturmischer Tag (Germany)</description>
+		<description>Winnie Puuh - Ein stürmischer Tag (Germany)</description>
 		<year>200?</year>
 		<publisher>Publications International Ltd. / Disney</publisher>
 		<part name="cart" interface="pi_storyreader_cart">
