@@ -19,7 +19,7 @@
 #include "riscii.h"
 #include "riidasm.h"
 
-#define LOG_TBRD (1 << 1U)
+#define LOG_TBRD (1U << 1)
 #include "logmacro.h"
 
 // device type definitions

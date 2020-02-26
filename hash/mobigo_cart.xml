@@ -38,7 +38,7 @@
 	</software>
 
 	<software name="ben10" supported="no">
-		<description>Ben 10 - UltimateAlien - Mine der Gedanken  (Germany) (80-250604)</description>
+		<description>Ben 10 - UltimateAlien - Mine der Gedanken (Germany) (80-250604)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="mobigo_cart">
