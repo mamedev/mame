@@ -104,7 +104,7 @@
 	</software>
 
 	<software name="teamumiz" supported="no">
-		<description>Team Umizoomi - Die grosse Umiauto Rettung (Germany) (80-252504)</description>
+		<description>Team Umizoomi - Die große Umiauto Rettung (Germany) (80-252504)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="mobigo_cart">
@@ -137,7 +137,7 @@
 	</software>
 
 	<software name="fishrek" supported="no">
-		<description>Fur immer Shrek (Germany) (80-250004)</description>
+		<description>Für immer Shrek (Germany) (80-250004)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="mobigo_cart">

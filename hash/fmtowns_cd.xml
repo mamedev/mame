@@ -8638,7 +8638,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="parapara">
+	<software name="parapara" supported="no">
 		<!--
 		Origin: redump.org
 		<rom name="Para Para Paradise (Japan) (Disc A) (Akane Kouda) (Track 01).bin" size="123729312" crc="4afc3e75" sha1="775643d94e0899bfec5ce21c89b834f4de9f4006"/>
