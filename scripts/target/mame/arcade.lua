@@ -280,6 +280,7 @@ SOUNDS["MM5837"] = true
 --SOUNDS["DAVE"] = true
 SOUNDS["LC7535"] = true
 --SOUNDS["UPD934G"] = true
+--SOUNDS["VGMVIZ"] = true
 
 --------------------------------------------------
 -- specify available video cores

@@ -216,7 +216,7 @@
 	</group>
 
 	<view name="Internal Layout">
-		<bounds left="0" right="60" top="0" bottom="55" />
+		<bounds left="0" right="120" top="0" bottom="55" />
 
 		<cpanel element="static_black2"><bounds x="0"  y="4" width="11" height="5" /></cpanel>
 		<cpanel element="static_black2"><bounds x="12" y="4" width="11" height="5" /></cpanel>
@@ -237,5 +237,7 @@
 		<cpanel element="hl1" inputtag="CONTROLS" inputmask="0x0010"><bounds x="48" y="4" width="11" height="5" /><color alpha="0.15" /></cpanel>
 
 		<group ref="activity"><bounds x="0" y="21" width="60" height="34" /></group>
+
+		<screen index="0"><bounds x="60" y="0" width="60" height="55" /></screen>
 	</view>
 </mamelayout>

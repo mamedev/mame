@@ -41,6 +41,7 @@ SOUNDS["MULTIPCM"] = true
 SOUNDS["NES_APU"] = true
 SOUNDS["OKIM6258"] = true
 SOUNDS["OKIM6295"] = true
+SOUNDS["VGMVIZ"] = true
 SOUNDS["POKEY"] = true
 SOUNDS["QSOUND"] = true
 SOUNDS["RF5C68"] = true
