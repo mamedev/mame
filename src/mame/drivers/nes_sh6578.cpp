@@ -131,7 +131,7 @@ ROM_START( ablwikid )
 ROM_END
 
 
-CONS( 1997, bandgpad,  0,  0,  nes_sh6578,    nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Bandai", "Gamppad (Bandai)", MACHINE_NOT_WORKING )
+CONS( 1997, bandgpad,  0,  0,  nes_sh6578,    nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Bandai", "Multi Game Player Gamepad", MACHINE_NOT_WORKING )
 
 // possibly newer than 2001
 CONS( 2001, ts_handy11,  0,  0,  nes_sh6578,    nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Techno Source", "Handy Boy 11-in-1 (TV Play Power)", MACHINE_NOT_WORKING )
