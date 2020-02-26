@@ -33,22 +33,22 @@ Simple layout for Trivia Madness
 		<screen index="0">
 			<bounds left="0" top="0" right="640" bottom="480" />
 		</screen>
-		<cpanel name="button_1" element="button" inputtag="IN0" inputmask="0x01">
+		<cpanel name="0.0" element="button" inputtag="IN0" inputmask="0x01">
 			<bounds x="80" y="505" width="70" height="35" />
 		</cpanel>
-		<cpanel name="button_2" element="button" inputtag="IN0" inputmask="0x02">
+		<cpanel name="0.1" element="button" inputtag="IN0" inputmask="0x02">
 			<bounds x="180" y="505" width="70" height="35" />
 		</cpanel>
-		<cpanel name="button_3" element="button" inputtag="IN0" inputmask="0x04">
+		<cpanel name="0.2" element="button" inputtag="IN0" inputmask="0x04">
 			<bounds x="280" y="505" width="70" height="35" />
 		</cpanel>
-		<cpanel name="button_4" element="button" inputtag="IN0" inputmask="0x08">
+		<cpanel name="0.3" element="button" inputtag="IN0" inputmask="0x08">
 			<bounds x="380" y="505" width="70" height="35" />
 		</cpanel>
-		<cpanel name="button_5" element="button" inputtag="IN0" inputmask="0x10">
+		<cpanel name="0.4" element="button" inputtag="IN0" inputmask="0x10">
 			<bounds x="480" y="505" width="70" height="35" />
 		</cpanel>
-		<cpanel name="button_6" element="start" inputtag="IN0" inputmask="0x40">
+		<cpanel name="0.6" element="start" inputtag="IN0" inputmask="0x40">
 			<bounds x="250" y="565" width="130" height="35" />
 		</cpanel>
 	</view>
