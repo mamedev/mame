@@ -11231,4 +11231,26 @@
 		</part>
 	</software>
 
+	<software name="crsus91">
+		<description>Crosscountry USA</description>
+		<year>1991</year>
+		<publisher>Didatech Software</publisher>
+		<info name="release" value="2020-02-24"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234810">
+				<rom name="crosscountry usa side a.woz" size="234810" crc="4beaeb36" sha1="668cc7a732175ac92faaf4a73a4e76901def8a6e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234810">
+				<rom name="crosscountry usa side b.woz" size="234810" crc="f4bbb410" sha1="b5464fd5c4885923f28e8403879ffa4e2528244b"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
