@@ -432,7 +432,7 @@ void dgpix_state::dgpix(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dgpix_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &dgpix_state::io_map);
 
-	KS0164(config, m_soundcpu, 16900000);
+	KS0164(config, m_soundcpu, 16.9344_MHz_XTAL);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &dgpix_state::snd_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
