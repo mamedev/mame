@@ -299,7 +299,7 @@
 	</software>
 
 	<software name="dasdsch" supported="no">
-		<description>Das Dschungel-Buch (Germany)</description>
+		<description>Das Dschungelbuch (Germany)</description>
 		<year>200?</year>
 		<publisher>Publications International Ltd. / Disney</publisher>
 		<part name="cart" interface="pi_storyreader_cart">
