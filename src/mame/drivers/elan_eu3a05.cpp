@@ -93,6 +93,119 @@
 
 */
 
+/*
+
+Buzztime Trivia notes from Tahg (addresses based on base ROM, not cartridges)
+
+300 Cursor Left
+301 Cursor Top
+302 Cursor Right
+303 Cursor Bottom
+
+3E5 Sent Command
+3E6 Watchdog Counter
+3E9 Active Player
+3EA Sent Player Id/Incoming Byte
+3EB Sent Player Button/Loop Counter
+
+0-A Name
+E-F Score
+44x Player 1 Data
+...
+4Fx Player 12 Data
+
+509 Cursor index
+515 Name on Enter name screen
+
+These read a byte, (aaabbbcc) MSB first on IO 5041. In general:
+Set 5043 bit 0 high.
+Repeat 8 times
+  Wait for 5041 bit 0 to go high
+  Read 5041 bit 1
+Set 5043 bit 0 low
+
+6B29  ReadCommandA  Exit on c=2 or c=1,b=7,a=7  Watchdog resets counters and reads port again
+6BE8  ReadCommandB  Exit on c=2 or c=1,b=7,a=7  Watchdog exits with b=FF if 3E7 nonzero
+6CB4  ReadCommandC  Exit on c=2                 Watchdog exits with b=FF
+
+  Address         Publics by Value
+
+ 00000000:00000000       byte_0
+ 00000000:0000050A       index
+ 00000000:00006011       LoadTileSet
+ 00000000:0000605B       LoadPalette
+ 00000000:00006090       SetTileBase
+ 00000000:000060D7       DisableSprites
+ 00000000:000060F0       SetSpriteBase
+ 00000000:0000648F       Play0
+ 00000000:00006494       Play1
+ 00000000:00006499       Play2
+ 00000000:0000649E       Play3
+ 00000000:000064A3       Play4
+ 00000000:000064A8       Play5
+ 00000000:000064AD       Play6
+ 00000000:000064B2       Play7
+ 00000000:000064B7       Play8
+ 00000000:000064BC       Play9
+ 00000000:000064C1       PlayA
+ 00000000:000064C6       PlayB
+ 00000000:000064CB       DisableSoundCh0
+ 00000000:000064EA       DisableSoundCh1
+ 00000000:00006509       DisableSoundCh2
+ 00000000:00006528       DisableSoundCh3
+ 00000000:00006547       DisableSoundCh4
+ 00000000:00006566       DisableSoundCh5
+ 00000000:00006585       DisableSoundChAll
+ 00000000:000065AC       WaitForVBIAndSetSpriteBase
+ 00000000:000065B5       WaitForVBIAndSetTileBase
+ 00000000:000065BE       WaitForVBIAndLoadTileSet
+ 00000000:000065C7       JJLoadTileSet
+ 00000000:00006933       DrawBackground
+ 00000000:00006B29       ReadCommandA
+ 00000000:00006BE8       ReadCommandB
+ 00000000:00006CB4       ReadCommandC
+ 00000000:00006D66       DrawText
+ 00000000:00007E80       WaitXTimesForInput
+ 00000000:000099B4       NameScreenLoop
+ 00000000:00009EB0       NameScreenSetChar
+ 00000000:00009F43       NameScreenDeleteChar
+ 00000000:00009FC8       NameScreenCalcCharacter
+ 00000000:0000A02F       NameScreenCalculateCursor
+ 00000000:0000A051       NameScreenUpdateCursor
+ 00000000:0000A112       SelectPlayersLoop
+ 00000000:0000A290       SelectPlayer
+ 00000000:0000A31E       CreatePlayer
+ 00000000:0000A769       ReadAAndWaitForSelect
+ 00000000:0000A821       DrawRoundTitles
+ 00000000:0000AD8A       ReadAAndSetPlayer
+ 00000000:0000ADDF       ReadAAndCheckPlayer
+ 00000000:0000AF1F       ShowQuestion
+ 00000000:0000AF65       ShowChoices
+ 00000000:0000AFC5       ShowHint1
+ 00000000:0000B004       ShowHint2
+ 00000000:0000B033       ShowHint3
+ 00000000:0000B061       ShowAnswer
+ 00000000:0000B0BF       ShowReason
+ 00000000:0000B1C0       ShowScore
+ 00000000:0000C848       MenuUpdate
+ 00000000:0000D10D       WinScreen
+ 00000000:0000D1F1       DoFireworks
+ 00000000:0000E9AE       JLoadTileSet
+ 00000000:0000E9B6       JLoadPalette
+ 00000000:0000E9C2       JSetTileBase
+ 00000000:0000E9C8       JSetSpriteBase
+ 00000000:0000E9CE       JDisableSprites
+ 00000000:0000E9D4       SetGamePage
+ 00000000:0000E9DF       MemoryTest
+ 00000000:0000EA36       SRAMTest
+ 00000000:0000EBA9       nullsub_1
+ 00000000:0000EBAA       WaitForVBI
+ 00000000:0000EBCA       RomTest
+ 00000000:0000EC24       WaitForTimer
+ 00000000:0000ECE9       nullsub_2
+
+*/
+
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 //#include "cpu/m6502/m65c02.h"
