@@ -54,6 +54,10 @@ void roland_r8_state::r8mk2(machine_config &config)
 ROM_START(r8)
 	ROM_REGION(0x20000, "maincpu", 0)
 	ROM_LOAD("roland r-8_2.02_27c010.bin", 0x00000, 0x20000, CRC(45d0f64f) SHA1(55f0831db74cbdeae20cd7f1ff28af27dafba9b9))
+
+	ROM_REGION(0x100000, "wavedata", 0)
+	ROM_LOAD("mn234000rle.ic30", 0x000000, 0x080000, NO_DUMP)
+	ROM_LOAD("mn234000rlf.ic31", 0x080000, 0x080000, NO_DUMP)
 ROM_END
 
 ROM_START(r8m)
@@ -64,6 +68,11 @@ ROM_END
 ROM_START(r8mk2)
 	ROM_REGION(0x20000, "maincpu", 0)
 	ROM_LOAD("roland r8 mkii eprom v1.0.3.bin", 0x00000, 0x20000, CRC(128a9a0c) SHA1(94bd8c76efe270754219f2899f31b62fc4f9060d))
+
+	ROM_REGION(0x180000, "wavedata", 0)
+	ROM_LOAD("upd27c8001eacz-025.ic30", 0x000000, 0x080000, NO_DUMP)
+	ROM_LOAD("upd27c8001eacz-026.ic31", 0x080000, 0x080000, NO_DUMP)
+	ROM_LOAD("upd27c8001eacz-027.ic82", 0x100000, 0x080000, NO_DUMP)
 ROM_END
 
 
