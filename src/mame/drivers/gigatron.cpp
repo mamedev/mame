@@ -41,7 +41,6 @@ private:
 	void data_map(address_map &map);
 	
 	void blinkenlights();
-	uint16_t fetch_outx();
 	
 	uint16_t lights_changed;
 
@@ -50,7 +49,7 @@ private:
 		return machine().rand() & 0xff;
 	}
 
-	required_device<cpu_device> m_maincpu;
+	required_device<gigatron_cpu_device> m_maincpu;
 	required_ioport m_io_inputs;
 };
 
@@ -77,14 +76,9 @@ void gigatron_state::machine_reset()
 {
 }
 
-uint16_t gigatron_state::fetch_outx()
-{
-	return 0;
-}
-
 void gigatron_state::blinkenlights()
 {
-	uint16_t light = fetch_outx() & 0xF;
+	uint16_t light = m_maincpu->fetch_outx() & 0xF;
 	lights_changed ^= light;
 }
 
