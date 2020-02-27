@@ -9217,6 +9217,9 @@ sbishik                         // GX675 (c) 1998 (Korea)
 sbishika                        // GX675 (c) 1998 (Korea)
 dobouchn                        //
 
+@source:bitbangr.cpp
+bitbangr						// (c) 2011 Linus Akesson
+
 @source:bitel.cpp
 feap90                          //
 t3210                           //
