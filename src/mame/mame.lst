@@ -15471,8 +15471,9 @@ dblpointd                       // (c) 1995 Dong Bang Electron
 gumbo                           // (c) 1994 Min Corp.
 msbingo                         // (C) 1994 Min Corp.
 mspuzzle                        // (c) 1994 Min Corp.
+mspuzzlea                       // (c) 1994 Min Corp.
+mspuzzleb                       // (c) 1994 Min Corp.
 mspuzzleg                       // (c) 1994 Min Corp.
-mspuzzlen                       // (c) 1994 Min Corp.
 
 @source:gunbustr.cpp
 gunbustr                        // D27 (c) 1992 Taito Corporation Japan (World)
