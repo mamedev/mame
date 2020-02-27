@@ -53,8 +53,7 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	DECLARE_READ32_MEMBER(eeprom_r);
-	DECLARE_WRITE32_MEMBER(eeprom_set_w);
-	DECLARE_WRITE32_MEMBER(eeprom_clear_w);
+	DECLARE_WRITE32_MEMBER(eeprom_w);
 
 	DECLARE_READ32_MEMBER(cpld_r);
 	DECLARE_WRITE32_MEMBER(cpld_w);
