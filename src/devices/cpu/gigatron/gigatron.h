@@ -25,7 +25,8 @@ class gigatron_cpu_device :  public cpu_device
 public:
 	// construction/destruction
 	gigatron_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
+	auto outx_cb() { return m_outx_cb.bind(); }
+	
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -76,6 +77,8 @@ private:
 	int m_icount;
 
 	void gigatron_illegal();
+	
+	devcb_write8 m_outx_cb;
 };
 
 
