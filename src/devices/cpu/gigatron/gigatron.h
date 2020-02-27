@@ -25,7 +25,7 @@ class gigatron_cpu_device :  public cpu_device
 public:
 	// construction/destruction
 	gigatron_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	uint16_t read_outx() const { return m_outx; }
+	uint16_t fetch_outx() { return m_outx; }
 	
 protected:
 	// device-level overrides
@@ -85,4 +85,5 @@ DECLARE_DEVICE_TYPE(GTRON, gigatron_cpu_device)
 
 
 #endif // MAME_CPU_GTRON_H
+
 
