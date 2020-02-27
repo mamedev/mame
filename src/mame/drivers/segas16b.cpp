@@ -1528,6 +1528,33 @@ READ16_MEMBER( segas16b_state::hwchamp_custom_io_r )
 					if (!machine().side_effects_disabled())
 						m_hwc_input_value <<= 1;
 					return result;
+				case 0x30/2: // c43035
+					/*
+						Signals, affects blocking and stance (both fists down, both fists up, up/down or down/up)
+						According to service mode:
+						---- --00 no status for right trigger
+						---- --01 down
+						---- --10 up
+						---- --11 both (signals) in red, mustn't occur most likely
+						---- xx-- same applied to left trigger
+						According to the flyer, cabinet has two sticks that can be moved up/down and/or towards the cabinet,
+						simulating punch motions.
+					*/
+					u8 left = m_hwc_left_limit->read();
+					u8 right = m_hwc_right_limit->read();
+					result = 0xf0;
+
+					// TODO: these limits are arbitrary.
+					if (left < 0x40)
+						result |= 1 << 3;
+					if (left > 0xc0)
+						result |= 1 << 2;
+					if (right < 0x40)
+						result |= 1 << 1;
+					if (right > 0xc0)
+						result |= 1 << 0;
+										
+					return result;
 			}
 			break;
 	}
@@ -1547,13 +1574,14 @@ WRITE16_MEMBER( segas16b_state::hwchamp_custom_io_w )
 						case 0:
 							m_hwc_input_value = m_hwc_monitor->read();
 							break;
-
+						
+						// TODO: order of these two flipped when returning a status of 0xf0 instead of open bus in r 0x30?
 						case 1:
-							m_hwc_input_value = m_hwc_left->read();
+							m_hwc_input_value = m_hwc_right->read();
 							break;
 
 						case 2:
-							m_hwc_input_value = m_hwc_right->read();
+							m_hwc_input_value = m_hwc_left->read();
 							break;
 
 						default:
@@ -2804,6 +2832,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( hwchamp )
 	PORT_INCLUDE( system16b_generic )
 
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_MODIFY("P1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -2833,13 +2864,19 @@ static INPUT_PORTS_START( hwchamp )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
 	PORT_START("MONITOR")   // monitor
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(70) PORT_KEYDELTA(32)
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(70) PORT_KEYDELTA(32) PORT_NAME("Monitor X")
 
 	PORT_START("RIGHT")     // right handle
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(32)
+	PORT_BIT( 0xff, 0x20, IPT_AD_STICK_Z ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(70) PORT_KEYDELTA(32) PORT_PLAYER(2) PORT_REVERSE PORT_NAME("Right Handle")
 
 	PORT_START("LEFT")      // left handle
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(70) PORT_KEYDELTA(32)
+	PORT_BIT( 0xff, 0x20, IPT_AD_STICK_Z ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(70) PORT_KEYDELTA(32) PORT_PLAYER(1) PORT_REVERSE PORT_NAME("Left Handle")
+
+	PORT_START("RIGHT_LIMIT")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(32) PORT_PLAYER(2) PORT_NAME("Right Y Limit")
+	
+	PORT_START("LEFT_LIMIT")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(32) PORT_PLAYER(1) PORT_NAME("Left Y Limit")
 INPUT_PORTS_END
 
 
