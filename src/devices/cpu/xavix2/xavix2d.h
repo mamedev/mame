@@ -3,8 +3,8 @@
 
 // Xavix2 disassembler
 
-#ifndef MAME_CPU_XAVIX2_XAVIX2DASM_H
-#define MAME_CPU_XAVIX2_XAVIX2DASM_H
+#ifndef MAME_CPU_XAVIX2_XAVIX2D_H
+#define MAME_CPU_XAVIX2_XAVIX2D_H
 
 #pragma once
 
@@ -50,5 +50,4 @@ private:
 	std::string rel8();
 };
 
-#endif
-
+#endif // MAME_CPU_XAVIX2_XAVIX2D_H
