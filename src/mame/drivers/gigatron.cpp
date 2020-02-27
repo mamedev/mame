@@ -40,14 +40,14 @@ private:
 	void prog_map(address_map &map);
 	void data_map(address_map &map);
 	
-	void blinkenlights();
-	
 	uint16_t lights_changed;
 
 	DECLARE_READ8_MEMBER(gigatron_random)
 	{
 		return machine().rand() & 0xff;
 	}
+	
+	DECLARE_WRITE8_MEMBER(blinkenlights);
 
 	required_device<gigatron_cpu_device> m_maincpu;
 	required_ioport m_io_inputs;
@@ -76,9 +76,9 @@ void gigatron_state::machine_reset()
 {
 }
 
-void gigatron_state::blinkenlights()
+WRITE8_MEMBER(gigatron_state::blinkenlights)
 {
-	uint16_t light = m_maincpu->fetch_outx() & 0xF;
+	uint16_t light = data & 0xF;
 	lights_changed ^= light;
 }
 
@@ -99,6 +99,7 @@ void gigatron_state::gigatron(machine_config &config)
 	GTRON(config, m_maincpu, MAIN_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gigatron_state::prog_map);
 	m_maincpu->set_addrmap(AS_DATA, &gigatron_state::data_map);
+	m_maincpu->outx_cb().set(FUNC(gigatron_state::blinkenlights));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
