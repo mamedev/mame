@@ -5,6 +5,7 @@
 // 3dfx Voodoo Graphics acceleration using DirectX 11
 //
 
+#include "emu.h"
 #include "voodoo_gpu.h"
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -1005,7 +1006,7 @@ void voodoo_gpu::UpdateAlphaTest()
 
 void voodoo_gpu::UpdateColorCtrl()
 {
-	Color_Ctrl_Struct newCtrl;
+	//Color_Ctrl_Struct newCtrl;
 	float r, g, b, a;
 
 	a = float((m_regColor0 >> 24) & 0xff) / 255.0f;
