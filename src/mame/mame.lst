@@ -33707,6 +33707,10 @@ polyplay                        //
 polyplay2                       //
 polyplay2c                      //
 
+@source:polysix.cpp
+polysix                         //
+poly61                          //
+
 @source:pong.cpp
 breakout                        // (c) 1976 Atari
 pong                            // (c) 1972 Atari
